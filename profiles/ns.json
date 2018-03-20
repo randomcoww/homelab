@@ -1,0 +1,5 @@
+{
+  "id": "ns",
+  "name": "General network services - non DHCP",
+  "ignition_id": "ns.yaml"
+}

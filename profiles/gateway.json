@@ -1,0 +1,5 @@
+{
+  "id": "gateway",
+  "name": "Network gateway - non DHCP",
+  "ignition_id": "gateway.yaml"
+}
