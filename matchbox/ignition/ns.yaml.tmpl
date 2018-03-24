@@ -66,6 +66,18 @@ storage:
       contents:
         inline: |
           fs.inotify.max_user_watches=16184
+    - path: /etc/ssl/certs/internal-ca.pem
+      filesystem: root
+      contents:
+        inline: "{{.internal_ca}}"
+    - path: /etc/ssl/certs/internal-key.pem
+      filesystem: root
+      contents:
+        inline: "{{.internal_key}}"
+    - path: /etc/ssl/certs/internal.pem
+      filesystem: root
+      contents:
+        inline: "{{.internal_cert}}"
 passwd:
   users:
   - name: {{.default_user}}

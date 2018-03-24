@@ -9,7 +9,6 @@ ssh_authorized_key = "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQCz0pddhkPMJy1DrfdtzE
 
 cluster_dns_ip = "10.3.0.10"
 cluster_domain = "cluster.local"
-cidr_network   = "10.244.0.0/16"
 
 flannel_conf = <<EOF
 {
@@ -48,3 +47,38 @@ contexts:
     user: kube
 current-context: kube-context
 EOF
+
+
+# [Service]
+# ExecStartPre=/usr/bin/mkdir -p /var/log/containers
+# ExecStartPre=-/usr/bin/rkt rm --uuid-file=/var/run/matchbox-pod.uuid
+# ExecStart=/usr/bin/rkt run \
+#   --insecure-options=image \
+#   --uuid-file-save=/var/run/matchbox-pod.uuid \
+#   \
+#   --volume dns,kind=host,source=/etc/resolv.conf \
+#   --volume etc-ssl-certs,kind=host,source=/etc/ssl/certs,readOnly=true \
+#   --volume usr-share-certs,kind=host,source=/etc/pki/ca-trust,readOnly=true \
+#   --volume matchbox-data,kind=host,source=/data/matchbox \
+#   \
+#   --mount volume=dns,target=/etc/resolv.conf \
+#   --mount volume=etc-ssl-certs,target=/etc/ssl/certs \
+#   --mount volume=usr-share-certs,target=/etc/pki/ca-trust \
+#   --mount volume=matchbox-data,target=/data/matchbox \
+#   \
+#   --hosts-entry host \
+#   --stage1-from-dir=stage1-fly.aci docker://{{.matchbox_image}} \
+#   --exec=/matchbox -- \
+#   -address=0.0.0.0:48080 \
+#   -rpc-address=0.0.0.0:48081 \
+#   -ca-file=/etc/ssl/certs/matchbox-ca.pem \
+#   -cert-file=/etc/ssl/certs/matchbox.pem \
+#   -key-file=/etc/ssl/certs/matchbox-key.pem \
+#   -data-path=/data/matchbox \
+#   -assets-path=/data/matchbox/assets \
+# ExecStop=-/usr/bin/rkt stop --uuid-file=/var/run/matchbox-pod.uuid
+# Restart=always
+# RestartSec=10
+#
+# [Install]
+# WantedBy=multi-user.target

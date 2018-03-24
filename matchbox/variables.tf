@@ -29,10 +29,6 @@ variable "cluster_domain" {
   type        = "string"
 }
 
-variable "cidr_network" {
-  type        = "string"
-}
-
 variable "gateway_ip" {
   type        = "string"
 }
