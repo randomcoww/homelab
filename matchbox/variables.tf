@@ -13,11 +13,23 @@ variable "ssh_authorized_key" {
   description = "SSH public key to set as an authorized_key on machines"
 }
 
+variable "hyperkube_image" {
+  type        = "string"
+}
+
 variable "default_user" {
   type        = "string"
 }
 
-variable "hyperkube_image" {
+variable "cluster_dns_ip" {
+  type        = "string"
+}
+
+variable "cluster_domain" {
+  type        = "string"
+}
+
+variable "cidr_network" {
   type        = "string"
 }
 

@@ -92,9 +92,9 @@ resource "matchbox_group" "vmhost1" {
     gateway_ip  = "${var.gateway_ip}"
     dns_ip      = "${var.dns_ip}"
     default_user   = "${var.default_user}"
-    cluster_dns_ip = "10.3.0.10"
-    cluster_domain = "cluster.local"
-    cidr_network   = "10.244.0.0/16"
+    cluster_dns_ip = "${var.cluster_dns_ip}"
+    cluster_domain = "${var.cluster_domain}"
+    cidr_network   = "${var.cidr_network}"
     hyperkube_image = "${var.hyperkube_image}"
     ssh_authorized_key = "${var.ssh_authorized_key}"
 
