@@ -9,11 +9,11 @@ timezone --utc Etc/UTC
 rootpw --lock password
 firewall --disabled
 selinux --disabled
-network --hostname=vm1
+network --hostname={{.name}}
 
 ## user
 user --name={{.default_user}} --password=password --plaintext --groups wheel,libvirt
-sshkey --username=fedora "{{.ssh_authorized_key}}"
+sshkey --username={{.default_user}} "{{.ssh_authorized_key}}"
 
 ## disk
 zerombr
