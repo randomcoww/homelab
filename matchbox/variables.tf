@@ -13,6 +13,10 @@ variable "ssh_authorized_key" {
   description = "SSH public key to set as an authorized_key on machines"
 }
 
+variable "default_user" {
+  type        = "string"
+}
+
 variable "hyperkube_image" {
   type        = "string"
 }
@@ -22,5 +26,17 @@ variable "gateway_ip" {
 }
 
 variable "dns_ip" {
+  type        = "string"
+}
+
+variable "flannel_conf" {
+  type        = "string"
+}
+
+variable "cni_conf" {
+  type        = "string"
+}
+
+variable "kubeconfig_local" {
   type        = "string"
 }

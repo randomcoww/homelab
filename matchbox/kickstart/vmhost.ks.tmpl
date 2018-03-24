@@ -1,0 +1,307 @@
+install
+text
+shutdown
+skipx
+url --mirrorlist=http://mirrors.fedoraproject.org/mirrorlist?repo=fedora-$releasever&arch=$basearch
+lang en_US.UTF-8
+keyboard us
+timezone --utc Etc/UTC
+rootpw --lock password
+firewall --disabled
+selinux --disabled
+network --hostname=vm1
+
+## user
+user --name={{.default_user}} --password=password --plaintext --groups wheel,libvirt
+sshkey --username=fedora "{{.ssh_authorized_key}}"
+
+## disk
+zerombr
+autopart --type=plain
+clearpart --all --initlabel
+bootloader --timeout=1 --append="console=tty0 console=ttyS1,115200n8 elevator=noop intel_iommu=on iommu=pt cgroup_enable=memory"
+
+## packages
+%packages --excludeWeakdeps --excludedocs
+@core
+systemd-udev
+which
+ipmitool
+libvirt-daemon-kvm
+libvirt-client
+qemu-kvm
+openssh
+gnupg
+ksm
+nfs-utils
+pciutils
+screen
+dnf-automatic
+lm_sensors
+rkt
+docker
+ca-certificates
+wget
+-NetworkManager
+-plymouth
+-dhclient
+-sendmail
+-ppc64-utils
+%end
+
+##
+## post config
+##
+
+%post --erroronfail
+
+## install ZOL
+dnf -y install http://download.zfsonlinux.org/fedora/zfs-release$(rpm -E %dist).noarch.rpm && \
+gpg --quiet --with-fingerprint /etc/pki/rpm-gpg/RPM-GPG-KEY-zfsonlinux && \
+dnf -y install "kernel-devel-uname-r == $(uname -r)" && \
+dnf -y swap zfs-fuse zfs
+
+
+##
+## systemd units
+##
+
+## base directories
+mkdir -p /var/lib/kubelet /etc/kubernetes /etc/kubernetes/cni/net.d /etc/kube-flannel
+
+cat <<EOF > /etc/systemd/system/kubelet.service
+[Service]
+ExecStartPre=/usr/bin/mkdir -p /var/log/containers
+ExecStartPre=-/usr/bin/rkt rm --uuid-file=/var/run/kubelet-pod.uuid
+ExecStart=/usr/bin/rkt run \
+  --insecure-options=image \
+  --uuid-file-save=/var/run/kubelet-pod.uuid \
+  --volume dns,kind=host,source=/etc/resolv.conf \
+  --mount volume=dns,target=/etc/resolv.conf \
+  --volume etc-kubernetes,kind=host,source=/etc/kubernetes,readOnly=false \
+  --volume etc-ssl-certs,kind=host,source=/etc/ssl/certs,readOnly=true \
+  --volume usr-share-certs,kind=host,source=/etc/pki/ca-trust,readOnly=true \
+  --volume var-lib-docker,kind=host,source=/var/lib/docker,readOnly=false \
+  --volume var-lib-kubelet,kind=host,source=/var/lib/kubelet,readOnly=false,recursive=true \
+  --volume var-log,kind=host,source=/var/log,readOnly=false \
+  --volume os-release,kind=host,source=/usr/lib/os-release,readOnly=true \
+  --volume run,kind=host,source=/run,readOnly=false \
+  --volume lib-modules,kind=host,source=/lib/modules,readOnly=true \
+  --mount volume=etc-kubernetes,target=/etc/kubernetes \
+  --mount volume=etc-ssl-certs,target=/etc/ssl/certs \
+  --mount volume=usr-share-certs,target=/etc/pki/ca-trust \
+  --mount volume=var-lib-docker,target=/var/lib/docker \
+  --mount volume=var-lib-kubelet,target=/var/lib/kubelet \
+  --mount volume=var-log,target=/var/log \
+  --mount volume=os-release,target=/etc/os-release \
+  --mount volume=run,target=/run \
+  --mount volume=lib-modules,target=/lib/modules \
+  --hosts-entry host \
+  --stage1-from-dir=stage1-fly.aci docker://{{.hyperkube_image}} \
+  --exec=/kubelet -- \
+  --register-node=true \
+  --cni-conf-dir=/etc/kubernetes/cni/net.d \
+  --network-plugin=cni \
+  --container-runtime=docker \
+  --allow-privileged=true \
+  --manifest-url=https://raw.githubusercontent.com/randomcoww/environment-config/master/manifests/{{.name}} \
+  --hostname-override={{.store_ip}} \
+  --cluster_dns={{.cluster_dns_ip}} \
+  --cluster_domain={{.cluster_domain}} \
+  --kubeconfig=/var/lib/kubelet/client_kubeconfig \
+  --docker-disable-shared-pid=false \
+  --image-gc-high-threshold=0 \
+  --image-gc-low-threshold=0 \
+  --fail-swap-on=false \
+  --cgroup-driver=systemd
+ExecStop=-/usr/bin/rkt stop --uuid-file=/var/run/kubelet-pod.uuid
+Restart=always
+RestartSec=10
+
+[Install]
+WantedBy=multi-user.target
+EOF
+
+cat <<EOF > /etc/systemd/system/fancontrol.service
+[Unit]
+Description=Fan Control
+After=ipmievd.service
+
+[Service]
+Type=oneshot
+ExecStart=/usr/bin/ipmitool raw 0x30 0x70 0x66 0x01 0x00 0x10
+ExecStart=/usr/bin/ipmitool raw 0x30 0x70 0x66 0x01 0x01 0x10
+
+[Install]
+WantedBy=multi-user.target
+EOF
+
+
+##
+## networkd
+##
+
+## enable systemd-resolve
+ln -sf /run/systemd/resolve/resolv.conf /etc/resolv.conf
+
+## write all configs
+cat <<EOF > /etc/systemd/resolved.conf
+[Resolve]
+FallbackDNS=
+DNSStubListener=no
+EOF
+
+## wan
+cat <<EOF > /etc/systemd/network/eno2.network
+[Match]
+Name=eno2
+
+[Network]
+LinkLocalAddressing=no
+DHCP=no
+EOF
+
+## default network pair
+cat <<EOF > /etc/systemd/network/ens1f0.network
+[Match]
+Name=ens1f0
+
+[Network]
+LinkLocalAddressing=no
+DHCP=no
+MACVLAN=store_host
+EOF
+
+cat <<EOF > /etc/systemd/network/store_host.netdev
+[NetDev]
+Name=store_host
+Kind=macvlan
+
+[MACVLAN]
+Mode=bridge
+EOF
+
+cat <<EOF > /etc/systemd/network/store_host.network
+[Match]
+Name=store_host
+
+[Network]
+LinkLocalAddressing=no
+DHCP=no
+DNS={{.dns_ip}}
+DNS=8.8.8.8
+
+[Address]
+Address={{.store_ip}}
+
+[Route]
+Gateway={{.gateway_ip}}
+
+## lan network pairs
+
+cat <<EOF > /etc/systemd/network/ens1f1.network
+[Match]
+Name=ens1f1
+
+[Network]
+LinkLocalAddressing=no
+DHCP=no
+MACVLAN=lan_host
+EOF
+
+cat <<EOF > /etc/systemd/network/lan_host.netdev
+[NetDev]
+Name=lan_host
+Kind=macvlan
+
+[MACVLAN]
+Mode=bridge
+EOF
+
+cat <<EOF > /etc/systemd/network/lan_host.network
+[Match]
+Name=lan_host
+
+[Network]
+LinkLocalAddressing=no
+DHCP=no
+
+[Address]
+Address={{.lan_ip}}
+EOF
+
+
+##
+## populate files
+##
+
+## populate referenced files
+
+cat <<EOF > /var/lib/kubelet/client_kubeconfig
+{{.kubeconfig}}
+EOF
+
+cat <<EOF > /etc/kube-flannel/net-conf.json
+{{.flannel_conf}}
+EOF
+
+cat <<EOF > /etc/kubernetes/cni/net.d/10-flannel.conf
+{{.cni_conf}}
+EOF
+
+cat <<EOF > /etc/modprobe.d/local.conf
+options kvm ignore_msrs=1
+options kvm-intel nested=1
+options igb max_vfs=16
+options ixgbe max_vfs=16
+EOF
+
+cat <<EOF > /etc/dnf/automatic.conf
+[commands]
+apply_updates=True
+upgrade_type=default
+
+[emitters]
+emit_via=motd
+EOF
+
+cat <<EOF > /etc/ssh/sshd_config
+Subsystem sftp internal-sftp
+PermitRootLogin no
+PasswordAuthentication no
+ChallengeResponseAuthentication no
+EOF
+
+
+##
+## enable services
+##
+
+systemctl enable systemd-networkd systemd-resolved ksm ksmtuned fancontrol zfs-import-cache zfs-import-scan zfs-mount zfs-share zfs-zed zfs.target nfs-server dnf-automatic-download.timer chronyd docker kubelet
+
+
+##
+## grub
+##
+
+cat <<EOF >> /etc/default/grub
+GRUB_TERMINAL="console serial"
+GRUB_SERIAL_COMMAND="serial --unit=1 --speed=115200 --word=8 --parity=no --stop=1"
+EOF
+
+## regenerate grub config
+grub2-mkconfig -o /boot/grub2/grub.cfg
+
+
+##
+## cleanup
+##
+
+dnf -y autoremove
+dnf -y clean all
+
+## remove machineid in case of reuse - may not be needed?
+echo -n > /var/lib/dbus/machine-id
+echo -n > /etc/machine-id
+
+%end

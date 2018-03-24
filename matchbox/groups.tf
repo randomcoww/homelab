@@ -31,6 +31,7 @@ resource "matchbox_group" "ns2" {
     store_ip    = "192.168.126.220/23"
     gateway_ip  = "${var.gateway_ip}"
     dns_ip      = "127.0.0.1"
+    default_user   = "${var.default_user}"
     hyperkube_image = "${var.hyperkube_image}"
     ssh_authorized_key = "${var.ssh_authorized_key}"
   }
@@ -50,6 +51,7 @@ resource "matchbox_group" "gateway1" {
     store_ip    = "192.168.126.217/23"
     gateway_ip  = "${var.gateway_ip}"
     dns_ip      = "${var.dns_ip}"
+    default_user   = "${var.default_user}"
     hyperkube_image = "${var.hyperkube_image}"
     ssh_authorized_key = "${var.ssh_authorized_key}"
   }
@@ -69,7 +71,35 @@ resource "matchbox_group" "gateway2" {
     store_ip    = "192.168.126.218/23"
     gateway_ip  = "${var.gateway_ip}"
     dns_ip      = "${var.dns_ip}"
+    default_user   = "${var.default_user}"
     hyperkube_image = "${var.hyperkube_image}"
     ssh_authorized_key = "${var.ssh_authorized_key}"
+  }
+}
+
+resource "matchbox_group" "vmhost1" {
+  name    = "vmhost1"
+  profile = "${matchbox_profile.vmhost.name}"
+
+  selector {
+    mac = "d6:3d:1f:7b:0b:d0"
+  }
+
+  metadata {
+    name        = "vmhost1"
+    lan_ip      = "192.168.62.251/23"
+    store_ip    = "192.168.126.251/23"
+    gateway_ip  = "${var.gateway_ip}"
+    dns_ip      = "${var.dns_ip}"
+    default_user   = "${var.default_user}"
+    cluster_dns_ip = "10.3.0.10"
+    cluster_domain = "cluster.local"
+    cidr_network   = "10.244.0.0/16"
+    hyperkube_image = "${var.hyperkube_image}"
+    ssh_authorized_key = "${var.ssh_authorized_key}"
+
+    flannel_conf =  "${chomp(var.flannel_conf)}"
+    cni_conf =  "${chomp(var.cni_conf)}"
+    kubeconfig =  "${chomp(var.kubeconfig_local)}"
   }
 }

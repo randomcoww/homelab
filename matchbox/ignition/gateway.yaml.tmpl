@@ -82,6 +82,6 @@ storage:
           fs.inotify.max_user_watches=16184
 passwd:
   users:
-  - name: core
+  - name: {{.default_user}}
     ssh_authorized_keys:
       - {{.ssh_authorized_key}}
