@@ -123,6 +123,16 @@ WantedBy=multi-user.target
 EOF
 
 cat <<EOF > /etc/systemd/system/fancontrol.service
+# ipmi fan control:
+#
+# ommited full speed:
+# ExecStartPre=/usr/bin/ipmitool raw 0x30 0x45 0x01 0x01
+#
+# setting a specific duty cycle:
+# fan control 0x30 0x70 0x66
+# get 0x00, set 0x01
+# zone FAN 1,2,.. 0x00, FAN A,B,.. 0x01
+# duty cycle 0x00-0x64
 [Unit]
 Description=Fan Control
 After=ipmievd.service
