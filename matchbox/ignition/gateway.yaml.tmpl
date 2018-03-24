@@ -67,6 +67,13 @@ systemd:
         RestartSec=10
         [Install]
         WantedBy=multi-user.target
+    - name: docker.service
+      enabled: true
+      dropins:
+        - name: iptables.conf
+          contents: |
+            [Service]
+            Environment=DOCKER_OPTS=--iptables=false
 storage:
   files:
     - path: /etc/hostname
@@ -75,6 +82,13 @@ storage:
       contents:
         inline:
           {{.name}}
+    - path: /etc/sysctl.d/ipforward.conf
+      filesystem: root
+      mode: 0644
+      contents:
+        inline: |
+          net.ipv4.ip_forward=1
+          net.ipv4.ip_nonlocal_bind=1
     - path: /etc/sysctl.d/max-user-watches.conf
       filesystem: root
       contents:
