@@ -38,6 +38,7 @@ pciutils
 screen
 dnf-automatic
 lm_sensors
+rsyslog
 rkt
 docker
 ca-certificates
@@ -134,6 +135,47 @@ ExecStart=/usr/bin/rkt run \
   --fail-swap-on=false \
   --cgroup-driver=systemd
 ExecStop=-/usr/bin/rkt stop --uuid-file=/var/run/kubelet-pod.uuid
+Restart=always
+RestartSec=10
+
+[Install]
+WantedBy=multi-user.target
+EOF
+
+## vault
+mkdir -p /etc/vault
+
+cat <<EOF > /etc/vault/config.json
+{{.vault_config}}
+EOF
+
+cat <<EOF > /etc/systemd/system/vault.service
+[Service]
+ExecStartPre=/usr/bin/mkdir -p /var/log/containers
+ExecStartPre=-/usr/bin/rkt rm --uuid-file=/var/run/vault-pod.uuid
+ExecStart=/usr/bin/rkt run \
+  --insecure-options=image \
+  --uuid-file-save=/var/run/vault-pod.uuid \
+  \
+  --volume dns,kind=host,source=/etc/resolv.conf \
+  --volume etc-ssl-certs,kind=host,source=/etc/ssl/certs,readOnly=true \
+  --volume usr-share-certs,kind=host,source=/etc/pki/ca-trust,readOnly=true \
+  --volume volume-vault-logs,kind=host,source=/var/log \
+  --volume volume-vault-file,kind=host,source=/data/vault \
+  --volume volume-vault-config,kind=host,source=/etc/vault \
+  \
+  --mount volume=dns,target=/etc/resolv.conf \
+  --mount volume=etc-ssl-certs,target=/etc/ssl/certs \
+  --mount volume=usr-share-certs,target=/etc/pki/ca-trust \
+  --mount volume=volume-vault-logs,target=/vault/logs \
+  --mount volume=volume-vault-file,target=/vault/file \
+  --mount volume=volume-vault-config,target=/vault/config \
+  \
+  --hosts-entry host \
+  --stage1-from-dir=stage1-fly.aci docker://{{.vault_image}} \
+  --exec=/usr/local/bin/docker-entrypoint.sh -- \
+  server
+ExecStop=-/usr/bin/rkt stop --uuid-file=/var/run/vault-pod.uuid
 Restart=always
 RestartSec=10
 

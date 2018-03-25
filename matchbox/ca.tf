@@ -9,10 +9,10 @@ resource "tls_self_signed_cert" "root" {
   private_key_pem = "${tls_private_key.root.private_key_pem}"
 
   validity_period_hours = 43800
-  early_renewal_hours   = 8760
+  # early_renewal_hours   = 8760
   is_ca_certificate = true
   allowed_uses = ["cert_signing"]
   subject {
-    common_name = "CA"
+    common_name = "internal"
   }
 }

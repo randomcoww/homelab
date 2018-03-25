@@ -7,9 +7,13 @@ resource "tls_private_key" "instance" {
 resource "tls_cert_request" "instance" {
   key_algorithm   = "${tls_private_key.instance.algorithm}"
   private_key_pem = "${tls_private_key.instance.private_key_pem}"
+
   subject {
     common_name  = "${var.common_name}"
   }
+
+  ip_addresses = "${var.ip_addresses}"
+  dns_names = "${var.dns_names}"
 }
 
 resource "tls_locally_signed_cert" "instance" {
@@ -19,7 +23,7 @@ resource "tls_locally_signed_cert" "instance" {
   ca_cert_pem        = "${var.ca_cert_pem}"
 
   validity_period_hours = 43800
-  early_renewal_hours   = 8760
+  # early_renewal_hours   = 8760
   allowed_uses = [
     "key_encipherment",
     "digital_signature",

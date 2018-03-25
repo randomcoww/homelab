@@ -45,6 +45,13 @@ module "ns1_cert" {
   ca_key_algorithm   = "${tls_private_key.root.algorithm}"
   ca_private_key_pem = "${tls_private_key.root.private_key_pem}"
   ca_cert_pem        = "${tls_self_signed_cert.root.cert_pem}"
+  ip_addresses = [
+    "192.168.62.219",
+    "192.168.126.219"
+  ]
+  dns_names = [
+    "*.internal"
+  ]
 }
 
 resource "matchbox_group" "ns1" {
@@ -77,6 +84,13 @@ module "ns2_cert" {
   ca_key_algorithm   = "${tls_private_key.root.algorithm}"
   ca_private_key_pem = "${tls_private_key.root.private_key_pem}"
   ca_cert_pem        = "${tls_self_signed_cert.root.cert_pem}"
+  ip_addresses = [
+    "192.168.62.220",
+    "192.168.126.220"
+  ]
+  dns_names = [
+    "*.internal"
+  ]
 }
 
 resource "matchbox_group" "ns2" {
@@ -110,6 +124,13 @@ module "vmhost1_cert" {
   ca_key_algorithm   = "${tls_private_key.root.algorithm}"
   ca_private_key_pem = "${tls_private_key.root.private_key_pem}"
   ca_cert_pem        = "${tls_self_signed_cert.root.cert_pem}"
+  ip_addresses = [
+    "192.168.62.251",
+    "192.168.126.251"
+  ]
+  dns_names = [
+    "*.internal"
+  ]
 }
 
 resource "matchbox_group" "vmhost1" {
