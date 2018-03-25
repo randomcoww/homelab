@@ -8,6 +8,7 @@ module "pki_etcd" {
   "max_ttl": "720h"
 }
 EOT
+  ca_cert_pem = "${tls_self_signed_cert.root.cert_pem}"
 }
 
 module "pki_apiserver" {
@@ -20,4 +21,5 @@ module "pki_apiserver" {
   "max_ttl": "720h"
 }
 EOT
+  ca_cert_pem = "${tls_self_signed_cert.root.cert_pem}"
 }

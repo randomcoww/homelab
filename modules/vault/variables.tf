@@ -9,3 +9,7 @@ variable "role" {
 variable "csr_options" {
   default     = "{}"
 }
+
+variable "ca_cert_pem" {
+  default     = ""
+}

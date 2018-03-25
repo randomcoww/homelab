@@ -5,6 +5,9 @@
 # vault write $CLUSTER_ID/pki/$COMPONENT/root/generate/internal \
 # common_name=$CLUSTER_ID/pki/$COMPONENT ttl=87600h
 
+## enable pki path
+## needed but doesn't seem to support rerunning from terraform
+##
 # resource "vault_mount" "pki" {
 #   path = "${var.pki_path}"
 #   type = "pki"
@@ -67,11 +70,21 @@ resource "vault_generic_secret" "role_policy" {
 EOT
 }
 
-# vault token-create \
-#   -policy="$CLUSTER_ID/pki/etcd/member" \
-#   -role="k8s-$CLUSTER"
-
-# resource "vault_auth_backend" "example" {
-#   type = "token"
-#   path = "create/kube"
+## using TLS auth backend - enable cert
+## needed but doesn't seem to support rerunning
+##
+# resource "vault_auth_backend" "tls_auth_enable" {
+#   type = "cert"
 # }
+
+resource "vault_generic_secret" "tls_auth" {
+  path = "auth/cert/certs/${var.role}"
+  # disable_read = true
+  data_json = <<EOT
+{
+  "display_name": "${var.role}",
+  "policies": "${vault_policy.policy.name}",
+  "certificate": "${replace(var.ca_cert_pem, "\n", "\\n")}"
+}
+EOT
+}
