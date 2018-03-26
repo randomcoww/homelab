@@ -8,8 +8,9 @@ resource "matchbox_group" "gateway1" {
 
   metadata {
     name        = "gateway1"
-    lan_ip      = "192.168.62.217/23"
-    store_ip    = "192.168.126.217/23"
+    lan_ip      = "192.168.62.217"
+    store_ip    = "192.168.126.217"
+    netmask     = "23"
     gateway_ip  = "${var.gateway_ip}"
     dns_ip      = "${var.dns_ip}"
     default_user    = "${var.default_user}"
@@ -28,8 +29,9 @@ resource "matchbox_group" "gateway2" {
 
   metadata {
     name        = "gateway2"
-    lan_ip      = "192.168.62.218/23"
-    store_ip    = "192.168.126.218/23"
+    lan_ip      = "192.168.62.218"
+    store_ip    = "192.168.126.218"
+    netmask     = "23"
     gateway_ip  = "${var.gateway_ip}"
     dns_ip      = "${var.dns_ip}"
     default_user    = "${var.default_user}"
@@ -46,11 +48,13 @@ module "ns1_cert" {
   ca_private_key_pem = "${tls_private_key.root.private_key_pem}"
   ca_cert_pem        = "${tls_self_signed_cert.root.cert_pem}"
   ip_addresses = [
+    "127.0.0.1",
     "192.168.62.219",
     "192.168.126.219"
   ]
   dns_names = [
-    "*.internal"
+    "*.svc.internal",
+    "*.host.internal"
   ]
 }
 
@@ -64,8 +68,9 @@ resource "matchbox_group" "ns1" {
 
   metadata {
     name        = "ns1"
-    lan_ip      = "192.168.62.219/23"
-    store_ip    = "192.168.126.219/23"
+    lan_ip      = "192.168.62.219"
+    store_ip    = "192.168.126.219"
+    netmask     = "23"
     gateway_ip  = "${var.gateway_ip}"
     dns_ip      = "127.0.0.1"
     hyperkube_image = "${var.hyperkube_image}"
@@ -74,6 +79,8 @@ resource "matchbox_group" "ns1" {
     internal_ca   = "${replace(tls_self_signed_cert.root.cert_pem, "\n", "\\n")}"
     internal_key  = "${replace(module.ns1_cert.private_key_pem, "\n", "\\n")}"
     internal_cert = "${replace(module.ns1_cert.cert_pem, "\n", "\\n")}"
+
+    cert_base_path = "/etc/ssl/certs/internal"
   }
 }
 
@@ -85,11 +92,13 @@ module "ns2_cert" {
   ca_private_key_pem = "${tls_private_key.root.private_key_pem}"
   ca_cert_pem        = "${tls_self_signed_cert.root.cert_pem}"
   ip_addresses = [
+    "127.0.0.1",
     "192.168.62.220",
     "192.168.126.220"
   ]
   dns_names = [
-    "*.internal"
+    "*.svc.internal",
+    "*.host.internal"
   ]
 }
 
@@ -103,8 +112,9 @@ resource "matchbox_group" "ns2" {
 
   metadata {
     name        = "ns2"
-    lan_ip      = "192.168.62.220/23"
-    store_ip    = "192.168.126.220/23"
+    lan_ip      = "192.168.62.220"
+    store_ip    = "192.168.126.220"
+    netmask     = "23"
     gateway_ip  = "${var.gateway_ip}"
     dns_ip      = "127.0.0.1"
     default_user   = "${var.default_user}"
@@ -114,6 +124,8 @@ resource "matchbox_group" "ns2" {
     internal_ca   = "${replace(tls_self_signed_cert.root.cert_pem, "\n", "\\n")}"
     internal_key  = "${replace(module.ns2_cert.private_key_pem, "\n", "\\n")}"
     internal_cert = "${replace(module.ns2_cert.cert_pem, "\n", "\\n")}"
+
+    cert_base_path = "/etc/ssl/certs/internal"
   }
 }
 
@@ -125,11 +137,13 @@ module "vmhost1_cert" {
   ca_private_key_pem = "${tls_private_key.root.private_key_pem}"
   ca_cert_pem        = "${tls_self_signed_cert.root.cert_pem}"
   ip_addresses = [
+    "127.0.0.1",
     "192.168.62.251",
     "192.168.126.251"
   ]
   dns_names = [
-    "*.internal"
+    "*.svc.internal",
+    "*.host.internal"
   ]
 }
 
@@ -143,8 +157,9 @@ resource "matchbox_group" "vmhost1" {
 
   metadata {
     name        = "vmhost1"
-    lan_ip      = "192.168.62.251/23"
-    store_ip    = "192.168.126.251/23"
+    lan_ip      = "192.168.62.251"
+    store_ip    = "192.168.126.251"
+    netmask     = "23"
     gateway_ip  = "${var.gateway_ip}"
     dns_ip      = "${var.dns_ip}"
     default_user    = "${var.default_user}"
@@ -160,5 +175,7 @@ resource "matchbox_group" "vmhost1" {
     internal_ca   = "${chomp(tls_self_signed_cert.root.cert_pem)}"
     internal_key  = "${chomp(module.vmhost1_cert.private_key_pem)}"
     internal_cert = "${chomp(module.vmhost1_cert.cert_pem)}"
+
+    cert_base_path = "/etc/ssl/certs/internal"
   }
 }

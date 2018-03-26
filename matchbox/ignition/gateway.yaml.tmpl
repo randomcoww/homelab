@@ -22,7 +22,7 @@ networkd:
         DHCP=no
 
         [Address]
-        Address={{.store_ip}}
+        Address={{.store_ip}}/{{.netmask}}
     - name: eth2.network
       contents: |
         [Match]

@@ -5,16 +5,6 @@
 # vault write $CLUSTER_ID/pki/$COMPONENT/root/generate/internal \
 # common_name=$CLUSTER_ID/pki/$COMPONENT ttl=87600h
 
-## enable pki path
-## needed but doesn't seem to support rerunning from terraform
-##
-# resource "vault_mount" "pki" {
-#   path = "${var.pki_path}"
-#   type = "pki"
-#   default_lease_ttl_seconds = 1200
-#   max_lease_ttl_seconds = 1200
-# }
-
 resource "vault_generic_secret" "ca" {
   path = "${var.pki_path}/root/generate/internal"
   disable_read = true
@@ -22,6 +12,17 @@ resource "vault_generic_secret" "ca" {
 {
   "common_name": "${var.pki_path}",
   "ttl": "87600h"
+}
+EOT
+}
+
+# servivce account
+
+resource "vault_generic_secret" "private_key" {
+  path = "secret/${var.role}"
+  data_json = <<EOT
+{
+  "key": "${replace(var.private_key_pem, "\n", "\\n")}"
 }
 EOT
 }
@@ -50,6 +51,10 @@ resource "vault_policy" "policy" {
 path "${var.pki_path}/issue/${var.role}" {
   policy = "write"
 }
+
+path "secret/${var.role}" {
+  policy = "read"
+}
 EOT
 }
 
@@ -70,13 +75,8 @@ resource "vault_generic_secret" "role_policy" {
 EOT
 }
 
-## using TLS auth backend - enable cert
-## needed but doesn't seem to support rerunning
-##
-# resource "vault_auth_backend" "tls_auth_enable" {
-#   type = "cert"
-# }
 
+## using TLS auth backend - enable cert
 resource "vault_generic_secret" "tls_auth" {
   path = "auth/cert/certs/${var.role}"
   # disable_read = true

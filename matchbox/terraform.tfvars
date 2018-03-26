@@ -47,21 +47,3 @@ contexts:
     user: kube
 current-context: kube-context
 EOF
-
-vault_config = <<EOF
-{
-  "storage": {
-    "file": {
-      "path": "/vault/file/data"
-    }
-  },
-  "listener": {
-    "tcp": {
-      "address": "0.0.0.0:48889",
-      "tls_cert_file": "/etc/ssl/certs/internal.pem",
-      "tls_key_file": "/etc/ssl/certs/internal-key.pem",
-      "tls_client_ca_file": "/etc/ssl/certs/internal-ca.pem"
-    }
-  }
-}
-EOF

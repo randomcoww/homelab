@@ -12,10 +12,9 @@ module "local_cert" {
   ca_private_key_pem = "${tls_private_key.root.private_key_pem}"
   ca_cert_pem        = "${tls_self_signed_cert.root.cert_pem}"
   ip_addresses = [
+    "127.0.0.1",
     "192.168.62.251",
-    "192.168.126.251",
-    "192.168.62.242",
-    "192.168.126.242"
+    "192.168.126.251"
   ]
   dns_names = [
     "*.svc.internal",

@@ -24,7 +24,7 @@ networkd:
         DNS=8.8.8.8
 
         [Address]
-        Address={{.store_ip}}
+        Address={{.store_ip}}/{{.netmask}}
 
         [Route]
         Gateway={{.gateway_ip}}
@@ -66,15 +66,15 @@ storage:
       contents:
         inline: |
           fs.inotify.max_user_watches=16184
-    - path: /etc/ssl/certs/internal-ca.pem
+    - path: {{.cert_base_path}}-ca.pem
       filesystem: root
       contents:
         inline: "{{.internal_ca}}"
-    - path: /etc/ssl/certs/internal-key.pem
+    - path: {{.cert_base_path}}-key.pem
       filesystem: root
       contents:
         inline: "{{.internal_key}}"
-    - path: /etc/ssl/certs/internal.pem
+    - path: {{.cert_base_path}}.pem
       filesystem: root
       contents:
         inline: "{{.internal_cert}}"

@@ -13,3 +13,7 @@ variable "csr_options" {
 variable "ca_cert_pem" {
   default     = ""
 }
+
+variable "private_key_pem" {
+  default     = ""
+}
