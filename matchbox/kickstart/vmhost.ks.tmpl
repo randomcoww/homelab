@@ -67,25 +67,6 @@ dnf -y install "kernel-devel-uname-r == $(uname -r)" && \
 dnf -y swap zfs-fuse zfs
 
 
-##
-## systemd units
-##
-
-mkdir -p /var/lib/kubelet /etc/kubernetes/cni/net.d /etc/kube-flannel
-
-## kubernetes
-cat <<EOF > /var/lib/kubelet/client_kubeconfig
-{{.kubeconfig}}
-EOF
-
-cat <<EOF > /etc/kubernetes/cni/net.d/10-flannel.conf
-{{.cni_conf}}
-EOF
-
-cat <<EOF > /etc/kube-flannel/net-conf.json
-{{.flannel_conf}}
-EOF
-
 cat <<EOF > /etc/systemd/system/kubelet.service
 [Service]
 ExecStartPre=/usr/bin/mkdir -p /var/log/containers
@@ -119,138 +100,12 @@ ExecStart=/usr/bin/rkt run \
   --hosts-entry host \
   --stage1-from-dir=stage1-fly.aci docker://{{.hyperkube_image}} \
   --exec=/kubelet -- \
-  --register-node=true \
-  --cni-conf-dir=/etc/kubernetes/cni/net.d \
-  --network-plugin=cni \
-  --container-runtime=docker \
   --allow-privileged=true \
   --manifest-url=https://raw.githubusercontent.com/randomcoww/environment-config/master/manifests/{{.name}} \
-  --hostname-override={{.store_ip}} \
-  --cluster_dns={{.cluster_dns_ip}} \
-  --cluster_domain={{.cluster_domain}} \
-  --kubeconfig=/var/lib/kubelet/client_kubeconfig \
   --docker-disable-shared-pid=false \
-  --image-gc-high-threshold=0 \
-  --image-gc-low-threshold=0 \
   --fail-swap-on=false \
   --cgroup-driver=systemd
 ExecStop=-/usr/bin/rkt stop --uuid-file=/var/run/kubelet-pod.uuid
-Restart=always
-RestartSec=10
-
-[Install]
-WantedBy=multi-user.target
-EOF
-
-
-## etcd
-cat <<EOF > /etc/systemd/system/etcd@.service
-[Service]
-Environment="ETCD_NAME=%m"
-Environment="ETCD_DATA_DIR=/var/lib/etcd/%i"
-Environment="ETCD_INITIAL_ADVERTISE_PEER_URLS=https://${{.store_ip}}:2380"
-Environment="ETCD_LISTEN_PEER_URLS=https://${{.store_ip}}:2380"
-Environment="ETCD_ADVERTISE_CLIENT_URLS=https://${{.store_ip}}:2379"
-Environment="ETCD_LISTEN_CLIENT_URLS=https://${{.store_ip}}:2379,https://127.0.0.1:2379"
-Environment="ETCD_INITIAL_CLUSTER=%m=https://${{.store_ip}}:2380"
-Environment="ETCD_INITIAL_CLUSTER_STATE=new"
-Environment="ETCD_INITIAL_CLUSTER_TOKEN=%i"
-Environment="ETCD_TRUSTED_CA_FILE={{.cert_base_path}}-ca.pem"
-Environment="ETCD_CERT_FILE={{.cert_base_path}}.pem"
-Environment="ETCD_KEY_FILE={{.cert_base_path}}-key.pem"
-Environment="ETCD_PEER_TRUSTED_CA_FILE={{.cert_base_path}}-ca.pem"
-Environment="ETCD_PEER_CERT_FILE={{.cert_base_path}}.pem"
-Environment="ETCD_PEER_KEY_FILE={{.cert_base_path}}-key.pem"
-Environment="ETCD_PEER_CLIENT_CERT_AUTH=true"
-ExecStartPre=/usr/bin/mkdir -p /var/log/containers
-ExecStartPre=-/usr/bin/rkt rm --uuid-file=/var/run/etcd-%i-pod.uuid
-ExecStart=/usr/bin/rkt run \
-  --insecure-options=image \
-  --uuid-file-save=/var/run/etcd-%i-pod.uuid \
-  \
-  --volume dns,kind=host,source=/etc/resolv.conf \
-  --volume etc-ssl-certs,kind=host,source=/etc/ssl/certs,readOnly=true \
-  --volume usr-share-certs,kind=host,source=/etc/pki/ca-trust,readOnly=true \
-  --volume var-log,kind=host,source=/var/log \
-  --volume etcd-data,kind=host,source=/data/etcd \
-  \
-  --mount volume=dns,target=/etc/resolv.conf \
-  --mount volume=etc-ssl-certs,target=/etc/ssl/certs \
-  --mount volume=usr-share-certs,target=/etc/pki/ca-trust \
-  --mount volume=var-log,target=/var/log \
-  --mount volume=etcd-data,target=/var/lib/etcd \
-  \
-  --inherit-env \
-  --hosts-entry host \
-  --stage1-from-dir=stage1-fly.aci docker://{{.etcd_image}} \
-  --exec=/usr/local/bin/etcd
-ExecStop=-/usr/bin/rkt stop --uuid-file=/var/run/etcd-%i-pod.uuid
-Restart=always
-RestartSec=10
-
-[Install]
-WantedBy=multi-user.target
-EOF
-
-
-## vault
-mkdir -p /etc/vault
-
-cat <<EOF > /etc/vault/config.json
-{
-  "api_addr": "{{.store_ip}}"
-  "storage": {
-    "etcd": {
-      "address": "https://127.0.0.1:2379",
-      "etcd_api": "v3",
-      "ha_enabled": "true",
-      "tls_cert_file": "{{.cert_base_path}}.pem",
-      "tls_key_file": "{{.cert_base_path}}-key.pem",
-      "tls_ca_file": "{{.cert_base_path}}-ca.pem"
-    }
-  },
-  "listener": {
-    "tcp": {
-      "address": "0.0.0.0:48889",
-      "tls_cert_file": "{{.cert_base_path}}.pem",
-      "tls_key_file": "{{.cert_base_path}}-key.pem",
-      "tls_client_ca_file": "{{.cert_base_path}}-ca.pem"
-    }
-  }
-}
-EOF
-
-cat <<EOF > /etc/systemd/system/vault.service
-[Unit]
-Wants=etcd@default.service
-After=etcd@default.service
-
-[Service]
-ExecStartPre=/usr/bin/mkdir -p /var/log/containers
-ExecStartPre=-/usr/bin/rkt rm --uuid-file=/var/run/vault-pod.uuid
-ExecStart=/usr/bin/rkt run \
-  --insecure-options=image \
-  --uuid-file-save=/var/run/vault-pod.uuid \
-  \
-  --volume dns,kind=host,source=/etc/resolv.conf \
-  --volume etc-ssl-certs,kind=host,source=/etc/ssl/certs,readOnly=true \
-  --volume usr-share-certs,kind=host,source=/etc/pki/ca-trust,readOnly=true \
-  --volume volume-vault-logs,kind=host,source=/var/log \
-  --volume volume-vault-file,kind=host,source=/etc/vault \
-  --volume volume-vault-config,kind=host,source=/etc/vault \
-  \
-  --mount volume=dns,target=/etc/resolv.conf \
-  --mount volume=etc-ssl-certs,target=/etc/ssl/certs \
-  --mount volume=usr-share-certs,target=/etc/pki/ca-trust \
-  --mount volume=volume-vault-logs,target=/vault/logs \
-  --mount volume=volume-vault-file,target=/vault/file \
-  --mount volume=volume-vault-config,target=/vault/config \
-  \
-  --hosts-entry host \
-  --stage1-from-dir=stage1-fly.aci docker://{{.vault_image}} \
-  --exec=/usr/local/bin/docker-entrypoint.sh -- \
-  server
-ExecStop=-/usr/bin/rkt stop --uuid-file=/var/run/vault-pod.uuid
 Restart=always
 RestartSec=10
 
@@ -335,15 +190,10 @@ Name=store_host
 
 [Network]
 LinkLocalAddressing=no
-DHCP=no
-DNS={{.dns_ip}}
-DNS=8.8.8.8
+DHCP=yes
 
 [Address]
 Address={{.store_ip}}/{{.netmask}}
-
-[Route]
-Gateway={{.gateway_ip}}
 
 ## lan network pairs
 

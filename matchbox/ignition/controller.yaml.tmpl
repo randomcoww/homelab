@@ -8,40 +8,7 @@ networkd:
 
         [Network]
         LinkLocalAddressing=no
-        DHCP=no
-
-        [Address]
-        Address={{.lan_ip}}
-    - name: eth1.network
-      contents: |
-        [Match]
-        Name=eth1
-
-        [Network]
-        LinkLocalAddressing=no
-        DHCP=no
-
-        [Address]
-        Address={{.store_ip}}/{{.netmask}}
-    - name: eth2.network
-      contents: |
-        [Match]
-        Name=eth2
-
-        [Network]
-        LinkLocalAddressing=no
         DHCP=yes
-        DNS={{.dns_ip}}
-        DNS=8.8.8.8
-
-        [DHCP]
-        UseDNS=false
-        UseNTP=false
-        SendHostname=false
-        UseHostname=false
-        UseDomains=false
-        UseTimezone=no
-        RouteMetric=1024
 systemd:
   units:
     - name: kubelet.service
@@ -61,19 +28,19 @@ systemd:
         ExecStart=/usr/lib/coreos/kubelet-wrapper \
           --allow-privileged=true \
           --manifest-url=https://raw.githubusercontent.com/randomcoww/environment-config/master/manifests/{{.name}} \
-          --docker-disable-shared-pid=false
+          --docker-disable-shared-pid=false \
+          --cni-conf-dir=/etc/kubernetes/cni/net.d \
+          --network-plugin=cni \
+          --container-runtime=docker \
+          --kubeconfig=/var/lib/kubelet/client_kubeconfig \
+          --cluster_dns={{.cluster_dns_ip}} \
+          --cluster_domain={{.cluster_domain}} \
+          --register-node=true
         ExecStop=-/usr/bin/rkt stop --uuid-file=/var/cache/kubelet-pod.uuid
         Restart=always
         RestartSec=10
         [Install]
         WantedBy=multi-user.target
-    - name: docker.service
-      enabled: true
-      dropins:
-        - name: iptables.conf
-          contents: |
-            [Service]
-            Environment=DOCKER_OPTS=--iptables=false
 storage:
   files:
     - path: /etc/hostname
@@ -82,18 +49,38 @@ storage:
       contents:
         inline:
           {{.name}}
-    - path: /etc/sysctl.d/ipforward.conf
-      filesystem: root
-      mode: 0644
-      contents:
-        inline: |
-          net.ipv4.ip_forward=1
-          net.ipv4.ip_nonlocal_bind=1
     - path: /etc/sysctl.d/max-user-watches.conf
       filesystem: root
       contents:
         inline: |
           fs.inotify.max_user_watches=16184
+    - path: {{.cert_base_path}}-ca.pem
+      filesystem: root
+      contents:
+        inline: "{{.internal_ca}}"
+    - path: {{.cert_base_path}}-key.pem
+      filesystem: root
+      contents:
+        inline: "{{.internal_key}}"
+    - path: {{.cert_base_path}}.pem
+      filesystem: root
+      contents:
+        inline: "{{.internal_cert}}"
+    - path: /etc/kube-flannel/net-conf.json
+      filesystem: root
+      contents:
+        inline: |
+          {{.flannel_conf}}
+    - path: /etc/kubernetes/cni/net.d/10-flannel.conf
+      filesystem: root
+      contents:
+        inline: |
+          {{.cni_conf}}
+    - path: /var/lib/kubelet/client_kubeconfig
+      filesystem: root
+      contents:
+        inline: |
+          {{.kubeconfig}}
 passwd:
   users:
   - name: {{.default_user}}

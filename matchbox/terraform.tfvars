@@ -1,7 +1,7 @@
 matchbox_http_endpoint = "http://haproxy.svc.internal:48080"
 matchbox_rpc_endpoint = "haproxy.svc.internal:48081"
 
-hyperkube_image = "gcr.io/google_containers/hyperkube:v1.9.4"
+hyperkube_image = "gcr.io/google_containers/hyperkube:v1.10.0"
 gateway_ip      = "192.168.126.240"
 dns_ip          = "192.168.126.244"
 default_user    = "core"

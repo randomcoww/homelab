@@ -45,7 +45,7 @@ systemd:
         ExecStartPre=/bin/mkdir -p /var/log/containers
         ExecStartPre=-/usr/bin/rkt rm --uuid-file=/var/cache/kubelet-pod.uuid
         ExecStart=/usr/lib/coreos/kubelet-wrapper \
-          --allow-privileged \
+          --allow-privileged=true \
           --manifest-url=https://raw.githubusercontent.com/randomcoww/environment-config/master/manifests/{{.name}} \
           --docker-disable-shared-pid=false
         ExecStop=-/usr/bin/rkt stop --uuid-file=/var/cache/kubelet-pod.uuid
@@ -66,18 +66,6 @@ storage:
       contents:
         inline: |
           fs.inotify.max_user_watches=16184
-    - path: {{.cert_base_path}}-ca.pem
-      filesystem: root
-      contents:
-        inline: "{{.internal_ca}}"
-    - path: {{.cert_base_path}}-key.pem
-      filesystem: root
-      contents:
-        inline: "{{.internal_key}}"
-    - path: {{.cert_base_path}}.pem
-      filesystem: root
-      contents:
-        inline: "{{.internal_cert}}"
 passwd:
   users:
   - name: {{.default_user}}

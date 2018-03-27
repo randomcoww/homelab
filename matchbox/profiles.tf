@@ -8,6 +8,11 @@ resource "matchbox_profile" "gateway" {
   container_linux_config = "${file("./ignition/gateway.yaml.tmpl")}"
 }
 
+resource "matchbox_profile" "controller" {
+  name   = "controller"
+  container_linux_config = "${file("./ignition/controller.yaml.tmpl")}"
+}
+
 resource "matchbox_profile" "vmhost" {
   name   = "vmhost"
   generic_config = "${file("./kickstart/vmhost.ks.tmpl")}"
