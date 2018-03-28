@@ -11,12 +11,33 @@ networkd:
         DHCP=yes
 systemd:
   units:
+    - name: setup-network-environment.service
+      enabled: true
+      contents: |
+        [Unit]
+        Description=Setup Network Environment
+        Documentation=https://github.com/kelseyhightower/setup-network-environment
+        Requires=network-online.target
+        After=network-online.target
+
+        [Service]
+        ExecStartPre=-/usr/bin/mkdir -p /opt/bin
+        ExecStartPre=/usr/bin/wget -N -P /opt/bin https://github.com/kelseyhightower/setup-network-environment/releases/download/v1.0.0/setup-network-environment
+
+        ExecStartPre=/usr/bin/chmod +x /opt/bin/setup-network-environment
+        ExecStart=/opt/bin/setup-network-environment
+        RemainAfterExit=yes
+        Type=oneshot
     - name: kubelet.service
       enabled: true
       contents: |
         [Unit]
         Description=Kubelet via Hyperkube ACI
+        Requires=setup-network-environment.service
+        After=setup-network-environment.service
+
         [Service]
+        EnvironmentFile=/etc/network-environment
         Environment="KUBELET_IMAGE=docker://{{.hyperkube_image}}"
         Environment="RKT_RUN_ARGS=--uuid-file-save=/var/cache/kubelet-pod.uuid \
           --volume=resolv,kind=host,source=/etc/resolv.conf \
@@ -35,10 +56,12 @@ systemd:
           --kubeconfig=/var/lib/kubelet/client_kubeconfig \
           --cluster_dns={{.cluster_dns_ip}} \
           --cluster_domain={{.cluster_domain}} \
+          --hostname_override=${DEFAULT_IPV4} \
           --register-node=true
         ExecStop=-/usr/bin/rkt stop --uuid-file=/var/cache/kubelet-pod.uuid
         Restart=always
         RestartSec=10
+
         [Install]
         WantedBy=multi-user.target
 storage:
@@ -79,10 +102,9 @@ storage:
     - path: /var/lib/kubelet/client_kubeconfig
       filesystem: root
       contents:
-        inline: |
-          {{.kubeconfig}}
+        inline: "{{.kubeconfig}}"
 passwd:
   users:
   - name: {{.default_user}}
     ssh_authorized_keys:
-      - cert-authority {{.ssh_authorized_key}}
+      - {{.ssh_authorized_key}}

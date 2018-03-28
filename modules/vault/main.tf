@@ -11,7 +11,7 @@ resource "vault_generic_secret" "ca" {
   data_json = <<EOT
 {
   "common_name": "${var.pki_path}",
-  "ttl": "87600h"
+  "ttl": "8760h"
 }
 EOT
 }
@@ -68,7 +68,7 @@ resource "vault_generic_secret" "role_policy" {
   # disable_read = true
   data_json = <<EOT
 {
-  "period": "720h",
+  "period": "8760h",
   "orphan": true,
   "allowed_policies": "${vault_policy.policy.name}"
 }

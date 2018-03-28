@@ -27,13 +27,14 @@ resource "matchbox_group" "controller" {
     cluster_domain  = "${var.cluster_domain}"
     hyperkube_image = "${var.hyperkube_image}"
 
-    ssh_authorized_key = "${module.controller_cert.public_key_openssh}"
+    # ssh_authorized_key = "cert-authority ${module.controller_cert.public_key_openssh}"
+    ssh_authorized_key = "${var.ssh_authorized_key}"
     internal_ca   = "${replace(tls_self_signed_cert.root.cert_pem, "\n", "\\n")}"
     internal_key  = "${replace(module.controller_cert.private_key_pem, "\n", "\\n")}"
     internal_cert = "${replace(module.controller_cert.cert_pem, "\n", "\\n")}"
 
-    flannel_conf = "${replace(var.flannel_conf, "\n", "\\n")}"
-    cni_conf     = "${replace(var.cni_conf, "\n", "\\n")}"
+    flannel_conf = "${replace(var.flannel_conf, "\n", "")}"
+    cni_conf     = "${replace(var.cni_conf, "\n", "")}"
     kubeconfig   = "${replace(var.kubeconfig_local, "\n", "\\n")}"
 
     cert_base_path = "/etc/ssl/certs/internal"

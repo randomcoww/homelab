@@ -8,6 +8,10 @@ variable "matchbox_rpc_endpoint" {
   description = "Matchbox gRPC API endpoint, without the protocol (e.g. matchbox.example.com:8081)"
 }
 
+variable "ssh_authorized_key" {
+  type        = "string"
+}
+
 variable "hyperkube_image" {
   type        = "string"
 }

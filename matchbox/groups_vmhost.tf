@@ -22,13 +22,12 @@ resource "matchbox_group" "vmhost1" {
 
   metadata {
     name        = "vmhost1"
-    lan_ip      = "192.168.62.251"
     store_ip    = "192.168.126.251"
     netmask     = "23"
     default_user    = "${var.default_user}"
     hyperkube_image = "${var.hyperkube_image}"
 
-    ssh_authorized_key = "${chomp(module.controller_cert.public_key_openssh)}"
+    ssh_authorized_key = "cert-authority ${chomp(module.controller_cert.public_key_openssh)}"
     internal_ca   = "${chomp(tls_self_signed_cert.root.cert_pem)}"
     internal_key  = "${chomp(module.vmhost_cert.private_key_pem)}"
     internal_cert = "${chomp(module.vmhost_cert.cert_pem)}"
@@ -47,13 +46,12 @@ resource "matchbox_group" "vmhost2" {
 
   metadata {
     name        = "vmhost2"
-    lan_ip      = "192.168.62.252"
     store_ip    = "192.168.126.252"
     netmask     = "23"
     default_user    = "${var.default_user}"
     hyperkube_image = "${var.hyperkube_image}"
 
-    ssh_authorized_key = "${chomp(module.controller_cert.public_key_openssh)}"
+    ssh_authorized_key = "cert-authority ${chomp(module.controller_cert.public_key_openssh)}"
     internal_ca   = "${chomp(tls_self_signed_cert.root.cert_pem)}"
     internal_key  = "${chomp(module.vmhost_cert.private_key_pem)}"
     internal_cert = "${chomp(module.vmhost_cert.cert_pem)}"

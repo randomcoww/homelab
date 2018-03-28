@@ -10,6 +10,7 @@
 
 ## shuld run these manually
 # vault mount pki
+# vault secrets tune -max-lease-ttl=8760h pki
 # vault auth enable cert
 
 resource "tls_private_key" "serviceaccount" {
@@ -25,7 +26,7 @@ module "pki_apiserver" {
   csr_options = <<EOT
 {
   "allow_any_name": true,
-  "max_ttl": "720h"
+  "max_ttl": "8760h"
 }
 EOT
   # ca_cert_pem = "${tls_self_signed_cert.root.cert_pem}"
