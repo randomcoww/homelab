@@ -13,7 +13,7 @@ network --hostname={{.name}}
 
 ## user
 user --name={{.default_user}} --password=password --plaintext --groups wheel,libvirt
-sshkey --username={{.default_user}} "{{.ssh_authorized_key}}"
+sshkey --username={{.default_user}} "cert-authority {{.ssh_authorized_key}}"
 
 ## disk
 zerombr
@@ -264,6 +264,8 @@ EOF
 
 cat <<EOF > /etc/ssh/sshd_config
 Subsystem sftp internal-sftp
+ClientAliveInterval 180
+UseDNS no
 PermitRootLogin no
 PasswordAuthentication no
 ChallengeResponseAuthentication no

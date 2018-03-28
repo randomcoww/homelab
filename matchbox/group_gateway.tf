@@ -15,7 +15,7 @@ resource "matchbox_group" "gateway1" {
     dns_ip      = "${var.dns_ip}"
     default_user    = "${var.default_user}"
     hyperkube_image = "${var.hyperkube_image}"
-    ssh_authorized_key = "${var.ssh_authorized_key}"
+    ssh_authorized_key = "${module.controller_cert.public_key_openssh}"
   }
 }
 
@@ -36,6 +36,6 @@ resource "matchbox_group" "gateway2" {
     dns_ip      = "${var.dns_ip}"
     default_user    = "${var.default_user}"
     hyperkube_image = "${var.hyperkube_image}"
-    ssh_authorized_key = "${var.ssh_authorized_key}"
+    ssh_authorized_key = "${module.controller_cert.public_key_openssh}"
   }
 }

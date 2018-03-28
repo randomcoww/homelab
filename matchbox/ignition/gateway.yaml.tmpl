@@ -98,4 +98,4 @@ passwd:
   users:
   - name: {{.default_user}}
     ssh_authorized_keys:
-      - {{.ssh_authorized_key}}
+      - cert-authority {{.ssh_authorized_key}}

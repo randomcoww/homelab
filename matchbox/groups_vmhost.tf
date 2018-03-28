@@ -27,8 +27,8 @@ resource "matchbox_group" "vmhost1" {
     netmask     = "23"
     default_user    = "${var.default_user}"
     hyperkube_image = "${var.hyperkube_image}"
-    ssh_authorized_key = "${var.ssh_authorized_key}"
 
+    ssh_authorized_key = "${chomp(module.controller_cert.public_key_openssh)}"
     internal_ca   = "${chomp(tls_self_signed_cert.root.cert_pem)}"
     internal_key  = "${chomp(module.vmhost_cert.private_key_pem)}"
     internal_cert = "${chomp(module.vmhost_cert.cert_pem)}"
@@ -52,8 +52,8 @@ resource "matchbox_group" "vmhost2" {
     netmask     = "23"
     default_user    = "${var.default_user}"
     hyperkube_image = "${var.hyperkube_image}"
-    ssh_authorized_key = "${var.ssh_authorized_key}"
 
+    ssh_authorized_key = "${chomp(module.controller_cert.public_key_openssh)}"
     internal_ca   = "${chomp(tls_self_signed_cert.root.cert_pem)}"
     internal_key  = "${chomp(module.vmhost_cert.private_key_pem)}"
     internal_cert = "${chomp(module.vmhost_cert.cert_pem)}"
