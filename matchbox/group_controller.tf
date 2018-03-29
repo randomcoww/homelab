@@ -27,8 +27,8 @@ resource "matchbox_group" "controller" {
     cluster_domain  = "${var.cluster_domain}"
     hyperkube_image = "${var.hyperkube_image}"
 
-    # ssh_authorized_key = "cert-authority ${module.controller_cert.public_key_openssh}"
-    ssh_authorized_key = "${var.ssh_authorized_key}"
+    ssh_authorized_key = "cert-authority ${tls_private_key.root.public_key_openssh}"
+    # ssh_authorized_key = "${var.ssh_authorized_key}"
     internal_ca   = "${replace(tls_self_signed_cert.root.cert_pem, "\n", "\\n")}"
     internal_key  = "${replace(module.controller_cert.private_key_pem, "\n", "\\n")}"
     internal_cert = "${replace(module.controller_cert.cert_pem, "\n", "\\n")}"
