@@ -1,0 +1,34 @@
+{
+  "builders": [
+    {
+      "boot_command" : [
+        "<tab> ",
+        "inst.ks=http://haproxy.svc.internal:58080/generic?host={{user `kickstart`}} ",
+        "inst.gpt ",
+        "<enter>"
+      ],
+      "disk_size" : 30000,
+      "headless" : false,
+      "http_directory" : "kickstart",
+      "iso_checksum_type": "none",
+      "iso_url": "https://download.fedoraproject.org/pub/fedora/linux/releases/27/Server/x86_64/iso/Fedora-Server-netinst-x86_64-27-1.6.iso",
+      "shutdown_command" : "",
+      "disk_interface": "virtio",
+      "net_device": "virtio-net",
+      "communicator": "none",
+      "type": "qemu",
+      "shutdown_timeout": "30m",
+      "qemuargs": [
+        [ "-m", "4096M" ],
+        [ "-smp", "2" ]
+      ],
+      "accelerator": "kvm",
+      "vm_name": "{{user `kickstart`}}",
+      "format": "qcow2",
+      "output_directory": "output-qemu"
+    }
+  ],
+  "variables": {
+    "kickstart": "vmhost2"
+  }
+}
