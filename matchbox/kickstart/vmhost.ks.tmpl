@@ -67,6 +67,13 @@ dnf -y install "kernel-devel-uname-r == $(uname -r)" && \
 dnf -y swap zfs-fuse zfs
 
 
+##
+## systemd units
+##
+
+## kubelet
+mkdir -p /var/lib/kubelet /etc/kubernetes
+
 cat <<EOF > /etc/systemd/system/kubelet.service
 [Service]
 ExecStartPre=/usr/bin/mkdir -p /var/log/containers
@@ -112,7 +119,6 @@ RestartSec=10
 [Install]
 WantedBy=multi-user.target
 EOF
-
 
 ## fan control
 cat <<EOF > /etc/systemd/system/fancontrol.service
