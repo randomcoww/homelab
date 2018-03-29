@@ -38,5 +38,6 @@ resource "matchbox_group" "controller" {
     kubeconfig   = "${replace(var.kubeconfig_local, "\n", "\\n")}"
 
     cert_base_path = "/etc/ssl/certs/internal"
+    manifest_url = "https://raw.githubusercontent.com/randomcoww/environment-config/master/manifests/controller"
   }
 }

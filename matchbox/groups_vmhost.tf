@@ -33,6 +33,7 @@ resource "matchbox_group" "vmhost1" {
     internal_cert = "${chomp(module.vmhost_cert.cert_pem)}"
 
     cert_base_path = "/etc/ssl/certs/internal"
+    manifest_url = "https://raw.githubusercontent.com/randomcoww/environment-config/master/manifests/vmhost1"
   }
 }
 
@@ -57,5 +58,6 @@ resource "matchbox_group" "vmhost2" {
     internal_cert = "${chomp(module.vmhost_cert.cert_pem)}"
 
     cert_base_path = "/etc/ssl/certs/internal"
+    manifest_url = "https://raw.githubusercontent.com/randomcoww/environment-config/master/manifests/vmhost2"
   }
 }
