@@ -1,0 +1,58 @@
+#cloud-config
+
+hostname: {{.name}}
+
+users:
+  -
+    name: {{.default_user}}
+    ssh-authorized-keys:
+      - {{.ssh_authorized_key}}
+    sudo:
+      - ALL=(ALL) NOPASSWD:ALL
+
+write_files:
+  -
+    path: /etc/systemd/network/00_ens1f0.network
+    content: |
+      [Match]
+      Name=ens1f0
+
+      [Network]
+      LinkLocalAddressing=no
+      DHCP=no
+      MACVLAN=host_bridge
+  -
+    path: /etc/systemd/network/00_host_bridge.netdev
+    content: |
+      [NetDev]
+      Name=host_bridge
+      Kind=macvlan
+
+      [MACVLAN]
+      Mode=bridge
+  -
+    path: /etc/systemd/network/00_host_bridge.network
+    content: |
+      [Match]
+      Name=host_bridge
+
+      [Network]
+      LinkLocalAddressing=no
+      DHCP=yes
+
+      [Address]
+      Address={{.store_ip}}/{{.netmask}}
+  -
+    path: /etc/kubernetes/environment
+    content: |
+      HYPERKUBE_IMAGE={{.hyperkube_image}}
+      MANIFEST_URL={{.manifest_url}}
+  -
+    path: {{.cert_base_path}}-ca.pem
+    content: "{{.internal_ca}}"
+  -
+    path: {{.cert_base_path}}-key.pem
+    content: "{{.internal_key}}"
+  -
+    path: {{.cert_base_path}}.pem
+    content: "{{.internal_cert}}"

@@ -12,6 +12,20 @@ module "vmhost_cert" {
   ]
 }
 
+resource "matchbox_group" "vmhost_base" {
+  name    = "vmhost_base"
+  profile = "${matchbox_profile.vmhost_base.name}"
+
+  selector {
+    host = "vmhost_base"
+  }
+
+  metadata {
+    name        = "vmhost_base"
+    default_user    = "${var.default_user}"
+  }
+}
+
 resource "matchbox_group" "vmhost1" {
   name    = "vmhost1"
   profile = "${matchbox_profile.vmhost.name}"
@@ -28,9 +42,9 @@ resource "matchbox_group" "vmhost1" {
     hyperkube_image = "${var.hyperkube_image}"
 
     ssh_authorized_key = "cert-authority ${chomp(tls_private_key.root.public_key_openssh)}"
-    internal_ca   = "${chomp(tls_self_signed_cert.root.cert_pem)}"
-    internal_key  = "${chomp(module.vmhost_cert.private_key_pem)}"
-    internal_cert = "${chomp(module.vmhost_cert.cert_pem)}"
+    internal_ca   = "${replace(tls_self_signed_cert.root.cert_pem, "\n", "\\n")}"
+    internal_key  = "${replace(module.controller_cert.private_key_pem, "\n", "\\n")}"
+    internal_cert = "${replace(module.controller_cert.cert_pem, "\n", "\\n")}"
 
     cert_base_path = "/etc/ssl/certs/internal"
     manifest_url = "https://raw.githubusercontent.com/randomcoww/environment-config/master/manifests/vmhost1"
@@ -53,9 +67,9 @@ resource "matchbox_group" "vmhost2" {
     hyperkube_image = "${var.hyperkube_image}"
 
     ssh_authorized_key = "cert-authority ${chomp(tls_private_key.root.public_key_openssh)}"
-    internal_ca   = "${chomp(tls_self_signed_cert.root.cert_pem)}"
-    internal_key  = "${chomp(module.vmhost_cert.private_key_pem)}"
-    internal_cert = "${chomp(module.vmhost_cert.cert_pem)}"
+    internal_ca   = "${replace(tls_self_signed_cert.root.cert_pem, "\n", "\\n")}"
+    internal_key  = "${replace(module.controller_cert.private_key_pem, "\n", "\\n")}"
+    internal_cert = "${replace(module.controller_cert.cert_pem, "\n", "\\n")}"
 
     cert_base_path = "/etc/ssl/certs/internal"
     manifest_url = "https://raw.githubusercontent.com/randomcoww/environment-config/master/manifests/vmhost2"

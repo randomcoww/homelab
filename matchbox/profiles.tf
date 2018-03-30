@@ -13,7 +13,13 @@ resource "matchbox_profile" "controller" {
   container_linux_config = "${file("./ignition/controller.yaml.tmpl")}"
 }
 
+resource "matchbox_profile" "vmhost_base" {
+  name   = "vmhost_base"
+  generic_config = "${file("./kickstart/vmhost.ks.tmpl")}"
+}
+
+# generic cloud-config - not container linux formatted
 resource "matchbox_profile" "vmhost" {
   name   = "vmhost"
-  generic_config = "${file("./kickstart/vmhost.ks.tmpl")}"
+  generic_config = "${file("./cloud/vmhost.yaml.tmpl")}"
 }

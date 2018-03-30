@@ -13,7 +13,6 @@ network --hostname={{.name}}
 
 ## user
 user --name={{.default_user}} --password=password --plaintext --groups wheel,libvirt
-sshkey --username={{.default_user}} "{{.ssh_authorized_key}}"
 
 ## disk
 zerombr
@@ -57,26 +56,75 @@ vim-enhanced
 
 %post --erroronfail
 
-## no password sudo
-echo "%wheel ALL=(ALL) NOPASSWD: ALL" > /etc/sudoers.d/99_wheel
-
 ## install ZOL
 dnf -y install http://download.zfsonlinux.org/fedora/zfs-release$(rpm -E %dist).noarch.rpm && \
 gpg --quiet --with-fingerprint /etc/pki/rpm-gpg/RPM-GPG-KEY-zfsonlinux && \
 dnf -y install "kernel-devel-uname-r == $(uname -r)" && \
 dnf -y swap zfs-fuse zfs
 
+## build and install clearlinux cloud-init
+dnf install -y \
+    wget \
+    autoconf \
+    automake \
+    libtool \
+    glib2-devel \
+    libyaml-devel \
+    json-glib-devel \
+    parted-devel \
+    libblkid-devel \
+    check-devel \
+    e2fsprogs \
+    passwd \
+  \
+  && wget -O ucd.tar.gz https://github.com/clearlinux/micro-config-drive/archive/v30.tar.gz \
+  && mkdir /usr/src/ucd \
+  && tar xzf ucd.tar.gz --strip-components=1 -C /usr/src/ucd/ \
+  && rm -f ucd.tar.gz \
+  && cd /usr/src/ucd \
+  \
+  && sh autogen.sh \
+  && make install-exec \
+  && rm -rf /usr/src/ucd
+
 
 ##
 ## systemd units
 ##
 
-## kubelet
-mkdir -p /var/lib/kubelet /etc/kubernetes
+## cloud-init startup
+## modified https://github.com/clearlinux/micro-config-drive/blob/master/data/ucd.service.in
+cat <<EOF > /etc/systemd/system/ucd.service
+[Unit]
+Description=micro-config-drive job
+After=local-fs.target
+Before=network.target systemd-networkd.service
+Wants=local-fs.target sshd.service sshd-keygen.service
 
-cat <<EOF > /etc/systemd/system/kubelet.service
 [Service]
-ExecStartPre=/usr/bin/mkdir -p /var/log/containers
+Type=oneshot
+ExecStart=/usr/bin/ucd --user-data --metadata
+RemainAfterExit=yes
+TimeoutSec=0
+
+# Output needs to appear in instance console output
+StandardOutput=journal+console
+
+[Install]
+WantedBy=multi-user.target
+EOF
+
+## kubelet
+cat <<EOF > /etc/systemd/system/kubelet.service
+[Unit]
+ConditionFileNotEmpty=/etc/kubernetes/environment
+
+[Service]
+EnvironmentFile=/etc/kubernetes/environment
+ExecStartPre=/usr/bin/mkdir -p \
+  /var/lib/kubelet \
+  /var/log/containers \
+  /etc/kubernetes
 ExecStartPre=-/usr/bin/rkt rm --uuid-file=/var/run/kubelet-pod.uuid
 ExecStart=/usr/bin/rkt run \
   --insecure-options=image \
@@ -105,10 +153,10 @@ ExecStart=/usr/bin/rkt run \
   --mount volume=lib-modules,target=/lib/modules \
   \
   --hosts-entry host \
-  --stage1-from-dir=stage1-fly.aci docker://{{.hyperkube_image}} \
+  --stage1-from-dir=stage1-fly.aci docker://${HYPERKUBE_IMAGE} \
   --exec=/kubelet -- \
   --allow-privileged=true \
-  --manifest-url={{.manifest_url}} \
+  --manifest-url=${MANIFEST_URL} \
   --docker-disable-shared-pid=false \
   --fail-swap-on=false \
   --cgroup-driver=systemd
@@ -160,52 +208,10 @@ FallbackDNS=
 DNSStubListener=no
 EOF
 
-## wan
-cat <<EOF > /etc/systemd/network/eno2.network
+## disable default network
+cat <<EOF > /etc/systemd/network/99_en.network
 [Match]
-Name=eno2
-
-[Network]
-LinkLocalAddressing=no
-DHCP=no
-EOF
-
-## default network pair
-cat <<EOF > /etc/systemd/network/ens1f0.network
-[Match]
-Name=ens1f0
-
-[Network]
-LinkLocalAddressing=no
-DHCP=no
-MACVLAN=store_host
-EOF
-
-cat <<EOF > /etc/systemd/network/store_host.netdev
-[NetDev]
-Name=store_host
-Kind=macvlan
-
-[MACVLAN]
-Mode=bridge
-EOF
-
-cat <<EOF > /etc/systemd/network/store_host.network
-[Match]
-Name=store_host
-
-[Network]
-LinkLocalAddressing=no
-DHCP=yes
-
-[Address]
-Address={{.store_ip}}/{{.netmask}}
-EOF
-
-## lan network pairs
-cat <<EOF > /etc/systemd/network/ens1f1.network
-[Match]
-Name=ens1f1
+Name=en*
 
 [Network]
 LinkLocalAddressing=no
@@ -217,19 +223,6 @@ EOF
 ## general file writes
 ##
 
-## distribute common internal cert
-cat <<EOF > {{.cert_base_path}}-ca.pem
-{{.internal_ca}}
-EOF
-
-cat <<EOF > {{.cert_base_path}}-key.pem
-{{.internal_key}}
-EOF
-
-cat <<EOF > {{.cert_base_path}}.pem
-{{.internal_cert}}
-EOF
-
 cat <<EOF > /etc/modprobe.d/local.conf
 options kvm ignore_msrs=1
 options kvm-intel nested=1
@@ -240,7 +233,7 @@ EOF
 cat <<EOF > /etc/dnf/automatic.conf
 [commands]
 apply_updates=True
-upgrade_type=default
+upgrade_type=security
 
 [emitters]
 emit_via=motd
@@ -260,7 +253,7 @@ EOF
 ## enable services
 ##
 
-systemctl enable systemd-networkd systemd-resolved ksm ksmtuned fancontrol zfs-import-cache zfs-import-scan zfs-mount zfs-share zfs-zed zfs.target nfs-server dnf-automatic-download.timer chronyd docker kubelet
+systemctl enable ucd systemd-networkd systemd-resolved ksm ksmtuned fancontrol zfs-import-cache zfs-import-scan zfs-mount zfs-share zfs-zed zfs.target nfs-server dnf-automatic-download.timer chronyd docker kubelet
 
 
 ##

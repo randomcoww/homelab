@@ -29,6 +29,6 @@
     }
   ],
   "variables": {
-    "kickstart": "vmhost2"
+    "kickstart": "vmhost_base"
   }
 }
