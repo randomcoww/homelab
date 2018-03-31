@@ -1,5 +1,5 @@
-matchbox_http_endpoint = "http://haproxy.svc.internal:48080"
-matchbox_rpc_endpoint = "haproxy.svc.internal:48081"
+matchbox_http_endpoint = "http://haproxy.svc.internal:58080"
+matchbox_rpc_endpoint = "haproxy.svc.internal:58081"
 
 hyperkube_image = "gcr.io/google_containers/hyperkube:v1.10.0"
 gateway_ip      = "192.168.126.240"
@@ -9,6 +9,8 @@ ssh_authorized_key = "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQCz0pddhkPMJy1DrfdtzE
 
 cluster_dns_ip = "10.3.0.10"
 cluster_domain = "cluster.local"
+
+container_linux_version = "1688.3.0"
 
 flannel_conf = <<EOF
 {
