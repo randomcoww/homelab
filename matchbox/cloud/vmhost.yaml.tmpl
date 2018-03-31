@@ -53,13 +53,13 @@ write_files:
       MANIFEST_URL={{.manifest_url}}
   -
     path: {{.cert_base_path}}-ca.pem
-    permissions: 0400
+    permissions: 0444
     content: "{{.internal_ca}}"
   -
     path: {{.cert_base_path}}-key.pem
-    permissions: 0400
+    permissions: 0444
     content: "{{.internal_key}}"
   -
     path: {{.cert_base_path}}.pem
-    permissions: 0400
+    permissions: 0444
     content: "{{.internal_cert}}"
