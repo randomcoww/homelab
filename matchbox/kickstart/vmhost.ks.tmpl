@@ -103,7 +103,7 @@ Wants=local-fs.target sshd.service sshd-keygen.service
 
 [Service]
 Type=oneshot
-ExecStart=/usr/bin/ucd --user-data --metadata
+ExecStart=/usr/bin/ucd --user-data-once --metadata
 RemainAfterExit=yes
 TimeoutSec=0
 
@@ -117,6 +117,7 @@ EOF
 ## kubelet
 cat <<EOF > /etc/systemd/system/kubelet.service
 [Unit]
+After=network.target docker.service
 ConditionFileNotEmpty=/etc/kubernetes/environment
 
 [Service]
@@ -153,10 +154,10 @@ ExecStart=/usr/bin/rkt run \
   --mount volume=lib-modules,target=/lib/modules \
   \
   --hosts-entry host \
-  --stage1-from-dir=stage1-fly.aci docker://${HYPERKUBE_IMAGE} \
+  --stage1-from-dir=stage1-fly.aci docker://\${HYPERKUBE_IMAGE} \
   --exec=/kubelet -- \
   --allow-privileged=true \
-  --manifest-url=${MANIFEST_URL} \
+  --manifest-url=\${MANIFEST_URL} \
   --docker-disable-shared-pid=false \
   --fail-swap-on=false \
   --cgroup-driver=systemd
@@ -206,16 +207,6 @@ cat <<EOF > /etc/systemd/resolved.conf
 [Resolve]
 FallbackDNS=
 DNSStubListener=no
-EOF
-
-## disable default network
-cat <<EOF > /etc/systemd/network/99_en.network
-[Match]
-Name=en*
-
-[Network]
-LinkLocalAddressing=no
-DHCP=no
 EOF
 
 

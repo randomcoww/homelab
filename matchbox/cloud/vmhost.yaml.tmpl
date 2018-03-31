@@ -13,6 +13,7 @@ users:
 write_files:
   -
     path: /etc/systemd/network/00_ens1f0.network
+    permissions: 0644
     content: |
       [Match]
       Name=ens1f0
@@ -23,6 +24,7 @@ write_files:
       MACVLAN=host_bridge
   -
     path: /etc/systemd/network/00_host_bridge.netdev
+    permissions: 0644
     content: |
       [NetDev]
       Name=host_bridge
@@ -32,6 +34,7 @@ write_files:
       Mode=bridge
   -
     path: /etc/systemd/network/00_host_bridge.network
+    permissions: 0644
     content: |
       [Match]
       Name=host_bridge
@@ -44,15 +47,19 @@ write_files:
       Address={{.store_ip}}/{{.netmask}}
   -
     path: /etc/kubernetes/environment
+    permissions: 0644
     content: |
       HYPERKUBE_IMAGE={{.hyperkube_image}}
       MANIFEST_URL={{.manifest_url}}
   -
     path: {{.cert_base_path}}-ca.pem
+    permissions: 0400
     content: "{{.internal_ca}}"
   -
     path: {{.cert_base_path}}-key.pem
+    permissions: 0400
     content: "{{.internal_key}}"
   -
     path: {{.cert_base_path}}.pem
+    permissions: 0400
     content: "{{.internal_cert}}"
