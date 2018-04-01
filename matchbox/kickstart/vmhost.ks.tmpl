@@ -3,6 +3,9 @@ text
 shutdown
 skipx
 url --mirrorlist=http://mirrors.fedoraproject.org/mirrorlist?repo=fedora-$releasever&arch=$basearch
+repo --name=fedora-updates --mirrorlist=http://mirrors.fedoraproject.org/mirrorlist?repo=updates-released-f$releasever&arch=$basearch
+repo --name=zfs-on-linux --baseurl=http://download.zfsonlinux.org/fedora/$releasever/$basearch/
+
 lang en_US.UTF-8
 keyboard us
 timezone --utc Etc/UTC
@@ -12,7 +15,7 @@ selinux --disabled
 network --hostname={{.name}}
 
 ## user
-user --name={{.default_user}} --password=password --plaintext --groups wheel,libvirt
+user --name={{.default_user}} --password=password --plaintext --groups wheel
 
 ## disk
 zerombr
@@ -41,8 +44,28 @@ rsyslog
 rkt
 docker
 ca-certificates
-wget
 vim-enhanced
+rsync
+
+## zol
+kernel-devel
+zfs
+
+## ucd
+wget
+autoconf
+automake
+libtool
+glib2-devel
+libyaml-devel
+json-glib-devel
+parted-devel
+libblkid-devel
+check-devel
+e2fsprogs
+passwd
+
+-zfs-fuse
 -NetworkManager
 -plymouth
 -dhclient
@@ -56,28 +79,8 @@ vim-enhanced
 
 %post --erroronfail
 
-## install ZOL
-dnf -y install http://download.zfsonlinux.org/fedora/zfs-release$(rpm -E %dist).noarch.rpm && \
-gpg --quiet --with-fingerprint /etc/pki/rpm-gpg/RPM-GPG-KEY-zfsonlinux && \
-dnf -y install "kernel-devel-uname-r == $(uname -r)" && \
-dnf -y swap zfs-fuse zfs
-
 ## build and install clearlinux cloud-init
-dnf install -y \
-    wget \
-    autoconf \
-    automake \
-    libtool \
-    glib2-devel \
-    libyaml-devel \
-    json-glib-devel \
-    parted-devel \
-    libblkid-devel \
-    check-devel \
-    e2fsprogs \
-    passwd \
-  \
-  && wget -O ucd.tar.gz https://github.com/clearlinux/micro-config-drive/archive/v30.tar.gz \
+wget -O ucd.tar.gz https://github.com/clearlinux/micro-config-drive/archive/v30.tar.gz \
   && mkdir /usr/src/ucd \
   && tar xzf ucd.tar.gz --strip-components=1 -C /usr/src/ucd/ \
   && rm -f ucd.tar.gz \
