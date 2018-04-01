@@ -15,7 +15,7 @@ resource "matchbox_group" "ns1" {
     dns_ip      = "127.0.0.1"
     default_user   = "${var.default_user}"
     hyperkube_image = "${var.hyperkube_image}"
-    ssh_authorized_key = "cert-authority ${tls_private_key.root.public_key_openssh}"
+    ssh_authorized_key = "cert-authority ${tls_private_key.ssh.public_key_openssh}"
     manifest_url = "https://raw.githubusercontent.com/randomcoww/environment-config/master/manifests/ns1"
   }
 }
@@ -37,7 +37,7 @@ resource "matchbox_group" "ns2" {
     dns_ip      = "127.0.0.1"
     default_user   = "${var.default_user}"
     hyperkube_image = "${var.hyperkube_image}"
-    ssh_authorized_key = "cert-authority ${tls_private_key.root.public_key_openssh}"
+    ssh_authorized_key = "cert-authority ${tls_private_key.ssh.public_key_openssh}"
     manifest_url = "https://raw.githubusercontent.com/randomcoww/environment-config/master/manifests/ns2"
   }
 }

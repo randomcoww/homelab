@@ -16,3 +16,10 @@ resource "tls_self_signed_cert" "root" {
     common_name = "internal"
   }
 }
+
+
+## ssh ca key
+resource "tls_private_key" "ssh" {
+  algorithm   = "ECDSA"
+  ecdsa_curve = "P521"
+}

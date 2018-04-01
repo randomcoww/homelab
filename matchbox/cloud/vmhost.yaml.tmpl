@@ -5,6 +5,7 @@ hostname: {{.name}}
 users:
   -
     name: {{.default_user}}
+    groups: [ "wheel", "libvirt", "docker" ]
     ssh-authorized-keys:
       - {{.ssh_authorized_key}}
     sudo:

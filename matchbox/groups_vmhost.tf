@@ -41,7 +41,7 @@ resource "matchbox_group" "vmhost1" {
     default_user    = "${var.default_user}"
     hyperkube_image = "${var.hyperkube_image}"
 
-    ssh_authorized_key = "cert-authority ${chomp(tls_private_key.root.public_key_openssh)}"
+    ssh_authorized_key = "cert-authority ${chomp(tls_private_key.ssh.public_key_openssh)}"
     internal_ca   = "${replace(tls_self_signed_cert.root.cert_pem, "\n", "\\n")}"
     internal_key  = "${replace(module.controller_cert.private_key_pem, "\n", "\\n")}"
     internal_cert = "${replace(module.controller_cert.cert_pem, "\n", "\\n")}"
@@ -66,7 +66,7 @@ resource "matchbox_group" "vmhost2" {
     default_user    = "${var.default_user}"
     hyperkube_image = "${var.hyperkube_image}"
 
-    ssh_authorized_key = "cert-authority ${chomp(tls_private_key.root.public_key_openssh)}"
+    ssh_authorized_key = "cert-authority ${chomp(tls_private_key.ssh.public_key_openssh)}"
     internal_ca   = "${replace(tls_self_signed_cert.root.cert_pem, "\n", "\\n")}"
     internal_key  = "${replace(module.controller_cert.private_key_pem, "\n", "\\n")}"
     internal_cert = "${replace(module.controller_cert.cert_pem, "\n", "\\n")}"

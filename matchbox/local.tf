@@ -1,15 +1,8 @@
 ## write certs locally
-
 resource "local_file" "ca" {
   content  = "${chomp(tls_self_signed_cert.root.cert_pem)}"
   filename = "/tmp/internal-ca.pem"
 }
-
-resource "local_file" "ca-key" {
-  content  = "${chomp(tls_private_key.root.private_key_pem)}"
-  filename = "/tmp/internal-ca-key.pem"
-}
-
 
 module "local_cert" {
   source = "../modules/cert"
@@ -27,4 +20,11 @@ resource "local_file" "key" {
 resource "local_file" "cert" {
   content  = "${chomp(module.local_cert.cert_pem)}"
   filename = "/tmp/internal.pem"
+}
+
+
+## ssh ca
+resource "local_file" "ssh-ca-key" {
+  content  = "${chomp(tls_private_key.ssh.private_key_pem)}"
+  filename = "/tmp/ssh-ca-key.pem"
 }
