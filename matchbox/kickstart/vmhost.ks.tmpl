@@ -20,7 +20,7 @@ user --name={{.default_user}} --password=password --plaintext --groups wheel
 ## disk
 zerombr
 clearpart --all --initlabel --disklabel=gpt
-part / --size 10000 --fstype ext4
+part / --size {{.disk_size}} --fstype ext4
 # autopart --type=plain
 
 bootloader --timeout=1 --append="console=tty0 console=ttyS1,115200n8 elevator=noop intel_iommu=on iommu=pt cgroup_enable=memory"
@@ -195,9 +195,18 @@ After=ipmievd.service
 Type=oneshot
 ExecStart=/usr/bin/ipmitool raw 0x30 0x70 0x66 0x01 0x00 0x10
 ExecStart=/usr/bin/ipmitool raw 0x30 0x70 0x66 0x01 0x01 0x10
+EOF
+
+cat <<EOF > /etc/systemd/system/fancontrol.timer
+[Unit]
+Description=fancontrol timer
+After=ipmievd.service
+
+[Timer]
+OnUnitInactiveSec=1
 
 [Install]
-WantedBy=multi-user.target
+WantedBy=basic.target
 EOF
 
 
@@ -250,7 +259,7 @@ EOF
 ## enable services
 ##
 
-systemctl enable ucd systemd-networkd systemd-resolved ksm ksmtuned fancontrol zfs-import-cache zfs-import-scan zfs-mount zfs-share zfs-zed zfs.target nfs-server dnf-automatic-download.timer chronyd docker kubelet
+systemctl enable ucd systemd-networkd systemd-resolved ksm ksmtuned fancontrol.timer zfs-import-cache zfs-import-scan zfs-mount zfs-share zfs-zed zfs.target nfs-server dnf-automatic-download.timer chronyd docker kubelet
 
 
 ##

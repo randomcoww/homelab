@@ -21,10 +21,12 @@ resource "matchbox_group" "vmhost_base" {
   }
 
   metadata {
-    name        = "vmhost_base"
-    default_user    = "${var.default_user}"
+    name         = "vmhost_base"
+    default_user = "${var.default_user}"
+    disk_size    = 12000
   }
 }
+
 
 resource "matchbox_group" "vmhost1" {
   name    = "vmhost1"
@@ -51,12 +53,13 @@ resource "matchbox_group" "vmhost1" {
   }
 }
 
+
 resource "matchbox_group" "vmhost2" {
   name    = "vmhost2"
-  profile = "${matchbox_profile.vmhost.name}"
+  profile = "${matchbox_profile.vmhost_live.name}"
 
   selector {
-    host = "vmhost2"
+    mac = "0c-c4-7a-da-b5-a0"
   }
 
   metadata {

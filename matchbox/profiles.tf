@@ -33,3 +33,21 @@ resource "matchbox_profile" "vmhost" {
   name   = "vmhost"
   generic_config = "${file("./cloud/vmhost.yaml.tmpl")}"
 }
+
+## boot live image in memory
+resource "matchbox_profile" "vmhost_live" {
+  name   = "vmhost_live"
+  kernel = "/assets/fedora/vmlinuz-4.15.13-300.fc27.x86_64"
+  initrd = [
+    "/assets/fedora/initramfs-4.15.13-300.fc27.x86_64.img"
+  ]
+  args = [
+    "root=live:${var.matchbox_http_endpoint}/assets/fedora/live-rootfs.squashfs.img",
+    "console=tty0",
+    "console=ttyS1,115200n8",
+    "elevator=noop",
+    "intel_iommu=on",
+    "iommu=pt",
+    "cgroup_enable=memory"
+  ]
+}
