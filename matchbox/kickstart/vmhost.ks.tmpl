@@ -1,5 +1,5 @@
 install
-text
+# text
 shutdown
 skipx
 url --mirrorlist=http://mirrors.fedoraproject.org/mirrorlist?repo=fedora-$releasever&arch=$basearch
@@ -19,8 +19,10 @@ user --name={{.default_user}} --password=password --plaintext --groups wheel
 
 ## disk
 zerombr
-autopart --type=plain
-clearpart --all --initlabel
+clearpart --all --initlabel --disklabel=gpt
+part / --size 10000 --fstype ext4
+# autopart --type=plain
+
 bootloader --timeout=1 --append="console=tty0 console=ttyS1,115200n8 elevator=noop intel_iommu=on iommu=pt cgroup_enable=memory"
 
 ## packages
@@ -46,6 +48,7 @@ docker
 ca-certificates
 vim-enhanced
 rsync
+dracut-live
 
 ## zol
 kernel-devel
