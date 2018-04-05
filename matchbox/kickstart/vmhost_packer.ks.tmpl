@@ -1,0 +1,288 @@
+install
+# text
+shutdown
+skipx
+url --mirrorlist=http://mirrors.fedoraproject.org/mirrorlist?repo=fedora-$releasever&arch=$basearch
+repo --name=fedora-updates --mirrorlist=http://mirrors.fedoraproject.org/mirrorlist?repo=updates-released-f$releasever&arch=$basearch
+repo --name=zfs-on-linux --baseurl=http://download.zfsonlinux.org/fedora/$releasever/$basearch/
+
+lang en_US.UTF-8
+keyboard us
+timezone --utc Etc/UTC
+rootpw --lock password
+firewall --disabled
+selinux --disabled
+network --hostname={{.name}}
+
+## user
+user --name={{.default_user}} --password=password --plaintext --groups wheel
+
+## disk
+zerombr
+clearpart --all --initlabel
+autopart --type=plain
+
+bootloader --timeout=1 --append="console=tty0 console=ttyS1,115200n8 elevator=noop intel_iommu=on iommu=pt cgroup_enable=memory"
+
+## packages
+%packages --excludeWeakdeps --excludedocs
+@core
+systemd-udev
+which
+ipmitool
+libvirt-daemon-kvm
+libvirt-client
+qemu-kvm
+openssh
+gnupg
+ksm
+nfs-utils
+pciutils
+screen
+dnf-automatic
+lm_sensors
+rsyslog
+rkt
+docker
+ca-certificates
+vim-enhanced
+rsync
+dracut-live
+
+## zol
+kernel-devel
+zfs
+
+## ucd
+wget
+autoconf
+automake
+libtool
+glib2-devel
+libyaml-devel
+json-glib-devel
+parted-devel
+libblkid-devel
+check-devel
+e2fsprogs
+passwd
+
+-zfs-fuse
+-NetworkManager
+-plymouth
+-dhclient
+-sendmail
+-ppc64-utils
+%end
+
+##
+## post config
+##
+
+%post --erroronfail
+
+## build and install clearlinux cloud-init
+wget -O ucd.tar.gz https://github.com/clearlinux/micro-config-drive/archive/v30.tar.gz \
+  && mkdir /usr/src/ucd \
+  && tar xzf ucd.tar.gz --strip-components=1 -C /usr/src/ucd/ \
+  && rm -f ucd.tar.gz \
+  && cd /usr/src/ucd \
+  \
+  && sh autogen.sh \
+  && make install-exec \
+  && rm -rf /usr/src/ucd
+
+
+##
+## systemd units
+##
+
+## cloud-init startup
+## modified https://github.com/clearlinux/micro-config-drive/blob/master/data/ucd.service.in
+cat <<EOF > /etc/systemd/system/ucd.service
+[Unit]
+Description=micro-config-drive job
+After=local-fs.target
+Before=network.target systemd-networkd.service
+Wants=local-fs.target sshd.service sshd-keygen.service
+
+[Service]
+Type=oneshot
+ExecStart=/usr/bin/ucd --user-data-once --metadata
+RemainAfterExit=yes
+TimeoutSec=0
+
+# Output needs to appear in instance console output
+StandardOutput=journal+console
+
+[Install]
+WantedBy=multi-user.target
+EOF
+
+## kubelet
+cat <<EOF > /etc/systemd/system/kubelet.service
+[Unit]
+After=network.target docker.service
+ConditionFileNotEmpty=/etc/kubernetes/environment
+
+[Service]
+EnvironmentFile=/etc/kubernetes/environment
+ExecStartPre=/usr/bin/mkdir -p \
+  /var/lib/kubelet \
+  /var/log/containers \
+  /etc/kubernetes
+ExecStartPre=-/usr/bin/rkt rm --uuid-file=/var/run/kubelet-pod.uuid
+ExecStart=/usr/bin/rkt run \
+  --insecure-options=image \
+  --uuid-file-save=/var/run/kubelet-pod.uuid \
+  \
+  --volume dns,kind=host,source=/etc/resolv.conf \
+  --volume etc-kubernetes,kind=host,source=/etc/kubernetes,readOnly=false \
+  --volume etc-ssl-certs,kind=host,source=/etc/ssl/certs,readOnly=true \
+  --volume usr-share-certs,kind=host,source=/etc/pki/ca-trust,readOnly=true \
+  --volume var-lib-docker,kind=host,source=/var/lib/docker,readOnly=false \
+  --volume var-lib-kubelet,kind=host,source=/var/lib/kubelet,readOnly=false,recursive=true \
+  --volume var-log,kind=host,source=/var/log,readOnly=false \
+  --volume os-release,kind=host,source=/usr/lib/os-release,readOnly=true \
+  --volume run,kind=host,source=/run,readOnly=false \
+  --volume lib-modules,kind=host,source=/lib/modules,readOnly=true \
+  \
+  --mount volume=dns,target=/etc/resolv.conf \
+  --mount volume=etc-kubernetes,target=/etc/kubernetes \
+  --mount volume=etc-ssl-certs,target=/etc/ssl/certs \
+  --mount volume=usr-share-certs,target=/etc/pki/ca-trust \
+  --mount volume=var-lib-docker,target=/var/lib/docker \
+  --mount volume=var-lib-kubelet,target=/var/lib/kubelet \
+  --mount volume=var-log,target=/var/log \
+  --mount volume=os-release,target=/etc/os-release \
+  --mount volume=run,target=/run \
+  --mount volume=lib-modules,target=/lib/modules \
+  \
+  --hosts-entry host \
+  --stage1-from-dir=stage1-fly.aci docker://\${HYPERKUBE_IMAGE} \
+  --exec=/kubelet -- \
+  --allow-privileged=true \
+  --manifest-url=\${MANIFEST_URL} \
+  --docker-disable-shared-pid=false \
+  --fail-swap-on=false \
+  --cgroup-driver=systemd
+ExecStop=-/usr/bin/rkt stop --uuid-file=/var/run/kubelet-pod.uuid
+Restart=always
+RestartSec=10
+
+[Install]
+WantedBy=multi-user.target
+EOF
+
+## fan control
+cat <<EOF > /etc/systemd/system/fancontrol.service
+# ipmi fan control:
+#
+# ommited full speed:
+# ExecStartPre=/usr/bin/ipmitool raw 0x30 0x45 0x01 0x01
+#
+# setting a specific duty cycle:
+# fan control 0x30 0x70 0x66
+# get 0x00, set 0x01
+# zone FAN 1,2,.. 0x00, FAN A,B,.. 0x01
+# duty cycle 0x00-0x64
+[Unit]
+Description=Fan Control
+After=ipmievd.service
+
+[Service]
+Type=oneshot
+ExecStart=/usr/bin/ipmitool raw 0x30 0x70 0x66 0x01 0x00 0x10
+ExecStart=/usr/bin/ipmitool raw 0x30 0x70 0x66 0x01 0x01 0x10
+EOF
+
+cat <<EOF > /etc/systemd/system/fancontrol.timer
+[Unit]
+Description=fancontrol timer
+After=ipmievd.service
+
+[Timer]
+OnUnitInactiveSec=3
+
+[Install]
+WantedBy=basic.target
+EOF
+
+
+##
+## networkd
+##
+
+## enable systemd-resolve
+ln -sf /run/systemd/resolve/resolv.conf /etc/resolv.conf
+
+## write all configs
+cat <<EOF > /etc/systemd/resolved.conf
+[Resolve]
+FallbackDNS=
+DNSStubListener=no
+EOF
+
+
+##
+## general file writes
+##
+
+cat <<EOF > /etc/modprobe.d/local.conf
+options kvm ignore_msrs=1
+options kvm-intel nested=1
+options igb max_vfs=16
+options ixgbe max_vfs=16
+EOF
+
+cat <<EOF > /etc/dnf/automatic.conf
+[commands]
+apply_updates=True
+upgrade_type=security
+
+[emitters]
+emit_via=motd
+EOF
+
+cat <<EOF > /etc/ssh/sshd_config
+Subsystem sftp internal-sftp
+ClientAliveInterval 180
+UseDNS no
+PermitRootLogin no
+PasswordAuthentication no
+ChallengeResponseAuthentication no
+EOF
+
+
+##
+## enable services
+##
+
+systemctl enable ucd systemd-networkd systemd-resolved ksm ksmtuned fancontrol.timer zfs-import-cache zfs-import-scan zfs-mount zfs-share zfs-zed zfs.target nfs-server dnf-automatic-download.timer chronyd docker kubelet
+
+
+##
+## grub
+##
+
+cat <<EOF >> /etc/default/grub
+GRUB_TERMINAL="console serial"
+GRUB_SERIAL_COMMAND="serial --unit=1 --speed=115200 --word=8 --parity=no --stop=1"
+EOF
+
+## regenerate grub config
+grub2-mkconfig -o /boot/grub2/grub.cfg
+
+
+##
+## cleanup
+##
+
+dnf -y autoremove
+dnf -y clean all
+
+## remove machineid in case of reuse - may not be needed?
+echo -n > /var/lib/dbus/machine-id
+echo -n > /etc/machine-id
+
+%end

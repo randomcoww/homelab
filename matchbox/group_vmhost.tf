@@ -86,7 +86,7 @@ resource "matchbox_group" "vmhost2" {
 ## PXE live boot profile selector
 ##
 resource "matchbox_group" "vmhost2_live" {
-  name    = "vmhost2"
+  name    = "vmhost2_live"
   profile = "${matchbox_profile.vmhost_live.name}"
 
   selector {

@@ -49,9 +49,9 @@ resource "matchbox_profile" "vmhost_cloud" {
 ##
 resource "matchbox_profile" "vmhost_live" {
   name   = "vmhost_live"
-  kernel = "/assets/fedora/vmlinuz-4.15.13-300.fc27.x86_64"
+  kernel = "/assets/fedora/vmlinuz-4.15.14-300.fc27.x86_64"
   initrd = [
-    "/assets/fedora/initramfs-4.15.13-300.fc27.x86_64.img"
+    "/assets/fedora/initramfs-4.15.14-300.fc27.x86_64.img"
   ]
   args = [
     "root=live:${var.matchbox_http_endpoint}/assets/fedora/live-rootfs.squashfs.img",
