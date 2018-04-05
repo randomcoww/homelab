@@ -12,25 +12,29 @@ module "vmhost_cert" {
   ]
 }
 
-resource "matchbox_group" "vmhost_base" {
-  name    = "vmhost_base"
-  profile = "${matchbox_profile.vmhost_base.name}"
+##
+## common kickstart
+##
+resource "matchbox_group" "vmhost_ks" {
+  name    = "vmhost_ks"
+  profile = "${matchbox_profile.vmhost_ks.name}"
 
   selector {
-    host = "vmhost_base"
+    host = "vmhost_ks"
   }
 
   metadata {
-    name         = "vmhost_base"
+    name         = "vmhost_ks"
     default_user = "${var.default_user}"
-    disk_size    = 12000
   }
 }
 
-
+##
+## cloud-config renderer
+##
 resource "matchbox_group" "vmhost1" {
   name    = "vmhost1"
-  profile = "${matchbox_profile.vmhost.name}"
+  profile = "${matchbox_profile.vmhost_cloud.name}"
 
   selector {
     host = "vmhost1"
@@ -53,13 +57,12 @@ resource "matchbox_group" "vmhost1" {
   }
 }
 
-
 resource "matchbox_group" "vmhost2" {
   name    = "vmhost2"
-  profile = "${matchbox_profile.vmhost_live.name}"
+  profile = "${matchbox_profile.vmhost_cloud.name}"
 
   selector {
-    mac = "0c-c4-7a-da-b5-a0"
+    host = "vmhost2"
   }
 
   metadata {
@@ -76,5 +79,17 @@ resource "matchbox_group" "vmhost2" {
 
     cert_base_path = "/etc/ssl/certs/internal"
     manifest_url = "https://raw.githubusercontent.com/randomcoww/environment-config/master/manifests/vmhost2"
+  }
+}
+
+##
+## PXE live boot profile selector
+##
+resource "matchbox_group" "vmhost2_live" {
+  name    = "vmhost2"
+  profile = "${matchbox_profile.vmhost_live.name}"
+
+  selector {
+    mac = "0c-c4-7a-da-b5-a0"
   }
 }

@@ -13,6 +13,16 @@ users:
 
 write_files:
   -
+    path: /etc/systemd/network/99_en.network
+    permissions: 0644
+    content: |
+      [Match]
+      Name=en*
+
+      [Network]
+      LinkLocalAddressing=no
+      DHCP=no
+  -
     path: /etc/systemd/network/00_ens1f0.network
     permissions: 0644
     content: |

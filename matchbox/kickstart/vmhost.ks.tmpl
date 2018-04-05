@@ -19,9 +19,9 @@ user --name={{.default_user}} --password=password --plaintext --groups wheel
 
 ## disk
 zerombr
-clearpart --all --initlabel --disklabel=gpt
-part / --size {{.disk_size}} --fstype ext4
+clearpart --all --initlabel
 # autopart --type=plain
+part / --size=8192 --grow --fstype ext4
 
 bootloader --timeout=1 --append="console=tty0 console=ttyS1,115200n8 elevator=noop intel_iommu=on iommu=pt cgroup_enable=memory"
 
@@ -117,7 +117,7 @@ TimeoutSec=0
 StandardOutput=journal+console
 
 [Install]
-WantedBy=multi-user.target
+WantedBy=basic.target
 EOF
 
 ## kubelet
@@ -203,7 +203,8 @@ Description=fancontrol timer
 After=ipmievd.service
 
 [Timer]
-OnUnitInactiveSec=1
+OnBootSec=3
+OnUnitInactiveSec=3
 
 [Install]
 WantedBy=basic.target
@@ -254,12 +255,32 @@ PasswordAuthentication no
 ChallengeResponseAuthentication no
 EOF
 
+## systemd configs from https://linux.xvx.cz/2017/07/how-to-build-pxe-fedora-26-live-image.html
+cat <<EOF >> /etc/systemd/system.conf
+DumpCore=no
+EOF
+
+cat <<EOF >> /etc/systemd/journald.conf
+Storage=volatile
+RuntimeMaxUse=15M
+ForwardToSyslog=no
+ForwardToConsole=no
+EOF
+
 
 ##
 ## enable services
 ##
 
-systemctl enable ucd systemd-networkd systemd-resolved ksm ksmtuned fancontrol.timer zfs-import-cache zfs-import-scan zfs-mount zfs-share zfs-zed zfs.target nfs-server dnf-automatic-download.timer chronyd docker kubelet
+systemctl enable \
+  ucd \
+  systemd-networkd systemd-resolved \
+  chronyd \
+  fancontrol.timer \
+  dnf-automatic.timer \
+  ksm ksmtuned \
+  zfs-import-cache zfs-import-scan zfs-mount zfs-share zfs-zed zfs.target nfs-server \
+  docker kubelet
 
 
 ##

@@ -8,6 +8,10 @@ resource "matchbox_profile" "gateway" {
   container_linux_config = "${file("./ignition/gateway.yaml.tmpl")}"
 }
 
+
+##
+## controller ignition renderer
+##
 resource "matchbox_profile" "controller" {
   name   = "controller"
   container_linux_config = "${file("./ignition/controller.yaml.tmpl")}"
@@ -23,18 +27,26 @@ resource "matchbox_profile" "controller" {
   ]
 }
 
-resource "matchbox_profile" "vmhost_base" {
-  name   = "vmhost_base"
+
+##
+## vmhost common kickstart renderer
+##
+resource "matchbox_profile" "vmhost_ks" {
+  name   = "vmhost_ks"
   generic_config = "${file("./kickstart/vmhost.ks.tmpl")}"
 }
 
-# generic cloud-config - not container linux formatted
-resource "matchbox_profile" "vmhost" {
-  name   = "vmhost"
+##
+## render cloud configs
+##
+resource "matchbox_profile" "vmhost_cloud" {
+  name   = "vmhost_cloud"
   generic_config = "${file("./cloud/vmhost.yaml.tmpl")}"
 }
 
-## boot live image in memory
+##
+## PXE live boot
+##
 resource "matchbox_profile" "vmhost_live" {
   name   = "vmhost_live"
   kernel = "/assets/fedora/vmlinuz-4.15.13-300.fc27.x86_64"
@@ -48,6 +60,7 @@ resource "matchbox_profile" "vmhost_live" {
     "elevator=noop",
     "intel_iommu=on",
     "iommu=pt",
-    "cgroup_enable=memory"
+    "cgroup_enable=memory",
+    "rd.writable.fsimg=1"
   ]
 }

@@ -4,6 +4,8 @@
       "boot_command" : [
         "<tab> ",
         "inst.ks=http://haproxy.svc.internal:58080/generic?host={{user `kickstart`}} ",
+        "inst.text ",
+        "inst.gpt ",
         "<enter>"
       ],
       "disk_size" : 30000,
