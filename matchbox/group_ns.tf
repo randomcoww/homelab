@@ -1,3 +1,10 @@
+## profile
+resource "matchbox_profile" "ns" {
+  name   = "ns"
+  container_linux_config = "${file("./ignition/ns.yaml.tmpl")}"
+}
+
+## groups
 resource "matchbox_group" "ns1" {
   name    = "ns1"
   profile = "${matchbox_profile.ns.name}"

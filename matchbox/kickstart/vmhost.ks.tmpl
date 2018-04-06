@@ -1,5 +1,5 @@
 install
-# text
+text
 shutdown
 skipx
 url --mirrorlist=http://mirrors.fedoraproject.org/mirrorlist?repo=fedora-$releasever&arch=$basearch
@@ -19,9 +19,8 @@ user --name={{.default_user}} --password=password --plaintext --groups wheel
 
 ## disk
 zerombr
-clearpart --all --initlabel
-# autopart --type=plain
-part / --size=8192 --grow --fstype ext4
+clearpart --all --initlabel --disklabel=gpt
+autopart --type=plain
 
 bootloader --timeout=1 --append="console=tty0 console=ttyS1,115200n8 elevator=noop intel_iommu=on iommu=pt cgroup_enable=memory"
 
@@ -48,7 +47,6 @@ docker
 ca-certificates
 vim-enhanced
 rsync
-dracut-live
 
 ## zol
 kernel-devel
@@ -203,8 +201,8 @@ Description=fancontrol timer
 After=ipmievd.service
 
 [Timer]
-OnBootSec=3
-OnUnitInactiveSec=3
+OnBootSec=5
+OnUnitInactiveSec=5
 
 [Install]
 WantedBy=basic.target
@@ -253,18 +251,6 @@ UseDNS no
 PermitRootLogin no
 PasswordAuthentication no
 ChallengeResponseAuthentication no
-EOF
-
-## systemd configs from https://linux.xvx.cz/2017/07/how-to-build-pxe-fedora-26-live-image.html
-cat <<EOF >> /etc/systemd/system.conf
-DumpCore=no
-EOF
-
-cat <<EOF >> /etc/systemd/journald.conf
-Storage=volatile
-RuntimeMaxUse=15M
-ForwardToSyslog=no
-ForwardToConsole=no
 EOF
 
 

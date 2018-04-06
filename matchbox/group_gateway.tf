@@ -1,3 +1,10 @@
+## gateway
+resource "matchbox_profile" "gateway" {
+  name   = "gateway"
+  container_linux_config = "${file("./ignition/gateway.yaml.tmpl")}"
+}
+
+## groups
 resource "matchbox_group" "gateway1" {
   name    = "gateway1"
   profile = "${matchbox_profile.gateway.name}"

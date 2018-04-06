@@ -53,9 +53,14 @@ write_files:
       [Network]
       LinkLocalAddressing=no
       DHCP=yes
+      DNS={{.dns_ip}}
+      DNS=8.8.8.8
 
       [Address]
       Address={{.store_ip}}/{{.netmask}}
+
+      [Route]
+      Gateway={{.gateway_ip}}
   -
     path: /etc/kubernetes/environment
     permissions: 0644

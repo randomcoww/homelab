@@ -12,8 +12,54 @@ module "vmhost_cert" {
   ]
 }
 
+
 ##
-## common kickstart
+## vmhost kickstart renderer
+##
+resource "matchbox_profile" "vmhost_ks" {
+  name   = "vmhost_ks"
+  generic_config = "${file("./kickstart/vmhost.ks.tmpl")}"
+}
+
+resource "matchbox_profile" "vmhost_live_ks" {
+  name   = "vmhost_live_ks"
+  generic_config = "${file("./kickstart/vmhost_live.ks.tmpl")}"
+}
+
+
+##
+## render cloud configs
+##
+resource "matchbox_profile" "vmhost_cloud" {
+  name   = "vmhost_cloud"
+  generic_config = "${file("./cloud/vmhost.yaml.tmpl")}"
+}
+
+
+##
+## PXE live boot
+##
+resource "matchbox_profile" "vmhost_live" {
+  name   = "vmhost_live"
+  kernel = "/assets/fedora/vmlinuz-4.15.14-300.fc27.x86_64"
+  initrd = [
+    "/assets/fedora/initramfs-4.15.14-300.fc27.x86_64.img"
+  ]
+  args = [
+    "root=live:${var.matchbox_http_endpoint}/assets/fedora/live-rootfs.squashfs.img",
+    "console=tty0",
+    "console=ttyS1,115200n8",
+    "elevator=noop",
+    "intel_iommu=on",
+    "iommu=pt",
+    "cgroup_enable=memory",
+    "rd.writable.fsimg=1"
+  ]
+}
+
+
+##
+## kickstart
 ##
 resource "matchbox_group" "vmhost_ks" {
   name    = "vmhost_ks"
@@ -28,6 +74,21 @@ resource "matchbox_group" "vmhost_ks" {
     default_user = "${var.default_user}"
   }
 }
+
+resource "matchbox_group" "vmhost_live_ks" {
+  name    = "vmhost_live_ks"
+  profile = "${matchbox_profile.vmhost_live_ks.name}"
+
+  selector {
+    host = "vmhost_live_ks"
+  }
+
+  metadata {
+    name         = "vmhost_live_ks"
+    default_user = "${var.default_user}"
+  }
+}
+
 
 ##
 ## cloud-config renderer
@@ -44,6 +105,8 @@ resource "matchbox_group" "vmhost1" {
     name        = "vmhost1"
     store_ip    = "192.168.126.251"
     netmask     = "23"
+    gateway_ip  = "${var.gateway_ip}"
+    dns_ip      = "192.168.126.244"
     default_user    = "${var.default_user}"
     hyperkube_image = "${var.hyperkube_image}"
 
@@ -69,6 +132,8 @@ resource "matchbox_group" "vmhost2" {
     name        = "vmhost2"
     store_ip    = "192.168.126.252"
     netmask     = "23"
+    gateway_ip  = "${var.gateway_ip}"
+    dns_ip      = "192.168.126.244"
     default_user    = "${var.default_user}"
     hyperkube_image = "${var.hyperkube_image}"
 
@@ -81,6 +146,7 @@ resource "matchbox_group" "vmhost2" {
     manifest_url = "https://raw.githubusercontent.com/randomcoww/environment-config/master/manifests/vmhost2"
   }
 }
+
 
 ##
 ## PXE live boot profile selector
