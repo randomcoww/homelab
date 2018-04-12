@@ -1,4 +1,4 @@
-matchbox_http_endpoint = "http://haproxy.svc.internal:58080"
+matchbox_http_endpoint = "http://192.168.126.242:58080"
 matchbox_rpc_endpoint = "haproxy.svc.internal:58081"
 
 hyperkube_image = "gcr.io/google_containers/hyperkube:v1.10.0"
