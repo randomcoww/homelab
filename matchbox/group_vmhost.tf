@@ -102,7 +102,7 @@ resource "matchbox_group" "vmhost1" {
   }
 
   metadata {
-    name        = "vmhost1"
+    name        = "vmhost1.${var.internal_domain}"
     store_ip    = "192.168.126.251"
     netmask     = "23"
     gateway_ip  = "${var.gateway_ip}"
@@ -129,7 +129,7 @@ resource "matchbox_group" "vmhost2" {
   }
 
   metadata {
-    name        = "vmhost2"
+    name        = "vmhost2.${var.internal_domain}"
     store_ip    = "192.168.126.252"
     netmask     = "23"
     gateway_ip  = "${var.gateway_ip}"

@@ -32,6 +32,10 @@ variable "cluster_domain" {
   type        = "string"
 }
 
+variable "internal_domain" {
+  type        = "string"
+}
+
 variable "gateway_ip" {
   type        = "string"
 }

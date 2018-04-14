@@ -10,6 +10,8 @@ ssh_authorized_key = "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQCz0pddhkPMJy1DrfdtzE
 cluster_dns_ip = "10.3.0.10"
 cluster_domain = "cluster.local"
 
+internal_domain = "host.internal"
+
 container_linux_version = "1688.3.0"
 
 flannel_conf = <<EOF

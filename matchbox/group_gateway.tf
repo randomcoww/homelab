@@ -14,7 +14,7 @@ resource "matchbox_group" "gateway1" {
   }
 
   metadata {
-    name        = "gateway1"
+    name        = "gateway1.${var.internal_domain}"
     lan_ip      = "192.168.62.217"
     store_ip    = "192.168.126.217"
     netmask     = "23"
@@ -36,7 +36,7 @@ resource "matchbox_group" "gateway2" {
   }
 
   metadata {
-    name        = "gateway2"
+    name        = "gateway2.${var.internal_domain}"
     lan_ip      = "192.168.62.218"
     store_ip    = "192.168.126.218"
     netmask     = "23"

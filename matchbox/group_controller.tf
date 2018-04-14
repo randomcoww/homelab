@@ -44,7 +44,7 @@ resource "matchbox_group" "controller1" {
   }
 
   metadata {
-    name        = "controller1"
+    name        = "controller1.${var.internal_domain}"
     default_user    = "${var.default_user}"
     cluster_dns_ip  = "${var.cluster_dns_ip}"
     cluster_domain  = "${var.cluster_domain}"
@@ -75,7 +75,7 @@ resource "matchbox_group" "controller2" {
   }
 
   metadata {
-    name        = "controller2"
+    name        = "controller2.${var.internal_domain}"
     default_user    = "${var.default_user}"
     cluster_dns_ip  = "${var.cluster_dns_ip}"
     cluster_domain  = "${var.cluster_domain}"

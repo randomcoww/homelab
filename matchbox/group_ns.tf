@@ -32,7 +32,7 @@ resource "matchbox_group" "ns1" {
   }
 
   metadata {
-    name        = "ns1"
+    name        = "ns1.${var.internal_domain}"
     lan_ip      = "192.168.62.219"
     store_ip    = "192.168.126.219"
     netmask     = "23"
@@ -55,7 +55,7 @@ resource "matchbox_group" "ns2" {
   }
 
   metadata {
-    name        = "ns2"
+    name        = "ns2.${var.internal_domain}"
     lan_ip      = "192.168.62.220"
     store_ip    = "192.168.126.220"
     netmask     = "23"
@@ -78,7 +78,7 @@ resource "matchbox_group" "ns3" {
   }
 
   metadata {
-    name        = "ns3"
+    name        = "ns3.${var.internal_domain}"
     lan_ip      = "192.168.62.221"
     store_ip    = "192.168.126.221"
     netmask     = "23"
