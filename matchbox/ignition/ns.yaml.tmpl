@@ -11,7 +11,7 @@ networkd:
         DHCP=no
 
         [Address]
-        Address={{.lan_ip}}
+        Address={{.lan_ip}}/{{.netmask}}
     - name: eth1.network
       contents: |
         [Match]

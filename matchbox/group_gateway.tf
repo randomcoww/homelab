@@ -17,13 +17,14 @@ resource "matchbox_group" "gateway1" {
     name        = "gateway1.${var.internal_domain}"
     lan_ip      = "192.168.62.217"
     store_ip    = "192.168.126.217"
+    sync_ip     = "192.168.190.217"
     netmask     = "23"
     gateway_ip  = "${var.gateway_ip}"
     dns_ip      = "${var.dns_ip}"
     default_user    = "${var.default_user}"
     hyperkube_image = "${var.hyperkube_image}"
     ssh_authorized_key = "cert-authority ${tls_private_key.ssh.public_key_openssh}"
-    manifest_url = "https://raw.githubusercontent.com/randomcoww/environment-config/master/manifests/gateway"
+    manifest_url = "https://raw.githubusercontent.com/randomcoww/environment-config/master/manifests/gateway1"
   }
 }
 
@@ -39,12 +40,13 @@ resource "matchbox_group" "gateway2" {
     name        = "gateway2.${var.internal_domain}"
     lan_ip      = "192.168.62.218"
     store_ip    = "192.168.126.218"
+    sync_ip     = "192.168.190.218"
     netmask     = "23"
     gateway_ip  = "${var.gateway_ip}"
     dns_ip      = "${var.dns_ip}"
     default_user    = "${var.default_user}"
     hyperkube_image = "${var.hyperkube_image}"
     ssh_authorized_key = "cert-authority ${tls_private_key.ssh.public_key_openssh}"
-    manifest_url = "https://raw.githubusercontent.com/randomcoww/environment-config/master/manifests/gateway"
+    manifest_url = "https://raw.githubusercontent.com/randomcoww/environment-config/master/manifests/gateway2"
   }
 }

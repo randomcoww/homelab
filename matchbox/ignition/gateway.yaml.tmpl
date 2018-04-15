@@ -11,7 +11,7 @@ networkd:
         DHCP=no
 
         [Address]
-        Address={{.lan_ip}}
+        Address={{.lan_ip}}/{{.netmask}}
     - name: eth1.network
       contents: |
         [Match]
@@ -42,6 +42,17 @@ networkd:
         UseDomains=false
         UseTimezone=no
         RouteMetric=1024
+    - name: eth3.network
+      contents: |
+        [Match]
+        Name=eth3
+
+        [Network]
+        LinkLocalAddressing=no
+        DHCP=no
+
+        [Address]
+        Address={{.sync_ip}}/{{.netmask}}
 systemd:
   units:
     - name: kubelet.service
