@@ -156,6 +156,7 @@ resource "matchbox_group" "vmhost2_live" {
   profile = "${matchbox_profile.vmhost_live.name}"
 
   selector {
-    mac = "0c-c4-7a-da-b5-a0"
+    # mac = "0c-c4-7a-da-b5-a0"
+    mac = "00-1b-21-bc-67-c6"
   }
 }
