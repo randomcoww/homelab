@@ -23,6 +23,10 @@ networkd:
 
         [Address]
         Address={{.store_ip}}/{{.netmask}}
+
+        [Route]
+        Gateway={{.gateway_ip}}
+        Metric=2048
     - name: eth2.network
       contents: |
         [Match]
@@ -55,6 +59,17 @@ networkd:
         Address={{.sync_ip}}/{{.netmask}}
 systemd:
   units:
+    - name: disable-wan.service
+      enabled: {{.disable_wan}}
+      contents: |
+        [Unit]
+        After=systemd-networkd.service
+        BindsTo=systemd-networkd.service
+        [Service]
+        Type=oneshot
+        ExecStart=/usr/bin/ip link set eth2 down
+        [Install]
+        WantedBy=network.target
     - name: kubelet.service
       enabled: true
       contents: |
