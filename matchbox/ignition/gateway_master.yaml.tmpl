@@ -53,6 +53,11 @@ networkd:
         UseTimezone=no
         RouteMetric=1024
         RouteTable=100
+
+        [RoutingPolicyRule]
+        To=0.0.0.0/0
+        Table=100
+        Priority=32768
     - name: eth3.network
       contents: |
         [Match]
