@@ -19,6 +19,9 @@ write_files:
       [Match]
       Name=en*
 
+      [Link]
+      ARP=no
+
       [Network]
       LinkLocalAddressing=no
       DHCP=no
@@ -28,6 +31,9 @@ write_files:
     content: |
       [Match]
       Name=ens1f0
+
+      [Link]
+      ARP=no
 
       [Network]
       LinkLocalAddressing=no
