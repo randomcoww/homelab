@@ -1,0 +1,138 @@
+---
+networkd:
+  units:
+    - name: eth0.network
+      contents: |
+        [Match]
+        Name=eth0
+
+        [Network]
+        LinkLocalAddressing=no
+        DHCP=no
+
+        [Address]
+        Address={{.ip_lan}}/{{.netmask_lan}}
+    - name: eth1.network
+      contents: |
+        [Match]
+        Name=eth1
+
+        [Network]
+        LinkLocalAddressing=no
+        DHCP=no
+
+        [Address]
+        Address={{.ip_store}}/{{.netmask_store}}
+    - name: eth2.network
+      contents: |
+        [Match]
+        Name=eth2
+
+        [Network]
+        LinkLocalAddressing=no
+        DHCP=yes
+        DNS=127.0.0.1
+        DNS=8.8.8.8
+
+        [DHCP]
+        UseDNS=false
+        UseNTP=false
+        SendHostname=false
+        UseHostname=false
+        UseDomains=false
+        UseTimezone=no
+        RouteMetric=1024
+        RouteTable=100
+    - name: eth3.network
+      contents: |
+        [Match]
+        Name=eth3
+
+        [Network]
+        LinkLocalAddressing=no
+        DHCP=no
+
+        [Address]
+        Address={{.ip_sync}}/{{.netmask_sync}}
+systemd:
+  units:
+    - name: kubelet.service
+      enabled: true
+      contents: |
+        [Unit]
+        Description=Kubelet via Hyperkube ACI
+
+        [Service]
+        Environment="KUBELET_IMAGE=docker://{{.hyperkube_image}}"
+        Environment="RKT_RUN_ARGS=--uuid-file-save=/var/cache/kubelet-pod.uuid \
+          --volume=resolv,kind=host,source=/etc/resolv.conf \
+          --mount volume=resolv,target=/etc/resolv.conf \
+          --insecure-options=image"
+        ExecStartPre=/bin/mkdir -p /var/log/containers
+        ExecStartPre=-/usr/bin/rkt rm --uuid-file=/var/cache/kubelet-pod.uuid
+        ExecStart=/usr/lib/coreos/kubelet-wrapper \
+          --allow-privileged=true \
+          --manifest-url={{.manifest_url}} \
+          --docker-disable-shared-pid=false
+        ExecStop=-/usr/bin/rkt stop --uuid-file=/var/cache/kubelet-pod.uuid
+        Restart=on-failure
+        RestartSec=5
+
+        [Install]
+        WantedBy=multi-user.target
+    - name: docker.service
+      enabled: true
+      dropins:
+        - name: iptables.conf
+          contents: |
+            [Service]
+            Environment=DOCKER_OPTS=--iptables=false
+storage:
+  files:
+    - path: /etc/hostname
+      filesystem: root
+      mode: 0644
+      contents:
+        inline:
+          {{.hostname}}
+    - path: /etc/sysctl.d/ipforward.conf
+      filesystem: root
+      mode: 0644
+      contents:
+        inline: |
+          net.ipv4.ip_forward=1
+          net.ipv4.ip_nonlocal_bind=1
+    - path: /etc/sysctl.d/max-user-watches.conf
+      filesystem: root
+      contents:
+        inline: |
+          fs.inotify.max_user_watches=16184
+    - path: /etc/ssl/certs/ca.pem
+      filesystem: root
+      contents:
+        inline: "{{.tls_ca}}"
+    - path: /etc/ssl/certs/ca-key.pem
+      filesystem: root
+      contents:
+        inline: "{{.tls_ca_key}}"
+    - path: /etc/ssl/certs/matchbox.pem
+      filesystem: root
+      contents:
+        inline: "{{.tls_matchbox}}"
+    - path: /etc/ssl/certs/matchbox-key.pem
+      filesystem: root
+      contents:
+        inline: "{{.tls_matchbox_key}}"
+    - path: /etc/ssl/certs/cfssl.pem
+      filesystem: root
+      contents:
+        inline: "{{.tls_cfssl}}"
+    - path: /etc/ssl/certs/cfssl-key.pem
+      filesystem: root
+      contents:
+        inline: "{{.tls_cfssl_key}}"
+passwd:
+  users:
+  - name: {{.default_user}}
+    ssh_authorized_keys:
+      - {{.ssh_authorized_key}}
