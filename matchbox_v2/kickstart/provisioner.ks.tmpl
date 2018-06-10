@@ -1,0 +1,392 @@
+install
+text
+shutdown
+skipx
+url --mirrorlist=http://mirrors.fedoraproject.org/mirrorlist?repo=fedora-$releasever&arch=$basearch
+repo --name=fedora-updates --mirrorlist=http://mirrors.fedoraproject.org/mirrorlist?repo=updates-released-f$releasever&arch=$basearch
+repo --name=zfs-on-linux --baseurl=http://download.zfsonlinux.org/fedora/$releasever/$basearch/
+
+lang en_US.UTF-8
+keyboard us
+timezone --utc Etc/UTC
+rootpw --lock password
+firewall --disabled
+network --hostname={{.hostname}}
+
+## user
+user --name={{.default_user}} --password=password --plaintext --groups wheel
+sshkey --username={{.default_user}} "{{.ssh_authorized_key}}"
+
+## disk
+zerombr
+clearpart --all --initlabel --disklabel=gpt
+autopart --type=plain
+bootloader --timeout=1 --append="console=tty0 console=ttyS1,115200n8 elevator=noop intel_iommu=on iommu=pt cgroup_enable=memory"
+
+## packages
+%packages --excludeWeakdeps --excludedocs
+@core
+systemd-udev
+which
+ipmitool
+libvirt-daemon-kvm
+libvirt-client
+qemu-kvm
+openssh
+gnupg
+ksm
+nfs-utils
+pciutils
+screen
+dnf-automatic
+lm_sensors
+rsyslog
+ca-certificates
+vim-enhanced
+rsync
+runc
+
+## zol
+kernel-devel
+zfs
+
+-zfs-fuse
+-NetworkManager
+-plymouth
+-dhclient
+-sendmail
+-ppc64-utils
+%end
+
+
+##
+## post config
+##
+
+%post --erroronfail
+
+## download containerd
+wget -O /tmp/containerd.gz https://github.com/containerd/containerd/releases/download/v1.1.1-rc.0/containerd-1.1.1-rc.0.linux-amd64.tar.gz
+tar xzf /tmp/containerd.gz -C /usr/local
+rm /tmp/containerd.gz
+
+wget -O /tmp/crictl.gz https://github.com/kubernetes-incubator/cri-tools/releases/download/v1.0.0-beta.1/crictl-v1.0.0-beta.1-linux-amd64.tar.gz
+tar xzf /tmp/crictl.gz -C /usr/local/bin
+rm /tmp/crictl.gz
+
+## fan control
+cat <<EOF > /etc/systemd/system/fancontrol.service
+# ipmi fan control:
+#
+# ommited full speed:
+# ExecStartPre=/usr/bin/ipmitool raw 0x30 0x45 0x01 0x01
+#
+# setting a specific duty cycle:
+# fan control 0x30 0x70 0x66
+# get 0x00, set 0x01
+# zone FAN 1,2,.. 0x00, FAN A,B,.. 0x01
+# duty cycle 0x00-0x64
+[Unit]
+Description=Fan Control
+After=ipmievd.service
+
+[Service]
+Type=oneshot
+ExecStart=/usr/bin/ipmitool raw 0x30 0x70 0x66 0x01 0x00 0x10
+ExecStart=/usr/bin/ipmitool raw 0x30 0x70 0x66 0x01 0x01 0x10
+EOF
+
+cat <<EOF > /etc/systemd/system/fancontrol.timer
+[Unit]
+Description=fancontrol timer
+After=ipmievd.service
+
+[Timer]
+OnBootSec=5
+OnUnitActiveSec=5
+
+[Install]
+WantedBy=basic.target
+EOF
+
+cat <<EOF > /etc/systemd/system/containerd.service
+[Unit]
+Description=containerd container runtime
+Documentation=https://containerd.io
+After=network.target
+
+[Service]
+ExecStartPre=/sbin/modprobe overlay
+ExecStart=/usr/local/bin/containerd
+Restart=always
+RestartSec=5
+Delegate=yes
+KillMode=process
+OOMScoreAdjust=-999
+LimitNOFILE=1048576
+LimitNPROC=infinity
+LimitCORE=infinity
+
+[Install]
+WantedBy=multi-user.target
+EOF
+
+cat <<EOF > /etc/systemd/system/kubelet.service
+[Unit]
+After=network.target
+
+[Service]
+ExecStartPre=/usr/bin/mkdir -p /var/log/containers
+ExecStartPre=-/usr/bin/rkt rm --uuid-file=/var/run/kubelet-pod.uuid
+ExecStart=/usr/bin/rkt run \\
+  --insecure-options=image \\
+  --uuid-file-save=/var/run/kubelet-pod.uuid \\
+  \\
+  --volume dns,kind=host,source=/etc/resolv.conf \\
+  --volume data-manifest,kind=host,source=/data/manifest,readOnly=false \\
+  --volume var-log,kind=host,source=/var/log,readOnly=false \\
+  --volume os-release,kind=host,source=/usr/lib/os-release,readOnly=true \\
+  --volume run,kind=host,source=/run,readOnly=false \\
+  --volume lib-modules,kind=host,source=/lib/modules,readOnly=true \\
+  \\
+  --mount volume=dns,target=/etc/resolv.conf \\
+  --mount volume=data-manifest,target=/etc/manifest \\
+  --mount volume=var-log,target=/var/log \\
+  --mount volume=os-release,target=/etc/os-release \\
+  --mount volume=run,target=/run \\
+  --mount volume=lib-modules,target=/lib/modules \\
+  \\
+  --hosts-entry=host \\
+  --stage1-from-dir=stage1-fly.aci docker://{{.hyperkube_image}} \\
+  --exec=/kubelet -- \\
+  --allow-privileged=true \\
+  --pod-manifest-path=/etc/manifest \\
+  --container-runtime=remote \\
+  --container-runtime-endpoint=unix:///var/run/containerd/containerd.sock \\
+  --fail-swap-on=false \\
+  --cgroup-driver=systemd
+ExecStop=-/usr/bin/rkt stop --uuid-file=/var/run/kubelet-pod.uuid
+Restart=always
+RestartSec=10
+
+[Install]
+WantedBy=multi-user.target
+EOF
+
+
+##
+## networkd
+##
+
+## enable systemd-resolve
+ln -sf /run/systemd/resolve/resolv.conf /etc/resolv.conf
+
+## write all configs
+cat <<EOF > /etc/systemd/resolved.conf
+[Resolve]
+FallbackDNS=
+DNSStubListener=no
+EOF
+
+## default
+cat <<EOF > /etc/systemd/network/99_en.network
+[Match]
+Name=en*
+
+[Link]
+ARP=no
+
+[Network]
+LinkLocalAddressing=no
+DHCP=no
+EOF
+
+cat <<EOF > /etc/systemd/network/99_macvlan.netdev
+[NetDev]
+Name=macvlan_*
+Kind=macvlan
+
+[MACVLAN]
+Mode=bridge
+EOF
+
+## store
+cat <<EOF > /etc/systemd/network/00_{{.if_store}}.network
+[Match]
+Name={{.if_store}}
+
+[Link]
+ARP=no
+
+[Network]
+LinkLocalAddressing=no
+DHCP=no
+MACVLAN=macvlan_{{.if_store}}
+EOF
+
+cat <<EOF > /etc/systemd/network/00_macvlan_{{.if_store}}.network
+[Match]
+Name=macvlan_{{.if_store}}
+
+[Network]
+LinkLocalAddressing=no
+DHCP=no
+
+[Address]
+Address={{.ip_store}}/{{.netmask_store}}
+EOF
+
+## lan
+cat <<EOF > /etc/systemd/network/00_{{.if_lan}}.network
+[Match]
+Name={{.if_lan}}
+
+[Link]
+ARP=no
+
+[Network]
+LinkLocalAddressing=no
+DHCP=no
+MACVLAN=macvlan_{{.if_lan}}
+EOF
+
+cat <<EOF > /etc/systemd/network/00_macvlan_{{.if_lan}}.network
+[Match]
+Name=macvlan_{{.if_lan}}
+
+[Network]
+LinkLocalAddressing=no
+DHCP=no
+
+[Address]
+Address={{.ip_lan}}/{{.netmask_lan}}
+EOF
+
+## wan
+cat <<EOF > /etc/systemd/network/00_{{.if_wan}}.network
+[Match]
+Name={{.if_wan}}
+
+[Link]
+ARP=no
+
+[Network]
+LinkLocalAddressing=no
+DHCP=no
+MACVLAN=macvlan_{{.if_wan}}
+EOF
+
+cat <<EOF > /etc/systemd/network/00_macvlan_{{.if_wan}}.network
+[Match]
+Name=macvlan_{{.if_wan}}
+
+[Network]
+LinkLocalAddressing=no
+DHCP=yes
+DNS=127.0.0.1
+DNS=8.8.8.8
+
+[DHCP]
+UseDNS=false
+UseNTP=false
+SendHostname=false
+UseHostname=false
+UseDomains=false
+UseTimezone=no
+EOF
+
+
+##
+## general file writes
+##
+
+cat <<EOF > /etc/modprobe.d/local.conf
+options kvm ignore_msrs=1
+options kvm-intel nested=1
+options igb max_vfs=8
+options ixgbe max_vfs=8
+EOF
+
+cat <<EOF > /etc/dnf/automatic.conf
+[commands]
+apply_updates=True
+upgrade_type=security
+
+[emitters]
+emit_via=motd
+EOF
+
+cat <<EOF > /etc/ssh/sshd_config
+Subsystem sftp internal-sftp
+ClientAliveInterval 180
+UseDNS no
+PermitRootLogin no
+PasswordAuthentication no
+ChallengeResponseAuthentication no
+EOF
+
+cat <<EOF > /etc/containerd/config.toml
+[plugins]
+  [plugins.cri.containerd]
+    snapshotter = "overlayfs"
+    [plugins.cri.containerd.default_runtime]
+      runtime_type = "io.containerd.runtime.v1.linux"
+      runtime_engine = "/usr/bin/runc"
+      runtime_root = ""
+    [plugins.cri.containerd.untrusted_workload_runtime]
+      runtime_type = "io.containerd.runtime.v1.linux"
+      runtime_engine = "/usr/bin/runc"
+      runtime_root = "/run/containerd/runsc"
+EOF
+
+cat <<EOF > /etc/ssl/certs/ca.pem
+{{.tls_ca}}
+EOF
+
+cat <<EOF > /etc/ssl/certs/matchbox.pem
+{{.tls_matchbox}}
+EOF
+
+cat <<EOF > /etc/ssl/certs/matchbox-key.pem
+{{.tls_matchbox_key}}
+EOF
+
+
+##
+## grub
+##
+
+cat <<EOF >> /etc/default/grub
+GRUB_TERMINAL="console serial"
+GRUB_SERIAL_COMMAND="serial --unit=1 --speed=115200 --word=8 --parity=no --stop=1"
+EOF
+
+## regenerate grub config
+grub2-mkconfig -o /boot/grub2/grub.cfg
+
+
+##
+## enable services
+##
+
+systemctl enable \
+  systemd-networkd systemd-resolved chronyd \
+  ksm ksmtuned \
+  zfs-import-cache zfs-import-scan zfs-mount zfs-share zfs-zed zfs.target nfs-server \
+  fancontrol.timer \
+  dnf-automatic.timer \
+  containerd kubelet
+
+
+##
+## cleanup
+##
+
+dnf -y autoremove
+dnf -y clean all
+
+## remove machineid in case of reuse - may not be needed?
+echo -n > /var/lib/dbus/machine-id
+echo -n > /etc/machine-id
+
+%end
