@@ -8,50 +8,7 @@ networkd:
 
         [Network]
         LinkLocalAddressing=no
-        DHCP=no
-
-        [Address]
-        Address={{.ip_lan}}/{{.netmask_lan}}
-    - name: eth1.network
-      contents: |
-        [Match]
-        Name=eth1
-
-        [Network]
-        LinkLocalAddressing=no
-        DHCP=no
-
-        [Address]
-        Address={{.ip_store}}/{{.netmask_store}}
-    - name: eth2.network
-      contents: |
-        [Match]
-        Name=eth2
-
-        [Network]
-        LinkLocalAddressing=no
         DHCP=yes
-        DNS=127.0.0.1
-        DNS=8.8.8.8
-
-        [DHCP]
-        UseDNS=false
-        UseNTP=false
-        SendHostname=false
-        UseHostname=false
-        UseDomains=false
-        UseTimezone=no
-    - name: eth3.network
-      contents: |
-        [Match]
-        Name=eth3
-
-        [Network]
-        LinkLocalAddressing=no
-        DHCP=no
-
-        [Address]
-        Address={{.ip_sync}}/{{.netmask_sync}}
 systemd:
   units:
     - name: kubelet.service
@@ -78,13 +35,6 @@ systemd:
 
         [Install]
         WantedBy=multi-user.target
-    - name: docker.service
-      enabled: true
-      dropins:
-        - name: iptables.conf
-          contents: |
-            [Service]
-            Environment=DOCKER_OPTS=--iptables=false
 storage:
   files:
     - path: /etc/hostname
@@ -109,26 +59,22 @@ storage:
       filesystem: root
       contents:
         inline: "{{.tls_ca}}"
-    - path: /etc/ssl/certs/ca-key.pem
+    - path: /etc/ssl/certs/api_server.pem
       filesystem: root
       contents:
-        inline: "{{.tls_ca_key}}"
-    - path: /etc/ssl/certs/matchbox.pem
+        inline: "{{.tls_api_server}}"
+    - path: /etc/ssl/certs/api_server-key.pem
       filesystem: root
       contents:
-        inline: "{{.tls_matchbox}}"
-    - path: /etc/ssl/certs/matchbox-key.pem
+        inline: "{{.tls_api_server_key}}"
+    - path: /etc/ssl/certs/service_account.pem
       filesystem: root
       contents:
-        inline: "{{.tls_matchbox_key}}"
-    - path: /etc/ssl/certs/cfssl.pem
+        inline: "{{.tls_service_account}}"
+    - path: /etc/ssl/certs/service_account-key.pem
       filesystem: root
       contents:
-        inline: "{{.tls_cfssl}}"
-    - path: /etc/ssl/certs/cfssl-key.pem
-      filesystem: root
-      contents:
-        inline: "{{.tls_cfssl_key}}"
+        inline: "{{.tls_service_account_key}}"
 passwd:
   users:
   - name: {{.default_user}}

@@ -66,13 +66,13 @@ zfs
 %post --erroronfail
 
 ## download containerd
-wget -O /tmp/containerd.gz https://github.com/containerd/containerd/releases/download/v1.1.1-rc.0/containerd-1.1.1-rc.0.linux-amd64.tar.gz
-tar xzf /tmp/containerd.gz -C /usr/local
-rm /tmp/containerd.gz
+wget -O /tmp/containerd.gz https://github.com/containerd/containerd/releases/download/v1.1.1-rc.0/containerd-1.1.1-rc.0.linux-amd64.tar.gz \
+  && tar xzf /tmp/containerd.gz -C /usr/local \
+  && rm /tmp/containerd.gz
 
-wget -O /tmp/crictl.gz https://github.com/kubernetes-incubator/cri-tools/releases/download/v1.0.0-beta.1/crictl-v1.0.0-beta.1-linux-amd64.tar.gz
-tar xzf /tmp/crictl.gz -C /usr/local/bin
-rm /tmp/crictl.gz
+wget -O /tmp/crictl.gz https://github.com/kubernetes-incubator/cri-tools/releases/download/v1.0.0-beta.1/crictl-v1.0.0-beta.1-linux-amd64.tar.gz \
+  && tar xzf /tmp/crictl.gz -C /usr/local/bin \
+  && rm /tmp/crictl.gz
 
 ## fan control
 cat <<EOF > /etc/systemd/system/fancontrol.service
@@ -299,6 +299,11 @@ EOF
 ##
 ## general file writes
 ##
+
+cat <<EOF > /etc/sysctl.d/ipforward.conf
+net.ipv4.ip_forward=1
+net.ipv4.ip_nonlocal_bind=1
+EOF
 
 cat <<EOF > /etc/modprobe.d/local.conf
 options kvm ignore_msrs=1
