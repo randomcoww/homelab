@@ -12,23 +12,11 @@ variable "container_linux_version" {
   type        = "string"
 }
 
-variable "ssh_authorized_key" {
-  type        = "string"
-}
-
 variable "hyperkube_image" {
   type        = "string"
 }
 
 variable "default_user" {
-  type        = "string"
-}
-
-variable "cluster_dns_ip" {
-  type        = "string"
-}
-
-variable "cluster_domain" {
   type        = "string"
 }
 
@@ -41,17 +29,5 @@ variable "gateway_ip" {
 }
 
 variable "dns_ip" {
-  type        = "string"
-}
-
-variable "flannel_conf" {
-  type        = "string"
-}
-
-variable "cni_conf" {
-  type        = "string"
-}
-
-variable "kubeconfig_local" {
   type        = "string"
 }

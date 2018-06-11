@@ -1,6 +1,0 @@
-*/terraform.tfstate
-*/terraform.tfstate.backup
-*/.terraform
-*/crash.log
-output-qemu
-packer_cache

@@ -28,7 +28,8 @@ systemd:
         ExecStart=/usr/lib/coreos/kubelet-wrapper \
           --allow-privileged=true \
           --manifest-url={{.manifest_url}} \
-          --docker-disable-shared-pid=false
+          --docker-disable-shared-pid=false \
+          --make-iptables-util-chains=false
         ExecStop=-/usr/bin/rkt stop --uuid-file=/var/cache/kubelet-pod.uuid
         Restart=on-failure
         RestartSec=5
@@ -43,18 +44,6 @@ storage:
       contents:
         inline:
           {{.hostname}}
-    - path: /etc/sysctl.d/ipforward.conf
-      filesystem: root
-      mode: 0644
-      contents:
-        inline: |
-          net.ipv4.ip_forward=1
-          net.ipv4.ip_nonlocal_bind=1
-    - path: /etc/sysctl.d/max-user-watches.conf
-      filesystem: root
-      contents:
-        inline: |
-          fs.inotify.max_user_watches=16184
     - path: /etc/ssl/certs/ca.pem
       filesystem: root
       contents:
@@ -63,6 +52,7 @@ storage:
       filesystem: root
       contents:
         inline: "{{.tls_ca_key}}"
+
     - path: /etc/ssl/certs/api_server.pem
       filesystem: root
       contents:
@@ -71,6 +61,23 @@ storage:
       filesystem: root
       contents:
         inline: "{{.tls_api_server_key}}"
+    - path: /etc/ssl/certs/controller_manager.pem
+      filesystem: root
+      contents:
+        inline: "{{.tls_controller_manager}}"
+    - path: /etc/ssl/certs/controller_manager-key.pem
+      filesystem: root
+      contents:
+        inline: "{{.tls_controller_manager_key}}"
+    - path: /etc/ssl/certs/scheduler.pem
+      filesystem: root
+      contents:
+        inline: "{{.tls_scheduler}}"
+    - path: /etc/ssl/certs/scheduler-key.pem
+      filesystem: root
+      contents:
+        inline: "{{.tls_scheduler_key}}"
+
     - path: /etc/ssl/certs/service_account.pem
       filesystem: root
       contents:
