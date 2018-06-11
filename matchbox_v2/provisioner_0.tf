@@ -23,6 +23,7 @@ resource "matchbox_group" "provisioner_0" {
     hyperkube_image = "${var.hyperkube_image}"
     ssh_authorized_key = "cert-authority ${chomp(tls_private_key.ssh_ca.public_key_openssh)}"
     default_user  = "${var.default_user}"
+    hyperkube_image = "gcr.io/google_containers/hyperkube:v1.10.3"
 
     ip_lan        = "192.168.62.218"
     if_lan        = "ens1f1"
@@ -32,7 +33,6 @@ resource "matchbox_group" "provisioner_0" {
     netmask_store = "23"
     if_wan        = "eno2"
 
-    hyperkube_image = "gcr.io/google_containers/hyperkube:v1.10.3"
     tls_ca        = "${chomp(tls_self_signed_cert.root.cert_pem)}"
     tls_matchbox  = "${chomp(tls_locally_signed_cert.matchbox.cert_pem)}"
     tls_matchbox_key = "${chomp(tls_private_key.matchbox.private_key_pem)}"

@@ -59,6 +59,10 @@ storage:
       filesystem: root
       contents:
         inline: "{{.tls_ca}}"
+    - path: /etc/ssl/certs/ca-key.pem
+      filesystem: root
+      contents:
+        inline: "{{.tls_ca_key}}"
     - path: /etc/ssl/certs/api_server.pem
       filesystem: root
       contents:
