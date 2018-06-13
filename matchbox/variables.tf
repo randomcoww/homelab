@@ -31,3 +31,11 @@ variable "gateway_ip" {
 variable "dns_ip" {
   type        = "string"
 }
+
+variable "controller_ip" {
+  type        = "string"
+}
+
+variable "matchbox_ip" {
+  type        = "string"
+}

@@ -1,0 +1,210 @@
+---
+networkd:
+  units:
+    - name: eth0.network
+      contents: |
+        [Match]
+        Name=eth0
+
+        [Network]
+        LinkLocalAddressing=no
+        DHCP=yes
+
+        [Address]
+        Address={{.ip_store}}/{{.netmask_store}}
+systemd:
+  units:
+    - name: kubelet.service
+      enabled: true
+      contents: |
+        [Unit]
+        Description=Kubelet via Hyperkube ACI
+
+        [Service]
+        Environment="KUBELET_IMAGE=docker://{{.hyperkube_image}}"
+        Environment="RKT_RUN_ARGS=--uuid-file-save=/var/cache/kubelet-pod.uuid \
+          --volume=resolv,kind=host,source=/etc/resolv.conf \
+          --volume=var-lib-kubernetes,kind=host,source=/var/lib/kubernetes \
+          --mount volume=resolv,target=/etc/resolv.conf \
+          --mount volume=var-lib-kubernetes,target=/var/lib/kubernetes \
+          --insecure-options=image"
+        ExecStartPre=/bin/mkdir -p /var/log/containers
+        ExecStartPre=-/usr/bin/rkt rm --uuid-file=/var/cache/kubelet-pod.uuid
+        ExecStart=/usr/lib/coreos/kubelet-wrapper \
+          --allow-privileged=true \
+          --config=/var/lib/kubernetes/kubelet-config.yaml \
+          --kubeconfig=/var/lib/kubernetes/kubelet.kubeconfig \
+          --cni-conf-dir=/var/lib/kubernetes/cni \
+          --network-plugin=cni \
+          --register-node=true \
+          --v=2
+        ExecStop=-/usr/bin/rkt stop --uuid-file=/var/cache/kubelet-pod.uuid
+        Restart=on-failure
+        RestartSec=5
+
+        [Install]
+        WantedBy=multi-user.target
+storage:
+  files:
+    - path: /etc/hostname
+      filesystem: root
+      mode: 0644
+      contents:
+        inline:
+          {{.hostname}}
+    - path: /var/lib/kubernetes/ca.pem
+      filesystem: root
+      mode: 420
+      contents:
+        inline: "{{.tls_ca}}"
+
+    - path: /var/lib/kubernetes/kubelet.pem
+      filesystem: root
+      mode: 420
+      contents:
+        inline: "{{.tls_kubelet}}"
+    - path: /var/lib/kubernetes/kubelet-key.pem
+      filesystem: root
+      mode: 420
+      contents:
+        inline: "{{.tls_kubelet_key}}"
+    - path: /var/lib/kubernetes/kube-proxy.pem
+      filesystem: root
+      mode: 420
+      contents:
+        inline: "{{.tls_proxy}}"
+    - path: /var/lib/kubernetes/kube-proxy-key.pem
+      filesystem: root
+      mode: 420
+      contents:
+        inline: "{{.tls_proxy_key}}"
+
+    - path: /var/lib/kubernetes/kubelet-config.yaml
+      filesystem: root
+      mode: 420
+      contents:
+        inline: |-
+          kind: KubeletConfiguration
+          apiVersion: kubelet.config.k8s.io/v1beta1
+          authentication:
+            anonymous:
+              enabled: false
+            webhook:
+              enabled: true
+            x509:
+              clientCAFile: "/var/lib/kubernetes/ca.pem"
+          authorization:
+            mode: Webhook
+          clusterDomain: "cluster.local"
+          clusterDNS:
+            - "10.32.0.10"
+          podCIDR: "10.200.0.0/16"
+          runtimeRequestTimeout: "15m"
+          StaticPodURL: {{.manifest_url}}
+          tlsCertFile: "/var/lib/kubernetes/kubelet.pem"
+          tlsPrivateKeyFile: "/var/lib/kubernetes/kubelet-key.pem"
+
+    - path: /var/lib/kubernetes/kube-proxy-config.yaml
+      filesystem: root
+      mode: 420
+      contents:
+        inline: |-
+          kind: KubeProxyConfiguration
+          apiVersion: kubeproxy.config.k8s.io/v1alpha1
+          clientConnection:
+            kubeconfig: "/var/lib/kubernetes/kube-proxy.kubeconfig"
+          mode: "iptables"
+          clusterCIDR: "10.200.0.0/16"
+
+    - path: /var/lib/kubernetes/kube-proxy.kubeconfig
+      filesystem: root
+      mode: 420
+      contents:
+        inline: |-
+          apiVersion: v1
+          clusters:
+          - cluster:
+              certificate-authority: /var/lib/kubernetes/ca.pem
+              server: https://192.168.126.245:56443
+            name: kube_cluster
+          contexts:
+          - context:
+              cluster: kube_cluster
+              user: system:kube-proxy
+            name: default
+          current-context: default
+          kind: Config
+          preferences: {}
+          users:
+          - name: system:kube-proxy
+            user:
+              client-certificate: /var/lib/kubernetes/kube-proxy.pem
+              client-key: /var/lib/kubernetes/kube-proxy-key.pem
+
+    - path: /var/lib/kubernetes/kubelet.kubeconfig
+      filesystem: root
+      mode: 420
+      contents:
+        inline: |-
+          apiVersion: v1
+          clusters:
+          - cluster:
+              certificate-authority: /var/lib/kubernetes/ca.pem
+              server: https://192.168.126.245:56443
+            name: kube_cluster
+          contexts:
+          - context:
+              cluster: kube_cluster
+              user: system:node:{{.hostname}}
+            name: default
+          current-context: default
+          kind: Config
+          preferences: {}
+          users:
+          - name: system:node:{{.hostname}}
+            user:
+              client-certificate: /var/lib/kubernetes/kubelet.pem
+              client-key: /var/lib/kubernetes/kubelet-key.pem
+
+    - path: /var/lib/kubernetes/cni/10-flannel.conf
+      filesystem: root
+      mode: 420
+      contents:
+        inline: |-
+          {
+            "name": "cbr0",
+            "type": "flannel",
+            "delegate": {
+              "hairpinMode": true,
+              "isDefaultGateway": true
+            }
+          }
+    - path: /etc/kube-flannel/cni-conf.json
+      filesystem: root
+      mode: 420
+      contents:
+        inline: |-
+          {
+            "name": "cbr0",
+            "type": "flannel",
+            "delegate": {
+              "hairpinMode": true,
+              "isDefaultGateway": true
+            }
+          }
+    - path: /etc/kube-flannel/net-conf.json
+      filesystem: root
+      mode: 420
+      contents:
+        inline: |-
+          {
+            "Network": "10.200.0.0/16",
+            "Backend": {
+              "Type": "vxlan"
+            }
+          }
+passwd:
+  users:
+  - name: {{.default_user}}
+    ssh_authorized_keys:
+      - {{.ssh_authorized_key}}

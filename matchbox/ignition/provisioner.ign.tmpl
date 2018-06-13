@@ -103,19 +103,23 @@ storage:
           net.ipv4.ip_nonlocal_bind=1
     - path: /etc/sysctl.d/max-user-watches.conf
       filesystem: root
+      mode: 0644
       contents:
         inline: |
           fs.inotify.max_user_watches=16184
     - path: /etc/ssl/certs/ca.pem
       filesystem: root
+      mode: 420
       contents:
         inline: "{{.tls_ca}}"
     - path: /etc/ssl/certs/matchbox.pem
       filesystem: root
+      mode: 420
       contents:
         inline: "{{.tls_matchbox}}"
     - path: /etc/ssl/certs/matchbox-key.pem
       filesystem: root
+      mode: 420
       contents:
         inline: "{{.tls_matchbox_key}}"
 passwd:
