@@ -9,9 +9,6 @@ networkd:
         [Network]
         LinkLocalAddressing=no
         DHCP=yes
-
-        [Address]
-        Address={{.ip_store}}/{{.netmask_store}}
 systemd:
   units:
     - name: kubelet.service

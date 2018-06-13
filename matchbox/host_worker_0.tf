@@ -36,9 +36,6 @@ resource "matchbox_group" "worker_0" {
     manifest_url  = "https://raw.githubusercontent.com/randomcoww/environment-config/master/manifests/worker-0"
     hyperkube_image = "gcr.io/google_containers/hyperkube:v1.10.3"
 
-    ip_store      = "192.168.126.220"
-    netmask_store = "23"
-
     tls_ca        = "${replace(tls_self_signed_cert.root.cert_pem, "\n", "\\n")}"
 
     tls_kubelet   = "${replace(tls_locally_signed_cert.kubelet.cert_pem, "\n", "\\n")}"
