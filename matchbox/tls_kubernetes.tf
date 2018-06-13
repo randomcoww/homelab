@@ -24,6 +24,7 @@ resource "tls_cert_request" "kubernetes" {
   ip_addresses = [
     "127.0.0.1",
     "${var.controller_ip}",
+    "${var.worker_ip}",
     "10.32.0.1",
   ]
 }

@@ -39,3 +39,7 @@ variable "controller_ip" {
 variable "matchbox_ip" {
   type        = "string"
 }
+
+variable "worker_ip" {
+  type        = "string"
+}
