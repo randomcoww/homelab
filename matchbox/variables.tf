@@ -20,26 +20,34 @@ variable "default_user" {
   type        = "string"
 }
 
-variable "internal_domain" {
+variable "matchbox_url" {
   type        = "string"
 }
 
-variable "gateway_ip" {
+variable "cluster_cidr" {
   type        = "string"
 }
 
-variable "dns_ip" {
+variable "cluster_dns_ip" {
   type        = "string"
 }
 
-variable "controller_ip" {
+variable "cluster_service_ip" {
   type        = "string"
 }
 
-variable "matchbox_ip" {
+variable "cluster_name" {
   type        = "string"
 }
 
-variable "worker_ip" {
+variable "cluster_domain" {
+  type        = "string"
+}
+
+variable "vip_matchbox" {
+  type        = "string"
+}
+
+variable "vip_controller" {
   type        = "string"
 }

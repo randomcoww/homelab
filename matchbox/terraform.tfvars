@@ -2,13 +2,16 @@ matchbox_http_endpoint = "http://127.0.0.1:58080"
 matchbox_rpc_endpoint = "127.0.0.1:58081"
 
 container_linux_version = "1688.3.0"
-
 hyperkube_image = "gcr.io/google_containers/hyperkube:v1.10.3"
-
-internal_domain = "host.internal"
-gateway_ip      = "192.168.126.240"
-dns_ip          = "192.168.126.244"
-controller_ip   = "192.168.126.245"
-matchbox_ip     = "192.168.126.242"
-worker_ip       = "192.168.126.246"
 default_user    = "core"
+
+matchbox_url    = "http://192.168.126.242:58080"
+cluster_cidr    = "10.200.0.0/16"
+cluster_dns_ip  = "10.32.0.10"
+cluster_service_ip = "10.32.0.1"
+
+cluster_name    = "kube_cluster"
+cluster_domain  = "kubernetes.default"
+
+vip_matchbox    = "192.168.126.242"
+vip_controller  = "192.168.126.245"

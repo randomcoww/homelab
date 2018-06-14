@@ -16,16 +16,13 @@ resource "tls_cert_request" "kubernetes" {
   }
 
   dns_names = [
-    "kubernetes.default",
-    "host.internal",
-    "svc.internal"
+    "${var.cluster_domain}"
   ]
 
   ip_addresses = [
     "127.0.0.1",
-    "${var.controller_ip}",
-    "${var.worker_ip}",
-    "10.32.0.1",
+    "${var.cluster_service_ip}",
+    "${var.vip_controller}",
   ]
 }
 

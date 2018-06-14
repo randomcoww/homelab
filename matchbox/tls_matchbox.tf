@@ -15,14 +15,9 @@ resource "tls_cert_request" "matchbox" {
     organization = "matchbox"
   }
 
-  dns_names = [
-    "host.internal",
-    "svc.internal"
-  ]
-
   ip_addresses = [
     "127.0.0.1",
-    "192.168.126.240"
+    "${var.vip_matchbox}"
   ]
 }
 

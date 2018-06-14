@@ -32,6 +32,7 @@ systemd:
           --config=/var/lib/kubernetes/kubelet-config.yaml \
           --kubeconfig=/var/lib/kubernetes/kubelet.kubeconfig \
           --cni-conf-dir=/var/lib/kubernetes/cni \
+          --docker-disable-shared-pid=false \
           --network-plugin=cni \
           --register-node=true \
           --v=2
@@ -92,10 +93,10 @@ storage:
               clientCAFile: "/var/lib/kubernetes/ca.pem"
           authorization:
             mode: Webhook
-          clusterDomain: "cluster.local"
+          clusterDomain: "{{.cluster_domain}}"
           clusterDNS:
-            - "10.32.0.10"
-          podCIDR: "10.200.0.0/16"
+            - "{{.cluster_dns_ip}}"
+          podCIDR: "{{.cluster_cidr}}"
           runtimeRequestTimeout: "15m"
           StaticPodURL: {{.manifest_url}}
           tlsCertFile: "/var/lib/kubernetes/kubelet.pem"
@@ -111,7 +112,7 @@ storage:
           clientConnection:
             kubeconfig: "/var/lib/kubernetes/kube-proxy.kubeconfig"
           mode: "iptables"
-          clusterCIDR: "10.200.0.0/16"
+          clusterCIDR: "{{.cluster_cidr}}"
 
     - path: /var/lib/kubernetes/kube-proxy.kubeconfig
       filesystem: root
@@ -122,7 +123,7 @@ storage:
           clusters:
           - cluster:
               certificate-authority: /var/lib/kubernetes/ca.pem
-              server: https://192.168.126.245:56443
+              server: {{.apiserver_url}}
             name: kube_cluster
           contexts:
           - context:
@@ -147,7 +148,7 @@ storage:
           clusters:
           - cluster:
               certificate-authority: /var/lib/kubernetes/ca.pem
-              server: https://192.168.126.245:56443
+              server: {{.apiserver_url}}
             name: kube_cluster
           contexts:
           - context:
@@ -195,7 +196,7 @@ storage:
       contents:
         inline: |-
           {
-            "Network": "10.200.0.0/16",
+            "Network": "{{.cluster_cidr}}",
             "Backend": {
               "Type": "vxlan"
             }

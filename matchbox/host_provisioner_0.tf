@@ -19,12 +19,12 @@ resource "matchbox_group" "provisioner_0" {
   }
 
   metadata {
-    hostname      = "provisioner-0.${var.internal_domain}"
+    hostname      = "provisioner-0"
     hyperkube_image = "${var.hyperkube_image}"
     ssh_authorized_key = "cert-authority ${chomp(tls_private_key.ssh_ca.public_key_openssh)}"
     default_user  = "${var.default_user}"
+    hyperkube_image = "${var.hyperkube_image}"
     manifest_url  = "https://raw.githubusercontent.com/randomcoww/environment-config/master/ignition/provisioner_0"
-    hyperkube_image = "gcr.io/google_containers/hyperkube:v1.10.3"
 
     ip_lan        = "192.168.62.218"
     netmask_lan   = "23"

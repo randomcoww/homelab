@@ -19,7 +19,7 @@ resource "matchbox_group" "store_0" {
   }
 
   metadata {
-    hostname      = "store-0.${var.internal_domain}"
+    hostname      = "store-0"
     hyperkube_image = "${var.hyperkube_image}"
     ssh_authorized_key = "cert-authority ${chomp(tls_private_key.ssh_ca.public_key_openssh)}"
     default_user  = "${var.default_user}"

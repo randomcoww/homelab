@@ -121,7 +121,7 @@ storage:
           clusters:
           - cluster:
               certificate-authority: /var/lib/kubernetes/ca.pem
-              server: https://127.0.0.1:56443
+              server: {{.apiserver_url}}
             name: kube_cluster
           contexts:
           - context:
@@ -146,7 +146,7 @@ storage:
           clusters:
           - cluster:
               certificate-authority: /var/lib/kubernetes/ca.pem
-              server: https://127.0.0.1:56443
+              server: {{.apiserver_url}}
             name: kube_cluster
           contexts:
           - context:
