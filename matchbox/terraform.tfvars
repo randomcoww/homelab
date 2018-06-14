@@ -11,7 +11,7 @@ cluster_dns_ip  = "10.32.0.10"
 cluster_service_ip = "10.32.0.1"
 
 cluster_name    = "kube_cluster"
-cluster_domain  = "kubernetes.default"
+cluster_domain  = "cluster.local"
 
 vip_matchbox    = "192.168.126.242"
 vip_controller  = "192.168.126.245"

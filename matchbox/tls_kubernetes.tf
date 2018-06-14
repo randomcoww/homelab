@@ -16,7 +16,7 @@ resource "tls_cert_request" "kubernetes" {
   }
 
   dns_names = [
-    "${var.cluster_domain}"
+    "kubernetes.default"
   ]
 
   ip_addresses = [
