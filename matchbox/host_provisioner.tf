@@ -1,8 +1,8 @@
 ##
 ## gateway kickstart renderer
 ##
-resource "matchbox_profile" "provisioner_0" {
-  name   = "provisioner_0"
+resource "matchbox_profile" "provisioner" {
+  name   = "provisioner"
   container_linux_config = "${file("./ignition/provisioner.ign.tmpl")}"
 }
 
@@ -12,7 +12,7 @@ resource "matchbox_profile" "provisioner_0" {
 ##
 resource "matchbox_group" "provisioner_0" {
   name    = "provisioner_0"
-  profile = "${matchbox_profile.provisioner_0.name}"
+  profile = "${matchbox_profile.provisioner.name}"
 
   selector {
     host = "provisioner_0"
@@ -24,7 +24,7 @@ resource "matchbox_group" "provisioner_0" {
     ssh_authorized_key = "cert-authority ${chomp(tls_private_key.ssh_ca.public_key_openssh)}"
     default_user  = "${var.default_user}"
     hyperkube_image = "${var.hyperkube_image}"
-    manifest_url  = "https://raw.githubusercontent.com/randomcoww/environment-config/master/ignition/provisioner_0"
+    manifest_url  = "https://raw.githubusercontent.com/randomcoww/environment-config/master/ignition/provisioner-0"
 
     ip_lan        = "192.168.62.218"
     netmask_lan   = "23"

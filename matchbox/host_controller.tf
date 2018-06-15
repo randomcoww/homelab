@@ -1,8 +1,8 @@
 ##
 ## kube controller kickstart renderer
 ##
-resource "matchbox_profile" "controller_0" {
-  name   = "controller_0"
+resource "matchbox_profile" "controller" {
+  name   = "controller"
   container_linux_config = "${file("./ignition/controller.ign.tmpl")}"
   kernel = "/assets/coreos/${var.container_linux_version}/coreos_production_pxe.vmlinuz"
   initrd = [
@@ -22,7 +22,7 @@ resource "matchbox_profile" "controller_0" {
 ##
 resource "matchbox_group" "controller_0" {
   name    = "controller_0"
-  profile = "${matchbox_profile.controller_0.name}"
+  profile = "${matchbox_profile.controller.name}"
 
   selector {
     mac = "52-54-00-1a-61-8b"
