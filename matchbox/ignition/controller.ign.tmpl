@@ -30,9 +30,7 @@ systemd:
         ExecStartPre=-/usr/bin/rkt rm --uuid-file=/var/cache/kubelet-pod.uuid
         ExecStart=/usr/lib/coreos/kubelet-wrapper \
           --allow-privileged=true \
-          --manifest-url={{.manifest_url}} \
-          --docker-disable-shared-pid=false \
-          --make-iptables-util-chains=false
+          --manifest-url={{.manifest_url}}
         ExecStop=-/usr/bin/rkt stop --uuid-file=/var/cache/kubelet-pod.uuid
         Restart=on-failure
         RestartSec=5
@@ -122,10 +120,10 @@ storage:
           - cluster:
               certificate-authority: /var/lib/kubernetes/ca.pem
               server: {{.apiserver_url}}
-            name: kube_cluster
+            name: {{.cluster_name}}
           contexts:
           - context:
-              cluster: kube_cluster
+              cluster: {{.cluster_name}}
               user: system:kube-controller-manager
             name: default
           current-context: default
@@ -147,10 +145,10 @@ storage:
           - cluster:
               certificate-authority: /var/lib/kubernetes/ca.pem
               server: {{.apiserver_url}}
-            name: kube_cluster
+            name: {{.cluster_name}}
           contexts:
           - context:
-              cluster: kube_cluster
+              cluster: {{.cluster_name}}
               user: system:kube-scheduler
             name: default
           current-context: default

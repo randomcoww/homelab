@@ -1,8 +1,8 @@
 ##
 ## kube worker kickstart renderer
 ##
-resource "matchbox_profile" "worker_0" {
-  name   = "worker_0"
+resource "matchbox_profile" "worker_1" {
+  name   = "worker_1"
   container_linux_config = "${file("./ignition/worker.ign.tmpl")}"
   kernel = "/assets/coreos/${var.container_linux_version}/coreos_production_pxe.vmlinuz"
   initrd = [
@@ -20,21 +20,21 @@ resource "matchbox_profile" "worker_0" {
 ##
 ## kickstart
 ##
-resource "matchbox_group" "worker_0" {
-  name    = "worker_0"
-  profile = "${matchbox_profile.worker_0.name}"
+resource "matchbox_group" "worker_1" {
+  name    = "worker_1"
+  profile = "${matchbox_profile.worker_1.name}"
 
   selector {
-    mac = "52-54-00-1a-61-8c"
+    mac = "52-54-00-1a-61-8d"
   }
 
   metadata {
-    hostname      = "worker-0"
+    hostname      = "worker-1"
     hyperkube_image = "${var.hyperkube_image}"
     ssh_authorized_key = "cert-authority ${chomp(tls_private_key.ssh_ca.public_key_openssh)}"
     default_user  = "${var.default_user}"
     hyperkube_image = "${var.hyperkube_image}"
-    manifest_url  = "https://raw.githubusercontent.com/randomcoww/environment-config/master/manifests/worker-0"
+    manifest_url  = "https://raw.githubusercontent.com/randomcoww/environment-config/master/manifests/worker"
     apiserver_url = "https://192.168.126.245:56443"
 
     cluster_cidr   = "${var.cluster_cidr}"

@@ -37,6 +37,8 @@ resource "matchbox_group" "controller_0" {
     manifest_url  = "https://raw.githubusercontent.com/randomcoww/environment-config/master/manifests/controller-0"
     apiserver_url = "https://127.0.0.1:56443"
 
+    cluster_name   = "${var.cluster_name}"
+
     ip_store      = "192.168.126.219"
     netmask_store = "23"
 
