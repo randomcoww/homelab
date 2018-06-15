@@ -4,6 +4,17 @@
 resource "matchbox_profile" "provisioner" {
   name   = "provisioner"
   container_linux_config = "${file("./ignition/provisioner.ign.tmpl")}"
+  kernel = "/assets/coreos/${var.container_linux_version}/coreos_production_pxe.vmlinuz"
+  initrd = [
+    "/assets/coreos/${var.container_linux_version}/coreos_production_pxe_image.cpio.gz"
+  ]
+  args = [
+    "coreos.config.url=${var.matchbox_url}/ignition?mac=$${mac:hexhyp}",
+    "coreos.first_boot=yes",
+    "console=hvc0",
+    "coreos.autologin",
+    "provisioner_slave=1"
+  ]
 }
 
 
@@ -15,7 +26,7 @@ resource "matchbox_group" "provisioner_0" {
   profile = "${matchbox_profile.provisioner.name}"
 
   selector {
-    host = "provisioner_0"
+    host = "provisioner-0"
   }
 
   metadata {
@@ -24,7 +35,7 @@ resource "matchbox_group" "provisioner_0" {
     ssh_authorized_key = "cert-authority ${chomp(tls_private_key.ssh_ca.public_key_openssh)}"
     default_user  = "${var.default_user}"
     hyperkube_image = "${var.hyperkube_image}"
-    manifest_url  = "https://raw.githubusercontent.com/randomcoww/environment-config/master/ignition/provisioner-0"
+    manifest_url  = "https://raw.githubusercontent.com/randomcoww/environment-config/master/manifests/provisioner"
 
     ip_lan        = "192.168.62.218"
     netmask_lan   = "23"
@@ -32,6 +43,67 @@ resource "matchbox_group" "provisioner_0" {
     netmask_store = "23"
     ip_sync       = "192.168.190.218"
     netmask_sync  = "23"
+    vip_gateway   = "${var.vip_gateway}"
+
+    tls_ca        = "${replace(tls_self_signed_cert.root.cert_pem, "\n", "\\n")}"
+    tls_matchbox  = "${replace(tls_locally_signed_cert.matchbox.cert_pem, "\n", "\\n")}"
+    tls_matchbox_key = "${replace(tls_private_key.matchbox.private_key_pem, "\n", "\\n")}"
+  }
+}
+
+resource "matchbox_group" "slave_0" {
+  name    = "slave_0"
+  profile = "${matchbox_profile.provisioner.name}"
+
+  selector {
+    mac = "52-54-00-1a-61-8e"
+  }
+
+  metadata {
+    hostname      = "slave-0"
+    hyperkube_image = "${var.hyperkube_image}"
+    ssh_authorized_key = "cert-authority ${chomp(tls_private_key.ssh_ca.public_key_openssh)}"
+    default_user  = "${var.default_user}"
+    hyperkube_image = "${var.hyperkube_image}"
+    manifest_url  = "https://raw.githubusercontent.com/randomcoww/environment-config/master/manifests/provisioner"
+
+    ip_lan        = "192.168.62.217"
+    netmask_lan   = "23"
+    ip_store      = "192.168.126.217"
+    netmask_store = "23"
+    ip_sync       = "192.168.190.217"
+    netmask_sync  = "23"
+    vip_gateway   = "${var.vip_gateway}"
+
+    tls_ca        = "${replace(tls_self_signed_cert.root.cert_pem, "\n", "\\n")}"
+    tls_matchbox  = "${replace(tls_locally_signed_cert.matchbox.cert_pem, "\n", "\\n")}"
+    tls_matchbox_key = "${replace(tls_private_key.matchbox.private_key_pem, "\n", "\\n")}"
+  }
+}
+
+resource "matchbox_group" "slave_1" {
+  name    = "slave_1"
+  profile = "${matchbox_profile.provisioner.name}"
+
+  selector {
+    mac = "52-54-00-1a-61-8f"
+  }
+
+  metadata {
+    hostname      = "slave-1"
+    hyperkube_image = "${var.hyperkube_image}"
+    ssh_authorized_key = "cert-authority ${chomp(tls_private_key.ssh_ca.public_key_openssh)}"
+    default_user  = "${var.default_user}"
+    hyperkube_image = "${var.hyperkube_image}"
+    manifest_url  = "https://raw.githubusercontent.com/randomcoww/environment-config/master/manifests/provisioner"
+
+    ip_lan        = "192.168.62.218"
+    netmask_lan   = "23"
+    ip_store      = "192.168.126.218"
+    netmask_store = "23"
+    ip_sync       = "192.168.190.218"
+    netmask_sync  = "23"
+    vip_gateway   = "${var.vip_gateway}"
 
     tls_ca        = "${replace(tls_self_signed_cert.root.cert_pem, "\n", "\\n")}"
     tls_matchbox  = "${replace(tls_locally_signed_cert.matchbox.cert_pem, "\n", "\\n")}"

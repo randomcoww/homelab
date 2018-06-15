@@ -53,12 +53,18 @@ storage:
       contents:
         inline:
           {{.hostname}}
+    - path: /etc/sysctl.d/max-user-watches.conf
+      filesystem: root
+      mode: 0644
+      contents:
+        inline: |
+          fs.inotify.max_user_watches=16184
+
     - path: /var/lib/kubernetes/ca.pem
       filesystem: root
       mode: 420
       contents:
         inline: "{{.tls_ca}}"
-
     - path: /var/lib/kubernetes/bootstrap.pem
       filesystem: root
       mode: 420

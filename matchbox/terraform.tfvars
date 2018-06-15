@@ -15,3 +15,4 @@ cluster_domain  = "cluster.local"
 
 vip_matchbox    = "192.168.126.242"
 vip_controller  = "192.168.126.245"
+vip_gateway     = "192.168.126.240"

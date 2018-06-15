@@ -51,3 +51,7 @@ variable "vip_matchbox" {
 variable "vip_controller" {
   type        = "string"
 }
+
+variable "vip_gateway" {
+  type        = "string"
+}

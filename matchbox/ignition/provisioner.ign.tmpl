@@ -1,7 +1,7 @@
 ---
 networkd:
   units:
-    - name: eth0.network
+    - name: 00_eth0.network
       contents: |
         [Match]
         Name=eth0
@@ -12,7 +12,7 @@ networkd:
 
         [Address]
         Address={{.ip_lan}}/{{.netmask_lan}}
-    - name: eth1.network
+    - name: 00_eth1.network
       contents: |
         [Match]
         Name=eth1
@@ -23,7 +23,18 @@ networkd:
 
         [Address]
         Address={{.ip_store}}/{{.netmask_store}}
-    - name: eth2.network
+
+        [Route]
+        Gateway={{.vip_gateway}}
+        Metric=2048
+        Table=101
+
+        [RoutingPolicyRule]
+        To=0.0.0.0/0
+        Table=101
+        Priority=32769
+
+    - name: 10_eth2.network
       contents: |
         [Match]
         Name=eth2
@@ -41,14 +52,43 @@ networkd:
         UseHostname=false
         UseDomains=false
         UseTimezone=no
-    - name: eth3.network
+        RouteMetric=1024
+        RouteTable=100
+
+        [RoutingPolicyRule]
+        To=0.0.0.0/0
+        Table=100
+        Priority=32768
+    - name: 00_eth2.network
+      contents: |
+        [Match]
+        Name=eth2
+        KernelCommandLine=provisioner_slave=1
+
+        [Network]
+        LinkLocalAddressing=no
+        DHCP=yes
+        DNS=127.0.0.1
+        DNS=8.8.8.8
+
+        [DHCP]
+        UseDNS=false
+        UseNTP=false
+        SendHostname=false
+        UseHostname=false
+        UseDomains=false
+        UseTimezone=no
+        RouteMetric=1024
+        RouteTable=100
+
+    - name: 00_eth3.network
       contents: |
         [Match]
         Name=eth3
 
         [Network]
         LinkLocalAddressing=no
-        DHCP=yes
+        DHCP=no
 
         [Address]
         Address={{.ip_sync}}/{{.netmask_sync}}
@@ -106,6 +146,7 @@ storage:
       contents:
         inline: |
           fs.inotify.max_user_watches=16184
+
     - path: /etc/ssl/certs/ca.pem
       filesystem: root
       mode: 420
