@@ -1,5 +1,4 @@
 install
-text
 shutdown
 skipx
 url --mirrorlist=http://mirrors.fedoraproject.org/mirrorlist?repo=fedora-$releasever&arch=$basearch
@@ -11,7 +10,7 @@ keyboard us
 timezone --utc Etc/UTC
 rootpw --lock password
 firewall --disabled
-network --hostname={{.hostname}}
+network --hostname={{.name}}
 
 ## user
 user --name={{.default_user}} --password=password --plaintext --groups wheel
@@ -19,8 +18,8 @@ sshkey --username={{.default_user}} "{{.ssh_authorized_key}}"
 
 ## disk
 zerombr
-clearpart --all --initlabel --disklabel=gpt
-autopart --type=plain
+clearpart --all --initlabel
+part / --size=8192 --grow --fstype ext4
 bootloader --timeout=1 --append="console=tty0 console=ttyS1,115200n8 elevator=noop intel_iommu=on iommu=pt cgroup_enable=memory"
 
 ## packages
@@ -44,6 +43,7 @@ rsyslog
 ca-certificates
 vim-enhanced
 rsync
+dracut-live
 
 ## zol
 kernel-devel
@@ -56,7 +56,6 @@ zfs
 -sendmail
 -ppc64-utils
 %end
-
 
 ##
 ## post config
@@ -225,6 +224,19 @@ UseDNS no
 PermitRootLogin no
 PasswordAuthentication no
 ChallengeResponseAuthentication no
+EOF
+
+## live image settings
+## systemd configs from https://linux.xvx.cz/2017/07/how-to-build-pxe-fedora-26-live-image.html
+cat <<EOF >> /etc/systemd/system.conf
+DumpCore=no
+EOF
+
+cat <<EOF >> /etc/systemd/journald.conf
+Storage=volatile
+RuntimeMaxUse=15M
+ForwardToSyslog=no
+ForwardToConsole=no
 EOF
 
 
