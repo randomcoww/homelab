@@ -37,7 +37,7 @@ systemd:
           --network-plugin=cni \
           --register-node=true \
           --rotate-certificates \
-          --feature-gates=RotateKubeletClientCertificate=true \
+          --feature-gates=RotateKubeletClientCertificate=true,RotateKubeletServerCertificate=true \
           --v=2
         ExecStop=-/usr/bin/rkt stop --uuid-file=/var/cache/kubelet-pod.uuid
         Restart=on-failure
