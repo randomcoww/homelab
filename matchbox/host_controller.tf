@@ -33,7 +33,6 @@ resource "matchbox_group" "controller_0" {
     hyperkube_image = "${var.hyperkube_image}"
     ssh_authorized_key = "cert-authority ${chomp(tls_private_key.ssh_ca.public_key_openssh)}"
     default_user  = "${var.default_user}"
-    hyperkube_image = "${var.hyperkube_image}"
     manifest_url  = "https://raw.githubusercontent.com/randomcoww/environment-config/master/manifests/controller-0"
     apiserver_url = "https://127.0.0.1:56443"
 
