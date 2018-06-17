@@ -55,3 +55,7 @@ variable "vip_controller" {
 variable "vip_gateway" {
   type        = "string"
 }
+
+variable "vip_dns" {
+  type        = "string"
+}

@@ -40,6 +40,7 @@ resource "matchbox_group" "provisioner_0" {
     ip_store      = "192.168.126.217"
     netmask_store = "23"
     vip_gateway   = "${var.vip_gateway}"
+    vip_dns       = "${var.vip_dns}"
 
     tls_ca        = "${replace(tls_self_signed_cert.root.cert_pem, "\n", "\\n")}"
     tls_matchbox  = "${replace(tls_locally_signed_cert.matchbox.cert_pem, "\n", "\\n")}"

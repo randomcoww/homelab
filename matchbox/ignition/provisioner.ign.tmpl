@@ -31,7 +31,7 @@ networkd:
         [Network]
         LinkLocalAddressing=no
         DHCP=yes
-        DNS=127.0.0.1
+        DNS={{.vip_dns}}
         DNS=8.8.8.8
 
         [DHCP]
