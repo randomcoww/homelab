@@ -51,6 +51,44 @@ items:
     hostNetwork: true
     restartPolicy: Always
     containers:
+    - name: kube-etcd
+      image: {{.etcd_image}}
+      args:
+      - "/usr/local/bin/etcd"
+      - "--name=$(NODE_NAME)"
+      - "--cert-file={{.kubernetes_path}}/kubernetes.pem"
+      - "--key-file={{.kubernetes_path}}/kubernetes-key.pem"
+      - "--peer-cert-file={{.kubernetes_path}}/kubernetes.pem"
+      - "--peer-key-file={{.kubernetes_path}}/kubernetes-key.pem"
+      - "--trusted-ca-file={{.kubernetes_path}}/ca.pem"
+      - "--peer-trusted-ca-file={{.kubernetes_path}}/ca.pem"
+      - "--peer-client-cert-auth"
+      - "--client-cert-auth"
+      - "--initial-advertise-peer-urls=https://$(INTERNAL_IP):2380"
+      - "--listen-peer-urls=https://$(INTERNAL_IP):2380"
+      - "--listen-client-urls=https://$(INTERNAL_IP):{{.etcd_client_port}},https://127.0.0.1:{{.etcd_client_port}}"
+      - "--advertise-client-urls=https://$(INTERNAL_IP):{{.etcd_client_port}}"
+      - "--initial-cluster-token={{.etcd_cluster_token}}"
+      - "--initial-cluster={{.etcd_initial_cluster}}"
+      - "--initial-cluster-state={{.etcd_initial_cluster_state}}"
+      - "--data-dir=/var/lib/etcd/$(NODE_NAME)"
+      - "--enable-v2=false"
+      env:
+      - name: INTERNAL_IP
+        valueFrom:
+          fieldRef:
+            fieldPath: status.hostIP
+      - name: NODE_NAME
+        valueFrom:
+          fieldRef:
+            fieldPath: spec.nodeName
+      volumeMounts:
+      - name: kubernetes-path
+        mountPath: "{{.kubernetes_path}}"
+        readOnly: true
+      - name: data-etcd-host
+        mountPath: "/var/lib/etcd"
+        readOnly: false
     - name: kube-apiserver
       image: {{.kube_apiserver_image}}
       command:
@@ -85,7 +123,7 @@ items:
       - "--kubelet-preferred-address-types=InternalIP,InternalDNS"
       - "--v=2"
       volumeMounts:
-      - name: kubeconfig
+      - name: kubernetes-path
         mountPath: "{{.kubernetes_path}}"
         readOnly: true
       livenessProbe:
@@ -97,9 +135,13 @@ items:
         initialDelaySeconds: 15
         timeoutSeconds: 15
     volumes:
-    - name: kubeconfig
+    - name: kubernetes-path
       hostPath:
         path: "{{.kubernetes_path}}"
+    - name: data-etcd-host
+      nfs:
+        server: {{.nfs_vip}}
+        path: "{{.etcd_data_path}}"
 - kind: Pod
   apiVersion: v1
   metadata:
@@ -127,7 +169,7 @@ items:
       - "--use-service-account-credentials=true"
       - "--v=2"
       volumeMounts:
-      - name: kubeconfig
+      - name: kubernetes-path
         mountPath: "{{.kubernetes_path}}"
         readOnly: true
       livenessProbe:
@@ -139,7 +181,7 @@ items:
         initialDelaySeconds: 15
         timeoutSeconds: 15
     volumes:
-    - name: kubeconfig
+    - name: kubernetes-path
       hostPath:
         path: "{{.kubernetes_path}}"
 - kind: Pod
@@ -166,65 +208,10 @@ items:
         initialDelaySeconds: 15
         timeoutSeconds: 15
       volumeMounts:
-      - name: kubeconfig
+      - name: kubernetes-path
         mountPath: "{{.kubernetes_path}}"
         readOnly: true
     volumes:
-    - name: kubeconfig
+    - name: kubernetes-path
       hostPath:
         path: "{{.kubernetes_path}}"
-- apiVersion: v1
-  kind: Pod
-  metadata:
-    name: kube-etcd
-    namespace: kube-system
-  spec:
-    restartPolicy: Always
-    hostNetwork: true
-    containers:
-    - name: kube-etcd
-      image: {{.etcd_image}}
-      args:
-      - "/usr/local/bin/etcd"
-      - "--name=$(NODE_NAME)"
-      - "--cert-file={{.kubernetes_path}}/kubernetes.pem"
-      - "--key-file={{.kubernetes_path}}/kubernetes-key.pem"
-      - "--peer-cert-file={{.kubernetes_path}}/kubernetes.pem"
-      - "--peer-key-file={{.kubernetes_path}}/kubernetes-key.pem"
-      - "--trusted-ca-file={{.kubernetes_path}}/ca.pem"
-      - "--peer-trusted-ca-file={{.kubernetes_path}}/ca.pem"
-      - "--peer-client-cert-auth"
-      - "--client-cert-auth"
-      - "--initial-advertise-peer-urls=https://$(INTERNAL_IP):2380"
-      - "--listen-peer-urls=https://$(INTERNAL_IP):2380"
-      - "--listen-client-urls=https://$(INTERNAL_IP):{{.etcd_client_port}},https://127.0.0.1:{{.etcd_client_port}}"
-      - "--advertise-client-urls=https://$(INTERNAL_IP):{{.etcd_client_port}}"
-      - "--initial-cluster-token={{.etcd_cluster_token}}"
-      - "--initial-cluster={{.etcd_initial_cluster}}"
-      - "--initial-cluster-state={{.etcd_initial_cluster_state}}"
-      - "--data-dir=/var/lib/etcd/$(NODE_NAME)"
-      - "--enable-v2=false"
-      env:
-      - name: INTERNAL_IP
-        valueFrom:
-          fieldRef:
-            fieldPath: status.hostIP
-      - name: NODE_NAME
-        valueFrom:
-          fieldRef:
-            fieldPath: spec.nodeName
-      volumeMounts:
-      - name: ssl-path
-        mountPath: "{{.kubernetes_path}}"
-        readOnly: true
-      - mountPath: "/var/lib/etcd"
-        name: data-etcd-host
-        readOnly: false
-    volumes:
-    - name: ssl-path
-      hostPath:
-        path: "{{.kubernetes_path}}"
-    - name: data-etcd-host
-      nfs:
-        server: {{.nfs_vip}}
-        path: "{{.etcd_data_path}}"

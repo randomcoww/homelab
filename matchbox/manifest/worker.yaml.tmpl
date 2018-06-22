@@ -34,7 +34,7 @@ items:
         mountPath: "/run"
       - name: flannel-cfg
         mountPath: "/etc/kube-flannel"
-      - name: kubeconfig
+      - name: kubernetes-path
         mountPath: "{{.kubernetes_path}}"
         readOnly: true
     volumes:
@@ -44,7 +44,7 @@ items:
     - name: flannel-cfg
       hostPath:
         path: "/etc/kube-flannel"
-    - name: kubeconfig
+    - name: kubernetes-path
       hostPath:
         path: "{{.kubernetes_path}}"
 - apiVersion: v1
@@ -64,10 +64,10 @@ items:
       securityContext:
         privileged: true
       volumeMounts:
-      - name: kubeconfig
+      - name: kubernetes-path
         mountPath: "{{.kubernetes_path}}"
         readOnly: true
     volumes:
-    - name: kubeconfig
+    - name: kubernetes-path
       hostPath:
         path: "{{.kubernetes_path}}"
