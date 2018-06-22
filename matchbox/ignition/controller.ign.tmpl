@@ -14,6 +14,13 @@ networkd:
         Address={{.store_ip}}/{{.store_netmask}}
 systemd:
   units:
+    - name: docker.service
+      enabled: true
+      dropins:
+        - name: docker.conf
+          contents: |
+            [Service]
+            Environment=DOCKER_OPTS="--log-driver=journald"
     - name: kubelet.service
       enabled: true
       contents: |

@@ -43,6 +43,13 @@ networkd:
         UseTimezone=no
 systemd:
   units:
+    - name: docker.service
+      enabled: true
+      dropins:
+        - name: docker.conf
+          contents: |
+            [Service]
+            Environment=DOCKER_OPTS="--log-driver=journald --iptables=false"
     - name: kubelet.service
       enabled: true
       contents: |
@@ -66,13 +73,6 @@ systemd:
 
         [Install]
         WantedBy=multi-user.target
-    - name: docker.service
-      enabled: true
-      dropins:
-        - name: iptables.conf
-          contents: |
-            [Service]
-            Environment=DOCKER_OPTS=--iptables=false
 storage:
   files:
     - path: /etc/hostname
