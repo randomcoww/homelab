@@ -1,8 +1,8 @@
 ##
 ## kube worker kickstart renderer
 ##
-resource "matchbox_profile" "worker" {
-  name   = "worker"
+resource "matchbox_profile" "ignition_worker" {
+  name   = "ignition_worker"
   container_linux_config = "${file("./ignition/worker.ign.tmpl")}"
   kernel = "/assets/coreos/${var.container_linux_version}/coreos_production_pxe.vmlinuz"
   initrd = [
@@ -20,9 +20,9 @@ resource "matchbox_profile" "worker" {
 ##
 ## kickstart
 ##
-resource "matchbox_group" "worker_0" {
-  name    = "worker_0"
-  profile = "${matchbox_profile.worker.name}"
+resource "matchbox_group" "ignition_worker_0" {
+  name    = "ignition_worker_0"
+  profile = "${matchbox_profile.ignition_worker.name}"
 
   selector {
     mac = "52-54-00-1a-61-8c"
@@ -34,13 +34,16 @@ resource "matchbox_group" "worker_0" {
     ssh_authorized_key = "cert-authority ${chomp(tls_private_key.ssh_ca.public_key_openssh)}"
     default_user  = "${var.default_user}"
     hyperkube_image = "${var.hyperkube_image}"
-    manifest_url  = "https://raw.githubusercontent.com/randomcoww/environment-config/master/manifests/worker"
-    apiserver_url = "https://192.168.126.245:56443"
+    # manifest_url  = "https://raw.githubusercontent.com/randomcoww/environment-config/master/manifests/worker"
+    manifest_url  = "${var.matchbox_url}/generic?manifest=worker"
+    apiserver_url = "https://${var.controller_vip}:${var.apiserver_secure_port}"
 
     cluster_cidr   = "${var.cluster_cidr}"
     cluster_dns_ip = "${var.cluster_dns_ip}"
     cluster_domain = "${var.cluster_domain}"
     cluster_name   = "${var.cluster_name}"
+
+    kubernetes_path = "${var.kubernetes_path}"
 
     tls_ca        = "${replace(tls_self_signed_cert.root.cert_pem, "\n", "\\n")}"
     tls_bootstrap = "${replace(tls_locally_signed_cert.bootstrap.cert_pem, "\n", "\\n")}"
@@ -50,9 +53,9 @@ resource "matchbox_group" "worker_0" {
   }
 }
 
-resource "matchbox_group" "worker_1" {
-  name    = "worker_1"
-  profile = "${matchbox_profile.worker.name}"
+resource "matchbox_group" "ignition_worker_1" {
+  name    = "ignition_worker_1"
+  profile = "${matchbox_profile.ignition_worker.name}"
 
   selector {
     mac = "52-54-00-1a-61-8d"
@@ -64,13 +67,16 @@ resource "matchbox_group" "worker_1" {
     ssh_authorized_key = "cert-authority ${chomp(tls_private_key.ssh_ca.public_key_openssh)}"
     default_user  = "${var.default_user}"
     hyperkube_image = "${var.hyperkube_image}"
-    manifest_url  = "https://raw.githubusercontent.com/randomcoww/environment-config/master/manifests/worker"
-    apiserver_url = "https://192.168.126.245:56443"
+    # manifest_url  = "https://raw.githubusercontent.com/randomcoww/environment-config/master/manifests/worker"
+    manifest_url  = "${var.matchbox_url}/generic?manifest=worker"
+    apiserver_url = "https://${var.controller_vip}:${var.apiserver_secure_port}"
 
     cluster_cidr   = "${var.cluster_cidr}"
     cluster_dns_ip = "${var.cluster_dns_ip}"
     cluster_domain = "${var.cluster_domain}"
     cluster_name   = "${var.cluster_name}"
+
+    kubernetes_path = "${var.kubernetes_path}"
 
     tls_ca        = "${replace(tls_self_signed_cert.root.cert_pem, "\n", "\\n")}"
     tls_bootstrap = "${replace(tls_locally_signed_cert.bootstrap.cert_pem, "\n", "\\n")}"

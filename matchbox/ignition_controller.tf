@@ -1,8 +1,8 @@
 ##
 ## kube controller kickstart renderer
 ##
-resource "matchbox_profile" "controller" {
-  name   = "controller"
+resource "matchbox_profile" "ignition_controller" {
+  name   = "ignition_controller"
   container_linux_config = "${file("./ignition/controller.ign.tmpl")}"
   kernel = "/assets/coreos/${var.container_linux_version}/coreos_production_pxe.vmlinuz"
   initrd = [
@@ -20,9 +20,9 @@ resource "matchbox_profile" "controller" {
 ##
 ## kickstart
 ##
-resource "matchbox_group" "controller_0" {
-  name    = "controller_0"
-  profile = "${matchbox_profile.controller.name}"
+resource "matchbox_group" "ignition_controller_0" {
+  name    = "ignition_controller_0"
+  profile = "${matchbox_profile.ignition_controller.name}"
 
   selector {
     mac = "52-54-00-1a-61-8b"
@@ -33,13 +33,16 @@ resource "matchbox_group" "controller_0" {
     hyperkube_image = "${var.hyperkube_image}"
     ssh_authorized_key = "cert-authority ${chomp(tls_private_key.ssh_ca.public_key_openssh)}"
     default_user  = "${var.default_user}"
-    manifest_url  = "https://raw.githubusercontent.com/randomcoww/environment-config/master/manifests/controller-0"
-    apiserver_url = "https://127.0.0.1:56443"
+    # manifest_url  = "https://raw.githubusercontent.com/randomcoww/environment-config/master/manifests/controller-0"
+    manifest_url  = "${var.matchbox_url}/generic?manifest=controller"
+    apiserver_url = "https://127.0.0.1:${var.apiserver_secure_port}"
 
     cluster_name   = "${var.cluster_name}"
 
-    ip_store      = "192.168.126.219"
-    netmask_store = "23"
+    store_ip      = "192.168.126.219"
+    store_netmask = "${var.store_netmask}"
+
+    kubernetes_path = "${var.kubernetes_path}"
 
     tls_ca        = "${replace(tls_self_signed_cert.root.cert_pem, "\n", "\\n")}"
     tls_ca_key    = "${replace(tls_private_key.root.private_key_pem, "\n", "\\n")}"

@@ -11,7 +11,7 @@ networkd:
         DHCP=yes
 
         [Address]
-        Address={{.ip_store}}/{{.netmask_store}}
+        Address={{.store_ip}}/{{.store_netmask}}
 systemd:
   units:
     - name: kubelet.service
@@ -51,58 +51,58 @@ storage:
         inline: |
           fs.inotify.max_user_watches=16184
 
-    - path: /var/lib/kubernetes/ca.pem
+    - path: {{.kubernetes_path}}/ca.pem
       filesystem: root
       mode: 420
       contents:
         inline: "{{.tls_ca}}"
-    - path: /var/lib/kubernetes/ca-key.pem
+    - path: {{.kubernetes_path}}/ca-key.pem
       filesystem: root
       mode: 420
       contents:
         inline: "{{.tls_ca_key}}"
-    - path: /var/lib/kubernetes/kubernetes.pem
+    - path: {{.kubernetes_path}}/kubernetes.pem
       filesystem: root
       mode: 420
       contents:
         inline: "{{.tls_kubernetes}}"
-    - path: /var/lib/kubernetes/kubernetes-key.pem
+    - path: {{.kubernetes_path}}/kubernetes-key.pem
       filesystem: root
       mode: 420
       contents:
         inline: "{{.tls_kubernetes_key}}"
-    - path: /var/lib/kubernetes/kube-controller-manager.pem
+    - path: {{.kubernetes_path}}/kube-controller-manager.pem
       filesystem: root
       mode: 420
       contents:
         inline: "{{.tls_controller_manager}}"
-    - path: /var/lib/kubernetes/kube-controller-manager-key.pem
+    - path: {{.kubernetes_path}}/kube-controller-manager-key.pem
       filesystem: root
       mode: 420
       contents:
         inline: "{{.tls_controller_manager_key}}"
-    - path: /var/lib/kubernetes/kube-scheduler.pem
+    - path: {{.kubernetes_path}}/kube-scheduler.pem
       filesystem: root
       mode: 420
       contents:
         inline: "{{.tls_scheduler}}"
-    - path: /var/lib/kubernetes/kube-scheduler-key.pem
+    - path: {{.kubernetes_path}}/kube-scheduler-key.pem
       filesystem: root
       mode: 420
       contents:
         inline: "{{.tls_scheduler_key}}"
-    - path: /var/lib/kubernetes/service-account.pem
+    - path: {{.kubernetes_path}}/service-account.pem
       filesystem: root
       mode: 420
       contents:
         inline: "{{.tls_service_account}}"
-    - path: /var/lib/kubernetes/service-account-key.pem
+    - path: {{.kubernetes_path}}/service-account-key.pem
       filesystem: root
       mode: 420
       contents:
         inline: "{{.tls_service_account_key}}"
 
-    - path: /var/lib/kubernetes/kube-scheduler.yaml
+    - path: {{.kubernetes_path}}/kube-scheduler.yaml
       filesystem: root
       mode: 420
       contents:
@@ -110,11 +110,11 @@ storage:
           apiVersion: componentconfig/v1alpha1
           kind: KubeSchedulerConfiguration
           clientConnection:
-            kubeconfig: "/var/lib/kubernetes/kube-scheduler.kubeconfig"
+            kubeconfig: "{{.kubernetes_path}}/kube-scheduler.kubeconfig"
           leaderElection:
             leaderElect: true
 
-    - path: /var/lib/kubernetes/kube-controller-manager.kubeconfig
+    - path: {{.kubernetes_path}}/kube-controller-manager.kubeconfig
       filesystem: root
       mode: 420
       contents:
@@ -122,7 +122,7 @@ storage:
           apiVersion: v1
           clusters:
           - cluster:
-              certificate-authority: /var/lib/kubernetes/ca.pem
+              certificate-authority: {{.kubernetes_path}}/ca.pem
               server: {{.apiserver_url}}
             name: {{.cluster_name}}
           contexts:
@@ -136,10 +136,10 @@ storage:
           users:
           - name: system:kube-controller-manager
             user:
-              client-certificate: /var/lib/kubernetes/kube-controller-manager.pem
-              client-key: /var/lib/kubernetes/kube-controller-manager-key.pem
+              client-certificate: {{.kubernetes_path}}/kube-controller-manager.pem
+              client-key: {{.kubernetes_path}}/kube-controller-manager-key.pem
 
-    - path: /var/lib/kubernetes/kube-scheduler.kubeconfig
+    - path: {{.kubernetes_path}}/kube-scheduler.kubeconfig
       filesystem: root
       mode: 420
       contents:
@@ -147,7 +147,7 @@ storage:
           apiVersion: v1
           clusters:
           - cluster:
-              certificate-authority: /var/lib/kubernetes/ca.pem
+              certificate-authority: {{.kubernetes_path}}/ca.pem
               server: {{.apiserver_url}}
             name: {{.cluster_name}}
           contexts:
@@ -161,8 +161,8 @@ storage:
           users:
           - name: system:kube-scheduler
             user:
-              client-certificate: /var/lib/kubernetes/kube-scheduler.pem
-              client-key: /var/lib/kubernetes/kube-scheduler-key.pem
+              client-certificate: {{.kubernetes_path}}/kube-scheduler.pem
+              client-key: {{.kubernetes_path}}/kube-scheduler-key.pem
 
 passwd:
   users:

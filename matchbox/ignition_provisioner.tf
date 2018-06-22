@@ -1,8 +1,8 @@
 ##
 ## gateway kickstart renderer
 ##
-resource "matchbox_profile" "provisioner" {
-  name   = "provisioner"
+resource "matchbox_profile" "ignition_provisioner" {
+  name   = "ignition_provisioner"
   container_linux_config = "${file("./ignition/provisioner.ign.tmpl")}"
   kernel = "/assets/coreos/${var.container_linux_version}/coreos_production_pxe.vmlinuz"
   initrd = [
@@ -20,9 +20,9 @@ resource "matchbox_profile" "provisioner" {
 ##
 ## kickstart
 ##
-resource "matchbox_group" "provisioner_0" {
-  name    = "provisioner_0"
-  profile = "${matchbox_profile.provisioner.name}"
+resource "matchbox_group" "ignition_provisioner_0" {
+  name    = "ignition_provisioner_0"
+  profile = "${matchbox_profile.ignition_provisioner.name}"
 
   selector {
     host = "provisioner-0"
@@ -35,12 +35,12 @@ resource "matchbox_group" "provisioner_0" {
     default_user  = "${var.default_user}"
     manifest_url  = "https://raw.githubusercontent.com/randomcoww/environment-config/master/manifests/provisioner"
 
-    ip_lan        = "192.168.62.217"
-    netmask_lan   = "23"
-    ip_store      = "192.168.126.217"
-    netmask_store = "23"
-    vip_gateway   = "${var.vip_gateway}"
-    vip_dns       = "${var.vip_dns}"
+    lan_ip        = "192.168.62.217"
+    lan_netmask   = "${var.lan_netmask}"
+    store_ip      = "192.168.126.217"
+    store_netmask = "${var.store_netmask}"
+    gateway_vip   = "${var.gateway_vip}"
+    dns_vip       = "${var.dns_vip}"
 
     tls_ca        = "${replace(tls_self_signed_cert.root.cert_pem, "\n", "\\n")}"
     tls_matchbox  = "${replace(tls_locally_signed_cert.matchbox.cert_pem, "\n", "\\n")}"

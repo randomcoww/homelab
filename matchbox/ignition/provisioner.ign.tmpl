@@ -11,7 +11,7 @@ networkd:
         DHCP=no
 
         [Address]
-        Address={{.ip_lan}}/{{.netmask_lan}}
+        Address={{.lan_ip}}/{{.lan_netmask}}
     - name: eth1.network
       contents: |
         [Match]
@@ -22,7 +22,7 @@ networkd:
         DHCP=no
 
         [Address]
-        Address={{.ip_store}}/{{.netmask_store}}
+        Address={{.store_ip}}/{{.store_netmask}}
     - name: eth2.network
       contents: |
         [Match]
@@ -31,7 +31,7 @@ networkd:
         [Network]
         LinkLocalAddressing=no
         DHCP=yes
-        DNS={{.vip_dns}}
+        DNS={{.dns_vip}}
         DNS=8.8.8.8
 
         [DHCP]

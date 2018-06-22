@@ -1,8 +1,8 @@
 ##
 ## live kickstart renderer
 ##
-resource "matchbox_profile" "live_0" {
-  name   = "live_0"
+resource "matchbox_profile" "generic_live" {
+  name   = "generic_live"
   generic_config = "${file("./kickstart/live.ks.tmpl")}"
   kernel = "/assets/live_0/vmlinuz-4.15.14-300.fc27.x86_64"
   initrd = [
@@ -23,9 +23,9 @@ resource "matchbox_profile" "live_0" {
 ##
 ## kickstart
 ##
-resource "matchbox_group" "live_0" {
-  name    = "live_0"
-  profile = "${matchbox_profile.live_0.name}"
+resource "matchbox_group" "generic_live_0" {
+  name    = "generic_live_0"
+  profile = "${matchbox_profile.generic_live.name}"
 
   selector {
     mac = "00-1b-21-bc-67-c6"
@@ -37,11 +37,11 @@ resource "matchbox_group" "live_0" {
     ssh_authorized_key = "cert-authority ${chomp(tls_private_key.ssh_ca.public_key_openssh)}"
     default_user  = "${var.default_user}"
 
-    ip_lan        = "192.168.62.252"
-    if_lan        = "ens1f1"
-    netmask_lan   = "23"
-    ip_store      = "192.168.126.252"
-    if_store      = "ens1f0"
-    netmask_store = "23"
+    lan_ip        = "192.168.62.252"
+    lan_if        = "ens1f1"
+    lan_netmask   = "${var.lan_netmask}"
+    store_ip      = "192.168.126.252"
+    store_if      = "ens1f0"
+    store_netmask = "${var.store_netmask}"
   }
 }

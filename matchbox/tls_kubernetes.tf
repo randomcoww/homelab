@@ -22,7 +22,7 @@ resource "tls_cert_request" "kubernetes" {
   ip_addresses = [
     "127.0.0.1",
     "${var.cluster_service_ip}",
-    "${var.vip_controller}",
+    "${var.controller_vip}",
   ]
 }
 

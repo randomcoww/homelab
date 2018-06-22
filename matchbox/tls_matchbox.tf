@@ -16,8 +16,7 @@ resource "tls_cert_request" "matchbox" {
   }
 
   ip_addresses = [
-    "127.0.0.1",
-    "${var.vip_matchbox}"
+    "127.0.0.1"
   ]
 }
 
