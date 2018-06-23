@@ -1,10 +1,10 @@
 ---
 networkd:
   units:
-    - name: eth0.network
+    - name: {{.store_if}}.network
       contents: |
         [Match]
-        Name=eth0
+        Name={{.store_if}}
 
         [Network]
         LinkLocalAddressing=no
@@ -17,7 +17,7 @@ systemd:
         - name: docker.conf
           contents: |
             [Service]
-            Environment=DOCKER_OPTS="--log-driver=journald"
+            Environment=DOCKER_OPTS="{{.docker_opts}}"
     - name: kubelet.service
       enabled: true
       contents: |

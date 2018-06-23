@@ -1,10 +1,10 @@
 ---
 networkd:
   units:
-    - name: eth0.network
+    - name: {{.lan_if}}.network
       contents: |
         [Match]
-        Name=eth0
+        Name={{.lan_if}}
 
         [Network]
         LinkLocalAddressing=no
@@ -12,10 +12,10 @@ networkd:
 
         [Address]
         Address={{.lan_ip}}/{{.lan_netmask}}
-    - name: eth1.network
+    - name: {{.store_if}}.network
       contents: |
         [Match]
-        Name=eth1
+        Name={{.store_if}}
 
         [Network]
         LinkLocalAddressing=no
@@ -23,16 +23,15 @@ networkd:
 
         [Address]
         Address={{.store_ip}}/{{.store_netmask}}
-    - name: eth2.network
+    - name: {{.wan_if}}.network
       contents: |
         [Match]
-        Name=eth2
+        Name={{.wan_if}}
 
         [Network]
         LinkLocalAddressing=no
         DHCP=yes
         DNS={{.dns_vip}}
-        DNS=8.8.8.8
 
         [DHCP]
         UseDNS=false
@@ -49,7 +48,7 @@ systemd:
         - name: docker.conf
           contents: |
             [Service]
-            Environment=DOCKER_OPTS="--log-driver=journald --iptables=false"
+            Environment=DOCKER_OPTS="{{.docker_opts}}"
     - name: kubelet.service
       enabled: true
       contents: |

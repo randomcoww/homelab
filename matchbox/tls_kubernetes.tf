@@ -16,7 +16,7 @@ resource "tls_cert_request" "kubernetes" {
   }
 
   dns_names = [
-    "kubernetes.default"
+    "kubernetes.default",
   ]
 
   ip_addresses = [
@@ -37,6 +37,6 @@ resource "tls_locally_signed_cert" "kubernetes" {
   allowed_uses = [
     "key_encipherment",
     "server_auth",
-    "client_auth"
+    "client_auth",
   ]
 }

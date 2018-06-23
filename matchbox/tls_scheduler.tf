@@ -27,6 +27,6 @@ resource "tls_locally_signed_cert" "scheduler" {
   allowed_uses = [
     "key_encipherment",
     "server_auth",
-    "client_auth"
+    "client_auth",
   ]
 }

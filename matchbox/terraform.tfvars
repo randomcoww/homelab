@@ -1,10 +1,8 @@
 default_user    = "core"
 
-matchbox_http_endpoint = "http://127.0.0.1:58080"
-matchbox_rpc_endpoint = "127.0.0.1:58081"
-matchbox_url    = "http://192.168.126.242:58080"
-
 container_linux_version = "1688.3.0"
+fedora_live_version = "4.15.14-300.fc27.x86_64"
+
 hyperkube_image = "gcr.io/google_containers/hyperkube:v1.10.3"
 keepalived_image = "randomcoww/keepalived:20180412.02"
 kube_apiserver_image = "gcr.io/google_containers/kube-apiserver:v1.10.3"
@@ -13,6 +11,10 @@ kube_scheduler_image = "gcr.io/google_containers/kube-scheduler:v1.10.3"
 kube_proxy_image = "gcr.io/google_containers/kube-proxy:v1.10.3"
 etcd_image = "quay.io/coreos/etcd:v3.3"
 flannel_image = "quay.io/coreos/flannel:v0.10.0-amd64"
+nftables_image = "randomcoww/nftables:20180412.01"
+kea_image = "randomcoww/kea:1.4.0-beta"
+tftpd_image = "randomcoww/tftpd_ipxe:20180222.02"
+matchbox_image = "quay.io/coreos/matchbox:latest"
 
 cluster_cidr    = "10.200.0.0/16"
 cluster_dns_ip  = "10.32.0.10"
@@ -24,11 +26,13 @@ kubernetes_path = "/var/lib/kubernetes"
 
 etcd_client_port = "52379"
 apiserver_secure_port = "56443"
+matchbox_rpc_port = "58081"
+matchbox_http_port = "58080"
 
 controller_vip  = "192.168.126.245"
 gateway_vip     = "192.168.126.240"
-dns_vip         = "192.168.127.254"
 nfs_vip         = "192.168.126.251"
+matchbox_vip    = "192.168.126.242"
 
 lan_netmask = "23"
 store_netmask = "23"

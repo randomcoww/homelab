@@ -16,7 +16,7 @@ resource "tls_cert_request" "matchbox" {
   }
 
   ip_addresses = [
-    "127.0.0.1"
+    "127.0.0.1",
   ]
 }
 
@@ -31,6 +31,6 @@ resource "tls_locally_signed_cert" "matchbox" {
   allowed_uses = [
     "key_encipherment",
     "server_auth",
-    "client_auth"
+    "client_auth",
   ]
 }

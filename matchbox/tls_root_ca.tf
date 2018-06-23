@@ -11,7 +11,7 @@ resource "tls_self_signed_cert" "root" {
   private_key_pem = "${tls_private_key.root.private_key_pem}"
 
   validity_period_hours = 8760
-  is_ca_certificate = true
+  is_ca_certificate     = true
 
   subject {
     common_name  = "root"
@@ -22,6 +22,6 @@ resource "tls_self_signed_cert" "root" {
     "cert_signing",
     "key_encipherment",
     "server_auth",
-    "client_auth"
+    "client_auth",
   ]
 }

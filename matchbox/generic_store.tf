@@ -2,10 +2,9 @@
 ## vmhost kickstart renderer
 ##
 resource "matchbox_profile" "generic_store" {
-  name   = "generic_store"
+  name           = "generic_store"
   generic_config = "${file("./kickstart/store.ks.tmpl")}"
 }
-
 
 ##
 ## kickstart
@@ -19,10 +18,10 @@ resource "matchbox_group" "generic_store_0" {
   }
 
   metadata {
-    hostname      = "store-0"
-    hyperkube_image = "${var.hyperkube_image}"
+    hostname           = "store-0"
+    hyperkube_image    = "${var.hyperkube_image}"
     ssh_authorized_key = "cert-authority ${chomp(tls_private_key.ssh_ca.public_key_openssh)}"
-    default_user  = "${var.default_user}"
+    default_user       = "${var.default_user}"
 
     lan_ip        = "192.168.62.251"
     lan_if        = "ens1f1"
@@ -42,10 +41,10 @@ resource "matchbox_group" "generic_store_1" {
   }
 
   metadata {
-    hostname      = "store-1"
-    hyperkube_image = "${var.hyperkube_image}"
+    hostname           = "store-1"
+    hyperkube_image    = "${var.hyperkube_image}"
     ssh_authorized_key = "cert-authority ${chomp(tls_private_key.ssh_ca.public_key_openssh)}"
-    default_user  = "${var.default_user}"
+    default_user       = "${var.default_user}"
 
     lan_ip        = "192.168.62.252"
     lan_if        = "ens1f1"
