@@ -280,11 +280,6 @@ items:
               {{.lan_gateway_vip}}/{{.lan_netmask}}
             }
           }
-          vrrp_sync_group VG_matchbox {
-            group {
-              VI_matchbox_store
-            }
-          }
           vrrp_script CHK_matchbox {
             script "nc -z -w5 localhost {{.matchbox_http_port}}"
             interval 2
@@ -336,7 +331,7 @@ items:
       volumeMounts:
       - mountPath: "/etc/ssl/certs"
         name: ssl-matchbox
-        readOnly: false
+        readOnly: true
       - mountPath: "/var/lib/matchbox"
         name: data-matchbox
         readOnly: false
