@@ -137,6 +137,10 @@ variable "backup_dns_ip" {
   type = "string"
 }
 
+variable "lan_gateway_vip" {
+  type = "string"
+}
+
 ## ip ranges
 variable "lan_ip_range" {
   type = "string"

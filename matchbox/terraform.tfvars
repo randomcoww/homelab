@@ -43,6 +43,8 @@ lan_netmask    = "23"
 store_netmask  = "23"
 backup_dns_ip  = "9.9.9.9"
 
+lan_gateway_vip = "192.168.62.240"
+
 ## ip ranges
 lan_ip_range     = "192.168.62.0/23"
 store_ip_range   = "192.168.126.0/23"

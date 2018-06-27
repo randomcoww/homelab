@@ -167,7 +167,7 @@ items:
                   "option-data": [
                     {
                       "name": "routers",
-                      "data": "{{.gateway_vip}}"
+                      "data": "{{.lan_gateway_vip}}"
                     },
                     {
                       "name": "domain-name-servers",
@@ -277,7 +277,7 @@ items:
             interface {{.lan_if}}
             priority 100
             virtual_ipaddress {
-              {{.gateway_vip}}/{{.lan_netmask}}
+              {{.lan_gateway_vip}}/{{.lan_netmask}}
             }
           }
           vrrp_sync_group VG_matchbox {
