@@ -29,11 +29,10 @@ resource "matchbox_group" "manifest_provisioner" {
 
     controller_vip = "${var.controller_vip}"
     nfs_vip        = "${var.nfs_vip}"
-    dns_vip        = "${var.dns_vip}"
     matchbox_vip   = "${var.matchbox_vip}"
-    gateway_vip    = "${var.gateway_vip}"
-    backup_dns_ip  = "${var.backup_dns_ip}"
+    store_gateway_vip = "${var.store_gateway_vip}"
     lan_gateway_vip = "${var.lan_gateway_vip}"
+    backup_dns_ip  = "${var.backup_dns_ip}"
 
     store_netmask  = "${var.store_netmask}"
     store_if       = "eth1"

@@ -193,7 +193,7 @@ items:
                   "option-data": [
                     {
                       "name": "routers",
-                      "data": "{{.gateway_vip}}"
+                      "data": "{{.store_gateway_vip}}"
                     },
                     {
                       "name": "domain-name-servers",
@@ -267,7 +267,7 @@ items:
             interface {{.store_if}}
             priority 100
             virtual_ipaddress {
-              {{.gateway_vip}}/{{.store_netmask}}
+              {{.store_gateway_vip}}/{{.store_netmask}}
             }
           }
           vrrp_instance VI_gateway_lan {

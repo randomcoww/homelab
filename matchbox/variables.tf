@@ -109,10 +109,6 @@ variable "controller_vip" {
   type = "string"
 }
 
-variable "gateway_vip" {
-  type = "string"
-}
-
 variable "nfs_vip" {
   type = "string"
 }
@@ -125,11 +121,11 @@ variable "dns_vip" {
   type = "string"
 }
 
-variable "lan_netmask" {
+variable "lan_gateway_vip" {
   type = "string"
 }
 
-variable "store_netmask" {
+variable "store_gateway_vip" {
   type = "string"
 }
 
@@ -137,7 +133,11 @@ variable "backup_dns_ip" {
   type = "string"
 }
 
-variable "lan_gateway_vip" {
+variable "lan_netmask" {
+  type = "string"
+}
+
+variable "store_netmask" {
   type = "string"
 }
 

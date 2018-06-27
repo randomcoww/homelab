@@ -35,15 +35,15 @@ matchbox_http_port = "58080"
 
 ## ip
 controller_vip = "192.168.126.245"
-gateway_vip    = "192.168.126.240"
 nfs_vip        = "192.168.126.251"
 matchbox_vip   = "192.168.126.242"
 dns_vip        = "192.168.127.254"
-lan_netmask    = "23"
-store_netmask  = "23"
+store_gateway_vip = "192.168.126.240"
+lan_gateway_vip = "192.168.62.240"
 backup_dns_ip  = "9.9.9.9"
 
-lan_gateway_vip = "192.168.62.240"
+lan_netmask    = "23"
+store_netmask  = "23"
 
 ## ip ranges
 lan_ip_range     = "192.168.62.0/23"

@@ -31,7 +31,7 @@ networkd:
         [Network]
         LinkLocalAddressing=no
         DHCP=yes
-        DNS={{.dns_vip}}
+        DNS={{.backup_dns_ip}}
 
         [DHCP]
         UseDNS=false

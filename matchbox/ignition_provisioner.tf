@@ -31,7 +31,8 @@ resource "matchbox_group" "ignition_provisioner_0" {
     store_if      = "eth1"
     store_netmask = "${var.store_netmask}"
     wan_if        = "eth2"
-    dns_vip       = "8.8.8.8"
+    dns_vip       = "${var.dns_vip}"
+    backup_dns_ip = "${var.backup_dns_ip}"
 
     docker_opts = "--log-driver=journald --iptables=false"
 
