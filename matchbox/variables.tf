@@ -121,11 +121,40 @@ variable "matchbox_vip" {
   type = "string"
 }
 
+variable "dns_vip" {
+  type = "string"
+}
+
 variable "lan_netmask" {
   type = "string"
 }
 
 variable "store_netmask" {
+  type = "string"
+}
+
+variable "backup_dns_ip" {
+  type = "string"
+}
+
+## ip ranges
+variable "lan_ip_range" {
+  type = "string"
+}
+
+variable "store_ip_range" {
+  type = "string"
+}
+
+variable "lan_dhcp_ip_range" {
+  type = "string"
+}
+
+variable "store_dhcp_ip_range" {
+  type = "string"
+}
+
+variable "metallb_ip_range" {
   type = "string"
 }
 

@@ -1,0 +1,350 @@
+---
+apiVersion: v1
+kind: PodList
+items:
+- apiVersion: v1
+  kind: Pod
+  metadata:
+    name: nftables
+  spec:
+    restartPolicy: OnFailure
+    hostNetwork: true
+    containers:
+    - name: nftables
+      image: {{.nftables_image}}
+      securityContext:
+        capabilities:
+          add:
+          - NET_ADMIN
+      env:
+      - name: CONFIG
+        value: |
+          define if_internal = { {{.lan_if}}, {{.store_if}} }
+          define if_external = {{.wan_if}}
+
+          table ip filter {
+            chain base_checks {
+              ct state {established, related} accept;
+              ct state invalid drop;
+            }
+
+            set tcp_fwd {
+              type inet_service; flags interval;
+              elements = {
+                ssh,
+                sunrpc,nfs
+              }
+            }
+
+            set udp_fwd {
+              type inet_service; flags interval;
+              elements = {
+                sunrpc,nfs
+              }
+            }
+
+            chain input {
+              type filter hook input priority 0; policy drop;
+
+              jump base_checks;
+
+              iifname "lo" accept;
+              iifname != "lo" ip daddr 127.0.0.1/8 drop;
+
+              ip protocol icmp icmp type { echo-request, echo-reply, time-exceeded, parameter-problem, destination-unreachable } accept;
+
+              iifname eth1 accept;
+
+              iifname $if_internal tcp dport domain accept;
+              iifname $if_internal udp dport domain accept;
+              iifname $if_internal udp sport bootps udp dport bootpc accept;
+              iifname $if_internal pkttype multicast accept;
+              iifname $if_internal tcp dport ssh accept;
+            }
+
+            chain forward {
+              type filter hook forward priority 0; policy drop;
+
+              jump base_checks;
+
+              ip protocol icmp icmp type { echo-request, echo-reply, time-exceeded, parameter-problem, destination-unreachable } accept;
+
+              iifname $if_internal oifname $if_external accept;
+
+              iifname $if_internal tcp dport @tcp_fwd accept;
+              iifname $if_internal udp dport @udp_fwd accept;
+
+              iifname $if_internal ip daddr {{.controller_vip}} accept;
+              iifname $if_internal ip daddr {{.metallb_ip_range}} accept;
+
+              ip daddr {{.controller_vip}} ct status dnat accept;
+            }
+
+            chain output {
+              type filter hook output priority 100; policy accept;
+            }
+          }
+
+          table ip nat {
+            set tcp_dnat {
+              type inet_service; flags interval;
+              elements = {
+                2222
+              }
+            }
+
+            chain prerouting {
+              type nat hook prerouting priority 0; policy accept;
+              tcp dport @tcp_dnat dnat {{.controller_vip}};
+            }
+
+            chain input {
+              type nat hook input priority 0; policy accept;
+            }
+
+            chain output {
+              type nat hook output priority 0; policy accept;
+            }
+
+            chain postrouting {
+              type nat hook postrouting priority 100; policy accept;
+              oifname $if_external masquerade;
+            }
+          }
+          ;
+- apiVersion: v1
+  kind: Pod
+  metadata:
+    name: kea-mysql
+  spec:
+    restartPolicy: Always
+    hostNetwork: true
+    containers:
+    - name: kea-dhcp4
+      image: {{.kea_image}}
+      args:
+      - kea-dhcp4
+      env:
+      - name: KEA_LOCAL_CONFIG
+        value: |-
+          {
+            "Dhcp4": {
+              "valid-lifetime": 1200,
+              "renew-timer": 1200,
+              "rebind-timer": 1200,
+              "interfaces-config": {
+                "interfaces": [
+                  "*"
+                ]
+              },
+              "lease-database": {
+                "type": "memfile",
+                "name": "/var/lib/kea/dhcp4.leases",
+                "persist": true
+              },
+              "client-classes": [
+                {
+                  "name": "ipxe_detected",
+                  "test": "substring(option[77].hex,0,4) == 'iPXE'",
+                  "boot-file-name": "http://{{.matchbox_vip}}:{{.matchbox_http_port}}/boot.ipxe"
+                },
+                {
+                  "name": "ipxe",
+                  "test": "not(substring(option[77].hex,0,4) == 'iPXE') and (option[93].hex == 0x0000)",
+                  "next-server": "{{.matchbox_vip}}",
+                  "boot-file-name": "/undionly.kpxe"
+                },
+                {
+                  "name": "ipxe_efi",
+                  "test": "not(substring(option[77].hex,0,4) == 'iPXE') and (option[93].hex == 0x0007)",
+                  "next-server": "{{.matchbox_vip}}",
+                  "boot-file-name": "/ipxe.efi"
+                }
+              ],
+              "subnet4": [
+                {
+                  "subnet": "{{.lan_ip_range}}",
+                  "option-data": [
+                    {
+                      "name": "routers",
+                      "data": "{{.gateway_vip}}"
+                    },
+                    {
+                      "name": "domain-name-servers",
+                      "data": "{{.dns_vip}},{{.backup_dns_ip}}",
+                      "csv-format": true
+                    },
+                    {
+                      "name": "domain-name",
+                      "data": "host.internal"
+                    }
+                  ],
+                  "pools": [
+                    {
+                      "pool": "{{.lan_dhcp_ip_range}}"
+                    }
+                  ],
+                  "reservations": [
+
+                  ]
+                },
+                {
+                  "subnet": "{{.store_ip_range}}",
+                  "option-data": [
+                    {
+                      "name": "routers",
+                      "data": "{{.gateway_vip}}"
+                    },
+                    {
+                      "name": "domain-name-servers",
+                      "data": "{{.dns_vip}},{{.backup_dns_ip}}",
+                      "csv-format": true
+                    },
+                    {
+                      "name": "domain-name",
+                      "data": "host.internal"
+                    }
+                  ],
+                  "pools": [
+                    {
+                      "pool": "{{.store_dhcp_ip_range}}"
+                    }
+                  ],
+                  "reservations": [
+
+                  ]
+                }
+              ],
+              "dhcp-ddns": {
+                "enable-updates": true,
+                "qualifying-suffix": "host.internal.",
+                "override-client-update": true,
+                "override-no-update": true,
+                "replace-client-name": "when-not-present"
+              }
+            }
+          }
+      volumeMounts:
+      - name: lease-path
+        mountPath: "/var/lib/kea"
+        readOnly: false
+    volumes:
+    - name: lease-path
+      emptyDir: {}
+- apiVersion: v1
+  kind: Pod
+  metadata:
+    namespace: kube-system
+    name: keepalived
+  spec:
+    restartPolicy: Always
+    hostNetwork: true
+    containers:
+    - name: keepalived
+      image: {{.keepalived_image}}
+      securityContext:
+        capabilities:
+          add:
+          - NET_ADMIN
+      args:
+      - "-P"
+      env:
+      - name: KEEPALIVED_LOCAL_CONFIG
+        value: |-
+          global_defs {
+            vrrp_version 3
+          }
+          vrrp_sync_group VG_gateway {
+            group {
+              VI_gateway_store
+              VI_gateway_lan
+            }
+          }
+          vrrp_instance VI_gateway_store {
+            state BACKUP
+            strict_mode off
+            virtual_router_id 247
+            interface {{.store_if}}
+            priority 100
+            virtual_ipaddress {
+              {{.gateway_vip}}/{{.store_netmask}}
+            }
+          }
+          vrrp_instance VI_gateway_lan {
+            state BACKUP
+            strict_mode off
+            virtual_router_id 227
+            interface {{.lan_if}}
+            priority 100
+            virtual_ipaddress {
+              {{.gateway_vip}}/{{.lan_netmask}}
+            }
+          }
+          vrrp_sync_group VG_matchbox {
+            group {
+              VI_matchbox_store
+            }
+          }
+          vrrp_script CHK_matchbox {
+            script "nc -z -w5 localhost {{.matchbox_http_port}}"
+            interval 2
+          }
+          vrrp_instance VI_matchbox_store {
+            state BACKUP
+            strict_mode off
+            virtual_router_id 39
+            interface {{.store_if}}
+            priority 100
+            virtual_ipaddress {
+              {{.matchbox_vip}}/{{.store_netmask}}
+            }
+            track_script {
+              CHK_matchbox
+            }
+          }
+- apiVersion: v1
+  kind: Pod
+  metadata:
+    name: kea-tftp
+  spec:
+    restartPolicy: Always
+    hostNetwork: true
+    containers:
+    - name: tftpd-ipxe
+      image: {{.tftpd_image}}
+      args:
+      - "--address"
+      - 0.0.0.0:69
+      - "--verbose"
+- kind: Pod
+  apiVersion: v1
+  metadata:
+    name: matchbox
+  spec:
+    hostNetwork: true
+    containers:
+    - name: matchbox
+      image: {{.matchbox_image}}
+      args:
+      - "-address=0.0.0.0:{{.matchbox_http_port}}"
+      - "-rpc-address=127.0.0.1:{{.matchbox_rpc_port}}"
+      - "-ca-file=/etc/ssl/certs/ca.pem"
+      - "-cert-file=/etc/ssl/certs/matchbox.pem"
+      - "-key-file=/etc/ssl/certs/matchbox-key.pem"
+      - "-data-path=/var/lib/matchbox"
+      - "-assets-path=/var/lib/matchbox/assets"
+      volumeMounts:
+      - mountPath: "/etc/ssl/certs"
+        name: ssl-matchbox
+        readOnly: false
+      - mountPath: "/var/lib/matchbox"
+        name: data-matchbox
+        readOnly: false
+    volumes:
+    - name: ssl-matchbox
+      hostPath:
+        path: "/etc/ssl/certs"
+    - name: data-matchbox
+      nfs:
+        server: {{.nfs_vip}}
+        path: "/data/matchbox"
