@@ -32,6 +32,7 @@ resource "matchbox_group" "manifest_provisioner" {
     matchbox_vip   = "${var.matchbox_vip}"
     store_gateway_vip = "${var.store_gateway_vip}"
     lan_gateway_vip = "${var.lan_gateway_vip}"
+    dns_vip        = "${var.dns_vip}"
     backup_dns_ip  = "${var.backup_dns_ip}"
 
     store_netmask  = "${var.store_netmask}"
