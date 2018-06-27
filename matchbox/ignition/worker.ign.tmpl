@@ -113,7 +113,7 @@ storage:
           clusterDNS:
             - "{{.cluster_dns_ip}}"
           runtimeRequestTimeout: "15m"
-          StaticPodURL: {{.manifest_url}}
+          staticPodURL: {{.manifest_url}}
 
     - path: {{.kubernetes_path}}/kube-proxy-config.yaml
       filesystem: root
