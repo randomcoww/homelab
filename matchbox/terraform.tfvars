@@ -1,4 +1,5 @@
-default_user    = "core"
+default_user = "core"
+domain_name  = "host.internal"
 
 ## images
 container_linux_version = "1800.2.0"
@@ -13,7 +14,7 @@ etcd_image = "quay.io/coreos/etcd:v3.3"
 flannel_image = "quay.io/coreos/flannel:v0.10.0-amd64"
 nftables_image = "randomcoww/nftables:20180412.01"
 kea_image = "randomcoww/kea:1.4.0"
-tftpd_image = "randomcoww/tftpd_ipxe:20180222.02"
+tftpd_image = "randomcoww/tftpd_ipxe:20180626.02"
 matchbox_image = "quay.io/coreos/matchbox:latest"
 
 ## kubernetes
@@ -24,6 +25,7 @@ cluster_ip_range = "10.96.0.0/12"
 cluster_name    = "kube_cluster"
 cluster_domain  = "cluster.local"
 kubernetes_path = "/var/lib/kubernetes"
+certs_path = "/etc/ssl/certs"
 etcd_initial_cluster = "controller-0=https://192.168.126.219:2380"
 etcd_cluster_token = "etcd-default"
 
@@ -32,6 +34,7 @@ etcd_client_port = "52379"
 apiserver_secure_port = "56443"
 matchbox_rpc_port = "58081"
 matchbox_http_port = "58080"
+dhcp_relay_port = "8080"
 
 ## ip
 controller_vip = "192.168.126.245"

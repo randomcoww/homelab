@@ -40,6 +40,6 @@ resource "matchbox_group" "manifest_controller" {
     store_if       = "eth0"
 
     kubernetes_path = "${var.kubernetes_path}"
-    etcd_data_path  = "/data/etcd"
+    etcd_mount_path = "/data/etcd"
   }
 }

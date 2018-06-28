@@ -139,9 +139,20 @@ items:
               },
               "lease-database": {
                 "type": "memfile",
-                "name": "/var/lib/kea/dhcp4.leases",
+                "name": "{{.kea_path}}/dhcp4.leases",
                 "persist": true
               },
+              "option-data": [
+                {
+                  "name": "domain-name-servers",
+                  "data": "{{.dns_vip}},{{.backup_dns_ip}}",
+                  "csv-format": true
+                },
+                {
+                  "name": "domain-name",
+                  "data": "{{.domain_name}}"
+                }
+              ],
               "client-classes": [
                 {
                   "name": "ipxe_detected",
@@ -168,24 +179,12 @@ items:
                     {
                       "name": "routers",
                       "data": "{{.lan_gateway_vip}}"
-                    },
-                    {
-                      "name": "domain-name-servers",
-                      "data": "{{.dns_vip}},{{.backup_dns_ip}}",
-                      "csv-format": true
-                    },
-                    {
-                      "name": "domain-name",
-                      "data": "host.internal"
                     }
                   ],
                   "pools": [
                     {
                       "pool": "{{.lan_dhcp_ip_range}}"
                     }
-                  ],
-                  "reservations": [
-
                   ]
                 },
                 {
@@ -194,30 +193,18 @@ items:
                     {
                       "name": "routers",
                       "data": "{{.store_gateway_vip}}"
-                    },
-                    {
-                      "name": "domain-name-servers",
-                      "data": "{{.dns_vip}},{{.backup_dns_ip}}",
-                      "csv-format": true
-                    },
-                    {
-                      "name": "domain-name",
-                      "data": "host.internal"
                     }
                   ],
                   "pools": [
                     {
                       "pool": "{{.store_dhcp_ip_range}}"
                     }
-                  ],
-                  "reservations": [
-
                   ]
                 }
               ],
               "dhcp-ddns": {
                 "enable-updates": true,
-                "qualifying-suffix": "host.internal.",
+                "qualifying-suffix": "{{.domain_name}}.",
                 "override-client-update": true,
                 "override-no-update": true,
                 "replace-client-name": "when-not-present"
@@ -226,11 +213,13 @@ items:
           }
       volumeMounts:
       - name: lease-path
-        mountPath: "/var/lib/kea"
+        mountPath: "{{.kea_path}}"
         readOnly: false
     volumes:
     - name: lease-path
-      emptyDir: {}
+      nfs:
+        server: {{.nfs_vip}}
+        path: "{{.kea_mount_path}}"
 - apiVersion: v1
   kind: Pod
   metadata:
@@ -323,23 +312,23 @@ items:
       args:
       - "-address=0.0.0.0:{{.matchbox_http_port}}"
       - "-rpc-address=127.0.0.1:{{.matchbox_rpc_port}}"
-      - "-ca-file=/etc/ssl/certs/ca.pem"
-      - "-cert-file=/etc/ssl/certs/matchbox.pem"
-      - "-key-file=/etc/ssl/certs/matchbox-key.pem"
-      - "-data-path=/var/lib/matchbox"
-      - "-assets-path=/var/lib/matchbox/assets"
+      - "-ca-file={{.certs_path}}/ca.pem"
+      - "-cert-file={{.certs_path}}/matchbox.pem"
+      - "-key-file={{.certs_path}}/matchbox-key.pem"
+      - "-data-path={{.matchbox_path}}"
+      - "-assets-path={{.matchbox_path}}/assets"
       volumeMounts:
-      - mountPath: "/etc/ssl/certs"
-        name: ssl-matchbox
+      - mountPath: "{{.certs_path}}"
+        name: certs-path
         readOnly: true
-      - mountPath: "/var/lib/matchbox"
-        name: data-matchbox
+      - mountPath: "{{.matchbox_path}}"
+        name: matchbox-data
         readOnly: false
     volumes:
-    - name: ssl-matchbox
+    - name: certs-path
       hostPath:
-        path: "/etc/ssl/certs"
-    - name: data-matchbox
+        path: "{{.certs_path}}"
+    - name: matchbox-data
       nfs:
         server: {{.nfs_vip}}
-        path: "/data/matchbox"
+        path: "{{.matchbox_mount_path}}"

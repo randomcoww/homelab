@@ -2,6 +2,10 @@ variable "default_user" {
   type = "string"
 }
 
+variable "domain_name" {
+  type = "string"
+}
+
 ## images
 variable "container_linux_version" {
   type = "string"
@@ -88,6 +92,10 @@ variable "kubernetes_path" {
   type = "string"
 }
 
+variable "certs_path" {
+  type = "string"
+}
+
 variable "etcd_client_port" {
   type = "string"
 }
@@ -101,6 +109,10 @@ variable "matchbox_rpc_port" {
 }
 
 variable "matchbox_http_port" {
+  type = "string"
+}
+
+variable "dhcp_relay_port" {
   type = "string"
 }
 

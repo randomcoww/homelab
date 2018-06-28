@@ -18,6 +18,8 @@ resource "matchbox_group" "manifest_provisioner" {
   }
 
   metadata {
+    domain_name      = "${var.domain_name}"
+
     keepalived_image = "${var.keepalived_image}"
     nftables_image   = "${var.nftables_image}"
     kea_image        = "${var.kea_image}"
@@ -26,6 +28,7 @@ resource "matchbox_group" "manifest_provisioner" {
 
     matchbox_http_port = "${var.matchbox_http_port}"
     matchbox_rpc_port  = "${var.matchbox_rpc_port}"
+    dhcp_relay_port    = "${var.dhcp_relay_port}"
 
     controller_vip = "${var.controller_vip}"
     nfs_vip        = "${var.nfs_vip}"
@@ -47,7 +50,10 @@ resource "matchbox_group" "manifest_provisioner" {
     store_dhcp_ip_range = "${var.store_dhcp_ip_range}"
     metallb_ip_range    = "${var.metallb_ip_range}"
 
-    kubernetes_path = "${var.kubernetes_path}"
-    etcd_data_path  = "/data/etcd"
+    certs_path          = "${var.certs_path}"
+    kea_path            = "/var/lib/kea"
+    kea_mount_path      = "/data/kea"
+    matchbox_path       = "/var/lib/matchbox"
+    matchbox_mount_path = "/data/matchbox"
   }
 }

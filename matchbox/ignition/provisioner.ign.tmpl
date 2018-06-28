@@ -94,17 +94,17 @@ storage:
         inline: |
           fs.inotify.max_user_watches=16184
 
-    - path: /etc/ssl/certs/ca.pem
+    - path: {{.certs_path}}/ca.pem
       filesystem: root
       mode: 420
       contents:
         inline: "{{.tls_ca}}"
-    - path: /etc/ssl/certs/matchbox.pem
+    - path: {{.certs_path}}/matchbox.pem
       filesystem: root
       mode: 420
       contents:
         inline: "{{.tls_matchbox}}"
-    - path: /etc/ssl/certs/matchbox-key.pem
+    - path: {{.certs_path}}/matchbox-key.pem
       filesystem: root
       mode: 420
       contents:

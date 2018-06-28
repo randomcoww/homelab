@@ -141,7 +141,7 @@ items:
     - name: data-etcd-host
       nfs:
         server: {{.nfs_vip}}
-        path: "{{.etcd_data_path}}"
+        path: "{{.etcd_mount_path}}"
 - kind: Pod
   apiVersion: v1
   metadata:

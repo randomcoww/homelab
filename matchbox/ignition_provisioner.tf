@@ -33,7 +33,8 @@ resource "matchbox_group" "ignition_provisioner_0" {
     wan_if        = "eth2"
     backup_dns_ip = "${var.backup_dns_ip}"
 
-    docker_opts = "--log-driver=journald --iptables=false"
+    certs_path    = "${var.certs_path}"
+    docker_opts   = "--log-driver=journald --iptables=false"
 
     tls_ca           = "${replace(tls_self_signed_cert.root.cert_pem, "\n", "\\n")}"
     tls_matchbox     = "${replace(tls_locally_signed_cert.matchbox.cert_pem, "\n", "\\n")}"
