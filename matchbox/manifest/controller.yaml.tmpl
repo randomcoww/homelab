@@ -46,7 +46,7 @@ items:
   apiVersion: v1
   metadata:
     namespace: kube-system
-    name: kube-apiserver
+    name: kube-etcd
   spec:
     hostNetwork: true
     restartPolicy: Always
@@ -89,6 +89,23 @@ items:
       - name: data-etcd-host
         mountPath: "/var/lib/etcd"
         readOnly: false
+    volumes:
+    - name: kubernetes-path
+      hostPath:
+        path: "{{.kubernetes_path}}"
+    - name: data-etcd-host
+      nfs:
+        server: {{.nfs_vip}}
+        path: "{{.etcd_mount_path}}"
+- kind: Pod
+  apiVersion: v1
+  metadata:
+    namespace: kube-system
+    name: kube-apiserver
+  spec:
+    hostNetwork: true
+    restartPolicy: Always
+    containers:
     - name: kube-apiserver
       image: {{.kube_apiserver_image}}
       command:
@@ -138,10 +155,6 @@ items:
     - name: kubernetes-path
       hostPath:
         path: "{{.kubernetes_path}}"
-    - name: data-etcd-host
-      nfs:
-        server: {{.nfs_vip}}
-        path: "{{.etcd_mount_path}}"
 - kind: Pod
   apiVersion: v1
   metadata:
