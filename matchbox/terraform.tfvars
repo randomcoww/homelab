@@ -25,7 +25,6 @@ cluster_ip_range = "10.96.0.0/12"
 cluster_name    = "kube_cluster"
 cluster_domain  = "cluster.local"
 kubernetes_path = "/var/lib/kubernetes"
-certs_path = "/etc/ssl/certs"
 etcd_initial_cluster = "controller-0=https://192.168.126.219:2380"
 etcd_cluster_token = "etcd-default"
 
@@ -54,3 +53,7 @@ store_ip_range   = "192.168.126.0/23"
 lan_dhcp_ip_range   = "192.168.62.64/26"
 store_dhcp_ip_range = "192.168.126.64/26"
 metallb_ip_range    = "192.168.127.128/25"
+
+## general paths
+certs_path = "/etc/ssl/certs"
+base_mount_path = "/data/pv"

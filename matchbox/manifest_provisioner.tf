@@ -52,8 +52,8 @@ resource "matchbox_group" "manifest_provisioner" {
 
     certs_path          = "${var.certs_path}"
     kea_path            = "/var/lib/kea"
-    kea_mount_path      = "/data/kea"
+    kea_mount_path      = "${var.base_mount_path}/kea"
     matchbox_path       = "/var/lib/matchbox"
-    matchbox_mount_path = "/data/matchbox"
+    matchbox_mount_path = "${var.base_mount_path}/matchbox"
   }
 }

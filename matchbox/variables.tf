@@ -92,10 +92,6 @@ variable "kubernetes_path" {
   type = "string"
 }
 
-variable "certs_path" {
-  type = "string"
-}
-
 variable "etcd_client_port" {
   type = "string"
 }
@@ -180,5 +176,14 @@ variable "etcd_initial_cluster" {
 }
 
 variable "etcd_cluster_token" {
+  type = "string"
+}
+
+## general paths
+variable "certs_path" {
+  type = "string"
+}
+
+variable "base_mount_path" {
   type = "string"
 }
