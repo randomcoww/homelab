@@ -28,6 +28,6 @@
     }
   ],
   "variables": {
-    "kickstart": "store_0"
+    "kickstart": "store-0"
   }
 }

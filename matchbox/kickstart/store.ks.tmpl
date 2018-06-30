@@ -13,10 +13,6 @@ rootpw --lock password
 firewall --disabled
 network --hostname={{.hostname}}
 
-## user
-user --name={{.default_user}} --password=password --plaintext --groups wheel
-sshkey --username={{.default_user}} "{{.ssh_authorized_key}}"
-
 ## disk
 zerombr
 clearpart --all --initlabel --disklabel=gpt
@@ -56,6 +52,10 @@ zfs
 -sendmail
 -ppc64-utils
 %end
+
+## user
+user --name={{.default_user}} --password=password --plaintext --groups=wheel,libvirt
+sshkey --username={{.default_user}} "{{.ssh_authorized_key}}"
 
 
 ##
