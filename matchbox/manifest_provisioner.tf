@@ -2,7 +2,7 @@
 ## kube controller kickstart renderer
 ##
 resource "matchbox_profile" "manifest_provisioner" {
-  name           = "manifest_provisioner"
+  name           = "provisioner"
   generic_config = "${file("./manifest/provisioner.yaml.tmpl")}"
 }
 
@@ -10,11 +10,11 @@ resource "matchbox_profile" "manifest_provisioner" {
 ## kickstart
 ##
 resource "matchbox_group" "manifest_provisioner" {
-  name    = "manifest_provisioner"
+  name    = "${matchbox_profile.manifest_provisioner.name}"
   profile = "${matchbox_profile.manifest_provisioner.name}"
 
   selector {
-    manifest = "provisioner"
+    manifest = "${matchbox_profile.manifest_provisioner.name}"
   }
 
   metadata {

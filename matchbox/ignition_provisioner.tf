@@ -9,25 +9,27 @@ resource "matchbox_profile" "ignition_provisioner" {
 ##
 ## kickstart
 ##
-resource "matchbox_group" "ignition_provisioner_0" {
-  name    = "ignition_provisioner_0"
+resource "matchbox_group" "ignition_provisioner" {
+  count   = "${length(var.provisioner_hosts)}"
+
+  name    = "ignition_${var.provisioner_hosts[count.index]}"
   profile = "${matchbox_profile.ignition_provisioner.name}"
 
   selector {
-    host = "provisioner-0"
+    host = "${var.provisioner_hosts[count.index]}"
   }
 
   metadata {
-    hostname           = "provisioner-0"
+    hostname           = "${var.provisioner_hosts[count.index]}"
     hyperkube_image    = "${var.hyperkube_image}"
     ssh_authorized_key = "cert-authority ${chomp(tls_private_key.ssh_ca.public_key_openssh)}"
     default_user       = "${var.default_user}"
-    manifest_url       = "https://raw.githubusercontent.com/randomcoww/environment-config/master/manifests/provisioner"
+    manifest_url       = "https://raw.githubusercontent.com/randomcoww/environment-config/master/manifests/${matchbox_profile.manifest_provisioner.name}"
 
-    lan_ip        = "192.168.62.217"
+    lan_ip        = "${var.provisioner_lan_ips[count.index]}"
     lan_if        = "eth0"
     lan_netmask   = "${var.lan_netmask}"
-    store_ip      = "192.168.126.217"
+    store_ip      = "${var.provisioner_store_ips[count.index]}"
     store_if      = "eth1"
     store_netmask = "${var.store_netmask}"
     wan_if        = "eth2"

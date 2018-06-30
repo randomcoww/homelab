@@ -64,14 +64,14 @@ items:
       - "--peer-trusted-ca-file={{.kubernetes_path}}/ca.pem"
       - "--peer-client-cert-auth"
       - "--client-cert-auth"
-      - "--initial-advertise-peer-urls=https://$(INTERNAL_IP):2380"
-      - "--listen-peer-urls=https://$(INTERNAL_IP):2380"
+      - "--initial-advertise-peer-urls=https://$(INTERNAL_IP):{{.etcd_peer_port}}"
+      - "--listen-peer-urls=https://$(INTERNAL_IP):{{.etcd_peer_port}}"
       - "--listen-client-urls=https://$(INTERNAL_IP):{{.etcd_client_port}},https://127.0.0.1:{{.etcd_client_port}}"
       - "--advertise-client-urls=https://$(INTERNAL_IP):{{.etcd_client_port}}"
       - "--initial-cluster-token={{.etcd_cluster_token}}"
       - "--initial-cluster={{.etcd_initial_cluster}}"
       - "--initial-cluster-state={{.etcd_initial_cluster_state}}"
-      - "--data-dir=/var/lib/etcd/$(NODE_NAME)"
+      - "--data-dir={{.etcd_path}}/$(NODE_NAME)"
       - "--enable-v2=false"
       env:
       - name: INTERNAL_IP
@@ -87,7 +87,7 @@ items:
         mountPath: "{{.kubernetes_path}}"
         readOnly: true
       - name: data-etcd-host
-        mountPath: "/var/lib/etcd"
+        mountPath: "{{.etcd_path}}"
         readOnly: false
     volumes:
     - name: kubernetes-path
@@ -125,7 +125,7 @@ items:
       - "--etcd-cafile={{.kubernetes_path}}/ca.pem"
       - "--etcd-certfile={{.kubernetes_path}}/kubernetes.pem"
       - "--etcd-keyfile={{.kubernetes_path}}/kubernetes-key.pem"
-      - "--etcd-servers=https://127.0.0.1:{{.etcd_client_port}}"
+      - "--etcd-servers={{.etcd_servers}}"
       - "--event-ttl=1h"
       - "--kubelet-certificate-authority={{.kubernetes_path}}/ca.pem"
       - "--kubelet-client-certificate={{.kubernetes_path}}/kubernetes.pem"

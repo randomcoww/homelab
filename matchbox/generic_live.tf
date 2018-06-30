@@ -2,16 +2,16 @@
 ## live kickstart renderer
 ##
 resource "matchbox_profile" "generic_live" {
-  name           = "generic_live"
+  name           = "host_live"
   generic_config = "${file("./kickstart/live.ks.tmpl")}"
-  kernel         = "/assets/live_0/vmlinuz-${var.fedora_live_version}"
+  kernel         = "/assets/live/vmlinuz-${var.fedora_live_version}"
 
   initrd = [
-    "/assets/live_0/initramfs-${var.fedora_live_version}.img",
+    "/assets/live/initramfs-${var.fedora_live_version}.img",
   ]
 
   args = [
-    "root=live:http://${var.matchbox_vip}:${var.matchbox_http_port}/assets/live_0/live-rootfs.squashfs.img",
+    "root=live:http://${var.matchbox_vip}:${var.matchbox_http_port}/assets/live/live-rootfs.squashfs.img",
     "console=tty0",
     "console=ttyS1,115200n8",
     "elevator=noop",
@@ -25,8 +25,8 @@ resource "matchbox_profile" "generic_live" {
 ##
 ## kickstart
 ##
-resource "matchbox_group" "generic_live_0" {
-  name    = "generic_live_0"
+resource "matchbox_group" "generic_live" {
+  name    = "host_live"
   profile = "${matchbox_profile.generic_live.name}"
 
   selector {
@@ -34,7 +34,7 @@ resource "matchbox_group" "generic_live_0" {
   }
 
   metadata {
-    hostname           = "live-0"
+    hostname           = "live"
     hyperkube_image    = "${var.hyperkube_image}"
     ssh_authorized_key = "cert-authority ${chomp(tls_private_key.ssh_ca.public_key_openssh)}"
     default_user       = "${var.default_user}"

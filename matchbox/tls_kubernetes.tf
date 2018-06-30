@@ -19,11 +19,11 @@ resource "tls_cert_request" "kubernetes" {
     "kubernetes.default",
   ]
 
-  ip_addresses = [
+  ip_addresses = "${concat("${var.controller_ips}", list(
     "127.0.0.1",
     "${var.cluster_service_ip}",
-    "${var.controller_vip}",
-  ]
+    "${var.controller_vip}"
+  ))}"
 }
 
 resource "tls_locally_signed_cert" "kubernetes" {
