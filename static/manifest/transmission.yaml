@@ -1,0 +1,290 @@
+---
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: torrent-nfs-pv
+spec:
+  capacity:
+    storage: 1Gi
+  accessModes:
+  - ReadWriteMany
+  persistentVolumeReclaimPolicy: Retain
+  nfs:
+    path: "/vol/torrent"
+    server: 192.168.126.251
+    readOnly: false
+
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: torrent-nfs-pvc
+spec:
+  accessModes:
+  - ReadWriteMany
+  resources:
+    requests:
+      storage: 1Gi
+
+---
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: transmission-nfs-pv
+spec:
+  capacity:
+    storage: 1Gi
+  accessModes:
+  - ReadWriteMany
+  persistentVolumeReclaimPolicy: Retain
+  nfs:
+    path: "/data/pv/transmission"
+    server: 192.168.126.251
+    readOnly: false
+
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: transmission-nfs-pvc
+spec:
+  accessModes:
+  - ReadWriteMany
+  resources:
+    requests:
+      storage: 1Gi
+
+---
+kind: Deployment
+apiVersion: extensions/v1beta1
+metadata:
+  name: transmission
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      k8s-app: transmission
+  template:
+    metadata:
+      labels:
+        k8s-app: transmission
+    spec:
+      restartPolicy: Always
+      volumes:
+      - name: torrent-data
+        persistentVolumeClaim:
+          claimName: torrent-nfs-pvc
+      - name: transmission-data
+        persistentVolumeClaim:
+          claimName: transmission-nfs-pvc
+
+      initContainers:
+      - name: nftables
+        image: randomcoww/nftables:20180628.01
+        securityContext:
+          capabilities:
+            add:
+            - NET_ADMIN
+        env:
+        - name: NFTABLES_LOCAL_CONFIG
+          value: |
+            table ip filter {
+              chain output {
+                type filter hook output priority 30; policy drop;
+                ct state { established, related } accept
+                oifname "tun*" accept
+                skgid { "nobody" } accept
+                ip daddr { 192.168.0.0/16, 10.0.0.0/8 } accept
+              }
+            }
+            ;
+
+      containers:
+      - name: openvpn
+        image: randomcoww/openvpn:20180628.01
+        securityContext:
+          capabilities:
+            add:
+            - NET_ADMIN
+        args:
+        - "--route 192.168.0.0 255.255.0.0 net_gateway"
+        - "--route 10.0.0.0 255.0.0.0 net_gateway"
+        env:
+        - name: OVPN_CONFIG
+          value: |-
+            client
+            auth-nocache
+            proto udp
+            remote us-seattle.privateinternetaccess.com 1198
+            resolv-retry infinite
+            nobind
+            persist-key
+            persist-tun
+            cipher aes-128-cbc
+            auth sha1
+            tls-client
+            remote-cert-tls server
+            comp-lzo
+            verb 3
+            reneg-sec 0
+            keepalive 10 30
+            fast-io
+            route-nopull
+            redirect-gateway
+        - name: OVPN_AUTH_USER_PASS
+          valueFrom:
+            secretKeyRef:
+              name: openvpn-auth-user-pass
+              key: openvpn-auth-user-pass
+        - name: OVPN_CRL_VERIFY
+          value: |
+            -----BEGIN X509 CRL-----
+            MIICWDCCAUAwDQYJKoZIhvcNAQENBQAwgegxCzAJBgNVBAYTAlVTMQswCQYDVQQI
+            EwJDQTETMBEGA1UEBxMKTG9zQW5nZWxlczEgMB4GA1UEChMXUHJpdmF0ZSBJbnRl
+            cm5ldCBBY2Nlc3MxIDAeBgNVBAsTF1ByaXZhdGUgSW50ZXJuZXQgQWNjZXNzMSAw
+            HgYDVQQDExdQcml2YXRlIEludGVybmV0IEFjY2VzczEgMB4GA1UEKRMXUHJpdmF0
+            ZSBJbnRlcm5ldCBBY2Nlc3MxLzAtBgkqhkiG9w0BCQEWIHNlY3VyZUBwcml2YXRl
+            aW50ZXJuZXRhY2Nlc3MuY29tFw0xNjA3MDgxOTAwNDZaFw0zNjA3MDMxOTAwNDZa
+            MCYwEQIBARcMMTYwNzA4MTkwMDQ2MBECAQYXDDE2MDcwODE5MDA0NjANBgkqhkiG
+            9w0BAQ0FAAOCAQEAQZo9X97ci8EcPYu/uK2HB152OZbeZCINmYyluLDOdcSvg6B5
+            jI+ffKN3laDvczsG6CxmY3jNyc79XVpEYUnq4rT3FfveW1+Ralf+Vf38HdpwB8EW
+            B4hZlQ205+21CALLvZvR8HcPxC9KEnev1mU46wkTiov0EKc+EdRxkj5yMgv0V2Re
+            ze7AP+NQ9ykvDScH4eYCsmufNpIjBLhpLE2cuZZXBLcPhuRzVoU3l7A9lvzG9mjA
+            5YijHJGHNjlWFqyrn1CfYS6koa4TGEPngBoAziWRbDGdhEgJABHrpoaFYaL61zqy
+            MR6jC0K2ps9qyZAN74LEBedEfK7tBOzWMwr58A==
+            -----END X509 CRL-----
+        - name: OVPN_CA
+          value: |
+            -----BEGIN CERTIFICATE-----
+            MIIFqzCCBJOgAwIBAgIJAKZ7D5Yv87qDMA0GCSqGSIb3DQEBDQUAMIHoMQswCQYD
+            VQQGEwJVUzELMAkGA1UECBMCQ0ExEzARBgNVBAcTCkxvc0FuZ2VsZXMxIDAeBgNV
+            BAoTF1ByaXZhdGUgSW50ZXJuZXQgQWNjZXNzMSAwHgYDVQQLExdQcml2YXRlIElu
+            dGVybmV0IEFjY2VzczEgMB4GA1UEAxMXUHJpdmF0ZSBJbnRlcm5ldCBBY2Nlc3Mx
+            IDAeBgNVBCkTF1ByaXZhdGUgSW50ZXJuZXQgQWNjZXNzMS8wLQYJKoZIhvcNAQkB
+            FiBzZWN1cmVAcHJpdmF0ZWludGVybmV0YWNjZXNzLmNvbTAeFw0xNDA0MTcxNzM1
+            MThaFw0zNDA0MTIxNzM1MThaMIHoMQswCQYDVQQGEwJVUzELMAkGA1UECBMCQ0Ex
+            EzARBgNVBAcTCkxvc0FuZ2VsZXMxIDAeBgNVBAoTF1ByaXZhdGUgSW50ZXJuZXQg
+            QWNjZXNzMSAwHgYDVQQLExdQcml2YXRlIEludGVybmV0IEFjY2VzczEgMB4GA1UE
+            AxMXUHJpdmF0ZSBJbnRlcm5ldCBBY2Nlc3MxIDAeBgNVBCkTF1ByaXZhdGUgSW50
+            ZXJuZXQgQWNjZXNzMS8wLQYJKoZIhvcNAQkBFiBzZWN1cmVAcHJpdmF0ZWludGVy
+            bmV0YWNjZXNzLmNvbTCCASIwDQYJKoZIhvcNAQEBBQADggEPADCCAQoCggEBAPXD
+            L1L9tX6DGf36liA7UBTy5I869z0UVo3lImfOs/GSiFKPtInlesP65577nd7UNzzX
+            lH/P/CnFPdBWlLp5ze3HRBCc/Avgr5CdMRkEsySL5GHBZsx6w2cayQ2EcRhVTwWp
+            cdldeNO+pPr9rIgPrtXqT4SWViTQRBeGM8CDxAyTopTsobjSiYZCF9Ta1gunl0G/
+            8Vfp+SXfYCC+ZzWvP+L1pFhPRqzQQ8k+wMZIovObK1s+nlwPaLyayzw9a8sUnvWB
+            /5rGPdIYnQWPgoNlLN9HpSmsAcw2z8DXI9pIxbr74cb3/HSfuYGOLkRqrOk6h4RC
+            OfuWoTrZup1uEOn+fw8CAwEAAaOCAVQwggFQMB0GA1UdDgQWBBQv63nQ/pJAt5tL
+            y8VJcbHe22ZOsjCCAR8GA1UdIwSCARYwggESgBQv63nQ/pJAt5tLy8VJcbHe22ZO
+            sqGB7qSB6zCB6DELMAkGA1UEBhMCVVMxCzAJBgNVBAgTAkNBMRMwEQYDVQQHEwpM
+            b3NBbmdlbGVzMSAwHgYDVQQKExdQcml2YXRlIEludGVybmV0IEFjY2VzczEgMB4G
+            A1UECxMXUHJpdmF0ZSBJbnRlcm5ldCBBY2Nlc3MxIDAeBgNVBAMTF1ByaXZhdGUg
+            SW50ZXJuZXQgQWNjZXNzMSAwHgYDVQQpExdQcml2YXRlIEludGVybmV0IEFjY2Vz
+            czEvMC0GCSqGSIb3DQEJARYgc2VjdXJlQHByaXZhdGVpbnRlcm5ldGFjY2Vzcy5j
+            b22CCQCmew+WL/O6gzAMBgNVHRMEBTADAQH/MA0GCSqGSIb3DQEBDQUAA4IBAQAn
+            a5PgrtxfwTumD4+3/SYvwoD66cB8IcK//h1mCzAduU8KgUXocLx7QgJWo9lnZ8xU
+            ryXvWab2usg4fqk7FPi00bED4f4qVQFVfGfPZIH9QQ7/48bPM9RyfzImZWUCenK3
+            7pdw4Bvgoys2rHLHbGen7f28knT2j/cbMxd78tQc20TIObGjo8+ISTRclSTRBtyC
+            GohseKYpTS9himFERpUgNtefvYHbn70mIOzfOJFTVqfrptf9jXa9N8Mpy3ayfodz
+            1wiqdteqFXkTYoSDctgKMiZ6GdocK9nMroQipIQtpnwd4yBDWIyC6Bvlkrq5TQUt
+            YDQ8z9v+DMO6iwyIDRiU
+            -----END CERTIFICATE-----
+      - name: transmission
+        image: randomcoww/transmission:20180626.01
+        securityContext:
+          capabilities:
+            add:
+            - NET_ADMIN
+        ports:
+        - containerPort: 9091
+        volumeMounts:
+        - name: torrent-data
+          mountPath: "/data"
+        - name: transmission-data
+          mountPath: "/var/lib/transmission"
+        env:
+        - name: TRANSMISSION_LOCAL_CONFIG
+          value: |-
+            {
+              "alt-speed-down": 1900,
+              "alt-speed-enabled": true,
+              "alt-speed-time-begin": 540,
+              "alt-speed-time-day": 127,
+              "alt-speed-time-enabled": false,
+              "alt-speed-time-end": 1020,
+              "alt-speed-up": 10,
+              "bind-address-ipv4": "0.0.0.0",
+              "bind-address-ipv6": "::",
+              "blocklist-enabled": false,
+              "blocklist-url": "http://www.example.com/blocklist",
+              "cache-size-mb": 4,
+              "dht-enabled": true,
+              "download-dir": "/data/downloads",
+              "download-limit": 100,
+              "download-limit-enabled": 0,
+              "download-queue-enabled": true,
+              "download-queue-size": 5,
+              "encryption": 1,
+              "idle-seeding-limit": 30,
+              "idle-seeding-limit-enabled": false,
+              "incomplete-dir": "/data/incomplete",
+              "incomplete-dir-enabled": true,
+              "lpd-enabled": false,
+              "max-peers-global": 200,
+              "message-level": 1,
+              "peer-congestion-algorithm": "",
+              "peer-id-ttl-hours": 6,
+              "peer-limit-global": 34919,
+              "peer-limit-per-torrent": 16959,
+              "peer-port": 51413,
+              "peer-port-random-high": 65535,
+              "peer-port-random-low": 49152,
+              "peer-port-random-on-start": false,
+              "peer-socket-tos": "default",
+              "pex-enabled": true,
+              "port-forwarding-enabled": false,
+              "preallocation": 1,
+              "prefetch-enabled": true,
+              "queue-stalled-enabled": true,
+              "queue-stalled-minutes": 30,
+              "ratio-limit": 0,
+              "ratio-limit-enabled": true,
+              "rename-partial-files": true,
+              "rpc-authentication-required": false,
+              "rpc-bind-address": "0.0.0.0",
+              "rpc-enabled": true,
+              "rpc-port": 9091,
+              "rpc-url": "/transmission/",
+              "rpc-username": "transmission",
+              "rpc-whitelist": "127.0.0.1",
+              "rpc-whitelist-enabled": false,
+              "scrape-paused-torrents-enabled": true,
+              "script-torrent-done-enabled": false,
+              "script-torrent-done-filename": "",
+              "seed-queue-enabled": false,
+              "seed-queue-size": 10,
+              "speed-limit-down": 100,
+              "speed-limit-down-enabled": false,
+              "speed-limit-up": 100,
+              "speed-limit-up-enabled": false,
+              "start-added-torrents": false,
+              "trash-original-torrent-files": false,
+              "umask": 18,
+              "upload-limit": 100,
+              "upload-limit-enabled": 0,
+              "upload-slots-per-torrent": 14,
+              "utp-enabled": true,
+              "watch-dir-enabled": false
+            }
+---
+kind: Service
+apiVersion: v1
+metadata:
+  name: transmission-service
+spec:
+  type: LoadBalancer
+  ports:
+  - name: webui
+    port: 80
+    targetPort: 9091
+  selector:
+    k8s-app: transmission
