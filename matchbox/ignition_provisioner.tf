@@ -24,7 +24,7 @@ resource "matchbox_group" "ignition_provisioner" {
     hyperkube_image    = "${var.hyperkube_image}"
     ssh_authorized_key = "cert-authority ${chomp(tls_private_key.ssh_ca.public_key_openssh)}"
     default_user       = "${var.default_user}"
-    manifest_url       = "https://raw.githubusercontent.com/randomcoww/environment-config/master/manifests/${matchbox_profile.manifest_provisioner.name}"
+    manifest_url       = "${var.remote_provision_url}/manifest/${matchbox_profile.manifest_provisioner.name}.yaml"
 
     lan_ip        = "${var.provisioner_lan_ips[count.index]}"
     lan_if        = "eth0"

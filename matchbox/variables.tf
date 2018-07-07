@@ -205,6 +205,10 @@ variable "store_netmask" {
   type = "string"
 }
 
+variable "remote_provision_url" {
+  type = "string"
+}
+
 ## ip ranges
 variable "lan_ip_range" {
   type = "string"

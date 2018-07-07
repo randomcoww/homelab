@@ -63,6 +63,8 @@ backup_dns_ip  = "9.9.9.9"
 lan_netmask    = "23"
 store_netmask  = "23"
 
+remote_provision_url = "https://raw.githubusercontent.com/randomcoww/terraform/master/static"
+
 ## ip ranges
 lan_ip_range     = "192.168.62.0/23"
 store_ip_range   = "192.168.126.0/23"

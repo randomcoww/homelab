@@ -3,15 +3,16 @@ resource "local_file" "tls_ca" {
   filename = "output/ca.pem"
 }
 
-# resource "local_file" "tls_key" {
-#   content  = "${chomp(tls_private_key.admin.private_key_pem)}"
-#   filename = "output/admin-key.pem"
-# }
-#
-# resource "local_file" "tls_cert" {
-#   content  = "${chomp(tls_locally_signed_cert.admin.cert_pem)}"
-#   filename = "output/admin.pem"
-# }
+## matchbox
+resource "local_file" "tls_key" {
+  content  = "${chomp(tls_private_key.matchbox.private_key_pem)}"
+  filename = "output/matchbox-key.pem"
+}
+
+resource "local_file" "tls_cert" {
+  content  = "${chomp(tls_locally_signed_cert.matchbox.cert_pem)}"
+  filename = "output/matchbox.pem"
+}
 
 ## ssh ca
 resource "local_file" "ssh_ca_key" {

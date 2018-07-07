@@ -7,7 +7,7 @@
     <type arch='x86_64' machine='pc'>hvm</type>
     <kernel>/data/pv/matchbox/assets/coreos/1800.2.0/coreos_production_pxe.vmlinuz</kernel>
     <initrd>/data/pv/matchbox/assets/coreos/1800.2.0/coreos_production_pxe_image.cpio.gz</initrd>
-    <cmdline>coreos.first_boot=1 coreos.autologin coreos.config.url=https://randomcoww.github.io/terraform/ignition/provisioner-0.ign console=hvc0 elevator=noop</cmdline>
+    <cmdline>coreos.first_boot=1 coreos.autologin coreos.config.url=https://raw.githubusercontent.com/randomcoww/terraform/master/static/ignition/provisioner-0.ign console=hvc0 elevator=noop</cmdline>
     <boot dev='hd'/>
   </os>
   <features>
