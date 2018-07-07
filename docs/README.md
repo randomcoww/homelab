@@ -1,13 +1,13 @@
 ## Serve static files from github to provision the provisioner
 
-### manifests
+### manifests/
 
 Static kubelet pod manifests for provisioner.
 
-### ignition
+### ignition/
 
 Container Linux ignition files for provisioner.
 
-### libvirt
+### libvirt/
 
 Libvirt domain configs for Container Linux VMs. All nodes run on RAM disk.
