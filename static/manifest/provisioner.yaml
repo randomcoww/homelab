@@ -245,6 +245,7 @@ items:
             vrrp_version 3
           }
           vrrp_instance VI_gateway {
+            use_vmac macvlan_eth2
             state BACKUP
             strict_mode off
             virtual_router_id 247
@@ -258,7 +259,6 @@ items:
             virtual_ipaddress {
               192.168.126.240/23 dev eth1
               192.168.62.240/23 dev eth0
-              192.168.255.254 dev eth2
             }
           }
           vrrp_script CHK_matchbox {
