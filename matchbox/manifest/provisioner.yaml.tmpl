@@ -244,30 +244,20 @@ items:
           global_defs {
             vrrp_version 3
           }
-          vrrp_sync_group VG_gateway {
-            group {
-              VI_gateway_store
-              VI_gateway_lan
-            }
-          }
-          vrrp_instance VI_gateway_store {
+          vrrp_instance VI_gateway {
             state BACKUP
             strict_mode off
             virtual_router_id 247
             interface {{.store_if}}
-            priority 100
-            virtual_ipaddress {
-              {{.store_gateway_vip}}/{{.store_netmask}}
+            track_interface {
+              {{.store_if}}
+              {{.lan_if}}
+              {{.wan_if}}
             }
-          }
-          vrrp_instance VI_gateway_lan {
-            state BACKUP
-            strict_mode off
-            virtual_router_id 227
-            interface {{.lan_if}}
             priority 100
             virtual_ipaddress {
-              {{.lan_gateway_vip}}/{{.lan_netmask}}
+              {{.store_gateway_vip}}/{{.store_netmask}} dev {{.store_if}}
+              {{.lan_gateway_vip}}/{{.lan_netmask}} dev {{.lan_if}}
             }
           }
           vrrp_script CHK_matchbox {
