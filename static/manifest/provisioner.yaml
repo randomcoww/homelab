@@ -249,7 +249,7 @@ items:
             state BACKUP
             strict_mode off
             virtual_router_id 247
-            interface eth1
+            interface eth2
             track_interface {
               eth1
               eth0
