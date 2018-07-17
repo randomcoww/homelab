@@ -245,11 +245,10 @@ items:
             vrrp_version 3
           }
           vrrp_instance VI_gateway {
-            use_vmac macvlan_eth2
             state BACKUP
             strict_mode off
             virtual_router_id 247
-            interface eth2
+            interface eth1
             track_interface {
               eth1
               eth0
