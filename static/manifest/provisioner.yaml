@@ -231,7 +231,7 @@ items:
     hostNetwork: true
     containers:
     - name: keepalived
-      image: randomcoww/keepalived:20180626.01
+      image: randomcoww/keepalived:20180716.01
       securityContext:
         capabilities:
           add:
