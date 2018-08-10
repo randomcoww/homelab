@@ -1,19 +1,3 @@
-resource "local_file" "tls_ca" {
-  content  = "${chomp(tls_self_signed_cert.root.cert_pem)}"
-  filename = "output/ca.pem"
-}
-
-## matchbox
-resource "local_file" "tls_key" {
-  content  = "${chomp(tls_private_key.matchbox.private_key_pem)}"
-  filename = "output/matchbox-key.pem"
-}
-
-resource "local_file" "tls_cert" {
-  content  = "${chomp(tls_locally_signed_cert.matchbox.cert_pem)}"
-  filename = "output/matchbox.pem"
-}
-
 ## ssh ca
 resource "local_file" "ssh_ca_key" {
   content  = "${chomp(tls_private_key.ssh_ca.private_key_pem)}"
