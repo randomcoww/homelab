@@ -4,3 +4,12 @@ provider "matchbox" {
   client_key  = "${file("output/matchbox-key.pem")}"
   ca          = "${file("output/ca.pem")}"
 }
+
+terraform {
+  backend "s3" {
+    bucket  = "randomcoww-tfstate"
+    key     = "matchbox/default.tfstate"
+    region  = "us-west-2"
+    encrypt = true
+  }
+}
