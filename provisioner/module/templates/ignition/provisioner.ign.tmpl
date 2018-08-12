@@ -1,0 +1,116 @@
+---
+networkd:
+  units:
+    - name: {{.lan_if}}.network
+      contents: |
+        [Match]
+        Name={{.lan_if}}
+
+        [Network]
+        LinkLocalAddressing=no
+        DHCP=no
+
+        [Address]
+        Address={{.lan_ip}}/{{.lan_netmask}}
+    - name: {{.store_if}}.network
+      contents: |
+        [Match]
+        Name={{.store_if}}
+
+        [Network]
+        LinkLocalAddressing=no
+        DHCP=no
+
+        [Address]
+        Address={{.store_ip}}/{{.store_netmask}}
+    - name: {{.wan_if}}.network
+      contents: |
+        [Match]
+        Name={{.wan_if}}
+
+        [Network]
+        LinkLocalAddressing=no
+        DHCP=yes
+        DNS={{.backup_dns_ip}}
+
+        [DHCP]
+        UseDNS=false
+        UseNTP=false
+        SendHostname=false
+        UseHostname=false
+        UseDomains=false
+        UseTimezone=no
+systemd:
+  units:
+    - name: docker.service
+      enabled: true
+      dropins:
+        - name: docker.conf
+          contents: |
+            [Service]
+            Environment=DOCKER_OPTS="{{.docker_opts}}"
+    - name: kubelet.service
+      enabled: true
+      contents: |
+        [Unit]
+        Description=Kubelet via Hyperkube ACI
+
+        [Service]
+        Environment="KUBELET_IMAGE=docker://{{.hyperkube_image}}"
+        Environment="RKT_RUN_ARGS=--uuid-file-save=/var/cache/kubelet-pod.uuid \
+          --volume=resolv,kind=host,source=/etc/resolv.conf \
+          --mount volume=resolv,target=/etc/resolv.conf \
+          --insecure-options=image"
+        ExecStartPre=/bin/mkdir -p /var/log/containers
+        ExecStartPre=-/usr/bin/rkt rm --uuid-file=/var/cache/kubelet-pod.uuid
+        ExecStart=/usr/lib/coreos/kubelet-wrapper \
+          --manifest-url={{.manifest_url}} \
+          --make-iptables-util-chains=false
+        ExecStop=-/usr/bin/rkt stop --uuid-file=/var/cache/kubelet-pod.uuid
+        Restart=on-failure
+        RestartSec=5
+
+        [Install]
+        WantedBy=multi-user.target
+storage:
+  files:
+    - path: /etc/hostname
+      filesystem: root
+      mode: 0644
+      contents:
+        inline:
+          {{.hostname}}
+    - path: /etc/sysctl.d/ipforward.conf
+      filesystem: root
+      mode: 0644
+      contents:
+        inline: |
+          net.ipv4.ip_forward=1
+          net.ipv4.ip_nonlocal_bind=1
+    - path: /etc/sysctl.d/max-user-watches.conf
+      filesystem: root
+      mode: 0644
+      contents:
+        inline: |
+          fs.inotify.max_user_watches=16184
+
+    - path: {{.certs_path}}/ca.pem
+      filesystem: root
+      mode: 420
+      contents:
+        inline: "{{.tls_ca}}"
+    - path: {{.certs_path}}/matchbox.pem
+      filesystem: root
+      mode: 420
+      contents:
+        inline: "{{.tls_matchbox}}"
+    - path: {{.certs_path}}/matchbox-key.pem
+      filesystem: root
+      mode: 420
+      contents:
+        inline: "{{.tls_matchbox_key}}"
+passwd:
+  users:
+  - name: {{.default_user}}
+    ssh_authorized_keys:
+      - {{.ssh_authorized_key}}
