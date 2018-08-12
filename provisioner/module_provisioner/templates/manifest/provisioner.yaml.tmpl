@@ -256,8 +256,8 @@ items:
             }
             priority 100
             virtual_ipaddress {
-              {{.store_gateway_vip}}/{{.store_netmask}} dev {{.store_if}}
-              {{.lan_gateway_vip}}/{{.lan_netmask}} dev {{.lan_if}}
+              {{.store_gateway_vip}} dev {{.store_if}}
+              {{.lan_gateway_vip}} dev {{.lan_if}}
             }
           }
           vrrp_script CHK_matchbox {
@@ -271,7 +271,7 @@ items:
             interface {{.store_if}}
             priority 100
             virtual_ipaddress {
-              {{.matchbox_vip}}/{{.store_netmask}}
+              {{.matchbox_vip}}
             }
             track_script {
               CHK_matchbox

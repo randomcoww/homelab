@@ -13,22 +13,8 @@ module "store" {
   store_lan_if    = "ens1f1"
   store_store_if  = "ens1f0"
 
-  live_hosts     = ["live-0"]
-  live_macs      = ["00-1b-21-bc-67-c6"]
-  live_lan_ips   = ["192.168.62.252"]
-  live_store_ips = ["192.168.126.252"]
-  live_lan_if    = "ens1f1"
-  live_store_if  = "ens1f0"
-
   ## images
-  hyperkube_image     = "gcr.io/google_containers/hyperkube:v1.11.0"
-  fedora_live_version = "4.15.14-300.fc27.x86_64"
-
-  ## ports
-  matchbox_http_port = "58080"
-
-  ## vip
-  matchbox_vip = "192.168.126.242"
+  hyperkube_image = "gcr.io/google_containers/hyperkube:v1.11.0"
 
   # ## ip ranges
   lan_netmask   = "23"

@@ -6,29 +6,48 @@ variable "ssh_ca_public_key" {
   type = "string"
 }
 
-## store
-variable "store_hosts" {
+## live
+
+variable "live_hosts" {
   type = "list"
 }
 
-variable "store_lan_ips" {
+variable "live_macs" {
   type = "list"
 }
 
-variable "store_store_ips" {
+variable "live_lan_ips" {
   type = "list"
 }
 
-variable "store_lan_if" {
+variable "live_store_ips" {
+  type = "list"
+}
+
+variable "live_lan_if" {
   type = "string"
 }
 
-variable "store_store_if" {
+variable "live_store_if" {
   type = "string"
 }
 
 ## images
 variable "hyperkube_image" {
+  type = "string"
+}
+
+variable "fedora_live_version" {
+  type = "string"
+}
+
+## ports
+variable "matchbox_http_port" {
+  type = "string"
+}
+
+## vip
+variable "matchbox_vip" {
   type = "string"
 }
 
