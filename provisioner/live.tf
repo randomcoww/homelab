@@ -12,19 +12,19 @@
 #   live_lan_if    = "ens1f1"
 #   live_store_if  = "ens1f0"
 #   ## images
-#   hyperkube_image     = "gcr.io/google_containers/hyperkube:v1.11.0"
+#   hyperkube_image     = "gcr.io/google_containers/hyperkube:${local.kubernetes_version}"
 #   fedora_live_version = "4.15.14-300.fc27.x86_64"
 #   ## ports
 #   matchbox_http_port = "58080"
 #   ## vip
 #   matchbox_vip = "192.168.126.242"
 #   # ## ip ranges
-#   lan_netmask   = "23"
-#   store_netmask = "23"
+#   lan_netmask   = "${locals.lan_netmask}"
+#   store_netmask = "${locals.store_netmask}"
 #   ## renderer provisioning access
-#   renderer_endpoint        = "127.0.0.1:8081"
-#   renderer_cert_pem        = "${file("../renderer/output/server.crt")}"
-#   renderer_private_key_pem = "${file("../renderer/output/server.key")}"
-#   renderer_ca_pem          = "${file("../renderer/output/ca.crt")}"
+#   renderer_endpoint        = "${local.renderer_endpoint}"
+#   renderer_cert_pem        = "${local.renderer_cert_pem}"
+#   renderer_private_key_pem = "${local.renderer_private_key_pem}"
+#   renderer_ca_pem          = "${local.renderer_ca_pem}"
 # }
 

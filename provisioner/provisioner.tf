@@ -20,7 +20,7 @@ module "provisioner" {
   provisioner_wan_if    = "eth2"
 
   ## images
-  hyperkube_image  = "gcr.io/google_containers/hyperkube:v1.11.0"
+  hyperkube_image  = "gcr.io/google_containers/hyperkube:${local.kubernetes_version}"
   keepalived_image = "randomcoww/keepalived:20180716.01"
   nftables_image   = "randomcoww/nftables:20180628.01"
   kea_image        = "randomcoww/kea:1.4.0"
@@ -57,8 +57,8 @@ module "provisioner" {
   remote_provision_url = "https://raw.githubusercontent.com/randomcoww/terraform/master/static"
 
   ## renderer provisioning access
-  renderer_endpoint        = "127.0.0.1:8081"
-  renderer_cert_pem        = "${file("../renderer/output/server.crt")}"
-  renderer_private_key_pem = "${file("../renderer/output/server.key")}"
-  renderer_ca_pem          = "${file("../renderer/output/ca.crt")}"
+  renderer_endpoint        = "${local.renderer_endpoint}"
+  renderer_cert_pem        = "${local.renderer_cert_pem}"
+  renderer_private_key_pem = "${local.renderer_private_key_pem}"
+  renderer_ca_pem          = "${local.renderer_ca_pem}"
 }

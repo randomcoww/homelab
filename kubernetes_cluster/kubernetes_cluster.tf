@@ -1,6 +1,3 @@
-locals {
-  kubernetes_version = "v1.11.2"
-}
 
 # Matchbox configs for Kubernetes cluster
 module "kubernetes_cluster" {
@@ -50,8 +47,8 @@ module "kubernetes_cluster" {
   etcd_mount_path = "/data/pv/etcd"
 
   ## renderer provisioning access
-  renderer_endpoint        = "127.0.0.1:8081"
-  renderer_cert_pem        = "${file("../renderer/output/server.crt")}"
-  renderer_private_key_pem = "${file("../renderer/output/server.key")}"
-  renderer_ca_pem          = "${file("../renderer/output/ca.crt")}"
+  renderer_endpoint        = "${local.renderer_endpoint}"
+  renderer_cert_pem        = "${local.renderer_cert_pem}"
+  renderer_private_key_pem = "${local.renderer_private_key_pem}"
+  renderer_ca_pem          = "${local.renderer_ca_pem}"
 }
