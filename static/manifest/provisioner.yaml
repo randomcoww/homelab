@@ -256,8 +256,8 @@ items:
             }
             priority 100
             virtual_ipaddress {
-              192.168.126.240/23 dev eth1
-              192.168.62.240/23 dev eth0
+              192.168.126.240 dev eth1
+              192.168.62.240 dev eth0
             }
           }
           vrrp_script CHK_matchbox {
@@ -271,7 +271,7 @@ items:
             interface eth1
             priority 100
             virtual_ipaddress {
-              192.168.126.242/23
+              192.168.126.242
             }
             track_script {
               CHK_matchbox
