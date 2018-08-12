@@ -302,7 +302,7 @@ items:
       image: quay.io/coreos/matchbox:latest
       args:
       - "-address=0.0.0.0:58080"
-      - "-rpc-address=127.0.0.1:58081"
+      - "-rpc-address=0.0.0.0:58081"
       - "-ca-file=/etc/ssl/certs/ca.pem"
       - "-cert-file=/etc/ssl/certs/matchbox.pem"
       - "-key-file=/etc/ssl/certs/matchbox-key.pem"
