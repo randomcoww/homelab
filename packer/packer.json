@@ -3,7 +3,7 @@
     {
       "boot_command" : [
         "<tab> ",
-        "inst.ks=http://{{.HTTPIP}}:58080/generic?host={{user `kickstart`}} ",
+        "inst.ks=http://{{.HTTPIP}}:8080/generic?host={{user `kickstart`}} ",
         "<enter>"
       ],
       "disk_size" : 30000,
