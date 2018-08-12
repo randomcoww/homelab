@@ -1,0 +1,212 @@
+---
+systemd:
+  units:
+    - name: docker.service
+      enabled: true
+      dropins:
+        - name: docker.conf
+          contents: |
+            [Service]
+            Environment=DOCKER_OPTS="{{.docker_opts}}"
+    - name: kubelet.service
+      enabled: true
+      contents: |
+        [Unit]
+        Description=Kubelet via Hyperkube ACI
+
+        [Service]
+        Environment="KUBELET_IMAGE=docker://{{.hyperkube_image}}"
+        Environment="RKT_RUN_ARGS=--uuid-file-save=/var/cache/kubelet-pod.uuid \
+          --volume=resolv,kind=host,source=/etc/resolv.conf \
+          --volume=var-lib-kubernetes,kind=host,source={{.kubernetes_path}} \
+          --mount volume=resolv,target=/etc/resolv.conf \
+          --mount volume=var-lib-kubernetes,target={{.kubernetes_path}} \
+          --insecure-options=image"
+        ExecStartPre=/bin/mkdir -p /var/log/containers
+        ExecStartPre=-/usr/bin/rkt rm --uuid-file=/var/cache/kubelet-pod.uuid
+        ExecStart=/usr/lib/coreos/kubelet-wrapper \
+          --allow-privileged=true \
+          --config={{.kubernetes_path}}/kubelet-config.yaml \
+          --kubeconfig={{.kubernetes_path}}/kubelet.kubeconfig \
+          --bootstrap-kubeconfig={{.kubernetes_path}}/bootstrap.kubeconfig \
+          --cert-dir={{.kubernetes_path}} \
+          --cni-conf-dir={{.kubernetes_path}}/cni \
+          --network-plugin=cni \
+          --register-node=true \
+          --feature-gates=RotateKubeletClientCertificate=true,RotateKubeletServerCertificate=true \
+          --v=2
+        ExecStop=-/usr/bin/rkt stop --uuid-file=/var/cache/kubelet-pod.uuid
+        Restart=on-failure
+        RestartSec=5
+
+        [Install]
+        WantedBy=multi-user.target
+storage:
+  files:
+    - path: /etc/hostname
+      filesystem: root
+      mode: 0644
+      contents:
+        inline:
+          {{.hostname}}
+    - path: /etc/sysctl.d/max-user-watches.conf
+      filesystem: root
+      mode: 0644
+      contents:
+        inline: |
+          fs.inotify.max_user_watches=16184
+
+    - path: {{.kubernetes_path}}/ca.pem
+      filesystem: root
+      mode: 420
+      contents:
+        inline: "{{.tls_ca}}"
+    - path: {{.kubernetes_path}}/bootstrap.pem
+      filesystem: root
+      mode: 420
+      contents:
+        inline: "{{.tls_bootstrap}}"
+    - path: {{.kubernetes_path}}/bootstrap-key.pem
+      filesystem: root
+      mode: 420
+      contents:
+        inline: "{{.tls_bootstrap_key}}"
+    - path: {{.kubernetes_path}}/kube-proxy.pem
+      filesystem: root
+      mode: 420
+      contents:
+        inline: "{{.tls_proxy}}"
+    - path: {{.kubernetes_path}}/kube-proxy-key.pem
+      filesystem: root
+      mode: 420
+      contents:
+        inline: "{{.tls_proxy_key}}"
+
+    - path: {{.kubernetes_path}}/kubelet-config.yaml
+      filesystem: root
+      mode: 420
+      contents:
+        inline: |-
+          kind: KubeletConfiguration
+          apiVersion: kubelet.config.k8s.io/v1beta1
+          authentication:
+            anonymous:
+              enabled: false
+            webhook:
+              enabled: true
+            x509:
+              clientCAFile: "{{.kubernetes_path}}/ca.pem"
+          authorization:
+            mode: Webhook
+          clusterDomain: "{{.cluster_domain}}"
+          clusterDNS:
+            - "{{.cluster_dns_ip}}"
+          runtimeRequestTimeout: "15m"
+          staticPodURL: {{.manifest_url}}
+          rotateCertificates: true
+          serverTLSBootstrap: true
+
+    - path: {{.kubernetes_path}}/kube-proxy-config.yaml
+      filesystem: root
+      mode: 420
+      contents:
+        inline: |-
+          kind: KubeProxyConfiguration
+          apiVersion: kubeproxy.config.k8s.io/v1alpha1
+          clientConnection:
+            kubeconfig: "{{.kubernetes_path}}/kube-proxy.kubeconfig"
+          mode: "iptables"
+          clusterCIDR: "{{.cluster_cidr}}"
+
+    - path: {{.kubernetes_path}}/kube-proxy.kubeconfig
+      filesystem: root
+      mode: 420
+      contents:
+        inline: |-
+          apiVersion: v1
+          clusters:
+          - cluster:
+              certificate-authority: {{.kubernetes_path}}/ca.pem
+              server: {{.apiserver_url}}
+            name: {{.cluster_name}}
+          contexts:
+          - context:
+              cluster: {{.cluster_name}}
+              user: system:kube-proxy
+            name: default
+          current-context: default
+          kind: Config
+          preferences: {}
+          users:
+          - name: system:kube-proxy
+            user:
+              client-certificate: {{.kubernetes_path}}/kube-proxy.pem
+              client-key: {{.kubernetes_path}}/kube-proxy-key.pem
+
+    - path: {{.kubernetes_path}}/bootstrap.kubeconfig
+      filesystem: root
+      mode: 420
+      contents:
+        inline: |-
+          apiVersion: v1
+          clusters:
+          - cluster:
+              certificate-authority: {{.kubernetes_path}}/ca.pem
+              server: {{.apiserver_url}}
+            name: {{.cluster_name}}
+          contexts:
+          - context:
+              cluster: {{.cluster_name}}
+              user: system:node:{{.hostname}}
+            name: default
+          current-context: default
+          kind: Config
+          preferences: {}
+          users:
+          - name: system:node:{{.hostname}}
+            user:
+              client-certificate: {{.kubernetes_path}}/bootstrap.pem
+              client-key: {{.kubernetes_path}}/bootstrap-key.pem
+
+    - path: {{.kubernetes_path}}/cni/10-flannel.conf
+      filesystem: root
+      mode: 420
+      contents:
+        inline: |-
+          {
+            "name": "cbr0",
+            "type": "flannel",
+            "delegate": {
+              "hairpinMode": true,
+              "isDefaultGateway": true
+            }
+          }
+    - path: /etc/kube-flannel/cni-conf.json
+      filesystem: root
+      mode: 420
+      contents:
+        inline: |-
+          {
+            "name": "cbr0",
+            "type": "flannel",
+            "delegate": {
+              "hairpinMode": true,
+              "isDefaultGateway": true
+            }
+          }
+    - path: /etc/kube-flannel/net-conf.json
+      filesystem: root
+      mode: 420
+      contents:
+        inline: |-
+          {
+            "Network": "{{.cluster_cidr}}",
+            "Backend": {
+              "Type": "vxlan"
+            }
+          }
+passwd:
+  users:
+  - name: {{.default_user}}
+    ssh_authorized_keys:
+      - {{.ssh_authorized_key}}

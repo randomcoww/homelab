@@ -1,0 +1,230 @@
+---
+apiVersion: v1
+kind: PodList
+items:
+- apiVersion: v1
+  kind: Pod
+  metadata:
+    namespace: kube-system
+    name: keepalived
+  spec:
+    restartPolicy: Always
+    hostNetwork: true
+    containers:
+    - name: keepalived
+      image: {{.keepalived_image}}
+      securityContext:
+        capabilities:
+          add:
+          - NET_ADMIN
+      args:
+      - "-P"
+      env:
+      - name: KEEPALIVED_LOCAL_CONFIG
+        value: |-
+          global_defs {
+            vrrp_version 3
+          }
+          vrrp_script CHK_kube-master {
+            script "nc -z -w5 localhost {{.apiserver_secure_port}}"
+            interval 2
+          }
+          vrrp_instance VI_kube-master_store {
+            state BACKUP
+            strict_mode off
+            virtual_router_id 70
+            interface {{.host_if}}
+            priority 100
+            virtual_ipaddress {
+              {{.controller_vip}}
+            }
+            track_script {
+              CHK_kube-master
+            }
+          }
+- kind: Pod
+  apiVersion: v1
+  metadata:
+    namespace: kube-system
+    name: kube-etcd
+  spec:
+    hostNetwork: true
+    restartPolicy: Always
+    containers:
+    - name: kube-etcd
+      image: {{.etcd_image}}
+      args:
+      - "/usr/local/bin/etcd"
+      - "--name=$(NODE_NAME)"
+      - "--cert-file={{.kubernetes_path}}/kubernetes.pem"
+      - "--key-file={{.kubernetes_path}}/kubernetes-key.pem"
+      - "--peer-cert-file={{.kubernetes_path}}/kubernetes.pem"
+      - "--peer-key-file={{.kubernetes_path}}/kubernetes-key.pem"
+      - "--trusted-ca-file={{.kubernetes_path}}/ca.pem"
+      - "--peer-trusted-ca-file={{.kubernetes_path}}/ca.pem"
+      - "--peer-client-cert-auth"
+      - "--client-cert-auth"
+      - "--initial-advertise-peer-urls=https://$(INTERNAL_IP):{{.etcd_peer_port}}"
+      - "--listen-peer-urls=https://$(INTERNAL_IP):{{.etcd_peer_port}}"
+      - "--listen-client-urls=https://$(INTERNAL_IP):{{.etcd_client_port}},https://127.0.0.1:{{.etcd_client_port}}"
+      - "--advertise-client-urls=https://$(INTERNAL_IP):{{.etcd_client_port}}"
+      - "--initial-cluster-token={{.etcd_cluster_token}}"
+      - "--initial-cluster={{.etcd_initial_cluster}}"
+      - "--initial-cluster-state={{.etcd_initial_cluster_state}}"
+      - "--data-dir={{.etcd_path}}/$(NODE_NAME)"
+      - "--enable-v2=false"
+      env:
+      - name: INTERNAL_IP
+        valueFrom:
+          fieldRef:
+            fieldPath: status.hostIP
+      - name: NODE_NAME
+        valueFrom:
+          fieldRef:
+            fieldPath: spec.nodeName
+      volumeMounts:
+      - name: kubernetes-path
+        mountPath: "{{.kubernetes_path}}"
+        readOnly: true
+      - name: data-etcd-host
+        mountPath: "{{.etcd_path}}"
+        readOnly: false
+    volumes:
+    - name: kubernetes-path
+      hostPath:
+        path: "{{.kubernetes_path}}"
+    - name: data-etcd-host
+      nfs:
+        server: {{.nfs_vip}}
+        path: "{{.etcd_mount_path}}"
+- kind: Pod
+  apiVersion: v1
+  metadata:
+    namespace: kube-system
+    name: kube-apiserver
+  spec:
+    hostNetwork: true
+    restartPolicy: Always
+    containers:
+    - name: kube-apiserver
+      image: {{.kube_apiserver_image}}
+      command:
+      - kube-apiserver
+      - "--secure-port={{.apiserver_secure_port}}"
+      - "--allow-privileged=true"
+      - "--apiserver-count=1"
+      - "--audit-log-maxage=30"
+      - "--audit-log-maxbackup=1"
+      - "--audit-log-maxsize=100"
+      - "--audit-log-path=/var/log/audit.log"
+      - "--authorization-mode=Node,RBAC"
+      - "--bind-address=0.0.0.0"
+      - "--client-ca-file={{.kubernetes_path}}/ca.pem"
+      - "--enable-admission-plugins=Initializers,NamespaceLifecycle,NodeRestriction,LimitRanger,ServiceAccount,DefaultStorageClass,ResourceQuota"
+      - "--enable-swagger-ui=true"
+      - "--etcd-cafile={{.kubernetes_path}}/ca.pem"
+      - "--etcd-certfile={{.kubernetes_path}}/kubernetes.pem"
+      - "--etcd-keyfile={{.kubernetes_path}}/kubernetes-key.pem"
+      - "--etcd-servers={{.etcd_servers}}"
+      - "--event-ttl=1h"
+      - "--kubelet-certificate-authority={{.kubernetes_path}}/ca.pem"
+      - "--kubelet-client-certificate={{.kubernetes_path}}/kubernetes.pem"
+      - "--kubelet-client-key={{.kubernetes_path}}/kubernetes-key.pem"
+      - "--kubelet-https=true"
+      - "--runtime-config=api/all"
+      - "--service-account-key-file={{.kubernetes_path}}/service-account.pem"
+      - "--service-cluster-ip-range={{.cluster_ip_range}}"
+      - "--tls-cert-file={{.kubernetes_path}}/kubernetes.pem"
+      - "--tls-private-key-file={{.kubernetes_path}}/kubernetes-key.pem"
+      - "--storage-backend=etcd3"
+      - "--kubelet-preferred-address-types=InternalIP,InternalDNS"
+      - "--v=2"
+      volumeMounts:
+      - name: kubernetes-path
+        mountPath: "{{.kubernetes_path}}"
+        readOnly: true
+      livenessProbe:
+        httpGet:
+          scheme: HTTP
+          host: 127.0.0.1
+          port: 8080
+          path: "/healthz"
+        initialDelaySeconds: 15
+        timeoutSeconds: 15
+    volumes:
+    - name: kubernetes-path
+      hostPath:
+        path: "{{.kubernetes_path}}"
+- kind: Pod
+  apiVersion: v1
+  metadata:
+    namespace: kube-system
+    name: kube-controller-manager
+  spec:
+    hostNetwork: true
+    restartPolicy: Always
+    containers:
+    - name: kube-controller-manager
+      image: {{.kube_controller_manager_image}}
+      command:
+      - kube-controller-manager
+      - "--address=0.0.0.0"
+      - "--cluster-cidr={{.cluster_cidr}}"
+      - "--allocate-node-cidrs=true"
+      - "--cluster-name=kube_cluster"
+      - "--cluster-signing-cert-file={{.kubernetes_path}}/ca.pem"
+      - "--cluster-signing-key-file={{.kubernetes_path}}/ca-key.pem"
+      - "--kubeconfig={{.kubernetes_path}}/kube-controller-manager.kubeconfig"
+      - "--leader-elect=true"
+      - "--root-ca-file={{.kubernetes_path}}/ca.pem"
+      - "--service-account-private-key-file={{.kubernetes_path}}/service-account-key.pem"
+      - "--service-cluster-ip-range={{.cluster_ip_range}}"
+      - "--use-service-account-credentials=true"
+      - "--v=2"
+      volumeMounts:
+      - name: kubernetes-path
+        mountPath: "{{.kubernetes_path}}"
+        readOnly: true
+      livenessProbe:
+        httpGet:
+          scheme: HTTP
+          host: 127.0.0.1
+          port: 10252
+          path: "/healthz"
+        initialDelaySeconds: 15
+        timeoutSeconds: 15
+    volumes:
+    - name: kubernetes-path
+      hostPath:
+        path: "{{.kubernetes_path}}"
+- kind: Pod
+  apiVersion: v1
+  metadata:
+    namespace: kube-system
+    name: kube-scheduler
+  spec:
+    restartPolicy: Always
+    hostNetwork: true
+    containers:
+    - name: kube-scheduler
+      image: {{.kube_scheduler_image}}
+      command:
+      - kube-scheduler
+      - "--config={{.kubernetes_path}}/kube-scheduler.yaml"
+      - "--v=2"
+      livenessProbe:
+        httpGet:
+          scheme: HTTP
+          host: 127.0.0.1
+          port: 10251
+          path: "/healthz"
+        initialDelaySeconds: 15
+        timeoutSeconds: 15
+      volumeMounts:
+      - name: kubernetes-path
+        mountPath: "{{.kubernetes_path}}"
+        readOnly: true
+    volumes:
+    - name: kubernetes-path
+      hostPath:
+        path: "{{.kubernetes_path}}"
