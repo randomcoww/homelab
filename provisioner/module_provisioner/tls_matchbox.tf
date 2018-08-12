@@ -2,13 +2,17 @@
 ## matchbox
 ##
 resource "tls_private_key" "matchbox" {
+  count = "${length(var.provisioner_hosts)}"
+
   algorithm   = "ECDSA"
   ecdsa_curve = "P521"
 }
 
 resource "tls_cert_request" "matchbox" {
-  key_algorithm   = "${tls_private_key.matchbox.algorithm}"
-  private_key_pem = "${tls_private_key.matchbox.private_key_pem}"
+  count = "${length(var.provisioner_hosts)}"
+
+  key_algorithm   = "${element(tls_private_key.matchbox.*.algorithm, count.index)}"
+  private_key_pem = "${element(tls_private_key.matchbox.*.private_key_pem, count.index)}"
 
   subject {
     common_name  = "matchbox"
@@ -17,11 +21,16 @@ resource "tls_cert_request" "matchbox" {
 
   ip_addresses = [
     "127.0.0.1",
+    "${var.provisioner_lan_ips[count.index]}",
+    "${var.provisioner_store_ips[count.index]}",
+    "${var.matchbox_vip}",
   ]
 }
 
 resource "tls_locally_signed_cert" "matchbox" {
-  cert_request_pem   = "${tls_cert_request.matchbox.cert_request_pem}"
+  count = "${length(var.provisioner_hosts)}"
+
+  cert_request_pem   = "${element(tls_cert_request.matchbox.*.cert_request_pem, count.index)}"
   ca_key_algorithm   = "${tls_private_key.root.algorithm}"
   ca_private_key_pem = "${tls_private_key.root.private_key_pem}"
   ca_cert_pem        = "${tls_self_signed_cert.root.cert_pem}"
@@ -33,19 +42,4 @@ resource "tls_locally_signed_cert" "matchbox" {
     "server_auth",
     "client_auth",
   ]
-}
-
-resource "local_file" "matchbox_ca_pem" {
-  content  = "${chomp(tls_self_signed_cert.root.cert_pem)}"
-  filename = "output/${var.output_path}/ca.crt"
-}
-
-resource "local_file" "matchbox_private_key_pem" {
-  content  = "${chomp(tls_private_key.matchbox.private_key_pem)}"
-  filename = "output/${var.output_path}/server.key"
-}
-
-resource "local_file" "matchbox_cert_pem" {
-  content  = "${chomp(tls_locally_signed_cert.matchbox.cert_pem)}"
-  filename = "output/${var.output_path}/server.crt"
 }

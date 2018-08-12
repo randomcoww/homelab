@@ -302,7 +302,7 @@ items:
       image: {{.matchbox_image}}
       args:
       - "-address=0.0.0.0:{{.matchbox_http_port}}"
-      - "-rpc-address=127.0.0.1:{{.matchbox_rpc_port}}"
+      - "-rpc-address=0.0.0.0:{{.matchbox_rpc_port}}"
       - "-ca-file={{.certs_path}}/ca.pem"
       - "-cert-file={{.certs_path}}/matchbox.pem"
       - "-key-file={{.certs_path}}/matchbox-key.pem"

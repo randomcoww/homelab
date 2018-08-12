@@ -1,4 +1,3 @@
-
 # Matchbox configs for Kubernetes cluster
 module "kubernetes_cluster" {
   source = "./module_kubernetes_cluster"

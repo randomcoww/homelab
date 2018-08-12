@@ -2,7 +2,7 @@
 module "provisioner" {
   source = "./module_provisioner"
 
-  output_path = "default"
+  output_path = "matchbox"
 
   ## user (default container linux)
   default_user      = "core"
