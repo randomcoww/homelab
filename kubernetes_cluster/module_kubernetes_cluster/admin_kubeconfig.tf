@@ -1,12 +1,6 @@
-## ssh ca
-resource "local_file" "ssh_ca_key" {
-  content  = "${chomp(tls_private_key.ssh_ca.private_key_pem)}"
-  filename = "output/${var.cluster_name}-ssh-ca-key.pem"
-}
-
 ## admin kubeconfig
 resource "local_file" "kubeconfig" {
-  content  = <<EOF
+  content = <<EOF
 apiVersion: v1
 clusters:
 - cluster:
@@ -28,5 +22,6 @@ users:
     client-certificate-data: ${replace(base64encode(chomp(tls_locally_signed_cert.admin.cert_pem)), "\n", "")}
     client-key-data: ${replace(base64encode(chomp(tls_private_key.admin.private_key_pem)), "\n", "")}
 EOF
-  filename = "output/${var.cluster_name}.kubeconfig"
+
+  filename = "output/${var.cluster_name}/admin.kubeconfig"
 }

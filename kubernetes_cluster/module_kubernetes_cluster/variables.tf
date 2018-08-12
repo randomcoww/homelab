@@ -3,6 +3,10 @@ variable "default_user" {
   type = "string"
 }
 
+variable "ssh_ca_public_key" {
+  type = "string"
+}
+
 ## controller host
 variable "controller_hosts" {
   type = "list"
@@ -35,7 +39,7 @@ variable "container_linux_version" {
 }
 
 variable "hyperkube_image" {
-  type    = "string"
+  type = "string"
 }
 
 variable "keepalived_image" {

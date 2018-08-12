@@ -19,7 +19,7 @@ resource "matchbox_profile" "ignition_controller" {
 }
 
 resource "matchbox_group" "ignition_controller" {
-  count   = "${length(var.controller_hosts)}"
+  count = "${length(var.controller_hosts)}"
 
   name    = "host_${var.controller_hosts[count.index]}"
   profile = "${matchbox_profile.ignition_controller.name}"
@@ -31,14 +31,14 @@ resource "matchbox_group" "ignition_controller" {
   metadata {
     hostname           = "${var.controller_hosts[count.index]}"
     hyperkube_image    = "${var.hyperkube_image}"
-    ssh_authorized_key = "cert-authority ${chomp(tls_private_key.ssh_ca.public_key_openssh)}"
+    ssh_authorized_key = "cert-authority ${chomp(var.ssh_ca_public_key)}"
     default_user       = "${var.default_user}"
     manifest_url       = "http://${var.matchbox_vip}:${var.matchbox_http_port}/generic?manifest=${matchbox_profile.manifest_controller.name}"
     apiserver_url      = "https://127.0.0.1:${var.apiserver_secure_port}"
     cluster_name       = "${var.cluster_name}"
 
-    host_ip = "${var.controller_ips[count.index]}"
-    host_if = "${var.controller_if}"
+    host_ip      = "${var.controller_ips[count.index]}"
+    host_if      = "${var.controller_if}"
     host_netmask = "${var.netmask}"
 
     kubernetes_path = "${var.kubernetes_path}"

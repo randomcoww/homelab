@@ -7,7 +7,7 @@ resource "matchbox_profile" "ignition_provisioner" {
 }
 
 resource "matchbox_group" "ignition_provisioner" {
-  count   = "${length(var.provisioner_hosts)}"
+  count = "${length(var.provisioner_hosts)}"
 
   name    = "ignition_${var.provisioner_hosts[count.index]}"
   profile = "${matchbox_profile.ignition_provisioner.name}"
@@ -19,7 +19,7 @@ resource "matchbox_group" "ignition_provisioner" {
   metadata {
     hostname           = "${var.provisioner_hosts[count.index]}"
     hyperkube_image    = "${var.hyperkube_image}"
-    ssh_authorized_key = "cert-authority ${chomp(tls_private_key.ssh_ca.public_key_openssh)}"
+    ssh_authorized_key = "cert-authority ${chomp(var.ssh_ca_public_key)}"
     default_user       = "${var.default_user}"
     manifest_url       = "${var.remote_provision_url}/manifest/${matchbox_profile.manifest_provisioner.name}.yaml"
 
@@ -32,8 +32,8 @@ resource "matchbox_group" "ignition_provisioner" {
     wan_if        = "${var.provisioner_wan_if}"
     backup_dns_ip = "${var.backup_dns_ip}"
 
-    certs_path    = "${var.certs_path}"
-    docker_opts   = "--log-driver=journald --iptables=false"
+    certs_path  = "${var.certs_path}"
+    docker_opts = "--log-driver=journald --iptables=false"
 
     tls_ca           = "${replace(tls_self_signed_cert.root.cert_pem, "\n", "\\n")}"
     tls_matchbox     = "${replace(tls_locally_signed_cert.matchbox.cert_pem, "\n", "\\n")}"

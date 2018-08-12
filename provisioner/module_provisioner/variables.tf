@@ -2,7 +2,16 @@ variable "default_user" {
   type = "string"
 }
 
+variable "ssh_ca_public_key" {
+  type = "string"
+}
+
 variable "domain_name" {
+  type = "string"
+}
+
+## instance
+variable "output_path" {
   type = "string"
 }
 
@@ -31,58 +40,7 @@ variable "provisioner_wan_if" {
   type = "string"
 }
 
-## store
-variable "store_hosts" {
-  type = "list"
-}
-
-variable "store_lan_ips" {
-  type = "list"
-}
-
-variable "store_store_ips" {
-  type = "list"
-}
-
-variable "store_lan_if" {
-  type = "string"
-}
-
-variable "store_store_if" {
-  type = "string"
-}
-
-## live
-
-variable "live_hosts" {
-  type = "list"
-}
-
-variable "live_macs" {
-  type = "list"
-}
-
-variable "live_lan_ips" {
-  type = "list"
-}
-
-variable "live_store_ips" {
-  type = "list"
-}
-
-variable "live_lan_if" {
-  type = "string"
-}
-
-variable "live_store_if" {
-  type = "string"
-}
-
 ## images
-variable "container_linux_version" {
-  type = "string"
-}
-
 variable "hyperkube_image" {
   type = "string"
 }
@@ -104,20 +62,16 @@ variable "tftpd_image" {
 }
 
 variable "matchbox_image" {
-    type = "string"
-}
-
-variable "fedora_live_version" {
-    type = "string"
+  type = "string"
 }
 
 ## ports
 variable "matchbox_http_port" {
-    type = "string"
+  type = "string"
 }
 
 variable "matchbox_rpc_port" {
-    type = "string"
+  type = "string"
 }
 
 ## vip
@@ -195,11 +149,11 @@ variable "matchbox_path" {
 }
 
 variable "kea_mount_path" {
-  type    = "string"
+  type = "string"
 }
 
 variable "matchbox_mount_path" {
-  type    = "string"
+  type = "string"
 }
 
 ## provisioner provisions from github

@@ -19,7 +19,7 @@ resource "matchbox_profile" "ignition_worker" {
 }
 
 resource "matchbox_group" "ignition_worker" {
-  count   = "${length(var.worker_hosts)}"
+  count = "${length(var.worker_hosts)}"
 
   name    = "host_${var.worker_hosts[count.index]}"
   profile = "${matchbox_profile.ignition_worker.name}"
@@ -31,7 +31,7 @@ resource "matchbox_group" "ignition_worker" {
   metadata {
     hostname           = "${var.worker_hosts[count.index]}"
     hyperkube_image    = "${var.hyperkube_image}"
-    ssh_authorized_key = "cert-authority ${chomp(tls_private_key.ssh_ca.public_key_openssh)}"
+    ssh_authorized_key = "cert-authority ${chomp(var.ssh_ca_public_key)}"
     default_user       = "${var.default_user}"
     manifest_url       = "http://${var.matchbox_vip}:${var.matchbox_http_port}/generic?manifest=${matchbox_profile.manifest_worker.name}"
     apiserver_url      = "https://${var.controller_vip}:${var.apiserver_secure_port}"

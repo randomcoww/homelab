@@ -1,5 +1,5 @@
 ##
-## provisioner ca
+## kubernetes ca
 ##
 resource "tls_private_key" "root" {
   algorithm   = "ECDSA"

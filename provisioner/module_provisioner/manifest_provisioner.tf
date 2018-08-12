@@ -15,7 +15,7 @@ resource "matchbox_group" "manifest_provisioner" {
   }
 
   metadata {
-    domain_name      = "${var.domain_name}"
+    domain_name = "${var.domain_name}"
 
     keepalived_image = "${var.keepalived_image}"
     nftables_image   = "${var.nftables_image}"
@@ -34,11 +34,11 @@ resource "matchbox_group" "manifest_provisioner" {
     dns_vip           = "${var.dns_vip}"
     backup_dns_ip     = "${var.backup_dns_ip}"
 
-    store_netmask  = "${var.store_netmask}"
-    store_if       = "${var.provisioner_store_if}"
-    lan_netmask    = "${var.lan_netmask}"
-    lan_if         = "${var.provisioner_lan_if}"
-    wan_if         = "${var.provisioner_wan_if}"
+    store_netmask = "${var.store_netmask}"
+    store_if      = "${var.provisioner_store_if}"
+    lan_netmask   = "${var.lan_netmask}"
+    lan_if        = "${var.provisioner_lan_if}"
+    wan_if        = "${var.provisioner_wan_if}"
 
     lan_ip_range        = "${var.lan_ip_range}"
     lan_dhcp_ip_range   = "${var.lan_dhcp_ip_range}"

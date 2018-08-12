@@ -23,7 +23,7 @@ resource "matchbox_profile" "generic_live" {
 }
 
 resource "matchbox_group" "generic_live" {
-  count   = "${length(var.live_hosts)}"
+  count = "${length(var.live_hosts)}"
 
   name    = "host_${var.live_hosts[count.index]}"
   profile = "${matchbox_profile.generic_live.name}"
@@ -35,7 +35,7 @@ resource "matchbox_group" "generic_live" {
   metadata {
     hostname           = "${var.live_hosts[count.index]}"
     hyperkube_image    = "${var.hyperkube_image}"
-    ssh_authorized_key = "cert-authority ${chomp(tls_private_key.ssh_ca.public_key_openssh)}"
+    ssh_authorized_key = "cert-authority ${chomp(var.ssh_ca_public_key)}"
     default_user       = "${var.default_user}"
 
     lan_ip        = "${var.live_lan_ips[count.index]}"

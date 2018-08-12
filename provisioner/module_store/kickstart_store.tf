@@ -7,7 +7,7 @@ resource "matchbox_profile" "generic_store" {
 }
 
 resource "matchbox_group" "generic_store" {
-  count   = "${length(var.store_hosts)}"
+  count = "${length(var.store_hosts)}"
 
   name    = "host_${var.store_hosts[count.index]}"
   profile = "${matchbox_profile.generic_store.name}"
@@ -19,7 +19,7 @@ resource "matchbox_group" "generic_store" {
   metadata {
     hostname           = "${var.store_hosts[count.index]}"
     hyperkube_image    = "${var.hyperkube_image}"
-    ssh_authorized_key = "cert-authority ${chomp(tls_private_key.ssh_ca.public_key_openssh)}"
+    ssh_authorized_key = "cert-authority ${chomp(var.ssh_ca_public_key)}"
     default_user       = "${var.default_user}"
 
     lan_ip        = "${var.store_lan_ips[count.index]}"
