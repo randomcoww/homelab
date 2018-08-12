@@ -8,12 +8,26 @@ module "provisioner" {
     ## DHCP domain
     domain_name = "host.internal"
 
+    ## host configs
     provisioner_hosts = ["provisioner-0"]
     provisioner_lan_ips = ["192.168.62.217"]
     provisioner_store_ips = ["192.168.126.217"]
     provisioner_lan_if = "eth0"
     provisioner_store_if = "eth1"
     provisioner_wan_if = "eth2"
+
+    store_hosts = ["store-0"]
+    store_lan_ips = ["192.168.62.251"]
+    store_store_ips = ["192.168.126.251"]
+    store_lan_if = "ens1f1"
+    store_store_if = "ens1f0"
+
+    live_hosts = ["live-0"]
+    live_macs = ["00-1b-21-bc-67-c6"]
+    live_lan_ips = ["192.168.62.252"]
+    live_store_ips = ["192.168.126.252"]
+    live_lan_if = "ens1f1"
+    live_store_if = "ens1f0"
 
     ## images
     container_linux_version = "1828.3.0"
@@ -23,6 +37,7 @@ module "provisioner" {
     kea_image = "randomcoww/kea:1.4.0"
     tftpd_image = "randomcoww/tftpd_ipxe:20180626.02"
     matchbox_image = "quay.io/coreos/matchbox:latest"
+    fedora_live_version = "4.15.14-300.fc27.x86_64"
 
     ## ports
     matchbox_http_port = "58080"

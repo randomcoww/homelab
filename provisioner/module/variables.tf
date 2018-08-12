@@ -31,6 +31,53 @@ variable "provisioner_wan_if" {
   type = "string"
 }
 
+## store
+variable "store_hosts" {
+  type = "list"
+}
+
+variable "store_lan_ips" {
+  type = "list"
+}
+
+variable "store_store_ips" {
+  type = "list"
+}
+
+variable "store_lan_if" {
+  type = "string"
+}
+
+variable "store_store_if" {
+  type = "string"
+}
+
+## live
+
+variable "live_hosts" {
+  type = "list"
+}
+
+variable "live_macs" {
+  type = "list"
+}
+
+variable "live_lan_ips" {
+  type = "list"
+}
+
+variable "live_store_ips" {
+  type = "list"
+}
+
+variable "live_lan_if" {
+  type = "string"
+}
+
+variable "live_store_if" {
+  type = "string"
+}
+
 ## images
 variable "container_linux_version" {
   type = "string"
@@ -57,6 +104,10 @@ variable "tftpd_image" {
 }
 
 variable "matchbox_image" {
+    type = "string"
+}
+
+variable "fedora_live_version" {
     type = "string"
 }
 
