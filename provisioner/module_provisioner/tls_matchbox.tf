@@ -15,14 +15,15 @@ resource "tls_cert_request" "matchbox" {
   private_key_pem = "${element(tls_private_key.matchbox.*.private_key_pem, count.index)}"
 
   subject {
-    common_name  = "matchbox"
-    organization = "matchbox"
+    common_name = "matchbox"
   }
 
   ip_addresses = [
     "127.0.0.1",
-    "${var.provisioner_lan_ips[count.index]}",
+
+    # "${var.provisioner_lan_ips[count.index]}",
     "${var.provisioner_store_ips[count.index]}",
+
     "${var.matchbox_vip}",
   ]
 }
@@ -39,7 +40,7 @@ resource "tls_locally_signed_cert" "matchbox" {
 
   allowed_uses = [
     "key_encipherment",
+    "digital_signature",
     "server_auth",
-    "client_auth",
   ]
 }

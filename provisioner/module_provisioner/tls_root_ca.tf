@@ -14,14 +14,12 @@ resource "tls_self_signed_cert" "root" {
   is_ca_certificate     = true
 
   subject {
-    common_name  = "root"
-    organization = "root"
+    common_name = "root"
   }
 
   allowed_uses = [
     "cert_signing",
-    "key_encipherment",
-    "server_auth",
-    "client_auth",
+    "crl_signing",
+    "digital_signature",
   ]
 }

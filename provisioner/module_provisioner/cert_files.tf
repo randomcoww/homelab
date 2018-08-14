@@ -11,8 +11,7 @@ resource "tls_cert_request" "client" {
   private_key_pem = "${tls_private_key.client.private_key_pem}"
 
   subject {
-    common_name  = "client"
-    organization = "client"
+    common_name = "client"
   }
 }
 
@@ -28,8 +27,9 @@ resource "tls_locally_signed_cert" "client" {
 
   allowed_uses = [
     "key_encipherment",
-    "server_auth",
+    "digital_signature",
     "client_auth",
+    "content_commitment",
   ]
 }
 
