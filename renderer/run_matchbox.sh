@@ -1,3 +1,5 @@
+#!/usr/bin/env bash
+
 docker run -it --rm \
     -v `pwd`/output:/etc/matchbox:Z \
     -v `pwd`/output:/var/lib/matchbox:Z \

@@ -1,4 +1,4 @@
-resource "local_file" "matchbox_ca_pem" {
+resource "local_file" "ca_pem" {
   content  = "${chomp(tls_self_signed_cert.root.cert_pem)}"
   filename = "output/ca.crt"
 }
