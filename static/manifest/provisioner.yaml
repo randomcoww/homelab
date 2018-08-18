@@ -165,7 +165,7 @@ items:
                   "*"
                 ]
               },
-              "control-sockets": {
+              "control-socket": {
                 "socket-type": "unix",
                 "socket-name": "/var/lib/kea/kea-dhcp4-ctrl.sock"
               },
