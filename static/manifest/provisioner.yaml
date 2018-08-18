@@ -221,7 +221,7 @@ items:
                         "max-ack-delay": 5000,
                         "max-unacked-clients": 5,
                         "peers": [
-                          {"name": "provisioner-0", "url": "http://192.168.126.217:58082/", "role": "primary", "auto-failover": true},{"name": "provisioner-1", "url": "http://192.168.126.218:58082/", "role": "secondary", "auto-failover": true}
+                          {"name":"provisioner-0","role":"primary","url":"http://192.168.126.217:58082/"},{"name":"provisioner-1","role":"secondary","url":"http://192.168.126.218:58082/"}
                         ]
                       }
                     ]

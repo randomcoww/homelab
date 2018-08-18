@@ -7,8 +7,11 @@ resource "matchbox_profile" "manifest_provisioner" {
 }
 
 locals {
-  kea_ha_peers_template = <<EOF
-{"name": "%s", "url": "http://%s:${var.kea_peer_port}/", "role": "%s", "auto-failover": true}EOF
+  kea_ha_peers_template = {
+    name = "%s"
+    role = "%s"
+    url  = "http://%s:${var.kea_peer_port}/"
+  }
 }
 
 resource "matchbox_group" "manifest_provisioner" {
@@ -56,6 +59,11 @@ resource "matchbox_group" "manifest_provisioner" {
     matchbox_path       = "${var.matchbox_path}"
     matchbox_mount_path = "${var.matchbox_mount_path}"
 
-    kea_ha_peers = "${join(",", formatlist("${local.kea_ha_peers_template}", "${var.provisioner_hosts}", "${var.provisioner_store_ips}", "${var.kea_ha_roles}"))}"
+    kea_ha_peers = "${join(",", formatlist(
+      "${jsonencode(local.kea_ha_peers_template)}",
+      "${var.provisioner_hosts}",
+      "${var.kea_ha_roles}",
+      "${var.provisioner_store_ips}"
+    ))}"
   }
 }
