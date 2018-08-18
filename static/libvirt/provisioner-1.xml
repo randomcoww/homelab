@@ -1,5 +1,5 @@
 <domain type='kvm'>
-  <name>provisioner-0</name>
+  <name>provisioner-1</name>
   <memory unit='GiB'>4</memory>
   <currentMemory unit='GiB'>4</currentMemory>
   <vcpu placement='static'>3</vcpu>
@@ -7,7 +7,7 @@
     <type arch='x86_64' machine='pc'>hvm</type>
     <kernel>/data/pv/matchbox/assets/coreos/1800.2.0/coreos_production_pxe.vmlinuz</kernel>
     <initrd>/data/pv/matchbox/assets/coreos/1800.2.0/coreos_production_pxe_image.cpio.gz</initrd>
-    <cmdline>coreos.first_boot=1 coreos.autologin coreos.config.url=https://raw.githubusercontent.com/randomcoww/terraform/master/static/ignition/provisioner-0.ign console=hvc0 elevator=noop</cmdline>
+    <cmdline>coreos.first_boot=1 coreos.autologin coreos.config.url=https://raw.githubusercontent.com/randomcoww/terraform/master/static/ignition/provisioner-1.ign console=hvc0 elevator=noop</cmdline>
     <boot dev='hd'/>
   </os>
   <features>
@@ -30,11 +30,11 @@
     </interface>
     <interface type='direct' trustGuestRxFilters='yes'>
       <source dev='ens1f0' mode='bridge'/>
-      <mac address='52:54:00:1a:61:2a'/>
+      <mac address='52:54:00:1a:61:2b'/>
       <model type='virtio-net'/>
     </interface>
     <interface type='direct' trustGuestRxFilters='yes'>
-      <mac address='52:54:00:63:6e:b2'/>
+      <mac address='52:54:00:63:6e:b1'/>
       <source dev='eno2' mode='bridge'/>
       <model type='virtio-net'/>
     </interface>
