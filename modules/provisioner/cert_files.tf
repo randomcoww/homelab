@@ -16,8 +16,6 @@ resource "tls_cert_request" "client" {
 }
 
 resource "tls_locally_signed_cert" "client" {
-  count = "${length(var.provisioner_hosts)}"
-
   cert_request_pem   = "${tls_cert_request.client.cert_request_pem}"
   ca_key_algorithm   = "${tls_private_key.root.algorithm}"
   ca_private_key_pem = "${tls_private_key.root.private_key_pem}"

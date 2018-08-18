@@ -1,6 +1,6 @@
 # Matchbox configs for PXE environment with matchbox renderer
 module "store" {
-  source = "./module_store"
+  source = "../modules/store"
 
   ## user (default container linux)
   default_user      = "core"

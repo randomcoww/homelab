@@ -20,8 +20,7 @@ resource "tls_self_signed_cert" "root" {
 
   allowed_uses = [
     "cert_signing",
-    "key_encipherment",
-    "server_auth",
-    "client_auth",
+    "crl_signing",
+    "digital_signature",
   ]
 }

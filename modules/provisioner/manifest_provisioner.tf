@@ -6,6 +6,11 @@ resource "matchbox_profile" "manifest_provisioner" {
   generic_config = "${file("${path.module}/templates/manifest/provisioner.yaml.tmpl")}"
 }
 
+locals {
+  kea_ha_peers_template = <<EOF
+{"name": "%s", "url": "http://%s:${var.kea_peer_port}/", "role": "%s", "auto-failover": true}EOF
+}
+
 resource "matchbox_group" "manifest_provisioner" {
   name    = "${matchbox_profile.manifest_provisioner.name}"
   profile = "${matchbox_profile.manifest_provisioner.name}"
@@ -25,6 +30,7 @@ resource "matchbox_group" "manifest_provisioner" {
 
     matchbox_http_port = "${var.matchbox_http_port}"
     matchbox_rpc_port  = "${var.matchbox_rpc_port}"
+    kea_peer_port      = "${var.kea_peer_port}"
 
     controller_vip    = "${var.controller_vip}"
     nfs_vip           = "${var.nfs_vip}"
@@ -49,5 +55,7 @@ resource "matchbox_group" "manifest_provisioner" {
     kea_mount_path      = "${var.kea_mount_path}"
     matchbox_path       = "${var.matchbox_path}"
     matchbox_mount_path = "${var.matchbox_mount_path}"
+
+    kea_ha_peers = "${join(",", formatlist("${local.kea_ha_peers_template}", "${var.provisioner_hosts}", "${var.provisioner_store_ips}", "${var.kea_ha_roles}"))}"
   }
 }

@@ -1,6 +1,6 @@
 # # Matchbox configs for PXE environment with matchbox renderer
 # module "live" {
-#   source = "./module_live"
+#   source = "../modules/live"
 #   ## user (default container linux)
 #   default_user      = "core"
 #   ssh_ca_public_key = "${tls_private_key.ssh_ca.public_key_openssh}"

@@ -116,16 +116,43 @@ items:
 - apiVersion: v1
   kind: Pod
   metadata:
-    name: kea-mysql
+    name: kea
   spec:
     restartPolicy: Always
     hostNetwork: true
     containers:
+    - name: kea-control-agent
+      image: {{.kea_image}}
+      args:
+      - kea-ctrl-agent
+      env:
+      - name: KEA_LOCAL_CONFIG
+        value: |-
+          {
+            "Control-agent": {
+              "http-host": "0.0.0.0",
+              "http-port": {{.kea_peer_port}},
+              "control-sockets": {
+                "dhcp4": {
+                  "socket-type": "unix",
+                  "socket-name": "{{.kea_path}}/kea-dhcp4-ctrl.sock"
+                }
+              }
+            }
+          }
+      volumeMounts:
+      - name: kea-path
+        mountPath: "{{.kea_path}}"
+        readOnly: false
     - name: kea-dhcp4
       image: {{.kea_image}}
       args:
       - kea-dhcp4
       env:
+      - name: NODE_NAME
+        valueFrom:
+          fieldRef:
+            fieldPath: spec.nodeName
       - name: KEA_LOCAL_CONFIG
         value: |-
           {
@@ -137,6 +164,10 @@ items:
                 "interfaces": [
                   "*"
                 ]
+              },
+              "control-socket": {
+                "socket-type": "unix",
+                "socket-name": "{{.kea_path}}/kea-dhcp4-ctrl.sock"
               },
               "lease-database": {
                 "type": "memfile",
@@ -171,6 +202,30 @@ items:
                   "test": "not(substring(option[77].hex,0,4) == 'iPXE') and (option[93].hex == 0x0007)",
                   "next-server": "{{.matchbox_vip}}",
                   "boot-file-name": "/ipxe.efi"
+                }
+              ],
+              "hooks-libraries": [
+                {
+                  "library": "/usr/local/lib/hooks/libdhcp_lease_cmds.so",
+                  "parameters": {}
+                },
+                {
+                  "library": "/usr/local/lib/hooks/libdhcp_ha.so",
+                  "parameters": {
+                    "high-availability": [
+                      {
+                        "this-server-name": "$(NODE_NAME)",
+                        "mode": "load-balancing",
+                        "heartbeat-delay": 10000,
+                        "max-response-delay": 10000,
+                        "max-ack-delay": 5000,
+                        "max-unacked-clients": 5,
+                        "peers": [
+                          {{.kea_ha_peers}}
+                        ]
+                      }
+                    ]
+                  }
                 }
               ],
               "subnet4": [
@@ -213,14 +268,12 @@ items:
             }
           }
       volumeMounts:
-      - name: lease-path
+      - name: kea-path
         mountPath: "{{.kea_path}}"
         readOnly: false
     volumes:
-    - name: lease-path
-      nfs:
-        server: {{.nfs_vip}}
-        path: "{{.kea_mount_path}}"
+    - name: kea-path
+      emptyDir: {}
 - apiVersion: v1
   kind: Pod
   metadata:

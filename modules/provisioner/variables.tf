@@ -20,6 +20,10 @@ variable "provisioner_hosts" {
   type = "list"
 }
 
+variable "provisioner_macs" {
+  type = "list"
+}
+
 variable "provisioner_lan_ips" {
   type = "list"
 }
@@ -40,7 +44,15 @@ variable "provisioner_wan_if" {
   type = "string"
 }
 
+variable "kea_ha_roles" {
+  type = "list"
+}
+
 ## images
+variable "container_linux_version" {
+  type = "string"
+}
+
 variable "hyperkube_image" {
   type = "string"
 }
@@ -72,6 +84,11 @@ variable "matchbox_http_port" {
 
 variable "matchbox_rpc_port" {
   type = "string"
+}
+
+variable "kea_peer_port" {
+  type    = "string"
+  default = "58082"
 }
 
 ## vip

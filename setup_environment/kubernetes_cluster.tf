@@ -1,6 +1,6 @@
 # Matchbox configs for Kubernetes cluster
 module "kubernetes_cluster" {
-  source = "./module_kubernetes_cluster"
+  source = "../modules/kubernetes_cluster"
 
   ## user (default container linux)
   default_user      = "core"

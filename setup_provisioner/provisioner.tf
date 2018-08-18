@@ -1,6 +1,6 @@
 # Matchbox configs for PXE environment with matchbox renderer
 module "provisioner" {
-  source = "./module_provisioner"
+  source = "../modules/provisioner"
 
   output_path = "matchbox"
 
@@ -12,12 +12,15 @@ module "provisioner" {
   domain_name = "host.internal"
 
   ## host configs
-  provisioner_hosts     = ["provisioner-0"]
-  provisioner_lan_ips   = ["192.168.62.217"]
-  provisioner_store_ips = ["192.168.126.217"]
-  provisioner_lan_if    = "eth0"
-  provisioner_store_if  = "eth1"
-  provisioner_wan_if    = "eth2"
+  container_linux_version = "1828.3.0"
+  provisioner_hosts       = ["provisioner-0", "provisioner-1"]
+  provisioner_macs        = ["52-54-00-1a-61-2a", "52-54-00-1a-61-2b"]
+  provisioner_lan_ips     = ["192.168.62.217", "192.168.62.218"]
+  provisioner_store_ips   = ["192.168.126.217", "192.168.126.218"]
+  kea_ha_roles            = ["primary", "secondary"]
+  provisioner_lan_if      = "eth0"
+  provisioner_store_if    = "eth1"
+  provisioner_wan_if      = "eth2"
 
   ## images
   hyperkube_image  = "gcr.io/google_containers/hyperkube:${local.kubernetes_version}"

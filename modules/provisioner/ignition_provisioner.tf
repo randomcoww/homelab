@@ -2,8 +2,20 @@
 ## provisioner ignition renderer
 ##
 resource "matchbox_profile" "ignition_provisioner" {
-  name                   = "ignition_provisioner"
+  name                   = "host_provisioner"
   container_linux_config = "${file("${path.module}/templates/ignition/provisioner.ign.tmpl")}"
+  kernel                 = "/assets/coreos/${var.container_linux_version}/coreos_production_pxe.vmlinuz"
+
+  initrd = [
+    "/assets/coreos/${var.container_linux_version}/coreos_production_pxe_image.cpio.gz",
+  ]
+
+  args = [
+    "coreos.config.url=http://${var.matchbox_vip}:${var.matchbox_http_port}/ignition?mac=$${mac:hexhyp}",
+    "coreos.first_boot=yes",
+    "console=hvc0",
+    "coreos.autologin",
+  ]
 }
 
 resource "matchbox_group" "ignition_provisioner" {
@@ -13,7 +25,7 @@ resource "matchbox_group" "ignition_provisioner" {
   profile = "${matchbox_profile.ignition_provisioner.name}"
 
   selector {
-    host = "${var.provisioner_hosts[count.index]}"
+    mac = "${var.provisioner_macs[count.index]}"
   }
 
   metadata {
