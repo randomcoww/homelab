@@ -116,16 +116,43 @@ items:
 - apiVersion: v1
   kind: Pod
   metadata:
-    name: kea-mysql
+    name: kea
   spec:
     restartPolicy: Always
     hostNetwork: true
     containers:
+    - name: kea-control-agent
+      image: randomcoww/kea:1.4.0
+      args:
+      - kea-ctrl-agent
+      env:
+      - name: KEA_LOCAL_CONFIG
+        value: |-
+          {
+            "Control-agent": {
+              "http-host": "0.0.0.0",
+              "http-port": 58082,
+              "control-sockets": {
+                "dhcp4": {
+                  "socket-type": "unix",
+                  "socket-name": "/var/lib/kea/kea-dhcp4-ctrl.sock"
+                }
+              }
+            }
+          }
+      volumeMounts:
+      - name: kea-path
+        mountPath: "/var/lib/kea"
+        readOnly: false
     - name: kea-dhcp4
       image: randomcoww/kea:1.4.0
       args:
       - kea-dhcp4
       env:
+      - name: NODE_NAME
+        valueFrom:
+          fieldRef:
+            fieldPath: spec.nodeName
       - name: KEA_LOCAL_CONFIG
         value: |-
           {
@@ -137,6 +164,10 @@ items:
                 "interfaces": [
                   "*"
                 ]
+              },
+              "control-sockets": {
+                "socket-type": "unix",
+                "socket-name": "/var/lib/kea/kea-dhcp4-ctrl.sock"
               },
               "lease-database": {
                 "type": "memfile",
@@ -173,6 +204,22 @@ items:
                   "boot-file-name": "/ipxe.efi"
                 }
               ],
+              {
+                "high-availability": [
+                  {
+                    "this-server-name": "$(NODE_NAME)",
+                    "mode": "load-balancing",
+                    "send-lease-updates": false,
+                    "heartbeat-interval": 10,
+                    "max-response-delay": 60,
+                    "max-ack-delay": 10,
+                    "max-unacked-messages": 10,
+                    "peers": [
+                      {"name": "provisioner-0", "url": "http://192.168.126.217:58082/", "auto-failover": true},{"name": "provisioner-1", "url": "http://192.168.126.218:58082/", "auto-failover": true}
+                    ]
+                  }
+                ]
+              },
               "subnet4": [
                 {
                   "subnet": "192.168.62.0/23",
@@ -213,14 +260,12 @@ items:
             }
           }
       volumeMounts:
-      - name: lease-path
+      - name: kea-path
         mountPath: "/var/lib/kea"
         readOnly: false
     volumes:
-    - name: lease-path
-      nfs:
-        server: 192.168.126.251
-        path: "/data/pv/kea"
+    - name: kea-path
+      emptyDir: {}
 - apiVersion: v1
   kind: Pod
   metadata:
