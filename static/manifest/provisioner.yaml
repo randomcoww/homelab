@@ -210,7 +210,7 @@ items:
                   "parameters": {}
                 },
                 {
-                "library": "/usr/local/lib/hooks/libdhcp_ha.so",
+                  "library": "/usr/local/lib/hooks/libdhcp_ha.so",
                   "parameters": {
                     "high-availability": [
                       {
