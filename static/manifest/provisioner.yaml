@@ -204,22 +204,31 @@ items:
                   "boot-file-name": "/ipxe.efi"
                 }
               ],
-              {
-                "high-availability": [
-                  {
-                    "this-server-name": "$(NODE_NAME)",
-                    "mode": "load-balancing",
-                    "send-lease-updates": false,
-                    "heartbeat-interval": 10,
-                    "max-response-delay": 60,
-                    "max-ack-delay": 10,
-                    "max-unacked-messages": 10,
-                    "peers": [
-                      {"name": "provisioner-0", "url": "http://192.168.126.217:58082/", "auto-failover": true},{"name": "provisioner-1", "url": "http://192.168.126.218:58082/", "auto-failover": true}
+              "hooks-libraries": [
+                {
+                  "library": "/usr/local/lib/hooks/libdhcp_lease_cmds.so",
+                  "parameters": {}
+                },
+                {
+                "library": "/usr/local/lib/hooks/libdhcp_ha.so",
+                  "parameters": {
+                    "high-availability": [
+                      {
+                        "this-server-name": "$(NODE_NAME)",
+                        "mode": "load-balancing",
+                        "send-lease-updates": false,
+                        "heartbeat-interval": 10,
+                        "max-response-delay": 60,
+                        "max-ack-delay": 10,
+                        "max-unacked-messages": 10,
+                        "peers": [
+                          {"name": "provisioner-0", "url": "http://192.168.126.217:58082/", "auto-failover": true},{"name": "provisioner-1", "url": "http://192.168.126.218:58082/", "auto-failover": true}
+                        ]
+                      }
                     ]
                   }
-                ]
-              },
+                }
+              ],
               "subnet4": [
                 {
                   "subnet": "192.168.62.0/23",
