@@ -3,13 +3,15 @@
     {
       "boot_command" : [
         "<tab> ",
+        "text ",
         "inst.ks=http://{{.HTTPIP}}:8080/generic?host={{user `kickstart`}} ",
         "<enter>"
       ],
       "disk_size" : 30000,
       "headless" : false,
       "http_directory" : "packer",
-      "iso_checksum_type": "none",
+      "iso_checksum_type": "sha256",
+      "iso_checksum": "ea1efdc692356b3346326f82e2f468903e8da59324fdee8b10eac4fea83f23fe",
       "iso_url": "https://download.fedoraproject.org/pub/fedora/linux/releases/28/Server/x86_64/iso/Fedora-Server-netinst-x86_64-28-1.1.iso",
       "shutdown_command" : "",
       "disk_interface": "virtio",

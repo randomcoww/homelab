@@ -1,5 +1,4 @@
 install
-text
 shutdown
 skipx
 url --mirrorlist=http://mirrors.fedoraproject.org/mirrorlist?repo=fedora-$releasever&arch=$basearch
@@ -225,6 +224,23 @@ UseDNS no
 PermitRootLogin no
 PasswordAuthentication no
 ChallengeResponseAuthentication no
+EOF
+
+
+##
+## live image settings
+## systemd configs from https://linux.xvx.cz/2017/07/how-to-build-pxe-fedora-26-live-image.html
+##
+
+cat <<EOF >> /etc/systemd/system.conf
+DumpCore=no
+EOF
+
+cat <<EOF >> /etc/systemd/journald.conf
+Storage=volatile
+RuntimeMaxUse=15M
+ForwardToSyslog=no
+ForwardToConsole=no
 EOF
 
 
