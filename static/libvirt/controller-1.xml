@@ -1,8 +1,8 @@
 <domain type='kvm'>
   <name>controller-1</name>
-  <memory unit='GiB'>6</memory>
-  <currentMemory unit='GiB'>6</currentMemory>
-  <vcpu placement='static'>3</vcpu>
+  <memory unit='GiB'>5</memory>
+  <currentMemory unit='GiB'>5</currentMemory>
+  <vcpu placement='static'>2</vcpu>
   <os>
     <type arch='x86_64' machine='pc'>hvm</type>
     <boot dev='hd'/>
@@ -13,7 +13,7 @@
     <pae/>
   </features>
   <cpu mode='host-passthrough'>
-    <topology sockets='1' cores='3' threads='1'/>
+    <topology sockets='1' cores='2' threads='1'/>
   </cpu>
   <clock offset='utc'/>
   <on_poweroff>destroy</on_poweroff>

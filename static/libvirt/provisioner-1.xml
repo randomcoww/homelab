@@ -2,7 +2,7 @@
   <name>provisioner-1</name>
   <memory unit='GiB'>4</memory>
   <currentMemory unit='GiB'>4</currentMemory>
-  <vcpu placement='static'>3</vcpu>
+  <vcpu placement='static'>2</vcpu>
   <os>
     <type arch='x86_64' machine='pc'>hvm</type>
     <kernel>/data/pv/matchbox/assets/coreos/1800.2.0/coreos_production_pxe.vmlinuz</kernel>
@@ -16,7 +16,7 @@
     <pae/>
   </features>
   <cpu mode='host-passthrough'>
-    <topology sockets='1' cores='3' threads='1'/>
+    <topology sockets='1' cores='2' threads='1'/>
   </cpu>
   <clock offset='utc'/>
   <on_poweroff>destroy</on_poweroff>
@@ -30,7 +30,6 @@
     </interface>
     <interface type='direct' trustGuestRxFilters='yes'>
       <source dev='ens1f0' mode='bridge'/>
-      <mac address='52:54:00:1a:61:2b'/>
       <model type='virtio-net'/>
     </interface>
     <interface type='direct' trustGuestRxFilters='yes'>
