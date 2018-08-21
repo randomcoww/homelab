@@ -19,10 +19,13 @@ networkd:
 
         [Network]
         LinkLocalAddressing=no
-        DHCP=no
+        DHCP=yes
 
         [Address]
         Address={{.store_ip}}/{{.store_netmask}}
+
+        [DHCP]
+        RouteMetric=2048
     - name: {{.wan_if}}.network
       contents: |
         [Match]
@@ -31,15 +34,15 @@ networkd:
         [Network]
         LinkLocalAddressing=no
         DHCP=yes
-        DNS={{.backup_dns_ip}}
 
         [DHCP]
-        UseDNS=false
+        UseDNS=true
         UseNTP=false
         SendHostname=false
         UseHostname=false
         UseDomains=false
         UseTimezone=no
+        RouteMetric=1024
 systemd:
   units:
     - name: docker.service
