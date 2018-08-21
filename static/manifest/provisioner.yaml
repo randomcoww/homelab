@@ -305,13 +305,14 @@ items:
             track_interface {
               eth1
               eth0
-              eth2
             }
             priority 100
             virtual_ipaddress {
               192.168.126.240 dev eth1
               192.168.62.240 dev eth0
             }
+            notify_master "ip link set dev eth2 down && ip link set dev eth2 address 52:54:00:63:6e:b1 && ip link set dev eth2 up"
+            notify_backup "ip link set dev eth2 down"
           }
           vrrp_script CHK_matchbox {
             script "nc -z -w5 localhost 58080"
