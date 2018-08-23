@@ -66,10 +66,15 @@ items:
       securityContext:
         privileged: true
       volumeMounts:
+      - name: modules
+        mountPath: "/lib/modules"
       - name: kubernetes-path
         mountPath: "{{.kubernetes_path}}"
         readOnly: true
     volumes:
+    - name: modules
+      hostPath:
+        path: "/lib/modules"
     - name: kubernetes-path
       hostPath:
         path: "{{.kubernetes_path}}"
