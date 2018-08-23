@@ -19,7 +19,9 @@ items:
       - "--kube-subnet-mgr"
       - "--kubeconfig-file={{.kubernetes_path}}/kubelet.kubeconfig"
       securityContext:
-        privileged: true
+        capabilities:
+          add:
+          - NET_ADMIN
       env:
       - name: POD_NAME
         valueFrom:
