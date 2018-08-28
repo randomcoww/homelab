@@ -11,19 +11,11 @@ variable "store_hosts" {
   type = "list"
 }
 
-variable "store_lan_ips" {
+variable "store_ips" {
   type = "list"
 }
 
-variable "store_store_ips" {
-  type = "list"
-}
-
-variable "store_lan_if" {
-  type = "string"
-}
-
-variable "store_store_if" {
+variable "store_if" {
   type = "string"
 }
 
@@ -33,11 +25,7 @@ variable "hyperkube_image" {
 }
 
 ## ip ranges
-variable "lan_netmask" {
-  type = "string"
-}
-
-variable "store_netmask" {
+variable "netmask" {
   type = "string"
 }
 

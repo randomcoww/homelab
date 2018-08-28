@@ -127,10 +127,10 @@ LinkLocalAddressing=no
 DHCP=no
 EOF
 
-## store
-cat <<EOF > /etc/systemd/network/00_{{.store_if}}.network
+## host macvlan
+cat <<EOF > /etc/systemd/network/00_{{.host_if}}.network
 [Match]
-Name={{.store_if}}
+Name={{.host_if}}
 
 [Link]
 ARP=no
@@ -138,63 +138,28 @@ ARP=no
 [Network]
 LinkLocalAddressing=no
 DHCP=no
-MACVLAN=macvlan_{{.store_if}}
+MACVLAN=macvlan_{{.host_if}}
 EOF
 
-cat <<EOF > /etc/systemd/network/00_macvlan_{{.store_if}}.netdev
+cat <<EOF > /etc/systemd/network/00_macvlan_{{.host_if}}.netdev
 [NetDev]
-Name=macvlan_{{.store_if}}
+Name=macvlan_{{.host_if}}
 Kind=macvlan
 
 [MACVLAN]
 Mode=bridge
 EOF
 
-cat <<EOF > /etc/systemd/network/00_macvlan_{{.store_if}}.network
+cat <<EOF > /etc/systemd/network/00_macvlan_{{.host_if}}.network
 [Match]
-Name=macvlan_{{.store_if}}
+Name=macvlan_{{.host_if}}
 
 [Network]
 LinkLocalAddressing=no
 DHCP=yes
 
 [Address]
-Address={{.store_ip}}/{{.store_netmask}}
-EOF
-
-## lan
-cat <<EOF > /etc/systemd/network/00_{{.lan_if}}.network
-[Match]
-Name={{.lan_if}}
-
-[Link]
-ARP=no
-
-[Network]
-LinkLocalAddressing=no
-DHCP=no
-MACVLAN=macvlan_{{.lan_if}}
-EOF
-
-cat <<EOF > /etc/systemd/network/00_macvlan_{{.lan_if}}.netdev
-[NetDev]
-Name=macvlan_{{.lan_if}}
-Kind=macvlan
-
-[MACVLAN]
-Mode=bridge
-EOF
-
-cat <<EOF > /etc/systemd/network/00_macvlan_{{.lan_if}}.network
-[Match]
-Name=macvlan_{{.lan_if}}
-
-[Network]
-LinkLocalAddressing=no
-DHCP=no
-
-[Address]
-Address={{.lan_ip}}/{{.lan_netmask}}
+Address={{.host_ip}}/{{.host_netmask}}
 EOF
 
 
