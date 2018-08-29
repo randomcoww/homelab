@@ -3,7 +3,7 @@
     {
       "boot_command" : [
         "<tab> ",
-        "text ",
+        "inst.text ",
         "inst.ks=http://{{.HTTPIP}}:8080/generic?host={{.Name}} ",
         "<enter>"
       ],

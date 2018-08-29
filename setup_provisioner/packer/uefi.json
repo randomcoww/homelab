@@ -31,15 +31,14 @@
       "accelerator": "kvm",
       "vm_name": "{{user `vm_name`}}",
       "format": "{{user `format`}}",
-      "output_directory": "{{user `output_directory`}}"
+      "output_directory": "output-qemu"
     }
   ],
   "variables": {
     "ovmf_code": "/usr/share/OVMF/OVMF_CODE.fd",
     "ovmf_vars": "ovmf/OVMF_VARS.fd",
-    "format": "qcow2",
-    "output_directory": "output-qemu",
     "disk_interface": "virtio",
+    "format": "qcow2",
     "vm_name": "store-0"
   }
 }
