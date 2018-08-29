@@ -4,7 +4,7 @@
       "boot_command" : [
         "<tab> ",
         "text ",
-        "inst.ks=http://{{.HTTPIP}}:8080/generic?host={{user `vm_name`}} ",
+        "inst.ks=http://{{.HTTPIP}}:8080/generic?host={{.Name}} ",
         "<enter>"
       ],
       "disk_size" : 30000,
@@ -21,7 +21,7 @@
       "shutdown_timeout": "30m",
       "qemuargs": [
         [ "-m", "4096M" ],
-        [ "-smp", "2" ]
+        [ "-smp", "4" ]
       ],
       "accelerator": "kvm",
       "vm_name": "{{user `vm_name`}}",
