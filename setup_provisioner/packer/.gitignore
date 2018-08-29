@@ -1,3 +1,4 @@
 output-qemu
 packer_cache
 build.*
+ovmf

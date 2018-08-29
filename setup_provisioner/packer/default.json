@@ -4,7 +4,7 @@
       "boot_command" : [
         "<tab> ",
         "text ",
-        "inst.ks=http://{{.HTTPIP}}:8080/generic?host={{user `kickstart`}} ",
+        "inst.ks=http://{{.HTTPIP}}:8080/generic?host={{user `vm_name`}} ",
         "<enter>"
       ],
       "disk_size" : 30000,
@@ -24,12 +24,12 @@
         [ "-smp", "2" ]
       ],
       "accelerator": "kvm",
-      "vm_name": "{{user `kickstart`}}",
+      "vm_name": "{{user `vm_name`}}",
       "format": "qcow2",
       "output_directory": "output-qemu"
     }
   ],
   "variables": {
-    "kickstart": "store-0"
+    "vm_name": "store-0"
   }
 }

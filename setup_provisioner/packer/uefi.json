@@ -1,0 +1,45 @@
+{
+  "builders": [
+    {
+      "boot_command" : [
+        "<up>e",
+        "<down><down><end> ",
+        "nomodeset ",
+        "inst.text ",
+        "inst.ks=http://{{.HTTPIP}}:8080/generic?host={{user `vm_name`}} ",
+        "<leftCtrlOn>x<leftCtrlOff>"
+      ],
+      "disk_size" : 30000,
+      "headless" : false,
+      "http_directory" : "packer",
+      "iso_checksum_type": "sha256",
+      "iso_checksum": "ea1efdc692356b3346326f82e2f468903e8da59324fdee8b10eac4fea83f23fe",
+      "iso_url": "https://download.fedoraproject.org/pub/fedora/linux/releases/28/Server/x86_64/iso/Fedora-Server-netinst-x86_64-28-1.1.iso",
+      "shutdown_command" : "",
+      "disk_interface": "{{user `disk_interface`}}",
+      "net_device": "virtio-net",
+      "communicator": "none",
+      "type": "qemu",
+      "shutdown_timeout": "30m",
+      "qemuargs": [
+        [ "-m", "4096M" ],
+        [ "-smp", "2" ],
+        [ "-drive", "if=pflash,format=raw,readonly=on,file={{user `ovmf_code`}},unit=0" ],
+        [ "-drive", "if=pflash,format=raw,file={{user `ovmf_vars`}},unit=1" ],
+        [ "-drive", "file={{user `output_directory`}}/{{user `vm_name`}},if={{user `disk_interface`}},cache=writeback,discard=ignore,format={{user `format`}}" ]
+      ],
+      "accelerator": "kvm",
+      "vm_name": "{{user `vm_name`}}",
+      "format": "{{user `format`}}",
+      "output_directory": "{{user `output_directory`}}"
+    }
+  ],
+  "variables": {
+    "ovmf_code": "/usr/share/OVMF/OVMF_CODE.fd",
+    "ovmf_vars": "ovmf/OVMF_VARS.fd",
+    "format": "qcow2",
+    "output_directory": "output-qemu",
+    "disk_interface": "virtio",
+    "vm_name": "store-0"
+  }
+}
