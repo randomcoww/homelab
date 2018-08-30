@@ -21,29 +21,24 @@ bootloader --timeout=1 --append="console=tty0 console=ttyS1,115200n8 elevator=no
 ## packages
 %packages --excludeWeakdeps --excludedocs
 @core
-systemd-udev
-which
-ipmitool
 libvirt-daemon-kvm
-libvirt-client
 qemu-kvm
-openssh
-gnupg
 ksm
-nfs-utils
-pciutils
-screen
+ipmitool
 dnf-automatic
-lm_sensors
-rsyslog
-ca-certificates
-vim-enhanced
-rsync
-hdparm
-
-## zol
+openssh-server
+cronie
+logrotate
 kernel-devel
 zfs
+nfs-utils
+
+screen
+pciutils
+lm_sensors
+rsync
+hdparm
+libvirt-client
 
 -zfs-fuse
 -NetworkManager
@@ -51,6 +46,7 @@ zfs
 -dhclient
 -sendmail
 -ppc64-utils
+-rsyslog
 %end
 
 ## user
@@ -228,7 +224,7 @@ grub2-mkconfig -o /boot/grub2/grub.cfg
 ##
 
 systemctl enable \
-  systemd-networkd systemd-resolved chronyd \
+  systemd-networkd systemd-resolved chronyd crond sshd \
   ksm ksmtuned \
   zfs-import-cache zfs-import-scan zfs-mount zfs-share zfs-zed zfs.target nfs-server \
   fancontrol.timer \
