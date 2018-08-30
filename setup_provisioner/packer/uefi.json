@@ -2,7 +2,7 @@
   "builders": [
     {
       "boot_command" : [
-        "<up>e",
+        "e",
         "<down><down><end> ",
         "nomodeset ",
         "inst.text ",
