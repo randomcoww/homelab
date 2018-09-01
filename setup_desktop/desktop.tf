@@ -1,18 +1,15 @@
 # Matchbox configs for PXE environment with matchbox renderer
-module "store" {
-  source = "../modules/store"
+module "desktop" {
+  source = "../modules/desktop"
 
   ## user (default container linux)
-  default_user      = "core"
-  ssh_ca_public_key = "${tls_private_key.ssh_ca.public_key_openssh}"
+  default_user = "core"
+  password     = "password"
 
   ## host configs
-  store_hosts = ["store-0"]
-  store_ips   = ["192.168.126.251"]
-  store_if    = "ens1f0"
-
-  ## images
-  hyperkube_image = "gcr.io/google_containers/hyperkube:${local.kubernetes_version}"
+  desktop_hosts = ["desktop-0"]
+  desktop_ips   = ["192.168.127.251"]
+  desktop_if    = "enp37s0"
 
   ## ip ranges
   netmask = "23"
