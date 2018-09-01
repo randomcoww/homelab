@@ -226,7 +226,7 @@ grub2-mkconfig -o /boot/grub2/grub.cfg
 systemctl enable \
   systemd-networkd systemd-resolved chronyd crond sshd \
   ksm ksmtuned \
-  zfs-import-scan zfs-mount zfs-share zfs-zed zfs.target nfs-server \
+  zfs-import-cache zfs-import-scan zfs-mount zfs-share zfs-zed zfs.target nfs-server \
   fancontrol.timer \
   dnf-automatic.timer
 
