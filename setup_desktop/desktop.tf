@@ -9,7 +9,7 @@ module "desktop" {
   ## host configs
   desktop_hosts = ["desktop-0"]
   desktop_ips   = ["192.168.127.251"]
-  desktop_if    = "enp37s0"
+  desktop_if    = "eno1"
 
   ## ip ranges
   netmask = "23"

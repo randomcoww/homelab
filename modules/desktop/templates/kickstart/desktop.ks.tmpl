@@ -1,17 +1,11 @@
 install
 reboot
-skipx
 url --mirrorlist=http://mirrors.fedoraproject.org/mirrorlist?repo=fedora-$releasever&arch=$basearch
 repo --name=fedora-updates --mirrorlist=http://mirrors.fedoraproject.org/mirrorlist?repo=updates-released-f$releasever&arch=$basearch
-
 repo --name=rpmfusion-free --metalink=https://mirrors.rpmfusion.org/metalink?repo=free-fedora-$releasever&arch=$basearch
 repo --name=rpmfusion-free-updates --metalink=https://mirrors.rpmfusion.org/metalink?repo=free-fedora-updates-released-$releasever&arch=$basearch
 repo --name=rpmfusion-nonfree --metalink=https://mirrors.rpmfusion.org/metalink?repo=nonfree-fedora-$releasever&arch=$basearch
 repo --name=rpmfusion-nonfree-updates --metalink=https://mirrors.rpmfusion.org/metalink?repo=nonfree-fedora-updates-released-$releasever&arch=$basearch
-
-repo --name=code --baseurl=https://packages.microsoft.com/yumrepos/vscode
-repo --name=docker-ce-stable --baseurl=https://download.docker.com/linux/fedora/$releasever/$basearch/stable
-repo --name=kubernetes --baseurl=https://packages.cloud.google.com/yum/repos/kubernetes-el7-x86_64
 
 lang en_US.UTF-8
 keyboard us
@@ -36,27 +30,29 @@ ipmitool
 dnf-automatic
 cronie
 logrotate
+nfs-utils
 
-gnome-desktop
 screen
 pciutils
 lm_sensors
 rsync
 libvirt-client
 vim-enhanced
-code
-kubelet
-docker-ce
+
+@gnome-desktop
+@fonts
+@printing
+@hardware-support
+@base-x
+firefox
+tilix
 git
-steam
-mpv
+wget
 
 -NetworkManager
 -plymouth
--dhclient
--sendmail
+-dhcp-client
 -ppc64-utils
--rsyslog
 %end
 
 ## user
@@ -134,6 +130,7 @@ systemctl enable \
   ksm ksmtuned \
   dnf-automatic.timer
 
+systemctl set-default graphical.target
 
 ##
 ## cleanup

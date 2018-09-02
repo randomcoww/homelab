@@ -15,7 +15,7 @@ network --hostname={{.hostname}}
 ## disk
 zerombr
 clearpart --all --initlabel --disklabel=gpt
-autopart --type=plain
+autopart --type=plain --noswap --nohome
 bootloader --timeout=1 --append="console=tty0 console=ttyS1,115200n8 elevator=noop intel_iommu=on iommu=pt cgroup_enable=memory"
 
 ## packages
@@ -43,10 +43,8 @@ libvirt-client
 -zfs-fuse
 -NetworkManager
 -plymouth
--dhclient
--sendmail
+-dhcp-client
 -ppc64-utils
--rsyslog
 %end
 
 ## user
@@ -216,7 +214,7 @@ GRUB_SERIAL_COMMAND="serial --unit=1 --speed=115200 --word=8 --parity=no --stop=
 EOF
 
 ## regenerate grub config
-grub2-mkconfig -o /boot/grub2/grub.cfg
+# grub2-mkconfig -o /boot/grub2/grub.cfg
 
 
 ##
