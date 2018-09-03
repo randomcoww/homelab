@@ -1,6 +1,7 @@
 #!/usr/bin/env bash
 
 docker run -it --rm \
+    --user $(id -u):$(id -g) \
     -v `pwd`/output:/etc/matchbox:Z \
     -v `pwd`/output:/var/lib/matchbox:Z \
     -p 8080:8080 \

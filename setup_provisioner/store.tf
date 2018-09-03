@@ -4,6 +4,7 @@ module "store" {
 
   ## user (default container linux)
   default_user      = "core"
+  password          = "password"
   ssh_ca_public_key = "${tls_private_key.ssh_ca.public_key_openssh}"
 
   ## host configs

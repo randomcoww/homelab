@@ -6,10 +6,13 @@ repo --name=rpmfusion-free --metalink=https://mirrors.rpmfusion.org/metalink?rep
 repo --name=rpmfusion-free-updates --metalink=https://mirrors.rpmfusion.org/metalink?repo=free-fedora-updates-released-$releasever&arch=$basearch
 repo --name=rpmfusion-nonfree --metalink=https://mirrors.rpmfusion.org/metalink?repo=nonfree-fedora-$releasever&arch=$basearch
 repo --name=rpmfusion-nonfree-updates --metalink=https://mirrors.rpmfusion.org/metalink?repo=nonfree-fedora-updates-released-$releasever&arch=$basearch
+#repo --name=docker-ce --baseurl=https://download.docker.com/linux/fedora/$releasever/$basearch/stable
+repo --name=kubernetes --baseurl=https://packages.cloud.google.com/yum/repos/kubernetes-el7-$basearch
+repo --name=code --baseurl=https://packages.microsoft.com/yumrepos/vscode
 
 lang en_US.UTF-8
 keyboard us
-timezone --utc Etc/UTC
+timezone --utc America/Los_Angeles
 rootpw --lock password
 firewall --disabled
 network --hostname={{.hostname}}
@@ -17,45 +20,35 @@ network --hostname={{.hostname}}
 ## disk
 zerombr
 clearpart --all --initlabel --disklabel=gpt
-autopart --type=plain
+autopart --type=plain --noswap --nohome
 bootloader --timeout=1 --append="elevator=noop"
 
 ## packages
 %packages --excludeWeakdeps --excludedocs
 @core
-libvirt-daemon-kvm
-qemu-kvm
+@workstation-product
+@firefox
+@fonts
+@gnome-desktop
+@hardware-support
+@multimedia
+@printing
+@base-x
+@networkmanager-submodules
+
 ksm
 ipmitool
 dnf-automatic
 cronie
-logrotate
-nfs-utils
-
 screen
-pciutils
 lm_sensors
-rsync
-libvirt-client
 vim-enhanced
-
-@gnome-desktop
-@fonts
-@printing
-@hardware-support
-@base-x
-firefox
 tilix
-git
-wget
-unzip
-cracklib-dicts
 libva-intel-driver
+#docker-ce
+kubectl
+code
 
--NetworkManager
--plymouth
--dhcp-client
--ppc64-utils
 %end
 
 ## user
@@ -67,47 +60,6 @@ user --name={{.default_user}} --password={{.password}} --plaintext --groups=whee
 ##
 
 %post --erroronfail
-
-
-##
-## networkd
-##
-
-## enable systemd-resolve
-ln -sf /run/systemd/resolve/resolv.conf /etc/resolv.conf
-
-## write all configs
-cat <<EOF > /etc/systemd/resolved.conf
-[Resolve]
-FallbackDNS=
-DNSStubListener=no
-EOF
-
-## default
-cat <<EOF > /etc/systemd/network/99_en.network
-[Match]
-Name=en*
-
-[Link]
-ARP=no
-
-[Network]
-LinkLocalAddressing=no
-DHCP=no
-EOF
-
-## host macvlan
-cat <<EOF > /etc/systemd/network/00_{{.host_if}}.network
-[Match]
-Name={{.host_if}}
-
-[Network]
-LinkLocalAddressing=no
-DHCP=yes
-
-[Address]
-Address={{.host_ip}}/{{.host_netmask}}
-EOF
 
 
 ##
@@ -129,8 +81,9 @@ EOF
 ##
 
 systemctl enable \
-  systemd-networkd systemd-resolved chronyd crond \
+  chronyd crond \
   ksm ksmtuned \
+  docker \
   dnf-automatic.timer
 
 systemctl set-default graphical.target
