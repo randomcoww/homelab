@@ -16,7 +16,7 @@ network --hostname={{.hostname}}
 zerombr
 clearpart --all --initlabel --disklabel=gpt
 autopart --type=plain --noswap --nohome
-bootloader --timeout=1 --append="console=tty0 console=ttyS1,115200n8 elevator=noop intel_iommu=on iommu=pt cgroup_enable=memory"
+bootloader --timeout=1 --append="console=tty0 console=ttyS1,115200n8 elevator=noop intel_iommu=on iommu=pt"
 
 ## packages
 %packages --excludeWeakdeps --excludedocs
@@ -48,7 +48,7 @@ libvirt-client
 %end
 
 ## user
-user --name={{.default_user}} --password=password --plaintext --groups=wheel,libvirt
+user --name={{.default_user}} --password={{.password}} --plaintext --groups=wheel,libvirt
 sshkey --username={{.default_user}} "{{.ssh_authorized_key}}"
 
 
