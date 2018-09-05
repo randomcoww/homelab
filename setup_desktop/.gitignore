@@ -1,5 +1,0 @@
-output/*
-terraform.tfstate
-terraform.tfstate.*
-.terraform
-crash.log

@@ -6,9 +6,9 @@ repo --name=rpmfusion-free --metalink=https://mirrors.rpmfusion.org/metalink?rep
 repo --name=rpmfusion-free-updates --metalink=https://mirrors.rpmfusion.org/metalink?repo=free-fedora-updates-released-$releasever&arch=$basearch
 repo --name=rpmfusion-nonfree --metalink=https://mirrors.rpmfusion.org/metalink?repo=nonfree-fedora-$releasever&arch=$basearch
 repo --name=rpmfusion-nonfree-updates --metalink=https://mirrors.rpmfusion.org/metalink?repo=nonfree-fedora-updates-released-$releasever&arch=$basearch
-#repo --name=docker-ce --baseurl=https://download.docker.com/linux/fedora/$releasever/$basearch/stable
 repo --name=kubernetes --baseurl=https://packages.cloud.google.com/yum/repos/kubernetes-el7-$basearch
 repo --name=code --baseurl=https://packages.microsoft.com/yumrepos/vscode
+#repo --name=docker-ce --baseurl=https://download.docker.com/linux/fedora/$releasever/$basearch/stable
 
 lang en_US.UTF-8
 keyboard us
@@ -36,7 +36,6 @@ bootloader --timeout=1 --append="elevator=noop"
 @base-x
 @networkmanager-submodules
 
-ksm
 ipmitool
 dnf-automatic
 cronie
@@ -44,10 +43,12 @@ screen
 lm_sensors
 vim-enhanced
 tilix
+libva-utils
 libva-intel-driver
-#docker-ce
+golang
 kubectl
 code
+#docker-ce
 
 %end
 
@@ -82,7 +83,6 @@ EOF
 
 systemctl enable \
   chronyd crond \
-  ksm ksmtuned \
   docker \
   dnf-automatic.timer
 
