@@ -24,10 +24,10 @@ module "provisioner" {
 
   ## images
   hyperkube_image  = "gcr.io/google_containers/hyperkube:${local.kubernetes_version}"
-  keepalived_image = "randomcoww/keepalived:20180716.01"
-  nftables_image   = "randomcoww/nftables:20180628.01"
+  keepalived_image = "randomcoww/keepalived:20180913.01"
+  nftables_image   = "randomcoww/nftables:20180913.01"
   kea_image        = "randomcoww/kea:1.4.0"
-  tftpd_image      = "randomcoww/tftpd_ipxe:20180626.02"
+  tftpd_image      = "randomcoww/tftpd_ipxe:20180913.01"
   matchbox_image   = "quay.io/coreos/matchbox:latest"
 
   ## ports

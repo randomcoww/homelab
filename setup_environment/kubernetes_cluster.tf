@@ -24,7 +24,7 @@ module "kubernetes_cluster" {
   kube_proxy_image              = "gcr.io/google_containers/kube-proxy:${local.kubernetes_version}"
   etcd_image                    = "quay.io/coreos/etcd:v3.3"
   flannel_image                 = "quay.io/coreos/flannel:v0.10.0-amd64"
-  keepalived_image              = "randomcoww/keepalived:20180716.01"
+  keepalived_image              = "randomcoww/keepalived:20180913.01"
 
   ## kubernetes
   cluster_name       = "kube-cluster"
