@@ -42,7 +42,6 @@ resource "matchbox_group" "ignition_worker" {
     cluster_name   = "${var.cluster_name}"
 
     kubernetes_path = "${var.kubernetes_path}"
-    docker_opts     = "--log-driver=journald"
 
     tls_ca            = "${replace(tls_self_signed_cert.root.cert_pem, "\n", "\\n")}"
     tls_bootstrap     = "${replace(tls_locally_signed_cert.bootstrap.cert_pem, "\n", "\\n")}"

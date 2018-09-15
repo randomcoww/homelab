@@ -14,13 +14,10 @@ networkd:
         Address={{.host_ip}}/{{.host_netmask}}
 systemd:
   units:
-    - name: docker.service
+    - name: containerd.service
       enabled: true
-      dropins:
-        - name: docker.conf
-          contents: |
-            [Service]
-            Environment=DOCKER_OPTS="{{.docker_opts}}"
+    - name: docker.service
+      mask: true
     - name: kubelet.service
       enabled: true
       contents: |
@@ -31,12 +28,16 @@ systemd:
         Environment="KUBELET_IMAGE=docker://{{.hyperkube_image}}"
         Environment="RKT_RUN_ARGS=--uuid-file-save=/var/cache/kubelet-pod.uuid \
           --volume=resolv,kind=host,source=/etc/resolv.conf \
+          --volume var-lib-containerd,kind=host,source=/var/lib/containerd,readOnly=false \
           --mount volume=resolv,target=/etc/resolv.conf \
+          --mount volume=var-lib-containerd,target=/var/lib/containerd \
           --insecure-options=image"
         ExecStartPre=/bin/mkdir -p /var/log/containers
         ExecStartPre=-/usr/bin/rkt rm --uuid-file=/var/cache/kubelet-pod.uuid
         ExecStart=/usr/lib/coreos/kubelet-wrapper \
-          --manifest-url={{.manifest_url}}
+          --manifest-url={{.manifest_url}} \
+          --container-runtime=remote \
+          --container-runtime-endpoint=unix:///run/docker/libcontainerd/docker-containerd.sock
         ExecStop=-/usr/bin/rkt stop --uuid-file=/var/cache/kubelet-pod.uuid
         Restart=on-failure
         RestartSec=5
