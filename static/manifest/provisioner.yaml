@@ -11,7 +11,7 @@ items:
     hostNetwork: true
     containers:
     - name: nftables
-      image: randomcoww/nftables:20180628.01
+      image: randomcoww/nftables:20180913.01
       securityContext:
         capabilities:
           add:
@@ -284,7 +284,7 @@ items:
     hostNetwork: true
     containers:
     - name: keepalived
-      image: randomcoww/keepalived:20180716.01
+      image: randomcoww/keepalived:20180913.01
       securityContext:
         capabilities:
           add:
@@ -339,7 +339,7 @@ items:
     hostNetwork: true
     containers:
     - name: tftpd-ipxe
-      image: randomcoww/tftpd_ipxe:20180626.02
+      image: randomcoww/tftpd_ipxe:20180913.01
       args:
       - "--address"
       - 0.0.0.0:69
