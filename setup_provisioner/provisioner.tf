@@ -12,7 +12,7 @@ module "provisioner" {
   domain_name = "host.internal"
 
   ## host configs
-  container_linux_version = "1828.3.0"
+  container_linux_version = "1883.1.0"
   provisioner_hosts       = ["provisioner-0", "provisioner-1"]
   provisioner_macs        = ["52-54-00-1a-61-2a", "52-54-00-1a-61-2b"]
   provisioner_lan_ips     = ["192.168.62.217", "192.168.62.218"]
