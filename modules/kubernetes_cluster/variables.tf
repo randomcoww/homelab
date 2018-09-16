@@ -70,6 +70,10 @@ variable "flannel_image" {
   type = "string"
 }
 
+variable "cni_plugins_image" {
+  type = "string"
+}
+
 ## kubernetes
 variable "cluster_cidr" {
   type    = "string"

@@ -15,8 +15,9 @@ resource "matchbox_group" "manifest_worker" {
   }
 
   metadata {
-    kube_proxy_image = "${var.kube_proxy_image}"
-    flannel_image    = "${var.flannel_image}"
-    kubernetes_path  = "${var.kubernetes_path}"
+    kube_proxy_image  = "${var.kube_proxy_image}"
+    flannel_image     = "${var.flannel_image}"
+    cni_plugins_image = "${var.cni_plugins_image}"
+    kubernetes_path   = "${var.kubernetes_path}"
   }
 }

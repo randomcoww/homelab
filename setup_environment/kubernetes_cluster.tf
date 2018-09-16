@@ -25,6 +25,7 @@ module "kubernetes_cluster" {
   etcd_image                    = "quay.io/coreos/etcd:v3.3"
   flannel_image                 = "quay.io/coreos/flannel:v0.10.0-amd64"
   keepalived_image              = "randomcoww/keepalived:20180913.01"
+  cni_plugins_image             = "randomcoww/cni_plugins:0.7.1"
 
   ## kubernetes
   cluster_name       = "kube-cluster"

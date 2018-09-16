@@ -5,6 +5,29 @@ items:
 - apiVersion: v1
   kind: Pod
   metadata:
+    name: cni-plugins
+    namespace: kube-system
+  spec:
+    restartPolicy: OnFailure
+    hostNetwork: true
+    containers:
+    - name: cni-plugins
+      image: {{.cni_plugins_image}}
+      command:
+      - "cp"
+      - "-r"
+      - "/opt/cni/bin"
+      - "/cni"
+      volumeMounts:
+      - name: cni
+        mountPath: "/cni"
+    volumes:
+    - name: cni
+      hostPath:
+        path: "/opt/cni"
+- apiVersion: v1
+  kind: Pod
+  metadata:
     name: kube-flannel
     namespace: kube-system
   spec:
