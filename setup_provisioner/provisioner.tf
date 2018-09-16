@@ -57,7 +57,7 @@ module "provisioner" {
   matchbox_mount_path = "/data/pv/matchbox"
 
   ## github provisioner url
-  remote_provision_url = "https://raw.githubusercontent.com/randomcoww/terraform/master/static"
+  remote_provision_url = "https://raw.githubusercontent.com/randomcoww/terraform/master/docs"
 
   ## renderer provisioning access
   renderer_endpoint        = "${local.renderer_endpoint}"
