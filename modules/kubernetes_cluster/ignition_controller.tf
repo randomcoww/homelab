@@ -42,7 +42,6 @@ resource "matchbox_group" "ignition_controller" {
     host_netmask = "${var.netmask}"
 
     kubernetes_path = "${var.kubernetes_path}"
-    docker_opts     = "--log-driver=journald"
 
     tls_ca                     = "${replace(tls_self_signed_cert.root.cert_pem, "\n", "\\n")}"
     tls_ca_key                 = "${replace(tls_private_key.root.private_key_pem, "\n", "\\n")}"

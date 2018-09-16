@@ -46,7 +46,6 @@ resource "matchbox_group" "ignition_provisioner" {
     matchbox_vip = "${var.matchbox_vip}"
 
     certs_path  = "${var.certs_path}"
-    docker_opts = "--log-driver=journald --iptables=false"
 
     tls_ca           = "${replace(tls_self_signed_cert.root.cert_pem, "\n", "\\n")}"
     tls_matchbox     = "${replace(element(tls_locally_signed_cert.matchbox.*.cert_pem, count.index), "\n", "\\n")}"
