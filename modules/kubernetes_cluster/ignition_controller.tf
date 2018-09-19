@@ -41,7 +41,7 @@ resource "matchbox_group" "ignition_controller" {
     host_if      = "${var.controller_if}"
     host_netmask = "${var.netmask}"
 
-    kubernetes_path = "${var.kubernetes_path}"
+    kubelet_path = "${var.kubelet_path}"
 
     tls_ca                     = "${replace(tls_self_signed_cert.root.cert_pem, "\n", "\\n")}"
     tls_ca_key                 = "${replace(tls_private_key.root.private_key_pem, "\n", "\\n")}"

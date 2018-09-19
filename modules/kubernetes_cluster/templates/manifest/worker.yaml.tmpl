@@ -40,7 +40,7 @@ items:
       - "/opt/bin/flanneld"
       - "--ip-masq"
       - "--kube-subnet-mgr"
-      - "--kubeconfig-file={{.kubernetes_path}}/kubelet.kubeconfig"
+      - "--kubeconfig-file={{.kubelet_path}}/kubelet.kubeconfig"
       securityContext:
         capabilities:
           add:
@@ -60,7 +60,7 @@ items:
       - name: flannel-cfg
         mountPath: "/etc/kube-flannel"
       - name: kubernetes-path
-        mountPath: "{{.kubernetes_path}}"
+        mountPath: "{{.kubelet_path}}"
         readOnly: true
     volumes:
     - name: run
@@ -71,7 +71,7 @@ items:
         path: "/etc/kube-flannel"
     - name: kubernetes-path
       hostPath:
-        path: "{{.kubernetes_path}}"
+        path: "{{.kubelet_path}}"
 - apiVersion: v1
   kind: Pod
   metadata:
@@ -85,14 +85,14 @@ items:
       image: {{.kube_proxy_image}}
       command:
       - kube-proxy
-      - "--config={{.kubernetes_path}}/kube-proxy-config.yaml"
+      - "--config={{.kubelet_path}}/kube-proxy-config.yaml"
       securityContext:
         privileged: true
       volumeMounts:
       - name: modules
         mountPath: "/lib/modules"
       - name: kubernetes-path
-        mountPath: "{{.kubernetes_path}}"
+        mountPath: "{{.kubelet_path}}"
         readOnly: true
     volumes:
     - name: modules
@@ -100,4 +100,4 @@ items:
         path: "/lib/modules"
     - name: kubernetes-path
       hostPath:
-        path: "{{.kubernetes_path}}"
+        path: "{{.kubelet_path}}"

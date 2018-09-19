@@ -56,12 +56,12 @@ items:
       args:
       - "/usr/local/bin/etcd"
       - "--name=$(NODE_NAME)"
-      - "--cert-file={{.kubernetes_path}}/kubernetes.pem"
-      - "--key-file={{.kubernetes_path}}/kubernetes-key.pem"
-      - "--peer-cert-file={{.kubernetes_path}}/kubernetes.pem"
-      - "--peer-key-file={{.kubernetes_path}}/kubernetes-key.pem"
-      - "--trusted-ca-file={{.kubernetes_path}}/ca.pem"
-      - "--peer-trusted-ca-file={{.kubernetes_path}}/ca.pem"
+      - "--cert-file={{.kubelet_path}}/kubernetes.pem"
+      - "--key-file={{.kubelet_path}}/kubernetes-key.pem"
+      - "--peer-cert-file={{.kubelet_path}}/kubernetes.pem"
+      - "--peer-key-file={{.kubelet_path}}/kubernetes-key.pem"
+      - "--trusted-ca-file={{.kubelet_path}}/ca.pem"
+      - "--peer-trusted-ca-file={{.kubelet_path}}/ca.pem"
       - "--peer-client-cert-auth"
       - "--client-cert-auth"
       - "--initial-advertise-peer-urls=https://$(INTERNAL_IP):{{.etcd_peer_port}}"
@@ -84,7 +84,7 @@ items:
             fieldPath: spec.nodeName
       volumeMounts:
       - name: kubernetes-path
-        mountPath: "{{.kubernetes_path}}"
+        mountPath: "{{.kubelet_path}}"
         readOnly: true
       - name: data-etcd-host
         mountPath: "{{.etcd_path}}"
@@ -92,7 +92,7 @@ items:
     volumes:
     - name: kubernetes-path
       hostPath:
-        path: "{{.kubernetes_path}}"
+        path: "{{.kubelet_path}}"
     - name: data-etcd-host
       nfs:
         server: {{.nfs_vip}}
@@ -113,35 +113,31 @@ items:
       - "--secure-port={{.apiserver_secure_port}}"
       - "--allow-privileged=true"
       - "--apiserver-count=1"
-      - "--audit-log-maxage=30"
-      - "--audit-log-maxbackup=1"
-      - "--audit-log-maxsize=100"
-      - "--audit-log-path=/var/log/audit.log"
       - "--authorization-mode=Node,RBAC"
       - "--bind-address=0.0.0.0"
-      - "--client-ca-file={{.kubernetes_path}}/ca.pem"
+      - "--client-ca-file={{.kubelet_path}}/ca.pem"
       - "--enable-admission-plugins=Initializers,NamespaceLifecycle,NodeRestriction,LimitRanger,ServiceAccount,DefaultStorageClass,ResourceQuota"
       - "--enable-swagger-ui=true"
-      - "--etcd-cafile={{.kubernetes_path}}/ca.pem"
-      - "--etcd-certfile={{.kubernetes_path}}/kubernetes.pem"
-      - "--etcd-keyfile={{.kubernetes_path}}/kubernetes-key.pem"
+      - "--etcd-cafile={{.kubelet_path}}/ca.pem"
+      - "--etcd-certfile={{.kubelet_path}}/kubernetes.pem"
+      - "--etcd-keyfile={{.kubelet_path}}/kubernetes-key.pem"
       - "--etcd-servers={{.etcd_servers}}"
       - "--event-ttl=1h"
-      - "--kubelet-certificate-authority={{.kubernetes_path}}/ca.pem"
-      - "--kubelet-client-certificate={{.kubernetes_path}}/kubernetes.pem"
-      - "--kubelet-client-key={{.kubernetes_path}}/kubernetes-key.pem"
+      - "--kubelet-certificate-authority={{.kubelet_path}}/ca.pem"
+      - "--kubelet-client-certificate={{.kubelet_path}}/kubernetes.pem"
+      - "--kubelet-client-key={{.kubelet_path}}/kubernetes-key.pem"
       - "--kubelet-https=true"
       - "--runtime-config=api/all"
-      - "--service-account-key-file={{.kubernetes_path}}/service-account.pem"
+      - "--service-account-key-file={{.kubelet_path}}/service-account.pem"
       - "--service-cluster-ip-range={{.cluster_ip_range}}"
-      - "--tls-cert-file={{.kubernetes_path}}/kubernetes.pem"
-      - "--tls-private-key-file={{.kubernetes_path}}/kubernetes-key.pem"
+      - "--tls-cert-file={{.kubelet_path}}/kubernetes.pem"
+      - "--tls-private-key-file={{.kubelet_path}}/kubernetes-key.pem"
       - "--storage-backend=etcd3"
       - "--kubelet-preferred-address-types=InternalIP,InternalDNS"
       - "--v=2"
       volumeMounts:
       - name: kubernetes-path
-        mountPath: "{{.kubernetes_path}}"
+        mountPath: "{{.kubelet_path}}"
         readOnly: true
       livenessProbe:
         httpGet:
@@ -154,7 +150,7 @@ items:
     volumes:
     - name: kubernetes-path
       hostPath:
-        path: "{{.kubernetes_path}}"
+        path: "{{.kubelet_path}}"
 - kind: Pod
   apiVersion: v1
   metadata:
@@ -171,19 +167,19 @@ items:
       - "--address=0.0.0.0"
       - "--cluster-cidr={{.cluster_cidr}}"
       - "--allocate-node-cidrs=true"
-      - "--cluster-name=kube_cluster"
-      - "--cluster-signing-cert-file={{.kubernetes_path}}/ca.pem"
-      - "--cluster-signing-key-file={{.kubernetes_path}}/ca-key.pem"
-      - "--kubeconfig={{.kubernetes_path}}/kube-controller-manager.kubeconfig"
+      - "--cluster-name={{.cluster_name}}"
+      - "--cluster-signing-cert-file={{.kubelet_path}}/ca.pem"
+      - "--cluster-signing-key-file={{.kubelet_path}}/ca-key.pem"
+      - "--kubeconfig={{.kubelet_path}}/kube-controller-manager.kubeconfig"
       - "--leader-elect=true"
-      - "--root-ca-file={{.kubernetes_path}}/ca.pem"
-      - "--service-account-private-key-file={{.kubernetes_path}}/service-account-key.pem"
+      - "--root-ca-file={{.kubelet_path}}/ca.pem"
+      - "--service-account-private-key-file={{.kubelet_path}}/service-account-key.pem"
       - "--service-cluster-ip-range={{.cluster_ip_range}}"
       - "--use-service-account-credentials=true"
       - "--v=2"
       volumeMounts:
       - name: kubernetes-path
-        mountPath: "{{.kubernetes_path}}"
+        mountPath: "{{.kubelet_path}}"
         readOnly: true
       livenessProbe:
         httpGet:
@@ -196,7 +192,7 @@ items:
     volumes:
     - name: kubernetes-path
       hostPath:
-        path: "{{.kubernetes_path}}"
+        path: "{{.kubelet_path}}"
 - kind: Pod
   apiVersion: v1
   metadata:
@@ -210,7 +206,7 @@ items:
       image: {{.kube_scheduler_image}}
       command:
       - kube-scheduler
-      - "--config={{.kubernetes_path}}/kube-scheduler.yaml"
+      - "--config={{.kubelet_path}}/kube-scheduler.yaml"
       - "--v=2"
       livenessProbe:
         httpGet:
@@ -222,9 +218,9 @@ items:
         timeoutSeconds: 15
       volumeMounts:
       - name: kubernetes-path
-        mountPath: "{{.kubernetes_path}}"
+        mountPath: "{{.kubelet_path}}"
         readOnly: true
     volumes:
     - name: kubernetes-path
       hostPath:
-        path: "{{.kubernetes_path}}"
+        path: "{{.kubelet_path}}"

@@ -15,25 +15,22 @@ systemd:
         Environment="KUBELET_IMAGE=docker://{{.hyperkube_image}}"
         Environment="RKT_RUN_ARGS=--uuid-file-save=/var/cache/kubelet-pod.uuid \
           --volume=resolv,kind=host,source=/etc/resolv.conf \
-          --volume=var-lib-kubernetes,kind=host,source={{.kubernetes_path}} \
           --volume=var-lib-containerd,kind=host,source=/var/lib/containerd,readOnly=false \
           --mount volume=resolv,target=/etc/resolv.conf \
-          --mount volume=var-lib-kubernetes,target={{.kubernetes_path}} \
           --mount volume=var-lib-containerd,target=/var/lib/containerd \
           --insecure-options=image"
         ExecStartPre=/bin/mkdir -p /var/log/containers
         ExecStartPre=-/usr/bin/rkt rm --uuid-file=/var/cache/kubelet-pod.uuid
         ExecStart=/usr/lib/coreos/kubelet-wrapper \
           --allow-privileged=true \
-          --config={{.kubernetes_path}}/kubelet-config.yaml \
-          --kubeconfig={{.kubernetes_path}}/kubelet.kubeconfig \
-          --bootstrap-kubeconfig={{.kubernetes_path}}/bootstrap.kubeconfig \
+          --config={{.kubelet_path}}/kubelet-config.yaml \
+          --kubeconfig={{.kubelet_path}}/kubelet.kubeconfig \
+          --bootstrap-kubeconfig={{.kubelet_path}}/bootstrap.kubeconfig \
           --container-runtime=remote \
           --container-runtime-endpoint=unix:///run/docker/libcontainerd/docker-containerd.sock \
           --network-plugin=cni \
-          --cert-dir={{.kubernetes_path}} \
+          --cert-dir={{.kubelet_path}} \
           --register-node=true \
-          --feature-gates=RotateKubeletClientCertificate=true,RotateKubeletServerCertificate=true \
           --v=2
         ExecStop=-/usr/bin/rkt stop --uuid-file=/var/cache/kubelet-pod.uuid
         Restart=on-failure
@@ -56,33 +53,33 @@ storage:
         inline: |
           fs.inotify.max_user_watches=16184
 
-    - path: {{.kubernetes_path}}/ca.pem
+    - path: {{.kubelet_path}}/ca.pem
       filesystem: root
       mode: 420
       contents:
         inline: "{{.tls_ca}}"
-    - path: {{.kubernetes_path}}/bootstrap.pem
+    - path: {{.kubelet_path}}/bootstrap.pem
       filesystem: root
       mode: 420
       contents:
         inline: "{{.tls_bootstrap}}"
-    - path: {{.kubernetes_path}}/bootstrap-key.pem
+    - path: {{.kubelet_path}}/bootstrap-key.pem
       filesystem: root
       mode: 420
       contents:
         inline: "{{.tls_bootstrap_key}}"
-    - path: {{.kubernetes_path}}/kube-proxy.pem
+    - path: {{.kubelet_path}}/kube-proxy.pem
       filesystem: root
       mode: 420
       contents:
         inline: "{{.tls_proxy}}"
-    - path: {{.kubernetes_path}}/kube-proxy-key.pem
+    - path: {{.kubelet_path}}/kube-proxy-key.pem
       filesystem: root
       mode: 420
       contents:
         inline: "{{.tls_proxy_key}}"
 
-    - path: {{.kubernetes_path}}/kubelet-config.yaml
+    - path: {{.kubelet_path}}/kubelet-config.yaml
       filesystem: root
       mode: 420
       contents:
@@ -95,7 +92,7 @@ storage:
             webhook:
               enabled: true
             x509:
-              clientCAFile: "{{.kubernetes_path}}/ca.pem"
+              clientCAFile: "{{.kubelet_path}}/ca.pem"
           authorization:
             mode: Webhook
           clusterDomain: "{{.cluster_domain}}"
@@ -105,8 +102,11 @@ storage:
           staticPodURL: {{.manifest_url}}
           rotateCertificates: true
           serverTLSBootstrap: true
+          featureGates:
+            RotateKubeletClientCertificate: true
+            RotateKubeletServerCertificate: true
 
-    - path: {{.kubernetes_path}}/kube-proxy-config.yaml
+    - path: {{.kubelet_path}}/kube-proxy-config.yaml
       filesystem: root
       mode: 420
       contents:
@@ -114,13 +114,13 @@ storage:
           kind: KubeProxyConfiguration
           apiVersion: kubeproxy.config.k8s.io/v1alpha1
           clientConnection:
-            kubeconfig: "{{.kubernetes_path}}/kube-proxy.kubeconfig"
+            kubeconfig: "{{.kubelet_path}}/kube-proxy.kubeconfig"
           featureGates:
             SupportIPVSProxyMode: true
           mode: "ipvs"
           clusterCIDR: "{{.cluster_cidr}}"
 
-    - path: {{.kubernetes_path}}/kube-proxy.kubeconfig
+    - path: {{.kubelet_path}}/kube-proxy.kubeconfig
       filesystem: root
       mode: 420
       contents:
@@ -128,7 +128,7 @@ storage:
           apiVersion: v1
           clusters:
           - cluster:
-              certificate-authority: {{.kubernetes_path}}/ca.pem
+              certificate-authority: {{.kubelet_path}}/ca.pem
               server: {{.apiserver_url}}
             name: {{.cluster_name}}
           contexts:
@@ -142,10 +142,10 @@ storage:
           users:
           - name: system:kube-proxy
             user:
-              client-certificate: {{.kubernetes_path}}/kube-proxy.pem
-              client-key: {{.kubernetes_path}}/kube-proxy-key.pem
+              client-certificate: {{.kubelet_path}}/kube-proxy.pem
+              client-key: {{.kubelet_path}}/kube-proxy-key.pem
 
-    - path: {{.kubernetes_path}}/bootstrap.kubeconfig
+    - path: {{.kubelet_path}}/bootstrap.kubeconfig
       filesystem: root
       mode: 420
       contents:
@@ -153,7 +153,7 @@ storage:
           apiVersion: v1
           clusters:
           - cluster:
-              certificate-authority: {{.kubernetes_path}}/ca.pem
+              certificate-authority: {{.kubelet_path}}/ca.pem
               server: {{.apiserver_url}}
             name: {{.cluster_name}}
           contexts:
@@ -167,8 +167,8 @@ storage:
           users:
           - name: system:node:{{.hostname}}
             user:
-              client-certificate: {{.kubernetes_path}}/bootstrap.pem
-              client-key: {{.kubernetes_path}}/bootstrap-key.pem
+              client-certificate: {{.kubelet_path}}/bootstrap.pem
+              client-key: {{.kubelet_path}}/bootstrap-key.pem
 
     - path: /etc/cni/net.d/10-flannel.conf
       filesystem: root

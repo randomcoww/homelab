@@ -104,9 +104,9 @@ variable "cluster_domain" {
   default = "cluster.local"
 }
 
-variable "kubernetes_path" {
+variable "kubelet_path" {
   type    = "string"
-  default = "/var/lib/kubernetes"
+  default = "/var/lib/kubelet"
 }
 
 variable "etcd_path" {

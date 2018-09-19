@@ -150,6 +150,11 @@ variable "metallb_ip_range" {
 }
 
 ## service paths
+variable "kubelet_path" {
+  type    = "string"
+  default = "/var/lib/kubelet"
+}
+
 variable "certs_path" {
   type    = "string"
   default = "/etc/ssl/certs"

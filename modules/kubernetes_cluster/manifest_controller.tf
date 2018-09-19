@@ -33,11 +33,12 @@ resource "matchbox_group" "manifest_controller" {
 
     cluster_ip_range = "${var.cluster_ip_range}"
     cluster_cidr     = "${var.cluster_cidr}"
+    cluster_name     = "${var.cluster_name}"
 
     controller_vip = "${var.controller_vip}"
     host_if        = "${var.controller_if}"
 
-    kubernetes_path = "${var.kubernetes_path}"
+    kubelet_path    = "${var.kubelet_path}"
     etcd_path       = "${var.etcd_path}"
     etcd_mount_path = "${var.etcd_mount_path}"
   }
