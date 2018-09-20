@@ -68,16 +68,6 @@ storage:
       mode: 420
       contents:
         inline: "{{.tls_bootstrap_key}}"
-    - path: {{.kubelet_path}}/kube-proxy.pem
-      filesystem: root
-      mode: 420
-      contents:
-        inline: "{{.tls_proxy}}"
-    - path: {{.kubelet_path}}/kube-proxy-key.pem
-      filesystem: root
-      mode: 420
-      contents:
-        inline: "{{.tls_proxy_key}}"
 
     - path: {{.kubelet_path}}/kubelet-config.yaml
       filesystem: root
@@ -99,51 +89,11 @@ storage:
           clusterDNS:
             - "{{.cluster_dns_ip}}"
           runtimeRequestTimeout: "15m"
-          staticPodURL: {{.manifest_url}}
           rotateCertificates: true
           serverTLSBootstrap: true
           featureGates:
             RotateKubeletClientCertificate: true
             RotateKubeletServerCertificate: true
-
-    - path: {{.kubelet_path}}/kube-proxy-config.yaml
-      filesystem: root
-      mode: 420
-      contents:
-        inline: |-
-          kind: KubeProxyConfiguration
-          apiVersion: kubeproxy.config.k8s.io/v1alpha1
-          clientConnection:
-            kubeconfig: "{{.kubelet_path}}/kube-proxy.kubeconfig"
-          featureGates:
-            SupportIPVSProxyMode: true
-          mode: "ipvs"
-          clusterCIDR: "{{.cluster_cidr}}"
-
-    - path: {{.kubelet_path}}/kube-proxy.kubeconfig
-      filesystem: root
-      mode: 420
-      contents:
-        inline: |-
-          apiVersion: v1
-          clusters:
-          - cluster:
-              certificate-authority: {{.kubelet_path}}/ca.pem
-              server: {{.apiserver_url}}
-            name: {{.cluster_name}}
-          contexts:
-          - context:
-              cluster: {{.cluster_name}}
-              user: system:kube-proxy
-            name: default
-          current-context: default
-          kind: Config
-          preferences: {}
-          users:
-          - name: system:kube-proxy
-            user:
-              client-certificate: {{.kubelet_path}}/kube-proxy.pem
-              client-key: {{.kubelet_path}}/kube-proxy-key.pem
 
     - path: {{.kubelet_path}}/bootstrap.kubeconfig
       filesystem: root
@@ -170,43 +120,6 @@ storage:
               client-certificate: {{.kubelet_path}}/bootstrap.pem
               client-key: {{.kubelet_path}}/bootstrap-key.pem
 
-    - path: /etc/cni/net.d/10-flannel.conf
-      filesystem: root
-      mode: 420
-      contents:
-        inline: |-
-          {
-            "name": "cbr0",
-            "type": "flannel",
-            "delegate": {
-              "hairpinMode": true,
-              "isDefaultGateway": true
-            }
-          }
-    - path: /etc/kube-flannel/cni-conf.json
-      filesystem: root
-      mode: 420
-      contents:
-        inline: |-
-          {
-            "name": "cbr0",
-            "type": "flannel",
-            "delegate": {
-              "hairpinMode": true,
-              "isDefaultGateway": true
-            }
-          }
-    - path: /etc/kube-flannel/net-conf.json
-      filesystem: root
-      mode: 420
-      contents:
-        inline: |-
-          {
-            "Network": "{{.cluster_cidr}}",
-            "Backend": {
-              "Type": "vxlan"
-            }
-          }
 passwd:
   users:
   - name: {{.default_user}}

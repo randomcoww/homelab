@@ -1,0 +1,96 @@
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: kube-proxy
+  namespace: kube-system
+---
+kind: ClusterRoleBinding
+apiVersion: rbac.authorization.k8s.io/v1beta1
+metadata:
+  name: system:kube-proxy
+subjects:
+  - kind: ServiceAccount
+    name: kube-proxy
+    namespace: kube-system
+roleRef:
+  kind: ClusterRole
+  name: system:node-proxier
+  apiGroup: rbac.authorization.k8s.io
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: kube-proxy-config
+  namespace: kube-system
+data:
+  kube-proxy-config.yaml: |-
+    kind: KubeProxyConfiguration
+    apiVersion: kubeproxy.config.k8s.io/v1alpha1
+    featureGates:
+      SupportIPVSProxyMode: true
+    mode: "ipvs"
+    clusterCIDR: "{{.cluster_cidr}}"
+---
+apiVersion: extensions/v1beta1
+kind: DaemonSet
+metadata:
+  labels:
+    k8s-app: kube-proxy
+  name: kube-proxy
+  namespace: kube-system
+spec:
+  selector:
+    matchLabels:
+      k8s-app: kube-proxy
+  updateStrategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxUnavailable: 10%
+  template:
+    metadata:
+      labels:
+        k8s-app: kube-proxy
+      annotations:
+        scheduler.alpha.kubernetes.io/critical-pod: ''
+    spec:
+      priorityClassName: system-node-critical
+      hostNetwork: true
+      serviceAccountName: kube-proxy
+      tolerations:
+      - operator: "Exists"
+        effect: "NoExecute"
+      - operator: "Exists"
+        effect: "NoSchedule"
+      containers:
+      - name: kube-proxy
+        image: {{.kube_proxy_image}}
+        command:
+        - kube-proxy
+        - "--config=/etc/kube-proxy/kube-proxy-config.yaml"
+        env:
+        - name: KUBERNETES_SERVICE_HOST
+          value: {{.controller_vip}}
+        - name: KUBERNETES_SERVICE_PORT
+          value: "{{.apiserver_secure_port}}"
+        securityContext:
+          privileged: true
+        volumeMounts:
+        - mountPath: /run/xtables.lock
+          name: xtables-lock
+          readOnly: false
+        - mountPath: /lib/modules
+          name: lib-modules
+          readOnly: true
+        - name: kube-proxy-config
+          mountPath: /etc/kube-proxy/
+      volumes:
+      - name: xtables-lock
+        hostPath:
+          path: /run/xtables.lock
+          type: FileOrCreate
+      - name: lib-modules
+        hostPath:
+          path: /lib/modules
+      - name: kube-proxy-config
+        configMap:
+          name: kube-proxy-config

@@ -125,6 +125,7 @@ storage:
           authorization:
             mode: AlwaysAllow
           staticPodURL: {{.manifest_url}}
+          makeIPTablesUtilChains: false
 
     - path: {{.kubelet_path}}/kube-scheduler.yaml
       filesystem: root
@@ -187,16 +188,7 @@ storage:
             user:
               client-certificate: {{.kubelet_path}}/kube-scheduler.pem
               client-key: {{.kubelet_path}}/kube-scheduler-key.pem
-    
-    - path: /etc/cni/net.d/99-loopback.conf
-      filesystem: root
-      mode: 420
-      contents:
-        inline: |-
-          {
-            "cniVersion": "0.3.1",
-            "type": "loopback"
-          }
+
 passwd:
   users:
   - name: {{.default_user}}

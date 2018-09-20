@@ -130,15 +130,6 @@ storage:
           staticPodURL: {{.manifest_url}}
           makeIPTablesUtilChains: false
 
-    - path: /etc/cni/net.d/99-loopback.conf
-      filesystem: root
-      mode: 420
-      contents:
-        inline: |-
-          {
-            "cniVersion": "0.3.1",
-            "type": "loopback"
-          }
 passwd:
   users:
   - name: {{.default_user}}
