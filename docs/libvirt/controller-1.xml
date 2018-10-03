@@ -1,7 +1,7 @@
 <domain type='kvm'>
   <name>controller-1</name>
-  <memory unit='GiB'>5</memory>
-  <currentMemory unit='GiB'>5</currentMemory>
+  <memory unit='GiB'>6</memory>
+  <currentMemory unit='GiB'>6</currentMemory>
   <vcpu placement='static'>2</vcpu>
   <os>
     <type arch='x86_64' machine='pc'>hvm</type>
