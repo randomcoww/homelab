@@ -99,6 +99,16 @@ spec:
         beta.kubernetes.io/arch: amd64
       serviceAccountName: flannel
       initContainers:
+      - name: install-cni-plugins
+        image: {{.cni_plugins_image}}
+        command:
+        - "cp"
+        - "-r"
+        - "/opt/cni/bin"
+        - "/cni"
+        volumeMounts:
+        - name: cni-plugins
+          mountPath: "/cni"
       - name: install-cni
         image: {{.flannel_image}}
         command:
@@ -112,16 +122,6 @@ spec:
           mountPath: /etc/cni/net.d
         - name: flannel-cfg
           mountPath: /etc/kube-flannel/      
-      - name: install-cni-plugins
-        image: {{.cni_plugins_image}}
-        command:
-        - "cp"
-        - "-r"
-        - "/opt/cni/bin"
-        - "/cni"
-        volumeMounts:
-        - name: cni-plugins
-          mountPath: "/cni"
       containers:
       - name: kube-flannel
         image: {{.flannel_image}}
