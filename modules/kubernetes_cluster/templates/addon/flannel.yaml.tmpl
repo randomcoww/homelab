@@ -93,11 +93,19 @@ spec:
       labels:
         tier: node
         app: flannel
+      annotations:
+        scheduler.alpha.kubernetes.io/critical-pod: ''
     spec:
+      priorityClassName: system-node-critical
       hostNetwork: true
       nodeSelector:
         beta.kubernetes.io/arch: amd64
       serviceAccountName: flannel
+      tolerations:
+      - operator: "Exists"
+        effect: "NoExecute"
+      - operator: "Exists"
+        effect: "NoSchedule"
       initContainers:
       - name: install-cni-plugins
         image: {{.cni_plugins_image}}
