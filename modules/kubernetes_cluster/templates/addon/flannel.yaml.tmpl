@@ -109,14 +109,9 @@ spec:
       initContainers:
       - name: install-cni-plugins
         image: {{.cni_plugins_image}}
-        command:
-        - "cp"
-        - "-r"
-        - "/opt/cni/bin"
-        - "/cni"
         volumeMounts:
         - name: cni-plugins
-          mountPath: "/cni"
+          mountPath: "/opt/cni/bin"
       - name: install-cni
         image: {{.flannel_image}}
         command:
@@ -157,7 +152,7 @@ spec:
       volumes:
         - name: cni-plugins
           hostPath:
-            path: "/opt/cni"
+            path: "/opt/cni/bin"
         - name: run
           hostPath:
             path: /run
