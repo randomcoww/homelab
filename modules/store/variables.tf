@@ -23,6 +23,10 @@ variable "store_if" {
   type = "string"
 }
 
+variable "mtu" {
+  type = "string"
+}
+
 ## images
 variable "hyperkube_image" {
   type = "string"

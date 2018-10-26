@@ -26,5 +26,6 @@ resource "matchbox_group" "generic_store" {
     host_ip      = "${var.store_ips[count.index]}"
     host_if      = "${var.store_if}"
     host_netmask = "${var.netmask}"
+    mtu          = "${var.mtu}"
   }
 }

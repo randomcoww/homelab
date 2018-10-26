@@ -79,6 +79,7 @@ Name=en*
 
 [Link]
 ARP=no
+MTUBytes={{.mtu}}
 
 [Network]
 LinkLocalAddressing=no
@@ -92,6 +93,7 @@ Name={{.host_if}}
 
 [Link]
 ARP=no
+MTUBytes={{.mtu}}
 
 [Network]
 LinkLocalAddressing=no
@@ -118,21 +120,15 @@ DHCP=yes
 
 [Address]
 Address={{.host_ip}}/{{.host_netmask}}
+
+[DHCP]
+UseMTU=yes
 EOF
 
 
 ##
 ## general file writes
 ##
-
-# cat <<EOF > /etc/dnf/automatic.conf
-# [commands]
-# apply_updates=True
-# upgrade_type=security
-# 
-# [emitters]
-# emit_via=motd
-# EOF
 
 cat <<EOF > /etc/ssh/sshd_config
 Subsystem sftp internal-sftp

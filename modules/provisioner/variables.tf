@@ -44,6 +44,11 @@ variable "provisioner_wan_if" {
   type = "string"
 }
 
+## send this MTU via DHCP
+variable "mtu" {
+  type = "string"
+}
+
 variable "kea_ha_roles" {
   type = "list"
 }

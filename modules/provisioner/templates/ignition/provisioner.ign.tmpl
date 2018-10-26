@@ -8,10 +8,14 @@ networkd:
 
         [Network]
         LinkLocalAddressing=no
-        DHCP=no
+        DHCP=yes
 
         [Address]
         Address={{.lan_ip}}/{{.lan_netmask}}
+
+        [DHCP]
+        UseMTU=yes
+        RouteMetric=4096
     - name: {{.store_if}}.network
       contents: |
         [Match]
@@ -25,6 +29,7 @@ networkd:
         Address={{.store_ip}}/{{.store_netmask}}
 
         [DHCP]
+        UseMTU=yes
         RouteMetric=2048
     - name: {{.wan_if}}.network
       contents: |
@@ -36,6 +41,7 @@ networkd:
         DHCP=yes
 
         [DHCP]
+        UseMTU=yes
         UseDNS=true
         UseNTP=false
         SendHostname=false

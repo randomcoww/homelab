@@ -46,6 +46,7 @@ resource "matchbox_group" "manifest_provisioner" {
     store_if = "${var.provisioner_store_if}"
     lan_if   = "${var.provisioner_lan_if}"
     wan_if   = "${var.provisioner_wan_if}"
+    mtu      = "${var.mtu}"
 
     lan_ip_range        = "${var.lan_ip_range}"
     lan_dhcp_ip_range   = "${var.lan_dhcp_ip_range}"

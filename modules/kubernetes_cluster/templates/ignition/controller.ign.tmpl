@@ -12,6 +12,9 @@ networkd:
 
         [Address]
         Address={{.host_ip}}/{{.host_netmask}}
+
+        [DHCP]
+        UseMTU=yes
 systemd:
   units:
     - name: containerd.service

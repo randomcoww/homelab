@@ -21,6 +21,7 @@ module "provisioner" {
   provisioner_lan_if      = "eth0"
   provisioner_store_if    = "eth1"
   provisioner_wan_if      = "eth2"
+  mtu                     = "9000"
 
   ## images
   hyperkube_image  = "gcr.io/google_containers/hyperkube:${local.kubernetes_version}"
