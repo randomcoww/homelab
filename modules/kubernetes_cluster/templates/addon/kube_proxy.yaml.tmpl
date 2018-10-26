@@ -30,6 +30,8 @@ data:
       SupportIPVSProxyMode: true
     mode: "ipvs"
     clusterCIDR: "{{.cluster_cidr}}"
+    iptables:
+      masqueradeAll: true
 ---
 apiVersion: extensions/v1beta1
 kind: DaemonSet
