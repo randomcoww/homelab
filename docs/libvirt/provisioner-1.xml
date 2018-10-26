@@ -25,11 +25,11 @@
   <devices>
     <emulator>/usr/bin/qemu-system-x86_64</emulator>
     <interface type='direct' trustGuestRxFilters='yes'>
-      <source dev='ens1f1' mode='bridge'/>
+      <source dev='enp1s0f1' mode='bridge'/>
       <model type='virtio-net'/>
     </interface>
     <interface type='direct' trustGuestRxFilters='yes'>
-      <source dev='ens1f0' mode='bridge'/>
+      <source dev='enp1s0f0' mode='bridge'/>
       <model type='virtio-net'/>
     </interface>
     <interface type='direct' trustGuestRxFilters='yes'>

@@ -23,7 +23,7 @@
     <emulator>/usr/bin/qemu-system-x86_64</emulator>
     <interface type='direct' trustGuestRxFilters='yes'>
       <mac address='52:54:00:1a:61:1b'/>
-      <source dev='ens1f0' mode='bridge'/>
+      <source dev='enp1s0f0' mode='bridge'/>
       <model type='virtio-net'/>
     </interface>
     <console>
