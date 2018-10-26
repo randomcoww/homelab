@@ -25,7 +25,6 @@ libvirt-daemon-kvm
 qemu-kvm
 ksm
 ipmitool
-dnf-automatic
 openssh-server
 cronie
 logrotate
@@ -57,41 +56,6 @@ sshkey --username={{.default_user}} "{{.ssh_authorized_key}}"
 ##
 
 %post --erroronfail
-
-## fan control
-cat <<EOF > /etc/systemd/system/fancontrol.service
-# ipmi fan control:
-#
-# ommited full speed:
-# ExecStartPre=/usr/bin/ipmitool raw 0x30 0x45 0x01 0x01
-#
-# setting a specific duty cycle:
-# fan control 0x30 0x70 0x66
-# get 0x00, set 0x01
-# zone FAN 1,2,.. 0x00, FAN A,B,.. 0x01
-# duty cycle 0x00-0x64
-[Unit]
-Description=Fan Control
-After=ipmievd.service
-
-[Service]
-Type=oneshot
-ExecStart=/usr/bin/ipmitool raw 0x30 0x70 0x66 0x01 0x00 0x14
-ExecStart=/usr/bin/ipmitool raw 0x30 0x70 0x66 0x01 0x01 0x14
-EOF
-
-cat <<EOF > /etc/systemd/system/fancontrol.timer
-[Unit]
-Description=fancontrol timer
-After=ipmievd.service
-
-[Timer]
-OnBootSec=5
-OnUnitActiveSec=5
-
-[Install]
-WantedBy=basic.target
-EOF
 
 
 ##
@@ -132,21 +96,21 @@ ARP=no
 [Network]
 LinkLocalAddressing=no
 DHCP=no
-MACVLAN=macvlan_{{.host_if}}
+MACVLAN=v{{.host_if}}
 EOF
 
-cat <<EOF > /etc/systemd/network/00_macvlan_{{.host_if}}.netdev
+cat <<EOF > /etc/systemd/network/00_v{{.host_if}}.netdev
 [NetDev]
-Name=macvlan_{{.host_if}}
+Name=v{{.host_if}}
 Kind=macvlan
 
 [MACVLAN]
 Mode=bridge
 EOF
 
-cat <<EOF > /etc/systemd/network/00_macvlan_{{.host_if}}.network
+cat <<EOF > /etc/systemd/network/00_v{{.host_if}}.network
 [Match]
-Name=macvlan_{{.host_if}}
+Name=v{{.host_if}}
 
 [Network]
 LinkLocalAddressing=no
@@ -161,21 +125,14 @@ EOF
 ## general file writes
 ##
 
-cat <<EOF > /etc/modprobe.d/local.conf
-options kvm ignore_msrs=1
-options kvm-intel nested=1
-options igb max_vfs=8
-options ixgbe max_vfs=8
-EOF
-
-cat <<EOF > /etc/dnf/automatic.conf
-[commands]
-apply_updates=True
-upgrade_type=security
-
-[emitters]
-emit_via=motd
-EOF
+# cat <<EOF > /etc/dnf/automatic.conf
+# [commands]
+# apply_updates=True
+# upgrade_type=security
+# 
+# [emitters]
+# emit_via=motd
+# EOF
 
 cat <<EOF > /etc/ssh/sshd_config
 Subsystem sftp internal-sftp
@@ -224,9 +181,7 @@ EOF
 systemctl enable \
   systemd-networkd systemd-resolved chronyd crond sshd \
   ksm ksmtuned \
-  zfs-import-cache zfs-import-scan zfs-mount zfs-share zfs-zed zfs.target nfs-server \
-  fancontrol.timer \
-  dnf-automatic.timer
+  zfs-import-cache zfs-import-scan zfs-mount zfs-share zfs-zed zfs.target nfs-server
 
 
 ##

@@ -10,7 +10,7 @@ module "store" {
   ## host configs
   store_hosts = ["store-0"]
   store_ips   = ["192.168.126.251"]
-  store_if    = "ens1f0"
+  store_if    = "enp1s0f0"
 
   ## images
   hyperkube_image = "gcr.io/google_containers/hyperkube:${local.kubernetes_version}"
