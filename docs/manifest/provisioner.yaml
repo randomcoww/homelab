@@ -249,6 +249,10 @@ items:
                     {
                       "name": "routers",
                       "data": "192.168.126.240"
+                    },
+                    {
+                      "name": "interface-mtu",
+                      "data": "9000"
                     }
                   ],
                   "pools": [
