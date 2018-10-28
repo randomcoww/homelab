@@ -6,31 +6,29 @@ networkd:
         [Match]
         Name={{.lan_if}}
 
+        [Link]
+        MTUBytes={{.mtu}}
+
         [Network]
         LinkLocalAddressing=no
-        DHCP=yes
+        DHCP=no
 
         [Address]
         Address={{.lan_ip}}/{{.lan_netmask}}
-
-        [DHCP]
-        UseMTU=yes
-        RouteMetric=4096
     - name: {{.store_if}}.network
       contents: |
         [Match]
         Name={{.store_if}}
 
+        [Link]
+        MTUBytes={{.mtu}}
+
         [Network]
         LinkLocalAddressing=no
-        DHCP=yes
+        DHCP=no
 
         [Address]
         Address={{.store_ip}}/{{.store_netmask}}
-
-        [DHCP]
-        UseMTU=yes
-        RouteMetric=2048
     - name: {{.wan_if}}.network
       contents: |
         [Match]

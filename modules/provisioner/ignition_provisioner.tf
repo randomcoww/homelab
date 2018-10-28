@@ -42,6 +42,7 @@ resource "matchbox_group" "ignition_provisioner" {
     store_if      = "${var.provisioner_store_if}"
     store_netmask = "${var.store_netmask}"
     wan_if        = "${var.provisioner_wan_if}"
+    mtu           = "${var.mtu}"
 
     matchbox_vip = "${var.matchbox_vip}"
 

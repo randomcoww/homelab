@@ -86,7 +86,7 @@ LinkLocalAddressing=no
 DHCP=no
 EOF
 
-## host macvlan
+## host macvtap
 cat <<EOF > /etc/systemd/network/00_{{.host_if}}.network
 [Match]
 Name={{.host_if}}
@@ -98,15 +98,15 @@ MTUBytes={{.mtu}}
 [Network]
 LinkLocalAddressing=no
 DHCP=no
-MACVLAN=v{{.host_if}}
+MACVTAP=v{{.host_if}}
 EOF
 
 cat <<EOF > /etc/systemd/network/00_v{{.host_if}}.netdev
 [NetDev]
 Name=v{{.host_if}}
-Kind=macvlan
+Kind=macvtap
 
-[MACVLAN]
+[MACVTAP]
 Mode=bridge
 EOF
 
@@ -114,21 +114,26 @@ cat <<EOF > /etc/systemd/network/00_v{{.host_if}}.network
 [Match]
 Name=v{{.host_if}}
 
+[Link]
+MTUBytes={{.mtu}}
+
 [Network]
 LinkLocalAddressing=no
 DHCP=yes
 
 [Address]
 Address={{.host_ip}}/{{.host_netmask}}
-
-[DHCP]
-UseMTU=yes
 EOF
 
 
 ##
 ## general file writes
 ##
+
+cat <<EOF > /etc/modprobe.d/local.conf
+options igb max_vfs=8
+options ixgbe max_vfs=8
+EOF
 
 cat <<EOF > /etc/ssh/sshd_config
 Subsystem sftp internal-sftp
