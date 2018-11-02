@@ -4,10 +4,10 @@
 resource "matchbox_profile" "ignition_worker" {
   name                   = "host_worker"
   container_linux_config = "${file("${path.module}/templates/ignition/worker.ign.tmpl")}"
-  kernel                 = "/assets/coreos/${var.container_linux_version}/coreos_production_pxe.vmlinuz"
+  kernel                 = "http://${var.matchbox_vip}:${var.matchbox_http_port}/assets/coreos/${var.container_linux_version}/coreos_production_pxe.vmlinuz"
 
   initrd = [
-    "/assets/coreos/${var.container_linux_version}/coreos_production_pxe_image.cpio.gz",
+    "http://${var.matchbox_vip}:${var.matchbox_http_port}/assets/coreos/${var.container_linux_version}/coreos_production_pxe_image.cpio.gz",
   ]
 
   args = [
@@ -29,10 +29,11 @@ resource "matchbox_group" "ignition_worker" {
   }
 
   metadata {
-    hyperkube_image    = "${var.hyperkube_image}"
-    ssh_authorized_key = "cert-authority ${chomp(var.ssh_ca_public_key)}"
-    default_user       = "${var.default_user}"
-    apiserver_url      = "https://${var.controller_vip}:${var.apiserver_secure_port}"
+    bootstrap_node_name = "worker"
+    hyperkube_image     = "${var.hyperkube_image}"
+    ssh_authorized_key  = "cert-authority ${chomp(var.ssh_ca_public_key)}"
+    default_user        = "${var.default_user}"
+    apiserver_url       = "https://${var.controller_vip}:${var.apiserver_secure_port}"
 
     cluster_cidr   = "${var.cluster_cidr}"
     cluster_dns_ip = "${var.cluster_dns_ip}"

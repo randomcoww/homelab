@@ -4,10 +4,10 @@
 resource "matchbox_profile" "ignition_provisioner" {
   name                   = "host_provisioner"
   container_linux_config = "${file("${path.module}/templates/ignition/provisioner.ign.tmpl")}"
-  kernel                 = "/assets/coreos/${var.container_linux_version}/coreos_production_pxe.vmlinuz"
+  kernel                 = "http://${var.matchbox_vip}:${var.matchbox_http_port}/assets/coreos/${var.container_linux_version}/coreos_production_pxe.vmlinuz"
 
   initrd = [
-    "/assets/coreos/${var.container_linux_version}/coreos_production_pxe_image.cpio.gz",
+    "http://${var.matchbox_vip}:${var.matchbox_http_port}/assets/coreos/${var.container_linux_version}/coreos_production_pxe_image.cpio.gz",
   ]
 
   args = [

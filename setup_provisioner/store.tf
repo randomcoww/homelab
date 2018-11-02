@@ -8,8 +8,8 @@ module "store" {
   ssh_ca_public_key = "${tls_private_key.ssh_ca.public_key_openssh}"
 
   ## host configs
-  store_hosts = ["store-0"]
-  store_ips   = ["192.168.126.251"]
+  store_hosts = ["store-0", "store-1"]
+  store_ips   = ["192.168.126.251", "192.168.126.252"]
   store_if    = "enp1s0f0"
   mtu         = "9000"
 
