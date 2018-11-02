@@ -29,11 +29,11 @@ resource "matchbox_group" "ignition_worker" {
   }
 
   metadata {
-    bootstrap_node_name = "worker"
-    hyperkube_image     = "${var.hyperkube_image}"
-    ssh_authorized_key  = "cert-authority ${chomp(var.ssh_ca_public_key)}"
-    default_user        = "${var.default_user}"
-    apiserver_url       = "https://${var.controller_vip}:${var.apiserver_secure_port}"
+    hostname           = "${var.worker_hosts[count.index]}"
+    hyperkube_image    = "${var.hyperkube_image}"
+    ssh_authorized_key = "cert-authority ${chomp(var.ssh_ca_public_key)}"
+    default_user       = "${var.default_user}"
+    apiserver_url      = "https://${var.controller_vip}:${var.apiserver_secure_port}"
 
     cluster_cidr   = "${var.cluster_cidr}"
     cluster_dns_ip = "${var.cluster_dns_ip}"

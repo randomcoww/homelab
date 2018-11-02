@@ -102,13 +102,13 @@ storage:
           contexts:
           - context:
               cluster: {{.cluster_name}}
-              user: system:node:{{.bootstrap_node_name}}
+              user: system:node:{{.hostname}}
             name: default
           current-context: default
           kind: Config
           preferences: {}
           users:
-          - name: system:node:{{.bootstrap_node_name}}
+          - name: system:node:{{.hostname}}
             user:
               client-certificate: {{.kubelet_path}}/bootstrap.pem
               client-key: {{.kubelet_path}}/bootstrap-key.pem
