@@ -29,7 +29,6 @@ resource "matchbox_group" "ignition_controller" {
   }
 
   metadata {
-    hostname           = "${var.controller_hosts[count.index]}"
     hyperkube_image    = "${var.hyperkube_image}"
     ssh_authorized_key = "cert-authority ${chomp(var.ssh_ca_public_key)}"
     default_user       = "${var.default_user}"

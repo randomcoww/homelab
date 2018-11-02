@@ -43,8 +43,8 @@ networkd:
         UseDNS=true
         UseNTP=false
         SendHostname=false
-        UseHostname=false
-        UseDomains=false
+        UseHostname=true
+        UseDomains=true
         UseTimezone=no
         RouteMetric=1024
 systemd:
@@ -81,12 +81,6 @@ systemd:
         WantedBy=multi-user.target
 storage:
   files:
-    - path: /etc/hostname
-      filesystem: root
-      mode: 0644
-      contents:
-        inline:
-          {{.hostname}}
     - path: /etc/sysctl.d/ipforward.conf
       filesystem: root
       mode: 0644

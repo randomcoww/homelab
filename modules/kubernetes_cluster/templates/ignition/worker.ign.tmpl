@@ -39,12 +39,6 @@ systemd:
         WantedBy=multi-user.target
 storage:
   files:
-    - path: /etc/hostname
-      filesystem: root
-      mode: 0644
-      contents:
-        inline:
-          {{.hostname}}
     - path: /etc/sysctl.d/max-user-watches.conf
       filesystem: root
       mode: 0644
