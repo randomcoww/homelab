@@ -4,7 +4,6 @@
       "boot_command" : [
         "e",
         "<down><down><end> ",
-        "nomodeset ",
         "inst.text ",
         "inst.ks=http://{{.HTTPIP}}:8080/generic?host={{.Name}} ",
         "<leftCtrlOn>x<leftCtrlOff>"
