@@ -1,14 +1,14 @@
 install
-reboot
+shutdown
+skipx
 url --mirrorlist=http://mirrors.fedoraproject.org/mirrorlist?repo=fedora-$releasever&arch=$basearch
 repo --name=fedora-updates --mirrorlist=http://mirrors.fedoraproject.org/mirrorlist?repo=updates-released-f$releasever&arch=$basearch
-repo --name=rpmfusion-free --metalink=https://mirrors.rpmfusion.org/metalink?repo=free-fedora-$releasever&arch=$basearch
-repo --name=rpmfusion-free-updates --metalink=https://mirrors.rpmfusion.org/metalink?repo=free-fedora-updates-released-$releasever&arch=$basearch
-repo --name=rpmfusion-nonfree --metalink=https://mirrors.rpmfusion.org/metalink?repo=nonfree-fedora-$releasever&arch=$basearch
-repo --name=rpmfusion-nonfree-updates --metalink=https://mirrors.rpmfusion.org/metalink?repo=nonfree-fedora-updates-released-$releasever&arch=$basearch
+repo --name=rpmfusion-free --install --metalink=https://mirrors.rpmfusion.org/metalink?repo=free-fedora-$releasever&arch=$basearch
+repo --name=rpmfusion-free-updates --install --metalink=https://mirrors.rpmfusion.org/metalink?repo=free-fedora-updates-released-$releasever&arch=$basearch
+repo --name=rpmfusion-nonfree --install --metalink=https://mirrors.rpmfusion.org/metalink?repo=nonfree-fedora-$releasever&arch=$basearch
+repo --name=rpmfusion-nonfree-updates --install --metalink=https://mirrors.rpmfusion.org/metalink?repo=nonfree-fedora-updates-released-$releasever&arch=$basearch
 repo --name=kubernetes --baseurl=https://packages.cloud.google.com/yum/repos/kubernetes-el7-$basearch
 repo --name=code --baseurl=https://packages.microsoft.com/yumrepos/vscode
-#repo --name=docker-ce --baseurl=https://download.docker.com/linux/fedora/$releasever/$basearch/stable
 
 lang en_US.UTF-8
 keyboard us
@@ -21,26 +21,33 @@ network --hostname={{.hostname}}
 zerombr
 clearpart --all --initlabel --disklabel=gpt
 autopart --type=plain --noswap --nohome
-bootloader --timeout=1 --append="elevator=noop"
+bootloader --timeout=1 --append="elevator=noop intel_iommu=on iommu=pt rd.driver.pre=vfio-pci video=vesafb:off,efifb:off"
 
 ## packages
-%packages --excludeWeakdeps --excludedocs
+%packages --excludeWeakdeps
 @core
-@workstation-product
 @firefox
 @fonts
 @gnome-desktop
 @hardware-support
-@multimedia
 @printing
 @base-x
-@networkmanager-submodules
 
+libvirt-daemon-kvm
+qemu-kvm
+ksm
 ipmitool
-dnf-automatic
 cronie
+logrotate
+nfs-utils
+
 screen
+pciutils
 lm_sensors
+rsync
+libvirt-client
+
+dnf-automatic
 vim-enhanced
 tilix
 libva-utils
@@ -48,29 +55,92 @@ libva-intel-driver
 golang
 kubectl
 code
-#docker-ce
+docker
 
+-NetworkManager
+-plymouth
+-dhcp-client
 %end
 
 ## user
 user --name={{.default_user}} --password={{.password}} --plaintext --groups=wheel,libvirt,docker
 
 
+%post --erroronfail
+
+
 ##
-## post config
+## networkd
 ##
 
-%post --erroronfail
+## enable systemd-resolve
+ln -sf /run/systemd/resolve/resolv.conf /etc/resolv.conf
+
+## write all configs
+cat <<EOF > /etc/systemd/resolved.conf
+[Resolve]
+FallbackDNS=
+DNSStubListener=no
+EOF
+
+## host macvtap
+cat <<EOF > /etc/systemd/network/00_{{.host_if}}.network
+[Match]
+Name={{.host_if}}
+
+[Link]
+ARP=no
+MTUBytes={{.mtu}}
+
+[Network]
+LinkLocalAddressing=no
+DHCP=no
+MACVTAP=v{{.host_if}}
+EOF
+
+cat <<EOF > /etc/systemd/network/00_v{{.host_if}}.netdev
+[NetDev]
+Name=v{{.host_if}}
+Kind=macvtap
+
+[MACVTAP]
+Mode=bridge
+EOF
+
+cat <<EOF > /etc/systemd/network/00_v{{.host_if}}.network
+[Match]
+Name=v{{.host_if}}
+
+[Link]
+MTUBytes={{.mtu}}
+
+[Network]
+LinkLocalAddressing=no
+DHCP=yes
+
+[Address]
+Address={{.host_ip}}/{{.host_netmask}}
+EOF
 
 
 ##
 ## general file writes
 ##
 
+cat <<EOF > /etc/modprobe.d/local.conf
+options igb max_vfs=8
+options ixgbe max_vfs=8
+options vfio-pci ids=1002:ffffffff:ffffffff:ffffffff:00030000:ffff00ff,1002:ffffffff:ffffffff:ffffffff:00040300:ffffffff,10de:ffffffff:ffffffff:ffffffff:00030000:ffff00ff,10de:ffffffff:ffffffff:ffffffff:00040300:ffffffff
+EOF
+
+cat <<EOF > /etc/dracut.conf.d/local.conf
+add_drivers+="vfio vfio_iommu_type1 vfio_pci vfio_virqfd"
+EOF
+
 cat <<EOF > /etc/dnf/automatic.conf
 [commands]
 apply_updates=True
-upgrade_type=security
+upgrade_type=default
 
 [emitters]
 emit_via=motd
@@ -81,10 +151,13 @@ EOF
 ## enable services
 ##
 
+KERNEL_VERSION=$(rpm -q kernel --qf '%{version}-%{release}.%{arch}\n')
+dracut -f /boot/initramfs-$KERNEL_VERSION.img $KERNEL_VERSION
+
 systemctl enable \
-  chronyd crond \
-  docker \
-  dnf-automatic.timer
+  systemd-networkd systemd-resolved chronyd crond \
+  ksm ksmtuned \
+  dnf-automatic.timer docker
 
 systemctl set-default graphical.target
 
@@ -94,5 +167,9 @@ systemctl set-default graphical.target
 
 dnf -y autoremove
 dnf -y clean all
+
+## remove machineid in case of reuse - may not be needed?
+echo -n > /var/lib/dbus/machine-id
+echo -n > /etc/machine-id
 
 %end

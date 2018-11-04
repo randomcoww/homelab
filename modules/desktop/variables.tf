@@ -19,6 +19,10 @@ variable "desktop_if" {
   type = "string"
 }
 
+variable "mtu" {
+  type = "string"
+}
+
 ## ip ranges
 variable "netmask" {
   type = "string"

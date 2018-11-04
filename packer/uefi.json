@@ -39,6 +39,6 @@
     "ovmf_vars": "ovmf/OVMF_VARS.fd",
     "disk_interface": "virtio",
     "format": "qcow2",
-    "vm_name": "store-0"
+    "vm_name": "desktop-0"
   }
 }
