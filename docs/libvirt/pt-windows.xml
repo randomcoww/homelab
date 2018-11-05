@@ -55,7 +55,7 @@
       <readonly/>
     </disk>
     <controller type='scsi' model='virtio-scsi'/>
-    <controller type='usb' model='nec-xhci'>
+    <controller type='usb' model='none'/>
     <interface type='direct'>
       <source dev='eno1' mode='bridge'/>
       <model type='virtio-net'/>
@@ -71,8 +71,16 @@
     <hostdev mode='subsystem' type='pci' managed='yes'>
       <driver name='vfio'/>
       <source>
-        <address domain='0x0000' bus='0x01' slot='0x00' function='0x0' multifunction='on'/>
+        <address domain='0x0000' bus='0x01' slot='0x00' function='0x0'/>
       </source>
+      <address type='pci' domain='0x0000' bus='0x01' slot='0x00' function='0x0' multifunction='on'/>
+    </hostdev>
+    <hostdev mode='subsystem' type='pci' managed='yes'>
+      <driver name='vfio'/>
+      <source>
+        <address domain='0x0000' bus='0x01' slot='0x00' function='0x0'/>
+      </source>
+      <address type='pci' domain='0x0000' bus='0x01' slot='0x00' function='0x1'/>
     </hostdev>
     <memballoon model='none'/>
   </devices>
