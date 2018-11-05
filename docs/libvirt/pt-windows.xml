@@ -66,32 +66,25 @@
       <readonly/>
     </disk>
     <controller type='scsi' model='virtio-scsi'/>
-    <controller type='usb' model='none'/>
+    <controller type='usb' model='nec-xhci'/>
     <interface type='direct'>
       <source dev='eno1' mode='bridge'/>
       <model type='virtio-net'/>
     </interface>
     <input type='mouse' bus='virtio'/>
     <input type='keyboard' bus='virtio'/>
-    <graphics type='spice' port='20000' autoport='no' listen='127.0.0.1'>
-      <listen type='address' address='127.0.0.1'/>
+    <graphics type='spice'>
+      <listen type='socket'/>
     </graphics>
+    <sound model='usb'/>
     <video>
-      <model type='qxl'/>
+      <model type='virtio'/>
     </video>
     <hostdev mode='subsystem' type='pci' managed='yes'>
       <driver name='vfio'/>
       <source>
         <address domain='0x0000' bus='0x01' slot='0x00' function='0x0'/>
       </source>
-      <address type='pci' domain='0x0000' bus='0x01' slot='0x00' function='0x0' multifunction='on'/>
-    </hostdev>
-    <hostdev mode='subsystem' type='pci' managed='yes'>
-      <driver name='vfio'/>
-      <source>
-        <address domain='0x0000' bus='0x01' slot='0x00' function='0x0'/>
-      </source>
-      <address type='pci' domain='0x0000' bus='0x01' slot='0x00' function='0x1'/>
     </hostdev>
     <memballoon model='none'/>
   </devices>
