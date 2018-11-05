@@ -135,6 +135,7 @@ cat <<EOF > /etc/modprobe.d/local.conf
 options igb max_vfs=8
 options ixgbe max_vfs=8
 options vfio-pci ids=1002:ffffffff:ffffffff:ffffffff:00030000:ffff00ff,1002:ffffffff:ffffffff:ffffffff:00040300:ffffffff,10de:ffffffff:ffffffff:ffffffff:00030000:ffff00ff,10de:ffffffff:ffffffff:ffffffff:00040300:ffffffff
+options kvm ignore_msrs=1
 EOF
 
 cat <<EOF > /etc/dracut.conf.d/local.conf
