@@ -3,14 +3,14 @@ module "desktop" {
   source = "../modules/desktop"
 
   ## user (default container linux)
-  default_user      = "randomcoww"
-  password          = "password"
+  default_user = "randomcoww"
+  password     = "password"
 
   ## host configs
   desktop_hosts = ["desktop-0"]
   desktop_ips   = ["192.168.126.253"]
   desktop_if    = "eno1"
-  mtu         = "9000"
+  mtu           = "9000"
 
   ## ip ranges
   netmask = "23"
