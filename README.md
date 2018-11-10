@@ -29,7 +29,7 @@ livecd-creator \
     --config=store-0.ks \
     --cache=/var/cache/live \
     --releasever 28 \
-    --title store-1
+    --title store-0
 ```
 
 #### Remaining environment
