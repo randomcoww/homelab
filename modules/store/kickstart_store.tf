@@ -17,11 +17,9 @@ resource "matchbox_group" "generic_store" {
   }
 
   metadata {
-    hostname           = "${var.store_hosts[count.index]}"
     hyperkube_image    = "${var.hyperkube_image}"
     ssh_authorized_key = "cert-authority ${chomp(var.ssh_ca_public_key)}"
     default_user       = "${var.default_user}"
-    password           = "${var.password}"
 
     host_ip      = "${var.store_ips[count.index]}"
     host_if      = "${var.store_if}"

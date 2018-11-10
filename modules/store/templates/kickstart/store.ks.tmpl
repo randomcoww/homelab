@@ -1,34 +1,43 @@
-install
-shutdown
-skipx
-url --mirrorlist=http://mirrors.fedoraproject.org/mirrorlist?repo=fedora-$releasever&arch=$basearch
-repo --name=fedora-updates --mirrorlist=http://mirrors.fedoraproject.org/mirrorlist?repo=updates-released-f$releasever&arch=$basearch
-repo --name=zfs-on-linux --baseurl=http://download.zfsonlinux.org/fedora/$releasever/$basearch/
+##
+## store-* host kickstart for livecd-creator
+##
 
 lang en_US.UTF-8
 keyboard us
 timezone --utc Etc/UTC
-rootpw --lock password
+auth --useshadow --passalgo=sha512
+selinux --disabled
 firewall --disabled
-network --hostname={{.hostname}}
-
-## disk
 zerombr
-clearpart --all --initlabel --disklabel=gpt
-autopart --type=plain --noswap --nohome
-bootloader --timeout=1 --append="console=tty0 console=ttyS1,115200n8 elevator=noop intel_iommu=on iommu=pt"
+clearpart --all --disklabel=gpt
+part / --size 5120 --fstype ext4
+rootpw --lock --iscrypted locked
+shutdown
+bootloader --append="console=tty0 console=ttyS1,115200n8 elevator=noop intel_iommu=on iommu=pt rd.live.ram=1 rd.live.image ro"
 
-## packages
+repo --name=fedora --mirrorlist=https://mirrors.fedoraproject.org/mirrorlist?repo=fedora-$releasever&arch=$basearch
+repo --name=updates --mirrorlist=https://mirrors.fedoraproject.org/mirrorlist?repo=updates-released-f$releasever&arch=$basearch
+repo --name=zfs-on-linux --baseurl=http://download.zfsonlinux.org/fedora/$releasever/$basearch/
+url --mirrorlist=https://mirrors.fedoraproject.org/mirrorlist?repo=fedora-$releasever&arch=$basearch
+
 %packages --excludeWeakdeps --excludedocs
 @core
+
+## livecd-creator
+kernel
+dracut-live
+grub2-efi-x64-cdboot
+shim
+##
+
 libvirt-daemon-kvm
 qemu-kvm
 ksm
 ipmitool
 openssh-server
 cronie
+chrony
 logrotate
-kernel-devel
 zfs
 nfs-utils
 
@@ -42,21 +51,20 @@ libvirt-client
 -zfs-fuse
 -NetworkManager
 -plymouth
--dhcp-client
--ppc64-utils
 %end
-
-## user
-user --name={{.default_user}} --password={{.password}} --plaintext --groups=wheel,libvirt
-sshkey --username={{.default_user}} "{{.ssh_authorized_key}}"
-
-
-##
-## post config
-##
 
 %post --erroronfail
 
+##
+## serial autologin
+##
+
+mkdir -p /etc/systemd/system/serial-getty@.service.d
+cat <<EOF > /etc/systemd/system/serial-getty@.service.d/autologin.conf
+[Service]
+ExecStart=
+ExecStart=-/sbin/agetty -a {{.default_user}} --keep-baud 115200,38400,9600 %I $TERM
+EOF
 
 ##
 ## networkd
@@ -125,7 +133,6 @@ DHCP=yes
 Address={{.host_ip}}/{{.host_netmask}}
 EOF
 
-
 ##
 ## general file writes
 ##
@@ -135,6 +142,10 @@ options igb max_vfs=8
 options ixgbe max_vfs=8
 EOF
 
+cat <<EOF > /etc/ssh/authorized_keys
+{{.ssh_authorized_key}}
+EOF
+
 cat <<EOF > /etc/ssh/sshd_config
 Subsystem sftp internal-sftp
 ClientAliveInterval 180
@@ -142,12 +153,13 @@ UseDNS no
 PermitRootLogin no
 PasswordAuthentication no
 ChallengeResponseAuthentication no
+AuthorizedKeysFile /etc/ssh/authorized_keys
 EOF
-
 
 ##
 ## live image settings
 ## systemd configs from https://linux.xvx.cz/2017/07/how-to-build-pxe-fedora-26-live-image.html
+## https://fedoraproject.org/wiki/LiveOS_image
 ##
 
 cat <<EOF >> /etc/systemd/system.conf
@@ -161,20 +173,6 @@ ForwardToSyslog=no
 ForwardToConsole=no
 EOF
 
-
-##
-## grub
-##
-
-cat <<EOF >> /etc/default/grub
-GRUB_TERMINAL="console serial"
-GRUB_SERIAL_COMMAND="serial --unit=1 --speed=115200 --word=8 --parity=no --stop=1"
-EOF
-
-## regenerate grub config
-# grub2-mkconfig -o /boot/grub2/grub.cfg
-
-
 ##
 ## enable services
 ##
@@ -184,6 +182,8 @@ systemctl enable \
   ksm ksmtuned \
   zfs-import-cache zfs-import-scan zfs-mount zfs-share zfs-zed zfs.target nfs-server
 
+systemctl mask \
+  firstboot-text
 
 ##
 ## cleanup
@@ -192,8 +192,7 @@ systemctl enable \
 dnf -y autoremove
 dnf -y clean all
 
-## remove machineid in case of reuse - may not be needed?
-echo -n > /var/lib/dbus/machine-id
-echo -n > /etc/machine-id
+rm -f /etc/machine-id
+touch /etc/machine-id
 
 %end
