@@ -65,6 +65,11 @@
       <target dev='sdc' bus='sata'/>
       <readonly/>
     </disk>
+    <disk type='file' device='disk'>
+      <driver name='qemu' type='raw' cache='none' io='native'/>
+      <source file='/vol/img/pt-windows-data.img'/>
+      <target dev='sdd' bus='scsi'/>
+    </disk>
     <controller type='scsi' model='virtio-scsi'/>
     <controller type='usb' model='none'/>
     <interface type='direct'>
