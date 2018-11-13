@@ -46,17 +46,17 @@ cronie
 chrony
 logrotate
 nfs-utils
-docker-ce
 
 screen
 pciutils
 lm_sensors
 rsync
+hdparm
 libvirt-client
+docker-ce
 virt-viewer
 libva-utils
 libva-intel-driver
-
 vim-enhanced
 tilix
 golang
@@ -69,12 +69,21 @@ unzip
 awscli
 livecd-tools
 remmina
+gimp
+bind-utils
+
+## looking-glass
+SDL2_ttf
+##
 
 -NetworkManager
 -plymouth
 %end
 
+##
 ## user
+##
+
 user --name={{.default_user}} --password={{.password}} --plaintext --groups=wheel,libvirt,docker
 
 %post --erroronfail
