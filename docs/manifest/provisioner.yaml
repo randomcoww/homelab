@@ -70,6 +70,7 @@ items:
 
               ip protocol icmp icmp type { echo-request, echo-reply, time-exceeded, parameter-problem, destination-unreachable } accept;
 
+              iifname $if_trusted accept;
               iifname $if_internal oifname $if_external accept;
 
               iifname $if_internal tcp dport @tcp_fwd accept;
