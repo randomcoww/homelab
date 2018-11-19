@@ -49,7 +49,7 @@
   <devices>
     <emulator>/usr/bin/qemu-system-x86_64</emulator>
     <disk type='file' device='disk'>
-      <driver name='qemu' type='raw' cache='none' io='native'/>
+      <driver name='qemu' type='raw' cache='none' io='native' discard='unmap'/>
       <source file='/vol/img/pt-windows.img'/>
       <target dev='sda' bus='scsi'/>
       <boot order='2'/>
@@ -68,7 +68,7 @@
       <readonly/>
     </disk>
     <disk type='file' device='disk'>
-      <driver name='qemu' type='raw' cache='none' io='native'/>
+      <driver name='qemu' type='raw' cache='none' io='native' discard='unmap'/>
       <source file='/vol/img/pt-windows-data.img'/>
       <target dev='sdd' bus='scsi'/>
     </disk>
