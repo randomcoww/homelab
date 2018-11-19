@@ -4,7 +4,7 @@ module "desktop" {
 
   ## user (default container linux)
   default_user = "randomcoww"
-  password     = "$1$Tfw58onC$LlmO0qsSa9WAsRh0bJwzW0"
+  password     = "password"
 
   ## host configs
   desktop_hosts = ["desktop-0"]

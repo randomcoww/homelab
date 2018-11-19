@@ -13,7 +13,7 @@ clearpart --all --disklabel=gpt
 part / --size 5120 --fstype ext4
 rootpw --lock --iscrypted locked
 shutdown
-bootloader --append="console=tty0 console=ttyS1,115200n8 elevator=noop intel_iommu=on iommu=pt rd.live.ram=1 rd.live.image ro"
+bootloader --append="console=tty0 console=ttyS1,115200n8 elevator=noop intel_iommu=on iommu=pt rd.live.ram=1"
 
 repo --name=fedora --mirrorlist=https://mirrors.fedoraproject.org/mirrorlist?repo=fedora-$releasever&arch=$basearch
 repo --name=updates --mirrorlist=https://mirrors.fedoraproject.org/mirrorlist?repo=updates-released-f$releasever&arch=$basearch
@@ -182,7 +182,10 @@ systemctl enable \
   zfs-import-cache zfs-import-scan zfs-mount zfs-share zfs-zed zfs.target nfs-server
 
 systemctl mask \
-  firstboot-text
+  NetworkManager \
+  firstboot-text \
+  mdmonitor \
+  mdmonitor-takeover
 
 ##
 ## cleanup
