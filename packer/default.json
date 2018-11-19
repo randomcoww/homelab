@@ -4,15 +4,15 @@
       "boot_command" : [
         "<tab> ",
         "inst.text ",
-        "inst.ks=http://{{.HTTPIP}}:8080/generic?host={{.Name}} ",
+        "inst.ks=http://192.168.126.242:58080/generic?host={{.Name}} ",
         "<enter>"
       ],
       "disk_size" : 30000,
       "headless" : false,
       "http_directory" : "packer",
       "iso_checksum_type": "sha256",
-      "iso_checksum": "ea1efdc692356b3346326f82e2f468903e8da59324fdee8b10eac4fea83f23fe",
-      "iso_url": "https://download.fedoraproject.org/pub/fedora/linux/releases/28/Server/x86_64/iso/Fedora-Server-netinst-x86_64-28-1.1.iso",
+      "iso_checksum": "6554404b66d38b89693232966d9290ed62156e32d1edde4074b1d25c97a7b10e",
+      "iso_url": "https://download.fedoraproject.org/pub/fedora/linux/releases/29/Workstation/x86_64/iso/Fedora-Workstation-netinst-x86_64-29-1.2.iso",
       "shutdown_command" : "",
       "disk_interface": "virtio",
       "net_device": "virtio-net",
@@ -30,6 +30,6 @@
     }
   ],
   "variables": {
-    "vm_name": "store-1"
+    "vm_name": "desktop-0"
   }
 }
