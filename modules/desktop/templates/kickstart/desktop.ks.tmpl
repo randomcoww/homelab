@@ -10,7 +10,7 @@ clearpart --all --disklabel=gpt
 
 part /boot/efi --fstype=efi --size=200
 part /boot --fstype=ext4 --size=512
-part / --fstype=ext4 --size=8192 --grow
+part / --fstype=ext4 --size=122880 --grow
 
 rootpw --lock --iscrypted locked
 network --hostname={{.hostname}}
@@ -29,7 +29,8 @@ repo --name=rpmfusion-nonfree-updates --install --metalink=https://mirrors.rpmfu
 
 repo --name=kubernetes --install --baseurl=https://packages.cloud.google.com/yum/repos/kubernetes-el7-$basearch
 repo --name=code --install --baseurl=https://packages.microsoft.com/yumrepos/vscode
-repo --name=docker-ce --install --baseurl=https://download.docker.com/linux/fedora/$releasever/$basearch/stable
+# repo --name=docker-ce --install --baseurl=https://download.docker.com/linux/fedora/$releasever/$basearch/stable
+repo --name=docker-ce --install --baseurl=https://download.docker.com/linux/fedora/28/$basearch/stable
 
 %packages --excludeWeakdeps
 @core
@@ -73,12 +74,16 @@ livecd-tools
 remmina
 gimp
 bind-utils
+openssl
+shadow-utils
 
 ## looking-glass
 SDL2_ttf
 ##
 
 -zfs-fuse
+-plymouth
+-plymouth-*
 %end
 
 ##
