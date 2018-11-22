@@ -6,14 +6,14 @@ timezone --utc America/Los_Angeles
 auth --useshadow --passalgo=sha512
 firewall --disabled
 zerombr
-clearpart --all --disklabel=gpt
-# clearpart --none
+# clearpart --all --disklabel=gpt
+clearpart --none
 
-part /boot/efi --fstype=efi --size=200
-part /boot --fstype=ext4 --size=512
-part / --fstype=ext4 --size=20480
-part /home --fstype=ext4 --size=1024 --grow
-# part /home --fstype=ext4 --size=1024 --grow --noformat
+part /boot/efi --fstype=efi --size=200 --onpart /dev/nvme0n1p1
+part /boot --fstype=ext4 --size=512 --onpart /dev/nvme0n1p2
+part / --fstype=ext4 --size=20480 --onpart /dev/nvme0n1p3
+# part /home --fstype=ext4 --size=1024 --grow --onpart /dev/nvme0n1p4
+part /home --fstype=ext4 --size=1024 --grow --noformat --onpart /dev/nvme0n1p4
 
 rootpw --lock --iscrypted locked
 network --hostname={{.hostname}}
@@ -53,6 +53,7 @@ logrotate
 nfs-utils
 
 tmux
+xclip
 pciutils
 lm_sensors
 rsync
@@ -174,7 +175,6 @@ dracut -f /boot/initramfs-$KERNEL_VERSION.img $KERNEL_VERSION
 systemctl enable \
   systemd-networkd systemd-resolved chronyd crond \
   ksm ksmtuned \
-  zfs-import-cache zfs-import-scan zfs-mount zfs-share zfs-zed zfs.target nfs-server \
   docker
 
 systemctl mask \
