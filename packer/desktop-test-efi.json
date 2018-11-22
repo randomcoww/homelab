@@ -2,34 +2,43 @@
   "builders": [
     {
       "boot_command" : [
-        "<tab> ",
+        "e",
+        "<down><down><end> ",
+        "nomodeset ",
         "inst.text ",
         "inst.ks=http://192.168.126.242:58080/generic?host={{.Name}} ",
-        "<enter>"
+        "<leftCtrlOn>x<leftCtrlOff>"
       ],
-      "disk_size" : 30000,
+      "disk_size" : 60000,
       "headless" : false,
       "http_directory" : "packer",
       "iso_checksum_type": "sha256",
       "iso_checksum": "6554404b66d38b89693232966d9290ed62156e32d1edde4074b1d25c97a7b10e",
       "iso_url": "https://download.fedoraproject.org/pub/fedora/linux/releases/29/Workstation/x86_64/iso/Fedora-Workstation-netinst-x86_64-29-1.2.iso",
       "shutdown_command" : "",
-      "disk_interface": "virtio",
+      "disk_interface": "{{user `disk_interface`}}",
       "net_device": "virtio-net",
       "communicator": "none",
       "type": "qemu",
       "shutdown_timeout": "30m",
       "qemuargs": [
         [ "-m", "4096M" ],
-        [ "-smp", "4" ]
+        [ "-smp", "4" ],
+        [ "-drive", "if=pflash,format=raw,readonly=on,file={{user `ovmf_code`}},unit=0" ],
+        [ "-drive", "if=pflash,format=raw,file={{user `ovmf_vars`}},unit=1" ],
+        [ "-drive", "file={{.OutputDir}}/{{.Name}},if={{user `disk_interface`}},cache=writeback,discard=ignore,format={{user `format`}}" ]
       ],
       "accelerator": "kvm",
       "vm_name": "{{user `vm_name`}}",
-      "format": "qcow2",
+      "format": "{{user `format`}}",
       "output_directory": "output-qemu"
     }
   ],
   "variables": {
+    "ovmf_code": "/usr/share/OVMF/OVMF_CODE.fd",
+    "ovmf_vars": "ovmf/OVMF_VARS.fd",
+    "disk_interface": "virtio",
+    "format": "qcow2",
     "vm_name": "desktop-0"
   }
 }
