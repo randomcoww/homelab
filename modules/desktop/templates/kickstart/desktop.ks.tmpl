@@ -24,15 +24,15 @@ repo --name=fedora --mirrorlist=https://mirrors.fedoraproject.org/mirrorlist?rep
 repo --name=updates --mirrorlist=https://mirrors.fedoraproject.org/mirrorlist?repo=updates-released-f$releasever&arch=$basearch
 url --mirrorlist=https://mirrors.fedoraproject.org/mirrorlist?repo=fedora-$releasever&arch=$basearch
 
-repo --name=rpmfusion-free --install --metalink=https://mirrors.rpmfusion.org/metalink?repo=free-fedora-$releasever&arch=$basearch
-repo --name=rpmfusion-free-updates --install --metalink=https://mirrors.rpmfusion.org/metalink?repo=free-fedora-updates-released-$releasever&arch=$basearch
-repo --name=rpmfusion-nonfree --install --metalink=https://mirrors.rpmfusion.org/metalink?repo=nonfree-fedora-$releasever&arch=$basearch
-repo --name=rpmfusion-nonfree-updates --install --metalink=https://mirrors.rpmfusion.org/metalink?repo=nonfree-fedora-updates-released-$releasever&arch=$basearch
+repo --name=rpmfusion-free --metalink=https://mirrors.rpmfusion.org/metalink?repo=free-fedora-$releasever&arch=$basearch
+repo --name=rpmfusion-free-updates --metalink=https://mirrors.rpmfusion.org/metalink?repo=free-fedora-updates-released-$releasever&arch=$basearch
+repo --name=rpmfusion-nonfree --metalink=https://mirrors.rpmfusion.org/metalink?repo=nonfree-fedora-$releasever&arch=$basearch
+repo --name=rpmfusion-nonfree-updates --metalink=https://mirrors.rpmfusion.org/metalink?repo=nonfree-fedora-updates-released-$releasever&arch=$basearch
 
-repo --name=kubernetes --install --baseurl=https://packages.cloud.google.com/yum/repos/kubernetes-el7-$basearch
-repo --name=code --install --baseurl=https://packages.microsoft.com/yumrepos/vscode
-# repo --name=docker-ce --install --baseurl=https://download.docker.com/linux/fedora/$releasever/$basearch/stable
-repo --name=docker-ce --install --baseurl=https://download.docker.com/linux/fedora/28/$basearch/stable
+repo --name=kubernetes --baseurl=https://packages.cloud.google.com/yum/repos/kubernetes-el7-$basearch
+repo --name=code --baseurl=https://packages.microsoft.com/yumrepos/vscode
+# repo --name=docker-ce --baseurl=https://download.docker.com/linux/fedora/$releasever/$basearch/stable
+repo --name=docker-ce --baseurl=https://download.docker.com/linux/fedora/28/$basearch/stable
 
 %packages --excludeWeakdeps
 @core
@@ -60,7 +60,6 @@ rsync
 hdparm
 libvirt-client
 docker-ce
-virt-viewer
 libva-utils
 libva-intel-driver
 vim-enhanced
@@ -74,6 +73,9 @@ unzip
 awscli
 livecd-tools
 remmina
+remmina-plugins-vnc
+remmina-plugins-rdp
+remmina-plugins-spice
 gimp
 bind-utils
 openssl
