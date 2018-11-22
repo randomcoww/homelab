@@ -19,7 +19,6 @@ bootloader --append="elevator=noop intel_iommu=on iommu=pt plymouth.enable=0 rd.
 
 repo --name=fedora --mirrorlist=https://mirrors.fedoraproject.org/mirrorlist?repo=fedora-$releasever&arch=$basearch
 repo --name=updates --mirrorlist=https://mirrors.fedoraproject.org/mirrorlist?repo=updates-released-f$releasever&arch=$basearch
-repo --name=zfs-on-linux --baseurl=http://download.zfsonlinux.org/fedora/$releasever/$basearch/
 url --mirrorlist=https://mirrors.fedoraproject.org/mirrorlist?repo=fedora-$releasever&arch=$basearch
 
 repo --name=rpmfusion-free --install --metalink=https://mirrors.rpmfusion.org/metalink?repo=free-fedora-$releasever&arch=$basearch
@@ -30,6 +29,7 @@ repo --name=rpmfusion-nonfree-updates --install --metalink=https://mirrors.rpmfu
 repo --name=kubernetes --install --baseurl=https://packages.cloud.google.com/yum/repos/kubernetes-el7-$basearch
 repo --name=code --install --baseurl=https://packages.microsoft.com/yumrepos/vscode
 # repo --name=docker-ce --install --baseurl=https://download.docker.com/linux/fedora/$releasever/$basearch/stable
+repo --name=docker-ce --install --baseurl=https://download.docker.com/linux/fedora/28/$basearch/stable
 
 %packages --excludeWeakdeps
 @core
@@ -55,7 +55,7 @@ lm_sensors
 rsync
 hdparm
 libvirt-client
-# docker-ce
+docker-ce
 virt-viewer
 libva-utils
 libva-intel-driver
@@ -80,7 +80,6 @@ shadow-utils
 SDL2_ttf
 ##
 
--zfs-fuse
 -plymouth
 -plymouth-*
 %end
@@ -173,8 +172,8 @@ dracut -f /boot/initramfs-$KERNEL_VERSION.img $KERNEL_VERSION
 systemctl enable \
   systemd-networkd systemd-resolved chronyd crond \
   ksm ksmtuned \
-  zfs-import-cache zfs-import-scan zfs-mount zfs-share zfs-zed zfs.target nfs-server
-  # docker
+  zfs-import-cache zfs-import-scan zfs-mount zfs-share zfs-zed zfs.target nfs-server \
+  docker
 
 systemctl mask \
   NetworkManager
