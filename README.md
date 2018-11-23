@@ -4,7 +4,7 @@ All VMs run on [CoreOS Container Linux](https://coreos.com/os/docs/latest/) usin
 
 Config rendering is handled by [CoreOS Matchbox](https://github.com/coreos/matchbox/).
 
-[HashiCorp Terraform](https://www.hashicorp.com/products/terraform) is used in all steps. The [Terraform Matchbox plugin](https://github.com/coreos/terraform-provider-matchbox) is needed. S3 is used at the backend store for Terraform and requires AWS access from the dev environment.
+[HashiCorp Terraform](https://www.hashicorp.com/products/terraform) is used in all steps. The [Terraform Matchbox plugin](https://github.com/coreos/terraform-provider-matchbox) is needed. S3 is used as the backend store for Terraform and requires AWS access from the dev environment.
 
 The hypervisor and all VMs run on RAM disk and keep no state. Any persistent configuration is intended to live on shared NFS (at 192.168.126.251 in my case).
 
@@ -166,7 +166,7 @@ terraform init
 terraform apply
 ```
 
-I currently have no PXE boot environment for Fedora. The following boot args can be added to a Fedora 29 installer to use:
+I currently have no PXE boot environment for Fedora. The following boot args can be added to a Fedora 29 installer to use. 192.168.126.242:58080 is where I run the provisioner Matchbox instance.
 ```
 inst.text inst.ks=http://192.168.126.242:58080/generic?host=desktop-0
 ```
