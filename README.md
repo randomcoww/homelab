@@ -147,3 +147,26 @@ Admin kubeconfig:
 ```
 setup_environment/output/kube-cluster/<name_of_cluster>/admin.kubeconfig
 ```
+
+### Desktop Provisioning
+
+[Setup desktop](setup_desktop) generates a kickstart for my desktop box. The following disk with existing partitions is assumed and the home partition is not formatted:
+
+```
+part /boot/efi --fstype=efi --size=200 --onpart /dev/nvme0n1p1
+part /boot --fstype=ext4 --size=512 --onpart /dev/nvme0n1p2
+part / --fstype=ext4 --size=20480 --onpart /dev/nvme0n1p3
+part /home --fstype=ext4 --size=1024 --grow --noformat --onpart /dev/nvme0n1p4
+```
+
+Generate Kickstart:
+```
+cd setup_desktop
+terraform init
+terraform apply
+```
+
+I currently have no PXE boot environment for Fedora. The following boot args can be added to a Fedora 29 installer to use:
+```
+inst.text inst.ks=http://192.168.126.242:58080/generic?host=desktop-0
+```
