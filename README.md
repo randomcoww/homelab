@@ -40,7 +40,7 @@ terraform init
 terraform apply
 ```
 
-#### Hypervisor Image
+#### Hypervisor image
 
 Generate hypervisor kickstart for live boot images:
 ```
@@ -106,14 +106,14 @@ virsh start provisioner-0
 
 These steps are ugly and need revising.
 
-#### Terraform Output
+#### Terraform output
 
 SSH CA private key for the hypervisor and provisioner VMs:
 ```
 setup_provisioner/output/ssh-ca-key.pem
 ```
 
-### Kubernetes and Remaining Environment
+### Kubernetes and remaining environment
 
 [Setup environment](setup_environment) handles generating PXE boot configurations that are pushed to the provisioner. This currently consists of a three master and two worker Kubernetes cluster.
 
@@ -136,7 +136,7 @@ virsh start controller-0
 ...
 ```
 
-#### Terraform Output
+#### Terraform output
 
 SSH CA private key for the Kubernetes VMs:
 ```
@@ -148,7 +148,7 @@ Admin kubeconfig:
 setup_environment/output/kube-cluster/<name_of_cluster>/admin.kubeconfig
 ```
 
-### Desktop Provisioning
+### Desktop provisioning
 
 [Setup desktop](setup_desktop) generates a kickstart for my desktop box. The following disk with existing partitions is assumed and the home partition is not formatted:
 
