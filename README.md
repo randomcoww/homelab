@@ -1,25 +1,48 @@
-### Terraform configs for provisioning homelab resources
+## Terraform configs for provisioning homelab resources
 
-All VMs run CoreOS Container Linux.
+All VMs run on [CoreOS Container Linux](https://coreos.com/os/docs/latest/) using [Ignition](https://coreos.com/ignition/docs/latest/) for boot time configuration.
+
 Config rendering is handled by [CoreOS Matchbox](https://github.com/coreos/matchbox/).
 
-#### Renderer
+[HashiCorp Terraform](https://www.hashicorp.com/products/terraform) is used in all steps. The [Terraform Matchbox plugin](https://github.com/coreos/terraform-provider-matchbox) is needed. S3 is used at the backend store for Terraform and requires AWS access from the dev environment.
 
-[Renderer](setup_renderer) generates minimal configuration for standing up a local Matchbox server that accepts configuration from terraform.
-This is used to generate configuration for provisioning the VM host and PXE boot environment VM before a network boot environment is available.
+The hypervisor and all VMs run on RAM disk and keep no state. Any persistent configuration is intended to live on shared NFS (at 192.168.126.251 in my case).
 
+### Renderer
+
+[Renderer](setup_renderer) generates minimal configuration for standing up a local Matchbox server that accepts configuration from terraform and provides rendered configuration over http.
+This is used to render configuration that cannot be provided over PXE (i.e. provisioner for the PXE server itself and hypervisor that they run on).
+
+Generate TLS for local Matchbox
 ```
 cd setup_renderer
+terraform init
+terraform apply
+```
+
+Start local Matchbox on Docker
+```
 ./run_matchbox.sh
 ```
 
-#### Provisioner
+Service runs at:
+```
+http://127.0.0.1:8080
+```
 
-[Provisioner](setup_provisioner) is configuration for Matchbox and the network PXE environment itself. These configs can be pushed to the local renderer to generate. Currently, the rendered configs need to be commited to the repo path [static](static) and referenced through github raw in [libvirt](docs/libvirt/provisioner-0.xml) and [ignition](docs/ignition/provisioner-0.ign) to stand up the server.
+### Provisioner
 
-Hypervisor/storage hardware hosts (store-*) images are built using [livecd-creator](https://github.com/livecd-tools/livecd-tools).
+[Provisioner](setup_provisioner) generates configuration for the PXE boot environment on the local Matchbox instance. Provisioner consists of a network gateway with Nftables and a PXE environemnt with a Matchbox instance of its own, DHCP and TFTP.
 
-With local matchbox running:
+```
+cd setup_provisioner
+terraform init
+terraform apply
+```
+
+#### Hypervisor Image
+
+Generate hypervisor kickstart for live boot images:
 ```
 wget -O store-0.ks \
     http://127.0.0.1:8080/generic?host=store-0
@@ -30,13 +53,78 @@ livecd-creator \
     --cache=/var/cache/live \
     --releasever 28 \
     --title store-0
+
+wget -O store-1.ks \
+    http://127.0.0.1:8080/generic?host=store-1
+
+livecd-creator \
+    --verbose \
+    --config=store-1.ks \
+    --cache=/var/cache/live \
+    --releasever 28 \
+    --title store-1
+```
+These images are configured to run only in RAM disk, and no state is saved.
+
+#### Provisioner VM
+
+Provisioner VMs serving PXE also serve as the WAN gateway intended to boot on ISP DHCP. Ignition configuration is pulled from this github repo at boot time.
+
+Copy and push CoreOS ignition configs to repo:
+```
+cd docs/ignition
+
+wget -O provisioner-0.ign \
+    http://127.0.0.1:8080/ignition?mac=52-54-00-1a-61-2a
+wget -O provisioner-1.ign \
+    http://127.0.0.1:8080/ignition?mac=52-54-00-1a-61-2b
+    
+git add provisioner-0.ign provisioner-1.ign
+...
 ```
 
-#### Remaining environment
+VM runs Kubelet in masterless mode to provide most of its services. The configuration for this is provided as a YAML manifest which is also pushed to and served from this repo:
 
-[Setup environment](setup_environment) contains configuration that will only work after the provisioner is deployed. Currently it will deploy a three master and two worker Kubernetes cluster from libvirt configs in [docs](docs/libvirt)
+```
+cd docs/manifest
 
-#### VM data persistence
+wget -O provisioner.yaml \
+    http://127.0.0.1:8080/generic?manifest=provisioner
+    
+git add provisioner.yaml
+...
+```
 
-* Hypervisor images are intended to boot from a flash drive and run on RAM disk. There is no configuration for persistence by default.
-* Proviosioner and Kubernetes VMs also run on RAM disk using the default configuration of Container Linux PXE boot. There is no root disk persistence.
+Compatible KVM libvirt configurations are under [docs](docs/libvirt). I currently have no automation for defining and starting VMs.
+```
+virsh define provisioner-0.xml
+virsh define provisioner-1.xml
+
+virsh start provisioner-0
+...
+```
+
+These steps are ugly and need revising.
+
+### Kubernetes and Remaining Environment
+
+[Setup environment](setup_environment) handles generating PXE boot configurations that are pushed to the provisioner. This currently consists of a three master and two worker Kubernetes cluster.
+
+Populate provisioner Matchbox instance:
+```
+cd setup_environment
+terraform init
+terraform apply
+```
+
+Compatible KVM libvirt configurations are under [docs](docs/libvirt). I currently have no automation for defining and starting VMs.
+```
+virsh define controller-0.xml
+virsh define controller-1.xml
+virsh define controller-2.xml
+virsh define worker-0.xml
+virsh define worker-1.xml
+
+virsh start controller-0
+...
+```
