@@ -51,7 +51,7 @@ livecd-creator \
     --verbose \
     --config=store-0.ks \
     --cache=/var/cache/live \
-    --releasever 28 \
+    --releasever 29 \
     --title store-0
 
 wget -O store-1.ks \
@@ -61,7 +61,7 @@ livecd-creator \
     --verbose \
     --config=store-1.ks \
     --cache=/var/cache/live \
-    --releasever 28 \
+    --releasever 29 \
     --title store-1
 ```
 These images are configured to run only in RAM disk, and no state is saved.
@@ -106,6 +106,13 @@ virsh start provisioner-0
 
 These steps are ugly and need revising.
 
+#### Terraform Output
+
+SSH CA private key for the hypervisor and provisioner VMs:
+```
+setup_provisioner/output/ssh-ca-key.pem
+```
+
 ### Kubernetes and Remaining Environment
 
 [Setup environment](setup_environment) handles generating PXE boot configurations that are pushed to the provisioner. This currently consists of a three master and two worker Kubernetes cluster.
@@ -127,4 +134,16 @@ virsh define worker-1.xml
 
 virsh start controller-0
 ...
+```
+
+#### Terraform Output
+
+SSH CA private key for the Kubernetes VMs:
+```
+setup_environment/output/ssh-ca-key.pem
+```
+
+Admin kubeconfig:
+```
+setup_environment/output/kube-cluster/<name_of_cluster>/admin.kubeconfig
 ```
