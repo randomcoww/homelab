@@ -54,7 +54,6 @@ module "provisioner" {
   metallb_ip_range    = "192.168.127.128/25"
 
   ## persist data on host
-  kea_mount_path      = "/data/pv/kea"
   matchbox_mount_path = "/data/pv/matchbox"
 
   ## github provisioner url

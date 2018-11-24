@@ -175,10 +175,6 @@ variable "matchbox_path" {
   default = "/var/lib/matchbox"
 }
 
-variable "kea_mount_path" {
-  type = "string"
-}
-
 variable "matchbox_mount_path" {
   type = "string"
 }
