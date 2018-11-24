@@ -216,10 +216,10 @@ items:
                     "high-availability": [
                       {
                         "this-server-name": "$(NODE_NAME)",
-                        "mode": "load-balancing",
+                        "mode": "hot-standby",
                         "max-unacked-clients": 5,
                         "peers": [
-                          {"name":"provisioner-0","role":"primary","url":"http://192.168.126.217:58082/"},{"name":"provisioner-1","role":"secondary","url":"http://192.168.126.218:58082/"}
+                          {"name":"provisioner-0","role":"primary","url":"http://192.168.126.217:58082/"},{"name":"provisioner-1","role":"standby","url":"http://192.168.126.218:58082/"}
                         ]
                       }
                     ]
