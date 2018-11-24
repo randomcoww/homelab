@@ -17,7 +17,7 @@ module "provisioner" {
   provisioner_macs        = ["52-54-00-1a-61-2a", "52-54-00-1a-61-2b"]
   provisioner_lan_ips     = ["192.168.62.217", "192.168.62.218"]
   provisioner_store_ips   = ["192.168.126.217", "192.168.126.218"]
-  kea_ha_roles            = ["primary", "secondary"]
+  kea_ha_roles            = ["primary", "standby"]
   provisioner_lan_if      = "eth0"
   provisioner_store_if    = "eth1"
   provisioner_wan_if      = "eth2"
@@ -27,7 +27,7 @@ module "provisioner" {
   hyperkube_image  = "gcr.io/google_containers/hyperkube:${local.kubernetes_version}"
   keepalived_image = "randomcoww/keepalived:20180913.01"
   nftables_image   = "randomcoww/nftables:20180913.01"
-  kea_image        = "randomcoww/kea:1.4.0"
+  kea_image        = "randomcoww/kea:1.4.0-P1"
   tftpd_image      = "randomcoww/tftpd_ipxe:20180913.01"
   matchbox_image   = "quay.io/coreos/matchbox:latest"
 

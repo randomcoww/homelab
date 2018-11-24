@@ -216,10 +216,7 @@ items:
                     "high-availability": [
                       {
                         "this-server-name": "$(NODE_NAME)",
-                        "mode": "load-balancing",
-                        "heartbeat-delay": 10000,
-                        "max-response-delay": 10000,
-                        "max-ack-delay": 5000,
+                        "mode": "hot-standby",
                         "max-unacked-clients": 5,
                         "peers": [
                           {{.kea_ha_peers}}
