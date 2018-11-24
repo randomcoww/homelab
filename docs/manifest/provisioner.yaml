@@ -123,7 +123,7 @@ items:
     hostNetwork: true
     containers:
     - name: kea-control-agent
-      image: randomcoww/kea:1.4.0
+      image: randomcoww/kea:1.4.0-P1
       args:
       - kea-ctrl-agent
       env:
@@ -146,7 +146,7 @@ items:
         mountPath: "/var/lib/kea"
         readOnly: false
     - name: kea-dhcp4
-      image: randomcoww/kea:1.4.0
+      image: randomcoww/kea:1.4.0-P1
       args:
       - kea-dhcp4
       env:
@@ -217,9 +217,6 @@ items:
                       {
                         "this-server-name": "$(NODE_NAME)",
                         "mode": "load-balancing",
-                        "heartbeat-delay": 10000,
-                        "max-response-delay": 10000,
-                        "max-ack-delay": 5000,
                         "max-unacked-clients": 5,
                         "peers": [
                           {"name":"provisioner-0","role":"primary","url":"http://192.168.126.217:58082/"},{"name":"provisioner-1","role":"secondary","url":"http://192.168.126.218:58082/"}
