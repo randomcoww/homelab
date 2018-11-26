@@ -82,6 +82,10 @@ variable "matchbox_image" {
   type = "string"
 }
 
+variable "syncthing_image" {
+  type = "string"
+}
+
 ## ports
 variable "matchbox_http_port" {
   type = "string"
@@ -175,8 +179,9 @@ variable "matchbox_path" {
   default = "/var/lib/matchbox"
 }
 
-variable "matchbox_mount_path" {
-  type = "string"
+variable "syncthing_path" {
+  type    = "string"
+  default = "/var/syncthing/config"
 }
 
 ## provisioner provisions from github

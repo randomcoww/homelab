@@ -12,6 +12,8 @@ locals {
     role = "%s"
     url  = "http://%s:${var.kea_peer_port}/"
   }
+
+  syncthing_devices_template = "<device id=\"%s\"></device>"
 }
 
 resource "matchbox_group" "manifest_provisioner" {
@@ -30,6 +32,7 @@ resource "matchbox_group" "manifest_provisioner" {
     kea_image        = "${var.kea_image}"
     tftpd_image      = "${var.tftpd_image}"
     matchbox_image   = "${var.matchbox_image}"
+    syncthing_image  = "${var.syncthing_image}"
 
     matchbox_http_port = "${var.matchbox_http_port}"
     matchbox_rpc_port  = "${var.matchbox_rpc_port}"
@@ -57,13 +60,18 @@ resource "matchbox_group" "manifest_provisioner" {
     certs_path          = "${var.certs_path}"
     kea_path            = "${var.kea_path}"
     matchbox_path       = "${var.matchbox_path}"
-    matchbox_mount_path = "${var.matchbox_mount_path}"
+    syncthing_path      = "${var.syncthing_path}"
 
     kea_ha_peers = "${join(",", formatlist(
       "${jsonencode(local.kea_ha_peers_template)}",
       "${var.provisioner_hosts}",
       "${var.kea_ha_roles}",
       "${var.provisioner_store_ips}"
+    ))}"
+
+    syncthing_devices = "${join("", formatlist(
+      "${local.syncthing_devices_template}",
+      "${data.syncthing_device.syncthing.*.device_id}"
     ))}"
   }
 }

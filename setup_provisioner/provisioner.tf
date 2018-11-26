@@ -30,6 +30,7 @@ module "provisioner" {
   kea_image        = "randomcoww/kea:1.4.0-P1"
   tftpd_image      = "randomcoww/tftpd_ipxe:20180913.01"
   matchbox_image   = "quay.io/coreos/matchbox:latest"
+  syncthing_image  = "randomcoww/syncthing:20181125.01"
 
   ## ports
   matchbox_http_port = "58080"
@@ -52,9 +53,6 @@ module "provisioner" {
   lan_dhcp_ip_range   = "192.168.62.64/26"
   store_dhcp_ip_range = "192.168.126.64/26"
   metallb_ip_range    = "192.168.127.128/25"
-
-  ## persist data on host
-  matchbox_mount_path = "/data/pv/matchbox"
 
   ## github provisioner url
   remote_provision_url = "https://raw.githubusercontent.com/randomcoww/terraform/master/docs"

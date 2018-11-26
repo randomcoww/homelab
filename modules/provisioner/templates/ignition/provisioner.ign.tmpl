@@ -117,6 +117,16 @@ storage:
       mode: 420
       contents:
         inline: "{{.tls_matchbox_key}}"
+    - path: {{.certs_path}}/syncthing.pem
+      filesystem: root
+      mode: 420
+      contents:
+        inline: "{{.tls_syncthing}}"
+    - path: {{.certs_path}}/syncthing-key.pem
+      filesystem: root
+      mode: 420
+      contents:
+        inline: "{{.tls_syncthing_key}}"
 
     - path: {{.kubelet_path}}/kubelet-config.yaml
       filesystem: root
