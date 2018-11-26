@@ -150,10 +150,10 @@ items:
       args:
       - kea-dhcp4
       env:
-      - name: NODE_IP
+      - name: NODE_NAME
         valueFrom:
           fieldRef:
-            fieldPath: status.hostIP
+            fieldPath: spec.nodeName
       - name: KEA_LOCAL_CONFIG
         value: |-
           {
@@ -215,11 +215,11 @@ items:
                   "parameters": {
                     "high-availability": [
                       {
-                        "this-server-name": "$(NODE_IP)",
+                        "this-server-name": "$(NODE_NAME)",
                         "mode": "hot-standby",
                         "max-unacked-clients": 5,
                         "peers": [
-                          {"name":"192.168.126.217","role":"primary","url":"http://192.168.126.217:58082/"},{"name":"192.168.126.218","role":"standby","url":"http://192.168.126.218:58082/"}
+                          {"name":"provisioner-0","role":"primary","url":"http://192.168.126.217:58082/"},{"name":"provisioner-1","role":"standby","url":"http://192.168.126.218:58082/"}
                         ]
                       }
                     ]
@@ -371,14 +371,6 @@ items:
     - name: syncthing
       image: randomcoww/syncthing:20181125.01
       env:
-      - name: NODE_NAME
-        valueFrom:
-          fieldRef:
-            fieldPath: spec.nodeName
-      - name: NODE_IP
-        valueFrom:
-          fieldRef:
-            fieldPath: status.hostIP
       - name: CERT_PATH
         value: /etc/ssl/certs/syncthing.pem
       - name: KEY_PATH
@@ -386,16 +378,13 @@ items:
       - name: SYNCTHING_LOCAL_CONFIG
         value: |-
           <configuration version="28">
-            <folder id="default" label="matchbox" path="/var/lib/matchbox" type="sendreceive" rescanIntervalS="60">
-              <device id="5KRPDOW-PV74VRB-OBVWNDY-CPK35QW-HD56ZRN-LMGNWIA-QOYIOGV-4HRMAAO"></device>
-              <device id="5VBZ3SG-UZNR5DT-EGDTU25-UMWGPGU-J44KCUO-OGUPNNU-SDHCR2W-NEBINA7"></device>
+            <folder id="default" label="matchbox" path="/var/lib/matchbox" type="sendreceive" rescanIntervalS="10">
+              <device id="5KRPDOW-PV74VRB-OBVWNDY-CPK35QW-HD56ZRN-LMGNWIA-QOYIOGV-4HRMAAO"></device><device id="5VBZ3SG-UZNR5DT-EGDTU25-UMWGPGU-J44KCUO-OGUPNNU-SDHCR2W-NEBINA7"></device>
               <autoAcceptFolders>true</autoAcceptFolders>
             </folder>
-            <device id="5KRPDOW-PV74VRB-OBVWNDY-CPK35QW-HD56ZRN-LMGNWIA-QOYIOGV-4HRMAAO"></device>
-            <device id="5VBZ3SG-UZNR5DT-EGDTU25-UMWGPGU-J44KCUO-OGUPNNU-SDHCR2W-NEBINA7"></device>
+            <device id="5KRPDOW-PV74VRB-OBVWNDY-CPK35QW-HD56ZRN-LMGNWIA-QOYIOGV-4HRMAAO"></device><device id="5VBZ3SG-UZNR5DT-EGDTU25-UMWGPGU-J44KCUO-OGUPNNU-SDHCR2W-NEBINA7"></device>
             <gui enabled="false"/>
             <options>
-              <listenAddress>default</listenAddress>
               <globalAnnounceEnabled>false</globalAnnounceEnabled>
               <localAnnounceEnabled>true</localAnnounceEnabled>
               <reconnectionIntervalS>5</reconnectionIntervalS>
