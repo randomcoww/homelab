@@ -391,12 +391,8 @@ items:
               <device id="5VBZ3SG-UZNR5DT-EGDTU25-UMWGPGU-J44KCUO-OGUPNNU-SDHCR2W-NEBINA7"></device>
               <autoAcceptFolders>true</autoAcceptFolders>
             </folder>
-            <device id="5KRPDOW-PV74VRB-OBVWNDY-CPK35QW-HD56ZRN-LMGNWIA-QOYIOGV-4HRMAAO" name="192.168.126.217">
-              <autoAcceptFolders>true</autoAcceptFolders>
-            </device>
-            <device id="5VBZ3SG-UZNR5DT-EGDTU25-UMWGPGU-J44KCUO-OGUPNNU-SDHCR2W-NEBINA7" name="192.168.126.218">
-              <autoAcceptFolders>true</autoAcceptFolders>
-            </device>
+            <device id="5KRPDOW-PV74VRB-OBVWNDY-CPK35QW-HD56ZRN-LMGNWIA-QOYIOGV-4HRMAAO"></device>
+            <device id="5VBZ3SG-UZNR5DT-EGDTU25-UMWGPGU-J44KCUO-OGUPNNU-SDHCR2W-NEBINA7"></device>
             <gui enabled="false"/>
             <options>
               <listenAddress>default</listenAddress>
