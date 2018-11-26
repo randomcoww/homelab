@@ -390,8 +390,7 @@ items:
           <configuration version="28">
             <folder id="default" label="matchbox" path="/var/lib/matchbox" type="sendreceive" rescanIntervalS="300">
               <device id="5KRPDOW-PV74VRB-OBVWNDY-CPK35QW-HD56ZRN-LMGNWIA-QOYIOGV-4HRMAAO"></device>
-  <device id="5VBZ3SG-UZNR5DT-EGDTU25-UMWGPGU-J44KCUO-OGUPNNU-SDHCR2W-NEBINA7"></device>
-  
+              <device id="5VBZ3SG-UZNR5DT-EGDTU25-UMWGPGU-J44KCUO-OGUPNNU-SDHCR2W-NEBINA7"></device>
               <autoAcceptFolders>true</autoAcceptFolders>
             </folder>
             <device id="$(NODE_NAME)"/>
