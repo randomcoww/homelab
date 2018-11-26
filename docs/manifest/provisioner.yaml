@@ -399,7 +399,7 @@ items:
             </device>
             <gui enabled="false"/>
             <options>
-              <listenAddress>$(NODE_IP)</listenAddress>
+              <listenAddress>default</listenAddress>
               <globalAnnounceEnabled>false</globalAnnounceEnabled>
               <localAnnounceEnabled>true</localAnnounceEnabled>
               <reconnectionIntervalS>5</reconnectionIntervalS>
