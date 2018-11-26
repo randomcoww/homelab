@@ -305,8 +305,6 @@ items:
             virtual_router_id 247
             interface eth1
             track_interface {
-              eth1
-              eth0
               eth2
             }
             priority 100
