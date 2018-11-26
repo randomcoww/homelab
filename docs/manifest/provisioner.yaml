@@ -360,7 +360,7 @@ items:
       - "-cert-file=/etc/ssl/certs/matchbox.pem"
       - "-key-file=/etc/ssl/certs/matchbox-key.pem"
       - "-data-path=/var/lib/matchbox"
-      - "-assets-path=/var/lib/matchbox/assets"
+      - "-assets-path=''"
       volumeMounts:
       - mountPath: "/etc/ssl/certs"
         name: certs-path
