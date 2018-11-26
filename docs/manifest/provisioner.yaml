@@ -219,7 +219,7 @@ items:
                         "mode": "hot-standby",
                         "max-unacked-clients": 5,
                         "peers": [
-                          {"name":"provisioner-0","role":"primary","url":"http://192.168.126.217:58082/"},{"name":"provisioner-1","role":"standby","url":"http://192.168.126.218:58082/"}
+                          {"name":"5KRPDOW-PV74VRB-OBVWNDY-CPK35QW-HD56ZRN-LMGNWIA-QOYIOGV-4HRMAAO","role":"primary","url":"http://192.168.126.217:58082/"},{"name":"5VBZ3SG-UZNR5DT-EGDTU25-UMWGPGU-J44KCUO-OGUPNNU-SDHCR2W-NEBINA7","role":"standby","url":"http://192.168.126.218:58082/"}
                         ]
                       }
                     ]
