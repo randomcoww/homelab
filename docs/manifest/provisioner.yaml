@@ -391,12 +391,8 @@ items:
               <device id="5VBZ3SG-UZNR5DT-EGDTU25-UMWGPGU-J44KCUO-OGUPNNU-SDHCR2W-NEBINA7"></device>
               <autoAcceptFolders>true</autoAcceptFolders>
             </folder>
-            <device id="5KRPDOW-PV74VRB-OBVWNDY-CPK35QW-HD56ZRN-LMGNWIA-QOYIOGV-4HRMAAO">
-               <autoAcceptFolders>true</autoAcceptFolders
-            </device>
-            <device id="5VBZ3SG-UZNR5DT-EGDTU25-UMWGPGU-J44KCUO-OGUPNNU-SDHCR2W-NEBINA7">
-               <autoAcceptFolders>true</autoAcceptFolders
-            </device>
+            <device id="5KRPDOW-PV74VRB-OBVWNDY-CPK35QW-HD56ZRN-LMGNWIA-QOYIOGV-4HRMAAO"></device>
+            <device id="5VBZ3SG-UZNR5DT-EGDTU25-UMWGPGU-J44KCUO-OGUPNNU-SDHCR2W-NEBINA7"></device>
             <gui enabled="false"/>
             <options>
               <listenAddress>$(NODE_IP)</listenAddress>
