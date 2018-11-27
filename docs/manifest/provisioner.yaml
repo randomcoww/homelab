@@ -371,28 +371,41 @@ items:
     - name: syncthing
       image: randomcoww/syncthing:20181125.01
       env:
+      - name: NODE_IP
+        valueFrom:
+          fieldRef:
+            fieldPath: status.hostIP
       - name: CERT_PATH
         value: /etc/ssl/certs/syncthing.pem
       - name: KEY_PATH
         value: /etc/ssl/certs/syncthing-key.pem
       - name: SYNCTHING_LOCAL_CONFIG
         value: |-
-          <configuration version="28">
-            <folder id="default" label="matchbox" path="/var/lib/matchbox" type="sendreceive" rescanIntervalS="10">
+          <configuration>
+            <folder id="default" label="matchbox" path="/var/lib/matchbox" type="sendreceive" fsWatcherEnabled="true" fsWatcherDelayS="1" rescanIntervalS="10" autoNormalize="false">
               <device id="5KRPDOW-PV74VRB-OBVWNDY-CPK35QW-HD56ZRN-LMGNWIA-QOYIOGV-4HRMAAO"></device><device id="5VBZ3SG-UZNR5DT-EGDTU25-UMWGPGU-J44KCUO-OGUPNNU-SDHCR2W-NEBINA7"></device>
-              <autoAcceptFolders>true</autoAcceptFolders>
+              <maxConflicts>1</maxConflicts>
             </folder>
-            <device id="5KRPDOW-PV74VRB-OBVWNDY-CPK35QW-HD56ZRN-LMGNWIA-QOYIOGV-4HRMAAO"></device><device id="5VBZ3SG-UZNR5DT-EGDTU25-UMWGPGU-J44KCUO-OGUPNNU-SDHCR2W-NEBINA7"></device>
+            <device id="5KRPDOW-PV74VRB-OBVWNDY-CPK35QW-HD56ZRN-LMGNWIA-QOYIOGV-4HRMAAO" compression="always" skipIntroductionRemovals="true">
+              <address>tcp://192.168.126.217:22000</address>
+              <allowedNetwork>192.168.126.0/23</allowedNetwork>
+            </device>
+            <device id="5VBZ3SG-UZNR5DT-EGDTU25-UMWGPGU-J44KCUO-OGUPNNU-SDHCR2W-NEBINA7" compression="always" skipIntroductionRemovals="true">
+              <address>tcp://192.168.126.218:22000</address>
+              <allowedNetwork>192.168.126.0/23</allowedNetwork>
+            </device>
             <gui enabled="false"/>
             <options>
+              <listenAddress>tcp://$(NODE_IP):22000</listenAddress>
               <globalAnnounceEnabled>false</globalAnnounceEnabled>
-              <localAnnounceEnabled>true</localAnnounceEnabled>
+              <localAnnounceEnabled>false</localAnnounceEnabled>
               <reconnectionIntervalS>5</reconnectionIntervalS>
               <relaysEnabled>false</relaysEnabled>
               <startBrowser>false</startBrowser>
               <natEnabled>false</natEnabled>
               <urAccepted>-1</urAccepted>
-              <urSeen>3</urSeen>
+              <autoUpgradeIntervalH>0</autoUpgradeIntervalH>
+              <defaultFolderPath></defaultFolderPath>
             </options>
           </configuration>
       volumeMounts:
