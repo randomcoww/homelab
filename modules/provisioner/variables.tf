@@ -126,10 +126,6 @@ variable "controller_vip" {
   type = "string"
 }
 
-variable "nfs_vip" {
-  type = "string"
-}
-
 variable "backup_dns_ip" {
   type = "string"
 }

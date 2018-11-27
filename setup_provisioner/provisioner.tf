@@ -42,7 +42,6 @@ module "provisioner" {
   lan_gateway_vip   = "192.168.62.240"
   dns_vip           = "192.168.127.254"
   matchbox_vip      = "192.168.126.242"
-  nfs_vip           = "192.168.126.251"
   backup_dns_ip     = "9.9.9.9"
 
   ## ip ranges

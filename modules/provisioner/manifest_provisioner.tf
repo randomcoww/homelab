@@ -46,7 +46,6 @@ resource "matchbox_group" "manifest_provisioner" {
     syncthing_peer_port = "${var.syncthing_peer_port}"
 
     controller_vip    = "${var.controller_vip}"
-    nfs_vip           = "${var.nfs_vip}"
     matchbox_vip      = "${var.matchbox_vip}"
     store_gateway_vip = "${var.store_gateway_vip}"
     lan_gateway_vip   = "${var.lan_gateway_vip}"
