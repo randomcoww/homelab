@@ -387,16 +387,16 @@ items:
               <maxConflicts>1</maxConflicts>
             </folder>
             <device id="5KRPDOW-PV74VRB-OBVWNDY-CPK35QW-HD56ZRN-LMGNWIA-QOYIOGV-4HRMAAO" compression="always" skipIntroductionRemovals="true">
-              <address>tcp://192.168.126.217:22000</address>
+              <address>192.168.126.217:22000</address>
               <allowedNetwork>192.168.126.0/23</allowedNetwork>
             </device>
             <device id="5VBZ3SG-UZNR5DT-EGDTU25-UMWGPGU-J44KCUO-OGUPNNU-SDHCR2W-NEBINA7" compression="always" skipIntroductionRemovals="true">
-              <address>tcp://192.168.126.218:22000</address>
+              <address>192.168.126.218:22000</address>
               <allowedNetwork>192.168.126.0/23</allowedNetwork>
             </device>
             <gui enabled="false"/>
             <options>
-              <listenAddress>tcp://$(NODE_IP):22000</listenAddress>
+              <listenAddress>$(NODE_IP):22000</listenAddress>
               <globalAnnounceEnabled>false</globalAnnounceEnabled>
               <localAnnounceEnabled>false</localAnnounceEnabled>
               <reconnectionIntervalS>5</reconnectionIntervalS>
