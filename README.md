@@ -68,8 +68,6 @@ These images are configured to run only in RAM disk, and no state is saved.
 
 #### Provisioner VM
 
-![provisioner](images/provisioner.png)
-
 Provisioner VMs serving PXE also serve as the WAN gateway intended to boot on ISP DHCP. Ignition configuration is pulled from this github repo at boot time.
 
 Copy and push CoreOS ignition configs to repo:
@@ -107,6 +105,10 @@ virsh start provisioner-0
 ```
 
 These steps are ugly and need revising.
+
+DHCP (Kea) instances run in hot-standby. Matchbox instances share configuration over Syncthing. This data is lost if all instances are rebooted at the same time.
+
+![provisioner](images/provisioner.png)
 
 #### Terraform output
 
