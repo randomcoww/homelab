@@ -371,28 +371,34 @@ items:
     - name: syncthing
       image: {{.syncthing_image}}
       env:
+      - name: NODE_IP
+        valueFrom:
+          fieldRef:
+            fieldPath: status.hostIP
       - name: CERT_PATH
         value: {{.certs_path}}/syncthing.pem
       - name: KEY_PATH
         value: {{.certs_path}}/syncthing-key.pem
       - name: SYNCTHING_LOCAL_CONFIG
         value: |-
-          <configuration version="28">
-            <folder id="default" label="matchbox" path="{{.matchbox_path}}" type="sendreceive" rescanIntervalS="10">
-              {{.syncthing_devices}}
-              <autoAcceptFolders>true</autoAcceptFolders>
+          <configuration>
+            <folder id="matchbox" label="matchbox" path="{{.matchbox_path}}" type="sendreceive" fsWatcherEnabled="true" fsWatcherDelayS="1" rescanIntervalS="10" autoNormalize="false">
+              {{.syncthing_folder_devices}}
+              <maxConflicts>1</maxConflicts>
             </folder>
             {{.syncthing_devices}}
             <gui enabled="false"/>
             <options>
+              <listenAddress>$(NODE_IP):{{.syncthing_peer_port}}</listenAddress>
               <globalAnnounceEnabled>false</globalAnnounceEnabled>
-              <localAnnounceEnabled>true</localAnnounceEnabled>
+              <localAnnounceEnabled>false</localAnnounceEnabled>
               <reconnectionIntervalS>5</reconnectionIntervalS>
               <relaysEnabled>false</relaysEnabled>
               <startBrowser>false</startBrowser>
               <natEnabled>false</natEnabled>
               <urAccepted>-1</urAccepted>
-              <urSeen>3</urSeen>
+              <autoUpgradeIntervalH>0</autoUpgradeIntervalH>
+              <defaultFolderPath></defaultFolderPath>
             </options>
           </configuration>
       volumeMounts:

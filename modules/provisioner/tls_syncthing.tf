@@ -40,6 +40,6 @@ resource "tls_locally_signed_cert" "syncthing" {
 data "syncthing_device" "syncthing" {
   count = "${length(var.provisioner_hosts)}"
 
-  cert_pem = "${element(tls_locally_signed_cert.syncthing.*.cert_pem, count.index)}"
+  cert_pem        = "${element(tls_locally_signed_cert.syncthing.*.cert_pem, count.index)}"
   private_key_pem = "${element(tls_private_key.syncthing.*.private_key_pem, count.index)}"
 }

@@ -49,9 +49,9 @@ resource "matchbox_group" "ignition_provisioner" {
     kubelet_path = "${var.kubelet_path}"
     certs_path   = "${var.certs_path}"
 
-    tls_ca           = "${replace(tls_self_signed_cert.root.cert_pem, "\n", "\\n")}"
-    tls_matchbox     = "${replace(element(tls_locally_signed_cert.matchbox.*.cert_pem, count.index), "\n", "\\n")}"
-    tls_matchbox_key = "${replace(element(tls_private_key.matchbox.*.private_key_pem, count.index), "\n", "\\n")}"
+    tls_ca            = "${replace(tls_self_signed_cert.root.cert_pem, "\n", "\\n")}"
+    tls_matchbox      = "${replace(element(tls_locally_signed_cert.matchbox.*.cert_pem, count.index), "\n", "\\n")}"
+    tls_matchbox_key  = "${replace(element(tls_private_key.matchbox.*.private_key_pem, count.index), "\n", "\\n")}"
     tls_syncthing     = "${replace(element(tls_locally_signed_cert.syncthing.*.cert_pem, count.index), "\n", "\\n")}"
     tls_syncthing_key = "${replace(element(tls_private_key.syncthing.*.private_key_pem, count.index), "\n", "\\n")}"
   }

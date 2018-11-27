@@ -13,7 +13,13 @@ locals {
     url  = "http://%s:${var.kea_peer_port}/"
   }
 
-  syncthing_devices_template = "<device id=\"%s\"></device>"
+  syncthing_folder_devices_template = <<EOF
+<device id="%s"></device>
+EOF
+
+  syncthing_devices_template = <<EOF
+<device id="%s" compression="always" skipIntroductionRemovals="true"><address>%s:%s</address><allowedNetwork>%s</allowedNetwork></device>
+EOF
 }
 
 resource "matchbox_group" "manifest_provisioner" {
@@ -34,9 +40,10 @@ resource "matchbox_group" "manifest_provisioner" {
     matchbox_image   = "${var.matchbox_image}"
     syncthing_image  = "${var.syncthing_image}"
 
-    matchbox_http_port = "${var.matchbox_http_port}"
-    matchbox_rpc_port  = "${var.matchbox_rpc_port}"
-    kea_peer_port      = "${var.kea_peer_port}"
+    matchbox_http_port  = "${var.matchbox_http_port}"
+    matchbox_rpc_port   = "${var.matchbox_rpc_port}"
+    kea_peer_port       = "${var.kea_peer_port}"
+    syncthing_peer_port = "${var.syncthing_peer_port}"
 
     controller_vip    = "${var.controller_vip}"
     nfs_vip           = "${var.nfs_vip}"
@@ -57,10 +64,10 @@ resource "matchbox_group" "manifest_provisioner" {
     store_dhcp_ip_range = "${var.store_dhcp_ip_range}"
     metallb_ip_range    = "${var.metallb_ip_range}"
 
-    certs_path          = "${var.certs_path}"
-    kea_path            = "${var.kea_path}"
-    matchbox_path       = "${var.matchbox_path}"
-    syncthing_path      = "${var.syncthing_path}"
+    certs_path     = "${var.certs_path}"
+    kea_path       = "${var.kea_path}"
+    matchbox_path  = "${var.matchbox_path}"
+    syncthing_path = "${var.syncthing_path}"
 
     kea_ha_peers = "${join(",", formatlist(
       "${jsonencode(local.kea_ha_peers_template)}",
@@ -69,9 +76,17 @@ resource "matchbox_group" "manifest_provisioner" {
       "${var.provisioner_store_ips}"
     ))}"
 
-    syncthing_devices = "${join("", formatlist(
-      "${local.syncthing_devices_template}",
+    syncthing_folder_devices = "${join("", formatlist(
+      "${chomp(local.syncthing_folder_devices_template)}",
       "${data.syncthing_device.syncthing.*.device_id}"
+    ))}"
+
+    syncthing_devices = "${join("", formatlist(
+      "${chomp(local.syncthing_devices_template)}",
+      "${data.syncthing_device.syncthing.*.device_id}",
+      "${var.provisioner_store_ips}",
+      "${var.syncthing_peer_port}",
+      "${var.store_ip_range}"
     ))}"
   }
 }

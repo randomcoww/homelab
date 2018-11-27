@@ -100,6 +100,11 @@ variable "kea_peer_port" {
   default = "58082"
 }
 
+variable "syncthing_peer_port" {
+  type    = "string"
+  default = "22000"
+}
+
 ## vip
 variable "lan_gateway_vip" {
   type = "string"
