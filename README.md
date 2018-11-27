@@ -68,6 +68,8 @@ These images are configured to run only in RAM disk, and no state is saved.
 
 #### Provisioner VM
 
+![provisioner](images/provisioner.png)
+
 Provisioner VMs serving PXE also serve as the WAN gateway intended to boot on ISP DHCP. Ignition configuration is pulled from this github repo at boot time.
 
 Copy and push CoreOS ignition configs to repo:
