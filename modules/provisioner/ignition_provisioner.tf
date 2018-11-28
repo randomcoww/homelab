@@ -4,18 +4,6 @@
 resource "matchbox_profile" "ignition_provisioner" {
   name                   = "host_provisioner"
   container_linux_config = "${file("${path.module}/templates/ignition/provisioner.ign.tmpl")}"
-  kernel                 = "http://${var.matchbox_vip}:${var.matchbox_http_port}/assets/coreos/${var.container_linux_version}/coreos_production_pxe.vmlinuz"
-
-  initrd = [
-    "http://${var.matchbox_vip}:${var.matchbox_http_port}/assets/coreos/${var.container_linux_version}/coreos_production_pxe_image.cpio.gz",
-  ]
-
-  args = [
-    "coreos.config.url=http://${var.matchbox_vip}:${var.matchbox_http_port}/ignition?mac=$${mac:hexhyp}",
-    "coreos.first_boot=yes",
-    "console=hvc0",
-    "coreos.autologin",
-  ]
 }
 
 resource "matchbox_group" "ignition_provisioner" {
@@ -33,7 +21,7 @@ resource "matchbox_group" "ignition_provisioner" {
     hyperkube_image    = "${var.hyperkube_image}"
     ssh_authorized_key = "cert-authority ${chomp(var.ssh_ca_public_key)}"
     default_user       = "${var.default_user}"
-    manifest_url       = "${var.remote_provision_url}/manifest/${matchbox_profile.manifest_provisioner.name}.yaml"
+    manifest_url       = "${var.remote_provision_base_url}/manifest/${matchbox_profile.manifest_provisioner.name}.yaml"
 
     lan_ip        = "${var.provisioner_lan_ips[count.index]}"
     lan_if        = "${var.provisioner_lan_if}"

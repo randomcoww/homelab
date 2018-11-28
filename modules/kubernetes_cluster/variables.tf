@@ -34,6 +34,10 @@ variable "worker_macs" {
 }
 
 ## images
+variable "container_linux_base_url" {
+  type    = "string"
+}
+
 variable "container_linux_version" {
   type = "string"
 }

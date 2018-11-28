@@ -54,10 +54,6 @@ variable "kea_ha_roles" {
 }
 
 ## images
-variable "container_linux_version" {
-  type = "string"
-}
-
 variable "hyperkube_image" {
   type = "string"
 }
@@ -186,7 +182,7 @@ variable "syncthing_path" {
 }
 
 ## provisioner provisions from github
-variable "remote_provision_url" {
+variable "remote_provision_base_url" {
   type = "string"
 }
 

@@ -12,7 +12,6 @@ module "provisioner" {
   domain_name = "host.internal"
 
   ## host configs
-  container_linux_version = "1883.1.0"
   provisioner_hosts       = ["provisioner-0", "provisioner-1"]
   provisioner_macs        = ["52-54-00-1a-61-2a", "52-54-00-1a-61-2b"]
   provisioner_lan_ips     = ["192.168.62.217", "192.168.62.218"]
@@ -28,7 +27,7 @@ module "provisioner" {
   keepalived_image = "randomcoww/keepalived:20180913.01"
   nftables_image   = "randomcoww/nftables:20180913.01"
   kea_image        = "randomcoww/kea:1.4.0-P1"
-  tftpd_image      = "randomcoww/tftpd_ipxe:20180913.01"
+  tftpd_image      = "randomcoww/tftpd_ipxe:20181128.01"
   matchbox_image   = "quay.io/coreos/matchbox:latest"
   syncthing_image  = "randomcoww/syncthing:20181125.01"
 
@@ -54,7 +53,7 @@ module "provisioner" {
   metallb_ip_range    = "192.168.127.128/25"
 
   ## github provisioner url
-  remote_provision_url = "http://r.fuzzybunny.io"
+  remote_provision_base_url = "http://r.fuzzybunny.io"
 
   ## renderer provisioning access
   renderer_endpoint        = "${local.renderer_endpoint}"
