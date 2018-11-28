@@ -54,7 +54,7 @@ module "provisioner" {
   metallb_ip_range    = "192.168.127.128/25"
 
   ## github provisioner url
-  remote_provision_url = "https://raw.githubusercontent.com/randomcoww/terraform/master/docs"
+  remote_provision_url = "http://r.fuzzybunny.io"
 
   ## renderer provisioning access
   renderer_endpoint        = "${local.renderer_endpoint}"
