@@ -72,7 +72,7 @@ These images are configured to run only in RAM disk, and no state is saved.
 
 #### Provisioner VM
 
-Provisioner VMs serving PXE also serve as the WAN gateway intended to boot on ISP DHCP. Ignition configuration is pulled from this github repo at boot time.
+Provisioner VMs serving PXE also serve as the WAN gateway intended to boot on ISP DHCP. Ignition configuration is pushed to and served from [ops-provisioner](https://github.com/randomcoww/ops-provisioner) at boot time.
 
 Copy and push CoreOS ignition configs to repo:
 ```
@@ -87,7 +87,7 @@ git add provisioner-0.ign provisioner-1.ign
 ...
 ```
 
-VM runs Kubelet in masterless mode to provide most of its services. The configuration for this is provided as a YAML manifest which is also pushed to and served from this repo:
+VM runs Kubelet in masterless mode to provide most of its services. The configuration for this is provided as a YAML manifest which is also pushed to and served from the [ops-provisioner](https://github.com/randomcoww/ops-provisioner) repo:
 
 ```
 cd docs/manifest
@@ -99,7 +99,7 @@ git add provisioner.yaml
 ...
 ```
 
-Compatible KVM libvirt configurations are under [docs](docs/libvirt). I currently have no automation for defining and starting VMs.
+Compatible KVM libvirt configurations are in [ops-provisioner](https://github.com/randomcoww/ops-provisioner). I currently have no automation for defining and starting VMs.
 ```
 virsh define provisioner-0.xml
 virsh define provisioner-1.xml
@@ -132,7 +132,7 @@ terraform init
 terraform apply
 ```
 
-Compatible KVM libvirt configurations are under [docs](docs/libvirt). I currently have no automation for defining and starting VMs.
+Compatible KVM libvirt configurations are in [ops-provisioner](https://github.com/randomcoww/ops-provisioner). I currently have no automation for defining and starting VMs.
 ```
 virsh define controller-0.xml
 virsh define controller-1.xml
