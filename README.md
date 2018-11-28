@@ -76,7 +76,8 @@ Provisioner VMs serving PXE also serve as the WAN gateway intended to boot on IS
 
 Copy and push CoreOS ignition configs to repo:
 ```
-cd docs/ignition
+git clone git@github.com:randomcoww/ops-provisioner.git
+cd ops-provisioner/ignition
 
 wget -O provisioner-0.ign \
     http://127.0.0.1:8080/ignition?mac=52-54-00-1a-61-2a
@@ -90,7 +91,8 @@ git add provisioner-0.ign provisioner-1.ign
 VM runs Kubelet in masterless mode to provide most of its services. The configuration for this is provided as a YAML manifest which is also pushed to and served from the [ops-provisioner](https://github.com/randomcoww/ops-provisioner) repo:
 
 ```
-cd docs/manifest
+git clone git@github.com:randomcoww/ops-provisioner.git
+cd ops-provisioner/manifest
 
 wget -O provisioner.yaml \
     http://127.0.0.1:8080/generic?manifest=provisioner
