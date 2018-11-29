@@ -72,12 +72,12 @@ These images are configured to run only in RAM disk, and no state is saved.
 
 #### Provisioner VM
 
-Provisioner VMs serving PXE also serve as the WAN gateway intended to boot on ISP DHCP. Ignition configuration is pushed to and served from [ops-provisioner](https://github.com/randomcoww/ops-provisioner) at boot time.
+Provisioner VMs serving PXE also serve as the WAN gateway intended to boot on ISP DHCP. Ignition configuration is pushed to and served from [env-provisioner](https://github.com/randomcoww/env-provisioner) at boot time.
 
 Copy and push CoreOS ignition configs to repo:
 ```
-git clone git@github.com:randomcoww/ops-provisioner.git
-cd ops-provisioner/ignition
+git clone git@github.com:randomcoww/env-provisioner.git
+cd env-provisioner/ignition
 
 wget -O provisioner-0.ign \
     http://127.0.0.1:8080/ignition?mac=52-54-00-1a-61-2a
@@ -88,11 +88,11 @@ git add provisioner-0.ign provisioner-1.ign
 ...
 ```
 
-VM runs Kubelet in masterless mode to provide most of its services. The configuration for this is provided as a YAML manifest which is also pushed to and served from the [ops-provisioner](https://github.com/randomcoww/ops-provisioner) repo:
+VM runs Kubelet in masterless mode to provide most of its services. The configuration for this is provided as a YAML manifest which is also pushed to and served from the [env-provisioner](https://github.com/randomcoww/env-provisioner) repo:
 
 ```
-git clone git@github.com:randomcoww/ops-provisioner.git
-cd ops-provisioner/manifest
+git clone git@github.com:randomcoww/env-provisioner.git
+cd env-provisioner/manifest
 
 wget -O provisioner.yaml \
     http://127.0.0.1:8080/generic?manifest=provisioner
@@ -101,7 +101,7 @@ git add provisioner.yaml
 ...
 ```
 
-Compatible KVM libvirt configurations are in [ops-provisioner](https://github.com/randomcoww/ops-provisioner). I currently have no automation for defining and starting VMs.
+Compatible KVM libvirt configurations are in [env-provisioner](https://github.com/randomcoww/env-provisioner). I currently have no automation for defining and starting VMs.
 ```
 virsh define provisioner-0.xml
 virsh define provisioner-1.xml
@@ -134,7 +134,7 @@ terraform init
 terraform apply
 ```
 
-Compatible KVM libvirt configurations are in [ops-provisioner](https://github.com/randomcoww/ops-provisioner). I currently have no automation for defining and starting VMs.
+Compatible KVM libvirt configurations are in [env-provisioner](https://github.com/randomcoww/env-provisioner). I currently have no automation for defining and starting VMs.
 ```
 virsh define controller-0.xml
 virsh define controller-1.xml
