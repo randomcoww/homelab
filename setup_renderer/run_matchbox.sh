@@ -2,8 +2,8 @@
 
 docker run -it --rm \
     --user $(id -u):$(id -g) \
-    -v `pwd`/output:/etc/matchbox:Z \
-    -v `pwd`/output:/var/lib/matchbox:Z \
+    -v "$(pwd)"/output:/etc/matchbox \
+    -v "$(pwd)"/output:/var/lib/matchbox \
     -p 8080:8080 \
     -p 8081:8081 \
     quay.io/coreos/matchbox:latest \

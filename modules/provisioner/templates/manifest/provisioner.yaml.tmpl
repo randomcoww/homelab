@@ -154,6 +154,10 @@ items:
         valueFrom:
           fieldRef:
             fieldPath: spec.nodeName
+      - name: NODE_IP
+        valueFrom:
+          fieldRef:
+            fieldPath: status.hostIP
       - name: KEA_LOCAL_CONFIG
         value: |-
           {
@@ -195,13 +199,13 @@ items:
                 {
                   "name": "ipxe",
                   "test": "not(substring(option[77].hex,0,4) == 'iPXE') and (option[93].hex == 0x0000)",
-                  "next-server": "{{.matchbox_vip}}",
+                  "next-server": "$(NODE_IP)",
                   "boot-file-name": "/undionly.kpxe"
                 },
                 {
                   "name": "ipxe_efi",
                   "test": "not(substring(option[77].hex,0,4) == 'iPXE') and (option[93].hex == 0x0007)",
-                  "next-server": "{{.matchbox_vip}}",
+                  "next-server": "$(NODE_IP)",
                   "boot-file-name": "/ipxe.efi"
                 }
               ],
