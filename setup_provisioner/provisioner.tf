@@ -27,7 +27,7 @@ module "provisioner" {
   keepalived_image = "randomcoww/keepalived:20180913.01"
   nftables_image   = "randomcoww/nftables:20180913.01"
   kea_image        = "randomcoww/kea:1.4.0-P1"
-  tftpd_image      = "randomcoww/tftpd_ipxe:20181128.01"
+  tftpd_image      = "randomcoww/tftpd_ipxe:20181129.01"
   matchbox_image   = "quay.io/coreos/matchbox:latest"
   syncthing_image  = "randomcoww/syncthing:20181125.01"
 

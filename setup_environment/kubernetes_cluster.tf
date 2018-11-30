@@ -16,8 +16,8 @@ module "kubernetes_cluster" {
   worker_macs  = ["52-54-00-1a-61-1a", "52-54-00-1a-61-1b"]
 
   ## images
-  container_linux_base_url      = "http://stable.release.core-os.net/amd64-usr"
-  container_linux_version       = "1911.3.0"
+  container_linux_base_url      = "http://beta.release.core-os.net/amd64-usr"
+  container_linux_version       = "1939.1.0"
   hyperkube_image               = "gcr.io/google_containers/hyperkube:${local.kubernetes_version}"
   kube_apiserver_image          = "gcr.io/google_containers/kube-apiserver:${local.kubernetes_version}"
   kube_controller_manager_image = "gcr.io/google_containers/kube-controller-manager:${local.kubernetes_version}"

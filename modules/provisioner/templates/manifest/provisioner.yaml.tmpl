@@ -237,6 +237,10 @@ items:
                     {
                       "name": "routers",
                       "data": "{{.lan_gateway_vip}}"
+                    },
+                    {
+                      "name": "interface-mtu",
+                      "data": "{{.mtu}}"
                     }
                   ],
                   "pools": [
@@ -344,10 +348,6 @@ items:
     containers:
     - name: tftpd-ipxe
       image: {{.tftpd_image}}
-      args:
-      - "--address"
-      - 0.0.0.0:69
-      - "--verbose"
 - kind: Pod
   apiVersion: v1
   metadata:
