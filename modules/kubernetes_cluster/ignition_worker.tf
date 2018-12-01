@@ -14,7 +14,7 @@ resource "matchbox_profile" "ignition_worker" {
     "coreos.config.url=http://${var.matchbox_vip}:${var.matchbox_http_port}/ignition?mac=$${mac:hexhyp}",
     "coreos.first_boot=yes",
     "console=hvc0",
-    "coreos.autologin=hvc0"
+    "coreos.autologin"
   ]
 }
 
