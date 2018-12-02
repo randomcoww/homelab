@@ -46,7 +46,7 @@ terraform apply
 
 #### Hypervisor image
 
-Generate hypervisor kickstart for live boot images:
+Generate hypervisor images:
 ```bash
 wget -O store-0.ks \
     http://127.0.0.1:8080/generic?host=store-0
@@ -68,7 +68,7 @@ livecd-creator \
     --releasever 29 \
     --title store-1
 ```
-These images are configured to run only in RAM disk, and no state is saved.
+These images can be written to a USB flash drive.
 
 #### Provisioner VM
 
@@ -102,6 +102,11 @@ git add provisioner.yaml
 ```
 
 Provisioners need Container Linux PXE boot images on the host filesystem to boot. Looking for possible workarounds to this such as booting a more miminal GRUB image that is able to download these at boot time.
+
+**TODO**: Investigate
+* https://lists.gnu.org/archive/html/help-grub/2013-08/msg00037.html
+* http://www.manobit.com/pxe-multi-boot-server-using-grub2-on-mikrotik-routeros-bios-and-efi-support/
+
 ```bash
 VERSION=1939.1.0
 cd /data/bootstrap/coreos/$VERSION
