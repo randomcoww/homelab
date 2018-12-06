@@ -20,10 +20,6 @@ variable "provisioner_hosts" {
   type = "list"
 }
 
-variable "provisioner_macs" {
-  type = "list"
-}
-
 variable "provisioner_lan_ips" {
   type = "list"
 }
@@ -174,11 +170,6 @@ variable "kea_path" {
 variable "matchbox_path" {
   type    = "string"
   default = "/var/lib/matchbox"
-}
-
-variable "syncthing_path" {
-  type    = "string"
-  default = "/var/syncthing/config"
 }
 
 ## provisioner provisions from github

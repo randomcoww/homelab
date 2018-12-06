@@ -6,6 +6,9 @@ networkd:
         [Match]
         Name={{.lan_if}}
 
+        [Link]
+        MTUBytes={{.mtu}}
+
         [Network]
         LinkLocalAddressing=no
         DHCP=no
@@ -16,6 +19,9 @@ networkd:
       contents: |
         [Match]
         Name={{.store_if}}
+
+        [Link]
+        MTUBytes={{.mtu}}
 
         [Network]
         LinkLocalAddressing=no
@@ -31,16 +37,16 @@ networkd:
         [Network]
         LinkLocalAddressing=no
         DHCP=yes
+        DNS={{.backup_dns_ip}}
 
         [DHCP]
         UseMTU=yes
-        UseDNS=true
+        UseDNS=false
         UseNTP=false
         SendHostname=false
         UseHostname=false
         UseDomains=false
         UseTimezone=no
-        RouteMetric=1024
 systemd:
   units:
     - name: containerd.service

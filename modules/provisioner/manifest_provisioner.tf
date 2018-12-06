@@ -63,10 +63,9 @@ resource "matchbox_group" "manifest_provisioner" {
     store_dhcp_ip_range = "${var.store_dhcp_ip_range}"
     metallb_ip_range    = "${var.metallb_ip_range}"
 
-    certs_path     = "${var.certs_path}"
-    kea_path       = "${var.kea_path}"
-    matchbox_path  = "${var.matchbox_path}"
-    syncthing_path = "${var.syncthing_path}"
+    certs_path    = "${var.certs_path}"
+    kea_path      = "${var.kea_path}"
+    matchbox_path = "${var.matchbox_path}"
 
     kea_ha_peers = "${join(",", formatlist(
       "${jsonencode(local.kea_ha_peers_template)}",

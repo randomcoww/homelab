@@ -7,14 +7,14 @@ resource "matchbox_profile" "ignition_controller" {
   kernel                 = "${var.container_linux_base_url}/${var.container_linux_version}/coreos_production_pxe.vmlinuz"
 
   initrd = [
-    "${var.container_linux_base_url}/${var.container_linux_version}/coreos_production_pxe_image.cpio.gz"
+    "${var.container_linux_base_url}/${var.container_linux_version}/coreos_production_pxe_image.cpio.gz",
   ]
 
   args = [
     "coreos.config.url=http://${var.matchbox_vip}:${var.matchbox_http_port}/ignition?mac=$${mac:hexhyp}",
     "coreos.first_boot=yes",
     "console=hvc0",
-    "coreos.autologin"
+    "coreos.autologin",
   ]
 }
 

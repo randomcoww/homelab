@@ -13,7 +13,7 @@ resource "matchbox_group" "ignition_provisioner" {
   profile = "${matchbox_profile.ignition_provisioner.name}"
 
   selector {
-    mac = "${var.provisioner_macs[count.index]}"
+    ign = "${var.provisioner_hosts[count.index]}"
   }
 
   metadata {
@@ -32,7 +32,7 @@ resource "matchbox_group" "ignition_provisioner" {
     wan_if        = "${var.provisioner_wan_if}"
     mtu           = "${var.mtu}"
 
-    matchbox_vip = "${var.matchbox_vip}"
+    backup_dns_ip = "${var.backup_dns_ip}"
 
     kubelet_path = "${var.kubelet_path}"
     certs_path   = "${var.certs_path}"

@@ -20,10 +20,7 @@ resource "tls_cert_request" "matchbox" {
 
   ip_addresses = [
     "127.0.0.1",
-
-    # "${var.provisioner_lan_ips[count.index]}",
     "${var.provisioner_store_ips[count.index]}",
-
     "${var.matchbox_vip}",
   ]
 }

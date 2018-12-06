@@ -14,7 +14,7 @@ resource "matchbox_group" "generic_desktop" {
   profile = "${matchbox_profile.generic_desktop.name}"
 
   selector {
-    host = "${var.desktop_hosts[count.index]}"
+    ks = "${var.desktop_hosts[count.index]}"
   }
 
   metadata {

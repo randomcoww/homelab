@@ -13,7 +13,7 @@ resource "matchbox_group" "generic_store" {
   profile = "${matchbox_profile.generic_store.name}"
 
   selector {
-    host = "${var.store_hosts[count.index]}"
+    ks = "${var.store_hosts[count.index]}"
   }
 
   metadata {
