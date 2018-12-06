@@ -49,7 +49,7 @@ terraform apply
 Generate hypervisor images:
 ```bash
 wget -O store-0.ks \
-    http://127.0.0.1:8080/generic?host=store-0
+    http://127.0.0.1:8080/generic?ks=store-0
 
 livecd-creator \
     --verbose \
@@ -59,7 +59,7 @@ livecd-creator \
     --title store-0
 
 wget -O store-1.ks \
-    http://127.0.0.1:8080/generic?host=store-1
+    http://127.0.0.1:8080/generic?ks=store-1
 
 livecd-creator \
     --verbose \
@@ -80,9 +80,9 @@ git clone git@github.com:randomcoww/env-provisioner.git
 cd env-provisioner/ignition
 
 wget -O provisioner-0.ign \
-    http://127.0.0.1:8080/ignition?mac=52-54-00-1a-61-2a
+    http://127.0.0.1:8080/ignition?ign=provisioner-0
 wget -O provisioner-1.ign \
-    http://127.0.0.1:8080/ignition?mac=52-54-00-1a-61-2b
+    http://127.0.0.1:8080/ignition?ign=provisioner-1
     
 git add provisioner-0.ign provisioner-1.ign
 ...
@@ -192,5 +192,5 @@ terraform apply
 
 I currently have no PXE boot environment for Fedora. The following boot args can be added to a Fedora 29 installer to use, where 192.168.126.242:58080 is the provisioner Matchbox address.
 ```
-inst.text inst.ks=http://192.168.126.242:58080/generic?host=desktop-0
+inst.text inst.ks=http://192.168.126.242:58080/generic?ks=desktop-0
 ```
