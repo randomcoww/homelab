@@ -17,11 +17,31 @@ bootloader --append="console=tty0 console=ttyS1,115200n8 elevator=noop intel_iom
 
 repo --name=fedora --mirrorlist=https://mirrors.fedoraproject.org/mirrorlist?repo=fedora-$releasever&arch=$basearch
 repo --name=updates --mirrorlist=https://mirrors.fedoraproject.org/mirrorlist?repo=updates-released-f$releasever&arch=$basearch
-repo --name=zfs-on-linux --baseurl=http://download.zfsonlinux.org/fedora/$releasever/$basearch/
 url --mirrorlist=https://mirrors.fedoraproject.org/mirrorlist?repo=fedora-$releasever&arch=$basearch
+repo --name=zfs-on-linux --baseurl=http://download.zfsonlinux.org/fedora/$releasever/$basearch/
 
 %packages --excludeWeakdeps --excludedocs
+
+## common
 @core
+libvirt-daemon-kvm
+qemu-kvm
+ksmtuned
+cronie
+chrony
+logrotate
+nfs-utils
+ipmitool
+pciutils
+lm_sensors
+hdparm
+##
+
+zfs
+-zfs-fuse
+libvirt-client
+openssh-server
+rsync
 
 ## livecd-creator
 kernel
@@ -30,27 +50,9 @@ grub2-efi-x64-cdboot
 shim
 ##
 
-libvirt-daemon-kvm
-qemu-kvm
-ksmtuned
-ipmitool
-openssh-server
-cronie
-chrony
-logrotate
-zfs
-nfs-utils
-
-tmux
-pciutils
-lm_sensors
-rsync
-hdparm
-libvirt-client
-
--zfs-fuse
 -NetworkManager
 -plymouth
+-plymouth-*
 %end
 
 %post --erroronfail
@@ -177,15 +179,14 @@ EOF
 ##
 
 systemctl enable \
-  systemd-networkd systemd-resolved chronyd crond sshd \
-  ksm ksmtuned \
-  zfs-import-cache zfs-import-scan zfs-mount zfs-share zfs-zed zfs.target nfs-server
+  systemd-networkd systemd-resolved chronyd crond \
+  libvirtd ksm ksmtuned \
+  zfs-import-cache zfs-import-scan zfs-mount zfs-share zfs-zed zfs.target nfs-server \
+  sshd
 
 systemctl mask \
   NetworkManager \
-  firstboot-text \
-  mdmonitor \
-  mdmonitor-takeover
+  firstboot-text
 
 ##
 ## cleanup

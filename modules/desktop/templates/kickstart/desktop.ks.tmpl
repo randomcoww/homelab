@@ -7,7 +7,7 @@ auth --useshadow --passalgo=sha512
 firewall --disabled
 zerombr
 # clearpart --all --disklabel=gpt
-clearpart --none
+clearpart --none --disklabel=gpt
 
 part /boot/efi --fstype=efi --size=200 --onpart /dev/nvme0n1p1
 part /boot --fstype=ext4 --size=512 --onpart /dev/nvme0n1p2
@@ -35,30 +35,32 @@ repo --name=code --baseurl=https://packages.microsoft.com/yumrepos/vscode
 repo --name=docker-ce --baseurl=https://download.docker.com/linux/fedora/28/$basearch/stable
 
 %packages --excludeWeakdeps
+
+## common
 @core
+libvirt-daemon-kvm
+qemu-kvm
+ksmtuned
+cronie
+chrony
+logrotate
+nfs-utils
+ipmitool
+pciutils
+lm_sensors
+hdparm
+##
+
 @firefox
 @fonts
 @gnome-desktop
 @hardware-support
 @printing
 @base-x
-
-libvirt-daemon-kvm
-qemu-kvm
-ksmtuned
-ipmitool
-cronie
-chrony
-logrotate
-nfs-utils
-
+libvirt-client
+rsync
 tmux
 xclip
-pciutils
-lm_sensors
-rsync
-hdparm
-libvirt-client
 docker-ce
 docker-compose
 libva-utils
@@ -77,10 +79,10 @@ remmina
 remmina-plugins-vnc
 remmina-plugins-rdp
 remmina-plugins-spice
+virt-viewer
 gimp
 bind-utils
 openssl
-shadow-utils
 steam
 
 ## looking-glass
@@ -178,7 +180,7 @@ dracut -f /boot/initramfs-$KERNEL_VERSION.img $KERNEL_VERSION
 
 systemctl enable \
   systemd-networkd systemd-resolved chronyd crond \
-  ksm ksmtuned \
+  libvirtd ksm ksmtuned \
   docker
 
 systemctl mask \
