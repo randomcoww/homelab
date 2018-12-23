@@ -52,9 +52,8 @@ items:
     restartPolicy: Always
     containers:
     - name: kube-etcd
-      image: {{.etcd_image}}
+      image: {{.etcd_wrapper_image}}
       args:
-      - "/usr/local/bin/etcd"
       - "--name=$(NODE_NAME)"
       - "--cert-file={{.kubelet_path}}/kubernetes.pem"
       - "--key-file={{.kubelet_path}}/kubernetes-key.pem"
@@ -62,18 +61,32 @@ items:
       - "--peer-key-file={{.kubelet_path}}/kubernetes-key.pem"
       - "--trusted-ca-file={{.kubelet_path}}/ca.pem"
       - "--peer-trusted-ca-file={{.kubelet_path}}/ca.pem"
-      - "--peer-client-cert-auth"
-      - "--client-cert-auth"
       - "--initial-advertise-peer-urls=https://$(INTERNAL_IP):{{.etcd_peer_port}}"
       - "--listen-peer-urls=https://$(INTERNAL_IP):{{.etcd_peer_port}}"
       - "--listen-client-urls=https://$(INTERNAL_IP):{{.etcd_client_port}},https://127.0.0.1:{{.etcd_client_port}}"
       - "--advertise-client-urls=https://$(INTERNAL_IP):{{.etcd_client_port}}"
-      - "--initial-cluster-token={{.etcd_cluster_token}}"
       - "--initial-cluster={{.etcd_initial_cluster}}"
-      - "--initial-cluster-state={{.etcd_initial_cluster_state}}"
-      - "--data-dir={{.etcd_path}}/$(NODE_NAME)"
-      - "--enable-v2=false"
+      - "--initial-cluster-token={{.etcd_cluster_token}}"
+      - "--etcd-servers={{.etcd_servers}}"
+      - "--backup-dir={{.kubelet_path}}/etcd/backup"
+      - "--backup-file={{.kubelet_path}}/etcd/backup/etcd.db"
+      - "--tls-dir={{.kubelet_path}}"
+      - "--image={{.etcd_image}}"
+      - "--pod-spec-file={{.kubelet_path}}/manifests/podspec.json"
+      - "--s3-backup-path=randomcoww-etcd-backup/test-backup"
+      - "--run-interval=10s"
+      - "--backup-interval=30m"
+      - "--restore-interval=3m"
+      - "--etcd-timeout=3m"
       env:
+      - name: AWS_ACCESS_KEY_ID
+        value: "{{.aws_access_key_id}}"
+      - name: AWS_SECRET_ACCESS_KEY
+        value: "{{.aws_secret_access_key}}"
+      - name: AWS_DEFAULT_REGION
+        value: "{{.aws_region}}"
+      - name: AWS_SDK_LOAD_CONFIG
+        value: "1"
       - name: INTERNAL_IP
         valueFrom:
           fieldRef:
@@ -85,18 +98,11 @@ items:
       volumeMounts:
       - name: kubernetes-path
         mountPath: "{{.kubelet_path}}"
-        readOnly: true
-      - name: data-etcd-host
-        mountPath: "{{.etcd_path}}"
         readOnly: false
     volumes:
     - name: kubernetes-path
       hostPath:
         path: "{{.kubelet_path}}"
-    - name: data-etcd-host
-      nfs:
-        server: {{.nfs_vip}}
-        path: "{{.etcd_mount_path}}"
 - kind: Pod
   apiVersion: v1
   metadata:

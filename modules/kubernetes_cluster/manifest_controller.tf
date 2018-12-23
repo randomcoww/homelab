@@ -19,6 +19,7 @@ resource "matchbox_group" "manifest_controller" {
     kube_apiserver_image          = "${var.kube_apiserver_image}"
     kube_controller_manager_image = "${var.kube_controller_manager_image}"
     kube_scheduler_image          = "${var.kube_scheduler_image}"
+    etcd_wrapper_image            = "${var.etcd_wrapper_image}"
     etcd_image                    = "${var.etcd_image}"
 
     etcd_initial_cluster       = "${join(",", formatlist("%s=https://%s:${var.etcd_peer_port}", "${var.controller_hosts}", "${var.controller_ips}"))}"
@@ -30,6 +31,10 @@ resource "matchbox_group" "manifest_controller" {
     etcd_peer_port        = "${var.etcd_peer_port}"
     apiserver_secure_port = "${var.apiserver_secure_port}"
     nfs_vip               = "${var.nfs_vip}"
+
+    aws_region            = "${var.aws_region}"
+    aws_access_key_id     = "${var.aws_access_key_id}"
+    aws_secret_access_key = "${var.aws_secret_access_key}"
 
     cluster_ip_range = "${var.cluster_ip_range}"
     cluster_cidr     = "${var.cluster_cidr}"

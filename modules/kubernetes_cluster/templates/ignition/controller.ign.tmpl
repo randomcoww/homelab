@@ -40,6 +40,7 @@ systemd:
         ExecStart=/usr/lib/coreos/kubelet-wrapper \
           --config={{.kubelet_path}}/kubelet-config.yaml \
           --node-ip={{.host_ip}} \
+          --pod-manifest-path={{.kubelet_path}}/manifests \
           --container-runtime=remote \
           --container-runtime-endpoint=unix:///run/docker/libcontainerd/docker-containerd.sock
         ExecStop=-/usr/bin/rkt stop --uuid-file=/var/cache/kubelet-pod.uuid
@@ -129,6 +130,7 @@ storage:
           authorization:
             mode: AlwaysAllow
           staticPodURL: {{.manifest_url}}
+          StaticPodPath: {{.kubelet_path}}/manifests
           makeIPTablesUtilChains: false
 
     - path: {{.kubelet_path}}/kube-scheduler.yaml

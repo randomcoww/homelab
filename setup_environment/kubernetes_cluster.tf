@@ -23,6 +23,7 @@ module "kubernetes_cluster" {
   kube_controller_manager_image = "gcr.io/google_containers/kube-controller-manager:${local.kubernetes_version}"
   kube_scheduler_image          = "gcr.io/google_containers/kube-scheduler:${local.kubernetes_version}"
   kube_proxy_image              = "gcr.io/google_containers/kube-proxy:${local.kubernetes_version}"
+  etcd_wrapper_image            = "randomcoww/etcd-wrapper:20181222.01"
   etcd_image                    = "quay.io/coreos/etcd:v3.3"
   flannel_image                 = "quay.io/coreos/flannel:v0.10.0-amd64"
   keepalived_image              = "randomcoww/keepalived:20180913.01"
@@ -46,6 +47,11 @@ module "kubernetes_cluster" {
 
   ## vm runs on ram, mount etcd data path from host
   etcd_mount_path = "/data/pv/etcd"
+
+  ## etcd backup access
+  aws_region            = "us-west-2"
+  aws_access_key_id     = "${var.aws_access_key_id}"
+  aws_secret_access_key = "${var.aws_secret_access_key}"
 
   ## renderer provisioning access
   renderer_endpoint        = "${local.renderer_endpoint}"

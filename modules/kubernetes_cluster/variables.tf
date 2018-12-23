@@ -66,6 +66,10 @@ variable "kube_proxy_image" {
   type = "string"
 }
 
+variable "etcd_wrapper_image" {
+  type = "string"
+}
+
 variable "etcd_image" {
   type = "string"
 }
@@ -178,5 +182,18 @@ variable "renderer_cert_pem" {
 }
 
 variable "renderer_ca_pem" {
+  type = "string"
+}
+
+# etcd backup
+variable "aws_region" {
+  type = "string"
+}
+
+variable "aws_access_key_id" {
+  type = "string"
+}
+
+variable "aws_secret_access_key" {
   type = "string"
 }
