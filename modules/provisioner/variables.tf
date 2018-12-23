@@ -58,6 +58,10 @@ variable "keepalived_image" {
   type = "string"
 }
 
+variable "unbound_image" {
+  type = "string"
+}
+
 variable "nftables_image" {
   type = "string"
 }

@@ -24,6 +24,7 @@ module "provisioner" {
   ## images
   hyperkube_image  = "gcr.io/google_containers/hyperkube:${local.kubernetes_version}"
   keepalived_image = "randomcoww/keepalived:20180913.01"
+  unbound_image    = "randomcoww/unbound:20180913.01"
   nftables_image   = "randomcoww/nftables:20180913.01"
   kea_image        = "randomcoww/kea:1.4.0-P1"
   tftpd_image      = "randomcoww/tftpd_ipxe:20181129.01"
@@ -38,7 +39,7 @@ module "provisioner" {
   controller_vip    = "192.168.126.245"
   store_gateway_vip = "192.168.126.240"
   lan_gateway_vip   = "192.168.62.240"
-  dns_vip           = "192.168.127.254"
+  dns_vip           = "192.168.126.241"
   matchbox_vip      = "192.168.126.242"
   backup_dns_ip     = "9.9.9.9"
 

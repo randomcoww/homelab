@@ -181,11 +181,6 @@ items:
               },
               "option-data": [
                 {
-                  "name": "domain-name-servers",
-                  "data": "{{.dns_vip}},{{.backup_dns_ip}}",
-                  "csv-format": true
-                },
-                {
                   "name": "domain-name",
                   "data": "{{.domain_name}}"
                 }
@@ -239,6 +234,11 @@ items:
                       "data": "{{.lan_gateway_vip}}"
                     },
                     {
+                      "name": "domain-name-servers",
+                      "data": "{{.backup_dns_ip}}",
+                      "csv-format": true
+                    },
+                    {
                       "name": "interface-mtu",
                       "data": "{{.mtu}}"
                     }
@@ -255,6 +255,11 @@ items:
                     {
                       "name": "routers",
                       "data": "{{.store_gateway_vip}}"
+                    },
+                    {
+                      "name": "domain-name-servers",
+                      "data": "{{.dns_vip}},{{.backup_dns_ip}}",
+                      "csv-format": true
                     },
                     {
                       "name": "interface-mtu",
@@ -288,6 +293,36 @@ items:
   kind: Pod
   metadata:
     namespace: kube-system
+    name: unbound
+  spec:
+    restartPolicy: Always
+    hostNetwork: true
+    containers:
+    - name: unbound
+      image: {{.unbound_image}}
+      env:
+      - name: UNBOUND_LOCAL_CONFIG
+        value: |-
+          server:
+            interface-automatic: yes
+            port: 53
+            interface: 0.0.0.0
+            num-threads: 2
+            do-ip6: no
+            do-udp: yes
+            do-tcp: yes
+            access-control: 0.0.0.0/0 allow
+            do-not-query-localhost: no
+          forward-zone:
+            name: "."
+            forward-tls-upstream: yes
+            forward-addr: {{.backup_dns_ip}}@853
+          remote-control:
+            control-enable: yes
+- apiVersion: v1
+  kind: Pod
+  metadata:
+    namespace: kube-system
     name: keepalived
   spec:
     restartPolicy: Always
@@ -312,30 +347,12 @@ items:
             strict_mode off
             virtual_router_id 247
             interface {{.store_if}}
-            track_interface {
-              {{.wan_if}}
-            }
             priority 100
             virtual_ipaddress {
               {{.store_gateway_vip}} dev {{.store_if}}
               {{.lan_gateway_vip}} dev {{.lan_if}}
-            }
-          }
-          vrrp_script CHK_matchbox {
-            script "nc -z -w5 localhost {{.matchbox_http_port}}"
-            interval 2
-          }
-          vrrp_instance VI_matchbox_store {
-            state BACKUP
-            strict_mode off
-            virtual_router_id 39
-            interface {{.store_if}}
-            priority 100
-            virtual_ipaddress {
-              {{.matchbox_vip}}
-            }
-            track_script {
-              CHK_matchbox
+              {{.dns_vip}} dev {{.store_if}}
+              {{.matchbox_vip}} dev {{.store_if}}
             }
           }
 - apiVersion: v1

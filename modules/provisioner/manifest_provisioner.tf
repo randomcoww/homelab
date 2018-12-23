@@ -34,6 +34,7 @@ resource "matchbox_group" "manifest_provisioner" {
     domain_name = "${var.domain_name}"
 
     keepalived_image = "${var.keepalived_image}"
+    unbound_image    = "${var.unbound_image}"
     nftables_image   = "${var.nftables_image}"
     kea_image        = "${var.kea_image}"
     tftpd_image      = "${var.tftpd_image}"
