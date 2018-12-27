@@ -51,7 +51,7 @@ items:
     hostNetwork: true
     restartPolicy: Always
     containers:
-    - name: kube-etcd
+    - name: kube-etcd-wrapper
       image: {{.etcd_wrapper_image}}
       args:
       - "--name=$(NODE_NAME)"
@@ -74,10 +74,10 @@ items:
       - "--image={{.etcd_image}}"
       - "--pod-spec-file={{.kubelet_path}}/manifests/podspec.json"
       - "--s3-backup-path=randomcoww-etcd-backup/test-backup"
-      - "--run-interval=10s"
+      - "--healthcheck-interval=10s"
       - "--backup-interval=30m"
-      - "--restore-interval=3m"
-      - "--etcd-timeout=3m"
+      - "--cluster-err-thresh=6"
+      - "--local-err-thresh=6"
       env:
       - name: AWS_ACCESS_KEY_ID
         value: "{{.aws_access_key_id}}"
