@@ -74,10 +74,9 @@ items:
       - "--image={{.etcd_image}}"
       - "--pod-spec-file={{.kubelet_path}}/manifests/podspec.json"
       - "--s3-backup-path=randomcoww-etcd-backup/test-backup"
-      - "--healthcheck-interval=10s"
       - "--backup-interval=30m"
-      - "--cluster-err-thresh=6"
-      - "--local-err-thresh=6"
+      - "--healthcheck-interval=10s"
+      - "--pod-update-interval=3m"
       env:
       - name: AWS_ACCESS_KEY_ID
         value: "{{.aws_access_key_id}}"
