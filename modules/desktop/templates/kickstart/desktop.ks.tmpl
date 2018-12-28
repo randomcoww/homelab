@@ -84,6 +84,8 @@ gimp
 bind-utils
 openssl
 steam
+vlc
+rkt
 
 ## looking-glass
 SDL2_ttf
@@ -165,6 +167,10 @@ EOF
 
 cat <<EOF > /etc/dracut.conf.d/local.conf
 add_drivers+="vfio vfio_iommu_type1 vfio_pci vfio_virqfd"
+EOF
+
+cat <<EOF > /etc/sysctl.d/local.conf
+vm.nr_hugepages=4096
 EOF
 
 ##
