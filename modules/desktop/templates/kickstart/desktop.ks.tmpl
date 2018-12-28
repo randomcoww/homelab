@@ -99,7 +99,7 @@ SDL2_ttf
 ## user
 ##
 
-user --name={{.default_user}} --password={{.password}} --plaintext --groups=wheel,libvirt,docker
+user --name={{.default_user}} --password={{.password}} --plaintext --groups=wheel,libvirt,docker,qemu
 
 %post --erroronfail
 
