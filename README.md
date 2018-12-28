@@ -141,7 +141,7 @@ setup_provisioner/output/ssh-ca-key.pem
 
 [Setup environment](setup_environment) handles generating PXE boot configurations that are pushed to the provisioner. This currently consists of a three master and two worker Kubernetes cluster.
 
-Etcd, in addition to most other services in my lab, runs on RAM disk, but is periodically backed up to S3 and recovered as needed with the custom [etcd-wrapper](https://github.com/randomcoww/etcd-wrapper) tool to manage the cluster.
+Etcd, in addition to most other services in my lab, runs on RAM disk, but is periodically backed up to S3 and recovered as needed. Custom [etcd-wrapper](https://github.com/randomcoww/etcd-wrapper) tool is used to manage this.
 
 Populate provisioner Matchbox instance:
 ```bash
