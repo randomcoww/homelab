@@ -8,12 +8,8 @@ module "desktop" {
 
   ## host configs
   desktop_hosts = ["desktop-0"]
-  desktop_ips   = ["192.168.126.253"]
   desktop_if    = "eno1"
   mtu           = "9000"
-
-  ## ip ranges
-  netmask = "23"
 
   ## renderer provisioning access
   renderer_endpoint        = "${local.renderer_endpoint}"

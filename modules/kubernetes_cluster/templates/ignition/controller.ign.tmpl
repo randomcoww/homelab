@@ -40,6 +40,7 @@ systemd:
         ExecStart=/usr/lib/coreos/kubelet-wrapper \
           --config={{.kubelet_path}}/kubelet-config.yaml \
           --node-ip={{.host_ip}} \
+          --register-node=false \
           --pod-manifest-path={{.kubelet_path}}/manifests \
           --container-runtime=remote \
           --container-runtime-endpoint=unix:///run/docker/libcontainerd/docker-containerd.sock

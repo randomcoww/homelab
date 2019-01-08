@@ -39,16 +39,11 @@ repo --name=docker-ce --baseurl=https://download.docker.com/linux/fedora/28/$bas
 ## common
 @core
 libvirt-daemon-kvm
-qemu-kvm
 ksmtuned
 cronie
 chrony
 logrotate
 nfs-utils
-ipmitool
-pciutils
-lm_sensors
-hdparm
 ##
 
 @firefox
@@ -57,6 +52,10 @@ hdparm
 @hardware-support
 @printing
 @base-x
+hdparm
+ipmitool
+pciutils
+lm_sensors
 libvirt-client
 rsync
 tmux
@@ -149,11 +148,8 @@ Name=v{{.host_if}}
 MTUBytes={{.mtu}}
 
 [Network]
-LinkLocalAddressing=no
+LinkLocalAddressing=yes
 DHCP=yes
-
-[Address]
-Address={{.host_ip}}/{{.host_netmask}}
 EOF
 
 ##

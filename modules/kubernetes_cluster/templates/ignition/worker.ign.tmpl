@@ -29,7 +29,6 @@ systemd:
           --container-runtime-endpoint=unix:///run/docker/libcontainerd/docker-containerd.sock \
           --network-plugin=cni \
           --cert-dir={{.kubelet_path}} \
-          --register-node=true \
           --v=2
         ExecStop=-/usr/bin/rkt stop --uuid-file=/var/cache/kubelet-pod.uuid
         Restart=on-failure

@@ -11,10 +11,6 @@ variable "store_hosts" {
   type = "list"
 }
 
-variable "store_ips" {
-  type = "list"
-}
-
 variable "store_if" {
   type = "string"
 }
@@ -25,11 +21,6 @@ variable "mtu" {
 
 ## images
 variable "hyperkube_image" {
-  type = "string"
-}
-
-## ip ranges
-variable "netmask" {
   type = "string"
 }
 

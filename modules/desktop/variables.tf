@@ -23,11 +23,6 @@ variable "mtu" {
   type = "string"
 }
 
-## ip ranges
-variable "netmask" {
-  type = "string"
-}
-
 ## matchbox provisioning access
 variable "renderer_endpoint" {
   type = "string"
