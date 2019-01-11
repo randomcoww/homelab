@@ -54,19 +54,9 @@ wget -O store-0.ks \
 livecd-creator \
     --verbose \
     --config=store-0.ks \
-    --cache=/var/cache/live \
+    --cache=/var/tmp \
     --releasever 29 \
     --title store-0
-
-wget -O store-1.ks \
-    http://127.0.0.1:8080/generic?ks=store-1
-
-livecd-creator \
-    --verbose \
-    --config=store-1.ks \
-    --cache=/var/cache/live \
-    --releasever 29 \
-    --title store-1
 ```
 These images can be written to a USB flash drive.
 
