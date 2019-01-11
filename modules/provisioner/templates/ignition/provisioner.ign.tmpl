@@ -32,6 +32,7 @@ networkd:
         LinkLocalAddressing=no
         DHCP=yes
         DNS={{.backup_dns_ip}}
+        DNSOverTLS=opportunistic
 
         [DHCP]
         UseMTU=false

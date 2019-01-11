@@ -11,10 +11,6 @@ variable "desktop_hosts" {
   type = "list"
 }
 
-variable "desktop_ips" {
-  type = "list"
-}
-
 variable "desktop_if" {
   type = "string"
 }
