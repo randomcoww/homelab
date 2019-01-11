@@ -54,7 +54,7 @@ wget -O store-0.ks \
 livecd-creator \
     --verbose \
     --config=store-0.ks \
-    --cache=/var/tmp \
+    --tmpdir=/var/tmp \
     --releasever 29 \
     --title store-0
 ```
