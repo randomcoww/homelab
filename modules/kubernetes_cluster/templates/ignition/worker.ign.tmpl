@@ -1,10 +1,13 @@
 ---
 systemd:
   units:
-    - name: containerd.service
-      enabled: true
     - name: docker.service
-      mask: true
+      enabled: true
+      dropins:
+        - name: docker.conf
+          contents: |
+            [Service]
+            Environment=DOCKER_OPTS="--iptables=false"
     - name: kubelet.service
       enabled: true
       contents: |
@@ -15,18 +18,18 @@ systemd:
         Environment="KUBELET_IMAGE=docker://{{.hyperkube_image}}"
         Environment="RKT_RUN_ARGS=--uuid-file-save=/var/cache/kubelet-pod.uuid \
           --volume=resolv,kind=host,source=/etc/resolv.conf \
-          --volume=var-lib-containerd,kind=host,source=/var/lib/containerd,readOnly=false \
+          --volume=cni,kind=host,source=/etc/cni/net.d,readOnly=true \
           --mount volume=resolv,target=/etc/resolv.conf \
-          --mount volume=var-lib-containerd,target=/var/lib/containerd \
+          --mount volume=cni,target=/etc/cni/net.d \
           --insecure-options=image"
-        ExecStartPre=/bin/mkdir -p /var/log/containers
+        ExecStartPre=/bin/mkdir -p \
+          /var/log/containers \
+          /etc/cni/net.d
         ExecStartPre=-/usr/bin/rkt rm --uuid-file=/var/cache/kubelet-pod.uuid
         ExecStart=/usr/lib/coreos/kubelet-wrapper \
           --config={{.kubelet_path}}/kubelet-config.yaml \
           --kubeconfig={{.kubelet_path}}/kubelet.kubeconfig \
           --bootstrap-kubeconfig={{.kubelet_path}}/bootstrap.kubeconfig \
-          --container-runtime=remote \
-          --container-runtime-endpoint=unix:///run/docker/libcontainerd/docker-containerd.sock \
           --network-plugin=cni \
           --cert-dir={{.kubelet_path}} \
           --v=2
