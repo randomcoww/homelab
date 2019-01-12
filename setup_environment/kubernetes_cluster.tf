@@ -17,7 +17,7 @@ module "kubernetes_cluster" {
 
   ## images
   container_linux_base_url      = "http://beta.release.core-os.net/amd64-usr"
-  container_linux_version       = "1939.1.0"
+  container_linux_version       = "current"
   hyperkube_image               = "gcr.io/google_containers/hyperkube:${local.kubernetes_version}"
   kube_apiserver_image          = "gcr.io/google_containers/kube-apiserver:${local.kubernetes_version}"
   kube_controller_manager_image = "gcr.io/google_containers/kube-controller-manager:${local.kubernetes_version}"
