@@ -24,7 +24,7 @@ module "kubernetes_cluster" {
   kube_scheduler_image          = "gcr.io/google_containers/kube-scheduler:${local.kubernetes_version}"
   kube_proxy_image              = "gcr.io/google_containers/kube-proxy:${local.kubernetes_version}"
   etcd_wrapper_image            = "randomcoww/etcd-wrapper:20181227.02"
-  etcd_image                    = "quay.io/coreos/etcd:v3.3"
+  etcd_image                    = "gcr.io/etcd-development/etcd:v3.3"
   flannel_image                 = "quay.io/coreos/flannel:v0.10.0-amd64"
   keepalived_image              = "randomcoww/keepalived:20180913.01"
   cni_plugins_image             = "randomcoww/cni_plugins:0.7.1"
