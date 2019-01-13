@@ -15,12 +15,11 @@ variable "store_if" {
   type = "string"
 }
 
-variable "mtu" {
+variable "store_vif" {
   type = "string"
 }
 
-## images
-variable "hyperkube_image" {
+variable "mtu" {
   type = "string"
 }
 

@@ -39,19 +39,16 @@ module "kubernetes_cluster" {
 
   ## vip
   controller_vip = "192.168.126.245"
-  nfs_vip        = "192.168.126.251"
   matchbox_vip   = "192.168.126.242"
 
   ## ip ranges
   netmask = "23"
 
-  ## vm runs on ram, mount etcd data path from host
-  etcd_mount_path = "/data/pv/etcd"
-
   ## etcd backup access
   aws_region            = "us-west-2"
   aws_access_key_id     = "${var.aws_access_key_id}"
   aws_secret_access_key = "${var.aws_secret_access_key}"
+  s3_backup_path        = "randomcoww-etcd-backup/test-backup"
 
   ## renderer provisioning access
   renderer_endpoint        = "${local.renderer_endpoint}"

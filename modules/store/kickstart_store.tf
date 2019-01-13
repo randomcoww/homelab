@@ -17,11 +17,11 @@ resource "matchbox_group" "generic_store" {
   }
 
   metadata {
-    hyperkube_image    = "${var.hyperkube_image}"
     ssh_authorized_key = "cert-authority ${chomp(var.ssh_ca_public_key)}"
     default_user       = "${var.default_user}"
 
-    host_if      = "${var.store_if}"
-    mtu          = "${var.mtu}"
+    host_if  = "${var.store_if}"
+    host_vif = "${var.store_vif}"
+    mtu      = "${var.mtu}"
   }
 }

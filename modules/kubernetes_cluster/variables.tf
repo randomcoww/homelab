@@ -150,21 +150,12 @@ variable "controller_vip" {
   type = "string"
 }
 
-variable "nfs_vip" {
-  type = "string"
-}
-
 variable "matchbox_vip" {
   type = "string"
 }
 
 ## ip ranges
 variable "netmask" {
-  type = "string"
-}
-
-## etcd net mount path
-variable "etcd_mount_path" {
   type = "string"
 }
 
@@ -195,5 +186,9 @@ variable "aws_access_key_id" {
 }
 
 variable "aws_secret_access_key" {
+  type = "string"
+}
+
+variable "s3_backup_path" {
   type = "string"
 }

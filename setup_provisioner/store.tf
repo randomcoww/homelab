@@ -9,10 +9,8 @@ module "store" {
   ## host configs
   store_hosts = ["store-0"]
   store_if    = "enp1s0f0"
+  store_vif   = "veth0"
   mtu         = "9000"
-
-  ## images
-  hyperkube_image = "gcr.io/google_containers/hyperkube:${local.kubernetes_version}"
 
   ## renderer provisioning access
   renderer_endpoint        = "${local.renderer_endpoint}"

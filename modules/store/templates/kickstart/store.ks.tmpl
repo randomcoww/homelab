@@ -38,7 +38,6 @@ nfs-utils
 zfs
 -zfs-fuse
 openssh-server
-hdparm
 
 ## livecd-creator
 kernel
@@ -105,21 +104,21 @@ MTUBytes={{.mtu}}
 [Network]
 LinkLocalAddressing=no
 DHCP=no
-MACVTAP=v{{.host_if}}
+MACVTAP={{.host_vif}}
 EOF
 
-cat <<EOF > /etc/systemd/network/00_v{{.host_if}}.netdev
+cat <<EOF > /etc/systemd/network/00_{{.host_vif}}.netdev
 [NetDev]
-Name=v{{.host_if}}
+Name={{.host_vif}}
 Kind=macvtap
 
 [MACVTAP]
 Mode=bridge
 EOF
 
-cat <<EOF > /etc/systemd/network/00_v{{.host_if}}.network
+cat <<EOF > /etc/systemd/network/00_{{.host_vif}}.network
 [Match]
-Name=v{{.host_if}}
+Name={{.host_vif}}
 
 [Link]
 MTUBytes={{.mtu}}

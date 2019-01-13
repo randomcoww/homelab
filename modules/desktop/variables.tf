@@ -15,6 +15,10 @@ variable "desktop_if" {
   type = "string"
 }
 
+variable "desktop_vif" {
+  type = "string"
+}
+
 variable "mtu" {
   type = "string"
 }

@@ -73,7 +73,7 @@ items:
       - "--tls-dir={{.kubelet_path}}"
       - "--image={{.etcd_image}}"
       - "--pod-spec-file={{.kubelet_path}}/manifests/podspec.json"
-      - "--s3-backup-path=randomcoww-etcd-backup/test-backup"
+      - "--s3-backup-path={{.s3_backup_path}}"
       - "--backup-interval=30m"
       - "--healthcheck-interval=10s"
       - "--pod-update-interval=3m"

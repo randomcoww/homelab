@@ -9,6 +9,7 @@ module "desktop" {
   ## host configs
   desktop_hosts = ["desktop-0"]
   desktop_if    = "eno1"
+  desktop_vif   = "veth0"
   mtu           = "9000"
 
   ## renderer provisioning access

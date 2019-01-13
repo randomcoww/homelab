@@ -22,7 +22,8 @@ resource "matchbox_group" "generic_desktop" {
     default_user = "${var.default_user}"
     password     = "${var.password}"
 
-    host_if      = "${var.desktop_if}"
-    mtu          = "${var.mtu}"
+    host_if  = "${var.desktop_if}"
+    host_vif = "${var.desktop_vif}"
+    mtu      = "${var.mtu}"
   }
 }
