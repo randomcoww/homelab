@@ -7,15 +7,15 @@ module "kubernetes_cluster" {
   ssh_ca_public_key = "${tls_private_key.ssh_ca.public_key_openssh}"
 
   ## hosts
-  controller_hosts = ["controller-0", "controller-1", "controller-2"]
-  controller_ips   = ["192.168.126.219", "192.168.126.220", "192.168.126.221"]
-  controller_macs  = ["52-54-00-1a-61-0a", "52-54-00-1a-61-0b", "52-54-00-1a-61-0c"]
-  controller_if    = "eth0"
-
-  worker_hosts = ["worker-0", "worker-1", "worker-2"]
-  worker_macs  = ["52-54-00-1a-61-1a", "52-54-00-1a-61-1b", "52-54-00-1a-61-1c"]
-  worker_if    = "eth0"
-  worker_br_if = "eth1"
+  controller_hosts   = ["controller-0", "controller-1", "controller-2"]
+  controller_ips     = ["192.168.126.219", "192.168.126.220", "192.168.126.221"]
+  controller_macs    = ["52-54-00-1a-61-0a", "52-54-00-1a-61-0b", "52-54-00-1a-61-0c"]
+  controller_if      = "eth0"
+  controller_netmask = "23"
+  worker_hosts       = ["worker-0", "worker-1", "worker-2"]
+  worker_macs        = ["52-54-00-1a-61-1a", "52-54-00-1a-61-1b", "52-54-00-1a-61-1c"]
+  worker_if          = "eth0"
+  worker_br_if       = "eth1"
 
   ## images
   container_linux_base_url      = "http://beta.release.core-os.net/amd64-usr"
@@ -42,9 +42,6 @@ module "kubernetes_cluster" {
   ## vip
   controller_vip = "192.168.126.245"
   matchbox_vip   = "192.168.126.242"
-
-  ## ip ranges
-  netmask = "23"
 
   ## etcd backup access
   aws_region            = "us-west-2"

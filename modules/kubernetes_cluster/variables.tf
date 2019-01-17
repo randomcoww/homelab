@@ -24,6 +24,10 @@ variable "controller_if" {
   type = "string"
 }
 
+variable "controller_netmask" {
+  type = "string"
+}
+
 variable "worker_if" {
   type = "string"
 }
@@ -159,11 +163,6 @@ variable "controller_vip" {
 }
 
 variable "matchbox_vip" {
-  type = "string"
-}
-
-## ip ranges
-variable "netmask" {
   type = "string"
 }
 
