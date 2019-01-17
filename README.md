@@ -50,6 +50,8 @@ Generate hypervisor images:
 ```bash
 wget -O store-0.ks \
     http://127.0.0.1:8080/generic?ks=store-0
+wget -O store-1.ks \
+    http://127.0.0.1:8080/generic?ks=store-1
 
 livecd-creator \
     --verbose \
@@ -57,6 +59,12 @@ livecd-creator \
     --tmpdir=/var/tmp \
     --releasever 29 \
     --title store-0
+livecd-creator \
+    --verbose \
+    --config=store-1.ks \
+    --tmpdir=/var/tmp \
+    --releasever 29 \
+    --title store-1
 ```
 These images can be written to a USB flash drive.
 
