@@ -79,6 +79,7 @@ DNSStubListener=no
 EOF
 
 ## default
+
 cat <<EOF > /etc/systemd/network/99_en.network
 [Match]
 Name=en*
@@ -92,7 +93,6 @@ LinkLocalAddressing=no
 DHCP=no
 EOF
 
-## host macvtap
 cat <<EOF > /etc/systemd/network/00_{{.host_if}}.network
 [Match]
 Name={{.host_if}}
@@ -104,29 +104,98 @@ MTUBytes={{.mtu}}
 [Network]
 LinkLocalAddressing=no
 DHCP=no
-MACVTAP={{.host_vif}}
+MACVTAP=int0
 EOF
 
-cat <<EOF > /etc/systemd/network/00_{{.host_vif}}.netdev
+## vswitch bridge
+
+cat <<EOF > /etc/systemd/network/{{.br_if}}.netdev
 [NetDev]
-Name={{.host_vif}}
+Name={{.br_if}}
+Kind=bridge
+EOF
+
+cat <<EOF > /etc/systemd/network/{{.br_if}}.network
+[Match]
+Name={{.br_if}}
+
+[Link]
+ARP=no
+MTUBytes={{.mtu}}
+
+[Network]
+LinkLocalAddressing=no
+DHCP=no
+MACVTAP=int1
+Bridge=dummy0
+EOF
+
+cat <<EOF > /etc/systemd/network/dummy0.netdev
+[NetDev]
+Name=dummy0
+Kind=dummy
+EOF
+
+cat <<EOF > /etc/systemd/network/dummy0.network
+[Match]
+Name=dummy0
+
+[Network]
+LinkLocalAddressing=no
+DHCP=no
+Bridge={{.br_if}}
+EOF
+
+## host macvtap
+
+cat <<EOF > /etc/systemd/network/int0.netdev
+[NetDev]
+Name=int0
 Kind=macvtap
 
 [MACVTAP]
 Mode=bridge
 EOF
 
-cat <<EOF > /etc/systemd/network/00_{{.host_vif}}.network
+cat <<EOF > /etc/systemd/network/int0.network
 [Match]
-Name={{.host_vif}}
+Name=int0
 
 [Link]
 MTUBytes={{.mtu}}
 
 [Network]
-LinkLocalAddressing=yes
-LLMNR=no
+LinkLocalAddressing=no
 DHCP=yes
+
+[Address]
+Address={{.host_ip}}/{{.host_netmask}}
+EOF
+
+## host macvtap to vswitch
+
+cat <<EOF > /etc/systemd/network/int1.netdev
+[NetDev]
+Name=int1
+Kind=macvtap
+
+[MACVTAP]
+Mode=bridge
+EOF
+
+cat <<EOF > /etc/systemd/network/int1.network
+[Match]
+Name=int1
+
+[Link]
+MTUBytes={{.mtu}}
+
+[Network]
+LinkLocalAddressing=no
+DHCP=no
+
+[Address]
+Address={{.br_ip}}/{{.br_netmask}}
 EOF
 
 ##

@@ -11,12 +11,31 @@ variable "store_hosts" {
   type = "list"
 }
 
+variable "store_ips" {
+  type = "list"
+}
+
 variable "store_if" {
   type = "string"
 }
 
-variable "store_vif" {
+variable "store_netmask" {
   type = "string"
+}
+
+variable "br_if" {
+  type    = "string"
+  default = "br0"
+}
+
+variable "br_ip" {
+  type    = "string"
+  default = "169.254.169.254"
+}
+
+variable "br_netmask" {
+  type    = "string"
+  default = "16"
 }
 
 variable "mtu" {

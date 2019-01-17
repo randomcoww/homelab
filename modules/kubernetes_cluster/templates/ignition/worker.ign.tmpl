@@ -1,4 +1,25 @@
 ---
+networkd:
+  units:
+    - name: {{.host_if}}.network
+      contents: |
+        [Match]
+        Name={{.host_if}}
+
+        [Network]
+        LinkLocalAddressing=no
+        DHCP=yes
+
+        [DHCP]
+        UseMTU=yes
+    - name: {{.br_if}}.network
+      contents: |
+        [Match]
+        Name={{.br_if}}
+
+        [Network]
+        LinkLocalAddressing=yes
+        DHCP=no
 systemd:
   units:
     - name: docker.service

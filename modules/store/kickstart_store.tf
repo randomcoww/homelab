@@ -20,8 +20,12 @@ resource "matchbox_group" "generic_store" {
     ssh_authorized_key = "cert-authority ${chomp(var.ssh_ca_public_key)}"
     default_user       = "${var.default_user}"
 
-    host_if  = "${var.store_if}"
-    host_vif = "${var.store_vif}"
-    mtu      = "${var.mtu}"
+    host_ip      = "${var.store_ips[count.index]}"
+    host_if      = "${var.store_if}"
+    host_netmask = "${var.store_netmask}"
+    br_if        = "${var.br_if}"
+    br_ip        = "${var.br_ip}"
+    br_netmask   = "${var.br_netmask}"
+    mtu          = "${var.mtu}"
   }
 }

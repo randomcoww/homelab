@@ -14,6 +14,8 @@ module "kubernetes_cluster" {
 
   worker_hosts = ["worker-0", "worker-1", "worker-2"]
   worker_macs  = ["52-54-00-1a-61-1a", "52-54-00-1a-61-1b", "52-54-00-1a-61-1c"]
+  worker_if    = "eth0"
+  worker_br_if = "eth1"
 
   ## images
   container_linux_base_url      = "http://beta.release.core-os.net/amd64-usr"

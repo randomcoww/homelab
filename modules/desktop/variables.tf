@@ -11,12 +11,31 @@ variable "desktop_hosts" {
   type = "list"
 }
 
+variable "desktop_ips" {
+  type = "list"
+}
+
 variable "desktop_if" {
   type = "string"
 }
 
-variable "desktop_vif" {
+variable "desktop_netmask" {
   type = "string"
+}
+
+variable "br_if" {
+  type    = "string"
+  default = "br0"
+}
+
+variable "br_ip" {
+  type    = "string"
+  default = "169.254.169.254"
+}
+
+variable "br_netmask" {
+  type    = "string"
+  default = "16"
 }
 
 variable "mtu" {

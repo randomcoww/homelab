@@ -24,6 +24,14 @@ variable "controller_if" {
   type = "string"
 }
 
+variable "worker_if" {
+  type = "string"
+}
+
+variable "worker_br_if" {
+  type = "string"
+}
+
 ## worker host
 variable "worker_hosts" {
   type = "list"

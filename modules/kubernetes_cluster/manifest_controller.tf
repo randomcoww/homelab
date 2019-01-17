@@ -41,7 +41,8 @@ resource "matchbox_group" "manifest_controller" {
     controller_vip = "${var.controller_vip}"
     host_if        = "${var.controller_if}"
 
-    kubelet_path = "${var.kubelet_path}"
-    etcd_path    = "${var.etcd_path}"
+    kubelet_path   = "${var.kubelet_path}"
+    etcd_path      = "${var.etcd_path}"
+    s3_backup_path = "${var.s3_backup_path}"
   }
 }
