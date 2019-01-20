@@ -39,6 +39,8 @@ systemd:
 
         [Install]
         WantedBy=remote-fs.target
+    - name: rpc-statd.service
+      enabled: true
     - name: docker.service
       enabled: true
       dropins:
