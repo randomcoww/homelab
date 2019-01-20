@@ -6,7 +6,7 @@
         "<down><down><end> ",
         "nomodeset ",
         "inst.text ",
-        "inst.ks=http://192.168.126.242:58080/generic?host={{.Name}} ",
+        "inst.ks=http://192.168.126.242:58080/generic?ks={{.Name}} ",
         "<leftCtrlOn>x<leftCtrlOff>"
       ],
       "disk_size" : 60000,

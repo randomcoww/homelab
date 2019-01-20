@@ -42,7 +42,10 @@ resource "matchbox_group" "ignition_worker" {
     host_if = "${var.worker_if}"
     br_if   = "${var.worker_br_if}"
 
-    kubelet_path = "${var.kubelet_path}"
+    kubelet_path           = "${var.kubelet_path}"
+    ceph_nfs_server        = "${var.ceph_nfs_server}"
+    ceph_nfs_mount         = "${var.ceph_nfs_mount}"
+    ceph_nfs_mount_service = "${join("-", slice(split("/", var.ceph_nfs_mount), 1, length(split("/", var.ceph_nfs_mount))))}"
 
     tls_ca            = "${replace(tls_self_signed_cert.root.cert_pem, "\n", "\\n")}"
     tls_bootstrap     = "${replace(tls_locally_signed_cert.bootstrap.cert_pem, "\n", "\\n")}"

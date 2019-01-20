@@ -43,6 +43,10 @@ module "kubernetes_cluster" {
   controller_vip = "192.168.126.245"
   matchbox_vip   = "192.168.126.242"
 
+  ## root mount
+  ceph_nfs_server = "169.254.169.254:/data/ceph"
+  ceph_nfs_mount  = "/var/lib/rook"
+
   ## etcd backup access
   aws_region            = "us-west-2"
   aws_access_key_id     = "${var.aws_access_key_id}"

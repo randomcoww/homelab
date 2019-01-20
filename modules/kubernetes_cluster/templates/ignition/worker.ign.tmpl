@@ -22,6 +22,26 @@ networkd:
         DHCP=no
 systemd:
   units:
+    - name: {{.ceph_nfs_mount_service}}.mount
+      contents: |
+        [Unit]
+        Before=remote-fs.target
+
+        [Mount]
+        What={{.ceph_nfs_server}}
+        Where={{.ceph_nfs_mount}}
+        Type=nfs
+
+        [Install]
+        WantedBy=remote-fs.target
+    - name: {{.ceph_nfs_mount_service}}.automount
+      enable: true
+      contents: |
+        [Automount]
+        Where={{.ceph_nfs_mount}}
+
+        [Install]
+        WantedBy=remote-fs.target
     - name: docker.service
       enabled: true
       dropins:
@@ -53,6 +73,7 @@ systemd:
           --bootstrap-kubeconfig={{.kubelet_path}}/bootstrap.kubeconfig \
           --network-plugin=cni \
           --cert-dir={{.kubelet_path}} \
+          --volume-plugin-dir={{.kubelet_path}}/volumeplugins \
           --v=2
         ExecStop=-/usr/bin/rkt stop --uuid-file=/var/cache/kubelet-pod.uuid
         Restart=on-failure

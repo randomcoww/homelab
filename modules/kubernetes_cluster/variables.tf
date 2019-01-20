@@ -36,6 +36,14 @@ variable "worker_br_if" {
   type = "string"
 }
 
+variable "ceph_nfs_server" {
+  type = "string"
+}
+
+variable "ceph_nfs_mount" {
+  type = "string"
+}
+
 ## worker host
 variable "worker_hosts" {
   type = "list"
