@@ -28,8 +28,8 @@ module "kubernetes_cluster" {
   etcd_wrapper_image            = "randomcoww/etcd-wrapper:20181227.02"
   etcd_image                    = "gcr.io/etcd-development/etcd:v3.3"
   flannel_image                 = "quay.io/coreos/flannel:v0.10.0-amd64"
-  keepalived_image              = "randomcoww/keepalived:20180913.01"
-  cni_plugins_image             = "randomcoww/cni_plugins:0.7.1"
+  keepalived_image              = "randomcoww/keepalived:20190119.01"
+  cni_plugins_image             = "randomcoww/cni_plugins:0.7.4"
 
   ## kubernetes
   cluster_name       = "kube-cluster"
