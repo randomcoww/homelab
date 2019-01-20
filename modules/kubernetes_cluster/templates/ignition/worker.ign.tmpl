@@ -31,9 +31,6 @@ systemd:
         What={{.ceph_nfs_server}}
         Where={{.ceph_nfs_mount}}
         Type=nfs
-
-        [Install]
-        WantedBy=remote-fs.target
     - name: {{.ceph_nfs_mount_service}}.automount
       enable: true
       contents: |
