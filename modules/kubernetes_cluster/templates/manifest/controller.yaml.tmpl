@@ -25,10 +25,6 @@ items:
           global_defs {
             vrrp_version 3
           }
-          vrrp_script CHK_kube-master {
-            script "nc -z -w5 localhost {{.apiserver_secure_port}}"
-            interval 2
-          }
           vrrp_instance VI_kube-master_store {
             state BACKUP
             strict_mode off
@@ -38,9 +34,13 @@ items:
             virtual_ipaddress {
               {{.controller_vip}}
             }
-            track_script {
-              CHK_kube-master
-            }
+          }
+          virtual_server {{.controller_vip}} {{.apiserver_secure_port}} {
+            delay_loop 2
+            lb_algo rr
+            lb_kind DR
+            protocol TCP
+            {{.keepalived_real_servers}}
           }
 - kind: Pod
   apiVersion: v1

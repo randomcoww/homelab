@@ -6,6 +6,18 @@ resource "matchbox_profile" "manifest_controller" {
   generic_config = "${file("${path.module}/templates/manifest/controller.yaml.tmpl")}"
 }
 
+locals {
+  keepalived_real_servers_template = <<EOF
+real_server %s ${var.apiserver_secure_port} {
+  weight 1
+  TCP_CHECK {
+    connect_port ${var.apiserver_secure_port}
+    connect_timeout 1
+  }
+}
+EOF
+}
+
 resource "matchbox_group" "manifest_controller" {
   name    = "${matchbox_profile.manifest_controller.name}"
   profile = "${matchbox_profile.manifest_controller.name}"
@@ -22,13 +34,13 @@ resource "matchbox_group" "manifest_controller" {
     etcd_wrapper_image            = "${var.etcd_wrapper_image}"
     etcd_image                    = "${var.etcd_image}"
 
-    etcd_initial_cluster = "${join(",", formatlist("%s=https://%s:${var.etcd_peer_port}", "${var.controller_hosts}", "${var.controller_ips}"))}"
-    etcd_cluster_token   = "${var.etcd_cluster_token}"
-    etcd_servers         = "${join(",", formatlist("https://%s:${var.etcd_client_port}", "${var.controller_ips}"))}"
-
-    etcd_client_port      = "${var.etcd_client_port}"
-    etcd_peer_port        = "${var.etcd_peer_port}"
-    apiserver_secure_port = "${var.apiserver_secure_port}"
+    etcd_initial_cluster    = "${join(",", formatlist("%s=https://%s:${var.etcd_peer_port}", "${var.controller_hosts}", "${var.controller_ips}"))}"
+    etcd_cluster_token      = "${var.etcd_cluster_token}"
+    etcd_servers            = "${join(",", formatlist("https://%s:${var.etcd_client_port}", "${var.controller_ips}"))}"
+    etcd_client_port        = "${var.etcd_client_port}"
+    etcd_peer_port          = "${var.etcd_peer_port}"
+    apiserver_secure_port   = "${var.apiserver_secure_port}"
+    keepalived_real_servers = "${indent(12, join("\n", formatlist("${local.keepalived_real_servers_template}", "${var.controller_ips}")))}"
 
     aws_region            = "${var.aws_region}"
     aws_access_key_id     = "${var.aws_access_key_id}"
