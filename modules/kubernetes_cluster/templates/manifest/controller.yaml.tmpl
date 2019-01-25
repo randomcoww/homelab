@@ -17,6 +17,8 @@ items:
         capabilities:
           add:
           - NET_ADMIN
+      args:
+      - "-P"
       env:
       - name: KEEPALIVED_LOCAL_CONFIG
         value: |-
@@ -32,13 +34,6 @@ items:
             virtual_ipaddress {
               {{.controller_vip}}
             }
-          }
-          virtual_server {{.controller_vip}} {{.apiserver_secure_port}} {
-            delay_loop 2
-            lb_algo rr
-            lb_kind DR
-            protocol TCP
-            {{.keepalived_real_servers}}
           }
 - kind: Pod
   apiVersion: v1
