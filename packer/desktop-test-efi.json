@@ -19,7 +19,7 @@
       "net_device": "virtio-net",
       "communicator": "none",
       "type": "qemu",
-      "shutdown_timeout": "30m",
+      "shutdown_timeout": "60m",
       "qemuargs": [
         [ "-m", "4096M" ],
         [ "-smp", "4" ],
