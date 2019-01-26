@@ -42,20 +42,29 @@ networkd:
         UseHostname=false
         UseDomains=false
         UseTimezone=no
+
 systemd:
   units:
     - name: docker.service
+      mask: true
+    - name: docker.socket
+      mask: true
+    - name: containerd.service
       enabled: true
       dropins:
-        - name: docker.conf
+        - name: containerd.conf
           contents: |
             [Service]
-            Environment=DOCKER_OPTS="--iptables=false"
+            ExecStart=
+            ExecStart=/usr/bin/env PATH=${TORCX_BINDIR}:${PATH} ${TORCX_BINDIR}/containerd
+            OOMScoreAdjust=-999
     - name: kubelet.service
       enabled: true
       contents: |
         [Unit]
         Description=Kubelet via Hyperkube ACI
+        After=containerd.service
+        Requires=containerd.service
 
         [Service]
         Environment="KUBELET_IMAGE=docker://{{.hyperkube_image}}"
@@ -68,13 +77,16 @@ systemd:
         ExecStart=/usr/lib/coreos/kubelet-wrapper \
           --config={{.kubelet_path}}/kubelet-config.yaml \
           --node-ip={{.store_ip}} \
-          --register-node=false
+          --register-node=false \
+          --container-runtime=remote \
+          --container-runtime-endpoint=unix:///var/run/containerd/containerd.sock
         ExecStop=-/usr/bin/rkt stop --uuid-file=/var/cache/kubelet-pod.uuid
-        Restart=on-failure
+        Restart=always
         RestartSec=5
 
         [Install]
         WantedBy=multi-user.target
+
 storage:
   files:
     - path: /etc/hostname

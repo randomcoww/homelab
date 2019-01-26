@@ -20,6 +20,7 @@ networkd:
         [Network]
         LinkLocalAddressing=yes
         DHCP=no
+
 systemd:
   units:
     - name: {{.ceph_nfs_mount_service}}.mount
@@ -42,17 +43,25 @@ systemd:
     - name: rpc-statd.service
       enabled: true
     - name: docker.service
+      mask: true
+    - name: docker.socket
+      mask: true
+    - name: containerd.service
       enabled: true
       dropins:
-        - name: docker.conf
+        - name: containerd.conf
           contents: |
             [Service]
-            Environment=DOCKER_OPTS="--iptables=false"
+            ExecStart=
+            ExecStart=/usr/bin/env PATH=${TORCX_BINDIR}:${PATH} ${TORCX_BINDIR}/containerd
+            OOMScoreAdjust=-999
     - name: kubelet.service
       enabled: true
       contents: |
         [Unit]
         Description=Kubelet via Hyperkube ACI
+        After=containerd.service
+        Requires=containerd.service
 
         [Service]
         Environment="KUBELET_IMAGE=docker://{{.hyperkube_image}}"
@@ -73,13 +82,15 @@ systemd:
           --network-plugin=cni \
           --cert-dir={{.kubelet_path}} \
           --volume-plugin-dir={{.kubelet_path}}/volumeplugins \
-          --v=2
+          --container-runtime=remote \
+          --container-runtime-endpoint=unix:///var/run/containerd/containerd.sock
         ExecStop=-/usr/bin/rkt stop --uuid-file=/var/cache/kubelet-pod.uuid
-        Restart=on-failure
+        Restart=always
         RestartSec=5
 
         [Install]
         WantedBy=multi-user.target
+
 storage:
   files:
     - path: /etc/sysctl.d/max-user-watches.conf
@@ -130,7 +141,6 @@ storage:
           featureGates:
             RotateKubeletClientCertificate: true
             RotateKubeletServerCertificate: true
-
     - path: {{.kubelet_path}}/bootstrap.kubeconfig
       filesystem: root
       mode: 420
