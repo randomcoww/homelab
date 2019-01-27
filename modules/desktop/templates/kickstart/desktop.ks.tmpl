@@ -92,7 +92,7 @@ jq
 ## user
 ##
 
-user --name={{.default_user}} --password={{.password}} --plaintext --uid=1000 --gid=1000 --groups=wheel,libvirt,docker,qemu
+user --name={{.default_user}} --password={{.password}} --plaintext --uid=1000 --gid=1000 --groups=wheel,libvirt,docker,qemu,input
 
 %post --erroronfail
 
