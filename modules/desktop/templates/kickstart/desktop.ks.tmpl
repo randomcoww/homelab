@@ -283,6 +283,22 @@ systemctl mask \
 systemctl set-default graphical.target
 
 ##
+## qemu.conf changes needed for evdev and pa
+##
+
+cat <<EOF >> /etc/libvirt/qemu.conf
+user = "{{.default_user}}"
+cgroup_device_acl = [
+    "/dev/null", "/dev/full", "/dev/zero",
+    "/dev/random", "/dev/urandom",
+    "/dev/ptmx", "/dev/kvm", "/dev/kqemu",
+    "/dev/rtc","/dev/hpet", "/dev/sev",
+    "/dev/input/by-id/usb-Logitech_USB_Receiver-event-mouse",
+    "/dev/input/by-id/usb-Cooler_Master_Technology_Inc._MasterKeys_S-event-kbd",
+]
+EOF
+
+##
 ## cleanup
 ##
 
