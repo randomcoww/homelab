@@ -46,7 +46,6 @@ resource "matchbox_group" "manifest_provisioner" {
     kea_peer_port       = "${var.kea_peer_port}"
     syncthing_peer_port = "${var.syncthing_peer_port}"
 
-    controller_vip    = "${var.controller_vip}"
     matchbox_vip      = "${var.matchbox_vip}"
     store_gateway_vip = "${var.store_gateway_vip}"
     lan_gateway_vip   = "${var.lan_gateway_vip}"
@@ -62,7 +61,6 @@ resource "matchbox_group" "manifest_provisioner" {
     lan_dhcp_ip_range   = "${var.lan_dhcp_ip_range}"
     store_ip_range      = "${var.store_ip_range}"
     store_dhcp_ip_range = "${var.store_dhcp_ip_range}"
-    metallb_ip_range    = "${var.metallb_ip_range}"
 
     certs_path    = "${var.certs_path}"
     kea_path      = "${var.kea_path}"

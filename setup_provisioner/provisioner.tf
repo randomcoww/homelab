@@ -36,7 +36,6 @@ module "provisioner" {
   matchbox_rpc_port  = "58081"
 
   ## vip
-  controller_vip    = "192.168.126.245"
   store_gateway_vip = "192.168.126.240"
   lan_gateway_vip   = "192.168.62.240"
   dns_vip           = "192.168.126.241"
@@ -50,7 +49,6 @@ module "provisioner" {
   store_ip_range      = "192.168.126.0/23"
   lan_dhcp_ip_range   = "192.168.62.64/26"
   store_dhcp_ip_range = "192.168.126.64/26"
-  metallb_ip_range    = "192.168.127.128/25"
 
   ## github provisioner url
   remote_provision_base_url = "http://r.fuzzybunny.io"

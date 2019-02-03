@@ -29,21 +29,6 @@ items:
               ct state invalid drop;
             }
 
-            set tcp_fwd {
-              type inet_service; flags interval;
-              elements = {
-                ssh,
-                sunrpc,nfs
-              }
-            }
-
-            set udp_fwd {
-              type inet_service; flags interval;
-              elements = {
-                sunrpc,nfs
-              }
-            }
-
             chain input {
               type filter hook input priority 0; policy drop;
 
@@ -72,14 +57,6 @@ items:
 
               iifname $if_trusted accept;
               iifname $if_internal oifname $if_external accept;
-
-              iifname $if_internal tcp dport @tcp_fwd accept;
-              iifname $if_internal udp dport @udp_fwd accept;
-
-              iifname $if_internal ip daddr {{.controller_vip}} accept;
-              iifname $if_internal ip daddr {{.metallb_ip_range}} accept;
-
-              ip daddr {{.controller_vip}} ct status dnat accept;
             }
 
             chain output {
@@ -88,16 +65,8 @@ items:
           }
 
           table ip nat {
-            set tcp_dnat {
-              type inet_service; flags interval;
-              elements = {
-                2222
-              }
-            }
-
             chain prerouting {
               type nat hook prerouting priority 0; policy accept;
-              tcp dport @tcp_dnat dnat {{.controller_vip}};
             }
 
             chain input {

@@ -118,10 +118,6 @@ variable "matchbox_vip" {
   type = "string"
 }
 
-variable "controller_vip" {
-  type = "string"
-}
-
 variable "backup_dns_ip" {
   type = "string"
 }
@@ -148,10 +144,6 @@ variable "lan_dhcp_ip_range" {
 }
 
 variable "store_dhcp_ip_range" {
-  type = "string"
-}
-
-variable "metallb_ip_range" {
   type = "string"
 }
 

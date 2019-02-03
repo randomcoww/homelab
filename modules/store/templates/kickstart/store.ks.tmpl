@@ -105,6 +105,8 @@ MTUBytes={{.mtu}}
 LinkLocalAddressing=no
 DHCP=no
 MACVTAP=int0
+VLAN=env30
+VLAN=env90
 EOF
 
 ## vswitch bridge
@@ -144,6 +146,26 @@ Name=dummy0
 LinkLocalAddressing=no
 DHCP=no
 Bridge={{.br_if}}
+EOF
+
+## vlan
+
+cat <<EOF > /etc/systemd/network/env30.netdev
+[NetDev]
+Name=env30
+Kind=vlan
+
+[VLAN]
+Id=30
+EOF
+
+cat <<EOF > /etc/systemd/network/env90.netdev
+[NetDev]
+Name=env90
+Kind=vlan
+
+[VLAN]
+Id=90
 EOF
 
 ## host macvtap
