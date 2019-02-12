@@ -33,9 +33,8 @@ resource "matchbox_group" "ignition_provisioner" {
     mtu           = "${var.mtu}"
 
     backup_dns_ip = "${var.backup_dns_ip}"
-
-    kubelet_path = "${var.kubelet_path}"
-    certs_path   = "${var.certs_path}"
+    kubelet_path  = "${var.kubelet_path}"
+    certs_path    = "${var.certs_path}"
 
     tls_ca            = "${replace(tls_self_signed_cert.root.cert_pem, "\n", "\\n")}"
     tls_matchbox      = "${replace(element(tls_locally_signed_cert.matchbox.*.cert_pem, count.index), "\n", "\\n")}"

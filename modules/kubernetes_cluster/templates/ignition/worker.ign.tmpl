@@ -12,36 +12,9 @@ networkd:
 
         [DHCP]
         UseMTU=yes
-    - name: {{.br_if}}.network
-      contents: |
-        [Match]
-        Name={{.br_if}}
-
-        [Network]
-        LinkLocalAddressing=yes
-        DHCP=no
 
 systemd:
   units:
-    - name: {{.ceph_nfs_mount_service}}.mount
-      contents: |
-        [Unit]
-        Before=remote-fs.target
-
-        [Mount]
-        What={{.ceph_nfs_server}}
-        Where={{.ceph_nfs_mount}}
-        Type=nfs
-    - name: {{.ceph_nfs_mount_service}}.automount
-      enable: true
-      contents: |
-        [Automount]
-        Where={{.ceph_nfs_mount}}
-
-        [Install]
-        WantedBy=remote-fs.target
-    - name: rpc-statd.service
-      enabled: true
     - name: docker.service
       mask: true
     - name: docker.socket

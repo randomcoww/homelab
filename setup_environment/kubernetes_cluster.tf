@@ -15,7 +15,6 @@ module "kubernetes_cluster" {
   worker_hosts       = ["worker-0", "worker-1", "worker-2"]
   worker_macs        = ["52-54-00-1a-61-1a", "52-54-00-1a-61-1b", "52-54-00-1a-61-1c"]
   worker_if          = "eth0"
-  worker_br_if       = "eth1"
 
   ## images
   container_linux_base_url      = "http://beta.release.core-os.net/amd64-usr"
@@ -42,10 +41,6 @@ module "kubernetes_cluster" {
   ## vip
   controller_vip = "192.168.126.245"
   matchbox_vip   = "192.168.126.242"
-
-  ## root mount
-  ceph_nfs_server = "169.254.169.254:/data/ceph"
-  ceph_nfs_mount  = "/var/lib/rook"
 
   ## etcd backup access
   aws_region            = "us-west-2"

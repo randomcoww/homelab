@@ -40,7 +40,6 @@ resource "matchbox_group" "ignition_controller" {
     host_ip      = "${var.controller_ips[count.index]}"
     host_if      = "${var.controller_if}"
     host_netmask = "${var.controller_netmask}"
-
     kubelet_path = "${var.kubelet_path}"
 
     tls_ca                     = "${replace(tls_self_signed_cert.root.cert_pem, "\n", "\\n")}"
