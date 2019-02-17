@@ -53,13 +53,13 @@ wget -O store-0.ks \
 wget -O store-1.ks \
     http://127.0.0.1:8080/generic?ks=store-1
 
-livecd-creator \
+sudo livecd-creator \
     --verbose \
     --config=store-0.ks \
     --tmpdir=/var/tmp \
     --releasever 29 \
     --title store-0
-livecd-creator \
+sudo livecd-creator \
     --verbose \
     --config=store-1.ks \
     --tmpdir=/var/tmp \
