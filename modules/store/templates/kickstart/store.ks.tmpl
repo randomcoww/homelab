@@ -142,6 +142,10 @@ cat <<EOF > /etc/systemd/network/dummy0.network
 [Match]
 Name=dummy0
 
+[Link]
+ARP=no
+MTUBytes={{.mtu}}
+
 [Network]
 LinkLocalAddressing=no
 DHCP=no

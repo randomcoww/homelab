@@ -39,7 +39,10 @@ resource "matchbox_group" "ignition_worker" {
     cluster_domain = "${var.cluster_domain}"
     cluster_name   = "${var.cluster_name}"
 
-    host_if      = "${var.worker_if}"
+    host_if = "${var.worker_if}"
+    br_if   = "${var.worker_br_if}"
+    mtu     = "${var.mtu}"
+
     kubelet_path = "${var.kubelet_path}"
 
     tls_ca            = "${replace(tls_self_signed_cert.root.cert_pem, "\n", "\\n")}"

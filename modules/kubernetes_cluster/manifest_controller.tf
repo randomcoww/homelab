@@ -32,6 +32,7 @@ resource "matchbox_group" "manifest_controller" {
     aws_region            = "${var.aws_region}"
     aws_access_key_id     = "${var.aws_access_key_id}"
     aws_secret_access_key = "${var.aws_secret_access_key}"
+    s3_backup_path        = "${var.s3_backup_path}"
 
     cluster_ip_range = "${var.cluster_ip_range}"
     cluster_cidr     = "${var.cluster_cidr}"
@@ -41,6 +42,5 @@ resource "matchbox_group" "manifest_controller" {
     host_if        = "${var.controller_if}"
     kubelet_path   = "${var.kubelet_path}"
     etcd_path      = "${var.etcd_path}"
-    s3_backup_path = "${var.s3_backup_path}"
   }
 }

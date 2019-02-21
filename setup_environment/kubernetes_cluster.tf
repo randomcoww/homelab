@@ -1,4 +1,35 @@
 # Matchbox configs for Kubernetes cluster
+
+locals {
+  iam_user = "etcd_backup"
+
+  iam_user_policy = {
+    Version = "2012-10-17"
+
+    Statement = [
+      {
+        Effect   = "Allow"
+        Action   = "s3:*"
+        Resource = "*"
+      },
+    ]
+  }
+}
+
+resource "aws_iam_user" "etcd_backup" {
+  name = "${local.iam_user}"
+}
+
+resource "aws_iam_access_key" "etcd_backup" {
+  user = "${aws_iam_user.etcd_backup.name}"
+}
+
+resource "aws_iam_user_policy" "s3_access" {
+  name   = "test"
+  user   = "${aws_iam_user.etcd_backup.name}"
+  policy = "${jsonencode(local.iam_user_policy)}"
+}
+
 module "kubernetes_cluster" {
   source = "../modules/kubernetes_cluster"
 
@@ -15,6 +46,8 @@ module "kubernetes_cluster" {
   worker_hosts       = ["worker-0", "worker-1", "worker-2"]
   worker_macs        = ["52-54-00-1a-61-1a", "52-54-00-1a-61-1b", "52-54-00-1a-61-1c"]
   worker_if          = "eth0"
+  worker_br_if       = "eth1"
+  mtu                = "9000"
 
   ## images
   container_linux_base_url      = "http://beta.release.core-os.net/amd64-usr"
@@ -44,8 +77,8 @@ module "kubernetes_cluster" {
 
   ## etcd backup access
   aws_region            = "us-west-2"
-  aws_access_key_id     = "${var.aws_access_key_id}"
-  aws_secret_access_key = "${var.aws_secret_access_key}"
+  aws_access_key_id     = "${aws_iam_access_key.etcd_backup.id}"
+  aws_secret_access_key = "${aws_iam_access_key.etcd_backup.secret}"
   s3_backup_path        = "randomcoww-etcd-backup/test-backup"
 
   ## renderer provisioning access

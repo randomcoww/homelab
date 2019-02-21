@@ -32,6 +32,10 @@ variable "worker_if" {
   type = "string"
 }
 
+variable "worker_br_if" {
+  type = "string"
+}
+
 ## worker host
 variable "worker_hosts" {
   type = "list"
@@ -109,6 +113,10 @@ variable "cluster_service_ip" {
 variable "cluster_ip_range" {
   type    = "string"
   default = "10.96.0.0/12"
+}
+
+variable "mtu" {
+  type = "string"
 }
 
 variable "cluster_name" {

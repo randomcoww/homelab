@@ -12,6 +12,16 @@ networkd:
 
         [DHCP]
         UseMTU=yes
+    - name: {{.br_if}}.network
+      contents: |
+        [Match]
+        Name={{.br_if}}
+
+        [Link]
+        MTUBytes={{.mtu}}
+
+        [Network]
+        LinkLocalAddressing=yes
 
 systemd:
   units:
@@ -111,9 +121,6 @@ storage:
           runtimeRequestTimeout: "15m"
           rotateCertificates: true
           serverTLSBootstrap: true
-          featureGates:
-            RotateKubeletClientCertificate: true
-            RotateKubeletServerCertificate: true
     - path: {{.kubelet_path}}/bootstrap.kubeconfig
       filesystem: root
       mode: 420
