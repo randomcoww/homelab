@@ -32,7 +32,16 @@ variable "worker_if" {
   type = "string"
 }
 
-variable "worker_br_if" {
+variable "worker_ll_if" {
+  type = "string"
+}
+
+## storage
+variable "worker_ll_nfs_server" {
+  type = "string"
+}
+
+variable "worker_ll_nfs_mount" {
   type = "string"
 }
 

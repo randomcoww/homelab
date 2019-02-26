@@ -29,6 +29,7 @@ resource "matchbox_group" "ignition_worker" {
   }
 
   metadata {
+    hostname           = "${var.worker_hosts[count.index]}"
     hyperkube_image    = "${var.hyperkube_image}"
     ssh_authorized_key = "cert-authority ${chomp(var.ssh_ca_public_key)}"
     default_user       = "${var.default_user}"
@@ -40,8 +41,13 @@ resource "matchbox_group" "ignition_worker" {
     cluster_name   = "${var.cluster_name}"
 
     host_if = "${var.worker_if}"
-    br_if   = "${var.worker_br_if}"
+    ll_if   = "${var.worker_ll_if}"
     mtu     = "${var.mtu}"
+
+    # NFS mount for systemd
+    ll_nfs_server        = "${var.worker_ll_nfs_server}"
+    ll_nfs_mount         = "${var.worker_ll_nfs_mount}"
+    ll_nfs_mount_service = "${join("-", slice(split("/", var.worker_ll_nfs_mount), 1, length(split("/", var.worker_ll_nfs_mount))))}"
 
     kubelet_path = "${var.kubelet_path}"
 

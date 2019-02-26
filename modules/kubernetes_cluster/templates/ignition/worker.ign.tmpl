@@ -12,16 +12,17 @@ networkd:
 
         [DHCP]
         UseMTU=yes
-    - name: {{.br_if}}.network
+    - name: {{.ll_if}}.network
       contents: |
         [Match]
-        Name={{.br_if}}
+        Name={{.ll_if}}
 
         [Link]
         MTUBytes={{.mtu}}
 
         [Network]
         LinkLocalAddressing=yes
+        DHCP=no
 
 systemd:
   units:
@@ -76,6 +77,12 @@ systemd:
 
 storage:
   files:
+    - path: /etc/hostname
+      filesystem: root
+      mode: 0644
+      contents:
+        inline:
+          {{.hostname}}
     - path: /etc/sysctl.d/max-user-watches.conf
       filesystem: root
       mode: 0644
