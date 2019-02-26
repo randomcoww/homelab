@@ -23,9 +23,9 @@ resource "matchbox_group" "generic_store" {
     host_ip      = "${var.store_ips[count.index]}"
     host_if      = "${var.store_if}"
     host_netmask = "${var.store_netmask}"
-    br_if        = "${var.br_if}"
-    br_ip        = "${var.br_ip}"
-    br_netmask   = "${var.br_netmask}"
+    ll_if        = "${var.ll_if}"
+    ll_ip        = "${var.ll_ip}"
+    ll_netmask   = "${var.ll_netmask}"
     mtu          = "${var.mtu}"
   }
 }
