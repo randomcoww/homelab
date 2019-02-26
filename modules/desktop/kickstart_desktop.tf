@@ -25,9 +25,9 @@ resource "matchbox_group" "generic_desktop" {
     host_ip      = "${var.desktop_ips[count.index]}"
     host_if      = "${var.desktop_if}"
     host_netmask = "${var.desktop_netmask}"
-    br_ip        = "${var.br_ip}"
-    br_if        = "${var.br_if}"
-    br_netmask   = "${var.br_netmask}"
+    ll_ip        = "${var.ll_ip}"
+    ll_if        = "${var.ll_if}"
+    ll_netmask   = "${var.ll_netmask}"
     mtu          = "${var.mtu}"
   }
 }

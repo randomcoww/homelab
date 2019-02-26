@@ -23,17 +23,17 @@ variable "desktop_netmask" {
   type = "string"
 }
 
-variable "br_if" {
+variable "ll_if" {
   type    = "string"
   default = "br0"
 }
 
-variable "br_ip" {
+variable "ll_ip" {
   type    = "string"
   default = "169.254.169.254"
 }
 
-variable "br_netmask" {
+variable "ll_netmask" {
   type    = "string"
   default = "16"
 }

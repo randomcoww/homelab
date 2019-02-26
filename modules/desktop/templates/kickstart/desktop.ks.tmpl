@@ -156,15 +156,15 @@ EOF
 
 ## vswitch bridge
 
-cat <<EOF > /etc/systemd/network/{{.br_if}}.netdev
+cat <<EOF > /etc/systemd/network/{{.ll_if}}.netdev
 [NetDev]
-Name={{.br_if}}
+Name={{.ll_if}}
 Kind=bridge
 EOF
 
-cat <<EOF > /etc/systemd/network/{{.br_if}}.network
+cat <<EOF > /etc/systemd/network/{{.ll_if}}.network
 [Match]
-Name={{.br_if}}
+Name={{.ll_if}}
 
 [Link]
 ARP=no
@@ -186,6 +186,10 @@ EOF
 cat <<EOF > /etc/systemd/network/dummy0.network
 [Match]
 Name=dummy0
+
+[Link]
+ARP=no
+MTUBytes={{.mtu}}
 
 [Network]
 LinkLocalAddressing=no
@@ -262,7 +266,7 @@ LinkLocalAddressing=no
 DHCP=no
 
 [Address]
-Address={{.br_ip}}/{{.br_netmask}}
+Address={{.ll_ip}}/{{.ll_netmask}}
 EOF
 
 ##
