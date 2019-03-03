@@ -306,8 +306,12 @@ items:
         value: |-
           global_defs {
             vrrp_version 3
+            vrrp_iptables
+            dynamic_interfaces
           }
           vrrp_instance VI_gateway {
+            no_accept
+            nopreempt
             state BACKUP
             strict_mode off
             virtual_router_id 247
