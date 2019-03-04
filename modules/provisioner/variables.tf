@@ -40,6 +40,10 @@ variable "provisioner_wan_if" {
   type = "string"
 }
 
+variable "provisioner_share_if" {
+  type = "string"
+}
+
 ## send this MTU via DHCP
 variable "mtu" {
   type = "string"

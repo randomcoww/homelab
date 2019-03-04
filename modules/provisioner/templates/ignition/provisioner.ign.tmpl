@@ -35,13 +35,33 @@ networkd:
         DNSOverTLS=opportunistic
 
         [DHCP]
-        UseMTU=false
+        UseMTU=true
         UseDNS=false
         UseNTP=false
         SendHostname=false
         UseHostname=false
         UseDomains=false
         UseTimezone=no
+    - name: {{.share_if}}.network
+      contents: |
+        [Match]
+        Name={{.share_if}}
+
+        [Network]
+        LinkLocalAddressing=no
+        DHCP=yes
+        DNS={{.backup_dns_ip}}
+        DNSOverTLS=opportunistic
+
+        [DHCP]
+        UseMTU=true
+        UseDNS=false
+        UseNTP=false
+        SendHostname=false
+        UseHostname=false
+        UseDomains=false
+        UseTimezone=no
+        RouteTable=250
 
 systemd:
   units:
@@ -177,7 +197,7 @@ storage:
               - name: NFTABLES_LOCAL_CONFIG
                 value: |
                   define if_internal = { {{.lan_if}}, {{.store_if}} }
-                  define if_external = {{.wan_if}}
+                  define if_external = {{.share_if}}
                   define if_trusted = {{.store_if}}
 
                   table ip filter {
@@ -500,6 +520,11 @@ storage:
                       {{.lan_gateway_vip}} dev {{.lan_if}}
                       {{.dns_vip}} dev {{.store_if}}
                       {{.matchbox_vip}} dev {{.store_if}}
+                    }
+                    virtual_rules {
+                      to {{.store_ip_range}} priority 32760 lookup main
+                      to {{.lan_ip_range}} priority 32760 lookup main
+                      to all priority 32761 lookup 250
                     }
                   }
 

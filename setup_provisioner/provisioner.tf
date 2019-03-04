@@ -19,6 +19,7 @@ module "provisioner" {
   provisioner_lan_if    = "eth0"
   provisioner_store_if  = "eth1"
   provisioner_wan_if    = "eth2"
+  provisioner_share_if  = "eth3"
   mtu                   = "9000"
 
   ## images
