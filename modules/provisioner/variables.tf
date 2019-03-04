@@ -168,11 +168,6 @@ variable "matchbox_path" {
   default = "/var/lib/matchbox"
 }
 
-## provisioner provisions from github
-variable "remote_provision_base_url" {
-  type = "string"
-}
-
 ## matchbox provisioning access
 variable "renderer_endpoint" {
   type = "string"
