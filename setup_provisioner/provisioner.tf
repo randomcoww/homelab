@@ -50,9 +50,6 @@ module "provisioner" {
   lan_dhcp_ip_range   = "192.168.62.64/26"
   store_dhcp_ip_range = "192.168.126.64/26"
 
-  ## github provisioner url
-  remote_provision_base_url = "http://r.fuzzybunny.io"
-
   ## renderer provisioning access
   renderer_endpoint        = "${local.renderer_endpoint}"
   renderer_cert_pem        = "${local.renderer_cert_pem}"
