@@ -148,7 +148,6 @@ storage:
               enabled: false
           authorization:
             mode: AlwaysAllow
-          staticPodURL: {{.manifest_url}}
           StaticPodPath: {{.kubelet_path}}/manifests
           makeIPTablesUtilChains: false
     - path: {{.kubelet_path}}/kube-scheduler.yaml
@@ -210,6 +209,265 @@ storage:
             user:
               client-certificate: {{.kubelet_path}}/kube-scheduler.pem
               client-key: {{.kubelet_path}}/kube-scheduler-key.pem
+
+    - path: {{.kubelet_path}}/manifests/keepalived.yaml
+      filesystem: root
+      mode: 420
+      contents:
+        inline: |-
+          ---
+          apiVersion: v1
+          kind: Pod
+          metadata:
+            namespace: kube-system
+            name: keepalived
+          spec:
+            restartPolicy: Always
+            hostNetwork: true
+            containers:
+            - name: keepalived
+              image: {{.keepalived_image}}
+              securityContext:
+                capabilities:
+                  add:
+                  - NET_ADMIN
+              args:
+              - "-P"
+              env:
+              - name: KEEPALIVED_LOCAL_CONFIG
+                value: |-
+                  global_defs {
+                    vrrp_version 3
+                    vrrp_iptables
+                    dynamic_interfaces
+                  }
+                  vrrp_instance VI_kube-master_store {
+                    no_accept
+                    nopreempt
+                    state BACKUP
+                    strict_mode off
+                    virtual_router_id 70
+                    interface {{.host_if}}
+                    priority 100
+                    virtual_ipaddress {
+                      {{.controller_vip}}
+                    }
+                  }
+
+    - path: {{.kubelet_path}}/manifests/etcd-wrapper.yaml
+      filesystem: root
+      mode: 420
+      contents:
+        inline: |-
+          ---
+          kind: Pod
+          apiVersion: v1
+          metadata:
+            namespace: kube-system
+            name: kube-etcd
+          spec:
+            hostNetwork: true
+            restartPolicy: Always
+            containers:
+            - name: kube-etcd-wrapper
+              image: {{.etcd_wrapper_image}}
+              args:
+              - "--name=$(NODE_NAME)"
+              - "--cert-file={{.kubelet_path}}/kubernetes.pem"
+              - "--key-file={{.kubelet_path}}/kubernetes-key.pem"
+              - "--peer-cert-file={{.kubelet_path}}/kubernetes.pem"
+              - "--peer-key-file={{.kubelet_path}}/kubernetes-key.pem"
+              - "--trusted-ca-file={{.kubelet_path}}/ca.pem"
+              - "--peer-trusted-ca-file={{.kubelet_path}}/ca.pem"
+              - "--initial-advertise-peer-urls=https://$(INTERNAL_IP):{{.etcd_peer_port}}"
+              - "--listen-peer-urls=https://$(INTERNAL_IP):{{.etcd_peer_port}}"
+              - "--listen-client-urls=https://$(INTERNAL_IP):{{.etcd_client_port}},https://127.0.0.1:{{.etcd_client_port}}"
+              - "--advertise-client-urls=https://$(INTERNAL_IP):{{.etcd_client_port}}"
+              - "--initial-cluster={{.etcd_initial_cluster}}"
+              - "--initial-cluster-token={{.etcd_cluster_token}}"
+              - "--etcd-servers={{.etcd_servers}}"
+              - "--backup-dir={{.kubelet_path}}/etcd/backup"
+              - "--backup-file={{.kubelet_path}}/etcd/backup/etcd.db"
+              - "--tls-dir={{.kubelet_path}}"
+              - "--image={{.etcd_image}}"
+              - "--pod-spec-file={{.kubelet_path}}/manifests/etcd.json"
+              - "--s3-backup-path={{.s3_backup_path}}"
+              - "--backup-interval=30m"
+              - "--healthcheck-interval=10s"
+              - "--pod-update-interval=3m"
+              env:
+              - name: AWS_ACCESS_KEY_ID
+                value: "{{.aws_access_key_id}}"
+              - name: AWS_SECRET_ACCESS_KEY
+                value: "{{.aws_secret_access_key}}"
+              - name: AWS_DEFAULT_REGION
+                value: "{{.aws_region}}"
+              - name: AWS_SDK_LOAD_CONFIG
+                value: "1"
+              - name: INTERNAL_IP
+                valueFrom:
+                  fieldRef:
+                    fieldPath: status.hostIP
+              - name: NODE_NAME
+                valueFrom:
+                  fieldRef:
+                    fieldPath: spec.nodeName
+              volumeMounts:
+              - name: kubernetes-path
+                mountPath: "{{.kubelet_path}}"
+                readOnly: false
+            volumes:
+            - name: kubernetes-path
+              hostPath:
+                path: "{{.kubelet_path}}"
+
+    - path: {{.kubelet_path}}/manifests/kube-apiserver.yaml
+      filesystem: root
+      mode: 420
+      contents:
+        inline: |-
+          ---
+          kind: Pod
+          apiVersion: v1
+          metadata:
+            namespace: kube-system
+            name: kube-apiserver
+          spec:
+            hostNetwork: true
+            restartPolicy: Always
+            containers:
+            - name: kube-apiserver
+              image: {{.kube_apiserver_image}}
+              command:
+              - kube-apiserver
+              - "--secure-port={{.apiserver_secure_port}}"
+              - "--allow-privileged=true"
+              - "--apiserver-count=1"
+              - "--authorization-mode=Node,RBAC"
+              - "--bind-address=0.0.0.0"
+              - "--client-ca-file={{.kubelet_path}}/ca.pem"
+              - "--enable-admission-plugins=Initializers,NamespaceLifecycle,NodeRestriction,LimitRanger,ServiceAccount,DefaultStorageClass,ResourceQuota"
+              - "--enable-swagger-ui=true"
+              - "--etcd-cafile={{.kubelet_path}}/ca.pem"
+              - "--etcd-certfile={{.kubelet_path}}/kubernetes.pem"
+              - "--etcd-keyfile={{.kubelet_path}}/kubernetes-key.pem"
+              - "--etcd-servers={{.etcd_servers}}"
+              - "--event-ttl=1h"
+              - "--kubelet-certificate-authority={{.kubelet_path}}/ca.pem"
+              - "--kubelet-client-certificate={{.kubelet_path}}/kubernetes.pem"
+              - "--kubelet-client-key={{.kubelet_path}}/kubernetes-key.pem"
+              - "--kubelet-https=true"
+              - "--runtime-config=api/all"
+              - "--service-account-key-file={{.kubelet_path}}/service-account.pem"
+              - "--service-cluster-ip-range={{.cluster_ip_range}}"
+              - "--tls-cert-file={{.kubelet_path}}/kubernetes.pem"
+              - "--tls-private-key-file={{.kubelet_path}}/kubernetes-key.pem"
+              - "--storage-backend=etcd3"
+              - "--kubelet-preferred-address-types=InternalIP,InternalDNS"
+              - "--v=2"
+              volumeMounts:
+              - name: kubernetes-path
+                mountPath: "{{.kubelet_path}}"
+                readOnly: true
+              livenessProbe:
+                httpGet:
+                  scheme: HTTP
+                  host: 127.0.0.1
+                  port: 8080
+                  path: "/healthz"
+                initialDelaySeconds: 15
+                timeoutSeconds: 15
+            volumes:
+            - name: kubernetes-path
+              hostPath:
+                path: "{{.kubelet_path}}"
+
+    - path: {{.kubelet_path}}/manifests/kube-controller-manager.yaml
+      filesystem: root
+      mode: 420
+      contents:
+        inline: |-
+          ---
+          kind: Pod
+          apiVersion: v1
+          metadata:
+            namespace: kube-system
+            name: kube-controller-manager
+          spec:
+            hostNetwork: true
+            restartPolicy: Always
+            containers:
+            - name: kube-controller-manager
+              image: {{.kube_controller_manager_image}}
+              command:
+              - kube-controller-manager
+              - "--address=0.0.0.0"
+              - "--cluster-cidr={{.cluster_cidr}}"
+              - "--allocate-node-cidrs=true"
+              - "--cluster-name={{.cluster_name}}"
+              - "--cluster-signing-cert-file={{.kubelet_path}}/ca.pem"
+              - "--cluster-signing-key-file={{.kubelet_path}}/ca-key.pem"
+              - "--kubeconfig={{.kubelet_path}}/kube-controller-manager.kubeconfig"
+              - "--leader-elect=true"
+              - "--root-ca-file={{.kubelet_path}}/ca.pem"
+              - "--service-account-private-key-file={{.kubelet_path}}/service-account-key.pem"
+              - "--service-cluster-ip-range={{.cluster_ip_range}}"
+              - "--use-service-account-credentials=true"
+              - "--v=2"
+              volumeMounts:
+              - name: kubernetes-path
+                mountPath: "{{.kubelet_path}}"
+                readOnly: true
+              livenessProbe:
+                httpGet:
+                  scheme: HTTP
+                  host: 127.0.0.1
+                  port: 10252
+                  path: "/healthz"
+                initialDelaySeconds: 15
+                timeoutSeconds: 15
+            volumes:
+            - name: kubernetes-path
+              hostPath:
+                path: "{{.kubelet_path}}"
+
+    - path: {{.kubelet_path}}/manifests/kube-scheduler.yaml
+      filesystem: root
+      mode: 420
+      contents:
+        inline: |-
+          ---
+          kind: Pod
+          apiVersion: v1
+          metadata:
+            namespace: kube-system
+            name: kube-scheduler
+          spec:
+            restartPolicy: Always
+            hostNetwork: true
+            containers:
+            - name: kube-scheduler
+              image: {{.kube_scheduler_image}}
+              command:
+              - kube-scheduler
+              - "--config={{.kubelet_path}}/kube-scheduler.yaml"
+              - "--v=2"
+              livenessProbe:
+                httpGet:
+                  scheme: HTTP
+                  host: 127.0.0.1
+                  port: 10251
+                  path: "/healthz"
+                initialDelaySeconds: 15
+                timeoutSeconds: 15
+              volumeMounts:
+              - name: kubernetes-path
+                mountPath: "{{.kubelet_path}}"
+                readOnly: true
+            volumes:
+            - name: kubernetes-path
+              hostPath:
+                path: "{{.kubelet_path}}"
 
 passwd:
   users:
