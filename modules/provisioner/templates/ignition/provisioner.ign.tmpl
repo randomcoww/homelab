@@ -153,11 +153,449 @@ storage:
           StaticPodPath: {{.kubelet_path}}/manifests
           makeIPTablesUtilChains: false
 
-    - path: {{.kubelet_path}}/manifests/manifest.yaml
+    - path: {{.kubelet_path}}/manifests/nftables.yaml
       filesystem: root
       mode: 420
       contents:
-        source: {{.manifest_url}}
+        inline: |-
+          ---
+          apiVersion: v1
+          kind: Pod
+          metadata:
+            name: nftables
+          spec:
+            restartPolicy: OnFailure
+            hostNetwork: true
+            containers:
+            - name: nftables
+              image: {{.nftables_image}}
+              securityContext:
+                capabilities:
+                  add:
+                  - NET_ADMIN
+              env:
+              - name: NFTABLES_LOCAL_CONFIG
+                value: |
+                  define if_internal = { {{.lan_if}}, {{.store_if}} }
+                  define if_external = {{.wan_if}}
+                  define if_trusted = {{.store_if}}
+
+                  table ip filter {
+                    chain base_checks {
+                      ct state {established, related} accept;
+                      ct state invalid drop;
+                    }
+
+                    chain input {
+                      type filter hook input priority 0; policy drop;
+
+                      jump base_checks;
+
+                      iifname "lo" accept;
+                      iifname != "lo" ip daddr 127.0.0.1/8 drop;
+
+                      ip protocol icmp icmp type { echo-request, echo-reply, time-exceeded, parameter-problem, destination-unreachable } accept;
+
+                      iifname $if_trusted accept;
+
+                      iifname $if_internal tcp dport domain accept;
+                      iifname $if_internal udp dport domain accept;
+                      iifname $if_internal udp sport bootps udp dport bootpc accept;
+                      iifname $if_internal pkttype multicast accept;
+                      iifname $if_internal tcp dport ssh accept;
+                    }
+
+                    chain forward {
+                      type filter hook forward priority 0; policy drop;
+
+                      jump base_checks;
+
+                      ip protocol icmp icmp type { echo-request, echo-reply, time-exceeded, parameter-problem, destination-unreachable } accept;
+
+                      iifname $if_trusted accept;
+                      iifname $if_internal oifname $if_external accept;
+                    }
+
+                    chain output {
+                      type filter hook output priority 100; policy accept;
+                    }
+                  }
+
+                  table ip nat {
+                    chain prerouting {
+                      type nat hook prerouting priority 0; policy accept;
+                    }
+
+                    chain input {
+                      type nat hook input priority 0; policy accept;
+                    }
+
+                    chain output {
+                      type nat hook output priority 0; policy accept;
+                    }
+
+                    chain postrouting {
+                      type nat hook postrouting priority 100; policy accept;
+                      oifname $if_external masquerade;
+                    }
+                  }
+                  ;
+
+    - path: {{.kubelet_path}}/manifests/kea.yaml
+      filesystem: root
+      mode: 420
+      contents:
+        inline: |-
+          ---
+          apiVersion: v1
+          kind: Pod
+          metadata:
+            name: kea
+          spec:
+            restartPolicy: Always
+            hostNetwork: true
+            containers:
+            - name: kea-control-agent
+              image: {{.kea_image}}
+              args:
+              - kea-ctrl-agent
+              env:
+              - name: KEA_LOCAL_CONFIG
+                value: |-
+                  {
+                    "Control-agent": {
+                      "http-host": "0.0.0.0",
+                      "http-port": {{.kea_peer_port}},
+                      "control-sockets": {
+                        "dhcp4": {
+                          "socket-type": "unix",
+                          "socket-name": "{{.kea_path}}/kea-dhcp4-ctrl.sock"
+                        }
+                      }
+                    }
+                  }
+              volumeMounts:
+              - name: kea-path
+                mountPath: "{{.kea_path}}"
+                readOnly: false
+            - name: kea-dhcp4
+              image: {{.kea_image}}
+              args:
+              - kea-dhcp4
+              env:
+              - name: NODE_NAME
+                valueFrom:
+                  fieldRef:
+                    fieldPath: spec.nodeName
+              - name: NODE_IP
+                valueFrom:
+                  fieldRef:
+                    fieldPath: status.hostIP
+              - name: KEA_LOCAL_CONFIG
+                value: |-
+                  {
+                    "Dhcp4": {
+                      "valid-lifetime": 1200,
+                      "renew-timer": 1200,
+                      "rebind-timer": 1200,
+                      "interfaces-config": {
+                        "interfaces": [
+                          "*"
+                        ]
+                      },
+                      "control-socket": {
+                        "socket-type": "unix",
+                        "socket-name": "{{.kea_path}}/kea-dhcp4-ctrl.sock"
+                      },
+                      "lease-database": {
+                        "type": "memfile",
+                        "name": "{{.kea_path}}/dhcp4.leases",
+                        "persist": true
+                      },
+                      "option-data": [
+                        {
+                          "name": "domain-name",
+                          "data": "{{.domain_name}}"
+                        }
+                      ],
+                      "client-classes": [
+                        {
+                          "name": "ipxe_detected",
+                          "test": "substring(option[77].hex,0,4) == 'iPXE'",
+                          "boot-file-name": "http://{{.matchbox_vip}}:{{.matchbox_http_port}}/boot.ipxe"
+                        },
+                        {
+                          "name": "ipxe",
+                          "test": "not(substring(option[77].hex,0,4) == 'iPXE') and (option[93].hex == 0x0000)",
+                          "next-server": "$(NODE_IP)",
+                          "boot-file-name": "/undionly.kpxe"
+                        },
+                        {
+                          "name": "ipxe_efi",
+                          "test": "not(substring(option[77].hex,0,4) == 'iPXE') and (option[93].hex == 0x0007)",
+                          "next-server": "$(NODE_IP)",
+                          "boot-file-name": "/ipxe.efi"
+                        }
+                      ],
+                      "hooks-libraries": [
+                        {
+                          "library": "/usr/lib/hooks/libdhcp_lease_cmds.so",
+                          "parameters": {}
+                        },
+                        {
+                          "library": "/usr/lib/hooks/libdhcp_ha.so",
+                          "parameters": {
+                            "high-availability": [
+                              {
+                                "this-server-name": "$(NODE_NAME)",
+                                "mode": "hot-standby",
+                                "max-unacked-clients": 5,
+                                "peers": [
+                                  {{.kea_ha_peers}}
+                                ]
+                              }
+                            ]
+                          }
+                        }
+                      ],
+                      "subnet4": [
+                        {
+                          "subnet": "{{.lan_ip_range}}",
+                          "option-data": [
+                            {
+                              "name": "routers",
+                              "data": "{{.lan_gateway_vip}}"
+                            },
+                            {
+                              "name": "domain-name-servers",
+                              "data": "{{.backup_dns_ip}}",
+                              "csv-format": true
+                            }
+                          ],
+                          "pools": [
+                            {
+                              "pool": "{{.lan_dhcp_ip_range}}"
+                            }
+                          ]
+                        },
+                        {
+                          "subnet": "{{.store_ip_range}}",
+                          "option-data": [
+                            {
+                              "name": "routers",
+                              "data": "{{.store_gateway_vip}}"
+                            },
+                            {
+                              "name": "domain-name-servers",
+                              "data": "{{.dns_vip}},{{.backup_dns_ip}}",
+                              "csv-format": true
+                            },
+                            {
+                              "name": "interface-mtu",
+                              "data": "{{.mtu}}"
+                            }
+                          ],
+                          "pools": [
+                            {
+                              "pool": "{{.store_dhcp_ip_range}}"
+                            }
+                          ]
+                        }
+                      ],
+                      "dhcp-ddns": {
+                        "enable-updates": true,
+                        "qualifying-suffix": "{{.domain_name}}.",
+                        "override-client-update": true,
+                        "override-no-update": true,
+                        "replace-client-name": "when-not-present"
+                      }
+                    }
+                  }
+              volumeMounts:
+              - name: kea-path
+                mountPath: "{{.kea_path}}"
+                readOnly: false
+            volumes:
+            - name: kea-path
+              emptyDir: {}
+
+    - path: {{.kubelet_path}}/manifests/unbound.yaml
+      filesystem: root
+      mode: 420
+      contents:
+        inline: |-
+          ---
+          apiVersion: v1
+          kind: Pod
+          metadata:
+            namespace: kube-system
+            name: unbound
+          spec:
+            restartPolicy: Always
+            hostNetwork: true
+            containers:
+            - name: unbound
+              image: {{.unbound_image}}
+              env:
+              - name: UNBOUND_LOCAL_CONFIG
+                value: |-
+                  server:
+                    interface-automatic: yes
+                    port: 53
+                    interface: 0.0.0.0
+                    num-threads: 2
+                    do-ip6: no
+                    do-udp: yes
+                    do-tcp: yes
+                    access-control: 0.0.0.0/0 allow
+                    do-not-query-localhost: no
+                  forward-zone:
+                    name: "."
+                    forward-tls-upstream: yes
+                    forward-addr: {{.backup_dns_ip}}@853
+                  remote-control:
+                    control-enable: yes
+
+    - path: {{.kubelet_path}}/manifests/keepalived.yaml
+      filesystem: root
+      mode: 420
+      contents:
+        inline: |-
+          ---
+          apiVersion: v1
+          kind: Pod
+          metadata:
+            namespace: kube-system
+            name: keepalived
+          spec:
+            restartPolicy: Always
+            hostNetwork: true
+            containers:
+            - name: keepalived
+              image: {{.keepalived_image}}
+              securityContext:
+                capabilities:
+                  add:
+                  - NET_ADMIN
+              args:
+              - "-P"
+              env:
+              - name: KEEPALIVED_LOCAL_CONFIG
+                value: |-
+                  global_defs {
+                    vrrp_version 3
+                    vrrp_iptables
+                    dynamic_interfaces
+                  }
+                  vrrp_instance VI_gateway {
+                    no_accept
+                    nopreempt
+                    state BACKUP
+                    strict_mode off
+                    virtual_router_id 247
+                    interface {{.store_if}}
+                    priority 100
+                    virtual_ipaddress {
+                      {{.store_gateway_vip}} dev {{.store_if}}
+                      {{.lan_gateway_vip}} dev {{.lan_if}}
+                      {{.dns_vip}} dev {{.store_if}}
+                      {{.matchbox_vip}} dev {{.store_if}}
+                    }
+                  }
+
+    - path: {{.kubelet_path}}/manifests/tftp.yaml
+      filesystem: root
+      mode: 420
+      contents:
+        inline: |-
+          ---
+          apiVersion: v1
+          kind: Pod
+          metadata:
+            name: kea-tftp
+          spec:
+            restartPolicy: Always
+            hostNetwork: true
+            containers:
+            - name: tftpd-ipxe
+              image: {{.tftpd_image}}
+
+    - path: {{.kubelet_path}}/manifests/matchbox.yaml
+      filesystem: root
+      mode: 420
+      contents:
+        inline: |-
+          ---
+          apiVersion: v1
+          kind: Pod
+          metadata:
+            name: matchbox
+          spec:
+            hostNetwork: true
+            containers:
+            - name: matchbox
+              image: {{.matchbox_image}}
+              args:
+              - "-address=0.0.0.0:{{.matchbox_http_port}}"
+              - "-rpc-address=0.0.0.0:{{.matchbox_rpc_port}}"
+              - "-ca-file={{.certs_path}}/ca.pem"
+              - "-cert-file={{.certs_path}}/matchbox.pem"
+              - "-key-file={{.certs_path}}/matchbox-key.pem"
+              - "-data-path={{.matchbox_path}}"
+              - "-assets-path="
+              volumeMounts:
+              - mountPath: "{{.certs_path}}"
+                name: certs-path
+                readOnly: true
+              - mountPath: "{{.matchbox_path}}"
+                name: matchbox-data
+                readOnly: false
+            - name: syncthing
+              image: {{.syncthing_image}}
+              env:
+              - name: NODE_IP
+                valueFrom:
+                  fieldRef:
+                    fieldPath: status.hostIP
+              - name: CERT_PATH
+                value: {{.certs_path}}/syncthing.pem
+              - name: KEY_PATH
+                value: {{.certs_path}}/syncthing-key.pem
+              - name: SYNCTHING_LOCAL_CONFIG
+                value: |-
+                  <configuration>
+                    <folder id="matchbox" label="matchbox" path="{{.matchbox_path}}" type="sendreceive" fsWatcherEnabled="true" fsWatcherDelayS="1" rescanIntervalS="10" autoNormalize="false">
+                      {{.syncthing_folder_devices}}
+                      <maxConflicts>1</maxConflicts>
+                    </folder>
+                    {{.syncthing_devices}}
+                    <gui enabled="false"/>
+                    <options>
+                      <listenAddress>$(NODE_IP):{{.syncthing_peer_port}}</listenAddress>
+                      <globalAnnounceEnabled>false</globalAnnounceEnabled>
+                      <localAnnounceEnabled>false</localAnnounceEnabled>
+                      <reconnectionIntervalS>5</reconnectionIntervalS>
+                      <relaysEnabled>false</relaysEnabled>
+                      <startBrowser>false</startBrowser>
+                      <natEnabled>false</natEnabled>
+                      <urAccepted>-1</urAccepted>
+                      <autoUpgradeIntervalH>0</autoUpgradeIntervalH>
+                      <defaultFolderPath></defaultFolderPath>
+                    </options>
+                  </configuration>
+              volumeMounts:
+              - mountPath: "{{.certs_path}}"
+                name: certs-path
+                readOnly: true
+              - mountPath: "{{.matchbox_path}}"
+                name: matchbox-data
+                readOnly: false
+            volumes:
+            - name: certs-path
+              hostPath:
+                path: "{{.certs_path}}"
+            - name: matchbox-data
+              emptyDir: {}
 
 passwd:
   users:
