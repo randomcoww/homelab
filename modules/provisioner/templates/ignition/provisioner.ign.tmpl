@@ -12,6 +12,11 @@ networkd:
 
         [Address]
         Address={{.lan_ip}}/{{.lan_netmask}}
+
+        [RoutingPolicyRule]
+        IncomingInterface={{.lan_if}}
+        Table=250
+        Priority=32760
     - name: {{.store_if}}.network
       contents: |
         [Match]
@@ -23,6 +28,11 @@ networkd:
 
         [Address]
         Address={{.store_ip}}/{{.store_netmask}}
+
+        [RoutingPolicyRule]
+        IncomingInterface={{.store_if}}
+        Table=250
+        Priority=32760
     - name: {{.wan_if}}.network
       contents: |
         [Match]
@@ -520,11 +530,6 @@ storage:
                       {{.lan_gateway_vip}} dev {{.lan_if}}
                       {{.dns_vip}} dev {{.store_if}}
                       {{.matchbox_vip}} dev {{.store_if}}
-                    }
-                    virtual_rules {
-                      to {{.store_ip_range}} priority 32760 lookup main
-                      to {{.lan_ip_range}} priority 32760 lookup main
-                      to all priority 32761 lookup 250
                     }
                   }
 
