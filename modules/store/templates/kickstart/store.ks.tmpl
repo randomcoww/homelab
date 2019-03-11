@@ -2,17 +2,18 @@
 ## store-* host kickstart for livecd-creator
 ##
 
+install
 skipx
 lang en_US.UTF-8
 keyboard us
 timezone --utc Etc/UTC
 auth --useshadow --passalgo=sha512
-selinux --disabled
 firewall --disabled
 zerombr
 clearpart --all --disklabel=gpt
 part / --size 5120 --fstype ext4
 rootpw --lock --iscrypted locked
+network --hostname={{.hostname}}
 shutdown
 bootloader --append="console=tty0 console=ttyS1,115200n8 elevator=noop intel_iommu=on iommu=pt rd.live.ram=1"
 
@@ -21,9 +22,9 @@ repo --name=updates --mirrorlist=https://mirrors.fedoraproject.org/mirrorlist?re
 url --mirrorlist=https://mirrors.fedoraproject.org/mirrorlist?repo=fedora-$releasever&arch=$basearch
 
 repo --name=kubernetes --baseurl=https://packages.cloud.google.com/yum/repos/kubernetes-el7-$basearch
-repo --name=zfs-on-linux --baseurl=http://download.zfsonlinux.org/fedora-testing/$releasever/$basearch/
+repo --name=zfs-on-linux --baseurl=http://download.zfsonlinux.org/fedora/$releasever/$basearch/
 
-%packages --excludedocs
+%packages --excludeWeakdeps --excludedocs
 
 ## common
 @core
@@ -33,17 +34,24 @@ cronie
 chrony
 logrotate
 nfs-utils
+openssh-server
 ##
 
+## ZFS on linux
+kernel-devel
 zfs
 -zfs-fuse
-openssh-server
+##
 
-## livecd-creator
-kernel
+## livemedia-creator
+fedora-logos
+dracut-config-generic
 dracut-live
+-dracut-config-rescue
 grub2-efi-x64-cdboot
 shim
+memtest86+
+syslinux
 ##
 
 -NetworkManager
@@ -51,18 +59,14 @@ shim
 -plymouth-*
 %end
 
+##
+## user
+##
+
+user --name={{.default_user}} --password={{.password}} --plaintext --groups=wheel,libvirt
+sshkey --username={{.default_user}} "{{.ssh_authorized_key}}"
+
 %post --erroronfail
-
-##
-## serial autologin
-##
-
-mkdir -p /etc/systemd/system/serial-getty@.service.d
-cat <<EOF > /etc/systemd/system/serial-getty@.service.d/autologin.conf
-[Service]
-ExecStart=
-ExecStart=-/sbin/agetty -a {{.default_user}} --keep-baud 115200,38400,9600 %I $TERM
-EOF
 
 ##
 ## networkd
@@ -233,17 +237,12 @@ options igb max_vfs=8
 options ixgbe max_vfs=8
 EOF
 
-cat <<EOF > /etc/ssh/authorized_keys
-{{.ssh_authorized_key}}
-EOF
-
 cat <<EOF > /etc/ssh/sshd_config
 Subsystem sftp internal-sftp
 ClientAliveInterval 180
 UseDNS no
 PasswordAuthentication no
 ChallengeResponseAuthentication no
-AuthorizedKeysFile /etc/ssh/authorized_keys
 EOF
 
 ##
