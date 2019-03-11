@@ -42,6 +42,7 @@ cronie
 chrony
 logrotate
 nfs-utils
+openssh-server
 ##
 
 @firefox
@@ -280,6 +281,14 @@ options vfio-pci ids=1002:ffffffff:ffffffff:ffffffff:00030000:ffff00ff,1002:ffff
 options kvm ignore_msrs=1
 EOF
 
+cat <<EOF > /etc/ssh/sshd_config
+Subsystem sftp internal-sftp
+ClientAliveInterval 180
+UseDNS no
+PasswordAuthentication no
+ChallengeResponseAuthentication no
+EOF
+
 cat <<EOF > /etc/dracut.conf.d/local.conf
 add_drivers+="vfio vfio_iommu_type1 vfio_pci vfio_virqfd"
 EOF
@@ -302,7 +311,7 @@ dracut -f /boot/initramfs-$KERNEL_VERSION.img $KERNEL_VERSION
 systemctl enable \
   systemd-networkd systemd-resolved chronyd crond \
   libvirtd ksm ksmtuned \
-  docker
+  docker sshd
 
 systemctl mask \
   NetworkManager
