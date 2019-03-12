@@ -48,23 +48,42 @@ terraform apply
 
 Generate hypervisor images:
 ```bash
+
+git clone https://github.com/randomcoww/lorax
+cd lorax
+
+wget \
+    https://download.fedoraproject.org/pub/fedora/linux/releases/29/Server/x86_64/iso/Fedora-Server-netinst-x86_64-29-1.2.iso
+
 wget -O store-0.ks \
     http://127.0.0.1:8080/generic?ks=store-0
+
+sudo livemedia-creator \
+    --make-iso \
+    --iso=./Fedora-Server-netinst-x86_64-29-1.2.iso \
+    --project store \
+    --volid store \
+    --releasever 29 \
+    --title store \
+    --resultdir ./result \
+    --ks=./store-0.ks \
+    --no-virt \
+    --lorax-templates ./share
+
 wget -O store-1.ks \
     http://127.0.0.1:8080/generic?ks=store-1
-
-sudo livecd-creator \
-    --verbose \
-    --config=store-0.ks \
-    --tmpdir=/var/tmp \
+    
+sudo livemedia-creator \
+    --make-iso \
+    --iso=./Fedora-Server-netinst-x86_64-29-1.2.iso \
+    --project store \
+    --volid store \
     --releasever 29 \
-    --title store-0
-sudo livecd-creator \
-    --verbose \
-    --config=store-1.ks \
-    --tmpdir=/var/tmp \
-    --releasever 29 \
-    --title store-1
+    --title store \
+    --resultdir ./result \
+    --ks=./store-1.ks \
+    --no-virt \
+    --lorax-templates ./share
 ```
 These images can be written to a USB flash drive.
 
@@ -86,32 +105,11 @@ git add provisioner-0.ign provisioner-1.ign
 ...
 ```
 
-VM runs Kubelet in masterless mode to provide most of its services. The configuration for this is provided as a YAML manifest which is also pushed to and served from the [env-provisioner](https://github.com/randomcoww/env-provisioner) repo:
-
-```bash
-git clone git@github.com:randomcoww/env-provisioner.git
-cd env-provisioner/manifest
-
-wget -O provisioner.yaml \
-    http://127.0.0.1:8080/generic?manifest=provisioner
-    
-git add provisioner.yaml
-...
-```
-
 Provisioners need Container Linux PXE boot images on the host filesystem to boot. Looking for possible workarounds to this such as booting a more miminal GRUB image that is able to download these at boot time.
 
 **TODO**: Investigate
 * https://lists.gnu.org/archive/html/help-grub/2013-08/msg00037.html
 * http://www.manobit.com/pxe-multi-boot-server-using-grub2-on-mikrotik-routeros-bios-and-efi-support/
-
-```bash
-VERSION=1939.1.0
-cd /data/bootstrap/coreos/$VERSION
-
-curl -LO https://beta.release.core-os.net/amd64-usr/$VERSION/coreos_production_pxe.vmlinuz
-curl -LO https://beta.release.core-os.net/amd64-usr/$VERSION/coreos_production_pxe_image.cpio.gz
-```
 
 Compatible KVM libvirt configurations are in [env-provisioner](https://github.com/randomcoww/env-provisioner). I currently have no automation for defining and starting VMs.
 ```bash
