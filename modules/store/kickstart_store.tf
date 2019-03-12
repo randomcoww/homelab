@@ -29,5 +29,9 @@ resource "matchbox_group" "generic_store" {
     ll_ip        = "${var.ll_ip}"
     ll_netmask   = "${var.ll_netmask}"
     mtu          = "${var.mtu}"
+
+    container_linux_image_path = "${var.container_linux_image_path}"
+    container_linux_base_url   = "${var.container_linux_base_url}"
+    container_linux_version    = "${var.container_linux_version}"
   }
 }

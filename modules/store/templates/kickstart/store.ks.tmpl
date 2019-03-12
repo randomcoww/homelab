@@ -21,7 +21,6 @@ repo --name=fedora --mirrorlist=https://mirrors.fedoraproject.org/mirrorlist?rep
 repo --name=updates --mirrorlist=https://mirrors.fedoraproject.org/mirrorlist?repo=updates-released-f$releasever&arch=$basearch
 url --mirrorlist=https://mirrors.fedoraproject.org/mirrorlist?repo=fedora-$releasever&arch=$basearch
 
-repo --name=kubernetes --baseurl=https://packages.cloud.google.com/yum/repos/kubernetes-el7-$basearch
 repo --name=zfs-on-linux --baseurl=http://download.zfsonlinux.org/fedora/$releasever/$basearch/
 
 %packages --excludeWeakdeps --excludedocs
@@ -276,6 +275,15 @@ systemctl mask \
   NetworkManager
 
 systemctl set-default multi-user.target
+
+##
+## bootstrap image
+##
+
+mkdir -p {{.container_linux_image_path}}
+cd {{.container_linux_image_path}}
+curl -O {{.container_linux_base_url}}/{{.container_linux_version}}/coreos_production_pxe.vmlinuz
+curl -O {{.container_linux_base_url}}/{{.container_linux_version}}/coreos_production_pxe_image.cpio.gz
 
 ##
 ## cleanup

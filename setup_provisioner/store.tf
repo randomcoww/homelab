@@ -14,6 +14,11 @@ module "store" {
   store_netmask = "23"
   mtu           = "9000"
 
+  ## image
+  container_linux_image_path = "/var/lib/tftpboot"
+  container_linux_base_url   = "https://beta.release.core-os.net/amd64-usr"
+  container_linux_version    = "current"
+
   ## renderer provisioning access
   renderer_endpoint        = "${local.renderer_endpoint}"
   renderer_cert_pem        = "${local.renderer_cert_pem}"
