@@ -71,6 +71,8 @@ resource "matchbox_group" "ignition_controller" {
     tls_ca_key                 = "${replace(tls_private_key.root.private_key_pem, "\n", "\\n")}"
     tls_kubernetes             = "${replace(element(tls_locally_signed_cert.kubernetes.*.cert_pem, count.index), "\n", "\\n")}"
     tls_kubernetes_key         = "${replace(element(tls_private_key.kubernetes.*.private_key_pem, count.index), "\n", "\\n")}"
+    tls_etcd                   = "${replace(element(tls_locally_signed_cert.etcd.*.cert_pem, count.index), "\n", "\\n")}"
+    tls_etcd_key               = "${replace(element(tls_private_key.etcd.*.private_key_pem, count.index), "\n", "\\n")}"
     tls_controller_manager     = "${replace(tls_locally_signed_cert.controller_manager.cert_pem, "\n", "\\n")}"
     tls_controller_manager_key = "${replace(tls_private_key.controller_manager.private_key_pem, "\n", "\\n")}"
     tls_scheduler              = "${replace(tls_locally_signed_cert.scheduler.cert_pem, "\n", "\\n")}"

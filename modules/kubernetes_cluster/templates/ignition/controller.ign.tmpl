@@ -103,6 +103,18 @@ storage:
       mode: 420
       contents:
         inline: "{{.tls_kubernetes_key}}"
+
+    - path: {{.kubelet_path}}/etcd.pem
+      filesystem: root
+      mode: 420
+      contents:
+        inline: "{{.tls_etcd}}"
+    - path: {{.kubelet_path}}/etcd-key.pem
+      filesystem: root
+      mode: 420
+      contents:
+        inline: "{{.tls_etcd_key}}"
+
     - path: {{.kubelet_path}}/kube-controller-manager.pem
       filesystem: root
       mode: 420
@@ -123,6 +135,7 @@ storage:
       mode: 420
       contents:
         inline: "{{.tls_scheduler_key}}"
+
     - path: {{.kubelet_path}}/service-account.pem
       filesystem: root
       mode: 420
@@ -273,10 +286,10 @@ storage:
               image: {{.etcd_wrapper_image}}
               args:
               - "--name=$(NODE_NAME)"
-              - "--cert-file={{.kubelet_path}}/kubernetes.pem"
-              - "--key-file={{.kubelet_path}}/kubernetes-key.pem"
-              - "--peer-cert-file={{.kubelet_path}}/kubernetes.pem"
-              - "--peer-key-file={{.kubelet_path}}/kubernetes-key.pem"
+              - "--cert-file={{.kubelet_path}}/etcd.pem"
+              - "--key-file={{.kubelet_path}}/etcd-key.pem"
+              - "--peer-cert-file={{.kubelet_path}}/etcd.pem"
+              - "--peer-key-file={{.kubelet_path}}/etcd-key.pem"
               - "--trusted-ca-file={{.kubelet_path}}/ca.pem"
               - "--peer-trusted-ca-file={{.kubelet_path}}/ca.pem"
               - "--initial-advertise-peer-urls=https://$(INTERNAL_IP):{{.etcd_peer_port}}"
