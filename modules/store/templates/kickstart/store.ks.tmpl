@@ -20,7 +20,6 @@ bootloader --append="console=tty0 console=ttyS1,115200n8 elevator=noop intel_iom
 repo --name=fedora --mirrorlist=https://mirrors.fedoraproject.org/mirrorlist?repo=fedora-$releasever&arch=$basearch
 repo --name=updates --mirrorlist=https://mirrors.fedoraproject.org/mirrorlist?repo=updates-released-f$releasever&arch=$basearch
 url --mirrorlist=https://mirrors.fedoraproject.org/mirrorlist?repo=fedora-$releasever&arch=$basearch
-
 repo --name=zfs-on-linux --baseurl=http://download.zfsonlinux.org/fedora/$releasever/$basearch/
 
 %packages --excludeWeakdeps --excludedocs
@@ -230,11 +229,6 @@ EOF
 ##
 ## general file writes
 ##
-
-cat <<EOF > /etc/modprobe.d/local.conf
-options igb max_vfs=8
-options ixgbe max_vfs=8
-EOF
 
 cat <<EOF > /etc/ssh/sshd_config
 Subsystem sftp internal-sftp
