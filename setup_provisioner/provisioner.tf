@@ -15,11 +15,13 @@ module "provisioner" {
   provisioner_hosts     = ["provisioner-0", "provisioner-1"]
   provisioner_lan_ips   = ["192.168.62.217", "192.168.62.218"]
   provisioner_store_ips = ["192.168.126.217", "192.168.126.218"]
+  provisioner_sync_ips  = ["192.168.190.1", "192.168.190.2"]
   kea_ha_roles          = ["primary", "standby"]
-  provisioner_lan_if    = "eth0"
-  provisioner_store_if  = "eth1"
-  provisioner_wan_if    = "eth2"
-  provisioner_share_if  = "eth3"
+  provisioner_store_if  = "eth0"
+  provisioner_lan_if    = "eth1"
+  provisioner_sync_if   = "eth2"
+  provisioner_wan_if    = "eth3"
+  provisioner_vwan_if   = "eth4"
   mtu                   = "9000"
 
   ## images
@@ -44,12 +46,14 @@ module "provisioner" {
   backup_dns_ip     = "9.9.9.9"
 
   ## ip ranges
-  lan_netmask         = "23"
   store_netmask       = "23"
-  lan_ip_range        = "192.168.62.0/23"
+  lan_netmask         = "23"
+  sync_netmask        = "29"
   store_ip_range      = "192.168.126.0/23"
-  lan_dhcp_ip_range   = "192.168.62.64/26"
+  lan_ip_range        = "192.168.62.0/23"
+  sync_ip_range       = "192.168.190.0/29"
   store_dhcp_ip_range = "192.168.126.64/26"
+  lan_dhcp_ip_range   = "192.168.62.64/26"
 
   ## renderer provisioning access
   renderer_endpoint        = "${local.renderer_endpoint}"

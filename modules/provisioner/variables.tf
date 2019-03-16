@@ -28,6 +28,10 @@ variable "provisioner_store_ips" {
   type = "list"
 }
 
+variable "provisioner_sync_ips" {
+  type = "list"
+}
+
 variable "provisioner_lan_if" {
   type = "string"
 }
@@ -40,7 +44,11 @@ variable "provisioner_wan_if" {
   type = "string"
 }
 
-variable "provisioner_share_if" {
+variable "provisioner_vwan_if" {
+  type = "string"
+}
+
+variable "provisioner_sync_if" {
   type = "string"
 }
 
@@ -139,7 +147,15 @@ variable "store_ip_range" {
   type = "string"
 }
 
+variable "sync_ip_range" {
+  type = "string"
+}
+
 variable "store_netmask" {
+  type = "string"
+}
+
+variable "sync_netmask" {
   type = "string"
 }
 

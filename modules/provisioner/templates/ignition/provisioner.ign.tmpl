@@ -1,22 +1,6 @@
 ---
 networkd:
   units:
-    - name: {{.lan_if}}.network
-      contents: |
-        [Match]
-        Name={{.lan_if}}
-
-        [Network]
-        LinkLocalAddressing=no
-        DHCP=no
-
-        [Address]
-        Address={{.lan_ip}}/{{.lan_netmask}}
-
-        [RoutingPolicyRule]
-        IncomingInterface={{.lan_if}}
-        Table=250
-        Priority=32760
     - name: {{.store_if}}.network
       contents: |
         [Match]
@@ -33,6 +17,36 @@ networkd:
         IncomingInterface={{.store_if}}
         Table=250
         Priority=32760
+
+    - name: {{.lan_if}}.network
+      contents: |
+        [Match]
+        Name={{.lan_if}}
+
+        [Network]
+        LinkLocalAddressing=no
+        DHCP=no
+
+        [Address]
+        Address={{.lan_ip}}/{{.lan_netmask}}
+
+        [RoutingPolicyRule]
+        IncomingInterface={{.lan_if}}
+        Table=250
+        Priority=32761
+
+    - name: {{.sync_if}}.network
+      contents: |
+        [Match]
+        Name={{.sync_if}}
+
+        [Network]
+        LinkLocalAddressing=no
+        DHCP=no
+
+        [Address]
+        Address={{.sync_ip}}/{{.sync_netmask}}
+
     - name: {{.wan_if}}.network
       contents: |
         [Match]
@@ -52,16 +66,15 @@ networkd:
         UseHostname=false
         UseDomains=false
         UseTimezone=no
-    - name: {{.share_if}}.network
+
+    - name: {{.vwan_if}}.network
       contents: |
         [Match]
-        Name={{.share_if}}
+        Name={{.vwan_if}}
 
         [Network]
         LinkLocalAddressing=no
         DHCP=yes
-        DNS={{.backup_dns_ip}}
-        DNSOverTLS=opportunistic
 
         [DHCP]
         UseMTU=true
@@ -207,8 +220,9 @@ storage:
               - name: NFTABLES_LOCAL_CONFIG
                 value: |
                   define if_internal = { {{.lan_if}}, {{.store_if}} }
-                  define if_external = {{.share_if}}
+                  define if_external = {{.vwan_if}}
                   define if_trusted = {{.store_if}}
+                  define if_sync = {{.sync_if}}
 
                   table ip filter {
                     chain base_checks {
@@ -227,6 +241,7 @@ storage:
                       ip protocol icmp icmp type { echo-request, echo-reply, time-exceeded, parameter-problem, destination-unreachable } accept;
 
                       iifname $if_trusted accept;
+                      iifname $if_sync accept;
 
                       iifname $if_internal tcp dport domain accept;
                       iifname $if_internal udp dport domain accept;

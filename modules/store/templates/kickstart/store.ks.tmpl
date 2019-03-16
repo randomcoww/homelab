@@ -107,8 +107,9 @@ MTUBytes={{.mtu}}
 LinkLocalAddressing=no
 DHCP=no
 MACVTAP=int0
-VLAN=env30
 VLAN=env90
+VLAN=env60
+VLAN=env30
 EOF
 
 ## vswitch bridge
@@ -163,6 +164,15 @@ Kind=vlan
 
 [VLAN]
 Id=30
+EOF
+
+cat <<EOF > /etc/systemd/network/env60.netdev
+[NetDev]
+Name=env60
+Kind=vlan
+
+[VLAN]
+Id=60
 EOF
 
 cat <<EOF > /etc/systemd/network/env90.netdev
