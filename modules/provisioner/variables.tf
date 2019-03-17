@@ -94,6 +94,10 @@ variable "syncthing_image" {
   type = "string"
 }
 
+variable "conntrack_image" {
+  type = "string"
+}
+
 ## ports
 variable "matchbox_http_port" {
   type = "string"

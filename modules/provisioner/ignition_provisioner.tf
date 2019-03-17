@@ -45,16 +45,17 @@ resource "matchbox_group" "ignition_provisioner" {
     tftpd_image      = "${var.tftpd_image}"
     matchbox_image   = "${var.matchbox_image}"
     syncthing_image  = "${var.syncthing_image}"
+    conntrack_image  = "${var.conntrack_image}"
 
     matchbox_http_port  = "${var.matchbox_http_port}"
     matchbox_rpc_port   = "${var.matchbox_rpc_port}"
     kea_peer_port       = "${var.kea_peer_port}"
     syncthing_peer_port = "${var.syncthing_peer_port}"
 
-    matchbox_vip      = "${var.matchbox_vip}"
     store_gateway_vip = "${var.store_gateway_vip}"
-    lan_gateway_vip   = "${var.lan_gateway_vip}"
     dns_vip           = "${var.dns_vip}"
+    matchbox_vip      = "${var.matchbox_vip}"
+    lan_gateway_vip   = "${var.lan_gateway_vip}"
     backup_dns_ip     = "${var.backup_dns_ip}"
 
     lan_ip        = "${var.provisioner_lan_ips[count.index]}"
@@ -86,7 +87,7 @@ resource "matchbox_group" "ignition_provisioner" {
       "${jsonencode(local.kea_ha_peers_template)}",
       "${var.provisioner_hosts}",
       "${var.kea_ha_roles}",
-      "${var.provisioner_store_ips}"
+      "${var.provisioner_sync_ips}"
     ))}"
 
     syncthing_folder_devices = "${join("", formatlist(
@@ -97,9 +98,9 @@ resource "matchbox_group" "ignition_provisioner" {
     syncthing_devices = "${join("", formatlist(
       "${chomp(local.syncthing_devices_template)}",
       "${data.syncthing_device.syncthing.*.device_id}",
-      "${var.provisioner_store_ips}",
+      "${var.provisioner_sync_ips}",
       "${var.syncthing_peer_port}",
-      "${var.store_ip_range}"
+      "${var.sync_ip_range}"
     ))}"
 
     tls_ca            = "${replace(tls_self_signed_cert.root.cert_pem, "\n", "\\n")}"

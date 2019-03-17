@@ -33,6 +33,7 @@ module "provisioner" {
   tftpd_image      = "randomcoww/tftpd_ipxe:20190119.01"
   matchbox_image   = "quay.io/coreos/matchbox:latest"
   syncthing_image  = "randomcoww/syncthing:20190119.01"
+  conntrack_image  = "randomcoww/conntrack:20190316.02"
 
   ## ports
   matchbox_http_port = "58080"
@@ -40,9 +41,9 @@ module "provisioner" {
 
   ## vip
   store_gateway_vip = "192.168.126.240"
-  lan_gateway_vip   = "192.168.62.240"
   dns_vip           = "192.168.126.241"
   matchbox_vip      = "192.168.126.242"
+  lan_gateway_vip   = "192.168.62.240"
   backup_dns_ip     = "9.9.9.9"
 
   ## ip ranges
