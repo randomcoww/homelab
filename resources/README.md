@@ -1,5 +1,6 @@
 ### Generate renderer
 
+```
 terraform apply \
     -target=module.renderer \
     -target=local_file.ca_pem \
@@ -17,24 +18,33 @@ docker run -it --rm \
         -assets-path /var/lib/matchbox \
         -address 0.0.0.0:8080 \
         -rpc-address 0.0.0.0:8081
+```
 
 ### Generate host kickstart (requires renderer)
 
+```
 terraform apply \
     -target=module.store
+```
 
 ### Generate provisioner ignition (requires renderer)
 
+```
 terraform apply \
     -target=module.provisioner
+```
 
 ### Generate kubernetes ignition (requires provisioner)
 
+```
 terraform apply \
     -target=module.kubernetes_cluster \
     -target=local_file.admin_kubeconfig
+```
 
 ### Generate desktop kickstart (requires provisioner)
 
+```
 terraform apply \
     -target=module.desktop
+```
