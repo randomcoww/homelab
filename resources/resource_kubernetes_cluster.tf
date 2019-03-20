@@ -1,7 +1,8 @@
 # Matchbox configs for Kubernetes cluster
 
 locals {
-  iam_user = "etcd_backup"
+  iam_user    = "kube-cluster-etcd"
+  policy_name = "s3-admin"
 
   iam_user_policy = {
     Version = "2012-10-17"
@@ -25,7 +26,7 @@ resource "aws_iam_access_key" "etcd_backup" {
 }
 
 resource "aws_iam_user_policy" "s3_access" {
-  name   = "test"
+  name   = "${local.policy_name}"
   user   = "${aws_iam_user.etcd_backup.name}"
   policy = "${jsonencode(local.iam_user_policy)}"
 }
@@ -83,11 +84,16 @@ module "kubernetes_cluster" {
   aws_region            = "us-west-2"
   aws_access_key_id     = "${aws_iam_access_key.etcd_backup.id}"
   aws_secret_access_key = "${aws_iam_access_key.etcd_backup.secret}"
-  s3_backup_path        = "randomcoww-etcd-backup/test-backup"
+  s3_backup_path        = "randomcoww-etcd-backup/kube-cluster"
 
   ## renderer provisioning access
   renderer_endpoint        = "${local.renderer_endpoint}"
   renderer_cert_pem        = "${local.renderer_cert_pem}"
   renderer_private_key_pem = "${local.renderer_private_key_pem}"
   renderer_ca_pem          = "${local.renderer_ca_pem}"
+}
+
+resource "local_file" "admin_kubeconfig" {
+  content  = "${module.kubernetes_cluster.kubeconfig}"
+  filename = "./output/kube-cluster/admin.kubeconfig"
 }

@@ -95,6 +95,7 @@ jq
 ##
 
 user --name={{.default_user}} --password={{.password}} --plaintext --uid=1000 --gid=1000 --groups=wheel,libvirt,docker,qemu,input
+sshkey --username={{.default_user}} "{{.ssh_authorized_key}}"
 
 %post --erroronfail
 

@@ -6,6 +6,10 @@ variable "password" {
   type = "string"
 }
 
+variable "ssh_ca_public_key" {
+  type = "string"
+}
+
 ## desktop
 variable "desktop_hosts" {
   type = "list"

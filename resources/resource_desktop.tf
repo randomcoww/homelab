@@ -3,8 +3,9 @@ module "desktop" {
   source = "../modules/desktop"
 
   ## user (default container linux)
-  default_user = "randomcoww"
-  password     = "password"
+  default_user      = "randomcoww"
+  password          = "password"
+  ssh_ca_public_key = "${tls_private_key.ssh_ca.public_key_openssh}"
 
   ## host configs
   desktop_hosts   = ["desktop-0"]

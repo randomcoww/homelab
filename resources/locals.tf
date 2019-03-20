@@ -1,0 +1,12 @@
+locals {
+  renderer_endpoint        = "192.168.126.242:58081"
+  renderer_cert_pem        = "${module.provisioner.matchbox_cert_pem}"
+  renderer_private_key_pem = "${module.provisioner.matchbox_private_key_pem}"
+  renderer_ca_pem          = "${module.provisioner.matchbox_ca_pem}"
+
+  local_renderer_endpoint        = "127.0.0.1:8081"
+  local_renderer_cert_pem        = "${module.renderer.matchbox_cert_pem}"
+  local_renderer_private_key_pem = "${module.renderer.matchbox_private_key_pem}"
+  local_renderer_ca_pem          = "${module.renderer.matchbox_ca_pem}"
+  kubernetes_version             = "v1.13.2"
+}

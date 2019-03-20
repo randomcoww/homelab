@@ -519,7 +519,6 @@ storage:
                     dynamic_interfaces
                   }
                   vrrp_instance VI_gateway {
-                    no_accept
                     nopreempt
                     state BACKUP
                     strict_mode off
@@ -695,11 +694,6 @@ storage:
                     }
 
                     Filter From Kernelspace {
-                      Protocol Accept {
-                        TCP
-                        UDP
-                      }
-
                       Address Ignore {
                         IPv4_address 127.0.0.1
                         IPv4_address $(NODE_IP)

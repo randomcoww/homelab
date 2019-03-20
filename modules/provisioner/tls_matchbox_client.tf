@@ -30,18 +30,3 @@ resource "tls_locally_signed_cert" "client" {
     "content_commitment",
   ]
 }
-
-resource "local_file" "ca_pem" {
-  content  = "${chomp(tls_self_signed_cert.root.cert_pem)}"
-  filename = "output/${var.output_path}/ca.crt"
-}
-
-resource "local_file" "client_private_key_pem" {
-  content  = "${chomp(tls_private_key.client.private_key_pem)}"
-  filename = "output/${var.output_path}/client.key"
-}
-
-resource "local_file" "client_cert_pem" {
-  content  = "${chomp(tls_locally_signed_cert.client.cert_pem)}"
-  filename = "output/${var.output_path}/client.crt"
-}

@@ -1,6 +1,5 @@
-## admin kubeconfig
-resource "local_file" "kubeconfig" {
-  content = <<EOF
+output "kubeconfig" {
+  value = <<EOF
 apiVersion: v1
 clusters:
 - cluster:
@@ -22,6 +21,4 @@ users:
     client-certificate-data: ${replace(base64encode(chomp(tls_locally_signed_cert.admin.cert_pem)), "\n", "")}
     client-key-data: ${replace(base64encode(chomp(tls_private_key.admin.private_key_pem)), "\n", "")}
 EOF
-
-  filename = "output/${var.cluster_name}/admin.kubeconfig"
 }

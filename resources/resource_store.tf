@@ -20,8 +20,8 @@ module "store" {
   container_linux_version    = "current"
 
   ## renderer provisioning access
-  renderer_endpoint        = "${local.renderer_endpoint}"
-  renderer_cert_pem        = "${local.renderer_cert_pem}"
-  renderer_private_key_pem = "${local.renderer_private_key_pem}"
-  renderer_ca_pem          = "${local.renderer_ca_pem}"
+  renderer_endpoint        = "${local.local_renderer_endpoint}"
+  renderer_cert_pem        = "${local.local_renderer_cert_pem}"
+  renderer_private_key_pem = "${local.local_renderer_private_key_pem}"
+  renderer_ca_pem          = "${local.local_renderer_ca_pem}"
 }

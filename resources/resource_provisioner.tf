@@ -26,7 +26,7 @@ module "provisioner" {
 
   ## images
   hyperkube_image  = "gcr.io/google_containers/hyperkube:${local.kubernetes_version}"
-  keepalived_image = "randomcoww/keepalived:20190119.01"
+  keepalived_image = "randomcoww/keepalived:20190319.03"
   unbound_image    = "randomcoww/unbound:20190119.01"
   nftables_image   = "randomcoww/nftables:20190119.01"
   kea_image        = "randomcoww/kea:20190119.01"
@@ -57,8 +57,8 @@ module "provisioner" {
   lan_dhcp_ip_range   = "192.168.62.64/26"
 
   ## renderer provisioning access
-  renderer_endpoint        = "${local.renderer_endpoint}"
-  renderer_cert_pem        = "${local.renderer_cert_pem}"
-  renderer_private_key_pem = "${local.renderer_private_key_pem}"
-  renderer_ca_pem          = "${local.renderer_ca_pem}"
+  renderer_endpoint        = "${local.local_renderer_endpoint}"
+  renderer_cert_pem        = "${local.local_renderer_cert_pem}"
+  renderer_private_key_pem = "${local.local_renderer_private_key_pem}"
+  renderer_ca_pem          = "${local.local_renderer_ca_pem}"
 }
