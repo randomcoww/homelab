@@ -48,3 +48,10 @@ terraform apply \
 terraform apply \
     -target=module.desktop
 ```
+
+### Write out SSH CA key
+
+```
+terraform apply \
+    -target=local_file.ssh_ca_key
+```
