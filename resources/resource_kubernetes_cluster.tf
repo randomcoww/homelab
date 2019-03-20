@@ -94,6 +94,28 @@ module "kubernetes_cluster" {
 }
 
 resource "local_file" "admin_kubeconfig" {
-  content  = "${module.kubernetes_cluster.kubeconfig}"
+  content = <<EOF
+apiVersion: v1
+clusters:
+- cluster:
+    certificate-authority-data: ${replace(base64encode(chomp(module.kubernetes_cluster.kubernetes_ca_pem)), "\n", "")}
+    server: https://192.168.126.245:56443
+  name: kube-cluster
+contexts:
+- context:
+    cluster: kube-cluster
+    user: admin
+  name: default
+current-context: default
+kind: Config
+preferences: {}
+users:
+- name: admin
+  user:
+    as-user-extra: {}
+    client-certificate-data: ${replace(base64encode(chomp(module.kubernetes_cluster.kubernetes_cert_pem)), "\n", "")}
+    client-key-data: ${replace(base64encode(chomp(module.kubernetes_cluster.kubernetes_private_key_pem)), "\n", "")}
+EOF
+
   filename = "./output/kube-cluster/admin.kubeconfig"
 }
