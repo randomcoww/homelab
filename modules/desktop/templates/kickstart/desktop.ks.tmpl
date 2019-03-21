@@ -153,6 +153,7 @@ LinkLocalAddressing=no
 DHCP=no
 MACVTAP=int0
 VLAN=env30
+VLAN=env60
 VLAN=env90
 EOF
 
@@ -208,6 +209,15 @@ Kind=vlan
 
 [VLAN]
 Id=30
+EOF
+
+cat <<EOF > /etc/systemd/network/env60.netdev
+[NetDev]
+Name=env60
+Kind=vlan
+
+[VLAN]
+Id=60
 EOF
 
 cat <<EOF > /etc/systemd/network/env90.netdev
@@ -276,10 +286,7 @@ EOF
 ##
 
 cat <<EOF > /etc/modprobe.d/local.conf
-options igb max_vfs=8
-options ixgbe max_vfs=8
 options vfio-pci ids=1002:ffffffff:ffffffff:ffffffff:00030000:ffff00ff,1002:ffffffff:ffffffff:ffffffff:00040300:ffffffff,10de:ffffffff:ffffffff:ffffffff:00030000:ffff00ff,10de:ffffffff:ffffffff:ffffffff:00040300:ffffffff
-options kvm ignore_msrs=1
 EOF
 
 cat <<EOF > /etc/ssh/sshd_config

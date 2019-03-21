@@ -1,10 +1,15 @@
 # Matchbox configs for Kubernetes cluster
 
 locals {
-  iam_user    = "kube-cluster-etcd"
-  policy_name = "s3-admin"
+  kubernetes_version        = "v1.13.2"
+  kubernetes_cluster_name   = "kube-cluster"
+  kubernetes_apiserver_vip  = "192.168.126.245"
+  kubernetes_apiserver_port = "56443"
 
-  iam_user_policy = {
+  etcd_backup_iam_user        = "kube-cluster-etcd"
+  etcd_backup_iam_policy_name = "s3-admin"
+
+  etcd_backup_iam_policy = {
     Version = "2012-10-17"
 
     Statement = [
@@ -18,7 +23,7 @@ locals {
 }
 
 resource "aws_iam_user" "etcd_backup" {
-  name = "${local.iam_user}"
+  name = "${local.etcd_backup_iam_user}"
 }
 
 resource "aws_iam_access_key" "etcd_backup" {
@@ -26,9 +31,9 @@ resource "aws_iam_access_key" "etcd_backup" {
 }
 
 resource "aws_iam_user_policy" "s3_access" {
-  name   = "${local.policy_name}"
+  name   = "${local.etcd_backup_iam_policy_name}"
   user   = "${aws_iam_user.etcd_backup.name}"
-  policy = "${jsonencode(local.iam_user_policy)}"
+  policy = "${jsonencode(local.etcd_backup_iam_policy)}"
 }
 
 module "kubernetes_cluster" {
@@ -65,16 +70,16 @@ module "kubernetes_cluster" {
   cni_plugins_image             = "randomcoww/cni_plugins:0.7.4"
 
   ## kubernetes
-  cluster_name       = "kube-cluster"
+  cluster_name       = "${local.kubernetes_cluster_name}"
   etcd_cluster_token = "etcd-default"
 
   ## ports
-  apiserver_secure_port = "56443"
-  matchbox_http_port    = "58080"
+  apiserver_secure_port = "${local.kubernetes_apiserver_port}"
+  matchbox_http_port    = "${local.matchbox_http_port}"
 
   ## vip
-  controller_vip = "192.168.126.245"
-  matchbox_vip   = "192.168.126.242"
+  controller_vip = "${local.kubernetes_apiserver_vip}"
+  matchbox_vip   = "${local.matchbox_vip}"
 
   ## link local mount
   worker_ll_nfs_server = "169.254.169.254:/data/worker"
@@ -84,7 +89,7 @@ module "kubernetes_cluster" {
   aws_region            = "us-west-2"
   aws_access_key_id     = "${aws_iam_access_key.etcd_backup.id}"
   aws_secret_access_key = "${aws_iam_access_key.etcd_backup.secret}"
-  s3_backup_path        = "randomcoww-etcd-backup/kube-cluster"
+  s3_backup_path        = "randomcoww-etcd-backup/${local.kubernetes_cluster_name}"
 
   ## renderer provisioning access
   renderer_endpoint        = "${local.renderer_endpoint}"
@@ -93,29 +98,19 @@ module "kubernetes_cluster" {
   renderer_ca_pem          = "${local.renderer_ca_pem}"
 }
 
-resource "local_file" "admin_kubeconfig" {
-  content = <<EOF
-apiVersion: v1
-clusters:
-- cluster:
-    certificate-authority-data: ${replace(base64encode(chomp(module.kubernetes_cluster.kubernetes_ca_pem)), "\n", "")}
-    server: https://192.168.126.245:56443
-  name: kube-cluster
-contexts:
-- context:
-    cluster: kube-cluster
-    user: admin
-  name: default
-current-context: default
-kind: Config
-preferences: {}
-users:
-- name: admin
-  user:
-    as-user-extra: {}
-    client-certificate-data: ${replace(base64encode(chomp(module.kubernetes_cluster.kubernetes_cert_pem)), "\n", "")}
-    client-key-data: ${replace(base64encode(chomp(module.kubernetes_cluster.kubernetes_private_key_pem)), "\n", "")}
-EOF
+data "template_file" "kubeconfig" {
+  template = "${file("./kubeconfig.yaml.tpl")}"
 
-  filename = "./output/kube-cluster/admin.kubeconfig"
+  vars = {
+    kubernetes_cluster_name       = "${local.kubernetes_cluster_name}"
+    kubernetes_ca_pem             = "${replace(base64encode(chomp(module.kubernetes_cluster.kubernetes_ca_pem)), "\n", "")}"
+    kubernetes_cert_pem           = "${replace(base64encode(chomp(module.kubernetes_cluster.kubernetes_cert_pem)), "\n", "")}"
+    kubernetes_private_key_pem    = "${replace(base64encode(chomp(module.kubernetes_cluster.kubernetes_private_key_pem)), "\n", "")}"
+    kubernetes_apiserver_endpoint = "https://${local.kubernetes_apiserver_vip}:${local.kubernetes_apiserver_port}"
+  }
+}
+
+resource "local_file" "admin_kubeconfig" {
+  content  = "${data.template_file.kubeconfig.rendered}"
+  filename = "./output/${local.kubernetes_cluster_name}/admin.kubeconfig"
 }

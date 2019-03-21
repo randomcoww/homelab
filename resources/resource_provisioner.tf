@@ -1,4 +1,11 @@
 # Matchbox configs for PXE environment with matchbox renderer
+
+locals {
+  subnet_store_netmask = "23"
+  subnet_lan_netmask   = "23"
+  subnet_sync_netmask  = "29"
+}
+
 module "provisioner" {
   source = "../modules/provisioner"
 
@@ -25,7 +32,7 @@ module "provisioner" {
   mtu                   = "9000"
 
   ## images
-  hyperkube_image  = "gcr.io/google_containers/hyperkube:${local.kubernetes_version}"
+  hyperkube_image  = "gcr.io/google_containers/hyperkube:v1.13.2"
   keepalived_image = "randomcoww/keepalived:20190319.03"
   unbound_image    = "randomcoww/unbound:20190119.01"
   nftables_image   = "randomcoww/nftables:20190119.01"
@@ -36,23 +43,23 @@ module "provisioner" {
   conntrack_image  = "randomcoww/conntrack:20190316.02"
 
   ## ports
-  matchbox_http_port = "58080"
-  matchbox_rpc_port  = "58081"
+  matchbox_http_port = "${local.matchbox_http_port}"
+  matchbox_rpc_port  = "${local.matchbox_rpc_port}"
 
   ## vip
   store_gateway_vip = "192.168.126.240"
   dns_vip           = "192.168.126.241"
-  matchbox_vip      = "192.168.126.242"
+  matchbox_vip      = "${local.matchbox_vip}"
   lan_gateway_vip   = "192.168.62.240"
   backup_dns_ip     = "9.9.9.9"
 
   ## ip ranges
-  store_netmask       = "23"
-  lan_netmask         = "23"
-  sync_netmask        = "29"
-  store_ip_range      = "192.168.126.0/23"
-  lan_ip_range        = "192.168.62.0/23"
-  sync_ip_range       = "192.168.190.0/29"
+  store_netmask       = "${local.subnet_store_netmask}"
+  lan_netmask         = "${local.subnet_lan_netmask}"
+  sync_netmask        = "${local.subnet_sync_netmask}"
+  store_ip_range      = "192.168.126.0/${local.subnet_store_netmask}"
+  lan_ip_range        = "192.168.62.0/${local.subnet_lan_netmask}"
+  sync_ip_range       = "192.168.190.0/${local.subnet_sync_netmask}"
   store_dhcp_ip_range = "192.168.126.64/26"
   lan_dhcp_ip_range   = "192.168.62.64/26"
 
