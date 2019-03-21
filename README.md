@@ -14,18 +14,12 @@ The hypervisor and all VMs run on RAM disk and keep no state. Any persistent con
 
 ### Renderer
 
-[Renderer](setup_renderer) generates minimal configuration for standing up a local Matchbox server that accepts configuration from terraform and provides rendered configuration over http.
+Generates minimal configuration for standing up a local Matchbox server that accepts configuration from terraform and provides rendered configuration over http.
 This is used to render configuration that cannot be provided over PXE (i.e. provisioner for the PXE server itself and hypervisor that they run on).
-
-Generate TLS for local Matchbox
-```bash
-cd setup_renderer
-terraform init
-terraform apply
-```
 
 Start local Matchbox on Docker
 ```bash
+cd resources
 ./run_matchbox.sh
 ```
 
@@ -36,19 +30,19 @@ http://127.0.0.1:8080
 
 ### Provisioner
 
-[Provisioner](setup_provisioner) generates configuration for the PXE boot environment on the local Matchbox instance. Provisioner consists of a network gateway with Nftables and a PXE environment with a Matchbox instance of its own, DHCP and TFTP.
+Generates configuration for the PXE boot environment on the local Matchbox instance. Provisioner consists of a network gateway with Nftables and a PXE environment with a Matchbox instance of its own, DHCP and TFTP.
 
 ```bash
-cd setup_provisioner
-terraform init
-terraform apply
+cd resources
+terraform apply \
+    -target=module.provisioner \
+    -target=module.store
 ```
 
 #### Hypervisor image
 
 Generate hypervisor images:
 ```bash
-
 git clone https://github.com/randomcoww/lorax
 cd lorax
 
@@ -98,6 +92,7 @@ cd env-provisioner/ignition
 
 wget -O provisioner-0.ign \
     http://127.0.0.1:8080/ignition?ign=provisioner-0
+
 wget -O provisioner-1.ign \
     http://127.0.0.1:8080/ignition?ign=provisioner-1
     
@@ -126,24 +121,18 @@ DHCP (Kea) instances run in hot-standby. Matchbox instances share configuration 
 
 ![provisioner](images/provisioner.png)
 
-#### Terraform output
-
-SSH CA private key for the hypervisor and provisioner VMs:
-```
-setup_provisioner/output/ssh-ca-key.pem
-```
-
 ### Kubernetes and remaining environment
 
-[Setup environment](setup_environment) handles generating PXE boot configurations that are pushed to the provisioner. This currently consists of a three master and two worker Kubernetes cluster.
+Generate a Kubernetes cluster of 3 controller/etcd nodes and 2 worker nodes.
 
 Etcd, in addition to most other services in my lab, runs on RAM disk, but is periodically backed up to S3 and recovered as needed. Custom [etcd-wrapper](https://github.com/randomcoww/etcd-wrapper) tool is used to manage this.
 
 Populate provisioner Matchbox instance:
 ```bash
-cd setup_environment
-terraform init
-terraform apply
+cd resources
+terraform apply \
+    -target=module.kubernetes_cluster \
+    -target=local_file.admin_kubeconfig
 ```
 
 Compatible KVM libvirt configurations are in [env-provisioner](https://github.com/randomcoww/env-provisioner). I currently have no automation for defining and starting VMs.
@@ -158,13 +147,6 @@ virsh start controller-0
 ...
 ```
 
-#### Terraform output
-
-SSH CA private key for the Kubernetes VMs:
-```
-setup_environment/output/ssh-ca-key.pem
-```
-
 Admin kubeconfig:
 ```
 setup_environment/output/kube-cluster/<name_of_cluster>/admin.kubeconfig
@@ -172,7 +154,7 @@ setup_environment/output/kube-cluster/<name_of_cluster>/admin.kubeconfig
 
 ### Desktop provisioning
 
-[Setup desktop](setup_desktop) generates a kickstart for my desktop box. The following disk with existing partitions is assumed and the home partition is not formatted:
+Generates kickstart for my desktop box. The following disk with existing partitions is assumed and the home partition is not formatted:
 
 ```
 part /boot/efi --fstype=efi --size=200 --onpart /dev/nvme0n1p1
@@ -183,12 +165,22 @@ part /home --fstype=ext4 --size=1024 --grow --noformat --onpart /dev/nvme0n1p4
 
 Generate Kickstart:
 ```bash
-cd setup_desktop
-terraform init
-terraform apply
+cd resources
+terraform apply \
+    -target=module.desktop
 ```
 
 I currently have no PXE boot environment for Fedora. The following boot args can be added to a Fedora 29 installer to use, where 192.168.126.242:58080 is the provisioner Matchbox address.
 ```
 inst.text inst.ks=http://192.168.126.242:58080/generic?ks=desktop-0
+```
+
+### SSH CA
+
+Outputs SSH CA key that can be used to sign public keys for accessing all servers built using this terraform.
+
+```bash
+cd resources
+terraform apply \
+    -target=local_file.ssh_ca_key
 ```
