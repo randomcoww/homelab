@@ -99,7 +99,7 @@ module "kubernetes_cluster" {
 }
 
 data "template_file" "kubeconfig" {
-  template = "${file("./kubeconfig.yaml.tpl")}"
+  template = "${file("./templates/kubeconfig.yaml.tmpl")}"
 
   vars = {
     kubernetes_cluster_name       = "${local.kubernetes_cluster_name}"
