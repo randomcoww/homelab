@@ -15,8 +15,9 @@ module "provisioner" {
   default_user      = "core"
   ssh_ca_public_key = "${tls_private_key.ssh_ca.public_key_openssh}"
 
-  ## DHCP domain
-  domain_name = "host.internal"
+  ## domain
+  internal_domain = "${local.internal_domain}"
+  dhcp_domain     = "host.${local.internal_domain}"
 
   ## host configs
   provisioner_hosts     = ["provisioner-0", "provisioner-1"]
@@ -48,10 +49,11 @@ module "provisioner" {
 
   ## vip
   store_gateway_vip = "192.168.126.240"
-  dns_vip           = "192.168.126.241"
+  recursive_dns_vip = "192.168.126.241"
+  internal_dns_vip  = "${local.internal_dns_vip}"
   matchbox_vip      = "${local.matchbox_vip}"
   lan_gateway_vip   = "192.168.62.240"
-  backup_dns_ip     = "9.9.9.9"
+  public_dns_ip     = "9.9.9.9"
 
   ## ip ranges
   store_netmask       = "${local.subnet_store_netmask}"

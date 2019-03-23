@@ -45,8 +45,9 @@ networkd:
         [Network]
         LinkLocalAddressing=no
         DHCP=yes
-        DNS={{.backup_dns_ip}}
+        DNS={{.public_dns_ip}}
         DNSOverTLS=opportunistic
+        Domains=~
 
         [DHCP]
         UseMTU=true
@@ -346,7 +347,7 @@ storage:
                       "option-data": [
                         {
                           "name": "domain-name",
-                          "data": "{{.domain_name}}"
+                          "data": "{{.dhcp_domain}}"
                         }
                       ],
                       "client-classes": [
@@ -399,7 +400,7 @@ storage:
                             },
                             {
                               "name": "domain-name-servers",
-                              "data": "{{.backup_dns_ip}}",
+                              "data": "{{.recursive_dns_vip}},{{.public_dns_ip}}",
                               "csv-format": true
                             }
                           ],
@@ -418,7 +419,7 @@ storage:
                             },
                             {
                               "name": "domain-name-servers",
-                              "data": "{{.dns_vip}},{{.backup_dns_ip}}",
+                              "data": "{{.recursive_dns_vip}},{{.public_dns_ip}}",
                               "csv-format": true
                             },
                             {
@@ -435,7 +436,7 @@ storage:
                       ],
                       "dhcp-ddns": {
                         "enable-updates": true,
-                        "qualifying-suffix": "{{.domain_name}}.",
+                        "qualifying-suffix": "{{.dhcp_domain}}.",
                         "override-client-update": true,
                         "override-no-update": true,
                         "replace-client-name": "when-not-present"
@@ -481,11 +482,15 @@ storage:
                     access-control: 0.0.0.0/0 allow
                     do-not-query-localhost: no
                   forward-zone:
+                    name: "{{.internal_domain}}"
+                    forward-no-cache: no
+                    forward-addr: {{.internal_dns_vip}}@53
+                  forward-zone:
                     name: "."
                     forward-tls-upstream: yes
-                    forward-addr: {{.backup_dns_ip}}@853
+                    forward-addr: {{.public_dns_ip}}@853
                   remote-control:
-                    control-enable: yes
+                    control-enable: no
 
     - path: {{.kubelet_path}}/manifests/keepalived.yaml
       filesystem: root
@@ -527,7 +532,7 @@ storage:
                     priority 100
                     virtual_ipaddress {
                       {{.store_gateway_vip}} dev {{.store_if}}
-                      {{.dns_vip}} dev {{.store_if}}
+                      {{.recursive_dns_vip}} dev {{.store_if}}
                       {{.matchbox_vip}} dev {{.store_if}}
                       {{.lan_gateway_vip}} dev {{.lan_if}}
                     }
@@ -699,7 +704,7 @@ storage:
                         IPv4_address 127.0.0.1
                         IPv4_address $(NODE_IP)
                         IPv4_address {{.store_gateway_vip}}
-                        IPv4_address {{.dns_vip}}
+                        IPv4_address {{.recursive_dns_vip}}
                         IPv4_address {{.matchbox_vip}}
                         IPv4_address {{.lan_gateway_vip}}
                       }

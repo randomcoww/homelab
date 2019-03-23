@@ -6,7 +6,11 @@ variable "ssh_ca_public_key" {
   type = "string"
 }
 
-variable "domain_name" {
+variable "internal_domain" {
+  type = "string"
+}
+
+variable "dhcp_domain" {
   type = "string"
 }
 
@@ -126,7 +130,11 @@ variable "store_gateway_vip" {
   type = "string"
 }
 
-variable "dns_vip" {
+variable "recursive_dns_vip" {
+  type = "string"
+}
+
+variable "internal_dns_vip" {
   type = "string"
 }
 
@@ -134,7 +142,7 @@ variable "matchbox_vip" {
   type = "string"
 }
 
-variable "backup_dns_ip" {
+variable "public_dns_ip" {
   type = "string"
 }
 

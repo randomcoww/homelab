@@ -53,10 +53,11 @@ resource "matchbox_group" "ignition_provisioner" {
     syncthing_peer_port = "${var.syncthing_peer_port}"
 
     store_gateway_vip = "${var.store_gateway_vip}"
-    dns_vip           = "${var.dns_vip}"
+    recursive_dns_vip = "${var.recursive_dns_vip}"
+    internal_dns_vip  = "${var.internal_dns_vip}"
     matchbox_vip      = "${var.matchbox_vip}"
     lan_gateway_vip   = "${var.lan_gateway_vip}"
-    backup_dns_ip     = "${var.backup_dns_ip}"
+    public_dns_ip     = "${var.public_dns_ip}"
 
     lan_ip        = "${var.provisioner_lan_ips[count.index]}"
     lan_if        = "${var.provisioner_lan_if}"
@@ -71,7 +72,8 @@ resource "matchbox_group" "ignition_provisioner" {
     vwan_if       = "${var.provisioner_vwan_if}"
     mtu           = "${var.mtu}"
 
-    domain_name = "${var.domain_name}"
+    internal_domain = "${var.internal_domain}"
+    dhcp_domain = "${var.dhcp_domain}"
 
     lan_ip_range        = "${var.lan_ip_range}"
     lan_dhcp_ip_range   = "${var.lan_dhcp_ip_range}"
