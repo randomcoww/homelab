@@ -78,8 +78,9 @@ module "kubernetes_cluster" {
   matchbox_http_port    = "${local.matchbox_http_port}"
 
   ## vip
-  controller_vip = "${local.kubernetes_apiserver_vip}"
-  matchbox_vip   = "${local.matchbox_vip}"
+  controller_vip   = "${local.kubernetes_apiserver_vip}"
+  matchbox_vip     = "${local.matchbox_vip}"
+  internal_dns_vip = "${local.internal_dns_vip}"
 
   ## link local mount
   worker_ll_nfs_server = "169.254.169.254:/data/worker"

@@ -481,10 +481,13 @@ storage:
                     do-tcp: yes
                     access-control: 0.0.0.0/0 allow
                     do-not-query-localhost: no
-                  forward-zone:
+                  private-domain: "{{.internal_domain}}"
+                  domain-insecure: "{{.internal_domain}}"
+                  unblock-lan-zones: yes
+                  insecure-lan-zones: yes
+                  stub-zone:
                     name: "{{.internal_domain}}"
-                    forward-no-cache: no
-                    forward-addr: {{.internal_dns_vip}}@53
+                    stub-addr: {{.internal_dns_vip}}
                   forward-zone:
                     name: "."
                     forward-tls-upstream: yes
