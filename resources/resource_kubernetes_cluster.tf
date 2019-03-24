@@ -68,6 +68,8 @@ module "kubernetes_cluster" {
   flannel_image                 = "quay.io/coreos/flannel:v0.10.0-amd64"
   keepalived_image              = "randomcoww/keepalived:20190119.01"
   cni_plugins_image             = "randomcoww/cni_plugins:0.7.4"
+  coredns_image                 = "coredns/coredns:1.3.1"
+  external_dns_image            = "registry.opensource.zalan.do/teapot/external-dns:latest"
 
   ## kubernetes
   cluster_name       = "${local.kubernetes_cluster_name}"

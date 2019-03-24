@@ -103,6 +103,14 @@ variable "cni_plugins_image" {
   type = "string"
 }
 
+variable "coredns_image" {
+  type = "string"
+}
+
+variable "external_dns_image" {
+  type = "string"
+}
+
 ## kubernetes
 variable "cluster_cidr" {
   type    = "string"
@@ -176,6 +184,10 @@ variable "controller_vip" {
 }
 
 variable "matchbox_vip" {
+  type = "string"
+}
+
+variable "internal_dns_vip" {
   type = "string"
 }
 
