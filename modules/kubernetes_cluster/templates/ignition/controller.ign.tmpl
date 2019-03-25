@@ -136,17 +136,6 @@ storage:
       contents:
         inline: "{{.tls_scheduler_key}}"
 
-    - path: {{.kubelet_path}}/external-dns.pem
-      filesystem: root
-      mode: 420
-      contents:
-        inline: "{{.tls_external_dns}}"
-    - path: {{.kubelet_path}}/external-dns-key.pem
-      filesystem: root
-      mode: 420
-      contents:
-        inline: "{{.tls_external_dns_key}}"
-
     - path: {{.kubelet_path}}/service-account.pem
       filesystem: root
       mode: 420
@@ -233,47 +222,6 @@ storage:
             user:
               client-certificate: {{.kubelet_path}}/kube-scheduler.pem
               client-key: {{.kubelet_path}}/kube-scheduler-key.pem
-    - path: {{.kubelet_path}}/external-dns.kubeconfig
-      filesystem: root
-      mode: 420
-      contents:
-        inline: |-
-          apiVersion: v1
-          clusters:
-          - cluster:
-              certificate-authority: {{.kubelet_path}}/ca.pem
-              server: {{.apiserver_url}}
-            name: {{.cluster_name}}
-          contexts:
-          - context:
-              cluster: {{.cluster_name}}
-              user: external-dns
-            name: default
-          current-context: default
-          kind: Config
-          preferences: {}
-          users:
-          - name: external-dns
-            user:
-              client-certificate: {{.kubelet_path}}/external-dns.pem
-              client-key: {{.kubelet_path}}/external-dns-key.pem
-
-    - path: {{.kubelet_path}}/Corefile
-      filesystem: root
-      mode: 420
-      contents:
-        inline: |-
-          .:53 {
-            cache 30
-            errors
-            health :10253
-            loadbalance round_robin
-            prometheus 0.0.0.0:9153
-            etcd internal {
-              endpoint {{.etcd_local_endpoint}}
-              tls {{.kubelet_path}}/etcd.pem {{.kubelet_path}}/etcd-key.pem {{.kubelet_path}}/ca.pem
-            }
-          }
 
     - path: {{.kubelet_path}}/manifests/keepalived.yaml
       filesystem: root
@@ -316,7 +264,6 @@ storage:
                     priority 100
                     virtual_ipaddress {
                       {{.controller_vip}}
-                      {{.internal_dns_vip}}
                     }
                   }
 
@@ -526,76 +473,6 @@ storage:
                   path: "/healthz"
                 initialDelaySeconds: 15
                 timeoutSeconds: 15
-              volumeMounts:
-              - name: kubernetes-path
-                mountPath: "{{.kubelet_path}}"
-                readOnly: true
-            volumes:
-            - name: kubernetes-path
-              hostPath:
-                path: "{{.kubelet_path}}"
-
-    - path: {{.kubelet_path}}/manifests/external-dns.yaml
-      filesystem: root
-      mode: 420
-      contents:
-        inline: |-
-          ---
-          kind: Pod
-          apiVersion: v1
-          metadata:
-            namespace: kube-system
-            name: external-dns
-          spec:
-            restartPolicy: Always
-            hostNetwork: true
-            containers:
-            - name: "coredns"
-              image: "{{.coredns_image}}"
-              args:
-              - "-conf"
-              - "{{.kubelet_path}}/Corefile"
-              resources:
-                limits:
-                  cpu: 100m
-                  memory: 128Mi
-                requests:
-                  cpu: 100m
-                  memory: 128Mi
-              ports:
-              - containerPort: 53
-                protocol: UDP
-              - containerPort: 53
-                protocol: TCP
-              livenessProbe:
-                httpGet:
-                  path: /health
-                  port: 10253
-                  scheme: HTTP
-                initialDelaySeconds: 60
-                timeoutSeconds: 5
-                successThreshold: 1
-                failureThreshold: 5
-              volumeMounts:
-              - name: kubernetes-path
-                mountPath: "{{.kubelet_path}}"
-                readOnly: true
-            - name: external-dns
-              image: {{.external_dns_image}}
-              args:
-              - "--source=service"
-              - "--provider=coredns"
-              - "--log-level=debug"
-              - "--kubeconfig={{.kubelet_path}}/external-dns.kubeconfig"
-              env:
-              - name: ETCD_URLS
-                value: "{{.etcd_endpoints}}"
-              - name: ETCD_CA_FILE
-                value: "{{.kubelet_path}}/ca.pem"
-              - name: ETCD_CERT_FILE
-                value: "{{.kubelet_path}}/etcd.pem"
-              - name: ETCD_KEY_FILE
-                value: "{{.kubelet_path}}/etcd-key.pem"
               volumeMounts:
               - name: kubernetes-path
                 mountPath: "{{.kubelet_path}}"

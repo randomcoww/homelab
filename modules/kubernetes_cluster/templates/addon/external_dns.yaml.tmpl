@@ -28,19 +28,39 @@ roleRef:
 subjects:
 - kind: ServiceAccount
   name: external-dns
-  namespace: kube-system
+  namespace: {{.namespace}}
 ---
 apiVersion: v1
 kind: ServiceAccount
 metadata:
   name: external-dns
-  namespace: kube-system
+  namespace: {{.namespace}}
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: coredns-external-dns
+  namespace: {{.namespace}}
+data:
+  Corefile: |
+    .:53 {
+      errors
+      health
+      etcd internal {
+        endpoint {{.corefile_etcd_endpoints}}
+        tls {{.kubelet_path}}/bootstrap.pem {{.kubelet_path}}/bootstrap-key.pem {{.kubelet_path}}/ca.pem
+      }
+      prometheus :9153
+      cache 30
+      reload
+      loadbalance
+    }
 ---
 apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: external-dns
-  namespace: kube-system
+  namespace: {{.namespace}}
 spec:
   strategy:
     type: Recreate
@@ -55,12 +75,12 @@ spec:
       serviceAccountName: external-dns
       containers:
       - name: external-dns
-        image: registry.opensource.zalan.do/teapot/external-dns:latest
+        image: {{.external_dns_image}}
         args:
         - --source=service
         - --source=ingress
         - --provider=coredns
-        - --log-level=debug # debug only
+        - --log-level=debug
         env:
         - name: ETCD_URLS
           value: "{{.etcd_endpoints}}"
@@ -74,7 +94,85 @@ spec:
         - name: kubernetes-path
           mountPath: "{{.kubelet_path}}"
           readOnly: false
+      - name: "coredns"
+        image: "{{.coredns_image}}"
+        args:
+        - "-conf"
+        - "/etc/coredns/Corefile"
+        resources:
+          limits:
+            cpu: 100m
+            memory: 128Mi
+          requests:
+            cpu: 100m
+            memory: 128Mi
+        ports:
+        - containerPort: 53
+          protocol: UDP
+        - containerPort: 53
+          protocol: TCP
+        - containerPort: 9153
+          name: metrics
+          protocol: TCP
+        livenessProbe:
+          httpGet:
+            path: /health
+            port: 8080
+            scheme: HTTP
+          initialDelaySeconds: 60
+          timeoutSeconds: 5
+          successThreshold: 1
+          failureThreshold: 5
+        volumeMounts:
+        - name: kubernetes-path
+          mountPath: "{{.kubelet_path}}"
+          readOnly: true
+        - name: config-volume
+          mountPath: /etc/coredns
+          readOnly: true
       volumes:
       - name: kubernetes-path
         hostPath:
-        path: "{{.kubelet_path}}"
+          path: "{{.kubelet_path}}"
+      - name: config-volume
+        configMap:
+          name: coredns-external-dns
+          items:
+          - key: Corefile
+            path: Corefile
+
+---
+kind: Service
+apiVersion: v1
+metadata:
+  name: external-dns-tcp
+  namespace: {{.namespace}}
+  annotations:
+    metallb.universe.tf/allow-shared-ip: external-dns
+spec:
+  type: LoadBalancer
+  loadBalancerIP: {{.internal_dns_vip}}
+  ports:
+  - name: default
+    port: 53
+    targetPort: 53
+  selector:
+    app: external-dns
+---
+kind: Service
+apiVersion: v1
+metadata:
+  name: external-dns-udp
+  namespace: {{.namespace}}
+  annotations:
+    metallb.universe.tf/allow-shared-ip: external-dns
+spec:
+  type: LoadBalancer
+  loadBalancerIP: {{.internal_dns_vip}}
+  ports:
+  - name: default
+    port: 53
+    targetPort: 53
+    protocol: UDP
+  selector:
+    app: external-dns

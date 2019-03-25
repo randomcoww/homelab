@@ -17,7 +17,7 @@ resource "matchbox_group" "addon_flannel" {
   metadata {
     flannel_image     = "${var.flannel_image}"
     cni_plugins_image = "${var.cni_plugins_image}"
-
-    cluster_cidr = "${var.cluster_cidr}"
+    cluster_cidr      = "${var.cluster_cidr}"
+    namespace         = "kube-system"
   }
 }

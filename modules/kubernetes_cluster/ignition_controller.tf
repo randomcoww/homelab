@@ -45,8 +45,6 @@ resource "matchbox_group" "ignition_controller" {
     kube_scheduler_image          = "${var.kube_scheduler_image}"
     etcd_wrapper_image            = "${var.etcd_wrapper_image}"
     etcd_image                    = "${var.etcd_image}"
-    coredns_image                 = "${var.coredns_image}"
-    external_dns_image            = "${var.external_dns_image}"
 
     etcd_initial_cluster  = "${join(",", formatlist("%s=https://%s:${var.etcd_peer_port}", "${var.controller_hosts}", "${var.controller_ips}"))}"
     etcd_cluster_token    = "${var.etcd_cluster_token}"
@@ -81,8 +79,6 @@ resource "matchbox_group" "ignition_controller" {
     tls_controller_manager_key = "${replace(tls_private_key.controller_manager.private_key_pem, "\n", "\\n")}"
     tls_scheduler              = "${replace(tls_locally_signed_cert.scheduler.cert_pem, "\n", "\\n")}"
     tls_scheduler_key          = "${replace(tls_private_key.scheduler.private_key_pem, "\n", "\\n")}"
-    tls_external_dns           = "${replace(tls_locally_signed_cert.external_dns.cert_pem, "\n", "\\n")}"
-    tls_external_dns_key       = "${replace(tls_private_key.external_dns.private_key_pem, "\n", "\\n")}"
     tls_service_account        = "${replace(tls_private_key.service_account.public_key_pem, "\n", "\\n")}"
     tls_service_account_key    = "${replace(tls_private_key.service_account.private_key_pem, "\n", "\\n")}"
   }

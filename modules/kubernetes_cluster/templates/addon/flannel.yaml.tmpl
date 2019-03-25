@@ -35,19 +35,19 @@ roleRef:
 subjects:
 - kind: ServiceAccount
   name: flannel
-  namespace: kube-system
+  namespace: {{.namespace}}
 ---
 apiVersion: v1
 kind: ServiceAccount
 metadata:
   name: flannel
-  namespace: kube-system
+  namespace: {{.namespace}}
 ---
 kind: ConfigMap
 apiVersion: v1
 metadata:
   name: kube-flannel-cfg
-  namespace: kube-system
+  namespace: {{.namespace}}
   labels:
     tier: node
     app: flannel
@@ -83,7 +83,7 @@ apiVersion: extensions/v1beta1
 kind: DaemonSet
 metadata:
   name: kube-flannel-ds-amd64
-  namespace: kube-system
+  namespace: {{.namespace}}
   labels:
     tier: node
     app: flannel
@@ -124,7 +124,7 @@ spec:
         - name: cni
           mountPath: /etc/cni/net.d
         - name: flannel-cfg
-          mountPath: /etc/kube-flannel/      
+          mountPath: /etc/kube-flannel/
       containers:
       - name: kube-flannel
         image: {{.flannel_image}}

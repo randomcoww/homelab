@@ -15,12 +15,11 @@ resource "matchbox_group" "addon_kube_proxy" {
   }
 
   metadata {
-    kube_proxy_image = "${var.kube_proxy_image}"
-
+    kube_proxy_image      = "${var.kube_proxy_image}"
     controller_vip        = "${var.controller_vip}"
     apiserver_secure_port = "${var.apiserver_secure_port}"
-
-    cluster_name = "${var.cluster_name}"
-    cluster_cidr = "${var.cluster_cidr}"
+    cluster_name          = "${var.cluster_name}"
+    cluster_cidr          = "${var.cluster_cidr}"
+    namespace             = "kube-system"
   }
 }
