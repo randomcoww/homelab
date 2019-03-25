@@ -43,6 +43,8 @@ module "kubernetes_cluster" {
   default_user      = "core"
   ssh_ca_public_key = "${tls_private_key.ssh_ca.public_key_openssh}"
 
+  internal_domain = "${local.internal_domain}"
+
   ## hosts
   controller_hosts   = ["controller-0", "controller-1", "controller-2"]
   controller_ips     = ["192.168.126.219", "192.168.126.220", "192.168.126.221"]
@@ -80,9 +82,10 @@ module "kubernetes_cluster" {
   matchbox_http_port    = "${local.matchbox_http_port}"
 
   ## vip
-  controller_vip   = "${local.kubernetes_apiserver_vip}"
-  matchbox_vip     = "${local.matchbox_vip}"
-  internal_dns_vip = "${local.internal_dns_vip}"
+  controller_vip    = "${local.kubernetes_apiserver_vip}"
+  matchbox_vip      = "${local.matchbox_vip}"
+  internal_dns_vip  = "${local.internal_dns_vip}"
+  recursive_dns_vip = "${local.recursive_dns_vip}"
 
   ## link local mount
   worker_ll_nfs_server = "169.254.169.254:/data/worker"

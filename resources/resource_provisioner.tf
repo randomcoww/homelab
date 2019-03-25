@@ -49,7 +49,7 @@ module "provisioner" {
 
   ## vip
   store_gateway_vip = "192.168.126.240"
-  recursive_dns_vip = "192.168.126.241"
+  recursive_dns_vip = "${local.recursive_dns_vip}"
   internal_dns_vip  = "${local.internal_dns_vip}"
   matchbox_vip      = "${local.matchbox_vip}"
   lan_gateway_vip   = "192.168.62.240"

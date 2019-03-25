@@ -140,6 +140,10 @@ variable "cluster_name" {
   type = "string"
 }
 
+variable "internal_domain" {
+  type = "string"
+}
+
 variable "cluster_domain" {
   type    = "string"
   default = "cluster.local"
@@ -184,6 +188,10 @@ variable "controller_vip" {
 }
 
 variable "matchbox_vip" {
+  type = "string"
+}
+
+variable "recursive_dns_vip" {
   type = "string"
 }
 
