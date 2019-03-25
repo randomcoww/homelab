@@ -179,6 +179,10 @@ variable "store_dhcp_ip_range" {
   type = "string"
 }
 
+variable "metallb_ip_range" {
+  type = "string"
+}
+
 ## service paths
 variable "kubelet_path" {
   type    = "string"

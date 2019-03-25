@@ -79,6 +79,7 @@ resource "matchbox_group" "ignition_provisioner" {
     lan_dhcp_ip_range   = "${var.lan_dhcp_ip_range}"
     store_ip_range      = "${var.store_ip_range}"
     store_dhcp_ip_range = "${var.store_dhcp_ip_range}"
+    metallb_ip_range    = "${var.metallb_ip_range}"
 
     kubelet_path  = "${var.kubelet_path}"
     certs_path    = "${var.certs_path}"

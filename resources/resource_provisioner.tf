@@ -64,6 +64,7 @@ module "provisioner" {
   sync_ip_range       = "192.168.190.0/${local.subnet_sync_netmask}"
   store_dhcp_ip_range = "192.168.126.64/26"
   lan_dhcp_ip_range   = "192.168.62.64/26"
+  metallb_ip_range    = "192.168.127.128/25"
 
   ## renderer provisioning access
   renderer_endpoint        = "${local.local_renderer_endpoint}"

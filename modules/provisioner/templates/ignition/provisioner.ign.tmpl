@@ -238,7 +238,6 @@ storage:
                       iifname $if_internal udp dport domain accept;
                       iifname $if_internal udp sport bootps udp dport bootpc accept;
                       iifname $if_internal pkttype multicast accept;
-                      iifname $if_internal tcp dport ssh accept;
                     }
 
                     chain forward {
@@ -250,6 +249,8 @@ storage:
 
                       iifname $if_trusted accept;
                       iifname $if_internal oifname $if_external accept;
+
+                      iifname $if_internal ip daddr {{.metallb_ip_range}} accept;
                     }
 
                     chain output {
@@ -540,8 +541,10 @@ storage:
                       {{.lan_gateway_vip}} dev {{.lan_if}}
                     }
                     virtual_rules {
-                      from all iif {{.store_if}} lookup 250 priority 32760
-                      from all iif {{.lan_if}} lookup 250 priority 32760
+                      to {{.store_ip_range}} lookup main priority 32758
+                      to {{.lan_ip_range}} lookup main priority 32758
+                      iif {{.store_if}} lookup 250 priority 32760
+                      iif {{.lan_if}} lookup 250 priority 32760
                     }
                   }
 
