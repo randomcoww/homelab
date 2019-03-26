@@ -1,4 +1,3 @@
-# coredns
 ---
 apiVersion: v1
 kind: ServiceAccount
@@ -8,6 +7,8 @@ metadata:
   labels:
     kubernetes.io/cluster-service: "true"
     addonmanager.kubernetes.io/mode: Reconcile
+
+# combine rules for coredns and external-dns
 ---
 apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRole
@@ -17,22 +18,18 @@ metadata:
     addonmanager.kubernetes.io/mode: Reconcile
   name: system:coredns
 rules:
-- apiGroups:
-  - ""
-  resources:
-  - endpoints
-  - services
-  - pods
-  - namespaces
-  verbs:
-  - list
-  - watch
-- apiGroups:
-  - ""
-  resources:
-  - nodes
-  verbs:
-  - get
+- apiGroups: [""]
+  resources: ["endpoints", "namespaces"]
+  verbs: ["list", "watch"]
+- apiGroups: [""]
+  resources: ["services", "pods"]
+  verbs: ["get", "list", "watch"]
+- apiGroups: [""]
+  resources: ["nodes"]
+  verbs: ["get", "list"]
+- apiGroups: ["extensions"]
+  resources: ["ingresses"]
+  verbs: ["get","watch","list"]
 ---
 apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRoleBinding
@@ -70,8 +67,6 @@ data:
         fallthrough in-addr.arpa ip6.arpa
       }
       etcd {{.internal_domain}} in-addr.arpa ip6.arp {
-        endpoint {{.corefile_etcd_endpoints}}
-        tls {{.kubelet_path}}/bootstrap.pem {{.kubelet_path}}/bootstrap-key.pem {{.kubelet_path}}/ca.pem
         fallthrough in-addr.arpa ip6.arpa
       }
       proxy . {{.recursive_dns_vip}}
@@ -80,6 +75,9 @@ data:
       reload
       loadbalance
     }
+
+
+# deploy coredns, etcd, external-dns
 ---
 apiVersion: apps/v1
 kind: Deployment
@@ -126,9 +124,6 @@ spec:
         - name: config-volume
           mountPath: /etc/coredns
           readOnly: true
-        - name: kubernetes-path
-          mountPath: {{.kubelet_path}}
-          readOnly: true
         ports:
         - containerPort: 53
           name: dns
@@ -161,6 +156,16 @@ spec:
             drop:
             - all
           readOnlyRootFilesystem: true
+      - name: etcd
+        image: {{.etcd_image}}
+        command: [ "/usr/local/bin/etcd" ]
+      - name: external-dns
+        image: {{.external_dns_image}}
+        args:
+        - --source=service
+        - --source=ingress
+        - --provider=coredns
+        - --log-level=debug
       dnsPolicy: Default
       volumes:
       - name: config-volume
@@ -169,9 +174,9 @@ spec:
           items:
           - key: Corefile
             path: Corefile
-      - name: kubernetes-path
-        hostPath:
-          path: "{{.kubelet_path}}"
+
+
+# services
 ---
 kind: Service
 apiVersion: v1
@@ -231,86 +236,3 @@ spec:
   - name: dns-tcp
     port: 53
     protocol: TCP
-
-
-# external-dns
----
-apiVersion: rbac.authorization.k8s.io/v1beta1
-kind: ClusterRole
-metadata:
-  name: external-dns
-rules:
-- apiGroups: [""]
-  resources: ["services"]
-  verbs: ["get","watch","list"]
-- apiGroups: [""]
-  resources: ["pods"]
-  verbs: ["get","watch","list"]
-- apiGroups: ["extensions"]
-  resources: ["ingresses"]
-  verbs: ["get","watch","list"]
-- apiGroups: [""]
-  resources: ["nodes"]
-  verbs: ["list"]
----
-apiVersion: rbac.authorization.k8s.io/v1beta1
-kind: ClusterRoleBinding
-metadata:
-  name: external-dns-viewer
-roleRef:
-  apiGroup: rbac.authorization.k8s.io
-  kind: ClusterRole
-  name: external-dns
-subjects:
-- kind: ServiceAccount
-  name: external-dns
-  namespace: {{.namespace}}
----
-apiVersion: v1
-kind: ServiceAccount
-metadata:
-  name: external-dns
-  namespace: {{.namespace}}
----
-apiVersion: apps/v1
-kind: Deployment
-metadata:
-  name: external-dns
-  namespace: {{.namespace}}
-spec:
-  strategy:
-    type: Recreate
-  selector:
-    matchLabels:
-      app: external-dns
-  template:
-    metadata:
-      labels:
-        app: external-dns
-    spec:
-      serviceAccountName: external-dns
-      containers:
-      - name: external-dns
-        image: {{.external_dns_image}}
-        args:
-        - --source=service
-        - --source=ingress
-        - --provider=coredns
-        - --log-level=debug
-        env:
-        - name: ETCD_URLS
-          value: "{{.etcd_endpoints}}"
-        - name: ETCD_CA_FILE
-          value: "{{.kubelet_path}}/ca.pem"
-        - name: ETCD_CERT_FILE
-          value: "{{.kubelet_path}}/bootstrap.pem"
-        - name: ETCD_KEY_FILE
-          value: "{{.kubelet_path}}/bootstrap-key.pem"
-        volumeMounts:
-        - name: kubernetes-path
-          mountPath: {{.kubelet_path}}
-          readOnly: false
-      volumes:
-      - name: kubernetes-path
-        hostPath:
-          path: "{{.kubelet_path}}"
