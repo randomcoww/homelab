@@ -21,8 +21,8 @@ module "provisioner" {
 
   ## host configs
   provisioner_hosts     = ["provisioner-0", "provisioner-1"]
-  provisioner_lan_ips   = ["192.168.62.217", "192.168.62.218"]
-  provisioner_store_ips = ["192.168.126.217", "192.168.126.218"]
+  provisioner_lan_ips   = ["192.168.63.217", "192.168.63.218"]
+  provisioner_store_ips = ["192.168.127.217", "192.168.127.218"]
   provisioner_sync_ips  = ["192.168.190.1", "192.168.190.2"]
   kea_ha_roles          = ["primary", "standby"]
   provisioner_store_if  = "eth0"
@@ -62,9 +62,9 @@ module "provisioner" {
   store_ip_range      = "192.168.126.0/${local.subnet_store_netmask}"
   lan_ip_range        = "192.168.62.0/${local.subnet_lan_netmask}"
   sync_ip_range       = "192.168.190.0/${local.subnet_sync_netmask}"
-  store_dhcp_ip_range = "192.168.126.64/26"
-  lan_dhcp_ip_range   = "192.168.62.64/26"
-  metallb_ip_range    = "192.168.127.128/25"
+  store_dhcp_ip_range = "192.168.127.64/26"
+  lan_dhcp_ip_range   = "192.168.63.64/26"
+  metallb_ip_range    = "192.168.126.64/26"
 
   ## renderer provisioning access
   renderer_endpoint        = "${local.local_renderer_endpoint}"

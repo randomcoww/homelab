@@ -14,6 +14,6 @@ locals {
   renderer_ca_pem          = "${module.provisioner.matchbox_ca_pem}"
 
   recursive_dns_vip = "192.168.126.241"
-  internal_dns_vip  = "192.168.127.254"
+  internal_dns_vip  = "192.168.126.127"
   internal_domain   = "internal"
 }

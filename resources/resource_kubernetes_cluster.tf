@@ -47,7 +47,7 @@ module "kubernetes_cluster" {
 
   ## hosts
   controller_hosts   = ["controller-0", "controller-1", "controller-2"]
-  controller_ips     = ["192.168.126.219", "192.168.126.220", "192.168.126.221"]
+  controller_ips     = ["192.168.127.219", "192.168.127.220", "192.168.127.221"]
   controller_macs    = ["52-54-00-1a-61-0a", "52-54-00-1a-61-0b", "52-54-00-1a-61-0c"]
   controller_if      = "eth0"
   controller_netmask = "23"
