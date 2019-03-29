@@ -73,7 +73,6 @@ resource "matchbox_group" "ignition_provisioner" {
     mtu           = "${var.mtu}"
 
     internal_domain = "${var.internal_domain}"
-    dhcp_domain     = "${var.dhcp_domain}"
 
     lan_ip_range        = "${var.lan_ip_range}"
     lan_dhcp_ip_range   = "${var.lan_dhcp_ip_range}"

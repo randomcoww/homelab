@@ -17,7 +17,6 @@ module "provisioner" {
 
   ## domain
   internal_domain = "${local.internal_domain}"
-  dhcp_domain     = "host.${local.internal_domain}"
 
   ## host configs
   provisioner_hosts     = ["provisioner-0", "provisioner-1"]

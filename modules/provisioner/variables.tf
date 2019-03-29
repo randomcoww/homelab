@@ -10,10 +10,6 @@ variable "internal_domain" {
   type = "string"
 }
 
-variable "dhcp_domain" {
-  type = "string"
-}
-
 ## instance
 variable "output_path" {
   type = "string"

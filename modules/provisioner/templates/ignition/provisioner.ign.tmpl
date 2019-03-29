@@ -348,7 +348,7 @@ storage:
                       "option-data": [
                         {
                           "name": "domain-name",
-                          "data": "{{.dhcp_domain}}"
+                          "data": "{{.internal_domain}}"
                         }
                       ],
                       "client-classes": [
@@ -437,7 +437,7 @@ storage:
                       ],
                       "dhcp-ddns": {
                         "enable-updates": true,
-                        "qualifying-suffix": "{{.dhcp_domain}}.",
+                        "qualifying-suffix": "{{.internal_domain}}.",
                         "override-client-update": true,
                         "override-no-update": true,
                         "replace-client-name": "when-not-present"
