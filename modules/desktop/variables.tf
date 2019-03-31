@@ -2,6 +2,15 @@ variable "default_user" {
   type = "string"
 }
 
+variable "desktop_user" {
+  type = "string"
+}
+
+variable "localhome_path" {
+  type    = "string"
+  default = "/localhome"
+}
+
 variable "password" {
   type = "string"
 }

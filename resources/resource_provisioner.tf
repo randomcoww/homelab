@@ -12,7 +12,7 @@ module "provisioner" {
   output_path = "matchbox"
 
   ## user (default container linux)
-  default_user      = "core"
+  default_user      = "${local.default_user}"
   ssh_ca_public_key = "${tls_private_key.ssh_ca.public_key_openssh}"
 
   ## domain

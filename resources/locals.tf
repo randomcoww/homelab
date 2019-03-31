@@ -16,4 +16,6 @@ locals {
   recursive_dns_vip = "192.168.126.241"
   internal_dns_vip  = "192.168.126.127"
   internal_domain   = "fuzzybunny.internal"
+
+  default_user = "core"
 }

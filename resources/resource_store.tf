@@ -3,7 +3,7 @@ module "store" {
   source = "../modules/store"
 
   ## user (default container linux)
-  default_user      = "core"
+  default_user      = "${local.default_user}"
   password          = "password"
   ssh_ca_public_key = "${tls_private_key.ssh_ca.public_key_openssh}"
 

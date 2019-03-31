@@ -18,9 +18,12 @@ resource "matchbox_group" "generic_desktop" {
   }
 
   metadata {
-    hostname     = "${var.desktop_hosts[count.index]}"
-    default_user = "${var.default_user}"
-    password     = "${var.password}"
+    hostname           = "${var.desktop_hosts[count.index]}"
+    ssh_authorized_key = "cert-authority ${chomp(var.ssh_ca_public_key)}"
+    default_user       = "${var.default_user}"
+    desktop_user       = "${var.desktop_user}"
+    localhome_path     = "${var.localhome_path}"
+    password           = "${var.password}"
 
     host_ip      = "${var.desktop_ips[count.index]}"
     host_if      = "${var.desktop_if}"
