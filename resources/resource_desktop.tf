@@ -11,7 +11,7 @@ module "desktop" {
   ## host configs
   desktop_hosts   = ["desktop-0"]
   desktop_ips     = ["192.168.127.253"]
-  desktop_if      = "eno1"
+  desktop_if      = "eno2"
   desktop_netmask = "23"
   mtu             = "9000"
 
