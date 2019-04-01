@@ -108,7 +108,7 @@ dnf config-manager \
 dnf install -y \
   docker-ce \
   docker-compose
-gpasswd -a {{.default_user}} docker
+gpasswd -a {{.desktop_user}} docker
 
 ##
 ## networkd
@@ -286,6 +286,7 @@ EOF
 
 cat <<EOF > /etc/modprobe.d/local.conf
 options vfio-pci ids=1002:ffffffff:ffffffff:ffffffff:00030000:ffff00ff,1002:ffffffff:ffffffff:ffffffff:00040300:ffffffff,10de:ffffffff:ffffffff:ffffffff:00030000:ffff00ff,10de:ffffffff:ffffffff:ffffffff:00040300:ffffffff
+options kvm ignore_msrs=1
 EOF
 
 cat <<EOF > /etc/ssh/sshd_config
@@ -330,7 +331,7 @@ systemctl set-default graphical.target
 ##
 
 cat <<EOF >> /etc/libvirt/qemu.conf
-user = "{{.default_user}}"
+user = "{{.desktop_user}}"
 cgroup_device_acl = [
     "/dev/null", "/dev/full", "/dev/zero",
     "/dev/random", "/dev/urandom",
