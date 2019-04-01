@@ -36,6 +36,8 @@ systemd:
         - name: containerd.conf
           contents: |
             [Service]
+            LimitNOFILE=infinity
+            LimitNPROC=infinity
             ExecStart=
             ExecStart=/usr/bin/env PATH=${TORCX_BINDIR}:${PATH} ${TORCX_BINDIR}/containerd
             OOMScoreAdjust=-999
