@@ -87,10 +87,6 @@ module "kubernetes_cluster" {
   internal_dns_vip  = "${local.internal_dns_vip}"
   recursive_dns_vip = "${local.recursive_dns_vip}"
 
-  ## link local mount
-  worker_ll_nfs_server = "169.254.169.254:/data/worker"
-  worker_ll_nfs_mount  = "/data"
-
   ## etcd backup access
   aws_region            = "us-west-2"
   aws_access_key_id     = "${aws_iam_access_key.etcd_backup.id}"

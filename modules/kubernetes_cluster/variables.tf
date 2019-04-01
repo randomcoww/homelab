@@ -36,15 +36,6 @@ variable "worker_ll_if" {
   type = "string"
 }
 
-## storage
-variable "worker_ll_nfs_server" {
-  type = "string"
-}
-
-variable "worker_ll_nfs_mount" {
-  type = "string"
-}
-
 ## worker host
 variable "worker_hosts" {
   type = "list"

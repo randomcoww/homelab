@@ -44,11 +44,6 @@ resource "matchbox_group" "ignition_worker" {
     ll_if   = "${var.worker_ll_if}"
     mtu     = "${var.mtu}"
 
-    # NFS mount for systemd
-    ll_nfs_server        = "${var.worker_ll_nfs_server}"
-    ll_nfs_mount         = "${var.worker_ll_nfs_mount}"
-    ll_nfs_mount_service = "${join("-", slice(split("/", var.worker_ll_nfs_mount), 1, length(split("/", var.worker_ll_nfs_mount))))}"
-
     kubelet_path = "${var.kubelet_path}"
 
     tls_ca            = "${replace(tls_self_signed_cert.root.cert_pem, "\n", "\\n")}"
