@@ -93,7 +93,7 @@ ncmpcpp
 
 user --name={{.desktop_user}} --password={{.password}} --plaintext --uid=1000 --gid=1000 --groups=wheel,libvirt,docker,qemu,input --homedir={{.localhome_path}}/{{.desktop_user}}
 
-user --name={{.default_user}} --lock --plaintext --groups=wheel,libvirt
+user --name={{.default_user}} --lock --iscrypted --groups=wheel,libvirt
 sshkey --username={{.default_user}} "{{.ssh_authorized_key}}"
 
 %post --erroronfail
