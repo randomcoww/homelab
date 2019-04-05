@@ -271,6 +271,14 @@ storage:
                       {{.controller_vip}}
                     }
                   }
+              livenessProbe:
+                httpGet:
+                  scheme: HTTP
+                  host: 127.0.0.1
+                  port: 8080
+                  path: "/healthz"
+                initialDelaySeconds: 15
+                timeoutSeconds: 15
 
     - path: {{.kubelet_path}}/manifests/etcd-wrapper.yaml
       filesystem: root
