@@ -15,6 +15,7 @@ resource "matchbox_profile" "ignition_worker" {
     "coreos.first_boot=yes",
     "console=hvc0",
     "coreos.autologin",
+    "elevator=noop",
   ]
 }
 
