@@ -10,20 +10,20 @@ variable "ssh_ca_public_key" {
   type = "string"
 }
 
-## store
-variable "store_hosts" {
+## vm
+variable "vm_hosts" {
   type = "list"
 }
 
-variable "store_ips" {
+variable "vm_ips" {
   type = "list"
 }
 
-variable "store_if" {
+variable "vm_if" {
   type = "string"
 }
 
-variable "store_netmask" {
+variable "vm_netmask" {
   type = "string"
 }
 

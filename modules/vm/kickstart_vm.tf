@@ -1,30 +1,30 @@
 ##
 ## vmhost kickstart renderer
 ##
-resource "matchbox_profile" "generic_store" {
-  name           = "host_store"
-  generic_config = "${file("${path.module}/templates/kickstart/store.ks.tmpl")}"
+resource "matchbox_profile" "generic_vm" {
+  name           = "host_vm"
+  generic_config = "${file("${path.module}/templates/kickstart/vm.ks.tmpl")}"
 }
 
-resource "matchbox_group" "generic_store" {
-  count = "${length(var.store_hosts)}"
+resource "matchbox_group" "generic_vm" {
+  count = "${length(var.vm_hosts)}"
 
-  name    = "host_${var.store_hosts[count.index]}"
-  profile = "${matchbox_profile.generic_store.name}"
+  name    = "host_${var.vm_hosts[count.index]}"
+  profile = "${matchbox_profile.generic_vm.name}"
 
   selector {
-    ks = "${var.store_hosts[count.index]}"
+    ks = "${var.vm_hosts[count.index]}"
   }
 
   metadata {
-    hostname           = "${var.store_hosts[count.index]}"
+    hostname           = "${var.vm_hosts[count.index]}"
     ssh_authorized_key = "cert-authority ${chomp(var.ssh_ca_public_key)}"
     default_user       = "${var.default_user}"
     password           = "${var.password}"
 
-    host_ip      = "${var.store_ips[count.index]}"
-    host_if      = "${var.store_if}"
-    host_netmask = "${var.store_netmask}"
+    host_ip      = "${var.vm_ips[count.index]}"
+    host_if      = "${var.vm_if}"
+    host_netmask = "${var.vm_netmask}"
     ll_if        = "${var.ll_if}"
     ll_ip        = "${var.ll_ip}"
     ll_netmask   = "${var.ll_netmask}"
