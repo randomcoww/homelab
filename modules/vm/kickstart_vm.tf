@@ -28,6 +28,9 @@ resource "matchbox_group" "generic_vm" {
     ll_ip         = "${var.vm_ll_ip}"
     ll_if         = "${var.vm_ll_if}"
     ll_netmask    = "${var.ll_netmask}"
+    lan_if        = "en${var.vm_lan_if}"
+    sync_if       = "en${var.vm_sync_if}"
+    wan_if        = "en${var.vm_wan_if}"
     mtu           = "${var.mtu}"
 
     container_linux_image_path = "${var.container_linux_image_path}"

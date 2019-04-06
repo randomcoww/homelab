@@ -49,6 +49,21 @@ variable "ll_netmask" {
   type = "string"
 }
 
+variable "desktop_lan_if" {
+  type    = "string"
+  default = "v90"
+}
+
+variable "desktop_sync_if" {
+  type    = "string"
+  default = "v60"
+}
+
+variable "desktop_wan_if" {
+  type    = "string"
+  default = "v30"
+}
+
 variable "mtu" {
   type = "string"
 }

@@ -31,6 +31,9 @@ resource "matchbox_group" "generic_desktop" {
     ll_ip         = "${var.desktop_ll_ip}"
     ll_if         = "${var.desktop_ll_if}"
     ll_netmask    = "${var.ll_netmask}"
+    lan_if        = "en${var.desktop_lan_if}"
+    sync_if       = "en${var.desktop_sync_if}"
+    wan_if        = "en${var.desktop_wan_if}"
     mtu           = "${var.mtu}"
   }
 }
