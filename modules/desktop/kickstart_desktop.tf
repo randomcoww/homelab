@@ -25,12 +25,12 @@ resource "matchbox_group" "generic_desktop" {
     localhome_path     = "${var.localhome_path}"
     password           = "${var.password}"
 
-    host_ip      = "${var.desktop_ips[count.index]}"
-    host_if      = "${var.desktop_if}"
-    host_netmask = "${var.desktop_netmask}"
-    ll_ip        = "${var.ll_ip}"
-    ll_if        = "${var.ll_if}"
-    ll_netmask   = "${var.ll_netmask}"
-    mtu          = "${var.mtu}"
+    store_ip      = "${var.desktop_store_ips[count.index]}"
+    store_if      = "${var.desktop_store_if}"
+    store_netmask = "${var.store_netmask}"
+    ll_ip         = "${var.desktop_ll_ip}"
+    ll_if         = "${var.desktop_ll_if}"
+    ll_netmask    = "${var.ll_netmask}"
+    mtu           = "${var.mtu}"
   }
 }

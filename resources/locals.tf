@@ -18,4 +18,14 @@ locals {
   internal_domain   = "fuzzybunny.internal"
 
   default_user = "core"
+
+  subnet_store_netmask = "23"
+  subnet_lan_netmask   = "23"
+  subnet_sync_netmask  = "29"
+  subnet_ll_netmask    = "16"
+
+  ## VM access to host
+  host_ll_ip = "169.254.169.254"
+
+  default_mtu = "9000"
 }

@@ -1,11 +1,5 @@
 # Matchbox configs for PXE environment with matchbox renderer
 
-locals {
-  subnet_store_netmask = "23"
-  subnet_lan_netmask   = "23"
-  subnet_sync_netmask  = "29"
-}
-
 module "provisioner" {
   source = "../modules/provisioner"
 
@@ -29,7 +23,7 @@ module "provisioner" {
   provisioner_sync_if   = "eth2"
   provisioner_wan_if    = "eth3"
   provisioner_vwan_if   = "eth4"
-  mtu                   = "9000"
+  mtu                   = "${local.default_mtu}"
 
   ## images
   hyperkube_image  = "gcr.io/google_containers/hyperkube:v1.13.2"

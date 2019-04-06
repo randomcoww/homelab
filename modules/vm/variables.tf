@@ -15,31 +15,29 @@ variable "vm_hosts" {
   type = "list"
 }
 
-variable "vm_ips" {
+variable "vm_store_ips" {
   type = "list"
 }
 
-variable "vm_if" {
+variable "vm_store_if" {
   type = "string"
 }
 
-variable "vm_netmask" {
+variable "store_netmask" {
   type = "string"
 }
 
-variable "ll_if" {
+variable "vm_ll_if" {
   type    = "string"
   default = "br0"
 }
 
-variable "ll_ip" {
-  type    = "string"
-  default = "169.254.169.254"
+variable "vm_ll_ip" {
+  type = "string"
 }
 
 variable "ll_netmask" {
-  type    = "string"
-  default = "16"
+  type = "string"
 }
 
 variable "mtu" {

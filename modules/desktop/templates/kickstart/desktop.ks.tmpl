@@ -139,9 +139,9 @@ LinkLocalAddressing=no
 DHCP=no
 EOF
 
-cat <<EOF > /etc/systemd/network/00_{{.host_if}}.network
+cat <<EOF > /etc/systemd/network/00_{{.store_if}}.network
 [Match]
-Name={{.host_if}}
+Name={{.store_if}}
 
 [Link]
 ARP=no
@@ -251,7 +251,7 @@ LinkLocalAddressing=no
 DHCP=yes
 
 [Address]
-Address={{.host_ip}}/{{.host_netmask}}
+Address={{.store_ip}}/{{.store_netmask}}
 EOF
 
 ## host macvtap to vswitch

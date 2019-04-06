@@ -8,11 +8,14 @@ module "vm" {
   ssh_ca_public_key = "${tls_private_key.ssh_ca.public_key_openssh}"
 
   ## host configs
-  vm_hosts   = ["vm-0", "vm-1"]
-  vm_ips     = ["192.168.127.251", "192.168.127.252"]
-  vm_if      = "enp1s0f0"
-  vm_netmask = "23"
-  mtu           = "9000"
+  vm_hosts     = ["vm-0", "vm-1"]
+  vm_store_ips = ["192.168.127.251", "192.168.127.252"]
+  vm_store_if  = "enp1s0f0"
+  vm_ll_ip     = "${local.host_ll_ip}"
+  mtu          = "${local.default_mtu}"
+
+  store_netmask = "${local.subnet_store_netmask}"
+  ll_netmask    = "${local.subnet_ll_netmask}"
 
   ## image
   container_linux_image_path = "/var/lib/tftpboot"

@@ -55,7 +55,7 @@ module "kubernetes_cluster" {
   worker_macs        = ["52-54-00-1a-61-1a", "52-54-00-1a-61-1b", "52-54-00-1a-61-1c"]
   worker_if          = "eth0"
   worker_ll_if       = "eth1"
-  mtu                = "9000"
+  mtu                = "${local.default_mtu}"
 
   ## images
   container_linux_base_url      = "http://beta.release.core-os.net/amd64-usr"

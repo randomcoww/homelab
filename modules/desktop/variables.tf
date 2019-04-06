@@ -24,31 +24,29 @@ variable "desktop_hosts" {
   type = "list"
 }
 
-variable "desktop_ips" {
+variable "desktop_store_ips" {
   type = "list"
 }
 
-variable "desktop_if" {
+variable "desktop_store_if" {
   type = "string"
 }
 
-variable "desktop_netmask" {
+variable "store_netmask" {
   type = "string"
 }
 
-variable "ll_if" {
+variable "desktop_ll_if" {
   type    = "string"
   default = "br0"
 }
 
-variable "ll_ip" {
-  type    = "string"
-  default = "169.254.169.254"
+variable "desktop_ll_ip" {
+  type = "string"
 }
 
 variable "ll_netmask" {
-  type    = "string"
-  default = "16"
+  type = "string"
 }
 
 variable "mtu" {

@@ -9,11 +9,14 @@ module "desktop" {
   ssh_ca_public_key = "${tls_private_key.ssh_ca.public_key_openssh}"
 
   ## host configs
-  desktop_hosts   = ["desktop-0"]
-  desktop_ips     = ["192.168.127.253"]
-  desktop_if      = "eno2"
-  desktop_netmask = "23"
-  mtu             = "9000"
+  desktop_hosts     = ["desktop-0"]
+  desktop_store_ips = ["192.168.127.253"]
+  desktop_store_if  = "eno2"
+  desktop_ll_ip     = "${local.host_ll_ip}"
+  mtu               = "${local.default_mtu}"
+
+  store_netmask = "${local.subnet_store_netmask}"
+  ll_netmask    = "${local.subnet_ll_netmask}"
 
   ## renderer provisioning access
   renderer_endpoint        = "${local.renderer_endpoint}"
