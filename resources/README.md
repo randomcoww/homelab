@@ -24,7 +24,7 @@ docker run -it --rm \
 
 ```
 terraform apply \
-    -target=module.store
+    -target=module.vm
 ```
 
 ### Generate provisioner ignition (requires renderer)

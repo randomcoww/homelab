@@ -53,7 +53,7 @@ systemd:
           --register-node=false \
           --pod-manifest-path={{.kubelet_path}}/manifests \
           --container-runtime=remote \
-          --container-runtime-endpoint=unix:///var/run/containerd/containerd.sock
+          --container-runtime-endpoint=unix:///run/containerd/containerd.sock
         ExecStop=-/usr/bin/rkt stop --uuid-file=/var/cache/kubelet-pod.uuid
         Restart=always
         RestartSec=5

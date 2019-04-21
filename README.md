@@ -36,7 +36,7 @@ Generates configuration for the PXE boot environment on the local Matchbox insta
 cd resources
 terraform apply \
     -target=module.provisioner \
-    -target=module.store
+    -target=module.vm
 ```
 
 #### Hypervisor image

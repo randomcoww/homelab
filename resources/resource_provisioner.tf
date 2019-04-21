@@ -26,7 +26,7 @@ module "provisioner" {
   mtu                   = "${local.default_mtu}"
 
   ## images
-  hyperkube_image  = "gcr.io/google_containers/hyperkube:v1.13.2"
+  hyperkube_image  = "randomcoww/hyperkube-slim:v1.13.5"
   keepalived_image = "randomcoww/keepalived:20190319.03"
   unbound_image    = "randomcoww/unbound:20190119.01"
   nftables_image   = "randomcoww/nftables:20190119.01"

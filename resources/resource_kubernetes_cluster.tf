@@ -1,7 +1,7 @@
 # Matchbox configs for Kubernetes cluster
 
 locals {
-  kubernetes_version        = "v1.13.2"
+  kubernetes_version        = "v1.13.5"
   kubernetes_cluster_name   = "kube-cluster"
   kubernetes_apiserver_vip  = "192.168.126.245"
   kubernetes_apiserver_port = "56443"
@@ -60,10 +60,10 @@ module "kubernetes_cluster" {
   ## images
   container_linux_base_url      = "http://beta.release.core-os.net/amd64-usr"
   container_linux_version       = "current"
-  hyperkube_image               = "gcr.io/google_containers/hyperkube:${local.kubernetes_version}"
-  kube_apiserver_image          = "gcr.io/google_containers/kube-apiserver:${local.kubernetes_version}"
-  kube_controller_manager_image = "gcr.io/google_containers/kube-controller-manager:${local.kubernetes_version}"
-  kube_scheduler_image          = "gcr.io/google_containers/kube-scheduler:${local.kubernetes_version}"
+  hyperkube_image               = "randomcoww/hyperkube-slim:${local.kubernetes_version}"
+  kube_apiserver_image          = "randomcoww/hyperkube-slim:${local.kubernetes_version}"
+  kube_controller_manager_image = "randomcoww/hyperkube-slim:${local.kubernetes_version}"
+  kube_scheduler_image          = "randomcoww/hyperkube-slim:${local.kubernetes_version}"
   kube_proxy_image              = "gcr.io/google_containers/kube-proxy:${local.kubernetes_version}"
   etcd_wrapper_image            = "randomcoww/etcd-wrapper:20181227.02"
   etcd_image                    = "gcr.io/etcd-development/etcd:v3.3"
