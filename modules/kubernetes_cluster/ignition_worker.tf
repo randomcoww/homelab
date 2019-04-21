@@ -31,7 +31,7 @@ resource "matchbox_group" "ignition_worker" {
 
   metadata {
     hostname           = "${var.worker_hosts[count.index]}"
-    hyperkube_image    = "${var.hyperkube_image}"
+    kubelet_image      = "${var.kubelet_image}"
     ssh_authorized_key = "cert-authority ${chomp(var.ssh_ca_public_key)}"
     default_user       = "${var.default_user}"
     apiserver_url      = "https://${var.controller_vip}:${var.apiserver_secure_port}"

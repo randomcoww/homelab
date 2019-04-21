@@ -26,15 +26,15 @@ module "provisioner" {
   mtu                   = "${local.default_mtu}"
 
   ## images
-  hyperkube_image  = "randomcoww/hyperkube-slim:v1.13.5"
-  keepalived_image = "randomcoww/keepalived:20190319.03"
-  unbound_image    = "randomcoww/unbound:20190119.01"
-  nftables_image   = "randomcoww/nftables:20190119.01"
-  kea_image        = "randomcoww/kea:20190119.01"
-  tftpd_image      = "randomcoww/tftpd_ipxe:20190119.01"
-  matchbox_image   = "quay.io/coreos/matchbox:latest"
-  syncthing_image  = "randomcoww/syncthing:20190119.01"
-  conntrack_image  = "randomcoww/conntrack:20190316.02"
+  kubelet_masterless_image = "randomcoww/hyperkube-slim:v1.13.5"
+  keepalived_image         = "randomcoww/keepalived:20190319.03"
+  unbound_image            = "randomcoww/unbound:20190119.01"
+  nftables_image           = "randomcoww/nftables:20190119.01"
+  kea_image                = "randomcoww/kea:20190119.01"
+  tftpd_image              = "randomcoww/tftpd_ipxe:20190119.01"
+  matchbox_image           = "quay.io/coreos/matchbox:latest"
+  syncthing_image          = "randomcoww/syncthing:20190119.01"
+  conntrack_image          = "randomcoww/conntrack:20190316.02"
 
   ## ports
   matchbox_http_port = "${local.matchbox_http_port}"

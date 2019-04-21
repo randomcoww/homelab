@@ -33,10 +33,10 @@ resource "matchbox_group" "ignition_provisioner" {
   }
 
   metadata {
-    hostname           = "${var.provisioner_hosts[count.index]}"
-    hyperkube_image    = "${var.hyperkube_image}"
-    ssh_authorized_key = "cert-authority ${chomp(var.ssh_ca_public_key)}"
-    default_user       = "${var.default_user}"
+    hostname                 = "${var.provisioner_hosts[count.index]}"
+    kubelet_masterless_image = "${var.kubelet_masterless_image}"
+    ssh_authorized_key       = "cert-authority ${chomp(var.ssh_ca_public_key)}"
+    default_user             = "${var.default_user}"
 
     keepalived_image = "${var.keepalived_image}"
     unbound_image    = "${var.unbound_image}"

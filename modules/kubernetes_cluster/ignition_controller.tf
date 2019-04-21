@@ -30,11 +30,11 @@ resource "matchbox_group" "ignition_controller" {
   }
 
   metadata {
-    hostname           = "${var.controller_hosts[count.index]}"
-    hyperkube_image    = "${var.hyperkube_image}"
-    ssh_authorized_key = "cert-authority ${chomp(var.ssh_ca_public_key)}"
-    default_user       = "${var.default_user}"
-    apiserver_url      = "https://127.0.0.1:${var.apiserver_secure_port}"
+    hostname                 = "${var.controller_hosts[count.index]}"
+    kubelet_masterless_image = "${var.kubelet_masterless_image}"
+    ssh_authorized_key       = "cert-authority ${chomp(var.ssh_ca_public_key)}"
+    default_user             = "${var.default_user}"
+    apiserver_url            = "https://127.0.0.1:${var.apiserver_secure_port}"
 
     host_ip      = "${var.controller_ips[count.index]}"
     host_if      = "${var.controller_if}"

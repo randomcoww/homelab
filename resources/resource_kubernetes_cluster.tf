@@ -60,7 +60,8 @@ module "kubernetes_cluster" {
   ## images
   container_linux_base_url      = "http://beta.release.core-os.net/amd64-usr"
   container_linux_version       = "current"
-  hyperkube_image               = "randomcoww/hyperkube-slim:${local.kubernetes_version}"
+  kubelet_image                 = "gcr.io/google_containers/hyperkube:${local.kubernetes_version}"
+  kubelet_masterless_image      = "randomcoww/hyperkube-slim:${local.kubernetes_version}"
   kube_apiserver_image          = "randomcoww/hyperkube-slim:${local.kubernetes_version}"
   kube_controller_manager_image = "randomcoww/hyperkube-slim:${local.kubernetes_version}"
   kube_scheduler_image          = "randomcoww/hyperkube-slim:${local.kubernetes_version}"

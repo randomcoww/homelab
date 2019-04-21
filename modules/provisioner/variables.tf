@@ -62,7 +62,7 @@ variable "kea_ha_roles" {
 }
 
 ## images
-variable "hyperkube_image" {
+variable "kubelet_masterless_image" {
   type = "string"
 }
 

@@ -50,7 +50,7 @@ systemd:
         Requires=containerd.service
 
         [Service]
-        Environment="KUBELET_IMAGE=docker://{{.hyperkube_image}}"
+        Environment="KUBELET_IMAGE=docker://{{.kubelet_image}}"
         Environment="RKT_RUN_ARGS=--uuid-file-save=/var/cache/kubelet-pod.uuid \
           --volume=resolv,kind=host,source=/etc/resolv.conf \
           --volume=cni,kind=host,source=/etc/cni/net.d,readOnly=true \

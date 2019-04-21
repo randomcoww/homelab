@@ -54,7 +54,11 @@ variable "container_linux_version" {
   type = "string"
 }
 
-variable "hyperkube_image" {
+variable "kubelet_masterless_image" {
+  type = "string"
+}
+
+variable "kubelet_image" {
   type = "string"
 }
 
