@@ -25,23 +25,22 @@ module "provisioner" {
   provisioner_vwan_if   = "eth4"
   mtu                   = "${local.default_mtu}"
 
-  ## images
-  kubelet_masterless_image = "randomcoww/hyperkube-slim:v1.13.5"
-  keepalived_image         = "randomcoww/keepalived:20190319.03"
-  unbound_image            = "randomcoww/unbound:20190119.01"
-  nftables_image           = "randomcoww/nftables:20190119.01"
-  kea_image                = "randomcoww/kea:20190119.01"
-  tftpd_image              = "randomcoww/tftpd_ipxe:20190119.01"
-  matchbox_image           = "quay.io/coreos/matchbox:latest"
-  syncthing_image          = "randomcoww/syncthing:20190119.01"
-  conntrack_image          = "randomcoww/conntrack:20190316.02"
+  kubelet_image    = "randomcoww/kubelet:v1.14.1"
+  keepalived_image = "randomcoww/keepalived:20190319.03"
+  unbound_image    = "randomcoww/unbound:20190119.01"
+  nftables_image   = "randomcoww/nftables:20190119.01"
+  kea_image        = "randomcoww/kea:20190119.01"
+  tftpd_image      = "randomcoww/tftpd_ipxe:20190119.01"
+  matchbox_image   = "quay.io/coreos/matchbox:latest"
+  syncthing_image  = "randomcoww/syncthing:20190119.01"
+  conntrack_image  = "randomcoww/conntrack:20190316.02"
 
   ## ports
   matchbox_http_port = "${local.matchbox_http_port}"
   matchbox_rpc_port  = "${local.matchbox_rpc_port}"
 
   ## vip
-  store_gateway_vip = "192.168.126.240"
+  store_gateway_vip = "${local.store_gateway_vip}"
   recursive_dns_vip = "${local.recursive_dns_vip}"
   internal_dns_vip  = "${local.internal_dns_vip}"
   matchbox_vip      = "${local.matchbox_vip}"

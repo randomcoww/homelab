@@ -33,11 +33,11 @@ resource "matchbox_group" "ignition_provisioner" {
   }
 
   metadata {
-    hostname                 = "${var.provisioner_hosts[count.index]}"
-    kubelet_masterless_image = "${var.kubelet_masterless_image}"
-    ssh_authorized_key       = "cert-authority ${chomp(var.ssh_ca_public_key)}"
-    default_user             = "${var.default_user}"
+    hostname           = "${var.provisioner_hosts[count.index]}"
+    ssh_authorized_key = "cert-authority ${chomp(var.ssh_ca_public_key)}"
+    default_user       = "${var.default_user}"
 
+    kubelet_image    = "${var.kubelet_image}"
     keepalived_image = "${var.keepalived_image}"
     unbound_image    = "${var.unbound_image}"
     nftables_image   = "${var.nftables_image}"

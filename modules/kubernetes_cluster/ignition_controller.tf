@@ -30,16 +30,20 @@ resource "matchbox_group" "ignition_controller" {
   }
 
   metadata {
-    hostname                 = "${var.controller_hosts[count.index]}"
-    kubelet_masterless_image = "${var.kubelet_masterless_image}"
-    ssh_authorized_key       = "cert-authority ${chomp(var.ssh_ca_public_key)}"
-    default_user             = "${var.default_user}"
-    apiserver_url            = "https://127.0.0.1:${var.apiserver_secure_port}"
+    hostname           = "${var.controller_hosts[count.index]}"
+    ssh_authorized_key = "cert-authority ${chomp(var.ssh_ca_public_key)}"
+    default_user       = "${var.default_user}"
+    apiserver_url      = "https://127.0.0.1:${var.apiserver_secure_port}"
 
     host_ip      = "${var.controller_ips[count.index]}"
     host_if      = "${var.controller_if}"
     host_netmask = "${var.controller_netmask}"
+    mtu          = "${var.mtu}"
 
+    store_gateway_vip = "${var.store_gateway_vip}"
+    recursive_dns_vip = "${var.recursive_dns_vip}"
+
+    kubelet_image                 = "${var.kubelet_image}"
     keepalived_image              = "${var.keepalived_image}"
     kube_apiserver_image          = "${var.kube_apiserver_image}"
     kube_controller_manager_image = "${var.kube_controller_manager_image}"

@@ -54,11 +54,11 @@ variable "container_linux_version" {
   type = "string"
 }
 
-variable "kubelet_masterless_image" {
+variable "kubelet_image" {
   type = "string"
 }
 
-variable "kubelet_image" {
+variable "hyperkube_image" {
   type = "string"
 }
 
@@ -191,6 +191,10 @@ variable "recursive_dns_vip" {
 }
 
 variable "internal_dns_vip" {
+  type = "string"
+}
+
+variable "store_gateway_vip" {
   type = "string"
 }
 

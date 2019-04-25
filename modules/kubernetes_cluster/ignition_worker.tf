@@ -31,7 +31,6 @@ resource "matchbox_group" "ignition_worker" {
 
   metadata {
     hostname           = "${var.worker_hosts[count.index]}"
-    kubelet_image      = "${var.kubelet_image}"
     ssh_authorized_key = "cert-authority ${chomp(var.ssh_ca_public_key)}"
     default_user       = "${var.default_user}"
     apiserver_url      = "https://${var.controller_vip}:${var.apiserver_secure_port}"
@@ -45,7 +44,8 @@ resource "matchbox_group" "ignition_worker" {
     ll_if   = "${var.worker_ll_if}"
     mtu     = "${var.mtu}"
 
-    kubelet_path = "${var.kubelet_path}"
+    hyperkube_image = "${var.hyperkube_image}"
+    kubelet_path    = "${var.kubelet_path}"
 
     tls_ca            = "${replace(tls_self_signed_cert.root.cert_pem, "\n", "\\n")}"
     tls_bootstrap     = "${replace(tls_locally_signed_cert.bootstrap.cert_pem, "\n", "\\n")}"
