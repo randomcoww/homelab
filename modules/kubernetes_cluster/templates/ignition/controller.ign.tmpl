@@ -29,28 +29,23 @@ systemd:
       dropins:
         - name: containerd.conf
           contents: |
-            [Unit]
-            After=network-online.target
-
             [Service]
+            LimitNOFILE=infinity
             ExecStart=
             ExecStart=/usr/bin/env PATH=${TORCX_BINDIR}:${PATH} ${TORCX_BINDIR}/containerd
-            OOMScoreAdjust=-999
             RestartSec=5
     - name: kubelet.service
       enabled: true
       contents: |
         [Unit]
         Description=Kubelet via Hyperkube ACI
-        After=network-online.target
+        After=network.target
 
         [Service]
         Environment="KUBELET_IMAGE=docker://{{.kubelet_image}}"
         Environment="RKT_RUN_ARGS=--uuid-file-save=/var/cache/kubelet-pod.uuid \
           --volume=resolv,kind=host,source=/etc/resolv.conf \
-          --volume coreos-var-lib-containerd,kind=host,source=/var/lib/containerd,readOnly=false \
           --mount volume=resolv,target=/etc/resolv.conf \
-          --mount volume=coreos-var-lib-containerd,target=/var/lib/containerd \
           --insecure-options=image"
         ExecStartPre=/bin/mkdir -p \
           /var/log/containers \
@@ -112,6 +107,18 @@ storage:
       mode: 420
       contents:
         inline: "{{.tls_kubernetes_key}}"
+
+    - path: /etc/containerd/config.toml
+      filesystem: root
+      mode: 420
+      contents:
+        inline: |-
+          subreaper = true
+          oom_score = -999
+          [plugins]
+            [plugins.cri]
+              stream_server_address = "127.0.0.1"
+              stream_server_port = "0"
 
     - path: {{.kubelet_path}}/etcd-ca.pem
       filesystem: root
