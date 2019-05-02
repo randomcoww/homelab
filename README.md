@@ -43,8 +43,7 @@ terraform apply \
 
 Generate hypervisor images:
 ```bash
-git clone https://github.com/randomcoww/lorax
-cd lorax
+cd build
 
 wget \
     https://download.fedoraproject.org/pub/fedora/linux/releases/29/Server/x86_64/iso/Fedora-Server-netinst-x86_64-29-1.2.iso
@@ -60,9 +59,10 @@ sudo livemedia-creator \
     --releasever 29 \
     --title store \
     --resultdir ./result \
+    --tmp . \
     --ks=./store-0.ks \
     --no-virt \
-    --lorax-templates ./share
+    --lorax-templates ./lorax
 
 wget -O store-1.ks \
     http://127.0.0.1:8080/generic?ks=store-1
@@ -75,9 +75,10 @@ sudo livemedia-creator \
     --releasever 29 \
     --title store \
     --resultdir ./result \
+    --tmp . \
     --ks=./store-1.ks \
     --no-virt \
-    --lorax-templates ./share
+    --lorax-templates ./lorax
 ```
 These images can be written to a USB flash drive.
 
