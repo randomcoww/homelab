@@ -14,6 +14,11 @@ part /boot --fstype=ext4 --size=512 --onpart /dev/nvme0n1p2
 part / --fstype=ext4 --size=20480 --onpart /dev/nvme0n1p3
 part {{.localhome_path}} --fstype=ext4 --size=1024 --grow --noformat --onpart /dev/nvme0n1p4
 
+#part /boot/efi --fstype=efi --size=200
+#part /boot --fstype=ext4 --size=512
+#part / --fstype=ext4 --size=20480
+#part {{.localhome_path}} --fstype=ext4 --size=1024 --grow
+
 rootpw --lock --iscrypted locked
 network --hostname={{.hostname}}
 shutdown
@@ -74,6 +79,8 @@ nmap
 unzip
 awscli
 lorax-lmc-novirt
+xorriso
+dnf-plugins-core
 virt-viewer
 gimp
 ldns-utils
@@ -107,6 +114,8 @@ dnf config-manager \
   https://download.docker.com/linux/fedora/docker-ce.repo
 dnf install -y \
   docker-ce \
+  docker-ce-cli \
+  containerd.io \
   docker-compose
 gpasswd -a {{.desktop_user}} docker
 
@@ -319,7 +328,7 @@ dracut -f /boot/initramfs-$KERNEL_VERSION.img $KERNEL_VERSION
 systemctl enable \
   systemd-networkd systemd-resolved chronyd crond \
   libvirtd ksm ksmtuned \
-  docker sshd
+  sshd docker
 
 systemctl mask \
   NetworkManager
