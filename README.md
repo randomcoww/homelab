@@ -56,7 +56,7 @@ wget -O vm-0.ks \
 sudo livemedia-creator \
     --make-iso \
     --iso=./Fedora-Server-netinst-x86_64-$FEDORA_RELEASE-1.2.iso \
-    --project vm \
+    --project Fedora \
     --volid vm \
     --releasever $FEDORA_RELEASE \
     --title vm \
@@ -72,7 +72,7 @@ wget -O vm-1.ks \
 sudo livemedia-creator \
     --make-iso \
     --iso=./Fedora-Server-netinst-x86_64-$FEDORA_RELEASE-1.2.iso \
-    --project vm \
+    --project Fedora \
     --volid vm \
     --releasever $FEDORA_RELEASE \
     --title vm \
