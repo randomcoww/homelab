@@ -43,40 +43,42 @@ terraform apply \
 
 Generate hypervisor images:
 ```bash
+FEDORA_RELEASE=30
+
 cd build
 
 wget \
-    https://download.fedoraproject.org/pub/fedora/linux/releases/29/Server/x86_64/iso/Fedora-Server-netinst-x86_64-29-1.2.iso
+    https://download.fedoraproject.org/pub/fedora/linux/releases/$FEDORA_RELEASE/Server/x86_64/iso/Fedora-Server-netinst-x86_64-$FEDORA_RELEASE-1.2.iso
 
-wget -O store-0.ks \
-    http://127.0.0.1:8080/generic?ks=store-0
+wget -O vm-0.ks \
+    http://127.0.0.1:8080/generic?ks=vm-0
 
 sudo livemedia-creator \
     --make-iso \
-    --iso=./Fedora-Server-netinst-x86_64-29-1.2.iso \
-    --project store \
-    --volid store \
-    --releasever 29 \
-    --title store \
+    --iso=./Fedora-Server-netinst-x86_64-$FEDORA_RELEASE-1.2.iso \
+    --project Fedora \
+    --volid vm \
+    --releasever $FEDORA_RELEASE \
+    --title vm \
     --resultdir ./result \
     --tmp . \
-    --ks=./store-0.ks \
+    --ks=./vm-0.ks \
     --no-virt \
     --lorax-templates ./lorax
 
-wget -O store-1.ks \
-    http://127.0.0.1:8080/generic?ks=store-1
+wget -O vm-1.ks \
+    http://127.0.0.1:8080/generic?ks=vm-1
     
 sudo livemedia-creator \
     --make-iso \
-    --iso=./Fedora-Server-netinst-x86_64-29-1.2.iso \
-    --project store \
-    --volid store \
-    --releasever 29 \
-    --title store \
+    --iso=./Fedora-Server-netinst-x86_64-$FEDORA_RELEASE-1.2.iso \
+    --project Fedora \
+    --volid vm \
+    --releasever $FEDORA_RELEASE \
+    --title vm \
     --resultdir ./result \
     --tmp . \
-    --ks=./store-1.ks \
+    --ks=./vm-1.ks \
     --no-virt \
     --lorax-templates ./lorax
 ```
