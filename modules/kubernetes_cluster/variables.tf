@@ -106,6 +106,10 @@ variable "external_dns_image" {
   type = "string"
 }
 
+variable "kapprover_image" {
+  type = "string"
+}
+
 ## kubernetes
 variable "cluster_cidr" {
   type    = "string"

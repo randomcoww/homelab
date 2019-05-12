@@ -74,6 +74,7 @@ module "kubernetes_cluster" {
   cni_plugins_image             = "randomcoww/cni_plugins:0.7.5"
   coredns_image                 = "coredns/coredns:1.3.1"
   external_dns_image            = "registry.opensource.zalan.do/teapot/external-dns:latest"
+  kapprover_image               = "randomcoww/kapprover:v0.0.3"
 
   ## kubernetes
   cluster_name       = "${local.kubernetes_cluster_name}"
