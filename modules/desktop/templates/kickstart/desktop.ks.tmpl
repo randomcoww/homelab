@@ -70,6 +70,7 @@ dnf-plugins-core
 libva-utils
 libva-intel-driver
 vim-enhanced
+git
 golang
 kubectl
 code
@@ -114,8 +115,6 @@ dnf config-manager \
   https://download.docker.com/linux/fedora/docker-ce.repo
 dnf install -y \
   docker-ce \
-  docker-ce-cli \
-  containerd.io \
   docker-compose
 gpasswd -a {{.desktop_user}} docker
 
