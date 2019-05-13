@@ -9,15 +9,15 @@ firewall --disabled
 zerombr
 clearpart --none --disklabel=gpt
 
-part /boot/efi --fstype=efi --size=200 --onpart /dev/nvme0n1p1
-part /boot --fstype=ext4 --size=512 --onpart /dev/nvme0n1p2
-part / --fstype=ext4 --size=20480 --onpart /dev/nvme0n1p3
-part {{.localhome_path}} --fstype=ext4 --size=1024 --grow --noformat --onpart /dev/nvme0n1p4
+#part /boot/efi --fstype=efi --size=200 --onpart /dev/nvme0n1p1
+#part /boot --fstype=ext4 --size=512 --onpart /dev/nvme0n1p2
+#part / --fstype=ext4 --size=20480 --onpart /dev/nvme0n1p3
+#part {{.localhome_path}} --fstype=ext4 --size=1024 --grow --noformat --onpart /dev/nvme0n1p4
 
-#part /boot/efi --fstype=efi --size=200
-#part /boot --fstype=ext4 --size=512
-#part / --fstype=ext4 --size=20480
-#part {{.localhome_path}} --fstype=ext4 --size=1024 --grow
+part /boot/efi --fstype=efi --size=200
+part /boot --fstype=ext4 --size=512
+part / --fstype=ext4 --size=20480
+part {{.localhome_path}} --fstype=ext4 --size=1024 --grow
 
 rootpw --lock --iscrypted locked
 network --hostname={{.hostname}}
@@ -35,7 +35,8 @@ repo --name=rpmfusion-nonfree-updates --metalink=https://mirrors.rpmfusion.org/m
 
 repo --name=kubernetes --baseurl=https://packages.cloud.google.com/yum/repos/kubernetes-el7-$basearch
 repo --name=code --baseurl=https://packages.microsoft.com/yumrepos/vscode
-#repo --name=docker-ce --baseurl=https://download.docker.com/linux/fedora/$releasever/$basearch/test
+repo --name=docker-ce-stable --baseurl=https://download.docker.com/linux/fedora/29/$basearch/stable
+repo --name=docker-ce-stable-source --baseurl=https://download.docker.com/linux/fedora/29/source/stable
 
 %packages --excludeWeakdeps
 
@@ -64,9 +65,8 @@ libvirt-client
 rsync
 tmux
 xclip
-dnf-plugins-core
-#docker-ce
-#docker-compose
+docker-ce
+docker-compose
 libva-utils
 libva-intel-driver
 vim-enhanced
@@ -81,7 +81,6 @@ unzip
 awscli
 lorax-lmc-novirt
 xorriso
-dnf-plugins-core
 virt-viewer
 gimp
 ldns-utils
@@ -93,6 +92,7 @@ ncmpcpp
 
 -plymouth
 -plymouth-*
+-gnome-boxes
 %end
 
 ##
@@ -101,22 +101,10 @@ ncmpcpp
 
 user --name={{.desktop_user}} --password={{.password}} --plaintext --uid=1000 --gid=1000 --groups=wheel,libvirt,docker,qemu,input --homedir={{.localhome_path}}/{{.desktop_user}}
 
-user --name={{.default_user}} --lock --iscrypted --groups=wheel,libvirt
+user --name={{.default_user}} --password= --plaintext --groups=wheel,libvirt
 sshkey --username={{.default_user}} "{{.ssh_authorized_key}}"
 
 %post --erroronfail
-
-##
-## fix broken docker install
-##
-
-dnf config-manager \
-  --add-repo \
-  https://download.docker.com/linux/fedora/docker-ce.repo
-dnf install -y \
-  docker-ce \
-  docker-compose
-gpasswd -a {{.desktop_user}} docker
 
 ##
 ## networkd
