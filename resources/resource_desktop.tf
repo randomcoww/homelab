@@ -18,6 +18,11 @@ module "desktop" {
   store_netmask = "${local.subnet_store_netmask}"
   ll_netmask    = "${local.subnet_ll_netmask}"
 
+  ## image
+  container_linux_image_path = "${local.container_linux_image_path}"
+  container_linux_base_url   = "${local.container_linux_base_url}"
+  container_linux_version    = "${local.container_linux_version}"
+
   ## renderer provisioning access
   renderer_endpoint        = "${local.renderer_endpoint}"
   renderer_cert_pem        = "${local.renderer_cert_pem}"

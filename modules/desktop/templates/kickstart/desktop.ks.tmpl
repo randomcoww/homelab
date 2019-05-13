@@ -351,6 +351,15 @@ cgroup_device_acl = [
 EOF
 
 ##
+## bootstrap image
+##
+
+mkdir -p {{.container_linux_image_path}}
+cd {{.container_linux_image_path}}
+curl -O {{.container_linux_base_url}}/{{.container_linux_version}}/coreos_production_pxe.vmlinuz
+curl -O {{.container_linux_base_url}}/{{.container_linux_version}}/coreos_production_pxe_image.cpio.gz
+
+##
 ## cleanup
 ##
 
