@@ -29,9 +29,4 @@ locals {
   host_ll_ip = "169.254.169.254"
 
   default_mtu = "9000"
-
-  ## image
-  container_linux_image_path = "/var/lib/tftpboot"
-  container_linux_base_url   = "https://beta.release.core-os.net/amd64-usr"
-  container_linux_version    = "current"
 }

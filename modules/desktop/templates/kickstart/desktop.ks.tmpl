@@ -9,15 +9,15 @@ firewall --disabled
 zerombr
 clearpart --none --disklabel=gpt
 
-#part /boot/efi --fstype=efi --size=200 --onpart /dev/nvme0n1p1
-#part /boot --fstype=ext4 --size=512 --onpart /dev/nvme0n1p2
-#part / --fstype=ext4 --size=20480 --onpart /dev/nvme0n1p3
-#part {{.localhome_path}} --fstype=ext4 --size=1024 --grow --noformat --onpart /dev/nvme0n1p4
+part /boot/efi --fstype=efi --size=200 --onpart /dev/nvme0n1p1
+part /boot --fstype=ext4 --size=512 --onpart /dev/nvme0n1p2
+part / --fstype=ext4 --size=20480 --onpart /dev/nvme0n1p3
+part {{.localhome_path}} --fstype=ext4 --size=1024 --grow --noformat --onpart /dev/nvme0n1p4
 
-part /boot/efi --fstype=efi --size=200
-part /boot --fstype=ext4 --size=512
-part / --fstype=ext4 --size=20480
-part {{.localhome_path}} --fstype=ext4 --size=1024 --grow
+#part /boot/efi --fstype=efi --size=200
+#part /boot --fstype=ext4 --size=512
+#part / --fstype=ext4 --size=20480
+#part {{.localhome_path}} --fstype=ext4 --size=1024 --grow
 
 rootpw --lock --iscrypted locked
 network --hostname={{.hostname}}
@@ -85,7 +85,7 @@ virt-viewer
 gimp
 ldns-utils
 openssl
-steam
+#steam
 vlc
 jq
 ncmpcpp
@@ -100,9 +100,6 @@ ncmpcpp
 ##
 
 user --name={{.desktop_user}} --password={{.password}} --plaintext --uid=1000 --gid=1000 --groups=wheel,libvirt,docker,qemu,input --homedir={{.localhome_path}}/{{.desktop_user}}
-
-user --name={{.default_user}} --password= --plaintext --groups=wheel,libvirt
-sshkey --username={{.default_user}} "{{.ssh_authorized_key}}"
 
 %post --erroronfail
 
@@ -337,15 +334,6 @@ cgroup_device_acl = [
     "/dev/input/by-id/usb-Cooler_Master_Technology_Inc._MasterKeys_S-event-kbd",
 ]
 EOF
-
-##
-## bootstrap image
-##
-
-mkdir -p {{.container_linux_image_path}}
-cd {{.container_linux_image_path}}
-curl -O {{.container_linux_base_url}}/{{.container_linux_version}}/coreos_production_pxe.vmlinuz
-curl -O {{.container_linux_base_url}}/{{.container_linux_version}}/coreos_production_pxe_image.cpio.gz
 
 ##
 ## cleanup

@@ -18,12 +18,10 @@ resource "matchbox_group" "generic_desktop" {
   }
 
   metadata {
-    hostname           = "${var.desktop_hosts[count.index]}"
-    ssh_authorized_key = "cert-authority ${chomp(var.ssh_ca_public_key)}"
-    default_user       = "${var.default_user}"
-    desktop_user       = "${var.desktop_user}"
-    localhome_path     = "${var.localhome_path}"
-    password           = "${var.password}"
+    hostname       = "${var.desktop_hosts[count.index]}"
+    desktop_user   = "${var.desktop_user}"
+    localhome_path = "${var.localhome_path}"
+    password       = "${var.password}"
 
     store_ip      = "${var.desktop_store_ips[count.index]}"
     store_if      = "${var.desktop_store_if}"
@@ -35,9 +33,5 @@ resource "matchbox_group" "generic_desktop" {
     sync_if       = "en${var.desktop_sync_if}"
     wan_if        = "en${var.desktop_wan_if}"
     mtu           = "${var.mtu}"
-
-    container_linux_image_path = "${var.container_linux_image_path}"
-    container_linux_base_url   = "${var.container_linux_base_url}"
-    container_linux_version    = "${var.container_linux_version}"
   }
 }

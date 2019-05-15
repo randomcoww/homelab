@@ -1,7 +1,3 @@
-variable "default_user" {
-  type = "string"
-}
-
 variable "desktop_user" {
   type = "string"
 }
@@ -12,10 +8,6 @@ variable "localhome_path" {
 }
 
 variable "password" {
-  type = "string"
-}
-
-variable "ssh_ca_public_key" {
   type = "string"
 }
 
@@ -65,19 +57,6 @@ variable "desktop_wan_if" {
 }
 
 variable "mtu" {
-  type = "string"
-}
-
-## images
-variable "container_linux_image_path" {
-  type = "string"
-}
-
-variable "container_linux_base_url" {
-  type = "string"
-}
-
-variable "container_linux_version" {
   type = "string"
 }
 
