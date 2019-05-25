@@ -1,7 +1,7 @@
 # Matchbox configs for Kubernetes cluster
 
 locals {
-  kubernetes_version        = "v1.14.1"
+  kubernetes_version        = "v1.14.2"
   kubernetes_cluster_name   = "kube-cluster"
   kubernetes_apiserver_vip  = "192.168.126.245"
   kubernetes_apiserver_port = "56443"
@@ -66,13 +66,13 @@ module "kubernetes_cluster" {
   kube_controller_manager_image = "gcr.io/google_containers/kube-controller-manager:${local.kubernetes_version}"
   kube_scheduler_image          = "gcr.io/google_containers/kube-scheduler:${local.kubernetes_version}"
   kube_proxy_image              = "gcr.io/google_containers/kube-proxy:${local.kubernetes_version}"
-  kubelet_image                 = "randomcoww/kubelet:v1.14.1"
+  kubelet_image                 = "randomcoww/kubelet:v1.14.2"
   etcd_wrapper_image            = "randomcoww/etcd-wrapper:20181227.02"
   etcd_image                    = "gcr.io/etcd-development/etcd:v3.3"
-  flannel_image                 = "quay.io/coreos/flannel:v0.10.0-amd64"
+  flannel_image                 = "quay.io/coreos/flannel:v0.11.0-amd64"
   keepalived_image              = "randomcoww/keepalived:20190119.01"
   cni_plugins_image             = "randomcoww/cni_plugins:0.7.5"
-  coredns_image                 = "coredns/coredns:1.3.1"
+  coredns_image                 = "coredns/coredns:1.5.0"
   external_dns_image            = "registry.opensource.zalan.do/teapot/external-dns:latest"
   kapprover_image               = "randomcoww/kapprover:v0.0.3"
 

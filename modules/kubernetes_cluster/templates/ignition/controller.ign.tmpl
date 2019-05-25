@@ -405,7 +405,7 @@ storage:
               - "--tls-cert-file={{.kubelet_path}}/kubernetes.pem"
               - "--tls-private-key-file={{.kubelet_path}}/kubernetes-key.pem"
               - "--storage-backend=etcd3"
-              - "--kubelet-preferred-address-types=InternalIP,InternalDNS"
+              - "--kubelet-preferred-address-types=InternalIP"
               - "--v=2"
               volumeMounts:
               - name: kubernetes-path

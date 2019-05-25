@@ -69,7 +69,7 @@ data:
       etcd {{.internal_domain}} in-addr.arpa ip6.arp {
         fallthrough in-addr.arpa ip6.arpa
       }
-      proxy . {{.recursive_dns_vip}}
+      forward . {{.recursive_dns_vip}}
       prometheus :9153
       cache 30
       reload

@@ -60,6 +60,19 @@ variable "mtu" {
   type = "string"
 }
 
+## images
+variable "container_linux_image_path" {
+  type = "string"
+}
+
+variable "container_linux_base_url" {
+  type = "string"
+}
+
+variable "container_linux_version" {
+  type = "string"
+}
+
 ## matchbox provisioning access
 variable "renderer_endpoint" {
   type = "string"
