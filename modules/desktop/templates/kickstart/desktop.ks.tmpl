@@ -18,7 +18,7 @@ network --hostname={{.hostname}}
 shutdown
 
 ## Not used for live images. Add this to lorax template.
-# bootloader --append="elevator=noop intel_iommu=on iommu=pt plymouth.enable=0 rd.plymouth=0 rd.driver.pre=vfio-pci video=vesafb:off,efifb:off rd.live.ram=1"
+# bootloader --append="elevator=noop intel_iommu=on iommu=pt plymouth.enable=0 rd.plymouth=0 rd.driver.pre=vfio-pci video=vesafb:off,efifb:off"
 
 repo --name=fedora --mirrorlist=https://mirrors.fedoraproject.org/mirrorlist?repo=fedora-$releasever&arch=$basearch
 repo --name=updates --mirrorlist=https://mirrors.fedoraproject.org/mirrorlist?repo=updates-released-f$releasever&arch=$basearch
@@ -99,15 +99,17 @@ virt-viewer
 gimp
 ldns-utils
 openssl
-#steam
+# steam
 vlc
 jq
 ncmpcpp
 deadbeef
 
+-NetworkManager
 -plymouth
 -plymouth-*
 -gnome-boxes
+-gnome-initial-setup
 %end
 
 ##
