@@ -195,12 +195,12 @@ sudo livemedia-creator \
     --dracut-arg='--no-early-microcode'
 ```
 
-Dracut args need to be modified to add vfio drivers into initrd. Following needs to be added to default:
+Dracut args need to be modified to add vfio drivers into initrd. Following is added to default:
 ```
 --dracut-arg='--add-drivers vfio vfio_iommu_type1 vfio_pci vfio_virqfd'
 ```
 
-Built image can be written to a USB flash drive to boot live environment.
+Built image can be written to a USB flash drive to boot live environment. Currently `/localhome` containing persistent user home directory is overlay mounted with ZFS.
 
 ### SSH CA
 
