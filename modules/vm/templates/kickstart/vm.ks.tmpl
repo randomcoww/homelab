@@ -16,8 +16,8 @@ rootpw --lock --iscrypted locked
 network --hostname={{.hostname}}
 shutdown
 
-## Not used. Add this to lorax template.
-bootloader --append="console=tty0 console=ttyS1,115200n8 elevator=noop intel_iommu=on iommu=pt rd.live.ram=1"
+## Not used for live images. Add this to lorax template.
+# bootloader --append="console=tty0 console=ttyS1,115200n8 elevator=noop intel_iommu=on iommu=pt rd.live.ram=1"
 
 repo --name=fedora --mirrorlist=https://mirrors.fedoraproject.org/mirrorlist?repo=fedora-$releasever&arch=$basearch
 repo --name=updates --mirrorlist=https://mirrors.fedoraproject.org/mirrorlist?repo=updates-released-f$releasever&arch=$basearch

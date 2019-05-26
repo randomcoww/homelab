@@ -1,3 +1,7 @@
+##
+## desktop-* host kickstart for livecd-creator
+##
+
 install
 skipx
 lang en_US.UTF-8
@@ -7,26 +11,19 @@ auth --useshadow --passalgo=sha512
 selinux --disabled
 firewall --disabled
 zerombr
-clearpart --none --disklabel=gpt
-
-part /boot/efi --fstype=efi --size=200 --onpart /dev/nvme0n1p1
-part /boot --fstype=ext4 --size=512 --onpart /dev/nvme0n1p2
-part / --fstype=ext4 --size=20480 --onpart /dev/nvme0n1p3
-part {{.localhome_path}} --fstype=ext4 --size=1024 --grow --noformat --onpart /dev/nvme0n1p4
-
-#part /boot/efi --fstype=efi --size=200
-#part /boot --fstype=ext4 --size=512
-#part / --fstype=ext4 --size=20480
-#part {{.localhome_path}} --fstype=ext4 --size=1024 --grow
-
+clearpart --all --disklabel=gpt
+part / --size 20480 --fstype ext4
 rootpw --lock --iscrypted locked
 network --hostname={{.hostname}}
 shutdown
-bootloader --append="elevator=noop intel_iommu=on iommu=pt plymouth.enable=0 rd.plymouth=0 rd.driver.pre=vfio-pci video=vesafb:off,efifb:off"
+
+## Not used for live images. Add this to lorax template.
+# bootloader --append="elevator=noop intel_iommu=on iommu=pt plymouth.enable=0 rd.plymouth=0 rd.driver.pre=vfio-pci video=vesafb:off,efifb:off rd.live.ram=1"
 
 repo --name=fedora --mirrorlist=https://mirrors.fedoraproject.org/mirrorlist?repo=fedora-$releasever&arch=$basearch
 repo --name=updates --mirrorlist=https://mirrors.fedoraproject.org/mirrorlist?repo=updates-released-f$releasever&arch=$basearch
 url --mirrorlist=https://mirrors.fedoraproject.org/mirrorlist?repo=fedora-$releasever&arch=$basearch
+repo --name=zfs-on-linux --baseurl=http://download.zfsonlinux.org/fedora/$releasever/$basearch/
 
 repo --name=rpmfusion-free --metalink=https://mirrors.rpmfusion.org/metalink?repo=free-fedora-$releasever&arch=$basearch
 repo --name=rpmfusion-free-updates --metalink=https://mirrors.rpmfusion.org/metalink?repo=free-fedora-updates-released-$releasever&arch=$basearch
@@ -49,6 +46,23 @@ chrony
 logrotate
 nfs-utils
 openssh-server
+##
+
+## ZFS on linux
+kernel-devel
+zfs
+-zfs-fuse
+##
+
+## livemedia-creator
+fedora-logos
+dracut-config-generic
+dracut-live
+-dracut-config-rescue
+grub2-efi-x64-cdboot
+shim
+memtest86+
+syslinux
 ##
 
 @firefox
@@ -278,10 +292,11 @@ EOF
 ## general file writes
 ##
 
-cat <<EOF > /etc/modprobe.d/local.conf
-options vfio-pci ids=1002:ffffffff:ffffffff:ffffffff:00030000:ffff00ff,1002:ffffffff:ffffffff:ffffffff:00040300:ffffffff,10de:ffffffff:ffffffff:ffffffff:00030000:ffff00ff,10de:ffffffff:ffffffff:ffffffff:00040300:ffffffff
-options kvm ignore_msrs=1
-EOF
+## Does not seem to work in live boot, particularly for vfio-pci. Added to boot parameter.
+# cat <<EOF > /etc/modprobe.d/local.conf
+# options vfio-pci ids=1002:ffffffff:ffffffff:ffffffff:00030000:ffff00ff,1002:ffffffff:ffffffff:ffffffff:00040300:ffffffff,10de:ffffffff:ffffffff:ffffffff:00030000:ffff00ff,10de:ffffffff:ffffffff:ffffffff:00040300:ffffffff
+# options kvm ignore_msrs=1
+# EOF
 
 cat <<EOF > /etc/ssh/sshd_config
 Subsystem sftp internal-sftp
@@ -291,20 +306,39 @@ PasswordAuthentication no
 ChallengeResponseAuthentication no
 EOF
 
-cat <<EOF > /etc/dracut.conf.d/local.conf
-add_drivers+="vfio vfio_iommu_type1 vfio_pci vfio_virqfd"
-EOF
+## Not used. Pass this into livemedia-creator dracut-args.
+# cat <<EOF > /etc/dracut.conf.d/local.conf
+# add_drivers+="vfio vfio_iommu_type1 vfio_pci vfio_virqfd"
+# EOF
 
 cat <<EOF > /etc/sysctl.d/local.conf
 vm.nr_hugepages=4096
 EOF
 
 ##
+## live image settings
+## systemd configs from https://linux.xvx.cz/2017/07/how-to-build-pxe-fedora-26-live-image.html
+## https://fedoraproject.org/wiki/LiveOS_image
+##
+
+cat <<EOF >> /etc/systemd/system.conf
+DumpCore=no
+EOF
+
+cat <<EOF >> /etc/systemd/journald.conf
+Storage=volatile
+RuntimeMaxUse=15M
+ForwardToSyslog=no
+ForwardToConsole=no
+EOF
+
+##
 ## add modules to initramfs
 ##
 
-KERNEL_VERSION=$(rpm -q kernel --qf '%{version}-%{release}.%{arch}\n')
-dracut -f /boot/initramfs-$KERNEL_VERSION.img $KERNEL_VERSION
+## Does not work with livemedia-creator
+# KERNEL_VERSION=$(rpm -q kernel --qf '%{version}-%{release}.%{arch}\n')
+# dracut -f /boot/initramfs-$KERNEL_VERSION.img $KERNEL_VERSION
 
 ##
 ## enable services
@@ -313,6 +347,7 @@ dracut -f /boot/initramfs-$KERNEL_VERSION.img $KERNEL_VERSION
 systemctl enable \
   systemd-networkd systemd-resolved chronyd crond \
   libvirtd ksm ksmtuned \
+  zfs-import-cache zfs-import-scan zfs-mount zfs-share zfs-zed zfs.target nfs-server \
   sshd docker
 
 systemctl mask \
@@ -335,6 +370,15 @@ cgroup_device_acl = [
     "/dev/input/by-id/usb-Cooler_Master_Technology_Inc._MasterKeys_S-event-kbd",
 ]
 EOF
+
+##
+## bootstrap image
+##
+
+mkdir -p {{.container_linux_image_path}}
+cd {{.container_linux_image_path}}
+curl -O {{.container_linux_base_url}}/{{.container_linux_version}}/coreos_production_pxe.vmlinuz
+curl -O {{.container_linux_base_url}}/{{.container_linux_version}}/coreos_production_pxe_image.cpio.gz
 
 ##
 ## cleanup
