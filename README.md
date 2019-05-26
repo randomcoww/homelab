@@ -43,9 +43,8 @@ terraform apply \
 
 Generate hypervisor images:
 ```bash
-FEDORA_RELEASE=30
-
 cd build
+export FEDORA_RELEASE=30
 
 wget \
     https://download.fedoraproject.org/pub/fedora/linux/releases/$FEDORA_RELEASE/Server/x86_64/iso/Fedora-Server-netinst-x86_64-$FEDORA_RELEASE-1.2.iso
@@ -157,15 +156,6 @@ setup_environment/output/kube-cluster/<name_of_cluster>/admin.kubeconfig
 
 ### Desktop provisioning
 
-Generates kickstart for my desktop box. The following disk with existing partitions is assumed and the home partition is not formatted:
-
-```
-part /boot/efi --fstype=efi --size=200 --onpart /dev/nvme0n1p1
-part /boot --fstype=ext4 --size=512 --onpart /dev/nvme0n1p2
-part / --fstype=ext4 --size=20480 --onpart /dev/nvme0n1p3
-part /home --fstype=ext4 --size=1024 --grow --noformat --onpart /dev/nvme0n1p4
-```
-
 Generate Kickstart:
 ```bash
 cd resources
@@ -173,10 +163,44 @@ terraform apply \
     -target=module.desktop
 ```
 
-I currently have no PXE boot environment for Fedora. The following boot args can be added to a Fedora 29 installer to use, where 192.168.126.242:58080 is the provisioner Matchbox address.
+Generate desktop images:
+```bash
+cd build
+export FEDORA_RELEASE=30
+
+wget \
+    https://download.fedoraproject.org/pub/fedora/linux/releases/$FEDORA_RELEASE/Server/x86_64/iso/Fedora-Server-netinst-x86_64-$FEDORA_RELEASE-1.2.iso
+
+wget -O desktop-0.ks \
+    http://192.168.126.242:58080/generic?ks=desktop-0
+
+sudo livemedia-creator \
+    --make-iso \
+    --iso=./Fedora-Server-netinst-x86_64-$FEDORA_RELEASE-1.2.iso \
+    --project Fedora \
+    --volid desktop \
+    --releasever $FEDORA_RELEASE \
+    --title desktop \
+    --resultdir ./result \
+    --tmp . \
+    --ks=./desktop-0.ks \
+    --no-virt \
+    --lorax-templates ./lorax-desktop \
+    --dracut-arg='--xz' \
+    --dracut-arg='--add-drivers vfio vfio_iommu_type1 vfio_pci vfio_virqfd' \
+    --dracut-arg='--add livenet dmsquash-live convertfs pollcdrom qemu qemu-net' \
+    --dracut-arg='--omit plymouth' \
+    --dracut-arg='--no-hostonly' \
+    --dracut-arg='--debug' \
+    --dracut-arg='--no-early-microcode'
 ```
-inst.text inst.ks=http://192.168.126.242:58080/generic?ks=desktop-0
+
+Dracut args need to be modified to add vfio drivers into initrd. Following needs to be added to default:
 ```
+--dracut-arg='--add-drivers vfio vfio_iommu_type1 vfio_pci vfio_virqfd'
+```
+
+Built image can be written to a USB flash drive to boot live environment.
 
 ### SSH CA
 
