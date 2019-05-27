@@ -104,7 +104,9 @@ systemd:
         Environment="KUBELET_IMAGE=docker://{{.kubelet_image}}"
         Environment="RKT_RUN_ARGS=--uuid-file-save=/var/cache/kubelet-pod.uuid \
           --volume=resolv,kind=host,source=/etc/resolv.conf \
+          --volume var-lib-containerd,kind=host,source=/var/lib/containerd,readOnly=false \
           --mount volume=resolv,target=/etc/resolv.conf \
+          --mount volume=var-lib-containerd,target=/var/lib/containerd \
           --insecure-options=image"
         ExecStartPre=/bin/mkdir -p \
           /var/log/containers \
@@ -182,6 +184,8 @@ storage:
           [plugins]
             [plugins.cri]
               stream_server_address = "127.0.0.1"
+              [plugins.cri.containerd]
+                no_pivot = true
 
     - path: {{.kubelet_path}}/kubelet-config.yaml
       filesystem: root
