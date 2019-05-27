@@ -114,6 +114,7 @@ storage:
           oom_score = -999
           [plugins]
             [plugins.cri]
+              stream_server_address = "0.0.0.0"
 
     - path: {{.kubelet_path}}/kubelet-config.yaml
       filesystem: root
