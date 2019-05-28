@@ -66,7 +66,7 @@ module "kubernetes_cluster" {
   kube_controller_manager_image = "gcr.io/google_containers/kube-controller-manager:${local.kubernetes_version}"
   kube_scheduler_image          = "gcr.io/google_containers/kube-scheduler:${local.kubernetes_version}"
   kube_proxy_image              = "gcr.io/google_containers/kube-proxy:${local.kubernetes_version}"
-  kubelet_image                 = "randomcoww/kubelet:v1.14.2"
+  kubelet_image                 = "randomcoww/kubelet:latest"
   etcd_wrapper_image            = "randomcoww/etcd-wrapper:20181227.02"
   etcd_image                    = "gcr.io/etcd-development/etcd:v3.3"
   flannel_image                 = "quay.io/coreos/flannel:v0.11.0-amd64"

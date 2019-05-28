@@ -25,7 +25,7 @@ module "provisioner" {
   provisioner_vwan_if   = "eth4"
   mtu                   = "${local.default_mtu}"
 
-  kubelet_image    = "randomcoww/kubelet:v1.14.2"
+  kubelet_image    = "randomcoww/kubelet:latest"
   keepalived_image = "randomcoww/keepalived:20190319.03"
   unbound_image    = "randomcoww/unbound:20190119.01"
   nftables_image   = "randomcoww/nftables:20190119.01"

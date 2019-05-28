@@ -44,8 +44,8 @@ resource "matchbox_group" "ignition_worker" {
     ll_if   = "${var.worker_ll_if}"
     mtu     = "${var.mtu}"
 
-    hyperkube_image = "${var.hyperkube_image}"
-    kubelet_path    = "${var.kubelet_path}"
+    kubelet_image = "${var.kubelet_image}"
+    kubelet_path  = "${var.kubelet_path}"
 
     tls_ca            = "${replace(tls_self_signed_cert.root.cert_pem, "\n", "\\n")}"
     tls_bootstrap     = "${replace(tls_locally_signed_cert.bootstrap.cert_pem, "\n", "\\n")}"
