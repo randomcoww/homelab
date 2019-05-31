@@ -499,6 +499,7 @@ storage:
                     do-tcp: yes
                     access-control: 0.0.0.0/0 allow
                     do-not-query-localhost: no
+                    local-data: "{{.matchbox_dns_name}}.{{.internal_domain}} 300 A {{.matchbox_vip}}"
                   private-domain: "{{.internal_domain}}"
                   domain-insecure: "{{.internal_domain}}"
                   unblock-lan-zones: yes

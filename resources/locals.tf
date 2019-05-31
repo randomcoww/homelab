@@ -5,7 +5,7 @@ locals {
   local_renderer_ca_pem          = "${module.renderer.matchbox_ca_pem}"
 
   matchbox_vip       = "192.168.126.242"
-  matchbox_http_port = "58080"
+  matchbox_http_port = "80"
   matchbox_rpc_port  = "58081"
 
   renderer_endpoint        = "${local.matchbox_vip}:${local.matchbox_rpc_port}"

@@ -107,6 +107,10 @@ variable "matchbox_rpc_port" {
   type = "string"
 }
 
+variable "matchbox_dns_name" {
+  type = "string"
+}
+
 variable "kea_peer_port" {
   type    = "string"
   default = "58082"

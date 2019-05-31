@@ -39,6 +39,9 @@ module "provisioner" {
   matchbox_http_port = "${local.matchbox_http_port}"
   matchbox_rpc_port  = "${local.matchbox_rpc_port}"
 
+  ## this should be the only static dns entry
+  matchbox_dns_name = "config"
+
   ## vip
   store_gateway_vip = "${local.store_gateway_vip}"
   recursive_dns_vip = "${local.recursive_dns_vip}"

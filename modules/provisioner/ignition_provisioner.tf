@@ -49,6 +49,7 @@ resource "matchbox_group" "ignition_provisioner" {
 
     matchbox_http_port  = "${var.matchbox_http_port}"
     matchbox_rpc_port   = "${var.matchbox_rpc_port}"
+    matchbox_dns_name   = "${var.matchbox_dns_name}"
     kea_peer_port       = "${var.kea_peer_port}"
     syncthing_peer_port = "${var.syncthing_peer_port}"
 
