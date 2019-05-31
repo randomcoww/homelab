@@ -172,7 +172,7 @@ wget \
     https://download.fedoraproject.org/pub/fedora/linux/releases/$FEDORA_RELEASE/Server/x86_64/iso/Fedora-Server-netinst-x86_64-$FEDORA_RELEASE-1.2.iso
 
 wget -O desktop-0.ks \
-    http://192.168.126.242:58080/generic?ks=desktop-0
+    http://config.fuzzybunny.internal:58080/generic?ks=desktop-0
 
 sudo livemedia-creator \
     --make-iso \
