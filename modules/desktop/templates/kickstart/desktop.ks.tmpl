@@ -46,6 +46,7 @@ chrony
 logrotate
 nfs-utils
 openssh-server
+glusterfs-server
 ##
 
 ## ZFS on linux
@@ -349,7 +350,7 @@ systemctl enable \
   systemd-networkd systemd-resolved chronyd crond \
   libvirtd ksm ksmtuned \
   zfs-import-cache zfs-import-scan zfs-mount zfs-share zfs-zed zfs.target nfs-server \
-  sshd docker
+  sshd glusterd docker
 
 systemctl mask \
   NetworkManager
