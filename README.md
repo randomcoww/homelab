@@ -63,7 +63,7 @@ sudo livemedia-creator \
     --tmp . \
     --ks=./vm-0.ks \
     --no-virt \
-    --lorax-templates ./lorax
+    --lorax-templates ./lorax-vm
 
 wget -O vm-1.ks \
     http://127.0.0.1:8080/generic?ks=vm-1
@@ -79,7 +79,7 @@ sudo livemedia-creator \
     --tmp . \
     --ks=./vm-1.ks \
     --no-virt \
-    --lorax-templates ./lorax
+    --lorax-templates ./lorax-vm
 ```
 These images can be written to a USB flash drive.
 
