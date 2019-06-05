@@ -35,9 +35,9 @@ resource "tls_locally_signed_cert" "kubernetes" {
   count = "${length(var.controller_hosts)}"
 
   cert_request_pem   = "${element(tls_cert_request.kubernetes.*.cert_request_pem, count.index)}"
-  ca_key_algorithm   = "${tls_private_key.root.algorithm}"
-  ca_private_key_pem = "${tls_private_key.root.private_key_pem}"
-  ca_cert_pem        = "${tls_self_signed_cert.root.cert_pem}"
+  ca_key_algorithm   = "${tls_private_key.kubernetes_ca.algorithm}"
+  ca_private_key_pem = "${tls_private_key.kubernetes_ca.private_key_pem}"
+  ca_cert_pem        = "${tls_self_signed_cert.kubernetes_ca.cert_pem}"
 
   validity_period_hours = 8760
 

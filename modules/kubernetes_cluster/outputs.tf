@@ -7,5 +7,5 @@ output "kubernetes_private_key_pem" {
 }
 
 output "kubernetes_ca_pem" {
-  value = "${tls_self_signed_cert.root.cert_pem}"
+  value = "${tls_self_signed_cert.kubernetes_ca.cert_pem}"
 }

@@ -74,8 +74,8 @@ resource "matchbox_group" "ignition_controller" {
     kubelet_path = "${var.kubelet_path}"
     etcd_path    = "${var.etcd_path}"
 
-    tls_ca                     = "${replace(tls_self_signed_cert.root.cert_pem, "\n", "\\n")}"
-    tls_ca_key                 = "${replace(tls_private_key.root.private_key_pem, "\n", "\\n")}"
+    tls_ca                     = "${replace(tls_self_signed_cert.kubernetes_ca.cert_pem, "\n", "\\n")}"
+    tls_ca_key                 = "${replace(tls_private_key.kubernetes_ca.private_key_pem, "\n", "\\n")}"
     tls_kubernetes             = "${replace(element(tls_locally_signed_cert.kubernetes.*.cert_pem, count.index), "\n", "\\n")}"
     tls_kubernetes_key         = "${replace(element(tls_private_key.kubernetes.*.private_key_pem, count.index), "\n", "\\n")}"
     tls_controller_manager     = "${replace(tls_locally_signed_cert.controller_manager.cert_pem, "\n", "\\n")}"
