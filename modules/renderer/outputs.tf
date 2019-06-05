@@ -7,5 +7,5 @@ output "matchbox_private_key_pem" {
 }
 
 output "matchbox_ca_pem" {
-  value = "${tls_self_signed_cert.root.cert_pem}"
+  value = "${tls_self_signed_cert.matchbox_ca.cert_pem}"
 }
