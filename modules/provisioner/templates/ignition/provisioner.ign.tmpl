@@ -148,11 +148,11 @@ storage:
         inline: |
           fs.inotify.max_user_watches=16184
 
-    - path: {{.certs_path}}/ca.pem
+    - path: {{.certs_path}}/matchbox-ca.pem
       filesystem: root
       mode: 420
       contents:
-        inline: "{{.tls_ca}}"
+        inline: "{{.tls_matchbox_ca}}"
     - path: {{.certs_path}}/matchbox.pem
       filesystem: root
       mode: 420
@@ -601,7 +601,7 @@ storage:
               args:
               - "-address=0.0.0.0:{{.matchbox_http_port}}"
               - "-rpc-address=0.0.0.0:{{.matchbox_rpc_port}}"
-              - "-ca-file={{.certs_path}}/ca.pem"
+              - "-ca-file={{.certs_path}}/matchbox-ca.pem"
               - "-cert-file={{.certs_path}}/matchbox.pem"
               - "-key-file={{.certs_path}}/matchbox-key.pem"
               - "-data-path={{.matchbox_path}}"
