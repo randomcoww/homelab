@@ -49,9 +49,6 @@ export FEDORA_RELEASE=30
 wget \
     https://download.fedoraproject.org/pub/fedora/linux/releases/$FEDORA_RELEASE/Server/x86_64/iso/Fedora-Server-netinst-x86_64-$FEDORA_RELEASE-1.2.iso
 
-wget -O vm-0.ks \
-    http://127.0.0.1:8080/generic?ks=vm-0
-
 sudo livemedia-creator \
     --make-iso \
     --iso=./Fedora-Server-netinst-x86_64-$FEDORA_RELEASE-1.2.iso \
@@ -64,9 +61,6 @@ sudo livemedia-creator \
     --ks=./vm-0.ks \
     --no-virt \
     --lorax-templates ./lorax-vm
-
-wget -O vm-1.ks \
-    http://127.0.0.1:8080/generic?ks=vm-1
     
 sudo livemedia-creator \
     --make-iso \
@@ -170,9 +164,6 @@ export FEDORA_RELEASE=30
 
 wget \
     https://download.fedoraproject.org/pub/fedora/linux/releases/$FEDORA_RELEASE/Server/x86_64/iso/Fedora-Server-netinst-x86_64-$FEDORA_RELEASE-1.2.iso
-
-wget -O desktop-0.ks \
-    http://config.fuzzybunny.internal/generic?ks=desktop-0
 
 sudo livemedia-creator \
     --make-iso \
