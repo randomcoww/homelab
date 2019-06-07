@@ -39,7 +39,7 @@ terraform apply \
     -target=module.vm
 ```
 
-#### Hypervisor image
+#### Hypervisor and desktop images
 
 Generate hypervisor images:
 ```bash
@@ -61,7 +61,7 @@ sudo livemedia-creator \
     --ks=./vm-0.ks \
     --no-virt \
     --lorax-templates ./lorax-vm
-    
+
 sudo livemedia-creator \
     --make-iso \
     --iso=./Fedora-Server-netinst-x86_64-$FEDORA_RELEASE-1.2.iso \
@@ -74,7 +74,33 @@ sudo livemedia-creator \
     --ks=./vm-1.ks \
     --no-virt \
     --lorax-templates ./lorax-vm
+
+sudo livemedia-creator \
+    --make-iso \
+    --iso=./Fedora-Server-netinst-x86_64-$FEDORA_RELEASE-1.2.iso \
+    --project Fedora \
+    --volid desktop \
+    --releasever $FEDORA_RELEASE \
+    --title desktop \
+    --resultdir ./result \
+    --tmp . \
+    --ks=./ws-0.ks \
+    --no-virt \
+    --lorax-templates ./lorax-desktop \
+    --dracut-arg='--xz' \
+    --dracut-arg='--add-drivers vfio vfio_iommu_type1 vfio_pci vfio_virqfd' \
+    --dracut-arg='--add livenet dmsquash-live convertfs pollcdrom qemu qemu-net' \
+    --dracut-arg='--omit plymouth' \
+    --dracut-arg='--no-hostonly' \
+    --dracut-arg='--debug' \
+    --dracut-arg='--no-early-microcode'
 ```
+
+*Following dracut args are added to default*
+```
+--dracut-arg='--add-drivers vfio vfio_iommu_type1 vfio_pci vfio_virqfd'
+```
+
 These images can be written to a USB flash drive.
 
 #### Provisioner VM
@@ -146,49 +172,6 @@ virsh start controller-0
 Admin kubeconfig:
 ```
 setup_environment/output/kube-cluster/<name_of_cluster>/admin.kubeconfig
-```
-
-### Desktop provisioning
-
-Generate Kickstart:
-```bash
-cd resources
-terraform apply \
-    -target=module.desktop
-```
-
-Generate desktop images:
-```bash
-cd build
-export FEDORA_RELEASE=30
-
-wget \
-    https://download.fedoraproject.org/pub/fedora/linux/releases/$FEDORA_RELEASE/Server/x86_64/iso/Fedora-Server-netinst-x86_64-$FEDORA_RELEASE-1.2.iso
-
-sudo livemedia-creator \
-    --make-iso \
-    --iso=./Fedora-Server-netinst-x86_64-$FEDORA_RELEASE-1.2.iso \
-    --project Fedora \
-    --volid desktop \
-    --releasever $FEDORA_RELEASE \
-    --title desktop \
-    --resultdir ./result \
-    --tmp . \
-    --ks=./desktop-0.ks \
-    --no-virt \
-    --lorax-templates ./lorax-desktop \
-    --dracut-arg='--xz' \
-    --dracut-arg='--add-drivers vfio vfio_iommu_type1 vfio_pci vfio_virqfd' \
-    --dracut-arg='--add livenet dmsquash-live convertfs pollcdrom qemu qemu-net' \
-    --dracut-arg='--omit plymouth' \
-    --dracut-arg='--no-hostonly' \
-    --dracut-arg='--debug' \
-    --dracut-arg='--no-early-microcode'
-```
-
-Dracut args need to be modified to add vfio drivers into initrd. Following is added to default:
-```
---dracut-arg='--add-drivers vfio vfio_iommu_type1 vfio_pci vfio_virqfd'
 ```
 
 Built image can be written to a USB flash drive to boot live environment. Currently `/localhome` containing persistent user home directory is overlay mounted with ZFS.
