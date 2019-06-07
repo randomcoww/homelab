@@ -2,28 +2,12 @@
 ## desktop-* host kickstart for livecd-creator
 ##
 
-install
-skipx
-lang en_US.UTF-8
-keyboard us
 timezone --utc America/Los_Angeles
-auth --useshadow --passalgo=sha512
 selinux --disabled
-firewall --disabled
-zerombr
-clearpart --all --disklabel=gpt
 part / --size 20480 --fstype ext4
-rootpw --lock --iscrypted locked
-network --hostname={{.hostname}}
-shutdown
 
 ## Not used for live images. Add this to lorax template.
 # bootloader --append="elevator=noop intel_iommu=on iommu=pt plymouth.enable=0 rd.plymouth=0 rd.driver.pre=vfio-pci video=vesafb:off,efifb:off"
-
-repo --name=fedora --mirrorlist=https://mirrors.fedoraproject.org/mirrorlist?repo=fedora-$releasever&arch=$basearch
-repo --name=updates --mirrorlist=https://mirrors.fedoraproject.org/mirrorlist?repo=updates-released-f$releasever&arch=$basearch
-url --mirrorlist=https://mirrors.fedoraproject.org/mirrorlist?repo=fedora-$releasever&arch=$basearch
-repo --name=zfs-on-linux --baseurl=http://download.zfsonlinux.org/fedora/$releasever/$basearch/
 
 repo --name=rpmfusion-free --metalink=https://mirrors.rpmfusion.org/metalink?repo=free-fedora-$releasever&arch=$basearch
 repo --name=rpmfusion-free-updates --metalink=https://mirrors.rpmfusion.org/metalink?repo=free-fedora-updates-released-$releasever&arch=$basearch
@@ -36,35 +20,6 @@ repo --name=docker-ce-stable --baseurl=https://download.docker.com/linux/fedora/
 repo --name=docker-ce-stable-source --baseurl=https://download.docker.com/linux/fedora/29/source/stable
 
 %packages --excludeWeakdeps
-
-## common
-@core
-libvirt-daemon-kvm
-ksmtuned
-cronie
-chrony
-logrotate
-nfs-utils
-openssh-server
-glusterfs-server
-##
-
-## ZFS on linux
-kernel-devel
-zfs
--zfs-fuse
-##
-
-## livemedia-creator
-fedora-logos
-dracut-config-generic
-dracut-live
--dracut-config-rescue
-grub2-efi-x64-cdboot
-shim
-memtest86+
-syslinux
-##
 
 @firefox
 @fonts
@@ -106,33 +61,22 @@ jq
 ncmpcpp
 deadbeef
 
--plymouth
--plymouth-*
 -gnome-boxes
 -gnome-initial-setup
+
 %end
 
 ##
 ## user
 ##
 
-user --name={{.desktop_user}} --password={{.password}} --plaintext --uid=1000 --gid=1000 --groups=wheel,libvirt,docker,qemu,input --homedir={{.localhome_path}}/{{.desktop_user}}
+user --name={{.default_user}} --password={{.password}} --plaintext --uid=1000 --gid=1000 --groups=wheel,libvirt,docker,qemu,input --homedir={{.localhome_path}}/{{.default_user}}
 
 %post --erroronfail
 
 ##
 ## networkd
 ##
-
-## enable systemd-resolve
-ln -sf /run/systemd/resolve/resolv.conf /etc/resolv.conf
-
-## write all configs
-cat <<EOF > /etc/systemd/resolved.conf
-[Resolve]
-FallbackDNS=
-DNSStubListener=no
-EOF
 
 ## default
 
@@ -160,53 +104,10 @@ MTUBytes={{.mtu}}
 [Network]
 LinkLocalAddressing=no
 DHCP=no
-MACVTAP=int0
+MACVTAP={{.store_macvlan_if}}
 VLAN={{.lan_if}}
 VLAN={{.sync_if}}
 VLAN={{.wan_if}}
-EOF
-
-## vswitch bridge
-
-cat <<EOF > /etc/systemd/network/{{.ll_if}}.netdev
-[NetDev]
-Name={{.ll_if}}
-Kind=bridge
-EOF
-
-cat <<EOF > /etc/systemd/network/{{.ll_if}}.network
-[Match]
-Name={{.ll_if}}
-
-[Link]
-ARP=no
-MTUBytes={{.mtu}}
-
-[Network]
-LinkLocalAddressing=no
-DHCP=no
-MACVTAP=int1
-Bridge=dummy0
-EOF
-
-cat <<EOF > /etc/systemd/network/dummy0.netdev
-[NetDev]
-Name=dummy0
-Kind=dummy
-EOF
-
-cat <<EOF > /etc/systemd/network/dummy0.network
-[Match]
-Name=dummy0
-
-[Link]
-ARP=no
-MTUBytes={{.mtu}}
-
-[Network]
-LinkLocalAddressing=no
-DHCP=no
-Bridge=br0
 EOF
 
 ## vlan
@@ -240,18 +141,18 @@ EOF
 
 ## host macvtap
 
-cat <<EOF > /etc/systemd/network/int0.netdev
+cat <<EOF > /etc/systemd/network/{{.store_macvlan_if}}.netdev
 [NetDev]
-Name=int0
+Name={{.store_macvlan_if}}
 Kind=macvtap
 
 [MACVTAP]
 Mode=bridge
 EOF
 
-cat <<EOF > /etc/systemd/network/int0.network
+cat <<EOF > /etc/systemd/network/{{.store_macvlan_if}}.network
 [Match]
-Name=int0
+Name={{.store_macvlan_if}}
 
 [Link]
 MTUBytes={{.mtu}}
@@ -264,35 +165,13 @@ DHCP=yes
 Address={{.store_ip}}/{{.store_netmask}}
 EOF
 
-## host macvtap to vswitch
-
-cat <<EOF > /etc/systemd/network/int1.netdev
-[NetDev]
-Name=int1
-Kind=macvtap
-
-[MACVTAP]
-Mode=bridge
-EOF
-
-cat <<EOF > /etc/systemd/network/int1.network
-[Match]
-Name=int1
-
-[Link]
-MTUBytes={{.mtu}}
-
-[Network]
-LinkLocalAddressing=no
-DHCP=no
-
-[Address]
-Address={{.ll_ip}}/{{.ll_netmask}}
-EOF
-
 ##
 ## general file writes
 ##
+
+cat <<EOF > /etc/sysctl.d/local.conf
+vm.nr_hugepages=4096
+EOF
 
 ## Does not seem to work in live boot, particularly for vfio-pci. Added to boot parameter.
 # cat <<EOF > /etc/modprobe.d/local.conf
@@ -300,69 +179,21 @@ EOF
 # options kvm ignore_msrs=1
 # EOF
 
-cat <<EOF > /etc/ssh/sshd_config
-Subsystem sftp internal-sftp
-ClientAliveInterval 180
-UseDNS no
-PasswordAuthentication no
-ChallengeResponseAuthentication no
-EOF
-
 ## Not used. Pass this into livemedia-creator dracut-args.
 # cat <<EOF > /etc/dracut.conf.d/local.conf
 # add_drivers+="vfio vfio_iommu_type1 vfio_pci vfio_virqfd"
 # EOF
-
-cat <<EOF > /etc/sysctl.d/local.conf
-vm.nr_hugepages=4096
-EOF
-
-##
-## live image settings
-## systemd configs from https://linux.xvx.cz/2017/07/how-to-build-pxe-fedora-26-live-image.html
-## https://fedoraproject.org/wiki/LiveOS_image
-##
-
-cat <<EOF >> /etc/systemd/system.conf
-DumpCore=no
-EOF
-
-cat <<EOF >> /etc/systemd/journald.conf
-Storage=volatile
-RuntimeMaxUse=15M
-ForwardToSyslog=no
-ForwardToConsole=no
-EOF
-
-##
-## add modules to initramfs
-##
 
 ## Does not work with livemedia-creator
 # KERNEL_VERSION=$(rpm -q kernel --qf '%{version}-%{release}.%{arch}\n')
 # dracut -f /boot/initramfs-$KERNEL_VERSION.img $KERNEL_VERSION
 
 ##
-## enable services
-##
-
-systemctl enable \
-  systemd-networkd systemd-resolved chronyd crond \
-  libvirtd ksm ksmtuned \
-  zfs-import-cache zfs-import-scan zfs-mount zfs-share zfs-zed zfs.target nfs-server \
-  sshd glusterd docker
-
-systemctl mask \
-  NetworkManager
-
-systemctl set-default graphical.target
-
-##
 ## qemu.conf changes needed for evdev and pa
 ##
 
 cat <<EOF >> /etc/libvirt/qemu.conf
-user = "{{.desktop_user}}"
+user = "{{.default_user}}"
 cgroup_device_acl = [
     "/dev/null", "/dev/full", "/dev/zero",
     "/dev/random", "/dev/urandom",
@@ -374,22 +205,12 @@ cgroup_device_acl = [
 EOF
 
 ##
-## bootstrap image
+## enable services
 ##
 
-mkdir -p {{.container_linux_image_path}}
-cd {{.container_linux_image_path}}
-curl -O {{.container_linux_base_url}}/{{.container_linux_version}}/coreos_production_pxe.vmlinuz
-curl -O {{.container_linux_base_url}}/{{.container_linux_version}}/coreos_production_pxe_image.cpio.gz
+systemctl enable \
+  docker
 
-##
-## cleanup
-##
-
-dnf -y autoremove
-dnf -y clean all
-
-rm -f /etc/machine-id
-touch /etc/machine-id
+systemctl set-default graphical.target
 
 %end

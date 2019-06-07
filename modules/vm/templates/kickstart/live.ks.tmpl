@@ -1,0 +1,196 @@
+##
+## base kickstart for livecd-creator
+##
+
+install
+skipx
+lang en_US.UTF-8
+keyboard us
+timezone --utc Etc/UTC
+auth --useshadow --passalgo=sha512
+firewall --disabled
+zerombr
+clearpart --all --disklabel=gpt
+part / --size 5120 --fstype ext4
+rootpw --lock --iscrypted locked
+network
+shutdown
+
+repo --name=fedora --mirrorlist=https://mirrors.fedoraproject.org/mirrorlist?repo=fedora-$releasever&arch=$basearch
+repo --name=updates --mirrorlist=https://mirrors.fedoraproject.org/mirrorlist?repo=updates-released-f$releasever&arch=$basearch
+url --mirrorlist=https://mirrors.fedoraproject.org/mirrorlist?repo=fedora-$releasever&arch=$basearch
+repo --name=zfs-on-linux --baseurl=http://download.zfsonlinux.org/fedora/$releasever/$basearch/
+
+%packages --excludeWeakdeps --excludedocs
+
+## common
+@core
+libvirt-daemon-kvm
+ksmtuned
+cronie
+chrony
+logrotate
+nfs-utils
+openssh-server
+##
+
+## ZFS on linux
+kernel-devel
+zfs
+-zfs-fuse
+##
+
+## livemedia-creator
+fedora-logos
+dracut-config-generic
+dracut-live
+-dracut-config-rescue
+grub2-efi-x64-cdboot
+shim
+memtest86+
+syslinux
+##
+
+-plymouth
+-plymouth-*
+
+%end
+
+%post --erroronfail
+
+##
+## networkd
+##
+
+## enable systemd-resolve
+ln -sf /run/systemd/resolve/resolv.conf /etc/resolv.conf
+
+## write all configs
+cat <<EOF > /etc/systemd/resolved.conf
+[Resolve]
+FallbackDNS=
+DNSStubListener=no
+EOF
+
+## vswitch bridge
+
+cat <<EOF > /etc/systemd/network/{{.ll_if}}.netdev
+[NetDev]
+Name={{.ll_if}}
+Kind=bridge
+EOF
+
+cat <<EOF > /etc/systemd/network/{{.ll_if}}.network
+[Match]
+Name={{.ll_if}}
+
+[Link]
+ARP=no
+MTUBytes={{.mtu}}
+
+[Network]
+LinkLocalAddressing=no
+DHCP=no
+MACVTAP={{.ll_macvtap_if}}
+Bridge={{.dummy_if}}
+EOF
+
+cat <<EOF > /etc/systemd/network/{{.dummy_if}}.netdev
+[NetDev]
+Name={{.dummy_if}}
+Kind=dummy
+EOF
+
+cat <<EOF > /etc/systemd/network/{{.dummy_if}}.network
+[Match]
+Name={{.dummy_if}}
+
+[Link]
+ARP=no
+MTUBytes={{.mtu}}
+
+[Network]
+LinkLocalAddressing=no
+DHCP=no
+Bridge={{.ll_if}}
+EOF
+
+## host macvtap to vswitch
+
+cat <<EOF > /etc/systemd/network/{{.ll_macvtap_if}}.netdev
+[NetDev]
+Name={{.ll_macvtap_if}}
+Kind=macvtap
+
+[MACVTAP]
+Mode=bridge
+EOF
+
+cat <<EOF > /etc/systemd/network/{{.ll_macvtap_if}}.network
+[Match]
+Name={{.ll_macvtap_if}}
+
+[Link]
+MTUBytes={{.mtu}}
+
+[Network]
+LinkLocalAddressing=no
+DHCP=no
+
+[Address]
+Address={{.ll_ip}}/{{.ll_netmask}}
+EOF
+
+##
+## general file writes
+##
+
+cat <<EOF > /etc/ssh/sshd_config
+Subsystem sftp internal-sftp
+ClientAliveInterval 180
+UseDNS no
+PasswordAuthentication no
+ChallengeResponseAuthentication no
+EOF
+
+##
+## live image settings
+## systemd configs from https://linux.xvx.cz/2017/07/how-to-build-pxe-fedora-26-live-image.html
+## https://fedoraproject.org/wiki/LiveOS_image
+##
+
+cat <<EOF >> /etc/systemd/system.conf
+DumpCore=no
+EOF
+
+cat <<EOF >> /etc/systemd/journald.conf
+Storage=volatile
+RuntimeMaxUse=15M
+ForwardToSyslog=no
+ForwardToConsole=no
+EOF
+
+##
+## enable services
+##
+
+systemctl enable \
+  systemd-networkd systemd-resolved chronyd crond \
+  zfs-import-cache zfs-import-scan zfs-mount zfs-share zfs-zed zfs.target nfs-server \
+  libvirtd ksm ksmtuned \
+  sshd
+
+systemctl mask \
+  NetworkManager
+
+##
+## cleanup
+##
+
+dnf -y autoremove
+dnf -y clean all
+
+rm -f /etc/machine-id
+touch /etc/machine-id
+
+%end

@@ -19,8 +19,8 @@ variable "vm_store_ips" {
   type = "list"
 }
 
-variable "vm_store_if" {
-  type = "string"
+variable "vm_store_ifs" {
+  type = "list"
 }
 
 variable "store_netmask" {

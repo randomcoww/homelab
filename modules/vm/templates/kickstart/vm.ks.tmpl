@@ -2,62 +2,13 @@
 ## vm-* host kickstart for livecd-creator
 ##
 
-install
-skipx
-lang en_US.UTF-8
-keyboard us
-timezone --utc Etc/UTC
-auth --useshadow --passalgo=sha512
-firewall --disabled
-zerombr
-clearpart --all --disklabel=gpt
-part / --size 5120 --fstype ext4
-rootpw --lock --iscrypted locked
-network --hostname={{.hostname}}
-shutdown
-
 ## Not used for live images. Add this to lorax template.
 # bootloader --append="console=tty0 console=ttyS1,115200n8 elevator=noop intel_iommu=on iommu=pt rd.live.ram=1"
 
-repo --name=fedora --mirrorlist=https://mirrors.fedoraproject.org/mirrorlist?repo=fedora-$releasever&arch=$basearch
-repo --name=updates --mirrorlist=https://mirrors.fedoraproject.org/mirrorlist?repo=updates-released-f$releasever&arch=$basearch
-url --mirrorlist=https://mirrors.fedoraproject.org/mirrorlist?repo=fedora-$releasever&arch=$basearch
-repo --name=zfs-on-linux --baseurl=http://download.zfsonlinux.org/fedora/$releasever/$basearch/
-
 %packages --excludeWeakdeps --excludedocs
 
-## common
-@core
-libvirt-daemon-kvm
-ksmtuned
-cronie
-chrony
-logrotate
-nfs-utils
-openssh-server
-glusterfs-server
-##
-
-## ZFS on linux
-kernel-devel
-zfs
--zfs-fuse
-##
-
-## livemedia-creator
-fedora-logos
-dracut-config-generic
-dracut-live
--dracut-config-rescue
-grub2-efi-x64-cdboot
-shim
-memtest86+
-syslinux
-##
-
 -NetworkManager
--plymouth
--plymouth-*
+
 %end
 
 ##
@@ -72,16 +23,6 @@ sshkey --username={{.default_user}} "{{.ssh_authorized_key}}"
 ##
 ## networkd
 ##
-
-## enable systemd-resolve
-ln -sf /run/systemd/resolve/resolv.conf /etc/resolv.conf
-
-## write all configs
-cat <<EOF > /etc/systemd/resolved.conf
-[Resolve]
-FallbackDNS=
-DNSStubListener=no
-EOF
 
 ## default
 
@@ -109,53 +50,10 @@ MTUBytes={{.mtu}}
 [Network]
 LinkLocalAddressing=no
 DHCP=no
-MACVTAP=int0
+MACVTAP={{.store_macvlan_if}}
 VLAN={{.lan_if}}
 VLAN={{.sync_if}}
 VLAN={{.wan_if}}
-EOF
-
-## vswitch bridge
-
-cat <<EOF > /etc/systemd/network/{{.ll_if}}.netdev
-[NetDev]
-Name={{.ll_if}}
-Kind=bridge
-EOF
-
-cat <<EOF > /etc/systemd/network/{{.ll_if}}.network
-[Match]
-Name={{.ll_if}}
-
-[Link]
-ARP=no
-MTUBytes={{.mtu}}
-
-[Network]
-LinkLocalAddressing=no
-DHCP=no
-MACVTAP=int1
-Bridge=dummy0
-EOF
-
-cat <<EOF > /etc/systemd/network/dummy0.netdev
-[NetDev]
-Name=dummy0
-Kind=dummy
-EOF
-
-cat <<EOF > /etc/systemd/network/dummy0.network
-[Match]
-Name=dummy0
-
-[Link]
-ARP=no
-MTUBytes={{.mtu}}
-
-[Network]
-LinkLocalAddressing=no
-DHCP=no
-Bridge={{.ll_if}}
 EOF
 
 ## vlan
@@ -189,18 +87,18 @@ EOF
 
 ## host macvtap
 
-cat <<EOF > /etc/systemd/network/int0.netdev
+cat <<EOF > /etc/systemd/network/{{.store_macvlan_if}}.netdev
 [NetDev]
-Name=int0
+Name={{.store_macvlan_if}}
 Kind=macvtap
 
 [MACVTAP]
 Mode=bridge
 EOF
 
-cat <<EOF > /etc/systemd/network/int0.network
+cat <<EOF > /etc/systemd/network/{{.store_macvlan_if}}.network
 [Match]
-Name=int0
+Name={{.store_macvlan_if}}
 
 [Link]
 MTUBytes={{.mtu}}
@@ -213,76 +111,6 @@ DHCP=yes
 Address={{.store_ip}}/{{.store_netmask}}
 EOF
 
-## host macvtap to vswitch
-
-cat <<EOF > /etc/systemd/network/int1.netdev
-[NetDev]
-Name=int1
-Kind=macvtap
-
-[MACVTAP]
-Mode=bridge
-EOF
-
-cat <<EOF > /etc/systemd/network/int1.network
-[Match]
-Name=int1
-
-[Link]
-MTUBytes={{.mtu}}
-
-[Network]
-LinkLocalAddressing=no
-DHCP=no
-
-[Address]
-Address={{.ll_ip}}/{{.ll_netmask}}
-EOF
-
-##
-## general file writes
-##
-
-cat <<EOF > /etc/ssh/sshd_config
-Subsystem sftp internal-sftp
-ClientAliveInterval 180
-UseDNS no
-PasswordAuthentication no
-ChallengeResponseAuthentication no
-EOF
-
-##
-## live image settings
-## systemd configs from https://linux.xvx.cz/2017/07/how-to-build-pxe-fedora-26-live-image.html
-## https://fedoraproject.org/wiki/LiveOS_image
-##
-
-cat <<EOF >> /etc/systemd/system.conf
-DumpCore=no
-EOF
-
-cat <<EOF >> /etc/systemd/journald.conf
-Storage=volatile
-RuntimeMaxUse=15M
-ForwardToSyslog=no
-ForwardToConsole=no
-EOF
-
-##
-## enable services
-##
-
-systemctl enable \
-  systemd-networkd systemd-resolved chronyd crond \
-  libvirtd ksm ksmtuned \
-  zfs-import-cache zfs-import-scan zfs-mount zfs-share zfs-zed zfs.target nfs-server \
-  sshd glusterd
-
-systemctl mask \
-  NetworkManager
-
-systemctl set-default multi-user.target
-
 ##
 ## bootstrap image
 ##
@@ -291,15 +119,5 @@ mkdir -p {{.container_linux_image_path}}
 cd {{.container_linux_image_path}}
 curl -O {{.container_linux_base_url}}/{{.container_linux_version}}/coreos_production_pxe.vmlinuz
 curl -O {{.container_linux_base_url}}/{{.container_linux_version}}/coreos_production_pxe_image.cpio.gz
-
-##
-## cleanup
-##
-
-dnf -y autoremove
-dnf -y clean all
-
-rm -f /etc/machine-id
-touch /etc/machine-id
 
 %end
