@@ -1,5 +1,5 @@
 ##
-## matchbox
+## etcd server
 ##
 resource "tls_private_key" "etcd" {
   count = "${length(var.controller_hosts)}"
@@ -15,14 +15,17 @@ resource "tls_cert_request" "etcd" {
   private_key_pem = "${element(tls_private_key.etcd.*.private_key_pem, count.index)}"
 
   subject {
-    common_name  = "etcd"
+    common_name  = "${var.controller_hosts[count.index]}"
     organization = "etcd"
   }
 
-  ip_addresses = [
-    "127.0.0.1",
-    "${var.controller_ips[count.index]}",
-  ]
+  ip_addresses = "${concat(var.controller_ips, list("127.0.0.1"))}"
+
+  ## This generated rejected connection bad certificate errors
+  # ip_addresses = [
+  #   "${var.controller_ips[count.index]}",
+  #   "127.0.0.1",
+  # ]
 }
 
 resource "tls_locally_signed_cert" "etcd" {

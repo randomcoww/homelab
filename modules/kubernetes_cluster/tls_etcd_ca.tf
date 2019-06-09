@@ -14,13 +14,13 @@ resource "tls_self_signed_cert" "etcd_ca" {
   is_ca_certificate     = true
 
   subject {
-    common_name  = "etcd"
+    common_name  = "etcd-ca"
     organization = "etcd"
   }
 
   allowed_uses = [
-    "cert_signing",
-    "crl_signing",
+    "key_encipherment",
     "digital_signature",
+    "cert_signing",
   ]
 }
