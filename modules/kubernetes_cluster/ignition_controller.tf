@@ -89,5 +89,7 @@ resource "matchbox_group" "ignition_controller" {
     tls_etcd_ca  = "${replace(tls_self_signed_cert.etcd_ca.cert_pem, "\n", "\\n")}"
     tls_etcd     = "${replace(element(tls_locally_signed_cert.etcd.*.cert_pem, count.index), "\n", "\\n")}"
     tls_etcd_key = "${replace(element(tls_private_key.etcd.*.private_key_pem, count.index), "\n", "\\n")}"
+    tls_etcd_client     = "${replace(element(tls_locally_signed_cert.etcd_client.*.cert_pem, count.index), "\n", "\\n")}"
+    tls_etcd_client_key = "${replace(element(tls_private_key.etcd_client.*.private_key_pem, count.index), "\n", "\\n")}"
   }
 }
