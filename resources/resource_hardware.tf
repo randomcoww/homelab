@@ -1,6 +1,6 @@
 # Matchbox configs for PXE environment with matchbox renderer
-module "vm" {
-  source = "../modules/vm"
+module "hardware" {
+  source = "../modules/hardware"
 
   ## user (default container linux)
   default_user      = "${local.default_user}"
@@ -8,12 +8,14 @@ module "vm" {
   ssh_ca_public_key = "${tls_private_key.ssh_ca.public_key_openssh}"
 
   ## host configs
-  vm_hosts     = ["vm-0", "vm-1", "ws-0"]
-  vm_store_ips = ["192.168.127.251", "192.168.127.252", "192.168.127.253"]
-  vm_store_ifs = ["enp1s0f0", "enp1s0f0", "eno2"]
+  vm_hosts     = ["vm-0", "vm-1"]
+  vm_store_ips = ["192.168.127.251", "192.168.127.252"]
+  vm_store_ifs = ["enp1s0f0", "enp1s0f0"]
 
-  vm_ll_ip = "${local.host_ll_ip}"
-  mtu      = "${local.default_mtu}"
+  desktop_hosts = ["desktop-0"]
+
+  ll_ip = "${local.host_ll_ip}"
+  mtu   = "${local.default_mtu}"
 
   store_netmask = "${local.subnet_store_netmask}"
   ll_netmask    = "${local.subnet_ll_netmask}"

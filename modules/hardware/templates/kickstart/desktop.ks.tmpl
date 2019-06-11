@@ -1,0 +1,109 @@
+##
+## desktop-* host kickstart for livecd-creator
+##
+
+timezone --utc America/Los_Angeles
+selinux --disabled
+part / --size 20480 --fstype ext4
+
+## Not used for live images. Add this to lorax template.
+# bootloader --append="rd.live.image elevator=noop intel_iommu=on iommu=pt rd.live.ram=1 plymouth.enable=0 rd.plymouth=0 rd.driver.blacklist=nouveau modprobe.blacklist=nouveau"
+
+repo --name=rpmfusion-free --metalink=https://mirrors.rpmfusion.org/metalink?repo=free-fedora-$releasever&arch=$basearch
+repo --name=rpmfusion-free-updates --metalink=https://mirrors.rpmfusion.org/metalink?repo=free-fedora-updates-released-$releasever&arch=$basearch
+repo --name=rpmfusion-nonfree --metalink=https://mirrors.rpmfusion.org/metalink?repo=nonfree-fedora-$releasever&arch=$basearch
+repo --name=rpmfusion-nonfree-updates --metalink=https://mirrors.rpmfusion.org/metalink?repo=nonfree-fedora-updates-released-$releasever&arch=$basearch
+
+repo --name=kubernetes --baseurl=https://packages.cloud.google.com/yum/repos/kubernetes-el7-$basearch
+repo --name=code --baseurl=https://packages.microsoft.com/yumrepos/vscode
+repo --name=docker-ce-stable --baseurl=https://download.docker.com/linux/fedora/29/$basearch/stable
+repo --name=docker-ce-stable-source --baseurl=https://download.docker.com/linux/fedora/29/source/stable
+
+%packages --excludeWeakdeps
+
+@firefox
+@fonts
+@gnome-desktop
+@hardware-support
+@printing
+@base-x
+hdparm
+ipmitool
+pciutils
+lm_sensors
+libvirt-client
+rsync
+tmux
+xclip
+# docker-ce
+# docker-compose
+vim-enhanced
+git
+golang
+kubectl
+code
+mpv
+youtube-dl
+nmap
+unzip
+awscli
+lorax-lmc-novirt
+xorriso
+virt-viewer
+gimp
+ldns-utils
+openssl
+steam
+vlc
+jq
+ncmpcpp
+deadbeef
+xorg-x11-drv-nvidia
+akmod-nvidia
+xorg-x11-drv-nvidia-cuda
+vdpauinfo
+libva-vdpau-driver
+libva-utils
+
+-gnome-boxes
+-gnome-initial-setup
+
+%end
+
+##
+## user
+##
+
+user --name={{.default_user}} --password={{.password}} --plaintext --uid=1000 --gid=1000 --groups=wheel,libvirt,docker,qemu,input --homedir={{.localhome_path}}/{{.default_user}}
+
+%post --erroronfail
+
+##
+## networkd
+##
+
+## default
+
+cat <<EOF > /etc/systemd/network/00_en.network
+[Match]
+Name=en*
+
+[Network]
+LinkLocalAddressing=no
+DHCP=yes
+
+[DHCP]
+UseMTU=yes
+CriticalConnection=true
+EOF
+
+##
+## enable services
+##
+
+# systemctl enable \
+#   docker
+
+systemctl set-default graphical.target
+
+%end

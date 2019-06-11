@@ -15,6 +15,10 @@ variable "vm_hosts" {
   type = "list"
 }
 
+variable "desktop_hosts" {
+  type = "list"
+}
+
 variable "vm_store_ips" {
   type = "list"
 }
@@ -27,12 +31,12 @@ variable "store_netmask" {
   type = "string"
 }
 
-variable "vm_ll_if" {
+variable "ll_if" {
   type    = "string"
   default = "br0"
 }
 
-variable "vm_ll_ip" {
+variable "ll_ip" {
   type = "string"
 }
 

@@ -15,8 +15,8 @@ resource "matchbox_group" "generic_live" {
   }
 
   metadata {
-    ll_ip         = "${var.vm_ll_ip}"
-    ll_if         = "${var.vm_ll_if}"
+    ll_ip         = "${var.ll_ip}"
+    ll_if         = "${var.ll_if}"
     ll_netmask    = "${var.ll_netmask}"
     ll_macvtap_if = "int1"
     dummy_if      = "dummy0"
