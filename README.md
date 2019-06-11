@@ -84,16 +84,9 @@ sudo livemedia-creator \
     --title desktop \
     --resultdir ./result \
     --tmp . \
-    --ks=./ws-0.ks \
+    --ks=./desktop-0.ks \
     --no-virt \
-    --lorax-templates ./lorax-desktop \
-    --dracut-arg='--xz' \
-    --dracut-arg='--add-drivers vfio vfio_iommu_type1 vfio_pci vfio_virqfd' \
-    --dracut-arg='--add livenet dmsquash-live convertfs pollcdrom qemu qemu-net' \
-    --dracut-arg='--omit plymouth' \
-    --dracut-arg='--no-hostonly' \
-    --dracut-arg='--debug' \
-    --dracut-arg='--no-early-microcode'
+    --lorax-templates ./lorax-desktop
 ```
 
 *Following dracut args are added to default*
