@@ -16,8 +16,11 @@ repo --name=rpmfusion-nonfree-updates --metalink=https://mirrors.rpmfusion.org/m
 
 repo --name=kubernetes --baseurl=https://packages.cloud.google.com/yum/repos/kubernetes-el7-$basearch
 repo --name=code --baseurl=https://packages.microsoft.com/yumrepos/vscode
+repo --name=winehq --baseurl=https://dl.winehq.org/wine-builds/fedora/$releasever
+
 repo --name=docker-ce-stable --baseurl=https://download.docker.com/linux/fedora/29/$basearch/stable
 repo --name=docker-ce-stable-source --baseurl=https://download.docker.com/linux/fedora/29/source/stable
+repo --name=docker-ce-stable-debuginfo --baseurl=https://download.docker.com/linux/fedora/29/debug-$basearch/stable
 
 %packages --excludeWeakdeps
 
@@ -35,8 +38,8 @@ libvirt-client
 rsync
 tmux
 xclip
-# docker-ce
-# docker-compose
+docker-ce
+docker-compose
 vim-enhanced
 git
 golang
@@ -53,7 +56,6 @@ virt-viewer
 gimp
 ldns-utils
 openssl
-steam
 vlc
 jq
 ncmpcpp
@@ -65,6 +67,19 @@ vdpauinfo
 libva-vdpau-driver
 libva-utils
 
+## gaming
+steam
+lutris
+gnutls
+gnutls-devel
+openldap
+openldap-devel
+libgpg-error
+sqlite2.i686
+sqlite2.x86_64
+winehq-staging
+##
+
 -gnome-boxes
 -gnome-initial-setup
 
@@ -74,7 +89,7 @@ libva-utils
 ## user
 ##
 
-user --name={{.default_user}} --password={{.password}} --plaintext --uid=1000 --gid=1000 --groups=wheel,libvirt,docker,qemu,input --homedir={{.localhome_path}}/{{.default_user}}
+user --name={{.default_user}} --password={{.password}} --plaintext --uid=1000 --gid=1000 --groups=wheel,libvirt,docker --homedir={{.localhome_path}}/{{.default_user}}
 
 %post --erroronfail
 
@@ -101,8 +116,8 @@ EOF
 ## enable services
 ##
 
-# systemctl enable \
-#   docker
+systemctl enable \
+  docker
 
 systemctl set-default graphical.target
 
