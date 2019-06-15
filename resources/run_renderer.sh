@@ -6,8 +6,7 @@ terraform apply -auto-approve \
     -target=local_file.matchbox_private_key_pem \
     -target=local_file.matchbox_cert_pem 
 
-docker run -it --rm \
-    --user $(id -u):$(id -g) \
+podman run -it --rm \
     -v "$(pwd)"/output/renderer:/etc/matchbox \
     -v "$(pwd)"/output/renderer:/var/lib/matchbox \
     -p 8080:8080 \
