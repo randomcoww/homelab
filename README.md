@@ -36,7 +36,7 @@ Generates configuration for the PXE boot environment on the local Matchbox insta
 cd resources
 terraform apply \
     -target=module.provisioner \
-    -target=module.vm
+    -target=module.hardware
 ```
 
 #### Hypervisor and desktop images
@@ -87,11 +87,6 @@ sudo livemedia-creator \
     --ks=./desktop-0.ks \
     --no-virt \
     --lorax-templates ./lorax-desktop
-```
-
-*Following dracut args are added to default*
-```
---dracut-arg='--add-drivers vfio vfio_iommu_type1 vfio_pci vfio_virqfd'
 ```
 
 These images can be written to a USB flash drive.
