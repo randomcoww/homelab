@@ -26,7 +26,8 @@ resource "matchbox_group" "ignition_controller" {
   profile = "${matchbox_profile.ignition_controller.name}"
 
   selector {
-    mac = "${var.controller_macs[count.index]}"
+    # mac = "${var.controller_macs[count.index]}"
+    ign = "${var.controller_hosts[count.index]}"
   }
 
   metadata {

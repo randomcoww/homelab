@@ -26,7 +26,8 @@ resource "matchbox_group" "ignition_worker" {
   profile = "${matchbox_profile.ignition_worker.name}"
 
   selector {
-    mac = "${var.worker_macs[count.index]}"
+    # mac = "${var.worker_macs[count.index]}"
+    ign = "${var.worker_hosts[count.index]}"
   }
 
   metadata {
