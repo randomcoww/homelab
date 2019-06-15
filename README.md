@@ -17,7 +17,7 @@ The hypervisor and all VMs run on RAM disk and keep no state. Any persistent con
 Generates minimal configuration for standing up a local Matchbox server that accepts configuration from terraform and provides rendered configuration over http.
 This is used to render configuration that cannot be provided over PXE (i.e. provisioner for the PXE server itself and hypervisor that they run on).
 
-Start local Matchbox on Docker
+Start local Matchbox in a container (using podman)
 ```bash
 cd resources
 ./run_matchbox.sh
