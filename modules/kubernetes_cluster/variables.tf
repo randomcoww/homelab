@@ -144,8 +144,7 @@ variable "internal_domain" {
 }
 
 variable "cluster_domain" {
-  type    = "string"
-  default = "cluster.local"
+  type = "string"
 }
 
 variable "kubelet_path" {

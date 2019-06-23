@@ -78,6 +78,7 @@ module "kubernetes_cluster" {
 
   ## kubernetes
   cluster_name       = "${local.kubernetes_cluster_name}"
+  cluster_domain     = "${local.kubernetes_cluster_domain}"
   etcd_cluster_token = "etcd-default"
 
   ## ports

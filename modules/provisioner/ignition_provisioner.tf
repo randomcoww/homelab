@@ -73,7 +73,8 @@ resource "matchbox_group" "ignition_provisioner" {
     vwan_if       = "${var.provisioner_vwan_if}"
     mtu           = "${var.mtu}"
 
-    internal_domain = "${var.internal_domain}"
+    internal_domain           = "${var.internal_domain}"
+    kubernetes_cluster_domain = "${var.kubernetes_cluster_domain}"
 
     lan_ip_range        = "${var.lan_ip_range}"
     lan_dhcp_ip_range   = "${var.lan_dhcp_ip_range}"

@@ -10,7 +10,8 @@ module "provisioner" {
   ssh_ca_public_key = "${tls_private_key.ssh_ca.public_key_openssh}"
 
   ## domain
-  internal_domain = "${local.internal_domain}"
+  internal_domain           = "${local.internal_domain}"
+  kubernetes_cluster_domain = "${local.kubernetes_cluster_domain}"
 
   ## host configs
   provisioner_hosts     = ["provisioner-0", "provisioner-1"]

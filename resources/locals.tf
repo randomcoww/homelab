@@ -13,10 +13,11 @@ locals {
   renderer_private_key_pem = "${module.provisioner.matchbox_private_key_pem}"
   renderer_ca_pem          = "${module.provisioner.matchbox_ca_pem}"
 
-  recursive_dns_vip = "192.168.126.241"
-  internal_dns_vip  = "192.168.126.127"
-  store_gateway_vip = "192.168.126.240"
-  internal_domain   = "fuzzybunny.internal"
+  recursive_dns_vip         = "192.168.126.241"
+  internal_dns_vip          = "192.168.126.127"
+  store_gateway_vip         = "192.168.126.240"
+  internal_domain           = "fuzzybunny.internal"
+  kubernetes_cluster_domain = "cluster.local"
 
   default_user = "core"
 
