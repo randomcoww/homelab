@@ -22,5 +22,8 @@ resource "matchbox_group" "generic_desktop" {
     default_user   = "${var.default_user}"
     localhome_path = "/localhome"
     password       = "${var.password}"
+
+    store_macvlan_if = "int0"
+    mtu              = "${var.mtu}"
   }
 }

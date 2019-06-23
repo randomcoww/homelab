@@ -116,7 +116,6 @@ systemd:
           --config={{.kubelet_path}}/kubelet-config.yaml \
           --node-ip={{.sync_ip}} \
           --register-node=false \
-          --pod-manifest-path={{.kubelet_path}}/manifests \
           --container-runtime=remote \
           --container-runtime-endpoint=unix:///run/containerd/containerd.sock
         ExecStop=-/usr/bin/rkt stop --uuid-file=/var/cache/kubelet-pod.uuid
@@ -201,7 +200,7 @@ storage:
               enabled: false
           authorization:
             mode: AlwaysAllow
-          StaticPodPath: {{.kubelet_path}}/manifests
+          staticPodPath: {{.kubelet_path}}/manifests
           makeIPTablesUtilChains: false
 
     - path: {{.kubelet_path}}/manifests/nftables.yaml

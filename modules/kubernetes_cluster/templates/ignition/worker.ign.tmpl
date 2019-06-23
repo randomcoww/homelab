@@ -27,6 +27,18 @@ networkd:
 
 systemd:
   units:
+    - name: pv.mount
+      enable: true
+      contents: |
+        [Unit]
+        Before=local-fs.target
+        [Mount]
+        What=/dev/sda
+        Where=/pv
+        Type=ext4
+        [Install]
+        WantedBy=local-fs.target
+
     - name: docker.service
       mask: true
     - name: docker.socket
@@ -47,12 +59,14 @@ systemd:
         [Unit]
         Description=Kubelet via Hyperkube ACI
         After=network.target
+        After=pv.mount
+        Requires=pv.mount
 
         [Service]
         Environment="KUBELET_IMAGE=docker://{{.kubelet_image}}"
         Environment="RKT_RUN_ARGS=--uuid-file-save=/var/cache/kubelet-pod.uuid \
           --volume=resolv,kind=host,source=/etc/resolv.conf \
-          --volume var-lib-containerd,kind=host,source=/var/lib/containerd,readOnly=false \
+          --volume var-lib-containerd,kind=host,source=/pv/containerd,readOnly=false \
           --mount volume=resolv,target=/etc/resolv.conf \
           --mount volume=var-lib-containerd,target=/var/lib/containerd \
           --insecure-options=image"
@@ -77,6 +91,13 @@ systemd:
         WantedBy=multi-user.target
 
 storage:
+  filesystems:
+    - name: pv
+      mount:
+        device: /dev/sda
+        format: ext4
+        wipeFilesystem: false
+        label: PV
   files:
     - path: /etc/hostname
       filesystem: root
@@ -112,6 +133,7 @@ storage:
       mode: 420
       contents:
         inline: |-
+          root = "/pv/containerd"
           subreaper = true
           oom_score = -999
           [plugins]

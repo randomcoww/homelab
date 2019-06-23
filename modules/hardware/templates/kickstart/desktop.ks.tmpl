@@ -20,7 +20,7 @@ repo --name=rpmfusion-nonfree-rawhide --metalink=https://mirrors.rpmfusion.org/m
 repo --name=kubernetes --baseurl=https://packages.cloud.google.com/yum/repos/kubernetes-el7-$basearch
 repo --name=code --baseurl=https://packages.microsoft.com/yumrepos/vscode
 repo --name=winehq --baseurl=https://dl.winehq.org/wine-builds/fedora/$releasever
-# repo --name=docker-ce-stable --baseurl=https://download.docker.com/linux/fedora/29/$basearch/stable
+repo --name=docker-ce-stable --baseurl=https://download.docker.com/linux/fedora/29/$basearch/stable
 
 %packages
 
@@ -109,21 +109,45 @@ cat <<EOF > /etc/systemd/network/00_en.network
 [Match]
 Name=en*
 
+[Link]
+ARP=no
+MTUBytes={{.mtu}}
+
+[Network]
+LinkLocalAddressing=no
+DHCP=no
+MACVTAP={{.store_macvlan_if}}
+EOF
+
+## host macvtap
+
+cat <<EOF > /etc/systemd/network/{{.store_macvlan_if}}.netdev
+[NetDev]
+Name={{.store_macvlan_if}}
+Kind=macvtap
+
+[MACVTAP]
+Mode=bridge
+EOF
+
+cat <<EOF > /etc/systemd/network/{{.store_macvlan_if}}.network
+[Match]
+Name={{.store_macvlan_if}}
+
+[Link]
+MTUBytes={{.mtu}}
+
 [Network]
 LinkLocalAddressing=no
 DHCP=yes
-
-[DHCP]
-UseMTU=yes
-CriticalConnection=true
 EOF
 
 ##
 ## enable services
 ##
 
-# systemctl enable \
-#   docker
+systemctl enable \
+  docker
 
 systemctl set-default graphical.target
 
