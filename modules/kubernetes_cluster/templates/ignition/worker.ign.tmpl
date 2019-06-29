@@ -48,6 +48,10 @@ systemd:
       dropins:
         - name: containerd.conf
           contents: |
+            [Unit]
+            After=pv.mount
+            Requires=pv.mount
+
             [Service]
             LimitNOFILE=infinity
             ExecStart=
@@ -92,12 +96,12 @@ systemd:
 
 storage:
   filesystems:
-    - name: pv
+    - name: pvcontainer
       mount:
         device: /dev/sda
         format: ext4
         wipeFilesystem: false
-        label: PV
+        label: PVCONTAINER
   files:
     - path: /etc/hostname
       filesystem: root
