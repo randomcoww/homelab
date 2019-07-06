@@ -39,7 +39,8 @@ resource "matchbox_group" "ignition_provisioner" {
 
     kubelet_image    = "${var.kubelet_image}"
     keepalived_image = "${var.keepalived_image}"
-    unbound_image    = "${var.unbound_image}"
+    coredns_image    = "${var.coredns_image}"
+    busybox_image    = "${var.busybox_image}"
     nftables_image   = "${var.nftables_image}"
     kea_image        = "${var.kea_image}"
     tftpd_image      = "${var.tftpd_image}"

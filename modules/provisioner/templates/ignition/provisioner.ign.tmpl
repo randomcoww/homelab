@@ -468,7 +468,7 @@ storage:
             - name: kea-path
               emptyDir: {}
 
-    - path: {{.kubelet_path}}/manifests/unbound.yaml
+    - path: {{.kubelet_path}}/manifests/coredns.yaml
       filesystem: root
       mode: 420
       contents:
@@ -478,45 +478,94 @@ storage:
           kind: Pod
           metadata:
             namespace: kube-system
-            name: unbound
+            name: coredns
           spec:
             restartPolicy: Always
             hostNetwork: true
-            containers:
-            - name: unbound
-              image: {{.unbound_image}}
+            dnsPolicy: Default
+            initContainers:
+            - name: configwriter
+              image: "{{.busybox_image}}"
+              imagePullPolicy: IfNotPresent
+              args: [ "/bin/sh", "-c", "echo -en \"$CONFIG\" > $CONFIG_PATH" ]
               env:
-              - name: UNBOUND_LOCAL_CONFIG
+              - name: CONFIG
                 value: |-
-                  server:
-                    interface-automatic: yes
-                    port: 53
-                    interface: 0.0.0.0
-                    num-threads: 2
-                    do-ip6: no
-                    do-udp: yes
-                    do-tcp: yes
-                    access-control: 0.0.0.0/0 allow
-                    do-not-query-localhost: no
-                    local-data: "{{.matchbox_dns_name}}.{{.internal_domain}} 300 A {{.matchbox_vip}}"
-                  private-domain: "{{.internal_domain}}"
-                  private-domain: "{{.kubernetes_cluster_domain}}"
-                  domain-insecure: "{{.internal_domain}}"
-                  domain-insecure: "{{.kubernetes_cluster_domain}}"
-                  unblock-lan-zones: yes
-                  insecure-lan-zones: yes
-                  stub-zone:
-                    name: "{{.internal_domain}}"
-                    stub-addr: {{.internal_dns_vip}}
-                  stub-zone:
-                    name: "{{.kubernetes_cluster_domain}}"
-                    stub-addr: {{.internal_dns_vip}}
-                  forward-zone:
-                    name: "."
-                    forward-tls-upstream: yes
-                    forward-addr: {{.public_dns_ip}}@853
-                  remote-control:
-                    control-enable: no
+                  {{.internal_domain}}:53 {
+                    errors
+                    forward . {{.internal_dns_vip}}
+                  }
+                  {{.kubernetes_cluster_domain}}:53 {
+                    errors
+                    forward . {{.internal_dns_vip}}
+                  }
+                  .:53 {
+                    errors
+                    health
+                    forward . tls://{{.public_dns_ip}} {
+                      tls_servername dns.quad9.net
+                      health_check 5s
+                    }
+                    prometheus :9153
+                    cache 30
+                    reload
+                    loadbalance
+                  }
+              - name: CONFIG_PATH
+                value: /etc/coredns/Corefile
+              volumeMounts:
+              - name: config-volume
+                mountPath: /etc/coredns
+            containers:
+            - name: coredns
+              image: "{{.coredns_image}}"
+              imagePullPolicy: IfNotPresent
+              resources:
+                limits:
+                  memory: 170Mi
+                requests:
+                  cpu: 100m
+                  memory: 70Mi
+              args: [ "-conf", "/etc/coredns/Corefile" ]
+              volumeMounts:
+              - name: config-volume
+                mountPath: /etc/coredns
+                readOnly: true
+              ports:
+              - containerPort: 53
+                name: dns
+                protocol: UDP
+              - containerPort: 53
+                name: dns-tcp
+                protocol: TCP
+              - containerPort: 9153
+                name: metrics
+                protocol: TCP
+              livenessProbe:
+                httpGet:
+                  path: /health
+                  port: 8080
+                  scheme: HTTP
+                initialDelaySeconds: 60
+                timeoutSeconds: 5
+                successThreshold: 1
+                failureThreshold: 5
+              readinessProbe:
+                httpGet:
+                  path: /health
+                  port: 8080
+                  scheme: HTTP
+              securityContext:
+                allowPrivilegeEscalation: false
+                capabilities:
+                  add:
+                  - NET_BIND_SERVICE
+                  drop:
+                  - all
+                readOnlyRootFilesystem: true
+            volumes:
+            - name: config-volume
+              emptyDir: {}
 
     - path: {{.kubelet_path}}/manifests/keepalived.yaml
       filesystem: root

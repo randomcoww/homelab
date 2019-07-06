@@ -28,7 +28,8 @@ module "provisioner" {
 
   kubelet_image    = "randomcoww/kubelet:latest"
   keepalived_image = "randomcoww/keepalived:20190319.03"
-  unbound_image    = "randomcoww/unbound:20190119.01"
+  coredns_image    = "coredns/coredns:1.5.0"
+  busybox_image    = "busybox:latest"
   nftables_image   = "randomcoww/nftables:20190119.01"
   kea_image        = "randomcoww/kea:20190119.01"
   tftpd_image      = "randomcoww/tftpd_ipxe:20190119.01"

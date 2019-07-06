@@ -74,7 +74,11 @@ variable "keepalived_image" {
   type = "string"
 }
 
-variable "unbound_image" {
+variable "coredns_image" {
+  type = "string"
+}
+
+variable "busybox_image" {
   type = "string"
 }
 
