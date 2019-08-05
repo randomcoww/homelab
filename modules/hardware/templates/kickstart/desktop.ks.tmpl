@@ -20,7 +20,7 @@ repo --name=rpmfusion-nonfree-rawhide --metalink=https://mirrors.rpmfusion.org/m
 repo --name=kubernetes --baseurl=https://packages.cloud.google.com/yum/repos/kubernetes-el7-$basearch
 repo --name=code --baseurl=https://packages.microsoft.com/yumrepos/vscode
 repo --name=winehq --baseurl=https://dl.winehq.org/wine-builds/fedora/$releasever
-repo --name=docker-ce-stable --baseurl=https://download.docker.com/linux/fedora/29/$basearch/stable
+repo --name=docker-ce-stable --baseurl=https://download.docker.com/linux/fedora/$releasever/$basearch/stable
 
 %packages
 
@@ -141,6 +141,15 @@ MTUBytes={{.mtu}}
 LinkLocalAddressing=no
 DHCP=yes
 EOF
+
+##
+## bootstrap image
+##
+
+mkdir -p {{.container_linux_image_path}}
+cd {{.container_linux_image_path}}
+curl -O {{.container_linux_base_url}}/{{.container_linux_version}}/coreos_production_pxe.vmlinuz
+curl -O {{.container_linux_base_url}}/{{.container_linux_version}}/coreos_production_pxe_image.cpio.gz
 
 ##
 ## enable services

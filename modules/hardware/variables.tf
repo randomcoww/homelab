@@ -10,6 +10,11 @@ variable "ssh_ca_public_key" {
   type = "string"
 }
 
+variable "kubelet_path" {
+  type    = "string"
+  default = "/var/lib/kubelet"
+}
+
 ## vm
 variable "vm_hosts" {
   type = "list"
@@ -73,6 +78,15 @@ variable "container_linux_base_url" {
 }
 
 variable "container_linux_version" {
+  type = "string"
+}
+
+## Static pod manifest path
+variable "matchbox_vip" {
+  type = "string"
+}
+
+variable "matchbox_http_port" {
   type = "string"
 }
 

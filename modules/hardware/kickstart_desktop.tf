@@ -25,5 +25,9 @@ resource "matchbox_group" "generic_desktop" {
 
     store_macvlan_if = "int0"
     mtu              = "${var.mtu}"
+
+    container_linux_image_path = "${var.container_linux_image_path}"
+    container_linux_base_url   = "${var.container_linux_base_url}"
+    container_linux_version    = "${var.container_linux_version}"
   }
 }

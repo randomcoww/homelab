@@ -25,6 +25,10 @@ module "hardware" {
   container_linux_base_url   = "https://beta.release.core-os.net/amd64-usr"
   container_linux_version    = "current"
 
+  ## static pod provisioning
+  matchbox_vip       = "${local.matchbox_vip}"
+  matchbox_http_port = "${local.matchbox_http_port}"
+
   ## renderer provisioning access
   renderer_endpoint        = "${local.local_renderer_endpoint}"
   renderer_cert_pem        = "${local.local_renderer_cert_pem}"
