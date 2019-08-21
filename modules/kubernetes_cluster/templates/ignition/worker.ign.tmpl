@@ -39,6 +39,8 @@ systemd:
         [Install]
         WantedBy=local-fs.target
 
+    - name: iscsid.service
+      enable: true
     - name: docker.service
       mask: true
     - name: docker.socket
@@ -71,8 +73,10 @@ systemd:
         Environment="RKT_RUN_ARGS=--uuid-file-save=/var/cache/kubelet-pod.uuid \
           --volume=resolv,kind=host,source=/etc/resolv.conf \
           --volume var-lib-containerd,kind=host,source=/pv/containerd,readOnly=false \
+          --volume iscsiadm,kind=host,source=/usr/sbin/iscsiadm \
           --mount volume=resolv,target=/etc/resolv.conf \
           --mount volume=var-lib-containerd,target=/var/lib/containerd \
+          --mount volume=iscsiadm,target=/usr/sbin/iscsiadm \
           --insecure-options=image"
         ExecStartPre=/bin/mkdir -p \
           /var/log/containers \
