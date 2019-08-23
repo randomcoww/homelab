@@ -10,7 +10,7 @@ Config rendering is handled by [CoreOS Matchbox](https://github.com/coreos/match
 
 S3 is used as the backend store for Terraform and requires AWS access from the dev environment.
 
-The hypervisor and all VMs run on RAM disk and keep no state. Hardware hosts participate in a [Minio](https://min.io/) cluster for persistent storage via S3 API or via iSCSI + [s3backer](https://github.com/archiecobbs/s3backer) on top of Minio.
+The hypervisor and all VMs run on RAM disk and keep no state. Hardware hosts participate in a [Minio](https://min.io/) cluster for persistent storage over S3 API or over iSCSI + [s3backer](https://github.com/archiecobbs/s3backer) on top of Minio.
 
 ### Renderer
 
