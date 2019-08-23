@@ -89,7 +89,7 @@ sudo livemedia-creator \
     --lorax-templates ./lorax-desktop
 ```
 
-These images can be written to a USB flash drive.
+These images are bootable and intended for running from a USB flash drive. Image is copied to and runs entirely in RAM. There is no data persistence on these images.
 
 Hypervisor hosts vm-* are able to run static pods. Currenrly this is used to run Minio. This may move to being served over http from provisioner Matchbox.
 
