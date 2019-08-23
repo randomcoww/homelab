@@ -10,7 +10,7 @@ Config rendering is handled by [CoreOS Matchbox](https://github.com/coreos/match
 
 S3 is used as the backend store for Terraform and requires AWS access from the dev environment.
 
-The hypervisor and all VMs run on RAM disk and keep no state. Any persistent configuration is intended to live on shared NFS (at 192.168.126.251 in my case).
+The hypervisor and all VMs run on RAM disk and keep no state. Hardware hosts participate in a [Minio](https://min.io/) cluster for persistent storage via S3 API or via iSCSI + [s3backer](https://github.com/archiecobbs/s3backer) on top of Minio.
 
 ### Renderer
 
@@ -90,6 +90,8 @@ sudo livemedia-creator \
 ```
 
 These images can be written to a USB flash drive.
+
+Hypervisor hosts vm-* are able to run static pods. Currenrly this is used to run Minio. This may move to being served over http from provisioner Matchbox.
 
 #### Provisioner VM
 
