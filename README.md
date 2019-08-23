@@ -164,7 +164,6 @@ Admin kubeconfig:
 setup_environment/output/kube-cluster/<name_of_cluster>/admin.kubeconfig
 ```
 
-Built image can be written to a USB flash drive to boot live environment. Currently `/localhome` containing persistent user home directory is overlay mounted with ZFS.
 
 ### SSH CA
 
