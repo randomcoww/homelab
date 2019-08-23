@@ -112,7 +112,7 @@ git add provisioner-0.ign provisioner-1.ign
 ...
 ```
 
-Compatible KVM libvirt configurations are in [env-provisioner](https://github.com/randomcoww/env-provisioner). Boot kernel and initrd images are Container Linux PXE images available from CoreOS. The latest of these images are baked into the hypervisor at build time.
+Compatible KVM libvirt configurations are in [env-provisioner](https://github.com/randomcoww/env-provisioner). Boot kernel and initrd images are Container Linux PXE images available from CoreOS. The latest of these are baked into the hypervisor at time of building these images.
 
 I currently have no automation for defining and starting VMs. They are defined and started manually:
 
