@@ -20,7 +20,6 @@ repo --name=rpmfusion-nonfree-rawhide --metalink=https://mirrors.rpmfusion.org/m
 repo --name=kubernetes --baseurl=https://packages.cloud.google.com/yum/repos/kubernetes-el7-$basearch
 repo --name=code --baseurl=https://packages.microsoft.com/yumrepos/vscode
 repo --name=winehq --baseurl=https://dl.winehq.org/wine-builds/fedora/$releasever
-repo --name=docker-ce-stable --baseurl=https://download.docker.com/linux/fedora/$releasever/$basearch/stable
 
 %packages
 
@@ -59,11 +58,6 @@ jq
 ncmpcpp
 deadbeef
 podman
-
-## docker frequently fails to install and may need to be commented out
-# docker-ce
-# docker-compose
-##
 
 ## nvidia driver
 xorg-x11-drv-nvidia
@@ -143,6 +137,24 @@ DHCP=yes
 EOF
 
 ##
+## mount disk for home
+##
+
+mkdir -p {{.localhome_path}}
+
+cat <<EOF > /etc/systemd/system/{{.localhome_mount}}
+[Unit]
+Before=local-fs.target
+
+[Mount]
+What={{.localhome_dev}}
+Where={{.localhome_path}}
+
+[Install]
+WantedBy=local-fs.target
+EOF
+
+##
 ## bootstrap image
 ##
 
@@ -156,7 +168,7 @@ curl -O {{.container_linux_base_url}}/{{.container_linux_version}}/coreos_produc
 ##
 
 systemctl enable \
-  docker
+  {{.localhome_mount}}
 
 systemctl set-default graphical.target
 

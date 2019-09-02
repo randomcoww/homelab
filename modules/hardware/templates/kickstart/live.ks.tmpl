@@ -19,7 +19,6 @@ shutdown
 repo --name=fedora --mirrorlist=https://mirrors.fedoraproject.org/mirrorlist?repo=fedora-$releasever&arch=$basearch
 repo --name=updates --mirrorlist=https://mirrors.fedoraproject.org/mirrorlist?repo=updates-released-f$releasever&arch=$basearch
 url --mirrorlist=https://mirrors.fedoraproject.org/mirrorlist?repo=fedora-$releasever&arch=$basearch
-repo --name=zfs-on-linux --baseurl=http://download.zfsonlinux.org/fedora/$releasever/$basearch/
 
 %packages --excludeWeakdeps --excludedocs
 
@@ -32,12 +31,6 @@ chrony
 logrotate
 nfs-utils
 openssh-server
-##
-
-## ZFS on linux
-kernel-devel
-zfs
--zfs-fuse
 ##
 
 ## livemedia-creator
@@ -176,7 +169,6 @@ EOF
 
 systemctl enable \
   systemd-networkd systemd-resolved chronyd crond \
-  zfs-import-cache zfs-import-scan zfs-mount zfs-share zfs-zed zfs.target nfs-server \
   libvirtd ksm ksmtuned \
   sshd
 

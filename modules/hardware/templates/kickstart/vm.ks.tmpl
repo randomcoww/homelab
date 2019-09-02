@@ -4,14 +4,9 @@
 
 ## Not used for live images. Add this to lorax template.
 # bootloader --append="console=tty0 console=ttyS1,115200n8 elevator=noop intel_iommu=on iommu=pt rd.live.ram=1"
-selinux --disabled
-
-repo --name=kubernetes --baseurl=https://packages.cloud.google.com/yum/repos/kubernetes-el7-$basearch
 
 %packages --excludeWeakdeps --excludedocs
 
-containerd
-kubelet
 -NetworkManager
 
 %end
@@ -117,57 +112,6 @@ Address={{.store_ip}}/{{.store_netmask}}
 EOF
 
 ##
-## worker
-##
-
-mkdir -p {{.kubelet_path}}
-
-cat <<EOF > /etc/containerd/config.toml
-subreaper = true
-oom_score = -999
-[plugins]
-  [plugins.cri]
-    stream_server_address = "0.0.0.0"
-    [plugins.cri.containerd]
-      no_pivot = true
-EOF
-
-cat <<EOF > {{.kubelet_path}}/kubelet-config.yaml
-kind: KubeletConfiguration
-apiVersion: kubelet.config.k8s.io/v1beta1
-authentication:
-  anonymous:
-    enabled: true
-  webhook:
-    enabled: false
-authorization:
-  mode: AlwaysAllow
-staticPodPath: {{.kubelet_path}}/manifests
-staticPodURL: http://{{.matchbox_vip}}:{{.matchbox_http_port}}/generic?manifest={{.hostname}}
-makeIPTablesUtilChains: false
-EOF
-
-cat <<EOF > /etc/systemd/system/kubelet.service
-[Unit]
-Description=Kubernetes Kubelet
-After=containerd.service
-Requires=containerd.service
-
-[Service]
-ExecStart=/usr/bin/kubelet \
-  --config={{.kubelet_path}}/kubelet-config.yaml \
-  --node-ip={{.store_ip}} \
-  --register-node=false \
-  --container-runtime=remote \
-  --container-runtime-endpoint=unix:///run/containerd/containerd.sock
-Restart=on-failure
-RestartSec=5
-
-[Install]
-WantedBy=multi-user.target
-EOF
-
-##
 ## bootstrap image
 ##
 
@@ -175,12 +119,5 @@ mkdir -p {{.container_linux_image_path}}
 cd {{.container_linux_image_path}}
 curl -O {{.container_linux_base_url}}/{{.container_linux_version}}/coreos_production_pxe.vmlinuz
 curl -O {{.container_linux_base_url}}/{{.container_linux_version}}/coreos_production_pxe_image.cpio.gz
-
-##
-## enable services
-##
-
-systemctl enable \
-  containerd kubelet
 
 %end

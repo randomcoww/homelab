@@ -7,6 +7,10 @@ resource "matchbox_profile" "generic_desktop" {
   generic_config = "${file("${path.module}/templates/kickstart/desktop.ks.tmpl")}"
 }
 
+locals {
+  localhome_path = "/localhome"
+}
+
 resource "matchbox_group" "generic_desktop" {
   count = "${length(var.desktop_hosts)}"
 
@@ -18,11 +22,13 @@ resource "matchbox_group" "generic_desktop" {
   }
 
   metadata {
-    hostname       = "${var.desktop_hosts[count.index]}"
-    default_user   = "${var.default_user}"
-    localhome_path = "/localhome"
-    password       = "${var.password}"
+    hostname        = "${var.desktop_hosts[count.index]}"
+    default_user    = "${var.default_user}"
+    localhome_path  = "${local.localhome_path}"
+    password        = "${var.password}"
+    localhome_mount = "${join("-", compact(split("/", local.localhome_path)))}.mount"
 
+    localhome_dev    = "/dev/disk/by-path/pci-0000:04:00.0-nvme-1-part1"
     store_macvlan_if = "int0"
     mtu              = "${var.mtu}"
 
