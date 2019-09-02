@@ -39,6 +39,73 @@ systemd:
         [Install]
         WantedBy=local-fs.target
 
+    - name: s3-a00.mount
+      enable: true
+      contents: |
+        [Unit]
+        Before=local-fs.target
+        [Mount]
+        What=/dev/sdb
+        Where=/s3/a00
+        Type=ext4
+        [Install]
+        WantedBy=local-fs.target
+    - name: s3-a01.mount
+      enable: true
+      contents: |
+        [Unit]
+        Before=local-fs.target
+        [Mount]
+        What=/dev/sdc
+        Where=/s3/a01
+        Type=ext4
+        [Install]
+        WantedBy=local-fs.target
+    - name: s3-a02.mount
+      enable: true
+      contents: |
+        [Unit]
+        Before=local-fs.target
+        [Mount]
+        What=/dev/sdd
+        Where=/s3/a02
+        Type=ext4
+        [Install]
+        WantedBy=local-fs.target
+    - name: s3-a03.mount
+      enable: true
+      contents: |
+        [Unit]
+        Before=local-fs.target
+        [Mount]
+        What=/dev/sde
+        Where=/s3/a03
+        Type=ext4
+        [Install]
+        WantedBy=local-fs.target
+    - name: s3-a04.mount
+      enable: true
+      contents: |
+        [Unit]
+        Before=local-fs.target
+        [Mount]
+        What=/dev/sdf
+        Where=/s3/a04
+        Type=ext4
+        [Install]
+        WantedBy=local-fs.target
+    - name: s3-a05.mount
+      enable: true
+      contents: |
+        [Unit]
+        Before=local-fs.target
+        [Mount]
+        What=/dev/sdg
+        Where=/s3/a05
+        Type=ext4
+        [Install]
+        WantedBy=local-fs.target
+
     - name: iscsid.service
       enable: true
     - name: docker.service
@@ -53,6 +120,18 @@ systemd:
             [Unit]
             After=pv.mount
             Requires=pv.mount
+            After=s3-a00.mount
+            Requires=s3-a00.mount
+            After=s3-a01.mount
+            Requires=s3-a01.mount
+            After=s3-a02.mount
+            Requires=s3-a02.mount
+            After=s3-a03.mount
+            Requires=s3-a03.mount
+            After=s3-a04.mount
+            Requires=s3-a04.mount
+            After=s3-a05.mount
+            Requires=s3-a05.mount
 
             [Service]
             LimitNOFILE=infinity
@@ -67,6 +146,18 @@ systemd:
         After=network.target
         After=pv.mount
         Requires=pv.mount
+        After=s3-a00.mount
+        Requires=s3-a00.mount
+        After=s3-a01.mount
+        Requires=s3-a01.mount
+        After=s3-a02.mount
+        Requires=s3-a02.mount
+        After=s3-a03.mount
+        Requires=s3-a03.mount
+        After=s3-a04.mount
+        Requires=s3-a04.mount
+        After=s3-a05.mount
+        Requires=s3-a05.mount
 
         [Service]
         Environment="KUBELET_IMAGE=docker://{{.kubelet_image}}"
@@ -106,6 +197,44 @@ storage:
         format: ext4
         wipeFilesystem: false
         label: PVCONTAINER
+
+    - name: s3-a00
+      mount:
+        device: /dev/sdb
+        format: ext4
+        wipeFilesystem: false
+        label: S3-A00
+    - name: s3-a01
+      mount:
+        device: /dev/sdc
+        format: ext4
+        wipeFilesystem: false
+        label: S3-A01
+    - name: s3-a02
+      mount:
+        device: /dev/sdd
+        format: ext4
+        wipeFilesystem: false
+        label: S3-A02
+    - name: s3-a03
+      mount:
+        device: /dev/sde
+        format: ext4
+        wipeFilesystem: false
+        label: S3-A03
+    - name: s3-a04
+      mount:
+        device: /dev/sdf
+        format: ext4
+        wipeFilesystem: false
+        label: S3-A04
+    - name: s3-a05
+      mount:
+        device: /dev/sdg
+        format: ext4
+        wipeFilesystem: false
+        label: S3-A05
+
   files:
     - path: /etc/hostname
       filesystem: root
