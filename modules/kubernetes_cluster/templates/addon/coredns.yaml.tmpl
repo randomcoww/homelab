@@ -90,6 +90,7 @@ metadata:
     addonmanager.kubernetes.io/mode: Reconcile
     kubernetes.io/name: "CoreDNS"
 spec:
+  replicas: 2
   strategy:
     type: RollingUpdate
     rollingUpdate:
