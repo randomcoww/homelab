@@ -27,15 +27,15 @@ module "provisioner" {
   mtu                   = "${local.default_mtu}"
 
   kubelet_image    = "randomcoww/kubelet:latest"
-  keepalived_image = "randomcoww/keepalived:20190319.03"
-  coredns_image    = "coredns/coredns:1.5.0"
+  keepalived_image = "randomcoww/keepalived:latest"
+  coredns_image    = "coredns/coredns:1.6.3"
   busybox_image    = "busybox:latest"
-  nftables_image   = "randomcoww/nftables:20190119.01"
+  nftables_image   = "randomcoww/nftables:latest"
   kea_image        = "randomcoww/kea:20190119.01"
-  tftpd_image      = "randomcoww/tftpd_ipxe:20190119.01"
+  tftpd_image      = "randomcoww/tftpd_ipxe:latest"
   matchbox_image   = "quay.io/coreos/matchbox:latest"
-  syncthing_image  = "randomcoww/syncthing:20190119.01"
-  conntrack_image  = "randomcoww/conntrack:20190316.02"
+  syncthing_image  = "randomcoww/syncthing:latest"
+  conntrack_image  = "randomcoww/conntrack:latest"
 
   ## ports
   matchbox_http_port = "${local.matchbox_http_port}"
