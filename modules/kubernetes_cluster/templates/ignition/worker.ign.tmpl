@@ -50,10 +50,6 @@ systemd:
       dropins:
         - name: containerd.conf
           contents: |
-            [Unit]
-            After=pv.mount
-            Requires=pv.mount
-
             [Service]
             LimitNOFILE=infinity
             ExecStart=
@@ -65,8 +61,6 @@ systemd:
         [Unit]
         Description=Kubelet via Hyperkube ACI
         After=network.target
-        After=pv.mount
-        Requires=pv.mount
 
         [Service]
         Environment="KUBELET_IMAGE=docker://{{.kubelet_image}}"
@@ -100,12 +94,12 @@ systemd:
 
 storage:
   filesystems:
-    - name: pvcontainer
+    - name: pv-worker
       mount:
         device: /dev/sda
         format: ext4
         wipeFilesystem: false
-        label: PVCONTAINER
+        label: PV-WORKER
 
   files:
     - path: /etc/hostname
