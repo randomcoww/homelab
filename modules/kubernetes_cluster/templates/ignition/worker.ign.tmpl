@@ -50,6 +50,10 @@ systemd:
       dropins:
         - name: containerd.conf
           contents: |
+            [Unit]
+            After=pv.mount
+            Requires=pv.mount
+
             [Service]
             LimitNOFILE=infinity
             ExecStart=
@@ -61,6 +65,8 @@ systemd:
         [Unit]
         Description=Kubelet via Hyperkube ACI
         After=network.target
+        After=pv.mount
+        Requires=pv.mount
 
         [Service]
         Environment="KUBELET_IMAGE=docker://{{.kubelet_image}}"
