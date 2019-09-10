@@ -57,6 +57,7 @@ networkd:
         UseHostname=false
         UseDomains=false
         UseTimezone=no
+        RouteMetric=512
 
     - name: {{.vwan_if}}.network
       contents: |
@@ -76,6 +77,7 @@ networkd:
         UseDomains=false
         UseTimezone=no
         RouteTable=250
+        RouteMetric=512
 
 systemd:
   units:
