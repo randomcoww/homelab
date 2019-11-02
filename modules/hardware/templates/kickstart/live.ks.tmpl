@@ -65,75 +65,6 @@ FallbackDNS=
 DNSStubListener=no
 EOF
 
-## vswitch bridge
-
-cat <<EOF > /etc/systemd/network/{{.ll_if}}.netdev
-[NetDev]
-Name={{.ll_if}}
-Kind=bridge
-EOF
-
-cat <<EOF > /etc/systemd/network/{{.ll_if}}.network
-[Match]
-Name={{.ll_if}}
-
-[Link]
-ARP=no
-MTUBytes={{.mtu}}
-
-[Network]
-LinkLocalAddressing=no
-DHCP=no
-MACVTAP={{.ll_macvtap_if}}
-Bridge={{.dummy_if}}
-EOF
-
-cat <<EOF > /etc/systemd/network/{{.dummy_if}}.netdev
-[NetDev]
-Name={{.dummy_if}}
-Kind=dummy
-EOF
-
-cat <<EOF > /etc/systemd/network/{{.dummy_if}}.network
-[Match]
-Name={{.dummy_if}}
-
-[Link]
-ARP=no
-MTUBytes={{.mtu}}
-
-[Network]
-LinkLocalAddressing=no
-DHCP=no
-Bridge={{.ll_if}}
-EOF
-
-## host macvtap to vswitch
-
-cat <<EOF > /etc/systemd/network/{{.ll_macvtap_if}}.netdev
-[NetDev]
-Name={{.ll_macvtap_if}}
-Kind=macvtap
-
-[MACVTAP]
-Mode=bridge
-EOF
-
-cat <<EOF > /etc/systemd/network/{{.ll_macvtap_if}}.network
-[Match]
-Name={{.ll_macvtap_if}}
-
-[Link]
-MTUBytes={{.mtu}}
-
-[Network]
-LinkLocalAddressing=no
-DHCP=no
-
-[Address]
-Address={{.ll_ip}}/{{.ll_netmask}}
-EOF
-
 ##
 ## general file writes
 ##
@@ -173,7 +104,8 @@ systemctl enable \
   sshd
 
 systemctl mask \
-  NetworkManager
+  NetworkManager \
+  NetworkManager-wait-online
 
 ##
 ## cleanup

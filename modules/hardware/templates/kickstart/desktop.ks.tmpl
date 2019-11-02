@@ -19,7 +19,9 @@ repo --name=rpmfusion-nonfree-rawhide --metalink=https://mirrors.rpmfusion.org/m
 
 repo --name=kubernetes --baseurl=https://packages.cloud.google.com/yum/repos/kubernetes-el7-$basearch
 repo --name=code --baseurl=https://packages.microsoft.com/yumrepos/vscode
-repo --name=winehq --baseurl=https://dl.winehq.org/wine-builds/fedora/$releasever
+
+## replxce 30 with $releasever once f31 repo is available
+repo --name=winehq --baseurl=https://dl.winehq.org/wine-builds/fedora/30
 
 %packages
 
@@ -89,7 +91,7 @@ winehq-staging
 ## user
 ##
 
-user --name={{.default_user}} --password={{.password}} --plaintext --uid=1000 --gid=1000 --groups=wheel,libvirt,docker --homedir={{.localhome_path}}/{{.default_user}}
+user --name={{.default_user}} --password={{.password}} --plaintext --uid=1000 --gid=1000 --groups=wheel,libvirt --homedir={{.localhome_path}}/{{.default_user}}
 
 %post --erroronfail
 
@@ -153,15 +155,6 @@ Where={{.localhome_path}}
 [Install]
 WantedBy=local-fs.target
 EOF
-
-##
-## bootstrap image
-##
-
-mkdir -p {{.container_linux_image_path}}
-cd {{.container_linux_image_path}}
-curl -O {{.container_linux_base_url}}/{{.container_linux_version}}/coreos_production_pxe.vmlinuz
-curl -O {{.container_linux_base_url}}/{{.container_linux_version}}/coreos_production_pxe_image.cpio.gz
 
 ##
 ## enable services
