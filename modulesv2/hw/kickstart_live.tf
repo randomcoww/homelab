@@ -4,7 +4,7 @@
 
 resource "matchbox_profile" "ks-live" {
   name           = "live"
-  generic_config = file("${path.module}/../../templates/kickstart/live.ks.tmpl")
+  generic_config = "{{.config}}"
 }
 
 resource "matchbox_group" "ks-live" {
@@ -14,5 +14,9 @@ resource "matchbox_group" "ks-live" {
   name    = each.key
   selector = {
     ks = each.key
+  }
+  metadata = {
+    config = templatefile("${path.module}/../../templates/kickstart/live.ks.tmpl", {
+    })
   }
 }

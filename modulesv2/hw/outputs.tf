@@ -12,7 +12,7 @@ output "matchbox_private_key_pem" {
 
 output "matchbox_rpc_endpoints" {
   value = [
-    for h in values(var.kvm_hosts):
+    for h in values(var.kvm_hosts) :
     "${h.network.host_tap_ip}:${var.service_ports.renderer_rpc}"
   ]
 }

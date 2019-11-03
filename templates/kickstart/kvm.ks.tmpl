@@ -3,13 +3,15 @@
 
 %packages --excludeWeakdeps --excludedocs
 
+libvirt-daemon-kvm
+ksmtuned
 kea
 -NetworkManager
 
 %end
 
-user --name={{.user}} --password={{.password}} --plaintext --groups=wheel,libvirt
-sshkey --username={{.user}} "{{.ssh_authorized_key}}"
+user --name=${user} --password=${password} --plaintext --groups=wheel,libvirt
+sshkey --username=${user} "${ssh_authorized_key}"
 
 %post --erroronfail
 
@@ -18,94 +20,168 @@ sshkey --username={{.user}} "{{.ssh_authorized_key}}"
 ##############################################
 
 ##
-## internal network for host <-> local vm
+## allocate vlan interfaces to hardware
 ##
 
-cat <<EOF > /etc/systemd/network/50_{{.int_if}}.netdev
-[NetDev]
-Name={{.int_if}}
-Kind=bridge
-EOF
-
-cat <<EOF > /etc/systemd/network/50_{{.int_if}}.network
+cat <<EOF > /etc/systemd/network/${networkd_priority}_${host_network.hw_if}.network
 [Match]
-Name={{.int_if}}
+Name=${host_network.hw_if}
 
 [Link]
 ARP=no
+MTUBytes=${mtu}
 
 [Network]
 LinkLocalAddressing=no
 DHCP=no
-MACVTAP={{.int_tap_if}}
-Bridge={{.int_dummy_if}}
+%{ for vlan in vlans ~}
+VLAN=${networks[vlan].if}
+%{ endfor ~}
 EOF
+%{ for vlan in vlans ~}
 
-cat <<EOF > /etc/systemd/network/50_{{.int_dummy_if}}.netdev
+##
+## vlan ${vlan}
+##
+
+cat <<EOF > /etc/systemd/network/${networkd_priority}_${networks[vlan].if}.netdev
 [NetDev]
-Name={{.int_dummy_if}}
-Kind=dummy
-EOF
+Name=${networks[vlan].if}
+Kind=vlan
 
-cat <<EOF > /etc/systemd/network/50_{{.int_dummy_if}}.network
+[VLAN]
+Id=${networks[vlan].id}
+EOF
+%{ if vlan == host_tap_vlan ~}
+
+## host macvtap on vlan ${vlan}
+cat <<EOF > /etc/systemd/network/${networkd_priority}_${networks[vlan].if}.network
 [Match]
-Name={{.int_dummy_if}}
+Name=${networks[vlan].if}
 
 [Link]
 ARP=no
+MTUBytes=${mtu}
 
 [Network]
 LinkLocalAddressing=no
 DHCP=no
-Bridge={{.int_if}}
+MACVTAP=${host_tap_if}
 EOF
 
-cat <<EOF > /etc/systemd/network/50_{{.int_tap_if}}.netdev
+cat <<EOF > /etc/systemd/network/${networkd_priority}_${host_tap_if}.netdev
 [NetDev]
-Name={{.int_tap_if}}
+Name=${host_tap_if}
 Kind=macvtap
 
 [MACVTAP]
 Mode=bridge
 EOF
 
-cat <<EOF > /etc/systemd/network/50_{{.int_tap_if}}.network
+cat <<EOF > /etc/systemd/network/${networkd_priority}_${host_tap_if}.network
 [Match]
-Name={{.int_tap_if}}
+Name=${host_tap_if}
+
+[Link]
+MTUBytes=${mtu}
+
+[Network]
+LinkLocalAddressing=no
+DHCP=yes
+
+[Address]
+Address=${host_network.host_tap_ip}/${networks[vlan].cidr}
+EOF
+%{ endif ~}
+%{ endfor ~}
+
+##
+## internal network for host <-> local vm
+##
+
+cat <<EOF > /etc/systemd/network/${networkd_priority}_${networks.int.if}.netdev
+[NetDev]
+Name=${networks.int.if}
+Kind=bridge
+EOF
+
+cat <<EOF > /etc/systemd/network/${networkd_priority}_${networks.int.if}.network
+[Match]
+Name=${networks.int.if}
+
+[Link]
+ARP=no
+
+[Network]
+LinkLocalAddressing=no
+DHCP=no
+MACVTAP=${int_tap_if}
+Bridge=${int_dummy_if}
+EOF
+
+cat <<EOF > /etc/systemd/network/${networkd_priority}_${int_dummy_if}.netdev
+[NetDev]
+Name=${int_dummy_if}
+Kind=dummy
+EOF
+
+cat <<EOF > /etc/systemd/network/${networkd_priority}_${int_dummy_if}.network
+[Match]
+Name=${int_dummy_if}
+
+[Link]
+ARP=no
+
+[Network]
+LinkLocalAddressing=no
+DHCP=no
+Bridge=${networks.int.if}
+EOF
+
+cat <<EOF > /etc/systemd/network/${networkd_priority}_${int_tap_if}.netdev
+[NetDev]
+Name=${int_tap_if}
+Kind=macvtap
+
+[MACVTAP]
+Mode=bridge
+EOF
+
+cat <<EOF > /etc/systemd/network/${networkd_priority}_${int_tap_if}.network
+[Match]
+Name=${int_tap_if}
 
 [Network]
 LinkLocalAddressing=no
 DHCP=no
 
 [Address]
-Address={{.int_tap_ip}}/{{.int_cidr}}
+Address=${networks.int.ip}/${networks.int.cidr}
 EOF
-
-{{.networkd}}
 
 ##############################################
 ## matchbox
 ##############################################
 
 mkdir -p \
-  {{.certs_path}} \
-  {{.matchbox_data_path}} \
-  {{.matchbox_assets_path}}
+  ${certs_path} \
+  ${matchbox_data_path} \
+  ${matchbox_assets_path}
 
-cat <<EOF > {{.certs_path}}/matchbox-ca.pem
-{{.tls_matchbox_ca}}
+cat <<EOF > ${certs_path}/matchbox-ca.pem
+${tls_matchbox_ca}
 EOF
 
-cat <<EOF > {{.certs_path}}/matchbox.pem
-{{.tls_matchbox}}
+cat <<EOF > ${certs_path}/matchbox.pem
+${tls_matchbox}
 EOF
 
-cat <<EOF > {{.certs_path}}/matchbox-key.pem
-{{.tls_matchbox_key}}
+cat <<EOF > ${certs_path}/matchbox-key.pem
+${tls_matchbox_key}
 EOF
 
 curl -o matchbox.tar.gz \
-  -LO {{.matchbox_url}}
+  -LO ${matchbox_url}
 tar xzf matchbox.tar.gz */matchbox --strip 1 -C /usr/loca/bin/
 rm -f matchbox.tar.gz
 
@@ -116,13 +192,13 @@ After=network.target
 
 [Service]
 ExecStart=/usr/local/bin/matchbox \
-  -address={{.int_tap_ip}}:{{.matchbox_http_port}} \
-  -rpc-address=0.0.0.0:{{.matchbox_rpc_port}} \
-  -ca-file={{.certs_path}}/matchbox-ca.pem \
-  -cert-file={{.certs_path}}/matchbox.pem \
-  -key-file={{.certs_path}}/matchbox-key.pem \
-  -data-path={{.matchbox_data_path}} \
-  -assets-path={{.matchbox_assets_path}}
+  -address=${networks.int.ip}:${service_ports.renderer_http} \
+  -rpc-address=0.0.0.0:${service_ports.renderer_rpc} \
+  -ca-file=${certs_path}/matchbox-ca.pem \
+  -cert-file=${certs_path}/matchbox.pem \
+  -key-file=${certs_path}/matchbox-key.pem \
+  -data-path=${matchbox_data_path} \
+  -assets-path=${matchbox_assets_path}
 Restart=always
 RestartSec=5
 
@@ -140,15 +216,15 @@ cat <<EOF > /etc/kea/kea-dhcp4.conf
   "Dhcp4": {
     "interfaces-config": {
       "interfaces": [
-        "{{.int_tap_if}}"
+        "${int_tap_if}"
       ]
     },
     "subnet4": [
       {
-        "subnet": "{{.int_tap_ip}}/{{.int_cidr}}",
+        "subnet": "${networks.int.ip}/${networks.int.cidr}",
         "pools": [
           {
-            "pool": "{{.int_dhcp_pool}}"
+            "pool": "${networks.int.dhcp_pool}"
           }
         ]
       }
@@ -157,9 +233,9 @@ cat <<EOF > /etc/kea/kea-dhcp4.conf
 }
 EOF
 
-pushd {{.matchbox_assets_path}}
-curl -LO {{.container_linux_base_url}}/coreos_production_pxe.vmlinuz
-curl -LO {{.container_linux_base_url}}/coreos_production_pxe_image.cpio.gz
+pushd ${matchbox_assets_path}
+curl -LO ${container_linux_base_url}/${container_linux_kernel}
+curl -LO ${container_linux_base_url}/${container_linux_image}
 popd
 
 systemctl enable \

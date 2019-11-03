@@ -32,8 +32,6 @@ ipmitool
 pciutils
 lm_sensors
 libvirt-client
-rsync
-tmux
 xclip
 vim-enhanced
 git
@@ -81,7 +79,7 @@ winehq-staging
 
 %end
 
-user --name={{.user}} --password={{.password}} --plaintext --uid=1000 --gid=1000 --groups=wheel,libvirt --homedir={{.persistent_home_path}}/{{.user}}
+user --name=${user} --password=${password} --plaintext --uid=1000 --gid=1000 --groups=wheel,libvirt --homedir=${persistent_home_path}/${user}
 
 %post --erroronfail
 
@@ -89,28 +87,35 @@ user --name={{.user}} --password={{.password}} --plaintext --uid=1000 --gid=1000
 ## networkd
 ##############################################
 
-{{.networkd}}
+cat <<EOF > /etc/systemd/network/00_default.network
+[Match]
+Name=en*
+
+[Network]
+LinkLocalAddressing=no
+DHCP=yes
+EOF
 
 ##############################################
 ## persistent home directory
 ##############################################
 
-mkdir -p {{.persistent_home_path}}
+mkdir -p ${persistent_home_path}
 
-cat <<EOF > /etc/systemd/system/{{.persistent_home_mount}}
+cat <<EOF > /etc/systemd/system/${persistent_home_mount}
 [Unit]
 Before=local-fs.target
 
 [Mount]
-What={{.persistent_home_dev}}
-Where={{.persistent_home_path}}
+What=${persistent_home_dev}
+Where=${persistent_home_path}
 
 [Install]
 WantedBy=local-fs.target
 EOF
 
 systemctl enable \
-  {{.persistent_home_mount}}
+  ${persistent_home_mount}
 
 systemctl set-default graphical.target
 

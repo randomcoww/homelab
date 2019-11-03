@@ -11,7 +11,7 @@ locals {
 
   service_ports = {
     renderer_http = 8080
-    renderer_rpc = 8081
+    renderer_rpc  = 8081
   }
 
   networks = {

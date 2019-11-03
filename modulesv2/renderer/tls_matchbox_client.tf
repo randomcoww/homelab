@@ -13,7 +13,7 @@ resource "tls_cert_request" "matchbox-client" {
   subject {
     common_name = "matchbox"
   }
-  
+
   ip_addresses = [
     "127.0.0.1",
   ]

@@ -6,7 +6,7 @@ module "hw" {
   ssh_ca_public_key = tls_private_key.ssh-ca.public_key_openssh
   mtu               = local.mtu
   networks          = local.networks
-  service_ports = local.service_ports
+  service_ports     = local.service_ports
 
   # LiveOS base KS
   live_hosts = {
@@ -33,10 +33,6 @@ module "hw" {
   # Desktop host KS
   desktop_hosts = {
     desktop-0 = {
-      network = {
-        hw_if       = "eno2"
-        host_tap_ip = "192.168.127.253"
-      }
       persistent_home_path = "/localhome"
       persistent_home_dev  = "/dev/disk/by-path/pci-0000:04:00.0-nvme-1-part1"
     }
