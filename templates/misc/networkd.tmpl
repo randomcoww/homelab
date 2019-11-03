@@ -1,0 +1,75 @@
+##
+## allocate vlan interfaces to hardware
+##
+
+cat <<EOF > ${file_path}/${priority}_${config.hw_if}.network
+[Match]
+Name=${config.hw_if}
+
+[Link]
+ARP=no
+MTUBytes=${mtu}
+
+[Network]
+LinkLocalAddressing=no
+DHCP=no
+%{ for vlan in vlans ~}
+VLAN=${networks[vlan].if}
+%{ endfor ~}
+EOF
+%{ for vlan in vlans ~}
+
+##
+## vlan ${vlan}
+##
+
+cat <<EOF > ${file_path}/${priority}_${networks[vlan].if}.netdev
+[NetDev]
+Name=${networks[vlan].if}
+Kind=vlan
+
+[VLAN]
+Id=${networks[vlan].id}
+EOF
+%{ if vlan == host_tap_vlan ~}
+
+## host macvtap on vlan ${vlan}
+cat <<EOF > ${file_path}/${priority}_${networks[vlan].if}.network
+[Match]
+Name=${networks[vlan].if}
+
+[Link]
+ARP=no
+MTUBytes=${mtu}
+
+[Network]
+LinkLocalAddressing=no
+DHCP=no
+MACVTAP=${host_tap_if}
+EOF
+
+cat <<EOF > ${file_path}/${priority}_${host_tap_if}.netdev
+[NetDev]
+Name=${host_tap_if}
+Kind=macvtap
+
+[MACVTAP]
+Mode=bridge
+EOF
+
+cat <<EOF > ${file_path}/${priority}_${host_tap_if}.network
+[Match]
+Name=${host_tap_if}
+
+[Link]
+MTUBytes=${mtu}
+
+[Network]
+LinkLocalAddressing=no
+DHCP=yes
+
+[Address]
+Address=${config.host_tap_ip}/${networks[vlan].cidr}
+EOF
+%{ endif ~}
+%{ endfor ~}

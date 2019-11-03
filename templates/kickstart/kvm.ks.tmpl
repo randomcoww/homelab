@@ -1,0 +1,168 @@
+## Not used for live images. Add this to lorax template.
+# bootloader --append="console=tty0 console=ttyS1,115200n8 elevator=noop intel_iommu=on iommu=pt rd.live.ram=1"
+
+%packages --excludeWeakdeps --excludedocs
+
+kea
+-NetworkManager
+
+%end
+
+user --name={{.user}} --password={{.password}} --plaintext --groups=wheel,libvirt
+sshkey --username={{.user}} "{{.ssh_authorized_key}}"
+
+%post --erroronfail
+
+##############################################
+## networkd
+##############################################
+
+##
+## internal network for host <-> local vm
+##
+
+cat <<EOF > /etc/systemd/network/50_{{.int_if}}.netdev
+[NetDev]
+Name={{.int_if}}
+Kind=bridge
+EOF
+
+cat <<EOF > /etc/systemd/network/50_{{.int_if}}.network
+[Match]
+Name={{.int_if}}
+
+[Link]
+ARP=no
+
+[Network]
+LinkLocalAddressing=no
+DHCP=no
+MACVTAP={{.int_tap_if}}
+Bridge={{.int_dummy_if}}
+EOF
+
+cat <<EOF > /etc/systemd/network/50_{{.int_dummy_if}}.netdev
+[NetDev]
+Name={{.int_dummy_if}}
+Kind=dummy
+EOF
+
+cat <<EOF > /etc/systemd/network/50_{{.int_dummy_if}}.network
+[Match]
+Name={{.int_dummy_if}}
+
+[Link]
+ARP=no
+
+[Network]
+LinkLocalAddressing=no
+DHCP=no
+Bridge={{.int_if}}
+EOF
+
+cat <<EOF > /etc/systemd/network/50_{{.int_tap_if}}.netdev
+[NetDev]
+Name={{.int_tap_if}}
+Kind=macvtap
+
+[MACVTAP]
+Mode=bridge
+EOF
+
+cat <<EOF > /etc/systemd/network/50_{{.int_tap_if}}.network
+[Match]
+Name={{.int_tap_if}}
+
+[Network]
+LinkLocalAddressing=no
+DHCP=no
+
+[Address]
+Address={{.int_tap_ip}}/{{.int_cidr}}
+EOF
+
+{{.networkd}}
+
+##############################################
+## matchbox
+##############################################
+
+mkdir -p \
+  {{.certs_path}} \
+  {{.matchbox_data_path}} \
+  {{.matchbox_assets_path}}
+
+cat <<EOF > {{.certs_path}}/matchbox-ca.pem
+{{.tls_matchbox_ca}}
+EOF
+
+cat <<EOF > {{.certs_path}}/matchbox.pem
+{{.tls_matchbox}}
+EOF
+
+cat <<EOF > {{.certs_path}}/matchbox-key.pem
+{{.tls_matchbox_key}}
+EOF
+
+curl -o matchbox.tar.gz \
+  -LO {{.matchbox_url}}
+tar xzf matchbox.tar.gz */matchbox --strip 1 -C /usr/loca/bin/
+rm -f matchbox.tar.gz
+
+cat <<EOF > /etc/systemd/system/matchbox.service
+[Unit]
+Description=CoreOS Matchbox
+After=network.target
+
+[Service]
+ExecStart=/usr/local/bin/matchbox \
+  -address={{.int_tap_ip}}:{{.matchbox_http_port}} \
+  -rpc-address=0.0.0.0:{{.matchbox_rpc_port}} \
+  -ca-file={{.certs_path}}/matchbox-ca.pem \
+  -cert-file={{.certs_path}}/matchbox.pem \
+  -key-file={{.certs_path}}/matchbox-key.pem \
+  -data-path={{.matchbox_data_path}} \
+  -assets-path={{.matchbox_assets_path}}
+Restart=always
+RestartSec=5
+
+[Install]
+WantedBy=multi-user.target
+EOF
+
+##############################################
+## internal kea
+##############################################
+
+mkdir -p /etc/kea
+cat <<EOF > /etc/kea/kea-dhcp4.conf
+{
+  "Dhcp4": {
+    "interfaces-config": {
+      "interfaces": [
+        "{{.int_tap_if}}"
+      ]
+    },
+    "subnet4": [
+      {
+        "subnet": "{{.int_tap_ip}}/{{.int_cidr}}",
+        "pools": [
+          {
+            "pool": "{{.int_dhcp_pool}}"
+          }
+        ]
+      }
+    ]
+  }
+}
+EOF
+
+pushd {{.matchbox_assets_path}}
+curl -LO {{.container_linux_base_url}}/{{.container_linux_version}}/coreos_production_pxe.vmlinuz
+curl -LO {{.container_linux_base_url}}/{{.container_linux_version}}/coreos_production_pxe_image.cpio.gz
+popd
+
+systemctl enable \
+  kea-dhcp4 matchbox
+
+%end
