@@ -18,6 +18,10 @@ variable "networks" {
   type = any
 }
 
+variable "service_ports" {
+  type = map(number)
+}
+
 variable "live_hosts" {
   type = any
 }

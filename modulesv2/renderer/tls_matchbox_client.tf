@@ -1,33 +1,26 @@
 ##
 ## matchbox
 ##
-resource "tls_private_key" "matchbox" {
-  for_each = var.kvm_hosts
-
+resource "tls_private_key" "matchbox-client" {
   algorithm   = "ECDSA"
   ecdsa_curve = "P521"
 }
 
-resource "tls_cert_request" "matchbox" {
-  for_each = var.kvm_hosts
-
-  key_algorithm   = tls_private_key.matchbox[each.key].algorithm
-  private_key_pem = tls_private_key.matchbox[each.key].private_key_pem
+resource "tls_cert_request" "matchbox-client" {
+  key_algorithm   = tls_private_key.matchbox-client.algorithm
+  private_key_pem = tls_private_key.matchbox-client.private_key_pem
 
   subject {
     common_name = "matchbox"
   }
-
+  
   ip_addresses = [
     "127.0.0.1",
-    each.value.network.host_tap_ip
   ]
 }
 
-resource "tls_locally_signed_cert" "matchbox" {
-  for_each = var.kvm_hosts
-
-  cert_request_pem   = tls_cert_request.matchbox[each.key].cert_request_pem
+resource "tls_locally_signed_cert" "matchbox-client" {
+  cert_request_pem   = tls_cert_request.matchbox-client.cert_request_pem
   ca_key_algorithm   = tls_private_key.matchbox-ca.algorithm
   ca_private_key_pem = tls_private_key.matchbox-ca.private_key_pem
   ca_cert_pem        = tls_self_signed_cert.matchbox-ca.cert_pem

@@ -158,8 +158,8 @@ cat <<EOF > /etc/kea/kea-dhcp4.conf
 EOF
 
 pushd {{.matchbox_assets_path}}
-curl -LO {{.container_linux_base_url}}/{{.container_linux_version}}/coreos_production_pxe.vmlinuz
-curl -LO {{.container_linux_base_url}}/{{.container_linux_version}}/coreos_production_pxe_image.cpio.gz
+curl -LO {{.container_linux_base_url}}/coreos_production_pxe.vmlinuz
+curl -LO {{.container_linux_base_url}}/coreos_production_pxe_image.cpio.gz
 popd
 
 systemctl enable \

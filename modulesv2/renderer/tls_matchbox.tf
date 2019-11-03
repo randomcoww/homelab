@@ -30,6 +30,7 @@ resource "tls_locally_signed_cert" "matchbox" {
 
   allowed_uses = [
     "key_encipherment",
+    "digital_signature",
     "server_auth",
     "client_auth",
   ]

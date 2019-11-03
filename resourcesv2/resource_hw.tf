@@ -6,6 +6,7 @@ module "hw" {
   ssh_ca_public_key = tls_private_key.ssh-ca.public_key_openssh
   mtu               = local.mtu
   networks          = local.networks
+  service_ports = local.service_ports
 
   # LiveOS base KS
   live_hosts = {

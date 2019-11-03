@@ -9,6 +9,11 @@ locals {
     ca_pem          = module.renderer.matchbox_ca_pem
   }
 
+  service_ports = {
+    renderer_http = 8080
+    renderer_rpc = 8081
+  }
+
   networks = {
     store = {
       id        = 0

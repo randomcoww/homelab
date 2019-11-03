@@ -1,5 +1,5 @@
 ##
-## Desktop (HW) kickstart renderer
+## KVM (HW) kickstart renderer
 ##
 
 resource "matchbox_profile" "ks-kvm" {
@@ -50,9 +50,8 @@ resource "matchbox_group" "ks-kvm" {
     int_cidr      = var.networks.int.cidr
     int_dhcp_pool = var.networks.int.dhcp_pool
 
-    matchbox_http_port       = 8080
-    matchbox_rpc_port        = 8081
-    container_linux_base_url = "https://beta.release.core-os.net/amd64-usr"
-    container_linux_version  = "current"
+    matchbox_http_port       = var.service_ports.renderer_http
+    matchbox_rpc_port        = var.service_ports.renderer_rpc
+    container_linux_base_url = "https://beta.release.core-os.net/amd64-usr/current"
   }
 }

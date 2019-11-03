@@ -4,7 +4,7 @@ terraform apply -auto-approve \
     -target=module.renderer \
     -target=local_file.matchbox-ca-pem \
     -target=local_file.matchbox-private-key-pem \
-    -target=local_file.matchbox-cert-pem 
+    -target=local_file.matchbox-cert-pem
 
 podman run -it --rm \
     -v "$(pwd)"/output/renderer:/etc/matchbox \
