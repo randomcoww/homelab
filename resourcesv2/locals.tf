@@ -29,9 +29,15 @@ locals {
     }
     recursive_dns = {
       vip = "192.168.126.241"
+      ports = {
+        prometheus = 9153
+      }
     }
     internal_dns = {
       vip = "192.168.126.127"
+      ports = {
+        prometheus = 9153
+      }
     }
     kubernetes_service = {
       vip = "10.96.0.1"

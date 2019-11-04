@@ -37,19 +37,3 @@ variable "desktop_hosts" {
 variable "renderer" {
   type = map(string)
 }
-
-# variable "renderer_endpoint" {
-#   type = string
-# }
-
-# variable "renderer_cert_pem" {
-#   type = string
-# }
-
-# variable "renderer_private_key_pem" {
-#   type = string
-# }
-
-# variable "renderer_ca_pem" {
-#   type = string
-# }

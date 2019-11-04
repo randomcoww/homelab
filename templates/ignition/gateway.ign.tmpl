@@ -45,7 +45,7 @@ networkd:
         [Network]
         LinkLocalAddressing=no
         DHCP=yes
-        DNS=${dns_forward.ip}
+        DNS=${dns_forward_ip}
         DNSOverTLS=opportunistic
         Domains=~
 
@@ -459,11 +459,11 @@ storage:
                   .:53 {
                     errors
                     health
-                    forward . tls://${dns_forward.ip} {
-                      tls_servername ${dns_forward.server_name}
+                    forward . tls://${dns_forward_ip} {
+                      tls_servername ${dns_forward_tls_servername}
                       health_check 5s
                     }
-                    prometheus :9153
+                    prometheus :${services.recursive_dns.port.promethus}
                     cache 30
                     reload
                     loadbalance
@@ -488,16 +488,6 @@ storage:
               - name: config-volume
                 mountPath: /etc/coredns
                 readOnly: true
-              ports:
-              - containerPort: 53
-                name: dns
-                protocol: UDP
-              - containerPort: 53
-                name: dns-tcp
-                protocol: TCP
-              - containerPort: 9153
-                name: metrics
-                protocol: TCP
               livenessProbe:
                 httpGet:
                   path: /health

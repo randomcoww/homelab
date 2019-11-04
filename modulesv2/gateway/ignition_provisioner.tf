@@ -21,17 +21,14 @@ resource "matchbox_group" "ign-gateway" {
       user               = var.user
       ssh_authorized_key = "cert-authority ${chomp(var.ssh_ca_public_key)}"
 
-      container_images = var.container_images
-      networks         = var.networks
-      host_network     = each.value.network
-      services         = var.services
-      domains          = var.domains
-      mtu              = var.mtu
-
-      dns_forward = {
-        ip          = "9.9.9.9"
-        server_name = "dns.quad9.net"
-      }
+      container_images           = var.container_images
+      networks                   = var.networks
+      host_network               = each.value.network
+      services                   = var.services
+      domains                    = var.domains
+      mtu                        = var.mtu
+      dns_forward_ip             = "9.9.9.9"
+      dns_forward_tls_servername = "dns.quad9.net"
 
       kubelet_path = "/var/lib/kubelet"
       kea_path     = "/var/lib/kea"
