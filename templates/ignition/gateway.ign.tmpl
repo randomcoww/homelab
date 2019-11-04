@@ -1,0 +1,673 @@
+---
+networkd:
+  units:
+    - name: ${host_network.store_if}.network
+      contents: |
+        [Match]
+        Name=${host_network.store_if}
+
+        [Network]
+        LinkLocalAddressing=no
+        DHCP=no
+
+        [Address]
+        Address=${host_network.store_ip}/${networks.store.cidr}
+
+    - name: ${host_network.lan_if}.network
+      contents: |
+        [Match]
+        Name=${host_network.lan_if}
+
+        [Network]
+        LinkLocalAddressing=no
+        DHCP=no
+
+        [Address]
+        Address=${host_network.lan_ip}/${networks.lan.cidr}
+
+    - name: ${host_network.sync_if}.network
+      contents: |
+        [Match]
+        Name=${host_network.sync_if}
+
+        [Network]
+        LinkLocalAddressing=no
+        DHCP=no
+
+        [Address]
+        Address=${host_network.sync_ip}/${networks.sync.cidr}
+
+    - name: ${host_network.wan_if}.network
+      contents: |
+        [Match]
+        Name=${host_network.wan_if}
+
+        [Network]
+        LinkLocalAddressing=no
+        DHCP=yes
+        DNS=${dns_forward.ip}
+        DNSOverTLS=opportunistic
+        Domains=~
+
+        [DHCP]
+        UseMTU=true
+        UseDNS=false
+        UseNTP=false
+        SendHostname=false
+        UseHostname=false
+        UseDomains=false
+        UseTimezone=no
+        RouteMetric=512
+
+    - name: ${host_network.vwan_if}.network
+      contents: |
+        [Match]
+        Name=${host_network.vwan_if}
+
+        [Network]
+        LinkLocalAddressing=no
+        DHCP=yes
+
+        [DHCP]
+        UseMTU=true
+        UseDNS=false
+        UseNTP=false
+        SendHostname=false
+        UseHostname=false
+        UseDomains=false
+        UseTimezone=no
+        RouteTable=250
+        RouteMetric=512
+
+systemd:
+  units:
+    - name: docker.service
+      mask: true
+    - name: docker.socket
+      mask: true
+    - name: containerd.service
+      enabled: true
+      dropins:
+        - name: containerd.conf
+          contents: |
+            [Service]
+            LimitNOFILE=infinity
+            ExecStart=
+            ExecStart=/usr/bin/env PATH=$${TORCX_BINDIR}:$${PATH} $${TORCX_BINDIR}/containerd
+            RestartSec=5
+    - name: kubelet.service
+      enabled: true
+      contents: |
+        [Unit]
+        Description=Kubelet via Hyperkube ACI
+        After=network.target
+
+        [Service]
+        Environment="KUBELET_IMAGE=docker://${container_images.kubelet}"
+        Environment="RKT_RUN_ARGS=--uuid-file-save=/var/cache/kubelet-pod.uuid \
+          --volume=resolv,kind=host,source=/etc/resolv.conf \
+          --volume var-lib-containerd,kind=host,source=/var/lib/containerd,readOnly=false \
+          --mount volume=resolv,target=/etc/resolv.conf \
+          --mount volume=var-lib-containerd,target=/var/lib/containerd \
+          --insecure-options=image"
+        ExecStartPre=/bin/mkdir -p \
+          /var/log/containers \
+          /etc/cni/net.d
+        ExecStartPre=-/usr/bin/rkt rm --uuid-file=/var/cache/kubelet-pod.uuid
+        ExecStart=/usr/lib/coreos/kubelet-wrapper \
+          --config=${kubelet_path}/kubelet-config.yaml \
+          --node-ip=${host_network.sync_ip} \
+          --register-node=false \
+          --container-runtime=remote \
+          --container-runtime-endpoint=unix:///run/containerd/containerd.sock
+        ExecStop=-/usr/bin/rkt stop --uuid-file=/var/cache/kubelet-pod.uuid
+        Restart=always
+        RestartSec=5
+
+        [Install]
+        WantedBy=multi-user.target
+
+storage:
+  files:
+    - path: /etc/hostname
+      filesystem: root
+      mode: 0644
+      contents:
+        inline:
+          ${hostname}
+    - path: /etc/sysctl.d/ipforward.conf
+      filesystem: root
+      mode: 0644
+      contents:
+        inline: |
+          net.ipv4.ip_forward=1
+          net.ipv4.ip_nonlocal_bind=1
+    - path: /etc/sysctl.d/max-user-watches.conf
+      filesystem: root
+      mode: 0644
+      contents:
+        inline: |
+          fs.inotify.max_user_watches=16184
+
+    - path: /etc/containerd/config.toml
+      filesystem: root
+      mode: 420
+      contents:
+        inline: |-
+          subreaper = true
+          oom_score = -999
+          [plugins]
+            [plugins.cri]
+              stream_server_address = "127.0.0.1"
+              [plugins.cri.containerd]
+                no_pivot = true
+
+    - path: ${kubelet_path}/kubelet-config.yaml
+      filesystem: root
+      mode: 420
+      contents:
+        inline: |-
+          kind: KubeletConfiguration
+          apiVersion: kubelet.config.k8s.io/v1beta1
+          authentication:
+            anonymous:
+              enabled: true
+            webhook:
+              enabled: false
+          authorization:
+            mode: AlwaysAllow
+          staticPodPath: ${kubelet_path}/manifests
+          makeIPTablesUtilChains: false
+
+    - path: ${kubelet_path}/manifests/nftables.yaml
+      filesystem: root
+      mode: 420
+      contents:
+        inline: |-
+          ---
+          apiVersion: v1
+          kind: Pod
+          metadata:
+            name: nftables
+          spec:
+            restartPolicy: OnFailure
+            hostNetwork: true
+            containers:
+            - name: nftables
+              image: ${container_images.nftables}
+              securityContext:
+                capabilities:
+                  add:
+                  - NET_ADMIN
+              env:
+              - name: NFTABLES_LOCAL_CONFIG
+                value: |
+                  define if_internal = { ${host_network.lan_if}, ${host_network.store_if} }
+                  define if_external = ${host_network.vwan_if}
+                  define if_trusted = ${host_network.store_if}
+                  define if_sync = ${host_network.sync_if}
+
+                  table ip filter {
+                    chain base_checks {
+                      ct state {established, related} accept;
+                      ct state invalid drop;
+                    }
+
+                    chain input {
+                      type filter hook input priority 0; policy drop;
+
+                      jump base_checks;
+
+                      iifname "lo" accept;
+                      iifname != "lo" ip daddr 127.0.0.1/8 drop;
+
+                      ip protocol icmp icmp type { echo-request, echo-reply, time-exceeded, parameter-problem, destination-unreachable } accept;
+
+                      iifname $if_trusted accept;
+                      iifname $if_sync accept;
+
+                      iifname $if_internal tcp dport domain accept;
+                      iifname $if_internal udp dport domain accept;
+                      iifname $if_internal udp sport bootps udp dport bootpc accept;
+                      iifname $if_internal pkttype multicast accept;
+                    }
+
+                    chain forward {
+                      type filter hook forward priority 0; policy drop;
+
+                      jump base_checks;
+
+                      ip protocol icmp icmp type { echo-request, echo-reply, time-exceeded, parameter-problem, destination-unreachable } accept;
+
+                      iifname $if_trusted accept;
+                      iifname $if_internal oifname $if_external accept;
+
+                      iifname $if_internal ip daddr ${networks.metallb.network}/${networks.metallb.cidr} accept;
+                    }
+
+                    chain output {
+                      type filter hook output priority 100; policy accept;
+                    }
+                  }
+
+                  table ip nat {
+                    chain prerouting {
+                      type nat hook prerouting priority 0; policy accept;
+                    }
+
+                    chain input {
+                      type nat hook input priority 0; policy accept;
+                    }
+
+                    chain output {
+                      type nat hook output priority 0; policy accept;
+                    }
+
+                    chain postrouting {
+                      type nat hook postrouting priority 100; policy accept;
+                      oifname $if_external masquerade;
+                    }
+                  }
+                  ;
+
+    - path: ${kubelet_path}/manifests/kea.yaml
+      filesystem: root
+      mode: 420
+      contents:
+        inline: |-
+          ---
+          apiVersion: v1
+          kind: Pod
+          metadata:
+            name: kea
+          spec:
+            restartPolicy: Always
+            hostNetwork: true
+            containers:
+            - name: kea-control-agent
+              image: ${container_images.kea}
+              args:
+              - kea-ctrl-agent
+              env:
+              - name: KEA_LOCAL_CONFIG
+                value: |-
+                  {
+                    "Control-agent": {
+                      "http-host": "0.0.0.0",
+                      "http-port": ${services.kea.ports.peer},
+                      "control-sockets": {
+                        "dhcp4": {
+                          "socket-type": "unix",
+                          "socket-name": "${kea_path}/kea-dhcp4-ctrl.sock"
+                        }
+                      }
+                    }
+                  }
+              volumeMounts:
+              - name: kea-path
+                mountPath: "${kea_path}"
+                readOnly: false
+            - name: kea-dhcp4
+              image: ${container_images.kea}
+              args:
+              - kea-dhcp4
+              env:
+              - name: NODE_NAME
+                valueFrom:
+                  fieldRef:
+                    fieldPath: spec.nodeName
+              - name: KEA_LOCAL_CONFIG
+                value: |-
+                  {
+                    "Dhcp4": {
+                      "valid-lifetime": 1200,
+                      "renew-timer": 1200,
+                      "rebind-timer": 1200,
+                      "interfaces-config": {
+                        "interfaces": [
+                          "*"
+                        ]
+                      },
+                      "control-socket": {
+                        "socket-type": "unix",
+                        "socket-name": "${kea_path}/kea-dhcp4-ctrl.sock"
+                      },
+                      "lease-database": {
+                        "type": "memfile",
+                        "name": "${kea_path}/dhcp4.leases",
+                        "persist": true
+                      },
+                      "option-data": [
+                        {
+                          "name": "domain-name",
+                          "data": "${domains.internal}"
+                        }
+                      ],
+                      "hooks-libraries": [
+                        {
+                          "library": "/usr/lib/hooks/libdhcp_lease_cmds.so",
+                          "parameters": {}
+                        },
+                        {
+                          "library": "/usr/lib/hooks/libdhcp_ha.so",
+                          "parameters": {
+                            "high-availability": [
+                              {
+                                "this-server-name": "$(NODE_NAME)",
+                                "mode": "hot-standby",
+                                "max-unacked-clients": 0,
+                                "peers": [
+                                  ${kea_ha_peers}
+                                ]
+                              }
+                            ]
+                          }
+                        }
+                      ],
+                      "subnet4": [
+                        {
+                          "subnet": "${networks.lan.network}/${networks.lan.cidr}",
+                          "option-data": [
+                            {
+                              "name": "routers",
+                              "data": "${services.lan_gateway.vip}"
+                            },
+                            {
+                              "name": "domain-name-servers",
+                              "data": "${services.recursive_dns.vip}",
+                              "csv-format": true
+                            }
+                          ],
+                          "pools": [
+                            {
+                              "pool": "${networks.store.dhcp_pool}"
+                            }
+                          ]
+                        },
+                        {
+                          "subnet": "${networks.store.network}/${networks.store.cidr}",
+                          "option-data": [
+                            {
+                              "name": "routers",
+                              "data": "${services.gateway.vip}"
+                            },
+                            {
+                              "name": "domain-name-servers",
+                              "data": "${services.recursive_dns.vip}",
+                              "csv-format": true
+                            },
+                            {
+                              "name": "interface-mtu",
+                              "data": "${mtu}"
+                            }
+                          ],
+                          "pools": [
+                            {
+                              "pool": "${networks.store.dhcp_pool}"
+                            }
+                          ]
+                        }
+                      ],
+                      "dhcp-ddns": {
+                        "enable-updates": true,
+                        "qualifying-suffix": "${domains.internal}.",
+                        "override-client-update": true,
+                        "override-no-update": true,
+                        "replace-client-name": "when-not-present"
+                      }
+                    }
+                  }
+              volumeMounts:
+              - name: kea-path
+                mountPath: "${kea_path}"
+                readOnly: false
+            volumes:
+            - name: kea-path
+              emptyDir: {}
+
+    - path: ${kubelet_path}/manifests/coredns.yaml
+      filesystem: root
+      mode: 420
+      contents:
+        inline: |-
+          ---
+          apiVersion: v1
+          kind: Pod
+          metadata:
+            namespace: kube-system
+            name: coredns
+          spec:
+            restartPolicy: Always
+            hostNetwork: true
+            dnsPolicy: Default
+            initContainers:
+            - name: configwriter
+              image: "${container_images.busybox}"
+              imagePullPolicy: IfNotPresent
+              args: [ "/bin/sh", "-c", "echo -en \"$CONFIG\" > $CONFIG_PATH" ]
+              env:
+              - name: CONFIG
+                value: |-
+                  ${domains.internal}:53 {
+                    errors
+                    forward . ${services.internal_dns.vip}
+                  }
+                  ${domains.kubernetes_cluster}:53 {
+                    errors
+                    forward . ${services.internal_dns.vip}
+                  }
+                  .:53 {
+                    errors
+                    health
+                    forward . tls://${dns_forward.ip} {
+                      tls_servername ${dns_forward.server_name}
+                      health_check 5s
+                    }
+                    prometheus :9153
+                    cache 30
+                    reload
+                    loadbalance
+                  }
+              - name: CONFIG_PATH
+                value: /etc/coredns/Corefile
+              volumeMounts:
+              - name: config-volume
+                mountPath: /etc/coredns
+            containers:
+            - name: coredns
+              image: "${container_images.coredns}"
+              imagePullPolicy: IfNotPresent
+              resources:
+                limits:
+                  memory: 170Mi
+                requests:
+                  cpu: 100m
+                  memory: 70Mi
+              args: [ "-conf", "/etc/coredns/Corefile" ]
+              volumeMounts:
+              - name: config-volume
+                mountPath: /etc/coredns
+                readOnly: true
+              ports:
+              - containerPort: 53
+                name: dns
+                protocol: UDP
+              - containerPort: 53
+                name: dns-tcp
+                protocol: TCP
+              - containerPort: 9153
+                name: metrics
+                protocol: TCP
+              livenessProbe:
+                httpGet:
+                  path: /health
+                  port: 8080
+                  scheme: HTTP
+                initialDelaySeconds: 60
+                timeoutSeconds: 5
+                successThreshold: 1
+                failureThreshold: 5
+              readinessProbe:
+                httpGet:
+                  path: /health
+                  port: 8080
+                  scheme: HTTP
+              securityContext:
+                allowPrivilegeEscalation: false
+                capabilities:
+                  add:
+                  - NET_BIND_SERVICE
+                  drop:
+                  - all
+                readOnlyRootFilesystem: true
+            volumes:
+            - name: config-volume
+              emptyDir: {}
+
+    - path: ${kubelet_path}/manifests/keepalived.yaml
+      filesystem: root
+      mode: 420
+      contents:
+        inline: |-
+          ---
+          apiVersion: v1
+          kind: Pod
+          metadata:
+            namespace: kube-system
+            name: keepalived
+          spec:
+            restartPolicy: Always
+            hostNetwork: true
+            containers:
+            - name: keepalived
+              image: ${container_images.keepalived}
+              securityContext:
+                capabilities:
+                  add:
+                  - NET_ADMIN
+              args:
+              - "-P"
+              env:
+              - name: KEEPALIVED_LOCAL_CONFIG
+                value: |-
+                  global_defs {
+                    vrrp_version 3
+                    vrrp_iptables
+                    dynamic_interfaces
+                  }
+                  vrrp_instance VI_gateway {
+                    nopreempt
+                    state BACKUP
+                    strict_mode off
+                    virtual_router_id 247
+                    interface ${host_network.store_if}
+                    priority 100
+                    virtual_ipaddress {
+                      ${services.gateway.vip} dev ${host_network.store_if}
+                      ${services.recursive_dns.vip} dev ${host_network.store_if}
+                      ${services.lan_gateway.vip} dev ${host_network.lan_if}
+                    }
+                    virtual_rules {
+                      to ${networks.store.network}/${networks.store.cidr} lookup main priority 32758
+                      to ${networks.lan.network}/${networks.lan.cidr} lookup main priority 32758
+                      iif ${host_network.store_if} lookup 250 priority 32760
+                      iif ${host_network.lan_if} lookup 250 priority 32760
+                    }
+                  }
+
+    - path: ${kubelet_path}/manifests/tftp.yaml
+      filesystem: root
+      mode: 420
+      contents:
+        inline: |-
+          ---
+          apiVersion: v1
+          kind: Pod
+          metadata:
+            name: kea-tftp
+          spec:
+            restartPolicy: Always
+            hostNetwork: true
+            containers:
+            - name: tftpd-ipxe
+              image: ${container_images.tftpd}
+
+    - path: ${kubelet_path}/manifests/conntrackd.yaml
+      filesystem: root
+      mode: 420
+      contents:
+        inline: |-
+          ---
+          apiVersion: v1
+          kind: Pod
+          metadata:
+            namespace: kube-system
+            name: conntrackd
+          spec:
+            restartPolicy: Always
+            hostNetwork: true
+            containers:
+            - name: conntrackd
+              image: ${container_images.conntrack}
+              securityContext:
+                capabilities:
+                  add:
+                  - NET_ADMIN
+                  - SYS_NICE
+              env:
+              - name: NODE_IP
+                valueFrom:
+                  fieldRef:
+                    fieldPath: status.hostIP
+              - name: CONNTRACKD_LOCAL_CONFIG
+                value: |-
+                  Sync {
+                    Mode FTFW {
+                      # StartupResync on
+                      DisableExternalCache on
+                    }
+
+                    Multicast {
+                      IPv4_address 225.0.0.50
+                      Group 3780
+                      IPv4_interface $(NODE_IP)
+                      Interface ${host_network.sync_if}
+                      SndSocketBuffer 24985600
+                      RcvSocketBuffer 24985600
+                      Checksum on
+                    }
+
+                    Options {
+                      TCPWindowTracking on
+                      ExpectationSync on
+                    }
+                  }
+
+                  General {
+                    LogFile /dev/stdout
+                    HashSize 32768
+                    HashLimit 131072
+                    NetlinkBufferSize 2097152
+                    NetlinkBufferSizeMaxGrowth 8388608
+                    NetlinkEventsReliable on
+
+                    UNIX {
+                      Path /var/run/conntrackd.ctl
+                    }
+
+                    Filter From Kernelspace {
+                      Address Ignore {
+                        IPv4_address 127.0.0.1
+                        IPv4_address $(NODE_IP)
+                        IPv4_address ${services.gateway.vip}
+                        IPv4_address ${services.recursive_dns.vip}
+                        IPv4_address ${services.lan_gateway.vip}
+                      }
+                    }
+                  }
+
+passwd:
+  users:
+  - name: ${user}
+    ssh_authorized_keys:
+      - ${ssh_authorized_key}

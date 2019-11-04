@@ -23,15 +23,23 @@ resource "matchbox_group" "ks-kvm" {
       ssh_authorized_key = "cert-authority ${chomp(var.ssh_ca_public_key)}"
 
       networkd_priority = 30
+      networks          = var.networks
       host_network      = each.value.network
-      vlans = [
-        "store",
-        "lan",
-        "sync",
-        "wan"
-      ]
-      networks      = var.networks
-      service_ports = var.service_ports
+      vlans = {
+        store = {
+          if = "en-store"
+        }
+        lan = {
+          if = "en-lan"
+        }
+        sync = {
+          if = "en-sync"
+        }
+        wan = {
+          if = "en-wan"
+        }
+      }
+      services      = var.services
       mtu           = var.mtu
       host_tap_vlan = "store"
       host_tap_if   = "host-tap"

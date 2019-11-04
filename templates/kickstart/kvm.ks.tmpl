@@ -23,7 +23,7 @@ sshkey --username=${user} "${ssh_authorized_key}"
 ## allocate vlan interfaces to hardware
 ##
 
-cat <<EOF > /etc/systemd/network/${networkd_priority}_${host_network.hw_if}.network
+cat <<EOF > /etc/systemd/network/50_${host_network.hw_if}.network
 [Match]
 Name=${host_network.hw_if}
 
@@ -34,30 +34,30 @@ MTUBytes=${mtu}
 [Network]
 LinkLocalAddressing=no
 DHCP=no
-%{ for vlan in vlans ~}
-VLAN=${networks[vlan].if}
+%{ for vlan in values(vlans) ~}
+VLAN=${vlan.if}
 %{ endfor ~}
 EOF
-%{ for vlan in vlans ~}
+%{ for k in keys(vlans) ~}
 
 ##
-## vlan ${vlan}
+## vlan ${k}
 ##
 
-cat <<EOF > /etc/systemd/network/${networkd_priority}_${networks[vlan].if}.netdev
+cat <<EOF > /etc/systemd/network/50_${vlans[k].if}.netdev
 [NetDev]
-Name=${networks[vlan].if}
+Name=${vlans[k].if}
 Kind=vlan
 
 [VLAN]
-Id=${networks[vlan].id}
+Id=${networks[k].id}
 EOF
-%{ if vlan == host_tap_vlan ~}
+%{ if k == host_tap_vlan ~}
 
-## host macvtap on vlan ${vlan}
-cat <<EOF > /etc/systemd/network/${networkd_priority}_${networks[vlan].if}.network
+## host macvtap on vlan ${k}
+cat <<EOF > /etc/systemd/network/50_${vlans[k].if}.network
 [Match]
-Name=${networks[vlan].if}
+Name=${vlans[k].if}
 
 [Link]
 ARP=no
@@ -69,7 +69,7 @@ DHCP=no
 MACVTAP=${host_tap_if}
 EOF
 
-cat <<EOF > /etc/systemd/network/${networkd_priority}_${host_tap_if}.netdev
+cat <<EOF > /etc/systemd/network/50_${host_tap_if}.netdev
 [NetDev]
 Name=${host_tap_if}
 Kind=macvtap
@@ -78,7 +78,7 @@ Kind=macvtap
 Mode=bridge
 EOF
 
-cat <<EOF > /etc/systemd/network/${networkd_priority}_${host_tap_if}.network
+cat <<EOF > /etc/systemd/network/50_${host_tap_if}.network
 [Match]
 Name=${host_tap_if}
 
@@ -90,7 +90,7 @@ LinkLocalAddressing=no
 DHCP=yes
 
 [Address]
-Address=${host_network.host_tap_ip}/${networks[vlan].cidr}
+Address=${host_network.host_tap_ip}/${networks[k].cidr}
 EOF
 %{ endif ~}
 %{ endfor ~}
@@ -99,15 +99,15 @@ EOF
 ## internal network for host <-> local vm
 ##
 
-cat <<EOF > /etc/systemd/network/${networkd_priority}_${networks.int.if}.netdev
+cat <<EOF > /etc/systemd/network/50_${int_tap_if}.netdev
 [NetDev]
-Name=${networks.int.if}
+Name=${int_tap_if}
 Kind=bridge
 EOF
 
-cat <<EOF > /etc/systemd/network/${networkd_priority}_${networks.int.if}.network
+cat <<EOF > /etc/systemd/network/50_${int_tap_if}.network
 [Match]
-Name=${networks.int.if}
+Name=${int_tap_if}
 
 [Link]
 ARP=no
@@ -119,13 +119,13 @@ MACVTAP=${int_tap_if}
 Bridge=${int_dummy_if}
 EOF
 
-cat <<EOF > /etc/systemd/network/${networkd_priority}_${int_dummy_if}.netdev
+cat <<EOF > /etc/systemd/network/50_${int_dummy_if}.netdev
 [NetDev]
 Name=${int_dummy_if}
 Kind=dummy
 EOF
 
-cat <<EOF > /etc/systemd/network/${networkd_priority}_${int_dummy_if}.network
+cat <<EOF > /etc/systemd/network/50_${int_dummy_if}.network
 [Match]
 Name=${int_dummy_if}
 
@@ -135,10 +135,10 @@ ARP=no
 [Network]
 LinkLocalAddressing=no
 DHCP=no
-Bridge=${networks.int.if}
+Bridge=${int_tap_if}
 EOF
 
-cat <<EOF > /etc/systemd/network/${networkd_priority}_${int_tap_if}.netdev
+cat <<EOF > /etc/systemd/network/50_${int_tap_if}.netdev
 [NetDev]
 Name=${int_tap_if}
 Kind=macvtap
@@ -147,7 +147,7 @@ Kind=macvtap
 Mode=bridge
 EOF
 
-cat <<EOF > /etc/systemd/network/${networkd_priority}_${int_tap_if}.network
+cat <<EOF > /etc/systemd/network/50_${int_tap_if}.network
 [Match]
 Name=${int_tap_if}
 
@@ -156,7 +156,7 @@ LinkLocalAddressing=no
 DHCP=no
 
 [Address]
-Address=${networks.int.ip}/${networks.int.cidr}
+Address=${host_network.int_tap_ip}/${networks.int.cidr}
 EOF
 
 ##############################################
@@ -192,8 +192,8 @@ After=network.target
 
 [Service]
 ExecStart=/usr/local/bin/matchbox \
-  -address=${networks.int.ip}:${service_ports.renderer_http} \
-  -rpc-address=0.0.0.0:${service_ports.renderer_rpc} \
+  -address=${host_network.int_tap_ip}:${services.renderer.ports.http} \
+  -rpc-address=0.0.0.0:${services.renderer.ports.rpc} \
   -ca-file=${certs_path}/matchbox-ca.pem \
   -cert-file=${certs_path}/matchbox.pem \
   -key-file=${certs_path}/matchbox-key.pem \
@@ -221,7 +221,7 @@ cat <<EOF > /etc/kea/kea-dhcp4.conf
     },
     "subnet4": [
       {
-        "subnet": "${networks.int.ip}/${networks.int.cidr}",
+        "subnet": "${host_network.int_tap_ip}/${networks.int.cidr}",
         "pools": [
           {
             "pool": "${networks.int.dhcp_pool}"

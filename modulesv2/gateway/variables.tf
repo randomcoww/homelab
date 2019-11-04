@@ -2,10 +2,6 @@ variable "user" {
   type = string
 }
 
-variable "password" {
-  type = string
-}
-
 variable "ssh_ca_public_key" {
   type = string
 }
@@ -22,15 +18,15 @@ variable "services" {
   type = any
 }
 
-variable "live_hosts" {
+variable "domains" {
   type = any
 }
 
-variable "kvm_hosts" {
+variable "container_images" {
   type = any
 }
 
-variable "desktop_hosts" {
+variable "gateway_hosts" {
   type = any
 }
 

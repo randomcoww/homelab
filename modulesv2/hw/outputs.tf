@@ -11,12 +11,15 @@ output "matchbox_private_key_pem" {
 }
 
 output "matchbox_rpc_endpoints" {
-  value = [
-    for h in values(var.kvm_hosts) :
-    "${h.network.host_tap_ip}:${var.service_ports.renderer_rpc}"
-  ]
+  value = {
+    for k in keys(var.kvm_hosts) :
+    k => "${var.kvm_hosts[k].network.host_tap_ip}:${var.services.renderer.ports.rpc}"
+  }
 }
 
-output "matchbox_http_endpoint" {
-  value = "http://${var.networks.int.ip}:${var.service_ports.renderer_http}"
+output "matchbox_http_endpoints" {
+  value = {
+    for k in keys(var.kvm_hosts) :
+    k => "${var.kvm_hosts[k].network.int_tap_ip}:${var.services.renderer.ports.http}"
+  }
 }
