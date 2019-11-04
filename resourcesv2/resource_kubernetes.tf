@@ -1,4 +1,6 @@
 locals {
+  kubernetes_cluster_name = "default-cluster"
+
   controller_hosts = {
     controller-0 = {
       network = {
@@ -51,7 +53,7 @@ module "kubernetes-test" {
 
   s3_backup_aws_region    = "us-west-2"
   s3_etcd_backup_bucket   = "randomcoww-etcd-backup"
-  kubernetes_cluster_name = "default-cluster"
+  kubernetes_cluster_name = local.kubernetes_cluster_name
 
   ## Use local matchbox renderer launched with run_renderer.sh
   renderer = {
@@ -60,4 +62,15 @@ module "kubernetes-test" {
     private_key_pem = module.renderer.matchbox_private_key_pem
     ca_pem          = module.renderer.matchbox_ca_pem
   }
+}
+
+resource "local_file" "kubeconfig-admin" {
+  content = templatefile("${path.module}/../templates/manifest/kubeconfig_admin.yaml.tmpl", {
+    cluster_name       = local.kubernetes_cluster_name
+    ca_pem             = replace(base64encode(chomp(module.kubernetes-test.kubernetes_ca_pem)), "\n", "")
+    cert_pem           = replace(base64encode(chomp(module.kubernetes-test.kubernetes_cert_pem)), "\n", "")
+    private_key_pem    = replace(base64encode(chomp(module.kubernetes-test.kubernetes_private_key_pem)), "\n", "")
+    apiserver_endpoint = module.kubernetes-test.apiserver_endpoint
+  })
+  filename = "./output/kubernetes/${local.kubernetes_cluster_name}.kubeconfig"
 }

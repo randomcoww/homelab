@@ -1,3 +1,7 @@
+output "apiserver_endpoint" {
+  value = "https://${var.services.kubernetes_apiserver.vip}:${var.services.kubernetes_apiserver.ports.secure}"
+}
+
 output "kubernetes_cert_pem" {
   value = tls_locally_signed_cert.kubernetes-client.cert_pem
 }
