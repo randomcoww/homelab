@@ -12,13 +12,13 @@ locals {
     }
     kea = {
       ports = {
-        peer = 8888
+        peer = 58082
       }
     }
     etcd = {
       ports = {
-        peer   = 58888
-        client = 58888
+        peer   = 52380
+        client = 52379
       }
     }
     gateway = {
@@ -37,6 +37,12 @@ locals {
       vip = "192.168.126.127"
       ports = {
         prometheus = 9153
+      }
+    }
+    kubernetes_apiserver = {
+      vip = "192.168.126.245"
+      ports = {
+        secure = 56443
       }
     }
     kubernetes_service = {

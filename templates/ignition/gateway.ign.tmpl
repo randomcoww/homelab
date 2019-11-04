@@ -463,7 +463,7 @@ storage:
                       tls_servername ${dns_forward_tls_servername}
                       health_check 5s
                     }
-                    prometheus :${services.recursive_dns.port.promethus}
+                    prometheus :${services.recursive_dns.ports.prometheus}
                     cache 30
                     reload
                     loadbalance
