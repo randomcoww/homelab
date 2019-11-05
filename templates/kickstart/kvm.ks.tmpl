@@ -99,15 +99,15 @@ EOF
 ## internal network for host <-> local vm
 ##
 
-cat <<EOF > /etc/systemd/network/50_${int_tap_if}.netdev
+cat <<EOF > /etc/systemd/network/50_${int_bridge_if}.netdev
 [NetDev]
-Name=${int_tap_if}
+Name=${int_bridge_if}
 Kind=bridge
 EOF
 
-cat <<EOF > /etc/systemd/network/50_${int_tap_if}.network
+cat <<EOF > /etc/systemd/network/50_${int_bridge_if}.network
 [Match]
-Name=${int_tap_if}
+Name=${int_bridge_if}
 
 [Link]
 ARP=no
@@ -135,7 +135,7 @@ ARP=no
 [Network]
 LinkLocalAddressing=no
 DHCP=no
-Bridge=${int_tap_if}
+Bridge=${int_bridge_if}
 EOF
 
 cat <<EOF > /etc/systemd/network/50_${int_tap_if}.netdev
@@ -156,7 +156,7 @@ LinkLocalAddressing=no
 DHCP=no
 
 [Address]
-Address=${host_network.int_tap_ip}/${networks.int.cidr}
+Address=${services.renderer.vip}/${networks.int.cidr}
 EOF
 
 ##############################################
@@ -192,7 +192,7 @@ After=network.target
 
 [Service]
 ExecStart=/usr/local/bin/matchbox \
-  -address=${host_network.int_tap_ip}:${services.renderer.ports.http} \
+  -address=${services.renderer.vip}:${services.renderer.ports.http} \
   -rpc-address=0.0.0.0:${services.renderer.ports.rpc} \
   -ca-file=${certs_path}/matchbox-ca.pem \
   -cert-file=${certs_path}/matchbox.pem \
@@ -216,12 +216,20 @@ cat <<EOF > /etc/kea/kea-dhcp4.conf
   "Dhcp4": {
     "interfaces-config": {
       "interfaces": [
+        "${int_bridge_if}",
         "${int_tap_if}"
       ]
     },
+    "client-classes": [
+      {
+        "name": "ipxe_detected",
+        "test": "substring(option[77].hex,0,4) == 'iPXE'",
+        "boot-file-name": "http://${services.renderer.vip}:${services.renderer.ports.http}/boot.ipxe"
+      }
+    ],
     "subnet4": [
       {
-        "subnet": "${host_network.int_tap_ip}/${networks.int.cidr}",
+        "subnet": "${networks.int.network}/${networks.int.cidr}",
         "pools": [
           {
             "pool": "${networks.int.dhcp_pool}"

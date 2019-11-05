@@ -1,18 +1,13 @@
 ##
 ## worker ignition renderer
 ##
-resource "matchbox_profile" "ign-worker" {
-  name                   = "controller"
-  container_linux_config = "{{.config}}"
-}
-
 resource "matchbox_group" "ign-worker" {
   for_each = var.worker_hosts
 
-  profile = matchbox_profile.ign-worker.name
+  profile = matchbox_profile.ign-profile.name
   name    = each.key
   selector = {
-    ign = each.key
+    mac = each.value.network.int_mac
   }
 
   metadata = {

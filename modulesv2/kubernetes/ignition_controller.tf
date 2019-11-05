@@ -1,18 +1,13 @@
 ##
 ## provisioner ignition renderer
 ##
-resource "matchbox_profile" "ign-controller" {
-  name                   = "controller"
-  container_linux_config = "{{.config}}"
-}
-
 resource "matchbox_group" "ign-controller" {
   for_each = var.controller_hosts
 
-  profile = matchbox_profile.ign-controller.name
+  profile = matchbox_profile.ign-profile.name
   name    = each.key
   selector = {
-    ign = each.key
+    mac = each.value.network.int_mac
   }
 
   metadata = {

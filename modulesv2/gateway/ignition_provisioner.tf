@@ -1,18 +1,13 @@
 ##
 ## provisioner ignition renderer
 ##
-resource "matchbox_profile" "ign-gateway" {
-  name                   = "gateway"
-  container_linux_config = "{{.config}}"
-}
-
 resource "matchbox_group" "ign-gateway" {
   for_each = var.gateway_hosts
 
-  profile = matchbox_profile.ign-gateway.name
+  profile = matchbox_profile.ign-profile.name
   name    = each.key
   selector = {
-    ign = each.key
+    mac = each.value.network.int_mac
   }
 
   metadata = {

@@ -1,16 +1,11 @@
 ##
 ## kube proxy addon manifest
 ##
-resource "matchbox_profile" "manifest-kube-proxy" {
-  name           = "kube-proxy"
-  generic_config = "{{.config}}"
-}
-
 resource "matchbox_group" "manifest-kube-proxy" {
-  name    = matchbox_profile.manifest-kube-proxy.name
-  profile = matchbox_profile.manifest-kube-proxy.name
+  profile = matchbox_profile.manifest-profile.name
+  name    = "kube-proxy"
   selector = {
-    manifest = matchbox_profile.manifest-kube-proxy.name
+    manifest = "kube-proxy"
   }
 
   metadata = {

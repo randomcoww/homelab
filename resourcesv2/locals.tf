@@ -6,6 +6,7 @@ locals {
   services = {
     # kvm services
     renderer = {
+      vip = "192.168.224.1"
       ports = {
         http = 80
         rpc  = 58081
@@ -125,5 +126,13 @@ locals {
       network = "192.168.126.64"
       cidr    = 26
     }
+  }
+
+  ## Use local matchbox renderer launched with run_renderer.sh
+  local_renderer = {
+    endpoint        = "127.0.0.1:8081"
+    cert_pem        = module.renderer.matchbox_cert_pem
+    private_key_pem = module.renderer.matchbox_private_key_pem
+    ca_pem          = module.renderer.matchbox_ca_pem
   }
 }

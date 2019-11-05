@@ -12,6 +12,7 @@ locals {
         wan_if   = "eth3"
         vwan_ip  = "192.168.127.217"
         vwan_if  = "eth4"
+        int_mac  = "52-54-00-1a-61-2a"
       }
       kea_ha_role = "primary"
     }
@@ -27,6 +28,7 @@ locals {
         wan_if   = "eth3"
         vwan_ip  = "192.168.127.218"
         vwan_if  = "eth4"
+        int_mac  = "52-54-00-1a-61-2b"
       }
       kea_ha_role = "standby"
     }
@@ -69,10 +71,5 @@ module "gateway-test" {
   gateway_hosts     = local.gateway_hosts
 
   ## Use local matchbox renderer launched with run_renderer.sh
-  renderer = {
-    endpoint        = "127.0.0.1:8081"
-    cert_pem        = module.renderer.matchbox_cert_pem
-    private_key_pem = module.renderer.matchbox_private_key_pem
-    ca_pem          = module.renderer.matchbox_ca_pem
-  }
+  renderer = local.local_renderer
 }

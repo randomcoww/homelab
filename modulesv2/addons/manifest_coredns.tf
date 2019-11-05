@@ -1,16 +1,11 @@
 ##
 ## external dns addon manifest
 ##
-resource "matchbox_profile" "manifest-coredns" {
-  name           = "coredns"
-  generic_config = "{{.config}}"
-}
-
 resource "matchbox_group" "manifest-coredns" {
-  name    = matchbox_profile.manifest-coredns.name
-  profile = matchbox_profile.manifest-coredns.name
+  profile = matchbox_profile.manifest-profile.name
+  name    = "coredns"
   selector = {
-    manifest = matchbox_profile.manifest-coredns.name
+    manifest = "coredns"
   }
 
   metadata = {

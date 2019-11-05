@@ -1,16 +1,10 @@
 ##
 ## KVM (HW) kickstart renderer
 ##
-
-resource "matchbox_profile" "ks-kvm" {
-  name           = "kvm"
-  generic_config = "{{.config}}"
-}
-
 resource "matchbox_group" "ks-kvm" {
   for_each = var.kvm_hosts
 
-  profile = matchbox_profile.ks-kvm.name
+  profile = matchbox_profile.ks-profile.name
   name    = each.key
   selector = {
     ks = each.key
@@ -43,6 +37,7 @@ resource "matchbox_group" "ks-kvm" {
       mtu           = var.mtu
       host_tap_vlan = "store"
       host_tap_if   = "host-tap"
+      int_bridge_if = "en-int"
       int_dummy_if  = "int-dummy"
       int_tap_if    = "int-tap"
 

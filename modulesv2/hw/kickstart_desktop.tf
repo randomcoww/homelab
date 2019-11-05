@@ -1,16 +1,10 @@
 ##
 ## Desktop (HW) kickstart renderer
 ##
-
-resource "matchbox_profile" "ks-desktop" {
-  name           = "desktop"
-  generic_config = "{{.config}}"
-}
-
 resource "matchbox_group" "ks-desktop" {
   for_each = var.desktop_hosts
 
-  profile = matchbox_profile.ks-desktop.name
+  profile = matchbox_profile.ks-profile.name
   name    = each.key
   selector = {
     ks = each.key
