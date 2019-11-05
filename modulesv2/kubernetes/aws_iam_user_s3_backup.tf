@@ -1,5 +1,5 @@
 resource "aws_iam_user" "s3-etcd-backup" {
-  name = "s3-etcd-backup-${var.kubernetes_cluster_name}"
+  name = "s3-etcd-backup-${var.cluster_name}"
 }
 
 resource "aws_iam_access_key" "s3-etcd-backup" {
@@ -14,7 +14,7 @@ resource "aws_iam_user_policy" "s3-etcd-backup-access" {
     Statement = [
       {
         Effect   = "Allow"
-        Action   = "s3:${var.s3_etcd_backup_bucket}/${var.kubernetes_cluster_name}"
+        Action   = "s3:${var.s3_etcd_backup_bucket}/${var.cluster_name}"
         Resource = "*"
       }
     ]
