@@ -2,7 +2,7 @@
 ## kapprover addon manifest
 ##
 resource "matchbox_group" "manifest-kapprover" {
-  profile = matchbox_profile.manifest-profile.name
+  profile = matchbox_profile.generic-profile.name
   name    = "kapprover"
   selector = {
     manifest = "kapprover"

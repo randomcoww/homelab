@@ -4,7 +4,7 @@
 resource "matchbox_group" "ks-desktop" {
   for_each = var.desktop_hosts
 
-  profile = matchbox_profile.ks-profile.name
+  profile = matchbox_profile.generic-profile.name
   name    = each.key
   selector = {
     ks = each.key

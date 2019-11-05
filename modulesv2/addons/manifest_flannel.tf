@@ -2,7 +2,7 @@
 ## CNI (flannel) addon manifest
 ##
 resource "matchbox_group" "manifest-flannel" {
-  profile = matchbox_profile.manifest-profile.name
+  profile = matchbox_profile.generic-profile.name
   name    = "flannel"
   selector = {
     manifest = "flannel"

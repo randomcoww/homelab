@@ -2,7 +2,7 @@
 ## external dns addon manifest
 ##
 resource "matchbox_group" "manifest-coredns" {
-  profile = matchbox_profile.manifest-profile.name
+  profile = matchbox_profile.generic-profile.name
   name    = "coredns"
   selector = {
     manifest = "coredns"

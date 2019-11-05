@@ -4,7 +4,7 @@
 resource "matchbox_group" "ks-kvm" {
   for_each = var.kvm_hosts
 
-  profile = matchbox_profile.ks-profile.name
+  profile = matchbox_profile.generic-profile.name
   name    = each.key
   selector = {
     ks = each.key

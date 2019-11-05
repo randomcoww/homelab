@@ -2,7 +2,7 @@
 ## kube proxy addon manifest
 ##
 resource "matchbox_group" "manifest-kube-proxy" {
-  profile = matchbox_profile.manifest-profile.name
+  profile = matchbox_profile.generic-profile.name
   name    = "kube-proxy"
   selector = {
     manifest = "kube-proxy"
