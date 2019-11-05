@@ -4,21 +4,18 @@ locals {
   kubernetes_version = "v1.15.3"
 
   services = {
+    # kvm services
     renderer = {
       ports = {
         http = 80
         rpc  = 58081
       }
     }
+
+    # provisioner services
     kea = {
       ports = {
         peer = 58082
-      }
-    }
-    etcd = {
-      ports = {
-        peer   = 52380
-        client = 52379
       }
     }
     gateway = {
@@ -33,14 +30,9 @@ locals {
         prometheus = 9153
       }
     }
-    internal_dns = {
-      vip = "192.168.126.127"
-      ports = {
-        prometheus = 9153
-      }
-    }
+
+    # kubernetes common
     kubernetes_apiserver = {
-      vip = "192.168.126.245"
       ports = {
         secure = 56443
       }
@@ -50,6 +42,18 @@ locals {
     }
     kubernetes_dns = {
       vip = "10.96.0.10"
+    }
+    etcd = {
+      ports = {
+        peer   = 52380
+        client = 52379
+      }
+    }
+    internal_dns = {
+      vip = "192.168.126.127"
+      ports = {
+        prometheus = 9153
+      }
     }
   }
 

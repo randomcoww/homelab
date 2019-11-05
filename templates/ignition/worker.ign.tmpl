@@ -171,10 +171,10 @@ storage:
           - cluster:
               certificate-authority: ${kubelet_path}/kubernetes-ca.pem
               server: ${apiserver_endpoint}
-            name: ${kubernetes_cluster_name}
+            name: ${cluster_name}
           contexts:
           - context:
-              cluster: ${kubernetes_cluster_name}
+              cluster: ${cluster_name}
               user: system:node:bootstrap
             name: default
           current-context: default

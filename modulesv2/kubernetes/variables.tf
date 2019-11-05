@@ -10,6 +10,14 @@ variable "mtu" {
   type = number
 }
 
+variable "cluster_name" {
+  type = string
+}
+
+variable "apiserver_vip" {
+  type = string
+}
+
 variable "networks" {
   type = any
 }
@@ -39,10 +47,6 @@ variable "s3_backup_aws_region" {
 }
 
 variable "s3_etcd_backup_bucket" {
-  type = string
-}
-
-variable "kubernetes_cluster_name" {
   type = string
 }
 

@@ -217,10 +217,10 @@ storage:
           - cluster:
               certificate-authority: ${kubelet_path}/kubernetes-ca.pem
               server: ${apiserver_local_endpoint}
-            name: ${kubernetes_cluster_name}
+            name: ${cluster_name}
           contexts:
           - context:
-              cluster: ${kubernetes_cluster_name}
+              cluster: ${cluster_name}
               user: system:kube-controller-manager
             name: default
           current-context: default
@@ -241,10 +241,10 @@ storage:
           - cluster:
               certificate-authority: ${kubelet_path}/kubernetes-ca.pem
               server: ${apiserver_local_endpoint}
-            name: ${kubernetes_cluster_name}
+            name: ${cluster_name}
           contexts:
           - context:
-              cluster: ${kubernetes_cluster_name}
+              cluster: ${cluster_name}
               user: system:kube-scheduler
             name: default
           current-context: default
@@ -296,7 +296,7 @@ storage:
                     interface ${host_network.store_if}
                     priority 100
                     virtual_ipaddress {
-                      $(services.kubernetes_apiserver.vip)
+                      $(apiserver_vip)
                     }
                   }
               livenessProbe:
@@ -455,7 +455,7 @@ storage:
               - "--address=0.0.0.0"
               - "--cluster-cidr=${networks.kubernetes.network}/${networks.kubernetes.cidr}"
               - "--allocate-node-cidrs=true"
-              - "--cluster-name=${kubernetes_cluster_name}"
+              - "--cluster-name=${cluster_name}"
               - "--cluster-signing-cert-file=${kubelet_path}/kubernetes-ca.pem"
               - "--cluster-signing-key-file=${kubelet_path}/kubernetes-ca-key.pem"
               - "--kubeconfig=${kubelet_path}/kube-controller-manager.kubeconfig"

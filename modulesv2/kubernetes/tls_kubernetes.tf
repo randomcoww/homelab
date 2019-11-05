@@ -27,7 +27,7 @@ resource "tls_cert_request" "kubernetes" {
     "127.0.0.1",
     each.value.network.store_ip,
     var.services.kubernetes_service.vip,
-    var.services.kubernetes_apiserver.vip
+    var.apiserver_vip
   ]
 }
 

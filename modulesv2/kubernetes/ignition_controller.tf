@@ -17,19 +17,19 @@ resource "matchbox_group" "ign-controller" {
 
   metadata = {
     config = templatefile("${path.module}/../../templates/ignition/controller.ign.tmpl", {
-      hostname                = each.key
-      user                    = var.user
-      ssh_authorized_key      = "cert-authority ${chomp(var.ssh_ca_public_key)}"
-      mtu                     = var.mtu
-      kubernetes_cluster_name = var.kubernetes_cluster_name
+      hostname           = each.key
+      user               = var.user
+      ssh_authorized_key = "cert-authority ${chomp(var.ssh_ca_public_key)}"
+      mtu                = var.mtu
+      cluster_name       = var.cluster_name
 
       container_images = var.container_images
       networks         = var.networks
       host_network     = each.value.network
       services         = var.services
 
-      etcd_cluster_token    = var.kubernetes_cluster_name
-      s3_etcd_backup_path   = "${var.s3_etcd_backup_bucket}/${var.kubernetes_cluster_name}"
+      etcd_cluster_token    = var.cluster_name
+      s3_etcd_backup_path   = "${var.s3_etcd_backup_bucket}/${var.cluster_name}"
       aws_region            = var.s3_backup_aws_region
       aws_access_key_id     = aws_iam_access_key.s3-etcd-backup.id
       aws_secret_access_key = aws_iam_access_key.s3-etcd-backup.secret

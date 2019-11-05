@@ -17,11 +17,11 @@ resource "matchbox_group" "ign-worker" {
 
   metadata = {
     config = templatefile("${path.module}/../../templates/ignition/worker.ign.tmpl", {
-      hostname                = each.key
-      user                    = var.user
-      ssh_authorized_key      = "cert-authority ${chomp(var.ssh_ca_public_key)}"
-      mtu                     = var.mtu
-      kubernetes_cluster_name = var.kubernetes_cluster_name
+      hostname           = each.key
+      user               = var.user
+      ssh_authorized_key = "cert-authority ${chomp(var.ssh_ca_public_key)}"
+      mtu                = var.mtu
+      cluster_name       = var.cluster_name
 
       container_images = var.container_images
       networks         = var.networks
@@ -29,7 +29,7 @@ resource "matchbox_group" "ign-worker" {
       services         = var.services
       domains          = var.domains
 
-      apiserver_endpoint = "https://${var.services.kubernetes_apiserver.vip}:${var.services.kubernetes_apiserver.ports.secure}"
+      apiserver_endpoint = "https://${var.apiserver_vip}:${var.services.kubernetes_apiserver.ports.secure}"
       kubelet_path       = "/var/lib/kubelet"
 
       tls_kubernetes_ca = replace(tls_self_signed_cert.kubernetes-ca.cert_pem, "\n", "\\n")
