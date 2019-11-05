@@ -32,6 +32,14 @@ locals {
       }
     }
   }
+
+  ## Use local matchbox renderer launched with run_renderer.sh
+  local_renderer = {
+    endpoint        = "127.0.0.1:8081"
+    cert_pem        = module.renderer.matchbox_cert_pem
+    private_key_pem = module.renderer.matchbox_private_key_pem
+    ca_pem          = module.renderer.matchbox_ca_pem
+  }
 }
 
 # Do this to each provider until for_each module is available
@@ -56,13 +64,20 @@ module "kubernetes-test" {
   s3_backup_aws_region  = "us-west-2"
   s3_etcd_backup_bucket = "randomcoww-etcd-backup"
 
-  ## Use local matchbox renderer launched with run_renderer.sh
-  renderer = {
-    endpoint        = "127.0.0.1:8081"
-    cert_pem        = module.renderer.matchbox_cert_pem
-    private_key_pem = module.renderer.matchbox_private_key_pem
-    ca_pem          = module.renderer.matchbox_ca_pem
-  }
+  renderer = local.local_renderer
+}
+
+module "kubernetes-addons" {
+  source = "../modulesv2/addons"
+
+  namespace        = "kube-system"
+  apiserver_vip    = module.kubernetes-test.apiserver_vip
+  networks         = local.networks
+  services         = local.services
+  domains          = local.domains
+  container_images = local.container_images
+
+  renderer = local.local_renderer
 }
 
 resource "local_file" "kubeconfig-admin" {

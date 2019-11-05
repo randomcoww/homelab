@@ -2,6 +2,10 @@ output "cluster_name" {
   value = var.cluster_name
 }
 
+output "apiserver_vip" {
+  value = var.apiserver_vip
+}
+
 output "apiserver_endpoint" {
   value = "https://${var.apiserver_vip}:${var.services.kubernetes_apiserver.ports.secure}"
 }
