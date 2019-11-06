@@ -71,7 +71,7 @@ spec:
         - "--config=/etc/kube-proxy/kube-proxy-config.yaml"
         env:
         - name: KUBERNETES_SERVICE_HOST
-          value: ${apiserver_vip}
+          value: ${services.kubernetes_apiserver.vip}
         - name: KUBERNETES_SERVICE_PORT
           value: "${services.kubernetes_apiserver.ports.secure}"
         securityContext:

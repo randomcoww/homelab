@@ -14,10 +14,6 @@ variable "cluster_name" {
   type = string
 }
 
-variable "apiserver_vip" {
-  type = string
-}
-
 variable "networks" {
   type = any
 }

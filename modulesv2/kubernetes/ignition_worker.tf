@@ -24,7 +24,7 @@ resource "matchbox_group" "ign-worker" {
       services         = var.services
       domains          = var.domains
 
-      apiserver_endpoint = "https://${var.apiserver_vip}:${var.services.kubernetes_apiserver.ports.secure}"
+      apiserver_endpoint = "https://${var.services.kubernetes_apiserver.vip}:${var.services.kubernetes_apiserver.ports.secure}"
       kubelet_path       = "/var/lib/kubelet"
 
       tls_kubernetes_ca = replace(tls_self_signed_cert.kubernetes-ca.cert_pem, "\n", "\\n")

@@ -156,7 +156,7 @@ LinkLocalAddressing=no
 DHCP=no
 
 [Address]
-Address=${services.renderer.vip}/${networks.int.cidr}
+Address=${host_network.int_tap_ip}/${networks.int.cidr}
 EOF
 
 ##############################################

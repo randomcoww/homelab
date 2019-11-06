@@ -2,6 +2,27 @@ locals {
   user               = "core"
   mtu                = 9000
   kubernetes_version = "v1.15.3"
+  container_images = {
+    hyperkube               = "gcr.io/google_containers/hyperkube:${local.kubernetes_version}"
+    kube_apiserver          = "gcr.io/google_containers/kube-apiserver:${local.kubernetes_version}"
+    kube_controller_manager = "gcr.io/google_containers/kube-controller-manager:${local.kubernetes_version}"
+    kube_scheduler          = "gcr.io/google_containers/kube-scheduler:${local.kubernetes_version}"
+    kube_proxy              = "gcr.io/google_containers/kube-proxy:${local.kubernetes_version}"
+    kubelet                 = "randomcoww/kubelet:latest"
+    etcd_wrapper            = "randomcoww/etcd-wrapper:20190609.01"
+    etcd                    = "gcr.io/etcd-development/etcd:v3.4.0"
+    flannel                 = "quay.io/coreos/flannel:v0.11.0-amd64"
+    keepalived              = "randomcoww/keepalived:latest"
+    cni_plugins             = "randomcoww/cni_plugins:v0.8.2"
+    coredns                 = "coredns/coredns:1.6.3"
+    external_dns            = "registry.opensource.zalan.do/teapot/external-dns:latest"
+    kapprover               = "randomcoww/kapprover:v0.0.3"
+    busybox                 = "busybox:latest"
+    nftables                = "randomcoww/nftables:latest"
+    kea                     = "randomcoww/kea:20190119.01"
+    tftpd                   = "randomcoww/tftpd_ipxe:latest"
+    conntrack               = "randomcoww/conntrack:latest"
+  }
 
   services = {
     # kvm services
@@ -34,6 +55,7 @@ locals {
 
     # kubernetes common
     kubernetes_apiserver = {
+      vip = "192.168.126.245"
       ports = {
         secure = 56443
       }
@@ -61,28 +83,6 @@ locals {
   domains = {
     internal           = "fuzzybunny.internal"
     kubernetes_cluster = "cluster.local"
-  }
-
-  container_images = {
-    hyperkube               = "gcr.io/google_containers/hyperkube:${local.kubernetes_version}"
-    kube_apiserver          = "gcr.io/google_containers/kube-apiserver:${local.kubernetes_version}"
-    kube_controller_manager = "gcr.io/google_containers/kube-controller-manager:${local.kubernetes_version}"
-    kube_scheduler          = "gcr.io/google_containers/kube-scheduler:${local.kubernetes_version}"
-    kube_proxy              = "gcr.io/google_containers/kube-proxy:${local.kubernetes_version}"
-    kubelet                 = "randomcoww/kubelet:latest"
-    etcd_wrapper            = "randomcoww/etcd-wrapper:20190609.01"
-    etcd                    = "gcr.io/etcd-development/etcd:v3.4.0"
-    flannel                 = "quay.io/coreos/flannel:v0.11.0-amd64"
-    keepalived              = "randomcoww/keepalived:latest"
-    cni_plugins             = "randomcoww/cni_plugins:v0.8.2"
-    coredns                 = "coredns/coredns:1.6.3"
-    external_dns            = "registry.opensource.zalan.do/teapot/external-dns:latest"
-    kapprover               = "randomcoww/kapprover:v0.0.3"
-    busybox                 = "busybox:latest"
-    nftables                = "randomcoww/nftables:latest"
-    kea                     = "randomcoww/kea:20190119.01"
-    tftpd                   = "randomcoww/tftpd_ipxe:latest"
-    conntrack               = "randomcoww/conntrack:latest"
   }
 
   networks = {
@@ -129,10 +129,20 @@ locals {
   }
 
   ## Use local matchbox renderer launched with run_renderer.sh
-  local_renderer = {
+  renderer_local = {
     endpoint        = "127.0.0.1:8081"
     cert_pem        = module.renderer.matchbox_cert_pem
     private_key_pem = module.renderer.matchbox_private_key_pem
     ca_pem          = module.renderer.matchbox_ca_pem
+  }
+
+  renderers = {
+    for k in keys(module.hw.matchbox_rpc_endpoints) :
+    k => {
+      endpoint        = module.hw.matchbox_rpc_endpoints[k]
+      cert_pem        = module.hw.matchbox_cert_pem
+      private_key_pem = module.hw.matchbox_private_key_pem
+      ca_pem          = module.hw.matchbox_ca_pem
+    }
   }
 }

@@ -36,28 +36,6 @@ locals {
 }
 
 # Do this to each provider until for_each module is available
-
-# module "gateway-kvm-0" {
-#   source = "../modulesv2/gateway"
-
-#   user              = local.user
-#   ssh_ca_public_key = tls_private_key.ssh-ca.public_key_openssh
-#   mtu               = local.mtu
-#   networks          = local.networks
-#   services          = local.services
-#   domains           = local.domains
-#   container_images  = local.container_images
-#   gateway_hosts     = local.gateway_hosts
-
-#   ## Use local matchbox renderer launched with run_renderer.sh
-#   renderer = {
-#     endpoint        = module.hw.matchbox_rpc_endpoints.kvm-0
-#     cert_pem        = module.hw.matchbox_cert_pem
-#     private_key_pem = module.hw.matchbox_private_key_pem
-#     ca_pem          = module.hw.matchbox_ca_pem
-#   }
-# }
-
 module "gateway-test" {
   source = "../modulesv2/gateway"
 
@@ -71,5 +49,5 @@ module "gateway-test" {
   gateway_hosts     = local.gateway_hosts
 
   ## Use local matchbox renderer launched with run_renderer.sh
-  renderer = local.local_renderer
+  renderer = local.renderer_local
 }

@@ -44,10 +44,6 @@ locals {
 module "kubernetes-test" {
   source = "../modulesv2/kubernetes"
 
-  # cluster identifier - should be unique for each cluster
-  cluster_name  = "default-cluster"
-  apiserver_vip = "192.168.126.245"
-
   user              = local.user
   ssh_ca_public_key = tls_private_key.ssh-ca.public_key_openssh
   mtu               = local.mtu
@@ -58,23 +54,11 @@ module "kubernetes-test" {
   controller_hosts  = local.controller_hosts
   worker_hosts      = local.worker_hosts
 
+  cluster_name          = "default-cluster"
   s3_backup_aws_region  = "us-west-2"
   s3_etcd_backup_bucket = "randomcoww-etcd-backup"
 
-  renderer = local.local_renderer
-}
-
-module "kubernetes-addons" {
-  source = "../modulesv2/addons"
-
-  namespace        = "kube-system"
-  apiserver_vip    = module.kubernetes-test.apiserver_vip
-  networks         = local.networks
-  services         = local.services
-  domains          = local.domains
-  container_images = local.container_images
-
-  renderer = local.local_renderer
+  renderer = local.renderer_local
 }
 
 resource "local_file" "kubeconfig-admin" {
@@ -85,5 +69,5 @@ resource "local_file" "kubeconfig-admin" {
     private_key_pem    = module.kubernetes-test.kubernetes_private_key_pem_base64
     apiserver_endpoint = module.kubernetes-test.apiserver_endpoint
   })
-  filename = "./output/${module.kubernetes-test.cluster_name}.kubeconfig"
+  filename = "output/${module.kubernetes-test.cluster_name}.kubeconfig"
 }

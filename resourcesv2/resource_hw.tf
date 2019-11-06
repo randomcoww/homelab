@@ -28,15 +28,17 @@ module "hw" {
       network = {
         hw_if       = "enp1s0f0"
         host_tap_ip = "192.168.127.251"
+        int_tap_ip  = local.services.renderer.vip
       }
     }
     kvm-1 = {
       network = {
         hw_if       = "enp1s0f0"
         host_tap_ip = "192.168.127.252"
+        int_tap_ip  = local.services.renderer.vip
       }
     }
   }
 
-  renderer = local.local_renderer
+  renderer = local.renderer_local
 }

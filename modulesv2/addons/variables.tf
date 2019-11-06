@@ -1,7 +1,3 @@
-variable "apiserver_vip" {
-  type = string
-}
-
 variable "namespace" {
   type = string
 }

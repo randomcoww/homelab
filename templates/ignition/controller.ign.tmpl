@@ -296,7 +296,7 @@ storage:
                     interface ${host_network.store_if}
                     priority 100
                     virtual_ipaddress {
-                      $(apiserver_vip)
+                      $(services.kubernetes_apiserver.vip)
                     }
                   }
               livenessProbe:
