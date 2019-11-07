@@ -45,13 +45,14 @@ Generate hypervisor images:
 ```bash
 cd build
 export FEDORA_RELEASE=30
+export ISO_FILE=./Fedora-Server-netinst-x86_64-31-1.9.iso
 
 wget \
     https://download.fedoraproject.org/pub/fedora/linux/releases/$FEDORA_RELEASE/Server/x86_64/iso/Fedora-Server-netinst-x86_64-$FEDORA_RELEASE-1.2.iso
 
 sudo livemedia-creator \
     --make-iso \
-    --iso=./Fedora-Server-netinst-x86_64-$FEDORA_RELEASE-1.2.iso \
+    --iso=$ISO_FILE \
     --project Fedora \
     --volid vm \
     --releasever $FEDORA_RELEASE \
@@ -64,7 +65,7 @@ sudo livemedia-creator \
 
 sudo livemedia-creator \
     --make-iso \
-    --iso=./Fedora-Server-netinst-x86_64-$FEDORA_RELEASE-1.2.iso \
+    --iso=$ISO_FILE \
     --project Fedora \
     --volid vm \
     --releasever $FEDORA_RELEASE \
@@ -77,7 +78,7 @@ sudo livemedia-creator \
 
 sudo livemedia-creator \
     --make-iso \
-    --iso=./Fedora-Server-netinst-x86_64-$FEDORA_RELEASE-1.2.iso \
+    --iso=$ISO_FILE \
     --project Fedora \
     --volid desktop \
     --releasever $FEDORA_RELEASE \
