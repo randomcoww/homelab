@@ -356,9 +356,7 @@ storage:
                                 "this-server-name": "$(NODE_NAME)",
                                 "mode": "hot-standby",
                                 "max-unacked-clients": 0,
-                                "peers": [
-                                  ${kea_ha_peers}
-                                ]
+                                "peers": ${kea_ha_peers}
                               }
                             ]
                           }
