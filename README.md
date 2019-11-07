@@ -54,27 +54,27 @@ sudo livemedia-creator \
     --make-iso \
     --iso=$ISO_FILE \
     --project Fedora \
-    --volid vm \
+    --volid kvm \
     --releasever $FEDORA_RELEASE \
-    --title vm \
+    --title kvm \
     --resultdir ./result \
     --tmp . \
-    --ks=./vm-0.ks \
+    --ks=./kvm-0.ks \
     --no-virt \
-    --lorax-templates ./lorax-vm
+    --lorax-templates ./lorax-kvm
 
 sudo livemedia-creator \
     --make-iso \
     --iso=$ISO_FILE \
     --project Fedora \
-    --volid vm \
+    --volid kvm \
     --releasever $FEDORA_RELEASE \
-    --title vm \
+    --title kvm \
     --resultdir ./result \
     --tmp . \
-    --ks=./vm-1.ks \
+    --ks=./kvm-1.ks \
     --no-virt \
-    --lorax-templates ./lorax-vm
+    --lorax-templates ./lorax-kvm
 
 sudo livemedia-creator \
     --make-iso \
