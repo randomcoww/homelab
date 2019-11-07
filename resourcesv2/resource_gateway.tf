@@ -4,13 +4,11 @@ locals {
       network = {
         store_ip = "192.168.127.217"
         store_if = "eth0"
-        lan_ip   = "192.168.127.217"
+        lan_ip   = "192.168.63.217"
         lan_if   = "eth1"
-        sync_ip  = "192.168.127.217"
+        sync_ip  = "192.168.190.1"
         sync_if  = "eth2"
-        wan_ip   = "192.168.127.217"
         wan_if   = "eth3"
-        vwan_ip  = "192.168.127.217"
         vwan_if  = "eth4"
         int_mac  = "52-54-00-1a-61-2a"
       }
@@ -20,13 +18,11 @@ locals {
       network = {
         store_ip = "192.168.127.218"
         store_if = "eth0"
-        lan_ip   = "192.168.127.218"
+        lan_ip   = "192.168.63.218"
         lan_if   = "eth1"
-        sync_ip  = "192.168.127.218"
+        sync_ip  = "192.168.190.2"
         sync_if  = "eth2"
-        wan_ip   = "192.168.127.218"
         wan_if   = "eth3"
-        vwan_ip  = "192.168.127.218"
         vwan_if  = "eth4"
         int_mac  = "52-54-00-1a-61-2b"
       }
