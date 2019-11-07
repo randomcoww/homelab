@@ -106,9 +106,8 @@ EOF
 
 ## enable services
 systemctl enable \
-  systemd-networkd systemd-resolved chronyd crond \
-  libvirtd ksm ksmtuned \
-  sshd
+  systemd-networkd systemd-resolved \
+  chronyd crond sshd
 
 systemctl mask \
   NetworkManager \

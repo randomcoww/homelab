@@ -247,6 +247,7 @@ curl -LO ${container_linux_base_url}/${container_linux_image}
 popd
 
 systemctl enable \
+  libvirtd ksm ksmtuned \
   kea-dhcp4 matchbox
 
 %end
