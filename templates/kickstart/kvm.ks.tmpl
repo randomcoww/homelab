@@ -182,7 +182,7 @@ EOF
 
 curl -o matchbox.tar.gz \
   -LO ${matchbox_url}
-tar xzf matchbox.tar.gz */matchbox --strip 1 -C /usr/loca/bin/
+tar xzf matchbox.tar.gz --strip 1 -C /usr/local/bin/ */matchbox
 rm -f matchbox.tar.gz
 
 cat <<EOF > /etc/systemd/system/matchbox.service
@@ -191,13 +191,13 @@ Description=CoreOS Matchbox
 After=network.target
 
 [Service]
-ExecStart=/usr/local/bin/matchbox \
-  -address=${services.renderer.vip}:${services.renderer.ports.http} \
-  -rpc-address=0.0.0.0:${services.renderer.ports.rpc} \
-  -ca-file=${certs_path}/matchbox-ca.pem \
-  -cert-file=${certs_path}/matchbox.pem \
-  -key-file=${certs_path}/matchbox-key.pem \
-  -data-path=${matchbox_data_path} \
+ExecStart=/usr/local/bin/matchbox \\
+  -address=${services.renderer.vip}:${services.renderer.ports.http} \\
+  -rpc-address=0.0.0.0:${services.renderer.ports.rpc} \\
+  -ca-file=${certs_path}/matchbox-ca.pem \\
+  -cert-file=${certs_path}/matchbox.pem \\
+  -key-file=${certs_path}/matchbox-key.pem \\
+  -data-path=${matchbox_data_path} \\
   -assets-path=${matchbox_assets_path}
 Restart=always
 RestartSec=5

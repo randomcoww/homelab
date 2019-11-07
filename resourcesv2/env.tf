@@ -87,7 +87,7 @@ locals {
   networks = {
     # vlans
     store = {
-      id        = 0
+      id        = 1
       network   = "192.168.126.0"
       cidr      = 23
       dhcp_pool = "192.168.127.64/26"
