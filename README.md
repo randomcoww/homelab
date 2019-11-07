@@ -44,7 +44,7 @@ terraform apply \
 Generate hypervisor images:
 ```bash
 cd build
-export FEDORA_RELEASE=30
+export FEDORA_RELEASE=31
 export ISO_FILE=./Fedora-Server-netinst-x86_64-31-1.9.iso
 
 wget \
