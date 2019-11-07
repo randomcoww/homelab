@@ -7,5 +7,6 @@ module "kubernetes-addons" {
   domains          = local.domains
   container_images = local.container_images
 
-  renderer = local.renderer_local
+  # Render to one of KVM host matchbox instances
+  renderer = local.renderers[var.renderer]
 }

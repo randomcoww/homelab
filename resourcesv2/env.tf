@@ -128,15 +128,20 @@ locals {
     }
   }
 
-  ## Use local matchbox renderer launched with run_renderer.sh
-  renderer_local = {
+  ## Matchbox instance to write configs to
+  ## This needs to be passed in by hostname (e.g. -var=renderer=kvm-0) for now
+  ## Dynamic provider support might resolse this
+  local_renderer = {
     endpoint        = "127.0.0.1:8081"
-    cert_pem        = module.renderer.matchbox_cert_pem
-    private_key_pem = module.renderer.matchbox_private_key_pem
-    ca_pem          = module.renderer.matchbox_ca_pem
+    cert_pem        = module.local-renderer.matchbox_cert_pem
+    private_key_pem = module.local-renderer.matchbox_private_key_pem
+    ca_pem          = module.local-renderer.matchbox_ca_pem
   }
 
-  renderers = {
+  renderers = merge({
+    local = local.local_renderer
+  },
+  {
     for k in keys(module.hw.matchbox_rpc_endpoints) :
     k => {
       endpoint        = module.hw.matchbox_rpc_endpoints[k]
@@ -144,5 +149,5 @@ locals {
       private_key_pem = module.hw.matchbox_private_key_pem
       ca_pem          = module.hw.matchbox_ca_pem
     }
-  }
+  })
 }

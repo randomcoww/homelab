@@ -48,6 +48,6 @@ module "gateway-test" {
   container_images  = local.container_images
   gateway_hosts     = local.gateway_hosts
 
-  ## Use local matchbox renderer launched with run_renderer.sh
-  renderer = local.renderer_local
+  # Render to one of KVM host matchbox instances
+  renderer = local.renderers[var.renderer]
 }

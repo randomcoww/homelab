@@ -1,19 +1,4 @@
-module "hw" {
-  source = "../modulesv2/hw"
-
-  user              = local.user
-  password          = var.password
-  ssh_ca_public_key = tls_private_key.ssh-ca.public_key_openssh
-  mtu               = local.mtu
-  networks          = local.networks
-  services          = local.services
-
-  # LiveOS base KS
-  live_hosts = {
-    live-base = {
-    }
-  }
-
+locals {
   # Desktop host KS
   desktop_hosts = {
     desktop-0 = {
@@ -39,6 +24,27 @@ module "hw" {
       }
     }
   }
+}
 
-  renderer = local.renderer_local
+module "hw" {
+  source = "../modulesv2/hw"
+
+  user              = local.user
+  password          = var.password
+  ssh_ca_public_key = tls_private_key.ssh-ca.public_key_openssh
+  mtu               = local.mtu
+  networks          = local.networks
+  services          = local.services
+
+  # LiveOS base KS
+  live_hosts = {
+    live-base = {
+    }
+  }
+  desktop_hosts = local.desktop_hosts
+  kvm_hosts = local.kvm_hosts
+
+  # only local renderer makes sense here
+  # this resource creates non-local renderers
+  renderer = local.local_renderer
 }

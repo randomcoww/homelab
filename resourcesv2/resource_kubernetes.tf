@@ -40,7 +40,6 @@ locals {
 }
 
 # Do this to each provider until for_each module is available
-
 module "kubernetes-test" {
   source = "../modulesv2/kubernetes"
 
@@ -58,9 +57,11 @@ module "kubernetes-test" {
   s3_backup_aws_region  = "us-west-2"
   s3_etcd_backup_bucket = "randomcoww-etcd-backup"
 
-  renderer = local.renderer_local
+  # Render to one of KVM host matchbox instances
+  renderer = local.renderers[var.renderer]
 }
 
+# Write admin kubeconfig file
 resource "local_file" "kubeconfig-admin" {
   content = templatefile("${path.module}/../templates/manifest/kubeconfig_admin.yaml.tmpl", {
     cluster_name       = module.kubernetes-test.cluster_name

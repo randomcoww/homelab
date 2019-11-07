@@ -15,9 +15,9 @@ resource "tls_cert_request" "matchbox" {
     organization = "matchbox"
   }
 
-  ip_addresses = [
+  ip_addresses = concat([
     "127.0.0.1",
-  ]
+  ], var.ip_addresses)
 }
 
 resource "tls_locally_signed_cert" "matchbox" {
