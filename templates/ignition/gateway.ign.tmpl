@@ -565,23 +565,6 @@ storage:
                     }
                   }
 
-    - path: ${kubelet_path}/manifests/tftp.yaml
-      filesystem: root
-      mode: 420
-      contents:
-        inline: |-
-          ---
-          apiVersion: v1
-          kind: Pod
-          metadata:
-            name: kea-tftp
-          spec:
-            restartPolicy: Always
-            hostNetwork: true
-            containers:
-            - name: tftpd-ipxe
-              image: ${container_images.tftpd}
-
     - path: ${kubelet_path}/manifests/conntrackd.yaml
       filesystem: root
       mode: 420

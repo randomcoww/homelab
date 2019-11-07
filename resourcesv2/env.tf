@@ -20,7 +20,6 @@ locals {
     busybox                 = "busybox:latest"
     nftables                = "randomcoww/nftables:latest"
     kea                     = "randomcoww/kea:20190119.01"
-    tftpd                   = "randomcoww/tftpd_ipxe:latest"
     conntrack               = "randomcoww/conntrack:latest"
   }
 
