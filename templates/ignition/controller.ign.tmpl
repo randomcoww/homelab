@@ -9,7 +9,7 @@ networkd:
         [Network]
         LinkLocalAddressing=no
         DHCP=no
-        Gateway=${services.gateway.vip}
+        Gateway=${networks.store.router}
         DNS=${services.recursive_dns.vip}
 
         [Link]

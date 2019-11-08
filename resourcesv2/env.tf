@@ -30,7 +30,6 @@ locals {
         rpc  = 8081
       }
     }
-    # kvm services
     renderer = {
       vip = "192.168.224.1"
       ports = {
@@ -45,14 +44,14 @@ locals {
         peer = 58082
       }
     }
-    gateway = {
-      vip = "192.168.126.240"
-    }
-    lan_gateway = {
-      vip = "192.168.62.240"
-    }
     recursive_dns = {
       vip = "192.168.126.241"
+      ports = {
+        prometheus = 9153
+      }
+    }
+    internal_dns = {
+      vip = "192.168.126.127"
       ports = {
         prometheus = 9153
       }
@@ -77,12 +76,6 @@ locals {
         client = 52379
       }
     }
-    internal_dns = {
-      vip = "192.168.126.127"
-      ports = {
-        prometheus = 9153
-      }
-    }
   }
 
   domains = {
@@ -96,12 +89,14 @@ locals {
       id        = 1
       network   = "192.168.126.0"
       cidr      = 23
+      router    = "192.168.126.240"
       dhcp_pool = "192.168.127.64/26"
     }
     lan = {
       id        = 90
       network   = "192.168.62.0"
       cidr      = 23
+      router    = "192.168.62.240"
       dhcp_pool = "192.168.63.64/26"
     }
     sync = {

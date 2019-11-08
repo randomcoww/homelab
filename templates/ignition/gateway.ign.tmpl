@@ -76,8 +76,8 @@ networkd:
         UseHostname=false
         UseDomains=false
         UseTimezone=no
-        RouteTable=250
         RouteMetric=512
+        RouteTable=${host_network.vwan_route_table}
 
     - name: ${host_network.int_if}.network
       contents: |
@@ -337,22 +337,27 @@ storage:
                       "rebind-timer": 1200,
                       "interfaces-config": {
                         "interfaces": [
-                          "*"
+                          "${host_network.lan_if}",
+                          "${host_network.store_if}"
                         ]
                       },
                       "control-socket": {
                         "socket-type": "unix",
                         "socket-name": "${kea_path}/kea-dhcp4-ctrl.sock"
                       },
-                      "lease-database": {
-                        "type": "memfile",
-                        "name": "${kea_path}/dhcp4.leases",
-                        "persist": true
-                      },
                       "option-data": [
                         {
                           "name": "domain-name",
                           "data": "${domains.internal}"
+                        },
+                        {
+                          "name": "domain-name-servers",
+                          "data": "${services.recursive_dns.vip}",
+                          "csv-format": true
+                        },
+                        {
+                          "name": "interface-mtu",
+                          "data": "${mtu}"
                         }
                       ],
                       "hooks-libraries": [
@@ -380,12 +385,7 @@ storage:
                           "option-data": [
                             {
                               "name": "routers",
-                              "data": "${services.lan_gateway.vip}"
-                            },
-                            {
-                              "name": "domain-name-servers",
-                              "data": "${services.recursive_dns.vip}",
-                              "csv-format": true
+                              "data": "${networks.lan.router}"
                             }
                           ],
                           "pools": [
@@ -399,16 +399,7 @@ storage:
                           "option-data": [
                             {
                               "name": "routers",
-                              "data": "${services.gateway.vip}"
-                            },
-                            {
-                              "name": "domain-name-servers",
-                              "data": "${services.recursive_dns.vip}",
-                              "csv-format": true
-                            },
-                            {
-                              "name": "interface-mtu",
-                              "data": "${mtu}"
+                              "data": "${networks.store.router}"
                             }
                           ],
                           "pools": [
@@ -563,15 +554,15 @@ storage:
                     interface ${host_network.store_if}
                     priority 100
                     virtual_ipaddress {
-                      ${services.gateway.vip} dev ${host_network.store_if}
+                      ${networks.lan.router} dev ${host_network.lan_if}
+                      ${networks.store.router} dev ${host_network.store_if}
                       ${services.recursive_dns.vip} dev ${host_network.store_if}
-                      ${services.lan_gateway.vip} dev ${host_network.lan_if}
                     }
                     virtual_rules {
                       to ${networks.store.network}/${networks.store.cidr} lookup main priority 32758
                       to ${networks.lan.network}/${networks.lan.cidr} lookup main priority 32758
-                      iif ${host_network.store_if} lookup 250 priority 32760
-                      iif ${host_network.lan_if} lookup 250 priority 32760
+                      iif ${host_network.store_if} lookup ${host_network.vwan_route_table} priority 32760
+                      iif ${host_network.lan_if} lookup ${host_network.vwan_route_table} priority 32760
                     }
                   }
 
@@ -642,9 +633,9 @@ storage:
                       Address Ignore {
                         IPv4_address 127.0.0.1
                         IPv4_address $(NODE_IP)
-                        IPv4_address ${services.gateway.vip}
+                        IPv4_address ${networks.lan.router}
+                        IPv4_address ${networks.store.router}
                         IPv4_address ${services.recursive_dns.vip}
-                        IPv4_address ${services.lan_gateway.vip}
                       }
                     }
                   }
