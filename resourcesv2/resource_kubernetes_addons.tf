@@ -8,5 +8,6 @@ module "kubernetes-addons" {
   container_images = local.container_images
 
   # Render to one of KVM host matchbox instances
-  renderer = local.renderers[var.renderer]
+  # renderer = local.renderers[var.renderer]
+  renderer = local.local_renderer
 }

@@ -99,13 +99,13 @@ locals {
       dhcp_pool = "192.168.127.64/26"
     }
     lan = {
-      id        = 60
+      id        = 90
       network   = "192.168.62.0"
       cidr      = 23
       dhcp_pool = "192.168.63.64/26"
     }
     sync = {
-      id      = 90
+      id      = 60
       network = "192.168.190.0"
       cidr    = 29
     }
