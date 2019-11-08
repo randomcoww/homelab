@@ -16,7 +16,8 @@ resource "aws_iam_user_policy" "s3-etcd-backup-access" {
         Effect = "Allow"
         Action = "*"
         Resource = [
-          "arn:aws:s3:::${var.s3_etcd_backup_bucket}/${var.cluster_name}/*"
+          "arn:aws:s3:::${var.s3_etcd_backup_bucket}/${var.cluster_name}",
+          "arn:aws:s3:::${var.s3_etcd_backup_bucket}/${var.cluster_name}/*",
         ]
       }
     ]
