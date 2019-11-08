@@ -24,6 +24,12 @@ locals {
   }
 
   services = {
+    local_renderer = {
+      ports = {
+        http = 8080
+        rpc  = 8081
+      }
+    }
     # kvm services
     renderer = {
       vip = "192.168.224.1"
@@ -131,7 +137,7 @@ locals {
   ## This needs to be passed in by hostname (e.g. -var=renderer=kvm-0) for now
   ## Dynamic provider support might resolse this
   local_renderer = {
-    endpoint        = "127.0.0.1:8081"
+    endpoint        = "127.0.0.1:${local.services.local_renderer.ports.rpc}"
     cert_pem        = module.local-renderer.matchbox_cert_pem
     private_key_pem = module.local-renderer.matchbox_private_key_pem
     ca_pem          = module.local-renderer.matchbox_ca_pem

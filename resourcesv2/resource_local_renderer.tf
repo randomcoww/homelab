@@ -1,7 +1,6 @@
 ## Use local matchbox renderer launched with run_renderer.sh
 module "local-renderer" {
-  source       = "../modulesv2/renderer"
-  ip_addresses = []
+  source = "../modulesv2/renderer"
 }
 
 resource "local_file" "matchbox-ca-pem" {
