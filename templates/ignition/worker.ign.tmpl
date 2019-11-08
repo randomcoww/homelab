@@ -13,6 +13,18 @@ networkd:
         [DHCP]
         UseMTU=yes
 
+    - name: ${host_network.int_if}.network
+      contents: |
+        [Match]
+        Name=${host_network.int_if}
+
+        [Link]
+        ARP=no
+
+        [Network]
+        LinkLocalAddressing=no
+        DHCP=no
+
 systemd:
   units:
     - name: pv.mount

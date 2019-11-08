@@ -26,7 +26,7 @@
       <target dev='sda' bus='scsi'/>
     </disk>
     <interface type='direct' trustGuestRxFilters='yes'>
-      <source dev='en-sync' mode='bridge'/>
+      <source dev='en-store' mode='bridge'/>
       <model type='virtio-net'/>
     </interface>
     <interface type='direct' trustGuestRxFilters='yes'>

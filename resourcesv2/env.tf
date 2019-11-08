@@ -139,14 +139,14 @@ locals {
 
   renderers = merge({
     local = local.local_renderer
-  },
-  {
-    for k in keys(module.hw.matchbox_rpc_endpoints) :
-    k => {
-      endpoint        = module.hw.matchbox_rpc_endpoints[k]
-      cert_pem        = module.hw.matchbox_cert_pem
-      private_key_pem = module.hw.matchbox_private_key_pem
-      ca_pem          = module.hw.matchbox_ca_pem
-    }
+    },
+    {
+      for k in keys(module.hw.matchbox_rpc_endpoints) :
+      k => {
+        endpoint        = module.hw.matchbox_rpc_endpoints[k]
+        cert_pem        = module.hw.matchbox_cert_pem
+        private_key_pem = module.hw.matchbox_private_key_pem
+        ca_pem          = module.hw.matchbox_ca_pem
+      }
   })
 }

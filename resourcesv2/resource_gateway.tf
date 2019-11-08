@@ -9,7 +9,10 @@ locals {
         sync_ip  = "192.168.190.1"
         sync_if  = "eth2"
         wan_if   = "eth3"
+        wan_mac  = "52-54-00-63-6e-b2"
         vwan_if  = "eth4"
+        vwan_mac = "52-54-00-63-6e-b3"
+        int_if   = "eth5"
         int_mac  = "52-54-00-1a-61-2a"
       }
       kea_ha_role = "primary"
@@ -23,7 +26,10 @@ locals {
         sync_ip  = "192.168.190.2"
         sync_if  = "eth2"
         wan_if   = "eth3"
+        wan_mac  = "52-54-00-63-6e-b1"
         vwan_if  = "eth4"
+        vwan_mac = "52-54-00-63-6e-b3"
+        int_if   = "eth5"
         int_mac  = "52-54-00-1a-61-2b"
       }
       kea_ha_role = "standby"

@@ -4,6 +4,7 @@ locals {
       network = {
         store_ip = "192.168.127.219"
         store_if = "eth0"
+        int_if   = "eth1"
         int_mac  = "52-54-00-1a-61-0a"
       }
     }
@@ -11,6 +12,7 @@ locals {
       network = {
         store_ip = "192.168.127.220"
         store_if = "eth0"
+        int_if   = "eth1"
         int_mac  = "52-54-00-1a-61-0b"
       }
     }
@@ -18,6 +20,7 @@ locals {
       network = {
         store_ip = "192.168.127.221"
         store_if = "eth0"
+        int_if   = "eth1"
         int_mac  = "52-54-00-1a-61-0c"
       }
     }
@@ -27,12 +30,14 @@ locals {
     worker-0 = {
       network = {
         store_if = "eth0"
+        int_if   = "eth1"
         int_mac  = "52-54-00-1a-61-1a"
       }
     }
     worker-1 = {
       network = {
         store_if = "eth0"
+        int_if   = "eth1"
         int_mac  = "52-54-00-1a-61-1b"
       }
     }

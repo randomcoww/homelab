@@ -1,6 +1,6 @@
 ## Use local matchbox renderer launched with run_renderer.sh
 module "local-renderer" {
-  source = "../modulesv2/renderer"
+  source       = "../modulesv2/renderer"
   ip_addresses = []
 }
 

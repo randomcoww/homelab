@@ -42,7 +42,7 @@ module "hw" {
     }
   }
   desktop_hosts = local.desktop_hosts
-  kvm_hosts = local.kvm_hosts
+  kvm_hosts     = local.kvm_hosts
 
   # only local renderer makes sense here
   # this resource creates non-local renderers

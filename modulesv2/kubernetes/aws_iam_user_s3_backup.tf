@@ -13,8 +13,8 @@ resource "aws_iam_user_policy" "s3-etcd-backup-access" {
     Version = "2012-10-17"
     Statement = [
       {
-        Effect   = "Allow"
-        Action   = "*"
+        Effect = "Allow"
+        Action = "*"
         Resource = [
           "arn:aws:s3:::${var.s3_etcd_backup_bucket}/${var.cluster_name}/*"
         ]
