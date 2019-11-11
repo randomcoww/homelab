@@ -1,7 +1,6 @@
 #!/usr/bin/env bash
 
 terraform apply -auto-approve \
-    -target=module.local-renderer \
     -target=local_file.matchbox-ca-pem \
     -target=local_file.matchbox-private-key-pem \
     -target=local_file.matchbox-cert-pem
