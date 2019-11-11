@@ -55,6 +55,23 @@ sudo livemedia-creator \
     --lorax-templates ./lorax-kvm
 ```
 
+This is also setup to create an image for the desktop PC:
+
+```
+sudo livemedia-creator \
+    --make-iso \
+    --iso=$ISO_FILE \
+    --project Fedora \
+    --volid desktop \
+    --releasever $FEDORA_RELEASE \
+    --title desktop \
+    --resultdir ./result \
+    --tmp . \
+    --ks=./desktop-0.ks \
+    --no-virt \
+    --lorax-templates ./lorax-desktop
+```
+
 ### Generate Ignition configuration on hypervisor hosts
 
 Each hypervisor runs a PXE boot environment on an internal network for provisioning VMs local to the host. VMs run [Container Linux](https://coreos.com/os/docs/latest/) using [Ignition](https://coreos.com/ignition/docs/latest/) for boot time configuration. Configuration is generated on each hypervisor as follows:
