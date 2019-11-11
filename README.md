@@ -132,7 +132,7 @@ terraform apply -target=local_file.kubeconfig-admin
 ### Generate basic Kubernetes addons
 
 ```bash
-terraform apply -target=mofule.kubernetes-addons
+terraform apply -target=module.kubernetes-addons
 ```
 
 Apply addons:
