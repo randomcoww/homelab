@@ -10,10 +10,6 @@ variable "mtu" {
   type = number
 }
 
-variable "cluster_name" {
-  type = string
-}
-
 variable "networks" {
   type = any
 }
@@ -30,22 +26,6 @@ variable "container_images" {
   type = any
 }
 
-variable "controller_hosts" {
+variable "gateway_hosts" {
   type = any
-}
-
-variable "worker_hosts" {
-  type = any
-}
-
-variable "s3_backup_aws_region" {
-  type = string
-}
-
-variable "s3_etcd_backup_bucket" {
-  type = string
-}
-
-variable "renderer" {
-  type = map(string)
 }
