@@ -106,6 +106,8 @@ virsh -c qemu+ssh://core@192.168.127.252/system start gateway-1
 
 ### Start Kubernetes cluster VMs
 
+Etcd data is backed up to and restored from S3 on start. Local files are discarded when the etcd container stops.
+
 ```bash
 cd templates/libvirt
 virsh -c qemu+ssh://core@192.168.127.251/system define controller-0.xml
