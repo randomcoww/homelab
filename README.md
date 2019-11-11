@@ -6,7 +6,7 @@ Configurations for creating hypervisor images are generated on a local [Matchbox
 
 ```bash
 cd resourcesv2
-terraform apply -auto-approve \
+terraform apply \
     -target=local_file.matchbox-ca-pem \
     -target=local_file.matchbox-private-key-pem \
     -target=local_file.matchbox-cert-pem
