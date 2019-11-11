@@ -74,7 +74,9 @@ sudo livemedia-creator \
 
 ### Generate Ignition configuration on hypervisor hosts
 
-Each hypervisor runs a PXE boot environment on an internal network for provisioning VMs local to the host. VMs run [Container Linux](https://coreos.com/os/docs/latest/) using [Ignition](https://coreos.com/ignition/docs/latest/) for boot time configuration. Configuration is generated on each hypervisor as follows:
+Each hypervisor runs a PXE boot environment on an internal network for provisioning VMs local to the host. VMs run [Container Linux](https://coreos.com/os/docs/latest/) using [Ignition](https://coreos.com/ignition/docs/latest/) for boot time configuration. Hypervisor hosts run on RAM disk and Ignition and defined VM configuration is lost on each reboot.
+
+Ignition configuration is generated on each hypervisor as follows:
 
 ```bash
 cd resourcesv2
