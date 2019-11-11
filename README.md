@@ -89,7 +89,7 @@ cd resourcesv2
 terraform apply -target=local_file.ssh-ca-key
 ```
 
-## Start gateway VMs
+### Start gateway VMs
 
 This will provide a basic infrastructure including NAT routing, DHCP and DNS.
 
@@ -102,7 +102,7 @@ virsh -c qemu+ssh://core@192.168.127.251/system start gateway-0
 virsh -c qemu+ssh://core@192.168.127.252/system start gateway-1
 ```
 
-## Start Kubernetes cluster VMs
+### Start Kubernetes cluster VMs
 
 ```bash
 cd templates/libvirt
