@@ -1,4 +1,0 @@
-output-qemu
-packer_cache
-build.*
-crash.log
