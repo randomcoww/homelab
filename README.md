@@ -94,8 +94,9 @@ Ignition configuration is generated on each hypervisor as follows:
 
 ```bash
 cd resourcesv2
-terraform apply -target=module.ignition-kvm-0
-terraform apply -target=module.ignition-kvm-1
+terraform apply \
+    -target=module.ignition-kvm-0 \
+    -target=module.ignition-kvm-1
 ```
 
 Write SSH CA configuration for accessing the hypervisor over `virsh` and `ssh`.
