@@ -55,7 +55,7 @@ sudo livemedia-creator \
     --lorax-templates ./lorax-kvm
 ```
 
-This is also setup to create an image for the desktop PC:
+Also create an image for the desktop PC:
 
 ```
 sudo livemedia-creator \
