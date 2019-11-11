@@ -15,8 +15,6 @@ repo --name=rpmfusion-nonfree-rawhide --metalink=https://mirrors.rpmfusion.org/m
 
 repo --name=kubernetes --baseurl=https://packages.cloud.google.com/yum/repos/kubernetes-el7-$basearch
 repo --name=code --baseurl=https://packages.microsoft.com/yumrepos/vscode
-
-## replace 30 with $releasever once f31 repo is available
 repo --name=winehq --baseurl=https://dl.winehq.org/wine-builds/fedora/30
 
 %packages
@@ -54,6 +52,7 @@ jq
 ncmpcpp
 deadbeef
 podman
+net-tools
 
 ## nvidia driver
 xorg-x11-drv-nvidia
