@@ -86,13 +86,19 @@ user --name=${user} --password=${password} --plaintext --uid=1000 --gid=1000 --g
 ## networkd
 ##############################################
 
-cat <<EOF > /etc/systemd/network/00_default.network
+cat <<EOF > /etc/systemd/network/50_${host_network.store_if}.network
 [Match]
-Name=en*
+Name=${host_network.store_if}
+
+[Link]
+MTUBytes=${mtu}
 
 [Network]
 LinkLocalAddressing=no
 DHCP=yes
+
+[Address]
+Address=${host_network.store_ip}/${networks.store.cidr}
 EOF
 
 ##############################################

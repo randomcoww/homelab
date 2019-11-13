@@ -13,12 +13,6 @@ module "kickstart" {
     live-base = {
     }
   }
-  desktop_hosts = {
-    desktop-0 = {
-      persistent_home_path = "/localhome"
-      persistent_home_dev  = "/dev/disk/by-path/pci-0000:04:00.0-nvme-1-part1"
-    }
-  }
 
   # KVM host KS
   kvm_hosts = {
@@ -35,6 +29,18 @@ module "kickstart" {
         host_tap_ip = "192.168.127.252"
         int_tap_ip  = local.services.renderer.vip
       }
+    }
+  }
+
+  # Desktop host KS
+  desktop_hosts = {
+    desktop-0 = {
+      network = {
+        store_if = "eno2"
+        store_ip = "192.168.127.253"
+      }
+      persistent_home_path = "/localhome"
+      persistent_home_dev  = "/dev/disk/by-path/pci-0000:04:00.0-nvme-1-part1"
     }
   }
 

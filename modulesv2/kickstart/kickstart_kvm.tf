@@ -15,10 +15,9 @@ resource "matchbox_group" "ks-kvm" {
       user               = var.user
       password           = var.password
       ssh_authorized_key = "cert-authority ${chomp(var.ssh_ca_public_key)}"
+      host_network       = each.value.network
+      mtu                = var.mtu
 
-      networkd_priority = 30
-      networks          = var.networks
-      host_network      = each.value.network
       vlans = {
         store = {
           if = "en-store"
@@ -33,8 +32,8 @@ resource "matchbox_group" "ks-kvm" {
           if = "en-wan"
         }
       }
+      networks      = var.networks
       services      = var.services
-      mtu           = var.mtu
       host_tap_vlan = "store"
       host_tap_if   = "host-tap"
       int_bridge_if = "en-int"

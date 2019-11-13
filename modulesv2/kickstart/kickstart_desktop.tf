@@ -11,9 +11,12 @@ resource "matchbox_group" "ks-desktop" {
   }
   metadata = {
     config = templatefile("${path.module}/../../templates/kickstart/desktop.ks.tmpl", {
-      hostname = each.key
-      user     = var.user
-      password = var.password
+      hostname     = each.key
+      user         = var.user
+      password     = var.password
+      networks     = var.networks
+      host_network = each.value.network
+      mtu          = var.mtu
 
       persistent_home_path  = each.value.persistent_home_path
       persistent_home_dev   = each.value.persistent_home_dev

@@ -6,7 +6,7 @@ resource "matchbox_profile" "ign-profile" {
     "/assets/coreos_production_pxe_image.cpio.gz",
   ]
   args = [
-    "coreos.config.url=http://${var.services.renderer.vip}:${var.services.renderer.ports.http}/ignition?mac=$${mac:hexhyp}",
+    "ignition.config.url=http://${var.services.renderer.vip}:${var.services.renderer.ports.http}/ignition?mac=$${mac:hexhyp}",
     "coreos.first_boot=1",
     "console=hvc0",
     "elevator=noop"
