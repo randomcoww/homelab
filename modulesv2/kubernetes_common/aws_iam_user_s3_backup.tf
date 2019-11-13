@@ -4,6 +4,9 @@ resource "aws_iam_user" "s3-etcd-backup" {
 
 resource "aws_iam_access_key" "s3-etcd-backup" {
   user = aws_iam_user.s3-etcd-backup.name
+  depends_on = [
+    aws_iam_user_policy.s3-etcd-backup-access
+  ]
 }
 
 resource "aws_iam_user_policy" "s3-etcd-backup-access" {
