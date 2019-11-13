@@ -46,12 +46,100 @@ module "kubernetes-common" {
         int_if   = "eth1"
         int_mac  = "52-54-00-1a-61-1a"
       }
+      disks = {
+        pvworker = {
+          host_device = "/dev/disk/by-path/pci-0000:00:17.0-ata-2"
+          device      = "/dev/sda"
+          format      = "ext4"
+          mount_path  = "/pv"
+        }
+        # phy12 = {
+        #   host_device = "/dev/disk/by-path/pci-0000:03:00.0-sas-exp0x5003048000a2973f-phy12-lun-0"
+        #   device      = "/dev/sdb"
+        #   format      = "ext4"
+        #   mount_path  = "/minio/0"
+        # }
+        # phy13 = {
+        #   host_device = "/dev/disk/by-path/pci-0000:03:00.0-sas-exp0x5003048000a2973f-phy13-lun-0"
+        #   device      = "/dev/sdc"
+        #   format      = "ext4"
+        #   mount_path  = "/minio/1"
+        # }
+        # phy14 = {
+        #   host_device = "/dev/disk/by-path/pci-0000:03:00.0-sas-exp0x5003048000a2973f-phy14-lun-0"
+        #   device      = "/dev/sdd"
+        #   format      = "ext4"
+        #   mount_path  = "/minio/2"
+        # }
+        # phy15 = {
+        #   host_device = "/dev/disk/by-path/pci-0000:03:00.0-sas-exp0x5003048000a2973f-phy15-lun-0"
+        #   device      = "/dev/sde"
+        #   format      = "ext4"
+        #   mount_path  = "/minio/3"
+        # }
+        # phy16 = {
+        #   host_device = "/dev/disk/by-path/pci-0000:03:00.0-sas-exp0x5003048000a2973f-phy16-lun-0"
+        #   device      = "/dev/sdf"
+        #   format      = "ext4"
+        #   mount_path  = "/minio/4"
+        # }
+        # phy17 = {
+        #   host_device = "/dev/disk/by-path/pci-0000:03:00.0-sas-exp0x5003048000a2973f-phy17-lun-0"
+        #   device      = "/dev/sdg"
+        #   format      = "ext4"
+        #   mount_path  = "/minio/5"
+        # }
+        # phy18 = {
+        #   host_device = "/dev/disk/by-path/pci-0000:03:00.0-sas-exp0x5003048000a2973f-phy18-lun-0"
+        #   device      = "/dev/sdh"
+        #   format      = "ext4"
+        #   mount_path  = "/minio/6"
+        # }
+        # phy19 = {
+        #   host_device = "/dev/disk/by-path/pci-0000:03:00.0-sas-exp0x5003048000a2973f-phy19-lun-0"
+        #   device      = "/dev/sdi"
+        #   format      = "ext4"
+        #   mount_path  = "/minio/7"
+        # }
+        # phy20 = {
+        #   host_device = "/dev/disk/by-path/pci-0000:03:00.0-sas-exp0x5003048000a2973f-phy20-lun-0"
+        #   device      = "/dev/sdj"
+        #   format      = "ext4"
+        #   mount_path  = "/minio/8"
+        # }
+        # phy21 = {
+        #   host_device = "/dev/disk/by-path/pci-0000:03:00.0-sas-exp0x5003048000a2973f-phy21-lun-0"
+        #   device      = "/dev/sdk"
+        #   format      = "ext4"
+        #   mount_path  = "/minio/9"
+        # }
+        # phy22 = {
+        #   host_device = "/dev/disk/by-path/pci-0000:03:00.0-sas-exp0x5003048000a2973f-phy22-lun-0"
+        #   device      = "/dev/sdl"
+        #   format      = "ext4"
+        #   mount_path  = "/minio/10"
+        # }
+        # phy23 = {
+        #   host_device = "/dev/disk/by-path/pci-0000:03:00.0-sas-exp0x5003048000a2973f-phy23-lun-0"
+        #   device      = "/dev/sdm"
+        #   format      = "ext4"
+        #   mount_path  = "/minio/11"
+        # }
+      }
     }
     worker-1 = {
       network = {
         store_if = "eth0"
         int_if   = "eth1"
         int_mac  = "52-54-00-1a-61-1b"
+      },
+      disks = {
+        pvworker = {
+          host_device = "/dev/disk/by-path/pci-0000:00:17.0-ata-2"
+          device      = "/dev/sda"
+          format      = "ext4"
+          mount_path  = "/pv"
+        }
       }
     }
   }

@@ -84,6 +84,7 @@ output "worker_params" {
       container_images = var.container_images
       networks         = var.networks
       host_network     = var.worker_hosts[k].network
+      host_disks       = var.worker_hosts[k].disks
       services         = var.services
       domains          = var.domains
 

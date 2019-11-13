@@ -27,17 +27,19 @@ networkd:
 
 systemd:
   units:
-    - name: pv.mount
+    %{~ for k in keys(host_disks) ~}
+    - name: ${join("-", compact(split("/", host_disks[k].mount_path)))}.mount
       enable: true
       contents: |
         [Unit]
         Before=local-fs.target
         [Mount]
-        What=/dev/sda
-        Where=/pv
-        Type=ext4
+        What=${host_disks[k].device}
+        Where=${host_disks[k].mount_path}
+        Type=${host_disks[k].format}
         [Install]
         WantedBy=local-fs.target
+    %{~ endfor ~}
 
     - name: iscsid.service
       enable: true
@@ -50,10 +52,6 @@ systemd:
       dropins:
         - name: containerd.conf
           contents: |
-            [Unit]
-            After=pv.mount
-            Requires=pv.mount
-
             [Service]
             LimitNOFILE=infinity
             ExecStart=
@@ -65,8 +63,6 @@ systemd:
         [Unit]
         Description=Kubelet via Hyperkube ACI
         After=network.target
-        After=pv.mount
-        Requires=pv.mount
 
         [Service]
         Environment="KUBELET_IMAGE=docker://${container_images.hyperkube}"
@@ -100,12 +96,14 @@ systemd:
 
 storage:
   filesystems:
-    - name: pv-worker
+    %{~ for k in keys(host_disks) ~}
+    - name: ${k}
       mount:
-        device: /dev/sda
-        format: ext4
+        device: ${host_disks[k].device}
+        format: ${host_disks[k].format}
         wipeFilesystem: false
-        label: PV-WORKER
+        label: ${upper(k)}
+    %{~ endfor ~}
 
   files:
     - path: /etc/hostname
