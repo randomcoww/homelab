@@ -47,84 +47,84 @@ module "kubernetes-common" {
         int_mac  = "52-54-00-1a-61-1a"
       }
       disks = {
-        pvworker = {
-          host_device = "/dev/disk/by-path/pci-0000:00:17.0-ata-2"
+        "S4PGNF0M414895K" = {
+          host_device = "/dev/disk/by-id/ata-Samsung_SSD_860_QVO_1TB_S4PGNF0M414895K"
           device      = "/dev/sda"
           format      = "ext4"
           mount_path  = "/pv"
         }
-        # phy12 = {
-        #   host_device = "/dev/disk/by-path/pci-0000:03:00.0-sas-exp0x5003048000a2973f-phy12-lun-0"
-        #   device      = "/dev/sdb"
-        #   format      = "ext4"
-        #   mount_path  = "/minio/0"
-        # }
-        # phy13 = {
-        #   host_device = "/dev/disk/by-path/pci-0000:03:00.0-sas-exp0x5003048000a2973f-phy13-lun-0"
-        #   device      = "/dev/sdc"
-        #   format      = "ext4"
-        #   mount_path  = "/minio/1"
-        # }
-        # phy14 = {
-        #   host_device = "/dev/disk/by-path/pci-0000:03:00.0-sas-exp0x5003048000a2973f-phy14-lun-0"
-        #   device      = "/dev/sdd"
-        #   format      = "ext4"
-        #   mount_path  = "/minio/2"
-        # }
-        # phy15 = {
-        #   host_device = "/dev/disk/by-path/pci-0000:03:00.0-sas-exp0x5003048000a2973f-phy15-lun-0"
-        #   device      = "/dev/sde"
-        #   format      = "ext4"
-        #   mount_path  = "/minio/3"
-        # }
-        # phy16 = {
-        #   host_device = "/dev/disk/by-path/pci-0000:03:00.0-sas-exp0x5003048000a2973f-phy16-lun-0"
-        #   device      = "/dev/sdf"
-        #   format      = "ext4"
-        #   mount_path  = "/minio/4"
-        # }
-        # phy17 = {
-        #   host_device = "/dev/disk/by-path/pci-0000:03:00.0-sas-exp0x5003048000a2973f-phy17-lun-0"
-        #   device      = "/dev/sdg"
-        #   format      = "ext4"
-        #   mount_path  = "/minio/5"
-        # }
-        # phy18 = {
-        #   host_device = "/dev/disk/by-path/pci-0000:03:00.0-sas-exp0x5003048000a2973f-phy18-lun-0"
-        #   device      = "/dev/sdh"
-        #   format      = "ext4"
-        #   mount_path  = "/minio/6"
-        # }
-        # phy19 = {
-        #   host_device = "/dev/disk/by-path/pci-0000:03:00.0-sas-exp0x5003048000a2973f-phy19-lun-0"
-        #   device      = "/dev/sdi"
-        #   format      = "ext4"
-        #   mount_path  = "/minio/7"
-        # }
-        # phy20 = {
-        #   host_device = "/dev/disk/by-path/pci-0000:03:00.0-sas-exp0x5003048000a2973f-phy20-lun-0"
-        #   device      = "/dev/sdj"
-        #   format      = "ext4"
-        #   mount_path  = "/minio/8"
-        # }
-        # phy21 = {
-        #   host_device = "/dev/disk/by-path/pci-0000:03:00.0-sas-exp0x5003048000a2973f-phy21-lun-0"
-        #   device      = "/dev/sdk"
-        #   format      = "ext4"
-        #   mount_path  = "/minio/9"
-        # }
-        # phy22 = {
-        #   host_device = "/dev/disk/by-path/pci-0000:03:00.0-sas-exp0x5003048000a2973f-phy22-lun-0"
-        #   device      = "/dev/sdl"
-        #   format      = "ext4"
-        #   mount_path  = "/minio/10"
-        # }
-        # phy23 = {
-        #   host_device = "/dev/disk/by-path/pci-0000:03:00.0-sas-exp0x5003048000a2973f-phy23-lun-0"
-        #   device      = "/dev/sdm"
-        #   format      = "ext4"
-        #   mount_path  = "/minio/11"
-        # }
+        "2YK7XTRD" = {
+          host_device = "/dev/disk/by-id/ata-WDC_WD100EFAX-68LHPN0_2YK7XTRD"
+          device      = "/dev/sdb"
+          format      = "ext4"
+          mount_path  = "/minio/0"
+        }
+        "2YK87AVD" = {
+          host_device = "/dev/disk/by-id/ata-WDC_WD100EFAX-68LHPN0_2YK87AVD"
+          device      = "/dev/sdc"
+          format      = "ext4"
+          mount_path  = "/minio/1"
+        }
+        "2YK89PND" = {
+          host_device = "/dev/disk/by-id/ata-WDC_WD100EFAX-68LHPN0_2YK89PND"
+          device      = "/dev/sdd"
+          format      = "ext4"
+          mount_path  = "/minio/2"
+        }
+        "2YKG1X2D" = {
+          host_device = "/dev/disk/by-id/ata-WDC_WD100EFAX-68LHPN0_2YKG1X2D"
+          device      = "/dev/sde"
+          format      = "ext4"
+          mount_path  = "/minio/3"
+        }
+        "2YKGML5D" = {
+          host_device = "/dev/disk/by-id/ata-WDC_WD100EFAX-68LHPN0_2YKGML5D"
+          device      = "/dev/sdf"
+          format      = "ext4"
+          mount_path  = "/minio/4"
+        }
+        "2YKGML7D" = {
+          host_device = "/dev/disk/by-id/ata-WDC_WD100EFAX-68LHPN0_2YKGML7D"
+          device      = "/dev/sdg"
+          format      = "ext4"
+          mount_path  = "/minio/5"
+        }
+        "2YKGNL4D" = {
+          host_device = "/dev/disk/by-id/ata-WDC_WD100EFAX-68LHPN0_2YKGNL4D"
+          device      = "/dev/sdh"
+          format      = "ext4"
+          mount_path  = "/minio/6"
+        }
+        "JEK830AZ" = {
+          host_device = "/dev/disk/by-id/ata-WDC_WD100EFAX-68LHPN0_JEK830AZ"
+          device      = "/dev/sdi"
+          format      = "ext4"
+          mount_path  = "/minio/7"
+        }
+        "JEK830RZ" = {
+          host_device = "/dev/disk/by-id/ata-WDC_WD100EFAX-68LHPN0_JEK830RZ"
+          device      = "/dev/sdj"
+          format      = "ext4"
+          mount_path  = "/minio/8"
+        }
+        "JEK8V1YZ" = {
+          host_device = "/dev/disk/by-id/ata-WDC_WD100EFAX-68LHPN0_JEK8V1YZ"
+          device      = "/dev/sdk"
+          format      = "ext4"
+          mount_path  = "/minio/9"
+        }
+        "JEK8YTSZ" = {
+          host_device = "/dev/disk/by-id/ata-WDC_WD100EFAX-68LHPN0_JEK8YTSZ"
+          device      = "/dev/sdl"
+          format      = "ext4"
+          mount_path  = "/minio/10"
+        }
+        "JEKAZ92N" = {
+          host_device = "/dev/disk/by-id/ata-WDC_WD100EFAX-68LHPN0_JEKAZ92N"
+          device      = "/dev/sdm"
+          format      = "ext4"
+          mount_path  = "/minio/11"
+        }
       }
     }
     worker-1 = {
@@ -132,10 +132,10 @@ module "kubernetes-common" {
         store_if = "eth0"
         int_if   = "eth1"
         int_mac  = "52-54-00-1a-61-1b"
-      },
+      }
       disks = {
-        pvworker = {
-          host_device = "/dev/disk/by-path/pci-0000:00:17.0-ata-2"
+        "S4PGNF0M410395Z" = {
+          host_device = "/dev/disk/by-id/ata-Samsung_SSD_860_QVO_1TB_S4PGNF0M410395Z"
           device      = "/dev/sda"
           format      = "ext4"
           mount_path  = "/pv"
