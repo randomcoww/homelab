@@ -155,8 +155,11 @@ terraform apply -target=module.kubernetes-addons
 Apply addons:
 
 ```bash
+kubectl apply -f http://127.0.0.1:8080/generic?manifest=bootstrap
 kubectl apply -f http://127.0.0.1:8080/generic?manifest=kube-proxy
 kubectl apply -f http://127.0.0.1:8080/generic?manifest=flannel
 kubectl apply -f http://127.0.0.1:8080/generic?manifest=kapprover
 kubectl apply -f http://127.0.0.1:8080/generic?manifest=coredns
+kubectl apply -f https://raw.githubusercontent.com/google/metallb/v0.8.3/manifests/metallb.yaml
+kubectl apply -f http://127.0.0.1:8080/generic?manifest=metallb
 ```
