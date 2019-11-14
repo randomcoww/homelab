@@ -1,28 +1,28 @@
----
 kind: ClusterRole
 apiVersion: rbac.authorization.k8s.io/v1beta1
 metadata:
   name: flannel
 rules:
-  - apiGroups:
-      - ""
-    resources:
-      - pods
-    verbs:
-      - get
-  - apiGroups:
-      - ""
-    resources:
-      - nodes
-    verbs:
-      - list
-      - watch
-  - apiGroups:
-      - ""
-    resources:
-      - nodes/status
-    verbs:
-      - patch
+- apiGroups:
+  - ""
+  resources:
+  - pods
+  verbs:
+  - get
+- apiGroups:
+  - ""
+  resources:
+  - nodes
+  verbs:
+  - list
+  - watch
+- apiGroups:
+  - ""
+  resources:
+  - nodes/status
+  verbs:
+  - patch
+
 ---
 kind: ClusterRoleBinding
 apiVersion: rbac.authorization.k8s.io/v1beta1
@@ -36,12 +36,14 @@ subjects:
 - kind: ServiceAccount
   name: flannel
   namespace: ${namespace}
+
 ---
 apiVersion: v1
 kind: ServiceAccount
 metadata:
   name: flannel
   namespace: ${namespace}
+
 ---
 kind: ConfigMap
 apiVersion: v1
@@ -78,6 +80,7 @@ data:
         "Type": "host-gw"
       }
     }
+
 ---
 apiVersion: extensions/v1beta1
 kind: DaemonSet
@@ -150,15 +153,15 @@ spec:
         - name: flannel-cfg
           mountPath: /etc/kube-flannel/
       volumes:
-        - name: cni-plugins
-          hostPath:
-            path: "/opt/cni/bin"
-        - name: run
-          hostPath:
-            path: /run
-        - name: cni
-          hostPath:
-            path: /etc/cni/net.d
-        - name: flannel-cfg
-          configMap:
-            name: kube-flannel-cfg
+      - name: cni-plugins
+        hostPath:
+          path: "/opt/cni/bin"
+      - name: run
+        hostPath:
+          path: /run
+      - name: cni
+        hostPath:
+          path: /etc/cni/net.d
+      - name: flannel-cfg
+        configMap:
+          name: kube-flannel-cfg

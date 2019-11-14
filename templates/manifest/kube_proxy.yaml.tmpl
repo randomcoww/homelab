@@ -3,6 +3,7 @@ kind: ServiceAccount
 metadata:
   name: kube-proxy
   namespace: ${namespace}
+
 ---
 kind: ClusterRoleBinding
 apiVersion: rbac.authorization.k8s.io/v1beta1
@@ -16,6 +17,7 @@ roleRef:
   kind: ClusterRole
   name: system:node-proxier
   apiGroup: rbac.authorization.k8s.io
+
 ---
 apiVersion: v1
 kind: ConfigMap
@@ -32,6 +34,7 @@ data:
     clusterCIDR: "${networks.kubernetes.network}/${networks.kubernetes.cidr}"
     iptables:
       masqueradeAll: true
+
 ---
 apiVersion: extensions/v1beta1
 kind: DaemonSet
