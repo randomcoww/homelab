@@ -1,5 +1,5 @@
 module "kubernetes-addons" {
-  source = "../modulesv2/addons"
+  source = "../modulesv2/kubernetes_addons"
 
   namespace        = "kube-system"
   networks         = local.networks

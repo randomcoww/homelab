@@ -1,5 +1,5 @@
 ##
-## external dns addon manifest
+## kubernetes and external dns addon manifest
 ##
 resource "matchbox_group" "manifest-coredns" {
   profile = matchbox_profile.generic-profile.name
