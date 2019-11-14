@@ -22,7 +22,7 @@
     <controller type='usb' model='none'/>
     <disk type='block' device='disk'>
       <driver name='qemu' type='raw' cache='none' io='threads' discard='unmap'/>
-      <source dev='/dev/disk/by-path/pci-0000:00:17.0-ata-2'/>
+      <source dev='/dev/disk/by-id/ata-Samsung_SSD_860_QVO_1TB_S4PGNF0M410395Z'/>
       <target dev='sda' bus='scsi'/>
     </disk>
     <interface type='direct' trustGuestRxFilters='yes'>
