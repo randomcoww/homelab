@@ -1,0 +1,97 @@
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: minio
+spec:
+  serviceName: minio
+  replicas: 1
+  selector:
+    matchLabels:
+      app: minio
+  template:
+    metadata:
+      labels:
+        app: minio
+    spec:
+      hostNetwork: true
+      dnsPolicy: ClusterFirstWithHostNet
+      nodeSelector:
+        kubernetes.io/hostname: worker-0
+      volumes:
+      - name: s3
+        hostPath:
+          path: "/minio"
+          type: DirectoryOrCreate
+      containers:
+      - name: minio
+        env:
+        - name: MINIO_STORAGE_CLASS_STANDARD
+          value: "EC:2"
+        - name: MINIO_STORAGE_CLASS_RRS
+          value: "EC:2"
+        - name: MINIO_ACCESS_KEY
+          value: "minio"
+        - name: MINIO_SECRET_KEY
+          value: "minio-key"
+        - name: HOST_IP
+          valueFrom:
+            fieldRef:
+              fieldPath: status.hostIP
+        image: minio/minio:RELEASE.2019-10-11T00-38-09Z
+        args:
+        - server
+        - --address
+        - :9000
+        - http://$(HOST_IP)/minio/0
+        - http://$(HOST_IP)/minio/1
+        - http://$(HOST_IP)/minio/2
+        - http://$(HOST_IP)/minio/3
+        - http://$(HOST_IP)/minio/4
+        - http://$(HOST_IP)/minio/5
+        - http://$(HOST_IP)/minio/6
+        - http://$(HOST_IP)/minio/7
+        - http://$(HOST_IP)/minio/8
+        - http://$(HOST_IP)/minio/9
+        - http://$(HOST_IP)/minio/10
+        - http://$(HOST_IP)/minio/11
+        ports:
+        - containerPort: 9000
+        volumeMounts:
+        - name: s3
+          mountPath: /minio
+        livenessProbe:
+          httpGet:
+            path: /minio/health/live
+            port: 9000
+          initialDelaySeconds: 120
+          periodSeconds: 20
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: minio
+  labels:
+    app: minio
+spec:
+  clusterIP: None
+  ports:
+  - port: 9000
+  selector:
+    app: minio
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: minio-ui
+  annotations:
+    external-dns.alpha.kubernetes.io/hostname: minio.fuzzybunny.internal
+spec:
+  type: LoadBalancer
+  ports:
+  - port: 80
+    targetPort: 9000
+    protocol: TCP
+  selector:
+    app: minio

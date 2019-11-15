@@ -1,0 +1,74 @@
+kind: DaemonSet
+apiVersion: apps/v1
+metadata:
+  name: ingest-rclone-vol
+spec:
+  selector:
+    matchLabels:
+      app: ingest-rclone-vol
+  template:
+    metadata:
+      labels:
+        app: ingest-rclone-vol
+    spec:
+      dnsPolicy: ClusterFirstWithHostNet
+      hostNetwork: true
+      volumes:
+      - name: ingest-rclone-vol
+        hostPath:
+          path: /hostpath/ingest
+          type: DirectoryOrCreate
+      containers:
+      - name: rclone
+        imagePullPolicy: Always
+        image: randomcoww/rclone:v1.50.1
+        securityContext:
+          privileged: true
+        env:
+        - name: AWS_ACCESS_KEY_ID
+          value: minio
+        - name: AWS_SECRET_ACCESS_KEY
+          value: minio-key
+        args:
+        - "mount"
+        - ":s3:ingest/"
+        - "/vol"
+        - "--s3-provider=Minio"
+        - "--s3-env-auth=true"
+        - "--s3-region="
+        - "--s3-endpoint=http://minio.default.svc.cluster.local:9000"
+        - "--allow-other"
+        - "--vfs-cache-mode=minimal"
+        - "--no-modtime"
+        volumeMounts:
+        - name: ingest-rclone-vol
+          mountPath: /vol
+          mountPropagation: Bidirectional
+
+---
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: ingest-pv
+spec:
+  storageClassName: ingest
+  capacity:
+    storage: 50Ti
+  accessModes:
+    - ReadWriteOnce
+  hostPath:
+    path: /hostpath/ingest
+    type: Directory
+
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: ingest-pvc
+spec:
+  accessModes:
+  - ReadWriteOnce
+  storageClassName: ingest
+  resources:
+    requests:
+      storage: 50Ti
