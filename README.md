@@ -163,3 +163,10 @@ kubectl apply -f http://127.0.0.1:8080/generic?manifest=coredns
 kubectl apply -f https://raw.githubusercontent.com/google/metallb/v0.8.3/manifests/metallb.yaml
 kubectl apply -f http://127.0.0.1:8080/generic?manifest=metallb
 ```
+
+### Deploy services on Kubernetes
+
+```
+kubectl create secret generic openvpn-auth-user-pass --from-file=openvpn-auth-user-pass
+...
+```
