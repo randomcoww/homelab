@@ -1,0 +1,74 @@
+kind: DaemonSet
+apiVersion: apps/v1
+metadata:
+  name: unifi-rclone-vol
+spec:
+  selector:
+    matchLabels:
+      app: unifi-rclone-vol
+  template:
+    metadata:
+      labels:
+        app: unifi-rclone-vol
+    spec:
+      dnsPolicy: ClusterFirstWithHostNet
+      hostNetwork: true
+      volumes:
+      - name: unifi-rclone-vol
+        hostPath:
+          path: /hostpath/unifi
+          type: DirectoryOrCreate
+      containers:
+      - name: rclone
+        imagePullPolicy: Always
+        image: randomcoww/rclone:v1.50.1
+        securityContext:
+          privileged: true
+        env:
+        - name: AWS_ACCESS_KEY_ID
+          value: minio
+        - name: AWS_SECRET_ACCESS_KEY
+          value: minio-key
+        args:
+        - "mount"
+        - ":s3:unifi/"
+        - "/vol"
+        - "--s3-provider=Minio"
+        - "--s3-env-auth=true"
+        - "--s3-region="
+        - "--s3-endpoint=http://minio.default.svc.cluster.local:9000"
+        - "--allow-other"
+        - "--vfs-cache-mode=full"
+        - "--no-modtime"
+        volumeMounts:
+        - name: unifi-rclone-vol
+          mountPath: /vol
+          mountPropagation: Bidirectional
+
+---
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: unifi-pv
+spec:
+  storageClassName: unifi
+  capacity:
+    storage: 2Gi
+  accessModes:
+    - ReadWriteOnce
+  hostPath:
+    path: /hostpath/unifi
+    type: Directory
+
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: unifi-pvc
+spec:
+  accessModes:
+  - ReadWriteOnce
+  storageClassName: unifi
+  resources:
+    requests:
+      storage: 2Gi
