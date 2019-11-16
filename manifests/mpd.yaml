@@ -1,0 +1,54 @@
+kind: Deployment
+apiVersion: extensions/v1beta1
+metadata:
+  name: mpd
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      k8s-app: mpd
+  template:
+    metadata:
+      labels:
+        k8s-app: mpd
+    spec:
+      dnsPolicy: ClusterFirstWithHostNet
+      containers:
+      - name: mpd
+        image: randomcoww/mpd:latest
+        ports:
+        - containerPort: 8000
+          protocol: TCP
+        - containerPort: 6600
+          protocol: TCP
+        volumeMounts:
+        - mountPath: "/mpd/music"
+          name: music-data
+        - mountPath: "/mpd/cache"
+          name: mpd-data
+      volumes:
+      - name: music-data
+        persistentVolumeClaim:
+          claimName: music-pvc
+      - name: mpd-data
+        persistentVolumeClaim:
+          claimName: mpd-pvc
+
+---
+kind: Service
+apiVersion: v1
+metadata:
+  name: mpd
+  annotations:
+    external-dns.alpha.kubernetes.io/hostname: mpd.fuzzybunny.internal
+spec:
+  type: LoadBalancer
+  ports:
+  - name: control
+    port: 6600
+    targetPort: 6600
+  - name: stream
+    port: 80
+    targetPort: 8000
+  selector:
+    k8s-app: mpd

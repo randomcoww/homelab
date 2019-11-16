@@ -1,0 +1,74 @@
+kind: DaemonSet
+apiVersion: apps/v1
+metadata:
+  name: mpd-rclone-vol
+spec:
+  selector:
+    matchLabels:
+      app: mpd-rclone-vol
+  template:
+    metadata:
+      labels:
+        app: mpd-rclone-vol
+    spec:
+      dnsPolicy: ClusterFirstWithHostNet
+      hostNetwork: true
+      volumes:
+      - name: mpd-rclone-vol
+        hostPath:
+          path: /hostpath/mpd
+          type: DirectoryOrCreate
+      containers:
+      - name: rclone
+        imagePullPolicy: Always
+        image: randomcoww/rclone:v1.50.1
+        securityContext:
+          privileged: true
+        env:
+        - name: AWS_ACCESS_KEY_ID
+          value: minio
+        - name: AWS_SECRET_ACCESS_KEY
+          value: minio-key
+        args:
+        - "mount"
+        - ":s3:mpd/"
+        - "/vol"
+        - "--s3-provider=Minio"
+        - "--s3-env-auth=true"
+        - "--s3-region="
+        - "--s3-endpoint=http://minio.default.svc.cluster.local:9000"
+        - "--allow-other"
+        - "--vfs-cache-mode=full"
+        - "--no-modtime"
+        volumeMounts:
+        - name: mpd-rclone-vol
+          mountPath: /vol
+          mountPropagation: Bidirectional
+
+---
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: mpd-pv
+spec:
+  storageClassName: mpd
+  capacity:
+    storage: 10Ti
+  accessModes:
+    - ReadWriteOnce
+  hostPath:
+    path: /hostpath/mpd
+    type: Directory
+
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: mpd-pvc
+spec:
+  accessModes:
+  - ReadWriteOnce
+  storageClassName: mpd
+  resources:
+    requests:
+      storage: 10Ti
