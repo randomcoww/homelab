@@ -1,7 +1,7 @@
 <domain type='kvm'>
   <name>worker-0</name>
-  <memory unit='GiB'>16</memory>
-  <currentMemory unit='GiB'>16</currentMemory>
+  <memory unit='GiB'>32</memory>
+  <currentMemory unit='GiB'>32</currentMemory>
   <vcpu placement='static'>4</vcpu>
   <os>
     <type arch='x86_64' machine='pc'>hvm</type>
@@ -21,70 +21,71 @@
     <emulator>/usr/bin/qemu-system-x86_64</emulator>
     <controller type='usb' model='none'/>
     <disk type='block' device='disk'>
-      <driver name='qemu' type='raw' cache='none' io='threads' discard='unmap'/>
+      <driver name='qemu' type='raw' cache='none' io='native' discard='unmap'/>
       <source dev='/dev/disk/by-id/ata-Samsung_SSD_860_QVO_1TB_S4PGNF0M414895K'/>
       <target dev='sda' bus='scsi'/>
     </disk>
     <disk type='block' device='disk'>
-      <driver name='qemu' type='raw' cache='none' io='threads' discard='unmap'/>
+      <driver name='qemu' type='raw' cache='none' io='native' discard='unmap'/>
       <source dev='/dev/disk/by-id/ata-WDC_WD100EFAX-68LHPN0_2YK7XTRD'/>
       <target dev='sdb' bus='scsi'/>
     </disk>
     <disk type='block' device='disk'>
-      <driver name='qemu' type='raw' cache='none' io='threads' discard='unmap'/>
+      <driver name='qemu' type='raw' cache='none' io='native' discard='unmap'/>
       <source dev='/dev/disk/by-id/ata-WDC_WD100EFAX-68LHPN0_2YK87AVD'/>
       <target dev='sdc' bus='scsi'/>
     </disk>
     <disk type='block' device='disk'>
-      <driver name='qemu' type='raw' cache='none' io='threads' discard='unmap'/>
+      <driver name='qemu' type='raw' cache='none' io='native' discard='unmap'/>
       <source dev='/dev/disk/by-id/ata-WDC_WD100EFAX-68LHPN0_2YK89PND'/>
       <target dev='sdd' bus='scsi'/>
     </disk>
     <disk type='block' device='disk'>
-      <driver name='qemu' type='raw' cache='none' io='threads' discard='unmap'/>
+      <driver name='qemu' type='raw' cache='none' io='native' discard='unmap'/>
       <source dev='/dev/disk/by-id/ata-WDC_WD100EFAX-68LHPN0_2YKG1X2D'/>
       <target dev='sde' bus='scsi'/>
     </disk>
     <disk type='block' device='disk'>
-      <driver name='qemu' type='raw' cache='none' io='threads' discard='unmap'/>
+      <driver name='qemu' type='raw' cache='none' io='native' discard='unmap'/>
       <source dev='/dev/disk/by-id/ata-WDC_WD100EFAX-68LHPN0_2YKGML5D'/>
       <target dev='sdf' bus='scsi'/>
     </disk>
     <disk type='block' device='disk'>
-      <driver name='qemu' type='raw' cache='none' io='threads' discard='unmap'/>
+      <driver name='qemu' type='raw' cache='none' io='native' discard='unmap'/>
       <source dev='/dev/disk/by-id/ata-WDC_WD100EFAX-68LHPN0_2YKGML7D'/>
       <target dev='sdg' bus='scsi'/>
     </disk>
     <disk type='block' device='disk'>
-      <driver name='qemu' type='raw' cache='none' io='threads' discard='unmap'/>
+      <driver name='qemu' type='raw' cache='none' io='native' discard='unmap'/>
       <source dev='/dev/disk/by-id/ata-WDC_WD100EFAX-68LHPN0_2YKGNL4D'/>
       <target dev='sdh' bus='scsi'/>
     </disk>
     <disk type='block' device='disk'>
-      <driver name='qemu' type='raw' cache='none' io='threads' discard='unmap'/>
+      <driver name='qemu' type='raw' cache='none' io='native' discard='unmap'/>
       <source dev='/dev/disk/by-id/ata-WDC_WD100EFAX-68LHPN0_JEK830AZ'/>
       <target dev='sdi' bus='scsi'/>
     </disk>
     <disk type='block' device='disk'>
-      <driver name='qemu' type='raw' cache='none' io='threads' discard='unmap'/>
+      <driver name='qemu' type='raw' cache='none' io='native' discard='unmap'/>
       <source dev='/dev/disk/by-id/ata-WDC_WD100EFAX-68LHPN0_JEK830RZ'/>
       <target dev='sdj' bus='scsi'/>
     </disk>
     <disk type='block' device='disk'>
-      <driver name='qemu' type='raw' cache='none' io='threads' discard='unmap'/>
+      <driver name='qemu' type='raw' cache='none' io='native' discard='unmap'/>
       <source dev='/dev/disk/by-id/ata-WDC_WD100EFAX-68LHPN0_JEK8V1YZ'/>
       <target dev='sdk' bus='scsi'/>
     </disk>
     <disk type='block' device='disk'>
-      <driver name='qemu' type='raw' cache='none' io='threads' discard='unmap'/>
+      <driver name='qemu' type='raw' cache='none' io='native' discard='unmap'/>
       <source dev='/dev/disk/by-id/ata-WDC_WD100EFAX-68LHPN0_JEK8YTSZ'/>
       <target dev='sdl' bus='scsi'/>
     </disk>
     <disk type='block' device='disk'>
-      <driver name='qemu' type='raw' cache='none' io='threads' discard='unmap'/>
+      <driver name='qemu' type='raw' cache='none' io='native' discard='unmap'/>
       <source dev='/dev/disk/by-id/ata-WDC_WD100EFAX-68LHPN0_JEKAZ92N'/>
       <target dev='sdm' bus='scsi'/>
     </disk>
+    <controller type='scsi' model='virtio-scsi'/>
     <interface type='direct' trustGuestRxFilters='yes'>
       <source dev='en-store' mode='bridge'/>
       <model type='virtio-net'/>

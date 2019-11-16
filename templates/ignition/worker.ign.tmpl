@@ -101,7 +101,7 @@ storage:
       mount:
         device: ${host_disks[k].device}
         format: ${host_disks[k].format}
-        wipeFilesystem: false
+        wipe_filesystem: false
         label: ${upper(k)}
     %{~ endfor ~}
 

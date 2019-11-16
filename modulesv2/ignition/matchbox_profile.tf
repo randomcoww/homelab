@@ -8,7 +8,6 @@ resource "matchbox_profile" "ign-profile" {
   args = [
     "ignition.config.url=http://${var.services.renderer.vip}:${var.services.renderer.ports.http}/ignition?mac=$${mac:hexhyp}",
     "coreos.first_boot=1",
-    "console=hvc0",
-    "elevator=noop"
+    "console=hvc0"
   ]
 }

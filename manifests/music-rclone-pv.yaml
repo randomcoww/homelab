@@ -38,7 +38,7 @@ spec:
         - "--s3-region="
         - "--s3-endpoint=http://minio.default.svc.cluster.local:9000"
         - "--allow-other"
-        - "--vfs-cache-mode=off"
+        - "--vfs-cache-mode=minimal"
         - "--no-modtime"
         volumeMounts:
         - name: music-rclone-vol
