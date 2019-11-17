@@ -7,11 +7,12 @@ terraform apply -auto-approve \
 
 podman run -it --rm \
     -v "$(pwd)"/output/local-renderer:/etc/matchbox \
-    -v "$(pwd)"/output/local-renderer:/var/lib/matchbox \
+    -v "$(pwd)"/output/local-renderer:/var/lib/matchbox/data \
+    -v "$(pwd)"/assets:/var/lib/matchbox/assets \
     -p 8080:8080 \
     -p 8081:8081 \
     quay.io/coreos/matchbox:latest \
-        -data-path /var/lib/matchbox \
-        -assets-path /var/lib/matchbox \
+        -data-path /var/lib/matchbox/data \
+        -assets-path /var/lib/matchbox/assets \
         -address 0.0.0.0:8080 \
         -rpc-address 0.0.0.0:8081

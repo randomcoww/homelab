@@ -18,14 +18,14 @@ module "kickstart" {
   kvm_hosts = {
     kvm-0 = {
       network = {
-        hw_if       = "enp1s0f0"
+        hw_if       = "enp2s0f0"
         host_tap_ip = "192.168.127.251"
         int_tap_ip  = local.services.renderer.vip
       }
     }
     kvm-1 = {
       network = {
-        hw_if       = "enp1s0f0"
+        hw_if       = "enp2s0f0"
         host_tap_ip = "192.168.127.252"
         int_tap_ip  = local.services.renderer.vip
       }
