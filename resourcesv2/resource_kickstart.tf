@@ -40,7 +40,7 @@ module "kickstart" {
         store_ip = "192.168.127.253"
       }
       persistent_home_path = "/localhome"
-      persistent_home_dev  = "/dev/disk/by-path/pci-0000:04:00.0-nvme-1-part1"
+      persistent_home_dev  = "/dev/disk/by-id/nvme-Samsung_SSD_970_EVO_250GB_S465NB0K598517N-part1"
     }
   }
 
