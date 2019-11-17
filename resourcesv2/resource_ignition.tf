@@ -48,82 +48,69 @@ module "kubernetes-common" {
       }
       disks = {
         "S4PGNF0M414895K" = {
-          host_device = "/dev/disk/by-id/ata-Samsung_SSD_860_QVO_1TB_S4PGNF0M414895K"
-          device      = "/dev/sda"
-          format      = "ext4"
-          mount_path  = "/pv"
+          device     = "/dev/vda"
+          format     = "ext4"
+          mount_path = "/pv"
         }
         "2YK7XTRD" = {
-          host_device = "/dev/disk/by-id/ata-WDC_WD100EFAX-68LHPN0_2YK7XTRD"
-          device      = "/dev/sdb"
-          format      = "xfs"
-          mount_path  = "/minio/0"
+          device     = "/dev/disk/by-id/ata-WDC_WD100EFAX-68LHPN0_2YK7XTRD"
+          format     = "xfs"
+          mount_path = "/minio/0"
         }
         "2YK87AVD" = {
-          host_device = "/dev/disk/by-id/ata-WDC_WD100EFAX-68LHPN0_2YK87AVD"
-          device      = "/dev/sdc"
-          format      = "xfs"
-          mount_path  = "/minio/1"
+          device     = "/dev/disk/by-id/ata-WDC_WD100EFAX-68LHPN0_2YK87AVD"
+          format     = "xfs"
+          mount_path = "/minio/1"
         }
         "2YK89PND" = {
-          host_device = "/dev/disk/by-id/ata-WDC_WD100EFAX-68LHPN0_2YK89PND"
-          device      = "/dev/sdd"
-          format      = "xfs"
-          mount_path  = "/minio/2"
+          device     = "/dev/disk/by-id/ata-WDC_WD100EFAX-68LHPN0_2YK89PND"
+          format     = "xfs"
+          mount_path = "/minio/2"
         }
         "2YKG1X2D" = {
-          host_device = "/dev/disk/by-id/ata-WDC_WD100EFAX-68LHPN0_2YKG1X2D"
-          device      = "/dev/sde"
-          format      = "xfs"
-          mount_path  = "/minio/3"
+          device     = "/dev/disk/by-id/ata-WDC_WD100EFAX-68LHPN0_2YKG1X2D"
+          format     = "xfs"
+          mount_path = "/minio/3"
         }
         "2YKGML5D" = {
-          host_device = "/dev/disk/by-id/ata-WDC_WD100EFAX-68LHPN0_2YKGML5D"
-          device      = "/dev/sdf"
-          format      = "xfs"
-          mount_path  = "/minio/4"
+          device     = "/dev/disk/by-id/ata-WDC_WD100EFAX-68LHPN0_2YKGML5D"
+          format     = "xfs"
+          mount_path = "/minio/4"
         }
         "2YKGML7D" = {
-          host_device = "/dev/disk/by-id/ata-WDC_WD100EFAX-68LHPN0_2YKGML7D"
-          device      = "/dev/sdg"
-          format      = "xfs"
-          mount_path  = "/minio/5"
+          device     = "/dev/disk/by-id/ata-WDC_WD100EFAX-68LHPN0_2YKGML7D"
+          format     = "xfs"
+          mount_path = "/minio/5"
         }
         "2YKGNL4D" = {
-          host_device = "/dev/disk/by-id/ata-WDC_WD100EFAX-68LHPN0_2YKGNL4D"
-          device      = "/dev/sdh"
-          format      = "xfs"
-          mount_path  = "/minio/6"
+          device     = "/dev/disk/by-id/ata-WDC_WD100EFAX-68LHPN0_2YKGNL4D"
+          format     = "xfs"
+          mount_path = "/minio/6"
         }
         "JEK830AZ" = {
-          host_device = "/dev/disk/by-id/ata-WDC_WD100EFAX-68LHPN0_JEK830AZ"
-          device      = "/dev/sdi"
-          format      = "xfs"
-          mount_path  = "/minio/7"
+          device     = "/dev/disk/by-id/ata-WDC_WD100EFAX-68LHPN0_JEK830AZ"
+          format     = "xfs"
+          mount_path = "/minio/7"
         }
         "JEK830RZ" = {
-          host_device = "/dev/disk/by-id/ata-WDC_WD100EFAX-68LHPN0_JEK830RZ"
-          device      = "/dev/sdj"
-          format      = "xfs"
-          mount_path  = "/minio/8"
+          device     = "/dev/disk/by-id/ata-WDC_WD100EFAX-68LHPN0_JEK830RZ"
+          format     = "xfs"
+          mount_path = "/minio/8"
         }
         "JEK8V1YZ" = {
-          host_device = "/dev/disk/by-id/ata-WDC_WD100EFAX-68LHPN0_JEK8V1YZ"
-          device      = "/dev/sdk"
-          format      = "xfs"
-          mount_path  = "/minio/9"
+          device     = "/dev/disk/by-id/ata-WDC_WD100EFAX-68LHPN0_JEK8V1YZ"
+          format     = "xfs"
+          mount_path = "/minio/9"
         }
         "JEK8YTSZ" = {
-          host_device = "/dev/disk/by-id/ata-WDC_WD100EFAX-68LHPN0_JEK8YTSZ"
-          device      = "/dev/sdl"
-          format      = "xfs"
-          mount_path  = "/minio/10"
+          device     = "/dev/disk/by-id/ata-WDC_WD100EFAX-68LHPN0_JEK8YTSZ"
+          format     = "xfs"
+          mount_path = "/minio/10"
         }
         "JEKAZ92N" = {
-          host_device = "/dev/disk/by-id/ata-WDC_WD100EFAX-68LHPN0_JEKAZ92N"
-          device      = "/dev/sdm"
-          format      = "xfs"
-          mount_path  = "/minio/11"
+          device     = "/dev/disk/by-id/ata-WDC_WD100EFAX-68LHPN0_JEKAZ92N"
+          format     = "xfs"
+          mount_path = "/minio/11"
         }
       }
     }
@@ -135,10 +122,9 @@ module "kubernetes-common" {
       }
       disks = {
         "S4PGNF0M410395Z" = {
-          host_device = "/dev/disk/by-id/ata-Samsung_SSD_860_QVO_1TB_S4PGNF0M410395Z"
-          device      = "/dev/sda"
-          format      = "ext4"
-          mount_path  = "/pv"
+          device     = "/dev/vda"
+          format     = "ext4"
+          mount_path = "/pv"
         }
       }
     }

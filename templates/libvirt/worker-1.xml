@@ -23,9 +23,8 @@
     <disk type='block' device='disk'>
       <driver name='qemu' type='raw' cache='none' io='native' discard='unmap'/>
       <source dev='/dev/disk/by-id/ata-Samsung_SSD_860_QVO_1TB_S4PGNF0M410395Z'/>
-      <target dev='sda' bus='scsi'/>
+      <target dev='vda' bus='virtio'/>
     </disk>
-    <controller type='scsi' model='virtio-scsi'/>
     <interface type='direct' trustGuestRxFilters='yes'>
       <source dev='en-store' mode='bridge'/>
       <model type='virtio-net'/>
@@ -43,6 +42,13 @@
       <target type='virtio' name='com.redhat.spice.0'/>
       <address type='virtio-serial'/>
     </channel>
+    <hostdev mode='subsystem' type='pci' managed='yes'>
+      <driver name='vfio'/>
+      <source>
+        <address domain='0x0000' bus='0x05' slot='0x00' function='0x0'/>
+      </source>
+      <rom bar='on' file='/var/lib/libvirt/boot/SAS9300_8i_IT.bin'/>
+    </hostdev>
     <memballoon model='virtio'/>
     <rng model='virtio'>
       <backend model='random'>/dev/urandom</backend>

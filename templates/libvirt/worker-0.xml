@@ -23,69 +23,8 @@
     <disk type='block' device='disk'>
       <driver name='qemu' type='raw' cache='none' io='native' discard='unmap'/>
       <source dev='/dev/disk/by-id/ata-Samsung_SSD_860_QVO_1TB_S4PGNF0M414895K'/>
-      <target dev='sda' bus='scsi'/>
+      <target dev='vda' bus='virtio'/>
     </disk>
-    <disk type='block' device='disk'>
-      <driver name='qemu' type='raw' cache='none' io='native' discard='unmap'/>
-      <source dev='/dev/disk/by-id/ata-WDC_WD100EFAX-68LHPN0_2YK7XTRD'/>
-      <target dev='sdb' bus='scsi'/>
-    </disk>
-    <disk type='block' device='disk'>
-      <driver name='qemu' type='raw' cache='none' io='native' discard='unmap'/>
-      <source dev='/dev/disk/by-id/ata-WDC_WD100EFAX-68LHPN0_2YK87AVD'/>
-      <target dev='sdc' bus='scsi'/>
-    </disk>
-    <disk type='block' device='disk'>
-      <driver name='qemu' type='raw' cache='none' io='native' discard='unmap'/>
-      <source dev='/dev/disk/by-id/ata-WDC_WD100EFAX-68LHPN0_2YK89PND'/>
-      <target dev='sdd' bus='scsi'/>
-    </disk>
-    <disk type='block' device='disk'>
-      <driver name='qemu' type='raw' cache='none' io='native' discard='unmap'/>
-      <source dev='/dev/disk/by-id/ata-WDC_WD100EFAX-68LHPN0_2YKG1X2D'/>
-      <target dev='sde' bus='scsi'/>
-    </disk>
-    <disk type='block' device='disk'>
-      <driver name='qemu' type='raw' cache='none' io='native' discard='unmap'/>
-      <source dev='/dev/disk/by-id/ata-WDC_WD100EFAX-68LHPN0_2YKGML5D'/>
-      <target dev='sdf' bus='scsi'/>
-    </disk>
-    <disk type='block' device='disk'>
-      <driver name='qemu' type='raw' cache='none' io='native' discard='unmap'/>
-      <source dev='/dev/disk/by-id/ata-WDC_WD100EFAX-68LHPN0_2YKGML7D'/>
-      <target dev='sdg' bus='scsi'/>
-    </disk>
-    <disk type='block' device='disk'>
-      <driver name='qemu' type='raw' cache='none' io='native' discard='unmap'/>
-      <source dev='/dev/disk/by-id/ata-WDC_WD100EFAX-68LHPN0_2YKGNL4D'/>
-      <target dev='sdh' bus='scsi'/>
-    </disk>
-    <disk type='block' device='disk'>
-      <driver name='qemu' type='raw' cache='none' io='native' discard='unmap'/>
-      <source dev='/dev/disk/by-id/ata-WDC_WD100EFAX-68LHPN0_JEK830AZ'/>
-      <target dev='sdi' bus='scsi'/>
-    </disk>
-    <disk type='block' device='disk'>
-      <driver name='qemu' type='raw' cache='none' io='native' discard='unmap'/>
-      <source dev='/dev/disk/by-id/ata-WDC_WD100EFAX-68LHPN0_JEK830RZ'/>
-      <target dev='sdj' bus='scsi'/>
-    </disk>
-    <disk type='block' device='disk'>
-      <driver name='qemu' type='raw' cache='none' io='native' discard='unmap'/>
-      <source dev='/dev/disk/by-id/ata-WDC_WD100EFAX-68LHPN0_JEK8V1YZ'/>
-      <target dev='sdk' bus='scsi'/>
-    </disk>
-    <disk type='block' device='disk'>
-      <driver name='qemu' type='raw' cache='none' io='native' discard='unmap'/>
-      <source dev='/dev/disk/by-id/ata-WDC_WD100EFAX-68LHPN0_JEK8YTSZ'/>
-      <target dev='sdl' bus='scsi'/>
-    </disk>
-    <disk type='block' device='disk'>
-      <driver name='qemu' type='raw' cache='none' io='native' discard='unmap'/>
-      <source dev='/dev/disk/by-id/ata-WDC_WD100EFAX-68LHPN0_JEKAZ92N'/>
-      <target dev='sdm' bus='scsi'/>
-    </disk>
-    <controller type='scsi' model='virtio-scsi'/>
     <interface type='direct' trustGuestRxFilters='yes'>
       <source dev='en-store' mode='bridge'/>
       <model type='virtio-net'/>
@@ -103,6 +42,13 @@
       <target type='virtio' name='com.redhat.spice.0'/>
       <address type='virtio-serial'/>
     </channel>
+    <hostdev mode='subsystem' type='pci' managed='yes'>
+      <driver name='vfio'/>
+      <source>
+        <address domain='0x0000' bus='0x05' slot='0x00' function='0x0'/>
+      </source>
+      <rom bar='on' file='/var/lib/libvirt/boot/SAS9300_8i_IT.bin'/>
+    </hostdev>
     <memballoon model='virtio'/>
     <rng model='virtio'>
       <backend model='random'>/dev/urandom</backend>
