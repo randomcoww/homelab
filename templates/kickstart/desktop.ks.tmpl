@@ -10,9 +10,6 @@ repo --name=rpmfusion-free-updates --metalink=https://mirrors.rpmfusion.org/meta
 repo --name=rpmfusion-nonfree --metalink=https://mirrors.rpmfusion.org/metalink?repo=nonfree-fedora-$releasever&arch=$basearch
 repo --name=rpmfusion-nonfree-updates --metalink=https://mirrors.rpmfusion.org/metalink?repo=nonfree-fedora-updates-released-$releasever&arch=$basearch
 
-## install nvidia driver from rawhide
-repo --name=rpmfusion-nonfree-rawhide --metalink=https://mirrors.rpmfusion.org/metalink?repo=nonfree-fedora-rawhide&arch=$basearch --includepkgs=xorg-x11-drv-nvidia
-
 repo --name=kubernetes --baseurl=https://packages.cloud.google.com/yum/repos/kubernetes-el7-$basearch
 repo --name=code --baseurl=https://packages.microsoft.com/yumrepos/vscode
 repo --name=winehq --baseurl=https://dl.winehq.org/wine-builds/fedora/30
@@ -56,10 +53,6 @@ net-tools
 vdpauinfo
 libva-vdpau-driver
 libva-utils
-
-## nvidia driver
-xorg-x11-drv-nvidia
-akmod-nvidia
 
 ## gaming
 steam
