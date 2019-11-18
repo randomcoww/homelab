@@ -23,9 +23,9 @@ sshkey --username=${user} "${ssh_authorized_key}"
 ## allocate vlan interfaces to hardware
 ##
 
-cat <<EOF > /etc/systemd/network/50_${host_network.hw_if}.network
+cat <<EOF > /etc/systemd/network/50_${host_network.hw.if}.network
 [Match]
-Name=${host_network.hw_if}
+Name=${host_network.hw.if}
 
 [Link]
 ARP=no
@@ -52,7 +52,7 @@ Kind=vlan
 [VLAN]
 Id=${networks[k].id}
 EOF
-%{ if k == host_tap_vlan ~}
+%{ if lookup(host_network, k, null) != null ~}
 
 ## host macvtap on vlan ${k}
 cat <<EOF > /etc/systemd/network/50_${vlans[k].if}.network
@@ -66,21 +66,21 @@ MTUBytes=${mtu}
 [Network]
 LinkLocalAddressing=no
 DHCP=no
-MACVTAP=${host_tap_if}
+MACVTAP=${k}-tap
 EOF
 
-cat <<EOF > /etc/systemd/network/50_${host_tap_if}.netdev
+cat <<EOF > /etc/systemd/network/50_${k}-tap.netdev
 [NetDev]
-Name=${host_tap_if}
+Name=${k}-tap
 Kind=macvtap
 
 [MACVTAP]
 Mode=bridge
 EOF
 
-cat <<EOF > /etc/systemd/network/50_${host_tap_if}.network
+cat <<EOF > /etc/systemd/network/50_${k}-tap.network
 [Match]
-Name=${host_tap_if}
+Name=${k}-tap
 
 [Link]
 MTUBytes=${mtu}
@@ -90,24 +90,25 @@ LinkLocalAddressing=no
 DHCP=yes
 
 [Address]
-Address=${host_network.host_tap_ip}/${networks[k].cidr}
+Address=${host_network[k].ip}/${networks[k].cidr}
 EOF
 %{ endif ~}
 %{ endfor ~}
 
+%{ for k in keys(internal_networks) ~}
 ##
-## internal network for host <-> local vm
+## internal network ${k} for host <-> local vm
 ##
 
-cat <<EOF > /etc/systemd/network/50_${int_bridge_if}.netdev
+cat <<EOF > /etc/systemd/network/50_${internal_networks[k].bridge_if}.netdev
 [NetDev]
-Name=${int_bridge_if}
+Name=${internal_networks[k].bridge_if}
 Kind=bridge
 EOF
 
-cat <<EOF > /etc/systemd/network/50_${int_bridge_if}.network
+cat <<EOF > /etc/systemd/network/50_${internal_networks[k].bridge_if}.network
 [Match]
-Name=${int_bridge_if}
+Name=${internal_networks[k].bridge_if}
 
 [Link]
 ARP=no
@@ -115,19 +116,19 @@ ARP=no
 [Network]
 LinkLocalAddressing=no
 DHCP=no
-MACVTAP=${int_tap_if}
-Bridge=${int_dummy_if}
+MACVTAP=${internal_networks[k].tap_if}
+Bridge=${internal_networks[k].dummy_if}
 EOF
 
-cat <<EOF > /etc/systemd/network/50_${int_dummy_if}.netdev
+cat <<EOF > /etc/systemd/network/50_${internal_networks[k].dummy_if}.netdev
 [NetDev]
-Name=${int_dummy_if}
+Name=${internal_networks[k].dummy_if}
 Kind=dummy
 EOF
 
-cat <<EOF > /etc/systemd/network/50_${int_dummy_if}.network
+cat <<EOF > /etc/systemd/network/50_${internal_networks[k].dummy_if}.network
 [Match]
-Name=${int_dummy_if}
+Name=${internal_networks[k].dummy_if}
 
 [Link]
 ARP=no
@@ -135,29 +136,30 @@ ARP=no
 [Network]
 LinkLocalAddressing=no
 DHCP=no
-Bridge=${int_bridge_if}
+Bridge=${internal_networks[k].bridge_if}
 EOF
 
-cat <<EOF > /etc/systemd/network/50_${int_tap_if}.netdev
+cat <<EOF > /etc/systemd/network/50_${internal_networks[k].tap_if}.netdev
 [NetDev]
-Name=${int_tap_if}
+Name=${internal_networks[k].tap_if}
 Kind=macvtap
 
 [MACVTAP]
 Mode=bridge
 EOF
 
-cat <<EOF > /etc/systemd/network/50_${int_tap_if}.network
+cat <<EOF > /etc/systemd/network/50_${internal_networks[k].tap_if}.network
 [Match]
-Name=${int_tap_if}
+Name=${internal_networks[k].tap_if}
 
 [Network]
 LinkLocalAddressing=no
 DHCP=no
 
 [Address]
-Address=${host_network.int_tap_ip}/${networks.int.cidr}
+Address=${internal_networks[k].ip}/${networks[k].cidr}
 EOF
+%{ endfor ~}
 
 ##############################################
 ## matchbox
@@ -215,10 +217,11 @@ cat <<EOF > /etc/kea/kea-dhcp4.conf
 {
   "Dhcp4": {
     "interfaces-config": {
-      "interfaces": [
-        "${int_bridge_if}",
-        "${int_tap_if}"
-      ]
+      "interfaces": ${jsonencode([
+        for k in keys(internal_networks):
+        internal_networks[k].tap_if
+        if lookup(networks[k], "dhcp_pool", null) != null
+      ])}
     },
     "client-classes": [
       {
@@ -227,16 +230,18 @@ cat <<EOF > /etc/kea/kea-dhcp4.conf
         "boot-file-name": "http://${services.renderer.vip}:${services.renderer.ports.http}/boot.ipxe"
       }
     ],
-    "subnet4": [
+    "subnet4": ${jsonencode([
+      for k in keys(internal_networks):
       {
-        "subnet": "${networks.int.network}/${networks.int.cidr}",
-        "pools": [
+        subnet = "${networks[k].network}/${networks[k].cidr}",
+        pools = [
           {
-            "pool": "${networks.int.dhcp_pool}"
+            pool = "${networks[k].dhcp_pool}"
           }
         ]
       }
-    ]
+      if lookup(networks[k], "dhcp_pool", null) != null
+    ])}
   }
 }
 EOF

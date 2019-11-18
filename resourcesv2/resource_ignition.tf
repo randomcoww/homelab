@@ -16,35 +16,51 @@ module "kubernetes-common" {
   controller_hosts = {
     controller-0 = {
       network = {
-        store_ip = "192.168.127.219"
-        store_if = "eth0"
-        int_if   = "eth1"
-        int_mac  = "52-54-00-1a-61-0a"
+        store = {
+          ip = "192.168.127.219"
+          if = "eth0"
+        }
+        int = {
+          if  = "eth1"
+          mac = "52-54-00-1a-61-0a"
+        }
       }
     }
     controller-1 = {
       network = {
-        store_ip = "192.168.127.220"
-        store_if = "eth0"
-        int_if   = "eth1"
-        int_mac  = "52-54-00-1a-61-0b"
+        store = {
+          ip = "192.168.127.220"
+          if = "eth0"
+        }
+        int = {
+          if  = "eth1"
+          mac = "52-54-00-1a-61-0b"
+        }
       }
     }
     controller-2 = {
       network = {
-        store_ip = "192.168.127.221"
-        store_if = "eth0"
-        int_if   = "eth1"
-        int_mac  = "52-54-00-1a-61-0c"
+        store = {
+          ip = "192.168.127.221"
+          if = "eth0"
+        }
+        int = {
+          if  = "eth1"
+          mac = "52-54-00-1a-61-0c"
+        }
       }
     }
   }
   worker_hosts = {
     worker-0 = {
       network = {
-        store_if = "eth0"
-        int_if   = "eth1"
-        int_mac  = "52-54-00-1a-61-1a"
+        store = {
+          if = "eth0"
+        }
+        int = {
+          if  = "eth1"
+          mac = "52-54-00-1a-61-1a"
+        }
       }
       disks = {
         "S4PGNF0M414895K" = {
@@ -116,9 +132,13 @@ module "kubernetes-common" {
     }
     worker-1 = {
       network = {
-        store_if = "eth0"
-        int_if   = "eth1"
-        int_mac  = "52-54-00-1a-61-1b"
+        store = {
+          if = "eth0"
+        }
+        int = {
+          if  = "eth1"
+          mac = "52-54-00-1a-61-1b"
+        }
       }
       disks = {
         "S4PGNF0M410395Z" = {
@@ -145,37 +165,61 @@ module "gateway-common" {
   gateway_hosts = {
     gateway-0 = {
       network = {
-        store_ip         = "192.168.127.217"
-        store_if         = "eth0"
-        lan_ip           = "192.168.63.217"
-        lan_if           = "eth1"
-        sync_ip          = "192.168.190.1"
-        sync_if          = "eth2"
-        wan_if           = "eth3"
-        wan_mac          = "52-54-00-63-6e-b2"
-        vwan_if          = "eth4"
-        vwan_mac         = "52-54-00-63-6e-b3"
-        vwan_route_table = 250
-        int_if           = "eth5"
-        int_mac          = "52-54-00-1a-61-2a"
+        store = {
+          ip = "192.168.127.217"
+          if = "eth0"
+        }
+        lan = {
+          ip = "192.168.63.217"
+          if = "eth1"
+        }
+        sync = {
+          ip = "192.168.190.1"
+          if = "eth2"
+        }
+        host_wan = {
+          if  = "eth3"
+          mac = "52-54-00-63-6e-b2"
+        }
+        wan = {
+          if          = "eth4"
+          mac         = "52-54-00-63-6e-b3"
+          route_table = 250
+        }
+        int = {
+          if  = "eth5"
+          mac = "52-54-00-1a-61-2a"
+        }
       }
       kea_ha_role = "primary"
     }
     gateway-1 = {
       network = {
-        store_ip         = "192.168.127.218"
-        store_if         = "eth0"
-        lan_ip           = "192.168.63.218"
-        lan_if           = "eth1"
-        sync_ip          = "192.168.190.2"
-        sync_if          = "eth2"
-        wan_if           = "eth3"
-        wan_mac          = "52-54-00-63-6e-b1"
-        vwan_if          = "eth4"
-        vwan_mac         = "52-54-00-63-6e-b3"
-        vwan_route_table = 250
-        int_if           = "eth5"
-        int_mac          = "52-54-00-1a-61-2b"
+        store = {
+          ip = "192.168.127.218"
+          if = "eth0"
+        }
+        lan = {
+          ip = "192.168.63.218"
+          if = "eth1"
+        }
+        sync = {
+          ip = "192.168.190.2"
+          if = "eth2"
+        }
+        host_wan = {
+          if  = "eth3"
+          mac = "52-54-00-63-6e-b1"
+        }
+        wan = {
+          if          = "eth4"
+          mac         = "52-54-00-63-6e-b3"
+          route_table = 250
+        }
+        int = {
+          if  = "eth5"
+          mac = "52-54-00-1a-61-2b"
+        }
       }
       kea_ha_role = "standby"
     }

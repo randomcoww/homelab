@@ -1,10 +1,10 @@
 ---
 networkd:
   units:
-    - name: ${host_network.store_if}.network
+    - name: ${host_network.store.if}.network
       contents: |
         [Match]
-        Name=${host_network.store_if}
+        Name=${host_network.store.if}
 
         [Network]
         LinkLocalAddressing=no
@@ -16,12 +16,12 @@ networkd:
         MTUBytes=${mtu}
 
         [Address]
-        Address=${host_network.store_ip}/${networks.store.cidr}
+        Address=${host_network.store.ip}/${networks.store.cidr}
 
-    - name: ${host_network.int_if}.network
+    - name: ${host_network.int.if}.network
       contents: |
         [Match]
-        Name=${host_network.int_if}
+        Name=${host_network.int.if}
 
         [Link]
         ARP=no
@@ -67,7 +67,7 @@ systemd:
         ExecStartPre=-/usr/bin/rkt rm --uuid-file=/var/cache/kubelet-pod.uuid
         ExecStart=/usr/lib/coreos/kubelet-wrapper \
           --config=${kubelet_path}/kubelet-config.yaml \
-          --node-ip=${host_network.store_ip} \
+          --node-ip=${host_network.store.ip} \
           --register-node=false \
           --container-runtime=remote \
           --container-runtime-endpoint=unix:///run/containerd/containerd.sock
@@ -305,7 +305,7 @@ storage:
                     state BACKUP
                     strict_mode off
                     virtual_router_id 70
-                    interface ${host_network.store_if}
+                    interface ${host_network.store.if}
                     priority 100
                     virtual_ipaddress {
                       ${services.kubernetes_apiserver.vip}

@@ -1,10 +1,10 @@
 ---
 networkd:
   units:
-    - name: ${host_network.store_if}.network
+    - name: ${host_network.store.if}.network
       contents: |
         [Match]
-        Name=${host_network.store_if}
+        Name=${host_network.store.if}
 
         [Network]
         LinkLocalAddressing=no
@@ -13,10 +13,10 @@ networkd:
         [DHCP]
         UseMTU=yes
 
-    - name: ${host_network.int_if}.network
+    - name: ${host_network.int.if}.network
       contents: |
         [Match]
-        Name=${host_network.int_if}
+        Name=${host_network.int.if}
 
         [Link]
         ARP=no

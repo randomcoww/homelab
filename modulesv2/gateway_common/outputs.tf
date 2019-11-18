@@ -22,7 +22,7 @@ output "gateway_params" {
         {
           name = k
           role = var.gateway_hosts[k].kea_ha_role
-          url  = "http://${var.gateway_hosts[k].network.sync_ip}:${var.services.kea.ports.peer}/"
+          url  = "http://${var.gateway_hosts[k].network.sync.ip}:${var.services.kea.ports.peer}/"
         }
       ])
     }

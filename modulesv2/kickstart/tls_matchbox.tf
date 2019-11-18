@@ -20,7 +20,7 @@ resource "tls_cert_request" "matchbox" {
 
   ip_addresses = [
     "127.0.0.1",
-    each.value.network.host_tap_ip
+    each.value.network.store.ip
   ]
 }
 

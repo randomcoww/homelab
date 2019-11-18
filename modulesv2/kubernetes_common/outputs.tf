@@ -40,11 +40,11 @@ output "controller_params" {
       aws_secret_access_key = aws_iam_access_key.s3-etcd-backup.secret
       etcd_initial_cluster = join(",", [
         for k in keys(var.controller_hosts) :
-        "${k}=https://${var.controller_hosts[k].network.store_ip}:${var.services.etcd.ports.peer}"
+        "${k}=https://${var.controller_hosts[k].network.store.ip}:${var.services.etcd.ports.peer}"
       ])
       etcd_endpoints = join(",", [
         for k in keys(var.controller_hosts) :
-        "https://${var.controller_hosts[k].network.store_ip}:${var.services.etcd.ports.client}"
+        "https://${var.controller_hosts[k].network.store.ip}:${var.services.etcd.ports.client}"
       ])
       etcd_local_endpoint      = "https://127.0.0.1:${var.services.etcd.ports.client}"
       apiserver_local_endpoint = "https://127.0.0.1:${var.services.kubernetes_apiserver.ports.secure}"

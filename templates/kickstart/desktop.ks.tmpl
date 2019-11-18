@@ -79,9 +79,9 @@ user --name=${user} --password=${password} --plaintext --uid=1000 --gid=1000 --g
 ## networkd
 ##############################################
 
-cat <<EOF > /etc/systemd/network/50_${host_network.store_if}.network
+cat <<EOF > /etc/systemd/network/50_${host_network.store.if}.network
 [Match]
-Name=${host_network.store_if}
+Name=${host_network.store.if}
 
 [Link]
 MTUBytes=${mtu}
@@ -91,7 +91,7 @@ LinkLocalAddressing=no
 DHCP=yes
 
 [Address]
-Address=${host_network.store_ip}/${networks.store.cidr}
+Address=${host_network.store.ip}/${networks.store.cidr}
 EOF
 
 ##############################################

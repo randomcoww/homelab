@@ -1,46 +1,46 @@
 ---
 networkd:
   units:
-    - name: ${host_network.store_if}.network
+    - name: ${host_network.store.if}.network
       contents: |
         [Match]
-        Name=${host_network.store_if}
+        Name=${host_network.store.if}
 
         [Network]
         LinkLocalAddressing=no
         DHCP=no
 
         [Address]
-        Address=${host_network.store_ip}/${networks.store.cidr}
+        Address=${host_network.store.ip}/${networks.store.cidr}
 
-    - name: ${host_network.lan_if}.network
+    - name: ${host_network.lan.if}.network
       contents: |
         [Match]
-        Name=${host_network.lan_if}
+        Name=${host_network.lan.if}
 
         [Network]
         LinkLocalAddressing=no
         DHCP=no
 
         [Address]
-        Address=${host_network.lan_ip}/${networks.lan.cidr}
+        Address=${host_network.lan.ip}/${networks.lan.cidr}
 
-    - name: ${host_network.sync_if}.network
+    - name: ${host_network.sync.if}.network
       contents: |
         [Match]
-        Name=${host_network.sync_if}
+        Name=${host_network.sync.if}
 
         [Network]
         LinkLocalAddressing=no
         DHCP=no
 
         [Address]
-        Address=${host_network.sync_ip}/${networks.sync.cidr}
+        Address=${host_network.sync.ip}/${networks.sync.cidr}
 
-    - name: ${host_network.wan_if}.network
+    - name: ${host_network.host_wan.if}.network
       contents: |
         [Match]
-        Name=${host_network.wan_if}
+        Name=${host_network.host_wan.if}
 
         [Network]
         LinkLocalAddressing=no
@@ -59,10 +59,10 @@ networkd:
         UseTimezone=no
         RouteMetric=512
 
-    - name: ${host_network.vwan_if}.network
+    - name: ${host_network.wan.if}.network
       contents: |
         [Match]
-        Name=${host_network.vwan_if}
+        Name=${host_network.wan.if}
 
         [Network]
         LinkLocalAddressing=no
@@ -77,12 +77,12 @@ networkd:
         UseDomains=false
         UseTimezone=no
         RouteMetric=512
-        RouteTable=${host_network.vwan_route_table}
+        RouteTable=${host_network.wan.route_table}
 
-    - name: ${host_network.int_if}.network
+    - name: ${host_network.int.if}.network
       contents: |
         [Match]
-        Name=${host_network.int_if}
+        Name=${host_network.int.if}
 
         [Link]
         ARP=no
@@ -128,7 +128,7 @@ systemd:
         ExecStartPre=-/usr/bin/rkt rm --uuid-file=/var/cache/kubelet-pod.uuid
         ExecStart=/usr/lib/coreos/kubelet-wrapper \
           --config=${kubelet_path}/kubelet-config.yaml \
-          --node-ip=${host_network.sync_ip} \
+          --node-ip=${host_network.sync.ip} \
           --register-node=false \
           --container-runtime=remote \
           --container-runtime-endpoint=unix:///run/containerd/containerd.sock
@@ -214,10 +214,14 @@ storage:
               env:
               - name: NFTABLES_LOCAL_CONFIG
                 value: |
-                  define if_internal = { ${host_network.lan_if}, ${host_network.store_if} }
-                  define if_external = ${host_network.vwan_if}
-                  define if_trusted = ${host_network.store_if}
-                  define if_sync = ${host_network.sync_if}
+                  define if_internal = { ${join(",", [
+                    for k in keys(networks):
+                    "${host_network[k].if}"
+                    if lookup(networks[k], "dhcp_pool", null) != null && lookup(networks[k], "router", null) != null
+                  ])} }
+                  define if_external = ${host_network.wan.if}
+                  define if_trusted = ${host_network.store.if}
+                  define if_sync = ${host_network.sync.if}
 
                   table ip filter {
                     chain base_checks {
@@ -336,10 +340,11 @@ storage:
                       "renew-timer": 1200,
                       "rebind-timer": 1200,
                       "interfaces-config": {
-                        "interfaces": [
-                          "${host_network.lan_if}",
-                          "${host_network.store_if}"
-                        ]
+                        "interfaces": ${jsonencode([
+                        for k in keys(networks):
+                        "${host_network[k].if}"
+                        if lookup(networks[k], "dhcp_pool", null) != null && lookup(networks[k], "router", null) != null
+                        ])},
                       },
                       "control-socket": {
                         "socket-type": "unix",
@@ -379,36 +384,24 @@ storage:
                           }
                         }
                       ],
-                      "subnet4": [
+                      "subnet4": ${jsonencode([
+                        for k in keys(networks):
                         {
-                          "subnet": "${networks.lan.network}/${networks.lan.cidr}",
-                          "option-data": [
+                          subnet = "${networks[k].network}/${networks[k].cidr}",
+                          option-data = [
                             {
-                              "name": "routers",
-                              "data": "${networks.lan.router}"
-                            }
-                          ],
-                          "pools": [
-                            {
-                              "pool": "${networks.lan.dhcp_pool}"
+                              name = "routers"
+                              data = "${networks[k].router}"
                             }
                           ]
-                        },
-                        {
-                          "subnet": "${networks.store.network}/${networks.store.cidr}",
-                          "option-data": [
+                          pools = [
                             {
-                              "name": "routers",
-                              "data": "${networks.store.router}"
-                            }
-                          ],
-                          "pools": [
-                            {
-                              "pool": "${networks.store.dhcp_pool}"
+                              pool = "${networks[k].dhcp_pool}"
                             }
                           ]
                         }
-                      ],
+                        if lookup(networks[k], "dhcp_pool", null) != null && lookup(networks[k], "router", null) != null
+                      ])},
                       "dhcp-ddns": {
                         "enable-updates": true,
                         "qualifying-suffix": "${domains.internal}.",
@@ -551,18 +544,23 @@ storage:
                     state BACKUP
                     strict_mode off
                     virtual_router_id 247
-                    interface ${host_network.store_if}
+                    interface ${host_network.store.if}
                     priority 100
                     virtual_ipaddress {
-                      ${networks.lan.router} dev ${host_network.lan_if}
-                      ${networks.store.router} dev ${host_network.store_if}
-                      ${services.recursive_dns.vip} dev ${host_network.store_if}
+                      %{~ for k in keys(networks) ~}
+                      %{~ if lookup(networks[k], "router", null) != null ~}
+                      ${networks[k].router} dev ${host_network[k].if}
+                      %{~ endif ~}
+                      %{~ endfor ~}
+                      ${services.recursive_dns.vip} dev ${host_network.store.if}
                     }
                     virtual_rules {
-                      to ${networks.store.network}/${networks.store.cidr} lookup main priority 32758
-                      to ${networks.lan.network}/${networks.lan.cidr} lookup main priority 32758
-                      iif ${host_network.store_if} lookup ${host_network.vwan_route_table} priority 32760
-                      iif ${host_network.lan_if} lookup ${host_network.vwan_route_table} priority 32760
+                      %{~ for k in keys(networks) ~}
+                      %{~ if lookup(networks[k], "router", null) != null ~}
+                      to ${networks[k].network}/${networks[k].cidr} lookup main priority 32758
+                      iif ${host_network[k].if} lookup ${host_network.wan.route_table} priority 32760
+                      %{~ endif ~}
+                      %{~ endfor ~}
                     }
                   }
 
@@ -605,7 +603,7 @@ storage:
                       IPv4_address 225.0.0.50
                       Group 3780
                       IPv4_interface $(NODE_IP)
-                      Interface ${host_network.sync_if}
+                      Interface ${host_network.sync.if}
                       SndSocketBuffer 24985600
                       RcvSocketBuffer 24985600
                       Checksum on

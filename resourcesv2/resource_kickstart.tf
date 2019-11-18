@@ -18,16 +18,22 @@ module "kickstart" {
   kvm_hosts = {
     kvm-0 = {
       network = {
-        hw_if       = "enp2s0f0"
-        host_tap_ip = "192.168.127.251"
-        int_tap_ip  = local.services.renderer.vip
+        hw = {
+          if = "enp2s0f0"
+        }
+        store = {
+          ip = "192.168.127.251"
+        }
       }
     }
     kvm-1 = {
       network = {
-        hw_if       = "enp2s0f0"
-        host_tap_ip = "192.168.127.252"
-        int_tap_ip  = local.services.renderer.vip
+        hw = {
+          if = "enp2s0f0"
+        }
+        store = {
+          ip = "192.168.127.252"
+        }
       }
     }
   }
@@ -36,8 +42,10 @@ module "kickstart" {
   desktop_hosts = {
     desktop-0 = {
       network = {
-        store_if = "eno2"
-        store_ip = "192.168.127.253"
+        store = {
+          if = "eno2"
+          ip = "192.168.127.253"
+        }
       }
       persistent_home_path = "/localhome"
       persistent_home_dev  = "/dev/disk/by-id/nvme-Samsung_SSD_970_EVO_250GB_S465NB0K598517N-part1"

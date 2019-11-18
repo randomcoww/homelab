@@ -32,14 +32,18 @@ resource "matchbox_group" "ks-kvm" {
           if = "en-wan"
         }
       }
-      networks      = var.networks
-      services      = var.services
-      host_tap_vlan = "store"
-      host_tap_if   = "host-tap"
-      int_bridge_if = "en-int"
-      int_dummy_if  = "int-dummy"
-      int_tap_if    = "int-tap"
 
+      internal_networks = {
+        int = {
+          bridge_if = "en-int"
+          dummy_if  = "int-dummy"
+          tap_if    = "int-tap"
+          ip        = var.services.renderer.vip
+        }
+      }
+
+      networks                 = var.networks
+      services                 = var.services
       certs_path               = "/etc/ssl/certs"
       matchbox_url             = "https://github.com/poseidon/matchbox/releases/download/v0.8.0/matchbox-v0.8.0-linux-amd64.tar.gz"
       matchbox_data_path       = "/var/lib/matchbox/data"
