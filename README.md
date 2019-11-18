@@ -143,6 +143,7 @@ Write admin kubeconfig file:
 
 ```bash
 terraform apply -target=local_file.kubeconfig-admin
+export KUBECONFIG=$(pwd)/output/default-cluster-012.kubeconfig
 ```
 
 ### Generate basic Kubernetes addons
