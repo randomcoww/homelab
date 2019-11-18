@@ -35,10 +35,8 @@ resource "matchbox_group" "ks-kvm" {
 
       internal_networks = {
         int = {
-          bridge_if = "en-int"
-          dummy_if  = "int-dummy"
-          tap_if    = "int-tap"
-          ip        = var.services.renderer.vip
+          if = "en-int"
+          ip = var.services.renderer.vip
         }
       }
 

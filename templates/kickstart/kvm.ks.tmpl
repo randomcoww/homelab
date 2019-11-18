@@ -100,15 +100,15 @@ EOF
 ## internal network ${k} for host <-> local vm
 ##
 
-cat <<EOF > /etc/systemd/network/50_${internal_networks[k].bridge_if}.netdev
+cat <<EOF > /etc/systemd/network/50_${internal_networks[k].if}.netdev
 [NetDev]
-Name=${internal_networks[k].bridge_if}
+Name=${internal_networks[k].if}
 Kind=bridge
 EOF
 
-cat <<EOF > /etc/systemd/network/50_${internal_networks[k].bridge_if}.network
+cat <<EOF > /etc/systemd/network/50_${internal_networks[k].if}.network
 [Match]
-Name=${internal_networks[k].bridge_if}
+Name=${internal_networks[k].if}
 
 [Link]
 ARP=no
@@ -116,19 +116,19 @@ ARP=no
 [Network]
 LinkLocalAddressing=no
 DHCP=no
-MACVTAP=${internal_networks[k].tap_if}
-Bridge=${internal_networks[k].dummy_if}
+MACVTAP=${k}-tap
+Bridge=${k}-dummy
 EOF
 
-cat <<EOF > /etc/systemd/network/50_${internal_networks[k].dummy_if}.netdev
+cat <<EOF > /etc/systemd/network/50_${k}-dummy.netdev
 [NetDev]
-Name=${internal_networks[k].dummy_if}
+Name=${k}-dummy
 Kind=dummy
 EOF
 
-cat <<EOF > /etc/systemd/network/50_${internal_networks[k].dummy_if}.network
+cat <<EOF > /etc/systemd/network/50_${k}-dummy.network
 [Match]
-Name=${internal_networks[k].dummy_if}
+Name=${k}-dummy
 
 [Link]
 ARP=no
@@ -136,21 +136,21 @@ ARP=no
 [Network]
 LinkLocalAddressing=no
 DHCP=no
-Bridge=${internal_networks[k].bridge_if}
+Bridge=${internal_networks[k].if}
 EOF
 
-cat <<EOF > /etc/systemd/network/50_${internal_networks[k].tap_if}.netdev
+cat <<EOF > /etc/systemd/network/50_${k}-tap.netdev
 [NetDev]
-Name=${internal_networks[k].tap_if}
+Name=${k}-tap
 Kind=macvtap
 
 [MACVTAP]
 Mode=bridge
 EOF
 
-cat <<EOF > /etc/systemd/network/50_${internal_networks[k].tap_if}.network
+cat <<EOF > /etc/systemd/network/50_${k}-tap.network
 [Match]
-Name=${internal_networks[k].tap_if}
+Name=${k}-tap
 
 [Network]
 LinkLocalAddressing=no
@@ -219,7 +219,7 @@ cat <<EOF > /etc/kea/kea-dhcp4.conf
     "interfaces-config": {
       "interfaces": ${jsonencode([
         for k in keys(internal_networks):
-        internal_networks[k].tap_if
+        "${k}-tap"
         if lookup(networks[k], "dhcp_pool", null) != null
       ])}
     },
