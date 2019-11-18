@@ -344,7 +344,7 @@ storage:
                         for k in keys(networks):
                         "${host_network[k].if}"
                         if lookup(networks[k], "dhcp_pool", null) != null && lookup(networks[k], "router", null) != null
-                        ])},
+                        ])}
                       },
                       "control-socket": {
                         "socket-type": "unix",
