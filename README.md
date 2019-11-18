@@ -5,6 +5,7 @@
 Configurations for creating hypervisor images are generated on a local [Matchbox](https://github.com/coreos/matchbox/) instance. This will generate necessary TLS certs and start a local Matchbox instance using Podman:
 
 ```bash
+cd resourcesv2
 ./run_renderer.sh
 ```
 
@@ -73,7 +74,7 @@ sudo livemedia-creator \
 
 ### Generate Ignition configuration on hypervisor hosts
 
-Each hypervisor runs a PXE boot environment on an internal network for provisioning VMs local to the host. VMs run [Container Linux](https://coreos.com/os/docs/latest/) using [Ignition](https://coreos.com/ignition/docs/latest/) for boot time configuration. Hypervisor hosts run on RAM disk and Ignition and defined VM configuration is lost on each reboot.
+Each hypervisor runs a PXE boot environment on an internal network for provisioning VMs local to the host. VMs run [Container Linux](https://coreos.com/os/docs/latest/) using [Ignition](https://coreos.com/ignition/docs/latest/) for boot time configuration.
 
 Ignition configuration is generated on each hypervisor as follows:
 
@@ -84,12 +85,25 @@ terraform apply \
     -target=module.ignition-kvm-1
 ```
 
-Write SSH CA configuration for accessing the hypervisor over `virsh` and `ssh`.
+Write SSH CA private key to sign a key for accessing the hypervisor over `virsh` and `ssh`.
 
 ```bash
 cd resourcesv2
 terraform apply -target=local_file.ssh-ca-key
 ```
+
+Sign an existing key
+
+```
+CA=$(pwd)/output/ssh-ca-key.pem
+KEY=$HOME/.ssh/id_ecdsa.pub
+USER=$(whoami)
+
+chmod 400 $CA
+ssh-keygen -s $CA -I $USER -n $USER -V +1w -z 1 $KEY
+```
+
+Hypervisor hosts run on RAM disk and Ignition and defined VM configuration is lost on each reboot.
 
 ### Start gateway VMs
 
@@ -106,7 +120,7 @@ virsh -c qemu+ssh://core@192.168.127.252/system start gateway-1
 
 ### Start Kubernetes cluster VMs
 
-Etcd data is backed up to and restored from S3 on start. Local files are discarded when the etcd container stops.
+Etcd data is restored from S3 on fresh start of a cluster if there is an existing backup. A backup is made every 30 minutes. Local data is not kept and is discarded when the etcd container stops.
 
 ```bash
 cd templates/libvirt
