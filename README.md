@@ -120,7 +120,7 @@ virsh -c qemu+ssh://core@192.168.127.252/system start gateway-1
 
 ### Start Kubernetes cluster VMs
 
-Etcd data is restored from S3 on fresh start of a cluster if there is an existing backup. A backup is made every 30 minutes. Local data is not kept and is discarded when the etcd container stops.
+Etcd data is restored from S3 on fresh start of a cluster if there is an existing backup. A backup is made every 30 minutes. Local data is discarded when the etcd container stops.
 
 ```bash
 cd templates/libvirt
