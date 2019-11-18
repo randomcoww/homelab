@@ -100,7 +100,7 @@ KEY=$HOME/.ssh/id_ecdsa.pub
 USER=$(whoami)
 
 chmod 400 $CA
-ssh-keygen -s $CA -I $USER -n $USER -V +1w -z 1 $KEY
+ssh-keygen -s $CA -I $USER -n core -V +1w -z 1 $KEY
 ```
 
 Hypervisor hosts run on RAM disk and Ignition and defined VM configuration is lost on each reboot.
