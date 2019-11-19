@@ -19,7 +19,7 @@ locals {
     kapprover               = "randomcoww/kapprover:v0.0.3"
     busybox                 = "busybox:latest"
     nftables                = "randomcoww/nftables:latest"
-    kea                     = "randomcoww/kea:latest"
+    kea                     = "randomcoww/kea:20190119.01"
     conntrack               = "randomcoww/conntrack:latest"
   }
 
