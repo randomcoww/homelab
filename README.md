@@ -166,7 +166,16 @@ kubectl apply -f http://127.0.0.1:8080/generic?manifest=metallb
 
 ### Deploy services on Kubernetes
 
+Deploy [Minio](https://min.io/) storage controller:
+
 ```
+cd reqourcesv2/manifests
+kubectl apply -f minio.yaml
+```
+
+Create external OpenVPN auth secret:
+
+```
+cd reqourcesv2/manifests
 kubectl create secret generic openvpn-auth-user-pass --from-file=openvpn-auth-user-pass
-...
 ```
