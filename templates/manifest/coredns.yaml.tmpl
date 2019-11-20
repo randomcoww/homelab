@@ -165,6 +165,7 @@ spec:
         - --source=ingress
         - --provider=coredns
         - --log-level=debug
+        - --domain-filter=${domains.internal}
       dnsPolicy: Default
       volumes:
       - name: config-volume
