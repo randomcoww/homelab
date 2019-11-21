@@ -162,9 +162,17 @@ kubectl apply -f http://127.0.0.1:8080/generic?manifest=kapprover
 kubectl apply -f http://127.0.0.1:8080/generic?manifest=coredns
 kubectl apply -f https://raw.githubusercontent.com/google/metallb/v0.8.3/manifests/metallb.yaml
 kubectl apply -f http://127.0.0.1:8080/generic?manifest=metallb
+kubectl apply -f http://127.0.0.1:8080/generic?manifest=internal-tls
 ```
 
 ### Deploy services on Kubernetes
+
+Deploy [Traefik](https://traefik.io/) ingress:
+
+```
+cd reqourcesv2/manifests
+kubectl apply -f traefik.yaml
+```
 
 Deploy [Minio](https://min.io/) storage controller:
 
