@@ -180,13 +180,30 @@ kind: Service
 apiVersion: v1
 metadata:
   name: transmission
-  annotations:
-    external-dns.alpha.kubernetes.io/hostname: tr.fuzzybunny.internal
 spec:
-  type: LoadBalancer
   ports:
   - name: webui
     port: 80
     targetPort: 9091
   selector:
     k8s-app: transmission
+
+---
+apiVersion: extensions/v1beta1
+kind: Ingress
+metadata:
+  name: transmission
+  annotations:
+    kubernetes.io/ingress.class: traefik
+    ingress.kubernetes.io/ssl-redirect: "true"
+spec:
+  rules:
+  - host: tr.fuzzybunny.internal
+    http:
+      paths:
+      - path: /
+        backend:
+          serviceName: transmission
+          servicePort: webui
+  tls:
+  - secretName: internal-tls

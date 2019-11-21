@@ -1,12 +1,13 @@
 module "kickstart" {
   source = "../modulesv2/kickstart"
 
-  user              = local.user
-  password          = var.password
-  ssh_ca_public_key = tls_private_key.ssh-ca.public_key_openssh
-  mtu               = local.mtu
-  networks          = local.networks
-  services          = local.services
+  user                 = local.user
+  password             = var.password
+  ssh_ca_public_key    = tls_private_key.ssh-ca.public_key_openssh
+  internal_ca_cert_pem = tls_self_signed_cert.internal-ca.cert_pem
+  mtu                  = local.mtu
+  networks             = local.networks
+  services             = local.services
 
   # LiveOS base KS
   live_hosts = {

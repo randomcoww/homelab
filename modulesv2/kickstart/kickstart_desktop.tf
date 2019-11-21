@@ -11,13 +11,15 @@ resource "matchbox_group" "ks-desktop" {
   }
   metadata = {
     config = templatefile("${path.module}/../../templates/kickstart/desktop.ks.tmpl", {
-      hostname     = each.key
-      user         = var.user
-      password     = var.password
-      networks     = var.networks
-      host_network = each.value.network
-      mtu          = var.mtu
+      hostname        = each.key
+      user            = var.user
+      password        = var.password
+      tls_internal_ca = chomp(var.internal_ca_cert_pem)
+      networks        = var.networks
+      host_network    = each.value.network
+      mtu             = var.mtu
 
+      certs_path            = "/usr/share/pki/ca-trust-source/anchors"
       persistent_home_path  = each.value.persistent_home_path
       persistent_home_dev   = each.value.persistent_home_dev
       persistent_home_mount = "${join("-", compact(split("/", each.value.persistent_home_path)))}.mount"

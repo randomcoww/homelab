@@ -40,21 +40,19 @@ roleRef:
 subjects:
 - kind: ServiceAccount
   name: traefik-ingress-controller
-  namespace: kube-system
+  namespace: default
 
 ---
 apiVersion: v1
 kind: ServiceAccount
 metadata:
   name: traefik-ingress-controller
-  namespace: kube-system
 
 ---
 kind: DaemonSet
 apiVersion: extensions/v1beta1
 metadata:
   name: traefik-ingress-controller
-  namespace: kube-system
   labels:
     k8s-app: traefik-ingress-lb
 spec:
@@ -67,9 +65,6 @@ spec:
       serviceAccountName: traefik-ingress-controller
       terminationGracePeriodSeconds: 60
       volumes:
-      - name: config
-        configMap:
-          name: traefik-conf
       containers:
       - image: traefik:v1.7
         name: traefik-ingress-lb
@@ -89,14 +84,16 @@ spec:
         - --api
         - --kubernetes
         - --logLevel=INFO
-        - --kubernetes.ingressendpoint.publishedservice=kube-system/traefik-ingress-service
+        - --kubernetes.ingressendpoint.publishedservice=default/traefik-ingress-service
+        - --entryPoints=Name:https Address::443 TLS
+        - --entryPoints=Name:http Address::80
+        - --defaultentrypoints=https,http
 
 ---
 kind: Service
 apiVersion: v1
 metadata:
   name: traefik-ingress-service
-  namespace: kube-system
 spec:
   type: LoadBalancer
   selector:
@@ -104,7 +101,10 @@ spec:
   ports:
   - protocol: TCP
     port: 80
-    name: web
+    name: http
+  - protocol: TCP
+    port: 443
+    name: https
   - protocol: TCP
     port: 8080
     name: admin
@@ -114,7 +114,6 @@ apiVersion: v1
 kind: Service
 metadata:
   name: traefik-web-ui
-  namespace: kube-system
 spec:
   selector:
     k8s-app: traefik-ingress-lb
@@ -128,7 +127,9 @@ apiVersion: extensions/v1beta1
 kind: Ingress
 metadata:
   name: traefik-web-ui
-  namespace: kube-system
+  annotations:
+    kubernetes.io/ingress.class: traefik
+    ingress.kubernetes.io/ssl-redirect: "true"
 spec:
   rules:
   - host: traefik-ui.fuzzybunny.internal
@@ -138,3 +139,5 @@ spec:
         backend:
           serviceName: traefik-web-ui
           servicePort: web
+  tls:
+  - secretName: internal-tls

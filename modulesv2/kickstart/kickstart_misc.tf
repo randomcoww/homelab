@@ -3,7 +3,7 @@
 ##
 resource "matchbox_group" "ks-misc" {
   for_each = {
-    zfs = "${path.module}/../../templates/kickstart/zfs.ks.tmpl"
+    zfs    = "${path.module}/../../templates/kickstart/zfs.ks.tmpl"
     nvidia = "${path.module}/../../templates/kickstart/nvidia.ks.tmpl"
   }
 

@@ -31,7 +31,7 @@ spec:
           value: minio-key
         args:
         - "mount"
-        - ":s3:ingest/"
+        - ":s3:ingest-minio/"
         - "/vol"
         - "--s3-provider=Minio"
         - "--s3-env-auth=true"

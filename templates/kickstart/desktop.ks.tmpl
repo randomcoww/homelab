@@ -111,6 +111,20 @@ Where=${persistent_home_path}
 WantedBy=local-fs.target
 EOF
 
+##############################################
+## trust internal CA
+##############################################
+
+cat <<EOF > ${certs_path}/internal-ca.pem
+${tls_internal_ca}
+EOF
+
+update-ca-trust
+
+##############################################
+## enable services
+##############################################
+
 systemctl enable \
   ${persistent_home_mount}
 

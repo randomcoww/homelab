@@ -47,8 +47,38 @@ spec:
   - name: control
     port: 6600
     targetPort: 6600
+  selector:
+    k8s-app: mpd
+
+---
+kind: Service
+apiVersion: v1
+metadata:
+  name: mpd-stream
+spec:
+  ports:
   - name: stream
     port: 80
     targetPort: 8000
   selector:
     k8s-app: mpd
+
+---
+apiVersion: extensions/v1beta1
+kind: Ingress
+metadata:
+  name: mpd-stream
+  annotations:
+    kubernetes.io/ingress.class: traefik
+    ingress.kubernetes.io/ssl-redirect: "true"
+spec:
+  rules:
+  - host: stream.fuzzybunny.internal
+    http:
+      paths:
+      - path: /
+        backend:
+          serviceName: mpd-stream
+          servicePort: stream
+  tls:
+  - secretName: internal-tls

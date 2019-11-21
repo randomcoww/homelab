@@ -10,6 +10,10 @@ variable "ssh_ca_public_key" {
   type = string
 }
 
+variable "internal_ca_cert_pem" {
+  type = string
+}
+
 variable "mtu" {
   type = number
 }
