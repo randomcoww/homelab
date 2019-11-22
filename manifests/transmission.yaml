@@ -18,7 +18,7 @@ data:
       "blocklist-url": "http://www.example.com/blocklist",
       "cache-size-mb": 4,
       "dht-enabled": true,
-      "download-dir": "/vol/downloads",
+      "download-dir": "/vol/mnt/downloads",
       "download-limit": 100,
       "download-limit-enabled": 0,
       "download-queue-enabled": true,
@@ -126,6 +126,17 @@ spec:
         persistentVolumeClaim:
           claimName: ingest-pvc
       initContainers:
+      # /vol/mnt should be fuse mounted by another container
+      # Verify that this is mounted before continuing
+      - name: wait-mount
+        image: busybox:latest
+        command:
+        - "/bin/mountpoint"
+        args:
+        - "/vol/mnt"
+        volumeMounts:
+        - name: torrent-vol
+          mountPath: "/vol"
       - name: nftables
         image: randomcoww/nftables:latest
         securityContext:
@@ -163,9 +174,9 @@ spec:
         image: randomcoww/transmission:latest
         env:
         - name: RESUME_DIR
-          value: /transmission/resume
+          value: /vol/mnt/resume
         - name: TORRENTS_DIR
-          value: /vol/torrents
+          value: /vol/mnt/torrents
         ports:
         - containerPort: 9091
         volumeMounts:

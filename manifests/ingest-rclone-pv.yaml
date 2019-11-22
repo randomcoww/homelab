@@ -13,10 +13,12 @@ spec:
     spec:
       dnsPolicy: ClusterFirstWithHostNet
       hostNetwork: true
+      # Mount fuse in mnt under base path so that client container
+      # can verify that it is mounted before starting
       volumes:
       - name: ingest-rclone-vol
         hostPath:
-          path: /hostpath/ingest
+          path: /hostpath/ingest/mnt
           type: DirectoryOrCreate
       containers:
       - name: rclone
