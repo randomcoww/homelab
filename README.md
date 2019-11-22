@@ -181,9 +181,20 @@ cd reqourcesv2/manifests
 kubectl apply -f minio.yaml
 ```
 
-Create external OpenVPN auth secret:
+Deploy MPD
+
+```
+cd reqourcesv2/manifests
+kubectl apply -f mpd-rclone-pv.yaml
+kubectl apply -f music-rclone-pv.yaml
+kubectl apply -f mpd.yaml
+```
+
+Deploy Transmission
 
 ```
 cd reqourcesv2/manifests
 kubectl create secret generic openvpn-auth-user-pass --from-file=openvpn-auth-user-pass
+kubectl apply -f ingest-rclone-pv.yaml
+kubectl apply -f transmission.yaml
 ```
