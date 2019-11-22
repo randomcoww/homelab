@@ -1,3 +1,39 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: mpd-config
+data:
+  mpd.conf: |
+    user "mpd"
+    bind_to_address "0.0.0.0"
+    port "6600"
+
+    music_directory "/mpd/music/mnt"
+    playlist_directory "/mpd/cache/mnt/playlists"
+    db_file "/mpd/cache/mnt/tag_cache"
+    state_file "/mpd/cache/mnt/state"
+    sticker_file "/mpd/cache/mnt/sticker.sql"
+
+    filesystem_charset "UTF-8"
+    id3v1_encoding "UTF-8"
+
+    audio_output {
+      type "httpd"
+      name "HTTP FLAC-3"
+      encoder "flac"
+      compression "3"
+      port "8000"
+      bind_to_address "0.0.0.0"
+      max_clients "0"
+    }
+
+    audio_output {
+      type "null"
+      name "Null Output"
+      mixer_type "none"
+    }
+
+---
 kind: Deployment
 apiVersion: extensions/v1beta1
 metadata:
@@ -13,6 +49,27 @@ spec:
         k8s-app: mpd
     spec:
       dnsPolicy: ClusterFirstWithHostNet
+      initContainers:
+      # /vol/mnt should be fuse mounted by another container
+      # Verify that this is mounted before continuing
+      - name: wait-mount-music
+        image: busybox:latest
+        command:
+        - "/bin/mountpoint"
+        args:
+        - "/vol/mnt"
+        volumeMounts:
+        - name: music-data
+          mountPath: "/vol"
+      - name: wait-mount-mpd
+        image: busybox:latest
+        command:
+        - "/bin/mountpoint"
+        args:
+        - "/vol/mnt"
+        volumeMounts:
+        - name: mpd-data
+          mountPath: "/vol"
       containers:
       - name: mpd
         image: randomcoww/mpd:latest
@@ -26,6 +83,9 @@ spec:
           name: music-data
         - mountPath: "/mpd/cache"
           name: mpd-data
+        - mountPath: /etc/mpd.conf
+          name: mpd-config
+          subPath: mpd.conf
       volumes:
       - name: music-data
         persistentVolumeClaim:
@@ -33,6 +93,9 @@ spec:
       - name: mpd-data
         persistentVolumeClaim:
           claimName: mpd-pvc
+      - name: mpd-config
+        configMap:
+          name: mpd-config
 
 ---
 kind: Service

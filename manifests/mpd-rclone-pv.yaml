@@ -13,10 +13,12 @@ spec:
     spec:
       dnsPolicy: ClusterFirstWithHostNet
       hostNetwork: true
+      # Mount fuse in mnt under base path so that client container
+      # can verify that it is mounted before starting
       volumes:
       - name: mpd-rclone-vol
         hostPath:
-          path: /hostpath/mpd
+          path: /hostpath/mpd/mnt
           type: DirectoryOrCreate
       containers:
       - name: rclone

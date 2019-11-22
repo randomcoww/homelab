@@ -13,10 +13,12 @@ spec:
     spec:
       dnsPolicy: ClusterFirstWithHostNet
       hostNetwork: true
+      # Mount fuse in mnt under base path so that client container
+      # can verify that it is mounted before starting
       volumes:
       - name: music-rclone-vol
         hostPath:
-          path: /hostpath/music
+          path: /hostpath/music/mnt
           type: DirectoryOrCreate
       containers:
       - name: rclone
@@ -40,6 +42,7 @@ spec:
         - "--allow-other"
         - "--vfs-cache-mode=minimal"
         - "--no-modtime"
+        - "--read-only"
         volumeMounts:
         - name: music-rclone-vol
           mountPath: /vol
