@@ -181,7 +181,7 @@ cd reqourcesv2/manifests
 kubectl apply -f minio.yaml
 ```
 
-Deploy MPD
+Deploy MPD:
 
 ```
 cd reqourcesv2/manifests
@@ -190,7 +190,7 @@ kubectl apply -f music-rclone-pv.yaml
 kubectl apply -f mpd.yaml
 ```
 
-Deploy Transmission
+Deploy Transmission:
 
 ```
 cd reqourcesv2/manifests
