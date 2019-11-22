@@ -14,8 +14,21 @@ spec:
     spec:
       dnsPolicy: ClusterFirstWithHostNet
       restartPolicy: Always
+      initContainers:
+      # /vol/mnt should be fuse mounted by another container
+      # Verify that this is mounted before continuing
+      - name: wait-mount
+        image: busybox:latest
+        command:
+        - "/bin/mountpoint"
+        args:
+        - "/vol/mnt"
+        volumeMounts:
+        - name: unifi-data
+          mountPath: "/vol"
       containers:
       - name: unifi
+        imagePullPolicy: Always
         image: randomcoww/unifi:5.12.22
         lifecycle:
           preStop:
@@ -30,8 +43,11 @@ spec:
         - containerPort: 3478
           protocol: UDP
         volumeMounts:
-        - mountPath: "/opt/UniFi/data"
+        - mountPath: "/unifi"
           name: unifi-data
+        env:
+        - name: DATA_DIR
+          value: /unifi/mnt
       volumes:
       - name: unifi-data
         persistentVolumeClaim:
@@ -49,7 +65,8 @@ spec:
   type: LoadBalancer
   ports:
   - name: http
-    port: 8080
+    port: 80
+    targetPort: 8080
   - name: https
     port: 8443
   selector:

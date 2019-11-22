@@ -14,9 +14,11 @@ spec:
       dnsPolicy: ClusterFirstWithHostNet
       hostNetwork: true
       volumes:
+      # Mount fuse in mnt under base path so that client container
+      # can verify that it is mounted before starting
       - name: unifi-rclone-vol
         hostPath:
-          path: /hostpath/unifi
+          path: /hostpath/unifi/mnt
           type: DirectoryOrCreate
       containers:
       - name: rclone

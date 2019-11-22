@@ -172,6 +172,7 @@ spec:
           subPath: openvpn-auth-user-pass
       - name: transmission
         image: randomcoww/transmission:latest
+        imagePullPolicy: Always
         env:
         - name: RESUME_DIR
           value: /vol/mnt/resume

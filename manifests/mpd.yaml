@@ -73,6 +73,7 @@ spec:
       containers:
       - name: mpd
         image: randomcoww/mpd:latest
+        imagePullPolicy: Always
         ports:
         - containerPort: 8000
           protocol: TCP
