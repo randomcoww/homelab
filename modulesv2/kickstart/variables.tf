@@ -2,7 +2,7 @@ variable "user" {
   type = string
 }
 
-variable "password" {
+variable "desktop_password" {
   type = string
 }
 

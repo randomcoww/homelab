@@ -16,3 +16,10 @@ output "matchbox_rpc_endpoints" {
     k => "${var.kvm_hosts[k].network.store.ip}:${var.services.renderer.ports.rpc}"
   }
 }
+
+output "kvm_passwords" {
+  value = {
+    for k in keys(var.kvm_hosts) :
+    k => random_password.ks-kvm[k].result
+  }
+}

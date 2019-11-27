@@ -13,7 +13,7 @@ resource "matchbox_group" "ks-desktop" {
     config = templatefile("${path.module}/../../templates/kickstart/desktop.ks.tmpl", {
       hostname        = each.key
       user            = var.user
-      password        = var.password
+      password        = var.desktop_password
       tls_internal_ca = chomp(var.internal_ca_cert_pem)
       networks        = var.networks
       host_network    = each.value.network

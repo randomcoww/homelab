@@ -1,6 +1,13 @@
 ##
 ## KVM (HW) kickstart renderer
 ##
+resource "random_password" "ks-kvm" {
+  for_each = var.kvm_hosts
+
+  length  = 30
+  special = false
+}
+
 resource "matchbox_group" "ks-kvm" {
   for_each = var.kvm_hosts
 
@@ -13,7 +20,7 @@ resource "matchbox_group" "ks-kvm" {
     config = templatefile("${path.module}/../../templates/kickstart/kvm.ks.tmpl", {
       hostname           = each.key
       user               = var.user
-      password           = var.password
+      password           = random_password.ks-kvm[each.key].result
       ssh_authorized_key = "cert-authority ${chomp(var.ssh_ca_public_key)}"
       host_network       = each.value.network
       mtu                = var.mtu

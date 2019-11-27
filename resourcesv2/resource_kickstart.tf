@@ -2,7 +2,7 @@ module "kickstart" {
   source = "../modulesv2/kickstart"
 
   user                 = local.user
-  password             = var.password
+  desktop_password     = var.desktop_password
   ssh_ca_public_key    = tls_private_key.ssh-ca.public_key_openssh
   internal_ca_cert_pem = tls_self_signed_cert.internal-ca.cert_pem
   mtu                  = local.mtu
