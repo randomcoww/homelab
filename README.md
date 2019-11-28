@@ -162,7 +162,8 @@ kubectl apply -f http://127.0.0.1:8080/generic?manifest=kapprover
 kubectl apply -f http://127.0.0.1:8080/generic?manifest=coredns
 kubectl apply -f https://raw.githubusercontent.com/google/metallb/v0.8.3/manifests/metallb.yaml
 kubectl apply -f http://127.0.0.1:8080/generic?manifest=metallb
-kubectl apply -f http://127.0.0.1:8080/generic?manifest=internal-tls
+kubectl apply -f http://127.0.0.1:8080/generic?secret=internal-tls
+kubectl apply -f http://127.0.0.1:8080/generic?secret=minio-auth
 ```
 
 ### Deploy services on Kubernetes
