@@ -18,12 +18,8 @@ variable "container_images" {
   type = any
 }
 
-variable "internal_cert_pem" {
-  type = string
-}
-
-variable "internal_private_key_pem" {
-  type = string
+variable "secrets" {
+  type = any
 }
 
 variable "renderer" {

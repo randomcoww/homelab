@@ -1,8 +1,0 @@
-apiVersion: v1
-kind: Secret
-metadata:
-  name: internal-tls
-data:
-  tls.crt: ${tls_internal}
-  tls.key: ${tls_internal_key}
-type: kubernetes.io/tls

@@ -30,9 +30,15 @@ spec:
         - name: MINIO_STORAGE_CLASS_RRS
           value: "EC:2"
         - name: MINIO_ACCESS_KEY
-          value: "minio"
+          valueFrom:
+            secretKeyRef:
+              name: minio-auth
+              key: access_key_id
         - name: MINIO_SECRET_KEY
-          value: "minio-key"
+          valueFrom:
+            secretKeyRef:
+              name: minio-auth
+              key: secret_access_key
         - name: HOST_IP
           valueFrom:
             fieldRef:

@@ -70,12 +70,23 @@ spec:
       - name: s3backer
         securityContext:
           privileged: true
+        env:
+        - name: AWS_ACCESS_KEY_ID
+          valueFrom:
+            secretKeyRef:
+              name: minio-auth
+              key: access_key_id
+        - name: AWS_SECRET_ACCESS_KEY
+          valueFrom:
+            secretKeyRef:
+              name: minio-auth
+              key: secret_access_key
         image: randomcoww/s3backer:1.5.4
         args:
         - -d
-        - --accessId=minio-b
-        - --accessKey=minio-b-key
-        - --baseURL=http://minio-b-ui.default.svc.cluster.local/
+        - --accessId=$(AWS_ACCESS_KEY_ID)
+        - --accessKey=$(AWS_SECRET_ACCESS_KEY)
+        - --baseURL=http://minio.default.svc.cluster.local:9000/"
         - --blockSize=128k 
         - --size=2g
         - --listBlocks

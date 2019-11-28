@@ -146,6 +146,19 @@ locals {
 }
 
 ##
+## minio user-pass
+##
+resource "random_password" "minio-user" {
+  length  = 30
+  special = false
+}
+
+resource "random_password" "minio-password" {
+  length  = 30
+  special = false
+}
+
+##
 ## Write local files
 ##
 resource "local_file" "matchbox-ca-pem" {

@@ -28,9 +28,15 @@ spec:
           privileged: true
         env:
         - name: AWS_ACCESS_KEY_ID
-          value: minio
+          valueFrom:
+            secretKeyRef:
+              name: minio-auth
+              key: access_key_id
         - name: AWS_SECRET_ACCESS_KEY
-          value: minio-key
+          valueFrom:
+            secretKeyRef:
+              name: minio-auth
+              key: secret_access_key
         args:
         - "mount"
         - ":s3:music/"
