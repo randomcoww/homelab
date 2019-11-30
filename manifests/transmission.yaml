@@ -36,7 +36,7 @@ data:
       "speed-limit-down-enabled": true,
       "speed-limit-up": 10,
       "speed-limit-up-enabled": true,
-      "start-added-torrents": false
+      "start-added-torrents": true
     }
 
 ---
