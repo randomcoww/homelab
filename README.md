@@ -105,41 +105,16 @@ ssh-keygen -s $CA -I $USER -n core -V +1w -z 1 $KEY
 
 Hypervisor hosts run on RAM disk and Ignition and defined VM configuration is lost on each reboot.
 
-### Start gateway VMs
-
-This will provide a basic infrastructure including NAT routing, DHCP and DNS.
+### Start VMs
 
 ```bash
-cd templates/libvirt
-virsh -c qemu+ssh://core@192.168.127.251/system define gateway-0.xml
-virsh -c qemu+ssh://core@192.168.127.252/system define gateway-1.xml
-
-virsh -c qemu+ssh://core@192.168.127.251/system start gateway-0
-virsh -c qemu+ssh://core@192.168.127.252/system start gateway-1
+cd resourcesv2
+terraform apply \
+    -target=module.libvirt-kvm-0 \
+    -target=module.libvirt-kvm-1
 ```
 
-### Start Kubernetes cluster VMs
-
-Etcd data is restored from S3 on fresh start of a cluster if there is an existing backup. A backup is made every 30 minutes. Local data is discarded when the etcd container stops.
-
-```bash
-cd templates/libvirt
-virsh -c qemu+ssh://core@192.168.127.251/system define controller-0.xml
-virsh -c qemu+ssh://core@192.168.127.252/system define controller-1.xml
-virsh -c qemu+ssh://core@192.168.127.252/system define controller-2.xml
-
-virsh -c qemu+ssh://core@192.168.127.251/system start controller-0
-virsh -c qemu+ssh://core@192.168.127.252/system start controller-1
-virsh -c qemu+ssh://core@192.168.127.252/system start controller-2
-
-virsh -c qemu+ssh://core@192.168.127.251/system define worker-0.xml
-virsh -c qemu+ssh://core@192.168.127.252/system define worker-1.xml
-
-virsh -c qemu+ssh://core@192.168.127.251/system start worker-0
-virsh -c qemu+ssh://core@192.168.127.252/system start worker-1
-```
-
-Write admin kubeconfig file:
+### Write kubeconfig file
 
 ```bash
 terraform apply -target=local_file.kubeconfig-admin
