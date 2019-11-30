@@ -25,24 +25,14 @@ resource "matchbox_group" "ks-kvm" {
       host_network       = each.value.network
       mtu                = var.mtu
 
-      vlans = {
-        store = {
-          if = "en-store"
-        }
-        lan = {
-          if = "en-lan"
-        }
-        sync = {
-          if = "en-sync"
-        }
-        wan = {
-          if = "en-wan"
-        }
-      }
-
+      vlans = [
+        for k in keys(var.networks) :
+        k
+        if lookup(var.networks[k], "id", null) != null
+      ]
       internal_networks = {
         int = {
-          if = "en-int"
+          if = var.networks.int.br_if
           ip = var.services.renderer.vip
         }
       }

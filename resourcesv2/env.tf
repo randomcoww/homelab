@@ -91,6 +91,7 @@ locals {
       cidr      = 23
       router    = "192.168.126.240"
       dhcp_pool = "192.168.127.64/26"
+      br_if     = "en-store"
     }
     lan = {
       id        = 90
@@ -98,20 +99,24 @@ locals {
       cidr      = 23
       router    = "192.168.62.240"
       dhcp_pool = "192.168.63.64/26"
+      br_if     = "en-lan"
     }
     sync = {
       id      = 60
       network = "192.168.190.0"
       cidr    = 29
+      br_if   = "en-sync"
     }
     wan = {
-      id = 30
+      id    = 30
+      br_if = "en-wan"
     }
     # internal network on each hypervisor
     int = {
       network   = "192.168.224.0"
       cidr      = 23
       dhcp_pool = "192.168.225.64/26"
+      br_if     = "en-int"
     }
     # kubernetes
     kubernetes = {
@@ -125,6 +130,347 @@ locals {
     metallb = {
       network = "192.168.126.64"
       cidr    = 26
+    }
+  }
+
+  hosts = {
+    # gateway
+    gateway-0 = {
+      component = "gateway"
+      memory    = 2
+      vcpu      = 2
+      network = [
+        {
+          network = "store"
+          ip      = "192.168.127.217"
+          if      = "eth0"
+        },
+        {
+          network = "lan"
+          ip      = "192.168.63.217"
+          if      = "eth1"
+        },
+        {
+          network = "sync"
+          ip      = "192.168.190.1"
+          if      = "eth2"
+        },
+        {
+          alias   = "host_wan"
+          network = "wan"
+          if      = "eth3"
+          mac     = "52-54-00-63-6e-b2"
+        },
+        {
+          network     = "wan"
+          if          = "eth4"
+          mac         = "52-54-00-63-6e-b3"
+          route_table = 250
+        },
+        {
+          network   = "int"
+          if        = "eth5"
+          mac       = "52-54-00-1a-61-2a"
+          bootorder = 1
+        }
+      ]
+      kea_ha_role = "primary"
+    }
+    gateway-1 = {
+      component = "gateway"
+      memory    = 2
+      vcpu      = 2
+      network = [
+        {
+          network = "store"
+          ip      = "192.168.127.218"
+          if      = "eth0"
+        },
+        {
+          network = "lan"
+          ip      = "192.168.63.218"
+          if      = "eth1"
+        },
+        {
+          network = "sync"
+          ip      = "192.168.190.2"
+          if      = "eth2"
+        },
+        {
+          alias   = "host_wan"
+          network = "wan"
+          if      = "eth3"
+          mac     = "52-54-00-63-6e-b1"
+        },
+        {
+          network     = "wan"
+          if          = "eth4"
+          mac         = "52-54-00-63-6e-b3"
+          route_table = 250
+        },
+        {
+          network   = "int"
+          if        = "eth5"
+          mac       = "52-54-00-1a-61-2b"
+          bootorder = 1
+        }
+      ]
+      kea_ha_role = "standby"
+    }
+
+    # controllers
+    controller-0 = {
+      memory    = 4
+      vcpu      = 2
+      component = "controller"
+      network = [
+        {
+          network = "store"
+          ip      = "192.168.127.219"
+          if      = "eth0"
+        },
+        {
+          network   = "int"
+          if        = "eth1"
+          mac       = "52-54-00-1a-61-0a"
+          bootorder = 1
+        }
+      ]
+    }
+    controller-1 = {
+      memory    = 4
+      vcpu      = 2
+      component = "controller"
+      network = [
+        {
+          network = "store"
+          ip      = "192.168.127.220"
+          if      = "eth0"
+        },
+        {
+          network   = "int"
+          if        = "eth1"
+          mac       = "52-54-00-1a-61-0b"
+          bootorder = 1
+        }
+      ]
+    }
+    controller-2 = {
+      memory    = 4
+      vcpu      = 2
+      component = "controller"
+      network = [
+        {
+          network = "store"
+          ip      = "192.168.127.221"
+          if      = "eth0"
+        },
+        {
+          network   = "int"
+          if        = "eth1"
+          mac       = "52-54-00-1a-61-0c"
+          bootorder = 1
+        }
+      ]
+    }
+
+    # workers
+    worker-0 = {
+      component = "worker"
+      memory    = 32
+      vcpu      = 4
+      network = [
+        {
+          network = "store"
+          if      = "eth0"
+        },
+        {
+          network   = "int"
+          if        = "eth1"
+          mac       = "52-54-00-1a-61-1a"
+          bootorder = 1
+        }
+      ]
+      hostdev = [
+        {
+          domain   = "0x0000"
+          bus      = "0x05"
+          slot     = "0x00"
+          function = "0x0"
+          rom      = "/var/lib/libvirt/boot/SAS9300_8i_IT.bin"
+        }
+      ]
+      disk = [
+        {
+          label      = "2YK7XTRD"
+          device     = "/dev/disk/by-id/ata-WDC_WD100EFAX-68LHPN0_2YK7XTRD"
+          format     = "xfs"
+          mount_path = "/minio/0"
+        },
+        {
+          label      = "2YK87AVD"
+          device     = "/dev/disk/by-id/ata-WDC_WD100EFAX-68LHPN0_2YK87AVD"
+          format     = "xfs"
+          mount_path = "/minio/1"
+        },
+        {
+          label      = "2YK89PND"
+          device     = "/dev/disk/by-id/ata-WDC_WD100EFAX-68LHPN0_2YK89PND"
+          format     = "xfs"
+          mount_path = "/minio/2"
+        },
+        {
+          label      = "2YKG1X2D"
+          device     = "/dev/disk/by-id/ata-WDC_WD100EFAX-68LHPN0_2YKG1X2D"
+          format     = "xfs"
+          mount_path = "/minio/3"
+        },
+        {
+          label      = "2YKGML5D"
+          device     = "/dev/disk/by-id/ata-WDC_WD100EFAX-68LHPN0_2YKGML5D"
+          format     = "xfs"
+          mount_path = "/minio/4"
+        },
+        {
+          label      = "2YKGML7D"
+          device     = "/dev/disk/by-id/ata-WDC_WD100EFAX-68LHPN0_2YKGML7D"
+          format     = "xfs"
+          mount_path = "/minio/5"
+        },
+        {
+          label      = "2YKGNL4D"
+          device     = "/dev/disk/by-id/ata-WDC_WD100EFAX-68LHPN0_2YKGNL4D"
+          format     = "xfs"
+          mount_path = "/minio/6"
+        },
+        {
+          label      = "JEK830AZ"
+          device     = "/dev/disk/by-id/ata-WDC_WD100EFAX-68LHPN0_JEK830AZ"
+          format     = "xfs"
+          mount_path = "/minio/7"
+        },
+        {
+          label      = "JEK830RZ"
+          device     = "/dev/disk/by-id/ata-WDC_WD100EFAX-68LHPN0_JEK830RZ"
+          format     = "xfs"
+          mount_path = "/minio/8"
+        },
+        {
+          label      = "JEK8V1YZ"
+          device     = "/dev/disk/by-id/ata-WDC_WD100EFAX-68LHPN0_JEK8V1YZ"
+          format     = "xfs"
+          mount_path = "/minio/9"
+        },
+        {
+          label      = "JEK8YTSZ"
+          device     = "/dev/disk/by-id/ata-WDC_WD100EFAX-68LHPN0_JEK8YTSZ"
+          format     = "xfs"
+          mount_path = "/minio/10"
+        },
+        {
+          label      = "JEKAZ92N"
+          device     = "/dev/disk/by-id/ata-WDC_WD100EFAX-68LHPN0_JEKAZ92N"
+          format     = "xfs"
+          mount_path = "/minio/11"
+        },
+        {
+          label      = "S4PGNF0M414895K"
+          source     = "/dev/disk/by-id/ata-Samsung_SSD_860_QVO_1TB_S4PGNF0M414895K"
+          target     = "vda"
+          device     = "/dev/vda"
+          format     = "ext4"
+          mount_path = "/pv"
+        },
+      ]
+    }
+    worker-1 = {
+      component = "worker"
+      memory    = 32
+      vcpu      = 4
+      network = [
+        {
+          network = "store"
+          if      = "eth0"
+        },
+        {
+          network   = "int"
+          if        = "eth1"
+          mac       = "52-54-00-1a-61-1b"
+          bootorder = 1
+        }
+      ]
+      hostdev = [
+        {
+          domain   = "0x0000"
+          bus      = "0x05"
+          slot     = "0x00"
+          function = "0x0"
+          rom      = "/var/lib/libvirt/boot/SAS9300_8i_IT.bin"
+        }
+      ]
+      disk = [
+        {
+          label      = "S4PGNF0M410395Z"
+          source     = "/dev/disk/by-id/ata-Samsung_SSD_860_QVO_1TB_S4PGNF0M410395Z"
+          target     = "vda"
+          device     = "/dev/vda"
+          format     = "ext4"
+          mount_path = "/pv"
+        }
+      ]
+    }
+
+    # KVM
+    kvm-0 = {
+      component = "kvm"
+      network = [
+        {
+          alias = "hw"
+          if    = "enp2s0f0"
+        },
+        {
+          network = "store"
+          ip      = "192.168.127.251"
+        }
+      ]
+      guests = [
+        "gateway-0",
+        "controller-0",
+        "worker-0",
+      ]
+    }
+    kvm-1 = {
+      component = "kvm"
+      network = [
+        {
+          alias = "hw"
+          if    = "enp2s0f0"
+        },
+        {
+          network = "store"
+          ip      = "192.168.127.252"
+        }
+      ]
+      guests = [
+        "gateway-1",
+        "controller-1",
+        "controller-2",
+        "worker-1",
+      ]
+    }
+
+    # desktop
+    desktop-0 = {
+      component = "desktop"
+      network = [
+        {
+          network = "store"
+          if      = "eno2"
+          ip      = "192.168.127.253"
+        }
+      ]
+      persistent_home_path = "/localhome"
+      persistent_home_dev  = "/dev/disk/by-id/nvme-Samsung_SSD_970_EVO_250GB_S465NB0K598517N-part1"
     }
   }
 }

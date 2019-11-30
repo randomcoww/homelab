@@ -14,140 +14,25 @@ module "kubernetes-common" {
   container_images  = local.container_images
 
   controller_hosts = {
-    controller-0 = {
+    for k in keys(local.hosts) :
+    k => merge(local.hosts[k], {
       network = {
-        store = {
-          ip = "192.168.127.219"
-          if = "eth0"
-        }
-        int = {
-          if  = "eth1"
-          mac = "52-54-00-1a-61-0a"
-        }
+        for n in local.hosts[k].network :
+        lookup(n, "alias", lookup(n, "network", "placeholder")) => n
       }
-    }
-    controller-1 = {
-      network = {
-        store = {
-          ip = "192.168.127.220"
-          if = "eth0"
-        }
-        int = {
-          if  = "eth1"
-          mac = "52-54-00-1a-61-0b"
-        }
-      }
-    }
-    controller-2 = {
-      network = {
-        store = {
-          ip = "192.168.127.221"
-          if = "eth0"
-        }
-        int = {
-          if  = "eth1"
-          mac = "52-54-00-1a-61-0c"
-        }
-      }
-    }
+    })
+    if local.hosts[k].component == "controller"
   }
+
   worker_hosts = {
-    worker-0 = {
+    for k in keys(local.hosts) :
+    k => merge(local.hosts[k], {
       network = {
-        store = {
-          if = "eth0"
-        }
-        int = {
-          if  = "eth1"
-          mac = "52-54-00-1a-61-1a"
-        }
+        for n in local.hosts[k].network :
+        lookup(n, "alias", lookup(n, "network", "placeholder")) => n
       }
-      disks = {
-        "S4PGNF0M414895K" = {
-          device     = "/dev/vda"
-          format     = "ext4"
-          mount_path = "/pv"
-        }
-        "2YK7XTRD" = {
-          device     = "/dev/disk/by-id/ata-WDC_WD100EFAX-68LHPN0_2YK7XTRD"
-          format     = "xfs"
-          mount_path = "/minio/0"
-        }
-        "2YK87AVD" = {
-          device     = "/dev/disk/by-id/ata-WDC_WD100EFAX-68LHPN0_2YK87AVD"
-          format     = "xfs"
-          mount_path = "/minio/1"
-        }
-        "2YK89PND" = {
-          device     = "/dev/disk/by-id/ata-WDC_WD100EFAX-68LHPN0_2YK89PND"
-          format     = "xfs"
-          mount_path = "/minio/2"
-        }
-        "2YKG1X2D" = {
-          device     = "/dev/disk/by-id/ata-WDC_WD100EFAX-68LHPN0_2YKG1X2D"
-          format     = "xfs"
-          mount_path = "/minio/3"
-        }
-        "2YKGML5D" = {
-          device     = "/dev/disk/by-id/ata-WDC_WD100EFAX-68LHPN0_2YKGML5D"
-          format     = "xfs"
-          mount_path = "/minio/4"
-        }
-        "2YKGML7D" = {
-          device     = "/dev/disk/by-id/ata-WDC_WD100EFAX-68LHPN0_2YKGML7D"
-          format     = "xfs"
-          mount_path = "/minio/5"
-        }
-        "2YKGNL4D" = {
-          device     = "/dev/disk/by-id/ata-WDC_WD100EFAX-68LHPN0_2YKGNL4D"
-          format     = "xfs"
-          mount_path = "/minio/6"
-        }
-        "JEK830AZ" = {
-          device     = "/dev/disk/by-id/ata-WDC_WD100EFAX-68LHPN0_JEK830AZ"
-          format     = "xfs"
-          mount_path = "/minio/7"
-        }
-        "JEK830RZ" = {
-          device     = "/dev/disk/by-id/ata-WDC_WD100EFAX-68LHPN0_JEK830RZ"
-          format     = "xfs"
-          mount_path = "/minio/8"
-        }
-        "JEK8V1YZ" = {
-          device     = "/dev/disk/by-id/ata-WDC_WD100EFAX-68LHPN0_JEK8V1YZ"
-          format     = "xfs"
-          mount_path = "/minio/9"
-        }
-        "JEK8YTSZ" = {
-          device     = "/dev/disk/by-id/ata-WDC_WD100EFAX-68LHPN0_JEK8YTSZ"
-          format     = "xfs"
-          mount_path = "/minio/10"
-        }
-        "JEKAZ92N" = {
-          device     = "/dev/disk/by-id/ata-WDC_WD100EFAX-68LHPN0_JEKAZ92N"
-          format     = "xfs"
-          mount_path = "/minio/11"
-        }
-      }
-    }
-    worker-1 = {
-      network = {
-        store = {
-          if = "eth0"
-        }
-        int = {
-          if  = "eth1"
-          mac = "52-54-00-1a-61-1b"
-        }
-      }
-      disks = {
-        "S4PGNF0M410395Z" = {
-          device     = "/dev/vda"
-          format     = "ext4"
-          mount_path = "/pv"
-        }
-      }
-    }
+    })
+    if local.hosts[k].component == "worker"
   }
 }
 
@@ -163,66 +48,14 @@ module "gateway-common" {
   container_images  = local.container_images
 
   gateway_hosts = {
-    gateway-0 = {
+    for k in keys(local.hosts) :
+    k => merge(local.hosts[k], {
       network = {
-        store = {
-          ip = "192.168.127.217"
-          if = "eth0"
-        }
-        lan = {
-          ip = "192.168.63.217"
-          if = "eth1"
-        }
-        sync = {
-          ip = "192.168.190.1"
-          if = "eth2"
-        }
-        host_wan = {
-          if  = "eth3"
-          mac = "52-54-00-63-6e-b2"
-        }
-        wan = {
-          if          = "eth4"
-          mac         = "52-54-00-63-6e-b3"
-          route_table = 250
-        }
-        int = {
-          if  = "eth5"
-          mac = "52-54-00-1a-61-2a"
-        }
+        for n in local.hosts[k].network :
+        lookup(n, "alias", lookup(n, "network", "placeholder")) => n
       }
-      kea_ha_role = "primary"
-    }
-    gateway-1 = {
-      network = {
-        store = {
-          ip = "192.168.127.218"
-          if = "eth0"
-        }
-        lan = {
-          ip = "192.168.63.218"
-          if = "eth1"
-        }
-        sync = {
-          ip = "192.168.190.2"
-          if = "eth2"
-        }
-        host_wan = {
-          if  = "eth3"
-          mac = "52-54-00-63-6e-b1"
-        }
-        wan = {
-          if          = "eth4"
-          mac         = "52-54-00-63-6e-b3"
-          route_table = 250
-        }
-        int = {
-          if  = "eth5"
-          mac = "52-54-00-1a-61-2b"
-        }
-      }
-      kea_ha_role = "standby"
-    }
+    })
+    if local.hosts[k].component == "gateway"
   }
 }
 

@@ -17,40 +17,26 @@ module "kickstart" {
 
   # KVM host KS
   kvm_hosts = {
-    kvm-0 = {
+    for k in keys(local.hosts) :
+    k => merge(local.hosts[k], {
       network = {
-        hw = {
-          if = "enp2s0f0"
-        }
-        store = {
-          ip = "192.168.127.251"
-        }
+        for n in local.hosts[k].network :
+        lookup(n, "alias", lookup(n, "network", "placeholder")) => n
       }
-    }
-    kvm-1 = {
-      network = {
-        hw = {
-          if = "enp2s0f0"
-        }
-        store = {
-          ip = "192.168.127.252"
-        }
-      }
-    }
+    })
+    if local.hosts[k].component == "kvm"
   }
 
   # Desktop host KS
   desktop_hosts = {
-    desktop-0 = {
+    for k in keys(local.hosts) :
+    k => merge(local.hosts[k], {
       network = {
-        store = {
-          if = "eno2"
-          ip = "192.168.127.253"
-        }
+        for n in local.hosts[k].network :
+        lookup(n, "alias", lookup(n, "network", "placeholder")) => n
       }
-      persistent_home_path = "/localhome"
-      persistent_home_dev  = "/dev/disk/by-id/nvme-Samsung_SSD_970_EVO_250GB_S465NB0K598517N-part1"
-    }
+    })
+    if local.hosts[k].component == "desktop"
   }
 
   # only local renderer makes sense here
@@ -66,6 +52,13 @@ locals {
       cert_pem        = module.kickstart.matchbox_cert_pem
       private_key_pem = module.kickstart.matchbox_private_key_pem
       ca_pem          = module.kickstart.matchbox_ca_pem
+    }
+  }
+
+  libvirt = {
+    for k in keys(module.kickstart.libvirt_endpoints) :
+    k => {
+      endpoint = module.kickstart.libvirt_endpoints[k]
     }
   }
 }

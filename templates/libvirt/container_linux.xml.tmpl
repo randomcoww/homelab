@@ -29,9 +29,9 @@
     %{~ endfor ~}
     %{~ for k in network ~}
     <interface type='direct' trustGuestRxFilters='yes'>
-      <source dev='${k.if}' mode='bridge'/>
+      <source dev='${networks[k.network].br_if}' mode='bridge'/>
       %{~ if lookup(k, "mac", null) != null ~}
-      <mac address='${k.mac}'/>
+      <mac address='${join(":", split("-", k.mac))}'/>
       %{~ endif ~}
       %{~ if lookup(k, "bootorder", null) != null ~}
       <boot order='${k.bootorder}'/>

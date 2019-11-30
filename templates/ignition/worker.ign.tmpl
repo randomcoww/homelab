@@ -27,16 +27,16 @@ networkd:
 
 systemd:
   units:
-    %{~ for k in keys(host_disks) ~}
-    - name: ${join("-", compact(split("/", host_disks[k].mount_path)))}.mount
+    %{~ for disk in host_disks ~}
+    - name: ${join("-", compact(split("/", disk.mount_path)))}.mount
       enable: true
       contents: |
         [Unit]
         Before=local-fs.target
         [Mount]
-        What=${host_disks[k].device}
-        Where=${host_disks[k].mount_path}
-        Type=${host_disks[k].format}
+        What=${disk.device}
+        Where=${disk.mount_path}
+        Type=${disk.format}
         [Install]
         WantedBy=local-fs.target
     %{~ endfor ~}
@@ -96,13 +96,13 @@ systemd:
 
 storage:
   filesystems:
-    %{~ for k in keys(host_disks) ~}
-    - name: ${k}
+    %{~ for disk in host_disks ~}
+    - name: ${disk.label}
       mount:
-        device: ${host_disks[k].device}
-        format: ${host_disks[k].format}
+        device: ${disk.device}
+        format: ${disk.format}
         wipe_filesystem: false
-        label: ${upper(k)}
+        label: ${upper(disk.label)}
     %{~ endfor ~}
 
   files:
