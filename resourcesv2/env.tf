@@ -436,6 +436,7 @@ locals {
       guests = [
         "gateway-0",
         "controller-0",
+        "controller-2",
         "worker-0",
       ]
     }
@@ -454,7 +455,6 @@ locals {
       guests = [
         "gateway-1",
         "controller-1",
-        "controller-2",
         "worker-1",
       ]
     }
