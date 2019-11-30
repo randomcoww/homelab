@@ -22,7 +22,7 @@ resource "matchbox_group" "ks-kvm" {
       user               = var.user
       password           = random_password.ks-kvm[each.key].result
       ssh_authorized_key = "cert-authority ${chomp(var.ssh_ca_public_key)}"
-      host_network       = each.value.network
+      host_network       = each.value.host_network
       mtu                = var.mtu
 
       vlans = [

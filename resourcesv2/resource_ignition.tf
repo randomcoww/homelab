@@ -16,7 +16,7 @@ module "kubernetes-common" {
   controller_hosts = {
     for k in keys(local.hosts) :
     k => merge(local.hosts[k], {
-      network = {
+      host_network = {
         for n in local.hosts[k].network :
         lookup(n, "alias", lookup(n, "network", "placeholder")) => n
       }
@@ -27,7 +27,7 @@ module "kubernetes-common" {
   worker_hosts = {
     for k in keys(local.hosts) :
     k => merge(local.hosts[k], {
-      network = {
+      host_network = {
         for n in local.hosts[k].network :
         lookup(n, "alias", lookup(n, "network", "placeholder")) => n
       }
@@ -50,7 +50,7 @@ module "gateway-common" {
   gateway_hosts = {
     for k in keys(local.hosts) :
     k => merge(local.hosts[k], {
-      network = {
+      host_network = {
         for n in local.hosts[k].network :
         lookup(n, "alias", lookup(n, "network", "placeholder")) => n
       }

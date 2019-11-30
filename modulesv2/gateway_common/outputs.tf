@@ -8,7 +8,7 @@ output "gateway_params" {
 
       container_images           = var.container_images
       networks                   = var.networks
-      host_network               = var.gateway_hosts[k].network
+      host_network               = var.gateway_hosts[k].host_network
       services                   = var.services
       domains                    = var.domains
       mtu                        = var.mtu
@@ -22,7 +22,7 @@ output "gateway_params" {
         {
           name = k
           role = var.gateway_hosts[k].kea_ha_role
-          url  = "http://${var.gateway_hosts[k].network.sync.ip}:${var.services.kea.ports.peer}/"
+          url  = "http://${var.gateway_hosts[k].host_network.sync.ip}:${var.services.kea.ports.peer}/"
         }
       ])
     }

@@ -16,7 +16,7 @@ resource "matchbox_group" "ks-desktop" {
       password        = var.desktop_password
       tls_internal_ca = chomp(var.internal_ca_cert_pem)
       networks        = var.networks
-      host_network    = each.value.network
+      host_network    = each.value.host_network
       mtu             = var.mtu
 
       certs_path            = "/usr/share/pki/ca-trust-source/anchors"

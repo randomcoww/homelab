@@ -21,7 +21,7 @@ resource "tls_cert_request" "etcd" {
 
   ip_addresses = concat([
     for host in values(var.controller_hosts) :
-    host.network.store.ip
+    host.host_network.store.ip
   ], ["127.0.0.1"])
 }
 
