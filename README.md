@@ -1,12 +1,32 @@
 ## Terraform configs for provisioning homelab resources
 
-### Run local Matchbox
+### Run local matchbox server
 
 Configurations for creating hypervisor images are generated on a local [Matchbox](https://github.com/coreos/matchbox/) instance. This will generate necessary TLS certs and start a local Matchbox instance using Podman:
 
 ```bash
 cd resourcesv2
 ./run_renderer.sh
+```
+
+### Setup SSH access
+
+Write SSH CA private key to sign a key for accessing the hypervisor over `virsh` and `ssh`:
+
+```bash
+cd resourcesv2
+terraform apply -target=local_file.ssh-ca-key
+```
+
+Sign an existing key:
+
+```
+CA=$(pwd)/output/ssh-ca-key.pem
+KEY=$HOME/.ssh/id_ecdsa.pub
+USER=$(whoami)
+
+chmod 400 $CA
+ssh-keygen -s $CA -I $USER -n core -V +1w -z 1 $KEY
 ```
 
 ### Create hypervisor images
@@ -18,7 +38,7 @@ cd resourcesv2
 terraform apply -target=module.kickstart
 ```
 
-Generate live USB images:
+Generate USB images for hypervisor hosts:
 
 ```bash
 cd build
@@ -55,7 +75,7 @@ sudo livemedia-creator \
     --lorax-templates ./lorax-kvm
 ```
 
-Also create an image for the desktop PC:
+Create an image for the desktop PC:
 
 ```
 sudo livemedia-creator \
@@ -72,7 +92,7 @@ sudo livemedia-creator \
     --lorax-templates ./lorax-desktop
 ```
 
-### Generate Ignition configuration on hypervisor hosts
+### Generate configuration on hypervisor hosts
 
 Each hypervisor runs a PXE boot environment on an internal network for provisioning VMs local to the host. VMs run [Container Linux](https://coreos.com/os/docs/latest/) using [Ignition](https://coreos.com/ignition/docs/latest/) for boot time configuration.
 
@@ -85,25 +105,7 @@ terraform apply \
     -target=module.ignition-kvm-1
 ```
 
-Write SSH CA private key to sign a key for accessing the hypervisor over `virsh` and `ssh`.
-
-```bash
-cd resourcesv2
-terraform apply -target=local_file.ssh-ca-key
-```
-
-Sign an existing key
-
-```
-CA=$(pwd)/output/ssh-ca-key.pem
-KEY=$HOME/.ssh/id_ecdsa.pub
-USER=$(whoami)
-
-chmod 400 $CA
-ssh-keygen -s $CA -I $USER -n core -V +1w -z 1 $KEY
-```
-
-### Define VMs
+Define VMs on each hypervisor:
 
 ```bash
 cd resourcesv2
@@ -134,7 +136,7 @@ virsh -c qemu+ssh://core@192.168.127.251/system start worker-0
 virsh -c qemu+ssh://core@192.168.127.252/system start worker-1
 ```
 
-### Write kubeconfig file
+Write kubeconfig file:
 
 ```bash
 terraform apply -target=local_file.kubeconfig-admin
