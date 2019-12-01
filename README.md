@@ -75,7 +75,13 @@ sudo livemedia-creator \
     --lorax-templates ./lorax-kvm
 ```
 
-Create an image for the desktop PC:
+Write boot image to disk after each run:
+
+```
+sudo dd if=result/images/boot.iso of=/dev/sdb bs=4k
+```
+
+Image for the desktop (admin) PC can also be generated using this method. This image will trust the internal CA.
 
 ```
 sudo livemedia-creator \
