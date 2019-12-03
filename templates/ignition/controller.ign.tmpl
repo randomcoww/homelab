@@ -410,10 +410,10 @@ storage:
               - kube-apiserver
               - "--secure-port=${services.kubernetes_apiserver.ports.secure}"
               - "--allow-privileged=true"
+              - "--advertise-address=$(INTERNAL_IP)"
               - "--authorization-mode=Node,RBAC"
               - "--bind-address=0.0.0.0"
               - "--client-ca-file=${kubelet_path}/kubernetes-ca.pem"
-              - "--enable-admission-plugins=NamespaceLifecycle,NodeRestriction,LimitRanger,ServiceAccount,DefaultStorageClass,ResourceQuota"
               - "--etcd-cafile=${kubelet_path}/etcd-ca.pem"
               - "--etcd-certfile=${kubelet_path}/etcd-client.pem"
               - "--etcd-keyfile=${kubelet_path}/etcd-client-key.pem"
@@ -423,11 +423,17 @@ storage:
               - "--kubelet-client-key=${kubelet_path}/kubernetes-key.pem"
               - "--runtime-config=api/all"
               - "--service-account-key-file=${kubelet_path}/service-account.pem"
+              - "--service-account-max-token-expiration=24h"
               - "--service-cluster-ip-range=${networks.kubernetes_service.network}/${networks.kubernetes_service.cidr}"
               - "--tls-cert-file=${kubelet_path}/kubernetes.pem"
               - "--tls-private-key-file=${kubelet_path}/kubernetes-key.pem"
               - "--kubelet-preferred-address-types=InternalIP"
               - "--v=2"
+              env:
+              - name: INTERNAL_IP
+                valueFrom:
+                  fieldRef:
+                    fieldPath: status.hostIP
               volumeMounts:
               - name: kubernetes-path
                 mountPath: "${kubelet_path}"
