@@ -179,6 +179,14 @@ cd reqourcesv2/manifests
 kubectl apply -f traefik.yaml
 ```
 
+Deploy monitoring:
+
+```
+cd reqourcesv2/manifests
+kubectl apply -f prometheus.yaml
+kubectl apply -f grafana.yaml
+```
+
 Deploy [Minio](https://min.io/) storage controller:
 
 ```
