@@ -174,12 +174,16 @@ kubectl apply -f http://127.0.0.1:8080/generic?secret=minio-auth
 
 Deploy [Traefik](https://traefik.io/) ingress:
 
+https://traefik-ui.fuzzybunny.internal
+
 ```
 cd reqourcesv2/manifests
 kubectl apply -f traefik.yaml
 ```
 
 Deploy monitoring:
+
+https://grafana.fuzzybunny.internal
 
 ```
 cd reqourcesv2/manifests
@@ -189,12 +193,16 @@ kubectl apply -f grafana.yaml
 
 Deploy [Minio](https://min.io/) storage controller:
 
+https://minio.fuzzybunny.internal
+
 ```
 cd reqourcesv2/manifests
 kubectl apply -f minio.yaml
 ```
 
 Deploy MPD:
+
+https://stream.fuzzybunny.internal
 
 ```
 cd reqourcesv2/manifests
@@ -204,6 +212,8 @@ kubectl apply -f mpd.yaml
 ```
 
 Deploy Transmission:
+
+https://tr.fuzzybunny.internal
 
 ```
 cd reqourcesv2/manifests
