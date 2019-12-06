@@ -138,7 +138,7 @@ locals {
     gateway-0 = {
       component = "gateway"
       memory    = 2
-      vcpu      = 2
+      vcpu      = 1
       network = [
         {
           network = "store"
@@ -179,7 +179,7 @@ locals {
     gateway-1 = {
       component = "gateway"
       memory    = 2
-      vcpu      = 2
+      vcpu      = 1
       network = [
         {
           network = "store"
@@ -277,7 +277,7 @@ locals {
     # workers
     worker-0 = {
       component = "worker"
-      memory    = 32
+      memory    = 48
       vcpu      = 4
       network = [
         {
@@ -385,7 +385,7 @@ locals {
     }
     worker-1 = {
       component = "worker"
-      memory    = 32
+      memory    = 48
       vcpu      = 4
       network = [
         {
@@ -420,6 +420,26 @@ locals {
       ]
     }
 
+    # Test instances
+    test-0 = {
+      memory    = 4
+      vcpu      = 2
+      component = "test"
+      network = [
+        {
+          network = "store"
+          ip      = "192.168.127.222"
+          if      = "eth0"
+        },
+        {
+          network   = "int"
+          if        = "eth1"
+          mac       = "52-54-00-1a-61-3a"
+          bootorder = 1
+        }
+      ]
+    }
+
     # KVM
     kvm-0 = {
       component = "kvm"
@@ -439,6 +459,7 @@ locals {
         "controller-1",
         "controller-2",
         "worker-0",
+        "test-0",
       ]
     }
     kvm-1 = {
@@ -459,6 +480,7 @@ locals {
         "controller-1",
         "controller-2",
         "worker-1",
+        "test-0",
       ]
     }
 

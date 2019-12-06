@@ -1,0 +1,37 @@
+---
+networkd:
+  units:
+    - name: ${host_network.store.if}.network
+      contents: |
+        [Match]
+        Name=${host_network.store.if}
+
+        [Network]
+        LinkLocalAddressing=no
+        DHCP=no
+        Gateway=${networks.store.router}
+        DNS=${services.recursive_dns.vip}
+
+        [Link]
+        MTUBytes=${mtu}
+
+        [Address]
+        Address=${host_network.store.ip}/${networks.store.cidr}
+
+    - name: ${host_network.int.if}.network
+      contents: |
+        [Match]
+        Name=${host_network.int.if}
+
+        [Link]
+        ARP=no
+
+        [Network]
+        LinkLocalAddressing=no
+        DHCP=no
+
+passwd:
+  users:
+  - name: ${user}
+    ssh_authorized_keys:
+      - ${ssh_authorized_key}

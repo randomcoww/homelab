@@ -59,6 +59,27 @@ module "gateway-common" {
   }
 }
 
+module "test-common" {
+  source = "../modulesv2/test_common"
+
+  user              = local.user
+  ssh_ca_public_key = tls_private_key.ssh-ca.public_key_openssh
+  mtu               = local.mtu
+  networks          = local.networks
+  services          = local.services
+
+  test_hosts = {
+    for k in keys(local.hosts) :
+    k => merge(local.hosts[k], {
+      host_network = {
+        for n in local.hosts[k].network :
+        lookup(n, "alias", lookup(n, "network", "placeholder")) => n
+      }
+    })
+    if local.hosts[k].component == "test"
+  }
+}
+
 ##
 ## Write config to each matchbox host
 ## Hardcode each matchbox host until for_each module becomes available
@@ -70,6 +91,7 @@ module "ignition-kvm-0" {
   controller_params = module.kubernetes-common.controller_params
   worker_params     = module.kubernetes-common.worker_params
   gateway_params    = module.gateway-common.gateway_params
+  test_params       = module.test-common.test_params
   renderer          = local.renderers.kvm-0
 }
 
@@ -80,6 +102,7 @@ module "ignition-kvm-1" {
   controller_params = module.kubernetes-common.controller_params
   worker_params     = module.kubernetes-common.worker_params
   gateway_params    = module.gateway-common.gateway_params
+  test_params       = module.test-common.test_params
   renderer          = local.renderers.kvm-1
 }
 
@@ -91,6 +114,7 @@ module "ignition-local" {
   controller_params = module.kubernetes-common.controller_params
   worker_params     = module.kubernetes-common.worker_params
   gateway_params    = module.gateway-common.gateway_params
+  test_params       = module.test-common.test_params
   renderer          = local.local_renderer
 }
 
