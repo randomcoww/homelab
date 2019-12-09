@@ -136,9 +136,11 @@ locals {
   hosts = {
     # gateway
     gateway-0 = {
-      component = "gateway"
-      memory    = 2
-      vcpu      = 1
+      components = [
+        "gateway"
+      ]
+      memory = 2
+      vcpu   = 1
       network = [
         {
           network = "store"
@@ -177,9 +179,11 @@ locals {
       kea_ha_role = "primary"
     }
     gateway-1 = {
-      component = "gateway"
-      memory    = 2
-      vcpu      = 1
+      components = [
+        "gateway"
+      ]
+      memory = 2
+      vcpu   = 1
       network = [
         {
           network = "store"
@@ -220,9 +224,11 @@ locals {
 
     # controllers
     controller-0 = {
-      memory    = 4
-      vcpu      = 2
-      component = "controller"
+      memory = 4
+      vcpu   = 2
+      components = [
+        "controller"
+      ]
       network = [
         {
           network = "store"
@@ -238,9 +244,11 @@ locals {
       ]
     }
     controller-1 = {
-      memory    = 4
-      vcpu      = 2
-      component = "controller"
+      memory = 4
+      vcpu   = 2
+      components = [
+        "controller"
+      ]
       network = [
         {
           network = "store"
@@ -256,9 +264,11 @@ locals {
       ]
     }
     controller-2 = {
-      memory    = 4
-      vcpu      = 2
-      component = "controller"
+      memory = 4
+      vcpu   = 2
+      components = [
+        "controller"
+      ]
       network = [
         {
           network = "store"
@@ -276,9 +286,11 @@ locals {
 
     # workers
     worker-0 = {
-      component = "worker"
-      memory    = 48
-      vcpu      = 4
+      components = [
+        "worker"
+      ]
+      memory = 48
+      vcpu   = 4
       network = [
         {
           network = "store"
@@ -384,9 +396,11 @@ locals {
       ]
     }
     worker-1 = {
-      component = "worker"
-      memory    = 48
-      vcpu      = 4
+      components = [
+        "worker"
+      ]
+      memory = 48
+      vcpu   = 4
       network = [
         {
           network = "store"
@@ -422,9 +436,11 @@ locals {
 
     # Test instances
     test-0 = {
-      memory    = 4
-      vcpu      = 2
-      component = "test"
+      memory = 4
+      vcpu   = 2
+      components = [
+        "test"
+      ]
       network = [
         {
           network = "store"
@@ -442,7 +458,9 @@ locals {
 
     # KVM
     kvm-0 = {
-      component = "kvm"
+      components = [
+        "kvm"
+      ]
       network = [
         {
           alias = "hw"
@@ -463,7 +481,9 @@ locals {
       ]
     }
     kvm-1 = {
-      component = "kvm"
+      components = [
+        "kvm"
+      ]
       network = [
         {
           alias = "hw"
@@ -480,19 +500,28 @@ locals {
         "controller-1",
         "controller-2",
         "worker-1",
-        "test-0",
       ]
     }
 
     # desktop
     desktop-0 = {
-      component = "desktop"
+      components = [
+        "kvm",
+        "desktop",
+      ]
       network = [
         {
+          alias = "hw"
+          if    = "enp4s0f0"
+        },
+        {
           network = "store"
-          if      = "eno2"
           ip      = "192.168.127.253"
         }
+      ]
+      guests = [
+        "controller-2",
+        "test-0",
       ]
       persistent_home_path = "/localhome"
       persistent_home_dev  = "/dev/disk/by-id/nvme-Samsung_SSD_970_EVO_250GB_S465NB0K598517N-part1"

@@ -1,12 +1,11 @@
 ## Not used for live images. Add this to lorax template.
-# bootloader --append="console=tty0 console=ttyS1,115200n8 elevator=noop intel_iommu=on iommu=pt rd.live.ram=1"
+# bootloader --append="console=tty0 console=ttyS1,115200n8 elevator=noop intel_iommu=on amd_iommu=on iommu=pt rd.live.ram=1"
 
 %packages --excludeWeakdeps --excludedocs
 
 libvirt-daemon-kvm
 ksmtuned
 kea
--NetworkManager
 
 %end
 

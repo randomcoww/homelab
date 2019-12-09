@@ -3,7 +3,7 @@ selinux --disabled
 part / --size 20480 --fstype ext4
 
 ## Not used for live images. Add this to lorax template.
-# bootloader --append="rd.live.image elevator=noop intel_iommu=on iommu=pt rd.live.ram=1 plymouth.enable=0 rd.plymouth=0 rd.driver.blacklist=nouveau modprobe.blacklist=nouveau"
+# bootloader --append="rd.live.image elevator=noop intel_iommu=on amd_iommu=on iommu=pt rd.live.ram=1 plymouth.enable=0 rd.plymouth=0 rd.driver.blacklist=nouveau modprobe.blacklist=nouveau"
 
 repo --name=rpmfusion-free --metalink=https://mirrors.rpmfusion.org/metalink?repo=free-fedora-$releasever&arch=$basearch
 repo --name=rpmfusion-free-updates --metalink=https://mirrors.rpmfusion.org/metalink?repo=free-fedora-updates-released-$releasever&arch=$basearch
@@ -70,28 +70,9 @@ winehq-staging
 
 %end
 
-user --name=${user} --password=${password} --plaintext --uid=1000 --gid=1000 --groups=wheel,libvirt --homedir=${persistent_home_path}/${user}
+user --name=${user} --password=${password} --plaintext --uid=10000 --gid=10000 --groups=wheel,libvirt --homedir=${persistent_home_path}/${user}
 
 %post --erroronfail
-
-##############################################
-## networkd
-##############################################
-
-cat <<EOF > /etc/systemd/network/50_${host_network.store.if}.network
-[Match]
-Name=${host_network.store.if}
-
-[Link]
-MTUBytes=${mtu}
-
-[Network]
-LinkLocalAddressing=no
-DHCP=yes
-
-[Address]
-Address=${host_network.store.ip}/${networks.store.cidr}
-EOF
 
 ##############################################
 ## persistent home directory

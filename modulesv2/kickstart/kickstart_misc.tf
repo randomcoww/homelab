@@ -8,9 +8,9 @@ resource "matchbox_group" "ks-misc" {
   }
 
   profile = matchbox_profile.generic-profile.name
-  name    = each.key
+  name    = "misc-${each.key}"
   selector = {
-    ks = each.key
+    ks = "misc-${each.key}"
   }
   metadata = {
     config = templatefile(each.value, {

@@ -12,9 +12,9 @@ resource "matchbox_group" "ks-kvm" {
   for_each = var.kvm_hosts
 
   profile = matchbox_profile.generic-profile.name
-  name    = each.key
+  name    = "kvm-${each.key}"
   selector = {
-    ks = each.key
+    ks = "kvm-${each.key}"
   }
   metadata = {
     config = templatefile("${path.module}/../../templates/kickstart/kvm.ks.tmpl", {

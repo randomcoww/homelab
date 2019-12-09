@@ -21,7 +21,7 @@ module "kubernetes-common" {
         lookup(n, "alias", lookup(n, "network", "placeholder")) => n
       }
     })
-    if local.hosts[k].component == "controller"
+    if contains(local.hosts[k].components, "controller")
   }
 
   worker_hosts = {
@@ -32,7 +32,7 @@ module "kubernetes-common" {
         lookup(n, "alias", lookup(n, "network", "placeholder")) => n
       }
     })
-    if local.hosts[k].component == "worker"
+    if contains(local.hosts[k].components, "worker")
   }
 }
 
@@ -55,7 +55,7 @@ module "gateway-common" {
         lookup(n, "alias", lookup(n, "network", "placeholder")) => n
       }
     })
-    if local.hosts[k].component == "gateway"
+    if contains(local.hosts[k].components, "gateway")
   }
 }
 
@@ -76,7 +76,7 @@ module "test-common" {
         lookup(n, "alias", lookup(n, "network", "placeholder")) => n
       }
     })
-    if local.hosts[k].component == "test"
+    if contains(local.hosts[k].components, "test")
   }
 }
 

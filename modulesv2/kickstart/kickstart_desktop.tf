@@ -5,14 +5,14 @@ resource "matchbox_group" "ks-desktop" {
   for_each = var.desktop_hosts
 
   profile = matchbox_profile.generic-profile.name
-  name    = each.key
+  name    = "desktop-${each.key}"
   selector = {
-    ks = each.key
+    ks = "desktop-${each.key}"
   }
   metadata = {
     config = templatefile("${path.module}/../../templates/kickstart/desktop.ks.tmpl", {
       hostname        = each.key
-      user            = var.user
+      user            = var.desktop_user
       password        = var.desktop_password
       tls_internal_ca = chomp(var.internal_ca_cert_pem)
       networks        = var.networks

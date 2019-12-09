@@ -2,6 +2,10 @@ variable "user" {
   type = string
 }
 
+variable "desktop_user" {
+  type = string
+}
+
 variable "desktop_password" {
   type = string
 }
