@@ -3,7 +3,7 @@ selinux --disabled
 part / --size 20480 --fstype ext4
 
 ## Not used for live images. Add this to lorax template.
-# bootloader --append="rd.live.image elevator=noop intel_iommu=on amd_iommu=on iommu=pt rd.live.ram=1 plymouth.enable=0 rd.plymouth=0 rd.driver.blacklist=nouveau modprobe.blacklist=nouveau"
+# bootloader --append="rd.live.image elevator=noop intel_iommu=on amd_iommu=on iommu=pt rd.live.ram=1 plymouth.enable=0 rd.plymouth=0 rd.driver.blacklist=nouveau modprobe.blacklist=nouveau clearcpuid=514"
 
 repo --name=rpmfusion-free --metalink=https://mirrors.rpmfusion.org/metalink?repo=free-fedora-$releasever&arch=$basearch
 repo --name=rpmfusion-free-updates --metalink=https://mirrors.rpmfusion.org/metalink?repo=free-fedora-updates-released-$releasever&arch=$basearch
