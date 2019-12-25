@@ -106,6 +106,17 @@ module "ignition-kvm-1" {
   renderer          = local.renderers.kvm-1
 }
 
+module "ignition-desktop-0" {
+  source = "../modulesv2/ignition"
+
+  services          = local.services
+  controller_params = module.kubernetes-common.controller_params
+  worker_params     = module.kubernetes-common.worker_params
+  gateway_params    = module.gateway-common.gateway_params
+  test_params       = module.test-common.test_params
+  renderer          = local.renderers.desktop-0
+}
+
 # Test locally
 module "ignition-local" {
   source = "../modulesv2/ignition"
