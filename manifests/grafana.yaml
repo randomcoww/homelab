@@ -74,12 +74,8 @@ data:
           },
           "targets": [
             {
-              "expr": "{host=\"gateway-0\"}",
+              "expr": "{host=\"gateway-0\",unit=\"kubelet.service\"}",
               "refId": "A"
-            },
-            {
-              "expr": "{unit=\"kubelet.service\"}",
-              "refId": "B"
             }
           ],
           "timeFrom": null,
@@ -102,12 +98,8 @@ data:
           },
           "targets": [
             {
-              "expr": "{host=\"gateway-0\"}",
+              "expr": "{host=\"gateway-0\",container_name=\"keepalived\"}",
               "refId": "A"
-            },
-            {
-              "expr": "{container_name=\"keepalived\"}",
-              "refId": "B"
             }
           ],
           "timeFrom": null,
@@ -130,12 +122,8 @@ data:
           },
           "targets": [
             {
-              "expr": "{host=\"gateway-0\"}",
+              "expr": "{host=\"gateway-0\",container_name=\"kea-dhcp4\"}",
               "refId": "A"
-            },
-            {
-              "expr": "{container_name=\"kea-dhcp4\"}",
-              "refId": "B"
             }
           ],
           "timeFrom": null,
@@ -194,12 +182,8 @@ data:
           },
           "targets": [
             {
-              "expr": "{host=\"gateway-1\"}",
+              "expr": "{host=\"gateway-1\",unit=\"kubelet.service\"}",
               "refId": "A"
-            },
-            {
-              "expr": "{unit=\"kubelet.service\"}",
-              "refId": "B"
             }
           ],
           "timeFrom": null,
@@ -222,12 +206,8 @@ data:
           },
           "targets": [
             {
-              "expr": "{host=\"gateway-1\"}",
+              "expr": "{host=\"gateway-1\",container_name=\"keepalived\"}",
               "refId": "A"
-            },
-            {
-              "expr": "{container_name=\"keepalived\"}",
-              "refId": "B"
             }
           ],
           "timeFrom": null,
@@ -250,12 +230,8 @@ data:
           },
           "targets": [
             {
-              "expr": "{host=\"gateway-1\"}",
+              "expr": "{host=\"gateway-1\",container_name=\"kea-dhcp4\"}",
               "refId": "A"
-            },
-            {
-              "expr": "{container_name=\"kea-dhcp4\"}",
-              "refId": "B"
             }
           ],
           "timeFrom": null,
@@ -314,12 +290,8 @@ data:
           },
           "targets": [
             {
-              "expr": "{host=\"controller-0\"}",
+              "expr": "{host=\"controller-0\",unit=\"kubelet.service\"}",
               "refId": "A"
-            },
-            {
-              "expr": "{unit=\"kubelet.service\"}",
-              "refId": "B"
             }
           ],
           "timeFrom": null,
@@ -342,12 +314,8 @@ data:
           },
           "targets": [
             {
-              "expr": "{host=\"controller-0\"}",
+              "expr": "{host=\"controller-0\",container_name=\"etcd\"}",
               "refId": "A"
-            },
-            {
-              "expr": "{container_name=\"etcd\"}",
-              "refId": "B"
             }
           ],
           "timeFrom": null,
@@ -370,132 +338,8 @@ data:
           },
           "targets": [
             {
-              "expr": "{host=\"controller-0\"}",
+              "expr": "{host=\"controller-0\",container_name=\"kube-apiserver\"}",
               "refId": "A"
-            },
-            {
-              "expr": "{container_name=\"kube-apiserver\"}",
-              "refId": "B"
-            }
-          ],
-          "timeFrom": null,
-          "timeShift": null,
-          "title": "kube-apiserver",
-          "type": "logs"
-        }
-      ],
-      "schemaVersion": 21,
-      "style": "dark",
-      "tags": [],
-      "templating": {
-        "list": []
-      },
-      "time": {
-        "from": "now-6h",
-        "to": "now"
-      },
-      "timepicker": {},
-      "timezone": "",
-      "title": "controller-0",
-      "version": 2
-    }
-  controller-0.json: |
-    {
-      "annotations": {
-        "list": [
-          {
-            "builtIn": 1,
-            "datasource": "-- Grafana --",
-            "enable": true,
-            "hide": true,
-            "iconColor": "rgba(0, 211, 255, 1)",
-            "name": "Annotations & Alerts",
-            "type": "dashboard"
-          }
-        ]
-      },
-      "editable": true,
-      "gnetId": null,
-      "graphTooltip": 0,
-      "links": [],
-      "panels": [
-        {
-          "datasource": "loki1",
-          "gridPos": {
-            "h": 10,
-            "w": 24,
-            "x": 0,
-            "y": 0
-          },
-          "id": 4,
-          "options": {
-            "showTime": true,
-            "sortOrder": "Descending"
-          },
-          "targets": [
-            {
-              "expr": "{host=\"controller-0\"}",
-              "refId": "A"
-            },
-            {
-              "expr": "{unit=\"kubelet.service\"}",
-              "refId": "B"
-            }
-          ],
-          "timeFrom": null,
-          "timeShift": null,
-          "title": "kubelet",
-          "type": "logs"
-        },
-        {
-          "datasource": "loki1",
-          "gridPos": {
-            "h": 10,
-            "w": 24,
-            "x": 0,
-            "y": 10
-          },
-          "id": 6,
-          "options": {
-            "showTime": true,
-            "sortOrder": "Descending"
-          },
-          "targets": [
-            {
-              "expr": "{host=\"controller-0\"}",
-              "refId": "A"
-            },
-            {
-              "expr": "{container_name=\"etcd\"}",
-              "refId": "B"
-            }
-          ],
-          "timeFrom": null,
-          "timeShift": null,
-          "title": "etcd",
-          "type": "logs"
-        },
-        {
-          "datasource": "loki1",
-          "gridPos": {
-            "h": 10,
-            "w": 24,
-            "x": 0,
-            "y": 20
-          },
-          "id": 2,
-          "options": {
-            "showTime": true,
-            "sortOrder": "Descending"
-          },
-          "targets": [
-            {
-              "expr": "{host=\"controller-0\"}",
-              "refId": "A"
-            },
-            {
-              "expr": "{container_name=\"kube-apiserver\"}",
-              "refId": "B"
             }
           ],
           "timeFrom": null,
@@ -554,12 +398,8 @@ data:
           },
           "targets": [
             {
-              "expr": "{host=\"controller-1\"}",
+              "expr": "{host=\"controller-1\",unit=\"kubelet.service\"}",
               "refId": "A"
-            },
-            {
-              "expr": "{unit=\"kubelet.service\"}",
-              "refId": "B"
             }
           ],
           "timeFrom": null,
@@ -582,12 +422,8 @@ data:
           },
           "targets": [
             {
-              "expr": "{host=\"controller-1\"}",
+              "expr": "{host=\"controller-1\",container_name=\"etcd\"}",
               "refId": "A"
-            },
-            {
-              "expr": "{container_name=\"etcd\"}",
-              "refId": "B"
             }
           ],
           "timeFrom": null,
@@ -610,12 +446,8 @@ data:
           },
           "targets": [
             {
-              "expr": "{host=\"controller-1\"}",
+              "expr": "{host=\"controller-1\",container_name=\"kube-apiserver\"}",
               "refId": "A"
-            },
-            {
-              "expr": "{container_name=\"kube-apiserver\"}",
-              "refId": "B"
             }
           ],
           "timeFrom": null,
@@ -674,12 +506,8 @@ data:
           },
           "targets": [
             {
-              "expr": "{host=\"controller-2\"}",
+              "expr": "{host=\"controller-2\",unit=\"kubelet.service\"}",
               "refId": "A"
-            },
-            {
-              "expr": "{unit=\"kubelet.service\"}",
-              "refId": "B"
             }
           ],
           "timeFrom": null,
@@ -702,12 +530,8 @@ data:
           },
           "targets": [
             {
-              "expr": "{host=\"controller-2\"}",
+              "expr": "{host=\"controller-2\",container_name=\"etcd\"}",
               "refId": "A"
-            },
-            {
-              "expr": "{container_name=\"etcd\"}",
-              "refId": "B"
             }
           ],
           "timeFrom": null,
@@ -730,12 +554,8 @@ data:
           },
           "targets": [
             {
-              "expr": "{host=\"controller-2\"}",
+              "expr": "{host=\"controller-2\",container_name=\"kube-apiserver\"}",
               "refId": "A"
-            },
-            {
-              "expr": "{container_name=\"kube-apiserver\"}",
-              "refId": "B"
             }
           ],
           "timeFrom": null,

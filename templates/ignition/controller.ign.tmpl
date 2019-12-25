@@ -583,6 +583,7 @@ storage:
                       - localhost
                       labels:
                         job: static-pod
+                        host: $(NODE_NAME)
                         __path__: /var/log/pods/*/*/*.log
                     pipeline_stages:
                     - match:
@@ -605,7 +606,7 @@ storage:
               image: ${container_images.promtail}
               args:
               - "-config.file=/etc/promtail/promtail-config.yaml"
-              - "-client.url=http://${services.loki.vip}:${services.loki.ports.http}/loki/api/v1/push"
+              - "-client.url=http://${services.loki.name}:${services.loki.ports.http}/loki/api/v1/push"
               - "-log.level=info"
               volumeMounts:
               - name: pods
