@@ -481,10 +481,8 @@ locals {
       guests = [
         "gateway-0",
         "controller-0",
-        "controller-1",
         "controller-2",
         "worker-0",
-        "test-0",
       ]
     }
     kvm-1 = {
@@ -503,9 +501,7 @@ locals {
       ]
       guests = [
         "gateway-1",
-        "controller-0",
         "controller-1",
-        "controller-2",
         "worker-1",
       ]
     }
