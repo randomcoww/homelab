@@ -109,10 +109,9 @@ kind: Service
 metadata:
   name: loki
   namespace: default
-  annotations:
-    external-dns.alpha.kubernetes.io/hostname: loki.fuzzybunny.internal
 spec:
   type: LoadBalancer
+  loadBalancerIP: "192.168.126.126"
   ports:
   - port: 3100
     protocol: TCP

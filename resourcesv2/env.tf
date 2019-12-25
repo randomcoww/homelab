@@ -78,7 +78,7 @@ locals {
       }
     }
     loki = {
-      name = "loki.fuzzybunny.internal"
+      vip = "192.168.126.126"
       ports = {
         http = 3100
       }
