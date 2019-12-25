@@ -558,6 +558,10 @@ storage:
               imagePullPolicy: IfNotPresent
               args: [ "/bin/sh", "-c", "echo -e \"$CONFIG\" > $CONFIG_PATH" ]
               env:
+              - name: NODE_NAME
+                valueFrom:
+                  fieldRef:
+                    fieldPath: spec.nodeName
               - name: CONFIG
                 value: |-
                   positions:
@@ -568,21 +572,20 @@ storage:
                     - targets:
                       - localhost
                       labels:
-                        job: static_pods
+                        host: $(NODE_NAME)
                         __path__: /var/log/pods/*/*/*.log
                     pipeline_stages:
                     - match:
-                        selector: '{job="static_pods"}'
+                        selector: '{host="$(NODE_NAME)"}'
                         stages:
                         - cri: {}
                         - regex:
                             source: filename
-                            expression: "(?:pods)/(?P<namespace>\\\S+?)_(?P<pod>\\\S+?)-(?P<host>\\\S+?)_\\\S+?/(?P<container>\\\S+?)/"
+                            expression: "(?:pods)/(?P<namespace>\\\S+?)_(?P<instance>\\\S+?)-$(NODE_NAME)_\\\S+?/(?P<container_name>\\\S+?)/"
                         - labels:
                             namespace:
-                            pod:
-                            host:
-                            container:
+                            instance:
+                            container_name:
               - name: CONFIG_PATH
                 value: /etc/promtail/promtail-config.yaml
               volumeMounts:
