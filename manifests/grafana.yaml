@@ -628,11 +628,11 @@ spec:
             memory: 100Mi
         env:
         - name: GF_AUTH_BASIC_ENABLED
-          value: "false"
-        # - name: GF_SECURITY_ADMIN_USER
-        #   value: admin
-        # - name: GF_SECURITY_ADMIN_PASSWORD
-        #   value: admin
+          value: "true"
+        - name: GF_SECURITY_ADMIN_USER
+          value: admin
+        - name: GF_SECURITY_ADMIN_PASSWORD
+          value: admin
         - name: GF_AUTH_ANONYMOUS_ENABLED
           value: "true"
         # - name: GF_AUTH_ANONYMOUS_ORG_ROLE

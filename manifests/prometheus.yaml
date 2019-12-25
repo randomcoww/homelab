@@ -4,7 +4,6 @@ metadata:
   labels:
     component: "server"
     app: prometheus
-    release: prometheus
   name: prometheus-server
 data:
   prometheus.yml: |
@@ -183,7 +182,6 @@ metadata:
   labels:
     component: "kube-state-metrics"
     app: prometheus
-    release: prometheus
   name: prometheus-kube-state-metrics
 
 ---
@@ -193,7 +191,6 @@ metadata:
   labels:
     component: "server"
     app: prometheus
-    release: prometheus
   name: prometheus-server
 
 ---
@@ -203,7 +200,6 @@ metadata:
   labels:
     component: "kube-state-metrics"
     app: prometheus
-    release: prometheus
   name: prometheus-kube-state-metrics
 rules:
 - apiGroups:
@@ -282,7 +278,6 @@ metadata:
   labels:
     component: "server"
     app: prometheus
-    release: prometheus
   name: prometheus-server
 rules:
 - apiGroups:
@@ -321,7 +316,6 @@ metadata:
   labels:
     component: "kube-state-metrics"
     app: prometheus
-    release: prometheus
   name: prometheus-kube-state-metrics
 subjects:
 - kind: ServiceAccount
@@ -339,7 +333,6 @@ metadata:
   labels:
     component: "server"
     app: prometheus
-    release: prometheus
   name: prometheus-server
 subjects:
 - kind: ServiceAccount
@@ -357,14 +350,12 @@ metadata:
   labels:
     component: "node-exporter"
     app: prometheus
-    release: prometheus
   name: prometheus-node-exporter
 spec:
   selector:
     matchLabels:
       component: "node-exporter"
       app: prometheus
-      release: prometheus
   updateStrategy:
     type: RollingUpdate
   template:
@@ -372,7 +363,6 @@ spec:
       labels:
         component: "node-exporter"
         app: prometheus
-        release: prometheus
     spec:
       containers:
       - name: prometheus-node-exporter
@@ -409,21 +399,18 @@ metadata:
   labels:
     component: "kube-state-metrics"
     app: prometheus
-    release: prometheus
   name: prometheus-kube-state-metrics
 spec:
   selector:
     matchLabels:
       component: "kube-state-metrics"
       app: prometheus
-      release: prometheus
   replicas: 1
   template:
     metadata:
       labels:
         component: "kube-state-metrics"
         app: prometheus
-        release: prometheus
     spec:
       serviceAccountName: prometheus-kube-state-metrics
       containers:
@@ -444,21 +431,18 @@ metadata:
   labels:
     component: "server"
     app: prometheus
-    release: prometheus
   name: prometheus-server
 spec:
   selector:
     matchLabels:
       component: "server"
       app: prometheus
-      release: prometheus
   replicas: 1
   template:
     metadata:
       labels:
         component: "server"
         app: prometheus
-        release: prometheus
     spec:
       serviceAccountName: prometheus-server
       containers:
@@ -513,7 +497,6 @@ metadata:
   labels:
     component: "kube-state-metrics"
     app: prometheus
-    release: prometheus
   name: prometheus-kube-state-metrics
 spec:
   clusterIP: None
@@ -525,7 +508,6 @@ spec:
   selector:
     component: "kube-state-metrics"
     app: prometheus
-    release: prometheus
   type: "ClusterIP"
 
 ---
@@ -537,7 +519,6 @@ metadata:
   labels:
     component: "node-exporter"
     app: prometheus
-    release: prometheus
   name: prometheus-node-exporter
 spec:
   clusterIP: None
@@ -549,7 +530,6 @@ spec:
   selector:
     component: "node-exporter"
     app: prometheus
-    release: prometheus
   type: "ClusterIP"
 
 ---
@@ -559,7 +539,6 @@ metadata:
   labels:
     component: "server"
     app: prometheus
-    release: prometheus
   name: prometheus-server
 spec:
   ports:
@@ -571,14 +550,13 @@ spec:
   selector:
     component: "server"
     app: prometheus
-    release: prometheus
   type: "ClusterIP"
 
 ---
 apiVersion: extensions/v1beta1
 kind: Ingress
 metadata:
-  name: grafana
+  name: prometheus
   annotations:
     kubernetes.io/ingress.class: traefik
     ingress.kubernetes.io/ssl-redirect: "true"
