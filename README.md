@@ -188,6 +188,8 @@ https://grafana.fuzzybunny.internal
 ```
 cd reqourcesv2/manifests
 kubectl apply -f prometheus.yaml
+kubectl apply -f promtail.yaml
+kubectl apply -f loki.yaml
 kubectl apply -f grafana.yaml
 ```
 
