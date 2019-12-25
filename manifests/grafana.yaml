@@ -15,6 +15,14 @@ data:
       is_default: true
       version: 1
       editable: false
+    - name: 'loki1'
+      type: 'loki'
+      access: 'proxy'
+      org_id: 1
+      url: 'http://loki:3100'
+      is_default: false
+      version: 1
+      editable: false
   dashboards.yaml: |
     - name: 'default'
       org_id: 1
@@ -22,7 +30,16 @@ data:
       type: 'file'
       options:
         folder: '/var/lib/grafana/dashboards'
-  dashboard.json: |
+
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  labels:
+    app: grafana-dashboards
+  name: grafana-dashboards
+data:
+  gateway-0.json: |
     {
       "annotations": {
         "list": [
@@ -40,7 +57,726 @@ data:
       "editable": true,
       "gnetId": null,
       "graphTooltip": 0,
-      "id": 17,
+      "links": [],
+      "panels": [
+        {
+          "datasource": "loki1",
+          "gridPos": {
+            "h": 10,
+            "w": 24,
+            "x": 0,
+            "y": 0
+          },
+          "id": 4,
+          "options": {
+            "showTime": true,
+            "sortOrder": "Descending"
+          },
+          "targets": [
+            {
+              "expr": "{host=\"gateway-0\"}",
+              "refId": "A"
+            },
+            {
+              "expr": "{unit=\"kubelet.service\"}",
+              "refId": "B"
+            }
+          ],
+          "timeFrom": null,
+          "timeShift": null,
+          "title": "kubelet",
+          "type": "logs"
+        },
+        {
+          "datasource": "loki1",
+          "gridPos": {
+            "h": 10,
+            "w": 24,
+            "x": 0,
+            "y": 10
+          },
+          "id": 6,
+          "options": {
+            "showTime": true,
+            "sortOrder": "Descending"
+          },
+          "targets": [
+            {
+              "expr": "{host=\"gateway-0\"}",
+              "refId": "A"
+            },
+            {
+              "expr": "{container_name=\"keepalived\"}",
+              "refId": "B"
+            }
+          ],
+          "timeFrom": null,
+          "timeShift": null,
+          "title": "keepalived",
+          "type": "logs"
+        },
+        {
+          "datasource": "loki1",
+          "gridPos": {
+            "h": 10,
+            "w": 24,
+            "x": 0,
+            "y": 20
+          },
+          "id": 2,
+          "options": {
+            "showTime": true,
+            "sortOrder": "Descending"
+          },
+          "targets": [
+            {
+              "expr": "{host=\"gateway-0\"}",
+              "refId": "A"
+            },
+            {
+              "expr": "{container_name=\"kea-dhcp4\"}",
+              "refId": "B"
+            }
+          ],
+          "timeFrom": null,
+          "timeShift": null,
+          "title": "kea-dhcp4",
+          "type": "logs"
+        }
+      ],
+      "schemaVersion": 21,
+      "style": "dark",
+      "tags": [],
+      "templating": {
+        "list": []
+      },
+      "time": {
+        "from": "now-6h",
+        "to": "now"
+      },
+      "timepicker": {},
+      "timezone": "",
+      "title": "gateway-0",
+      "version": 1
+    }
+  gateway-1.json: |
+    {
+      "annotations": {
+        "list": [
+          {
+            "builtIn": 1,
+            "datasource": "-- Grafana --",
+            "enable": true,
+            "hide": true,
+            "iconColor": "rgba(0, 211, 255, 1)",
+            "name": "Annotations & Alerts",
+            "type": "dashboard"
+          }
+        ]
+      },
+      "editable": true,
+      "gnetId": null,
+      "graphTooltip": 0,
+      "links": [],
+      "panels": [
+        {
+          "datasource": "loki1",
+          "gridPos": {
+            "h": 10,
+            "w": 24,
+            "x": 0,
+            "y": 0
+          },
+          "id": 4,
+          "options": {
+            "showTime": true,
+            "sortOrder": "Descending"
+          },
+          "targets": [
+            {
+              "expr": "{host=\"gateway-1\"}",
+              "refId": "A"
+            },
+            {
+              "expr": "{unit=\"kubelet.service\"}",
+              "refId": "B"
+            }
+          ],
+          "timeFrom": null,
+          "timeShift": null,
+          "title": "kubelet",
+          "type": "logs"
+        },
+        {
+          "datasource": "loki1",
+          "gridPos": {
+            "h": 10,
+            "w": 24,
+            "x": 0,
+            "y": 10
+          },
+          "id": 6,
+          "options": {
+            "showTime": true,
+            "sortOrder": "Descending"
+          },
+          "targets": [
+            {
+              "expr": "{host=\"gateway-1\"}",
+              "refId": "A"
+            },
+            {
+              "expr": "{container_name=\"keepalived\"}",
+              "refId": "B"
+            }
+          ],
+          "timeFrom": null,
+          "timeShift": null,
+          "title": "keepalived",
+          "type": "logs"
+        },
+        {
+          "datasource": "loki1",
+          "gridPos": {
+            "h": 10,
+            "w": 24,
+            "x": 0,
+            "y": 20
+          },
+          "id": 2,
+          "options": {
+            "showTime": true,
+            "sortOrder": "Descending"
+          },
+          "targets": [
+            {
+              "expr": "{host=\"gateway-1\"}",
+              "refId": "A"
+            },
+            {
+              "expr": "{container_name=\"kea-dhcp4\"}",
+              "refId": "B"
+            }
+          ],
+          "timeFrom": null,
+          "timeShift": null,
+          "title": "kea-dhcp4",
+          "type": "logs"
+        }
+      ],
+      "schemaVersion": 21,
+      "style": "dark",
+      "tags": [],
+      "templating": {
+        "list": []
+      },
+      "time": {
+        "from": "now-6h",
+        "to": "now"
+      },
+      "timepicker": {},
+      "timezone": "",
+      "title": "gateway-1",
+      "version": 1
+    }
+  controller-0.json: |
+    {
+      "annotations": {
+        "list": [
+          {
+            "builtIn": 1,
+            "datasource": "-- Grafana --",
+            "enable": true,
+            "hide": true,
+            "iconColor": "rgba(0, 211, 255, 1)",
+            "name": "Annotations & Alerts",
+            "type": "dashboard"
+          }
+        ]
+      },
+      "editable": true,
+      "gnetId": null,
+      "graphTooltip": 0,
+      "links": [],
+      "panels": [
+        {
+          "datasource": "loki1",
+          "gridPos": {
+            "h": 10,
+            "w": 24,
+            "x": 0,
+            "y": 0
+          },
+          "id": 4,
+          "options": {
+            "showTime": true,
+            "sortOrder": "Descending"
+          },
+          "targets": [
+            {
+              "expr": "{host=\"controller-0\"}",
+              "refId": "A"
+            },
+            {
+              "expr": "{unit=\"kubelet.service\"}",
+              "refId": "B"
+            }
+          ],
+          "timeFrom": null,
+          "timeShift": null,
+          "title": "kubelet",
+          "type": "logs"
+        },
+        {
+          "datasource": "loki1",
+          "gridPos": {
+            "h": 10,
+            "w": 24,
+            "x": 0,
+            "y": 10
+          },
+          "id": 6,
+          "options": {
+            "showTime": true,
+            "sortOrder": "Descending"
+          },
+          "targets": [
+            {
+              "expr": "{host=\"controller-0\"}",
+              "refId": "A"
+            },
+            {
+              "expr": "{container_name=\"etcd\"}",
+              "refId": "B"
+            }
+          ],
+          "timeFrom": null,
+          "timeShift": null,
+          "title": "etcd",
+          "type": "logs"
+        },
+        {
+          "datasource": "loki1",
+          "gridPos": {
+            "h": 10,
+            "w": 24,
+            "x": 0,
+            "y": 20
+          },
+          "id": 2,
+          "options": {
+            "showTime": true,
+            "sortOrder": "Descending"
+          },
+          "targets": [
+            {
+              "expr": "{host=\"controller-0\"}",
+              "refId": "A"
+            },
+            {
+              "expr": "{container_name=\"kube-apiserver\"}",
+              "refId": "B"
+            }
+          ],
+          "timeFrom": null,
+          "timeShift": null,
+          "title": "kube-apiserver",
+          "type": "logs"
+        }
+      ],
+      "schemaVersion": 21,
+      "style": "dark",
+      "tags": [],
+      "templating": {
+        "list": []
+      },
+      "time": {
+        "from": "now-6h",
+        "to": "now"
+      },
+      "timepicker": {},
+      "timezone": "",
+      "title": "controller-0",
+      "version": 2
+    }
+  controller-0.json: |
+    {
+      "annotations": {
+        "list": [
+          {
+            "builtIn": 1,
+            "datasource": "-- Grafana --",
+            "enable": true,
+            "hide": true,
+            "iconColor": "rgba(0, 211, 255, 1)",
+            "name": "Annotations & Alerts",
+            "type": "dashboard"
+          }
+        ]
+      },
+      "editable": true,
+      "gnetId": null,
+      "graphTooltip": 0,
+      "links": [],
+      "panels": [
+        {
+          "datasource": "loki1",
+          "gridPos": {
+            "h": 10,
+            "w": 24,
+            "x": 0,
+            "y": 0
+          },
+          "id": 4,
+          "options": {
+            "showTime": true,
+            "sortOrder": "Descending"
+          },
+          "targets": [
+            {
+              "expr": "{host=\"controller-0\"}",
+              "refId": "A"
+            },
+            {
+              "expr": "{unit=\"kubelet.service\"}",
+              "refId": "B"
+            }
+          ],
+          "timeFrom": null,
+          "timeShift": null,
+          "title": "kubelet",
+          "type": "logs"
+        },
+        {
+          "datasource": "loki1",
+          "gridPos": {
+            "h": 10,
+            "w": 24,
+            "x": 0,
+            "y": 10
+          },
+          "id": 6,
+          "options": {
+            "showTime": true,
+            "sortOrder": "Descending"
+          },
+          "targets": [
+            {
+              "expr": "{host=\"controller-0\"}",
+              "refId": "A"
+            },
+            {
+              "expr": "{container_name=\"etcd\"}",
+              "refId": "B"
+            }
+          ],
+          "timeFrom": null,
+          "timeShift": null,
+          "title": "etcd",
+          "type": "logs"
+        },
+        {
+          "datasource": "loki1",
+          "gridPos": {
+            "h": 10,
+            "w": 24,
+            "x": 0,
+            "y": 20
+          },
+          "id": 2,
+          "options": {
+            "showTime": true,
+            "sortOrder": "Descending"
+          },
+          "targets": [
+            {
+              "expr": "{host=\"controller-0\"}",
+              "refId": "A"
+            },
+            {
+              "expr": "{container_name=\"kube-apiserver\"}",
+              "refId": "B"
+            }
+          ],
+          "timeFrom": null,
+          "timeShift": null,
+          "title": "kube-apiserver",
+          "type": "logs"
+        }
+      ],
+      "schemaVersion": 21,
+      "style": "dark",
+      "tags": [],
+      "templating": {
+        "list": []
+      },
+      "time": {
+        "from": "now-6h",
+        "to": "now"
+      },
+      "timepicker": {},
+      "timezone": "",
+      "title": "controller-0",
+      "version": 2
+    }
+  controller-1.json: |
+    {
+      "annotations": {
+        "list": [
+          {
+            "builtIn": 1,
+            "datasource": "-- Grafana --",
+            "enable": true,
+            "hide": true,
+            "iconColor": "rgba(0, 211, 255, 1)",
+            "name": "Annotations & Alerts",
+            "type": "dashboard"
+          }
+        ]
+      },
+      "editable": true,
+      "gnetId": null,
+      "graphTooltip": 0,
+      "links": [],
+      "panels": [
+        {
+          "datasource": "loki1",
+          "gridPos": {
+            "h": 10,
+            "w": 24,
+            "x": 0,
+            "y": 0
+          },
+          "id": 4,
+          "options": {
+            "showTime": true,
+            "sortOrder": "Descending"
+          },
+          "targets": [
+            {
+              "expr": "{host=\"controller-1\"}",
+              "refId": "A"
+            },
+            {
+              "expr": "{unit=\"kubelet.service\"}",
+              "refId": "B"
+            }
+          ],
+          "timeFrom": null,
+          "timeShift": null,
+          "title": "kubelet",
+          "type": "logs"
+        },
+        {
+          "datasource": "loki1",
+          "gridPos": {
+            "h": 10,
+            "w": 24,
+            "x": 0,
+            "y": 10
+          },
+          "id": 6,
+          "options": {
+            "showTime": true,
+            "sortOrder": "Descending"
+          },
+          "targets": [
+            {
+              "expr": "{host=\"controller-1\"}",
+              "refId": "A"
+            },
+            {
+              "expr": "{container_name=\"etcd\"}",
+              "refId": "B"
+            }
+          ],
+          "timeFrom": null,
+          "timeShift": null,
+          "title": "etcd",
+          "type": "logs"
+        },
+        {
+          "datasource": "loki1",
+          "gridPos": {
+            "h": 10,
+            "w": 24,
+            "x": 0,
+            "y": 20
+          },
+          "id": 2,
+          "options": {
+            "showTime": true,
+            "sortOrder": "Descending"
+          },
+          "targets": [
+            {
+              "expr": "{host=\"controller-1\"}",
+              "refId": "A"
+            },
+            {
+              "expr": "{container_name=\"kube-apiserver\"}",
+              "refId": "B"
+            }
+          ],
+          "timeFrom": null,
+          "timeShift": null,
+          "title": "kube-apiserver",
+          "type": "logs"
+        }
+      ],
+      "schemaVersion": 21,
+      "style": "dark",
+      "tags": [],
+      "templating": {
+        "list": []
+      },
+      "time": {
+        "from": "now-6h",
+        "to": "now"
+      },
+      "timepicker": {},
+      "timezone": "",
+      "title": "controller-1",
+      "version": 2
+    }
+  controller-2.json: |
+    {
+      "annotations": {
+        "list": [
+          {
+            "builtIn": 1,
+            "datasource": "-- Grafana --",
+            "enable": true,
+            "hide": true,
+            "iconColor": "rgba(0, 211, 255, 1)",
+            "name": "Annotations & Alerts",
+            "type": "dashboard"
+          }
+        ]
+      },
+      "editable": true,
+      "gnetId": null,
+      "graphTooltip": 0,
+      "links": [],
+      "panels": [
+        {
+          "datasource": "loki1",
+          "gridPos": {
+            "h": 10,
+            "w": 24,
+            "x": 0,
+            "y": 0
+          },
+          "id": 4,
+          "options": {
+            "showTime": true,
+            "sortOrder": "Descending"
+          },
+          "targets": [
+            {
+              "expr": "{host=\"controller-2\"}",
+              "refId": "A"
+            },
+            {
+              "expr": "{unit=\"kubelet.service\"}",
+              "refId": "B"
+            }
+          ],
+          "timeFrom": null,
+          "timeShift": null,
+          "title": "kubelet",
+          "type": "logs"
+        },
+        {
+          "datasource": "loki1",
+          "gridPos": {
+            "h": 10,
+            "w": 24,
+            "x": 0,
+            "y": 10
+          },
+          "id": 6,
+          "options": {
+            "showTime": true,
+            "sortOrder": "Descending"
+          },
+          "targets": [
+            {
+              "expr": "{host=\"controller-2\"}",
+              "refId": "A"
+            },
+            {
+              "expr": "{container_name=\"etcd\"}",
+              "refId": "B"
+            }
+          ],
+          "timeFrom": null,
+          "timeShift": null,
+          "title": "etcd",
+          "type": "logs"
+        },
+        {
+          "datasource": "loki1",
+          "gridPos": {
+            "h": 10,
+            "w": 24,
+            "x": 0,
+            "y": 20
+          },
+          "id": 2,
+          "options": {
+            "showTime": true,
+            "sortOrder": "Descending"
+          },
+          "targets": [
+            {
+              "expr": "{host=\"controller-2\"}",
+              "refId": "A"
+            },
+            {
+              "expr": "{container_name=\"kube-apiserver\"}",
+              "refId": "B"
+            }
+          ],
+          "timeFrom": null,
+          "timeShift": null,
+          "title": "kube-apiserver",
+          "type": "logs"
+        }
+      ],
+      "schemaVersion": 21,
+      "style": "dark",
+      "tags": [],
+      "templating": {
+        "list": []
+      },
+      "time": {
+        "from": "now-6h",
+        "to": "now"
+      },
+      "timepicker": {},
+      "timezone": "",
+      "title": "controller-2",
+      "version": 2
+    }
+  kubernetes.json: |
+    {
+      "annotations": {
+        "list": [
+          {
+            "builtIn": 1,
+            "datasource": "-- Grafana --",
+            "enable": true,
+            "hide": true,
+            "iconColor": "rgba(0, 211, 255, 1)",
+            "name": "Annotations & Alerts",
+            "type": "dashboard"
+          }
+        ]
+      },
+      "editable": true,
+      "gnetId": null,
+      "graphTooltip": 0,
       "links": [],
       "panels": [
         {
@@ -595,7 +1331,6 @@ data:
       },
       "timezone": "",
       "title": "Kubernetes",
-      "uid": "xbGZOdaWk",
       "version": 4
     }
 
@@ -653,15 +1388,17 @@ spec:
         - name: grafana-config
           mountPath: /etc/grafana/provisioning/dashboards/all.yaml
           subPath: dashboards.yaml
-        - name: grafana-config
-          mountPath: /var/lib/grafana/dashboards/default.json
-          subPath: dashboard.json
+        - name: grafana-dashboards
+          mountPath: /var/lib/grafana/dashboards
       volumes:
       - name: grafana-persistent-storage
         emptyDir: {}
       - name: grafana-config
         configMap:
           name: grafana-config
+      - name: grafana-dashboards
+        configMap:
+          name: grafana-dashboards
 
 ---
 apiVersion: v1
