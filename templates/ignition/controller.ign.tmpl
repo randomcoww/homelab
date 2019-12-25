@@ -567,16 +567,26 @@ storage:
                   positions:
                     filename: /etc/promtail/promtail-positions.yaml
                   scrape_configs:
+                  - job_name: journal
+                    journal:
+                      max_age: 12h
+                      path: /run/log/journal
+                      labels:
+                        job: systemd-journal
+                        host: $(NODE_NAME)
+                    relabel_configs:
+                      - source_labels: ['__journal__systemd_unit']
+                        target_label: 'unit'
                   - job_name: containers
                     static_configs:
                     - targets:
                       - localhost
                       labels:
-                        host: $(NODE_NAME)
+                        job: static-pod
                         __path__: /var/log/pods/*/*/*.log
                     pipeline_stages:
                     - match:
-                        selector: '{host="$(NODE_NAME)"}'
+                        selector: '{job="static-pod"}'
                         stages:
                         - cri: {}
                         - regex:
@@ -601,12 +611,18 @@ storage:
               - name: pods
                 mountPath: /var/log/pods
                 readOnly: true
+              - name: journal
+                mountPath: /run/log/journal
+                readOnly: true
               - name: config-volume
                 mountPath: /etc/promtail
             volumes:
             - name: pods
               hostPath:
                 path: /var/log/pods
+            - name: journal
+              hostPath:
+                path: /run/log/journal
             - name: config-volume
               emptyDir: {}
 
