@@ -638,6 +638,76 @@ storage:
                     }
                   }
 
+    - path: ${kubelet_path}/manifests/promtail.yaml
+      filesystem: root
+      mode: 420
+      contents:
+        inline: |-
+          ---
+          apiVersion: v1
+          kind: Pod
+          metadata:
+            namespace: kube-system
+            name: promtail
+          spec:
+            restartPolicy: Always
+            hostNetwork: true
+            initContainers:
+            - name: configwriter
+              image: "${container_images.busybox}"
+              imagePullPolicy: IfNotPresent
+              args: [ "/bin/sh", "-c", "echo -e \"$CONFIG\" > $CONFIG_PATH" ]
+              env:
+              - name: CONFIG
+                value: |-
+                  positions:
+                    filename: /etc/promtail/promtail-positions.yaml
+                  scrape_configs:
+                  - job_name: containers
+                    static_configs:
+                    - targets:
+                      - localhost
+                      labels:
+                        job: static_pods
+                        __path__: /var/log/pods/*/*/*.log
+                    pipeline_stages:
+                    - match:
+                        selector: '{job="static_pods"}'
+                        stages:
+                        - cri: {}
+                        - regex:
+                            source: filename
+                            expression: "(?:pods)/(?P<namespace>\\\S+?)_(?P<pod>\\\S+?)-(?P<host>\\\S+?)_\\\S+?/(?P<container>\\\S+?)/"
+                        - labels:
+                            namespace:
+                            pod:
+                            host:
+                            container:
+              - name: CONFIG_PATH
+                value: /etc/promtail/promtail-config.yaml
+              volumeMounts:
+              - name: config-volume
+                mountPath: /etc/promtail
+            containers:
+            - name: promtail
+              image: ${container_images.promtail}
+              args:
+              - "-config.file=/etc/promtail/promtail-config.yaml"
+              - "-client.url=http://${services.loki.vip}:${services.loki.ports.http}/loki/api/v1/push"
+              - "-log.level=info"
+              volumeMounts:
+              - name: pods
+                mountPath: /var/log/pods
+                readOnly: true
+              - name: config-volume
+                mountPath: /etc/promtail
+            volumes:
+            - name: pods
+              hostPath:
+                path: /var/log/pods
+            - name: config-volume
+              emptyDir: {}
+
 passwd:
   users:
   - name: ${user}

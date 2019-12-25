@@ -21,6 +21,7 @@ locals {
     nftables                = "randomcoww/nftables:latest"
     kea                     = "randomcoww/kea:1.6.1"
     conntrack               = "randomcoww/conntrack:latest"
+    promtail                = "grafana/promtail:v1.2.0"
   }
 
   services = {
@@ -57,7 +58,7 @@ locals {
       }
     }
 
-    # kubernetes common
+    # kubernetes services
     kubernetes_apiserver = {
       vip = "192.168.126.245"
       ports = {
@@ -74,6 +75,12 @@ locals {
       ports = {
         peer   = 52380
         client = 52379
+      }
+    }
+    loki = {
+      vip = "192.168.126.244"
+      ports = {
+        http = 3100
       }
     }
   }
