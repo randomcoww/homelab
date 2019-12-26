@@ -1,29 +1,29 @@
 kind: DaemonSet
 apiVersion: apps/v1
 metadata:
-  name: music-rclone-vol
+  name: music-s3-vol
 spec:
   selector:
     matchLabels:
-      app: music-rclone-vol
+      app: music-s3-vol
   template:
     metadata:
       labels:
-        app: music-rclone-vol
+        app: music-s3-vol
     spec:
       dnsPolicy: ClusterFirstWithHostNet
       hostNetwork: true
       # Mount fuse in mnt under base path so that client container
       # can verify that it is mounted before starting
       volumes:
-      - name: music-rclone-vol
+      - name: music-s3-vol
         hostPath:
           path: /hostpath/music/mnt
           type: DirectoryOrCreate
       containers:
       - name: rclone
         imagePullPolicy: Always
-        image: randomcoww/rclone:v1.50.1
+        image: randomcoww/rclone:v1.50.2
         securityContext:
           privileged: true
         env:
@@ -50,7 +50,7 @@ spec:
         - "--no-modtime"
         - "--read-only"
         volumeMounts:
-        - name: music-rclone-vol
+        - name: music-s3-vol
           mountPath: /vol
           mountPropagation: Bidirectional
 

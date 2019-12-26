@@ -1,29 +1,29 @@
 kind: DaemonSet
 apiVersion: apps/v1
 metadata:
-  name: mpd-rclone-vol
+  name: unifi-s3-vol
 spec:
   selector:
     matchLabels:
-      app: mpd-rclone-vol
+      app: unifi-s3-vol
   template:
     metadata:
       labels:
-        app: mpd-rclone-vol
+        app: unifi-s3-vol
     spec:
       dnsPolicy: ClusterFirstWithHostNet
       hostNetwork: true
+      volumes:
       # Mount fuse in mnt under base path so that client container
       # can verify that it is mounted before starting
-      volumes:
-      - name: mpd-rclone-vol
+      - name: unifi-s3-vol
         hostPath:
-          path: /hostpath/mpd/mnt
+          path: /hostpath/unifi/mnt
           type: DirectoryOrCreate
       containers:
       - name: rclone
         imagePullPolicy: Always
-        image: randomcoww/rclone:v1.50.1
+        image: randomcoww/rclone:v1.50.2
         securityContext:
           privileged: true
         env:
@@ -39,17 +39,17 @@ spec:
               key: secret_access_key
         args:
         - "mount"
-        - ":s3:mpd/"
+        - ":s3:unifi/"
         - "/vol"
         - "--s3-provider=Minio"
         - "--s3-env-auth=true"
         - "--s3-region="
         - "--s3-endpoint=http://minio.default.svc.cluster.local:9000"
         - "--allow-other"
-        - "--vfs-cache-mode=full"
+        - "--vfs-cache-mode=minimal"
         - "--no-modtime"
         volumeMounts:
-        - name: mpd-rclone-vol
+        - name: unifi-s3-vol
           mountPath: /vol
           mountPropagation: Bidirectional
 
@@ -57,26 +57,26 @@ spec:
 apiVersion: v1
 kind: PersistentVolume
 metadata:
-  name: mpd-pv
+  name: unifi-pv
 spec:
-  storageClassName: mpd
+  storageClassName: unifi
   capacity:
-    storage: 10Ti
+    storage: 2Gi
   accessModes:
     - ReadWriteOnce
   hostPath:
-    path: /hostpath/mpd
+    path: /hostpath/unifi
     type: Directory
 
 ---
 apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
-  name: mpd-pvc
+  name: unifi-pvc
 spec:
   accessModes:
   - ReadWriteOnce
-  storageClassName: mpd
+  storageClassName: unifi
   resources:
     requests:
-      storage: 10Ti
+      storage: 2Gi

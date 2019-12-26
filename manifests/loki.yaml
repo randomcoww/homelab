@@ -2,7 +2,7 @@ apiVersion: policy/v1beta1
 kind: PodSecurityPolicy
 metadata:
   name: loki
-  namespace: ${namespace}
+  namespace: default
   labels:
     app: loki
 spec:
@@ -39,7 +39,7 @@ apiVersion: v1
 kind: ConfigMap
 metadata:
   name: loki
-  namespace: ${namespace}
+  namespace: default
   labels:
     app: loki
 data:
@@ -87,14 +87,14 @@ metadata:
   labels:
     app: loki
   name: loki
-  namespace: ${namespace}
+  namespace: default
 
 ---
 apiVersion: rbac.authorization.k8s.io/v1
 kind: Role
 metadata:
   name: loki
-  namespace: ${namespace}
+  namespace: default
   labels:
     app: loki
 rules:
@@ -108,7 +108,7 @@ apiVersion: rbac.authorization.k8s.io/v1
 kind: RoleBinding
 metadata:
   name: loki
-  namespace: ${namespace}
+  namespace: default
   labels:
     app: loki
 roleRef:
@@ -124,13 +124,13 @@ apiVersion: v1
 kind: Service
 metadata:
   name: loki-headless
-  namespace: ${namespace}
+  namespace: default
   labels:
     app: loki
 spec:
   clusterIP: None
   ports:
-  - port: ${services.loki.ports.http}
+  - port: 3100
     protocol: TCP
     name: http-metrics
     targetPort: http-metrics
@@ -142,12 +142,12 @@ apiVersion: v1
 kind: Service
 metadata:
   name: loki
-  namespace: ${namespace}
+  namespace: default
 spec:
   type: LoadBalancer
-  loadBalancerIP: "${services.loki.vip}"
+  loadBalancerIP: "192,168.126.126"
   ports:
-  - port: ${services.loki.ports.http}
+  - port: 3100
     protocol: TCP
     name: http-metrics
     targetPort: http-metrics
@@ -159,7 +159,7 @@ apiVersion: apps/v1
 kind: StatefulSet
 metadata:
   name: loki
-  namespace: ${namespace}
+  namespace: default
   labels:
     app: loki
 spec:
@@ -188,7 +188,7 @@ spec:
         runAsUser: 10001
       containers:
       - name: loki
-        image: "${container_images.loki}"
+        image: "grafana/loki:latest"
         imagePullPolicy: Always
         args:
         - "-config.file=/etc/loki/loki.yaml"
@@ -200,7 +200,7 @@ spec:
           subPath: 
         ports:
         - name: http-metrics
-          containerPort: ${services.loki.ports.http}
+          containerPort: 3100
           protocol: TCP
         livenessProbe:
           httpGet:
