@@ -108,7 +108,8 @@ Ignition configuration is generated on each hypervisor as follows:
 cd resourcesv2
 terraform apply \
     -target=module.ignition-kvm-0 \
-    -target=module.ignition-kvm-1
+    -target=module.ignition-kvm-1 \
+    -target=module.ignition-desktop-0
 ```
 
 Define VMs on each hypervisor:
@@ -117,7 +118,8 @@ Define VMs on each hypervisor:
 cd resourcesv2
 terraform apply \
     -target=module.libvirt-kvm-0 \
-    -target=module.libvirt-kvm-1
+    -target=module.libvirt-kvm-1 \
+    -target=module.libvirt-desktop-0
 ```
 
 ### Start gateway VMs
