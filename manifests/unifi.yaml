@@ -24,12 +24,20 @@ spec:
         args:
         - "/vol/mnt"
         volumeMounts:
-        - name: unifi-data
+        - name: unifi-backup
           mountPath: "/vol"
       containers:
+      # Unifi will restart when restoring a backup.
+      # Run this dummy container so that data persists in emptyDir between restarts.
+      - name: data-persist
+        image: busybox:latest
+        args: [ "/bin/sh", "-c", "trap : TERM INT; sleep infinity & wait" ]
+        volumeMounts:
+        - mountPath: "/opt/UniFi/data"
+          name: unifi-data
       - name: unifi
         imagePullPolicy: Always
-        image: randomcoww/unifi:5.12.22
+        image: randomcoww/unifi:5.12.35
         lifecycle:
           preStop:
             exec:
@@ -43,13 +51,17 @@ spec:
         - containerPort: 3478
           protocol: UDP
         volumeMounts:
-        - mountPath: "/unifi"
+        - mountPath: "/opt/UniFi/data"
           name: unifi-data
+        - mountPath: "/unifi"
+          name: unifi-backup
         env:
-        - name: DATA_DIR
+        - name: BACKUP_DIR
           value: /unifi/mnt
       volumes:
       - name: unifi-data
+        emptyDir: {}
+      - name: unifi-backup
         persistentVolumeClaim:
           claimName: unifi-pvc
 
