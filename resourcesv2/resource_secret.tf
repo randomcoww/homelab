@@ -159,6 +159,19 @@ resource "random_password" "minio-password" {
 }
 
 ##
+## grafana user-pass
+##
+resource "random_password" "grafana-user" {
+  length  = 30
+  special = false
+}
+
+resource "random_password" "grafana-password" {
+  length  = 30
+  special = false
+}
+
+##
 ## Write local files
 ##
 resource "local_file" "matchbox-ca-pem" {

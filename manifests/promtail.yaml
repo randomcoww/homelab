@@ -393,15 +393,14 @@ spec:
       labels:
         app: promtail
       annotations:
-        checksum/config: 2437d32e12028462441d87c861d6b11a28dcfb4c16ad4d328b3041920469a312
         prometheus.io/port: http-metrics
         prometheus.io/scrape: "true"
     spec:
       serviceAccountName: promtail
       containers:
       - name: promtail
-        image: "grafana/promtail:v1.2.0"
-        imagePullPolicy: IfNotPresent
+        image: "grafana/promtail:latest"
+        imagePullPolicy: Always
         args:
         - "-config.file=/etc/promtail/promtail.yaml"
         - "-client.url=http://loki:3100/loki/api/v1/push"

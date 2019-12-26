@@ -10,7 +10,7 @@ resource "matchbox_group" "manifest-coredns" {
 
   metadata = {
     config = templatefile("${path.module}/../../templates/manifest/coredns.yaml.tmpl", {
-      namespace        = var.namespace
+      namespace        = "kube-system"
       container_images = var.container_images
       services         = var.services
       domains          = var.domains

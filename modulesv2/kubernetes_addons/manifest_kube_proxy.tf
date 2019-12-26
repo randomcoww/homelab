@@ -10,7 +10,7 @@ resource "matchbox_group" "manifest-kube-proxy" {
 
   metadata = {
     config = templatefile("${path.module}/../../templates/manifest/kube_proxy.yaml.tmpl", {
-      namespace        = var.namespace
+      namespace        = "kube-system"
       services         = var.services
       networks         = var.networks
       container_images = var.container_images

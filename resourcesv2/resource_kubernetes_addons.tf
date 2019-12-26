@@ -1,7 +1,6 @@
 module "kubernetes-addons" {
   source = "../modulesv2/kubernetes_addons"
 
-  namespace        = "kube-system"
   networks         = local.networks
   services         = local.services
   domains          = local.domains
@@ -21,6 +20,14 @@ module "kubernetes-addons" {
       data = {
         access_key_id     = random_password.minio-user.result
         secret_access_key = random_password.minio-password.result
+      },
+      type = "Opaque"
+    },
+    grafana-auth = {
+      namespace = "default"
+      data = {
+        user     = random_password.grafana-user.result
+        password = random_password.grafana-password.result
       },
       type = "Opaque"
     }

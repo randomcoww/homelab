@@ -21,7 +21,8 @@ locals {
     nftables                = "randomcoww/nftables:latest"
     kea                     = "randomcoww/kea:1.6.1"
     conntrack               = "randomcoww/conntrack:latest"
-    promtail                = "grafana/promtail:v1.2.0"
+    promtail                = "grafana/promtail:latest"
+    loki                    = "grafana/loki:latest"
   }
 
   services = {

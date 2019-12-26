@@ -1,7 +1,3 @@
-variable "namespace" {
-  type = string
-}
-
 variable "networks" {
   type = any
 }

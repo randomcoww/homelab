@@ -10,7 +10,7 @@ resource "matchbox_group" "manifest-flannel" {
 
   metadata = {
     config = templatefile("${path.module}/../../templates/manifest/flannel.yaml.tmpl", {
-      namespace        = var.namespace
+      namespace        = "kube-system"
       container_images = var.container_images
       services         = var.services
       networks         = var.networks

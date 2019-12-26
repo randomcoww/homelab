@@ -1173,7 +1173,7 @@ spec:
       containers:
       - image: grafana/grafana:latest
         name: grafana-core
-        imagePullPolicy: IfNotPresent
+        imagePullPolicy: Always
         resources:
           limits:
             cpu: 100m
@@ -1183,18 +1183,21 @@ spec:
             memory: 100Mi
         env:
         - name: GF_AUTH_BASIC_ENABLED
-          value: "true"
+          value: "false"
         - name: GF_SECURITY_ADMIN_USER
-          value: admin
+          valueFrom:
+            secretKeyRef:
+              name: grafana-auth
+              key: user
         - name: GF_SECURITY_ADMIN_PASSWORD
-          value: admin
+          valueFrom:
+            secretKeyRef:
+              name: grafana-auth
+              key: password
         - name: GF_AUTH_ANONYMOUS_ENABLED
           value: "true"
-        # - name: GF_AUTH_ANONYMOUS_ORG_ROLE
-        #   value: Admin
-        # does not really work, because of template variables in exported dashboards:
-        # - name: GF_DASHBOARDS_JSON_ENABLED
-        #   value: "true"
+        - name: GF_AUTH_ANONYMOUS_ORG_ROLE
+          value: Editor
         readinessProbe:
           httpGet:
             path: /login

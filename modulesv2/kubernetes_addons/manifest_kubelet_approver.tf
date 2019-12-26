@@ -10,7 +10,7 @@ resource "matchbox_group" "manifest-kapprover" {
 
   metadata = {
     config = templatefile("${path.module}/../../templates/manifest/kapprover.yaml.tmpl", {
-      namespace        = var.namespace
+      namespace        = "kube-system"
       container_images = var.container_images
     })
   }
