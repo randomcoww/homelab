@@ -170,6 +170,7 @@ kubectl apply -f https://raw.githubusercontent.com/google/metallb/v0.8.3/manifes
 kubectl apply -f http://127.0.0.1:8080/generic?manifest=metallb
 kubectl apply -f http://127.0.0.1:8080/generic?secret=internal-tls
 kubectl apply -f http://127.0.0.1:8080/generic?secret=minio-auth
+kubectl apply -f http://127.0.0.1:8080/generic?secret=grafana-auth
 ```
 
 ### Deploy services on Kubernetes
