@@ -20,7 +20,7 @@ locals {
     busybox                 = "busybox:latest"
     nftables                = "randomcoww/nftables:latest"
     kea                     = "randomcoww/kea:1.6.1"
-    conntrack               = "randomcoww/conntrack:latest"
+    conntrackd              = "randomcoww/conntrack:latest"
     promtail                = "grafana/promtail:latest"
     loki                    = "grafana/loki:latest"
   }

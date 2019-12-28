@@ -15,6 +15,7 @@ output "gateway_params" {
       dns_forward_ip             = "9.9.9.9"
       dns_forward_tls_servername = "dns.quad9.net"
 
+      pod_mount_path = "/var/lib/podconfig"
       kubelet_path   = "/var/lib/kubelet"
       kea_path       = "/var/lib/kea"
       kea_hooks_path = "/usr/local/lib/kea/hooks"
