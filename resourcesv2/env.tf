@@ -4,9 +4,9 @@ locals {
   kubernetes_version = "v1.15.3"
   container_images = {
     hyperkube               = "gcr.io/google_containers/hyperkube:${local.kubernetes_version}"
-    kube_apiserver          = "gcr.io/google_containers/kube-apiserver:${local.kubernetes_version}"
-    kube_controller_manager = "gcr.io/google_containers/kube-controller-manager:${local.kubernetes_version}"
-    kube_scheduler          = "gcr.io/google_containers/kube-scheduler:${local.kubernetes_version}"
+    kube_apiserver          = "randomcoww/kube-master:${local.kubernetes_version}"
+    kube_controller_manager = "randomcoww/kube-master:${local.kubernetes_version}"
+    kube_scheduler          = "randomcoww/kube-master:${local.kubernetes_version}"
     kube_proxy              = "gcr.io/google_containers/kube-proxy:${local.kubernetes_version}"
     kubelet                 = "randomcoww/kubelet:v1.16.3"
     etcd_wrapper            = "randomcoww/etcd-wrapper:v0.1.1"
@@ -21,10 +21,6 @@ locals {
     nftables                = "randomcoww/nftables:latest"
     kea                     = "randomcoww/kea:1.6.1"
     conntrackd              = "randomcoww/conntrack:latest"
-    prometheus              = "prom/prometheus:latest"
-    node_exporter           = "prom/node-exporter:latest"
-    loki                    = "grafana/loki:latest"
-    promtail                = "grafana/promtail:latest"
   }
 
   services = {
@@ -78,24 +74,6 @@ locals {
       ports = {
         peer   = 52380
         client = 52379
-      }
-    }
-
-    # metrics
-    loki = {
-      ports = {
-        http_listen = 53100
-        grpc_listen = 59095
-      }
-    }
-    prometheus = {
-      ports = {
-        http_listen = 59090
-      }
-    }
-    node_exporter = {
-      ports = {
-        http_listen = 59100
       }
     }
   }
@@ -161,7 +139,7 @@ locals {
       components = [
         "gateway"
       ]
-      memory = 4
+      memory = 2
       vcpu   = 1
       network = [
         {
@@ -204,7 +182,7 @@ locals {
       components = [
         "gateway"
       ]
-      memory = 4
+      memory = 2
       vcpu   = 1
       network = [
         {

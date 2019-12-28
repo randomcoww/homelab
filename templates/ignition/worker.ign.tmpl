@@ -133,22 +133,6 @@ storage:
               [plugins.cri.containerd]
                 no_pivot = true
 
-    - path: ${kubelet_path}/kubernetes-ca.pem
-      filesystem: root
-      mode: 420
-      contents:
-        inline: "${tls_kubernetes_ca}"
-    - path: ${kubelet_path}/bootstrap.pem
-      filesystem: root
-      mode: 420
-      contents:
-        inline: "${tls_bootstrap}"
-    - path: ${kubelet_path}/bootstrap-key.pem
-      filesystem: root
-      mode: 420
-      contents:
-        inline: "${tls_bootstrap_key}"
-
     - path: ${kubelet_path}/kubelet-config.yaml
       filesystem: root
       mode: 420
@@ -196,6 +180,26 @@ storage:
             user:
               client-certificate: ${kubelet_path}/bootstrap.pem
               client-key: ${kubelet_path}/bootstrap-key.pem
+
+    ##
+    ## certs
+    ##
+
+    - path: ${kubelet_path}/kubernetes-ca.pem
+      filesystem: root
+      mode: 420
+      contents:
+        inline: "${tls_kubernetes_ca}"
+    - path: ${kubelet_path}/bootstrap.pem
+      filesystem: root
+      mode: 420
+      contents:
+        inline: "${tls_bootstrap}"
+    - path: ${kubelet_path}/bootstrap-key.pem
+      filesystem: root
+      mode: 420
+      contents:
+        inline: "${tls_bootstrap_key}"
 
 passwd:
   users:

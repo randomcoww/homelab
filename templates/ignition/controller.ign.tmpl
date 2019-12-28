@@ -130,6 +130,10 @@ storage:
           staticPodPath: ${kubelet_path}/manifests
           makeIPTablesUtilChains: false
 
+    ##
+    ## certs
+    ##
+
     - path: ${controller_mount_path}/kubernetes-ca.pem
       filesystem: root
       mode: 420
@@ -208,6 +212,10 @@ storage:
       mode: 420
       contents:
         inline: "${tls_service_account_key}"
+
+    ##
+    ## pod config
+    ##
 
     - path: ${controller_mount_path}/kube-scheduler.yaml
       filesystem: root
@@ -294,101 +302,9 @@ storage:
             }
           }
 
-    - path: ${pod_mount_path}/loki/promtail-config.yaml
-      filesystem: root
-      mode: 420
-      contents:
-        inline: |-
-          positions:
-            filename: /etc/promtail/promtail-positions.yaml
-          scrape_configs:
-          - job_name: journal
-            journal:
-              max_age: 12h
-              path: /run/log/journal
-              labels:
-                job: systemd-journal
-                host: ${hostname}
-            relabel_configs:
-              - source_labels: ['__journal__systemd_unit']
-                target_label: 'unit'
-          - job_name: containers
-            static_configs:
-            - targets:
-              - localhost
-              labels:
-                job: static-pod
-                host: ${hostname}
-                __path__: /var/log/pods/*/*/*.log
-            pipeline_stages:
-            - match:
-                selector: '{job="static-pod"}'
-                stages:
-                - cri: {}
-                - regex:
-                    source: filename
-                    expression: "(?:pods)/(?P<namespace>\\S+?)_\\S+?/(?P<container_name>\\S+?)/"
-                - labels:
-                    namespace:
-                    container_name:
-
-    - path: ${pod_mount_path}/prometheus/prometheus.yaml
-      filesystem: root
-      mode: 420
-      contents:
-        inline: |-
-          global:
-            evaluation_interval: 1m
-            scrape_interval: 1m
-            scrape_timeout: 10s
-          scrape_configs:
-          - job_name: node-exporter
-            static_configs:
-            - targets:
-              - localhost:${services.node_exporter.ports.http_listen}
-          - job_name: etcd
-            static_configs:
-            - targets:
-              - localhost:${services.etcd.ports.client}
-
-    - path: ${pod_mount_path}/loki/loki.yaml
-      filesystem: root
-      mode: 420
-      contents:
-        inline: |-
-          auth_enabled: false
-          chunk_store_config:
-            max_look_back_period: 0
-          ingester:
-            chunk_block_size: 262144
-            chunk_idle_period: 3m
-            chunk_retain_period: 1m
-            lifecycler:
-              ring:
-                kvstore:
-                  store: inmemory
-                replication_factor: 1
-          limits_config:
-            enforce_metric_name: false
-            reject_old_samples: true
-            reject_old_samples_max_age: 168h
-          schema_config:
-            configs:
-            - from: "2018-04-15"
-              index:
-                period: 168h
-                prefix: index_
-              object_store: filesystem
-              schema: v9
-              store: boltdb
-          storage_config:
-            boltdb:
-              directory: /data/loki/index
-            filesystem:
-              directory: /data/loki/chunks
-          table_manager:
-            retention_deletes_enabled: false
-            retention_period: 0
+    ##
+    ## pod manifests
+    ##
 
     - path: ${kubelet_path}/manifests/etcd-wrapper.yaml
       filesystem: root
@@ -657,144 +573,6 @@ storage:
             - name: config-volume
               hostPath:
                 path: ${pod_mount_path}/keepalived/keepalived.conf
-
-    - path: ${kubelet_path}/manifests/loki.yaml
-      filesystem: root
-      mode: 420
-      contents:
-        inline: |-
-          ---
-          apiVersion: v1
-          kind: Pod
-          metadata:
-            namespace: kube-system
-            name: loki
-          spec:
-            restartPolicy: Always
-            hostNetwork: true
-            containers:
-            - name: promtail
-              image: ${container_images.promtail}
-              args:
-              - "-config.file=/etc/promtail/promtail-config.yaml"
-              - "-client.url=http://127.0.0.1:${services.loki.ports.http_listen}/loki/api/v1/push"
-              - "-log.level=info"
-              volumeMounts:
-              - name: pods
-                mountPath: /var/log/pods
-                readOnly: true
-              - name: journal
-                mountPath: /run/log/journal
-                readOnly: true
-              - name: config-promtail
-                mountPath: /etc/promtail/promtail-config.yaml
-                readOnly: true
-            - name: loki
-              image: ${container_images.loki}
-              args:
-              - "-config.file=/etc/loki/loki.yaml"
-              - "-server.grpc-listen-port=${services.loki.ports.grpc_listen}"
-              - "-server.http-listen-port=${services.loki.ports.http_listen}"
-              livenessProbe:
-                httpGet:
-                  path: /ready
-                  port: ${services.loki.ports.http_listen}
-                initialDelaySeconds: 45
-              readinessProbe:
-                httpGet:
-                  path: /ready
-                  port: ${services.loki.ports.http_listen}
-                initialDelaySeconds: 45
-              volumeMounts:
-              - name: config-loki
-                mountPath: /etc/loki/loki.yaml
-                readOnly: true
-              - name: storage
-                mountPath: "/data"
-            volumes:
-            - name: pods
-              hostPath:
-                path: /var/log/pods
-            - name: journal
-              hostPath:
-                path: /run/log/journal
-            - name: config-promtail
-              hostPath:
-                path: ${pod_mount_path}/loki/promtail-config.yaml
-            - name: config-loki
-              hostPath:
-                path: ${pod_mount_path}/loki/loki.yaml
-            - name: storage
-              emptyDir: {}
-
-    - path: ${kubelet_path}/manifests/prometheus.yaml
-      filesystem: root
-      mode: 420
-      contents:
-        inline: |-
-          ---
-          apiVersion: v1
-          kind: Pod
-          metadata:
-            namespace: kube-system
-            name: prometheus
-          spec:
-            restartPolicy: Always
-            hostNetwork: true
-            containers:
-            - name: prometheus-server
-              image: "${container_images.prometheus}"
-              args:
-              - --storage.tsdb.retention.time=1d
-              - --config.file=/etc/config/prometheus.yaml
-              - --storage.tsdb.path=/data
-              - --web.listen-address=0.0.0.0:${services.prometheus.ports.http_listen}
-              - --web.console.libraries=/etc/prometheus/console_libraries
-              - --web.console.templates=/etc/prometheus/consoles
-              - --web.enable-lifecycle
-              readinessProbe:
-                httpGet:
-                  path: /-/ready
-                  port: ${services.prometheus.ports.http_listen}
-                initialDelaySeconds: 30
-                timeoutSeconds: 30
-              livenessProbe:
-                httpGet:
-                  path: /-/healthy
-                  port: ${services.prometheus.ports.http_listen}
-                initialDelaySeconds: 30
-                timeoutSeconds: 30
-              volumeMounts:
-              - name: config-volume
-                mountPath: /etc/config/prometheus.yaml
-                readOnly: true
-              - name: storage
-                mountPath: /data
-            - name: prometheus-node-exporter
-              image: "${container_images.node_exporter}"
-              args:
-              - --web.listen-address=127.0.0.1:${services.node_exporter.ports.http_listen}
-              - --path.procfs=/host/proc
-              - --path.sysfs=/host/sys
-              volumeMounts:
-              - name: proc
-                mountPath: /host/proc
-                readOnly: true
-              - name: sys
-                mountPath: /host/sys
-                readOnly: true
-            volumes:
-            - name: proc
-              hostPath:
-                path: /proc
-            - name: sys
-              hostPath:
-                path: /sys
-            - name: config-volume
-              hostPath:
-                path: ${pod_mount_path}/prometheus/prometheus.yaml
-            - name: storage
-              emptyDir: {}
 
 passwd:
   users:
