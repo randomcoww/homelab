@@ -21,8 +21,10 @@ locals {
     nftables                = "randomcoww/nftables:latest"
     kea                     = "randomcoww/kea:1.6.1"
     conntrackd              = "randomcoww/conntrack:latest"
-    promtail                = "grafana/promtail:latest"
+    prometheus              = "prom/prometheus:latest"
+    node_exporter           = "prom/node-exporter:latest"
     loki                    = "grafana/loki:latest"
+    promtail                = "grafana/promtail:latest"
   }
 
   services = {
@@ -49,13 +51,13 @@ locals {
     recursive_dns = {
       vip = "192.168.126.241"
       ports = {
-        prometheus = 9153
+        prometheus = 59153
       }
     }
     internal_dns = {
       vip = "192.168.126.127"
       ports = {
-        prometheus = 9153
+        prometheus = 59153
       }
     }
 
@@ -78,10 +80,22 @@ locals {
         client = 52379
       }
     }
+
+    # metrics
     loki = {
-      vip = "192.168.126.126"
       ports = {
-        http = 3100
+        http_listen = 53100
+        grpc_listen = 59095
+      }
+    }
+    prometheus = {
+      ports = {
+        http_listen = 59090
+      }
+    }
+    node_exporter = {
+      ports = {
+        http_listen = 59100
       }
     }
   }
@@ -147,7 +161,7 @@ locals {
       components = [
         "gateway"
       ]
-      memory = 2
+      memory = 4
       vcpu   = 1
       network = [
         {
@@ -190,7 +204,7 @@ locals {
       components = [
         "gateway"
       ]
-      memory = 2
+      memory = 4
       vcpu   = 1
       network = [
         {
