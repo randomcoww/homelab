@@ -119,6 +119,20 @@ storage:
         inline: |
           fs.inotify.max_user_watches=16184
 
+    - path: /etc/containerd/config.toml
+      filesystem: root
+      mode: 420
+      contents:
+        inline: |-
+          root = "/pv/containerd"
+          subreaper = true
+          oom_score = -999
+          [plugins]
+            [plugins.cri]
+              stream_server_address = "0.0.0.0"
+              [plugins.cri.containerd]
+                no_pivot = true
+
     - path: ${kubelet_path}/kubernetes-ca.pem
       filesystem: root
       mode: 420
@@ -134,20 +148,6 @@ storage:
       mode: 420
       contents:
         inline: "${tls_bootstrap_key}"
-
-    - path: /etc/containerd/config.toml
-      filesystem: root
-      mode: 420
-      contents:
-        inline: |-
-          root = "/pv/containerd"
-          subreaper = true
-          oom_score = -999
-          [plugins]
-            [plugins.cri]
-              stream_server_address = "0.0.0.0"
-              [plugins.cri.containerd]
-                no_pivot = true
 
     - path: ${kubelet_path}/kubelet-config.yaml
       filesystem: root
@@ -171,6 +171,7 @@ storage:
           runtimeRequestTimeout: "15m"
           rotateCertificates: true
           serverTLSBootstrap: true
+
     - path: ${kubelet_path}/bootstrap.kubeconfig
       filesystem: root
       mode: 420

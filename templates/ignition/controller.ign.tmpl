@@ -100,27 +100,6 @@ storage:
         inline: |
           fs.inotify.max_user_watches=16184
 
-    - path: ${kubelet_path}/kubernetes-ca.pem
-      filesystem: root
-      mode: 420
-      contents:
-        inline: "${tls_kubernetes_ca}"
-    - path: ${kubelet_path}/kubernetes-ca-key.pem
-      filesystem: root
-      mode: 420
-      contents:
-        inline: "${tls_kubernetes_ca_key}"
-    - path: ${kubelet_path}/kubernetes.pem
-      filesystem: root
-      mode: 420
-      contents:
-        inline: "${tls_kubernetes}"
-    - path: ${kubelet_path}/kubernetes-key.pem
-      filesystem: root
-      mode: 420
-      contents:
-        inline: "${tls_kubernetes_key}"
-
     - path: /etc/containerd/config.toml
       filesystem: root
       mode: 420
@@ -133,64 +112,6 @@ storage:
               stream_server_address = "127.0.0.1"
               [plugins.cri.containerd]
                 no_pivot = true
-
-    - path: ${kubelet_path}/etcd-ca.pem
-      filesystem: root
-      mode: 420
-      contents:
-        inline: "${tls_etcd_ca}"
-    - path: ${kubelet_path}/etcd.pem
-      filesystem: root
-      mode: 420
-      contents:
-        inline: "${tls_etcd}"
-    - path: ${kubelet_path}/etcd-key.pem
-      filesystem: root
-      mode: 420
-      contents:
-        inline: "${tls_etcd_key}"
-    - path: ${kubelet_path}/etcd-client.pem
-      filesystem: root
-      mode: 420
-      contents:
-        inline: "${tls_etcd_client}"
-    - path: ${kubelet_path}/etcd-client-key.pem
-      filesystem: root
-      mode: 420
-      contents:
-        inline: "${tls_etcd_client_key}"
-
-    - path: ${kubelet_path}/kube-controller-manager.pem
-      filesystem: root
-      mode: 420
-      contents:
-        inline: "${tls_controller_manager}"
-    - path: ${kubelet_path}/kube-controller-manager-key.pem
-      filesystem: root
-      mode: 420
-      contents:
-        inline: "${tls_controller_manager_key}"
-    - path: ${kubelet_path}/kube-scheduler.pem
-      filesystem: root
-      mode: 420
-      contents:
-        inline: "${tls_scheduler}"
-    - path: ${kubelet_path}/kube-scheduler-key.pem
-      filesystem: root
-      mode: 420
-      contents:
-        inline: "${tls_scheduler_key}"
-
-    - path: ${kubelet_path}/service-account.pem
-      filesystem: root
-      mode: 420
-      contents:
-        inline: "${tls_service_account}"
-    - path: ${kubelet_path}/service-account-key.pem
-      filesystem: root
-      mode: 420
-      contents:
-        inline: "${tls_service_account_key}"
 
     - path: ${kubelet_path}/kubelet-config.yaml
       filesystem: root
@@ -208,7 +129,87 @@ storage:
             mode: AlwaysAllow
           staticPodPath: ${kubelet_path}/manifests
           makeIPTablesUtilChains: false
-    - path: ${kubelet_path}/kube-scheduler.yaml
+
+    - path: ${controller_mount_path}/kubernetes-ca.pem
+      filesystem: root
+      mode: 420
+      contents:
+        inline: "${tls_kubernetes_ca}"
+    - path: ${controller_mount_path}/kubernetes-ca-key.pem
+      filesystem: root
+      mode: 420
+      contents:
+        inline: "${tls_kubernetes_ca_key}"
+    - path: ${controller_mount_path}/kubernetes.pem
+      filesystem: root
+      mode: 420
+      contents:
+        inline: "${tls_kubernetes}"
+    - path: ${controller_mount_path}/kubernetes-key.pem
+      filesystem: root
+      mode: 420
+      contents:
+        inline: "${tls_kubernetes_key}"
+
+    - path: ${controller_mount_path}/etcd-ca.pem
+      filesystem: root
+      mode: 420
+      contents:
+        inline: "${tls_etcd_ca}"
+    - path: ${controller_mount_path}/etcd.pem
+      filesystem: root
+      mode: 420
+      contents:
+        inline: "${tls_etcd}"
+    - path: ${controller_mount_path}/etcd-key.pem
+      filesystem: root
+      mode: 420
+      contents:
+        inline: "${tls_etcd_key}"
+    - path: ${controller_mount_path}/etcd-client.pem
+      filesystem: root
+      mode: 420
+      contents:
+        inline: "${tls_etcd_client}"
+    - path: ${controller_mount_path}/etcd-client-key.pem
+      filesystem: root
+      mode: 420
+      contents:
+        inline: "${tls_etcd_client_key}"
+
+    - path: ${controller_mount_path}/kube-controller-manager.pem
+      filesystem: root
+      mode: 420
+      contents:
+        inline: "${tls_controller_manager}"
+    - path: ${controller_mount_path}/kube-controller-manager-key.pem
+      filesystem: root
+      mode: 420
+      contents:
+        inline: "${tls_controller_manager_key}"
+    - path: ${controller_mount_path}/kube-scheduler.pem
+      filesystem: root
+      mode: 420
+      contents:
+        inline: "${tls_scheduler}"
+    - path: ${controller_mount_path}/kube-scheduler-key.pem
+      filesystem: root
+      mode: 420
+      contents:
+        inline: "${tls_scheduler_key}"
+
+    - path: ${controller_mount_path}/service-account.pem
+      filesystem: root
+      mode: 420
+      contents:
+        inline: "${tls_service_account}"
+    - path: ${controller_mount_path}/service-account-key.pem
+      filesystem: root
+      mode: 420
+      contents:
+        inline: "${tls_service_account_key}"
+
+    - path: ${controller_mount_path}/kube-scheduler.yaml
       filesystem: root
       mode: 420
       contents:
@@ -216,10 +217,11 @@ storage:
           apiVersion: kubescheduler.config.k8s.io/v1alpha1
           kind: KubeSchedulerConfiguration
           clientConnection:
-            kubeconfig: "${kubelet_path}/kube-scheduler.kubeconfig"
+            kubeconfig: "${controller_mount_path}/kube-scheduler.kubeconfig"
           leaderElection:
             leaderElect: true
-    - path: ${kubelet_path}/kube-controller-manager.kubeconfig
+
+    - path: ${controller_mount_path}/kube-controller-manager.kubeconfig
       filesystem: root
       mode: 420
       contents:
@@ -227,7 +229,7 @@ storage:
           apiVersion: v1
           clusters:
           - cluster:
-              certificate-authority: ${kubelet_path}/kubernetes-ca.pem
+              certificate-authority: ${controller_mount_path}/kubernetes-ca.pem
               server: ${apiserver_local_endpoint}
             name: ${cluster_name}
           contexts:
@@ -241,9 +243,10 @@ storage:
           users:
           - name: system:kube-controller-manager
             user:
-              client-certificate: ${kubelet_path}/kube-controller-manager.pem
-              client-key: ${kubelet_path}/kube-controller-manager-key.pem
-    - path: ${kubelet_path}/kube-scheduler.kubeconfig
+              client-certificate: ${controller_mount_path}/kube-controller-manager.pem
+              client-key: ${controller_mount_path}/kube-controller-manager-key.pem
+
+    - path: ${controller_mount_path}/kube-scheduler.kubeconfig
       filesystem: root
       mode: 420
       contents:
@@ -251,7 +254,7 @@ storage:
           apiVersion: v1
           clusters:
           - cluster:
-              certificate-authority: ${kubelet_path}/kubernetes-ca.pem
+              certificate-authority: ${controller_mount_path}/kubernetes-ca.pem
               server: ${apiserver_local_endpoint}
             name: ${cluster_name}
           contexts:
@@ -265,60 +268,69 @@ storage:
           users:
           - name: system:kube-scheduler
             user:
-              client-certificate: ${kubelet_path}/kube-scheduler.pem
-              client-key: ${kubelet_path}/kube-scheduler-key.pem
+              client-certificate: ${controller_mount_path}/kube-scheduler.pem
+              client-key: ${controller_mount_path}/kube-scheduler-key.pem
 
-    - path: ${kubelet_path}/manifests/keepalived.yaml
+    - path: ${pod_mount_path}/keepalived/keepalived.conf
       filesystem: root
       mode: 420
       contents:
         inline: |-
-          ---
-          apiVersion: v1
-          kind: Pod
-          metadata:
-            namespace: kube-system
-            name: keepalived
-          spec:
-            restartPolicy: Always
-            hostNetwork: true
-            containers:
-            - name: keepalived
-              image: ${container_images.keepalived}
-              securityContext:
-                capabilities:
-                  add:
-                  - NET_ADMIN
-              args:
-              - "-P"
-              env:
-              - name: KEEPALIVED_LOCAL_CONFIG
-                value: |-
-                  global_defs {
-                    vrrp_version 3
-                    vrrp_iptables
-                    dynamic_interfaces
-                  }
-                  vrrp_instance VI_kube-master_store {
-                    no_accept
-                    nopreempt
-                    state BACKUP
-                    strict_mode off
-                    virtual_router_id 70
-                    interface ${host_network.store.if}
-                    priority 100
-                    virtual_ipaddress {
-                      ${services.kubernetes_apiserver.vip}
-                    }
-                  }
-              livenessProbe:
-                httpGet:
-                  scheme: HTTP
-                  host: 127.0.0.1
-                  port: 8080
-                  path: "/healthz"
-                initialDelaySeconds: 15
-                timeoutSeconds: 15
+          global_defs {
+            vrrp_version 3
+            vrrp_iptables
+            dynamic_interfaces
+          }
+          vrrp_instance VI_kube-master_store {
+            no_accept
+            nopreempt
+            state BACKUP
+            strict_mode off
+            virtual_router_id 70
+            interface ${host_network.store.if}
+            priority 100
+            virtual_ipaddress {
+              ${services.kubernetes_apiserver.vip}
+            }
+          }
+
+    - path: ${pod_mount_path}/promtail/promtail-config.yaml
+      filesystem: root
+      mode: 420
+      contents:
+        inline: |-
+          positions:
+            filename: /etc/promtail/promtail-positions.yaml
+          scrape_configs:
+          - job_name: journal
+            journal:
+              max_age: 12h
+              path: /run/log/journal
+              labels:
+                job: systemd-journal
+                host: ${hostname}
+            relabel_configs:
+              - source_labels: ['__journal__systemd_unit']
+                target_label: 'unit'
+          - job_name: containers
+            static_configs:
+            - targets:
+              - localhost
+              labels:
+                job: static-pod
+                host: ${hostname}
+                __path__: /var/log/pods/*/*/*.log
+            pipeline_stages:
+            - match:
+                selector: '{job="static-pod"}'
+                stages:
+                - cri: {}
+                - regex:
+                    source: filename
+                    expression: "(?:pods)/(?P<namespace>\\S+?)_\\S+?/(?P<container_name>\\S+?)/"
+                - labels:
+                    namespace:
+                    container_name:
 
     - path: ${kubelet_path}/manifests/etcd-wrapper.yaml
       filesystem: root
@@ -339,14 +351,14 @@ storage:
               image: ${container_images.etcd_wrapper}
               args:
               - "--name=$(NODE_NAME)"
-              - "--cert-file=${kubelet_path}/etcd.pem"
-              - "--key-file=${kubelet_path}/etcd-key.pem"
-              - "--client-cert-file=${kubelet_path}/etcd-client.pem"
-              - "--client-key-file=${kubelet_path}/etcd-client-key.pem"
-              - "--trusted-ca-file=${kubelet_path}/etcd-ca.pem"
-              - "--peer-cert-file=${kubelet_path}/etcd.pem"
-              - "--peer-key-file=${kubelet_path}/etcd-key.pem"
-              - "--peer-trusted-ca-file=${kubelet_path}/etcd-ca.pem"
+              - "--cert-file=${controller_mount_path}/etcd.pem"
+              - "--key-file=${controller_mount_path}/etcd-key.pem"
+              - "--client-cert-file=${controller_mount_path}/etcd-client.pem"
+              - "--client-key-file=${controller_mount_path}/etcd-client-key.pem"
+              - "--trusted-ca-file=${controller_mount_path}/etcd-ca.pem"
+              - "--peer-cert-file=${controller_mount_path}/etcd.pem"
+              - "--peer-key-file=${controller_mount_path}/etcd-key.pem"
+              - "--peer-trusted-ca-file=${controller_mount_path}/etcd-ca.pem"
               - "--initial-advertise-peer-urls=https://$(INTERNAL_IP):${services.etcd.ports.peer}"
               - "--listen-peer-urls=https://$(INTERNAL_IP):${services.etcd.ports.peer}"
               - "--listen-client-urls=${etcd_local_endpoint},https://$(INTERNAL_IP):${services.etcd.ports.client}"
@@ -354,11 +366,11 @@ storage:
               - "--initial-cluster=${etcd_initial_cluster}"
               - "--initial-cluster-token=${etcd_cluster_token}"
               - "--etcd-servers=${etcd_endpoints}"
-              - "--backup-dir=${kubelet_path}/etcd/backup"
-              - "--backup-file=${kubelet_path}/etcd/backup/etcd.db"
-              - "--tls-dir=${kubelet_path}"
+              - "--backup-dir=${pod_mount_path}/etcd"
+              - "--backup-file=${pod_mount_path}/etcd/etcd.db"
+              - "--tls-dir=${controller_mount_path}"
               - "--image=${container_images.etcd}"
-              - "--pod-spec-file=${kubelet_path}/manifests/etcd.json"
+              - "--pod-spec-file=${kubelet_path}/manifests/kube-etcd.json"
               - "--s3-backup-path=${s3_etcd_backup_path}"
               - "--backup-interval=30m"
               - "--healthcheck-interval=10s"
@@ -381,13 +393,26 @@ storage:
                   fieldRef:
                     fieldPath: spec.nodeName
               volumeMounts:
-              - name: kubernetes-path
-                mountPath: "${kubelet_path}"
+              - name: config-volume
+                mountPath: "${controller_mount_path}"
+                readOnly: true
+              - name: etcd-restore-volume
+                mountPath: "${pod_mount_path}/etcd"
+                readOnly: false
+              - name: manifest-volume
+                mountPath: "${kubelet_path}/manifests/kube-etcd.json"
                 readOnly: false
             volumes:
-            - name: kubernetes-path
+            - name: config-volume
               hostPath:
-                path: "${kubelet_path}"
+                path: "${controller_mount_path}"
+            - name: etcd-restore-volume
+              hostPath:
+                path: "${pod_mount_path}/etcd"
+            - name: manifest-volume
+              hostPath:
+                type: FileOrCreate
+                path: "${kubelet_path}/manifests/kube-etcd.json"
 
     - path: ${kubelet_path}/manifests/kube-apiserver.yaml
       filesystem: root
@@ -413,20 +438,20 @@ storage:
               - "--advertise-address=$(INTERNAL_IP)"
               - "--authorization-mode=Node,RBAC"
               - "--bind-address=0.0.0.0"
-              - "--client-ca-file=${kubelet_path}/kubernetes-ca.pem"
-              - "--etcd-cafile=${kubelet_path}/etcd-ca.pem"
-              - "--etcd-certfile=${kubelet_path}/etcd-client.pem"
-              - "--etcd-keyfile=${kubelet_path}/etcd-client-key.pem"
+              - "--client-ca-file=${controller_mount_path}/kubernetes-ca.pem"
+              - "--etcd-cafile=${controller_mount_path}/etcd-ca.pem"
+              - "--etcd-certfile=${controller_mount_path}/etcd-client.pem"
+              - "--etcd-keyfile=${controller_mount_path}/etcd-client-key.pem"
               - "--etcd-servers=${etcd_local_endpoint}"
-              - "--kubelet-certificate-authority=${kubelet_path}/kubernetes-ca.pem"
-              - "--kubelet-client-certificate=${kubelet_path}/kubernetes.pem"
-              - "--kubelet-client-key=${kubelet_path}/kubernetes-key.pem"
+              - "--kubelet-certificate-authority=${controller_mount_path}/kubernetes-ca.pem"
+              - "--kubelet-client-certificate=${controller_mount_path}/kubernetes.pem"
+              - "--kubelet-client-key=${controller_mount_path}/kubernetes-key.pem"
               - "--runtime-config=api/all"
-              - "--service-account-key-file=${kubelet_path}/service-account.pem"
+              - "--service-account-key-file=${controller_mount_path}/service-account.pem"
               - "--service-account-max-token-expiration=24h"
               - "--service-cluster-ip-range=${networks.kubernetes_service.network}/${networks.kubernetes_service.cidr}"
-              - "--tls-cert-file=${kubelet_path}/kubernetes.pem"
-              - "--tls-private-key-file=${kubelet_path}/kubernetes-key.pem"
+              - "--tls-cert-file=${controller_mount_path}/kubernetes.pem"
+              - "--tls-private-key-file=${controller_mount_path}/kubernetes-key.pem"
               - "--kubelet-preferred-address-types=InternalIP"
               - "--v=2"
               env:
@@ -435,8 +460,8 @@ storage:
                   fieldRef:
                     fieldPath: status.hostIP
               volumeMounts:
-              - name: kubernetes-path
-                mountPath: "${kubelet_path}"
+              - name: config-volume
+                mountPath: "${controller_mount_path}"
                 readOnly: true
               livenessProbe:
                 httpGet:
@@ -447,9 +472,9 @@ storage:
                 initialDelaySeconds: 15
                 timeoutSeconds: 15
             volumes:
-            - name: kubernetes-path
+            - name: config-volume
               hostPath:
-                path: "${kubelet_path}"
+                path: "${controller_mount_path}"
 
     - path: ${kubelet_path}/manifests/kube-controller-manager.yaml
       filesystem: root
@@ -474,18 +499,18 @@ storage:
               - "--cluster-cidr=${networks.kubernetes.network}/${networks.kubernetes.cidr}"
               - "--allocate-node-cidrs=true"
               - "--cluster-name=${cluster_name}"
-              - "--cluster-signing-cert-file=${kubelet_path}/kubernetes-ca.pem"
-              - "--cluster-signing-key-file=${kubelet_path}/kubernetes-ca-key.pem"
-              - "--kubeconfig=${kubelet_path}/kube-controller-manager.kubeconfig"
+              - "--cluster-signing-cert-file=${controller_mount_path}/kubernetes-ca.pem"
+              - "--cluster-signing-key-file=${controller_mount_path}/kubernetes-ca-key.pem"
+              - "--kubeconfig=${controller_mount_path}/kube-controller-manager.kubeconfig"
               - "--leader-elect=true"
-              - "--root-ca-file=${kubelet_path}/kubernetes-ca.pem"
-              - "--service-account-private-key-file=${kubelet_path}/service-account-key.pem"
+              - "--root-ca-file=${controller_mount_path}/kubernetes-ca.pem"
+              - "--service-account-private-key-file=${controller_mount_path}/service-account-key.pem"
               - "--service-cluster-ip-range=${networks.kubernetes_service.network}/${networks.kubernetes_service.cidr}"
               - "--use-service-account-credentials=true"
               - "--v=2"
               volumeMounts:
-              - name: kubernetes-path
-                mountPath: "${kubelet_path}"
+              - name: config-volume
+                mountPath: "${controller_mount_path}"
                 readOnly: true
               livenessProbe:
                 httpGet:
@@ -496,9 +521,9 @@ storage:
                 initialDelaySeconds: 15
                 timeoutSeconds: 15
             volumes:
-            - name: kubernetes-path
+            - name: config-volume
               hostPath:
-                path: "${kubelet_path}"
+                path: "${controller_mount_path}"
 
     - path: ${kubelet_path}/manifests/kube-scheduler.yaml
       filesystem: root
@@ -519,7 +544,7 @@ storage:
               image: ${container_images.kube_scheduler}
               command:
               - kube-scheduler
-              - "--config=${kubelet_path}/kube-scheduler.yaml"
+              - "--config=${controller_mount_path}/kube-scheduler.yaml"
               - "--v=2"
               livenessProbe:
                 httpGet:
@@ -530,13 +555,52 @@ storage:
                 initialDelaySeconds: 15
                 timeoutSeconds: 15
               volumeMounts:
-              - name: kubernetes-path
-                mountPath: "${kubelet_path}"
+              - name: config-volume
+                mountPath: "${controller_mount_path}"
                 readOnly: true
             volumes:
-            - name: kubernetes-path
+            - name: config-volume
               hostPath:
-                path: "${kubelet_path}"
+                path: "${controller_mount_path}"
+
+    - path: ${kubelet_path}/manifests/keepalived.yaml
+      filesystem: root
+      mode: 420
+      contents:
+        inline: |-
+          ---
+          apiVersion: v1
+          kind: Pod
+          metadata:
+            namespace: kube-system
+            name: keepalived
+          spec:
+            restartPolicy: Always
+            hostNetwork: true
+            containers:
+            - name: keepalived
+              image: ${container_images.keepalived}
+              securityContext:
+                capabilities:
+                  add:
+                  - NET_ADMIN
+              args: [ "-P", "-D", "-f", "/etc/keepalived/keepalived.conf" ]
+              livenessProbe:
+                httpGet:
+                  scheme: HTTP
+                  host: 127.0.0.1
+                  port: 8080
+                  path: "/healthz"
+                initialDelaySeconds: 15
+                timeoutSeconds: 15
+              volumeMounts:
+              - name: config-volume
+                mountPath: /etc/keepalived/keepalived.conf
+                readOnly: true
+            volumes:
+            - name: config-volume
+              hostPath:
+                path: ${pod_mount_path}/keepalived/keepalived.conf
 
     - path: ${kubelet_path}/manifests/promtail.yaml
       filesystem: root
@@ -552,55 +616,6 @@ storage:
           spec:
             restartPolicy: Always
             hostNetwork: true
-            initContainers:
-            - name: configwriter
-              image: "${container_images.busybox}"
-              imagePullPolicy: IfNotPresent
-              args: [ "/bin/sh", "-c", "echo -e \"$CONFIG\" > $CONFIG_PATH" ]
-              env:
-              - name: NODE_NAME
-                valueFrom:
-                  fieldRef:
-                    fieldPath: spec.nodeName
-              - name: CONFIG
-                value: |-
-                  positions:
-                    filename: /etc/promtail/promtail-positions.yaml
-                  scrape_configs:
-                  - job_name: journal
-                    journal:
-                      max_age: 12h
-                      path: /run/log/journal
-                      labels:
-                        job: systemd-journal
-                        host: $(NODE_NAME)
-                    relabel_configs:
-                      - source_labels: ['__journal__systemd_unit']
-                        target_label: 'unit'
-                  - job_name: containers
-                    static_configs:
-                    - targets:
-                      - localhost
-                      labels:
-                        job: static-pod
-                        host: $(NODE_NAME)
-                        __path__: /var/log/pods/*/*/*.log
-                    pipeline_stages:
-                    - match:
-                        selector: '{job="static-pod"}'
-                        stages:
-                        - cri: {}
-                        - regex:
-                            source: filename
-                            expression: "(?:pods)/(?P<namespace>\\\S+?)_\\\S+?/(?P<container_name>\\\S+?)/"
-                        - labels:
-                            namespace:
-                            container_name:
-              - name: CONFIG_PATH
-                value: /etc/promtail/promtail-config.yaml
-              volumeMounts:
-              - name: config-volume
-                mountPath: /etc/promtail
             containers:
             - name: promtail
               image: ${container_images.promtail}
@@ -616,7 +631,8 @@ storage:
                 mountPath: /run/log/journal
                 readOnly: true
               - name: config-volume
-                mountPath: /etc/promtail
+                mountPath: /etc/promtail/promtail-config.yaml
+                readOnly: true
             volumes:
             - name: pods
               hostPath:
@@ -625,7 +641,8 @@ storage:
               hostPath:
                 path: /run/log/journal
             - name: config-volume
-              emptyDir: {}
+              hostPath:
+                path: ${pod_mount_path}/promtail/promtail-config.yaml
 
 passwd:
   users:
