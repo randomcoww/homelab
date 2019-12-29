@@ -77,19 +77,6 @@ spec:
     spec:
       dnsPolicy: ClusterFirstWithHostNet
       restartPolicy: Always
-      volumes:
-      - name: transmission-config
-        configMap:
-          name: transmission-config
-      - name: openvpn-auth-user-pass
-        secret:
-          secretName: openvpn-auth-user-pass
-      - name: nftables-config
-        configMap:
-          name: nftables-config
-      - name: torrent-vol
-        persistentVolumeClaim:
-          claimName: ingest-pvc
       initContainers:
       # /vol/mnt should be fuse mounted by another container
       # Verify that this is mounted before continuing
@@ -104,6 +91,7 @@ spec:
           mountPath: "/vol"
       - name: nftables
         image: randomcoww/nftables:latest
+        args: [ "-f", "/etc/nftables/nft.rules" ]
         imagePullPolicy: Always
         securityContext:
           capabilities:
@@ -111,7 +99,7 @@ spec:
             - NET_ADMIN
         volumeMounts:
         - name: nftables-config
-          mountPath: /etc/nft.rules
+          mountPath: /etc/nftables/nft.rules
           subPath: nft.rules
       containers:
       - name: openvpn
@@ -153,6 +141,19 @@ spec:
           subPath: settings.json
         - name: torrent-vol
           mountPath: "/vol"
+      volumes:
+      - name: transmission-config
+        configMap:
+          name: transmission-config
+      - name: openvpn-auth-user-pass
+        secret:
+          secretName: openvpn-auth-user-pass
+      - name: nftables-config
+        configMap:
+          name: nftables-config
+      - name: torrent-vol
+        persistentVolumeClaim:
+          claimName: ingest-pvc
 
 ---
 kind: Service
