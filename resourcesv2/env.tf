@@ -9,7 +9,7 @@ locals {
     kube_scheduler          = "randomcoww/kube-master:${local.kubernetes_version}"
     kube_proxy              = "gcr.io/google_containers/kube-proxy:${local.kubernetes_version}"
     kubelet                 = "randomcoww/kubelet:v1.16.3"
-    etcd_wrapper            = "randomcoww/etcd-wrapper:v0.1.1"
+    etcd_wrapper            = "randomcoww/etcd-wrapper:v0.2.0"
     etcd                    = "gcr.io/etcd-development/etcd:v3.4.0"
     flannel                 = "quay.io/coreos/flannel:v0.11.0-amd64"
     keepalived              = "randomcoww/keepalived:latest"

@@ -15,8 +15,10 @@ output "gateway_params" {
       dns_forward_ip             = "9.9.9.9"
       dns_forward_tls_servername = "dns.quad9.net"
 
-      pod_mount_path = "/var/lib/podconfig"
-      kubelet_path   = "/var/lib/kubelet"
+      # Path mounted by kubelet running in container
+      kubelet_path = "/var/lib/kubelet"
+      # This paths should be visible by kubelet running in the container
+      pod_mount_path = "/var/lib/kubelet/podconfig"
       kea_path       = "/var/lib/kea"
       kea_hooks_path = "/usr/local/lib/kea/hooks"
       kea_ha_peers = jsonencode([

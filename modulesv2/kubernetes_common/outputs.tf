@@ -48,9 +48,11 @@ output "controller_params" {
       ])
       etcd_local_endpoint      = "https://127.0.0.1:${var.services.etcd.ports.client}"
       apiserver_local_endpoint = "https://127.0.0.1:${var.services.kubernetes_apiserver.ports.secure}"
-      kubelet_path             = "/var/lib/kubelet"
-      pod_mount_path           = "/var/lib/podconfig"
-      controller_mount_path    = "/var/lib/kube-controller"
+      # Path mounted by kubelet running in container
+      kubelet_path = "/var/lib/kubelet"
+      # These paths should be visible by kubelet running in the container
+      pod_mount_path        = "/var/lib/kubelet/podconfig"
+      controller_mount_path = "/var/lib/kubelet/controller"
 
       tls_kubernetes_ca          = replace(tls_self_signed_cert.kubernetes-ca.cert_pem, "\n", "\\n")
       tls_kubernetes_ca_key      = replace(tls_private_key.kubernetes-ca.private_key_pem, "\n", "\\n")
