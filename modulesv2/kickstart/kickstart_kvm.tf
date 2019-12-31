@@ -40,15 +40,15 @@ resource "matchbox_group" "ks-kvm" {
       networks                 = var.networks
       services                 = var.services
       certs_path               = "/etc/ssl/certs"
-      matchbox_url             = "https://github.com/poseidon/matchbox/releases/download/v0.8.0/matchbox-v0.8.0-linux-amd64.tar.gz"
+      matchbox_url             = "https://github.com/poseidon/matchbox/releases/download/v0.8.3/matchbox-v0.8.3-linux-amd64.tar.gz"
       matchbox_data_path       = "/var/lib/matchbox/data"
       matchbox_assets_path     = "/var/lib/matchbox/assets"
       tls_matchbox_ca          = chomp(tls_self_signed_cert.matchbox-ca.cert_pem)
       tls_matchbox             = chomp(tls_locally_signed_cert.matchbox[each.key].cert_pem)
       tls_matchbox_key         = chomp(tls_private_key.matchbox[each.key].private_key_pem)
-      container_linux_base_url = "https://beta.release.core-os.net/amd64-usr/current"
-      container_linux_kernel   = "coreos_production_pxe.vmlinuz"
-      container_linux_image    = "coreos_production_pxe_image.cpio.gz"
+      container_linux_base_url = "https://edge.release.flatcar-linux.net/amd64-usr/current"
+      container_linux_kernel   = "flatcar_production_pxe.vmlinuz"
+      container_linux_image    = "flatcar_production_pxe_image.cpio.gz"
     })
   }
 }
