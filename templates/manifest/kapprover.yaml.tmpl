@@ -32,8 +32,8 @@ subjects:
   namespace: ${namespace}
 
 ---
-apiVersion: extensions/v1beta1
 kind: Deployment
+apiVersion: apps/v1
 metadata:
   name: kubelet-approver
   namespace: ${namespace}
@@ -41,9 +41,11 @@ metadata:
     k8s-app: kubelet-approver
 spec:
   replicas: 1
+  selector:
+    matchLabels:
+      k8s-app: kubelet-approver
   template:
     metadata:
-      name: kubelet-approver
       labels:
         k8s-app: kubelet-approver
     spec:
