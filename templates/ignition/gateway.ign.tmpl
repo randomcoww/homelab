@@ -166,13 +166,19 @@ storage:
       mode: 420
       contents:
         inline: |-
-          subreaper = true
+          version = 2
           oom_score = -999
           [plugins]
-            [plugins.cri]
-              stream_server_address = "127.0.0.1"
-              [plugins.cri.containerd]
-                no_pivot = true
+            [plugins."io.containerd.grpc.v1.cri"]
+              [plugins."io.containerd.grpc.v1.cri".containerd]
+                snapshotter = "overlayfs"
+                [plugins."io.containerd.grpc.v1.cri".containerd.runtimes]
+                  [plugins."io.containerd.grpc.v1.cri".containerd.runtimes.runc]
+                    # runtime_type should be normally be "io.containerd.runc.v*"
+                    # containerd-shim-runc-v* binaries are needed but not provided in the flatcar image
+                    runtime_type = "io.containerd.runtime.v1.linux"
+            [plugins."io.containerd.runtime.v1.linux"]
+              no_pivot = true
 
     - path: ${kubelet_path}/kubelet-config.yaml
       filesystem: root
