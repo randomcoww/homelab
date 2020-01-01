@@ -115,24 +115,43 @@ systemd:
         After=network.target
 
         [Service]
-        Environment="KUBELET_IMAGE=docker://${container_images.kubelet}"
-        Environment="RKT_RUN_ARGS=--uuid-file-save=/var/cache/kubelet-pod.uuid \
+        ExecStartPre=/bin/mkdir -p \
+          ${kubelet_path} \
+          /var/log/containers \
+          /etc/cni/net.d
+        ExecStartPre=-/usr/bin/rkt rm --uuid-file=/var/cache/kubelet-pod.uuid
+        ExecStart=/usr/bin/rkt run \
+          --uuid-file-save=/var/cache/kubelet-pod.uuid \
           --volume=resolv,kind=host,source=/etc/resolv.conf \
           --volume var-lib-containerd,kind=host,source=/var/lib/containerd,readOnly=false \
           --mount volume=resolv,target=/etc/resolv.conf \
           --mount volume=var-lib-containerd,target=/var/lib/containerd \
-          --insecure-options=image"
-        Environment="KUBELET_IMAGE_ARGS=--exec=/usr/local/bin/kubelet"
-        ExecStartPre=/bin/mkdir -p \
-          /var/log/containers \
-          /etc/cni/net.d
-        ExecStartPre=-/usr/bin/rkt rm --uuid-file=/var/cache/kubelet-pod.uuid
-        ExecStart=/usr/lib/coreos/kubelet-wrapper \
-          --config=${kubelet_path}/kubelet-config.yaml \
-          --node-ip=${host_network.store.ip} \
-          --register-node=false \
-          --container-runtime=remote \
-          --container-runtime-endpoint=unix:///run/containerd/containerd.sock
+          --insecure-options=image \
+          --volume coreos-etc-ssl-certs,kind=host,source=/etc/ssl/certs,readOnly=true \
+          --volume coreos-usr-share-certs,kind=host,source=/usr/share/ca-certificates,readOnly=true \
+          --volume coreos-var-lib-kubelet,kind=host,source=${kubelet_path},readOnly=false,recursive=true \
+          --volume coreos-var-log,kind=host,source=/var/log,readOnly=false \
+          --volume coreos-os-release,kind=host,source=/usr/lib/os-release,readOnly=true \
+          --volume coreos-run,kind=host,source=/run,readOnly=false \
+          --volume coreos-lib-modules,kind=host,source=/lib/modules,readOnly=true \
+          --volume coreos-etc-machine-id,kind=host,source=/etc/machine-id,readOnly=true \
+          --mount volume=coreos-etc-ssl-certs,target=/etc/ssl/certs \
+          --mount volume=coreos-usr-share-certs,target=/usr/share/ca-certificates \
+          --mount volume=coreos-var-lib-kubelet,target=${kubelet_path} \
+          --mount volume=coreos-var-log,target=/var/log \
+          --mount volume=coreos-os-release,target=/etc/os-release \
+          --mount volume=coreos-run,target=/run \
+          --mount volume=coreos-lib-modules,target=/lib/modules \
+          --mount volume=coreos-etc-machine-id,target=/etc/machine-id \
+          --hosts-entry host \
+          --stage1-from-dir=stage1-fly.aci \
+          docker://${container_images.kubelet} \
+            --exec=/usr/local/bin/kubelet -- \
+            --config=${kubelet_path}/kubelet-config.yaml \
+            --node-ip=${host_network.store.ip} \
+            --register-node=false \
+            --container-runtime=remote \
+            --container-runtime-endpoint=unix:///run/containerd/containerd.sock
         ExecStop=-/usr/bin/rkt stop --uuid-file=/var/cache/kubelet-pod.uuid
         Restart=always
         RestartSec=5

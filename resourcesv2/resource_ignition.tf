@@ -67,6 +67,8 @@ module "test-common" {
   mtu               = local.mtu
   networks          = local.networks
   services          = local.services
+  domains           = local.domains
+  container_images  = local.container_images
 
   test_hosts = {
     for k in keys(local.hosts) :

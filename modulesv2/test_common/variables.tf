@@ -18,6 +18,14 @@ variable "services" {
   type = any
 }
 
+variable "domains" {
+  type = any
+}
+
+variable "container_images" {
+  type = any
+}
+
 variable "test_hosts" {
   type = any
 }
