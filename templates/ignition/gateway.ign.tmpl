@@ -122,6 +122,7 @@ systemd:
           --mount volume=resolv,target=/etc/resolv.conf \
           --mount volume=var-lib-containerd,target=/var/lib/containerd \
           --insecure-options=image"
+        Environment="KUBELET_IMAGE_ARGS=--exec=/usr/local/bin/kubelet"
         ExecStartPre=/bin/mkdir -p \
           /var/log/containers \
           /etc/cni/net.d

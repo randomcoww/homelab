@@ -1,14 +1,14 @@
 locals {
   user               = "core"
   mtu                = 9000
-  kubernetes_version = "v1.16.4"
+  kubernetes_version = "v1.17.0"
   container_images = {
     hyperkube               = "gcr.io/google_containers/hyperkube:${local.kubernetes_version}"
     kube_apiserver          = "randomcoww/kube-master:${local.kubernetes_version}"
     kube_controller_manager = "randomcoww/kube-master:${local.kubernetes_version}"
     kube_scheduler          = "randomcoww/kube-master:${local.kubernetes_version}"
     kube_proxy              = "gcr.io/google_containers/kube-proxy:${local.kubernetes_version}"
-    kubelet                 = "randomcoww/kubelet:v1.16.4"
+    kubelet                 = "randomcoww/kubelet:v1.17.0"
     etcd_wrapper            = "randomcoww/etcd-wrapper:v0.2.0"
     etcd                    = "randomcoww/etcd:v3.4.3"
     flannel                 = "quay.io/coreos/flannel:v0.11.0-amd64"
@@ -289,7 +289,7 @@ locals {
       components = [
         "worker"
       ]
-      memory = 48
+      memory = 40
       vcpu   = 4
       network = [
         {
@@ -399,7 +399,7 @@ locals {
       components = [
         "worker"
       ]
-      memory = 48
+      memory = 40
       vcpu   = 4
       network = [
         {
@@ -516,7 +516,6 @@ locals {
         }
       ]
       guests = [
-        "controller-2",
         "test-0",
       ]
       persistent_home_path = "/localhome"

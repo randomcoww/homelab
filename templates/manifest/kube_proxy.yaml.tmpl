@@ -72,6 +72,7 @@ spec:
         command:
         - kube-proxy
         - "--config=/etc/kube-proxy/kube-proxy-config.yaml"
+        - "--v=2"
         env:
         - name: KUBERNETES_SERVICE_HOST
           value: ${services.kubernetes_apiserver.vip}
