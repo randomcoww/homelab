@@ -42,25 +42,6 @@ data:
     }
 
 ---
-apiVersion: v1
-kind: ConfigMap
-metadata:
-  name: nftables-config
-data:
-  nft.rules: |
-    table ip filter {
-      chain output {
-        type filter hook output priority 30; policy drop;
-        ct state { established, related } accept
-        oifname "tun*" accept
-        oifname "lo" accept
-        skgid { "nobody" } accept
-        ip daddr { 192.168.0.0/16, 10.0.0.0/8 } accept
-      }
-    }
-    ;
-
----
 kind: Deployment
 apiVersion: apps/v1
 metadata:
@@ -89,42 +70,19 @@ spec:
         volumeMounts:
         - name: torrent-vol
           mountPath: "/vol"
-      - name: nftables
-        image: randomcoww/nftables:latest
-        args: [ "-f", "/etc/nftables/nft.rules" ]
-        imagePullPolicy: Always
-        securityContext:
-          capabilities:
-            add:
-            - NET_ADMIN
-        volumeMounts:
-        - name: nftables-config
-          mountPath: /etc/nftables/nft.rules
-          subPath: nft.rules
-      containers:
-      - name: openvpn
-        image: randomcoww/openvpn:latest
-        imagePullPolicy: Always
-        securityContext:
-          capabilities:
-            add:
-            - NET_ADMIN
-        env:
-        - name: PIA_PROFILE
-          value: "US Seattle"
+      - name: wireguard
+        image: randomcoww/wireguard:latest
         args:
-        - "--config \"$(PIA_PROFILE).ovpn\""
-        - "--route 192.168.0.0 255.255.0.0 net_gateway"
-        - "--route 10.0.0.0 255.0.0.0 net_gateway"
-        - "--auth-user-pass /etc/openvpn/auth-user-pass"
-        - "--route-nopull"
-        - "--redirect-gateway"
-        - "--fast-io"
-        - "--auth-nocache"
+        - "up"
+        - "wg0"
+        imagePullPolicy: Always
+        securityContext:
+          privileged: true
         volumeMounts:
-        - mountPath: /etc/openvpn/auth-user-pass
-          name: openvpn-auth-user-pass
-          subPath: openvpn-auth-user-pass
+        - name: wireguard-config
+          mountPath: /etc/wireguard/wg0.conf
+          subPath: wireguard-secret
+      containers:
       - name: transmission
         image: randomcoww/transmission:latest
         imagePullPolicy: Always
@@ -145,12 +103,9 @@ spec:
       - name: transmission-config
         configMap:
           name: transmission-config
-      - name: openvpn-auth-user-pass
+      - name: wireguard-config
         secret:
-          secretName: openvpn-auth-user-pass
-      - name: nftables-config
-        configMap:
-          name: nftables-config
+          secretName: wireguard-config
       - name: torrent-vol
         persistentVolumeClaim:
           claimName: ingest-pvc
