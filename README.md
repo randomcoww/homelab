@@ -222,7 +222,7 @@ https://tr.fuzzybunny.internal
 
 ```
 cd reqourcesv2/manifests
-kubectl create secret generic openvpn-auth-user-pass --from-file=openvpn-auth-user-pass
+kubectl create secret generic wireguard-config --from-file=wireguard-secret
 kubectl apply -f ingest-rclone-pv.yaml
 kubectl apply -f transmission.yaml
 ```
