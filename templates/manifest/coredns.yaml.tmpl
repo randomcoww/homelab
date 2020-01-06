@@ -70,7 +70,7 @@ data:
         fallthrough in-addr.arpa ip6.arpa
       }
       forward . ${services.recursive_dns.vip}
-      prometheus :9153
+      prometheus :${services.internal_dns.ports.prometheus}
       cache 30
       reload
       loadbalance

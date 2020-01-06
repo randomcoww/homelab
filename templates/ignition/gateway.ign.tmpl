@@ -592,11 +592,10 @@ storage:
               args: [ "-conf", "/etc/coredns/Corefile" ]
               livenessProbe:
                 httpGet:
-                  scheme: HTTP
-                  host: 127.0.0.1
+                  path: /health
                   port: 8080
-                  path: "/healthz"
-                initialDelaySeconds: 60
+                  scheme: HTTP
+                initialDelaySeconds: 15
                 timeoutSeconds: 5
                 successThreshold: 1
                 failureThreshold: 5
@@ -621,11 +620,10 @@ storage:
               args: [ "-P", "-D", "-f", "/etc/keepalived/keepalived.conf" ]
               livenessProbe:
                 httpGet:
-                  scheme: HTTP
-                  host: 127.0.0.1
+                  path: /health
                   port: 8080
-                  path: "/healthz"
-                initialDelaySeconds: 60
+                  scheme: HTTP
+                initialDelaySeconds: 15
                 timeoutSeconds: 5
                 successThreshold: 1
                 failureThreshold: 5
