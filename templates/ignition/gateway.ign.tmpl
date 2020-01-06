@@ -206,6 +206,10 @@ storage:
           staticPodPath: ${kubelet_path}/manifests
           makeIPTablesUtilChains: false
 
+    ##
+    ## pod config
+    ##
+
     - path: ${pod_mount_path}/coredns/Corefile
       filesystem: root
       mode: 420
@@ -231,10 +235,6 @@ storage:
             reload
             loadbalance
           }
-
-    ##
-    ## pod config
-    ##
 
     - path: ${pod_mount_path}/keepalived/keepalived.conf
       filesystem: root
