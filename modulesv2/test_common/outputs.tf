@@ -6,8 +6,10 @@ output "test_params" {
       user               = var.user
       ssh_authorized_key = "cert-authority ${chomp(var.ssh_ca_public_key)}"
 
-      container_images = var.container_images
-      domains          = var.domains
+      container_images           = var.container_images
+      domains                    = var.domains
+      dns_forward_ip             = "9.9.9.9"
+      dns_forward_tls_servername = "dns.quad9.net"
 
       # Path mounted by kubelet running in container
       kubelet_path = "/var/lib/kubelet"

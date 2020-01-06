@@ -445,7 +445,7 @@ storage:
                   fieldRef:
                     fieldPath: status.hostIP
               volumeMounts:
-              - name: config-volume
+              - name: config-apiserver
                 mountPath: "${controller_mount_path}"
                 readOnly: true
               livenessProbe:
@@ -456,10 +456,32 @@ storage:
                   path: "/healthz"
                 initialDelaySeconds: 15
                 timeoutSeconds: 15
+            - name: keepalived
+              image: ${container_images.keepalived}
+              securityContext:
+                capabilities:
+                  add:
+                  - NET_ADMIN
+              args: [ "-P", "-D", "-f", "/etc/keepalived/keepalived.conf" ]
+              livenessProbe:
+                httpGet:
+                  scheme: HTTP
+                  host: 127.0.0.1
+                  port: 8080
+                  path: "/healthz"
+                initialDelaySeconds: 15
+                timeoutSeconds: 15
+              volumeMounts:
+              - name: config-keepalived
+                mountPath: /etc/keepalived/keepalived.conf
+                readOnly: true
             volumes:
-            - name: config-volume
+            - name: config-apiserver
               hostPath:
                 path: "${controller_mount_path}"
+            - name: config-keepalived
+              hostPath:
+                path: ${pod_mount_path}/keepalived/keepalived.conf
 
     - path: ${kubelet_path}/manifests/kube-controller-manager.yaml
       filesystem: root
@@ -547,45 +569,6 @@ storage:
             - name: config-volume
               hostPath:
                 path: "${controller_mount_path}"
-
-    - path: ${kubelet_path}/manifests/keepalived.yaml
-      filesystem: root
-      mode: 420
-      contents:
-        inline: |-
-          ---
-          apiVersion: v1
-          kind: Pod
-          metadata:
-            namespace: kube-system
-            name: keepalived
-          spec:
-            restartPolicy: Always
-            hostNetwork: true
-            containers:
-            - name: keepalived
-              image: ${container_images.keepalived}
-              securityContext:
-                capabilities:
-                  add:
-                  - NET_ADMIN
-              args: [ "-P", "-D", "-f", "/etc/keepalived/keepalived.conf" ]
-              livenessProbe:
-                httpGet:
-                  scheme: HTTP
-                  host: 127.0.0.1
-                  port: 8080
-                  path: "/healthz"
-                initialDelaySeconds: 15
-                timeoutSeconds: 15
-              volumeMounts:
-              - name: config-volume
-                mountPath: /etc/keepalived/keepalived.conf
-                readOnly: true
-            volumes:
-            - name: config-volume
-              hostPath:
-                path: ${pod_mount_path}/keepalived/keepalived.conf
 
 passwd:
   users:

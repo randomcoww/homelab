@@ -206,10 +206,6 @@ storage:
           staticPodPath: ${kubelet_path}/manifests
           makeIPTablesUtilChains: false
 
-    ##
-    ## pod config
-    ##
-
     - path: ${pod_mount_path}/coredns/Corefile
       filesystem: root
       mode: 420
@@ -228,13 +224,17 @@ storage:
             health
             forward . tls://${dns_forward_ip} {
               tls_servername ${dns_forward_tls_servername}
-              health_check 5s
+              health_check 20s
             }
             prometheus :${services.recursive_dns.ports.prometheus}
             cache 30
             reload
             loadbalance
           }
+
+    ##
+    ## pod config
+    ##
 
     - path: ${pod_mount_path}/keepalived/keepalived.conf
       filesystem: root
@@ -554,7 +554,7 @@ storage:
               hostPath:
                 path: ${pod_mount_path}/kea/kea-dhcp4.conf
 
-    - path: ${kubelet_path}/manifests/coredns.yaml
+    - path: ${kubelet_path}/manifests/gateway-node.yaml
       filesystem: root
       mode: 420
       contents:
@@ -564,63 +564,7 @@ storage:
           kind: Pod
           metadata:
             namespace: kube-system
-            name: coredns
-          spec:
-            restartPolicy: Always
-            hostNetwork: true
-            dnsPolicy: Default
-            containers:
-            - name: coredns
-              image: "${container_images.coredns}"
-              resources:
-                limits:
-                  memory: 170Mi
-                requests:
-                  cpu: 100m
-                  memory: 70Mi
-              args: [ "-conf", "/etc/coredns/Corefile" ]
-              livenessProbe:
-                httpGet:
-                  path: /health
-                  port: 8080
-                  scheme: HTTP
-                initialDelaySeconds: 60
-                timeoutSeconds: 5
-                successThreshold: 1
-                failureThreshold: 5
-              readinessProbe:
-                httpGet:
-                  path: /health
-                  port: 8080
-                  scheme: HTTP
-              securityContext:
-                allowPrivilegeEscalation: false
-                capabilities:
-                  add:
-                  - NET_BIND_SERVICE
-                  drop:
-                  - all
-                readOnlyRootFilesystem: true
-              volumeMounts:
-              - name: config-volume
-                mountPath: /etc/coredns/Corefile
-                readOnly: true
-            volumes:
-            - name: config-volume
-              hostPath:
-                path: ${pod_mount_path}/coredns/Corefile
-
-    - path: ${kubelet_path}/manifests/keepalived.yaml
-      filesystem: root
-      mode: 420
-      contents:
-        inline: |-
-          ---
-          apiVersion: v1
-          kind: Pod
-          metadata:
-            namespace: kube-system
-            name: keepalived
+            name: gateway-node
           spec:
             restartPolicy: Always
             hostNetwork: true
@@ -637,6 +581,37 @@ storage:
                 mountPath: /etc/nftables/nft.rules
                 readOnly: true
             containers:
+            - name: coredns
+              image: "${container_images.coredns}"
+              resources:
+                limits:
+                  memory: 170Mi
+                requests:
+                  cpu: 100m
+                  memory: 70Mi
+              args: [ "-conf", "/etc/coredns/Corefile" ]
+              livenessProbe:
+                httpGet:
+                  scheme: HTTP
+                  host: 127.0.0.1
+                  port: 8080
+                  path: "/healthz"
+                initialDelaySeconds: 60
+                timeoutSeconds: 5
+                successThreshold: 1
+                failureThreshold: 5
+              securityContext:
+                allowPrivilegeEscalation: false
+                capabilities:
+                  add:
+                  - NET_BIND_SERVICE
+                  drop:
+                  - all
+                readOnlyRootFilesystem: true
+              volumeMounts:
+              - name: config-coredns
+                mountPath: /etc/coredns/Corefile
+                readOnly: true
             - name: keepalived
               image: ${container_images.keepalived}
               securityContext:
@@ -644,17 +619,30 @@ storage:
                   add:
                   - NET_ADMIN
               args: [ "-P", "-D", "-f", "/etc/keepalived/keepalived.conf" ]
+              livenessProbe:
+                httpGet:
+                  scheme: HTTP
+                  host: 127.0.0.1
+                  port: 8080
+                  path: "/healthz"
+                initialDelaySeconds: 60
+                timeoutSeconds: 5
+                successThreshold: 1
+                failureThreshold: 5
               volumeMounts:
               - name: config-keepalived
                 mountPath: /etc/keepalived/keepalived.conf
                 readOnly: true
             volumes:
-            - name: config-keepalived
-              hostPath:
-                path: ${pod_mount_path}/keepalived/keepalived.conf
             - name: config-nftables
               hostPath:
                 path: ${pod_mount_path}/nftables/nft.rules
+            - name: config-coredns
+              hostPath:
+                path: ${pod_mount_path}/coredns/Corefile
+            - name: config-keepalived
+              hostPath:
+                path: ${pod_mount_path}/keepalived/keepalived.conf
 
     - path: ${kubelet_path}/manifests/conntrackd.yaml
       filesystem: root
