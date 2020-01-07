@@ -145,6 +145,10 @@ storage:
           staticPodPath: ${kubelet_path}/manifests
           makeIPTablesUtilChains: false
 
+    ##
+    ## pod config
+    ##
+
     - path: ${pod_mount_path}/coredns/Corefile
       filesystem: root
       mode: 420
@@ -172,7 +176,7 @@ storage:
           }
 
     ##
-    ## pod config
+    ## pod manifests
     ##
 
     - path: ${kubelet_path}/manifests/coredns.yaml
@@ -202,11 +206,10 @@ storage:
               args: [ "-conf", "/etc/coredns/Corefile" ]
               livenessProbe:
                 httpGet:
-                  scheme: HTTP
-                  host: 127.0.0.1
+                  path: /health
                   port: 8080
-                  path: "/healthz"
-                initialDelaySeconds: 60
+                  scheme: HTTP
+                initialDelaySeconds: 15
                 timeoutSeconds: 5
                 successThreshold: 1
                 failureThreshold: 5
