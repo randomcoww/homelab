@@ -24,15 +24,18 @@ locals {
     nftables                = "randomcoww/nftables:latest"
     kea                     = "randomcoww/kea:1.6.1"
     conntrackd              = "randomcoww/conntrackd:latest"
+    promtail                = "randomcoww/promtail:v1.2.0"
   }
 
   services = {
+    # local dev
     local_renderer = {
       ports = {
         http = 8080
         rpc  = 8081
       }
     }
+    # hypervisor internal
     renderer = {
       vip = "192.168.224.1"
       ports = {
@@ -41,7 +44,7 @@ locals {
       }
     }
 
-    # provisioner services
+    # outside of kubernetes network
     kea = {
       ports = {
         peer = 58082
@@ -59,8 +62,14 @@ locals {
         prometheus = 59153
       }
     }
+    loki = {
+      vip = "192.168.126.126"
+      ports = {
+        http_listen = 3100
+      }
+    }
 
-    # kubernetes services
+    # kubernetes network
     kubernetes_apiserver = {
       vip = "192.168.126.245"
       ports = {
