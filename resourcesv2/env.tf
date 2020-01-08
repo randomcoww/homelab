@@ -23,7 +23,7 @@ locals {
     busybox                 = "busybox:latest"
     nftables                = "randomcoww/nftables:latest"
     kea                     = "randomcoww/kea:1.6.1"
-    conntrackd              = "randomcoww/conntrack:latest"
+    conntrackd              = "randomcoww/conntrackd:latest"
   }
 
   services = {
