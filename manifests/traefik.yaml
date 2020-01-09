@@ -73,7 +73,7 @@ spec:
       terminationGracePeriodSeconds: 60
       volumes:
       containers:
-      - image: traefik:v1.7
+      - image: traefik:v2.1
         name: traefik-ingress-lb
         ports:
         - name: http
@@ -88,13 +88,14 @@ spec:
             add:
             - NET_BIND_SERVICE
         args:
-        - --api
-        - --kubernetes
-        - --logLevel=INFO
-        - --kubernetes.ingressendpoint.publishedservice=default/traefik-ingress-service
-        - --entryPoints=Name:https Address::443 TLS
-        - --entryPoints=Name:http Address::80
-        - --defaultentrypoints=https,http
+        - --api=true
+        - --api.insecure=true
+        - --accesslog=true
+        - --providers.kubernetesingress=true
+        - --providers.kubernetesingress.ingressclass=traefik
+        - --providers.kubernetesingress.ingressendpoint.publishedservice=default/traefik-ingress-service
+        - --entrypoints.https=true
+        - --entrypoints.https.address=:443
 
 ---
 kind: Service
@@ -136,7 +137,6 @@ metadata:
   name: traefik-web-ui
   annotations:
     kubernetes.io/ingress.class: traefik
-    ingress.kubernetes.io/ssl-redirect: "true"
 spec:
   rules:
   - host: traefik-ui.fuzzybunny.internal
