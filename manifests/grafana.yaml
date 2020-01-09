@@ -68,7 +68,7 @@ data:
           "fill": 1,
           "fillGradient": 0,
           "gridPos": {
-            "h": 10,
+            "h": 11,
             "w": 12,
             "x": 0,
             "y": 0
@@ -155,7 +155,7 @@ data:
           "fill": 1,
           "fillGradient": 0,
           "gridPos": {
-            "h": 10,
+            "h": 11,
             "w": 12,
             "x": 12,
             "y": 0
@@ -242,10 +242,10 @@ data:
           "fill": 1,
           "fillGradient": 0,
           "gridPos": {
-            "h": 10,
+            "h": 11,
             "w": 12,
             "x": 0,
-            "y": 10
+            "y": 11
           },
           "hiddenSeries": false,
           "id": 6,
@@ -331,10 +331,10 @@ data:
           "fill": 1,
           "fillGradient": 0,
           "gridPos": {
-            "h": 10,
+            "h": 11,
             "w": 12,
             "x": 12,
-            "y": 10
+            "y": 11
           },
           "hiddenSeries": false,
           "id": 4,
@@ -418,10 +418,10 @@ data:
           "fill": 1,
           "fillGradient": 0,
           "gridPos": {
-            "h": 10,
+            "h": 11,
             "w": 12,
             "x": 0,
-            "y": 20
+            "y": 22
           },
           "hiddenSeries": false,
           "id": 10,
@@ -505,10 +505,10 @@ data:
           "fill": 1,
           "fillGradient": 0,
           "gridPos": {
-            "h": 10,
+            "h": 11,
             "w": 12,
             "x": 12,
-            "y": 20
+            "y": 22
           },
           "hiddenSeries": false,
           "id": 12,
@@ -610,8 +610,254 @@ data:
         ]
       },
       "timezone": "",
-      "title": "Kubernetes",
+      "title": "kubernetes",
       "version": 4
+    }
+  etcd-logs.json: |
+    {
+      "annotations": {
+        "list": [
+          {
+            "builtIn": 1,
+            "datasource": "-- Grafana --",
+            "enable": true,
+            "hide": true,
+            "iconColor": "rgba(0, 211, 255, 1)",
+            "name": "Annotations & Alerts",
+            "type": "dashboard"
+          }
+        ]
+      },
+      "editable": true,
+      "gnetId": null,
+      "graphTooltip": 0,
+      "id": 2,
+      "links": [],
+      "panels": [
+        {
+          "datasource": "loki1",
+          "gridPos": {
+            "h": 11,
+            "w": 24,
+            "x": 0,
+            "y": 0
+          },
+          "id": 6,
+          "options": {
+            "showTime": true,
+            "sortOrder": "Descending"
+          },
+          "targets": [
+            {
+              "expr": "{container_name=\"etcd\",host=\"controller-0\"}",
+              "refId": "A"
+            }
+          ],
+          "timeFrom": null,
+          "timeShift": null,
+          "title": "etcd-controller-0",
+          "type": "logs"
+        },
+        {
+          "datasource": "loki1",
+          "gridPos": {
+            "h": 11,
+            "w": 24,
+            "x": 0,
+            "y": 11
+          },
+          "id": 2,
+          "options": {
+            "showTime": true,
+            "sortOrder": "Descending"
+          },
+          "targets": [
+            {
+              "expr": "{container_name=\"etcd\",host=\"controller-1\"}",
+              "refId": "A"
+            }
+          ],
+          "timeFrom": null,
+          "timeShift": null,
+          "title": "etcd-controller-1",
+          "type": "logs"
+        },
+        {
+          "datasource": "loki1",
+          "gridPos": {
+            "h": 11,
+            "w": 24,
+            "x": 0,
+            "y": 22
+          },
+          "id": 8,
+          "options": {
+            "showTime": true,
+            "sortOrder": "Descending"
+          },
+          "targets": [
+            {
+              "expr": "{container_name=\"etcd\",host=\"controller-2\"}",
+              "refId": "A"
+            }
+          ],
+          "timeFrom": null,
+          "timeShift": null,
+          "title": "etcd-controller-2",
+          "type": "logs"
+        }
+      ],
+      "refresh": "5s",
+      "schemaVersion": 21,
+      "style": "dark",
+      "tags": [],
+      "templating": {
+        "list": []
+      },
+      "time": {
+        "from": "now-6h",
+        "to": "now"
+      },
+      "timepicker": {
+        "refresh_intervals": [
+          "5s",
+          "10s",
+          "30s",
+          "1m",
+          "5m",
+          "15m",
+          "30m",
+          "1h",
+          "2h",
+          "1d"
+        ]
+      },
+      "timezone": "",
+      "title": "etcd",
+      "version": 3
+    }
+  kube-apiserver-logs.json: |
+    {
+      "annotations": {
+        "list": [
+          {
+            "builtIn": 1,
+            "datasource": "-- Grafana --",
+            "enable": true,
+            "hide": true,
+            "iconColor": "rgba(0, 211, 255, 1)",
+            "name": "Annotations & Alerts",
+            "type": "dashboard"
+          }
+        ]
+      },
+      "editable": true,
+      "gnetId": null,
+      "graphTooltip": 0,
+      "id": 2,
+      "links": [],
+      "panels": [
+        {
+          "datasource": "loki1",
+          "gridPos": {
+            "h": 11,
+            "w": 24,
+            "x": 0,
+            "y": 0
+          },
+          "id": 6,
+          "options": {
+            "showTime": true,
+            "sortOrder": "Descending"
+          },
+          "targets": [
+            {
+              "expr": "{container_name=\"kube-apiserver\",host=\"controller-0\"}",
+              "refId": "A"
+            }
+          ],
+          "timeFrom": null,
+          "timeShift": null,
+          "title": "kube-apiserver-controller-0",
+          "type": "logs"
+        },
+        {
+          "datasource": "loki1",
+          "gridPos": {
+            "h": 11,
+            "w": 24,
+            "x": 0,
+            "y": 11
+          },
+          "id": 2,
+          "options": {
+            "showTime": true,
+            "sortOrder": "Descending"
+          },
+          "targets": [
+            {
+              "expr": "{container_name=\"kube-apiserver\",host=\"controller-1\"}",
+              "refId": "A"
+            }
+          ],
+          "timeFrom": null,
+          "timeShift": null,
+          "title": "kube-apiserver-controller-1",
+          "type": "logs"
+        },
+        {
+          "datasource": "loki1",
+          "gridPos": {
+            "h": 11,
+            "w": 24,
+            "x": 0,
+            "y": 22
+          },
+          "id": 8,
+          "options": {
+            "showTime": true,
+            "sortOrder": "Descending"
+          },
+          "targets": [
+            {
+              "expr": "{container_name=\"kube-apiserver\",host=\"controller-2\"}",
+              "refId": "A"
+            }
+          ],
+          "timeFrom": null,
+          "timeShift": null,
+          "title": "kube-apiserver-controller-2",
+          "type": "logs"
+        }
+      ],
+      "refresh": "5s",
+      "schemaVersion": 21,
+      "style": "dark",
+      "tags": [],
+      "templating": {
+        "list": []
+      },
+      "time": {
+        "from": "now-6h",
+        "to": "now"
+      },
+      "timepicker": {
+        "refresh_intervals": [
+          "5s",
+          "10s",
+          "30s",
+          "1m",
+          "5m",
+          "15m",
+          "30m",
+          "1h",
+          "2h",
+          "1d"
+        ]
+      },
+      "timezone": "",
+      "title": "kube-apiserver",
+      "version": 3
     }
 
 ---
