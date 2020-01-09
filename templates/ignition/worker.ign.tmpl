@@ -41,6 +41,8 @@ systemd:
         WantedBy=local-fs.target
     %{~ endfor ~}
 
+    - name: ntpd.service
+      enabled: true
     - name: iscsid.service
       enable: true
     - name: docker.service
