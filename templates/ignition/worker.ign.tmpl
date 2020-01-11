@@ -36,7 +36,7 @@ systemd:
         [Mount]
         What=${disk.device}
         Where=${disk.mount_path}
-        Type=${disk.format}
+        Type=${lookup(disk, "format", "xfs")}
         [Install]
         WantedBy=local-fs.target
     %{~ endfor ~}
@@ -111,8 +111,8 @@ storage:
     - name: ${disk.label}
       mount:
         device: ${disk.device}
-        format: ${disk.format}
-        wipe_filesystem: false
+        format: ${lookup(disk, "format", "xfs")}
+        wipe_filesystem: ${lookup(disk, "wipe_filesystem", false)}
         label: ${upper(disk.label)}
     %{~ endfor ~}
 

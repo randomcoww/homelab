@@ -301,7 +301,7 @@ locals {
       components = [
         "worker"
       ]
-      memory = 40
+      memory = 48
       vcpu   = 4
       network = [
         {
@@ -324,86 +324,78 @@ locals {
           rom      = "/var/lib/libvirt/boot/SAS9300_8i_IT.bin"
         }
       ]
+      # Defaults:
+      # format = "xfs"
+      # wipe_filesystem = false
       disk = [
         {
           label      = "2YK7XTRD"
           device     = "/dev/disk/by-id/ata-WDC_WD100EFAX-68LHPN0_2YK7XTRD"
-          format     = "xfs"
           mount_path = "/minio/0"
         },
         {
           label      = "2YK87AVD"
           device     = "/dev/disk/by-id/ata-WDC_WD100EFAX-68LHPN0_2YK87AVD"
-          format     = "xfs"
           mount_path = "/minio/1"
         },
         {
           label      = "2YK89PND"
           device     = "/dev/disk/by-id/ata-WDC_WD100EFAX-68LHPN0_2YK89PND"
-          format     = "xfs"
           mount_path = "/minio/2"
         },
         {
           label      = "2YKG1X2D"
           device     = "/dev/disk/by-id/ata-WDC_WD100EFAX-68LHPN0_2YKG1X2D"
-          format     = "xfs"
           mount_path = "/minio/3"
         },
         {
           label      = "2YKGML5D"
           device     = "/dev/disk/by-id/ata-WDC_WD100EFAX-68LHPN0_2YKGML5D"
-          format     = "xfs"
           mount_path = "/minio/4"
         },
         {
           label      = "2YKGML7D"
           device     = "/dev/disk/by-id/ata-WDC_WD100EFAX-68LHPN0_2YKGML7D"
-          format     = "xfs"
           mount_path = "/minio/5"
         },
         {
           label      = "2YKGNL4D"
           device     = "/dev/disk/by-id/ata-WDC_WD100EFAX-68LHPN0_2YKGNL4D"
-          format     = "xfs"
           mount_path = "/minio/6"
         },
         {
           label      = "JEK830AZ"
           device     = "/dev/disk/by-id/ata-WDC_WD100EFAX-68LHPN0_JEK830AZ"
-          format     = "xfs"
           mount_path = "/minio/7"
         },
         {
           label      = "JEK830RZ"
           device     = "/dev/disk/by-id/ata-WDC_WD100EFAX-68LHPN0_JEK830RZ"
-          format     = "xfs"
           mount_path = "/minio/8"
         },
         {
           label      = "JEK8V1YZ"
           device     = "/dev/disk/by-id/ata-WDC_WD100EFAX-68LHPN0_JEK8V1YZ"
-          format     = "xfs"
           mount_path = "/minio/9"
         },
         {
           label      = "JEK8YTSZ"
           device     = "/dev/disk/by-id/ata-WDC_WD100EFAX-68LHPN0_JEK8YTSZ"
-          format     = "xfs"
           mount_path = "/minio/10"
         },
         {
           label      = "JEKAZ92N"
           device     = "/dev/disk/by-id/ata-WDC_WD100EFAX-68LHPN0_JEKAZ92N"
-          format     = "xfs"
           mount_path = "/minio/11"
         },
         {
-          label      = "S4PGNF0M414895K"
-          source     = "/dev/disk/by-id/ata-Samsung_SSD_860_QVO_1TB_S4PGNF0M414895K"
-          target     = "vda"
-          device     = "/dev/vda"
-          format     = "ext4"
-          mount_path = "/pv"
+          label           = "S4PGNF0M414895K"
+          source          = "/dev/disk/by-id/ata-Samsung_SSD_860_QVO_1TB_S4PGNF0M414895K"
+          target          = "vda"
+          device          = "/dev/vda"
+          format          = "ext4"
+          wipe_filesystem = true
+          mount_path      = "/pv"
         },
       ]
     }
@@ -411,7 +403,7 @@ locals {
       components = [
         "worker"
       ]
-      memory = 40
+      memory = 48
       vcpu   = 4
       network = [
         {
@@ -434,14 +426,18 @@ locals {
           rom      = "/var/lib/libvirt/boot/SAS9300_8i_IT.bin"
         }
       ]
+      # Defaults:
+      # format = "xfs"
+      # wipe_filesystem = false
       disk = [
         {
-          label      = "S4PGNF0M410395Z"
-          source     = "/dev/disk/by-id/ata-Samsung_SSD_860_QVO_1TB_S4PGNF0M410395Z"
-          target     = "vda"
-          device     = "/dev/vda"
-          format     = "ext4"
-          mount_path = "/pv"
+          label           = "S4PGNF0M410395Z"
+          source          = "/dev/disk/by-id/ata-Samsung_SSD_860_QVO_1TB_S4PGNF0M410395Z"
+          target          = "vda"
+          device          = "/dev/vda"
+          format          = "ext4"
+          wipe_filesystem = true
+          mount_path      = "/pv"
         }
       ]
     }
