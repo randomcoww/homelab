@@ -544,7 +544,7 @@ spec:
   ports:
   - name: http
     name: web
-    port: 80
+    port: 9090
     protocol: TCP
     targetPort: 9090
   selector:

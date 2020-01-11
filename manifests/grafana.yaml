@@ -7,15 +7,15 @@ metadata:
 data:
   datasources.yaml: |
     datasources:
-    - name: 'prom1'
+    - name: 'prometheus-default'
       type: 'prometheus'
       access: 'proxy'
       org_id: 1
-      url: 'http://prometheus-server'
+      url: 'http://prometheus-server:9090'
       is_default: true
       version: 1
       editable: false
-    - name: 'loki1'
+    - name: 'static-pod-logs'
       type: 'loki'
       access: 'proxy'
       org_id: 1
@@ -60,6 +60,7 @@ data:
       "links": [],
       "panels": [
         {
+          "datasource": "prometheus-default",
           "aliasColors": {},
           "bars": false,
           "dashLength": 10,
@@ -147,6 +148,7 @@ data:
           }
         },
         {
+          "datasource": "prometheus-default",
           "aliasColors": {},
           "bars": false,
           "dashLength": 10,
@@ -234,6 +236,7 @@ data:
           }
         },
         {
+          "datasource": "prometheus-default",
           "aliasColors": {},
           "bars": false,
           "dashLength": 10,
@@ -323,6 +326,7 @@ data:
           }
         },
         {
+          "datasource": "prometheus-default",
           "aliasColors": {},
           "bars": false,
           "dashLength": 10,
@@ -410,6 +414,7 @@ data:
           }
         },
         {
+          "datasource": "prometheus-default",
           "aliasColors": {},
           "bars": false,
           "dashLength": 10,
@@ -497,6 +502,7 @@ data:
           }
         },
         {
+          "datasource": "prometheus-default",
           "aliasColors": {},
           "bars": false,
           "dashLength": 10,
@@ -635,7 +641,7 @@ data:
       "links": [],
       "panels": [
         {
-          "datasource": "loki1",
+          "datasource": "static-pod-logs",
           "gridPos": {
             "h": 11,
             "w": 24,
@@ -659,7 +665,7 @@ data:
           "type": "logs"
         },
         {
-          "datasource": "loki1",
+          "datasource": "static-pod-logs",
           "gridPos": {
             "h": 11,
             "w": 24,
@@ -683,7 +689,7 @@ data:
           "type": "logs"
         },
         {
-          "datasource": "loki1",
+          "datasource": "static-pod-logs",
           "gridPos": {
             "h": 11,
             "w": 24,
@@ -758,7 +764,7 @@ data:
       "links": [],
       "panels": [
         {
-          "datasource": "loki1",
+          "datasource": "static-pod-logs",
           "gridPos": {
             "h": 11,
             "w": 24,
@@ -782,7 +788,7 @@ data:
           "type": "logs"
         },
         {
-          "datasource": "loki1",
+          "datasource": "static-pod-logs",
           "gridPos": {
             "h": 11,
             "w": 24,
@@ -806,7 +812,7 @@ data:
           "type": "logs"
         },
         {
-          "datasource": "loki1",
+          "datasource": "static-pod-logs",
           "gridPos": {
             "h": 11,
             "w": 24,

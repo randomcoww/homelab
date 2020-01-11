@@ -18,7 +18,7 @@ locals {
     keepalived              = "randomcoww/keepalived:latest"
     cni_plugins             = "randomcoww/cni_plugins:v0.8.3"
     coredns                 = "coredns/coredns:1.6.5"
-    external_dns            = "registry.opensource.zalan.do/teapot/external-dns:latest"
+    external_dns            = "randomcoww/external_dns:v0.5.17"
     kapprover               = "randomcoww/kapprover:v0.0.4"
     busybox                 = "busybox:latest"
     nftables                = "randomcoww/nftables:latest"
