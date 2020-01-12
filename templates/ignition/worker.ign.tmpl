@@ -88,7 +88,7 @@ systemd:
           --dns host \
           --hosts-entry host \
           --stage1-from-dir=stage1-fly.aci \
-          docker://${container_images.kubelet} \
+          docker://${container_images.hyperkube} \
             --exec=/usr/local/bin/kubelet -- \
             --config=${kubelet_path}/kubelet-config.yaml \
             --kubeconfig=${kubelet_path}/kubelet.kubeconfig \
