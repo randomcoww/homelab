@@ -643,10 +643,82 @@ data:
         {
           "datasource": "static-pod-logs",
           "gridPos": {
-            "h": 11,
+            "h": 8,
             "w": 24,
             "x": 0,
             "y": 0
+          },
+          "id": 14,
+          "options": {
+            "showTime": true,
+            "sortOrder": "Descending"
+          },
+          "targets": [
+            {
+              "expr": "{container_name=\"kube-etcd-wrapper\",host=\"controller-0\"}",
+              "refId": "A"
+            }
+          ],
+          "timeFrom": null,
+          "timeShift": null,
+          "title": "etcd-wrapper-controller-2",
+          "type": "logs"
+        },
+        {
+          "datasource": "static-pod-logs",
+          "gridPos": {
+            "h": 8,
+            "w": 24,
+            "x": 0,
+            "y": 8
+          },
+          "id": 12,
+          "options": {
+            "showTime": true,
+            "sortOrder": "Descending"
+          },
+          "targets": [
+            {
+              "expr": "{container_name=\"kube-etcd-wrapper\",host=\"controller-1\"}",
+              "refId": "A"
+            }
+          ],
+          "timeFrom": null,
+          "timeShift": null,
+          "title": "etcd-wrapper-controller-1",
+          "type": "logs"
+        },
+        {
+          "datasource": "static-pod-logs",
+          "gridPos": {
+            "h": 8,
+            "w": 24,
+            "x": 0,
+            "y": 16
+          },
+          "id": 10,
+          "options": {
+            "showTime": true,
+            "sortOrder": "Descending"
+          },
+          "targets": [
+            {
+              "expr": "{container_name=\"kube-etcd-wrapper\",host=\"controller-2\"}",
+              "refId": "A"
+            }
+          ],
+          "timeFrom": null,
+          "timeShift": null,
+          "title": "etcd-wrapper-controller-0",
+          "type": "logs"
+        },
+        {
+          "datasource": "static-pod-logs",
+          "gridPos": {
+            "h": 8,
+            "w": 24,
+            "x": 0,
+            "y": 24
           },
           "id": 6,
           "options": {
@@ -667,10 +739,10 @@ data:
         {
           "datasource": "static-pod-logs",
           "gridPos": {
-            "h": 11,
+            "h": 8,
             "w": 24,
             "x": 0,
-            "y": 11
+            "y": 32
           },
           "id": 2,
           "options": {
@@ -691,10 +763,10 @@ data:
         {
           "datasource": "static-pod-logs",
           "gridPos": {
-            "h": 11,
+            "h": 8,
             "w": 24,
             "x": 0,
-            "y": 22
+            "y": 40
           },
           "id": 8,
           "options": {
