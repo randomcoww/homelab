@@ -41,6 +41,10 @@ systemd:
         WantedBy=local-fs.target
     %{~ endfor ~}
 
+    - name: sshd.service
+      enable: true
+    - name: sshd.socket
+      mask: true
     - name: ntpd.service
       enabled: true
     - name: iscsid.service
