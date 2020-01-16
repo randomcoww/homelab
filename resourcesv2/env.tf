@@ -6,7 +6,7 @@ locals {
   # kubelet image is used for static pods and does not need to match the kubernetes version
   # hyperkube is used for the worker kubelet and should match the version
   container_images = {
-    kubelet                 = "randomcoww/kubernetes:kubelet-v1.17.0"
+    kubelet                 = "randomcoww/kubernetes:kubelet-${local.kubernetes_version}"
     kube_apiserver          = "randomcoww/kubernetes:kube-master-${local.kubernetes_version}"
     kube_controller_manager = "randomcoww/kubernetes:kube-master-${local.kubernetes_version}"
     kube_scheduler          = "randomcoww/kubernetes:kube-master-${local.kubernetes_version}"

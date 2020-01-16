@@ -42,11 +42,12 @@ data:
     }
 
 ---
-kind: Deployment
+kind: StatefulSet
 apiVersion: apps/v1
 metadata:
   name: transmission
 spec:
+  serviceName: transmission
   replicas: 1
   selector:
     matchLabels:
@@ -94,12 +95,16 @@ spec:
         ports:
         - containerPort: 9091
         volumeMounts:
+        - name: transmission-resume
+          mountPath: /transmission
         - name: transmission-config
           mountPath: /var/lib/transmission/settings.json
           subPath: settings.json
         - name: torrent-vol
           mountPath: "/vol"
       volumes:
+      - name: transmission-resume
+        emptyDir: {}
       - name: transmission-config
         configMap:
           name: transmission-config
