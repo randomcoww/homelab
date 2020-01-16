@@ -10,8 +10,8 @@ networkd:
         LinkLocalAddressing=no
         DHCP=yes
 
-        [DHCP]
-        UseMTU=yes
+        [Link]
+        MTUBytes=${mtu}
 
     - name: ${host_network.int.if}.network
       contents: |
