@@ -192,7 +192,7 @@ https://grafana.fuzzybunny.internal
 cd reqourcesv2/manifests
 kubectl apply -f prometheus.yaml
 kubectl apply -f promtail.yaml
-kubectl apply -f loki.yaml
+kubectl apply -f http://127.0.0.1:8080/generic?manifest=loki
 kubectl apply -f grafana.yaml
 ```
 
