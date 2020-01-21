@@ -70,7 +70,7 @@ data:
         schema: v9
         store: boltdb
     server:
-      http_listen_port: 3100
+      http_listen_port: ${services.loki.ports.http_listen}
     storage_config:
       boltdb:
         directory: /data/loki/index
@@ -130,7 +130,7 @@ metadata:
 spec:
   clusterIP: None
   ports:
-  - port: 3100
+  - port: ${services.loki.ports.http_listen}
     protocol: TCP
     name: http-metrics
     targetPort: http-metrics
@@ -145,9 +145,9 @@ metadata:
   namespace: default
 spec:
   type: LoadBalancer
-  loadBalancerIP: "192.168.126.126"
+  loadBalancerIP: "${services.loki.vip}"
   ports:
-  - port: 3100
+  - port: ${services.loki.ports.http_listen}
     protocol: TCP
     name: http-metrics
     targetPort: http-metrics
@@ -200,7 +200,7 @@ spec:
           subPath: 
         ports:
         - name: http-metrics
-          containerPort: 3100
+          containerPort: ${services.loki.ports.http_listen}
           protocol: TCP
         livenessProbe:
           httpGet:
