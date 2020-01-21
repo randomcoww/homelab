@@ -104,7 +104,8 @@ spec:
           mountPath: "/vol"
       volumes:
       - name: transmission-resume
-        emptyDir: {}
+        hostPath:
+          path: /pv/sync/transmission
       - name: transmission-config
         configMap:
           name: transmission-config
