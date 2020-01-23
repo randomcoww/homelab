@@ -389,13 +389,9 @@ locals {
           mount_path = "/minio/11"
         },
         {
-          label           = "S4PGNF0M414895K"
-          source          = "/dev/disk/by-id/ata-Samsung_SSD_860_QVO_1TB_S4PGNF0M414895K"
-          target          = "vda"
-          device          = "/dev/vda"
-          format          = "ext4"
-          wipe_filesystem = true
-          mount_path      = "/pv"
+          source = "/dev/disk/by-id/ata-Samsung_SSD_860_QVO_1TB_S4PGNF0M414895K"
+          target = "vda"
+          device = "/dev/vda"
         },
       ]
     }
@@ -431,13 +427,9 @@ locals {
       # wipe_filesystem = false
       disk = [
         {
-          label           = "S4PGNF0M410395Z"
-          source          = "/dev/disk/by-id/ata-Samsung_SSD_860_QVO_1TB_S4PGNF0M410395Z"
-          target          = "vda"
-          device          = "/dev/vda"
-          format          = "ext4"
-          wipe_filesystem = true
-          mount_path      = "/pv"
+          source = "/dev/disk/by-id/ata-Samsung_SSD_860_QVO_1TB_S4PGNF0M410395Z"
+          target = "vda"
+          device = "/dev/vda"
         }
       ]
     }

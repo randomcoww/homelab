@@ -28,6 +28,8 @@ networkd:
 systemd:
   units:
     %{~ for disk in host_disks ~}
+    %{~ if lookup(disk, "label", null) != null ~}
+    %{~ if lookup(disk, "mount_path", null) != null ~}
     - name: ${join("-", compact(split("/", disk.mount_path)))}.mount
       enable: true
       contents: |
@@ -39,6 +41,8 @@ systemd:
         Type=${lookup(disk, "format", "xfs")}
         [Install]
         WantedBy=local-fs.target
+    %{~ endif ~}
+    %{~ endif ~}
     %{~ endfor ~}
 
     - name: sshd.service
@@ -78,10 +82,8 @@ systemd:
         ExecStartPre=-/usr/bin/rkt rm --uuid-file=/var/cache/kubelet-pod.uuid
         ExecStart=/usr/bin/rkt run \
           --uuid-file-save=/var/cache/kubelet-pod.uuid \
-          --volume var-lib-containerd,kind=host,source=/pv/containerd,readOnly=false \
-          --volume iscsiadm,kind=host,source=/usr/sbin/iscsiadm \
-          --mount volume=var-lib-containerd,target=/pv/containerd \
-          --mount volume=iscsiadm,target=/usr/sbin/iscsiadm \
+          --volume var-lib-containerd,kind=host,source=/var/lib/containerd,readOnly=false \
+          --mount volume=var-lib-containerd,target=/var/lib/containerd \
           --insecure-options=image \
           --volume coreos-var-lib-kubelet,kind=host,source=${kubelet_path},readOnly=false,recursive=true \
           --volume coreos-var-log,kind=host,source=/var/log,readOnly=false \
@@ -112,12 +114,14 @@ systemd:
 storage:
   filesystems:
     %{~ for disk in host_disks ~}
+    %{~ if lookup(disk, "label", null) != null ~}
     - name: ${disk.label}
       mount:
         device: ${disk.device}
         format: ${lookup(disk, "format", "xfs")}
         wipe_filesystem: ${lookup(disk, "wipe_filesystem", false)}
         label: ${upper(disk.label)}
+    %{~ endif ~}
     %{~ endfor ~}
 
   files:
@@ -140,7 +144,7 @@ storage:
       contents:
         inline: |-
           version = 2
-          root = "/pv/containerd"
+          root = "/var/lib/containerd"
           oom_score = -999
           [plugins]
             [plugins."io.containerd.grpc.v1.cri"]
