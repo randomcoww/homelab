@@ -10,7 +10,7 @@ locals {
     kube_apiserver          = "randomcoww/kubernetes:kube-master-${local.kubernetes_version}"
     kube_controller_manager = "randomcoww/kubernetes:kube-master-${local.kubernetes_version}"
     kube_scheduler          = "randomcoww/kubernetes:kube-master-${local.kubernetes_version}"
-    hyperkube               = "randomcoww/kubernetes:kubelet-${local.kubernetes_version}"
+    hyperkube               = "gcr.io/google_containers/hyperkube:${local.kubernetes_version}"
     kube_proxy              = "randomcoww/kubernetes:kube-proxy-${local.kubernetes_version}"
     etcd_wrapper            = "randomcoww/etcd-wrapper:v0.2.0"
     etcd                    = "randomcoww/etcd:v3.4.3"
@@ -306,6 +306,7 @@ locals {
       network = [
         {
           network = "store"
+          ip      = "192.168.127.223"
           if      = "eth0"
         },
         {
@@ -389,9 +390,12 @@ locals {
           mount_path = "/minio/11"
         },
         {
-          source = "/dev/disk/by-id/ata-Samsung_SSD_860_QVO_1TB_S4PGNF0M414895K"
-          target = "vda"
-          device = "/dev/vda"
+          label      = "S4PGNF0M414895K"
+          source     = "/dev/disk/by-id/ata-Samsung_SSD_860_QVO_1TB_S4PGNF0M414895K"
+          target     = "vda"
+          device     = "/dev/vda"
+          format     = "ext4"
+          mount_path = "/pv"
         },
       ]
     }
@@ -404,6 +408,7 @@ locals {
       network = [
         {
           network = "store"
+          ip      = "192.168.127.224"
           if      = "eth0"
         },
         {
@@ -427,9 +432,12 @@ locals {
       # wipe_filesystem = false
       disk = [
         {
-          source = "/dev/disk/by-id/ata-Samsung_SSD_860_QVO_1TB_S4PGNF0M410395Z"
-          target = "vda"
-          device = "/dev/vda"
+          label      = "S4PGNF0M410395Z"
+          source     = "/dev/disk/by-id/ata-Samsung_SSD_860_QVO_1TB_S4PGNF0M410395Z"
+          target     = "vda"
+          device     = "/dev/vda"
+          format     = "ext4"
+          mount_path = "/pv"
         }
       ]
     }

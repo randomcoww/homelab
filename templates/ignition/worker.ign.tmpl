@@ -8,10 +8,15 @@ networkd:
 
         [Network]
         LinkLocalAddressing=no
-        DHCP=yes
+        DHCP=no
+        Gateway=${networks.store.router}
+        DNS=${services.recursive_dns.vip}
 
         [Link]
         MTUBytes=${mtu}
+
+        [Address]
+        Address=${host_network.store.ip}/${networks.store.cidr}
 
     - name: ${host_network.int.if}.network
       contents: |
@@ -44,11 +49,6 @@ systemd:
     %{~ endif ~}
     %{~ endif ~}
     %{~ endfor ~}
-
-    - name: sshd.service
-      enable: true
-    - name: sshd.socket
-      mask: true
     - name: ntpd.service
       enabled: true
     - name: iscsid.service
@@ -83,7 +83,9 @@ systemd:
         ExecStart=/usr/bin/rkt run \
           --uuid-file-save=/var/cache/kubelet-pod.uuid \
           --volume var-lib-containerd,kind=host,source=/var/lib/containerd,readOnly=false \
+          --volume iscsiadm,kind=host,source=/usr/sbin/iscsiadm \
           --mount volume=var-lib-containerd,target=/var/lib/containerd \
+          --mount volume=iscsiadm,target=/usr/sbin/iscsiadm \
           --insecure-options=image \
           --volume coreos-var-lib-kubelet,kind=host,source=${kubelet_path},readOnly=false,recursive=true \
           --volume coreos-var-log,kind=host,source=/var/log,readOnly=false \
@@ -137,6 +139,12 @@ storage:
       contents:
         inline: |
           fs.inotify.max_user_watches=16184
+    - path: /etc/modules-load.d/iscsi.conf
+      filesystem: root
+      mode: 0644
+      contents:
+        inline: |
+          iscsi_tcp
 
     - path: /etc/containerd/config.toml
       filesystem: root

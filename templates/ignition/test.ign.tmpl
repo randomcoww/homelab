@@ -32,10 +32,6 @@ networkd:
 
 systemd:
   units:
-    - name: sshd.service
-      enable: true
-    - name: sshd.socket
-      mask: true
     - name: ntpd.service
       enabled: true
     - name: docker.service
