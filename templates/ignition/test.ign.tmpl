@@ -82,7 +82,6 @@ systemd:
           docker://${container_images.kubelet} \
             --exec=/usr/local/bin/kubelet -- \
             --config=${kubelet_path}/kubelet-config.yaml \
-            --node-ip=${host_network.store.ip} \
             --register-node=false \
             --container-runtime=remote \
             --container-runtime-endpoint=unix:///run/containerd/containerd.sock
