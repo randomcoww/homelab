@@ -1,24 +1,20 @@
 ---
 networkd:
   units:
-    - name: ${host_network.store.if}.network
+    - name: 00-${host_network.store.if}.network
       contents: |
         [Match]
         Name=${host_network.store.if}
 
         [Network]
         LinkLocalAddressing=no
-        DHCP=no
-        Gateway=${networks.store.router}
-        DNS=${services.recursive_dns.vip}
+        DHCP=yes
 
-        [Link]
-        MTUBytes=${mtu}
+        [DHCP]
+        UseMTU=true
+        UseDomains=true
 
-        [Address]
-        Address=${host_network.store.ip}/${networks.store.cidr}
-
-    - name: ${host_network.int.if}.network
+    - name: 00-${host_network.int.if}.network
       contents: |
         [Match]
         Name=${host_network.int.if}
@@ -29,6 +25,14 @@ networkd:
         [Network]
         LinkLocalAddressing=no
         DHCP=no
+
+    - name: 50-kube-proxy.network
+      contents: |
+        [Match]
+        Name=kube*
+
+        [Link]
+        Unmanaged=true
 
 systemd:
   units:
