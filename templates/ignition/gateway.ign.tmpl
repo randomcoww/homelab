@@ -12,7 +12,6 @@ networkd:
 
         [Address]
         Address=${host_network.store.ip}/${networks.store.cidr}
-
     - name: 00-${host_network.lan.if}.network
       contents: |
         [Match]
@@ -24,7 +23,6 @@ networkd:
 
         [Address]
         Address=${host_network.lan.ip}/${networks.lan.cidr}
-
     - name: 00-${host_network.sync.if}.network
       contents: |
         [Match]
@@ -36,7 +34,6 @@ networkd:
 
         [Address]
         Address=${host_network.sync.ip}/${networks.sync.cidr}
-
     - name: 00-${host_network.host_wan.if}.network
       contents: |
         [Match]
@@ -58,7 +55,6 @@ networkd:
         UseDomains=false
         UseTimezone=no
         RouteMetric=512
-
     - name: 00-${host_network.wan.if}.network
       contents: |
         [Match]
@@ -78,7 +74,6 @@ networkd:
         UseTimezone=no
         RouteMetric=512
         RouteTable=${host_network.wan.route_table}
-
     - name: 00-${host_network.int.if}.network
       contents: |
         [Match]
@@ -434,8 +429,8 @@ storage:
           {
             "Dhcp4": {
               "valid-lifetime": 1200,
-              "renew-timer": 1200,
-              "rebind-timer": 1200,
+              "renew-timer": 300,
+              "rebind-timer": 600,
               "interfaces-config": {
                 "interfaces": ${jsonencode([
                 for k in keys(networks):

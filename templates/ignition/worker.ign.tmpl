@@ -8,12 +8,15 @@ networkd:
 
         [Network]
         LinkLocalAddressing=no
-        DHCP=yes
+        DHCP=no
+        Gateway=${networks.store.router}
+        DNS=${services.recursive_dns.vip}
 
-        [DHCP]
-        UseMTU=true
-        UseDomains=true
+        [Link]
+        MTUBytes=${mtu}
 
+        [Address]
+        Address=${host_network.store.ip}/${networks.store.cidr}
     - name: 00-${host_network.int.if}.network
       contents: |
         [Match]
@@ -25,11 +28,17 @@ networkd:
         [Network]
         LinkLocalAddressing=no
         DHCP=no
-
     - name: 50-kube-proxy.network
       contents: |
         [Match]
         Name=kube*
+
+        [Link]
+        Unmanaged=true
+    - name: 50-veth.network
+      contents: |
+        [Match]
+        Name=veth*
 
         [Link]
         Unmanaged=true

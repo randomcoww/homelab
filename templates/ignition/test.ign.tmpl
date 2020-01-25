@@ -14,6 +14,8 @@ networkd:
         UseMTU=true
         UseDomains=true
 
+        [Link]
+        MTUBytes=${mtu}
     - name: 00-${host_network.int.if}.network
       contents: |
         [Match]
@@ -25,11 +27,17 @@ networkd:
         [Network]
         LinkLocalAddressing=no
         DHCP=no
-
     - name: 50-kube-proxy.network
       contents: |
         [Match]
         Name=kube*
+
+        [Link]
+        Unmanaged=true
+    - name: 50-veth.network
+      contents: |
+        [Match]
+        Name=veth*
 
         [Link]
         Unmanaged=true

@@ -17,7 +17,6 @@ networkd:
 
         [Address]
         Address=${host_network.store.ip}/${networks.store.cidr}
-
     - name: 00-${host_network.int.if}.network
       contents: |
         [Match]

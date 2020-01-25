@@ -1,3 +1,39 @@
+apiVersion: openebs.io/v1alpha1
+kind: StoragePool
+metadata:
+  name: mpd
+  type: hostdir
+spec:
+  path: "/pv/mpd"
+
+---
+apiVersion: storage.k8s.io/v1
+kind: StorageClass
+metadata:
+  name: openebs-mpd
+  annotations:
+    openebs.io/cas-type: jiva
+    cas.openebs.io/config: |
+      - name: ReplicaCount
+        value: "2"
+      - name: StoragePool
+        value: mpd
+provisioner: openebs.io/provisioner-iscsi
+
+---
+kind: PersistentVolumeClaim
+apiVersion: v1
+metadata:
+  name: mpd-pvc
+spec:
+  storageClassName: openebs-mpd
+  accessModes:
+  - ReadWriteOnce
+  resources:
+    requests:
+      storage: 2G
+
+---
 apiVersion: v1
 kind: ConfigMap
 metadata:
@@ -9,10 +45,10 @@ data:
     port "6600"
 
     music_directory "/mpd/music/mnt"
-    playlist_directory "/mpd/cache/mnt/playlists"
-    db_file "/mpd/cache/mnt/tag_cache"
-    state_file "/mpd/cache/mnt/state"
-    sticker_file "/mpd/cache/mnt/sticker.sql"
+    playlist_directory "/mpd/cache/playlists"
+    db_file "/mpd/cache/tag_cache"
+    state_file "/mpd/cache/state"
+    sticker_file "/mpd/cache/sticker.sql"
 
     filesystem_charset "UTF-8"
     id3v1_encoding "UTF-8"
@@ -60,15 +96,6 @@ spec:
         - "/vol/mnt"
         volumeMounts:
         - name: music-data
-          mountPath: "/vol"
-      - name: wait-mount-mpd
-        image: busybox:latest
-        command:
-        - "/bin/mountpoint"
-        args:
-        - "/vol/mnt"
-        volumeMounts:
-        - name: mpd-data
           mountPath: "/vol"
       containers:
       - name: mpd

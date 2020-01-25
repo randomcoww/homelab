@@ -1,3 +1,39 @@
+apiVersion: openebs.io/v1alpha1
+kind: StoragePool
+metadata:
+  name: transmission
+  type: hostdir
+spec:
+  path: "/pv/transmission"
+
+---
+apiVersion: storage.k8s.io/v1
+kind: StorageClass
+metadata:
+  name: openebs-transmission
+  annotations:
+    openebs.io/cas-type: jiva
+    cas.openebs.io/config: |
+      - name: ReplicaCount
+        value: "2"
+      - name: StoragePool
+        value: transmission
+provisioner: openebs.io/provisioner-iscsi
+
+---
+kind: PersistentVolumeClaim
+apiVersion: v1
+metadata:
+  name: transmission-pvc
+spec:
+  storageClassName: openebs-transmission
+  accessModes:
+  - ReadWriteOnce
+  resources:
+    requests:
+      storage: 400G
+
+---
 apiVersion: v1
 kind: ConfigMap
 metadata:
@@ -104,8 +140,8 @@ spec:
           mountPath: "/vol"
       volumes:
       - name: transmission-resume
-        hostPath:
-          path: /pv/sync/transmission
+        persistentVolumeClaim:
+          claimName: transmission-pvc
       - name: transmission-config
         configMap:
           name: transmission-config

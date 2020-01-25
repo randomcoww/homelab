@@ -1,3 +1,39 @@
+apiVersion: openebs.io/v1alpha1
+kind: StoragePool
+metadata:
+  name: unifi
+  type: hostdir
+spec:
+  path: "/pv/unifi"
+
+---
+apiVersion: storage.k8s.io/v1
+kind: StorageClass
+metadata:
+  name: openebs-unifi
+  annotations:
+    openebs.io/cas-type: jiva
+    cas.openebs.io/config: |
+      - name: ReplicaCount
+        value: "2"
+      - name: StoragePool
+        value: unifi
+provisioner: openebs.io/provisioner-iscsi
+
+---
+kind: PersistentVolumeClaim
+apiVersion: v1
+metadata:
+  name: unifi-pvc
+spec:
+  storageClassName: openebs-unifi
+  accessModes:
+  - ReadWriteOnce
+  resources:
+    requests:
+      storage: 2G
+
+---
 kind: Deployment
 apiVersion: apps/v1
 metadata:
@@ -60,10 +96,11 @@ spec:
           value: /unifi/mnt
       volumes:
       - name: unifi-data
-        emptyDir: {}
-      - name: unifi-backup
         persistentVolumeClaim:
           claimName: unifi-pvc
+      - name: unifi-backup
+        persistentVolumeClaim:
+          claimName: unifi-backup-pvc
 
 ---
 kind: Service
