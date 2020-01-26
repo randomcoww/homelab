@@ -10,7 +10,7 @@ locals {
     kube_apiserver          = "randomcoww/kubernetes:kube-master-${local.kubernetes_version}"
     kube_controller_manager = "randomcoww/kubernetes:kube-master-${local.kubernetes_version}"
     kube_scheduler          = "randomcoww/kubernetes:kube-master-${local.kubernetes_version}"
-    hyperkube               = "gcr.io/google_containers/hyperkube:${local.kubernetes_version}"
+    hyperkube               = "randomcoww/kubernetes:kubelet-${local.kubernetes_version}"
     kube_proxy              = "randomcoww/kubernetes:kube-proxy-${local.kubernetes_version}"
     etcd_wrapper            = "randomcoww/etcd-wrapper:v0.2.0"
     etcd                    = "randomcoww/etcd:v3.4.3"

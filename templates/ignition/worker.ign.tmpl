@@ -64,8 +64,6 @@ systemd:
     %{~ endfor ~}
     - name: ntpd.service
       enabled: true
-    - name: iscsid.service
-      enable: true
     - name: docker.service
       mask: true
     - name: docker.socket
@@ -96,9 +94,7 @@ systemd:
         ExecStart=/usr/bin/rkt run \
           --uuid-file-save=/var/cache/kubelet-pod.uuid \
           --volume var-lib-containerd,kind=host,source=/var/lib/containerd,readOnly=false \
-          --volume iscsiadm,kind=host,source=/usr/sbin/iscsiadm \
           --mount volume=var-lib-containerd,target=/var/lib/containerd \
-          --mount volume=iscsiadm,target=/usr/sbin/iscsiadm \
           --insecure-options=image \
           --volume coreos-var-lib-kubelet,kind=host,source=${kubelet_path},readOnly=false,recursive=true \
           --volume coreos-var-log,kind=host,source=/var/log,readOnly=false \

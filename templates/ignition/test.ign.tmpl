@@ -121,6 +121,12 @@ storage:
       contents:
         inline: |
           fs.inotify.max_user_watches=16184
+    - path: /etc/modules-load.d/iscsi.conf
+      filesystem: root
+      mode: 0644
+      contents:
+        inline: |
+          iscsi_tcp
 
     - path: /etc/containerd/config.toml
       filesystem: root
