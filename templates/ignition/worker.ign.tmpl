@@ -8,15 +8,11 @@ networkd:
 
         [Network]
         LinkLocalAddressing=no
-        DHCP=no
-        Gateway=${networks.store.router}
-        DNS=${services.recursive_dns.vip}
+        DHCP=yes
 
-        [Link]
-        MTUBytes=${mtu}
-
-        [Address]
-        Address=${host_network.store.ip}/${networks.store.cidr}
+        [DHCP]
+        UseMTU=true
+        UseDomains=true
     - name: 00-${host_network.int.if}.network
       contents: |
         [Match]

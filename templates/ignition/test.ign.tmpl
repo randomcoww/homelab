@@ -13,9 +13,6 @@ networkd:
         [DHCP]
         UseMTU=true
         UseDomains=true
-
-        [Link]
-        MTUBytes=${mtu}
     - name: 00-${host_network.int.if}.network
       contents: |
         [Match]

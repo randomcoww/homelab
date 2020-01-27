@@ -306,7 +306,6 @@ locals {
       network = [
         {
           network = "store"
-          ip      = "192.168.127.222"
           if      = "eth0"
         },
         {
@@ -408,7 +407,6 @@ locals {
       network = [
         {
           network = "store"
-          ip      = "192.168.127.223"
           if      = "eth0"
         },
         {
