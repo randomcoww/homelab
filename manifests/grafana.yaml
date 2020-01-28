@@ -15,7 +15,7 @@ data:
       is_default: true
       version: 1
       editable: false
-    - name: 'static-pod-logs'
+    - name: 'loki-pod-logs'
       type: 'loki'
       access: 'proxy'
       org_id: 1
@@ -641,7 +641,7 @@ data:
       "links": [],
       "panels": [
         {
-          "datasource": "static-pod-logs",
+          "datasource": "loki-pod-logs",
           "gridPos": {
             "h": 8,
             "w": 24,
@@ -665,7 +665,7 @@ data:
           "type": "logs"
         },
         {
-          "datasource": "static-pod-logs",
+          "datasource": "loki-pod-logs",
           "gridPos": {
             "h": 8,
             "w": 24,
@@ -689,7 +689,7 @@ data:
           "type": "logs"
         },
         {
-          "datasource": "static-pod-logs",
+          "datasource": "loki-pod-logs",
           "gridPos": {
             "h": 8,
             "w": 24,
@@ -713,7 +713,7 @@ data:
           "type": "logs"
         },
         {
-          "datasource": "static-pod-logs",
+          "datasource": "loki-pod-logs",
           "gridPos": {
             "h": 8,
             "w": 24,
@@ -737,7 +737,7 @@ data:
           "type": "logs"
         },
         {
-          "datasource": "static-pod-logs",
+          "datasource": "loki-pod-logs",
           "gridPos": {
             "h": 8,
             "w": 24,
@@ -761,7 +761,7 @@ data:
           "type": "logs"
         },
         {
-          "datasource": "static-pod-logs",
+          "datasource": "loki-pod-logs",
           "gridPos": {
             "h": 8,
             "w": 24,
@@ -836,7 +836,7 @@ data:
       "links": [],
       "panels": [
         {
-          "datasource": "static-pod-logs",
+          "datasource": "loki-pod-logs",
           "gridPos": {
             "h": 11,
             "w": 24,
@@ -860,7 +860,7 @@ data:
           "type": "logs"
         },
         {
-          "datasource": "static-pod-logs",
+          "datasource": "loki-pod-logs",
           "gridPos": {
             "h": 11,
             "w": 24,
@@ -884,7 +884,7 @@ data:
           "type": "logs"
         },
         {
-          "datasource": "static-pod-logs",
+          "datasource": "loki-pod-logs",
           "gridPos": {
             "h": 11,
             "w": 24,
@@ -936,6 +936,96 @@ data:
       "timezone": "",
       "title": "kube-apiserver",
       "version": 3
+    }
+  worker-network-logs.json: |
+    {
+      "annotations": {
+        "list": [
+          {
+            "builtIn": 1,
+            "datasource": "-- Grafana --",
+            "enable": true,
+            "hide": true,
+            "iconColor": "rgba(0, 211, 255, 1)",
+            "name": "Annotations & Alerts",
+            "type": "dashboard"
+          }
+        ]
+      },
+      "editable": true,
+      "gnetId": null,
+      "graphTooltip": 0,
+      "id": 4,
+      "links": [],
+      "panels": [
+        {
+          "datasource": "loki-pod-logs",
+          "gridPos": {
+            "h": 16,
+            "w": 24,
+            "x": 0,
+            "y": 0
+          },
+          "id": 2,
+          "options": {
+            "showLabels": false,
+            "showTime": true,
+            "sortOrder": "Descending",
+            "wrapLogMessage": true
+          },
+          "targets": [
+            {
+              "expr": "{container_name=\"kube-proxy\"}",
+              "refId": "A"
+            }
+          ],
+          "timeFrom": null,
+          "timeShift": null,
+          "title": "kube-proxy",
+          "type": "logs"
+        },
+        {
+          "datasource": "loki-pod-logs",
+          "gridPos": {
+            "h": 16,
+            "w": 24,
+            "x": 0,
+            "y": 16
+          },
+          "id": 4,
+          "options": {
+            "showLabels": false,
+            "showTime": true,
+            "sortOrder": "Descending",
+            "wrapLogMessage": true
+          },
+          "targets": [
+            {
+              "expr": "{container_name=\"kube-flannel\"}",
+              "refId": "A"
+            }
+          ],
+          "timeFrom": null,
+          "timeShift": null,
+          "title": "flannel",
+          "type": "logs"
+        }
+      ],
+      "refresh": "5s",
+      "schemaVersion": 22,
+      "style": "dark",
+      "tags": [],
+      "templating": {
+        "list": []
+      },
+      "time": {
+        "from": "now-6h",
+        "to": "now"
+      },
+      "timepicker": {},
+      "timezone": "",
+      "title": "worker-network",
+      "version": 2
     }
 
 ---
