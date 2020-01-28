@@ -28,8 +28,6 @@ data:
   kube-proxy-config.yaml: |-
     kind: KubeProxyConfiguration
     apiVersion: kubeproxy.config.k8s.io/v1alpha1
-    featureGates:
-      SupportIPVSProxyMode: true
     mode: "ipvs"
     clusterCIDR: "${networks.kubernetes.network}/${networks.kubernetes.cidr}"
     iptables:

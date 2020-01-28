@@ -467,7 +467,7 @@ storage:
               - "--service-cluster-ip-range=${networks.kubernetes_service.network}/${networks.kubernetes_service.cidr}"
               - "--tls-cert-file=${controller_mount_path}/kubernetes.pem"
               - "--tls-private-key-file=${controller_mount_path}/kubernetes-key.pem"
-              - "--kubelet-preferred-address-types=InternalIP"
+              - "--kubelet-preferred-address-types=InternalDNS,InternalIP"
               - "--v=2"
               env:
               - name: INTERNAL_IP
