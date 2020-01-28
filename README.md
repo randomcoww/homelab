@@ -177,7 +177,7 @@ kubectl apply -f http://127.0.0.1:8080/generic?secret=grafana-auth
 
 Deploy [OpenEBS](https://www.openebs.io/):
 
-Only Jiva is used (I don't have enough disks to dedicate for cStore). This is the same as https://openebs.github.io/charts/openebs-operator-1.6.0.yaml with some unused components removed.
+Only Jiva is used (I don't have enough disks to dedicate to cStor). This is the same as https://openebs.github.io/charts/openebs-operator-1.6.0.yaml with some unused components removed.
 
 ```
 cd reqourcesv2/manifests
