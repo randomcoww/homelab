@@ -1,7 +1,7 @@
 ---
 networkd:
   units:
-    - name: 00-${host_network.store.if}.network
+    - name: 10-${host_network.store.if}.network
       contents: |
         [Match]
         Name=${host_network.store.if}
@@ -13,7 +13,7 @@ networkd:
         [DHCP]
         UseMTU=true
         UseDomains=true
-    - name: 00-${host_network.int.if}.network
+    - name: 10-${host_network.int.if}.network
       contents: |
         [Match]
         Name=${host_network.int.if}

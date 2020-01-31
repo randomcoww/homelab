@@ -1,7 +1,7 @@
 ---
 networkd:
   units:
-    - name: 00-${host_network.store.if}.network
+    - name: 10-${host_network.store.if}.network
       contents: |
         [Match]
         Name=${host_network.store.if}
@@ -12,7 +12,7 @@ networkd:
 
         [Address]
         Address=${host_network.store.ip}/${networks.store.cidr}
-    - name: 00-${host_network.lan.if}.network
+    - name: 10-${host_network.lan.if}.network
       contents: |
         [Match]
         Name=${host_network.lan.if}
@@ -23,7 +23,7 @@ networkd:
 
         [Address]
         Address=${host_network.lan.ip}/${networks.lan.cidr}
-    - name: 00-${host_network.sync.if}.network
+    - name: 10-${host_network.sync.if}.network
       contents: |
         [Match]
         Name=${host_network.sync.if}
@@ -34,7 +34,7 @@ networkd:
 
         [Address]
         Address=${host_network.sync.ip}/${networks.sync.cidr}
-    - name: 00-${host_network.host_wan.if}.network
+    - name: 10-${host_network.host_wan.if}.network
       contents: |
         [Match]
         Name=${host_network.host_wan.if}
@@ -55,7 +55,7 @@ networkd:
         UseDomains=false
         UseTimezone=no
         RouteMetric=512
-    - name: 00-${host_network.wan.if}.network
+    - name: 10-${host_network.wan.if}.network
       contents: |
         [Match]
         Name=${host_network.wan.if}
@@ -74,7 +74,7 @@ networkd:
         UseTimezone=no
         RouteMetric=512
         RouteTable=${host_network.wan.route_table}
-    - name: 00-${host_network.int.if}.network
+    - name: 10-${host_network.int.if}.network
       contents: |
         [Match]
         Name=${host_network.int.if}
