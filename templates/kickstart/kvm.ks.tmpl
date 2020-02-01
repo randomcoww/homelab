@@ -22,7 +22,7 @@ sshkey --username=${user} "${ssh_authorized_key}"
 ## allocate vlan interfaces to hardware
 ##
 
-cat <<EOF > /etc/systemd/network/00-${host_network.hw.if}.network
+cat <<EOF > /etc/systemd/network/10-${host_network.hw.if}.network
 [Match]
 Name=${host_network.hw.if}
 
@@ -43,7 +43,7 @@ EOF
 ## vlan ${k}
 ##
 
-cat <<EOF > /etc/systemd/network/00-${networks[k].br_if}.netdev
+cat <<EOF > /etc/systemd/network/10-${networks[k].br_if}.netdev
 [NetDev]
 Name=${networks[k].br_if}
 Kind=vlan
@@ -54,7 +54,7 @@ EOF
 %{ if lookup(host_network, k, null) != null ~}
 
 ## host macvtap on vlan ${k}
-cat <<EOF > /etc/systemd/network/00-${networks[k].br_if}.network
+cat <<EOF > /etc/systemd/network/10-${networks[k].br_if}.network
 [Match]
 Name=${networks[k].br_if}
 
@@ -68,7 +68,7 @@ DHCP=no
 MACVTAP=${k}-tap
 EOF
 
-cat <<EOF > /etc/systemd/network/00-${k}-tap.netdev
+cat <<EOF > /etc/systemd/network/10-${k}-tap.netdev
 [NetDev]
 Name=${k}-tap
 Kind=macvtap
@@ -77,7 +77,7 @@ Kind=macvtap
 Mode=bridge
 EOF
 
-cat <<EOF > /etc/systemd/network/00-${k}-tap.network
+cat <<EOF > /etc/systemd/network/10-${k}-tap.network
 [Match]
 Name=${k}-tap
 
@@ -99,13 +99,13 @@ EOF
 ## internal network ${k} for host <-> local vm
 ##
 
-cat <<EOF > /etc/systemd/network/00-${internal_networks[k].if}.netdev
+cat <<EOF > /etc/systemd/network/10-${internal_networks[k].if}.netdev
 [NetDev]
 Name=${internal_networks[k].if}
 Kind=bridge
 EOF
 
-cat <<EOF > /etc/systemd/network/00-${internal_networks[k].if}.network
+cat <<EOF > /etc/systemd/network/10-${internal_networks[k].if}.network
 [Match]
 Name=${internal_networks[k].if}
 
@@ -119,13 +119,13 @@ MACVTAP=${k}-tap
 Bridge=${k}-dummy
 EOF
 
-cat <<EOF > /etc/systemd/network/00-${k}-dummy.netdev
+cat <<EOF > /etc/systemd/network/10-${k}-dummy.netdev
 [NetDev]
 Name=${k}-dummy
 Kind=dummy
 EOF
 
-cat <<EOF > /etc/systemd/network/00-${k}-dummy.network
+cat <<EOF > /etc/systemd/network/10-${k}-dummy.network
 [Match]
 Name=${k}-dummy
 
@@ -138,7 +138,7 @@ DHCP=no
 Bridge=${internal_networks[k].if}
 EOF
 
-cat <<EOF > /etc/systemd/network/00-${k}-tap.netdev
+cat <<EOF > /etc/systemd/network/10-${k}-tap.netdev
 [NetDev]
 Name=${k}-tap
 Kind=macvtap
@@ -147,7 +147,7 @@ Kind=macvtap
 Mode=bridge
 EOF
 
-cat <<EOF > /etc/systemd/network/00-${k}-tap.network
+cat <<EOF > /etc/systemd/network/10-${k}-tap.network
 [Match]
 Name=${k}-tap
 

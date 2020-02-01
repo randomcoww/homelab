@@ -82,6 +82,18 @@ user --name=${user} --password=${password} --plaintext --uid=10000 --gid=10000 -
 %post --erroronfail
 
 ##############################################
+## networkd
+##############################################
+
+cat <<EOF > /etc/systemd/network/90-wl.network
+[Match]
+Name=wl*
+
+[Link]
+Unmanaged=true
+EOF
+
+##############################################
 ## persistent home directory
 ##############################################
 
