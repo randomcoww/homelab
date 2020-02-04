@@ -1,0 +1,42 @@
+FROM golang:alpine AS MODULES
+
+RUN set -x \
+  \
+  && apk add --no-cache \
+    git \
+    libvirt-dev \
+    g++ \
+  \
+  && git clone https://github.com/randomcoww/terraform-provider-libvirt.git terraform-provider-libvirt \
+  && cd terraform-provider-libvirt \
+  && GO111MODULE=on GOOS=linux go install \
+  && git clone https://github.com/poseidon/terraform-provider-matchbox.git terraform-provider-matchbox \
+  && cd terraform-provider-matchbox \
+  && GO111MODULE=on GOOS=linux go install
+
+FROM alpine:edge
+
+ENV HOME /home/tf
+ENV VERSION 0.12.20
+
+RUN set -x \
+  \
+  && apk add --no-cache \
+    bash \
+    ca-certificates \
+    libvirt-libs \
+    openssh-client \
+  \
+  && update-ca-certificates \
+  && wget -O terraform.zip \
+    https://releases.hashicorp.com/terraform/${VERSION}/terraform_${VERSION}_linux_amd64.zip \
+  && unzip terraform.zip -d /usr/local/bin/ \
+  && rm terraform.zip \
+  && adduser -DH tf
+
+USER tf
+WORKDIR /home/tf
+COPY --from=MODULES /go/bin/ go/bin/
+COPY terraformrc .terraformrc
+
+ENTRYPOINT [ "terraform" ]
