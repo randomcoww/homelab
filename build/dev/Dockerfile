@@ -14,10 +14,25 @@ RUN set -x \
   && cd terraform-provider-matchbox \
   && GO111MODULE=on GOOS=linux go install
 
+FROM golang:alpine AS MATCHBOX
+
+RUN set -x \
+  \
+  && apk add --no-cache \
+    git \
+  \
+  && git clone https://github.com/poseidon/matchbox.git matchbox \
+  && cd matchbox/cmd/matchbox \
+  && GO111MODULE=on GOOS=linux go install
+
 FROM alpine:edge
 
-ENV HOME /home/tf
+ENV HOME /root
 ENV VERSION 0.12.20
+
+COPY --from=MATCHBOX /go/bin/ /usr/local/bin/
+COPY files/tf-wrapper.sh /usr/local/bin/tf-wrapper
+COPY files/start-renderer.sh /usr/local/bin/start-renderer
 
 RUN set -x \
   \
@@ -31,12 +46,12 @@ RUN set -x \
   && wget -O terraform.zip \
     https://releases.hashicorp.com/terraform/${VERSION}/terraform_${VERSION}_linux_amd64.zip \
   && unzip terraform.zip -d /usr/local/bin/ \
-  && rm terraform.zip \
-  && adduser -DH tf
+  && rm terraform.zip
 
-USER tf
-WORKDIR /home/tf
+WORKDIR $HOME
 COPY --from=MODULES /go/bin/ go/bin/
-COPY terraformrc .terraformrc
+COPY files/terraformrc .terraformrc
+COPY files/ssh-config .ssh/config
 
-ENTRYPOINT [ "terraform" ]
+VOLUME ["$HOME/mnt"]
+WORKDIR $HOME/mnt/resourcesv2
