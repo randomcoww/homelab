@@ -238,6 +238,8 @@ kubectl apply -f transmission.yaml
 
 ### Using tf-env container
 
+[[build/dev/Dockerfile]]
+
 Start renderer:
 
 ```
