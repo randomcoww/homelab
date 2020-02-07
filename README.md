@@ -236,7 +236,7 @@ kubectl apply -f ingest-rclone-pv.yaml
 kubectl apply -f transmission.yaml
 ```
 
-### Dev container
+### Using tf-env container
 
 Start renderer:
 
