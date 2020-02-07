@@ -243,7 +243,7 @@ Start renderer:
 ```
 podman run -it --rm \
     -e AWS_ACCESS_KEY_ID=id \
-    -e WS_SECRET_ACCESS_KEY=key \
+    -e AWS_SECRET_ACCESS_KEY=key \
     --net=host \
     -v $(pwd):/root/mnt \
     randomcoww/tf-env start-renderer
@@ -254,7 +254,7 @@ Wrapper for terraform calls:
 ```
 podman run -it --rm \
     -e AWS_ACCESS_KEY_ID=id \
-    -e WS_SECRET_ACCESS_KEY=key \
+    -e AWS_SECRET_ACCESS_KEY=key \
     --net=host \
     -v $(pwd):/root/mnt \
     randomcoww/tf-env tf-wrapper
