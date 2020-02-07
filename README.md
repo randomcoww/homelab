@@ -41,7 +41,7 @@ terraform apply -target=module.kickstart
 Generate USB images for hypervisor hosts:
 
 ```bash
-cd build
+cd build/kickstart
 export FEDORA_RELEASE=31
 export ISO_FILE=Fedora-Server-netinst-x86_64-31-1.9.iso
 
@@ -234,4 +234,28 @@ cd reqourcesv2/manifests
 kubectl create secret generic wireguard-config --from-file=wireguard-secret
 kubectl apply -f ingest-rclone-pv.yaml
 kubectl apply -f transmission.yaml
+```
+
+### Dev container
+
+Start renderer:
+
+```
+podman run -it --rm \
+    -e AWS_ACCESS_KEY_ID=id \
+    -e WS_SECRET_ACCESS_KEY=key \
+    --net=host \
+    -v $(pwd):/root/mnt \
+    randomcoww/tf-env start-renderer
+```
+
+Wrapper for terraform calls:
+
+```
+podman run -it --rm \
+    -e AWS_ACCESS_KEY_ID=id \
+    -e WS_SECRET_ACCESS_KEY=key \
+    --net=host \
+    -v $(pwd):/root/mnt \
+    randomcoww/tf-env tf-wrapper
 ```
