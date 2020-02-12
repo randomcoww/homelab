@@ -83,22 +83,41 @@ spec:
         k8s-app: mpd
     spec:
       dnsPolicy: ClusterFirstWithHostNet
-      initContainers:
-      # /vol/mnt should be fuse mounted by another container
-      # Verify that this is mounted before continuing
-      - name: wait-mount-music
-        image: busybox:latest
-        command:
-        - "/bin/mountpoint"
+      containers:
+      - name: rclone
+        image: randomcoww/rclone:v1.51.0
+        securityContext:
+          privileged: true
+        env:
+        - name: AWS_ACCESS_KEY_ID
+          valueFrom:
+            secretKeyRef:
+              name: minio-auth
+              key: access_key_id
+        - name: AWS_SECRET_ACCESS_KEY
+          valueFrom:
+            secretKeyRef:
+              name: minio-auth
+              key: secret_access_key
         args:
+        - "mount"
+        - ":s3:music/"
         - "/vol/mnt"
+        - "--s3-provider=Minio"
+        - "--s3-env-auth=true"
+        - "--s3-region="
+        - "--s3-endpoint=http://minio.default.svc.cluster.local:9000"
+        - "--allow-other"
+        - "--vfs-cache-mode=minimal"
+        - "--no-modtime"
+        - "--read-only"
         volumeMounts:
         - name: music-data
-          mountPath: "/vol"
-      containers:
+          mountPath: /vol/mnt
+          subPath: mnt
+          mountPropagation: Bidirectional
       - name: mpd
         image: randomcoww/mpd:0.21.19
-        imagePullPolicy: Always
         ports:
         - containerPort: 8000
           protocol: TCP
@@ -112,16 +131,22 @@ spec:
         - mountPath: /etc/mpd.conf
           name: mpd-config
           subPath: mpd.conf
+        lifecycle:
+          postStart:
+            exec:
+              # /mpd/music/mnt should be fuse mounted by rclone
+              # Kill the container if this is not mounted
+              command: ["mountpoint", "-q", "/mpd/music/mnt"]
       volumes:
-      - name: music-data
-        persistentVolumeClaim:
-          claimName: music-pvc
       - name: mpd-data
         persistentVolumeClaim:
           claimName: mpd-pvc
       - name: mpd-config
         configMap:
           name: mpd-config
+      # shared mountpoint for fuse mount
+      - name: music-data
+        emptyDir: {}
 
 ---
 kind: Service
