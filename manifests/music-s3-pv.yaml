@@ -23,7 +23,7 @@ spec:
       containers:
       - name: rclone
         imagePullPolicy: Always
-        image: randomcoww/rclone:v1.50.2
+        image: randomcoww/rclone:v1.51.0
         securityContext:
           privileged: true
         env:
