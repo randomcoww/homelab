@@ -220,8 +220,6 @@ https://stream.fuzzybunny.internal
 
 ```
 cd reqourcesv2/manifests
-kubectl apply -f mpd-rclone-pv.yaml
-kubectl apply -f music-rclone-pv.yaml
 kubectl apply -f mpd.yaml
 ```
 
@@ -232,7 +230,7 @@ https://tr.fuzzybunny.internal
 ```
 cd reqourcesv2/manifests
 kubectl create secret generic wireguard-config --from-file=wireguard-secret
-kubectl apply -f ingest-rclone-pv.yaml
+kubectl apply -f ingest-s3-pv.yaml
 kubectl apply -f transmission.yaml
 ```
 
