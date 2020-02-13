@@ -106,7 +106,7 @@ spec:
         - "--s3-provider=Minio"
         - "--s3-env-auth=true"
         - "--s3-region="
-        - "--s3-endpoint=http://minio.default.svc.cluster.local:9000"
+        - "--s3-endpoint=http://minio-ui.default.svc.cluster.local"
         - "--allow-other"
         - "--vfs-cache-mode=minimal"
         - "--no-modtime"

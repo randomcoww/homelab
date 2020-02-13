@@ -96,17 +96,6 @@ spec:
       dnsPolicy: ClusterFirstWithHostNet
       restartPolicy: Always
       initContainers:
-      # /vol/mnt should be fuse mounted by another container
-      # Verify that this is mounted before continuing
-      - name: wait-mount
-        image: busybox:latest
-        command:
-        - "/bin/mountpoint"
-        args:
-        - "/vol/mnt"
-        volumeMounts:
-        - name: torrent-vol
-          mountPath: "/vol"
       - name: wireguard
         image: randomcoww/wireguard:latest
         args:
@@ -120,6 +109,37 @@ spec:
           mountPath: /etc/wireguard/wg0.conf
           subPath: wireguard-secret
       containers:
+      - name: rclone
+        image: randomcoww/rclone:v1.51.0
+        securityContext:
+          privileged: true
+        env:
+        - name: AWS_ACCESS_KEY_ID
+          valueFrom:
+            secretKeyRef:
+              name: minio-auth
+              key: access_key_id
+        - name: AWS_SECRET_ACCESS_KEY
+          valueFrom:
+            secretKeyRef:
+              name: minio-auth
+              key: secret_access_key
+        args:
+        - "mount"
+        - ":s3:ingest-minio/"
+        - "/vol/mnt"
+        - "--s3-provider=Minio"
+        - "--s3-env-auth=true"
+        - "--s3-region="
+        - "--s3-endpoint=http://minio-ui.default.svc.cluster.local"
+        - "--allow-other"
+        - "--vfs-cache-mode=minimal"
+        - "--no-modtime"
+        volumeMounts:
+        - name: torrent-vol
+          mountPath: "/vol/mnt"
+          subPath: mnt
+          mountPropagation: Bidirectional
       - name: transmission
         image: randomcoww/transmission:latest
         imagePullPolicy: Always
@@ -138,19 +158,25 @@ spec:
           subPath: settings.json
         - name: torrent-vol
           mountPath: "/vol"
+        lifecycle:
+          postStart:
+            exec:
+              # /vol/mnt should be fuse mounted by rclone
+              # Kill the container if this is not mounted
+              command: ["mountpoint", "-q", "/vol/mnt"]
       volumes:
-      - name: transmission-resume
-        persistentVolumeClaim:
-          claimName: transmission-pvc
       - name: transmission-config
         configMap:
           name: transmission-config
       - name: wireguard-config
         secret:
           secretName: wireguard-config
-      - name: torrent-vol
+      - name: transmission-resume
         persistentVolumeClaim:
-          claimName: ingest-pvc
+          claimName: transmission-pvc
+      # shared mountpoint for fuse mount
+      - name: torrent-vol
+        emptyDir: {}
 
 ---
 kind: Service
