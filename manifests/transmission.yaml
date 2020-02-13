@@ -34,6 +34,92 @@ spec:
       storage: 400G
 
 ---
+kind: Deployment
+apiVersion: apps/v1
+metadata:
+  name: s3-ingest
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      k8s-app: s3-ingest
+  template:
+    metadata:
+      labels:
+        k8s-app: s3-ingest
+    spec:
+      dnsPolicy: ClusterFirstWithHostNet
+      restartPolicy: Always
+      hostNetwork: true
+      containers:
+      - name: rclone
+        imagePullPolicy: Always
+        image: randomcoww/rclone:v1.51.0
+        securityContext:
+          privileged: true
+        env:
+        - name: AWS_ACCESS_KEY_ID
+          valueFrom:
+            secretKeyRef:
+              name: minio-auth
+              key: access_key_id
+        - name: AWS_SECRET_ACCESS_KEY
+          valueFrom:
+            secretKeyRef:
+              name: minio-auth
+              key: secret_access_key
+        args:
+        - "mount"
+        - ":s3:ingest-minio/"
+        - "/vol"
+        - "--s3-provider=Minio"
+        - "--s3-env-auth=true"
+        - "--s3-region="
+        - "--s3-endpoint=http://minio.default.svc.cluster.local:9000"
+        - "--allow-other"
+        - "--allow-non-empty"
+        - "--vfs-cache-mode=minimal"
+        - "--no-modtime"
+        volumeMounts:
+        - name: s3-ingest-vol
+          mountPath: /vol
+          mountPropagation: Bidirectional
+      # Mount fuse in mnt under base path so that client container
+      # can verify that it is mounted before starting
+      volumes:
+        - name: s3-ingest-vol
+          hostPath:
+            path: /hostpath/ingest/mnt
+
+---
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: s3-ingest-pv
+spec:
+  storageClassName: s3-ingest
+  capacity:
+    storage: 50Ti
+  accessModes:
+  - ReadWriteOnce
+  hostPath:
+    path: /hostpath/ingest
+    type: Directory
+
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: s3-ingest-pvc
+spec:
+  accessModes:
+  - ReadWriteOnce
+  storageClassName: s3-ingest
+  resources:
+    requests:
+      storage: 50Ti
+
+---
 apiVersion: v1
 kind: ConfigMap
 metadata:
@@ -92,15 +178,25 @@ spec:
       labels:
         k8s-app: transmission
     spec:
+      affinity:
+        podAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+          - labelSelector:
+              matchExpressions:
+              - key: k8s-app
+                operator: In
+                values:
+                - s3-ingest
+            topologyKey: kubernetes.io/hostname
       dnsPolicy: ClusterFirstWithHostNet
       restartPolicy: Always
       initContainers:
       - name: wireguard
         image: randomcoww/wireguard:latest
+        imagePullPolicy: Always
         args:
         - "up"
         - "wg0"
-        imagePullPolicy: Always
         securityContext:
           privileged: true
         volumeMounts:
@@ -108,37 +204,6 @@ spec:
           mountPath: /etc/wireguard/wg0.conf
           subPath: wireguard-secret
       containers:
-      - name: rclone
-        image: randomcoww/rclone:v1.51.0
-        securityContext:
-          privileged: true
-        env:
-        - name: AWS_ACCESS_KEY_ID
-          valueFrom:
-            secretKeyRef:
-              name: minio-auth
-              key: access_key_id
-        - name: AWS_SECRET_ACCESS_KEY
-          valueFrom:
-            secretKeyRef:
-              name: minio-auth
-              key: secret_access_key
-        args:
-        - "mount"
-        - ":s3:ingest-minio/"
-        - "/vol/mnt"
-        - "--s3-provider=Minio"
-        - "--s3-env-auth=true"
-        - "--s3-region="
-        - "--s3-endpoint=http://minio-ui.default.svc.cluster.local"
-        - "--allow-other"
-        - "--vfs-cache-mode=minimal"
-        - "--no-modtime"
-        volumeMounts:
-        - name: torrent-vol
-          mountPath: "/vol/mnt"
-          subPath: mnt
-          mountPropagation: Bidirectional
       - name: transmission
         image: randomcoww/transmission:latest
         imagePullPolicy: Always
@@ -173,9 +238,9 @@ spec:
       - name: transmission-resume
         persistentVolumeClaim:
           claimName: transmission-pvc
-      # shared mountpoint for fuse mount
       - name: torrent-vol
-        emptyDir: {}
+        persistentVolumeClaim:
+          claimName: s3-ingest-pvc
 
 ---
 kind: Service
