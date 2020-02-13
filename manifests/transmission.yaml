@@ -78,12 +78,11 @@ data:
     }
 
 ---
-kind: StatefulSet
+kind: Deployment
 apiVersion: apps/v1
 metadata:
   name: transmission
 spec:
-  serviceName: transmission
   replicas: 1
   selector:
     matchLabels:
