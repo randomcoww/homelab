@@ -230,7 +230,6 @@ https://tr.fuzzybunny.internal
 ```
 cd reqourcesv2/manifests
 kubectl create secret generic wireguard-config --from-file=wireguard-secret
-kubectl apply -f ingest-s3-pv.yaml
 kubectl apply -f transmission.yaml
 ```
 
