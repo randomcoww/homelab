@@ -9,6 +9,7 @@ kea
 
 %end
 
+## add no password but allow ssh for this user
 user --name=${user} --password=* --iscrypted --groups=wheel,libvirt
 sshkey --username=${user} "${ssh_authorized_key}"
 
@@ -17,6 +18,14 @@ sshkey --username=${user} "${ssh_authorized_key}"
 ##############################################
 ## networkd
 ##############################################
+
+##
+## passwordless sudo for primary user
+##
+
+cat <<EOF > /etc/sudoers.d/admin
+${user} ALL=(ALL) NOPASSWD: ALL
+EOF
 
 ##
 ## allocate vlan interfaces to hardware
