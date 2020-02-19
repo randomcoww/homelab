@@ -2,12 +2,10 @@
 ## LiveOS base template renderer
 ##
 resource "matchbox_group" "ks-live" {
-  for_each = var.live_hosts
-
   profile = matchbox_profile.generic-profile.name
-  name    = "live-${each.key}"
+  name    = "live"
   selector = {
-    ks = "live-${each.key}"
+    ks = "live"
   }
   metadata = {
     config = templatefile("${path.module}/../../templates/kickstart/live.ks.tmpl", {

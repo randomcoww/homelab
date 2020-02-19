@@ -1,4 +1,4 @@
-timezone --utc America/Los_Angeles
+timezone --utc ${timezone}
 selinux --disabled
 part / --size 20480 --fstype ext4
 
@@ -99,9 +99,10 @@ EOF
 
 mkdir -p ${persistent_home_path}
 
-cat <<EOF > /etc/systemd/system/${persistent_home_mount}
+cat <<EOF > /etc/systemd/system/${join("-", compact(split("/", persistent_home_path)))}.mount
 [Unit]
 Before=local-fs.target
+ConditionPathExists=${persistent_home_dev}
 
 [Mount]
 What=${persistent_home_dev}
@@ -126,7 +127,7 @@ update-ca-trust
 ##############################################
 
 systemctl enable \
-  ${persistent_home_mount}
+  ${join("-", compact(split("/", persistent_home_path)))}.mount
 
 systemctl set-default graphical.target
 

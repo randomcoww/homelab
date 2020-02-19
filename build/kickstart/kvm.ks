@@ -1,6 +1,5 @@
-%include http://127.0.0.1:8080/generic?ks=live-live-base
-%include http://127.0.0.1:8080/generic?ks=kvm-kvm-1
-# %include http://127.0.0.1:8080/generic?ks=zfs
+%include http://127.0.0.1:8080/generic?ks=live
+%include http://127.0.0.1:8080/generic?ks=kvm
 
 %post --erroronfail
 

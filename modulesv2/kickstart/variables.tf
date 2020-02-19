@@ -10,6 +10,10 @@ variable "desktop_password" {
   type = string
 }
 
+variable "local_timezone" {
+  type = string
+}
+
 variable "ssh_ca_public_key" {
   type = string
 }

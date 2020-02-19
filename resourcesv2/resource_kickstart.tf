@@ -9,6 +9,7 @@ module "kickstart" {
   mtu                  = local.mtu
   networks             = local.networks
   services             = local.services
+  local_timezone       = local.local_timezone
 
   # LiveOS base KS
   live_hosts = {

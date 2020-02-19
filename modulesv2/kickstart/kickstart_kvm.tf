@@ -2,27 +2,22 @@
 ## KVM (HW) kickstart renderer
 ##
 resource "random_password" "ks-kvm" {
-  for_each = var.kvm_hosts
-
   length  = 30
   special = false
 }
 
 resource "matchbox_group" "ks-kvm" {
-  for_each = var.kvm_hosts
-
   profile = matchbox_profile.generic-profile.name
-  name    = "kvm-${each.key}"
+  name    = "kvm"
   selector = {
-    ks = "kvm-${each.key}"
+    ks = "kvm"
   }
   metadata = {
     config = templatefile("${path.module}/../../templates/kickstart/kvm.ks.tmpl", {
-      hostname           = each.key
       user               = var.user
-      password           = random_password.ks-kvm[each.key].result
+      password           = random_password.ks-kvm.result
       ssh_authorized_key = "cert-authority ${chomp(var.ssh_ca_public_key)}"
-      host_network       = each.value.host_network
+      hosts              = var.kvm_hosts
       mtu                = var.mtu
 
       vlans = [
@@ -44,8 +39,8 @@ resource "matchbox_group" "ks-kvm" {
       matchbox_data_path       = "/var/lib/matchbox/data"
       matchbox_assets_path     = "/var/lib/matchbox/assets"
       tls_matchbox_ca          = chomp(tls_self_signed_cert.matchbox-ca.cert_pem)
-      tls_matchbox             = chomp(tls_locally_signed_cert.matchbox[each.key].cert_pem)
-      tls_matchbox_key         = chomp(tls_private_key.matchbox[each.key].private_key_pem)
+      tls_matchbox             = chomp(tls_locally_signed_cert.matchbox.cert_pem)
+      tls_matchbox_key         = chomp(tls_private_key.matchbox.private_key_pem)
       container_linux_base_url = "https://edge.release.flatcar-linux.net/amd64-usr/current"
       container_linux_kernel   = "flatcar_production_pxe.vmlinuz"
       container_linux_image    = "flatcar_production_pxe_image.cpio.gz"

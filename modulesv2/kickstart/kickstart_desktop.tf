@@ -2,27 +2,24 @@
 ## Desktop (HW) kickstart renderer
 ##
 resource "matchbox_group" "ks-desktop" {
-  for_each = var.desktop_hosts
-
   profile = matchbox_profile.generic-profile.name
-  name    = "desktop-${each.key}"
+  name    = "desktop"
   selector = {
-    ks = "desktop-${each.key}"
+    ks = "desktop"
   }
   metadata = {
     config = templatefile("${path.module}/../../templates/kickstart/desktop.ks.tmpl", {
-      hostname        = each.key
-      user            = var.desktop_user
-      password        = var.desktop_password
-      tls_internal_ca = chomp(var.internal_ca_cert_pem)
-      networks        = var.networks
-      host_network    = each.value.host_network
-      mtu             = var.mtu
+      user     = var.desktop_user
+      password = var.desktop_password
+      timezone = var.local_timezone
+      networks = var.networks
+      hosts    = var.desktop_hosts
+      mtu      = var.mtu
 
-      certs_path            = "/usr/share/pki/ca-trust-source/anchors"
-      persistent_home_path  = each.value.persistent_home_path
-      persistent_home_dev   = each.value.persistent_home_dev
-      persistent_home_mount = "${join("-", compact(split("/", each.value.persistent_home_path)))}.mount"
+      tls_internal_ca      = chomp(var.internal_ca_cert_pem)
+      certs_path           = "/usr/share/pki/ca-trust-source/anchors"
+      persistent_home_path = "/localhome"
+      persistent_home_dev  = "/dev/disk/by-id/nvme-Samsung_SSD_970_EVO_250GB_S465NB0K598517N-part1"
     })
   }
 }
