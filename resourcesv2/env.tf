@@ -508,7 +508,7 @@ locals {
     }
 
     # desktop
-    desktop-0 = {
+    desktop = {
       components = [
         "kvm",
         "desktop",

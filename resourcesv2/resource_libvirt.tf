@@ -46,14 +46,14 @@ module "libvirt-kvm-1" {
   }
 }
 
-module "libvirt-desktop-0" {
+module "libvirt-desktop" {
   source = "../modulesv2/libvirt"
 
-  libvirt_endpoint = local.libvirt.desktop-0.endpoint
+  libvirt_endpoint = local.libvirt.desktop.endpoint
   networks         = local.networks
 
   guests = {
-    for k in local.hosts.desktop-0.guests :
+    for k in local.hosts.desktop.guests :
     k => {
       vcpu    = local.hosts[k].vcpu
       memory  = local.hosts[k].memory

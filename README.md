@@ -57,25 +57,12 @@ sudo livemedia-creator \
     --title kvm \
     --resultdir ./result \
     --tmp . \
-    --ks=./kvm-0.ks \
-    --no-virt \
-    --lorax-templates ./lorax-kvm
-
-sudo livemedia-creator \
-    --make-iso \
-    --iso=$ISO_FILE \
-    --project Fedora \
-    --volid kvm \
-    --releasever $FEDORA_RELEASE \
-    --title kvm \
-    --resultdir ./result \
-    --tmp . \
-    --ks=./kvm-1.ks \
+    --ks=./kvm.ks \
     --no-virt \
     --lorax-templates ./lorax-kvm
 ```
 
-Write boot image to disk after each run:
+Write boot image to disks as below. The same image may be used for all KVM hosts.
 
 ```
 sudo dd if=result/images/boot.iso of=/dev/sdb bs=4k
@@ -93,7 +80,7 @@ sudo livemedia-creator \
     --title desktop \
     --resultdir ./result \
     --tmp . \
-    --ks=./desktop-0.ks \
+    --ks=./desktop.ks \
     --no-virt \
     --lorax-templates ./lorax-desktop
 ```
@@ -109,7 +96,7 @@ cd resourcesv2
 terraform apply \
     -target=module.ignition-kvm-0 \
     -target=module.ignition-kvm-1 \
-    -target=module.ignition-desktop-0
+    -target=module.ignition-desktop
 ```
 
 Define VMs on each hypervisor:
@@ -119,7 +106,7 @@ cd resourcesv2
 terraform apply \
     -target=module.libvirt-kvm-0 \
     -target=module.libvirt-kvm-1 \
-    -target=module.libvirt-desktop-0
+    -target=module.libvirt-desktop
 ```
 
 ### Start gateway VMs
