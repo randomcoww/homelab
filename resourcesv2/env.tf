@@ -503,6 +503,7 @@ locals {
       guests = [
         "gateway-1",
         "controller-1",
+        "controller-2",
         "worker-1",
       ]
     }
