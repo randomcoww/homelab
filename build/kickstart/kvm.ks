@@ -4,9 +4,9 @@
 %post --erroronfail
 
 ## Add firmware for worker HBA passthrough
-mkdir -p /var/lib/libvirt/boot
+mkdir -p /etc/libvirt/boot
 
-pushd /var/lib/libvirt/boot
+pushd /etc/libvirt/boot
 curl -LO http://127.0.0.1:8080/assets/firmware/SAS9300_8i_IT.bin
 popd
 

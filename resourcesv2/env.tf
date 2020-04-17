@@ -323,7 +323,7 @@ locals {
           bus      = "0x05"
           slot     = "0x00"
           function = "0x0"
-          rom      = "/var/lib/libvirt/boot/SAS9300_8i_IT.bin"
+          rom      = "/etc/libvirt/boot/SAS9300_8i_IT.bin"
         }
       ]
       # Defaults:
@@ -425,7 +425,7 @@ locals {
           bus      = "0x05"
           slot     = "0x00"
           function = "0x0"
-          rom      = "/var/lib/libvirt/boot/SAS9300_8i_IT.bin"
+          rom      = "/etc/libvirt/boot/SAS9300_8i_IT.bin"
         }
       ]
       # Defaults:
