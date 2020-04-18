@@ -23,10 +23,3 @@ output "libvirt_endpoints" {
     k => "qemu+ssh://${var.user}@${var.kvm_hosts[k].host_network.store.ip}/system"
   }
 }
-
-output "kvm_passwords" {
-  value = {
-    for k in keys(var.kvm_hosts) :
-    k => random_password.ks-kvm[k].result
-  }
-}

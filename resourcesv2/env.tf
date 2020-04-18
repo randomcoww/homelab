@@ -2,6 +2,7 @@ locals {
   user               = "core"
   mtu                = 9000
   kubernetes_version = "v1.17.2"
+  local_timezone     = "America/Los_Angeles"
 
   # kubelet image is used for static pods and does not need to match the kubernetes version
   # hyperkube is used for the worker kubelet and should match the version
@@ -322,7 +323,7 @@ locals {
           bus      = "0x05"
           slot     = "0x00"
           function = "0x0"
-          rom      = "/var/lib/libvirt/boot/SAS9300_8i_IT.bin"
+          rom      = "/etc/libvirt/boot/SAS9300_8i_IT.bin"
         }
       ]
       # Defaults:
@@ -424,7 +425,7 @@ locals {
           bus      = "0x05"
           slot     = "0x00"
           function = "0x0"
-          rom      = "/var/lib/libvirt/boot/SAS9300_8i_IT.bin"
+          rom      = "/etc/libvirt/boot/SAS9300_8i_IT.bin"
         }
       ]
       # Defaults:
@@ -471,7 +472,7 @@ locals {
       network = [
         {
           alias = "hw"
-          if    = "enp2s0f0"
+          mac   = "00-1b-21-bc-4c-16"
         },
         {
           network = "store"
@@ -492,7 +493,7 @@ locals {
       network = [
         {
           alias = "hw"
-          if    = "enp2s0f0"
+          mac   = "00-1b-21-bc-67-c6"
         },
         {
           network = "store"
@@ -502,12 +503,13 @@ locals {
       guests = [
         "gateway-1",
         "controller-1",
+        "controller-2",
         "worker-1",
       ]
     }
 
     # desktop
-    desktop-0 = {
+    desktop = {
       components = [
         "kvm",
         "desktop",
@@ -515,7 +517,7 @@ locals {
       network = [
         {
           alias = "hw"
-          if    = "enp4s0f0"
+          mac   = "f8-f2-1e-1e-3c-40"
         },
         {
           network = "store"
@@ -525,8 +527,6 @@ locals {
       guests = [
         "test-0",
       ]
-      persistent_home_path = "/localhome"
-      persistent_home_dev  = "/dev/disk/by-id/nvme-Samsung_SSD_970_EVO_250GB_S465NB0K598517N-part1"
     }
   }
 }

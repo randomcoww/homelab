@@ -9,7 +9,8 @@ kea
 
 %end
 
-user --name=${user} --password=${password} --plaintext --groups=wheel,libvirt
+## add no password but allow ssh for this user
+user --name=${user} --password=* --iscrypted --groups=wheel,libvirt
 sshkey --username=${user} "${ssh_authorized_key}"
 
 %post --erroronfail
@@ -19,12 +20,23 @@ sshkey --username=${user} "${ssh_authorized_key}"
 ##############################################
 
 ##
+## passwordless sudo for primary user
+##
+
+cat <<EOF > /etc/sudoers.d/admin
+${user} ALL=(ALL) NOPASSWD: ALL
+EOF
+
+##
 ## allocate vlan interfaces to hardware
 ##
 
-cat <<EOF > /etc/systemd/network/10-${host_network.hw.if}.network
+cat <<EOF > /etc/systemd/network/10-hw.network
 [Match]
-Name=${host_network.hw.if}
+MACAddress=${join(" ", [
+  for h in hosts :
+  h.host_network.hw.mac
+])}
 
 [Link]
 ARP=no
@@ -37,8 +49,8 @@ DHCP=no
 VLAN=${networks[k].br_if}
 %{ endfor ~}
 EOF
-%{ for k in vlans ~}
 
+%{ for k in vlans ~}
 ##
 ## vlan ${k}
 ##
@@ -51,37 +63,17 @@ Kind=vlan
 [VLAN]
 Id=${networks[k].id}
 EOF
-%{ if lookup(host_network, k, null) != null ~}
 
+%{ for h in hosts ~}
+%{ if lookup(h.host_network, k, null) != null ~}
 ## host macvtap on vlan ${k}
-cat <<EOF > /etc/systemd/network/10-${networks[k].br_if}.network
+cat <<EOF > /etc/systemd/network/10-${networks[k].br_if}-${h.host_network.hw.mac}.network
 [Match]
 Name=${networks[k].br_if}
+MACAddress=${h.host_network.hw.mac}
 
 [Link]
-ARP=no
-MTUBytes=${mtu}
-
-[Network]
-LinkLocalAddressing=no
-DHCP=no
-MACVTAP=${k}-tap
-EOF
-
-cat <<EOF > /etc/systemd/network/10-${k}-tap.netdev
-[NetDev]
-Name=${k}-tap
-Kind=macvtap
-
-[MACVTAP]
-Mode=bridge
-EOF
-
-cat <<EOF > /etc/systemd/network/10-${k}-tap.network
-[Match]
-Name=${k}-tap
-
-[Link]
+ARP=yes
 MTUBytes=${mtu}
 
 [Network]
@@ -89,11 +81,12 @@ LinkLocalAddressing=no
 DHCP=yes
 
 [Address]
-Address=${host_network[k].ip}/${networks[k].cidr}
+Address=${h.host_network[k].ip}/${networks[k].cidr}
 EOF
+
 %{ endif ~}
 %{ endfor ~}
-
+%{ endfor ~}
 %{ for k in keys(internal_networks) ~}
 ##
 ## internal network ${k} for host <-> local vm

@@ -89,7 +89,7 @@ spec:
       volumes:
         - name: s3-ingest-vol
           hostPath:
-            path: /hostpath/ingest/mnt
+            path: /var/lib/kubelet/hostpath/ingest/mnt
 
 ---
 apiVersion: v1
@@ -103,8 +103,7 @@ spec:
   accessModes:
   - ReadWriteOnce
   hostPath:
-    path: /hostpath/ingest
-    type: Directory
+    path: /var/lib/kubelet/hostpath/ingest
 
 ---
 apiVersion: v1

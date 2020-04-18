@@ -1,4 +1,4 @@
-timezone --utc America/Los_Angeles
+timezone --utc ${timezone}
 selinux --disabled
 part / --size 20480 --fstype ext4
 
@@ -13,7 +13,7 @@ repo --name=rpmfusion-nonfree-updates --metalink=https://mirrors.rpmfusion.org/m
 repo --name=kubernetes --baseurl=https://packages.cloud.google.com/yum/repos/kubernetes-el7-$basearch
 repo --name=code --baseurl=https://packages.microsoft.com/yumrepos/vscode
 repo --name=winehq --baseurl=https://dl.winehq.org/wine-builds/fedora/$releasever
-repo --name=kernel-vanilla-stable --baseurl=http://repos.fedorapeople.org/repos/thl/kernel-vanilla-mainline/fedora-$releasever/$basearch
+# repo --name=kernel-vanilla-stable --baseurl=http://repos.fedorapeople.org/repos/thl/kernel-vanilla-mainline/fedora-$releasever/$basearch
 
 %packages
 
@@ -99,9 +99,10 @@ EOF
 
 mkdir -p ${persistent_home_path}
 
-cat <<EOF > /etc/systemd/system/${persistent_home_mount}
+cat <<EOF > /etc/systemd/system/${join("-", compact(split("/", persistent_home_path)))}.mount
 [Unit]
 Before=local-fs.target
+ConditionPathExists=${persistent_home_dev}
 
 [Mount]
 What=${persistent_home_dev}
@@ -126,7 +127,7 @@ update-ca-trust
 ##############################################
 
 systemctl enable \
-  ${persistent_home_mount}
+  ${join("-", compact(split("/", persistent_home_path)))}.mount
 
 systemctl set-default graphical.target
 
