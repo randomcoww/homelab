@@ -7,7 +7,7 @@ resource "matchbox_group" "ign-kvm" {
   profile = matchbox_profile.profile-noop.name
   name    = each.key
   selector = {
-    host = each.value.hostname
+    ign = each.value.hostname
   }
   metadata = {
     config = templatefile("${path.module}/../../templates/ignition/kvm.ign.tmpl", each.value)

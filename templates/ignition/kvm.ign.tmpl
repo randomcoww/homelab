@@ -59,6 +59,7 @@ systemd:
 storage:
   links:
     - path: /run/systemd/resolve/resolv.conf
+      filesystem: root
       overwrite: true
       target: /etc/resolv.conf
   files:
