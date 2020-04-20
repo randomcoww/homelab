@@ -1,0 +1,309 @@
+---
+systemd:
+  units:
+    - name: libvirtd.service
+      enabled: true
+    - name: ksm.service
+      enabled: true
+    - name: ksmtuned.service
+      enabled: true
+    - name: kea-dhcp4.service
+      enabled: true
+      dropins:
+        - name: internal.conf
+          contents: |
+            [Service]
+            ExecStart=
+            ExecStart=/usr/sbin/kea-dhcp4 -c /etc/kea/kea-dhcp4-internal.conf
+    - name: matchbox.service
+      enabled: true
+      contents: |
+        [Unit]
+        After=network.target
+
+        [Service]
+        Type=simple
+        TimeoutStartSec=5m
+        Restart=always
+        RestartSec=10
+        ExecStartPre=-/usr/bin/podman rm "matchbox-service"
+        # Host initially has no internet access - preload image
+        ExecStartPre=/usr/bin/podman import image \
+          ${image_preload_path}/matchbox.tgz ${container_images.matchbox}
+        ExecStart=/usr/bin/podman run \
+          --name matchbox-service \
+          --net host \
+          -v ${certs_path}:${certs_path} \
+          ${container_images.kubelet} \
+            -address=${services.renderer.vip}:${services.renderer.ports.http} \
+            -rpc-address=0.0.0.0:${services.renderer.ports.rpc} \
+            -ca-file=${certs_path}/matchbox-ca.pem \
+            -cert-file=${certs_path}/matchbox.pem \
+            -key-file=${certs_path}/matchbox-key.pem \
+            -data-path=${matchbox_data_path} \
+            -assets-path=${matchbox_assets_path}
+        ExecReload=-/usr/bin/podman stop -t 10 "matchbox-service"
+        ExecReload=-/usr/bin/podman rm "matchbox-service"
+        ExecStop=/usr/bin/podman stop -t 10 "matchbox-service"
+
+        [Install]
+        WantedBy=multi-user.target
+
+storage:
+  files:
+    - path: /etc/systemd/network/90-default.network
+      filesystem: root
+      mode: 0644
+      contents:
+        inline: |
+          [Match]
+          Name=en*
+
+          [Link]
+          ARP=no
+
+          [Network]
+          LinkLocalAddressing=no
+          DHCP=no
+
+    ##
+    ## allocate vlan interfaces to hardware
+    ##
+    - path: /etc/systemd/network/10-hw.network
+      filesystem: root
+      mode: 0644
+      contents:
+        inline: |
+          [Match]
+          MACAddress=${join(" ", [
+            for h in hosts :
+            h.host_network.hw.mac
+          ])}
+
+          [Link]
+          ARP=no
+          MTUBytes=${mtu}
+
+          [Network]
+          LinkLocalAddressing=no
+          DHCP=no
+          %{ for k in vlans ~}
+          VLAN=${networks[k].br_if}
+          %{ endfor ~}
+
+    %{~ for k in vlans ~}
+    ##
+    ## vlan ${k}
+    ##
+    - path: /etc/systemd/network/10-${networks[k].br_if}.netdev
+      filesystem: root
+      mode: 0644
+      contents:
+        inline: |
+          [NetDev]
+          Name=${networks[k].br_if}
+          Kind=vlan
+
+          [VLAN]
+          Id=${networks[k].id}
+
+    %{~ for h in hosts ~}
+    %{~ if lookup(h.host_network, k, null) != null ~}
+    - path: /etc/systemd/network/10-${networks[k].br_if}-${h.host_network.hw.mac}.network
+      filesystem: root
+      mode: 0644
+      contents:
+        inline: |
+          [Match]
+          Name=${networks[k].br_if}
+          MACAddress=${h.host_network.hw.mac}
+
+          [Link]
+          ARP=yes
+          MTUBytes=${mtu}
+
+          [Network]
+          LinkLocalAddressing=no
+          DHCP=yes
+
+          [Address]
+          Address=${h.host_network[k].ip}/${networks[k].cidr}
+
+    %{~ endif ~}
+    %{~ endfor ~}
+    %{~ endfor ~}
+    %{~ for k in keys(internal_networks) ~}
+    ##
+    ## internal network ${k} for host <-> local vm
+    ##
+    - path: /etc/systemd/network/10-${internal_networks[k].if}.netdev
+      filesystem: root
+      mode: 0644
+      contents:
+        inline: |
+          [NetDev]
+          Name=${internal_networks[k].if}
+          Kind=bridge
+
+    - path: /etc/systemd/network/10-${internal_networks[k].if}.network
+      filesystem: root
+      mode: 0644
+      contents:
+        inline: |
+          [Match]
+          Name=${internal_networks[k].if}
+
+          [Link]
+          ARP=no
+
+          [Network]
+          LinkLocalAddressing=no
+          DHCP=no
+          MACVTAP=${k}-tap
+          Bridge=${k}-dummy
+
+    - path: /etc/systemd/network/10-${k}-dummy.netdev
+      filesystem: root
+      mode: 0644
+      contents:
+        inline: |
+          [NetDev]
+          Name=${k}-dummy
+          Kind=dummy
+
+    - path: /etc/systemd/network/10-${k}-dummy.network
+      filesystem: root
+      mode: 0644
+      contents:
+        inline: |
+          [Match]
+          Name=${k}-dummy
+
+          [Link]
+          ARP=no
+
+          [Network]
+          LinkLocalAddressing=no
+          DHCP=no
+          Bridge=${internal_networks[k].if}
+
+    - path: /etc/systemd/network/10-${k}-tap.netdev
+      filesystem: root
+      mode: 0644
+      contents:
+        inline: |
+          [NetDev]
+          Name=${k}-tap
+          Kind=macvtap
+
+          [MACVTAP]
+          Mode=bridge
+
+    - path: /etc/systemd/network/10-${k}-tap.network
+      filesystem: root
+      mode: 0644
+      contents:
+        inline: |
+          [Match]
+          Name=${k}-tap
+
+          [Network]
+          LinkLocalAddressing=no
+          DHCP=no
+
+          [Address]
+          Address=${internal_networks[k].ip}/${networks[k].cidr}
+    %{~ endfor ~}
+
+    - path: /etc/kea/kea-dhcp4-internal.conf
+      filesystem: root
+      mode: 0644
+      contents:
+        inline: |
+          {
+            "Dhcp4": {
+              "interfaces-config": {
+                "interfaces": ${jsonencode([
+                  for k in keys(internal_networks):
+                  "${k}-tap"
+                  if lookup(networks[k], "dhcp_pool", null) != null
+                ])}
+              },
+              "client-classes": [
+                {
+                  "name": "ipxe_detected",
+                  "test": "substring(option[77].hex,0,4) == 'iPXE'",
+                  "boot-file-name": "http://${services.renderer.vip}:${services.renderer.ports.http}/boot.ipxe"
+                }
+              ],
+              "subnet4": ${jsonencode([
+                for k in keys(internal_networks):
+                {
+                  subnet = "${networks[k].network}/${networks[k].cidr}",
+                  pools = [
+                    {
+                      pool = "${networks[k].dhcp_pool}"
+                    }
+                  ]
+                }
+                if lookup(networks[k], "dhcp_pool", null) != null
+              ])}
+            }
+          }
+
+    ##
+    ## certs
+    ##
+    - path: ${certs_path}/matchbox-ca.pem
+      filesystem: root
+      mode: 0644
+      contents:
+        inline: "${tls_matchbox_ca}"
+    - path: ${certs_path}/matchbox.pem
+      filesystem: root
+      mode: 0644
+      contents:
+        inline: "${tls_matchbox}"
+    - path: ${certs_path}/matchbox-key.pem
+      filesystem: root
+      mode: 0644
+      contents:
+        inline: "${tls_matchbox_key}"
+
+    - path: /etc/systemd/journal.conf.d/05-live.conf
+      filesystem: root
+      mode: 0644
+      contents:
+        inline: |
+          [Journal]
+          Storage=volatile
+          RuntimeMaxUse=15M
+          ForwardToSyslog=no
+          ForwardToConsole=no
+    - path: /etc/systemd/resolved.conf.d/05-disable-stub.conf
+      filesystem: root
+      mode: 0644
+      contents:
+        inline: |
+          [Resolve]
+          FallbackDNS=
+          DNSStubListener=no
+    - path: /etc/systemd/system.conf.d/05-live.conf
+      filesystem: root
+      mode: 0644
+      contents:
+        inline: |
+          [Manager]
+          DumpCore=no
+
+passwd:
+  users:
+    - name: ${user}
+      groups:
+        - adm
+        - sudo
+        - systemd-journal
+        - wheel
+        - libvirt
+      ssh_authorized_keys:
+        - ${ssh_authorized_key}

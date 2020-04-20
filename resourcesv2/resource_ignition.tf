@@ -82,6 +82,29 @@ module "test-common" {
   }
 }
 
+module "kvm-common" {
+  source = "../modulesv2/kvm_common"
+
+  user              = local.user
+  ssh_ca_public_key = tls_private_key.ssh-ca.public_key_openssh
+  mtu               = local.mtu
+  networks          = local.networks
+  services          = local.services
+  domains           = local.domains
+  container_images  = local.container_images
+
+  kvm_hosts = {
+    for k in keys(local.hosts) :
+    k => merge(local.hosts[k], {
+      host_network = {
+        for n in local.hosts[k].network :
+        lookup(n, "alias", lookup(n, "network", "placeholder")) => n
+      }
+    })
+    if contains(local.hosts[k].components, "kvm")
+  }
+}
+
 ##
 ## Write config to each matchbox host
 ## Hardcode each matchbox host until for_each module becomes available
@@ -93,7 +116,8 @@ module "ignition-kvm-0" {
   controller_params = module.kubernetes-common.controller_params
   worker_params     = module.kubernetes-common.worker_params
   gateway_params    = module.gateway-common.gateway_params
-  test_params       = module.test-common.test_params
+  test_params       = {}
+  kvm_params        = {}
   renderer          = local.renderers.kvm-0
 }
 
@@ -104,7 +128,8 @@ module "ignition-kvm-1" {
   controller_params = module.kubernetes-common.controller_params
   worker_params     = module.kubernetes-common.worker_params
   gateway_params    = module.gateway-common.gateway_params
-  test_params       = module.test-common.test_params
+  test_params       = {}
+  kvm_params        = {}
   renderer          = local.renderers.kvm-1
 }
 
@@ -116,10 +141,11 @@ module "ignition-desktop" {
   worker_params     = module.kubernetes-common.worker_params
   gateway_params    = module.gateway-common.gateway_params
   test_params       = module.test-common.test_params
+  kvm_params        = {}
   renderer          = local.renderers.desktop
 }
 
-# Test locally
+# Build and test environment
 module "ignition-local" {
   source = "../modulesv2/ignition"
 
@@ -128,6 +154,7 @@ module "ignition-local" {
   worker_params     = module.kubernetes-common.worker_params
   gateway_params    = module.gateway-common.gateway_params
   test_params       = module.test-common.test_params
+  kvm_params        = module.kvm-common.kvm_params
   renderer          = local.local_renderer
 }
 
@@ -141,4 +168,23 @@ resource "local_file" "kubeconfig-admin" {
     apiserver_endpoint = module.kubernetes-common.apiserver_endpoint
   })
   filename = "output/${module.kubernetes-common.cluster_name}.kubeconfig"
+}
+
+locals {
+  matchbox_renderers = {
+    for k in keys(module.ignition-local.matchbox_rpc_endpoints) :
+    k => {
+      endpoint        = module.ignition-local.matchbox_rpc_endpoints[k]
+      cert_pem        = module.ignition-local.matchbox_cert_pem
+      private_key_pem = module.ignition-local.matchbox_private_key_pem
+      ca_pem          = module.ignition-local.matchbox_ca_pem
+    }
+  }
+
+  coreos_libvirt = {
+    for k in keys(module.ignition-local.libvirt_endpoints) :
+    k => {
+      endpoint = module.ignition-local.libvirt_endpoints[k]
+    }
+  }
 }

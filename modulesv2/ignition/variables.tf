@@ -10,6 +10,10 @@ variable "worker_params" {
   type = any
 }
 
+variable "kvm_params" {
+  type = any
+}
+
 variable "test_params" {
   type = any
 }

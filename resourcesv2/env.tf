@@ -26,6 +26,7 @@ locals {
     kea                     = "randomcoww/kea:1.6.1"
     conntrackd              = "randomcoww/conntrackd:latest"
     promtail                = "randomcoww/promtail:v1.2.0"
+    matchbox                = "quay.io/poseidon/matchbox:latest"
   }
 
   services = {
