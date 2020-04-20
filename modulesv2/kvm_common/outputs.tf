@@ -13,7 +13,7 @@ output "kvm_params" {
       networks           = var.networks
       services           = var.services
       certs_path         = "/etc/ssl/certs"
-      image_preload_path = "/var/opt/podman"
+      image_preload_path = "/var/opt/container-save"
 
       vlans = [
         for k in keys(var.networks) :
@@ -27,8 +27,8 @@ output "kvm_params" {
         }
       }
 
-      matchbox_data_path       = "/var/lib/matchbox/data"
-      matchbox_assets_path     = "/var/lib/matchbox/assets"
+      matchbox_data_path       = "/etc/matchbox/data"
+      matchbox_assets_path     = "/etc/matchbox/assets"
       tls_matchbox_ca          = replace(tls_self_signed_cert.matchbox-ca.cert_pem, "\n", "\\n")
       tls_matchbox             = replace(tls_locally_signed_cert.matchbox.cert_pem, "\n", "\\n")
       tls_matchbox_key         = replace(tls_private_key.matchbox.private_key_pem, "\n", "\\n")

@@ -1,6 +1,13 @@
 ---
 systemd:
   units:
+    - name: NetworkManager.service
+      enabled: false
+      mask: true
+    - name: systemd-networkd.service
+      enabled: true
+    - name: systemd-resolved.service
+      enabled: true
     - name: libvirtd.service
       enabled: true
     - name: ksm.service
@@ -19,22 +26,25 @@ systemd:
       enabled: true
       contents: |
         [Unit]
-        After=network.target
+        After=network-online.target
+        Wants=network-online.target
 
         [Service]
-        Type=simple
         TimeoutStartSec=5m
         Restart=always
         RestartSec=10
-        ExecStartPre=-/usr/bin/podman rm "matchbox-service"
+        ExecStartPre=-/usr/bin/podman kill matchbox-service
+        ExecStartPre=-/usr/bin/podman rm matchbox-service
         # Host initially has no internet access - preload image
-        ExecStartPre=/usr/bin/podman import image \
+        ExecStartPre=-/usr/bin/podman import image \
           ${image_preload_path}/matchbox.tgz ${container_images.matchbox}
         ExecStart=/usr/bin/podman run \
           --name matchbox-service \
           --net host \
           -v ${certs_path}:${certs_path} \
-          ${container_images.kubelet} \
+          -v ${matchbox_data_path}:${matchbox_data_path} \
+          -v ${matchbox_assets_path}:${matchbox_assets_path} \
+          ${container_images.matchbox} \
             -address=${services.renderer.vip}:${services.renderer.ports.http} \
             -rpc-address=0.0.0.0:${services.renderer.ports.rpc} \
             -ca-file=${certs_path}/matchbox-ca.pem \
@@ -42,14 +52,15 @@ systemd:
             -key-file=${certs_path}/matchbox-key.pem \
             -data-path=${matchbox_data_path} \
             -assets-path=${matchbox_assets_path}
-        ExecReload=-/usr/bin/podman stop -t 10 "matchbox-service"
-        ExecReload=-/usr/bin/podman rm "matchbox-service"
-        ExecStop=/usr/bin/podman stop -t 10 "matchbox-service"
 
         [Install]
         WantedBy=multi-user.target
 
 storage:
+  links:
+    - path: /run/systemd/resolve/resolv.conf
+      overwrite: true
+      target: /etc/resolv.conf
   files:
     - path: /etc/systemd/network/90-default.network
       filesystem: root
