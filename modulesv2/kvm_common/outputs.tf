@@ -13,7 +13,7 @@ output "kvm_params" {
       networks           = var.networks
       services           = var.services
       certs_path         = "/etc/ssl/certs"
-      image_preload_path = "/var/opt/container-save"
+      image_preload_path = "/etc/container-save"
 
       vlans = [
         for k in keys(var.networks) :

@@ -1,13 +1,6 @@
 ---
 systemd:
   units:
-    - name: NetworkManager.service
-      enabled: false
-      mask: true
-    - name: systemd-networkd.service
-      enabled: true
-    - name: systemd-resolved.service
-      enabled: true
     - name: libvirtd.service
       enabled: true
     - name: ksm.service
@@ -33,13 +26,13 @@ systemd:
         TimeoutStartSec=5m
         Restart=always
         RestartSec=10
-        ExecStartPre=-/usr/bin/podman kill matchbox-service
-        ExecStartPre=-/usr/bin/podman rm matchbox-service
-        # Host initially has no internet access - preload image
-        ExecStartPre=-/usr/bin/podman import image \
-          ${image_preload_path}/matchbox.tgz ${container_images.matchbox}
-        ExecStart=/usr/bin/podman run \
-          --name matchbox-service \
+        ExecStartPre=/usr/bin/mkdir -p \
+          ${matchbox_data_path} ${matchbox_assets_path}
+        # Host initially has no internet access - use image archive
+        ExecStartPre=-/usr/bin/podman load -i \
+          ${image_preload_path}/matchbox.tar
+        ExecStart=/usr/bin/podman run --rm \
+          --security-opt label=disable \
           --net host \
           -v ${certs_path}:${certs_path} \
           -v ${matchbox_data_path}:${matchbox_data_path} \
@@ -57,11 +50,6 @@ systemd:
         WantedBy=multi-user.target
 
 storage:
-  links:
-    - path: /run/systemd/resolve/resolv.conf
-      filesystem: root
-      overwrite: true
-      target: /etc/resolv.conf
   files:
     - path: /etc/systemd/network/90-default.network
       filesystem: root
