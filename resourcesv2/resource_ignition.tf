@@ -105,27 +105,6 @@ module "kvm-common" {
   }
 }
 
-module "desktop-common" {
-  source = "../modulesv2/desktop_common"
-
-  user                 = var.desktop_user
-  password             = var.desktop_password
-  internal_ca_cert_pem = tls_self_signed_cert.internal-ca.cert_pem
-  mtu                  = local.mtu
-  networks             = local.networks
-
-  desktop_hosts = {
-    for k in keys(local.hosts) :
-    k => merge(local.hosts[k], {
-      host_network = {
-        for n in local.hosts[k].network :
-        lookup(n, "alias", lookup(n, "network", "placeholder")) => n
-      }
-    })
-    if contains(local.hosts[k].components, "desktop")
-  }
-}
-
 ##
 ## Write config to each matchbox host
 ## Hardcode each matchbox host until for_each module becomes available
@@ -139,7 +118,6 @@ module "ignition-kvm-0" {
   gateway_params    = module.gateway-common.gateway_params
   test_params       = {}
   kvm_params        = {}
-  desktop_params    = {}
   renderer          = module.kvm-common.matchbox_rpc_endpoints.kvm-0
 }
 
@@ -152,7 +130,6 @@ module "ignition-kvm-1" {
   gateway_params    = module.gateway-common.gateway_params
   test_params       = {}
   kvm_params        = {}
-  desktop_params    = {}
   renderer          = module.kvm-common.matchbox_rpc_endpoints.kvm-1
 }
 
@@ -166,7 +143,6 @@ module "ignition-local" {
   gateway_params    = module.gateway-common.gateway_params
   test_params       = module.test-common.test_params
   kvm_params        = module.kvm-common.kvm_params
-  desktop_params    = module.desktop-common.desktop_params
   renderer          = local.local_renderer
 }
 

@@ -6,6 +6,10 @@ variable "password" {
   type = string
 }
 
+variable "local_timezone" {
+  type = string
+}
+
 variable "mtu" {
   type = number
 }

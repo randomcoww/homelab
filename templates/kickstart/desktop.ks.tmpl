@@ -17,6 +17,10 @@ repo --name=winehq --baseurl=https://dl.winehq.org/wine-builds/fedora/$releaseve
 
 %packages
 
+libvirt-daemon-kvm
+ksmtuned
+kea
+
 @fonts
 @gnome-desktop
 @hardware-support
@@ -77,7 +81,7 @@ winehq-staging
 
 %end
 
-user --name=${user} --password=${password} --plaintext --uid=10000 --gid=10000 --groups=wheel,libvirt --homedir=${persistent_home_path}/${user}
+user --name=${user} --password=${bcrypt(password)} --iscrypted --uid=${uid} --groups=wheel,libvirt --homedir=${persistent_home_path}/${user}
 
 %post --erroronfail
 
@@ -85,7 +89,7 @@ user --name=${user} --password=${password} --plaintext --uid=10000 --gid=10000 -
 ## networkd
 ##############################################
 
-cat <<EOF > /etc/systemd/network/90-wl.network
+cat <<EOF > /etc/systemd/network/80-wl.network
 [Match]
 Name=wl*
 
@@ -93,6 +97,66 @@ Name=wl*
 Unmanaged=true
 EOF
 
+##
+## allocate vlan interfaces to hardware
+##
+
+cat <<EOF > /etc/systemd/network/10-hw.network
+[Match]
+MACAddress=${join(" ", [
+  for h in hosts :
+  h.host_network.hw.mac
+])}
+
+[Link]
+ARP=no
+MTUBytes=${mtu}
+
+[Network]
+LinkLocalAddressing=no
+DHCP=no
+%{ for k in vlans ~}
+VLAN=${networks[k].br_if}
+%{ endfor ~}
+EOF
+
+%{ for k in vlans ~}
+##
+## vlan ${k}
+##
+
+cat <<EOF > /etc/systemd/network/10-${networks[k].br_if}.netdev
+[NetDev]
+Name=${networks[k].br_if}
+Kind=vlan
+
+[VLAN]
+Id=${networks[k].id}
+EOF
+
+%{ for h in hosts ~}
+%{ if lookup(h.host_network, k, null) != null ~}
+## host macvtap on vlan ${k}
+cat <<EOF > /etc/systemd/network/10-${networks[k].br_if}-${h.host_network.hw.mac}.network
+[Match]
+Name=${networks[k].br_if}
+MACAddress=${h.host_network.hw.mac}
+
+[Link]
+ARP=yes
+MTUBytes=${mtu}
+
+[Network]
+LinkLocalAddressing=no
+DHCP=yes
+
+[Address]
+Address=${h.host_network[k].ip}/${networks[k].cidr}
+EOF
+
+%{ endif ~}
+%{ endfor ~}
+%{ endfor ~}
 ##############################################
 ## persistent home directory
 ##############################################
@@ -116,7 +180,7 @@ EOF
 ## trust internal CA
 ##############################################
 
-cat <<EOF > ${certs_path}/internal-ca.pem
+cat <<EOF > ${internal_tls_path}/internal-ca.pem
 ${tls_internal_ca}
 EOF
 
@@ -127,6 +191,7 @@ update-ca-trust
 ##############################################
 
 systemctl enable \
+  libvirtd ksm ksmtuned \
   ${join("-", compact(split("/", persistent_home_path)))}.mount
 
 systemctl set-default graphical.target

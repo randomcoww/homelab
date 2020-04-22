@@ -14,10 +14,6 @@ variable "kvm_params" {
   type = any
 }
 
-variable "desktop_params" {
-  type = any
-}
-
 variable "test_params" {
   type = any
 }
