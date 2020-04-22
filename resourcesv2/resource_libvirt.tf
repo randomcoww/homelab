@@ -5,7 +5,7 @@
 module "libvirt-kvm-0" {
   source = "../modulesv2/libvirt"
 
-  libvirt_endpoint = local.libvirt.kvm-0.endpoint
+  libvirt_endpoint = module.kvm-common.libvirt_endpoints.kvm-0.endpoint
   networks         = local.networks
 
   guests = {
@@ -27,33 +27,11 @@ module "libvirt-kvm-0" {
 module "libvirt-kvm-1" {
   source = "../modulesv2/libvirt"
 
-  libvirt_endpoint = local.libvirt.kvm-1.endpoint
+  libvirt_endpoint = module.kvm-common.libvirt_endpoints.kvm-1.endpoint
   networks         = local.networks
 
   guests = {
     for k in local.hosts.kvm-1.guests :
-    k => {
-      vcpu    = local.hosts[k].vcpu
-      memory  = local.hosts[k].memory
-      network = lookup(local.hosts[k], "network", [])
-      hostdev = lookup(local.hosts[k], "hostdev", [])
-      disk = [
-        for k in lookup(local.hosts[k], "disk", []) :
-        k
-        if lookup(k, "source", null) != null && lookup(k, "target", null) != null
-      ]
-    }
-  }
-}
-
-module "libvirt-desktop" {
-  source = "../modulesv2/libvirt"
-
-  libvirt_endpoint = local.libvirt.desktop.endpoint
-  networks         = local.networks
-
-  guests = {
-    for k in local.hosts.desktop.guests :
     k => {
       vcpu    = local.hosts[k].vcpu
       memory  = local.hosts[k].memory

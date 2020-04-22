@@ -1,21 +1,11 @@
-output "cluster_name" {
-  value = var.cluster_name
-}
-
-output "apiserver_endpoint" {
-  value = "https://${var.services.kubernetes_apiserver.vip}:${var.services.kubernetes_apiserver.ports.secure}"
-}
-
-output "kubernetes_ca_pem" {
-  value = tls_self_signed_cert.kubernetes-ca.cert_pem
-}
-
-output "kubernetes_cert_pem" {
-  value = tls_locally_signed_cert.kubernetes-client.cert_pem
-}
-
-output "kubernetes_private_key_pem" {
-  value = tls_private_key.kubernetes-client.private_key_pem
+output "cluster_endpoint" {
+  value = {
+    cluster_name               = var.cluster_name
+    apiserver_endpoint         = "https://${var.services.kubernetes_apiserver.vip}:${var.services.kubernetes_apiserver.ports.secure}"
+    kubernetes_ca_pem          = tls_self_signed_cert.kubernetes-ca.cert_pem
+    kubernetes_cert_pem        = tls_locally_signed_cert.kubernetes-client.cert_pem
+    kubernetes_private_key_pem = tls_private_key.kubernetes-client.private_key_pem
+  }
 }
 
 output "controller_params" {

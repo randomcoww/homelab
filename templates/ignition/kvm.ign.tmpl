@@ -1,12 +1,29 @@
 ---
 systemd:
   units:
+    - name: NetworkManager.service
+      mask: true
+    - name: systemd-networkd.service
+      enabled: true
+    - name: systemd-resolved.service
+      enabled: true
+    - name: systemd-networkd-wait-online.service
+      mask: true
     - name: libvirtd.service
       enabled: true
     - name: ksm.service
       enabled: true
     - name: ksmtuned.service
       enabled: true
+    # /etc/fstab is not present in live - use --all
+    - name: fstrim.service
+      enabled: true
+      dropins:
+        - name: all.conf
+          contents: |
+            [Service]
+            ExecStart=
+            ExecStart=/usr/sbin/fstrim --all --verbose --quiet
     - name: kea-dhcp4.service
       enabled: true
       dropins:
@@ -27,22 +44,22 @@ systemd:
         Restart=always
         RestartSec=10
         ExecStartPre=/usr/bin/mkdir -p \
-          ${matchbox_data_path} ${matchbox_assets_path}
+          ${matchbox_data_path} ${matchbox_assets_path} ${matchbox_tls_path}
         # Host initially has no internet access - use image archive
         ExecStartPre=-/usr/bin/podman load -i \
           ${image_preload_path}/matchbox.tar
         ExecStart=/usr/bin/podman run --rm \
           --security-opt label=disable \
           --net host \
-          -v ${certs_path}:${certs_path} \
+          -v ${matchbox_tls_path}:${matchbox_tls_path} \
           -v ${matchbox_data_path}:${matchbox_data_path} \
           -v ${matchbox_assets_path}:${matchbox_assets_path} \
           ${container_images.matchbox} \
             -address=${services.renderer.vip}:${services.renderer.ports.http} \
             -rpc-address=0.0.0.0:${services.renderer.ports.rpc} \
-            -ca-file=${certs_path}/matchbox-ca.pem \
-            -cert-file=${certs_path}/matchbox.pem \
-            -key-file=${certs_path}/matchbox-key.pem \
+            -ca-file=${matchbox_tls_path}/matchbox-ca.pem \
+            -cert-file=${matchbox_tls_path}/matchbox.pem \
+            -key-file=${matchbox_tls_path}/matchbox-key.pem \
             -data-path=${matchbox_data_path} \
             -assets-path=${matchbox_assets_path}
 
@@ -254,17 +271,17 @@ storage:
     ##
     ## certs
     ##
-    - path: ${certs_path}/matchbox-ca.pem
+    - path: ${matchbox_tls_path}/matchbox-ca.pem
       filesystem: root
       mode: 0644
       contents:
         inline: "${tls_matchbox_ca}"
-    - path: ${certs_path}/matchbox.pem
+    - path: ${matchbox_tls_path}/matchbox.pem
       filesystem: root
       mode: 0644
       contents:
         inline: "${tls_matchbox}"
-    - path: ${certs_path}/matchbox-key.pem
+    - path: ${matchbox_tls_path}/matchbox-key.pem
       filesystem: root
       mode: 0644
       contents:
