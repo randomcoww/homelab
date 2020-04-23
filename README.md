@@ -31,16 +31,26 @@ ssh-keygen -s $CA -I $USER -n core -V +1w -z 1 $KEY
 
 ### Create hypervisor images
 
-Hypervisor images are live USB disks created using Kickstart and livemedia-creator. Generate Kickstart configuration to local Matchbox server:
+Hypervisor images are live USB disks created using [Fedora CoreOS assembler](https://github.com/coreos/coreos-assembler). Generate ignition configuration to local Matchbox server:
 
 ```bash
 cd resourcesv2
-terraform apply -target=module.kickstart
+terraform apply -target=module.ignition-local
+```
+
+Run build from https://github.com/randomcoww/fedora-coreos-custom
+
+### Create desktop image
+
+Desktop image is built using Kickstart and Fedora livemedia-creator. Generate kickstart configuration to local Matchbox server:
+
+```bash
+cd resourcesv2
+terraform apply -target=module.kickstart-local
 ```
 
 Generate USB images for hypervisor hosts:
-
-```bash
+```
 cd build/kickstart
 export FEDORA_RELEASE=31
 export ISO_FILE=Fedora-Server-netinst-x86_64-31-1.9.iso
@@ -48,29 +58,6 @@ export ISO_FILE=Fedora-Server-netinst-x86_64-31-1.9.iso
 wget \
     https://download.fedoraproject.org/pub/fedora/linux/releases/$FEDORA_RELEASE/Server/x86_64/iso/$ISO_FILE
 
-sudo livemedia-creator \
-    --make-iso \
-    --iso=$ISO_FILE \
-    --project Fedora \
-    --volid kvm \
-    --releasever $FEDORA_RELEASE \
-    --title kvm \
-    --resultdir ./result \
-    --tmp . \
-    --ks=./kvm.ks \
-    --no-virt \
-    --lorax-templates ./lorax-kvm
-```
-
-Write boot image to disks as below. The same image may be used for all KVM hosts.
-
-```
-sudo dd if=result/images/boot.iso of=/dev/sdb bs=4k
-```
-
-Image for the desktop (admin) PC can also be generated using this method. This image will trust the internal CA.
-
-```
 sudo livemedia-creator \
     --make-iso \
     --iso=$ISO_FILE \
@@ -84,6 +71,8 @@ sudo livemedia-creator \
     --no-virt \
     --lorax-templates ./lorax-desktop
 ```
+
+Write boot image from `result/images/boot.iso` to disk.
 
 ### Generate configuration on hypervisor hosts
 
