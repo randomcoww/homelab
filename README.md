@@ -47,6 +47,7 @@ buildtool tf-wrapper apply \
 Sign an existing key:
 
 ```
+cd resourcesv2
 CA=$(pwd)/output/ssh-ca-key.pem
 KEY=$HOME/.ssh/id_ecdsa.pub
 USER=$(whoami)
