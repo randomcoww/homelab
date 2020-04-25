@@ -110,8 +110,7 @@ Ignition configuration is generated on each hypervisor as follows:
 ```bash
 buildtool tf-wrapper apply \
     -target=module.ignition-kvm-0 \
-    -target=module.ignition-kvm-1 \
-    -target=module.ignition-desktop
+    -target=module.ignition-kvm-1
 ```
 
 Define VMs on each hypervisor:
@@ -119,8 +118,7 @@ Define VMs on each hypervisor:
 ```bash
 buildtool tf-wrapper apply \
     -target=module.libvirt-kvm-0 \
-    -target=module.libvirt-kvm-1 \
-    -target=module.libvirt-desktop
+    -target=module.libvirt-kvm-1
 ```
 
 ### Start gateway VMs
