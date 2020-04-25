@@ -13,10 +13,6 @@ RUN set -x \
   \
   && git clone https://github.com/poseidon/terraform-provider-matchbox.git terraform-provider-matchbox \
   && cd terraform-provider-matchbox \
-  && GO111MODULE=on GOOS=linux go install \
-  \
-  && git clone https://github.com/poseidon/terraform-provider-ct.git terraform-provider-ct \
-  && cd terraform-provider-ct \
   && GO111MODULE=on GOOS=linux go install
 
 FROM golang:alpine AS MATCHBOX
@@ -33,11 +29,16 @@ RUN set -x \
 FROM alpine:edge
 
 ENV HOME /root
-ENV VERSION 0.12.20
+ENV TF_VERSION 0.12.20
+ENV CT_VERSION v0.5.0
+
+WORKDIR $HOME
 
 COPY --from=MATCHBOX /go/bin/ /usr/local/bin/
 COPY files/tf-wrapper.sh /usr/local/bin/tf-wrapper
 COPY files/start-renderer.sh /usr/local/bin/start-renderer
+COPY --from=MODULES /go/bin/ .terraform.d/plugins/
+COPY files/ssh-config .ssh/config
 
 RUN set -x \
   \
@@ -49,14 +50,15 @@ RUN set -x \
   \
   && update-ca-certificates \
   && wget -O terraform.zip \
-    https://releases.hashicorp.com/terraform/${VERSION}/terraform_${VERSION}_linux_amd64.zip \
+    https://releases.hashicorp.com/terraform/${TF_VERSION}/terraform_${TF_VERSION}_linux_amd64.zip \
   && unzip terraform.zip -d /usr/local/bin/ \
-  && rm terraform.zip
-
-WORKDIR $HOME
-COPY --from=MODULES /go/bin/ go/bin/
-COPY files/terraformrc .terraformrc
-COPY files/ssh-config .ssh/config
+  && rm terraform.zip \
+  \
+  && wget -O terraform-provider-ct.tar.gz \
+    https://github.com/poseidon/terraform-provider-ct/releases/download/${CT_VERSION}/terraform-provider-ct-${CT_VERSION}-linux-amd64.tar.gz \
+  && tar xzf terraform-provider-ct.tar.gz --strip 1 -C .terraform.d/plugins/ \
+  && rm terraform-provider-ct.tar.gz \
+  && mv .terraform.d/plugins/terraform-provider-ct .terraform.d/plugins/terraform-provider-ct_${CT_VERSION}
 
 VOLUME ["$HOME/mnt"]
 WORKDIR $HOME/mnt/resourcesv2
