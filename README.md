@@ -9,7 +9,7 @@ buildtool() {
         -v $HOME/.aws:/root/.aws \
         -v $(pwd):/root/mnt \
         --net=host \
-        randomcoww/tf-env "$@"
+        randomcoww/tf-env:latest "$@"
     rc=$?; set +x; return $rc
 }
 ```
@@ -24,7 +24,7 @@ buildtool() {
         -e AWS_SECRET_ACCESS_KEY=$AWS_SECRET_ACCESS_KEY \
         -v $(pwd):/root/mnt \
         --net=host \
-        randomcoww/tf-env "$@"
+        randomcoww/tf-env:latest "$@"
     rc=$?; set +x; return $rc
 }
 ```
