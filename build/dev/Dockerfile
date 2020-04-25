@@ -10,8 +10,13 @@ RUN set -x \
   && git clone https://github.com/randomcoww/terraform-provider-libvirt.git terraform-provider-libvirt \
   && cd terraform-provider-libvirt \
   && GO111MODULE=on GOOS=linux go install \
+  \
   && git clone https://github.com/poseidon/terraform-provider-matchbox.git terraform-provider-matchbox \
   && cd terraform-provider-matchbox \
+  && GO111MODULE=on GOOS=linux go install \
+  \
+  && git clone https://github.com/poseidon/terraform-provider-ct.git terraform-provider-ct \
+  && cd terraform-provider-ct \
   && GO111MODULE=on GOOS=linux go install
 
 FROM golang:alpine AS MATCHBOX
