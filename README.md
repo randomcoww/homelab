@@ -25,7 +25,8 @@ buildtool start-renderer
 Write SSH CA private key to sign a key for accessing the hypervisor over `virsh` and `ssh`:
 
 ```bash
-buildtool tf-wrapper apply -target=local_file.ssh-ca-key
+buildtool tf-wrapper apply \
+    -target=local_file.ssh-ca-key
 ```
 
 Sign an existing key:
@@ -44,7 +45,8 @@ ssh-keygen -s $CA -I $USER -n core -V +1w -z 1 $KEY
 Hypervisor images are live USB disks created using [Fedora CoreOS assembler](https://github.com/coreos/coreos-assembler). Generate ignition configuration to local Matchbox server:
 
 ```bash
-buildtool tf-wrapper apply -target=module.ignition-local
+buildtool tf-wrapper apply \
+    -target=module.ignition-local
 ```
 
 Run build from https://github.com/randomcoww/fedora-coreos-custom
@@ -54,7 +56,8 @@ Run build from https://github.com/randomcoww/fedora-coreos-custom
 Desktop image is built using Kickstart and Fedora livemedia-creator. Generate kickstart configuration to local Matchbox server:
 
 ```bash
-buildtool tf-wrapper apply -target=module.kickstart-local
+buildtool tf-wrapper apply \
+    -target=module.kickstart-local
 ```
 
 Generate USB images for hypervisor hosts:
@@ -131,6 +134,7 @@ Write kubeconfig file:
 ```bash
 buildtool tf-wrapper apply \
     -target=local_file.kubeconfig-admin
+
 export KUBECONFIG=$(pwd)/output/default-cluster-012.kubeconfig
 ```
 
