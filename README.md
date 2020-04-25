@@ -1,5 +1,7 @@
 ## Terraform configs for provisioning homelab resources
 
+Build container includes terraform with plugins:
+
 ```
 buildtool() {
     set -x
