@@ -17,10 +17,6 @@ repo --name=winehq --baseurl=https://dl.winehq.org/wine-builds/fedora/$releaseve
 
 %packages
 
-libvirt-daemon-kvm
-ksmtuned
-kea
-
 @fonts
 @gnome-desktop
 @hardware-support
@@ -28,13 +24,32 @@ kea
 @base-x
 kernel-devel
 kernel-headers
+
 hdparm
 ipmitool
 pciutils
 usbutils
 lm_sensors
+nmap
+ldns-utils
+openssl
+jq
+net-tools
+unzip
+unrar
+p7zip
+vdpauinfo
+libva-vdpau-driver
+libva-utils
+
+libvirt-daemon-kvm
 libvirt-client
 libvirt-devel
+virt-viewer
+ksmtuned
+podman
+fuse-overlayfs
+
 xclip
 vim-enhanced
 git
@@ -43,27 +58,13 @@ kubectl
 code
 mpv
 youtube-dl
-nmap
-unzip
-unrar
-p7zip
 awscli
+gimp
+vlc
+ncmpcpp
+firefox
 lorax-lmc-novirt
 xorriso
-virt-viewer
-gimp
-ldns-utils
-openssl
-vlc
-jq
-ncmpcpp
-podman
-fuse-overlayfs
-net-tools
-vdpauinfo
-libva-vdpau-driver
-libva-utils
-firefox
 
 ## gaming
 steam
