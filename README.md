@@ -1,12 +1,23 @@
 ## Terraform configs for provisioning homelab resources
 
+```
+buildtool() {
+    set -x
+    podman run -it --rm \
+        -v $HOME/.aws:/root/.aws \
+        -v $(pwd):/root/mnt \
+        --net=host \
+        randomcoww/tf-env "$@"
+    rc=$?; set +x; return $rc
+}
+```
+
 ### Run local matchbox server
 
 Configurations for creating hypervisor images are generated on a local [Matchbox](https://github.com/coreos/matchbox/) instance. This will generate necessary TLS certs and start a local Matchbox instance using Podman:
 
 ```bash
-cd resourcesv2
-./run_renderer.sh
+buildtool start-renderer
 ```
 
 ### Setup SSH access
@@ -14,8 +25,7 @@ cd resourcesv2
 Write SSH CA private key to sign a key for accessing the hypervisor over `virsh` and `ssh`:
 
 ```bash
-cd resourcesv2
-terraform apply -target=local_file.ssh-ca-key
+buildtool tf-wrapper apply -target=local_file.ssh-ca-key
 ```
 
 Sign an existing key:
@@ -34,8 +44,7 @@ ssh-keygen -s $CA -I $USER -n core -V +1w -z 1 $KEY
 Hypervisor images are live USB disks created using [Fedora CoreOS assembler](https://github.com/coreos/coreos-assembler). Generate ignition configuration to local Matchbox server:
 
 ```bash
-cd resourcesv2
-terraform apply -target=module.ignition-local
+buildtool tf-wrapper apply -target=module.ignition-local
 ```
 
 Run build from https://github.com/randomcoww/fedora-coreos-custom
@@ -45,8 +54,7 @@ Run build from https://github.com/randomcoww/fedora-coreos-custom
 Desktop image is built using Kickstart and Fedora livemedia-creator. Generate kickstart configuration to local Matchbox server:
 
 ```bash
-cd resourcesv2
-terraform apply -target=module.kickstart-local
+buildtool tf-wrapper apply -target=module.kickstart-local
 ```
 
 Generate USB images for hypervisor hosts:
@@ -81,8 +89,7 @@ Each hypervisor runs a PXE boot environment on an internal network for provision
 Ignition configuration is generated on each hypervisor as follows:
 
 ```bash
-cd resourcesv2
-terraform apply \
+buildtool tf-wrapper apply \
     -target=module.ignition-kvm-0 \
     -target=module.ignition-kvm-1 \
     -target=module.ignition-desktop
@@ -91,8 +98,7 @@ terraform apply \
 Define VMs on each hypervisor:
 
 ```bash
-cd resourcesv2
-terraform apply \
+buildtool tf-wrapper apply \
     -target=module.libvirt-kvm-0 \
     -target=module.libvirt-kvm-1 \
     -target=module.libvirt-desktop
@@ -123,14 +129,16 @@ virsh -c qemu+ssh://core@192.168.127.252/system start worker-1
 Write kubeconfig file:
 
 ```bash
-terraform apply -target=local_file.kubeconfig-admin
+buildtool tf-wrapper apply \
+    -target=local_file.kubeconfig-admin
 export KUBECONFIG=$(pwd)/output/default-cluster-012.kubeconfig
 ```
 
 ### Generate basic Kubernetes addons
 
 ```bash
-terraform apply -target=module.kubernetes-addons
+buildtool tf-wrapper apply \
+    -target=module.kubernetes-addons
 ```
 
 Apply addons:
@@ -207,39 +215,4 @@ https://tr.fuzzybunny.internal
 cd reqourcesv2/manifests
 kubectl create secret generic wireguard-config --from-file=wireguard-secret
 kubectl apply -f transmission.yaml
-```
-
-### Using tf-env container
-
-[Dockerfile](build/dev/Dockerfile)
-
-Start renderer:
-
-```
-podman run -it --rm \
-    -v $HOME/.aws:/root/.aws \
-    -v $(pwd):/root/mnt \
-    --net=host \
-    randomcoww/tf-env start-renderer
-```
-
-or
-
-```
-podman run -it --rm \
-    -e AWS_ACCESS_KEY_ID=id \
-    -e AWS_SECRET_ACCESS_KEY=key \
-    -v $(pwd):/root/mnt \
-    --net=host \
-    randomcoww/tf-env start-renderer
-```
-
-Wrapper for terraform calls:
-
-```
-podman run -it --rm \
-    -v $HOME/.aws:/root/.aws \
-    -v $(pwd):/root/mnt \
-    --net=host \
-    randomcoww/tf-env tf-wrapper
 ```
