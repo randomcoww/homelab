@@ -6,6 +6,12 @@ data "ct_config" "ign-gateway" {
 
   content = templatefile("${path.module}/../../templates/ignition/gateway.ign.tmpl", each.value)
   strict  = true
+
+  snippets = [
+    templatefile("${path.module}/../../templates/ignition/base.ign.tmpl", each.value),
+    templatefile("${path.module}/../../templates/ignition/containerd.ign.tmpl", each.value),
+    templatefile("${path.module}/../../templates/ignition/masterless-kubelet.ign.tmpl", each.value),
+  ]
 }
 
 resource "matchbox_profile" "ign-gateway" {

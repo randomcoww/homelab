@@ -3,31 +3,12 @@ variant: fcos
 version: 1.0.0
 systemd:
   units:
-    - name: NetworkManager.service
-      mask: true
-    - name: NetworkManager-wait-online.service
-      mask: true
-    - name: systemd-networkd.service
-      enabled: true
-    - name: systemd-resolved.service
-      enabled: true
-    - name: systemd-networkd-wait-online.service
-      mask: true
     - name: libvirtd.service
       enabled: true
     - name: ksm.service
       enabled: true
     - name: ksmtuned.service
       enabled: true
-    # /etc/fstab is not present in live - use --all
-    - name: fstrim.service
-      enabled: true
-      dropins:
-        - name: all.conf
-          contents: |
-            [Service]
-            ExecStart=
-            ExecStart=/usr/sbin/fstrim --all --verbose --quiet
     - name: kea-dhcp4.service
       enabled: true
       dropins:
@@ -276,38 +257,3 @@ storage:
       mode: 0644
       contents:
         inline: "${tls_matchbox_key}"
-
-    - path: /etc/systemd/journal.conf.d/05-live.conf
-      mode: 0644
-      contents:
-        inline: |
-          [Journal]
-          Storage=volatile
-          RuntimeMaxUse=15M
-          ForwardToSyslog=no
-          ForwardToConsole=no
-    - path: /etc/systemd/resolved.conf.d/05-disable-stub.conf
-      mode: 0644
-      contents:
-        inline: |
-          [Resolve]
-          FallbackDNS=
-          DNSStubListener=no
-    - path: /etc/systemd/system.conf.d/05-live.conf
-      mode: 0644
-      contents:
-        inline: |
-          [Manager]
-          DumpCore=no
-
-passwd:
-  users:
-    - name: ${user}
-      groups:
-        - adm
-        - sudo
-        - systemd-journal
-        - wheel
-        - libvirt
-      ssh_authorized_keys:
-        - ${ssh_authorized_key}

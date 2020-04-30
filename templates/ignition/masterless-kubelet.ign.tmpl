@@ -1,0 +1,63 @@
+---
+variant: fcos
+version: 1.0.0
+systemd:
+  units:
+    - name: kubelet.service
+      enabled: true
+      contents: |
+        [Unit]
+        Description=Kubelet via Hyperkube
+        After=network.target containerd.service
+        Requires=containerd.service
+
+        [Service]
+        ExecStartPre=/bin/mkdir -p \
+          ${kubelet_path} \
+          /var/log/containers \
+          /etc/cni/net.d
+        ExecStart=/usr/bin/podman run --rm \
+          --security-opt label=disable \
+          --network host \
+          --pid host \
+          --privileged \
+          -v /run:/run \
+          -v /sys/fs/cgroup:/sys/fs/cgroup:ro \
+          -v /sys/fs/cgroup/systemd:/sys/fs/cgroup/systemd \
+          -v /var/lib/containerd:/var/lib/containerd \
+          -v ${kubelet_path}:${kubelet_path}:rshared,z \
+          -v /var/log:/var/log \
+          -v /var/run/lock:/var/run/lock:z \
+          ${container_images.kubelet} \
+          /usr/local/bin/kubelet \
+            --config=/var/lib/kubelet/kubelet-config.yaml \
+            --register-node=false \
+            --exit-on-lock-contention \
+            --lock-file=/var/run/lock/kubelet.lock \
+            --container-runtime=remote \
+            --container-runtime-endpoint=unix:///run/containerd/containerd.sock
+        Restart=always
+        RestartSec=10
+        Delegate=yes
+
+        [Install]
+        WantedBy=multi-user.target
+
+storage:
+  files:
+    - path: ${kubelet_path}/kubelet-config.yaml
+      mode: 0644
+      contents:
+        inline: |-
+          kind: KubeletConfiguration
+          apiVersion: kubelet.config.k8s.io/v1beta1
+          authentication:
+            anonymous:
+              enabled: true
+            webhook:
+              enabled: false
+          authorization:
+            mode: AlwaysAllow
+          staticPodPath: ${kubelet_path}/manifests
+          makeIPTablesUtilChains: false
+          cgroupDriver: systemd

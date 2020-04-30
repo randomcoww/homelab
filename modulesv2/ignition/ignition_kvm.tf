@@ -6,6 +6,10 @@ data "ct_config" "ign-kvm" {
 
   content = templatefile("${path.module}/../../templates/ignition/kvm.ign.tmpl", each.value)
   strict  = true
+
+  snippets = [
+    templatefile("${path.module}/../../templates/ignition/base.ign.tmpl", each.value),
+  ]
 }
 
 resource "matchbox_profile" "ign-kvm" {
