@@ -5,6 +5,8 @@ systemd:
   units:
     - name: NetworkManager.service
       mask: true
+    - name: NetworkManager-wait-online.service
+      mask: true
     - name: systemd-networkd.service
       enabled: true
     - name: systemd-resolved.service
