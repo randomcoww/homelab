@@ -448,7 +448,7 @@ spec:
         hostPath:
           path: /run/promtail
       - hostPath:
-          path: /pv/containers
+          path: /var/pv/containers
         name: containerd
       - hostPath:
           path: /var/log/pods

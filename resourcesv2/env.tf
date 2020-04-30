@@ -349,62 +349,62 @@ locals {
         {
           label      = "2YK7XTRD"
           device     = "/dev/disk/by-id/ata-WDC_WD100EFAX-68LHPN0_2YK7XTRD"
-          mount_path = "/minio/0"
+          mount_path = "/var/s3/0"
         },
         {
           label      = "2YK87AVD"
           device     = "/dev/disk/by-id/ata-WDC_WD100EFAX-68LHPN0_2YK87AVD"
-          mount_path = "/minio/1"
+          mount_path = "/var/s3/1"
         },
         {
           label      = "2YK89PND"
           device     = "/dev/disk/by-id/ata-WDC_WD100EFAX-68LHPN0_2YK89PND"
-          mount_path = "/minio/2"
+          mount_path = "/var/s3/2"
         },
         {
           label      = "2YKG1X2D"
           device     = "/dev/disk/by-id/ata-WDC_WD100EFAX-68LHPN0_2YKG1X2D"
-          mount_path = "/minio/3"
+          mount_path = "/var/s3/3"
         },
         {
           label      = "2YKGML5D"
           device     = "/dev/disk/by-id/ata-WDC_WD100EFAX-68LHPN0_2YKGML5D"
-          mount_path = "/minio/4"
+          mount_path = "/var/s3/4"
         },
         {
           label      = "2YKGML7D"
           device     = "/dev/disk/by-id/ata-WDC_WD100EFAX-68LHPN0_2YKGML7D"
-          mount_path = "/minio/5"
+          mount_path = "/var/s3/5"
         },
         {
           label      = "2YKGNL4D"
           device     = "/dev/disk/by-id/ata-WDC_WD100EFAX-68LHPN0_2YKGNL4D"
-          mount_path = "/minio/6"
+          mount_path = "/var/s3/6"
         },
         {
           label      = "JEK830AZ"
           device     = "/dev/disk/by-id/ata-WDC_WD100EFAX-68LHPN0_JEK830AZ"
-          mount_path = "/minio/7"
+          mount_path = "/var/s3/7"
         },
         {
           label      = "JEK830RZ"
           device     = "/dev/disk/by-id/ata-WDC_WD100EFAX-68LHPN0_JEK830RZ"
-          mount_path = "/minio/8"
+          mount_path = "/var/s3/8"
         },
         {
           label      = "JEK8V1YZ"
           device     = "/dev/disk/by-id/ata-WDC_WD100EFAX-68LHPN0_JEK8V1YZ"
-          mount_path = "/minio/9"
+          mount_path = "/var/s3/9"
         },
         {
           label      = "JEK8YTSZ"
           device     = "/dev/disk/by-id/ata-WDC_WD100EFAX-68LHPN0_JEK8YTSZ"
-          mount_path = "/minio/10"
+          mount_path = "/var/s3/10"
         },
         {
           label      = "JEKAZ92N"
           device     = "/dev/disk/by-id/ata-WDC_WD100EFAX-68LHPN0_JEKAZ92N"
-          mount_path = "/minio/11"
+          mount_path = "/var/s3/11"
         },
         {
           label      = "S4PGNF0M414895K"
@@ -412,7 +412,7 @@ locals {
           target     = "vda"
           device     = "/dev/vda"
           format     = "ext4"
-          mount_path = "/pv"
+          mount_path = "/var/pv"
         },
       ]
     }

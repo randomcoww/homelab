@@ -4,7 +4,7 @@ metadata:
   name: unifi
   type: hostdir
 spec:
-  path: "/pv/unifi"
+  path: "/var/pv/unifi"
 
 ---
 apiVersion: storage.k8s.io/v1
