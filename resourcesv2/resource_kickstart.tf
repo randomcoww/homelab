@@ -1,8 +1,8 @@
 module "desktop-common" {
   source = "../modulesv2/desktop_common"
 
-  user         = var.desktop_user
-  password     = var.desktop_password
+  user                 = var.desktop_user
+  password             = var.desktop_password
   internal_ca_cert_pem = tls_self_signed_cert.internal-ca.cert_pem
   mtu                  = local.mtu
   networks             = local.networks
@@ -25,6 +25,6 @@ module "desktop-common" {
 module "kickstart-local" {
   source = "../modulesv2/kickstart"
 
-  desktop_params     = module.desktop-common.desktop_params
-  renderer          = local.local_renderer
+  desktop_params = module.desktop-common.desktop_params
+  renderer       = local.local_renderer
 }

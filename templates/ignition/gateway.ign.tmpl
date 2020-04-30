@@ -1,195 +1,237 @@
 ---
-networkd:
-  units:
-    - name: 10-${host_network.store.if}.network
-      contents: |
-        [Match]
-        Name=${host_network.store.if}
-
-        [Network]
-        LinkLocalAddressing=no
-        DHCP=no
-
-        [Address]
-        Address=${host_network.store.ip}/${networks.store.cidr}
-    - name: 10-${host_network.lan.if}.network
-      contents: |
-        [Match]
-        Name=${host_network.lan.if}
-
-        [Network]
-        LinkLocalAddressing=no
-        DHCP=no
-
-        [Address]
-        Address=${host_network.lan.ip}/${networks.lan.cidr}
-    - name: 10-${host_network.sync.if}.network
-      contents: |
-        [Match]
-        Name=${host_network.sync.if}
-
-        [Network]
-        LinkLocalAddressing=no
-        DHCP=no
-
-        [Address]
-        Address=${host_network.sync.ip}/${networks.sync.cidr}
-    - name: 10-${host_network.host_wan.if}.network
-      contents: |
-        [Match]
-        Name=${host_network.host_wan.if}
-
-        [Network]
-        LinkLocalAddressing=no
-        DHCP=yes
-        DNS=${dns_forward_ip}
-        DNSOverTLS=opportunistic
-        Domains=~
-
-        [DHCP]
-        UseMTU=true
-        UseDNS=false
-        UseNTP=false
-        SendHostname=false
-        UseHostname=false
-        UseDomains=false
-        UseTimezone=no
-        RouteMetric=512
-    - name: 10-${host_network.wan.if}.network
-      contents: |
-        [Match]
-        Name=${host_network.wan.if}
-
-        [Network]
-        LinkLocalAddressing=no
-        DHCP=yes
-
-        [DHCP]
-        UseMTU=true
-        UseDNS=false
-        UseNTP=false
-        SendHostname=false
-        UseHostname=false
-        UseDomains=false
-        UseTimezone=no
-        RouteMetric=512
-        RouteTable=${host_network.wan.route_table}
-    - name: 10-${host_network.int.if}.network
-      contents: |
-        [Match]
-        Name=${host_network.int.if}
-
-        [Link]
-        ARP=no
-
-        [Network]
-        LinkLocalAddressing=no
-        DHCP=no
-
+variant: fcos
+version: 1.0.0
 systemd:
   units:
-    - name: ntpd.service
+    - name: NetworkManager.service
+      mask: true
+    - name: NetworkManager-wait-online.service
+      mask: true
+    - name: systemd-networkd.service
       enabled: true
-    - name: docker.service
+    - name: systemd-resolved.service
+      enabled: true
+    - name: systemd-networkd-wait-online.service
       mask: true
-    - name: docker.socket
-      mask: true
+    - name: fstrim.service
+      enabled: true
+      dropins:
+        - name: all.conf
+          contents: |
+            [Service]
+            ExecStart=
+            ExecStart=/usr/sbin/fstrim --all --verbose --quiet
     - name: containerd.service
       enabled: true
       dropins:
-        - name: containerd.conf
+        - name: killmode.conf
           contents: |
             [Service]
-            LimitNOFILE=infinity
-            ExecStart=
-            ExecStart=/usr/bin/env PATH=$${TORCX_BINDIR}:$${PATH} $${TORCX_BINDIR}/containerd
-            RestartSec=5
+            KillMode=mixed
     - name: kubelet.service
       enabled: true
       contents: |
         [Unit]
-        Description=Kubelet via Hyperkube ACI
-        After=network.target
+        Description=Kubelet via Hyperkube
+        After=network.target containerd.service
+        Requires=containerd.service
 
         [Service]
         ExecStartPre=/bin/mkdir -p \
           ${kubelet_path} \
           /var/log/containers \
           /etc/cni/net.d
-        ExecStartPre=-/usr/bin/rkt rm --uuid-file=/var/cache/kubelet-pod.uuid
-        ExecStart=/usr/bin/rkt run \
-          --uuid-file-save=/var/cache/kubelet-pod.uuid \
-          --volume var-lib-containerd,kind=host,source=/var/lib/containerd,readOnly=false \
-          --mount volume=var-lib-containerd,target=/var/lib/containerd \
-          --insecure-options=image \
-          --volume coreos-var-lib-kubelet,kind=host,source=${kubelet_path},readOnly=false,recursive=true \
-          --volume coreos-var-log,kind=host,source=/var/log,readOnly=false \
-          --volume coreos-run,kind=host,source=/run,readOnly=false \
-          --mount volume=coreos-var-lib-kubelet,target=${kubelet_path} \
-          --mount volume=coreos-var-log,target=/var/log \
-          --mount volume=coreos-run,target=/run \
-          --dns host \
-          --hosts-entry host \
-          --stage1-from-dir=stage1-fly.aci \
-          docker://${container_images.kubelet} \
-            --exec=/usr/local/bin/kubelet -- \
-            --config=${kubelet_path}/kubelet-config.yaml \
-            --node-ip=${host_network.store.ip} \
+        ExecStart=/usr/bin/podman run --rm \
+          --security-opt label=disable \
+          --network host \
+          --pid host \
+          --privileged \
+          -v /run:/run \
+          -v /sys/fs/cgroup:/sys/fs/cgroup:ro \
+          -v /sys/fs/cgroup/systemd:/sys/fs/cgroup/systemd \
+          -v /var/lib/containerd:/var/lib/containerd \
+          -v ${kubelet_path}:${kubelet_path}:rshared,z \
+          -v /var/log:/var/log \
+          -v /var/run/lock:/var/run/lock:z \
+          ${container_images.kubelet} \
+          /usr/local/bin/kubelet \
+            --config=/var/lib/kubelet/kubelet-config.yaml \
             --register-node=false \
+            --exit-on-lock-contention \
+            --lock-file=/var/run/lock/kubelet.lock \
             --container-runtime=remote \
             --container-runtime-endpoint=unix:///run/containerd/containerd.sock
-        ExecStop=-/usr/bin/rkt stop --uuid-file=/var/cache/kubelet-pod.uuid
         Restart=always
-        RestartSec=5
+        RestartSec=10
+        Delegate=yes
 
         [Install]
         WantedBy=multi-user.target
 
 storage:
   files:
+    - path: /etc/systemd/network/10-${host_network.store.if}.network
+      mode: 0644
+      contents:
+        inline: |
+          [Match]
+          Name=${host_network.store.if}
+
+          [Network]
+          LinkLocalAddressing=no
+          DHCP=no
+
+          [Address]
+          Address=${host_network.store.ip}/${networks.store.cidr}
+    - path: /etc/systemd/network/10-${host_network.lan.if}.network
+      mode: 0644
+      contents:
+        inline: |
+          [Match]
+          Name=${host_network.lan.if}
+
+          [Network]
+          LinkLocalAddressing=no
+          DHCP=no
+
+          [Address]
+          Address=${host_network.lan.ip}/${networks.lan.cidr}
+    - path: /etc/systemd/network/10-${host_network.sync.if}.network
+      mode: 0644
+      contents:
+        inline: |
+          [Match]
+          Name=${host_network.sync.if}
+
+          [Network]
+          LinkLocalAddressing=no
+          DHCP=no
+
+          [Address]
+          Address=${host_network.sync.ip}/${networks.sync.cidr}
+    - path: /etc/systemd/network/10-${host_network.host_wan.if}.network
+      mode: 0644
+      contents:
+        inline: |
+          [Match]
+          Name=${host_network.host_wan.if}
+
+          [Network]
+          LinkLocalAddressing=no
+          DHCP=yes
+          DNS=${dns_forward_ip}
+          DNSOverTLS=opportunistic
+          Domains=~
+
+          [DHCP]
+          UseMTU=true
+          UseDNS=false
+          UseNTP=false
+          SendHostname=false
+          UseHostname=false
+          UseDomains=false
+          UseTimezone=no
+          RouteMetric=512
+    - path: /etc/systemd/network/10-${host_network.wan.if}.network
+      mode: 0644
+      contents:
+        inline: |
+          [Match]
+          Name=${host_network.wan.if}
+
+          [Network]
+          LinkLocalAddressing=no
+          DHCP=yes
+
+          [DHCP]
+          UseMTU=true
+          UseDNS=false
+          UseNTP=false
+          SendHostname=false
+          UseHostname=false
+          UseDomains=false
+          UseTimezone=no
+          RouteMetric=512
+          RouteTable=${host_network.wan.route_table}
+    - path: /etc/systemd/network/10-${host_network.int.if}.network
+      mode: 0644
+      contents:
+        inline: |
+          [Match]
+          Name=${host_network.int.if}
+
+          [Link]
+          ARP=no
+
+          [Network]
+          LinkLocalAddressing=no
+          DHCP=no
+
     - path: /etc/hostname
-      filesystem: root
       mode: 0644
       contents:
         inline:
           ${hostname}
     - path: /etc/sysctl.d/ipforward.conf
-      filesystem: root
       mode: 0644
       contents:
         inline: |
           net.ipv4.ip_forward=1
           net.ipv4.ip_nonlocal_bind=1
     - path: /etc/sysctl.d/max-user-watches.conf
-      filesystem: root
       mode: 0644
       contents:
         inline: |
           fs.inotify.max_user_watches=16184
 
+    - path: /etc/systemd/journal.conf.d/05-live.conf
+      mode: 0644
+      contents:
+        inline: |
+          [Journal]
+          Storage=volatile
+          RuntimeMaxUse=15M
+          ForwardToSyslog=no
+          ForwardToConsole=no
+    - path: /etc/systemd/resolved.conf.d/05-disable-stub.conf
+      mode: 0644
+      contents:
+        inline: |
+          [Resolve]
+          FallbackDNS=
+          DNSStubListener=no
+    - path: /etc/systemd/system.conf.d/05-live.conf
+      mode: 0644
+      contents:
+        inline: |
+          [Manager]
+          DumpCore=no
+
     - path: /etc/containerd/config.toml
-      filesystem: root
-      mode: 420
+      mode: 0644
+      overwrite: true
       contents:
         inline: |-
-          version = 2
           root = "/var/lib/containerd"
+          state = "/run/containerd"
           oom_score = -999
           [plugins]
+            version = 2
             [plugins."io.containerd.grpc.v1.cri"]
+              disable_tcp_service = true
+              stream_server_address = "127.0.0.1"
+              stream_server_port = "0"
               [plugins."io.containerd.grpc.v1.cri".containerd]
                 snapshotter = "overlayfs"
-                [plugins."io.containerd.grpc.v1.cri".containerd.runtimes]
-                  [plugins."io.containerd.grpc.v1.cri".containerd.runtimes.runc]
-                    # runtime_type should be normally be "io.containerd.runc.v*"
-                    # containerd-shim-runc-v* binaries are needed but not provided in the flatcar image
-                    runtime_type = "io.containerd.runtime.v1.linux"
-            [plugins."io.containerd.runtime.v1.linux"]
-              no_pivot = true
+                default_runtime_name = "runc"
+                [plugins."io.containerd.grpc.v1.cri".containerd.runtimes.runc]
+                  runtime_type = "io.containerd.runc.v2"
+                  [plugins."io.containerd.grpc.v1.cri".containerd.runtimes.runc.options]
+                    NoPivotRoot = true
+                    SystemdCgroup = true
 
     - path: ${kubelet_path}/kubelet-config.yaml
-      filesystem: root
-      mode: 420
+      mode: 0644
       contents:
         inline: |-
           kind: KubeletConfiguration
@@ -203,14 +245,14 @@ storage:
             mode: AlwaysAllow
           staticPodPath: ${kubelet_path}/manifests
           makeIPTablesUtilChains: false
+          cgroupDriver: systemd
 
     ##
     ## pod config
     ##
 
     - path: ${pod_mount_path}/coredns/Corefile
-      filesystem: root
-      mode: 420
+      mode: 0644
       contents:
         inline: |-
           ${domains.internal}:53 {
@@ -235,8 +277,7 @@ storage:
           }
 
     - path: ${pod_mount_path}/keepalived/keepalived.conf
-      filesystem: root
-      mode: 420
+      mode: 0644
       contents:
         inline: |-
           global_defs {
@@ -270,8 +311,7 @@ storage:
           }
 
     - path: ${pod_mount_path}/conntrackd/conntrackd.conf
-      filesystem: root
-      mode: 420
+      mode: 0644
       contents:
         inline: |-
           Sync {
@@ -327,8 +367,7 @@ storage:
           }
 
     - path: ${pod_mount_path}/nftables/nft.rules
-      filesystem: root
-      mode: 420
+      mode: 0644
       contents:
         inline: |-
           define if_internal = { ${join(",", [
@@ -404,8 +443,7 @@ storage:
           ;
 
     - path: ${pod_mount_path}/kea/kea-ctrl-agent.conf
-      filesystem: root
-      mode: 420
+      mode: 0644
       contents:
         inline: |-
           {
@@ -422,8 +460,7 @@ storage:
           }
 
     - path: ${pod_mount_path}/kea/kea-dhcp4.conf
-      filesystem: root
-      mode: 420
+      mode: 0644
       contents:
         inline: |-
           {
@@ -505,8 +542,7 @@ storage:
           }
 
     - path: ${pod_mount_path}/loki/promtail-config.yaml
-      filesystem: root
-      mode: 420
+      mode: 0644
       contents:
         inline: |-
           positions:
@@ -537,8 +573,7 @@ storage:
     ##
 
     - path: ${kubelet_path}/manifests/kea.yaml
-      filesystem: root
-      mode: 420
+      mode: 0644
       contents:
         inline: |-
           ---
@@ -581,8 +616,7 @@ storage:
                 path: ${pod_mount_path}/kea/kea-dhcp4.conf
 
     - path: ${kubelet_path}/manifests/gateway-node.yaml
-      filesystem: root
-      mode: 420
+      mode: 0644
       contents:
         inline: |-
           ---
@@ -669,8 +703,7 @@ storage:
                 path: ${pod_mount_path}/keepalived/keepalived.conf
 
     - path: ${kubelet_path}/manifests/conntrackd.yaml
-      filesystem: root
-      mode: 420
+      mode: 0644
       contents:
         inline: |-
           ---
@@ -701,8 +734,7 @@ storage:
                 path: ${pod_mount_path}/conntrackd/conntrackd.conf
 
     - path: ${kubelet_path}/manifests/promtail.yaml
-      filesystem: root
-      mode: 420
+      mode: 0644
       contents:
         inline: |-
           ---
@@ -738,5 +770,10 @@ storage:
 passwd:
   users:
     - name: ${user}
+      groups:
+        - adm
+        - sudo
+        - systemd-journal
+        - wheel
       ssh_authorized_keys:
         - ${ssh_authorized_key}

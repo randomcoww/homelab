@@ -29,6 +29,21 @@ locals {
     matchbox                = "quay.io/poseidon/matchbox:latest"
   }
 
+  ## images served from matchbox
+  kernel_image = "fedora-coreos-live-kernel"
+  initrd_images = [
+    "fedora-coreos-live-initramfs.img"
+  ]
+  kernel_params = [
+    "console=hvc0",
+    "rd.neednet=1",
+    "ignition.firstboot",
+    "ignition.platform.id=metal",
+    "net.ifnames=0",
+    "biosdevname=0",
+    "systemd.unified_cgroup_hierarchy=0",
+  ]
+
   services = {
     # local dev
     local_renderer = {
@@ -439,7 +454,7 @@ locals {
           target     = "vda"
           device     = "/dev/vda"
           format     = "ext4"
-          mount_path = "/pv"
+          mount_path = "/var/pv"
         }
       ]
     }
@@ -483,6 +498,7 @@ locals {
       guests = [
         "gateway-0",
         "controller-0",
+        "controller-1",
         "controller-2",
         "worker-0",
       ]
@@ -506,6 +522,7 @@ locals {
         "controller-1",
         "controller-2",
         "worker-1",
+        "test-0",
       ]
     }
 

@@ -119,6 +119,9 @@ module "ignition-kvm-0" {
   test_params       = {}
   kvm_params        = {}
   renderer          = module.kvm-common.matchbox_rpc_endpoints.kvm-0
+  kernel_image      = local.kernel_image
+  initrd_images     = local.initrd_images
+  kernel_params     = local.kernel_params
 }
 
 module "ignition-kvm-1" {
@@ -128,9 +131,12 @@ module "ignition-kvm-1" {
   controller_params = module.kubernetes-common.controller_params
   worker_params     = module.kubernetes-common.worker_params
   gateway_params    = module.gateway-common.gateway_params
-  test_params       = {}
+  test_params       = module.test-common.test_params
   kvm_params        = {}
   renderer          = module.kvm-common.matchbox_rpc_endpoints.kvm-1
+  kernel_image      = local.kernel_image
+  initrd_images     = local.initrd_images
+  kernel_params     = local.kernel_params
 }
 
 # Build and test environment
@@ -144,6 +150,9 @@ module "ignition-local" {
   test_params       = module.test-common.test_params
   kvm_params        = module.kvm-common.kvm_params
   renderer          = local.local_renderer
+  kernel_image      = local.kernel_image
+  initrd_images     = local.initrd_images
+  kernel_params     = local.kernel_params
 }
 
 # Write admin kubeconfig file

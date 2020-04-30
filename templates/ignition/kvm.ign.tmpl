@@ -54,7 +54,7 @@ systemd:
           ${image_preload_path}/matchbox.tar
         ExecStart=/usr/bin/podman run --rm \
           --security-opt label=disable \
-          --net host \
+          --network host \
           -v ${matchbox_tls_path}:${matchbox_tls_path}:ro \
           -v ${matchbox_data_path}:${matchbox_data_path} \
           -v ${matchbox_assets_path}:${matchbox_assets_path} \
