@@ -93,7 +93,6 @@ sudo livemedia-creator \
     --project Fedora \
     --volid desktop \
     --releasever $FEDORA_RELEASE \
-    --title desktop \
     --resultdir ./result \
     --tmp . \
     --ks=./desktop.ks \

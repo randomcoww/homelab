@@ -112,7 +112,8 @@ systemctl enable \
 
 systemctl mask \
   NetworkManager \
-  NetworkManager-wait-online
+  NetworkManager-wait-online \
+  systemd-networkd-wait-online.service
 
 ## cleanup
 dnf -y autoremove
