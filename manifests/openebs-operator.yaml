@@ -226,20 +226,20 @@ spec:
         # Minimum is 1h. You can convert this to weekly by setting 168h
         #- name: OPENEBS_IO_ANALYTICS_PING_INTERVAL
         #  value: "24h"
-        # livenessProbe:
-        #   exec:
-        #     command:
-        #     - /usr/local/bin/mayactl
-        #     - version
-        #   initialDelaySeconds: 30
-        #   periodSeconds: 60
-        # readinessProbe:
-        #   exec:
-        #     command:
-        #     - /usr/local/bin/mayactl
-        #     - version
-        #   initialDelaySeconds: 30
-        #   periodSeconds: 60
+        livenessProbe:
+          exec:
+            command:
+            - /usr/local/bin/mayactl
+            - version
+          initialDelaySeconds: 30
+          periodSeconds: 60
+        readinessProbe:
+          exec:
+            command:
+            - /usr/local/bin/mayactl
+            - version
+          initialDelaySeconds: 30
+          periodSeconds: 60
 ---
 apiVersion: v1
 kind: Service
