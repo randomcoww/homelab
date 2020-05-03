@@ -1,26 +1,4 @@
-apiVersion: openebs.io/v1alpha1
-kind: StoragePool
-metadata:
-  name: transmission
-  type: hostdir
-spec:
-  path: "/var/pv/transmission"
 
----
-apiVersion: storage.k8s.io/v1
-kind: StorageClass
-metadata:
-  name: openebs-transmission
-  annotations:
-    openebs.io/cas-type: jiva
-    cas.openebs.io/config: |
-      - name: ReplicaCount
-        value: "2"
-      - name: StoragePool
-        value: transmission
-provisioner: openebs.io/provisioner-iscsi
-
----
 kind: PersistentVolumeClaim
 apiVersion: v1
 metadata:

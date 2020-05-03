@@ -257,3 +257,9 @@ storage:
       mode: 0644
       contents:
         inline: "${tls_matchbox_key}"
+
+passwd:
+  users:
+    - name: ${user}
+      groups:
+        - libvirt

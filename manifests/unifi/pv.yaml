@@ -1,0 +1,21 @@
+apiVersion: openebs.io/v1alpha1
+kind: StoragePool
+metadata:
+  name: unifi
+  type: hostdir
+spec:
+  path: "/var/pv/unifi"
+
+---
+apiVersion: storage.k8s.io/v1
+kind: StorageClass
+metadata:
+  name: openebs-unifi
+  annotations:
+    openebs.io/cas-type: jiva
+    cas.openebs.io/config: |
+      - name: ReplicaCount
+        value: "2"
+      - name: StoragePool
+        value: unifi
+provisioner: openebs.io/provisioner-iscsi

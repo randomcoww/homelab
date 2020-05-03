@@ -399,7 +399,7 @@ spec:
       serviceAccountName: promtail
       containers:
       - name: promtail
-        image: "randomcoww/promtail:v1.2.0"
+        image: "randomcoww/promtail:v1.4.1"
         imagePullPolicy: Always
         args:
         - "-config.file=/etc/promtail/promtail.yaml"

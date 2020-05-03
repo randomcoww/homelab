@@ -366,7 +366,7 @@ spec:
     spec:
       containers:
       - name: prometheus-node-exporter
-        image: "prom/node-exporter:v0.18.0"
+        image: "prom/node-exporter:latest"
         imagePullPolicy: "IfNotPresent"
         args:
         - --path.procfs=/host/proc
@@ -415,7 +415,7 @@ spec:
       serviceAccountName: prometheus-kube-state-metrics
       containers:
       - name: prometheus-kube-state-metrics
-        image: "quay.io/coreos/kube-state-metrics:v1.6.0"
+        image: "quay.io/coreos/kube-state-metrics:latest"
         imagePullPolicy: "IfNotPresent"
         ports:
         - name: metrics
@@ -447,7 +447,7 @@ spec:
       serviceAccountName: prometheus-server
       containers:
       - name: prometheus-server
-        image: "prom/prometheus:v2.13.1"
+        image: "prom/prometheus:latest"
         imagePullPolicy: "IfNotPresent"
         args:
         - --storage.tsdb.retention.time=2d

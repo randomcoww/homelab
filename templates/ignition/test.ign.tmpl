@@ -3,6 +3,11 @@ variant: fcos
 version: 1.0.0
 storage:
   files:
+    - path: /etc/hostname
+      mode: 0644
+      contents:
+        inline:
+          ${hostname}
     - path: /etc/systemd/network/10-${host_network.store.if}.network
       mode: 0644
       contents:

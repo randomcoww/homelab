@@ -13,7 +13,6 @@ systemd:
       enabled: true
     - name: systemd-networkd-wait-online.service
       mask: true
-    # /etc/fstab is not present in live - use --all
     - name: fstrim.service
       enabled: true
       dropins:
@@ -25,11 +24,6 @@ systemd:
 
 storage:
   files:
-    - path: /etc/hostname
-      mode: 0644
-      contents:
-        inline:
-          ${hostname}
     - path: /etc/sysctl.d/ipforward.conf
       mode: 0644
       contents:

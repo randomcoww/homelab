@@ -10,7 +10,6 @@ data "ct_config" "ign-gateway" {
   snippets = [
     templatefile("${path.module}/../../templates/ignition/base.ign.tmpl", each.value),
     templatefile("${path.module}/../../templates/ignition/containerd.ign.tmpl", each.value),
-    templatefile("${path.module}/../../templates/ignition/masterless-kubelet.ign.tmpl", each.value),
   ]
 }
 

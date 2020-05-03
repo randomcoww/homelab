@@ -23,47 +23,42 @@ systemd:
 
     - name: kubelet.service
       enabled: true
-      contents: |
-        [Unit]
-        Description=Kubelet via Hyperkube
-        After=network.target containerd.service
-        Requires=containerd.service
-
-        [Service]
-        ExecStartPre=/bin/mkdir -p \
-          ${kubelet_path} \
-          /var/log/containers \
-          /etc/cni/net.d
-        ExecStart=/usr/bin/podman run --rm \
-          --security-opt label=disable \
-          --network host \
-          --pid host \
-          --privileged \
-          -v /run:/run \
-          -v /sys/fs/cgroup:/sys/fs/cgroup:ro \
-          -v /sys/fs/cgroup/systemd:/sys/fs/cgroup/systemd \
-          -v /var/lib/containerd:/var/lib/containerd \
-          -v ${kubelet_path}:${kubelet_path}:rshared,z \
-          -v /var/log:/var/log \
-          -v /var/run/lock:/var/run/lock:z \
-          ${container_images.kubelet} \
-          /usr/local/bin/kubelet \
-            --exit-on-lock-contention \
-            --lock-file=/var/run/lock/kubelet.lock \
-            --config=${kubelet_path}/kubelet-config.yaml \
-            --kubeconfig=${kubelet_path}/kubelet.kubeconfig \
-            --bootstrap-kubeconfig=${kubelet_path}/bootstrap.kubeconfig \
-            --network-plugin=cni \
-            --cert-dir=${kubelet_path} \
-            --volume-plugin-dir=${kubelet_path}/volumeplugins \
-            --container-runtime=remote \
-            --container-runtime-endpoint=unix:///run/containerd/containerd.sock
-        Restart=always
-        RestartSec=10
-        Delegate=yes
-
-        [Install]
-        WantedBy=multi-user.target
+      dropins:
+        - name: 10-worker.conf
+          contents: |
+            [Service]
+            ExecStart=
+            ExecStart=/usr/bin/podman run --rm \
+              --security-opt label=disable \
+              --network host \
+              --pid host \
+              --privileged \
+              -v /run:/run \
+              -v /dev:/dev \
+              -v /etc/ssl/certs:/etc/ssl/certs:ro \
+              -v /etc/pki/ca-trust:/etc/pki/ca-trust:ro \
+              -v /usr/lib/modules:/lib/modules:ro \
+              -v /etc/machine-id:/etc/machine-id:ro \
+              -v /usr/lib/os-release:/etc/os-release \
+              -v /sys/fs/cgroup:/sys/fs/cgroup:ro \
+              -v /sys/fs/cgroup/systemd:/sys/fs/cgroup/systemd \
+              -v /var/lib/containerd:/var/lib/containerd \
+              -v /opt/cni/bin:/opt/cni/bin:z \
+              -v ${kubelet_path}:${kubelet_path}:rshared,z \
+              -v /var/log:/var/log \
+              -v /var/run/lock:/var/run/lock:z \
+              ${container_images.kubelet} \
+                kubelet \
+                  --config=${kubelet_path}/kubelet-config-worker.yaml \
+                  --exit-on-lock-contention \
+                  --lock-file=/var/run/lock/kubelet.lock \
+                  --kubeconfig=${kubelet_path}/kubelet.kubeconfig \
+                  --bootstrap-kubeconfig=${kubelet_path}/bootstrap.kubeconfig \
+                  --network-plugin=cni \
+                  --cert-dir=${kubelet_path} \
+                  --volume-plugin-dir=${kubelet_path}/volumeplugins \
+                  --container-runtime=remote \
+                  --container-runtime-endpoint=unix:///run/containerd/containerd.sock
 
 storage:
   filesystems:
@@ -78,6 +73,11 @@ storage:
     %{~ endfor ~}
 
   files:
+    - path: /etc/hostname
+      mode: 0644
+      contents:
+        inline:
+          ${hostname}
     - path: /etc/systemd/network/10-${host_network.store.if}.network
       mode: 0644
       contents:
@@ -128,7 +128,7 @@ storage:
           [Link]
           Unmanaged=true
 
-    - path: ${kubelet_path}/kubelet-config.yaml
+    - path: ${kubelet_path}/kubelet-config-worker.yaml
       mode: 0644
       contents:
         inline: |-
@@ -149,7 +149,6 @@ storage:
           runtimeRequestTimeout: "15m"
           rotateCertificates: true
           serverTLSBootstrap: true
-
     - path: ${kubelet_path}/bootstrap.kubeconfig
       mode: 0644
       contents:
