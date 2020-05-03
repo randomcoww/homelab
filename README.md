@@ -81,8 +81,8 @@ buildtool tf-wrapper apply \
 Generate USB images for hypervisor hosts:
 ```
 cd build/kickstart
-export FEDORA_RELEASE=31
-export ISO_FILE=Fedora-Server-netinst-x86_64-31-1.9.iso
+export FEDORA_RELEASE=32
+export ISO_FILE=Fedora-Server-netinst-x86_64-32-1.6.iso
 
 wget \
     https://download.fedoraproject.org/pub/fedora/linux/releases/$FEDORA_RELEASE/Server/x86_64/iso/$ISO_FILE
