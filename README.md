@@ -202,10 +202,8 @@ https://grafana.fuzzybunny.internal
 
 ```
 cd reqourcesv2/manifests
-kubectl apply -f prometheus.yaml
-kubectl apply -f promtail.yaml
 kubectl apply -f http://127.0.0.1:8080/generic?manifest=loki
-kubectl apply -f grafana.yaml
+kubectl apply -f grafana/
 ```
 
 Deploy [Minio](https://min.io/) storage controller:
@@ -223,7 +221,7 @@ https://stream.fuzzybunny.internal
 
 ```
 cd reqourcesv2/manifests
-kubectl apply -f mpd.yaml
+kubectl apply -f mpd/
 ```
 
 Deploy Transmission:
@@ -233,5 +231,5 @@ https://tr.fuzzybunny.internal
 ```
 cd reqourcesv2/manifests
 kubectl create secret generic wireguard-config --from-file=wireguard-secret
-kubectl apply -f transmission.yaml
+kubectl apply -f transmission/
 ```
