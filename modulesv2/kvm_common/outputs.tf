@@ -47,6 +47,7 @@ output "kvm_params" {
         }
       }
 
+      kea_path             = "/var/lib/kea"
       matchbox_tls_path    = "/etc/matchbox/certs"
       matchbox_data_path   = "/etc/matchbox/data"
       matchbox_assets_path = "/etc/matchbox/assets"

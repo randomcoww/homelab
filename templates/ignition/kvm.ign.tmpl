@@ -213,6 +213,11 @@ storage:
         inline: |
           {
             "Dhcp4": {
+              "lease-database": {
+                "type": "memfile",
+                "persist": true,
+                "name": "${kea_path}/kea-leases4.csv"
+              },
               "interfaces-config": {
                 "interfaces": ${jsonencode([
                   for k in keys(internal_networks):
