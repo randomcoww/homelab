@@ -3,10 +3,10 @@ module "desktop-common" {
 
   user                 = var.desktop_user
   password             = var.desktop_password
+  local_timezone       = var.desktop_timezone
   internal_ca_cert_pem = tls_self_signed_cert.internal-ca.cert_pem
   mtu                  = local.mtu
   networks             = local.networks
-  local_timezone       = local.local_timezone
 
   # Desktop host KS
   desktop_hosts = {

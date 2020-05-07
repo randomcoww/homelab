@@ -8,3 +8,8 @@ variable "desktop_password" {
   type    = string
   default = "password"
 }
+
+variable "desktop_timezone" {
+  type    = string
+  default = "America/Los_Angeles"
+}
