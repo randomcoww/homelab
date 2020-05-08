@@ -17,7 +17,7 @@ locals {
     flannel                 = "docker.io/randomcoww/flannel:latest"
     keepalived              = "docker.io/randomcoww/keepalived:latest"
     cni_plugins             = "docker.io/randomcoww/cni-plugins:v0.8.5"
-    coredns                 = "docker.io/coredns/coredns:1.6.7"
+    coredns                 = "docker.io/coredns/coredns:1.6.9"
     external_dns            = "docker.io/randomcoww/external-dns:v0.7.1"
     kapprover               = "docker.io/randomcoww/kapprover:v0.0.4"
     nftables                = "docker.io/randomcoww/nftables:latest"
