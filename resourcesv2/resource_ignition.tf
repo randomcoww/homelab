@@ -112,12 +112,28 @@ module "kvm-common" {
 module "ignition-kvm-0" {
   source = "../modulesv2/ignition"
 
-  services          = local.services
-  controller_params = module.kubernetes-common.controller_params
-  worker_params     = module.kubernetes-common.worker_params
-  gateway_params    = module.gateway-common.gateway_params
-  test_params       = {}
+  controller_params = {
+    for k in local.hosts.kvm-0.guests :
+    k => module.kubernetes-common.controller_params[k]
+    if lookup(module.kubernetes-common.controller_params, k, null) != null
+  }
+  worker_params = {
+    for k in local.hosts.kvm-0.guests :
+    k => module.kubernetes-common.worker_params[k]
+    if lookup(module.kubernetes-common.worker_params, k, null) != null
+  }
+  gateway_params = {
+    for k in local.hosts.kvm-0.guests :
+    k => module.gateway-common.gateway_params[k]
+    if lookup(module.gateway-common.gateway_params, k, null) != null
+  }
+  test_params = {
+    for k in local.hosts.kvm-0.guests :
+    k => module.test-common.test_params[k]
+    if lookup(module.test-common.test_params, k, null) != null
+  }
   kvm_params        = {}
+  services          = local.services
   renderer          = module.kvm-common.matchbox_rpc_endpoints.kvm-0
   kernel_image      = local.kernel_image
   initrd_images     = local.initrd_images
@@ -127,12 +143,28 @@ module "ignition-kvm-0" {
 module "ignition-kvm-1" {
   source = "../modulesv2/ignition"
 
-  services          = local.services
-  controller_params = module.kubernetes-common.controller_params
-  worker_params     = module.kubernetes-common.worker_params
-  gateway_params    = module.gateway-common.gateway_params
-  test_params       = module.test-common.test_params
+  controller_params = {
+    for k in local.hosts.kvm-1.guests :
+    k => module.kubernetes-common.controller_params[k]
+    if lookup(module.kubernetes-common.controller_params, k, null) != null
+  }
+  worker_params = {
+    for k in local.hosts.kvm-1.guests :
+    k => module.kubernetes-common.worker_params[k]
+    if lookup(module.kubernetes-common.worker_params, k, null) != null
+  }
+  gateway_params = {
+    for k in local.hosts.kvm-1.guests :
+    k => module.gateway-common.gateway_params[k]
+    if lookup(module.gateway-common.gateway_params, k, null) != null
+  }
+  test_params = {
+    for k in local.hosts.kvm-1.guests :
+    k => module.test-common.test_params[k]
+    if lookup(module.test-common.test_params, k, null) != null
+  }
   kvm_params        = {}
+  services          = local.services
   renderer          = module.kvm-common.matchbox_rpc_endpoints.kvm-1
   kernel_image      = local.kernel_image
   initrd_images     = local.initrd_images
@@ -143,12 +175,12 @@ module "ignition-kvm-1" {
 module "ignition-local" {
   source = "../modulesv2/ignition"
 
-  services          = local.services
   controller_params = module.kubernetes-common.controller_params
   worker_params     = module.kubernetes-common.worker_params
   gateway_params    = module.gateway-common.gateway_params
   test_params       = module.test-common.test_params
   kvm_params        = module.kvm-common.kvm_params
+  services          = local.services
   renderer          = local.local_renderer
   kernel_image      = local.kernel_image
   initrd_images     = local.initrd_images
