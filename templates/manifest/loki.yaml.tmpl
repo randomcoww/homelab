@@ -189,7 +189,7 @@ spec:
       containers:
       - name: loki
         image: ${container_images.loki}
-        imagePullPolicy: Always
+        imagePullPolicy: IfNotPresent
         args:
         - "-config.file=/etc/loki/loki.yaml"
         volumeMounts:

@@ -1,7 +1,7 @@
 locals {
   user               = "core"
   mtu                = 9000
-  kubernetes_version = "v1.17.2"
+  kubernetes_version = "v1.18.2"
 
   # kubelet image is used for static pods and does not need to match the kubernetes version
   # hyperkube is used for the worker kubelet and should match the version

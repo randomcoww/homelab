@@ -31,7 +31,7 @@ spec:
       hostNetwork: true
       containers:
       - name: rclone
-        imagePullPolicy: Always
+        imagePullPolicy: IfNotPresent
         image: randomcoww/rclone:v1.51.0
         securityContext:
           privileged: true
