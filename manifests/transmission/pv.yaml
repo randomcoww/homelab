@@ -19,3 +19,16 @@ metadata:
       - name: StoragePool
         value: transmission
 provisioner: openebs.io/provisioner-iscsi
+
+---
+kind: PersistentVolumeClaim
+apiVersion: v1
+metadata:
+  name: transmission-pvc
+spec:
+  storageClassName: openebs-transmission
+  accessModes:
+  - ReadWriteOnce
+  resources:
+    requests:
+      storage: 400G

@@ -1,17 +1,3 @@
-
-kind: PersistentVolumeClaim
-apiVersion: v1
-metadata:
-  name: mpd-pvc
-spec:
-  storageClassName: openebs-mpd
-  accessModes:
-  - ReadWriteOnce
-  resources:
-    requests:
-      storage: 2G
-
----
 apiVersion: v1
 kind: ConfigMap
 metadata:

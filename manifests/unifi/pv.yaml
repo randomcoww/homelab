@@ -19,3 +19,16 @@ metadata:
       - name: StoragePool
         value: unifi
 provisioner: openebs.io/provisioner-iscsi
+
+---
+kind: PersistentVolumeClaim
+apiVersion: v1
+metadata:
+  name: unifi-pvc
+spec:
+  storageClassName: openebs-unifi
+  accessModes:
+  - ReadWriteOnce
+  resources:
+    requests:
+      storage: 2G
