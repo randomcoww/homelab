@@ -416,7 +416,6 @@ locals {
           mount_path = "/var/s3/11"
         },
         {
-          label      = "S4PGNF0M414895K"
           source     = "/dev/disk/by-id/ata-Samsung_SSD_860_QVO_1TB_S4PGNF0M414895K"
           target     = "vda"
           device     = "/dev/vda"
@@ -458,7 +457,6 @@ locals {
       # wipe_filesystem = false
       disk = [
         {
-          label      = "S4PGNF0M410395Z"
           source     = "/dev/disk/by-id/ata-Samsung_SSD_860_QVO_1TB_S4PGNF0M410395Z"
           target     = "vda"
           device     = "/dev/vda"
@@ -557,7 +555,7 @@ locals {
       ]
       disk = [
         {
-          device     = "/dev/disk/by-id/nvme-Samsung_SSD_970_EVO_250GB_S465NB0K598517N-part1"
+          device     = "/dev/disk/by-path/pci-0000:01:00.0-nvme-1-part1"
           mount_path = "/var/home/${var.desktop_user}"
         }
       ]
