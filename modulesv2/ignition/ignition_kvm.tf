@@ -8,6 +8,7 @@ data "ct_config" "ign-kvm" {
   strict  = true
 
   snippets = [
+    templatefile("${path.module}/../../templates/ignition/vlan-network.ign.tmpl", each.value),
     templatefile("${path.module}/../../templates/ignition/base.ign.tmpl", each.value),
   ]
 }

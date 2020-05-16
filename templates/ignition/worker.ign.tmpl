@@ -3,24 +3,6 @@ variant: fcos
 version: 1.0.0
 systemd:
   units:
-    %{~ for disk in host_disks ~}
-    %{~ if lookup(disk, "label", null) != null ~}
-    %{~ if lookup(disk, "mount_path", null) != null ~}
-    - name: ${join("-", compact(split("/", disk.mount_path)))}.mount
-      enabled: true
-      contents: |
-        [Unit]
-        Before=local-fs.target
-        [Mount]
-        What=${disk.device}
-        Where=${disk.mount_path}
-        Type=${lookup(disk, "format", "xfs")}
-        [Install]
-        WantedBy=local-fs.target
-    %{~ endif ~}
-    %{~ endif ~}
-    %{~ endfor ~}
-
     - name: kubelet.service
       enabled: true
       dropins:
@@ -61,17 +43,6 @@ systemd:
                   --container-runtime-endpoint=unix:///run/containerd/containerd.sock
 
 storage:
-  filesystems:
-    %{~ for disk in host_disks ~}
-    %{~ if lookup(disk, "label", null) != null ~}
-    - path: ${disk.mount_path}
-      device: ${disk.device}
-      format: ${lookup(disk, "format", "xfs")}
-      wipe_filesystem: ${lookup(disk, "wipe_filesystem", false)}
-      label: ${upper(disk.label)}
-    %{~ endif ~}
-    %{~ endfor ~}
-
   files:
     - path: /etc/hostname
       mode: 0644

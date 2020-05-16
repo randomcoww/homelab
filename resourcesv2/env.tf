@@ -204,6 +204,8 @@ locals {
           bootorder = 1
         }
       ]
+      disk = [
+      ]
       kea_ha_role = "primary"
     }
     gateway-1 = {
@@ -247,6 +249,8 @@ locals {
           bootorder = 1
         }
       ]
+      disk = [
+      ]
       kea_ha_role = "standby"
     }
 
@@ -270,6 +274,8 @@ locals {
           bootorder = 1
         }
       ]
+      disk = [
+      ]
     }
     controller-1 = {
       memory = 4
@@ -290,6 +296,8 @@ locals {
           bootorder = 1
         }
       ]
+      disk = [
+      ]
     }
     controller-2 = {
       memory = 4
@@ -309,6 +317,8 @@ locals {
           mac       = "52-54-00-1a-61-0c"
           bootorder = 1
         }
+      ]
+      disk = [
       ]
     }
 
@@ -477,6 +487,8 @@ locals {
           bootorder = 1
         }
       ]
+      disk = [
+      ]
     }
 
     # KVM
@@ -493,6 +505,8 @@ locals {
           network = "store"
           ip      = "192.168.127.251"
         }
+      ]
+      disk = [
       ]
       guests = [
         "gateway-0",
@@ -515,18 +529,20 @@ locals {
           ip      = "192.168.127.252"
         }
       ]
+      disk = [
+      ]
       guests = [
         "gateway-1",
         "controller-1",
         "controller-2",
         "worker-1",
+        "test-0",
       ]
     }
 
     # desktop
     desktop = {
       components = [
-        "kvm",
         "desktop",
       ]
       network = [
@@ -537,6 +553,12 @@ locals {
         {
           network = "store"
           ip      = "192.168.127.253"
+        }
+      ]
+      disk = [
+        {
+          device     = "/dev/disk/by-id/nvme-Samsung_SSD_970_EVO_250GB_S465NB0K598517N-part1"
+          mount_path = "/var/home/${var.desktop_user}"
         }
       ]
     }

@@ -18,6 +18,7 @@ output "test_params" {
 
       networks     = var.networks
       host_network = var.test_hosts[k].host_network
+      host_disks   = var.test_hosts[k].disk
       mtu          = var.mtu
       services     = var.services
     }

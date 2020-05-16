@@ -1,0 +1,59 @@
+---
+variant: fcos
+version: 1.0.0
+systemd:
+  units:
+    - name: libvirtd.service
+      enabled: true
+    - name: ksm.service
+      enabled: true
+    - name: ksmtuned.service
+      enabled: true
+    - name: flatpak-system-helper.service
+      enabled: true
+      dropins:
+        - name: location.conf
+          contents: |
+            Environment=
+            Environment=XDG_DATA_DIRS=/var/lib/flatpak/exports/share/:/usr/local/share/:/usr/share/
+
+storage:
+  files:
+    - path: /etc/systemd/network/90-default.network
+      mode: 0644
+      contents:
+        inline: |
+          [Match]
+          Name=en*
+
+          [Link]
+          ARP=no
+
+          [Network]
+          LinkLocalAddressing=no
+          DHCP=no
+    - path: /etc/systemd/network/80-wl.network
+      mode: 0644
+      contents:
+        inline: |
+          [Match]
+          Name=wl*
+
+          [Link]
+          Unmanaged=true
+
+    ##
+    ## certs
+    ##
+    - path: ${internal_tls_path}/internal-ca.pem
+      mode: 0644
+      contents:
+        inline: "${tls_internal_ca}"
+
+passwd:
+  users:
+    - name: ${user}
+      password_hash: ${bcrypt(password)}
+      groups:
+        - libvirt
+      ssh_authorized_keys:

@@ -1,0 +1,68 @@
+---
+variant: fcos
+version: 1.0.0
+storage:
+  files:
+    ##
+    ## allocate vlan interfaces to hardware
+    ##
+    - path: /etc/systemd/network/10-hw.network
+      mode: 0644
+      contents:
+        inline: |
+          [Match]
+          MACAddress=${join(" ", [
+            for h in hosts :
+            h.host_network.hw.mac
+          ])}
+
+          [Link]
+          ARP=no
+          MTUBytes=${mtu}
+
+          [Network]
+          LinkLocalAddressing=no
+          DHCP=no
+          %{ for k in vlans ~}
+          VLAN=${networks[k].br_if}
+          %{ endfor ~}
+
+    %{~ for k in vlans ~}
+    ##
+    ## vlan ${k}
+    ##
+    - path: /etc/systemd/network/10-${networks[k].br_if}.netdev
+      mode: 0644
+      contents:
+        inline: |
+          [NetDev]
+          Name=${networks[k].br_if}
+          Kind=vlan
+
+          [VLAN]
+          Id=${networks[k].id}
+
+    %{~ for h in hosts ~}
+    %{~ if lookup(h.host_network, k, null) != null ~}
+    - path: /etc/systemd/network/10-${networks[k].br_if}-${h.host_network.hw.mac}.network
+      mode: 0644
+      contents:
+        inline: |
+          [Match]
+          Name=${networks[k].br_if}
+          MACAddress=${h.host_network.hw.mac}
+
+          [Link]
+          ARP=yes
+          MTUBytes=${mtu}
+
+          [Network]
+          LinkLocalAddressing=no
+          DHCP=yes
+
+          [Address]
+          Address=${h.host_network[k].ip}/${networks[k].cidr}
+
+    %{~ endif ~}
+    %{~ endfor ~}
+    %{~ endfor ~}

@@ -6,7 +6,7 @@ variable "password" {
   type = string
 }
 
-variable "local_timezone" {
+variable "timezone" {
   type = string
 }
 

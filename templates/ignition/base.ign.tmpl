@@ -21,8 +21,36 @@ systemd:
             [Service]
             ExecStart=
             ExecStart=/usr/sbin/fstrim --all --verbose --quiet
+    %{~ for disk in host_disks ~}
+    %{~ if lookup(disk, "mount_path", null) != null && lookup(disk, "device", null) != null ~}
+    - name: ${join("-", compact(split("/", disk.mount_path)))}.mount
+      enabled: true
+      contents: |
+        [Unit]
+        Before=local-fs.target
+        [Mount]
+        What=${disk.device}
+        Where=${disk.mount_path}
+        Type=${lookup(disk, "format", "xfs")}
+        [Install]
+        WantedBy=local-fs.target
+    %{~ endif ~}
+    %{~ endfor ~}
 
 storage:
+  filesystems:
+    %{~ for disk in host_disks ~}
+    %{~ if lookup(disk, "mount_path", null) != null && lookup(disk, "device", null) != null ~}
+    - path: ${disk.mount_path}
+      device: ${disk.device}
+      format: ${lookup(disk, "format", "xfs")}
+      wipe_filesystem: ${lookup(disk, "wipe_filesystem", false)}
+      %{~ if lookup(disk, "label", null) != null ~}
+      label: ${upper(disk.label)}
+      %{~ endif ~}
+    %{~ endif ~}
+    %{~ endfor ~}
+
   files:
     - path: /etc/sysctl.d/ipforward.conf
       mode: 0644

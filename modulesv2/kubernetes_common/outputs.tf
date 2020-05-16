@@ -21,6 +21,7 @@ output "controller_params" {
       container_images = var.container_images
       networks         = var.networks
       host_network     = var.controller_hosts[k].host_network
+      host_disks       = var.controller_hosts[k].disk
       services         = var.services
 
       etcd_cluster_token    = var.cluster_name
