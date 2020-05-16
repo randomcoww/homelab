@@ -9,6 +9,7 @@ data "ct_config" "ign-desktop" {
 
   snippets = [
     templatefile("${path.module}/../../templates/ignition/vlan-network.ign.tmpl", each.value),
+    templatefile("${path.module}/../../templates/ignition/storage.ign.tmpl", each.value),
     templatefile("${path.module}/../../templates/ignition/base.ign.tmpl", each.value),
   ]
 }

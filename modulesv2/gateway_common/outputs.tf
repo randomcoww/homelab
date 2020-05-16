@@ -9,7 +9,6 @@ output "gateway_params" {
       container_images           = var.container_images
       networks                   = var.networks
       host_network               = var.gateway_hosts[k].host_network
-      host_disks                 = var.gateway_hosts[k].disk
       services                   = var.services
       domains                    = var.domains
       mtu                        = var.mtu

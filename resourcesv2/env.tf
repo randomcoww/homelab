@@ -204,8 +204,6 @@ locals {
           bootorder = 1
         }
       ]
-      disk = [
-      ]
       kea_ha_role = "primary"
     }
     gateway-1 = {
@@ -249,8 +247,6 @@ locals {
           bootorder = 1
         }
       ]
-      disk = [
-      ]
       kea_ha_role = "standby"
     }
 
@@ -274,8 +270,6 @@ locals {
           bootorder = 1
         }
       ]
-      disk = [
-      ]
     }
     controller-1 = {
       memory = 4
@@ -296,8 +290,6 @@ locals {
           bootorder = 1
         }
       ]
-      disk = [
-      ]
     }
     controller-2 = {
       memory = 4
@@ -317,8 +309,6 @@ locals {
           mac       = "52-54-00-1a-61-0c"
           bootorder = 1
         }
-      ]
-      disk = [
       ]
     }
 
@@ -504,8 +494,6 @@ locals {
           ip      = "192.168.127.251"
         }
       ]
-      disk = [
-      ]
       guests = [
         "gateway-0",
         "controller-0",
@@ -526,8 +514,6 @@ locals {
           network = "store"
           ip      = "192.168.127.252"
         }
-      ]
-      disk = [
       ]
       guests = [
         "gateway-1",
@@ -555,7 +541,7 @@ locals {
       ]
       disk = [
         {
-          device     = "/dev/disk/by-path/pci-0000:01:00.0-nvme-1-part1"
+          device     = "/dev/disk/by-id/nvme-Samsung_SSD_970_EVO_250GB_S465NB0K598517N-part1"
           mount_path = "/var/home/${var.desktop_user}"
         }
       ]

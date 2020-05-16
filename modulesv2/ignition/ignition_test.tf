@@ -9,6 +9,7 @@ data "ct_config" "ign-test" {
 
   snippets = [
     templatefile("${path.module}/../../templates/ignition/base.ign.tmpl", each.value),
+    templatefile("${path.module}/../../templates/ignition/storage.ign.tmpl", each.value),
     templatefile("${path.module}/../../templates/ignition/containerd.ign.tmpl", each.value),
   ]
 }

@@ -33,7 +33,6 @@ output "kvm_params" {
       mtu                = var.mtu
       networks           = var.networks
       services           = var.services
-      host_disks         = var.kvm_hosts[k].disk
       image_preload_path = "/etc/container-save"
 
       vlans = [
