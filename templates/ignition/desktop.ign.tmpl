@@ -9,13 +9,6 @@ systemd:
       enabled: true
     - name: ksmtuned.service
       enabled: true
-    - name: flatpak-system-helper.service
-      enabled: true
-      dropins:
-        - name: location.conf
-          contents: |
-            Environment=
-            Environment=XDG_DATA_DIRS=/var/lib/flatpak/exports/share/:/usr/local/share/:/usr/share/
 
 storage:
   files:
@@ -56,4 +49,3 @@ passwd:
       password_hash: ${bcrypt(password)}
       groups:
         - libvirt
-      ssh_authorized_keys:
