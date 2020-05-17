@@ -67,40 +67,13 @@ buildtool tf-wrapper apply \
     -target=module.ignition-local
 ```
 
+#### KVM hosts
+
 Run build from https://github.com/randomcoww/fedora-coreos-custom
 
-### Create desktop image
+#### Desktop
 
-Desktop image is built using Kickstart and Fedora livemedia-creator. Generate kickstart configuration to local Matchbox server:
-
-```bash
-buildtool tf-wrapper apply \
-    -target=module.kickstart-local
-```
-
-Generate USB images for hypervisor hosts:
-```
-cd build/kickstart
-export FEDORA_RELEASE=32
-export ISO_FILE=Fedora-Server-netinst-x86_64-32-1.6.iso
-
-wget \
-    https://download.fedoraproject.org/pub/fedora/linux/releases/$FEDORA_RELEASE/Server/x86_64/iso/$ISO_FILE
-
-sudo livemedia-creator \
-    --make-iso \
-    --iso=$ISO_FILE \
-    --project Fedora \
-    --volid desktop \
-    --releasever $FEDORA_RELEASE \
-    --resultdir ./result \
-    --tmp . \
-    --ks=./desktop.ks \
-    --no-virt \
-    --lorax-templates ./lorax-desktop
-```
-
-Write boot image from `result/images/boot.iso` to disk.
+Run build from https://github.com/randomcoww/fedora-silverblue-custom
 
 ### Generate configuration on hypervisor hosts
 
