@@ -46,6 +46,7 @@ storage:
 passwd:
   users:
     - name: ${user}
+      uid: ${uid}
       password_hash: ${bcrypt(password)}
       groups:
         - libvirt
