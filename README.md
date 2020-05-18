@@ -8,6 +8,7 @@ buildtool() {
     podman run -it --rm \
         -v $HOME/.aws:/root/.aws \
         -v $(pwd):/root/mnt \
+        -w /root/mnt/resourcesv2 \
         --net=host \
         randomcoww/tf-env:latest "$@"
     rc=$?; set +x; return $rc
@@ -23,6 +24,7 @@ buildtool() {
         -e AWS_ACCESS_KEY_ID=$AWS_ACCESS_KEY_ID \
         -e AWS_SECRET_ACCESS_KEY=$AWS_SECRET_ACCESS_KEY \
         -v $(pwd):/root/mnt \
+        -w /root/mnt/resourcesv2 \
         --net=host \
         randomcoww/tf-env:latest "$@"
     rc=$?; set +x; return $rc
