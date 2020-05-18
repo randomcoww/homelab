@@ -59,6 +59,3 @@ RUN set -x \
   && tar xzf terraform-provider-ct.tar.gz --strip 1 -C .terraform.d/plugins/ \
   && rm terraform-provider-ct.tar.gz \
   && mv .terraform.d/plugins/terraform-provider-ct .terraform.d/plugins/terraform-provider-ct_${CT_VERSION}
-
-VOLUME ["$HOME/mnt"]
-WORKDIR $HOME/mnt/resourcesv2
