@@ -44,11 +44,18 @@ storage:
         inline: "${tls_internal_ca}"
 
     ##
-    ## misc config
+    ## misc configs
+    ## add to global paths - persistent home directory is mounted afterwards
     ##
+    - path: /etc/tmux.conf
+      mode: 0644
+      contents:
+        inline: |
+          set -g mouse on
+          set-option -s set-clipboard off
+          bind-key -T copy-mode MouseDragEnd1Pane send-keys -X copy-pipe-and-cancel "xclip -in -sel clip"
     - path: /etc/mpv/mpv.conf
       mode: 0644
-      overwrite: true
       contents:
         inline: |
           hwdec=vaapi
