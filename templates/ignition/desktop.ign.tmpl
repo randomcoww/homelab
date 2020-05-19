@@ -43,6 +43,29 @@ storage:
       contents:
         inline: "${tls_internal_ca}"
 
+    ##
+    ## misc config
+    ##
+    - path: /etc/mpv/mpv.conf
+      mode: 0644
+      overwrite: true
+      contents:
+        inline: |
+          hwdec=vaapi
+    - path: /etc/pulse/daemon.conf
+      append:
+        - inline: |
+            default-sample-format = float32le
+            default-sample-rate = 48000
+            alternate-sample-rate = 192000
+            resample-method = soxr-vhq
+            high-priority = yes
+            nice-level = -11
+            realtime-scheduling = yes
+            realtime-priority = 9
+            rlimit-rtprio = 9
+            daemonize = no
+
 passwd:
   users:
     - name: ${user}
