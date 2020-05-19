@@ -109,7 +109,7 @@ module "desktop-common" {
   source = "../modulesv2/desktop_common"
 
   user                 = var.desktop_user
-  password             = var.desktop_password
+  password_hash        = bcrypt(var.desktop_password)
   timezone             = var.desktop_timezone
   internal_ca_cert_pem = tls_self_signed_cert.internal-ca.cert_pem
   mtu                  = local.mtu

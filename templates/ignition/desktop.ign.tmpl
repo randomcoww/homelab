@@ -77,6 +77,6 @@ passwd:
   users:
     - name: ${user}
       uid: ${uid}
-      password_hash: ${bcrypt(password)}
+      password_hash: ${password_hash}
       groups:
         - libvirt

@@ -5,7 +5,7 @@ output "desktop_params" {
       hostname           = k
       user               = var.user
       uid                = 10000
-      password           = var.password
+      password_hash      = var.password_hash
       timezone           = var.timezone
       ssh_authorized_key = ""
       hosts              = var.desktop_hosts
