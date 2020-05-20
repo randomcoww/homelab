@@ -38,6 +38,14 @@ variable "worker_hosts" {
   type = any
 }
 
+variable "controller_templates" {
+  type = list(string)
+}
+
+variable "worker_templates" {
+  type = list(string)
+}
+
 variable "s3_backup_aws_region" {
   type = string
 }

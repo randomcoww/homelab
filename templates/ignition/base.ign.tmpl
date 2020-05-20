@@ -63,14 +63,3 @@ storage:
         inline: |
           [Manager]
           DumpCore=no
-
-passwd:
-  users:
-    - name: ${user}
-      groups:
-        - adm
-        - sudo
-        - systemd-journal
-        - wheel
-      ssh_authorized_keys:
-        - ${ssh_authorized_key}

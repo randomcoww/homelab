@@ -2,16 +2,16 @@ output "desktop_params" {
   value = {
     for k in keys(var.desktop_hosts) :
     k => {
-      hostname           = k
-      user               = var.user
-      uid                = 10000
-      password_hash      = var.password_hash
-      timezone           = var.timezone
-      ssh_authorized_key = ""
-      hosts              = var.desktop_hosts
-      host_disks         = var.desktop_hosts[k].disk
-      networks           = var.networks
-      mtu                = var.mtu
+      hostname   = k
+      user       = var.user
+      uid        = 10000
+      password   = var.password
+      timezone   = var.timezone
+      hosts      = var.desktop_hosts
+      host_disks = var.desktop_hosts[k].disk
+      networks   = var.networks
+      mtu        = var.mtu
+      templates  = var.desktop_templates
 
       vlans = [
         for k in keys(var.networks) :

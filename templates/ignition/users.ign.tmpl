@@ -1,0 +1,13 @@
+---
+variant: fcos
+version: 1.0.0
+passwd:
+  users:
+    - name: ${user}
+      groups:
+        - adm
+        - sudo
+        - systemd-journal
+        - wheel
+      ssh_authorized_keys:
+        - ${ssh_authorized_key}

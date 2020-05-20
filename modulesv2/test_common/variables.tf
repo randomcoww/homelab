@@ -29,3 +29,7 @@ variable "container_images" {
 variable "test_hosts" {
   type = any
 }
+
+variable "test_templates" {
+  type = list(string)
+}

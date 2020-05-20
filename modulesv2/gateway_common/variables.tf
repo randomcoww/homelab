@@ -29,3 +29,7 @@ variable "container_images" {
 variable "gateway_hosts" {
   type = any
 }
+
+variable "gateway_templates" {
+  type = list(string)
+}

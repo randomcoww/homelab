@@ -2,7 +2,7 @@ variable "user" {
   type = string
 }
 
-variable "password_hash" {
+variable "password" {
   type = string
 }
 
@@ -20,6 +20,10 @@ variable "networks" {
 
 variable "desktop_hosts" {
   type = any
+}
+
+variable "desktop_templates" {
+  type = list(string)
 }
 
 variable "internal_ca_cert_pem" {

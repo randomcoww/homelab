@@ -22,6 +22,7 @@ output "controller_params" {
       networks         = var.networks
       host_network     = var.controller_hosts[k].host_network
       services         = var.services
+      templates        = var.controller_templates
 
       etcd_cluster_token    = var.cluster_name
       s3_etcd_backup_path   = "${var.s3_etcd_backup_bucket}/${var.cluster_name}"
@@ -81,6 +82,7 @@ output "worker_params" {
       host_disks       = var.worker_hosts[k].disk
       services         = var.services
       domains          = var.domains
+      templates        = var.worker_templates
 
       apiserver_endpoint = "https://${var.services.kubernetes_apiserver.vip}:${var.services.kubernetes_apiserver.ports.secure}"
       kubelet_path       = "/var/lib/kubelet"

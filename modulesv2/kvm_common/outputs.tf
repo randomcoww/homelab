@@ -34,6 +34,7 @@ output "kvm_params" {
       networks           = var.networks
       services           = var.services
       image_preload_path = "/etc/container-save"
+      templates          = var.kvm_templates
 
       vlans = [
         for k in keys(var.networks) :

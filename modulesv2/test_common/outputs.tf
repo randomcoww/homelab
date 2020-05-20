@@ -10,6 +10,7 @@ output "test_params" {
       domains                    = var.domains
       dns_forward_ip             = "9.9.9.9"
       dns_forward_tls_servername = "dns.quad9.net"
+      templates                  = var.test_templates
 
       # Path mounted by kubelet running in container
       kubelet_path = "/var/lib/kubelet"

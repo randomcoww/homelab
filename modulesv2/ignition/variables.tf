@@ -1,24 +1,9 @@
-variable "controller_params" {
+
+variable "pxe_ignition_params" {
   type = any
 }
 
-variable "gateway_params" {
-  type = any
-}
-
-variable "worker_params" {
-  type = any
-}
-
-variable "kvm_params" {
-  type = any
-}
-
-variable "desktop_params" {
-  type = any
-}
-
-variable "test_params" {
+variable "local_ignition_params" {
   type = any
 }
 

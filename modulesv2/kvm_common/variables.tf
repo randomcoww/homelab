@@ -29,3 +29,7 @@ variable "container_images" {
 variable "kvm_hosts" {
   type = any
 }
+
+variable "kvm_templates" {
+  type = list(string)
+}
