@@ -179,30 +179,19 @@ module "ignition-kvm-0" {
   source = "../modulesv2/ignition"
 
   pxe_ignition_params = merge(
-    # controller
-    {
-      for k in local.hosts.kvm-0.guests :
-      k => module.kubernetes-common.controller_params[k]
-      if lookup(module.kubernetes-common.controller_params, k, null) != null
-    },
-    # worker
-    {
-      for k in local.hosts.kvm-0.guests :
-      k => module.kubernetes-common.worker_params[k]
-      if lookup(module.kubernetes-common.worker_params, k, null) != null
-    },
-    # gateway
-    {
-      for k in local.hosts.kvm-0.guests :
-      k => module.gateway-common.gateway_params[k]
-      if lookup(module.gateway-common.gateway_params, k, null) != null
-    },
-    # test
-    {
-      for k in local.hosts.kvm-0.guests :
-      k => module.test-common.test_params[k]
-      if lookup(module.test-common.test_params, k, null) != null
-    },
+    [
+      for params in [
+        module.kubernetes-common.controller_params,
+        module.kubernetes-common.worker_params,
+        module.gateway-common.gateway_params,
+        module.test-common.test_params,
+      ] :
+      {
+        for host in local.hosts.kvm-0.guests :
+        host => params[host]
+        if lookup(params, host, null) != null
+      }
+    ]...
   )
   local_ignition_params = {}
 
@@ -217,30 +206,19 @@ module "ignition-kvm-1" {
   source = "../modulesv2/ignition"
 
   pxe_ignition_params = merge(
-    # controller
-    {
-      for k in local.hosts.kvm-0.guests :
-      k => module.kubernetes-common.controller_params[k]
-      if lookup(module.kubernetes-common.controller_params, k, null) != null
-    },
-    # worker
-    {
-      for k in local.hosts.kvm-0.guests :
-      k => module.kubernetes-common.worker_params[k]
-      if lookup(module.kubernetes-common.worker_params, k, null) != null
-    },
-    # gateway
-    {
-      for k in local.hosts.kvm-0.guests :
-      k => module.gateway-common.gateway_params[k]
-      if lookup(module.gateway-common.gateway_params, k, null) != null
-    },
-    # test
-    {
-      for k in local.hosts.kvm-0.guests :
-      k => module.test-common.test_params[k]
-      if lookup(module.test-common.test_params, k, null) != null
-    },
+    [
+      for params in [
+        module.kubernetes-common.controller_params,
+        module.kubernetes-common.worker_params,
+        module.gateway-common.gateway_params,
+        module.test-common.test_params,
+      ] :
+      {
+        for host in local.hosts.kvm-1.guests :
+        host => params[host]
+        if lookup(params, host, null) != null
+      }
+    ]...
   )
   local_ignition_params = {}
 
@@ -256,19 +234,13 @@ module "ignition-local" {
   source = "../modulesv2/ignition"
 
   pxe_ignition_params = merge(
-    # controller
     module.kubernetes-common.controller_params,
-    # worker
     module.kubernetes-common.worker_params,
-    # gateway
     module.gateway-common.gateway_params,
-    # test
     module.test-common.test_params,
   )
   local_ignition_params = merge(
-    # kvm
     module.kvm-common.kvm_params,
-    # desktop
     module.desktop-common.desktop_params,
   )
 
