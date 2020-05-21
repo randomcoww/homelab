@@ -13,42 +13,27 @@ module "kubernetes-common" {
   domains           = local.domains
   container_images  = local.container_images
 
+  controller_templates = local.components.controller.templates
   controller_hosts = {
-    for k in keys(local.hosts) :
+    for k in local.components.controller.nodes :
     k => merge(local.hosts[k], {
       host_network = {
         for n in local.hosts[k].network :
         lookup(n, "alias", lookup(n, "network", "placeholder")) => n
       }
     })
-    if contains(local.hosts[k].components, "controller")
   }
 
-  controller_templates = [
-    "${path.module}/../templates/ignition/controller.ign.tmpl",
-    "${path.module}/../templates/ignition/base.ign.tmpl",
-    "${path.module}/../templates/ignition/containerd.ign.tmpl",
-    "${path.module}/../templates/ignition/users.ign.tmpl",
-  ]
-
+  worker_templates = local.components.worker.templates
   worker_hosts = {
-    for k in keys(local.hosts) :
+    for k in local.components.worker.nodes :
     k => merge(local.hosts[k], {
       host_network = {
         for n in local.hosts[k].network :
         lookup(n, "alias", lookup(n, "network", "placeholder")) => n
       }
     })
-    if contains(local.hosts[k].components, "worker")
   }
-
-  worker_templates = [
-    "${path.module}/../templates/ignition/worker.ign.tmpl",
-    "${path.module}/../templates/ignition/base.ign.tmpl",
-    "${path.module}/../templates/ignition/storage.ign.tmpl",
-    "${path.module}/../templates/ignition/containerd.ign.tmpl",
-    "${path.module}/../templates/ignition/users.ign.tmpl",
-  ]
 }
 
 module "gateway-common" {
@@ -62,23 +47,16 @@ module "gateway-common" {
   domains           = local.domains
   container_images  = local.container_images
 
+  gateway_templates = local.components.gateway.templates
   gateway_hosts = {
-    for k in keys(local.hosts) :
+    for k in local.components.gateway.nodes :
     k => merge(local.hosts[k], {
       host_network = {
         for n in local.hosts[k].network :
         lookup(n, "alias", lookup(n, "network", "placeholder")) => n
       }
     })
-    if contains(local.hosts[k].components, "gateway")
   }
-
-  gateway_templates = [
-    "${path.module}/../templates/ignition/gateway.ign.tmpl",
-    "${path.module}/../templates/ignition/base.ign.tmpl",
-    "${path.module}/../templates/ignition/containerd.ign.tmpl",
-    "${path.module}/../templates/ignition/users.ign.tmpl",
-  ]
 }
 
 module "test-common" {
@@ -92,24 +70,16 @@ module "test-common" {
   domains           = local.domains
   container_images  = local.container_images
 
+  test_templates = local.components.test.templates
   test_hosts = {
-    for k in keys(local.hosts) :
+    for k in local.components.test.nodes :
     k => merge(local.hosts[k], {
       host_network = {
         for n in local.hosts[k].network :
         lookup(n, "alias", lookup(n, "network", "placeholder")) => n
       }
     })
-    if contains(local.hosts[k].components, "test")
   }
-
-  test_templates = [
-    "${path.module}/../templates/ignition/test.ign.tmpl",
-    "${path.module}/../templates/ignition/base.ign.tmpl",
-    "${path.module}/../templates/ignition/storage.ign.tmpl",
-    "${path.module}/../templates/ignition/containerd.ign.tmpl",
-    "${path.module}/../templates/ignition/users.ign.tmpl",
-  ]
 }
 
 module "kvm-common" {
@@ -123,23 +93,16 @@ module "kvm-common" {
   domains           = local.domains
   container_images  = local.container_images
 
+  kvm_templates = local.components.kvm.templates
   kvm_hosts = {
-    for k in keys(local.hosts) :
+    for k in local.components.kvm.nodes :
     k => merge(local.hosts[k], {
       host_network = {
         for n in local.hosts[k].network :
         lookup(n, "alias", lookup(n, "network", "placeholder")) => n
       }
     })
-    if contains(local.hosts[k].components, "kvm")
   }
-
-  kvm_templates = [
-    "${path.module}/../templates/ignition/kvm.ign.tmpl",
-    "${path.module}/../templates/ignition/vlan-network.ign.tmpl",
-    "${path.module}/../templates/ignition/base.ign.tmpl",
-    "${path.module}/../templates/ignition/users.ign.tmpl",
-  ]
 }
 
 module "desktop-common" {
@@ -152,22 +115,14 @@ module "desktop-common" {
   mtu                  = local.mtu
   networks             = local.networks
 
+  desktop_templates = local.components.desktop.templates
   desktop_hosts = {
-    for k in keys(local.hosts) :
+    for k in local.components.desktop.nodes :
     k => merge(local.hosts[k], {
       host_network = {
         for n in local.hosts[k].network :
         lookup(n, "alias", lookup(n, "network", "placeholder")) => n
       }
     })
-    if contains(local.hosts[k].components, "desktop")
   }
-
-  desktop_templates = [
-    "${path.module}/../templates/ignition/desktop.ign.tmpl",
-    "${path.module}/../templates/ignition/vlan-network.ign.tmpl",
-    "${path.module}/../templates/ignition/base.ign.tmpl",
-    "${path.module}/../templates/ignition/storage.ign.tmpl",
-    "${path.module}/../templates/ignition/users.ign.tmpl",
-  ]
 }

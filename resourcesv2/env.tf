@@ -161,12 +161,86 @@ locals {
     }
   }
 
+  components = {
+    gateway = {
+      nodes = [
+        "gateway-0",
+        "gateway-1",
+      ]
+      templates = [
+        "${path.module}/../templates/ignition/gateway.ign.tmpl",
+        "${path.module}/../templates/ignition/base.ign.tmpl",
+        "${path.module}/../templates/ignition/containerd.ign.tmpl",
+        "${path.module}/../templates/ignition/users.ign.tmpl",
+      ]
+    }
+    controller = {
+      nodes = [
+        "controller-0",
+        "controller-1",
+        "controller-2",
+      ]
+      templates = [
+        "${path.module}/../templates/ignition/controller.ign.tmpl",
+        "${path.module}/../templates/ignition/base.ign.tmpl",
+        "${path.module}/../templates/ignition/containerd.ign.tmpl",
+        "${path.module}/../templates/ignition/users.ign.tmpl",
+      ]
+    }
+    worker = {
+      nodes = [
+        "worker-0",
+        "worker-1",
+      ]
+      templates = [
+        "${path.module}/../templates/ignition/worker.ign.tmpl",
+        "${path.module}/../templates/ignition/base.ign.tmpl",
+        "${path.module}/../templates/ignition/storage.ign.tmpl",
+        "${path.module}/../templates/ignition/containerd.ign.tmpl",
+        "${path.module}/../templates/ignition/users.ign.tmpl",
+      ]
+    }
+    test = {
+      nodes = [
+        "test-0"
+      ]
+      templates = [
+        "${path.module}/../templates/ignition/test.ign.tmpl",
+        "${path.module}/../templates/ignition/base.ign.tmpl",
+        "${path.module}/../templates/ignition/storage.ign.tmpl",
+        "${path.module}/../templates/ignition/containerd.ign.tmpl",
+        "${path.module}/../templates/ignition/users.ign.tmpl",
+      ]
+    }
+    kvm = {
+      nodes = [
+        "kvm-0",
+        "kvm-1",
+      ]
+      templates = [
+        "${path.module}/../templates/ignition/kvm.ign.tmpl",
+        "${path.module}/../templates/ignition/vlan-network.ign.tmpl",
+        "${path.module}/../templates/ignition/base.ign.tmpl",
+        "${path.module}/../templates/ignition/users.ign.tmpl",
+      ]
+    }
+    desktop = {
+      nodes = [
+        "desktop",
+      ]
+      templates = [
+        "${path.module}/../templates/ignition/desktop.ign.tmpl",
+        "${path.module}/../templates/ignition/vlan-network.ign.tmpl",
+        "${path.module}/../templates/ignition/base.ign.tmpl",
+        "${path.module}/../templates/ignition/storage.ign.tmpl",
+        "${path.module}/../templates/ignition/users.ign.tmpl",
+      ]
+    }
+  }
+
   hosts = {
     # gateway
     gateway-0 = {
-      components = [
-        "gateway"
-      ]
       memory = 2
       vcpu   = 1
       network = [
@@ -207,9 +281,6 @@ locals {
       kea_ha_role = "primary"
     }
     gateway-1 = {
-      components = [
-        "gateway"
-      ]
       memory = 2
       vcpu   = 1
       network = [
@@ -254,9 +325,6 @@ locals {
     controller-0 = {
       memory = 4
       vcpu   = 2
-      components = [
-        "controller"
-      ]
       network = [
         {
           network = "store"
@@ -274,9 +342,6 @@ locals {
     controller-1 = {
       memory = 4
       vcpu   = 2
-      components = [
-        "controller"
-      ]
       network = [
         {
           network = "store"
@@ -294,9 +359,6 @@ locals {
     controller-2 = {
       memory = 4
       vcpu   = 2
-      components = [
-        "controller"
-      ]
       network = [
         {
           network = "store"
@@ -314,9 +376,6 @@ locals {
 
     # workers
     worker-0 = {
-      components = [
-        "worker"
-      ]
       memory = 48
       vcpu   = 4
       network = [
@@ -415,9 +474,6 @@ locals {
       ]
     }
     worker-1 = {
-      components = [
-        "worker"
-      ]
       memory = 48
       vcpu   = 4
       network = [
@@ -460,9 +516,6 @@ locals {
     test-0 = {
       memory = 4
       vcpu   = 2
-      components = [
-        "test"
-      ]
       network = [
         {
           network = "store"
@@ -481,9 +534,6 @@ locals {
 
     # KVM
     kvm-0 = {
-      components = [
-        "kvm"
-      ]
       network = [
         {
           alias = "hw"
@@ -502,9 +552,6 @@ locals {
       ]
     }
     kvm-1 = {
-      components = [
-        "kvm"
-      ]
       network = [
         {
           alias = "hw"
@@ -526,9 +573,6 @@ locals {
 
     # desktop
     desktop = {
-      components = [
-        "desktop",
-      ]
       network = [
         {
           alias = "hw"
