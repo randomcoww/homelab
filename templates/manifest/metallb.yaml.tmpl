@@ -17,4 +17,4 @@ data:
     - name: my-ip-space
       protocol: layer2
       addresses:
-      - ${networks.metallb.network}/${networks.metallb.cidr}
+      - ${loadbalancer_pools.kubernetes.network}/${loadbalancer_pools.kubernetes.cidr}

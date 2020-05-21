@@ -12,7 +12,7 @@ resource "matchbox_group" "manifest-metallb" {
 
   metadata = {
     config = templatefile("${path.module}/../../templates/manifest/metallb.yaml.tmpl", {
-      networks = var.networks
+      loadbalancer_pools = var.loadbalancer_pools
     })
   }
 }

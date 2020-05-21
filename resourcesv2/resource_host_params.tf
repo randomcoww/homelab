@@ -39,13 +39,14 @@ module "kubernetes-common" {
 module "gateway-common" {
   source = "../modulesv2/gateway_common"
 
-  user              = local.user
-  ssh_ca_public_key = tls_private_key.ssh-ca.public_key_openssh
-  mtu               = local.mtu
-  networks          = local.networks
-  services          = local.services
-  domains           = local.domains
-  container_images  = local.container_images
+  user               = local.user
+  ssh_ca_public_key  = tls_private_key.ssh-ca.public_key_openssh
+  mtu                = local.mtu
+  networks           = local.networks
+  loadbalancer_pools = local.loadbalancer_pools
+  services           = local.services
+  domains            = local.domains
+  container_images   = local.container_images
 
   gateway_templates = local.components.gateway.templates
   gateway_hosts = {

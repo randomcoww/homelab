@@ -150,7 +150,7 @@ locals {
       dhcp_pool = "192.168.225.64/26"
       br_if     = "en-int"
     }
-    # kubernetes
+    # kubernetes internal
     kubernetes = {
       network = "10.244.0.0"
       cidr    = 16
@@ -159,7 +159,10 @@ locals {
       network = "10.96.0.0"
       cidr    = 12
     }
-    metallb = {
+  }
+
+  loadbalancer_pools = {
+    kubernetes = {
       network = "192.168.126.64"
       cidr    = 26
     }

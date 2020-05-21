@@ -271,6 +271,10 @@ storage:
 
               iifname $if_trusted accept;
               iifname $if_internal oifname $if_external accept;
+
+              %{~ for v in values(loadbalancer_pools) ~}
+              iifname $if_internal ip daddr ${v.network}/${v.cidr} accept;
+              %{~ endfor ~}
             }
 
             chain output {

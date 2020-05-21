@@ -8,6 +8,7 @@ output "gateway_params" {
 
       container_images           = var.container_images
       networks                   = var.networks
+      loadbalancer_pools         = var.loadbalancer_pools
       host_network               = var.gateway_hosts[k].host_network
       services                   = var.services
       domains                    = var.domains

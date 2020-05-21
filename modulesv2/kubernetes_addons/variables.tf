@@ -2,6 +2,10 @@ variable "networks" {
   type = any
 }
 
+variable "loadbalancer_pools" {
+  type = any
+}
+
 variable "services" {
   type = any
 }

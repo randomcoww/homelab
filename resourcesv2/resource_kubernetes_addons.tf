@@ -1,10 +1,11 @@
 module "kubernetes-addons" {
   source = "../modulesv2/kubernetes_addons"
 
-  networks         = local.networks
-  services         = local.services
-  domains          = local.domains
-  container_images = local.container_images
+  networks           = local.networks
+  loadbalancer_pools = local.loadbalancer_pools
+  services           = local.services
+  domains            = local.domains
+  container_images   = local.container_images
 
   secrets = {
     internal-tls = {
