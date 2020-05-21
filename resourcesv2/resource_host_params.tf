@@ -1,9 +1,9 @@
 module "kubernetes-common" {
   source = "../modulesv2/kubernetes_common"
 
-  cluster_name          = "default-cluster-012"
-  s3_backup_aws_region  = "us-west-2"
-  s3_etcd_backup_bucket = "randomcoww-etcd-backup"
+  cluster_name          = local.kubernetes_cluster_name
+  s3_backup_aws_region  = local.s3_backup_aws_region
+  s3_etcd_backup_bucket = local.s3_etcd_backup_bucket
 
   user              = local.user
   ssh_ca_public_key = tls_private_key.ssh-ca.public_key_openssh

@@ -271,8 +271,6 @@ storage:
 
               iifname $if_trusted accept;
               iifname $if_internal oifname $if_external accept;
-
-              iifname $if_internal ip daddr ${networks.metallb.network}/${networks.metallb.cidr} accept;
             }
 
             chain output {

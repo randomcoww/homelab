@@ -1,17 +1,21 @@
 locals {
-  user               = "core"
-  mtu                = 9000
-  kubernetes_version = "v1.18.2"
+  user = "core"
+  mtu  = 9000
+  # kubernetes
+  kubernetes_cluster_name = "default-cluster-012"
+  # etcd backup
+  s3_backup_aws_region  = "us-west-2"
+  s3_etcd_backup_bucket = "randomcoww-etcd-backup"
 
   # kubelet image is used for static pods and does not need to match the kubernetes version
   # hyperkube is used for the worker kubelet and should match the version
   container_images = {
     kubelet                 = "docker.io/randomcoww/kubernetes:kubelet-v1.18.2"
-    kube_apiserver          = "docker.io/randomcoww/kubernetes:kube-master-${local.kubernetes_version}"
-    kube_controller_manager = "docker.io/randomcoww/kubernetes:kube-master-${local.kubernetes_version}"
-    kube_scheduler          = "docker.io/randomcoww/kubernetes:kube-master-${local.kubernetes_version}"
-    hyperkube               = "docker.io/randomcoww/kubernetes:kubelet-${local.kubernetes_version}"
-    kube_proxy              = "docker.io/randomcoww/kubernetes:kube-proxy-${local.kubernetes_version}"
+    kube_apiserver          = "docker.io/randomcoww/kubernetes:kube-master-v1.18.2"
+    kube_controller_manager = "docker.io/randomcoww/kubernetes:kube-master-v1.18.2"
+    kube_scheduler          = "docker.io/randomcoww/kubernetes:kube-master-v1.18.2"
+    hyperkube               = "docker.io/randomcoww/kubernetes:kubelet-v1.18.2"
+    kube_proxy              = "docker.io/randomcoww/kubernetes:kube-proxy-v1.18.2"
     etcd_wrapper            = "docker.io/randomcoww/etcd-wrapper:v0.2.0"
     etcd                    = "docker.io/randomcoww/etcd:v3.4.7"
     flannel                 = "docker.io/randomcoww/flannel:latest"
