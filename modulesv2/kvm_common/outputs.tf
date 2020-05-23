@@ -19,42 +19,42 @@ output "libvirt_endpoints" {
   }
 }
 
-output "kvm_params" {
+output "templates" {
   value = {
     for k in keys(var.kvm_hosts) :
-    k => {
-      hostname           = k
-      user               = var.user
-      ssh_authorized_key = "cert-authority ${chomp(var.ssh_ca_public_key)}"
+    k => [
+      for template in var.kvm_templates :
+      templatefile(template, {
+        hostname           = k
+        user               = var.user
+        container_images   = var.container_images
+        networks           = var.networks
+        hosts              = var.kvm_hosts
+        mtu                = var.mtu
+        networks           = var.networks
+        services           = var.services
+        image_preload_path = "/etc/container-save"
 
-      container_images   = var.container_images
-      networks           = var.networks
-      hosts              = var.kvm_hosts
-      mtu                = var.mtu
-      networks           = var.networks
-      services           = var.services
-      image_preload_path = "/etc/container-save"
-      templates          = var.kvm_templates
-
-      vlans = [
-        for k in keys(var.networks) :
-        k
-        if lookup(var.networks[k], "id", null) != null
-      ]
-      internal_networks = {
-        int = {
-          if = var.networks.int.br_if
-          ip = var.services.renderer.vip
+        vlans = [
+          for k in keys(var.networks) :
+          k
+          if lookup(var.networks[k], "id", null) != null
+        ]
+        internal_networks = {
+          int = {
+            if = var.networks.int.br_if
+            ip = var.services.renderer.vip
+          }
         }
-      }
 
-      kea_path             = "/var/lib/kea"
-      matchbox_tls_path    = "/etc/matchbox/certs"
-      matchbox_data_path   = "/etc/matchbox/data"
-      matchbox_assets_path = "/etc/matchbox/assets"
-      tls_matchbox_ca      = replace(tls_self_signed_cert.matchbox-ca.cert_pem, "\n", "\\n")
-      tls_matchbox         = replace(tls_locally_signed_cert.matchbox.cert_pem, "\n", "\\n")
-      tls_matchbox_key     = replace(tls_private_key.matchbox.private_key_pem, "\n", "\\n")
-    }
+        kea_path             = "/var/lib/kea"
+        matchbox_tls_path    = "/etc/matchbox/certs"
+        matchbox_data_path   = "/etc/matchbox/data"
+        matchbox_assets_path = "/etc/matchbox/assets"
+        tls_matchbox_ca      = replace(tls_self_signed_cert.matchbox-ca.cert_pem, "\n", "\\n")
+        tls_matchbox         = replace(tls_locally_signed_cert.matchbox.cert_pem, "\n", "\\n")
+        tls_matchbox_key     = replace(tls_private_key.matchbox.private_key_pem, "\n", "\\n")
+      })
+    ]
   }
 }

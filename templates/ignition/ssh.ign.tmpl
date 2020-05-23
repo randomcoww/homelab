@@ -1,0 +1,27 @@
+---
+variant: fcos
+version: 1.0.0
+passwd:
+  users:
+    - name: ${user}
+      ssh_authorized_keys:
+        - ${ssh_ca_authorized_key}
+
+storage:
+  files:
+    - path: /etc/ssh/sshd_config.d/30-host-certificate.conf
+      mode: 0644
+      contents:
+        inline: "HostCertificate /etc/ssh/ssh_host_ecdsa_key-cert-test.pub"
+    - path: /etc/ssh/ssh_host_ecdsa_key
+      mode: 0600
+      contents:
+        inline: "${ssh_host_private_key}"
+    - path: /etc/ssh/ssh_host_ecdsa_key.pub
+      mode: 0600
+      contents:
+        inline: "${ssh_host_public_key}"
+    - path: /etc/ssh/ssh_host_ecdsa_key-cert.pub
+      mode: 0600
+      contents:
+        inline: "${ssh_host_certificate}"

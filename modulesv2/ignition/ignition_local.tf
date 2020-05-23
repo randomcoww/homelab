@@ -4,13 +4,9 @@
 data "ct_config" "ign-local" {
   for_each = var.local_ignition_params
 
-  content = templatefile(each.value.templates[0], each.value)
-  strict  = true
-
-  snippets = [
-    for k in slice(each.value.templates, 1, length(each.value.templates) - 1) :
-    templatefile(k, each.value)
-  ]
+  content  = each.value.templates[0]
+  strict   = true
+  snippets = slice(each.value.templates, 1, length(each.value.templates))
 }
 
 resource "matchbox_profile" "ign-local" {
@@ -26,6 +22,6 @@ resource "matchbox_group" "ign-local" {
   profile = matchbox_profile.ign-local[each.key].name
   name    = each.key
   selector = {
-    ign = each.value.hostname
+    ign = each.key
   }
 }

@@ -169,6 +169,22 @@ locals {
   }
 
   components = {
+    ssh = {
+      nodes = [
+        "gateway-0",
+        "gateway-1",
+        "controller-0",
+        "controller-1",
+        "controller-2",
+        "worker-0",
+        "worker-1",
+        "kvm-0",
+        "kvm-1",
+      ]
+      templates = [
+        "${path.module}/../templates/ignition/ssh.ign.tmpl",
+      ]
+    }
     gateway = {
       nodes = [
         "gateway-0",
@@ -178,7 +194,7 @@ locals {
         "${path.module}/../templates/ignition/gateway.ign.tmpl",
         "${path.module}/../templates/ignition/base.ign.tmpl",
         "${path.module}/../templates/ignition/containerd.ign.tmpl",
-        "${path.module}/../templates/ignition/users.ign.tmpl",
+        "${path.module}/../templates/ignition/user.ign.tmpl",
       ]
     }
     controller = {
@@ -191,7 +207,7 @@ locals {
         "${path.module}/../templates/ignition/controller.ign.tmpl",
         "${path.module}/../templates/ignition/base.ign.tmpl",
         "${path.module}/../templates/ignition/containerd.ign.tmpl",
-        "${path.module}/../templates/ignition/users.ign.tmpl",
+        "${path.module}/../templates/ignition/user.ign.tmpl",
       ]
     }
     worker = {
@@ -204,7 +220,7 @@ locals {
         "${path.module}/../templates/ignition/base.ign.tmpl",
         "${path.module}/../templates/ignition/storage.ign.tmpl",
         "${path.module}/../templates/ignition/containerd.ign.tmpl",
-        "${path.module}/../templates/ignition/users.ign.tmpl",
+        "${path.module}/../templates/ignition/user.ign.tmpl",
       ]
     }
     test = {
@@ -216,7 +232,7 @@ locals {
         "${path.module}/../templates/ignition/base.ign.tmpl",
         "${path.module}/../templates/ignition/storage.ign.tmpl",
         "${path.module}/../templates/ignition/containerd.ign.tmpl",
-        "${path.module}/../templates/ignition/users.ign.tmpl",
+        "${path.module}/../templates/ignition/user.ign.tmpl",
       ]
     }
     kvm = {
@@ -228,7 +244,7 @@ locals {
         "${path.module}/../templates/ignition/kvm.ign.tmpl",
         "${path.module}/../templates/ignition/vlan-network.ign.tmpl",
         "${path.module}/../templates/ignition/base.ign.tmpl",
-        "${path.module}/../templates/ignition/users.ign.tmpl",
+        "${path.module}/../templates/ignition/user.ign.tmpl",
       ]
     }
     desktop = {
@@ -240,7 +256,7 @@ locals {
         "${path.module}/../templates/ignition/vlan-network.ign.tmpl",
         "${path.module}/../templates/ignition/base.ign.tmpl",
         "${path.module}/../templates/ignition/storage.ign.tmpl",
-        "${path.module}/../templates/ignition/users.ign.tmpl",
+        "${path.module}/../templates/ignition/user.ign.tmpl",
       ]
     }
   }
@@ -596,6 +612,14 @@ locals {
           mount_path = "/var/home/${var.desktop_user}"
         }
       ]
+    }
+  }
+
+  host_network_by_type = {
+    for k in keys(local.hosts) :
+    k => {
+      for n in local.hosts[k].network :
+      lookup(n, "alias", lookup(n, "network", "placeholder")) => n
     }
   }
 }
