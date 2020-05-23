@@ -13,3 +13,8 @@ output "grafana-auth" {
     password = random_password.grafana-password.result
   }
 }
+
+# Add to authorized-keys @cert-authority
+output "ssh-ca-authorized-key" {
+  value = module.ssh-common.ssh_ca_authorized_key
+}

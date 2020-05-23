@@ -6,21 +6,18 @@
 module "ignition-kvm-0" {
   source = "../modulesv2/ignition"
 
-  pxe_ignition_params = merge(
-    [
-      for params in [
-        module.kubernetes-common.controller_params,
-        module.kubernetes-common.worker_params,
-        module.gateway-common.gateway_params,
-        module.test-common.test_params,
-      ] :
-      {
-        for host in local.hosts.kvm-0.guests :
-        host => params[host]
-        if lookup(params, host, null) != null
-      }
-    ]...
-  )
+  pxe_ignition_params = {
+    for h in local.hosts.kvm-0.guests :
+    h => {
+      templates = flatten([
+        lookup(module.kubernetes-common.templates, h, []),
+        lookup(module.gateway-common.templates, h, []),
+        lookup(module.test-common.templates, h, []),
+        lookup(module.ssh-common.templates, h, [])
+      ])
+      selector = lookup(local.host_network_by_type[h], "int", {})
+    }
+  }
   local_ignition_params = {}
 
   services      = local.services
@@ -33,21 +30,18 @@ module "ignition-kvm-0" {
 module "ignition-kvm-1" {
   source = "../modulesv2/ignition"
 
-  pxe_ignition_params = merge(
-    [
-      for params in [
-        module.kubernetes-common.controller_params,
-        module.kubernetes-common.worker_params,
-        module.gateway-common.gateway_params,
-        module.test-common.test_params,
-      ] :
-      {
-        for host in local.hosts.kvm-1.guests :
-        host => params[host]
-        if lookup(params, host, null) != null
-      }
-    ]...
-  )
+  pxe_ignition_params = {
+    for h in local.hosts.kvm-1.guests :
+    h => {
+      templates = flatten([
+        lookup(module.kubernetes-common.templates, h, []),
+        lookup(module.gateway-common.templates, h, []),
+        lookup(module.test-common.templates, h, []),
+        lookup(module.ssh-common.templates, h, [])
+      ])
+      selector = lookup(local.host_network_by_type[h], "int", {})
+    }
+  }
   local_ignition_params = {}
 
   services      = local.services
@@ -61,16 +55,20 @@ module "ignition-kvm-1" {
 module "ignition-local" {
   source = "../modulesv2/ignition"
 
-  pxe_ignition_params = merge(
-    module.kubernetes-common.controller_params,
-    module.kubernetes-common.worker_params,
-    module.gateway-common.gateway_params,
-    module.test-common.test_params,
-  )
-  local_ignition_params = merge(
-    module.kvm-common.kvm_params,
-    module.desktop-common.desktop_params,
-  )
+  pxe_ignition_params = {}
+  local_ignition_params = {
+    for h in keys(local.hosts) :
+    h => {
+      templates = flatten([
+        lookup(module.kubernetes-common.templates, h, []),
+        lookup(module.gateway-common.templates, h, []),
+        lookup(module.test-common.templates, h, []),
+        lookup(module.kvm-common.templates, h, []),
+        lookup(module.desktop-common.templates, h, []),
+        lookup(module.ssh-common.templates, h, [])
+      ])
+    }
+  }
 
   services      = local.services
   renderer      = local.local_renderer

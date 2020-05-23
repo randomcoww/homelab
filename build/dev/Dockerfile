@@ -9,11 +9,17 @@ RUN set -x \
   \
   && git clone https://github.com/randomcoww/terraform-provider-libvirt.git terraform-provider-libvirt \
   && cd terraform-provider-libvirt \
-  && GO111MODULE=on GOOS=linux go install \
+  && GO111MODULE=on GOOS=linux go install -v -ldflags '-s -w' \
   \
+  && cd .. \
+  && git clone https://github.com/randomcoww/terraform-provider-sshca.git terraform-provider-sshca \
+  && cd terraform-provider-sshca \
+  && CGO_ENABLED=0 GO111MODULE=on GOOS=linux go install -v -ldflags '-s -w' \
+  \
+  && cd .. \
   && git clone https://github.com/poseidon/terraform-provider-matchbox.git terraform-provider-matchbox \
   && cd terraform-provider-matchbox \
-  && GO111MODULE=on GOOS=linux go install
+  && CGO_ENABLED=0 GO111MODULE=on GOOS=linux go install -v -ldflags '-s -w'
 
 FROM golang:alpine AS MATCHBOX
 
@@ -24,7 +30,7 @@ RUN set -x \
   \
   && git clone https://github.com/poseidon/matchbox.git matchbox \
   && cd matchbox/cmd/matchbox \
-  && GO111MODULE=on GOOS=linux go install
+  && CGO_ENABLED=0 GO111MODULE=on GOOS=linux go install -v -ldflags '-s -w'
 
 FROM alpine:edge
 

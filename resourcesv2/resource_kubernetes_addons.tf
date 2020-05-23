@@ -1,3 +1,29 @@
+##
+## minio user-pass
+##
+resource "random_password" "minio-user" {
+  length  = 30
+  special = false
+}
+
+resource "random_password" "minio-password" {
+  length  = 30
+  special = false
+}
+
+##
+## grafana user-pass
+##
+resource "random_password" "grafana-user" {
+  length  = 30
+  special = false
+}
+
+resource "random_password" "grafana-password" {
+  length  = 30
+  special = false
+}
+
 module "kubernetes-addons" {
   source = "../modulesv2/kubernetes_addons"
 

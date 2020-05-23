@@ -2,10 +2,6 @@ variable "user" {
   type = string
 }
 
-variable "ssh_ca_public_key" {
-  type = string
-}
-
 variable "mtu" {
   type = number
 }
