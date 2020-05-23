@@ -56,14 +56,12 @@ storage:
           [Match]
           Name=${host_network.store.if}
 
-          [Network]
-          LinkLocalAddressing=no
-          DHCP=no
-          Gateway=${networks.store.router}
-          DNS=${services.recursive_dns.vip}
-
           [Link]
           MTUBytes=${mtu}
+
+          [Network]
+          LinkLocalAddressing=no
+          DHCP=yes
 
           [Address]
           Address=${host_network.store.ip}/${networks.store.cidr}
