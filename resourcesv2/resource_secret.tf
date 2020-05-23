@@ -1,18 +1,4 @@
 ##
-## SSH CA for all hosts
-##
-resource "tls_private_key" "ssh-ca" {
-  algorithm   = "ECDSA"
-  ecdsa_curve = "P521"
-}
-
-## ssh ca
-resource "local_file" "ssh-ca-key" {
-  content  = chomp(tls_private_key.ssh-ca.private_key_pem)
-  filename = "output/ssh-ca-key.pem"
-}
-
-##
 ## internal CA for ingress
 ##
 resource "tls_private_key" "internal-ca" {
@@ -143,32 +129,6 @@ locals {
     private_key_pem = tls_private_key.local-matchbox.private_key_pem
     ca_pem          = tls_self_signed_cert.local-matchbox-ca.cert_pem
   }
-}
-
-##
-## minio user-pass
-##
-resource "random_password" "minio-user" {
-  length  = 30
-  special = false
-}
-
-resource "random_password" "minio-password" {
-  length  = 30
-  special = false
-}
-
-##
-## grafana user-pass
-##
-resource "random_password" "grafana-user" {
-  length  = 30
-  special = false
-}
-
-resource "random_password" "grafana-password" {
-  length  = 30
-  special = false
 }
 
 ##

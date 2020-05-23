@@ -6,7 +6,7 @@ data "ct_config" "ign-local" {
 
   content  = each.value.templates[0]
   strict   = true
-  snippets = slice(each.value.templates, 1, length(each.value.templates))
+  snippets = length(each.value.templates) > 1 ? slice(each.value.templates, 1, length(each.value.templates)) : []
 }
 
 resource "matchbox_profile" "ign-local" {

@@ -6,7 +6,7 @@ data "ct_config" "ign-pxe" {
 
   content  = each.value.templates[0]
   strict   = true
-  snippets = slice(each.value.templates, 1, length(each.value.templates))
+  snippets = length(each.value.templates) > 1 ? slice(each.value.templates, 1, length(each.value.templates)) : []
 }
 
 resource "matchbox_profile" "ign-pxe" {
@@ -20,7 +20,7 @@ resource "matchbox_profile" "ign-pxe" {
   ]
   args = concat(var.kernel_params, [
     "ignition.config.url=http://${var.services.renderer.vip}:${var.services.renderer.ports.http}/ignition?mac=$${mac:hexhyp}",
-    "ip=${each.value.selector.if}:dhcp"
+    "ip=${each.value.selector.if}:dhcp",
   ])
 
   raw_ignition = data.ct_config.ign-pxe[each.key].rendered

@@ -15,10 +15,7 @@ module "ignition-kvm-0" {
         lookup(module.test-common.templates, h, []),
         lookup(module.ssh-common.templates, h, [])
       ])
-      selector = {
-        if  = local.host_network_by_type[h].int.if
-        mac = local.host_network_by_type[h].int.mac
-      }
+      selector = lookup(local.host_network_by_type[h], "int", {})
     }
   }
   local_ignition_params = {}
@@ -42,10 +39,7 @@ module "ignition-kvm-1" {
         lookup(module.test-common.templates, h, []),
         lookup(module.ssh-common.templates, h, [])
       ])
-      selector = {
-        if  = local.host_network_by_type[h].int.if
-        mac = local.host_network_by_type[h].int.mac
-      }
+      selector = lookup(local.host_network_by_type[h], "int", {})
     }
   }
   local_ignition_params = {}
@@ -61,25 +55,14 @@ module "ignition-kvm-1" {
 module "ignition-local" {
   source = "../modulesv2/ignition"
 
-  pxe_ignition_params = {
+  pxe_ignition_params = {}
+  local_ignition_params = {
     for h in keys(local.hosts) :
     h => {
       templates = flatten([
         lookup(module.kubernetes-common.templates, h, []),
         lookup(module.gateway-common.templates, h, []),
         lookup(module.test-common.templates, h, []),
-        lookup(module.ssh-common.templates, h, [])
-      ])
-      selector = {
-        if  = local.host_network_by_type[h].int.if
-        mac = local.host_network_by_type[h].int.mac
-      }
-    }
-  }
-  local_ignition_params = {
-    for h in keys(local.hosts) :
-    h => {
-      templates = flatten([
         lookup(module.kvm-common.templates, h, []),
         lookup(module.desktop-common.templates, h, []),
         lookup(module.ssh-common.templates, h, [])
