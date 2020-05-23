@@ -118,3 +118,9 @@ module "desktop-common" {
     })
   }
 }
+
+# Write ssh ca key
+resource "local_file" "ssh-ca-private-key" {
+  content  = chomp(module.ssh-common.ssh_ca_private_key)
+  filename = "output/ssh-ca-private-key.pem"
+}

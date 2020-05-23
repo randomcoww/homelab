@@ -180,6 +180,7 @@ locals {
         "worker-1",
         "kvm-0",
         "kvm-1",
+        "test-0",
       ]
       templates = [
         "${path.module}/../templates/ignition/ssh.ign.tmpl",
@@ -542,6 +543,7 @@ locals {
       network = [
         {
           network = "store"
+          ip      = "192.168.127.224"
           if      = "eth0"
         },
         {

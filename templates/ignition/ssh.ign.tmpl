@@ -5,14 +5,14 @@ passwd:
   users:
     - name: ${user}
       ssh_authorized_keys:
-        - ${ssh_ca_authorized_key}
+        - cert-authority ${ssh_ca_authorized_key}
 
 storage:
   files:
     - path: /etc/ssh/sshd_config.d/30-host-certificate.conf
       mode: 0644
       contents:
-        inline: "HostCertificate /etc/ssh/ssh_host_ecdsa_key-cert-test.pub"
+        inline: "HostCertificate /etc/ssh/ssh_host_ecdsa_key-cert.pub"
     - path: /etc/ssh/ssh_host_ecdsa_key
       mode: 0600
       contents:
