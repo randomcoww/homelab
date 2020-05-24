@@ -543,7 +543,6 @@ locals {
       network = [
         {
           network = "store"
-          ip      = "192.168.127.224"
           if      = "eth0"
         },
         {
@@ -574,6 +573,7 @@ locals {
         "controller-0",
         "controller-2",
         "worker-0",
+        "test-0",
       ]
     }
     kvm-1 = {

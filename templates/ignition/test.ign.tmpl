@@ -21,9 +21,6 @@ storage:
           [Network]
           LinkLocalAddressing=no
           DHCP=yes
-
-          [Address]
-          Address=${host_network.store.ip}/${networks.store.cidr}
     - path: /etc/systemd/network/10-${host_network.int.if}.network
       mode: 0644
       contents:
