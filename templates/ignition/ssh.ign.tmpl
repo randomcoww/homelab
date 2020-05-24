@@ -12,7 +12,9 @@ storage:
     - path: /etc/ssh/sshd_config.d/30-host-certificate.conf
       mode: 0644
       contents:
-        inline: "HostCertificate /etc/ssh/ssh_host_ecdsa_key-cert.pub"
+        inline: |
+          HostKey /etc/ssh/ssh_host_ecdsa_key
+          HostCertificate /etc/ssh/ssh_host_ecdsa_key-cert.pub
     - path: /etc/ssh/ssh_host_ecdsa_key
       mode: 0600
       contents:

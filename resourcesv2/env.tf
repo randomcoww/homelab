@@ -543,6 +543,7 @@ locals {
       network = [
         {
           network = "store"
+          ip      = "192.168.127.224"
           if      = "eth0"
         },
         {
