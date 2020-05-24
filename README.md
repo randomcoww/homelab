@@ -56,8 +56,7 @@ buildtool terraform output ssh-client-certificate > $KEY-cert.pub
 Add certificate to known hosts
 
 ```bash
-echo -n "@cert-authority * " >> $KNOWN_HOSTS
-buildtool terraform output ssh-ca-authorized-key >> $KNOWN_HOSTS
+echo -n "@cert-authority * $(buildtool terraform output ssh-ca-authorized-key)" >> $HOME/.ssh/known_hosts
 ```
 
 ### Create hypervisor images
