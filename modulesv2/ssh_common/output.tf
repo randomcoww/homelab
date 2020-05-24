@@ -6,6 +6,10 @@ output "ssh_ca_authorized_key" {
   value = tls_private_key.ssh-ca.public_key_openssh
 }
 
+output "ssh_client_certificate" {
+  value = length(sshca_client_cert.ssh-client) > 0 ? sshca_client_cert.ssh-client[0].cert_authorized_key : ""
+}
+
 output "templates" {
   value = {
     for k in keys(var.ssh_hosts) :

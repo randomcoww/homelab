@@ -44,20 +44,19 @@ buildtool start-renderer
 Write SSH CA private key to sign a key for accessing the hypervisor over `virsh` and `ssh`:
 
 ```bash
-buildtool tf-wrapper apply \
-    -target=local_file.ssh-ca-key
+KEY=$HOME/.ssh/id_ecdsa
+
+buildtool terraform apply \
+    -target=null_resource.output-triggers \
+    -var="ssh_client_public_key=$(cat $KEY.pub)"
+
+buildtool terraform output ssh-client-certificate > $KEY-cert.pub
 ```
 
-Sign an existing key:
+Add certificate to known hosts
 
-```
-cd resourcesv2
-CA=$(pwd)/output/ssh-ca-key.pem
-KEY=$HOME/.ssh/id_ecdsa.pub
-USER=$(whoami)
-
-chmod 400 $CA
-ssh-keygen -s $CA -I $USER -n core -V +1w -z 1 $KEY
+```bash
+echo -n "@cert-authority * $(buildtool terraform output ssh-ca-authorized-key)" >> $HOME/.ssh/known_hosts
 ```
 
 ### Create hypervisor images

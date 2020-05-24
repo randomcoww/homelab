@@ -44,7 +44,6 @@ COPY --from=MATCHBOX /go/bin/ /usr/local/bin/
 COPY files/tf-wrapper.sh /usr/local/bin/tf-wrapper
 COPY files/start-renderer.sh /usr/local/bin/start-renderer
 COPY --from=MODULES /go/bin/ .terraform.d/plugins/
-COPY files/ssh-config .ssh/config
 
 RUN set -x \
   \

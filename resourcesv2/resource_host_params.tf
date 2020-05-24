@@ -1,8 +1,9 @@
 module "ssh-common" {
   source = "../modulesv2/ssh_common"
 
-  user          = local.user
-  ssh_templates = local.components.ssh.templates
+  user                  = local.user
+  ssh_client_public_key = var.ssh_client_public_key
+  ssh_templates         = local.components.ssh.templates
   ssh_hosts = {
     for k in local.components.ssh.nodes :
     k => merge(local.hosts[k], {
@@ -117,10 +118,4 @@ module "desktop-common" {
       host_network = local.host_network_by_type[k]
     })
   }
-}
-
-# Write ssh ca key
-resource "local_file" "ssh-ca-private-key" {
-  content  = chomp(module.ssh-common.ssh_ca_private_key)
-  filename = "output/ssh-ca-private-key.pem"
 }
