@@ -12,6 +12,6 @@ terraform apply \
   -var="ssh_client_public_key=$(cat $KEY.pub)"
 
 terraform output ssh-client-certificate > $KEY-cert.pub
-echo -n "@cert-authority * $(terraform output ssh-ca-authorized-key)" >> $KNOWN_HOSTS
+echo -n "@cert-authority * $(terraform output ssh-ca-authorized-key)" > $KNOWN_HOSTS
 
 terraform $@
