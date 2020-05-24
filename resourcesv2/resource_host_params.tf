@@ -1,9 +1,9 @@
 module "ssh-common" {
   source = "../modulesv2/ssh_common"
 
-  user          = local.user
+  user                  = local.user
   ssh_client_public_key = var.ssh_client_public_key
-  ssh_templates = local.components.ssh.templates
+  ssh_templates         = local.components.ssh.templates
   ssh_hosts = {
     for k in local.components.ssh.nodes :
     k => merge(local.hosts[k], {

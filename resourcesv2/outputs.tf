@@ -27,7 +27,7 @@ output "ssh-client-certificate" {
 # Module outputs are not automatically generated unless called in a resource
 resource "null_resource" "output-triggers" {
   triggers = {
-    ssh_ca_authorized_key = module.ssh-common.ssh_ca_authorized_key
+    ssh_ca_authorized_key  = module.ssh-common.ssh_ca_authorized_key
     ssh_client_certificate = module.ssh-common.ssh_client_certificate
   }
 }

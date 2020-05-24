@@ -18,7 +18,7 @@ resource "sshca_host_cert" "ssh-host" {
   public_key_openssh = tls_private_key.ssh-host[each.key].public_key_openssh
   key_id             = each.key
 
-  early_renewal_hours = 8040
+  early_renewal_hours   = 8040
   validity_period_hours = 8760
 
   valid_principals = [
@@ -36,7 +36,7 @@ resource "sshca_client_cert" "ssh-client" {
   public_key_openssh = var.ssh_client_public_key
   key_id             = var.user
 
-  early_renewal_hours = 168
+  early_renewal_hours   = 168
   validity_period_hours = 336
-  valid_principals = []
+  valid_principals      = []
 }

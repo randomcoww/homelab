@@ -15,6 +15,6 @@ variable "desktop_timezone" {
 }
 
 variable "ssh_client_public_key" {
-  type = string
+  type    = string
   default = ""
 }

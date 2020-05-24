@@ -3,7 +3,7 @@ variable "user" {
 }
 
 variable "ssh_client_public_key" {
-  type = string
+  type    = string
   default = ""
 }
 
