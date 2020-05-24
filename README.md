@@ -47,6 +47,7 @@ Write SSH CA private key to sign a key for accessing the hypervisor over `virsh`
 KEY=$HOME/.ssh/id_ecdsa
 
 buildtool terraform apply \
+    -auto-apply \
     -target=null_resource.output-triggers \
     -var="ssh_client_public_key=$(cat $KEY.pub)"
 
