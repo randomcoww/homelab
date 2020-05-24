@@ -257,7 +257,6 @@ locals {
         "${path.module}/../templates/ignition/vlan-network.ign.tmpl",
         "${path.module}/../templates/ignition/base.ign.tmpl",
         "${path.module}/../templates/ignition/storage.ign.tmpl",
-        "${path.module}/../templates/ignition/user.ign.tmpl",
       ]
     }
   }
