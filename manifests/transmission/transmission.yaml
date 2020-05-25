@@ -120,8 +120,8 @@ data:
       "rpc-whitelist-enabled": false,
       "script-torrent-done-enabled": true,
       "script-torrent-done-filename": "/remove-completed.sh",
-      "speed-limit-down": 800,
-      "speed-limit-down-enabled": true,
+      "speed-limit-down": 1000,
+      "speed-limit-down-enabled": false,
       "speed-limit-up": 10,
       "speed-limit-up-enabled": true,
       "start-added-torrents": true
