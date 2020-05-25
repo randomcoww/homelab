@@ -20,6 +20,7 @@ resource "tls_cert_request" "matchbox" {
   }
 
   ip_addresses = concat([
+    # Include all IPs to share config
     for v in values(var.kvm_hosts) :
     v.host_network.store.ip
   ], ["127.0.0.1"])
