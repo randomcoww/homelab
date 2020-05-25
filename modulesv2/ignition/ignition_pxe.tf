@@ -4,9 +4,13 @@
 data "ct_config" "ign-pxe" {
   for_each = var.pxe_ignition_params
 
-  content  = each.value.templates[0]
+  content  = <<EOT
+---
+variant: fcos
+version: 1.0.0
+EOT
   strict   = true
-  snippets = length(each.value.templates) > 1 ? slice(each.value.templates, 1, length(each.value.templates)) : []
+  snippets = each.value.templates
 }
 
 resource "matchbox_profile" "ign-pxe" {

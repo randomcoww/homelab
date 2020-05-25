@@ -15,8 +15,8 @@ resource "tls_cert_request" "matchbox" {
   }
 
   ip_addresses = concat([
-    for k in var.kvm_hosts :
-    k.host_network.store.ip
+    for v in values(var.kvm_hosts) :
+    v.host_network.store.ip
   ], ["127.0.0.1"])
 }
 

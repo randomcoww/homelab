@@ -4,9 +4,13 @@
 data "ct_config" "ign-local" {
   for_each = var.local_ignition_params
 
-  content  = each.value.templates[0]
+  content  = <<EOT
+---
+variant: fcos
+version: 1.0.0
+EOT
   strict   = true
-  snippets = length(each.value.templates) > 1 ? slice(each.value.templates, 1, length(each.value.templates)) : []
+  snippets = each.value.templates
 }
 
 resource "matchbox_profile" "ign-local" {
