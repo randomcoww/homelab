@@ -64,31 +64,31 @@ output "templates" {
         tls_etcd_client_key = replace(tls_private_key.etcd-client[host].private_key_pem, "\n", "\\n")
       })
     ]
-  },
-  {
-    for host, params in var.worker_hosts :
-    host => [
-      for template in var.worker_templates :
-      templatefile(template, {
-        hostname     = host
-        user         = var.user
-        mtu          = var.mtu
-        cluster_name = var.cluster_name
+    },
+    {
+      for host, params in var.worker_hosts :
+      host => [
+        for template in var.worker_templates :
+        templatefile(template, {
+          hostname     = host
+          user         = var.user
+          mtu          = var.mtu
+          cluster_name = var.cluster_name
 
-        container_images = var.container_images
-        networks         = var.networks
-        host_network     = params.host_network
-        host_disks       = params.disk
-        services         = var.services
-        domains          = var.domains
+          container_images = var.container_images
+          networks         = var.networks
+          host_network     = params.host_network
+          host_disks       = params.disk
+          services         = var.services
+          domains          = var.domains
 
-        apiserver_endpoint = "https://${var.services.kubernetes_apiserver.vip}:${var.services.kubernetes_apiserver.ports.secure}"
-        kubelet_path       = "/var/lib/kubelet"
+          apiserver_endpoint = "https://${var.services.kubernetes_apiserver.vip}:${var.services.kubernetes_apiserver.ports.secure}"
+          kubelet_path       = "/var/lib/kubelet"
 
-        tls_kubernetes_ca = replace(tls_self_signed_cert.kubernetes-ca.cert_pem, "\n", "\\n")
-        tls_bootstrap     = replace(tls_locally_signed_cert.bootstrap.cert_pem, "\n", "\\n")
-        tls_bootstrap_key = replace(tls_private_key.bootstrap.private_key_pem, "\n", "\\n")
-      })
-    ]
+          tls_kubernetes_ca = replace(tls_self_signed_cert.kubernetes-ca.cert_pem, "\n", "\\n")
+          tls_bootstrap     = replace(tls_locally_signed_cert.bootstrap.cert_pem, "\n", "\\n")
+          tls_bootstrap_key = replace(tls_private_key.bootstrap.private_key_pem, "\n", "\\n")
+        })
+      ]
   })
 }

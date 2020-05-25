@@ -2,6 +2,10 @@ variable "user" {
   type = string
 }
 
+variable "networks" {
+  type = any
+}
+
 variable "ssh_client_public_key" {
   type    = string
   default = ""

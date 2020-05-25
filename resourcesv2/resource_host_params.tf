@@ -2,6 +2,7 @@ module "ssh-common" {
   source = "../modulesv2/ssh_common"
 
   user                  = local.user
+  networks              = local.networks
   ssh_client_public_key = var.ssh_client_public_key
   ssh_templates         = local.components.ssh.templates
   ssh_hosts = {

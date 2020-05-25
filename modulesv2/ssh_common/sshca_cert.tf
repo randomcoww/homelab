@@ -20,10 +20,11 @@ resource "sshca_host_cert" "ssh-host" {
 
   early_renewal_hours   = 8040
   validity_period_hours = 8760
-  valid_principals      = concat([
-    for k, v in var.ssh_hosts :
-    v.host_network.store.ip
-  ], ["127.0.0.1"])
+  valid_principals = concat(
+    ["127.0.0.1"],
+    # Include all IPs to share config
+    var.networks.store.ip_list,
+  )
 }
 
 resource "sshca_client_cert" "ssh-client" {
