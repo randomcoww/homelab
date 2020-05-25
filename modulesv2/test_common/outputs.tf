@@ -1,10 +1,10 @@
 output "templates" {
   value = {
-    for k in keys(var.test_hosts) :
-    k => [
+    for host, params in var.test_hosts :
+    host => [
       for template in var.test_templates :
       templatefile(template, {
-        hostname                   = k
+        hostname                   = host
         user                       = var.user
         container_images           = var.container_images
         domains                    = var.domains
@@ -17,8 +17,8 @@ output "templates" {
         pod_mount_path = "/var/lib/kubelet/podconfig"
 
         networks     = var.networks
-        host_network = var.test_hosts[k].host_network
-        host_disks   = var.test_hosts[k].disk
+        host_network = params.host_network
+        host_disks   = params.disk
         mtu          = var.mtu
         services     = var.services
       })

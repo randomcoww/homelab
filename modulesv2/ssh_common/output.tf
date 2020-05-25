@@ -12,15 +12,15 @@ output "ssh_client_certificate" {
 
 output "templates" {
   value = {
-    for k in keys(var.ssh_hosts) :
-    k => [
+    for host, params in var.ssh_hosts :
+    host => [
       for template in var.ssh_templates :
       templatefile(template, {
         user                  = var.user
         ssh_ca_authorized_key = tls_private_key.ssh-ca.public_key_openssh
-        ssh_host_private_key  = replace(tls_private_key.ssh-host[k].private_key_pem, "\n", "\\n")
-        ssh_host_public_key   = tls_private_key.ssh-host[k].public_key_openssh
-        ssh_host_certificate  = sshca_host_cert.ssh-host[k].cert_authorized_key
+        ssh_host_private_key  = replace(tls_private_key.ssh-host[host].private_key_pem, "\n", "\\n")
+        ssh_host_public_key   = tls_private_key.ssh-host[host].public_key_openssh
+        ssh_host_certificate  = sshca_host_cert.ssh-host[host].cert_authorized_key
       })
     ]
   }

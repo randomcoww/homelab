@@ -1,8 +1,8 @@
 output "matchbox_rpc_endpoints" {
   value = {
-    for k in keys(var.kvm_hosts) :
-    k => {
-      endpoint        = "${var.kvm_hosts[k].host_network.store.ip}:${var.services.renderer.ports.rpc}"
+    for host, params in var.kvm_hosts :
+    host => {
+      endpoint        = "${params.host_network.store.ip}:${var.services.renderer.ports.rpc}"
       cert_pem        = tls_locally_signed_cert.matchbox.cert_pem
       private_key_pem = tls_private_key.matchbox.private_key_pem
       ca_pem          = tls_self_signed_cert.matchbox-ca.cert_pem
@@ -12,20 +12,20 @@ output "matchbox_rpc_endpoints" {
 
 output "libvirt_endpoints" {
   value = {
-    for k in keys(var.kvm_hosts) :
-    k => {
-      endpoint = "qemu+ssh://${var.user}@${var.kvm_hosts[k].host_network.store.ip}/system"
+    for host, params in var.kvm_hosts :
+    host => {
+      endpoint = "qemu+ssh://${var.user}@${params.host_network.store.ip}/system"
     }
   }
 }
 
 output "templates" {
   value = {
-    for k in keys(var.kvm_hosts) :
-    k => [
+    for host, params in var.kvm_hosts :
+    host => [
       for template in var.kvm_templates :
       templatefile(template, {
-        hostname           = k
+        hostname           = host
         user               = var.user
         container_images   = var.container_images
         networks           = var.networks
@@ -36,9 +36,9 @@ output "templates" {
         image_preload_path = "/etc/container-save"
 
         vlans = [
-          for k in keys(var.networks) :
+          for k, v in var.networks :
           k
-          if lookup(var.networks[k], "id", null) != null
+          if lookup(v, "id", null) != null
         ]
         internal_networks = {
           int = {

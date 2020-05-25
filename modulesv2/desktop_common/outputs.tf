@@ -1,23 +1,23 @@
 output "templates" {
   value = {
-    for k in keys(var.desktop_hosts) :
-    k => [
+    for host, params in var.desktop_hosts :
+    host => [
       for template in var.desktop_templates :
       templatefile(template, {
-        hostname   = k
+        hostname   = host
         user       = var.user
         uid        = 10000
         password   = var.password
         timezone   = var.timezone
         hosts      = var.desktop_hosts
-        host_disks = var.desktop_hosts[k].disk
+        host_disks = params.disk
         networks   = var.networks
         mtu        = var.mtu
 
         vlans = [
-          for k in keys(var.networks) :
+          for k, v in var.networks :
           k
-          if lookup(var.networks[k], "id", null) != null
+          if lookup(v, "id", null) != null
         ]
 
         tls_internal_ca   = replace(var.internal_ca_cert_pem, "\n", "\\n")
