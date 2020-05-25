@@ -9,14 +9,14 @@ module "libvirt-kvm-0" {
   networks         = local.networks
 
   guests = {
-    for k in local.hosts.kvm-0.guests :
-    k => {
-      vcpu    = local.hosts[k].vcpu
-      memory  = local.hosts[k].memory
-      network = lookup(local.hosts[k], "network", [])
-      hostdev = lookup(local.hosts[k], "hostdev", [])
+    for host in local.hosts.kvm-0.guests :
+    host => {
+      vcpu    = local.hosts[host].vcpu
+      memory  = local.hosts[host].memory
+      network = lookup(local.hosts[host], "network", [])
+      hostdev = lookup(local.hosts[host], "hostdev", [])
       disk = [
-        for k in lookup(local.hosts[k], "disk", []) :
+        for k in lookup(local.hosts[host], "disk", []) :
         k
         if lookup(k, "source", null) != null && lookup(k, "target", null) != null
       ]
@@ -31,14 +31,14 @@ module "libvirt-kvm-1" {
   networks         = local.networks
 
   guests = {
-    for k in local.hosts.kvm-1.guests :
-    k => {
-      vcpu    = local.hosts[k].vcpu
-      memory  = local.hosts[k].memory
-      network = lookup(local.hosts[k], "network", [])
-      hostdev = lookup(local.hosts[k], "hostdev", [])
+    for host in local.hosts.kvm-1.guests :
+    host => {
+      vcpu    = local.hosts[host].vcpu
+      memory  = local.hosts[host].memory
+      network = lookup(local.hosts[host], "network", [])
+      hostdev = lookup(local.hosts[host], "hostdev", [])
       disk = [
-        for k in lookup(local.hosts[k], "disk", []) :
+        for k in lookup(local.hosts[host], "disk", []) :
         k
         if lookup(k, "source", null) != null && lookup(k, "target", null) != null
       ]
