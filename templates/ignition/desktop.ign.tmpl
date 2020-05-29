@@ -72,6 +72,16 @@ storage:
             realtime-priority = 9
             rlimit-rtprio = 9
             daemonize = no
+    - path: /etc/udev/rules.d/60-steam-input.rules
+      mode: 0644
+      contents:
+        inline: |
+          ${indent(10, udev_steam_input)}
+    - path: /etc/udev/rules.d/60-steam-vr.rules
+      mode: 0644
+      contents:
+        inline: |
+          ${indent(10, udev_steam_vr)}
 
 passwd:
   users:
@@ -80,6 +90,3 @@ passwd:
       password_hash: ${bcrypt(password)}
       groups:
         - libvirt
-        - adm
-        - systemd-journal
-        - wheel

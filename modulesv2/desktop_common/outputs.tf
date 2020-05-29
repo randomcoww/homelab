@@ -4,15 +4,17 @@ output "templates" {
     host => [
       for template in var.desktop_templates :
       templatefile(template, {
-        hostname     = host
-        user         = var.user
-        uid          = 10000
-        password     = var.password
-        timezone     = var.timezone
-        host_disks   = params.disk
-        networks     = var.networks
-        host_network = params.host_network
-        mtu          = var.mtu
+        hostname         = host
+        user             = var.user
+        uid              = 10000
+        password         = var.password
+        timezone         = var.timezone
+        host_disks       = params.disk
+        networks         = var.networks
+        host_network     = params.host_network
+        mtu              = var.mtu
+        udev_steam_input = data.http.udev-60-steam-input.body
+        udev_steam_vr    = data.http.udev-60-steam-vr.body
 
         vlans = [
           for k, v in var.networks :
