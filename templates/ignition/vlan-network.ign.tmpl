@@ -11,10 +11,7 @@ storage:
       contents:
         inline: |
           [Match]
-          MACAddress=${join(" ", [
-            for h in hosts :
-            h.host_network.hw.mac
-          ])}
+          MACAddress=${host_network.hw.mac}
 
           [Link]
           ARP=no
@@ -23,9 +20,9 @@ storage:
           [Network]
           LinkLocalAddressing=no
           DHCP=no
-          %{ for k in vlans ~}
+          %{~ for k in vlans ~}
           VLAN=${networks[k].br_if}
-          %{ endfor ~}
+          %{~ endfor ~}
 
     %{~ for k in vlans ~}
     ##
@@ -42,15 +39,14 @@ storage:
           [VLAN]
           Id=${networks[k].id}
 
-    %{~ for h in hosts ~}
-    %{~ if lookup(h.host_network, k, null) != null ~}
-    - path: /etc/systemd/network/10-${networks[k].br_if}-${h.host_network.hw.mac}.network
+    %{~ if lookup(host_network, k, null) != null ~}
+    - path: /etc/systemd/network/10-${networks[k].br_if}-${host_network.hw.mac}.network
       mode: 0644
       contents:
         inline: |
           [Match]
           Name=${networks[k].br_if}
-          MACAddress=${h.host_network.hw.mac}
+          MACAddress=${host_network.hw.mac}
 
           [Link]
           ARP=yes
@@ -61,8 +57,7 @@ storage:
           DHCP=yes
 
           [Address]
-          Address=${h.host_network[k].ip}/${networks[k].cidr}
+          Address=${host_network[k].ip}/${networks[k].cidr}
 
     %{~ endif ~}
-    %{~ endfor ~}
     %{~ endfor ~}

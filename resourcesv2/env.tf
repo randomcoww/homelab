@@ -124,10 +124,6 @@ locals {
       router    = "192.168.126.240"
       dhcp_pool = "192.168.127.64/26"
       br_if     = "en-store"
-      ip_list = [
-        for k in range(512) :
-        cidrhost("192.168.126.0/23", k)
-      ]
     }
     lan = {
       id        = 90
@@ -577,7 +573,6 @@ locals {
         "controller-0",
         "controller-2",
         "worker-0",
-        "test-0",
       ]
     }
     kvm-1 = {

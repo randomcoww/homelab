@@ -19,11 +19,10 @@ resource "tls_cert_request" "matchbox" {
     organization = "matchbox"
   }
 
-  ip_addresses = concat([
-    # Include all IPs to share config
-    for v in values(var.kvm_hosts) :
-    v.host_network.store.ip
-  ], ["127.0.0.1"])
+  ip_addresses = [
+    each.value.host_network.store.ip,
+    "127.0.0.1",
+  ]
 }
 
 resource "tls_locally_signed_cert" "matchbox" {

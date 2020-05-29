@@ -4,15 +4,15 @@ output "templates" {
     host => [
       for template in var.desktop_templates :
       templatefile(template, {
-        hostname   = host
-        user       = var.user
-        uid        = 10000
-        password   = var.password
-        timezone   = var.timezone
-        hosts      = var.desktop_hosts
-        host_disks = params.disk
-        networks   = var.networks
-        mtu        = var.mtu
+        hostname     = host
+        user         = var.user
+        uid          = 10000
+        password     = var.password
+        timezone     = var.timezone
+        host_disks   = params.disk
+        networks     = var.networks
+        host_network = params.host_network
+        mtu          = var.mtu
 
         vlans = [
           for k, v in var.networks :

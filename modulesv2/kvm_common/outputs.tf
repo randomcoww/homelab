@@ -29,7 +29,7 @@ output "templates" {
         user               = var.user
         container_images   = var.container_images
         networks           = var.networks
-        hosts              = var.kvm_hosts
+        host_network       = params.host_network
         mtu                = var.mtu
         networks           = var.networks
         services           = var.services
