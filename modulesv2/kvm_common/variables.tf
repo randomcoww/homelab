@@ -22,6 +22,10 @@ variable "container_images" {
   type = any
 }
 
+variable "image_device" {
+  type = any
+}
+
 variable "kvm_hosts" {
   type = any
 }

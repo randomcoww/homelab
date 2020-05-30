@@ -32,10 +32,12 @@ locals {
     loki                    = "docker.io/grafana/loki:latest"
   }
 
+  ## mount boot difk to reuse kernel and initrd for booting VMs
+  image_device = "/dev/disk/by-label/fedora-coreos-32"
   ## images served from matchbox
-  kernel_image = "fedora-coreos-live-kernel"
+  kernel_image = "images/vmlinuz"
   initrd_images = [
-    "fedora-coreos-live-initramfs.img"
+    "images/initramfs.img"
   ]
   kernel_params = [
     "console=hvc0",

@@ -34,6 +34,7 @@ output "templates" {
         networks           = var.networks
         services           = var.services
         image_preload_path = "/etc/container-save"
+        image_device       = var.image_device
 
         vlans = [
           for k, v in var.networks :

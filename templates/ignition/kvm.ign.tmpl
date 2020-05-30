@@ -23,6 +23,7 @@ systemd:
         [Unit]
         After=network-online.target
         Wants=network-online.target
+        Requires=${join("-", compact(split("/", matchbox_assets_path)))}.mount
 
         [Service]
         TimeoutStartSec=5m
@@ -38,7 +39,7 @@ systemd:
           --network host \
           -v ${matchbox_tls_path}:${matchbox_tls_path}:ro \
           -v ${matchbox_data_path}:${matchbox_data_path} \
-          -v ${matchbox_assets_path}:${matchbox_assets_path} \
+          -v ${matchbox_assets_path}:${matchbox_assets_path}:ro,rslave \
           ${container_images.matchbox} \
             -address=${services.renderer.vip}:${services.renderer.ports.http} \
             -rpc-address=0.0.0.0:${services.renderer.ports.rpc} \
@@ -50,6 +51,17 @@ systemd:
 
         [Install]
         WantedBy=multi-user.target
+    - name: ${join("-", compact(split("/", matchbox_assets_path)))}.mount
+      enabled: true
+      contents: |
+        [Unit]
+        Before=local-fs.target
+        [Mount]
+        What=${image_device}
+        Where=${matchbox_assets_path}
+        Type=iso9660
+        [Install]
+        WantedBy=local-fs.target
 
 storage:
   files:
