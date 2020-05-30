@@ -267,7 +267,7 @@ locals {
   hosts = {
     # gateway
     gateway-0 = {
-      memory = 2
+      memory = 4
       vcpu   = 1
       network = [
         {
@@ -307,7 +307,7 @@ locals {
       kea_ha_role = "primary"
     }
     gateway-1 = {
-      memory = 2
+      memory = 4
       vcpu   = 1
       network = [
         {
