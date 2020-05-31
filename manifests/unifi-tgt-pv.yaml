@@ -86,7 +86,7 @@ spec:
         - -d
         - --accessId=$(AWS_ACCESS_KEY_ID)
         - --accessKey=$(AWS_SECRET_ACCESS_KEY)
-        - --baseURL=http://minio.default.svc.cluster.local:9000/"
+        - --baseURL=http://minio.default.svc.cluster.internal:9000/"
         - --blockSize=128k 
         - --size=2g
         - --listBlocks
