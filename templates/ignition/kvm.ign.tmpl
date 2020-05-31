@@ -17,13 +17,37 @@ systemd:
             [Service]
             ExecStart=
             ExecStart=/usr/sbin/kea-dhcp4 -c /etc/kea/kea-dhcp4-internal.conf
+
+    - name: podman-image-vol.service
+      enabled: true
+      contents: |
+        [Unit]
+        ConditionPathExists=${image_device}
+        ConditionPathExists=!/var/tmp/image_vol.iso
+        After=local-fs.target
+
+        [Service]
+        TimeoutStartSec=5m
+        Restart=on-failure
+        RestartSec=10
+        Type=oneshot
+        ExecStart=/usr/bin/coreos-installer iso remove \
+          ${image_device} -o /var/tmp/image_vol.iso
+        ExecStart=/usr/bin/podman volume create \
+          --opt type=iso9660 \
+          --opt device=/var/tmp/image_vol.iso \
+          image_vol
+
+        [Install]
+        WantedBy=multi-user.target
     - name: matchbox.service
       enabled: true
       contents: |
         [Unit]
         After=network-online.target
         Wants=network-online.target
-        Requires=${join("-", compact(split("/", matchbox_assets_path)))}.mount
+        After=podman-image-vol.service
+        Wants=podman-image-vol.service
 
         [Service]
         TimeoutStartSec=5m
@@ -31,15 +55,14 @@ systemd:
         RestartSec=10
         ExecStartPre=/usr/bin/mkdir -p \
           ${matchbox_data_path} ${matchbox_assets_path} ${matchbox_tls_path}
-        # Host initially has no internet access - use image archive
-        ExecStartPre=-/usr/bin/podman load -i \
+        ExecStartPre=/usr/bin/podman load -i \
           ${image_preload_path}/matchbox.tar
         ExecStart=/usr/bin/podman run --rm \
           --security-opt label=disable \
           --network host \
+          --mount type=volume,source=image_vol,destination=${matchbox_assets_path} \
           -v ${matchbox_tls_path}:${matchbox_tls_path}:ro \
           -v ${matchbox_data_path}:${matchbox_data_path} \
-          -v ${matchbox_assets_path}:${matchbox_assets_path}:ro,rslave \
           ${container_images.matchbox} \
             -address=${services.renderer.vip}:${services.renderer.ports.http} \
             -rpc-address=0.0.0.0:${services.renderer.ports.rpc} \
@@ -51,17 +74,6 @@ systemd:
 
         [Install]
         WantedBy=multi-user.target
-    - name: ${join("-", compact(split("/", matchbox_assets_path)))}.mount
-      enabled: true
-      contents: |
-        [Unit]
-        Before=local-fs.target
-        [Mount]
-        What=${image_device}
-        Where=${matchbox_assets_path}
-        Type=iso9660
-        [Install]
-        WantedBy=local-fs.target
 
 storage:
   files:
