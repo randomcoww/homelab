@@ -54,6 +54,29 @@ storage:
 
           [Network]
           LinkLocalAddressing=no
+          DHCP=no
+          MACVTAP=${networks[k].br_if}-tap
+
+    - path: /etc/systemd/network/10-${networks[k].br_if}-tap.netdev
+      mode: 0644
+      contents:
+        inline: |
+          [NetDev]
+          Name=${networks[k].br_if}-tap
+          Kind=macvtap
+
+          [MACVTAP]
+          Mode=bridge
+
+    - path: /etc/systemd/network/10-${networks[k].br_if}-tap.network
+      mode: 0644
+      contents:
+        inline: |
+          [Match]
+          Name=${networks[k].br_if}-tap
+
+          [Network]
+          LinkLocalAddressing=no
           DHCP=yes
 
           [Address]

@@ -33,6 +33,7 @@ storage:
 
           [Link]
           ARP=no
+          RequiredForOnline=no
 
           [Network]
           LinkLocalAddressing=no
@@ -46,6 +47,7 @@ storage:
 
           [Link]
           Unmanaged=true
+          RequiredForOnline=no
     - path: /etc/systemd/network/50-veth.network
       mode: 0644
       contents:
@@ -55,6 +57,7 @@ storage:
 
           [Link]
           Unmanaged=true
+          RequiredForOnline=no
 
     ##
     ## pod config

@@ -54,6 +54,9 @@ storage:
           [Match]
           Name=${host_network.host_wan.if}
 
+          [Link]
+          RequiredForOnline=no
+
           [Network]
           LinkLocalAddressing=no
           DHCP=yes
@@ -76,6 +79,9 @@ storage:
         inline: |
           [Match]
           Name=${host_network.wan.if}
+
+          [Link]
+          RequiredForOnline=no
 
           [Network]
           LinkLocalAddressing=no
@@ -100,6 +106,7 @@ storage:
 
           [Link]
           ARP=no
+          RequiredForOnline=no
 
           [Network]
           LinkLocalAddressing=no
