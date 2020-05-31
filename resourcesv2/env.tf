@@ -2,7 +2,7 @@ locals {
   user = "core"
   mtu  = 9000
   # kubernetes
-  kubernetes_cluster_name = "default-cluster-012"
+  kubernetes_cluster_name = "default-cluster-2005"
   # etcd backup
   s3_backup_aws_region  = "us-west-2"
   s3_etcd_backup_bucket = "randomcoww-etcd-backup"
@@ -16,7 +16,7 @@ locals {
     kube_scheduler          = "docker.io/randomcoww/kubernetes:kube-master-v1.18.2"
     hyperkube               = "docker.io/randomcoww/kubernetes:kubelet-v1.18.2"
     kube_proxy              = "docker.io/randomcoww/kubernetes:kube-proxy-v1.18.2"
-    etcd_wrapper            = "docker.io/randomcoww/etcd-wrapper:v0.2.0"
+    etcd_wrapper            = "docker.io/randomcoww/etcd-wrapper:v0.2.1"
     etcd                    = "docker.io/randomcoww/etcd:v3.4.7"
     flannel                 = "docker.io/randomcoww/flannel:latest"
     keepalived              = "docker.io/randomcoww/keepalived:latest"
@@ -114,7 +114,8 @@ locals {
 
   domains = {
     internal           = "fuzzybunny.internal"
-    kubernetes_cluster = "cluster.local"
+    kubernetes_cluster = "cluster.internal"
+    mdns               = "local"
   }
 
   networks = {
@@ -407,7 +408,6 @@ locals {
       network = [
         {
           network = "store"
-          ip      = "192.168.127.222"
           if      = "eth0"
         },
         {
@@ -505,7 +505,6 @@ locals {
       network = [
         {
           network = "store"
-          ip      = "192.168.127.223"
           if      = "eth0"
         },
         {
@@ -545,7 +544,6 @@ locals {
       network = [
         {
           network = "store"
-          ip      = "192.168.127.224"
           if      = "eth0"
         },
         {

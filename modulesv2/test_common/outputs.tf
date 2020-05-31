@@ -4,7 +4,7 @@ output "templates" {
     host => [
       for template in var.test_templates :
       templatefile(template, {
-        hostname                   = host
+        hostname                   = params.hostname
         user                       = var.user
         container_images           = var.container_images
         domains                    = var.domains

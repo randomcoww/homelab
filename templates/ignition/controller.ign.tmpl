@@ -3,11 +3,6 @@ variant: fcos
 version: 1.0.0
 storage:
   files:
-    - path: /etc/hostname
-      mode: 0644
-      contents:
-        inline:
-          ${hostname}
     - path: /etc/systemd/network/10-${host_network.store.if}.network
       mode: 0644
       contents:
@@ -15,12 +10,13 @@ storage:
           [Match]
           Name=${host_network.store.if}
 
-          [Link]
-          MTUBytes=${mtu}
+          [DHCP]
+          UseMTU=yes
 
           [Network]
           LinkLocalAddressing=no
           DHCP=yes
+          MulticastDNS=yes
 
           [Address]
           Address=${host_network.store.ip}/${networks.store.cidr}
@@ -320,7 +316,6 @@ storage:
               - kube-apiserver
               - "--secure-port=${services.kubernetes_apiserver.ports.secure}"
               - "--allow-privileged=true"
-              - "--advertise-address=$(INTERNAL_IP)"
               - "--authorization-mode=Node,RBAC"
               - "--bind-address=0.0.0.0"
               - "--client-ca-file=${controller_mount_path}/kubernetes-ca.pem"
@@ -339,11 +334,6 @@ storage:
               - "--tls-private-key-file=${controller_mount_path}/kubernetes-key.pem"
               - "--kubelet-preferred-address-types=InternalDNS,InternalIP"
               - "--v=2"
-              env:
-              - name: INTERNAL_IP
-                valueFrom:
-                  fieldRef:
-                    fieldPath: status.hostIP
               volumeMounts:
               - name: config-apiserver
                 mountPath: "${controller_mount_path}"

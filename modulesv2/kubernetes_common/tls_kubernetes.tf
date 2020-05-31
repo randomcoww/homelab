@@ -21,14 +21,15 @@ resource "tls_cert_request" "kubernetes" {
 
   dns_names = [
     "kubernetes.default",
+    each.value.hostname,
   ]
 
-  ip_addresses = [
+  ip_addresses = compact([
     "127.0.0.1",
-    each.value.host_network.store.ip,
+    lookup(each.value.host_network.store, "ip", null),
     var.services.kubernetes_service.vip,
-    var.services.kubernetes_apiserver.vip
-  ]
+    var.services.kubernetes_apiserver.vip,
+  ])
 }
 
 resource "tls_locally_signed_cert" "kubernetes" {

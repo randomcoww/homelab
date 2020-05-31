@@ -3,11 +3,6 @@ variant: fcos
 version: 1.0.0
 storage:
   files:
-    - path: /etc/hostname
-      mode: 0644
-      contents:
-        inline:
-          ${hostname}
     - path: /etc/systemd/network/10-${host_network.store.if}.network
       mode: 0644
       contents:
@@ -18,6 +13,7 @@ storage:
           [Network]
           LinkLocalAddressing=no
           DHCP=no
+          MulticastDNS=yes
 
           [Address]
           Address=${host_network.store.ip}/${networks.store.cidr}
@@ -354,7 +350,7 @@ storage:
               "option-data": [
                 {
                   "name": "domain-name",
-                  "data": "${domains.internal}"
+                  "data": "${domains.mdns}"
                 },
                 {
                   "name": "domain-name-servers",
@@ -405,7 +401,7 @@ storage:
               ])},
               "dhcp-ddns": {
                 "enable-updates": true,
-                "qualifying-suffix": "${domains.internal}.",
+                "qualifying-suffix": "${domains.mdns}.",
                 "override-client-update": true,
                 "override-no-update": true,
                 "replace-client-name": "when-not-present"

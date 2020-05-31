@@ -56,7 +56,7 @@ systemd:
         ExecStartPre=/usr/bin/mkdir -p \
           ${matchbox_data_path} ${matchbox_assets_path} ${matchbox_tls_path}
         ExecStartPre=/usr/bin/podman load -i \
-          ${image_preload_path}/matchbox.tar
+          ${matchbox_image_path}
         ExecStart=/usr/bin/podman run --rm \
           --security-opt label=disable \
           --network host \

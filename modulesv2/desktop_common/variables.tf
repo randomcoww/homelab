@@ -18,6 +18,10 @@ variable "networks" {
   type = any
 }
 
+variable "domains" {
+  type = any
+}
+
 variable "desktop_hosts" {
   type = any
 }

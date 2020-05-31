@@ -3,11 +3,13 @@ module "ssh-common" {
 
   user                  = local.user
   networks              = local.networks
+  domains               = local.domains
   ssh_client_public_key = var.ssh_client_public_key
   ssh_templates         = local.components.ssh.templates
   ssh_hosts = {
     for k in local.components.ssh.nodes :
     k => merge(local.hosts[k], {
+      hostname     = join(".", [k, local.domains.mdns])
       host_network = local.host_network_by_type[k]
     })
   }
@@ -31,6 +33,7 @@ module "kubernetes-common" {
   controller_hosts = {
     for k in local.components.controller.nodes :
     k => merge(local.hosts[k], {
+      hostname     = join(".", [k, local.domains.mdns])
       host_network = local.host_network_by_type[k]
     })
   }
@@ -39,6 +42,7 @@ module "kubernetes-common" {
   worker_hosts = {
     for k in local.components.worker.nodes :
     k => merge(local.hosts[k], {
+      hostname     = join(".", [k, local.domains.mdns])
       host_network = local.host_network_by_type[k]
     })
   }
@@ -59,6 +63,7 @@ module "gateway-common" {
   gateway_hosts = {
     for k in local.components.gateway.nodes :
     k => merge(local.hosts[k], {
+      hostname     = join(".", [k, local.domains.mdns])
       host_network = local.host_network_by_type[k]
     })
   }
@@ -78,6 +83,7 @@ module "test-common" {
   test_hosts = {
     for k in local.components.test.nodes :
     k => merge(local.hosts[k], {
+      hostname     = join(".", [k, local.domains.mdns])
       host_network = local.host_network_by_type[k]
     })
   }
@@ -98,6 +104,7 @@ module "kvm-common" {
   kvm_hosts = {
     for k in local.components.kvm.nodes :
     k => merge(local.hosts[k], {
+      hostname     = join(".", [k, local.domains.mdns])
       host_network = local.host_network_by_type[k]
     })
   }
@@ -112,11 +119,13 @@ module "desktop-common" {
   internal_ca_cert_pem = tls_self_signed_cert.internal-ca.cert_pem
   mtu                  = local.mtu
   networks             = local.networks
+  domains              = local.domains
 
   desktop_templates = local.components.desktop.templates
   desktop_hosts = {
     for k in local.components.desktop.nodes :
     k => merge(local.hosts[k], {
+      hostname     = join(".", [k, local.domains.mdns])
       host_network = local.host_network_by_type[k]
     })
   }

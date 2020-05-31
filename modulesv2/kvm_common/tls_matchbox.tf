@@ -19,10 +19,14 @@ resource "tls_cert_request" "matchbox" {
     organization = "matchbox"
   }
 
-  ip_addresses = [
-    each.value.host_network.store.ip,
-    "127.0.0.1",
+  dns_names = [
+    each.value.hostname,
   ]
+
+  ip_addresses = compact([
+    lookup(each.value.host_network.store, "ip", null),
+    "127.0.0.1",
+  ])
 }
 
 resource "tls_locally_signed_cert" "matchbox" {

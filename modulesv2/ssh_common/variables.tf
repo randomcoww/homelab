@@ -6,6 +6,10 @@ variable "networks" {
   type = any
 }
 
+variable "domains" {
+  type = any
+}
+
 variable "ssh_client_public_key" {
   type    = string
   default = ""

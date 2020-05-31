@@ -22,6 +22,11 @@ systemd:
 
 storage:
   files:
+    - path: /etc/hostname
+      mode: 0644
+      contents:
+        inline:
+          ${hostname}
     - path: /etc/sysctl.d/ipforward.conf
       mode: 0644
       contents:
@@ -55,9 +60,15 @@ storage:
           [Resolve]
           FallbackDNS=
           DNSStubListener=no
+          MulticastDNS=yes
     - path: /etc/systemd/system.conf.d/05-live.conf
       mode: 0644
       contents:
         inline: |
           [Manager]
           DumpCore=no
+    ## Appending seems to override the earlier hosts entry
+    - path: /etc/nsswitch.conf
+      append:
+        - inline: |
+            hosts: files resolve dns myhostname

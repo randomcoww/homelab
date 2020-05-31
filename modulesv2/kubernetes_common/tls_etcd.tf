@@ -15,14 +15,22 @@ resource "tls_cert_request" "etcd" {
   private_key_pem = tls_private_key.etcd[each.key].private_key_pem
 
   subject {
-    common_name  = each.key
+    common_name  = each.value.hostname
     organization = "etcd"
   }
 
-  ip_addresses = concat([
-    for host in values(var.controller_hosts) :
-    host.host_network.store.ip
-  ], ["127.0.0.1"])
+  dns_names = compact([
+    for params in values(var.controller_hosts) :
+    params.hostname
+  ])
+
+  ip_addresses = compact(concat(
+    [
+      for params in values(var.controller_hosts) :
+      lookup(params.host_network.store, "ip", null)
+    ],
+    ["127.0.0.1"]
+  ))
 }
 
 resource "tls_locally_signed_cert" "etcd" {

@@ -4,7 +4,7 @@ output "templates" {
     host => [
       for template in var.gateway_templates :
       templatefile(template, {
-        hostname                   = host
+        hostname                   = params.hostname
         user                       = var.user
         container_images           = var.container_images
         networks                   = var.networks
@@ -25,7 +25,7 @@ output "templates" {
         kea_ha_peers = jsonencode([
           for k, v in var.gateway_hosts :
           {
-            name = k
+            name = v.hostname
             role = v.kea_ha_role
             url  = "http://${v.host_network.sync.ip}:${var.services.kea.ports.peer}/"
           }

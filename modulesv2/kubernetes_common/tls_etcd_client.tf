@@ -15,7 +15,7 @@ resource "tls_cert_request" "etcd-client" {
   private_key_pem = tls_private_key.etcd-client[each.key].private_key_pem
 
   subject {
-    common_name  = each.key
+    common_name  = each.value.hostname
     organization = "etcd"
   }
 }

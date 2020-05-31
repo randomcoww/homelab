@@ -14,7 +14,7 @@ output "templates" {
     host => [
       for template in var.controller_templates :
       templatefile(template, {
-        hostname     = host
+        hostname     = params.hostname
         user         = var.user
         mtu          = var.mtu
         cluster_name = var.cluster_name
@@ -31,7 +31,7 @@ output "templates" {
         aws_secret_access_key = aws_iam_access_key.s3-etcd-backup.secret
         etcd_initial_cluster = join(",", [
           for k, v in var.controller_hosts :
-          "${k}=https://${v.host_network.store.ip}:${var.services.etcd.ports.peer}"
+          "${v.hostname}=https://${v.host_network.store.ip}:${var.services.etcd.ports.peer}"
         ])
         etcd_endpoints = join(",", [
           for k, v in var.controller_hosts :
@@ -70,7 +70,7 @@ output "templates" {
       host => [
         for template in var.worker_templates :
         templatefile(template, {
-          hostname     = host
+          hostname     = params.hostname
           user         = var.user
           mtu          = var.mtu
           cluster_name = var.cluster_name

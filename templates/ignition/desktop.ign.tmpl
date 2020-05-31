@@ -9,6 +9,10 @@ systemd:
       enabled: true
     - name: ksmtuned.service
       enabled: true
+    - name: avahi-daemon.service
+      mask: true
+    - name: avahi-daemon.socket
+      mask: true
 
 storage:
   files:
@@ -85,6 +89,11 @@ storage:
       contents:
         inline: |
           ${indent(10, udev_steam_vr)}
+
+  links:
+    - path: /etc/resolv.conf
+      target: /run/systemd/resolve/resolv.conf
+      overwrite: true
 
 passwd:
   users:
