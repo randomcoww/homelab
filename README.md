@@ -74,13 +74,15 @@ buildtool tf-wrapper apply \
 
 Run build from https://github.com/randomcoww/fedora-coreos-custom
 
+VMs running on the host will boot off of the same kernel and initramfs as the hypervisor.
+
 #### Desktop
 
 Run build from https://github.com/randomcoww/fedora-silverblue-custom
 
 ### Generate configuration on hypervisor hosts
 
-Each hypervisor runs a PXE boot environment on an internal network for provisioning VMs local to the host. VMs run [Container Linux](https://coreos.com/os/docs/latest/) using [Ignition](https://coreos.com/ignition/docs/latest/) for boot time configuration.
+Each hypervisor runs a PXE boot environment on an internal network for provisioning VMs local to the host. VMs run Fedora CoreOS using [Ignition](https://coreos.com/ignition/docs/latest/) for boot time configuration.
 
 Ignition configuration is generated on each hypervisor as follows:
 
@@ -101,7 +103,7 @@ buildtool tf-wrapper apply \
 
 ### Start gateway VMs
 
-This will provide a basic infrastructure including NAT routing, DHCP and DNS.
+This will provide a basic infrastructure including NAT routing, DHCP and basic DNS.
 
 ```bash
 virsh -c qemu+ssh://core@kvm-0.local/system start gateway-0
