@@ -16,7 +16,7 @@ spec:
       hostNetwork: true
       dnsPolicy: ClusterFirstWithHostNet
       nodeSelector:
-        kubernetes.io/hostname: worker-0
+        kubernetes.io/hostname: worker-0.local
       volumes:
       - name: s3
         hostPath:
@@ -52,18 +52,18 @@ spec:
         - server
         - --address
         - :9000
-        - http://$(NODE_NAME)/var/s3/0
-        - http://$(NODE_NAME)/var/s3/1
-        - http://$(NODE_NAME)/var/s3/2
-        - http://$(NODE_NAME)/var/s3/3
-        - http://$(NODE_NAME)/var/s3/4
-        - http://$(NODE_NAME)/var/s3/5
-        - http://$(NODE_NAME)/var/s3/6
-        - http://$(NODE_NAME)/var/s3/7
-        - http://$(NODE_NAME)/var/s3/8
-        - http://$(NODE_NAME)/var/s3/9
-        - http://$(NODE_NAME)/var/s3/10
-        - http://$(NODE_NAME)/var/s3/11
+        - http://$(INTERNAL_IP)/var/s3/0
+        - http://$(INTERNAL_IP)/var/s3/1
+        - http://$(INTERNAL_IP)/var/s3/2
+        - http://$(INTERNAL_IP)/var/s3/3
+        - http://$(INTERNAL_IP)/var/s3/4
+        - http://$(INTERNAL_IP)/var/s3/5
+        - http://$(INTERNAL_IP)/var/s3/6
+        - http://$(INTERNAL_IP)/var/s3/7
+        - http://$(INTERNAL_IP)/var/s3/8
+        - http://$(INTERNAL_IP)/var/s3/9
+        - http://$(INTERNAL_IP)/var/s3/10
+        - http://$(INTERNAL_IP)/var/s3/11
         ports:
         - containerPort: 9000
         volumeMounts:

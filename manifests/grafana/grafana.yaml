@@ -11,7 +11,7 @@ data:
       type: 'prometheus'
       access: 'proxy'
       org_id: 1
-      url: 'http://prometheus-server:9090'
+      url: 'http://prometheus-server.default.svc.cluster.internal:9090'
       is_default: true
       version: 1
       editable: false
@@ -19,7 +19,7 @@ data:
       type: 'loki'
       access: 'proxy'
       org_id: 1
-      url: 'http://loki:3100'
+      url: 'http://loki.default.svc.cluster.internal:3100'
       is_default: false
       version: 1
       editable: false
@@ -655,7 +655,7 @@ data:
           },
           "targets": [
             {
-              "expr": "{container_name=\"kube-etcd-wrapper\",host=\"controller-0\"}",
+              "expr": "{container_name=\"kube-etcd-wrapper\",host=\"controller-0.local\"}",
               "refId": "A"
             }
           ],
@@ -679,7 +679,7 @@ data:
           },
           "targets": [
             {
-              "expr": "{container_name=\"kube-etcd-wrapper\",host=\"controller-1\"}",
+              "expr": "{container_name=\"kube-etcd-wrapper\",host=\"controller-1.local\"}",
               "refId": "A"
             }
           ],
@@ -703,7 +703,7 @@ data:
           },
           "targets": [
             {
-              "expr": "{container_name=\"kube-etcd-wrapper\",host=\"controller-2\"}",
+              "expr": "{container_name=\"kube-etcd-wrapper\",host=\"controller-2.local\"}",
               "refId": "A"
             }
           ],
@@ -727,7 +727,7 @@ data:
           },
           "targets": [
             {
-              "expr": "{container_name=\"etcd\",host=\"controller-0\"}",
+              "expr": "{container_name=\"etcd\",host=\"controller-0.local\"}",
               "refId": "A"
             }
           ],
@@ -751,7 +751,7 @@ data:
           },
           "targets": [
             {
-              "expr": "{container_name=\"etcd\",host=\"controller-1\"}",
+              "expr": "{container_name=\"etcd\",host=\"controller-1.local\"}",
               "refId": "A"
             }
           ],
@@ -775,7 +775,7 @@ data:
           },
           "targets": [
             {
-              "expr": "{container_name=\"etcd\",host=\"controller-2\"}",
+              "expr": "{container_name=\"etcd\",host=\"controller-2.local\"}",
               "refId": "A"
             }
           ],
@@ -850,7 +850,7 @@ data:
           },
           "targets": [
             {
-              "expr": "{container_name=\"kube-apiserver\",host=\"controller-0\"}",
+              "expr": "{container_name=\"kube-apiserver\",host=\"controller-0.local\"}",
               "refId": "A"
             }
           ],
@@ -874,7 +874,7 @@ data:
           },
           "targets": [
             {
-              "expr": "{container_name=\"kube-apiserver\",host=\"controller-1\"}",
+              "expr": "{container_name=\"kube-apiserver\",host=\"controller-1.local\"}",
               "refId": "A"
             }
           ],
@@ -898,7 +898,7 @@ data:
           },
           "targets": [
             {
-              "expr": "{container_name=\"kube-apiserver\",host=\"controller-2\"}",
+              "expr": "{container_name=\"kube-apiserver\",host=\"controller-2.local\"}",
               "refId": "A"
             }
           ],
