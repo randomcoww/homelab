@@ -41,7 +41,7 @@ buildtool start-renderer
 
 ### Setup SSH access
 
-Write SSH CA private key to sign a key for accessing the hypervisor over `virsh` and `ssh`:
+Sign client SSH key
 
 ```bash
 KEY=$HOME/.ssh/id_ecdsa
@@ -55,7 +55,7 @@ buildtool terraform apply \
 buildtool terraform output ssh-client-certificate > $KEY-cert.pub
 ```
 
-Add certificate to known hosts
+Copy host certificate to known hosts
 
 ```bash
 echo -n "@cert-authority * $(buildtool terraform output ssh-ca-authorized-key)" >> $HOME/.ssh/known_hosts
