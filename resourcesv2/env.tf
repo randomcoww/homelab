@@ -185,6 +185,7 @@ locals {
         "kvm-0",
         "kvm-1",
         "test-0",
+        "desktop",
       ]
       templates = [
         "${path.module}/../templates/ignition/ssh.ign.tmpl",
