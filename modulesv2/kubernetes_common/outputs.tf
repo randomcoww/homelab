@@ -44,6 +44,7 @@ output "templates" {
         # These paths should be visible by kubelet running in the container
         pod_mount_path        = "/var/lib/kubelet/podconfig"
         controller_mount_path = "/var/lib/kubelet/controller"
+        vrrp_id               = 70
 
         tls_kubernetes_ca          = replace(tls_self_signed_cert.kubernetes-ca.cert_pem, "\n", "\\n")
         tls_kubernetes_ca_key      = replace(tls_private_key.kubernetes-ca.private_key_pem, "\n", "\\n")

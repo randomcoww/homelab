@@ -1,6 +1,19 @@
 ---
 variant: fcos
 version: 1.0.0
+systemd:
+  units:
+    - name: nftables.service
+      enabled: true
+    - name: keepalived.service
+      enabled: true
+      dropins:
+        - name: 10-dependency.conf
+          contents: |
+            [Unit]
+            Requires=nftables.service
+            PartOf=nftables.service
+
 storage:
   files:
     - path: /etc/systemd/network/10-${host_network.store.if}.network
@@ -43,12 +56,21 @@ storage:
 
           [Address]
           Address=${host_network.sync.ip}/${networks.sync.cidr}
-    - path: /etc/systemd/network/10-${host_network.host_wan.if}.network
+
+          [Route]
+          Gateway=${networks.sync.router}
+          Destination=0.0.0.0/0
+          Table=${slave_default_route_table}
+
+          [RoutingPolicyRule]
+          Table=${slave_default_route_table}
+          Priority=${slave_default_route_priority}
+    - path: /etc/systemd/network/10-${host_network.wan.if}.network
       mode: 0644
       contents:
         inline: |
           [Match]
-          Name=${host_network.host_wan.if}
+          Name=${host_network.wan.if}
 
           [Link]
           RequiredForOnline=no
@@ -68,31 +90,7 @@ storage:
           UseHostname=false
           UseDomains=false
           UseTimezone=no
-          RouteMetric=512
-    - path: /etc/systemd/network/10-${host_network.wan.if}.network
-      mode: 0644
-      contents:
-        inline: |
-          [Match]
-          Name=${host_network.wan.if}
-
-          [Link]
-          RequiredForOnline=no
-
-          [Network]
-          LinkLocalAddressing=no
-          DHCP=yes
-
-          [DHCP]
-          UseMTU=true
-          UseDNS=false
-          UseNTP=false
-          SendHostname=false
-          UseHostname=false
-          UseDomains=false
-          UseTimezone=no
-          RouteMetric=512
-          RouteTable=${host_network.wan.route_table}
+          RouteTable=${master_default_route_table}
     - path: /etc/systemd/network/10-${host_network.int.if}.network
       mode: 0644
       contents:
@@ -107,6 +105,116 @@ storage:
           [Network]
           LinkLocalAddressing=no
           DHCP=no
+
+    - path: /etc/keepalived/keepalived.conf
+      mode: 0644
+      overwrite: true
+      contents:
+        inline: |-
+          global_defs {
+            vrrp_version 3
+            vrrp_iptables
+            nftables keepalived
+            dynamic_interfaces
+          }
+          vrrp_instance VI_gateway {
+            nopreempt
+            state BACKUP
+            strict_mode off
+            virtual_router_id ${vrrp_id}
+            interface ${host_network.sync.if}
+            priority 100
+            virtual_ipaddress {
+              %{~ for k, v in networks ~}
+              %{~ if lookup(v, "router", null) != null ~}
+              ${v.router} dev ${host_network[k].if}
+              %{~ endif ~}
+              %{~ endfor ~}
+              ${services.recursive_dns.vip} dev ${host_network.store.if}
+            }
+            virtual_rules {
+              to all lookup ${master_default_route_table} priority ${master_default_route_priority}
+            }
+          }
+    - path: /etc/sysconfig/nftables.conf
+      mode: 0644
+      overwrite: true
+      contents:
+        inline: |-
+          define if_internal = { ${join(",", [
+            for k, v in networks:
+            "${host_network[k].if}"
+            if lookup(v, "dhcp_pool", null) != null && lookup(v, "router", null) != null
+          ])} }
+          define if_external = ${host_network.wan.if}
+          define if_trusted = ${host_network.store.if}
+          define if_sync = ${host_network.sync.if}
+
+          table ip filter {
+            chain base_checks {
+              ct state {established, related} accept;
+              ct state invalid drop;
+            }
+
+            chain input {
+              type filter hook input priority 0; policy drop;
+
+              jump base_checks;
+
+              iifname "lo" accept;
+              iifname != "lo" ip daddr 127.0.0.1/8 drop;
+
+              ip protocol icmp icmp type { echo-request, echo-reply, time-exceeded, parameter-problem, destination-unreachable } accept;
+
+              iifname $if_trusted accept;
+              iifname $if_sync accept;
+
+              iifname $if_internal tcp dport domain accept;
+              iifname $if_internal udp dport domain accept;
+              iifname $if_internal udp sport bootps udp dport bootpc accept;
+              iifname $if_internal pkttype multicast accept;
+            }
+
+            chain forward {
+              type filter hook forward priority 0; policy drop;
+
+              jump base_checks;
+
+              ip protocol icmp icmp type { echo-request, echo-reply, time-exceeded, parameter-problem, destination-unreachable } accept;
+
+              iifname $if_trusted accept;
+              iifname $if_sync accept;
+              iifname $if_internal oifname $if_external accept;
+
+              %{~ for v in values(loadbalancer_pools) ~}
+              iifname $if_internal ip daddr ${v.network}/${v.cidr} accept;
+              %{~ endfor ~}
+            }
+
+            chain output {
+              type filter hook output priority 100; policy accept;
+            }
+          }
+
+          table ip nat {
+            chain prerouting {
+              type nat hook prerouting priority 0; policy accept;
+            }
+
+            chain input {
+              type nat hook input priority 0; policy accept;
+            }
+
+            chain output {
+              type nat hook output priority 0; policy accept;
+            }
+
+            chain postrouting {
+              type nat hook postrouting priority 100; policy accept;
+              oifname $if_external masquerade;
+            }
+          }
+          ;
 
     ##
     ## pod config
@@ -135,40 +243,6 @@ storage:
             cache 30
             reload
             loadbalance
-          }
-
-    - path: ${pod_mount_path}/keepalived/keepalived.conf
-      mode: 0644
-      contents:
-        inline: |-
-          global_defs {
-            vrrp_version 3
-            vrrp_iptables
-            dynamic_interfaces
-          }
-          vrrp_instance VI_gateway {
-            nopreempt
-            state BACKUP
-            strict_mode off
-            virtual_router_id 247
-            interface ${host_network.store.if}
-            priority 100
-            virtual_ipaddress {
-              %{~ for k in keys(networks) ~}
-              %{~ if lookup(networks[k], "router", null) != null ~}
-              ${networks[k].router} dev ${host_network[k].if}
-              %{~ endif ~}
-              %{~ endfor ~}
-              ${services.recursive_dns.vip} dev ${host_network.store.if}
-            }
-            virtual_rules {
-              %{~ for k in keys(networks) ~}
-              %{~ if lookup(networks[k], "router", null) != null ~}
-              to ${networks[k].network}/${networks[k].cidr} lookup main priority 32758
-              iif ${host_network[k].if} lookup ${host_network.wan.route_table} priority 32760
-              %{~ endif ~}
-              %{~ endfor ~}
-            }
           }
 
     - path: ${pod_mount_path}/conntrackd/conntrackd.conf
@@ -213,97 +287,20 @@ storage:
               Address Ignore {
                 IPv4_address 127.0.0.1
                 IPv4_address ${services.recursive_dns.vip}
-                %{~ for k in keys(host_network) ~}
-                %{~ if lookup(host_network[k], "ip", null) != null ~}
-                IPv4_address ${host_network[k].ip}
+                IPv4_address ${networks.sync.network}/${networks.sync.cidr}
+                %{~ for k, v in host_network ~}
+                %{~ if lookup(v, "ip", null) != null ~}
+                IPv4_address ${v.ip}
                 %{~ endif ~}
                 %{~ endfor ~}
-                %{~ for k in keys(networks) ~}
-                %{~ if lookup(networks[k], "router", null) != null ~}
-                IPv4_address ${networks[k].router}
+                %{~ for k, v in networks ~}
+                %{~ if lookup(v, "router", null) != null ~}
+                IPv4_address ${v.router}
                 %{~ endif ~}
                 %{~ endfor ~}
               }
             }
           }
-
-    - path: ${pod_mount_path}/nftables/nft.rules
-      mode: 0644
-      contents:
-        inline: |-
-          define if_internal = { ${join(",", [
-            for k in keys(networks):
-            "${host_network[k].if}"
-            if lookup(networks[k], "dhcp_pool", null) != null && lookup(networks[k], "router", null) != null
-          ])} }
-          define if_external = ${host_network.wan.if}
-          define if_trusted = ${host_network.store.if}
-          define if_sync = ${host_network.sync.if}
-
-          table ip filter {
-            chain base_checks {
-              ct state {established, related} accept;
-              ct state invalid drop;
-            }
-
-            chain input {
-              type filter hook input priority 0; policy drop;
-
-              jump base_checks;
-
-              iifname "lo" accept;
-              iifname != "lo" ip daddr 127.0.0.1/8 drop;
-
-              ip protocol icmp icmp type { echo-request, echo-reply, time-exceeded, parameter-problem, destination-unreachable } accept;
-
-              iifname $if_trusted accept;
-              iifname $if_sync accept;
-
-              iifname $if_internal tcp dport domain accept;
-              iifname $if_internal udp dport domain accept;
-              iifname $if_internal udp sport bootps udp dport bootpc accept;
-              iifname $if_internal pkttype multicast accept;
-            }
-
-            chain forward {
-              type filter hook forward priority 0; policy drop;
-
-              jump base_checks;
-
-              ip protocol icmp icmp type { echo-request, echo-reply, time-exceeded, parameter-problem, destination-unreachable } accept;
-
-              iifname $if_trusted accept;
-              iifname $if_internal oifname $if_external accept;
-
-              %{~ for v in values(loadbalancer_pools) ~}
-              iifname $if_internal ip daddr ${v.network}/${v.cidr} accept;
-              %{~ endfor ~}
-            }
-
-            chain output {
-              type filter hook output priority 100; policy accept;
-            }
-          }
-
-          table ip nat {
-            chain prerouting {
-              type nat hook prerouting priority 0; policy accept;
-            }
-
-            chain input {
-              type nat hook input priority 0; policy accept;
-            }
-
-            chain output {
-              type nat hook output priority 0; policy accept;
-            }
-
-            chain postrouting {
-              type nat hook postrouting priority 100; policy accept;
-              oifname $if_external masquerade;
-            }
-          }
-          ;
 
     - path: ${pod_mount_path}/kea/kea-ctrl-agent.conf
       mode: 0644
@@ -338,9 +335,9 @@ storage:
               },
               "interfaces-config": {
                 "interfaces": ${jsonencode([
-                  for k in keys(networks):
+                  for k, v in networks:
                   "${host_network[k].if}"
-                  if lookup(networks[k], "dhcp_pool", null) != null && lookup(networks[k], "router", null) != null
+                  if lookup(v, "dhcp_pool", null) != null && lookup(v, "router", null) != null
                 ])}
               },
               "control-socket": {
@@ -382,22 +379,22 @@ storage:
                 }
               ],
               "subnet4": ${jsonencode([
-                for k in keys(networks):
+                for k, v in networks:
                 {
-                  subnet = "${networks[k].network}/${networks[k].cidr}",
+                  subnet = "${v.network}/${v.cidr}",
                   option-data = [
                     {
                       name = "routers"
-                      data = "${networks[k].router}"
+                      data = "${v.router}"
                     }
                   ]
                   pools = [
                     {
-                      pool = "${networks[k].dhcp_pool}"
+                      pool = "${v.dhcp_pool}"
                     }
                   ]
                 }
-                if lookup(networks[k], "dhcp_pool", null) != null && lookup(networks[k], "router", null) != null
+                if lookup(v, "dhcp_pool", null) != null && lookup(v, "router", null) != null
               ])},
               "dhcp-ddns": {
                 "enable-updates": true,
@@ -483,7 +480,7 @@ storage:
               hostPath:
                 path: ${pod_mount_path}/kea/kea-dhcp4.conf
 
-    - path: ${kubelet_path}/manifests/gateway-node.yaml
+    - path: ${kubelet_path}/manifests/coredns.yaml
       mode: 0644
       contents:
         inline: |-
@@ -492,22 +489,10 @@ storage:
           kind: Pod
           metadata:
             namespace: kube-system
-            name: gateway-node
+            name: coredns
           spec:
             restartPolicy: Always
             hostNetwork: true
-            initContainers:
-            - name: nftables
-              image: ${container_images.nftables}
-              args: [ "-f", "/etc/nftables/nft.rules" ]
-              securityContext:
-                capabilities:
-                  add:
-                  - NET_ADMIN
-              volumeMounts:
-              - name: config-nftables
-                mountPath: /etc/nftables/nft.rules
-                readOnly: true
             containers:
             - name: coredns
               image: "${container_images.coredns}"
@@ -539,36 +524,10 @@ storage:
               - name: config-coredns
                 mountPath: /etc/coredns/Corefile
                 readOnly: true
-            - name: keepalived
-              image: ${container_images.keepalived}
-              securityContext:
-                capabilities:
-                  add:
-                  - NET_ADMIN
-              args: [ "-P", "-D", "-f", "/etc/keepalived/keepalived.conf" ]
-              livenessProbe:
-                httpGet:
-                  path: /health
-                  port: 8080
-                  scheme: HTTP
-                initialDelaySeconds: 15
-                timeoutSeconds: 5
-                successThreshold: 1
-                failureThreshold: 5
-              volumeMounts:
-              - name: config-keepalived
-                mountPath: /etc/keepalived/keepalived.conf
-                readOnly: true
             volumes:
-            - name: config-nftables
-              hostPath:
-                path: ${pod_mount_path}/nftables/nft.rules
             - name: config-coredns
               hostPath:
                 path: ${pod_mount_path}/coredns/Corefile
-            - name: config-keepalived
-              hostPath:
-                path: ${pod_mount_path}/keepalived/keepalived.conf
 
     - path: ${kubelet_path}/manifests/conntrackd.yaml
       mode: 0644

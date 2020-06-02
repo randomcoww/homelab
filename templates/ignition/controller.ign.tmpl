@@ -173,6 +173,7 @@ storage:
           global_defs {
             vrrp_version 3
             vrrp_iptables
+            nftables keepalived
             dynamic_interfaces
           }
           vrrp_instance VI_kube-master_store {
@@ -180,7 +181,7 @@ storage:
             nopreempt
             state BACKUP
             strict_mode off
-            virtual_router_id 70
+            virtual_router_id ${vrrp_id}
             interface ${host_network.store.if}
             priority 100
             virtual_ipaddress {

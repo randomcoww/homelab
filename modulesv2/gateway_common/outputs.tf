@@ -15,6 +15,14 @@ output "templates" {
         mtu                        = var.mtu
         dns_forward_ip             = "9.9.9.9"
         dns_forward_tls_servername = "dns.quad9.net"
+        # master route prioirty is slotted in between main and slave
+        # when keepalived becomes master on the host
+        # priority for both should be greater than 32767 (default)
+        slave_default_route_table     = 240
+        slave_default_route_priority  = 32780
+        master_default_route_table    = 250
+        master_default_route_priority = 32770
+        vrrp_id                       = 247
 
         # Path mounted by kubelet running in container
         kubelet_path = "/var/lib/kubelet"

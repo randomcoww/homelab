@@ -32,9 +32,9 @@ locals {
     loki                    = "docker.io/grafana/loki:latest"
   }
 
-  ## mount boot difk to reuse kernel and initrd for booting VMs
+  ## hypervisor boot image is copied with coreos-installer to strip
+  ## out ignition and re-used to boot VMs
   image_device = "/dev/disk/by-label/fedora-coreos-32"
-  ## images served from matchbox
   kernel_image = "images/vmlinuz"
   initrd_images = [
     "images/initramfs.img"
@@ -139,6 +139,7 @@ locals {
     sync = {
       id      = 60
       network = "192.168.190.0"
+      router  = "192.168.190.6"
       cidr    = 29
       br_if   = "en-sync"
     }
@@ -287,20 +288,13 @@ locals {
           if      = "eth2"
         },
         {
-          alias   = "host_wan"
           network = "wan"
           if      = "eth3"
-          mac     = "52-54-00-63-6e-b2"
-        },
-        {
-          network     = "wan"
-          if          = "eth4"
-          mac         = "52-54-00-63-6e-b3"
-          route_table = 250
+          mac     = "52-54-00-63-6e-b3"
         },
         {
           network   = "int"
-          if        = "eth5"
+          if        = "eth4"
           mac       = "52-54-00-1a-61-2a"
           bootorder = 1
         }
@@ -327,20 +321,13 @@ locals {
           if      = "eth2"
         },
         {
-          alias   = "host_wan"
           network = "wan"
           if      = "eth3"
-          mac     = "52-54-00-63-6e-b1"
-        },
-        {
-          network     = "wan"
-          if          = "eth4"
-          mac         = "52-54-00-63-6e-b3"
-          route_table = 250
+          mac     = "52-54-00-63-6e-b3"
         },
         {
           network   = "int"
-          if        = "eth5"
+          if        = "eth4"
           mac       = "52-54-00-1a-61-2b"
           bootorder = 1
         }
