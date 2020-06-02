@@ -89,11 +89,26 @@ storage:
       contents:
         inline: |
           ${indent(10, udev_steam_vr)}
+    - path: /etc/dconf/db/local.d/00-custom
+      mode: 0644
+      contents:
+        inline: |
+          [org/gnome/system/location]
+          enabled=true
 
-  links:
-    - path: /etc/resolv.conf
-      target: /run/systemd/resolve/resolv.conf
-      overwrite: true
+          [org/gnome/desktop/datetime]
+          automatic-timezone=true
+
+          [org/gnome/settings-daemon/plugins/color]
+          night-light-enabled=true
+          night-light-schedule-automatic=true
+
+          [org/gnome/desktop/media-handling]
+          automount=false
+          autorun-never=true
+
+          [org/gnome/desktop/sound/event-sounds]
+          enabled=false
 
 passwd:
   users:
