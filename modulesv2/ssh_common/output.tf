@@ -1,7 +1,3 @@
-output "ssh_ca_private_key" {
-  value = tls_private_key.ssh-ca.private_key_pem
-}
-
 output "ssh_ca_authorized_key" {
   value = tls_private_key.ssh-ca.public_key_openssh
 }

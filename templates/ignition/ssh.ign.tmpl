@@ -27,3 +27,7 @@ storage:
       mode: 0600
       contents:
         inline: "${ssh_host_certificate}"
+    - path: /etc/ssh/ssh_known_hosts
+      mode: 0644
+      contents:
+        inline: "@cert-authority * ${ssh_ca_authorized_key}"

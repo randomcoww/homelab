@@ -55,12 +55,6 @@ buildtool terraform apply \
 buildtool terraform output ssh-client-certificate > $KEY-cert.pub
 ```
 
-Copy host certificate to known hosts
-
-```bash
-echo -n "@cert-authority * $(buildtool terraform output ssh-ca-authorized-key)" >> $HOME/.ssh/known_hosts
-```
-
 ### Create hypervisor images
 
 Hypervisor images are live USB disks created using [Fedora CoreOS assembler](https://github.com/coreos/coreos-assembler). Generate ignition configuration to local Matchbox server:
