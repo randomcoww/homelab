@@ -118,6 +118,8 @@ storage:
             dynamic_interfaces
           }
           vrrp_instance VI_gateway {
+            use_vmac
+            vmac_xmit_base
             nopreempt
             state BACKUP
             strict_mode off
