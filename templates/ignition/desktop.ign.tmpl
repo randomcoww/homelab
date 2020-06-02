@@ -13,6 +13,20 @@ systemd:
       mask: true
     - name: avahi-daemon.socket
       mask: true
+    - name: default-dconf-update.service
+      enabled: true
+      contents: |
+        [Unit]
+        ConditionFirstBoot=true
+        ConditionDirectoryNotEmpty=/etc/dconf/db/local.d/
+
+        [Service]
+        ExecStart=/usr/bin/dconf update
+        Type=oneshot
+        RemainAfterExit=yes
+
+        [Install]
+        WantedBy=graphical.target
 
 storage:
   files:
@@ -107,8 +121,24 @@ storage:
           automount=false
           autorun-never=true
 
-          [org/gnome/desktop/sound/event-sounds]
-          enabled=false
+          [org/gnome/desktop/sound]
+          event-sounds=false
+
+          [org/gnome/desktop/session]
+          idle-delay=uint32 3600
+
+          [org/gnome/desktop/privacy]
+          old-files-age=uint32 1
+          remember-recent-files=false
+          remove-old-temp-files=true
+          remove-old-trash-files=true
+
+          [org/gnome/software]
+          first-run=false
+          show-nonfree-prompt=false
+
+          [org/gnome/desktop/notifications]
+          show-in-lock-screen=false
 
 passwd:
   users:
