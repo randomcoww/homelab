@@ -19,18 +19,14 @@ resource "tls_cert_request" "etcd" {
     organization = "etcd"
   }
 
-  dns_names = compact([
-    for params in values(var.controller_hosts) :
-    params.hostname
-  ])
+  dns_names = [
+    each.value.hostname,
+  ]
 
-  ip_addresses = compact(concat(
-    [
-      for params in values(var.controller_hosts) :
-      lookup(params.host_network.store, "ip", null)
-    ],
-    ["127.0.0.1"]
-  ))
+  ip_addresses = compact([
+    "127.0.0.1",
+    lookup(each.value.host_network.store, "ip", null),
+  ])
 }
 
 resource "tls_locally_signed_cert" "etcd" {

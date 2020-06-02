@@ -24,8 +24,8 @@ resource "tls_cert_request" "matchbox" {
   ]
 
   ip_addresses = compact([
-    lookup(each.value.host_network.store, "ip", null),
     "127.0.0.1",
+    lookup(each.value.host_network.store, "ip", null),
   ])
 }
 
