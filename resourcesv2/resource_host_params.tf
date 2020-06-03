@@ -113,13 +113,11 @@ module "kvm-common" {
 module "desktop-common" {
   source = "../modulesv2/desktop_common"
 
-  user                 = var.desktop_user
-  password             = var.desktop_password
-  timezone             = var.desktop_timezone
-  internal_ca_cert_pem = tls_self_signed_cert.internal-ca.cert_pem
-  mtu                  = local.mtu
-  networks             = local.networks
-  domains              = local.domains
+  user     = var.desktop_user
+  password = var.desktop_password
+  mtu      = local.mtu
+  networks = local.networks
+  domains  = local.domains
 
   desktop_templates = local.components.desktop.templates
   desktop_hosts = {
@@ -129,4 +127,81 @@ module "desktop-common" {
       host_network = local.host_network_by_type[k]
     })
   }
+}
+
+##
+## minio user-pass
+##
+resource "random_password" "minio-user" {
+  length  = 30
+  special = false
+}
+
+resource "random_password" "minio-password" {
+  length  = 30
+  special = false
+}
+
+##
+## grafana user-pass
+##
+resource "random_password" "grafana-user" {
+  length  = 30
+  special = false
+}
+
+resource "random_password" "grafana-password" {
+  length  = 30
+  special = false
+}
+
+module "kubernetes-addons" {
+  source = "../modulesv2/kubernetes_addons"
+
+  networks           = local.networks
+  loadbalancer_pools = local.loadbalancer_pools
+  services           = local.services
+  domains            = local.domains
+  container_images   = local.container_images
+  addon_templates    = local.addon_templates
+
+  secrets = {
+    minio-auth-secret = {
+      namespace = "default"
+      data = {
+        access_key_id     = random_password.minio-user.result
+        secret_access_key = random_password.minio-password.result
+      },
+      type = "Opaque"
+    },
+    grafana-auth-secret = {
+      namespace = "default"
+      data = {
+        user     = random_password.grafana-user.result
+        password = random_password.grafana-password.result
+      },
+      type = "Opaque"
+    }
+  }
+
+  internal_tls_templates = local.components.internal_tls.templates
+  internal_tls_hosts = {
+    for k in local.components.internal_tls.nodes :
+    k => merge(local.hosts[k], {
+      hostname     = join(".", [k, local.domains.mdns])
+      host_network = local.host_network_by_type[k]
+    })
+  }
+}
+
+# Write admin kubeconfig file
+resource "local_file" "kubeconfig-admin" {
+  content = templatefile("${path.module}/../templates/manifest/kubeconfig_admin.yaml.tmpl", {
+    cluster_name       = module.kubernetes-common.cluster_endpoint.cluster_name
+    ca_pem             = replace(base64encode(chomp(module.kubernetes-common.cluster_endpoint.kubernetes_ca_pem)), "\n", "")
+    cert_pem           = replace(base64encode(chomp(module.kubernetes-common.cluster_endpoint.kubernetes_cert_pem)), "\n", "")
+    private_key_pem    = replace(base64encode(chomp(module.kubernetes-common.cluster_endpoint.kubernetes_private_key_pem)), "\n", "")
+    apiserver_endpoint = module.kubernetes-common.cluster_endpoint.apiserver_endpoint
+  })
+  filename = "output/${module.kubernetes-common.cluster_endpoint.cluster_name}.kubeconfig"
 }

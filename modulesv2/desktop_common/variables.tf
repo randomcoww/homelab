@@ -6,10 +6,6 @@ variable "password" {
   type = string
 }
 
-variable "timezone" {
-  type = string
-}
-
 variable "mtu" {
   type = number
 }
@@ -19,7 +15,7 @@ variable "networks" {
 }
 
 variable "domains" {
-  type = any
+  type = map(string)
 }
 
 variable "desktop_hosts" {
@@ -28,8 +24,4 @@ variable "desktop_hosts" {
 
 variable "desktop_templates" {
   type = list(string)
-}
-
-variable "internal_ca_cert_pem" {
-  type = string
 }

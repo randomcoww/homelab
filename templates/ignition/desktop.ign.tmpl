@@ -56,14 +56,6 @@ storage:
           RequiredForOnline=no
 
     ##
-    ## certs
-    ##
-    - path: ${internal_tls_path}/internal-ca.pem
-      mode: 0644
-      contents:
-        inline: "${tls_internal_ca}"
-
-    ##
     ## misc configs
     ## add to global paths - persistent home directory is mounted afterwards
     ##

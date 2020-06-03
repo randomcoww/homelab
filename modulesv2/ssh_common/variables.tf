@@ -7,7 +7,7 @@ variable "networks" {
 }
 
 variable "domains" {
-  type = any
+  type = map(string)
 }
 
 variable "ssh_client_public_key" {

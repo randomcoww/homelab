@@ -191,6 +191,14 @@ locals {
         "${path.module}/../templates/ignition/ssh.ign.tmpl",
       ]
     }
+    internal_tls = {
+      nodes = [
+        "desktop",
+      ]
+      templates = [
+        "${path.module}/../templates/ignition/internal_tls.ign.tmpl",
+      ]
+    }
     gateway = {
       nodes = [
         "gateway-0",
@@ -248,7 +256,7 @@ locals {
       ]
       templates = [
         "${path.module}/../templates/ignition/kvm.ign.tmpl",
-        "${path.module}/../templates/ignition/vlan-network.ign.tmpl",
+        "${path.module}/../templates/ignition/vlan_network.ign.tmpl",
         "${path.module}/../templates/ignition/base.ign.tmpl",
         "${path.module}/../templates/ignition/user.ign.tmpl",
       ]
@@ -259,12 +267,23 @@ locals {
       ]
       templates = [
         "${path.module}/../templates/ignition/desktop.ign.tmpl",
-        "${path.module}/../templates/ignition/vlan-network.ign.tmpl",
+        "${path.module}/../templates/ignition/vlan_network.ign.tmpl",
         "${path.module}/../templates/ignition/base.ign.tmpl",
         "${path.module}/../templates/ignition/storage.ign.tmpl",
         "${path.module}/../templates/ignition/user.ign.tmpl",
       ]
     }
+  }
+
+  addon_templates = {
+    bootstrap       = "${path.module}/../templates/manifest/bootstrap.yaml.tmpl"
+    kube-proxy      = "${path.module}/../templates/manifest/kube_proxy.yaml.tmpl"
+    kapprover       = "${path.module}/../templates/manifest/kapprover.yaml.tmpl"
+    flannel         = "${path.module}/../templates/manifest/flannel.yaml.tmpl"
+    coredns         = "${path.module}/../templates/manifest/coredns.yaml.tmpl"
+    secret          = "${path.module}/../templates/manifest/secret.yaml.tmpl"
+    loki            = "${path.module}/../templates/manifest/loki.yaml.tmpl"
+    metallb_network = "${path.module}/../templates/manifest/metallb_network.yaml.tmpl"
   }
 
   hosts = {

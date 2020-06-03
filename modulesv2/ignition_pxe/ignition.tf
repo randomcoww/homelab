@@ -1,8 +1,8 @@
 ##
 ## Ignition renderer for PXE boot CoreOS VMs
 ##
-data "ct_config" "ign-pxe" {
-  for_each = var.pxe_ignition_params
+data "ct_config" "ign" {
+  for_each = var.ignition_params
 
   content  = <<EOT
 ---
@@ -13,8 +13,8 @@ EOT
   snippets = each.value.templates
 }
 
-resource "matchbox_profile" "ign-pxe" {
-  for_each = var.pxe_ignition_params
+resource "matchbox_profile" "ign" {
+  for_each = var.ignition_params
 
   name   = each.key
   kernel = "/assets/${var.kernel_image}"
@@ -27,13 +27,13 @@ resource "matchbox_profile" "ign-pxe" {
     "ip=${each.value.selector.if}:dhcp",
   ])
 
-  raw_ignition = data.ct_config.ign-pxe[each.key].rendered
+  raw_ignition = data.ct_config.ign[each.key].rendered
 }
 
-resource "matchbox_group" "ign-pxe" {
-  for_each = var.pxe_ignition_params
+resource "matchbox_group" "ign" {
+  for_each = var.ignition_params
 
-  profile = matchbox_profile.ign-pxe[each.key].name
+  profile = matchbox_profile.ign[each.key].name
   name    = each.key
   selector = {
     mac = each.value.selector.mac

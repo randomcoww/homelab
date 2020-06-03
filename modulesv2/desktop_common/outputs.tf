@@ -8,7 +8,6 @@ output "templates" {
         user             = var.user
         uid              = 10000
         password         = var.password
-        timezone         = var.timezone
         host_disks       = params.disk
         networks         = var.networks
         domains          = var.domains
@@ -22,9 +21,6 @@ output "templates" {
           k
           if lookup(v, "id", null) != null
         ]
-
-        tls_internal_ca   = replace(var.internal_ca_cert_pem, "\n", "\\n")
-        internal_tls_path = "/etc/pki/ca-trust/source/anchors"
       })
     ]
   }

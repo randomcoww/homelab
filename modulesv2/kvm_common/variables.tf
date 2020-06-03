@@ -15,11 +15,11 @@ variable "services" {
 }
 
 variable "domains" {
-  type = any
+  type = map(string)
 }
 
 variable "container_images" {
-  type = any
+  type = map(string)
 }
 
 variable "image_device" {

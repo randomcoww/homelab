@@ -1,9 +1,5 @@
 
-variable "pxe_ignition_params" {
-  type = any
-}
-
-variable "local_ignition_params" {
+variable "ignition_params" {
   type = any
 }
 

@@ -11,17 +11,25 @@ variable "services" {
 }
 
 variable "domains" {
-  type = any
+  type = map(string)
 }
 
 variable "container_images" {
-  type = any
+  type = map(string)
 }
 
 variable "secrets" {
   type = any
 }
 
-variable "renderer" {
+variable "internal_tls_hosts" {
+  type = any
+}
+
+variable "internal_tls_templates" {
+  type = list(string)
+}
+
+variable "addon_templates" {
   type = map(string)
 }

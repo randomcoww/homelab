@@ -9,11 +9,6 @@ variable "desktop_password" {
   default = "password"
 }
 
-variable "desktop_timezone" {
-  type    = string
-  default = "America/Los_Angeles"
-}
-
 variable "ssh_client_public_key" {
   type    = string
   default = ""
