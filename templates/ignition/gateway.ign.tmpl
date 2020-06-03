@@ -14,6 +14,10 @@ systemd:
             Requires=nftables.service
             PartOf=nftables.service
 
+            [Service]
+            EnvironmentFile=
+            Environment=KEEPALIVED_OPTIONS="-D -P"
+
 storage:
   files:
     - path: /etc/systemd/network/10-${host_network.store.if}.network
@@ -251,7 +255,7 @@ storage:
         inline: |-
           Sync {
             Mode FTFW {
-              # StartupResync on
+              StartupResync on
               DisableExternalCache on
             }
 
@@ -272,7 +276,9 @@ storage:
           }
 
           General {
+            Systemd off
             LogFile /dev/stdout
+            Syslog off
             HashSize 32768
             HashLimit 131072
             NetlinkBufferSize 2097152
