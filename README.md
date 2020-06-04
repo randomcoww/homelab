@@ -146,6 +146,8 @@ kubectl apply -f http://127.0.0.1:8080/generic?manifest=metallb
 kubectl apply -f http://127.0.0.1:8080/generic?manifest=internal-tls-secret
 kubectl apply -f http://127.0.0.1:8080/generic?manifest=minio-auth-secret
 kubectl apply -f http://127.0.0.1:8080/generic?manifest=grafana-auth-secret
+kubectl apply -f http://127.0.0.1:8080/generic?manifest=wireguard-client-secret
+kubectl apply -f http://127.0.0.1:8080/generic?manifest=loki
 ```
 
 ### Deploy services on Kubernetes
@@ -174,7 +176,6 @@ https://grafana.fuzzybunny.internal
 
 ```
 cd reqourcesv2/manifests
-kubectl apply -f http://127.0.0.1:8080/generic?manifest=loki
 kubectl apply -f grafana/
 ```
 
@@ -202,6 +203,5 @@ https://tr.fuzzybunny.internal
 
 ```
 cd reqourcesv2/manifests
-kubectl create secret generic wireguard-config --from-file=wireguard-secret
 kubectl apply -f transmission/
 ```
