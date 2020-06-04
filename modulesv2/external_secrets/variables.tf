@@ -10,10 +10,6 @@ variable "s3_secrets_key" {
   type = string
 }
 
-variable "container_images" {
-  type = map(string)
-}
-
 variable "wireguard_client_hosts" {
   type = any
 }

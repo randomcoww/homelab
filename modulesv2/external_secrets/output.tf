@@ -8,7 +8,6 @@ output "templates" {
     host => [
       for template in var.wireguard_client_templates :
       templatefile(template, {
-        host_network     = params.host_network
         wireguard_secret = local.secrets.wireguard
         wireguard_if     = "wg0"
       })

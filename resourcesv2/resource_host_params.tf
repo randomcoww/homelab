@@ -197,7 +197,6 @@ module "external-secrets" {
   source = "../modulesv2/external_secrets"
 
   networks          = local.networks
-  container_images  = local.container_images
   addon_templates   = local.addon_templates
   s3_secrets_bucket = local.s3_secrets_bucket
   s3_secrets_key    = local.s3_secrets_key
