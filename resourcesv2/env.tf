@@ -6,6 +6,7 @@ locals {
   # etcd backup
   s3_backup_aws_region  = "us-west-2"
   s3_etcd_backup_bucket = "randomcoww-etcd-backup"
+  s3_secrets_bucket     = "randomcoww-secrets"
 
   # kubelet image is used for static pods and does not need to match the kubernetes version
   # hyperkube is used for the worker kubelet and should match the version
@@ -197,6 +198,14 @@ locals {
       ]
       templates = [
         "${path.module}/../templates/ignition/internal_tls.ign.tmpl",
+      ]
+    }
+    wireguard_client = {
+      nodes = [
+        "desktop",
+      ]
+      templates = [
+        "${path.module}/../templates/ignition/wireguard_client.ign.tmpl",
       ]
     }
     gateway = {

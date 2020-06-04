@@ -62,7 +62,8 @@ module "ignition-local" {
         lookup(module.kvm-common.templates, h, []),
         lookup(module.desktop-common.templates, h, []),
         lookup(module.ssh-common.templates, h, []),
-        lookup(module.kubernetes-addons.templates, h, [])
+        lookup(module.kubernetes-addons.templates, h, []),
+        lookup(module.external-secrets.templates, h, []),
       ])
     }
   }
@@ -73,6 +74,10 @@ module "ignition-local" {
 module "generic-manifest-local" {
   source = "../modulesv2/generic_manifest"
 
-  generic_params = module.kubernetes-addons.addons
-  renderer       = local.local_renderer
+  generic_params = merge(
+    module.kubernetes-addons.addons,
+    module.external-secrets.addons,
+  )
+
+  renderer = local.local_renderer
 }

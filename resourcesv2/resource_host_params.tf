@@ -194,6 +194,23 @@ module "kubernetes-addons" {
   }
 }
 
+module "external-secrets" {
+  source = "../modulesv2/external_secrets"
+
+  networks          = local.networks
+  addon_templates   = local.addon_templates
+  s3_secrets_bucket = local.s3_secrets_bucket
+
+  wireguard_client_templates = local.components.wireguard_client.templates
+  wireguard_client_hosts = {
+    for k in local.components.wireguard_client.nodes :
+    k => merge(local.hosts[k], {
+      hostname     = join(".", [k, local.domains.mdns])
+      host_network = local.host_network_by_type[k]
+    })
+  }
+}
+
 # Write admin kubeconfig file
 resource "local_file" "kubeconfig-admin" {
   content = templatefile("${path.module}/../templates/manifest/kubeconfig_admin.yaml.tmpl", {

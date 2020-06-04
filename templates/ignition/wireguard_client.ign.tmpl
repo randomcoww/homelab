@@ -1,0 +1,30 @@
+---
+variant: fcos
+version: 1.0.0
+storage:
+  files:
+    - path: /etc/systemd/network/wg0.netdev
+      mode: 0644
+      contents:
+        inline: |
+          [NetDev]
+          Name=wg0
+          Kind=wireguard
+
+          [WireGuard]
+          PrivateKey=${wireguard_secret.Interface.PrivateKey}
+
+          [WireGuardPeer]
+          PublicKey=${wireguard_secret.Peer.PublicKey}
+          AllowedIPs=${wireguard_secret.Peer.AllowedIPs}
+          Endpoint=${wireguard_secret.Peer.Endpoint}
+    - path: /etc/systemd/network/wg0.network
+      mode: 0644
+      contents:
+        inline: |
+          [Match]
+          Name=wg0
+
+          [Network]
+          Address=${wireguard_secret.Interface.Address}
+          RequiredForOnline=no
