@@ -98,7 +98,6 @@ module "kvm-common" {
   services         = local.services
   domains          = local.domains
   container_images = local.container_images
-  image_device     = local.image_device
 
   kvm_templates = local.components.kvm.templates
   kvm_hosts = {

@@ -47,9 +47,6 @@ locals {
     wireguard               = "docker.io/randomcoww/wireguard:latest"
   }
 
-  ## hypervisor boot image is copied with coreos-installer to strip
-  ## out ignition and re-used to boot VMs
-  image_device = "/dev/disk/by-label/fedora-coreos-32"
   kernel_image = "images/vmlinuz"
   initrd_images = [
     "images/initramfs.img"
@@ -604,6 +601,9 @@ locals {
         "controller-2",
         "worker-0",
       ]
+      ## hypervisor boot image is copied with coreos-installer to strip
+      ## out ignition and re-used to boot VMs
+      image_device = "/dev/disk/by-label/fedora-coreos-32"
     }
     kvm-1 = {
       network = [
@@ -623,6 +623,9 @@ locals {
         "worker-1",
         "test-0",
       ]
+      ## hypervisor boot image is copied with coreos-installer to strip
+      ## out ignition and re-used to boot VMs
+      image_device = "/dev/disk/by-label/fedora-coreos-32"
     }
 
     # desktop
@@ -643,6 +646,9 @@ locals {
           mount_path = "/var/home/${var.desktop_user}"
         }
       ]
+      ## hypervisor boot image is copied with coreos-installer to strip
+      ## out ignition and re-used to boot VMs
+      image_device = "/dev/disk/by-label/fedora-silverblue-32"
     }
   }
 

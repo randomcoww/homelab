@@ -35,7 +35,7 @@ output "templates" {
         domains             = var.domains
         services            = var.services
         matchbox_image_path = "/etc/container-save/matchbox.tar"
-        image_device        = var.image_device
+        image_device        = params.image_device
 
         vlans = [
           for k, v in var.networks :

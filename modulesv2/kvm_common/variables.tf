@@ -22,10 +22,6 @@ variable "container_images" {
   type = map(string)
 }
 
-variable "image_device" {
-  type = any
-}
-
 variable "kvm_hosts" {
   type = any
 }
