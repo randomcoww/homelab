@@ -6,6 +6,10 @@ variable "s3_secrets_bucket" {
   type = string
 }
 
+variable "s3_secrets_key" {
+  type = string
+}
+
 variable "container_images" {
   type = map(string)
 }

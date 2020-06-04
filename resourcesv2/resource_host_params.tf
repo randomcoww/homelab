@@ -201,6 +201,7 @@ module "external-secrets" {
   container_images  = local.container_images
   addon_templates   = local.addon_templates
   s3_secrets_bucket = local.s3_secrets_bucket
+  s3_secrets_key    = local.s3_secrets_key
 
   wireguard_client_templates = local.components.wireguard_client.templates
   wireguard_client_hosts = {

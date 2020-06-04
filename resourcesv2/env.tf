@@ -1,12 +1,25 @@
 locals {
   user = "core"
   mtu  = 9000
+
   # kubernetes
   kubernetes_cluster_name = "default-cluster-2005"
+
   # etcd backup
   s3_backup_aws_region  = "us-west-2"
   s3_etcd_backup_bucket = "randomcoww-etcd-backup"
-  s3_secrets_bucket     = "randomcoww-secrets"
+
+  # secrets store
+  # format:
+  # ---
+  # service1:
+  #   service1key: service1value
+  #   ...
+  # service2:
+  #   service2key: service2value
+  # ...
+  s3_secrets_bucket = "randomcoww-secrets"
+  s3_secrets_key    = "secrets.yaml"
 
   # kubelet image is used for static pods and does not need to match the kubernetes version
   # hyperkube is used for the worker kubelet and should match the version
