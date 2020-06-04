@@ -31,6 +31,7 @@ locals {
     promtail                = "docker.io/randomcoww/promtail:v1.4.1"
     matchbox                = "quay.io/poseidon/matchbox:latest"
     loki                    = "docker.io/grafana/loki:latest"
+    wireguard               = "docker.io/randomcoww/wireguard:latest"
   }
 
   ## hypervisor boot image is copied with coreos-installer to strip
@@ -202,7 +203,6 @@ locals {
     }
     wireguard_client = {
       nodes = [
-        "desktop",
       ]
       templates = [
         "${path.module}/../templates/ignition/wireguard_client.ign.tmpl",

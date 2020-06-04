@@ -75,11 +75,13 @@ storage:
           [Match]
           Name=${networks[k].br_if}-tap
 
+          [Link]
+          RequiredForOnline=no
+
           [Network]
           LinkLocalAddressing=no
           DHCP=yes
           MulticastDNS=yes
-          RequiredForOnline=no
 
           [Address]
           Address=${host_network[k].ip}/${networks[k].cidr}

@@ -3,12 +3,14 @@ variant: fcos
 version: 1.0.0
 storage:
   files:
-    - path: /etc/systemd/network/wg0.netdev
-      mode: 0644
+    - path: /etc/systemd/network/20-${wireguard_if}.netdev
+      mode: 0600
+      user:
+        name: systemd-network
       contents:
         inline: |
           [NetDev]
-          Name=wg0
+          Name=${wireguard_if}
           Kind=wireguard
 
           [WireGuard]
@@ -16,15 +18,24 @@ storage:
 
           [WireGuardPeer]
           PublicKey=${wireguard_secret.Peer.PublicKey}
-          AllowedIPs=${wireguard_secret.Peer.AllowedIPs}
+          %{~ for k in split(",", wireguard_secret.Peer.AllowedIPs) ~}
+          AllowedIPs=${trimspace(k)}
+          %{~ endfor ~}
           Endpoint=${wireguard_secret.Peer.Endpoint}
-    - path: /etc/systemd/network/wg0.network
-      mode: 0644
+          PersistentKeepalive=25
+    - path: /etc/systemd/network/20-${wireguard_if}.network
+      mode: 0600
+      user:
+        name: systemd-network
       contents:
         inline: |
           [Match]
-          Name=wg0
+          Name=${wireguard_if}
+
+          [Link]
+          RequiredForOnline=no
 
           [Network]
-          Address=${wireguard_secret.Interface.Address}
-          RequiredForOnline=no
+          %{~ for k in split(",", wireguard_secret.Interface.Address) ~}
+          Address=${trimspace(k)}
+          %{~ endfor ~}

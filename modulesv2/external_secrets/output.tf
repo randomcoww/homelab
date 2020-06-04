@@ -8,7 +8,9 @@ output "templates" {
     host => [
       for template in var.wireguard_client_templates :
       templatefile(template, {
+        host_network     = params.host_network
         wireguard_secret = local.secrets.wireguard
+        wireguard_if     = "wg0"
       })
     ]
   }
@@ -32,6 +34,7 @@ PostUp = nft add table ip filter && nft add chain ip filter output { type filter
 PublicKey = ${local.secrets.wireguard.Peer.PublicKey}
 AllowedIPs = ${local.secrets.wireguard.Peer.AllowedIPs}
 Endpoint = ${local.secrets.wireguard.Peer.Endpoint}
+PersistentKeepalive = 25
 EOF
       }
     })
