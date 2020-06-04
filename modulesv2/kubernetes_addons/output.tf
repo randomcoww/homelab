@@ -4,7 +4,7 @@ output "templates" {
     host => [
       for template in var.internal_tls_templates :
       templatefile(template, {
-        tls_internal_ca   = replace(tls_private_key.internal-ca.public_key_pem, "\n", "\\n")
+        tls_internal_ca   = replace(tls_self_signed_cert.internal-ca.cert_pem, "\n", "\\n")
         internal_tls_path = "/etc/pki/ca-trust/source/anchors"
       })
     ]
