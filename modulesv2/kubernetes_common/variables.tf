@@ -2,10 +2,6 @@ variable "user" {
   type = string
 }
 
-variable "mtu" {
-  type = number
-}
-
 variable "cluster_name" {
   type = string
 }
@@ -48,4 +44,8 @@ variable "s3_backup_aws_region" {
 
 variable "s3_etcd_backup_bucket" {
   type = string
+}
+
+variable "addon_templates" {
+  type = map(string)
 }

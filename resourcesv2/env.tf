@@ -4,9 +4,9 @@ locals {
 
   # kubernetes
   kubernetes_cluster_name = "default-cluster-2005"
+  s3_backup_aws_region    = "us-west-2"
 
   # etcd backup
-  s3_backup_aws_region  = "us-west-2"
   s3_etcd_backup_bucket = "randomcoww-etcd-backup"
 
   # secrets store
@@ -295,14 +295,15 @@ locals {
   }
 
   addon_templates = {
-    bootstrap       = "${path.module}/../templates/manifest/bootstrap.yaml.tmpl"
-    kube-proxy      = "${path.module}/../templates/manifest/kube_proxy.yaml.tmpl"
-    kapprover       = "${path.module}/../templates/manifest/kapprover.yaml.tmpl"
-    flannel         = "${path.module}/../templates/manifest/flannel.yaml.tmpl"
-    coredns         = "${path.module}/../templates/manifest/coredns.yaml.tmpl"
-    secret          = "${path.module}/../templates/manifest/secret.yaml.tmpl"
-    loki            = "${path.module}/../templates/manifest/loki.yaml.tmpl"
-    metallb_network = "${path.module}/../templates/manifest/metallb_network.yaml.tmpl"
+    bootstrap        = "${path.module}/../templates/manifest/bootstrap.yaml.tmpl"
+    kube-proxy       = "${path.module}/../templates/manifest/kube_proxy.yaml.tmpl"
+    kapprover        = "${path.module}/../templates/manifest/kapprover.yaml.tmpl"
+    flannel          = "${path.module}/../templates/manifest/flannel.yaml.tmpl"
+    coredns          = "${path.module}/../templates/manifest/coredns.yaml.tmpl"
+    secret           = "${path.module}/../templates/manifest/secret.yaml.tmpl"
+    loki             = "${path.module}/../templates/manifest/loki.yaml.tmpl"
+    metallb_network  = "${path.module}/../templates/manifest/metallb_network.yaml.tmpl"
+    kubeconfig_admin = "${path.module}/../templates/manifest/kubeconfig_admin.yaml.tmpl"
   }
 
   hosts = {

@@ -33,3 +33,7 @@ variable "gateway_hosts" {
 variable "gateway_templates" {
   type = list(string)
 }
+
+variable "addon_templates" {
+  type = map(string)
+}

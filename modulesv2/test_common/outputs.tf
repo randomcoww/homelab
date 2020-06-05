@@ -10,17 +10,12 @@ output "templates" {
         domains                    = var.domains
         dns_forward_ip             = "9.9.9.9"
         dns_forward_tls_servername = "dns.quad9.net"
-
-        # Path mounted by kubelet running in container
-        kubelet_path = "/var/lib/kubelet"
-        # This paths should be visible by kubelet running in the container
-        pod_mount_path = "/var/lib/kubelet/podconfig"
-
-        networks     = var.networks
-        host_network = params.host_network
-        host_disks   = params.disk
-        mtu          = var.mtu
-        services     = var.services
+        networks                   = var.networks
+        host_network               = params.host_network
+        host_disks                 = params.disk
+        services                   = var.services
+        kubelet_path               = "/var/lib/kubelet"
+        pod_mount_path             = "/var/lib/kubelet/podconfig"
       })
     ]
   }

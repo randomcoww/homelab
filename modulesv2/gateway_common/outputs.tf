@@ -15,6 +15,11 @@ output "templates" {
         mtu                        = var.mtu
         dns_forward_ip             = "9.9.9.9"
         dns_forward_tls_servername = "dns.quad9.net"
+        kubelet_path               = "/var/lib/kubelet"
+        pod_mount_path             = "/var/lib/kubelet/podconfig"
+        kea_path                   = "/var/lib/kea"
+        kea_hooks_path             = "/usr/local/lib/kea/hooks"
+
         # master route prioirty is slotted in between main and slave
         # when keepalived becomes master on the host
         # priority for both should be greater than 32767 (default)
@@ -24,12 +29,6 @@ output "templates" {
         master_default_route_priority = 32770
         vrrp_id                       = 247
 
-        # Path mounted by kubelet running in container
-        kubelet_path = "/var/lib/kubelet"
-        # This paths should be visible by kubelet running in the container
-        pod_mount_path = "/var/lib/kubelet/podconfig"
-        kea_path       = "/var/lib/kea"
-        kea_hooks_path = "/usr/local/lib/kea/hooks"
         kea_ha_peers = jsonencode([
           for k, v in var.gateway_hosts :
           {
@@ -40,5 +39,14 @@ output "templates" {
         ])
       })
     ]
+  }
+}
+
+output "addons" {
+  value = {
+    ## Metallb network
+    metallb-network = templatefile(var.addon_templates.metallb_network, {
+      loadbalancer_pools = var.loadbalancer_pools
+    })
   }
 }

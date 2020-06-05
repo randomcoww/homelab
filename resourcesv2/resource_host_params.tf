@@ -5,7 +5,8 @@ module "ssh-common" {
   networks              = local.networks
   domains               = local.domains
   ssh_client_public_key = var.ssh_client_public_key
-  ssh_templates         = local.components.ssh.templates
+
+  ssh_templates = local.components.ssh.templates
   ssh_hosts = {
     for k in local.components.ssh.nodes :
     k => merge(local.hosts[k], {
@@ -18,16 +19,15 @@ module "ssh-common" {
 module "kubernetes-common" {
   source = "../modulesv2/kubernetes_common"
 
+  user                  = local.user
+  networks              = local.networks
+  services              = local.services
+  domains               = local.domains
+  container_images      = local.container_images
   cluster_name          = local.kubernetes_cluster_name
   s3_backup_aws_region  = local.s3_backup_aws_region
   s3_etcd_backup_bucket = local.s3_etcd_backup_bucket
-
-  user             = local.user
-  mtu              = local.mtu
-  networks         = local.networks
-  services         = local.services
-  domains          = local.domains
-  container_images = local.container_images
+  addon_templates       = local.addon_templates
 
   controller_templates = local.components.controller.templates
   controller_hosts = {
@@ -58,6 +58,7 @@ module "gateway-common" {
   services           = local.services
   domains            = local.domains
   container_images   = local.container_images
+  addon_templates    = local.addon_templates
 
   gateway_templates = local.components.gateway.templates
   gateway_hosts = {
@@ -73,7 +74,6 @@ module "test-common" {
   source = "../modulesv2/test_common"
 
   user             = local.user
-  mtu              = local.mtu
   networks         = local.networks
   services         = local.services
   domains          = local.domains
@@ -154,15 +154,14 @@ resource "random_password" "grafana-password" {
   special = false
 }
 
-module "kubernetes-addons" {
-  source = "../modulesv2/kubernetes_addons"
+module "secrets" {
+  source = "../modulesv2/secrets"
 
-  networks           = local.networks
-  loadbalancer_pools = local.loadbalancer_pools
-  services           = local.services
-  domains            = local.domains
-  container_images   = local.container_images
-  addon_templates    = local.addon_templates
+  networks          = local.networks
+  domains           = local.domains
+  addon_templates   = local.addon_templates
+  s3_secrets_bucket = local.s3_secrets_bucket
+  s3_secrets_key    = local.s3_secrets_key
 
   secrets = {
     minio-auth-secret = {
@@ -191,15 +190,6 @@ module "kubernetes-addons" {
       host_network = local.host_network_by_type[k]
     })
   }
-}
-
-module "external-secrets" {
-  source = "../modulesv2/external_secrets"
-
-  networks          = local.networks
-  addon_templates   = local.addon_templates
-  s3_secrets_bucket = local.s3_secrets_bucket
-  s3_secrets_key    = local.s3_secrets_key
 
   wireguard_client_templates = local.components.wireguard_client.templates
   wireguard_client_hosts = {
@@ -213,7 +203,7 @@ module "external-secrets" {
 
 # Write admin kubeconfig file
 resource "local_file" "kubeconfig-admin" {
-  content = templatefile("${path.module}/../templates/manifest/kubeconfig_admin.yaml.tmpl", {
+  content = templatefile(local.addon_templates.kubeconfig_admin, {
     cluster_name       = module.kubernetes-common.cluster_endpoint.cluster_name
     ca_pem             = replace(base64encode(chomp(module.kubernetes-common.cluster_endpoint.kubernetes_ca_pem)), "\n", "")
     cert_pem           = replace(base64encode(chomp(module.kubernetes-common.cluster_endpoint.kubernetes_cert_pem)), "\n", "")

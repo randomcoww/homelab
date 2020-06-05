@@ -25,17 +25,21 @@ output "templates" {
     host => [
       for template in var.kvm_templates :
       templatefile(template, {
-        hostname            = params.hostname
-        user                = var.user
-        container_images    = var.container_images
-        networks            = var.networks
-        host_network        = params.host_network
-        mtu                 = var.mtu
-        networks            = var.networks
-        domains             = var.domains
-        services            = var.services
-        matchbox_image_path = "/etc/container-save/matchbox.tar"
-        image_device        = params.image_device
+        hostname             = params.hostname
+        user                 = var.user
+        container_images     = var.container_images
+        networks             = var.networks
+        host_network         = params.host_network
+        mtu                  = var.mtu
+        networks             = var.networks
+        domains              = var.domains
+        services             = var.services
+        matchbox_image_path  = "/etc/container-save/matchbox.tar"
+        image_device         = params.image_device
+        kea_path             = "/var/lib/kea"
+        matchbox_tls_path    = "/etc/matchbox/certs"
+        matchbox_data_path   = "/etc/matchbox/data"
+        matchbox_assets_path = "/etc/matchbox/assets"
 
         vlans = [
           for k, v in var.networks :
@@ -49,13 +53,9 @@ output "templates" {
           }
         }
 
-        kea_path             = "/var/lib/kea"
-        matchbox_tls_path    = "/etc/matchbox/certs"
-        matchbox_data_path   = "/etc/matchbox/data"
-        matchbox_assets_path = "/etc/matchbox/assets"
-        tls_matchbox_ca      = replace(tls_self_signed_cert.matchbox-ca.cert_pem, "\n", "\\n")
-        tls_matchbox         = replace(tls_locally_signed_cert.matchbox[host].cert_pem, "\n", "\\n")
-        tls_matchbox_key     = replace(tls_private_key.matchbox[host].private_key_pem, "\n", "\\n")
+        tls_matchbox_ca  = replace(tls_self_signed_cert.matchbox-ca.cert_pem, "\n", "\\n")
+        tls_matchbox     = replace(tls_locally_signed_cert.matchbox[host].cert_pem, "\n", "\\n")
+        tls_matchbox_key = replace(tls_private_key.matchbox[host].private_key_pem, "\n", "\\n")
       })
     ]
   }

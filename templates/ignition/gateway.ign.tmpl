@@ -27,6 +27,9 @@ storage:
           [Match]
           Name=${host_network.store.if}
 
+          [Link]
+          MTUBytes=${mtu}
+
           [Network]
           LinkLocalAddressing=no
           DHCP=no
@@ -41,6 +44,9 @@ storage:
           [Match]
           Name=${host_network.lan.if}
 
+          [Link]
+          MTUBytes=${mtu}
+
           [Network]
           LinkLocalAddressing=no
           DHCP=no
@@ -53,6 +59,9 @@ storage:
         inline: |
           [Match]
           Name=${host_network.sync.if}
+
+          [Link]
+          MTUBytes=${mtu}
 
           [Network]
           LinkLocalAddressing=no
