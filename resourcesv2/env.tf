@@ -21,6 +21,7 @@ locals {
   s3_secrets_bucket = "randomcoww-secrets"
   s3_secrets_key    = "secrets.yaml"
 
+  templates_path = "${path.module}/../templates"
   # kubelet image is used for static pods and does not need to match the kubernetes version
   # hyperkube is used for the worker kubelet and should match the version
   container_images = {
@@ -200,7 +201,7 @@ locals {
         "desktop",
       ]
       templates = [
-        "${path.module}/../templates/ignition/ssh.ign.tmpl",
+        "${local.templates_path}/ignition/ssh.ign.tmpl",
       ]
     }
     internal_tls = {
@@ -208,14 +209,14 @@ locals {
         "desktop",
       ]
       templates = [
-        "${path.module}/../templates/ignition/internal_tls.ign.tmpl",
+        "${local.templates_path}/ignition/internal_tls.ign.tmpl",
       ]
     }
     wireguard_client = {
       nodes = [
       ]
       templates = [
-        "${path.module}/../templates/ignition/wireguard_client.ign.tmpl",
+        "${local.templates_path}/ignition/wireguard_client.ign.tmpl",
       ]
     }
     gateway = {
@@ -224,10 +225,10 @@ locals {
         "gateway-1",
       ]
       templates = [
-        "${path.module}/../templates/ignition/gateway.ign.tmpl",
-        "${path.module}/../templates/ignition/base.ign.tmpl",
-        "${path.module}/../templates/ignition/containerd.ign.tmpl",
-        "${path.module}/../templates/ignition/user.ign.tmpl",
+        "${local.templates_path}/ignition/gateway.ign.tmpl",
+        "${local.templates_path}/ignition/base.ign.tmpl",
+        "${local.templates_path}/ignition/containerd.ign.tmpl",
+        "${local.templates_path}/ignition/user.ign.tmpl",
       ]
     }
     controller = {
@@ -237,10 +238,10 @@ locals {
         "controller-2",
       ]
       templates = [
-        "${path.module}/../templates/ignition/controller.ign.tmpl",
-        "${path.module}/../templates/ignition/base.ign.tmpl",
-        "${path.module}/../templates/ignition/containerd.ign.tmpl",
-        "${path.module}/../templates/ignition/user.ign.tmpl",
+        "${local.templates_path}/ignition/controller.ign.tmpl",
+        "${local.templates_path}/ignition/base.ign.tmpl",
+        "${local.templates_path}/ignition/containerd.ign.tmpl",
+        "${local.templates_path}/ignition/user.ign.tmpl",
       ]
     }
     worker = {
@@ -249,11 +250,11 @@ locals {
         "worker-1",
       ]
       templates = [
-        "${path.module}/../templates/ignition/worker.ign.tmpl",
-        "${path.module}/../templates/ignition/base.ign.tmpl",
-        "${path.module}/../templates/ignition/storage.ign.tmpl",
-        "${path.module}/../templates/ignition/containerd.ign.tmpl",
-        "${path.module}/../templates/ignition/user.ign.tmpl",
+        "${local.templates_path}/ignition/worker.ign.tmpl",
+        "${local.templates_path}/ignition/base.ign.tmpl",
+        "${local.templates_path}/ignition/storage.ign.tmpl",
+        "${local.templates_path}/ignition/containerd.ign.tmpl",
+        "${local.templates_path}/ignition/user.ign.tmpl",
       ]
     }
     test = {
@@ -261,11 +262,11 @@ locals {
         "test-0"
       ]
       templates = [
-        "${path.module}/../templates/ignition/test.ign.tmpl",
-        "${path.module}/../templates/ignition/base.ign.tmpl",
-        "${path.module}/../templates/ignition/storage.ign.tmpl",
-        "${path.module}/../templates/ignition/containerd.ign.tmpl",
-        "${path.module}/../templates/ignition/user.ign.tmpl",
+        "${local.templates_path}/ignition/test.ign.tmpl",
+        "${local.templates_path}/ignition/base.ign.tmpl",
+        "${local.templates_path}/ignition/storage.ign.tmpl",
+        "${local.templates_path}/ignition/containerd.ign.tmpl",
+        "${local.templates_path}/ignition/user.ign.tmpl",
       ]
     }
     kvm = {
@@ -274,10 +275,10 @@ locals {
         "kvm-1",
       ]
       templates = [
-        "${path.module}/../templates/ignition/kvm.ign.tmpl",
-        "${path.module}/../templates/ignition/vlan_network.ign.tmpl",
-        "${path.module}/../templates/ignition/base.ign.tmpl",
-        "${path.module}/../templates/ignition/user.ign.tmpl",
+        "${local.templates_path}/ignition/kvm.ign.tmpl",
+        "${local.templates_path}/ignition/vlan_network.ign.tmpl",
+        "${local.templates_path}/ignition/base.ign.tmpl",
+        "${local.templates_path}/ignition/user.ign.tmpl",
       ]
     }
     desktop = {
@@ -285,25 +286,25 @@ locals {
         "desktop",
       ]
       templates = [
-        "${path.module}/../templates/ignition/desktop.ign.tmpl",
-        "${path.module}/../templates/ignition/vlan_network.ign.tmpl",
-        "${path.module}/../templates/ignition/base.ign.tmpl",
-        "${path.module}/../templates/ignition/storage.ign.tmpl",
-        "${path.module}/../templates/ignition/user.ign.tmpl",
+        "${local.templates_path}/ignition/desktop.ign.tmpl",
+        "${local.templates_path}/ignition/vlan_network.ign.tmpl",
+        "${local.templates_path}/ignition/base.ign.tmpl",
+        "${local.templates_path}/ignition/storage.ign.tmpl",
+        "${local.templates_path}/ignition/user.ign.tmpl",
       ]
     }
   }
 
   addon_templates = {
-    bootstrap        = "${path.module}/../templates/manifest/bootstrap.yaml.tmpl"
-    kube-proxy       = "${path.module}/../templates/manifest/kube_proxy.yaml.tmpl"
-    kapprover        = "${path.module}/../templates/manifest/kapprover.yaml.tmpl"
-    flannel          = "${path.module}/../templates/manifest/flannel.yaml.tmpl"
-    coredns          = "${path.module}/../templates/manifest/coredns.yaml.tmpl"
-    secret           = "${path.module}/../templates/manifest/secret.yaml.tmpl"
-    loki             = "${path.module}/../templates/manifest/loki.yaml.tmpl"
-    metallb_network  = "${path.module}/../templates/manifest/metallb_network.yaml.tmpl"
-    kubeconfig_admin = "${path.module}/../templates/manifest/kubeconfig_admin.yaml.tmpl"
+    bootstrap        = "${local.templates_path}/manifest/bootstrap.yaml.tmpl"
+    kube-proxy       = "${local.templates_path}/manifest/kube_proxy.yaml.tmpl"
+    kapprover        = "${local.templates_path}/manifest/kapprover.yaml.tmpl"
+    flannel          = "${local.templates_path}/manifest/flannel.yaml.tmpl"
+    coredns          = "${local.templates_path}/manifest/coredns.yaml.tmpl"
+    secret           = "${local.templates_path}/manifest/secret.yaml.tmpl"
+    loki             = "${local.templates_path}/manifest/loki.yaml.tmpl"
+    metallb_network  = "${local.templates_path}/manifest/metallb_network.yaml.tmpl"
+    kubeconfig_admin = "${local.templates_path}/manifest/kubeconfig_admin.yaml.tmpl"
   }
 
   hosts = {
