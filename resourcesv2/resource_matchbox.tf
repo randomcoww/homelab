@@ -12,7 +12,8 @@ module "ignition-kvm-0" {
         lookup(module.kubernetes-common.templates, h, []),
         lookup(module.gateway-common.templates, h, []),
         lookup(module.test-common.templates, h, []),
-        lookup(module.ssh-common.templates, h, [])
+        lookup(module.ssh-common.templates, h, []),
+        lookup(module.secrets.templates, h, []),
       ])
       selector = lookup(local.host_network_by_type[h], "int", {})
     }
@@ -35,7 +36,8 @@ module "ignition-kvm-1" {
         lookup(module.kubernetes-common.templates, h, []),
         lookup(module.gateway-common.templates, h, []),
         lookup(module.test-common.templates, h, []),
-        lookup(module.ssh-common.templates, h, [])
+        lookup(module.ssh-common.templates, h, []),
+        lookup(module.secrets.templates, h, []),
       ])
       selector = lookup(local.host_network_by_type[h], "int", {})
     }
@@ -53,12 +55,9 @@ module "ignition-local" {
   source = "../modulesv2/ignition_local"
 
   ignition_params = {
-    for h in keys(local.hosts) :
+    for h in local.local_renderer_hosts_include :
     h => {
       templates = flatten([
-        lookup(module.kubernetes-common.templates, h, []),
-        lookup(module.gateway-common.templates, h, []),
-        lookup(module.test-common.templates, h, []),
         lookup(module.kvm-common.templates, h, []),
         lookup(module.desktop-common.templates, h, []),
         lookup(module.ssh-common.templates, h, []),
@@ -77,6 +76,8 @@ module "generic-manifest-local" {
     module.gateway-common.addons,
     module.kubernetes-common.addons,
     module.secrets.addons,
+    module.ssh-common.addons,
+    module.test-common.addons,
   )
 
   renderer = local.local_renderer

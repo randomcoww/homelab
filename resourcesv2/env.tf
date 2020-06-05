@@ -653,6 +653,15 @@ locals {
     }
   }
 
+  # similar to guests filter
+  # control which configs are rendered on local matchbox
+  local_renderer_hosts_include = [
+    "kvm-0",
+    "kvm-1",
+    # password bcrypt included with desktop causes all ignition configs to get regerated each run
+    "desktop",
+  ]
+
   host_network_by_type = {
     for k in keys(local.hosts) :
     k => {
