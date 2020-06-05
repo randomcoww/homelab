@@ -173,11 +173,9 @@ storage:
           global_defs {
             vrrp_version 3
             vrrp_iptables
-            nftables keepalived
-            dynamic_interfaces
+            dynamic_interfaces allow_if_changes
           }
           vrrp_instance VI_kube-master_store {
-            no_accept
             nopreempt
             state BACKUP
             strict_mode off

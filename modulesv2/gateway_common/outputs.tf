@@ -27,7 +27,8 @@ output "templates" {
         slave_default_route_priority  = 32780
         master_default_route_table    = 250
         master_default_route_priority = 32770
-        vrrp_id                       = 247
+        vrrp_gateway_id               = 55
+        vrrp_dns_id                   = 56
 
         kea_ha_peers = jsonencode([
           for k, v in var.gateway_hosts :

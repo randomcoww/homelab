@@ -127,14 +127,13 @@ storage:
           global_defs {
             vrrp_version 3
             vrrp_iptables
-            nftables keepalived
-            dynamic_interfaces
+            dynamic_interfaces allow_if_changes
           }
           vrrp_instance VI_gateway {
             nopreempt
             state BACKUP
             strict_mode off
-            virtual_router_id ${vrrp_id}
+            virtual_router_id ${vrrp_gateway_id}
             interface ${host_network.sync.if}
             priority 100
             virtual_ipaddress {
@@ -143,7 +142,6 @@ storage:
               ${v.router} dev ${host_network[k].if}
               %{~ endif ~}
               %{~ endfor ~}
-              ${services.recursive_dns.vip} dev ${host_network.store.if}
             }
             virtual_rules {
               to all lookup ${master_default_route_table} priority ${master_default_route_priority}
@@ -448,6 +446,27 @@ storage:
                     namespace:
                     container_name:
 
+    - path: ${pod_mount_path}/keepalived/keepalived.conf
+      mode: 0644
+      contents:
+        inline: |-
+          global_defs {
+            vrrp_version 3
+            vrrp_iptables
+            dynamic_interfaces allow_if_changes
+          }
+          vrrp_instance VI_dns_store {
+            nopreempt
+            state BACKUP
+            strict_mode off
+            virtual_router_id ${vrrp_dns_id}
+            interface ${host_network.store.if}
+            priority 100
+            virtual_ipaddress {
+              ${services.recursive_dns.vip}
+            }
+          }
+
     ##
     ## pod manifests
     ##
@@ -539,10 +558,33 @@ storage:
               - name: config-coredns
                 mountPath: /etc/coredns/Corefile
                 readOnly: true
+            - name: keepalived
+              image: ${container_images.keepalived}
+              securityContext:
+                capabilities:
+                  add:
+                  - NET_ADMIN
+              args: [ "-P", "-D", "-f", "/etc/keepalived/keepalived.conf" ]
+              livenessProbe:
+                httpGet:
+                  path: /health
+                  port: 8080
+                  scheme: HTTP
+                initialDelaySeconds: 15
+                timeoutSeconds: 5
+                successThreshold: 1
+                failureThreshold: 5
+              volumeMounts:
+              - name: config-keepalived
+                mountPath: /etc/keepalived/keepalived.conf
+                readOnly: true
             volumes:
             - name: config-coredns
               hostPath:
                 path: ${pod_mount_path}/coredns/Corefile
+            - name: config-keepalived
+              hostPath:
+                path: ${pod_mount_path}/keepalived/keepalived.conf
 
     - path: ${kubelet_path}/manifests/conntrackd.yaml
       mode: 0644
