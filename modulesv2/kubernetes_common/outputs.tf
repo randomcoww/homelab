@@ -23,7 +23,7 @@ output "templates" {
         services                 = var.services
         etcd_cluster_token       = var.cluster_name
         s3_etcd_backup_path      = "${var.s3_etcd_backup_bucket}/${var.cluster_name}"
-        aws_region               = var.s3_backup_aws_region
+        aws_region               = var.aws_region
         aws_access_key_id        = aws_iam_access_key.s3-etcd-backup.id
         aws_secret_access_key    = aws_iam_access_key.s3-etcd-backup.secret
         etcd_local_endpoint      = "https://127.0.0.1:${var.services.etcd.ports.client}"

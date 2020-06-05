@@ -4,7 +4,7 @@ locals {
 
   # kubernetes
   kubernetes_cluster_name = "default-cluster-2005"
-  s3_backup_aws_region    = "us-west-2"
+  aws_region              = "us-west-2"
 
   # etcd backup
   s3_etcd_backup_bucket = "randomcoww-etcd-backup"

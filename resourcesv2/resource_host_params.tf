@@ -19,13 +19,13 @@ module "ssh-common" {
 module "kubernetes-common" {
   source = "../modulesv2/kubernetes_common"
 
+  aws_region            = local.aws_region
   user                  = local.user
   networks              = local.networks
   services              = local.services
   domains               = local.domains
   container_images      = local.container_images
   cluster_name          = local.kubernetes_cluster_name
-  s3_backup_aws_region  = local.s3_backup_aws_region
   s3_etcd_backup_bucket = local.s3_etcd_backup_bucket
   addon_templates       = local.addon_templates
 
@@ -157,6 +157,7 @@ resource "random_password" "grafana-password" {
 module "secrets" {
   source = "../modulesv2/secrets"
 
+  aws_region        = local.aws_region
   networks          = local.networks
   domains           = local.domains
   addon_templates   = local.addon_templates

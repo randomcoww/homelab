@@ -1,3 +1,7 @@
+variable "aws_region" {
+  type = string
+}
+
 variable "user" {
   type = string
 }
@@ -36,10 +40,6 @@ variable "controller_templates" {
 
 variable "worker_templates" {
   type = list(string)
-}
-
-variable "s3_backup_aws_region" {
-  type = string
 }
 
 variable "s3_etcd_backup_bucket" {
