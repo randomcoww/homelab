@@ -157,7 +157,7 @@ https://github.com/grafana/loki/tree/master/production/helm
 ```
 helm repo add loki https://grafana.github.io/loki/charts
 
-helm template loki loki/loki
+helm template loki --namespace=monitoring loki/loki
 ```
 
 Currently the PSP `requiredDropCapabilities` causes pod to crashloop:
