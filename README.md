@@ -141,16 +141,18 @@ kubectl apply -f http://127.0.0.1:8080/generic?manifest=kube-proxy
 kubectl apply -f http://127.0.0.1:8080/generic?manifest=flannel
 kubectl apply -f http://127.0.0.1:8080/generic?manifest=kapprover
 kubectl apply -f http://127.0.0.1:8080/generic?manifest=coredns
-kubectl apply -f https://raw.githubusercontent.com/google/metallb/v0.8.3/manifests/metallb.yaml
-kubectl apply -f http://127.0.0.1:8080/generic?manifest=metallb
+kubectl apply -f http://127.0.0.1:8080/generic?manifest=metallb-network
 kubectl apply -f http://127.0.0.1:8080/generic?manifest=internal-tls-secret
 kubectl apply -f http://127.0.0.1:8080/generic?manifest=minio-auth-secret
 kubectl apply -f http://127.0.0.1:8080/generic?manifest=grafana-auth-secret
 kubectl apply -f http://127.0.0.1:8080/generic?manifest=wireguard-client-secret
-kubectl apply -f http://127.0.0.1:8080/generic?manifest=loki
 ```
 
 ### Deploy services on Kubernetes
+
+Deploy MetalLb:
+
+https://metallb.universe.tf/installation/#installation-by-manifest
 
 Deploy [OpenEBS](https://www.openebs.io/):
 
@@ -174,54 +176,6 @@ helm template openebs \
   --set helper.imageTag=1.9.0 \
   --set policies.monitoring.imageTag=1.9.0 \
    stable/openebs
-```
-
-A PSP was needed on the default SA for provisioner pods to run:
-```
-apiVersion: policy/v1beta1
-kind: PodSecurityPolicy
-metadata:
-  name: openebs-provisioner-psp
-  namespace: openebs
-spec:
-  privileged: true
-  volumes: ['*']
-  runAsUser:
-    rule: 'RunAsAny'
-  seLinux:
-    rule: 'RunAsAny'
-  supplementalGroups:
-    rule: 'RunAsAny'
-  fsGroup:
-    rule: 'RunAsAny'
-
----
-apiVersion: rbac.authorization.k8s.io/v1
-kind: ClusterRole
-metadata:
-  labels:
-    kubernetes.io/bootstrapping: rbac-defaults
-    addonmanager.kubernetes.io/mode: Reconcile
-  name: openebs-provisioner-psp
-rules:
-- apiGroups: ["extensions"]
-  resources: ["podsecuritypolicies"]
-  verbs:     ["use"]
-  resourceNames: ["openebs-provisioner-psp"]
-
----
-kind: ClusterRoleBinding
-apiVersion: rbac.authorization.k8s.io/v1beta1
-metadata:
-  name: openebs-provisioner-psp
-subjects:
-  - kind: ServiceAccount
-    name: default
-    namespace: openebs
-roleRef:
-  kind: ClusterRole
-  name: openebs-provisioner-psp
-  apiGroup: rbac.authorization.k8s.io
 ```
 
 Deploy [Traefik](https://traefik.io/) ingress:
