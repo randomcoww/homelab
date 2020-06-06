@@ -5,13 +5,30 @@ metadata:
   namespace: ${namespace}
 
 ---
+apiVersion: policy/v1beta1
+kind: PodSecurityPolicy
+metadata:
+  name: kapprover-psp
+  namespace: ${namespace}
+spec:
+  volumes: ['secret']
+  runAsUser:
+    rule: 'RunAsAny'
+  seLinux:
+    rule: 'RunAsAny'
+  supplementalGroups:
+    rule: 'RunAsAny'
+  fsGroup:
+    rule: 'RunAsAny'
+
+---
 apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRole
 metadata:
   name: kubelet-approver
 rules:
 - apiGroups: ["certificates.k8s.io"]
-  resources: ["certificatesigningrequests" ]
+  resources: ["certificatesigningrequests"]
   verbs: ["get", "list", "delete", "watch"]
 - apiGroups: ["certificates.k8s.io"]
   resources: ["certificatesigningrequests/approval"]
@@ -20,6 +37,10 @@ rules:
   resources: ["signers"]
   resourceNames: ["kubernetes.io/kubelet-serving"]
   verbs: ["approve"]
+- apiGroups: ["extensions"]
+  resources: ["podsecuritypolicies"]
+  verbs: ["use"]
+  resourceNames: ["kapprover-psp"]
 
 ---
 kind: ClusterRoleBinding

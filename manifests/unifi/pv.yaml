@@ -3,6 +3,7 @@ kind: StoragePool
 metadata:
   name: unifi
   type: hostdir
+  namespace: default
 spec:
   path: "/var/pv/unifi"
 
@@ -11,6 +12,7 @@ apiVersion: storage.k8s.io/v1
 kind: StorageClass
 metadata:
   name: openebs-unifi
+  namespace: default
   annotations:
     openebs.io/cas-type: jiva
     cas.openebs.io/config: |
@@ -25,6 +27,7 @@ kind: PersistentVolumeClaim
 apiVersion: v1
 metadata:
   name: unifi-pvc
+  namespace: default
 spec:
   storageClassName: openebs-unifi
   accessModes:
