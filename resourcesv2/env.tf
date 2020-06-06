@@ -217,6 +217,18 @@ locals {
         "${local.templates_path}/ignition/wireguard_client.ign.tmpl",
       ]
     }
+    static_pod_logging = {
+      nodes = [
+        "gateway-0",
+        "gateway-1",
+        "controller-0",
+        "controller-1",
+        "controller-2",
+      ]
+      templates = [
+        "${local.templates_path}/ignition/static_pod_logging.ign.tmpl",
+      ]
+    }
     gateway = {
       nodes = [
         "gateway-0",
@@ -302,6 +314,7 @@ locals {
     secret           = "${local.templates_path}/manifest/secret.yaml.tmpl"
     metallb-network  = "${local.templates_path}/manifest/metallb_network.yaml.tmpl"
     kubeconfig-admin = "${local.templates_path}/manifest/kubeconfig_admin.yaml.tmpl"
+    loki-lb-service  = "${local.templates_path}/manifest/loki_lb_service.yaml.tmpl"
   }
 
   hosts = {

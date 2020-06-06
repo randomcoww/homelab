@@ -14,6 +14,7 @@ module "ignition-kvm-0" {
         lookup(module.test-common.templates, h, []),
         lookup(module.ssh-common.templates, h, []),
         lookup(module.secrets.templates, h, []),
+        lookup(module.static-pod-logging.templates, h, []),
       ])
       selector = lookup(local.host_network_by_type[h], "int", {})
     }
@@ -38,6 +39,7 @@ module "ignition-kvm-1" {
         lookup(module.test-common.templates, h, []),
         lookup(module.ssh-common.templates, h, []),
         lookup(module.secrets.templates, h, []),
+        lookup(module.static-pod-logging.templates, h, []),
       ])
       selector = lookup(local.host_network_by_type[h], "int", {})
     }
@@ -77,6 +79,7 @@ module "generic-manifest-local" {
     module.kubernetes-common.addons,
     module.secrets.addons,
     module.ssh-common.addons,
+    module.static-pod-logging.addons,
     module.test-common.addons,
   )
 

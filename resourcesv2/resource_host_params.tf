@@ -202,6 +202,23 @@ module "secrets" {
   }
 }
 
+module "static-pod-logging" {
+  source = "../modulesv2/static_pod_logging"
+
+  services         = local.services
+  container_images = local.container_images
+  addon_templates  = local.addon_templates
+
+  static_pod_logging_templates = local.components.static_pod_logging.templates
+  static_pod_logging_hosts = {
+    for k in local.components.static_pod_logging.nodes :
+    k => merge(local.hosts[k], {
+      hostname     = join(".", [k, local.domains.mdns])
+      host_network = local.host_network_by_type[k]
+    })
+  }
+}
+
 # Write admin kubeconfig file
 resource "local_file" "kubeconfig-admin" {
   content = templatefile(local.addon_templates.kubeconfig-admin, {
