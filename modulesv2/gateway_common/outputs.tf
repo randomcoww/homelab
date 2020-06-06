@@ -46,7 +46,7 @@ output "templates" {
 output "addons" {
   value = {
     ## Metallb network
-    metallb-network = templatefile(var.addon_templates.metallb_network, {
+    metallb-network = templatefile(var.addon_templates.metallb-network, {
       loadbalancer_pools = var.loadbalancer_pools
     })
   }

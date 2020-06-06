@@ -44,8 +44,6 @@ locals {
     conntrackd              = "docker.io/randomcoww/conntrackd:latest"
     promtail                = "docker.io/randomcoww/promtail:v1.4.1"
     matchbox                = "quay.io/poseidon/matchbox:latest"
-    loki                    = "docker.io/grafana/loki:latest"
-    wireguard               = "docker.io/randomcoww/wireguard:latest"
   }
 
   kernel_image = "images/vmlinuz"
@@ -302,9 +300,8 @@ locals {
     flannel          = "${local.templates_path}/manifest/flannel.yaml.tmpl"
     coredns          = "${local.templates_path}/manifest/coredns.yaml.tmpl"
     secret           = "${local.templates_path}/manifest/secret.yaml.tmpl"
-    loki             = "${local.templates_path}/manifest/loki.yaml.tmpl"
-    metallb_network  = "${local.templates_path}/manifest/metallb_network.yaml.tmpl"
-    kubeconfig_admin = "${local.templates_path}/manifest/kubeconfig_admin.yaml.tmpl"
+    metallb-network  = "${local.templates_path}/manifest/metallb_network.yaml.tmpl"
+    kubeconfig-admin = "${local.templates_path}/manifest/kubeconfig_admin.yaml.tmpl"
   }
 
   hosts = {
