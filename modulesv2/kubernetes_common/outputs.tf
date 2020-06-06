@@ -86,34 +86,20 @@ output "templates" {
 }
 
 output "addons" {
-  value = merge(
-    {
-      for k in [
-        "loki",
-      ] :
-      k => templatefile(var.addon_templates[k], {
-        namespace        = "default"
-        container_images = var.container_images
-        services         = var.services
-        networks         = var.networks
-        domains          = var.domains
-      })
-    },
-    {
-      for k in [
-        "kube-proxy",
-        "kapprover",
-        "flannel",
-        "coredns",
-        "bootstrap",
-      ] :
-      k => templatefile(var.addon_templates[k], {
-        namespace        = "kube-system"
-        container_images = var.container_images
-        services         = var.services
-        networks         = var.networks
-        domains          = var.domains
-      })
-    }
-  )
+  value = {
+    for k in [
+      "kube-proxy",
+      "kapprover",
+      "flannel",
+      "coredns",
+      "bootstrap",
+    ] :
+    k => templatefile(var.addon_templates[k], {
+      namespace        = "kube-system"
+      container_images = var.container_images
+      services         = var.services
+      networks         = var.networks
+      domains          = var.domains
+    })
+  }
 }

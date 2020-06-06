@@ -150,13 +150,31 @@ kubectl apply -f http://127.0.0.1:8080/generic?manifest=wireguard-client-secret
 
 ### Deploy services on Kubernetes
 
-Deploy MetalLb:
+#### Loki
+
+https://github.com/grafana/loki/tree/master/production/helm
+
+```
+helm repo add loki https://grafana.github.io/loki/charts
+
+helm template loki loki/loki
+```
+
+Currently the PSP `requiredDropCapabilities` causes pod to crashloop:
+```
+---
+# Source: loki/templates/podsecuritypolicy.yaml
+  ...
+  requiredDropCapabilities:
+    - ALL
+```
+
+#### MetalLb
 
 https://metallb.universe.tf/installation/#installation-by-manifest
 
-Deploy [OpenEBS](https://www.openebs.io/):
+#### [OpenEBS](https://www.openebs.io/)
 
-Template from helm v3:
 ```
 helm repo add stable https://kubernetes-charts.storage.googleapis.com
 
@@ -182,29 +200,26 @@ helm template openebs \
 kubectl apply -f manifests/openebs_psp.yaml
 ```
 
-Deploy [Minio](https://min.io/) storage controller:
-
-https://minio.fuzzybunny.internal
+#### Traefik
 
 ```
-cd reqourcesv2/manifests
-kubectl apply -f minio.yaml
+kubectl apply -f manifests/traefik.yaml
 ```
 
-Deploy MPD:
-
-https://stream.fuzzybunny.internal
+#### [Minio](https://min.io/) storage controller
 
 ```
-cd reqourcesv2/manifests
-kubectl apply -f mpd/
+kubectl apply -f manifests/minio.yaml
 ```
 
-Deploy Transmission:
-
-https://tr.fuzzybunny.internal
+#### MPD
 
 ```
-cd reqourcesv2/manifests
-kubectl apply -f transmission/
+kubectl apply -f manifests/mpd/
+```
+
+#### Transmission
+
+```
+kubectl apply -f manifests/transmission/
 ```
