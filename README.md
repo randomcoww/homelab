@@ -175,7 +175,7 @@ helm template openebs \
   --set jiva.imageTag=1.9.0 \
   --set helper.imageTag=1.9.0 \
   --set policies.monitoring.imageTag=1.9.0 \
-   stable/openebs
+  stable/openebs
 ```
 
 Deploy [Traefik](https://traefik.io/) ingress:
