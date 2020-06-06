@@ -196,7 +196,10 @@ helm template openebs \
   --set helper.imageTag=1.9.0 \
   --set policies.monitoring.imageTag=1.9.0 \
   stable/openebs
+```
 
+Currently additional PSP is needed for Jiva PVC pods to run:
+```
 kubectl apply -f manifests/openebs_psp.yaml
 ```
 
