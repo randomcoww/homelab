@@ -158,6 +158,8 @@ Deploy [OpenEBS](https://www.openebs.io/):
 
 Template from helm v3:
 ```
+helm repo add stable https://kubernetes-charts.storage.googleapis.com
+
 helm template openebs \
   --namespace openebs \
   --set rbac.pspEnabled=true \
@@ -176,24 +178,6 @@ helm template openebs \
   --set helper.imageTag=1.9.0 \
   --set policies.monitoring.imageTag=1.9.0 \
   stable/openebs
-```
-
-Deploy [Traefik](https://traefik.io/) ingress:
-
-https://traefik-ui.fuzzybunny.internal
-
-```
-cd reqourcesv2/manifests
-kubectl apply -f traefik.yaml
-```
-
-Deploy monitoring:
-
-https://grafana.fuzzybunny.internal
-
-```
-cd reqourcesv2/manifests
-kubectl apply -f grafana/
 ```
 
 Deploy [Minio](https://min.io/) storage controller:
