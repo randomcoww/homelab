@@ -154,11 +154,74 @@ kubectl apply -f http://127.0.0.1:8080/generic?manifest=loki
 
 Deploy [OpenEBS](https://www.openebs.io/):
 
-Only Jiva is used (I don't have enough disks to dedicate to cStor). This is the same as https://openebs.github.io/charts/openebs-operator-1.6.0.yaml with some unused components removed.
-
+Template from helm v3:
 ```
-cd reqourcesv2/manifests
-kubectl apply -f openebs-operator.yaml
+helm template openebs \
+  --namespace openebs \
+  --set rbac.pspEnabled=true \
+  --set ndm.enabled=false \
+  --set ndmOperator.enabled=false \
+  --set localprovisioner.enabled=false \
+  --set analytics.enabled=false \
+  --set defaultStorageConfig.enabled=false \
+  --set snapshotOperator.enabled=false \
+  --set apiserver.imageTag=1.9.0 \
+  --set provisioner.imageTag=1.9.0 \
+  --set webhook.imageTag=1.9.0 \
+  --set snapshotOperator.provisioner.imageTag=1.9.0 \
+  --set snapshotOperator.controller.imageTag=1.9.0 \
+  --set jiva.imageTag=1.9.0 \
+  --set helper.imageTag=1.9.0 \
+  --set policies.monitoring.imageTag=1.9.0 \
+   stable/openebs
+```
+
+A PSP was needed on the default SA for provisioner pods to run:
+```
+apiVersion: policy/v1beta1
+kind: PodSecurityPolicy
+metadata:
+  name: openebs-provisioner-psp
+  namespace: openebs
+spec:
+  privileged: true
+  volumes: ['*']
+  runAsUser:
+    rule: 'RunAsAny'
+  seLinux:
+    rule: 'RunAsAny'
+  supplementalGroups:
+    rule: 'RunAsAny'
+  fsGroup:
+    rule: 'RunAsAny'
+
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  labels:
+    kubernetes.io/bootstrapping: rbac-defaults
+    addonmanager.kubernetes.io/mode: Reconcile
+  name: openebs-provisioner-psp
+rules:
+- apiGroups: ["extensions"]
+  resources: ["podsecuritypolicies"]
+  verbs:     ["use"]
+  resourceNames: ["openebs-provisioner-psp"]
+
+---
+kind: ClusterRoleBinding
+apiVersion: rbac.authorization.k8s.io/v1beta1
+metadata:
+  name: openebs-provisioner-psp
+subjects:
+  - kind: ServiceAccount
+    name: default
+    namespace: openebs
+roleRef:
+  kind: ClusterRole
+  name: openebs-provisioner-psp
+  apiGroup: rbac.authorization.k8s.io
 ```
 
 Deploy [Traefik](https://traefik.io/) ingress:
