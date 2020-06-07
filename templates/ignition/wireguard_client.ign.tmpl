@@ -36,6 +36,7 @@ storage:
           RequiredForOnline=no
 
           [Network]
+          DefaultRouteOnDevice=yes
           %{~ for k in split(",", wireguard_secret.Interface.Address) ~}
           Address=${trimspace(k)}
           %{~ endfor ~}

@@ -212,7 +212,6 @@ locals {
     }
     wireguard_client = {
       nodes = [
-        "desktop",
       ]
       templates = [
         "${local.templates_path}/ignition/wireguard_client.ign.tmpl",
