@@ -49,12 +49,12 @@ storage:
       contents:
         inline:
           ${hostname}
-    - path: /etc/systemd/network/10-${host_network.store.if}.network
+    - path: /etc/systemd/network/10-${host_network.main.if}.network
       mode: 0644
       contents:
         inline: |
           [Match]
-          Name=${host_network.store.if}
+          Name=${host_network.main.if}
 
           [DHCP]
           UseMTU=yes

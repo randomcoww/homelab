@@ -20,6 +20,7 @@ module "libvirt-kvm-0" {
         k
         if lookup(k, "source", null) != null && lookup(k, "target", null) != null
       ]
+      libvirt_template = local.hosts[host].libvirt_template
     }
   }
 }
@@ -42,6 +43,7 @@ module "libvirt-kvm-1" {
         k
         if lookup(k, "source", null) != null && lookup(k, "target", null) != null
       ]
+      libvirt_template = local.hosts[host].libvirt_template
     }
   }
 }

@@ -22,7 +22,7 @@ resource "sshca_host_cert" "ssh-host" {
   validity_period_hours = 8760
   valid_principals = compact([
     each.value.hostname,
-    lookup(each.value.host_network.store, "ip", null),
+    lookup(each.value.host_network.main, "ip", null),
     "127.0.0.1",
   ])
 }

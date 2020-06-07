@@ -131,13 +131,13 @@ locals {
 
   networks = {
     # vlans
-    store = {
+    main = {
       id        = 1
       network   = "192.168.126.0"
       cidr      = 23
       router    = "192.168.126.240"
       dhcp_pool = "192.168.127.64/26"
-      br_if     = "en-store"
+      br_if     = "en-main"
     }
     lan = {
       id        = 90
@@ -324,7 +324,7 @@ locals {
       vcpu   = 1
       network = [
         {
-          network = "store"
+          network = "main"
           ip      = "192.168.127.217"
           if      = "eth0"
         },
@@ -350,14 +350,15 @@ locals {
           bootorder = 1
         }
       ]
-      kea_ha_role = "primary"
+      kea_ha_role      = "primary"
+      libvirt_template = "${local.templates_path}/libvirt/container_linux.xml.tmpl"
     }
     gateway-1 = {
       memory = 3
       vcpu   = 1
       network = [
         {
-          network = "store"
+          network = "main"
           ip      = "192.168.127.218"
           if      = "eth0"
         },
@@ -383,7 +384,8 @@ locals {
           bootorder = 1
         }
       ]
-      kea_ha_role = "standby"
+      kea_ha_role      = "standby"
+      libvirt_template = "${local.templates_path}/libvirt/container_linux.xml.tmpl"
     }
 
     # controllers
@@ -392,7 +394,7 @@ locals {
       vcpu   = 2
       network = [
         {
-          network = "store"
+          network = "main"
           ip      = "192.168.127.219"
           if      = "eth0"
         },
@@ -403,13 +405,14 @@ locals {
           bootorder = 1
         }
       ]
+      libvirt_template = "${local.templates_path}/libvirt/container_linux.xml.tmpl"
     }
     controller-1 = {
       memory = 4
       vcpu   = 2
       network = [
         {
-          network = "store"
+          network = "main"
           ip      = "192.168.127.220"
           if      = "eth0"
         },
@@ -420,13 +423,14 @@ locals {
           bootorder = 1
         }
       ]
+      libvirt_template = "${local.templates_path}/libvirt/container_linux.xml.tmpl"
     }
     controller-2 = {
       memory = 4
       vcpu   = 2
       network = [
         {
-          network = "store"
+          network = "main"
           ip      = "192.168.127.221"
           if      = "eth0"
         },
@@ -437,6 +441,7 @@ locals {
           bootorder = 1
         }
       ]
+      libvirt_template = "${local.templates_path}/libvirt/container_linux.xml.tmpl"
     }
 
     # workers
@@ -445,7 +450,7 @@ locals {
       vcpu   = 4
       network = [
         {
-          network = "store"
+          network = "main"
           if      = "eth0"
         },
         {
@@ -536,13 +541,14 @@ locals {
           mount_path = "/var/pv"
         },
       ]
+      libvirt_template = "${local.templates_path}/libvirt/container_linux.xml.tmpl"
     }
     worker-1 = {
       memory = 48
       vcpu   = 4
       network = [
         {
-          network = "store"
+          network = "main"
           if      = "eth0"
         },
         {
@@ -573,6 +579,7 @@ locals {
           mount_path = "/var/pv"
         }
       ]
+      libvirt_template = "${local.templates_path}/libvirt/container_linux.xml.tmpl"
     }
 
     # Test instances
@@ -581,7 +588,7 @@ locals {
       vcpu   = 2
       network = [
         {
-          network = "store"
+          network = "main"
           if      = "eth0"
         },
         {
@@ -593,6 +600,7 @@ locals {
       ]
       disk = [
       ]
+      libvirt_template = "${local.templates_path}/libvirt/container_linux.xml.tmpl"
     }
 
     # KVM
@@ -603,7 +611,7 @@ locals {
           mac   = "00-1b-21-bc-4c-16"
         },
         {
-          network = "store"
+          network = "main"
           ip      = "192.168.127.251"
         }
       ]
@@ -624,7 +632,7 @@ locals {
           mac   = "00-1b-21-bc-67-c6"
         },
         {
-          network = "store"
+          network = "main"
           ip      = "192.168.127.252"
         }
       ]
@@ -648,7 +656,7 @@ locals {
           mac   = "f8-f2-1e-1e-3c-40"
         },
         {
-          network = "store"
+          network = "main"
           ip      = "192.168.127.253"
         }
       ]

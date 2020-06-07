@@ -35,11 +35,11 @@ output "controller_templates" {
 
         etcd_initial_cluster = join(",", [
           for k, v in var.controller_hosts :
-          "${v.hostname}=https://${v.host_network.store.ip}:${var.services.etcd.ports.peer}"
+          "${v.hostname}=https://${v.host_network.main.ip}:${var.services.etcd.ports.peer}"
         ])
         etcd_endpoints = join(",", [
           for k, v in var.controller_hosts :
-          "https://${v.host_network.store.ip}:${var.services.etcd.ports.client}"
+          "https://${v.host_network.main.ip}:${var.services.etcd.ports.client}"
         ])
 
         tls_kubernetes_ca          = replace(tls_self_signed_cert.kubernetes-ca.cert_pem, "\n", "\\n")

@@ -3,12 +3,12 @@ variant: fcos
 version: 1.0.0
 storage:
   files:
-    - path: /etc/systemd/network/10-${host_network.store.if}.network
+    - path: /etc/systemd/network/10-${host_network.main.if}.network
       mode: 0644
       contents:
         inline: |
           [Match]
-          Name=${host_network.store.if}
+          Name=${host_network.main.if}
 
           [DHCP]
           UseMTU=yes
@@ -19,7 +19,7 @@ storage:
           MulticastDNS=yes
 
           [Address]
-          Address=${host_network.store.ip}/${networks.store.cidr}
+          Address=${host_network.main.ip}/${networks.main.cidr}
     - path: /etc/systemd/network/10-${host_network.int.if}.network
       mode: 0644
       contents:
@@ -175,12 +175,12 @@ storage:
             vrrp_iptables
             dynamic_interfaces allow_if_changes
           }
-          vrrp_instance VI_kube-master_store {
+          vrrp_instance VI_kube-master_main {
             nopreempt
             state BACKUP
             strict_mode off
             virtual_router_id ${vrrp_id}
-            interface ${host_network.store.if}
+            interface ${host_network.main.if}
             priority 100
             virtual_ipaddress {
               ${services.kubernetes_apiserver.vip}
