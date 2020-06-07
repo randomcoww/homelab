@@ -164,9 +164,9 @@ spec:
         securityContext:
           privileged: true
         volumeMounts:
-        - name: wireguard-config
+        - name: wireguard-client
           mountPath: /etc/wireguard/wg0.conf
-          subPath: wireguard-secret
+          subPath: wireguard-client
       containers:
       - name: transmission
         image: randomcoww/transmission:latest
@@ -196,9 +196,9 @@ spec:
       - name: transmission-config
         configMap:
           name: transmission-config
-      - name: wireguard-config
+      - name: wireguard-client
         secret:
-          secretName: wireguard-config
+          secretName: wireguard-client
       - name: transmission-resume
         persistentVolumeClaim:
           claimName: transmission-pvc
