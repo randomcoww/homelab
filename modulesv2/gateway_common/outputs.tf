@@ -1,8 +1,8 @@
 output "templates" {
   value = {
-    for host, params in var.gateway_hosts :
+    for host, params in var.hosts :
     host => [
-      for template in var.gateway_templates :
+      for template in var.templates :
       templatefile(template, {
         hostname                   = params.hostname
         user                       = var.user
@@ -31,7 +31,7 @@ output "templates" {
         vrrp_dns_id                   = 56
 
         kea_ha_peers = jsonencode([
-          for k, v in var.gateway_hosts :
+          for k, v in var.hosts :
           {
             name = v.hostname
             role = v.kea_ha_role

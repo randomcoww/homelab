@@ -6,8 +6,8 @@ module "ssh-common" {
   domains               = local.domains
   ssh_client_public_key = var.ssh_client_public_key
 
-  ssh_templates = local.components.ssh.templates
-  ssh_hosts = {
+  templates = local.components.ssh.templates
+  hosts = {
     for k in local.components.ssh.nodes :
     k => merge(local.hosts[k], {
       hostname     = join(".", [k, local.domains.mdns])
@@ -60,8 +60,8 @@ module "gateway-common" {
   container_images   = local.container_images
   addon_templates    = local.addon_templates
 
-  gateway_templates = local.components.gateway.templates
-  gateway_hosts = {
+  templates = local.components.gateway.templates
+  hosts = {
     for k in local.components.gateway.nodes :
     k => merge(local.hosts[k], {
       hostname     = join(".", [k, local.domains.mdns])
@@ -79,8 +79,8 @@ module "test-common" {
   domains          = local.domains
   container_images = local.container_images
 
-  test_templates = local.components.test.templates
-  test_hosts = {
+  templates = local.components.test.templates
+  hosts = {
     for k in local.components.test.nodes :
     k => merge(local.hosts[k], {
       hostname     = join(".", [k, local.domains.mdns])
@@ -99,8 +99,8 @@ module "kvm-common" {
   domains          = local.domains
   container_images = local.container_images
 
-  kvm_templates = local.components.kvm.templates
-  kvm_hosts = {
+  templates = local.components.kvm.templates
+  hosts = {
     for k in local.components.kvm.nodes :
     k => merge(local.hosts[k], {
       hostname     = join(".", [k, local.domains.mdns])
@@ -118,8 +118,8 @@ module "desktop-common" {
   networks = local.networks
   domains  = local.domains
 
-  desktop_templates = local.components.desktop.templates
-  desktop_hosts = {
+  templates = local.components.desktop.templates
+  hosts = {
     for k in local.components.desktop.nodes :
     k => merge(local.hosts[k], {
       hostname     = join(".", [k, local.domains.mdns])
@@ -209,8 +209,8 @@ module "static-pod-logging" {
   container_images = local.container_images
   addon_templates  = local.addon_templates
 
-  static_pod_logging_templates = local.components.static_pod_logging.templates
-  static_pod_logging_hosts = {
+  templates = local.components.static_pod_logging.templates
+  hosts = {
     for k in local.components.static_pod_logging.nodes :
     k => merge(local.hosts[k], {
       hostname     = join(".", [k, local.domains.mdns])

@@ -1,8 +1,8 @@
 output "templates" {
   value = {
-    for host, params in var.static_pod_logging_hosts :
+    for host, params in var.hosts :
     host => [
-      for template in var.static_pod_logging_templates :
+      for template in var.templates :
       templatefile(template, {
         hostname         = params.hostname
         services         = var.services

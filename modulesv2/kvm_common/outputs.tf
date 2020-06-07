@@ -1,6 +1,6 @@
 output "matchbox_rpc_endpoints" {
   value = {
-    for host, params in var.kvm_hosts :
+    for host, params in var.hosts :
     host => {
       endpoint        = "${params.host_network.store.ip}:${var.services.renderer.ports.rpc}"
       cert_pem        = tls_locally_signed_cert.matchbox-client.cert_pem
@@ -12,7 +12,7 @@ output "matchbox_rpc_endpoints" {
 
 output "libvirt_endpoints" {
   value = {
-    for host, params in var.kvm_hosts :
+    for host, params in var.hosts :
     host => {
       endpoint = "qemu+ssh://${var.user}@${params.host_network.store.ip}/system"
     }
@@ -21,9 +21,9 @@ output "libvirt_endpoints" {
 
 output "templates" {
   value = {
-    for host, params in var.kvm_hosts :
+    for host, params in var.hosts :
     host => [
-      for template in var.kvm_templates :
+      for template in var.templates :
       templatefile(template, {
         hostname             = params.hostname
         user                 = var.user

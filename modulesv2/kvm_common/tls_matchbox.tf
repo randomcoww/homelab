@@ -2,14 +2,14 @@
 ## matchbox
 ##
 resource "tls_private_key" "matchbox" {
-  for_each = var.kvm_hosts
+  for_each = var.hosts
 
   algorithm   = "ECDSA"
   ecdsa_curve = "P521"
 }
 
 resource "tls_cert_request" "matchbox" {
-  for_each = var.kvm_hosts
+  for_each = var.hosts
 
   key_algorithm   = tls_private_key.matchbox[each.key].algorithm
   private_key_pem = tls_private_key.matchbox[each.key].private_key_pem
@@ -30,7 +30,7 @@ resource "tls_cert_request" "matchbox" {
 }
 
 resource "tls_locally_signed_cert" "matchbox" {
-  for_each = var.kvm_hosts
+  for_each = var.hosts
 
   cert_request_pem   = tls_cert_request.matchbox[each.key].cert_request_pem
   ca_key_algorithm   = tls_private_key.matchbox-ca.algorithm

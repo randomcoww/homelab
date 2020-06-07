@@ -1,8 +1,8 @@
 output "templates" {
   value = {
-    for host, params in var.desktop_hosts :
+    for host, params in var.hosts :
     host => [
-      for template in var.desktop_templates :
+      for template in var.templates :
       templatefile(template, {
         hostname         = params.hostname
         user             = var.user

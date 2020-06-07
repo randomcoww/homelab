@@ -8,9 +8,9 @@ output "ssh_client_certificate" {
 
 output "templates" {
   value = {
-    for host, params in var.ssh_hosts :
+    for host, params in var.hosts :
     host => [
-      for template in var.ssh_templates :
+      for template in var.templates :
       templatefile(template, {
         user                  = var.user
         ssh_ca_authorized_key = tls_private_key.ssh-ca.public_key_openssh

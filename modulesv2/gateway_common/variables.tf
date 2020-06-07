@@ -26,11 +26,11 @@ variable "container_images" {
   type = map(string)
 }
 
-variable "gateway_hosts" {
+variable "hosts" {
   type = any
 }
 
-variable "gateway_templates" {
+variable "templates" {
   type = list(string)
 }
 

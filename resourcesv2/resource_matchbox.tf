@@ -9,11 +9,11 @@ module "ignition-kvm-0" {
     for h in local.hosts.kvm-0.guests :
     h => {
       templates = flatten([
-        lookup(module.kubernetes-common.templates, h, []),
+        lookup(module.kubernetes-common.controller_templates, h, []),
+        lookup(module.kubernetes-common.worker_templates, h, []),
         lookup(module.gateway-common.templates, h, []),
         lookup(module.test-common.templates, h, []),
         lookup(module.ssh-common.templates, h, []),
-        lookup(module.secrets.templates, h, []),
         lookup(module.static-pod-logging.templates, h, []),
       ])
       selector = lookup(local.host_network_by_type[h], "int", {})
@@ -34,11 +34,11 @@ module "ignition-kvm-1" {
     for h in local.hosts.kvm-1.guests :
     h => {
       templates = flatten([
-        lookup(module.kubernetes-common.templates, h, []),
+        lookup(module.kubernetes-common.controller_templates, h, []),
+        lookup(module.kubernetes-common.worker_templates, h, []),
         lookup(module.gateway-common.templates, h, []),
         lookup(module.test-common.templates, h, []),
         lookup(module.ssh-common.templates, h, []),
-        lookup(module.secrets.templates, h, []),
         lookup(module.static-pod-logging.templates, h, []),
       ])
       selector = lookup(local.host_network_by_type[h], "int", {})
@@ -63,7 +63,8 @@ module "ignition-local" {
         lookup(module.kvm-common.templates, h, []),
         lookup(module.desktop-common.templates, h, []),
         lookup(module.ssh-common.templates, h, []),
-        lookup(module.secrets.templates, h, []),
+        lookup(module.secrets.wireguard_client_templates, h, []),
+        lookup(module.secrets.internal_tls_templates, h, []),
       ])
     }
   }

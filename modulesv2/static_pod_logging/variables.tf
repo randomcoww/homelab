@@ -6,11 +6,11 @@ variable "container_images" {
   type = map(string)
 }
 
-variable "static_pod_logging_hosts" {
+variable "hosts" {
   type = any
 }
 
-variable "static_pod_logging_templates" {
+variable "templates" {
   type = list(string)
 }
 

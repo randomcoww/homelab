@@ -18,10 +18,10 @@ variable "domains" {
   type = map(string)
 }
 
-variable "desktop_hosts" {
+variable "hosts" {
   type = any
 }
 
-variable "desktop_templates" {
+variable "templates" {
   type = list(string)
 }

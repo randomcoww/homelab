@@ -22,10 +22,10 @@ variable "container_images" {
   type = map(string)
 }
 
-variable "kvm_hosts" {
+variable "hosts" {
   type = any
 }
 
-variable "kvm_templates" {
+variable "templates" {
   type = list(string)
 }

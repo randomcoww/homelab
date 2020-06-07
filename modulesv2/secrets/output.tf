@@ -2,8 +2,8 @@ locals {
   secrets = yamldecode(data.aws_s3_bucket_object.secrets.body)
 }
 
-output "templates" {
-  value = merge({
+output "wireguard_client_templates" {
+  value = {
     for host, params in var.wireguard_client_hosts :
     host => [
       for template in var.wireguard_client_templates :
@@ -12,17 +12,20 @@ output "templates" {
         wireguard_if     = "wg0"
       })
     ]
-    },
-    {
-      for host, params in var.internal_tls_hosts :
-      host => [
-        for template in var.internal_tls_templates :
-        templatefile(template, {
-          tls_internal_ca   = replace(tls_self_signed_cert.internal-ca.cert_pem, "\n", "\\n")
-          internal_tls_path = "/etc/pki/ca-trust/source/anchors"
-        })
-      ]
-  })
+  }
+}
+
+output "internal_tls_templates" {
+  value = {
+    for host, params in var.internal_tls_hosts :
+    host => [
+      for template in var.internal_tls_templates :
+      templatefile(template, {
+        tls_internal_ca   = replace(tls_self_signed_cert.internal-ca.cert_pem, "\n", "\\n")
+        internal_tls_path = "/etc/pki/ca-trust/source/anchors"
+      })
+    ]
+  }
 }
 
 output "addons" {

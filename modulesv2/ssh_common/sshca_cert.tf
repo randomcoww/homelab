@@ -4,14 +4,14 @@ resource "tls_private_key" "ssh-ca" {
 }
 
 resource "tls_private_key" "ssh-host" {
-  for_each = var.ssh_hosts
+  for_each = var.hosts
 
   algorithm   = "ECDSA"
   ecdsa_curve = "P521"
 }
 
 resource "sshca_host_cert" "ssh-host" {
-  for_each = var.ssh_hosts
+  for_each = var.hosts
 
   ca_key_algorithm   = tls_private_key.ssh-ca.algorithm
   ca_private_key_pem = tls_private_key.ssh-ca.private_key_pem

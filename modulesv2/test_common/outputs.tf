@@ -1,8 +1,8 @@
 output "templates" {
   value = {
-    for host, params in var.test_hosts :
+    for host, params in var.hosts :
     host => [
-      for template in var.test_templates :
+      for template in var.templates :
       templatefile(template, {
         hostname                   = params.hostname
         user                       = var.user

@@ -18,10 +18,10 @@ variable "container_images" {
   type = map(string)
 }
 
-variable "test_hosts" {
+variable "hosts" {
   type = any
 }
 
-variable "test_templates" {
+variable "templates" {
   type = list(string)
 }
