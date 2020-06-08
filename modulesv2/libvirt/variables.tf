@@ -2,10 +2,6 @@ variable "libvirt_endpoint" {
   type = string
 }
 
-variable "guests" {
-  type = any
-}
-
-variable "networks" {
+variable "libvirt_domains" {
   type = any
 }

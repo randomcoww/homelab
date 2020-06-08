@@ -219,6 +219,28 @@ module "static-pod-logging" {
   }
 }
 
+module "common-guests" {
+  source = "../modulesv2/common_guests"
+
+  networks = local.networks
+
+  libvirt_template = local.components.common_guests.libvirt_template
+  hosts = {
+    for k in local.components.common_guests.nodes :
+    k => merge(local.hosts[k], {
+      hostname     = join(".", [k, local.domains.mdns])
+      host_network = local.host_network_by_type[k]
+      network      = lookup(local.hosts[k], "network", [])
+      hostdev      = lookup(local.hosts[k], "hostdev", [])
+      disk = [
+        for d in lookup(local.hosts[k], "disk", []) :
+        d
+        if lookup(d, "source", null) != null && lookup(d, "target", null) != null
+      ]
+    })
+  }
+}
+
 # Write admin kubeconfig file
 resource "local_file" "kubeconfig-admin" {
   content = templatefile(local.addon_templates.kubeconfig-admin, {

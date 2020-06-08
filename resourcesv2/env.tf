@@ -130,7 +130,7 @@ locals {
   }
 
   networks = {
-    # vlans
+    # management
     main = {
       id        = 1
       network   = "192.168.126.0"
@@ -147,6 +147,7 @@ locals {
       dhcp_pool = "192.168.63.64/26"
       br_if     = "en-lan"
     }
+    # gateway state sync
     sync = {
       id      = 60
       network = "192.168.190.0"
@@ -158,7 +159,7 @@ locals {
       id    = 30
       br_if = "en-wan"
     }
-    # internal network on each hypervisor
+    # internal network on each hypervisor for PXE bootstrap
     int = {
       network   = "192.168.224.0"
       cidr      = 23
@@ -184,6 +185,19 @@ locals {
   }
 
   components = {
+    common_guests = {
+      nodes = [
+        "gateway-0",
+        "gateway-1",
+        "controller-0",
+        "controller-1",
+        "controller-2",
+        "worker-0",
+        "worker-1",
+        "test-0",
+      ]
+      libvirt_template = "${local.templates_path}/libvirt/container_linux.xml.tmpl"
+    }
     ssh = {
       nodes = [
         "gateway-0",
@@ -350,8 +364,7 @@ locals {
           bootorder = 1
         }
       ]
-      kea_ha_role      = "primary"
-      libvirt_template = "${local.templates_path}/libvirt/container_linux.xml.tmpl"
+      kea_ha_role = "primary"
     }
     gateway-1 = {
       memory = 3
@@ -384,8 +397,7 @@ locals {
           bootorder = 1
         }
       ]
-      kea_ha_role      = "standby"
-      libvirt_template = "${local.templates_path}/libvirt/container_linux.xml.tmpl"
+      kea_ha_role = "standby"
     }
 
     # controllers
@@ -405,7 +417,6 @@ locals {
           bootorder = 1
         }
       ]
-      libvirt_template = "${local.templates_path}/libvirt/container_linux.xml.tmpl"
     }
     controller-1 = {
       memory = 4
@@ -423,7 +434,6 @@ locals {
           bootorder = 1
         }
       ]
-      libvirt_template = "${local.templates_path}/libvirt/container_linux.xml.tmpl"
     }
     controller-2 = {
       memory = 4
@@ -441,7 +451,6 @@ locals {
           bootorder = 1
         }
       ]
-      libvirt_template = "${local.templates_path}/libvirt/container_linux.xml.tmpl"
     }
 
     # workers
@@ -541,7 +550,6 @@ locals {
           mount_path = "/var/pv"
         },
       ]
-      libvirt_template = "${local.templates_path}/libvirt/container_linux.xml.tmpl"
     }
     worker-1 = {
       memory = 48
@@ -579,7 +587,6 @@ locals {
           mount_path = "/var/pv"
         }
       ]
-      libvirt_template = "${local.templates_path}/libvirt/container_linux.xml.tmpl"
     }
 
     # Test instances
@@ -600,7 +607,6 @@ locals {
       ]
       disk = [
       ]
-      libvirt_template = "${local.templates_path}/libvirt/container_linux.xml.tmpl"
     }
 
     # KVM
