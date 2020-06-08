@@ -148,6 +148,7 @@ kubectl apply -f http://127.0.0.1:8080/generic?manifest=traefik-tls-ingress
 kubectl apply -f http://127.0.0.1:8080/generic?manifest=minio-tls-ingress
 
 kubectl apply -f http://127.0.0.1:8080/generic?manifest=minio-minio-auth
+kubectl apply -f http://127.0.0.1:8080/generic?manifest=common-minio-auth
 kubectl apply -f http://127.0.0.1:8080/generic?manifest=monitoring-grafana-auth
 ```
 
