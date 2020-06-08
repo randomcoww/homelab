@@ -177,6 +177,7 @@ https://metallb.universe.tf/installation/#installation-by-manifest
 #### [OpenEBS](https://www.openebs.io/)
 
 ```
+OPENEBS_VERSION=1.9.0
 helm repo add stable https://kubernetes-charts.storage.googleapis.com
 
 helm template openebs \
@@ -188,14 +189,14 @@ helm template openebs \
   --set analytics.enabled=false \
   --set defaultStorageConfig.enabled=false \
   --set snapshotOperator.enabled=false \
-  --set apiserver.imageTag=1.9.0 \
-  --set provisioner.imageTag=1.9.0 \
-  --set webhook.imageTag=1.9.0 \
-  --set snapshotOperator.provisioner.imageTag=1.9.0 \
-  --set snapshotOperator.controller.imageTag=1.9.0 \
-  --set jiva.imageTag=1.9.0 \
-  --set helper.imageTag=1.9.0 \
-  --set policies.monitoring.imageTag=1.9.0 \
+  --set apiserver.imageTag=$OPENEBS_VERSION \
+  --set provisioner.imageTag=$OPENEBS_VERSION \
+  --set webhook.imageTag=$OPENEBS_VERSION \
+  --set snapshotOperator.provisioner.imageTag=$OPENEBS_VERSION \
+  --set snapshotOperator.controller.imageTag=$OPENEBS_VERSION \
+  --set jiva.imageTag=$OPENEBS_VERSION \
+  --set helper.imageTag=$OPENEBS_VERSION \
+  --set policies.monitoring.imageTag=$OPENEBS_VERSION \
   stable/openebs
 ```
 
