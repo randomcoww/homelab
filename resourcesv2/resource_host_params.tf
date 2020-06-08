@@ -157,44 +157,55 @@ resource "random_password" "grafana-password" {
 module "secrets" {
   source = "../modulesv2/secrets"
 
-  aws_region        = local.aws_region
-  networks          = local.networks
-  domains           = local.domains
-  addon_templates   = local.addon_templates
-  s3_secrets_bucket = local.s3_secrets_bucket
-  s3_secrets_key    = local.s3_secrets_key
-
-  secrets = {
-    minio-auth-secret = {
-      namespace = "default"
+  addon_templates = local.addon_templates
+  secrets = [
+    {
+      name      = "minio-auth"
+      namespace = "minio"
       data = {
         access_key_id     = random_password.minio-user.result
         secret_access_key = random_password.minio-password.result
-      },
-      type = "Opaque"
+      }
     },
-    grafana-auth-secret = {
-      namespace = "default"
+    {
+      name      = "grafana-auth"
+      namespace = "monitoring"
       data = {
         user     = random_password.grafana-user.result
         password = random_password.grafana-password.result
-      },
-      type = "Opaque"
+      }
     }
-  }
+  ]
+}
 
-  internal_tls_templates = local.components.internal_tls.templates
-  internal_tls_hosts = {
-    for k in local.components.internal_tls.nodes :
-    k => merge(local.hosts[k], {
-      hostname     = join(".", [k, local.domains.mdns])
-      host_network = local.host_network_by_type[k]
-    })
-  }
+module "tls-secrets" {
+  source = "../modulesv2/tls_secrets"
 
-  wireguard_client_templates = local.components.wireguard_client.templates
-  wireguard_client_hosts = {
-    for k in local.components.wireguard_client.nodes :
+  domains         = local.domains
+  addon_templates = local.addon_templates
+  secrets = [
+    {
+      name      = "tls-ingress"
+      namespace = "traefik"
+    },
+    {
+      name      = "tls-ingress"
+      namespace = "minio"
+    },
+    {
+      name      = "tls-ingress"
+      namespace = "monitoring"
+    },
+    {
+      name      = "tls-ingress"
+      namespace = "common"
+    }
+  ]
+
+  name      = "traefik-tls"
+  templates = local.components.traefik_tls.templates
+  hosts = {
+    for k in local.components.traefik_tls.nodes :
     k => merge(local.hosts[k], {
       hostname     = join(".", [k, local.domains.mdns])
       host_network = local.host_network_by_type[k]

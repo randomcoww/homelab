@@ -63,8 +63,7 @@ module "ignition-local" {
         lookup(module.kvm-common.templates, h, []),
         lookup(module.desktop-common.templates, h, []),
         lookup(module.ssh-common.templates, h, []),
-        lookup(module.secrets.wireguard_client_templates, h, []),
-        lookup(module.secrets.internal_tls_templates, h, []),
+        lookup(module.tls-secrets.templates, h, []),
       ])
     }
   }
@@ -79,6 +78,7 @@ module "generic-manifest-local" {
     module.gateway-common.addons,
     module.kubernetes-common.addons,
     module.secrets.addons,
+    module.tls-secrets.addons,
     module.ssh-common.addons,
     module.static-pod-logging.addons,
     module.test-common.addons,

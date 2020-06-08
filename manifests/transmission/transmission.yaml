@@ -3,6 +3,7 @@ kind: Deployment
 apiVersion: apps/v1
 metadata:
   name: s3-ingest
+  namespace: common
 spec:
   replicas: 1
   selector:
@@ -57,10 +58,25 @@ spec:
             path: /var/lib/kubelet/hostpath/ingest/mnt
 
 ---
+kind: PersistentVolumeClaim
+apiVersion: v1
+metadata:
+  name: transmission-pvc
+  namespace: common
+spec:
+  storageClassName: openebs-transmission
+  accessModes:
+  - ReadWriteOnce
+  resources:
+    requests:
+      storage: 400G
+
+---
 apiVersion: v1
 kind: PersistentVolume
 metadata:
   name: s3-ingest-pv
+  namespace: common
 spec:
   storageClassName: s3-ingest
   capacity:
@@ -75,6 +91,7 @@ apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
   name: s3-ingest-pvc
+  namespace: common
 spec:
   accessModes:
   - ReadWriteOnce
@@ -88,6 +105,7 @@ apiVersion: v1
 kind: ConfigMap
 metadata:
   name: transmission-config
+  namespace: common
 data:
   settings.json: |
     {
@@ -132,6 +150,7 @@ kind: Deployment
 apiVersion: apps/v1
 metadata:
   name: transmission
+  namespace: common
 spec:
   replicas: 1
   selector:
@@ -211,6 +230,7 @@ kind: Service
 apiVersion: v1
 metadata:
   name: transmission
+  namespace: common
 spec:
   ports:
   - name: webui
@@ -224,6 +244,7 @@ apiVersion: extensions/v1beta1
 kind: Ingress
 metadata:
   name: transmission
+  namespace: common
   annotations:
     kubernetes.io/ingress.class: traefik
     ingress.kubernetes.io/ssl-redirect: "true"
@@ -237,4 +258,4 @@ spec:
           serviceName: transmission
           servicePort: webui
   tls:
-  - secretName: internal-tls
+  - secretName: tls-ingress

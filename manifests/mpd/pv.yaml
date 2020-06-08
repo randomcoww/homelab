@@ -2,6 +2,7 @@ apiVersion: openebs.io/v1alpha1
 kind: StoragePool
 metadata:
   name: mpd
+  namespace: common
   type: hostdir
 spec:
   path: "/var/pv/mpd"
@@ -11,6 +12,7 @@ apiVersion: storage.k8s.io/v1
 kind: StorageClass
 metadata:
   name: openebs-mpd
+  namespace: common
   annotations:
     openebs.io/cas-type: jiva
     cas.openebs.io/config: |
@@ -19,16 +21,3 @@ metadata:
       - name: StoragePool
         value: mpd
 provisioner: openebs.io/provisioner-iscsi
-
----
-kind: PersistentVolumeClaim
-apiVersion: v1
-metadata:
-  name: mpd-pvc
-spec:
-  storageClassName: openebs-mpd
-  accessModes:
-  - ReadWriteOnce
-  resources:
-    requests:
-      storage: 2G

@@ -2,6 +2,7 @@ kind: Deployment
 apiVersion: apps/v1
 metadata:
   name: unifi
+  namespace: common
 spec:
   replicas: 1
   selector:
@@ -81,10 +82,25 @@ spec:
         emptyDir: {}
 
 ---
+kind: PersistentVolumeClaim
+apiVersion: v1
+metadata:
+  name: unifi-pvc
+  namespace: common
+spec:
+  storageClassName: openebs-unifi
+  accessModes:
+  - ReadWriteOnce
+  resources:
+    requests:
+      storage: 2G
+
+---
 kind: Service
 apiVersion: v1
 metadata:
   name: unifi
+  namespace: common
   annotations:
     metallb.universe.tf/allow-shared-ip: unifi
     external-dns.alpha.kubernetes.io/hostname: unifi.fuzzybunny.internal
@@ -103,6 +119,7 @@ kind: Service
 apiVersion: v1
 metadata:
   name: unifi-stun
+  namespace: common
   annotations:
     metallb.universe.tf/allow-shared-ip: unifi
 spec:

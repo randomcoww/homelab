@@ -2,6 +2,7 @@ apiVersion: v1
 kind: ConfigMap
 metadata:
   name: mpd-config
+  namespace: common
 data:
   mpd.conf: |
     user "mpd"
@@ -36,6 +37,7 @@ kind: Deployment
 apiVersion: apps/v1
 metadata:
   name: mpd
+  namespace: common
 spec:
   replicas: 1
   selector:
@@ -114,10 +116,25 @@ spec:
         emptyDir: {}
 
 ---
+kind: PersistentVolumeClaim
+apiVersion: v1
+metadata:
+  name: mpd-pvc
+  namespace: common
+spec:
+  storageClassName: openebs-mpd
+  accessModes:
+  - ReadWriteOnce
+  resources:
+    requests:
+      storage: 2G
+
+---
 kind: Service
 apiVersion: v1
 metadata:
   name: mpd
+  namespace: common
   annotations:
     external-dns.alpha.kubernetes.io/hostname: mpd.fuzzybunny.internal
 spec:
@@ -134,6 +151,7 @@ kind: Service
 apiVersion: v1
 metadata:
   name: mpd-stream
+  namespace: common
 spec:
   ports:
   - name: stream
@@ -147,6 +165,7 @@ apiVersion: extensions/v1beta1
 kind: Ingress
 metadata:
   name: mpd-stream
+  namespace: common
   annotations:
     kubernetes.io/ingress.class: traefik
     ingress.kubernetes.io/ssl-redirect: "true"
@@ -160,4 +179,4 @@ spec:
           serviceName: mpd-stream
           servicePort: stream
   tls:
-  - secretName: internal-tls
+  - secretName: tls-ingress

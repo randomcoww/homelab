@@ -216,7 +216,7 @@ locals {
         "${local.templates_path}/ignition/ssh.ign.tmpl",
       ]
     }
-    internal_tls = {
+    traefik_tls = {
       nodes = [
         "desktop",
       ]
@@ -624,6 +624,7 @@ locals {
       guests = [
         "gateway-0",
         "controller-0",
+        "controller-1",
         "controller-2",
         "worker-0",
       ]
@@ -644,10 +645,10 @@ locals {
       ]
       guests = [
         "gateway-1",
+        "controller-0",
         "controller-1",
         "controller-2",
         "worker-1",
-        "test-0",
       ]
       ## hypervisor boot image is copied with coreos-installer to strip
       ## out ignition and re-used to boot VMs

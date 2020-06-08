@@ -1,8 +1,13 @@
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: traefik
+
+---
 apiVersion: policy/v1beta1
 kind: PodSecurityPolicy
 metadata:
-  name: traefik-psp
-  namespace: default
+  name: traefik
 spec:
   allowedCapabilities: ["NET_BIND_SERVICE"]
   volumes: ['secret']
@@ -36,7 +41,7 @@ rules:
 - apiGroups: ["extensions"]
   resources: ["podsecuritypolicies"]
   verbs: ["use"]
-  resourceNames: ["traefik-psp"]
+  resourceNames: ["traefik"]
 
 ---
 kind: ClusterRoleBinding
@@ -50,21 +55,21 @@ roleRef:
 subjects:
 - kind: ServiceAccount
   name: traefik-ingress-controller
-  namespace: default
+  namespace: traefik
 
 ---
 apiVersion: v1
 kind: ServiceAccount
 metadata:
   name: traefik-ingress-controller
-  namespace: default
+  namespace: traefik
 
 ---
 kind: DaemonSet
 apiVersion: apps/v1
 metadata:
   name: traefik-ingress-controller
-  namespace: default
+  namespace: traefik
   labels:
     k8s-app: traefik-ingress-lb
 spec:
@@ -102,7 +107,8 @@ spec:
         - --api
         - --kubernetes
         - --logLevel=INFO
-        - --kubernetes.ingressendpoint.publishedservice=default/traefik-ingress-service
+        - --kubernetes.namespaces=traefik,minio,monitoring,common
+        - --kubernetes.ingressendpoint.publishedservice=traefik/traefik-ingress-service
         - --entryPoints=Name:https Address::443 TLS
         - --entryPoints=Name:http Address::80
         - --defaultentrypoints=https,http
@@ -112,7 +118,7 @@ kind: Service
 apiVersion: v1
 metadata:
   name: traefik-ingress-service
-  namespace: default
+  namespace: traefik
 spec:
   type: LoadBalancer
   selector:
@@ -133,7 +139,7 @@ apiVersion: v1
 kind: Service
 metadata:
   name: traefik-web-ui
-  namespace: default
+  namespace: traefik
 spec:
   selector:
     k8s-app: traefik-ingress-lb
@@ -147,7 +153,7 @@ apiVersion: extensions/v1beta1
 kind: Ingress
 metadata:
   name: traefik-web-ui
-  namespace: default
+  namespace: traefik
   annotations:
     kubernetes.io/ingress.class: traefik
     ingress.kubernetes.io/ssl-redirect: "true"
@@ -161,4 +167,4 @@ spec:
           serviceName: traefik-web-ui
           servicePort: web
   tls:
-  - secretName: internal-tls
+  - secretName: tls-ingress
