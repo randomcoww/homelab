@@ -192,8 +192,6 @@ helm template openebs \
   --set apiserver.imageTag=$OPENEBS_VERSION \
   --set provisioner.imageTag=$OPENEBS_VERSION \
   --set webhook.imageTag=$OPENEBS_VERSION \
-  --set snapshotOperator.provisioner.imageTag=$OPENEBS_VERSION \
-  --set snapshotOperator.controller.imageTag=$OPENEBS_VERSION \
   --set jiva.imageTag=$OPENEBS_VERSION \
   --set helper.imageTag=$OPENEBS_VERSION \
   --set policies.monitoring.imageTag=$OPENEBS_VERSION \
