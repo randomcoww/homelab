@@ -196,11 +196,13 @@ kubectl apply -f manifests/grafana.yaml
 
 Currently the PSP `requiredDropCapabilities` causes loki pod to crashloop:
 ```
----
-# Source: loki/templates/podsecuritypolicy.yaml
-  ...
-  requiredDropCapabilities:
-    - ALL
+kubectl patch -n monitoring psp loki --type='json' -p='{
+  "spec": {
+    "requiredDropCapabilities": [
+      ""
+    ]
+  }
+}'
 ```
 
 #### MetalLb
