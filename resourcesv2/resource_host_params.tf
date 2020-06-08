@@ -168,6 +168,14 @@ module "secrets" {
       }
     },
     {
+      name      = "minio-auth"
+      namespace = "common"
+      data = {
+        access_key_id     = random_password.minio-user.result
+        secret_access_key = random_password.minio-password.result
+      }
+    },
+    {
       name      = "grafana-auth"
       namespace = "monitoring"
       data = {

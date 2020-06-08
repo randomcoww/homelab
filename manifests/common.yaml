@@ -9,7 +9,8 @@ kind: PodSecurityPolicy
 metadata:
   name: common
 spec:
-  volumes: ['secret']
+  privileged: true
+  volumes: ['*']
   hostPorts:
   - min: 0
     max: 65535
