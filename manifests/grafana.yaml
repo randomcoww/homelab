@@ -1,9 +1,71 @@
+---
+apiVersion: policy/v1beta1
+kind: PodSecurityPolicy
+metadata:
+  name: monitoring
+spec:
+  requiredDropCapabilities:
+    - FOWNER
+    - FSETID
+    - KILL
+    - SETGID
+    - SETUID
+    - SETPCAP
+    - NET_BIND_SERVICE
+    - NET_RAW
+    - SYS_CHROOT
+    - MKNOD
+    - AUDIT_WRITE
+    - SETFCAP
+  volumes:
+    - 'configMap'
+    - 'emptyDir'
+    - 'projected'
+    - 'secret'
+    - 'downwardAPI'
+    - 'persistentVolumeClaim'
+  runAsUser:
+    rule: 'RunAsAny'
+  seLinux:
+    rule: 'RunAsAny'
+  supplementalGroups:
+    rule: 'RunAsAny'
+  fsGroup:
+    rule: 'RunAsAny'
+
+---
+kind: ClusterRole
+apiVersion: rbac.authorization.k8s.io/v1beta1
+metadata:
+  name: monitoring-psp
+rules:
+- apiGroups: ["extensions"]
+  resources: ["podsecuritypolicies"]
+  verbs: ["use"]
+  resourceNames: ["monitoring"]
+
+---
+kind: ClusterRoleBinding
+apiVersion: rbac.authorization.k8s.io/v1beta1
+metadata:
+  name: monitoring-psp
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: monitoring-psp
+subjects:
+- kind: ServiceAccount
+  name: default
+  namespace: monitoring
+
+---
 apiVersion: v1
 kind: ConfigMap
 metadata:
   labels:
     app: grafana-config
   name: grafana-config
+  namespace: monitoring
 data:
   datasources.yaml: |
     datasources:
@@ -11,7 +73,7 @@ data:
       type: 'prometheus'
       access: 'proxy'
       org_id: 1
-      url: 'http://prometheus-server.default.svc.cluster.internal:9090'
+      url: 'http://prometheus-server.monitoring.svc'
       is_default: true
       version: 1
       editable: false
@@ -19,7 +81,7 @@ data:
       type: 'loki'
       access: 'proxy'
       org_id: 1
-      url: 'http://loki.default.svc.cluster.internal:3100'
+      url: 'http://loki.monitoring.svc:3100'
       is_default: false
       version: 1
       editable: false
@@ -38,6 +100,7 @@ metadata:
   labels:
     app: grafana-dashboards
   name: grafana-dashboards
+  namespace: monitoring
 data:
   kubernetes.json: |
     {
@@ -1033,6 +1096,7 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: grafana-core
+  namespace: monitoring
   labels:
     app: grafana
     component: core
@@ -1105,6 +1169,7 @@ apiVersion: v1
 kind: Service
 metadata:
   name: grafana
+  namespace: monitoring
   labels:
     app: grafana
     component: core
@@ -1121,6 +1186,7 @@ apiVersion: extensions/v1beta1
 kind: Ingress
 metadata:
   name: grafana
+  namespace: monitoring
   annotations:
     kubernetes.io/ingress.class: traefik
     ingress.kubernetes.io/ssl-redirect: "true"
@@ -1134,4 +1200,4 @@ spec:
          serviceName: grafana
          servicePort: web
   tls:
-  - secretName: internal-tls
+  - secretName: tls-ingress

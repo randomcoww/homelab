@@ -146,6 +146,8 @@ kubectl apply -f http://127.0.0.1:8080/generic?manifest=loki-lb-service
 
 kubectl apply -f http://127.0.0.1:8080/generic?manifest=traefik-tls-ingress
 kubectl apply -f http://127.0.0.1:8080/generic?manifest=minio-tls-ingress
+kubectl apply -f http://127.0.0.1:8080/generic?manifest=common-tls-ingress
+kubectl apply -f http://127.0.0.1:8080/generic?manifest=monitoring-tls-ingress
 
 kubectl apply -f http://127.0.0.1:8080/generic?manifest=minio-minio-auth
 kubectl apply -f http://127.0.0.1:8080/generic?manifest=common-minio-auth
@@ -154,17 +156,45 @@ kubectl apply -f http://127.0.0.1:8080/generic?manifest=monitoring-grafana-auth
 
 ### Deploy services on Kubernetes
 
-#### Loki
+#### Monitoring
 
 https://github.com/grafana/loki/tree/master/production/helm
 
 ```
 helm repo add loki https://grafana.github.io/loki/charts
+helm repo add stable https://kubernetes-charts.storage.googleapis.com
 
-helm template loki --namespace=monitoring loki/loki
+helm template loki \
+    --namespace=monitoring \
+    loki/loki
+
+helm template promtail \
+    --namespace monitoring \
+    loki/promtail
+
+helm template prometheus \
+    --namespace monitoring \
+    --set alertmanager.enabled=false \
+    --set configmapReload.prometheus.enabled=false \
+    --set configmapReload.alertmanager.enabled=false \
+    --set initChownData.enabled=false \
+    --set podSecurityPolicy.enabled=true \
+    --set kube-state-metrics.podSecurityPolicy.enabled=true \
+    --set pushgateway.enabled=false \
+    --set server.persistentVolume.enabled=false \
+    stable/prometheus
+
+helm template loki-grafana \
+    --namespace=monitoring \
+    --set persistence.enabled=false \
+    --set initChownData.enabled=false \
+    --set testFramework.enabled=false \
+    stable/grafana
+
+kubectl apply -f manifests/grafana.yaml
 ```
 
-Currently the PSP `requiredDropCapabilities` causes pod to crashloop:
+Currently the PSP `requiredDropCapabilities` causes loki pod to crashloop:
 ```
 ---
 # Source: loki/templates/podsecuritypolicy.yaml
@@ -184,21 +214,21 @@ OPENEBS_VERSION=1.9.0
 helm repo add stable https://kubernetes-charts.storage.googleapis.com
 
 helm template openebs \
-  --namespace openebs \
-  --set rbac.pspEnabled=true \
-  --set ndm.enabled=false \
-  --set ndmOperator.enabled=false \
-  --set localprovisioner.enabled=false \
-  --set analytics.enabled=false \
-  --set defaultStorageConfig.enabled=false \
-  --set snapshotOperator.enabled=false \
-  --set apiserver.imageTag=$OPENEBS_VERSION \
-  --set provisioner.imageTag=$OPENEBS_VERSION \
-  --set webhook.imageTag=$OPENEBS_VERSION \
-  --set jiva.imageTag=$OPENEBS_VERSION \
-  --set helper.imageTag=$OPENEBS_VERSION \
-  --set policies.monitoring.imageTag=$OPENEBS_VERSION \
-  stable/openebs
+    --namespace openebs \
+    --set rbac.pspEnabled=true \
+    --set ndm.enabled=false \
+    --set ndmOperator.enabled=false \
+    --set localprovisioner.enabled=false \
+    --set analytics.enabled=false \
+    --set defaultStorageConfig.enabled=false \
+    --set snapshotOperator.enabled=false \
+    --set apiserver.imageTag=$OPENEBS_VERSION \
+    --set provisioner.imageTag=$OPENEBS_VERSION \
+    --set webhook.imageTag=$OPENEBS_VERSION \
+    --set jiva.imageTag=$OPENEBS_VERSION \
+    --set helper.imageTag=$OPENEBS_VERSION \
+    --set policies.monitoring.imageTag=$OPENEBS_VERSION \
+    stable/openebs
 ```
 
 Currently additional PSP is needed for Jiva PVC pods to run:
@@ -221,11 +251,13 @@ kubectl apply -f manifests/minio.yaml
 #### MPD
 
 ```
-kubectl apply -f manifests/mpd/
+kubectl apply -f manifests/mpd/pv.yaml
+kubectl apply -f manifests/mpd/mpd.yaml
 ```
 
 #### Transmission
 
 ```
-kubectl apply -f manifests/transmission/
+kubectl apply -f manifests/transmission/pv.yaml
+kubectl apply -f manifests/transmission/transmission.yaml
 ```
