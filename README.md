@@ -143,10 +143,12 @@ kubectl apply -f http://127.0.0.1:8080/generic?manifest=kapprover
 kubectl apply -f http://127.0.0.1:8080/generic?manifest=coredns
 kubectl apply -f http://127.0.0.1:8080/generic?manifest=metallb-network
 kubectl apply -f http://127.0.0.1:8080/generic?manifest=loki-lb-service
-kubectl apply -f http://127.0.0.1:8080/generic?manifest=internal-tls-secret
-kubectl apply -f http://127.0.0.1:8080/generic?manifest=minio-auth-secret
-kubectl apply -f http://127.0.0.1:8080/generic?manifest=grafana-auth-secret
-kubectl apply -f http://127.0.0.1:8080/generic?manifest=wireguard-client-secret
+
+kubectl apply -f http://127.0.0.1:8080/generic?manifest=traefik-tls-ingress
+kubectl apply -f http://127.0.0.1:8080/generic?manifest=minio-tls-ingress
+
+kubectl apply -f http://127.0.0.1:8080/generic?manifest=minio-minio-auth
+kubectl apply -f http://127.0.0.1:8080/generic?manifest=monitoring-grafana-auth
 ```
 
 ### Deploy services on Kubernetes
