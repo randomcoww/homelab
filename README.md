@@ -33,7 +33,7 @@ buildtool() {
 
 ### Run local matchbox server
 
-Configurations for creating hypervisor images are generated on a local [Matchbox](https://github.com/coreos/matchbox/) instance. This will generate necessary TLS certs and start a local Matchbox instance using Podman:
+Configurations for creating hypervisor images are generated on a local Matchbox instance. This will generate necessary TLS certs and start a local Matchbox instance using Podman:
 
 ```bash
 buildtool start-renderer
@@ -76,7 +76,7 @@ Run build from https://github.com/randomcoww/fedora-silverblue-custom
 
 ### Generate configuration on hypervisor hosts
 
-Each hypervisor runs a PXE boot environment on an internal network for provisioning VMs local to the host. VMs run Fedora CoreOS using [Ignition](https://coreos.com/ignition/docs/latest/) for boot time configuration.
+Each hypervisor runs a PXE boot environment on an internal network for provisioning VMs local to the host. VMs run Fedora CoreOS using Ignition for boot time configuration.
 
 Ignition configuration is generated on each hypervisor as follows:
 
@@ -156,9 +156,18 @@ kubectl apply -f http://127.0.0.1:8080/generic?manifest=monitoring-grafana-auth
 
 ### Deploy services on Kubernetes
 
-#### Monitoring
+#### MetalLb
 
-https://github.com/grafana/loki/tree/master/production/helm
+https://metallb.universe.tf/installation/#installation-by-manifest
+
+
+#### Traefik
+
+```
+kubectl apply -f manifests/traefik.yaml
+```
+
+#### Monitoring
 
 ```
 helm repo add loki https://grafana.github.io/loki/charts
@@ -205,11 +214,7 @@ kubectl patch -n monitoring psp loki -p='{
 }'
 ```
 
-#### MetalLb
-
-https://metallb.universe.tf/installation/#installation-by-manifest
-
-#### [OpenEBS](https://www.openebs.io/)
+#### OpenEBS
 
 ```
 OPENEBS_VERSION=1.9.0
@@ -238,13 +243,7 @@ Currently additional PSP is needed for Jiva PVC pods to run:
 kubectl apply -f manifests/openebs_psp.yaml
 ```
 
-#### Traefik
-
-```
-kubectl apply -f manifests/traefik.yaml
-```
-
-#### [Minio](https://min.io/) storage controller
+#### Minio
 
 ```
 kubectl apply -f manifests/minio.yaml
