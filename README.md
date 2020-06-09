@@ -248,17 +248,3 @@ kubectl apply -f manifests/openebs_psp.yaml
 ```
 kubectl apply -f manifests/minio.yaml
 ```
-
-#### MPD
-
-```
-kubectl apply -f manifests/mpd/pv.yaml
-kubectl apply -f manifests/mpd/mpd.yaml
-```
-
-#### Transmission
-
-```
-kubectl apply -f manifests/transmission/pv.yaml
-kubectl apply -f manifests/transmission/transmission.yaml
-```
