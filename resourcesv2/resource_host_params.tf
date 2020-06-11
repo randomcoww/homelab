@@ -191,14 +191,18 @@ module "secrets" {
         data = {
           wireguard-client = <<EOF
 [Interface]
+
 %{~for k, v in var.wireguard_config.Interface~}
 ${k} = ${v}
+
 %{~endfor~}
 PostUp = nft add table ip filter && nft add chain ip filter output { type filter hook output priority 0 \; } && nft insert rule ip filter output oifname != "%i" mark != $(wg show %i fwmark) fib daddr type != local ip daddr != ${local.networks.kubernetes.network}/${local.networks.kubernetes.cidr} reject
 
 [Peer]
+
 %{~for k, v in var.wireguard_config.Peer~}
 ${k} = ${v}
+
 %{~endfor~}
 EOF
         }
