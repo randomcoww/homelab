@@ -1,4 +1,5 @@
-output/*
+output
+assets
 terraform.tfstate
 terraform.tfstate.*
 .terraform
