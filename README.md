@@ -152,6 +152,7 @@ kubectl apply -f http://127.0.0.1:8080/generic?manifest=monitoring-tls-ingress
 kubectl apply -f http://127.0.0.1:8080/generic?manifest=minio-minio-auth
 kubectl apply -f http://127.0.0.1:8080/generic?manifest=common-minio-auth
 kubectl apply -f http://127.0.0.1:8080/generic?manifest=monitoring-grafana-auth
+kubectl apply -f http://127.0.0.1:8080/generic?manifest=common-wireguard-client
 ```
 
 ### Deploy services on Kubernetes
