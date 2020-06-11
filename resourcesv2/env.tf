@@ -1,4 +1,6 @@
 locals {
+  desktop_user = "randomcoww"
+  # Default user for CoreOS
   user = "core"
   mtu  = 9000
 
@@ -670,7 +672,7 @@ locals {
       disk = [
         {
           device     = "/dev/disk/by-id/nvme-Samsung_SSD_970_EVO_250GB_S465NB0K598517N-part1"
-          mount_path = "/var/home/${var.desktop_user}"
+          mount_path = "/var/home/${local.desktop_user}"
         }
       ]
       ## hypervisor boot image is copied with coreos-installer to strip

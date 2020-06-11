@@ -139,6 +139,8 @@ passwd:
   users:
     - name: ${user}
       uid: ${uid}
+      %{~ if length(password) > 0 ~}
       password_hash: ${bcrypt(password)}
+      %{~ endif ~}
       groups:
         - libvirt

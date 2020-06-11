@@ -112,7 +112,7 @@ module "kvm-common" {
 module "desktop-common" {
   source = "../modulesv2/desktop_common"
 
-  user     = var.desktop_user
+  user     = local.desktop_user
   password = var.desktop_password
   mtu      = local.mtu
   networks = local.networks
@@ -158,7 +158,7 @@ module "secrets" {
   source = "../modulesv2/secrets"
 
   addon_templates = local.addon_templates
-  secrets = [
+  secrets = concat([
     {
       name      = "minio-auth"
       namespace = "minio"
@@ -183,7 +183,27 @@ module "secrets" {
         password = random_password.grafana-password.result
       }
     }
-  ]
+    ],
+    lookup(var.wireguard_config, "Interface", null) != null && lookup(var.wireguard_config, "Peer", null) != null ? [
+      {
+        name      = "wireguard-client"
+        namespace = "common"
+        data = {
+          wireguard-client = <<EOF
+[Interface]
+%{~for k, v in var.wireguard_config.Interface~}
+${k} = ${v}
+%{~endfor~}
+PostUp = nft add table ip filter && nft add chain ip filter output { type filter hook output priority 0 \; } && nft insert rule ip filter output oifname != "%i" mark != $(wg show %i fwmark) fib daddr type != local ip daddr != ${local.networks.kubernetes.network}/${local.networks.kubernetes.cidr} reject
+
+[Peer]
+%{~for k, v in var.wireguard_config.Peer~}
+${k} = ${v}
+%{~endfor~}
+EOF
+        }
+      }
+  ] : [])
 }
 
 module "tls-secrets" {
