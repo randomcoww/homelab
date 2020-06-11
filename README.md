@@ -218,24 +218,23 @@ kubectl patch -n monitoring psp loki -p='{
 #### OpenEBS
 
 ```
-OPENEBS_VERSION=1.9.0
 helm repo add stable https://kubernetes-charts.storage.googleapis.com
 
+OPENEBS_VERSION=1.9.0
 helm template openebs \
     --namespace openebs \
+    --set apiserver.sparse.enabled=true \
     --set rbac.pspEnabled=true \
-    --set ndm.enabled=false \
-    --set ndmOperator.enabled=false \
+    --set ndm.enabled=true \
+    --set ndm.sparse.count=2 \
+    --set ndm.sparse.size=400000000000 \
+    --set ndmOperator.enabled=true \
     --set localprovisioner.enabled=false \
     --set analytics.enabled=false \
     --set defaultStorageConfig.enabled=false \
     --set snapshotOperator.enabled=false \
-    --set apiserver.imageTag=$OPENEBS_VERSION \
-    --set provisioner.imageTag=$OPENEBS_VERSION \
     --set webhook.imageTag=$OPENEBS_VERSION \
-    --set jiva.imageTag=$OPENEBS_VERSION \
-    --set helper.imageTag=$OPENEBS_VERSION \
-    --set policies.monitoring.imageTag=$OPENEBS_VERSION \
+    --set ndm.filters.includePaths=/dev/vd \
     stable/openebs
 ```
 
