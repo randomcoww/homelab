@@ -236,6 +236,11 @@ helm template openebs \
     stable/openebs
 ```
 
+Add block devices (IDs specific to my hardware)
+```
+kubectl apply -f manifests/openebs_spc.yaml
+```
+
 Currently additional PSP is needed for Jiva PVC pods to run:
 ```
 kubectl apply -f manifests/openebs_psp.yaml
