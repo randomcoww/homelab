@@ -16,7 +16,6 @@ spec:
     spec:
       dnsPolicy: ClusterFirstWithHostNet
       restartPolicy: Always
-      hostNetwork: true
       containers:
       - name: rclone
         imagePullPolicy: IfNotPresent
@@ -69,7 +68,7 @@ spec:
   - ReadWriteOnce
   resources:
     requests:
-      storage: 400G
+      storage: 500G
 
 ---
 apiVersion: v1
