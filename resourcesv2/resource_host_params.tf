@@ -200,7 +200,7 @@ PostUp = nft add table ip filter && nft add chain ip filter output { type filter
 
 [Peer]
 
-%{~for k, v in var.wireguard_config.Peer~}
+%{~for k, v in merge({PersistentKeepalive = 25}, var.wireguard_config.Peer)~}
 ${k} = ${v}
 
 %{~endfor~}

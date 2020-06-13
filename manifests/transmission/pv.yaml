@@ -1,23 +1,14 @@
-apiVersion: openebs.io/v1alpha1
-kind: StoragePool
-metadata:
-  name: transmission
-  type: hostdir
-  namespace: common
-spec:
-  path: "/var/pv/transmission"
-
----
 apiVersion: storage.k8s.io/v1
 kind: StorageClass
 metadata:
   name: openebs-transmission
-  namespace: common
   annotations:
-    openebs.io/cas-type: jiva
+    openebs.io/cas-type: cstor
     cas.openebs.io/config: |
+      - name: FSType
+        value: xfs
+      - name: StoragePoolClaim
+        value: "cstor-disk-pool"
       - name: ReplicaCount
-        value: "2"
-      - name: StoragePool
-        value: transmission
+        value: "1"
 provisioner: openebs.io/provisioner-iscsi

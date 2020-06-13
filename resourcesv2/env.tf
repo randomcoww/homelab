@@ -27,12 +27,12 @@ locals {
   # kubelet image is used for static pods and does not need to match the kubernetes version
   # hyperkube is used for the worker kubelet and should match the version
   container_images = {
-    kubelet                 = "docker.io/randomcoww/kubernetes:kubelet-v1.18.2"
-    kube_apiserver          = "docker.io/randomcoww/kubernetes:kube-master-v1.18.2"
-    kube_controller_manager = "docker.io/randomcoww/kubernetes:kube-master-v1.18.2"
-    kube_scheduler          = "docker.io/randomcoww/kubernetes:kube-master-v1.18.2"
-    hyperkube               = "docker.io/randomcoww/kubernetes:kubelet-v1.18.2"
-    kube_proxy              = "docker.io/randomcoww/kubernetes:kube-proxy-v1.18.2"
+    kubelet                 = "docker.io/randomcoww/kubernetes:kubelet-v1.18.3"
+    kube_apiserver          = "docker.io/randomcoww/kubernetes:kube-master-v1.18.3"
+    kube_controller_manager = "docker.io/randomcoww/kubernetes:kube-master-v1.18.3"
+    kube_scheduler          = "docker.io/randomcoww/kubernetes:kube-master-v1.18.3"
+    hyperkube               = "docker.io/randomcoww/kubernetes:kubelet-v1.18.3"
+    kube_proxy              = "docker.io/randomcoww/kubernetes:kube-proxy-v1.18.3"
     etcd_wrapper            = "docker.io/randomcoww/etcd-wrapper:v0.2.1"
     etcd                    = "docker.io/randomcoww/etcd:v3.4.7"
     flannel                 = "docker.io/randomcoww/flannel:latest"
@@ -548,8 +548,6 @@ locals {
           source     = "/dev/disk/by-id/ata-Samsung_SSD_860_QVO_1TB_S4PGNF0M414895K"
           target     = "vda"
           device     = "/dev/vda"
-          format     = "ext4"
-          mount_path = "/var/pv"
         },
       ]
     }
@@ -585,8 +583,6 @@ locals {
           source     = "/dev/disk/by-id/ata-Samsung_SSD_860_QVO_1TB_S4PGNF0M410395Z"
           target     = "vda"
           device     = "/dev/vda"
-          format     = "ext4"
-          mount_path = "/var/pv"
         }
       ]
     }

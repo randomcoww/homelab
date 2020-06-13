@@ -29,7 +29,7 @@ systemd:
               -v ${kubelet_path}:${kubelet_path}:rshared,z \
               -v /var/log:/var/log \
               -v /var/run/lock:/var/run/lock:z \
-              ${container_images.kubelet} \
+              ${container_images.hyperkube} \
                 kubelet \
                   --config=${kubelet_path}/kubelet-config-worker.yaml \
                   --exit-on-lock-contention \

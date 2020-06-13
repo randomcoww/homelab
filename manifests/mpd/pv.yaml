@@ -1,23 +1,14 @@
-apiVersion: openebs.io/v1alpha1
-kind: StoragePool
-metadata:
-  name: mpd
-  namespace: common
-  type: hostdir
-spec:
-  path: "/var/pv/mpd"
-
----
 apiVersion: storage.k8s.io/v1
 kind: StorageClass
 metadata:
   name: openebs-mpd
-  namespace: common
   annotations:
-    openebs.io/cas-type: jiva
+    openebs.io/cas-type: cstor
     cas.openebs.io/config: |
+      - name: FSType
+        value: xfs
+      - name: StoragePoolClaim
+        value: "cstor-disk-pool"
       - name: ReplicaCount
-        value: "2"
-      - name: StoragePool
-        value: mpd
+        value: "1"
 provisioner: openebs.io/provisioner-iscsi
