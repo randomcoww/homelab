@@ -49,7 +49,7 @@ ssh-keygen -q -t ecdsa -N '' -f $KEY 2>/dev/null <<< y >/dev/null
 
 buildtool terraform apply \
     -auto-approve \
-    -target=module.ssh_common \
+    -target=null_resource.output-triggers \
     -var="ssh_client_public_key=$(cat $KEY.pub)"
 
 buildtool terraform output ssh-client-certificate > $KEY-cert.pub
@@ -122,7 +122,7 @@ Write kubeconfig file:
 ```bash
 buildtool terraform apply \
     -auto-approve \
-    -target=module.kubernetes_common
+    -target=null_resource.output-triggers
 
 mkdir -p ~/.kube
 buildtool terraform output kubeconfig > ~/.kube/config
