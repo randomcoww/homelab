@@ -49,7 +49,7 @@ ssh-keygen -q -t ecdsa -N '' -f $KEY 2>/dev/null <<< y >/dev/null
 
 buildtool terraform apply \
     -auto-approve \
-    -target=null_resource.output-triggers \
+    -target=module.ssh_common \
     -var="ssh_client_public_key=$(cat $KEY.pub)"
 
 buildtool terraform output ssh-client-certificate > $KEY-cert.pub
@@ -120,10 +120,13 @@ virsh -c qemu+ssh://core@kvm-1.local/system start worker-1
 Write kubeconfig file:
 
 ```bash
-buildtool tf-wrapper apply \
-    -target=local_file.kubeconfig-admin
+buildtool terraform apply \
+    -auto-approve \
+    -target=module.kubernetes_common
 
-export KUBECONFIG=$(pwd)/output/default-cluster-012.kubeconfig
+buildtool terraform output kubeconfig > output/kubeconfig
+
+export KUBECONFIG=$(pwd)/output/kubeconfig
 ```
 
 ### Generate basic Kubernetes addons
