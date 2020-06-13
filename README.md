@@ -221,13 +221,11 @@ kubectl patch -n monitoring psp loki -p='{
 helm repo add stable https://kubernetes-charts.storage.googleapis.com
 
 OPENEBS_VERSION=1.9.0
+
 helm template openebs \
     --namespace openebs \
-    --set apiserver.sparse.enabled=true \
     --set rbac.pspEnabled=true \
     --set ndm.enabled=true \
-    --set ndm.sparse.count=2 \
-    --set ndm.sparse.size=400000000000 \
     --set ndmOperator.enabled=true \
     --set localprovisioner.enabled=false \
     --set analytics.enabled=false \
