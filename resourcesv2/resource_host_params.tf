@@ -193,24 +193,26 @@ module "secrets" {
 [Interface]
 
 %{~for k, v in merge({
-  PostUp = <<EOT
+          PostUp = <<EOT
 nft add table ip filter && nft add chain ip filter output { type filter hook output priority 0 \; } && nft insert rule ip filter output oifname != "%i" mark != $(wg show %i fwmark) fib daddr type != local ip daddr != ${local.networks.kubernetes.network}/${local.networks.kubernetes.cidr} reject
 EOT
-}, var.wireguard_config.Interface)~}
+          }, var.wireguard_config.Interface)~}
 ${trimspace(k)} = ${trimspace(v)}
 
 %{~endfor~}
 
 [Peer]
 
-%{~for k, v in merge({PersistentKeepalive = 25}, var.wireguard_config.Peer)~}
+%{~for k, v in merge({
+          PersistentKeepalive = 25
+    }, var.wireguard_config.Peer)~}
 ${trimspace(k)} = ${trimspace(v)}
 
 %{~endfor~}
 EOF
-        }
-      }
-  ] : [])
+  }
+}
+] : [])
 }
 
 module "tls-secrets" {

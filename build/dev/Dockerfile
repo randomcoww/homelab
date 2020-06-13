@@ -7,6 +7,11 @@ RUN set -x \
     libvirt-dev \
     g++ \
   \
+  && git clone https://github.com/hashicorp/terraform-provider-kubernetes-alpha.git terraform-provider-kubernetes-alpha \
+  && cd terraform-provider-kubernetes-alpha \
+  && CGO_ENABLED=0 GO111MODULE=on GOOS=linux go install -v -ldflags '-s -w' \
+  \
+  && cd .. \
   && git clone https://github.com/randomcoww/terraform-provider-libvirt.git terraform-provider-libvirt \
   && cd terraform-provider-libvirt \
   && GO111MODULE=on GOOS=linux go install -v -ldflags '-s -w' \

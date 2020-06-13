@@ -545,9 +545,9 @@ locals {
           mount_path = "/var/s3/11"
         },
         {
-          source     = "/dev/disk/by-id/ata-Samsung_SSD_860_QVO_1TB_S4PGNF0M414895K"
-          target     = "vda"
-          device     = "/dev/vda"
+          source = "/dev/disk/by-id/ata-Samsung_SSD_860_QVO_1TB_S4PGNF0M414895K"
+          target = "vda"
+          device = "/dev/vda"
         },
       ]
     }
@@ -580,9 +580,9 @@ locals {
       # wipe_filesystem = false
       disk = [
         {
-          source     = "/dev/disk/by-id/ata-Samsung_SSD_860_QVO_1TB_S4PGNF0M410395Z"
-          target     = "vda"
-          device     = "/dev/vda"
+          source = "/dev/disk/by-id/ata-Samsung_SSD_860_QVO_1TB_S4PGNF0M410395Z"
+          target = "vda"
+          device = "/dev/vda"
         }
       ]
     }
