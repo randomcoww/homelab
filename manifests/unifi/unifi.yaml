@@ -17,7 +17,7 @@ spec:
       restartPolicy: Always
       containers:
       - name: rclone
-        image: randomcoww/rclone:v1.51.0
+        image: rclone/rclone:latest
         securityContext:
           privileged: true
         env:
