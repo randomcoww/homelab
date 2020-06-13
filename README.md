@@ -124,9 +124,8 @@ buildtool terraform apply \
     -auto-approve \
     -target=module.kubernetes_common
 
-buildtool terraform output kubeconfig > output/kubeconfig
-
-export KUBECONFIG=$(pwd)/output/kubeconfig
+mkdir -p ~/.kube
+buildtool terraform output kubeconfig > ~/.kube/config
 ```
 
 ### Generate basic Kubernetes addons
