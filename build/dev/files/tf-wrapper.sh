@@ -8,7 +8,7 @@ ssh-keygen -q -t ecdsa -N '' -f $KEY 2>/dev/null <<< y >/dev/null
 terraform init
 terraform apply \
   -auto-approve \
-  -target=null_resource.output-triggers \
+  -target=module.ssh_common \
   -var="ssh_client_public_key=$(cat $KEY.pub)"
 
 terraform output ssh-client-certificate > $KEY-cert.pub
