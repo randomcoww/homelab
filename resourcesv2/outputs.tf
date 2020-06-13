@@ -16,18 +16,32 @@ output "grafana-auth" {
 
 # Add to ~/.ssh/known_hosts @cert-authority * <key>
 output "ssh-ca-authorized-key" {
-  value = module.ssh-common.ssh_ca_authorized_key
+  value = module.ssh-common.client_params.ssh_ca_authorized_key
 }
 
 # Signed client public key for ~/.ssh/id_ecdsa-cert.pub
 output "ssh-client-certificate" {
-  value = module.ssh-common.ssh_client_certificate
+  value = module.ssh-common.client_params.ssh_client_certificate
 }
 
-# Module outputs are not automatically generated unless called in a resource
+output "kubeconfig" {
+  value = templatefile(local.addon_templates.kubeconfig-admin, {
+    cluster_name       = module.kubernetes-common.cluster_endpoint.cluster_name
+    ca_pem             = replace(base64encode(chomp(module.kubernetes-common.cluster_endpoint.kubernetes_ca_pem)), "\n", "")
+    cert_pem           = replace(base64encode(chomp(module.kubernetes-common.cluster_endpoint.kubernetes_cert_pem)), "\n", "")
+    private_key_pem    = replace(base64encode(chomp(module.kubernetes-common.cluster_endpoint.kubernetes_private_key_pem)), "\n", "")
+    apiserver_endpoint = module.kubernetes-common.cluster_endpoint.apiserver_endpoint
+  })
+}
+
+# Force output values to update
 resource "null_resource" "output-triggers" {
-  triggers = {
-    ssh_ca_authorized_key  = module.ssh-common.ssh_ca_authorized_key
-    ssh_client_certificate = module.ssh-common.ssh_client_certificate
-  }
+  triggers = merge({
+    for k, v in module.kubernetes-common.cluster_endpoint :
+    k => v
+  },
+  {
+    for k, v in module.ssh-common.client_params :
+    k => v
+  })
 }

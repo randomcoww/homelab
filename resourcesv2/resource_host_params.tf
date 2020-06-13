@@ -288,15 +288,3 @@ module "common-guests" {
     })
   }
 }
-
-# Write admin kubeconfig file
-resource "local_file" "kubeconfig-admin" {
-  content = templatefile(local.addon_templates.kubeconfig-admin, {
-    cluster_name       = module.kubernetes-common.cluster_endpoint.cluster_name
-    ca_pem             = replace(base64encode(chomp(module.kubernetes-common.cluster_endpoint.kubernetes_ca_pem)), "\n", "")
-    cert_pem           = replace(base64encode(chomp(module.kubernetes-common.cluster_endpoint.kubernetes_cert_pem)), "\n", "")
-    private_key_pem    = replace(base64encode(chomp(module.kubernetes-common.cluster_endpoint.kubernetes_private_key_pem)), "\n", "")
-    apiserver_endpoint = module.kubernetes-common.cluster_endpoint.apiserver_endpoint
-  })
-  filename = "output/${module.kubernetes-common.cluster_endpoint.cluster_name}.kubeconfig"
-}
