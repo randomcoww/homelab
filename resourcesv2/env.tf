@@ -647,6 +647,7 @@ locals {
         "controller-1",
         "controller-2",
         "worker-1",
+        "test-0",
       ]
       ## hypervisor boot image is copied with coreos-installer to strip
       ## out ignition and re-used to boot VMs

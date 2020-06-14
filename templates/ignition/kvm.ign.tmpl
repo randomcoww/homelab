@@ -57,7 +57,10 @@ systemd:
           ${matchbox_data_path} ${matchbox_assets_path} ${matchbox_tls_path}
         ExecStartPre=/usr/bin/podman load -i \
           ${matchbox_image_path}
-        ExecStart=/usr/bin/podman run --rm \
+        ExecStartPre=-/usr/bin/podman kill matchbox
+        ExecStartPre=-/usr/bin/podman rm matchbox
+        ExecStart=/usr/bin/podman run --rm -it \
+          --name matchbox \
           --security-opt label=disable \
           --network host \
           --mount type=volume,source=image_vol,destination=${matchbox_assets_path} \

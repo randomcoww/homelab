@@ -28,7 +28,10 @@ systemd:
           /var/log/containers \
           /etc/cni/net.d \
           /opt/cni/bin
-        ExecStart=/usr/bin/podman run --rm \
+        ExecStartPre=-/usr/bin/podman kill kubelet
+        ExecStartPre=-/usr/bin/podman rm kubelet
+        ExecStart=/usr/bin/podman run --rm -it \
+          --name kubelet \
           --security-opt label=disable \
           --network host \
           --pid host \

@@ -10,7 +10,8 @@ systemd:
           contents: |
             [Service]
             ExecStart=
-            ExecStart=/usr/bin/podman run --rm \
+            ExecStart=/usr/bin/podman run --rm -it \
+              --name kubelet \
               --security-opt label=disable \
               --network host \
               --pid host \
@@ -41,6 +42,33 @@ systemd:
                   --volume-plugin-dir=${kubelet_path}/volumeplugins \
                   --container-runtime=remote \
                   --container-runtime-endpoint=unix:///run/containerd/containerd.sock
+    - name: iscsid.socket
+      mask: true
+    - name: iscsid.service
+      enabled: true
+      contents: |
+        [Unit]
+        After=network.target
+        Before=kubelet.service
+
+        [Service]
+        ExecStartPre=-/usr/bin/podman kill iscsid
+        ExecStartPre=-/usr/bin/podman rm iscsid
+        ExecStart=
+        ExecStart=/usr/bin/podman run --rm -it \
+          --name iscsid \
+          --security-opt label=disable \
+          --network host \
+          --pid host \
+          --privileged \
+          -v /run:/run \
+          -v /dev:/dev \
+          -v /usr/lib/modules:/lib/modules:ro \
+          ${container_images.hyperkube} \
+            iscsid -f
+
+        [Install]
+        WantedBy=multi-user.target
 
 storage:
   files:
