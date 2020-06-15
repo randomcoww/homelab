@@ -15,22 +15,6 @@ buildtool() {
 }
 ```
 
-or
-
-```
-buildtool() {
-    set -x
-    podman run -it --rm \
-        -e AWS_ACCESS_KEY_ID=$AWS_ACCESS_KEY_ID \
-        -e AWS_SECRET_ACCESS_KEY=$AWS_SECRET_ACCESS_KEY \
-        -v $(pwd):/root/mnt \
-        -w /root/mnt/resourcesv2 \
-        --net=host \
-        randomcoww/tf-env:latest "$@"
-    rc=$?; set +x; return $rc
-}
-```
-
 ### Run local matchbox server
 
 Configurations for creating hypervisor images are generated on a local Matchbox instance. This will generate necessary TLS certs and start a local Matchbox instance using Podman:
