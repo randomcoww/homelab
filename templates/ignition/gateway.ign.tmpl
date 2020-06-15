@@ -112,12 +112,7 @@ storage:
           Name=${host_network.int.if}
 
           [Link]
-          ARP=no
-          RequiredForOnline=no
-
-          [Network]
-          LinkLocalAddressing=no
-          DHCP=no
+          Unmanaged=yes
 
     - path: /etc/keepalived/keepalived.conf
       mode: 0644

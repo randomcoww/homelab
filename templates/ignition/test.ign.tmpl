@@ -25,32 +25,7 @@ storage:
           Name=${host_network.int.if}
 
           [Link]
-          ARP=no
-          RequiredForOnline=no
-
-          [Network]
-          LinkLocalAddressing=no
-          DHCP=no
-    - path: /etc/systemd/network/50-kube-proxy.network
-      mode: 0644
-      contents:
-        inline: |
-          [Match]
-          Name=kube*
-
-          [Link]
-          Unmanaged=true
-          RequiredForOnline=no
-    - path: /etc/systemd/network/50-veth.network
-      mode: 0644
-      contents:
-        inline: |
-          [Match]
-          Name=veth*
-
-          [Link]
-          Unmanaged=true
-          RequiredForOnline=no
+          Unmanaged=yes
 
     ##
     ## pod config

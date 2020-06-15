@@ -20,18 +20,10 @@ systemd:
         [Unit]
         Description=Kubelet via Hyperkube
         After=network.target containerd.service
-        Requires=containerd.service
+        Wants=containerd.service
 
         [Service]
-        ExecStartPre=/bin/mkdir -p \
-          ${kubelet_path} \
-          /var/log/containers \
-          /etc/cni/net.d \
-          /opt/cni/bin
-        ExecStartPre=-/usr/bin/podman kill kubelet
-        ExecStartPre=-/usr/bin/podman rm kubelet
-        ExecStart=/usr/bin/podman run --rm -it \
-          --name kubelet \
+        Environment=KUBELET_PODMAN_OPTS="--name kubelet \
           --security-opt label=disable \
           --network host \
           --pid host \
@@ -49,7 +41,16 @@ systemd:
           -v /opt/cni/bin:/opt/cni/bin:z \
           -v ${kubelet_path}:${kubelet_path}:rshared,z \
           -v /var/log:/var/log \
-          -v /var/run/lock:/var/run/lock:z \
+          -v /var/run/lock:/var/run/lock:z"
+        ExecStartPre=/bin/mkdir -p \
+          ${kubelet_path} \
+          /var/log/containers \
+          /etc/cni/net.d \
+          /opt/cni/bin
+        ExecStartPre=-/usr/bin/podman kill kubelet
+        ExecStartPre=-/usr/bin/podman rm kubelet
+        ExecStart=/usr/bin/podman run --rm -it \
+          $KUBELET_PODMAN_OPTS \
           ${container_images.kubelet} \
             kubelet \
               --config=${kubelet_path}/kubelet-config-common.yaml \

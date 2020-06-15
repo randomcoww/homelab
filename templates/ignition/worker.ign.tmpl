@@ -8,28 +8,14 @@ systemd:
       dropins:
         - name: 10-worker.conf
           contents: |
+            [Unit]
+            After=iscsid.service
+            Wants=iscsid.service
+
             [Service]
             ExecStart=
             ExecStart=/usr/bin/podman run --rm -it \
-              --name kubelet \
-              --security-opt label=disable \
-              --network host \
-              --pid host \
-              --privileged \
-              -v /run:/run \
-              -v /dev:/dev \
-              -v /etc/ssl/certs:/etc/ssl/certs:ro \
-              -v /etc/pki/ca-trust:/etc/pki/ca-trust:ro \
-              -v /usr/lib/modules:/lib/modules:ro \
-              -v /etc/machine-id:/etc/machine-id:ro \
-              -v /usr/lib/os-release:/etc/os-release \
-              -v /sys/fs/cgroup:/sys/fs/cgroup:ro \
-              -v /sys/fs/cgroup/systemd:/sys/fs/cgroup/systemd \
-              -v /var/lib/containerd:/var/lib/containerd \
-              -v /opt/cni/bin:/opt/cni/bin:z \
-              -v ${kubelet_path}:${kubelet_path}:rshared,z \
-              -v /var/log:/var/log \
-              -v /var/run/lock:/var/run/lock:z \
+              $KUBELET_PODMAN_OPTS \
               ${container_images.hyperkube} \
                 kubelet \
                   --config=${kubelet_path}/kubelet-config-worker.yaml \
@@ -49,23 +35,20 @@ systemd:
       contents: |
         [Unit]
         After=network.target
-        Before=kubelet.service
 
         [Service]
         ExecStartPre=-/usr/bin/podman kill iscsid
         ExecStartPre=-/usr/bin/podman rm iscsid
-        ExecStart=
         ExecStart=/usr/bin/podman run --rm -it \
           --name iscsid \
           --security-opt label=disable \
           --network host \
           --pid host \
           --privileged \
-          -v /run:/run \
           -v /dev:/dev \
           -v /usr/lib/modules:/lib/modules:ro \
           ${container_images.hyperkube} \
-            iscsid -f
+            iscsid -fn
 
         [Install]
         WantedBy=multi-user.target
@@ -99,12 +82,7 @@ storage:
           Name=${host_network.int.if}
 
           [Link]
-          ARP=no
-          RequiredForOnline=no
-
-          [Network]
-          LinkLocalAddressing=no
-          DHCP=no
+          Unmanaged=yes
     - path: /etc/systemd/network/50-kube-proxy.network
       mode: 0644
       contents:
@@ -113,9 +91,7 @@ storage:
           Name=kube*
 
           [Link]
-          Unmanaged=true
-          RequiredForOnline=no
-
+          Unmanaged=yes
     - path: /etc/systemd/network/50-veth.network
       mode: 0644
       contents:
@@ -124,8 +100,7 @@ storage:
           Name=veth*
 
           [Link]
-          Unmanaged=true
-          RequiredForOnline=no
+          Unmanaged=yes
 
     - path: ${kubelet_path}/kubelet-config-worker.yaml
       mode: 0644

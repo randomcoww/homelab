@@ -28,12 +28,7 @@ storage:
           Name=${host_network.int.if}
 
           [Link]
-          ARP=no
-          RequiredForOnline=no
-
-          [Network]
-          LinkLocalAddressing=no
-          DHCP=no
+          Unmanaged=yes
 
     ##
     ## certs
