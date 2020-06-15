@@ -122,6 +122,14 @@ virsh -c qemu+ssh://core@kvm-1.local/system start controller-2
 virsh -c qemu+ssh://core@kvm-1.local/system start worker-1
 ```
 
+### Generate basic Kubernetes addons
+
+```bash
+buildtool terraform apply \
+    -var-file=secrets.tfvars \
+    -target=module.generic-manifest-local
+```
+
 Write kubeconfig file:
 
 ```bash
@@ -131,14 +139,6 @@ buildtool terraform apply \
 
 mkdir -p ~/.kube
 buildtool terraform output kubeconfig > ~/.kube/config
-```
-
-### Generate basic Kubernetes addons
-
-```bash
-buildtool terraform apply \
-    -var-file=secrets.tfvars \
-    -target=module.generic-manifest-local
 ```
 
 Apply addons:
