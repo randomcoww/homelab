@@ -60,7 +60,26 @@ buildtool terraform output ssh-client-certificate > $KEY-cert.pub
 Hypervisor images are live USB disks created using [Fedora CoreOS assembler](https://github.com/coreos/coreos-assembler). Generate ignition configuration to local Matchbox server:
 
 ```bash
-buildtool tf-wrapper apply \
+cat > secrets.tfvars <<EOF
+desktop_password = "password"
+wireguard_config = {
+  Interface = {
+    PrivateKey =
+    Address    =
+    DNS        =
+  }
+  Peer = {
+    PublicKey  =
+    AllowedIPs =
+    Endpoint   =
+  }
+}
+EOF
+```
+
+```bash
+buildtool terraform apply \
+    -var-file=secrets.tfvars \
     -target=module.ignition-local
 ```
 
@@ -81,7 +100,7 @@ Each hypervisor runs a PXE boot environment on an internal network for provision
 Ignition configuration is generated on each hypervisor as follows:
 
 ```bash
-buildtool tf-wrapper apply \
+buildtool terraform apply \
     -target=module.ignition-local \
     -target=module.ignition-kvm-0 \
     -target=module.ignition-kvm-1
@@ -110,10 +129,10 @@ Etcd data is restored from S3 on fresh start of a cluster if there is an existin
 
 ```bash
 virsh -c qemu+ssh://core@kvm-0.local/system start controller-0
-virsh -c qemu+ssh://core@kvm-1.local/system start controller-1
-virsh -c qemu+ssh://core@kvm-0.local/system start controller-2
-
 virsh -c qemu+ssh://core@kvm-0.local/system start worker-0
+
+virsh -c qemu+ssh://core@kvm-1.local/system start controller-1
+virsh -c qemu+ssh://core@kvm-1.local/system start controller-2
 virsh -c qemu+ssh://core@kvm-1.local/system start worker-1
 ```
 
@@ -131,8 +150,9 @@ buildtool terraform output kubeconfig > ~/.kube/config
 ### Generate basic Kubernetes addons
 
 ```bash
-buildtool tf-wrapper apply \
-    -target=module.kubernetes-addons
+buildtool terraform apply \
+    -var-file=secrets.tfvars \
+    -target=module.generic-manifest-local
 ```
 
 Apply addons:
