@@ -39,6 +39,26 @@ Configurations for creating hypervisor images are generated on a local Matchbox 
 buildtool start-renderer
 ```
 
+### Define secrets
+
+```bash
+cat > secrets.tfvars <<EOF
+desktop_password = "password"
+wireguard_config = {
+  Interface = {
+    PrivateKey =
+    Address    =
+    DNS        =
+  }
+  Peer = {
+    PublicKey  =
+    AllowedIPs =
+    Endpoint   =
+  }
+}
+EOF
+```
+
 ### Setup SSH access
 
 Sign client SSH key
@@ -58,24 +78,6 @@ buildtool terraform output ssh-client-certificate > $KEY-cert.pub
 ### Create hypervisor images
 
 Hypervisor images are live USB disks created using [Fedora CoreOS assembler](https://github.com/coreos/coreos-assembler). Generate ignition configuration to local Matchbox server:
-
-```bash
-cat > secrets.tfvars <<EOF
-desktop_password = "password"
-wireguard_config = {
-  Interface = {
-    PrivateKey =
-    Address    =
-    DNS        =
-  }
-  Peer = {
-    PublicKey  =
-    AllowedIPs =
-    Endpoint   =
-  }
-}
-EOF
-```
 
 ```bash
 buildtool terraform apply \
