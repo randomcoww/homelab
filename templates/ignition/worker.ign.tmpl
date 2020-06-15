@@ -49,17 +49,13 @@ systemd:
           -v /usr/lib/modules:/lib/modules:ro \
           ${container_images.hyperkube} \
             iscsid -fn
+        Restart=always
 
         [Install]
         WantedBy=multi-user.target
 
 storage:
   files:
-    - path: /etc/hostname
-      mode: 0644
-      contents:
-        inline:
-          ${hostname}
     - path: /etc/systemd/network/10-${host_network.main.if}.network
       mode: 0644
       contents:
@@ -80,24 +76,6 @@ storage:
         inline: |
           [Match]
           Name=${host_network.int.if}
-
-          [Link]
-          Unmanaged=yes
-    - path: /etc/systemd/network/50-kube-proxy.network
-      mode: 0644
-      contents:
-        inline: |
-          [Match]
-          Name=kube*
-
-          [Link]
-          Unmanaged=yes
-    - path: /etc/systemd/network/50-veth.network
-      mode: 0644
-      contents:
-        inline: |
-          [Match]
-          Name=veth*
 
           [Link]
           Unmanaged=yes

@@ -21,9 +21,9 @@ systemd:
         ConditionDirectoryNotEmpty=/etc/dconf/db/local.d/
 
         [Service]
-        ExecStart=/usr/bin/dconf update
         Type=oneshot
         RemainAfterExit=yes
+        ExecStart=/usr/bin/dconf update
 
         [Install]
         WantedBy=graphical.target
