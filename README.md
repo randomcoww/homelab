@@ -59,22 +59,6 @@ wireguard_config = {
 EOF
 ```
 
-### Setup SSH access
-
-Sign client SSH key
-
-```bash
-KEY=$HOME/.ssh/id_ecdsa
-ssh-keygen -q -t ecdsa -N '' -f $KEY 2>/dev/null <<< y >/dev/null
-
-buildtool terraform apply \
-    -auto-approve \
-    -target=null_resource.output-triggers \
-    -var="ssh_client_public_key=$(cat $KEY.pub)"
-
-buildtool terraform output ssh-client-certificate > $KEY-cert.pub
-```
-
 ### Create hypervisor images
 
 Hypervisor images are live USB disks created using [Fedora CoreOS assembler](https://github.com/coreos/coreos-assembler). Generate ignition configuration to local Matchbox server:
@@ -274,4 +258,20 @@ kubectl apply -f manifests/openebs_psp.yaml
 
 ```
 kubectl apply -f manifests/minio.yaml
+```
+
+### Setup SSH access from desktop
+
+Sign client SSH key
+
+```bash
+KEY=$HOME/.ssh/id_ecdsa
+ssh-keygen -q -t ecdsa -N '' -f $KEY 2>/dev/null <<< y >/dev/null
+
+buildtool terraform apply \
+    -auto-approve \
+    -target=null_resource.output-triggers \
+    -var="ssh_client_public_key=$(cat $KEY.pub)"
+
+buildtool terraform output ssh-client-certificate > $KEY-cert.pub
 ```
