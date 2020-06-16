@@ -128,6 +128,9 @@ buildtool terraform output kubeconfig > ~/.kube/config
 Apply addons:
 
 ```bash
+kubectl create namespace monitoring
+kubectl create namespace common
+
 kubectl apply -f http://127.0.0.1:8080/generic?manifest=bootstrap
 kubectl apply -f http://127.0.0.1:8080/generic?manifest=kube-proxy
 kubectl apply -f http://127.0.0.1:8080/generic?manifest=flannel
