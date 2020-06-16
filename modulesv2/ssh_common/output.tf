@@ -1,6 +1,6 @@
 output "client_params" {
   value = {
-    ssh_ca_authorized_key = tls_private_key.ssh-ca.public_key_openssh
+    ssh_ca_authorized_key  = tls_private_key.ssh-ca.public_key_openssh
     ssh_client_certificate = length(sshca_client_cert.ssh-client) > 0 ? sshca_client_cert.ssh-client[0].cert_authorized_key : ""
   }
 }

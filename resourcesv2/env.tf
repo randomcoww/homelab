@@ -1,29 +1,20 @@
 locals {
-  desktop_user = "randomcoww"
+  templates_path = "${path.module}/../templates"
+
   # Default user for CoreOS
   user = "core"
-  mtu  = 9000
+  # Desktop env user
+  desktop_user = "randomcoww"
 
-  # kubernetes
-  kubernetes_cluster_name = "default-cluster-2005"
+  # Set all MTU
+  mtu = 9000
+
+  # S3 backup for etcd
+  # path is based on the cluster name
   aws_region              = "us-west-2"
+  s3_etcd_backup_bucket   = "randomcoww-etcd-backup"
+  kubernetes_cluster_name = "default-cluster-2005"
 
-  # etcd backup
-  s3_etcd_backup_bucket = "randomcoww-etcd-backup"
-
-  # secrets store
-  # format:
-  # ---
-  # service1:
-  #   service1key: service1value
-  #   ...
-  # service2:
-  #   service2key: service2value
-  # ...
-  s3_secrets_bucket = "randomcoww-secrets"
-  s3_secrets_key    = "secrets.yaml"
-
-  templates_path = "${path.module}/../templates"
   # kubelet image is used for static pods and does not need to match the kubernetes version
   # hyperkube is used for the worker kubelet and should match the version
   container_images = {
