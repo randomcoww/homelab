@@ -41,7 +41,6 @@ locals {
     coredns                 = "docker.io/coredns/coredns:1.6.9"
     external_dns            = "docker.io/randomcoww/external-dns:v0.7.1"
     kapprover               = "docker.io/randomcoww/kapprover:v0.0.4"
-    nftables                = "docker.io/randomcoww/nftables:latest"
     kea                     = "docker.io/randomcoww/kea:1.6.2"
     conntrackd              = "docker.io/randomcoww/conntrackd:latest"
     promtail                = "docker.io/randomcoww/promtail:v1.4.1"
