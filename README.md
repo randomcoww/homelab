@@ -118,7 +118,6 @@ Write kubeconfig file:
 
 ```bash
 buildtool terraform apply \
-    -auto-approve \
     -target=null_resource.output-triggers
 
 mkdir -p ~/.kube
@@ -138,16 +137,6 @@ kubectl apply -f http://127.0.0.1:8080/generic?manifest=kapprover
 kubectl apply -f http://127.0.0.1:8080/generic?manifest=coredns
 kubectl apply -f http://127.0.0.1:8080/generic?manifest=metallb-network
 kubectl apply -f http://127.0.0.1:8080/generic?manifest=loki-lb-service
-
-kubectl apply -f http://127.0.0.1:8080/generic?manifest=traefik-tls-ingress
-kubectl apply -f http://127.0.0.1:8080/generic?manifest=minio-tls-ingress
-kubectl apply -f http://127.0.0.1:8080/generic?manifest=common-tls-ingress
-kubectl apply -f http://127.0.0.1:8080/generic?manifest=monitoring-tls-ingress
-
-kubectl apply -f http://127.0.0.1:8080/generic?manifest=minio-minio-auth
-kubectl apply -f http://127.0.0.1:8080/generic?manifest=common-minio-auth
-kubectl apply -f http://127.0.0.1:8080/generic?manifest=monitoring-grafana-auth
-kubectl apply -f http://127.0.0.1:8080/generic?manifest=common-wireguard-client
 ```
 
 ### Deploy services on Kubernetes
@@ -245,6 +234,14 @@ kubectl apply -f manifests/openebs_psp.yaml
 
 ```
 kubectl apply -f manifests/minio.yaml
+```
+
+#### Apply secrets
+
+```bash
+buildtool terraform apply \
+    -var-file=secrets.tfvars \
+    -target=module.kubernetes-addons
 ```
 
 ### Setup SSH access from desktop

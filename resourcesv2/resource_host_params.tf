@@ -223,10 +223,6 @@ module "tls-secrets" {
   secrets = [
     {
       name      = "tls-ingress"
-      namespace = "traefik"
-    },
-    {
-      name      = "tls-ingress"
       namespace = "minio"
     },
     {
