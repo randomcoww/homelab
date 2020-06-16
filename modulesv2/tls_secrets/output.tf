@@ -12,18 +12,16 @@ output "templates" {
 }
 
 output "addons" {
-  value = merge(
-    {
-      for k, v in var.secrets :
-      "${v.namespace}-${v.name}" => templatefile(var.addon_templates.secret, {
-        namespace = v.namespace
-        name      = v.name
-        type      = "kubernetes.io/tls"
-        data = {
-          "tls.crt" = tls_locally_signed_cert.internal[k].cert_pem
-          "tls.key" = tls_private_key.internal[k].private_key_pem
-        }
-      })
-    }
-  )
+  value = {
+    for k, v in var.secrets :
+    "${v.namespace}-${v.name}" => templatefile(var.addon_templates.secret, {
+      namespace = v.namespace
+      name      = v.name
+      type      = "kubernetes.io/tls"
+      data = {
+        "tls.crt" = tls_locally_signed_cert.internal[k].cert_pem
+        "tls.key" = tls_private_key.internal[k].private_key_pem
+      }
+    })
+  }
 }
