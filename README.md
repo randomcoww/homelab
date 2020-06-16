@@ -160,11 +160,11 @@ kubectl create namespace monitoring
 
 helm template loki \
     --namespace=monitoring \
-    loki/loki
+    loki/loki | kubectl apply -f -
 
 helm template promtail \
     --namespace monitoring \
-    loki/promtail
+    loki/promtail | kubectl apply -f -
 
 helm template prometheus \
     --namespace monitoring \
@@ -176,14 +176,7 @@ helm template prometheus \
     --set kube-state-metrics.podSecurityPolicy.enabled=true \
     --set pushgateway.enabled=false \
     --set server.persistentVolume.enabled=false \
-    stable/prometheus
-
-helm template loki-grafana \
-    --namespace=monitoring \
-    --set persistence.enabled=false \
-    --set initChownData.enabled=false \
-    --set testFramework.enabled=false \
-    stable/grafana
+    stable/prometheus | kubectl apply -f -
 
 kubectl apply -f manifests/grafana.yaml
 ```
@@ -222,7 +215,7 @@ helm template openebs \
     --set snapshotOperator.enabled=false \
     --set webhook.imageTag=$OPENEBS_VERSION \
     --set ndm.filters.includePaths=/dev/vd \
-    stable/openebs
+    stable/openebs | kubectl apply -f -
 ```
 
 Add block devices (IDs specific to my hardware)
