@@ -127,16 +127,11 @@ buildtool terraform output kubeconfig > ~/.kube/config
 Apply addons:
 
 ```bash
-kubectl create namespace monitoring
-kubectl create namespace common
-
 kubectl apply -f http://127.0.0.1:8080/generic?manifest=bootstrap
 kubectl apply -f http://127.0.0.1:8080/generic?manifest=kube-proxy
 kubectl apply -f http://127.0.0.1:8080/generic?manifest=flannel
 kubectl apply -f http://127.0.0.1:8080/generic?manifest=kapprover
 kubectl apply -f http://127.0.0.1:8080/generic?manifest=coredns
-kubectl apply -f http://127.0.0.1:8080/generic?manifest=metallb-network
-kubectl apply -f http://127.0.0.1:8080/generic?manifest=loki-lb-service
 ```
 
 ### Deploy services on Kubernetes
@@ -145,6 +140,9 @@ kubectl apply -f http://127.0.0.1:8080/generic?manifest=loki-lb-service
 
 https://metallb.universe.tf/installation/#installation-by-manifest
 
+```
+kubectl apply -f http://127.0.0.1:8080/generic?manifest=metallb-network
+```
 
 #### Traefik
 
@@ -157,6 +155,8 @@ kubectl apply -f manifests/traefik.yaml
 ```
 helm repo add loki https://grafana.github.io/loki/charts
 helm repo add stable https://kubernetes-charts.storage.googleapis.com
+
+kubectl create namespace monitoring
 
 helm template loki \
     --namespace=monitoring \
@@ -186,6 +186,11 @@ helm template loki-grafana \
     stable/grafana
 
 kubectl apply -f manifests/grafana.yaml
+```
+Allow non cluster nodes to send logs to loki:
+
+```
+kubectl apply -f http://127.0.0.1:8080/generic?manifest=loki-lb-service
 ```
 
 Currently the PSP `requiredDropCapabilities` causes loki pod to crashloop:
