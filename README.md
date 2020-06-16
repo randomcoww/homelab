@@ -43,6 +43,22 @@ wireguard_config = {
 EOF
 ```
 
+### Setup SSH access from desktop
+
+Sign client SSH key
+
+```bash
+KEY=$HOME/.ssh/id_ecdsa
+ssh-keygen -q -t ecdsa -N '' -f $KEY 2>/dev/null <<< y >/dev/null
+
+buildtool terraform apply \
+    -auto-approve \
+    -target=null_resource.output-triggers \
+    -var="ssh_client_public_key=$(cat $KEY.pub)"
+
+buildtool terraform output ssh-client-certificate > $KEY-cert.pub
+```
+
 ### Create hypervisor images
 
 Hypervisor images are live USB disks created using [Fedora CoreOS assembler](https://github.com/coreos/coreos-assembler). Generate ignition configuration to local Matchbox server:
@@ -76,7 +92,7 @@ buildtool terraform apply \
     -target=module.ignition-kvm-1
 ```
 
-Define VMs on each hypervisor:
+Define libvirt domains on each hypervisor:
 
 ```bash
 buildtool tf-wrapper apply \
@@ -84,29 +100,20 @@ buildtool tf-wrapper apply \
     -target=module.libvirt-kvm-1
 ```
 
-### Start gateway VMs
-
-This will provide a basic infrastructure including NAT routing, DHCP and basic DNS.
+### Start VMs
 
 ```bash
 virsh -c qemu+ssh://core@kvm-0.local/system start gateway-0
-virsh -c qemu+ssh://core@kvm-1.local/system start gateway-1
-```
-
-### Start Kubernetes cluster VMs
-
-Etcd data is restored from S3 on fresh start of a cluster if there is an existing backup. A backup is made every 30 minutes. Local data is discarded when the etcd container stops.
-
-```bash
 virsh -c qemu+ssh://core@kvm-0.local/system start controller-0
 virsh -c qemu+ssh://core@kvm-0.local/system start worker-0
 
+virsh -c qemu+ssh://core@kvm-1.local/system start gateway-1
 virsh -c qemu+ssh://core@kvm-1.local/system start controller-1
 virsh -c qemu+ssh://core@kvm-1.local/system start controller-2
 virsh -c qemu+ssh://core@kvm-1.local/system start worker-1
 ```
 
-### Generate basic Kubernetes addons
+### Deploy kubernetes services
 
 ```bash
 buildtool terraform apply \
@@ -124,7 +131,7 @@ mkdir -p ~/.kube
 buildtool terraform output kubeconfig > ~/.kube/config
 ```
 
-Apply addons:
+Basic addons:
 
 ```bash
 kubectl apply -f http://127.0.0.1:8080/generic?manifest=bootstrap
@@ -133,8 +140,6 @@ kubectl apply -f http://127.0.0.1:8080/generic?manifest=flannel
 kubectl apply -f http://127.0.0.1:8080/generic?manifest=kapprover
 kubectl apply -f http://127.0.0.1:8080/generic?manifest=coredns
 ```
-
-### Deploy services on Kubernetes
 
 #### MetalLb
 
@@ -240,20 +245,4 @@ kubectl apply -f manifests/minio.yaml
 buildtool terraform apply \
     -var-file=secrets.tfvars \
     -target=module.kubernetes-addons
-```
-
-### Setup SSH access from desktop
-
-Sign client SSH key
-
-```bash
-KEY=$HOME/.ssh/id_ecdsa
-ssh-keygen -q -t ecdsa -N '' -f $KEY 2>/dev/null <<< y >/dev/null
-
-buildtool terraform apply \
-    -auto-approve \
-    -target=null_resource.output-triggers \
-    -var="ssh_client_public_key=$(cat $KEY.pub)"
-
-buildtool terraform output ssh-client-certificate > $KEY-cert.pub
 ```
