@@ -129,7 +129,7 @@ mkdir -p ~/.kube
 buildtool terraform output kubeconfig > ~/.kube/config
 ```
 
-Basic addons:
+#### Basic addons
 
 ```bash
 kubectl apply -f http://127.0.0.1:8080/generic?manifest=bootstrap
@@ -240,6 +240,8 @@ kubectl apply -f manifests/minio.yaml
 #### Apply secrets
 
 ```bash
+kubectl create namespace common
+
 buildtool terraform apply \
     -var-file=secrets.tfvars \
     -target=module.kubernetes-addons
