@@ -91,11 +91,11 @@ module "generic-manifest-local" {
   generic_params = merge(
     module.gateway-common.addons,
     module.kubernetes-common.addons,
-    module.secrets.addons,
-    module.tls-secrets.addons,
-    module.ssh-common.addons,
+    # module.secrets.addons,
+    # module.tls-secrets.addons,
+    # module.ssh-common.addons,
     module.static-pod-logging.addons,
-    module.test-common.addons,
+    # module.test-common.addons,
   )
 
   renderer = local.local_renderer
