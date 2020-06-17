@@ -203,6 +203,7 @@ locals {
         "kvm-1",
         "test-0",
         "desktop",
+        "laptop",
       ]
       templates = [
         "${local.templates_path}/ignition/ssh.ign.tmpl",
@@ -211,6 +212,7 @@ locals {
     traefik_tls = {
       nodes = [
         "desktop",
+        "laptop",
       ]
       templates = [
         "${local.templates_path}/ignition/internal_tls.ign.tmpl",
@@ -300,6 +302,7 @@ locals {
     desktop = {
       nodes = [
         "desktop",
+        "laptop",
       ]
       templates = [
         "${local.templates_path}/ignition/desktop.ign.tmpl",
@@ -666,6 +669,27 @@ locals {
       ## out ignition and re-used to boot VMs
       image_device = "/dev/disk/by-label/fedora-silverblue-32"
     }
+    laptop = {
+      network = [
+        {
+          alias = "hw"
+          mac   = "08-0e-01-cf-ef-aa"
+        },
+        {
+          network = "main"
+          ip      = "192.168.127.254"
+        }
+      ]
+      disk = [
+        {
+          device     = "/dev/disk/by-id/ata-SAMSUNG_SSD_830_Series_SOXYNEAC720618-part1"
+          mount_path = "/var/home/${local.desktop_user}"
+        }
+      ]
+      ## hypervisor boot image is copied with coreos-installer to strip
+      ## out ignition and re-used to boot VMs
+      image_device = "/dev/disk/by-label/fedora-silverblue-32"
+    }
   }
 
   # similar to guests filter
@@ -675,6 +699,7 @@ locals {
     "kvm-1",
     # password bcrypt included with desktop causes all ignition configs to get regenerated each run
     "desktop",
+    "laptop",
   ]
 
   host_network_by_type = {
