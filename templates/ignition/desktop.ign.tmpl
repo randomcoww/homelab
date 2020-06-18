@@ -44,12 +44,12 @@ storage:
           [Network]
           LinkLocalAddressing=no
           DHCP=no
-    - path: /etc/systemd/network/80-wl.network
+    - path: /etc/systemd/network/80-w.network
       mode: 0644
       contents:
         inline: |
           [Match]
-          Name=wl*
+          Name=w*
 
           [Link]
           Unmanaged=true

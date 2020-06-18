@@ -28,6 +28,24 @@
     </disk>
     %{~ endfor ~}
     %{~ for k in network ~}
+    %{~ if lookup(k, "type", null) == "vf" ~}
+    <interface type='network'>
+    <source network='sriov-net'/>
+      %{~ if lookup(k, "mac", null) != null ~}
+      <mac address='${join(":", split("-", k.mac))}'/>
+      %{~ endif ~}
+      %{~ if lookup(k, "bootorder", null) != null ~}
+      <boot order='${k.bootorder}'/>
+      %{~ endif ~}
+      %{~ if lookup(networks[k.network], "id", null) != null ~}
+      <vlan>
+        <tag id='${networks[k.network].id}'/>
+      </vlan>
+      %{~ endif ~}
+      <driver name='vfio'/>
+      <model type='virtio-net'/>
+    </interface>
+    %{~ else ~}
     <interface type='direct' trustGuestRxFilters='yes'>
       <source dev='${networks[k.network].br_if}' mode='bridge'/>
       %{~ if lookup(k, "mac", null) != null ~}
@@ -38,6 +56,7 @@
       %{~ endif ~}
       <model type='virtio-net'/>
     </interface>
+    %{~ endif ~}
     %{~ endfor ~}
     %{~ for k in hostdev ~}
     <hostdev mode='subsystem' type='pci' managed='yes'>

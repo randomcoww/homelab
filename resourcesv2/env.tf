@@ -203,7 +203,6 @@ locals {
         "kvm-1",
         "test-0",
         "desktop",
-        "laptop",
       ]
       templates = [
         "${local.templates_path}/ignition/ssh.ign.tmpl",
@@ -212,7 +211,6 @@ locals {
     traefik_tls = {
       nodes = [
         "desktop",
-        "laptop",
       ]
       templates = [
         "${local.templates_path}/ignition/internal_tls.ign.tmpl",
@@ -302,7 +300,6 @@ locals {
     desktop = {
       nodes = [
         "desktop",
-        "laptop",
       ]
       templates = [
         "${local.templates_path}/ignition/desktop.ign.tmpl",
@@ -333,30 +330,30 @@ locals {
       vcpu   = 1
       network = [
         {
+          network   = "int"
+          if        = "eth0"
+          mac       = "52-54-00-1a-61-2a"
+          bootorder = 1
+        },
+        {
           network = "main"
           ip      = "192.168.127.217"
-          if      = "eth0"
+          if      = "eth1"
         },
         {
           network = "lan"
           ip      = "192.168.63.217"
-          if      = "eth1"
+          if      = "eth2"
         },
         {
           network = "sync"
           ip      = "192.168.190.1"
-          if      = "eth2"
+          if      = "eth3"
         },
         {
           network = "wan"
-          if      = "eth3"
+          if      = "eth4"
           mac     = "52-54-00-63-6e-b3"
-        },
-        {
-          network   = "int"
-          if        = "eth4"
-          mac       = "52-54-00-1a-61-2a"
-          bootorder = 1
         }
       ]
       kea_ha_role = "primary"
@@ -366,30 +363,30 @@ locals {
       vcpu   = 1
       network = [
         {
+          network   = "int"
+          if        = "eth0"
+          mac       = "52-54-00-1a-61-2b"
+          bootorder = 1
+        },
+        {
           network = "main"
           ip      = "192.168.127.218"
-          if      = "eth0"
+          if      = "eth1"
         },
         {
           network = "lan"
           ip      = "192.168.63.218"
-          if      = "eth1"
+          if      = "eth2"
         },
         {
           network = "sync"
           ip      = "192.168.190.2"
-          if      = "eth2"
+          if      = "eth3"
         },
         {
           network = "wan"
-          if      = "eth3"
+          if      = "eth4"
           mac     = "52-54-00-63-6e-b3"
-        },
-        {
-          network   = "int"
-          if        = "eth4"
-          mac       = "52-54-00-1a-61-2b"
-          bootorder = 1
         }
       ]
       kea_ha_role = "standby"
@@ -401,15 +398,15 @@ locals {
       vcpu   = 2
       network = [
         {
-          network = "main"
-          ip      = "192.168.127.219"
-          if      = "eth0"
-        },
-        {
           network   = "int"
-          if        = "eth1"
+          if        = "eth0"
           mac       = "52-54-00-1a-61-0a"
           bootorder = 1
+        },
+        {
+          network = "main"
+          ip      = "192.168.127.219"
+          if      = "eth1"
         }
       ]
     }
@@ -418,15 +415,15 @@ locals {
       vcpu   = 2
       network = [
         {
-          network = "main"
-          ip      = "192.168.127.220"
-          if      = "eth0"
-        },
-        {
           network   = "int"
-          if        = "eth1"
+          if        = "eth0"
           mac       = "52-54-00-1a-61-0b"
           bootorder = 1
+        },
+        {
+          network = "main"
+          ip      = "192.168.127.220"
+          if      = "eth1"
         }
       ]
     }
@@ -435,15 +432,15 @@ locals {
       vcpu   = 2
       network = [
         {
-          network = "main"
-          ip      = "192.168.127.221"
-          if      = "eth0"
-        },
-        {
           network   = "int"
-          if        = "eth1"
+          if        = "eth0"
           mac       = "52-54-00-1a-61-0c"
           bootorder = 1
+        },
+        {
+          network = "main"
+          ip      = "192.168.127.221"
+          if      = "eth1"
         }
       ]
     }
@@ -454,14 +451,14 @@ locals {
       vcpu   = 4
       network = [
         {
-          network = "main"
-          if      = "eth0"
-        },
-        {
           network   = "int"
-          if        = "eth1"
+          if        = "eth0"
           mac       = "52-54-00-1a-61-1a"
           bootorder = 1
+        },
+        {
+          network = "main"
+          if      = "eth1"
         }
       ]
       hostdev = [
@@ -549,20 +546,20 @@ locals {
       vcpu   = 4
       network = [
         {
-          network = "main"
-          if      = "eth0"
-        },
-        {
           network   = "int"
-          if        = "eth1"
+          if        = "eth0"
           mac       = "52-54-00-1a-61-1b"
           bootorder = 1
+        },
+        {
+          network = "main"
+          if      = "eth1"
         }
       ]
       hostdev = [
         {
           domain   = "0x0000"
-          bus      = "0x05"
+          bus      = "0x02"
           slot     = "0x00"
           function = "0x0"
           rom      = "/etc/libvirt/boot/SAS9300_8i_IT.bin"
@@ -586,14 +583,14 @@ locals {
       vcpu   = 2
       network = [
         {
-          network = "main"
-          if      = "eth0"
-        },
-        {
           network   = "int"
-          if        = "eth1"
+          if        = "eth0"
           mac       = "52-54-00-1a-61-3a"
           bootorder = 1
+        },
+        {
+          network = "main"
+          if      = "eth1"
         }
       ]
       disk = [
@@ -699,7 +696,6 @@ locals {
     "kvm-1",
     # password bcrypt included with desktop causes all ignition configs to get regenerated each run
     "desktop",
-    "laptop",
   ]
 
   host_network_by_type = {
