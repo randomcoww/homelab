@@ -5,6 +5,12 @@ systemd:
   units:
     - name: libvirtd.service
       enabled: true
+      dropins:
+        - name: boot-image-mount.conf
+          contents: |
+            [Unit]
+            After=mount-boot-vol.service
+            Wants=mount-boot-vol.service
     - name: ksm.service
       enabled: true
     - name: ksmtuned.service
@@ -18,24 +24,21 @@ systemd:
             ExecStart=
             ExecStart=/usr/sbin/kea-dhcp4 -c /etc/kea/kea-dhcp4-internal.conf
 
-    - name: podman-image-vol.service
+    - name: mount-boot-vol.service
       enabled: true
       contents: |
         [Unit]
-        ConditionPathExists=${image_device}
-        ConditionPathExists=!/var/tmp/image_vol.iso
+        ConditionPathExists=${boot_image_device}
+        ConditionPathExists=!${boot_image_mount_path}
         After=local-fs.target
 
         [Service]
-        TimeoutStartSec=5m
-        Restart=on-failure
-        RestartSec=10
         Type=oneshot
         ExecStart=/usr/bin/coreos-installer iso remove \
-          ${image_device} -o /var/tmp/image_vol.iso
+          ${boot_image_device} -o ${boot_image_mount_path}
         ExecStart=/usr/bin/podman volume create \
           --opt type=iso9660 \
-          --opt device=/var/tmp/image_vol.iso \
+          --opt device=${boot_image_mount_path} \
           image_vol
 
         [Install]
@@ -46,8 +49,8 @@ systemd:
         [Unit]
         After=network-online.target
         Wants=network-online.target
-        After=podman-image-vol.service
-        Wants=podman-image-vol.service
+        After=mount-boot-vol.service
+        Wants=mount-boot-vol.service
 
         [Service]
         TimeoutStartSec=5m

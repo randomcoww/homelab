@@ -25,21 +25,22 @@ output "templates" {
     host => [
       for template in var.templates :
       templatefile(template, {
-        hostname             = params.hostname
-        user                 = var.user
-        container_images     = var.container_images
-        networks             = var.networks
-        host_network         = params.host_network
-        mtu                  = var.mtu
-        networks             = var.networks
-        domains              = var.domains
-        services             = var.services
-        matchbox_image_path  = "/etc/container-save/matchbox.tar"
-        image_device         = params.image_device
-        kea_path             = "/var/lib/kea"
-        matchbox_tls_path    = "/etc/matchbox/certs"
-        matchbox_data_path   = "/etc/matchbox/data"
-        matchbox_assets_path = "/etc/matchbox/assets"
+        hostname              = params.hostname
+        user                  = var.user
+        container_images      = var.container_images
+        networks              = var.networks
+        host_network          = params.host_network
+        mtu                   = var.mtu
+        networks              = var.networks
+        domains               = var.domains
+        services              = var.services
+        matchbox_image_path   = "/etc/container-save/matchbox.tar"
+        boot_image_device     = params.boot_image_device
+        boot_image_mount_path = var.boot_image_mount_path
+        kea_path              = "/var/lib/kea"
+        matchbox_tls_path     = "/etc/matchbox/certs"
+        matchbox_data_path    = "/etc/matchbox/data"
+        matchbox_assets_path  = "/etc/matchbox/assets"
 
         vlans = [
           for k, v in var.networks :

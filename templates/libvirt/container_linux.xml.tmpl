@@ -20,6 +20,13 @@
   <devices>
     <emulator>/usr/bin/qemu-system-x86_64</emulator>
     <controller type='usb' model='none'/>
+    <controller type='scsi' model='virtio-scsi'/>
+    <disk type='file' device='cdrom'>
+      <driver name='qemu' type='raw'/>
+      <source file='${boot_image_mount_path}'/>
+      <target dev='sda' bus='scsi'/>
+      <readonly/>
+    </disk>
     %{~ for k in disk ~}
     <disk type='block' device='disk'>
       <driver name='qemu' type='raw' cache='none' io='native' discard='unmap'/>
@@ -43,6 +50,7 @@
       </vlan>
       %{~ endif ~}
       <driver name='vfio'/>
+      <guest dev="${k.if}"/>
       <model type='virtio-net'/>
     </interface>
     %{~ else ~}
@@ -54,6 +62,7 @@
       %{~ if lookup(k, "bootorder", null) != null ~}
       <boot order='${k.bootorder}'/>
       %{~ endif ~}
+      <guest dev="${k.if}"/>
       <model type='virtio-net'/>
     </interface>
     %{~ endif ~}

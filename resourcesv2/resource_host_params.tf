@@ -92,12 +92,13 @@ module "test-common" {
 module "kvm-common" {
   source = "../modulesv2/kvm_common"
 
-  user             = local.user
-  mtu              = local.mtu
-  networks         = local.networks
-  services         = local.services
-  domains          = local.domains
-  container_images = local.container_images
+  user                  = local.user
+  mtu                   = local.mtu
+  networks              = local.networks
+  services              = local.services
+  domains               = local.domains
+  container_images      = local.container_images
+  boot_image_mount_path = local.boot_image_mount_path
 
   templates = local.components.kvm.templates
   hosts = {
@@ -266,7 +267,8 @@ module "static-pod-logging" {
 module "common-guests" {
   source = "../modulesv2/common_guests"
 
-  networks = local.networks
+  networks              = local.networks
+  boot_image_mount_path = local.boot_image_mount_path
 
   libvirt_template = local.components.common_guests.libvirt_template
   hosts = {

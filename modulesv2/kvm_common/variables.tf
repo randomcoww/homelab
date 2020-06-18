@@ -29,3 +29,7 @@ variable "hosts" {
 variable "templates" {
   type = list(string)
 }
+
+variable "boot_image_mount_path" {
+  type = string
+}

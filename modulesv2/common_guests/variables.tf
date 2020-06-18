@@ -9,3 +9,7 @@ variable "hosts" {
 variable "libvirt_template" {
   type = string
 }
+
+variable "boot_image_mount_path" {
+  type = string
+}

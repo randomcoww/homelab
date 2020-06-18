@@ -38,9 +38,11 @@ locals {
     matchbox                = "quay.io/poseidon/matchbox:latest"
   }
 
-  kernel_image = "images/vmlinuz"
+  boot_image_mount_path = "/etc/libvirt/boot/boot_image.iso"
+  boot_disk_label       = "fedora-coreos-32"
+  kernel_image          = "images/vmlinuz"
   initrd_images = [
-    "images/initramfs.img"
+    "images/initramfs.img",
   ]
   kernel_params = [
     "console=hvc0",
@@ -50,6 +52,7 @@ locals {
     "net.ifnames=0",
     "biosdevname=0",
     "systemd.unified_cgroup_hierarchy=0",
+    "coreos.liveiso=${local.boot_disk_label}",
   ]
 
   services = {
@@ -618,7 +621,7 @@ locals {
       ]
       ## hypervisor boot image is copied with coreos-installer to strip
       ## out ignition and re-used to boot VMs
-      image_device = "/dev/disk/by-label/fedora-coreos-32"
+      boot_image_device = "/dev/disk/by-label/${local.boot_disk_label}"
     }
     kvm-1 = {
       network = [
@@ -641,7 +644,7 @@ locals {
       ]
       ## hypervisor boot image is copied with coreos-installer to strip
       ## out ignition and re-used to boot VMs
-      image_device = "/dev/disk/by-label/fedora-coreos-32"
+      boot_image_device = "/dev/disk/by-label/${local.boot_disk_label}"
     }
 
     # desktop
@@ -662,9 +665,6 @@ locals {
           mount_path = "/var/home/${local.desktop_user}"
         }
       ]
-      ## hypervisor boot image is copied with coreos-installer to strip
-      ## out ignition and re-used to boot VMs
-      image_device = "/dev/disk/by-label/fedora-silverblue-32"
     }
     laptop = {
       network = [
@@ -683,9 +683,6 @@ locals {
           mount_path = "/var/home/${local.desktop_user}"
         }
       ]
-      ## hypervisor boot image is copied with coreos-installer to strip
-      ## out ignition and re-used to boot VMs
-      image_device = "/dev/disk/by-label/fedora-silverblue-32"
     }
   }
 
