@@ -19,25 +19,10 @@
   <on_crash>restart</on_crash>
   <devices>
     <emulator>/usr/bin/qemu-system-x86_64</emulator>
-    <controller type='usb' model='none'/>
-    <controller type='scsi' model='virtio-scsi'/>
-    <disk type='file' device='cdrom'>
-      <driver name='qemu' type='raw'/>
-      <source file='${boot_image_mount_path}'/>
-      <target dev='sda' bus='scsi'/>
-      <readonly/>
-    </disk>
-    %{~ for k in disk ~}
-    <disk type='block' device='disk'>
-      <driver name='qemu' type='raw' cache='none' io='native' discard='unmap'/>
-      <source dev='${k.source}'/>
-      <target dev='${k.target}' bus='virtio'/>
-    </disk>
-    %{~ endfor ~}
     %{~ for k in network ~}
     %{~ if lookup(k, "type", null) == "vf" ~}
     <interface type='network'>
-    <source network='sriov-net'/>
+    <source network='sriov-vf'/>
       %{~ if lookup(k, "mac", null) != null ~}
       <mac address='${join(":", split("-", k.mac))}'/>
       %{~ endif ~}
@@ -67,6 +52,21 @@
     </interface>
     %{~ endif ~}
     %{~ endfor ~}
+    <controller type='usb' model='none'/>
+    <controller type='scsi' model='virtio-scsi'/>
+    %{~ for k in disk ~}
+    <disk type='block' device='disk'>
+      <driver name='qemu' type='raw' cache='none' io='native' discard='unmap'/>
+      <source dev='${k.source}'/>
+      <target dev='${k.target}' bus='scsi'/>
+    </disk>
+    %{~ endfor ~}
+    <disk type='file' device='cdrom'>
+      <driver name='qemu' type='raw'/>
+      <source file='${boot_image_mount_path}'/>
+      <target dev='sda' bus='scsi'/>
+      <readonly/>
+    </disk>
     %{~ for k in hostdev ~}
     <hostdev mode='subsystem' type='pci' managed='yes'>
       <driver name='vfio'/>

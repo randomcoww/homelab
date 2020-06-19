@@ -124,24 +124,33 @@ storage:
             vrrp_iptables
             dynamic_interfaces allow_if_changes
           }
-          vrrp_instance VI_gateway {
+          vrrp_sync_group VG_gateway {
+            group {
+              %{~ for k in keys(host_network) ~}
+              %{~ if lookup(networks[k], "router", null) != null ~}
+              VI_gateway_${k}
+              %{~ endif ~}
+              %{~ endfor ~}
+            }
+          }
+          %{~ for k, v in host_network ~}
+          %{~ if lookup(networks[k], "router", null) != null ~}
+          vrrp_instance VI_gateway_${k} {
             nopreempt
             state BACKUP
             strict_mode off
             virtual_router_id ${vrrp_gateway_id}
-            interface ${host_network.sync.if}
+            interface ${v.if}
             priority 100
-            virtual_ipaddress {
-              %{~ for k, v in networks ~}
-              %{~ if lookup(v, "router", null) != null ~}
-              ${v.router} dev ${host_network[k].if}
-              %{~ endif ~}
-              %{~ endfor ~}
-            }
             virtual_rules {
               to all lookup ${master_default_route_table} priority ${master_default_route_priority}
             }
+            virtual_ipaddress {
+              ${networks[k].router}
+            }
           }
+          %{~ endif ~}
+          %{~ endfor ~}
     - path: /etc/sysconfig/nftables.conf
       mode: 0644
       overwrite: true

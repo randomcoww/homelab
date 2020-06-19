@@ -11,6 +11,9 @@ systemd:
             [Unit]
             After=mount-boot-vol.service
             Wants=mount-boot-vol.service
+
+            [Service]
+            ExecStartPre=-/bin/bash -c "echo 31 > /sys/class/net/${host_network.en-pf.if}/device/sriov_numvfs"
     - name: ksm.service
       enabled: true
     - name: ksmtuned.service

@@ -6,16 +6,28 @@ storage:
     ##
     ## allocate vlan interfaces to hardware
     ##
-    - path: /etc/systemd/network/10-hw.network
+    - path: /etc/systemd/network/05-${host_network.en-pf.if}.link
       mode: 0644
       contents:
         inline: |
           [Match]
-          MACAddress=${host_network.hw.mac}
+          PermanentMACAddress=${host_network.en-pf.mac}
+
+          [Link]
+          MACAddressPolicy=persistent
+          Name=${host_network.en-pf.if}
+          MTUBytes=${mtu}
+
+    - path: /etc/systemd/network/10-${host_network.en-pf.if}.network
+      mode: 0644
+      contents:
+        inline: |
+          [Match]
+          Name=${host_network.en-pf.if}
+          MACAddress=${host_network.en-pf.mac}
 
           [Link]
           ARP=no
-          MTUBytes=${mtu}
 
           [Network]
           LinkLocalAddressing=no
@@ -40,13 +52,13 @@ storage:
           Id=${networks[k].id}
 
     %{~ if lookup(host_network, k, null) != null ~}
-    - path: /etc/systemd/network/10-${networks[k].br_if}-${host_network.hw.mac}.network
+    - path: /etc/systemd/network/10-${networks[k].br_if}-${host_network.en-pf.mac}.network
       mode: 0644
       contents:
         inline: |
           [Match]
           Name=${networks[k].br_if}
-          MACAddress=${host_network.hw.mac}
+          MACAddress=${host_network.en-pf.mac}
 
           [Link]
           ARP=no

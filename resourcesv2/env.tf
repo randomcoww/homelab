@@ -38,8 +38,8 @@ locals {
     matchbox                = "quay.io/poseidon/matchbox:latest"
   }
 
-  boot_image_mount_path = "/etc/libvirt/boot/boot_image.iso"
   boot_disk_label       = "fedora-coreos-32"
+  boot_image_mount_path = "/etc/libvirt/boot/${local.boot_disk_label}.iso"
   kernel_image          = "images/vmlinuz"
   initrd_images = [
     "images/initramfs.img",
@@ -49,8 +49,8 @@ locals {
     "rd.neednet=1",
     "ignition.firstboot",
     "ignition.platform.id=metal",
-    "net.ifnames=0",
-    "biosdevname=0",
+    # "net.ifnames=0",
+    # "biosdevname=0",
     "systemd.unified_cgroup_hierarchy=0",
     "coreos.liveiso=${local.boot_disk_label}",
   ]
@@ -295,7 +295,7 @@ locals {
       ]
       templates = [
         "${local.templates_path}/ignition/kvm.ign.tmpl",
-        "${local.templates_path}/ignition/vlan_network.ign.tmpl",
+        "${local.templates_path}/ignition/macvlan_network.ign.tmpl",
         "${local.templates_path}/ignition/base.ign.tmpl",
         "${local.templates_path}/ignition/user.ign.tmpl",
       ]
@@ -306,7 +306,7 @@ locals {
       ]
       templates = [
         "${local.templates_path}/ignition/desktop.ign.tmpl",
-        "${local.templates_path}/ignition/vlan_network.ign.tmpl",
+        "${local.templates_path}/ignition/macvlan_network.ign.tmpl",
         "${local.templates_path}/ignition/base.ign.tmpl",
         "${local.templates_path}/ignition/storage.ign.tmpl",
         "${local.templates_path}/ignition/user.ign.tmpl",
@@ -331,32 +331,39 @@ locals {
     gateway-0 = {
       memory = 3
       vcpu   = 1
+      # interface name should always start at ens2 and count up
+      # libvirt auto assigns interfaces starting at 00:02.0 and
+      # increments the slot for each element
       network = [
         {
           network   = "int"
-          if        = "eth0"
+          if        = "ens2"
           mac       = "52-54-00-1a-61-2a"
           bootorder = 1
         },
         {
           network = "main"
           ip      = "192.168.127.217"
-          if      = "eth1"
+          if      = "ens3"
+          type    = "vf"
         },
         {
           network = "lan"
           ip      = "192.168.63.217"
-          if      = "eth2"
+          if      = "ens4"
+          type    = "vf"
         },
         {
           network = "sync"
           ip      = "192.168.190.1"
-          if      = "eth3"
+          if      = "ens5"
+          type    = "vf"
         },
         {
           network = "wan"
-          if      = "eth4"
+          if      = "ens6"
           mac     = "52-54-00-63-6e-b3"
+          type    = "vf"
         }
       ]
       kea_ha_role = "primary"
@@ -367,29 +374,33 @@ locals {
       network = [
         {
           network   = "int"
-          if        = "eth0"
+          if        = "ens2"
           mac       = "52-54-00-1a-61-2b"
           bootorder = 1
         },
         {
           network = "main"
           ip      = "192.168.127.218"
-          if      = "eth1"
+          if      = "ens3"
+          type    = "vf"
         },
         {
           network = "lan"
           ip      = "192.168.63.218"
-          if      = "eth2"
+          if      = "ens4"
+          type    = "vf"
         },
         {
           network = "sync"
           ip      = "192.168.190.2"
-          if      = "eth3"
+          if      = "ens5"
+          type    = "vf"
         },
         {
           network = "wan"
-          if      = "eth4"
+          if      = "ens6"
           mac     = "52-54-00-63-6e-b3"
+          type    = "vf"
         }
       ]
       kea_ha_role = "standby"
@@ -402,14 +413,15 @@ locals {
       network = [
         {
           network   = "int"
-          if        = "eth0"
+          if        = "ens2"
           mac       = "52-54-00-1a-61-0a"
           bootorder = 1
         },
         {
           network = "main"
           ip      = "192.168.127.219"
-          if      = "eth1"
+          if      = "ens3"
+          type    = "vf"
         }
       ]
     }
@@ -419,14 +431,15 @@ locals {
       network = [
         {
           network   = "int"
-          if        = "eth0"
+          if        = "ens2"
           mac       = "52-54-00-1a-61-0b"
           bootorder = 1
         },
         {
           network = "main"
           ip      = "192.168.127.220"
-          if      = "eth1"
+          if      = "ens3"
+          type    = "vf"
         }
       ]
     }
@@ -436,14 +449,15 @@ locals {
       network = [
         {
           network   = "int"
-          if        = "eth0"
+          if        = "ens2"
           mac       = "52-54-00-1a-61-0c"
           bootorder = 1
         },
         {
           network = "main"
           ip      = "192.168.127.221"
-          if      = "eth1"
+          if      = "ens3"
+          type    = "vf"
         }
       ]
     }
@@ -455,19 +469,20 @@ locals {
       network = [
         {
           network   = "int"
-          if        = "eth0"
+          if        = "ens2"
           mac       = "52-54-00-1a-61-1a"
           bootorder = 1
         },
         {
           network = "main"
-          if      = "eth1"
+          if      = "ens3"
+          type    = "vf"
         }
       ]
       hostdev = [
         {
           domain   = "0x0000"
-          bus      = "0x05"
+          bus      = "0x02"
           slot     = "0x00"
           function = "0x0"
           rom      = "/etc/libvirt/boot/SAS9300_8i_IT.bin"
@@ -539,8 +554,7 @@ locals {
         },
         {
           source = "/dev/disk/by-id/ata-Samsung_SSD_860_QVO_1TB_S4PGNF0M414895K"
-          target = "vda"
-          device = "/dev/vda"
+          target = "sdb"
         },
       ]
     }
@@ -550,13 +564,14 @@ locals {
       network = [
         {
           network   = "int"
-          if        = "eth0"
+          if        = "ens2"
           mac       = "52-54-00-1a-61-1b"
           bootorder = 1
         },
         {
           network = "main"
-          if      = "eth1"
+          if      = "ens3"
+          type    = "vf"
         }
       ]
       hostdev = [
@@ -574,8 +589,7 @@ locals {
       disk = [
         {
           source = "/dev/disk/by-id/ata-Samsung_SSD_860_QVO_1TB_S4PGNF0M410395Z"
-          target = "vda"
-          device = "/dev/vda"
+          target = "sdb"
         }
       ]
     }
@@ -587,13 +601,14 @@ locals {
       network = [
         {
           network   = "int"
-          if        = "eth0"
+          if        = "ens2"
           mac       = "52-54-00-1a-61-3a"
           bootorder = 1
         },
         {
           network = "main"
-          if      = "eth1"
+          if      = "ens3"
+          type    = "vf"
         }
       ]
       disk = [
@@ -604,8 +619,8 @@ locals {
     kvm-0 = {
       network = [
         {
-          alias = "hw"
-          mac   = "00-1b-21-bc-4c-16"
+          mac = "00-1b-21-bc-4c-16"
+          if  = "en-pf"
         },
         {
           network = "main"
@@ -626,8 +641,8 @@ locals {
     kvm-1 = {
       network = [
         {
-          alias = "hw"
-          mac   = "00-1b-21-bc-67-c6"
+          mac = "00-1b-21-bc-67-c6"
+          if  = "en-pf"
         },
         {
           network = "main"
@@ -651,8 +666,8 @@ locals {
     desktop = {
       network = [
         {
-          alias = "hw"
-          mac   = "f8-f2-1e-1e-3c-40"
+          mac = "f8-f2-1e-1e-3c-40"
+          if  = "en-pf"
         },
         {
           network = "main"
@@ -669,8 +684,8 @@ locals {
     laptop = {
       network = [
         {
-          alias = "hw"
-          mac   = "08-0e-01-cf-ef-aa"
+          mac = "08-0e-01-cf-ef-aa"
+          if  = "en-pf"
         },
         {
           network = "main"
@@ -699,7 +714,7 @@ locals {
     for k in keys(local.hosts) :
     k => {
       for n in local.hosts[k].network :
-      lookup(n, "alias", lookup(n, "network", "placeholder")) => n
+      lookup(n, "network", lookup(n, "if", "placeholder")) => n
     }
   }
 }
