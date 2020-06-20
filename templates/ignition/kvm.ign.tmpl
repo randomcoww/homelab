@@ -9,11 +9,8 @@ systemd:
         - name: boot-image-mount.conf
           contents: |
             [Unit]
-            After=mount-boot-vol.service
-            Wants=mount-boot-vol.service
-
-            [Service]
-            ExecStartPre=-/bin/bash -c "echo 31 > /sys/class/net/${host_network.en-pf.if}/device/sriov_numvfs"
+            After=prepare-vm-resources.service
+            Wants=prepare-vm-resources.service
     - name: ksm.service
       enabled: true
     - name: ksmtuned.service
@@ -26,8 +23,7 @@ systemd:
             [Service]
             ExecStart=
             ExecStart=/usr/sbin/kea-dhcp4 -c /etc/kea/kea-dhcp4-internal.conf
-
-    - name: mount-boot-vol.service
+    - name: prepare-vm-resources.service
       enabled: true
       contents: |
         [Unit]
@@ -37,12 +33,14 @@ systemd:
 
         [Service]
         Type=oneshot
+        RemainAfterExit=yes
         ExecStart=/usr/bin/coreos-installer iso remove \
           ${boot_image_device} -o ${boot_image_mount_path}
         ExecStart=/usr/bin/podman volume create \
           --opt type=iso9660 \
           --opt device=${boot_image_mount_path} \
           image_vol
+        ExecStart=/bin/bash -c "echo 31 > /sys/class/net/${host_network.en-pf.if}/device/sriov_numvfs"
 
         [Install]
         WantedBy=multi-user.target
@@ -52,8 +50,8 @@ systemd:
         [Unit]
         After=network-online.target
         Wants=network-online.target
-        After=mount-boot-vol.service
-        Wants=mount-boot-vol.service
+        After=prepare-vm-resources.service
+        Wants=prepare-vm-resources.service
 
         [Service]
         TimeoutStartSec=5m

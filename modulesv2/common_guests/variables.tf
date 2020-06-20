@@ -6,7 +6,7 @@ variable "hosts" {
   type = any
 }
 
-variable "libvirt_template" {
+variable "domain_template" {
   type = string
 }
 

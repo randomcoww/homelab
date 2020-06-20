@@ -20,9 +20,9 @@
   <devices>
     <emulator>/usr/bin/qemu-system-x86_64</emulator>
     %{~ for k in network ~}
-    %{~ if lookup(k, "type", null) == "vf" ~}
+    %{~ if lookup(k, "libvirt_network", null) != null ~}
     <interface type='network'>
-    <source network='sriov-vf'/>
+    <source network='${k.libvirt_network}'/>
       %{~ if lookup(k, "mac", null) != null ~}
       <mac address='${join(":", split("-", k.mac))}'/>
       %{~ endif ~}
@@ -34,7 +34,6 @@
         <tag id='${networks[k.network].id}'/>
       </vlan>
       %{~ endif ~}
-      <driver name='vfio'/>
       <guest dev="${k.if}"/>
       <model type='virtio-net'/>
     </interface>

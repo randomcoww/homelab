@@ -191,7 +191,7 @@ locals {
         "worker-1",
         "test-0",
       ]
-      libvirt_template = "${local.templates_path}/libvirt/container_linux.xml.tmpl"
+      domain_template = "${local.templates_path}/libvirt/coreos.xml.tmpl"
     }
     ssh = {
       nodes = [
@@ -207,7 +207,7 @@ locals {
         "test-0",
         "desktop",
       ]
-      templates = [
+      ignition_templates = [
         "${local.templates_path}/ignition/ssh.ign.tmpl",
       ]
     }
@@ -215,14 +215,14 @@ locals {
       nodes = [
         "desktop",
       ]
-      templates = [
+      ignition_templates = [
         "${local.templates_path}/ignition/internal_tls.ign.tmpl",
       ]
     }
     wireguard_client = {
       nodes = [
       ]
-      templates = [
+      ignition_templates = [
         "${local.templates_path}/ignition/wireguard_client.ign.tmpl",
       ]
     }
@@ -234,7 +234,7 @@ locals {
         "controller-1",
         "controller-2",
       ]
-      templates = [
+      ignition_templates = [
         "${local.templates_path}/ignition/static_pod_logging.ign.tmpl",
       ]
     }
@@ -243,7 +243,7 @@ locals {
         "gateway-0",
         "gateway-1",
       ]
-      templates = [
+      ignition_templates = [
         "${local.templates_path}/ignition/gateway.ign.tmpl",
         "${local.templates_path}/ignition/base.ign.tmpl",
         "${local.templates_path}/ignition/containerd.ign.tmpl",
@@ -256,7 +256,7 @@ locals {
         "controller-1",
         "controller-2",
       ]
-      templates = [
+      ignition_templates = [
         "${local.templates_path}/ignition/controller.ign.tmpl",
         "${local.templates_path}/ignition/base.ign.tmpl",
         "${local.templates_path}/ignition/containerd.ign.tmpl",
@@ -268,7 +268,7 @@ locals {
         "worker-0",
         "worker-1",
       ]
-      templates = [
+      ignition_templates = [
         "${local.templates_path}/ignition/worker.ign.tmpl",
         "${local.templates_path}/ignition/base.ign.tmpl",
         "${local.templates_path}/ignition/storage.ign.tmpl",
@@ -280,7 +280,7 @@ locals {
       nodes = [
         "test-0"
       ]
-      templates = [
+      ignition_templates = [
         "${local.templates_path}/ignition/test.ign.tmpl",
         "${local.templates_path}/ignition/base.ign.tmpl",
         "${local.templates_path}/ignition/storage.ign.tmpl",
@@ -293,7 +293,7 @@ locals {
         "kvm-0",
         "kvm-1",
       ]
-      templates = [
+      ignition_templates = [
         "${local.templates_path}/ignition/kvm.ign.tmpl",
         "${local.templates_path}/ignition/macvlan_network.ign.tmpl",
         "${local.templates_path}/ignition/base.ign.tmpl",
@@ -304,7 +304,7 @@ locals {
       nodes = [
         "desktop",
       ]
-      templates = [
+      ignition_templates = [
         "${local.templates_path}/ignition/desktop.ign.tmpl",
         "${local.templates_path}/ignition/macvlan_network.ign.tmpl",
         "${local.templates_path}/ignition/base.ign.tmpl",
@@ -326,6 +326,12 @@ locals {
     loki-lb-service  = "${local.templates_path}/manifest/loki_lb_service.yaml.tmpl"
   }
 
+  libvirt_networks = {
+    sriov = {
+      template = "${local.templates_path}/libvirt/hostdev_network.xml.tmpl"
+    }
+  }
+
   hosts = {
     # gateway
     gateway-0 = {
@@ -342,28 +348,28 @@ locals {
           bootorder = 1
         },
         {
-          network = "main"
-          ip      = "192.168.127.217"
-          if      = "ens3"
-          type    = "vf"
+          network         = "main"
+          ip              = "192.168.127.217"
+          if              = "ens3"
+          libvirt_network = "sriov"
         },
         {
-          network = "lan"
-          ip      = "192.168.63.217"
-          if      = "ens4"
-          type    = "vf"
+          network         = "lan"
+          ip              = "192.168.63.217"
+          if              = "ens4"
+          libvirt_network = "sriov"
         },
         {
-          network = "sync"
-          ip      = "192.168.190.1"
-          if      = "ens5"
-          type    = "vf"
+          network         = "sync"
+          ip              = "192.168.190.1"
+          if              = "ens5"
+          libvirt_network = "sriov"
         },
         {
-          network = "wan"
-          if      = "ens6"
-          mac     = "52-54-00-63-6e-b3"
-          type    = "vf"
+          network         = "wan"
+          if              = "ens6"
+          mac             = "52-54-00-63-6e-b3"
+          libvirt_network = "sriov"
         }
       ]
       kea_ha_role = "primary"
@@ -379,28 +385,28 @@ locals {
           bootorder = 1
         },
         {
-          network = "main"
-          ip      = "192.168.127.218"
-          if      = "ens3"
-          type    = "vf"
+          network         = "main"
+          ip              = "192.168.127.218"
+          if              = "ens3"
+          libvirt_network = "sriov"
         },
         {
-          network = "lan"
-          ip      = "192.168.63.218"
-          if      = "ens4"
-          type    = "vf"
+          network         = "lan"
+          ip              = "192.168.63.218"
+          if              = "ens4"
+          libvirt_network = "sriov"
         },
         {
-          network = "sync"
-          ip      = "192.168.190.2"
-          if      = "ens5"
-          type    = "vf"
+          network         = "sync"
+          ip              = "192.168.190.2"
+          if              = "ens5"
+          libvirt_network = "sriov"
         },
         {
-          network = "wan"
-          if      = "ens6"
-          mac     = "52-54-00-63-6e-b3"
-          type    = "vf"
+          network         = "wan"
+          if              = "ens6"
+          mac             = "52-54-00-63-6e-b3"
+          libvirt_network = "sriov"
         }
       ]
       kea_ha_role = "standby"
@@ -418,10 +424,10 @@ locals {
           bootorder = 1
         },
         {
-          network = "main"
-          ip      = "192.168.127.219"
-          if      = "ens3"
-          type    = "vf"
+          network         = "main"
+          ip              = "192.168.127.219"
+          if              = "ens3"
+          libvirt_network = "sriov"
         }
       ]
     }
@@ -436,10 +442,10 @@ locals {
           bootorder = 1
         },
         {
-          network = "main"
-          ip      = "192.168.127.220"
-          if      = "ens3"
-          type    = "vf"
+          network         = "main"
+          ip              = "192.168.127.220"
+          if              = "ens3"
+          libvirt_network = "sriov"
         }
       ]
     }
@@ -454,10 +460,10 @@ locals {
           bootorder = 1
         },
         {
-          network = "main"
-          ip      = "192.168.127.221"
-          if      = "ens3"
-          type    = "vf"
+          network         = "main"
+          ip              = "192.168.127.221"
+          if              = "ens3"
+          libvirt_network = "sriov"
         }
       ]
     }
@@ -474,9 +480,9 @@ locals {
           bootorder = 1
         },
         {
-          network = "main"
-          if      = "ens3"
-          type    = "vf"
+          network         = "main"
+          if              = "ens3"
+          libvirt_network = "sriov"
         }
       ]
       hostdev = [
@@ -569,9 +575,9 @@ locals {
           bootorder = 1
         },
         {
-          network = "main"
-          if      = "ens3"
-          type    = "vf"
+          network         = "main"
+          if              = "ens3"
+          libvirt_network = "sriov"
         }
       ]
       hostdev = [
@@ -606,9 +612,9 @@ locals {
           bootorder = 1
         },
         {
-          network = "main"
-          if      = "ens3"
-          type    = "vf"
+          network         = "main"
+          if              = "ens3"
+          libvirt_network = "sriov"
         }
       ]
       disk = [
@@ -634,6 +640,11 @@ locals {
         "controller-2",
         "worker-0",
       ]
+      guest_networks = {
+        sriov = {
+          pf = "en-pf"
+        }
+      }
       ## hypervisor boot image is copied with coreos-installer to strip
       ## out ignition and re-used to boot VMs
       boot_image_device = "/dev/disk/by-label/${local.boot_disk_label}"
@@ -657,6 +668,11 @@ locals {
         "worker-1",
         "test-0",
       ]
+      guest_networks = {
+        sriov = {
+          pf = "en-pf"
+        }
+      }
       ## hypervisor boot image is copied with coreos-installer to strip
       ## out ignition and re-used to boot VMs
       boot_image_device = "/dev/disk/by-label/${local.boot_disk_label}"

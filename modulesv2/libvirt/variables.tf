@@ -1,7 +1,11 @@
-variable "libvirt_endpoint" {
+variable "endpoint" {
   type = string
 }
 
-variable "libvirt_domains" {
+variable "domains" {
+  type = any
+}
+
+variable "networks" {
   type = any
 }

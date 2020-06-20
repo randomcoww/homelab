@@ -1,3 +1,3 @@
 provider "libvirt" {
-  uri = var.libvirt_endpoint
+  uri = var.endpoint
 }

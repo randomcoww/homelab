@@ -1,7 +1,7 @@
 output "libvirt_domains" {
   value = {
     for host, params in var.hosts :
-    host => chomp(templatefile(var.libvirt_template, {
+    host => chomp(templatefile(var.domain_template, {
       name                  = host
       memory                = params.memory
       vcpu                  = params.vcpu

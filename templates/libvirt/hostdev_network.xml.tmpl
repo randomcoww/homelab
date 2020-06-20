@@ -1,7 +1,7 @@
 <network>
-  <name>sriov-vf</name>
+  <name>${name}</name>
   <forward mode='hostdev' managed='yes'>
-    <pf dev='en-pf'/>
+    <pf dev='${pf}'/>
     <driver name='vfio'/>
   </forward>
 </network>

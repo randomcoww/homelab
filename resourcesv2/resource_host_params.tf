@@ -6,7 +6,7 @@ module "ssh-common" {
   domains               = local.domains
   ssh_client_public_key = var.ssh_client_public_key
 
-  templates = local.components.ssh.templates
+  templates = local.components.ssh.ignition_templates
   hosts = {
     for k in local.components.ssh.nodes :
     k => merge(local.hosts[k], {
@@ -29,7 +29,7 @@ module "kubernetes-common" {
   s3_etcd_backup_bucket = local.s3_etcd_backup_bucket
   addon_templates       = local.addon_templates
 
-  controller_templates = local.components.controller.templates
+  controller_templates = local.components.controller.ignition_templates
   controller_hosts = {
     for k in local.components.controller.nodes :
     k => merge(local.hosts[k], {
@@ -38,7 +38,7 @@ module "kubernetes-common" {
     })
   }
 
-  worker_templates = local.components.worker.templates
+  worker_templates = local.components.worker.ignition_templates
   worker_hosts = {
     for k in local.components.worker.nodes :
     k => merge(local.hosts[k], {
@@ -60,7 +60,7 @@ module "gateway-common" {
   container_images   = local.container_images
   addon_templates    = local.addon_templates
 
-  templates = local.components.gateway.templates
+  templates = local.components.gateway.ignition_templates
   hosts = {
     for k in local.components.gateway.nodes :
     k => merge(local.hosts[k], {
@@ -79,7 +79,7 @@ module "test-common" {
   domains          = local.domains
   container_images = local.container_images
 
-  templates = local.components.test.templates
+  templates = local.components.test.ignition_templates
   hosts = {
     for k in local.components.test.nodes :
     k => merge(local.hosts[k], {
@@ -100,7 +100,7 @@ module "kvm-common" {
   container_images      = local.container_images
   boot_image_mount_path = local.boot_image_mount_path
 
-  templates = local.components.kvm.templates
+  templates = local.components.kvm.ignition_templates
   hosts = {
     for k in local.components.kvm.nodes :
     k => merge(local.hosts[k], {
@@ -119,7 +119,7 @@ module "desktop-common" {
   networks = local.networks
   domains  = local.domains
 
-  templates = local.components.desktop.templates
+  templates = local.components.desktop.ignition_templates
   hosts = {
     for k in local.components.desktop.nodes :
     k => merge(local.hosts[k], {
@@ -237,7 +237,7 @@ module "tls-secrets" {
   ]
 
   name      = "traefik-tls"
-  templates = local.components.traefik_tls.templates
+  templates = local.components.traefik_tls.ignition_templates
   hosts = {
     for k in local.components.traefik_tls.nodes :
     k => merge(local.hosts[k], {
@@ -254,7 +254,7 @@ module "static-pod-logging" {
   container_images = local.container_images
   addon_templates  = local.addon_templates
 
-  templates = local.components.static_pod_logging.templates
+  templates = local.components.static_pod_logging.ignition_templates
   hosts = {
     for k in local.components.static_pod_logging.nodes :
     k => merge(local.hosts[k], {
@@ -270,7 +270,7 @@ module "common-guests" {
   networks              = local.networks
   boot_image_mount_path = local.boot_image_mount_path
 
-  libvirt_template = local.components.common_guests.libvirt_template
+  domain_template = local.components.common_guests.domain_template
   hosts = {
     for k in local.components.common_guests.nodes :
     k => merge(local.hosts[k], {
