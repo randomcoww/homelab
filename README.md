@@ -165,11 +165,11 @@ kubectl create namespace monitoring
 
 helm template loki \
     --namespace=monitoring \
-    loki/loki | kubectl apply -f -
+    loki/loki | kubectl -n monitoring apply -f -
 
 helm template promtail \
     --namespace monitoring \
-    loki/promtail | kubectl apply -f -
+    loki/promtail | kubectl -n monitoring apply -f -
 
 helm template prometheus \
     --namespace monitoring \
@@ -181,9 +181,9 @@ helm template prometheus \
     --set kube-state-metrics.podSecurityPolicy.enabled=true \
     --set pushgateway.enabled=false \
     --set server.persistentVolume.enabled=false \
-    stable/prometheus | kubectl apply -f -
+    stable/prometheus | kubectl -n monitoring apply -f -
 
-kubectl apply -f manifests/grafana.yaml
+kubectl apply -n monitoring -f manifests/grafana.yaml
 ```
 Allow non cluster nodes to send logs to loki:
 
@@ -220,17 +220,17 @@ helm template openebs \
     --set snapshotOperator.enabled=false \
     --set webhook.imageTag=$OPENEBS_VERSION \
     --set ndm.filters.includePaths=/dev/vd \
-    stable/openebs | kubectl apply -f -
+    stable/openebs | kubectl -n openebs apply -f -
 ```
 
 Add block devices (IDs specific to my hardware)
 ```
-kubectl apply -f manifests/openebs_spc.yaml
+kubectl apply -n openebs -f manifests/openebs_spc.yaml
 ```
 
 Currently additional PSP is needed for PVC pods to run:
 ```
-kubectl apply -f manifests/openebs_psp.yaml
+kubectl apply -n openebs -f manifests/openebs_psp.yaml
 ```
 
 #### Minio
