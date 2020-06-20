@@ -207,6 +207,8 @@ kubectl patch -n monitoring psp loki -p='{
 ```
 helm repo add stable https://kubernetes-charts.storage.googleapis.com
 
+kubectl create namespace openebs
+
 helm template openebs \
     --namespace openebs \
     --set rbac.pspEnabled=true \
