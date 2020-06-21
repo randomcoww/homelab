@@ -6,25 +6,25 @@ storage:
     ##
     ## allocate vlan interfaces to hardware
     ##
-    - path: /etc/systemd/network/05-${host_network.en-pf.if}.link
+    - path: /etc/systemd/network/05-${p.networks_by_key.en-pf.if}.link
       mode: 0644
       contents:
         inline: |
           [Match]
-          PermanentMACAddress=${host_network.en-pf.mac}
+          PermanentMACAddress=${p.networks_by_key.en-pf.mac}
 
           [Link]
           MACAddressPolicy=persistent
-          Name=${host_network.en-pf.if}
+          Name=${p.networks_by_key.en-pf.if}
           MTUBytes=${mtu}
 
-    - path: /etc/systemd/network/10-${host_network.en-pf.if}.network
+    - path: /etc/systemd/network/10-${p.networks_by_key.en-pf.if}.network
       mode: 0644
       contents:
         inline: |
           [Match]
-          Name=${host_network.en-pf.if}
-          MACAddress=${host_network.en-pf.mac}
+          Name=${p.networks_by_key.en-pf.if}
+          MACAddress=${p.networks_by_key.en-pf.mac}
 
           [Link]
           ARP=no
@@ -51,14 +51,14 @@ storage:
           [VLAN]
           Id=${networks[k].id}
 
-    %{~ if lookup(host_network, k, null) != null ~}
-    - path: /etc/systemd/network/10-${networks[k].br_if}-${host_network.en-pf.mac}.network
+    %{~ if lookup(p.networks_by_key, k, null) != null ~}
+    - path: /etc/systemd/network/10-${networks[k].br_if}-${p.networks_by_key.en-pf.mac}.network
       mode: 0644
       contents:
         inline: |
           [Match]
           Name=${networks[k].br_if}
-          MACAddress=${host_network.en-pf.mac}
+          MACAddress=${p.networks_by_key.en-pf.mac}
 
           [Link]
           ARP=no
@@ -96,7 +96,7 @@ storage:
           MulticastDNS=yes
 
           [Address]
-          Address=${host_network[k].ip}/${networks[k].cidr}
+          Address=${p.networks_by_key[k].ip}/${networks[k].cidr}
 
     %{~ endif ~}
     %{~ endfor ~}

@@ -2,10 +2,6 @@ variable "user" {
   type = string
 }
 
-variable "networks" {
-  type = any
-}
-
 variable "domains" {
   type = map(string)
 }

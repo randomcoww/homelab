@@ -4,12 +4,10 @@ output "templates" {
     host => [
       for template in var.templates :
       templatefile(template, {
-        hostname                   = params.hostname
+        p                          = params
         user                       = var.user
         container_images           = var.container_images
-        networks                   = var.networks
         loadbalancer_pools         = var.loadbalancer_pools
-        host_network               = params.host_network
         services                   = var.services
         domains                    = var.domains
         mtu                        = var.mtu
@@ -35,7 +33,7 @@ output "templates" {
           {
             name = v.hostname
             role = v.kea_ha_role
-            url  = "http://${v.host_network.sync.ip}:${var.services.kea.ports.peer}/"
+            url  = "http://${v.networks_by_key.sync.ip}:${var.services.kea.ports.peer}/"
           }
         ])
       })

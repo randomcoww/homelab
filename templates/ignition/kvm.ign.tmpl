@@ -27,20 +27,20 @@ systemd:
       enabled: true
       contents: |
         [Unit]
-        ConditionPathExists=${boot_image_device}
-        ConditionPathExists=!${boot_image_mount_path}
+        ConditionPathExists=${p.boot_image_device}
+        ConditionPathExists=!${p.boot_image_mount_path}
         After=local-fs.target
 
         [Service]
         Type=oneshot
         RemainAfterExit=yes
         ExecStart=/usr/bin/coreos-installer iso remove \
-          ${boot_image_device} -o ${boot_image_mount_path}
+          ${p.boot_image_device} -o ${p.boot_image_mount_path}
         ExecStart=/usr/bin/podman volume create \
           --opt type=iso9660 \
-          --opt device=${boot_image_mount_path} \
+          --opt device=${p.boot_image_mount_path} \
           image_vol
-        ExecStart=/bin/bash -c "echo 31 > /sys/class/net/${host_network.en-pf.if}/device/sriov_numvfs"
+        ExecStart=/bin/bash -c "echo 31 > /sys/class/net/${p.networks_by_key.en-pf.if}/device/sriov_numvfs"
 
         [Install]
         WantedBy=multi-user.target
@@ -99,24 +99,24 @@ storage:
           LinkLocalAddressing=no
           DHCP=no
 
-    %{~ for k in keys(internal_networks) ~}
+    %{~ for k in internal_networks ~}
     ##
     ## internal network ${k} for host <-> local vm
     ##
-    - path: /etc/systemd/network/10-${internal_networks[k].if}.netdev
+    - path: /etc/systemd/network/10-${p.networks_by_key[k].if}.netdev
       mode: 0644
       contents:
         inline: |
           [NetDev]
-          Name=${internal_networks[k].if}
+          Name=${p.networks_by_key[k].if}
           Kind=bridge
 
-    - path: /etc/systemd/network/10-${internal_networks[k].if}.network
+    - path: /etc/systemd/network/10-${p.networks_by_key[k].if}.network
       mode: 0644
       contents:
         inline: |
           [Match]
-          Name=${internal_networks[k].if}
+          Name=${p.networks_by_key[k].if}
 
           [Link]
           ARP=no
@@ -148,7 +148,7 @@ storage:
           [Network]
           LinkLocalAddressing=no
           DHCP=no
-          Bridge=${internal_networks[k].if}
+          Bridge=${p.networks_by_key[k].if}
 
     - path: /etc/systemd/network/10-${k}-tap.netdev
       mode: 0644
@@ -173,7 +173,7 @@ storage:
           DHCP=no
 
           [Address]
-          Address=${internal_networks[k].ip}/${networks[k].cidr}
+          Address=${p.networks_by_key[k].ip}/${p.networks_by_key[k].cidr}
     %{~ endfor ~}
 
     - path: /etc/kea/kea-dhcp4-internal.conf
@@ -189,9 +189,9 @@ storage:
               },
               "interfaces-config": {
                 "interfaces": ${jsonencode([
-                  for k in keys(internal_networks):
+                  for k in internal_networks:
                   "${k}-tap"
-                  if lookup(networks[k], "dhcp_pool", null) != null
+                  if lookup(p.networks_by_key[k], "dhcp_pool", null) != null
                 ])}
               },
               "client-classes": [
@@ -202,16 +202,16 @@ storage:
                 }
               ],
               "subnet4": ${jsonencode([
-                for k in keys(internal_networks):
+                for k in internal_networks:
                 {
-                  subnet = "${networks[k].network}/${networks[k].cidr}",
+                  subnet = "${p.networks_by_key[k].network}/${p.networks_by_key[k].cidr}",
                   pools = [
                     {
-                      pool = "${networks[k].dhcp_pool}"
+                      pool = "${p.networks_by_key[k].dhcp_pool}"
                     }
                   ]
                 }
-                if lookup(networks[k], "dhcp_pool", null) != null
+                if lookup(p.networks_by_key[k], "dhcp_pool", null) != null
               ])}
             }
           }

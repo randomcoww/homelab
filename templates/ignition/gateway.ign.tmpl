@@ -20,12 +20,12 @@ systemd:
 
 storage:
   files:
-    - path: /etc/systemd/network/10-${host_network.main.if}.network
+    - path: /etc/systemd/network/10-${p.networks_by_key.main.if}.network
       mode: 0644
       contents:
         inline: |
           [Match]
-          Name=${host_network.main.if}
+          Name=${p.networks_by_key.main.if}
 
           [Link]
           MTUBytes=${mtu}
@@ -36,13 +36,13 @@ storage:
           MulticastDNS=yes
 
           [Address]
-          Address=${host_network.main.ip}/${networks.main.cidr}
-    - path: /etc/systemd/network/10-${host_network.lan.if}.network
+          Address=${p.networks_by_key.main.ip}/${p.networks_by_key.main.cidr}
+    - path: /etc/systemd/network/10-${p.networks_by_key.lan.if}.network
       mode: 0644
       contents:
         inline: |
           [Match]
-          Name=${host_network.lan.if}
+          Name=${p.networks_by_key.lan.if}
 
           [Link]
           MTUBytes=${mtu}
@@ -52,13 +52,13 @@ storage:
           DHCP=no
 
           [Address]
-          Address=${host_network.lan.ip}/${networks.lan.cidr}
-    - path: /etc/systemd/network/10-${host_network.sync.if}.network
+          Address=${p.networks_by_key.lan.ip}/${p.networks_by_key.lan.cidr}
+    - path: /etc/systemd/network/10-${p.networks_by_key.sync.if}.network
       mode: 0644
       contents:
         inline: |
           [Match]
-          Name=${host_network.sync.if}
+          Name=${p.networks_by_key.sync.if}
 
           [Link]
           MTUBytes=${mtu}
@@ -68,22 +68,22 @@ storage:
           DHCP=no
 
           [Address]
-          Address=${host_network.sync.ip}/${networks.sync.cidr}
+          Address=${p.networks_by_key.sync.ip}/${p.networks_by_key.sync.cidr}
 
           [Route]
-          Gateway=${networks.sync.router}
+          Gateway=${p.networks_by_key.sync.router}
           Destination=0.0.0.0/0
           Table=${slave_default_route_table}
 
           [RoutingPolicyRule]
           Table=${slave_default_route_table}
           Priority=${slave_default_route_priority}
-    - path: /etc/systemd/network/10-${host_network.wan.if}.network
+    - path: /etc/systemd/network/10-${p.networks_by_key.wan.if}.network
       mode: 0644
       contents:
         inline: |
           [Match]
-          Name=${host_network.wan.if}
+          Name=${p.networks_by_key.wan.if}
 
           [Link]
           RequiredForOnline=no
@@ -104,12 +104,12 @@ storage:
           UseDomains=false
           UseTimezone=no
           RouteTable=${master_default_route_table}
-    - path: /etc/systemd/network/10-${host_network.int.if}.network
+    - path: /etc/systemd/network/10-${p.networks_by_key.int.if}.network
       mode: 0644
       contents:
         inline: |
           [Match]
-          Name=${host_network.int.if}
+          Name=${p.networks_by_key.int.if}
 
           [Link]
           Unmanaged=yes
@@ -126,15 +126,15 @@ storage:
           }
           vrrp_sync_group VG_gateway {
             group {
-              %{~ for k in keys(host_network) ~}
-              %{~ if lookup(networks[k], "router", null) != null ~}
+              %{~ for k, v in p.networks_by_key ~}
+              %{~ if lookup(v, "router", null) != null ~}
               VI_gateway_${k}
               %{~ endif ~}
               %{~ endfor ~}
             }
           }
-          %{~ for k, v in host_network ~}
-          %{~ if lookup(networks[k], "router", null) != null ~}
+          %{~ for k, v in p.networks_by_key ~}
+          %{~ if lookup(v, "router", null) != null ~}
           vrrp_instance VI_gateway_${k} {
             nopreempt
             state BACKUP
@@ -146,7 +146,7 @@ storage:
               to all lookup ${master_default_route_table} priority ${master_default_route_priority}
             }
             virtual_ipaddress {
-              ${networks[k].router}
+              ${v.router}
             }
           }
           %{~ endif ~}
@@ -157,13 +157,13 @@ storage:
       contents:
         inline: |-
           define if_internal = { ${join(",", [
-            for k, v in networks:
-            "${host_network[k].if}"
-            if lookup(v, "dhcp_pool", null) != null && lookup(v, "router", null) != null
+            for k in p.network:
+            "${k.if}"
+            if lookup(k, "dhcp_pool", null) != null && lookup(k, "router", null) != null
           ])} }
-          define if_external = ${host_network.wan.if}
-          define if_trusted = ${host_network.main.if}
-          define if_sync = ${host_network.sync.if}
+          define if_external = ${p.networks_by_key.wan.if}
+          define if_trusted = ${p.networks_by_key.main.if}
+          define if_sync = ${p.networks_by_key.sync.if}
 
           table ip filter {
             chain base_checks {
@@ -273,8 +273,8 @@ storage:
             Multicast {
               IPv4_address 225.0.0.50
               Group 3780
-              IPv4_interface ${host_network.sync.ip}
-              Interface ${host_network.sync.if}
+              IPv4_interface ${p.networks_by_key.sync.ip}
+              Interface ${p.networks_by_key.sync.if}
               SndSocketBuffer 24985600
               RcvSocketBuffer 24985600
               Checksum on
@@ -304,15 +304,15 @@ storage:
               Address Ignore {
                 IPv4_address 127.0.0.1
                 IPv4_address ${services.recursive_dns.vip}
-                IPv4_address ${networks.sync.network}/${networks.sync.cidr}
-                %{~ for k, v in host_network ~}
-                %{~ if lookup(v, "ip", null) != null ~}
-                IPv4_address ${v.ip}
+                IPv4_address ${p.networks_by_key.sync.network}/${p.networks_by_key.sync.cidr}
+                %{~ for k in p.network ~}
+                %{~ if lookup(k, "ip", null) != null ~}
+                IPv4_address ${k.ip}
                 %{~ endif ~}
                 %{~ endfor ~}
-                %{~ for k, v in networks ~}
-                %{~ if lookup(v, "router", null) != null ~}
-                IPv4_address ${v.router}
+                %{~ for k in p.network ~}
+                %{~ if lookup(k, "router", null) != null ~}
+                IPv4_address ${k.router}
                 %{~ endif ~}
                 %{~ endfor ~}
               }
@@ -352,9 +352,9 @@ storage:
               },
               "interfaces-config": {
                 "interfaces": ${jsonencode([
-                  for k, v in networks:
-                  "${host_network[k].if}"
-                  if lookup(v, "dhcp_pool", null) != null && lookup(v, "router", null) != null
+                  for k in p.network:
+                  "${k.if}"
+                  if lookup(k, "dhcp_pool", null) != null && lookup(k, "router", null) != null
                 ])}
               },
               "control-socket": {
@@ -386,7 +386,7 @@ storage:
                   "parameters": {
                     "high-availability": [
                       {
-                        "this-server-name": "${hostname}",
+                        "this-server-name": "${p.hostname}",
                         "mode": "hot-standby",
                         "max-unacked-clients": 0,
                         "peers": ${kea_ha_peers}
@@ -396,22 +396,22 @@ storage:
                 }
               ],
               "subnet4": ${jsonencode([
-                for k, v in networks:
+                for k in p.network:
                 {
-                  subnet = "${v.network}/${v.cidr}",
+                  subnet = "${k.network}/${k.cidr}",
                   option-data = [
                     {
                       name = "routers"
-                      data = "${v.router}"
+                      data = "${k.router}"
                     }
                   ]
                   pools = [
                     {
-                      pool = "${v.dhcp_pool}"
+                      pool = "${k.dhcp_pool}"
                     }
                   ]
                 }
-                if lookup(v, "dhcp_pool", null) != null && lookup(v, "router", null) != null
+                if lookup(k, "dhcp_pool", null) != null && lookup(k, "router", null) != null
               ])},
               "dhcp-ddns": {
                 "enable-updates": true,
@@ -437,7 +437,7 @@ storage:
             state BACKUP
             strict_mode off
             virtual_router_id ${vrrp_dns_id}
-            interface ${host_network.main.if}
+            interface ${p.networks_by_key.main.if}
             priority 100
             virtual_ipaddress {
               ${services.recursive_dns.vip}

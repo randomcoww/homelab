@@ -38,9 +38,8 @@ locals {
     matchbox                = "quay.io/poseidon/matchbox:latest"
   }
 
-  boot_disk_label       = "fedora-coreos-32"
-  boot_image_mount_path = "/etc/libvirt/boot/${local.boot_disk_label}.iso"
-  kernel_image          = "images/vmlinuz"
+  boot_disk_label = "fedora-coreos-32"
+  kernel_image    = "images/vmlinuz"
   initrd_images = [
     "images/initramfs.img",
   ]
@@ -124,75 +123,7 @@ locals {
     mdns               = "local"
   }
 
-  networks = {
-    # management
-    main = {
-      id        = 1
-      network   = "192.168.126.0"
-      cidr      = 23
-      router    = "192.168.126.240"
-      dhcp_pool = "192.168.127.64/26"
-      br_if     = "en-main"
-    }
-    lan = {
-      id        = 90
-      network   = "192.168.62.0"
-      cidr      = 23
-      router    = "192.168.62.240"
-      dhcp_pool = "192.168.63.64/26"
-      br_if     = "en-lan"
-    }
-    # gateway state sync
-    sync = {
-      id      = 60
-      network = "192.168.190.0"
-      router  = "192.168.190.6"
-      cidr    = 29
-      br_if   = "en-sync"
-    }
-    wan = {
-      id    = 30
-      br_if = "en-wan"
-    }
-    # internal network on each hypervisor for PXE bootstrap
-    int = {
-      network   = "192.168.224.0"
-      cidr      = 23
-      dhcp_pool = "192.168.225.64/26"
-      br_if     = "en-int"
-    }
-    # kubernetes internal
-    kubernetes = {
-      network = "10.244.0.0"
-      cidr    = 16
-    }
-    kubernetes_service = {
-      network = "10.96.0.0"
-      cidr    = 12
-    }
-  }
-
-  loadbalancer_pools = {
-    kubernetes = {
-      network = "192.168.126.64"
-      cidr    = 26
-    }
-  }
-
   components = {
-    common_guests = {
-      nodes = [
-        "gateway-0",
-        "gateway-1",
-        "controller-0",
-        "controller-1",
-        "controller-2",
-        "worker-0",
-        "worker-1",
-        "test-0",
-      ]
-      domain_template = "${local.templates_path}/libvirt/coreos.xml.tmpl"
-    }
     ssh = {
       nodes = [
         "gateway-0",
@@ -295,7 +226,7 @@ locals {
       ]
       ignition_templates = [
         "${local.templates_path}/ignition/kvm.ign.tmpl",
-        "${local.templates_path}/ignition/macvlan_network.ign.tmpl",
+        "${local.templates_path}/ignition/sriov_network.ign.tmpl",
         "${local.templates_path}/ignition/base.ign.tmpl",
         "${local.templates_path}/ignition/user.ign.tmpl",
       ]
@@ -306,7 +237,7 @@ locals {
       ]
       ignition_templates = [
         "${local.templates_path}/ignition/desktop.ign.tmpl",
-        "${local.templates_path}/ignition/macvlan_network.ign.tmpl",
+        "${local.templates_path}/ignition/sriov_network.ign.tmpl",
         "${local.templates_path}/ignition/base.ign.tmpl",
         "${local.templates_path}/ignition/storage.ign.tmpl",
         "${local.templates_path}/ignition/user.ign.tmpl",
@@ -326,9 +257,65 @@ locals {
     loki-lb-service  = "${local.templates_path}/manifest/loki_lb_service.yaml.tmpl"
   }
 
-  libvirt_networks = {
-    sriov = {
-      template = "${local.templates_path}/libvirt/hostdev_network.xml.tmpl"
+  libvirt_domain_templates = {
+    coreos = "${local.templates_path}/libvirt/coreos.xml.tmpl"
+  }
+  libvirt_network_templates = {
+    sriov = "${local.templates_path}/libvirt/hostdev_network.xml.tmpl"
+  }
+
+  networks = {
+    # management
+    main = {
+      id              = 1
+      network         = "192.168.126.0"
+      cidr            = 23
+      router          = "192.168.126.240"
+      dhcp_pool       = "192.168.127.64/26"
+      libvirt_network = "sriov"
+    }
+    lan = {
+      id              = 90
+      network         = "192.168.62.0"
+      cidr            = 23
+      router          = "192.168.62.240"
+      dhcp_pool       = "192.168.63.64/26"
+      libvirt_network = "sriov"
+    }
+    # gateway state sync
+    sync = {
+      id              = 60
+      network         = "192.168.190.0"
+      cidr            = 29
+      router          = "192.168.190.6"
+      libvirt_network = "sriov"
+    }
+    wan = {
+      id              = 30
+      libvirt_network = "sriov"
+    }
+    # internal network on each hypervisor for PXE bootstrap
+    int = {
+      network   = "192.168.224.0"
+      cidr      = 23
+      dhcp_pool = "192.168.225.64/26"
+      bootorder = 1
+    }
+    # kubernetes internal
+    kubernetes = {
+      network = "10.244.0.0"
+      cidr    = 16
+    }
+    kubernetes_service = {
+      network = "10.96.0.0"
+      cidr    = 12
+    }
+  }
+
+  loadbalancer_pools = {
+    kubernetes = {
+      network = "192.168.126.64"
+      cidr    = 26
     }
   }
 
@@ -342,34 +329,29 @@ locals {
       # increments the slot for each element
       network = [
         {
-          network   = "int"
-          if        = "ens2"
-          mac       = "52-54-00-1a-61-2a"
-          bootorder = 1
+          label = "int"
+          if    = "ens2"
+          mac   = "52-54-00-1a-61-2a"
         },
         {
-          network         = "main"
-          ip              = "192.168.127.217"
-          if              = "ens3"
-          libvirt_network = "sriov"
+          label = "main"
+          ip    = "192.168.127.217"
+          if    = "ens3"
         },
         {
-          network         = "lan"
-          ip              = "192.168.63.217"
-          if              = "ens4"
-          libvirt_network = "sriov"
+          label = "lan"
+          ip    = "192.168.63.217"
+          if    = "ens4"
         },
         {
-          network         = "sync"
-          ip              = "192.168.190.1"
-          if              = "ens5"
-          libvirt_network = "sriov"
+          label = "sync"
+          ip    = "192.168.190.1"
+          if    = "ens5"
         },
         {
-          network         = "wan"
-          if              = "ens6"
-          mac             = "52-54-00-63-6e-b3"
-          libvirt_network = "sriov"
+          label = "wan"
+          if    = "ens6"
+          mac   = "52-54-00-63-6e-b3"
         }
       ]
       kea_ha_role = "primary"
@@ -379,34 +361,29 @@ locals {
       vcpu   = 1
       network = [
         {
-          network   = "int"
-          if        = "ens2"
-          mac       = "52-54-00-1a-61-2b"
-          bootorder = 1
+          label = "int"
+          if    = "ens2"
+          mac   = "52-54-00-1a-61-2b"
         },
         {
-          network         = "main"
-          ip              = "192.168.127.218"
-          if              = "ens3"
-          libvirt_network = "sriov"
+          label = "main"
+          ip    = "192.168.127.218"
+          if    = "ens3"
         },
         {
-          network         = "lan"
-          ip              = "192.168.63.218"
-          if              = "ens4"
-          libvirt_network = "sriov"
+          label = "lan"
+          ip    = "192.168.63.218"
+          if    = "ens4"
         },
         {
-          network         = "sync"
-          ip              = "192.168.190.2"
-          if              = "ens5"
-          libvirt_network = "sriov"
+          label = "sync"
+          ip    = "192.168.190.2"
+          if    = "ens5"
         },
         {
-          network         = "wan"
-          if              = "ens6"
-          mac             = "52-54-00-63-6e-b3"
-          libvirt_network = "sriov"
+          label = "wan"
+          if    = "ens6"
+          mac   = "52-54-00-63-6e-b3"
         }
       ]
       kea_ha_role = "standby"
@@ -418,16 +395,14 @@ locals {
       vcpu   = 2
       network = [
         {
-          network   = "int"
-          if        = "ens2"
-          mac       = "52-54-00-1a-61-0a"
-          bootorder = 1
+          label = "int"
+          if    = "ens2"
+          mac   = "52-54-00-1a-61-0a"
         },
         {
-          network         = "main"
-          ip              = "192.168.127.219"
-          if              = "ens3"
-          libvirt_network = "sriov"
+          label = "main"
+          ip    = "192.168.127.219"
+          if    = "ens3"
         }
       ]
     }
@@ -436,16 +411,14 @@ locals {
       vcpu   = 2
       network = [
         {
-          network   = "int"
-          if        = "ens2"
-          mac       = "52-54-00-1a-61-0b"
-          bootorder = 1
+          label = "int"
+          if    = "ens2"
+          mac   = "52-54-00-1a-61-0b"
         },
         {
-          network         = "main"
-          ip              = "192.168.127.220"
-          if              = "ens3"
-          libvirt_network = "sriov"
+          label = "main"
+          ip    = "192.168.127.220"
+          if    = "ens3"
         }
       ]
     }
@@ -454,16 +427,14 @@ locals {
       vcpu   = 2
       network = [
         {
-          network   = "int"
-          if        = "ens2"
-          mac       = "52-54-00-1a-61-0c"
-          bootorder = 1
+          label = "int"
+          if    = "ens2"
+          mac   = "52-54-00-1a-61-0c"
         },
         {
-          network         = "main"
-          ip              = "192.168.127.221"
-          if              = "ens3"
-          libvirt_network = "sriov"
+          label = "main"
+          ip    = "192.168.127.221"
+          if    = "ens3"
         }
       ]
     }
@@ -474,15 +445,13 @@ locals {
       vcpu   = 4
       network = [
         {
-          network   = "int"
-          if        = "ens2"
-          mac       = "52-54-00-1a-61-1a"
-          bootorder = 1
+          label = "int"
+          if    = "ens2"
+          mac   = "52-54-00-1a-61-1a"
         },
         {
-          network         = "main"
-          if              = "ens3"
-          libvirt_network = "sriov"
+          label = "main"
+          if    = "ens3"
         }
       ]
       hostdev = [
@@ -569,15 +538,13 @@ locals {
       vcpu   = 4
       network = [
         {
-          network   = "int"
-          if        = "ens2"
-          mac       = "52-54-00-1a-61-1b"
-          bootorder = 1
+          label = "int"
+          if    = "ens2"
+          mac   = "52-54-00-1a-61-1b"
         },
         {
-          network         = "main"
-          if              = "ens3"
-          libvirt_network = "sriov"
+          label = "main"
+          if    = "ens3"
         }
       ]
       hostdev = [
@@ -606,18 +573,14 @@ locals {
       vcpu   = 2
       network = [
         {
-          network   = "int"
-          if        = "ens2"
-          mac       = "52-54-00-1a-61-3a"
-          bootorder = 1
+          label = "int"
+          if    = "ens2"
+          mac   = "52-54-00-1a-61-3a"
         },
         {
-          network         = "main"
-          if              = "ens3"
-          libvirt_network = "sriov"
+          label = "main"
+          if    = "ens3"
         }
-      ]
-      disk = [
       ]
     }
 
@@ -625,57 +588,67 @@ locals {
     kvm-0 = {
       network = [
         {
-          mac = "00-1b-21-bc-4c-16"
-          if  = "en-pf"
+          mac                = "00-1b-21-bc-4c-16"
+          if                 = "en-pf"
+          libvirt_network_pf = "sriov"
         },
         {
-          network = "main"
-          ip      = "192.168.127.251"
+          label = "main"
+          if    = "en-main"
+          ip    = "192.168.127.251"
+        },
+        {
+          label = "int"
+          if    = "en-int"
+          ip    = local.services.renderer.vip
         }
       ]
-      guests = [
-        "gateway-0",
-        "controller-0",
-        "controller-1",
-        "controller-2",
-        "worker-0",
-      ]
-      guest_networks = {
-        sriov = {
-          pf = "en-pf"
-        }
-      }
       ## hypervisor boot image is copied with coreos-installer to strip
       ## out ignition and re-used to boot VMs
-      boot_image_device = "/dev/disk/by-label/${local.boot_disk_label}"
+      libvirt_domains = {
+        coreos = [
+          "gateway-0",
+          "controller-0",
+          "controller-1",
+          "controller-2",
+          "worker-0",
+        ]
+      }
+      boot_image_device     = "/dev/disk/by-label/${local.boot_disk_label}"
+      boot_image_mount_path = "/etc/libvirt/boot/${local.boot_disk_label}.iso"
     }
     kvm-1 = {
       network = [
         {
-          mac = "00-1b-21-bc-67-c6"
-          if  = "en-pf"
+          mac                = "00-1b-21-bc-67-c6"
+          if                 = "en-pf"
+          libvirt_network_pf = "sriov"
         },
         {
-          network = "main"
-          ip      = "192.168.127.252"
+          label = "main"
+          if    = "en-main"
+          ip    = "192.168.127.252"
+        },
+        {
+          label = "int"
+          if    = "en-int"
+          ip    = local.services.renderer.vip
         }
       ]
-      guests = [
-        "gateway-1",
-        "controller-0",
-        "controller-1",
-        "controller-2",
-        "worker-1",
-        "test-0",
-      ]
-      guest_networks = {
-        sriov = {
-          pf = "en-pf"
-        }
-      }
       ## hypervisor boot image is copied with coreos-installer to strip
       ## out ignition and re-used to boot VMs
-      boot_image_device = "/dev/disk/by-label/${local.boot_disk_label}"
+      libvirt_domains = {
+        coreos = [
+          "gateway-1",
+          "controller-0",
+          "controller-1",
+          "controller-2",
+          "worker-1",
+          "test-0",
+        ]
+      }
+      boot_image_device     = "/dev/disk/by-label/${local.boot_disk_label}"
+      boot_image_mount_path = "/etc/libvirt/boot/${local.boot_disk_label}.iso"
     }
 
     # desktop
@@ -686,8 +659,9 @@ locals {
           if  = "en-pf"
         },
         {
-          network = "main"
-          ip      = "192.168.127.253"
+          label = "main"
+          if    = "en-main"
+          ip    = "192.168.127.253"
         }
       ]
       disk = [
@@ -704,8 +678,9 @@ locals {
           if  = "en-pf"
         },
         {
-          network = "main"
-          ip      = "192.168.127.254"
+          label = "main"
+          if    = "en-main"
+          ip    = "192.168.127.254"
         }
       ]
       disk = [
@@ -725,12 +700,4 @@ locals {
     # password bcrypt included with desktop causes all ignition configs to get regenerated each run
     "desktop",
   ]
-
-  host_network_by_type = {
-    for k in keys(local.hosts) :
-    k => {
-      for n in local.hosts[k].network :
-      lookup(n, "network", lookup(n, "if", "placeholder")) => n
-    }
-  }
 }

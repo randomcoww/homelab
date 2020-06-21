@@ -25,7 +25,7 @@ resource "tls_cert_request" "etcd" {
 
   ip_addresses = compact([
     "127.0.0.1",
-    lookup(each.value.host_network.main, "ip", null),
+    lookup(each.value.networks_by_key.main, "ip", null),
   ])
 }
 

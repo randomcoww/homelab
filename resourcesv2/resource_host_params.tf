@@ -2,17 +2,13 @@ module "ssh-common" {
   source = "../modulesv2/ssh_common"
 
   user                  = local.user
-  networks              = local.networks
   domains               = local.domains
   ssh_client_public_key = var.ssh_client_public_key
 
   templates = local.components.ssh.ignition_templates
   hosts = {
     for k in local.components.ssh.nodes :
-    k => merge(local.hosts[k], {
-      hostname     = join(".", [k, local.domains.mdns])
-      host_network = local.host_network_by_type[k]
-    })
+    k => local.aggr_hosts[k]
   }
 }
 
@@ -32,19 +28,13 @@ module "kubernetes-common" {
   controller_templates = local.components.controller.ignition_templates
   controller_hosts = {
     for k in local.components.controller.nodes :
-    k => merge(local.hosts[k], {
-      hostname     = join(".", [k, local.domains.mdns])
-      host_network = local.host_network_by_type[k]
-    })
+    k => local.aggr_hosts[k]
   }
 
   worker_templates = local.components.worker.ignition_templates
   worker_hosts = {
     for k in local.components.worker.nodes :
-    k => merge(local.hosts[k], {
-      hostname     = join(".", [k, local.domains.mdns])
-      host_network = local.host_network_by_type[k]
-    })
+    k => local.aggr_hosts[k]
   }
 }
 
@@ -53,7 +43,6 @@ module "gateway-common" {
 
   user               = local.user
   mtu                = local.mtu
-  networks           = local.networks
   loadbalancer_pools = local.loadbalancer_pools
   services           = local.services
   domains            = local.domains
@@ -63,10 +52,7 @@ module "gateway-common" {
   templates = local.components.gateway.ignition_templates
   hosts = {
     for k in local.components.gateway.nodes :
-    k => merge(local.hosts[k], {
-      hostname     = join(".", [k, local.domains.mdns])
-      host_network = local.host_network_by_type[k]
-    })
+    k => local.aggr_hosts[k]
   }
 }
 
@@ -74,7 +60,6 @@ module "test-common" {
   source = "../modulesv2/test_common"
 
   user             = local.user
-  networks         = local.networks
   services         = local.services
   domains          = local.domains
   container_images = local.container_images
@@ -82,31 +67,23 @@ module "test-common" {
   templates = local.components.test.ignition_templates
   hosts = {
     for k in local.components.test.nodes :
-    k => merge(local.hosts[k], {
-      hostname     = join(".", [k, local.domains.mdns])
-      host_network = local.host_network_by_type[k]
-    })
+    k => local.aggr_hosts[k]
   }
 }
 
 module "kvm-common" {
   source = "../modulesv2/kvm_common"
 
-  user                  = local.user
-  mtu                   = local.mtu
-  networks              = local.networks
-  services              = local.services
-  domains               = local.domains
-  container_images      = local.container_images
-  boot_image_mount_path = local.boot_image_mount_path
+  user             = local.user
+  mtu              = local.mtu
+  services         = local.services
+  domains          = local.domains
+  container_images = local.container_images
 
   templates = local.components.kvm.ignition_templates
   hosts = {
     for k in local.components.kvm.nodes :
-    k => merge(local.hosts[k], {
-      hostname     = join(".", [k, local.domains.mdns])
-      host_network = local.host_network_by_type[k]
-    })
+    k => local.aggr_hosts[k]
   }
 }
 
@@ -116,16 +93,12 @@ module "desktop-common" {
   user     = local.desktop_user
   password = var.desktop_password
   mtu      = local.mtu
-  networks = local.networks
   domains  = local.domains
 
   templates = local.components.desktop.ignition_templates
   hosts = {
     for k in local.components.desktop.nodes :
-    k => merge(local.hosts[k], {
-      hostname     = join(".", [k, local.domains.mdns])
-      host_network = local.host_network_by_type[k]
-    })
+    k => local.aggr_hosts[k]
   }
 }
 
@@ -240,10 +213,7 @@ module "tls-secrets" {
   templates = local.components.traefik_tls.ignition_templates
   hosts = {
     for k in local.components.traefik_tls.nodes :
-    k => merge(local.hosts[k], {
-      hostname     = join(".", [k, local.domains.mdns])
-      host_network = local.host_network_by_type[k]
-    })
+    k => local.aggr_hosts[k]
   }
 }
 
@@ -257,32 +227,6 @@ module "static-pod-logging" {
   templates = local.components.static_pod_logging.ignition_templates
   hosts = {
     for k in local.components.static_pod_logging.nodes :
-    k => merge(local.hosts[k], {
-      hostname     = join(".", [k, local.domains.mdns])
-      host_network = local.host_network_by_type[k]
-    })
-  }
-}
-
-module "common-guests" {
-  source = "../modulesv2/common_guests"
-
-  networks              = local.networks
-  boot_image_mount_path = local.boot_image_mount_path
-
-  domain_template = local.components.common_guests.domain_template
-  hosts = {
-    for k in local.components.common_guests.nodes :
-    k => merge(local.hosts[k], {
-      hostname     = join(".", [k, local.domains.mdns])
-      host_network = local.host_network_by_type[k]
-      network      = lookup(local.hosts[k], "network", [])
-      hostdev      = lookup(local.hosts[k], "hostdev", [])
-      disk = [
-        for d in lookup(local.hosts[k], "disk", []) :
-        d
-        if lookup(d, "source", null) != null && lookup(d, "target", null) != null
-      ]
-    })
+    k => local.aggr_hosts[k]
   }
 }

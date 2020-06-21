@@ -6,10 +6,6 @@ variable "mtu" {
   type = number
 }
 
-variable "networks" {
-  type = any
-}
-
 variable "services" {
   type = any
 }
@@ -28,8 +24,4 @@ variable "hosts" {
 
 variable "templates" {
   type = list(string)
-}
-
-variable "boot_image_mount_path" {
-  type = string
 }

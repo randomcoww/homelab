@@ -14,12 +14,11 @@ output "controller_templates" {
     host => [
       for template in var.controller_templates :
       templatefile(template, {
-        hostname                 = params.hostname
+        p                        = params
         user                     = var.user
         cluster_name             = var.cluster_name
         container_images         = var.container_images
         networks                 = var.networks
-        host_network             = params.host_network
         services                 = var.services
         etcd_cluster_token       = var.cluster_name
         s3_etcd_backup_path      = "${var.s3_etcd_backup_bucket}/${var.cluster_name}"
@@ -35,11 +34,11 @@ output "controller_templates" {
 
         etcd_initial_cluster = join(",", [
           for k, v in var.controller_hosts :
-          "${v.hostname}=https://${v.host_network.main.ip}:${var.services.etcd.ports.peer}"
+          "${v.hostname}=https://${v.networks_by_key.main.ip}:${var.services.etcd.ports.peer}"
         ])
         etcd_endpoints = join(",", [
           for k, v in var.controller_hosts :
-          "https://${v.host_network.main.ip}:${var.services.etcd.ports.client}"
+          "https://${v.networks_by_key.main.ip}:${var.services.etcd.ports.client}"
         ])
 
         tls_kubernetes_ca          = replace(tls_self_signed_cert.kubernetes-ca.cert_pem, "\n", "\\n")
@@ -68,13 +67,10 @@ output "worker_templates" {
     host => [
       for template in var.worker_templates :
       templatefile(template, {
-        hostname           = params.hostname
+        p                  = params
         user               = var.user
         cluster_name       = var.cluster_name
         container_images   = var.container_images
-        networks           = var.networks
-        host_network       = params.host_network
-        host_disks         = params.disk
         services           = var.services
         domains            = var.domains
         apiserver_endpoint = "https://${var.services.kubernetes_apiserver.vip}:${var.services.kubernetes_apiserver.ports.secure}"

@@ -1,0 +1,58 @@
+---
+variant: fcos
+version: 1.0.0
+storage:
+  files:
+    ##
+    ## allocate vlan interfaces to hardware
+    ##
+    - path: /etc/systemd/network/05-${p.networks_by_key.en-pf.if}.link
+      mode: 0644
+      contents:
+        inline: |
+          [Match]
+          PermanentMACAddress=${p.networks_by_key.en-pf.mac}
+
+          [Link]
+          MACAddressPolicy=persistent
+          Name=${p.networks_by_key.en-pf.if}
+          MTUBytes=${mtu}
+    - path: /etc/systemd/network/10-${p.networks_by_key.en-pf.if}.network
+      mode: 0644
+      contents:
+        inline: |
+          [Match]
+          Name=${p.networks_by_key.en-pf.if}
+          MACAddress=${p.networks_by_key.en-pf.mac}
+
+          [Network]
+          LinkLocalAddressing=no
+          DHCP=no
+          VLAN=${p.networks_by_key.main.if}
+    - path: /etc/systemd/network/10-${p.networks_by_key.main.if}.netdev
+      mode: 0644
+      contents:
+        inline: |
+          [NetDev]
+          Name=${p.networks_by_key.main.if}
+          Kind=vlan
+
+          [VLAN]
+          Id=${p.networks_by_key.main.id}
+    - path: /etc/systemd/network/10-${p.networks_by_key.main.if}.network
+      mode: 0644
+      contents:
+        inline: |
+          [Match]
+          Name=${p.networks_by_key.main.if}
+
+          [Link]
+          RequiredForOnline=no
+
+          [Network]
+          LinkLocalAddressing=no
+          DHCP=yes
+          MulticastDNS=yes
+
+          [Address]
+          Address=${p.networks_by_key.main.ip}/${p.networks_by_key.main.cidr}

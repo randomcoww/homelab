@@ -6,10 +6,6 @@ variable "mtu" {
   type = number
 }
 
-variable "networks" {
-  type = any
-}
-
 variable "loadbalancer_pools" {
   type = any
 }

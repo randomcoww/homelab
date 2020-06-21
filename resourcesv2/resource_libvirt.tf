@@ -6,15 +6,21 @@ module "libvirt-kvm-0" {
   source = "../modulesv2/libvirt"
 
   endpoint = module.kvm-common.libvirt_endpoints.kvm-0.endpoint
-  domains = {
-    for h in local.hosts.kvm-0.guests :
-    h => module.common-guests.libvirt_domains[h]
-    if lookup(module.common-guests.libvirt_domains, h, null) != null
-  }
+  domains = merge([
+    for params in values(local.aggr_hosts.kvm-0.libvirt_domains) :
+    {
+      for node in params.nodes :
+      node => chomp(templatefile(params.template, {
+        name         = node
+        p            = local.aggr_hosts[node]
+        hypervisor_p = local.aggr_hosts.kvm-0
+      }))
+    }]...
+  )
   networks = {
-    for n, params in local.hosts.kvm-1.guest_networks :
-    n => chomp(templatefile(local.libvirt_networks[n].template, {
-      name = n
+    for name, params in local.aggr_hosts.kvm-0.libvirt_networks :
+    name => chomp(templatefile(params.template, {
+      name = name
       pf   = params.pf
     }))
   }
@@ -24,15 +30,21 @@ module "libvirt-kvm-1" {
   source = "../modulesv2/libvirt"
 
   endpoint = module.kvm-common.libvirt_endpoints.kvm-1.endpoint
-  domains = {
-    for h in local.hosts.kvm-1.guests :
-    h => module.common-guests.libvirt_domains[h]
-    if lookup(module.common-guests.libvirt_domains, h, null) != null
-  }
+  domains = merge([
+    for params in values(local.aggr_hosts.kvm-1.libvirt_domains) :
+    {
+      for node in params.nodes :
+      node => chomp(templatefile(params.template, {
+        name         = node
+        p            = local.aggr_hosts[node]
+        hypervisor_p = local.aggr_hosts.kvm-1
+      }))
+    }]...
+  )
   networks = {
-    for n, params in local.hosts.kvm-1.guest_networks :
-    n => chomp(templatefile(local.libvirt_networks[n].template, {
-      name = n
+    for name, params in local.aggr_hosts.kvm-1.libvirt_networks :
+    name => chomp(templatefile(params.template, {
+      name = name
       pf   = params.pf
     }))
   }
