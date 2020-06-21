@@ -33,7 +33,7 @@ locals {
         }
       }
       libvirt_networks = {
-        for k in lookup(local.aggr_network[host], "label", []) :
+        for k in lookup(local.aggr_network[host], "network", []) :
         k.libvirt_network_pf => {
           pf       = k.if
           template = local.libvirt_network_templates[k.libvirt_network_pf]
