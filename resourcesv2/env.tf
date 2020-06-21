@@ -441,7 +441,7 @@ locals {
 
     # workers
     worker-0 = {
-      memory = 48
+      memory = 44
       vcpu   = 4
       network = [
         {
@@ -534,7 +534,7 @@ locals {
       ]
     }
     worker-1 = {
-      memory = 48
+      memory = 44
       vcpu   = 4
       network = [
         {

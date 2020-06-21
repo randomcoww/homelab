@@ -25,10 +25,14 @@ storage:
           Name=${p.networks_by_key.en-pf.if}
           MACAddress=${p.networks_by_key.en-pf.mac}
 
+          [Link]
+          ARP=no
+
           [Network]
           LinkLocalAddressing=no
           DHCP=no
           VLAN=${p.networks_by_key.main.if}
+
     - path: /etc/systemd/network/10-${p.networks_by_key.main.if}.netdev
       mode: 0644
       contents:
@@ -45,6 +49,32 @@ storage:
         inline: |
           [Match]
           Name=${p.networks_by_key.main.if}
+
+          [Link]
+          ARP=no
+          MTUBytes=${mtu}
+
+          [Network]
+          LinkLocalAddressing=no
+          DHCP=no
+          MACVTAP=${p.networks_by_key.main.if}-tap
+
+    - path: /etc/systemd/network/10-${p.networks_by_key.main.if}-tap.netdev
+      mode: 0644
+      contents:
+        inline: |
+          [NetDev]
+          Name=${p.networks_by_key.main.if}-tap
+          Kind=macvtap
+
+          [MACVTAP]
+          Mode=bridge
+    - path: /etc/systemd/network/10-${p.networks_by_key.main.if}-tap.network
+      mode: 0644
+      contents:
+        inline: |
+          [Match]
+          Name=${p.networks_by_key.main.if}-tap
 
           [Link]
           RequiredForOnline=no
