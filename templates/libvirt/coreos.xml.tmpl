@@ -35,7 +35,6 @@
       </vlan>
       %{~ endif ~}
       <guest dev="${n.if}"/>
-      <model type='virtio-net'/>
     </interface>
     %{~ else ~}
     <interface type='direct' trustGuestRxFilters='yes'>

@@ -455,6 +455,14 @@ locals {
         }
       ]
       hostdev = [
+        # Chipset SATA
+        {
+          domain   = "0x0000"
+          bus      = "0x00"
+          slot     = "0x17"
+          function = "0x0"
+        },
+        # HBA addon card
         {
           domain   = "0x0000"
           bus      = "0x02"
@@ -526,11 +534,7 @@ locals {
           label      = "JEKAZ92N"
           device     = "/dev/disk/by-id/ata-WDC_WD100EFAX-68LHPN0_JEKAZ92N"
           mount_path = "/var/s3/11"
-        },
-        {
-          source = "/dev/disk/by-id/ata-Samsung_SSD_860_QVO_1TB_S4PGNF0M414895K"
-          target = "sdb"
-        },
+        }
       ]
     }
     worker-1 = {
@@ -548,21 +552,20 @@ locals {
         }
       ]
       hostdev = [
+        # Chipset SATA
+        {
+          domain   = "0x0000"
+          bus      = "0x00"
+          slot     = "0x17"
+          function = "0x0"
+        },
+        # HBA addon card
         {
           domain   = "0x0000"
           bus      = "0x02"
           slot     = "0x00"
           function = "0x0"
           rom      = "/etc/libvirt/boot/SAS9300_8i_IT.bin"
-        }
-      ]
-      # Defaults:
-      # format = "xfs"
-      # wipe_filesystem = false
-      disk = [
-        {
-          source = "/dev/disk/by-id/ata-Samsung_SSD_860_QVO_1TB_S4PGNF0M410395Z"
-          target = "sdb"
         }
       ]
     }
