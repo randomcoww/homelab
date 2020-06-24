@@ -455,21 +455,8 @@ locals {
         }
       ]
       hostdev = [
-        # Chipset SATA
-        {
-          domain   = "0x0000"
-          bus      = "0x00"
-          slot     = "0x17"
-          function = "0x0"
-        },
-        # HBA addon card
-        {
-          domain   = "0x0000"
-          bus      = "0x02"
-          slot     = "0x00"
-          function = "0x0"
-          rom      = "/etc/libvirt/boot/SAS9300_8i_IT.bin"
-        }
+        "chipset-sata",
+        "hba"
       ]
       # Defaults:
       # format = "xfs"
@@ -552,21 +539,8 @@ locals {
         }
       ]
       hostdev = [
-        # Chipset SATA
-        {
-          domain   = "0x0000"
-          bus      = "0x00"
-          slot     = "0x17"
-          function = "0x0"
-        },
-        # HBA addon card
-        {
-          domain   = "0x0000"
-          bus      = "0x02"
-          slot     = "0x00"
-          function = "0x0"
-          rom      = "/etc/libvirt/boot/SAS9300_8i_IT.bin"
-        }
+        "chipset-sata",
+        "hba"
       ]
     }
 
@@ -617,6 +591,23 @@ locals {
           "worker-0",
         ]
       }
+      dev = {
+        # Chipset SATA
+        chipset-sata = {
+          domain   = "0x0000"
+          bus      = "0x00"
+          slot     = "0x17"
+          function = "0x0"
+        }
+        # HBA addon card
+        hba = {
+          domain   = "0x0000"
+          bus      = "0x02"
+          slot     = "0x00"
+          function = "0x0"
+          rom      = "/etc/libvirt/boot/SAS9300_8i_IT.bin"
+        }
+      }
       boot_image_device     = "/dev/disk/by-label/${local.boot_disk_label}"
       boot_image_mount_path = "/etc/libvirt/boot/${local.boot_disk_label}.iso"
     }
@@ -649,6 +640,23 @@ locals {
           "worker-1",
           "test-0",
         ]
+      }
+      dev = {
+        # Chipset SATA
+        chipset-sata = {
+          domain   = "0x0000"
+          bus      = "0x00"
+          slot     = "0x17"
+          function = "0x0"
+        }
+        # HBA addon card
+        hba = {
+          domain   = "0x0000"
+          bus      = "0x02"
+          slot     = "0x00"
+          function = "0x0"
+          rom      = "/etc/libvirt/boot/SAS9300_8i_IT.bin"
+        }
       }
       boot_image_device     = "/dev/disk/by-label/${local.boot_disk_label}"
       boot_image_mount_path = "/etc/libvirt/boot/${local.boot_disk_label}.iso"

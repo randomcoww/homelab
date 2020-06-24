@@ -68,15 +68,17 @@
       <readonly/>
     </disk>
     %{~ for h in p.hostdev ~}
+    %{~ if lookup(hypervisor_p.dev, h, null) != null ~}
     <hostdev mode='subsystem' type='pci' managed='yes'>
       <driver name='vfio'/>
       <source>
-        <address domain='${h.domain}' bus='${h.bus}' slot='${h.slot}' function='${h.function}'/>
+        <address domain='${hypervisor_p.dev[h].domain}' bus='${hypervisor_p.dev[h].bus}' slot='${hypervisor_p.dev[h].slot}' function='${hypervisor_p.dev[h].function}'/>
       </source>
-      %{~ if lookup(h, "rom", null) != null ~}
-      <rom bar='on' file='${h.rom}'/>
+      %{~ if lookup(hypervisor_p.dev[h], "rom", null) != null ~}
+      <rom bar='on' file='${hypervisor_p.dev[h].rom}'/>
       %{~ endif ~}
     </hostdev>
+    %{~ endif ~}
     %{~ endfor ~}
     <console>
       <target type='virtio'/>
