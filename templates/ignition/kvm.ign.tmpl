@@ -84,6 +84,13 @@ systemd:
 
 storage:
   files:
+    - path: /etc/modprobe.d/vfio.conf
+      mode: 0644
+      contents:
+        inline: |
+          # https://vfio.blogspot.com/2015/05/vfio-gpu-how-to-series-part-3-host.html
+          options vfio-pci ids=1002:ffffffff:ffffffff:ffffffff:00030000:ffff00ff,1002:ffffffff:ffffffff:ffffffff:00040300:ffffffff,10de:ffffffff:ffffffff:ffffffff:00030000:ffff00ff,10de:ffffffff:ffffffff:ffffffff:00040300:ffffffff
+
     - path: /etc/systemd/network/90-default.network
       mode: 0644
       contents:
