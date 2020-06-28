@@ -28,7 +28,7 @@ storage:
       format: ${lookup(disk, "format", "xfs")}
       wipe_filesystem: ${lookup(disk, "wipe_filesystem", false)}
       %{~ if lookup(disk, "label", null) != null ~}
-      label: ${upper(disk.label)}
+      label: ${disk.label}
       %{~ endif ~}
     %{~ endif ~}
     %{~ endfor ~}

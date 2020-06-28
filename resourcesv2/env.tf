@@ -137,6 +137,7 @@ locals {
         "kvm-1",
         "test-0",
         "desktop",
+        "laptop",
       ]
       ignition_templates = [
         "${local.templates_path}/ignition/ssh.ign.tmpl",
@@ -145,6 +146,7 @@ locals {
     traefik_tls = {
       nodes = [
         "desktop",
+        "laptop",
       ]
       ignition_templates = [
         "${local.templates_path}/ignition/internal_tls.ign.tmpl",
@@ -234,6 +236,7 @@ locals {
     desktop = {
       nodes = [
         "desktop",
+        "laptop",
       ]
       ignition_templates = [
         "${local.templates_path}/ignition/desktop.ign.tmpl",
@@ -685,7 +688,7 @@ locals {
     laptop = {
       network = [
         {
-          mac = "08-0e-01-cf-ef-aa"
+          mac = "08-9e-01-cf-ef-aa"
           if  = "en-pf"
         },
         {
@@ -696,7 +699,7 @@ locals {
       ]
       disk = [
         {
-          device     = "/dev/disk/by-id/ata-SAMSUNG_SSD_830_Series_SOXYNEAC720618-part1"
+          device     = "/dev/disk/by-label/home-local"
           mount_path = "/var/home/${local.desktop_user}"
         }
       ]
@@ -710,5 +713,6 @@ locals {
     "kvm-1",
     # password bcrypt included with desktop causes all ignition configs to get regenerated each run
     "desktop",
+    "laptop",
   ]
 }
