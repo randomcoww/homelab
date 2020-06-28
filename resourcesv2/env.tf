@@ -325,7 +325,7 @@ locals {
   hosts = {
     # gateway
     gateway-0 = {
-      memory = 3
+      memory = 2
       vcpu   = 1
       # interface name should always start at ens2 and count up
       # libvirt auto assigns interfaces starting at 00:02.0 and
@@ -360,7 +360,7 @@ locals {
       kea_ha_role = "primary"
     }
     gateway-1 = {
-      memory = 3
+      memory = 2
       vcpu   = 1
       network = [
         {
