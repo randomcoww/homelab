@@ -11,10 +11,8 @@ systemd:
             [Unit]
             After=prepare-vm-resources.service
             Wants=prepare-vm-resources.service
-    - name: ksm.service
-      enabled: true
     - name: ksmtuned.service
-      enabled: true
+      enabled: false
     - name: kea-dhcp4.service
       enabled: true
       dropins:
