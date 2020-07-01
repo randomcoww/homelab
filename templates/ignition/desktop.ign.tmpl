@@ -138,6 +138,30 @@ storage:
 
           [org/gnome/desktop/interface]
           enable-hot-corners=false
+    - path: /etc/firefox/pref/autoconfig.js
+      mode: 0644
+      contents:
+        inline: |
+          pref("general.config.filename", "mozilla.cfg");
+          pref("general.config.obscure_value", 0);
+
+          pref("browser.startup.homepage", "about:blank");
+          pref("browser.startup.page", 3);
+
+          pref("browser.cache.disk.enable", false);
+          pref("browser.cache.memory.enable", true);
+          pref("browser.sessionstore.interval", 300000);
+          pref("layers.acceleration.force-enabled", true);
+          pref("gfx.webrender.all", true);
+
+          pref("browser.safebrowsing.malware.enabled", false);
+          pref("browser.safebrowsing.phishing.enabled", false);
+          pref("extensions.pocket.enabled", false);
+          pref("privacy.resistFingerprinting", true);
+          pref("privacy.trackingprotection.enabled", true);
+          pref("toolkit.telemetry.enabled", false);
+          pref("network.trr.mode", 0);
+          pref("signon.rememberSignons", false);
 
 passwd:
   users:
