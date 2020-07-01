@@ -5,8 +5,10 @@ systemd:
   units:
     - name: libvirtd.service
       enabled: true
+    - name: ksm.service
+      mask: true
     - name: ksmtuned.service
-      enabled: false
+      mask: true
     - name: avahi-daemon.service
       mask: true
     - name: avahi-daemon.socket
