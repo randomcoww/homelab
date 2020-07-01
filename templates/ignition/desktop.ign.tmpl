@@ -3,6 +3,8 @@ variant: fcos
 version: 1.0.0
 systemd:
   units:
+    - name: sshd.service
+      enabled: true
     - name: libvirtd.service
       enabled: true
     - name: ksm.service
