@@ -3,6 +3,8 @@ variant: fcos
 version: 1.0.0
 systemd:
   units:
+    - name: lm_sensors.service
+      mask: true
     - name: NetworkManager.service
       mask: true
     - name: NetworkManager-wait-online.service

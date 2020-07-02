@@ -1,0 +1,58 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: filestash
+  namespace: common
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: filestash
+  template:
+    metadata:
+      labels:
+        app: filestash
+    spec:
+      dnsPolicy: ClusterFirstWithHostNet
+      containers:
+      - name: filestash
+        image: machines/filestash:c4363a0
+        ports:
+        - containerPort: 8334
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: filestash
+  namespace: common
+spec:
+  ports:
+  - name: web
+    port: 80
+    targetPort: 8334
+    protocol: TCP
+  selector:
+    app: filestash
+
+---
+apiVersion: extensions/v1beta1
+kind: Ingress
+metadata:
+  name: filestash
+  namespace: common
+  annotations:
+    kubernetes.io/ingress.class: traefik
+    ingress.kubernetes.io/ssl-redirect: "true"
+spec:
+  rules:
+  - host: filestash.fuzzybunny.internal
+    http:
+      paths:
+      - path: /
+        backend:
+          serviceName: filestash
+          servicePort: web
+  tls:
+  - secretName: tls-ingress
