@@ -4,7 +4,12 @@ version: 1.0.0
 systemd:
   units:
     - name: lm_sensors.service
-      mask: true
+      dropins:
+        - name: 10-virtualization.conf
+          contents: |
+            [Unit]
+            ConditionVirtualization=!vm
+            ConditionVirtualization=!container
     - name: NetworkManager.service
       mask: true
     - name: NetworkManager-wait-online.service
