@@ -29,7 +29,7 @@ module "ignition-kvm-0" {
   )
 
   services      = local.services
-  renderer      = module.kvm-common.matchbox_rpc_endpoints.kvm-0
+  renderer      = module.hypervisor.matchbox_rpc_endpoints.kvm-0
   kernel_image  = local.kernel_image
   initrd_images = local.initrd_images
   kernel_params = local.kernel_params
@@ -62,7 +62,40 @@ module "ignition-kvm-1" {
   )
 
   services      = local.services
-  renderer      = module.kvm-common.matchbox_rpc_endpoints.kvm-1
+  renderer      = module.hypervisor.matchbox_rpc_endpoints.kvm-1
+  kernel_image  = local.kernel_image
+  initrd_images = local.initrd_images
+  kernel_params = local.kernel_params
+}
+
+module "ignition-desktop" {
+  source = "../modulesv2/ignition_pxe"
+
+  ignition_params = merge([
+    for params in values(local.aggr_hosts.desktop.libvirt_domains) :
+    {
+      for h in params.nodes :
+      h => {
+        templates = flatten([
+          for k in [
+            module.kubernetes-common.controller_templates,
+            module.kubernetes-common.worker_templates,
+            module.gateway-common.templates,
+            module.test-common.templates,
+            module.ssh-common.templates,
+            module.static-pod-logging.templates,
+            module.tls-secrets.templates,
+          ] :
+          k[h]
+          if lookup(k, h, null) != null
+        ])
+        selector = lookup(local.aggr_hosts[h].networks_by_key, "int", {})
+      }
+    }]...
+  )
+
+  services      = local.services
+  renderer      = module.hypervisor.matchbox_rpc_endpoints.desktop
   kernel_image  = local.kernel_image
   initrd_images = local.initrd_images
   kernel_params = local.kernel_params
@@ -78,8 +111,9 @@ module "ignition-local" {
       templates = flatten([
         for k in [
           module.ssh-common.templates,
-          module.kvm-common.templates,
+          module.hypervisor.templates,
           module.desktop-common.templates,
+          module.hypervisor.templates,
           module.tls-secrets.templates,
         ] :
         k[h]

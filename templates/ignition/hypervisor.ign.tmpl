@@ -3,26 +3,10 @@ variant: fcos
 version: 1.0.0
 systemd:
   units:
-    - name: libvirtd.service
-      enabled: true
-      dropins:
-        - name: boot-image-mount.conf
-          contents: |
-            [Unit]
-            After=prepare-vm-resources.service
-            Wants=prepare-vm-resources.service
     - name: ksm.service
       mask: true
     - name: ksmtuned.service
       mask: true
-    - name: kea-dhcp4.service
-      enabled: true
-      dropins:
-        - name: internal.conf
-          contents: |
-            [Service]
-            ExecStart=
-            ExecStart=/usr/sbin/kea-dhcp4 -c /etc/kea/kea-dhcp4-internal.conf
     - name: prepare-vm-resources.service
       enabled: true
       contents: |
@@ -34,13 +18,14 @@ systemd:
         [Service]
         Type=oneshot
         RemainAfterExit=yes
+        ExecStart=-/bin/bash -c "echo 31 > /sys/class/net/${p.networks_by_key.en-pf.if}/device/sriov_numvfs"
+        ExecStart=/usr/bin/mkdir -p ${dirname(p.boot_image_mount_path)}
         ExecStart=/usr/bin/coreos-installer iso remove \
           ${p.boot_image_device} -o ${p.boot_image_mount_path}
         ExecStart=/usr/bin/podman volume create \
           --opt type=iso9660 \
           --opt device=${p.boot_image_mount_path} \
           image_vol
-        ExecStart=/bin/bash -c "echo 31 > /sys/class/net/${p.networks_by_key.en-pf.if}/device/sriov_numvfs"
 
         [Install]
         WantedBy=multi-user.target
@@ -52,14 +37,15 @@ systemd:
         Wants=network-online.target
         After=prepare-vm-resources.service
         Wants=prepare-vm-resources.service
+        ConditionPathExists=${p.boot_image_mount_path}
 
         [Service]
         TimeoutStartSec=5m
         Restart=always
         RestartSec=10
         ExecStartPre=/usr/bin/mkdir -p \
-          ${matchbox_data_path} ${matchbox_assets_path} ${matchbox_tls_path}
-        ExecStartPre=/usr/bin/podman load -i \
+          ${matchbox_data_path} ${matchbox_tls_path}
+        ExecStartPre=-/usr/bin/podman load -i \
           ${matchbox_image_path}
         ExecStartPre=-/usr/bin/podman kill matchbox
         ExecStartPre=-/usr/bin/podman rm matchbox
@@ -81,31 +67,24 @@ systemd:
 
         [Install]
         WantedBy=multi-user.target
+    - name: kea-dhcp4.service
+      enabled: true
+      dropins:
+        - name: internal.conf
+          contents: |
+            [Unit]
+            After=matchbox.service
+            Wants=matchbox.service
+            Before=libvirtd.service
+            WantedBy=libvirtd.service
+            ConditionPathExists=${p.boot_image_mount_path}
+
+            [Service]
+            ExecStart=
+            ExecStart=/usr/sbin/kea-dhcp4 -c /etc/kea/kea-dhcp4-internal.conf
 
 storage:
   files:
-    - path: /etc/modprobe.d/vfio.conf
-      mode: 0644
-      contents:
-        inline: |
-          # https://vfio.blogspot.com/2015/05/vfio-gpu-how-to-series-part-3-host.html
-          options vfio-pci ids=1002:ffffffff:ffffffff:ffffffff:00030000:ffff00ff,1002:ffffffff:ffffffff:ffffffff:00040300:ffffffff,10de:ffffffff:ffffffff:ffffffff:00030000:ffff00ff,10de:ffffffff:ffffffff:ffffffff:00040300:ffffffff
-
-    - path: /etc/systemd/network/90-default.network
-      mode: 0644
-      contents:
-        inline: |
-          [Match]
-          Name=en*
-
-          [Link]
-          ARP=no
-          RequiredForOnline=no
-
-          [Network]
-          LinkLocalAddressing=no
-          DHCP=no
-
     %{~ for k in internal_networks ~}
     ##
     ## internal network ${k} for host <-> local vm

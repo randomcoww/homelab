@@ -3,10 +3,6 @@ variant: fcos
 version: 1.0.0
 systemd:
   units:
-    - name: libvirtd.service
-      mask: true
-    - name: libvirtd.socket
-      mask: true
     - name: containerd.service
       enabled: true
       dropins:

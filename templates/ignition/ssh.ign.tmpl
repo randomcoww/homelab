@@ -1,11 +1,10 @@
 ---
 variant: fcos
 version: 1.0.0
-passwd:
-  users:
-    - name: ${user}
-      ssh_authorized_keys:
-        - cert-authority ${ssh_ca_authorized_key}
+systemd:
+  units:
+    - name: sshd.service
+      enabled: true
 
 storage:
   files:
@@ -31,3 +30,14 @@ storage:
       mode: 0644
       contents:
         inline: "@cert-authority * ${ssh_ca_authorized_key}"
+
+passwd:
+  users:
+    - name: ${user}
+      ssh_authorized_keys:
+        - cert-authority ${ssh_ca_authorized_key}
+      groups:
+        - adm
+        - sudo
+        - systemd-journal
+        - wheel

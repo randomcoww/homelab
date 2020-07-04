@@ -124,6 +124,88 @@ locals {
   }
 
   components = {
+    # hosts
+    gateway = {
+      nodes = [
+        "gateway-0",
+        "gateway-1",
+      ]
+      ignition_templates = [
+        "${local.templates_path}/ignition/gateway.ign.tmpl",
+        "${local.templates_path}/ignition/base.ign.tmpl",
+        "${local.templates_path}/ignition/containerd.ign.tmpl",
+      ]
+    }
+    controller = {
+      nodes = [
+        "controller-0",
+        "controller-1",
+        "controller-2",
+      ]
+      ignition_templates = [
+        "${local.templates_path}/ignition/controller.ign.tmpl",
+        "${local.templates_path}/ignition/base.ign.tmpl",
+        "${local.templates_path}/ignition/containerd.ign.tmpl",
+      ]
+    }
+    worker = {
+      nodes = [
+        "worker-0",
+        "worker-1",
+      ]
+      ignition_templates = [
+        "${local.templates_path}/ignition/worker.ign.tmpl",
+        "${local.templates_path}/ignition/base.ign.tmpl",
+        "${local.templates_path}/ignition/storage.ign.tmpl",
+        "${local.templates_path}/ignition/containerd.ign.tmpl",
+      ]
+    }
+    test = {
+      nodes = [
+        "test-0"
+      ]
+      ignition_templates = [
+        "${local.templates_path}/ignition/test.ign.tmpl",
+        "${local.templates_path}/ignition/base.ign.tmpl",
+        "${local.templates_path}/ignition/storage.ign.tmpl",
+        "${local.templates_path}/ignition/containerd.ign.tmpl",
+      ]
+    }
+    kvm = {
+      nodes = [
+        "kvm-0",
+        "kvm-1",
+      ]
+      ignition_templates = [
+        "${local.templates_path}/ignition/vlan_network.ign.tmpl",
+        "${local.templates_path}/ignition/base.ign.tmpl",
+        "${local.templates_path}/ignition/gpu_vfio.ign.tmpl",
+      ]
+    }
+    desktop = {
+      nodes = [
+        "desktop",
+        "laptop",
+      ]
+      ignition_templates = [
+        "${local.templates_path}/ignition/desktop.ign.tmpl",
+        "${local.templates_path}/ignition/vlan_network.ign.tmpl",
+        "${local.templates_path}/ignition/storage.ign.tmpl",
+        "${local.templates_path}/ignition/base.ign.tmpl",
+      ]
+    }
+
+    # addons
+    hypervisor = {
+      nodes = [
+        "kvm-0",
+        "kvm-1",
+        "desktop",
+      ]
+      ignition_templates = [
+        "${local.templates_path}/ignition/hypervisor.ign.tmpl",
+      ]
+    }
     ssh = {
       nodes = [
         "gateway-0",
@@ -169,81 +251,6 @@ locals {
       ]
       ignition_templates = [
         "${local.templates_path}/ignition/static_pod_logging.ign.tmpl",
-      ]
-    }
-    gateway = {
-      nodes = [
-        "gateway-0",
-        "gateway-1",
-      ]
-      ignition_templates = [
-        "${local.templates_path}/ignition/gateway.ign.tmpl",
-        "${local.templates_path}/ignition/base.ign.tmpl",
-        "${local.templates_path}/ignition/containerd.ign.tmpl",
-        "${local.templates_path}/ignition/user.ign.tmpl",
-      ]
-    }
-    controller = {
-      nodes = [
-        "controller-0",
-        "controller-1",
-        "controller-2",
-      ]
-      ignition_templates = [
-        "${local.templates_path}/ignition/controller.ign.tmpl",
-        "${local.templates_path}/ignition/base.ign.tmpl",
-        "${local.templates_path}/ignition/containerd.ign.tmpl",
-        "${local.templates_path}/ignition/user.ign.tmpl",
-      ]
-    }
-    worker = {
-      nodes = [
-        "worker-0",
-        "worker-1",
-      ]
-      ignition_templates = [
-        "${local.templates_path}/ignition/worker.ign.tmpl",
-        "${local.templates_path}/ignition/base.ign.tmpl",
-        "${local.templates_path}/ignition/storage.ign.tmpl",
-        "${local.templates_path}/ignition/containerd.ign.tmpl",
-        "${local.templates_path}/ignition/user.ign.tmpl",
-      ]
-    }
-    test = {
-      nodes = [
-        "test-0"
-      ]
-      ignition_templates = [
-        "${local.templates_path}/ignition/test.ign.tmpl",
-        "${local.templates_path}/ignition/base.ign.tmpl",
-        "${local.templates_path}/ignition/storage.ign.tmpl",
-        "${local.templates_path}/ignition/containerd.ign.tmpl",
-        "${local.templates_path}/ignition/user.ign.tmpl",
-      ]
-    }
-    kvm = {
-      nodes = [
-        "kvm-0",
-        "kvm-1",
-      ]
-      ignition_templates = [
-        "${local.templates_path}/ignition/kvm.ign.tmpl",
-        "${local.templates_path}/ignition/sriov_network.ign.tmpl",
-        "${local.templates_path}/ignition/base.ign.tmpl",
-        "${local.templates_path}/ignition/user.ign.tmpl",
-      ]
-    }
-    desktop = {
-      nodes = [
-        "desktop",
-        "laptop",
-      ]
-      ignition_templates = [
-        "${local.templates_path}/ignition/desktop.ign.tmpl",
-        "${local.templates_path}/ignition/sriov_network.ign.tmpl",
-        "${local.templates_path}/ignition/base.ign.tmpl",
-        "${local.templates_path}/ignition/storage.ign.tmpl",
-        "${local.templates_path}/ignition/user.ign.tmpl",
       ]
     }
   }
@@ -641,7 +648,6 @@ locals {
           "controller-1",
           "controller-2",
           "worker-1",
-          "test-0",
         ]
       }
       dev = {
@@ -664,18 +670,23 @@ locals {
       boot_image_device     = "/dev/disk/by-label/${local.boot_disk_label}"
       boot_image_mount_path = "/etc/libvirt/boot/${local.boot_disk_label}.iso"
     }
-
-    # desktop
+    # desktop hypervisor hybrid
     desktop = {
       network = [
         {
-          mac = "f8-f2-1e-1e-3c-40"
-          if  = "en-pf"
+          mac                = "f8-f2-1e-1e-3c-40"
+          if                 = "en-pf"
+          libvirt_network_pf = "sriov"
         },
         {
           label = "main"
           if    = "en-main"
           ip    = "192.168.127.253"
+        },
+        {
+          label = "int"
+          if    = "en-hostint"
+          ip    = local.services.renderer.vip
         }
       ]
       disk = [
@@ -684,7 +695,25 @@ locals {
           mount_path = "/var/home/${local.desktop_user}"
         }
       ]
+      libvirt_domains = {
+        coreos = [
+          "controller-2",
+          "test-0",
+        ]
+      }
+      dev = {
+        # Chipset SATA
+        chipset-sata = {
+          domain   = "0x0000"
+          bus      = "0x09"
+          slot     = "0x00"
+          function = "0x0"
+        }
+      }
+      boot_image_device     = "/dev/disk/by-label/${local.boot_disk_label}"
+      boot_image_mount_path = "/etc/libvirt/boot/${local.boot_disk_label}.iso"
     }
+    # backup
     laptop = {
       network = [
         {

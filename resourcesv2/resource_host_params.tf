@@ -74,11 +74,8 @@ module "test-common" {
 module "kvm-common" {
   source = "../modulesv2/kvm_common"
 
-  user             = local.user
-  mtu              = local.mtu
-  services         = local.services
-  domains          = local.domains
-  container_images = local.container_images
+  user = local.user
+  mtu  = local.mtu
 
   templates = local.components.kvm.ignition_templates
   hosts = {
@@ -90,14 +87,29 @@ module "kvm-common" {
 module "desktop-common" {
   source = "../modulesv2/desktop_common"
 
-  user     = local.desktop_user
-  password = var.desktop_password
-  mtu      = local.mtu
-  domains  = local.domains
+  user             = local.user
+  desktop_user     = local.desktop_user
+  desktop_password = var.desktop_password
+  mtu              = local.mtu
+  domains          = local.domains
 
   templates = local.components.desktop.ignition_templates
   hosts = {
     for k in local.components.desktop.nodes :
+    k => local.aggr_hosts[k]
+  }
+}
+
+module "hypervisor" {
+  source = "../modulesv2/hypervisor"
+
+  user             = local.user
+  services         = local.services
+  container_images = local.container_images
+
+  templates = local.components.hypervisor.ignition_templates
+  hosts = {
+    for k in local.components.hypervisor.nodes :
     k => local.aggr_hosts[k]
   }
 }

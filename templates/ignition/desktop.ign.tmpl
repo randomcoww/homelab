@@ -3,17 +3,7 @@ variant: fcos
 version: 1.0.0
 systemd:
   units:
-    - name: sshd.service
-      enabled: true
-    - name: libvirtd.service
-      enabled: true
-    - name: ksm.service
-      mask: true
-    - name: ksmtuned.service
-      mask: true
-    - name: avahi-daemon.service
-      mask: true
-    - name: avahi-daemon.socket
+    - name: firewalld.service
       mask: true
     - name: systemd-networkd-wait-online.service
       mask: true
@@ -34,25 +24,13 @@ systemd:
 
 storage:
   files:
-    - path: /etc/systemd/network/90-default.network
-      mode: 0644
-      contents:
-        inline: |
-          [Match]
-          Name=en*
-
-          [Link]
-          ARP=no
-          RequiredForOnline=no
-
-          [Network]
-          LinkLocalAddressing=no
-          DHCP=no
     - path: /etc/systemd/network/80-w.network
       mode: 0644
       contents:
         inline: |
           [Match]
+          Virtualization=!vm
+          Virtualization=!container
           Name=w*
 
           [Link]
@@ -171,10 +149,13 @@ storage:
 
 passwd:
   users:
-    - name: ${user}
-      uid: ${uid}
-      %{~ if length(password) > 0 ~}
-      password_hash: ${bcrypt(password)}
+    - name: ${desktop_user}
+      uid: ${desktop_uid}
+      %{~ if length(desktop_password) > 0 ~}
+      password_hash: ${bcrypt(desktop_password)}
       %{~ endif ~}
       groups:
-        - libvirt
+        - adm
+        - sudo
+        - systemd-journal
+        - wheel

@@ -6,8 +6,9 @@ output "templates" {
       templatefile(template, {
         p                = params
         user             = var.user
-        uid              = 10000
-        password         = var.password
+        desktop_user     = var.desktop_user
+        desktop_uid      = 10000
+        desktop_password = var.desktop_password
         domains          = var.domains
         mtu              = var.mtu
         udev_steam_input = data.http.udev-60-steam-input.body

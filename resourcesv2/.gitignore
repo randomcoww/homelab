@@ -1,7 +1,7 @@
 output
 assets
-terraform.tfstate
-terraform.tfstate.*
+*.tfstate
+*.tfstate.*
 .terraform
 crash.log
 data

@@ -9,7 +9,7 @@
   </memoryBacking>
   <vcpu placement='static'>8</vcpu>
   <os>
-    <type arch='x86_64' machine='q35'>hvm</type>
+    <type machine='q35'>hvm</type>
     <loader readonly='yes' type='pflash'>/usr/share/OVMF/OVMF_CODE.fd</loader>
     <nvram template='/usr/share/OVMF/OVMF_VARS.fd'/>
   </os>
@@ -44,9 +44,9 @@
     <suspend-to-disk enabled='no'/>
   </pm>
   <devices>
-    <emulator>/usr/bin/qemu-system-x86_64</emulator>
+    <emulator>/usr/bin/qemu-kvm</emulator>
     <disk type='file' device='disk'>
-      <driver name='qemu' type='raw' cache='none' io='threads' discard='unmap'/>
+      <driver name='qemu' type='raw' cache='none' io='native' discard='unmap'/>
       <source file='/data/qemu/pt-windows.img'/>
       <target dev='sda' bus='scsi'/>
       <boot order='2'/>
@@ -65,14 +65,17 @@
       <readonly/>
     </disk>
     <disk type='file' device='disk'>
-      <driver name='qemu' type='raw' cache='none' io='threads' discard='unmap'/>
+      <driver name='qemu' type='raw' cache='none' io='native' discard='unmap'/>
       <source file='/data/qemu/pt-windows-data.img'/>
       <target dev='sdd' bus='scsi'/>
     </disk>
     <controller type='scsi' model='virtio-scsi'/>
     <controller type='usb' model='nec-xhci'/>
-    <interface type='direct'>
-      <source dev='env90' mode='bridge'/>
+    <interface type='network'>
+      <source network='sriov'/>
+      <vlan>
+        <tag id='90'/>
+      </vlan>
       <model type='virtio-net'/>
     </interface>
     <input type='mouse' bus='virtio'/>

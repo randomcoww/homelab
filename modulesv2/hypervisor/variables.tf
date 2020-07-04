@@ -2,8 +2,12 @@ variable "user" {
   type = string
 }
 
-variable "mtu" {
-  type = number
+variable "services" {
+  type = any
+}
+
+variable "container_images" {
+  type = map(string)
 }
 
 variable "hosts" {
