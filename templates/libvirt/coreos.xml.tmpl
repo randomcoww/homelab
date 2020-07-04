@@ -18,7 +18,7 @@
   </cpu>
   <on_crash>restart</on_crash>
   <devices>
-    <emulator>/usr/bin/qemu-system-x86_64</emulator>
+    <emulator>/usr/bin/qemu-kvm</emulator>
     %{~ for n in p.network ~}
     %{~ if lookup(n, "libvirt_network", null) != null ~}
     <interface type='network'>
@@ -35,6 +35,7 @@
       </vlan>
       %{~ endif ~}
       <guest dev="${n.if}"/>
+      <model type='virtio-net'/>
     </interface>
     %{~ else ~}
     <interface type='direct' trustGuestRxFilters='yes'>
