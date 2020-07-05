@@ -87,7 +87,8 @@ Ignition configuration is generated on each hypervisor as follows:
 buildtool terraform apply \
     -target=module.ignition-local \
     -target=module.ignition-kvm-0 \
-    -target=module.ignition-kvm-1
+    -target=module.ignition-kvm-1 \
+    -target=module.ignition-desktop
 ```
 
 Define libvirt domains on each hypervisor:
@@ -95,7 +96,8 @@ Define libvirt domains on each hypervisor:
 ```bash
 buildtool tf-wrapper apply \
     -target=module.libvirt-kvm-0 \
-    -target=module.libvirt-kvm-1
+    -target=module.libvirt-kvm-1 \
+    -target=module.libvirt-desktop
 ```
 
 ### Start VMs
@@ -109,8 +111,11 @@ virsh -c qemu+ssh://core@kvm-0.local/system start worker-0
 virsh -c qemu+ssh://core@kvm-1.local/system net-start sriov
 virsh -c qemu+ssh://core@kvm-1.local/system start gateway-1
 virsh -c qemu+ssh://core@kvm-1.local/system start controller-1
-virsh -c qemu+ssh://core@kvm-1.local/system start controller-2
 virsh -c qemu+ssh://core@kvm-1.local/system start worker-1
+
+virsh -c qemu+ssh://core@desktop.local/system net-start sriov
+virsh -c qemu+ssh://core@desktop.local/system start controller-2
+virsh -c qemu+ssh://core@desktop.local/system start test-0
 ```
 
 ### Deploy kubernetes services
