@@ -36,8 +36,3 @@ passwd:
     - name: ${user}
       ssh_authorized_keys:
         - cert-authority ${ssh_ca_authorized_key}
-      groups:
-        - adm
-        - sudo
-        - systemd-journal
-        - wheel

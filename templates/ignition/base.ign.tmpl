@@ -107,3 +107,12 @@ storage:
       append:
         - inline: |
             hosts: files resolve dns myhostname
+
+passwd:
+  users:
+    - name: ${user}
+      groups:
+        - adm
+        - sudo
+        - systemd-journal
+        - wheel

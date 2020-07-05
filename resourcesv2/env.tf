@@ -596,8 +596,6 @@ locals {
         coreos = [
           "gateway-0",
           "controller-0",
-          "controller-1",
-          "controller-2",
           "worker-0",
         ]
       }
@@ -644,9 +642,7 @@ locals {
       libvirt_domains = {
         coreos = [
           "gateway-1",
-          "controller-0",
           "controller-1",
-          "controller-2",
           "worker-1",
         ]
       }

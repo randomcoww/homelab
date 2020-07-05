@@ -113,6 +113,7 @@ module "ignition-local" {
           module.ssh-common.templates,
           module.hypervisor.templates,
           module.desktop-common.templates,
+          module.kvm-common.templates,
           module.hypervisor.templates,
           module.tls-secrets.templates,
         ] :
