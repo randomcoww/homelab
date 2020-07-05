@@ -14,14 +14,14 @@ storage:
           Kind=wireguard
 
           [WireGuard]
-          PrivateKey=${wireguard_secret.Interface.PrivateKey}
+          PrivateKey=${wireguard_config.Interface.PrivateKey}
 
           [WireGuardPeer]
-          PublicKey=${wireguard_secret.Peer.PublicKey}
-          %{~ for k in split(",", wireguard_secret.Peer.AllowedIPs) ~}
+          PublicKey=${wireguard_config.Peer.PublicKey}
+          %{~ for k in split(",", wireguard_config.Peer.AllowedIPs) ~}
           AllowedIPs=${trimspace(k)}
           %{~ endfor ~}
-          Endpoint=${wireguard_secret.Peer.Endpoint}
+          Endpoint=${wireguard_config.Peer.Endpoint}
           PersistentKeepalive=25
     - path: /etc/systemd/network/20-${wireguard_if}.network
       mode: 0600
@@ -37,6 +37,6 @@ storage:
 
           [Network]
           DefaultRouteOnDevice=yes
-          %{~ for k in split(",", wireguard_secret.Interface.Address) ~}
+          %{~ for k in split(",", wireguard_config.Interface.Address) ~}
           Address=${trimspace(k)}
           %{~ endfor ~}

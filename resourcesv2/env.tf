@@ -236,6 +236,7 @@ locals {
     }
     wireguard_client = {
       nodes = [
+        "test-0",
       ]
       ignition_templates = [
         "${local.templates_path}/ignition/wireguard_client.ign.tmpl",

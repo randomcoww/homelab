@@ -229,6 +229,17 @@ module "tls-secrets" {
   }
 }
 
+module "wireguard-client" {
+  source           = "../modulesv2/wireguard_client"
+  wireguard_config = var.wireguard_config
+
+  templates = local.components.wireguard_client.ignition_templates
+  hosts = {
+    for k in local.components.wireguard_client.nodes :
+    k => local.aggr_hosts[k]
+  }
+}
+
 module "static-pod-logging" {
   source = "../modulesv2/static_pod_logging"
 
