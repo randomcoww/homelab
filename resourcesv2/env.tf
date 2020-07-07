@@ -132,6 +132,7 @@ locals {
       ]
       ignition_templates = [
         "${local.templates_path}/ignition/gateway.ign.tmpl",
+        "${local.templates_path}/ignition/general_network.ign.tmpl",
         "${local.templates_path}/ignition/base.ign.tmpl",
         "${local.templates_path}/ignition/containerd.ign.tmpl",
       ]
@@ -144,6 +145,7 @@ locals {
       ]
       ignition_templates = [
         "${local.templates_path}/ignition/controller.ign.tmpl",
+        "${local.templates_path}/ignition/general_network.ign.tmpl",
         "${local.templates_path}/ignition/base.ign.tmpl",
         "${local.templates_path}/ignition/containerd.ign.tmpl",
       ]
@@ -155,6 +157,7 @@ locals {
       ]
       ignition_templates = [
         "${local.templates_path}/ignition/worker.ign.tmpl",
+        "${local.templates_path}/ignition/general_network.ign.tmpl",
         "${local.templates_path}/ignition/base.ign.tmpl",
         "${local.templates_path}/ignition/storage.ign.tmpl",
         "${local.templates_path}/ignition/containerd.ign.tmpl",
@@ -166,6 +169,7 @@ locals {
       ]
       ignition_templates = [
         "${local.templates_path}/ignition/test.ign.tmpl",
+        "${local.templates_path}/ignition/general_network.ign.tmpl",
         "${local.templates_path}/ignition/base.ign.tmpl",
         "${local.templates_path}/ignition/storage.ign.tmpl",
         "${local.templates_path}/ignition/containerd.ign.tmpl",
@@ -234,14 +238,6 @@ locals {
         "${local.templates_path}/ignition/internal_tls.ign.tmpl",
       ]
     }
-    wireguard_client = {
-      nodes = [
-        "test-0",
-      ]
-      ignition_templates = [
-        "${local.templates_path}/ignition/wireguard_client.ign.tmpl",
-      ]
-    }
     static_pod_logging = {
       nodes = [
         "gateway-0",
@@ -284,6 +280,8 @@ locals {
       router          = "192.168.126.240"
       dhcp_pool       = "192.168.127.64/26"
       libvirt_network = "sriov"
+      mdns            = true
+      mtu             = local.mtu
     }
     lan = {
       id              = 90
@@ -292,6 +290,7 @@ locals {
       router          = "192.168.62.240"
       dhcp_pool       = "192.168.63.64/26"
       libvirt_network = "sriov"
+      mtu             = local.mtu
     }
     # gateway state sync
     sync = {
@@ -300,6 +299,7 @@ locals {
       cidr            = 29
       router          = "192.168.190.6"
       libvirt_network = "sriov"
+      mtu             = local.mtu
     }
     wan = {
       id              = 30
@@ -363,6 +363,7 @@ locals {
           label = "wan"
           if    = "ens6"
           mac   = "52-54-00-63-6e-b3"
+          dhcp  = true
         }
       ]
       kea_ha_role = "primary"
@@ -395,6 +396,7 @@ locals {
           label = "wan"
           if    = "ens6"
           mac   = "52-54-00-63-6e-b3"
+          dhcp  = true
         }
       ]
       kea_ha_role = "standby"
@@ -414,6 +416,7 @@ locals {
           label = "main"
           ip    = "192.168.127.219"
           if    = "ens3"
+          dhcp  = true
         }
       ]
     }
@@ -430,6 +433,7 @@ locals {
           label = "main"
           ip    = "192.168.127.220"
           if    = "ens3"
+          dhcp  = true
         }
       ]
     }
@@ -446,6 +450,7 @@ locals {
           label = "main"
           ip    = "192.168.127.221"
           if    = "ens3"
+          dhcp  = true
         }
       ]
     }
@@ -463,6 +468,7 @@ locals {
         {
           label = "main"
           if    = "ens3"
+          dhcp  = true
         }
       ]
       hostdev = [
@@ -547,6 +553,7 @@ locals {
         {
           label = "main"
           if    = "ens3"
+          dhcp  = true
         }
       ]
       hostdev = [
@@ -568,6 +575,7 @@ locals {
         {
           label = "main"
           if    = "ens3"
+          dhcp  = true
         }
       ]
     }
@@ -584,6 +592,7 @@ locals {
           label = "main"
           if    = "en-main"
           ip    = "192.168.127.251"
+          dhcp  = true
         },
         {
           label = "int"
@@ -631,6 +640,7 @@ locals {
           label = "main"
           if    = "en-main"
           ip    = "192.168.127.252"
+          dhcp  = true
         },
         {
           label = "int"
@@ -681,6 +691,11 @@ locals {
           ip    = "192.168.127.253"
         },
         {
+          label = "lan"
+          if    = "en-lan"
+          dhcp  = true
+        },
+        {
           label = "int"
           if    = "en-hostint"
           ip    = local.services.renderer.vip
@@ -721,6 +736,11 @@ locals {
           label = "main"
           if    = "en-main"
           ip    = "192.168.127.254"
+        },
+        {
+          label = "lan"
+          if    = "en-lan"
+          dhcp  = true
         }
       ]
       disk = [

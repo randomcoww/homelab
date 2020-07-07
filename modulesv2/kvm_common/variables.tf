@@ -2,10 +2,6 @@ variable "user" {
   type = string
 }
 
-variable "mtu" {
-  type = number
-}
-
 variable "hosts" {
   type = any
 }

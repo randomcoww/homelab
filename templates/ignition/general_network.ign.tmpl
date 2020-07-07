@@ -1,0 +1,44 @@
+---
+variant: fcos
+version: 1.0.0
+storage:
+  files:
+    %{~ for k, v in p.networks_by_key ~}
+    %{~ if lookup(v, "id", null) != null ~}
+    - path: /etc/systemd/network/20-${v.if}.network
+      mode: 0644
+      contents:
+        inline: |
+          [Match]
+          Name=${v.if}
+          %{~ if lookup(v, "mtu", null) != null ~}
+
+          [Link]
+          MTUBytes=${v.mtu}
+          %{~ else ~}
+
+          [DHCP]
+          UseMTU=true
+          %{~ endif ~}
+
+          [Network]
+          LinkLocalAddressing=false
+          DHCP=${lookup(v, "dhcp", false)}
+          MulticastDNS=${lookup(v, "mdns", false)}
+          %{~ if lookup(v, "ip", null) != null && lookup(v, "cidr", null) != null ~}
+
+          [Address]
+          Address=${v.ip}/${v.cidr}
+          %{~ endif ~}
+    %{~ endif ~}
+    %{~ endfor ~}
+    - path: /etc/systemd/network/20-${p.networks_by_key.int.if}.network
+      mode: 0644
+      contents:
+        inline: |
+          [Match]
+          Virtualization=vm
+          Name=${p.networks_by_key.int.if}
+
+          [Link]
+          Unmanaged=yes

@@ -42,7 +42,6 @@ module "gateway-common" {
   source = "../modulesv2/gateway_common"
 
   user               = local.user
-  mtu                = local.mtu
   loadbalancer_pools = local.loadbalancer_pools
   services           = local.services
   domains            = local.domains
@@ -75,7 +74,6 @@ module "kvm-common" {
   source = "../modulesv2/kvm_common"
 
   user = local.user
-  mtu  = local.mtu
 
   templates = local.components.kvm.ignition_templates
   hosts = {
@@ -90,7 +88,6 @@ module "desktop-common" {
   user             = local.user
   desktop_user     = local.desktop_user
   desktop_password = var.desktop_password
-  mtu              = local.mtu
   domains          = local.domains
 
   templates = local.components.desktop.ignition_templates
@@ -225,17 +222,6 @@ module "tls-secrets" {
   templates = local.components.traefik_tls.ignition_templates
   hosts = {
     for k in local.components.traefik_tls.nodes :
-    k => local.aggr_hosts[k]
-  }
-}
-
-module "wireguard-client" {
-  source           = "../modulesv2/wireguard_client"
-  wireguard_config = var.wireguard_config
-
-  templates = local.components.wireguard_client.ignition_templates
-  hosts = {
-    for k in local.components.wireguard_client.nodes :
     k => local.aggr_hosts[k]
   }
 }

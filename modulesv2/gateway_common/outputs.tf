@@ -10,7 +10,6 @@ output "templates" {
         loadbalancer_pools         = var.loadbalancer_pools
         services                   = var.services
         domains                    = var.domains
-        mtu                        = var.mtu
         dns_forward_ip             = "9.9.9.9"
         dns_forward_tls_servername = "dns.quad9.net"
         kubelet_path               = "/var/lib/kubelet"

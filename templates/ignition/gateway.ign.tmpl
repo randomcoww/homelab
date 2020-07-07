@@ -20,39 +20,6 @@ systemd:
 
 storage:
   files:
-    - path: /etc/systemd/network/10-${p.networks_by_key.main.if}.network
-      mode: 0644
-      contents:
-        inline: |
-          [Match]
-          Name=${p.networks_by_key.main.if}
-
-          [Link]
-          MTUBytes=${mtu}
-
-          [Network]
-          LinkLocalAddressing=no
-          DHCP=no
-          MulticastDNS=yes
-
-          [Address]
-          Address=${p.networks_by_key.main.ip}/${p.networks_by_key.main.cidr}
-    - path: /etc/systemd/network/10-${p.networks_by_key.lan.if}.network
-      mode: 0644
-      contents:
-        inline: |
-          [Match]
-          Name=${p.networks_by_key.lan.if}
-
-          [Link]
-          MTUBytes=${mtu}
-
-          [Network]
-          LinkLocalAddressing=no
-          DHCP=no
-
-          [Address]
-          Address=${p.networks_by_key.lan.ip}/${p.networks_by_key.lan.cidr}
     - path: /etc/systemd/network/10-${p.networks_by_key.sync.if}.network
       mode: 0644
       contents:
@@ -61,7 +28,7 @@ storage:
           Name=${p.networks_by_key.sync.if}
 
           [Link]
-          MTUBytes=${mtu}
+          MTUBytes=${p.networks_by_key.sync.mtu}
 
           [Network]
           LinkLocalAddressing=no
@@ -104,15 +71,6 @@ storage:
           UseDomains=false
           UseTimezone=no
           RouteTable=${master_default_route_table}
-    - path: /etc/systemd/network/10-${p.networks_by_key.int.if}.network
-      mode: 0644
-      contents:
-        inline: |
-          [Match]
-          Name=${p.networks_by_key.int.if}
-
-          [Link]
-          Unmanaged=yes
 
     - path: /etc/keepalived/keepalived.conf
       mode: 0644
@@ -370,10 +328,6 @@ storage:
                   "name": "domain-name-servers",
                   "data": "${services.recursive_dns.vip}",
                   "csv-format": true
-                },
-                {
-                  "name": "interface-mtu",
-                  "data": "${mtu}"
                 }
               ],
               "hooks-libraries": [
@@ -403,6 +357,12 @@ storage:
                     {
                       name = "routers"
                       data = "${k.router}"
+                    %{~ if lookup(k, "mtu", null) != null ~}
+                    },
+                    {
+                      "name": "interface-mtu",
+                      "data": "${k.mtu}"
+                    %{~ endif ~}
                     }
                   ]
                   pools = [

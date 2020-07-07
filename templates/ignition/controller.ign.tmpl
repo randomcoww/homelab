@@ -3,33 +3,6 @@ variant: fcos
 version: 1.0.0
 storage:
   files:
-    - path: /etc/systemd/network/10-${p.networks_by_key.main.if}.network
-      mode: 0644
-      contents:
-        inline: |
-          [Match]
-          Name=${p.networks_by_key.main.if}
-
-          [DHCP]
-          UseMTU=yes
-
-          [Network]
-          LinkLocalAddressing=no
-          DHCP=yes
-          MulticastDNS=yes
-
-          [Address]
-          Address=${p.networks_by_key.main.ip}/${p.networks_by_key.main.cidr}
-    - path: /etc/systemd/network/10-${p.networks_by_key.int.if}.network
-      mode: 0644
-      contents:
-        inline: |
-          [Match]
-          Name=${p.networks_by_key.int.if}
-
-          [Link]
-          Unmanaged=yes
-
     ##
     ## certs
     ##

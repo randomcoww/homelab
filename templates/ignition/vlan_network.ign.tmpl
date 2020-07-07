@@ -6,7 +6,7 @@ storage:
     ##
     ## allocate vlan interfaces to hardware
     ##
-    - path: /etc/systemd/network/05-${p.networks_by_key.en-pf.if}.link
+    - path: /etc/systemd/network/10-${p.networks_by_key.en-pf.if}.link
       mode: 0644
       contents:
         inline: |
@@ -16,8 +16,7 @@ storage:
           [Link]
           MACAddressPolicy=persistent
           Name=${p.networks_by_key.en-pf.if}
-          MTUBytes=${mtu}
-    - path: /etc/systemd/network/10-${p.networks_by_key.en-pf.if}.network
+    - path: /etc/systemd/network/20-${p.networks_by_key.en-pf.if}.network
       mode: 0644
       contents:
         inline: |
@@ -31,58 +30,76 @@ storage:
           [Network]
           LinkLocalAddressing=no
           DHCP=no
-          VLAN=${p.networks_by_key.main.if}
+          %{~ for k, v in p.networks_by_key ~}
+          %{~ if lookup(v, "id", null) != null ~}
+          VLAN=${v.if}
+          %{~ endif ~}
+          %{~ endfor ~}
 
-    - path: /etc/systemd/network/10-${p.networks_by_key.main.if}.netdev
+    %{~ for k, v in p.networks_by_key ~}
+    %{~ if lookup(v, "id", null) != null ~}
+    - path: /etc/systemd/network/20-${v.if}.netdev
       mode: 0644
       contents:
         inline: |
           [NetDev]
-          Name=${p.networks_by_key.main.if}
+          Name=${v.if}
           Kind=vlan
 
           [VLAN]
-          Id=${p.networks_by_key.main.id}
-    - path: /etc/systemd/network/10-${p.networks_by_key.main.if}.network
+          Id=${v.id}
+    - path: /etc/systemd/network/20-${v.if}.network
       mode: 0644
       contents:
         inline: |
           [Match]
-          Name=${p.networks_by_key.main.if}
+          Name=${v.if}
 
           [Link]
           ARP=no
-          MTUBytes=${mtu}
+          %{~ if lookup(v, "mtu", null) != null ~}
+          MTUBytes=${v.mtu}
+          %{~ endif ~}
 
           [Network]
           LinkLocalAddressing=no
           DHCP=no
-          MACVTAP=${p.networks_by_key.main.if}-tap
+          MACVTAP=${v.if}-tap
 
-    - path: /etc/systemd/network/10-${p.networks_by_key.main.if}-tap.netdev
+    - path: /etc/systemd/network/20-${v.if}-tap.netdev
       mode: 0644
       contents:
         inline: |
           [NetDev]
-          Name=${p.networks_by_key.main.if}-tap
+          Name=${v.if}-tap
           Kind=macvtap
 
           [MACVTAP]
           Mode=bridge
-    - path: /etc/systemd/network/10-${p.networks_by_key.main.if}-tap.network
+    - path: /etc/systemd/network/20-${v.if}-tap.network
       mode: 0644
       contents:
         inline: |
           [Match]
-          Name=${p.networks_by_key.main.if}-tap
+          Name=${v.if}-tap
+          %{~ if lookup(v, "mtu", null) != null ~}
 
           [Link]
-          RequiredForOnline=no
+          MTUBytes=${v.mtu}
+          %{~ else ~}
+
+          [DHCP]
+          UseMTU=true
+          %{~ endif ~}
 
           [Network]
-          LinkLocalAddressing=no
-          DHCP=yes
-          MulticastDNS=yes
+          LinkLocalAddressing=false
+          DHCP=${lookup(v, "dhcp", false)}
+          MulticastDNS=${lookup(v, "mdns", false)}
+          %{~ if lookup(v, "ip", null) != null && lookup(v, "cidr", null) != null ~}
 
           [Address]
-          Address=${p.networks_by_key.main.ip}/${p.networks_by_key.main.cidr}
+          Address=${v.ip}/${v.cidr}
+          %{~ endif ~}
+    %{~ endif ~}
+    %{~ endfor ~}

@@ -10,10 +10,6 @@ variable "desktop_password" {
   type = string
 }
 
-variable "mtu" {
-  type = number
-}
-
 variable "domains" {
   type = map(string)
 }

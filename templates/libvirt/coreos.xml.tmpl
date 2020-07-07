@@ -34,6 +34,9 @@
         <tag id='${n.id}'/>
       </vlan>
       %{~ endif ~}
+      %{~ if lookup(n, "mtu", null) != null ~}
+      <mtu size='${n.mtu}'/>
+      %{~ endif ~}
       <guest dev="${n.if}"/>
       <model type='virtio-net'/>
     </interface>
@@ -45,6 +48,9 @@
       %{~ endif ~}
       %{~ if lookup(n, "bootorder", null) != null ~}
       <boot order='${n.bootorder}'/>
+      %{~ endif ~}
+      %{~ if lookup(n, "mtu", null) != null ~}
+      <mtu size='${n.mtu}'/>
       %{~ endif ~}
       <guest dev="${n.if}"/>
       <model type='virtio-net'/>

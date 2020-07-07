@@ -19,7 +19,6 @@ module "ignition-kvm-0" {
             module.ssh-common.templates,
             module.static-pod-logging.templates,
             module.tls-secrets.templates,
-            module.wireguard-client.templates,
           ] :
           k[h]
           if lookup(k, h, null) != null
@@ -53,7 +52,6 @@ module "ignition-kvm-1" {
             module.ssh-common.templates,
             module.static-pod-logging.templates,
             module.tls-secrets.templates,
-            module.wireguard-client.templates,
           ] :
           k[h]
           if lookup(k, h, null) != null
@@ -87,7 +85,6 @@ module "ignition-desktop" {
             module.ssh-common.templates,
             module.static-pod-logging.templates,
             module.tls-secrets.templates,
-            module.wireguard-client.templates,
           ] :
           k[h]
           if lookup(k, h, null) != null
@@ -119,7 +116,6 @@ module "ignition-local" {
           module.kvm-common.templates,
           module.hypervisor.templates,
           module.tls-secrets.templates,
-          module.wireguard-client.templates,
         ] :
         k[h]
         if lookup(k, h, null) != null

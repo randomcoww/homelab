@@ -6,7 +6,6 @@ output "templates" {
       templatefile(template, {
         p    = params
         user = var.user
-        mtu  = var.mtu
       })
     ]
   }
