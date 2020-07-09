@@ -14,9 +14,15 @@ storage:
           PermanentMACAddress=${p.networks_by_key.en-pf.mac}
 
           [Link]
+          MTUBytes=${max([
+            for k, v in p.networks_by_key:
+            lookup(v, "mtu", 1500)
+            if lookup(v, "id", null) != null
+          ]...
+          )}
           MACAddressPolicy=persistent
           Name=${p.networks_by_key.en-pf.if}
-    - path: /etc/systemd/network/20-${p.networks_by_key.en-pf.if}.network
+    - path: /etc/systemd/network/12-${p.networks_by_key.en-pf.if}.network
       mode: 0644
       contents:
         inline: |
@@ -66,7 +72,7 @@ storage:
           DHCP=no
           MACVTAP=${v.if}-tap
 
-    - path: /etc/systemd/network/20-${v.if}-tap.netdev
+    - path: /etc/systemd/network/22-${v.if}-tap.netdev
       mode: 0644
       contents:
         inline: |
@@ -76,7 +82,7 @@ storage:
 
           [MACVTAP]
           Mode=bridge
-    - path: /etc/systemd/network/20-${v.if}-tap.network
+    - path: /etc/systemd/network/22-${v.if}-tap.network
       mode: 0644
       contents:
         inline: |

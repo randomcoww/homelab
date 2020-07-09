@@ -353,18 +353,17 @@ storage:
                 for k in p.network:
                 {
                   subnet = "${k.network}/${k.cidr}",
-                  option-data = [
+                  option-data = concat([
                     {
                       name = "routers"
                       data = "${k.router}"
-                    %{~ if lookup(k, "mtu", null) != null ~}
-                    },
-                    {
-                      "name": "interface-mtu",
-                      "data": "${k.mtu}"
-                    %{~ endif ~}
                     }
-                  ]
+                  ], lookup(k, "mtu", null) != null ? [
+                    {
+                      name = "interface-mtu"
+                      data = "${k.mtu}"
+                    }
+                  ] : [])
                   pools = [
                     {
                       pool = "${k.dhcp_pool}"
