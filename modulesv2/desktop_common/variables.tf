@@ -6,6 +6,10 @@ variable "desktop_user" {
   type = string
 }
 
+variable "desktop_uid" {
+  type = number
+}
+
 variable "desktop_password" {
   type = string
 }

@@ -3,11 +3,9 @@ locals {
 
   # Default user for CoreOS
   user = "core"
-  # Desktop env user
+  # Desktop env user. This affects the persistent home directory.
   desktop_user = "randomcoww"
-
-  # Set all MTU
-  mtu = 9000
+  desktop_uid  = 10000
 
   # S3 backup for etcd
   # path is based on the cluster name
@@ -281,7 +279,7 @@ locals {
       dhcp_pool       = "192.168.127.64/26"
       libvirt_network = "sriov"
       mdns            = true
-      mtu             = local.mtu
+      mtu             = 9000
     }
     lan = {
       id              = 90
@@ -290,7 +288,7 @@ locals {
       router          = "192.168.62.240"
       dhcp_pool       = "192.168.63.64/26"
       libvirt_network = "sriov"
-      mtu             = local.mtu
+      mtu             = 9000
     }
     # gateway state sync
     sync = {
@@ -299,7 +297,7 @@ locals {
       cidr            = 29
       router          = "192.168.190.6"
       libvirt_network = "sriov"
-      mtu             = local.mtu
+      mtu             = 9000
     }
     wan = {
       id              = 30

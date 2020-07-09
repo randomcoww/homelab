@@ -87,6 +87,7 @@ module "desktop-common" {
 
   user             = local.user
   desktop_user     = local.desktop_user
+  desktop_uid      = local.desktop_uid
   desktop_password = var.desktop_password
   domains          = local.domains
 
