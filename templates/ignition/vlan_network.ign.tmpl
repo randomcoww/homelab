@@ -31,11 +31,11 @@ storage:
           MACAddress=${p.networks_by_key.en-pf.mac}
 
           [Link]
-          ARP=no
+          ARP=false
 
           [Network]
-          LinkLocalAddressing=no
-          DHCP=no
+          LinkLocalAddressing=false
+          DHCP=false
           %{~ for k, v in p.networks_by_key ~}
           %{~ if lookup(v, "id", null) != null ~}
           VLAN=${v.if}
@@ -62,14 +62,14 @@ storage:
           Name=${v.if}
 
           [Link]
-          ARP=no
+          ARP=false
           %{~ if lookup(v, "mtu", null) != null ~}
           MTUBytes=${v.mtu}
           %{~ endif ~}
 
           [Network]
-          LinkLocalAddressing=no
-          DHCP=no
+          LinkLocalAddressing=false
+          DHCP=false
           MACVTAP=${v.if}-tap
 
     - path: /etc/systemd/network/22-${v.if}-tap.netdev

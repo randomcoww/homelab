@@ -31,8 +31,8 @@ storage:
           MTUBytes=${p.networks_by_key.sync.mtu}
 
           [Network]
-          LinkLocalAddressing=no
-          DHCP=no
+          LinkLocalAddressing=false
+          DHCP=false
 
           [Address]
           Address=${p.networks_by_key.sync.ip}/${p.networks_by_key.sync.cidr}
@@ -53,11 +53,11 @@ storage:
           Name=${p.networks_by_key.wan.if}
 
           [Link]
-          RequiredForOnline=no
+          RequiredForOnline=false
 
           [Network]
-          LinkLocalAddressing=no
-          DHCP=yes
+          LinkLocalAddressing=false
+          DHCP=true
           DNS=${dns_forward_ip}
           DNSOverTLS=opportunistic
           Domains=~
@@ -69,7 +69,7 @@ storage:
           SendHostname=false
           UseHostname=false
           UseDomains=false
-          UseTimezone=no
+          UseTimezone=false
           RouteTable=${master_default_route_table}
 
     - path: /etc/keepalived/keepalived.conf

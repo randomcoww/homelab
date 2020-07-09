@@ -17,7 +17,7 @@ systemd:
 
         [Service]
         Type=oneshot
-        RemainAfterExit=yes
+        RemainAfterExit=true
         ExecStart=-/bin/bash -c "echo 31 > /sys/class/net/${p.networks_by_key.en-pf.if}/device/sriov_numvfs"
         ExecStart=/usr/bin/mkdir -p ${dirname(p.boot_image_mount_path)}
         ExecStart=/usr/bin/coreos-installer iso remove \
@@ -105,11 +105,11 @@ storage:
           Name=${p.networks_by_key[k].if}
 
           [Link]
-          ARP=no
+          ARP=false
 
           [Network]
-          LinkLocalAddressing=no
-          DHCP=no
+          LinkLocalAddressing=false
+          DHCP=false
           MACVTAP=${k}-tap
           Bridge=${k}-dummy
 
@@ -129,11 +129,11 @@ storage:
           Name=${k}-dummy
 
           [Link]
-          ARP=no
+          ARP=false
 
           [Network]
-          LinkLocalAddressing=no
-          DHCP=no
+          LinkLocalAddressing=false
+          DHCP=false
           Bridge=${p.networks_by_key[k].if}
 
     - path: /etc/systemd/network/10-${k}-tap.netdev
@@ -155,8 +155,8 @@ storage:
           Name=${k}-tap
 
           [Network]
-          LinkLocalAddressing=no
-          DHCP=no
+          LinkLocalAddressing=false
+          DHCP=false
 
           [Address]
           Address=${p.networks_by_key[k].ip}/${p.networks_by_key[k].cidr}

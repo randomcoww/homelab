@@ -72,12 +72,12 @@ storage:
           Name=en*
 
           [Link]
-          ARP=no
-          RequiredForOnline=no
+          ARP=false
+          RequiredForOnline=false
 
           [Network]
-          LinkLocalAddressing=no
-          DHCP=no
+          LinkLocalAddressing=false
+          DHCP=false
 
     - path: /etc/systemd/journal.conf.d/05-live.conf
       mode: 0644
@@ -86,22 +86,23 @@ storage:
           [Journal]
           Storage=volatile
           RuntimeMaxUse=15M
-          ForwardToSyslog=no
-          ForwardToConsole=no
+          ForwardToSyslog=false
+          ForwardToConsole=false
     - path: /etc/systemd/resolved.conf.d/05-disable-stub.conf
       mode: 0644
       contents:
         inline: |
           [Resolve]
           FallbackDNS=
-          DNSStubListener=no
-          MulticastDNS=yes
+          DNSStubListener=false
+          MulticastDNS=true
+          LLMNR=false
     - path: /etc/systemd/system.conf.d/05-live.conf
       mode: 0644
       contents:
         inline: |
           [Manager]
-          DumpCore=no
+          DumpCore=false
     ## Appending seems to override the earlier hosts entry
     - path: /etc/nsswitch.conf
       append:
