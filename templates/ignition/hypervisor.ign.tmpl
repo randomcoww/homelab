@@ -193,7 +193,7 @@ storage:
                   subnet = "${p.networks_by_key[k].network}/${p.networks_by_key[k].cidr}",
                   pools = [
                     {
-                      pool = "${p.networks_by_key[k].dhcp_pool}"
+                      pool = p.networks_by_key[k].dhcp_pool
                     }
                   ]
                 }
