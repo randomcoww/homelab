@@ -110,12 +110,16 @@ module "ignition-local" {
     h => {
       templates = flatten([
         for k in [
+          module.kubernetes-common.controller_templates,
+          module.kubernetes-common.worker_templates,
+          module.gateway-common.templates,
+          module.test-common.templates,
           module.ssh-common.templates,
+          module.static-pod-logging.templates,
+          module.tls-secrets.templates,
           module.hypervisor.templates,
           module.desktop-common.templates,
           module.kvm-common.templates,
-          module.hypervisor.templates,
-          module.tls-secrets.templates,
         ] :
         k[h]
         if lookup(k, h, null) != null
