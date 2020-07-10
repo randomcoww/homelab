@@ -115,6 +115,7 @@ virsh -c qemu+ssh://core@kvm-1.local/system start worker-1
 
 virsh -c qemu+ssh://core@desktop.local/system net-start sriov
 virsh -c qemu+ssh://core@desktop.local/system start controller-2
+virsh -c qemu+ssh://core@desktop.local/system start worker-2
 virsh -c qemu+ssh://core@desktop.local/system start test-0
 ```
 

@@ -152,6 +152,7 @@ locals {
       nodes = [
         "worker-0",
         "worker-1",
+        "worker-2",
       ]
       ignition_templates = [
         "${local.templates_path}/ignition/worker.ign.tmpl",
@@ -217,6 +218,7 @@ locals {
         "controller-2",
         "worker-0",
         "worker-1",
+        "worker-2",
         "kvm-0",
         "kvm-1",
         "test-0",
@@ -559,6 +561,25 @@ locals {
         "hba"
       ]
     }
+    worker-2 = {
+      memory = 8
+      vcpu   = 4
+      network = [
+        {
+          label = "int"
+          if    = "ens2"
+          mac   = "52-54-00-1a-61-1c"
+        },
+        {
+          label = "main"
+          if    = "ens3"
+          dhcp  = true
+        }
+      ]
+      hostdev = [
+        "chipset-sata"
+      ]
+    }
 
     # Test instances
     test-0 = {
@@ -708,6 +729,7 @@ locals {
       libvirt_domains = {
         coreos = [
           "controller-2",
+          "worker-2",
           "test-0",
         ]
       }
