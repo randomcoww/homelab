@@ -48,7 +48,7 @@ spec:
           subPath: mnt
           mountPropagation: Bidirectional
       - name: unifi
-        image: randomcoww/unifi:5.13.29
+        image: randomcoww/unifi:5.13.32
         env:
         - name: BACKUP_DIR
           value: /unifi/mnt
