@@ -11,8 +11,6 @@ locals {
     module.ssh-common.templates,
     module.static-pod-logging.templates,
     module.tls-secrets.templates,
-    module.kvm-common.templates,
-    module.hypervisor.templates,
   ]
 
   addons = merge(
@@ -107,6 +105,8 @@ module "ignition-local" {
     h => {
       templates = flatten([
         for k in concat(local.common_templates, [
+          module.kvm-common.templates,
+          module.hypervisor.templates,
           module.desktop-common.templates,
         ]) :
         lookup(k, h, [])

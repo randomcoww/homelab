@@ -27,7 +27,7 @@ buildtool start-renderer
 
 ```bash
 cat > secrets.tfvars <<EOF
-desktop_password = "password"
+desktop_password = "$(echo 'password' | mkpasswd -m sha-512 -s)"
 wireguard_config = {
   Interface = {
     PrivateKey =

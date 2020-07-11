@@ -777,7 +777,6 @@ locals {
   local_renderer_hosts_include = [
     "kvm-0",
     "kvm-1",
-    # password bcrypt included with desktop causes all ignition configs to get regenerated each run
     "desktop",
     "laptop",
   ]

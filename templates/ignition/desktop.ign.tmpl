@@ -152,7 +152,7 @@ passwd:
     - name: ${desktop_user}
       uid: ${desktop_uid}
       %{~ if length(desktop_password) > 0 ~}
-      password_hash: ${bcrypt(desktop_password)}
+      password_hash: ${desktop_password}
       %{~ endif ~}
       groups:
         - adm
