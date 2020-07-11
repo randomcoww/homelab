@@ -2,6 +2,30 @@
 ## Write config to each matchbox host
 ## Hardcode each matchbox host until for_each module becomes available
 ##
+locals {
+  common_templates = [
+    module.kubernetes-common.controller_templates,
+    module.kubernetes-common.worker_templates,
+    module.gateway-common.templates,
+    module.test-common.templates,
+    module.ssh-common.templates,
+    module.static-pod-logging.templates,
+    module.tls-secrets.templates,
+    module.kvm-common.templates,
+    module.hypervisor.templates,
+  ]
+
+  addons = merge(
+    module.gateway-common.addons,
+    module.kubernetes-common.addons,
+    module.secrets.addons,
+    module.tls-secrets.addons,
+    module.ssh-common.addons,
+    module.static-pod-logging.addons,
+    module.test-common.addons,
+  )
+}
+
 module "ignition-kvm-0" {
   source = "../modulesv2/ignition_pxe"
 
@@ -11,17 +35,8 @@ module "ignition-kvm-0" {
       for h in params.nodes :
       h => {
         templates = flatten([
-          for k in [
-            module.kubernetes-common.controller_templates,
-            module.kubernetes-common.worker_templates,
-            module.gateway-common.templates,
-            module.test-common.templates,
-            module.ssh-common.templates,
-            module.static-pod-logging.templates,
-            module.tls-secrets.templates,
-          ] :
-          k[h]
-          if lookup(k, h, null) != null
+          for k in local.common_templates :
+          lookup(k, h, [])
         ])
         selector = lookup(local.aggr_hosts[h].networks_by_key, "int", {})
       }
@@ -44,17 +59,8 @@ module "ignition-kvm-1" {
       for h in params.nodes :
       h => {
         templates = flatten([
-          for k in [
-            module.kubernetes-common.controller_templates,
-            module.kubernetes-common.worker_templates,
-            module.gateway-common.templates,
-            module.test-common.templates,
-            module.ssh-common.templates,
-            module.static-pod-logging.templates,
-            module.tls-secrets.templates,
-          ] :
-          k[h]
-          if lookup(k, h, null) != null
+          for k in local.common_templates :
+          lookup(k, h, [])
         ])
         selector = lookup(local.aggr_hosts[h].networks_by_key, "int", {})
       }
@@ -77,17 +83,8 @@ module "ignition-desktop" {
       for h in params.nodes :
       h => {
         templates = flatten([
-          for k in [
-            module.kubernetes-common.controller_templates,
-            module.kubernetes-common.worker_templates,
-            module.gateway-common.templates,
-            module.test-common.templates,
-            module.ssh-common.templates,
-            module.static-pod-logging.templates,
-            module.tls-secrets.templates,
-          ] :
-          k[h]
-          if lookup(k, h, null) != null
+          for k in local.common_templates :
+          lookup(k, h, [])
         ])
         selector = lookup(local.aggr_hosts[h].networks_by_key, "int", {})
       }
@@ -109,20 +106,10 @@ module "ignition-local" {
     for h in local.local_renderer_hosts_include :
     h => {
       templates = flatten([
-        for k in [
-          module.kubernetes-common.controller_templates,
-          module.kubernetes-common.worker_templates,
-          module.gateway-common.templates,
-          module.test-common.templates,
-          module.ssh-common.templates,
-          module.static-pod-logging.templates,
-          module.tls-secrets.templates,
-          module.hypervisor.templates,
+        for k in concat(local.common_templates, [
           module.desktop-common.templates,
-          module.kvm-common.templates,
-        ] :
-        k[h]
-        if lookup(k, h, null) != null
+        ]) :
+        lookup(k, h, [])
       ])
     }
   }
@@ -133,15 +120,6 @@ module "ignition-local" {
 module "generic-manifest-local" {
   source = "../modulesv2/generic_manifest"
 
-  generic_params = merge(
-    module.gateway-common.addons,
-    module.kubernetes-common.addons,
-    # module.secrets.addons,
-    # module.tls-secrets.addons,
-    # module.ssh-common.addons,
-    module.static-pod-logging.addons,
-    # module.test-common.addons,
-  )
-
-  renderer = local.local_renderer
+  generic_params = local.addons
+  renderer       = local.local_renderer
 }
