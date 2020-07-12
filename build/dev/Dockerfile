@@ -1,6 +1,7 @@
 FROM golang:alpine AS MODULES
 
-ENV CT_VERSION v0.5.0
+ENV CT_VERSION v0.5.1
+ENV K8S_PROVIDER_VERSION v0.1.0
 
 RUN set -x \
   \
@@ -9,7 +10,7 @@ RUN set -x \
     libvirt-dev \
     g++ \
   \
-  && git clone https://github.com/hashicorp/terraform-provider-kubernetes-alpha.git \
+  && git clone -b ${K8S_PROVIDER_VERSION} https://github.com/hashicorp/terraform-provider-kubernetes-alpha.git \
   && cd terraform-provider-kubernetes-alpha \
   && CGO_ENABLED=0 GO111MODULE=on GOOS=linux go install -v -ldflags '-s -w' \
   \
@@ -47,7 +48,7 @@ RUN set -x \
 
 FROM alpine:edge
 
-ENV TF_VERSION 0.12.26
+ENV TF_VERSION 0.12.28
 
 ENV HOME /root
 WORKDIR $HOME
