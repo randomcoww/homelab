@@ -17,7 +17,5 @@ terraform apply \
 
 terraform output ssh-client-certificate > $KEY-cert.pub
 echo -n "@cert-authority * $(terraform output ssh-ca-authorized-key)" > $KNOWN_HOSTS
-# terraform output kubeconfig > $HOME/.kube/config
-terraform output kubeconfig > output/kubeconfig
 
 terraform $@
