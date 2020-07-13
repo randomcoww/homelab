@@ -240,3 +240,39 @@ module "static-pod-logging" {
     k => local.aggr_hosts[k]
   }
 }
+
+locals {
+  templates_by_host = {
+    for h in keys(local.hosts) :
+    h => flatten([
+      for k in [
+        module.kubernetes-common.controller_templates,
+        module.kubernetes-common.worker_templates,
+        module.gateway-common.templates,
+        module.test-common.templates,
+        module.ssh-common.templates,
+        module.static-pod-logging.templates,
+        module.tls-secrets.templates,
+        module.kvm-common.templates,
+        module.hypervisor.templates,
+        module.desktop-common.templates,
+      ] :
+      lookup(k, h, [])
+    ])
+  }
+
+  # Use kubernetes provider to apply
+  provider_addons = merge(
+    module.secrets.addons,
+    module.tls-secrets.addons,
+  )
+
+  # Render manifest in matchbox
+  render_addons = merge(
+    module.gateway-common.addons,
+    module.kubernetes-common.addons,
+    module.ssh-common.addons,
+    module.static-pod-logging.addons,
+    module.test-common.addons,
+  )
+}

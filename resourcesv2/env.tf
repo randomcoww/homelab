@@ -46,9 +46,9 @@ locals {
     "rd.neednet=1",
     "ignition.firstboot",
     "ignition.platform.id=metal",
+    "systemd.unified_cgroup_hierarchy=0",
     # "net.ifnames=0",
     # "biosdevname=0",
-    "systemd.unified_cgroup_hierarchy=0",
     "coreos.liveiso=${local.boot_disk_label}",
   ]
 
@@ -202,7 +202,6 @@ locals {
     hypervisor = {
       nodes = [
         "kvm-0",
-        "kvm-1",
         "desktop",
       ]
       ignition_templates = [
@@ -577,7 +576,6 @@ locals {
         }
       ]
       hostdev = [
-        "chipset-sata"
       ]
     }
 
@@ -625,6 +623,7 @@ locals {
         coreos = [
           "gateway-0",
           "controller-0",
+          "controller-1",
           "worker-0",
         ]
       }
@@ -696,6 +695,7 @@ locals {
       boot_image_device     = "/dev/disk/by-label/${local.boot_disk_label}"
       boot_image_mount_path = "/etc/libvirt/boot/${local.boot_disk_label}.iso"
     }
+
     # desktop hypervisor hybrid
     desktop = {
       network = [
@@ -728,24 +728,15 @@ locals {
       ]
       libvirt_domains = {
         coreos = [
+          "gateway-1",
+          "controller-1",
           "controller-2",
           "worker-2",
-          "test-0",
         ]
-      }
-      dev = {
-        # Chipset SATA
-        chipset-sata = {
-          domain   = "0x0000"
-          bus      = "0x09"
-          slot     = "0x00"
-          function = "0x0"
-        }
       }
       boot_image_device     = "/dev/disk/by-label/${local.boot_disk_label}"
       boot_image_mount_path = "/etc/libvirt/boot/${local.boot_disk_label}.iso"
     }
-    # backup
     laptop = {
       network = [
         {

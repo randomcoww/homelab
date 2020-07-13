@@ -18,5 +18,3 @@ spec:
   blockDevices:
     blockDeviceList:
       - blockdevice-95ac8497ac7156b68aecb6bc2118a792
-      - blockdevice-fdac0f8a00fb8e2da3370b6f625c3c5f
-      - blockdevice-eaf09adaa672894d164814851b60864f
