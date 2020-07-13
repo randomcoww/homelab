@@ -211,7 +211,7 @@ kubectl patch -n monitoring psp loki -p='{
 #### OpenEBS
 
 ```
-helm repo add stable https://kubernetes-charts.storage.googleapis.com
+helm repo add openebs https://openebs.github.io/charts
 
 kubectl create namespace openebs
 
@@ -224,8 +224,7 @@ helm template openebs \
     --set analytics.enabled=false \
     --set defaultStorageConfig.enabled=false \
     --set snapshotOperator.enabled=false \
-    --set webhook.imageTag=1.9.0 \
-    stable/openebs | kubectl -n openebs apply -f -
+    openebs/openebs | kubectl -n openebs apply -f -
 ```
 
 Add block devices (IDs specific to my hardware)
