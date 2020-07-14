@@ -224,6 +224,7 @@ helm template openebs \
     --set analytics.enabled=false \
     --set defaultStorageConfig.enabled=false \
     --set snapshotOperator.enabled=false \
+    --set webhook.enabled=false \
     openebs/openebs | kubectl -n openebs apply -f -
 ```
 
