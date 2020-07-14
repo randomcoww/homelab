@@ -103,11 +103,17 @@ storage:
         inline: |
           [Manager]
           DumpCore=false
-    ## Appending seems to override the earlier hosts entry
+    # Appending seems to override the earlier hosts entry
     - path: /etc/nsswitch.conf
       append:
         - inline: |
             hosts: files resolve dns myhostname
+    # Clear podman CNI
+    # This is read eary by kubelet and messes with early container launches
+    - path: /etc/cni/net.d/87-podman-bridge.conflist
+      overwrite: true
+      contents:
+        inline: "{}"
 
 passwd:
   users:

@@ -152,7 +152,6 @@ locals {
       nodes = [
         "worker-0",
         "worker-1",
-        "worker-2",
       ]
       ignition_templates = [
         "${local.templates_path}/ignition/worker.ign.tmpl",
@@ -202,6 +201,7 @@ locals {
     hypervisor = {
       nodes = [
         "kvm-0",
+        "kvm-1",
         "desktop",
       ]
       ignition_templates = [
@@ -217,7 +217,6 @@ locals {
         "controller-2",
         "worker-0",
         "worker-1",
-        "worker-2",
         "kvm-0",
         "kvm-1",
         "test-0",
@@ -560,24 +559,6 @@ locals {
         "hba"
       ]
     }
-    worker-2 = {
-      memory = 8
-      vcpu   = 4
-      network = [
-        {
-          label = "int"
-          if    = "ens2"
-          mac   = "52-54-00-1a-61-1c"
-        },
-        {
-          label = "main"
-          if    = "ens3"
-          dhcp  = true
-        }
-      ]
-      hostdev = [
-      ]
-    }
 
     # Test instances
     test-0 = {
@@ -670,9 +651,6 @@ locals {
       ## out ignition and re-used to boot VMs
       libvirt_domains = {
         coreos = [
-          "gateway-1",
-          "controller-1",
-          "worker-1",
         ]
       }
       dev = {
@@ -731,7 +709,7 @@ locals {
           "gateway-1",
           "controller-1",
           "controller-2",
-          "worker-2",
+          "test-0",
         ]
       }
       boot_image_device     = "/dev/disk/by-label/${local.boot_disk_label}"
