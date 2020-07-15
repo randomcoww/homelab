@@ -88,8 +88,6 @@ spec:
         ports:
         - containerPort: 8000
           protocol: TCP
-        - containerPort: 6600
-          protocol: TCP
         volumeMounts:
         - mountPath: "/mpd/music"
           name: music-data
@@ -104,6 +102,18 @@ spec:
               # /mpd/music/mnt should be fuse mounted by rclone
               # Kill the container if this is not mounted
               command: ["mountpoint", "-q", "/mpd/music/mnt"]
+      - name: ympd
+        image: randomcoww/ympd:latest
+        args:
+        - "-h"
+        - "127.0.0.1"
+        - "-p"
+        - "6600"
+        - "-w"
+        - "8001"
+        ports:
+        - containerPort: 8001
+          protocol: TCP
       volumes:
       - name: mpd-data
         persistentVolumeClaim:
@@ -133,23 +143,6 @@ spec:
 kind: Service
 apiVersion: v1
 metadata:
-  name: mpd
-  namespace: common
-  annotations:
-    external-dns.alpha.kubernetes.io/hostname: mpd.fuzzybunny.internal
-spec:
-  type: LoadBalancer
-  ports:
-  - name: control
-    port: 6600
-    targetPort: 6600
-  selector:
-    k8s-app: mpd
-
----
-kind: Service
-apiVersion: v1
-metadata:
   name: mpd-stream
   namespace: common
 spec:
@@ -157,6 +150,20 @@ spec:
   - name: stream
     port: 80
     targetPort: 8000
+  selector:
+    k8s-app: mpd
+
+---
+kind: Service
+apiVersion: v1
+metadata:
+  name: mpd-control
+  namespace: common
+spec:
+  ports:
+  - name: control
+    port: 80
+    targetPort: 8001
   selector:
     k8s-app: mpd
 
@@ -178,5 +185,26 @@ spec:
         backend:
           serviceName: mpd-stream
           servicePort: stream
+  tls:
+  - secretName: tls-ingress
+
+---
+apiVersion: extensions/v1beta1
+kind: Ingress
+metadata:
+  name: mpd-control
+  namespace: common
+  annotations:
+    kubernetes.io/ingress.class: traefik
+    ingress.kubernetes.io/ssl-redirect: "true"
+spec:
+  rules:
+  - host: mpd.fuzzybunny.internal
+    http:
+      paths:
+      - path: /
+        backend:
+          serviceName: mpd-control
+          servicePort: control
   tls:
   - secretName: tls-ingress
