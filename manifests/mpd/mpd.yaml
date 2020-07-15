@@ -35,12 +35,6 @@ data:
       max_clients "0"
     }
 
-    audio_output {
-      type "null"
-      name "Null Output"
-      mixer_type "none"
-    }
-
 ---
 kind: Deployment
 apiVersion: apps/v1
