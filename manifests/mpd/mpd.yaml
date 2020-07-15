@@ -16,9 +16,18 @@ data:
     sticker_file "/mpd/cache/sticker.sql"
     filesystem_charset "UTF-8"
 
+    resampler {
+      plugin "soxr"
+      threads "0"
+      quality "very high"
+    }
+
     audio_output {
       type "httpd"
       name "HTTP FLAC-3"
+      tags "yes"
+      format "48000:32:2"
+      always_on "yes"
       encoder "flac"
       compression "3"
       port "8000"
