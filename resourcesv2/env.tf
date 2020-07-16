@@ -558,6 +558,63 @@ locals {
         "chipset-sata",
         "hba"
       ]
+      disk = [
+        {
+          label      = "ZA15EAPV"
+          device     = "/dev/disk/by-id/ata-ST8000VN0022-2EL112_ZA15EAPV"
+          mount_path = "/var/s3/0"
+        },
+        {
+          label      = "ZA15Q6AH"
+          device     = "/dev/disk/by-id/ata-ST8000VN0022-2EL112_ZA15Q6AH"
+          mount_path = "/var/s3/1"
+        },
+        {
+          label      = "ZA16BS65"
+          device     = "/dev/disk/by-id/ata-ST8000VN0022-2EL112_ZA16BS65"
+          mount_path = "/var/s3/2"
+        },
+        {
+          label      = "ZA16CF0F"
+          device     = "/dev/disk/by-id/ata-ST8000VN0022-2EL112_ZA16CF0F"
+          mount_path = "/var/s3/3"
+        },
+        {
+          label      = "ZA16JMFA"
+          device     = "/dev/disk/by-id/ata-ST8000VN0022-2EL112_ZA16JMFA"
+          mount_path = "/var/s3/4"
+        },
+        {
+          label      = "ZA16L5B4"
+          device     = "/dev/disk/by-id/ata-ST8000VN0022-2EL112_ZA16L5B4"
+          mount_path = "/var/s3/5"
+        },
+        {
+          label      = "ZA16LAV1"
+          device     = "/dev/disk/by-id/ata-ST8000VN0022-2EL112_ZA16LAV1"
+          mount_path = "/var/s3/6"
+        },
+        {
+          label      = "ZA16LAYD"
+          device     = "/dev/disk/by-id/ata-ST8000VN0022-2EL112_ZA16LAYD"
+          mount_path = "/var/s3/7"
+        },
+        {
+          label      = "ZA16PHJ7"
+          device     = "/dev/disk/by-id/ata-ST8000VN0022-2EL112_ZA16PHJ7"
+          mount_path = "/var/s3/8"
+        },
+        {
+          label      = "ZA16QQ66"
+          device     = "/dev/disk/by-id/ata-ST8000VN0022-2EL112_ZA16QQ66"
+          mount_path = "/var/s3/9"
+        },
+        {
+          label      = "ZA16RDGT"
+          device     = "/dev/disk/by-id/ata-ST8000VN0022-2EL112_ZA16RDGT"
+          mount_path = "/var/s3/10"
+        },
+      ]
     }
 
     # Test instances
@@ -604,7 +661,6 @@ locals {
         coreos = [
           "gateway-0",
           "controller-0",
-          "controller-1",
           "worker-0",
         ]
       }
@@ -651,6 +707,9 @@ locals {
       ## out ignition and re-used to boot VMs
       libvirt_domains = {
         coreos = [
+          "gateway-1",
+          "controller-1",
+          "worker-1",
         ]
       }
       dev = {
@@ -706,8 +765,6 @@ locals {
       ]
       libvirt_domains = {
         coreos = [
-          "gateway-1",
-          "controller-1",
           "controller-2",
           "test-0",
         ]
@@ -745,6 +802,8 @@ locals {
   # control which configs are rendered on local matchbox
   local_renderer_hosts_include = [
     "kvm-0",
+    "kvm-1",
     "desktop",
+    "laptop",
   ]
 }

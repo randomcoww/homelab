@@ -2,13 +2,15 @@ apiVersion: v1
 kind: Pod
 metadata:
   name: basic-pod
-  namespace: default
+  namespace: common
 spec:
+  hostNetwork: true
   containers:
   - image: alpine:edge
     command:
-      - sleep
-      - "3600"
+    - "tail"
+    - "-f"
+    - "/dev/null"
     imagePullPolicy: IfNotPresent
     name: basic-pod
   restartPolicy: Always
