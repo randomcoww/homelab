@@ -66,16 +66,20 @@ storage:
             realtime-priority = 9
             rlimit-rtprio = 9
             daemonize = no
-    - path: /etc/udev/rules.d/60-steam-input.rules
+    - path: /etc/udev/rules.d/62-steam-input.rules
       mode: 0644
       contents:
         inline: |
           ${indent(10, udev_steam_input)}
-    - path: /etc/udev/rules.d/60-steam-vr.rules
+    - path: /etc/udev/rules.d/62-steam-vr.rules
       mode: 0644
       contents:
         inline: |
           ${indent(10, udev_steam_vr)}
+    - path: /etc/environment
+      append:
+        - inline: |
+            RADV_PERFTEST=aco
 
     ##
     ## gnome desktop config
