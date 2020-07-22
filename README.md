@@ -131,6 +131,7 @@ Write kubeconfig file:
 
 ```bash
 buildtool terraform apply \
+    -auto-approve \
     -target=null_resource.output-triggers
 
 mkdir -p ~/.kube
