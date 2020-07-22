@@ -241,6 +241,23 @@ module "static-pod-logging" {
   }
 }
 
+data "null_data_source" "provider-addons" {
+  inputs = merge(
+    module.secrets.addons,
+    module.tls-secrets.addons
+  )
+}
+
+data "null_data_source" "render-addons" {
+  inputs = merge(
+    module.gateway-common.addons,
+    module.kubernetes-common.addons,
+    module.ssh-common.addons,
+    module.static-pod-logging.addons,
+    module.test-common.addons,
+  )
+}
+
 locals {
   templates_by_host = {
     for h in keys(local.hosts) :
@@ -260,19 +277,4 @@ locals {
       lookup(k, h, [])
     ])
   }
-
-  # Use kubernetes provider to apply
-  provider_addons = merge(
-    module.secrets.addons,
-    module.tls-secrets.addons,
-  )
-
-  # Render manifest in matchbox
-  render_addons = merge(
-    module.gateway-common.addons,
-    module.kubernetes-common.addons,
-    module.ssh-common.addons,
-    module.static-pod-logging.addons,
-    module.test-common.addons,
-  )
 }

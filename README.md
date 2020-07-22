@@ -2,7 +2,7 @@
 
 Build container includes terraform with plugins:
 
-```
+```bash
 buildtool() {
     set -x
     podman run -it --rm \
@@ -71,7 +71,6 @@ KEY=$HOME/.ssh/id_ecdsa
 ssh-keygen -q -t ecdsa -N '' -f $KEY 2>/dev/null <<< y >/dev/null
 
 buildtool terraform apply \
-    -auto-approve \
     -target=null_resource.output-triggers \
     -var="ssh_client_public_key=$(cat $KEY.pub)"
 
@@ -123,7 +122,6 @@ virsh -c qemu+ssh://core@desktop.local/system start test-0
 
 ```bash
 buildtool terraform apply \
-    -var-file=secrets.tfvars \
     -target=module.generic-manifest-local
 ```
 
@@ -131,7 +129,6 @@ Write kubeconfig file:
 
 ```bash
 buildtool terraform apply \
-    -auto-approve \
     -target=null_resource.output-triggers
 
 mkdir -p ~/.kube
@@ -152,19 +149,19 @@ kubectl apply -f http://127.0.0.1:8080/generic?manifest=coredns
 
 https://metallb.universe.tf/installation/#installation-by-manifest
 
-```
+```bash
 kubectl apply -f http://127.0.0.1:8080/generic?manifest=metallb-network
 ```
 
 #### Traefik
 
-```
+```bash
 kubectl apply -f manifests/traefik.yaml
 ```
 
 #### Monitoring
 
-```
+```bash
 helm repo add loki https://grafana.github.io/loki/charts
 helm repo add stable https://kubernetes-charts.storage.googleapis.com
 
@@ -194,12 +191,12 @@ kubectl apply -n monitoring -f manifests/grafana.yaml
 ```
 Allow non cluster nodes to send logs to loki:
 
-```
+```bash
 kubectl apply -f http://127.0.0.1:8080/generic?manifest=loki-lb-service
 ```
 
 Currently the PSP `requiredDropCapabilities` causes loki pod to crashloop:
-```
+```bash
 kubectl patch -n monitoring psp loki -p='{
   "spec": {
     "requiredDropCapabilities": [
@@ -211,7 +208,7 @@ kubectl patch -n monitoring psp loki -p='{
 
 #### OpenEBS
 
-```
+```bash
 helm repo add openebs https://openebs.github.io/charts
 
 kubectl create namespace openebs
@@ -230,27 +227,34 @@ helm template openebs \
 ```
 
 Add block devices (IDs specific to my hardware)
-```
+```bash
 kubectl apply -n openebs -f manifests/openebs_spc.yaml
 ```
 
 Currently additional PSP is needed for PVC pods to run:
-```
+```bash
 kubectl apply -n openebs -f manifests/openebs_psp.yaml
 ```
 
 #### Minio
 
-```
+```bash
 kubectl apply -f manifests/minio.yaml
 ```
 
 #### Apply secrets
 
 ```bash
-kubectl create namespace common
-
 buildtool terraform apply \
     -var-file=secrets.tfvars \
+    -target=data.null_data_source.provider-addon
+```
+
+```bash
+kubectl create namespace common
+kubectl create namespace monitoring
+kubectl create namespace minio
+
+buildtool terraform apply \
     -target=module.kubernetes-addons
 ```

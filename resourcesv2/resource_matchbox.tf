@@ -106,6 +106,6 @@ module "ignition-local" {
 module "generic-manifest-local" {
   source = "../modulesv2/generic_manifest"
 
-  generic_params = local.render_addons
+  generic_params = data.null_data_source.render-addons.outputs
   renderer       = local.local_renderer
 }

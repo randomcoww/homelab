@@ -660,6 +660,7 @@ locals {
         coreos = [
           "gateway-0",
           "controller-0",
+          "controller-1",
           "worker-0",
         ]
       }
@@ -706,6 +707,7 @@ locals {
       ## out ignition and re-used to boot VMs
       libvirt_domains = {
         coreos = [
+          "gateway-1",
           "controller-1",
           "worker-1",
         ]
