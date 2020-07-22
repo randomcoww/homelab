@@ -341,7 +341,7 @@ storage:
                     "high-availability": [
                       {
                         "this-server-name": "${p.hostname}",
-                        "mode": "hot-standby",
+                        "mode": "load-balancing",
                         "max-unacked-clients": 0,
                         "peers": ${kea_ha_peers}
                       }

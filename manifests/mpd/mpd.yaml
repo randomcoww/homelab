@@ -87,7 +87,7 @@ spec:
           subPath: mnt
           mountPropagation: Bidirectional
       - name: mpd
-        image: randomcoww/mpd:0.21.23
+        image: randomcoww/mpd:0.21.25
         ports:
         - containerPort: 8000
           protocol: TCP

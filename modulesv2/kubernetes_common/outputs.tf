@@ -1,3 +1,14 @@
+locals {
+  etcd_initial_cluster = join(",", [
+    for k, v in var.controller_hosts :
+    "${v.hostname}=https://${v.networks_by_key.main.ip}:${var.services.etcd.ports.peer}"
+  ])
+  etcd_endpoints = join(",", [
+    for k, v in var.controller_hosts :
+    "https://${v.networks_by_key.main.ip}:${var.services.etcd.ports.client}"
+  ])
+}
+
 output "cluster_endpoint" {
   value = {
     cluster_name               = var.cluster_name
@@ -31,15 +42,8 @@ output "controller_templates" {
         pod_mount_path           = "/var/lib/kubelet/podconfig"
         controller_mount_path    = "/var/lib/kubelet/controller"
         vrrp_id                  = 70
-
-        etcd_initial_cluster = join(",", [
-          for k, v in var.controller_hosts :
-          "${v.hostname}=https://${v.networks_by_key.main.ip}:${var.services.etcd.ports.peer}"
-        ])
-        etcd_endpoints = join(",", [
-          for k, v in var.controller_hosts :
-          "https://${v.networks_by_key.main.ip}:${var.services.etcd.ports.client}"
-        ])
+        etcd_initial_cluster     = local.etcd_initial_cluster
+        etcd_endpoints           = local.etcd_endpoints
 
         tls_kubernetes_ca          = replace(tls_self_signed_cert.kubernetes-ca.cert_pem, "\n", "\\n")
         tls_kubernetes_ca_key      = replace(tls_private_key.kubernetes-ca.private_key_pem, "\n", "\\n")

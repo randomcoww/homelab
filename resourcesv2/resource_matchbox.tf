@@ -54,7 +54,7 @@ module "ignition-kvm-1" {
       for h in params.nodes :
       h => {
         templates = lookup(local.templates_by_host, h, [])
-        selector = lookup(local.aggr_hosts[h].networks_by_key, "int", {})
+        selector  = lookup(local.aggr_hosts[h].networks_by_key, "int", {})
       }
     }]...
   )

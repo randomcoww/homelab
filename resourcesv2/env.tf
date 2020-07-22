@@ -11,7 +11,7 @@ locals {
   # path is based on the cluster name
   aws_region              = "us-west-2"
   s3_etcd_backup_bucket   = "randomcoww-etcd-backup"
-  kubernetes_cluster_name = "default-cluster-2005"
+  kubernetes_cluster_name = "default-cluster-2007-1"
 
   # kubelet image is used for static pods and does not need to match the kubernetes version
   # hyperkube is used for the worker kubelet and should match the version
@@ -23,16 +23,16 @@ locals {
     hyperkube               = "docker.io/randomcoww/kubernetes:kubelet-v1.18.5"
     kube_proxy              = "docker.io/randomcoww/kubernetes:kube-proxy-v1.18.5"
     etcd_wrapper            = "docker.io/randomcoww/etcd-wrapper:v0.2.1"
-    etcd                    = "docker.io/randomcoww/etcd:v3.4.7"
+    etcd                    = "docker.io/randomcoww/etcd:v3.4.10"
     flannel                 = "docker.io/randomcoww/flannel:latest"
     keepalived              = "docker.io/randomcoww/keepalived:latest"
-    cni_plugins             = "docker.io/randomcoww/cni-plugins:v0.8.5"
-    coredns                 = "docker.io/coredns/coredns:1.6.9"
+    cni_plugins             = "docker.io/randomcoww/cni-plugins:v0.8.6"
+    coredns                 = "docker.io/coredns/coredns:1.7.0"
     external_dns            = "registry.opensource.zalan.do/teapot/external-dns:latest"
     kapprover               = "docker.io/randomcoww/kapprover:v0.0.4"
     kea                     = "docker.io/randomcoww/kea:1.6.2"
     conntrackd              = "docker.io/randomcoww/conntrackd:latest"
-    promtail                = "docker.io/randomcoww/promtail:v1.4.1"
+    promtail                = "docker.io/randomcoww/promtail:v1.5.0"
     matchbox                = "quay.io/poseidon/matchbox:latest"
   }
 
@@ -201,7 +201,6 @@ locals {
     hypervisor = {
       nodes = [
         "kvm-0",
-        "kvm-1",
         "desktop",
       ]
       ignition_templates = [
@@ -397,7 +396,7 @@ locals {
           dhcp  = true
         }
       ]
-      kea_ha_role = "standby"
+      kea_ha_role = "secondary"
     }
 
     # controllers
@@ -707,7 +706,6 @@ locals {
       ## out ignition and re-used to boot VMs
       libvirt_domains = {
         coreos = [
-          "gateway-1",
           "controller-1",
           "worker-1",
         ]
@@ -765,6 +763,7 @@ locals {
       ]
       libvirt_domains = {
         coreos = [
+          "gateway-1",
           "controller-2",
           "test-0",
         ]

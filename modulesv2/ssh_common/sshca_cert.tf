@@ -10,7 +10,7 @@ resource "tls_private_key" "ssh-host" {
   ecdsa_curve = "P521"
 }
 
-resource "sshca_host_cert" "ssh-host" {
+resource "ssh_host_cert" "ssh-host" {
   for_each = var.hosts
 
   ca_key_algorithm   = tls_private_key.ssh-ca.algorithm
@@ -27,7 +27,7 @@ resource "sshca_host_cert" "ssh-host" {
   ])
 }
 
-resource "sshca_client_cert" "ssh-client" {
+resource "ssh_client_cert" "ssh-client" {
   # Hack to conditionally create this if a key is passed in
   count = length(var.ssh_client_public_key) > 0 ? 1 : 0
 

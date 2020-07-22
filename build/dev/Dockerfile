@@ -1,7 +1,10 @@
 FROM golang:alpine AS MODULES
 
-ENV CT_VERSION v0.5.1
-ENV K8S_PROVIDER_VERSION master
+ENV K8S_VERSION 0.1.0
+ENV LIBVIRT_VERSION 0.1.0
+ENV SSH_VERSION 0.1.1
+ENV MATCHBOX_VERSION 0.3.0
+ENV CT_VERSION 0.5.1
 
 RUN set -x \
   \
@@ -10,30 +13,41 @@ RUN set -x \
     libvirt-dev \
     g++ \
   \
-  && git clone -b ${K8S_PROVIDER_VERSION} https://github.com/hashicorp/terraform-provider-kubernetes-alpha.git \
+  ## Pull master but give it an arbitrary version because it is required
+  && git clone https://github.com/hashicorp/terraform-provider-kubernetes-alpha.git \
   && cd terraform-provider-kubernetes-alpha \
-  && CGO_ENABLED=0 GO111MODULE=on GOOS=linux go install -v -ldflags '-s -w' \
+  && mkdir -p ${GOPATH}/bin/github.com/hashicorp/kubernetes-alpha/${K8S_VERSION}/linux_amd64 \
+  && CGO_ENABLED=0 GO111MODULE=on GOOS=linux go build -v -ldflags '-s -w' \
+    -o ${GOPATH}/bin/github.com/hashicorp/kubernetes-alpha/${K8S_VERSION}/linux_amd64/terraform-provider-kubernetes-alpha_v${K8S_VERSION} \
   \
   && cd .. \
-  && git clone https://github.com/randomcoww/terraform-provider-libvirt.git \
+  && git clone -b v${LIBVIRT_VERSION} https://github.com/randomcoww/terraform-provider-libvirt.git \
   && cd terraform-provider-libvirt \
-  && GO111MODULE=on GOOS=linux go install -v -ldflags '-s -w' \
+  && mkdir -p ${GOPATH}/bin/github.com/randomcoww/libvirt/${LIBVIRT_VERSION}/linux_amd64 \
+  && GO111MODULE=on GOOS=linux go build -v -ldflags '-s -w' \
+    -o ${GOPATH}/bin/github.com/randomcoww/libvirt/${LIBVIRT_VERSION}/linux_amd64/terraform-provider-libvirt_v${LIBVIRT_VERSION} \
   \
   && cd .. \
-  && git clone https://github.com/randomcoww/terraform-provider-sshca.git \
-  && cd terraform-provider-sshca \
-  && CGO_ENABLED=0 GO111MODULE=on GOOS=linux go install -v -ldflags '-s -w' \
+  && git clone -b v${SSH_VERSION} https://github.com/randomcoww/terraform-provider-ssh.git \
+  && cd terraform-provider-ssh \
+  && mkdir -p ${GOPATH}/bin/github.com/randomcoww/ssh/${SSH_VERSION}/linux_amd64 \
+  && CGO_ENABLED=0 GO111MODULE=on GOOS=linux go build -v -ldflags '-s -w' \
+    -o ${GOPATH}/bin/github.com/randomcoww/ssh/${SSH_VERSION}/linux_amd64/terraform-provider-ssh_v${SSH_VERSION} \
   \
+  ## Pull master but give it an arbitrary version because it is required
   && cd .. \
   && git clone https://github.com/poseidon/terraform-provider-matchbox.git \
   && cd terraform-provider-matchbox \
-  && CGO_ENABLED=0 GO111MODULE=on GOOS=linux go install -v -ldflags '-s -w' \
+  && mkdir -p ${GOPATH}/bin/github.com/poseidon/matchbox/${MATCHBOX_VERSION}/linux_amd64 \
+  && CGO_ENABLED=0 GO111MODULE=on GOOS=linux go build -v -ldflags '-s -w' \
+    -o ${GOPATH}/bin/github.com/poseidon/matchbox/${MATCHBOX_VERSION}/linux_amd64/terraform-provider-matchbox_v${MATCHBOX_VERSION} \
   \
   && cd .. \
-  && git clone -b ${CT_VERSION} https://github.com/poseidon/terraform-provider-ct.git \
+  && git clone -b v${CT_VERSION} https://github.com/poseidon/terraform-provider-ct.git \
   && cd terraform-provider-ct \
+  && mkdir -p ${GOPATH}/bin/github.com/poseidon/ct/${CT_VERSION}/linux_amd64 \
   && CGO_ENABLED=0 GO111MODULE=on GOOS=linux go build -v -ldflags '-s -w' \
-  -o ${GOPATH}/bin/terraform-provider-ct_${CT_VERSION}
+    -o ${GOPATH}/bin/github.com/poseidon/ct/${CT_VERSION}/linux_amd64/terraform-provider-ct_v${CT_VERSION}
 
 FROM golang:alpine AS MATCHBOX
 
