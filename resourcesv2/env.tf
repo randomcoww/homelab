@@ -201,6 +201,7 @@ locals {
     hypervisor = {
       nodes = [
         "kvm-0",
+        "kvm-1",
         "desktop",
       ]
       ignition_templates = [
