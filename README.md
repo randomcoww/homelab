@@ -258,3 +258,9 @@ kubectl create namespace minio
 buildtool terraform apply \
     -target=module.kubernetes-addons
 ```
+
+#### Common service
+
+```bash
+kubectl apply -f manifests/common.yaml
+```
