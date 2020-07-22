@@ -86,7 +86,6 @@ data:
       health
       kubernetes ${domains.kubernetes_cluster} in-addr.arpa ip6.arp {
         pods insecure
-        upstream
         fallthrough in-addr.arpa ip6.arpa
       }
       etcd ${domains.internal} in-addr.arpa ip6.arp {
