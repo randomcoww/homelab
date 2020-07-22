@@ -85,7 +85,6 @@ Ignition configuration is generated on each hypervisor as follows:
 
 ```bash
 buildtool terraform apply \
-    -target=module.ignition-local \
     -target=module.ignition-kvm-0 \
     -target=module.ignition-kvm-1 \
     -target=module.ignition-desktop
