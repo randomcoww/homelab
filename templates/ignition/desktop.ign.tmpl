@@ -126,6 +126,9 @@ storage:
 
           [org/gnome/desktop/interface]
           enable-hot-corners=false
+
+          [org/gnome/settings-daemon/plugins/xsettings]
+          rgba-order='bgr'
     - path: /etc/firefox/pref/autoconfig.js
       mode: 0644
       contents:
@@ -141,6 +144,7 @@ storage:
           pref("browser.sessionstore.interval", 300000);
           pref("layers.acceleration.force-enabled", true);
           pref("gfx.webrender.all", true);
+          pref("gfx.font_rendering.cleartype_params.pixel_structure", 2);
 
           pref("browser.safebrowsing.malware.enabled", false);
           pref("browser.safebrowsing.phishing.enabled", false);
