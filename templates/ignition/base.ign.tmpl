@@ -10,13 +10,6 @@ systemd:
             [Unit]
             ConditionVirtualization=!vm
             ConditionVirtualization=!container
-    - name: lm_sensors.service
-      dropins:
-        - name: 10-virtualization.conf
-          contents: |
-            [Unit]
-            ConditionVirtualization=!vm
-            ConditionVirtualization=!container
     - name: NetworkManager.service
       mask: true
     - name: NetworkManager-wait-online.service
@@ -37,6 +30,12 @@ systemd:
             [Service]
             ExecStart=
             ExecStart=/usr/sbin/fstrim --all --verbose --quiet
+    - name: console-login-helper-messages-issuegen.service
+      dropins:
+        - name: 10-disable-rate-limit.conf
+          contents: |
+            [Unit]
+            StartLimitIntervalSec=0
 
 storage:
   files:
@@ -108,12 +107,17 @@ storage:
       append:
         - inline: |
             hosts: files resolve dns myhostname
-    # Clear podman CNI
-    # This is read eary by kubelet and messes with early container launches
+    # Default podman CNI is read early by kubelet and messes with initial container launches
     - path: /etc/cni/net.d/87-podman-bridge.conflist
       overwrite: true
       contents:
         inline: "{}"
+    # Read ssh authorized keys file created by ignition
+    - path: /etc/ssh/sshd_config.d/20-authorized-keys.conf
+      mode: 0644
+      contents:
+        inline: |
+          AuthorizedKeysFile .ssh/authorized_keys .ssh/authorized_keys.d/ignition .ssh/authorized_keys.d/afterburn
 
 passwd:
   users:
