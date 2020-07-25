@@ -36,6 +36,19 @@ systemd:
           contents: |
             [Unit]
             StartLimitIntervalSec=0
+    - name: systemd-resolved-link.service
+      enabled: true
+      contents: |
+        [Unit]
+        Require=systemd-resolved.service
+
+        [Service]
+        Type=oneshot
+        RemainAfterExit=true
+        ExecStart=/usr/bin/ln -sf /run/systemd/resolve/resolv.conf /etc/resolv.conf
+
+        [Install]
+        WantedBy=multi-user.target
 
 storage:
   files:
