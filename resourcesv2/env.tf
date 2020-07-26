@@ -187,7 +187,6 @@ locals {
     desktop = {
       nodes = [
         "desktop",
-        "laptop",
       ]
       ignition_templates = [
         "${local.templates_path}/ignition/desktop.ign.tmpl",
@@ -221,7 +220,6 @@ locals {
         "kvm-1",
         "test-0",
         "desktop",
-        "laptop",
       ]
       ignition_templates = [
         "${local.templates_path}/ignition/ssh.ign.tmpl",
@@ -230,7 +228,6 @@ locals {
     traefik_tls = {
       nodes = [
         "desktop",
-        "laptop",
       ]
       ignition_templates = [
         "${local.templates_path}/ignition/internal_tls.ign.tmpl",
@@ -774,30 +771,6 @@ locals {
       boot_image_device     = "/dev/disk/by-label/${local.boot_disk_label}"
       boot_image_mount_path = "/etc/libvirt/boot/${local.boot_disk_label}.iso"
     }
-    laptop = {
-      network = [
-        {
-          mac = "08-9e-01-cf-ef-aa"
-          if  = "en-pf"
-        },
-        {
-          label = "main"
-          if    = "en-main"
-          ip    = "192.168.127.254"
-        },
-        {
-          label = "lan"
-          if    = "en-lan"
-          dhcp  = true
-        }
-      ]
-      disk = [
-        {
-          device     = "/dev/disk/by-label/home-local"
-          mount_path = "/var/home/${local.desktop_user}"
-        }
-      ]
-    }
   }
 
   # similar to guests filter
@@ -806,6 +779,5 @@ locals {
     "kvm-0",
     "kvm-1",
     "desktop",
-    "laptop",
   ]
 }
