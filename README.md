@@ -245,15 +245,14 @@ kubectl apply -f manifests/minio.yaml
 #### Apply secrets
 
 ```bash
-buildtool terraform apply \
-    -var-file=secrets.tfvars \
-    -target=data.null_data_source.provider-addon
-```
 
-```bash
 kubectl create namespace common
 kubectl create namespace monitoring
 kubectl create namespace minio
+
+buildtool terraform apply \
+    -var-file=secrets.tfvars \
+    -target=data.null_data_source.provider-addon
 
 buildtool terraform apply \
     -target=module.kubernetes-addons
