@@ -85,21 +85,19 @@ buildtool terraform output ssh-client-certificate > $KEY-cert.pub
 
 Each hypervisor runs a PXE boot environment on an internal network for provisioning VMs local to the host. VMs run Fedora CoreOS using Ignition for boot time configuration.
 
-Ignition configuration is generated on each hypervisor as follows:
-
-```bash
-buildtool terraform apply \
-    -target=module.ignition-kvm-0 \
-    -target=module.ignition-kvm-1 \
-    -target=module.ignition-desktop
-```
-
-Define libvirt domains on each hypervisor:
+Configure ignition and libvirt on each hypervisor:
 
 ```bash
 buildtool tf-wrapper apply \
-    -target=module.libvirt-kvm-0 \
-    -target=module.libvirt-kvm-1 \
+    -target=module.ignition-kvm-0 \
+    -target=module.libvirt-kvm-0
+
+buildtool tf-wrapper apply \
+    -target=module.ignition-kvm-1 \
+    -target=module.libvirt-kvm-1
+    
+buildtool tf-wrapper apply \
+    -target=module.ignition-desktop \
     -target=module.libvirt-desktop
 ```
 
