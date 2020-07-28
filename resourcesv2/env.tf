@@ -764,6 +764,7 @@ locals {
       libvirt_domains = {
         coreos = [
           "gateway-1",
+          "controller-1",
           "controller-2",
           "test-0",
         ]

@@ -30,6 +30,12 @@ storage:
       mode: 0644
       contents:
         inline: "@cert-authority * ${ssh_ca_authorized_key}"
+    # Read ssh authorized keys file created by ignition
+    - path: /etc/ssh/sshd_config.d/22-authorized-keys.conf
+      mode: 0644
+      contents:
+        inline: |
+          AuthorizedKeysFile .ssh/authorized_keys .ssh/authorized_keys.d/ignition .ssh/authorized_keys.d/afterburn
 
 passwd:
   users:
