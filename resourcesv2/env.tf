@@ -780,12 +780,6 @@ locals {
       boot_image_mount_path = "/etc/libvirt/boot/${local.boot_disk_label}.iso"
     }
     laptop = {
-      disk = [
-        {
-          device     = "/dev/disk/by-label/localhome"
-          mount_path = "/var/home/${local.desktop_user}"
-        }
-      ]
     }
   }
 
