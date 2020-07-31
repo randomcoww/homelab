@@ -130,8 +130,6 @@ locals {
       ]
       ignition_templates = [
         "${local.templates_path}/ignition/gateway.ign.tmpl",
-        "${local.templates_path}/ignition/general_network.ign.tmpl",
-        "${local.templates_path}/ignition/base.ign.tmpl",
         "${local.templates_path}/ignition/containerd.ign.tmpl",
       ]
     }
@@ -143,8 +141,6 @@ locals {
       ]
       ignition_templates = [
         "${local.templates_path}/ignition/controller.ign.tmpl",
-        "${local.templates_path}/ignition/general_network.ign.tmpl",
-        "${local.templates_path}/ignition/base.ign.tmpl",
         "${local.templates_path}/ignition/containerd.ign.tmpl",
       ]
     }
@@ -155,8 +151,6 @@ locals {
       ]
       ignition_templates = [
         "${local.templates_path}/ignition/worker.ign.tmpl",
-        "${local.templates_path}/ignition/general_network.ign.tmpl",
-        "${local.templates_path}/ignition/base.ign.tmpl",
         "${local.templates_path}/ignition/storage.ign.tmpl",
         "${local.templates_path}/ignition/containerd.ign.tmpl",
       ]
@@ -167,36 +161,36 @@ locals {
       ]
       ignition_templates = [
         "${local.templates_path}/ignition/test.ign.tmpl",
-        "${local.templates_path}/ignition/general_network.ign.tmpl",
-        "${local.templates_path}/ignition/base.ign.tmpl",
         "${local.templates_path}/ignition/storage.ign.tmpl",
         "${local.templates_path}/ignition/containerd.ign.tmpl",
       ]
     }
-    kvm = {
-      nodes = [
-        "kvm-0",
-        "kvm-1",
-      ]
-      ignition_templates = [
-        "${local.templates_path}/ignition/vlan_network.ign.tmpl",
-        "${local.templates_path}/ignition/base.ign.tmpl",
-        "${local.templates_path}/ignition/gpu_vfio.ign.tmpl",
-      ]
-    }
-    desktop = {
-      nodes = [
-        "desktop",
-      ]
-      ignition_templates = [
-        "${local.templates_path}/ignition/desktop.ign.tmpl",
-        "${local.templates_path}/ignition/vlan_network.ign.tmpl",
-        "${local.templates_path}/ignition/storage.ign.tmpl",
-        "${local.templates_path}/ignition/base.ign.tmpl",
-      ]
-    }
 
     # addons
+    client = {
+      nodes = [
+        "laptop",
+      ]
+      ignition_templates = [
+        "${local.templates_path}/ignition/networkmanager.ign.tmpl",
+      ]
+    }
+    vm = {
+      nodes = [
+        "gateway-0",
+        "gateway-1",
+        "controller-0",
+        "controller-1",
+        "controller-2",
+        "worker-0",
+        "worker-1",
+        "test-0",
+      ]
+      ignition_templates = [
+        "${local.templates_path}/ignition/base.ign.tmpl",
+        "${local.templates_path}/ignition/general_network.ign.tmpl",
+      ]
+    }
     hypervisor = {
       nodes = [
         "kvm-0",
@@ -204,7 +198,19 @@ locals {
         "desktop",
       ]
       ignition_templates = [
+        "${local.templates_path}/ignition/base.ign.tmpl",
         "${local.templates_path}/ignition/hypervisor.ign.tmpl",
+        "${local.templates_path}/ignition/vlan_network.ign.tmpl",
+      ]
+    }
+    desktop = {
+      nodes = [
+        "desktop",
+        "laptop",
+      ]
+      ignition_templates = [
+        "${local.templates_path}/ignition/desktop.ign.tmpl",
+        "${local.templates_path}/ignition/storage.ign.tmpl",
       ]
     }
     ssh = {
@@ -228,6 +234,7 @@ locals {
     traefik_tls = {
       nodes = [
         "desktop",
+        "laptop",
       ]
       ignition_templates = [
         "${local.templates_path}/ignition/internal_tls.ign.tmpl",
@@ -772,6 +779,14 @@ locals {
       boot_image_device     = "/dev/disk/by-label/${local.boot_disk_label}"
       boot_image_mount_path = "/etc/libvirt/boot/${local.boot_disk_label}.iso"
     }
+    laptop = {
+      disk = [
+        {
+          device     = "/dev/disk/by-label/localhome"
+          mount_path = "/var/home/${local.desktop_user}"
+        }
+      ]
+    }
   }
 
   # similar to guests filter
@@ -780,5 +795,6 @@ locals {
     "kvm-0",
     "kvm-1",
     "desktop",
+    "laptop",
   ]
 }

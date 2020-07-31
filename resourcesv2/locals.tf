@@ -3,7 +3,7 @@ locals {
     for host, params in local.hosts :
     host => {
       network = [
-        for n in params.network :
+        for n in lookup(params, "network", []) :
         merge(lookup(local.networks, lookup(n, "label", lookup(n, "if", "placeholder")), {}),
           n, {
             label = lookup(n, "label", lookup(n, "if", "placeholder"))

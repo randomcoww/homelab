@@ -70,20 +70,8 @@ module "test-common" {
   }
 }
 
-module "kvm-common" {
-  source = "../modulesv2/kvm_common"
-
-  user = local.user
-
-  templates = local.components.kvm.ignition_templates
-  hosts = {
-    for k in local.components.kvm.nodes :
-    k => local.aggr_hosts[k]
-  }
-}
-
-module "desktop-common" {
-  source = "../modulesv2/desktop_common"
+module "desktop" {
+  source = "../modulesv2/desktop"
 
   user             = local.user
   desktop_user     = local.desktop_user
@@ -111,6 +99,29 @@ module "hypervisor" {
     k => local.aggr_hosts[k]
   }
 }
+
+module "vm" {
+  source = "../modulesv2/vm"
+
+  user      = local.user
+  templates = local.components.vm.ignition_templates
+  hosts = {
+    for k in local.components.vm.nodes :
+    k => local.aggr_hosts[k]
+  }
+}
+
+module "client" {
+  source = "../modulesv2/client"
+
+  user      = local.user
+  templates = local.components.client.ignition_templates
+  hosts = {
+    for k in local.components.client.nodes :
+    k => local.aggr_hosts[k]
+  }
+}
+
 
 ##
 ## minio user-pass
@@ -270,9 +281,10 @@ locals {
         module.ssh-common.templates,
         module.static-pod-logging.templates,
         module.tls-secrets.templates,
-        module.kvm-common.templates,
         module.hypervisor.templates,
-        module.desktop-common.templates,
+        module.vm.templates,
+        module.client.templates,
+        module.desktop.templates,
       ] :
       lookup(k, h, [])
     ])
