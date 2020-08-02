@@ -257,6 +257,7 @@ buildtool terraform apply \
     -target=data.null_data_source.provider-addon
 
 buildtool terraform apply \
+    -var-file=secrets.tfvars \
     -target=module.kubernetes-addons
 ```
 
