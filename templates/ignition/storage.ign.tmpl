@@ -22,7 +22,7 @@ systemd:
 storage:
   filesystems:
     %{~ for disk in p.disk ~}
-    %{~ if lookup(disk, "mount_path", null) != null && lookup(disk, "device", null) != null ~}
+    %{~ if lookup(disk, "wipe_filesystem", false) && lookup(disk, "mount_path", null) != null && lookup(disk, "device", null) != null ~}
     - path: ${disk.mount_path}
       device: ${disk.device}
       format: ${lookup(disk, "format", "xfs")}
