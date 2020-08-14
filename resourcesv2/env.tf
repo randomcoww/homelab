@@ -540,7 +540,11 @@ locals {
           label      = "JEKAZ92N"
           device     = "/dev/disk/by-id/ata-WDC_WD100EFAX-68LHPN0_JEKAZ92N"
           mount_path = "/var/s3/11"
-        }
+        },
+        {
+          device     = "/dev/disk/by-id/ata-Samsung_SSD_860_QVO_1TB_S4PGNF0M414895K"
+          mount_path = "/var/pv"
+        },
       ]
     }
     worker-1 = {
@@ -617,6 +621,10 @@ locals {
           label      = "ZA16RDGT"
           device     = "/dev/disk/by-id/ata-ST8000VN0022-2EL112_ZA16RDGT"
           mount_path = "/var/s3/10"
+        },
+        {
+          device     = "/dev/disk/by-id/ata-Samsung_SSD_860_QVO_1TB_S4PGNF0M410395Z"
+          mount_path = "/var/pv"
         },
       ]
     }
@@ -764,7 +772,7 @@ locals {
       ]
       disk = [
         {
-          device     = "/dev/disk/by-id/nvme-Samsung_SSD_970_EVO_250GB_S465NB0K598517N-part1"
+          device     = "/dev/disk/by-label/localhome"
           mount_path = "/var/home/${local.desktop_user}"
         }
       ]
@@ -780,6 +788,12 @@ locals {
       boot_image_mount_path = "/etc/libvirt/boot/${local.boot_disk_label}.iso"
     }
     laptop = {
+      disk = [
+        {
+          device     = "/dev/disk/by-label/localhome"
+          mount_path = "/var/home/${local.desktop_user}"
+        }
+      ]
     }
   }
 

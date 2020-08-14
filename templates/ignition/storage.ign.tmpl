@@ -9,6 +9,7 @@ systemd:
       enabled: true
       contents: |
         [Unit]
+        ConditionPathExists=${disk.device}
         Before=local-fs.target
         [Mount]
         What=${disk.device}
