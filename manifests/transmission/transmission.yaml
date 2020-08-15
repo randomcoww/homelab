@@ -1,105 +1,3 @@
-
-kind: Deployment
-apiVersion: apps/v1
-metadata:
-  name: s3-ingest
-  namespace: common
-spec:
-  replicas: 1
-  selector:
-    matchLabels:
-      k8s-app: s3-ingest
-  template:
-    metadata:
-      labels:
-        k8s-app: s3-ingest
-    spec:
-      dnsPolicy: ClusterFirstWithHostNet
-      restartPolicy: Always
-      containers:
-      - name: rclone
-        imagePullPolicy: IfNotPresent
-        image: rclone/rclone:latest
-        securityContext:
-          privileged: true
-        env:
-        - name: AWS_ACCESS_KEY_ID
-          valueFrom:
-            secretKeyRef:
-              name: minio-auth
-              key: access_key_id
-        - name: AWS_SECRET_ACCESS_KEY
-          valueFrom:
-            secretKeyRef:
-              name: minio-auth
-              key: secret_access_key
-        args:
-        - "mount"
-        - ":s3:ingest-minio/"
-        - "/vol"
-        - "--s3-provider=Minio"
-        - "--s3-env-auth=true"
-        - "--s3-region="
-        - "--s3-endpoint=http://minio.minio.svc:9000"
-        - "--allow-other"
-        - "--allow-non-empty"
-        - "--vfs-cache-mode=minimal"
-        - "--no-modtime"
-        volumeMounts:
-        - name: s3-ingest-vol
-          mountPath: /vol
-          mountPropagation: Bidirectional
-      # Mount fuse in mnt under base path so that client container
-      # can verify that it is mounted before starting
-      volumes:
-        - name: s3-ingest-vol
-          hostPath:
-            path: /var/lib/kubelet/hostpath/ingest/mnt
-
----
-kind: PersistentVolumeClaim
-apiVersion: v1
-metadata:
-  name: transmission-pvc
-  namespace: common
-spec:
-  storageClassName: openebs-transmission
-  accessModes:
-  - ReadWriteOnce
-  resources:
-    requests:
-      storage: 500G
-
----
-apiVersion: v1
-kind: PersistentVolume
-metadata:
-  name: s3-ingest-pv
-  namespace: common
-spec:
-  storageClassName: s3-ingest
-  capacity:
-    storage: 50Ti
-  accessModes:
-  - ReadWriteOnce
-  hostPath:
-    path: /var/lib/kubelet/hostpath/ingest
-
----
-apiVersion: v1
-kind: PersistentVolumeClaim
-metadata:
-  name: s3-ingest-pvc
-  namespace: common
-spec:
-  accessModes:
-  - ReadWriteOnce
-  storageClassName: s3-ingest
-  resources:
-    requests:
-      storage: 50Ti
-
----
 apiVersion: v1
 kind: ConfigMap
 metadata:
@@ -112,11 +10,11 @@ data:
       "bind-address-ipv6": "::",
       "blocklist-enabled": true,
       "blocklist-url": "http://list.iblocklist.com/?list=ydxerpxkpcfqjaybcssw&fileformat=p2p&archiveformat=gz",
-      "download-dir": "/vol/mnt/downloads",
+      "download-dir": "/vol/data/downloads",
       "download-queue-enabled": true,
       "download-queue-size": 20,
       "encryption": 2,
-      "incomplete-dir": "/transmission/incomplete",
+      "incomplete-dir": "/vol/cache/incomplete",
       "incomplete-dir-enabled": true,
       "max-peers-global": 1000,
       "message-level": 2,
@@ -154,22 +52,12 @@ spec:
   replicas: 1
   selector:
     matchLabels:
-      k8s-app: transmission
+      app: transmission
   template:
     metadata:
       labels:
-        k8s-app: transmission
+        app: transmission
     spec:
-      affinity:
-        podAffinity:
-          requiredDuringSchedulingIgnoredDuringExecution:
-          - labelSelector:
-              matchExpressions:
-              - key: k8s-app
-                operator: In
-                values:
-                - s3-ingest
-            topologyKey: kubernetes.io/hostname
       dnsPolicy: ClusterFirstWithHostNet
       restartPolicy: Always
       initContainers:
@@ -191,38 +79,44 @@ spec:
         imagePullPolicy: Always
         env:
         - name: RESUME_DIR
-          value: /transmission/resume
+          value: /vol/cache/resume
         - name: TORRENTS_DIR
-          value: /vol/mnt/torrents
+          value: /vol/data/torrents
         ports:
         - containerPort: 9091
         volumeMounts:
-        - name: transmission-resume
-          mountPath: /transmission
         - name: transmission-config
           mountPath: /var/lib/transmission/settings.json
           subPath: settings.json
-        - name: torrent-vol
-          mountPath: "/vol"
-        lifecycle:
-          postStart:
-            exec:
-              # /vol/mnt should be fuse mounted by rclone
-              # Kill the container if this is not mounted
-              command: ["mountpoint", "-q", "/vol/mnt"]
+        - name: ingest-cache-resume
+          mountPath: /vol/cache/resume
+        - name: ingest-cache-incomplete
+          mountPath: /vol/cache/incomplete
+        - name: ingest-data-downloads
+          mountPath: /vol/data/downloads
+        - name: ingest-data-torrents
+          mountPath: /vol/data/torrents
       volumes:
+      # configs
       - name: transmission-config
         configMap:
           name: transmission-config
       - name: wireguard-client
         secret:
           secretName: wireguard-client
-      - name: transmission-resume
+      # shared path for minio mount
+      - name: ingest-cache-resume
         persistentVolumeClaim:
-          claimName: transmission-pvc
-      - name: torrent-vol
+          claimName: ingest-cache-resume-pvc
+      - name: ingest-cache-incomplete
         persistentVolumeClaim:
-          claimName: s3-ingest-pvc
+          claimName: ingest-cache-incomplete-pvc
+      - name: ingest-data-downloads
+        persistentVolumeClaim:
+          claimName: ingest-data-downloads-pvc
+      - name: ingest-data-torrents
+        persistentVolumeClaim:
+          claimName: ingest-data-torrents-pvc
 
 ---
 kind: Service
@@ -231,12 +125,12 @@ metadata:
   name: transmission
   namespace: common
 spec:
+  clusterIP: None
   ports:
-  - name: webui
-    port: 80
-    targetPort: 9091
+  - name: web
+    port: 9091
   selector:
-    k8s-app: transmission
+    app: transmission
 
 ---
 apiVersion: extensions/v1beta1
@@ -255,6 +149,6 @@ spec:
       - path: /
         backend:
           serviceName: transmission
-          servicePort: webui
+          servicePort: web
   tls:
   - secretName: tls-ingress

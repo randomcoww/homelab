@@ -56,6 +56,14 @@ systemd:
 
 storage:
   files:
+    - path: /etc/modules-load.d/custom.conf
+      mode: 0644
+      contents:
+        inline: |
+          # openebs mount
+          iscsi_tcp
+          # kube-dns reply from unexpected source
+          br_netfilter
     - path: ${kubelet_path}/kubelet-config-worker.yaml
       mode: 0644
       contents:

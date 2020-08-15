@@ -4,7 +4,6 @@ metadata:
   name: basic-pod
   namespace: common
 spec:
-  hostNetwork: true
   containers:
   - image: alpine:edge
     command:

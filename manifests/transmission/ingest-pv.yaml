@@ -1,0 +1,251 @@
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: s3-ingest
+  namespace: common
+spec:
+  serviceName: s3-ingest
+  replicas: 1
+  selector:
+    matchLabels:
+      app: s3-ingest
+  template:
+    metadata:
+      labels:
+        app: s3-ingest
+    spec:
+      affinity:
+        nodeAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+            nodeSelectorTerms:
+            - matchExpressions:
+              - key: minio-data
+                operator: Exists
+      dnsPolicy: ClusterFirstWithHostNet
+      restartPolicy: Always
+      containers:
+      # mount minio for complete
+      - name: mount-data
+        imagePullPolicy: IfNotPresent
+        image: rclone/rclone:latest
+        securityContext:
+          privileged: true
+        env:
+        - name: AWS_ACCESS_KEY_ID
+          valueFrom:
+            secretKeyRef:
+              name: minio-auth
+              key: access_key_id
+        - name: AWS_SECRET_ACCESS_KEY
+          valueFrom:
+            secretKeyRef:
+              name: minio-auth
+              key: secret_access_key
+        args:
+        - "mount"
+        - ":s3:ingest-minio/"
+        - "/vol/mnt"
+        - "--s3-provider=Minio"
+        - "--s3-env-auth=true"
+        - "--s3-region="
+        - "--s3-endpoint=http://minio.minio.svc:9000"
+        - "--allow-other"
+        - "--allow-non-empty"
+        - "--vfs-cache-mode=minimal"
+        - "--no-modtime"
+        - "--cache-dir=/vfs"
+        volumeMounts:
+        - name: vol-data
+          mountPath: /vol/mnt
+          mountPropagation: Bidirectional
+        - name: vfs-data
+          mountPath: /vfs
+      # mount minio for incomplete
+      - name: mount-cache
+        imagePullPolicy: IfNotPresent
+        image: rclone/rclone:latest
+        securityContext:
+          privileged: true
+        env:
+        - name: AWS_ACCESS_KEY_ID
+          valueFrom:
+            secretKeyRef:
+              name: minio-auth
+              key: access_key_id
+        - name: AWS_SECRET_ACCESS_KEY
+          valueFrom:
+            secretKeyRef:
+              name: minio-auth
+              key: secret_access_key
+        args:
+        - "mount"
+        - ":s3:ingest-cache/"
+        - "/vol/mnt"
+        - "--s3-provider=Minio"
+        - "--s3-env-auth=true"
+        - "--s3-region="
+        - "--s3-endpoint=http://minio.minio.svc:9001"
+        - "--allow-other"
+        - "--allow-non-empty"
+        - "--vfs-cache-mode=writes"
+        - "--no-modtime"
+        - "--cache-dir=/vfs"
+        volumeMounts:
+        - name: vol-cache
+          mountPath: /vol/mnt
+          mountPropagation: Bidirectional
+        - name: vfs-cache
+          mountPath: /vfs
+      volumes:
+      # shared path for minio mount
+      - name: vol-data
+        hostPath:
+          path: /var/lib/kubelet/hostpath/ingest-data
+          type: DirectoryOrCreate
+      - name: vfs-data
+        hostPath:
+          path: "/var/pv/vfs/data"
+          type: DirectoryOrCreate
+      # local VFS cache
+      - name: vol-cache
+        hostPath:
+          path: /var/lib/kubelet/hostpath/ingest-cache
+          type: DirectoryOrCreate
+      - name: vfs-cache
+        hostPath:
+          path: "/var/pv/vfs/cache"
+          type: DirectoryOrCreate
+
+---
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: ingest-data-downloads
+  namespace: common
+spec:
+  nodeAffinity:
+    required:
+      nodeSelectorTerms:
+      - matchExpressions:
+        - key: minio-data
+          operator: Exists
+  storageClassName: ingest-data-downloads
+  capacity:
+    storage: 50Ti
+  accessModes:
+  - ReadWriteOnce
+  local:
+    path: /var/lib/kubelet/hostpath/ingest-data/downloads
+---
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: ingest-data-torrents
+  namespace: common
+spec:
+  nodeAffinity:
+    required:
+      nodeSelectorTerms:
+      - matchExpressions:
+        - key: minio-data
+          operator: Exists
+  storageClassName: ingest-data-torrents
+  capacity:
+    storage: 1Gi
+  accessModes:
+  - ReadWriteOnce
+  local:
+    path: /var/lib/kubelet/hostpath/ingest-data/torrents
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: ingest-data-downloads-pvc
+  namespace: common
+spec:
+  accessModes:
+  - ReadWriteOnce
+  storageClassName: ingest-data-downloads
+  resources:
+    requests:
+      storage: 50Ti
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: ingest-data-torrents-pvc
+  namespace: common
+spec:
+  accessModes:
+  - ReadWriteOnce
+  storageClassName: ingest-data-torrents
+  resources:
+    requests:
+      storage: 1Gi
+
+---
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: ingest-cache-resume
+  namespace: common
+spec:
+  nodeAffinity:
+    required:
+      nodeSelectorTerms:
+      - matchExpressions:
+        - key: minio-data
+          operator: Exists
+  storageClassName: ingest-cache-resume
+  capacity:
+    storage: 1Gi
+  accessModes:
+  - ReadWriteOnce
+  local:
+    path: /var/lib/kubelet/hostpath/ingest-cache/resume
+---
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: ingest-cache-incomplete
+  namespace: common
+spec:
+  nodeAffinity:
+    required:
+      nodeSelectorTerms:
+      - matchExpressions:
+        - key: minio-data
+          operator: Exists
+  storageClassName: ingest-cache-incomplete
+  capacity:
+    storage: 1Ti
+  accessModes:
+  - ReadWriteOnce
+  local:
+    path: /var/lib/kubelet/hostpath/ingest-cache/incomplete
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: ingest-cache-resume-pvc
+  namespace: common
+spec:
+  accessModes:
+  - ReadWriteOnce
+  storageClassName: ingest-cache-resume
+  resources:
+    requests:
+      storage: 1Gi
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: ingest-cache-incomplete-pvc
+  namespace: common
+spec:
+  accessModes:
+  - ReadWriteOnce
+  storageClassName: ingest-cache-incomplete
+  resources:
+    requests:
+      storage: 1Ti
