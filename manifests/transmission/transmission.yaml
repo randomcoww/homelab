@@ -88,14 +88,10 @@ spec:
         - name: transmission-config
           mountPath: /var/lib/transmission/settings.json
           subPath: settings.json
-        - name: ingest-cache-resume
-          mountPath: /vol/cache/resume
-        - name: ingest-cache-incomplete
-          mountPath: /vol/cache/incomplete
-        - name: ingest-data-downloads
-          mountPath: /vol/data/downloads
-        - name: ingest-data-torrents
-          mountPath: /vol/data/torrents
+        - name: ingest-cache
+          mountPath: /vol/cache
+        - name: ingest-data
+          mountPath: /vol/data
       volumes:
       # configs
       - name: transmission-config
@@ -105,19 +101,12 @@ spec:
         secret:
           secretName: wireguard-client
       # shared path for minio mount
-      - name: ingest-cache-resume
+      - name: ingest-cache
         persistentVolumeClaim:
-          claimName: ingest-cache-resume-pvc
-      - name: ingest-cache-incomplete
+          claimName: ingest-cache-pvc
+      - name: ingest-data
         persistentVolumeClaim:
-          claimName: ingest-cache-incomplete-pvc
-      - name: ingest-data-downloads
-        persistentVolumeClaim:
-          claimName: ingest-data-downloads-pvc
-      - name: ingest-data-torrents
-        persistentVolumeClaim:
-          claimName: ingest-data-torrents-pvc
-
+          claimName: ingest-data-pvc
 ---
 kind: Service
 apiVersion: v1

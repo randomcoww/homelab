@@ -1,18 +1,18 @@
 apiVersion: apps/v1
 kind: StatefulSet
 metadata:
-  name: s3-ingest
+  name: s3-mpd
   namespace: common
 spec:
-  serviceName: s3-ingest
+  serviceName: s3-mpd
   replicas: 1
   selector:
     matchLabels:
-      app: s3-ingest
+      app: s3-mpd
   template:
     metadata:
       labels:
-        app: s3-ingest
+        app: s3-mpd
     spec:
       affinity:
         nodeAffinity:
@@ -43,7 +43,7 @@ spec:
               key: secret_access_key
         args:
         - "mount"
-        - ":s3:ingest-data/"
+        - ":s3:mpd-data/"
         - "/vol/mnt"
         - "--s3-provider=Minio"
         - "--s3-env-auth=true"
@@ -53,6 +53,7 @@ spec:
         - "--allow-non-empty"
         - "--vfs-cache-mode=minimal"
         - "--no-modtime"
+        - "--read-only"
         - "--cache-dir=/vfs"
         volumeMounts:
         - name: vol-data
@@ -79,7 +80,7 @@ spec:
               key: secret_access_key
         args:
         - "mount"
-        - ":s3:ingest-cache/"
+        - ":s3:mpd-cache/"
         - "/vol/mnt"
         - "--s3-provider=Minio"
         - "--s3-env-auth=true"
@@ -100,27 +101,27 @@ spec:
       # shared path for minio mount
       - name: vol-data
         hostPath:
-          path: /var/lib/kubelet/hostpath/ingest-data
+          path: /var/lib/kubelet/hostpath/mpd-data
           type: DirectoryOrCreate
       - name: vfs-data
         hostPath:
-          path: "/var/pv/vfs/ingest-data"
+          path: /var/pv/vfs/mpd-data
           type: DirectoryOrCreate
       # local VFS cache
       - name: vol-cache
         hostPath:
-          path: /var/lib/kubelet/hostpath/ingest-cache
+          path: /var/lib/kubelet/hostpath/mpd-cache
           type: DirectoryOrCreate
       - name: vfs-cache
         hostPath:
-          path: "/var/pv/vfs/ingest-cache"
+          path: /var/pv/vfs/mpd-cache
           type: DirectoryOrCreate
 
 ---
 apiVersion: v1
 kind: PersistentVolume
 metadata:
-  name: ingest-data
+  name: mpd-data
   namespace: common
 spec:
   nodeAffinity:
@@ -129,23 +130,23 @@ spec:
       - matchExpressions:
         - key: minio-data
           operator: Exists
-  storageClassName: ingest-data
+  storageClassName: mpd-data
   capacity:
     storage: 50Ti
   accessModes:
   - ReadWriteOnce
   local:
-    path: /var/lib/kubelet/hostpath/ingest-data/vol
+    path: /var/lib/kubelet/hostpath/mpd-data/vol
 ---
 apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
-  name: ingest-data-pvc
+  name: mpd-data-pvc
   namespace: common
 spec:
   accessModes:
   - ReadWriteOnce
-  storageClassName: ingest-data
+  storageClassName: mpd-data
   resources:
     requests:
       storage: 50Ti
@@ -153,7 +154,7 @@ spec:
 apiVersion: v1
 kind: PersistentVolume
 metadata:
-  name: ingest-cache
+  name: mpd-cache
   namespace: common
 spec:
   nodeAffinity:
@@ -162,23 +163,23 @@ spec:
       - matchExpressions:
         - key: minio-data
           operator: Exists
-  storageClassName: ingest-cache
+  storageClassName: mpd-cache
   capacity:
     storage: 1Gi
   accessModes:
   - ReadWriteOnce
   local:
-    path: /var/lib/kubelet/hostpath/ingest-cache/vol
+    path: /var/lib/kubelet/hostpath/mpd-cache/vol
 ---
 apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
-  name: ingest-cache-pvc
+  name: mpd-cache-pvc
   namespace: common
 spec:
   accessModes:
   - ReadWriteOnce
-  storageClassName: ingest-cache
+  storageClassName: mpd-cache
   resources:
     requests:
       storage: 1Gi

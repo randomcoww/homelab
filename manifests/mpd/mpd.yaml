@@ -8,20 +8,17 @@ data:
     user "mpd"
     bind_to_address "0.0.0.0"
     port "6600"
-
-    music_directory "/mpd/music/mnt"
+    music_directory "/mpd/music"
     playlist_directory "/mpd/cache/playlists"
     db_file "/mpd/cache/tag_cache"
     state_file "/mpd/cache/state"
     sticker_file "/mpd/cache/sticker.sql"
     filesystem_charset "UTF-8"
-
     resampler {
       plugin "soxr"
       threads "0"
       quality "very high"
     }
-
     audio_output {
       type "httpd"
       name "HTTP FLAC-3"
@@ -45,66 +42,28 @@ spec:
   replicas: 1
   selector:
     matchLabels:
-      k8s-app: mpd
+      app: mpd
   template:
     metadata:
       labels:
-        k8s-app: mpd
+        app: mpd
     spec:
       dnsPolicy: ClusterFirstWithHostNet
       restartPolicy: Always
       containers:
-      - name: rclone
-        image: rclone/rclone:latest
-        securityContext:
-          privileged: true
-        env:
-        - name: AWS_ACCESS_KEY_ID
-          valueFrom:
-            secretKeyRef:
-              name: minio-auth
-              key: access_key_id
-        - name: AWS_SECRET_ACCESS_KEY
-          valueFrom:
-            secretKeyRef:
-              name: minio-auth
-              key: secret_access_key
-        args:
-        - "mount"
-        - ":s3:music/"
-        - "/vol/mnt"
-        - "--s3-provider=Minio"
-        - "--s3-env-auth=true"
-        - "--s3-region="
-        - "--s3-endpoint=http://minio.minio.svc:9000"
-        - "--allow-other"
-        - "--vfs-cache-mode=minimal"
-        - "--no-modtime"
-        - "--read-only"
-        volumeMounts:
-        - name: music-data
-          mountPath: /vol/mnt
-          subPath: mnt
-          mountPropagation: Bidirectional
       - name: mpd
         image: randomcoww/mpd:0.21.25
         ports:
         - containerPort: 8000
           protocol: TCP
         volumeMounts:
-        - mountPath: "/mpd/music"
-          name: music-data
-        - mountPath: "/mpd/cache"
-          name: mpd-data
         - mountPath: /etc/mpd.conf
           name: mpd-config
           subPath: mpd.conf
-        lifecycle:
-          postStart:
-            exec:
-              # /mpd/music/mnt should be fuse mounted by rclone
-              # Kill the container if this is not mounted
-              command: ["mountpoint", "-q", "/mpd/music/mnt"]
+        - mountPath: /mpd/music
+          name: mpd-data
+        - mountPath: /mpd/cache
+          name: mpd-cache
       - name: ympd
         image: randomcoww/ympd:latest
         args:
@@ -118,84 +77,35 @@ spec:
         - containerPort: 8001
           protocol: TCP
       volumes:
-      - name: mpd-data
-        persistentVolumeClaim:
-          claimName: mpd-pvc
       - name: mpd-config
         configMap:
           name: mpd-config
-      # shared mountpoint for fuse mount
-      - name: music-data
-        emptyDir: {}
-
----
-kind: PersistentVolumeClaim
-apiVersion: v1
-metadata:
-  name: mpd-pvc
-  namespace: common
-spec:
-  storageClassName: openebs-mpd
-  accessModes:
-  - ReadWriteOnce
-  resources:
-    requests:
-      storage: 2G
+      - name: mpd-data
+        persistentVolumeClaim:
+          claimName: mpd-data-pvc
+      - name: mpd-cache
+        persistentVolumeClaim:
+          claimName: mpd-cache-pvc
 
 ---
 kind: Service
 apiVersion: v1
 metadata:
-  name: mpd-stream
+  name: mpd
   namespace: common
 spec:
   ports:
   - name: stream
-    port: 80
-    targetPort: 8000
-  selector:
-    k8s-app: mpd
-
----
-kind: Service
-apiVersion: v1
-metadata:
-  name: mpd-control
-  namespace: common
-spec:
-  ports:
+    port: 8000
   - name: control
-    port: 80
-    targetPort: 8001
+    port: 8001
   selector:
-    k8s-app: mpd
-
+    app: mpd
 ---
 apiVersion: extensions/v1beta1
 kind: Ingress
 metadata:
-  name: mpd-stream
-  namespace: common
-  annotations:
-    kubernetes.io/ingress.class: traefik
-    ingress.kubernetes.io/ssl-redirect: "true"
-spec:
-  rules:
-  - host: stream.fuzzybunny.internal
-    http:
-      paths:
-      - path: /
-        backend:
-          serviceName: mpd-stream
-          servicePort: stream
-  tls:
-  - secretName: tls-ingress
-
----
-apiVersion: extensions/v1beta1
-kind: Ingress
-metadata:
-  name: mpd-control
+  name: mpd
   namespace: common
   annotations:
     kubernetes.io/ingress.class: traefik
@@ -207,7 +117,14 @@ spec:
       paths:
       - path: /
         backend:
-          serviceName: mpd-control
+          serviceName: mpd
           servicePort: control
+  - host: stream.fuzzybunny.internal
+    http:
+      paths:
+      - path: /
+        backend:
+          serviceName: mpd
+          servicePort: stream
   tls:
   - secretName: tls-ingress
