@@ -50,7 +50,7 @@ spec:
         - "--s3-endpoint=http://minio.minio.svc:9001"
         - "--allow-other"
         - "--allow-non-empty"
-        - "--vfs-cache-mode=writes"
+        - "--vfs-cache-mode=full"
         - "--no-modtime"
         - "--cache-dir=/vfs"
         volumeMounts:
