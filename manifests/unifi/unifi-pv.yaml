@@ -1,0 +1,105 @@
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: s3-unifi
+  namespace: common
+spec:
+  serviceName: s3-unifi
+  replicas: 1
+  selector:
+    matchLabels:
+      app: s3-unifi
+  template:
+    metadata:
+      labels:
+        app: s3-unifi
+    spec:
+      affinity:
+        nodeAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+            nodeSelectorTerms:
+            - matchExpressions:
+              - key: minio-data
+                operator: Exists
+      dnsPolicy: ClusterFirstWithHostNet
+      restartPolicy: Always
+      containers:
+      - name: mount-cache
+        imagePullPolicy: IfNotPresent
+        image: rclone/rclone:latest
+        securityContext:
+          privileged: true
+        env:
+        - name: AWS_ACCESS_KEY_ID
+          valueFrom:
+            secretKeyRef:
+              name: minio-auth
+              key: access_key_id
+        - name: AWS_SECRET_ACCESS_KEY
+          valueFrom:
+            secretKeyRef:
+              name: minio-auth
+              key: secret_access_key
+        args:
+        - "mount"
+        - ":s3:unifi-cache/"
+        - "/vol/mnt"
+        - "--s3-provider=Minio"
+        - "--s3-env-auth=true"
+        - "--s3-region="
+        - "--s3-endpoint=http://minio.minio.svc:9001"
+        - "--allow-other"
+        - "--allow-non-empty"
+        - "--vfs-cache-mode=writes"
+        - "--no-modtime"
+        - "--cache-dir=/vfs"
+        volumeMounts:
+        - name: vol-cache
+          mountPath: /vol/mnt
+          mountPropagation: Bidirectional
+        - name: vfs-cache
+          mountPath: /vfs
+      volumes:
+      # local VFS cache
+      - name: vol-cache
+        hostPath:
+          path: /var/lib/kubelet/hostpath/unifi-cache
+          type: DirectoryOrCreate
+      - name: vfs-cache
+        hostPath:
+          path: /var/pv/vfs/unifi-cache
+          type: DirectoryOrCreate
+
+---
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: unifi-cache
+  namespace: common
+spec:
+  nodeAffinity:
+    required:
+      nodeSelectorTerms:
+      - matchExpressions:
+        - key: minio-data
+          operator: Exists
+  storageClassName: unifi-cache
+  capacity:
+    storage: 1Gi
+  accessModes:
+  - ReadWriteOnce
+  local:
+    path: /var/lib/kubelet/hostpath/unifi-cache/vol
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: unifi-cache-pvc
+  namespace: common
+spec:
+  accessModes:
+  - ReadWriteOnce
+  storageClassName: unifi-cache
+  resources:
+    requests:
+      storage: 1Gi

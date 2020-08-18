@@ -7,51 +7,17 @@ spec:
   replicas: 1
   selector:
     matchLabels:
-      k8s-app: unifi
+      app: unifi
   template:
     metadata:
       labels:
-        k8s-app: unifi
+        app: unifi
     spec:
       dnsPolicy: ClusterFirstWithHostNet
       restartPolicy: Always
       containers:
-      - name: rclone
-        image: rclone/rclone:latest
-        securityContext:
-          privileged: true
-        env:
-        - name: AWS_ACCESS_KEY_ID
-          valueFrom:
-            secretKeyRef:
-              name: minio-auth
-              key: access_key_id
-        - name: AWS_SECRET_ACCESS_KEY
-          valueFrom:
-            secretKeyRef:
-              name: minio-auth
-              key: secret_access_key
-        args:
-        - "mount"
-        - ":s3:unifi/"
-        - "/vol/mnt"
-        - "--s3-provider=Minio"
-        - "--s3-env-auth=true"
-        - "--s3-region="
-        - "--s3-endpoint=http://minio.minio.svc:9000"
-        - "--allow-other"
-        - "--vfs-cache-mode=minimal"
-        - "--no-modtime"
-        volumeMounts:
-        - name: unifi-backup
-          mountPath: /vol/mnt
-          subPath: mnt
-          mountPropagation: Bidirectional
       - name: unifi
         image: randomcoww/unifi:5.13.32
-        env:
-        - name: BACKUP_DIR
-          value: /unifi/mnt
         ports:
         - containerPort: 8080
           protocol: TCP
@@ -60,40 +26,16 @@ spec:
         - containerPort: 3478
           protocol: UDP
         volumeMounts:
-        - mountPath: "/opt/UniFi/data"
-          name: unifi-data
-        - mountPath: "/unifi"
-          name: unifi-backup
+        - mountPath: /opt/UniFi/data
+          name: unifi-cache
         lifecycle:
-          postStart:
-            exec:
-              # /unifi/mnt should be fuse mounted by rclone
-              # Kill the container if this is not mounted
-              command: ["mountpoint", "-q", "/unifi/mnt"]
           preStop:
             exec:
               command: ["/docker-stop.sh"]
       volumes:
-      - name: unifi-data
+      - name: unifi-cache
         persistentVolumeClaim:
-          claimName: unifi-pvc
-      # shared mountpoint for fuse mount
-      - name: unifi-backup
-        emptyDir: {}
-
----
-kind: PersistentVolumeClaim
-apiVersion: v1
-metadata:
-  name: unifi-pvc
-  namespace: common
-spec:
-  storageClassName: openebs-unifi
-  accessModes:
-  - ReadWriteOnce
-  resources:
-    requests:
-      storage: 2G
+          claimName: unifi-cache-pvc
 
 ---
 kind: Service
@@ -112,8 +54,7 @@ spec:
   - name: https
     port: 8443
   selector:
-    k8s-app: unifi
-
+    app: unifi
 ---
 kind: Service
 apiVersion: v1
@@ -129,4 +70,4 @@ spec:
     port: 3478
     protocol: UDP
   selector:
-    k8s-app: unifi
+    app: unifi
