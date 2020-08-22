@@ -100,10 +100,10 @@ spec:
       - name: wireguard-client
         secret:
           secretName: wireguard-client
-      # shared path for minio mount
       - name: ingest-cache
-        persistentVolumeClaim:
-          claimName: ingest-cache-pvc
+        hostPath:
+          path: /var/pv/tmp/ingest-cache
+          type: DirectoryOrCreate
       - name: ingest-data
         persistentVolumeClaim:
           claimName: ingest-data-pvc

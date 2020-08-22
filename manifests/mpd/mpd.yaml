@@ -6,7 +6,7 @@ metadata:
 data:
   mpd.conf: |
     user "mpd"
-    bind_to_address "0.0.0.0"
+    bind_to_address "127.0.0.1"
     port "6600"
     music_directory "/mpd/music"
     playlist_directory "/mpd/cache/playlists"
@@ -31,7 +31,6 @@ data:
       bind_to_address "0.0.0.0"
       max_clients "0"
     }
-
 ---
 kind: Deployment
 apiVersion: apps/v1
@@ -77,16 +76,16 @@ spec:
         - containerPort: 8001
           protocol: TCP
       volumes:
+      - name: mpd-cache
+        hostPath:
+          path: /var/pv/tmp/mpd-cache
+          type: DirectoryOrCreate
       - name: mpd-config
         configMap:
           name: mpd-config
       - name: mpd-data
         persistentVolumeClaim:
           claimName: mpd-data-pvc
-      - name: mpd-cache
-        persistentVolumeClaim:
-          claimName: mpd-cache-pvc
-
 ---
 kind: Service
 apiVersion: v1

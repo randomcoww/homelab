@@ -28,15 +28,20 @@ spec:
         volumeMounts:
         - mountPath: /opt/UniFi/data
           name: unifi-cache
+        - mountPath: /opt/UniFi/data/backup
+          name: unifi-data
         lifecycle:
           preStop:
             exec:
               command: ["/docker-stop.sh"]
       volumes:
       - name: unifi-cache
+        hostPath:
+          path: /var/pv/tmp/unifi-cache
+          type: DirectoryOrCreate
+      - name: unifi-data
         persistentVolumeClaim:
-          claimName: unifi-cache-pvc
-
+          claimName: unifi-data-pvc
 ---
 kind: Service
 apiVersion: v1

@@ -51,71 +51,17 @@ spec:
         - "--s3-endpoint=http://minio.minio.svc:9000"
         - "--allow-other"
         - "--allow-non-empty"
-        - "--vfs-cache-mode=minimal"
+        - "--vfs-cache-mode=off"
         - "--no-modtime"
-        - "--cache-dir=/vfs"
         volumeMounts:
         - name: vol-data
           mountPath: /vol/mnt
           mountPropagation: Bidirectional
-        - name: vfs-data
-          mountPath: /vfs
-      # mount minio for incomplete
-      - name: mount-cache
-        imagePullPolicy: IfNotPresent
-        image: rclone/rclone:latest
-        securityContext:
-          privileged: true
-        env:
-        - name: AWS_ACCESS_KEY_ID
-          valueFrom:
-            secretKeyRef:
-              name: minio-auth
-              key: access_key_id
-        - name: AWS_SECRET_ACCESS_KEY
-          valueFrom:
-            secretKeyRef:
-              name: minio-auth
-              key: secret_access_key
-        args:
-        - "mount"
-        - ":s3:ingest-cache/"
-        - "/vol/mnt"
-        - "--s3-provider=Minio"
-        - "--s3-env-auth=true"
-        - "--s3-region="
-        - "--s3-endpoint=http://minio.minio.svc:9001"
-        - "--allow-other"
-        - "--allow-non-empty"
-        - "--vfs-cache-mode=writes"
-        - "--no-modtime"
-        - "--cache-dir=/vfs"
-        volumeMounts:
-        - name: vol-cache
-          mountPath: /vol/mnt
-          mountPropagation: Bidirectional
-        - name: vfs-cache
-          mountPath: /vfs
       volumes:
-      # shared path for minio mount
       - name: vol-data
         hostPath:
           path: /var/lib/kubelet/hostpath/ingest-data
           type: DirectoryOrCreate
-      - name: vfs-data
-        hostPath:
-          path: "/var/pv/vfs/ingest-data"
-          type: DirectoryOrCreate
-      # local VFS cache
-      - name: vol-cache
-        hostPath:
-          path: /var/lib/kubelet/hostpath/ingest-cache
-          type: DirectoryOrCreate
-      - name: vfs-cache
-        hostPath:
-          path: "/var/pv/vfs/ingest-cache"
-          type: DirectoryOrCreate
-
 ---
 apiVersion: v1
 kind: PersistentVolume
@@ -149,36 +95,3 @@ spec:
   resources:
     requests:
       storage: 50Ti
----
-apiVersion: v1
-kind: PersistentVolume
-metadata:
-  name: ingest-cache
-  namespace: common
-spec:
-  nodeAffinity:
-    required:
-      nodeSelectorTerms:
-      - matchExpressions:
-        - key: minio-data
-          operator: Exists
-  storageClassName: ingest-cache
-  capacity:
-    storage: 1Gi
-  accessModes:
-  - ReadWriteOnce
-  local:
-    path: /var/lib/kubelet/hostpath/ingest-cache/vol
----
-apiVersion: v1
-kind: PersistentVolumeClaim
-metadata:
-  name: ingest-cache-pvc
-  namespace: common
-spec:
-  accessModes:
-  - ReadWriteOnce
-  storageClassName: ingest-cache
-  resources:
-    requests:
-      storage: 1Gi

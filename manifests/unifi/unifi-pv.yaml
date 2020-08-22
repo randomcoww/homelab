@@ -42,39 +42,30 @@ spec:
               key: secret_access_key
         args:
         - "mount"
-        - ":s3:unifi-cache/"
+        - ":s3:unifi-data/"
         - "/vol/mnt"
         - "--s3-provider=Minio"
         - "--s3-env-auth=true"
         - "--s3-region="
-        - "--s3-endpoint=http://minio.minio.svc:9001"
+        - "--s3-endpoint=http://minio.minio.svc:9000"
         - "--allow-other"
         - "--allow-non-empty"
-        - "--vfs-cache-mode=full"
+        - "--vfs-cache-mode=off"
         - "--no-modtime"
-        - "--cache-dir=/vfs"
         volumeMounts:
-        - name: vol-cache
+        - name: vol-data
           mountPath: /vol/mnt
           mountPropagation: Bidirectional
-        - name: vfs-cache
-          mountPath: /vfs
       volumes:
-      # local VFS cache
-      - name: vol-cache
+      - name: vol-data
         hostPath:
-          path: /var/lib/kubelet/hostpath/unifi-cache
+          path: /var/lib/kubelet/hostpath/unifi-data
           type: DirectoryOrCreate
-      - name: vfs-cache
-        hostPath:
-          path: /var/pv/vfs/unifi-cache
-          type: DirectoryOrCreate
-
 ---
 apiVersion: v1
 kind: PersistentVolume
 metadata:
-  name: unifi-cache
+  name: unifi-data
   namespace: common
 spec:
   nodeAffinity:
@@ -83,23 +74,23 @@ spec:
       - matchExpressions:
         - key: minio-data
           operator: Exists
-  storageClassName: unifi-cache
+  storageClassName: unifi-data
   capacity:
     storage: 1Gi
   accessModes:
   - ReadWriteOnce
   local:
-    path: /var/lib/kubelet/hostpath/unifi-cache/vol
+    path: /var/lib/kubelet/hostpath/unifi-data/vol
 ---
 apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
-  name: unifi-cache-pvc
+  name: unifi-data-pvc
   namespace: common
 spec:
   accessModes:
   - ReadWriteOnce
-  storageClassName: unifi-cache
+  storageClassName: unifi-data
   resources:
     requests:
       storage: 1Gi
