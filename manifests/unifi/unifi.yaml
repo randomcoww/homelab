@@ -17,7 +17,7 @@ spec:
       restartPolicy: Always
       containers:
       - name: unifi
-        image: randomcoww/unifi:5.13.32
+        image: randomcoww/unifi:5.14.22
         ports:
         - containerPort: 8080
           protocol: TCP
