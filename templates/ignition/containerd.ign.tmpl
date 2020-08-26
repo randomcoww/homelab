@@ -6,9 +6,14 @@ systemd:
     - name: containerd.service
       enabled: true
       dropins:
-        - name: 10-killmode.conf
+        - name: 10-custom.conf
           contents: |
             [Service]
+            ExecStartPre=/usr/bin/mkdir -p \
+              /etc/cni/net.d
+            # Default podman CNI is read early by containerd and messes with initial container launches
+            ExecStartPre=/usr/bin/rm -f \
+              /etc/cni/net.d/87-podman-bridge.conflist
             KillMode=mixed
     - name: kubelet.service
       enabled: true
@@ -33,15 +38,14 @@ systemd:
           -v /usr/lib/os-release:/etc/os-release \
           -v /sys/fs/cgroup:/sys/fs/cgroup:ro \
           -v /sys/fs/cgroup/systemd:/sys/fs/cgroup/systemd \
-          -v /var/lib/containerd:/var/lib/containerd \
+          -v /var/lib/containerd:/var/lib/containerd:z \
           -v /opt/cni/bin:/opt/cni/bin:z \
           -v ${kubelet_path}:${kubelet_path}:rshared,z \
           -v /var/log:/var/log \
           -v /var/run/lock:/var/run/lock:z"
-        ExecStartPre=/bin/mkdir -p \
+        ExecStartPre=/usr/bin/mkdir -p \
           ${kubelet_path} \
           /var/log/containers \
-          /etc/cni/net.d \
           /opt/cni/bin
         ExecStartPre=-/usr/bin/podman kill kubelet
         ExecStartPre=-/usr/bin/podman rm kubelet

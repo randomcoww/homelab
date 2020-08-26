@@ -110,11 +110,6 @@ storage:
       append:
         - inline: |
             hosts: files resolve dns myhostname
-    # Default podman CNI is read early by kubelet and messes with initial container launches
-    - path: /etc/cni/net.d/87-podman-bridge.conflist
-      overwrite: true
-      contents:
-        inline: ""
 
 passwd:
   users:
