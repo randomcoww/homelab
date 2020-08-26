@@ -74,6 +74,7 @@ spec:
       labels:
         k8s-app: kubelet-approver
     spec:
+      priorityClassName: system-cluster-critical
       serviceAccountName: kubelet-approver
       containers:
       - name: kubelet-approver
