@@ -161,6 +161,29 @@ kubectl apply -f http://127.0.0.1:8080/generic?manifest=metallb-network
 kubectl apply -f manifests/traefik.yaml
 ```
 
+#### Apply secrets
+
+```bash
+kubectl create namespace common
+kubectl create namespace monitoring
+kubectl create namespace minio
+
+buildtool terraform apply \
+    -var-file=secrets.tfvars \
+    -target=data.null_data_source.provider-addon
+
+buildtool terraform apply \
+    -var-file=secrets.tfvars \
+    -target=module.kubernetes-addons
+```
+
+#### Minio
+
+```bash
+kubectl label node worker-0.local minio-data=true
+kubectl apply -f manifests/minio.yaml
+```
+
 #### Monitoring
 
 ```bash
@@ -236,30 +259,6 @@ kubectl apply -n openebs -f manifests/openebs_spc.yaml
 Currently additional PSP is needed for PVC pods to run:
 ```bash
 kubectl apply -n openebs -f manifests/openebs_psp.yaml
-```
-
-#### Apply secrets
-
-```bash
-
-kubectl create namespace common
-kubectl create namespace monitoring
-kubectl create namespace minio
-
-buildtool terraform apply \
-    -var-file=secrets.tfvars \
-    -target=data.null_data_source.provider-addon
-
-buildtool terraform apply \
-    -var-file=secrets.tfvars \
-    -target=module.kubernetes-addons
-```
-
-#### Minio
-
-```bash
-kubectl label node worker-0.local minio-data=true
-kubectl apply -f manifests/minio.yaml
 ```
 
 #### Common service
