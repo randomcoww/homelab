@@ -54,7 +54,7 @@ systemd:
               --exit-on-lock-contention \
               --lock-file=/var/run/lock/kubelet.lock \
               --container-runtime=remote \
-              --container-runtime-endpoint=unix:///run/containerd/containerd.sock
+              --container-runtime-endpoint=unix:///var/run/dockershim.sock
         Restart=always
         RestartSec=10
         Delegate=true
@@ -69,9 +69,9 @@ storage:
       overwrite: true
       contents:
         inline: |-
-          root = "/var/lib/containerd"
-          state = "/run/containerd"
           oom_score = -999
+          [grpc]
+            address = "/var/run/dockershim.sock"
           [plugins]
             version = 2
             [plugins."io.containerd.grpc.v1.cri"]

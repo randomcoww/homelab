@@ -27,7 +27,7 @@ systemd:
                   --cert-dir=${kubelet_path} \
                   --volume-plugin-dir=${kubelet_path}/volumeplugins \
                   --container-runtime=remote \
-                  --container-runtime-endpoint=unix:///run/containerd/containerd.sock
+                  --container-runtime-endpoint=unix:///var/run/dockershim.sock
     - name: iscsid.socket
       mask: true
     - name: iscsid.service
