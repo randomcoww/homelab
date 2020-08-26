@@ -238,12 +238,6 @@ Currently additional PSP is needed for PVC pods to run:
 kubectl apply -n openebs -f manifests/openebs_psp.yaml
 ```
 
-#### Minio
-
-```bash
-kubectl apply -f manifests/minio.yaml
-```
-
 #### Apply secrets
 
 ```bash
@@ -259,6 +253,12 @@ buildtool terraform apply \
 buildtool terraform apply \
     -var-file=secrets.tfvars \
     -target=module.kubernetes-addons
+```
+
+#### Minio
+
+```bash
+kubectl apply -f manifests/minio.yaml
 ```
 
 #### Common service
