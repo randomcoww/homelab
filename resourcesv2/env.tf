@@ -37,9 +37,10 @@ locals {
   }
 
   boot_disk_label = "fedora-coreos-32"
-  kernel_image    = "images/vmlinuz"
+  kernel_image    = "images/pxeboot/vmlinuz"
   initrd_images = [
-    "images/initramfs.img",
+    "images/pxeboot/initrd.img",
+    "images/ignition.img",
   ]
   kernel_params = [
     "console=hvc0",
@@ -722,6 +723,7 @@ locals {
         coreos = [
           "gateway-1",
           "controller-1",
+          "controller-2",
           "worker-1",
         ]
       }
