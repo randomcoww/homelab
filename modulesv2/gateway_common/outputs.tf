@@ -39,6 +39,7 @@ output "templates" {
         master_default_route_priority = 32770
         vrrp_gateway_id               = 55
         vrrp_dns_id                   = 56
+        dns_redirect_port             = 55353
       })
     ]
   }

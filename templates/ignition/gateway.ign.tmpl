@@ -20,6 +20,13 @@ systemd:
 
 storage:
   files:
+    - path: /etc/systemd/resolved.conf.d/10-mdns-stub.conf
+      mode: 0644
+      contents:
+        inline: |
+          [Resolve]
+          DNSStubListener=true
+
     - path: /etc/systemd/network/10-${p.networks_by_key.sync.if}.network
       mode: 0644
       contents:
@@ -59,7 +66,7 @@ storage:
           LinkLocalAddressing=false
           DHCP=true
           DNS=${dns_forward_ip}
-          DNSOverTLS=opportunistic
+          DNSOverTLS=yes
           Domains=~
 
           [DHCP]
@@ -142,8 +149,8 @@ storage:
               iifname $if_trusted accept;
               iifname $if_sync accept;
 
-              iifname $if_internal tcp dport domain accept;
-              iifname $if_internal udp dport domain accept;
+              iifname $if_internal tcp dport ${dns_redirect_port} accept;
+              iifname $if_internal udp dport ${dns_redirect_port} accept;
               iifname $if_internal udp sport bootps udp dport bootpc accept;
               iifname $if_internal pkttype multicast accept;
             }
@@ -171,7 +178,9 @@ storage:
 
           table ip nat {
             chain prerouting {
-              type nat hook prerouting priority 0; policy accept;
+              type nat hook prerouting priority -100; policy accept;
+              iifname $if_internal tcp dport domain redirect to ${dns_redirect_port};
+              iifname $if_internal udp dport domain redirect to ${dns_redirect_port};
             }
 
             chain input {
@@ -197,15 +206,19 @@ storage:
       mode: 0644
       contents:
         inline: |-
-          ${domains.internal}:53 {
+          ${domains.internal} {
             errors
             forward . ${services.internal_dns.vip}
           }
-          ${domains.kubernetes_cluster}:53 {
+          ${domains.kubernetes_cluster} {
             errors
             forward . ${services.internal_dns.vip}
           }
-          .:53 {
+          ${domains.mdns} {
+            errors
+            forward . 127.0.0.53
+          }
+          . {
             errors
             health
             forward . tls://${dns_forward_ip} {
@@ -472,7 +485,7 @@ storage:
                 requests:
                   cpu: 100m
                   memory: 70Mi
-              args: [ "-conf", "/etc/coredns/Corefile" ]
+              args: [ "-dns.port", "${dns_redirect_port}", "-conf", "/etc/coredns/Corefile" ]
               livenessProbe:
                 httpGet:
                   path: /health
