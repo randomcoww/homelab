@@ -64,11 +64,11 @@ Run build from https://github.com/randomcoww/fedora-coreos-custom
 
 VMs running on the host will boot off of the same kernel and initramfs as the hypervisor.
 
-#### Desktop
+#### Client devices
 
 Run build from https://github.com/randomcoww/fedora-silverblue-custom
 
-### Setup SSH access from desktop
+### Setup SSH access from client
 
 ```bash
 KEY=$HOME/.ssh/id_ecdsa
@@ -95,10 +95,6 @@ buildtool tf-wrapper apply \
 buildtool tf-wrapper apply \
     -target=module.ignition-kvm-1 \
     -target=module.libvirt-kvm-1
-    
-buildtool tf-wrapper apply \
-    -target=module.ignition-desktop \
-    -target=module.libvirt-desktop
 ```
 
 ### Start VMs
@@ -107,17 +103,14 @@ buildtool tf-wrapper apply \
 virsh -c qemu+ssh://core@kvm-0.local/system net-start sriov
 virsh -c qemu+ssh://core@kvm-0.local/system start gateway-0
 virsh -c qemu+ssh://core@kvm-0.local/system start controller-0
+virsh -c qemu+ssh://core@kvm-1.local/system start controller-1
 virsh -c qemu+ssh://core@kvm-0.local/system start worker-0
 
 virsh -c qemu+ssh://core@kvm-1.local/system net-start sriov
 virsh -c qemu+ssh://core@kvm-1.local/system start gateway-1
 virsh -c qemu+ssh://core@kvm-1.local/system start controller-1
+virsh -c qemu+ssh://core@kvm-1.local/system start controller-2
 virsh -c qemu+ssh://core@kvm-1.local/system start worker-1
-
-virsh -c qemu+ssh://core@desktop.local/system net-start sriov
-virsh -c qemu+ssh://core@desktop.local/system start controller-2
-virsh -c qemu+ssh://core@desktop.local/system start worker-2
-virsh -c qemu+ssh://core@desktop.local/system start test-0
 ```
 
 ### Deploy kubernetes services

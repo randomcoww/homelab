@@ -123,7 +123,92 @@ locals {
   }
 
   components = {
-    # hosts
+    # coreos hypervisor
+    hypervisor = {
+      nodes = [
+        "kvm-0",
+        "kvm-1",
+      ]
+      ignition_templates = [
+        "${local.templates_path}/ignition/base-server.ign.tmpl",
+        "${local.templates_path}/ignition/hypervisor.ign.tmpl",
+        "${local.templates_path}/ignition/vlan_network.ign.tmpl",
+      ]
+    }
+    # coreos VMs
+    vm = {
+      nodes = [
+        "gateway-0",
+        "gateway-1",
+        "controller-0",
+        "controller-1",
+        "controller-2",
+        "worker-0",
+        "worker-1",
+        "test-0",
+      ]
+      ignition_templates = [
+        "${local.templates_path}/ignition/base-server.ign.tmpl",
+        "${local.templates_path}/ignition/general_network.ign.tmpl",
+      ]
+    }
+    # silverblue (gnome) desktop with networkmanager
+    desktop = {
+      nodes = [
+        "client-0",
+        "client-1",
+      ]
+      ignition_templates = [
+        "${local.templates_path}/ignition/base-client.ign.tmpl",
+        "${local.templates_path}/ignition/storage.ign.tmpl",
+        "${local.templates_path}/ignition/desktop.ign.tmpl",
+      ]
+    }
+    # ssh client and server keys signed by CA
+    ssh = {
+      nodes = [
+        "gateway-0",
+        "gateway-1",
+        "controller-0",
+        "controller-1",
+        "controller-2",
+        "worker-0",
+        "worker-1",
+        "kvm-0",
+        "kvm-1",
+        "test-0",
+        "client-0",
+        "client-1",
+      ]
+      ignition_templates = [
+        "${local.templates_path}/ignition/ssh.ign.tmpl",
+      ]
+    }
+    # cert for fuzzybunny.internal
+    traefik_tls = {
+      nodes = [
+        "client-0",
+        "client-1",
+      ]
+      ignition_templates = [
+        "${local.templates_path}/ignition/internal_tls.ign.tmpl",
+      ]
+    }
+    # promtail to push logs to loki (non kubernetes containerd hosts)
+    static_pod_logging = {
+      nodes = [
+        "gateway-0",
+        "gateway-1",
+        "controller-0",
+        "controller-1",
+        "controller-2",
+      ]
+      ignition_templates = [
+        "${local.templates_path}/ignition/static_pod_logging.ign.tmpl",
+      ]
+    }
+
+    # host specific
     gateway = {
       nodes = [
         "gateway-0",
@@ -164,93 +249,6 @@ locals {
         "${local.templates_path}/ignition/test.ign.tmpl",
         "${local.templates_path}/ignition/storage.ign.tmpl",
         "${local.templates_path}/ignition/containerd.ign.tmpl",
-      ]
-    }
-
-    # addons
-    client = {
-      nodes = [
-        "laptop",
-      ]
-      ignition_templates = [
-        "${local.templates_path}/ignition/networkmanager.ign.tmpl",
-      ]
-    }
-    vm = {
-      nodes = [
-        "gateway-0",
-        "gateway-1",
-        "controller-0",
-        "controller-1",
-        "controller-2",
-        "worker-0",
-        "worker-1",
-        "test-0",
-      ]
-      ignition_templates = [
-        "${local.templates_path}/ignition/base.ign.tmpl",
-        "${local.templates_path}/ignition/general_network.ign.tmpl",
-      ]
-    }
-    hypervisor = {
-      nodes = [
-        "kvm-0",
-        "kvm-1",
-        "desktop",
-      ]
-      ignition_templates = [
-        "${local.templates_path}/ignition/base.ign.tmpl",
-        "${local.templates_path}/ignition/hypervisor.ign.tmpl",
-        "${local.templates_path}/ignition/vlan_network.ign.tmpl",
-      ]
-    }
-    desktop = {
-      nodes = [
-        "desktop",
-        "laptop",
-      ]
-      ignition_templates = [
-        "${local.templates_path}/ignition/desktop.ign.tmpl",
-        "${local.templates_path}/ignition/storage.ign.tmpl",
-      ]
-    }
-    ssh = {
-      nodes = [
-        "gateway-0",
-        "gateway-1",
-        "controller-0",
-        "controller-1",
-        "controller-2",
-        "worker-0",
-        "worker-1",
-        "kvm-0",
-        "kvm-1",
-        "test-0",
-        "desktop",
-      ]
-      ignition_templates = [
-        "${local.templates_path}/ignition/ssh.ign.tmpl",
-      ]
-    }
-    traefik_tls = {
-      nodes = [
-        "desktop",
-        "laptop",
-      ]
-      ignition_templates = [
-        "${local.templates_path}/ignition/internal_tls.ign.tmpl",
-      ]
-    }
-    static_pod_logging = {
-      nodes = [
-        "gateway-0",
-        "gateway-1",
-        "controller-0",
-        "controller-1",
-        "controller-2",
-      ]
-      ignition_templates = [
-        "${local.templates_path}/ignition/static_pod_logging.ign.tmpl",
       ]
     }
   }
@@ -748,48 +746,16 @@ locals {
       boot_image_mount_path = "/etc/libvirt/boot/${local.boot_disk_label}.iso"
     }
 
-    # desktop hypervisor hybrid
-    desktop = {
-      network = [
-        {
-          mac                = "f8-f2-1e-1e-3c-40"
-          if                 = "en-pf"
-          libvirt_network_pf = "sriov"
-        },
-        {
-          label = "main"
-          if    = "en-main"
-          ip    = "192.168.127.253"
-        },
-        {
-          label = "lan"
-          if    = "en-lan"
-          dhcp  = true
-        },
-        {
-          label = "int"
-          if    = "en-hostint"
-          ip    = local.services.renderer.vip
-        }
-      ]
+    # client devices
+    client-0 = {
       disk = [
         {
           device     = "/dev/disk/by-label/localhome"
           mount_path = "/var/home/${local.desktop_user}"
         }
       ]
-      libvirt_domains = {
-        coreos = [
-          "gateway-1",
-          "controller-1",
-          "controller-2",
-          "test-0",
-        ]
-      }
-      boot_image_device     = "/dev/disk/by-label/${local.boot_disk_label}"
-      boot_image_mount_path = "/etc/libvirt/boot/${local.boot_disk_label}.iso"
     }
-    laptop = {
+    client-1 = {
       disk = [
         {
           device     = "/dev/disk/by-label/localhome"
@@ -804,7 +770,7 @@ locals {
   local_renderer_hosts_include = [
     "kvm-0",
     "kvm-1",
-    "desktop",
-    "laptop",
+    "client-0",
+    "client-1",
   ]
 }

@@ -111,18 +111,6 @@ module "vm" {
   }
 }
 
-module "client" {
-  source = "../modulesv2/client"
-
-  user      = local.user
-  templates = local.components.client.ignition_templates
-  hosts = {
-    for k in local.components.client.nodes :
-    k => local.aggr_hosts[k]
-  }
-}
-
-
 ##
 ## minio user-pass
 ##
@@ -283,7 +271,6 @@ locals {
         module.tls-secrets.templates,
         module.hypervisor.templates,
         module.vm.templates,
-        module.client.templates,
         module.desktop.templates,
       ] :
       lookup(k, h, [])

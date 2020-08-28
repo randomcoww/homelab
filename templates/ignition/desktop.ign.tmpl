@@ -3,10 +3,6 @@ variant: fcos
 version: 1.0.0
 systemd:
   units:
-    - name: firewalld.service
-      mask: true
-    - name: systemd-networkd-wait-online.service
-      mask: true
     - name: default-dconf-update.service
       enabled: true
       contents: |
@@ -24,18 +20,6 @@ systemd:
 
 storage:
   files:
-    - path: /etc/systemd/network/80-w.network
-      mode: 0644
-      contents:
-        inline: |
-          [Match]
-          Virtualization=!vm
-          Virtualization=!container
-          Name=w*
-
-          [Link]
-          Unmanaged=true
-
     ##
     ## misc configs
     ## add to global paths - persistent home directory is mounted afterwards
