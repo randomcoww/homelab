@@ -14,6 +14,10 @@ systemd:
       mask: true
     - name: systemd-networkd-wait-online.service
       mask: true
+    - name: avahi-daemon.service
+      mask: true
+    - name: avahi-daemon.socket
+      mask: true
     - name: NetworkManager.service
       enabled: true
     - name: NetworkManager-wait-online.service

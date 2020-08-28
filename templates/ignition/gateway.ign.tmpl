@@ -152,6 +152,7 @@ storage:
               iifname $if_internal tcp dport ${dns_redirect_port} accept;
               iifname $if_internal udp dport ${dns_redirect_port} accept;
               iifname $if_internal udp sport bootps udp dport bootpc accept;
+              iifname $if_internal tcp dport ssh accept;
               iifname $if_internal pkttype multicast accept;
             }
 
@@ -165,6 +166,7 @@ storage:
               iifname $if_trusted accept;
               iifname $if_sync accept;
               iifname $if_internal oifname $if_external accept;
+              iifname $if_internal tcp dport ssh accept;
 
               %{~ for v in values(loadbalancer_pools) ~}
               iifname $if_internal ip daddr ${v.network}/${v.cidr} accept;
