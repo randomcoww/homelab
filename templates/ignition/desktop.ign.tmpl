@@ -90,6 +90,10 @@ storage:
           night-light-enabled=true
           night-light-schedule-automatic=true
 
+          [org/gnome/settings-daemon/plugins/power]
+          ambient-enabled=false
+          idle-dim=false
+
           [org/gnome/desktop/media-handling]
           automount=false
           autorun-never=true
@@ -122,9 +126,6 @@ storage:
 
           [org/gnome/desktop/interface]
           enable-hot-corners=false
-
-          [org/gnome/settings-daemon/plugins/xsettings]
-          rgba-order='bgr'
     - path: /etc/firefox/pref/autoconfig.js
       mode: 0644
       contents:
