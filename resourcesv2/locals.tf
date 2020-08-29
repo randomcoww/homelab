@@ -1,5 +1,5 @@
 locals {
-  aggr_network = {
+  aggr_host_params = {
     for host, params in local.hosts :
     host => {
       network = [
@@ -9,11 +9,17 @@ locals {
             label = lookup(n, "label", lookup(n, "if", "placeholder"))
         })
       ]
+      disk = [
+        for n in lookup(params, "disk", []) :
+        merge(n, {
+          systemd_unit_name = join("-", compact(split("/", replace(n.mount_path, "-", "\\x2d"))))
+        })
+      ]
     }
   }
 
   aggr_networks_by_key = {
-    for host, params in local.aggr_network :
+    for host, params in local.aggr_host_params :
     host => {
       networks_by_key = {
         for n in params.network :
@@ -33,7 +39,7 @@ locals {
         }
       }
       libvirt_networks = {
-        for k in lookup(local.aggr_network[host], "network", []) :
+        for k in lookup(local.aggr_host_params[host], "network", []) :
         k.libvirt_network_pf => {
           pf       = k.if
           template = local.libvirt_network_templates[k.libvirt_network_pf]
@@ -47,12 +53,11 @@ locals {
     for host, params in local.hosts :
     host => merge(
       params,
-      local.aggr_network[host],
+      local.aggr_host_params[host],
       local.aggr_networks_by_key[host],
       local.aggr_libvirt[host],
       {
         hostname = join(".", [host, local.domains.mdns])
-        disk     = lookup(params, "disk", [])
         hostdev  = lookup(params, "hostdev", [])
       }
     )
