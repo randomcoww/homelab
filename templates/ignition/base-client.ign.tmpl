@@ -39,11 +39,6 @@ systemd:
 
 storage:
   files:
-    - path: /etc/hostname
-      mode: 0644
-      contents:
-        inline:
-          ${p.hostname}
     - path: /etc/systemd/journal.conf.d/05-live.conf
       mode: 0644
       contents:

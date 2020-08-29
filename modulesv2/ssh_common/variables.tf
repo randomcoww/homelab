@@ -11,10 +11,18 @@ variable "ssh_client_public_key" {
   default = ""
 }
 
-variable "hosts" {
+variable "server_hosts" {
   type = any
 }
 
-variable "templates" {
+variable "client_hosts" {
+  type = any
+}
+
+variable "server_templates" {
+  type = list(string)
+}
+
+variable "client_templates" {
   type = list(string)
 }

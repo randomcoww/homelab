@@ -5,9 +5,15 @@ module "ssh-common" {
   domains               = local.domains
   ssh_client_public_key = var.ssh_client_public_key
 
-  templates = local.components.ssh.ignition_templates
-  hosts = {
-    for k in local.components.ssh.nodes :
+  server_templates = local.components.ssh_server.ignition_templates
+  server_hosts = {
+    for k in local.components.ssh_server.nodes :
+    k => local.aggr_hosts[k]
+  }
+
+  client_templates = local.components.ssh_client.ignition_templates
+  client_hosts = {
+    for k in local.components.ssh_client.nodes :
     k => local.aggr_hosts[k]
   }
 }
@@ -266,7 +272,8 @@ locals {
         module.kubernetes-common.worker_templates,
         module.gateway-common.templates,
         module.test-common.templates,
-        module.ssh-common.templates,
+        module.ssh-common.server_templates,
+        module.ssh-common.client_templates,
         module.static-pod-logging.templates,
         module.tls-secrets.templates,
         module.hypervisor.templates,
