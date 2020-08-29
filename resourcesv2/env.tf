@@ -155,8 +155,7 @@ locals {
     # silverblue (gnome) desktop with networkmanager
     desktop = {
       nodes = [
-        "client-0",
-        "client-1",
+        "client",
       ]
       ignition_templates = [
         "${local.templates_path}/ignition/base-client.ign.tmpl",
@@ -164,8 +163,8 @@ locals {
         "${local.templates_path}/ignition/desktop.ign.tmpl",
       ]
     }
-    # ssh client and server keys signed by CA
-    ssh = {
+    # server certs for SSH CA
+    ssh_server = {
       nodes = [
         "gateway-0",
         "gateway-1",
@@ -177,18 +176,23 @@ locals {
         "kvm-0",
         "kvm-1",
         "test-0",
-        "client-0",
-        "client-1",
       ]
       ignition_templates = [
-        "${local.templates_path}/ignition/ssh.ign.tmpl",
+        "${local.templates_path}/ignition/ssh-server.ign.tmpl",
+      ]
+    }
+    ssh_client = {
+      nodes = [
+        "client"
+      ]
+      ignition_templates = [
+        "${local.templates_path}/ignition/ssh-client.ign.tmpl",
       ]
     }
     # cert for fuzzybunny.internal
     traefik_tls = {
       nodes = [
-        "client-0",
-        "client-1",
+        "client",
       ]
       ignition_templates = [
         "${local.templates_path}/ignition/internal_tls.ign.tmpl",
@@ -298,7 +302,6 @@ locals {
       id              = 60
       network         = "192.168.190.0"
       cidr            = 29
-      router          = "192.168.190.6"
       libvirt_network = "sriov"
       mtu             = 9000
     }
@@ -747,15 +750,7 @@ locals {
     }
 
     # client devices
-    client-0 = {
-      disk = [
-        {
-          device     = "/dev/disk/by-label/localhome"
-          mount_path = "/var/home/${local.desktop_user}"
-        }
-      ]
-    }
-    client-1 = {
+    client = {
       disk = [
         {
           device     = "/dev/disk/by-label/localhome"
@@ -770,7 +765,6 @@ locals {
   local_renderer_hosts_include = [
     "kvm-0",
     "kvm-1",
-    "client-0",
-    "client-1",
+    "client",
   ]
 }

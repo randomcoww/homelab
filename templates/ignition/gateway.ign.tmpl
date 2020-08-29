@@ -26,51 +26,26 @@ storage:
         inline: |
           [Resolve]
           DNSStubListener=true
-
-    - path: /etc/systemd/network/10-${p.networks_by_key.sync.if}.network
+    - path: /etc/systemd/network/20-${p.networks_by_key.main.if}.network.d/backup-route.conf
       mode: 0644
       contents:
         inline: |
-          [Match]
-          Name=${p.networks_by_key.sync.if}
-
-          [Link]
-          MTUBytes=${p.networks_by_key.sync.mtu}
-
-          [Network]
-          LinkLocalAddressing=false
-          DHCP=false
-
-          [Address]
-          Address=${p.networks_by_key.sync.ip}/${p.networks_by_key.sync.cidr}
-
           [Route]
-          Gateway=${p.networks_by_key.sync.router}
+          Gateway=${p.networks_by_key.main.router}
           Destination=0.0.0.0/0
           Table=${slave_default_route_table}
 
           [RoutingPolicyRule]
           Table=${slave_default_route_table}
           Priority=${slave_default_route_priority}
-    - path: /etc/systemd/network/10-${p.networks_by_key.wan.if}.network
+    - path: /etc/systemd/network/20-${p.networks_by_key.wan.if}.network.d/gateway.conf
       mode: 0644
       contents:
         inline: |
-          [Match]
-          Name=${p.networks_by_key.wan.if}
-
           [Link]
           RequiredForOnline=false
 
-          [Network]
-          LinkLocalAddressing=false
-          DHCP=true
-          DNS=${dns_forward_ip}
-          DNSOverTLS=yes
-          Domains=~
-
           [DHCP]
-          UseMTU=true
           UseDNS=false
           UseNTP=false
           SendHostname=false
@@ -79,6 +54,10 @@ storage:
           UseTimezone=false
           RouteTable=${master_default_route_table}
 
+          [Network]
+          DNS=${dns_forward_ip}
+          DNSOverTLS=yes
+          Domains=~
     - path: /etc/keepalived/keepalived.conf
       mode: 0644
       overwrite: true
@@ -165,9 +144,9 @@ storage:
 
               iifname $if_trusted accept;
               iifname $if_sync accept;
+
               iifname $if_internal oifname $if_external accept;
               iifname $if_internal tcp dport ssh accept;
-
               %{~ for v in values(loadbalancer_pools) ~}
               iifname $if_internal ip daddr ${v.network}/${v.cidr} accept;
               %{~ endfor ~}
