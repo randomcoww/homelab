@@ -18,6 +18,8 @@ systemd:
       mask: true
     - name: avahi-daemon.socket
       mask: true
+    - name: chronyd.service
+      enabled: true
     - name: NetworkManager.service
       enabled: true
     - name: NetworkManager-wait-online.service
@@ -62,4 +64,3 @@ passwd:
         - adm
         - sudo
         - systemd-journal
-        - wheel

@@ -27,10 +27,11 @@ storage:
       contents:
         inline: "${ssh_host_certificate}"
     # Read ssh authorized keys file created by ignition
-    - path: /etc/ssh/sshd_config.d/22-authorized-keys.conf
+    - path: /etc/ssh/sshd_config.d/22-custom.conf
       mode: 0644
       contents:
         inline: |
+          PasswordAuthentication no
           AuthorizedKeysFile .ssh/authorized_keys .ssh/authorized_keys.d/ignition .ssh/authorized_keys.d/afterburn
 
 passwd:
