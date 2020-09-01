@@ -83,6 +83,11 @@ storage:
           LinkLocalAddressing=false
           DHCP=false
 
+    - path: /etc/ssh/sshd_config.d/10-block-password.conf
+      mode: 0644
+      contents:
+        inline: |
+          PasswordAuthentication no
     - path: /etc/systemd/journal.conf.d/05-live.conf
       mode: 0644
       contents:

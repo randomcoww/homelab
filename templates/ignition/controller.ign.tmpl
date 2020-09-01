@@ -209,9 +209,10 @@ storage:
               - name: AWS_SDK_LOAD_CONFIG
                 value: "1"
               - name: INTERNAL_IP
-                valueFrom:
-                  fieldRef:
-                    fieldPath: status.hostIP
+                value: ${p.networks_by_key.main.ip}
+                # valueFrom:
+                #   fieldRef:
+                #     fieldPath: status.hostIP
               - name: NODE_NAME
                 valueFrom:
                   fieldRef:
