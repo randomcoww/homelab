@@ -14,10 +14,6 @@ systemd:
       mask: true
     - name: NetworkManager-wait-online.service
       mask: true
-    - name: avahi-daemon.service
-      mask: true
-    - name: avahi-daemon.socket
-      mask: true
     - name: chronyd.service
       enabled: true
     - name: systemd-networkd.service
@@ -32,12 +28,6 @@ systemd:
             [Service]
             ExecStart=
             ExecStart=/usr/sbin/fstrim --all --verbose --quiet
-    - name: console-login-helper-messages-issuegen.service
-      dropins:
-        - name: 10-disable-rate-limit.conf
-          contents: |
-            [Unit]
-            StartLimitIntervalSec=0
     - name: systemd-resolved-link.service
       enabled: true
       contents: |
@@ -125,3 +115,4 @@ passwd:
         - adm
         - sudo
         - systemd-journal
+        - wheel

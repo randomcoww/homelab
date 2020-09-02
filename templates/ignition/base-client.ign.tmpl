@@ -32,12 +32,6 @@ systemd:
             [Service]
             ExecStart=
             ExecStart=/usr/sbin/fstrim --all --verbose --quiet
-    - name: console-login-helper-messages-issuegen.service
-      dropins:
-        - name: 10-disable-rate-limit.conf
-          contents: |
-            [Unit]
-            StartLimitIntervalSec=0
 
 storage:
   files:
@@ -69,3 +63,4 @@ passwd:
         - adm
         - sudo
         - systemd-journal
+        - wheel
