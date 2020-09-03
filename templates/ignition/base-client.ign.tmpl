@@ -10,8 +10,6 @@ systemd:
             [Unit]
             ConditionVirtualization=!vm
             ConditionVirtualization=!container
-    - name: firewalld.service
-      mask: true
     - name: systemd-networkd-wait-online.service
       mask: true
     - name: avahi-daemon.service
