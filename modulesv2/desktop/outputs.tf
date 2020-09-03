@@ -12,7 +12,6 @@ output "templates" {
         domains          = var.domains
         udev_steam_input = data.http.udev-60-steam-input.body
         udev_steam_vr    = data.http.udev-60-steam-vr.body
-        swap_device      = "/dev/disk/by-label/swap"
       })
     ]
   }

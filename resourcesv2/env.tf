@@ -751,6 +751,24 @@ locals {
 
     # client devices
     client = {
+      network = [
+        {
+          mac                = "00-1b-21-bc-67-c6"
+          if                 = "en-pf"
+          libvirt_network_pf = "sriov"
+        },
+        {
+          label = "main"
+          if    = "en-main"
+          ip    = "192.168.127.252"
+          dhcp  = true
+        },
+        {
+          label = "int"
+          if    = "en-int"
+          ip    = local.services.renderer.vip
+        }
+      ]
       disk = [
         {
           device     = "/dev/disk/by-label/localhome"

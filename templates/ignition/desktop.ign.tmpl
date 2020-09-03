@@ -17,15 +17,6 @@ systemd:
 
         [Install]
         WantedBy=graphical.target
-    - name: ${join("-", compact(split("/", replace(swap_device, "-", "\\x2d") )))}.swap
-      enabled: true
-      contents: |
-        [Swap]
-        What=${swap_device}
-        TimeoutSec=10s
-
-        [Install]
-        WantedBy=local-fs.target
 storage:
   files:
     ##

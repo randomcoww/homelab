@@ -20,7 +20,7 @@ systemd:
         RemainAfterExit=true
         ExecStart=-/bin/bash -c "echo 31 > /sys/class/net/${p.networks_by_key.en-pf.if}/device/sriov_numvfs"
         ExecStart=/usr/bin/mkdir -p ${dirname(p.boot_image_mount_path)}
-        ExecStart=/usr/bin/coreos-installer iso remove \
+        ExecStart=/usr/bin/coreos-installer iso ignition remove \
           ${p.boot_image_device} -o ${p.boot_image_mount_path}
         ExecStart=/usr/bin/podman volume create \
           --opt type=iso9660 \
