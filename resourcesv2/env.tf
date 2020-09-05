@@ -4,14 +4,14 @@ locals {
   # Default user for CoreOS
   user = "core"
   # Desktop env user. This affects the persistent home directory.
-  desktop_user = "randomcoww"
-  desktop_uid  = 10000
-
   # S3 backup for etcd
   # path is based on the cluster name
   aws_region              = "us-west-2"
   s3_etcd_backup_bucket   = "randomcoww-etcd-backup"
   kubernetes_cluster_name = "default-cluster-2007-1"
+
+  desktop_user = "randomcoww"
+  desktop_uid  = 10000
 
   # kubelet image is used for static pods and does not need to match the kubernetes version
   # hyperkube is used for the worker kubelet and should match the version
@@ -35,23 +35,6 @@ locals {
     promtail                = "docker.io/randomcoww/promtail:v1.5.0"
     matchbox                = "quay.io/poseidon/matchbox:latest"
   }
-
-  boot_disk_label = "fedora-coreos-32"
-  kernel_image    = "images/pxeboot/vmlinuz"
-  initrd_images = [
-    "images/pxeboot/initrd.img",
-    "images/ignition.img",
-  ]
-  kernel_params = [
-    "console=hvc0",
-    "rd.neednet=1",
-    "ignition.firstboot",
-    "ignition.platform.id=metal",
-    "systemd.unified_cgroup_hierarchy=0",
-    # "net.ifnames=0",
-    # "biosdevname=0",
-    "coreos.liveiso=${local.boot_disk_label}",
-  ]
 
   services = {
     # local dev
@@ -134,6 +117,24 @@ locals {
         "${local.templates_path}/ignition/hypervisor.ign.tmpl",
         "${local.templates_path}/ignition/vlan_network.ign.tmpl",
       ]
+      libvirt_network_template = "${local.templates_path}/libvirt/hostdev_network.xml.tmpl"
+      boot_image_device        = "/dev/disk/by-label/fedora-coreos-32"
+      boot_image_mount_path    = "/etc/libvirt/boot/fedora-coreos-32.iso"
+      kernel_image             = "images/pxeboot/vmlinuz"
+      initrd_images = [
+        "images/pxeboot/initrd.img",
+        "images/ignition.img",
+      ]
+      kernel_params = [
+        "console=hvc0",
+        "rd.neednet=1",
+        "ignition.firstboot",
+        "ignition.platform.id=metal",
+        "systemd.unified_cgroup_hierarchy=0",
+        # "net.ifnames=0",
+        # "biosdevname=0",
+        "coreos.liveiso=fedora-coreos-32",
+      ]
     }
     # coreos VMs
     vm = {
@@ -151,6 +152,7 @@ locals {
         "${local.templates_path}/ignition/base-server.ign.tmpl",
         "${local.templates_path}/ignition/general_network.ign.tmpl",
       ]
+      libvirt_domain_template = "${local.templates_path}/libvirt/coreos.xml.tmpl"
     }
     # silverblue (gnome) desktop with networkmanager
     desktop = {
@@ -162,6 +164,7 @@ locals {
         "${local.templates_path}/ignition/storage.ign.tmpl",
         "${local.templates_path}/ignition/desktop.ign.tmpl",
       ]
+
     }
     # server certs for SSH CA
     ssh_server = {
@@ -267,13 +270,6 @@ locals {
     metallb-network  = "${local.templates_path}/manifest/metallb_network.yaml.tmpl"
     kubeconfig-admin = "${local.templates_path}/manifest/kubeconfig_admin.yaml.tmpl"
     loki-lb-service  = "${local.templates_path}/manifest/loki_lb_service.yaml.tmpl"
-  }
-
-  libvirt_domain_templates = {
-    coreos = "${local.templates_path}/libvirt/coreos.xml.tmpl"
-  }
-  libvirt_network_templates = {
-    sriov = "${local.templates_path}/libvirt/hostdev_network.xml.tmpl"
   }
 
   networks = {
@@ -651,17 +647,27 @@ locals {
 
     # KVM
     kvm-0 = {
-      network = [
+      hwif = [
         {
-          mac                = "00-1b-21-bc-4c-16"
-          if                 = "en-pf"
-          libvirt_network_pf = "sriov"
+          label  = "en-pf0"
+          if     = "enp4s0f0"
+          mac    = "00-1b-21-bc-4c-16"
+          numvfs = 15
         },
+        {
+          label  = "en-pf1"
+          if     = "enp4s0f1"
+          mac    = "00-1b-21-bc-4c-17"
+          numvfs = 15
+        },
+      ]
+      network = [
         {
           label = "main"
           if    = "en-main"
           ip    = "192.168.127.251"
           dhcp  = true
+          hwif  = "en-pf0"
         },
         {
           label = "int"
@@ -669,16 +675,26 @@ locals {
           ip    = local.services.renderer.vip
         }
       ]
-      ## hypervisor boot image is copied with coreos-installer to strip
+      ## hypervisorf boot image is copied with coreos-installer to strip
       ## out ignition and re-used to boot VMs
-      libvirt_domains = {
-        coreos = [
-          "gateway-0",
-          "controller-0",
-          "controller-1",
-          "worker-0",
-        ]
-      }
+      libvirt_domains = [
+        {
+          node = "gateway-0",
+          hfiw = "en-pf0",
+        },
+        {
+          node = "controller-0",
+          hfiw = "en-pf0",
+        },
+        {
+          node = "controller-1",
+          hfiw = "en-pf0",
+        },
+        {
+          node = "worker-0",
+          hfiw = "en-pf0",
+        }
+      ]
       dev = {
         # Chipset SATA
         chipset-sata = {
@@ -696,21 +712,29 @@ locals {
           rom      = "/etc/libvirt/boot/SAS9300_8i_IT.bin"
         }
       }
-      boot_image_device     = "/dev/disk/by-label/${local.boot_disk_label}"
-      boot_image_mount_path = "/etc/libvirt/boot/${local.boot_disk_label}.iso"
     }
     kvm-1 = {
-      network = [
+      hwif = [
         {
-          mac                = "00-1b-21-bc-67-c6"
-          if                 = "en-pf"
-          libvirt_network_pf = "sriov"
+          label  = "en-pf0"
+          if     = "enp4s0f0"
+          mac    = "00-1b-21-bc-67-c6"
+          numvfs = 15
         },
+        {
+          label  = "en-pf1"
+          if     = "enp4s0f1"
+          mac    = "00-1b-21-bc-67-c7"
+          numvfs = 15
+        },
+      ]
+      network = [
         {
           label = "main"
           if    = "en-main"
           ip    = "192.168.127.252"
           dhcp  = true
+          hwif  = "en-pf0"
         },
         {
           label = "int"
@@ -720,14 +744,24 @@ locals {
       ]
       ## hypervisor boot image is copied with coreos-installer to strip
       ## out ignition and re-used to boot VMs
-      libvirt_domains = {
-        coreos = [
-          "gateway-1",
-          "controller-1",
-          "controller-2",
-          "worker-1",
-        ]
-      }
+      libvirt_domains = [
+        {
+          node = "gateway-1",
+          hfiw = "en-pf0",
+        },
+        {
+          node = "controller-1",
+          hfiw = "en-pf0",
+        },
+        {
+          node = "controller-2",
+          hfiw = "en-pf0",
+        },
+        {
+          node = "worker-1",
+          hfiw = "en-pf0",
+        }
+      ]
       dev = {
         # Chipset SATA
         chipset-sata = {
@@ -745,29 +779,28 @@ locals {
           rom      = "/etc/libvirt/boot/SAS9300_8i_IT.bin"
         }
       }
-      boot_image_device     = "/dev/disk/by-label/${local.boot_disk_label}"
-      boot_image_mount_path = "/etc/libvirt/boot/${local.boot_disk_label}.iso"
     }
 
     # client devices
     client = {
+      hwif = [
+        {
+          label = "en-pf0"
+          if    = "enp4s0f0"
+          mac   = "f8-f2-1e-1e-3c-40"
+        },
+      ]
       network = [
         {
-          mac                = "00-1b-21-bc-67-c6"
-          if                 = "en-pf"
-          libvirt_network_pf = "sriov"
-        },
-        {
           label = "main"
-          if    = "en-main"
-          ip    = "192.168.127.252"
-          dhcp  = true
+          ip    = "192.168.127.253"
+          hwif  = "en-pf0"
         },
         {
-          label = "int"
-          if    = "en-int"
-          ip    = local.services.renderer.vip
-        }
+          label = "lan"
+          dhcp  = true
+          hwif  = "en-pf0"
+        },
       ]
       disk = [
         {
