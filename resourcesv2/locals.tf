@@ -127,6 +127,7 @@ locals {
   aggr_hosts = {
     for host, params in local.hosts :
     host => merge(
+      local.aggr_component_params[host],
       params,
       local.aggr_network_params[host],
       local.aggr_networks_by_key[host],
@@ -142,7 +143,6 @@ locals {
           })
         ]
       },
-      local.aggr_component_params[host],
       local.aggr_libvirt[host],
     )
   }

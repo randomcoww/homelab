@@ -11,20 +11,22 @@ systemd:
       enabled: true
       contents: |
         [Unit]
-        ConditionPathExists=${p.boot_image_device}
-        ConditionPathExists=!${p.boot_image_mount_path}
+        ConditionPathExists=${p.guest_image_device}
+        ConditionPathExists=!${p.guest_image_mount_path}
         After=local-fs.target
 
         [Service]
         Type=oneshot
         RemainAfterExit=true
-        ExecStart=-/bin/bash -c "echo 31 > /sys/class/net/${p.networks_by_key.en-pf.if}/device/sriov_numvfs"
-        ExecStart=/usr/bin/mkdir -p ${dirname(p.boot_image_mount_path)}
+        %{~ for v in p.hwif ~}
+        ExecStart=-/bin/bash -c "echo ${v.numvfs} > /sys/class/net/${v.label}/device/sriov_numvfs"
+        %{~ endfor ~}
+        ExecStart=/usr/bin/mkdir -p ${dirname(p.guest_image_mount_path)}
         ExecStart=/usr/bin/coreos-installer iso ignition remove \
-          ${p.boot_image_device} -o ${p.boot_image_mount_path}
+          ${p.guest_image_device} -o ${p.guest_image_mount_path}
         ExecStart=/usr/bin/podman volume create \
           --opt type=iso9660 \
-          --opt device=${p.boot_image_mount_path} \
+          --opt device=${p.guest_image_mount_path} \
           image_vol
 
         [Install]
@@ -37,7 +39,7 @@ systemd:
         Wants=network-online.target
         After=prepare-vm-resources.service
         Wants=prepare-vm-resources.service
-        ConditionPathExists=${p.boot_image_mount_path}
+        ConditionPathExists=${p.guest_image_mount_path}
 
         [Service]
         TimeoutStartSec=5m
@@ -77,7 +79,7 @@ systemd:
             Wants=matchbox.service
             Before=libvirtd.service
             WantedBy=libvirtd.service
-            ConditionPathExists=${p.boot_image_mount_path}
+            ConditionPathExists=${p.guest_image_mount_path}
 
             [Service]
             ExecStart=

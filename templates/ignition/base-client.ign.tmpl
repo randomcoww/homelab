@@ -53,10 +53,53 @@ storage:
         inline: |
           [Manager]
           DumpCore=false
+    - path: /etc/NetworkManager/conf.d/custom.conf
+      mode: 0644
+      contents:
+        inline: |
+          [main]
+          no-auto-default=*
+
+    %{~ for v in p.hwif ~}
+    - path: /etc/NetworkManager/system-connections/${v.label}.nmconnection
+      mode: 0600
+      contents:
+        inline: |
+          [connection]
+          type=ethernet
+
+          [ethernet]
+          mac-address=${replace(v.mac, "-", ":")}
+          mtu=${lookup(v, "mtu", 9000)}
+    %{~ endfor ~}
+    %{~ for v in p.network ~}
+    %{~ if lookup(v, "id", null) != null ~}
+    - path: /etc/NetworkManager/system-connections/${v.label}.nmconnection
+      mode: 0600
+      contents:
+        inline: |
+          [connection]
+          type=vlan
+
+          [vlan]
+          parent=${p.hwif_by_key[v.hwif].if}
+          id=${v.id}
+
+          [ipv4]
+          method=%{if lookup(v, "dhcp", false)}auto%{else}manual%{endif}
+          %{~ if lookup(v, "ip", null) != null && lookup(v, "cidr", null) != null ~}
+          addresses=${v.ip}/${v.cidr}
+          %{~ endif ~}
+    %{~ endif ~}
+    %{~ endfor ~}
 
 passwd:
   users:
-    - name: ${user}
+    - name: ${p.client_user}
+      uid: ${p.client_user_uid}
+      %{~ if length(client_password) > 0 ~}
+      password_hash: ${client_password}
+      %{~ endif ~}
       groups:
         - adm
         - sudo

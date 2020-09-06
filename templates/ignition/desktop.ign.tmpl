@@ -144,16 +144,3 @@ storage:
           pref("toolkit.telemetry.enabled", false);
           pref("network.trr.mode", 0);
           pref("signon.rememberSignons", false);
-
-passwd:
-  users:
-    - name: ${desktop_user}
-      uid: ${desktop_uid}
-      %{~ if length(desktop_password) > 0 ~}
-      password_hash: ${desktop_password}
-      %{~ endif ~}
-      groups:
-        - adm
-        - sudo
-        - systemd-journal
-        - wheel

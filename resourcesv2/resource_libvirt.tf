@@ -31,23 +31,17 @@ module "libvirt-kvm-0" {
   source = "../modulesv2/libvirt"
 
   endpoint = module.hypervisor.libvirt_endpoints.kvm-0.endpoint
-  domains = merge([
-    for params in values(local.aggr_hosts.kvm-0.libvirt_domains) :
-    {
-      for node in params.nodes :
-      node => chomp(templatefile(params.template, {
-        name         = node
-        p            = local.aggr_hosts[node]
-        hypervisor_p = local.aggr_hosts.kvm-0
-      }))
-    }]...
-  )
+  domains = {
+    for v in local.aggr_hosts.kvm-0.libvirt_domains :
+    v.node => chomp(local.aggr_hosts[v.node].libvirt_domain_template, {
+      name = v.node
+      p    = local.aggr_hosts[v.node]
+      hwif = v.hwif
+    })
+  }
   networks = {
-    for name, params in local.aggr_hosts.kvm-0.libvirt_networks :
-    name => chomp(templatefile(params.template, {
-      name = name
-      pf   = params.pf
-    }))
+    for v in local.aggr_hosts.kvm-0.hwif :
+    v.node => chomp(local.aggr_hosts.kvm-0.libvirt_network_template, v)
   }
 }
 
@@ -55,46 +49,16 @@ module "libvirt-kvm-1" {
   source = "../modulesv2/libvirt"
 
   endpoint = module.hypervisor.libvirt_endpoints.kvm-1.endpoint
-  domains = merge([
-    for params in values(local.aggr_hosts.kvm-1.libvirt_domains) :
-    {
-      for node in params.nodes :
-      node => chomp(templatefile(params.template, {
-        name         = node
-        p            = local.aggr_hosts[node]
-        hypervisor_p = local.aggr_hosts.kvm-1
-      }))
-    }]...
-  )
-  networks = {
-    for name, params in local.aggr_hosts.kvm-1.libvirt_networks :
-    name => chomp(templatefile(params.template, {
-      name = name
-      pf   = params.pf
-    }))
+  domains = {
+    for v in local.aggr_hosts.kvm-1.libvirt_domains :
+    v.node => chomp(local.aggr_hosts[v.node].libvirt_domain_template, {
+      name = v.node
+      p    = local.aggr_hosts[v.node]
+      hwif = v.hwif
+    })
   }
-}
-
-module "libvirt-desktop" {
-  source = "../modulesv2/libvirt"
-
-  endpoint = module.hypervisor.libvirt_endpoints.desktop.endpoint
-  domains = merge([
-    for params in values(local.aggr_hosts.desktop.libvirt_domains) :
-    {
-      for node in params.nodes :
-      node => chomp(templatefile(params.template, {
-        name         = node
-        p            = local.aggr_hosts[node]
-        hypervisor_p = local.aggr_hosts.desktop
-      }))
-    }]...
-  )
   networks = {
-    for name, params in local.aggr_hosts.desktop.libvirt_networks :
-    name => chomp(templatefile(params.template, {
-      name = name
-      pf   = params.pf
-    }))
+    for v in local.aggr_hosts.kvm-1.hwif :
+    v.node => chomp(local.aggr_hosts.kvm-0.libvirt_network_template, v)
   }
 }

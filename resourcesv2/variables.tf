@@ -1,5 +1,5 @@
 # (Optional) Local login. SSH only otherwise.
-variable "desktop_password" {
+variable "client_password" {
   type    = string
   default = ""
 }

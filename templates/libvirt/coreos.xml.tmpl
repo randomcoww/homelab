@@ -42,7 +42,7 @@
     </interface>
     %{~ else ~}
     <interface type='direct' trustGuestRxFilters='yes'>
-      <source dev='${hypervisor_p.networks_by_key[n.label].if}' mode='bridge'/>
+      <source dev='${hwif}' mode='bridge'/>
       %{~ if lookup(n, "mac", null) != null ~}
       <mac address='${join(":", split("-", n.mac))}'/>
       %{~ endif ~}

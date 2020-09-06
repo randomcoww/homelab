@@ -31,18 +31,18 @@ module "ignition-kvm-0" {
     for params in values(local.aggr_hosts.kvm-0.libvirt_domains) :
     {
       for h in params.nodes :
-      h => {
-        templates = lookup(local.templates_by_host, h, [])
-        selector  = lookup(local.aggr_hosts[h].networks_by_key, "int", {})
+      h.node => {
+        templates     = lookup(local.templates_by_host, h.node, [])
+        selector      = lookup(local.aggr_hosts[h.node].networks_by_key, "int", {})
+        kernel_image  = local.aggr_hosts[h.node].kernel_image
+        initrd_images = local.aggr_hosts[h.node].initrd_images
+        kernel_params = local.aggr_hosts[h.node].kernel_params
       }
     }]...
   )
 
-  services      = local.services
-  renderer      = module.hypervisor.matchbox_rpc_endpoints.kvm-0
-  kernel_image  = local.kernel_image
-  initrd_images = local.initrd_images
-  kernel_params = local.kernel_params
+  services = local.services
+  renderer = module.hypervisor.matchbox_rpc_endpoints.kvm-0
 }
 
 module "ignition-kvm-1" {
@@ -53,38 +53,17 @@ module "ignition-kvm-1" {
     {
       for h in params.nodes :
       h => {
-        templates = lookup(local.templates_by_host, h, [])
-        selector  = lookup(local.aggr_hosts[h].networks_by_key, "int", {})
+        templates     = lookup(local.templates_by_host, h, [])
+        selector      = lookup(local.aggr_hosts[h].networks_by_key, "int", {})
+        kernel_image  = local.aggr_hosts[h.node].kernel_image
+        initrd_images = local.aggr_hosts[h.node].initrd_images
+        kernel_params = local.aggr_hosts[h.node].kernel_params
       }
     }]...
   )
 
-  services      = local.services
-  renderer      = module.hypervisor.matchbox_rpc_endpoints.kvm-1
-  kernel_image  = local.kernel_image
-  initrd_images = local.initrd_images
-  kernel_params = local.kernel_params
-}
-
-module "ignition-desktop" {
-  source = "../modulesv2/ignition_pxe"
-
-  ignition_params = merge([
-    for params in values(local.aggr_hosts.desktop.libvirt_domains) :
-    {
-      for h in params.nodes :
-      h => {
-        templates = lookup(local.templates_by_host, h, [])
-        selector  = lookup(local.aggr_hosts[h].networks_by_key, "int", {})
-      }
-    }]...
-  )
-
-  services      = local.services
-  renderer      = module.hypervisor.matchbox_rpc_endpoints.desktop
-  kernel_image  = local.kernel_image
-  initrd_images = local.initrd_images
-  kernel_params = local.kernel_params
+  services = local.services
+  renderer = module.hypervisor.matchbox_rpc_endpoints.kvm-1
 }
 
 ##

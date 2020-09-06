@@ -1,18 +1,17 @@
 locals {
   templates_path = "${path.module}/../templates"
 
-  # Default user for CoreOS
-  user = "core"
+  # Default user for CoreOS and Silverblue
+  user        = "core"
+  client_user = "randomcoww"
   # Desktop env user. This affects the persistent home directory.
   # S3 backup for etcd
   # path is based on the cluster name
   aws_region              = "us-west-2"
   s3_etcd_backup_bucket   = "randomcoww-etcd-backup"
-  kubernetes_cluster_name = "default-cluster-2007-1"
-
-  desktop_user = "randomcoww"
-  desktop_uid  = 10000
-
+  kubernetes_cluster_name = "default-cluster-2009-1"
+  # KVM guest image base name
+  guest_image_label = "fedora-coreos-32"
   # kubelet image is used for static pods and does not need to match the kubernetes version
   # hyperkube is used for the worker kubelet and should match the version
   container_images = {
@@ -118,23 +117,8 @@ locals {
         "${local.templates_path}/ignition/vlan_network.ign.tmpl",
       ]
       libvirt_network_template = "${local.templates_path}/libvirt/hostdev_network.xml.tmpl"
-      boot_image_device        = "/dev/disk/by-label/fedora-coreos-32"
-      boot_image_mount_path    = "/etc/libvirt/boot/fedora-coreos-32.iso"
-      kernel_image             = "images/pxeboot/vmlinuz"
-      initrd_images = [
-        "images/pxeboot/initrd.img",
-        "images/ignition.img",
-      ]
-      kernel_params = [
-        "console=hvc0",
-        "rd.neednet=1",
-        "ignition.firstboot",
-        "ignition.platform.id=metal",
-        "systemd.unified_cgroup_hierarchy=0",
-        # "net.ifnames=0",
-        # "biosdevname=0",
-        "coreos.liveiso=fedora-coreos-32",
-      ]
+      guest_image_device       = "/dev/disk/by-label/${local.guest_image_label}"
+      guest_image_mount_path   = "/etc/libvirt/boot/${local.guest_image_label}.iso"
     }
     # coreos VMs
     vm = {
@@ -153,6 +137,21 @@ locals {
         "${local.templates_path}/ignition/general_network.ign.tmpl",
       ]
       libvirt_domain_template = "${local.templates_path}/libvirt/coreos.xml.tmpl"
+      kernel_image            = "images/pxeboot/vmlinuz"
+      initrd_images = [
+        "images/pxeboot/initrd.img",
+        "images/ignition.img",
+      ]
+      kernel_params = [
+        "console=hvc0",
+        "rd.neednet=1",
+        "ignition.firstboot",
+        "ignition.platform.id=metal",
+        "systemd.unified_cgroup_hierarchy=0",
+        # "net.ifnames=0",
+        # "biosdevname=0",
+        "coreos.liveiso=${local.guest_image_label}",
+      ]
     }
     # silverblue (gnome) desktop with networkmanager
     desktop = {
@@ -802,10 +801,12 @@ locals {
           hwif  = "en-pf0"
         },
       ]
+      client_user     = local.client_user
+      client_user_uid = 10000
       disk = [
         {
           device     = "/dev/disk/by-label/localhome"
-          mount_path = "/var/home/${local.desktop_user}"
+          mount_path = "/var/home/${local.client_user}"
         }
       ]
     }
@@ -814,8 +815,16 @@ locals {
   # similar to guests filter
   # control which configs are rendered on local matchbox
   local_renderer_hosts_include = [
+    "gateway-0",
+    "gateway-1",
+    "controller-0",
+    "controller-1",
+    "controller-2",
+    "worker-0",
+    "worker-1",
     "kvm-0",
     "kvm-1",
+    "test-0",
     "client",
   ]
 }

@@ -17,12 +17,12 @@ resource "matchbox_profile" "ign" {
   for_each = var.ignition_params
 
   name   = each.key
-  kernel = "/assets/${var.kernel_image}"
+  kernel = "/assets/${each.value.kernel_image}"
   initrd = [
-    for k in var.initrd_images :
+    for k in each.value.initrd_images :
     "/assets/${k}"
   ]
-  args = concat(var.kernel_params, [
+  args = concat(each.value.kernel_params, [
     "ignition.config.url=http://${var.services.renderer.vip}:${var.services.renderer.ports.http}/ignition?mac=$${mac:hexhyp}",
     "ip=${each.value.selector.if}:dhcp",
   ])

@@ -6,29 +6,25 @@ storage:
     ##
     ## allocate vlan interfaces to hardware
     ##
-    - path: /etc/systemd/network/10-${p.networks_by_key.en-pf.if}.link
+    %{~ for v in p.hwif ~}
+    - path: /etc/systemd/network/10-${v.label}.link
       mode: 0644
       contents:
         inline: |
           [Match]
-          PermanentMACAddress=${p.networks_by_key.en-pf.mac}
+          PermanentMACAddress=${v.mac}
 
           [Link]
-          MTUBytes=${max([
-            for k, v in p.networks_by_key:
-            lookup(v, "mtu", 1500)
-            if lookup(v, "id", null) != null
-          ]...
-          )}
+          MTUBytes=${lookup(v, "mtu", 9000)}
           MACAddressPolicy=persistent
-          Name=${p.networks_by_key.en-pf.if}
-    - path: /etc/systemd/network/12-${p.networks_by_key.en-pf.if}.network
+          Name=${v.label}
+    - path: /etc/systemd/network/12-${v.label}.network
       mode: 0644
       contents:
         inline: |
           [Match]
-          Name=${p.networks_by_key.en-pf.if}
-          MACAddress=${p.networks_by_key.en-pf.mac}
+          Name=${v.label}
+          MACAddress=${v.mac}
 
           [Link]
           ARP=false
@@ -36,13 +32,12 @@ storage:
           [Network]
           LinkLocalAddressing=false
           DHCP=false
-          %{~ for k, v in p.networks_by_key ~}
-          %{~ if lookup(v, "id", null) != null ~}
-          VLAN=${v.if}
-          %{~ endif ~}
+          %{~ for c in v.children ~}
+          VLAN=${p.networks_by_key[c].if}
           %{~ endfor ~}
+    %{~ endfor ~}
 
-    %{~ for k, v in p.networks_by_key ~}
+    %{~ for v in p.network ~}
     %{~ if lookup(v, "id", null) != null ~}
     - path: /etc/systemd/network/20-${v.if}.netdev
       mode: 0644

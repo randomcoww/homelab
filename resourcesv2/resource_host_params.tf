@@ -79,11 +79,8 @@ module "test-common" {
 module "desktop" {
   source = "../modulesv2/desktop"
 
-  user             = local.user
-  desktop_user     = local.desktop_user
-  desktop_uid      = local.desktop_uid
-  desktop_password = var.desktop_password
-  domains          = local.domains
+  client_password = var.client_password
+  domains         = local.domains
 
   templates = local.components.desktop.ignition_templates
   hosts = {
