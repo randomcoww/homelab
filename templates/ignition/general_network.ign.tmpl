@@ -3,7 +3,7 @@ variant: fcos
 version: 1.0.0
 storage:
   files:
-    %{~ for k, v in p.networks_by_key ~}
+    %{~ for v in p.network ~}
     %{~ if lookup(v, "id", null) != null ~}
     - path: /etc/systemd/network/20-${v.if}.network
       mode: 0644
@@ -32,13 +32,13 @@ storage:
           %{~ endif ~}
     %{~ endif ~}
     %{~ endfor ~}
-    - path: /etc/systemd/network/20-${p.networks_by_key.int.if}.network
+    - path: /etc/systemd/network/20-${p.metadata.if}.network
       mode: 0644
       contents:
         inline: |
           [Match]
           Virtualization=vm
-          Name=${p.networks_by_key.int.if}
+          Name=${p.metadata.if}
 
           [Link]
           Unmanaged=true

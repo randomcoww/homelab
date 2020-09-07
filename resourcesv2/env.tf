@@ -9,7 +9,7 @@ locals {
   # path is based on the cluster name
   aws_region              = "us-west-2"
   s3_etcd_backup_bucket   = "randomcoww-etcd-backup"
-  kubernetes_cluster_name = "default-cluster-2009-1"
+  kubernetes_cluster_name = "default-cluster-2007-1"
   # KVM guest image base name
   guest_image_label = "fedora-coreos-32"
   # kubelet image is used for static pods and does not need to match the kubernetes version
@@ -279,7 +279,6 @@ locals {
       cidr            = 23
       router          = "192.168.126.240"
       dhcp_pool       = "192.168.127.64/26"
-      libvirt_network = "sriov"
       mdns            = true
       mtu             = 9000
     }
@@ -289,7 +288,6 @@ locals {
       cidr            = 23
       router          = "192.168.62.240"
       dhcp_pool       = "192.168.63.64/26"
-      libvirt_network = "sriov"
       mtu             = 9000
     }
     # gateway state sync
@@ -297,19 +295,16 @@ locals {
       id              = 60
       network         = "192.168.190.0"
       cidr            = 29
-      libvirt_network = "sriov"
       mtu             = 9000
     }
     wan = {
       id              = 30
-      libvirt_network = "sriov"
     }
     # internal network on each hypervisor for PXE bootstrap
     int = {
       network   = "192.168.224.0"
       cidr      = 23
       dhcp_pool = "192.168.225.64/26"
-      bootorder = 1
     }
     # kubernetes internal
     kubernetes = {
@@ -339,11 +334,6 @@ locals {
       # increments the slot for each element
       network = [
         {
-          label = "int"
-          if    = "ens2"
-          mac   = "52-54-00-1a-61-2a"
-        },
-        {
           label = "main"
           ip    = "192.168.127.217"
           if    = "ens3"
@@ -365,17 +355,17 @@ locals {
           dhcp  = true
         }
       ]
+      metadata = {
+        label = "int"
+        if    = "ens2"
+        mac   = "52-54-00-1a-61-2a"
+      }
       kea_ha_role = "primary"
     }
     gateway-1 = {
       memory = 2
       vcpu   = 1
       network = [
-        {
-          label = "int"
-          if    = "ens2"
-          mac   = "52-54-00-1a-61-2b"
-        },
         {
           label = "main"
           ip    = "192.168.127.218"
@@ -398,6 +388,11 @@ locals {
           dhcp  = true
         }
       ]
+      metadata = {
+        label = "int"
+        if    = "ens2"
+        mac   = "52-54-00-1a-61-2b"
+      }
       kea_ha_role = "secondary"
     }
 
@@ -407,27 +402,22 @@ locals {
       vcpu   = 2
       network = [
         {
-          label = "int"
-          if    = "ens2"
-          mac   = "52-54-00-1a-61-0a"
-        },
-        {
           label = "main"
           ip    = "192.168.127.219"
           if    = "ens3"
           dhcp  = true
         }
       ]
+      metadata = {
+        label = "int"
+        if    = "ens2"
+        mac   = "52-54-00-1a-61-0a"
+      }
     }
     controller-1 = {
       memory = 4
       vcpu   = 2
       network = [
-        {
-          label = "int"
-          if    = "ens2"
-          mac   = "52-54-00-1a-61-0b"
-        },
         {
           label = "main"
           ip    = "192.168.127.220"
@@ -435,16 +425,16 @@ locals {
           dhcp  = true
         }
       ]
+      metadata = {
+        label = "int"
+        if    = "ens2"
+        mac   = "52-54-00-1a-61-0b"
+      }
     }
     controller-2 = {
       memory = 4
       vcpu   = 2
       network = [
-        {
-          label = "int"
-          if    = "ens2"
-          mac   = "52-54-00-1a-61-0c"
-        },
         {
           label = "main"
           ip    = "192.168.127.221"
@@ -452,6 +442,11 @@ locals {
           dhcp  = true
         }
       ]
+      metadata = {
+        label = "int"
+        if    = "ens2"
+        mac   = "52-54-00-1a-61-0c"
+      }
     }
 
     # workers
@@ -460,16 +455,16 @@ locals {
       vcpu   = 6
       network = [
         {
-          label = "int"
-          if    = "ens2"
-          mac   = "52-54-00-1a-61-1a"
-        },
-        {
           label = "main"
           if    = "ens3"
           dhcp  = true
         }
       ]
+      metadata = {
+        label = "int"
+        if    = "ens2"
+        mac   = "52-54-00-1a-61-1a"
+      }
       hostdev = [
         "chipset-sata",
         "hba"
@@ -549,16 +544,16 @@ locals {
       vcpu   = 6
       network = [
         {
-          label = "int"
-          if    = "ens2"
-          mac   = "52-54-00-1a-61-1b"
-        },
-        {
           label = "main"
           if    = "ens3"
           dhcp  = true
         }
       ]
+      metadata = {
+        label = "int"
+        if    = "ens2"
+        mac   = "52-54-00-1a-61-1b"
+      }
       hostdev = [
         "chipset-sata",
         "hba"
@@ -632,16 +627,16 @@ locals {
       vcpu   = 2
       network = [
         {
-          label = "int"
-          if    = "ens2"
-          mac   = "52-54-00-1a-61-3a"
-        },
-        {
           label = "main"
           if    = "ens3"
           dhcp  = true
         }
       ]
+      metadata = {
+        label = "int"
+        if    = "ens2"
+        mac   = "52-54-00-1a-61-3a"
+      }
     }
 
     # KVM
@@ -667,31 +662,31 @@ locals {
           ip    = "192.168.127.251"
           dhcp  = true
           hwif  = "en-pf0"
-        },
-        {
-          label = "int"
-          if    = "en-int"
-          ip    = local.services.renderer.vip
         }
       ]
+      metadata = {
+        label = "int"
+        if    = "en-int"
+        ip    = local.services.renderer.vip
+      }
       ## hypervisorf boot image is copied with coreos-installer to strip
       ## out ignition and re-used to boot VMs
       libvirt_domains = [
         {
           node = "gateway-0",
-          hfiw = "en-pf0",
+          hwif = "en-pf0",
         },
         {
           node = "controller-0",
-          hfiw = "en-pf0",
+          hwif = "en-pf0",
         },
         {
           node = "controller-1",
-          hfiw = "en-pf0",
+          hwif = "en-pf0",
         },
         {
           node = "worker-0",
-          hfiw = "en-pf0",
+          hwif = "en-pf0",
         }
       ]
       dev = {
@@ -734,31 +729,31 @@ locals {
           ip    = "192.168.127.252"
           dhcp  = true
           hwif  = "en-pf0"
-        },
-        {
-          label = "int"
-          if    = "en-int"
-          ip    = local.services.renderer.vip
         }
       ]
+      metadata = {
+        label = "int"
+        if    = "en-int"
+        ip    = local.services.renderer.vip
+      }
       ## hypervisor boot image is copied with coreos-installer to strip
       ## out ignition and re-used to boot VMs
       libvirt_domains = [
         {
           node = "gateway-1",
-          hfiw = "en-pf0",
+          hwif = "en-pf0",
         },
         {
           node = "controller-1",
-          hfiw = "en-pf0",
+          hwif = "en-pf0",
         },
         {
           node = "controller-2",
-          hfiw = "en-pf0",
+          hwif = "en-pf0",
         },
         {
           node = "worker-1",
-          hfiw = "en-pf0",
+          hwif = "en-pf0",
         }
       ]
       dev = {
@@ -787,19 +782,14 @@ locals {
           label = "en-pf0"
           if    = "enp4s0f0"
           mac   = "f8-f2-1e-1e-3c-40"
-        },
+        }
       ]
       network = [
         {
           label = "main"
-          ip    = "192.168.127.253"
-          hwif  = "en-pf0"
-        },
-        {
-          label = "lan"
           dhcp  = true
           hwif  = "en-pf0"
-        },
+        }
       ]
       client_user     = local.client_user
       client_user_uid = 10000

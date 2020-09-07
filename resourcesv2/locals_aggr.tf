@@ -55,6 +55,16 @@ locals {
     }
   }
 
+  aggr_metadata = {
+    for host, params in local.hosts :
+    host => {
+      metadata = merge(
+        lookup(local.networks, lookup(lookup(params, "metadata", {}), "label", ""), {}),
+        lookup(params, "metadata", {})
+      )
+    }
+  }
+
   #### Merge component params with host params
 
   # Map node -> component
@@ -98,31 +108,6 @@ locals {
     )
   }
 
-  #### Merge libvirt host params with guest params
-
-  # Map guest -> host
-  aggr_guest_hypervisors = transpose({
-    for host, params in local.hosts :
-    host => [
-      for domain in lookup(params, "libvirt_domains", []) :
-      domain.node
-    ]
-  })
-
-  aggr_libvirt = {
-    for host, params in local.hosts :
-    host => {
-      # Add hostdev by hypervisor
-      hostdev = {
-        for hypervisor in lookup(local.aggr_guest_hypervisors, host, []) :
-        hypervisor => [
-          for dev in lookup(params, "hostdev", []) :
-          lookup(lookup(local.hosts[hypervisor], "dev", {}), dev, {})
-        ]
-      }
-    }
-  }
-
   #### Build all
   aggr_hosts = {
     for host, params in local.hosts :
@@ -133,6 +118,7 @@ locals {
       local.aggr_networks_by_key[host],
       local.aggr_hwif_params[host],
       local.aggr_hwif_by_key[host],
+      local.aggr_metadata[host],
       {
         hostname = join(".", [host, local.domains.mdns])
         hostdev  = lookup(params, "hostdev", [])
@@ -142,8 +128,41 @@ locals {
             systemd_unit_name = join("-", compact(split("/", replace(d.mount_path, "-", "\\x2d"))))
           })
         ]
-      },
-      local.aggr_libvirt[host],
+      }
     )
   }
+
+  #### Merge libvirt host params with guest params
+
+  aggr_libvirt_domains = {
+    for host, params in local.hosts :
+    host => [
+      for d in lookup(params, "libvirt_domains", []) :
+      merge(local.aggr_hosts[d.node], d)
+    ]
+  }
+
+  # # Map guest -> host
+  # aggr_guest_hypervisors = transpose({
+  #   for host, params in local.hosts :
+  #   host => [
+  #     for domain in lookup(params, "libvirt_domains", []) :
+  #     domain.node
+  #   ]
+  # })
+
+  # # Add hostdev by hypervisor
+  # aggr_libvirt = {
+  #   for host, params in local.hosts :
+  #   host => {
+  #     hostdev = {
+  #       for hypervisor in lookup(local.aggr_guest_hypervisors, host, []) :
+  #       hypervisor => [
+  #         for dev in lookup(params, "hostdev", []) :
+  #         lookup(lookup(local.hosts[hypervisor], "dev", {}), dev, {})
+  #       ]
+  #     }
+  #   }
+  # }
 }
+

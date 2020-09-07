@@ -34,7 +34,6 @@ output "templates" {
         matchbox_tls_path    = "/etc/matchbox/certs"
         matchbox_data_path   = "/etc/matchbox/data"
         matchbox_assets_path = "/etc/matchbox/assets"
-        internal_networks    = ["int"]
 
         tls_matchbox_ca  = replace(tls_self_signed_cert.matchbox-ca.cert_pem, "\n", "\\n")
         tls_matchbox     = replace(tls_locally_signed_cert.matchbox[host].cert_pem, "\n", "\\n")

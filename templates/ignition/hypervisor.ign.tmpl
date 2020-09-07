@@ -87,24 +87,23 @@ systemd:
 
 storage:
   files:
-    %{~ for k in internal_networks ~}
     ##
-    ## internal network ${k} for host <-> local vm
+    ## internal network ${p.metadata.label} for host <-> local vm
     ##
-    - path: /etc/systemd/network/10-${p.networks_by_key[k].if}.netdev
+    - path: /etc/systemd/network/10-${p.metadata.if}.netdev
       mode: 0644
       contents:
         inline: |
           [NetDev]
-          Name=${p.networks_by_key[k].if}
+          Name=${p.metadata.if}
           Kind=bridge
 
-    - path: /etc/systemd/network/10-${p.networks_by_key[k].if}.network
+    - path: /etc/systemd/network/10-${p.metadata.if}.network
       mode: 0644
       contents:
         inline: |
           [Match]
-          Name=${p.networks_by_key[k].if}
+          Name=${p.metadata.if}
 
           [Link]
           ARP=false
@@ -112,23 +111,23 @@ storage:
           [Network]
           LinkLocalAddressing=false
           DHCP=false
-          MACVTAP=${k}-tap
-          Bridge=${k}-dummy
+          MACVTAP=${p.metadata.label}-tap
+          Bridge=${p.metadata.label}-dummy
 
-    - path: /etc/systemd/network/10-${k}-dummy.netdev
+    - path: /etc/systemd/network/10-${p.metadata.label}-dummy.netdev
       mode: 0644
       contents:
         inline: |
           [NetDev]
-          Name=${k}-dummy
+          Name=${p.metadata.label}-dummy
           Kind=dummy
 
-    - path: /etc/systemd/network/10-${k}-dummy.network
+    - path: /etc/systemd/network/10-${p.metadata.label}-dummy.network
       mode: 0644
       contents:
         inline: |
           [Match]
-          Name=${k}-dummy
+          Name=${p.metadata.label}-dummy
 
           [Link]
           ARP=false
@@ -136,33 +135,32 @@ storage:
           [Network]
           LinkLocalAddressing=false
           DHCP=false
-          Bridge=${p.networks_by_key[k].if}
+          Bridge=${p.metadata.if}
 
-    - path: /etc/systemd/network/10-${k}-tap.netdev
+    - path: /etc/systemd/network/10-${p.metadata.label}-tap.netdev
       mode: 0644
       contents:
         inline: |
           [NetDev]
-          Name=${k}-tap
+          Name=${p.metadata.label}-tap
           Kind=macvtap
 
           [MACVTAP]
           Mode=bridge
 
-    - path: /etc/systemd/network/10-${k}-tap.network
+    - path: /etc/systemd/network/10-${p.metadata.label}-tap.network
       mode: 0644
       contents:
         inline: |
           [Match]
-          Name=${k}-tap
+          Name=${p.metadata.label}-tap
 
           [Network]
           LinkLocalAddressing=false
           DHCP=false
 
           [Address]
-          Address=${p.networks_by_key[k].ip}/${p.networks_by_key[k].cidr}
-    %{~ endfor ~}
+          Address=${p.metadata.ip}/${p.metadata.cidr}
 
     - path: /etc/kea/kea-dhcp4-internal.conf
       mode: 0644
@@ -177,9 +175,7 @@ storage:
               },
               "interfaces-config": {
                 "interfaces": ${jsonencode([
-                  for k in internal_networks:
-                  "${k}-tap"
-                  if lookup(p.networks_by_key[k], "dhcp_pool", null) != null
+                  "${p.metadata.label}-tap"
                 ])}
               },
               "client-classes": [
@@ -190,16 +186,14 @@ storage:
                 }
               ],
               "subnet4": ${jsonencode([
-                for k in internal_networks:
                 {
-                  subnet = "${p.networks_by_key[k].network}/${p.networks_by_key[k].cidr}",
+                  subnet = "${p.metadata.network}/${p.metadata.cidr}",
                   pools = [
                     {
-                      pool = p.networks_by_key[k].dhcp_pool
+                      pool = p.metadata.dhcp_pool
                     }
                   ]
                 }
-                if lookup(p.networks_by_key[k], "dhcp_pool", null) != null
               ])}
             }
           }

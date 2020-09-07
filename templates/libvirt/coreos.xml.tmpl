@@ -1,5 +1,5 @@
 <domain type='kvm'>
-  <name>${name}</name>
+  <name>${p.node}</name>
   <memory unit='GiB'>${p.memory}</memory>
   <currentMemory unit='GiB'>${p.memory}</currentMemory>
   <vcpu placement='static'>${p.vcpu}</vcpu>
@@ -19,15 +19,23 @@
   <on_crash>restart</on_crash>
   <devices>
     <emulator>/usr/bin/qemu-kvm</emulator>
-    %{~ for n in p.network ~}
-    %{~ if lookup(n, "libvirt_network", null) != null ~}
-    <interface type='network'>
-    <source network='${n.libvirt_network}'/>
-      %{~ if lookup(n, "mac", null) != null ~}
-      <mac address='${join(":", split("-", n.mac))}'/>
+    <interface type='direct' trustGuestRxFilters='yes'>
+      <source dev='${host_p.metadata.if}' mode='bridge'/>
+      %{~ if lookup(p.metadata, "mac", null) != null ~}
+      <mac address='${replace(p.metadata.mac, "-", ":")}'/>
       %{~ endif ~}
-      %{~ if lookup(n, "bootorder", null) != null ~}
-      <boot order='${n.bootorder}'/>
+      <boot order='1'/>
+      %{~ if lookup(p.metadata, "mtu", null) != null ~}
+      <mtu size='${p.metadatan.mtu}'/>
+      %{~ endif ~}
+      <guest dev="${p.metadata.if}"/>
+      <model type='virtio-net'/>
+    </interface>
+    %{~ for n in p.network ~}
+    <interface type='network'>
+    <source network='${p.hwif}'/>
+      %{~ if lookup(n, "mac", null) != null ~}
+      <mac address='${replace(p.metadata.mac, "-", ":")}'/>
       %{~ endif ~}
       %{~ if lookup(n, "id", null) != null ~}
       <vlan>
@@ -40,22 +48,6 @@
       <guest dev="${n.if}"/>
       <model type='virtio-net'/>
     </interface>
-    %{~ else ~}
-    <interface type='direct' trustGuestRxFilters='yes'>
-      <source dev='${hwif}' mode='bridge'/>
-      %{~ if lookup(n, "mac", null) != null ~}
-      <mac address='${join(":", split("-", n.mac))}'/>
-      %{~ endif ~}
-      %{~ if lookup(n, "bootorder", null) != null ~}
-      <boot order='${n.bootorder}'/>
-      %{~ endif ~}
-      %{~ if lookup(n, "mtu", null) != null ~}
-      <mtu size='${n.mtu}'/>
-      %{~ endif ~}
-      <guest dev="${n.if}"/>
-      <model type='virtio-net'/>
-    </interface>
-    %{~ endif ~}
     %{~ endfor ~}
     <controller type='usb' model='none'/>
     <controller type='scsi' model='virtio-scsi'/>
@@ -70,22 +62,20 @@
     %{~ endfor ~}
     <disk type='file' device='cdrom'>
       <driver name='qemu' type='raw'/>
-      <source file='${hypervisor_p.boot_image_mount_path}'/>
+      <source file='${host_p.guest_image_mount_path}'/>
       <target dev='sda' bus='scsi'/>
       <readonly/>
     </disk>
-    %{~ for h in p.hostdev ~}
-    %{~ if lookup(hypervisor_p.dev, h, null) != null ~}
+    %{~ for d in p.hostdev ~}
     <hostdev mode='subsystem' type='pci' managed='yes'>
       <driver name='vfio'/>
       <source>
-        <address domain='${hypervisor_p.dev[h].domain}' bus='${hypervisor_p.dev[h].bus}' slot='${hypervisor_p.dev[h].slot}' function='${hypervisor_p.dev[h].function}'/>
+        <address domain='${host_p.dev[d].domain}' bus='${host_p.dev[d].bus}' slot='${host_p.dev[d].slot}' function='${host_p.dev[d].function}'/>
       </source>
-      %{~ if lookup(hypervisor_p.dev[h], "rom", null) != null ~}
-      <rom bar='on' file='${hypervisor_p.dev[h].rom}'/>
+      %{~ if lookup(host_p.dev[d], "rom", null) != null ~}
+      <rom bar='on' file='${host_p.dev[d].rom}'/>
       %{~ endif ~}
     </hostdev>
-    %{~ endif ~}
     %{~ endfor ~}
     <console>
       <target type='virtio'/>
