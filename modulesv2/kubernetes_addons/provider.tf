@@ -1,6 +1,6 @@
-provider "matchbox" {
-  endpoint    = var.renderer.endpoint
-  client_cert = var.renderer.cert_pem
-  client_key  = var.renderer.private_key_pem
-  ca          = var.renderer.ca_pem
+provider "kubernetes-alpha" {
+  host                   = var.cluster_endpoint.apiserver_endpoint
+  cluster_ca_certificate = var.cluster_endpoint.kubernetes_ca_pem
+  client_certificate     = var.cluster_endpoint.kubernetes_cert_pem
+  client_key             = var.cluster_endpoint.kubernetes_private_key_pem
 }

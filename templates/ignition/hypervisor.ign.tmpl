@@ -1,0 +1,228 @@
+---
+variant: fcos
+version: 1.0.0
+systemd:
+  units:
+    - name: libvirtd.service
+      dropins:
+        - name: 10-virtualization.conf
+          contents: |
+            [Unit]
+            ConditionVirtualization=!vm
+            ConditionVirtualization=!container
+    - name: ksm.service
+      mask: true
+    - name: ksmtuned.service
+      mask: true
+    - name: prepare-vm-resources.service
+      enabled: true
+      contents: |
+        [Unit]
+        ConditionPathExists=${p.guest_image_device}
+        ConditionPathExists=!${p.guest_image_mount_path}
+        After=local-fs.target
+
+        [Service]
+        Type=oneshot
+        RemainAfterExit=true
+        %{~ for v in p.hwif ~}
+        ExecStart=-/bin/bash -c "echo ${v.numvfs} > /sys/class/net/${v.if}/device/sriov_numvfs"
+        %{~ endfor ~}
+        ExecStart=/usr/bin/mkdir -p ${dirname(p.guest_image_mount_path)}
+        ExecStart=/usr/bin/coreos-installer iso ignition remove \
+          ${p.guest_image_device} -o ${p.guest_image_mount_path}
+        ExecStart=/usr/bin/podman volume create \
+          --opt type=iso9660 \
+          --opt device=${p.guest_image_mount_path} \
+          image_vol
+
+        [Install]
+        WantedBy=multi-user.target
+    - name: matchbox.service
+      enabled: true
+      contents: |
+        [Unit]
+        After=network-online.target
+        Wants=network-online.target
+        After=prepare-vm-resources.service
+        Wants=prepare-vm-resources.service
+        ConditionPathExists=${p.guest_image_mount_path}
+
+        [Service]
+        TimeoutStartSec=5m
+        Restart=always
+        RestartSec=10
+        ExecStartPre=/usr/bin/mkdir -p \
+          ${matchbox_data_path} ${matchbox_tls_path}
+        ExecStartPre=-/usr/bin/podman load -i \
+          ${matchbox_image_path}
+        ExecStartPre=-/usr/bin/podman kill matchbox
+        ExecStartPre=-/usr/bin/podman rm matchbox
+        ExecStart=/usr/bin/podman run --rm -it \
+          --name matchbox \
+          --security-opt label=disable \
+          --network host \
+          --mount type=volume,source=image_vol,destination=${matchbox_assets_path} \
+          -v ${matchbox_tls_path}:${matchbox_tls_path}:ro \
+          -v ${matchbox_data_path}:${matchbox_data_path} \
+          ${container_images.matchbox} \
+            -address=${services.renderer.vip}:${services.renderer.ports.http} \
+            -rpc-address=0.0.0.0:${services.renderer.ports.rpc} \
+            -ca-file=${matchbox_tls_path}/matchbox-ca.pem \
+            -cert-file=${matchbox_tls_path}/matchbox.pem \
+            -key-file=${matchbox_tls_path}/matchbox-key.pem \
+            -data-path=${matchbox_data_path} \
+            -assets-path=${matchbox_assets_path}
+
+        [Install]
+        WantedBy=multi-user.target
+    - name: kea-dhcp4.service
+      enabled: true
+      dropins:
+        - name: internal.conf
+          contents: |
+            [Unit]
+            After=matchbox.service
+            Wants=matchbox.service
+            Before=libvirtd.service
+            WantedBy=libvirtd.service
+            ConditionPathExists=${p.guest_image_mount_path}
+
+            [Service]
+            ExecStart=
+            ExecStart=/usr/sbin/kea-dhcp4 -c /etc/kea/kea-dhcp4-internal.conf
+
+storage:
+  files:
+    ##
+    ## internal network ${p.metadata.label} for host <-> local vm
+    ##
+    - path: /etc/systemd/network/10-${p.metadata.if}.netdev
+      mode: 0644
+      contents:
+        inline: |
+          [NetDev]
+          Name=${p.metadata.if}
+          Kind=bridge
+
+    - path: /etc/systemd/network/10-${p.metadata.if}.network
+      mode: 0644
+      contents:
+        inline: |
+          [Match]
+          Name=${p.metadata.if}
+
+          [Link]
+          ARP=false
+
+          [Network]
+          LinkLocalAddressing=false
+          DHCP=false
+          MACVTAP=${p.metadata.label}-tap
+          Bridge=${p.metadata.label}-dummy
+
+    - path: /etc/systemd/network/10-${p.metadata.label}-dummy.netdev
+      mode: 0644
+      contents:
+        inline: |
+          [NetDev]
+          Name=${p.metadata.label}-dummy
+          Kind=dummy
+
+    - path: /etc/systemd/network/10-${p.metadata.label}-dummy.network
+      mode: 0644
+      contents:
+        inline: |
+          [Match]
+          Name=${p.metadata.label}-dummy
+
+          [Link]
+          ARP=false
+
+          [Network]
+          LinkLocalAddressing=false
+          DHCP=false
+          Bridge=${p.metadata.if}
+
+    - path: /etc/systemd/network/10-${p.metadata.label}-tap.netdev
+      mode: 0644
+      contents:
+        inline: |
+          [NetDev]
+          Name=${p.metadata.label}-tap
+          Kind=macvtap
+
+          [MACVTAP]
+          Mode=bridge
+
+    - path: /etc/systemd/network/10-${p.metadata.label}-tap.network
+      mode: 0644
+      contents:
+        inline: |
+          [Match]
+          Name=${p.metadata.label}-tap
+
+          [Network]
+          LinkLocalAddressing=false
+          DHCP=false
+
+          [Address]
+          Address=${p.metadata.ip}/${p.metadata.cidr}
+
+    - path: /etc/kea/kea-dhcp4-internal.conf
+      mode: 0644
+      contents:
+        inline: |
+          {
+            "Dhcp4": {
+              "lease-database": {
+                "type": "memfile",
+                "persist": true,
+                "name": "${kea_path}/kea-leases4.csv"
+              },
+              "interfaces-config": {
+                "interfaces": ${jsonencode([
+                  "${p.metadata.label}-tap"
+                ])}
+              },
+              "client-classes": [
+                {
+                  "name": "ipxe_detected",
+                  "test": "substring(option[77].hex,0,4) == 'iPXE'",
+                  "boot-file-name": "http://${services.renderer.vip}:${services.renderer.ports.http}/boot.ipxe"
+                }
+              ],
+              "subnet4": ${jsonencode([
+                {
+                  subnet = "${p.metadata.network}/${p.metadata.cidr}",
+                  pools = [
+                    {
+                      pool = p.metadata.dhcp_pool
+                    }
+                  ]
+                }
+              ])}
+            }
+          }
+
+    ##
+    ## certs
+    ##
+    - path: ${matchbox_tls_path}/matchbox-ca.pem
+      mode: 0644
+      contents:
+        inline: "${tls_matchbox_ca}"
+    - path: ${matchbox_tls_path}/matchbox.pem
+      mode: 0644
+      contents:
+        inline: "${tls_matchbox}"
+    - path: ${matchbox_tls_path}/matchbox-key.pem
+      mode: 0644
+      contents:
+        inline: "${tls_matchbox_key}"
+
+passwd:
+  users:
+    - name: ${user}
+      groups:
+        - libvirt

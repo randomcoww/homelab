@@ -1,0 +1,106 @@
+---
+variant: fcos
+version: 1.0.0
+storage:
+  files:
+    ##
+    ## allocate vlan interfaces to hardware
+    ##
+    %{~ for v in p.hwif ~}
+    - path: /etc/systemd/network/10-${v.label}.link
+      mode: 0644
+      contents:
+        inline: |
+          [Match]
+          PermanentMACAddress=${v.mac}
+
+          [Link]
+          MTUBytes=${lookup(v, "mtu", 9000)}
+          MACAddressPolicy=persistent
+          Name=${v.if}
+    - path: /etc/systemd/network/12-${v.if}.network
+      mode: 0644
+      contents:
+        inline: |
+          [Match]
+          Name=${v.if}
+          MACAddress=${v.mac}
+
+          [Link]
+          ARP=false
+
+          [Network]
+          LinkLocalAddressing=false
+          DHCP=false
+          %{~ for c in v.children ~}
+          VLAN=${p.networks_by_key[c].if}
+          %{~ endfor ~}
+    %{~ endfor ~}
+
+    %{~ for v in p.network ~}
+    %{~ if lookup(v, "id", null) != null ~}
+    - path: /etc/systemd/network/20-${v.if}.netdev
+      mode: 0644
+      contents:
+        inline: |
+          [NetDev]
+          Name=${v.if}
+          Kind=vlan
+
+          [VLAN]
+          Id=${v.id}
+    - path: /etc/systemd/network/20-${v.if}.network
+      mode: 0644
+      contents:
+        inline: |
+          [Match]
+          Name=${v.if}
+
+          [Link]
+          ARP=false
+          %{~ if lookup(v, "mtu", null) != null ~}
+          MTUBytes=${v.mtu}
+          %{~ endif ~}
+
+          [Network]
+          LinkLocalAddressing=false
+          DHCP=false
+          MACVTAP=${v.if}-tap
+
+    - path: /etc/systemd/network/22-${v.if}-tap.netdev
+      mode: 0644
+      contents:
+        inline: |
+          [NetDev]
+          Name=${v.if}-tap
+          Kind=macvtap
+
+          [MACVTAP]
+          Mode=bridge
+    - path: /etc/systemd/network/22-${v.if}-tap.network
+      mode: 0644
+      contents:
+        inline: |
+          [Match]
+          Name=${v.if}-tap
+          %{~ if lookup(v, "mtu", null) != null ~}
+
+          [Link]
+          MTUBytes=${v.mtu}
+          %{~ else ~}
+
+          [DHCP]
+          UseMTU=true
+          %{~ endif ~}
+
+          [Network]
+          LinkLocalAddressing=false
+          DHCP=${lookup(v, "dhcp", false)}
+          MulticastDNS=${lookup(v, "mdns", false)}
+          %{~ if lookup(v, "ip", null) != null && lookup(v, "cidr", null) != null ~}
+
+          [Address]
+          Address=${v.ip}/${v.cidr}
+          %{~ endif ~}
+    %{~ endif ~}
+    %{~ endfor ~}

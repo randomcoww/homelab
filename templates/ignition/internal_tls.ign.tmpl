@@ -1,0 +1,9 @@
+---
+variant: fcos
+version: 1.0.0
+storage:
+  files:
+    - path: ${internal_tls_path}
+      mode: 0644
+      contents:
+        inline: "${tls_internal_ca}"

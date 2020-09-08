@@ -1,3 +1,0 @@
-Host *
-  StrictHostKeyChecking=accept-new
-  IdentityFile ~/.ssh/id_ecdsa

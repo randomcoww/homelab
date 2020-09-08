@@ -1,232 +1,73 @@
 ---
-networkd:
-  units:
-    - name: 10-${host_network.store.if}.network
-      contents: |
-        [Match]
-        Name=${host_network.store.if}
-
-        [Network]
-        LinkLocalAddressing=no
-        DHCP=no
-        Gateway=${networks.store.router}
-        DNS=${services.recursive_dns.vip}
-
-        [Link]
-        MTUBytes=${mtu}
-
-        [Address]
-        Address=${host_network.store.ip}/${networks.store.cidr}
-    - name: 10-${host_network.int.if}.network
-      contents: |
-        [Match]
-        Name=${host_network.int.if}
-
-        [Link]
-        ARP=no
-
-        [Network]
-        LinkLocalAddressing=no
-        DHCP=no
-
-systemd:
-  units:
-    - name: ntpd.service
-      enabled: true
-    - name: docker.service
-      mask: true
-    - name: docker.socket
-      mask: true
-    - name: containerd.service
-      enabled: true
-      dropins:
-        - name: containerd.conf
-          contents: |
-            [Service]
-            LimitNOFILE=infinity
-            ExecStart=
-            ExecStart=/usr/bin/env PATH=$${TORCX_BINDIR}:$${PATH} $${TORCX_BINDIR}/containerd
-            RestartSec=5
-    - name: kubelet.service
-      enabled: true
-      contents: |
-        [Unit]
-        Description=Kubelet via Hyperkube ACI
-        After=network.target
-
-        [Service]
-        ExecStartPre=/bin/mkdir -p \
-          ${kubelet_path} \
-          /var/log/containers \
-          /etc/cni/net.d
-        ExecStartPre=-/usr/bin/rkt rm --uuid-file=/var/cache/kubelet-pod.uuid
-        ExecStart=/usr/bin/rkt run \
-          --uuid-file-save=/var/cache/kubelet-pod.uuid \
-          --volume var-lib-containerd,kind=host,source=/var/lib/containerd,readOnly=false \
-          --mount volume=var-lib-containerd,target=/var/lib/containerd \
-          --insecure-options=image \
-          --volume coreos-var-lib-kubelet,kind=host,source=${kubelet_path},readOnly=false,recursive=true \
-          --volume coreos-var-log,kind=host,source=/var/log,readOnly=false \
-          --volume coreos-run,kind=host,source=/run,readOnly=false \
-          --mount volume=coreos-var-lib-kubelet,target=${kubelet_path} \
-          --mount volume=coreos-var-log,target=/var/log \
-          --mount volume=coreos-run,target=/run \
-          --dns host \
-          --hosts-entry host \
-          --stage1-from-dir=stage1-fly.aci \
-          docker://${container_images.kubelet} \
-            --exec=/usr/local/bin/kubelet -- \
-            --config=${kubelet_path}/kubelet-config.yaml \
-            --node-ip=${host_network.store.ip} \
-            --register-node=false \
-            --container-runtime=remote \
-            --container-runtime-endpoint=unix:///run/containerd/containerd.sock
-        ExecStop=-/usr/bin/rkt stop --uuid-file=/var/cache/kubelet-pod.uuid
-        Restart=always
-        RestartSec=5
-
-        [Install]
-        WantedBy=multi-user.target
-
+variant: fcos
+version: 1.0.0
 storage:
   files:
-    - path: /etc/hostname
-      filesystem: root
-      mode: 0644
-      contents:
-        inline:
-          ${hostname}
-    - path: /etc/sysctl.d/ipforward.conf
-      filesystem: root
-      mode: 0644
-      contents:
-        inline: |
-          net.ipv4.ip_forward=1
-          net.ipv4.ip_nonlocal_bind=1
-    - path: /etc/sysctl.d/max-user-watches.conf
-      filesystem: root
-      mode: 0644
-      contents:
-        inline: |
-          fs.inotify.max_user_watches=16184
-
-    - path: /etc/containerd/config.toml
-      filesystem: root
-      mode: 420
-      contents:
-        inline: |-
-          version = 2
-          root = "/var/lib/containerd"
-          oom_score = -999
-          [plugins]
-            [plugins."io.containerd.grpc.v1.cri"]
-              [plugins."io.containerd.grpc.v1.cri".containerd]
-                snapshotter = "overlayfs"
-                [plugins."io.containerd.grpc.v1.cri".containerd.runtimes]
-                  [plugins."io.containerd.grpc.v1.cri".containerd.runtimes.runc]
-                    # runtime_type should be normally be "io.containerd.runc.v*"
-                    # containerd-shim-runc-v* binaries are needed but not provided in the flatcar image
-                    runtime_type = "io.containerd.runtime.v1.linux"
-            [plugins."io.containerd.runtime.v1.linux"]
-              no_pivot = true
-
-    - path: ${kubelet_path}/kubelet-config.yaml
-      filesystem: root
-      mode: 420
-      contents:
-        inline: |-
-          kind: KubeletConfiguration
-          apiVersion: kubelet.config.k8s.io/v1beta1
-          authentication:
-            anonymous:
-              enabled: true
-            webhook:
-              enabled: false
-          authorization:
-            mode: AlwaysAllow
-          staticPodPath: ${kubelet_path}/manifests
-          makeIPTablesUtilChains: false
-
     ##
     ## certs
     ##
 
     - path: ${controller_mount_path}/kubernetes-ca.pem
-      filesystem: root
-      mode: 420
+      mode: 0644
       contents:
         inline: "${tls_kubernetes_ca}"
     - path: ${controller_mount_path}/kubernetes-ca-key.pem
-      filesystem: root
-      mode: 420
+      mode: 0644
       contents:
         inline: "${tls_kubernetes_ca_key}"
     - path: ${controller_mount_path}/kubernetes.pem
-      filesystem: root
-      mode: 420
+      mode: 0644
       contents:
         inline: "${tls_kubernetes}"
     - path: ${controller_mount_path}/kubernetes-key.pem
-      filesystem: root
-      mode: 420
+      mode: 0644
       contents:
         inline: "${tls_kubernetes_key}"
 
     - path: ${controller_mount_path}/etcd-ca.pem
-      filesystem: root
-      mode: 420
+      mode: 0644
       contents:
         inline: "${tls_etcd_ca}"
     - path: ${controller_mount_path}/etcd.pem
-      filesystem: root
-      mode: 420
+      mode: 0644
       contents:
         inline: "${tls_etcd}"
     - path: ${controller_mount_path}/etcd-key.pem
-      filesystem: root
-      mode: 420
+      mode: 0644
       contents:
         inline: "${tls_etcd_key}"
     - path: ${controller_mount_path}/etcd-client.pem
-      filesystem: root
-      mode: 420
+      mode: 0644
       contents:
         inline: "${tls_etcd_client}"
     - path: ${controller_mount_path}/etcd-client-key.pem
-      filesystem: root
-      mode: 420
+      mode: 0644
       contents:
         inline: "${tls_etcd_client_key}"
 
     - path: ${controller_mount_path}/kube-controller-manager.pem
-      filesystem: root
-      mode: 420
+      mode: 0644
       contents:
         inline: "${tls_controller_manager}"
     - path: ${controller_mount_path}/kube-controller-manager-key.pem
-      filesystem: root
-      mode: 420
+      mode: 0644
       contents:
         inline: "${tls_controller_manager_key}"
     - path: ${controller_mount_path}/kube-scheduler.pem
-      filesystem: root
-      mode: 420
+      mode: 0644
       contents:
         inline: "${tls_scheduler}"
     - path: ${controller_mount_path}/kube-scheduler-key.pem
-      filesystem: root
-      mode: 420
+      mode: 0644
       contents:
         inline: "${tls_scheduler_key}"
 
     - path: ${controller_mount_path}/service-account.pem
-      filesystem: root
-      mode: 420
+      mode: 0644
       contents:
         inline: "${tls_service_account}"
     - path: ${controller_mount_path}/service-account-key.pem
-      filesystem: root
-      mode: 420
+      mode: 0644
       contents:
         inline: "${tls_service_account_key}"
 
@@ -235,8 +76,7 @@ storage:
     ##
 
     - path: ${controller_mount_path}/kube-scheduler.yaml
-      filesystem: root
-      mode: 420
+      mode: 0644
       contents:
         inline: |-
           apiVersion: kubescheduler.config.k8s.io/v1alpha1
@@ -247,8 +87,7 @@ storage:
             leaderElect: true
 
     - path: ${controller_mount_path}/kube-controller-manager.kubeconfig
-      filesystem: root
-      mode: 420
+      mode: 0644
       contents:
         inline: |-
           apiVersion: v1
@@ -272,8 +111,7 @@ storage:
               client-key: ${controller_mount_path}/kube-controller-manager-key.pem
 
     - path: ${controller_mount_path}/kube-scheduler.kubeconfig
-      filesystem: root
-      mode: 420
+      mode: 0644
       contents:
         inline: |-
           apiVersion: v1
@@ -297,63 +135,32 @@ storage:
               client-key: ${controller_mount_path}/kube-scheduler-key.pem
 
     - path: ${pod_mount_path}/keepalived/keepalived.conf
-      filesystem: root
-      mode: 420
+      mode: 0644
       contents:
         inline: |-
           global_defs {
             vrrp_version 3
             vrrp_iptables
-            dynamic_interfaces
+            dynamic_interfaces allow_if_changes
           }
-          vrrp_instance VI_kube-master_store {
-            no_accept
+          vrrp_instance VI_kube-master_main {
             nopreempt
             state BACKUP
             strict_mode off
-            virtual_router_id 70
-            interface ${host_network.store.if}
+            virtual_router_id ${vrrp_id}
+            interface ${p.networks_by_key.main.if}
             priority 100
             virtual_ipaddress {
               ${services.kubernetes_apiserver.vip}
             }
           }
 
-    - path: ${pod_mount_path}/loki/promtail-config.yaml
-      filesystem: root
-      mode: 420
-      contents:
-        inline: |-
-          positions:
-            filename: /etc/promtail/promtail-positions.yaml
-          scrape_configs:
-          - job_name: containers
-            static_configs:
-            - targets:
-              - localhost
-              labels:
-                job: static-pod
-                host: ${hostname}
-                __path__: /var/log/pods/*/*/*.log
-            pipeline_stages:
-            - match:
-                selector: '{job="static-pod"}'
-                stages:
-                - cri: {}
-                - regex:
-                    source: filename
-                    expression: "(?:pods)/(?P<namespace>\\S+?)_\\S+?/(?P<container_name>\\S+?)/"
-                - labels:
-                    namespace:
-                    container_name:
-
     ##
     ## pod manifests
     ##
 
     - path: ${kubelet_path}/manifests/etcd-wrapper.yaml
-      filesystem: root
-      mode: 420
+      mode: 0644
       contents:
         inline: |-
           ---
@@ -402,9 +209,10 @@ storage:
               - name: AWS_SDK_LOAD_CONFIG
                 value: "1"
               - name: INTERNAL_IP
-                valueFrom:
-                  fieldRef:
-                    fieldPath: status.hostIP
+                value: ${p.networks_by_key.main.ip}
+                # valueFrom:
+                #   fieldRef:
+                #     fieldPath: status.hostIP
               - name: NODE_NAME
                 valueFrom:
                   fieldRef:
@@ -430,8 +238,7 @@ storage:
                 path: "${kubelet_path}/manifests/kube-etcd.json"
 
     - path: ${kubelet_path}/manifests/kube-apiserver.yaml
-      filesystem: root
-      mode: 420
+      mode: 0644
       contents:
         inline: |-
           ---
@@ -450,7 +257,6 @@ storage:
               - kube-apiserver
               - "--secure-port=${services.kubernetes_apiserver.ports.secure}"
               - "--allow-privileged=true"
-              - "--advertise-address=$(INTERNAL_IP)"
               - "--authorization-mode=Node,RBAC"
               - "--bind-address=0.0.0.0"
               - "--client-ca-file=${controller_mount_path}/kubernetes-ca.pem"
@@ -468,12 +274,8 @@ storage:
               - "--tls-cert-file=${controller_mount_path}/kubernetes.pem"
               - "--tls-private-key-file=${controller_mount_path}/kubernetes-key.pem"
               - "--kubelet-preferred-address-types=InternalDNS,InternalIP"
+              - "--enable-admission-plugins=NamespaceLifecycle,LimitRanger,ServiceAccount,DefaultStorageClass,DefaultTolerationSeconds,MutatingAdmissionWebhook,ValidatingAdmissionWebhook,Priority,ResourceQuota,PodSecurityPolicy,NodeRestriction"
               - "--v=2"
-              env:
-              - name: INTERNAL_IP
-                valueFrom:
-                  fieldRef:
-                    fieldPath: status.hostIP
               volumeMounts:
               - name: config-apiserver
                 mountPath: "${controller_mount_path}"
@@ -514,8 +316,7 @@ storage:
                 path: ${pod_mount_path}/keepalived/keepalived.conf
 
     - path: ${kubelet_path}/manifests/kube-controller-manager.yaml
-      filesystem: root
-      mode: 420
+      mode: 0644
       contents:
         inline: |-
           ---
@@ -563,8 +364,7 @@ storage:
                 path: "${controller_mount_path}"
 
     - path: ${kubelet_path}/manifests/kube-scheduler.yaml
-      filesystem: root
-      mode: 420
+      mode: 0644
       contents:
         inline: |-
           ---
@@ -599,44 +399,3 @@ storage:
             - name: config-volume
               hostPath:
                 path: "${controller_mount_path}"
-
-    - path: ${kubelet_path}/manifests/promtail.yaml
-      filesystem: root
-      mode: 420
-      contents:
-        inline: |-
-          ---
-          apiVersion: v1
-          kind: Pod
-          metadata:
-            namespace: kube-system
-            name: loki
-          spec:
-            restartPolicy: Always
-            hostNetwork: true
-            containers:
-            - name: promtail
-              image: ${container_images.promtail}
-              args:
-              - "-config.file=/etc/promtail/promtail-config.yaml"
-              - "-client.url=http://${services.loki.vip}:${services.loki.ports.http_listen}/loki/api/v1/push"
-              volumeMounts:
-              - name: pods
-                mountPath: /var/log/pods
-                readOnly: true
-              - name: config-promtail
-                mountPath: /etc/promtail/promtail-config.yaml
-                readOnly: true
-            volumes:
-            - name: pods
-              hostPath:
-                path: /var/log/pods
-            - name: config-promtail
-              hostPath:
-                path: ${pod_mount_path}/loki/promtail-config.yaml
-
-passwd:
-  users:
-  - name: ${user}
-    ssh_authorized_keys:
-      - ${ssh_authorized_key}

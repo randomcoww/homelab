@@ -1,14 +1,21 @@
 #!/usr/bin/env bash
 set -xe
 
-terraform init
-terraform apply -target=local_file.ssh-ca-key
+mkdir -p \
+  $HOME/.kube \
+  $HOME/.ssh
 
+KNOWN_HOSTS=$HOME/.ssh/known_hosts
 KEY=$HOME/.ssh/id_ecdsa
 ssh-keygen -q -t ecdsa -N '' -f $KEY 2>/dev/null <<< y >/dev/null
 
-CA=$(pwd)/output/ssh-ca-key.pem
-chmod 400 $CA
-ssh-keygen -s $CA -I $(whoami) -n core -V +1h -z 1 $KEY.pub
+terraform init
+terraform apply \
+  -auto-approve \
+  -target=null_resource.output-triggers \
+  -var="ssh_client_public_key=$(cat $KEY.pub)"
+
+terraform output ssh-client-certificate > $KEY-cert.pub
+echo -n "@cert-authority * $(terraform output ssh-ca-authorized-key)" > $KNOWN_HOSTS
 
 terraform $@

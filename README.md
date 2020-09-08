@@ -1,256 +1,261 @@
 ## Terraform configs for provisioning homelab resources
 
+Build container includes terraform with plugins:
+
+```bash
+buildtool() {
+    set -x
+    podman run -it --rm \
+        -v $HOME/.aws:/root/.aws \
+        -v $(pwd):/root/mnt \
+        -w /root/mnt/resourcesv2 \
+        --net=host \
+        randomcoww/tf-env:latest "$@"
+    rc=$?; set +x; return $rc
+}
+```
+
 ### Run local matchbox server
 
-Configurations for creating hypervisor images are generated on a local [Matchbox](https://github.com/coreos/matchbox/) instance. This will generate necessary TLS certs and start a local Matchbox instance using Podman:
+Configurations for creating hypervisor images are generated on a local Matchbox instance. This will generate necessary TLS certs and start a local Matchbox instance using Podman:
 
 ```bash
-cd resourcesv2
-./run_renderer.sh
+buildtool start-renderer
 ```
 
-### Setup SSH access
-
-Write SSH CA private key to sign a key for accessing the hypervisor over `virsh` and `ssh`:
+### Define secrets
 
 ```bash
-cd resourcesv2
-terraform apply -target=local_file.ssh-ca-key
-```
-
-Sign an existing key:
-
-```
-CA=$(pwd)/output/ssh-ca-key.pem
-KEY=$HOME/.ssh/id_ecdsa.pub
-USER=$(whoami)
-
-chmod 400 $CA
-ssh-keygen -s $CA -I $USER -n core -V +1w -z 1 $KEY
+cat > secrets.tfvars <<EOF
+client_password = "$(echo 'password' | mkpasswd -m sha-512 -s)"
+wireguard_config = {
+  Interface = {
+    PrivateKey =
+    Address    =
+    DNS        =
+  }
+  Peer = {
+    PublicKey  =
+    AllowedIPs =
+    Endpoint   =
+  }
+}
+EOF
 ```
 
 ### Create hypervisor images
 
-Hypervisor images are live USB disks created using Kickstart and livemedia-creator. Generate Kickstart configuration to local Matchbox server:
+Hypervisor images are live USB disks created using [Fedora CoreOS assembler](https://github.com/coreos/coreos-assembler). Generate ignition configuration to local Matchbox server:
 
 ```bash
-cd resourcesv2
-terraform apply -target=module.kickstart
+buildtool terraform apply \
+    -target=module.hypervisor
 ```
-
-Generate USB images for hypervisor hosts:
 
 ```bash
-cd build/kickstart
-export FEDORA_RELEASE=31
-export ISO_FILE=Fedora-Server-netinst-x86_64-31-1.9.iso
-
-wget \
-    https://download.fedoraproject.org/pub/fedora/linux/releases/$FEDORA_RELEASE/Server/x86_64/iso/$ISO_FILE
-
-sudo livemedia-creator \
-    --make-iso \
-    --iso=$ISO_FILE \
-    --project Fedora \
-    --volid kvm \
-    --releasever $FEDORA_RELEASE \
-    --title kvm \
-    --resultdir ./result \
-    --tmp . \
-    --ks=./kvm.ks \
-    --no-virt \
-    --lorax-templates ./lorax-kvm
+buildtool terraform apply \
+    -var-file=secrets.tfvars \
+    -target=module.ignition-local
 ```
 
-Write boot image to disks as below. The same image may be used for all KVM hosts.
+#### KVM hosts
 
-```
-sudo dd if=result/images/boot.iso of=/dev/sdb bs=4k
-```
+Run build from https://github.com/randomcoww/fedora-coreos-custom
 
-Image for the desktop (admin) PC can also be generated using this method. This image will trust the internal CA.
+VMs running on the host will boot off of the same kernel and initramfs as the hypervisor.
 
-```
-sudo livemedia-creator \
-    --make-iso \
-    --iso=$ISO_FILE \
-    --project Fedora \
-    --volid desktop \
-    --releasever $FEDORA_RELEASE \
-    --title desktop \
-    --resultdir ./result \
-    --tmp . \
-    --ks=./desktop.ks \
-    --no-virt \
-    --lorax-templates ./lorax-desktop
+#### Client devices
+
+Run build from https://github.com/randomcoww/fedora-silverblue-custom
+
+### Setup SSH access from client
+
+```bash
+KEY=$HOME/.ssh/id_ecdsa
+ssh-keygen -q -t ecdsa -N '' -f $KEY 2>/dev/null <<< y >/dev/null
+
+buildtool terraform apply \
+    -target=null_resource.output-triggers \
+    -var="ssh_client_public_key=$(cat $KEY.pub)"
+
+buildtool terraform output ssh-client-certificate > $KEY-cert.pub
 ```
 
 ### Generate configuration on hypervisor hosts
 
-Each hypervisor runs a PXE boot environment on an internal network for provisioning VMs local to the host. VMs run [Container Linux](https://coreos.com/os/docs/latest/) using [Ignition](https://coreos.com/ignition/docs/latest/) for boot time configuration.
+Each hypervisor runs a PXE boot environment on an internal network for provisioning VMs local to the host. VMs run Fedora CoreOS using Ignition for boot time configuration.
 
-Ignition configuration is generated on each hypervisor as follows:
+Configure ignition and libvirt on each hypervisor:
 
 ```bash
-cd resourcesv2
-terraform apply \
+buildtool tf-wrapper apply \
     -target=module.ignition-kvm-0 \
+    -target=module.libvirt-kvm-0
+
+buildtool tf-wrapper apply \
     -target=module.ignition-kvm-1 \
-    -target=module.ignition-desktop
+    -target=module.libvirt-kvm-1
 ```
 
-Define VMs on each hypervisor:
+### Start VMs
 
 ```bash
-cd resourcesv2
-terraform apply \
-    -target=module.libvirt-kvm-0 \
-    -target=module.libvirt-kvm-1 \
-    -target=module.libvirt-desktop
+virsh -c qemu+ssh://core@kvm-0.local/system net-start sriov
+virsh -c qemu+ssh://core@kvm-0.local/system start gateway-0
+virsh -c qemu+ssh://core@kvm-0.local/system start controller-0
+virsh -c qemu+ssh://core@kvm-1.local/system start controller-1
+virsh -c qemu+ssh://core@kvm-0.local/system start worker-0
+
+virsh -c qemu+ssh://core@kvm-1.local/system net-start sriov
+virsh -c qemu+ssh://core@kvm-1.local/system start gateway-1
+virsh -c qemu+ssh://core@kvm-1.local/system start controller-1
+virsh -c qemu+ssh://core@kvm-1.local/system start controller-2
+virsh -c qemu+ssh://core@kvm-1.local/system start worker-1
 ```
 
-### Start gateway VMs
-
-This will provide a basic infrastructure including NAT routing, DHCP and DNS.
+### Deploy kubernetes services
 
 ```bash
-virsh -c qemu+ssh://core@192.168.127.251/system start gateway-0
-virsh -c qemu+ssh://core@192.168.127.252/system start gateway-1
-```
-
-### Start Kubernetes cluster VMs
-
-Etcd data is restored from S3 on fresh start of a cluster if there is an existing backup. A backup is made every 30 minutes. Local data is discarded when the etcd container stops.
-
-```bash
-virsh -c qemu+ssh://core@192.168.127.251/system start controller-0
-virsh -c qemu+ssh://core@192.168.127.252/system start controller-1
-virsh -c qemu+ssh://core@192.168.127.251/system start controller-2
-
-virsh -c qemu+ssh://core@192.168.127.251/system start worker-0
-virsh -c qemu+ssh://core@192.168.127.252/system start worker-1
+buildtool terraform apply \
+    -target=module.generic-manifest-local
 ```
 
 Write kubeconfig file:
 
 ```bash
-terraform apply -target=local_file.kubeconfig-admin
-export KUBECONFIG=$(pwd)/output/default-cluster-012.kubeconfig
+buildtool terraform apply \
+    -target=null_resource.output-triggers
+
+mkdir -p ~/.kube
+buildtool terraform output kubeconfig > ~/.kube/config
 ```
 
-### Generate basic Kubernetes addons
+#### Basic addons
 
 ```bash
-terraform apply -target=module.kubernetes-addons
-```
-
-Apply addons:
-
-```bash
-kubectl apply -f https://raw.githubusercontent.com/kubernetes/website/master/content/en/examples/policy/privileged-psp.yaml
 kubectl apply -f http://127.0.0.1:8080/generic?manifest=bootstrap
 kubectl apply -f http://127.0.0.1:8080/generic?manifest=kube-proxy
 kubectl apply -f http://127.0.0.1:8080/generic?manifest=flannel
 kubectl apply -f http://127.0.0.1:8080/generic?manifest=kapprover
 kubectl apply -f http://127.0.0.1:8080/generic?manifest=coredns
-kubectl apply -f https://raw.githubusercontent.com/google/metallb/v0.8.3/manifests/metallb.yaml
-kubectl apply -f http://127.0.0.1:8080/generic?manifest=metallb
-kubectl apply -f http://127.0.0.1:8080/generic?secret=internal-tls
-kubectl apply -f http://127.0.0.1:8080/generic?secret=minio-auth
-kubectl apply -f http://127.0.0.1:8080/generic?secret=grafana-auth
 ```
 
-### Deploy services on Kubernetes
+#### MetalLb
 
-Deploy [OpenEBS](https://www.openebs.io/):
+https://metallb.universe.tf/installation/#installation-by-manifest
 
-Only Jiva is used (I don't have enough disks to dedicate to cStor). This is the same as https://openebs.github.io/charts/openebs-operator-1.6.0.yaml with some unused components removed.
-
-```
-cd reqourcesv2/manifests
-kubectl apply -f openebs-operator.yaml
+```bash
+kubectl apply -f http://127.0.0.1:8080/generic?manifest=metallb-network
 ```
 
-Deploy [Traefik](https://traefik.io/) ingress:
+#### Traefik
 
-https://traefik-ui.fuzzybunny.internal
-
-```
-cd reqourcesv2/manifests
-kubectl apply -f traefik.yaml
+```bash
+kubectl apply -f manifests/traefik.yaml
 ```
 
-Deploy monitoring:
+#### Apply secrets
 
-https://grafana.fuzzybunny.internal
+```bash
+kubectl create namespace common
+kubectl create namespace monitoring
+kubectl create namespace minio
 
-```
-cd reqourcesv2/manifests
-kubectl apply -f prometheus.yaml
-kubectl apply -f promtail.yaml
-kubectl apply -f http://127.0.0.1:8080/generic?manifest=loki
-kubectl apply -f grafana.yaml
-```
+buildtool terraform apply \
+    -var-file=secrets.tfvars \
+    -target=data.null_data_source.provider-addon
 
-Deploy [Minio](https://min.io/) storage controller:
-
-https://minio.fuzzybunny.internal
-
-```
-cd reqourcesv2/manifests
-kubectl apply -f minio.yaml
+buildtool terraform apply \
+    -var-file=secrets.tfvars \
+    -target=module.kubernetes-addons
 ```
 
-Deploy MPD:
+#### Minio
 
-https://stream.fuzzybunny.internal
-
-```
-cd reqourcesv2/manifests
-kubectl apply -f mpd.yaml
+```bash
+kubectl label node worker-0.local minio-data=true
+kubectl apply -f manifests/minio.yaml
 ```
 
-Deploy Transmission:
+#### Monitoring
 
-https://tr.fuzzybunny.internal
+```bash
+helm repo add loki https://grafana.github.io/loki/charts
+helm repo add stable https://kubernetes-charts.storage.googleapis.com
 
+kubectl create namespace monitoring
+
+helm template loki \
+    --namespace=monitoring \
+    loki/loki | kubectl -n monitoring apply -f -
+
+helm template promtail \
+    --namespace monitoring \
+    loki/promtail | kubectl -n monitoring apply -f -
+
+helm template prometheus \
+    --namespace monitoring \
+    --set alertmanager.enabled=false \
+    --set configmapReload.prometheus.enabled=false \
+    --set configmapReload.alertmanager.enabled=false \
+    --set initChownData.enabled=false \
+    --set podSecurityPolicy.enabled=true \
+    --set kube-state-metrics.podSecurityPolicy.enabled=true \
+    --set pushgateway.enabled=false \
+    --set server.persistentVolume.enabled=false \
+    stable/prometheus | kubectl -n monitoring apply -f -
+
+kubectl apply -n monitoring -f manifests/grafana.yaml
 ```
-cd reqourcesv2/manifests
-kubectl create secret generic wireguard-config --from-file=wireguard-secret
-kubectl apply -f transmission.yaml
+Allow non cluster nodes to send logs to loki:
+
+```bash
+kubectl apply -f http://127.0.0.1:8080/generic?manifest=loki-lb-service
 ```
 
-### Using tf-env container
-
-[Dockerfile](build/dev/Dockerfile)
-
-Start renderer:
-
-```
-podman run -it --rm \
-    -v $HOME/.aws:/root/.aws \
-    -v $(pwd):/root/mnt \
-    --net=host \
-    randomcoww/tf-env start-renderer
+Currently the PSP `requiredDropCapabilities` causes loki pod to crashloop:
+```bash
+kubectl patch -n monitoring psp loki -p='{
+  "spec": {
+    "requiredDropCapabilities": [
+      ""
+    ]
+  }
+}'
 ```
 
-or
+#### OpenEBS
 
-```
-podman run -it --rm \
-    -e AWS_ACCESS_KEY_ID=id \
-    -e AWS_SECRET_ACCESS_KEY=key \
-    -v $(pwd):/root/mnt \
-    --net=host \
-    randomcoww/tf-env start-renderer
+```bash
+helm repo add openebs https://openebs.github.io/charts
+
+kubectl create namespace openebs
+
+helm template openebs \
+    --namespace openebs \
+    --set rbac.pspEnabled=true \
+    --set ndm.enabled=true \
+    --set ndmOperator.enabled=true \
+    --set localprovisioner.enabled=false \
+    --set analytics.enabled=false \
+    --set defaultStorageConfig.enabled=false \
+    --set snapshotOperator.enabled=false \
+    --set webhook.enabled=false \
+    openebs/openebs | kubectl -n openebs apply -f -
 ```
 
-Wrapper for terraform calls:
-
+Add block devices (IDs specific to my hardware)
+```bash
+kubectl apply -n openebs -f manifests/openebs_spc.yaml
 ```
-podman run -it --rm \
-    -v $HOME/.aws:/root/.aws \
-    -v $(pwd):/root/mnt \
-    --net=host \
-    randomcoww/tf-env tf-wrapper
+
+Currently additional PSP is needed for PVC pods to run:
+```bash
+kubectl apply -n openebs -f manifests/openebs_psp.yaml
+```
+
+#### Common service
+
+```bash
+kubectl apply -f manifests/common.yaml
 ```

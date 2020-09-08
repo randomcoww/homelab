@@ -1,344 +1,113 @@
 ---
-networkd:
-  units:
-    - name: 10-${host_network.store.if}.network
-      contents: |
-        [Match]
-        Name=${host_network.store.if}
-
-        [Network]
-        LinkLocalAddressing=no
-        DHCP=no
-
-        [Address]
-        Address=${host_network.store.ip}/${networks.store.cidr}
-    - name: 10-${host_network.lan.if}.network
-      contents: |
-        [Match]
-        Name=${host_network.lan.if}
-
-        [Network]
-        LinkLocalAddressing=no
-        DHCP=no
-
-        [Address]
-        Address=${host_network.lan.ip}/${networks.lan.cidr}
-    - name: 10-${host_network.sync.if}.network
-      contents: |
-        [Match]
-        Name=${host_network.sync.if}
-
-        [Network]
-        LinkLocalAddressing=no
-        DHCP=no
-
-        [Address]
-        Address=${host_network.sync.ip}/${networks.sync.cidr}
-    - name: 10-${host_network.host_wan.if}.network
-      contents: |
-        [Match]
-        Name=${host_network.host_wan.if}
-
-        [Network]
-        LinkLocalAddressing=no
-        DHCP=yes
-        DNS=${dns_forward_ip}
-        DNSOverTLS=opportunistic
-        Domains=~
-
-        [DHCP]
-        UseMTU=true
-        UseDNS=false
-        UseNTP=false
-        SendHostname=false
-        UseHostname=false
-        UseDomains=false
-        UseTimezone=no
-        RouteMetric=512
-    - name: 10-${host_network.wan.if}.network
-      contents: |
-        [Match]
-        Name=${host_network.wan.if}
-
-        [Network]
-        LinkLocalAddressing=no
-        DHCP=yes
-
-        [DHCP]
-        UseMTU=true
-        UseDNS=false
-        UseNTP=false
-        SendHostname=false
-        UseHostname=false
-        UseDomains=false
-        UseTimezone=no
-        RouteMetric=512
-        RouteTable=${host_network.wan.route_table}
-    - name: 10-${host_network.int.if}.network
-      contents: |
-        [Match]
-        Name=${host_network.int.if}
-
-        [Link]
-        ARP=no
-
-        [Network]
-        LinkLocalAddressing=no
-        DHCP=no
-
+variant: fcos
+version: 1.0.0
 systemd:
   units:
-    - name: ntpd.service
+    - name: nftables.service
       enabled: true
-    - name: docker.service
-      mask: true
-    - name: docker.socket
-      mask: true
-    - name: containerd.service
+    - name: keepalived.service
       enabled: true
       dropins:
-        - name: containerd.conf
+        - name: 10-dependency.conf
           contents: |
+            [Unit]
+            Requires=nftables.service
+            PartOf=nftables.service
+
             [Service]
-            LimitNOFILE=infinity
-            ExecStart=
-            ExecStart=/usr/bin/env PATH=$${TORCX_BINDIR}:$${PATH} $${TORCX_BINDIR}/containerd
-            RestartSec=5
-    - name: kubelet.service
-      enabled: true
-      contents: |
-        [Unit]
-        Description=Kubelet via Hyperkube ACI
-        After=network.target
-
-        [Service]
-        ExecStartPre=/bin/mkdir -p \
-          ${kubelet_path} \
-          /var/log/containers \
-          /etc/cni/net.d
-        ExecStartPre=-/usr/bin/rkt rm --uuid-file=/var/cache/kubelet-pod.uuid
-        ExecStart=/usr/bin/rkt run \
-          --uuid-file-save=/var/cache/kubelet-pod.uuid \
-          --volume var-lib-containerd,kind=host,source=/var/lib/containerd,readOnly=false \
-          --mount volume=var-lib-containerd,target=/var/lib/containerd \
-          --insecure-options=image \
-          --volume coreos-var-lib-kubelet,kind=host,source=${kubelet_path},readOnly=false,recursive=true \
-          --volume coreos-var-log,kind=host,source=/var/log,readOnly=false \
-          --volume coreos-run,kind=host,source=/run,readOnly=false \
-          --mount volume=coreos-var-lib-kubelet,target=${kubelet_path} \
-          --mount volume=coreos-var-log,target=/var/log \
-          --mount volume=coreos-run,target=/run \
-          --dns host \
-          --hosts-entry host \
-          --stage1-from-dir=stage1-fly.aci \
-          docker://${container_images.kubelet} \
-            --exec=/usr/local/bin/kubelet -- \
-            --config=${kubelet_path}/kubelet-config.yaml \
-            --node-ip=${host_network.store.ip} \
-            --register-node=false \
-            --container-runtime=remote \
-            --container-runtime-endpoint=unix:///run/containerd/containerd.sock
-        ExecStop=-/usr/bin/rkt stop --uuid-file=/var/cache/kubelet-pod.uuid
-        Restart=always
-        RestartSec=5
-
-        [Install]
-        WantedBy=multi-user.target
+            EnvironmentFile=
+            Environment=KEEPALIVED_OPTIONS="-D -P"
 
 storage:
   files:
-    - path: /etc/hostname
-      filesystem: root
-      mode: 0644
-      contents:
-        inline:
-          ${hostname}
-    - path: /etc/sysctl.d/ipforward.conf
-      filesystem: root
+    - path: /etc/systemd/resolved.conf.d/10-mdns-stub.conf
       mode: 0644
       contents:
         inline: |
-          net.ipv4.ip_forward=1
-          net.ipv4.ip_nonlocal_bind=1
-    - path: /etc/sysctl.d/max-user-watches.conf
-      filesystem: root
+          [Resolve]
+          DNSStubListener=true
+    - path: /etc/systemd/network/20-${p.networks_by_key.main.if}.network.d/backup-route.conf
       mode: 0644
       contents:
         inline: |
-          fs.inotify.max_user_watches=16184
+          [Route]
+          Gateway=${p.networks_by_key.main.router}
+          Destination=0.0.0.0/0
+          Table=${slave_default_route_table}
 
-    - path: /etc/containerd/config.toml
-      filesystem: root
-      mode: 420
+          [RoutingPolicyRule]
+          Table=${slave_default_route_table}
+          Priority=${slave_default_route_priority}
+    - path: /etc/systemd/network/20-${p.networks_by_key.wan.if}.network.d/gateway.conf
+      mode: 0644
       contents:
-        inline: |-
-          version = 2
-          root = "/var/lib/containerd"
-          oom_score = -999
-          [plugins]
-            [plugins."io.containerd.grpc.v1.cri"]
-              [plugins."io.containerd.grpc.v1.cri".containerd]
-                snapshotter = "overlayfs"
-                [plugins."io.containerd.grpc.v1.cri".containerd.runtimes]
-                  [plugins."io.containerd.grpc.v1.cri".containerd.runtimes.runc]
-                    # runtime_type should be normally be "io.containerd.runc.v*"
-                    # containerd-shim-runc-v* binaries are needed but not provided in the flatcar image
-                    runtime_type = "io.containerd.runtime.v1.linux"
-            [plugins."io.containerd.runtime.v1.linux"]
-              no_pivot = true
+        inline: |
+          [Link]
+          RequiredForOnline=false
 
-    - path: ${kubelet_path}/kubelet-config.yaml
-      filesystem: root
-      mode: 420
-      contents:
-        inline: |-
-          kind: KubeletConfiguration
-          apiVersion: kubelet.config.k8s.io/v1beta1
-          authentication:
-            anonymous:
-              enabled: true
-            webhook:
-              enabled: false
-          authorization:
-            mode: AlwaysAllow
-          staticPodPath: ${kubelet_path}/manifests
-          makeIPTablesUtilChains: false
+          [DHCP]
+          UseDNS=false
+          UseNTP=false
+          SendHostname=false
+          UseHostname=false
+          UseDomains=false
+          UseTimezone=false
+          RouteTable=${master_default_route_table}
 
-    ##
-    ## pod config
-    ##
-
-    - path: ${pod_mount_path}/coredns/Corefile
-      filesystem: root
-      mode: 420
-      contents:
-        inline: |-
-          ${domains.internal}:53 {
-            errors
-            forward . ${services.internal_dns.vip}
-          }
-          ${domains.kubernetes_cluster}:53 {
-            errors
-            forward . ${services.internal_dns.vip}
-          }
-          .:53 {
-            errors
-            health
-            forward . tls://${dns_forward_ip} {
-              tls_servername ${dns_forward_tls_servername}
-              health_check 20s
-            }
-            prometheus :${services.recursive_dns.ports.prometheus}
-            cache 30
-            reload
-            loadbalance
-          }
-
-    - path: ${pod_mount_path}/keepalived/keepalived.conf
-      filesystem: root
-      mode: 420
+          [Network]
+          DNS=${dns_forward_ip}
+          DNSOverTLS=yes
+          Domains=~
+    - path: /etc/keepalived/keepalived.conf
+      mode: 0644
+      overwrite: true
       contents:
         inline: |-
           global_defs {
             vrrp_version 3
             vrrp_iptables
-            dynamic_interfaces
+            dynamic_interfaces allow_if_changes
           }
-          vrrp_instance VI_gateway {
+          vrrp_sync_group VG_gateway {
+            group {
+              %{~ for k, v in p.networks_by_key ~}
+              %{~ if lookup(v, "router", null) != null ~}
+              VI_gateway_${k}
+              %{~ endif ~}
+              %{~ endfor ~}
+            }
+          }
+          %{~ for k, v in p.networks_by_key ~}
+          %{~ if lookup(v, "router", null) != null ~}
+          vrrp_instance VI_gateway_${k} {
             nopreempt
             state BACKUP
             strict_mode off
-            virtual_router_id 247
-            interface ${host_network.store.if}
+            virtual_router_id ${vrrp_gateway_id}
+            interface ${v.if}
             priority 100
-            virtual_ipaddress {
-              %{~ for k in keys(networks) ~}
-              %{~ if lookup(networks[k], "router", null) != null ~}
-              ${networks[k].router} dev ${host_network[k].if}
-              %{~ endif ~}
-              %{~ endfor ~}
-              ${services.recursive_dns.vip} dev ${host_network.store.if}
-            }
             virtual_rules {
-              %{~ for k in keys(networks) ~}
-              %{~ if lookup(networks[k], "router", null) != null ~}
-              to ${networks[k].network}/${networks[k].cidr} lookup main priority 32758
-              iif ${host_network[k].if} lookup ${host_network.wan.route_table} priority 32760
-              %{~ endif ~}
-              %{~ endfor ~}
+              to all lookup ${master_default_route_table} priority ${master_default_route_priority}
+            }
+            virtual_ipaddress {
+              ${v.router}
             }
           }
-
-    - path: ${pod_mount_path}/conntrackd/conntrackd.conf
-      filesystem: root
-      mode: 420
-      contents:
-        inline: |-
-          Sync {
-            Mode FTFW {
-              # StartupResync on
-              DisableExternalCache on
-            }
-
-            Multicast {
-              IPv4_address 225.0.0.50
-              Group 3780
-              IPv4_interface ${host_network.sync.ip}
-              Interface ${host_network.sync.if}
-              SndSocketBuffer 24985600
-              RcvSocketBuffer 24985600
-              Checksum on
-            }
-
-            Options {
-              TCPWindowTracking on
-              ExpectationSync on
-            }
-          }
-
-          General {
-            LogFile /dev/stdout
-            HashSize 32768
-            HashLimit 131072
-            NetlinkBufferSize 2097152
-            NetlinkBufferSizeMaxGrowth 8388608
-            NetlinkEventsReliable on
-
-            UNIX {
-              Path /var/run/conntrackd.ctl
-            }
-
-            Filter From Kernelspace {
-              Address Ignore {
-                IPv4_address 127.0.0.1
-                IPv4_address ${services.recursive_dns.vip}
-                %{~ for k in keys(host_network) ~}
-                %{~ if lookup(host_network[k], "ip", null) != null ~}
-                IPv4_address ${host_network[k].ip}
-                %{~ endif ~}
-                %{~ endfor ~}
-                %{~ for k in keys(networks) ~}
-                %{~ if lookup(networks[k], "router", null) != null ~}
-                IPv4_address ${networks[k].router}
-                %{~ endif ~}
-                %{~ endfor ~}
-              }
-            }
-          }
-
-    - path: ${pod_mount_path}/nftables/nft.rules
-      filesystem: root
-      mode: 420
+          %{~ endif ~}
+          %{~ endfor ~}
+    - path: /etc/sysconfig/nftables.conf
+      mode: 0644
+      overwrite: true
       contents:
         inline: |-
           define if_internal = { ${join(",", [
-            for k in keys(networks):
-            "${host_network[k].if}"
-            if lookup(networks[k], "dhcp_pool", null) != null && lookup(networks[k], "router", null) != null
+            for k in p.network:
+            "${k.if}"
+            if lookup(k, "dhcp_pool", null) != null && lookup(k, "router", null) != null
           ])} }
-          define if_external = ${host_network.wan.if}
-          define if_trusted = ${host_network.store.if}
-          define if_sync = ${host_network.sync.if}
+          define if_external = ${p.networks_by_key.wan.if}
+          define if_trusted = ${p.networks_by_key.main.if}
+          define if_sync = ${p.networks_by_key.sync.if}
 
           table ip filter {
             chain base_checks {
@@ -359,9 +128,10 @@ storage:
               iifname $if_trusted accept;
               iifname $if_sync accept;
 
-              iifname $if_internal tcp dport domain accept;
-              iifname $if_internal udp dport domain accept;
+              iifname $if_internal tcp dport ${dns_redirect_port} accept;
+              iifname $if_internal udp dport ${dns_redirect_port} accept;
               iifname $if_internal udp sport bootps udp dport bootpc accept;
+              iifname $if_internal tcp dport ssh accept;
               iifname $if_internal pkttype multicast accept;
             }
 
@@ -373,9 +143,13 @@ storage:
               ip protocol icmp icmp type { echo-request, echo-reply, time-exceeded, parameter-problem, destination-unreachable } accept;
 
               iifname $if_trusted accept;
-              iifname $if_internal oifname $if_external accept;
+              iifname $if_sync accept;
 
-              iifname $if_internal ip daddr ${networks.metallb.network}/${networks.metallb.cidr} accept;
+              iifname $if_internal oifname $if_external accept;
+              iifname $if_internal tcp dport ssh accept;
+              %{~ for v in values(loadbalancer_pools) ~}
+              iifname $if_internal ip daddr ${v.network}/${v.cidr} accept;
+              %{~ endfor ~}
             }
 
             chain output {
@@ -385,7 +159,9 @@ storage:
 
           table ip nat {
             chain prerouting {
-              type nat hook prerouting priority 0; policy accept;
+              type nat hook prerouting priority -100; policy accept;
+              iifname $if_internal tcp dport domain redirect to ${dns_redirect_port};
+              iifname $if_internal udp dport domain redirect to ${dns_redirect_port};
             }
 
             chain input {
@@ -403,9 +179,100 @@ storage:
           }
           ;
 
+    ##
+    ## pod config
+    ##
+
+    - path: ${pod_mount_path}/coredns/Corefile
+      mode: 0644
+      contents:
+        inline: |-
+          ${domains.internal} {
+            errors
+            forward . ${services.internal_dns.vip}
+          }
+          ${domains.kubernetes_cluster} {
+            errors
+            forward . ${services.internal_dns.vip}
+          }
+          ${domains.mdns} {
+            errors
+            forward . 127.0.0.53
+          }
+          . {
+            errors
+            health
+            forward . tls://${dns_forward_ip} {
+              tls_servername ${dns_forward_tls_servername}
+              health_check 20s
+            }
+            prometheus :${services.recursive_dns.ports.prometheus}
+            cache 30
+            reload
+            loadbalance
+          }
+
+    - path: ${pod_mount_path}/conntrackd/conntrackd.conf
+      mode: 0644
+      contents:
+        inline: |-
+          Sync {
+            Mode FTFW {
+              StartupResync on
+              DisableExternalCache on
+            }
+
+            Multicast {
+              IPv4_address 225.0.0.50
+              Group 3780
+              IPv4_interface ${p.networks_by_key.sync.ip}
+              Interface ${p.networks_by_key.sync.if}
+              SndSocketBuffer 24985600
+              RcvSocketBuffer 24985600
+              Checksum on
+            }
+
+            Options {
+              TCPWindowTracking on
+              ExpectationSync on
+            }
+          }
+
+          General {
+            Systemd off
+            LogFile /dev/stdout
+            Syslog off
+            HashSize 32768
+            HashLimit 131072
+            NetlinkBufferSize 2097152
+            NetlinkBufferSizeMaxGrowth 8388608
+            NetlinkEventsReliable on
+
+            UNIX {
+              Path /var/run/conntrackd.ctl
+            }
+
+            Filter From Kernelspace {
+              Address Ignore {
+                IPv4_address 127.0.0.1
+                IPv4_address ${services.recursive_dns.vip}
+                IPv4_address ${p.networks_by_key.sync.network}/${p.networks_by_key.sync.cidr}
+                %{~ for k in p.network ~}
+                %{~ if lookup(k, "ip", null) != null ~}
+                IPv4_address ${k.ip}
+                %{~ endif ~}
+                %{~ endfor ~}
+                %{~ for k in p.network ~}
+                %{~ if lookup(k, "router", null) != null ~}
+                IPv4_address ${k.router}
+                %{~ endif ~}
+                %{~ endfor ~}
+              }
+            }
+          }
+
     - path: ${pod_mount_path}/kea/kea-ctrl-agent.conf
-      filesystem: root
-      mode: 420
+      mode: 0644
       contents:
         inline: |-
           {
@@ -422,8 +289,7 @@ storage:
           }
 
     - path: ${pod_mount_path}/kea/kea-dhcp4.conf
-      filesystem: root
-      mode: 420
+      mode: 0644
       contents:
         inline: |-
           {
@@ -431,11 +297,16 @@ storage:
               "valid-lifetime": 1200,
               "renew-timer": 300,
               "rebind-timer": 600,
+              "lease-database": {
+                "type": "memfile",
+                "persist": true,
+                "name": "${kea_path}/kea-leases4.csv"
+              },
               "interfaces-config": {
                 "interfaces": ${jsonencode([
-                for k in keys(networks):
-                "${host_network[k].if}"
-                if lookup(networks[k], "dhcp_pool", null) != null && lookup(networks[k], "router", null) != null
+                  for k in p.network:
+                  k.if
+                  if lookup(k, "dhcp_pool", null) != null && lookup(k, "router", null) != null
                 ])}
               },
               "control-socket": {
@@ -451,10 +322,6 @@ storage:
                   "name": "domain-name-servers",
                   "data": "${services.recursive_dns.vip}",
                   "csv-format": true
-                },
-                {
-                  "name": "interface-mtu",
-                  "data": "${mtu}"
                 }
               ],
               "hooks-libraries": [
@@ -467,8 +334,8 @@ storage:
                   "parameters": {
                     "high-availability": [
                       {
-                        "this-server-name": "${hostname}",
-                        "mode": "hot-standby",
+                        "this-server-name": "${p.hostname}",
+                        "mode": "load-balancing",
                         "max-unacked-clients": 0,
                         "peers": ${kea_ha_peers}
                       }
@@ -477,22 +344,27 @@ storage:
                 }
               ],
               "subnet4": ${jsonencode([
-                for k in keys(networks):
+                for k in p.network:
                 {
-                  subnet = "${networks[k].network}/${networks[k].cidr}",
-                  option-data = [
+                  subnet = "${k.network}/${k.cidr}",
+                  option-data = concat([
                     {
                       name = "routers"
-                      data = "${networks[k].router}"
+                      data = k.router
                     }
-                  ]
+                  ], lookup(k, "mtu", null) != null ? [
+                    {
+                      name = "interface-mtu"
+                      data = format("%s", k.mtu)
+                    }
+                  ] : [])
                   pools = [
                     {
-                      pool = "${networks[k].dhcp_pool}"
+                      pool = k.dhcp_pool
                     }
                   ]
                 }
-                if lookup(networks[k], "dhcp_pool", null) != null && lookup(networks[k], "router", null) != null
+                if lookup(k, "dhcp_pool", null) != null && lookup(k, "router", null) != null
               ])},
               "dhcp-ddns": {
                 "enable-updates": true,
@@ -504,41 +376,33 @@ storage:
             }
           }
 
-    - path: ${pod_mount_path}/loki/promtail-config.yaml
-      filesystem: root
-      mode: 420
+    - path: ${pod_mount_path}/keepalived/keepalived.conf
+      mode: 0644
       contents:
         inline: |-
-          positions:
-            filename: /etc/promtail/promtail-positions.yaml
-          scrape_configs:
-          - job_name: containers
-            static_configs:
-            - targets:
-              - localhost
-              labels:
-                job: static-pod
-                host: ${hostname}
-                __path__: /var/log/pods/*/*/*.log
-            pipeline_stages:
-            - match:
-                selector: '{job="static-pod"}'
-                stages:
-                - cri: {}
-                - regex:
-                    source: filename
-                    expression: "(?:pods)/(?P<namespace>\\S+?)_\\S+?/(?P<container_name>\\S+?)/"
-                - labels:
-                    namespace:
-                    container_name:
+          global_defs {
+            vrrp_version 3
+            vrrp_iptables
+            dynamic_interfaces allow_if_changes
+          }
+          vrrp_instance VI_dns_main {
+            nopreempt
+            state BACKUP
+            strict_mode off
+            virtual_router_id ${vrrp_dns_id}
+            interface ${p.networks_by_key.main.if}
+            priority 100
+            virtual_ipaddress {
+              ${services.recursive_dns.vip}
+            }
+          }
 
     ##
     ## pod manifests
     ##
 
     - path: ${kubelet_path}/manifests/kea.yaml
-      filesystem: root
-      mode: 420
+      mode: 0644
       contents:
         inline: |-
           ---
@@ -580,9 +444,8 @@ storage:
               hostPath:
                 path: ${pod_mount_path}/kea/kea-dhcp4.conf
 
-    - path: ${kubelet_path}/manifests/gateway-node.yaml
-      filesystem: root
-      mode: 420
+    - path: ${kubelet_path}/manifests/coredns.yaml
+      mode: 0644
       contents:
         inline: |-
           ---
@@ -590,22 +453,10 @@ storage:
           kind: Pod
           metadata:
             namespace: kube-system
-            name: gateway-node
+            name: coredns
           spec:
             restartPolicy: Always
             hostNetwork: true
-            initContainers:
-            - name: nftables
-              image: ${container_images.nftables}
-              args: [ "-f", "/etc/nftables/nft.rules" ]
-              securityContext:
-                capabilities:
-                  add:
-                  - NET_ADMIN
-              volumeMounts:
-              - name: config-nftables
-                mountPath: /etc/nftables/nft.rules
-                readOnly: true
             containers:
             - name: coredns
               image: "${container_images.coredns}"
@@ -615,7 +466,7 @@ storage:
                 requests:
                   cpu: 100m
                   memory: 70Mi
-              args: [ "-conf", "/etc/coredns/Corefile" ]
+              args: [ "-dns.port", "${dns_redirect_port}", "-conf", "/etc/coredns/Corefile" ]
               livenessProbe:
                 httpGet:
                   path: /health
@@ -658,9 +509,6 @@ storage:
                 mountPath: /etc/keepalived/keepalived.conf
                 readOnly: true
             volumes:
-            - name: config-nftables
-              hostPath:
-                path: ${pod_mount_path}/nftables/nft.rules
             - name: config-coredns
               hostPath:
                 path: ${pod_mount_path}/coredns/Corefile
@@ -669,8 +517,7 @@ storage:
                 path: ${pod_mount_path}/keepalived/keepalived.conf
 
     - path: ${kubelet_path}/manifests/conntrackd.yaml
-      filesystem: root
-      mode: 420
+      mode: 0644
       contents:
         inline: |-
           ---
@@ -699,44 +546,3 @@ storage:
             - name: config-volume
               hostPath:
                 path: ${pod_mount_path}/conntrackd/conntrackd.conf
-
-    - path: ${kubelet_path}/manifests/promtail.yaml
-      filesystem: root
-      mode: 420
-      contents:
-        inline: |-
-          ---
-          apiVersion: v1
-          kind: Pod
-          metadata:
-            namespace: kube-system
-            name: loki
-          spec:
-            restartPolicy: Always
-            hostNetwork: true
-            containers:
-            - name: promtail
-              image: ${container_images.promtail}
-              args:
-              - "-config.file=/etc/promtail/promtail-config.yaml"
-              - "-client.url=http://${services.loki.vip}:${services.loki.ports.http_listen}/loki/api/v1/push"
-              volumeMounts:
-              - name: pods
-                mountPath: /var/log/pods
-                readOnly: true
-              - name: config-promtail
-                mountPath: /etc/promtail/promtail-config.yaml
-                readOnly: true
-            volumes:
-            - name: pods
-              hostPath:
-                path: /var/log/pods
-            - name: config-promtail
-              hostPath:
-                path: ${pod_mount_path}/loki/promtail-config.yaml
-
-passwd:
-  users:
-  - name: ${user}
-    ssh_authorized_keys:
-      - ${ssh_authorized_key}

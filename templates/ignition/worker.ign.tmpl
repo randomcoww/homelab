@@ -1,184 +1,71 @@
 ---
-networkd:
-  units:
-    - name: 10-${host_network.store.if}.network
-      contents: |
-        [Match]
-        Name=${host_network.store.if}
-
-        [Network]
-        LinkLocalAddressing=no
-        DHCP=no
-        Gateway=${networks.store.router}
-        DNS=${services.recursive_dns.vip}
-
-        [Link]
-        MTUBytes=${mtu}
-
-        [Address]
-        Address=${host_network.store.ip}/${networks.store.cidr}
-    - name: 10-${host_network.int.if}.network
-      contents: |
-        [Match]
-        Name=${host_network.int.if}
-
-        [Link]
-        ARP=no
-
-        [Network]
-        LinkLocalAddressing=no
-        DHCP=no
-    - name: 50-kube-proxy.network
-      contents: |
-        [Match]
-        Name=kube*
-
-        [Link]
-        Unmanaged=true
-    - name: 50-veth.network
-      contents: |
-        [Match]
-        Name=veth*
-
-        [Link]
-        Unmanaged=true
-
+variant: fcos
+version: 1.0.0
 systemd:
   units:
-    %{~ for disk in host_disks ~}
-    %{~ if lookup(disk, "label", null) != null ~}
-    %{~ if lookup(disk, "mount_path", null) != null ~}
-    - name: ${join("-", compact(split("/", disk.mount_path)))}.mount
-      enable: true
-      contents: |
-        [Unit]
-        Before=local-fs.target
-        [Mount]
-        What=${disk.device}
-        Where=${disk.mount_path}
-        Type=${lookup(disk, "format", "xfs")}
-        [Install]
-        WantedBy=local-fs.target
-    %{~ endif ~}
-    %{~ endif ~}
-    %{~ endfor ~}
-    - name: ntpd.service
-      enabled: true
-    - name: docker.service
-      mask: true
-    - name: docker.socket
-      mask: true
-    - name: containerd.service
-      enabled: true
-      dropins:
-        - name: containerd.conf
-          contents: |
-            [Service]
-            LimitNOFILE=infinity
-            ExecStart=
-            ExecStart=/usr/bin/env PATH=$${TORCX_BINDIR}:$${PATH} $${TORCX_BINDIR}/containerd
-            RestartSec=5
     - name: kubelet.service
       enabled: true
+      dropins:
+        - name: 10-worker.conf
+          contents: |
+            [Unit]
+            After=iscsid.service
+            Wants=iscsid.service
+
+            [Service]
+            ExecStart=
+            ExecStart=/usr/bin/podman run --rm -it \
+              $KUBELET_PODMAN_OPTS \
+              ${container_images.hyperkube} \
+                kubelet \
+                  --config=${kubelet_path}/kubelet-config-worker.yaml \
+                  --exit-on-lock-contention \
+                  --lock-file=/var/run/lock/kubelet.lock \
+                  --kubeconfig=${kubelet_path}/kubelet.kubeconfig \
+                  --bootstrap-kubeconfig=${kubelet_path}/bootstrap.kubeconfig \
+                  --network-plugin=cni \
+                  --cert-dir=${kubelet_path} \
+                  --volume-plugin-dir=${kubelet_path}/volumeplugins \
+                  --container-runtime=remote \
+                  --container-runtime-endpoint=unix:///var/run/dockershim.sock
+    - name: iscsid.socket
+      mask: true
+    - name: iscsid.service
+      enabled: true
       contents: |
         [Unit]
-        Description=Kubelet via Hyperkube ACI
         After=network.target
 
         [Service]
-        ExecStartPre=/bin/mkdir -p \
-          ${kubelet_path} \
-          /var/log/containers \
-          /etc/cni/net.d
-        ExecStartPre=-/usr/bin/rkt rm --uuid-file=/var/cache/kubelet-pod.uuid
-        ExecStart=/usr/bin/rkt run \
-          --uuid-file-save=/var/cache/kubelet-pod.uuid \
-          --volume var-lib-containerd,kind=host,source=/var/lib/containerd,readOnly=false \
-          --mount volume=var-lib-containerd,target=/var/lib/containerd \
-          --insecure-options=image \
-          --volume coreos-var-lib-kubelet,kind=host,source=${kubelet_path},readOnly=false,recursive=true \
-          --volume coreos-var-log,kind=host,source=/var/log,readOnly=false \
-          --volume coreos-run,kind=host,source=/run,readOnly=false \
-          --mount volume=coreos-var-lib-kubelet,target=${kubelet_path} \
-          --mount volume=coreos-var-log,target=/var/log \
-          --mount volume=coreos-run,target=/run \
-          --dns host \
-          --hosts-entry host \
-          --stage1-from-dir=stage1-fly.aci \
-          docker://${container_images.hyperkube} \
-            --exec=/usr/local/bin/kubelet -- \
-            --config=${kubelet_path}/kubelet-config.yaml \
-            --kubeconfig=${kubelet_path}/kubelet.kubeconfig \
-            --bootstrap-kubeconfig=${kubelet_path}/bootstrap.kubeconfig \
-            --network-plugin=cni \
-            --cert-dir=${kubelet_path} \
-            --volume-plugin-dir=${kubelet_path}/volumeplugins \
-            --container-runtime=remote \
-            --container-runtime-endpoint=unix:///run/containerd/containerd.sock
-        ExecStop=-/usr/bin/rkt stop --uuid-file=/var/cache/kubelet-pod.uuid
+        ExecStartPre=-/usr/bin/podman kill iscsid
+        ExecStartPre=-/usr/bin/podman rm iscsid
+        ExecStart=/usr/bin/podman run --rm -it \
+          --name iscsid \
+          --security-opt label=disable \
+          --network host \
+          --pid host \
+          --privileged \
+          -v /dev:/dev \
+          -v /usr/lib/modules:/lib/modules:ro \
+          ${container_images.hyperkube} \
+            iscsid -fn
         Restart=always
-        RestartSec=5
 
         [Install]
         WantedBy=multi-user.target
 
 storage:
-  filesystems:
-    %{~ for disk in host_disks ~}
-    %{~ if lookup(disk, "label", null) != null ~}
-    - name: ${disk.label}
-      mount:
-        device: ${disk.device}
-        format: ${lookup(disk, "format", "xfs")}
-        wipe_filesystem: ${lookup(disk, "wipe_filesystem", false)}
-        label: ${upper(disk.label)}
-    %{~ endif ~}
-    %{~ endfor ~}
-
   files:
-    - path: /etc/hostname
-      filesystem: root
-      mode: 0644
-      contents:
-        inline:
-          ${hostname}
-    - path: /etc/sysctl.d/max-user-watches.conf
-      filesystem: root
+    - path: /etc/modules-load.d/custom.conf
       mode: 0644
       contents:
         inline: |
-          fs.inotify.max_user_watches=16184
-    - path: /etc/modules-load.d/iscsi.conf
-      filesystem: root
-      mode: 0644
-      contents:
-        inline: |
+          # openebs mount
           iscsi_tcp
-
-    - path: /etc/containerd/config.toml
-      filesystem: root
-      mode: 420
-      contents:
-        inline: |-
-          version = 2
-          root = "/var/lib/containerd"
-          oom_score = -999
-          [plugins]
-            [plugins."io.containerd.grpc.v1.cri"]
-              stream_server_address = "0.0.0.0"
-              [plugins."io.containerd.grpc.v1.cri".containerd]
-                snapshotter = "overlayfs"
-                [plugins."io.containerd.grpc.v1.cri".containerd.runtimes]
-                  [plugins."io.containerd.grpc.v1.cri".containerd.runtimes.runc]
-                    # runtime_type should be normally be "io.containerd.runc.v*"
-                    # containerd-shim-runc-v* binaries are needed but not provided in the flatcar image
-                    runtime_type = "io.containerd.runtime.v1.linux"
-            [plugins."io.containerd.runtime.v1.linux"]
-              no_pivot = true
-
-    - path: ${kubelet_path}/kubelet-config.yaml
-      filesystem: root
-      mode: 420
+          # kube-dns reply from unexpected source
+          br_netfilter
+    - path: ${kubelet_path}/kubelet-config-worker.yaml
+      mode: 0644
       contents:
         inline: |-
           kind: KubeletConfiguration
@@ -198,10 +85,8 @@ storage:
           runtimeRequestTimeout: "15m"
           rotateCertificates: true
           serverTLSBootstrap: true
-
     - path: ${kubelet_path}/bootstrap.kubeconfig
-      filesystem: root
-      mode: 420
+      mode: 0644
       contents:
         inline: |-
           apiVersion: v1
@@ -213,13 +98,13 @@ storage:
           contexts:
           - context:
               cluster: ${cluster_name}
-              user: system:node:bootstrap
+              user: kubelet-bootstrap
             name: default
           current-context: default
           kind: Config
           preferences: {}
           users:
-          - name: system:node:bootstrap
+          - name: kubelet-bootstrap
             user:
               client-certificate: ${kubelet_path}/bootstrap.pem
               client-key: ${kubelet_path}/bootstrap-key.pem
@@ -229,23 +114,14 @@ storage:
     ##
 
     - path: ${kubelet_path}/kubernetes-ca.pem
-      filesystem: root
-      mode: 420
+      mode: 0644
       contents:
         inline: "${tls_kubernetes_ca}"
     - path: ${kubelet_path}/bootstrap.pem
-      filesystem: root
-      mode: 420
+      mode: 0644
       contents:
         inline: "${tls_bootstrap}"
     - path: ${kubelet_path}/bootstrap-key.pem
-      filesystem: root
-      mode: 420
+      mode: 0644
       contents:
         inline: "${tls_bootstrap_key}"
-
-passwd:
-  users:
-  - name: ${user}
-    ssh_authorized_keys:
-      - ${ssh_authorized_key}

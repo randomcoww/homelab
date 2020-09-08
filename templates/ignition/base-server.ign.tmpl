@@ -1,0 +1,25 @@
+---
+variant: fcos
+version: 1.0.0
+storage:
+  files:
+    - path: /etc/hostname
+      mode: 0644
+      contents:
+        inline:
+          ${p.hostname}
+    - path: /etc/sysctl.d/custom.conf
+      mode: 0644
+      contents:
+        inline: |
+          net.ipv4.ip_forward=1
+          net.ipv4.ip_nonlocal_bind=1
+          fs.inotify.max_user_watches=524288
+passwd:
+  users:
+    - name: ${user}
+      groups:
+        - adm
+        - sudo
+        - systemd-journal
+        - wheel

@@ -1,0 +1,7 @@
+<network>
+  <name>${label}</name>
+  <forward mode='hostdev' managed='yes'>
+    <pf dev='${if}'/>
+    <driver name='vfio'/>
+  </forward>
+</network>

@@ -1,7 +1,53 @@
+apiVersion: policy/v1beta1
+kind: PodSecurityPolicy
+metadata:
+  name: minio
+spec:
+  volumes: ['secret', 'hostPath']
+  hostNetwork: true
+  hostPorts:
+  - min: 0
+    max: 65535
+  runAsUser:
+    rule: 'RunAsAny'
+  seLinux:
+    rule: 'RunAsAny'
+  supplementalGroups:
+    rule: 'RunAsAny'
+  fsGroup:
+    rule: 'RunAsAny'
+
+---
+kind: ClusterRole
+apiVersion: rbac.authorization.k8s.io/v1beta1
+metadata:
+  name: minio-psp
+rules:
+- apiGroups: ["extensions"]
+  resources: ["podsecuritypolicies"]
+  verbs: ["use"]
+  resourceNames: ["minio"]
+
+---
+kind: ClusterRoleBinding
+apiVersion: rbac.authorization.k8s.io/v1beta1
+metadata:
+  name: minio-psp
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: minio-psp
+subjects:
+- kind: ServiceAccount
+  name: default
+  namespace: minio
+
+---
 apiVersion: apps/v1
 kind: StatefulSet
 metadata:
   name: minio
+  namespace: minio
 spec:
   serviceName: minio
   replicas: 1
@@ -13,18 +59,20 @@ spec:
       labels:
         app: minio
     spec:
+      affinity:
+        nodeAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+            nodeSelectorTerms:
+            - matchExpressions:
+              - key: minio-data
+                operator: Exists
       hostNetwork: true
       dnsPolicy: ClusterFirstWithHostNet
-      nodeSelector:
-        kubernetes.io/hostname: worker-0
-      volumes:
-      - name: s3
-        hostPath:
-          path: "/minio"
-          type: DirectoryOrCreate
       containers:
       - name: minio
         env:
+        - name: MINIO_CACHE_DRIVES
+          value: /var/cache
         - name: MINIO_STORAGE_CLASS_STANDARD
           value: "EC:2"
         - name: MINIO_STORAGE_CLASS_RRS
@@ -39,64 +87,63 @@ spec:
             secretKeyRef:
               name: minio-auth
               key: secret_access_key
-        - name: HOST_IP
+        - name: INTERNAL_IP
           valueFrom:
             fieldRef:
               fieldPath: status.hostIP
-        image: minio/minio
+        image: minio/minio:RELEASE.2020-05-08T02-40-49Z
         args:
         - server
         - --address
         - :9000
-        - http://$(HOST_IP)/minio/0
-        - http://$(HOST_IP)/minio/1
-        - http://$(HOST_IP)/minio/2
-        - http://$(HOST_IP)/minio/3
-        - http://$(HOST_IP)/minio/4
-        - http://$(HOST_IP)/minio/5
-        - http://$(HOST_IP)/minio/6
-        - http://$(HOST_IP)/minio/7
-        - http://$(HOST_IP)/minio/8
-        - http://$(HOST_IP)/minio/9
-        - http://$(HOST_IP)/minio/10
-        - http://$(HOST_IP)/minio/11
+        - http://$(INTERNAL_IP)/var/s3/0
+        - http://$(INTERNAL_IP)/var/s3/1
+        - http://$(INTERNAL_IP)/var/s3/2
+        - http://$(INTERNAL_IP)/var/s3/3
+        - http://$(INTERNAL_IP)/var/s3/4
+        - http://$(INTERNAL_IP)/var/s3/5
+        - http://$(INTERNAL_IP)/var/s3/6
+        - http://$(INTERNAL_IP)/var/s3/7
+        - http://$(INTERNAL_IP)/var/s3/8
+        - http://$(INTERNAL_IP)/var/s3/9
+        - http://$(INTERNAL_IP)/var/s3/10
+        - http://$(INTERNAL_IP)/var/s3/11
         ports:
         - containerPort: 9000
         volumeMounts:
-        - name: s3
-          mountPath: /minio
+        - name: data
+          mountPath: /var/s3
+        - name: cache
+          mountPath: /var/cache
         livenessProbe:
           httpGet:
             path: /minio/health/live
             port: 9000
           initialDelaySeconds: 120
           periodSeconds: 20
+      volumes:
+      - name: data
+        hostPath:
+          path: /var/s3
+          type: DirectoryOrCreate
+      - name: cache
+        hostPath:
+          path: /var/pv/cache
+          type: DirectoryOrCreate
 
 ---
 apiVersion: v1
 kind: Service
 metadata:
   name: minio
+  namespace: minio
   labels:
     app: minio
 spec:
   clusterIP: None
   ports:
   - port: 9000
-  selector:
-    app: minio
-
----
-apiVersion: v1
-kind: Service
-metadata:
-  name: minio-ui
-spec:
-  ports:
-  - name: web
-    port: 80
-    targetPort: 9000
-    protocol: TCP
+    name: api
   selector:
     app: minio
 
@@ -104,7 +151,8 @@ spec:
 apiVersion: extensions/v1beta1
 kind: Ingress
 metadata:
-  name: minio-ui
+  name: minio
+  namespace: minio
   annotations:
     kubernetes.io/ingress.class: traefik
     ingress.kubernetes.io/ssl-redirect: "true"
@@ -115,7 +163,7 @@ spec:
       paths:
       - path: /
         backend:
-          serviceName: minio-ui
-          servicePort: web
+          serviceName: minio
+          servicePort: api
   tls:
-  - secretName: internal-tls
+  - secretName: tls-ingress

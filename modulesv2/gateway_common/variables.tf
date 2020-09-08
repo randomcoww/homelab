@@ -2,15 +2,7 @@ variable "user" {
   type = string
 }
 
-variable "ssh_ca_public_key" {
-  type = string
-}
-
-variable "mtu" {
-  type = number
-}
-
-variable "networks" {
+variable "loadbalancer_pools" {
   type = any
 }
 
@@ -19,13 +11,21 @@ variable "services" {
 }
 
 variable "domains" {
-  type = any
+  type = map(string)
 }
 
 variable "container_images" {
+  type = map(string)
+}
+
+variable "hosts" {
   type = any
 }
 
-variable "gateway_hosts" {
-  type = any
+variable "templates" {
+  type = list(string)
+}
+
+variable "addon_templates" {
+  type = map(string)
 }

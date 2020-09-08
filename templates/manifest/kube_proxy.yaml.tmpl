@@ -5,6 +5,53 @@ metadata:
   namespace: ${namespace}
 
 ---
+apiVersion: policy/v1beta1
+kind: PodSecurityPolicy
+metadata:
+  name: kube-proxy-psp
+  namespace: ${namespace}
+spec:
+  privileged: true
+  volumes: ['*']
+  hostNetwork: true
+  runAsUser:
+    rule: 'RunAsAny'
+  seLinux:
+    rule: 'RunAsAny'
+  supplementalGroups:
+    rule: 'RunAsAny'
+  fsGroup:
+    rule: 'RunAsAny'
+
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  labels:
+    kubernetes.io/bootstrapping: rbac-defaults
+    addonmanager.kubernetes.io/mode: Reconcile
+  name: kube-proxy-psp
+rules:
+- apiGroups: ["extensions"]
+  resources: ["podsecuritypolicies"]
+  verbs: ["use"]
+  resourceNames: ["kube-proxy-psp"]
+
+---
+kind: ClusterRoleBinding
+apiVersion: rbac.authorization.k8s.io/v1beta1
+metadata:
+  name: kube-proxy-psp
+subjects:
+  - kind: ServiceAccount
+    name: kube-proxy
+    namespace: ${namespace}
+roleRef:
+  kind: ClusterRole
+  name: kube-proxy-psp
+  apiGroup: rbac.authorization.k8s.io
+
+---
 kind: ClusterRoleBinding
 apiVersion: rbac.authorization.k8s.io/v1beta1
 metadata:
@@ -30,9 +77,8 @@ data:
     apiVersion: kubeproxy.config.k8s.io/v1alpha1
     mode: "ipvs"
     clusterCIDR: "${networks.kubernetes.network}/${networks.kubernetes.cidr}"
-    iptables:
-      masqueradeAll: true
-
+    ipvs:
+      strictARP: true
 ---
 apiVersion: apps/v1
 kind: DaemonSet

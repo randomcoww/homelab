@@ -1,0 +1,77 @@
+<domain type='kvm'>
+  <name>recovery-windows</name>
+  <memory unit='GiB'>8</memory>
+  <currentMemory unit='GiB'>8</currentMemory>
+  <memoryBacking>
+    <nosharepages/>
+    <locked/>
+  </memoryBacking>
+  <vcpu placement='static'>8</vcpu>
+  <os>
+    <type machine='pc'>hvm</type>
+  </os>
+  <features>
+    <acpi/>
+    <apic/>
+    <pae/>
+    <hyperv>
+      <vpindex state='on'/>
+      <synic state='on'/>
+      <stimer state='on'/>
+      <reset state='on'/>
+      <relaxed state='on'/>
+      <vapic state='on'/>
+      <spinlocks state='on' retries='8191'/>
+      <vendor_id state='on' value='KeenlyKVM'/>
+    </hyperv>
+    <kvm>
+      <hidden state='on'/>
+    </kvm>
+    <vmport state='off'/>
+  </features>
+  <cpu mode='host-passthrough'>
+    <topology sockets='1' cores='8' threads='1'/>
+    <cache level='3' mode='emulate'/>
+  </cpu>
+  <clock offset='localtime'>
+    <timer name='hypervclock' present='yes'/>
+  </clock>
+  <pm>
+    <suspend-to-mem enabled='no'/>
+    <suspend-to-disk enabled='no'/>
+  </pm>
+  <devices>
+    <emulator>/usr/bin/qemu-kvm</emulator>
+    <disk type='file' device='disk'>
+      <driver name='qemu' type='raw' cache='none' io='native' discard='unmap'/>
+      <source file='/data/qemu/recovery-windows.img'/>
+      <target dev='sda' bus='sata'/>
+      <boot order='1'/>
+    </disk>
+    <disk type='file' device='cdrom'>
+      <driver name='qemu' type='raw'/>
+      <source file='/data/qemu/virtio-win.iso'/>
+      <target dev='sdc' bus='sata'/>
+      <readonly/>
+    </disk>
+    <controller type='scsi' model='virtio-scsi'/>
+    <controller type='usb' model='none'/>
+    <interface type='network'>
+      <source network='sriov'/>
+      <vlan>
+        <tag id='90'/>
+      </vlan>
+      <model type='e1000'/>
+    </interface>
+    <input type='mouse' bus='virtio'/>
+    <input type='keyboard' bus='virtio'/>
+    <graphics type='spice' port='5900'/>
+    <video>
+      <model type='virtio'/>
+    </video>
+    <memballoon model='none'/>
+    <rng model='virtio'>
+      <backend model='random'>/dev/urandom</backend>
+    </rng>
+  </devices>
+</domain>

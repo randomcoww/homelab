@@ -1,23 +1,7 @@
-variable "networks" {
-  type = any
+variable "cluster_endpoint" {
+  type = map(string)
 }
 
-variable "services" {
-  type = any
-}
-
-variable "domains" {
-  type = any
-}
-
-variable "container_images" {
-  type = any
-}
-
-variable "secrets" {
-  type = any
-}
-
-variable "renderer" {
+variable "kubernetes_manifests" {
   type = map(string)
 }

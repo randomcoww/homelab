@@ -1,13 +1,9 @@
+variable "aws_region" {
+  type = string
+}
+
 variable "user" {
   type = string
-}
-
-variable "ssh_ca_public_key" {
-  type = string
-}
-
-variable "mtu" {
-  type = number
 }
 
 variable "cluster_name" {
@@ -23,11 +19,11 @@ variable "services" {
 }
 
 variable "domains" {
-  type = any
+  type = map(string)
 }
 
 variable "container_images" {
-  type = any
+  type = map(string)
 }
 
 variable "controller_hosts" {
@@ -38,10 +34,18 @@ variable "worker_hosts" {
   type = any
 }
 
-variable "s3_backup_aws_region" {
-  type = string
+variable "controller_templates" {
+  type = list(string)
+}
+
+variable "worker_templates" {
+  type = list(string)
 }
 
 variable "s3_etcd_backup_bucket" {
   type = string
+}
+
+variable "addon_templates" {
+  type = map(string)
 }

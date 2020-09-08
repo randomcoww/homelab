@@ -1,174 +1,14 @@
 ---
-networkd:
-  units:
-    - name: 10-${host_network.store.if}.network
-      contents: |
-        [Match]
-        Name=${host_network.store.if}
-
-        [Network]
-        LinkLocalAddressing=no
-        DHCP=yes
-
-        [DHCP]
-        UseMTU=true
-        UseDomains=true
-    - name: 10-${host_network.int.if}.network
-      contents: |
-        [Match]
-        Name=${host_network.int.if}
-
-        [Link]
-        ARP=no
-
-        [Network]
-        LinkLocalAddressing=no
-        DHCP=no
-    - name: 50-kube-proxy.network
-      contents: |
-        [Match]
-        Name=kube*
-
-        [Link]
-        Unmanaged=true
-    - name: 50-veth.network
-      contents: |
-        [Match]
-        Name=veth*
-
-        [Link]
-        Unmanaged=true
-
-systemd:
-  units:
-    - name: ntpd.service
-      enabled: true
-    - name: docker.service
-      mask: true
-    - name: docker.socket
-      mask: true
-    - name: containerd.service
-      enabled: true
-      dropins:
-        - name: containerd.conf
-          contents: |
-            [Service]
-            LimitNOFILE=infinity
-            ExecStart=
-            ExecStart=/usr/bin/env PATH=$${TORCX_BINDIR}:$${PATH} $${TORCX_BINDIR}/containerd
-            RestartSec=5
-    - name: kubelet.service
-      enabled: true
-      contents: |
-        [Unit]
-        Description=Kubelet via Hyperkube ACI
-        After=network.target
-
-        [Service]
-        ExecStartPre=/bin/mkdir -p \
-          ${kubelet_path} \
-          /var/log/containers \
-          /etc/cni/net.d
-        ExecStartPre=-/usr/bin/rkt rm --uuid-file=/var/cache/kubelet-pod.uuid
-        ExecStart=/usr/bin/rkt run \
-          --uuid-file-save=/var/cache/kubelet-pod.uuid \
-          --volume var-lib-containerd,kind=host,source=/var/lib/containerd,readOnly=false \
-          --mount volume=var-lib-containerd,target=/var/lib/containerd \
-          --insecure-options=image \
-          --volume coreos-var-lib-kubelet,kind=host,source=${kubelet_path},readOnly=false,recursive=true \
-          --volume coreos-var-log,kind=host,source=/var/log,readOnly=false \
-          --volume coreos-run,kind=host,source=/run,readOnly=false \
-          --mount volume=coreos-var-lib-kubelet,target=${kubelet_path} \
-          --mount volume=coreos-var-log,target=/var/log \
-          --mount volume=coreos-run,target=/run \
-          --dns host \
-          --hosts-entry host \
-          --stage1-from-dir=stage1-fly.aci \
-          docker://${container_images.kubelet} \
-            --exec=/usr/local/bin/kubelet -- \
-            --config=${kubelet_path}/kubelet-config.yaml \
-            --register-node=false \
-            --container-runtime=remote \
-            --container-runtime-endpoint=unix:///run/containerd/containerd.sock
-        ExecStop=-/usr/bin/rkt stop --uuid-file=/var/cache/kubelet-pod.uuid
-        Restart=always
-        RestartSec=5
-
-        [Install]
-        WantedBy=multi-user.target
-
+variant: fcos
+version: 1.0.0
 storage:
   files:
-    - path: /etc/hostname
-      filesystem: root
-      mode: 0644
-      contents:
-        inline:
-          ${hostname}
-    - path: /etc/sysctl.d/ipforward.conf
-      filesystem: root
-      mode: 0644
-      contents:
-        inline: |
-          net.ipv4.ip_forward=1
-          net.ipv4.ip_nonlocal_bind=1
-    - path: /etc/sysctl.d/max-user-watches.conf
-      filesystem: root
-      mode: 0644
-      contents:
-        inline: |
-          fs.inotify.max_user_watches=16184
-    - path: /etc/modules-load.d/iscsi.conf
-      filesystem: root
-      mode: 0644
-      contents:
-        inline: |
-          iscsi_tcp
-
-    - path: /etc/containerd/config.toml
-      filesystem: root
-      mode: 420
-      contents:
-        inline: |-
-          version = 2
-          root = "/var/lib/containerd"
-          oom_score = -999
-          [plugins]
-            [plugins."io.containerd.grpc.v1.cri"]
-              [plugins."io.containerd.grpc.v1.cri".containerd]
-                snapshotter = "overlayfs"
-                [plugins."io.containerd.grpc.v1.cri".containerd.runtimes]
-                  [plugins."io.containerd.grpc.v1.cri".containerd.runtimes.runc]
-                    # runtime_type should be normally be "io.containerd.runc.v*"
-                    # containerd-shim-runc-v* binaries are needed but not provided in the flatcar image
-                    runtime_type = "io.containerd.runtime.v1.linux"
-            [plugins."io.containerd.runtime.v1.linux"]
-              no_pivot = true
-
-    - path: ${kubelet_path}/kubelet-config.yaml
-      filesystem: root
-      mode: 420
-      contents:
-        inline: |-
-          kind: KubeletConfiguration
-          apiVersion: kubelet.config.k8s.io/v1beta1
-          authentication:
-            anonymous:
-              enabled: true
-            webhook:
-              enabled: false
-          authorization:
-            mode: AlwaysAllow
-          staticPodPath: ${kubelet_path}/manifests
-          makeIPTablesUtilChains: false
-
     ##
     ## pod config
     ##
 
     - path: ${pod_mount_path}/coredns/Corefile
-      filesystem: root
-      mode: 420
+      mode: 0644
       contents:
         inline: |-
           ${domains.internal}:53 {
@@ -197,8 +37,7 @@ storage:
     ##
 
     - path: ${kubelet_path}/manifests/coredns.yaml
-      filesystem: root
-      mode: 420
+      mode: 0644
       contents:
         inline: |-
           ---
@@ -246,9 +85,3 @@ storage:
             - name: config-volume
               hostPath:
                 path: ${pod_mount_path}/coredns/Corefile
-
-passwd:
-  users:
-  - name: ${user}
-    ssh_authorized_keys:
-      - ${ssh_authorized_key}

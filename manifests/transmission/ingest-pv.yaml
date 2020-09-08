@@ -1,0 +1,97 @@
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: s3-ingest
+  namespace: common
+spec:
+  serviceName: s3-ingest
+  replicas: 1
+  selector:
+    matchLabels:
+      app: s3-ingest
+  template:
+    metadata:
+      labels:
+        app: s3-ingest
+    spec:
+      affinity:
+        nodeAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+            nodeSelectorTerms:
+            - matchExpressions:
+              - key: minio-data
+                operator: Exists
+      dnsPolicy: ClusterFirstWithHostNet
+      restartPolicy: Always
+      containers:
+      # mount minio for complete
+      - name: mount-data
+        imagePullPolicy: IfNotPresent
+        image: rclone/rclone:latest
+        securityContext:
+          privileged: true
+        env:
+        - name: AWS_ACCESS_KEY_ID
+          valueFrom:
+            secretKeyRef:
+              name: minio-auth
+              key: access_key_id
+        - name: AWS_SECRET_ACCESS_KEY
+          valueFrom:
+            secretKeyRef:
+              name: minio-auth
+              key: secret_access_key
+        args:
+        - "mount"
+        - ":s3:ingest-data/"
+        - "/vol/mnt"
+        - "--s3-provider=Minio"
+        - "--s3-env-auth=true"
+        - "--s3-region="
+        - "--s3-endpoint=http://minio.minio.svc:9000"
+        - "--allow-other"
+        - "--allow-non-empty"
+        - "--vfs-cache-mode=off"
+        - "--no-modtime"
+        volumeMounts:
+        - name: vol-data
+          mountPath: /vol/mnt
+          mountPropagation: Bidirectional
+      volumes:
+      - name: vol-data
+        hostPath:
+          path: /var/lib/kubelet/hostpath/ingest-data
+          type: DirectoryOrCreate
+---
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: ingest-data
+  namespace: common
+spec:
+  nodeAffinity:
+    required:
+      nodeSelectorTerms:
+      - matchExpressions:
+        - key: minio-data
+          operator: Exists
+  storageClassName: ingest-data
+  capacity:
+    storage: 50Ti
+  accessModes:
+  - ReadWriteOnce
+  local:
+    path: /var/lib/kubelet/hostpath/ingest-data/vol
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: ingest-data-pvc
+  namespace: common
+spec:
+  accessModes:
+  - ReadWriteOnce
+  storageClassName: ingest-data
+  resources:
+    requests:
+      storage: 50Ti

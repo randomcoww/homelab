@@ -1,0 +1,55 @@
+kind: Deployment
+apiVersion: apps/v1
+metadata:
+  name: speedtest
+  namespace: common
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      k8s-app: speedtest
+  template:
+    metadata:
+      labels:
+        k8s-app: speedtest
+    spec:
+      dnsPolicy: ClusterFirstWithHostNet
+      restartPolicy: Always
+      containers:
+      - name: speedtest
+        image: adolfintel/speedtest
+
+---
+kind: Service
+apiVersion: v1
+metadata:
+  name: speedtest
+  namespace: common
+spec:
+  ports:
+  - name: web
+    port: 80
+    targetPort: 80
+  selector:
+    k8s-app: speedtest
+
+---
+apiVersion: extensions/v1beta1
+kind: Ingress
+metadata:
+  name: speedtest
+  namespace: common
+  annotations:
+    kubernetes.io/ingress.class: traefik
+    ingress.kubernetes.io/ssl-redirect: "true"
+spec:
+  rules:
+  - host: speedtest.fuzzybunny.internal
+    http:
+      paths:
+      - path: /
+        backend:
+          serviceName: speedtest
+          servicePort: web
+  tls:
+  - secretName: tls-ingress

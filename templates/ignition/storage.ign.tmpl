@@ -1,0 +1,35 @@
+---
+variant: fcos
+version: 1.0.0
+systemd:
+  units:
+    %{~ for disk in p.disk ~}
+    %{~ if lookup(disk, "mount_path", null) != null && lookup(disk, "device", null) != null ~}
+    - name: ${disk.systemd_unit_name}.mount
+      enabled: true
+      contents: |
+        [Unit]
+        ConditionPathExists=${disk.device}
+        Before=local-fs.target
+        [Mount]
+        What=${disk.device}
+        Where=${disk.mount_path}
+        Type=${lookup(disk, "format", "xfs")}
+        [Install]
+        WantedBy=local-fs.target
+    %{~ endif ~}
+    %{~ endfor ~}
+
+storage:
+  filesystems:
+    %{~ for disk in p.disk ~}
+    %{~ if lookup(disk, "wipe_filesystem", false) && lookup(disk, "mount_path", null) != null && lookup(disk, "device", null) != null ~}
+    - path: ${disk.mount_path}
+      device: ${disk.device}
+      format: ${lookup(disk, "format", "xfs")}
+      wipe_filesystem: ${lookup(disk, "wipe_filesystem", false)}
+      %{~ if lookup(disk, "label", null) != null ~}
+      label: ${disk.label}
+      %{~ endif ~}
+    %{~ endif ~}
+    %{~ endfor ~}

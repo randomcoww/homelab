@@ -1,8 +1,8 @@
-variable "libvirt_endpoint" {
+variable "endpoint" {
   type = string
 }
 
-variable "guests" {
+variable "domains" {
   type = any
 }
 

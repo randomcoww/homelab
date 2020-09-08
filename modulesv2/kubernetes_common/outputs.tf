@@ -1,103 +1,108 @@
-output "cluster_name" {
-  value = var.cluster_name
+locals {
+  etcd_initial_cluster = join(",", [
+    for k, v in var.controller_hosts :
+    "${v.hostname}=https://${v.networks_by_key.main.ip}:${var.services.etcd.ports.peer}"
+  ])
+  etcd_endpoints = join(",", [
+    for k, v in var.controller_hosts :
+    "https://${v.networks_by_key.main.ip}:${var.services.etcd.ports.client}"
+  ])
 }
 
-output "apiserver_endpoint" {
-  value = "https://${var.services.kubernetes_apiserver.vip}:${var.services.kubernetes_apiserver.ports.secure}"
-}
-
-output "kubernetes_ca_pem" {
-  value = tls_self_signed_cert.kubernetes-ca.cert_pem
-}
-
-output "kubernetes_cert_pem" {
-  value = tls_locally_signed_cert.kubernetes-client.cert_pem
-}
-
-output "kubernetes_private_key_pem" {
-  value = tls_private_key.kubernetes-client.private_key_pem
-}
-
-output "controller_params" {
+output "cluster_endpoint" {
   value = {
-    for k in keys(var.controller_hosts) :
-    k => {
-      hostname           = k
-      user               = var.user
-      ssh_authorized_key = "cert-authority ${chomp(var.ssh_ca_public_key)}"
-      mtu                = var.mtu
-      cluster_name       = var.cluster_name
-
-      container_images = var.container_images
-      networks         = var.networks
-      host_network     = var.controller_hosts[k].host_network
-      services         = var.services
-
-      etcd_cluster_token    = var.cluster_name
-      s3_etcd_backup_path   = "${var.s3_etcd_backup_bucket}/${var.cluster_name}"
-      aws_region            = var.s3_backup_aws_region
-      aws_access_key_id     = aws_iam_access_key.s3-etcd-backup.id
-      aws_secret_access_key = aws_iam_access_key.s3-etcd-backup.secret
-      etcd_initial_cluster = join(",", [
-        for k in keys(var.controller_hosts) :
-        "${k}=https://${var.controller_hosts[k].host_network.store.ip}:${var.services.etcd.ports.peer}"
-      ])
-      etcd_endpoints = join(",", [
-        for k in keys(var.controller_hosts) :
-        "https://${var.controller_hosts[k].host_network.store.ip}:${var.services.etcd.ports.client}"
-      ])
-      etcd_local_endpoint      = "https://127.0.0.1:${var.services.etcd.ports.client}"
-      apiserver_local_endpoint = "https://127.0.0.1:${var.services.kubernetes_apiserver.ports.secure}"
-      # Path mounted by kubelet running in container
-      kubelet_path = "/var/lib/kubelet"
-      # These paths should be visible by kubelet running in the container
-      pod_mount_path        = "/var/lib/kubelet/podconfig"
-      controller_mount_path = "/var/lib/kubelet/controller"
-
-      tls_kubernetes_ca          = replace(tls_self_signed_cert.kubernetes-ca.cert_pem, "\n", "\\n")
-      tls_kubernetes_ca_key      = replace(tls_private_key.kubernetes-ca.private_key_pem, "\n", "\\n")
-      tls_kubernetes             = replace(tls_locally_signed_cert.kubernetes[k].cert_pem, "\n", "\\n")
-      tls_kubernetes_key         = replace(tls_private_key.kubernetes[k].private_key_pem, "\n", "\\n")
-      tls_controller_manager     = replace(tls_locally_signed_cert.controller-manager.cert_pem, "\n", "\\n")
-      tls_controller_manager_key = replace(tls_private_key.controller-manager.private_key_pem, "\n", "\\n")
-      tls_scheduler              = replace(tls_locally_signed_cert.scheduler.cert_pem, "\n", "\\n")
-      tls_scheduler_key          = replace(tls_private_key.scheduler.private_key_pem, "\n", "\\n")
-
-      tls_service_account     = replace(tls_private_key.service-account.public_key_pem, "\n", "\\n")
-      tls_service_account_key = replace(tls_private_key.service-account.private_key_pem, "\n", "\\n")
-
-      tls_etcd_ca         = replace(tls_self_signed_cert.etcd-ca.cert_pem, "\n", "\\n")
-      tls_etcd            = replace(tls_locally_signed_cert.etcd[k].cert_pem, "\n", "\\n")
-      tls_etcd_key        = replace(tls_private_key.etcd[k].private_key_pem, "\n", "\\n")
-      tls_etcd_client     = replace(tls_locally_signed_cert.etcd-client[k].cert_pem, "\n", "\\n")
-      tls_etcd_client_key = replace(tls_private_key.etcd-client[k].private_key_pem, "\n", "\\n")
-    }
+    cluster_name               = var.cluster_name
+    apiserver_endpoint         = "https://${var.services.kubernetes_apiserver.vip}:${var.services.kubernetes_apiserver.ports.secure}"
+    kubernetes_ca_pem          = tls_self_signed_cert.kubernetes-ca.cert_pem
+    kubernetes_cert_pem        = tls_locally_signed_cert.kubernetes-client.cert_pem
+    kubernetes_private_key_pem = tls_private_key.kubernetes-client.private_key_pem
   }
 }
 
-output "worker_params" {
+output "controller_templates" {
   value = {
-    for k in keys(var.worker_hosts) :
-    k => {
-      hostname           = k
-      user               = var.user
-      ssh_authorized_key = "cert-authority ${chomp(var.ssh_ca_public_key)}"
-      mtu                = var.mtu
-      cluster_name       = var.cluster_name
+    for host, params in var.controller_hosts :
+    host => [
+      for template in var.controller_templates :
+      templatefile(template, {
+        p                        = params
+        user                     = var.user
+        cluster_name             = var.cluster_name
+        container_images         = var.container_images
+        networks                 = var.networks
+        services                 = var.services
+        etcd_cluster_token       = var.cluster_name
+        s3_etcd_backup_path      = "${var.s3_etcd_backup_bucket}/${var.cluster_name}"
+        aws_region               = var.aws_region
+        aws_access_key_id        = aws_iam_access_key.s3-etcd-backup.id
+        aws_secret_access_key    = aws_iam_access_key.s3-etcd-backup.secret
+        etcd_local_endpoint      = "https://127.0.0.1:${var.services.etcd.ports.client}"
+        apiserver_local_endpoint = "https://127.0.0.1:${var.services.kubernetes_apiserver.ports.secure}"
+        kubelet_path             = "/var/lib/kubelet"
+        pod_mount_path           = "/var/lib/kubelet/podconfig"
+        controller_mount_path    = "/var/lib/kubelet/controller"
+        vrrp_id                  = 70
+        etcd_initial_cluster     = local.etcd_initial_cluster
+        etcd_endpoints           = local.etcd_endpoints
 
+        tls_kubernetes_ca          = replace(tls_self_signed_cert.kubernetes-ca.cert_pem, "\n", "\\n")
+        tls_kubernetes_ca_key      = replace(tls_private_key.kubernetes-ca.private_key_pem, "\n", "\\n")
+        tls_kubernetes             = replace(tls_locally_signed_cert.kubernetes[host].cert_pem, "\n", "\\n")
+        tls_kubernetes_key         = replace(tls_private_key.kubernetes[host].private_key_pem, "\n", "\\n")
+        tls_controller_manager     = replace(tls_locally_signed_cert.controller-manager.cert_pem, "\n", "\\n")
+        tls_controller_manager_key = replace(tls_private_key.controller-manager.private_key_pem, "\n", "\\n")
+        tls_scheduler              = replace(tls_locally_signed_cert.scheduler.cert_pem, "\n", "\\n")
+        tls_scheduler_key          = replace(tls_private_key.scheduler.private_key_pem, "\n", "\\n")
+        tls_service_account        = replace(tls_private_key.service-account.public_key_pem, "\n", "\\n")
+        tls_service_account_key    = replace(tls_private_key.service-account.private_key_pem, "\n", "\\n")
+        tls_etcd_ca                = replace(tls_self_signed_cert.etcd-ca.cert_pem, "\n", "\\n")
+        tls_etcd                   = replace(tls_locally_signed_cert.etcd[host].cert_pem, "\n", "\\n")
+        tls_etcd_key               = replace(tls_private_key.etcd[host].private_key_pem, "\n", "\\n")
+        tls_etcd_client            = replace(tls_locally_signed_cert.etcd-client[host].cert_pem, "\n", "\\n")
+        tls_etcd_client_key        = replace(tls_private_key.etcd-client[host].private_key_pem, "\n", "\\n")
+      })
+    ]
+  }
+}
+
+output "worker_templates" {
+  value = {
+    for host, params in var.worker_hosts :
+    host => [
+      for template in var.worker_templates :
+      templatefile(template, {
+        p                  = params
+        user               = var.user
+        cluster_name       = var.cluster_name
+        container_images   = var.container_images
+        services           = var.services
+        domains            = var.domains
+        apiserver_endpoint = "https://${var.services.kubernetes_apiserver.vip}:${var.services.kubernetes_apiserver.ports.secure}"
+        kubelet_path       = "/var/lib/kubelet"
+
+        tls_kubernetes_ca = replace(tls_self_signed_cert.kubernetes-ca.cert_pem, "\n", "\\n")
+        tls_bootstrap     = replace(tls_locally_signed_cert.bootstrap.cert_pem, "\n", "\\n")
+        tls_bootstrap_key = replace(tls_private_key.bootstrap.private_key_pem, "\n", "\\n")
+      })
+    ]
+  }
+}
+
+output "addons" {
+  value = {
+    for k in [
+      "kube-proxy",
+      "kapprover",
+      "flannel",
+      "coredns",
+      "bootstrap",
+    ] :
+    k => templatefile(var.addon_templates[k], {
+      namespace        = "kube-system"
       container_images = var.container_images
-      networks         = var.networks
-      host_network     = var.worker_hosts[k].host_network
-      host_disks       = var.worker_hosts[k].disk
       services         = var.services
+      networks         = var.networks
       domains          = var.domains
-
-      apiserver_endpoint = "https://${var.services.kubernetes_apiserver.vip}:${var.services.kubernetes_apiserver.ports.secure}"
-      kubelet_path       = "/var/lib/kubelet"
-
-      tls_kubernetes_ca = replace(tls_self_signed_cert.kubernetes-ca.cert_pem, "\n", "\\n")
-      tls_bootstrap     = replace(tls_locally_signed_cert.bootstrap.cert_pem, "\n", "\\n")
-      tls_bootstrap_key = replace(tls_private_key.bootstrap.private_key_pem, "\n", "\\n")
-    }
+    })
   }
 }

@@ -1,0 +1,37 @@
+---
+variant: fcos
+version: 1.0.0
+systemd:
+  units:
+    - name: chronyd.service
+      enabled: true
+    - name: fstrim.service
+      enabled: true
+      dropins:
+        - name: 10-all.conf
+          contents: |
+            [Service]
+            ExecStart=
+            ExecStart=/usr/sbin/fstrim --all --verbose --quiet
+storage:
+  files:
+    - path: /etc/ssh/sshd_config.d/10-block-password.conf
+      mode: 0644
+      contents:
+        inline: |
+          PasswordAuthentication no
+    - path: /etc/systemd/journal.conf.d/05-live.conf
+      mode: 0644
+      contents:
+        inline: |
+          [Journal]
+          Storage=volatile
+          RuntimeMaxUse=15M
+          ForwardToSyslog=false
+          ForwardToConsole=false
+    - path: /etc/systemd/system.conf.d/05-live.conf
+      mode: 0644
+      contents:
+        inline: |
+          [Manager]
+          DumpCore=false

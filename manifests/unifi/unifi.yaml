@@ -1,0 +1,78 @@
+kind: Deployment
+apiVersion: apps/v1
+metadata:
+  name: unifi
+  namespace: common
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: unifi
+  template:
+    metadata:
+      labels:
+        app: unifi
+    spec:
+      dnsPolicy: ClusterFirstWithHostNet
+      restartPolicy: Always
+      containers:
+      - name: unifi
+        image: randomcoww/unifi:5.14.22
+        ports:
+        - containerPort: 8080
+          protocol: TCP
+        - containerPort: 8443
+          protocol: TCP
+        - containerPort: 3478
+          protocol: UDP
+        volumeMounts:
+        - mountPath: /opt/UniFi/data
+          name: unifi-cache
+        - mountPath: /opt/UniFi/data/backup
+          name: unifi-data
+        lifecycle:
+          preStop:
+            exec:
+              command: ["/docker-stop.sh"]
+      volumes:
+      - name: unifi-cache
+        hostPath:
+          path: /var/pv/tmp/unifi-cache
+          type: DirectoryOrCreate
+      - name: unifi-data
+        persistentVolumeClaim:
+          claimName: unifi-data-pvc
+---
+kind: Service
+apiVersion: v1
+metadata:
+  name: unifi
+  namespace: common
+  annotations:
+    metallb.universe.tf/allow-shared-ip: unifi
+    external-dns.alpha.kubernetes.io/hostname: unifi.fuzzybunny.internal
+spec:
+  type: LoadBalancer
+  ports:
+  - name: http
+    port: 8080
+  - name: https
+    port: 8443
+  selector:
+    app: unifi
+---
+kind: Service
+apiVersion: v1
+metadata:
+  name: unifi-stun
+  namespace: common
+  annotations:
+    metallb.universe.tf/allow-shared-ip: unifi
+spec:
+  type: LoadBalancer
+  ports:
+  - name: stun
+    port: 3478
+    protocol: UDP
+  selector:
+    app: unifi

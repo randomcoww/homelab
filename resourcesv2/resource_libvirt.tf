@@ -1,69 +1,33 @@
-##
-## Write config to each libvirt host
-## Hardcode each libvirt host until for_each module becomes available
-##
 module "libvirt-kvm-0" {
   source = "../modulesv2/libvirt"
 
-  libvirt_endpoint = local.libvirt.kvm-0.endpoint
-  networks         = local.networks
-
-  guests = {
-    for k in local.hosts.kvm-0.guests :
-    k => {
-      vcpu    = local.hosts[k].vcpu
-      memory  = local.hosts[k].memory
-      network = lookup(local.hosts[k], "network", [])
-      hostdev = lookup(local.hosts[k], "hostdev", [])
-      disk = [
-        for k in lookup(local.hosts[k], "disk", []) :
-        k
-        if lookup(k, "source", null) != null && lookup(k, "target", null) != null
-      ]
-    }
+  endpoint = module.hypervisor.libvirt_endpoints.kvm-0.endpoint
+  domains = {
+    for v in local.aggr_libvirt_domains.kvm-0 :
+    v.node => chomp(templatefile(v.libvirt_domain_template, {
+      p      = v
+      host_p = local.aggr_hosts.kvm-0
+    }))
+  }
+  networks = {
+    for v in local.aggr_hosts.kvm-0.hwif :
+    v.label => chomp(templatefile(local.aggr_hosts.kvm-0.libvirt_network_template, v))
   }
 }
 
 module "libvirt-kvm-1" {
   source = "../modulesv2/libvirt"
 
-  libvirt_endpoint = local.libvirt.kvm-1.endpoint
-  networks         = local.networks
-
-  guests = {
-    for k in local.hosts.kvm-1.guests :
-    k => {
-      vcpu    = local.hosts[k].vcpu
-      memory  = local.hosts[k].memory
-      network = lookup(local.hosts[k], "network", [])
-      hostdev = lookup(local.hosts[k], "hostdev", [])
-      disk = [
-        for k in lookup(local.hosts[k], "disk", []) :
-        k
-        if lookup(k, "source", null) != null && lookup(k, "target", null) != null
-      ]
-    }
+  endpoint = module.hypervisor.libvirt_endpoints.kvm-1.endpoint
+  domains = {
+    for v in local.aggr_libvirt_domains.kvm-1 :
+    v.node => chomp(templatefile(v.libvirt_domain_template, {
+      p      = v
+      host_p = local.aggr_hosts.kvm-0
+    }))
   }
-}
-
-module "libvirt-desktop" {
-  source = "../modulesv2/libvirt"
-
-  libvirt_endpoint = local.libvirt.desktop.endpoint
-  networks         = local.networks
-
-  guests = {
-    for k in local.hosts.desktop.guests :
-    k => {
-      vcpu    = local.hosts[k].vcpu
-      memory  = local.hosts[k].memory
-      network = lookup(local.hosts[k], "network", [])
-      hostdev = lookup(local.hosts[k], "hostdev", [])
-      disk = [
-        for k in lookup(local.hosts[k], "disk", []) :
-        k
-        if lookup(k, "source", null) != null && lookup(k, "target", null) != null
-      ]
-    }
+  networks = {
+    for v in local.aggr_hosts.kvm-1.hwif :
+    v.label => chomp(templatefile(local.aggr_hosts.kvm-0.libvirt_network_template, v))
   }
 }
