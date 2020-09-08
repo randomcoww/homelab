@@ -112,9 +112,11 @@ locals {
         "kvm-1",
       ]
       ignition_templates = [
+        "${local.templates_path}/ignition/base.ign.tmpl",
         "${local.templates_path}/ignition/base-server.ign.tmpl",
-        "${local.templates_path}/ignition/hypervisor.ign.tmpl",
+        "${local.templates_path}/ignition/base-systemd-networkd.ign.tmpl",
         "${local.templates_path}/ignition/vlan_network.ign.tmpl",
+        "${local.templates_path}/ignition/hypervisor.ign.tmpl",
       ]
       libvirt_network_template = "${local.templates_path}/libvirt/hostdev_network.xml.tmpl"
       guest_image_device       = "/dev/disk/by-label/${local.guest_image_label}"
@@ -133,7 +135,9 @@ locals {
         "test-0",
       ]
       ignition_templates = [
+        "${local.templates_path}/ignition/base.ign.tmpl",
         "${local.templates_path}/ignition/base-server.ign.tmpl",
+        "${local.templates_path}/ignition/base-systemd-networkd.ign.tmpl",
         "${local.templates_path}/ignition/general_network.ign.tmpl",
       ]
       libvirt_domain_template = "${local.templates_path}/libvirt/coreos.xml.tmpl"
@@ -158,12 +162,16 @@ locals {
       nodes = [
         "client",
       ]
+      client_user     = local.client_user
+      client_user_uid = 10000
       ignition_templates = [
+        "${local.templates_path}/ignition/base.ign.tmpl",
         "${local.templates_path}/ignition/base-client.ign.tmpl",
+        "${local.templates_path}/ignition/base-systemd-networkd.ign.tmpl",
+        "${local.templates_path}/ignition/vlan_network.ign.tmpl",
         "${local.templates_path}/ignition/storage.ign.tmpl",
         "${local.templates_path}/ignition/desktop.ign.tmpl",
       ]
-
     }
     # server certs for SSH CA
     ssh_server = {
@@ -274,31 +282,31 @@ locals {
   networks = {
     # management
     main = {
-      id              = 1
-      network         = "192.168.126.0"
-      cidr            = 23
-      router          = "192.168.126.240"
-      dhcp_pool       = "192.168.127.64/26"
-      mdns            = true
-      mtu             = 9000
+      id        = 1
+      network   = "192.168.126.0"
+      cidr      = 23
+      router    = "192.168.126.240"
+      dhcp_pool = "192.168.127.64/26"
+      mdns      = true
+      mtu       = 9000
     }
     lan = {
-      id              = 90
-      network         = "192.168.62.0"
-      cidr            = 23
-      router          = "192.168.62.240"
-      dhcp_pool       = "192.168.63.64/26"
-      mtu             = 9000
+      id        = 90
+      network   = "192.168.62.0"
+      cidr      = 23
+      router    = "192.168.62.240"
+      dhcp_pool = "192.168.63.64/26"
+      mtu       = 9000
     }
     # gateway state sync
     sync = {
-      id              = 60
-      network         = "192.168.190.0"
-      cidr            = 29
-      mtu             = 9000
+      id      = 60
+      network = "192.168.190.0"
+      cidr    = 29
+      mtu     = 9000
     }
     wan = {
-      id              = 30
+      id = 30
     }
     # internal network on each hypervisor for PXE bootstrap
     int = {
@@ -643,15 +651,9 @@ locals {
     kvm-0 = {
       hwif = [
         {
-          label  = "en-pf0"
-          if     = "enp4s0f0"
+          label  = "pf0"
+          if     = "en-pf0"
           mac    = "00-1b-21-bc-4c-16"
-          numvfs = 15
-        },
-        {
-          label  = "en-pf1"
-          if     = "enp4s0f1"
-          mac    = "00-1b-21-bc-4c-17"
           numvfs = 15
         },
       ]
@@ -661,7 +663,7 @@ locals {
           if    = "en-main"
           ip    = "192.168.127.251"
           dhcp  = true
-          hwif  = "en-pf0"
+          hwif  = "pf0"
         }
       ]
       metadata = {
@@ -674,19 +676,19 @@ locals {
       libvirt_domains = [
         {
           node = "gateway-0",
-          hwif = "en-pf0",
+          hwif = "pf0",
         },
         {
           node = "controller-0",
-          hwif = "en-pf0",
+          hwif = "pf0",
         },
         {
           node = "controller-1",
-          hwif = "en-pf0",
+          hwif = "pf0",
         },
         {
           node = "worker-0",
-          hwif = "en-pf0",
+          hwif = "pf0",
         }
       ]
       dev = {
@@ -710,15 +712,9 @@ locals {
     kvm-1 = {
       hwif = [
         {
-          label  = "en-pf0"
-          if     = "enp4s0f0"
+          label  = "pf0"
+          if     = "en-pf0"
           mac    = "00-1b-21-bc-67-c6"
-          numvfs = 15
-        },
-        {
-          label  = "en-pf1"
-          if     = "enp4s0f1"
-          mac    = "00-1b-21-bc-67-c7"
           numvfs = 15
         },
       ]
@@ -728,7 +724,7 @@ locals {
           if    = "en-main"
           ip    = "192.168.127.252"
           dhcp  = true
-          hwif  = "en-pf0"
+          hwif  = "pf0"
         }
       ]
       metadata = {
@@ -741,19 +737,19 @@ locals {
       libvirt_domains = [
         {
           node = "gateway-1",
-          hwif = "en-pf0",
+          hwif = "pf0",
         },
         {
           node = "controller-1",
-          hwif = "en-pf0",
+          hwif = "pf0",
         },
         {
           node = "controller-2",
-          hwif = "en-pf0",
+          hwif = "pf0",
         },
         {
           node = "worker-1",
-          hwif = "en-pf0",
+          hwif = "pf0",
         }
       ]
       dev = {
@@ -779,20 +775,25 @@ locals {
     client = {
       hwif = [
         {
-          label = "en-pf0"
-          if    = "enp4s0f0"
+          label = "pf0"
+          if    = "en-pf0"
           mac   = "f8-f2-1e-1e-3c-40"
         }
       ]
       network = [
         {
           label = "main"
+          if    = "en-main"
+          ip    = "192.168.127.253"
+          hwif  = "pf0"
+        },
+        {
+          label = "lan"
+          if    = "en-lan"
           dhcp  = true
-          hwif  = "en-pf0"
+          hwif  = "pf0"
         }
       ]
-      client_user     = local.client_user
-      client_user_uid = 10000
       disk = [
         {
           device     = "/dev/disk/by-label/localhome"

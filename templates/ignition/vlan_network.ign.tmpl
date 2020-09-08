@@ -17,13 +17,13 @@ storage:
           [Link]
           MTUBytes=${lookup(v, "mtu", 9000)}
           MACAddressPolicy=persistent
-          Name=${v.label}
-    - path: /etc/systemd/network/12-${v.label}.network
+          Name=${v.if}
+    - path: /etc/systemd/network/12-${v.if}.network
       mode: 0644
       contents:
         inline: |
           [Match]
-          Name=${v.label}
+          Name=${v.if}
           MACAddress=${v.mac}
 
           [Link]

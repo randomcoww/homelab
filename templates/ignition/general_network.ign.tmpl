@@ -32,6 +32,7 @@ storage:
           %{~ endif ~}
     %{~ endif ~}
     %{~ endfor ~}
+    %{~ if length(lookup(p, "metadata", {})) > 0 ~}
     - path: /etc/systemd/network/20-${p.metadata.if}.network
       mode: 0644
       contents:
@@ -42,3 +43,4 @@ storage:
 
           [Link]
           Unmanaged=true
+    %{~ endif ~}

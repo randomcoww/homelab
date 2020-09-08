@@ -5,7 +5,7 @@ module "libvirt-kvm-0" {
   domains = {
     for v in local.aggr_libvirt_domains.kvm-0 :
     v.node => chomp(templatefile(v.libvirt_domain_template, {
-      p    = v
+      p      = v
       host_p = local.aggr_hosts.kvm-0
     }))
   }
@@ -22,7 +22,7 @@ module "libvirt-kvm-1" {
   domains = {
     for v in local.aggr_libvirt_domains.kvm-1 :
     v.node => chomp(templatefile(v.libvirt_domain_template, {
-      p    = v
+      p      = v
       host_p = local.aggr_hosts.kvm-0
     }))
   }

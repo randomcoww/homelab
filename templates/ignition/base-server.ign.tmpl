@@ -1,47 +1,6 @@
 ---
 variant: fcos
 version: 1.0.0
-systemd:
-  units:
-    - name: libvirtd.service
-      dropins:
-        - name: 10-virtualization.conf
-          contents: |
-            [Unit]
-            ConditionVirtualization=!vm
-            ConditionVirtualization=!container
-    - name: NetworkManager.service
-      mask: true
-    - name: NetworkManager-wait-online.service
-      mask: true
-    - name: chronyd.service
-      enabled: true
-    - name: systemd-networkd.service
-      enabled: true
-    - name: systemd-resolved.service
-      enabled: true
-    - name: fstrim.service
-      enabled: true
-      dropins:
-        - name: 10-all.conf
-          contents: |
-            [Service]
-            ExecStart=
-            ExecStart=/usr/sbin/fstrim --all --verbose --quiet
-    - name: systemd-resolved-link.service
-      enabled: true
-      contents: |
-        [Unit]
-        Require=systemd-resolved.service
-
-        [Service]
-        Type=oneshot
-        RemainAfterExit=true
-        ExecStart=/usr/bin/ln -sf /run/systemd/resolve/resolv.conf /etc/resolv.conf
-
-        [Install]
-        WantedBy=multi-user.target
-
 storage:
   files:
     - path: /etc/hostname
@@ -56,58 +15,6 @@ storage:
           net.ipv4.ip_forward=1
           net.ipv4.ip_nonlocal_bind=1
           fs.inotify.max_user_watches=524288
-    - path: /etc/systemd/network/90-default.network
-      mode: 0644
-      contents:
-        inline: |
-          [Match]
-          Virtualization=!vm
-          Virtualization=!container
-          Name=en*
-
-          [Link]
-          ARP=false
-          RequiredForOnline=false
-
-          [Network]
-          LinkLocalAddressing=false
-          DHCP=false
-
-    - path: /etc/ssh/sshd_config.d/10-block-password.conf
-      mode: 0644
-      contents:
-        inline: |
-          PasswordAuthentication no
-    - path: /etc/systemd/journal.conf.d/05-live.conf
-      mode: 0644
-      contents:
-        inline: |
-          [Journal]
-          Storage=volatile
-          RuntimeMaxUse=15M
-          ForwardToSyslog=false
-          ForwardToConsole=false
-    - path: /etc/systemd/resolved.conf.d/05-disable-stub.conf
-      mode: 0644
-      contents:
-        inline: |
-          [Resolve]
-          FallbackDNS=
-          DNSStubListener=false
-          MulticastDNS=true
-          LLMNR=false
-    - path: /etc/systemd/system.conf.d/05-live.conf
-      mode: 0644
-      contents:
-        inline: |
-          [Manager]
-          DumpCore=false
-    # Appending seems to override the earlier hosts entry
-    - path: /etc/nsswitch.conf
-      append:
-        - inline: |
-            hosts: files resolve dns myhostname
-
 passwd:
   users:
     - name: ${user}

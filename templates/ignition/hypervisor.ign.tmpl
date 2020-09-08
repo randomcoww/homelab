@@ -3,6 +3,13 @@ variant: fcos
 version: 1.0.0
 systemd:
   units:
+    - name: libvirtd.service
+      dropins:
+        - name: 10-virtualization.conf
+          contents: |
+            [Unit]
+            ConditionVirtualization=!vm
+            ConditionVirtualization=!container
     - name: ksm.service
       mask: true
     - name: ksmtuned.service
@@ -19,7 +26,7 @@ systemd:
         Type=oneshot
         RemainAfterExit=true
         %{~ for v in p.hwif ~}
-        ExecStart=-/bin/bash -c "echo ${v.numvfs} > /sys/class/net/${v.label}/device/sriov_numvfs"
+        ExecStart=-/bin/bash -c "echo ${v.numvfs} > /sys/class/net/${v.if}/device/sriov_numvfs"
         %{~ endfor ~}
         ExecStart=/usr/bin/mkdir -p ${dirname(p.guest_image_mount_path)}
         ExecStart=/usr/bin/coreos-installer iso ignition remove \

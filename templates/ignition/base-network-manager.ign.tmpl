@@ -1,0 +1,63 @@
+---
+variant: fcos
+version: 1.0.0
+systemd:
+  units:
+    - name: systemd-networkd-wait-online.service
+      mask: true
+    - name: avahi-daemon.service
+      mask: true
+    - name: avahi-daemon.socket
+      mask: true
+    - name: NetworkManager.service
+      enabled: true
+    - name: NetworkManager-wait-online.service
+      enabled: true
+storage:
+  files:
+    - path: /etc/NetworkManager/conf.d/custom.conf
+      mode: 0644
+      contents:
+        inline: |
+          [main]
+          no-auto-default=*
+    %{~ for v in p.hwif ~}
+    - path: /etc/NetworkManager/system-connections/${v.label}.nmconnection
+      mode: 0600
+      contents:
+        inline: |
+          [connection]
+          interface-name=${v.if}
+          type=802-3-ethernet
+
+          [802-3-ethernet]
+          mac-address=${replace(v.mac, "-", ":")}
+          mtu=${lookup(v, "mtu", 9000)}
+
+          # Just want to set MTU on parent interface. Try to configure as little as possible.
+          [ipv4]
+          method=auto
+          never-default=true
+          ignore-auto-dns=true
+          ignore-auto-routes=true
+    %{~ endfor ~}
+    %{~ for v in p.network ~}
+    %{~ if lookup(v, "id", null) != null ~}
+    - path: /etc/NetworkManager/system-connections/${v.label}.nmconnection
+      mode: 0600
+      contents:
+        inline: |
+          [connection]
+          type=vlan
+
+          [vlan]
+          parent=${p.hwif_by_key[v.hwif].if}
+          id=${v.id}
+
+          [ipv4]
+          method=%{if lookup(v, "dhcp", false)}auto%{else}manual%{endif}
+          %{~ if lookup(v, "ip", null) != null && lookup(v, "cidr", null) != null ~}
+          addresses=${v.ip}/${v.cidr}
+          %{~ endif ~}
+    %{~ endif ~}
+    %{~ endfor ~}
