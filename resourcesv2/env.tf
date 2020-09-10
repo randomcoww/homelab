@@ -167,8 +167,10 @@ locals {
       ignition_templates = [
         "${local.templates_path}/ignition/base.ign.tmpl",
         "${local.templates_path}/ignition/base-client.ign.tmpl",
-        "${local.templates_path}/ignition/base-systemd-networkd.ign.tmpl",
-        "${local.templates_path}/ignition/vlan_network.ign.tmpl",
+        # # Desktop
+        # "${local.templates_path}/ignition/base-systemd-networkd.ign.tmpl",
+        # "${local.templates_path}/ignition/vlan_network.ign.tmpl",
+        "${local.templates_path}/ignition/base-network-manager.ign.tmpl",
         "${local.templates_path}/ignition/storage.ign.tmpl",
         "${local.templates_path}/ignition/desktop.ign.tmpl",
       ]
@@ -773,27 +775,28 @@ locals {
 
     # client devices
     client = {
-      hwif = [
-        {
-          label = "pf0"
-          if    = "en-pf0"
-          mac   = "f8-f2-1e-1e-3c-40"
-        }
-      ]
-      network = [
-        {
-          label = "main"
-          if    = "en-main"
-          ip    = "192.168.127.253"
-          hwif  = "pf0"
-        },
-        {
-          label = "lan"
-          if    = "en-lan"
-          dhcp  = true
-          hwif  = "pf0"
-        }
-      ]
+      # # Enable for desktop
+      # hwif = [
+      #   {
+      #     label = "pf0"
+      #     if    = "en-pf0"
+      #     mac   = "f8-f2-1e-1e-3c-40"
+      #   }
+      # ]
+      # network = [
+      #   {
+      #     label = "main"
+      #     if    = "en-main"
+      #     ip    = "192.168.127.253"
+      #     hwif  = "pf0"
+      #   },
+      #   {
+      #     label = "lan"
+      #     if    = "en-lan"
+      #     dhcp  = true
+      #     hwif  = "pf0"
+      #   }
+      # ]
       disk = [
         {
           device     = "/dev/disk/by-label/localhome"
