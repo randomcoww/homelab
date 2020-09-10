@@ -132,6 +132,8 @@ storage:
               iifname $if_internal udp dport ${dns_redirect_port} accept;
               iifname $if_internal udp sport bootps udp dport bootpc accept;
               iifname $if_internal tcp dport ssh accept;
+              iifname $if_internal tcp dport ${services.kubernetes_apiserver.ports.secure} accept;
+              iifname $if_internal tcp dport ${services.renderer.ports.rpc} accept;
               iifname $if_internal pkttype multicast accept;
             }
 
@@ -147,6 +149,8 @@ storage:
 
               iifname $if_internal oifname $if_external accept;
               iifname $if_internal tcp dport ssh accept;
+              iifname $if_internal tcp dport ${services.kubernetes_apiserver.ports.secure} accept;
+              iifname $if_internal tcp dport ${services.renderer.ports.rpc} accept;
               %{~ for v in values(loadbalancer_pools) ~}
               iifname $if_internal ip daddr ${v.network}/${v.cidr} accept;
               %{~ endfor ~}
