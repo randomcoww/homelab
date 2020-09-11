@@ -15,12 +15,12 @@ locals {
   # kubelet image is used for static pods and does not need to match the kubernetes version
   # hyperkube is used for the worker kubelet and should match the version
   container_images = {
-    kubelet                 = "docker.io/randomcoww/kubernetes:kubelet-v1.18.8"
-    kube_apiserver          = "docker.io/randomcoww/kubernetes:kube-master-v1.18.8"
-    kube_controller_manager = "docker.io/randomcoww/kubernetes:kube-master-v1.18.8"
-    kube_scheduler          = "docker.io/randomcoww/kubernetes:kube-master-v1.18.8"
-    hyperkube               = "docker.io/randomcoww/kubernetes:kubelet-v1.18.8"
-    kube_proxy              = "docker.io/randomcoww/kubernetes:kube-proxy-v1.18.8"
+    kubelet                 = "docker.io/randomcoww/kubernetes:kubelet-v1.19.1"
+    kube_apiserver          = "docker.io/randomcoww/kubernetes:kube-master-v1.19.1"
+    kube_controller_manager = "docker.io/randomcoww/kubernetes:kube-master-v1.19.1"
+    kube_scheduler          = "docker.io/randomcoww/kubernetes:kube-master-v1.19.1"
+    hyperkube               = "docker.io/randomcoww/kubernetes:kubelet-v1.19.1"
+    kube_proxy              = "docker.io/randomcoww/kubernetes:kube-proxy-v1.19.1"
     etcd_wrapper            = "docker.io/randomcoww/etcd-wrapper:v0.2.1"
     etcd                    = "docker.io/randomcoww/etcd:v3.4.10"
     flannel                 = "docker.io/randomcoww/flannel:latest"
@@ -168,9 +168,10 @@ locals {
         "${local.templates_path}/ignition/base.ign.tmpl",
         "${local.templates_path}/ignition/base-client.ign.tmpl",
         # # Desktop
-        # "${local.templates_path}/ignition/base-systemd-networkd.ign.tmpl",
-        # "${local.templates_path}/ignition/vlan_network.ign.tmpl",
-        "${local.templates_path}/ignition/base-network-manager.ign.tmpl",
+        "${local.templates_path}/ignition/base-systemd-networkd.ign.tmpl",
+        "${local.templates_path}/ignition/vlan_network.ign.tmpl",
+        # # Laptop
+        # "${local.templates_path}/ignition/base-network-manager.ign.tmpl",
         "${local.templates_path}/ignition/storage.ign.tmpl",
         "${local.templates_path}/ignition/desktop.ign.tmpl",
       ]
@@ -775,28 +776,27 @@ locals {
 
     # client devices
     client = {
-      # # Enable for desktop
-      # hwif = [
-      #   {
-      #     label = "pf0"
-      #     if    = "en-pf0"
-      #     mac   = "f8-f2-1e-1e-3c-40"
-      #   }
-      # ]
-      # network = [
-      #   {
-      #     label = "main"
-      #     if    = "en-main"
-      #     ip    = "192.168.127.253"
-      #     hwif  = "pf0"
-      #   },
-      #   {
-      #     label = "lan"
-      #     if    = "en-lan"
-      #     dhcp  = true
-      #     hwif  = "pf0"
-      #   }
-      # ]
+      hwif = [
+        {
+          label = "pf0"
+          if    = "en-pf0"
+          mac   = "f8-f2-1e-1e-3c-40"
+        }
+      ]
+      network = [
+        {
+          label = "main"
+          if    = "en-main"
+          ip    = "192.168.127.253"
+          hwif  = "pf0"
+        },
+        {
+          label = "lan"
+          if    = "en-lan"
+          dhcp  = true
+          hwif  = "pf0"
+        }
+      ]
       disk = [
         {
           device     = "/dev/disk/by-label/localhome"
