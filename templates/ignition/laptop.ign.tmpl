@@ -5,17 +5,18 @@ systemd:
   units:
     - name: powertop.service
       enabled: true
-        contents: |
-          [Unit]
-          ConditionPathExists=/var/cache/powertop/saved_parameters.powertop
+      contents: |
+        [Unit]
+        ConditionPathExists=/var/cache/powertop/saved_parameters.powertop
+        ConditionPathExists=/var/cache/powertop/saved_results.powertop
 
-          [Service]
-          Type=oneshot
-          RemainAfterExit=true
-          ExecStart=/usr/sbin/powertop --auto-tune
+        [Service]
+        Type=oneshot
+        RemainAfterExit=true
+        ExecStart=/usr/sbin/powertop --auto-tune
 
-          [Install]
-          WantedBy=multi-user.target
+        [Install]
+        WantedBy=multi-user.target
 storage:
   files:
     - path: /var/cache/powertop/saved_parameters.powertop
