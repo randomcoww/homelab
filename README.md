@@ -93,13 +93,13 @@ buildtool tf-wrapper apply \
 ### Start VMs
 
 ```bash
-virsh -c qemu+ssh://core@kvm-0.local/system net-start sriov
+virsh -c qemu+ssh://core@kvm-0.local/system net-start pf0
 virsh -c qemu+ssh://core@kvm-0.local/system start gateway-0
 virsh -c qemu+ssh://core@kvm-0.local/system start controller-0
 virsh -c qemu+ssh://core@kvm-1.local/system start controller-1
 virsh -c qemu+ssh://core@kvm-0.local/system start worker-0
 
-virsh -c qemu+ssh://core@kvm-1.local/system net-start sriov
+virsh -c qemu+ssh://core@kvm-1.local/system net-start pf0
 virsh -c qemu+ssh://core@kvm-1.local/system start gateway-1
 virsh -c qemu+ssh://core@kvm-1.local/system start controller-1
 virsh -c qemu+ssh://core@kvm-1.local/system start controller-2
