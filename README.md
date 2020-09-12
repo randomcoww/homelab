@@ -8,6 +8,7 @@ buildtool() {
     podman run -it --rm \
         -v $HOME/.aws:/root/.aws \
         -v $(pwd):/root/mnt \
+        -v /var/cache:/var/cache \
         -w /root/mnt/resourcesv2 \
         --net=host \
         randomcoww/tf-env:latest "$@"
