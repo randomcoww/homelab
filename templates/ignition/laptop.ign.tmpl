@@ -21,7 +21,7 @@ storage:
   files:
     %{~ for f in [
       "/var/cache/powertop/saved_parameters.powertop",
-      "/var/cache/powertop/saved_resultss.powertop"
+      "/var/cache/powertop/saved_results.powertop"
     ] ~}
     %{~ if fileexists(f) ~}
     - path: ${f}
