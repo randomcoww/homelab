@@ -81,6 +81,7 @@ module "desktop" {
 
   client_password = var.client_password
   domains         = local.domains
+  swap_device     = "/dev/disk/by-label/swap"
 
   templates = local.components.desktop.ignition_templates
   hosts = {
