@@ -13,3 +13,13 @@ passwd:
         - sudo
         - systemd-journal
         - wheel
+systemd:
+  units:
+    - name: ${join("-", compact(split("/", replace(swap_device, "-", "\\x2d") )))}.swap
+      enabled: true
+      contents: |
+        [Swap]
+        What=${swap_device}
+
+        [Install]
+        WantedBy=local-fs.target
