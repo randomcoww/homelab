@@ -2,6 +2,9 @@
 module "kubernetes-addons" {
   source = "../modulesv2/kubernetes_addons"
 
-  kubernetes_manifests = data.null_data_source.provider-addons.outputs
-  cluster_endpoint     = module.kubernetes-common.cluster_endpoint
+  kubernetes_manifests = merge(
+    module.secrets.addons,
+    module.tls-secrets.addons
+  )
+  cluster_endpoint = module.kubernetes-common.cluster_endpoint
 }

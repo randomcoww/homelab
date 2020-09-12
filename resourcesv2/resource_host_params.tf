@@ -243,20 +243,11 @@ module "static-pod-logging" {
   }
 }
 
-data "null_data_source" "provider-addons" {
-  inputs = merge(
-    module.secrets.addons,
-    module.tls-secrets.addons
-  )
-}
-
-data "null_data_source" "render-addons" {
-  inputs = merge(
-    module.gateway-common.addons,
-    module.kubernetes-common.addons,
-    module.ssh-common.addons,
-    module.static-pod-logging.addons,
-    module.test-common.addons,
+# Force output values to update
+resource "null_resource" "output-triggers" {
+  triggers = merge(
+    module.kubernetes-common.cluster_endpoint,
+    module.ssh-common.client_params
   )
 }
 

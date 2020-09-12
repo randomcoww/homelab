@@ -33,15 +33,3 @@ output "kubeconfig" {
     apiserver_endpoint = module.kubernetes-common.cluster_endpoint.apiserver_endpoint
   })
 }
-
-# Force output values to update
-resource "null_resource" "output-triggers" {
-  triggers = merge({
-    for k, v in module.kubernetes-common.cluster_endpoint :
-    k => v
-    },
-    {
-      for k, v in module.ssh-common.client_params :
-      k => v
-  })
-}

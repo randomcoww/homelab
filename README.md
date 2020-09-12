@@ -15,14 +15,6 @@ buildtool() {
 }
 ```
 
-### Run local matchbox server
-
-Configurations for creating hypervisor images are generated on a local Matchbox instance. This will generate necessary TLS certs and start a local Matchbox instance using Podman:
-
-```bash
-buildtool start-renderer
-```
-
 ### Define secrets
 
 ```bash
@@ -55,7 +47,7 @@ buildtool terraform apply \
 ```bash
 buildtool terraform apply \
     -var-file=secrets.tfvars \
-    -target=module.ignition-local
+    -target=local_file.ignition-local
 ```
 
 #### KVM hosts
@@ -115,11 +107,6 @@ virsh -c qemu+ssh://core@kvm-1.local/system start worker-1
 
 ### Deploy kubernetes services
 
-```bash
-buildtool terraform apply \
-    -target=module.generic-manifest-local
-```
-
 Write kubeconfig file:
 
 ```bash
@@ -130,14 +117,19 @@ mkdir -p ~/.kube
 buildtool terraform output kubeconfig > ~/.kube/config
 ```
 
+```bash
+buildtool terraform apply \
+    -target=local_file.kubernetes-addons
+```
+
 #### Basic addons
 
 ```bash
-kubectl apply -f http://127.0.0.1:8080/generic?manifest=bootstrap
-kubectl apply -f http://127.0.0.1:8080/generic?manifest=kube-proxy
-kubectl apply -f http://127.0.0.1:8080/generic?manifest=flannel
-kubectl apply -f http://127.0.0.1:8080/generic?manifest=kapprover
-kubectl apply -f http://127.0.0.1:8080/generic?manifest=coredns
+kubectl apply -f output/addons/bootstrap.yaml
+kubectl apply -f output/addons/kube-proxy.yaml
+kubectl apply -f output/addons/flannel.yaml
+kubectl apply -f output/addons/kapprover.yaml
+kubectl apply -f output/addons/coredns.yaml
 ```
 
 #### MetalLb
@@ -145,7 +137,7 @@ kubectl apply -f http://127.0.0.1:8080/generic?manifest=coredns
 https://metallb.universe.tf/installation/#installation-by-manifest
 
 ```bash
-kubectl apply -f http://127.0.0.1:8080/generic?manifest=metallb-network
+kubectl apply -f output/addons/metallb-network.yaml
 ```
 
 #### Traefik
@@ -210,7 +202,7 @@ kubectl apply -n monitoring -f manifests/grafana.yaml
 Allow non cluster nodes to send logs to loki:
 
 ```bash
-kubectl apply -f http://127.0.0.1:8080/generic?manifest=loki-lb-service
+kubectl apply -f output/addons/loki-lb-service.yaml
 ```
 
 Currently the PSP `requiredDropCapabilities` causes loki pod to crashloop:

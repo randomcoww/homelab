@@ -810,16 +810,8 @@ locals {
   # similar to guests filter
   # control which configs are rendered on local matchbox
   local_renderer_hosts_include = [
-    "gateway-0",
-    "gateway-1",
-    "controller-0",
-    "controller-1",
-    "controller-2",
-    "worker-0",
-    "worker-1",
     "kvm-0",
     "kvm-1",
-    "test-0",
     "client",
   ]
 }
