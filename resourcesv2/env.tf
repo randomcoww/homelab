@@ -167,13 +167,14 @@ locals {
       ignition_templates = [
         "${local.templates_path}/ignition/base.ign.tmpl",
         "${local.templates_path}/ignition/base-client.ign.tmpl",
-        # # Desktop
-        "${local.templates_path}/ignition/base-systemd-networkd.ign.tmpl",
-        "${local.templates_path}/ignition/vlan_network.ign.tmpl",
-        # # Laptop
-        # "${local.templates_path}/ignition/base-network-manager.ign.tmpl",
         "${local.templates_path}/ignition/storage.ign.tmpl",
-        "${local.templates_path}/ignition/desktop.ign.tmpl",
+        "${local.templates_path}/ignition/desktop_env.ign.tmpl",
+        # # Desktop
+        # "${local.templates_path}/ignition/base-systemd-networkd.ign.tmpl",
+        # "${local.templates_path}/ignition/vlan_network.ign.tmpl",
+        # Laptop
+        "${local.templates_path}/ignition/base-network-manager.ign.tmpl",
+        "${local.templates_path}/ignition/laptop.ign.tmpl",
       ]
     }
     # server certs for SSH CA
