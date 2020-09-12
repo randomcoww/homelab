@@ -19,121 +19,15 @@ systemd:
         WantedBy=multi-user.target
 storage:
   files:
-    - path: /var/cache/powertop/saved_parameters.powertop
+    %{~ for f in [
+      "/var/cache/powertop/saved_parameters.powertop",
+      "/var/cache/powertop/saved_resultss.powertop"
+    ] ~}
+    %{~ if fileexists(f) ~}
+    - path: ${f}
       mode: 0644
       contents:
         inline: |
-          alsa-codec-power	0.5
-          backlight	0
-          backlight-boost-100	0
-          backlight-boost-40	0
-          backlight-boost-80	0
-          backlight-power	0
-          base power	1.03551795
-          cpu-consumption	1.56
-          cpu-wakeups	39.5
-          disk-operations	0
-          disk-operations-hard	0.2
-          enp2s0-link-100	0
-          enp2s0-link-1000	0
-          enp2s0-link-high	0
-          enp2s0-packets	0
-          enp2s0-powerunsave	0
-          enp2s0-up	0
-          gpu-operations	0.5576
-          radio:hci0	0
-          radio:phy0	0
-          radio:tpacpi_bluetooth_sw	0
-          runtime-0000:00:00.0	0
-          runtime-0000:00:00.2	0
-          runtime-0000:00:01.0	0
-          runtime-0000:00:02.0	0
-          runtime-0000:00:02.1	0
-          runtime-0000:00:02.2	0
-          runtime-0000:00:02.3	0
-          runtime-0000:00:08.0	0
-          runtime-0000:00:08.1	0
-          runtime-0000:00:14.0	0
-          runtime-0000:00:14.3	0
-          runtime-0000:00:18.0	0
-          runtime-0000:00:18.1	0
-          runtime-0000:00:18.2	0
-          runtime-0000:00:18.3	0
-          runtime-0000:00:18.4	0
-          runtime-0000:00:18.5	0
-          runtime-0000:00:18.6	0
-          runtime-0000:00:18.7	0
-          runtime-0000:01:00.0	0
-          runtime-0000:02:00.0	0
-          runtime-0000:03:00.0	0
-          runtime-0000:04:00.0	0
-          runtime-0000:04:00.1	0
-          runtime-0000:04:00.2	0
-          runtime-0000:04:00.3	0
-          runtime-0000:04:00.4	0
-          runtime-0000:04:00.5	0
-          runtime-0000:04:00.6	0
-          runtime-ACPI0003:00	0
-          runtime-ACPI0007:06	0
-          runtime-ACPI0007:07	0
-          runtime-ACPI0007:08	0
-          runtime-ACPI0007:09	0
-          runtime-ACPI0007:0a	0
-          runtime-ACPI0007:0b	0
-          runtime-ACPI0007:0c	0
-          runtime-ACPI0007:0d	0
-          runtime-ACPI0007:0e	0
-          runtime-ACPI0007:0f	0
-          runtime-AMDI0030:00	0
-          runtime-Fixed MDIO bus.0	0
-          runtime-LEN0100:00	0
-          runtime-LEN0130:00	0
-          runtime-LEN0268:00	0
-          runtime-PNP0800:00	0
-          runtime-PNP0C04:00	0
-          runtime-PNP0C09:00	0
-          runtime-PNP0C0A:00	0
-          runtime-PNP0C0C:00	0
-          runtime-PNP0C0D:00	0
-          runtime-PNP0C0E:00	0
-          runtime-PNP0C14:00	0
-          runtime-PNP0C14:01	0
-          runtime-PNP0C14:02	0
-          runtime-PNP0C14:03	0
-          runtime-PNP0C14:04	0
-          runtime-STM0125:00	0
-          runtime-USBC000:00	0
-          runtime-alarmtimer.0.auto	0
-          runtime-efi-framebuffer.0	0
-          runtime-efivars.0	0
-          runtime-i2c-0	0
-          runtime-i2c-1	0
-          runtime-i2c-2	0
-          runtime-i2c-3	0
-          runtime-i2c-4	0
-          runtime-i2c-5	0
-          runtime-i2c-6	0
-          runtime-i2c-7	0
-          runtime-i8042	0
-          runtime-kgdboc	0
-          runtime-microcode	0
-          runtime-pcspkr	0
-          runtime-reg-dummy	0
-          runtime-regulatory.0	0
-          runtime-rtc-efi.0	0
-          runtime-serial8250	0
-          runtime-sp5100-tco	0
-          runtime-thinkpad_acpi	0
-          runtime-thinkpad_hwmon	0
-          usb-device-06cb-00da	0.1
-          usb-device-1d6b-0002	0.1
-          usb-device-1d6b-0003	0.1
-          usb-device-30c9-0014	0.1
-          usb-device-8087-0029	0.1
-          wlp3s0-link-100	0
-          wlp3s0-link-1000	0
-          wlp3s0-link-high	0
-          wlp3s0-packets	0
-          wlp3s0-powerunsave	0
-          wlp3s0-up	0
-          xwakes	0.1
+          ${indent(10, file(f))}
+    %{~ endif ~}
+    %{~ endfor ~}
