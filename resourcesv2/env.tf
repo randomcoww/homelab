@@ -169,11 +169,7 @@ locals {
         "${local.templates_path}/ignition/base-client.ign.tmpl",
         "${local.templates_path}/ignition/storage.ign.tmpl",
         "${local.templates_path}/ignition/desktop_env.ign.tmpl",
-        ## Desktop
-        "${local.templates_path}/ignition/base-systemd-networkd.ign.tmpl",
-        "${local.templates_path}/ignition/vlan_network.ign.tmpl",
-        ## Laptop
-        # "${local.templates_path}/ignition/base-network-manager.ign.tmpl",
+        "${local.templates_path}/ignition/base-network-manager.ign.tmpl",
         # "${local.templates_path}/ignition/laptop.ign.tmpl",
       ]
     }
@@ -780,8 +776,9 @@ locals {
       hwif = [
         {
           label = "pf0"
-          if    = "en-pf0"
+          if    = "enp4s0f0"
           mac   = "f8-f2-1e-1e-3c-40"
+          numvfs = 15
         }
       ]
       network = [

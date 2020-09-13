@@ -30,16 +30,20 @@ storage:
           interface-name=${v.if}
           type=802-3-ethernet
 
+          [sriov]
+          total-vfs=${v.numvfs}
+
           [802-3-ethernet]
-          mac-address=${replace(v.mac, "-", ":")}
           mtu=${lookup(v, "mtu", 9000)}
 
-          # Just want to set MTU on parent interface. Try to configure as little as possible.
+          # Kind of a hack to only specify unused ipv6 configuration
+          # This brings up the interface with mtu and vfs without
+          # adding ipv4 addresses
           [ipv4]
-          method=auto
-          never-default=true
-          ignore-auto-dns=true
-          ignore-auto-routes=true
+          method=disabled
+
+          [ipv6]
+          method=link-local
     %{~ endfor ~}
     %{~ for v in p.network ~}
     %{~ if lookup(v, "id", null) != null ~}
