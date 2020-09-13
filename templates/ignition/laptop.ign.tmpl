@@ -3,6 +3,18 @@ variant: fcos
 version: 1.0.0
 systemd:
   units:
+    - name: ${join("-", compact(split("/", replace(swap_device, "-", "\\x2d") )))}.swap
+      enabled: true
+      contents: |
+        [Unit]
+        ConditionPathExists=${swap_device}
+
+        [Swap]
+        What=${swap_device}
+        TimeoutSec=10s
+
+        [Install]
+        WantedBy=local-fs.target
     - name: powertop.service
       enabled: true
       contents: |
