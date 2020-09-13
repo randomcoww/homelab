@@ -106,6 +106,21 @@ virsh -c qemu+ssh://core@kvm-1.local/system start controller-2
 virsh -c qemu+ssh://core@kvm-1.local/system start worker-1
 ```
 
+### Recover from no gateways running
+
+Internet access is needed to fetch the terraform state file. From client:
+
+```
+nmcli c up wan
+```
+
+Start VMs as above. Switch to LAN:
+
+```
+nmcli c down wan
+nmcli c up lan
+```
+
 ### Deploy kubernetes services
 
 Write kubeconfig file:

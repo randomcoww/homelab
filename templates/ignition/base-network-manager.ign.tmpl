@@ -6,9 +6,9 @@ systemd:
     - name: systemd-networkd-wait-online.service
       mask: true
     - name: avahi-daemon.service
-      mask: true
+      enabled: true
     - name: avahi-daemon.socket
-      mask: true
+      enabled: true
     - name: NetworkManager.service
       enabled: true
     - name: NetworkManager-wait-online.service
@@ -53,6 +53,9 @@ storage:
         inline: |
           [connection]
           type=vlan
+          %{~ if lookup(v, "disabled", false) ~}
+          autoconnect=false
+          %{~ endif ~}
 
           [vlan]
           parent=${p.hwif_by_key[v.hwif].if}
@@ -63,5 +66,8 @@ storage:
           %{~ if lookup(v, "ip", null) != null && lookup(v, "cidr", null) != null ~}
           addresses=${v.ip}/${v.cidr}
           %{~ endif ~}
+
+          [ipv6]
+          method=link-local
     %{~ endif ~}
     %{~ endfor ~}

@@ -775,9 +775,9 @@ locals {
     client = {
       hwif = [
         {
-          label = "pf0"
-          if    = "enp4s0f0"
-          mac   = "f8-f2-1e-1e-3c-40"
+          label  = "pf0"
+          if     = "enp4s0f0"
+          mac    = "f8-f2-1e-1e-3c-40"
           numvfs = 15
         }
       ]
@@ -793,6 +793,13 @@ locals {
           if    = "en-lan"
           dhcp  = true
           hwif  = "pf0"
+        },
+        {
+          label    = "wan"
+          if       = "en-wan"
+          dhcp     = true
+          hwif     = "pf0"
+          disabled = true
         }
       ]
       disk = [
