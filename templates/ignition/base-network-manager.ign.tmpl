@@ -71,3 +71,24 @@ storage:
           method=link-local
     %{~ endif ~}
     %{~ endfor ~}
+    %{~ if length(wireguard_config) > 0 ~}
+    - path: /etc/NetworkManager/system-connections/wireguard.nmconnection
+      mode: 0600
+      contents:
+        inline: |
+          [connection]
+          type=wireguard
+          interface-name=wg0
+
+          [wireguard]
+          private-key=${wireguard_config.Interface.PrivateKey}
+          mtu=9000
+
+          [wireguard-peer.${wireguard_config.Peer.PublicKey}]
+          endpoint=${wireguard_config.Peer.Endpoint}
+          allowed-ips=${wireguard_config.Peer.AllowedIPs}
+
+          [ipv4]
+          method=manual
+          address=${wireguard_config.Interface.Address}
+    %{~ endif ~}

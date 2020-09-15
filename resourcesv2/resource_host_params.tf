@@ -79,9 +79,10 @@ module "test-common" {
 module "desktop" {
   source = "../modulesv2/desktop"
 
-  client_password = var.client_password
-  domains         = local.domains
-  swap_device     = "/dev/disk/by-label/swap"
+  client_password  = var.client_password
+  domains          = local.domains
+  wireguard_config = var.wireguard_config
+  swap_device      = "/dev/disk/by-label/swap"
 
   templates = local.components.desktop.ignition_templates
   hosts = {
