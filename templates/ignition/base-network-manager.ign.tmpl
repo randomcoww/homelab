@@ -79,9 +79,11 @@ storage:
           [connection]
           type=wireguard
           interface-name=wg0
+          autoconnect=false
 
           [wireguard]
           private-key=${wireguard_config.Interface.PrivateKey}
+          ip4-auto-default-route=1
           mtu=9000
 
           [wireguard-peer.${wireguard_config.Peer.PublicKey}]
