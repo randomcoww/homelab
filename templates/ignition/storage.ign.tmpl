@@ -10,11 +10,12 @@ systemd:
       contents: |
         [Unit]
         ConditionPathExists=${disk.device}
-        Before=local-fs.target
+
         [Mount]
         What=${disk.device}
         Where=${disk.mount_path}
         Type=${lookup(disk, "format", "xfs")}
+
         [Install]
         WantedBy=local-fs.target
     %{~ endif ~}

@@ -7,7 +7,10 @@ systemd:
       enabled: true
       contents: |
         [Unit]
+        ConditionVirtualization=!vm
+        ConditionVirtualization=!container
         ConditionPathExists=${swap_device}
+        ConditionKernelCommandLine=resume
 
         [Swap]
         What=${swap_device}
@@ -19,8 +22,10 @@ systemd:
       enabled: true
       contents: |
         [Unit]
-        ConditionPathExists=/var/cache/powertop/saved_parameters.powertop
-        ConditionPathExists=/var/cache/powertop/saved_results.powertop
+        ConditionVirtualization=!vm
+        ConditionVirtualization=!container
+        ConditionFileNotEmpty=/var/cache/powertop/saved_parameters.powertop
+        ConditionFileNotEmpty=/var/cache/powertop/saved_results.powertop
 
         [Service]
         Type=oneshot

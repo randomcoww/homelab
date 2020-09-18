@@ -113,8 +113,8 @@ locals {
       ]
       ignition_templates = [
         "${local.templates_path}/ignition/base.ign.tmpl",
-        "${local.templates_path}/ignition/base-server.ign.tmpl",
-        "${local.templates_path}/ignition/base-systemd-networkd.ign.tmpl",
+        "${local.templates_path}/ignition/base_server.ign.tmpl",
+        "${local.templates_path}/ignition/base_systemd_networkd.ign.tmpl",
         "${local.templates_path}/ignition/vlan_network.ign.tmpl",
         "${local.templates_path}/ignition/hypervisor.ign.tmpl",
       ]
@@ -136,8 +136,8 @@ locals {
       ]
       ignition_templates = [
         "${local.templates_path}/ignition/base.ign.tmpl",
-        "${local.templates_path}/ignition/base-server.ign.tmpl",
-        "${local.templates_path}/ignition/base-systemd-networkd.ign.tmpl",
+        "${local.templates_path}/ignition/base_server.ign.tmpl",
+        "${local.templates_path}/ignition/base_systemd_networkd.ign.tmpl",
         "${local.templates_path}/ignition/general_network.ign.tmpl",
       ]
       libvirt_domain_template = "${local.templates_path}/libvirt/coreos.xml.tmpl"
@@ -158,18 +158,18 @@ locals {
       ]
     }
     # silverblue (gnome) desktop with networkmanager
-    desktop = {
+    client = {
       nodes = [
-        "client",
+        "client-0",
       ]
       client_user     = local.client_user
       client_user_uid = 10000
       ignition_templates = [
         "${local.templates_path}/ignition/base.ign.tmpl",
-        "${local.templates_path}/ignition/base-client.ign.tmpl",
+        "${local.templates_path}/ignition/base_client.ign.tmpl",
         "${local.templates_path}/ignition/storage.ign.tmpl",
         "${local.templates_path}/ignition/desktop_env.ign.tmpl",
-        "${local.templates_path}/ignition/base-network-manager.ign.tmpl",
+        "${local.templates_path}/ignition/base_network_manager.ign.tmpl",
         # "${local.templates_path}/ignition/laptop.ign.tmpl",
       ]
     }
@@ -188,21 +188,21 @@ locals {
         "test-0",
       ]
       ignition_templates = [
-        "${local.templates_path}/ignition/ssh-server.ign.tmpl",
+        "${local.templates_path}/ignition/ssh_server.ign.tmpl",
       ]
     }
     ssh_client = {
       nodes = [
-        "client"
+        "client-0"
       ]
       ignition_templates = [
-        "${local.templates_path}/ignition/ssh-client.ign.tmpl",
+        "${local.templates_path}/ignition/ssh_client.ign.tmpl",
       ]
     }
     # cert for fuzzybunny.internal
     traefik_tls = {
       nodes = [
-        "client",
+        "client-0",
       ]
       ignition_templates = [
         "${local.templates_path}/ignition/internal_tls.ign.tmpl",
@@ -772,7 +772,7 @@ locals {
     }
 
     # client devices
-    client = {
+    client-0 = {
       hwif = [
         {
           label  = "pf0"
@@ -816,6 +816,6 @@ locals {
   local_renderer_hosts_include = [
     "kvm-0",
     "kvm-1",
-    "client",
+    "client-0",
   ]
 }

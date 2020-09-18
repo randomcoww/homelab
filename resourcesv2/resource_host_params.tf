@@ -76,17 +76,17 @@ module "test-common" {
   }
 }
 
-module "desktop" {
-  source = "../modulesv2/desktop"
+module "client" {
+  source = "../modulesv2/client"
 
   client_password  = var.client_password
   domains          = local.domains
   wireguard_config = var.wireguard_config
   swap_device      = "/dev/disk/by-label/swap"
 
-  templates = local.components.desktop.ignition_templates
+  templates = local.components.client.ignition_templates
   hosts = {
-    for k in local.components.desktop.nodes :
+    for k in local.components.client.nodes :
     k => local.aggr_hosts[k]
   }
 }
@@ -268,7 +268,7 @@ locals {
         module.tls-secrets.templates,
         module.hypervisor.templates,
         module.vm.templates,
-        module.desktop.templates,
+        module.client.templates,
       ] :
       lookup(k, h, [])
     ])
