@@ -5,7 +5,7 @@ Build container includes terraform with plugins:
 ```bash
 buildtool() {
     set -x
-    podman run -it --rm \
+    podman run -it --rm --security-opt label=disable \
         -v $HOME/.aws:/root/.aws \
         -v $(pwd):/root/mnt \
         -v /var/cache:/var/cache \
