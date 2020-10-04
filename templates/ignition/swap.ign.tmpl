@@ -1,0 +1,19 @@
+---
+variant: fcos
+version: 1.0.0
+systemd:
+  units:
+    - name: ${join("-", compact(split("/", replace(swap_device, "-", "\\x2d") )))}.swap
+      enabled: true
+      contents: |
+        [Unit]
+        ConditionVirtualization=!vm
+        ConditionVirtualization=!container
+        ConditionKernelCommandLine=resume
+
+        [Swap]
+        What=${swap_device}
+        TimeoutSec=10s
+
+        [Install]
+        WantedBy=local-fs.target

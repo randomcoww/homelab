@@ -170,7 +170,7 @@ locals {
         "${local.templates_path}/ignition/storage.ign.tmpl",
         "${local.templates_path}/ignition/desktop_env.ign.tmpl",
         "${local.templates_path}/ignition/base_network_manager.ign.tmpl",
-        "${local.templates_path}/ignition/laptop.ign.tmpl",
+        # "${local.templates_path}/ignition/swap.ign.tmpl",
       ]
     }
     # server certs for SSH CA
