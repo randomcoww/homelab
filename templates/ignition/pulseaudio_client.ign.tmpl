@@ -1,0 +1,9 @@
+---
+variant: fcos
+version: 1.0.0
+storage:
+  files:
+    - path: /etc/pulse/default.pa
+      append:
+        - inline: |
+            load-module module-zeroconf-discover

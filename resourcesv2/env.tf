@@ -170,6 +170,9 @@ locals {
         "${local.templates_path}/ignition/storage.ign.tmpl",
         "${local.templates_path}/ignition/desktop_env.ign.tmpl",
         "${local.templates_path}/ignition/base_network_manager.ign.tmpl",
+        # Enable either pulseaudio server or client
+        "${local.templates_path}/ignition/pulseaudio_server.ign.tmpl",
+        # "${local.templates_path}/ignition/pulseaudio_client.ign.tmpl",
         # "${local.templates_path}/ignition/swap.ign.tmpl",
       ]
     }
