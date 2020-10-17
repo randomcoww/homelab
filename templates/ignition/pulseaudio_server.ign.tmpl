@@ -6,5 +6,8 @@ storage:
     - path: /etc/pulse/default.pa
       append:
         - inline: |
-            load-module module-native-protocol-tcp auth-ip-acl=127.0.0.1;${p.networks_by_key.lan.network}/${p.networks_by_key.lan.cidr}
+            load-module module-native-protocol-tcp auth-ip-acl=127.0.0.1;${join(";", [
+              for n in pulseaudio_server_networks :
+                "${p.networks_by_key[n].network}/${p.networks_by_key[n].cidr}"
+              ])}
             load-module module-zeroconf-publish
