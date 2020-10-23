@@ -306,6 +306,7 @@ locals {
       id      = 60
       network = "192.168.190.0"
       cidr    = 29
+      router  = "192.168.190.6"
       mtu     = 9000
     }
     wan = {
@@ -570,65 +571,6 @@ locals {
         "hba"
       ]
       disk = [
-        {
-          label      = "ZA15EAPV"
-          device     = "/dev/disk/by-id/ata-ST8000VN0022-2EL112_ZA15EAPV"
-          mount_path = "/var/s3/0"
-        },
-        {
-          label      = "ZA15Q6AH"
-          device     = "/dev/disk/by-id/ata-ST8000VN0022-2EL112_ZA15Q6AH"
-          mount_path = "/var/s3/1"
-        },
-        {
-          label      = "ZA16BS65"
-          device     = "/dev/disk/by-id/ata-ST8000VN0022-2EL112_ZA16BS65"
-          mount_path = "/var/s3/2"
-        },
-        {
-          label      = "ZA16CF0F"
-          device     = "/dev/disk/by-id/ata-ST8000VN0022-2EL112_ZA16CF0F"
-          mount_path = "/var/s3/3"
-        },
-        {
-          label      = "ZA16JMFA"
-          device     = "/dev/disk/by-id/ata-ST8000VN0022-2EL112_ZA16JMFA"
-          mount_path = "/var/s3/4"
-        },
-        {
-          label      = "ZA16L5B4"
-          device     = "/dev/disk/by-id/ata-ST8000VN0022-2EL112_ZA16L5B4"
-          mount_path = "/var/s3/5"
-        },
-        {
-          label      = "ZA16LAV1"
-          device     = "/dev/disk/by-id/ata-ST8000VN0022-2EL112_ZA16LAV1"
-          mount_path = "/var/s3/6"
-        },
-        {
-          label      = "ZA16LAYD"
-          device     = "/dev/disk/by-id/ata-ST8000VN0022-2EL112_ZA16LAYD"
-          mount_path = "/var/s3/7"
-        },
-        {
-          label      = "ZA16PHJ7"
-          device     = "/dev/disk/by-id/ata-ST8000VN0022-2EL112_ZA16PHJ7"
-          mount_path = "/var/s3/8"
-        },
-        {
-          label      = "ZA16QQ66"
-          device     = "/dev/disk/by-id/ata-ST8000VN0022-2EL112_ZA16QQ66"
-          mount_path = "/var/s3/9"
-        },
-        {
-          label      = "ZA16RDGT"
-          device     = "/dev/disk/by-id/ata-ST8000VN0022-2EL112_ZA16RDGT"
-          mount_path = "/var/s3/10"
-        },
-        {
-          device     = "/dev/disk/by-id/ata-Samsung_SSD_860_QVO_1TB_S4PGNF0M410395Z"
-          mount_path = "/var/pv"
-        },
       ]
     }
 

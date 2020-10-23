@@ -26,12 +26,12 @@ storage:
         inline: |
           [Resolve]
           DNSStubListener=true
-    - path: /etc/systemd/network/20-${p.networks_by_key.main.if}.network.d/backup-route.conf
+    - path: /etc/systemd/network/20-${p.networks_by_key.sync.if}.network.d/backup-route.conf
       mode: 0644
       contents:
         inline: |
           [Route]
-          Gateway=${p.networks_by_key.main.router}
+          Gateway=${p.networks_by_key.sync.router}
           Destination=0.0.0.0/0
           Table=${slave_default_route_table}
 
@@ -298,9 +298,9 @@ storage:
         inline: |-
           {
             "Dhcp4": {
-              "valid-lifetime": 86400,
-              "renew-timer": 43200,
-              "rebind-timer": 86400,
+              "valid-lifetime": 1200,
+              "renew-timer": 800,
+              "rebind-timer": 1200,
               "lease-database": {
                 "type": "memfile",
                 "persist": true,
