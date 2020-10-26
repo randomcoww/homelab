@@ -61,19 +61,6 @@ VMs running on the host will boot off of the same kernel and initramfs as the hy
 
 Run build from https://github.com/randomcoww/fedora-silverblue-custom
 
-### Setup SSH access from client
-
-```bash
-KEY=$HOME/.ssh/id_ecdsa
-ssh-keygen -q -t ecdsa -N '' -f $KEY 2>/dev/null <<< y >/dev/null
-
-buildtool terraform apply \
-    -target=null_resource.output-triggers \
-    -var="ssh_client_public_key=$(cat $KEY.pub)"
-
-buildtool terraform output ssh-client-certificate > $KEY-cert.pub
-```
-
 ### Generate configuration on hypervisor hosts
 
 Each hypervisor runs a PXE boot environment on an internal network for provisioning VMs local to the host. VMs run Fedora CoreOS using Ignition for boot time configuration.
@@ -88,6 +75,19 @@ buildtool tf-wrapper apply \
 buildtool tf-wrapper apply \
     -target=module.ignition-kvm-1 \
     -target=module.libvirt-kvm-1
+```
+
+### Setup SSH access from client
+
+```bash
+KEY=$HOME/.ssh/id_ecdsa
+ssh-keygen -q -t ecdsa -N '' -f $KEY 2>/dev/null <<< y >/dev/null
+
+buildtool terraform apply \
+    -target=null_resource.output-triggers \
+    -var="ssh_client_public_key=$(cat $KEY.pub)"
+
+buildtool terraform output ssh-client-certificate > $KEY-cert.pub
 ```
 
 ### Start VMs
