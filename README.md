@@ -2,7 +2,7 @@
 
 ### Setup
 
-Build container includes terraform with plugins:
+**Build container includes terraform with plugins:**
 
 ```bash
 buildtool() {
@@ -252,13 +252,13 @@ kubectl apply -f manifests/common.yaml
 
 ### Recover from no gateways running
 
-Internet access is needed to fetch the terraform state file. From client:
+**Internet access is needed to fetch the terraform state file. From client:**
 
 ```
 nmcli c up wan
 ```
 
-Start VMs as above. Switch to LAN:
+**Start VMs as above. Switch to LAN:**
 
 ```
 nmcli c down wan
