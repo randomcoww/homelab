@@ -571,6 +571,10 @@ locals {
         "hba"
       ]
       disk = [
+        {
+          device     = "/dev/disk/by-id/ata-Samsung_SSD_860_QVO_1TB_S4PGNF0M410395Z"
+          mount_path = "/var/pv"
+        },
       ]
     }
 
