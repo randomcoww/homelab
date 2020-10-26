@@ -1,6 +1,3 @@
-##
-## matchbox
-##
 resource "tls_private_key" "matchbox-client" {
   algorithm   = "ECDSA"
   ecdsa_curve = "P521"

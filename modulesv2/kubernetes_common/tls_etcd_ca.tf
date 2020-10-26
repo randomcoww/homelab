@@ -1,6 +1,3 @@
-##
-## etcd ca
-##
 resource "tls_private_key" "etcd-ca" {
   algorithm   = "ECDSA"
   ecdsa_curve = "P521"

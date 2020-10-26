@@ -1,6 +1,3 @@
-##
-## matchbox
-##
 resource "tls_private_key" "scheduler" {
   algorithm   = "ECDSA"
   ecdsa_curve = "P521"

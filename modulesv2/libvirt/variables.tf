@@ -1,5 +1,5 @@
-variable "endpoint" {
-  type = string
+variable "client" {
+  type = any
 }
 
 variable "domains" {

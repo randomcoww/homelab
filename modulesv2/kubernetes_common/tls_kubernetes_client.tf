@@ -1,6 +1,3 @@
-##
-## local
-##
 resource "tls_private_key" "kubernetes-client" {
   algorithm   = "ECDSA"
   ecdsa_curve = "P521"

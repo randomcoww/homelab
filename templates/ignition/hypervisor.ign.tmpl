@@ -3,13 +3,24 @@ variant: fcos
 version: 1.0.0
 systemd:
   units:
+    - name: libvirtd-admin.socket
+      mask: true
+    - name: libvirtd-ro.socket
+      mask: true
+    - name: libvirtd.socket
+      mask: true
     - name: libvirtd.service
+      enabled: true
       dropins:
-        - name: 10-virtualization.conf
+        - name: 10-listener.conf
           contents: |
             [Unit]
             ConditionVirtualization=!vm
             ConditionVirtualization=!container
+
+            [Service]
+            ExecStart=
+            ExecStart=/usr/sbin/libvirtd --listen
     - name: ksm.service
       mask: true
     - name: ksmtuned.service
@@ -220,6 +231,27 @@ storage:
       mode: 0644
       contents:
         inline: "${tls_matchbox_key}"
+
+    - path: ${libvirt_tls_path}/CA/cacert.pem
+      mode: 0644
+      contents:
+        inline: "${tls_libvirt_ca}"
+    - path: ${libvirt_tls_path}/libvirt/servercert.pem
+      mode: 0644
+      contents:
+        inline: "${tls_libvirt}"
+    - path: ${libvirt_tls_path}/libvirt/clientcert.pem
+      mode: 0644
+      contents:
+        inline: "${tls_libvirt}"
+    - path: ${libvirt_tls_path}/libvirt/private/serverkey.pem
+      mode: 0644
+      contents:
+        inline: "${tls_libvirt_key}"
+    - path: ${libvirt_tls_path}/libvirt/private/clientkey.pem
+      mode: 0644
+      contents:
+        inline: "${tls_libvirt_key}"
 
 passwd:
   users:

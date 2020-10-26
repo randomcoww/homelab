@@ -1,6 +1,3 @@
-##
-## matchbox
-##
 resource "tls_private_key" "kubernetes" {
   for_each = var.controller_hosts
 

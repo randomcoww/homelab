@@ -1,10 +1,10 @@
 FROM golang:alpine AS MODULES
 
-ENV K8S_VERSION 0.1.0
-ENV LIBVIRT_VERSION 0.1.0
+ENV K8S_VERSION 0.2.1
+ENV LIBVIRT_VERSION 0.1.7
 ENV SSH_VERSION 0.1.1
-ENV MATCHBOX_VERSION 0.3.0
-ENV CT_VERSION 0.5.1
+ENV MATCHBOX_VERSION 0.4.1
+ENV CT_VERSION 0.6.1
 
 RUN set -x \
   \
@@ -62,13 +62,12 @@ RUN set -x \
 
 FROM alpine:edge
 
-ENV TF_VERSION 0.13.0
+ENV TF_VERSION 0.13.5
 
 ENV HOME /root
 WORKDIR $HOME
 
 COPY --from=MATCHBOX /go/bin/ /usr/local/bin/
-COPY files/tf-wrapper.sh /usr/local/bin/tf-wrapper
 COPY --from=MODULES /go/bin/ .terraform.d/plugins/
 
 RUN set -x \

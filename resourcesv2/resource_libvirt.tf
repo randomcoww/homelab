@@ -1,7 +1,7 @@
 module "libvirt-kvm-0" {
   source = "../modulesv2/libvirt"
 
-  endpoint = module.hypervisor.libvirt_endpoints.kvm-0.endpoint
+  client = module.hypervisor.libvirt_endpoints.kvm-0
   domains = {
     for v in local.aggr_libvirt_domains.kvm-0 :
     v.node => chomp(templatefile(v.libvirt_domain_template, {
@@ -18,7 +18,7 @@ module "libvirt-kvm-0" {
 module "libvirt-kvm-1" {
   source = "../modulesv2/libvirt"
 
-  endpoint = module.hypervisor.libvirt_endpoints.kvm-1.endpoint
+  client = module.hypervisor.libvirt_endpoints.kvm-1
   domains = {
     for v in local.aggr_libvirt_domains.kvm-1 :
     v.node => chomp(templatefile(v.libvirt_domain_template, {

@@ -1,6 +1,3 @@
-##
-## matchbox
-##
 resource "tls_private_key" "matchbox" {
   for_each = var.hosts
 

@@ -1,6 +1,3 @@
-##
-## etcd client
-##
 resource "tls_private_key" "etcd-client" {
   for_each = var.controller_hosts
 
