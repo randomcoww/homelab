@@ -68,11 +68,11 @@ Each hypervisor runs a PXE boot environment on an internal network for provision
 Configure ignition and libvirt on each hypervisor:
 
 ```bash
-buildtool tf-wrapper apply \
+buildtool terraform apply \
     -target=module.ignition-kvm-0 \
     -target=module.libvirt-kvm-0
 
-buildtool tf-wrapper apply \
+buildtool terraform apply \
     -target=module.ignition-kvm-1 \
     -target=module.libvirt-kvm-1
 ```
