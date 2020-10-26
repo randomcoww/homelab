@@ -1,5 +1,7 @@
 ## Terraform configs for provisioning homelab resources
 
+### Setup
+
 Build container includes terraform with plugins:
 
 ```bash
@@ -16,7 +18,7 @@ buildtool() {
 }
 ```
 
-### Define secrets
+**Define secrets:**
 
 ```bash
 cat > secrets.tfvars <<EOF
@@ -38,7 +40,7 @@ EOF
 
 ### Create hypervisor images
 
-Hypervisor images are live USB disks created using [Fedora CoreOS assembler](https://github.com/coreos/coreos-assembler). Generate ignition configuration to local Matchbox server:
+Hypervisor images are live USB disks created using [Fedora CoreOS assembler](https://github.com/coreos/coreos-assembler)
 
 ```bash
 buildtool terraform apply \
@@ -51,21 +53,21 @@ buildtool terraform apply \
     -target=local_file.ignition-local
 ```
 
-#### KVM hosts
+**KVM hosts:**
 
 Run build from https://github.com/randomcoww/fedora-coreos-custom
 
 VMs running on the host will boot off of the same kernel and initramfs as the hypervisor.
 
-#### Client devices
+**Client devices:**
 
 Run build from https://github.com/randomcoww/fedora-silverblue-custom
 
-### Generate configuration on hypervisor hosts
+### Start VMs
 
 Each hypervisor runs a PXE boot environment on an internal network for provisioning VMs local to the host. VMs run Fedora CoreOS using Ignition for boot time configuration.
 
-Configure ignition and libvirt on each hypervisor:
+**Configure ignition and libvirt on each hypervisor:**
 
 ```bash
 buildtool terraform apply \
@@ -77,7 +79,7 @@ buildtool terraform apply \
     -target=module.libvirt-kvm-1
 ```
 
-### Setup SSH access from client
+**Setup SSH access:**
 
 ```bash
 KEY=$HOME/.ssh/id_ecdsa
@@ -90,7 +92,7 @@ buildtool terraform apply \
 buildtool terraform output ssh-client-certificate > $KEY-cert.pub
 ```
 
-### Start VMs
+**Launch VMs:**
 
 ```bash
 virsh -c qemu+ssh://core@kvm-0.local/system net-start pf0
@@ -106,24 +108,21 @@ virsh -c qemu+ssh://core@kvm-1.local/system start controller-2
 virsh -c qemu+ssh://core@kvm-1.local/system start worker-1
 ```
 
-### Recover from no gateways running
-
-Internet access is needed to fetch the terraform state file. From client:
-
-```
-nmcli c up wan
-```
-
-Start VMs as above. Switch to LAN:
-
-```
-nmcli c down wan
-nmcli c up lan
-```
-
 ### Deploy kubernetes services
 
-Write kubeconfig file:
+**Apply namespace and secrets:**
+
+```bash
+kubectl create namespace common
+kubectl create namespace monitoring
+kubectl create namespace minio
+
+buildtool terraform apply \
+    -var-file=secrets.tfvars \
+    -target=module.kubernetes-addons
+```
+
+**Write kubeconfig file:**
 
 ```bash
 buildtool terraform apply \
@@ -133,14 +132,12 @@ mkdir -p ~/.kube
 buildtool terraform output kubeconfig > ~/.kube/config
 ```
 
+**Basic addons:**
+
 ```bash
 buildtool terraform apply \
     -target=local_file.kubernetes-addons
-```
 
-#### Basic addons
-
-```bash
 kubectl apply -f output/addons/bootstrap.yaml
 kubectl apply -f output/addons/kube-proxy.yaml
 kubectl apply -f output/addons/flannel.yaml
@@ -148,7 +145,7 @@ kubectl apply -f output/addons/kapprover.yaml
 kubectl apply -f output/addons/coredns.yaml
 ```
 
-#### MetalLb
+**MetalLb:**
 
 https://metallb.universe.tf/installation/#installation-by-manifest
 
@@ -156,36 +153,20 @@ https://metallb.universe.tf/installation/#installation-by-manifest
 kubectl apply -f output/addons/metallb-network.yaml
 ```
 
-#### Traefik
+**Traefik:**
 
 ```bash
 kubectl apply -f manifests/traefik.yaml
 ```
 
-#### Apply secrets
-
-```bash
-kubectl create namespace common
-kubectl create namespace monitoring
-kubectl create namespace minio
-
-buildtool terraform apply \
-    -var-file=secrets.tfvars \
-    -target=data.null_data_source.provider-addon
-
-buildtool terraform apply \
-    -var-file=secrets.tfvars \
-    -target=module.kubernetes-addons
-```
-
-#### Minio
+**Minio:**
 
 ```bash
 kubectl label node worker-0.local minio-data=true
 kubectl apply -f manifests/minio.yaml
 ```
 
-#### Monitoring
+**Monitoring:**
 
 ```bash
 helm repo add loki https://grafana.github.io/loki/charts
@@ -215,7 +196,8 @@ helm template prometheus \
 
 kubectl apply -n monitoring -f manifests/grafana.yaml
 ```
-Allow non cluster nodes to send logs to loki:
+
+**Allow non cluster nodes to send logs to loki:**
 
 ```bash
 kubectl apply -f output/addons/loki-lb-service.yaml
@@ -232,7 +214,7 @@ kubectl patch -n monitoring psp loki -p='{
 }'
 ```
 
-#### OpenEBS
+**OpenEBS:**
 
 ```bash
 helm repo add openebs https://openebs.github.io/charts
@@ -262,8 +244,23 @@ Currently additional PSP is needed for PVC pods to run:
 kubectl apply -n openebs -f manifests/openebs_psp.yaml
 ```
 
-#### Common service
+**Common service:**
 
 ```bash
 kubectl apply -f manifests/common.yaml
+```
+
+### Recover from no gateways running
+
+Internet access is needed to fetch the terraform state file. From client:
+
+```
+nmcli c up wan
+```
+
+Start VMs as above. Switch to LAN:
+
+```
+nmcli c down wan
+nmcli c up lan
 ```
