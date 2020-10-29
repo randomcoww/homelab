@@ -10,8 +10,6 @@ locals {
   aws_region              = "us-west-2"
   s3_etcd_backup_bucket   = "randomcoww-etcd-backup"
   kubernetes_cluster_name = "default-cluster-2007-1"
-  # KVM guest image base name
-  guest_image_label = "fedora-coreos-32"
   # kubelet image is used for static pods and does not need to match the kubernetes version
   # hyperkube is used for the worker kubelet and should match the version
   container_images = {
@@ -119,8 +117,7 @@ locals {
         "${local.templates_path}/ignition/hypervisor.ign.tmpl",
       ]
       libvirt_network_template = "${local.templates_path}/libvirt/hostdev_network.xml.tmpl"
-      guest_image_device       = "/dev/disk/by-label/${local.guest_image_label}"
-      guest_image_mount_path   = "/etc/libvirt/boot/${local.guest_image_label}.iso"
+      pxe_image_mount_path     = "/run/media/iso/images/pxeboot"
     }
     # coreos VMs
     vm = {
@@ -141,10 +138,10 @@ locals {
         "${local.templates_path}/ignition/general_network.ign.tmpl",
       ]
       libvirt_domain_template = "${local.templates_path}/libvirt/coreos.xml.tmpl"
-      kernel_image            = "images/pxeboot/vmlinuz"
+      kernel_image            = "vmlinuz"
       initrd_images = [
-        "images/pxeboot/initrd.img",
-        "images/ignition.img",
+        "initrd.img",
+        "rootfs.img",
       ]
       kernel_params = [
         "console=hvc0",
@@ -152,9 +149,6 @@ locals {
         "ignition.firstboot",
         "ignition.platform.id=metal",
         "systemd.unified_cgroup_hierarchy=0",
-        # "net.ifnames=0",
-        # "biosdevname=0",
-        "coreos.liveiso=${local.guest_image_label}",
       ]
     }
     # silverblue (gnome) desktop with networkmanager
@@ -339,7 +333,7 @@ locals {
   hosts = {
     # gateway
     gateway-0 = {
-      memory = 2
+      memory = 3
       vcpu   = 1
       # interface name should always start at ens2 and count up
       # libvirt auto assigns interfaces starting at 00:02.0 and
@@ -375,7 +369,7 @@ locals {
       kea_ha_role = "primary"
     }
     gateway-1 = {
-      memory = 2
+      memory = 3
       vcpu   = 1
       network = [
         {
@@ -410,7 +404,7 @@ locals {
 
     # controllers
     controller-0 = {
-      memory = 4
+      memory = 5
       vcpu   = 2
       network = [
         {
@@ -427,7 +421,7 @@ locals {
       }
     }
     controller-1 = {
-      memory = 4
+      memory = 5
       vcpu   = 2
       network = [
         {
@@ -444,7 +438,7 @@ locals {
       }
     }
     controller-2 = {
-      memory = 4
+      memory = 5
       vcpu   = 2
       network = [
         {
@@ -698,6 +692,10 @@ locals {
         },
         {
           node = "worker-1",
+          hwif = "pf0",
+        },
+        {
+          node = "test-0",
           hwif = "pf0",
         }
       ]

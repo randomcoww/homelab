@@ -29,8 +29,6 @@ systemd:
       enabled: true
       contents: |
         [Unit]
-        ConditionPathExists=${p.guest_image_device}
-        ConditionPathExists=!${p.guest_image_mount_path}
         After=local-fs.target
 
         [Service]
@@ -39,13 +37,6 @@ systemd:
         %{~ for v in p.hwif ~}
         ExecStart=-/bin/bash -c "echo ${v.numvfs} > /sys/class/net/${v.if}/device/sriov_numvfs"
         %{~ endfor ~}
-        ExecStart=/usr/bin/mkdir -p ${dirname(p.guest_image_mount_path)}
-        ExecStart=/usr/bin/coreos-installer iso ignition remove \
-          ${p.guest_image_device} -o ${p.guest_image_mount_path}
-        ExecStart=/usr/bin/podman volume create \
-          --opt type=iso9660 \
-          --opt device=${p.guest_image_mount_path} \
-          image_vol
 
         [Install]
         WantedBy=multi-user.target
@@ -57,7 +48,7 @@ systemd:
         Wants=network-online.target
         After=prepare-vm-resources.service
         Wants=prepare-vm-resources.service
-        ConditionPathExists=${p.guest_image_mount_path}
+        ConditionPathExists=${p.pxe_image_mount_path}
 
         [Service]
         TimeoutStartSec=5m
@@ -73,7 +64,7 @@ systemd:
           --name matchbox \
           --security-opt label=disable \
           --network host \
-          --mount type=volume,source=image_vol,destination=${matchbox_assets_path} \
+          -v ${p.pxe_image_mount_path}:${matchbox_assets_path}:ro \
           -v ${matchbox_tls_path}:${matchbox_tls_path}:ro \
           -v ${matchbox_data_path}:${matchbox_data_path} \
           ${container_images.matchbox} \
@@ -97,7 +88,6 @@ systemd:
             Wants=matchbox.service
             Before=libvirtd.service
             WantedBy=libvirtd.service
-            ConditionPathExists=${p.guest_image_mount_path}
 
             [Service]
             ExecStart=

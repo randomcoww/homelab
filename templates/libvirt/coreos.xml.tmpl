@@ -51,21 +51,6 @@
     %{~ endfor ~}
     <controller type='usb' model='none'/>
     <controller type='scsi' model='virtio-scsi'/>
-    %{~ for d in p.disk ~}
-    %{~ if lookup(d, "source", null) != null && lookup(d, "target", null) != null ~}
-    <disk type='block' device='disk'>
-      <driver name='qemu' type='raw' cache='none' io='native' discard='unmap'/>
-      <source dev='${d.source}'/>
-      <target dev='${d.target}' bus='scsi'/>
-    </disk>
-    %{~ endif ~}
-    %{~ endfor ~}
-    <disk type='file' device='cdrom'>
-      <driver name='qemu' type='raw'/>
-      <source file='${host_p.guest_image_mount_path}'/>
-      <target dev='sda' bus='scsi'/>
-      <readonly/>
-    </disk>
     %{~ for d in p.hostdev ~}
     <hostdev mode='subsystem' type='pci' managed='yes'>
       <driver name='vfio'/>
