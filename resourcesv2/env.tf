@@ -13,12 +13,12 @@ locals {
   # kubelet image is used for static pods and does not need to match the kubernetes version
   # hyperkube is used for the worker kubelet and should match the version
   container_images = {
-    kubelet                 = "docker.io/randomcoww/kubernetes:kubelet-v1.19.1"
-    kube_apiserver          = "docker.io/randomcoww/kubernetes:kube-master-v1.19.1"
-    kube_controller_manager = "docker.io/randomcoww/kubernetes:kube-master-v1.19.1"
-    kube_scheduler          = "docker.io/randomcoww/kubernetes:kube-master-v1.19.1"
-    hyperkube               = "docker.io/randomcoww/kubernetes:kubelet-v1.19.1"
-    kube_proxy              = "docker.io/randomcoww/kubernetes:kube-proxy-v1.19.1"
+    kubelet                 = "docker.io/randomcoww/kubernetes:kubelet-v1.18.8"
+    kube_apiserver          = "docker.io/randomcoww/kubernetes:kube-master-v1.18.8"
+    kube_controller_manager = "docker.io/randomcoww/kubernetes:kube-master-v1.18.8"
+    kube_scheduler          = "docker.io/randomcoww/kubernetes:kube-master-v1.18.8"
+    hyperkube               = "docker.io/randomcoww/kubernetes:kubelet-v1.18.8"
+    kube_proxy              = "docker.io/randomcoww/kubernetes:kube-proxy-v1.18.8"
     etcd_wrapper            = "docker.io/randomcoww/etcd-wrapper:v0.2.1"
     etcd                    = "docker.io/randomcoww/etcd:v3.4.10"
     flannel                 = "docker.io/randomcoww/flannel:latest"
