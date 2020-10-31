@@ -756,6 +756,35 @@ locals {
         }
       ]
     }
+
+    # unmanaged hardware
+    switch-0 = {
+      network = [
+        {
+          label = "main"
+          ip    = "192.168.127.60"
+          mac   = "50-c7-bf-60-78-22"
+        }
+      ]
+    }
+    ipmi-0 = {
+      network = [
+        {
+          label = "main"
+          ip    = "192.168.127.62"
+          mac   = "ac-1f-6b-86-06-82"
+        }
+      ]
+    }
+    ipmi-1 = {
+      network = [
+        {
+          label = "main"
+          ip    = "192.168.127.61"
+          mac   = "ac-1f-6b-ae-76-60"
+        }
+      ]
+    }
   }
 
   # similar to guests filter
