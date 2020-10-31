@@ -35,7 +35,7 @@
     <interface type='network'>
     <source network='${p.hwif}'/>
       %{~ if lookup(n, "mac", null) != null ~}
-      <mac address='${replace(p.metadata.mac, "-", ":")}'/>
+      <mac address='${replace(n.mac, "-", ":")}'/>
       %{~ endif ~}
       %{~ if lookup(n, "id", null) != null ~}
       <vlan>
