@@ -112,6 +112,7 @@ spec:
         effect: "NoSchedule"
       containers:
       - name: kube-proxy
+        imagePullPolicy: Always
         image: ${container_images.kube_proxy}
         command:
         - kube-proxy

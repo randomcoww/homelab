@@ -78,7 +78,7 @@ spec:
       serviceAccountName: kubelet-approver
       containers:
       - name: kubelet-approver
-        imagePullPolicy: IfNotPresent
+        imagePullPolicy: Always
         image: ${container_images.kapprover}
         resources:
           requests:

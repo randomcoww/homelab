@@ -10,7 +10,7 @@ spec:
     - "tail"
     - "-f"
     - "/dev/null"
-    imagePullPolicy: IfNotPresent
+    imagePullPolicy: Always
     name: basic-pod
   restartPolicy: Always
   dnsPolicy: ClusterFirstWithHostNet

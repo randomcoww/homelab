@@ -51,7 +51,8 @@ spec:
       restartPolicy: Always
       containers:
       - name: mpd
-        image: randomcoww/mpd:0.21.25
+        imagePullPolicy: Always
+        image: randomcoww/mpd:0.22.1
         ports:
         - containerPort: 8000
           protocol: TCP
@@ -64,6 +65,7 @@ spec:
         - mountPath: /mpd/cache
           name: mpd-cache
       - name: ympd
+        imagePullPolicy: Always
         image: randomcoww/ympd:latest
         args:
         - "-h"

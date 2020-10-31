@@ -26,7 +26,7 @@ spec:
       containers:
       # mount minio for complete
       - name: mount-data
-        imagePullPolicy: IfNotPresent
+        imagePullPolicy: Always
         image: rclone/rclone:latest
         securityContext:
           privileged: true

@@ -25,7 +25,7 @@ spec:
       restartPolicy: Always
       containers:
       - name: mount-cache
-        imagePullPolicy: IfNotPresent
+        imagePullPolicy: Always
         image: rclone/rclone:latest
         securityContext:
           privileged: true

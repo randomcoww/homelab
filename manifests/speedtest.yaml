@@ -17,6 +17,7 @@ spec:
       restartPolicy: Always
       containers:
       - name: speedtest
+        imagePullPolicy: Always
         image: adolfintel/speedtest
 
 ---

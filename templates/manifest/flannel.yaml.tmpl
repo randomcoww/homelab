@@ -136,6 +136,7 @@ spec:
         - name: cni-plugins
           mountPath: "/opt/cni/bin"
       - name: install-cni
+        imagePullPolicy: Always
         image: ${container_images.flannel}
         command:
         - cp
@@ -150,6 +151,7 @@ spec:
           mountPath: /etc/kube-flannel/
       containers:
       - name: kube-flannel
+        imagePullPolicy: Always
         image: ${container_images.flannel}
         command:
         - /opt/bin/flanneld

@@ -133,7 +133,7 @@ spec:
       containers:
       - name: coredns
         image: "${container_images.coredns}"
-        imagePullPolicy: IfNotPresent
+        imagePullPolicy: Always
         resources:
           limits:
             memory: 170Mi
