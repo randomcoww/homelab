@@ -348,6 +348,7 @@ locals {
           label = "lan"
           ip    = "192.168.63.217"
           if    = "ens4"
+          mac   = "52-54-00-63-dd-a1"
         },
         {
           label = "sync"
@@ -381,6 +382,7 @@ locals {
           label = "lan"
           ip    = "192.168.63.218"
           if    = "ens4"
+          mac   = "52-54-00-63-dd-a1"
         },
         {
           label = "sync"

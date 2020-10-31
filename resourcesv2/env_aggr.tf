@@ -100,10 +100,10 @@ locals {
   aggr_component_params = {
     for host, params in local.hosts :
     host => merge(
-      local.aggr_components[host],
+      lookup(local.aggr_components, host, {}),
       {
-        ignition_templates = local.aggr_node_ignition_templates[host]
-        components         = local.aggr_node_components[host]
+        ignition_templates = lookup(local.aggr_node_ignition_templates, host, [])
+        components         = lookup(local.aggr_node_components, host, [])
       }
     )
   }
@@ -112,13 +112,13 @@ locals {
   aggr_hosts = {
     for host, params in local.hosts :
     host => merge(
-      local.aggr_component_params[host],
+      lookup(local.aggr_component_params, host, {}),
       params,
-      local.aggr_network_params[host],
-      local.aggr_networks_by_key[host],
-      local.aggr_hwif_params[host],
-      local.aggr_hwif_by_key[host],
-      local.aggr_metadata[host],
+      lookup(local.aggr_network_params, host, {}),
+      lookup(local.aggr_networks_by_key, host, {}),
+      lookup(local.aggr_hwif_params, host, {}),
+      lookup(local.aggr_hwif_by_key, host, {}),
+      lookup(local.aggr_metadata, host, {}),
       {
         hostname = join(".", [host, local.domains.mdns])
         hostdev  = lookup(params, "hostdev", [])
