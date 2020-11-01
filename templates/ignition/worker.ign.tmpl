@@ -43,6 +43,7 @@ systemd:
           --name iscsid \
           --security-opt label=disable \
           --network host \
+          --ipc host \
           --pid host \
           --privileged \
           -v /dev:/dev \

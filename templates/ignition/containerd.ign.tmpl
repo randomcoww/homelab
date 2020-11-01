@@ -28,6 +28,7 @@ systemd:
           --security-opt label=disable \
           --network host \
           --pid host \
+          --ipc host \
           --privileged \
           -v /run:/run \
           -v /dev:/dev \
