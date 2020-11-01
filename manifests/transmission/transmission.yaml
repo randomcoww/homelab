@@ -102,7 +102,7 @@ spec:
           secretName: wireguard-client
       - name: ingest-cache
         hostPath:
-          path: /var/pv/tmp/ingest-cache
+          path: /var/lib/kubelet/pv/tmp/ingest-cache
           type: DirectoryOrCreate
       - name: ingest-data
         persistentVolumeClaim:

@@ -543,7 +543,7 @@ locals {
         },
         {
           device     = "/dev/disk/by-id/ata-Samsung_SSD_860_QVO_1TB_S4PGNF0M414895K"
-          mount_path = "/var/pv"
+          mount_path = "/var/lib/kubelet/pv"
         },
       ]
     }
@@ -569,7 +569,7 @@ locals {
       disk = [
         {
           device     = "/dev/disk/by-id/ata-Samsung_SSD_860_QVO_1TB_S4PGNF0M410395Z"
-          mount_path = "/var/pv"
+          mount_path = "/var/lib/kubelet/pv"
         },
       ]
     }

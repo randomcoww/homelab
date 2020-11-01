@@ -38,7 +38,7 @@ spec:
       volumes:
       - name: unifi-cache
         hostPath:
-          path: /var/pv/tmp/unifi-cache
+          path: /var/lib/kubelet/pv/tmp/unifi-cache
           type: DirectoryOrCreate
       - name: unifi-data
         persistentVolumeClaim:

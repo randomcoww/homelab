@@ -80,7 +80,7 @@ spec:
       volumes:
       - name: mpd-cache
         hostPath:
-          path: /var/pv/tmp/mpd-cache
+          path: /var/lib/kubelet/pv/tmp/mpd-cache
           type: DirectoryOrCreate
       - name: mpd-config
         configMap:
