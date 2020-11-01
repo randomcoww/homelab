@@ -143,11 +143,11 @@ buildtool terraform output kubeconfig > ~/.kube/config
 buildtool terraform apply \
     -target=local_file.kubernetes-addons
 
-kubectl apply -f output/addons/bootstrap.yaml
-kubectl apply -f output/addons/kube-proxy.yaml
-kubectl apply -f output/addons/flannel.yaml
-kubectl apply -f output/addons/kapprover.yaml
-kubectl apply -f output/addons/coredns.yaml
+kubectl apply -f resourcesv2/output/addons/bootstrap.yaml
+kubectl apply -f resourcesv2/output/addons/kube-proxy.yaml
+kubectl apply -f resourcesv2/output/addons/flannel.yaml
+kubectl apply -f resourcesv2/output/addons/kapprover.yaml
+kubectl apply -f resourcesv2/output/addons/coredns.yaml
 ```
 
 **MetalLb:**
@@ -155,7 +155,7 @@ kubectl apply -f output/addons/coredns.yaml
 https://metallb.universe.tf/installation/#installation-by-manifest
 
 ```bash
-kubectl apply -f output/addons/metallb-network.yaml
+kubectl apply -f resourcesv2/output/addons/metallb-network.yaml
 ```
 
 **Traefik:**
@@ -205,7 +205,7 @@ kubectl apply -n monitoring -f manifests/grafana.yaml
 **Allow non cluster nodes to send logs to loki:**
 
 ```bash
-kubectl apply -f output/addons/loki-lb-service.yaml
+kubectl apply -f resourcesv2/output/addons/loki-lb-service.yaml
 ```
 
 Currently the PSP `requiredDropCapabilities` causes loki pod to crashloop:
