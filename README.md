@@ -200,11 +200,13 @@ helm template openebs \
 ```
 
 Add block devices (IDs specific to my hardware)
+
 ```bash
 kubectl apply -n openebs -f manifests/openebs_spc.yaml
 ```
 
-Currently additional PSP is needed for PVC pods to run:
+Currently additional PSP is needed for PVC pods to run
+
 ```bash
 kubectl apply -n openebs -f manifests/openebs_psp.yaml
 ```
@@ -250,7 +252,7 @@ virsh -c qemu+ssh://core@kvm-1.local/system
 
 ### Recovery
 
-Terraform needs access to a state file on AWS S3 to run. If both gateways are down and resources need to be generated using terraform, WAN access can be enabled in the client as follows:
+Terraform needs access to a state file on AWS S3 to run. If both gateways are down and resources need to be generated using terraform, WAN access can be enabled in the client as follows
 
 ```
 nmcli c up wan

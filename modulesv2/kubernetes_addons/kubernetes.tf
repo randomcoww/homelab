@@ -3,7 +3,7 @@ locals {
     for k in compact([
       for j in flatten([
         for i in var.kubernetes_manifests :
-        regexall( "(?ms)$(.*?)^---", "---\n${i}\n---" )
+        regexall("(?ms)$(.*?)^---", "---\n${i}\n---")
       ]) :
       trimspace(j)
     ]) :

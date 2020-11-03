@@ -31,5 +31,5 @@ module "kubernetes-addons" {
   source = "../modulesv2/kubernetes_addons"
 
   kubernetes_manifests = values(data.null_data_source.kubernetes-manifests.outputs)
-  cluster_endpoint = module.kubernetes-common.cluster_endpoint
+  cluster_endpoint     = module.kubernetes-common.cluster_endpoint
 }

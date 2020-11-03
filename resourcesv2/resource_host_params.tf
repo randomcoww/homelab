@@ -146,7 +146,7 @@ resource "random_password" "grafana-password" {
 ## metallb secret
 ##
 resource "random_string" "metallb-memberlist" {
-  length = 128
+  length  = 128
   special = false
 }
 
