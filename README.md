@@ -51,13 +51,11 @@ buildtool terraform apply \
 
 **KVM hosts**
 
-Run build from https://github.com/randomcoww/fedora-coreos-custom
-Write generated ISO file to disk (USB flash drive is sufficient) and boot from it.
+Run build from https://github.com/randomcoww/fedora-coreos-custom. Write generated ISO file to disk (USB flash drive is sufficient) and boot from it.
 
-**Client devices**
+**Client hosts**
 
-Run build from https://github.com/randomcoww/fedora-silverblue-custom
-Write generated ISO file to disk (USB flash drive is sufficient) and boot from it.
+Run build from https://github.com/randomcoww/fedora-silverblue-custom. Write generated ISO file to disk (USB flash drive is sufficient) and boot from it.
 
 #### Start VMs
 
