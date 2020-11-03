@@ -115,6 +115,23 @@ virsh -c qemu+ssh://core@kvm-1.local/system start worker-1
 
 ### Deploy kubernetes services
 
+**Create namespaces**
+
+```bash
+buildtool terraform apply \
+    -target=module.kubernetes-namespaces
+```
+
+**Apply basic addons and generate manifest files:**
+
+```bash
+buildtool terraform apply \
+    -var-file=secrets.tfvars \
+    -target=data.null_data_source.kubernetes-manifests \
+    -target=module.kubernetes-addons \
+    -target=local_file.kubernetes-addons
+```
+
 **Write kubeconfig file:**
 
 ```bash
@@ -123,21 +140,6 @@ buildtool terraform apply \
 
 mkdir -p ~/.kube
 buildtool terraform output kubeconfig > ~/.kube/config
-```
-
-**Apply basic addons and generate manifest files:**
-
-```bash
-kubectl create namespace common
-kubectl create namespace monitoring
-kubectl create namespace minio
-kubectl create namespace metallb-system
-
-buildtool terraform apply \
-    -var-file=secrets.tfvars \
-    -target=data.null_data_source.kubernetes-manifests \
-    -target=module.kubernetes-addons \
-    -target=local_file.kubernetes-addons
 ```
 
 **MetalLb:**
