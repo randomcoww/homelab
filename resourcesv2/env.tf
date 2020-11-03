@@ -635,7 +635,7 @@ locals {
         {
           node = "worker-0",
           hwif = "pf0",
-        }
+        },
       ]
       dev = {
         # Chipset SATA
@@ -685,10 +685,10 @@ locals {
           node = "gateway-1",
           hwif = "pf0",
         },
-        {
-          node = "controller-1",
-          hwif = "pf0",
-        },
+        # {
+        #   node = "controller-1",
+        #   hwif = "pf0",
+        # },
         {
           node = "controller-2",
           hwif = "pf0",
@@ -697,10 +697,6 @@ locals {
           node = "worker-1",
           hwif = "pf0",
         },
-        {
-          node = "test-0",
-          hwif = "pf0",
-        }
       ]
       dev = {
         # Chipset SATA

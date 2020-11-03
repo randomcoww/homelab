@@ -1,6 +1,6 @@
 ## Terraform configs for provisioning homelab resources
 
-### Setup
+### Provisioning
 
 **Build container includes terraform with plugins:**
 
@@ -38,18 +38,14 @@ wireguard_config = {
 EOF
 ```
 
-### Create hypervisor images
+### Create bootable hypervisor and client images
 
 Hypervisor images are live USB disks created using [Fedora CoreOS assembler](https://github.com/coreos/coreos-assembler)
 
 ```bash
 buildtool terraform apply \
-    -target=module.hypervisor
-```
-
-```bash
-buildtool terraform apply \
     -var-file=secrets.tfvars \
+    -target=module.hypervisor \
     -target=local_file.ignition-local
 ```
 
@@ -59,15 +55,17 @@ Run build from https://github.com/randomcoww/fedora-coreos-custom
 
 VMs running on the host will boot off of the same kernel and initramfs as the hypervisor.
 
+Write generated ISO file to disk (USB flash drive is sufficient) and boot from it.
+
 **Client devices:**
 
 Run build from https://github.com/randomcoww/fedora-silverblue-custom
 
+Write generated ISO file to disk (USB flash drive is sufficient) and boot from it.
+
 ### Start VMs
 
 Each hypervisor runs a PXE boot environment on an internal network for provisioning VMs local to the host. VMs run Fedora CoreOS using Ignition for boot time configuration.
-
-**Configure ignition and libvirt on each hypervisor:**
 
 ```bash
 buildtool terraform apply \
@@ -79,40 +77,7 @@ buildtool terraform apply \
     -target=module.libvirt-kvm-1
 ```
 
-**Setup SSH access:**
-
-Generate a new key as needed
-```bash
-KEY=$HOME/.ssh/id_ecdsa \
-ssh-keygen -q -t ecdsa -N '' -f $KEY 2>/dev/null <<< y >/dev/null
-```
-
-Sign public key
-```bash
-KEY=$HOME/.ssh/id_ecdsa \
-buildtool terraform apply \
-    -auto-approve \
-    -target=null_resource.output-triggers \
-    -var="ssh_client_public_key=$(cat $KEY.pub)" && \
-buildtool terraform output ssh-client-certificate > $KEY-cert.pub
-```
-
-**Launch VMs:**
-
-```bash
-virsh -c qemu+ssh://core@kvm-0.local/system net-start pf0
-virsh -c qemu+ssh://core@kvm-0.local/system start gateway-0
-virsh -c qemu+ssh://core@kvm-0.local/system start controller-0
-virsh -c qemu+ssh://core@kvm-0.local/system start worker-0
-
-virsh -c qemu+ssh://core@kvm-1.local/system net-start pf0
-virsh -c qemu+ssh://core@kvm-1.local/system start gateway-1
-virsh -c qemu+ssh://core@kvm-1.local/system start controller-1
-virsh -c qemu+ssh://core@kvm-1.local/system start controller-2
-virsh -c qemu+ssh://core@kvm-1.local/system start worker-1
-```
-
-### Deploy kubernetes services
+### Start kubernetes addons
 
 **Create namespaces:**
 
@@ -130,6 +95,10 @@ buildtool terraform apply \
     -target=module.kubernetes-addons \
     -target=local_file.kubernetes-addons
 ```
+
+---
+
+### Start services
 
 **Write kubeconfig file:**
 
@@ -251,17 +220,43 @@ kubectl apply -n openebs -f manifests/openebs_psp.yaml
 kubectl apply -f manifests/common.yaml
 ```
 
-### Recover from no gateways running
+---
 
-**Internet access is needed to fetch the terraform state file. From client:**
+### Remote access
+
+**SSH:**
+
+Generate a new key as needed
+```bash
+KEY=$HOME/.ssh/id_ecdsa \
+ssh-keygen -q -t ecdsa -N '' -f $KEY 2>/dev/null <<< y >/dev/null
+```
+
+Sign public key
+```bash
+KEY=$HOME/.ssh/id_ecdsa \
+buildtool terraform apply \
+    -auto-approve \
+    -target=null_resource.output-triggers \
+    -var="ssh_client_public_key=$(cat $KEY.pub)" && \
+buildtool terraform output ssh-client-certificate > $KEY-cert.pub
+```
+
+**Libvirt:**
+
+SSH setup above is needed first.
+
+```bash
+virsh -c qemu+ssh://core@kvm-0.local/system
+virsh -c qemu+ssh://core@kvm-1.local/system
+```
+
+---
+
+### Recovery
+
+Terraform needs access to a state file on AWS S3 to run. If both gateways are down and resources need to be generated using terraform, WAN access can be enabled in the client as follows:
 
 ```
 nmcli c up wan
-```
-
-**Start VMs as above. Switch to LAN:**
-
-```
-nmcli c down wan
-nmcli c up lan
 ```
