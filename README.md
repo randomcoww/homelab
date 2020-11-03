@@ -111,7 +111,9 @@ kubectl apply -f resourcesv2/output/addons/metallb.yaml
 kubectl apply -f resourcesv2/output/addons/metallb-network.yaml
 ```
 
-Add `LoadBalancer` services for external-dns:
+#### External DNS
+
+Add `LoadBalancer` services for external-dns
 
 ```bash
 kubectl apply -f resourcesv2/output/addons/external-dns.yaml
