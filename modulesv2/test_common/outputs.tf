@@ -17,7 +17,3 @@ output "templates" {
     ]
   }
 }
-
-output "addons" {
-  value = {}
-}

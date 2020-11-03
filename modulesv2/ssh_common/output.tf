@@ -32,7 +32,3 @@ output "client_templates" {
     ]
   }
 }
-
-output "addons" {
-  value = {}
-}

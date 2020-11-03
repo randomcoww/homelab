@@ -272,6 +272,7 @@ locals {
     coredns          = "${local.templates_path}/manifest/coredns.yaml.tmpl"
     secret           = "${local.templates_path}/manifest/secret.yaml.tmpl"
     metallb-network  = "${local.templates_path}/manifest/metallb_network.yaml.tmpl"
+    external-dns     = "${local.templates_path}/manifest/external_dns.yaml.tmpl"
     kubeconfig-admin = "${local.templates_path}/manifest/kubeconfig_admin.yaml.tmpl"
     loki-lb-service  = "${local.templates_path}/manifest/loki_lb_service.yaml.tmpl"
   }

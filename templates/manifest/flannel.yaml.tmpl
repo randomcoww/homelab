@@ -2,7 +2,7 @@ apiVersion: policy/v1beta1
 kind: PodSecurityPolicy
 metadata:
   name: flannel-psp
-  namespace: ${namespace}
+  namespace: kube-system
 spec:
   privileged: true
   volumes: ['*']
@@ -48,21 +48,21 @@ roleRef:
 subjects:
 - kind: ServiceAccount
   name: flannel
-  namespace: ${namespace}
+  namespace: kube-system
 
 ---
 apiVersion: v1
 kind: ServiceAccount
 metadata:
   name: flannel
-  namespace: ${namespace}
+  namespace: kube-system
 
 ---
 kind: ConfigMap
 apiVersion: v1
 metadata:
   name: kube-flannel-cfg
-  namespace: ${namespace}
+  namespace: kube-system
   labels:
     tier: node
     app: flannel
@@ -99,7 +99,7 @@ apiVersion: apps/v1
 kind: DaemonSet
 metadata:
   name: kube-flannel-ds-amd64
-  namespace: ${namespace}
+  namespace: kube-system
   labels:
     tier: node
     app: flannel

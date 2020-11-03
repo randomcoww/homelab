@@ -142,6 +142,14 @@ resource "random_password" "grafana-password" {
   special = false
 }
 
+##
+## metallb secret
+##
+resource "random_string" "metallb-memberlist" {
+  length = 128
+  special = false
+}
+
 module "secrets" {
   source = "../modulesv2/secrets"
 
@@ -169,6 +177,13 @@ module "secrets" {
       data = {
         user     = random_password.grafana-user.result
         password = random_password.grafana-password.result
+      }
+    },
+    {
+      name      = "memberlist"
+      namespace = "metallb-system"
+      data = {
+        secretkey = random_string.metallb-memberlist.result
       }
     }
     ],
@@ -220,7 +235,7 @@ module "tls-secrets" {
     {
       name      = "tls-ingress"
       namespace = "common"
-    }
+    },
   ]
 
   name      = "traefik-tls"

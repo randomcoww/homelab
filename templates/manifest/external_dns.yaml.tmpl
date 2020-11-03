@@ -1,0 +1,38 @@
+# Terraform resource can't create LoadBalancer services properly
+---
+kind: Service
+apiVersion: v1
+metadata:
+  name: external-dns-tcp
+  namespace: kube-system
+  annotations:
+    metallb.universe.tf/allow-shared-ip: external-dns
+spec:
+  type: LoadBalancer
+  loadBalancerIP: ${services.internal_dns.vip}
+  ports:
+  - name: default
+    port: 53
+    targetPort: 53
+    protocol: TCP
+  selector:
+    k8s-app: kube-dns
+
+---
+kind: Service
+apiVersion: v1
+metadata:
+  name: external-dns-udp
+  namespace: kube-system
+  annotations:
+    metallb.universe.tf/allow-shared-ip: external-dns
+spec:
+  type: LoadBalancer
+  loadBalancerIP: ${services.internal_dns.vip}
+  ports:
+  - name: default
+    port: 53
+    targetPort: 53
+    protocol: UDP
+  selector:
+    k8s-app: kube-dns

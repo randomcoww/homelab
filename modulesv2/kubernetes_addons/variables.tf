@@ -3,5 +3,5 @@ variable "cluster_endpoint" {
 }
 
 variable "kubernetes_manifests" {
-  type = map(string)
+  type = list(string)
 }

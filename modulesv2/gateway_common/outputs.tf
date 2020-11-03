@@ -51,5 +51,11 @@ output "addons" {
     metallb-network = templatefile(var.addon_templates.metallb-network, {
       loadbalancer_pools = var.loadbalancer_pools
     })
+    external-dns = templatefile(var.addon_templates.external-dns, {
+      services = var.services
+    })
+    # Cannot be added with terraform resource with error:
+    # .spec.template.spec.containers[name="speaker"].ports: element 0: associative list with keys has an element that omits key field "protocol"
+    metallb = data.http.metallb.body
   }
 }

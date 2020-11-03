@@ -98,7 +98,6 @@ output "addons" {
       "bootstrap",
     ] :
     k => templatefile(var.addon_templates[k], {
-      namespace        = "kube-system"
       container_images = var.container_images
       services         = var.services
       networks         = var.networks

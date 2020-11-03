@@ -115,18 +115,6 @@ virsh -c qemu+ssh://core@kvm-1.local/system start worker-1
 
 ### Deploy kubernetes services
 
-**Apply namespace and secrets:**
-
-```bash
-kubectl create namespace common
-kubectl create namespace monitoring
-kubectl create namespace minio
-
-buildtool terraform apply \
-    -var-file=secrets.tfvars \
-    -target=module.kubernetes-addons
-```
-
 **Write kubeconfig file:**
 
 ```bash
@@ -137,25 +125,32 @@ mkdir -p ~/.kube
 buildtool terraform output kubeconfig > ~/.kube/config
 ```
 
-**Basic addons:**
+**Apply basic addons and generate manifest files:**
 
 ```bash
-buildtool terraform apply \
-    -target=local_file.kubernetes-addons
+kubectl create namespace common
+kubectl create namespace monitoring
+kubectl create namespace minio
+kubectl create namespace metallb-system
 
-kubectl apply -f resourcesv2/output/addons/bootstrap.yaml
-kubectl apply -f resourcesv2/output/addons/kube-proxy.yaml
-kubectl apply -f resourcesv2/output/addons/flannel.yaml
-kubectl apply -f resourcesv2/output/addons/kapprover.yaml
-kubectl apply -f resourcesv2/output/addons/coredns.yaml
+buildtool terraform apply \
+    -var-file=secrets.tfvars \
+    -target=data.null_data_source.kubernetes-manifests \
+    -target=module.kubernetes-addons \
+    -target=local_file.kubernetes-addons
 ```
 
 **MetalLb:**
 
-https://metallb.universe.tf/installation/#installation-by-manifest
+```bash
+kubectl apply -f resourcesv2/output/addons/metallb.yaml
+kubectl apply -f resourcesv2/output/addons/metallb-network.yaml
+```
+
+Add `LoadBalancer` services for external-dns:
 
 ```bash
-kubectl apply -f resourcesv2/output/addons/metallb-network.yaml
+kubectl apply -f resourcesv2/output/addons/external-dns.yaml
 ```
 
 **Traefik:**

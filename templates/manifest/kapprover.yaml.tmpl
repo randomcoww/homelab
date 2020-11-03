@@ -2,14 +2,14 @@ apiVersion: v1
 kind: ServiceAccount
 metadata:
   name: kubelet-approver
-  namespace: ${namespace}
+  namespace: kube-system
 
 ---
 apiVersion: policy/v1beta1
 kind: PodSecurityPolicy
 metadata:
   name: kapprover-psp
-  namespace: ${namespace}
+  namespace: kube-system
 spec:
   volumes: ['secret']
   runAsUser:
@@ -54,14 +54,14 @@ roleRef:
 subjects:
 - kind: ServiceAccount
   name: kubelet-approver
-  namespace: ${namespace}
+  namespace: kube-system
 
 ---
 kind: Deployment
 apiVersion: apps/v1
 metadata:
   name: kubelet-approver
-  namespace: ${namespace}
+  namespace: kube-system
   labels:
     k8s-app: kubelet-approver
 spec:

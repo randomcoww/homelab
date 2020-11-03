@@ -2,14 +2,14 @@ apiVersion: v1
 kind: ServiceAccount
 metadata:
   name: kube-proxy
-  namespace: ${namespace}
+  namespace: kube-system
 
 ---
 apiVersion: policy/v1beta1
 kind: PodSecurityPolicy
 metadata:
   name: kube-proxy-psp
-  namespace: ${namespace}
+  namespace: kube-system
 spec:
   privileged: true
   volumes: ['*']
@@ -45,7 +45,7 @@ metadata:
 subjects:
   - kind: ServiceAccount
     name: kube-proxy
-    namespace: ${namespace}
+    namespace: kube-system
 roleRef:
   kind: ClusterRole
   name: kube-proxy-psp
@@ -59,7 +59,7 @@ metadata:
 subjects:
   - kind: ServiceAccount
     name: kube-proxy
-    namespace: ${namespace}
+    namespace: kube-system
 roleRef:
   kind: ClusterRole
   name: system:node-proxier
@@ -70,7 +70,7 @@ apiVersion: v1
 kind: ConfigMap
 metadata:
   name: kube-proxy-config
-  namespace: ${namespace}
+  namespace: kube-system
 data:
   kube-proxy-config.yaml: |-
     kind: KubeProxyConfiguration
@@ -86,7 +86,7 @@ metadata:
   labels:
     k8s-app: kube-proxy
   name: kube-proxy
-  namespace: ${namespace}
+  namespace: kube-system
 spec:
   selector:
     matchLabels:
