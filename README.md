@@ -2,7 +2,7 @@
 
 ### Provisioning
 
-**Build container includes terraform with plugins:**
+#### Setup buildtool command
 
 ```bash
 buildtool() {
@@ -18,7 +18,7 @@ buildtool() {
 }
 ```
 
-**Define secrets:**
+#### Define secrets
 
 ```bash
 cat > secrets.tfvars <<EOF
@@ -38,7 +38,7 @@ wireguard_config = {
 EOF
 ```
 
-### Create bootable hypervisor and client images
+#### Create bootable hypervisor and client images
 
 Hypervisor images are live USB disks created using [Fedora CoreOS assembler](https://github.com/coreos/coreos-assembler)
 
@@ -49,23 +49,17 @@ buildtool terraform apply \
     -target=local_file.ignition-local
 ```
 
-**KVM hosts:**
+**KVM hosts**
 
 Run build from https://github.com/randomcoww/fedora-coreos-custom
-
-VMs running on the host will boot off of the same kernel and initramfs as the hypervisor.
-
 Write generated ISO file to disk (USB flash drive is sufficient) and boot from it.
 
-**Client devices:**
+**Client devices**
 
 Run build from https://github.com/randomcoww/fedora-silverblue-custom
-
 Write generated ISO file to disk (USB flash drive is sufficient) and boot from it.
 
-### Start VMs
-
-Each hypervisor runs a PXE boot environment on an internal network for provisioning VMs local to the host. VMs run Fedora CoreOS using Ignition for boot time configuration.
+#### Start VMs
 
 ```bash
 buildtool terraform apply \
@@ -77,16 +71,16 @@ buildtool terraform apply \
     -target=module.libvirt-kvm-1
 ```
 
-### Start kubernetes addons
+#### Start kubernetes addons
 
-**Create namespaces:**
+Create namespaces
 
 ```bash
 buildtool terraform apply \
     -target=module.kubernetes-namespaces
 ```
 
-**Apply basic addons and generate manifest files:**
+Apply basic addons and generate manifest files
 
 ```bash
 buildtool terraform apply \
@@ -100,7 +94,7 @@ buildtool terraform apply \
 
 ### Start services
 
-**Write kubeconfig file:**
+#### Write kubeconfig file
 
 ```bash
 buildtool terraform apply \
@@ -110,7 +104,7 @@ mkdir -p ~/.kube
 buildtool terraform output kubeconfig > ~/.kube/config
 ```
 
-**MetalLb:**
+#### MetalLb
 
 ```bash
 kubectl apply -f resourcesv2/output/addons/metallb.yaml
@@ -123,20 +117,20 @@ Add `LoadBalancer` services for external-dns:
 kubectl apply -f resourcesv2/output/addons/external-dns.yaml
 ```
 
-**Traefik:**
+#### Traefik
 
 ```bash
 kubectl apply -f manifests/traefik.yaml
 ```
 
-**Minio:**
+#### Minio
 
 ```bash
 kubectl label node worker-0.local minio-data=true
 kubectl apply -f manifests/minio.yaml
 ```
 
-**Monitoring:**
+#### Monitoring
 
 ```bash
 helm repo add loki https://grafana.github.io/loki/charts
@@ -167,13 +161,14 @@ helm template prometheus \
 kubectl apply -n monitoring -f manifests/grafana.yaml
 ```
 
-**Allow non cluster nodes to send logs to loki:**
+Allow non cluster nodes to send logs to loki
 
 ```bash
 kubectl apply -f resourcesv2/output/addons/loki-lb-service.yaml
 ```
 
-Currently the PSP `requiredDropCapabilities` causes loki pod to crashloop:
+Currently the PSP `requiredDropCapabilities` causes loki pod to crashloop
+
 ```bash
 kubectl patch -n monitoring psp loki -p='{
   "spec": {
@@ -184,7 +179,7 @@ kubectl patch -n monitoring psp loki -p='{
 }'
 ```
 
-**OpenEBS:**
+#### OpenEBS
 
 ```bash
 helm repo add openebs https://openebs.github.io/charts
@@ -214,7 +209,7 @@ Currently additional PSP is needed for PVC pods to run:
 kubectl apply -n openebs -f manifests/openebs_psp.yaml
 ```
 
-**Common service:**
+#### Common service
 
 ```bash
 kubectl apply -f manifests/common.yaml
@@ -224,7 +219,7 @@ kubectl apply -f manifests/common.yaml
 
 ### Remote access
 
-**SSH:**
+**SSH**
 
 Generate a new key as needed
 ```bash
@@ -242,9 +237,9 @@ buildtool terraform apply \
 buildtool terraform output ssh-client-certificate > $KEY-cert.pub
 ```
 
-**Libvirt:**
+**Libvirt**
 
-SSH setup above is needed first.
+SSH setup above is needed first
 
 ```bash
 virsh -c qemu+ssh://core@kvm-0.local/system
