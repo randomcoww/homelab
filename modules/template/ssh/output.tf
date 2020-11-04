@@ -1,5 +1,7 @@
 locals {
-        user                  = var.user
+  params = {
+    user = var.user
+  }
 }
 
 output "client_params" {
@@ -13,9 +15,9 @@ output "ignition_server" {
   value = {
     for host, params in var.server_hosts :
     host => [
-      for f in fileset("templates/ignition_server", "*") :
+      for f in fileset(".", "${path.module}/templates/ignition_server/*") :
       templatefile(f, merge(local.params, {
-        p                  = params
+        p                     = params
         ssh_ca_authorized_key = tls_private_key.ssh-ca.public_key_openssh
         ssh_host_private_key  = replace(tls_private_key.ssh-host[host].private_key_pem, "\n", "\\n")
         ssh_host_public_key   = tls_private_key.ssh-host[host].public_key_openssh
@@ -29,9 +31,9 @@ output "ignition_client" {
   value = {
     for host, params in var.client_hosts :
     host => [
-      for f in fileset("templates/ignition_client", "*") :
+      for f in fileset(".", "${path.module}/templates/ignition_client/*") :
       templatefile(f, merge(local.params, {
-        p                  = params
+        p                     = params
         ssh_ca_authorized_key = tls_private_key.ssh-ca.public_key_openssh
       }))
     ]

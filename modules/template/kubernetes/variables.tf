@@ -34,18 +34,6 @@ variable "worker_hosts" {
   type = any
 }
 
-variable "controller_templates" {
-  type = list(string)
-}
-
-variable "worker_templates" {
-  type = list(string)
-}
-
 variable "s3_etcd_backup_bucket" {
   type = string
-}
-
-variable "addon_templates" {
-  type = map(string)
 }

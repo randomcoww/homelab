@@ -45,8 +45,8 @@ Hypervisor images are live USB disks created using [Fedora CoreOS assembler](htt
 ```bash
 buildtool terraform apply \
     -var-file=secrets.tfvars \
-    -target=module.hypervisor \
-    -target=local_file.ignition-local
+    -target=module.template-hypervisor \
+    -target=local_file.ignition
 ```
 
 **KVM hosts**

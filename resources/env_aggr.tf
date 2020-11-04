@@ -1,7 +1,44 @@
 locals {
+  #### Merge component params with host params
+  # Map node -> component
+  aggr_node_components = transpose({
+    for k, v in local.components :
+    k => v.nodes
+  })
+
+  aggr_components = {
+    for node, components in local.aggr_node_components :
+    node => merge([
+      for component in components : {
+        for k, v in local.components[component] :
+        k => v
+        if ! contains(["nodes"], k)
+      }
+      ]...
+    )
+  }
+
+  aggr_component_params = {
+    for host, params in local.hosts :
+    host => merge(
+      lookup(local.aggr_components, host, {}),
+      {
+        components = lookup(local.aggr_node_components, host, [])
+      }
+    )
+  }
+
+  aggr_host_pre1 = {
+    for host, params in local.hosts :
+    host => merge(
+      lookup(local.aggr_component_params, host, {}),
+      params,
+    )
+  }
+
   #### Merge network params with host network
   aggr_network_params = {
-    for host, params in local.hosts :
+    for host, params in local.aggr_host_pre1 :
     host => {
       network = [
         for n in lookup(params, "network", []) :
@@ -23,7 +60,7 @@ locals {
   }
 
   aggr_hwif_params = {
-    for host, params in local.hosts :
+    for host, params in local.aggr_host_pre1 :
     host => {
       hwif = [
         for h in lookup(params, "hwif", []) :
@@ -56,7 +93,7 @@ locals {
   }
 
   aggr_metadata = {
-    for host, params in local.hosts :
+    for host, params in local.aggr_host_pre1 :
     host => {
       metadata = merge(
         lookup(local.networks, lookup(lookup(params, "metadata", {}), "label", ""), {}),
@@ -65,60 +102,23 @@ locals {
     }
   }
 
-  #### Merge component params with host params
-
-  # Map node -> component
-  aggr_node_components = transpose({
-    for k, v in local.components :
-    k => v.nodes
-  })
-
-  # Map worker -> all ignition templates
-  aggr_node_ignition_templates = transpose(
-    merge([
-      for c in values(local.components) :
-      transpose({
-        for node in c.nodes :
-        node => c.ignition_templates
-      })
-      ]...
-    )
-  )
-
-  aggr_components = {
-    for node, components in local.aggr_node_components :
-    node => merge([
-      for component in components : {
-        for k, v in local.components[component] :
-        k => v
-        if ! contains(["nodes", "ignition_templates"], k)
-      }
-      ]...
-    )
-  }
-
-  aggr_component_params = {
-    for host, params in local.hosts :
-    host => merge(
-      lookup(local.aggr_components, host, {}),
-      {
-        ignition_templates = lookup(local.aggr_node_ignition_templates, host, [])
-        components         = lookup(local.aggr_node_components, host, [])
-      }
-    )
-  }
-
   #### Build all
-  aggr_host_params = {
-    for host, params in local.hosts :
+  aggr_host_pre2 = {
+    for host, params in local.aggr_host_pre1 :
     host => merge(
-      lookup(local.aggr_component_params, host, {}),
       params,
       lookup(local.aggr_network_params, host, {}),
       lookup(local.aggr_networks_by_key, host, {}),
       lookup(local.aggr_hwif_params, host, {}),
       lookup(local.aggr_hwif_by_key, host, {}),
       lookup(local.aggr_metadata, host, {}),
+    )
+  }
+
+  aggr_host_pre3 = {
+    for host, params in local.aggr_host_pre2 :
+    host => merge(
+      params,
       {
         hostname = join(".", [host, local.domains.mdns])
         hostdev  = lookup(params, "hostdev", [])
@@ -132,26 +132,23 @@ locals {
     )
   }
 
-  #### Merge libvirt host params with guest params
-  aggr_libvirt_domains = {
-    for host, params in local.hosts :
-    host => [
-      for d in lookup(params, "libvirt_domains", []) :
-      merge(local.aggr_hosts[d.node], d)
-    ]
-  }
-
-  ############################################
-  
-  #### Final merge
+  #### Final aggregate
   aggr_hosts = {
-    for host, params in local.hosts :
+    for host, params in local.aggr_host_pre3 :
     host => merge(
       params,
-      lookup(local.aggr_libvirt_domains, host, {}),
+      {
+        libvirt_domains = [
+          for d in lookup(params, "libvirt_domains", []) :
+          merge(d, {
+            node = merge(local.aggr_host_pre3[d.node], d)
+          })
+        ]
+      }
     )
   }
 
+  ############################################
   # # Map guest -> host
   # aggr_guest_hypervisors = transpose({
   #   for host, params in local.hosts :

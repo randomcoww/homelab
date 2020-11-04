@@ -11,5 +11,5 @@ module "kubernetes-addons" {
   source = "../modules/kubernetes"
 
   kubernetes_manifests = local.kubernetes_manifests
-  cluster_endpoint = module.template-kubernetes.cluster_endpoint
+  cluster_endpoint     = module.template-kubernetes.cluster_endpoint
 }

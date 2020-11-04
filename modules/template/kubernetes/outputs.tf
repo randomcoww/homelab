@@ -1,6 +1,7 @@
 locals {
   params = {
     user                     = var.user
+    domains = var.domains
     cluster_name             = var.cluster_name
     container_images         = var.container_images
     networks                 = var.networks
@@ -12,7 +13,7 @@ locals {
     aws_secret_access_key    = aws_iam_access_key.s3-etcd-backup.secret
     etcd_local_endpoint      = "https://127.0.0.1:${var.services.etcd.ports.client}"
     apiserver_local_endpoint = "https://127.0.0.1:${var.services.kubernetes_apiserver.ports.secure}"
-    apiserver_endpoint = "https://${var.services.kubernetes_apiserver.vip}:${var.services.kubernetes_apiserver.ports.secure}"
+    apiserver_endpoint       = "https://${var.services.kubernetes_apiserver.vip}:${var.services.kubernetes_apiserver.ports.secure}"
     kubelet_path             = "/var/lib/kubelet"
     pod_mount_path           = "/var/lib/kubelet/podconfig"
     controller_mount_path    = "/var/lib/kubelet/controller"
@@ -42,9 +43,9 @@ output "ignition_controller" {
   value = {
     for host, params in var.controller_hosts :
     host => [
-      for f in fileset("templates/ignition_controller", "*") :
+      for f in fileset(".", "${path.module}/templates/ignition_controller/*") :
       templatefile(f, merge(local.params, {
-        p                        = params
+        p                          = params
         tls_kubernetes_ca          = replace(tls_self_signed_cert.kubernetes-ca.cert_pem, "\n", "\\n")
         tls_kubernetes_ca_key      = replace(tls_private_key.kubernetes-ca.private_key_pem, "\n", "\\n")
         tls_kubernetes             = replace(tls_locally_signed_cert.kubernetes[host].cert_pem, "\n", "\\n")
@@ -69,9 +70,9 @@ output "ignition_worker" {
   value = {
     for host, params in var.worker_hosts :
     host => [
-      for f in fileset("templates/ignition_worker", "*") :
+      for f in fileset(".", "${path.module}/templates/ignition_worker/*") :
       templatefile(f, merge(local.params, {
-        p                  = params
+        p                 = params
         tls_kubernetes_ca = replace(tls_self_signed_cert.kubernetes-ca.cert_pem, "\n", "\\n")
         tls_bootstrap     = replace(tls_locally_signed_cert.bootstrap.cert_pem, "\n", "\\n")
         tls_bootstrap_key = replace(tls_private_key.bootstrap.private_key_pem, "\n", "\\n")
@@ -82,7 +83,7 @@ output "ignition_worker" {
 
 output "kubernetes" {
   value = [
-    for f in fileset("templates/kubernetes", "*") :
+    for f in fileset(".", "${path.module}/templates/kubernetes/*") :
     templatefile(f, local.params)
   ]
 }

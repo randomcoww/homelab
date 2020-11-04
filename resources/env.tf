@@ -9,7 +9,7 @@ locals {
   # path is based on the cluster name
   aws_region              = "us-west-2"
   s3_etcd_backup_bucket   = "randomcoww-etcd-backup"
-  kubernetes_cluster_name = "default-cluster-2007-1"
+  kubernetes_cluster_name = "default-cluster-2011-1"
   # kubelet image is used for static pods and does not need to match the kubernetes version
   # hyperkube is used for the worker kubelet and should match the version
   container_images = {
@@ -125,7 +125,7 @@ locals {
         "kvm-1",
       ]
       pxe_image_mount_path = "/run/media/iso/images/pxeboot"
-      kernel_image = "vmlinuz"
+      kernel_image         = "vmlinuz"
       initrd_images = [
         "initrd.img",
         "rootfs.img",

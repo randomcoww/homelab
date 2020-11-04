@@ -2,7 +2,7 @@
 ## Ignition renderer for PXE boot CoreOS VMs
 ##
 data "ct_config" "ign" {
-  for_each = var.hosts
+  for_each = var.ignition_params
 
   content  = <<EOT
 ---
@@ -26,7 +26,6 @@ resource "matchbox_profile" "ign" {
     "ignition.config.url=http://${var.services.renderer.vip}:${var.services.renderer.ports.http}/ignition?mac=$${mac:hexhyp}",
     "ip=${each.value.selector.if}:dhcp",
   ])
-
   raw_ignition = data.ct_config.ign[each.key].rendered
 }
 

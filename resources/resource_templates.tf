@@ -74,6 +74,7 @@ module "template-test" {
 module "template-server" {
   source = "../modules/template/server"
 
+  user = local.user
   hosts = {
     for k in local.components.server.nodes :
     k => local.aggr_hosts[k]
@@ -108,7 +109,8 @@ module "template-hypervisor" {
 module "template-vm" {
   source = "../modules/template/vm"
 
-  user      = local.user
+  user = local.user
+  container_images = local.container_images
   hosts = {
     for k in local.components.vm.nodes :
     k => local.aggr_hosts[k]
@@ -150,7 +152,7 @@ resource "random_string" "metallb-memberlist" {
 }
 
 module "secrets" {
-  source = "../modulesv2/secrets"
+  source = "../modules/template/secrets"
 
   secrets = concat([
     {
@@ -219,7 +221,7 @@ EOF
 module "template-ingress" {
   source = "../modules/template/ingress"
 
-  domains         = local.domains
+  domains = local.domains
   secrets = [
     {
       name      = "tls-ingress"
@@ -249,4 +251,25 @@ module "template-static-pod-logging" {
     for k in local.components.static_pod_logging.nodes :
     k => local.aggr_hosts[k]
   }
+}
+
+locals {
+  ignition_by_host = transpose(merge([
+    for k in [
+      lookup(module.template-kubernetes, "ignition_controller", {}),
+      lookup(module.template-kubernetes, "ignition_worker", {}),
+      lookup(module.template-gateway, "ignition", {}),
+      lookup(module.template-test, "ignition", {}),
+      lookup(module.template-ssh, "ignition_server", {}),
+      lookup(module.template-ssh, "ignition_client", {}),
+      lookup(module.template-static-pod-logging, "ignition", {}),
+      lookup(module.template-ingress, "ignition", {}),
+      lookup(module.template-hypervisor, "ignition", {}),
+      lookup(module.template-vm, "ignition", {}),
+      lookup(module.template-client, "ignition", {}),
+      lookup(module.template-server, "ignition", {}),
+    ] :
+    transpose(k)
+  ]...
+  ))
 }

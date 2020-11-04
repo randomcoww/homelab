@@ -7,7 +7,7 @@ module "ignition-local" {
   ignition_params = {
     for host in local.local_renderer_hosts_include :
     host => {
-      templates = lookup(local.templates_by_host, h, [])
+      templates = lookup(local.ignition_by_host, host, [])
     }
   }
 }

@@ -16,7 +16,7 @@ storage:
               - localhost
               labels:
                 job: static-pod
-                host: ${hostname}
+                host: ${p.hostname}
                 __path__: /var/log/pods/*/*/*.log
             pipeline_stages:
             - match:
