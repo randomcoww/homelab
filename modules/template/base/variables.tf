@@ -1,0 +1,3 @@
+variable "hosts" {
+  type = any
+}

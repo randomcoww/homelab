@@ -11,7 +11,7 @@ buildtool() {
         -v $HOME/.aws:/root/.aws \
         -v $(pwd):/root/mnt \
         -v /var/cache:/var/cache \
-        -w /root/mnt/resourcesv2 \
+        -w /root/mnt/resources \
         --net=host \
         randomcoww/tf-env:latest "$@"
     rc=$?; set +x; return $rc
@@ -105,8 +105,8 @@ buildtool terraform output kubeconfig > ~/.kube/config
 #### MetalLb
 
 ```bash
-kubectl apply -f resourcesv2/output/addons/metallb.yaml
-kubectl apply -f resourcesv2/output/addons/metallb-network.yaml
+kubectl apply -f resources/output/addons/metallb.yaml
+kubectl apply -f resources/output/addons/metallb-network.yaml
 ```
 
 #### External DNS
@@ -114,7 +114,7 @@ kubectl apply -f resourcesv2/output/addons/metallb-network.yaml
 Add `LoadBalancer` services for external-dns
 
 ```bash
-kubectl apply -f resourcesv2/output/addons/external-dns.yaml
+kubectl apply -f resources/output/addons/external-dns.yaml
 ```
 
 #### Traefik
@@ -164,7 +164,7 @@ kubectl apply -n monitoring -f manifests/grafana.yaml
 Allow non cluster nodes to send logs to loki
 
 ```bash
-kubectl apply -f resourcesv2/output/addons/loki-lb-service.yaml
+kubectl apply -f resources/output/addons/loki-lb-service.yaml
 ```
 
 Currently the PSP `requiredDropCapabilities` causes loki pod to crashloop
