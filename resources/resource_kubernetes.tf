@@ -7,7 +7,7 @@ module "kubernetes-namespaces" {
     "${j.kind}-${lookup(j.metadata, "namespace", "default")}-${j.metadata.name}" => yamlencode(j)
     if lookup(j, "kind", null) == "Namespace"
   }
-  cluster_endpoint     = module.template-kubernetes.cluster_endpoint
+  cluster_endpoint = module.template-kubernetes.cluster_endpoint
 }
 
 module "kubernetes-addons" {
@@ -18,5 +18,5 @@ module "kubernetes-addons" {
     "${j.kind}-${lookup(j.metadata, "namespace", "default")}-${j.metadata.name}" => yamlencode(j)
     if lookup(j, "kind", "Namespace") != "Namespace"
   }
-  cluster_endpoint     = module.template-kubernetes.cluster_endpoint
+  cluster_endpoint = module.template-kubernetes.cluster_endpoint
 }

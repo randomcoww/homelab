@@ -23,7 +23,7 @@ resource "local_file" "kubernetes-local" {
   content = join("\n---\n", concat([
     for j in local.kubernetes_addons_local :
     yamlencode(j) if lookup(j, "kind", null) == "Namespace"
-  ], [
+    ], [
     for j in local.kubernetes_addons_local :
     yamlencode(j) if lookup(j, "kind", "Namespace") != "Namespace"
   ]))

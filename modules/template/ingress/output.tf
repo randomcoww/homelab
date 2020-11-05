@@ -17,7 +17,7 @@ output "ignition" {
 
 output "kubernetes" {
   value = flatten([
-    for f in fileset(".", "${path.module}/templates/kubernetes/*") : 
+    for f in fileset(".", "${path.module}/templates/kubernetes/*") :
     [
       for k, v in var.secrets :
       templatefile(f, {

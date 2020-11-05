@@ -2,7 +2,7 @@ resource "null_resource" "output" {
   triggers = merge({
     for k, v in module.template-ssh.client_params :
     "ssh-${k}" => v
-  }, {
+    }, {
     for k, v in module.template-kubernetes.cluster_endpoint :
     "kubernetes-${k}" => v
   })

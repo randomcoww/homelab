@@ -89,9 +89,44 @@ buildtool terraform apply \
 
 ---
 
-### Start services
+### Remote access
 
-#### Write kubeconfig file
+**SSH**
+
+Generate a new key as needed
+```bash
+KEY=$HOME/.ssh/id_ecdsa \
+ssh-keygen -q -t ecdsa -N '' -f $KEY 2>/dev/null <<< y >/dev/null
+```
+
+Sign public key
+```bash
+KEY=$HOME/.ssh/id_ecdsa \
+buildtool terraform apply \
+    -auto-approve \
+    -target=null_resource.output \
+    -var="ssh_client_public_key=$(cat $KEY.pub)" && \
+buildtool terraform output ssh-client-certificate > $KEY-cert.pub
+```
+
+Access Libvirt through SSH
+```bash
+virsh -c qemu+ssh://core@kvm-0.local/system
+virsh -c qemu+ssh://core@kvm-1.local/system
+```
+
+**Kubeconfig**
+
+```bash
+buildtool terraform apply \
+    -target=null_resource.output && \
+mkdir -p ~/.kube && \
+buildtool terraform output kubeconfig > ~/.kube/config
+```
+
+---
+
+### Start services
 
 ```bash
 buildtool terraform apply \
@@ -99,18 +134,11 @@ buildtool terraform apply \
     -target=local_file.kubernetes-local
 ```
 
-```bash
-buildtool terraform apply \
-    -target=null_resource.output-triggers
-
-mkdir -p ~/.kube
-buildtool terraform output kubeconfig > ~/.kube/config
-```
-
 #### MetalLb
 
+https://metallb.universe.tf/installation/#installation-by-manifest
+
 ```bash
-kubectl apply -f resources/output/addons/metallb.yaml
 kubectl apply -f resources/output/addons/metallb-network.yaml
 ```
 
@@ -220,37 +248,6 @@ kubectl apply -n openebs -f manifests/openebs_psp.yaml
 
 ```bash
 kubectl apply -f manifests/common.yaml
-```
-
----
-
-### Remote access
-
-**SSH**
-
-Generate a new key as needed
-```bash
-KEY=$HOME/.ssh/id_ecdsa \
-ssh-keygen -q -t ecdsa -N '' -f $KEY 2>/dev/null <<< y >/dev/null
-```
-
-Sign public key
-```bash
-KEY=$HOME/.ssh/id_ecdsa \
-buildtool terraform apply \
-    -auto-approve \
-    -target=null_resource.output \
-    -var="ssh_client_public_key=$(cat $KEY.pub)" && \
-buildtool terraform output ssh-client-certificate > $KEY-cert.pub
-```
-
-**Libvirt**
-
-SSH setup above is needed first
-
-```bash
-virsh -c qemu+ssh://core@kvm-0.local/system
-virsh -c qemu+ssh://core@kvm-1.local/system
 ```
 
 ---
