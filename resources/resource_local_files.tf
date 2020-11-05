@@ -19,10 +19,13 @@ resource "local_file" "ignition" {
   filename = "output/ignition/${each.key}.ign"
 }
 
-resource "local_file" "kubernetes" {
-  content = join("\n---\n", [
-    module.template-gateway.kubernetes,
-    module.template-static-pod-logging.kubernetes,
-  ])
+resource "local_file" "kubernetes-local" {
+  content = join("\n---\n", concat([
+    for j in local.kubernetes_addons_local :
+    yamlencode(j) if lookup(j, "kind", null) == "Namespace"
+  ], [
+    for j in local.kubernetes_addons_local :
+    yamlencode(j) if lookup(j, "kind", "Namespace") != "Namespace"
+  ]))
   filename = "output/kubernetes/addons.yaml"
 }

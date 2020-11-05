@@ -87,7 +87,6 @@ module "template-client" {
   client_password  = var.client_password
   domains          = local.domains
   wireguard_config = var.wireguard_config
-  swap_device      = "/dev/disk/by-label/swap"
   hosts = {
     for k in local.components.client.nodes :
     k => local.aggr_hosts[k]
@@ -151,7 +150,7 @@ resource "random_string" "metallb-memberlist" {
   special = false
 }
 
-module "secrets" {
+module "template-secrets" {
   source = "../modules/template/secrets"
 
   secrets = concat([
@@ -237,7 +236,7 @@ module "template-ingress" {
     },
   ]
   hosts = {
-    for k in local.components.traefik_tls.nodes :
+    for k in local.components.ingress.nodes :
     k => local.aggr_hosts[k]
   }
 }
@@ -251,25 +250,4 @@ module "template-static-pod-logging" {
     for k in local.components.static_pod_logging.nodes :
     k => local.aggr_hosts[k]
   }
-}
-
-locals {
-  ignition_by_host = transpose(merge([
-    for k in [
-      lookup(module.template-kubernetes, "ignition_controller", {}),
-      lookup(module.template-kubernetes, "ignition_worker", {}),
-      lookup(module.template-gateway, "ignition", {}),
-      lookup(module.template-test, "ignition", {}),
-      lookup(module.template-ssh, "ignition_server", {}),
-      lookup(module.template-ssh, "ignition_client", {}),
-      lookup(module.template-static-pod-logging, "ignition", {}),
-      lookup(module.template-ingress, "ignition", {}),
-      lookup(module.template-hypervisor, "ignition", {}),
-      lookup(module.template-vm, "ignition", {}),
-      lookup(module.template-client, "ignition", {}),
-      lookup(module.template-server, "ignition", {}),
-    ] :
-    transpose(k)
-    ]...
-  ))
 }

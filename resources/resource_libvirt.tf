@@ -1,3 +1,21 @@
+## PXE boot entries
+module "ignition-kvm-0" {
+  source = "../modules/ignition"
+
+  services        = local.services
+  ignition_params = local.pxeboot_by_host.kvm-0
+  renderer        = module.template-hypervisor.matchbox_rpc_endpoints.kvm-0
+}
+
+module "ignition-kvm-1" {
+  source = "../modules/ignition"
+
+  services        = local.services
+  ignition_params = local.pxeboot_by_host.kvm-1
+  renderer        = module.template-hypervisor.matchbox_rpc_endpoints.kvm-1
+}
+
+## Libvirt config
 module "libvirt-kvm-0" {
   source = "../modules/libvirt"
 

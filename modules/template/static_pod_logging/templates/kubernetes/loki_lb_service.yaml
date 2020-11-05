@@ -3,6 +3,7 @@ kind: Service
 metadata:
   name: loki-lb
   namespace: monitoring
+  labels:
     app: loki
 spec:
   type: LoadBalancer

@@ -1,6 +1,4 @@
 locals {
-  templates_path = "${path.module}/../templates"
-
   # Default user for CoreOS and Silverblue
   user        = "core"
   client_user = "randomcoww"
@@ -179,7 +177,7 @@ locals {
         {
           device     = "/dev/disk/by-label/localhome"
           mount_path = "/var/home/${local.client_user}"
-        }
+        },
       ]
       client_user     = local.client_user
       client_user_uid = 10000
@@ -201,11 +199,11 @@ locals {
     }
     ssh_client = {
       nodes = [
-        "client-0"
+        "client-0",
       ]
     }
     # cert for fuzzybunny.internal
-    traefik_tls = {
+    ingress = {
       nodes = [
         "client-0",
       ]
@@ -248,14 +246,14 @@ locals {
       ]
       hostdev = [
         "chipset-sata",
-        "hba"
+        "hba",
       ]
     }
     test = {
       memory = 3
       vcpu   = 1
       nodes = [
-        "test-0"
+        "test-0",
       ]
     }
   }
@@ -342,7 +340,7 @@ locals {
           if    = "ens6"
           mac   = "52-54-00-63-6e-b3"
           dhcp  = true
-        }
+        },
       ]
       metadata = {
         label = "int"
@@ -374,7 +372,7 @@ locals {
           if    = "ens6"
           mac   = "52-54-00-63-6e-b3"
           dhcp  = true
-        }
+        },
       ]
       metadata = {
         label = "int"
@@ -392,7 +390,7 @@ locals {
           ip    = "192.168.127.219"
           if    = "ens3"
           dhcp  = true
-        }
+        },
       ]
       metadata = {
         label = "int"
@@ -407,7 +405,7 @@ locals {
           ip    = "192.168.127.220"
           if    = "ens3"
           dhcp  = true
-        }
+        },
       ]
       metadata = {
         label = "int"
@@ -422,7 +420,7 @@ locals {
           ip    = "192.168.127.221"
           if    = "ens3"
           dhcp  = true
-        }
+        },
       ]
       metadata = {
         label = "int"
@@ -438,7 +436,7 @@ locals {
           label = "main"
           if    = "ens3"
           dhcp  = true
-        }
+        },
       ]
       metadata = {
         label = "int"
@@ -521,7 +519,7 @@ locals {
           label = "main"
           if    = "ens3"
           dhcp  = true
-        }
+        },
       ]
       metadata = {
         label = "int"
@@ -543,7 +541,7 @@ locals {
           label = "main"
           if    = "ens3"
           dhcp  = true
-        }
+        },
       ]
       metadata = {
         label = "int"
@@ -634,10 +632,6 @@ locals {
           node = "gateway-1",
           hwif = "pf0",
         },
-        # {
-        #   node = "controller-1",
-        #   hwif = "pf0",
-        # },
         {
           node = "controller-2",
           hwif = "pf0",
@@ -674,7 +668,7 @@ locals {
           if     = "enp4s0f0"
           mac    = "f8-f2-1e-1e-3c-40"
           numvfs = 15
-        }
+        },
       ]
       network = [
         {
@@ -706,7 +700,7 @@ locals {
           label = "main"
           ip    = "192.168.127.60"
           mac   = "50-c7-bf-60-78-22"
-        }
+        },
       ]
     }
     ipmi-0 = {
@@ -715,7 +709,7 @@ locals {
           label = "main"
           ip    = "192.168.127.62"
           mac   = "ac-1f-6b-86-06-82"
-        }
+        },
       ]
     }
     ipmi-1 = {
@@ -724,7 +718,7 @@ locals {
           label = "main"
           ip    = "192.168.127.61"
           mac   = "ac-1f-6b-ae-76-60"
-        }
+        },
       ]
     }
   }

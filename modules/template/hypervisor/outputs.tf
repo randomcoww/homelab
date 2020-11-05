@@ -59,7 +59,7 @@ output "libvirt_domain" {
     for host, params in var.hosts :
     host => {
       for guest in params.libvirt_domains :
-      guest.node => chomp(templatefile("${path.module}/templates/libvirt_domain.xml.tmpl", {
+      guest.node => chomp(templatefile("${path.module}/templates/libvirt/domain_coreos.xml", {
         p    = params
         g    = guest.host
         hwif = guest.hwif
@@ -73,7 +73,7 @@ output "libvirt_network" {
     for host, params in var.hosts :
     host => {
       for if in params.hwif :
-      if.label => chomp(templatefile("${path.module}/templates/libvirt_network.xml.tmpl", {
+      if.label => chomp(templatefile("${path.module}/templates/libvirt/network_vf.xml", {
         p = params
         i = if
       }))

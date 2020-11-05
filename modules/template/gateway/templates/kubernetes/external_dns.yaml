@@ -1,5 +1,4 @@
 # Terraform resource can't create LoadBalancer services properly
----
 kind: Service
 apiVersion: v1
 metadata:

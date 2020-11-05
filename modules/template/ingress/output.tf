@@ -17,7 +17,8 @@ output "ignition" {
 
 output "kubernetes" {
   value = flatten([
-    for f in fileset("*", "${path.module}/templates/kubernetes/*") : concat([
+    for f in fileset(".", "${path.module}/templates/kubernetes/*") : 
+    [
       for k, v in var.secrets :
       templatefile(f, {
         namespace = v.namespace
@@ -28,6 +29,6 @@ output "kubernetes" {
           "tls.key" = tls_private_key.internal[k].private_key_pem
         }
       })
-    ])
+    ]
   ])
 }

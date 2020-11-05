@@ -75,6 +75,7 @@ Create namespaces
 
 ```bash
 buildtool terraform apply \
+    -var-file=secrets.tfvars \
     -target=module.kubernetes-namespaces
 ```
 
@@ -83,9 +84,7 @@ Apply basic addons and generate manifest files
 ```bash
 buildtool terraform apply \
     -var-file=secrets.tfvars \
-    -target=data.null_data_source.kubernetes-manifests \
-    -target=module.kubernetes-addons \
-    -target=local_file.kubernetes-addons
+    -target=module.kubernetes-addons
 ```
 
 ---
@@ -93,6 +92,12 @@ buildtool terraform apply \
 ### Start services
 
 #### Write kubeconfig file
+
+```bash
+buildtool terraform apply \
+    -var-file=secrets.tfvars \
+    -target=local_file.kubernetes-local
+```
 
 ```bash
 buildtool terraform apply \
@@ -234,7 +239,7 @@ Sign public key
 KEY=$HOME/.ssh/id_ecdsa \
 buildtool terraform apply \
     -auto-approve \
-    -target=null_resource.output-triggers \
+    -target=null_resource.output \
     -var="ssh_client_public_key=$(cat $KEY.pub)" && \
 buildtool terraform output ssh-client-certificate > $KEY-cert.pub
 ```
