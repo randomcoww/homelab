@@ -1,0 +1,65 @@
+---
+variant: fcos
+version: 1.0.0
+storage:
+  files:
+    - path: ${pod_mount_path}/loki/promtail-config.yaml
+      mode: 0644
+      contents:
+        inline: |-
+          positions:
+            filename: /etc/promtail/promtail-positions.yaml
+          scrape_configs:
+          - job_name: containers
+            static_configs:
+            - targets:
+              - localhost
+              labels:
+                job: static-pod
+                host: ${p.hostname}
+                __path__: /var/log/pods/*/*/*.log
+            pipeline_stages:
+            - match:
+                selector: '{job="static-pod"}'
+                stages:
+                - cri: {}
+                - regex:
+                    source: filename
+                    expression: "(?:pods)/(?P<namespace>\\S+?)_\\S+?/(?P<container_name>\\S+?)/"
+                - labels:
+                    namespace:
+                    container_name:
+
+    - path: ${kubelet_path}/manifests/promtail.yaml
+      mode: 0644
+      contents:
+        inline: |-
+          ---
+          apiVersion: v1
+          kind: Pod
+          metadata:
+            namespace: kube-system
+            name: loki
+          spec:
+            restartPolicy: Always
+            hostNetwork: true
+            containers:
+            - name: promtail
+              image: ${container_images.promtail}
+              args:
+              - "-config.file=/etc/promtail/promtail-config.yaml"
+              - "-client.url=http://${services.loki.vip}:${services.loki.ports.http_listen}/loki/api/v1/push"
+              volumeMounts:
+              - name: pods
+                mountPath: /var/log/pods
+                readOnly: true
+              - name: config-promtail
+                mountPath: /etc/promtail/promtail-config.yaml
+                readOnly: true
+            volumes:
+            - name: pods
+              hostPath:
+                path: /var/log/pods
+            - name: config-promtail
+              hostPath:
+                path: ${pod_mount_path}/loki/promtail-config.yaml

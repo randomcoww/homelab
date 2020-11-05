@@ -11,7 +11,7 @@ buildtool() {
         -v $HOME/.aws:/root/.aws \
         -v $(pwd):/root/mnt \
         -v /var/cache:/var/cache \
-        -w /root/mnt/resourcesv2 \
+        -w /root/mnt/resources \
         --net=host \
         randomcoww/tf-env:latest "$@"
     rc=$?; set +x; return $rc
@@ -45,8 +45,8 @@ Hypervisor images are live USB disks created using [Fedora CoreOS assembler](htt
 ```bash
 buildtool terraform apply \
     -var-file=secrets.tfvars \
-    -target=module.hypervisor \
-    -target=local_file.ignition-local
+    -target=module.template-hypervisor \
+    -target=local_file.ignition
 ```
 
 **KVM hosts**
@@ -75,6 +75,7 @@ Create namespaces
 
 ```bash
 buildtool terraform apply \
+    -var-file=secrets.tfvars \
     -target=module.kubernetes-namespaces
 ```
 
@@ -83,30 +84,62 @@ Apply basic addons and generate manifest files
 ```bash
 buildtool terraform apply \
     -var-file=secrets.tfvars \
-    -target=data.null_data_source.kubernetes-manifests \
-    -target=module.kubernetes-addons \
-    -target=local_file.kubernetes-addons
+    -target=module.kubernetes-addons
+```
+
+---
+
+### Remote access
+
+**SSH**
+
+Generate a new key as needed
+```bash
+KEY=$HOME/.ssh/id_ecdsa \
+ssh-keygen -q -t ecdsa -N '' -f $KEY 2>/dev/null <<< y >/dev/null
+```
+
+Sign public key
+```bash
+KEY=$HOME/.ssh/id_ecdsa \
+buildtool terraform apply \
+    -auto-approve \
+    -target=null_resource.output \
+    -var="ssh_client_public_key=$(cat $KEY.pub)" && \
+buildtool terraform output ssh-client-certificate > $KEY-cert.pub
+```
+
+Access Libvirt through SSH
+```bash
+virsh -c qemu+ssh://core@kvm-0.local/system
+virsh -c qemu+ssh://core@kvm-1.local/system
+```
+
+**Kubeconfig**
+
+```bash
+buildtool terraform apply \
+    -target=null_resource.output && \
+mkdir -p ~/.kube && \
+buildtool terraform output kubeconfig > ~/.kube/config
 ```
 
 ---
 
 ### Start services
 
-#### Write kubeconfig file
-
 ```bash
 buildtool terraform apply \
-    -target=null_resource.output-triggers
-
-mkdir -p ~/.kube
-buildtool terraform output kubeconfig > ~/.kube/config
+    -var-file=secrets.tfvars \
+    -target=local_file.kubernetes-local
 ```
 
 #### MetalLb
 
+https://metallb.universe.tf/installation/#installation-by-manifest
+
 ```bash
-kubectl apply -f resourcesv2/output/addons/metallb.yaml
-kubectl apply -f resourcesv2/output/addons/metallb-network.yaml
+kubectl apply -f resources/output/addons/metallb-network.yaml
 ```
 
 #### External DNS
@@ -114,7 +147,7 @@ kubectl apply -f resourcesv2/output/addons/metallb-network.yaml
 Add `LoadBalancer` services for external-dns
 
 ```bash
-kubectl apply -f resourcesv2/output/addons/external-dns.yaml
+kubectl apply -f resources/output/addons/external-dns.yaml
 ```
 
 #### Traefik
@@ -164,7 +197,7 @@ kubectl apply -n monitoring -f manifests/grafana.yaml
 Allow non cluster nodes to send logs to loki
 
 ```bash
-kubectl apply -f resourcesv2/output/addons/loki-lb-service.yaml
+kubectl apply -f resources/output/addons/loki-lb-service.yaml
 ```
 
 Currently the PSP `requiredDropCapabilities` causes loki pod to crashloop
@@ -215,37 +248,6 @@ kubectl apply -n openebs -f manifests/openebs_psp.yaml
 
 ```bash
 kubectl apply -f manifests/common.yaml
-```
-
----
-
-### Remote access
-
-**SSH**
-
-Generate a new key as needed
-```bash
-KEY=$HOME/.ssh/id_ecdsa \
-ssh-keygen -q -t ecdsa -N '' -f $KEY 2>/dev/null <<< y >/dev/null
-```
-
-Sign public key
-```bash
-KEY=$HOME/.ssh/id_ecdsa \
-buildtool terraform apply \
-    -auto-approve \
-    -target=null_resource.output-triggers \
-    -var="ssh_client_public_key=$(cat $KEY.pub)" && \
-buildtool terraform output ssh-client-certificate > $KEY-cert.pub
-```
-
-**Libvirt**
-
-SSH setup above is needed first
-
-```bash
-virsh -c qemu+ssh://core@kvm-0.local/system
-virsh -c qemu+ssh://core@kvm-1.local/system
 ```
 
 ---
