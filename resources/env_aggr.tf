@@ -141,7 +141,7 @@ locals {
         libvirt_domains = [
           for d in lookup(params, "libvirt_domains", []) :
           merge(d, {
-            node = merge(local.aggr_host_pre3[d.node], d)
+            host = merge(local.aggr_host_pre3[d.node], d)
           })
         ]
       }

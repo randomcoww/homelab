@@ -109,7 +109,7 @@ module "template-hypervisor" {
 module "template-vm" {
   source = "../modules/template/vm"
 
-  user = local.user
+  user             = local.user
   container_images = local.container_images
   hosts = {
     for k in local.components.vm.nodes :
@@ -270,6 +270,6 @@ locals {
       lookup(module.template-server, "ignition", {}),
     ] :
     transpose(k)
-  ]...
+    ]...
   ))
 }

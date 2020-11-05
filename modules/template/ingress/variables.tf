@@ -11,6 +11,6 @@ variable "hosts" {
 }
 
 variable "ca_path" {
-  type = string
+  type    = string
   default = "/etc/pki/ca-trust/source/anchors/ingress.pem"
 }

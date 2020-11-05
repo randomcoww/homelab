@@ -20,7 +20,7 @@
   <devices>
     <emulator>/usr/bin/qemu-kvm</emulator>
     <interface type='direct' trustGuestRxFilters='yes'>
-      <source dev='${hwif}' mode='bridge'/>
+      <source dev='${p.metadata.if}' mode='bridge'/>
       %{~ if lookup(g.metadata, "mac", null) != null ~}
       <mac address='${replace(g.metadata.mac, "-", ":")}'/>
       %{~ endif ~}

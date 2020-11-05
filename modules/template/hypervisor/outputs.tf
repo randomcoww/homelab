@@ -57,26 +57,26 @@ output "ignition" {
 output "libvirt_domain" {
   value = {
     for host, params in var.hosts :
-    host => [
+    host => {
       for guest in params.libvirt_domains :
-      chomp(templatefile("${path.module}/templates/libvirt_domain.xml.tmpl", {
-        p = params
-        g = guest.node
+      guest.node => chomp(templatefile("${path.module}/templates/libvirt_domain.xml.tmpl", {
+        p    = params
+        g    = guest.host
         hwif = guest.hwif
       }))
-    ]
+    }
   }
 }
 
 output "libvirt_network" {
   value = {
     for host, params in var.hosts :
-    host => [
+    host => {
       for if in params.hwif :
-      chomp(templatefile("${path.module}/templates/libvirt_network.xml.tmpl", {
+      if.label => chomp(templatefile("${path.module}/templates/libvirt_network.xml.tmpl", {
         p = params
         i = if
       }))
-    ]
+    }
   }
 }
