@@ -128,27 +128,9 @@ buildtool terraform output kubeconfig > ~/.kube/config
 
 ### Start services
 
-```bash
-buildtool terraform apply \
-    -var-file=secrets.tfvars \
-    -target=local_file.kubernetes-local
-```
-
 #### MetalLb
 
 https://metallb.universe.tf/installation/#installation-by-manifest
-
-```bash
-kubectl apply -f resources/output/addons/metallb-network.yaml
-```
-
-#### External DNS
-
-Add `LoadBalancer` services for external-dns
-
-```bash
-kubectl apply -f resources/output/addons/external-dns.yaml
-```
 
 #### Traefik
 
@@ -192,12 +174,6 @@ helm template prometheus \
     stable/prometheus | kubectl -n monitoring apply -f -
 
 kubectl apply -n monitoring -f manifests/grafana.yaml
-```
-
-Allow non cluster nodes to send logs to loki
-
-```bash
-kubectl apply -f resources/output/addons/loki-lb-service.yaml
 ```
 
 Currently the PSP `requiredDropCapabilities` causes loki pod to crashloop

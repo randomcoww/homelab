@@ -92,6 +92,28 @@ locals {
         client = 52379
       }
     }
+
+    # nodePort and clusterIP must be specified for LB services to work with
+    # the terraform kubernetes-alpha provider. Probably a bug?
+    # TODO: Remove once not needed by provider
+    kubernetes_external_dns_tcp = {
+      vip = "10.100.0.100"
+      ports = {
+        node = 31800
+      }
+    }
+    kubernetes_external_dns_udp = {
+      vip = "10.100.0.101"
+      ports = {
+        node = 31801
+      }
+    }
+    kubernetes_loki = {
+      vip = "10.100.0.102"
+      ports = {
+        node = 31802
+      }
+    }
   }
 
   domains = {

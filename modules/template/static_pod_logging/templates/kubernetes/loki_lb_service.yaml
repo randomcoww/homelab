@@ -1,3 +1,7 @@
+# nodePort and clusterIP must be specified for LB services to work with
+# the terraform kubernetes-alpha provider. Probably a bug?
+# TODO: Remove once not needed by provider
+
 apiVersion: v1
 kind: Service
 metadata:
@@ -7,9 +11,11 @@ metadata:
     app: loki
 spec:
   type: LoadBalancer
-  loadBalancerIP: "${services.loki.vip}"
+  loadBalancerIP: ${services.loki.vip}
+  clusterIP: ${services.kubernetes_loki.vip}
   ports:
   - port: ${services.loki.ports.http_listen}
+    nodePort: ${services.kubernetes_loki.ports.node}
     protocol: TCP
     name: http-metrics
     targetPort: http-metrics

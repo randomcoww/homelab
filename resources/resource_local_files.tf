@@ -18,14 +18,3 @@ resource "local_file" "ignition" {
   content  = each.value
   filename = "output/ignition/${each.key}.ign"
 }
-
-resource "local_file" "kubernetes-local" {
-  content = join("\n---\n", concat([
-    for j in local.kubernetes_addons_local :
-    yamlencode(j) if lookup(j, "kind", null) == "Namespace"
-    ], [
-    for j in local.kubernetes_addons_local :
-    yamlencode(j) if lookup(j, "kind", "Namespace") != "Namespace"
-  ]))
-  filename = "output/kubernetes/addons.yaml"
-}

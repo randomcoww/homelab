@@ -39,15 +39,6 @@ locals {
         lookup(module.template-ingress, "kubernetes", []),
         lookup(module.template-secrets, "kubernetes", []),
         lookup(module.template-kubernetes, "kubernetes", []),
-      ) :
-      regexall("(?ms)(.*?)^---", "${i}\n---")
-    ]) :
-    try(yamldecode(j), {})
-  ]
-
-  kubernetes_addons_local = [
-    for j in flatten([
-      for i in concat(
         lookup(module.template-gateway, "kubernetes", []),
         lookup(module.template-static-pod-logging, "kubernetes", []),
       ) :
