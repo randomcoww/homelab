@@ -1,6 +1,15 @@
 ---
 variant: fcos
 version: 1.0.0
+# storage:
+#   files:
+#     - path: /etc/modprobe.d/mlx4_core.conf
+#       mode: 0644
+#       contents:
+#         inline: |
+#           # https://docs.mellanox.com/pages/viewpage.action?pageId=19798214
+#           options mlx4_core num_vfs=8 port_type_array=1,2 probe_vf=8
+
 passwd:
   users:
     - name: ${p.client_user}

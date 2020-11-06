@@ -687,9 +687,9 @@ locals {
       hwif = [
         {
           label  = "pf0"
-          if     = "enp4s0f0"
-          mac    = "f8-f2-1e-1e-3c-40"
-          numvfs = 15
+          if     = "enp4s0"
+          mac    = "f4-52-14-80-6a-e0"
+          numvfs = 8
         },
       ]
       network = [

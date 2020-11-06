@@ -57,6 +57,11 @@ systemd:
 
 storage:
   files:
+    - path: /etc/sysctl.d/hugepages.conf
+      mode: 0644
+      contents:
+        inline: |
+          vm.nr_hugepages = 1024
     - path: /etc/modules-load.d/custom.conf
       mode: 0644
       contents:
