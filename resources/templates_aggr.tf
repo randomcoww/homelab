@@ -34,31 +34,25 @@ locals {
   }
 
   kubernetes_addons = [
-    for k in compact([
-      for j in flatten([
-        for i in concat(
-          lookup(module.template-ingress, "kubernetes", []),
-          lookup(module.template-secrets, "kubernetes", []),
-          lookup(module.template-kubernetes, "kubernetes", []),
-        ) :
-        regexall("(?ms)(.*?)^---", "${i}\n---")
-      ]) :
-      trimspace(j)
+    for j in flatten([
+      for i in concat(
+        lookup(module.template-ingress, "kubernetes", []),
+        lookup(module.template-secrets, "kubernetes", []),
+        lookup(module.template-kubernetes, "kubernetes", []),
+      ) :
+      regexall("(?ms)(.*?)^---", "${i}\n---")
     ]) :
-    try(yamldecode(k), {})
+    try(yamldecode(j), {})
   ]
 
   kubernetes_addons_local = [
-    for k in compact([
-      for j in flatten([
-        for i in concat(
-          lookup(module.template-gateway, "kubernetes", []),
-          lookup(module.template-static-pod-logging, "kubernetes", []),
-        ) :
-        regexall("(?ms)(.*?)^---", "${i}\n---")
-      ]) :
-      trimspace(j)
+    for j in flatten([
+      for i in concat(
+        lookup(module.template-gateway, "kubernetes", []),
+        lookup(module.template-static-pod-logging, "kubernetes", []),
+      ) :
+      regexall("(?ms)(.*?)^---", "${i}\n---")
     ]) :
-    try(yamldecode(k), {})
+    try(yamldecode(j), {})
   ]
 }
