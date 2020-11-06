@@ -79,7 +79,7 @@ buildtool terraform apply \
     -target=module.kubernetes-namespaces
 ```
 
-Apply basic addons and generate manifest files
+Create addons
 
 ```bash
 buildtool terraform apply \
