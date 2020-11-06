@@ -135,14 +135,14 @@ https://metallb.universe.tf/installation/#installation-by-manifest
 #### Traefik
 
 ```bash
-kubectl apply -f manifests/traefik.yaml
+kubectl apply -f services/traefik.yaml
 ```
 
 #### Minio
 
 ```bash
 kubectl label node worker-0.local minio-data=true
-kubectl apply -f manifests/minio.yaml
+kubectl apply -f services/minio.yaml
 ```
 
 #### Monitoring
@@ -173,7 +173,7 @@ helm template prometheus \
     --set server.persistentVolume.enabled=false \
     stable/prometheus | kubectl -n monitoring apply -f -
 
-kubectl apply -n monitoring -f manifests/grafana.yaml
+kubectl apply -n monitoring -f services/grafana.yaml
 ```
 
 Currently the PSP `requiredDropCapabilities` causes loki pod to crashloop
@@ -211,19 +211,19 @@ helm template openebs \
 Add block devices (IDs specific to my hardware)
 
 ```bash
-kubectl apply -n openebs -f manifests/openebs_spc.yaml
+kubectl apply -n openebs -f services/openebs_spc.yaml
 ```
 
 Currently additional PSP is needed for PVC pods to run
 
 ```bash
-kubectl apply -n openebs -f manifests/openebs_psp.yaml
+kubectl apply -n openebs -f services/openebs_psp.yaml
 ```
 
 #### Common service
 
 ```bash
-kubectl apply -f manifests/common.yaml
+kubectl apply -f services/common.yaml
 ```
 
 ---
