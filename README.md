@@ -224,6 +224,9 @@ kubectl apply -n openebs -f services/openebs_psp.yaml
 
 ```bash
 kubectl apply -f services/common.yaml
+kubectl apply -f services/transmission
+kubectl apply -f services/mpd
+kubectl apply -f services/unifi
 ```
 
 ---
