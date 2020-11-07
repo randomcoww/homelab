@@ -579,7 +579,6 @@ locals {
           label  = "pf0"
           if     = "en-pf0"
           mac    = "00-1b-21-bc-4c-16"
-          numvfs = 15
         },
       ]
       network = [
@@ -635,7 +634,6 @@ locals {
           label  = "pf0"
           if     = "en-pf0"
           mac    = "00-1b-21-bc-67-c6"
-          numvfs = 15
         },
       ]
       network = [
@@ -689,7 +687,6 @@ locals {
           label  = "pf0"
           if     = "enp4s0"
           mac    = "f4-52-14-80-6a-e0"
-          numvfs = 8
         },
       ]
       network = [

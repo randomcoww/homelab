@@ -32,7 +32,7 @@
       <model type='virtio-net'/>
     </interface>
     %{~ for n in g.network ~}
-    <interface type='network'>
+    <interface type='network' trustGuestRxFilters='yes'>
     <source network='${g.hwif}'/>
       %{~ if lookup(n, "mac", null) != null ~}
       <mac address='${replace(n.mac, "-", ":")}'/>
@@ -68,6 +68,10 @@
     <channel type='spicevmc'>
       <target type='virtio' name='com.redhat.spice.0'/>
       <address type='virtio-serial'/>
+    </channel>
+    <channel type='unix'>
+      <source mode='bind' path='/var/run/libvirt/qga-${g.node}.sock'/>
+      <target type='virtio' name='org.qemu.guest_agent.0'/>
     </channel>
     <memballoon model='virtio'/>
     <rng model='virtio'>

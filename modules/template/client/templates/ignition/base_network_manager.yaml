@@ -15,6 +15,17 @@ systemd:
       enabled: true
 storage:
   files:
+    # https://docs.mellanox.com/pages/viewpage.action?pageId=19798214
+    # FCOS writes these files too late and is not able to pass module params
+    # - path: /etc/modules-load.d/mlx4_core.conf
+    #   mode: 0644
+    #   contents:
+    #     inline: mlx4_core
+    # - path: /etc/modprobe.d/mlx4_core.conf
+    #   mode: 0644
+    #   contents:
+    #     inline: |
+    #       options mlx4_core num_vfs=8 port_type_array=2 probe_vf=8
     - path: /etc/NetworkManager/conf.d/custom.conf
       mode: 0644
       contents:
@@ -29,9 +40,6 @@ storage:
           [connection]
           interface-name=${v.if}
           type=802-3-ethernet
-
-          [sriov]
-          total-vfs=${v.numvfs}
 
           [802-3-ethernet]
           mtu=${lookup(v, "mtu", 9000)}

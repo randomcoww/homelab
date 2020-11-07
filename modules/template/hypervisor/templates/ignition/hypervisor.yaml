@@ -25,29 +25,12 @@ systemd:
       mask: true
     - name: ksmtuned.service
       mask: true
-    - name: prepare-vm-resources.service
-      enabled: true
-      contents: |
-        [Unit]
-        After=local-fs.target
-
-        [Service]
-        Type=oneshot
-        RemainAfterExit=true
-        %{~ for v in p.hwif ~}
-        ExecStart=-/bin/bash -c "echo ${v.numvfs} > /sys/class/net/${v.if}/device/sriov_numvfs"
-        %{~ endfor ~}
-
-        [Install]
-        WantedBy=multi-user.target
     - name: matchbox.service
       enabled: true
       contents: |
         [Unit]
         After=network-online.target
         Wants=network-online.target
-        After=prepare-vm-resources.service
-        Wants=prepare-vm-resources.service
         ConditionPathExists=${p.pxe_image_mount_path}
 
         [Service]
@@ -95,6 +78,11 @@ systemd:
 
 storage:
   files:
+    - path: /etc/udev/rules.d/sriov_numvfs.rules
+      mode: 0644
+      contents:
+        inline: |
+          ACTION=="add", SUBSYSTEM=="net", ENV{ID_NET_DRIVER}=="ixgbe", ATTR{device/sriov_numvfs}="16"
     ##
     ## internal network ${p.metadata.label} for host <-> local vm
     ##
