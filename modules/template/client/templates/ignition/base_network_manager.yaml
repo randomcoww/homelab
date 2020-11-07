@@ -26,6 +26,11 @@ storage:
     #   contents:
     #     inline: |
     #       options mlx4_core num_vfs=8 port_type_array=2 probe_vf=8
+    - path: /etc/udev/rules.d/sriov_numvfs.rules
+      mode: 0644
+      contents:
+        inline: |
+          ACTION=="add", SUBSYSTEM=="net", ENV{ID_NET_DRIVER}=="ixgbe", ATTR{device/sriov_numvfs}="16"
     - path: /etc/NetworkManager/conf.d/custom.conf
       mode: 0644
       contents:
