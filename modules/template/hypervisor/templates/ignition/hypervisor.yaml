@@ -200,36 +200,36 @@ storage:
     - path: ${matchbox_tls_path}/matchbox-ca.pem
       mode: 0644
       contents:
-        inline: "${tls_matchbox_ca}"
+        inline: "${replace(tls_matchbox_ca, "\n", "\\n")}"
     - path: ${matchbox_tls_path}/matchbox.pem
       mode: 0644
       contents:
-        inline: "${tls_matchbox}"
+        inline: "${replace(tls_matchbox, "\n", "\\n")}"
     - path: ${matchbox_tls_path}/matchbox-key.pem
       mode: 0644
       contents:
-        inline: "${tls_matchbox_key}"
+        inline: "${replace(tls_matchbox_key, "\n", "\\n")}"
 
     - path: ${libvirt_tls_path}/CA/cacert.pem
       mode: 0644
       contents:
-        inline: "${tls_libvirt_ca}"
+        inline: "${replace(tls_libvirt_ca, "\n", "\\n")}"
     - path: ${libvirt_tls_path}/libvirt/servercert.pem
       mode: 0644
       contents:
-        inline: "${tls_libvirt}"
+        inline: "${replace(tls_libvirt, "\n", "\\n")}"
     - path: ${libvirt_tls_path}/libvirt/clientcert.pem
       mode: 0644
       contents:
-        inline: "${tls_libvirt}"
+        inline: "${replace(tls_libvirt, "\n", "\\n")}"
     - path: ${libvirt_tls_path}/libvirt/private/serverkey.pem
       mode: 0644
       contents:
-        inline: "${tls_libvirt_key}"
+        inline: "${replace(tls_libvirt_key, "\n", "\\n")}"
     - path: ${libvirt_tls_path}/libvirt/private/clientkey.pem
       mode: 0644
       contents:
-        inline: "${tls_libvirt_key}"
+        inline: "${replace(tls_libvirt_key, "\n", "\\n")}"
 
 passwd:
   users:

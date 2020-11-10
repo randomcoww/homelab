@@ -122,12 +122,12 @@ storage:
     - path: ${kubelet_path}/kubernetes-ca.pem
       mode: 0644
       contents:
-        inline: "${tls_kubernetes_ca}"
+        inline: "${replace(tls_kubernetes_ca, "\n", "\\n")}"
     - path: ${kubelet_path}/bootstrap.pem
       mode: 0644
       contents:
-        inline: "${tls_bootstrap}"
+        inline: "${replace(tls_bootstrap, "\n", "\\n")}"
     - path: ${kubelet_path}/bootstrap-key.pem
       mode: 0644
       contents:
-        inline: "${tls_bootstrap_key}"
+        inline: "${replace(tls_bootstrap_key, "\n", "\\n")}"

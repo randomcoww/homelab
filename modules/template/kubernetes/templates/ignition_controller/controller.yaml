@@ -10,66 +10,66 @@ storage:
     - path: ${controller_mount_path}/kubernetes-ca.pem
       mode: 0644
       contents:
-        inline: "${tls_kubernetes_ca}"
+        inline: "${replace(tls_kubernetes_ca, "\n", "\\n")}"
     - path: ${controller_mount_path}/kubernetes-ca-key.pem
       mode: 0644
       contents:
-        inline: "${tls_kubernetes_ca_key}"
+        inline: "${replace(tls_kubernetes_ca_key, "\n", "\\n")}"
     - path: ${controller_mount_path}/kubernetes.pem
       mode: 0644
       contents:
-        inline: "${tls_kubernetes}"
+        inline: "${replace(tls_kubernetes, "\n", "\\n")}"
     - path: ${controller_mount_path}/kubernetes-key.pem
       mode: 0644
       contents:
-        inline: "${tls_kubernetes_key}"
+        inline: "${replace(tls_kubernetes_key, "\n", "\\n")}"
 
     - path: ${controller_mount_path}/etcd-ca.pem
       mode: 0644
       contents:
-        inline: "${tls_etcd_ca}"
+        inline: "${replace(tls_etcd_ca, "\n", "\\n")}"
     - path: ${controller_mount_path}/etcd.pem
       mode: 0644
       contents:
-        inline: "${tls_etcd}"
+        inline: "${replace(tls_etcd, "\n", "\\n")}"
     - path: ${controller_mount_path}/etcd-key.pem
       mode: 0644
       contents:
-        inline: "${tls_etcd_key}"
+        inline: "${replace(tls_etcd_key, "\n", "\\n")}"
     - path: ${controller_mount_path}/etcd-client.pem
       mode: 0644
       contents:
-        inline: "${tls_etcd_client}"
+        inline: "${replace(tls_etcd_client, "\n", "\\n")}"
     - path: ${controller_mount_path}/etcd-client-key.pem
       mode: 0644
       contents:
-        inline: "${tls_etcd_client_key}"
+        inline: "${replace(tls_etcd_client_key, "\n", "\\n")}"
 
     - path: ${controller_mount_path}/kube-controller-manager.pem
       mode: 0644
       contents:
-        inline: "${tls_controller_manager}"
+        inline: "${replace(tls_controller_manager, "\n", "\\n")}"
     - path: ${controller_mount_path}/kube-controller-manager-key.pem
       mode: 0644
       contents:
-        inline: "${tls_controller_manager_key}"
+        inline: "${replace(tls_controller_manager_key, "\n", "\\n")}"
     - path: ${controller_mount_path}/kube-scheduler.pem
       mode: 0644
       contents:
-        inline: "${tls_scheduler}"
+        inline: "${replace(tls_scheduler, "\n", "\\n")}"
     - path: ${controller_mount_path}/kube-scheduler-key.pem
       mode: 0644
       contents:
-        inline: "${tls_scheduler_key}"
+        inline: "${replace(tls_scheduler_key, "\n", "\\n")}"
 
     - path: ${controller_mount_path}/service-account.pem
       mode: 0644
       contents:
-        inline: "${tls_service_account}"
+        inline: "${replace(tls_service_account, "\n", "\\n")}"
     - path: ${controller_mount_path}/service-account-key.pem
       mode: 0644
       contents:
-        inline: "${tls_service_account_key}"
+        inline: "${replace(tls_service_account_key, "\n", "\\n")}"
 
     ##
     ## pod config

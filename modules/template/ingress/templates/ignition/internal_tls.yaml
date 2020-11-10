@@ -6,4 +6,4 @@ storage:
     - path: ${internal_tls_path}
       mode: 0644
       contents:
-        inline: "${tls_internal_ca}"
+        inline: "${replace(tls_internal_ca, "\n", "\\n")}"

@@ -19,7 +19,7 @@ output "ignition_server" {
       templatefile(f, merge(local.params, {
         p                     = params
         ssh_ca_authorized_key = tls_private_key.ssh-ca.public_key_openssh
-        ssh_host_private_key  = replace(tls_private_key.ssh-host[host].private_key_pem, "\n", "\\n")
+        ssh_host_private_key  = tls_private_key.ssh-host[host].private_key_pem
         ssh_host_public_key   = tls_private_key.ssh-host[host].public_key_openssh
         ssh_host_certificate  = ssh_host_cert.ssh-host[host].cert_authorized_key
       }))

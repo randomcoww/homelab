@@ -43,12 +43,12 @@ output "ignition" {
       for f in fileset(".", "${path.module}/templates/ignition/*") :
       templatefile(f, merge(local.params, {
         p                = params
-        tls_matchbox_ca  = replace(tls_self_signed_cert.matchbox-ca.cert_pem, "\n", "\\n")
-        tls_matchbox     = replace(tls_locally_signed_cert.matchbox[host].cert_pem, "\n", "\\n")
-        tls_matchbox_key = replace(tls_private_key.matchbox[host].private_key_pem, "\n", "\\n")
-        tls_libvirt_ca   = replace(tls_self_signed_cert.libvirt-ca.cert_pem, "\n", "\\n")
-        tls_libvirt      = replace(tls_locally_signed_cert.libvirt[host].cert_pem, "\n", "\\n")
-        tls_libvirt_key  = replace(tls_private_key.libvirt[host].private_key_pem, "\n", "\\n")
+        tls_matchbox_ca  = tls_self_signed_cert.matchbox-ca.cert_pem
+        tls_matchbox     = tls_locally_signed_cert.matchbox[host].cert_pem
+        tls_matchbox_key = tls_private_key.matchbox[host].private_key_pem
+        tls_libvirt_ca   = tls_self_signed_cert.libvirt-ca.cert_pem
+        tls_libvirt      = tls_locally_signed_cert.libvirt[host].cert_pem
+        tls_libvirt_key  = tls_private_key.libvirt[host].private_key_pem
       }))
     ]
   }

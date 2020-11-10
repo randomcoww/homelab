@@ -8,7 +8,7 @@ output "ignition" {
     host => [
       for f in fileset(".", "${path.module}/templates/ignition/*") :
       templatefile(f, merge(local.params, {
-        tls_internal_ca   = replace(tls_self_signed_cert.internal-ca.cert_pem, "\n", "\\n")
+        tls_internal_ca   = tls_self_signed_cert.internal-ca.cert_pem
         internal_tls_path = var.ca_path
       }))
     ]

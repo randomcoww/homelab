@@ -37,9 +37,9 @@ output "ssh-client-certificate" {
 output "kubeconfig" {
   value = templatefile("./templates/kubeconfig_admin.yaml", {
     cluster_name       = module.template-kubernetes.cluster_endpoint.cluster_name
-    ca_pem             = replace(base64encode(chomp(module.template-kubernetes.cluster_endpoint.kubernetes_ca_pem)), "\n", "")
-    cert_pem           = replace(base64encode(chomp(module.template-kubernetes.cluster_endpoint.kubernetes_cert_pem)), "\n", "")
-    private_key_pem    = replace(base64encode(chomp(module.template-kubernetes.cluster_endpoint.kubernetes_private_key_pem)), "\n", "")
+    ca_pem             = module.template-kubernetes.cluster_endpoint.kubernetes_ca_pem
+    cert_pem           = module.template-kubernetes.cluster_endpoint.kubernetes_cert_pem
+    private_key_pem    = module.template-kubernetes.cluster_endpoint.kubernetes_private_key_pem
     apiserver_endpoint = module.template-kubernetes.cluster_endpoint.apiserver_endpoint
   })
 }

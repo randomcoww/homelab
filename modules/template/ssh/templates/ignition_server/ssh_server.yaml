@@ -21,7 +21,7 @@ storage:
     - path: /etc/ssh/ssh_host_ecdsa_key.pub
       mode: 0600
       contents:
-        inline: "${ssh_host_public_key}"
+        inline: "${replace(ssh_host_public_key, "\n", "\\n")}"
     - path: /etc/ssh/ssh_host_ecdsa_key-cert.pub
       mode: 0600
       contents:

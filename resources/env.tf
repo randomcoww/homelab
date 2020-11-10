@@ -602,10 +602,6 @@ locals {
           hwif = "pf0",
         },
         {
-          node = "controller-1",
-          hwif = "pf0",
-        },
-        {
           node = "worker-0",
           hwif = "pf0",
         },
@@ -650,6 +646,10 @@ locals {
       libvirt_domains = [
         {
           node = "gateway-1",
+          hwif = "pf0",
+        },
+        {
+          node = "controller-1",
           hwif = "pf0",
         },
         {

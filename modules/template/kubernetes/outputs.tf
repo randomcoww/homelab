@@ -46,21 +46,21 @@ output "ignition_controller" {
       for f in fileset(".", "${path.module}/templates/ignition_controller/*") :
       templatefile(f, merge(local.params, {
         p                          = params
-        tls_kubernetes_ca          = replace(tls_self_signed_cert.kubernetes-ca.cert_pem, "\n", "\\n")
-        tls_kubernetes_ca_key      = replace(tls_private_key.kubernetes-ca.private_key_pem, "\n", "\\n")
-        tls_kubernetes             = replace(tls_locally_signed_cert.kubernetes[host].cert_pem, "\n", "\\n")
-        tls_kubernetes_key         = replace(tls_private_key.kubernetes[host].private_key_pem, "\n", "\\n")
-        tls_controller_manager     = replace(tls_locally_signed_cert.controller-manager.cert_pem, "\n", "\\n")
-        tls_controller_manager_key = replace(tls_private_key.controller-manager.private_key_pem, "\n", "\\n")
-        tls_scheduler              = replace(tls_locally_signed_cert.scheduler.cert_pem, "\n", "\\n")
-        tls_scheduler_key          = replace(tls_private_key.scheduler.private_key_pem, "\n", "\\n")
-        tls_service_account        = replace(tls_private_key.service-account.public_key_pem, "\n", "\\n")
-        tls_service_account_key    = replace(tls_private_key.service-account.private_key_pem, "\n", "\\n")
-        tls_etcd_ca                = replace(tls_self_signed_cert.etcd-ca.cert_pem, "\n", "\\n")
-        tls_etcd                   = replace(tls_locally_signed_cert.etcd[host].cert_pem, "\n", "\\n")
-        tls_etcd_key               = replace(tls_private_key.etcd[host].private_key_pem, "\n", "\\n")
-        tls_etcd_client            = replace(tls_locally_signed_cert.etcd-client[host].cert_pem, "\n", "\\n")
-        tls_etcd_client_key        = replace(tls_private_key.etcd-client[host].private_key_pem, "\n", "\\n")
+        tls_kubernetes_ca          = tls_self_signed_cert.kubernetes-ca.cert_pem
+        tls_kubernetes_ca_key      = tls_private_key.kubernetes-ca.private_key_pem
+        tls_kubernetes             = tls_locally_signed_cert.kubernetes[host].cert_pem
+        tls_kubernetes_key         = tls_private_key.kubernetes[host].private_key_pem
+        tls_controller_manager     = tls_locally_signed_cert.controller-manager.cert_pem
+        tls_controller_manager_key = tls_private_key.controller-manager.private_key_pem
+        tls_scheduler              = tls_locally_signed_cert.scheduler.cert_pem
+        tls_scheduler_key          = tls_private_key.scheduler.private_key_pem
+        tls_service_account        = tls_private_key.service-account.public_key_pem
+        tls_service_account_key    = tls_private_key.service-account.private_key_pem
+        tls_etcd_ca                = tls_self_signed_cert.etcd-ca.cert_pem
+        tls_etcd                   = tls_locally_signed_cert.etcd[host].cert_pem
+        tls_etcd_key               = tls_private_key.etcd[host].private_key_pem
+        tls_etcd_client            = tls_locally_signed_cert.etcd-client[host].cert_pem
+        tls_etcd_client_key        = tls_private_key.etcd-client[host].private_key_pem
       }))
     ]
   }
@@ -73,9 +73,9 @@ output "ignition_worker" {
       for f in fileset(".", "${path.module}/templates/ignition_worker/*") :
       templatefile(f, merge(local.params, {
         p                 = params
-        tls_kubernetes_ca = replace(tls_self_signed_cert.kubernetes-ca.cert_pem, "\n", "\\n")
-        tls_bootstrap     = replace(tls_locally_signed_cert.bootstrap.cert_pem, "\n", "\\n")
-        tls_bootstrap_key = replace(tls_private_key.bootstrap.private_key_pem, "\n", "\\n")
+        tls_kubernetes_ca = tls_self_signed_cert.kubernetes-ca.cert_pem
+        tls_bootstrap     = tls_locally_signed_cert.bootstrap.cert_pem
+        tls_bootstrap_key = tls_private_key.bootstrap.private_key_pem
       }))
     ]
   }
