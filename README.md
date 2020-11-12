@@ -235,6 +235,6 @@ kubectl apply -f services/unifi
 
 Terraform needs access to a state file on AWS S3 to run. If both gateways are down and resources need to be generated using terraform, WAN access can be enabled in the client as follows
 
-```
+```bash
 nmcli c up wan
 ```
