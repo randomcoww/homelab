@@ -220,10 +220,10 @@ Currently additional PSP is needed for PVC pods to run
 kubectl apply -n openebs -f services/openebs_psp.yaml
 ```
 
-#### Common service
+#### Common services
 
 ```bash
-kubectl apply -f services/common.yaml
+kubectl apply -f services/common-psp.yaml
 kubectl apply -f services/transmission
 kubectl apply -f services/mpd
 kubectl apply -f services/unifi

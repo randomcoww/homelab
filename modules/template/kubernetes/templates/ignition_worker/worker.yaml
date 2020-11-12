@@ -3,6 +3,8 @@ variant: fcos
 version: 1.0.0
 systemd:
   units:
+    - name: iscsid.service
+      enabled: true
     - name: kubelet.service
       enabled: true
       dropins:
@@ -28,32 +30,6 @@ systemd:
                   --volume-plugin-dir=${kubelet_path}/volumeplugins \
                   --container-runtime=remote \
                   --container-runtime-endpoint=unix:///var/run/dockershim.sock
-    - name: iscsid.socket
-      mask: true
-    - name: iscsid.service
-      enabled: true
-      contents: |
-        [Unit]
-        After=network.target
-
-        [Service]
-        ExecStartPre=-/usr/bin/podman kill iscsid
-        ExecStartPre=-/usr/bin/podman rm iscsid
-        ExecStart=/usr/bin/podman run --rm -it \
-          --name iscsid \
-          --security-opt label=disable \
-          --network host \
-          --ipc host \
-          --pid host \
-          --privileged \
-          -v /dev:/dev \
-          -v /usr/lib/modules:/lib/modules:ro \
-          ${container_images.hyperkube} \
-            iscsid -fn
-        Restart=always
-
-        [Install]
-        WantedBy=multi-user.target
 
 storage:
   files:
@@ -66,8 +42,6 @@ storage:
       mode: 0644
       contents:
         inline: |
-          # openebs mount
-          iscsi_tcp
           # kube-dns reply from unexpected source
           br_netfilter
     - path: ${kubelet_path}/kubelet-config-worker.yaml
