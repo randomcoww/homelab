@@ -125,7 +125,7 @@ locals {
         disk = [
           for d in lookup(params, "disk", []) :
           merge(d, {
-            systemd_unit_name = join("-", compact(split("/", replace(d.mount_path, "-", "\\x2d"))))
+            systemd_unit_name = join("-", compact(split("/", replace(lookup(d, "mount_path", ""), "-", "\\x2d"))))
           })
         ]
       }
