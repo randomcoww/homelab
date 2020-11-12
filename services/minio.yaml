@@ -71,8 +71,6 @@ spec:
       containers:
       - name: minio
         env:
-        - name: MINIO_CACHE_DRIVES
-          value: /var/cache
         - name: MINIO_STORAGE_CLASS_STANDARD
           value: "EC:2"
         - name: MINIO_ACCESS_KEY
@@ -112,8 +110,6 @@ spec:
         volumeMounts:
         - name: data
           mountPath: /var/s3
-        - name: cache
-          mountPath: /var/cache
         livenessProbe:
           httpGet:
             path: /minio/health/live
@@ -124,10 +120,6 @@ spec:
       - name: data
         hostPath:
           path: /var/s3
-          type: DirectoryOrCreate
-      - name: cache
-        hostPath:
-          path: /var/lib/kubelet/pv/cache
           type: DirectoryOrCreate
 
 ---
