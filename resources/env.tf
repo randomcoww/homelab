@@ -350,7 +350,6 @@ locals {
           label = "lan"
           ip    = "192.168.63.217"
           if    = "ens4"
-          mac   = "52-54-00-63-dd-a1"
         },
         {
           label = "sync"
@@ -382,7 +381,6 @@ locals {
           label = "lan"
           ip    = "192.168.63.218"
           if    = "ens4"
-          mac   = "52-54-00-63-dd-a1"
         },
         {
           label = "sync"
@@ -578,7 +576,7 @@ locals {
         {
           label  = "pf0"
           if     = "en-pf0"
-          mac    = "00-1b-21-bc-4c-16"
+          mac    = "f4-52-14-7b-53-80"
         },
       ]
       network = [
@@ -629,7 +627,7 @@ locals {
         {
           label  = "pf0"
           if     = "en-pf0"
-          mac    = "00-1b-21-bc-67-c6"
+          mac    = "f4-52-14-80-6a-e0"
         },
       ]
       network = [
@@ -685,8 +683,9 @@ locals {
       hwif = [
         {
           label  = "pf0"
-          if     = "enp4s0"
-          mac    = "f4-52-14-80-6a-e0"
+          if     = "enp4s0f0"
+          # interface name instead of mac is needed for network manager
+          # mac    = "f8-f2-1e-1e-3c-40"
         },
       ]
       network = [

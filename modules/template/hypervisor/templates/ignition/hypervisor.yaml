@@ -83,6 +83,7 @@ storage:
       contents:
         inline: |
           ACTION=="add", SUBSYSTEM=="net", ENV{ID_NET_DRIVER}=="ixgbe", ATTR{device/sriov_numvfs}="16"
+          ACTION=="add", SUBSYSTEM=="net", ENV{ID_NET_DRIVER}=="i40e", ATTR{device/sriov_numvfs}="16"
     ##
     ## internal network ${p.metadata.label} for host <-> local vm
     ##

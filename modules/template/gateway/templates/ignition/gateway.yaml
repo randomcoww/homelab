@@ -81,6 +81,10 @@ storage:
           %{~ if lookup(v, "router", null) != null ~}
           vrrp_instance VI_gateway_${k} {
             nopreempt
+            %{~ if k == "lan" ~}
+            use_vmac ${k}-tap
+            vmac_xmit_base
+            %{~ endif ~}
             state BACKUP
             strict_mode off
             virtual_router_id ${vrrp_gateway_id}
@@ -100,14 +104,9 @@ storage:
       overwrite: true
       contents:
         inline: |-
-          define if_internal = { ${join(",", [
-            for k in p.network:
-            "${k.if}"
-            if lookup(k, "dhcp_pool", null) != null && lookup(k, "router", null) != null
-          ])} }
-          define if_external = ${p.networks_by_key.wan.if}
           define if_trusted = ${p.networks_by_key.main.if}
           define if_sync = ${p.networks_by_key.sync.if}
+          define if_external = ${p.networks_by_key.wan.if}
 
           table ip filter {
             chain base_checks {
@@ -128,13 +127,10 @@ storage:
               iifname $if_trusted accept;
               iifname $if_sync accept;
 
-              iifname $if_internal tcp dport ${dns_redirect_port} accept;
-              iifname $if_internal udp dport ${dns_redirect_port} accept;
-              iifname $if_internal udp sport bootps udp dport bootpc accept;
-              iifname $if_internal tcp dport ssh accept;
-              iifname $if_internal tcp dport ${services.kubernetes_apiserver.ports.secure} accept;
-              iifname $if_internal tcp dport ${services.renderer.ports.rpc} accept;
-              iifname $if_internal pkttype multicast accept;
+              iifname != $if_external tcp dport ${dns_redirect_port} accept;
+              iifname != $if_external udp dport ${dns_redirect_port} accept;
+              iifname != $if_external udp sport bootps udp dport bootpc accept;
+              iifname != $if_external pkttype multicast accept;
             }
 
             chain forward {
@@ -145,15 +141,7 @@ storage:
               ip protocol icmp icmp type { echo-request, echo-reply, time-exceeded, parameter-problem, destination-unreachable } accept;
 
               iifname $if_trusted accept;
-              iifname $if_sync accept;
-
-              iifname $if_internal oifname $if_external accept;
-              iifname $if_internal tcp dport ssh accept;
-              iifname $if_internal tcp dport ${services.kubernetes_apiserver.ports.secure} accept;
-              iifname $if_internal tcp dport ${services.renderer.ports.rpc} accept;
-              %{~ for v in values(loadbalancer_pools) ~}
-              iifname $if_internal ip daddr ${v.network}/${v.cidr} accept;
-              %{~ endfor ~}
+              oifname $if_external accept;
             }
 
             chain output {
@@ -164,8 +152,8 @@ storage:
           table ip nat {
             chain prerouting {
               type nat hook prerouting priority -100; policy accept;
-              iifname $if_internal tcp dport domain redirect to ${dns_redirect_port};
-              iifname $if_internal udp dport domain redirect to ${dns_redirect_port};
+              iifname != $if_external tcp dport domain redirect to ${dns_redirect_port};
+              iifname != $if_external udp dport domain redirect to ${dns_redirect_port};
             }
 
             chain input {
@@ -178,7 +166,7 @@ storage:
 
             chain postrouting {
               type nat hook postrouting priority 100; policy accept;
-              oifname $if_external masquerade;
+              iifname != $if_external oifname $if_external masquerade;
             }
           }
           ;
