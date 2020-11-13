@@ -574,9 +574,9 @@ locals {
     kvm-0 = {
       hwif = [
         {
-          label  = "pf0"
-          if     = "en-pf0"
-          mac    = "f4-52-14-7b-53-80"
+          label = "pf0"
+          if    = "en-pf0"
+          mac   = "f4-52-14-7b-53-80"
         },
       ]
       network = [
@@ -625,9 +625,9 @@ locals {
     kvm-1 = {
       hwif = [
         {
-          label  = "pf0"
-          if     = "en-pf0"
-          mac    = "f4-52-14-80-6a-e0"
+          label = "pf0"
+          if    = "en-pf0"
+          mac   = "f4-52-14-80-6a-e0"
         },
       ]
       network = [
@@ -682,8 +682,8 @@ locals {
     client-0 = {
       hwif = [
         {
-          label  = "pf0"
-          if     = "enp4s0f0"
+          label = "pf0"
+          if    = "enp4s0f0"
           # interface name instead of mac is needed for network manager
           # mac    = "f8-f2-1e-1e-3c-40"
         },
