@@ -141,7 +141,6 @@ kubectl apply -f services/traefik.yaml
 #### Minio
 
 ```bash
-kubectl label node worker-0.local minio-data=true
 kubectl apply -f services/minio.yaml
 ```
 

@@ -29,7 +29,11 @@ systemd:
                   --cert-dir=${kubelet_path} \
                   --volume-plugin-dir=${kubelet_path}/volumeplugins \
                   --container-runtime=remote \
-                  --container-runtime-endpoint=unix:///var/run/dockershim.sock
+                  --container-runtime-endpoint=unix:///var/run/dockershim.sock \
+                  --node-labels=${join(",", [
+                    for k, v in  lookup(p, "node_labels", {}) :
+                    "${k}=${v}"
+                  ])}
 
 storage:
   files:
@@ -38,13 +42,15 @@ storage:
       contents:
         inline: |
           # use for mayastor malloc
-          vm.nr_hugepages = 1024
+          vm.nr_hugepages = 10240
     - path: /etc/modules-load.d/custom.conf
       mode: 0644
       contents:
         inline: |
           # kube-dns reply from unexpected source
           br_netfilter
+          # mayastor nvmeof
+          nvme-tcp
     - path: ${kubelet_path}/kubelet-config-worker.yaml
       mode: 0644
       contents:
