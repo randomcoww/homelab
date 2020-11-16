@@ -26,6 +26,10 @@ storage:
     #   contents:
     #     inline: |
     #       options mlx4_core num_vfs=8 port_type_array=2 probe_vf=8
+    - path: /etc/avahi/avahi-daemon.conf
+      append:
+        - inline: |
+            domain-name=${domains.mdns_lan}
     - path: /etc/udev/rules.d/sriov_numvfs.rules
       mode: 0644
       contents:

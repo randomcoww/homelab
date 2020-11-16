@@ -70,24 +70,24 @@ storage:
           }
           vrrp_sync_group VG_gateway {
             group {
-              %{~ for k, v in p.networks_by_key ~}
+              %{~ for v in p.network ~}
               %{~ if lookup(v, "router", null) != null ~}
-              VI_gateway_${k}
+              VI_gateway_${v.label}
               %{~ endif ~}
               %{~ endfor ~}
             }
           }
-          %{~ for k, v in p.networks_by_key ~}
+          %{~ for i, v in p.network ~}
           %{~ if lookup(v, "router", null) != null ~}
-          vrrp_instance VI_gateway_${k} {
+          vrrp_instance VI_gateway_${v.label} {
             nopreempt
-            %{~ if k == "lan" ~}
-            use_vmac ${k}-tap
+            %{~ if v.label == "lan" ~}
+            use_vmac
             vmac_xmit_base
             %{~ endif ~}
             state BACKUP
             strict_mode off
-            virtual_router_id ${vrrp_gateway_id}
+            virtual_router_id ${vrrp_gateway_id + i}
             interface ${v.if}
             priority 100
             virtual_rules {
@@ -104,9 +104,14 @@ storage:
       overwrite: true
       contents:
         inline: |-
-          define if_trusted = ${p.networks_by_key.main.if}
-          define if_sync = ${p.networks_by_key.sync.if}
-          define if_external = ${p.networks_by_key.wan.if}
+          %{~ for v in p.network ~}
+          %{~ if lookup(v, "network", null) != null && lookup(v, "cidr", null) != null ~}
+          define addr_${v.label} = ${v.network}/${v.cidr}
+          %{~ endif ~}
+          %{~ if lookup(v, "if", null) != null ~}
+          define if_${v.label} = ${v.if}
+          %{~ endif ~}
+          %{~ endfor ~}
 
           table ip filter {
             chain base_checks {
@@ -124,13 +129,13 @@ storage:
 
               ip protocol icmp icmp type { echo-request, echo-reply, time-exceeded, parameter-problem, destination-unreachable } accept;
 
-              iifname $if_trusted accept;
-              iifname $if_sync accept;
+              iifname != $if_wan tcp dport ${dns_redirect_port} accept;
+              iifname != $if_wan udp dport ${dns_redirect_port} accept;
 
-              iifname != $if_external tcp dport ${dns_redirect_port} accept;
-              iifname != $if_external udp dport ${dns_redirect_port} accept;
-              iifname != $if_external udp sport bootps udp dport bootpc accept;
-              iifname != $if_external pkttype multicast accept;
+              ip saddr $addr_main accept;
+              ip saddr $addr_sync accept;
+              ip saddr $addr_lan udp sport bootps udp dport bootpc accept;
+              ip saddr $addr_lan pkttype multicast accept;
             }
 
             chain forward {
@@ -140,8 +145,9 @@ storage:
 
               ip protocol icmp icmp type { echo-request, echo-reply, time-exceeded, parameter-problem, destination-unreachable } accept;
 
-              iifname $if_trusted accept;
-              oifname $if_external accept;
+              oifname $if_wan accept;
+              ip saddr $addr_main accept;
+              ip saddr $addr_lan ip daddr $addr_main tcp dport ssh accept;
             }
 
             chain output {
@@ -152,8 +158,8 @@ storage:
           table ip nat {
             chain prerouting {
               type nat hook prerouting priority -100; policy accept;
-              iifname != $if_external tcp dport domain redirect to ${dns_redirect_port};
-              iifname != $if_external udp dport domain redirect to ${dns_redirect_port};
+              iifname != $if_wan tcp dport domain redirect to ${dns_redirect_port};
+              iifname != $if_wan udp dport domain redirect to ${dns_redirect_port};
             }
 
             chain input {
@@ -166,7 +172,7 @@ storage:
 
             chain postrouting {
               type nat hook postrouting priority 100; policy accept;
-              iifname != $if_external oifname $if_external masquerade;
+              iifname != $if_wan oifname $if_wan masquerade;
             }
           }
           ;
@@ -187,7 +193,7 @@ storage:
             errors
             forward . ${services.internal_dns.vip}
           }
-          ${domains.mdns} {
+          ${domains.mdns_main} {
             errors
             forward . 127.0.0.53
           }
