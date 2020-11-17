@@ -147,10 +147,9 @@ kubectl apply -f services/minio.yaml
 #### Monitoring
 
 ```bash
+helm repo update
 helm repo add loki https://grafana.github.io/loki/charts
-helm repo add stable https://kubernetes-charts.storage.googleapis.com
-
-kubectl create namespace monitoring
+helm repo add prometheus-community https://prometheus-community.github.io/helm-charts
 
 helm template loki \
     --namespace=monitoring \
@@ -162,61 +161,17 @@ helm template promtail \
 
 helm template prometheus \
     --namespace monitoring \
+    --set podSecurityPolicy.enabled=true \
     --set alertmanager.enabled=false \
     --set configmapReload.prometheus.enabled=false \
     --set configmapReload.alertmanager.enabled=false \
-    --set initChownData.enabled=false \
-    --set podSecurityPolicy.enabled=true \
-    --set kube-state-metrics.podSecurityPolicy.enabled=true \
-    --set pushgateway.enabled=false \
+    --set kubeStateMetrics.enabled=true \
+    --set nodeExporter.enabled=true \
     --set server.persistentVolume.enabled=false \
-    stable/prometheus | kubectl -n monitoring apply -f -
+    --set pushgateway.enabled=false \
+    prometheus-community/prometheus | kubectl -n monitoring apply -f -
 
 kubectl apply -n monitoring -f services/grafana.yaml
-```
-
-Currently the PSP `requiredDropCapabilities` causes loki pod to crashloop
-
-```bash
-kubectl patch -n monitoring psp loki -p='{
-  "spec": {
-    "requiredDropCapabilities": [
-      ""
-    ]
-  }
-}'
-```
-
-#### OpenEBS
-
-```bash
-helm repo add openebs https://openebs.github.io/charts
-
-kubectl create namespace openebs
-
-helm template openebs \
-    --namespace openebs \
-    --set rbac.pspEnabled=true \
-    --set ndm.enabled=true \
-    --set ndmOperator.enabled=true \
-    --set localprovisioner.enabled=false \
-    --set analytics.enabled=false \
-    --set defaultStorageConfig.enabled=false \
-    --set snapshotOperator.enabled=false \
-    --set webhook.enabled=false \
-    openebs/openebs | kubectl -n openebs apply -f -
-```
-
-Add block devices (IDs specific to my hardware)
-
-```bash
-kubectl apply -n openebs -f services/openebs_spc.yaml
-```
-
-Currently additional PSP is needed for PVC pods to run
-
-```bash
-kubectl apply -n openebs -f services/openebs_psp.yaml
 ```
 
 #### Common services
@@ -235,5 +190,6 @@ kubectl apply -f services/unifi
 Terraform needs access to a state file on AWS S3 to run. If both gateways are down and resources need to be generated using terraform, WAN access can be enabled in the client as follows
 
 ```bash
+nmcli c down lan
 nmcli c up wan
 ```
