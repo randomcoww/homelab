@@ -78,12 +78,14 @@ systemd:
 
 storage:
   files:
+    ## Add VFs if using Intel NICs
     - path: /etc/udev/rules.d/sriov_numvfs.rules
       mode: 0644
       contents:
         inline: |
-          ACTION=="add", SUBSYSTEM=="net", ENV{ID_NET_DRIVER}=="ixgbe", ATTR{device/sriov_numvfs}="16"
-          ACTION=="add", SUBSYSTEM=="net", ENV{ID_NET_DRIVER}=="i40e", ATTR{device/sriov_numvfs}="16"
+          %{~ for d in ["ixgbe", "i40e"] ~}
+          ACTION=="add", SUBSYSTEM=="net", ENV{ID_NET_DRIVER}=="${d}", ATTR{device/sriov_numvfs}="16"
+          %{~ endfor ~}
     ##
     ## internal network ${p.metadata.label} for host <-> local vm
     ##
