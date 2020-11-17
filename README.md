@@ -147,9 +147,9 @@ kubectl apply -f services/minio.yaml
 #### Monitoring
 
 ```bash
-helm repo update
 helm repo add loki https://grafana.github.io/loki/charts
 helm repo add prometheus-community https://prometheus-community.github.io/helm-charts
+helm repo update
 
 helm template loki \
     --namespace=monitoring \
