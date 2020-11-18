@@ -24,7 +24,7 @@ storage:
           [Network]
           LinkLocalAddressing=false
           DHCP=${lookup(v, "dhcp", false)}
-          MulticastDNS=${lookup(v, "mdns_main", false)}
+          MulticastDNS=${lookup(v, "mdns", false)}
           %{~ if lookup(v, "ip", null) != null && lookup(v, "cidr", null) != null ~}
 
           [Address]
