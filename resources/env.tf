@@ -25,7 +25,7 @@ locals {
     coredns                 = "docker.io/coredns/coredns:1.7.0"
     external_dns            = "registry.opensource.zalan.do/teapot/external-dns:latest"
     kapprover               = "docker.io/randomcoww/kapprover:v0.0.4"
-    kea                     = "docker.io/randomcoww/kea:1.6.2"
+    kea                     = "docker.io/randomcoww/kea:1.8.1"
     conntrackd              = "docker.io/randomcoww/conntrackd:latest"
     promtail                = "docker.io/randomcoww/promtail:v2.0.0"
     matchbox                = "quay.io/poseidon/matchbox:latest"
