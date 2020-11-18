@@ -18,7 +18,7 @@ locals {
     hyperkube               = "docker.io/randomcoww/kubernetes:kubelet-v1.18.8"
     kube_proxy              = "docker.io/randomcoww/kubernetes:kube-proxy-v1.18.8"
     etcd_wrapper            = "docker.io/randomcoww/etcd-wrapper:v0.2.1"
-    etcd                    = "docker.io/randomcoww/etcd:v3.4.10"
+    etcd                    = "docker.io/randomcoww/etcd:v3.4.13"
     flannel                 = "docker.io/randomcoww/flannel:latest"
     keepalived              = "docker.io/randomcoww/keepalived:latest"
     cni_plugins             = "docker.io/randomcoww/cni-plugins:v0.8.6"
@@ -27,7 +27,7 @@ locals {
     kapprover               = "docker.io/randomcoww/kapprover:v0.0.4"
     kea                     = "docker.io/randomcoww/kea:1.6.2"
     conntrackd              = "docker.io/randomcoww/conntrackd:latest"
-    promtail                = "docker.io/randomcoww/promtail:v1.5.0"
+    promtail                = "docker.io/randomcoww/promtail:v2.0.0"
     matchbox                = "quay.io/poseidon/matchbox:latest"
   }
 
