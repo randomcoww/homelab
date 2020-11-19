@@ -66,6 +66,7 @@ storage:
           global_defs {
             vrrp_version 3
             vrrp_iptables
+            nftables keepalived
             dynamic_interfaces allow_if_changes
           }
           vrrp_sync_group VG_gateway {
@@ -80,13 +81,9 @@ storage:
           %{~ for i, v in p.network ~}
           %{~ if lookup(v, "router", null) != null ~}
           vrrp_instance VI_gateway_${v.label} {
+            no_accept
             nopreempt
-            %{~ if v.label == "lan" ~}
-            use_vmac
-            vmac_xmit_base
-            %{~ endif ~}
             state BACKUP
-            strict_mode off
             virtual_router_id ${vrrp_gateway_id + i}
             interface ${v.if}
             priority 100

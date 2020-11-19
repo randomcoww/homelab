@@ -356,6 +356,8 @@ locals {
           vlan = "lan"
           ip   = "192.168.63.217"
           if   = "ens4"
+          # Duplicate this on gateways
+          mac = "00-00-5e-00-01-3d"
         },
         {
           vlan = "sync"
@@ -365,6 +367,7 @@ locals {
         {
           vlan = "wan"
           if   = "ens6"
+          # Duplicate this on gateways
           mac  = "52-54-00-63-6e-b3"
           dhcp = true
         },
@@ -387,6 +390,8 @@ locals {
           vlan = "lan"
           ip   = "192.168.63.218"
           if   = "ens4"
+          # Duplicate this on gateways
+          mac = "00-00-5e-00-01-3d"
         },
         {
           vlan = "sync"
@@ -396,6 +401,7 @@ locals {
         {
           vlan = "wan"
           if   = "ens6"
+          # Duplicate this on gateways
           mac  = "52-54-00-63-6e-b3"
           dhcp = true
         },
