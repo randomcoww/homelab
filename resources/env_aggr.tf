@@ -42,9 +42,9 @@ locals {
     host => {
       network = [
         for n in lookup(params, "network", []) :
-        merge(lookup(local.networks, lookup(n, "label", lookup(n, "if", "placeholder")), {}),
+        merge(lookup(local.networks, lookup(n, "vlan", "default"), {}),
           n, {
-            label = lookup(n, "label", lookup(n, "if", "placeholder"))
+            label = lookup(n, "label", lookup(n, "vlan", "default"))
         })
       ]
     }
@@ -63,12 +63,24 @@ locals {
     for host, params in local.aggr_host_pre1 :
     host => {
       hwif = [
-        for h in lookup(params, "hwif", []) :
-        merge(h, {
-          label    = lookup(h, "label", lookup(h, "if", "placeholder"))
-          children = lookup(local.aggr_hwif_children[host], h.label, [])
+        for n in lookup(params, "hwif", []) :
+        merge(n, {
+          children = lookup(local.aggr_hwif_children[host], n.label, [])
         })
       ]
+    }
+  }
+
+  aggr_metadata_params = {
+    for host, params in local.aggr_host_pre1 :
+    host => {
+      metadata = merge(
+        lookup(local.networks, lookup(lookup(params, "metadata", {}), "vlan", "default"), {}),
+        lookup(params, "metadata", {}),
+        {
+          label = lookup(lookup(params, "metadata", {}), "label", lookup(lookup(params, "metadata", {}), "vlan", "default"))
+        }
+      )
     }
   }
 
@@ -92,16 +104,6 @@ locals {
     }
   }
 
-  aggr_metadata = {
-    for host, params in local.aggr_host_pre1 :
-    host => {
-      metadata = merge(
-        lookup(local.networks, lookup(lookup(params, "metadata", {}), "label", ""), {}),
-        lookup(params, "metadata", {})
-      )
-    }
-  }
-
   #### Build all
   aggr_host_pre2 = {
     for host, params in local.aggr_host_pre1 :
@@ -111,7 +113,7 @@ locals {
       lookup(local.aggr_networks_by_key, host, {}),
       lookup(local.aggr_hwif_params, host, {}),
       lookup(local.aggr_hwif_by_key, host, {}),
-      lookup(local.aggr_metadata, host, {}),
+      lookup(local.aggr_metadata_params, host, {}),
     )
   }
 

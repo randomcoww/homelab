@@ -154,9 +154,9 @@ locals {
         "rootfs.img",
       ]
       metadata = {
-        label = "int"
-        if    = "en-int"
-        ip    = local.services.renderer.vip
+        vlan = "int"
+        if   = "en-int"
+        ip   = local.services.renderer.vip
       }
     }
     # coreos VMs
@@ -273,6 +273,9 @@ locals {
         "chipset-sata",
         "hba",
       ]
+      node_labels = {
+        "openebs.io/engine" = "mayastor"
+      }
     }
     test = {
       memory = 3
@@ -345,62 +348,62 @@ locals {
       # increments the slot for each element
       network = [
         {
-          label = "main"
-          ip    = "192.168.127.217"
-          if    = "ens3"
+          vlan = "main"
+          ip   = "192.168.127.217"
+          if   = "ens3"
         },
         {
-          label = "lan"
-          ip    = "192.168.63.217"
-          if    = "ens4"
+          vlan = "lan"
+          ip   = "192.168.63.217"
+          if   = "ens4"
         },
         {
-          label = "sync"
-          ip    = "192.168.190.1"
-          if    = "ens5"
+          vlan = "sync"
+          ip   = "192.168.190.1"
+          if   = "ens5"
         },
         {
-          label = "wan"
-          if    = "ens6"
-          mac   = "52-54-00-63-6e-b3"
-          dhcp  = true
+          vlan = "wan"
+          if   = "ens6"
+          mac  = "52-54-00-63-6e-b3"
+          dhcp = true
         },
       ]
       metadata = {
-        label = "int"
-        if    = "ens2"
-        mac   = "52-54-00-1a-61-2a"
+        vlan = "int"
+        if   = "ens2"
+        mac  = "52-54-00-1a-61-2a"
       }
       kea_ha_role = "primary"
     }
     gateway-1 = {
       network = [
         {
-          label = "main"
-          ip    = "192.168.127.218"
-          if    = "ens3"
+          vlan = "main"
+          ip   = "192.168.127.218"
+          if   = "ens3"
         },
         {
-          label = "lan"
-          ip    = "192.168.63.218"
-          if    = "ens4"
+          vlan = "lan"
+          ip   = "192.168.63.218"
+          if   = "ens4"
         },
         {
-          label = "sync"
-          ip    = "192.168.190.2"
-          if    = "ens5"
+          vlan = "sync"
+          ip   = "192.168.190.2"
+          if   = "ens5"
         },
         {
-          label = "wan"
-          if    = "ens6"
-          mac   = "52-54-00-63-6e-b3"
-          dhcp  = true
+          vlan = "wan"
+          if   = "ens6"
+          mac  = "52-54-00-63-6e-b3"
+          dhcp = true
         },
       ]
       metadata = {
-        label = "int"
-        if    = "ens2"
-        mac   = "52-54-00-1a-61-2b"
+        vlan = "int"
+        if   = "ens2"
+        mac  = "52-54-00-1a-61-2b"
       }
       kea_ha_role = "secondary"
     }
@@ -409,46 +412,46 @@ locals {
     controller-0 = {
       network = [
         {
-          label = "main"
-          ip    = "192.168.127.219"
-          if    = "ens3"
-          dhcp  = true
+          vlan = "main"
+          ip   = "192.168.127.219"
+          if   = "ens3"
+          dhcp = true
         },
       ]
       metadata = {
-        label = "int"
-        if    = "ens2"
-        mac   = "52-54-00-1a-61-0a"
+        vlan = "int"
+        if   = "ens2"
+        mac  = "52-54-00-1a-61-0a"
       }
     }
     controller-1 = {
       network = [
         {
-          label = "main"
-          ip    = "192.168.127.220"
-          if    = "ens3"
-          dhcp  = true
+          vlan = "main"
+          ip   = "192.168.127.220"
+          if   = "ens3"
+          dhcp = true
         },
       ]
       metadata = {
-        label = "int"
-        if    = "ens2"
-        mac   = "52-54-00-1a-61-0b"
+        vlan = "int"
+        if   = "ens2"
+        mac  = "52-54-00-1a-61-0b"
       }
     }
     controller-2 = {
       network = [
         {
-          label = "main"
-          ip    = "192.168.127.221"
-          if    = "ens3"
-          dhcp  = true
+          vlan = "main"
+          ip   = "192.168.127.221"
+          if   = "ens3"
+          dhcp = true
         },
       ]
       metadata = {
-        label = "int"
-        if    = "ens2"
-        mac   = "52-54-00-1a-61-0c"
+        vlan = "int"
+        if   = "ens2"
+        mac  = "52-54-00-1a-61-0c"
       }
     }
 
@@ -456,15 +459,15 @@ locals {
     worker-0 = {
       network = [
         {
-          label = "main"
-          if    = "ens3"
-          dhcp  = true
+          vlan = "main"
+          if   = "ens3"
+          dhcp = true
         },
       ]
       metadata = {
-        label = "int"
-        if    = "ens2"
-        mac   = "52-54-00-1a-61-1a"
+        vlan = "int"
+        if   = "ens2"
+        mac  = "52-54-00-1a-61-1a"
       }
       # Defaults:
       # format = "xfs"
@@ -543,15 +546,15 @@ locals {
     worker-1 = {
       network = [
         {
-          label = "main"
-          if    = "ens3"
-          dhcp  = true
+          vlan = "main"
+          if   = "ens3"
+          dhcp = true
         },
       ]
       metadata = {
-        label = "int"
-        if    = "ens2"
-        mac   = "52-54-00-1a-61-1b"
+        vlan = "int"
+        if   = "ens2"
+        mac  = "52-54-00-1a-61-1b"
       }
       disk = [
         {
@@ -559,24 +562,21 @@ locals {
           mount_path = "/var/lib/kubelet/pv"
         },
       ]
-      node_labels = {
-        "openebs.io/engine" = "mayastor"
-      }
     }
 
     # Test instances
     test-0 = {
       network = [
         {
-          label = "main"
-          if    = "ens3"
-          dhcp  = true
+          vlan = "main"
+          if   = "ens3"
+          dhcp = true
         },
       ]
       metadata = {
-        label = "int"
-        if    = "ens2"
-        mac   = "52-54-00-1a-61-3a"
+        vlan = "int"
+        if   = "ens2"
+        mac  = "52-54-00-1a-61-3a"
       }
     }
 
@@ -591,11 +591,11 @@ locals {
       ]
       network = [
         {
-          label = "main"
-          if    = "en-main"
-          ip    = "192.168.127.251"
-          dhcp  = true
-          hwif  = "pf0"
+          vlan = "main"
+          if   = "en-main"
+          ip   = "192.168.127.251"
+          dhcp = true
+          hwif = "pf0"
         },
       ]
       ## hypervisorf boot image is copied with coreos-installer to strip
@@ -646,11 +646,11 @@ locals {
       ]
       network = [
         {
-          label = "main"
-          if    = "en-main"
-          ip    = "192.168.127.252"
-          dhcp  = true
-          hwif  = "pf0"
+          vlan = "main"
+          if   = "en-main"
+          ip   = "192.168.127.252"
+          dhcp = true
+          hwif = "pf0"
         },
       ]
       ## hypervisor boot image is copied with coreos-installer to strip
@@ -700,19 +700,19 @@ locals {
       ]
       network = [
         {
-          label = "main"
-          if    = "en-main"
-          ip    = "192.168.127.253"
-          hwif  = "pf0"
+          vlan = "main"
+          if   = "en-main"
+          ip   = "192.168.127.253"
+          hwif = "pf0"
         },
         {
-          label = "lan"
-          if    = "en-lan"
-          dhcp  = true
-          hwif  = "pf0"
+          vlan = "lan"
+          if   = "en-lan"
+          dhcp = true
+          hwif = "pf0"
         },
         {
-          label    = "wan"
+          vlan     = "wan"
           if       = "en-wan"
           dhcp     = true
           hwif     = "pf0"
@@ -725,27 +725,27 @@ locals {
     switch-0 = {
       network = [
         {
-          label = "main"
-          ip    = "192.168.127.60"
-          mac   = "50-c7-bf-60-78-22"
+          vlan = "main"
+          ip   = "192.168.127.60"
+          mac  = "50-c7-bf-60-78-22"
         },
       ]
     }
     ipmi-0 = {
       network = [
         {
-          label = "main"
-          ip    = "192.168.127.62"
-          mac   = "ac-1f-6b-86-06-82"
+          vlan = "main"
+          ip   = "192.168.127.62"
+          mac  = "ac-1f-6b-86-06-82"
         },
       ]
     }
     ipmi-1 = {
       network = [
         {
-          label = "main"
-          ip    = "192.168.127.61"
-          mac   = "ac-1f-6b-ae-76-60"
+          vlan = "main"
+          ip   = "192.168.127.61"
+          mac  = "ac-1f-6b-ae-76-60"
         },
       ]
     }
