@@ -9,26 +9,10 @@ systemd:
       mask: true
     - name: systemd-networkd.service
       enabled: true
-    - name: systemd-resolved.service
-      enabled: true
     - name: avahi-daemon.service
       mask: true
     - name: avahi-daemon.socket
       mask: true
-    - name: systemd-resolved-link.service
-      enabled: true
-      contents: |
-        [Unit]
-        After=systemd-resolved.service
-        Before=network.target
-
-        [Service]
-        Type=oneshot
-        RemainAfterExit=true
-        ExecStart=/usr/bin/ln -sf /run/systemd/resolve/resolv.conf /etc/resolv.conf
-
-        [Install]
-        WantedBy=multi-user.target
 storage:
   files:
     # Appending seems to override the earlier hosts entry

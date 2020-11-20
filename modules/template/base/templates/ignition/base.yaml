@@ -3,6 +3,8 @@ variant: fcos
 version: 1.0.0
 systemd:
   units:
+    - name: systemd-resolved.service
+      enabled: true
     - name: chronyd.service
       enabled: true
     - name: fstrim.service

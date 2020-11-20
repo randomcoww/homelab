@@ -26,10 +26,6 @@ storage:
     #   contents:
     #     inline: |
     #       options mlx4_core num_vfs=8 port_type_array=2 probe_vf=8
-    - path: /etc/avahi/avahi-daemon.conf
-      append:
-        - inline: |
-            domain-name=${domains.mdns_lan}
     - path: /etc/NetworkManager/conf.d/custom.conf
       mode: 0644
       contents:
@@ -68,6 +64,7 @@ storage:
           %{~ if lookup(v, "disabled", false) ~}
           autoconnect=false
           %{~ endif ~}
+          mdns=%{if lookup(v, "mdns", false)}2%{else}0%{endif}
 
           [vlan]
           parent=${p.hwif_by_key[v.hwif].if}

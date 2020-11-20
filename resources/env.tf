@@ -118,10 +118,7 @@ locals {
   domains = {
     internal           = "fuzzybunny.internal"
     kubernetes_cluster = "cluster.internal"
-    # Internal mDNS - this only supports local
-    mdns_main = "local"
-    # LAN mDNS
-    mdns_lan = "local"
+    mdns_main          = "local"
   }
 
   components = {
@@ -776,6 +773,7 @@ locals {
           if   = "en-lan"
           dhcp = true
           hwif = "pf0"
+          mdns = true
         },
         {
           vlan     = "wan"
