@@ -58,44 +58,36 @@ storage:
           DNS=${services.upstream_dns.vip}
           DNSOverTLS=yes
           Domains=~
+    # VRRPv3 currently fails with Invalid VRRPv3 checksum
     - path: /etc/keepalived/keepalived.conf
       mode: 0644
       overwrite: true
       contents:
         inline: |-
           global_defs {
-            vrrp_version 3
+            vrrp_version 2
             vrrp_iptables
             nftables keepalived
             dynamic_interfaces allow_if_changes
           }
-          vrrp_sync_group VG_gateway {
-            group {
-              %{~ for v in p.network ~}
-              %{~ if lookup(v, "router", null) != null ~}
-              VI_gateway_${v.label}
-              %{~ endif ~}
-              %{~ endfor ~}
-            }
-          }
-          %{~ for i, v in p.network ~}
-          %{~ if lookup(v, "router", null) != null ~}
-          vrrp_instance VI_gateway_${v.label} {
+          vrrp_instance VI_gateway {
             no_accept
             nopreempt
             state BACKUP
-            virtual_router_id ${vrrp_id_base + 1 + i}
-            interface ${v.if}
+            virtual_router_id ${vrrp_id_base + 1}
+            interface ${p.networks_by_key.sync.if}
             priority 100
             virtual_rules {
               to all lookup ${master_default_route_table} priority ${master_default_route_priority}
             }
             virtual_ipaddress {
-              ${v.router}
+              %{~ for i, v in p.network ~}
+              %{~ if lookup(v, "router", null) != null ~}
+              ${v.router} dev ${v.if}
+              %{~ endif ~}
+              %{~ endfor ~}
             }
           }
-          %{~ endif ~}
-          %{~ endfor ~}
     - path: /etc/sysconfig/nftables.conf
       mode: 0644
       overwrite: true

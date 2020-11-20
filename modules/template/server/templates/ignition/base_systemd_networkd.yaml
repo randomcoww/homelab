@@ -13,6 +13,22 @@ systemd:
       mask: true
     - name: avahi-daemon.socket
       mask: true
+    # This should be created automatically by systemd-resolved
+    # but is currently blocked by SELinux
+    - name: systemd-resolved-link.service
+      enabled: true
+      contents: |
+        [Unit]
+        After=systemd-resolved.service
+        Before=network.target
+
+        [Service]
+        Type=oneshot
+        RemainAfterExit=true
+        ExecStart=/usr/bin/ln -sf /run/systemd/resolve/resolv.conf /etc/resolv.conf
+
+        [Install]
+        WantedBy=multi-user.target
 storage:
   files:
     # Appending seems to override the earlier hosts entry
