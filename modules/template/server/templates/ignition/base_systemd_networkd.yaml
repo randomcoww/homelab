@@ -31,15 +31,6 @@ systemd:
         WantedBy=multi-user.target
 storage:
   files:
-    - path: /etc/systemd/resolved.conf.d/05-disable-stub.conf
-      mode: 0644
-      contents:
-        inline: |
-          [Resolve]
-          FallbackDNS=
-          DNSStubListener=false
-          MulticastDNS=true
-          LLMNR=false
     # Appending seems to override the earlier hosts entry
     - path: /etc/nsswitch.conf
       append:

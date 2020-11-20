@@ -58,6 +58,19 @@ module "template-gateway" {
   }
 }
 
+module "template-ns" {
+  source = "../modules/template/ns"
+
+  user             = local.user
+  services         = local.services
+  domains          = local.domains
+  container_images = local.container_images
+  hosts = {
+    for k in local.components.ns.nodes :
+    k => local.aggr_hosts[k]
+  }
+}
+
 module "template-test" {
   source = "../modules/template/test"
 

@@ -15,6 +15,15 @@ systemd:
             ExecStart=/usr/sbin/fstrim --all --verbose --quiet
 storage:
   files:
+    - path: /etc/systemd/resolved.conf.d/05-disable-stub.conf
+      mode: 0644
+      contents:
+        inline: |
+          [Resolve]
+          FallbackDNS=
+          DNSStubListener=false
+          MulticastDNS=true
+          LLMNR=false
     - path: /etc/ssh/sshd_config.d/10-block-password.conf
       mode: 0644
       contents:

@@ -1,16 +1,14 @@
 locals {
   params = {
-    user                       = var.user
-    container_images           = var.container_images
-    loadbalancer_pools         = var.loadbalancer_pools
-    services                   = var.services
-    domains                    = var.domains
-    dns_forward_ip             = "9.9.9.9"
-    dns_forward_tls_servername = "dns.quad9.net"
-    kubelet_path               = "/var/lib/kubelet"
-    pod_mount_path             = "/var/lib/kubelet/podconfig"
-    kea_path                   = "/var/lib/kea"
-    kea_hooks_path             = "/usr/local/lib/kea/hooks"
+    user               = var.user
+    container_images   = var.container_images
+    loadbalancer_pools = var.loadbalancer_pools
+    services           = var.services
+    domains            = var.domains
+    kubelet_path       = "/var/lib/kubelet"
+    pod_mount_path     = "/var/lib/kubelet/podconfig"
+    kea_path           = "/var/lib/kea"
+    kea_hooks_path     = "/usr/local/lib/kea/hooks"
     kea_ha_peers = jsonencode([
       for k, v in var.hosts :
       {
@@ -28,8 +26,7 @@ locals {
     slave_default_route_priority  = 32780
     master_default_route_table    = 250
     master_default_route_priority = 32770
-    vrrp_dns_id                   = 50
-    vrrp_gateway_id               = 60
+    vrrp_id_base                  = 50
     dns_redirect_port             = 55353
   }
 }

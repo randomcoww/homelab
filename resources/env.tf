@@ -32,13 +32,6 @@ locals {
   }
 
   services = {
-    # local dev
-    local_renderer = {
-      ports = {
-        http = 8080
-        rpc  = 8081
-      }
-    }
     # hypervisor internal
     renderer = {
       vip = "192.168.224.1"
@@ -114,6 +107,12 @@ locals {
         node = 31802
       }
     }
+
+    # DNS forward
+    upstream_dns = {
+      vip = "9.9.9.9"
+      url = "dns.quad9.net"
+    }
   }
 
   domains = {
@@ -130,6 +129,8 @@ locals {
       nodes = [
         "gateway-0",
         "gateway-1",
+        "ns-0",
+        "ns-1",
         "controller-0",
         "controller-1",
         "controller-2",
@@ -164,6 +165,8 @@ locals {
       nodes = [
         "gateway-0",
         "gateway-1",
+        "ns-0",
+        "ns-1",
         "controller-0",
         "controller-1",
         "controller-2",
@@ -183,6 +186,8 @@ locals {
       nodes = [
         "gateway-0",
         "gateway-1",
+        "ns-0",
+        "ns-1",
         "controller-0",
         "controller-1",
         "controller-2",
@@ -212,6 +217,8 @@ locals {
       nodes = [
         "gateway-0",
         "gateway-1",
+        "ns-0",
+        "ns-1",
         "controller-0",
         "controller-1",
         "controller-2",
@@ -238,6 +245,8 @@ locals {
       nodes = [
         "gateway-0",
         "gateway-1",
+        "ns-0",
+        "ns-1",
         "controller-0",
         "controller-1",
         "controller-2",
@@ -253,6 +262,14 @@ locals {
         "gateway-1",
       ]
     }
+    ns = {
+      memory = 3
+      vcpu   = 1
+      nodes = [
+        "ns-0",
+        "ns-1",
+      ]
+    }
     controller = {
       memory = 5
       vcpu   = 2
@@ -263,7 +280,7 @@ locals {
       ]
     }
     worker = {
-      memory = 44
+      memory = 40
       vcpu   = 6
       nodes = [
         "worker-0",
@@ -341,11 +358,12 @@ locals {
   }
 
   hosts = {
+    # interface name should always start at ens2 and count up
+    # libvirt auto assigns interfaces starting at 00:02.0 and
+    # increments the slot for each element
+
     # gateway
     gateway-0 = {
-      # interface name should always start at ens2 and count up
-      # libvirt auto assigns interfaces starting at 00:02.0 and
-      # increments the slot for each element
       network = [
         {
           vlan = "main"
@@ -367,9 +385,9 @@ locals {
         {
           vlan = "wan"
           if   = "ens6"
-          # Duplicate this on gateways
-          mac  = "52-54-00-63-6e-b3"
           dhcp = true
+          # Duplicate this on gateways
+          mac = "52-54-00-63-6e-b3"
         },
       ]
       metadata = {
@@ -401,15 +419,57 @@ locals {
         {
           vlan = "wan"
           if   = "ens6"
-          # Duplicate this on gateways
-          mac  = "52-54-00-63-6e-b3"
           dhcp = true
+          # Duplicate this on gateways
+          mac = "52-54-00-63-6e-b3"
         },
       ]
       metadata = {
         vlan = "int"
         if   = "ens2"
         mac  = "52-54-00-1a-61-2b"
+      }
+      kea_ha_role = "secondary"
+    }
+
+    # nameserver and dhcp
+    ns-0 = {
+      network = [
+        {
+          vlan = "main"
+          ip   = "192.168.127.222"
+          if   = "ens3"
+        },
+        {
+          vlan = "lan"
+          ip   = "192.168.63.222"
+          if   = "ens4"
+        },
+      ]
+      metadata = {
+        vlan = "int"
+        if   = "ens2"
+        mac  = "52-54-00-1a-61-3a"
+      }
+      kea_ha_role = "primary"
+    }
+    ns-1 = {
+      network = [
+        {
+          vlan = "main"
+          ip   = "192.168.127.223"
+          if   = "ens3"
+        },
+        {
+          vlan = "lan"
+          ip   = "192.168.63.223"
+          if   = "ens4"
+        },
+      ]
+      metadata = {
+        vlan = "int"
+        if   = "ens2"
+        mac  = "52-54-00-1a-61-3b"
       }
       kea_ha_role = "secondary"
     }

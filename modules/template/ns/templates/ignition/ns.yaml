@@ -5,97 +5,27 @@ systemd:
   units:
     - name: nftables.service
       enabled: true
-    - name: keepalived.service
-      enabled: true
-      dropins:
-        - name: 10-dependency.conf
-          contents: |
-            [Unit]
-            Requires=nftables.service
-            PartOf=nftables.service
-
-            [Service]
-            EnvironmentFile=
-            Environment=KEEPALIVED_OPTIONS="-D -P"
 
 storage:
   files:
+    - path: /etc/systemd/network/20-${p.networks_by_key.main.if}.network.d/default-route.conf
+      mode: 0644
+      contents:
+        inline: |
+          [Route]
+          Gateway=${p.networks_by_key.main.router}
+          Destination=0.0.0.0/0
+
+          [Network]
+          DNS=${services.upstream_dns.vip}
+          DNSOverTLS=yes
+          Domains=~
     - path: /etc/systemd/resolved.conf.d/10-mdns-stub.conf
       mode: 0644
       contents:
         inline: |
           [Resolve]
           DNSStubListener=true
-    - path: /etc/systemd/network/20-${p.networks_by_key.sync.if}.network.d/backup-route.conf
-      mode: 0644
-      contents:
-        inline: |
-          [Route]
-          Gateway=${p.networks_by_key.sync.router}
-          Destination=0.0.0.0/0
-          Table=${slave_default_route_table}
-
-          [RoutingPolicyRule]
-          Table=${slave_default_route_table}
-          Priority=${slave_default_route_priority}
-    - path: /etc/systemd/network/20-${p.networks_by_key.wan.if}.network.d/gateway.conf
-      mode: 0644
-      contents:
-        inline: |
-          [Link]
-          RequiredForOnline=false
-
-          [DHCP]
-          UseDNS=false
-          UseNTP=false
-          SendHostname=false
-          UseHostname=false
-          UseDomains=false
-          UseTimezone=false
-          RouteTable=${master_default_route_table}
-
-          [Network]
-          DNS=${services.upstream_dns.vip}
-          DNSOverTLS=yes
-          Domains=~
-    - path: /etc/keepalived/keepalived.conf
-      mode: 0644
-      overwrite: true
-      contents:
-        inline: |-
-          global_defs {
-            vrrp_version 3
-            vrrp_iptables
-            nftables keepalived
-            dynamic_interfaces allow_if_changes
-          }
-          vrrp_sync_group VG_gateway {
-            group {
-              %{~ for v in p.network ~}
-              %{~ if lookup(v, "router", null) != null ~}
-              VI_gateway_${v.label}
-              %{~ endif ~}
-              %{~ endfor ~}
-            }
-          }
-          %{~ for i, v in p.network ~}
-          %{~ if lookup(v, "router", null) != null ~}
-          vrrp_instance VI_gateway_${v.label} {
-            no_accept
-            nopreempt
-            state BACKUP
-            virtual_router_id ${vrrp_id_base + 1 + i}
-            interface ${v.if}
-            priority 100
-            virtual_rules {
-              to all lookup ${master_default_route_table} priority ${master_default_route_priority}
-            }
-            virtual_ipaddress {
-              ${v.router}
-            }
-          }
-          %{~ endif ~}
-          %{~ endfor ~}
     - path: /etc/sysconfig/nftables.conf
       mode: 0644
       overwrite: true
@@ -110,52 +40,11 @@ storage:
           %{~ endif ~}
           %{~ endfor ~}
 
-          table ip filter {
-            chain base_checks {
-              ct state {established, related} accept;
-              ct state invalid drop;
-            }
-
-            chain input {
-              type filter hook input priority 0; policy drop;
-              jump base_checks;
-
-              iifname "lo" accept;
-              iifname != "lo" ip daddr 127.0.0.1/8 drop;
-
-              ip protocol icmp icmp type { echo-request, echo-reply, time-exceeded, parameter-problem, destination-unreachable } accept;
-
-              iifname != $if_wan tcp dport ${dns_redirect_port} accept;
-              iifname != $if_wan udp dport ${dns_redirect_port} accept;
-
-              ip saddr $addr_main accept;
-              ip saddr $addr_sync accept;
-              ip saddr $addr_lan udp sport bootps udp dport bootpc accept;
-              ip saddr $addr_lan pkttype multicast accept;
-            }
-
-            chain forward {
-              type filter hook forward priority 0; policy drop;
-              jump base_checks;
-
-              ip protocol icmp icmp type { echo-request, echo-reply, time-exceeded, parameter-problem, destination-unreachable } accept;
-
-              oifname $if_wan accept;
-              ip saddr $addr_main accept;
-              ip saddr $addr_lan ip daddr $addr_main tcp dport ssh accept;
-            }
-          }
-
           table ip nat {
             chain prerouting {
               type nat hook prerouting priority -100; policy accept;
-              iifname != $if_wan tcp dport domain redirect to ${dns_redirect_port};
-              iifname != $if_wan udp dport domain redirect to ${dns_redirect_port};
-            }
-
-            chain postrouting {
-              type nat hook postrouting priority 100; policy accept;
-              iifname != $if_wan oifname $if_wan masquerade;
+              tcp dport domain redirect to ${dns_redirect_port};
+              udp dport domain redirect to ${dns_redirect_port};
             }
           }
           ;
@@ -191,65 +80,6 @@ storage:
             cache 30
             reload
             loadbalance
-          }
-
-    - path: ${pod_mount_path}/conntrackd/conntrackd.conf
-      mode: 0644
-      contents:
-        inline: |-
-          Sync {
-            Mode FTFW {
-              StartupResync on
-              DisableExternalCache on
-            }
-
-            Multicast {
-              IPv4_address 225.0.0.50
-              Group 3780
-              IPv4_interface ${p.networks_by_key.sync.ip}
-              Interface ${p.networks_by_key.sync.if}
-              SndSocketBuffer 24985600
-              RcvSocketBuffer 24985600
-              Checksum on
-            }
-
-            Options {
-              TCPWindowTracking on
-              ExpectationSync on
-            }
-          }
-
-          General {
-            Systemd off
-            LogFile /dev/stdout
-            Syslog off
-            HashSize 32768
-            HashLimit 131072
-            NetlinkBufferSize 2097152
-            NetlinkBufferSizeMaxGrowth 8388608
-            NetlinkEventsReliable on
-
-            UNIX {
-              Path /var/run/conntrackd.ctl
-            }
-
-            Filter From Kernelspace {
-              Address Ignore {
-                IPv4_address 127.0.0.1
-                IPv4_address ${services.recursive_dns.vip}
-                IPv4_address ${p.networks_by_key.sync.network}/${p.networks_by_key.sync.cidr}
-                %{~ for k in p.network ~}
-                %{~ if lookup(k, "ip", null) != null ~}
-                IPv4_address ${k.ip}
-                %{~ endif ~}
-                %{~ endfor ~}
-                %{~ for k in p.network ~}
-                %{~ if lookup(k, "router", null) != null ~}
-                IPv4_address ${k.router}
-                %{~ endif ~}
-                %{~ endfor ~}
-              }
-            }
           }
 
     - path: ${pod_mount_path}/kea/kea-ctrl-agent.conf
@@ -369,7 +199,8 @@ storage:
           vrrp_instance VI_dns_main {
             nopreempt
             state BACKUP
-            virtual_router_id ${vrrp_id_base}
+            strict_mode off
+            virtual_router_id ${vrrp_id}
             interface ${p.networks_by_key.main.if}
             priority 100
             virtual_ipaddress {
@@ -495,34 +326,3 @@ storage:
             - name: config-keepalived
               hostPath:
                 path: ${pod_mount_path}/keepalived/keepalived.conf
-
-    - path: ${kubelet_path}/manifests/conntrackd.yaml
-      mode: 0644
-      contents:
-        inline: |-
-          ---
-          apiVersion: v1
-          kind: Pod
-          metadata:
-            namespace: kube-system
-            name: conntrackd
-          spec:
-            restartPolicy: Always
-            hostNetwork: true
-            containers:
-            - name: conntrackd
-              image: ${container_images.conntrackd}
-              args: [ "-C", "/etc/conntrackd/conntrackd.conf" ]
-              securityContext:
-                capabilities:
-                  add:
-                  - NET_ADMIN
-                  - SYS_NICE
-              volumeMounts:
-              - name: config-volume
-                mountPath: /etc/conntrackd/conntrackd.conf
-                readOnly: true
-            volumes:
-            - name: config-volume
-              hostPath:
-                path: ${pod_mount_path}/conntrackd/conntrackd.conf
