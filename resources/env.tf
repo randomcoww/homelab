@@ -41,7 +41,7 @@ locals {
       }
     }
 
-    # outside of kubernetes network
+    # gateway
     kea = {
       ports = {
         peer = 58082
@@ -59,6 +59,12 @@ locals {
         prometheus = 59153
       }
     }
+    upstream_dns = {
+      vip = "9.9.9.9"
+      url = "dns.quad9.net"
+    }
+
+    # Log capture
     loki = {
       vip = "192.168.126.126"
       ports = {
@@ -108,11 +114,7 @@ locals {
       }
     }
 
-    # DNS forward
-    upstream_dns = {
-      vip = "9.9.9.9"
-      url = "dns.quad9.net"
-    }
+
   }
 
   domains = {
