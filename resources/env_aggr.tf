@@ -122,7 +122,7 @@ locals {
     host => merge(
       params,
       {
-        hostname = join(".", [host, local.domains.mdns_main])
+        hostname = join(".", [host, local.domains.internal_mdns])
         hostdev  = lookup(params, "hostdev", [])
         disk = [
           for d in lookup(params, "disk", []) :

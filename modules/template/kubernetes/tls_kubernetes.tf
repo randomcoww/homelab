@@ -23,7 +23,7 @@ resource "tls_cert_request" "kubernetes" {
 
   ip_addresses = compact([
     "127.0.0.1",
-    lookup(each.value.networks_by_key.main, "ip", null),
+    lookup(each.value.networks_by_key.internal, "ip", null),
     var.services.kubernetes_service.vip,
     var.services.kubernetes_apiserver.vip,
   ])

@@ -8,12 +8,12 @@ systemd:
 
 storage:
   files:
-    - path: /etc/systemd/network/20-${p.networks_by_key.main.if}.network.d/default-route.conf
+    - path: /etc/systemd/network/20-${p.networks_by_key.internal.if}.network.d/default-route.conf
       mode: 0644
       contents:
         inline: |
           [Route]
-          Gateway=${p.networks_by_key.main.router}
+          Gateway=${p.networks_by_key.internal.router}
           Destination=0.0.0.0/0
 
           [Network]
@@ -65,7 +65,7 @@ storage:
             errors
             forward . ${services.internal_dns.vip}
           }
-          ${domains.mdns_main} {
+          ${domains.internal_mdns} {
             errors
             forward . 127.0.0.53
           }
@@ -196,12 +196,12 @@ storage:
             vrrp_iptables
             dynamic_interfaces allow_if_changes
           }
-          vrrp_instance VI_dns_main {
+          vrrp_instance VI_dns {
             nopreempt
             state BACKUP
             strict_mode off
             virtual_router_id ${vrrp_id}
-            interface ${p.networks_by_key.main.if}
+            interface ${p.networks_by_key.internal.if}
             priority 100
             virtual_ipaddress {
               ${services.recursive_dns.vip}

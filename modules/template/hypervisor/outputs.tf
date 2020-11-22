@@ -16,7 +16,7 @@ output "matchbox_rpc_endpoints" {
   value = {
     for host, params in var.hosts :
     host => {
-      endpoint        = "${params.networks_by_key.main.ip}:${var.services.renderer.ports.rpc}"
+      endpoint        = "${params.networks_by_key.internal.ip}:${var.services.renderer.ports.rpc}"
       cert_pem        = tls_locally_signed_cert.matchbox-client.cert_pem
       private_key_pem = tls_private_key.matchbox-client.private_key_pem
       ca_pem          = tls_self_signed_cert.matchbox-ca.cert_pem
@@ -28,7 +28,7 @@ output "libvirt_endpoints" {
   value = {
     for host, params in var.hosts :
     host => {
-      endpoint        = "qemu://${params.networks_by_key.main.ip}/system"
+      endpoint        = "qemu://${params.networks_by_key.internal.ip}/system"
       cert_pem        = tls_locally_signed_cert.libvirt-client.cert_pem
       private_key_pem = tls_private_key.libvirt-client.private_key_pem
       ca_pem          = tls_self_signed_cert.libvirt-ca.cert_pem

@@ -143,12 +143,12 @@ storage:
             vrrp_iptables
             dynamic_interfaces allow_if_changes
           }
-          vrrp_instance VI_kube-master_main {
+          vrrp_instance VI_kube-master {
             nopreempt
             state BACKUP
             strict_mode off
             virtual_router_id ${vrrp_id}
-            interface ${p.networks_by_key.main.if}
+            interface ${p.networks_by_key.internal.if}
             priority 100
             virtual_ipaddress {
               ${services.kubernetes_apiserver.vip}
@@ -209,7 +209,7 @@ storage:
               - name: AWS_SDK_LOAD_CONFIG
                 value: "1"
               - name: INTERNAL_IP
-                value: ${p.networks_by_key.main.ip}
+                value: ${p.networks_by_key.internal.ip}
                 # valueFrom:
                 #   fieldRef:
                 #     fieldPath: status.hostIP
@@ -333,7 +333,7 @@ storage:
               image: ${container_images.kube_controller_manager}
               command:
               - kube-controller-manager
-              - "--address=0.0.0.0"
+              - "--bind-address=0.0.0.0"
               - "--cluster-cidr=${networks.kubernetes.network}/${networks.kubernetes.cidr}"
               - "--allocate-node-cidrs=true"
               - "--cluster-name=${cluster_name}"

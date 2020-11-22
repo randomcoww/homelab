@@ -13,7 +13,7 @@ locals {
       {
         name          = v.hostname
         role          = lookup(v, "kea_ha_role", "backup")
-        url           = "http://${v.networks_by_key.main.ip}:${var.services.kea.ports.peer}/"
+        url           = "http://${v.networks_by_key.internal.ip}:${var.services.kea.ports.peer}/"
         auto-failover = true
       }
     ])

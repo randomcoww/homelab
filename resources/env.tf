@@ -119,8 +119,8 @@ locals {
 
   domains = {
     internal           = "fuzzybunny.internal"
+    internal_mdns      = "local"
     kubernetes_cluster = "cluster.internal"
-    mdns_main          = "local"
   }
 
   components = {
@@ -154,8 +154,8 @@ locals {
         "rootfs.img",
       ]
       metadata = {
-        vlan = "int"
-        if   = "en-int"
+        vlan = "metadata"
+        if   = "en-md"
         ip   = local.services.renderer.vip
       }
     }
@@ -304,7 +304,7 @@ locals {
 
   networks = {
     # management
-    main = {
+    internal = {
       id        = 1
       network   = "192.168.126.0"
       cidr      = 23
@@ -333,7 +333,7 @@ locals {
       id = 30
     }
     # internal network on each hypervisor for PXE bootstrap
-    int = {
+    metadata = {
       network   = "192.168.224.0"
       cidr      = 23
       dhcp_pool = "192.168.225.64/26"
@@ -365,7 +365,7 @@ locals {
     gateway-0 = {
       network = [
         {
-          vlan = "main"
+          vlan = "internal"
           ip   = "192.168.127.217"
           if   = "ens3"
         },
@@ -390,7 +390,7 @@ locals {
         },
       ]
       metadata = {
-        vlan = "int"
+        vlan = "metadata"
         if   = "ens2"
         mac  = "52-54-00-1a-61-2a"
       }
@@ -399,7 +399,7 @@ locals {
     gateway-1 = {
       network = [
         {
-          vlan = "main"
+          vlan = "internal"
           ip   = "192.168.127.218"
           if   = "ens3"
         },
@@ -424,7 +424,7 @@ locals {
         },
       ]
       metadata = {
-        vlan = "int"
+        vlan = "metadata"
         if   = "ens2"
         mac  = "52-54-00-1a-61-2b"
       }
@@ -435,7 +435,7 @@ locals {
     ns-0 = {
       network = [
         {
-          vlan = "main"
+          vlan = "internal"
           ip   = "192.168.127.222"
           if   = "ens3"
         },
@@ -446,7 +446,7 @@ locals {
         },
       ]
       metadata = {
-        vlan = "int"
+        vlan = "metadata"
         if   = "ens2"
         mac  = "52-54-00-1a-61-3a"
       }
@@ -455,7 +455,7 @@ locals {
     ns-1 = {
       network = [
         {
-          vlan = "main"
+          vlan = "internal"
           ip   = "192.168.127.223"
           if   = "ens3"
         },
@@ -466,7 +466,7 @@ locals {
         },
       ]
       metadata = {
-        vlan = "int"
+        vlan = "metadata"
         if   = "ens2"
         mac  = "52-54-00-1a-61-3b"
       }
@@ -477,14 +477,14 @@ locals {
     controller-0 = {
       network = [
         {
-          vlan = "main"
+          vlan = "internal"
           ip   = "192.168.127.219"
           if   = "ens3"
           dhcp = true
         },
       ]
       metadata = {
-        vlan = "int"
+        vlan = "metadata"
         if   = "ens2"
         mac  = "52-54-00-1a-61-0a"
       }
@@ -492,14 +492,14 @@ locals {
     controller-1 = {
       network = [
         {
-          vlan = "main"
+          vlan = "internal"
           ip   = "192.168.127.220"
           if   = "ens3"
           dhcp = true
         },
       ]
       metadata = {
-        vlan = "int"
+        vlan = "metadata"
         if   = "ens2"
         mac  = "52-54-00-1a-61-0b"
       }
@@ -507,14 +507,14 @@ locals {
     controller-2 = {
       network = [
         {
-          vlan = "main"
+          vlan = "internal"
           ip   = "192.168.127.221"
           if   = "ens3"
           dhcp = true
         },
       ]
       metadata = {
-        vlan = "int"
+        vlan = "metadata"
         if   = "ens2"
         mac  = "52-54-00-1a-61-0c"
       }
@@ -524,13 +524,13 @@ locals {
     worker-0 = {
       network = [
         {
-          vlan = "main"
+          vlan = "internal"
           if   = "ens3"
           dhcp = true
         },
       ]
       metadata = {
-        vlan = "int"
+        vlan = "metadata"
         if   = "ens2"
         mac  = "52-54-00-1a-61-1a"
       }
@@ -611,13 +611,13 @@ locals {
     worker-1 = {
       network = [
         {
-          vlan = "main"
+          vlan = "internal"
           if   = "ens3"
           dhcp = true
         },
       ]
       metadata = {
-        vlan = "int"
+        vlan = "metadata"
         if   = "ens2"
         mac  = "52-54-00-1a-61-1b"
       }
@@ -633,13 +633,13 @@ locals {
     test-0 = {
       network = [
         {
-          vlan = "main"
+          vlan = "internal"
           if   = "ens3"
           dhcp = true
         },
       ]
       metadata = {
-        vlan = "int"
+        vlan = "metadata"
         if   = "ens2"
         mac  = "52-54-00-1a-61-3a"
       }
@@ -656,8 +656,8 @@ locals {
       ]
       network = [
         {
-          vlan = "main"
-          if   = "en-main"
+          vlan = "internal"
+          if   = "en-int"
           ip   = "192.168.127.251"
           dhcp = true
           hwif = "pf0"
@@ -707,8 +707,8 @@ locals {
       ]
       network = [
         {
-          vlan = "main"
-          if   = "en-main"
+          vlan = "internal"
+          if   = "en-int"
           ip   = "192.168.127.252"
           dhcp = true
           hwif = "pf0"
@@ -765,8 +765,8 @@ locals {
       ]
       network = [
         {
-          vlan = "main"
-          if   = "en-main"
+          vlan = "internal"
+          if   = "en-int"
           ip   = "192.168.127.253"
           hwif = "pf0"
         },
@@ -791,7 +791,7 @@ locals {
     switch-0 = {
       network = [
         {
-          vlan = "main"
+          vlan = "internal"
           ip   = "192.168.127.60"
           mac  = "50-c7-bf-60-78-22"
         },
@@ -800,7 +800,7 @@ locals {
     ipmi-0 = {
       network = [
         {
-          vlan = "main"
+          vlan = "internal"
           ip   = "192.168.127.62"
           mac  = "ac-1f-6b-86-06-82"
         },
@@ -809,7 +809,7 @@ locals {
     ipmi-1 = {
       network = [
         {
-          vlan = "main"
+          vlan = "internal"
           ip   = "192.168.127.61"
           mac  = "ac-1f-6b-ae-76-60"
         },

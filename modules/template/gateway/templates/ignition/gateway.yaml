@@ -83,7 +83,7 @@ storage:
             virtual_ipaddress {
               %{~ for i, v in p.network ~}
               %{~ if lookup(v, "router", null) != null ~}
-              ${v.router} dev ${v.if}
+              ${v.router}/${v.cidr} dev ${v.if}
               %{~ endif ~}
               %{~ endfor ~}
             }
@@ -120,7 +120,7 @@ storage:
               iifname != $if_wan tcp dport ${dns_redirect_port} accept;
               iifname != $if_wan udp dport ${dns_redirect_port} accept;
 
-              ip saddr $addr_main accept;
+              ip saddr $addr_internal accept;
               ip saddr $addr_sync accept;
               ip saddr $addr_lan udp sport bootps udp dport bootpc accept;
               ip saddr $addr_lan pkttype multicast accept;
@@ -133,8 +133,8 @@ storage:
               ip protocol icmp icmp type { echo-request, echo-reply, time-exceeded, parameter-problem, destination-unreachable } accept;
 
               oifname $if_wan accept;
-              ip saddr $addr_main accept;
-              ip saddr $addr_lan ip daddr $addr_main tcp dport ssh accept;
+              ip saddr $addr_internal accept;
+              ip saddr $addr_lan ip daddr $addr_internal tcp dport ssh accept;
             }
           }
 
@@ -168,7 +168,7 @@ storage:
             errors
             forward . ${services.internal_dns.vip}
           }
-          ${domains.mdns_main} {
+          ${domains.internal_mdns} {
             errors
             forward . 127.0.0.53
           }
@@ -279,7 +279,7 @@ storage:
                 "interfaces": ${jsonencode([
                   for k in p.network:
                   k.if
-                  if lookup(k, "dhcp_pool", null) != null && lookup(k, "router", null) != null && lookup(k, "ip", null) != null
+                  if lookup(k, "dhcp_pool", null) != null && lookup(k, "router", null) != null
                 ])}
               },
               "control-socket": {
@@ -337,7 +337,7 @@ storage:
                     }
                   ]
                 }
-                if lookup(k, "dhcp_pool", null) != null && lookup(k, "router", null) != null && lookup(k, "ip", null) != null
+                if lookup(k, "dhcp_pool", null) != null && lookup(k, "router", null) != null
               ])},
               "dhcp-ddns": {
                 "enable-updates": true,
@@ -358,11 +358,11 @@ storage:
             vrrp_iptables
             dynamic_interfaces allow_if_changes
           }
-          vrrp_instance VI_dns_main {
+          vrrp_instance VI_dns {
             nopreempt
             state BACKUP
             virtual_router_id ${vrrp_id_base}
-            interface ${p.networks_by_key.main.if}
+            interface ${p.networks_by_key.internal.if}
             priority 100
             virtual_ipaddress {
               ${services.recursive_dns.vip}
