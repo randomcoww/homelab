@@ -40,6 +40,14 @@ storage:
           %{~ endif ~}
           %{~ endfor ~}
 
+          table ip filter {
+            chain input {
+              type filter hook input priority 0; policy accept;
+              # ip saddr $addr_lan udp sport bootps udp dport bootpc accept;
+              # ip saddr $addr_lan pkttype multicast accept;
+            }
+          }
+
           table ip nat {
             chain prerouting {
               type nat hook prerouting priority -100; policy accept;
@@ -57,15 +65,15 @@ storage:
       mode: 0644
       contents:
         inline: |-
-          ${domains.internal} {
+          ${domains.internal}. {
             errors
             forward . ${services.internal_dns.vip}
           }
-          ${domains.kubernetes_cluster} {
+          ${domains.kubernetes_cluster}. {
             errors
             forward . ${services.internal_dns.vip}
           }
-          ${domains.internal_mdns} {
+          ${domains.internal_mdns}. {
             errors
             forward . 127.0.0.53
           }
@@ -117,7 +125,7 @@ storage:
                 "interfaces": ${jsonencode([
                   for k in p.network:
                   k.if
-                  if lookup(k, "dhcp_pool", null) != null && lookup(k, "router", null) != null && lookup(k, "ip", null) != null
+                  if lookup(k, "dhcp_pool", null) != null && lookup(k, "ip", null) != null
                 ])}
               },
               "control-socket": {
@@ -158,12 +166,12 @@ storage:
                 for k in p.network:
                 {
                   subnet = "${k.network}/${k.cidr}",
-                  option-data = concat([
+                  option-data = concat( lookup(k, "router", null) != null ? [
                     {
                       name = "routers"
                       data = k.router
                     }
-                  ], lookup(k, "mtu", null) != null ? [
+                  ] : [], lookup(k, "mtu", null) != null ? [
                     {
                       name = "interface-mtu"
                       data = format("%s", k.mtu)
@@ -175,7 +183,7 @@ storage:
                     }
                   ]
                 }
-                if lookup(k, "dhcp_pool", null) != null && lookup(k, "router", null) != null && lookup(k, "ip", null) != null
+                if lookup(k, "dhcp_pool", null) != null && lookup(k, "ip", null) != null
               ])},
               "dhcp-ddns": {
                 "enable-updates": true,

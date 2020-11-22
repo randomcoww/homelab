@@ -303,7 +303,16 @@ locals {
   }
 
   networks = {
-    # management
+    # main
+    lan = {
+      id        = 90
+      network   = "192.168.62.0"
+      cidr      = 23
+      router    = "192.168.62.240"
+      dhcp_pool = "192.168.63.64/26"
+      mtu       = 9000
+    }
+    # services
     internal = {
       id        = 1
       network   = "192.168.126.0"
@@ -313,15 +322,7 @@ locals {
       mdns      = true
       mtu       = 9000
     }
-    lan = {
-      id        = 90
-      network   = "192.168.62.0"
-      cidr      = 23
-      router    = "192.168.62.240"
-      dhcp_pool = "192.168.63.64/26"
-      mtu       = 9000
-    }
-    # gateway state sync
+    # gateway conntrack sync and backup route
     sync = {
       id      = 60
       network = "192.168.190.0"
@@ -371,7 +372,6 @@ locals {
         },
         {
           vlan = "lan"
-          ip   = "192.168.63.217"
           if   = "ens4"
           # Duplicate this on gateways
           mac = "00-00-5e-00-01-3d"
@@ -405,7 +405,6 @@ locals {
         },
         {
           vlan = "lan"
-          ip   = "192.168.63.218"
           if   = "ens4"
           # Duplicate this on gateways
           mac = "00-00-5e-00-01-3d"
@@ -671,6 +670,10 @@ locals {
           hwif = "pf0",
         },
         {
+          node = "ns-0",
+          hwif = "pf0",
+        },
+        {
           node = "controller-0",
           hwif = "pf0",
         },
@@ -719,6 +722,10 @@ locals {
       libvirt_domains = [
         {
           node = "gateway-1",
+          hwif = "pf0",
+        },
+        {
+          node = "ns-1",
           hwif = "pf0",
         },
         {
