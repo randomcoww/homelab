@@ -132,6 +132,10 @@ buildtool terraform output kubeconfig > ~/.kube/config
 
 https://metallb.universe.tf/installation/#installation-by-manifest
 
+```bash
+kubectl apply -f https://raw.githubusercontent.com/metallb/metallb/main/manifests/metallb.yaml
+```
+
 #### Traefik
 
 ```bash
