@@ -1,0 +1,58 @@
+apiVersion: "openebs.io/v1alpha1"
+kind: MayastorPool
+metadata:
+  name: worker-0-malloc0
+  namespace: mayastor
+spec:
+  node: worker-0.local
+  disks: ["malloc:///malloc0?size_mb=8191&blk_size=4096"]
+
+---
+apiVersion: "openebs.io/v1alpha1"
+kind: MayastorPool
+metadata:
+  name: worker-0-malloc1
+  namespace: mayastor
+spec:
+  node: worker-0.local
+  disks: ["malloc:///malloc1?size_mb=8191&blk_size=4096"]
+
+---
+apiVersion: "openebs.io/v1alpha1"
+kind: MayastorPool
+metadata:
+  name: worker-0-malloc2
+  namespace: mayastor
+spec:
+  node: worker-0.local
+  disks: ["malloc:///malloc2?size_mb=8191&blk_size=4096"]
+
+---
+apiVersion: "openebs.io/v1alpha1"
+kind: MayastorPool
+metadata:
+  name: worker-1-malloc0
+  namespace: mayastor
+spec:
+  node: worker-1.local
+  disks: ["malloc:///malloc0?size_mb=8191&blk_size=4096"]
+
+---
+apiVersion: "openebs.io/v1alpha1"
+kind: MayastorPool
+metadata:
+  name: worker-1-malloc1
+  namespace: mayastor
+spec:
+  node: worker-1.local
+  disks: ["malloc:///malloc1?size_mb=8191&blk_size=4096"]
+
+---
+apiVersion: "openebs.io/v1alpha1"
+kind: MayastorPool
+metadata:
+  name: worker-1-malloc2
+  namespace: mayastor
+spec:
+  node: worker-1.local
+  disks: ["malloc:///malloc2?size_mb=8191&blk_size=4096"]
