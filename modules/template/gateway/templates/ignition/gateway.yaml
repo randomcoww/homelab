@@ -65,7 +65,8 @@ storage:
             dynamic_interfaces allow_if_changes
           }
           vrrp_instance VI_gateway {
-            no_accept
+            # This makes the VIP inaccessible on host
+            # no_accept
             nopreempt
             state BACKUP
             virtual_router_id ${vrrp_id}
@@ -115,13 +116,13 @@ storage:
 
               ip protocol icmp icmp type { echo-request, echo-reply, time-exceeded, parameter-problem, destination-unreachable } accept;
 
-              ip saddr $addr_internal accept;
-              ip saddr $addr_sync accept;
-              ip saddr $addr_lan pkttype multicast accept;
+              iifname $if_internal accept;
+              iifname $if_sync accept;
+              iifname $if_lan pkttype multicast accept;
 
-              ip saddr $addr_lan ip daddr $addr_internal tcp dport ssh accept;
-              ip saddr $addr_lan ip daddr $addr_internal tcp dport domain accept;
-              ip saddr $addr_lan ip daddr $addr_internal udp dport domain accept;
+              iifname $if_lan oifname $if_internal tcp dport ssh accept;
+              iifname $if_lan oifname $if_internal tcp dport domain accept;
+              iifname $if_lan oifname $if_internal udp dport domain accept;
             }
 
             chain forward {
@@ -131,9 +132,10 @@ storage:
               ip protocol icmp icmp type { echo-request, echo-reply, time-exceeded, parameter-problem, destination-unreachable } accept;
 
               oifname $if_wan accept;
-              ip saddr $addr_lan ip daddr $addr_internal tcp dport ssh accept;
-              ip saddr $addr_lan ip daddr $addr_internal tcp dport domain accept;
-              ip saddr $addr_lan ip daddr $addr_internal udp dport domain accept;
+
+              iifname $if_lan oifname $if_internal tcp dport ssh accept;
+              iifname $if_lan oifname $if_internal tcp dport domain accept;
+              iifname $if_lan oifname $if_internal udp dport domain accept;
             }
           }
 
