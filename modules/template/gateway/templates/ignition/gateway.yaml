@@ -100,6 +100,9 @@ storage:
           define if_${v.label} = ${v.if}
           %{~ endif ~}
           %{~ endfor ~}
+          %{~ for k, v in loadbalancer_pools ~}
+          define lb_${k} = ${v.network}/${v.cidr}
+          %{~ endfor ~}
 
           table ip filter {
             chain base_checks {
@@ -123,6 +126,7 @@ storage:
               iifname $if_lan oifname $if_internal tcp dport ssh accept;
               iifname $if_lan oifname $if_internal tcp dport domain accept;
               iifname $if_lan oifname $if_internal udp dport domain accept;
+              iifname $if_lan ip daddr $lb_kubernetes accept;
             }
 
             chain forward {
@@ -136,6 +140,7 @@ storage:
               iifname $if_lan oifname $if_internal tcp dport ssh accept;
               iifname $if_lan oifname $if_internal tcp dport domain accept;
               iifname $if_lan oifname $if_internal udp dport domain accept;
+              iifname $if_lan ip daddr $lb_kubernetes accept;
             }
           }
 
