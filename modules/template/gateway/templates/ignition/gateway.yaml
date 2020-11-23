@@ -77,7 +77,11 @@ storage:
             virtual_ipaddress {
               %{~ for i, v in p.network ~}
               %{~ if lookup(v, "router", null) != null ~}
+              %{~ if lookup(v, "ip", null) != null ~}
+              ${v.router} dev ${v.if}
+              %{~ else ~}
               ${v.router}/${v.cidr} dev ${v.if}
+              %{~ endif ~}
               %{~ endif ~}
               %{~ endfor ~}
             }

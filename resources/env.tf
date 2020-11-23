@@ -113,8 +113,6 @@ locals {
         node = 31802
       }
     }
-
-
   }
 
   domains = {
