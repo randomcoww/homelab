@@ -268,7 +268,7 @@ locals {
       ]
     }
     controller = {
-      memory = 5
+      memory = 6
       vcpu   = 2
       nodes = [
         "controller-0",
@@ -277,8 +277,8 @@ locals {
       ]
     }
     worker = {
-      memory = 40
-      vcpu   = 6
+      memory = 36
+      vcpu   = 4
       nodes = [
         "worker-0",
         "worker-1",
