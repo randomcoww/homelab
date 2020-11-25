@@ -127,6 +127,7 @@ storage:
               iifname $if_lan oifname $if_internal tcp dport domain accept;
               iifname $if_lan oifname $if_internal udp dport domain accept;
               iifname $if_lan ip daddr $lb_kubernetes accept;
+              # tcp dport 8080 accept;
             }
 
             chain forward {
@@ -141,10 +142,16 @@ storage:
               iifname $if_lan oifname $if_internal tcp dport domain accept;
               iifname $if_lan oifname $if_internal udp dport domain accept;
               iifname $if_lan ip daddr $lb_kubernetes accept;
+              # tcp dport 8080 accept;
             }
           }
 
           table ip nat {
+            # chain prerouting {
+            #   type nat hook prerouting priority -100; policy accept;
+            #   iifname $if_wan tcp dport 8080 dnat 192.168.126.71:8080;
+            # }
+
             chain postrouting {
               type nat hook postrouting priority 100; policy accept;
               iifname != $if_wan oifname $if_wan masquerade;
