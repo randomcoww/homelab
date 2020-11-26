@@ -44,6 +44,10 @@ systemd:
           -v ${kubelet_path}:${kubelet_path}:rshared,z \
           -v /var/log:/var/log \
           -v /var/run/lock:/var/run/lock:z"
+        Environment=KUBELET_COMMON_ARGS="--exit-on-lock-contention \
+          --lock-file=/var/run/lock/kubelet.lock \
+          --container-runtime=remote \
+          --container-runtime-endpoint=unix:///var/run/dockershim.sock"
         ExecStartPre=/usr/bin/mkdir -p \
           ${kubelet_path} \
           /var/log/containers \
@@ -54,12 +58,9 @@ systemd:
           $KUBELET_PODMAN_OPTS \
           ${container_images.kubelet} \
             kubelet \
+              $KUBELET_COMMON_ARGS \
               --config=${kubelet_path}/kubelet-config-common.yaml \
-              --register-node=false \
-              --exit-on-lock-contention \
-              --lock-file=/var/run/lock/kubelet.lock \
-              --container-runtime=remote \
-              --container-runtime-endpoint=unix:///var/run/dockershim.sock
+              --register-node=false
         Restart=always
         RestartSec=10
         Delegate=true

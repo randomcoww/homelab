@@ -20,16 +20,13 @@ systemd:
               $KUBELET_PODMAN_OPTS \
               ${container_images.hyperkube} \
                 kubelet \
+                  $KUBELET_COMMON_ARGS \
                   --config=${kubelet_path}/kubelet-config-worker.yaml \
-                  --exit-on-lock-contention \
-                  --lock-file=/var/run/lock/kubelet.lock \
                   --kubeconfig=${kubelet_path}/kubelet.kubeconfig \
                   --bootstrap-kubeconfig=${kubelet_path}/bootstrap.kubeconfig \
                   --network-plugin=cni \
                   --cert-dir=${kubelet_path} \
                   --volume-plugin-dir=${kubelet_path}/volumeplugins \
-                  --container-runtime=remote \
-                  --container-runtime-endpoint=unix:///var/run/dockershim.sock \
                   --node-labels=${join(",", [
                     for k, v in  lookup(p, "node_labels", {}) :
                     "${k}=${v}"

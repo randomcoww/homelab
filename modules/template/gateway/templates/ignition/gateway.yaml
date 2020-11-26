@@ -61,8 +61,10 @@ storage:
           global_defs {
             vrrp_version 2
             vrrp_iptables
+            vrrp_garp_master_refresh 60
             nftables keepalived
             dynamic_interfaces allow_if_changes
+            max_auto_priority -1
           }
           vrrp_instance VI_gateway {
             # This makes the VIP inaccessible on host
@@ -71,7 +73,7 @@ storage:
             state BACKUP
             virtual_router_id ${vrrp_id}
             interface ${p.networks_by_key.sync.if}
-            priority 100
+            priority 10
             virtual_rules {
               to all lookup ${master_default_route_table} priority ${master_default_route_priority}
             }
@@ -85,6 +87,7 @@ storage:
               %{~ endif ~}
               %{~ endif ~}
               %{~ endfor ~}
+              0.0.0.0 dev ${p.networks_by_key.wan.if}
             }
           }
     - path: /etc/sysconfig/nftables.conf
@@ -127,7 +130,7 @@ storage:
               iifname $if_lan oifname $if_internal tcp dport domain accept;
               iifname $if_lan oifname $if_internal udp dport domain accept;
               iifname $if_lan ip daddr $lb_kubernetes accept;
-              # tcp dport 8080 accept;
+              oifname $if_internal ip daddr ${services.external_dnat.vip} tcp dport ${services.external_dnat.ports.https} accept;
             }
 
             chain forward {
@@ -142,15 +145,15 @@ storage:
               iifname $if_lan oifname $if_internal tcp dport domain accept;
               iifname $if_lan oifname $if_internal udp dport domain accept;
               iifname $if_lan ip daddr $lb_kubernetes accept;
-              # tcp dport 8080 accept;
+              oifname $if_internal ip daddr ${services.external_dnat.vip} tcp dport ${services.external_dnat.ports.https} accept;
             }
           }
 
           table ip nat {
-            # chain prerouting {
-            #   type nat hook prerouting priority -100; policy accept;
-            #   iifname $if_wan tcp dport 8080 dnat 192.168.126.71:8080;
-            # }
+            chain prerouting {
+              type nat hook prerouting priority -100; policy accept;
+              iifname $if_wan tcp dport ${services.external_dnat.ports.https} dnat ${services.external_dnat.vip}:${services.external_dnat.ports.https};
+            }
 
             chain postrouting {
               type nat hook postrouting priority 100; policy accept;

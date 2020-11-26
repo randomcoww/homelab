@@ -92,6 +92,14 @@ locals {
       }
     }
 
+    # externally forwarded to internal IP
+    external_dnat = {
+      vip = "192.168.94.125"
+      ports = {
+        https = 8080
+      }
+    }
+
     # nodePort and clusterIP must be specified for LB services to work with
     # the terraform kubernetes-alpha provider. Probably a bug?
     # TODO: Remove once not needed by provider
