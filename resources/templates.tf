@@ -106,6 +106,16 @@ module "template-client" {
   }
 }
 
+module "template-laptop" {
+  source = "../modules/template/laptop"
+
+  swap_device = "/dev/disk/by-label/swap"
+  hosts = {
+    for k in local.components.client.nodes :
+    k => local.aggr_hosts[k]
+  }
+}
+
 module "template-hypervisor" {
   source = "../modules/template/hypervisor"
 

@@ -145,6 +145,7 @@ locals {
         "kvm-1",
         "test-0",
         "client-0",
+        "client-1",
       ]
     }
     # coreos hypervisor
@@ -207,6 +208,7 @@ locals {
     client = {
       nodes = [
         "client-0",
+        "client-1",
       ]
       disk = [
         {
@@ -216,6 +218,11 @@ locals {
       ]
       client_user     = local.client_user
       client_user_uid = 10000
+    }
+    laptop = {
+      nodes = [
+        "client-1",
+      ]
     }
     # server certs for SSH CA
     ssh_server = {
@@ -237,12 +244,14 @@ locals {
     ssh_client = {
       nodes = [
         "client-0",
+        "client-1",
       ]
     }
     # cert for fuzzybunny.internal
     ingress = {
       nodes = [
         "client-0",
+        "client-1",
       ]
     }
     # promtail to push logs to loki (non kubernetes containerd hosts)
@@ -799,6 +808,8 @@ locals {
         }
       ]
     }
+    client-1 = {
+    }
 
     # unmanaged hardware
     switch-0 = {
@@ -836,5 +847,6 @@ locals {
     "kvm-0",
     "kvm-1",
     "client-0",
+    "client-1",
   ]
 }

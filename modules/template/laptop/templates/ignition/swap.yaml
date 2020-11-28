@@ -9,7 +9,6 @@ systemd:
         [Unit]
         ConditionVirtualization=!vm
         ConditionVirtualization=!container
-        ConditionKernelCommandLine=resume
 
         [Swap]
         What=${swap_device}

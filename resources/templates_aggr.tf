@@ -13,6 +13,7 @@ locals {
       lookup(module.template-hypervisor, "ignition", {}),
       lookup(module.template-vm, "ignition", {}),
       lookup(module.template-client, "ignition", {}),
+      lookup(module.template-laptop, "ignition", {}),
       lookup(module.template-server, "ignition", {}),
       lookup(module.template-base, "ignition", {}),
     ] :
