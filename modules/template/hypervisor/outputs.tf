@@ -10,6 +10,14 @@ locals {
     matchbox_assets_path = "/etc/matchbox/assets"
     libvirt_tls_path     = "/etc/pki"
   }
+
+  domain_templates = {
+    "coreos" = "${path.module}/templates/libvirt/domain_coreos.xml"
+  }
+
+  network_templates = {
+    "vf" = "${path.module}/templates/libvirt/network_vf.xml"
+  }
 }
 
 output "matchbox_rpc_endpoints" {
@@ -59,7 +67,7 @@ output "libvirt_domain" {
     for host, params in var.hosts :
     host => {
       for guest in params.libvirt_domains :
-      guest.node => chomp(templatefile("${path.module}/templates/libvirt/domain_coreos.xml", {
+      guest.node => chomp(templatefile(local.domain_templates[lookup(guest, "type", "coreos")], {
         p    = params
         g    = guest.host
         hwif = guest.hwif
@@ -73,7 +81,7 @@ output "libvirt_network" {
     for host, params in var.hosts :
     host => {
       for if in params.hwif :
-      if.label => chomp(templatefile("${path.module}/templates/libvirt/network_vf.xml", {
+      if.label => chomp(templatefile(local.network_templates[lookup(if, "type", "vf")], {
         p = params
         i = if
       }))
