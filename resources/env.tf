@@ -377,6 +377,9 @@ locals {
 
     # gateway
     gateway-0 = {
+      # Duplicate MAC VRRP (e.g. keepalived) do not work for IP traffic from other VFs on the same NIC.
+      # If a MAC exists on another VF on the same hardware, it seems to bypass the switch and get priority
+      # over other MACs on the same network even if the VF has no IP.
       network = [
         {
           vlan = "internal"
