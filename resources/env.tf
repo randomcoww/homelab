@@ -257,8 +257,6 @@ locals {
     # promtail to push logs to loki (non kubernetes containerd hosts)
     static_pod_logging = {
       nodes = [
-        "gateway-0",
-        "gateway-1",
         "ns-0",
         "ns-1",
         "controller-0",
