@@ -209,7 +209,6 @@ storage:
             Filter From Kernelspace {
               Address Ignore {
                 IPv4_address 127.0.0.1
-                IPv4_address ${services.recursive_dns.vip}
                 IPv4_address ${p.networks_by_key.sync.network}/${p.networks_by_key.sync.cidr}
                 %{~ for k in p.network ~}
                 %{~ if lookup(k, "ip", null) != null ~}
