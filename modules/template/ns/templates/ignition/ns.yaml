@@ -205,7 +205,7 @@ storage:
             dynamic_interfaces allow_if_changes
             max_auto_priority -1
           }
-          vrrp_instance VI_dns {
+          vrrp_instance VI_ns {
             nopreempt
             state BACKUP
             strict_mode off

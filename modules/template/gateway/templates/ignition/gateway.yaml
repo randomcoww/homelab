@@ -66,6 +66,11 @@ storage:
             dynamic_interfaces allow_if_changes
             max_auto_priority -1
           }
+          vrrp_sync_group VG_gateway {
+            group {
+              VI_gateway
+            }
+          }
           vrrp_instance VI_gateway {
             # This makes the VIP inaccessible on host
             # no_accept
