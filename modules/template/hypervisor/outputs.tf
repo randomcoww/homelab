@@ -57,6 +57,12 @@ output "ignition" {
         tls_libvirt_ca   = tls_self_signed_cert.libvirt-ca.cert_pem
         tls_libvirt      = tls_locally_signed_cert.libvirt[host].cert_pem
         tls_libvirt_key  = tls_private_key.libvirt[host].private_key_pem
+        # Apply max_vfs through /sys/class/net/<dev>/devices/sriov_numvfs
+        sriov_numvfs = {
+          "igb"   = 7
+          "ixgbe" = 16
+          "i40e"  = 16
+        }
       }))
     ]
   }

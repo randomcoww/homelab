@@ -8,12 +8,12 @@ systemd:
 
 storage:
   files:
-    - path: /etc/systemd/network/20-${p.networks_by_key.internal.if}.network.d/default-route.conf
+    - path: /etc/systemd/network/20-${p.networks_by_key.nat.if}.network.d/default-route.conf
       mode: 0644
       contents:
         inline: |
           [Route]
-          Gateway=${p.networks_by_key.internal.router}
+          Gateway=${p.networks_by_key.nat.router}
           Destination=0.0.0.0/0
 
           [Network]

@@ -187,6 +187,10 @@ locals {
         "ignition.platform.id=metal",
         "systemd.unified_cgroup_hierarchy=0",
       ]
+      metadata = {
+        vlan = "metadata"
+        if   = "ens2"
+      }
     }
     server = {
       nodes = [
@@ -294,6 +298,18 @@ locals {
     worker = {
       memory = 36
       vcpu   = 4
+      network = [
+        {
+          vlan = "internal"
+          if   = "ens3"
+          dhcp = true
+        },
+        {
+          vlan = "nat"
+          if   = "ens4"
+          dhcp = true
+        },
+      ]
       nodes = [
         "worker-0",
         "worker-1",
@@ -316,6 +332,24 @@ locals {
   }
 
   networks = {
+    # services
+    internal = {
+      id        = 1
+      network   = "192.168.126.0"
+      cidr      = 23
+      dhcp_pool = "192.168.127.64/26"
+      mdns      = true
+      mtu       = 9000
+    }
+    # services
+    nat = {
+      id        = 120
+      network   = "192.168.94.0"
+      cidr      = 23
+      router    = "192.168.94.240"
+      dhcp_pool = "192.168.95.64/26"
+      mtu       = 9000
+    }
     # main
     lan = {
       id        = 90
@@ -323,16 +357,6 @@ locals {
       cidr      = 23
       router    = "192.168.62.240"
       dhcp_pool = "192.168.63.64/26"
-      mtu       = 9000
-    }
-    # services
-    internal = {
-      id        = 1
-      network   = "192.168.126.0"
-      cidr      = 23
-      router    = "192.168.126.240"
-      dhcp_pool = "192.168.127.64/26"
-      mdns      = true
       mtu       = 9000
     }
     # gateway conntrack sync and backup route
@@ -371,11 +395,13 @@ locals {
   }
 
   hosts = {
-    # interface name should always start at ens2 and count up
+    # Interface name should always start at ens2 and count up
     # libvirt auto assigns interfaces starting at 00:02.0 and
-    # increments the slot for each element
+    # increments the slot for each element.
+    # Metadata network uses ens2. Start host specific
+    # interfaces at ens3.
 
-    # gateway
+    # Gateway
     gateway-0 = {
       # Duplicate MAC VRRP (e.g. keepalived) do not work for IP traffic from other VFs on the same NIC.
       # If a MAC exists on another VF on the same hardware, it seems to bypass the switch and get priority
@@ -387,30 +413,30 @@ locals {
           if   = "ens3"
         },
         {
-          vlan = "lan"
+          vlan = "nat"
           if   = "ens4"
           # Duplicate this on gateways
-          mac = "00-00-5e-00-01-3d"
+          mac = "00-00-5e-00-01-01"
+        },
+        {
+          vlan = "lan"
+          if   = "ens5"
+          # Duplicate this on gateways
+          mac = "00-00-5e-00-01-02"
         },
         {
           vlan = "sync"
           ip   = "192.168.190.1"
-          if   = "ens5"
+          if   = "ens6"
         },
         {
           vlan = "wan"
-          if   = "ens6"
+          if   = "ens7"
           dhcp = true
           # Duplicate this on gateways
           mac = "52-54-00-63-6e-b3"
         },
       ]
-      metadata = {
-        vlan = "metadata"
-        if   = "ens2"
-        mac  = "52-54-00-1a-61-2a"
-      }
-      kea_ha_role = "primary"
     }
     gateway-1 = {
       network = [
@@ -420,33 +446,33 @@ locals {
           if   = "ens3"
         },
         {
-          vlan = "lan"
+          vlan = "nat"
           if   = "ens4"
           # Duplicate this on gateways
-          mac = "00-00-5e-00-01-3d"
+          mac = "00-00-5e-00-01-01"
+        },
+        {
+          vlan = "lan"
+          if   = "ens5"
+          # Duplicate this on gateways
+          mac = "00-00-5e-00-01-02"
         },
         {
           vlan = "sync"
           ip   = "192.168.190.2"
-          if   = "ens5"
+          if   = "ens6"
         },
         {
           vlan = "wan"
-          if   = "ens6"
+          if   = "ens7"
           dhcp = true
           # Duplicate this on gateways
           mac = "52-54-00-63-6e-b3"
         },
       ]
-      metadata = {
-        vlan = "metadata"
-        if   = "ens2"
-        mac  = "52-54-00-1a-61-2b"
-      }
-      kea_ha_role = "secondary"
     }
 
-    # nameserver and dhcp
+    # Nameserver with DHCP
     ns-0 = {
       network = [
         {
@@ -455,16 +481,16 @@ locals {
           if   = "ens3"
         },
         {
-          vlan = "lan"
-          ip   = "192.168.63.222"
+          vlan = "nat"
+          ip   = "192.168.95.222"
           if   = "ens4"
         },
+        {
+          vlan = "lan"
+          ip   = "192.168.63.222"
+          if   = "ens5"
+        },
       ]
-      metadata = {
-        vlan = "metadata"
-        if   = "ens2"
-        mac  = "52-54-00-1a-61-3a"
-      }
       kea_ha_role = "primary"
     }
     ns-1 = {
@@ -475,34 +501,33 @@ locals {
           if   = "ens3"
         },
         {
-          vlan = "lan"
-          ip   = "192.168.63.223"
+          vlan = "nat"
+          ip   = "192.168.95.223"
           if   = "ens4"
         },
+        {
+          vlan = "lan"
+          ip   = "192.168.63.223"
+          if   = "ens5"
+        },
       ]
-      metadata = {
-        vlan = "metadata"
-        if   = "ens2"
-        mac  = "52-54-00-1a-61-3b"
-      }
       kea_ha_role = "secondary"
     }
 
-    # controllers
+    # Controllers
     controller-0 = {
       network = [
         {
           vlan = "internal"
           ip   = "192.168.127.219"
           if   = "ens3"
+        },
+        {
+          vlan = "nat"
+          if   = "ens4"
           dhcp = true
         },
       ]
-      metadata = {
-        vlan = "metadata"
-        if   = "ens2"
-        mac  = "52-54-00-1a-61-0a"
-      }
     }
     controller-1 = {
       network = [
@@ -510,14 +535,13 @@ locals {
           vlan = "internal"
           ip   = "192.168.127.220"
           if   = "ens3"
+        },
+        {
+          vlan = "nat"
+          if   = "ens4"
           dhcp = true
         },
       ]
-      metadata = {
-        vlan = "metadata"
-        if   = "ens2"
-        mac  = "52-54-00-1a-61-0b"
-      }
     }
     controller-2 = {
       network = [
@@ -525,30 +549,18 @@ locals {
           vlan = "internal"
           ip   = "192.168.127.221"
           if   = "ens3"
+        },
+        {
+          vlan = "nat"
+          if   = "ens4"
           dhcp = true
         },
       ]
-      metadata = {
-        vlan = "metadata"
-        if   = "ens2"
-        mac  = "52-54-00-1a-61-0c"
-      }
     }
 
-    # workers
+    # Workers
+    # Network config is same for all hosts
     worker-0 = {
-      network = [
-        {
-          vlan = "internal"
-          if   = "ens3"
-          dhcp = true
-        },
-      ]
-      metadata = {
-        vlan = "metadata"
-        if   = "ens2"
-        mac  = "52-54-00-1a-61-1a"
-      }
       # Defaults:
       # format = "xfs"
       # wipe_filesystem = false
@@ -624,18 +636,6 @@ locals {
       }
     }
     worker-1 = {
-      network = [
-        {
-          vlan = "internal"
-          if   = "ens3"
-          dhcp = true
-        },
-      ]
-      metadata = {
-        vlan = "metadata"
-        if   = "ens2"
-        mac  = "52-54-00-1a-61-1b"
-      }
       disk = [
         {
           device     = "/dev/disk/by-id/ata-Samsung_SSD_860_QVO_1TB_S4PGNF0M410395Z"
@@ -652,12 +652,12 @@ locals {
           if   = "ens3"
           dhcp = true
         },
+        {
+          vlan = "nat"
+          if   = "ens4"
+          dhcp = true
+        },
       ]
-      metadata = {
-        vlan = "metadata"
-        if   = "ens2"
-        mac  = "52-54-00-1a-61-3a"
-      }
     }
 
     # KVM
@@ -668,12 +668,23 @@ locals {
           if    = "en-pf0"
           mac   = "f4-52-14-7b-53-80"
         },
+        {
+          label = "pf1"
+          if    = "en-pf1"
+          # TBD
+          # mac   = ""
+        },
       ]
       network = [
         {
           vlan = "internal"
           if   = "en-int"
           ip   = "192.168.127.251"
+          hwif = "pf0"
+        },
+        {
+          vlan = "nat"
+          if   = "en-nat"
           dhcp = true
           hwif = "pf0"
         },
@@ -683,7 +694,8 @@ locals {
       libvirt_domains = [
         {
           node = "gateway-0",
-          hwif = "pf0",
+          # This cannot run on the same SRIOV pf as other VMs
+          hwif = "pf1",
         },
         {
           node = "ns-0",
@@ -691,6 +703,10 @@ locals {
         },
         {
           node = "controller-0",
+          hwif = "pf0",
+        },
+        {
+          node = "controller-1",
           hwif = "pf0",
         },
         {
@@ -723,12 +739,22 @@ locals {
           if    = "en-pf0"
           mac   = "f4-52-14-80-6a-e0"
         },
+        {
+          label = "pf1"
+          if    = "en-pf1"
+          mac   = "a0-36-9f-87-2f-a0"
+        },
       ]
       network = [
         {
           vlan = "internal"
           if   = "en-int"
           ip   = "192.168.127.252"
+          hwif = "pf0"
+        },
+        {
+          vlan = "nat"
+          if   = "en-nat"
           dhcp = true
           hwif = "pf0"
         },
@@ -738,14 +764,11 @@ locals {
       libvirt_domains = [
         {
           node = "gateway-1",
-          hwif = "pf0",
+          # This cannot run on the same SRIOV pf as other VMs
+          hwif = "pf1",
         },
         {
           node = "ns-1",
-          hwif = "pf0",
-        },
-        {
-          node = "controller-1",
           hwif = "pf0",
         },
         {

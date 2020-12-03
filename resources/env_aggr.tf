@@ -1,4 +1,8 @@
 locals {
+  # Pick a start value for metadata link mac
+  # 52-54-00-00-00-00
+  metadata_mac_base = 90520730730496
+
   #### Merge component params with host params
   # Map node -> component
   aggr_node_components = transpose({
@@ -33,6 +37,9 @@ locals {
     host => merge(
       lookup(local.aggr_component_params, host, {}),
       params,
+      {
+        host = host
+      }
     )
   }
 
@@ -72,13 +79,16 @@ locals {
   }
 
   aggr_metadata_params = {
-    for host, params in local.aggr_host_pre1 :
-    host => {
+    # for host, params in local.aggr_host_pre1 :
+    for i, params in values(local.aggr_host_pre1) :
+    params.host => {
       metadata = merge(
         lookup(local.networks, lookup(lookup(params, "metadata", {}), "vlan", "default"), {}),
         lookup(params, "metadata", {}),
         {
           label = lookup(lookup(params, "metadata", {}), "label", lookup(lookup(params, "metadata", {}), "vlan", "default"))
+          # Need any unique mac that both libvirt and matchbox know about
+          mac = join("-", regexall("..", format("%x", local.metadata_mac_base + i)))
         }
       )
     }

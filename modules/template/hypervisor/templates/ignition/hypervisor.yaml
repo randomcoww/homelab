@@ -83,8 +83,8 @@ storage:
       mode: 0644
       contents:
         inline: |
-          %{~ for d in ["ixgbe", "i40e"] ~}
-          ACTION=="add", SUBSYSTEM=="net", ENV{ID_NET_DRIVER}=="${d}", ATTR{device/sriov_numvfs}="16"
+          %{~ for k, v in sriov_numvfs ~}
+          ACTION=="add", SUBSYSTEM=="net", ENV{ID_NET_DRIVER}=="${k}", ATTR{device/sriov_numvfs}="${v}"
           %{~ endfor ~}
     ##
     ## internal network ${p.metadata.label} for host <-> local vm

@@ -2,10 +2,10 @@
 
 ### Provisioning
 
-#### Setup buildtool command
+#### Setup tw (terraform wrapper) command
 
 ```bash
-buildtool() {
+tw() {
     set -x
     podman run -it --rm --security-opt label=disable \
         -v $HOME/.aws:/root/.aws \
@@ -43,7 +43,7 @@ EOF
 Hypervisor images are live USB disks created using [Fedora CoreOS assembler](https://github.com/coreos/coreos-assembler)
 
 ```bash
-buildtool terraform apply \
+tw terraform apply \
     -var-file=secrets.tfvars \
     -target=module.template-hypervisor \
     -target=local_file.ignition
@@ -60,11 +60,11 @@ Run build from https://github.com/randomcoww/fedora-silverblue-custom. Write gen
 #### Start VMs
 
 ```bash
-buildtool terraform apply \
+tw terraform apply \
     -target=module.ignition-kvm-0 \
     -target=module.libvirt-kvm-0
 
-buildtool terraform apply \
+tw terraform apply \
     -target=module.ignition-kvm-1 \
     -target=module.libvirt-kvm-1
 ```
@@ -74,7 +74,7 @@ buildtool terraform apply \
 Create namespaces
 
 ```bash
-buildtool terraform apply \
+tw terraform apply \
     -var-file=secrets.tfvars \
     -target=module.kubernetes-namespaces
 ```
@@ -82,7 +82,7 @@ buildtool terraform apply \
 Create addons
 
 ```bash
-buildtool terraform apply \
+tw terraform apply \
     -var-file=secrets.tfvars \
     -target=module.kubernetes-addons
 ```
@@ -102,11 +102,11 @@ ssh-keygen -q -t ecdsa -N '' -f $KEY 2>/dev/null <<< y >/dev/null
 Sign public key
 ```bash
 KEY=$HOME/.ssh/id_ecdsa \
-buildtool terraform apply \
+tw terraform apply \
     -auto-approve \
     -target=null_resource.output \
     -var="ssh_client_public_key=$(cat $KEY.pub)" && \
-buildtool terraform output ssh-client-certificate > $KEY-cert.pub
+tw terraform output ssh-client-certificate > $KEY-cert.pub
 ```
 
 Access Libvirt through SSH
@@ -118,10 +118,10 @@ virsh -c qemu+ssh://core@kvm-1.local/system
 **Kubeconfig**
 
 ```bash
-buildtool terraform apply \
+tw terraform apply \
     -target=null_resource.output && \
 mkdir -p ~/.kube && \
-buildtool terraform output kubeconfig > ~/.kube/config
+tw terraform output kubeconfig > ~/.kube/config
 ```
 
 ---
