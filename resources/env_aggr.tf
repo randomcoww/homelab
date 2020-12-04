@@ -3,6 +3,32 @@ locals {
   # 52-54-00-00-00-00
   metadata_mac_base = 90520730730496
 
+  #### Add services to networks where vlan matches
+  aggr_services_by_vlan_pre1 = {
+    for service, params in local.services :
+    lookup(params, "vlan", "default") => [{
+      "${service}" = params
+    }]...
+  }
+
+  aggr_services_by_vlan = {
+    for vlan, services in local.aggr_services_by_vlan_pre1 :
+    vlan => merge(
+      flatten(services)...
+    )
+  }
+
+  # Add services to networks
+  aggr_networks = {
+    for network, params in local.networks :
+    network => merge(
+      params,
+      {
+        services = lookup(local.aggr_services_by_vlan, network, {})
+      }
+    )
+  }
+
   #### Merge component params with host params
   # Map node -> component
   aggr_node_components = transpose({
@@ -49,7 +75,7 @@ locals {
     host => {
       network = [
         for n in lookup(params, "network", []) :
-        merge(lookup(local.networks, lookup(n, "vlan", "default"), {}),
+        merge(lookup(local.aggr_networks, lookup(n, "vlan", "default"), {}),
           n, {
             label = lookup(n, "label", lookup(n, "vlan", "default"))
         })
@@ -83,7 +109,7 @@ locals {
     for i, params in values(local.aggr_host_pre1) :
     params.host => {
       metadata = merge(
-        lookup(local.networks, lookup(lookup(params, "metadata", {}), "vlan", "default"), {}),
+        lookup(local.aggr_networks, lookup(lookup(params, "metadata", {}), "vlan", "default"), {}),
         lookup(params, "metadata", {}),
         {
           label = lookup(lookup(params, "metadata", {}), "label", lookup(lookup(params, "metadata", {}), "vlan", "default"))
@@ -159,29 +185,4 @@ locals {
       }
     )
   }
-
-  ############################################
-  # # Map guest -> host
-  # aggr_guest_hypervisors = transpose({
-  #   for host, params in local.hosts :
-  #   host => [
-  #     for domain in lookup(params, "libvirt_domains", []) :
-  #     domain.node
-  #   ]
-  # })
-
-  # # Add hostdev by hypervisor
-  # aggr_libvirt = {
-  #   for host, params in local.hosts :
-  #   host => {
-  #     hostdev = {
-  #       for hypervisor in lookup(local.aggr_guest_hypervisors, host, []) :
-  #       hypervisor => [
-  #         for dev in lookup(params, "hostdev", []) :
-  #         lookup(lookup(local.hosts[hypervisor], "dev", {}), dev, {})
-  #       ]
-  #     }
-  #   }
-  # }
 }
-

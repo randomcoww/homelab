@@ -152,7 +152,15 @@ storage:
             interface ${p.networks_by_key.internal.if}
             priority 10
             virtual_ipaddress {
-              ${services.kubernetes_apiserver.vip}
+              %{~ for v in p.network ~}
+              %{~ if lookup(v.services, "kubernetes_apiserver", null) != null ~}
+              %{~ if lookup(v, "ip", null) != null ~}
+              ${v.services.kubernetes_apiserver.vip} dev ${v.if}
+              %{~ else ~}
+              ${v.services.kubernetes_apiserver.vip}/${v.cidr} dev ${v.if}
+              %{~ endif ~}
+              %{~ endif ~}
+              %{~ endfor ~}
             }
           }
 

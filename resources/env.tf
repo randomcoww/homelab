@@ -34,7 +34,8 @@ locals {
   services = {
     # hypervisor internal
     renderer = {
-      vip = "192.168.224.1"
+      vlan = "metadata"
+      vip  = "192.168.224.1"
       ports = {
         http = 80
         rpc  = 58081
@@ -48,13 +49,15 @@ locals {
       }
     }
     recursive_dns = {
-      vip = "192.168.94.241"
+      vlan = "nat"
+      vip  = "192.168.94.241"
       ports = {
         prometheus = 59153
       }
     }
     internal_dns = {
-      vip = "192.168.94.127"
+      vlan = "nat"
+      vip  = "192.168.94.127"
       ports = {
         prometheus = 59153
       }
@@ -66,7 +69,8 @@ locals {
 
     # Log capture
     loki = {
-      vip = "192.168.94.126"
+      vlan = "nat"
+      vip  = "192.168.94.126"
       ports = {
         http_listen = 3100
       }
@@ -74,16 +78,19 @@ locals {
 
     # kubernetes network
     kubernetes_apiserver = {
-      vip = "192.168.126.245"
+      vlan = "internal"
+      vip  = "192.168.126.245"
       ports = {
         secure = 56443
       }
     }
     kubernetes_service = {
-      vip = "10.96.0.1"
+      vlan = "kubernetes_service"
+      vip  = "10.96.0.1"
     }
     kubernetes_dns = {
-      vip = "10.96.0.10"
+      vlan = "kubernetes_service"
+      vip  = "10.96.0.10"
     }
     etcd = {
       ports = {
@@ -94,7 +101,8 @@ locals {
 
     # externally forwarded to internal IP
     external_dnat = {
-      vip = "192.168.94.125"
+      vlan = "nat"
+      vip  = "192.168.94.125"
       ports = {
         https = 8080
       }
