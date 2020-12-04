@@ -129,13 +129,12 @@ storage:
 
               iifname $if_internal accept;
               iifname $if_sync accept;
-              iifname $if_lan pkttype multicast accept;
 
-              iifname $if_lan oifname $if_internal tcp dport ssh accept;
-              iifname $if_lan oifname $if_internal tcp dport domain accept;
-              iifname $if_lan oifname $if_internal udp dport domain accept;
-              iifname $if_lan ip daddr $lb_kubernetes accept;
-              oifname $if_internal ip daddr ${services.external_dnat.vip} tcp dport ${services.external_dnat.ports.https} accept;
+              iifname != $if_wan oifname $if_internal tcp dport ssh accept;
+              iifname != $if_wan ip daddr ${services.recursive_dns.vip} tcp dport domain accept;
+              iifname != $if_wan ip daddr ${services.recursive_dns.vip} udp dport domain accept;
+              iifname != $if_wan ip daddr $lb_kubernetes accept;
+              ip daddr ${services.external_dnat.vip} tcp dport ${services.external_dnat.ports.https} accept;
             }
 
             chain forward {
@@ -146,11 +145,11 @@ storage:
 
               oifname $if_wan accept;
 
-              iifname $if_lan oifname $if_internal tcp dport ssh accept;
-              iifname $if_lan oifname $if_internal tcp dport domain accept;
-              iifname $if_lan oifname $if_internal udp dport domain accept;
-              iifname $if_lan ip daddr $lb_kubernetes accept;
-              oifname $if_internal ip daddr ${services.external_dnat.vip} tcp dport ${services.external_dnat.ports.https} accept;
+              iifname != $if_wan oifname $if_internal tcp dport ssh accept;
+              iifname != $if_wan ip daddr ${services.recursive_dns.vip} tcp dport domain accept;
+              iifname != $if_wan ip daddr ${services.recursive_dns.vip} udp dport domain accept;
+              iifname != $if_wan ip daddr $lb_kubernetes accept;
+              ip daddr ${services.external_dnat.vip} tcp dport ${services.external_dnat.ports.https} accept;
             }
           }
 
@@ -219,8 +218,6 @@ storage:
                 %{~ if lookup(k, "ip", null) != null ~}
                 IPv4_address ${k.ip}
                 %{~ endif ~}
-                %{~ endfor ~}
-                %{~ for k in p.network ~}
                 %{~ if lookup(k, "router", null) != null ~}
                 IPv4_address ${k.router}
                 %{~ endif ~}

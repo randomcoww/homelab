@@ -83,9 +83,10 @@ storage:
         inline: |
           [Match]
           Name=${v.if}-tap
-          %{~ if lookup(v, "mtu", null) != null ~}
 
           [Link]
+          RequiredForOnline=${!lookup(v, "dhcp", false)}
+          %{~ if lookup(v, "mtu", null) != null ~}
           MTUBytes=${v.mtu}
           %{~ else ~}
 

@@ -210,7 +210,7 @@ storage:
             state BACKUP
             strict_mode off
             virtual_router_id ${vrrp_id}
-            interface ${p.networks_by_key.internal.if}
+            interface ${p.networks_by_key.nat.if}
             priority 10
             virtual_ipaddress {
               ${services.recursive_dns.vip}

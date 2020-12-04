@@ -48,13 +48,13 @@ locals {
       }
     }
     recursive_dns = {
-      vip = "192.168.126.241"
+      vip = "192.168.94.241"
       ports = {
         prometheus = 59153
       }
     }
     internal_dns = {
-      vip = "192.168.126.127"
+      vip = "192.168.94.127"
       ports = {
         prometheus = 59153
       }
@@ -66,7 +66,7 @@ locals {
 
     # Log capture
     loki = {
-      vip = "192.168.126.126"
+      vip = "192.168.94.126"
       ports = {
         http_listen = 3100
       }
@@ -389,7 +389,7 @@ locals {
 
   loadbalancer_pools = {
     kubernetes = {
-      network = "192.168.126.64"
+      network = "192.168.94.64"
       cidr    = 26
     }
   }
@@ -671,8 +671,7 @@ locals {
         {
           label = "pf1"
           if    = "en-pf1"
-          # TBD
-          # mac   = ""
+          mac   = "a0-36-9f-87-27-34"
         },
       ]
       network = [
