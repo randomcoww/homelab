@@ -55,9 +55,10 @@ locals {
         prometheus = 59153
       }
     }
+    # Resolve ingress and metallb names - should be in a metallb pool
     internal_dns = {
       vlan = "nat"
-      vip  = "192.168.94.127"
+      vip  = "192.168.126.127"
       ports = {
         prometheus = 59153
       }
@@ -67,10 +68,10 @@ locals {
       url = "dns.quad9.net"
     }
 
-    # Log capture
+    # Log collector - should be in metallb a pool
     loki = {
       vlan = "nat"
-      vip  = "192.168.94.126"
+      vip  = "192.168.126.126"
       ports = {
         http_listen = 3100
       }
@@ -99,7 +100,7 @@ locals {
       }
     }
 
-    # externally forwarded to internal IP
+    # Externally forwarded to internal IP - should be in a metallb pool
     external_dnat = {
       vlan = "nat"
       vip  = "192.168.94.125"
@@ -396,8 +397,12 @@ locals {
   }
 
   loadbalancer_pools = {
-    kubernetes = {
+    kubernetes-nat = {
       network = "192.168.94.64"
+      cidr    = 26
+    }
+    kubernetes-internal = {
+      network = "192.168.126.64"
       cidr    = 26
     }
   }

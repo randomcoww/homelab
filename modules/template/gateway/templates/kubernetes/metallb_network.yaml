@@ -6,7 +6,9 @@ metadata:
 data:
   config: |
     address-pools:
-    - name: my-ip-space
+    %{~ for k, v in loadbalancer_pools ~}
+    - name: ${k}
       protocol: layer2
       addresses:
-      - ${loadbalancer_pools.kubernetes.network}/${loadbalancer_pools.kubernetes.cidr}
+      - ${v.network}/${v.cidr}
+    %{~ endfor ~}
