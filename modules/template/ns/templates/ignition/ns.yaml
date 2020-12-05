@@ -208,10 +208,9 @@ storage:
           vrrp_instance VI_ns {
             nopreempt
             state BACKUP
-            strict_mode off
             virtual_router_id ${vrrp_id}
             interface ${p.networks_by_key.internal.if}
-            priority 10
+            priority 250
             virtual_ipaddress {
               %{~ for v in p.network ~}
               %{~ if lookup(v.services, "recursive_dns", null) != null ~}

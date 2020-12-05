@@ -53,6 +53,8 @@ storage:
           DNSOverTLS=yes
           Domains=~
     # VRRPv3 currently fails with Invalid VRRPv3 checksum
+    # advert_int < 0.1 usually causes no interruption wih mpd remote stream
+    # Shadow stream still sees brief stutter with advert_int 0.01
     - path: /etc/keepalived/keepalived.conf
       mode: 0644
       overwrite: true
@@ -65,20 +67,16 @@ storage:
             nftables keepalived
             dynamic_interfaces allow_if_changes
             max_auto_priority -1
-          }
-          vrrp_sync_group VG_gateway {
-            group {
-              VI_gateway
-            }
+            lvs_sync_daemon ${p.networks_by_key.sync.if} VI_gateway
           }
           vrrp_instance VI_gateway {
-            # This makes the VIP inaccessible on host
-            # no_accept
+            no_accept
             nopreempt
             state BACKUP
+            advert_int 0.01
             virtual_router_id ${vrrp_id}
             interface ${p.networks_by_key.sync.if}
-            priority 10
+            priority 250
             virtual_rules {
               to all lookup ${master_default_route_table} priority ${master_default_route_priority}
             }
