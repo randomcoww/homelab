@@ -31,6 +31,15 @@ data:
       bind_to_address "0.0.0.0"
       max_clients "0"
     }
+    audio_output {
+      type "httpd"
+      name "HTTP lossy"
+      encoder "vorbis"
+      port "8001"
+      tags "yes"
+      format "44100:16:2"
+      always_on "yes"
+    }
 ---
 kind: Deployment
 apiVersion: apps/v1
@@ -56,6 +65,8 @@ spec:
         ports:
         - containerPort: 8000
           protocol: TCP
+        - containerPort: 8001
+          protocol: TCP
         volumeMounts:
         - mountPath: /etc/mpd.conf
           name: mpd-config
@@ -73,9 +84,9 @@ spec:
         - "-p"
         - "6600"
         - "-w"
-        - "8001"
+        - "8080"
         ports:
-        - containerPort: 8001
+        - containerPort: 8080
           protocol: TCP
       volumes:
       - name: mpd-cache
@@ -96,10 +107,12 @@ metadata:
   namespace: common
 spec:
   ports:
-  - name: stream
+  - name: flac
     port: 8000
-  - name: control
+  - name: lossy
     port: 8001
+  - name: control
+    port: 8080
   selector:
     app: mpd
 ---
@@ -120,12 +133,32 @@ spec:
         backend:
           serviceName: mpd
           servicePort: control
-  - host: stream.fuzzybunny.internal
+  - host: s.fuzzybunny.internal
     http:
       paths:
-      - path: /
+      - path: /flac
         backend:
           serviceName: mpd
-          servicePort: stream
+          servicePort: flac
+      - path: /lossy
+        backend:
+          serviceName: mpd
+          servicePort: lossy
   tls:
   - secretName: tls-ingress
+
+# ---
+# kind: Service
+# apiVersion: v1
+# metadata:
+#   name: mpd-ext
+#   namespace: common
+# spec:
+#   type: LoadBalancer
+#   loadBalancerIP: 192.168.94.125
+#   ports:
+#   - name: lossy
+#     port: 8080
+#     targetPort: 8001
+#   selector:
+#     app: mpd
