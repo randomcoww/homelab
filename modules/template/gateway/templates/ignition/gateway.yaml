@@ -179,8 +179,9 @@ storage:
       contents:
         inline: |-
           Sync {
-            Mode FTFW {
+            Mode NOTRACK {
               StartupResync on
+              DisableInternalCache on
               DisableExternalCache on
             }
 
@@ -215,6 +216,11 @@ storage:
             }
 
             Filter From Kernelspace {
+              Protocol Accept {
+                TCP
+                UDP
+                ICMP
+              }
               Address Ignore {
                 IPv4_address 127.0.0.1
                 IPv4_address ${p.networks_by_key.sync.network}/${p.networks_by_key.sync.cidr}
