@@ -140,13 +140,13 @@ storage:
         inline: |-
           global_defs {
             vrrp_version 3
-            vrrp_iptables
             dynamic_interfaces allow_if_changes
             max_auto_priority -1
           }
-          vrrp_instance VI_kube-master {
+          vrrp_instance VI_controller {
             nopreempt
             state BACKUP
+            advert_int 0.01
             virtual_router_id ${vrrp_id}
             interface ${p.networks_by_key.internal.if}
             priority 250

@@ -47,7 +47,7 @@ systemd:
         Environment=KUBELET_COMMON_ARGS="--exit-on-lock-contention \
           --lock-file=/var/run/lock/kubelet.lock \
           --container-runtime=remote \
-          --container-runtime-endpoint=unix:///var/run/dockershim.sock"
+          --container-runtime-endpoint=unix:///run/containerd/containerd.sock"
         ExecStartPre=/usr/bin/mkdir -p \
           ${kubelet_path} \
           /var/log/containers \
@@ -77,7 +77,7 @@ storage:
         inline: |-
           oom_score = -999
           [grpc]
-            address = "/var/run/dockershim.sock"
+            address = "/run/containerd/containerd.sock"
           [plugins]
             version = 2
             [plugins."io.containerd.grpc.v1.cri"]
