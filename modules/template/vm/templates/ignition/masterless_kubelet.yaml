@@ -6,7 +6,7 @@ systemd:
     - name: containerd.service
       enabled: true
       dropins:
-        - name: 10-custom.conf
+        - name: 10-kubelet.conf
           contents: |
             [Service]
             ExecStartPre=/usr/bin/mkdir -p \

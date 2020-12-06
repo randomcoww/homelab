@@ -27,7 +27,7 @@ storage:
       contents:
         inline: "${ssh_host_certificate}"
     # Read ssh authorized keys file created by ignition
-    - path: /etc/ssh/sshd_config.d/22-custom.conf
+    - path: /etc/ssh/sshd_config.d/22-ignition.conf
       mode: 0644
       contents:
         inline: |

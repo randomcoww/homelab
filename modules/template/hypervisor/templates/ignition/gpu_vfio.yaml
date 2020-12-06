@@ -3,12 +3,12 @@ variant: fcos
 version: 1.0.0
 storage:
   files:
+    - path: /etc/modules-load.d/vfio-pci.conf
+      mode: 0644
+      contents:
+        inline: vfio-pci
     # https://vfio.blogspot.com/2015/05/vfio-gpu-how-to-series-part-3-host.html
     # FCOS writes these files too late and is not able to pass module params
-    # - path: /etc/modules-load.d/vfio-pci.conf
-    #   mode: 0644
-    #   contents:
-    #     inline: vfio-pci
     # - path: /etc/modprobe.d/vfio-pci.conf
     #   mode: 0644
     #   contents:

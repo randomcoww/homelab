@@ -8,13 +8,20 @@ storage:
       contents:
         inline:
           ${p.hostname}
-    - path: /etc/sysctl.d/custom.conf
+    - path: /etc/sysctl.d/base.conf
       mode: 0644
       contents:
         inline: |
           net.ipv4.ip_forward=1
           net.ipv4.ip_nonlocal_bind=1
           fs.inotify.max_user_watches=524288
+    - path: /etc/modules-load.d/base.conf
+      mode: 0644
+      contents:
+        inline: |
+          # keepalived lvs
+          ip_vs
+
 passwd:
   users:
     - name: ${user}
