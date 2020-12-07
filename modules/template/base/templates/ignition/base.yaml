@@ -25,6 +25,7 @@ storage:
           FallbackDNS=
           DNSStubListener=false
           MulticastDNS=true
+          DNSOverTLS=true
           LLMNR=false
     - path: /etc/ssh/sshd_config.d/10-block-password.conf
       mode: 0644

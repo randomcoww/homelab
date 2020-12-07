@@ -20,6 +20,7 @@ systemd:
 
 storage:
   files:
+    # Create fallback route so backup node can access the internet through the wan interface
     - path: /etc/systemd/network/20-${p.networks_by_key.sync.if}.network.d/backup-route.conf
       mode: 0644
       contents:
@@ -50,7 +51,7 @@ storage:
 
           [Network]
           DNS=${services.upstream_dns.vip}
-          DNSOverTLS=yes
+          DNSOverTLS=true
           Domains=~
     # VRRPv3 currently fails with Invalid VRRPv3 checksum
     # advert_int < 0.1 usually causes no interruption wih mpd remote stream

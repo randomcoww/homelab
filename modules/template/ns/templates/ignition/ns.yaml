@@ -18,7 +18,7 @@ storage:
 
           [Network]
           DNS=${services.upstream_dns.vip}
-          DNSOverTLS=yes
+          DNSOverTLS=true
           Domains=~
     - path: /etc/systemd/resolved.conf.d/10-mdns-stub.conf
       mode: 0644

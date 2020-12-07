@@ -341,7 +341,7 @@ locals {
   }
 
   networks = {
-    # services
+    # services - no route to wan
     internal = {
       id        = 1
       network   = "192.168.126.0"
