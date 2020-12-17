@@ -18,6 +18,7 @@ systemd:
             ExecStart=
             ExecStart=/usr/bin/podman run --rm -it \
               $KUBELET_PODMAN_OPTS \
+              -v /etc/systemd:/etc/systemd \
               ${container_images.hyperkube} \
                 kubelet \
                   $KUBELET_COMMON_ARGS \
@@ -27,6 +28,7 @@ systemd:
                   --network-plugin=cni \
                   --cert-dir=${kubelet_path} \
                   --volume-plugin-dir=${kubelet_path}/volumeplugins \
+                  --feature-gates=GracefulNodeShutdown=true \
                   --node-labels=${join(",", [
                     for k, v in  lookup(p, "node_labels", {}) :
                     "${k}=${v}"
@@ -69,6 +71,8 @@ storage:
           runtimeRequestTimeout: "15m"
           rotateCertificates: true
           serverTLSBootstrap: true
+          shutdownGracePeriod: "120s"
+          shutdownGracePeriodCriticalPods: "40s"
     - path: ${kubelet_path}/bootstrap.kubeconfig
       mode: 0644
       contents:
