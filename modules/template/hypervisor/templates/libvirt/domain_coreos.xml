@@ -52,6 +52,7 @@
     <controller type='usb' model='none'/>
     <controller type='scsi' model='virtio-scsi'/>
     %{~ for d in g.hostdev ~}
+    %{~ if lookup(p.dev, d, null) != null ~}
     <hostdev mode='subsystem' type='pci' managed='yes'>
       <driver name='vfio'/>
       <source>
@@ -61,6 +62,7 @@
       <rom bar='on' file='${p.dev[d].rom}'/>
       %{~ endif ~}
     </hostdev>
+    %{~ endif ~}
     %{~ endfor ~}
     <console>
       <target type='virtio'/>

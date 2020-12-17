@@ -64,7 +64,6 @@ storage:
           global_defs {
             vrrp_version 2
             vrrp_iptables
-            vrrp_garp_master_refresh 60
             nftables keepalived
             dynamic_interfaces allow_if_changes
             max_auto_priority -1
@@ -78,6 +77,8 @@ storage:
             virtual_router_id ${vrrp_id}
             interface ${p.networks_by_key.sync.if}
             priority 250
+            garp_master_refresh 1
+            # garp_extra_if all 1
             virtual_rules {
               to all lookup ${master_default_route_table} priority ${master_default_route_priority}
             }

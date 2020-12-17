@@ -31,11 +31,6 @@ systemd:
         WantedBy=multi-user.target
 storage:
   files:
-    # Appending seems to override the earlier hosts entry
-    - path: /etc/nsswitch.conf
-      append:
-        - inline: |
-            hosts: files resolve dns myhostname
     - path: /etc/systemd/network/90-default.network
       mode: 0644
       contents:

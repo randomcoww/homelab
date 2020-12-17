@@ -150,8 +150,10 @@ locals {
         "controller-2",
         "worker-0",
         "worker-1",
+        "worker-2",
         "kvm-0",
         "kvm-1",
+        "kvm-2",
         "test-0",
         "client-0",
         "client-1",
@@ -162,6 +164,7 @@ locals {
       nodes = [
         "kvm-0",
         "kvm-1",
+        "kvm-2",
       ]
       pxe_image_mount_path = "/run/media/iso/images/pxeboot"
       kernel_image         = "vmlinuz"
@@ -187,6 +190,7 @@ locals {
         "controller-2",
         "worker-0",
         "worker-1",
+        "worker-2",
         "test-0",
       ]
       kernel_params = [
@@ -212,8 +216,10 @@ locals {
         "controller-2",
         "worker-0",
         "worker-1",
+        "worker-2",
         "kvm-0",
         "kvm-1",
+        "kvm-2",
         "test-0",
       ]
     }
@@ -249,8 +255,10 @@ locals {
         "controller-2",
         "worker-0",
         "worker-1",
+        "worker-2",
         "kvm-0",
         "kvm-1",
+        "kvm-2",
         "test-0",
       ]
     }
@@ -322,14 +330,12 @@ locals {
       nodes = [
         "worker-0",
         "worker-1",
+        "worker-2",
       ]
       hostdev = [
         "chipset-sata",
         "hba",
       ]
-      node_labels = {
-        "openebs.io/engine" = "mayastor"
-      }
     }
     test = {
       memory = 3
@@ -655,6 +661,11 @@ locals {
           mount_path = "/var/lib/kubelet/pv"
         },
       ]
+      node_labels = {
+        "openebs.io/engine" = "mayastor"
+      }
+    }
+    worker-2 = {
     }
 
     # Test instances
@@ -715,10 +726,6 @@ locals {
         },
         {
           node = "controller-0",
-          hwif = "pf0",
-        },
-        {
-          node = "controller-1",
           hwif = "pf0",
         },
         {
@@ -784,6 +791,10 @@ locals {
           hwif = "pf0",
         },
         {
+          node = "controller-1",
+          hwif = "pf0",
+        },
+        {
           node = "controller-2",
           hwif = "pf0",
         },
@@ -809,6 +820,65 @@ locals {
           rom      = "/etc/libvirt/boot/SAS9300_8i_IT.bin"
         }
       }
+    }
+    kvm-2 = {
+      hwif = [
+        {
+          label = "pf0"
+          if    = "en-pf0"
+          mac   = "3c-ec-ef-45-96-e6"
+        },
+        {
+          label = "pf1"
+          if    = "en-pf1"
+          mac   = "3c-ec-ef-45-96-e7"
+        },
+        {
+          label = "pf2"
+          if    = "en-pf2"
+          mac   = "3c-ec-ef-45-96-e8"
+        },
+        {
+          label = "pf3"
+          if    = "en-pf3"
+          mac   = "3c-ec-ef-45-96-e9"
+        },
+      ]
+      network = [
+        {
+          vlan = "internal"
+          if   = "en-int"
+          ip   = "192.168.127.250"
+          hwif = "pf0"
+        },
+        {
+          vlan = "nat"
+          if   = "en-nat"
+          dhcp = true
+          hwif = "pf0"
+        },
+      ]
+      ## hypervisor boot image is copied with coreos-installer to strip
+      ## out ignition and re-used to boot VMs
+      libvirt_domains = [
+        {
+          node = "gateway-1",
+          # This cannot run on the same SRIOV pf as other VMs
+          hwif = "pf1",
+        },
+        {
+          node = "ns-1",
+          hwif = "pf0",
+        },
+        {
+          node = "controller-2",
+          hwif = "pf1",
+        },
+        {
+          node = "worker-2",
+          hwif = "pf2",
+        },
+      ]
     }
 
     # client devices
@@ -875,6 +945,15 @@ locals {
         },
       ]
     }
+    ipmi-2 = {
+      network = [
+        {
+          vlan = "internal"
+          ip   = "192.168.127.63"
+          mac = "3c-ec-ef-45-97-77"
+        }
+      ]
+    }
   }
 
   # similar to guests filter
@@ -882,6 +961,7 @@ locals {
   local_renderer_hosts_include = [
     "kvm-0",
     "kvm-1",
+    "kvm-2",
     "client-0",
     "client-1",
   ]

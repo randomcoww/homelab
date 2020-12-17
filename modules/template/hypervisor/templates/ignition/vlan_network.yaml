@@ -95,7 +95,7 @@ storage:
           %{~ endif ~}
 
           [Network]
-          LinkLocalAddressing=false
+          LinkLocalAddressing=${lookup(v, "linklocal", false)}
           DHCP=${lookup(v, "dhcp", false)}
           MulticastDNS=${lookup(v, "mdns", false)}
           %{~ if lookup(v, "ip", null) != null && lookup(v, "cidr", null) != null ~}
