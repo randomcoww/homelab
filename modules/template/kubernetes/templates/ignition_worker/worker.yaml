@@ -72,7 +72,7 @@ storage:
           rotateCertificates: true
           serverTLSBootstrap: true
           shutdownGracePeriod: "120s"
-          shutdownGracePeriodCriticalPods: "40s"
+          shutdownGracePeriodCriticalPods: "60s"
     - path: ${kubelet_path}/bootstrap.kubeconfig
       mode: 0644
       contents:
