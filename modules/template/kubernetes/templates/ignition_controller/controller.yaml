@@ -276,7 +276,9 @@ storage:
               - "--kubelet-client-certificate=${controller_mount_path}/kubernetes.pem"
               - "--kubelet-client-key=${controller_mount_path}/kubernetes-key.pem"
               - "--runtime-config=api/all=true"
+              - "--service-account-issuer=https://kubernetes.default.svc"
               - "--service-account-key-file=${controller_mount_path}/service-account.pem"
+              - "--service-account-signing-key-file=${controller_mount_path}/service-account-key.pem"
               - "--service-account-max-token-expiration=24h"
               - "--service-cluster-ip-range=${networks.kubernetes_service.network}/${networks.kubernetes_service.cidr}"
               - "--tls-cert-file=${controller_mount_path}/kubernetes.pem"
@@ -288,11 +290,19 @@ storage:
               - name: config-apiserver
                 mountPath: "${controller_mount_path}"
                 readOnly: true
+              readinessProbe:
+                httpGet:
+                  scheme: HTTPS
+                  host: 127.0.0.1
+                  port: ${services.kubernetes_apiserver.ports.secure}
+                  path: "/readyz"
+                initialDelaySeconds: 15
+                timeoutSeconds: 15
               livenessProbe:
                 httpGet:
-                  scheme: HTTP
+                  scheme: HTTPS
                   host: 127.0.0.1
-                  port: 8080
+                  port: ${services.kubernetes_apiserver.ports.secure}
                   path: "/healthz"
                 initialDelaySeconds: 15
                 timeoutSeconds: 15
@@ -303,11 +313,19 @@ storage:
                   add:
                   - NET_ADMIN
               args: [ "-P", "-D", "-f", "/etc/keepalived/keepalived.conf" ]
+              readinessProbe:
+                httpGet:
+                  scheme: HTTPS
+                  host: 127.0.0.1
+                  port: ${services.kubernetes_apiserver.ports.secure}
+                  path: "/readyz"
+                initialDelaySeconds: 15
+                timeoutSeconds: 15
               livenessProbe:
                 httpGet:
-                  scheme: HTTP
+                  scheme: HTTPS
                   host: 127.0.0.1
-                  port: 8080
+                  port: ${services.kubernetes_apiserver.ports.secure}
                   path: "/healthz"
                 initialDelaySeconds: 15
                 timeoutSeconds: 15

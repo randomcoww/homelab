@@ -7,16 +7,16 @@ locals {
   # path is based on the cluster name
   aws_region              = "us-west-2"
   s3_etcd_backup_bucket   = "randomcoww-etcd-backup"
-  kubernetes_cluster_name = "default-cluster-2011-1"
+  kubernetes_cluster_name = "default-cluster-2012-1"
   # kubelet image is used for static pods and does not need to match the kubernetes version
   # hyperkube is used for the worker kubelet and should match the version
   container_images = {
-    kubelet                 = "docker.io/randomcoww/kubernetes:kubelet-v1.19.3"
-    kube_apiserver          = "docker.io/randomcoww/kubernetes:kube-master-v1.19.3"
-    kube_controller_manager = "docker.io/randomcoww/kubernetes:kube-master-v1.19.3"
-    kube_scheduler          = "docker.io/randomcoww/kubernetes:kube-master-v1.19.3"
-    hyperkube               = "docker.io/randomcoww/kubernetes:kubelet-v1.19.3"
-    kube_proxy              = "docker.io/randomcoww/kubernetes:kube-proxy-v1.19.3"
+    kubelet                 = "docker.io/randomcoww/kubernetes:kubelet-v1.20.0"
+    kube_apiserver          = "docker.io/randomcoww/kubernetes:kube-master-v1.20.0"
+    kube_controller_manager = "docker.io/randomcoww/kubernetes:kube-master-v1.20.0"
+    kube_scheduler          = "docker.io/randomcoww/kubernetes:kube-master-v1.20.0"
+    hyperkube               = "docker.io/randomcoww/kubernetes:kubelet-v1.20.0"
+    kube_proxy              = "docker.io/randomcoww/kubernetes:kube-proxy-v1.20.0"
     etcd_wrapper            = "docker.io/randomcoww/etcd-wrapper:v0.2.1"
     etcd                    = "docker.io/randomcoww/etcd:v3.4.13"
     flannel                 = "docker.io/randomcoww/flannel:latest"
