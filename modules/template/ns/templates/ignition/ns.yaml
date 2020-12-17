@@ -1,11 +1,6 @@
 ---
 variant: fcos
 version: 1.0.0
-systemd:
-  units:
-    - name: nftables.service
-      enabled: true
-
 storage:
   files:
     - path: /etc/systemd/network/20-${p.networks_by_key.nat.if}.network.d/default-route.conf
@@ -26,36 +21,6 @@ storage:
         inline: |
           [Resolve]
           DNSStubListener=true
-    - path: /etc/sysconfig/nftables.conf
-      mode: 0644
-      overwrite: true
-      contents:
-        inline: |-
-          %{~ for v in p.network ~}
-          %{~ if lookup(v, "network", null) != null && lookup(v, "cidr", null) != null ~}
-          define addr_${v.label} = ${v.network}/${v.cidr}
-          %{~ endif ~}
-          %{~ if lookup(v, "if", null) != null ~}
-          define if_${v.label} = ${v.if}
-          %{~ endif ~}
-          %{~ endfor ~}
-
-          table ip filter {
-            chain input {
-              type filter hook input priority 0; policy accept;
-              # ip saddr $addr_lan udp sport bootps udp dport bootpc accept;
-              # ip saddr $addr_lan pkttype multicast accept;
-            }
-          }
-
-          table ip nat {
-            chain prerouting {
-              type nat hook prerouting priority -100; policy accept;
-              tcp dport domain redirect to ${dns_redirect_port};
-              udp dport domain redirect to ${dns_redirect_port};
-            }
-          }
-          ;
 
     ##
     ## pod config
@@ -66,18 +31,26 @@ storage:
       contents:
         inline: |-
           ${domains.internal}. {
-            errors
-            forward . ${services.internal_dns.vip}
-          }
-          ${domains.kubernetes_cluster}. {
+            bind ${services.recursive_dns.vip} ${join(" ", [
+              for v in p.network:
+              v.ip
+            ])}
             errors
             forward . ${services.internal_dns.vip}
           }
           ${domains.internal_mdns}. {
+            bind ${services.recursive_dns.vip} ${join(" ", [
+              for v in p.network:
+              v.ip
+            ])}
             errors
             forward . 127.0.0.53
           }
           . {
+            bind ${services.recursive_dns.vip} ${join(" ", [
+              for v in p.network:
+              v.ip
+            ])}
             errors
             health
             forward . tls://${services.upstream_dns.vip} {
@@ -293,7 +266,7 @@ storage:
                 requests:
                   cpu: 100m
                   memory: 70Mi
-              args: [ "-dns.port", "${dns_redirect_port}", "-conf", "/etc/coredns/Corefile" ]
+              args: [ "-conf", "/etc/coredns/Corefile" ]
               livenessProbe:
                 httpGet:
                   path: /health

@@ -6,6 +6,7 @@ locals {
     domains          = var.domains
     kubelet_path     = "/var/lib/kubelet"
     pod_mount_path   = "/var/lib/kubelet/podconfig"
+    vrrp_id           = 50
     kea_path         = "/var/lib/kea"
     kea_hooks_path   = "/usr/local/lib/kea/hooks"
     kea_ha_peers = jsonencode([
@@ -17,9 +18,6 @@ locals {
         auto-failover = true
       }
     ])
-
-    vrrp_id           = 50
-    dns_redirect_port = 55353
   }
 }
 
