@@ -716,15 +716,6 @@ locals {
       ## out ignition and re-used to boot VMs
       libvirt_domains = [
         {
-          node = "gateway-0",
-          # This cannot run on the same SRIOV pf as other VMs
-          hwif = "pf1",
-        },
-        {
-          node = "ns-0",
-          hwif = "pf0",
-        },
-        {
           node = "controller-0",
           hwif = "pf0",
         },
@@ -795,10 +786,6 @@ locals {
           hwif = "pf0",
         },
         {
-          node = "controller-2",
-          hwif = "pf0",
-        },
-        {
           node = "worker-1",
           hwif = "pf0",
         },
@@ -862,12 +849,12 @@ locals {
       ## out ignition and re-used to boot VMs
       libvirt_domains = [
         {
-          node = "gateway-1",
+          node = "gateway-0",
           # This cannot run on the same SRIOV pf as other VMs
           hwif = "pf1",
         },
         {
-          node = "ns-1",
+          node = "ns-0",
           hwif = "pf0",
         },
         {
