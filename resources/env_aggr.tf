@@ -159,7 +159,7 @@ locals {
       params,
       {
         hostname = join(".", [host, local.domains.internal_mdns])
-        dev  = lookup(params, "dev", {})
+        dev      = lookup(params, "dev", {})
         hostdev  = lookup(params, "hostdev", [])
         disk = [
           for d in lookup(params, "disk", []) :

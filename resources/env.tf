@@ -645,8 +645,9 @@ locals {
           mount_path = "/var/s3/11"
         },
         {
-          device     = "/dev/disk/by-id/ata-Samsung_SSD_860_QVO_1TB_S4PGNF0M414895K"
-          mount_path = "/var/lib/kubelet/pv"
+          device          = "/dev/disk/by-id/ata-INTEL_SSDSA2BZ100G3D_CVLV2345008U100AGN"
+          mount_path      = "/var/lib/kubelet/pv"
+          wipe_filesystem = true
         },
       ]
       node_labels = {
@@ -657,8 +658,9 @@ locals {
     worker-1 = {
       disk = [
         {
-          device     = "/dev/disk/by-id/ata-Samsung_SSD_860_QVO_1TB_S4PGNF0M410395Z"
-          mount_path = "/var/lib/kubelet/pv"
+          device          = "/dev/disk/by-id/ata-INTEL_SSDSA2BZ100G3D_CVLV234300WH100AGN"
+          mount_path      = "/var/lib/kubelet/pv"
+          wipe_filesystem = true
         },
       ]
       node_labels = {
@@ -937,7 +939,7 @@ locals {
         {
           vlan = "internal"
           ip   = "192.168.127.63"
-          mac = "3c-ec-ef-45-97-77"
+          mac  = "3c-ec-ef-45-97-77"
         }
       ]
     }
