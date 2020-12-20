@@ -24,7 +24,7 @@ locals {
     cni_plugins             = "docker.io/randomcoww/cni-plugins:v0.8.7"
     coredns                 = "docker.io/coredns/coredns:1.8.0"
     external_dns            = "registry.opensource.zalan.do/teapot/external-dns:latest"
-    kapprover               = "docker.io/randomcoww/kapprover:v0.0.5"
+    kapprover               = "docker.io/randomcoww/kapprover:v0.0.6"
     kea                     = "docker.io/randomcoww/kea:1.8.1"
     conntrackd              = "docker.io/randomcoww/conntrackd:latest"
     promtail                = "docker.io/randomcoww/promtail:v2.0.0"
@@ -861,7 +861,7 @@ locals {
         },
         {
           node = "controller-2",
-          hwif = "pf1",
+          hwif = "pf0",
         },
         {
           node = "worker-2",
