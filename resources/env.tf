@@ -699,6 +699,11 @@ locals {
           if    = "en-pf1"
           mac   = "a0-36-9f-87-27-34"
         },
+        {
+          label = "pf2"
+          if    = "en-pf2"
+          mac   = "a0-36-9f-87-27-35"
+        },
       ]
       network = [
         {
@@ -755,6 +760,11 @@ locals {
           label = "pf1"
           if    = "en-pf1"
           mac   = "a0-36-9f-87-2f-a0"
+        },
+        {
+          label = "pf2"
+          if    = "en-pf2"
+          mac   = "a0-36-9f-87-2f-a1"
         },
       ]
       network = [
