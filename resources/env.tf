@@ -152,7 +152,6 @@ locals {
         "worker-1",
         "worker-2",
         "kvm-0",
-        "kvm-1",
         "kvm-2",
         "test-0",
         "client-0",
@@ -163,14 +162,14 @@ locals {
     hypervisor = {
       nodes = [
         "kvm-0",
-        "kvm-1",
         "kvm-2",
+        "client-0",
       ]
-      pxe_image_mount_path = "/run/media/iso/images/pxeboot"
-      kernel_image         = "vmlinuz"
+      iso_mount_path = "/run/media/iso"
+      kernel_image   = "images/pxeboot/vmlinuz"
       initrd_images = [
-        "initrd.img",
-        "rootfs.img",
+        "images/pxeboot/initrd.img",
+        "images/pxeboot/rootfs.img",
       ]
       metadata = {
         vlan = "metadata"
@@ -218,9 +217,9 @@ locals {
         "worker-1",
         "worker-2",
         "kvm-0",
-        "kvm-1",
         "kvm-2",
         "test-0",
+        "client-0",
       ]
     }
     # silverblue (gnome) desktop with networkmanager
@@ -257,7 +256,6 @@ locals {
         "worker-1",
         "worker-2",
         "kvm-0",
-        "kvm-1",
         "kvm-2",
         "test-0",
       ]
@@ -692,78 +690,21 @@ locals {
         {
           label = "pf0"
           if    = "en-pf0"
-          mac   = "f4-52-14-7b-53-80"
+          mac   = "a0:36:9f:87:27:34"
         },
         {
           label = "pf1"
           if    = "en-pf1"
-          mac   = "a0-36-9f-87-27-34"
+          mac   = "a0:36:9f:87:27:35"
         },
         {
           label = "pf2"
           if    = "en-pf2"
-          mac   = "a0-36-9f-87-27-35"
-        },
-      ]
-      network = [
-        {
-          vlan = "internal"
-          if   = "en-int"
-          ip   = "192.168.127.251"
-          hwif = "pf0"
-        },
-        {
-          vlan = "nat"
-          if   = "en-nat"
-          dhcp = true
-          hwif = "pf0"
-        },
-      ]
-      ## hypervisorf boot image is copied with coreos-installer to strip
-      ## out ignition and re-used to boot VMs
-      libvirt_domains = [
-        {
-          node = "controller-0",
-          hwif = "pf0",
-        },
-        {
-          node = "worker-0",
-          hwif = "pf0",
-        },
-      ]
-      dev = {
-        # Chipset SATA
-        chipset-sata = {
-          domain   = "0x0000"
-          bus      = "0x00"
-          slot     = "0x17"
-          function = "0x0"
-        }
-        # HBA addon card
-        hba = {
-          domain   = "0x0000"
-          bus      = "0x02"
-          slot     = "0x00"
-          function = "0x0"
-          rom      = "/etc/libvirt/boot/SAS9300_8i_IT.bin"
-        }
-      }
-    }
-    kvm-1 = {
-      hwif = [
-        {
-          label = "pf0"
-          if    = "en-pf0"
-          mac   = "f4-52-14-80-6a-e0"
-        },
-        {
-          label = "pf1"
-          if    = "en-pf1"
           mac   = "a0-36-9f-87-2f-a0"
         },
         {
-          label = "pf2"
-          if    = "en-pf2"
+          label = "pf3"
+          if    = "en-pf3"
           mac   = "a0-36-9f-87-2f-a1"
         },
       ]
@@ -771,7 +712,7 @@ locals {
         {
           vlan = "internal"
           if   = "en-int"
-          ip   = "192.168.127.252"
+          ip   = "192.168.127.251"
           hwif = "pf0"
         },
         {
@@ -794,12 +735,12 @@ locals {
           hwif = "pf0",
         },
         {
-          node = "controller-1",
-          hwif = "pf0",
+          node = "controller-0",
+          hwif = "pf2",
         },
         {
-          node = "worker-1",
-          hwif = "pf0",
+          node = "worker-0",
+          hwif = "pf3",
         },
       ]
       dev = {
@@ -885,9 +826,8 @@ locals {
       hwif = [
         {
           label = "pf0"
-          if    = "enp4s0f0"
-          # interface name instead of mac is needed for network manager
-          # mac    = "f8-f2-1e-1e-3c-40"
+          if    = "en-pf0"
+          mac   = "f8-f2-1e-1e-3c-40"
         },
       ]
       network = [
@@ -904,14 +844,25 @@ locals {
           hwif = "pf0"
           mdns = true
         },
-        {
-          vlan     = "wan"
-          if       = "en-wan"
-          dhcp     = true
-          hwif     = "pf0"
-          disabled = true
-        }
       ]
+      ## hypervisor boot image is copied with coreos-installer to strip
+      ## out ignition and re-used to boot VMs
+      libvirt_domains = [
+        {
+          node = "controller-1",
+          hwif = "pf0",
+        },
+        # {
+        #   node = "worker-1",
+        #   hwif = "pf0",
+        # },
+        # {
+        #   node = "test-0",
+        #   hwif = "pf0",
+        # },
+      ]
+      # Main image is not suitable for VMs. Mount this iso image to use.
+      mount_guest_image_device = "/dev/disk/by-label/fedora-coreos-33"
     }
     client-1 = {
     }
@@ -959,7 +910,6 @@ locals {
   # control which configs are rendered on local matchbox
   local_renderer_hosts_include = [
     "kvm-0",
-    "kvm-1",
     "kvm-2",
     "client-0",
     "client-1",

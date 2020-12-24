@@ -50,7 +50,7 @@ storage:
           RouteTable=${master_default_route_table}
 
           [Network]
-          DNS=${services.upstream_dns.vip}
+          DNS=${services.upstream_dns.vip}#${services.upstream_dns.url}
           DNSOverTLS=true
           Domains=~
     # VRRPv3 currently fails with Invalid VRRPv3 checksum

@@ -111,7 +111,7 @@ module "template-laptop" {
 
   swap_device = "/dev/disk/by-label/swap"
   hosts = {
-    for k in local.components.client.nodes :
+    for k in local.components.laptop.nodes :
     k => local.aggr_hosts[k]
   }
 }

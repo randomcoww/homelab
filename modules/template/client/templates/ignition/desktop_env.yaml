@@ -17,12 +17,24 @@ systemd:
 
         [Install]
         WantedBy=graphical.target
+    # Enable service discovery
+    # - name: avahi-daemon.service
+    #   enabled: true
+    # - name: avahi-daemon.socket
+    #   enabled: true
 storage:
   files:
     ##
     ## misc configs
     ## add to global paths - persistent home directory is mounted afterwards
     ##
+    # Let avahi handle mDNS
+    # - path: /etc/systemd/resolved.conf.d/10-disable-mdns.conf
+    #   mode: 0644
+    #   contents:
+    #     inline: |
+    #       [Resolve]
+    #       MulticastDNS=false
     - path: /etc/tmux.conf
       mode: 0644
       contents:

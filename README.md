@@ -65,12 +65,12 @@ tw terraform apply \
     -target=module.libvirt-kvm-0
 
 tw terraform apply \
-    -target=module.ignition-kvm-1 \
-    -target=module.libvirt-kvm-1
-
-tw terraform apply \
     -target=module.ignition-kvm-2 \
     -target=module.libvirt-kvm-2
+
+tw terraform apply \
+    -target=module.ignition-client-0 \
+    -target=module.libvirt-client-0
 ```
 
 #### Start kubernetes addons
@@ -114,7 +114,6 @@ tw terraform output ssh-client-certificate > $KEY-cert.pub
 Access Libvirt through SSH
 ```bash
 virsh -c qemu+ssh://core@kvm-0.local/system
-virsh -c qemu+ssh://core@kvm-1.local/system
 virsh -c qemu+ssh://core@kvm-2.local/system
 ```
 

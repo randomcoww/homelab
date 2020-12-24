@@ -25,13 +25,33 @@ systemd:
       mask: true
     - name: ksmtuned.service
       mask: true
+    %{~ if lookup(p, "mount_guest_image_device", null) != null ~}
+    - name: prepare-vm-resources.service
+      enabled: true
+      contents: |
+        [Unit]
+        ConditionPathExists=${lookup(p, "mount_guest_image_device", null)}
+        Before=matchbox.service
+        WantedBy=matchbox.service
+        After=local-fs.target
+
+        [Service]
+        Type=oneshot
+        RemainAfterExit=true
+        ExecStart=/usr/bin/podman volume create \
+          --opt type=iso9660 \
+          --opt device=${lookup(p, "mount_guest_image_device", null)} \
+          guest_image_vol
+
+        [Install]
+        WantedBy=matchbox.service
+    %{~ endif ~}
     - name: matchbox.service
       enabled: true
       contents: |
         [Unit]
         After=network-online.target
         Wants=network-online.target
-        ConditionPathExists=${p.pxe_image_mount_path}
 
         [Service]
         TimeoutStartSec=5m
@@ -47,7 +67,11 @@ systemd:
           --name matchbox \
           --security-opt label=disable \
           --network host \
-          -v ${p.pxe_image_mount_path}:${matchbox_assets_path}:ro \
+          %{~ if lookup(p, "mount_guest_image_device", null) != null ~}
+          --mount type=volume,source=guest_image_vol,destination=${matchbox_assets_path} \
+          %{~ else ~}
+          -v ${p.iso_mount_path}:${matchbox_assets_path}:ro \
+          %{~ endif ~}
           -v ${matchbox_tls_path}:${matchbox_tls_path}:ro \
           -v ${matchbox_data_path}:${matchbox_data_path} \
           ${container_images.matchbox} \
@@ -78,6 +102,17 @@ systemd:
 
 storage:
   files:
+    - path: /etc/modules-load.d/mlx4_core.conf
+      mode: 0644
+      contents:
+        inline: mlx4_core
+    # https://docs.mellanox.com/pages/viewpage.action?pageId=19798214
+    # FCOS writes these files too late and is not able to pass module params
+    # - path: /etc/modprobe.d/mlx4_core.conf
+    #   mode: 0644
+    #   contents:
+    #     inline: |
+    #       options mlx4_core num_vfs=8 port_type_array=2 probe_vf=8
     ## Add VFs if using Intel NICs
     - path: /etc/udev/rules.d/sriov_numvfs.rules
       mode: 0644

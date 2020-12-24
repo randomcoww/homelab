@@ -12,7 +12,7 @@ storage:
           Destination=0.0.0.0/0
 
           [Network]
-          DNS=${services.upstream_dns.vip}
+          DNS=${services.upstream_dns.vip}#${services.upstream_dns.url}
           DNSOverTLS=true
           Domains=~
     - path: /etc/systemd/resolved.conf.d/10-mdns-stub.conf
