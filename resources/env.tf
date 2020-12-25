@@ -881,15 +881,6 @@ locals {
       network = [
         {
           vlan = "internal"
-          ip   = "192.168.127.62"
-          mac  = "ac-1f-6b-86-06-82"
-        },
-      ]
-    }
-    ipmi-1 = {
-      network = [
-        {
-          vlan = "internal"
           ip   = "192.168.127.61"
           mac  = "ac-1f-6b-ae-76-60"
         },
