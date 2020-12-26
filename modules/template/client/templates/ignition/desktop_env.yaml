@@ -17,6 +17,14 @@ systemd:
 
         [Install]
         WantedBy=graphical.target
+    - name: lm_sensors.service
+      enabled: true
+      dropins:
+        - name: 10-vm.conf
+          contents: |
+            [Unit]
+            ConditionVirtualization=!vm
+            ConditionVirtualization=!container
     # Let avahi handle mDNS
     - name: avahi-daemon.service
       enabled: true
