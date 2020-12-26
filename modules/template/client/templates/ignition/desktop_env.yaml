@@ -17,28 +17,37 @@ systemd:
 
         [Install]
         WantedBy=graphical.target
-    # Enable service discovery
-    # - name: avahi-daemon.service
-    #   enabled: true
-    # - name: avahi-daemon.socket
-    #   enabled: true
+    # Let avahi handle mDNS
+    - name: avahi-daemon.service
+      enabled: true
+    - name: avahi-daemon.socket
+      enabled: true
 storage:
   files:
+    # Let avahi handle mDNS
+    - path: /etc/systemd/resolved.conf.d/10-disable-mdns.conf
+      mode: 0644
+      contents:
+        inline: |
+          [Resolve]
+          MulticastDNS=false
     ##
     ## misc configs
     ## add to global paths - persistent home directory is mounted afterwards
     ##
-    # Let avahi handle mDNS
-    # - path: /etc/systemd/resolved.conf.d/10-disable-mdns.conf
-    #   mode: 0644
-    #   contents:
-    #     inline: |
-    #       [Resolve]
-    #       MulticastDNS=false
+    - path: /etc/profile.d/tmux.sh
+      mode: 0644
+      contents:
+        inline: |
+          if command -v tmux >/dev/null 2>&1 && [ "$${DISPLAY}" ]; then
+            # if not inside a tmux session, and if no session is started, start a new session
+            [ -z "$${TMUX}" ] && (tmux attach >/dev/null 2>&1 || tmux)
+          fi
     - path: /etc/tmux.conf
       mode: 0644
       contents:
         inline: |
+          set -g history-limit 10000
           set -g mouse on
           set-option -s set-clipboard off
           bind-key -T copy-mode MouseDragEnd1Pane send-keys -X copy-pipe-and-cancel "xclip -in -sel clip"

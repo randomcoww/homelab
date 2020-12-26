@@ -3,16 +3,8 @@ variant: fcos
 version: 1.0.0
 systemd:
   units:
-    - name: NetworkManager.service
-      mask: true
-    - name: NetworkManager-wait-online.service
-      mask: true
     - name: systemd-networkd.service
       enabled: true
-    - name: avahi-daemon.service
-      mask: true
-    - name: avahi-daemon.socket
-      mask: true
     # This should be created automatically by systemd-resolved
     # but is currently blocked by SELinux
     - name: systemd-resolved-link.service
