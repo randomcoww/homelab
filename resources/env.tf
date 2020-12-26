@@ -654,18 +654,14 @@ locals {
       }
     }
     worker-1 = {
-      disk = [
-        {
-          device          = "/dev/disk/by-id/ata-INTEL_SSDSA2BZ100G3D_CVLV234300WH100AGN"
-          mount_path      = "/var/lib/kubelet/pv"
-          wipe_filesystem = true
-        },
-      ]
       node_labels = {
         "openebs.io/engine" = "mayastor"
       }
     }
     worker-2 = {
+      node_labels = {
+        "openebs.io/engine" = "mayastor"
+      }
     }
 
     # Test instances
@@ -827,7 +823,7 @@ locals {
         {
           label = "pf0"
           if    = "en-pf0"
-          mac   = "f8-f2-1e-1e-3c-40"
+          mac   = "f4-52-14-7b-53-80"
         },
       ]
       network = [
