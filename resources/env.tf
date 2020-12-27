@@ -70,7 +70,7 @@ locals {
 
     # Log collector - should be in metallb a pool
     loki = {
-      vlan = "nat"
+      vlan = "internal"
       vip  = "192.168.126.126"
       ports = {
         http_listen = 3100
@@ -153,7 +153,6 @@ locals {
         "worker-2",
         "kvm-0",
         "kvm-2",
-        "test-0",
         "client-0",
         "client-1",
       ]
@@ -190,7 +189,6 @@ locals {
         "worker-0",
         "worker-1",
         "worker-2",
-        "test-0",
       ]
       kernel_params = [
         "console=hvc0",
@@ -218,7 +216,6 @@ locals {
         "worker-2",
         "kvm-0",
         "kvm-2",
-        "test-0",
         "client-0",
       ]
     }
@@ -258,7 +255,6 @@ locals {
         "kvm-0",
         "kvm-2",
         "client-0",
-        "test-0",
       ]
     }
     ssh_client = {
@@ -334,13 +330,6 @@ locals {
       hostdev = [
         "chipset-sata",
         "hba",
-      ]
-    }
-    test = {
-      memory = 3
-      vcpu   = 1
-      nodes = [
-        "test-0",
       ]
     }
   }
@@ -665,22 +654,6 @@ locals {
       }
     }
 
-    # Test instances
-    test-0 = {
-      network = [
-        {
-          vlan = "internal"
-          if   = "ens3"
-          dhcp = true
-        },
-        {
-          vlan = "nat"
-          if   = "ens4"
-          dhcp = true
-        },
-      ]
-    }
-
     # KVM
     kvm-0 = {
       hwif = [
@@ -849,14 +822,6 @@ locals {
           node = "controller-1",
           hwif = "pf0",
         },
-        # {
-        #   node = "worker-1",
-        #   hwif = "pf0",
-        # },
-        # {
-        #   node = "test-0",
-        #   hwif = "pf0",
-        # },
       ]
       # Main image is not suitable for VMs. Mount this iso image to use.
       mount_guest_image_device = "/dev/disk/by-label/fedora-coreos-33"

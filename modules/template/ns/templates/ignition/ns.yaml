@@ -31,26 +31,26 @@ storage:
       contents:
         inline: |-
           ${domains.internal}. {
-            bind ${services.recursive_dns.vip} ${join(" ", [
+            bind ${services.recursive_dns.vip} ${join(" ", compact([
               for v in p.network:
-              v.ip
-            ])}
+              lookup(v, "ip", "")
+            ]))}
             errors
             forward . ${services.internal_dns.vip}
           }
           ${domains.internal_mdns}. {
-            bind ${services.recursive_dns.vip} ${join(" ", [
+            bind ${services.recursive_dns.vip} ${join(" ", compact([
               for v in p.network:
-              v.ip
-            ])}
+              lookup(v, "ip", "")
+            ]))}
             errors
             forward . 127.0.0.53
           }
           . {
-            bind ${services.recursive_dns.vip} ${join(" ", [
+            bind ${services.recursive_dns.vip} ${join(" ", compact([
               for v in p.network:
-              v.ip
-            ])}
+              lookup(v, "ip", "")
+            ]))}
             errors
             health
             forward . tls://${services.upstream_dns.vip} {

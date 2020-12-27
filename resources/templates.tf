@@ -71,19 +71,6 @@ module "template-ns" {
   }
 }
 
-module "template-test" {
-  source = "../modules/template/test"
-
-  user             = local.user
-  services         = local.services
-  domains          = local.domains
-  container_images = local.container_images
-  hosts = {
-    for k in local.components.test.nodes :
-    k => local.aggr_hosts[k]
-  }
-}
-
 module "template-server" {
   source = "../modules/template/server"
 

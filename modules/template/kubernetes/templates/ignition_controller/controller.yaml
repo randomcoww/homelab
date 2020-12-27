@@ -192,8 +192,8 @@ storage:
               - "--host-peer-key-file=${controller_mount_path}/etcd-key.pem"
               - "--host-peer-trusted-ca-file=${controller_mount_path}/etcd-ca.pem"
               - "--initial-advertise-peer-urls=https://$(NODE_NAME):${services.etcd.ports.peer}"
-              - "--listen-peer-urls=https://$(NODE_NAME):${services.etcd.ports.peer}"
-              - "--listen-client-urls=${etcd_local_endpoint},https://$(NODE_NAME):${services.etcd.ports.client}"
+              - "--listen-peer-urls=https://$(INTERNAL_IP):${services.etcd.ports.peer}"
+              - "--listen-client-urls=${etcd_local_endpoint},https://$(INTERNAL_IP):${services.etcd.ports.client}"
               - "--advertise-client-urls=https://$(NODE_NAME):${services.etcd.ports.client}"
               - "--initial-cluster=${etcd_initial_cluster}"
               - "--initial-cluster-token=${etcd_cluster_token}"
@@ -217,10 +217,9 @@ storage:
               - name: AWS_SDK_LOAD_CONFIG
                 value: "1"
               - name: INTERNAL_IP
-                value: ${p.networks_by_key.internal.ip}
-                # valueFrom:
-                #   fieldRef:
-                #     fieldPath: status.hostIP
+                valueFrom:
+                  fieldRef:
+                    fieldPath: status.hostIP
               - name: NODE_NAME
                 valueFrom:
                   fieldRef:

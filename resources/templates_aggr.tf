@@ -5,7 +5,6 @@ locals {
       lookup(module.template-kubernetes, "ignition_worker", {}),
       lookup(module.template-gateway, "ignition", {}),
       lookup(module.template-ns, "ignition", {}),
-      lookup(module.template-test, "ignition", {}),
       lookup(module.template-ssh, "ignition_server", {}),
       lookup(module.template-ssh, "ignition_client", {}),
       lookup(module.template-static-pod-logging, "ignition", {}),
