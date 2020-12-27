@@ -17,7 +17,7 @@ locals {
     kube_scheduler          = "docker.io/randomcoww/kubernetes:kube-master-v1.20.0"
     hyperkube               = "docker.io/randomcoww/kubernetes:kubelet-v1.20.0"
     kube_proxy              = "docker.io/randomcoww/kubernetes:kube-proxy-v1.20.0"
-    etcd_wrapper            = "docker.io/randomcoww/etcd-wrapper:v0.2.4"
+    etcd_wrapper            = "docker.io/randomcoww/etcd-wrapper:v0.2.6"
     etcd                    = "docker.io/randomcoww/etcd:v3.4.13"
     flannel                 = "docker.io/randomcoww/flannel:latest"
     keepalived              = "docker.io/randomcoww/keepalived:latest"
@@ -57,7 +57,7 @@ locals {
     }
     # Resolve ingress and metallb names - should be in a metallb pool
     internal_dns = {
-      vlan = "nat"
+      vlan = "internal"
       vip  = "192.168.126.127"
       ports = {
         prometheus = 59153
@@ -79,8 +79,8 @@ locals {
 
     # kubernetes network
     kubernetes_apiserver = {
-      vlan = "internal"
-      vip  = "192.168.126.245"
+      vlan = "nat"
+      vip  = "192.168.94.245"
       ports = {
         secure = 56443
       }

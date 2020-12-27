@@ -133,6 +133,7 @@ storage:
               iifname != $if_wan oifname $if_internal tcp dport ssh accept;
               iifname != $if_wan ip daddr ${services.recursive_dns.vip} tcp dport domain accept;
               iifname != $if_wan ip daddr ${services.recursive_dns.vip} udp dport domain accept;
+              iifname != $if_wan ip daddr ${services.kubernetes_apiserver.vip} tcp dport ${services.kubernetes_apiserver.ports.secure} accept;
               %{~ for k in keys(loadbalancer_pools) ~}
               iifname != $if_wan ip daddr $lb_${k} accept;
               %{~ endfor ~}
@@ -150,6 +151,7 @@ storage:
               iifname != $if_wan oifname $if_internal tcp dport ssh accept;
               iifname != $if_wan ip daddr ${services.recursive_dns.vip} tcp dport domain accept;
               iifname != $if_wan ip daddr ${services.recursive_dns.vip} udp dport domain accept;
+              iifname != $if_wan ip daddr ${services.kubernetes_apiserver.vip} tcp dport ${services.kubernetes_apiserver.ports.secure} accept;
               %{~ for k in keys(loadbalancer_pools) ~}
               iifname != $if_wan ip daddr $lb_${k} accept;
               %{~ endfor ~}

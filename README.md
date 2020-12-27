@@ -118,6 +118,7 @@ virsh -c qemu+ssh://core@client-0.local/system
 
 ```bash
 tw terraform apply \
+    -auto-approve \
     -target=null_resource.output && \
 mkdir -p ~/.kube && \
 tw terraform output kubeconfig > ~/.kube/config
