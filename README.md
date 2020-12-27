@@ -111,6 +111,7 @@ Access Libvirt through SSH
 ```bash
 virsh -c qemu+ssh://core@kvm-0.local/system
 virsh -c qemu+ssh://core@kvm-2.local/system
+virsh -c qemu+ssh://core@client-0.local/system
 ```
 
 **Kubeconfig**

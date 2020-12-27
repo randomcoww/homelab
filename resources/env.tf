@@ -257,6 +257,7 @@ locals {
         "worker-2",
         "kvm-0",
         "kvm-2",
+        "client-0",
         "test-0",
       ]
     }
