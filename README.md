@@ -49,13 +49,9 @@ tw terraform apply \
     -target=local_file.ignition
 ```
 
-**KVM hosts**
+**Host images**
 
-Run build from https://github.com/randomcoww/fedora-coreos-custom. Write generated ISO file to disk (USB flash drive is sufficient) and boot from it.
-
-**Client hosts**
-
-Run build from https://github.com/randomcoww/fedora-silverblue-custom. Write generated ISO file to disk (USB flash drive is sufficient) and boot from it.
+Run build from https://github.com/randomcoww/fedora-coreos-config-custom.git. Write generated ISO file to disk (USB flash drive is sufficient) and boot from it.
 
 #### Start VMs
 
