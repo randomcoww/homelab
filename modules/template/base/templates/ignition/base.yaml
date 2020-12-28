@@ -46,3 +46,9 @@ storage:
         inline: |
           [Manager]
           DumpCore=false
+    - path: /etc/modprobe.d/pcsp-blacklist.conf
+      mode: 0644
+      contents:
+        inline: |
+          blacklist pcspkr
+          blacklist snd_pcsp
