@@ -49,8 +49,8 @@ locals {
       }
     }
     recursive_dns = {
-      vlan = "nat"
-      vip  = "192.168.94.241"
+      vlan = "internal"
+      vip  = "192.168.126.241"
       ports = {
         prometheus = 59153
       }
@@ -79,8 +79,8 @@ locals {
 
     # kubernetes network
     kubernetes_apiserver = {
-      vlan = "nat"
-      vip  = "192.168.94.245"
+      vlan = "internal"
+      vip  = "192.168.126.245"
       ports = {
         secure = 56443
       }
@@ -102,8 +102,8 @@ locals {
 
     # Externally forwarded to internal IP - should be in a metallb pool
     external_dnat = {
-      vlan = "nat"
-      vip  = "192.168.94.125"
+      vlan = "internal"
+      vip  = "192.168.126.125"
       ports = {
         https = 8080
       }
@@ -316,11 +316,6 @@ locals {
           if   = "ens3"
           dhcp = true
         },
-        {
-          vlan = "nat"
-          if   = "ens4"
-          dhcp = true
-        },
       ]
       nodes = [
         "worker-0",
@@ -340,17 +335,9 @@ locals {
       id        = 1
       network   = "192.168.126.0"
       cidr      = 23
+      router    = "192.168.126.240"
       dhcp_pool = "192.168.127.64/26"
       mdns      = true
-      mtu       = 9000
-    }
-    # services
-    nat = {
-      id        = 120
-      network   = "192.168.94.0"
-      cidr      = 23
-      router    = "192.168.94.240"
-      dhcp_pool = "192.168.95.64/26"
       mtu       = 9000
     }
     # main
@@ -391,10 +378,6 @@ locals {
   }
 
   loadbalancer_pools = {
-    kubernetes-nat = {
-      network = "192.168.94.64"
-      cidr    = 26
-    }
     kubernetes-internal = {
       network = "192.168.126.64"
       cidr    = 26
@@ -414,14 +397,19 @@ locals {
       # If a MAC exists on another VF on the same hardware, it seems to bypass the switch and get priority
       # over other MACs on the same network even if the VF has no IP.
       network = [
+        # Dummy link for management access - don't add a router VIP
         {
-          vlan = "internal"
-          ip   = "192.168.127.217"
-          if   = "ens3"
+          vlan   = "internal"
+          ip     = "192.168.127.217"
+          router = null
+          metric = 2048
+          if     = "ens3"
         },
         {
-          vlan = "nat"
-          if   = "ens4"
+          label = "fwd"
+          vlan  = "internal"
+          if    = "ens4"
+          mdns  = false
           # Duplicate this on gateways
           mac = "00-00-5e-00-01-01"
         },
@@ -447,14 +435,19 @@ locals {
     }
     gateway-1 = {
       network = [
+        # Dummy link for management access - don't add a router VIP
         {
-          vlan = "internal"
-          ip   = "192.168.127.218"
-          if   = "ens3"
+          vlan   = "internal"
+          ip     = "192.168.127.218"
+          router = null
+          metric = 2048
+          if     = "ens3"
         },
         {
-          vlan = "nat"
-          if   = "ens4"
+          label = "fwd"
+          vlan  = "internal"
+          if    = "ens4"
+          mdns  = false
           # Duplicate this on gateways
           mac = "00-00-5e-00-01-01"
         },
@@ -488,14 +481,9 @@ locals {
           if   = "ens3"
         },
         {
-          vlan = "nat"
-          ip   = "192.168.95.222"
-          if   = "ens4"
-        },
-        {
           vlan = "lan"
           ip   = "192.168.63.222"
-          if   = "ens5"
+          if   = "ens4"
         },
       ]
       kea_ha_role = "primary"
@@ -508,14 +496,9 @@ locals {
           if   = "ens3"
         },
         {
-          vlan = "nat"
-          ip   = "192.168.95.223"
-          if   = "ens4"
-        },
-        {
           vlan = "lan"
           ip   = "192.168.63.223"
-          if   = "ens5"
+          if   = "ens4"
         },
       ]
       kea_ha_role = "secondary"
@@ -527,12 +510,8 @@ locals {
         {
           vlan = "internal"
           ip   = "192.168.127.219"
-          if   = "ens3"
-        },
-        {
-          vlan = "nat"
-          if   = "ens4"
           dhcp = true
+          if   = "ens3"
         },
       ]
     }
@@ -541,12 +520,8 @@ locals {
         {
           vlan = "internal"
           ip   = "192.168.127.220"
-          if   = "ens3"
-        },
-        {
-          vlan = "nat"
-          if   = "ens4"
           dhcp = true
+          if   = "ens3"
         },
       ]
     }
@@ -555,12 +530,8 @@ locals {
         {
           vlan = "internal"
           ip   = "192.168.127.221"
-          if   = "ens3"
-        },
-        {
-          vlan = "nat"
-          if   = "ens4"
           dhcp = true
+          if   = "ens3"
         },
       ]
     }
@@ -633,7 +604,7 @@ locals {
           mount_path = "/var/s3/11"
         },
         {
-          device          = "/dev/disk/by-id/ata-INTEL_SSDSA2BZ100G3D_CVLV2345008U100AGN"
+          device          = "/dev/disk/by-id/ata-INTEL_SSDSA2BZ100G3D_CVLV234300WH100AGN"
           mount_path      = "/var/lib/kubelet/pv"
           wipe_filesystem = true
         },
@@ -683,11 +654,6 @@ locals {
           vlan = "internal"
           if   = "en-int"
           ip   = "192.168.127.251"
-          hwif = "pf0"
-        },
-        {
-          vlan = "nat"
-          if   = "en-nat"
           dhcp = true
           hwif = "pf0"
         },
@@ -759,11 +725,6 @@ locals {
           vlan = "internal"
           if   = "en-int"
           ip   = "192.168.127.250"
-          hwif = "pf0"
-        },
-        {
-          vlan = "nat"
-          if   = "en-nat"
           dhcp = true
           hwif = "pf0"
         },
@@ -812,7 +773,6 @@ locals {
           if   = "en-lan"
           dhcp = true
           hwif = "pf0"
-          mdns = true
         },
       ]
       ## hypervisor boot image is copied with coreos-installer to strip
@@ -826,6 +786,7 @@ locals {
       # Main image is not suitable for VMs. Mount this iso image to use.
       mount_guest_image_device = "/dev/disk/by-label/fedora-coreos-33"
     }
+    # laptop
     client-1 = {
     }
 

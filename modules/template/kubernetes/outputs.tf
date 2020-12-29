@@ -20,11 +20,11 @@ locals {
     vrrp_id                  = 70
     etcd_initial_cluster = join(",", [
       for k, v in var.controller_hosts :
-      "${v.hostname}=https://${v.hostname}:${var.services.etcd.ports.peer}"
+      "${v.hostname}=https://${v.networks_by_key.internal.ip}:${var.services.etcd.ports.peer}"
     ])
     etcd_endpoints = join(",", [
       for k, v in var.controller_hosts :
-      "https://${v.hostname}:${var.services.etcd.ports.client}"
+      "https://${v.networks_by_key.internal.ip}:${var.services.etcd.ports.client}"
     ])
   }
 }

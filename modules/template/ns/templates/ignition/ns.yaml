@@ -1,26 +1,59 @@
 ---
 variant: fcos
 version: 1.0.0
+systemd:
+  units:
+    - name: nftables.service
+      enabled: true
+
 storage:
   files:
-    - path: /etc/systemd/network/20-${p.networks_by_key.nat.if}.network.d/default-route.conf
+    - path: /etc/systemd/network/20-${p.networks_by_key.internal.if}.network.d/default-route.conf
       mode: 0644
       contents:
         inline: |
           [Route]
-          Gateway=${p.networks_by_key.nat.router}
+          Gateway=${p.networks_by_key.internal.router}
           Destination=0.0.0.0/0
 
           [Network]
           DNS=${services.upstream_dns.vip}#${services.upstream_dns.url}
           DNSOverTLS=true
-          Domains=~
+          DNSDefaultRoute=true
     - path: /etc/systemd/resolved.conf.d/10-mdns-stub.conf
       mode: 0644
       contents:
         inline: |
           [Resolve]
           DNSStubListener=true
+    - path: /etc/sysconfig/nftables.conf
+      mode: 0644
+      overwrite: true
+      contents:
+        inline: |-
+          %{~ for v in p.network ~}
+          %{~ if lookup(v, "network", null) != null && lookup(v, "cidr", null) != null ~}
+          define addr_${v.label} = ${v.network}/${v.cidr}
+          %{~ endif ~}
+          %{~ if lookup(v, "if", null) != null ~}
+          define if_${v.label} = ${v.if}
+          %{~ endif ~}
+          %{~ endfor ~}
+          table ip filter {
+            chain input {
+              type filter hook input priority 0; policy accept;
+              # ip saddr $addr_lan udp sport bootps udp dport bootpc accept;
+              # ip saddr $addr_lan pkttype multicast accept;
+            }
+          }
+          table ip nat {
+            chain prerouting {
+              type nat hook prerouting priority -100; policy accept;
+              tcp dport domain redirect to ${dns_redirect_port};
+              udp dport domain redirect to ${dns_redirect_port};
+            }
+          }
+          ;
 
     ##
     ## pod config
@@ -31,26 +64,14 @@ storage:
       contents:
         inline: |-
           ${domains.internal}. {
-            bind ${services.recursive_dns.vip} ${join(" ", compact([
-              for v in p.network:
-              lookup(v, "ip", "")
-            ]))}
             errors
             forward . ${services.internal_dns.vip}
           }
           ${domains.internal_mdns}. {
-            bind ${services.recursive_dns.vip} ${join(" ", compact([
-              for v in p.network:
-              lookup(v, "ip", "")
-            ]))}
             errors
             forward . 127.0.0.53
           }
           . {
-            bind ${services.recursive_dns.vip} ${join(" ", compact([
-              for v in p.network:
-              lookup(v, "ip", "")
-            ]))}
             errors
             health
             forward . tls://${services.upstream_dns.vip} {
@@ -180,7 +201,7 @@ storage:
           vrrp_instance VI_ns {
             nopreempt
             state BACKUP
-            advert_int 0.01
+            advert_int 0.1
             virtual_router_id ${vrrp_id}
             interface ${p.networks_by_key.internal.if}
             priority 250
@@ -266,7 +287,7 @@ storage:
                 requests:
                   cpu: 100m
                   memory: 70Mi
-              args: [ "-conf", "/etc/coredns/Corefile" ]
+              args: [ "-dns.port", "${dns_redirect_port}", "-conf", "/etc/coredns/Corefile" ]
               livenessProbe:
                 httpGet:
                   path: /health

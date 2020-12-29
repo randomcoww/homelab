@@ -52,7 +52,7 @@ storage:
           [Network]
           DNS=${services.upstream_dns.vip}#${services.upstream_dns.url}
           DNSOverTLS=true
-          Domains=~
+          DNSDefaultRoute=true
     # VRRPv3 currently fails with Invalid VRRPv3 checksum
     # advert_int < 0.1 usually causes no interruption wih mpd remote stream
     # Shadow stream still sees brief stutter with advert_int 0.01
@@ -73,7 +73,7 @@ storage:
             no_accept
             nopreempt
             state BACKUP
-            advert_int 0.01
+            advert_int 0.02
             virtual_router_id ${vrrp_id}
             interface ${p.networks_by_key.sync.if}
             priority 250
@@ -186,7 +186,6 @@ storage:
               DisableInternalCache on
               DisableExternalCache on
             }
-
             Multicast {
               IPv4_address 225.0.0.50
               Group 3780
@@ -196,13 +195,11 @@ storage:
               RcvSocketBuffer 24985600
               Checksum on
             }
-
             Options {
               TCPWindowTracking on
               ExpectationSync on
             }
           }
-
           General {
             Systemd off
             LogFile /dev/stdout
@@ -212,11 +209,9 @@ storage:
             NetlinkBufferSize 2097152
             NetlinkBufferSizeMaxGrowth 8388608
             NetlinkEventsReliable on
-
             UNIX {
               Path /var/run/conntrackd.ctl
             }
-
             Filter From Kernelspace {
               Protocol Accept {
                 TCP
