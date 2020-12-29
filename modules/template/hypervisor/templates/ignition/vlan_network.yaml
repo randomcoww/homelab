@@ -92,6 +92,7 @@ storage:
 
           [DHCP]
           UseMTU=true
+          RouteMetric=${lookup(v, "route_metric", 1024)}
           %{~ endif ~}
 
           [Network]
@@ -102,6 +103,14 @@ storage:
 
           [Address]
           Address=${v.ip}/${v.cidr}
+          AddPrefixRoute=false
+
+          [Route]
+          Protocol=kernel
+          Scope=link
+          PreferredSource=${v.ip}
+          Destination=${v.network}/${v.cidr}
+          Metric=${lookup(v, "metric", 1024)}
           %{~ endif ~}
     %{~ endif ~}
     %{~ endfor ~}
