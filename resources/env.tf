@@ -631,22 +631,12 @@ locals {
         {
           label = "pf0"
           if    = "en-pf0"
-          mac   = "a0:36:9f:87:27:34"
+          mac   = "3c-fd-fe-9e-ac-70"
         },
         {
           label = "pf1"
           if    = "en-pf1"
-          mac   = "a0:36:9f:87:27:35"
-        },
-        {
-          label = "pf2"
-          if    = "en-pf2"
-          mac   = "a0-36-9f-87-2f-a0"
-        },
-        {
-          label = "pf3"
-          if    = "en-pf3"
-          mac   = "a0-36-9f-87-2f-a1"
+          mac   = "3c-fd-fe-9e-ac-72"
         },
       ]
       network = [
@@ -672,11 +662,11 @@ locals {
         },
         {
           node = "controller-0",
-          hwif = "pf2",
+          hwif = "pf0",
         },
         {
           node = "worker-0",
-          hwif = "pf3",
+          hwif = "pf0",
         },
       ]
       dev = {
