@@ -41,6 +41,11 @@ locals {
         rpc  = 58081
       }
     }
+    libvirtd = {
+      ports = {
+        tls = 16514
+      }
+    }
 
     # gateway
     kea = {

@@ -95,12 +95,14 @@ tw terraform apply \
 
 Generate a new key as needed
 ```bash
-KEY=$HOME/.ssh/id_ecdsa ssh-keygen -q -t ecdsa -N '' -f $KEY 2>/dev/null <<< y >/dev/null
+KEY=$HOME/.ssh/id_ecdsa
+ssh-keygen -q -t ecdsa -N '' -f $KEY 2>/dev/null <<< y >/dev/null
 ```
 
 Sign public key
 ```bash
-KEY=$HOME/.ssh/id_ecdsa tw terraform apply
+KEY=$HOME/.ssh/id_ecdsa
+tw terraform apply \
     -auto-approve \
     -target=null_resource.output \
     -var="ssh_client_public_key=$(cat $KEY.pub)" && \
