@@ -5,6 +5,7 @@ ARG LIBVIRT_VERSION=0.1.9
 ARG SSH_VERSION=0.1.2
 ARG MATCHBOX_VERSION=0.4.1
 ARG CT_VERSION=0.7.1
+ARG SYNCTHING_VERSION=0.1.0
 
 RUN set -x \
   \
@@ -47,7 +48,14 @@ RUN set -x \
   && cd terraform-provider-ct \
   && mkdir -p ${GOPATH}/bin/github.com/poseidon/ct/${CT_VERSION}/linux_amd64 \
   && CGO_ENABLED=0 GO111MODULE=on GOOS=linux go build -v -ldflags '-s -w' \
-    -o ${GOPATH}/bin/github.com/poseidon/ct/${CT_VERSION}/linux_amd64/terraform-provider-ct_v${CT_VERSION}
+    -o ${GOPATH}/bin/github.com/poseidon/ct/${CT_VERSION}/linux_amd64/terraform-provider-ct_v${CT_VERSION} \
+  \
+  && cd .. \
+  && git clone -b v${SYNCTHING_VERSION} https://github.com/randomcoww/terraform-provider-syncthing.git \
+  && cd terraform-provider-syncthing \
+  && mkdir -p ${GOPATH}/bin/github.com/randomcoww/syncthing/${SYNCTHING_VERSION}/linux_amd64 \
+  && CGO_ENABLED=0 GO111MODULE=on GOOS=linux go build -v -ldflags '-s -w' \
+    -o ${GOPATH}/bin/github.com/randomcoww/syncthing/${SYNCTHING_VERSION}/linux_amd64/terraform-provider-syncthing_v${SYNCTHING_VERSION}
 
 FROM golang:alpine AS MATCHBOX
 
