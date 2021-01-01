@@ -1,6 +1,6 @@
 locals {
   params = {
-    user = var.user
+    users = var.users
   }
 }
 

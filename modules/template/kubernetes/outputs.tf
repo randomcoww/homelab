@@ -1,6 +1,5 @@
 locals {
   params = {
-    user                     = var.user
     domains                  = var.domains
     cluster_name             = var.cluster_name
     container_images         = var.container_images

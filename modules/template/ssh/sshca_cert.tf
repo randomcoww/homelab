@@ -34,7 +34,7 @@ resource "ssh_client_cert" "ssh-client" {
   ca_key_algorithm   = tls_private_key.ssh-ca.algorithm
   ca_private_key_pem = tls_private_key.ssh-ca.private_key_pem
   public_key_openssh = var.ssh_client_public_key
-  key_id             = var.user
+  key_id             = var.users.default.name
 
   early_renewal_hours   = 168
   validity_period_hours = 336

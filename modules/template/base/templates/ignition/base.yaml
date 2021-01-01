@@ -17,6 +17,11 @@ systemd:
             ExecStart=/usr/sbin/fstrim --all --verbose --quiet
 storage:
   files:
+    - path: /etc/hostname
+      mode: 0644
+      contents:
+        inline:
+          ${p.hostname}
     - path: /etc/systemd/resolved.conf.d/05-disable-stub.conf
       mode: 0644
       contents:

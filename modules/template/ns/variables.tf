@@ -1,7 +1,3 @@
-variable "user" {
-  type = string
-}
-
 variable "services" {
   type = any
 }

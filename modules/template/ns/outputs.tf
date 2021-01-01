@@ -1,6 +1,5 @@
 locals {
   params = {
-    user              = var.user
     container_images  = var.container_images
     services          = var.services
     domains           = var.domains

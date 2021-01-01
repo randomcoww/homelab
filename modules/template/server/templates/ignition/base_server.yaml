@@ -3,11 +3,6 @@ variant: fcos
 version: 1.0.0
 storage:
   files:
-    - path: /etc/hostname
-      mode: 0644
-      contents:
-        inline:
-          ${p.hostname}
     - path: /etc/sysctl.d/base.conf
       mode: 0644
       contents:
@@ -24,7 +19,7 @@ storage:
 
 passwd:
   users:
-    - name: ${user}
+    - name: ${users.default.name}
       groups:
         - adm
         - sudo

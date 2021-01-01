@@ -10,7 +10,7 @@ module "template-base" {
 module "template-ssh" {
   source = "../modules/template/ssh"
 
-  user                  = local.user
+  users                 = local.aggr_users
   domains               = local.domains
   ssh_client_public_key = var.ssh_client_public_key
   server_hosts = {
@@ -27,7 +27,6 @@ module "template-kubernetes" {
   source = "../modules/template/kubernetes"
 
   aws_region            = local.aws_region
-  user                  = local.user
   networks              = local.networks
   services              = local.services
   domains               = local.domains
@@ -47,7 +46,6 @@ module "template-kubernetes" {
 module "template-gateway" {
   source = "../modules/template/gateway"
 
-  user               = local.user
   loadbalancer_pools = local.loadbalancer_pools
   services           = local.services
   domains            = local.domains
@@ -61,7 +59,6 @@ module "template-gateway" {
 module "template-ns" {
   source = "../modules/template/ns"
 
-  user             = local.user
   services         = local.services
   domains          = local.domains
   container_images = local.container_images
@@ -74,7 +71,7 @@ module "template-ns" {
 module "template-server" {
   source = "../modules/template/server"
 
-  user = local.user
+  users = local.aggr_users
   hosts = {
     for k in local.components.server.nodes :
     k => local.aggr_hosts[k]
@@ -84,9 +81,19 @@ module "template-server" {
 module "template-client" {
   source = "../modules/template/client"
 
-  client_password  = var.client_password
+  users            = local.aggr_users
+  networks         = local.networks
+  services         = local.services
   domains          = local.domains
+  container_images = local.container_images
   wireguard_config = var.wireguard_config
+  syncthing_directories = {
+    "vscode"  = "${local.aggr_users.client.home}/.vscode"
+    "firefox" = "${local.aggr_users.client.home}/.mozilla"
+    "aws"     = "${local.aggr_users.client.home}/.aws"
+    "ssh"     = "${local.aggr_users.client.home}/.ssh"
+    "bin"     = "${local.aggr_users.client.home}/bin"
+  }
   hosts = {
     for k in local.components.client.nodes :
     k => local.aggr_hosts[k]
@@ -106,7 +113,7 @@ module "template-laptop" {
 module "template-hypervisor" {
   source = "../modules/template/hypervisor"
 
-  user             = local.user
+  users            = local.aggr_users
   services         = local.services
   container_images = local.container_images
   hosts = {
@@ -118,7 +125,6 @@ module "template-hypervisor" {
 module "template-vm" {
   source = "../modules/template/vm"
 
-  user             = local.user
   container_images = local.container_images
   hosts = {
     for k in local.components.vm.nodes :

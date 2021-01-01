@@ -1,7 +1,3 @@
-variable "user" {
-  type = string
-}
-
 variable "loadbalancer_pools" {
   type = any
 }

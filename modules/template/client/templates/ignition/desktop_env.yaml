@@ -30,6 +30,32 @@ systemd:
       enabled: true
     - name: avahi-daemon.socket
       enabled: true
+    - name: syncthing.service
+      enabled: true
+      contents: |
+        [Unit]
+        After=local-fs.target
+        After=network.target
+
+        [Service]
+        TimeoutStartSec=5m
+        Restart=always
+        RestartSec=5
+        ExecStartPre=-/usr/bin/podman kill syncthing
+        ExecStartPre=-/usr/bin/podman rm syncthing
+        ExecStart=/usr/bin/podman run --rm -it \
+          --name syncthing \
+          --security-opt label=disable \
+          --network host \
+          -v ${syncthing_path}:${syncthing_path} \
+          -v /var/home:/var/home \
+          --entrypoint=syncthing \
+          ${container_images.syncthing} \
+            -home ${syncthing_path}
+
+        [Install]
+        WantedBy=multi-user.target
+
 storage:
   files:
     # Let avahi handle mDNS
@@ -92,7 +118,22 @@ storage:
       append:
         - inline: |
             RADV_PERFTEST=aco
-
+    ##
+    ## syncthing
+    ##
+    - path: ${syncthing_path}/cert.pem
+      mode: 0644
+      contents:
+        inline: "${replace(tls_syncthing, "\n", "\\n")}"
+    - path: ${syncthing_path}/key.pem
+      mode: 0644
+      contents:
+        inline: "${replace(tls_syncthing_key, "\n", "\\n")}"
+    - path: ${syncthing_path}/config.xml
+      mode: 0644
+      contents:
+        inline: |
+          ${indent(10, syncthing_config)}
     ##
     ## gnome desktop config
     ##
@@ -157,7 +198,16 @@ storage:
           pref("browser.startup.page", 3);
 
           pref("browser.cache.disk.enable", false);
+          pref("browser.cache.disk.smart_size.enabled", false);
+          pref("browser.cache.disk.capacity", 0);
+          pref("browser.cache.disk.max_entry_size", 0);
+          pref("browser.cache.disk_cache_ssl", false);
+          pref("browser.cache.offline.enable", false);
+
           pref("browser.cache.memory.enable", true);
+          pref("browser.cache.memory.capacity", -1);
+          pref("browser.cache.memory.max_entry_size", 51200);
+
           pref("browser.sessionstore.interval", 300000);
           pref("layers.acceleration.force-enabled", true);
           pref("gfx.webrender.all", true);

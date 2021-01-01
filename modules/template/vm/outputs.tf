@@ -1,6 +1,5 @@
 locals {
   params = {
-    user             = var.user
     kubelet_path     = "/var/lib/kubelet"
     container_images = var.container_images
   }

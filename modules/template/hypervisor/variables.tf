@@ -1,5 +1,5 @@
-variable "user" {
-  type = string
+variable "users" {
+  type = any
 }
 
 variable "services" {

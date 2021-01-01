@@ -271,6 +271,6 @@ storage:
 
 passwd:
   users:
-    - name: ${user}
+    - name: ${users.default.name}
       groups:
         - libvirt

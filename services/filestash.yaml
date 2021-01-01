@@ -16,7 +16,7 @@ spec:
       dnsPolicy: ClusterFirstWithHostNet
       containers:
       - name: filestash
-        image: machines/filestash:c4363a0
+        image: machines/filestash:latest
         ports:
         - containerPort: 8334
 

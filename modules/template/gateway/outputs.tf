@@ -1,6 +1,5 @@
 locals {
   params = {
-    user               = var.user
     container_images   = var.container_images
     loadbalancer_pools = var.loadbalancer_pools
     services           = var.services

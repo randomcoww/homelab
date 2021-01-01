@@ -35,6 +35,6 @@ storage:
 
 passwd:
   users:
-    - name: ${user}
+    - name: ${users.default.name}
       ssh_authorized_keys:
         - cert-authority ${ssh_ca_authorized_key}

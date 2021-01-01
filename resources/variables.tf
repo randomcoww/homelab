@@ -1,7 +1,7 @@
 # (Optional) Local login. SSH only otherwise.
-variable "client_password" {
-  type    = string
-  default = ""
+variable "users" {
+  type    = any
+  default = {}
 }
 
 # (Optional) Pass in client public key to sign it

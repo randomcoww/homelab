@@ -186,4 +186,13 @@ locals {
       }
     )
   }
+
+  ## Aggregate users with passwords passed in
+  aggr_users = {
+    for user, params in local.users :
+    user => merge(
+      params,
+      lookup(var.users, user, {})
+    )
+  }
 }

@@ -1,6 +1,6 @@
 locals {
   params = {
-    user                 = var.user
+    users                = var.users
     container_images     = var.container_images
     services             = var.services
     matchbox_image_path  = "/etc/container-save/matchbox.tar"

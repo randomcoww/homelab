@@ -1,10 +1,5 @@
 locals {
-  # Default user for CoreOS and Silverblue
-  user        = "core"
-  client_user = "randomcoww"
-  # Desktop env user. This affects the persistent home directory.
-  # S3 backup for etcd
-  # path is based on the cluster name
+  # Path for etcd backup to S3
   aws_region              = "us-west-2"
   s3_etcd_backup_bucket   = "randomcoww-etcd-backup"
   kubernetes_cluster_name = "default-cluster-2012-1"
@@ -29,6 +24,20 @@ locals {
     conntrackd              = "docker.io/randomcoww/conntrackd:latest"
     promtail                = "docker.io/randomcoww/promtail:v2.0.0"
     matchbox                = "quay.io/poseidon/matchbox:latest"
+    syncthing               = "docker.io/syncthing/syncthing:latest"
+  }
+
+  users = {
+    # Builtin user for CoreOS and Silverblue
+    default = {
+      name = "core"
+    }
+    # User for client devices
+    client = {
+      name = "randomcoww"
+      uid  = 10000
+      home = "/var/home/randomcoww"
+    }
   }
 
   services = {
@@ -111,6 +120,13 @@ locals {
       vip  = "192.168.126.125"
       ports = {
         https = 8080
+      }
+    }
+
+    # Client sync
+    syncthing = {
+      ports = {
+        peer = 22000
       }
     }
 
@@ -233,11 +249,9 @@ locals {
       disk = [
         {
           device     = "/dev/disk/by-label/localhome"
-          mount_path = "/var/home/${local.client_user}"
+          mount_path = local.users.client.home
         },
       ]
-      client_user     = local.client_user
-      client_user_uid = 10000
     }
     laptop = {
       nodes = [

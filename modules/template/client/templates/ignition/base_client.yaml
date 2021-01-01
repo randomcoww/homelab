@@ -3,11 +3,9 @@ variant: fcos
 version: 1.0.0
 passwd:
   users:
-    - name: ${p.client_user}
-      uid: ${p.client_user_uid}
-      %{~ if length(client_password) > 0 ~}
-      password_hash: ${client_password}
-      %{~ endif ~}
+    - name: ${users.client.name}
+      uid: ${users.client.uid}
+      password_hash: ${users.client.password}
       groups:
         - adm
         - sudo
