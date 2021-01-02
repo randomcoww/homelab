@@ -34,7 +34,7 @@ locals {
     }
   }
 
-  kubernetes_addons = [
+  kubernetes_pre1 = [
     for j in flatten([
       for i in concat(
         lookup(module.template-ingress, "kubernetes", []),
@@ -47,4 +47,22 @@ locals {
     ]) :
     try(yamldecode(j), {})
   ]
+
+  kubernetes_namespaces = {
+    for k, v in {
+      for j in local.kubernetes_pre1 :
+      "${j.kind}-${lookup(j.metadata, "namespace", "default")}-${j.metadata.name}" => [yamlencode(j)]...
+      if lookup(j, "kind", null) == "Namespace"
+    } :
+    k => flatten(v)[0]
+  }
+
+  kubernetes_manifests = {
+    for k, v in {
+      for j in local.kubernetes_pre1 :
+      "${j.kind}-${lookup(j.metadata, "namespace", "default")}-${j.metadata.name}" => [yamlencode(j)]...
+      if lookup(j, "kind", "Namespace") != "Namespace"
+    } :
+    k => flatten(v)[0]
+  }
 }

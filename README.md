@@ -57,19 +57,30 @@ Run build from https://github.com/randomcoww/fedora-coreos-config-custom.git. Wr
 
 ```bash
 tw terraform apply \
+    -var-file=secrets.tfvars \
     -target=module.ignition-kvm-0 \
     -target=module.libvirt-kvm-0
 
 tw terraform apply \
+    -var-file=secrets.tfvars \
     -target=module.ignition-kvm-2 \
     -target=module.libvirt-kvm-2
 
 tw terraform apply \
+    -var-file=secrets.tfvars \
     -target=module.ignition-client-0 \
     -target=module.libvirt-client-0
 ```
 
 #### Start kubernetes addons
+
+May need to force resource dependencies to generate
+
+```bash
+tw terraform apply \
+    -var-file=secrets.tfvars \
+    -target=null_resource.kubernetes_resources
+```
 
 Create namespaces
 

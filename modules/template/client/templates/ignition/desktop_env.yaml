@@ -193,36 +193,64 @@ storage:
         inline: |
           pref("general.config.filename", "mozilla.cfg");
           pref("general.config.obscure_value", 0);
-
+    - path: /etc/firefox/pref/mozilla.cfg
+      mode: 0644
+      contents:
+        inline: |
+          //
+          // startup
           pref("browser.startup.homepage", "about:blank");
           pref("browser.startup.page", 3);
+          pref("browser.aboutConfig.showWarning", false);
+          pref("browser.tabs.warnOnClose", false);
+          pref("browser.tabs.warnOnCloseOtherTabs", false);
+          pref("browser.tabs.warnOnOpen", false);
+          pref("browser.warnOnQuit", false);
 
+          // nuke bookmarks (works after first run)
+          lockPref("browser.toolbars.bookmarks.visibility", "never");
+
+          // local sync
+          pref("identity.sync.tokenserver.uri", "https://ffsync.fuzzybunny.internal/token/1.0/sync/1.5");
+          pref("services.sync.engine.passwords", false);
+          pref("services.sync.syncInterval", 30000);
+
+          // disable as much disk cache as possible
           pref("browser.cache.disk.enable", false);
           pref("browser.cache.disk.smart_size.enabled", false);
-          pref("browser.cache.disk.capacity", 0);
-          pref("browser.cache.disk.max_entry_size", 0);
           pref("browser.cache.disk_cache_ssl", false);
           pref("browser.cache.offline.enable", false);
-
+          pref("browser.sessionstore.interval", 300000);
           pref("browser.cache.memory.enable", true);
           pref("browser.cache.memory.capacity", -1);
           pref("browser.cache.memory.max_entry_size", 51200);
 
-          pref("browser.sessionstore.interval", 300000);
+          // performance
           pref("layers.acceleration.force-enabled", true);
           pref("gfx.webrender.all", true);
           pref("gfx.webrender.enabled", true);
-          pref("gfx.font_rendering.cleartype_params.pixel_structure", 2);
           pref("widget.wayland-dmabuf-vaapi.enabled", true);
 
+          // privacy (https://github.com/arkenfox/user.js/blob/master/user.js)
+          pref("browser.safebrowsing.downloads.remote.enabled", false);
           pref("browser.safebrowsing.malware.enabled", false);
           pref("browser.safebrowsing.phishing.enabled", false);
           pref("extensions.pocket.enabled", false);
           pref("privacy.resistFingerprinting", true);
           pref("privacy.trackingprotection.enabled", true);
+          pref("toolkit.telemetry.unified", false);
           pref("toolkit.telemetry.enabled", false);
+          pref("toolkit.telemetry.archive.enabled", false);
+          pref("toolkit.telemetry.newProfilePing.enabled", false);
+          pref("toolkit.telemetry.shutdownPingSender.enabled", false);
+          pref("toolkit.telemetry.updatePing.enabled", false);
+          pref("toolkit.telemetry.bhrPing.enabled", false);
+          pref("toolkit.telemetry.firstShutdownPing.enabled", false);
+          pref("toolkit.telemetry.coverage.opt-out", true);
+          pref("toolkit.coverage.opt-out", true);
           pref("network.trr.mode", 0);
           pref("signon.rememberSignons", false);
+
     # Shadow PC client display workaround
     # https://gitlab.com/NicolasGuilloux/shadow-live-os/raw/arch-master/airootfs/etc/drirc
     - path: /etc/drirc

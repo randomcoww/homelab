@@ -89,7 +89,6 @@ module "template-client" {
   wireguard_config = var.wireguard_config
   syncthing_directories = {
     "vscode"  = "${local.aggr_users.client.home}/.vscode"
-    "firefox" = "${local.aggr_users.client.home}/.mozilla"
     "aws"     = "${local.aggr_users.client.home}/.aws"
     "ssh"     = "${local.aggr_users.client.home}/.ssh"
     "bin"     = "${local.aggr_users.client.home}/bin"
@@ -166,6 +165,14 @@ resource "random_string" "metallb-memberlist" {
   special = false
 }
 
+##
+## firefox sync secret
+##
+resource "random_string" "ffsync-secret-key" {
+  length  = 128
+  special = false
+}
+
 module "template-secrets" {
   source = "../modules/template/secrets"
 
@@ -200,7 +207,14 @@ module "template-secrets" {
       data = {
         secretkey = random_string.metallb-memberlist.result
       }
-    }
+    },
+    {
+      name      = "ffsync-secret-key"
+      namespace = "common"
+      data = {
+        secretkey = random_string.ffsync-secret-key.result
+      }
+    },
     ],
     lookup(var.wireguard_config, "Interface", null) != null && lookup(var.wireguard_config, "Peer", null) != null ? [
       {

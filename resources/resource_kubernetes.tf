@@ -1,30 +1,23 @@
 # https://github.com/hashicorp/terraform-provider-kubernetes-alpha
 
+resource "null_resource" "kubernetes_resources" {
+  triggers = merge(
+    local.kubernetes_namespaces,
+    local.kubernetes_manifests
+  )
+}
+
 # Ignore duplicate manifests if name, namespace and kind are same
 module "kubernetes-namespaces" {
   source = "../modules/kubernetes"
 
-  kubernetes_manifests = {
-    for k, v in {
-      for j in local.kubernetes_addons :
-      "${j.kind}-${lookup(j.metadata, "namespace", "default")}-${j.metadata.name}" => [yamlencode(j)]...
-      if lookup(j, "kind", null) == "Namespace"
-    } :
-    k => flatten(v)[0]
-  }
+  kubernetes_manifests = local.kubernetes_namespaces
   cluster_endpoint = module.template-kubernetes.cluster_endpoint
 }
 
 module "kubernetes-addons" {
   source = "../modules/kubernetes"
 
-  kubernetes_manifests = {
-    for k, v in {
-      for j in local.kubernetes_addons :
-      "${j.kind}-${lookup(j.metadata, "namespace", "default")}-${j.metadata.name}" => [yamlencode(j)]...
-      if lookup(j, "kind", "Namespace") != "Namespace"
-    } :
-    k => flatten(v)[0]
-  }
+  kubernetes_manifests = local.kubernetes_manifests
   cluster_endpoint = module.template-kubernetes.cluster_endpoint
 }
