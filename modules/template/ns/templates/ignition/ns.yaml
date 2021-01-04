@@ -207,11 +207,11 @@ storage:
             priority 250
             virtual_ipaddress {
               %{~ for v in p.network ~}
-              %{~ if lookup(v.services, "recursive_dns", null) != null ~}
+              %{~ if lookup(v, "vip", null) != null ~}
               %{~ if lookup(v, "ip", null) != null ~}
-              ${v.services.recursive_dns.vip} dev ${v.if}
+              ${v.vip} dev ${v.if}
               %{~ else ~}
-              ${v.services.recursive_dns.vip}/${v.cidr} dev ${v.if}
+              ${v.vip}/${v.cidr} dev ${v.if}
               %{~ endif ~}
               %{~ endif ~}
               %{~ endfor ~}

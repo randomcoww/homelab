@@ -43,8 +43,7 @@ locals {
   services = {
     # hypervisor internal
     renderer = {
-      vlan = "metadata"
-      vip  = "192.168.224.1"
+      vip = "192.168.224.1"
       ports = {
         http = 80
         rpc  = 58081
@@ -63,16 +62,14 @@ locals {
       }
     }
     recursive_dns = {
-      vlan = "internal"
-      vip  = "192.168.126.241"
+      vip = "192.168.126.241"
       ports = {
         prometheus = 59153
       }
     }
     # Resolve ingress and metallb names - should be in a metallb pool
     internal_dns = {
-      vlan = "internal"
-      vip  = "192.168.126.127"
+      vip = "192.168.126.127"
       ports = {
         prometheus = 59153
       }
@@ -84,8 +81,7 @@ locals {
 
     # Log collector - should be in metallb a pool
     loki = {
-      vlan = "internal"
-      vip  = "192.168.126.126"
+      vip = "192.168.126.126"
       ports = {
         http_listen = 3100
       }
@@ -93,19 +89,16 @@ locals {
 
     # kubernetes network
     kubernetes_apiserver = {
-      vlan = "internal"
-      vip  = "192.168.126.245"
+      vip = "192.168.126.245"
       ports = {
         secure = 56443
       }
     }
     kubernetes_service = {
-      vlan = "kubernetes_service"
-      vip  = "10.96.0.1"
+      vip = "10.96.0.1"
     }
     kubernetes_dns = {
-      vlan = "kubernetes_service"
-      vip  = "10.96.0.10"
+      vip = "10.96.0.10"
     }
     etcd = {
       ports = {
@@ -116,8 +109,7 @@ locals {
 
     # Externally forwarded to internal IP - should be in a metallb pool
     external_dnat = {
-      vlan = "internal"
-      vip  = "192.168.126.125"
+      vip = "192.168.126.125"
       ports = {
         https = 8080
       }
@@ -425,16 +417,18 @@ locals {
           if     = "ens3"
         },
         {
-          label = "fwd"
+          label = "internal-vip"
           vlan  = "internal"
           if    = "ens4"
           mdns  = false
+          vip   = local.networks.internal.router
           # Duplicate this on gateways
           mac = "00-00-5e-00-01-01"
         },
         {
           vlan = "lan"
           if   = "ens5"
+          vip  = local.networks.lan.router
           # Duplicate this on gateways
           mac = "00-00-5e-00-01-02"
         },
@@ -463,17 +457,19 @@ locals {
           if     = "ens3"
         },
         {
-          label = "fwd"
+          label = "internal-vip"
           vlan  = "internal"
           if    = "ens4"
           mdns  = false
-          # Duplicate this on gateways
+          vip   = local.networks.internal.router
+          # Duplicate this on nodes
           mac = "00-00-5e-00-01-01"
         },
         {
           vlan = "lan"
           if   = "ens5"
-          # Duplicate this on gateways
+          vip  = local.networks.lan.router
+          # Duplicate this on nodes
           mac = "00-00-5e-00-01-02"
         },
         {
@@ -485,7 +481,7 @@ locals {
           vlan = "wan"
           if   = "ens7"
           dhcp = true
-          # Duplicate this on gateways
+          # Duplicate this on nodes
           mac = "52-54-00-63-6e-b3"
         },
       ]
@@ -497,6 +493,7 @@ locals {
         {
           vlan = "internal"
           ip   = "192.168.127.222"
+          vip  = local.services.recursive_dns.vip
           if   = "ens3"
         },
         {
@@ -512,6 +509,7 @@ locals {
         {
           vlan = "internal"
           ip   = "192.168.127.223"
+          vip  = local.services.recursive_dns.vip
           if   = "ens3"
         },
         {
@@ -529,7 +527,7 @@ locals {
         {
           vlan = "internal"
           ip   = "192.168.127.219"
-          dhcp = true
+          vip  = local.services.kubernetes_apiserver.vip
           if   = "ens3"
         },
       ]
@@ -539,7 +537,7 @@ locals {
         {
           vlan = "internal"
           ip   = "192.168.127.220"
-          dhcp = true
+          vip  = local.services.kubernetes_apiserver.vip
           if   = "ens3"
         },
       ]
@@ -549,7 +547,7 @@ locals {
         {
           vlan = "internal"
           ip   = "192.168.127.221"
-          dhcp = true
+          vip  = local.services.kubernetes_apiserver.vip
           if   = "ens3"
         },
       ]

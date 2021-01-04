@@ -3,6 +3,18 @@ variant: fcos
 version: 1.0.0
 storage:
   files:
+    - path: /etc/systemd/network/20-${p.networks_by_key.internal.if}.network.d/default-route.conf
+      mode: 0644
+      contents:
+        inline: |
+          [Route]
+          Gateway=${p.networks_by_key.internal.router}
+          Destination=0.0.0.0/0
+
+          [Network]
+          DNS=${services.upstream_dns.vip}#${services.upstream_dns.url}
+          DNSOverTLS=true
+          DNSDefaultRoute=true
     ##
     ## certs
     ##
@@ -152,11 +164,11 @@ storage:
             priority 250
             virtual_ipaddress {
               %{~ for v in p.network ~}
-              %{~ if lookup(v.services, "kubernetes_apiserver", null) != null ~}
+              %{~ if lookup(v, "vip", null) != null ~}
               %{~ if lookup(v, "ip", null) != null ~}
-              ${v.services.kubernetes_apiserver.vip} dev ${v.if}
+              ${v.vip} dev ${v.if}
               %{~ else ~}
-              ${v.services.kubernetes_apiserver.vip}/${v.cidr} dev ${v.if}
+              ${v.vip}/${v.cidr} dev ${v.if}
               %{~ endif ~}
               %{~ endif ~}
               %{~ endfor ~}
