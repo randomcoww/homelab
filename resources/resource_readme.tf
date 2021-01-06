@@ -2,7 +2,7 @@
 ## Render README
 ##
 resource "local_file" "readme" {
-  content = templatefile("./templates/README.md", {
+  content = templatefile("./templates/README.tmpl", {
     secrets_file     = "secrets.tfvars"
     users            = local.aggr_users
     container_images = local.container_images
