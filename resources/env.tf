@@ -30,7 +30,7 @@ locals {
   users = {
     # Builtin user for CoreOS and Silverblue
     default = {
-      name = "core"
+      name = "fcos"
     }
     # User for client devices
     client = {
@@ -162,7 +162,6 @@ locals {
         "controller-1",
         "controller-2",
         "worker-0",
-        "worker-1",
         "worker-2",
         "kvm-0",
         "kvm-2",
@@ -200,7 +199,6 @@ locals {
         "controller-1",
         "controller-2",
         "worker-0",
-        "worker-1",
         "worker-2",
       ]
       kernel_params = [
@@ -225,7 +223,6 @@ locals {
         "controller-1",
         "controller-2",
         "worker-0",
-        "worker-1",
         "worker-2",
         "kvm-0",
         "kvm-2",
@@ -237,12 +234,6 @@ locals {
       nodes = [
         "client-0",
         "client-1",
-      ]
-      disk = [
-        {
-          device     = "/dev/disk/by-label/localhome"
-          mount_path = local.users.client.home
-        },
       ]
     }
     laptop = {
@@ -261,7 +252,6 @@ locals {
         "controller-1",
         "controller-2",
         "worker-0",
-        "worker-1",
         "worker-2",
         "kvm-0",
         "kvm-2",
@@ -330,7 +320,6 @@ locals {
       ]
       nodes = [
         "worker-0",
-        "worker-1",
         "worker-2",
       ]
       hostdev = [
@@ -559,7 +548,7 @@ locals {
       # Defaults:
       # format = "xfs"
       # wipe_filesystem = false
-      disk = [
+      filesystems = [
         {
           label      = "2YK7XTRD"
           device     = "/dev/disk/by-id/ata-WDC_WD100EFAX-68LHPN0_2YK7XTRD"
@@ -620,19 +609,9 @@ locals {
           device     = "/dev/disk/by-id/ata-WDC_WD100EFAX-68LHPN0_JEKAZ92N"
           mount_path = "/var/s3/11"
         },
-        {
-          device          = "/dev/disk/by-id/ata-INTEL_SSDSA2BZ100G3D_CVLV234300WH100AGN"
-          mount_path      = "/var/lib/kubelet/pv"
-          wipe_filesystem = true
-        },
       ]
       node_labels = {
         "minio-data"        = "true"
-        "openebs.io/engine" = "mayastor"
-      }
-    }
-    worker-1 = {
-      node_labels = {
         "openebs.io/engine" = "mayastor"
       }
     }
@@ -792,9 +771,76 @@ locals {
       ]
       # Main image is not suitable for VMs. Mount this iso image to use.
       mount_guest_image_device = "/dev/disk/by-label/fedora-coreos-33"
+      luks = [
+        {
+          device = "/dev/disk/by-id/nvme-Samsung_SSD_970_EVO_1TB_S5H9NS0N986704R"
+          name   = "localhome"
+        },
+      ]
+      disks = [
+        {
+          # LUKS not supported by ct provider yet
+          # device = "/dev/disk/by-id/dm-name-localhome"
+          device = "/dev/disk/by-id/nvme-Samsung_SSD_970_EVO_1TB_S5H9NS0N986704R"
+          partitions = [
+            {
+              label     = "localhome"
+              start_mib = 0
+              size_mib  = 0
+            },
+          ]
+        },
+      ]
+      filesystems = [
+        {
+          device     = "/dev/disk/by-partlabel/localhome"
+          mount_path = "/var/home"
+          label      = "localhome"
+        },
+      ]
     }
     # laptop
     client-1 = {
+      luks = [
+        {
+          device = "/dev/disk/by-id/nvme-UMIS_RPJTJ256MEE1OWX_SS0W76181Z1CD06223WP"
+          name   = "localhome"
+        },
+      ]
+      disks = [
+        {
+          # LUKS not supported by ct provider yet
+          # device = "/dev/disk/by-id/dm-name-localhome"
+          device = "/dev/disk/by-id/nvme-UMIS_RPJTJ256MEE1OWX_SS0W76181Z1CD06223WP"
+          partitions = [
+            {
+              label     = "swap"
+              start_mib = 0
+              size_mib  = 16384
+            },
+            {
+              label     = "localhome"
+              start_mib = 0
+              size_mib  = 0
+            },
+          ]
+        },
+      ]
+      filesystems = [
+        {
+          device     = "/dev/disk/by-partlabel/localhome"
+          mount_path = "/var/home"
+          label      = "localhome"
+        },
+      ]
+      swap = [
+        {
+          device = "/dev/disk/by-partlabel/swap"
+          # Label should match
+          # https://github.com/randomcoww/fedora-coreos-config-custom/blob/master/builds/laptop/image.yaml
+          label = "swap"
+        },
+      ]
     }
 
     # unmanaged hardware

@@ -1,36 +1,65 @@
 ---
 variant: fcos
-version: 1.0.0
+version: 1.2.0
 systemd:
   units:
-    %{~ for disk in p.disk ~}
-    %{~ if lookup(disk, "mount_path", null) != null && lookup(disk, "device", null) != null ~}
-    - name: ${disk.systemd_unit_name}.mount
+    %{~ for filesystem in p.filesystems ~}
+    %{~ if lookup(filesystem, "mount_path", null) != null ~}
+    - name: ${filesystem.systemd_unit_name}.mount
       enabled: true
       contents: |
         [Unit]
-        ConditionPathExists=${disk.device}
+        ConditionPathExists=${filesystem.device}
 
         [Mount]
-        What=${disk.device}
-        Where=${disk.mount_path}
-        Type=${lookup(disk, "format", "xfs")}
-
+        What=${filesystem.device}
+        Where=${filesystem.mount_path}
+        Type=${lookup(filesystem, "format", "xfs")}
         [Install]
         WantedBy=local-fs.target
     %{~ endif ~}
     %{~ endfor ~}
+    %{~ for filesystem in p.swap ~}
+    - name: ${filesystem.systemd_unit_name}.swap
+      enabled: true
+      contents: |
+        [Unit]
+        ConditionPathExists=${filesystem.device}
+        ConditionVirtualization=!container
+        ConditionVirtualization=!container
+
+        [Swap]
+        What=${filesystem.device}
+
+        [Install]
+        WantedBy=local-fs.target
+    %{~ endfor ~}
 
 storage:
+  disks:
+    %{~ for disk in p.disks ~}
+    - device: ${disk.device}
+      wipe_table: ${lookup(disk, "wipe_table", false)}
+      partitions:
+      %{~ for i, part in disk.partitions ~}
+      - label: ${part.label}
+        number: ${i + 1}
+        start_mib: ${part.start_mib}
+        size_mib: ${part.size_mib}
+        wipe_partition_entry: ${lookup(part, "wipe_partition_entry", false)}
+      %{~ endfor ~}
+    %{~ endfor ~}
   filesystems:
-    %{~ for disk in p.disk ~}
-    %{~ if lookup(disk, "wipe_filesystem", false) && lookup(disk, "mount_path", null) != null && lookup(disk, "device", null) != null ~}
-    - path: ${disk.mount_path}
-      device: ${disk.device}
-      format: ${lookup(disk, "format", "xfs")}
-      wipe_filesystem: ${lookup(disk, "wipe_filesystem", false)}
-      %{~ if lookup(disk, "label", null) != null ~}
-      label: ${disk.label}
-      %{~ endif ~}
-    %{~ endif ~}
+    %{~ for filesystem in p.filesystems ~}
+    - path: ${filesystem.mount_path}
+      device: ${filesystem.device}
+      format: ${lookup(filesystem, "format", "xfs")}
+      wipe_filesystem: ${lookup(filesystem, "wipe_filesystem", false)}
+      label: ${filesystem.label}
+    %{~ endfor ~}
+    %{~ for filesystem in p.swap ~}
+    - device: ${filesystem.device}
+      format: swap
+      wipe_filesystem: ${lookup(filesystem, "wipe_filesystem", false)}
+      label: ${filesystem.label}
     %{~ endfor ~}

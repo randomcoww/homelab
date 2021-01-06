@@ -161,10 +161,18 @@ locals {
         hostname = join(".", [host, local.domains.internal_mdns])
         dev      = lookup(params, "dev", {})
         hostdev  = lookup(params, "hostdev", [])
-        disk = [
-          for d in lookup(params, "disk", []) :
+        luks     = lookup(params, "luks", [])
+        disks    = lookup(params, "disks", [])
+        filesystems = [
+          for d in lookup(params, "filesystems", []) :
           merge(d, {
             systemd_unit_name = join("-", compact(split("/", replace(lookup(d, "mount_path", ""), "-", "\\x2d"))))
+          })
+        ]
+        swap = [
+          for d in lookup(params, "swap", []) :
+          merge(d, {
+            systemd_unit_name = join("-", compact(split("/", replace(lookup(d, "device", ""), "-", "\\x2d"))))
           })
         ]
       }

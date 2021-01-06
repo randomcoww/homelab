@@ -8,7 +8,8 @@ output "ignition" {
     host => [
       for f in fileset(".", "${path.module}/templates/ignition/*") :
       templatefile(f, {
-        p = params
+        p        = params
+        luks_key = random_password.luks-key[host].result
       })
     ]
   }

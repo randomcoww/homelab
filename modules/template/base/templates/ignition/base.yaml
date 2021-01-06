@@ -1,6 +1,6 @@
 ---
 variant: fcos
-version: 1.0.0
+version: 1.2.0
 systemd:
   units:
     - name: systemd-resolved.service
@@ -57,3 +57,12 @@ storage:
         inline: |
           blacklist pcspkr
           blacklist snd_pcsp
+
+# Remove users baked into standard CoreOS image
+passwd:
+  users:
+    - name: core
+      should_exist: false
+  groups:
+    - name: core
+      should_exist: false
