@@ -13,7 +13,7 @@ tw() {
         -v /var/cache:/var/cache \
         -w /root/mnt/resources \
         --net=host \
-        docker.io/randomcoww/tf-env:latest "$@"
+        ${container_images.tw} "$@"
     rc=$?; set +x; return $rc
 }
 ```
@@ -21,7 +21,7 @@ tw() {
 #### Define secrets
 
 ```bash
-cat > secrets.tfvars <<EOF
+cat > ${secrets_file} <<EOF
 client_password = "$(echo 'password' | mkpasswd -m sha-512 -s)"
 wireguard_config = {
   Interface = {
@@ -44,7 +44,7 @@ Hypervisor images are live USB disks created using [Fedora CoreOS assembler](htt
 
 ```bash
 tw terraform apply \
-    -var-file=secrets.tfvars \
+    -var-file=${secrets_file} \
     -target=module.template-hypervisor \
     -target=local_file.ignition
 ```
@@ -55,44 +55,20 @@ Run build from https://github.com/randomcoww/fedora-coreos-config-custom.git. Wr
 
 #### Start VMs
 
-**client-0.local guests**
+%{~ for k, v in hypervisor_hosts}
+**${v.hostname} guests**
 
-- controller-1.local
-
-```bash
-tw terraform apply \
-    -var-file=secrets.tfvars \
-    -target=module.ignition-client-0 \
-    -target=module.libvirt-client-0
-```
-
-**kvm-0.local guests**
-
-- gateway-1.local
-- ns-1.local
-- controller-0.local
-- worker-0.local
+%{for d in v.libvirt_domains ~}
+- ${d.host.hostname}
+%{endfor ~}
 
 ```bash
 tw terraform apply \
-    -var-file=secrets.tfvars \
-    -target=module.ignition-kvm-0 \
-    -target=module.libvirt-kvm-0
+    -var-file=${secrets_file} \
+    -target=module.ignition-${k} \
+    -target=module.libvirt-${k}
 ```
-
-**kvm-2.local guests**
-
-- gateway-0.local
-- ns-0.local
-- controller-2.local
-- worker-2.local
-
-```bash
-tw terraform apply \
-    -var-file=secrets.tfvars \
-    -target=module.ignition-kvm-2 \
-    -target=module.libvirt-kvm-2
-```
+%{endfor ~}
 
 #### Start kubernetes addons
 
@@ -100,7 +76,7 @@ May need to force resource dependencies to generate
 
 ```bash
 tw terraform apply \
-    -var-file=secrets.tfvars \
+    -var-file=${secrets_file} \
     -target=null_resource.kubernetes_resources
 ```
 
@@ -108,7 +84,7 @@ Create namespaces
 
 ```bash
 tw terraform apply \
-    -var-file=secrets.tfvars \
+    -var-file=${secrets_file} \
     -target=module.kubernetes-namespaces
 ```
 
@@ -116,7 +92,7 @@ Create addons
 
 ```bash
 tw terraform apply \
-    -var-file=secrets.tfvars \
+    -var-file=${secrets_file} \
     -target=module.kubernetes-addons
 ```
 
@@ -144,9 +120,9 @@ tw terraform output ssh-client-certificate > $KEY-cert.pub
 
 Access Libvirt through SSH
 ```bash
-virsh -c qemu+ssh://core@client-0.local/system
-virsh -c qemu+ssh://core@kvm-0.local/system
-virsh -c qemu+ssh://core@kvm-2.local/system
+%{for v in values(hypervisor_hosts) ~}
+virsh -c qemu+ssh://core@${v.hostname}/system
+%{endfor ~}
 ```
 
 **Kubeconfig**

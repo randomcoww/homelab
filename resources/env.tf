@@ -24,15 +24,15 @@ locals {
     conntrackd              = "docker.io/randomcoww/conntrackd:latest"
     promtail                = "docker.io/randomcoww/promtail:v2.0.0"
     matchbox                = "quay.io/poseidon/matchbox:latest"
-    syncthing               = "docker.io/syncthing/syncthing:latest"
+    tw                      = "docker.io/randomcoww/tf-env:latest"
   }
 
   users = {
-    # Builtin user for CoreOS and Silverblue
+    # Servers
     default = {
       name = "fcos"
     }
-    # User for client devices
+    # Clients
     client = {
       name = "randomcoww"
       uid  = 10000
@@ -112,13 +112,6 @@ locals {
       vip = "192.168.126.125"
       ports = {
         https = 8080
-      }
-    }
-
-    # Client sync
-    syncthing = {
-      ports = {
-        peer = 22000
       }
     }
 
