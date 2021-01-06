@@ -115,8 +115,8 @@ Sign public key
 KEY=$HOME/.ssh/id_ecdsa
 tw terraform apply \
     -auto-approve \
-    -target=null_resource.output \
-    -var="ssh_client_public_key=$(cat $KEY.pub)" && \
+    -var="ssh_client_public_key=$(cat $KEY.pub)" \
+    -target=null_resource.output && \
 tw terraform output ssh-client-certificate > $KEY-cert.pub
 ```
 

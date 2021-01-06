@@ -82,17 +82,7 @@ module "template-client" {
   source = "../modules/template/client"
 
   users            = local.aggr_users
-  networks         = local.networks
-  services         = local.services
-  domains          = local.domains
-  container_images = local.container_images
   wireguard_config = var.wireguard_config
-  syncthing_directories = {
-    "vscode" = "${local.aggr_users.client.home}/.vscode"
-    "aws"    = "${local.aggr_users.client.home}/.aws"
-    "ssh"    = "${local.aggr_users.client.home}/.ssh"
-    "bin"    = "${local.aggr_users.client.home}/bin"
-  }
   hosts = {
     for k in local.components.client.nodes :
     k => local.aggr_hosts[k]
