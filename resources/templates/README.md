@@ -56,10 +56,12 @@ Run build from https://github.com/randomcoww/fedora-coreos-config-custom.git. Wr
 #### Start VMs
 
 %{~ for k, v in hypervisor_hosts}
-**${v.hostname} guests**
+**${v.hostname}**
 
+| Guest | IP | vCPU | Memory |
+|-------|----|------|--------|
 %{for d in v.libvirt_domains ~}
-- ${d.host.hostname}
+| ${d.host.hostname} | ${lookup(d.host.networks_by_key.internal, "ip", "")} | ${d.host.vcpu} | ${d.host.memory} |
 %{endfor ~}
 
 ```bash
@@ -121,7 +123,7 @@ tw terraform output ssh-client-certificate > $KEY-cert.pub
 Access Libvirt through SSH
 ```bash
 %{for v in values(hypervisor_hosts) ~}
-virsh -c qemu+ssh://core@${v.hostname}/system
+virsh -c qemu+ssh://${users.default.name}@${v.hostname}/system
 %{endfor ~}
 ```
 

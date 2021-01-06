@@ -55,9 +55,11 @@ Run build from https://github.com/randomcoww/fedora-coreos-config-custom.git. Wr
 
 #### Start VMs
 
-**client-0.local guests**
+**client-0.local**
 
-- controller-1.local
+| Guest | IP | vCPU | Memory |
+|-------|----|------|--------|
+| controller-1.local | 192.168.127.220 | 2 | 6 |
 
 ```bash
 tw terraform apply \
@@ -66,12 +68,14 @@ tw terraform apply \
     -target=module.libvirt-client-0
 ```
 
-**kvm-0.local guests**
+**kvm-0.local**
 
-- gateway-1.local
-- ns-1.local
-- controller-0.local
-- worker-0.local
+| Guest | IP | vCPU | Memory |
+|-------|----|------|--------|
+| gateway-1.local | 192.168.127.218 | 1 | 4 |
+| ns-1.local | 192.168.127.223 | 1 | 4 |
+| controller-0.local | 192.168.127.219 | 2 | 6 |
+| worker-0.local |  | 4 | 36 |
 
 ```bash
 tw terraform apply \
@@ -80,12 +84,14 @@ tw terraform apply \
     -target=module.libvirt-kvm-0
 ```
 
-**kvm-2.local guests**
+**kvm-2.local**
 
-- gateway-0.local
-- ns-0.local
-- controller-2.local
-- worker-2.local
+| Guest | IP | vCPU | Memory |
+|-------|----|------|--------|
+| gateway-0.local | 192.168.127.217 | 1 | 4 |
+| ns-0.local | 192.168.127.222 | 1 | 4 |
+| controller-2.local | 192.168.127.221 | 2 | 6 |
+| worker-2.local |  | 4 | 36 |
 
 ```bash
 tw terraform apply \
@@ -144,9 +150,9 @@ tw terraform output ssh-client-certificate > $KEY-cert.pub
 
 Access Libvirt through SSH
 ```bash
-virsh -c qemu+ssh://core@client-0.local/system
-virsh -c qemu+ssh://core@kvm-0.local/system
-virsh -c qemu+ssh://core@kvm-2.local/system
+virsh -c qemu+ssh://fcos@client-0.local/system
+virsh -c qemu+ssh://fcos@kvm-0.local/system
+virsh -c qemu+ssh://fcos@kvm-2.local/system
 ```
 
 **Kubeconfig**
