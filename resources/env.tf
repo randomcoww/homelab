@@ -796,7 +796,8 @@ locals {
     client-1 = {
       luks = [
         {
-          device = "/dev/disk/by-id/nvme-UMIS_RPJTJ256MEE1OWX_SS0W76181Z1CD06223WP"
+          # device = "/dev/disk/by-id/nvme-UMIS_RPJTJ256MEE1OWX_SS0W76181Z1CD06223WP"
+          device = "/dev/disk/by-id/ata-KINGSTON_SUV500MS240G_50026B77839B654A"
           name   = "localhome"
         },
       ]
@@ -804,7 +805,8 @@ locals {
         {
           # LUKS not supported by ct provider yet
           # device = "/dev/disk/by-id/dm-name-localhome"
-          device = "/dev/disk/by-id/nvme-UMIS_RPJTJ256MEE1OWX_SS0W76181Z1CD06223WP"
+          # device = "/dev/disk/by-id/nvme-UMIS_RPJTJ256MEE1OWX_SS0W76181Z1CD06223WP"
+          device = "/dev/disk/by-id/ata-KINGSTON_SUV500MS240G_50026B77839B654A"
           partitions = [
             {
               label     = "swap"
