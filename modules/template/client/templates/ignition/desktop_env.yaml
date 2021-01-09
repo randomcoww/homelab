@@ -171,7 +171,6 @@ storage:
           lockPref("browser.toolbars.bookmarks.visibility", "never");
 
           // local sync
-          pref("identity.sync.tokenserver.uri", "https://ffsync.fuzzybunny.internal/token/1.0/sync/1.5");
           pref("services.sync.engine.passwords", false);
           pref("services.sync.syncInterval", 30000);
 
