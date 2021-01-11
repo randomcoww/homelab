@@ -225,8 +225,8 @@ storage:
                 %{~ if lookup(k, "ip", null) != null ~}
                 IPv4_address ${k.ip}
                 %{~ endif ~}
-                %{~ if lookup(k, "router", null) != null ~}
-                IPv4_address ${k.router}
+                %{~ if lookup(k, "vip", null) != null ~}
+                IPv4_address ${k.vip}
                 %{~ endif ~}
                 %{~ endfor ~}
               }

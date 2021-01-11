@@ -429,7 +429,6 @@ locals {
         {
           vlan   = "internal"
           ip     = "192.168.127.218"
-          router = null
           metric = 2048
           if     = "ens3"
         },
