@@ -159,7 +159,6 @@ locals {
         "kvm-0",
         "kvm-2",
         "client-0",
-        "client-1",
       ]
     }
     # coreos hypervisor
@@ -226,12 +225,10 @@ locals {
     client = {
       nodes = [
         "client-0",
-        "client-1",
       ]
     }
     laptop = {
       nodes = [
-        "client-1",
       ]
     }
     # server certs for SSH CA
@@ -254,14 +251,12 @@ locals {
     ssh_client = {
       nodes = [
         "client-0",
-        "client-1",
       ]
     }
     # cert for fuzzybunny.internal
     ingress = {
       nodes = [
         "client-0",
-        "client-1",
       ]
     }
     # promtail to push logs to loki (non kubernetes containerd hosts)
@@ -792,51 +787,6 @@ locals {
         },
       ]
     }
-    # laptop
-    client-1 = {
-      luks = [
-        {
-          # device = "/dev/disk/by-id/nvme-UMIS_RPJTJ256MEE1OWX_SS0W76181Z1CD06223WP"
-          device = "/dev/disk/by-id/ata-KINGSTON_SUV500MS240G_50026B77839B654A"
-          name   = "localhome"
-        },
-      ]
-      disks = [
-        {
-          # LUKS not supported by ct provider yet
-          # device = "/dev/disk/by-id/dm-name-localhome"
-          # device = "/dev/disk/by-id/nvme-UMIS_RPJTJ256MEE1OWX_SS0W76181Z1CD06223WP"
-          device = "/dev/disk/by-id/ata-KINGSTON_SUV500MS240G_50026B77839B654A"
-          partitions = [
-            {
-              label     = "swap"
-              start_mib = 0
-              size_mib  = 16384
-            },
-            {
-              label     = "localhome"
-              start_mib = 0
-              size_mib  = 0
-            },
-          ]
-        },
-      ]
-      filesystems = [
-        {
-          device     = "/dev/disk/by-partlabel/localhome"
-          mount_path = "/var/home"
-          label      = "localhome"
-        },
-      ]
-      swap = [
-        {
-          device = "/dev/disk/by-partlabel/swap"
-          # Label should match
-          # https://github.com/randomcoww/fedora-coreos-config-custom/blob/master/builds/laptop/image.yaml
-          label = "swap"
-        },
-      ]
-    }
 
     # unmanaged hardware
     switch-0 = {
@@ -874,6 +824,5 @@ locals {
     "kvm-0",
     "kvm-2",
     "client-0",
-    "client-1",
   ]
 }
