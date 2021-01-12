@@ -88,19 +88,18 @@ storage:
           RequiredForOnline=${!lookup(v, "dhcp", false)}
           %{~ if lookup(v, "mtu", null) != null ~}
           MTUBytes=${v.mtu}
-          %{~ else ~}
+          %{~ endif ~}
 
           [DHCP]
-          UseMTU=true
+          UseMTU=${lookup(v, "mtu", null) == null}
           RouteMetric=${lookup(v, "route_metric", 1024)}
-          %{~ endif ~}
 
           [Network]
           LinkLocalAddressing=${lookup(v, "linklocal", false)}
           DHCP=${lookup(v, "dhcp", false)}
           MulticastDNS=${lookup(v, "mdns", false)}
-          %{~ if lookup(v, "ip", null) != null && lookup(v, "cidr", null) != null ~}
 
+          %{~ if lookup(v, "ip", null) != null && lookup(v, "cidr", null) != null ~}
           [Address]
           Address=${v.ip}/${v.cidr}
           AddPrefixRoute=false

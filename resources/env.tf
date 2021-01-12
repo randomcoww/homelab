@@ -412,6 +412,7 @@ locals {
         {
           vlan = "sync"
           ip   = "192.168.190.1"
+          vip  = local.networks.sync.router
           if   = "ens6"
         },
         {
@@ -451,6 +452,7 @@ locals {
         {
           vlan = "sync"
           ip   = "192.168.190.2"
+          vip  = local.networks.sync.router
           if   = "ens6"
         },
         {

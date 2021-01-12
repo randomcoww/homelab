@@ -50,12 +50,16 @@ storage:
       %{~ endfor ~}
     %{~ endfor ~}
   filesystems:
+    # SELinux relabel takes a long time on mounted filesystems with existing data
+    # Skip mounting this in ignition unless rebuilding the data (i.e. wipe enabled)
     %{~ for filesystem in p.filesystems ~}
+    %{~ if lookup(filesystem, "wipe_filesystem", false) ~}
     - path: ${filesystem.mount_path}
       device: ${filesystem.device}
       format: ${lookup(filesystem, "format", "xfs")}
       wipe_filesystem: ${lookup(filesystem, "wipe_filesystem", false)}
       label: ${filesystem.label}
+    %{~ endif ~}
     %{~ endfor ~}
     %{~ for filesystem in p.swap ~}
     - device: ${filesystem.device}
