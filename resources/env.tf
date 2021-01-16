@@ -288,7 +288,7 @@ locals {
       ]
     }
     controller = {
-      memory = 6
+      memory = 8
       vcpu   = 2
       nodes = [
         "controller-0",
@@ -597,6 +597,12 @@ locals {
           label      = "JEKAZ92N"
           device     = "/dev/disk/by-id/ata-WDC_WD100EFAX-68LHPN0_JEKAZ92N"
           mount_path = "/var/s3/11"
+        },
+        {
+          label           = "localcache"
+          device          = "/dev/disk/by-id/ata-INTEL_SSDSA2BZ100G3D_CVLV234300WH100AGN"
+          mount_path      = "/var/lib/kubelet/pv"
+          wipe_filesystem = true
         },
       ]
       node_labels = {

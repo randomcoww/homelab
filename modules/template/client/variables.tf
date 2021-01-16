@@ -2,8 +2,12 @@ variable "users" {
   type = any
 }
 
-variable "wireguard_config" {
+variable "services" {
   type = any
+}
+
+variable "container_images" {
+  type = map(string)
 }
 
 variable "hosts" {

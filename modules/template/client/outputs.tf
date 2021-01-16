@@ -1,9 +1,10 @@
 locals {
   params = {
     users            = var.users
+    services         = var.services
+    container_images = var.container_images
     udev_steam_input = data.http.udev-60-steam-input.body
     udev_steam_vr    = data.http.udev-60-steam-vr.body
-    wireguard_config = var.wireguard_config
   }
 }
 

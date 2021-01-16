@@ -82,7 +82,8 @@ module "template-client" {
   source = "../modules/template/client"
 
   users            = local.aggr_users
-  wireguard_config = var.wireguard_config
+  services         = local.services
+  container_images = local.container_images
   hosts = {
     for k in local.components.client.nodes :
     k => local.aggr_hosts[k]

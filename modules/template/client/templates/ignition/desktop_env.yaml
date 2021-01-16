@@ -44,6 +44,22 @@ storage:
     ## misc configs
     ## add to global paths - persistent home directory is mounted afterwards
     ##
+    - path: /etc/profile.d/helper.sh
+      mode: 0644
+      contents:
+        inline: |
+          # https://github.com/randomcoww/terraform-infra
+          tw() {
+            set -x
+            podman run -it --rm --security-opt label=disable \
+              -v $HOME/.aws:/root/.aws \
+              -v $(pwd):/root/mnt \
+              -v /var/cache:/var/cache \
+              -w /root/mnt/resources \
+              --net=host \
+              ${container_images.tw} "$@"
+            rc=$?; set +x; return $rc
+          }
     - path: /etc/profile.d/tmux.sh
       mode: 0644
       contents:
@@ -209,7 +225,6 @@ storage:
           pref("toolkit.coverage.opt-out", true);
           pref("network.trr.mode", 0);
           pref("signon.rememberSignons", false);
-
     # Shadow PC client display workaround
     # https://gitlab.com/NicolasGuilloux/shadow-live-os/raw/arch-master/airootfs/etc/drirc
     - path: /etc/drirc
