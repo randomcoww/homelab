@@ -108,4 +108,5 @@ storage:
             mode: AlwaysAllow
           staticPodPath: ${kubelet_path}/manifests
           makeIPTablesUtilChains: false
-          cgroupDriver: systemd
+          containerLogMaxSize: "10Mi"
+          containerLogMaxFiles: 1
