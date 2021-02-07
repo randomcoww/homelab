@@ -269,6 +269,12 @@ locals {
         "controller-2",
       ]
     }
+    # IPMI fan control for Supermicro motherboards
+    ipmi_fan_control = {
+      nodes = [
+        "kvm-0",
+      ]
+    }
 
     # host specific
     gateway = {

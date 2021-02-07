@@ -9,8 +9,7 @@ provider "github.com/hashicorp/kubernetes-alpha" {
 }
 
 provider "github.com/poseidon/ct" {
-  version     = "0.8.0"
-  constraints = "0.8.0"
+  version = "0.8.0"
   hashes = [
     "h1:b6kmvZmhHoYVB+Aqbmv65mJQBedUIJPpkqLUhSpbus8=",
   ]

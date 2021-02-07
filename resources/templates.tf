@@ -122,6 +122,15 @@ module "template-vm" {
   }
 }
 
+module "template-fancontrol" {
+  source = "../modules/template/ipmi_fan_control"
+
+  hosts = {
+    for k in local.components.ipmi_fan_control.nodes :
+    k => local.aggr_hosts[k]
+  }
+}
+
 ##
 ## minio user-pass
 ##

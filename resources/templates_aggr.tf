@@ -15,6 +15,7 @@ locals {
       lookup(module.template-laptop, "ignition", {}),
       lookup(module.template-server, "ignition", {}),
       lookup(module.template-base, "ignition", {}),
+      lookup(module.template-fancontrol, "ignition", {}),
     ] :
     transpose(k)
     ]...
