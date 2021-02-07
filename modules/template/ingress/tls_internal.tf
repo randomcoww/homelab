@@ -2,7 +2,7 @@ resource "tls_private_key" "internal" {
   count = length(var.secrets)
 
   algorithm   = "ECDSA"
-  ecdsa_curve = "P521"
+  ecdsa_curve = "P256"
 }
 
 resource "tls_cert_request" "internal" {
@@ -12,7 +12,7 @@ resource "tls_cert_request" "internal" {
   private_key_pem = tls_private_key.internal[count.index].private_key_pem
 
   subject {
-    common_name  = var.domains.internal
+    common_name  = "*.${var.domains.internal}"
     organization = var.domains.internal
   }
 
@@ -31,9 +31,7 @@ resource "tls_locally_signed_cert" "internal" {
 
   validity_period_hours = 8760
   allowed_uses = [
-    "key_encipherment",
     "digital_signature",
     "server_auth",
-    "client_auth",
   ]
 }

@@ -3,5 +3,5 @@ variable "hosts" {
 }
 
 variable "container_images" {
-  type = map
+  type = map(any)
 }

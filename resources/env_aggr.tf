@@ -42,7 +42,7 @@ locals {
       for component in components : {
         for k, v in local.components[component] :
         k => v
-        if ! contains(["nodes"], k)
+        if !contains(["nodes"], k)
       }
       ]...
     )

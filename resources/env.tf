@@ -643,21 +643,21 @@ locals {
       ## out ignition and re-used to boot VMs
       libvirt_domains = [
         {
-          node = "gateway-1",
+          node = "gateway-1"
           # This cannot run on the same SRIOV pf as other VMs
-          hwif = "pf1",
+          hwif = "pf1"
         },
         {
-          node = "ns-1",
-          hwif = "pf0",
+          node = "ns-1"
+          hwif = "pf0"
         },
         {
-          node = "controller-0",
-          hwif = "pf0",
+          node = "controller-0"
+          hwif = "pf0"
         },
         {
-          node = "worker-0",
-          hwif = "pf0",
+          node = "worker-0"
+          hwif = "pf0"
         },
       ]
       dev = {
@@ -714,21 +714,21 @@ locals {
       ## out ignition and re-used to boot VMs
       libvirt_domains = [
         {
-          node = "gateway-0",
+          node = "gateway-0"
           # This cannot run on the same SRIOV pf as other VMs
-          hwif = "pf1",
+          hwif = "pf1"
         },
         {
-          node = "ns-0",
-          hwif = "pf0",
+          node = "ns-0"
+          hwif = "pf0"
         },
         {
-          node = "controller-2",
-          hwif = "pf0",
+          node = "controller-2"
+          hwif = "pf0"
         },
         {
-          node = "worker-2",
-          hwif = "pf2",
+          node = "worker-2"
+          hwif = "pf2"
         },
       ]
     }
@@ -760,37 +760,38 @@ locals {
       ## out ignition and re-used to boot VMs
       libvirt_domains = [
         {
-          node = "controller-1",
-          hwif = "pf0",
+          node = "controller-1"
+          hwif = "pf0"
+        },
+      ]
+      disks = [
+        {
+          device = "/dev/disk/by-id/nvme-Samsung_SSD_970_EVO_1TB_S5H9NS0N986704R"
+          partitions = [
+            {
+              label                = "localhome"
+              start_mib            = 0
+              size_mib             = 0
+              wipe_partition_entry = false
+            },
+          ]
         },
       ]
       # Main image is not suitable for VMs. Mount this iso image to use.
       mount_guest_image_device = "/dev/disk/by-label/fedora-coreos-33"
       luks = [
         {
-          device = "/dev/disk/by-id/nvme-Samsung_SSD_970_EVO_1TB_S5H9NS0N986704R"
-          name   = "localhome"
-        },
-      ]
-      disks = [
-        {
-          # LUKS not supported by ct provider yet
-          # device = "/dev/disk/by-id/dm-name-localhome"
-          device = "/dev/disk/by-id/nvme-Samsung_SSD_970_EVO_1TB_S5H9NS0N986704R"
-          partitions = [
-            {
-              label     = "localhome"
-              start_mib = 0
-              size_mib  = 0
-            },
-          ]
+          label       = "localhome"
+          device      = "/dev/disk/by-partlabel/localhome"
+          wipe_volume = false
         },
       ]
       filesystems = [
         {
-          device     = "/dev/disk/by-partlabel/localhome"
-          mount_path = "/var/home"
-          label      = "localhome"
+          device          = "/dev/disk/by-id/dm-name-localhome"
+          mount_path      = "/var/home"
+          label           = "localhome"
+          wipe_filesystem = false
         },
       ]
     }

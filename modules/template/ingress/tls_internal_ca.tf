@@ -3,7 +3,7 @@
 ##
 resource "tls_private_key" "internal-ca" {
   algorithm   = "ECDSA"
-  ecdsa_curve = "P521"
+  ecdsa_curve = "P256"
 }
 
 resource "tls_self_signed_cert" "internal-ca" {
@@ -19,8 +19,5 @@ resource "tls_self_signed_cert" "internal-ca" {
 
   allowed_uses = [
     "cert_signing",
-    "key_encipherment",
-    "server_auth",
-    "client_auth",
   ]
 }

@@ -4,7 +4,3 @@ provider "matchbox" {
   client_key  = var.renderer.private_key_pem
   ca          = var.renderer.ca_pem
 }
-
-provider "ct" {
-  version = "0.7.1"
-}
