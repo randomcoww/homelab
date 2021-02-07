@@ -145,7 +145,7 @@ tw terraform apply \
     -auto-approve \
     -var="ssh_client_public_key=$(cat $KEY.pub)" \
     -target=null_resource.output && \
-tw terraform output ssh-client-certificate > $KEY-cert.pub
+tw terraform output -raw ssh-client-certificate > $KEY-cert.pub
 ```
 
 Access Libvirt through SSH
@@ -162,7 +162,7 @@ tw terraform apply \
     -auto-approve \
     -target=null_resource.output && \
 mkdir -p ~/.kube && \
-tw terraform output kubeconfig > ~/.kube/config
+tw terraform output -raw kubeconfig > ~/.kube/config
 ```
 
 ---
