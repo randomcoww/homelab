@@ -74,7 +74,7 @@ storage:
           shutdownGracePeriod: "120s"
           shutdownGracePeriodCriticalPods: "60s"
           containerLogMaxSize: "10Mi"
-          containerLogMaxFiles: 1
+          containerLogMaxFiles: 2
     - path: ${kubelet_path}/bootstrap.kubeconfig
       mode: 0644
       contents:

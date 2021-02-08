@@ -132,7 +132,7 @@ metadata:
     ingress.kubernetes.io/ssl-redirect: "true"
 spec:
   rules:
-  - host: tr.fuzzybunny.internal
+  - host: t.fuzzybunny.internal
     http:
       paths:
       - path: /

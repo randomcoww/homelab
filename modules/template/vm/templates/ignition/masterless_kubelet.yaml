@@ -109,4 +109,4 @@ storage:
           staticPodPath: ${kubelet_path}/manifests
           makeIPTablesUtilChains: false
           containerLogMaxSize: "10Mi"
-          containerLogMaxFiles: 1
+          containerLogMaxFiles: 2
