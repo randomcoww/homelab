@@ -540,10 +540,36 @@ locals {
     # Workers
     # Network config is same for all hosts
     worker-0 = {
+      disks = [
+        {
+          device = "/dev/disk/by-id/ata-Samsung_SSD_860_QVO_1TB_S4PGNF0M410395Z"
+          partitions = [
+            {
+              label                = "localcache"
+              start_mib            = 0
+              size_mib             = 0
+              wipe_partition_entry = true
+            },
+          ]
+        },
+      ]
+      luks = [
+        {
+          label       = "localcache"
+          device      = "/dev/disk/by-partlabel/localcache"
+          wipe_volume = true
+        },
+      ]
       # Defaults:
       # format = "xfs"
       # wipe_filesystem = false
       filesystems = [
+        {
+          label           = "localcache"
+          device          = "/dev/disk/by-id/dm-name-localcache"
+          mount_path      = "/var/lib/kubelet/pv"
+          wipe_filesystem = true
+        },
         {
           label      = "2YK7XTRD"
           device     = "/dev/disk/by-id/ata-WDC_WD100EFAX-68LHPN0_2YK7XTRD"
@@ -603,12 +629,6 @@ locals {
           label      = "JEKAZ92N"
           device     = "/dev/disk/by-id/ata-WDC_WD100EFAX-68LHPN0_JEKAZ92N"
           mount_path = "/var/s3/11"
-        },
-        {
-          label           = "localcache"
-          device          = "/dev/disk/by-id/ata-INTEL_SSDSA2BZ100G3D_CVLV234300WH100AGN"
-          mount_path      = "/var/lib/kubelet/pv"
-          wipe_filesystem = true
         },
       ]
       node_labels = {
@@ -783,8 +803,6 @@ locals {
           ]
         },
       ]
-      # Main image is not suitable for VMs. Mount this iso image to use.
-      mount_guest_image_device = "/dev/disk/by-label/fedora-coreos-33"
       luks = [
         {
           label       = "localhome"
@@ -794,12 +812,14 @@ locals {
       ]
       filesystems = [
         {
+          label           = "localhome"
           device          = "/dev/disk/by-id/dm-name-localhome"
           mount_path      = "/var/home"
-          label           = "localhome"
           wipe_filesystem = false
         },
       ]
+      # Main image is not suitable for VMs. Mount this iso image to use.
+      mount_guest_image_device = "/dev/disk/by-label/fedora-coreos-33"
     }
 
     # unmanaged hardware
