@@ -278,7 +278,7 @@ locals {
 
     # host specific
     gateway = {
-      memory = 4
+      memory = 2
       vcpu   = 1
       nodes = [
         "gateway-0",
@@ -286,7 +286,7 @@ locals {
       ]
     }
     ns = {
-      memory = 4
+      memory = 2
       vcpu   = 1
       nodes = [
         "ns-0",
@@ -294,7 +294,7 @@ locals {
       ]
     }
     controller = {
-      memory = 8
+      memory = 4
       vcpu   = 2
       nodes = [
         "controller-0",

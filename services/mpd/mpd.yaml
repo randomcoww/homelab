@@ -116,7 +116,7 @@ spec:
   selector:
     app: mpd
 ---
-apiVersion: extensions/v1beta1
+apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
   name: mpd
@@ -130,20 +130,29 @@ spec:
     http:
       paths:
       - path: /
+        pathType: Prefix
         backend:
-          serviceName: mpd
-          servicePort: control
+          service:
+            name: mpd
+            port:
+              name: control
   - host: s.fuzzybunny.internal
     http:
       paths:
       - path: /flac
+        pathType: Prefix
         backend:
-          serviceName: mpd
-          servicePort: flac
+          service:
+            name: mpd
+            port:
+              name: flac
       - path: /lossy
+        pathType: Prefix
         backend:
-          serviceName: mpd
-          servicePort: lossy
+          service:
+            name: mpd
+            port:
+              name: lossy
   tls:
   - secretName: tls-ingress
 

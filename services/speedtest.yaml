@@ -35,7 +35,7 @@ spec:
     k8s-app: speedtest
 
 ---
-apiVersion: extensions/v1beta1
+apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
   name: speedtest
@@ -49,8 +49,11 @@ spec:
     http:
       paths:
       - path: /
+        pathType: Prefix
         backend:
-          serviceName: speedtest
-          servicePort: web
+          service:
+            name: speedtest
+            port:
+              name: web
   tls:
   - secretName: tls-ingress

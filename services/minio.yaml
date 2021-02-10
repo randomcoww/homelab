@@ -139,7 +139,7 @@ spec:
     app: minio
 
 ---
-apiVersion: extensions/v1beta1
+apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
   name: minio
@@ -153,8 +153,11 @@ spec:
     http:
       paths:
       - path: /
+        pathType: Prefix
         backend:
-          serviceName: minio
-          servicePort: api
+          service:
+            name: minio
+            port:
+              name: api
   tls:
   - secretName: tls-ingress
