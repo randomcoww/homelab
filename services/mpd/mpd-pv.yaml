@@ -43,7 +43,7 @@ spec:
               key: secret_access_key
         args:
         - "mount"
-        - ":s3:mpd-data/"
+        - ":s3:miscmusic/vol/"
         - "/vol/mnt"
         - "--s3-provider=Minio"
         - "--s3-env-auth=true"
@@ -82,7 +82,7 @@ spec:
   accessModes:
   - ReadWriteOnce
   local:
-    path: /var/lib/kubelet/hostpath/mpd-data/vol
+    path: /var/lib/kubelet/hostpath/mpd-data/downloads
 ---
 apiVersion: v1
 kind: PersistentVolumeClaim
