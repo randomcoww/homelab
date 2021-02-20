@@ -294,7 +294,7 @@ locals {
       ]
     }
     controller = {
-      memory = 4
+      memory = 6
       vcpu   = 2
       nodes = [
         "controller-0",
@@ -317,7 +317,6 @@ locals {
         "worker-2",
       ]
       hostdev = [
-        "chipset-sata",
         "hba",
       ]
     }
@@ -571,64 +570,84 @@ locals {
           wipe_filesystem = true
         },
         {
-          label      = "2YK7XTRD"
-          device     = "/dev/disk/by-id/ata-WDC_WD100EFAX-68LHPN0_2YK7XTRD"
-          mount_path = "/var/s3/0"
+          label      = "20162AA4B92B"
+          device     = "/dev/disk/by-id/ata-Micron_5210_MTFDDAK7T6QDE_20162AA4B92B"
+          mount_path = "/var/minio0/0"
+          options = [
+            "noatime",
+            "nodiratime",
+            "discard",
+          ]
         },
         {
-          label      = "2YK87AVD"
-          device     = "/dev/disk/by-id/ata-WDC_WD100EFAX-68LHPN0_2YK87AVD"
-          mount_path = "/var/s3/1"
+          label      = "20162AA4B943"
+          device     = "/dev/disk/by-id/ata-Micron_5210_MTFDDAK7T6QDE_20162AA4B943"
+          mount_path = "/var/minio0/1"
+          options = [
+            "noatime",
+            "nodiratime",
+            "discard",
+          ]
         },
         {
-          label      = "2YK89PND"
-          device     = "/dev/disk/by-id/ata-WDC_WD100EFAX-68LHPN0_2YK89PND"
-          mount_path = "/var/s3/2"
+          label      = "20162AA4BFFD"
+          device     = "/dev/disk/by-id/ata-Micron_5210_MTFDDAK7T6QDE_20162AA4BFFD"
+          mount_path = "/var/minio0/2"
+          options = [
+            "noatime",
+            "nodiratime",
+            "discard",
+          ]
         },
         {
-          label      = "2YKG1X2D"
-          device     = "/dev/disk/by-id/ata-WDC_WD100EFAX-68LHPN0_2YKG1X2D"
-          mount_path = "/var/s3/3"
+          label      = "20162AA4C02F"
+          device     = "/dev/disk/by-id/ata-Micron_5210_MTFDDAK7T6QDE_20162AA4C02F"
+          mount_path = "/var/minio0/3"
+          options = [
+            "noatime",
+            "nodiratime",
+            "discard",
+          ]
         },
         {
-          label      = "2YKGML5D"
-          device     = "/dev/disk/by-id/ata-WDC_WD100EFAX-68LHPN0_2YKGML5D"
-          mount_path = "/var/s3/4"
+          label      = "20162AA4C311"
+          device     = "/dev/disk/by-id/ata-Micron_5210_MTFDDAK7T6QDE_20162AA4C311"
+          mount_path = "/var/minio0/4"
+          options = [
+            "noatime",
+            "nodiratime",
+            "discard",
+          ]
         },
         {
-          label      = "2YKGML7D"
-          device     = "/dev/disk/by-id/ata-WDC_WD100EFAX-68LHPN0_2YKGML7D"
-          mount_path = "/var/s3/5"
+          label      = "20162AA4C4CB"
+          device     = "/dev/disk/by-id/ata-Micron_5210_MTFDDAK7T6QDE_20162AA4C4CB"
+          mount_path = "/var/minio0/5"
+          options = [
+            "noatime",
+            "nodiratime",
+            "discard",
+          ]
         },
         {
-          label      = "2YKGNL4D"
-          device     = "/dev/disk/by-id/ata-WDC_WD100EFAX-68LHPN0_2YKGNL4D"
-          mount_path = "/var/s3/6"
+          label      = "20242A9E3D2A"
+          device     = "/dev/disk/by-id/ata-Micron_5210_MTFDDAK7T6QDE_20242A9E3D2A"
+          mount_path = "/var/minio0/6"
+          options = [
+            "noatime",
+            "nodiratime",
+            "discard",
+          ]
         },
         {
-          label      = "JEK830AZ"
-          device     = "/dev/disk/by-id/ata-WDC_WD100EFAX-68LHPN0_JEK830AZ"
-          mount_path = "/var/s3/7"
-        },
-        {
-          label      = "JEK830RZ"
-          device     = "/dev/disk/by-id/ata-WDC_WD100EFAX-68LHPN0_JEK830RZ"
-          mount_path = "/var/s3/8"
-        },
-        {
-          label      = "JEK8V1YZ"
-          device     = "/dev/disk/by-id/ata-WDC_WD100EFAX-68LHPN0_JEK8V1YZ"
-          mount_path = "/var/s3/9"
-        },
-        {
-          label      = "JEK8YTSZ"
-          device     = "/dev/disk/by-id/ata-WDC_WD100EFAX-68LHPN0_JEK8YTSZ"
-          mount_path = "/var/s3/10"
-        },
-        {
-          label      = "JEKAZ92N"
-          device     = "/dev/disk/by-id/ata-WDC_WD100EFAX-68LHPN0_JEKAZ92N"
-          mount_path = "/var/s3/11"
+          label      = "20242BABB479"
+          device     = "/dev/disk/by-id/ata-Micron_5210_MTFDDAK7T6QDE_20242BABB479"
+          mount_path = "/var/minio0/7"
+          options = [
+            "noatime",
+            "nodiratime",
+            "discard",
+          ]
         },
       ]
       node_labels = {
@@ -687,17 +706,10 @@ locals {
         },
       ]
       dev = {
-        # Chipset SATA
-        chipset-sata = {
-          domain   = "0x0000"
-          bus      = "0x00"
-          slot     = "0x17"
-          function = "0x0"
-        }
         # HBA addon card
         hba = {
           domain   = "0x0000"
-          bus      = "0x02"
+          bus      = "0x01"
           slot     = "0x00"
           function = "0x0"
           rom      = "/etc/libvirt/boot/SAS9300_8i_IT.bin"

@@ -14,12 +14,12 @@ systemd:
     # zone FAN 1,2,.. 0x00, FAN A,B,.. 0x01
     # duty cycle 0x00-0x64
     - name: fancontrol.service
-      enabled: true
+      enabled: false
       contents: |
         [Service]
         Type=oneshot
-        ExecStart=/usr/bin/ipmitool raw 0x30 0x70 0x66 0x01 0x00 0x3c
-        ExecStart=/usr/bin/ipmitool raw 0x30 0x70 0x66 0x01 0x01 0x3c
+        ExecStart=/usr/bin/ipmitool raw 0x30 0x70 0x66 0x01 0x00 0x28
+        ExecStart=/usr/bin/ipmitool raw 0x30 0x70 0x66 0x01 0x01 0x28
 
         [Install]
         WantedBy=multi-user.target

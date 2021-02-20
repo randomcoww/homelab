@@ -15,6 +15,7 @@ systemd:
         What=${filesystem.device}
         Where=${filesystem.mount_path}
         Type=${lookup(filesystem, "format", "xfs")}
+        Options=${join(",", lookup(filesystem, "options", ["noatime", "nodiratime"]))}
         [Install]
         WantedBy=local-fs.target
     %{~ endif ~}

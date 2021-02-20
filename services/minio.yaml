@@ -93,23 +93,19 @@ spec:
         - server
         - --address
         - :9000
-        - http://$(INTERNAL_IP)/var/s3/0
-        - http://$(INTERNAL_IP)/var/s3/1
-        - http://$(INTERNAL_IP)/var/s3/2
-        - http://$(INTERNAL_IP)/var/s3/3
-        - http://$(INTERNAL_IP)/var/s3/4
-        - http://$(INTERNAL_IP)/var/s3/5
-        - http://$(INTERNAL_IP)/var/s3/6
-        - http://$(INTERNAL_IP)/var/s3/7
-        - http://$(INTERNAL_IP)/var/s3/8
-        - http://$(INTERNAL_IP)/var/s3/9
-        - http://$(INTERNAL_IP)/var/s3/10
-        - http://$(INTERNAL_IP)/var/s3/11
+        - http://$(INTERNAL_IP)/var/minio0/0
+        - http://$(INTERNAL_IP)/var/minio0/1
+        - http://$(INTERNAL_IP)/var/minio0/2
+        - http://$(INTERNAL_IP)/var/minio0/3
+        - http://$(INTERNAL_IP)/var/minio0/4
+        - http://$(INTERNAL_IP)/var/minio0/5
+        - http://$(INTERNAL_IP)/var/minio0/6
+        - http://$(INTERNAL_IP)/var/minio0/7
         ports:
         - containerPort: 9000
         volumeMounts:
         - name: data
-          mountPath: /var/s3
+          mountPath: /var/minio0
         livenessProbe:
           httpGet:
             path: /minio/health/live
@@ -119,7 +115,7 @@ spec:
       volumes:
       - name: data
         hostPath:
-          path: /var/s3
+          path: /var/minio0
           type: DirectoryOrCreate
 
 ---
