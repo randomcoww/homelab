@@ -78,7 +78,7 @@ spec:
           operator: Exists
   storageClassName: mpd-data
   capacity:
-    storage: 50Ti
+    storage: 40Ti
   accessModes:
   - ReadWriteOnce
   local:
@@ -95,4 +95,4 @@ spec:
   storageClassName: mpd-data
   resources:
     requests:
-      storage: 50Ti
+      storage: 40Ti
