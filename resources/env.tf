@@ -793,6 +793,13 @@ locals {
           dhcp = true
           hwif = "pf0"
         },
+        {
+          vlan         = "wan"
+          if           = "en-wan"
+          dhcp         = true
+          hwif         = "pf0"
+          route_metric = 2048
+        },
       ]
       ## hypervisor boot image is copied with coreos-installer to strip
       ## out ignition and re-used to boot VMs

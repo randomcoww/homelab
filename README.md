@@ -59,7 +59,7 @@ Run build from https://github.com/randomcoww/fedora-coreos-config-custom.git. Wr
 
 | Guest | IP | vCPU | Memory |
 |-------|----|------|--------|
-| controller-1.local | 192.168.127.220 | 2 | 8 |
+| controller-1.local | 192.168.127.220 | 2 | 6 |
 
 ```bash
 tw terraform apply \
@@ -72,9 +72,9 @@ tw terraform apply \
 
 | Guest | IP | vCPU | Memory |
 |-------|----|------|--------|
-| gateway-1.local | 192.168.127.218 | 1 | 4 |
-| ns-1.local | 192.168.127.223 | 1 | 4 |
-| controller-0.local | 192.168.127.219 | 2 | 8 |
+| gateway-1.local | 192.168.127.218 | 1 | 2 |
+| ns-1.local | 192.168.127.223 | 1 | 2 |
+| controller-0.local | 192.168.127.219 | 2 | 6 |
 | worker-0.local |  | 4 | 36 |
 
 ```bash
@@ -88,9 +88,9 @@ tw terraform apply \
 
 | Guest | IP | vCPU | Memory |
 |-------|----|------|--------|
-| gateway-0.local | 192.168.127.217 | 1 | 4 |
-| ns-0.local | 192.168.127.222 | 1 | 4 |
-| controller-2.local | 192.168.127.221 | 2 | 8 |
+| gateway-0.local | 192.168.127.217 | 1 | 2 |
+| ns-0.local | 192.168.127.222 | 1 | 2 |
+| controller-2.local | 192.168.127.221 | 2 | 6 |
 | worker-2.local |  | 4 | 36 |
 
 ```bash
