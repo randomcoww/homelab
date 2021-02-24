@@ -14,7 +14,7 @@ systemd:
     # zone FAN 1,2,.. 0x00, FAN A,B,.. 0x01
     # duty cycle 0x00-0x64
     - name: fancontrol.service
-      enabled: false
+      enabled: true
       contents: |
         [Service]
         Type=oneshot

@@ -272,7 +272,6 @@ locals {
     # IPMI fan control for Supermicro motherboards
     ipmi_fan_control = {
       nodes = [
-        "kvm-0",
       ]
     }
 
