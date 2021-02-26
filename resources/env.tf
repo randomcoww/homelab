@@ -546,7 +546,6 @@ locals {
               label                = "localcache"
               start_mib            = 0
               size_mib             = 0
-              wipe_partition_entry = true
             },
           ]
         },
@@ -555,7 +554,6 @@ locals {
         {
           label       = "localcache"
           device      = "/dev/disk/by-partlabel/localcache"
-          wipe_volume = true
         },
       ]
       # Defaults:
@@ -566,7 +564,6 @@ locals {
           label           = "localcache"
           device          = "/dev/disk/by-id/dm-name-localcache"
           mount_path      = "/var/lib/kubelet/pv"
-          wipe_filesystem = true
         },
         {
           label      = "20162AA4B92B"
