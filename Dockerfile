@@ -70,7 +70,7 @@ RUN set -x \
 
 FROM alpine:edge
 
-ARG TF_VERSION=0.14.6
+ARG TF_VERSION=0.14.7
 
 ENV HOME /root
 WORKDIR $HOME
