@@ -1,5 +1,8 @@
 locals {
-  params = {}
+  params = {
+    kubelet_path     = "/var/lib/kubelet"
+    container_images = var.container_images
+  }
 }
 
 output "ignition" {

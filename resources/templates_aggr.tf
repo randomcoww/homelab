@@ -11,6 +11,7 @@ locals {
       lookup(module.template-ingress, "ignition", {}),
       lookup(module.template-hypervisor, "ignition", {}),
       lookup(module.template-vm, "ignition", {}),
+      lookup(module.template-kubelet, "ignition", {}),
       lookup(module.template-client, "ignition", {}),
       lookup(module.template-laptop, "ignition", {}),
       lookup(module.template-server, "ignition", {}),

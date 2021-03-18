@@ -5,6 +5,7 @@ passwd:
   users:
     - name: ${users.client.name}
       uid: ${users.client.uid}
+      home_dir: ${users.client.home}
       password_hash: ${users.client.password}
       groups:
         - adm

@@ -205,6 +205,20 @@ locals {
         if   = "ens2"
       }
     }
+    kubelet = {
+      nodes = [
+        "gateway-0",
+        "gateway-1",
+        "ns-0",
+        "ns-1",
+        "controller-0",
+        "controller-1",
+        "controller-2",
+        "worker-0",
+        "worker-2",
+        "client-0",
+      ]
+    }
     server = {
       nodes = [
         "gateway-0",
@@ -782,20 +796,8 @@ locals {
           vlan = "internal"
           if   = "en-int"
           ip   = "192.168.127.253"
-          hwif = "pf0"
-        },
-        {
-          vlan = "lan"
-          if   = "en-lan"
           dhcp = true
           hwif = "pf0"
-        },
-        {
-          vlan         = "wan"
-          if           = "en-wan"
-          dhcp         = true
-          hwif         = "pf0"
-          route_metric = 2048
         },
       ]
       ## hypervisor boot image is copied with coreos-installer to strip
@@ -811,27 +813,24 @@ locals {
           device = "/dev/disk/by-id/nvme-Samsung_SSD_970_EVO_1TB_S5H9NS0N986704R"
           partitions = [
             {
-              label                = "localhome"
-              start_mib            = 0
-              size_mib             = 0
-              wipe_partition_entry = false
+              label     = "localhome"
+              start_mib = 0
+              size_mib  = 0
             },
           ]
         },
       ]
       luks = [
         {
-          label       = "localhome"
-          device      = "/dev/disk/by-partlabel/localhome"
-          wipe_volume = false
+          label  = "localhome"
+          device = "/dev/disk/by-partlabel/localhome"
         },
       ]
       filesystems = [
         {
-          label           = "localhome"
-          device          = "/dev/disk/by-id/dm-name-localhome"
-          mount_path      = "/var/home"
-          wipe_filesystem = false
+          label      = "localhome"
+          device     = "/dev/disk/by-id/dm-name-localhome"
+          mount_path = "/var/home"
         },
       ]
       # Main image is not suitable for VMs. Mount this iso image to use.

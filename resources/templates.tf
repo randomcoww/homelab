@@ -115,9 +115,18 @@ module "template-hypervisor" {
 module "template-vm" {
   source = "../modules/template/vm"
 
-  container_images = local.container_images
   hosts = {
     for k in local.components.vm.nodes :
+    k => local.aggr_hosts[k]
+  }
+}
+
+module "template-kubelet" {
+  source = "../modules/template/kubelet"
+
+  container_images = local.container_images
+  hosts = {
+    for k in local.components.kubelet.nodes :
     k => local.aggr_hosts[k]
   }
 }

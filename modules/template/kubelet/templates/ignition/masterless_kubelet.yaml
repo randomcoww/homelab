@@ -46,6 +46,7 @@ systemd:
           -v /var/run/lock:/var/run/lock:z"
         Environment=KUBELET_COMMON_ARGS="--exit-on-lock-contention \
           --lock-file=/var/run/lock/kubelet.lock \
+          --fail-swap-on=false \
           --container-runtime=remote \
           --container-runtime-endpoint=unix:///run/containerd/containerd.sock"
         ExecStartPre=/usr/bin/mkdir -p \

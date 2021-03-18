@@ -25,21 +25,13 @@ systemd:
             [Unit]
             ConditionVirtualization=!vm
             ConditionVirtualization=!container
-    # Let avahi handle mDNS
     - name: avahi-daemon.service
-      enabled: true
+      mask: true
     - name: avahi-daemon.socket
-      enabled: true
+      mask: true
 
 storage:
   files:
-    # Let avahi handle mDNS
-    - path: /etc/systemd/resolved.conf.d/10-disable-mdns.conf
-      mode: 0644
-      contents:
-        inline: |
-          [Resolve]
-          MulticastDNS=false
     ##
     ## misc configs
     ## add to global paths - persistent home directory is mounted afterwards
