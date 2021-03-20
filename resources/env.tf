@@ -36,7 +36,7 @@ locals {
     client = {
       name = "randomcoww"
       uid  = 10000
-      home = "/var/home/randomcoww"
+      home = "/var/lib/kubelet/pv/randomcoww"
     }
   }
 
@@ -825,7 +825,7 @@ locals {
         {
           label      = "localhome"
           device     = "/dev/disk/by-id/dm-name-localhome"
-          mount_path = "/var/home"
+          mount_path = "/var/lib/kubelet/pv"
         },
       ]
     }
