@@ -195,6 +195,7 @@ locals {
       ]
       kernel_params = [
         "console=hvc0",
+        "console=tty0",
         "rd.neednet=1",
         "ignition.firstboot",
         "ignition.platform.id=metal",
@@ -525,6 +526,8 @@ locals {
       ]
     }
     controller-1 = {
+      # This uses the client image so needs more ram disk space
+      memory = 8
       network = [
         {
           vlan = "internal"
