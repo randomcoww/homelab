@@ -25,27 +25,6 @@ systemd:
       mask: true
     - name: ksmtuned.service
       mask: true
-    %{~ if lookup(p, "mount_guest_image_device", null) != null ~}
-    - name: prepare-vm-resources.service
-      enabled: true
-      contents: |
-        [Unit]
-        ConditionPathExists=${lookup(p, "mount_guest_image_device", null)}
-        Before=matchbox.service
-        WantedBy=matchbox.service
-        After=local-fs.target
-
-        [Service]
-        Type=oneshot
-        RemainAfterExit=true
-        ExecStart=/usr/bin/podman volume create \
-          --opt type=iso9660 \
-          --opt device=${lookup(p, "mount_guest_image_device", null)} \
-          guest_image_vol
-
-        [Install]
-        WantedBy=matchbox.service
-    %{~ endif ~}
     - name: matchbox.service
       enabled: true
       contents: |
@@ -67,11 +46,7 @@ systemd:
           --name matchbox \
           --security-opt label=disable \
           --network host \
-          %{~ if lookup(p, "mount_guest_image_device", null) != null ~}
-          --mount type=volume,source=guest_image_vol,destination=${matchbox_assets_path} \
-          %{~ else ~}
           -v ${p.iso_mount_path}:${matchbox_assets_path}:ro \
-          %{~ endif ~}
           -v ${matchbox_tls_path}:${matchbox_tls_path}:ro \
           -v ${matchbox_data_path}:${matchbox_data_path} \
           ${container_images.matchbox} \

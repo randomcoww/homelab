@@ -199,6 +199,7 @@ locals {
         "ignition.firstboot",
         "ignition.platform.id=metal",
         "systemd.unified_cgroup_hierarchy=0",
+        "systemd.unit=multi-user.target",
       ]
       metadata = {
         vlan = "metadata"
@@ -216,7 +217,6 @@ locals {
         "controller-2",
         "worker-0",
         "worker-2",
-        "client-0",
       ]
     }
     server = {
@@ -276,11 +276,6 @@ locals {
     # promtail to push logs to loki (non kubernetes containerd hosts)
     static_pod_logging = {
       nodes = [
-        "ns-0",
-        "ns-1",
-        "controller-0",
-        "controller-1",
-        "controller-2",
       ]
     }
     # IPMI fan control for Supermicro motherboards
@@ -833,8 +828,6 @@ locals {
           mount_path = "/var/home"
         },
       ]
-      # Main image is not suitable for VMs. Mount this iso image to use.
-      mount_guest_image_device = "/dev/disk/by-label/fedora-coreos-33"
     }
 
     # unmanaged hardware

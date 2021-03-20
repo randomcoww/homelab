@@ -4,9 +4,15 @@ version: 1.3.0
 passwd:
   users:
     - name: ${users.client.name}
-      uid: ${users.client.uid}
-      home_dir: ${users.client.home}
-      password_hash: ${users.client.password}
+      %{~ if lookup(users.client, "uid", null) != null ~}
+      uid: ${lookup(users.client, "uid", null)}
+      %{~ endif ~}
+      %{~ if lookup(users.client, "home", null) != null ~}
+      home_dir: ${lookup(users.client, "home", null)}
+      %{~ endif ~}
+      %{~ if lookup(users.client, "password", null) != null ~}
+      password_hash: ${lookup(users.client, "password", null)}
+      %{~ endif ~}
       groups:
         - adm
         - sudo

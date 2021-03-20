@@ -21,6 +21,10 @@ systemd:
 
         [Install]
         WantedBy=multi-user.target
+    - name: avahi-daemon.service
+      mask: true
+    - name: avahi-daemon.socket
+      mask: true
 storage:
   files:
     - path: /etc/systemd/network/90-default.network

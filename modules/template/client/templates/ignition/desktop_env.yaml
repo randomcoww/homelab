@@ -25,10 +25,6 @@ systemd:
             [Unit]
             ConditionVirtualization=!vm
             ConditionVirtualization=!container
-    - name: avahi-daemon.service
-      mask: true
-    - name: avahi-daemon.socket
-      mask: true
 
 storage:
   files:

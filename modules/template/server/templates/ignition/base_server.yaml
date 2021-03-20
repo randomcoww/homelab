@@ -20,6 +20,15 @@ storage:
 passwd:
   users:
     - name: ${users.default.name}
+      %{~ if lookup(users.default, "uid", null) != null ~}
+      uid: ${lookup(users.default, "uid", null)}
+      %{~ endif ~}
+      %{~ if lookup(users.default, "home", null) != null ~}
+      home_dir: ${lookup(users.default, "home", null)}
+      %{~ endif ~}
+      %{~ if lookup(users.default, "password", null) != null ~}
+      password_hash: ${lookup(users.default, "password", null)}
+      %{~ endif ~}
       groups:
         - adm
         - sudo
