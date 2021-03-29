@@ -26,6 +26,7 @@ systemd:
         [Service]
         Environment=KUBELET_PODMAN_OPTS="--name kubelet \
           --security-opt label=disable \
+          --log-driver none \
           --network host \
           --pid host \
           --ipc host \

@@ -3,12 +3,12 @@ locals {
     users                = var.users
     container_images     = var.container_images
     services             = var.services
-    matchbox_image_path  = "/etc/container-save/matchbox.tar"
     kea_path             = "/var/lib/kea"
+    libvirt_tls_path     = "/etc/pki"
     matchbox_tls_path    = "/etc/matchbox/certs"
     matchbox_data_path   = "/etc/matchbox/data"
     matchbox_assets_path = "/etc/matchbox/assets"
-    libvirt_tls_path     = "/etc/pki"
+    matchbox_image_path  = "/etc/container-save/matchbox.tar"
   }
 
   domain_templates = {

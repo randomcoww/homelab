@@ -45,6 +45,7 @@ systemd:
         ExecStart=/usr/bin/podman run --rm -it \
           --name matchbox \
           --security-opt label=disable \
+          --log-driver none \
           --network host \
           -v ${p.iso_mount_path}:${matchbox_assets_path}:ro \
           -v ${matchbox_tls_path}:${matchbox_tls_path}:ro \

@@ -23,6 +23,7 @@ locals {
     kea                     = "docker.io/randomcoww/kea:1.8.1"
     conntrackd              = "docker.io/randomcoww/conntrackd:latest"
     promtail                = "docker.io/randomcoww/promtail:v2.0.0"
+    tftpd                   = "docker.io/randomcoww/tftpd-ipxe:latest"
     matchbox                = "quay.io/poseidon/matchbox:latest"
     tw                      = "docker.io/randomcoww/tf-env:latest"
   }
@@ -169,10 +170,10 @@ locals {
         "client-0",
       ]
       iso_mount_path = "/run/media/iso"
-      kernel_image   = "images/pxeboot/vmlinuz"
+      kernel_image   = "/assets/images/pxeboot/vmlinuz"
       initrd_images = [
-        "images/pxeboot/initrd.img",
-        "images/pxeboot/rootfs.img",
+        "/assets/images/pxeboot/initrd.img",
+        "/assets/images/pxeboot/rootfs.img",
       ]
       metadata = {
         vlan = "metadata"
@@ -195,7 +196,6 @@ locals {
       ]
       kernel_params = [
         "console=hvc0",
-        "console=tty0",
         "rd.neednet=1",
         "ignition.firstboot",
         "ignition.platform.id=metal",
@@ -304,7 +304,7 @@ locals {
       ]
     }
     controller = {
-      memory = 6
+      memory = 8
       vcpu   = 2
       nodes = [
         "controller-0",
@@ -482,6 +482,8 @@ locals {
 
     # Nameserver with DHCP
     ns-0 = {
+      # This uses the client image so needs more ram disk space
+      memory = 8
       network = [
         {
           vlan = "internal"
@@ -527,7 +529,7 @@ locals {
     }
     controller-1 = {
       # This uses the client image so needs more ram disk space
-      memory = 8
+      memory = 10
       network = [
         {
           vlan = "internal"
@@ -766,10 +768,6 @@ locals {
           hwif = "pf1"
         },
         {
-          node = "ns-0"
-          hwif = "pf0"
-        },
-        {
           node = "controller-2"
           hwif = "pf0"
         },
@@ -801,6 +799,10 @@ locals {
       ## hypervisor boot image is copied with coreos-installer to strip
       ## out ignition and re-used to boot VMs
       libvirt_domains = [
+        {
+          node = "ns-0"
+          hwif = "pf0"
+        },
         {
           node = "controller-1"
           hwif = "pf0"
