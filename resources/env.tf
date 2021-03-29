@@ -201,6 +201,7 @@ locals {
         "ignition.platform.id=metal",
         "systemd.unified_cgroup_hierarchy=0",
         "systemd.unit=multi-user.target",
+        "elevator=noop",
       ]
       metadata = {
         vlan = "metadata"
@@ -584,81 +585,41 @@ locals {
           label      = "20162AA4B92B"
           device     = "/dev/disk/by-id/ata-Micron_5210_MTFDDAK7T6QDE_20162AA4B92B"
           mount_path = "/var/minio0/0"
-          options = [
-            "noatime",
-            "nodiratime",
-            "discard",
-          ]
         },
         {
           label      = "20162AA4B943"
           device     = "/dev/disk/by-id/ata-Micron_5210_MTFDDAK7T6QDE_20162AA4B943"
           mount_path = "/var/minio0/1"
-          options = [
-            "noatime",
-            "nodiratime",
-            "discard",
-          ]
         },
         {
           label      = "20162AA4BFFD"
           device     = "/dev/disk/by-id/ata-Micron_5210_MTFDDAK7T6QDE_20162AA4BFFD"
           mount_path = "/var/minio0/2"
-          options = [
-            "noatime",
-            "nodiratime",
-            "discard",
-          ]
         },
         {
           label      = "20162AA4C02F"
           device     = "/dev/disk/by-id/ata-Micron_5210_MTFDDAK7T6QDE_20162AA4C02F"
           mount_path = "/var/minio0/3"
-          options = [
-            "noatime",
-            "nodiratime",
-            "discard",
-          ]
         },
         {
           label      = "20162AA4C311"
           device     = "/dev/disk/by-id/ata-Micron_5210_MTFDDAK7T6QDE_20162AA4C311"
           mount_path = "/var/minio0/4"
-          options = [
-            "noatime",
-            "nodiratime",
-            "discard",
-          ]
         },
         {
           label      = "20162AA4C4CB"
           device     = "/dev/disk/by-id/ata-Micron_5210_MTFDDAK7T6QDE_20162AA4C4CB"
           mount_path = "/var/minio0/5"
-          options = [
-            "noatime",
-            "nodiratime",
-            "discard",
-          ]
         },
         {
           label      = "20242A9E3D2A"
           device     = "/dev/disk/by-id/ata-Micron_5210_MTFDDAK7T6QDE_20242A9E3D2A"
           mount_path = "/var/minio0/6"
-          options = [
-            "noatime",
-            "nodiratime",
-            "discard",
-          ]
         },
         {
           label      = "20242BABB479"
           device     = "/dev/disk/by-id/ata-Micron_5210_MTFDDAK7T6QDE_20242BABB479"
           mount_path = "/var/minio0/7"
-          options = [
-            "noatime",
-            "nodiratime",
-            "discard",
-          ]
         },
       ]
       node_labels = {
