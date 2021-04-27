@@ -158,7 +158,6 @@ locals {
         "worker-0",
         "worker-2",
         "kvm-0",
-        "kvm-2",
         "client-0",
       ]
     }
@@ -166,7 +165,6 @@ locals {
     hypervisor = {
       nodes = [
         "kvm-0",
-        "kvm-2",
         "client-0",
       ]
       iso_mount_path = "/run/media/iso"
@@ -233,7 +231,6 @@ locals {
         "worker-0",
         "worker-2",
         "kvm-0",
-        "kvm-2",
         "client-0",
       ]
     }
@@ -260,7 +257,6 @@ locals {
         "worker-0",
         "worker-2",
         "kvm-0",
-        "kvm-2",
         "client-0",
       ]
     }
@@ -283,7 +279,6 @@ locals {
     # IPMI fan control for Supermicro motherboards
     ipmi_fan_control = {
       nodes = [
-        "kvm-2",
       ]
     }
 
@@ -314,7 +309,7 @@ locals {
       ]
     }
     worker = {
-      memory = 36
+      memory = 30
       vcpu   = 4
       network = [
         {
@@ -660,16 +655,19 @@ locals {
       ## out ignition and re-used to boot VMs
       libvirt_domains = [
         {
-          node = "gateway-1"
-          # This cannot run on the same SRIOV pf as other VMs
+          node = "gateway-0"
           hwif = "pf1"
         },
         {
-          node = "ns-1"
+          node = "ns-0"
           hwif = "pf0"
         },
         {
           node = "controller-0"
+          hwif = "pf0"
+        },
+        {
+          node = "controller-2"
           hwif = "pf0"
         },
         {
@@ -687,56 +685,6 @@ locals {
           rom      = "/etc/libvirt/boot/SAS9300_8i_IT.bin"
         }
       }
-    }
-    kvm-2 = {
-      hwif = [
-        {
-          label = "pf0"
-          if    = "en-pf0"
-          mac   = "3c-ec-ef-45-96-e6"
-        },
-        {
-          label = "pf1"
-          if    = "en-pf1"
-          mac   = "3c-ec-ef-45-96-e7"
-        },
-        {
-          label = "pf2"
-          if    = "en-pf2"
-          mac   = "3c-ec-ef-45-96-e8"
-        },
-        {
-          label = "pf3"
-          if    = "en-pf3"
-          mac   = "3c-ec-ef-45-96-e9"
-        },
-      ]
-      network = [
-        {
-          vlan = "internal"
-          if   = "en-int"
-          ip   = "192.168.127.250"
-          dhcp = true
-          hwif = "pf0"
-        },
-      ]
-      ## hypervisor boot image is copied with coreos-installer to strip
-      ## out ignition and re-used to boot VMs
-      libvirt_domains = [
-        {
-          node = "gateway-0"
-          # This cannot run on the same SRIOV pf as other VMs
-          hwif = "pf1"
-        },
-        {
-          node = "controller-2"
-          hwif = "pf0"
-        },
-        {
-          node = "worker-2"
-          hwif = "pf2"
-        },
-      ]
     }
 
     # client devices
@@ -761,7 +709,7 @@ locals {
       ## out ignition and re-used to boot VMs
       libvirt_domains = [
         {
-          node = "ns-0"
+          node = "ns-1"
           hwif = "pf0"
         },
         {
@@ -830,7 +778,6 @@ locals {
   # control which configs are rendered on local matchbox
   local_renderer_hosts_include = [
     "kvm-0",
-    "kvm-2",
     "client-0",
   ]
 }
