@@ -25,6 +25,8 @@ systemd:
       mask: true
     - name: avahi-daemon.socket
       mask: true
+    - name: geoclue.service
+      mask: true
 storage:
   files:
     - path: /etc/systemd/network/90-default.network

@@ -59,7 +59,7 @@ Run build from https://github.com/randomcoww/fedora-coreos-config-custom.git. Wr
 
 | Guest | IP | vCPU | Memory |
 |-------|----|------|--------|
-| ns-0.local | 192.168.127.222 | 1 | 8 |
+| ns-1.local | 192.168.127.223 | 1 | 4 |
 | controller-1.local | 192.168.127.220 | 2 | 10 |
 
 ```bash
@@ -73,31 +73,17 @@ tw terraform apply \
 
 | Guest | IP | vCPU | Memory |
 |-------|----|------|--------|
-| gateway-1.local | 192.168.127.218 | 1 | 4 |
-| ns-1.local | 192.168.127.223 | 1 | 4 |
+| gateway-0.local | 192.168.127.217 | 1 | 4 |
+| ns-0.local | 192.168.127.222 | 1 | 8 |
 | controller-0.local | 192.168.127.219 | 2 | 8 |
-| worker-0.local |  | 4 | 36 |
+| controller-2.local | 192.168.127.221 | 2 | 8 |
+| worker-0.local |  | 4 | 30 |
 
 ```bash
 tw terraform apply \
     -var-file=secrets.tfvars \
     -target=module.ignition-kvm-0 \
     -target=module.libvirt-kvm-0
-```
-
-**kvm-2.local**
-
-| Guest | IP | vCPU | Memory |
-|-------|----|------|--------|
-| gateway-0.local | 192.168.127.217 | 1 | 4 |
-| controller-2.local | 192.168.127.221 | 2 | 8 |
-| worker-2.local |  | 4 | 36 |
-
-```bash
-tw terraform apply \
-    -var-file=secrets.tfvars \
-    -target=module.ignition-kvm-2 \
-    -target=module.libvirt-kvm-2
 ```
 
 #### Start kubernetes addons
@@ -152,7 +138,6 @@ Access Libvirt through SSH
 ```bash
 virsh -c qemu+ssh://fcos@client-0.local/system
 virsh -c qemu+ssh://fcos@kvm-0.local/system
-virsh -c qemu+ssh://fcos@kvm-2.local/system
 ```
 
 **Kubeconfig**

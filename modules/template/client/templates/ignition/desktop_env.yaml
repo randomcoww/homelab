@@ -106,10 +106,10 @@ storage:
       contents:
         inline: |
           [org/gnome/system/location]
-          enabled=true
+          enabled=false
 
           [org/gnome/desktop/datetime]
-          automatic-timezone=true
+          automatic-timezone=false
 
           [org/gnome/settings-daemon/plugins/color]
           night-light-enabled=true
@@ -175,3 +175,6 @@ storage:
               </application>
             </device>
           </driconf>
+  links:
+    - path: /etc/localtime
+      target: /usr/share/zoneinfo/${local_timezone}

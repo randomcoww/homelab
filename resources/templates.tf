@@ -83,6 +83,7 @@ module "template-client" {
 
   users            = local.aggr_users
   services         = local.services
+  local_timezone   = "America/Los_Angeles"
   container_images = local.container_images
   hosts = {
     for k in local.components.client.nodes :

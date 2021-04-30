@@ -13,3 +13,7 @@ variable "container_images" {
 variable "hosts" {
   type = any
 }
+
+variable "local_timezone" {
+  type = string
+}
