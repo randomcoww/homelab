@@ -716,6 +716,10 @@ locals {
           node = "controller-1"
           hwif = "pf0"
         },
+        {
+          node = "worker-2"
+          hwif = "pf0"
+        },
       ]
       disks = [
         {
