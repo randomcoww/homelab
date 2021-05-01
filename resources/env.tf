@@ -478,8 +478,6 @@ locals {
 
     # Nameserver with DHCP
     ns-0 = {
-      # This uses the client image so needs more ram disk space
-      memory = 8
       network = [
         {
           vlan = "internal"
@@ -496,6 +494,8 @@ locals {
       kea_ha_role = "primary"
     }
     ns-1 = {
+      # This uses the client image so needs more ram disk space
+      memory = 8
       network = [
         {
           vlan = "internal"
@@ -525,7 +525,7 @@ locals {
     }
     controller-1 = {
       # This uses the client image so needs more ram disk space
-      memory = 10
+      memory = 12
       network = [
         {
           vlan = "internal"
@@ -714,10 +714,6 @@ locals {
         },
         {
           node = "controller-1"
-          hwif = "pf0"
-        },
-        {
-          node = "worker-2"
           hwif = "pf0"
         },
       ]
