@@ -61,6 +61,7 @@ Run build from https://github.com/randomcoww/fedora-coreos-config-custom.git. Wr
 |-------|----|------|--------|
 | ns-1.local | 192.168.127.223 | 1 | 4 |
 | controller-1.local | 192.168.127.220 | 2 | 10 |
+| worker-2.local |  | 4 | 30 |
 
 ```bash
 tw terraform apply \
