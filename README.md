@@ -22,7 +22,11 @@ tw() {
 
 ```bash
 cat > secrets.tfvars <<EOF
-client_password = "$(echo 'password' | mkpasswd -m sha-512 -s)"
+users = {
+  client = {
+    password = "$(echo 'password' | mkpasswd -m sha-512 -s)"
+  }
+}
 wireguard_config = {
   Interface = {
     PrivateKey =
