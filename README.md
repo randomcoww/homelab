@@ -71,6 +71,23 @@ tw terraform apply \
     -target=module.libvirt-kvm-0
 ```
 
+**kvm-1.local**
+
+| Guest | IP | vCPU | Memory |
+|-------|----|------|--------|
+| gateway-1.local | 192.168.127.218 | 1 | 4 |
+| ns-1.local | 192.168.127.223 | 1 | 4 |
+| controller-1.local | 192.168.127.220 | 2 | 8 |
+| controller-2.local | 192.168.127.221 | 2 | 8 |
+| worker-1.local |  | 4 | 30 |
+
+```bash
+tw terraform apply \
+    -var-file=secrets.tfvars \
+    -target=module.ignition-kvm-1 \
+    -target=module.libvirt-kvm-1
+```
+
 #### Start kubernetes addons
 
 May need to force resource dependencies to generate
@@ -122,6 +139,7 @@ tw terraform output -raw ssh-client-certificate > $KEY-cert.pub
 Access Libvirt through SSH
 ```bash
 virsh -c qemu+ssh://fcos@kvm-0.local/system
+virsh -c qemu+ssh://fcos@kvm-1.local/system
 ```
 
 **Kubeconfig**

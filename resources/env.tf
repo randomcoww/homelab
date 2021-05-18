@@ -158,6 +158,7 @@ locals {
         "worker-0",
         "worker-1",
         "kvm-0",
+        "kvm-1",
         "client-0",
       ]
     }
@@ -165,6 +166,7 @@ locals {
     hypervisor = {
       nodes = [
         "kvm-0",
+        "kvm-1",
       ]
       iso_mount_path = "/run/media/iso"
       kernel_image   = "/assets/images/pxeboot/vmlinuz"
@@ -230,6 +232,7 @@ locals {
         "worker-0",
         "worker-1",
         "kvm-0",
+        "kvm-1",
       ]
     }
     # silverblue (gnome) desktop with networkmanager
@@ -256,6 +259,7 @@ locals {
         "worker-0",
         "worker-1",
         "kvm-0",
+        "kvm-1",
       ]
     }
     ssh_client = {
