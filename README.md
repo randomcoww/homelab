@@ -55,20 +55,6 @@ Run build from https://github.com/randomcoww/fedora-coreos-config-custom.git. Wr
 
 #### Start VMs
 
-**client-0.local**
-
-| Guest | IP | vCPU | Memory |
-|-------|----|------|--------|
-| ns-1.local | 192.168.127.223 | 1 | 8 |
-| controller-1.local | 192.168.127.220 | 2 | 12 |
-
-```bash
-tw terraform apply \
-    -var-file=secrets.tfvars \
-    -target=module.ignition-client-0 \
-    -target=module.libvirt-client-0
-```
-
 **kvm-0.local**
 
 | Guest | IP | vCPU | Memory |
@@ -76,7 +62,6 @@ tw terraform apply \
 | gateway-0.local | 192.168.127.217 | 1 | 4 |
 | ns-0.local | 192.168.127.222 | 1 | 4 |
 | controller-0.local | 192.168.127.219 | 2 | 8 |
-| controller-2.local | 192.168.127.221 | 2 | 8 |
 | worker-0.local |  | 4 | 30 |
 
 ```bash
@@ -136,7 +121,6 @@ tw terraform output -raw ssh-client-certificate > $KEY-cert.pub
 
 Access Libvirt through SSH
 ```bash
-virsh -c qemu+ssh://fcos@client-0.local/system
 virsh -c qemu+ssh://fcos@kvm-0.local/system
 ```
 

@@ -37,7 +37,7 @@ locals {
     client = {
       name = "randomcoww"
       uid  = 10000
-      home = "/var/lib/kubelet/pv/randomcoww"
+      home = "/var/localhome/randomcoww"
     }
   }
 
@@ -156,7 +156,7 @@ locals {
         "controller-1",
         "controller-2",
         "worker-0",
-        "worker-2",
+        "worker-1",
         "kvm-0",
         "client-0",
       ]
@@ -165,7 +165,6 @@ locals {
     hypervisor = {
       nodes = [
         "kvm-0",
-        "client-0",
       ]
       iso_mount_path = "/run/media/iso"
       kernel_image   = "/assets/images/pxeboot/vmlinuz"
@@ -190,7 +189,7 @@ locals {
         "controller-1",
         "controller-2",
         "worker-0",
-        "worker-2",
+        "worker-1",
       ]
       kernel_params = [
         "console=hvc0",
@@ -216,7 +215,7 @@ locals {
         "controller-1",
         "controller-2",
         "worker-0",
-        "worker-2",
+        "worker-1",
       ]
     }
     server = {
@@ -229,9 +228,8 @@ locals {
         "controller-1",
         "controller-2",
         "worker-0",
-        "worker-2",
+        "worker-1",
         "kvm-0",
-        "client-0",
       ]
     }
     # silverblue (gnome) desktop with networkmanager
@@ -242,6 +240,7 @@ locals {
     }
     laptop = {
       nodes = [
+        "client-0",
       ]
     }
     # server certs for SSH CA
@@ -255,9 +254,8 @@ locals {
         "controller-1",
         "controller-2",
         "worker-0",
-        "worker-2",
+        "worker-1",
         "kvm-0",
-        "client-0",
       ]
     }
     ssh_client = {
@@ -320,7 +318,7 @@ locals {
       ]
       nodes = [
         "worker-0",
-        "worker-2",
+        "worker-1",
       ]
       hostdev = [
         "hba",
@@ -494,8 +492,6 @@ locals {
       kea_ha_role = "primary"
     }
     ns-1 = {
-      # This uses the client image so needs more ram disk space
-      memory = 8
       network = [
         {
           vlan = "internal"
@@ -524,8 +520,6 @@ locals {
       ]
     }
     controller-1 = {
-      # This uses the client image so needs more ram disk space
-      memory = 12
       network = [
         {
           vlan = "internal"
@@ -622,7 +616,7 @@ locals {
         "openebs.io/engine" = "mayastor"
       }
     }
-    worker-2 = {
+    worker-1 = {
       node_labels = {
         "openebs.io/engine" = "mayastor"
       }
@@ -667,10 +661,6 @@ locals {
           hwif = "pf0"
         },
         {
-          node = "controller-2"
-          hwif = "pf0"
-        },
-        {
           node = "worker-0"
           hwif = "pf0"
         },
@@ -686,21 +676,34 @@ locals {
         }
       }
     }
-
-    # client devices
-    client-0 = {
+    kvm-1 = {
       hwif = [
         {
           label = "pf0"
           if    = "en-pf0"
-          mac   = "f4-52-14-7b-53-80"
+          mac   = "3c-ec-ef-45-96-e6"
+        },
+        {
+          label = "pf1"
+          if    = "en-pf1"
+          mac   = "3c-ec-ef-45-96-e7"
+        },
+        {
+          label = "pf2"
+          if    = "en-pf2"
+          mac   = "3c-ec-ef-45-96-e8"
+        },
+        {
+          label = "pf3"
+          if    = "en-pf3"
+          mac   = "3c-ec-ef-45-96-e9"
         },
       ]
       network = [
         {
           vlan = "internal"
           if   = "en-int"
-          ip   = "192.168.127.253"
+          ip   = "192.168.127.250"
           dhcp = true
           hwif = "pf0"
         },
@@ -709,37 +712,56 @@ locals {
       ## out ignition and re-used to boot VMs
       libvirt_domains = [
         {
-          node = "ns-1"
+          node = "gateway-1"
           hwif = "pf0"
+        },
+        {
+          node = "ns-1"
+          hwif = "pf1"
         },
         {
           node = "controller-1"
-          hwif = "pf0"
+          hwif = "pf2"
+        },
+        {
+          node = "controller-2"
+          hwif = "pf2"
+        },
+        {
+          node = "worker-1"
+          hwif = "pf3"
         },
       ]
+    }
+
+    # client devices
+    client-0 = {
       disks = [
         {
-          device = "/dev/disk/by-id/nvme-Samsung_SSD_970_EVO_1TB_S5H9NS0N986704R"
+          device = "/dev/disk/by-id/nvme-SAMSUNG_MZVLB256HBHQ-000L2_S4DXNX0NB13174"
           partitions = [
             {
-              label     = "localhome"
-              start_mib = 0
-              size_mib  = 0
+              label                = "localhome"
+              start_mib            = 0
+              size_mib             = 0
+              wipe_partition_entry = false
             },
           ]
         },
       ]
       luks = [
         {
-          label  = "localhome"
-          device = "/dev/disk/by-partlabel/localhome"
+          label       = "localhome"
+          device      = "/dev/disk/by-partlabel/localhome"
+          wipe_volume = false
         },
       ]
       filesystems = [
         {
-          label      = "localhome"
-          device     = "/dev/disk/by-id/dm-name-localhome"
-          mount_path = "/var/lib/kubelet/pv"
+          label           = "localhome"
+          device          = "/dev/disk/by-id/dm-name-localhome"
+          mount_path      = "/var/localhome"
+          wipe_filesystem = false
         },
       ]
     }
@@ -763,11 +785,11 @@ locals {
         },
       ]
     }
-    ipmi-2 = {
+    ipmi-1 = {
       network = [
         {
           vlan = "internal"
-          ip   = "192.168.127.63"
+          ip   = "192.168.127.62"
           mac  = "3c-ec-ef-45-97-77"
         }
       ]
@@ -778,6 +800,7 @@ locals {
   # control which configs are rendered on local matchbox
   local_renderer_hosts_include = [
     "kvm-0",
+    "kvm-1",
     "client-0",
   ]
 }
