@@ -431,7 +431,7 @@ locals {
           if   = "ens7"
           dhcp = true
           # Duplicate this on gateways
-          mac = "52-54-00-63-6e-b3"
+          mac = "a8-5e-45-56-85-70"
         },
       ]
     }
@@ -471,7 +471,7 @@ locals {
           if   = "ens7"
           dhcp = true
           # Duplicate this on nodes
-          mac = "52-54-00-63-6e-b3"
+          mac = "a8-5e-45-56-85-70"
         },
       ]
     }
@@ -668,7 +668,7 @@ locals {
         },
         {
           node = "controller-2"
-          hwif = "pf2"
+          hwif = "pf0"
         },
         {
           node = "worker-0"
