@@ -158,6 +158,7 @@ locals {
         "worker-0",
         "worker-1",
         "kvm-0",
+        "kvm-1",
         "client-0",
       ]
     }
@@ -165,7 +166,7 @@ locals {
     hypervisor = {
       nodes = [
         "kvm-0",
-        "client-0",
+        "kvm-1",
       ]
       iso_mount_path = "/run/media/iso"
       kernel_image   = "/assets/images/pxeboot/vmlinuz"
@@ -231,7 +232,7 @@ locals {
         "worker-0",
         "worker-1",
         "kvm-0",
-        "client-0",
+        "kvm-1",
       ]
     }
     # silverblue (gnome) desktop with networkmanager
@@ -257,7 +258,7 @@ locals {
         "worker-0",
         "worker-1",
         "kvm-0",
-        "client-0",
+        "kvm-1",
       ]
     }
     ssh_client = {
@@ -494,8 +495,6 @@ locals {
       kea_ha_role = "primary"
     }
     ns-1 = {
-      # This uses the client image so needs more ram disk space
-      memory = 8
       network = [
         {
           vlan = "internal"
@@ -524,8 +523,6 @@ locals {
       ]
     }
     controller-1 = {
-      # This uses the client image so needs more ram disk space
-      memory = 12
       network = [
         {
           vlan = "internal"
@@ -656,6 +653,7 @@ locals {
       libvirt_domains = [
         {
           node = "gateway-0"
+          # This cannot run on the same SRIOV pf as other VMs
           hwif = "pf1"
         },
         {
@@ -686,21 +684,34 @@ locals {
         }
       }
     }
-
-    # client devices
-    client-0 = {
+    kvm-1 = {
       hwif = [
         {
           label = "pf0"
           if    = "en-pf0"
-          mac   = "f4-52-14-7b-53-80"
+          mac   = "3c-ec-ef-45-96-e6"
+        },
+        {
+          label = "pf1"
+          if    = "en-pf1"
+          mac   = "3c-ec-ef-45-96-e7"
+        },
+        {
+          label = "pf2"
+          if    = "en-pf2"
+          mac   = "3c-ec-ef-45-96-e8"
+        },
+        {
+          label = "pf3"
+          if    = "en-pf3"
+          mac   = "3c-ec-ef-45-96-e9"
         },
       ]
       network = [
         {
           vlan = "internal"
           if   = "en-int"
-          ip   = "192.168.127.253"
+          ip   = "192.168.127.250"
           dhcp = true
           hwif = "pf0"
         },
@@ -709,6 +720,11 @@ locals {
       ## out ignition and re-used to boot VMs
       libvirt_domains = [
         {
+          node = "gateway-1"
+          # This cannot run on the same SRIOV pf as other VMs
+          hwif = "pf1"
+        },
+        {
           node = "ns-1"
           hwif = "pf0"
         },
@@ -716,10 +732,18 @@ locals {
           node = "controller-1"
           hwif = "pf0"
         },
+        {
+          node = "worker-1"
+          hwif = "pf2"
+        },
       ]
+    }
+
+    # client devices
+    client-0 = {
       disks = [
         {
-          device = "/dev/disk/by-id/nvme-Samsung_SSD_970_EVO_1TB_S5H9NS0N986704R"
+          device = "/dev/disk/by-id/nvme-SAMSUNG_MZVLB256HBHQ-000L2_S4DXNX0NB13174"
           partitions = [
             {
               label                = "localhome"
@@ -781,6 +805,7 @@ locals {
   # control which configs are rendered on local matchbox
   local_renderer_hosts_include = [
     "kvm-0",
+    "kvm-1",
     "client-0",
   ]
 }
