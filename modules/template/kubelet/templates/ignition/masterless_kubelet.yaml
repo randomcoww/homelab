@@ -82,7 +82,6 @@ storage:
           [grpc]
             address = "/run/containerd/containerd.sock"
           [plugins]
-            version = 2
             [plugins."io.containerd.grpc.v1.cri"]
               disable_tcp_service = true
               stream_server_address = "127.0.0.1"

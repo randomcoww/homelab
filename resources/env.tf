@@ -338,7 +338,7 @@ locals {
       router    = "192.168.126.240"
       dhcp_pool = "192.168.127.64/26"
       mdns      = true
-      mtu       = 9000
+      mtu       = 1500
     }
     # main
     lan = {
@@ -347,7 +347,7 @@ locals {
       cidr      = 23
       router    = "192.168.62.240"
       dhcp_pool = "192.168.63.64/26"
-      mtu       = 9000
+      mtu       = 1500
     }
     # gateway conntrack sync and backup route
     sync = {
@@ -355,7 +355,7 @@ locals {
       network = "192.168.190.0"
       cidr    = 29
       router  = "192.168.190.6"
-      mtu     = 9000
+      mtu     = 1500
     }
     wan = {
       id = 30
