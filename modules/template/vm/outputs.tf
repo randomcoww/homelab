@@ -1,5 +1,7 @@
 locals {
-  params = {}
+  params = {
+    users = var.users
+  }
 }
 
 output "ignition" {

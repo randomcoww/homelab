@@ -209,8 +209,6 @@ locals {
     }
     kubelet = {
       nodes = [
-        "gateway-0",
-        "gateway-1",
         "ns-0",
         "ns-1",
         "controller-0",
@@ -248,8 +246,6 @@ locals {
     # server certs for SSH CA
     ssh_server = {
       nodes = [
-        "gateway-0",
-        "gateway-1",
         "ns-0",
         "ns-1",
         "controller-0",
@@ -399,24 +395,16 @@ locals {
       network = [
         # Dummy link for management access - don't add a router VIP
         {
-          vlan   = "internal"
-          ip     = "192.168.127.217"
-          router = null
-          metric = 2048
-          if     = "ens3"
-        },
-        {
-          label = "internal-vip"
-          vlan  = "internal"
-          if    = "ens4"
-          mdns  = false
-          vip   = local.networks.internal.router
+          vlan = "internal"
+          if   = "ens3"
+          vip  = local.networks.internal.router
+          mdns = false
           # Duplicate this on gateways
           mac = "00-00-5e-00-01-01"
         },
         {
           vlan = "lan"
-          if   = "ens5"
+          if   = "ens4"
           vip  = local.networks.lan.router
           # Duplicate this on gateways
           mac = "00-00-5e-00-01-02"
@@ -425,11 +413,11 @@ locals {
           vlan = "sync"
           ip   = "192.168.190.1"
           vip  = local.networks.sync.router
-          if   = "ens6"
+          if   = "ens5"
         },
         {
           vlan = "wan"
-          if   = "ens7"
+          if   = "ens6"
           dhcp = true
           # Duplicate this on gateways
           mac = "a8-5e-45-56-85-70"
@@ -440,23 +428,15 @@ locals {
       network = [
         # Dummy link for management access - don't add a router VIP
         {
-          vlan   = "internal"
-          ip     = "192.168.127.218"
-          metric = 2048
-          if     = "ens3"
-        },
-        {
-          label = "internal-vip"
-          vlan  = "internal"
-          if    = "ens4"
-          mdns  = false
-          vip   = local.networks.internal.router
+          vlan = "internal"
+          if   = "ens3"
+          vip  = local.networks.internal.router
           # Duplicate this on nodes
           mac = "00-00-5e-00-01-01"
         },
         {
           vlan = "lan"
-          if   = "ens5"
+          if   = "ens4"
           vip  = local.networks.lan.router
           # Duplicate this on nodes
           mac = "00-00-5e-00-01-02"
@@ -465,11 +445,11 @@ locals {
           vlan = "sync"
           ip   = "192.168.190.2"
           vip  = local.networks.sync.router
-          if   = "ens6"
+          if   = "ens5"
         },
         {
           vlan = "wan"
-          if   = "ens7"
+          if   = "ens6"
           dhcp = true
           # Duplicate this on nodes
           mac = "a8-5e-45-56-85-70"

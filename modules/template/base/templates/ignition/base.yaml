@@ -59,6 +59,11 @@ storage:
         inline: |
           blacklist pcspkr
           blacklist snd_pcsp
+    - path: /etc/sysctl.d/console-print.conf
+      mode: 0644
+      contents:
+        inline: |
+          kernel.printk=4
 
 # Remove users baked into standard CoreOS image
 passwd:

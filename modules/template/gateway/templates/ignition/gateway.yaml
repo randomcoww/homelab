@@ -41,12 +41,14 @@ storage:
           RequiredForOnline=false
 
           [DHCP]
+          UseMTU=true
           UseDNS=false
           UseNTP=false
           SendHostname=false
           UseHostname=false
           UseDomains=false
           UseTimezone=false
+          ClientIdentifier=mac
           RouteTable=${master_default_route_table}
 
           [Network]

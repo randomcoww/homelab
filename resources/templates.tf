@@ -116,6 +116,7 @@ module "template-hypervisor" {
 module "template-vm" {
   source = "../modules/template/vm"
 
+  users = local.aggr_users
   hosts = {
     for k in local.components.vm.nodes :
     k => local.aggr_hosts[k]
