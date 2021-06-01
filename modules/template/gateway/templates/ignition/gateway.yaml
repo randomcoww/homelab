@@ -41,6 +41,9 @@ storage:
           RequiredForOnline=false
 
           [DHCP]
+          Anonymize=true
+          # Needed to request IP on each gateway
+          RequestBroadcast=true
           UseMTU=true
           UseDNS=false
           UseNTP=false

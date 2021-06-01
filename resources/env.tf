@@ -326,7 +326,6 @@ locals {
   }
 
   networks = {
-    # services - no route to wan
     internal = {
       id        = 1
       network   = "192.168.126.0"
@@ -336,7 +335,6 @@ locals {
       mdns      = true
       mtu       = 1500
     }
-    # main
     lan = {
       id        = 90
       network   = "192.168.62.0"
@@ -418,9 +416,9 @@ locals {
         {
           vlan = "wan"
           if   = "ens6"
-          dhcp = true
+          dhcp = "ipv4"
           # Duplicate this on gateways
-          mac = "a8-5e-45-56-85-70"
+          mac = "52-54-00-63-6e-b3"
         },
       ]
     }
@@ -450,9 +448,9 @@ locals {
         {
           vlan = "wan"
           if   = "ens6"
-          dhcp = true
+          dhcp = "ipv4"
           # Duplicate this on nodes
-          mac = "a8-5e-45-56-85-70"
+          mac = "52-54-00-63-6e-b3"
         },
       ]
     }
