@@ -201,6 +201,8 @@ locals {
         "systemd.unified_cgroup_hierarchy=0",
         "systemd.unit=multi-user.target",
         "elevator=noop",
+        # currently podman kubelet is failing with /dev/dma_heap
+        "enforcing=0",
       ]
       metadata = {
         vlan = "metadata"
@@ -209,6 +211,8 @@ locals {
     }
     kubelet = {
       nodes = [
+        "gateway-0",
+        "gateway-1",
         "ns-0",
         "ns-1",
         "controller-0",
