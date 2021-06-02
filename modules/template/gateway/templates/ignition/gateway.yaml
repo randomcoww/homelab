@@ -205,6 +205,8 @@ storage:
             Systemd off
             LogFile /dev/stdout
             Syslog off
+            NetlinkBufferSize 2097152
+            NetlinkBufferSizeMaxGrowth 8388608
             UNIX {
               Path /var/run/conntrackd.ctl
             }
