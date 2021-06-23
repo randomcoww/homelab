@@ -41,7 +41,7 @@ storage:
       contents:
         inline: |
           # use for mayastor malloc
-          vm.nr_hugepages = 10240
+          vm.nr_hugepages = 1024
     - path: /etc/modules-load.d/worker.conf
       mode: 0644
       contents:

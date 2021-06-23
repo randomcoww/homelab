@@ -310,7 +310,7 @@ locals {
       ]
     }
     worker = {
-      memory = 30
+      memory = 24
       vcpu   = 4
       network = [
         {
@@ -643,6 +643,18 @@ locals {
           hwif = "pf0"
         },
         {
+          node = "controller-0"
+          hwif = "pf0"
+        },
+        {
+          node = "controller-1"
+          hwif = "pf0"
+        },
+        {
+          node = "controller-2"
+          hwif = "pf0"
+        },
+        {
           node = "worker-0"
           hwif = "pf0"
         },
@@ -701,18 +713,6 @@ locals {
         {
           node = "ns-1"
           hwif = "pf0"
-        },
-        {
-          node = "controller-0"
-          hwif = "pf2"
-        },
-        {
-          node = "controller-1"
-          hwif = "pf2"
-        },
-        {
-          node = "controller-2"
-          hwif = "pf2"
         },
       ]
     }
