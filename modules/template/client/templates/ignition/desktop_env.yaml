@@ -83,6 +83,7 @@ storage:
             realtime-priority = 9
             rlimit-rtprio = 9
             daemonize = no
+    # Controller support in steam
     - path: /etc/udev/rules.d/62-steam-input.rules
       mode: 0644
       contents:
@@ -93,10 +94,23 @@ storage:
       contents:
         inline: |
           ${indent(10, udev_steam_vr)}
+    # Radeon
     - path: /etc/environment
       append:
         - inline: |
             RADV_PERFTEST=aco
+    # Nvidia container runtime
+    - path: /etc/nvidia-container-runtime/config.toml
+      overwrite: true
+      contents:
+        inline: |
+          disable-require = false
+
+          [nvidia-container-cli]
+          environment = []
+          load-kmods = true
+          no-cgroups = true
+          ldconfig = "@/sbin/ldconfig"
 
     ##
     ## gnome desktop config

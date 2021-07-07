@@ -25,9 +25,6 @@
       <mac address='${replace(g.metadata.mac, "-", ":")}'/>
       %{~ endif ~}
       <boot order='1'/>
-      %{~ if lookup(g.metadata, "mtu", null) != null ~}
-      <mtu size='${g.metadatan.mtu}'/>
-      %{~ endif ~}
       <guest dev="${g.metadata.if}"/>
       <model type='virtio-net'/>
     </interface>

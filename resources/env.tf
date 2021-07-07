@@ -158,7 +158,6 @@ locals {
         "worker-0",
         "worker-1",
         "kvm-0",
-        "kvm-1",
         "client-0",
       ]
     }
@@ -166,7 +165,6 @@ locals {
     hypervisor = {
       nodes = [
         "kvm-0",
-        "kvm-1",
       ]
       iso_mount_path = "/run/media/iso"
       kernel_image   = "/assets/images/pxeboot/vmlinuz"
@@ -201,8 +199,6 @@ locals {
         "systemd.unified_cgroup_hierarchy=0",
         "systemd.unit=multi-user.target",
         "elevator=noop",
-        # currently podman kubelet is failing with /dev/dma_heap
-        "enforcing=0",
       ]
       metadata = {
         vlan = "metadata"
@@ -234,7 +230,6 @@ locals {
         "worker-0",
         "worker-1",
         "kvm-0",
-        "kvm-1",
       ]
     }
     # silverblue (gnome) desktop with networkmanager
@@ -245,6 +240,7 @@ locals {
     }
     laptop = {
       nodes = [
+        "client-0",
       ]
     }
     # server certs for SSH CA
@@ -258,7 +254,6 @@ locals {
         "worker-0",
         "worker-1",
         "kvm-0",
-        "kvm-1",
       ]
     }
     ssh_client = {
@@ -310,7 +305,7 @@ locals {
       ]
     }
     worker = {
-      memory = 24
+      memory = 20
       vcpu   = 4
       network = [
         {
@@ -634,12 +629,16 @@ locals {
       ## out ignition and re-used to boot VMs
       libvirt_domains = [
         {
-          node = "gateway-0"
-          # This cannot run on the same SRIOV pf as other VMs
+          node = "gateway-1"
+          # This cannot share a PF with others
           hwif = "pf1"
         },
         {
           node = "ns-0"
+          hwif = "pf0"
+        },
+        {
+          node = "ns-1"
           hwif = "pf0"
         },
         {
@@ -669,52 +668,6 @@ locals {
           rom      = "/etc/libvirt/boot/SAS9300_8i_IT.bin"
         }
       }
-    }
-    kvm-1 = {
-      hwif = [
-        {
-          label = "pf0"
-          if    = "en-pf0"
-          mac   = "3c-ec-ef-45-96-e6"
-        },
-        {
-          label = "pf1"
-          if    = "en-pf1"
-          mac   = "3c-ec-ef-45-96-e7"
-        },
-        {
-          label = "pf2"
-          if    = "en-pf2"
-          mac   = "3c-ec-ef-45-96-e8"
-        },
-        {
-          label = "pf3"
-          if    = "en-pf3"
-          mac   = "3c-ec-ef-45-96-e9"
-        },
-      ]
-      network = [
-        {
-          vlan = "internal"
-          if   = "en-int"
-          ip   = "192.168.127.250"
-          dhcp = true
-          hwif = "pf0"
-        },
-      ]
-      ## hypervisor boot image is copied with coreos-installer to strip
-      ## out ignition and re-used to boot VMs
-      libvirt_domains = [
-        {
-          node = "gateway-1"
-          # This cannot run on the same SRIOV pf as other VMs
-          hwif = "pf1"
-        },
-        {
-          node = "ns-1"
-          hwif = "pf0"
-        },
-      ]
     }
 
     # client devices
@@ -783,7 +736,6 @@ locals {
   # control which configs are rendered on local matchbox
   local_renderer_hosts_include = [
     "kvm-0",
-    "kvm-1",
     "client-0",
   ]
 }
