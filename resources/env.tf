@@ -674,7 +674,7 @@ locals {
     client-0 = {
       disks = [
         {
-          device = "/dev/disk/by-id/nvme-SAMSUNG_MZVLB256HBHQ-000L2_S4DXNX0NB13174"
+          device = "/dev/disk/by-id/nvme-Samsung_SSD_970_EVO_1TB_S5H9NS0N986704R"
           partitions = [
             {
               label                = "localhome"
