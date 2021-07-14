@@ -1,6 +1,6 @@
 FROM golang:alpine AS MODULES
 
-ARG K8S_VERSION=0.2.1
+ARG K8S_VERSION=0.5.0
 ARG LIBVIRT_VERSION=0.1.9
 ARG SSH_VERSION=0.1.2
 ARG MATCHBOX_VERSION=0.4.1
@@ -14,8 +14,7 @@ RUN set -x \
     libvirt-dev \
     g++ \
   \
-  ## Pull master but give it an arbitrary version because it is required
-  && git clone https://github.com/hashicorp/terraform-provider-kubernetes-alpha.git \
+  && git clone -b v${K8S_VERSION} https://github.com/hashicorp/terraform-provider-kubernetes-alpha.git \
   && cd terraform-provider-kubernetes-alpha \
   && mkdir -p ${GOPATH}/bin/github.com/hashicorp/kubernetes-alpha/${K8S_VERSION}/linux_amd64 \
   && CGO_ENABLED=0 GO111MODULE=on GOOS=linux go build -v -ldflags '-s -w' \
@@ -70,7 +69,7 @@ RUN set -x \
 
 FROM alpine:edge
 
-ARG TF_VERSION=0.14.7
+ARG TF_VERSION=1.0.2
 
 ENV HOME /root
 WORKDIR $HOME
