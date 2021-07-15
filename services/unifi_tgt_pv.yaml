@@ -115,7 +115,6 @@ spec:
     iqn: iqn.2016-09.com.gotgt.gostor:unifi
     lun: 0
     fsType: 'ext4'
-    readOnly: false
 
 ---
 apiVersion: v1
