@@ -9,7 +9,6 @@ apiVersion: policy/v1beta1
 kind: PodSecurityPolicy
 metadata:
   name: kube-proxy-psp
-  namespace: kube-system
 spec:
   privileged: true
   volumes: ['*']
@@ -128,7 +127,6 @@ spec:
         volumeMounts:
         - mountPath: /run/xtables.lock
           name: xtables-lock
-          readOnly: false
         - mountPath: /lib/modules
           name: lib-modules
           readOnly: true

@@ -12,7 +12,6 @@ apiVersion: policy/v1beta1
 kind: PodSecurityPolicy
 metadata:
   name: coredns-psp
-  namespace: kube-system
 spec:
   allowedCapabilities: ['NET_BIND_SERVICE']
   volumes: ['configMap', 'secret']
@@ -134,17 +133,10 @@ spec:
       - name: coredns
         image: "${container_images.coredns}"
         imagePullPolicy: Always
-        resources:
-          limits:
-            memory: 170Mi
-          requests:
-            cpu: 100m
-            memory: 70Mi
         args: [ "-conf", "/etc/coredns/Corefile" ]
         volumeMounts:
         - name: config-volume
           mountPath: /etc/coredns
-          readOnly: true
         ports:
         - containerPort: 53
           name: dns
@@ -155,28 +147,15 @@ spec:
         - containerPort: 9153
           name: metrics
           protocol: TCP
-        livenessProbe:
-          httpGet:
-            path: /health
-            port: 8080
-            scheme: HTTP
-          initialDelaySeconds: 60
-          timeoutSeconds: 5
-          successThreshold: 1
-          failureThreshold: 5
-        readinessProbe:
-          httpGet:
-            path: /health
-            port: 8080
-            scheme: HTTP
-        securityContext:
-          allowPrivilegeEscalation: false
-          capabilities:
-            add:
-            - NET_BIND_SERVICE
-            drop:
-            - all
-          readOnlyRootFilesystem: true
+        ## Not working with terraform provider
+        # livenessProbe:
+        #   httpGet:
+        #     path: /health
+        #     port: 8080
+        #   initialDelaySeconds: 60
+        #   timeoutSeconds: 5
+        #   successThreshold: 1
+        #   failureThreshold: 5
       - name: etcd
         image: ${container_images.etcd}
         command: [ "/usr/local/bin/etcd" ]

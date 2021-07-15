@@ -9,7 +9,6 @@ apiVersion: policy/v1beta1
 kind: PodSecurityPolicy
 metadata:
   name: kapprover-psp
-  namespace: kube-system
 spec:
   volumes: ['secret']
   runAsUser:

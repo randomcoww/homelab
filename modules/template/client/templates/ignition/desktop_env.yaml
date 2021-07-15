@@ -100,17 +100,17 @@ storage:
         - inline: |
             RADV_PERFTEST=aco
     # Nvidia container runtime
-    - path: /etc/nvidia-container-runtime/config.toml
-      overwrite: true
-      contents:
-        inline: |
-          disable-require = false
+    # - path: /etc/nvidia-container-runtime/config.toml
+    #   overwrite: true
+    #   contents:
+    #     inline: |
+    #       disable-require = false
 
-          [nvidia-container-cli]
-          environment = []
-          load-kmods = true
-          no-cgroups = true
-          ldconfig = "@/sbin/ldconfig"
+    #       [nvidia-container-cli]
+    #       environment = []
+    #       load-kmods = true
+    #       no-cgroups = true
+    #       ldconfig = "@/sbin/ldconfig"
 
     ##
     ## gnome desktop config

@@ -2,7 +2,6 @@ apiVersion: policy/v1beta1
 kind: PodSecurityPolicy
 metadata:
   name: flannel-psp
-  namespace: kube-system
 spec:
   privileged: true
   volumes: ['*']

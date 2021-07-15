@@ -219,13 +219,6 @@ module "template-secrets" {
         secretkey = random_string.metallb-memberlist.result
       }
     },
-    {
-      name      = "ffsync-secret-key"
-      namespace = "common"
-      data = {
-        secretkey = random_string.ffsync-secret-key.result
-      }
-    },
     ],
     lookup(var.wireguard_config, "Interface", null) != null && lookup(var.wireguard_config, "Peer", null) != null ? [
       {

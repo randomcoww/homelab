@@ -216,6 +216,7 @@ locals {
         "controller-2",
         "worker-0",
         "worker-1",
+        "client-0",
       ]
     }
     server = {
@@ -317,6 +318,7 @@ locals {
       nodes = [
         "worker-0",
         "worker-1",
+        "client-0",
       ]
       hostdev = [
         "hba",

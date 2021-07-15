@@ -50,21 +50,21 @@ locals {
     try(yamldecode(j), {})
   ]
 
-  kubernetes_namespaces = {
+  kubernetes_namespaces = nonsensitive({
     for k, v in {
       for j in local.kubernetes_pre1 :
       "${j.kind}-${lookup(j.metadata, "namespace", "default")}-${j.metadata.name}" => [yamlencode(j)]...
       if lookup(j, "kind", null) == "Namespace"
     } :
     k => flatten(v)[0]
-  }
+  })
 
-  kubernetes_manifests = {
+  kubernetes_manifests = nonsensitive({
     for k, v in {
       for j in local.kubernetes_pre1 :
       "${j.kind}-${lookup(j.metadata, "namespace", "default")}-${j.metadata.name}" => [yamlencode(j)]...
       if lookup(j, "kind", "Namespace") != "Namespace"
     } :
     k => flatten(v)[0]
-  }
+  })
 }

@@ -241,7 +241,6 @@ storage:
               volumeMounts:
               - name: kea-share
                 mountPath: "${kea_path}"
-                readOnly: false
               - name: config-kea-ctrl-agent
                 mountPath: /etc/kea/kea-ctrl-agent.conf
                 readOnly: true
@@ -251,7 +250,6 @@ storage:
               volumeMounts:
               - name: kea-share
                 mountPath: "${kea_path}"
-                readOnly: false
               - name: config-kea-dhcp4
                 mountPath: /etc/kea/kea-dhcp4.conf
                 readOnly: true

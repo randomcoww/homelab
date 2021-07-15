@@ -11,16 +11,16 @@ resource "null_resource" "output" {
 # Minio UI access
 output "minio-auth" {
   value = {
-    access_key_id     = random_password.minio-user.result
-    secret_access_key = random_password.minio-password.result
+    access_key_id     = nonsensitive(random_password.minio-user.result)
+    secret_access_key = nonsensitive(random_password.minio-password.result)
   }
 }
 
 # Grafana auth
 output "grafana-auth" {
   value = {
-    user     = random_password.grafana-user.result
-    password = random_password.grafana-password.result
+    user     = nonsensitive(random_password.grafana-user.result)
+    password = nonsensitive(random_password.grafana-password.result)
   }
 }
 
@@ -35,11 +35,11 @@ output "ssh-client-certificate" {
 }
 
 output "kubeconfig" {
-  value = templatefile("./templates/kubeconfig_admin.yaml", {
+  value = nonsensitive(templatefile("./templates/kubeconfig_admin.yaml", {
     cluster_name       = module.template-kubernetes.cluster_endpoint.cluster_name
     ca_pem             = module.template-kubernetes.cluster_endpoint.kubernetes_ca_pem
     cert_pem           = module.template-kubernetes.cluster_endpoint.kubernetes_cert_pem
     private_key_pem    = module.template-kubernetes.cluster_endpoint.kubernetes_private_key_pem
     apiserver_endpoint = module.template-kubernetes.cluster_endpoint.apiserver_endpoint
-  })
+  }))
 }
