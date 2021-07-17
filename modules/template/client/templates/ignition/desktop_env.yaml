@@ -3,6 +3,7 @@ variant: fcos
 version: 1.3.0
 systemd:
   units:
+    # Handle nvidia container runtime
     - name: containerd.service
       enabled: true
       dropins:
@@ -109,7 +110,9 @@ storage:
       append:
         - inline: |
             RADV_PERFTEST=aco
-    # Nvidia container runtime
+
+    ## Nvidia container runtime handling
+    # containerd
     - path: /etc/containerd/config-nvidia.toml
       mode: 0644
       overwrite: true
@@ -135,8 +138,6 @@ storage:
 
                     [plugins."io.containerd.grpc.v1.cri".containerd.runtimes.nvidia.options]
                       BinaryName = "nvidia-container-runtime"
-
-    # Nvidia container runtime config for podman
     # Containerd needs `no-cgroups = false` but podman needs `no-cgroups = true`
     - path: /etc/profile.d/podman-nvidia.sh
       mode: 0644
