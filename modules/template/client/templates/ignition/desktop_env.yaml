@@ -136,17 +136,48 @@ storage:
                     [plugins."io.containerd.grpc.v1.cri".containerd.runtimes.nvidia.options]
                       BinaryName = "nvidia-container-runtime"
 
-    # - path: /etc/nvidia-container-runtime/config.toml
-    #   overwrite: true
-    #   contents:
-    #     inline: |
-    #       disable-require = false
+    # Nvidia container runtime config for podman
+    # Containerd needs `no-cgroups = false` but podman needs `no-cgroups = true`
+    - path: /etc/profile.d/podman-nvidia.sh
+      mode: 0644
+      contents:
+        inline: |
+          # Use custom nvidia-container-runtime hook
+          alias podman='podman --hooks-dir=/etc/containers/oci/hooks.d' 2>/dev/null
+    - path: /etc/nvidia-container-runtime/podman-config.toml
+      overwrite: true
+      contents:
+        inline: |
+          disable-require = false
 
-    #       [nvidia-container-cli]
-    #       environment = []
-    #       load-kmods = true
-    #       no-cgroups = true
-    #       ldconfig = "@/sbin/ldconfig"
+          [nvidia-container-cli]
+          environment = []
+          load-kmods = true
+          no-cgroups = true
+          ldconfig = "@/sbin/ldconfig"
+    - path: /etc/containers/oci/hooks.d/oci-nvidia-hook.json
+      contents:
+        inline: |
+          {
+            "version": "1.0.0",
+            "hook": {
+              "path": "/usr/bin/nvidia-container-toolkit",
+              "args": [
+                "nvidia-container-toolkit",
+                "-config",
+                "/etc/nvidia-container-runtime/podman-config.toml",
+                "prestart"
+              ],
+              "env": [
+                "PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin"
+              ]
+            },
+            "when": {
+              "always": true,
+              "commands": [".*"]
+            },
+            "stages": ["prestart"]
+          }
 
     ##
     ## gnome desktop config
