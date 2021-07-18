@@ -139,12 +139,13 @@ storage:
                     [plugins."io.containerd.grpc.v1.cri".containerd.runtimes.nvidia.options]
                       BinaryName = "nvidia-container-runtime"
     # Containerd needs `no-cgroups = false` but podman needs `no-cgroups = true`
-    - path: /etc/profile.d/podman-nvidia.sh
-      mode: 0644
+    # /etc/containers/containers.conf.d/<config>.conf would be better here but it is not working
+    - path: /etc/containers/containers.conf
+      overwrite: true
       contents:
         inline: |
-          # Use custom nvidia-container-runtime hook
-          alias podman='podman --hooks-dir=/etc/containers/oci/hooks.d' 2>/dev/null
+          [engine]
+          hooks_dir=["/etc/containers/oci/hooks.d"]
     - path: /etc/nvidia-container-runtime/podman-config.toml
       overwrite: true
       contents:
