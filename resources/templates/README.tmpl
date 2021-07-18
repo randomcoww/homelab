@@ -213,5 +213,4 @@ kubectl apply -n monitoring -f services/grafana.yaml
 kubectl apply -f services/common-psp.yaml
 kubectl apply -f services/transmission
 kubectl apply -f services/mpd
-kubectl apply -f services/unifi
 ```
