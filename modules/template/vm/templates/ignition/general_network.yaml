@@ -40,14 +40,14 @@ storage:
           %{~ endif ~}
     %{~ endif ~}
     %{~ endfor ~}
-    %{~ if length(lookup(p, "metadata", {})) > 0 ~}
-    - path: /etc/systemd/network/20-${p.metadata.if}.network
+    %{~ if length(lookup(p, "selector", {})) > 0 ~}
+    - path: /etc/systemd/network/20-${p.selector.if}.network
       mode: 0644
       contents:
         inline: |
           [Match]
           Virtualization=vm
-          Name=${p.metadata.if}
+          Name=${p.selector.if}
 
           [Link]
           Unmanaged=true

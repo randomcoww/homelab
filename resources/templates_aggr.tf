@@ -29,7 +29,7 @@ locals {
       kernel_image  = lookup(params, "kernel_image", "")
       initrd_images = lookup(params, "initrd_images", [])
       kernel_params = lookup(params, "kernel_params", [])
-      selector      = lookup(params, "metadata", {})
+      selector      = lookup(params, "selector", {})
     }
   }
 
@@ -64,7 +64,7 @@ locals {
   kubernetes_namespaces = nonsensitive({
     for k, v in {
       for j in local.kubernetes_pre1 :
-      "${j.kind}-${lookup(j.metadata, "namespace", "default")}-${j.metadata.name}" => [yamlencode(j)]...
+      "${j.kind}-${lookup(j.selector, "namespace", "default")}-${j.selector.name}" => [yamlencode(j)]...
       if lookup(j, "kind", null) == "Namespace"
     } :
     k => flatten(v)[0]
@@ -73,7 +73,7 @@ locals {
   kubernetes_manifests = nonsensitive({
     for k, v in {
       for j in local.kubernetes_pre1 :
-      "${j.kind}-${lookup(j.metadata, "namespace", "default")}-${j.metadata.name}" => [yamlencode(j)]...
+      "${j.kind}-${lookup(j.selector, "namespace", "default")}-${j.selector.name}" => [yamlencode(j)]...
       if lookup(j, "kind", "Namespace") != "Namespace"
     } :
     k => flatten(v)[0]

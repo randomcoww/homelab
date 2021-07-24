@@ -1,7 +1,7 @@
 locals {
-  # Pick a start value for metadata link mac
+  # Pick a start value for selector link mac
   # 52-54-00-00-00-00
-  metadata_mac_base = 90520730730496
+  selector_mac_base = 90520730730496
 
   #### Add services to networks where vlan matches
   aggr_services_by_vlan_pre1 = {
@@ -104,17 +104,17 @@ locals {
     }
   }
 
-  aggr_metadata_params = {
+  aggr_selector_params = {
     # for host, params in local.aggr_host_pre1 :
     for i, params in values(local.aggr_host_pre1) :
     params.host => {
-      metadata = merge(
-        lookup(local.aggr_networks, lookup(lookup(params, "metadata", {}), "vlan", "default"), {}),
-        lookup(params, "metadata", {}),
+      selector = merge(
+        lookup(local.aggr_networks, lookup(lookup(params, "selector", {}), "vlan", "default"), {}),
+        lookup(params, "selector", {}),
         {
-          label = lookup(lookup(params, "metadata", {}), "label", lookup(lookup(params, "metadata", {}), "vlan", "default"))
+          label = lookup(lookup(params, "selector", {}), "label", lookup(lookup(params, "metadata", {}), "vlan", "default"))
           # Need any unique mac that both libvirt and matchbox know about
-          mac = join("-", regexall("..", format("%x", local.metadata_mac_base + i)))
+          mac = lookup(lookup(params, "selector", {}), "mac", join("-", regexall("..", format("%x", local.selector_mac_base + i))))
         }
       )
     }
@@ -149,7 +149,7 @@ locals {
       lookup(local.aggr_networks_by_key, host, {}),
       lookup(local.aggr_hwif_params, host, {}),
       lookup(local.aggr_hwif_by_key, host, {}),
-      lookup(local.aggr_metadata_params, host, {}),
+      lookup(local.aggr_selector_params, host, {}),
     )
   }
 

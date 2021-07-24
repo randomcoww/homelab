@@ -20,12 +20,12 @@
   <devices>
     <emulator>/usr/bin/qemu-kvm</emulator>
     <interface type='direct' trustGuestRxFilters='yes'>
-      <source dev='${p.metadata.if}' mode='bridge'/>
-      %{~ if lookup(g.metadata, "mac", null) != null ~}
-      <mac address='${replace(g.metadata.mac, "-", ":")}'/>
+      <source dev='${p.selector.if}' mode='bridge'/>
+      %{~ if lookup(g.selector, "mac", null) != null ~}
+      <mac address='${replace(g.selector.mac, "-", ":")}'/>
       %{~ endif ~}
       <boot order='1'/>
-      <guest dev="${g.metadata.if}"/>
+      <guest dev="${g.selector.if}"/>
       <model type='virtio-net'/>
     </interface>
     %{~ for n in g.network ~}

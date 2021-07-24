@@ -175,8 +175,8 @@ locals {
         "kvm-0",
       ]
       iso_mount_path = "/run/media/iso"
-      metadata = {
-        vlan = "metadata"
+      selector = {
+        vlan = "selector"
         if   = "en-md"
         ip   = local.services.renderer.vip
       }
@@ -197,8 +197,8 @@ locals {
       kernel_image = "/assets/images/pxeboot/vmlinuz"
       initrd_images = [
         "/assets/images/pxeboot/initrd.img",
-        "/assets/images/pxeboot/rootfs.img",
       ]
+      # Always boot from ens2 - this is the device name for the first interface created in libvirt
       kernel_params = [
         "console=hvc0",
         "rd.neednet=1",
@@ -207,10 +207,13 @@ locals {
         "systemd.unified_cgroup_hierarchy=0",
         "systemd.unit=multi-user.target",
         "elevator=noop",
+        "ignition.config.url=http://${local.services.renderer.vip}:${local.services.renderer.ports.http}/ignition?mac=$${mac:hexhyp}",
+        "coreos.live.rootfs_url=http://${local.services.renderer.vip}:${local.services.renderer.ports.http}/assets/images/pxeboot/rootfs.img",
+        "ip=ens2:dhcp",
       ]
-      metadata = {
-        vlan = "metadata"
-        if   = "ens2"
+      selector = {
+        if    = "ens2"
+        label = "selector"
       }
     }
     kubelet = {
@@ -289,7 +292,7 @@ locals {
 
     # host specific
     gateway = {
-      memory = 4
+      memory = 2
       vcpu   = 1
       nodes = [
         "gateway-0",
@@ -297,7 +300,7 @@ locals {
       ]
     }
     ns = {
-      memory = 4
+      memory = 2
       vcpu   = 1
       nodes = [
         "ns-0",
@@ -364,7 +367,7 @@ locals {
       id = 30
     }
     # internal network on each hypervisor for PXE bootstrap
-    metadata = {
+    selector = {
       network   = "192.168.224.0"
       cidr      = 23
       dhcp_pool = "192.168.225.64/26"
@@ -391,7 +394,7 @@ locals {
     # Interface name should always start at ens2 and count up
     # libvirt auto assigns interfaces starting at 00:02.0 and
     # increments the slot for each element.
-    # Metadata network uses ens2. Start host specific
+    # Selector network uses ens2. Start host specific
     # interfaces at ens3.
 
     # Gateway
@@ -682,58 +685,24 @@ locals {
 
     # client devices
     client-0 = {
-      network = [
-        {
-          vlan = "internal"
-          if   = "eno1"
-          mac  = "8c-8c-aa-e3-58-62"
-        },
-      ]
-      kernel_image = "https://minio.fuzzybunny.internal/ipxe/fedora-silverblue-34-live-kernel-x86_64"
+      kernel_image = "http://192.168.127.67:9000/ipxe/fedora-silverblue-34-live-kernel-x86_64"
       initrd_images = [
-        "https://minio.fuzzybunny.internal/ipxe/fedora-silverblue-34-live-initramfs.x86_64.img",
-        "https://minio.fuzzybunny.internal/ipxe/fedora-silverblue-34-live-rootfs.x86_64.img",
+        "http://192.168.127.67:9000/ipxe/fedora-silverblue-34-live-initramfs.x86_64.img",
       ]
       kernel_params = [
-        "console=hvc0",
         "rd.neednet=1",
         "ignition.firstboot",
         "ignition.platform.id=metal",
         "systemd.unified_cgroup_hierarchy=0",
         "elevator=noop",
+        "ignition.config.url=http://${local.services.ipxe.vip}:${local.services.ipxe.ports.http}/ignition?mac=$${mac:hexhyp}",
+        "coreos.live.rootfs_url=http://192.168.127.67:9000/ipxe/fedora-silverblue-34-live-rootfs.x86_64.img",
+        "ip=dhcp",
       ]
-      metadata = {
-        vlan = "internal"
-        if   = "ens2"
+      selector = {
+        label = "selector"
+        mac   = "8c-8c-aa-e3-58-62"
       }
-      disks = [
-        {
-          device = "/dev/disk/by-id/nvme-Samsung_SSD_970_EVO_1TB_S5H9NS0N986704R"
-          partitions = [
-            {
-              label                = "localhome"
-              start_mib            = 0
-              size_mib             = 0
-              wipe_partition_entry = false
-            },
-          ]
-        },
-      ]
-      luks = [
-        {
-          label       = "localhome"
-          device      = "/dev/disk/by-partlabel/localhome"
-          wipe_volume = false
-        },
-      ]
-      filesystems = [
-        {
-          label           = "localhome"
-          device          = "/dev/disk/by-id/dm-name-localhome"
-          mount_path      = "/var/lib/kubelet/pv"
-          wipe_filesystem = false
-        },
-      ]
     }
 
     # unmanaged hardware

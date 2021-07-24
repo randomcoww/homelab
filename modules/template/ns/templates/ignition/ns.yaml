@@ -183,7 +183,7 @@ storage:
                 {
                   "name": "ipxe_detected",
                   "test": "substring(option[77].hex,0,4) == 'iPXE'",
-                  "boot-file-name": "http://${p.networks_by_key.internal.ip}:${services.ipxe.ports.rpc}/boot.ipxe"
+                  "boot-file-name": "http://${p.networks_by_key.internal.ip}:${services.ipxe.ports.http}/boot.ipxe"
                 },
                 {
                   "name": "ipxe",
