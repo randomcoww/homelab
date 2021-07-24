@@ -23,6 +23,7 @@ resource "tls_cert_request" "matchbox" {
   ip_addresses = compact([
     "127.0.0.1",
     lookup(each.value.networks_by_key.internal, "ip", null),
+    var.services.ipxe.vip,
   ])
 }
 

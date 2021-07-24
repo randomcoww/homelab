@@ -8,6 +8,30 @@ systemd:
 
 storage:
   files:
+    ##
+    ## certs
+    ##
+    - path: ${matchbox_tls_path}/matchbox-ca.pem
+      mode: 0644
+      contents:
+        inline: "${replace(tls_matchbox_ca, "\n", "\\n")}"
+    - path: ${matchbox_tls_path}/matchbox.pem
+      mode: 0644
+      contents:
+        inline: "${replace(tls_matchbox, "\n", "\\n")}"
+    - path: ${matchbox_tls_path}/matchbox-key.pem
+      mode: 0644
+      contents:
+        inline: "${replace(tls_matchbox_key, "\n", "\\n")}"
+    - path: ${syncthing_tls_path}/cert.pem
+      mode: 0644
+      contents:
+        inline: "${replace(tls_syncthing, "\n", "\\n")}"
+    - path: ${syncthing_tls_path}/key.pem
+      mode: 0644
+      contents:
+        inline: "${replace(tls_syncthing_key, "\n", "\\n")}"
+
     - path: /etc/systemd/network/20-${p.networks_by_key.internal.if}.network.d/default-route.conf
       mode: 0644
       contents:
@@ -78,7 +102,6 @@ storage:
               tls_servername ${services.upstream_dns.url}
               health_check 20s
             }
-            prometheus :${services.recursive_dns.ports.prometheus}
             cache 30
             reload
             loadbalance
@@ -156,6 +179,25 @@ storage:
                   }
                 }
               ],
+              "client-classes": [
+                {
+                  "name": "ipxe_detected",
+                  "test": "substring(option[77].hex,0,4) == 'iPXE'",
+                  "boot-file-name": "http://${p.networks_by_key.internal.ip}:${services.ipxe.ports.rpc}/boot.ipxe"
+                },
+                {
+                  "name": "ipxe",
+                  "test": "not(substring(option[77].hex,0,4) == 'iPXE') and (option[93].hex == 0x0000)",
+                  "next-server": "${p.networks_by_key.internal.ip}",
+                  "boot-file-name": "/undionly.kpxe"
+                },
+                {
+                  "name": "ipxe_efi",
+                  "test": "not(substring(option[77].hex,0,4) == 'iPXE') and (option[93].hex == 0x0007)",
+                  "next-server": "${p.networks_by_key.internal.ip}",
+                  "boot-file-name": "/ipxe.efi"
+                }
+              ],
               "subnet4": ${jsonencode([
                 for k in p.network:
                 {
@@ -207,16 +249,42 @@ storage:
             priority 250
             virtual_ipaddress {
               %{~ for v in p.network ~}
-              %{~ if lookup(v, "vip", null) != null ~}
+              %{~ if lookup(v, "dns", null) != null ~}
               %{~ if lookup(v, "ip", null) != null ~}
-              ${v.vip} dev ${v.if}
+              ${v.dns} dev ${v.if}
               %{~ else ~}
-              ${v.vip}/${v.cidr} dev ${v.if}
+              ${v.dns}/${v.cidr} dev ${v.if}
               %{~ endif ~}
               %{~ endif ~}
               %{~ endfor ~}
             }
           }
+
+    - path: ${syncthing_tls_path}/config.xml
+      mode: 0644
+      contents:
+        inline: |
+          <configuration>
+            <folder id="data" label="data" path="${matchbox_data_path}" type="sendreceive" fsWatcherEnabled="true" fsWatcherDelayS="1" rescanIntervalS="10" autoNormalize="false">
+              ${indent(14, syncthing_folder_devices)}
+              <maxConflicts>1</maxConflicts>
+            </folder>
+            ${indent(12, syncthing_devices)}
+            <gui enabled="false"/>
+            <options>
+              <listenAddress>tcp://${p.networks_by_key.internal.ip}:${services.ipxe.ports.sync}</listenAddress>
+              <globalAnnounceEnabled>false</globalAnnounceEnabled>
+              <localAnnounceEnabled>false</localAnnounceEnabled>
+              <reconnectionIntervalS>5</reconnectionIntervalS>
+              <relaysEnabled>false</relaysEnabled>
+              <startBrowser>false</startBrowser>
+              <natEnabled>false</natEnabled>
+              <urAccepted>-1</urAccepted>
+              <autoUpgradeIntervalH>0</autoUpgradeIntervalH>
+              <defaultFolderPath></defaultFolderPath>
+              <crashReportingEnabled>false</crashReportingEnabled>
+            </options>
+          </configuration>
 
     ##
     ## pod manifests
@@ -253,6 +321,9 @@ storage:
               - name: config-kea-dhcp4
                 mountPath: /etc/kea/kea-dhcp4.conf
                 readOnly: true
+            - name: tftpd
+              image: ${container_images.tftpd}
+              args: [ "--address", "0.0.0.0:69", "--verbose" ]
             volumes:
             - name: kea-share
               emptyDir: {}
@@ -334,3 +405,55 @@ storage:
             - name: config-keepalived
               hostPath:
                 path: ${pod_mount_path}/keepalived/keepalived.conf
+
+    - path: ${kubelet_path}/manifests/ipxe.yaml
+      mode: 0644
+      contents:
+        inline: |-
+          ---
+          apiVersion: v1
+          kind: Pod
+          metadata:
+            name: ipxe
+          spec:
+            restartPolicy: Always
+            hostNetwork: true
+            containers:
+            - name: matchbox
+              image: ${container_images.matchbox}
+              args:
+              - -address=0.0.0.0:${services.ipxe.ports.http}
+              - -rpc-address=0.0.0.0:${services.ipxe.ports.rpc}
+              - -ca-file=${matchbox_tls_path}/matchbox-ca.pem
+              - -cert-file=${matchbox_tls_path}/matchbox.pem
+              - -key-file=${matchbox_tls_path}/matchbox-key.pem
+              - -data-path=${matchbox_data_path}
+              - -assets-path=${matchbox_data_path}
+              volumeMounts:
+              - name: matchbox-tls
+                mountPath: "${matchbox_tls_path}"
+              - name: matchbox-data
+                mountPath: "${matchbox_data_path}"
+            - name: syncthing
+              image: ${container_images.syncthing}
+              cmd: [ "syncthing" ]
+              args: [ "-home", "${syncthing_tls_path}" ]
+              volumeMounts:
+              - name: syncthing-tls
+                mountPath: "${syncthing_tls_path}"
+              - name: matchbox-data
+                mountPath: "${matchbox_data_path}"
+              env:
+              - name: PUID
+                value: "0"
+              - name: PGID
+                value: "0"
+            volumes:
+            - name: matchbox-data
+              emptyDir: {}
+            - name: matchbox-tls
+              hostPath:
+                path: ${matchbox_tls_path}
+            - name: syncthing-tls
+              hostPath:
+                path: ${syncthing_tls_path}

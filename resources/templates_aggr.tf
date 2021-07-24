@@ -22,18 +22,28 @@ locals {
     ]...
   ))
 
-  pxeboot_by_host = {
+  pxeboot_hosts = {
+    for host, params in local.aggr_hosts :
+    host => {
+      templates     = lookup(local.ignition_by_host, host, [])
+      kernel_image  = lookup(params, "kernel_image", "")
+      initrd_images = lookup(params, "initrd_images", [])
+      kernel_params = lookup(params, "kernel_params", [])
+      selector      = lookup(params, "metadata", {})
+    }
+  }
+
+  pxeboot_hosts_by_hypervisor = {
     for host, params in local.aggr_hosts :
     host => {
       for g in params.libvirt_domains :
-      g.node => {
-        templates     = local.ignition_by_host[g.node]
-        kernel_image  = params.kernel_image
-        initrd_images = params.initrd_images
-        kernel_params = g.host.kernel_params
-        selector      = g.host.metadata
-      }
+      g.node => local.pxeboot_hosts[g.node]
     }
+  }
+
+  pxeboot_hosts_by_local_rederer = {
+    for host in local.local_renderer_hosts_include :
+    host => lookup(local.pxeboot_hosts, host, {})
   }
 
   kubernetes_pre1 = [
@@ -43,6 +53,7 @@ locals {
         lookup(module.template-secrets, "kubernetes", []),
         lookup(module.template-kubernetes, "kubernetes", []),
         lookup(module.template-gateway, "kubernetes", []),
+        lookup(module.template-ns, "kubernetes", []),
         lookup(module.template-static-pod-logging, "kubernetes", []),
       ) :
       regexall("(?ms)(.*?)^---", "${i}\n---")

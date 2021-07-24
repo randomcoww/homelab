@@ -89,11 +89,11 @@ storage:
             }
             virtual_ipaddress {
               %{~ for i, v in p.network ~}
-              %{~ if lookup(v, "vip", null) != null ~}
+              %{~ if lookup(v, "gateway", null) != null ~}
               %{~ if lookup(v, "ip", null) != null ~}
-              ${v.vip} dev ${v.if}
+              ${v.gateway} dev ${v.if}
               %{~ else ~}
-              ${v.vip}/${v.cidr} dev ${v.if}
+              ${v.gateway}/${v.cidr} dev ${v.if}
               %{~ endif ~}
               %{~ endif ~}
               %{~ endfor ~}
@@ -222,8 +222,8 @@ storage:
                 %{~ if lookup(k, "ip", null) != null ~}
                 IPv4_address ${k.ip}
                 %{~ endif ~}
-                %{~ if lookup(k, "vip", null) != null ~}
-                IPv4_address ${k.vip}
+                %{~ if lookup(k, "gateway", null) != null ~}
+                IPv4_address ${k.gateway}
                 %{~ endif ~}
                 %{~ endfor ~}
               }

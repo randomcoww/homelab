@@ -3,7 +3,7 @@ module "ignition-kvm-0" {
   source = "../modules/ignition"
 
   services        = local.services
-  ignition_params = local.pxeboot_by_host.kvm-0
+  ignition_params = local.pxeboot_hosts_by_hypervisor.kvm-0
   renderer        = module.template-hypervisor.matchbox_rpc_endpoints.kvm-0
 }
 

@@ -36,6 +36,13 @@ provider "github.com/randomcoww/ssh" {
   ]
 }
 
+provider "github.com/randomcoww/syncthing" {
+  version = "0.1.0"
+  hashes = [
+    "h1:ldRfOQizQpkecQ5TLHosfEiH43GlWT/bxciuWSXvTcA=",
+  ]
+}
+
 provider "registry.terraform.io/hashicorp/aws" {
   version = "3.49.0"
   hashes = [

@@ -104,6 +104,14 @@ tw terraform apply \
     -target=module.kubernetes-addons
 ```
 
+#### Generate ignition for hardware hosts
+
+```bash
+tw terraform apply \
+    -var-file=secrets.tfvars \
+    -target=module.ignition-hw
+```
+
 ---
 
 ### Remote access

@@ -26,6 +26,7 @@ locals {
     tftpd                   = "docker.io/randomcoww/tftpd-ipxe:latest"
     matchbox                = "quay.io/poseidon/matchbox:latest"
     tw                      = "docker.io/randomcoww/tf-env:latest"
+    syncthing               = "docker.io/syncthing/syncthing:latest"
   }
 
   users = {
@@ -56,7 +57,7 @@ locals {
       }
     }
 
-    # gateway
+    # ns
     kea = {
       ports = {
         peer = 58082
@@ -64,10 +65,17 @@ locals {
     }
     recursive_dns = {
       vip = "192.168.126.241"
+    }
+    # PXE boot for hardware nodes
+    ipxe = {
+      vip = "192.168.126.241"
       ports = {
-        prometheus = 59153
+        http = 80
+        rpc  = 58081
+        sync = 58083
       }
     }
+
     # Resolve ingress and metallb names - should be in a metallb pool
     internal_dns = {
       vip = "192.168.126.127"
@@ -167,11 +175,6 @@ locals {
         "kvm-0",
       ]
       iso_mount_path = "/run/media/iso"
-      kernel_image   = "/assets/images/pxeboot/vmlinuz"
-      initrd_images = [
-        "/assets/images/pxeboot/initrd.img",
-        "/assets/images/pxeboot/rootfs.img",
-      ]
       metadata = {
         vlan = "metadata"
         if   = "en-md"
@@ -190,6 +193,11 @@ locals {
         "controller-2",
         "worker-0",
         "worker-1",
+      ]
+      kernel_image = "/assets/images/pxeboot/vmlinuz"
+      initrd_images = [
+        "/assets/images/pxeboot/initrd.img",
+        "/assets/images/pxeboot/rootfs.img",
       ]
       kernel_params = [
         "console=hvc0",
@@ -394,25 +402,25 @@ locals {
       network = [
         # Dummy link for management access - don't add a router VIP
         {
-          vlan = "internal"
-          if   = "ens3"
-          vip  = local.networks.internal.router
-          mdns = false
+          vlan    = "internal"
+          if      = "ens3"
+          gateway = local.networks.internal.router
+          mdns    = false
           # Duplicate this on gateways
           mac = "00-00-5e-00-01-01"
         },
         {
-          vlan = "lan"
-          if   = "ens4"
-          vip  = local.networks.lan.router
+          vlan    = "lan"
+          if      = "ens4"
+          gateway = local.networks.lan.router
           # Duplicate this on gateways
           mac = "00-00-5e-00-01-02"
         },
         {
-          vlan = "sync"
-          ip   = "192.168.190.1"
-          vip  = local.networks.sync.router
-          if   = "ens5"
+          vlan    = "sync"
+          ip      = "192.168.190.1"
+          gateway = local.networks.sync.router
+          if      = "ens5"
         },
         {
           vlan = "wan"
@@ -427,24 +435,24 @@ locals {
       network = [
         # Dummy link for management access - don't add a router VIP
         {
-          vlan = "internal"
-          if   = "ens3"
-          vip  = local.networks.internal.router
+          vlan    = "internal"
+          if      = "ens3"
+          gateway = local.networks.internal.router
           # Duplicate this on nodes
           mac = "00-00-5e-00-01-01"
         },
         {
-          vlan = "lan"
-          if   = "ens4"
-          vip  = local.networks.lan.router
+          vlan    = "lan"
+          if      = "ens4"
+          gateway = local.networks.lan.router
           # Duplicate this on nodes
           mac = "00-00-5e-00-01-02"
         },
         {
-          vlan = "sync"
-          ip   = "192.168.190.2"
-          vip  = local.networks.sync.router
-          if   = "ens5"
+          vlan    = "sync"
+          ip      = "192.168.190.2"
+          gateway = local.networks.sync.router
+          if      = "ens5"
         },
         {
           vlan = "wan"
@@ -462,7 +470,7 @@ locals {
         {
           vlan = "internal"
           ip   = "192.168.127.222"
-          vip  = local.services.recursive_dns.vip
+          dns  = local.services.recursive_dns.vip
           if   = "ens3"
         },
         {
@@ -478,7 +486,7 @@ locals {
         {
           vlan = "internal"
           ip   = "192.168.127.223"
-          vip  = local.services.recursive_dns.vip
+          dns  = local.services.recursive_dns.vip
           if   = "ens3"
         },
         {
@@ -674,6 +682,30 @@ locals {
 
     # client devices
     client-0 = {
+      network = [
+        {
+          vlan = "internal"
+          if   = "eno1"
+          mac  = "8c-8c-aa-e3-58-62"
+        },
+      ]
+      kernel_image = "https://minio.fuzzybunny.internal/ipxe/fedora-silverblue-34-live-kernel-x86_64"
+      initrd_images = [
+        "https://minio.fuzzybunny.internal/ipxe/fedora-silverblue-34-live-initramfs.x86_64.img",
+        "https://minio.fuzzybunny.internal/ipxe/fedora-silverblue-34-live-rootfs.x86_64.img",
+      ]
+      kernel_params = [
+        "console=hvc0",
+        "rd.neednet=1",
+        "ignition.firstboot",
+        "ignition.platform.id=metal",
+        "systemd.unified_cgroup_hierarchy=0",
+        "elevator=noop",
+      ]
+      metadata = {
+        vlan = "internal"
+        if   = "ens2"
+      }
       disks = [
         {
           device = "/dev/disk/by-id/nvme-Samsung_SSD_970_EVO_1TB_S5H9NS0N986704R"
