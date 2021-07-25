@@ -38,7 +38,7 @@ locals {
     client = {
       name = "randomcoww"
       uid  = 10000
-      home = "/var/lib/kubelet/pv/randomcoww"
+      home = "/home/randomcoww"
     }
   }
 
@@ -686,9 +686,9 @@ locals {
 
     # client devices
     client-0 = {
-      kernel_image = "http://192.168.127.67:9000/ipxe/fedora-silverblue-34-live-kernel-x86_64"
+      kernel_image = "http://192.168.127.67:9000/ipxe/fedora-silverblue-34.20210725.0-live-kernel-x86_64"
       initrd_images = [
-        "http://192.168.127.67:9000/ipxe/fedora-silverblue-34-live-initramfs.x86_64.img",
+        "http://192.168.127.67:9000/ipxe/fedora-silverblue-34.20210725.0-live-initramfs.x86_64.img",
       ]
       kernel_params = [
         "rd.neednet=1",
@@ -696,10 +696,14 @@ locals {
         "ignition.platform.id=metal",
         "systemd.unified_cgroup_hierarchy=0",
         "elevator=noop",
-        "initrd=fedora-silverblue-34-live-initramfs.x86_64.img",
+        "initrd=fedora-silverblue-34.20210725.0-live-initramfs.x86_64.img",
         "ignition.config.url=http://${local.services.ipxe.vip}:${local.services.ipxe.ports.http}/ignition?mac=$${mac:hexhyp}",
-        "coreos.live.rootfs_url=http://192.168.127.67:9000/ipxe/fedora-silverblue-34-live-rootfs.x86_64.img",
+        "coreos.live.rootfs_url=http://192.168.127.67:9000/ipxe/fedora-silverblue-34.20210725.0-live-rootfs.x86_64.img",
         "ip=dhcp",
+        "enforcing=0",
+        "rd.driver.blacklist=nouveau",
+        "modprobe.blacklist=nouveau",
+        "nvidia-drm.modeset=1",
       ]
       selector = {
         label = "selector"
@@ -729,7 +733,7 @@ locals {
         {
           label           = "localhome"
           device          = "/dev/disk/by-id/dm-name-localhome"
-          mount_path      = "/var/lib/kubelet/pv"
+          mount_path      = "/var/home"
           wipe_filesystem = false
         },
       ]
