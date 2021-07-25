@@ -20,7 +20,7 @@ locals {
     coredns                 = "docker.io/coredns/coredns:1.8.0"
     external_dns            = "registry.opensource.zalan.do/teapot/external-dns:latest"
     kapprover               = "docker.io/randomcoww/kapprover:v0.0.6"
-    kea                     = "docker.io/randomcoww/kea:1.8.1"
+    kea                     = "docker.io/randomcoww/kea:latest"
     conntrackd              = "docker.io/randomcoww/conntrackd:latest"
     promtail                = "docker.io/randomcoww/promtail:v2.0.0"
     tftpd                   = "docker.io/randomcoww/tftpd-ipxe:latest"
@@ -207,6 +207,7 @@ locals {
         "systemd.unified_cgroup_hierarchy=0",
         "systemd.unit=multi-user.target",
         "elevator=noop",
+        "initrd=initrd.img",
         "ignition.config.url=http://${local.services.renderer.vip}:${local.services.renderer.ports.http}/ignition?mac=$${mac:hexhyp}",
         "coreos.live.rootfs_url=http://${local.services.renderer.vip}:${local.services.renderer.ports.http}/assets/images/pxeboot/rootfs.img",
         "ip=ens2:dhcp",
@@ -300,7 +301,7 @@ locals {
       ]
     }
     ns = {
-      memory = 2
+      memory = 4
       vcpu   = 1
       nodes = [
         "ns-0",
@@ -695,6 +696,7 @@ locals {
         "ignition.platform.id=metal",
         "systemd.unified_cgroup_hierarchy=0",
         "elevator=noop",
+        "initrd=fedora-silverblue-34-live-initramfs.x86_64.img",
         "ignition.config.url=http://${local.services.ipxe.vip}:${local.services.ipxe.ports.http}/ignition?mac=$${mac:hexhyp}",
         "coreos.live.rootfs_url=http://192.168.127.67:9000/ipxe/fedora-silverblue-34-live-rootfs.x86_64.img",
         "ip=dhcp",
@@ -703,6 +705,34 @@ locals {
         label = "selector"
         mac   = "8c-8c-aa-e3-58-62"
       }
+      disks = [
+        {
+          device = "/dev/disk/by-id/nvme-Samsung_SSD_970_EVO_1TB_S5H9NS0N986704R"
+          partitions = [
+            {
+              label                = "localhome"
+              start_mib            = 0
+              size_mib             = 0
+              wipe_partition_entry = false
+            },
+          ]
+        },
+      ]
+      luks = [
+        {
+          label       = "localhome"
+          device      = "/dev/disk/by-partlabel/localhome"
+          wipe_volume = false
+        },
+      ]
+      filesystems = [
+        {
+          label           = "localhome"
+          device          = "/dev/disk/by-id/dm-name-localhome"
+          mount_path      = "/var/lib/kubelet/pv"
+          wipe_filesystem = false
+        },
+      ]
     }
 
     # unmanaged hardware
