@@ -40,7 +40,7 @@ locals {
   }
 
   pxeboot_hosts_by_local_rederer = {
-    for host in local.local_renderer_hosts_include :
+    for host in local.local_ipxe_hosts_include :
     host => lookup(local.pxeboot_hosts, host, {})
   }
 
