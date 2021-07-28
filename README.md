@@ -170,6 +170,8 @@ kubectl apply -f services/minio.yaml
 #### iPXE and ignition host for hardware hosts
 
 ```bash
+kubectl apply -f services/matchbox.yaml
+
 tw terraform apply \
     -var-file=secrets.tfvars \
     -target=null_resource.tls_ipxe_client
