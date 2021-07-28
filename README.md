@@ -63,9 +63,9 @@ Run build from https://github.com/randomcoww/fedora-coreos-config-custom.git. Wr
 
 | Guest | IP | vCPU | Memory |
 |-------|----|------|--------|
-| gateway-1.local |  | 1 | 4 |
-| ns-0.local | 192.168.127.222 | 1 | 4 |
-| ns-1.local | 192.168.127.223 | 1 | 4 |
+| gateway-1.local |  | 1 | 2 |
+| ns-0.local | 192.168.127.222 | 1 | 3 |
+| ns-1.local | 192.168.127.223 | 1 | 3 |
 | controller-0.local | 192.168.127.219 | 2 | 8 |
 | controller-1.local | 192.168.127.220 | 2 | 8 |
 | controller-2.local | 192.168.127.221 | 2 | 8 |
@@ -80,36 +80,18 @@ tw terraform apply \
 
 #### Start kubernetes addons
 
-May need to force resource dependencies to generate
-
 ```bash
 tw terraform apply \
     -var-file=secrets.tfvars \
     -target=null_resource.kubernetes_resources
-```
 
-Create namespaces
-
-```bash
 tw terraform apply \
     -var-file=secrets.tfvars \
     -target=module.kubernetes-namespaces
-```
 
-Create addons
-
-```bash
 tw terraform apply \
     -var-file=secrets.tfvars \
     -target=module.kubernetes-addons
-```
-
-#### Generate ignition for hardware hosts
-
-```bash
-tw terraform apply \
-    -var-file=secrets.tfvars \
-    -target=module.ignition-hw
 ```
 
 ---
@@ -185,37 +167,19 @@ kubectl apply -f services/traefik.yaml
 kubectl apply -f services/minio.yaml
 ```
 
-#### Monitoring
+#### iPXE and ignition host for hardware hosts
 
 ```bash
-helm repo add loki https://grafana.github.io/loki/charts
-helm repo add prometheus-community https://prometheus-community.github.io/helm-charts
-helm repo update
+tw terraform apply \
+    -var-file=secrets.tfvars \
+    -target=null_resource.tls_ipxe_client
 
-helm template loki \
-    --namespace=monitoring \
-    loki/loki | kubectl -n monitoring apply -f -
-
-helm template promtail \
-    --namespace monitoring \
-    loki/promtail | kubectl -n monitoring apply -f -
-
-helm template prometheus \
-    --namespace monitoring \
-    --set podSecurityPolicy.enabled=true \
-    --set alertmanager.enabled=false \
-    --set configmapReload.prometheus.enabled=false \
-    --set configmapReload.alertmanager.enabled=false \
-    --set kubeStateMetrics.enabled=true \
-    --set nodeExporter.enabled=true \
-    --set server.persistentVolume.enabled=false \
-    --set pushgateway.enabled=false \
-    prometheus-community/prometheus | kubectl -n monitoring apply -f -
-
-kubectl apply -n monitoring -f services/grafana.yaml
+tw terraform apply \
+    -var-file=secrets.tfvars \
+    -target=module.ignition-ipxe
 ```
 
-#### Common services
+#### Misc services
 
 ```bash
 kubectl apply -f services/common-psp.yaml

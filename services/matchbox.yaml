@@ -1,0 +1,76 @@
+
+kind: Deployment
+apiVersion: apps/v1
+metadata:
+  name: matchbox
+  namespace: common
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: matchbox
+  template:
+    metadata:
+      labels:
+        app: matchbox
+    spec:
+      affinity:
+        nodeAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+            nodeSelectorTerms:
+            - matchExpressions:
+              - key: minio-data
+                operator: Exists
+      dnsPolicy: ClusterFirstWithHostNet
+      restartPolicy: Always
+      containers:
+      - name: matchbox
+        image: quay.io/poseidon/matchbox:latest
+        imagePullPolicy: Always
+        args:
+        - -address=0.0.0.0:8080
+        - -rpc-address=0.0.0.0:8081
+        - -data-path=/etc/matchbox/data
+        - -assets-path=/etc/matchbox/assets
+        ports:
+        - containerPort: 8080
+        - containerPort: 8081
+        volumeMounts:
+        - name: tls-ipxe
+          mountPath: /etc/matchbox/server.crt
+          subPath: tls.crt
+        - name: tls-ipxe
+          mountPath: /etc/matchbox/server.key
+          subPath: tls.key
+        - name: tls-ipxe
+          mountPath: /etc/matchbox/ca.crt
+          subPath: tls.ca
+        - name: matchbox-data
+          mountPath: /etc/matchbox/data
+        - name: matchbox-assets
+          mountPath: /etc/matchbox/assets
+      volumes:
+      - name: tls-ipxe
+        secret:
+          secretName: tls-ipxe
+      - name: matchbox-data
+        emptyDir: {}
+      - name: matchbox-assets
+        emptyDir: {}
+
+---
+kind: Service
+apiVersion: v1
+metadata:
+  name: matchbox
+  namespace: common
+spec:
+  type: LoadBalancer
+  loadBalancerIP: 192.168.126.126
+  ports:
+  - name: http
+    port: 8080
+  - name: rpc
+    port: 8081
+  selector:
+    app: matchbox

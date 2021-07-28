@@ -203,3 +203,49 @@ spec:
     protocol: TCP
   selector:
     k8s-app: kube-dns
+
+# nodePort and clusterIP must be specified for LB services to work with
+# the terraform kubernetes-alpha provider. Probably a bug?
+# TODO: Remove once not needed by provider
+
+---
+kind: Service
+apiVersion: v1
+metadata:
+  name: external-dns-tcp
+  namespace: kube-system
+  annotations:
+    metallb.universe.tf/allow-shared-ip: external-dns
+spec:
+  type: LoadBalancer
+  loadBalancerIP: ${services.internal_dns.vip}
+  clusterIP: ${services.kubernetes_external_dns_tcp.vip}
+  ports:
+  - name: default
+    nodePort: ${services.kubernetes_external_dns_tcp.ports.node}
+    port: 53
+    targetPort: 53
+    protocol: TCP
+  selector:
+    k8s-app: kube-dns
+
+---
+kind: Service
+apiVersion: v1
+metadata:
+  name: external-dns-udp
+  namespace: kube-system
+  annotations:
+    metallb.universe.tf/allow-shared-ip: external-dns
+spec:
+  type: LoadBalancer
+  loadBalancerIP: ${services.internal_dns.vip}
+  clusterIP: ${services.kubernetes_external_dns_udp.vip}
+  ports:
+  - name: default
+    nodePort: ${services.kubernetes_external_dns_udp.ports.node}
+    port: 53
+    targetPort: 53
+    protocol: UDP
+  selector:
+    k8s-app: kube-dns

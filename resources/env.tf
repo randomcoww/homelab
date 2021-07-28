@@ -26,7 +26,6 @@ locals {
     tftpd                   = "docker.io/randomcoww/tftpd-ipxe:latest"
     matchbox                = "quay.io/poseidon/matchbox:latest"
     tw                      = "docker.io/randomcoww/tf-env:latest"
-    syncthing               = "docker.io/syncthing/syncthing:latest"
   }
 
   users = {
@@ -64,7 +63,6 @@ locals {
       }
     }
 
-    # ns
     kea = {
       ports = {
         peer = 58082
@@ -73,33 +71,29 @@ locals {
     recursive_dns = {
       vip = "192.168.126.241"
     }
-    # PXE boot for hardware nodes
-    ipxe = {
-      vip = "192.168.126.241"
-      ports = {
-        http = 80
-        rpc  = 58081
-        sync = 58083
-      }
+    upstream_dns = {
+      vip = "9.9.9.9"
+      url = "dns.quad9.net"
     }
 
-    # Resolve ingress and metallb names - should be in a metallb pool
+    # Metallb pool
     internal_dns = {
       vip = "192.168.126.127"
       ports = {
         prometheus = 59153
       }
     }
-    upstream_dns = {
-      vip = "9.9.9.9"
-      url = "dns.quad9.net"
+    external_dnat = {
+      vip = "192.168.126.125"
+      ports = {
+        https = 8080
+      }
     }
-
-    # Log collector - should be in metallb a pool
-    loki = {
+    ipxe = {
       vip = "192.168.126.126"
       ports = {
-        http_listen = 3100
+        http = 8080
+        rpc  = 8081
       }
     }
 
@@ -123,14 +117,6 @@ locals {
       }
     }
 
-    # Externally forwarded to internal IP - should be in a metallb pool
-    external_dnat = {
-      vip = "192.168.126.125"
-      ports = {
-        https = 8080
-      }
-    }
-
     # nodePort and clusterIP must be specified for LB services to work with
     # the terraform kubernetes-alpha provider. Probably a bug?
     # TODO: Remove once not needed by provider
@@ -144,12 +130,6 @@ locals {
       vip = "10.100.0.101"
       ports = {
         node = 31801
-      }
-    }
-    kubernetes_loki = {
-      vip = "10.100.0.102"
-      ports = {
-        node = 31802
       }
     }
   }
@@ -287,16 +267,6 @@ locals {
         "client-0",
       ]
     }
-    # promtail to push logs to loki (non kubernetes containerd hosts)
-    static_pod_logging = {
-      nodes = [
-      ]
-    }
-    # IPMI fan control for Supermicro motherboards
-    ipmi_fan_control = {
-      nodes = [
-      ]
-    }
 
     # host specific
     gateway = {
@@ -308,7 +278,7 @@ locals {
       ]
     }
     ns = {
-      memory = 4
+      memory = 3
       vcpu   = 1
       nodes = [
         "ns-0",

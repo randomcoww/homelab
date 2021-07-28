@@ -7,7 +7,6 @@ locals {
       lookup(module.template-ns, "ignition", {}),
       lookup(module.template-ssh, "ignition_server", {}),
       lookup(module.template-ssh, "ignition_client", {}),
-      lookup(module.template-static-pod-logging, "ignition", {}),
       lookup(module.template-ingress, "ignition", {}),
       lookup(module.template-hypervisor, "ignition", {}),
       lookup(module.template-vm, "ignition", {}),
@@ -16,7 +15,6 @@ locals {
       lookup(module.template-laptop, "ignition", {}),
       lookup(module.template-server, "ignition", {}),
       lookup(module.template-base, "ignition", {}),
-      lookup(module.template-fancontrol, "ignition", {}),
     ] :
     transpose(k)
     ]...
@@ -53,8 +51,6 @@ locals {
         lookup(module.template-secrets, "kubernetes", []),
         lookup(module.template-kubernetes, "kubernetes", []),
         lookup(module.template-gateway, "kubernetes", []),
-        lookup(module.template-ns, "kubernetes", []),
-        lookup(module.template-static-pod-logging, "kubernetes", []),
       ) :
       regexall("(?ms)(.*?)^---", "${i}\n---")
     ]) :
@@ -64,7 +60,7 @@ locals {
   kubernetes_namespaces = nonsensitive({
     for k, v in {
       for j in local.kubernetes_pre1 :
-      "${j.kind}-${lookup(j.selector, "namespace", "default")}-${j.selector.name}" => [yamlencode(j)]...
+      "${j.kind}-${lookup(j.metadata, "namespace", "default")}-${j.metadata.name}" => [yamlencode(j)]...
       if lookup(j, "kind", null) == "Namespace"
     } :
     k => flatten(v)[0]
@@ -73,7 +69,7 @@ locals {
   kubernetes_manifests = nonsensitive({
     for k, v in {
       for j in local.kubernetes_pre1 :
-      "${j.kind}-${lookup(j.selector, "namespace", "default")}-${j.selector.name}" => [yamlencode(j)]...
+      "${j.kind}-${lookup(j.metadata, "namespace", "default")}-${j.metadata.name}" => [yamlencode(j)]...
       if lookup(j, "kind", "Namespace") != "Namespace"
     } :
     k => flatten(v)[0]

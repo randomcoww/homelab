@@ -133,15 +133,6 @@ module "template-kubelet" {
   }
 }
 
-module "template-fancontrol" {
-  source = "../modules/template/ipmi_fan_control"
-
-  hosts = {
-    for k in local.components.ipmi_fan_control.nodes :
-    k => local.aggr_hosts[k]
-  }
-}
-
 ##
 ## minio user-pass
 ##
@@ -176,18 +167,20 @@ resource "random_string" "metallb-memberlist" {
   special = false
 }
 
-##
-## firefox sync secret
-##
-resource "random_string" "ffsync-secret-key" {
-  length  = 128
-  special = false
-}
-
 module "template-secrets" {
   source = "../modules/template/secrets"
 
   secrets = concat([
+    {
+      name      = "tls-ipxe"
+      namespace = "common"
+      data = {
+        "tls.crt" = tls_locally_signed_cert.ipxe.cert_pem
+        "tls.key" = tls_private_key.ipxe.private_key_pem
+        "tls.ca " = tls_self_signed_cert.ipxe-ca.cert_pem
+      }
+      type = "kubernetes.io/tls"
+    },
     {
       name      = "minio-auth"
       namespace = "minio"
@@ -271,17 +264,6 @@ module "template-ingress" {
   ]
   hosts = {
     for k in local.components.ingress.nodes :
-    k => local.aggr_hosts[k]
-  }
-}
-
-module "template-static-pod-logging" {
-  source = "../modules/template/static_pod_logging"
-
-  services         = local.services
-  container_images = local.container_images
-  hosts = {
-    for k in local.components.static_pod_logging.nodes :
     k => local.aggr_hosts[k]
   }
 }
