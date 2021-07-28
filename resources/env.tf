@@ -154,7 +154,6 @@ locals {
         "worker-1",
         "kvm-0",
         "client-0",
-        "laptop-0",
       ]
     }
     # coreos hypervisor
@@ -237,13 +236,11 @@ locals {
     client = {
       nodes = [
         "client-0",
-        "laptop-0",
       ]
     }
     laptop = {
       nodes = [
         "client-0",
-        "laptop-0",
       ]
     }
     # server certs for SSH CA
@@ -262,14 +259,12 @@ locals {
     ssh_client = {
       nodes = [
         "client-0",
-        "laptop-0",
       ]
     }
     # cert for fuzzybunny.internal
     ingress = {
       nodes = [
         "client-0",
-        "laptop-0",
       ]
     }
 
@@ -720,36 +715,6 @@ locals {
         },
       ]
     }
-    laptop-0 = {
-      disks = [
-        {
-          device = "/dev/disk/by-id/nvme-Samsung_SSD_970_EVO_1TB_S5H9NS0N986704R"
-          partitions = [
-            {
-              label                = "localhome"
-              start_mib            = 0
-              size_mib             = 0
-              wipe_partition_entry = false
-            },
-          ]
-        },
-      ]
-      luks = [
-        {
-          label       = "localhome"
-          device      = "/dev/disk/by-partlabel/localhome"
-          wipe_volume = false
-        },
-      ]
-      filesystems = [
-        {
-          label           = "localhome"
-          device          = "/dev/disk/by-id/dm-name-localhome"
-          mount_path      = "/var/home"
-          wipe_filesystem = false
-        },
-      ]
-    }
 
     # unmanaged hardware
     switch-0 = {
@@ -785,7 +750,7 @@ locals {
   # control which configs are rendered on local matchbox
   local_renderer_hosts_include = [
     "kvm-0",
-    "laptop-0",
+    "client-0",
   ]
   local_ipxe_hosts_include = [
     "client-0",
