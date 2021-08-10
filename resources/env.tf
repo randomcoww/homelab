@@ -599,12 +599,22 @@ locals {
         {
           label = "pf0"
           if    = "en-pf0"
-          mac   = "3c-fd-fe-9e-ac-70"
+          mac   = "3c-fd-fe-b2-47-68"
         },
         {
           label = "pf1"
           if    = "en-pf1"
-          mac   = "3c-fd-fe-9e-ac-72"
+          mac   = "3c-fd-fe-b2-47-69"
+        },
+        {
+          label = "pf2"
+          if    = "en-pf2"
+          mac   = "3c-fd-fe-b2-47-6a"
+        },
+        {
+          label = "pf3"
+          if    = "en-pf3"
+          mac   = "3c-fd-fe-b2-47-6b"
         },
       ]
       network = [
@@ -620,9 +630,14 @@ locals {
       ## out ignition and re-used to boot VMs
       libvirt_domains = [
         {
+          node = "gateway-0"
+          # This cannot share a PF with others
+          hwif = "pf2"
+        },
+        {
           node = "gateway-1"
           # This cannot share a PF with others
-          hwif = "pf1"
+          hwif = "pf3"
         },
         {
           node = "ns-0"
@@ -630,7 +645,7 @@ locals {
         },
         {
           node = "ns-1"
-          hwif = "pf0"
+          hwif = "pf1"
         },
         {
           node = "controller-0"
@@ -642,11 +657,11 @@ locals {
         },
         {
           node = "controller-2"
-          hwif = "pf0"
+          hwif = "pf1"
         },
         {
           node = "worker-0"
-          hwif = "pf0"
+          hwif = "pf1"
         },
       ]
       dev = {

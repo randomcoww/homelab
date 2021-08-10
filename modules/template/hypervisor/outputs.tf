@@ -60,8 +60,8 @@ output "ignition" {
         # Apply max_vfs through /sys/class/net/<dev>/devices/sriov_numvfs
         sriov_numvfs = {
           "igb"   = 7
-          "ixgbe" = 63
-          "i40e"  = 63
+          "ixgbe" = 31
+          "i40e"  = 31
         }
       }))
     ]

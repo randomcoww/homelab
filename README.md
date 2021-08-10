@@ -63,6 +63,7 @@ Run build from https://github.com/randomcoww/fedora-coreos-config-custom.git. Wr
 
 | Guest | IP | vCPU | Memory |
 |-------|----|------|--------|
+| gateway-0.local |  | 1 | 2 |
 | gateway-1.local |  | 1 | 2 |
 | ns-0.local | 192.168.127.222 | 1 | 3 |
 | ns-1.local | 192.168.127.223 | 1 | 3 |
