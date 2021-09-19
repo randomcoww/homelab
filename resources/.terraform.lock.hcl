@@ -2,62 +2,55 @@
 # Manual edits may be lost in future updates.
 
 provider "github.com/hashicorp/kubernetes-alpha" {
-  version = "0.5.0"
+  version = "0.6.0"
   hashes = [
-    "h1:ZDgCi+6PpCsIWNPBswEjyDxa8OUp467kQWcdCXORV5Y=",
+    "h1:PXI5Hwhtkj36uv5XVzCWORzm8VOK43Ran88HN+pWXqY=",
   ]
 }
 
 provider "github.com/poseidon/ct" {
-  version = "0.8.0"
+  version = "0.9.0"
   hashes = [
-    "h1:cxxZrb/0zc0KDP6dcF5nBNJ7tMmuPxQ/oVbXrPhBOYk=",
+    "h1:bVVHj/O9e4NeSbI8SMgmPTtaF6QnnO6MxkuoJO55qbY=",
   ]
 }
 
 provider "github.com/poseidon/matchbox" {
   version = "0.4.1"
   hashes = [
-    "h1:0BTc1lw9NBH3s4RIlQz8tMqBRvWNzXH7PxdsSxXjM4c=",
+    "h1:7FduVJeAAHW/vR6WJ09wbpyHMJtx/+ivL69n1NYms7o=",
   ]
 }
 
 provider "github.com/randomcoww/libvirt" {
   version = "0.1.9"
   hashes = [
-    "h1:W5r1ENuuO0n498gPSZcLL1Q1YGD8tE5i/JkKJX3Ofb0=",
+    "h1:6xVnwZnc/VT2jdnLpeWGinLC505WAG/qi/Tw3V6t/fU=",
   ]
 }
 
 provider "github.com/randomcoww/ssh" {
   version = "0.1.2"
   hashes = [
-    "h1:/Z9rsruwu3OryfDDwTXTyQ3js8V+gzOe3vIt7VuDmxY=",
-  ]
-}
-
-provider "github.com/randomcoww/syncthing" {
-  version = "0.1.0"
-  hashes = [
-    "h1:ldRfOQizQpkecQ5TLHosfEiH43GlWT/bxciuWSXvTcA=",
+    "h1:r70mQvICqonrgbi1j9jt/Yn1jU+/Ikr04laeWEDSNbQ=",
   ]
 }
 
 provider "registry.terraform.io/hashicorp/aws" {
-  version = "3.49.0"
+  version = "3.59.0"
   hashes = [
-    "h1:Xvsiilfz2CItH9EsDLXzpFf10ARDNmXm0Ey4s/vPluM=",
-    "zh:35fa4cf6669ef6d4b002bc1494ef7168c3100c1248e9b7ef4ac1112209455e4d",
-    "zh:59742ddcaa52a7279966809c792951f4b4b8e3d5b769205a0598030cd7dcfa89",
-    "zh:5b36ae146ad0dc5d228ecb52f5160673ed02cf7e5415fde8da2f99fd8037d37d",
-    "zh:61713827833a9411abe1bc46616469a6f1be2395960268e478d901700b2176fa",
-    "zh:6726690c72204b542e8fd7bb0d725874ea6c5d21ce1e76afe458fd56ff371a77",
-    "zh:a8c222830241d09faaa56e318a305b2af12c80ee675ee5af10cd33cc9ddfa1b9",
-    "zh:b41d140ee952ff796c384e9a9f0cbefb80cda5f140595c0bb04b20c4338caf14",
-    "zh:b94848e3f2acc3bc899639c546f5d8673cfe9dee1f18138508f6d835b3393de1",
-    "zh:c1866f25050c8a408daf30a36ddf87a5d744657a81b88ba2fff77b8b8b8e30c1",
-    "zh:f26a7be8b4459fed1786b2752d83bf95eef8862b6b7c4758c30b36bf2f4380f3",
-    "zh:f69e4f8c700e9449f2f444784a08c08aa5532d8c269f83740b56b7ac7a478926",
+    "h1:6JlihvRdEq02BzOZ7P7De2W5HH41ASVYg5I5Z2lAhIo=",
+    "zh:0b33154c805071af15839184f3faafeb1549d26a2f1fe721393461790c5ddb46",
+    "zh:1c5c6793cbec328394c6dda686298d9f6bb7b4c6a39e3dc48dc3035dea9aeda0",
+    "zh:20b590b9d9f0a18fdc9f0fb18bb2d9d5349b14039899ecf66e4ae5513606405b",
+    "zh:3e9010dbb0655b5d05e5e98bfe3e1e73cfa5ff6b364dfd73e8eeeb5e1e58c643",
+    "zh:47a46895d2592fbe7c904107ab6af25abbb17de230852859c06eee95ab282823",
+    "zh:615745b8c25b111cfe204d52553ea530d84abba7fb8be6b5b00476184407b556",
+    "zh:701e0f2e5191729601b6d7591e5c3f5d77439125a74116786cca3bc6d7abf0d9",
+    "zh:7217637b5726bfd09dc9b4f75aef643530e8b673f6de6e06f660a70f4d3170e2",
+    "zh:8097811557dd5fffcc77e921d3a49dfaa203d4640ac3859a64dcd927122ade8b",
+    "zh:9a23df54c62dcf74e88aa309700651a6e77e173429ef0307ee15aaa7ff2f47d0",
+    "zh:e5fa052b9285332a1ebb360ab14676bca88efdaac96cdd809207b23f8e732bb0",
   ]
 }
 

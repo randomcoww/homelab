@@ -1,6 +1,17 @@
 ---
 variant: fcos
-version: 1.3.0
+version: 1.4.0
+kernel_arguments:
+  should_exist:
+    - systemd.unified_cgroup_hierarchy=0
+    - intel_iommu=on
+    - amd_iommu=on
+    - iommu=pt
+    - enforcing=0
+    - elevator=noop
+    - rd.driver.blacklist=nouveau
+    - modprobe.blacklist=nouveau
+    - nvidia-drm.modeset=1
 passwd:
   users:
     - name: ${users.client.name}

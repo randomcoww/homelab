@@ -1,6 +1,24 @@
 ---
 variant: fcos
-version: 1.3.0
+version: 1.4.0
+kernel_arguments:
+  should_exist:
+    - systemd.unified_cgroup_hierarchy=0
+    - intel_iommu=on
+    - amd_iommu=on
+    - iommu=pt
+    - console=tty0
+    - console=ttyS0,115200n8
+    - console=ttyS1,115200n8
+    - elevator=noop
+    # VFIO passthrough
+    - video=efifb:off
+    - rd.driver.pre=vfio-pci
+    - vfio-pci.ids=1002:ffffffff:ffffffff:ffffffff:00030000:ffff00ff,1002:ffffffff:ffffffff:ffffffff:00040300:ffffffff,10de:ffffffff:ffffffff:ffffffff:00030000:ffff00ff,10de:ffffffff:ffffffff:ffffffff:00040300:ffffffff
+    # https://docs.mellanox.com/pages/viewpage.action?pageId=19798214
+    # - mlx4_core.num_vfs=8
+    # - mlx4_core.port_type_array=2
+    # - mlx4_core.probe_vf=8
 systemd:
   units:
     - name: libvirtd-admin.socket
@@ -82,13 +100,6 @@ storage:
       mode: 0644
       contents:
         inline: mlx4_core
-    # https://docs.mellanox.com/pages/viewpage.action?pageId=19798214
-    # FCOS writes these files too late and is not able to pass module params
-    # - path: /etc/modprobe.d/mlx4_core.conf
-    #   mode: 0644
-    #   contents:
-    #     inline: |
-    #       options mlx4_core num_vfs=8 port_type_array=2 probe_vf=8
     ## Add VFs if using Intel NICs
     - path: /etc/udev/rules.d/sriov_numvfs.rules
       mode: 0644

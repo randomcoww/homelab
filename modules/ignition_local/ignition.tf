@@ -7,7 +7,7 @@ data "ct_config" "ign" {
   content  = <<EOT
 ---
 variant: fcos
-version: 1.3.0
+version: 1.4.0
 EOT
   strict   = true
   snippets = each.value.templates
