@@ -709,24 +709,24 @@ locals {
               label                = "localhome"
               start_mib            = 0
               size_mib             = 0
-              wipe_partition_entry = false
+              wipe_partition_entry = true
             },
           ]
         },
       ]
-      luks = [
-        {
-          label       = "localhome"
-          device      = "/dev/disk/by-partlabel/localhome"
-          wipe_volume = false
-        },
-      ]
+      # luks = [
+      #   {
+      #     label       = "localhome"
+      #     device      = "/dev/disk/by-partlabel/localhome"
+      #     wipe_volume = false
+      #   },
+      # ]
       filesystems = [
         {
           label           = "localhome"
-          device          = "/dev/disk/by-id/dm-name-localhome"
+          device          = "/dev/disk/by-partlabel/localhome"
           mount_path      = "/var/home"
-          wipe_filesystem = false
+          wipe_filesystem = true
         },
       ]
     }

@@ -8,16 +8,23 @@ systemd:
     - name: ${filesystem.systemd_unit_name}.mount
       enabled: true
       contents: |
-        [Unit]
-        ConditionPathExists=${filesystem.device}
-
         [Mount]
         What=${filesystem.device}
         Where=${filesystem.mount_path}
         Type=${lookup(filesystem, "format", "xfs")}
         Options=${join(",", lookup(filesystem, "options", ["noatime", "nodiratime", "discard"]))}
+    - name: ${filesystem.systemd_unit_name}.automount
+      enabled: true
+      contents: |
+        [Unit]
+        ConditionPathExists=${filesystem.mount_path}
+
+        [Automount]
+        Where=${filesystem.mount_path}
+        TimeoutIdleSec=10
+
         [Install]
-        WantedBy=local-fs.target
+        WantedBy=multi-user.target
     %{~ endif ~}
     %{~ endfor ~}
     %{~ for filesystem in p.swap ~}
@@ -25,7 +32,6 @@ systemd:
       enabled: true
       contents: |
         [Unit]
-        ConditionPathExists=${filesystem.device}
         ConditionVirtualization=!container
         ConditionVirtualization=!container
 
