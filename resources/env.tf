@@ -519,27 +519,30 @@ locals {
           device = "/dev/disk/by-id/ata-Samsung_SSD_860_QVO_1TB_S4PGNF0M410395Z"
           partitions = [
             {
-              label     = "localcache"
-              start_mib = 0
-              size_mib  = 0
+              label                = "localcache"
+              start_mib            = 0
+              size_mib             = 0
+              wipe_partition_entry = false
             },
           ]
         },
       ]
-      luks = [
-        {
-          label  = "localcache"
-          device = "/dev/disk/by-partlabel/localcache"
-        },
-      ]
+      # luks = [
+      #   {
+      #     label       = "localcache"
+      #     device      = "/dev/disk/by-partlabel/localcache"
+      #     wipe_volume = false
+      #   },
+      # ]
       # Defaults:
       # format = "xfs"
       # wipe_filesystem = false
       filesystems = [
         {
-          label      = "localcache"
-          device     = "/dev/disk/by-id/dm-name-localcache"
-          mount_path = "/var/lib/kubelet/pv"
+          label           = "localcache"
+          device          = "/dev/disk/by-partlabel/localcache"
+          mount_path      = "/var/lib/kubelet/pv"
+          wipe_filesystem = false
         },
         {
           label      = "20162AA4B92B"
@@ -709,7 +712,7 @@ locals {
               label                = "localhome"
               start_mib            = 0
               size_mib             = 0
-              wipe_partition_entry = true
+              wipe_partition_entry = false
             },
           ]
         },
@@ -726,7 +729,7 @@ locals {
           label           = "localhome"
           device          = "/dev/disk/by-partlabel/localhome"
           mount_path      = "/var/home"
-          wipe_filesystem = true
+          wipe_filesystem = false
         },
       ]
     }

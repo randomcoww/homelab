@@ -59,14 +59,14 @@ storage:
               ${container_images.tw} "$@"
             rc=$?; set +x; return $rc
           }
-    - path: /etc/profile.d/tmux.sh
-      mode: 0644
-      contents:
-        inline: |
-          if command -v tmux >/dev/null 2>&1 && [ "$${DISPLAY}" ]; then
-            # if not inside a tmux session, and if no session is started, start a new session
-            [ -z "$${TMUX}" ] && (tmux attach >/dev/null 2>&1 || tmux)
-          fi
+    # - path: /etc/profile.d/tmux.sh
+    #   mode: 0644
+    #   contents:
+    #     inline: |
+    #       if command -v tmux >/dev/null 2>&1 && [ "$${DISPLAY}" ]; then
+    #         # if not inside a tmux session, and if no session is started, start a new session
+    #         [ -z "$${TMUX}" ] && (tmux attach >/dev/null 2>&1 || tmux)
+    #       fi
     - path: /etc/tmux.conf
       mode: 0644
       contents:
