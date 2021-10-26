@@ -13,18 +13,25 @@ systemd:
         Where=${filesystem.mount_path}
         Type=${lookup(filesystem, "format", "xfs")}
         Options=${join(",", lookup(filesystem, "options", ["noatime", "nodiratime", "discard"]))}
+        %{~ if !lookup(filesystem, "automount", false) ~}
+
+        [Install]
+        WantedBy=local-fs.target
+        %{~ endif ~}
+    %{~ if lookup(filesystem, "automount", false) ~}
     - name: ${filesystem.systemd_unit_name}.automount
       enabled: true
       contents: |
         [Unit]
-        ConditionPathExists=${filesystem.mount_path}
+        ConditionPathExists=${filesystem.device}
 
         [Automount]
         Where=${filesystem.mount_path}
         TimeoutIdleSec=10
 
         [Install]
-        WantedBy=multi-user.target
+        WantedBy=local-fs.target
+    %{~ endif ~}
     %{~ endif ~}
     %{~ endfor ~}
     %{~ for filesystem in p.swap ~}

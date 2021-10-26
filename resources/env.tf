@@ -543,6 +543,7 @@ locals {
           device          = "/dev/disk/by-partlabel/localcache"
           mount_path      = "/var/lib/kubelet/pv"
           wipe_filesystem = false
+          automount       = true
         },
         {
           label      = "20162AA4B92B"
@@ -730,6 +731,7 @@ locals {
           device          = "/dev/disk/by-partlabel/localhome"
           mount_path      = "/var/home"
           wipe_filesystem = false
+          automount       = true
         },
       ]
     }
