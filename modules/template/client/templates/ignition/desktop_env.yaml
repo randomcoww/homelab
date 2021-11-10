@@ -82,6 +82,7 @@ storage:
           profile=gpu-hq
           hwdec=vaapi
           gpu-api=vulkan
+          gpu-context=wayland
     - path: /etc/pulse/daemon.conf
       append:
         - inline: |
