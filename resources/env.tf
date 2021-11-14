@@ -682,9 +682,9 @@ locals {
 
     # client devices
     client-0 = {
-      kernel_image = "http://${local.services.minio.vip}:${local.services.minio.ports.http}/ipxe/fedora-silverblue-34.20211025.0-live-kernel-x86_64"
+      kernel_image = "http://${local.services.minio.vip}:${local.services.minio.ports.http}/ipxe/fedora-silverblue-35.20211114.0-live-kernel-x86_64"
       initrd_images = [
-        "http://${local.services.minio.vip}:${local.services.minio.ports.http}/ipxe/fedora-silverblue-34.20211025.0-live-initramfs.x86_64.img",
+        "http://${local.services.minio.vip}:${local.services.minio.ports.http}/ipxe/fedora-silverblue-35.20211114.0-live-initramfs.x86_64.img",
       ]
       kernel_params = [
         "rd.neednet=1",
@@ -692,9 +692,9 @@ locals {
         "ignition.platform.id=metal",
         "systemd.unified_cgroup_hierarchy=0",
         "elevator=noop",
-        "initrd=fedora-silverblue-34.20211025.0-live-initramfs.x86_64.img",
+        "initrd=fedora-silverblue-35.20211114.0-live-initramfs.x86_64.img",
         "ignition.config.url=http://${local.services.ipxe.vip}:${local.services.ipxe.ports.http}/ignition?mac=$${mac:hexhyp}",
-        "coreos.live.rootfs_url=http://${local.services.minio.vip}:${local.services.minio.ports.http}/ipxe/fedora-silverblue-34.20211025.0-live-rootfs.x86_64.img",
+        "coreos.live.rootfs_url=http://${local.services.minio.vip}:${local.services.minio.ports.http}/ipxe/fedora-silverblue-35.20211114.0-live-rootfs.x86_64.img",
         "ip=dhcp",
         "enforcing=0",
         "rd.driver.blacklist=nouveau",
