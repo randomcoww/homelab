@@ -189,7 +189,14 @@ storage:
           enabled=false
 
           [org/gnome/desktop/datetime]
-          automatic-timezone=false
+          automatic-timezone=true
+
+          [org/gnome/desktop/interface]
+          enable-hot-corners=false
+
+          [org/gnome/desktop/notifications]
+          show-banners=false
+          show-in-lock-screen=false
 
           [org/gnome/settings-daemon/plugins/color]
           night-light-enabled=true
@@ -222,15 +229,12 @@ storage:
           remove-old-trash-files=true
           report-technical-problems=false
 
+          [org/gnome/mutter]
+          workspaces-only-on-primary=false
+
           [org/gnome/software]
           first-run=false
           show-nonfree-prompt=false
-
-          [org/gnome/desktop/notifications]
-          show-in-lock-screen=false
-
-          [org/gnome/desktop/interface]
-          enable-hot-corners=false
     # Shadow PC client display workaround
     # https://gitlab.com/NicolasGuilloux/shadow-live-os/raw/arch-master/airootfs/etc/drirc
     - path: /etc/drirc
