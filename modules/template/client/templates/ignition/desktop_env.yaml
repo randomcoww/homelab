@@ -143,6 +143,22 @@ storage:
         inline: |
           [engine]
           hooks_dir=["/etc/containers/oci/hooks.d"]
+    # Move root container storage off of RAM disk
+    - path: /etc/containers/storage.conf
+      overwrite: true
+      contents:
+        inline: |
+          [storage]
+          driver = "overlay"
+          runroot = "/run/containers/storage"
+          graphroot = "/home/containers/storage"
+
+          [storage.options]
+          additionalimagestores = [
+          ]
+
+          [storage.options.overlay]
+          mountopt = "nodev,metacopy=on"
     - path: /etc/nvidia-container-runtime/podman-config.toml
       overwrite: true
       contents:
