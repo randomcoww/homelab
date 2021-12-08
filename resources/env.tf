@@ -682,17 +682,17 @@ locals {
 
     # client devices
     client-0 = {
-      kernel_image = "http://${local.services.minio.vip}:${local.services.minio.ports.http}/ipxe/fedora-silverblue-35.20211130.0-live-kernel-x86_64"
+      kernel_image = "http://${local.services.minio.vip}:${local.services.minio.ports.http}/ipxe/fedora-silverblue-35.20211208.0-live-kernel-x86_64"
       initrd_images = [
-        "http://${local.services.minio.vip}:${local.services.minio.ports.http}/ipxe/fedora-silverblue-35.20211130.0-live-initramfs.x86_64.img",
+        "http://${local.services.minio.vip}:${local.services.minio.ports.http}/ipxe/fedora-silverblue-35.20211208.0-live-initramfs.x86_64.img",
       ]
       kernel_params = [
         "rd.neednet=1",
         "ignition.firstboot",
         "ignition.platform.id=metal",
-        "initrd=fedora-silverblue-35.20211130.0-live-initramfs.x86_64.img",
+        "initrd=fedora-silverblue-35.20211208.0-live-initramfs.x86_64.img",
         "ignition.config.url=http://${local.services.ipxe.vip}:${local.services.ipxe.ports.http}/ignition?mac=$${mac:hexhyp}",
-        "coreos.live.rootfs_url=http://${local.services.minio.vip}:${local.services.minio.ports.http}/ipxe/fedora-silverblue-35.20211130.0-live-rootfs.x86_64.img",
+        "coreos.live.rootfs_url=http://${local.services.minio.vip}:${local.services.minio.ports.http}/ipxe/fedora-silverblue-35.20211208.0-live-rootfs.x86_64.img",
         "ip=dhcp",
         "systemd.unified_cgroup_hierarchy=0",
         "intel_iommu=on",
@@ -707,11 +707,12 @@ locals {
       ]
       selector = {
         label = "selector"
-        mac   = "8c-8c-aa-e3-58-62"
+        mac   = "84-a9-38-0f-aa-76"
       }
       disks = [
         {
-          device = "/dev/disk/by-id/nvme-Samsung_SSD_970_EVO_1TB_S5H9NS0N986704R"
+          device = "/dev/disk/by-id/nvme-SKHynix_HFS512GDE9X084N_CYA8N037413008I5H"
+          wipe_table = false
           partitions = [
             {
               label                = "localhome"

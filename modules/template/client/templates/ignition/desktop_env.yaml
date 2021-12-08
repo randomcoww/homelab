@@ -151,7 +151,7 @@ storage:
           [storage]
           driver = "overlay"
           runroot = "/run/containers/storage"
-          graphroot = "/home/containers/storage"
+          graphroot = "/var/home/containers/storage"
 
           [storage.options]
           additionalimagestores = [

@@ -52,16 +52,20 @@ systemd:
 storage:
   disks:
     %{~ for disk in p.disks ~}
+    %{~ if lookup(disk, "wipe_table", false) ~}
     - device: ${disk.device}
       wipe_table: ${lookup(disk, "wipe_table", false)}
       partitions:
       %{~ for i, part in disk.partitions ~}
+      %{~ if lookup(part, "wipe_partition_entry", false) ~}
       - label: ${part.label}
         number: ${i + 1}
         start_mib: ${part.start_mib}
         size_mib: ${part.size_mib}
         wipe_partition_entry: ${lookup(part, "wipe_partition_entry", false)}
+      %{~ endif ~}
       %{~ endfor ~}
+    %{~ endif ~}
     %{~ endfor ~}
   luks:
     %{~ for luks in p.luks ~}
@@ -85,8 +89,10 @@ storage:
     %{~ endif ~}
     %{~ endfor ~}
     %{~ for filesystem in p.swap ~}
+    %{~ if lookup(filesystem, "wipe_filesystem", false) ~}
     - device: ${filesystem.device}
       format: swap
       wipe_filesystem: ${lookup(filesystem, "wipe_filesystem", false)}
       label: ${filesystem.label}
+    %{~ endif ~}
     %{~ endfor ~}
