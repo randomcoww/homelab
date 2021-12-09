@@ -96,6 +96,12 @@ storage:
             realtime-priority = 9
             rlimit-rtprio = 9
             daemonize = no
+    # Wayland flags
+    - path: /etc/profile.d/wayland.sh
+      append:
+        - inline: |
+            alias brave-browser="brave-browser --enable-features=VaapiVideoDecoder --ozone-platform=wayland --enable-vulkan --use-gl=desktop --ignore-gpu-blacklist --enable-gpu-rasterization --enable-native-gpu-memory-buffers"
+            alias code="code --unity-launch --reuse-window --no-sandbox --ozone-platform=wayland --ignore-gpu-blacklist --enable-gpu-rasterization --enable-native-gpu-memory-buffers"
     # Controller support in steam (flatpak)
     - path: /etc/udev/rules.d/62-steam-input.rules
       mode: 0644
