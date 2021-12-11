@@ -37,7 +37,7 @@ locals {
     client = {
       name = "randomcoww"
       uid  = 10000
-      home = "/home/randomcoww"
+      home = "/var/home/randomcoww"
     }
   }
 
