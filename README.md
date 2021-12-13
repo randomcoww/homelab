@@ -13,7 +13,7 @@ tw() {
         -v /var/cache:/var/cache \
         -w /root/mnt/resources \
         --net=host \
-        docker.io/randomcoww/tf-env:latest "$@"
+        ghcr.io/randomcoww/tw:latest "$@"
     rc=$?; set +x; return $rc
 }
 ```
@@ -188,4 +188,31 @@ tw terraform apply \
 kubectl apply -f services/common-psp.yaml
 kubectl apply -f services/transmission
 kubectl apply -f services/mpd
+```
+
+### Image build
+
+```
+mkdir -p build
+export TMPDIR=$(pwd)/build
+
+VERSION=latest
+K8S_VERSION=0.6.0
+LIBVIRT_VERSION=0.1.9
+SSH_VERSION=0.1.2
+MATCHBOX_VERSION=0.5.0
+CT_VERSION=0.9.1
+
+podman build \
+  --build-arg K8S_VERSION=$K8S_VERSION \
+  --build-arg LIBVIRT_VERSION=$LIBVIRT_VERSION \
+  --build-arg SSH_VERSION=$SSH_VERSION \
+  --build-arg MATCHBOX_VERSION=$MATCHBOX_VERSION \
+  --build-arg CT_VERSION=$CT_VERSION \
+  -f Dockerfile \
+  -t ghcr.io/randomcoww/tw:$VERSION
+```
+
+```
+podman push ghcr.io/randomcoww/tw:$VERSION
 ```
