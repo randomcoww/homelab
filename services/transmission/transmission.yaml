@@ -62,7 +62,7 @@ spec:
       restartPolicy: Always
       initContainers:
       - name: wireguard
-        image: randomcoww/wireguard:latest
+        image: ghcr.io/randomcoww/wireguard:latest
         imagePullPolicy: Always
         args:
         - "up"
@@ -75,7 +75,7 @@ spec:
           subPath: wireguard-client
       containers:
       - name: transmission
-        image: randomcoww/transmission:latest
+        image: ghcr.io/randomcoww/transmission:latest
         imagePullPolicy: Always
         env:
         - name: RESUME_DIR

@@ -61,7 +61,7 @@ spec:
       containers:
       - name: mpd
         imagePullPolicy: Always
-        image: randomcoww/mpd:0.22.1
+        image: ghcr.io/randomcoww/mpd:0.23.5
         ports:
         - containerPort: 8000
           protocol: TCP
@@ -77,7 +77,7 @@ spec:
           name: mpd-cache
       - name: ympd
         imagePullPolicy: Always
-        image: randomcoww/ympd:latest
+        image: ghcr.io/randomcoww/ympd:latest
         args:
         - "-h"
         - "127.0.0.1"
