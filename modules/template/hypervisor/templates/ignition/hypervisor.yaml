@@ -21,24 +21,8 @@ version: 1.4.0
 #     # - mlx4_core.probe_vf=8
 systemd:
   units:
-    - name: libvirtd-admin.socket
-      mask: true
-    - name: libvirtd-ro.socket
-      mask: true
-    - name: libvirtd.socket
-      mask: true
-    - name: libvirtd.service
+    - name: virtproxyd-tls.socket
       enabled: true
-      dropins:
-        - name: 10-listener.conf
-          contents: |
-            [Unit]
-            ConditionVirtualization=!vm
-            ConditionVirtualization=!container
-
-            [Service]
-            ExecStart=
-            ExecStart=/usr/sbin/libvirtd --listen
     - name: ksm.service
       mask: true
     - name: ksmtuned.service
