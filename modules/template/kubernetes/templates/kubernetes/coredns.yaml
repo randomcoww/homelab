@@ -34,22 +34,25 @@ metadata:
     addonmanager.kubernetes.io/mode: Reconcile
   name: system:coredns
 rules:
-- apiGroups: [""]
-  resources: ["endpoints", "namespaces"]
-  verbs: ["list", "watch"]
-- apiGroups: [""]
-  resources: ["services", "pods"]
-  verbs: ["get", "list", "watch"]
-- apiGroups: [""]
-  resources: ["nodes"]
-  verbs: ["get", "list"]
-- apiGroups: ["extensions"]
-  resources: ["ingresses"]
-  verbs: ["get","watch","list"]
 - apiGroups: ["extensions"]
   resources: ["podsecuritypolicies"]
   verbs: ["use"]
   resourceNames: ["coredns-psp"]
+# coredns
+- apiGroups: [""]
+  # resources: ["endpoints", "services", "pods", "namespaces"]
+  resources: ["namespaces"]
+  verbs: ["list", "watch"]
+- apiGroups: ["discovery.k8s.io"]
+  resources: ["endpointslices"]
+  verbs: ["list", "watch"]
+# external-dns
+- apiGroups: [""]
+  resources: ["endpoints", "pods", "services", "nodes"]
+  verbs: ["get", "watch", "list"]
+- apiGroups: ["extensions", "networking.k8s.io"]
+  resources: ["ingresses"]
+  verbs: ["get", "watch", "list"]
 
 ---
 apiVersion: rbac.authorization.k8s.io/v1

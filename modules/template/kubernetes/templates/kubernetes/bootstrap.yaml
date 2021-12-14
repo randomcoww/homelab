@@ -29,6 +29,21 @@ subjects:
 
 ---
 apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: auto-approve-renewals-for-nodes
+subjects:
+- kind: Group
+  name: system:nodes
+  apiGroup: rbac.authorization.k8s.io
+roleRef:
+  kind: ClusterRole
+  name: system:certificates.k8s.io:certificatesigningrequests:selfnodeclient
+  apiGroup: rbac.authorization.k8s.io
+
+# https://stackoverflow.com/questions/48118125/kubernetes-rbac-role-verbs-to-exec-to-pod
+---
+apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRole
 metadata:
   annotations:
@@ -37,16 +52,15 @@ metadata:
     kubernetes.io/bootstrapping: rbac-defaults
   name: system:kube-apiserver-to-kubelet
 rules:
-- apiGroups:
-  - ""
-  resources:
-  - nodes/proxy
-  - nodes/stats
-  - nodes/log
-  - nodes/spec
-  - nodes/metrics
-  verbs:
-  - "*"
+- apiGroups: [""]
+  resources: ["nodes/proxy", "nodes/stats", "nodes/log", "nodes/spec", "nodes/metrics"]
+  verbs: ["*"]
+- apiGroups: [""]
+  resources: ["pods", "pods/log"]
+  verbs: ["get", "list"]
+- apiGroups: [""]
+  resources: ["pods/exec"]
+  verbs: ["create"]
 
 ---
 apiVersion: rbac.authorization.k8s.io/v1

@@ -131,6 +131,12 @@ spec:
       initContainers:
       - name: install-cni-plugins
         image: ${container_images.cni_plugins}
+        command:
+        - cp
+        args:
+        - -f
+        - /flannel
+        - /opt/cni/bin/flannel
         volumeMounts:
         - name: cni-plugins
           mountPath: "/opt/cni/bin"
