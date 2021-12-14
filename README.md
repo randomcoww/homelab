@@ -63,14 +63,14 @@ Run build from https://github.com/randomcoww/fedora-coreos-config-custom.git. Wr
 
 | Guest | IP | vCPU | Memory |
 |-------|----|------|--------|
-| gateway-0.local |  | 1 | 2 |
-| gateway-1.local |  | 1 | 2 |
 | ns-0.local | 192.168.127.222 | 1 | 3 |
-| ns-1.local | 192.168.127.223 | 1 | 3 |
 | controller-0.local | 192.168.127.219 | 2 | 8 |
 | controller-1.local | 192.168.127.220 | 2 | 8 |
+| ns-1.local | 192.168.127.223 | 1 | 3 |
 | controller-2.local | 192.168.127.221 | 2 | 8 |
 | worker-0.local |  | 4 | 20 |
+| gateway-0.local |  | 1 | 2 |
+| gateway-1.local |  | 1 | 2 |
 
 ```bash
 tw terraform apply \
@@ -196,23 +196,20 @@ kubectl apply -f services/mpd
 mkdir -p build
 export TMPDIR=$(pwd)/build
 
-VERSION=latest
-K8S_VERSION=0.6.0
 LIBVIRT_VERSION=0.1.10
 SSH_VERSION=0.1.3
 MATCHBOX_VERSION=0.5.0
 CT_VERSION=0.9.1
 
 podman build \
-  --build-arg K8S_VERSION=$K8S_VERSION \
   --build-arg LIBVIRT_VERSION=$LIBVIRT_VERSION \
   --build-arg SSH_VERSION=$SSH_VERSION \
   --build-arg MATCHBOX_VERSION=$MATCHBOX_VERSION \
   --build-arg CT_VERSION=$CT_VERSION \
   -f Dockerfile \
-  -t ghcr.io/randomcoww/tw:$VERSION
+  -t ghcr.io/randomcoww/tw:latest
 ```
 
 ```
-podman push ghcr.io/randomcoww/tw:$VERSION
+podman push ghcr.io/randomcoww/tw:latest
 ```

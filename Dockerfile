@@ -1,6 +1,5 @@
 FROM golang:alpine AS MODULES
 
-ARG K8S_VERSION
 ARG LIBVIRT_VERSION
 ARG SSH_VERSION
 ARG MATCHBOX_VERSION
@@ -12,12 +11,6 @@ RUN set -x \
     git \
     libvirt-dev \
     g++ \
-  \
-  && git clone -b v${K8S_VERSION} https://github.com/hashicorp/terraform-provider-kubernetes-alpha.git \
-  && cd terraform-provider-kubernetes-alpha \
-  && mkdir -p ${GOPATH}/bin/github.com/hashicorp/kubernetes-alpha/${K8S_VERSION}/linux_amd64 \
-  && CGO_ENABLED=0 GO111MODULE=on GOOS=linux go build -v -ldflags '-s -w' \
-    -o ${GOPATH}/bin/github.com/hashicorp/kubernetes-alpha/${K8S_VERSION}/linux_amd64/terraform-provider-kubernetes-alpha_v${K8S_VERSION} \
   \
   && cd .. \
   && git clone -b v${LIBVIRT_VERSION} https://github.com/randomcoww/terraform-provider-libvirt.git \
@@ -48,17 +41,6 @@ RUN set -x \
   && CGO_ENABLED=0 GO111MODULE=on GOOS=linux go build -v -ldflags '-s -w' \
     -o ${GOPATH}/bin/github.com/poseidon/ct/${CT_VERSION}/linux_amd64/terraform-provider-ct_v${CT_VERSION}
 
-FROM golang:alpine AS MATCHBOX
-
-RUN set -x \
-  \
-  && apk add --no-cache \
-    git \
-  \
-  && git clone https://github.com/poseidon/matchbox.git matchbox \
-  && cd matchbox/cmd/matchbox \
-  && CGO_ENABLED=0 GO111MODULE=on GOOS=linux go install -v -ldflags '-s -w'
-
 FROM alpine:edge
 
 ARG TF_VERSION=1.1.0
@@ -66,7 +48,6 @@ ARG TF_VERSION=1.1.0
 ENV HOME /root
 WORKDIR $HOME
 
-COPY --from=MATCHBOX /go/bin/ /usr/local/bin/
 COPY --from=MODULES /go/bin/ .terraform.d/plugins/
 
 RUN set -x \

@@ -2,7 +2,7 @@ locals {
   # Path for etcd backup to S3
   aws_region              = "us-west-2"
   s3_etcd_backup_bucket   = "randomcoww-etcd-backup"
-  kubernetes_cluster_name = "default-cluster-2012-1"
+  kubernetes_cluster_name = "default-cluster-2112-1"
   # kubelet image is used for static pods and does not need to match the kubernetes version
   # hyperkube is used for the worker kubelet and should match the version
   container_images = {
@@ -633,22 +633,8 @@ locals {
       ## out ignition and re-used to boot VMs
       libvirt_domains = [
         {
-          node = "gateway-0"
-          # This cannot share a PF with others
-          hwif = "pf2"
-        },
-        {
-          node = "gateway-1"
-          # This cannot share a PF with others
-          hwif = "pf3"
-        },
-        {
           node = "ns-0"
           hwif = "pf0"
-        },
-        {
-          node = "ns-1"
-          hwif = "pf1"
         },
         {
           node = "controller-0"
@@ -659,12 +645,26 @@ locals {
           hwif = "pf0"
         },
         {
+          node = "ns-1"
+          hwif = "pf1"
+        },
+        {
           node = "controller-2"
           hwif = "pf1"
         },
         {
           node = "worker-0"
           hwif = "pf1"
+        },
+        {
+          node = "gateway-0"
+          # This cannot share a PF with others
+          hwif = "pf2"
+        },
+        {
+          node = "gateway-1"
+          # This cannot share a PF with others
+          hwif = "pf3"
         },
       ]
       dev = {
@@ -710,7 +710,7 @@ locals {
       }
       disks = [
         {
-          device = "/dev/disk/by-id/nvme-SKHynix_HFS512GDE9X084N_CYA8N037413008I5H"
+          device     = "/dev/disk/by-id/nvme-SKHynix_HFS512GDE9X084N_CYA8N037413008I5H"
           wipe_table = false
           partitions = [
             {

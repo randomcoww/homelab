@@ -1,4 +1,4 @@
-provider "kubernetes-alpha" {
+provider "kubernetes" {
   host                   = var.cluster_endpoint.apiserver_endpoint
   cluster_ca_certificate = var.cluster_endpoint.kubernetes_ca_pem
   client_certificate     = var.cluster_endpoint.kubernetes_cert_pem

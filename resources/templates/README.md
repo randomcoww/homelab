@@ -188,3 +188,27 @@ kubectl apply -f services/common-psp.yaml
 kubectl apply -f services/transmission
 kubectl apply -f services/mpd
 ```
+
+### Image build
+
+```
+mkdir -p build
+export TMPDIR=$(pwd)/build
+
+LIBVIRT_VERSION=0.1.10
+SSH_VERSION=0.1.3
+MATCHBOX_VERSION=0.5.0
+CT_VERSION=0.9.1
+
+podman build \
+  --build-arg LIBVIRT_VERSION=$LIBVIRT_VERSION \
+  --build-arg SSH_VERSION=$SSH_VERSION \
+  --build-arg MATCHBOX_VERSION=$MATCHBOX_VERSION \
+  --build-arg CT_VERSION=$CT_VERSION \
+  -f Dockerfile \
+  -t ${container_images.tw}
+```
+
+```
+podman push ${container_images.tw}
+```

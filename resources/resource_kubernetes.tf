@@ -1,5 +1,3 @@
-# https://github.com/hashicorp/terraform-provider-kubernetes-alpha
-
 resource "null_resource" "kubernetes_resources" {
   triggers = merge(
     local.kubernetes_namespaces,
