@@ -5,32 +5,11 @@ metadata:
   namespace: kube-system
 
 ---
-apiVersion: policy/v1beta1
-kind: PodSecurityPolicy
-metadata:
-  name: external-dns-psp
-spec:
-  volumes: ['configMap', 'secret']
-  runAsUser:
-    rule: 'RunAsAny'
-  seLinux:
-    rule: 'RunAsAny'
-  supplementalGroups:
-    rule: 'RunAsAny'
-  fsGroup:
-    rule: 'RunAsAny'
-
----
 apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRole
 metadata:
   name: external-dns
 rules:
-- apiGroups: ["extensions"]
-  resources: ["podsecuritypolicies"]
-  verbs: ["use"]
-  resourceNames: ["external-dns-psp"]
-# external-dns
 - apiGroups: [""]
   resources: ["endpoints", "pods", "services", "nodes"]
   verbs: ["get", "watch", "list"]

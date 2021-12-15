@@ -8,22 +8,6 @@ metadata:
     addonmanager.kubernetes.io/mode: Reconcile
 
 ---
-apiVersion: policy/v1beta1
-kind: PodSecurityPolicy
-metadata:
-  name: coredns-psp
-spec:
-  volumes: ['configMap', 'secret']
-  runAsUser:
-    rule: 'RunAsAny'
-  seLinux:
-    rule: 'RunAsAny'
-  supplementalGroups:
-    rule: 'RunAsAny'
-  fsGroup:
-    rule: 'RunAsAny'
-
----
 apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRole
 metadata:
@@ -32,11 +16,6 @@ metadata:
     addonmanager.kubernetes.io/mode: Reconcile
   name: system:coredns
 rules:
-- apiGroups: ["extensions"]
-  resources: ["podsecuritypolicies"]
-  verbs: ["use"]
-  resourceNames: ["coredns-psp"]
-# coredns
 - apiGroups: [""]
   resources: ["endpoints", "services", "pods", "namespaces"]
   resources: ["namespaces"]
