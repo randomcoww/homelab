@@ -60,6 +60,7 @@ output "ignition_controller" {
         tls_etcd_key               = tls_private_key.etcd[host].private_key_pem
         tls_etcd_client            = tls_locally_signed_cert.etcd-client[host].cert_pem
         tls_etcd_client_key        = tls_private_key.etcd-client[host].private_key_pem
+        encryption_config_secret   = base64encode(chomp(random_string.encryption-config-secret.result))
       }))
     ]
   }

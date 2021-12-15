@@ -22,17 +22,18 @@ systemd:
               ${container_images.hyperkube} \
                 kubelet \
                   $KUBELET_COMMON_ARGS \
-                  --config=${kubelet_path}/kubelet-config-worker.yaml \
-                  --kubeconfig=${kubelet_path}/kubelet.kubeconfig \
                   --bootstrap-kubeconfig=${kubelet_path}/bootstrap.kubeconfig \
-                  --network-plugin=cni \
                   --cert-dir=${kubelet_path} \
-                  --volume-plugin-dir=${kubelet_path}/volumeplugins \
+                  --config=${kubelet_path}/kubelet-config-worker.yaml \
                   --feature-gates=GracefulNodeShutdown=true \
+                  --kubeconfig=${kubelet_path}/kubelet.kubeconfig \
+                  --network-plugin=cni \
                   --node-labels=${join(",", [
                     for k, v in  lookup(p, "node_labels", {}) :
                     "${k}=${v}"
-                  ])}
+                  ])} \
+                  --register-node=true \
+                  --volume-plugin-dir=${kubelet_path}/volumeplugins
 
 storage:
   files:
@@ -50,6 +51,24 @@ storage:
           br_netfilter
           # mayastor nvmeof
           nvme-tcp
+
+    # certs #
+
+    - path: ${kubelet_path}/kubernetes-ca.pem
+      mode: 0644
+      contents:
+        inline: "${replace(tls_kubernetes_ca, "\n", "\\n")}"
+    - path: ${kubelet_path}/bootstrap.pem
+      mode: 0644
+      contents:
+        inline: "${replace(tls_bootstrap, "\n", "\\n")}"
+    - path: ${kubelet_path}/bootstrap-key.pem
+      mode: 0644
+      contents:
+        inline: "${replace(tls_bootstrap_key, "\n", "\\n")}"
+
+    # kubelet #
+
     - path: ${kubelet_path}/kubelet-config-worker.yaml
       mode: 0644
       contents:
@@ -67,7 +86,7 @@ storage:
             mode: Webhook
           clusterDomain: "${domains.kubernetes_cluster}"
           clusterDNS:
-            - "${services.kubernetes_dns.vip}"
+          - "${services.kubernetes_dns.vip}"
           runtimeRequestTimeout: "15m"
           rotateCertificates: true
           serverTLSBootstrap: true
@@ -75,6 +94,7 @@ storage:
           shutdownGracePeriodCriticalPods: "60s"
           containerLogMaxSize: "10Mi"
           containerLogMaxFiles: 2
+
     - path: ${kubelet_path}/bootstrap.kubeconfig
       mode: 0644
       contents:
@@ -98,20 +118,3 @@ storage:
             user:
               client-certificate: ${kubelet_path}/bootstrap.pem
               client-key: ${kubelet_path}/bootstrap-key.pem
-
-    ##
-    ## certs
-    ##
-
-    - path: ${kubelet_path}/kubernetes-ca.pem
-      mode: 0644
-      contents:
-        inline: "${replace(tls_kubernetes_ca, "\n", "\\n")}"
-    - path: ${kubelet_path}/bootstrap.pem
-      mode: 0644
-      contents:
-        inline: "${replace(tls_bootstrap, "\n", "\\n")}"
-    - path: ${kubelet_path}/bootstrap-key.pem
-      mode: 0644
-      contents:
-        inline: "${replace(tls_bootstrap_key, "\n", "\\n")}"

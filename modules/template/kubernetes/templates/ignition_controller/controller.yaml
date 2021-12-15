@@ -15,9 +15,8 @@ storage:
           DNS=${services.upstream_dns.vip}#${services.upstream_dns.url}
           DNSOverTLS=true
           DNSDefaultRoute=true
-    ##
-    ## certs
-    ##
+
+    # certs #
 
     - path: ${controller_mount_path}/kubernetes-ca.pem
       mode: 0644
@@ -83,68 +82,7 @@ storage:
       contents:
         inline: "${replace(tls_service_account_key, "\n", "\\n")}"
 
-    ##
-    ## pod config
-    ##
-
-    - path: ${controller_mount_path}/kube-scheduler.yaml
-      mode: 0644
-      contents:
-        inline: |-
-          apiVersion: kubescheduler.config.k8s.io/v1beta1
-          kind: KubeSchedulerConfiguration
-          clientConnection:
-            kubeconfig: "${controller_mount_path}/kube-scheduler.kubeconfig"
-          leaderElection:
-            leaderElect: true
-
-    - path: ${controller_mount_path}/kube-controller-manager.kubeconfig
-      mode: 0644
-      contents:
-        inline: |-
-          apiVersion: v1
-          clusters:
-          - cluster:
-              certificate-authority: ${controller_mount_path}/kubernetes-ca.pem
-              server: ${apiserver_local_endpoint}
-            name: ${cluster_name}
-          contexts:
-          - context:
-              cluster: ${cluster_name}
-              user: system:kube-controller-manager
-            name: default
-          current-context: default
-          kind: Config
-          preferences: {}
-          users:
-          - name: system:kube-controller-manager
-            user:
-              client-certificate: ${controller_mount_path}/kube-controller-manager.pem
-              client-key: ${controller_mount_path}/kube-controller-manager-key.pem
-
-    - path: ${controller_mount_path}/kube-scheduler.kubeconfig
-      mode: 0644
-      contents:
-        inline: |-
-          apiVersion: v1
-          clusters:
-          - cluster:
-              certificate-authority: ${controller_mount_path}/kubernetes-ca.pem
-              server: ${apiserver_local_endpoint}
-            name: ${cluster_name}
-          contexts:
-          - context:
-              cluster: ${cluster_name}
-              user: system:kube-scheduler
-            name: default
-          current-context: default
-          kind: Config
-          preferences: {}
-          users:
-          - name: system:kube-scheduler
-            user:
-              client-certificate: ${controller_mount_path}/kube-scheduler.pem
-              client-key: ${controller_mount_path}/kube-scheduler-key.pem
+    # keepalived #
 
     - path: ${pod_mount_path}/keepalived/keepalived.conf
       mode: 0644
@@ -175,9 +113,7 @@ storage:
             }
           }
 
-    ##
-    ## pod manifests
-    ##
+    # etcd #
 
     - path: ${kubelet_path}/manifests/etcd-wrapper.yaml
       mode: 0644
@@ -256,6 +192,25 @@ storage:
                 type: FileOrCreate
                 path: "${kubelet_path}/manifests/kube-etcd.json"
 
+    # Kube-apiserver #
+
+    - path: ${controller_mount_path}/encryption-config.yaml
+      mode: 0644
+      contents:
+        inline: |-
+          kind: EncryptionConfig
+          apiVersion: v1
+          resources:
+          - resources:
+            - secrets
+            providers:
+            # not working
+            # - secretbox:
+            #   keys:
+            #   - name: key1
+            #     secret: ${encryption_config_secret}
+            - identity: {}
+
     - path: ${kubelet_path}/manifests/kube-apiserver.yaml
       mode: 0644
       contents:
@@ -274,29 +229,36 @@ storage:
               image: ${container_images.kube_apiserver}
               command:
               - kube-apiserver
-              - "--secure-port=${services.kubernetes_apiserver.ports.secure}"
+              - "--advertise-address=$(INTERNAL_IP)"
               - "--allow-privileged=true"
               - "--authorization-mode=Node,RBAC"
               - "--bind-address=0.0.0.0"
               - "--client-ca-file=${controller_mount_path}/kubernetes-ca.pem"
+              - "--enable-admission-plugins=NamespaceLifecycle,NodeRestriction,LimitRanger,ServiceAccount,DefaultStorageClass,ResourceQuota"
+              - "--encryption-provider-config=${controller_mount_path}/encryption-config.yaml"
               - "--etcd-cafile=${controller_mount_path}/etcd-ca.pem"
               - "--etcd-certfile=${controller_mount_path}/etcd-client.pem"
               - "--etcd-keyfile=${controller_mount_path}/etcd-client-key.pem"
               - "--etcd-servers=${etcd_local_endpoint}"
+              - "--event-ttl=1h"
               - "--kubelet-certificate-authority=${controller_mount_path}/kubernetes-ca.pem"
               - "--kubelet-client-certificate=${controller_mount_path}/kubernetes.pem"
               - "--kubelet-client-key=${controller_mount_path}/kubernetes-key.pem"
+              - "--kubelet-preferred-address-types=InternalDNS,InternalIP"
               - "--runtime-config=api/all=true"
+              - "--secure-port=${services.kubernetes_apiserver.ports.secure}"
               - "--service-account-issuer=https://kubernetes.default.svc"
               - "--service-account-key-file=${controller_mount_path}/service-account.pem"
               - "--service-account-signing-key-file=${controller_mount_path}/service-account-key.pem"
-              - "--service-account-max-token-expiration=24h"
               - "--service-cluster-ip-range=${networks.kubernetes_service.network}/${networks.kubernetes_service.cidr}"
               - "--tls-cert-file=${controller_mount_path}/kubernetes.pem"
               - "--tls-private-key-file=${controller_mount_path}/kubernetes-key.pem"
-              - "--kubelet-preferred-address-types=InternalDNS,InternalIP"
-              - "--enable-admission-plugins=NamespaceLifecycle,LimitRanger,ServiceAccount,DefaultStorageClass,DefaultTolerationSeconds,MutatingAdmissionWebhook,ValidatingAdmissionWebhook,Priority,ResourceQuota,PodSecurityPolicy,NodeRestriction"
               - "--v=2"
+              env:
+              - name: INTERNAL_IP
+                valueFrom:
+                  fieldRef:
+                    fieldPath: status.hostIP
               volumeMounts:
               - name: config-apiserver
                 mountPath: "${controller_mount_path}"
@@ -352,6 +314,32 @@ storage:
               hostPath:
                 path: ${pod_mount_path}/keepalived/keepalived.conf
 
+    # Kube-controller-manager #
+
+    - path: ${controller_mount_path}/kube-controller-manager.kubeconfig
+      mode: 0644
+      contents:
+        inline: |-
+          kind: Config
+          apiVersion: v1
+          clusters:
+          - cluster:
+              certificate-authority: ${controller_mount_path}/kubernetes-ca.pem
+              server: ${apiserver_local_endpoint}
+            name: ${cluster_name}
+          contexts:
+          - context:
+              cluster: ${cluster_name}
+              user: system:kube-controller-manager
+            name: default
+          current-context: default
+          preferences: {}
+          users:
+          - name: system:kube-controller-manager
+            user:
+              client-certificate: ${controller_mount_path}/kube-controller-manager.pem
+              client-key: ${controller_mount_path}/kube-controller-manager-key.pem
+
     - path: ${kubelet_path}/manifests/kube-controller-manager.yaml
       mode: 0644
       contents:
@@ -370,9 +358,9 @@ storage:
               image: ${container_images.kube_controller_manager}
               command:
               - kube-controller-manager
+              - "--allocate-node-cidrs=true"
               - "--bind-address=0.0.0.0"
               - "--cluster-cidr=${networks.kubernetes.network}/${networks.kubernetes.cidr}"
-              - "--allocate-node-cidrs=true"
               - "--cluster-name=${cluster_name}"
               - "--cluster-signing-cert-file=${controller_mount_path}/kubernetes-ca.pem"
               - "--cluster-signing-key-file=${controller_mount_path}/kubernetes-ca-key.pem"
@@ -399,6 +387,43 @@ storage:
             - name: config-volume
               hostPath:
                 path: "${controller_mount_path}"
+
+    # Kube-scheduler #
+
+    - path: ${controller_mount_path}/kube-scheduler.yaml
+      mode: 0644
+      contents:
+        inline: |-
+          kind: KubeSchedulerConfiguration
+          apiVersion: kubescheduler.config.k8s.io/v1beta1
+          clientConnection:
+            kubeconfig: "${controller_mount_path}/kube-scheduler.kubeconfig"
+          leaderElection:
+            leaderElect: true
+
+    - path: ${controller_mount_path}/kube-scheduler.kubeconfig
+      mode: 0644
+      contents:
+        inline: |-
+          kind: Config
+          apiVersion: v1
+          clusters:
+          - cluster:
+              certificate-authority: ${controller_mount_path}/kubernetes-ca.pem
+              server: ${apiserver_local_endpoint}
+            name: ${cluster_name}
+          contexts:
+          - context:
+              cluster: ${cluster_name}
+              user: system:kube-scheduler
+            name: default
+          current-context: default
+          preferences: {}
+          users:
+          - name: system:kube-scheduler
+            user:
+              client-certificate: ${controller_mount_path}/kube-scheduler.pem
+              client-key: ${controller_mount_path}/kube-scheduler-key.pem
 
     - path: ${kubelet_path}/manifests/kube-scheduler.yaml
       mode: 0644

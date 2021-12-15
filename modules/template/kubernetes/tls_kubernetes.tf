@@ -46,3 +46,8 @@ resource "tls_locally_signed_cert" "kubernetes" {
     "client_auth",
   ]
 }
+
+resource "random_string" "encryption-config-secret" {
+  length  = 32
+  special = false
+}
