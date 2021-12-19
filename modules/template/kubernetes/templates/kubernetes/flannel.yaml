@@ -108,7 +108,21 @@ spec:
         effect: "NoSchedule"
       initContainers:
       - name: install-cni-plugins
+        imagePullPolicy: Always
         image: ${container_images.cni_plugins}
+        command:
+        - tar
+        args:
+        - xvzf
+        - /cni-plugins.tgz
+        - -C
+        - /opt/cni/bin/
+        volumeMounts:
+        - name: cni-plugins
+          mountPath: "/opt/cni/bin"
+      - name: install-flannel-cni-plugins
+        imagePullPolicy: Always
+        image: ${container_images.flannel_cni_plugins}
         command:
         - cp
         args:
