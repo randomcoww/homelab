@@ -19,7 +19,7 @@ locals {
     cni_plugins             = "ghcr.io/randomcoww/cni-plugins:v1.0.1"
     flannel_cni_plugins     = "docker.io/rancher/mirrored-flannelcni-flannel-cni-plugin:v1.0.0"
     coredns                 = "docker.io/coredns/coredns:latest"
-    external_dns            = "k8s.gcr.io/external-dns/external-dns:v0.7.6"
+    external_dns            = "k8s.gcr.io/external-dns/external-dns:v0.10.2"
     kapprover               = "ghcr.io/randomcoww/kapprover:latest"
     kea                     = "ghcr.io/randomcoww/kea:2.0.0"
     conntrackd              = "ghcr.io/randomcoww/conntrackd:latest"
