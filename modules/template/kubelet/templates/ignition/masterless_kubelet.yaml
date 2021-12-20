@@ -41,7 +41,7 @@ systemd:
           -v /sys/fs/cgroup:/sys/fs/cgroup:ro \
           -v /sys/fs/cgroup/systemd:/sys/fs/cgroup/systemd \
           -v /var/lib/containerd:/var/lib/containerd:z \
-          -v /opt/cni/bin:/opt/cni/bin:z \
+          -v /usr/libexec/cni:/opt/cni/bin:z \
           -v ${kubelet_path}:${kubelet_path}:rshared,z \
           -v /var/log:/var/log \
           -v /var/run/lock:/var/run/lock:z"
@@ -85,6 +85,11 @@ storage:
           [plugins]
             [plugins."io.containerd.grpc.v1.cri"]
               disable_tcp_service = true
+
+              [plugins."io.containerd.grpc.v1.cri".cni]
+                bin_dir = "/usr/libexec/cni"
+                conf_dir = "/etc/cni/net.d"
+                max_conf_num = 1
 
               [plugins."io.containerd.grpc.v1.cri".containerd]
                 default_runtime_name = "runc"
