@@ -1,0 +1,99 @@
+---
+variant: fcos
+version: 1.4.0
+storage:
+  files:
+    # Hardware interface #
+    %{~ for interface_name, interface in interfaces ~}
+    - path: /etc/systemd/network/10-${interface_name}.link
+      mode: 0644
+      contents:
+        inline: |
+          [Match]
+          PermanentMACAddress=${interface.mac}
+
+          [Link]
+          MTUBytes=${interface.mtu}
+          MACAddressPolicy=persistent
+          Name=${interface_name}
+    - path: /etc/systemd/network/12-${interface_name}.network
+      mode: 0644
+      contents:
+        inline: |
+          [Match]
+          Name=${interface_name}
+
+          [Link]
+          ARP=false
+
+          [Network]
+          LinkLocalAddressing=false
+          DHCP=false
+          %{~ for network_name, network in networks ~}
+          VLAN=${interface_name}-${network_name}
+          %{~ endfor ~}
+
+    # VLAN interfaces
+    %{~ for network_name, network in networks ~}
+    - path: /etc/systemd/network/20-${interface_name}-${network_name}.netdev
+      mode: 0644
+      contents:
+        inline: |
+          [NetDev]
+          Name=${interface_name}-${network_name}
+          Kind=vlan
+
+          [VLAN]
+          Id=${network.vlan_id}
+    - path: /etc/systemd/network/22-${interface_name}-${network_name}.network
+      mode: 0644
+      contents:
+        inline: |
+          [Match]
+          Name=${interface_name}-${network_name}
+
+          [Link]
+          ARP=false
+
+          [Network]
+          LinkLocalAddressing=false
+          DHCP=false
+          %{~ if lookup(interface.taps, network_name, null) != null ~}
+          MACVTAP=${interface_name}-${network_name}-tap
+          %{~ endif ~}
+    %{~ endfor ~}
+
+    # Tap interfaces
+    %{~ for network_name, tap in interface.taps ~}
+    - path: /etc/systemd/network/20-${interface_name}-${network_name}-tap.netdev
+      mode: 0644
+      contents:
+        inline: |
+          [NetDev]
+          Name=${interface_name}-${network_name}-tap
+          Kind=macvtap
+
+          [MACVTAP]
+          Mode=bridge
+    - path: /etc/systemd/network/22-${interface_name}-${network_name}-tap.network
+      mode: 0644
+      contents:
+        inline: |
+          [Match]
+          Name=${interface_name}-${network_name}-tap
+
+          [Link]
+          ARP=false
+
+          [Network]
+          LinkLocalAddressing=false
+          DHCP=${tap.dhcp}
+          MulticastDNS=${tap.mdns}
+
+          [Address]
+          Address=${tap.address}
+
+          [DHCP]
+          RouteMetric=512
+    %{~ endfor ~}
+    %{~ endfor ~}

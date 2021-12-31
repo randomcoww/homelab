@@ -1,0 +1,9 @@
+---
+variant: fcos
+version: 1.4.0
+storage:
+  files:
+    - path: /etc/ssh/ssh_known_hosts
+      mode: 0644
+      contents:
+        inline: "@cert-authority * ${ssh.ca_authorized_key.content}"

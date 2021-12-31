@@ -1,0 +1,37 @@
+---
+variant: fcos
+version: 1.4.0
+systemd:
+  units:
+    # Work around "could not connect to dbus: permission denied"
+    - name: systemd-networkd.service
+      enabled: true
+      dropins:
+        - name: 10-after-dbus.conf
+          contents: |
+            [Unit]
+            After=dbus.socket
+    - name: avahi-daemon.service
+      mask: true
+    - name: avahi-daemon.socket
+      mask: true
+
+storage:
+  files:
+    # Default systemd lnk #
+    - path: /etc/systemd/network/90-default.network
+      mode: 0644
+      contents:
+        inline: |
+          [Match]
+          Virtualization=!vm
+          Virtualization=!container
+          Name=en*
+
+          [Link]
+          ARP=false
+          RequiredForOnline=false
+
+          [Network]
+          LinkLocalAddressing=false
+          DHCP=false
