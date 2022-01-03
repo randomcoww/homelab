@@ -1,9 +1,0 @@
-output
-assets
-*.tfstate
-*.tfstate.*
-.terraform
-crash.log
-data
-*.tfvars
-dev.log

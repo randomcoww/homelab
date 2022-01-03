@@ -1,0 +1,47 @@
+---
+variant: fcos
+version: 1.4.0
+systemd:
+  units:
+    - name: sshd.service
+      enabled: true
+
+storage:
+  files:
+    - path: /etc/ssh/sshd_config.d/10-block-password.conf
+      mode: 0644
+      contents:
+        inline: |
+          PasswordAuthentication no
+    - path: /etc/ssh/sshd_config.d/20-host-certificate.conf
+      mode: 0644
+      contents:
+        inline: |
+          HostKey ${certs.server_private_key.path}
+          HostCertificate ${certs.server_certificate.path}
+    # Ignition creates SSH configs in .ssh/authorized_keys.d/ignition
+    - path: /etc/ssh/sshd_config.d/22-ignition.conf
+      mode: 0644
+      contents:
+        inline: |
+          AuthorizedKeysFile .ssh/authorized_keys .ssh/authorized_keys.d/ignition
+
+    # certs #
+    - path: ${certs.server_private_key.path}
+      mode: 0600
+      contents:
+        inline: "${replace(certs.server_private_key.content, "\n", "\\n")}"
+    - path: ${certs.server_public_key.path}
+      mode: 0600
+      contents:
+        inline: "${certs.server_public_key.content}"
+    - path: ${certs.server_certificate.path}
+      mode: 0600
+      contents:
+        inline: "${certs.server_certificate.content}"
+
+passwd:
+  users:
+    - name: ${user}
+      ssh_authorized_keys:
+        - cert-authority ${certs.ca_authorized_key.content}

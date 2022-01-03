@@ -1,0 +1,57 @@
+---
+variant: fcos
+version: 1.4.0
+systemd:
+  units:
+    %{~ for name, disk in disks ~}
+    %{~ for partition in disk.partitions ~}
+    - name: ${partition.systemd_unit_name}.mount
+      enabled: true
+      contents: |
+        [Mount]
+        What=${partition.device}
+        Where=${partition.mount_path}
+        Type=${lookup(partition, "format", "xfs")}
+        Options=${join(",", lookup(partition, "options", ["noatime", "nodiratime", "discard"]))}
+    - name: ${partition.systemd_unit_name}.automount
+      enabled: true
+      contents: |
+        [Unit]
+        ConditionPathExists=${partition.device}
+
+        [Automount]
+        Where=${partition.mount_path}
+        TimeoutIdleSec=${lookup(partition, "mount_timeout", 10)}
+
+        [Install]
+        WantedBy=local-fs.target
+    %{~ endfor ~}
+    %{~ endfor ~}
+
+storage:
+  disks:
+    %{~ for name, disk in disks ~}
+    - device: ${disk.device}
+      wipe_table: ${alltrue([
+        for partition in disk.partitions:
+        lookup(partition, "wipe", false)
+      ])}
+      partitions:
+      %{~ for partition in disk.partitions ~}
+      - label: ${partition.label}
+        number: ${partition.number}
+        start_mib: lookup(partition, "start_mib", 0)
+        size_mib: lookup(partition, "size_mib", 0)
+        wipe_partition_entry: ${lookup(partition, "wipe", false)}
+      %{~ end ~}
+    %{~ end ~}
+  filesystems:
+    %{~ for name, disk in disks ~}
+    %{~ for partition in disk.partitions ~}
+    - path: ${partition.mount_path}
+      device: ${partition.device}
+      format: ${lookup(partition, "format", "xfs")}
+      wipe_filesystem: ${lookup(partition, "wipe", false)}
+      label: ${partition.label}
+    %{~ end ~}
+    %{~ end ~}

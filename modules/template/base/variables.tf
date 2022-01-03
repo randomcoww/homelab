@@ -1,3 +1,0 @@
-variable "hosts" {
-  type = any
-}
