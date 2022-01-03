@@ -36,13 +36,13 @@ systemd:
           --network host \
           %{~ for cert in certs.matchbox ~}
           -v ${cert.path}:${cert.path}:ro \
-          %{~ end ~}
+          %{~ endfor ~}
           localhost/matchbox \
             -address=${internal_interface.ip}:${ports.matchbox_http} \
             -rpc-address=0.0.0.0:${ports.matchbox_rpc} \
-            -ca-file=${matchbox_tls.ca.path} \
-            -cert-file=${matchbox_tls.cert.path} \
-            -key-file=${matchbox_tls.key.path} \
+            -ca-file=${certs.matchbox.ca.path} \
+            -cert-file=${certs.matchbox.cert.path} \
+            -key-file=${certs.matchbox.key.path} \
             -data-path=${matchbox_data_path} \
             -assets-path=${matchbox_assets_path}
 
@@ -99,7 +99,7 @@ storage:
                 {
                   "name" = "ipxe_detected"
                   "test" = "substring(option[77].hex,0,4) == 'iPXE'"
-                  "boot-file-name" = "http://${join(":", internal_interface.ip, ports.matchbox_http)}/boot.ipxe"
+                  "boot-file-name" = "http://${join(":", [internal_interface.ip, ports.matchbox_http])}/boot.ipxe"
                 },
               ]
               "subnet4" = [
@@ -190,12 +190,14 @@ storage:
           Address=${internal_interface.address}
 
     # certs #
-    %{~ for cert in concat(values(certs)) ~}
+    %{~ for cert_category in values(certs) ~}
+    %{~ for cert in values(cert_category) ~}
     - path: ${cert.path}
       mode: 0644
       contents:
         inline: "${replace(cert.content, "\n", "\\n")}"
-    %{~ end ~}
+    %{~ endfor ~}
+    %{~ endfor ~}
 
 passwd:
   users:

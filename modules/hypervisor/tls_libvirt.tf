@@ -17,13 +17,13 @@ resource "tls_cert_request" "libvirt" {
     var.hostname,
   ]
 
-  ip_addresses = concat(["127.0.0.1"], [
+  ip_addresses = concat(["127.0.0.1"], flatten([
     for interface in values(local.interfaces) :
     [
-      for tap in value(interface.taps) :
+      for tap in values(interface.taps) :
       tap.ip
     ]
-  ])
+  ]))
 }
 
 resource "tls_locally_signed_cert" "libvirt" {

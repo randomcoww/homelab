@@ -16,11 +16,11 @@ resource "ssh_host_cert" "ssh-host" {
 
   early_renewal_hours   = 8040
   validity_period_hours = 8760
-  valid_principals = concat(["127.0.0.1", var.hostname], [
+  valid_principals = concat(["127.0.0.1", var.hostname], flatten([
     for interface in values(local.interfaces) :
     [
-      for tap in value(interface.taps) :
+      for tap in values(interface.taps) :
       tap.ip
     ]
-  ])
+  ]))
 }

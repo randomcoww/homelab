@@ -29,12 +29,12 @@ storage:
           [Network]
           LinkLocalAddressing=false
           DHCP=false
-          %{~ for network_name, network in networks ~}
+          %{~ for network_name, network in vlans ~}
           VLAN=${interface_name}-${network_name}
           %{~ endfor ~}
 
     # VLAN interfaces
-    %{~ for network_name, network in networks ~}
+    %{~ for network_name, network in vlans ~}
     - path: /etc/systemd/network/20-${interface_name}-${network_name}.netdev
       mode: 0644
       contents:

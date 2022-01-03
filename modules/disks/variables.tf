@@ -14,6 +14,6 @@ variable "disks" {
   #     ]
   #   }
   # }
-  type = any
+  type    = any
   default = {}
 }

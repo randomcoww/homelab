@@ -16,13 +16,13 @@ resource "tls_cert_request" "matchbox" {
     var.hostname,
   ]
 
-  ip_addresses = concat(["127.0.0.1"], [
-    for interface in values(var.interfaces) :
+  ip_addresses = concat(["127.0.0.1"], flatten([
+    for interface in values(local.interfaces) :
     [
-      for tap in value(interface.taps) :
-      tap.address
+      for tap in values(interface.taps) :
+      tap.ip
     ]
-  ])
+  ]))
 }
 
 resource "tls_locally_signed_cert" "matchbox" {

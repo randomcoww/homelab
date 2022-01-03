@@ -11,8 +11,8 @@ systemd:
         [Mount]
         What=${partition.device}
         Where=${partition.mount_path}
-        Type=${lookup(partition, "format", "xfs")}
-        Options=${join(",", lookup(partition, "options", ["noatime", "nodiratime", "discard"]))}
+        Type=${partition.format}
+        Options=${join(",", partition.mount_options)}
     - name: ${partition.systemd_unit_name}.automount
       enabled: true
       contents: |
@@ -32,26 +32,23 @@ storage:
   disks:
     %{~ for name, disk in disks ~}
     - device: ${disk.device}
-      wipe_table: ${alltrue([
-        for partition in disk.partitions:
-        lookup(partition, "wipe", false)
-      ])}
+      wipe_table: ${disk.wipe}
       partitions:
       %{~ for partition in disk.partitions ~}
       - label: ${partition.label}
         number: ${partition.number}
-        start_mib: lookup(partition, "start_mib", 0)
-        size_mib: lookup(partition, "size_mib", 0)
-        wipe_partition_entry: ${lookup(partition, "wipe", false)}
-      %{~ end ~}
-    %{~ end ~}
+        start_mib: ${lookup(partition, "start_mib", 0)}
+        size_mib: ${lookup(partition, "size_mib", 0)}
+        wipe_partition_entry: ${partition.wipe}
+      %{~ endfor ~}
+    %{~ endfor ~}
   filesystems:
     %{~ for name, disk in disks ~}
     %{~ for partition in disk.partitions ~}
     - path: ${partition.mount_path}
       device: ${partition.device}
-      format: ${lookup(partition, "format", "xfs")}
-      wipe_filesystem: ${lookup(partition, "wipe", false)}
+      format: ${partition.format}
+      wipe_filesystem: ${partition.wipe}
       label: ${partition.label}
-    %{~ end ~}
-    %{~ end ~}
+    %{~ endfor ~}
+    %{~ endfor ~}

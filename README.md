@@ -7,9 +7,9 @@ tw() {
     set -x
     podman run -it --rm --security-opt label=disable \
         -v $HOME/.aws:/root/.aws \
-        -v $(pwd):/root/tf \
+        -v $(pwd):/tf \
         -v /var/cache:/var/cache \
-        -w /root/tf \
+        -w /tf \
         --net=host \
         ghcr.io/randomcoww/tw:latest "$@"
     rc=$?; set +x; return $rc

@@ -20,7 +20,7 @@ variable "interfaces" {
   #     }
   #   }
   # }
-  type = any
+  type    = any
   default = {}
 }
 
@@ -31,15 +31,16 @@ variable "vlans" {
   #     vlan_id = 1
   #   }
   # }
-  type = any
+  type    = any
   default = {}
 }
 
 variable "ca" {
   type = object({
     ssh = object({
-      algorithm = string
-      private_key_pem = string
+      algorithm          = string
+      private_key_pem    = string
+      public_key_openssh = string
     })
   })
 }
