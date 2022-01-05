@@ -1,38 +1,25 @@
-variable "user" {
-  type = any
+variable "users" {
+  type    = list(string)
+  default = []
 }
 
-variable "hostname" {
+variable "key_id" {
   type = string
 }
 
-variable "interfaces" {
-  # {
-  #   en0 = {
-  #     mac = "8c-8c-aa-e3-58-62"
-  #     mtu = 9000
-  #     taps = {
-  #       lan = {
-  #         netnum = 1
-  #         mdns = true
-  #         dhcp = true
-  #       }
-  #     }
-  #   }
-  # }
-  type    = any
-  default = {}
+variable "valid_principals" {
+  type    = list(string)
+  default = []
 }
 
-variable "vlans" {
-  # {
-  #   lan = {
-  #     network = "192.168.126.0/24"
-  #     vlan_id = 1
-  #   }
-  # }
-  type    = any
-  default = {}
+variable "early_renewal_hours" {
+  type    = number
+  default = 8040
+}
+
+variable "validity_period_hours" {
+  type    = number
+  default = 8760
 }
 
 variable "ca" {

@@ -1,27 +1,4 @@
 locals {
-  vlans = {
-    for name, vlan in var.vlans :
-    name => merge(vlan, try({
-      cidr = split("/", vlan.network)[1]
-    }, {}))
-  }
-
-  interfaces = {
-    for interface_name, interface in var.interfaces :
-    interface_name => merge(interface, {
-      taps = {
-        for network_name, tap in interface.taps :
-        network_name => merge(tap, {
-          ip = cidrhost(local.vlans[network_name].network, tap.netnum)
-          address = join("/", [
-            cidrhost(local.vlans[network_name].network, tap.netnum),
-            local.vlans[network_name].cidr,
-          ])
-        })
-      }
-    })
-  }
-
   certs = {
     ca_authorized_key = {
       content = var.ca.ssh.public_key_openssh

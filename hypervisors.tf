@@ -56,11 +56,21 @@ module "template-hypervisor" {
 module "template-ssh_server" {
   for_each = local.hypervisors
 
-  source     = "./modules/ssh_server"
-  hostname   = each.value.hostname
-  user       = local.common.admin_user
-  vlans      = local.common.vlans
-  interfaces = each.value.interfaces
+  source = "./modules/ssh_server"
+  key_id = each.value.hostname
+  users = [
+    local.common.admin_user
+  ]
+  valid_principals = concat([
+    each.value.hostname,
+    "127.0.0.1",
+    ], flatten([
+      for _, interface in each.value.interfaces :
+      [
+        for network_name, tap in interface.taps :
+        cidrhost(local.common.vlans[network_name].network, tap.netnum)
+      ]
+  ]))
   ca = {
     ssh = {
       algorithm          = tls_private_key.ssh-ca.algorithm
