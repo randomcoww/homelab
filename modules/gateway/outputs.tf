@@ -16,6 +16,7 @@ output "ignition" {
       internal_interface = {
         name = local.interface_names.internal
       }
+      kubelet_node_ip      = local.interfaces.sync.ip
       domain_interfaces    = var.domain_interfaces
       master_default_route = var.master_default_route
       slave_default_route  = var.slave_default_route

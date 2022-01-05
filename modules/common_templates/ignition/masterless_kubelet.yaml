@@ -64,7 +64,7 @@ systemd:
             kubelet \
               $KUBELET_COMMON_ARGS \
               --config=${kubelet_config_path}/kubelet-config-common.yaml \
-              --node-ip=${lookup(interfaces.lan, "ip", "")} \
+              --node-ip=${kubelet_node_ip} \
               --register-node=false
         Restart=always
         RestartSec=10
