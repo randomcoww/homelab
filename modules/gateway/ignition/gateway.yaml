@@ -1,0 +1,130 @@
+---
+variant: fcos
+version: 1.4.0
+systemd:
+  units:
+    - name: nftables.service
+      enabled: true
+
+storage:
+  files:
+    - path: /etc/sysconfig/nftables.conf
+      mode: 0644
+      overwrite: true
+      contents:
+        inline: |-
+          table ip filter {
+            chain base_checks {
+              ct state {established, related} accept;
+              ct state invalid drop;
+            }
+
+            chain input {
+              type filter hook input priority 0; policy drop;
+              jump base_checks;
+
+              iifname "lo" accept;
+              iifname != "lo" ip daddr 127.0.0.1/8 drop;
+
+              ip protocol icmp icmp type { echo-request, echo-reply, time-exceeded, parameter-problem, destination-unreachable } accept;
+              iifname ${interfaces.lan.interface_name} accept;
+              iifname ${interfaces.sync.interface_name} accept;
+            }
+
+            chain forward {
+              type filter hook forward priority 0; policy drop;
+              jump base_checks;
+
+              ip protocol icmp icmp type { echo-request, echo-reply, time-exceeded, parameter-problem, destination-unreachable } accept;
+              oifname ${interfaces.wan.interface_name} accept;
+            }
+          }
+
+          table ip nat {
+            chain postrouting {
+              type nat hook postrouting priority 100; policy accept;
+              iifname != ${interfaces.wan.interface_name} oifname ${interfaces.wan.interface_name} masquerade;
+            }
+          }
+          ;
+
+    # pod config #
+    - path: ${pod_mount_path}/conntrackd/conntrackd.conf
+      mode: 0644
+      contents:
+        inline: |-
+          Sync {
+            Mode NOTRACK {
+              StartupResync on
+              DisableInternalCache on
+              DisableExternalCache on
+            }
+            Multicast {
+              IPv4_address 225.0.0.50
+              Group 3780
+              IPv4_interface ${interfaces.sync.address}
+              Interface ${interfaces.sync.interface_name}
+              SndSocketBuffer 24985600
+              RcvSocketBuffer 24985600
+              Checksum on
+            }
+          }
+          General {
+            Systemd off
+            LogFile /dev/stdout
+            Syslog off
+            NetlinkBufferSize 2097152
+            NetlinkBufferSizeMaxGrowth 8388608
+            UNIX {
+              Path /var/run/conntrackd.ctl
+            }
+            Filter From Kernelspace {
+              Protocol Accept {
+                TCP
+                UDP
+              }
+              Address Ignore {
+                %{~ for name, interface in interfaces ~}
+                %{~ if lookup(interface, "ip", null) != null ~}
+                IPv4_address ${interface.ip}
+                %{~ endif ~}
+                %{~ for vrrp_ip in interface.vrrp_ips ~}
+                IPv4_address ${vrrp_ip}
+                %{~ endfor ~}
+                %{~ endfor ~}
+                IPv4_address 127.0.0.1
+              }
+            }
+          }
+
+    # pod manifests #
+    - path: ${kubelet_config_path}/manifests/conntrackd.yaml
+      mode: 0644
+      contents:
+        inline: |-
+          ---
+          apiVersion: v1
+          kind: Pod
+          metadata:
+            namespace: kube-system
+            name: conntrackd
+          spec:
+            restartPolicy: Always
+            hostNetwork: true
+            containers:
+            - name: conntrackd
+              image: ${container_images.conntrackd}
+              args: [ "-C", "/etc/conntrackd/conntrackd.conf" ]
+              securityContext:
+                capabilities:
+                  add:
+                  - NET_ADMIN
+                  - SYS_NICE
+              volumeMounts:
+              - name: config-volume
+                mountPath: /etc/conntrackd/conntrackd.conf
+                readOnly: true
+            volumes:
+            - name: config-volume
+              hostPath:
+                path: ${pod_mount_path}/conntrackd/conntrackd.conf

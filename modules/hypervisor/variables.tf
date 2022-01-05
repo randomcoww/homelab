@@ -56,11 +56,9 @@ variable "ports" {
 variable "image_paths" {
   type = object({
     matchbox = string
-    kea      = string
   })
   default = {
     matchbox = "/var/lib/image-load/matchbox.tar"
-    kea      = "/var/lib/image-load/kea.tar"
   }
 }
 

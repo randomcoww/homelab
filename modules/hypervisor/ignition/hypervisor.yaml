@@ -50,39 +50,25 @@ systemd:
         WantedBy=multi-user.target
     - name: kea-dhcp4.service
       enabled: true
-      contents: |
-        [Unit]
-        After=network-online.target
-        Wants=network-online.target
-        Before=libvirtd.service
-        WantedBy=libvirtd.service
+      dropins:
+        - name: internal.conf
+          contents: |
+            [Unit]
+            After=matchbox.service
+            Wants=matchbox.service
+            Before=libvirtd.service
+            WantedBy=libvirtd.service
 
-        [Service]
-        TimeoutStartSec=5m
-        Restart=always
-        RestartSec=10
-        ExecStartPre=/usr/bin/podman load -i \
-          ${image_paths.kea} localhost/kea
-        ExecStartPre=-/usr/bin/podman kill kea-dhcp4
-        ExecStartPre=-/usr/bin/podman rm kea-dhcp4
-        ExecStart=/usr/bin/podman run --rm -it \
-          --name kea-dhcp4 \
-          --security-opt label=disable \
-          --log-driver none \
-          --network host \
-          -v ${kea_config_path}:${kea_config_path}:ro \
-          localhost/kea \
-            kea-dhcp4 \
-              -c ${kea_config_path}
-
-        [Install]
-        WantedBy=multi-user.target
+            [Service]
+            ExecStart=
+            ExecStart=/usr/sbin/kea-dhcp4 -c ${kea_config_path}
 
 storage:
   files:
     # Kea #
     - path: ${kea_config_path}
       mode: 0644
+      overwrite: true
       contents:
         inline: |
           ${jsonencode({

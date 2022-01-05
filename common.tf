@@ -6,9 +6,20 @@ locals {
         network = "192.168.126.0/24"
         vlan_id = 1
       }
+      sync = {
+        network = "192.168.224.0/24"
+        vlan_id = 10
+      }
+      wan = {
+        vlan_id = 90
+      }
     }
     domains = {
       mdns = "local"
+    }
+    container_images = {
+      conntrackd = "ghcr.io/randomcoww/conntrackd:latest"
+      kubelet    = "ghcr.io/randomcoww/kubernetes:kubelet-v1.22.4"
     }
   }
 }

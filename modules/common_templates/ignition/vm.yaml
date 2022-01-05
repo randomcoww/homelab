@@ -1,0 +1,61 @@
+---
+variant: fcos
+version: 1.4.0
+systemd:
+  units:
+    # auto-login via hvc0 console
+    - name: serial-getty@hvc0.service
+      dropins:
+      - name: 10-autologin.conf
+        contents: |
+          [Service]
+          ExecStart=
+          ExecStart=-/usr/sbin/agetty --autologin ${user} --noclear %I $TERM
+
+storage:
+  files:
+    # internal interface is only used for pxe boot #
+    - path: /etc/systemd/network/10-${internal_interface.name}.network
+      mode: 0644
+      contents:
+        inline: |
+          [Match]
+          Virtualization=vm
+          Name=${internal_interface.name}
+
+          [Link]
+          Unmanaged=true
+    # general network config
+    %{~ for network_name, interface in interfaces ~}
+    - path: /etc/systemd/network/20-${network_name}.network
+      mode: 0644
+      contents:
+        inline: |
+          [Match]
+          Name=${network_name}
+
+          [Link]
+          MTUBytes=${interface.mtu}
+
+          [DHCP]
+          UseMTU=true
+          RouteMetric=${interface.metric}
+
+          [Network]
+          LinkLocalAddressing=false
+          DHCP=${interface.dhcp}
+          MulticastDNS=${interface.mdns}
+          %{~ if !interface.dhcp ~}
+
+          [Address]
+          Address=${lookup(interface, "address", "")}
+          AddPrefixRoute=false
+
+          [Route]
+          Protocol=kernel
+          Scope=link
+          PreferredSource=${lookup(interface, "ip", "")}
+          Destination=${lookup(interface, "network", "")}
+          Metric=${interface.metric}
+          %{~ endif ~}
+    %{~ endfor ~}

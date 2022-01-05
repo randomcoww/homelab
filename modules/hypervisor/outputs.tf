@@ -7,7 +7,7 @@ output "ignition" {
     templatefile(f, {
       matchbox_data_path   = "/etc/matchbox/data"
       matchbox_assets_path = "/etc/matchbox/assets"
-      kea_config_path      = "/etc/kea/kea-dhcp4.conf"
+      kea_config_path      = "/etc/kea/kea-dhcp4-internal.conf"
       user                 = var.user
       hostname             = var.hostname
       ports                = var.ports

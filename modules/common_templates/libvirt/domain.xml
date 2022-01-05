@@ -1,0 +1,63 @@
+<domain type='kvm'>
+  <name>${name}</name>
+  <memory unit='MiB'>${memory}</memory>
+  <currentMemory unit='MiB'>${memory}</currentMemory>
+  <vcpu placement='static'>${vcpu}</vcpu>
+  <os>
+    <type arch='x86_64' machine='pc'>hvm</type>
+  </os>
+  <features>
+    <acpi/>
+    <apic/>
+    <pae/>
+    <vmport state='off'/>
+  </features>
+  <cpu mode='host-passthrough'>
+    <topology sockets='1' cores='${vcpu}' threads='1'/>
+    <cache level='3' mode='emulate'/>
+  </cpu>
+  <on_crash>restart</on_crash>
+  <devices>
+    <emulator>/usr/bin/qemu-kvm</emulator>
+    %{~ for interface in domain_interfaces ~}
+    <interface type='direct' trustGuestRxFilters='yes'>
+      <source dev='${interface.hypervisor_interface_name}' mode='bridge'/>
+      %{~ if lookup(interface, "macaddress", null) != null ~}
+      <mac address='${replace(interface.macaddress, "-", ":")}'/>
+      %{~ endif ~}
+      %{~ if lookup(interface, "boot_order", null) != null ~}
+      <boot order='${interface.boot_order}'/>
+      %{~ endif ~}
+      <model type='virtio-net'/>
+    </interface>
+    %{~ endfor ~}
+    <controller type='usb' model='none'/>
+    <controller type='scsi' model='virtio-scsi'/>
+    %{~ for host_device in host_devices ~}
+    <hostdev mode='subsystem' type='pci' managed='yes'>
+      <driver name='vfio'/>
+      <source>
+        <address domain='${host_device.domain}' bus='${host_device.bus}' slot='${host_device.slot}' function='${host_device.function}'/>
+      </source>
+      %{~ if lookup(host_device, "rom", null) != null ~}
+      <rom bar='on' file='${host_device.rom}'/>
+      %{~ endif ~}
+    </hostdev>
+    %{~ endfor ~}
+    <console>
+      <target type='virtio'/>
+    </console>
+    <channel type='spicevmc'>
+      <target type='virtio' name='com.redhat.spice.0'/>
+      <address type='virtio-serial'/>
+    </channel>
+    <channel type='unix'>
+      <source mode='bind' path='/var/run/libvirt/qga-${name}.sock'/>
+      <target type='virtio' name='org.qemu.guest_agent.0'/>
+    </channel>
+    <memballoon model='virtio'/>
+    <rng model='virtio'>
+      <backend model='random'>/dev/urandom</backend>
+    </rng>
+  </devices>
+</domain>

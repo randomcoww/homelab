@@ -1,9 +1,9 @@
 locals {
   vlans = {
     for name, vlan in var.vlans :
-    name => merge(vlan, {
+    name => merge(vlan, try({
       cidr = split("/", vlan.network)[1]
-    })
+    }, {}))
   }
 
   interfaces = {

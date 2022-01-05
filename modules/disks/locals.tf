@@ -14,10 +14,10 @@ locals {
           wipe              = lookup(partition, "wipe", false)
         })
       ]
-      wipe = alltrue([
+      wipe = lookup(disk, "wipe", alltrue([
         for partition in disk.partitions :
         lookup(partition, "wipe", false)
-      ])
+      ]))
     })
   }
 }
