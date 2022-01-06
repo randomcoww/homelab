@@ -1,0 +1,347 @@
+---
+variant: fcos
+version: 1.4.0
+systemd:
+  units:
+    - name: nftables.service
+      enabled: true
+
+storage:
+  files:
+    - path: /etc/systemd/network/20-${interfaces.lan.interface_name}.network.d/default-route.conf
+      mode: 0644
+      contents:
+        inline: |
+          [Route]
+          Gateway=${cidrhost(interfaces.lan.prefix, interfaces.lan.router_netnum)}
+          Destination=0.0.0.0/0
+
+          [Network]
+          DNS=${upstream_dns.ip}#${upstream_dns.tls_servername}
+          DNSOverTLS=true
+          DNSDefaultRoute=true
+    - path: /etc/systemd/resolved.conf.d/10-mdns-stub.conf
+      mode: 0644
+      contents:
+        inline: |
+          [Resolve]
+          DNSStubListener=true
+    - path: /etc/sysconfig/nftables.conf
+      mode: 0644
+      overwrite: true
+      contents:
+        inline: |-
+          table ip filter {
+            chain input {
+              type filter hook input priority 0; policy accept;
+            }
+          }
+          table ip nat {
+            chain prerouting {
+              type nat hook prerouting priority -100; policy accept;
+              tcp dport domain redirect to ${ports.dns_redirect};
+              udp dport domain redirect to ${ports.dns_redirect};
+            }
+          }
+          ;
+
+    # pod config #
+    - path: ${pod_mount_path}/coredns/Corefile
+      mode: 0644
+      contents:
+        inline: |-
+          ${domains.internal}. {
+            errors
+            forward . ${internal_dns.ip}
+          }
+          ${domains.internal_mdns}. {
+            errors
+            forward . 127.0.0.53
+          }
+          . {
+            errors
+            health
+            forward . tls://${upstream_dns.ip} {
+              tls_servername ${upstream_dns.tls_servername}
+              health_check 20s
+            }
+            cache 30
+            reload
+            loadbalance
+          }
+
+    - path: ${pod_mount_path}/kea/kea-ctrl-agent.conf
+      mode: 0644
+      contents:
+        inline: |-
+          ${jsonencode({
+            "Control-agent" = {
+              "http-host" = "0.0.0.0"
+              "http-port" = ports.kea_peer
+              "control-sockets" = {
+                "dhcp4" = {
+                  "socket-type" = "unix",
+                  "socket-name" = "${kea_shared_path}/kea-dhcp4-ctrl.sock"
+                }
+              }
+            }
+          })}
+
+    - path: ${pod_mount_path}/kea/kea-dhcp4.conf
+      mode: 0644
+      contents:
+        inline: |-
+          ${jsonencode({
+             "Dhcp4" = {
+              "valid-lifetime" = 7200
+              "renew-timer" = 1800
+              "rebind-timer" = 3600
+              "lease-database" = {
+                "type" = "memfile"
+                "persist" = true
+                "name" = "${kea_shared_path}/kea-leases4.csv"
+              }
+              "interfaces-config" = {
+                "interfaces" = [
+                  for network_name, interface in interfaces :
+                    cidrhost(interface.prefix, interface.netnum)
+                    if can(interface.dhcp_subnet) && can(interface.netnum)
+                ]
+              }
+              "control-socket" = {
+                "socket-type" = "unix"
+                "socket-name" = "${kea_shared_path}/kea-dhcp4-ctrl.sock"
+              }
+              "option-data" = [
+                {
+                  "name" = "domain-name"
+                  "data" = domains.internal
+                },
+                {
+                  "name" = "domain-name-servers"
+                  "data" = cidrhost(interfaces.lan.prefix, interfaces.lan.vrrp_netnum)
+                  "csv-format" = true
+                },
+              ]
+              "hooks-libraries" = [
+                {
+                  "library" = "${kea_hooks_path}/libdhcp_lease_cmds.so",
+                  "parameters" = {}
+                },
+                {
+                  "library" = "${kea_hooks_path}/libdhcp_ha.so",
+                  "parameters" = {
+                    "high-availability" = [
+                      {
+                        "this-server-name" = hostname
+                        "mode" = "load-balancing"
+                        "max-unacked-clients" = 0
+                        "peers" = "" 
+                      },
+                    ]
+                  }
+                },
+              ]
+              "client-classes" = [
+                {
+                  "name" = "ipxe_detected"
+                  "test" = "substring(option[77].hex,0,4) == 'iPXE'"
+                  "boot-file-name" = "http://${cidrhost(
+                    interfaces.lan.prefix,
+                    interfaces.lan.netnum
+                  )}:${ports.pxe_http}/boot.ipxe"
+                },
+                {
+                  "name" = "ipxe"
+                  "test" = "not(substring(option[77].hex,0,4) == 'iPXE') and (option[93].hex == 0x0000)"
+                  "next-server" = cidrhost(interfaces.lan.prefix, interfaces.lan.netnum)
+                  "boot-file-name" = "/undionly.kpxe"
+                },
+                {
+                  "name" = "ipxe_efi"
+                  "test" = "not(substring(option[77].hex,0,4) == 'iPXE') and (option[93].hex == 0x0007)"
+                  "next-server" = cidrhost(interfaces.lan.prefix, interfaces.lan.netnum)
+                  "boot-file-name" = "/ipxe.efi"
+                },
+              ]
+              "subnet4" = [
+                for network_name, interface in interfaces :
+                {
+                  subnet = interface.prefix,
+                  option-data = concat(
+                    try([
+                      {
+                        name = "routers"
+                        data = cidrhost(interface.network, interface.router_netnum)
+                      }
+                    ], []),
+                    try([
+                      {
+                        name = "interface-mtu"
+                        data = format("%s", interface.mtu)
+                      }
+                    ], [])
+                  )
+                  pools = [
+                    {
+                      pool = cidrsubnet(
+                        interface.prefix,
+                        interface.dhcp_subnet.newbit,
+                        interface.dhcp_subnet.netnum,
+                      )
+                    }
+                  ]
+                }
+                if can(interface.dhcp_subnet) && can(interface.netnum)
+              ]
+              "dhcp-ddns" = {
+                "enable-updates" = true
+                "qualifying-suffix" = "${domains.internal}."
+                "override-client-update" = true
+                "override-no-update" = true
+                "replace-client-name" = "when-not-present"
+              }
+            }
+          })}
+
+    - path: ${pod_mount_path}/keepalived/keepalived.conf
+      mode: 0644
+      contents:
+        inline: |-
+          global_defs {
+            vrrp_version 3
+            dynamic_interfaces allow_if_changes
+            max_auto_priority -1
+          }
+          vrrp_instance VI_ns {
+            nopreempt
+            state BACKUP
+            advert_int 0.1
+            virtual_router_id 290
+            interface ${interfaces.lan.interface_name}
+            priority 250
+            virtual_ipaddress {
+              %{~ for network_name, interface in interfaces ~}
+              %{~ if can(interface.vrrp_netnum) ~}
+              ${cidrhost(interface.prefix, interface.vrrp_netnum)} dev ${interface.interface_name}
+              %{~ endif ~}
+              %{~ endfor ~}
+            }
+          }
+
+    # pod manifests #
+    - path: ${kubelet_config_path}/manifests/kea.yaml
+      mode: 0644
+      contents:
+        inline: |-
+          ---
+          apiVersion: v1
+          kind: Pod
+          metadata:
+            name: kea
+          spec:
+            restartPolicy: Always
+            hostNetwork: true
+            containers:
+            - name: kea-control-agent
+              image: ${container_images.kea}
+              args: [ "kea-ctrl-agent", "-c", "/etc/kea/kea-ctrl-agent.conf" ]
+              volumeMounts:
+              - name: kea-share
+                mountPath: "${kea_shared_path}"
+              - name: config-kea-ctrl-agent
+                mountPath: /etc/kea/kea-ctrl-agent.conf
+                readOnly: true
+            - name: kea-dhcp4
+              image: ${container_images.kea}
+              args: [ "kea-dhcp4", "-c", "/etc/kea/kea-dhcp4.conf" ]
+              volumeMounts:
+              - name: kea-share
+                mountPath: "${kea_shared_path}"
+              - name: config-kea-dhcp4
+                mountPath: /etc/kea/kea-dhcp4.conf
+                readOnly: true
+            - name: tftpd
+              image: ${container_images.tftpd}
+              args: [ "--address", "0.0.0.0:69", "--verbose" ]
+            volumes:
+            - name: kea-share
+              emptyDir: {}
+            - name: config-kea-ctrl-agent
+              hostPath:
+                path: ${pod_mount_path}/kea/kea-ctrl-agent.conf
+            - name: config-kea-dhcp4
+              hostPath:
+                path: ${pod_mount_path}/kea/kea-dhcp4.conf
+
+    - path: ${kubelet_config_path}/manifests/coredns.yaml
+      mode: 0644
+      contents:
+        inline: |-
+          ---
+          apiVersion: v1
+          kind: Pod
+          metadata:
+            namespace: kube-system
+            name: coredns
+          spec:
+            restartPolicy: Always
+            hostNetwork: true
+            containers:
+            - name: coredns
+              image: "${container_images.coredns}"
+              resources:
+                limits:
+                  memory: 170Mi
+                requests:
+                  cpu: 100m
+                  memory: 70Mi
+              args: [ "-dns.port", "${ports.dns_redirect}", "-conf", "/etc/coredns/Corefile" ]
+              livenessProbe:
+                httpGet:
+                  path: /health
+                  port: 8080
+                  scheme: HTTP
+                initialDelaySeconds: 15
+                timeoutSeconds: 5
+                successThreshold: 1
+                failureThreshold: 5
+              securityContext:
+                allowPrivilegeEscalation: false
+                capabilities:
+                  add:
+                  - NET_BIND_SERVICE
+                  drop:
+                  - all
+                readOnlyRootFilesystem: true
+              volumeMounts:
+              - name: config-coredns
+                mountPath: /etc/coredns/Corefile
+                readOnly: true
+            - name: keepalived
+              image: ${container_images.keepalived}
+              securityContext:
+                capabilities:
+                  add:
+                  - NET_ADMIN
+              args: [ "-P", "-D", "-f", "/etc/keepalived/keepalived.conf" ]
+              livenessProbe:
+                httpGet:
+                  path: /health
+                  port: 8080
+                  scheme: HTTP
+                initialDelaySeconds: 15
+                timeoutSeconds: 5
+                successThreshold: 1
+                failureThreshold: 5
+              volumeMounts:
+              - name: config-keepalived
+                mountPath: /etc/keepalived/keepalived.conf
+                readOnly: true
+            volumes:
+            - name: config-coredns
+              hostPath:
+                path: ${pod_mount_path}/coredns/Corefile
+            - name: config-keepalived
+              hostPath:
+                path: ${pod_mount_path}/keepalived/keepalived.conf

@@ -48,10 +48,10 @@ storage:
               to all lookup ${master_default_route.table_id} priority ${master_default_route.table_priority}
             }
             virtual_ipaddress {
-              %{~ for interface in interfaces ~}
-              %{~ for vrrp_ip in interface.vrrp_ips ~}
-              ${vrrp_ip} dev ${interface.interface_name}
-              %{~ endfor ~}
+              %{~ for network_name, interface in interfaces ~}
+              %{~ if can(interface.vrrp_netnum) ~}
+              ${cidrhost(interface.prefix, interface.vrrp_netnum)} dev ${interface.interface_name}
+              %{~ endif ~}
               %{~ endfor ~}
               0.0.0.0 dev ${interfaces.wan.interface_name}
             }
@@ -80,20 +80,19 @@ storage:
           RouteTable=${master_default_route.table_id}
 
           [Network]
-          DNS=${upstream_dns.ip}#${upstream_dns.url}
+          DNS=${upstream_dns.ip}#${upstream_dns.tls_servername}
           DNSOverTLS=true
           DNSDefaultRoute=true
+
     - path: /etc/systemd/network/20-${interfaces.sync.interface_name}.network.d/20-slave-default-route.conf
       mode: 0644
       contents:
         inline: |
-          %{~ for vrrp_ip in interfaces.sync.vrrp_ips ~}
           [Route]
           GatewayOnLink=true
-          Gateway=${vrrp_ip}
+          Gateway=${cidrhost(interfaces.sync.prefix, interfaces.sync.vrrp_netnum)}
           Destination=0.0.0.0/0
           Table=${slave_default_route.table_id}
-          %{~ endfor ~}
 
           [RoutingPolicyRule]
           Table=${slave_default_route.table_id}

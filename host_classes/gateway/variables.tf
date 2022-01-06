@@ -8,7 +8,7 @@ variable "hostname" {
   default = "gateway"
 }
 
-variable "vlans" {
+variable "networks" {
   # {
   #   lan = {
   #     network = "192.168.126.0/24"
@@ -23,16 +23,12 @@ variable "interfaces" {
   # {
   #   lan = {
   #     mdns = true
-  #     vrrp_netnums = [
-  #       1,
-  #     ]
+  #     vrrp_netnum = 2
   #   }
   #   sync = {
   #     mdns = true
   #     netnum = 1
-  #     vrrp_netnums = [
-  #       1,
-  #     ]
+  #     vrrp_netnum = 2
   #   }
   #   wan = {
   #     dhcp = true
@@ -81,19 +77,16 @@ variable "slave_default_route" {
 }
 
 variable "container_images" {
-  type = object({
-    conntrackd = string
-    kubelet    = string
-  })
+  type = map(string)
 }
 
 variable "upstream_dns" {
   type = object({
-    ip  = string
-    url = string
+    ip             = string
+    tls_servername = string
   })
   default = {
-    ip  = "9.9.9.9"
-    url = "dns.quad9.net"
+    ip             = "9.9.9.9"
+    tls_servername = "dns.quad9.net"
   }
 }

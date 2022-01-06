@@ -22,12 +22,10 @@ variable "validity_period_hours" {
   default = 8760
 }
 
-variable "ca" {
+variable "ssh_ca" {
   type = object({
-    ssh = object({
-      algorithm          = string
-      private_key_pem    = string
-      public_key_openssh = string
-    })
+    algorithm          = string
+    private_key_pem    = string
+    public_key_openssh = string
   })
 }

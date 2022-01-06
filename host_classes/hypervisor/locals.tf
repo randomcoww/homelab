@@ -1,43 +1,35 @@
 locals {
-  vlans = {
-    for name, vlan in var.vlans :
-    name => merge(vlan, try({
-      cidr = split("/", vlan.network)[1]
+  networks = {
+    for network_name, network in var.networks :
+    network_name => merge(network, try({
+      prefix = "${network.network}/${network.cidr}"
     }, {}))
   }
 
-  interfaces = {
-    for interface_name, interface in var.interfaces :
+  hardware_interfaces = {
+    for interface_name, interface in var.hardware_interfaces :
     interface_name => merge(interface, {
-      taps = {
-        for network_name, tap in interface.taps :
-        network_name => merge(tap, {
-          ip = cidrhost(local.vlans[network_name].network, tap.netnum)
-          address = join("/", [
-            cidrhost(local.vlans[network_name].network, tap.netnum),
-            local.vlans[network_name].cidr,
-          ])
-        })
-      }
+      for network_name, network in interface.networks :
+      network_name => merge(local.networks[network_name], network, {
+        "interface_name" = "${interface_name}-${network_name}"
+      })
     })
   }
 
-  internal_interface = {
-    name    = "internal"
-    network = var.internal_vlan
-    ip      = cidrhost(var.internal_vlan, 1)
-    address = join("/", [
-      cidrhost(var.internal_vlan, 1),
-      split("/", var.internal_vlan)[1],
-    ])
-    dhcp_pool = cidrsubnet(var.internal_vlan, 1, 1)
-  }
+  internal_interface = merge({
+    netnum         = 1
+    interface_name = "internal"
+    dhcp_subnet = {
+      newbit = 1
+      netnum = 1
+    }
+  }, local.networks.internal)
 
   certs = {
     matchbox = {
       ca = {
         path    = "/etc/matchbox/ca.pem"
-        content = var.ca.matchbox.cert_pem
+        content = var.matchbox_ca.cert_pem
       }
       cert = {
         path    = "/etc/matchbox/cert.pem"
@@ -51,7 +43,7 @@ locals {
     libvirt = {
       ca = {
         path    = "/etc/pki/CA/cacert.pem"
-        content = var.ca.libvirt.cert_pem
+        content = var.libvirt_ca.cert_pem
       }
       serverCert = {
         path    = "/etc/pki/libvirt/servercert.pem"

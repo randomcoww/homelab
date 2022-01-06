@@ -1,16 +1,20 @@
 locals {
   hypervisors = {
     kvm-0 = {
-      hostname = join(".", ["kvm-0", local.common.domains.mdns])
-      interfaces = {
+      hostname = "kvm-0.${local.common.domains.internal_mdns}"
+      hardware_interfaces = {
         en0 = {
           mac = "8c-8c-aa-e3-58-62"
           mtu = 9000
-          taps = {
+          networks = {
             lan = {
               netnum = 1
               mdns   = true
-              dhcp   = true
+            }
+            sync = {
+              netnum = 1
+            }
+            wan = {
             }
           }
         }
@@ -34,50 +38,14 @@ locals {
 module "template-hypervisor" {
   for_each = local.hypervisors
 
-  source     = "./modules/hypervisor"
-  hostname   = each.value.hostname
-  user       = local.common.admin_user
-  vlans      = local.common.vlans
-  interfaces = each.value.interfaces
-  ca = {
-    matchbox = {
-      algorithm       = tls_private_key.matchbox-ca.algorithm
-      private_key_pem = tls_private_key.matchbox-ca.private_key_pem
-      cert_pem        = tls_self_signed_cert.matchbox-ca.cert_pem
-    }
-    libvirt = {
-      algorithm       = tls_private_key.libvirt-ca.algorithm
-      private_key_pem = tls_private_key.libvirt-ca.private_key_pem
-      cert_pem        = tls_self_signed_cert.libvirt-ca.cert_pem
-    }
-  }
-}
-
-module "template-ssh_server" {
-  for_each = local.hypervisors
-
-  source = "./modules/ssh_server"
-  key_id = each.value.hostname
-  users = [
-    local.common.admin_user
-  ]
-  valid_principals = concat([
-    each.value.hostname,
-    "127.0.0.1",
-    ], flatten([
-      for _, interface in each.value.interfaces :
-      [
-        for network_name, tap in interface.taps :
-        cidrhost(local.common.vlans[network_name].network, tap.netnum)
-      ]
-  ]))
-  ca = {
-    ssh = {
-      algorithm          = tls_private_key.ssh-ca.algorithm
-      private_key_pem    = tls_private_key.ssh-ca.private_key_pem
-      public_key_openssh = tls_private_key.ssh-ca.public_key_openssh
-    }
-  }
+  source              = "./host_classes/hypervisor"
+  hostname            = each.value.hostname
+  user                = local.common.admin_user
+  networks            = local.common.networks
+  hardware_interfaces = each.value.hardware_interfaces
+  matchbox_ca         = local.common.ca.matchbox
+  libvirt_ca          = local.common.ca.libvirt
+  ssh_ca              = local.common.ca.ssh
 }
 
 module "template-disks" {
@@ -99,7 +67,6 @@ EOT
   strict  = true
   snippets = concat(
     module.template-hypervisor[each.key].ignition,
-    module.template-ssh_server[each.key].ignition,
     module.template-disks[each.key].ignition,
   )
 }

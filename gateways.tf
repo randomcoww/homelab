@@ -1,19 +1,17 @@
 locals {
   gateways = {
     gateways-0 = {
-      hostname = join(".", ["gateways-0", local.common.domains.mdns])
+      hostname = "gateways-0.${local.common.domains.internal_mdns}"
       interfaces = {
         lan = {
-          mdns = true
-          vrrp_netnums = [
-            1,
-          ]
+          mdns        = true
+          vrrp_netnum = local.common.networks.lan.router_netnum
+          mtu         = 9000
         }
         sync = {
-          netnum = 10
-          vrrp_netnums = [
-            1,
-          ]
+          netnum      = 10
+          vrrp_netnum = local.common.networks.lan.router_netnum
+          mtu         = 9000
         }
         wan = {
           dhcp = true
@@ -27,10 +25,10 @@ locals {
 module "template-gateway" {
   for_each = local.gateways
 
-  source     = "./modules/gateway"
+  source     = "./host_classes/gateway"
   hostname   = each.value.hostname
   user       = local.common.admin_user
-  vlans      = local.common.vlans
+  networks   = local.common.networks
   interfaces = each.value.interfaces
   domain_interfaces = [
     {
@@ -49,7 +47,7 @@ module "template-gateway" {
     {
       network_name              = "wan"
       hypervisor_interface_name = "en0-wan"
-    }
+    },
   ]
 
   # master route prioirty is slotted in between main and slave

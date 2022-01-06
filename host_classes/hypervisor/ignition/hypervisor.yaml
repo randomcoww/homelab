@@ -26,7 +26,7 @@ systemd:
         ExecStartPre=/usr/bin/mkdir -p \
           ${matchbox_data_path}
         ExecStartPre=/usr/bin/podman load -i \
-          ${image_paths.matchbox} localhost/matchbox
+          ${container_image_paths.matchbox} localhost/matchbox
         ExecStartPre=-/usr/bin/podman kill matchbox
         ExecStartPre=-/usr/bin/podman rm matchbox
         ExecStart=/usr/bin/podman run --rm -it \
@@ -38,7 +38,10 @@ systemd:
           -v ${cert.path}:${cert.path}:ro \
           %{~ endfor ~}
           localhost/matchbox \
-            -address=${internal_interface.ip}:${ports.matchbox_http} \
+            -address=${cidrhost(
+              internal_interface.prefix,
+              internal_interface.netnum,
+            )}:${ports.matchbox_http} \
             -rpc-address=0.0.0.0:${ports.matchbox_rpc} \
             -ca-file=${certs.matchbox.ca.path} \
             -cert-file=${certs.matchbox.cert.path} \
@@ -65,7 +68,7 @@ systemd:
 
 storage:
   files:
-    # Kea #
+    # kea #
     - path: ${kea_config_path}
       mode: 0644
       overwrite: true
@@ -78,22 +81,29 @@ storage:
               }
               "interfaces-config" = {
                 "interfaces" = [
-                  "${internal_interface.name}-tap",
+                  "${internal_interface.interface_name}-tap",
                 ]
               }
               "client-classes" = [
                 {
                   "name" = "ipxe_detected"
                   "test" = "substring(option[77].hex,0,4) == 'iPXE'"
-                  "boot-file-name" = "http://${join(":", [internal_interface.ip, ports.matchbox_http])}/boot.ipxe"
+                  "boot-file-name" = "http://${cidrhost(
+                      internal_interface.prefix,
+                      internal_interface.netnum,
+                    )}:${ports.matchbox_http}/boot.ipxe"
                 },
               ]
               "subnet4" = [
                 {
-                  "subnet" = internal_interface.network
+                  "subnet" = internal_interface.prefix
                   "pools" = [
                     {
-                      "pool" = internal_interface.dhcp_pool
+                      "pool" = cidrsubnet(
+                        internal_interface.prefix,
+                        internal_interface.dhcp_subnet.newbit,
+                        internal_interface.dhcp_subnet.netnum,
+                      )
                     },
                   ]
                 },
@@ -101,20 +111,20 @@ storage:
             }
           })}
 
-    # Internal interface #
-    - path: /etc/systemd/network/10-${internal_interface.name}.netdev
+    # internal interface #
+    - path: /etc/systemd/network/10-${internal_interface.interface_name}.netdev
       mode: 0644
       contents:
         inline: |
           [NetDev]
-          Name=${internal_interface.name}
+          Name=${internal_interface.interface_name}
           Kind=bridge
-    - path: /etc/systemd/network/12-${internal_interface.name}.network
+    - path: /etc/systemd/network/12-${internal_interface.interface_name}.network
       mode: 0644
       contents:
         inline: |
           [Match]
-          Name=${internal_interface.name}
+          Name=${internal_interface.interface_name}
 
           [Link]
           ARP=false
@@ -122,21 +132,21 @@ storage:
           [Network]
           LinkLocalAddressing=false
           DHCP=false
-          MACVTAP=${internal_interface.name}-tap
-          Bridge=${internal_interface.name}-dummy
-    - path: /etc/systemd/network/10-${internal_interface.name}-dummy.netdev
+          MACVTAP=${internal_interface.interface_name}-tap
+          Bridge=${internal_interface.interface_name}-dummy
+    - path: /etc/systemd/network/10-${internal_interface.interface_name}-dummy.netdev
       mode: 0644
       contents:
         inline: |
           [NetDev]
-          Name=${internal_interface.name}-dummy
+          Name=${internal_interface.interface_name}-dummy
           Kind=dummy
-    - path: /etc/systemd/network/12-${internal_interface.name}-dummy.network
+    - path: /etc/systemd/network/12-${internal_interface.interface_name}-dummy.network
       mode: 0644
       contents:
         inline: |
           [Match]
-          Name=${internal_interface.name}-dummy
+          Name=${internal_interface.interface_name}-dummy
 
           [Link]
           ARP=false
@@ -144,25 +154,24 @@ storage:
           [Network]
           LinkLocalAddressing=false
           DHCP=false
-          Bridge=${internal_interface.name}
-
-    # Tap interfaces
-    - path: /etc/systemd/network/20-${internal_interface.name}-tap.netdev
+          Bridge=${internal_interface.interface_name}
+    # tap interfaces
+    - path: /etc/systemd/network/20-${internal_interface.interface_name}-tap.netdev
       mode: 0644
       contents:
         inline: |
           [NetDev]
-          Name=${internal_interface.name}-tap
+          Name=${internal_interface.interface_name}-tap
           Kind=macvtap
 
           [MACVTAP]
           Mode=bridge
-    - path: /etc/systemd/network/22-${internal_interface.name}-tap.network
+    - path: /etc/systemd/network/22-${internal_interface.interface_name}-tap.network
       mode: 0644
       contents:
         inline: |
           [Match]
-          Name=${internal_interface.name}-tap
+          Name=${internal_interface.interface_name}-tap
 
           [Link]
           ARP=false
@@ -173,7 +182,10 @@ storage:
           MulticastDNS=false
 
           [Address]
-          Address=${internal_interface.address}
+          Address=${cidrhost(
+            internal_interface.prefix,
+            internal_interface.netnum,
+          )}/${internal_interface.cidr}
 
     # certs #
     %{~ for cert_category in values(certs) ~}

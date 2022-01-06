@@ -1,5 +1,5 @@
 resource "tls_private_key" "matchbox" {
-  algorithm   = var.ca.matchbox.algorithm
+  algorithm   = var.matchbox_ca.algorithm
   ecdsa_curve = "P521"
 }
 
@@ -16,20 +16,20 @@ resource "tls_cert_request" "matchbox" {
     var.hostname,
   ]
 
-  ip_addresses = concat(["127.0.0.1"], flatten([
-    for interface in values(local.interfaces) :
+  ip_addresses = compact(concat(["127.0.0.1"], flatten([
+    for interface in values(local.hardware_interfaces) :
     [
-      for tap in values(interface.taps) :
-      tap.ip
+      for network in values(interface.networks) :
+      try(cidrhost(network.prefix, network.netnum), null)
     ]
-  ]))
+  ])))
 }
 
 resource "tls_locally_signed_cert" "matchbox" {
   cert_request_pem   = tls_cert_request.matchbox.cert_request_pem
-  ca_key_algorithm   = var.ca.matchbox.algorithm
-  ca_private_key_pem = var.ca.matchbox.private_key_pem
-  ca_cert_pem        = var.ca.matchbox.cert_pem
+  ca_key_algorithm   = var.matchbox_ca.algorithm
+  ca_private_key_pem = var.matchbox_ca.private_key_pem
+  ca_cert_pem        = var.matchbox_ca.cert_pem
 
   validity_period_hours = 8760
 

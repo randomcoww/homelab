@@ -1,0 +1,63 @@
+---
+variant: fcos
+version: 1.4.0
+systemd:
+  units:
+    # auto-login via hvc0 console
+    - name: serial-getty@hvc0.service
+      dropins:
+      - name: 10-autologin.conf
+        contents: |
+          [Service]
+          ExecStart=
+          ExecStart=-/usr/sbin/agetty --autologin ${user} --noclear %I $TERM
+
+storage:
+  files:
+    # internal interface is only used for pxe boot
+    # disable once in OS
+    - path: /etc/systemd/network/10-${internal_interface.interface_name}.network
+      mode: 0644
+      contents:
+        inline: |
+          [Match]
+          Virtualization=vm
+          Name=${internal_interface.interface_name}
+
+          [Link]
+          Unmanaged=true
+
+    # base networking
+    %{~ for network_name, interface in interfaces ~}
+    - path: /etc/systemd/network/20-${interface.interface_name}.network
+      mode: 0644
+      contents:
+        inline: |
+          [Match]
+          Name=${interface.interface_name}
+
+          [Link]
+          MTUBytes=${lookup(interface, "mtu", 1500)}
+
+          [DHCP]
+          UseMTU=true
+          RouteMetric=${lookup(interface, "metric", 1024)}
+
+          [Network]
+          LinkLocalAddressing=${lookup(interface, "linklocal", false)}
+          DHCP=${lookup(interface, "dhcp", false)}
+          MulticastDNS=${lookup(interface, "mdns", false)}
+          %{~ if can(interface.netnum) ~}
+
+          [Address]
+          Address=${cidrhost(interface.prefix, interface.netnum)}/${interface.cidr}
+          AddPrefixRoute=false
+
+          [Route]
+          Protocol=kernel
+          Scope=link
+          PreferredSource=${cidrhost(interface.prefix, interface.netnum)}
+          Destination=${interface.prefix}
+          Metric=${lookup(interface, "metric", 1024)}
+          %{~ endif ~}
+    %{~ endfor ~}
