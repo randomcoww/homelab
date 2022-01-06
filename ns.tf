@@ -7,6 +7,7 @@ locals {
           mdns        = true
           mtu         = 9000
           vrrp_netnum = 2
+          netnum      = 1
           dhcp_subnet = {
             newbit = 1
             netnum = 1

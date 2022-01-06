@@ -9,10 +9,12 @@ locals {
   hardware_interfaces = {
     for interface_name, interface in var.hardware_interfaces :
     interface_name => merge(interface, {
-      for network_name, network in interface.networks :
-      network_name => merge(local.networks[network_name], network, {
-        "interface_name" = "${interface_name}-${network_name}"
-      })
+      networks = {
+        for network_name, network in lookup(interface, "networks", {}) :
+        network_name => merge(local.networks[network_name], network, {
+          "interface_name" = "${interface_name}-${network_name}"
+        })
+      }
     })
   }
 
