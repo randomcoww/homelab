@@ -14,6 +14,23 @@ locals {
           }
         }
       }
+      kea_ha_role = "primary"
+    }
+    ns-1 = {
+      hostname = "ns-1.${local.common.domains.internal_mdns}"
+      interfaces = {
+        lan = {
+          mdns        = true
+          mtu         = 9000
+          vrrp_netnum = 2
+          netnum      = 3
+          dhcp_subnet = {
+            newbit = 1
+            netnum = 1
+          }
+        }
+      }
+      kea_ha_role = "secondary"
     }
   }
 }
@@ -22,12 +39,20 @@ locals {
 module "template-ns" {
   for_each = local.ns
 
-  source     = "./host_classes/ns"
+  source     = "./modules/ns"
   hostname   = each.value.hostname
   user       = local.common.admin_user
   networks   = local.common.networks
   interfaces = each.value.interfaces
   domains    = local.common.domains
+  kea_peers = [
+    for host in values(local.ns) :
+    {
+      name   = host.hostname
+      role   = lookup(host, "kea_ha_role", "backup")
+      netnum = host.interfaces.lan.netnum
+    }
+  ]
   domain_interfaces = [
     {
       network_name              = "internal"

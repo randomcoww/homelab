@@ -25,7 +25,7 @@ locals {
 module "template-gateway" {
   for_each = local.gateways
 
-  source     = "./host_classes/gateway"
+  source     = "./modules/gateway"
   hostname   = each.value.hostname
   user       = local.common.admin_user
   networks   = local.common.networks

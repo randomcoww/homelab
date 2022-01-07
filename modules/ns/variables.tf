@@ -103,6 +103,11 @@ variable "internal_dns" {
   }
 }
 
+variable "kea_peers" {
+  type    = any
+  default = []
+}
+
 variable "domains" {
   type = object({
     internal      = string

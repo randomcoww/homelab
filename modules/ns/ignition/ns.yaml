@@ -136,7 +136,15 @@ storage:
                         "this-server-name" = hostname
                         "mode" = "load-balancing"
                         "max-unacked-clients" = 0
-                        "peers" = "" 
+                        "peers" =  [
+                          for kea_peer in kea_peers :
+                          {
+                            name = kea_peer.name
+                            role = kea_peer.role
+                            url = "http://${cidrhost(interfaces.lan.prefix, kea_peer.netnum)}:${ports.kea_peer}/"
+                            auto-failover = true
+                          }
+                        ]
                       },
                     ]
                   }

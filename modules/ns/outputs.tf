@@ -21,6 +21,7 @@ output "ignition" {
       internal_dns        = var.internal_dns
       ports               = var.ports
       domains             = var.domains
+      kea_peers           = var.kea_peers
     })
   ]
 }

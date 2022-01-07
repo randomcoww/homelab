@@ -38,7 +38,7 @@ locals {
 module "template-hypervisor" {
   for_each = local.hypervisors
 
-  source              = "./host_classes/hypervisor"
+  source              = "./modules/hypervisor"
   hostname            = each.value.hostname
   user                = local.common.admin_user
   networks            = local.common.networks
