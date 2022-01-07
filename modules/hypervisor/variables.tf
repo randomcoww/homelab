@@ -55,7 +55,7 @@ variable "ports" {
 variable "container_image_load_paths" {
   type = map(string)
   default = {
-    matchbox = "/var/lib/image-load/matchbox.tar"
+    matchbox = "/etc/container-image-load/matchbox.tar"
   }
 }
 
