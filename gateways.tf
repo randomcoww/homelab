@@ -1,10 +1,10 @@
 locals {
   gateways = {
-    vrrp_netnum = 3
+    vrrp_netnum = 1
     hosts = {
       gateways-0 = {
         hostname = "gateways-0.${local.common.domains.internal_mdns}"
-        netnum   = 2
+        netnum   = 4
         interfaces = {
           lan = {
             enable_mdns        = true
@@ -31,7 +31,7 @@ module "template-gateway" {
 
   source           = "./modules/gateway"
   hostname         = each.value.hostname
-  user             = local.common.admin_user
+  user             = local.common.users.admin
   networks         = local.common.networks
   interfaces       = each.value.interfaces
   container_images = local.common.container_images

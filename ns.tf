@@ -1,6 +1,6 @@
 locals {
   ns = {
-    vrrp_netnum = 3
+    vrrp_netnum = 2
     dhcp_server = {
       newbit = 1
       netnum = 1
@@ -8,7 +8,7 @@ locals {
     hosts = {
       ns-0 = {
         hostname = "ns-0.${local.common.domains.internal_mdns}"
-        netnum   = 1
+        netnum   = 5
         interfaces = {
           lan = {
             enable_mdns        = true
@@ -22,7 +22,7 @@ locals {
       }
       ns-1 = {
         hostname = "ns-1.${local.common.domains.internal_mdns}"
-        netnum   = 2
+        netnum   = 6
         interfaces = {
           lan = {
             enable_mdns        = true
@@ -44,7 +44,7 @@ module "template-ns" {
 
   source           = "./modules/ns"
   hostname         = each.value.hostname
-  user             = local.common.admin_user
+  user             = local.common.users.admin
   networks         = local.common.networks
   interfaces       = each.value.interfaces
   domains          = local.common.domains

@@ -13,7 +13,7 @@ locals {
         hostname = "kvm-0.${local.common.domains.internal_mdns}"
         hardware_interfaces = {
           en0 = {
-            netnum = 2
+            netnum = 7
             mac    = "8c-8c-aa-e3-58-62"
             mtu    = 9000
             interfaces = {
@@ -51,7 +51,7 @@ module "template-hypervisor" {
 
   source              = "./modules/hypervisor"
   hostname            = each.value.hostname
-  user                = local.common.admin_user
+  user                = local.common.users.admin
   networks            = local.common.networks
   hardware_interfaces = each.value.hardware_interfaces
   internal_interface  = local.hypervisors.internal_interface

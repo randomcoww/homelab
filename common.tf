@@ -1,10 +1,12 @@
 locals {
   common = {
-    admin_user = "fcos"
+    users = {
+      admin = "fcos"
+    }
     networks = {
       internal = {
         network = "192.168.224.0"
-        cidr    = 26
+        cidr    = 24
       }
       lan = {
         network = "192.168.126.0"
@@ -12,12 +14,12 @@ locals {
         vlan_id = 1
       }
       sync = {
-        network = "192.168.224.0"
-        cidr    = 24
-        vlan_id = 10
+        network = "192.168.190.0"
+        cidr    = 29
+        vlan_id = 60
       }
       wan = {
-        vlan_id = 90
+        vlan_id = 30
       }
     }
     domains = {
