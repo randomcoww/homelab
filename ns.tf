@@ -18,6 +18,17 @@ locals {
             enable_dhcp_server = true
           }
         }
+        domain_interfaces = [
+          {
+            network_name              = "internal"
+            hypervisor_interface_name = "internal"
+            boot_order                = 1
+          },
+          {
+            network_name              = "lan"
+            hypervisor_interface_name = "phy0-lan"
+          },
+        ]
         kea_ha_role = "primary"
       }
       ns-1 = {
@@ -32,6 +43,17 @@ locals {
             enable_dhcp_server = true
           }
         }
+        domain_interfaces = [
+          {
+            network_name              = "internal"
+            hypervisor_interface_name = "internal"
+            boot_order                = 1
+          },
+          {
+            network_name              = "lan"
+            hypervisor_interface_name = "phy0-lan"
+          },
+        ]
         kea_ha_role = "secondary"
       }
     }
@@ -42,15 +64,16 @@ locals {
 module "template-ns" {
   for_each = local.ns.hosts
 
-  source           = "./modules/ns"
-  hostname         = each.value.hostname
-  user             = local.common.users.admin
-  networks         = local.common.networks
-  interfaces       = each.value.interfaces
-  domains          = local.common.domains
-  dhcp_server      = local.ns.dhcp_server
-  ssh_ca           = local.common.ca.ssh
-  container_images = local.common.container_images
+  source            = "./modules/ns"
+  hostname          = each.value.hostname
+  user              = local.common.users.admin
+  networks          = local.common.networks
+  interfaces        = each.value.interfaces
+  domains           = local.common.domains
+  dhcp_server       = local.ns.dhcp_server
+  ssh_ca            = local.common.ca.ssh
+  domain_interfaces = each.value.domain_interfaces
+  container_images  = local.common.container_images
   netnums = {
     host         = each.value.netnum
     vrrp         = local.ns.vrrp_netnum
@@ -63,17 +86,6 @@ module "template-ns" {
       role   = lookup(host, "kea_ha_role", "backup")
       netnum = host.netnum
     }
-  ]
-  domain_interfaces = [
-    {
-      network_name              = "internal"
-      hypervisor_interface_name = "internal"
-      boot_order                = 1
-    },
-    {
-      network_name              = "lan"
-      hypervisor_interface_name = "en0-lan"
-    },
   ]
 }
 

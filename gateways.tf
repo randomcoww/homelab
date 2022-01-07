@@ -20,6 +20,25 @@ locals {
             enable_dhcp = true
           }
         }
+        domain_interfaces = [
+          {
+            network_name              = "internal"
+            hypervisor_interface_name = "internal"
+            boot_order                = 1
+          },
+          {
+            network_name              = "lan"
+            hypervisor_interface_name = "phy0-lan"
+          },
+          {
+            network_name              = "sync"
+            hypervisor_interface_name = "phy0-sync"
+          },
+          {
+            network_name              = "wan"
+            hypervisor_interface_name = "phy0-wan"
+          },
+        ]
       }
     }
   }
@@ -29,35 +48,17 @@ locals {
 module "template-gateway" {
   for_each = local.gateways.hosts
 
-  source           = "./modules/gateway"
-  hostname         = each.value.hostname
-  user             = local.common.users.admin
-  networks         = local.common.networks
-  interfaces       = each.value.interfaces
-  container_images = local.common.container_images
+  source            = "./modules/gateway"
+  hostname          = each.value.hostname
+  user              = local.common.users.admin
+  networks          = local.common.networks
+  interfaces        = each.value.interfaces
+  domain_interfaces = each.value.domain_interfaces
+  container_images  = local.common.container_images
   netnums = {
     host = each.value.netnum
     vrrp = local.ns.vrrp_netnum
   }
-  domain_interfaces = [
-    {
-      network_name              = "internal"
-      hypervisor_interface_name = "internal"
-      boot_order                = 1
-    },
-    {
-      network_name              = "lan"
-      hypervisor_interface_name = "en0-lan"
-    },
-    {
-      network_name              = "sync"
-      hypervisor_interface_name = "en0-sync"
-    },
-    {
-      network_name              = "wan"
-      hypervisor_interface_name = "en0-wan"
-    },
-  ]
   # master route prioirty is slotted in between main and slave
   # when keepalived becomes master on the host
   # priority for both should be greater than 32767 (default)

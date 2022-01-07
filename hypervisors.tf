@@ -9,10 +9,10 @@ locals {
       }
     }
     hosts = {
-      kvm-0 = {
-        hostname = "kvm-0.${local.common.domains.internal_mdns}"
+      hypervisor-0 = {
+        hostname = "hypervisor-0.${local.common.domains.internal_mdns}"
         hardware_interfaces = {
-          en0 = {
+          phy0 = {
             netnum = 7
             mac    = "8c-8c-aa-e3-58-62"
             mtu    = 9000
