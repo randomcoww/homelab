@@ -1,5 +1,5 @@
 output "ignition" {
-  value = [
+  value = concat([
     for f in concat(tolist(fileset(".", "${path.module}/ignition/*.yaml")), [
       "${path.root}/common_templates/ignition/base.yaml",
       "${path.root}/common_templates/ignition/server.yaml",
@@ -25,5 +25,7 @@ output "ignition" {
       kea_peers           = var.kea_peers
       dhcp_server         = var.dhcp_server
     })
-  ]
+    ],
+    module.template-ssh_server.ignition,
+  )
 }

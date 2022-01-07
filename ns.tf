@@ -49,6 +49,7 @@ module "template-ns" {
   interfaces       = each.value.interfaces
   domains          = local.common.domains
   dhcp_server      = local.ns.dhcp_server
+  ssh_ca           = local.common.ca.ssh
   container_images = local.common.container_images
   netnums = {
     host         = each.value.netnum
