@@ -11,20 +11,18 @@ output "ignition" {
       pod_mount_path      = "/var/lib/kubelet/podconfig"
       kea_shared_path     = "/var/lib/kea"
       kea_hooks_path      = "/usr/local/lib/kea/hooks"
-      kubelet_node_ip     = cidrhost(local.interfaces.lan.prefix, var.netnum)
+      kubelet_node_ip     = cidrhost(local.interfaces.lan.prefix, var.netnums.host)
       user                = var.user
       hostname            = var.hostname
       interfaces          = local.interfaces
       internal_interface  = local.internal_interface
       container_images    = var.container_images
+      netnums             = var.netnums
       upstream_dns        = var.upstream_dns
       internal_dns        = var.internal_dns
       ports               = var.ports
       domains             = var.domains
       kea_peers           = var.kea_peers
-      netnum              = var.netnum
-      vrrp_netnum         = var.vrrp_netnum
-      gateway_netnum      = var.gateway_netnum
       dhcp_server         = var.dhcp_server
     })
   ]

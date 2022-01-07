@@ -42,16 +42,18 @@ locals {
 module "template-ns" {
   for_each = local.ns.hosts
 
-  source         = "./modules/ns"
-  hostname       = each.value.hostname
-  user           = local.common.admin_user
-  networks       = local.common.networks
-  interfaces     = each.value.interfaces
-  domains        = local.common.domains
-  netnum         = each.value.netnum
-  vrrp_netnum    = local.ns.vrrp_netnum
-  gateway_netnum = local.gateways.vrrp_netnum
-  dhcp_server    = local.ns.dhcp_server
+  source      = "./modules/ns"
+  hostname    = each.value.hostname
+  user        = local.common.admin_user
+  networks    = local.common.networks
+  interfaces  = each.value.interfaces
+  domains     = local.common.domains
+  dhcp_server = local.ns.dhcp_server
+  netnums = {
+    host         = each.value.netnum
+    vrrp         = local.ns.vrrp_netnum
+    gateway_vrrp = local.gateways.vrrp_netnum
+  }
   kea_peers = [
     for host in values(local.ns.hosts) :
     {

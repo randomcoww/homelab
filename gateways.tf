@@ -29,13 +29,15 @@ locals {
 module "template-gateway" {
   for_each = local.gateways.hosts
 
-  source      = "./modules/gateway"
-  hostname    = each.value.hostname
-  user        = local.common.admin_user
-  networks    = local.common.networks
-  interfaces  = each.value.interfaces
-  netnum      = each.value.netnum
-  vrrp_netnum = local.ns.vrrp_netnum
+  source     = "./modules/gateway"
+  hostname   = each.value.hostname
+  user       = local.common.admin_user
+  networks   = local.common.networks
+  interfaces = each.value.interfaces
+  netnums = {
+    host = each.value.netnum
+    vrrp = local.ns.vrrp_netnum
+  }
   domain_interfaces = [
     {
       network_name              = "internal"

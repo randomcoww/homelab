@@ -65,16 +65,12 @@ variable "kea_peers" {
   default = []
 }
 
-variable "netnum" {
-  type = number
-}
-
-variable "vrrp_netnum" {
-  type = number
-}
-
-variable "gateway_netnum" {
-  type = number
+variable "netnums" {
+  type = object({
+    host         = number
+    vrrp         = number
+    gateway_vrrp = number
+  })
 }
 
 variable "dhcp_server" {

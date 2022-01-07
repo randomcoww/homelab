@@ -13,7 +13,7 @@ storage:
       contents:
         inline: |
           [Route]
-          Gateway=${cidrhost(interfaces.lan.prefix, netnum)}
+          Gateway=${cidrhost(interfaces.lan.prefix, netnums.host)}
           Destination=0.0.0.0/0
 
           [Network]
@@ -104,7 +104,7 @@ storage:
               "interfaces-config" = {
                 "interfaces" = [
                   for network_name, interface in interfaces :
-                    cidrhost(interface.prefix, netnum)
+                    cidrhost(interface.prefix, netnums.host)
                     if lookup(interface, "enable_dhcp_server", false) && lookup(interface, "enable_netnum", false)
                 ]
               }
@@ -119,7 +119,7 @@ storage:
                 },
                 {
                   "name" = "domain-name-servers"
-                  "data" = cidrhost(interfaces.lan.prefix, vrrp_netnum)
+                  "data" = cidrhost(interfaces.lan.prefix, netnums.vrrp)
                   "csv-format" = true
                 },
               ]
@@ -156,19 +156,19 @@ storage:
                   "test" = "substring(option[77].hex,0,4) == 'iPXE'"
                   "boot-file-name" = "http://${cidrhost(
                     interfaces.lan.prefix,
-                    netnum
+                    netnums.host
                   )}:${ports.pxe_http}/boot.ipxe"
                 },
                 {
                   "name" = "ipxe"
                   "test" = "not(substring(option[77].hex,0,4) == 'iPXE') and (option[93].hex == 0x0000)"
-                  "next-server" = cidrhost(interfaces.lan.prefix, netnum)
+                  "next-server" = cidrhost(interfaces.lan.prefix, netnums.host)
                   "boot-file-name" = "/undionly.kpxe"
                 },
                 {
                   "name" = "ipxe_efi"
                   "test" = "not(substring(option[77].hex,0,4) == 'iPXE') and (option[93].hex == 0x0007)"
-                  "next-server" = cidrhost(interfaces.lan.prefix, netnum)
+                  "next-server" = cidrhost(interfaces.lan.prefix, netnums.host)
                   "boot-file-name" = "/ipxe.efi"
                 },
               ]
@@ -180,7 +180,7 @@ storage:
                     try([
                       {
                         name = "routers"
-                        data = cidrhost(interface.network, gateway_netnum)
+                        data = cidrhost(interface.network, netnums.gateway_vrrp)
                       }
                     ], []),
                     try([
@@ -231,7 +231,7 @@ storage:
             virtual_ipaddress {
               %{~ for network_name, interface in interfaces ~}
               %{~ if lookup(interface, "enable_vrrp_netnum", false) ~}
-              ${cidrhost(interface.prefix, vrrp_netnum)} dev ${interface.interface_name}
+              ${cidrhost(interface.prefix, netnums.vrrp)} dev ${interface.interface_name}
               %{~ endif ~}
               %{~ endfor ~}
             }
