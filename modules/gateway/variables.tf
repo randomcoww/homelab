@@ -23,6 +23,7 @@ variable "interfaces" {
   #   enable_linklocal   = optional(bool)
   #   enable_dhcp        = optional(bool)
   #   enable_dhcp_server = optional(bool)
+  #   enable_unmanaged   = optional(bool)
   #   mtu                = optional(number)
   #   metric             = optional(number)
   # }))

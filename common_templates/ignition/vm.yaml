@@ -14,29 +14,17 @@ systemd:
 
 storage:
   files:
-    # internal interface is only used for pxe boot
-    # disable once in OS
-    - path: /etc/systemd/network/10-${internal_interface.interface_name}.network
-      mode: 0644
-      contents:
-        inline: |
-          [Match]
-          Virtualization=vm
-          Name=${internal_interface.interface_name}
-
-          [Link]
-          Unmanaged=true
-
-    # base networking
     %{~ for network_name, interface in interfaces ~}
     - path: /etc/systemd/network/20-${interface.interface_name}.network
       mode: 0644
       contents:
         inline: |
           [Match]
+          Virtualization=vm
           Name=${interface.interface_name}
 
           [Link]
+          Unmanaged=${lookup(interface, "enable_unmanaged", false)}
           MTUBytes=${lookup(interface, "mtu", 1500)}
 
           [DHCP]
@@ -47,7 +35,7 @@ storage:
           LinkLocalAddressing=${lookup(interface, "enable_linklocal", false)}
           DHCP=${lookup(interface, "enable_dhcp", false)}
           MulticastDNS=${lookup(interface, "enable_mdns", false)}
-          %{~ if lookup(interface, "enable_netnum", false) == true ~}
+          %{~ if lookup(interface, "enable_netnum", false) ~}
 
           [Address]
           Address=${cidrhost(interface.prefix, netnums.host)}/${interface.cidr}

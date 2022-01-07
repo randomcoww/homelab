@@ -10,6 +10,9 @@ locals {
         hostname = "ns-0.${local.common.domains.internal_mdns}"
         netnum   = 5
         interfaces = {
+          internal = {
+            enable_unmanaged = true
+          }
           lan = {
             enable_mdns        = true
             mtu                = 9000
@@ -35,6 +38,9 @@ locals {
         hostname = "ns-1.${local.common.domains.internal_mdns}"
         netnum   = 6
         interfaces = {
+          internal = {
+            enable_unmanaged = true
+          }
           lan = {
             enable_mdns        = true
             mtu                = 9000

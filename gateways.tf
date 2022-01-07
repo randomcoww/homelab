@@ -6,6 +6,9 @@ locals {
         hostname = "gateways-0.${local.common.domains.internal_mdns}"
         netnum   = 4
         interfaces = {
+          internal = {
+            enable_unmanaged = true
+          }
           lan = {
             enable_mdns        = true
             enable_vrrp_netnum = true
