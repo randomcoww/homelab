@@ -1,7 +1,9 @@
 locals {
   common = {
     users = {
-      admin = "fcos"
+      admin = {
+        name = "fcos"
+      }
     }
     networks = {
       internal = {
@@ -10,7 +12,7 @@ locals {
       }
       lan = {
         network = "192.168.126.0"
-        cidr    = 24
+        cidr    = 23
         vlan_id = 1
       }
       sync = {
@@ -33,6 +35,10 @@ locals {
       tftpd      = "docker.io/randomcoww/tftpd-ipxe:latest"
       coredns    = "docker.io/coredns/coredns:1.8.0"
       keepalived = "docker.io/randomcoww/keepalived:latest"
+      matchbox   = "quay.io/poseidon/matchbox:latest"
+    }
+    system_image_tags = {
+      server = "fedora-coreos-35.20220107.0"
     }
     ca = {
       matchbox = {

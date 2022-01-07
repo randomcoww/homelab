@@ -26,7 +26,7 @@ systemd:
         ExecStartPre=/usr/bin/mkdir -p \
           ${matchbox_data_path}
         ExecStartPre=/usr/bin/podman load -i \
-          ${container_image_load_paths.matchbox} localhost/matchbox
+          ${container_image_load_paths.matchbox}
         ExecStartPre=-/usr/bin/podman kill matchbox
         ExecStartPre=-/usr/bin/podman rm matchbox
         ExecStart=/usr/bin/podman run --rm -it \
@@ -34,10 +34,12 @@ systemd:
           --security-opt label=disable \
           --log-driver none \
           --network host \
+          -v ${matchbox_data_path}:${matchbox_data_path} \
+          -v ${pxeboot_image_path}:${matchbox_assets_path}:ro \
           %{~ for cert in certs.matchbox ~}
           -v ${cert.path}:${cert.path}:ro \
           %{~ endfor ~}
-          localhost/matchbox \
+          ${container_images.matchbox} \
             -address=${cidrhost(
               internal_interface.prefix,
               internal_interface.netnum,

@@ -59,6 +59,10 @@ variable "container_images" {
   default = {}
 }
 
+variable "system_image_tag" {
+  type = string
+}
+
 variable "ports" {
   type = object({
     kea_peer     = number

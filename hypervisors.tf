@@ -22,7 +22,6 @@ locals {
                 enable_mdns   = true
               }
               sync = {
-                enable_netnum = true
               }
               wan = {
               }
@@ -35,7 +34,7 @@ locals {
             partitions = [
               {
                 mount_path = "/var/lib/kubelet/pv"
-                wipe       = true
+                wipe       = false
               },
             ]
           }
@@ -51,13 +50,14 @@ module "template-hypervisor" {
 
   source              = "./modules/hypervisor"
   hostname            = each.value.hostname
-  user                = local.common.users.admin
+  user                = local.common.users.admin.name
   networks            = local.common.networks
   hardware_interfaces = each.value.hardware_interfaces
   internal_interface  = local.hypervisors.internal_interface
   matchbox_ca         = local.common.ca.matchbox
   libvirt_ca          = local.common.ca.libvirt
   ssh_ca              = local.common.ca.ssh
+  container_images    = local.common.container_images
 }
 
 module "template-disks" {

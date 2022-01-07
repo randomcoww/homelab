@@ -30,5 +30,10 @@ output "libvirt" {
     vcpu               = 1
     domain_interfaces  = var.domain_interfaces
     hypervisor_devices = var.hypervisor_devices
+    system_image_tag   = var.system_image_tag
   })
+}
+
+output "internal_interface_name" {
+  value = local.interface_names.internal
 }

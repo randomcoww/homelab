@@ -33,6 +33,12 @@
     %{~ endfor ~}
     <controller type='usb' model='none'/>
     <controller type='scsi' model='virtio-scsi'/>
+    <disk type='file' device='cdrom'>
+      <driver name='qemu' type='raw'/>
+      <source file='/dev/disk/by-label/${system_image_tag}'/>
+      <target dev='sda' bus='scsi'/>
+      <readonly/>
+    </disk>
     %{~ for hypervisor_device in hypervisor_devices ~}
     <hostdev mode='subsystem' type='pci' managed='yes'>
       <driver name='vfio'/>

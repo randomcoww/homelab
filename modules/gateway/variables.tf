@@ -72,6 +72,10 @@ variable "container_images" {
   type = map(string)
 }
 
+variable "system_image_tag" {
+  type = string
+}
+
 variable "netnums" {
   type = object({
     host = number

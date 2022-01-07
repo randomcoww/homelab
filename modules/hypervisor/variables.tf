@@ -52,6 +52,11 @@ variable "ports" {
   }
 }
 
+variable "container_images" {
+  type    = map(string)
+  default = {}
+}
+
 variable "container_image_load_paths" {
   type = map(string)
   default = {

@@ -9,10 +9,12 @@ output "ignition_snippets" {
     templatefile(f, {
       matchbox_data_path         = "/etc/matchbox/data"
       matchbox_assets_path       = "/etc/matchbox/assets"
+      pxeboot_image_path         = "/run/media/iso/images/pxeboot"
       kea_config_path            = "/etc/kea/kea-dhcp4-internal.conf"
       user                       = var.user
       hostname                   = var.hostname
       ports                      = var.ports
+      container_images           = var.container_images
       container_image_load_paths = var.container_image_load_paths
       hardware_interfaces        = local.hardware_interfaces
       internal_interface         = local.internal_interface
@@ -27,11 +29,9 @@ output "matchbox_rpc_endpoints" {
   value = {
     for network_name, network in local.networks :
     network_name => compact([
-      for interface in values(local.hardware_interfaces) :
-      try("${cidrhost(
-        network.prefix,
-        interface[network_name].netnum,
-      )}:${var.ports.matchbox_rpc}", null)
+      for hardware_interface in values(local.hardware_interfaces) :
+      "http://${cidrhost(network.prefix, hardware_interface.netnum)}:${var.ports.matchbox_rpc}"
+      if try(hardware_interface.interfaces[network_name].enable_netnum, false)
     ])
   }
 }
@@ -47,11 +47,9 @@ output "libvirt_endpoints" {
   value = {
     for network_name, network in local.networks :
     network_name => compact([
-      for interface in values(local.hardware_interfaces) :
-      try("qemu://${cidrhost(
-        network.prefix,
-        interface[network_name].netnum,
-      )}/system", null)
+      for hardware_interface in values(local.hardware_interfaces) :
+      "qemu://${cidrhost(network.prefix, hardware_interface.netnum)}/system"
+      if try(hardware_interface.interfaces[network_name].enable_netnum, false)
     ])
   }
 }

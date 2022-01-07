@@ -6,10 +6,10 @@ locals {
     }, {}))
   }
 
-  # KVM domain interfaces are ens1, ens2 ... ensN in order defined in domain XML
+  # KVM domain interfaces are ens2, ens3 ... ensN in order defined in domain XML
   interface_names = {
     for i, interface in var.domain_interfaces :
-    interface.network_name => "ens${i + 1}"
+    interface.network_name => "ens${i + 2}"
   }
 
   interfaces = {

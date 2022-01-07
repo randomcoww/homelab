@@ -50,11 +50,12 @@ module "template-gateway" {
 
   source            = "./modules/gateway"
   hostname          = each.value.hostname
-  user              = local.common.users.admin
+  user              = local.common.users.admin.name
   networks          = local.common.networks
   interfaces        = each.value.interfaces
   domain_interfaces = each.value.domain_interfaces
   container_images  = local.common.container_images
+  system_image_tag  = local.common.system_image_tags.server
   netnums = {
     host = each.value.netnum
     vrrp = local.ns.vrrp_netnum
