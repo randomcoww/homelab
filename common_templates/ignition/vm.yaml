@@ -47,7 +47,7 @@ storage:
           LinkLocalAddressing=${lookup(interface, "enable_linklocal", false)}
           DHCP=${lookup(interface, "enable_dhcp", false)}
           MulticastDNS=${lookup(interface, "enable_mdns", false)}
-          %{~ if lookup(interface, "enable_netnum", false) ~}
+          %{~ if lookup(interface, "enable_netnum", false) == true ~}
 
           [Address]
           Address=${cidrhost(interface.prefix, netnums.host)}/${interface.cidr}

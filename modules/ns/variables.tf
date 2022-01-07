@@ -9,22 +9,41 @@ variable "hostname" {
 }
 
 variable "networks" {
-  type    = any
+  type = map(object({
+    network = optional(string)
+    cidr    = optional(string)
+    vlan_id = optional(number)
+  }))
   default = {}
 }
 
 variable "interfaces" {
+  # type = map(object({
+  #   enable_mdns        = optional(bool)
+  #   enable_netnum      = optional(bool)
+  #   enable_vrrp_netnum = optional(bool)
+  #   enable_linklocal   = optional(bool)
+  #   enable_dhcp        = optional(bool)
+  #   enable_dhcp_server = optional(bool)
+  #   mtu                = optional(number)
+  #   metric             = optional(number)
+  # }))
   type    = any
   default = {}
 }
 
 variable "domain_interfaces" {
-  type    = any
+  type = list(object({
+    network_name              = string
+    hypervisor_interface_name = string
+    boot_order                = optional(number)
+  }))
   default = []
 }
 
 variable "container_images" {
-  type = map(string)
+  type    = map(string)
+  default = {}
 }
 
 variable "ports" {

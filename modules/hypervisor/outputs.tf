@@ -7,16 +7,16 @@ output "ignition" {
       "${path.root}/common_templates/ignition/server.yaml",
     ]) :
     templatefile(f, {
-      matchbox_data_path    = "/etc/matchbox/data"
-      matchbox_assets_path  = "/etc/matchbox/assets"
-      kea_config_path       = "/etc/kea/kea-dhcp4-internal.conf"
-      user                  = var.user
-      hostname              = var.hostname
-      ports                 = var.ports
-      container_image_paths = var.container_image_paths
-      hardware_interfaces   = local.hardware_interfaces
-      internal_interface    = local.internal_interface
-      certs                 = local.certs
+      matchbox_data_path         = "/etc/matchbox/data"
+      matchbox_assets_path       = "/etc/matchbox/assets"
+      kea_config_path            = "/etc/kea/kea-dhcp4-internal.conf"
+      user                       = var.user
+      hostname                   = var.hostname
+      ports                      = var.ports
+      container_image_load_paths = var.container_image_load_paths
+      hardware_interfaces        = local.hardware_interfaces
+      internal_interface         = local.internal_interface
+      certs                      = local.certs
     })
     ],
     module.template-ssh_server.ignition,

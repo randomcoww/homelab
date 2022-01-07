@@ -26,7 +26,7 @@ systemd:
         ExecStartPre=/usr/bin/mkdir -p \
           ${matchbox_data_path}
         ExecStartPre=/usr/bin/podman load -i \
-          ${container_image_paths.matchbox} localhost/matchbox
+          ${container_image_load_paths.matchbox} localhost/matchbox
         ExecStartPre=-/usr/bin/podman kill matchbox
         ExecStartPre=-/usr/bin/podman rm matchbox
         ExecStart=/usr/bin/podman run --rm -it \

@@ -7,16 +7,14 @@ locals {
         cidr    = 26
       }
       lan = {
-        network       = "192.168.126.0"
-        cidr          = 24
-        vlan_id       = 1
-        router_netnum = 1
+        network = "192.168.126.0"
+        cidr    = 24
+        vlan_id = 1
       }
       sync = {
-        network       = "192.168.224.0"
-        cidr          = 24
-        vlan_id       = 10
-        router_netnum = 1
+        network = "192.168.224.0"
+        cidr    = 24
+        vlan_id = 10
       }
       wan = {
         vlan_id = 90

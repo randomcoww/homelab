@@ -1,5 +1,13 @@
 locals {
   hypervisors = {
+    internal_interface = {
+      interface_name = "internal"
+      netnum         = 1
+      dhcp_subnet = {
+        newbit = 1
+        netnum = 1
+      }
+    }
     hosts = {
       kvm-0 = {
         hostname = "kvm-0.${local.common.domains.internal_mdns}"
@@ -46,6 +54,7 @@ module "template-hypervisor" {
   user                = local.common.admin_user
   networks            = local.common.networks
   hardware_interfaces = each.value.hardware_interfaces
+  internal_interface  = local.hypervisors.internal_interface
   matchbox_ca         = local.common.ca.matchbox
   libvirt_ca          = local.common.ca.libvirt
   ssh_ca              = local.common.ca.ssh

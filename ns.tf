@@ -42,13 +42,14 @@ locals {
 module "template-ns" {
   for_each = local.ns.hosts
 
-  source      = "./modules/ns"
-  hostname    = each.value.hostname
-  user        = local.common.admin_user
-  networks    = local.common.networks
-  interfaces  = each.value.interfaces
-  domains     = local.common.domains
-  dhcp_server = local.ns.dhcp_server
+  source           = "./modules/ns"
+  hostname         = each.value.hostname
+  user             = local.common.admin_user
+  networks         = local.common.networks
+  interfaces       = each.value.interfaces
+  domains          = local.common.domains
+  dhcp_server      = local.ns.dhcp_server
+  container_images = local.common.container_images
   netnums = {
     host         = each.value.netnum
     vrrp         = local.ns.vrrp_netnum
@@ -73,7 +74,6 @@ module "template-ns" {
       hypervisor_interface_name = "en0-lan"
     },
   ]
-  container_images = local.common.container_images
 }
 
 # combine and render a single ignition file #

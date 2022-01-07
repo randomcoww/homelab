@@ -9,13 +9,36 @@ variable "hostname" {
 }
 
 variable "networks" {
-  type    = any
+  type = map(object({
+    network = optional(string)
+    cidr    = optional(string)
+    vlan_id = optional(number)
+  }))
   default = {}
 }
 
 variable "hardware_interfaces" {
   type    = any
   default = {}
+}
+
+variable "internal_interface" {
+  type = object({
+    interface_name = string
+    netnum         = number
+    dhcp_subnet = object({
+      newbit = number
+      netnum = number
+    })
+  })
+  default = {
+    interface_name = "internal"
+    netnum         = 1
+    dhcp_subnet = {
+      newbit = 1
+      netnum = 1
+    }
+  }
 }
 
 variable "ports" {
@@ -29,10 +52,8 @@ variable "ports" {
   }
 }
 
-variable "container_image_paths" {
-  type = object({
-    matchbox = string
-  })
+variable "container_image_load_paths" {
+  type = map(string)
   default = {
     matchbox = "/var/lib/image-load/matchbox.tar"
   }

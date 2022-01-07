@@ -19,14 +19,7 @@ locals {
   }
 
   # this is not seen outside of host and can be replicated on all hosts
-  internal_interface = merge({
-    netnum         = 1
-    interface_name = "internal"
-    dhcp_subnet = {
-      newbit = 1
-      netnum = 1
-    }
-  }, local.networks.internal)
+  internal_interface = merge(local.networks.internal, var.internal_interface)
 
   certs = {
     matchbox = {

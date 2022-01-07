@@ -29,11 +29,12 @@ locals {
 module "template-gateway" {
   for_each = local.gateways.hosts
 
-  source     = "./modules/gateway"
-  hostname   = each.value.hostname
-  user       = local.common.admin_user
-  networks   = local.common.networks
-  interfaces = each.value.interfaces
+  source           = "./modules/gateway"
+  hostname         = each.value.hostname
+  user             = local.common.admin_user
+  networks         = local.common.networks
+  interfaces       = each.value.interfaces
+  container_images = local.common.container_images
   netnums = {
     host = each.value.netnum
     vrrp = local.ns.vrrp_netnum
@@ -57,7 +58,6 @@ module "template-gateway" {
       hypervisor_interface_name = "en0-wan"
     },
   ]
-
   # master route prioirty is slotted in between main and slave
   # when keepalived becomes master on the host
   # priority for both should be greater than 32767 (default)
@@ -69,7 +69,6 @@ module "template-gateway" {
     table_id       = 240
     table_priority = 32780
   }
-  container_images = local.common.container_images
 }
 
 # combine and render a single ignition file #
