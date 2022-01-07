@@ -1,6 +1,6 @@
 
 
-output "ignition" {
+output "ignition_snippets" {
   value = concat([
     for f in concat(tolist(fileset(".", "${path.module}/ignition/*.yaml")), [
       "${path.root}/common_templates/ignition/base.yaml",
@@ -19,7 +19,7 @@ output "ignition" {
       certs                      = local.certs
     })
     ],
-    module.template-ssh_server.ignition,
+    module.template-ssh_server.ignition_snippets,
   )
 }
 

@@ -78,8 +78,8 @@ version: 1.4.0
 EOT
   strict  = true
   snippets = concat(
-    module.template-hypervisor[each.key].ignition,
-    module.template-disks[each.key].ignition,
+    module.template-hypervisor[each.key].ignition_snippets,
+    module.template-disks[each.key].ignition_snippets,
   )
 }
 

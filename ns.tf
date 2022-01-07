@@ -88,7 +88,7 @@ version: 1.4.0
 EOT
   strict  = true
   snippets = concat(
-    module.template-ns[each.key].ignition,
+    module.template-ns[each.key].ignition_snippets,
   )
 }
 

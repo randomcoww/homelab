@@ -33,11 +33,24 @@ variable "interfaces" {
 }
 
 variable "domain_interfaces" {
-  type = list(object({
-    network_name              = string
-    hypervisor_interface_name = string
-    boot_order                = optional(number)
-  }))
+  # type = list(object({
+  #   network_name              = string
+  #   hypervisor_interface_name = string
+  #   boot_order                = optional(number)
+  # }))
+  type    = list(map(string))
+  default = []
+}
+
+variable "hypervisor_devices" {
+  # type = list(object({
+  #   domain        = string
+  #   bus           = string
+  #   slot          = string
+  #   function      = string
+  #   rom_file_path = optional(string)
+  # }))
+  type    = list(map(string))
   default = []
 }
 

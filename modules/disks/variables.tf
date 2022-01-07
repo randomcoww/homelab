@@ -1,19 +1,17 @@
 variable "disks" {
-  # {
-  #   pv = {
-  #     device = "/dev/disk/by-id/nvme-Samsung_SSD_970_EVO_1TB_S5H9NS0N986704R"
-  #     partitions = [
-  #       {
-  #         start_mib = 0
-  #         size_mib = 0
-  #         mount_path = "/var/lib/kubelet/pv"
-  #         wipe = false
-  #         mount_timeout = 10
-  #         options = ["noatime", "nodiratime", "discard"]
-  #       }
-  #     ]
-  #   }
-  # }
+  # type = map(object({
+  #   device = string
+  #   partitions = list(object({
+  #     mount_path    = string
+  #     start_mib     = optional(number)
+  #     size_mib      = optional(number)
+  #     wipe          = optional(bool)
+  #     mount_timeout = optional(number)
+  #     options       = optional(list(string))
+  #     format        = optional(string)
+  #   }))
+  #   wipe = optional(bool)
+  # }))
   type    = any
   default = {}
 }

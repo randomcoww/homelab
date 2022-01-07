@@ -82,7 +82,7 @@ version: 1.4.0
 EOT
   strict  = true
   snippets = concat(
-    module.template-gateway[each.key].ignition,
+    module.template-gateway[each.key].ignition_snippets,
   )
 }
 

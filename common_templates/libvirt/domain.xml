@@ -19,28 +19,28 @@
   <on_crash>restart</on_crash>
   <devices>
     <emulator>/usr/bin/qemu-kvm</emulator>
-    %{~ for interface in domain_interfaces ~}
+    %{~ for domain_interface in domain_interfaces ~}
     <interface type='direct' trustGuestRxFilters='yes'>
-      <source dev='${interface.hypervisor_interface_name}' mode='bridge'/>
-      %{~ if lookup(interface, "macaddress", null) != null ~}
-      <mac address='${replace(interface.macaddress, "-", ":")}'/>
+      <source dev='${domain_interface.hypervisor_interface_name}' mode='bridge'/>
+      %{~ if can(domain_interface.macaddress) ~}
+      <mac address='${replace(domain_interface.macaddress, "-", ":")}'/>
       %{~ endif ~}
-      %{~ if lookup(interface, "boot_order", null) != null ~}
-      <boot order='${interface.boot_order}'/>
+      %{~ if can(domain_interface.boot_order) ~}
+      <boot order='${domain_interface.boot_order}'/>
       %{~ endif ~}
       <model type='virtio-net'/>
     </interface>
     %{~ endfor ~}
     <controller type='usb' model='none'/>
     <controller type='scsi' model='virtio-scsi'/>
-    %{~ for host_device in host_devices ~}
+    %{~ for hypervisor_device in hypervisor_devices ~}
     <hostdev mode='subsystem' type='pci' managed='yes'>
       <driver name='vfio'/>
       <source>
-        <address domain='${host_device.domain}' bus='${host_device.bus}' slot='${host_device.slot}' function='${host_device.function}'/>
+        <address domain='${hypervisor_device.domain}' bus='${hypervisor_device.bus}' slot='${hypervisor_device.slot}' function='${hypervisor_device.function}'/>
       </source>
-      %{~ if lookup(host_device, "rom", null) != null ~}
-      <rom bar='on' file='${host_device.rom}'/>
+      %{~ if can(hypervisor_device.rom_file_path) ~}
+      <rom bar='on' file='${hypervisor_device.rom_file_path}'/>
       %{~ endif ~}
     </hostdev>
     %{~ endfor ~}

@@ -21,7 +21,7 @@ systemd:
 
         [Automount]
         Where=${partition.mount_path}
-        TimeoutIdleSec=${lookup(partition, "mount_timeout", 10)}
+        TimeoutIdleSec=${partition.mount_timeout}
 
         [Install]
         WantedBy=local-fs.target
@@ -37,8 +37,8 @@ storage:
       %{~ for partition in disk.partitions ~}
       - label: ${partition.label}
         number: ${partition.number}
-        start_mib: ${lookup(partition, "start_mib", 0)}
-        size_mib: ${lookup(partition, "size_mib", 0)}
+        start_mib: ${partition.start_mib}
+        size_mib: ${partition.size_mib}
         wipe_partition_entry: ${partition.wipe}
       %{~ endfor ~}
     %{~ endfor ~}

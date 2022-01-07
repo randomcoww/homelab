@@ -1,4 +1,4 @@
-output "ignition" {
+output "ignition_snippets" {
   value = concat([
     for f in concat(tolist(fileset(".", "${path.module}/ignition/*.yaml")), [
       "${path.root}/common_templates/ignition/base.yaml",
@@ -26,6 +26,16 @@ output "ignition" {
       dhcp_server         = var.dhcp_server
     })
     ],
-    module.template-ssh_server.ignition,
+    module.template-ssh_server.ignition_snippets,
   )
+}
+
+output "libvirt" {
+  value = templatefile("${path.root}/common_templates/libvirt/domain.xml", {
+    name               = var.hostname
+    memory             = 512
+    vcpu               = 1
+    domain_interfaces  = var.domain_interfaces
+    hypervisor_devices = var.hypervisor_devices
+  })
 }

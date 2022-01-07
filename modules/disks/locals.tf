@@ -12,6 +12,9 @@ locals {
           mount_options     = lookup(partition, "mount_options", ["noatime", "nodiratime", "discard"])
           format            = lookup(partition, "format", "xfs")
           wipe              = lookup(partition, "wipe", false)
+          mount_timeout     = lookup(partition, "mount_timeout", 10)
+          start_mib         = lookup(partition, "start_mib", 0)
+          size_mib          = lookup(partition, "size_mib", 0)
         })
       ]
       wipe = lookup(disk, "wipe", alltrue([

@@ -1,4 +1,4 @@
-output "ignition" {
+output "ignition_snippets" {
   value = [
     for f in concat(tolist(fileset(".", "${path.module}/ignition/*.yaml")), [
       "${path.root}/common_templates/ignition/base.yaml",
@@ -21,4 +21,14 @@ output "ignition" {
       upstream_dns         = var.upstream_dns
     })
   ]
+}
+
+output "libvirt" {
+  value = templatefile("${path.root}/common_templates/libvirt/domain.xml", {
+    name               = var.hostname
+    memory             = 512
+    vcpu               = 1
+    domain_interfaces  = var.domain_interfaces
+    hypervisor_devices = var.hypervisor_devices
+  })
 }
