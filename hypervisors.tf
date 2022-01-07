@@ -1,33 +1,36 @@
 locals {
   hypervisors = {
-    kvm-0 = {
-      hostname = "kvm-0.${local.common.domains.internal_mdns}"
-      hardware_interfaces = {
-        en0 = {
-          mac = "8c-8c-aa-e3-58-62"
-          mtu = 9000
-          networks = {
-            lan = {
-              netnum = 1
-              mdns   = true
-            }
-            sync = {
-              netnum = 1
-            }
-            wan = {
+    hosts = {
+      kvm-0 = {
+        hostname = "kvm-0.${local.common.domains.internal_mdns}"
+        hardware_interfaces = {
+          en0 = {
+            netnum = 2
+            mac    = "8c-8c-aa-e3-58-62"
+            mtu    = 9000
+            interfaces = {
+              lan = {
+                enable_netnum = true
+                enable_mdns   = true
+              }
+              sync = {
+                enable_netnum = true
+              }
+              wan = {
+              }
             }
           }
         }
-      }
-      disks = {
-        pv = {
-          device = "/dev/disk/by-id/nvme-Samsung_SSD_970_EVO_1TB_S5H9NS0N986704R"
-          partitions = [
-            {
-              mount_path = "/var/lib/kubelet/pv"
-              wipe       = true
-            },
-          ]
+        disks = {
+          pv = {
+            device = "/dev/disk/by-id/nvme-Samsung_SSD_970_EVO_1TB_S5H9NS0N986704R"
+            partitions = [
+              {
+                mount_path = "/var/lib/kubelet/pv"
+                wipe       = true
+              },
+            ]
+          }
         }
       }
     }
@@ -36,7 +39,7 @@ locals {
 
 # templates #
 module "template-hypervisor" {
-  for_each = local.hypervisors
+  for_each = local.hypervisors.hosts
 
   source              = "./modules/hypervisor"
   hostname            = each.value.hostname
@@ -49,7 +52,7 @@ module "template-hypervisor" {
 }
 
 module "template-disks" {
-  for_each = local.hypervisors
+  for_each = local.hypervisors.hosts
 
   source = "./modules/disks"
   disks  = each.value.disks
@@ -57,7 +60,7 @@ module "template-disks" {
 
 # combine and render a single ignition file #
 data "ct_config" "hypervisor" {
-  for_each = local.hypervisors
+  for_each = local.hypervisors.hosts
 
   content = <<EOT
 ---
@@ -72,7 +75,7 @@ EOT
 }
 
 resource "local_file" "hypervisor" {
-  for_each = local.hypervisors
+  for_each = local.hypervisors.hosts
 
   content  = data.ct_config.hypervisor[each.key].rendered
   filename = "./output/ignition/${each.key}.ign"

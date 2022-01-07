@@ -108,6 +108,25 @@ variable "kea_peers" {
   default = []
 }
 
+variable "netnum" {
+  type = number
+}
+
+variable "vrrp_netnum" {
+  type = number
+}
+
+variable "gateway_netnum" {
+  type = number
+}
+
+variable "dhcp_server" {
+  type = object({
+    newbit = number
+    netnum = number
+  })
+}
+
 variable "domains" {
   type = object({
     internal      = string

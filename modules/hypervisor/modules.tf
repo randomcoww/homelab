@@ -5,10 +5,10 @@ module "template-ssh_server" {
     var.user
   ]
   valid_principals = compact(concat([var.hostname, "127.0.0.1"], flatten([
-    for interface in values(local.hardware_interfaces) :
+    for hardware_interface in values(local.hardware_interfaces) :
     [
-      for network in values(interface.networks) :
-      try(cidrhost(network.prefix, network.tap.netnum), null)
+      for interface in values(hardware_interface.interfaces) :
+      try(cidrhost(interface.prefix, hardware_interface.netnum), null)
     ]
   ])))
   ssh_ca = var.ssh_ca

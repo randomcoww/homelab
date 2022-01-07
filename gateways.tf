@@ -1,20 +1,24 @@
 locals {
   gateways = {
-    gateways-0 = {
-      hostname = "gateways-0.${local.common.domains.internal_mdns}"
-      interfaces = {
-        lan = {
-          mdns        = true
-          vrrp_netnum = local.common.networks.lan.router_netnum
-          mtu         = 9000
-        }
-        sync = {
-          netnum      = 10
-          vrrp_netnum = local.common.networks.lan.router_netnum
-          mtu         = 9000
-        }
-        wan = {
-          dhcp = true
+    vrrp_netnum = 3
+    hosts = {
+      gateways-0 = {
+        hostname = "gateways-0.${local.common.domains.internal_mdns}"
+        netnum   = 2
+        interfaces = {
+          lan = {
+            enable_mdns        = true
+            enable_vrrp_netnum = true
+            mtu                = 9000
+          }
+          sync = {
+            enable_netnum      = true
+            enable_vrrp_netnum = true
+            mtu                = 9000
+          }
+          wan = {
+            enable_dhcp = true
+          }
         }
       }
     }
@@ -23,13 +27,15 @@ locals {
 
 # templates #
 module "template-gateway" {
-  for_each = local.gateways
+  for_each = local.gateways.hosts
 
-  source     = "./modules/gateway"
-  hostname   = each.value.hostname
-  user       = local.common.admin_user
-  networks   = local.common.networks
-  interfaces = each.value.interfaces
+  source      = "./modules/gateway"
+  hostname    = each.value.hostname
+  user        = local.common.admin_user
+  networks    = local.common.networks
+  interfaces  = each.value.interfaces
+  netnum      = each.value.netnum
+  vrrp_netnum = local.ns.vrrp_netnum
   domain_interfaces = [
     {
       network_name              = "internal"
@@ -66,7 +72,7 @@ module "template-gateway" {
 
 # combine and render a single ignition file #
 data "ct_config" "gateway" {
-  for_each = local.gateways
+  for_each = local.gateways.hosts
 
   content = <<EOT
 ---
@@ -80,7 +86,7 @@ EOT
 }
 
 resource "local_file" "gateway" {
-  for_each = local.gateways
+  for_each = local.gateways.hosts
 
   content  = data.ct_config.gateway[each.key].rendered
   filename = "./output/ignition/${each.key}.ign"

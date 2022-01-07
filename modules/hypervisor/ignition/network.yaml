@@ -13,7 +13,7 @@ storage:
           PermanentMACAddress=${hardware_interface.mac}
 
           [Link]
-          MTUBytes=${hardware_interface.mtu}
+          MTUBytes=${lookup(hardware_interface, "mtu", 1500)}
           MACAddressPolicy=persistent
           Name=${hardware_interface_name}
     - path: /etc/systemd/network/12-${hardware_interface_name}.network
@@ -25,76 +25,87 @@ storage:
 
           [Link]
           ARP=false
+          MTUBytes=${lookup(hardware_interface, "mtu", 1500)}
 
           [Network]
           LinkLocalAddressing=false
           DHCP=false
-          %{~ for network_name, network in hardware_interface.networks ~}
-          VLAN=${network.interface_name}
+          %{~ for network_name, interface in hardware_interface.interfaces ~}
+          VLAN=${interface.interface_name}
           %{~ endfor ~}
 
     # VLAN interfaces
-    %{~ for network_name, network in hardware_interface.networks ~}
-    - path: /etc/systemd/network/20-${network.interface_name}.netdev
+    %{~ for network_name, interface in hardware_interface.interfaces ~}
+    - path: /etc/systemd/network/20-${interface.interface_name}.netdev
       mode: 0644
       contents:
         inline: |
           [NetDev]
-          Name=${network.interface_name}
+          Name=${interface.interface_name}
           Kind=vlan
 
           [VLAN]
-          Id=${network.vlan_id}
-    - path: /etc/systemd/network/22-${network.interface_name}.network
+          Id=${interface.vlan_id}
+    - path: /etc/systemd/network/22-${interface.interface_name}.network
       mode: 0644
       contents:
         inline: |
           [Match]
-          Name=${network.interface_name}
+          Name=${interface.interface_name}
 
           [Link]
           ARP=false
+          MTUBytes=${lookup(hardware_interface, "mtu", 1500)}
 
           [Network]
           LinkLocalAddressing=false
           DHCP=false
-          %{~ if can(network.netnum) || lookup(network, "dhcp", false) ~}
-          MACVTAP=${network.interface_name}-tap
+          %{~ if lookup(interface, "enable_netnum", false) || lookup(interface, "enable_dhcp", false) ~}
+          MACVTAP=${interface.interface_name}-tap
           %{~ endif ~}
 
     # tap interfaces
-    %{~ if can(network.netnum) || lookup(network, "dhcp", false) ~}
-    - path: /etc/systemd/network/20-${network.interface_name}-tap.netdev
+    %{~ if lookup(interface, "enable_netnum", false) || lookup(interface, "enable_dhcp", false) ~}
+    - path: /etc/systemd/network/20-${interface.interface_name}-tap.netdev
       mode: 0644
       contents:
         inline: |
           [NetDev]
-          Name=${network.interface_name}-tap
+          Name=${interface.interface_name}-tap
           Kind=macvtap
 
           [MACVTAP]
           Mode=bridge
-    - path: /etc/systemd/network/22-${network.interface_name}-tap.network
+    - path: /etc/systemd/network/22-${interface.interface_name}-tap.network
       mode: 0644
       contents:
         inline: |
           [Match]
-          Name=${network.interface_name}-tap
+          Name=${interface.interface_name}-tap
 
           [Link]
-          ARP=false
-
-          [Network]
-          LinkLocalAddressing=${lookup(network, "linklocal", false)}
-          DHCP=${lookup(network, "dhcp", false)}
-          MulticastDNS=${lookup(network, "mdns", false)}
+          MTUBytes=${lookup(hardware_interface, "mtu", 1500)}
 
           [DHCP]
-          RouteMetric=512
-          %{~ if can(network.netnum) ~}
+          UseMTU=true
+          RouteMetric=${lookup(interface, "metric", 1024)}
+
+          [Network]
+          LinkLocalAddressing=${lookup(interface, "enable_linklocal", false)}
+          DHCP=${lookup(interface, "enable_dhcp", false)}
+          MulticastDNS=${lookup(interface, "enable_mdns", false)}
+          %{~ if lookup(interface, "enable_netnum", false) ~}
 
           [Address]
-          Address=${cidrhost(network.prefix, network.netnum)}/${network.cidr}
+          Address=${cidrhost(interface.prefix, hardware_interface.netnum)}/${interface.cidr}
+          AddPrefixRoute=false
+
+          [Route]
+          Protocol=kernel
+          Scope=link
+          PreferredSource=${cidrhost(interface.prefix, hardware_interface.netnum)}
+          Destination=${interface.prefix}
+          Metric=${lookup(interface, "metric", 1024)}
           %{~ endif ~}
     %{~ endif ~}
     %{~ endfor ~}

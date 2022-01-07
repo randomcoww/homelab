@@ -80,6 +80,14 @@ variable "container_images" {
   type = map(string)
 }
 
+variable "netnum" {
+  type = number
+}
+
+variable "vrrp_netnum" {
+  type = number
+}
+
 variable "upstream_dns" {
   type = object({
     ip             = string

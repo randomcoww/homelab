@@ -44,19 +44,19 @@ storage:
           RouteMetric=${lookup(interface, "metric", 1024)}
 
           [Network]
-          LinkLocalAddressing=${lookup(interface, "linklocal", false)}
-          DHCP=${lookup(interface, "dhcp", false)}
-          MulticastDNS=${lookup(interface, "mdns", false)}
-          %{~ if can(interface.netnum) ~}
+          LinkLocalAddressing=${lookup(interface, "enable_linklocal", false)}
+          DHCP=${lookup(interface, "enable_dhcp", false)}
+          MulticastDNS=${lookup(interface, "enable_mdns", false)}
+          %{~ if lookup(interface, "enable_netnum", false) ~}
 
           [Address]
-          Address=${cidrhost(interface.prefix, interface.netnum)}/${interface.cidr}
+          Address=${cidrhost(interface.prefix, netnum)}/${interface.cidr}
           AddPrefixRoute=false
 
           [Route]
           Protocol=kernel
           Scope=link
-          PreferredSource=${cidrhost(interface.prefix, interface.netnum)}
+          PreferredSource=${cidrhost(interface.prefix, netnum)}
           Destination=${interface.prefix}
           Metric=${lookup(interface, "metric", 1024)}
           %{~ endif ~}

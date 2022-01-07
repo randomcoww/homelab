@@ -18,10 +18,10 @@ resource "tls_cert_request" "libvirt" {
   ]
 
   ip_addresses = compact(concat(["127.0.0.1"], flatten([
-    for interface in values(local.hardware_interfaces) :
+    for hardware_interface in values(local.hardware_interfaces) :
     [
-      for network in values(interface.networks) :
-      try(cidrhost(network.prefix, network.netnum), null)
+      for interface in values(hardware_interface.interfaces) :
+      try(cidrhost(interface.prefix, hardware_interface.netnum), null)
     ]
   ])))
 }

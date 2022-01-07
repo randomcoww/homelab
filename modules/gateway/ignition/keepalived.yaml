@@ -49,8 +49,8 @@ storage:
             }
             virtual_ipaddress {
               %{~ for network_name, interface in interfaces ~}
-              %{~ if can(interface.vrrp_netnum) ~}
-              ${cidrhost(interface.prefix, interface.vrrp_netnum)} dev ${interface.interface_name}
+              %{~ if lookup(interface, "enable_vrrp_netnum", false) ~}
+              ${cidrhost(interface.prefix, vrrp_netnum)} dev ${interface.interface_name}
               %{~ endif ~}
               %{~ endfor ~}
               0.0.0.0 dev ${interfaces.wan.interface_name}
@@ -90,7 +90,7 @@ storage:
         inline: |
           [Route]
           GatewayOnLink=true
-          Gateway=${cidrhost(interfaces.sync.prefix, interfaces.sync.vrrp_netnum)}
+          Gateway=${cidrhost(interfaces.sync.prefix, vrrp_netnum)}
           Destination=0.0.0.0/0
           Table=${slave_default_route.table_id}
 

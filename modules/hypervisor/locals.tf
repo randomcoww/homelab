@@ -7,17 +7,18 @@ locals {
   }
 
   hardware_interfaces = {
-    for interface_name, interface in var.hardware_interfaces :
-    interface_name => merge(interface, {
-      networks = {
-        for network_name, network in lookup(interface, "networks", {}) :
+    for hardware_interface_name, hardware_interface in var.hardware_interfaces :
+    hardware_interface_name => merge(hardware_interface, {
+      interfaces = {
+        for network_name, network in lookup(hardware_interface, "interfaces", {}) :
         network_name => merge(local.networks[network_name], network, {
-          "interface_name" = "${interface_name}-${network_name}"
+          "interface_name" = "${hardware_interface_name}-${network_name}"
         })
       }
     })
   }
 
+  # this is not seen outside of host and can be replicated on all hosts
   internal_interface = merge({
     netnum         = 1
     interface_name = "internal"

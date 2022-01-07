@@ -1,56 +1,63 @@
 locals {
   ns = {
-    ns-0 = {
-      hostname = "ns-0.${local.common.domains.internal_mdns}"
-      interfaces = {
-        lan = {
-          mdns        = true
-          mtu         = 9000
-          vrrp_netnum = 2
-          netnum      = 1
-          dhcp_subnet = {
-            newbit = 1
-            netnum = 1
-          }
-        }
-      }
-      kea_ha_role = "primary"
+    vrrp_netnum = 3
+    dhcp_server = {
+      newbit = 1
+      netnum = 1
     }
-    ns-1 = {
-      hostname = "ns-1.${local.common.domains.internal_mdns}"
-      interfaces = {
-        lan = {
-          mdns        = true
-          mtu         = 9000
-          vrrp_netnum = 2
-          netnum      = 3
-          dhcp_subnet = {
-            newbit = 1
-            netnum = 1
+    hosts = {
+      ns-0 = {
+        hostname = "ns-0.${local.common.domains.internal_mdns}"
+        netnum   = 1
+        interfaces = {
+          lan = {
+            enable_mdns        = true
+            mtu                = 9000
+            enable_vrrp_netnum = true
+            enable_netnum      = true
+            enable_dhcp_server = true
           }
         }
+        kea_ha_role = "primary"
       }
-      kea_ha_role = "secondary"
+      ns-1 = {
+        hostname = "ns-1.${local.common.domains.internal_mdns}"
+        netnum   = 2
+        interfaces = {
+          lan = {
+            enable_mdns        = true
+            mtu                = 9000
+            enable_vrrp_netnum = true
+            enable_netnum      = true
+            enable_dhcp_server = true
+          }
+        }
+        kea_ha_role = "secondary"
+      }
     }
   }
 }
 
 # templates #
 module "template-ns" {
-  for_each = local.ns
+  for_each = local.ns.hosts
 
-  source     = "./modules/ns"
-  hostname   = each.value.hostname
-  user       = local.common.admin_user
-  networks   = local.common.networks
-  interfaces = each.value.interfaces
-  domains    = local.common.domains
+  source         = "./modules/ns"
+  hostname       = each.value.hostname
+  user           = local.common.admin_user
+  networks       = local.common.networks
+  interfaces     = each.value.interfaces
+  domains        = local.common.domains
+  netnum         = each.value.netnum
+  vrrp_netnum    = local.ns.vrrp_netnum
+  gateway_netnum = local.gateways.vrrp_netnum
+  dhcp_server    = local.ns.dhcp_server
   kea_peers = [
-    for host in values(local.ns) :
+    for host in values(local.ns.hosts) :
     {
       name   = host.hostname
       role   = lookup(host, "kea_ha_role", "backup")
-      netnum = host.interfaces.lan.netnum
+      netnum = host.netnum
     }
   ]
   domain_interfaces = [
@@ -69,7 +76,7 @@ module "template-ns" {
 
 # combine and render a single ignition file #
 data "ct_config" "ns" {
-  for_each = local.ns
+  for_each = local.ns.hosts
 
   content = <<EOT
 ---
@@ -83,7 +90,7 @@ EOT
 }
 
 resource "local_file" "ns" {
-  for_each = local.ns
+  for_each = local.ns.hosts
 
   content  = data.ct_config.ns[each.key].rendered
   filename = "./output/ignition/${each.key}.ign"
