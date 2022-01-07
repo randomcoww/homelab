@@ -9,36 +9,11 @@ variable "hostname" {
 }
 
 variable "networks" {
-  # {
-  #   lan = {
-  #     network = "192.168.126.0"
-  #     cidr = 24
-  #     vlan_id = 1
-  #   }
-  #   internal = {
-  #     network = "192.168.224.0"
-  #     cidr = 28
-  #     vlan_id = 100
-  #   }
-  # }
   type    = any
   default = {}
 }
 
 variable "hardware_interfaces" {
-  # {
-  #   en0 = {
-  #     mac = "8c-8c-aa-e3-58-62"
-  #     mtu = 9000
-  #     networks = {
-  #       lan = {
-  #         netnum = 1
-  #         mdns = true
-  #         dhcp = true
-  #       }
-  #     }
-  #   }
-  # }
   type    = any
   default = {}
 }

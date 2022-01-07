@@ -9,55 +9,16 @@ variable "hostname" {
 }
 
 variable "networks" {
-  # {
-  #   lan = {
-  #     network = "192.168.126.0/24"
-  #     vlan_id = 1
-  #   }
-  # }
   type    = any
   default = {}
 }
 
 variable "interfaces" {
-  # {
-  #   lan = {
-  #     mdns = true
-  #     vrrp_netnum = 2
-  #   }
-  #   sync = {
-  #     mdns = true
-  #     netnum = 1
-  #     vrrp_netnum = 2
-  #   }
-  #   wan = {
-  #     dhcp = true
-  #   }
-  # }
   type    = any
   default = {}
 }
 
 variable "domain_interfaces" {
-  # [
-  #   {
-  #     network_name = "internal"
-  #     hypervisor_interface_name = "internal"
-  #   },
-  #   {
-  #     network_name = "lan"
-  #     hypervisor_interface_name = "en0-lan"
-  #     macaddress = "00-00-00-00-00-00"
-  #   },
-  #   {
-  #     network_name = "sync"
-  #     hypervisor_interface_name = "en0-lan"
-  #   },
-  #   {
-  #     network_name = "wan"
-  #     hypervisor_interface_name = "en0-lan"
-  #   }
-  # ]
   type    = any
   default = []
 }
