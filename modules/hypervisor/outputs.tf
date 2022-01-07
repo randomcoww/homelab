@@ -11,7 +11,7 @@ output "ignition_snippets" {
       matchbox_assets_path       = "/etc/matchbox/assets"
       pxeboot_image_path         = "/run/media/iso/images/pxeboot"
       kea_config_path            = "/etc/kea/kea-dhcp4-internal.conf"
-      user                       = var.user
+      user                       = local.user
       hostname                   = var.hostname
       ports                      = var.ports
       container_images           = var.container_images

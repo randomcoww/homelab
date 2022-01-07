@@ -27,12 +27,3 @@ storage:
       contents:
         inline:
           ${hostname}
-
-passwd:
-  users:
-    - name: ${user}
-      groups:
-        - adm
-        - sudo
-        - systemd-journal
-        - wheel

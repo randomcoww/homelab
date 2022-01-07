@@ -1,11 +1,9 @@
 variable "user" {
-  type    = string
-  default = "fcos"
+  type = any
 }
 
 variable "hostname" {
-  type    = string
-  default = "gateway"
+  type = string
 }
 
 variable "networks" {
@@ -28,7 +26,7 @@ variable "interfaces" {
   #   mtu                = optional(number)
   #   metric             = optional(number)
   # }))
-  type    = any
+  type    = map(map(string))
   default = {}
 }
 

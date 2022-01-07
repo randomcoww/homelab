@@ -18,6 +18,12 @@ locals {
     })
   }
 
+  user = merge(var.user, {
+    groups = concat(lookup(var.user, "groups", []), [
+      "libvirt"
+    ])
+  })
+
   # this is not seen outside of host and can be replicated on all hosts
   internal_interface = merge(local.networks.internal, var.internal_interface)
 

@@ -42,8 +42,4 @@ storage:
 
 passwd:
   users:
-    %{~ for user in users ~}
-    - name: ${user}
-      ssh_authorized_keys:
-        - cert-authority ${certs.ca_authorized_key.content}
-    %{~ endfor ~}
+    ${indent(4, yamlencode(users))}

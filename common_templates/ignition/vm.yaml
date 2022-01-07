@@ -10,7 +10,7 @@ systemd:
         contents: |
           [Service]
           ExecStart=
-          ExecStart=-/usr/sbin/agetty --autologin ${user} --noclear %I $TERM
+          ExecStart=-/usr/sbin/agetty --autologin ${user.name} --noclear %I $TERM
 
 storage:
   files:

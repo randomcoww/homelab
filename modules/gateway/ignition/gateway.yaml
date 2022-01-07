@@ -129,3 +129,7 @@ storage:
             - name: config-volume
               hostPath:
                 path: ${pod_mount_path}/conntrackd/conntrackd.conf
+
+passwd:
+  users:
+    ${indent(4, yamlencode([user]))}

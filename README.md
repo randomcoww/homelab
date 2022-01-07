@@ -18,6 +18,12 @@ tw() {
 }
 ```
 
+### Run
+
+```
+tw terraform apply
+```
+
 ### Cleanup
 
 ```

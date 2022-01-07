@@ -50,7 +50,7 @@ module "template-hypervisor" {
 
   source              = "./modules/hypervisor"
   hostname            = each.value.hostname
-  user                = local.common.users.admin.name
+  user                = local.common.users.admin
   networks            = local.common.networks
   hardware_interfaces = each.value.hardware_interfaces
   internal_interface  = local.hypervisors.internal_interface
@@ -60,7 +60,7 @@ module "template-hypervisor" {
   container_images    = local.common.container_images
 }
 
-module "template-disks" {
+module "template-hypervisor-disks" {
   for_each = local.hypervisors.hosts
 
   source = "./modules/disks"
@@ -79,7 +79,7 @@ EOT
   strict  = true
   snippets = concat(
     module.template-hypervisor[each.key].ignition_snippets,
-    module.template-disks[each.key].ignition_snippets,
+    module.template-hypervisor-disks[each.key].ignition_snippets,
   )
 }
 

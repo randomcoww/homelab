@@ -201,6 +201,4 @@ storage:
 
 passwd:
   users:
-    - name: ${user}
-      groups:
-        - libvirt
+    ${indent(4, yamlencode([user]))}

@@ -3,6 +3,23 @@ locals {
     users = {
       admin = {
         name = "fcos"
+        groups = [
+          "adm",
+          "sudo",
+          "systemd-journal",
+          "wheel",
+        ]
+      }
+      client = {
+        name = "randomcoww"
+        uid  = 10000
+        home = "/var/home/randomcoww"
+        groups = [
+          "adm",
+          "sudo",
+          "systemd-journal",
+          "wheel",
+        ]
       }
     }
     networks = {

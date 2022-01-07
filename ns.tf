@@ -66,7 +66,7 @@ module "template-ns" {
 
   source            = "./modules/ns"
   hostname          = each.value.hostname
-  user              = local.common.users.admin.name
+  user              = local.common.users.admin
   networks          = local.common.networks
   interfaces        = each.value.interfaces
   domains           = local.common.domains

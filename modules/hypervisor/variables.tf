@@ -1,11 +1,9 @@
 variable "user" {
-  type    = string
-  default = "fcos"
+  type = any
 }
 
 variable "hostname" {
-  type    = string
-  default = "hypervisor"
+  type = string
 }
 
 variable "networks" {

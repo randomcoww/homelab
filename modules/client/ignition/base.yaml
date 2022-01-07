@@ -1,0 +1,33 @@
+---
+variant: fcos
+version: 1.4.0
+systemd:
+  units:
+    - name: systemd-networkd-wait-online.service
+      mask: true
+    - name: NetworkManager.service
+      enabled: true
+    - name: NetworkManager-wait-online.service
+      enabled: true
+    - name: lm_sensors.service
+      enabled: true
+      dropins:
+        - name: 10-vm.conf
+          contents: |
+            [Unit]
+            ConditionVirtualization=!vm
+            ConditionVirtualization=!container
+
+storage:
+  files:
+    - path: /etc/NetworkManager/conf.d/base.conf
+      mode: 0644
+      contents:
+        inline: |
+          [main]
+          no-auto-default=*
+    # ssh-ca client #
+    - path: /etc/ssh/ssh_known_hosts
+      mode: 0644
+      contents:
+        inline: "@cert-authority * ${ssh_ca_authorized_key}"

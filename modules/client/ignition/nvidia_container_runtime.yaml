@@ -1,0 +1,83 @@
+---
+variant: fcos
+version: 1.4.0
+systemd:
+  units:
+    - name: containerd.service
+      enabled: true
+      dropins:
+        - name: 11-nvidia-config.conf
+          contents: |
+            [Service]
+            ExecStart=
+            ExecStart=/usr/bin/containerd -c /etc/containerd/config-nvidia.toml
+
+storage:
+  files:
+    # containerd needs `no-cgroups = false` but podman needs `no-cgroups = true`
+    # /etc/containers/containers.conf.d/<config>.conf would be better here but it is not working
+    - path: /etc/containerd/config-nvidia.toml
+      mode: 0644
+      overwrite: true
+      contents:
+        inline: |-
+          oom_score = -999
+          version = 2
+
+          [plugins]
+            [plugins."io.containerd.grpc.v1.cri"]
+              disable_tcp_service = true
+
+              [plugins."io.containerd.grpc.v1.cri".containerd]
+                default_runtime_name = "nvidia"
+
+                [plugins."io.containerd.grpc.v1.cri".containerd.runtimes]
+                  [plugins."io.containerd.grpc.v1.cri".containerd.runtimes.nvidia]
+                    runtime_type = "io.containerd.runc.v2"
+                    runtime_engine = ""
+                    runtime_root = ""
+                    privileged_without_host_devices = false
+                    base_runtime_spec = ""
+
+                    [plugins."io.containerd.grpc.v1.cri".containerd.runtimes.nvidia.options]
+                      BinaryName = "nvidia-container-runtime"
+    - path: /etc/containers/containers.conf
+      overwrite: true
+      contents:
+        inline: |
+          [engine]
+          hooks_dir=["/etc/containers/oci/hooks.d"]
+    - path: /etc/nvidia-container-runtime/podman-config.toml
+      overwrite: true
+      contents:
+        inline: |
+          disable-require = false
+
+          [nvidia-container-cli]
+          environment = []
+          load-kmods = true
+          no-cgroups = true
+          ldconfig = "@/sbin/ldconfig"
+    - path: /etc/containers/oci/hooks.d/oci-nvidia-hook.json
+      contents:
+        inline: |
+          {
+            "version": "1.0.0",
+            "hook": {
+              "path": "/usr/bin/nvidia-container-toolkit",
+              "args": [
+                "nvidia-container-toolkit",
+                "-config",
+                "/etc/nvidia-container-runtime/podman-config.toml",
+                "prestart"
+              ],
+              "env": [
+                "PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin"
+              ]
+            },
+            "when": {
+              "always": true,
+              "commands": [".*"]
+            },
+            "stages": ["prestart"]
+          }

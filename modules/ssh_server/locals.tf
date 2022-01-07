@@ -1,4 +1,14 @@
 locals {
+  users = [
+    for user_name in var.user_names :
+    {
+      name = user_name
+      ssh_authorized_keys = [
+        "cert-authority ${chomp(var.ssh_ca.public_key_openssh)}"
+      ]
+    }
+  ]
+
   certs = {
     ca_authorized_key = {
       content = var.ssh_ca.public_key_openssh
