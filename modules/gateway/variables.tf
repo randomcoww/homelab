@@ -30,7 +30,7 @@ variable "interfaces" {
   default = {}
 }
 
-variable "domain_interfaces" {
+variable "libvirt_domain_interfaces" {
   # type = list(object({
   #   network_name              = string
   #   hypervisor_interface_name = string

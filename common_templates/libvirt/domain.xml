@@ -19,14 +19,14 @@
   <on_crash>restart</on_crash>
   <devices>
     <emulator>/usr/bin/qemu-kvm</emulator>
-    %{~ for domain_interface in domain_interfaces ~}
+    %{~ for libvirt_domain_interface in libvirt_domain_interfaces ~}
     <interface type='direct' trustGuestRxFilters='yes'>
-      <source dev='${domain_interface.hypervisor_interface_name}' mode='bridge'/>
-      %{~ if can(domain_interface.macaddress) ~}
-      <mac address='${replace(domain_interface.macaddress, "-", ":")}'/>
+      <source dev='${libvirt_domain_interface.hypervisor_interface_name}' mode='bridge'/>
+      %{~ if can(libvirt_domain_interface.macaddress) ~}
+      <mac address='${replace(libvirt_domain_interface.macaddress, "-", ":")}'/>
       %{~ endif ~}
-      %{~ if can(domain_interface.boot_order) ~}
-      <boot order='${domain_interface.boot_order}'/>
+      %{~ if can(libvirt_domain_interface.boot_order) ~}
+      <boot order='${libvirt_domain_interface.boot_order}'/>
       %{~ endif ~}
       <model type='virtio-net'/>
     </interface>

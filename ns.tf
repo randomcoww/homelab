@@ -18,7 +18,7 @@ locals {
             enable_dhcp_server = true
           }
         }
-        domain_interfaces = [
+        libvirt_domain_interfaces = [
           {
             network_name              = "internal"
             hypervisor_interface_name = "internal"
@@ -43,7 +43,7 @@ locals {
             enable_dhcp_server = true
           }
         }
-        domain_interfaces = [
+        libvirt_domain_interfaces = [
           {
             network_name              = "internal"
             hypervisor_interface_name = "internal"
@@ -64,17 +64,17 @@ locals {
 module "template-ns" {
   for_each = local.ns.hosts
 
-  source            = "./modules/ns"
-  hostname          = each.value.hostname
-  user              = local.common.users.admin
-  networks          = local.common.networks
-  interfaces        = each.value.interfaces
-  domains           = local.common.domains
-  dhcp_server       = local.ns.dhcp_server
-  ssh_ca            = local.common.ca.ssh
-  domain_interfaces = each.value.domain_interfaces
-  container_images  = local.common.container_images
-  system_image_tag  = local.common.system_image_tags.server
+  source                    = "./modules/ns"
+  hostname                  = each.value.hostname
+  user                      = local.common.users.admin
+  networks                  = local.common.networks
+  interfaces                = each.value.interfaces
+  domains                   = local.common.domains
+  dhcp_server               = local.ns.dhcp_server
+  ssh_ca                    = local.common.ca.ssh
+  libvirt_domain_interfaces = each.value.libvirt_domain_interfaces
+  container_images          = local.common.container_images
+  system_image_tag          = local.common.system_image_tags.server
   netnums = {
     host         = each.value.netnum
     vrrp         = local.ns.vrrp_netnum

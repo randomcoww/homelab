@@ -20,7 +20,7 @@ locals {
             enable_dhcp = true
           }
         }
-        domain_interfaces = [
+        libvirt_domain_interfaces = [
           {
             network_name              = "internal"
             hypervisor_interface_name = "internal"
@@ -48,14 +48,14 @@ locals {
 module "template-gateway" {
   for_each = local.gateways.hosts
 
-  source            = "./modules/gateway"
-  hostname          = each.value.hostname
-  user              = local.common.users.admin
-  networks          = local.common.networks
-  interfaces        = each.value.interfaces
-  domain_interfaces = each.value.domain_interfaces
-  container_images  = local.common.container_images
-  system_image_tag  = local.common.system_image_tags.server
+  source                    = "./modules/gateway"
+  hostname                  = each.value.hostname
+  user                      = local.common.users.admin
+  networks                  = local.common.networks
+  interfaces                = each.value.interfaces
+  libvirt_domain_interfaces = each.value.libvirt_domain_interfaces
+  container_images          = local.common.container_images
+  system_image_tag          = local.common.system_image_tags.server
   netnums = {
     host = each.value.netnum
     vrrp = local.ns.vrrp_netnum

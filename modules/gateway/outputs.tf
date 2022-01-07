@@ -25,12 +25,12 @@ output "ignition_snippets" {
 
 output "libvirt" {
   value = templatefile("${path.root}/common_templates/libvirt/domain.xml", {
-    name               = var.hostname
-    memory             = 512
-    vcpu               = 1
-    domain_interfaces  = var.domain_interfaces
-    hypervisor_devices = var.hypervisor_devices
-    system_image_tag   = var.system_image_tag
+    name                      = var.hostname
+    memory                    = 512
+    vcpu                      = 1
+    libvirt_domain_interfaces = var.libvirt_domain_interfaces
+    hypervisor_devices        = var.hypervisor_devices
+    system_image_tag          = var.system_image_tag
   })
 }
 
