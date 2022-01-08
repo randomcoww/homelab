@@ -2,14 +2,22 @@ variable "name" {
   type = string
 }
 
-variable "libvirt_interfaces" {
-  type    = map(string)
+variable "interface_devices" {
+  type    = any
   default = {}
 }
 
 variable "guest_interface_device_order" {
   type    = list(string)
   default = []
+}
+
+variable "pxeboot_macaddress" {
+  type = string
+}
+
+variable "pxeboot_interface" {
+  type = string
 }
 
 variable "hypervisor_devices" {
@@ -21,7 +29,7 @@ variable "system_image_tag" {
   type = string
 }
 
-variable "vcpus" {
+variable "vcpu" {
   type = number
 }
 

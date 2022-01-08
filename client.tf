@@ -1,8 +1,8 @@
 locals {
-  clients = {
+  client_hostclass_config = {
     hosts = {
       clients-0 = {
-        hostname = "clients-0.${local.common.domains.internal_mdns}"
+        hostname = "clients-0.${local.config.domains.internal_mdns}"
         disks = {
           pv = {
             device = "/dev/disk/by-id/nvme-SKHynix_HFS512GDE9X084N_CYA8N037413008I5H"
@@ -21,16 +21,16 @@ locals {
 
 # templates #
 module "template-client" {
-  for_each = local.clients.hosts
+  for_each = local.client_hostclass_config.hosts
 
   source                    = "./modules/client"
   hostname                  = each.value.hostname
-  user                      = local.common.users.client
-  ssh_ca_public_key_openssh = local.common.ca.ssh.public_key_openssh
+  user                      = local.config.users.client
+  ssh_ca_public_key_openssh = local.config.ca.ssh.public_key_openssh
 }
 
 module "template-client-disks" {
-  for_each = local.clients.hosts
+  for_each = local.client_hostclass_config.hosts
 
   source = "./modules/disks"
   disks  = each.value.disks
@@ -38,7 +38,7 @@ module "template-client-disks" {
 
 # combine and render a single ignition file #
 data "ct_config" "client" {
-  for_each = local.clients.hosts
+  for_each = local.client_hostclass_config.hosts
 
   content = <<EOT
 ---
@@ -53,7 +53,7 @@ EOT
 }
 
 resource "local_file" "client" {
-  for_each = local.clients.hosts
+  for_each = local.client_hostclass_config.hosts
 
   content  = data.ct_config.client[each.key].rendered
   filename = "./output/ignition/${each.key}.ign"

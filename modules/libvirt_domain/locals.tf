@@ -1,8 +1,9 @@
 locals {
-  libvirt_interfaces = [
-    for network_name in var.guest_interface_device_order :
-    merge(var.libvirt_interfaces[network_name], {
-      network_name = network_name
-    })
-  ]
+  # add pxeboot macaddress to internal interface
+  interface_devices = {
+    for network_name, interface in var.interface_devices :
+    network_name => network_name == var.pxeboot_interface ? merge(interface, {
+      macaddress = var.pxeboot_macaddress
+    }) : interface
+  }
 }

@@ -24,11 +24,6 @@ variable "interfaces" {
   default = {}
 }
 
-variable "guest_interface_device_order" {
-  type    = list(string)
-  default = []
-}
-
 variable "host_netnum" {
   type = number
 }

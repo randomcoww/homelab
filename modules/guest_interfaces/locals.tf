@@ -1,19 +1,10 @@
 locals {
-  guest_interface_device_order = [
-    for network_name in var.guest_interface_device_order :
-    network_name
-    if can(var.interfaces[network_name])
-  ]
-
-  interface_names = {
-    for i, network_name in local.guest_interface_device_order :
-    network_name => "ens${i + 2}"
-  }
-
+  # assign names for guest interfaces by order
+  # libvirt assigns names ens2, ens3 ... ensN in order defined in domain XML
   interfaces = {
     for network_name, network in var.interfaces :
     network_name => merge(var.networks[network_name], network, {
-      interface_name = local.interface_names[network_name]
+      interface_name = "ens${index(sort(keys(var.interfaces)), network_name) + 2}"
     })
   }
 }

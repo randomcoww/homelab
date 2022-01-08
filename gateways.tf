@@ -1,9 +1,9 @@
 locals {
-  gateways = {
+  gateway_hostclass_config = {
     vrrp_netnum = 1
     hosts = {
       gateways-0 = {
-        hostname = "gateways-0.${local.common.domains.internal_mdns}"
+        hostname = "gateways-0.${local.config.domains.internal_mdns}"
         netnum   = 4
         interfaces = {
           internal = {
@@ -30,26 +30,25 @@ locals {
 
 # templates #
 module "template-gateway-guest_interfaces" {
-  for_each = local.gateways.hosts
+  for_each = local.gateway_hostclass_config.hosts
 
-  source                       = "./modules/guest_interfaces"
-  networks                     = local.common.networks
-  host_netnum                  = each.value.netnum
-  interfaces                   = each.value.interfaces
-  guest_interface_device_order = local.common.guest_interface_device_order
+  source      = "./modules/guest_interfaces"
+  networks    = local.config.networks
+  host_netnum = each.value.netnum
+  interfaces  = each.value.interfaces
 }
 
 module "template-gateway" {
-  for_each = local.gateways.hosts
+  for_each = local.gateway_hostclass_config.hosts
 
   source           = "./modules/gateway"
   hostname         = each.value.hostname
-  user             = local.common.users.admin
+  user             = local.config.users.admin
   guest_interfaces = module.template-gateway-guest_interfaces[each.key].interfaces
-  container_images = local.common.container_images
+  container_images = local.config.container_images
   netnums = {
     host = each.value.netnum
-    vrrp = local.ns.vrrp_netnum
+    vrrp = local.ns_hostclass_config.vrrp_netnum
   }
   # master route prioirty is slotted in between main and slave
   # when keepalived becomes master on the host
@@ -66,7 +65,7 @@ module "template-gateway" {
 
 # combine and render a single ignition file #
 data "ct_config" "gateway" {
-  for_each = local.gateways.hosts
+  for_each = local.gateway_hostclass_config.hosts
 
   content = <<EOT
 ---
@@ -81,7 +80,7 @@ EOT
 }
 
 resource "local_file" "gateway" {
-  for_each = local.gateways.hosts
+  for_each = local.gateway_hostclass_config.hosts
 
   content  = data.ct_config.gateway[each.key].rendered
   filename = "./output/ignition/${each.key}.ign"

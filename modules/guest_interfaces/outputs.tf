@@ -8,10 +8,6 @@ output "ignition_snippets" {
   ]
 }
 
-output "guest_interface_device_order" {
-  value = local.guest_interface_device_order
-}
-
 output "interfaces" {
   value = local.interfaces
 }

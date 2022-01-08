@@ -1,5 +1,5 @@
 locals {
-  hypervisors = {
+  hypervisor_hostclass_config = {
     internal_interface = {
       interface_name = "internal"
       netnum         = 1
@@ -10,7 +10,7 @@ locals {
     }
     hosts = {
       hypervisor-0 = {
-        hostname = "hypervisor-0.${local.common.domains.internal_mdns}"
+        hostname = "hypervisor-0.${local.config.domains.internal_mdns}"
         hardware_interfaces = {
           phy0 = {
             netnum = 7
@@ -46,36 +46,36 @@ locals {
 
 # templates #
 module "template-hypervisor" {
-  for_each = local.hypervisors.hosts
+  for_each = local.hypervisor_hostclass_config.hosts
 
   source   = "./modules/hypervisor"
   hostname = each.value.hostname
-  user = merge(local.common.users.admin, {
-    groups = concat(lookup(local.common.users.admin, "groups", []), [
+  user = merge(local.config.users.admin, {
+    groups = concat(lookup(local.config.users.admin, "groups", []), [
       "libvirt"
     ])
   })
-  networks            = local.common.networks
+  networks            = local.config.networks
   hardware_interfaces = each.value.hardware_interfaces
-  internal_interface  = local.hypervisors.internal_interface
-  matchbox_ca         = local.common.ca.matchbox
-  libvirt_ca          = local.common.ca.libvirt
-  container_images    = local.common.container_images
+  internal_interface  = local.hypervisor_hostclass_config.internal_interface
+  matchbox_ca         = local.config.ca.matchbox
+  libvirt_ca          = local.config.ca.libvirt
+  container_images    = local.config.container_images
 }
 
 module "template-hypervisor-disks" {
-  for_each = local.hypervisors.hosts
+  for_each = local.hypervisor_hostclass_config.hosts
 
   source = "./modules/disks"
   disks  = each.value.disks
 }
 
 module "template-hypervisor-ssh_server" {
-  for_each = local.hypervisors.hosts
+  for_each = local.hypervisor_hostclass_config.hosts
 
   source     = "./modules/ssh_server"
   key_id     = each.value.hostname
-  user_names = [local.common.users.admin.name]
+  user_names = [local.config.users.admin.name]
   valid_principals = compact(concat([each.value.hostname, "127.0.0.1"], flatten([
     for hardware_interface in values(module.template-hypervisor[each.key].hardware_interfaces) :
     [
@@ -83,12 +83,12 @@ module "template-hypervisor-ssh_server" {
       try(cidrhost(interface.prefix, hardware_interface.netnum), null)
     ]
   ])))
-  ssh_ca = local.common.ca.ssh
+  ssh_ca = local.config.ca.ssh
 }
 
 # combine and render a single ignition file #
 data "ct_config" "hypervisor" {
-  for_each = local.hypervisors.hosts
+  for_each = local.hypervisor_hostclass_config.hosts
 
   content = <<EOT
 ---
@@ -104,7 +104,7 @@ EOT
 }
 
 resource "local_file" "hypervisor" {
-  for_each = local.hypervisors.hosts
+  for_each = local.hypervisor_hostclass_config.hosts
 
   content  = data.ct_config.hypervisor[each.key].rendered
   filename = "./output/ignition/${each.key}.ign"

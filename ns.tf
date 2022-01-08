@@ -1,5 +1,5 @@
 locals {
-  ns = {
+  ns_hostclass_config = {
     vrrp_netnum = 2
     dhcp_server = {
       newbit = 1
@@ -7,7 +7,7 @@ locals {
     }
     hosts = {
       ns-0 = {
-        hostname = "ns-0.${local.common.domains.internal_mdns}"
+        hostname = "ns-0.${local.config.domains.internal_mdns}"
         netnum   = 5
         interfaces = {
           internal = {
@@ -24,7 +24,7 @@ locals {
         kea_ha_role = "primary"
       }
       ns-1 = {
-        hostname = "ns-1.${local.common.domains.internal_mdns}"
+        hostname = "ns-1.${local.config.domains.internal_mdns}"
         netnum   = 6
         interfaces = {
           internal = {
@@ -46,32 +46,31 @@ locals {
 
 # templates #
 module "template-ns-guest_interfaces" {
-  for_each = local.ns.hosts
+  for_each = local.ns_hostclass_config.hosts
 
-  source                       = "./modules/guest_interfaces"
-  networks                     = local.common.networks
-  host_netnum                  = each.value.netnum
-  interfaces                   = each.value.interfaces
-  guest_interface_device_order = local.common.guest_interface_device_order
+  source      = "./modules/guest_interfaces"
+  networks    = local.config.networks
+  host_netnum = each.value.netnum
+  interfaces  = each.value.interfaces
 }
 
 module "template-ns" {
-  for_each = local.ns.hosts
+  for_each = local.ns_hostclass_config.hosts
 
   source           = "./modules/ns"
   hostname         = each.value.hostname
-  user             = local.common.users.admin
+  user             = local.config.users.admin
   guest_interfaces = module.template-ns-guest_interfaces[each.key].interfaces
-  domains          = local.common.domains
-  dhcp_server      = local.ns.dhcp_server
-  container_images = local.common.container_images
+  domains          = local.config.domains
+  dhcp_server      = local.ns_hostclass_config.dhcp_server
+  container_images = local.config.container_images
   netnums = {
     host         = each.value.netnum
-    vrrp         = local.ns.vrrp_netnum
-    gateway_vrrp = local.gateways.vrrp_netnum
+    vrrp         = local.ns_hostclass_config.vrrp_netnum
+    gateway_vrrp = local.gateway_hostclass_config.vrrp_netnum
   }
   kea_peers = [
-    for host in values(local.ns.hosts) :
+    for host in values(local.ns_hostclass_config.hosts) :
     {
       name   = host.hostname
       role   = lookup(host, "kea_ha_role", "backup")
@@ -81,21 +80,21 @@ module "template-ns" {
 }
 
 module "template-ns-ssh_server" {
-  for_each = local.ns.hosts
+  for_each = local.ns_hostclass_config.hosts
 
   source     = "./modules/ssh_server"
   key_id     = each.value.hostname
-  user_names = [local.common.users.admin.name]
+  user_names = [local.config.users.admin.name]
   valid_principals = compact(concat([each.value.hostname, "127.0.0.1"], flatten([
     for interface in values(module.template-ns-guest_interfaces[each.key].interfaces) :
     try(cidrhost(interface.prefix, each.value.netnum), null)
   ])))
-  ssh_ca = local.common.ca.ssh
+  ssh_ca = local.config.ca.ssh
 }
 
 # combine and render a single ignition file #
 data "ct_config" "ns" {
-  for_each = local.ns.hosts
+  for_each = local.ns_hostclass_config.hosts
 
   content = <<EOT
 ---
@@ -111,7 +110,7 @@ EOT
 }
 
 resource "local_file" "ns" {
-  for_each = local.ns.hosts
+  for_each = local.ns_hostclass_config.hosts
 
   content  = data.ct_config.ns[each.key].rendered
   filename = "./output/ignition/${each.key}.ign"
