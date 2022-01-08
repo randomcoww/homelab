@@ -12,7 +12,9 @@ locals {
   }
 
   # this is not seen outside of host and can be replicated on all hosts
-  internal_interface = merge(var.networks.internal, var.internal_interface)
+  internal_interface = merge(var.networks.internal, var.internal_interface, {
+    prefix = "${var.networks.internal.network}/${var.networks.internal.cidr}"
+  })
 
   certs = {
     matchbox = {

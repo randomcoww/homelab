@@ -1,38 +1,47 @@
-variable "name" {
-  type = string
+variable "endpoint" {
+  type = map(string)
 }
 
-variable "interface_devices" {
-  type    = any
-  default = {}
-}
+# variable "name" {
+#   type = string
+# }
 
-variable "guest_interface_device_order" {
-  type    = list(string)
-  default = []
-}
+# variable "interface_devices" {
+#   type    = any
+#   default = {}
+# }
 
-variable "pxeboot_macaddress" {
-  type = string
-}
+# variable "guest_interface_device_order" {
+#   type    = list(string)
+#   default = []
+# }
 
-variable "pxeboot_interface" {
-  type = string
-}
+# variable "pxeboot_macaddress" {
+#   type = string
+# }
 
-variable "hypervisor_devices" {
-  type    = list(map(string))
-  default = []
-}
+# variable "pxeboot_interface" {
+#   type = string
+# }
 
-variable "system_image_tag" {
-  type = string
-}
+# variable "hypervisor_devices" {
+#   type    = list(map(string))
+#   default = []
+# }
 
-variable "vcpu" {
-  type = number
-}
+# variable "system_image_tag" {
+#   type = string
+# }
 
-variable "memory" {
-  type = number
+# variable "vcpu" {
+#   type = number
+# }
+
+# variable "memory" {
+#   type = number
+# }
+
+# cannot configure module as for_each when sneding provider config
+variable "hosts" {
+  type = any
 }

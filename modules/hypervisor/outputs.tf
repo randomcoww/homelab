@@ -32,17 +32,14 @@ output "matchbox_rpc_endpoints" {
     for network_name, network in var.networks :
     network_name => compact([
       for hardware_interface in values(local.hardware_interfaces) :
-      "http://${cidrhost(network.prefix, hardware_interface.netnum)}:${var.ports.matchbox_rpc}"
+      "${cidrhost(network.prefix, hardware_interface.netnum)}:${var.ports.matchbox_rpc}"
       if try(hardware_interface.interfaces[network_name].enable_netnum, false)
     ])
   }
 }
 
 output "matchbox_http_endpoint" {
-  value = "${cidrhost(
-    "${local.internal_interface.network}/${local.internal_interface.cidr}",
-    local.internal_interface.netnum,
-  )}:${var.ports.matchbox_http}"
+  value = "http://${cidrhost(local.internal_interface.prefix, local.internal_interface.netnum)}:${var.ports.matchbox_http}"
 }
 
 output "libvirt_endpoints" {

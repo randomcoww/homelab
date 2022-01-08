@@ -1,7 +1,7 @@
 locals {
   client_hostclass_config = {
     hosts = {
-      clients-0 = {
+      client-0 = {
         hostname = "clients-0.${local.config.domains.internal_mdns}"
         disks = {
           pv = {

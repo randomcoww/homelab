@@ -2,7 +2,7 @@ locals {
   gateway_hostclass_config = {
     vrrp_netnum = 1
     hosts = {
-      gateways-0 = {
+      gateway-0 = {
         hostname = "gateways-0.${local.config.domains.internal_mdns}"
         netnum   = 4
         interfaces = {

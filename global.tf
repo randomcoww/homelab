@@ -80,62 +80,6 @@ locals {
         public_key_openssh = tls_private_key.ssh-ca.public_key_openssh
       }
     }
-
-    # auto assign internal mac based on this for PXE boot
-    pxeboot_macaddress_base = 90520730730496
-  }
-
-  # assign guests to hypervisor
-  hypervisor_guest_preprocess = {
-    hypervisor-0 = {
-      guests = {
-        gateway-0 = {
-          vcpu   = 1
-          memory = 512
-          # pxeboot_macaddress = <assigned>
-          interfaces = {
-            internal = {
-              hypervisor_interface_name = "internal"
-            }
-            lan = {
-              hypervisor_interface_name = "phy0-lan"
-            }
-            sync = {
-              hypervisor_interface_name = "phy0-sync"
-            }
-            wan = {
-              hypervisor_interface_name = "phy0-wan"
-            }
-          }
-        }
-        ns-0 = {
-          vcpu   = 1
-          memory = 512
-          # pxeboot_macaddress = <assigned>
-          interfaces = {
-            internal = {
-              hypervisor_interface_name = "internal"
-            }
-            lan = {
-              hypervisor_interface_name = "phy0-lan"
-            }
-          }
-        }
-        ns-1 = {
-          vcpu   = 1
-          memory = 512
-          # pxeboot_macaddress = <assigned>
-          interfaces = {
-            internal = {
-              hypervisor_interface_name = "internal"
-            }
-            lan = {
-              hypervisor_interface_name = "phy0-lan"
-            }
-          }
-        }
-      }
-    }
   }
 }
 
@@ -193,5 +137,68 @@ resource "tls_self_signed_cert" "libvirt-ca" {
     "cert_signing",
     "crl_signing",
     "digital_signature",
+  ]
+}
+
+# matchbox cient #
+resource "tls_private_key" "matchbox-client" {
+  algorithm   = tls_private_key.matchbox-ca.algorithm
+  ecdsa_curve = "P521"
+}
+
+resource "tls_cert_request" "matchbox-client" {
+  key_algorithm   = tls_private_key.matchbox-client.algorithm
+  private_key_pem = tls_private_key.matchbox-client.private_key_pem
+
+  subject {
+    common_name  = "matchbox"
+    organization = "matchbox"
+  }
+}
+
+resource "tls_locally_signed_cert" "matchbox-client" {
+  cert_request_pem   = tls_cert_request.matchbox-client.cert_request_pem
+  ca_key_algorithm   = tls_private_key.matchbox-ca.algorithm
+  ca_private_key_pem = tls_private_key.matchbox-ca.private_key_pem
+  ca_cert_pem        = tls_self_signed_cert.matchbox-ca.cert_pem
+
+  validity_period_hours = 8760
+
+  allowed_uses = [
+    "key_encipherment",
+    "digital_signature",
+    "server_auth",
+    "client_auth",
+  ]
+}
+
+# libvirt client #
+resource "tls_private_key" "libvirt-client" {
+  algorithm   = tls_private_key.libvirt-ca.algorithm
+  ecdsa_curve = "P521"
+}
+
+resource "tls_cert_request" "libvirt-client" {
+  key_algorithm   = tls_private_key.libvirt-client.algorithm
+  private_key_pem = tls_private_key.libvirt-client.private_key_pem
+
+  subject {
+    common_name = "libvirt"
+  }
+}
+
+resource "tls_locally_signed_cert" "libvirt-client" {
+  cert_request_pem   = tls_cert_request.libvirt-client.cert_request_pem
+  ca_key_algorithm   = tls_private_key.libvirt-ca.algorithm
+  ca_private_key_pem = tls_private_key.libvirt-ca.private_key_pem
+  ca_cert_pem        = tls_self_signed_cert.libvirt-ca.cert_pem
+
+  validity_period_hours = 8760
+
+  allowed_uses = [
+    "key_encipherment",
+    "digital_signature",
+    "server_auth",
+    "client_auth",
   ]
 }
