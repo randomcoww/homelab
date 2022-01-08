@@ -1,7 +1,7 @@
 module "template-ssh_server" {
   source     = "../../modules/ssh_server"
   key_id     = var.hostname
-  user_names = [local.user.name]
+  user_names = [var.user.name]
   valid_principals = compact(concat([var.hostname, "127.0.0.1"], flatten([
     for hardware_interface in values(local.hardware_interfaces) :
     [
@@ -10,4 +10,10 @@ module "template-ssh_server" {
     ]
   ])))
   ssh_ca = var.ssh_ca
+}
+
+locals {
+  module_ignition_snippets = concat(
+    module.template-ssh_server.ignition_snippets,
+  )
 }

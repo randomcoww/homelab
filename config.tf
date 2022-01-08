@@ -1,5 +1,5 @@
 locals {
-  common = {
+  config = {
     users = {
       admin = {
         name = "fcos"

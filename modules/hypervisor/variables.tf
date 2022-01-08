@@ -10,6 +10,7 @@ variable "networks" {
   type = map(object({
     network = optional(string)
     cidr    = optional(string)
+    prefix  = optional(string)
     vlan_id = optional(number)
   }))
   default = {}

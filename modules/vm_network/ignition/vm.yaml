@@ -1,20 +1,6 @@
 ---
 variant: fcos
 version: 1.4.0
-systemd:
-  units:
-    # auto-login via hvc0 console
-    - name: serial-getty@hvc0.service
-      dropins:
-      - name: 10-autologin.conf
-        contents: |
-          [Unit]
-          ConditionVirtualization=vm
-
-          [Service]
-          ExecStart=
-          ExecStart=-/usr/sbin/agetty --autologin ${user.name} --noclear %I $TERM
-
 storage:
   files:
     %{~ for network_name, interface in interfaces ~}
@@ -41,13 +27,13 @@ storage:
           %{~ if lookup(interface, "enable_netnum", false) ~}
 
           [Address]
-          Address=${cidrhost(interface.prefix, netnums.host)}/${interface.cidr}
+          Address=${cidrhost(interface.prefix, host_netnum)}/${interface.cidr}
           AddPrefixRoute=false
 
           [Route]
           Protocol=kernel
           Scope=link
-          PreferredSource=${cidrhost(interface.prefix, netnums.host)}
+          PreferredSource=${cidrhost(interface.prefix, host_netnum)}
           Destination=${interface.prefix}
           Metric=${lookup(interface, "metric", 1024)}
           %{~ endif ~}

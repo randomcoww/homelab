@@ -1,31 +1,18 @@
 locals {
-  networks = {
-    for network_name, network in var.networks :
-    network_name => merge(network, try({
-      prefix = "${network.network}/${network.cidr}"
-    }, {}))
-  }
-
   hardware_interfaces = {
     for hardware_interface_name, hardware_interface in var.hardware_interfaces :
     hardware_interface_name => merge(hardware_interface, {
       interfaces = {
         for network_name, network in lookup(hardware_interface, "interfaces", {}) :
-        network_name => merge(local.networks[network_name], network, {
+        network_name => merge(var.networks[network_name], network, {
           "interface_name" = "${hardware_interface_name}-${network_name}"
         })
       }
     })
   }
 
-  user = merge(var.user, {
-    groups = concat(lookup(var.user, "groups", []), [
-      "libvirt"
-    ])
-  })
-
   # this is not seen outside of host and can be replicated on all hosts
-  internal_interface = merge(local.networks.internal, var.internal_interface)
+  internal_interface = merge(var.networks.internal, var.internal_interface)
 
   certs = {
     matchbox = {

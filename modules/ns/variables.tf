@@ -10,6 +10,7 @@ variable "networks" {
   type = map(object({
     network = optional(string)
     cidr    = optional(string)
+    prefix  = optional(string)
     vlan_id = optional(number)
   }))
   default = {}
@@ -51,10 +52,6 @@ variable "hypervisor_devices" {
 variable "container_images" {
   type    = map(string)
   default = {}
-}
-
-variable "system_image_tag" {
-  type = string
 }
 
 variable "ports" {

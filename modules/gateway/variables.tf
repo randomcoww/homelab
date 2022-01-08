@@ -10,6 +10,7 @@ variable "networks" {
   type = map(object({
     network = optional(string)
     cidr    = optional(string)
+    prefix  = optional(string)
     vlan_id = optional(number)
   }))
   default = {}
@@ -64,10 +65,6 @@ variable "slave_default_route" {
 
 variable "container_images" {
   type = map(string)
-}
-
-variable "system_image_tag" {
-  type = string
 }
 
 variable "netnums" {

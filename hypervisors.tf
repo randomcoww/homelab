@@ -48,9 +48,13 @@ locals {
 module "template-hypervisor" {
   for_each = local.hypervisors.hosts
 
-  source              = "./modules/hypervisor"
-  hostname            = each.value.hostname
-  user                = local.common.users.admin
+  source   = "./modules/hypervisor"
+  hostname = each.value.hostname
+  user = merge(local.common.users.admin, {
+    groups = concat(lookup(local.common.users.admin, "groups", []), [
+      "libvirt"
+    ])
+  })
   networks            = local.common.networks
   hardware_interfaces = each.value.hardware_interfaces
   internal_interface  = local.hypervisors.internal_interface

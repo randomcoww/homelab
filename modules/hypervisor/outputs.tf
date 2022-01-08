@@ -11,7 +11,7 @@ output "ignition_snippets" {
       matchbox_assets_path       = "/etc/matchbox/assets"
       pxeboot_image_path         = "/run/media/iso/images/pxeboot"
       kea_config_path            = "/etc/kea/kea-dhcp4-internal.conf"
-      user                       = local.user
+      user                       = var.user
       hostname                   = var.hostname
       ports                      = var.ports
       container_images           = var.container_images
@@ -21,13 +21,17 @@ output "ignition_snippets" {
       certs                      = local.certs
     })
     ],
-    module.template-ssh_server.ignition_snippets,
+    local.module_ignition_snippets,
   )
+}
+
+output "hardware_interfaces" {
+  value = local.hardware_interfaces
 }
 
 output "matchbox_rpc_endpoints" {
   value = {
-    for network_name, network in local.networks :
+    for network_name, network in var.networks :
     network_name => compact([
       for hardware_interface in values(local.hardware_interfaces) :
       "http://${cidrhost(network.prefix, hardware_interface.netnum)}:${var.ports.matchbox_rpc}"
@@ -45,7 +49,7 @@ output "matchbox_http_endpoint" {
 
 output "libvirt_endpoints" {
   value = {
-    for network_name, network in local.networks :
+    for network_name, network in var.networks :
     network_name => compact([
       for hardware_interface in values(local.hardware_interfaces) :
       "qemu://${cidrhost(network.prefix, hardware_interface.netnum)}/system"

@@ -1,9 +1,9 @@
 output "ignition_snippets" {
-  value = [
+  value = concat([
     for f in concat(tolist(fileset(".", "${path.module}/ignition/*.yaml")), [
       "${path.root}/common_templates/ignition/base.yaml",
       "${path.root}/common_templates/ignition/server.yaml",
-      "${path.root}/common_templates/ignition/vm.yaml",
+      "${path.root}/common_templates/ignition/autologin.yaml",
       "${path.root}/common_templates/ignition/masterless_kubelet.yaml",
     ]) :
     templatefile(f, {
@@ -19,9 +19,11 @@ output "ignition_snippets" {
       container_images     = var.container_images
       upstream_dns         = var.upstream_dns
     })
-  ]
+    ],
+    local.module_ignition_snippets,
+  )
 }
 
 output "internal_interface_name" {
-  value = local.interface_names.internal
+  value = local.interfaces.internal.interface_name
 }

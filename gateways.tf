@@ -39,7 +39,6 @@ module "template-gateway" {
   interfaces             = each.value.interfaces
   interface_device_order = local.common.interface_device_order
   container_images       = local.common.container_images
-  system_image_tag       = local.common.system_image_tags.server
   netnums = {
     host = each.value.netnum
     vrrp = local.ns.vrrp_netnum

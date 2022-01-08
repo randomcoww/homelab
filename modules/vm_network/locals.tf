@@ -1,11 +1,4 @@
 locals {
-  networks = {
-    for network_name, network in var.networks :
-    network_name => merge(network, try({
-      prefix = "${network.network}/${network.cidr}"
-    }, {}))
-  }
-
   interface_device_order = [
     for network_name in var.interface_device_order :
     network_name
@@ -19,7 +12,7 @@ locals {
 
   interfaces = {
     for network_name, network in var.interfaces :
-    network_name => merge(local.networks[network_name], network, {
+    network_name => merge(var.networks[network_name], network, {
       interface_name = local.interface_names[network_name]
     })
   }

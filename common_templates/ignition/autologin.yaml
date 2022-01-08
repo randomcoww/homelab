@@ -1,0 +1,16 @@
+---
+variant: fcos
+version: 1.4.0
+systemd:
+  units:
+    # auto-login via hvc0 console
+    - name: serial-getty@hvc0.service
+      dropins:
+      - name: 10-autologin.conf
+        contents: |
+          [Unit]
+          ConditionVirtualization=vm
+
+          [Service]
+          ExecStart=
+          ExecStart=-/usr/sbin/agetty --autologin ${user.name} --noclear %I $TERM
