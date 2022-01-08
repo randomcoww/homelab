@@ -23,25 +23,6 @@ locals {
             enable_dhcp = true
           }
         }
-        libvirt_domain_interfaces = [
-          {
-            network_name              = "internal"
-            hypervisor_interface_name = "internal"
-            boot_order                = 1
-          },
-          {
-            network_name              = "lan"
-            hypervisor_interface_name = "phy0-lan"
-          },
-          {
-            network_name              = "sync"
-            hypervisor_interface_name = "phy0-sync"
-          },
-          {
-            network_name              = "wan"
-            hypervisor_interface_name = "phy0-wan"
-          },
-        ]
       }
     }
   }
@@ -51,14 +32,14 @@ locals {
 module "template-gateway" {
   for_each = local.gateways.hosts
 
-  source                    = "./modules/gateway"
-  hostname                  = each.value.hostname
-  user                      = local.common.users.admin
-  networks                  = local.common.networks
-  interfaces                = each.value.interfaces
-  libvirt_domain_interfaces = each.value.libvirt_domain_interfaces
-  container_images          = local.common.container_images
-  system_image_tag          = local.common.system_image_tags.server
+  source                 = "./modules/gateway"
+  hostname               = each.value.hostname
+  user                   = local.common.users.admin
+  networks               = local.common.networks
+  interfaces             = each.value.interfaces
+  interface_device_order = local.common.interface_device_order
+  container_images       = local.common.container_images
+  system_image_tag       = local.common.system_image_tags.server
   netnums = {
     host = each.value.netnum
     vrrp = local.ns.vrrp_netnum

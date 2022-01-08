@@ -31,13 +31,8 @@ variable "interfaces" {
   default = {}
 }
 
-variable "libvirt_domain_interfaces" {
-  # type = list(object({
-  #   network_name              = string
-  #   hypervisor_interface_name = string
-  #   boot_order                = optional(number)
-  # }))
-  type    = list(map(string))
+variable "interface_device_order" {
+  type    = list(string)
   default = []
 }
 

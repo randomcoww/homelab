@@ -13,7 +13,6 @@ output "ignition_snippets" {
       user                 = var.user
       hostname             = var.hostname
       interfaces           = local.interfaces
-      internal_interface   = local.internal_interface
       netnums              = var.netnums
       master_default_route = var.master_default_route
       slave_default_route  = var.slave_default_route
@@ -21,17 +20,6 @@ output "ignition_snippets" {
       upstream_dns         = var.upstream_dns
     })
   ]
-}
-
-output "libvirt" {
-  value = templatefile("${path.root}/common_templates/libvirt/domain.xml", {
-    name                      = var.hostname
-    memory                    = 512
-    vcpu                      = 1
-    libvirt_domain_interfaces = var.libvirt_domain_interfaces
-    hypervisor_devices        = var.hypervisor_devices
-    system_image_tag          = var.system_image_tag
-  })
 }
 
 output "internal_interface_name" {

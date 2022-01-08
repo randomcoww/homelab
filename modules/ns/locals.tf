@@ -6,10 +6,15 @@ locals {
     }, {}))
   }
 
-  # libvirt assigns interface names ens2, ens3 ... ensN in order defined in domain XML
+  interface_device_order = [
+    for network_name in var.interface_device_order :
+    network_name
+    if can(var.interfaces[network_name])
+  ]
+
   interface_names = {
-    for i, libvirt_domain_interface in var.libvirt_domain_interfaces :
-    libvirt_domain_interface.network_name => "ens${i + 2}"
+    for i, network_name in local.interface_device_order :
+    network_name => "ens${i + 2}"
   }
 
   interfaces = {
@@ -18,8 +23,4 @@ locals {
       interface_name = local.interface_names[network_name]
     })
   }
-
-  internal_interface = merge(local.networks.internal, {
-    interface_name = local.interface_names.internal
-  })
 }
