@@ -76,7 +76,7 @@ locals {
     }
     # assign names for guest interfaces by order
     # libvirt assigns names ens2, ens3 ... ensN in order defined in domain XML
-    interface_device_order = ["lan", "sync", "wan", "internal"]
+    guest_interface_device_order = ["lan", "sync", "wan", "internal"]
   }
 }
 

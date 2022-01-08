@@ -32,7 +32,7 @@ storage:
             nftables keepalived
             dynamic_interfaces allow_if_changes
             max_auto_priority -1
-            lvs_sync_daemon ${interfaces.sync.interface_name} VI_gateway
+            lvs_sync_daemon ${guest_interfaces.sync.interface_name} VI_gateway
           }
           vrrp_instance VI_gateway {
             no_accept
@@ -40,7 +40,7 @@ storage:
             state BACKUP
             advert_int 0.02
             virtual_router_id 250
-            interface ${interfaces.sync.interface_name}
+            interface ${guest_interfaces.sync.interface_name}
             priority 250
             garp_master_refresh 1
             # garp_extra_if all 1
@@ -48,17 +48,17 @@ storage:
               to all lookup ${master_default_route.table_id} priority ${master_default_route.table_priority}
             }
             virtual_ipaddress {
-              %{~ for network_name, interface in interfaces ~}
-              %{~ if lookup(interface, "enable_vrrp_netnum", false) ~}
-              ${cidrhost(interface.prefix, netnums.vrrp)} dev ${interface.interface_name}
+              %{~ for network_name, guest_interface in guest_interfaces ~}
+              %{~ if lookup(guest_interface, "enable_vrrp_netnum", false) ~}
+              ${cidrhost(guest_interface.prefix, netnums.vrrp)} dev ${guest_interface.interface_name}
               %{~ endif ~}
               %{~ endfor ~}
-              0.0.0.0 dev ${interfaces.wan.interface_name}
+              0.0.0.0 dev ${guest_interfaces.wan.interface_name}
             }
           }
 
     # Create fallback route so backup node can access the internet through the wan interface
-    - path: /etc/systemd/network/20-${interfaces.wan.interface_name}.network.d/20-master-default-route.conf
+    - path: /etc/systemd/network/20-${guest_interfaces.wan.interface_name}.network.d/20-master-default-route.conf
       mode: 0644
       contents:
         inline: |
@@ -84,13 +84,13 @@ storage:
           DNSOverTLS=true
           DNSDefaultRoute=true
 
-    - path: /etc/systemd/network/20-${interfaces.sync.interface_name}.network.d/20-slave-default-route.conf
+    - path: /etc/systemd/network/20-${guest_interfaces.sync.interface_name}.network.d/20-slave-default-route.conf
       mode: 0644
       contents:
         inline: |
           [Route]
           GatewayOnLink=true
-          Gateway=${cidrhost(interfaces.sync.prefix, netnums.vrrp)}
+          Gateway=${cidrhost(guest_interfaces.sync.prefix, netnums.vrrp)}
           Destination=0.0.0.0/0
           Table=${slave_default_route.table_id}
 

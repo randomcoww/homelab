@@ -29,16 +29,24 @@ locals {
 }
 
 # templates #
+module "template-gateway-guest_interfaces" {
+  for_each = local.gateways.hosts
+
+  source                       = "./modules/guest_interfaces"
+  networks                     = local.common.networks
+  host_netnum                  = each.value.netnum
+  interfaces                   = each.value.interfaces
+  guest_interface_device_order = local.common.guest_interface_device_order
+}
+
 module "template-gateway" {
   for_each = local.gateways.hosts
 
-  source                 = "./modules/gateway"
-  hostname               = each.value.hostname
-  user                   = local.common.users.admin
-  networks               = local.common.networks
-  interfaces             = each.value.interfaces
-  interface_device_order = local.common.interface_device_order
-  container_images       = local.common.container_images
+  source           = "./modules/gateway"
+  hostname         = each.value.hostname
+  user             = local.common.users.admin
+  guest_interfaces = module.template-gateway-guest_interfaces[each.key].interfaces
+  container_images = local.common.container_images
   netnums = {
     host = each.value.netnum
     vrrp = local.ns.vrrp_netnum
@@ -67,6 +75,7 @@ version: 1.4.0
 EOT
   strict  = true
   snippets = concat(
+    module.template-gateway-guest_interfaces[each.key].ignition_snippets,
     module.template-gateway[each.key].ignition_snippets,
   )
 }

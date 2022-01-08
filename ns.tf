@@ -45,19 +45,27 @@ locals {
 }
 
 # templates #
+module "template-ns-guest_interfaces" {
+  for_each = local.ns.hosts
+
+  source                       = "./modules/guest_interfaces"
+  networks                     = local.common.networks
+  host_netnum                  = each.value.netnum
+  interfaces                   = each.value.interfaces
+  guest_interface_device_order = local.common.guest_interface_device_order
+}
+
 module "template-ns" {
   for_each = local.ns.hosts
 
-  source                 = "./modules/ns"
-  hostname               = each.value.hostname
-  user                   = local.common.users.admin
-  networks               = local.common.networks
-  interfaces             = each.value.interfaces
-  domains                = local.common.domains
-  dhcp_server            = local.ns.dhcp_server
-  ssh_ca                 = local.common.ca.ssh
-  interface_device_order = local.common.interface_device_order
-  container_images       = local.common.container_images
+  source           = "./modules/ns"
+  hostname         = each.value.hostname
+  user             = local.common.users.admin
+  guest_interfaces = module.template-ns-guest_interfaces[each.key].interfaces
+  domains          = local.common.domains
+  dhcp_server      = local.ns.dhcp_server
+  ssh_ca           = local.common.ca.ssh
+  container_images = local.common.container_images
   netnums = {
     host         = each.value.netnum
     vrrp         = local.ns.vrrp_netnum
@@ -73,6 +81,19 @@ module "template-ns" {
   ]
 }
 
+module "template-ns-ssh_server" {
+  for_each = local.ns.hosts
+
+  source     = "./modules/ssh_server"
+  key_id     = each.value.hostname
+  user_names = [local.common.users.admin.name]
+  valid_principals = compact(concat([each.value.hostname, "127.0.0.1"], flatten([
+    for interface in values(module.template-ns-guest_interfaces[each.key].interfaces) :
+    try(cidrhost(interface.prefix, each.value.netnum), null)
+  ])))
+  ssh_ca = local.common.ca.ssh
+}
+
 # combine and render a single ignition file #
 data "ct_config" "ns" {
   for_each = local.ns.hosts
@@ -84,7 +105,9 @@ version: 1.4.0
 EOT
   strict  = true
   snippets = concat(
+    module.template-ns-guest_interfaces[each.key].ignition_snippets,
     module.template-ns[each.key].ignition_snippets,
+    module.template-ns-ssh_server[each.key].ignition_snippets,
   )
 }
 

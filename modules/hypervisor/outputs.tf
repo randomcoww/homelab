@@ -1,7 +1,7 @@
 
 
 output "ignition_snippets" {
-  value = concat([
+  value = [
     for f in concat(tolist(fileset(".", "${path.module}/ignition/*.yaml")), [
       "${path.root}/common_templates/ignition/base.yaml",
       "${path.root}/common_templates/ignition/server.yaml",
@@ -20,9 +20,7 @@ output "ignition_snippets" {
       internal_interface         = local.internal_interface
       certs                      = local.certs
     })
-    ],
-    local.module_ignition_snippets,
-  )
+  ]
 }
 
 output "hardware_interfaces" {

@@ -24,7 +24,7 @@ variable "interfaces" {
   default = {}
 }
 
-variable "interface_device_order" {
+variable "guest_interface_device_order" {
   type    = list(string)
   default = []
 }

@@ -78,11 +78,3 @@ variable "libvirt_ca" {
     cert_pem        = string
   })
 }
-
-variable "ssh_ca" {
-  type = object({
-    algorithm          = string
-    private_key_pem    = string
-    public_key_openssh = string
-  })
-}

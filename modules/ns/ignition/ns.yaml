@@ -8,12 +8,12 @@ systemd:
 
 storage:
   files:
-    - path: /etc/systemd/network/20-${interfaces.lan.interface_name}.network.d/default-route.conf
+    - path: /etc/systemd/network/20-${guest_interfaces.lan.interface_name}.network.d/default-route.conf
       mode: 0644
       contents:
         inline: |
           [Route]
-          Gateway=${cidrhost(interfaces.lan.prefix, netnums.host)}
+          Gateway=${cidrhost(guest_interfaces.lan.prefix, netnums.host)}
           Destination=0.0.0.0/0
 
           [Network]
@@ -103,9 +103,9 @@ storage:
               }
               "interfaces-config" = {
                 "interfaces" = [
-                  for network_name, interface in interfaces :
-                    cidrhost(interface.prefix, netnums.host)
-                    if lookup(interface, "enable_dhcp_server", false) && lookup(interface, "enable_netnum", false)
+                  for network_name, guest_interface in guest_interfaces :
+                    cidrhost(guest_interface.prefix, netnums.host)
+                    if lookup(guest_interface, "enable_dhcp_server", false) && lookup(guest_interface, "enable_netnum", false)
                 ]
               }
               "control-socket" = {
@@ -119,7 +119,7 @@ storage:
                 },
                 {
                   "name" = "domain-name-servers"
-                  "data" = cidrhost(interfaces.lan.prefix, netnums.vrrp)
+                  "data" = cidrhost(guest_interfaces.lan.prefix, netnums.vrrp)
                   "csv-format" = true
                 },
               ]
@@ -141,7 +141,7 @@ storage:
                           {
                             name = kea_peer.name
                             role = kea_peer.role
-                            url = "http://${cidrhost(interfaces.lan.prefix, kea_peer.netnum)}:${ports.kea_peer}/"
+                            url = "http://${cidrhost(guest_interfaces.lan.prefix, kea_peer.netnum)}:${ports.kea_peer}/"
                             auto-failover = true
                           }
                         ]
@@ -155,52 +155,52 @@ storage:
                   "name" = "ipxe_detected"
                   "test" = "substring(option[77].hex,0,4) == 'iPXE'"
                   "boot-file-name" = "http://${cidrhost(
-                    interfaces.lan.prefix,
+                    guest_interfaces.lan.prefix,
                     netnums.host
                   )}:${ports.pxe_http}/boot.ipxe"
                 },
                 {
                   "name" = "ipxe"
                   "test" = "not(substring(option[77].hex,0,4) == 'iPXE') and (option[93].hex == 0x0000)"
-                  "next-server" = cidrhost(interfaces.lan.prefix, netnums.host)
+                  "next-server" = cidrhost(guest_interfaces.lan.prefix, netnums.host)
                   "boot-file-name" = "/undionly.kpxe"
                 },
                 {
                   "name" = "ipxe_efi"
                   "test" = "not(substring(option[77].hex,0,4) == 'iPXE') and (option[93].hex == 0x0007)"
-                  "next-server" = cidrhost(interfaces.lan.prefix, netnums.host)
+                  "next-server" = cidrhost(guest_interfaces.lan.prefix, netnums.host)
                   "boot-file-name" = "/ipxe.efi"
                 },
               ]
               "subnet4" = [
-                for network_name, interface in interfaces :
+                for network_name, guest_interface in guest_interfaces :
                 {
-                  subnet = interface.prefix,
+                  subnet = guest_interface.prefix,
                   option-data = concat(
                     try([
                       {
                         name = "routers"
-                        data = cidrhost(interface.network, netnums.gateway_vrrp)
+                        data = cidrhost(guest_interface.network, netnums.gateway_vrrp)
                       }
                     ], []),
                     try([
                       {
                         name = "interface-mtu"
-                        data = format("%s", interface.mtu)
+                        data = format("%s", guest_interface.mtu)
                       }
                     ], [])
                   )
                   pools = [
                     {
                       pool = cidrsubnet(
-                        interface.prefix,
+                        guest_interface.prefix,
                         dhcp_server.newbit,
                         dhcp_server.netnum,
                       )
                     }
                   ]
                 }
-                if lookup(interface, "enable_dhcp_server", false) && lookup(interface, "enable_netnum", false)
+                if lookup(guest_interface, "enable_dhcp_server", false) && lookup(guest_interface, "enable_netnum", false)
               ]
               "dhcp-ddns" = {
                 "enable-updates" = true
@@ -226,12 +226,12 @@ storage:
             state BACKUP
             advert_int 0.1
             virtual_router_id 290
-            interface ${interfaces.lan.interface_name}
+            interface ${guest_interfaces.lan.interface_name}
             priority 250
             virtual_ipaddress {
-              %{~ for network_name, interface in interfaces ~}
-              %{~ if lookup(interface, "enable_vrrp_netnum", false) ~}
-              ${cidrhost(interface.prefix, netnums.vrrp)} dev ${interface.interface_name}
+              %{~ for network_name, guest_interface in guest_interfaces ~}
+              %{~ if lookup(guest_interface, "enable_vrrp_netnum", false) ~}
+              ${cidrhost(guest_interface.prefix, netnums.vrrp)} dev ${guest_interface.interface_name}
               %{~ endif ~}
               %{~ endfor ~}
             }

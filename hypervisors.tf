@@ -60,7 +60,6 @@ module "template-hypervisor" {
   internal_interface  = local.hypervisors.internal_interface
   matchbox_ca         = local.common.ca.matchbox
   libvirt_ca          = local.common.ca.libvirt
-  ssh_ca              = local.common.ca.ssh
   container_images    = local.common.container_images
 }
 
@@ -69,6 +68,22 @@ module "template-hypervisor-disks" {
 
   source = "./modules/disks"
   disks  = each.value.disks
+}
+
+module "template-hypervisor-ssh_server" {
+  for_each = local.hypervisors.hosts
+
+  source     = "./modules/ssh_server"
+  key_id     = each.value.hostname
+  user_names = [local.common.users.admin.name]
+  valid_principals = compact(concat([each.value.hostname, "127.0.0.1"], flatten([
+    for hardware_interface in values(module.template-hypervisor[each.key].hardware_interfaces) :
+    [
+      for interface in values(hardware_interface.interfaces) :
+      try(cidrhost(interface.prefix, hardware_interface.netnum), null)
+    ]
+  ])))
+  ssh_ca = local.common.ca.ssh
 }
 
 # combine and render a single ignition file #
@@ -84,6 +99,7 @@ EOT
   snippets = concat(
     module.template-hypervisor[each.key].ignition_snippets,
     module.template-hypervisor-disks[each.key].ignition_snippets,
+    module.template-hypervisor-ssh_server[each.key].ignition_snippets,
   )
 }
 
