@@ -20,24 +20,31 @@ tw() {
 
 ### Define secrets
 
+#### Generate SSH key as needed
+
 ```
+KEY=$HOME/.ssh/id_ecdsa
+ssh-keygen -q -t ecdsa -N '' -f $KEY 2>/dev/null <<< y >/dev/null
+```
+
+#### Update secrets file
+
+```
+KEY=$HOME/.ssh/id_ecdsa
 cat > secrets.tfvars <<EOF
 users = {
+  admin = {
+    password_hash = "$(echo 'password' | mkpasswd -m sha-512 -s)"
+  }
   client = {
     password_hash = "$(echo 'password' | mkpasswd -m sha-512 -s)"
   }
 }
-wireguard_config = {
-  Interface = {
-    PrivateKey =
-    Address    =
-    DNS        =
-  }
-  Peer = {
-    PublicKey  =
-    AllowedIPs =
-    Endpoint   =
-  }
+ssh_client = {
+  key_id = "$(whoami)"
+  public_key = "ssh_client_public_key=$(cat $KEY.pub)"
+  early_renewal_hours = 168
+  validity_period_hours = 336
 }
 EOF
 ```
@@ -45,13 +52,20 @@ EOF
 ### Run
 
 ```
-tw terraform apply
+tw terraform apply -var-file=secrets.tfvars
+```
+
+### Sign local SSH key
+
+```
+KEY=$HOME/.ssh/id_ecdsa
+tw terraform output -raw ssh_client_cert_authorized_key > $KEY-cert.pub
 ```
 
 ### Cleanup
 
 ```
-tw find ../ -name '*.tf' -exec terraform fmt '{}' \;
+tw find . -name '*.tf' -exec terraform fmt '{}' \;
 ```
 
 ### Image build

@@ -10,5 +10,8 @@ terraform {
       source  = "poseidon/ct"
       version = "0.9.1"
     }
+    ssh = {
+      source = "github.com/randomcoww/ssh"
+    }
   }
 }
