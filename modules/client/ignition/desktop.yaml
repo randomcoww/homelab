@@ -86,10 +86,8 @@ storage:
           [org/gnome/desktop/interface]
           enable-hot-corners=false
 
-          [org/gtk/settings/file-chooser]
-          show-hidden=true
-          show-size-column=true
-          show-type-column=true
+          [org/gnome/system/location]
+          enabled=true
 
     # misc configs #
     - path: /etc/tmux.conf

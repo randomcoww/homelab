@@ -9,7 +9,7 @@ locals {
             partitions = [
               {
                 mount_path = "/var/home"
-                wipe       = true
+                wipe       = false
               },
             ]
           }
