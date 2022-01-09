@@ -27,3 +27,12 @@ storage:
       contents:
         inline:
           ${hostname}
+
+passwd:
+  users:
+    ${indent(4, yamlencode(
+      concat(users, [{
+        name = "core"
+        should_exist = false
+      }])
+    ))}

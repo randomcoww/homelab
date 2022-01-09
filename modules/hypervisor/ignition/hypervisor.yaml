@@ -198,7 +198,3 @@ storage:
         inline: "${replace(cert.content, "\n", "\\n")}"
     %{~ endfor ~}
     %{~ endfor ~}
-
-passwd:
-  users:
-    ${indent(4, yamlencode([user]))}

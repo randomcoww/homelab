@@ -18,6 +18,30 @@ tw() {
 }
 ```
 
+### Define secrets
+
+```
+cat > secrets.tfvars <<EOF
+users = {
+  client = {
+    password_hash = "$(echo 'password' | mkpasswd -m sha-512 -s)"
+  }
+}
+wireguard_config = {
+  Interface = {
+    PrivateKey =
+    Address    =
+    DNS        =
+  }
+  Peer = {
+    PublicKey  =
+    AllowedIPs =
+    Endpoint   =
+  }
+}
+EOF
+```
+
 ### Run
 
 ```

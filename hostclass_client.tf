@@ -5,11 +5,11 @@ locals {
         hostname = "clients-0.${local.config.domains.internal_mdns}"
         disks = {
           pv = {
-            device = "/dev/disk/by-id/nvme-SKHynix_HFS512GDE9X084N_CYA8N037413008I5H"
+            device = "/dev/disk/by-id/ata-INTEL_SSDSA2BZ100G3D_CVLV2345008U100AGN"
             partitions = [
               {
                 mount_path = "/var/home"
-                wipe       = false
+                wipe       = true
               },
             ]
           }

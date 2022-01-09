@@ -86,6 +86,11 @@ storage:
           [org/gnome/desktop/interface]
           enable-hot-corners=false
 
+          [org/gtk/settings/file-chooser]
+          show-hidden=true
+          show-size-column=true
+          show-type-column=true
+
     # misc configs #
     - path: /etc/tmux.conf
       mode: 0644

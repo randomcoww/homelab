@@ -1,18 +1,13 @@
 
 
 output "ignition_snippets" {
-  value = [
-    for f in concat(tolist(fileset(".", "${path.module}/ignition/*.yaml")), [
-      "${path.root}/common_templates/ignition/base.yaml",
-      "${path.root}/common_templates/ignition/server.yaml",
-    ]) :
+  value = concat([
+    for f in fileset(".", "${path.module}/ignition/*.yaml") :
     templatefile(f, {
       matchbox_data_path         = "/etc/matchbox/data"
       matchbox_assets_path       = "/etc/matchbox/assets"
       pxeboot_image_path         = "/run/media/iso/images/pxeboot"
       kea_config_path            = "/etc/kea/kea-dhcp4-internal.conf"
-      user                       = var.user
-      hostname                   = var.hostname
       ports                      = var.ports
       container_images           = var.container_images
       container_image_load_paths = var.container_image_load_paths
@@ -20,7 +15,14 @@ output "ignition_snippets" {
       internal_interface         = local.internal_interface
       certs                      = local.certs
     })
-  ]
+    ], [
+    templatefile("${path.root}/common_templates/ignition/base.yaml", {
+      users    = [var.user]
+      hostname = var.hostname
+    }),
+    templatefile("${path.root}/common_templates/ignition/server.yaml", {
+    }),
+  ])
 }
 
 output "hardware_interfaces" {

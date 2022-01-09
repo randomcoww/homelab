@@ -60,7 +60,7 @@ systemd:
         ExecStartPre=-/usr/bin/podman rm kubelet
         ExecStart=/usr/bin/podman run --rm -it \
           $KUBELET_PODMAN_OPTS \
-          ${container_images.kubelet} \
+          ${kubelet_container_image} \
             kubelet \
               $KUBELET_COMMON_ARGS \
               --config=${kubelet_config_path}/kubelet-config-common.yaml \

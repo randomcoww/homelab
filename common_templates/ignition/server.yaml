@@ -109,12 +109,3 @@ storage:
           [Network]
           LinkLocalAddressing=false
           DHCP=false
-
-# Remove users baked into standard CoreOS image
-passwd:
-  users:
-    - name: core
-      should_exist: false
-  groups:
-    - name: core
-      should_exist: false

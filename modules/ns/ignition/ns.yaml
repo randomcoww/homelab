@@ -353,7 +353,3 @@ storage:
             - name: config-keepalived
               hostPath:
                 path: ${pod_mount_path}/keepalived/keepalived.conf
-
-passwd:
-  users:
-    ${indent(4, yamlencode([user]))}
