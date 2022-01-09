@@ -25,7 +25,7 @@ systemd:
         RestartSec=10
         ExecStartPre=/usr/bin/mkdir -p \
           ${matchbox_data_path}
-        ExecStartPre=/usr/bin/podman load -i \
+        ExecStartPre=-/usr/bin/podman load -i \
           ${container_image_load_paths.matchbox}
         ExecStartPre=-/usr/bin/podman kill matchbox
         ExecStartPre=-/usr/bin/podman rm matchbox
