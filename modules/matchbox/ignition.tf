@@ -11,7 +11,7 @@ resource "matchbox_profile" "ignition" {
 resource "matchbox_group" "ignition" {
   for_each = var.hosts
 
-  profile = matchbox_profile[each.key].ignition.name
+  profile = matchbox_profile.ignition[each.key].name
   name    = each.key
   selector = {
     mac = each.value.pxeboot_macaddress

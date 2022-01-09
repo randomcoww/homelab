@@ -33,9 +33,9 @@
     %{~ endfor ~}
     <controller type='usb' model='none'/>
     <controller type='scsi' model='virtio-scsi'/>
-    <disk type='file' device='cdrom'>
+    <disk type='block' device='cdrom'>
       <driver name='qemu' type='raw'/>
-      <source file='/dev/disk/by-label/${system_image_tag}'/>
+      <source dev='/dev/disk/by-label/${system_image_tag}'/>
       <target dev='sda' bus='scsi'/>
       <readonly/>
     </disk>

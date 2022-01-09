@@ -62,6 +62,12 @@ KEY=$HOME/.ssh/id_ecdsa
 tw terraform output -raw ssh_client_cert_authorized_key > $KEY-cert.pub
 ```
 
+#### Hit libvirt over SSH
+
+```
+virsh -c qemu+ssh://fcos@hypervisor-0.local/system list --all
+```
+
 ### Cleanup
 
 ```
