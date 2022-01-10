@@ -50,9 +50,9 @@ locals {
     container_images = {
       conntrackd = "ghcr.io/randomcoww/conntrackd:latest"
       kubelet    = "ghcr.io/randomcoww/kubernetes:kubelet-v1.22.4"
-      kea        = "docker.io/randomcoww/kea:latest"
-      tftpd      = "docker.io/randomcoww/tftpd-ipxe:latest"
-      coredns    = "docker.io/coredns/coredns:1.8.0"
+      kea        = "ghcr.io/randomcoww/kea:2.0.0"
+      tftpd      = "ghcr.io/randomcoww/tftpd-ipxe:master"
+      coredns    = "docker.io/coredns/coredns:latest"
     }
 
     ca = {

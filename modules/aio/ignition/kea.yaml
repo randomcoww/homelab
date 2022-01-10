@@ -40,7 +40,7 @@ storage:
               interfaces-config = {
                 interfaces = [
                   for network_name, interface in interfaces :
-                  cidrhost(interface.prefix, netnums.host)
+                  interface.interface_name
                   if lookup(interface, "enable_dhcp_server", false) && lookup(interface, "enable_netnum", false)
                 ]
               }
@@ -48,7 +48,7 @@ storage:
                 socket-type = "unix"
                 socket-name = "${kea_shared_path}/kea-dhcp4-ctrl.sock"
               }
-              hooks-libraries = [
+              hooks-libraries = length(kea_peers) > 1 ? [
                 {
                   library = "${kea_hooks_libraries_path}/libdhcp_lease_cmds.so",
                   parameters = {}
@@ -74,7 +74,7 @@ storage:
                     ]
                   }
                 },
-              ]
+              ] : [],
               client-classes = [
                 {
                   name = "ipxe_detected"
@@ -100,7 +100,7 @@ storage:
                   option-data = [
                     {
                       name = "routers"
-                      data = cidrhost(interface.network, netnums.vrrp)
+                      data = cidrhost(interface.prefix, netnums.vrrp)
                     },
                     {
                       name = "interface-mtu"

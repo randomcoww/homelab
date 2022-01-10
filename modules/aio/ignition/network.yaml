@@ -60,13 +60,13 @@ storage:
           [Network]
           LinkLocalAddressing=false
           DHCP=false
-          %{~ for network_name, tap_interface in tap_interfaces ~}
-          %{~ if lookup(tap_interface, "enable_netnum", false) || lookup(tap_interface, "enable_dhcp", false) ~}
-          %{~ if tap_interface.hardware_interface_name == hardware_interface_name ~}
-          MACVTAP=${tap_interface.interface_name}
+          %{~ if can(tap_interfaces[network_name]) ~}
+          %{~ if tap_interfaces[network_name].hardware_interface_name == hardware_interface_name ~}
+          %{~ if lookup(tap_interfaces[network_name], "enable_netnum", false) || lookup(tap_interfaces[network_name], "enable_dhcp", false) ~}
+          MACVTAP=${tap_interfaces[network_name].interface_name}
           %{~ endif ~}
           %{~ endif ~}
-          %{~ endfor ~}
+          %{~ endif ~}
     %{~ endfor ~}
     %{~ endfor ~}
 
@@ -79,6 +79,7 @@ storage:
           [NetDev]
           Name=${tap_interface.interface_name}
           Kind=macvtap
+          MACAddress=${lookup(tap_interface, "macaddress", "")}
 
           [MACVTAP]
           Mode=bridge

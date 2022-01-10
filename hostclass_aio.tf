@@ -19,6 +19,7 @@ locals {
           lan = {
             hardware_interface_name = "phy0"
             enable_mdns             = true
+            enable_netnum           = true
             enable_vrrp_netnum      = true
             enable_dhcp_server      = true
             mtu                     = 9000
@@ -32,6 +33,7 @@ locals {
           wan = {
             hardware_interface_name = "phy0"
             enable_dhcp             = true
+            macaddress              = "52-54-00-63-6e-b3"
           }
         }
         disks = {

@@ -27,7 +27,7 @@ storage:
       contents:
         inline: |-
           global_defs {
-            vrrp_version 2
+            vrrp_version 3
             vrrp_iptables
             nftables keepalived
             dynamic_interfaces allow_if_changes
