@@ -9,6 +9,7 @@ locals {
           "sudo",
           "systemd-journal",
           "wheel",
+          "libvirt",
         ]
       }
       client = {
@@ -20,6 +21,7 @@ locals {
           "sudo",
           "systemd-journal",
           "wheel",
+          "libvirt",
         ]
       }
     }
@@ -28,6 +30,7 @@ locals {
       internal = {
         network = "192.168.224.0"
         cidr    = 24
+        vlan_id = 100
       }
       lan = {
         network = "192.168.126.0"
@@ -80,6 +83,12 @@ locals {
         public_key_openssh = tls_private_key.ssh-ca.public_key_openssh
       }
     }
+
+    # http path to kubernetes matchbox
+    pxeboot_file_name = "http://192.168.126.127/boot.ipxe"
+
+    # kubernetes external dns
+    internal_dns_ip = "192.168.126.126"
   }
 }
 
