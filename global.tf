@@ -27,11 +27,6 @@ locals {
     }
 
     networks = {
-      internal = {
-        network = "192.168.224.0"
-        cidr    = 24
-        vlan_id = 100
-      }
       lan = {
         network = "192.168.126.0"
         cidr    = 23
@@ -58,20 +53,9 @@ locals {
       kea        = "docker.io/randomcoww/kea:latest"
       tftpd      = "docker.io/randomcoww/tftpd-ipxe:latest"
       coredns    = "docker.io/coredns/coredns:1.8.0"
-      keepalived = "docker.io/randomcoww/keepalived:latest"
-      matchbox   = "quay.io/poseidon/matchbox:latest"
-    }
-
-    system_image_tags = {
-      server = "fedora-coreos-35.20220107.0"
     }
 
     ca = {
-      matchbox = {
-        algorithm       = tls_private_key.matchbox-ca.algorithm
-        private_key_pem = tls_private_key.matchbox-ca.private_key_pem
-        cert_pem        = tls_self_signed_cert.matchbox-ca.cert_pem
-      }
       libvirt = {
         algorithm       = tls_private_key.libvirt-ca.algorithm
         private_key_pem = tls_private_key.libvirt-ca.private_key_pem
@@ -98,32 +82,6 @@ resource "tls_private_key" "ssh-ca" {
   ecdsa_curve = "P521"
 }
 
-# matchbox CA #
-resource "tls_private_key" "matchbox-ca" {
-  algorithm   = "ECDSA"
-  ecdsa_curve = "P521"
-}
-
-resource "tls_self_signed_cert" "matchbox-ca" {
-  key_algorithm   = tls_private_key.matchbox-ca.algorithm
-  private_key_pem = tls_private_key.matchbox-ca.private_key_pem
-
-  validity_period_hours = 8760
-  is_ca_certificate     = true
-
-  subject {
-    common_name  = "matchbox"
-    organization = "matchbox"
-  }
-
-  allowed_uses = [
-    "cert_signing",
-    "key_encipherment",
-    "server_auth",
-    "client_auth",
-  ]
-}
-
 # libvirt CA #
 resource "tls_private_key" "libvirt-ca" {
   algorithm   = "ECDSA"
@@ -146,38 +104,6 @@ resource "tls_self_signed_cert" "libvirt-ca" {
     "cert_signing",
     "crl_signing",
     "digital_signature",
-  ]
-}
-
-# matchbox cient #
-resource "tls_private_key" "matchbox-client" {
-  algorithm   = tls_private_key.matchbox-ca.algorithm
-  ecdsa_curve = "P521"
-}
-
-resource "tls_cert_request" "matchbox-client" {
-  key_algorithm   = tls_private_key.matchbox-client.algorithm
-  private_key_pem = tls_private_key.matchbox-client.private_key_pem
-
-  subject {
-    common_name  = "matchbox"
-    organization = "matchbox"
-  }
-}
-
-resource "tls_locally_signed_cert" "matchbox-client" {
-  cert_request_pem   = tls_cert_request.matchbox-client.cert_request_pem
-  ca_key_algorithm   = tls_private_key.matchbox-ca.algorithm
-  ca_private_key_pem = tls_private_key.matchbox-ca.private_key_pem
-  ca_cert_pem        = tls_self_signed_cert.matchbox-ca.cert_pem
-
-  validity_period_hours = 8760
-
-  allowed_uses = [
-    "key_encipherment",
-    "digital_signature",
-    "server_auth",
-    "client_auth",
   ]
 }
 
