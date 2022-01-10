@@ -61,6 +61,10 @@
       <source mode='bind' path='/var/run/libvirt/qga-${name}.sock'/>
       <target type='virtio' name='org.qemu.guest_agent.0'/>
     </channel>
+    <graphics type='spice' autoport='yes' listen='0.0.0.0'/>
+    <video>
+      <model type='virtio'/>
+    </video>
     <memballoon model='virtio'/>
     <rng model='virtio'>
       <backend model='random'>/dev/urandom</backend>

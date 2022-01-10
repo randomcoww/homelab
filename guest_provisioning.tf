@@ -3,25 +3,6 @@ locals {
   hypervisor_guest_preprocess = {
     hypervisor-0 = {
       guests = {
-        gateway-0 = {
-          vcpu   = 1
-          memory = 512
-          # pxeboot_macaddress = <assigned>
-          interfaces = {
-            internal = {
-              hypervisor_interface_name = "internal"
-            }
-            lan = {
-              hypervisor_interface_name = "phy0-lan"
-            }
-            sync = {
-              hypervisor_interface_name = "phy0-sync"
-            }
-            wan = {
-              hypervisor_interface_name = "phy0-wan"
-            }
-          }
-        }
         ns-0 = {
           vcpu   = 1
           memory = 512
@@ -77,7 +58,6 @@ module "matchbox_hypervisor-0" {
         "elevator=noop",
         "initrd=initrd.img",
         "ignition.config.url=${local.hypervisor_endpoints.hypervisor-0.matchbox_http_endpoint}/ignition?mac=$${mac:hexhyp}",
-        "coreos.live.rootfs_url=${local.hypervisor_endpoints.hypervisor-0.matchbox_http_endpoint}/assets/rootfs.img",
         "ip=${local.guest_ignition_config[guest_name].guest_interface}:dhcp",
       ]
       raw_ignition       = local.guest_ignition_config[guest_name].ignition
@@ -102,6 +82,7 @@ module "libvirt-domains_hypervisor-0" {
       memory             = guest.memory
       pxeboot_macaddress = guest.pxeboot_macaddress
       pxeboot_interface  = local.hypervisor_hostclass_config.internal_interface.interface_name
+      hypervisor_devices = lookup(guest, "hypervisor_devices", [])
       interface_devices  = guest.interfaces
       system_image_tag   = local.config.system_image_tags.server
     }
