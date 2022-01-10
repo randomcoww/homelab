@@ -109,3 +109,10 @@ storage:
           [Network]
           LinkLocalAddressing=false
           DHCP=false
+    # ignore lid operations for running on laptop
+    - path: /etc/systemd/logind.conf.d/10-ignore-lid-switch.conf
+      contents:
+        inline: |-
+          HandleLidSwitch=ignore
+          HandleLidSwitchExternalPower=ignore
+          HandleLidSwitchDocked=ignore
