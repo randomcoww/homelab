@@ -13,15 +13,6 @@ systemd:
         Where=${partition.mount_path}
         Type=${partition.format}
         Options=${join(",", partition.mount_options)}
-    - name: ${partition.systemd_unit_name}.automount
-      enabled: true
-      contents: |
-        [Unit]
-        ConditionPathExists=${partition.device}
-
-        [Automount]
-        Where=${partition.mount_path}
-        TimeoutIdleSec=${partition.mount_timeout}
 
         [Install]
         WantedBy=local-fs.target

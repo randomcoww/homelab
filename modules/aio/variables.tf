@@ -113,3 +113,7 @@ variable "libvirt_ca" {
     cert_pem        = string
   })
 }
+
+variable "container_storage_path" {
+  type = string
+}

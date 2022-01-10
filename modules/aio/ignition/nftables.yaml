@@ -27,11 +27,9 @@ storage:
               iifname "lo" accept;
               iifname != "lo" ip daddr 127.0.0.1/8 drop;
 
-              iifname ${interfaces.lan.interface_name} udp sport bootps udp dport bootpc accept;
-              iifname ${interfaces.lan.interface_name} pkttype multicast accept;
-
-              iifname ${interfaces.lan.interface_name} accept;
-              iifname ${interfaces.sync.interface_name} accept;
+              iifname != ${interfaces.wan.interface_name} udp sport bootps udp dport bootpc accept;
+              iifname != ${interfaces.wan.interface_name} pkttype multicast accept;
+              iifname != ${interfaces.wan.interface_name} accept;
             }
 
             chain forward {

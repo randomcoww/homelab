@@ -4,7 +4,8 @@ locals {
   tap_interfaces = {
     for network_name, tap_interface in var.tap_interfaces :
     network_name => merge(var.networks[network_name], tap_interface, {
-      interface_name = "${tap_interface.hardware_interface_name}-${network_name}-tap"
+      interface_name      = network_name
+      vmac_interface_name = "${network_name}-vmac"
     })
   }
 

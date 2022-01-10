@@ -2,10 +2,10 @@ output "ignition_snippets" {
   value = compact([
     can(var.kea_peers[var.name]) ? templatefile("${path.module}/ignition/kea.yaml", {
       kubelet_config_path      = "/var/lib/kubelet"
+      pod_mount_path           = "/var/lib/kubelet/podconfig"
       name                     = var.name
       hostname                 = var.hostname
       dhcp_server              = var.dhcp_server
-      pod_mount_path           = "/var/lib/kubelet/podconfig"
       kea_shared_path          = var.kea_shared_path
       kea_hooks_libraries_path = var.kea_hooks_libraries_path
       kea_peers                = var.kea_peers
@@ -35,13 +35,20 @@ output "ignition_snippets" {
     templatefile("${path.module}/ignition/nftables.yaml", {
       interfaces = local.tap_interfaces
     }),
-    templatefile("${path.module}/ignition/vrrp.yaml", {
+    templatefile("${path.module}/ignition/keepalived.yaml", {
       interfaces                  = local.tap_interfaces
       master_default_route        = var.master_default_route
       slave_default_route         = var.slave_default_route
       upstream_dns_ip             = var.upstream_dns_ip
       upstream_dns_tls_servername = var.upstream_dns_tls_servername
       netnums                     = var.netnums
+    }),
+    templatefile("${path.module}/ignition/conntrackd.yaml", {
+      kubelet_config_path = "/var/lib/kubelet"
+      pod_mount_path      = "/var/lib/kubelet/podconfig"
+      interfaces          = local.tap_interfaces
+      container_images    = var.container_images
+      netnums             = var.netnums
     }),
     templatefile("${path.root}/common_templates/ignition/base.yaml", {
       users    = [var.user]
@@ -53,6 +60,9 @@ output "ignition_snippets" {
       kubelet_config_path     = "/var/lib/kubelet"
       kubelet_node_ip         = cidrhost(local.tap_interfaces.lan.prefix, var.netnums.host)
       kubelet_container_image = var.container_images.kubelet
+    }),
+    templatefile("${path.root}/common_templates/ignition/container_storage_path.yaml", {
+      container_storage_path = var.container_storage_path
     }),
   ])
 }

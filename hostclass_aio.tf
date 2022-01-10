@@ -41,7 +41,7 @@ locals {
             device = "/dev/disk/by-id/nvme-Samsung_SSD_970_EVO_1TB_S5H9NS0N986704R"
             partitions = [
               {
-                mount_path = "/var/lib/kubelet/pv"
+                mount_path = "/var/pv"
                 wipe       = false
               },
             ]
@@ -57,16 +57,17 @@ locals {
 module "template-aio" {
   for_each = local.aio_hostclass_config.hosts
 
-  source              = "./modules/aio"
-  name                = each.key
-  hostname            = each.value.hostname
-  user                = local.config.users.admin
-  networks            = local.config.networks
-  hardware_interfaces = each.value.hardware_interfaces
-  tap_interfaces      = each.value.tap_interfaces
-  dhcp_server         = local.aio_hostclass_config.dhcp_server
-  libvirt_ca          = local.config.ca.libvirt
-  container_images    = local.config.container_images
+  source                 = "./modules/aio"
+  name                   = each.key
+  hostname               = each.value.hostname
+  user                   = local.config.users.admin
+  networks               = local.config.networks
+  hardware_interfaces    = each.value.hardware_interfaces
+  tap_interfaces         = each.value.tap_interfaces
+  dhcp_server            = local.aio_hostclass_config.dhcp_server
+  libvirt_ca             = local.config.ca.libvirt
+  container_images       = local.config.container_images
+  container_storage_path = "${each.value.disks.pv.partitions[0].mount_path}/containers"
   netnums = {
     host = each.value.netnum
     vrrp = local.aio_hostclass_config.vrrp_netnum

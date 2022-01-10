@@ -13,5 +13,8 @@ output "ignition_snippets" {
       users    = [var.user]
       hostname = var.hostname
     }),
+    templatefile("${path.root}/common_templates/ignition/container_storage_path.yaml", {
+      container_storage_path = var.container_storage_path
+    }),
   ])
 }

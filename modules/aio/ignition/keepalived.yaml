@@ -18,9 +18,6 @@ systemd:
 
 storage:
   files:
-    # VRRPv3 currently fails with Invalid VRRPv3 checksum
-    # advert_int < 0.1 usually causes no interruption wih mpd remote stream
-    # Shadow stream still sees brief stutter with advert_int 0.01
     - path: /etc/keepalived/keepalived.conf
       mode: 0644
       overwrite: true
@@ -32,27 +29,52 @@ storage:
             nftables keepalived
             dynamic_interfaces allow_if_changes
             max_auto_priority -1
-            lvs_sync_daemon ${interfaces.sync.interface_name} VI_gateway
           }
-          vrrp_instance VI_gateway {
-            no_accept
+          vrrp_sync_group sync {
+            group {
+              %{~ for network_name, interface in interfaces ~}
+              %{~ if lookup(interface, "enable_vrrp_netnum", false) ~}
+              ${network_name}
+              %{~ endif ~}
+              %{~ endfor ~}
+              virtualrule
+            }
+          }
+          %{~ for network_name, interface in interfaces ~}
+          %{~ if lookup(interface, "enable_vrrp_netnum", false) ~}
+          vrrp_instance ${network_name} {
             nopreempt
             state BACKUP
             advert_int 0.02
-            virtual_router_id 250
+            virtual_router_id 100
+            interface ${interface.interface_name}
+            use_vmac ${interface.vmac_interface_name}
+            priority 250
+            garp_master_refresh 1
+            track_interface {
+              ${interface.interface_name}
+            }
+            virtual_ipaddress {
+              ${cidrhost(interface.prefix, netnums.vrrp)}
+            }
+          }
+          %{~ endif ~}
+          %{~ endfor ~}
+          vrrp_instance virtualrule {
+            nopreempt
+            state BACKUP
+            advert_int 0.02
+            virtual_router_id 110
             interface ${interfaces.sync.interface_name}
             priority 250
             garp_master_refresh 1
-            # garp_extra_if all 1
+            track_interface {
+              ${interfaces.wan.interface_name}
+            }
             virtual_rules {
               to all lookup ${master_default_route.table_id} priority ${master_default_route.table_priority}
             }
             virtual_ipaddress {
-              %{~ for network_name, interface in interfaces ~}
-              %{~ if lookup(interface, "enable_vrrp_netnum", false) ~}
-              ${cidrhost(interface.prefix, netnums.vrrp)} dev ${interface.interface_name}
-              %{~ endif ~}
-              %{~ endfor ~}
               0.0.0.0 dev ${interfaces.wan.interface_name}
             }
           }

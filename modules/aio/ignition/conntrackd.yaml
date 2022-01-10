@@ -1,0 +1,85 @@
+
+---
+variant: fcos
+version: 1.4.0
+storage:
+  files:
+    - path: ${pod_mount_path}/conntrackd/conntrackd.conf
+      mode: 0644
+      contents:
+        inline: |-
+          Sync {
+            Mode NOTRACK {
+              StartupResync on
+              DisableInternalCache on
+              DisableExternalCache on
+            }
+            Multicast {
+              IPv4_address 225.0.0.50
+              Group 3780
+              IPv4_interface ${cidrhost(interfaces.sync.prefix, netnums.host)}
+              Interface ${interfaces.sync.interface_name}
+              SndSocketBuffer 24985600
+              RcvSocketBuffer 24985600
+              Checksum on
+            }
+          }
+          General {
+            Systemd off
+            LogFile /dev/stdout
+            Syslog off
+            NetlinkBufferSize 2097152
+            NetlinkBufferSizeMaxGrowth 8388608
+            UNIX {
+              Path /var/run/conntrackd.ctl
+            }
+            Filter From Kernelspace {
+              Protocol Accept {
+                TCP
+                UDP
+              }
+              Address Ignore {
+                IPv4_address 127.0.0.1
+                IPv4_address ${cidrhost(interfaces.sync.prefix, netnums.host)}/${interfaces.sync.cidr}
+                %{~ for network_name, interface in interfaces ~}
+                %{~ if lookup(interface, "enable_netnum", false) ~}
+                IPv4_address ${cidrhost(interface.prefix, netnums.host)}
+                %{~ endif ~}
+                %{~ if lookup(interface, "enable_vrrp_netnum", false) ~}
+                IPv4_address ${cidrhost(interface.prefix, netnums.vrrp)}
+                %{~ endif ~}
+                %{~ endfor ~}
+              }
+            }
+          }
+    # pod manifests #
+    - path: ${kubelet_config_path}/manifests/conntrackd.yaml
+      mode: 0644
+      contents:
+        inline: |-
+          ---
+          apiVersion: v1
+          kind: Pod
+          metadata:
+            namespace: kube-system
+            name: conntrackd
+          spec:
+            restartPolicy: Always
+            hostNetwork: true
+            containers:
+            - name: conntrackd
+              image: ${container_images.conntrackd}
+              args: [ "-C", "/etc/conntrackd/conntrackd.conf" ]
+              securityContext:
+                capabilities:
+                  add:
+                  - NET_ADMIN
+                  - SYS_NICE
+              volumeMounts:
+              - name: config-volume
+                mountPath: /etc/conntrackd/conntrackd.conf
+                readOnly: true
+            volumes:
+            - name: config-volume
+              hostPath:
+                path: ${pod_mount_path}/conntrackd/conntrackd.conf

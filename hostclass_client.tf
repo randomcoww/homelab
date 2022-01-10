@@ -27,6 +27,7 @@ module "template-client" {
   hostname                  = each.value.hostname
   user                      = local.config.users.client
   ssh_ca_public_key_openssh = local.config.ca.ssh.public_key_openssh
+  container_storage_path    = "${each.value.disks.pv.partitions[0].mount_path}/containers"
 }
 
 module "template-client-disks" {
