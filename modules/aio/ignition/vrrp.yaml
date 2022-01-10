@@ -1,0 +1,99 @@
+---
+variant: fcos
+version: 1.4.0
+systemd:
+  units:
+    - name: keepalived.service
+      enabled: true
+      dropins:
+        - name: 10-dependency.conf
+          contents: |
+            [Unit]
+            Requires=nftables.service
+            PartOf=nftables.service
+
+            [Service]
+            EnvironmentFile=
+            Environment=KEEPALIVED_OPTIONS="-D -P"
+
+storage:
+  files:
+    # VRRPv3 currently fails with Invalid VRRPv3 checksum
+    # advert_int < 0.1 usually causes no interruption wih mpd remote stream
+    # Shadow stream still sees brief stutter with advert_int 0.01
+    - path: /etc/keepalived/keepalived.conf
+      mode: 0644
+      overwrite: true
+      contents:
+        inline: |-
+          global_defs {
+            vrrp_version 2
+            vrrp_iptables
+            nftables keepalived
+            dynamic_interfaces allow_if_changes
+            max_auto_priority -1
+            lvs_sync_daemon ${interfaces.sync.interface_name} VI_gateway
+          }
+          vrrp_instance VI_gateway {
+            no_accept
+            nopreempt
+            state BACKUP
+            advert_int 0.02
+            virtual_router_id 250
+            interface ${interfaces.sync.interface_name}
+            priority 250
+            garp_master_refresh 1
+            # garp_extra_if all 1
+            virtual_rules {
+              to all lookup ${master_default_route.table_id} priority ${master_default_route.table_priority}
+            }
+            virtual_ipaddress {
+              %{~ for network_name, interface in interfaces ~}
+              %{~ if lookup(interface, "enable_vrrp_netnum", false) ~}
+              ${cidrhost(interface.prefix, netnums.vrrp)} dev ${interface.interface_name}
+              %{~ endif ~}
+              %{~ endfor ~}
+              0.0.0.0 dev ${interfaces.wan.interface_name}
+            }
+          }
+
+    # Create fallback route so backup node can access the internet through the wan interface
+    - path: /etc/systemd/network/20-${interfaces.wan.interface_name}.network.d/20-master-default-route.conf
+      mode: 0644
+      contents:
+        inline: |
+          [Link]
+          RequiredForOnline=false
+
+          [DHCP]
+          Anonymize=true
+          # Needed to request IP on each gateway
+          RequestBroadcast=true
+          UseMTU=true
+          UseDNS=false
+          UseNTP=false
+          SendHostname=false
+          UseHostname=false
+          UseDomains=false
+          UseTimezone=false
+          ClientIdentifier=mac
+          RouteTable=${master_default_route.table_id}
+
+          [Network]
+          DNS=${upstream_dns_ip}#${upstream_dns_tls_servername}
+          DNSOverTLS=true
+          DNSDefaultRoute=true
+
+    - path: /etc/systemd/network/20-${interfaces.sync.interface_name}.network.d/20-slave-default-route.conf
+      mode: 0644
+      contents:
+        inline: |
+          [Route]
+          GatewayOnLink=true
+          Gateway=${cidrhost(interfaces.sync.prefix, netnums.vrrp)}
+          Destination=0.0.0.0/0
+          Table=${slave_default_route.table_id}
+
+          [RoutingPolicyRule]
+          Table=${slave_default_route.table_id}
+          Priority=${slave_default_route.table_priority}

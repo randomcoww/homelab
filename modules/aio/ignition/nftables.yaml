@@ -1,0 +1,50 @@
+---
+variant: fcos
+version: 1.4.0
+systemd:
+  units:
+    - name: nftables.service
+      enabled: true
+
+storage:
+  files:
+    - path: /etc/sysconfig/nftables.conf
+      mode: 0644
+      overwrite: true
+      contents:
+        inline: |-
+          table ip filter {
+            chain base_checks {
+              ct state {established, related} accept;
+              ct state invalid drop;
+              ip protocol icmp icmp type { echo-request, echo-reply, time-exceeded, parameter-problem, destination-unreachable } accept;
+            }
+
+            chain input {
+              type filter hook input priority 0; policy drop;
+              jump base_checks;
+
+              iifname "lo" accept;
+              iifname != "lo" ip daddr 127.0.0.1/8 drop;
+
+              iifname ${interfaces.lan.interface_name} udp sport bootps udp dport bootpc accept;
+              iifname ${interfaces.lan.interface_name} pkttype multicast accept;
+
+              iifname ${interfaces.lan.interface_name} accept;
+              iifname ${interfaces.sync.interface_name} accept;
+            }
+
+            chain forward {
+              type filter hook forward priority 0; policy drop;
+              jump base_checks;
+              oifname ${interfaces.wan.interface_name} accept;
+            }
+          }
+
+          table ip nat {
+            chain postrouting {
+              type nat hook postrouting priority 100; policy accept;
+              oifname ${interfaces.wan.interface_name} masquerade;
+            }
+          }
+          ;

@@ -1,0 +1,116 @@
+---
+variant: fcos
+version: 1.4.0
+storage:
+  files:
+    # hardware interface #
+    %{~ for hardware_interface_name, hardware_interface in hardware_interfaces ~}
+    - path: /etc/systemd/network/10-${hardware_interface_name}.link
+      mode: 0644
+      contents:
+        inline: |
+          [Match]
+          PermanentMACAddress=${hardware_interface.mac}
+
+          [Link]
+          MTUBytes=${lookup(hardware_interface, "mtu", 1500)}
+          MACAddressPolicy=persistent
+          Name=${hardware_interface_name}
+    - path: /etc/systemd/network/12-${hardware_interface_name}.network
+      mode: 0644
+      contents:
+        inline: |
+          [Match]
+          Name=${hardware_interface_name}
+
+          [Link]
+          ARP=false
+          MTUBytes=${lookup(hardware_interface, "mtu", 1500)}
+
+          [Network]
+          LinkLocalAddressing=false
+          DHCP=false
+          %{~ for network_name, network in networks ~}
+          VLAN=${hardware_interface_name}-${network_name}
+          %{~ endfor ~}
+
+    # VLAN interfaces
+    %{~ for network_name, network in networks ~}
+    - path: /etc/systemd/network/20-${hardware_interface_name}-${network_name}.netdev
+      mode: 0644
+      contents:
+        inline: |
+          [NetDev]
+          Name=${hardware_interface_name}-${network_name}
+          Kind=vlan
+
+          [VLAN]
+          Id=${network.vlan_id}
+    - path: /etc/systemd/network/22-${hardware_interface_name}-${network_name}.network
+      mode: 0644
+      contents:
+        inline: |
+          [Match]
+          Name=${hardware_interface_name}-${network_name}
+
+          [Link]
+          ARP=false
+          MTUBytes=${lookup(hardware_interface, "mtu", 1500)}
+
+          [Network]
+          LinkLocalAddressing=false
+          DHCP=false
+          %{~ for network_name, tap_interface in tap_interfaces ~}
+          %{~ if lookup(tap_interface, "enable_netnum", false) || lookup(tap_interface, "enable_dhcp", false) ~}
+          %{~ if tap_interface.hardware_interface_name == hardware_interface_name ~}
+          MACVTAP=${tap_interface.interface_name}
+          %{~ endif ~}
+          %{~ endif ~}
+          %{~ endfor ~}
+    %{~ endfor ~}
+    %{~ endfor ~}
+
+    # tap interfaces
+    %{~ for network_name, tap_interface in tap_interfaces ~}
+    - path: /etc/systemd/network/20-${tap_interface.interface_name}.netdev
+      mode: 0644
+      contents:
+        inline: |
+          [NetDev]
+          Name=${tap_interface.interface_name}
+          Kind=macvtap
+
+          [MACVTAP]
+          Mode=bridge
+    - path: /etc/systemd/network/22-${tap_interface.interface_name}.network
+      mode: 0644
+      contents:
+        inline: |
+          [Match]
+          Name=${tap_interface.interface_name}
+
+          [Link]
+          MTUBytes=${lookup(tap_interface, "mtu", 1500)}
+
+          [DHCP]
+          UseMTU=true
+          RouteMetric=${lookup(tap_interface, "metric", 1024)}
+
+          [Network]
+          LinkLocalAddressing=${lookup(tap_interface, "enable_linklocal", false)}
+          DHCP=${lookup(tap_interface, "enable_dhcp", false)}
+          MulticastDNS=${lookup(tap_interface, "enable_mdns", false)}
+          %{~ if lookup(tap_interface, "enable_netnum", false) ~}
+
+          [Address]
+          Address=${cidrhost(tap_interface.prefix, netnums.host)}/${tap_interface.cidr}
+          AddPrefixRoute=false
+
+          [Route]
+          Protocol=kernel
+          Scope=link
+          PreferredSource=${cidrhost(tap_interface.prefix, netnums.host)}
+          Destination=${tap_interface.prefix}
+          Metric=${lookup(tap_interface, "metric", 1024)}
+          %{~ endif ~}
+    %{~ endfor ~}
