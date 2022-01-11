@@ -89,9 +89,11 @@ storage:
         inline: |
           [Match]
           Name=${tap_interface.interface_name}
+          %{~ if !lookup(tap_interface, "enable_dhcp", false) ~}
 
           [Link]
           MTUBytes=${lookup(tap_interface, "mtu", 1500)}
+          %{~ endif ~}
 
           [DHCP]
           UseMTU=true

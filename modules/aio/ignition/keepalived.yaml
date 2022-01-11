@@ -80,7 +80,7 @@ storage:
           }
 
     # Create fallback route so backup node can access the internet through the wan interface
-    - path: /etc/systemd/network/20-${interfaces.wan.interface_name}.network.d/20-master-default-route.conf
+    - path: /etc/systemd/network/22-${interfaces.wan.interface_name}.network.d/20-master-default-route.conf
       mode: 0644
       contents:
         inline: |
@@ -106,7 +106,7 @@ storage:
           DNSOverTLS=true
           DNSDefaultRoute=true
 
-    - path: /etc/systemd/network/20-${interfaces.sync.interface_name}.network.d/20-slave-default-route.conf
+    - path: /etc/systemd/network/22-${interfaces.sync.interface_name}.network.d/20-slave-default-route.conf
       mode: 0644
       contents:
         inline: |
