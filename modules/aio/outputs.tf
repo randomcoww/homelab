@@ -14,9 +14,6 @@ output "ignition_snippets" {
       container_images         = var.container_images
       netnums                  = var.netnums
     }) : "",
-    templatefile("${path.module}/ignition/hypervisor.yaml", {
-      certs = local.certs
-    }),
     templatefile("${path.module}/ignition/dns.yaml", {
       kubelet_config_path         = "/var/lib/kubelet"
       pod_mount_path              = "/var/lib/kubelet/podconfig"
@@ -54,6 +51,9 @@ output "ignition_snippets" {
     templatefile("${path.root}/common_templates/ignition/base.yaml", {
       users    = [var.user]
       hostname = var.hostname
+    }),
+    templatefile("${path.root}/common_templates/ignition/hypervisor.yaml", {
+      certs = local.certs.libvirt
     }),
     templatefile("${path.root}/common_templates/ignition/server.yaml", {
     }),
