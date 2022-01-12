@@ -4,7 +4,7 @@ variant: fcos
 version: 1.4.0
 storage:
   files:
-    - path: ${pod_mount_path}/conntrackd/conntrackd.conf
+    - path: ${static_pod_config_path}/conntrackd/conntrackd.conf
       mode: 0644
       contents:
         inline: |-
@@ -53,7 +53,7 @@ storage:
             }
           }
     # pod manifests #
-    - path: ${kubelet_config_path}/manifests/conntrackd.yaml
+    - path: ${static_pod_manifest_path}/conntrackd.yaml
       mode: 0644
       contents:
         inline: |-
@@ -82,4 +82,4 @@ storage:
             volumes:
             - name: config-volume
               hostPath:
-                path: ${pod_mount_path}/conntrackd/conntrackd.conf
+                path: ${static_pod_config_path}/conntrackd/conntrackd.conf

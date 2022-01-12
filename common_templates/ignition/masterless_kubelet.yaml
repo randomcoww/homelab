@@ -44,6 +44,8 @@ systemd:
           -v /var/lib/containerd:/var/lib/containerd:z \
           -v /opt/cni/bin:/opt/cni/bin:z \
           -v ${kubelet_config_path}:${kubelet_config_path}:rshared,z \
+          -v ${static_pod_manifest_path}:${static_pod_manifest_path}:rshared,z \
+          -v ${static_pod_config_path}:${static_pod_config_path}:rshared,z \
           -v /var/log:/var/log \
           -v /var/run/lock:/var/run/lock:z"
         Environment=KUBELET_COMMON_ARGS="--exit-on-lock-contention \
@@ -105,7 +107,7 @@ storage:
               enabled: false
           authorization:
             mode: AlwaysAllow
-          staticPodPath: ${kubelet_config_path}/manifests
+          staticPodPath: ${static_pod_manifest_path}
           makeIPTablesUtilChains: false
           containerLogMaxSize: "10Mi"
           containerLogMaxFiles: 2

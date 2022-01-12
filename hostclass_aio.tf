@@ -1,7 +1,7 @@
 locals {
   aio_hostclass_config = {
     vrrp_netnum = 2
-    dhcp_server = {
+    dhcp_server_subnet = {
       newbit = 1
       netnum = 1
     }
@@ -11,8 +11,12 @@ locals {
         netnum   = 1
         hardware_interfaces = {
           phy0 = {
-            mac = "8c-8c-aa-e3-58-62"
-            mtu = 9000
+            mac   = "8c-8c-aa-e3-58-62"
+            mtu   = 9000
+            vlans = ["lan", "sync", "wan"]
+          }
+          wlan0 = {
+            mac = "b4-0e-de-fb-28-95"
           }
         }
         tap_interfaces = {
@@ -57,17 +61,14 @@ locals {
 module "template-aio" {
   for_each = local.aio_hostclass_config.hosts
 
-  source                 = "./modules/aio"
-  name                   = each.key
-  hostname               = each.value.hostname
-  user                   = local.config.users.admin
-  networks               = local.config.networks
-  hardware_interfaces    = each.value.hardware_interfaces
-  tap_interfaces         = each.value.tap_interfaces
-  dhcp_server            = local.aio_hostclass_config.dhcp_server
-  libvirt_ca             = local.config.ca.libvirt
-  container_images       = local.config.container_images
-  container_storage_path = "${each.value.disks.pv.partitions[0].mount_path}/containers"
+  source              = "./modules/aio"
+  hostname            = each.value.hostname
+  user                = local.config.users.admin
+  networks            = local.config.networks
+  hardware_interfaces = each.value.hardware_interfaces
+  tap_interfaces      = each.value.tap_interfaces
+  container_images    = local.config.container_images
+  dhcp_server_subnet  = local.aio_hostclass_config.dhcp_server_subnet
   netnums = {
     host = each.value.netnum
     vrrp = local.aio_hostclass_config.vrrp_netnum
@@ -75,16 +76,16 @@ module "template-aio" {
   kea_peers = {
     for host_key, host in local.aio_hostclass_config.hosts :
     host_key => {
-      name   = host.hostname
-      role   = host.kea_ha_role
-      netnum = host.netnum
-      port   = 58080
+      hostname = host.hostname
+      role     = lookup(host, "kea_ha_role", "backup")
+      netnum   = host.netnum
+      port     = local.config.ports.kea_peer
     }
-    if can(host.kea_ha_role)
   }
-  pxeboot_file_name = local.config.pxeboot_file_name
-  internal_dns_ip   = local.config.internal_dns_ip
-  internal_domain   = local.config.domains.internal
+  internal_dns_ip        = local.config.internal_dns_ip
+  internal_domain        = local.config.domains.internal
+  container_storage_path = "${each.value.disks.pv.partitions[0].mount_path}/containers"
+  pxeboot_file_name      = local.config.pxeboot_file_name
 }
 
 module "template-aio-disks" {

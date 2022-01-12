@@ -30,12 +30,12 @@ storage:
           [Network]
           LinkLocalAddressing=false
           DHCP=false
-          %{~ for network_name, network in networks ~}
+          %{~ for network_name, network in hardware_interface.vlans ~}
           VLAN=${hardware_interface_name}-${network_name}
           %{~ endfor ~}
 
     # VLAN interfaces
-    %{~ for network_name, network in networks ~}
+    %{~ for network_name, network in hardware_interface.vlans ~}
     - path: /etc/systemd/network/20-${hardware_interface_name}-${network_name}.netdev
       mode: 0644
       contents:
@@ -60,10 +60,10 @@ storage:
           [Network]
           LinkLocalAddressing=false
           DHCP=false
-          %{~ if can(tap_interfaces[network_name]) ~}
-          %{~ if tap_interfaces[network_name].hardware_interface_name == hardware_interface_name ~}
-          %{~ if lookup(tap_interfaces[network_name], "enable_netnum", false) || lookup(tap_interfaces[network_name], "enable_dhcp", false) ~}
-          MACVTAP=${tap_interfaces[network_name].interface_name}
+          %{~ if can(interfaces[network_name]) ~}
+          %{~ if interfaces[network_name].hardware_interface_name == hardware_interface_name ~}
+          %{~ if lookup(interfaces[network_name], "enable_netnum", false) || lookup(interfaces[network_name], "enable_dhcp", false) ~}
+          MACVTAP=${interfaces[network_name].interface_name}
           %{~ endif ~}
           %{~ endif ~}
           %{~ endif ~}
@@ -71,49 +71,49 @@ storage:
     %{~ endfor ~}
 
     # tap interfaces
-    %{~ for network_name, tap_interface in tap_interfaces ~}
-    - path: /etc/systemd/network/20-${tap_interface.interface_name}.netdev
+    %{~ for network_name, interface in interfaces ~}
+    - path: /etc/systemd/network/20-${interface.interface_name}.netdev
       mode: 0644
       contents:
         inline: |
           [NetDev]
-          Name=${tap_interface.interface_name}
+          Name=${interface.interface_name}
           Kind=macvtap
-          MACAddress=${lookup(tap_interface, "macaddress", "")}
+          MACAddress=${lookup(interface, "macaddress", "")}
 
           [MACVTAP]
           Mode=bridge
-    - path: /etc/systemd/network/22-${tap_interface.interface_name}.network
+    - path: /etc/systemd/network/22-${interface.interface_name}.network
       mode: 0644
       contents:
         inline: |
           [Match]
-          Name=${tap_interface.interface_name}
-          %{~ if !lookup(tap_interface, "enable_dhcp", false) ~}
+          Name=${interface.interface_name}
+          %{~ if !lookup(interface, "enable_dhcp", false) ~}
 
           [Link]
-          MTUBytes=${lookup(tap_interface, "mtu", 1500)}
+          MTUBytes=${lookup(interface, "mtu", 1500)}
           %{~ endif ~}
 
           [DHCP]
           UseMTU=true
-          RouteMetric=${lookup(tap_interface, "metric", 1024)}
+          RouteMetric=${lookup(interface, "metric", 1024)}
 
           [Network]
-          LinkLocalAddressing=${lookup(tap_interface, "enable_linklocal", false)}
-          DHCP=${lookup(tap_interface, "enable_dhcp", false)}
-          MulticastDNS=${lookup(tap_interface, "enable_mdns", false)}
-          %{~ if lookup(tap_interface, "enable_netnum", false) ~}
+          LinkLocalAddressing=${lookup(interface, "enable_linklocal", false)}
+          DHCP=${lookup(interface, "enable_dhcp", false)}
+          MulticastDNS=${lookup(interface, "enable_mdns", false)}
+          %{~ if lookup(interface, "enable_netnum", false) ~}
 
           [Address]
-          Address=${cidrhost(tap_interface.prefix, netnums.host)}/${tap_interface.cidr}
+          Address=${cidrhost(interface.prefix, netnums.host)}/${interface.cidr}
           AddPrefixRoute=false
 
           [Route]
           Protocol=kernel
           Scope=link
-          PreferredSource=${cidrhost(tap_interface.prefix, netnums.host)}
-          Destination=${tap_interface.prefix}
-          Metric=${lookup(tap_interface, "metric", 1024)}
+          PreferredSource=${cidrhost(interface.prefix, netnums.host)}
+          Destination=${interface.prefix}
+          Metric=${lookup(interface, "metric", 1024)}
           %{~ endif ~}
     %{~ endfor ~}

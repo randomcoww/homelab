@@ -68,7 +68,7 @@ storage:
               ${interfaces.wan.interface_name}
             }
             virtual_rules {
-              to all lookup ${master_default_route.table_id} priority ${master_default_route.table_priority}
+              to all lookup ${vrrp_master_default_route.table_id} priority ${vrrp_master_default_route.table_priority}
             }
             virtual_ipaddress {
               0.0.0.0 dev ${interfaces.wan.interface_name}
@@ -95,12 +95,7 @@ storage:
           UseDomains=false
           UseTimezone=false
           ClientIdentifier=mac
-          RouteTable=${master_default_route.table_id}
-
-          [Network]
-          DNS=${upstream_dns_ip}#${upstream_dns_tls_servername}
-          DNSOverTLS=true
-          DNSDefaultRoute=true
+          RouteTable=${vrrp_master_default_route.table_id}
 
     - path: /etc/systemd/network/22-${interfaces.sync.interface_name}.network.d/20-slave-default-route.conf
       mode: 0644
@@ -110,8 +105,8 @@ storage:
           GatewayOnLink=true
           Gateway=${cidrhost(interfaces.sync.prefix, netnums.vrrp)}
           Destination=0.0.0.0/0
-          Table=${slave_default_route.table_id}
+          Table=${vrrp_slave_default_route.table_id}
 
           [RoutingPolicyRule]
-          Table=${slave_default_route.table_id}
-          Priority=${slave_default_route.table_priority}
+          Table=${vrrp_slave_default_route.table_id}
+          Priority=${vrrp_slave_default_route.table_priority}

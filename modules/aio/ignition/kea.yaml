@@ -4,7 +4,7 @@ version: 1.4.0
 storage:
   files:
     # kea HA handler #
-    - path: ${pod_mount_path}/kea/kea-ctrl-agent.conf
+    - path: ${static_pod_config_path}/kea/kea-ctrl-agent.conf
       mode: 0644
       contents:
         inline: |-
@@ -22,7 +22,7 @@ storage:
           })}
 
     # kea for lan network #
-    - path: ${pod_mount_path}/kea/kea-dhcp4.conf
+    - path: ${static_pod_config_path}/kea/kea-dhcp4.conf
       mode: 0644
       overwrite: true
       contents:
@@ -64,9 +64,9 @@ storage:
                         peers =  [
                           for kea_peer in values(kea_peers) :
                           {
-                            name = kea_peer.name
+                            name = kea_peer.hostname
                             role = kea_peer.role
-                            url = "http://${cidrhost(interfaces.sync.prefix, netnums.host)}:${kea_peer.port}/"
+                            url = "http://${cidrhost(interfaces.sync.prefix, kea_peer.netnums)}:${kea_peer.port}/"
                             auto-failover = true
                           }
                         ]
@@ -123,7 +123,7 @@ storage:
           })}
 
     # pod manifests #
-    - path: ${kubelet_config_path}/manifests/kea.yaml
+    - path: ${static_pod_manifest_path}/kea.yaml
       mode: 0644
       contents:
         inline: |-
@@ -162,7 +162,7 @@ storage:
               emptyDir: {}
             - name: config-kea-ctrl-agent
               hostPath:
-                path: ${pod_mount_path}/kea/kea-ctrl-agent.conf
+                path: ${static_pod_config_path}/kea/kea-ctrl-agent.conf
             - name: config-kea-dhcp4
               hostPath:
-                path: ${pod_mount_path}/kea/kea-dhcp4.conf
+                path: ${static_pod_config_path}/kea/kea-dhcp4.conf

@@ -3,7 +3,7 @@ variant: fcos
 version: 1.4.0
 storage:
   files:
-    - path: ${pod_mount_path}/coredns/Corefile
+    - path: ${static_pod_config_path}/coredns/Corefile
       mode: 0644
       contents:
         inline: |-
@@ -23,7 +23,7 @@ storage:
             loadbalance
           }
 
-    - path: ${kubelet_config_path}/manifests/coredns.yaml
+    - path: ${static_pod_manifest_path}/coredns.yaml
       mode: 0644
       contents:
         inline: |-
@@ -70,4 +70,13 @@ storage:
             volumes:
             - name: config-coredns
               hostPath:
-                path: ${pod_mount_path}/coredns/Corefile
+                path: ${static_pod_config_path}/coredns/Corefile
+
+    - path: /etc/systemd/network/22-${interfaces.wan.interface_name}.network.d/10-upstream-dns.conf
+      mode: 0644
+      contents:
+        inline: |
+          [Network]
+          DNS=${upstream_dns_ip}#${upstream_dns_tls_servername}
+          DNSOverTLS=true
+          DNSDefaultRoute=true

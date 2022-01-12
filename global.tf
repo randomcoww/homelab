@@ -42,6 +42,13 @@ locals {
       }
     }
 
+    ports = {
+      kea_peer    = 58080
+      apiserver   = 58081
+      etcd_client = 58082
+      etcd_peer   = 58083
+    }
+
     domains = {
       internal_mdns = "local"
       internal      = "fuzzybunny.internal"
