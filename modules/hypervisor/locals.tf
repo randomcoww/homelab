@@ -1,7 +1,7 @@
 locals {
   certs = {
     libvirt = {
-      ca = {
+      ca_cert = {
         path    = "/etc/pki/CA/cacert.pem"
         content = var.libvirt_ca.cert_pem
       }
@@ -23,3 +23,4 @@ locals {
       }
     }
   }
+}

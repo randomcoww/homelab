@@ -1,3 +1,7 @@
+variable "interfaces" {
+  type = map(map(string))
+}
+
 variable "libvirt_ca" {
   type = object({
     algorithm       = string

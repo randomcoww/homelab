@@ -108,6 +108,14 @@ module "template-aio-ssh_server" {
   ssh_ca = local.config.ca.ssh
 }
 
+module "template-aio-hypervisor" {
+  for_each = local.aio_hostclass_config.hosts
+
+  source     = "./modules/hypervisor"
+  interfaces = module.template-aio[each.key].interfaces
+  libvirt_ca = local.config.ca.libvirt
+}
+
 # combine and render a single ignition file #
 data "ct_config" "aio" {
   for_each = local.aio_hostclass_config.hosts
@@ -122,6 +130,7 @@ EOT
     module.template-aio[each.key].ignition_snippets,
     module.template-aio-disks[each.key].ignition_snippets,
     module.template-aio-ssh_server[each.key].ignition_snippets,
+    module.template-aio-hypervisor[each.key].ignition_snippets,
   )
 }
 
