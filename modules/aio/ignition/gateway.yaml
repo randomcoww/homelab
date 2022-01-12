@@ -5,6 +5,14 @@ systemd:
   units:
     - name: nftables.service
       enabled: true
+      dropins:
+        - name: 10-namespace.conf
+          contents: |
+            [Service]
+            ExecReload=
+            ExecStop=
+            ExecReload=/sbin/nft 'delete table ${nftables_name}; include "/etc/sysconfig/nftables.conf";'
+            ExecStop=/sbin/nft delete table ${nftables_name}
 
 storage:
   files:
@@ -13,7 +21,7 @@ storage:
       overwrite: true
       contents:
         inline: |-
-          table ip filter {
+          table ip ${nftables_name} {
             chain base_checks {
               ct state {established, related} accept;
               ct state invalid drop;
@@ -37,9 +45,7 @@ storage:
               jump base_checks;
               oifname ${interfaces.wan.interface_name} accept;
             }
-          }
 
-          table ip nat {
             chain postrouting {
               type nat hook postrouting priority 100; policy accept;
               oifname ${interfaces.wan.interface_name} masquerade;

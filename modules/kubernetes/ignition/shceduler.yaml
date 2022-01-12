@@ -1,0 +1,74 @@
+---
+variant: fcos
+version: 1.4.0
+storage:
+  files:
+    - path: ${controller_mount_path}/kube-scheduler.yaml
+      mode: 0644
+      contents:
+        inline: |-
+          kind: KubeSchedulerConfiguration
+          apiVersion: kubescheduler.config.k8s.io/v1beta1
+          clientConnection:
+            kubeconfig: "${controller_mount_path}/kube-scheduler.kubeconfig"
+          leaderElection:
+            leaderElect: true
+    - path: ${controller_mount_path}/kube-scheduler.kubeconfig
+      mode: 0644
+      contents:
+        inline: |-
+          kind: Config
+          apiVersion: v1
+          clusters:
+          - cluster:
+              certificate-authority: ${controller_mount_path}/kubernetes-ca.pem
+              server: ${apiserver_local_endpoint}
+            name: ${cluster_name}
+          contexts:
+          - context:
+              cluster: ${cluster_name}
+              user: system:kube-scheduler
+            name: default
+          current-context: default
+          preferences: {}
+          users:
+          - name: system:kube-scheduler
+            user:
+              client-certificate: ${controller_mount_path}/kube-scheduler.pem
+              client-key: ${controller_mount_path}/kube-scheduler-key.pem
+    - path: ${kubelet_path}/manifests/kube-scheduler.yaml
+      mode: 0644
+      contents:
+        inline: |-
+          ---
+          kind: Pod
+          apiVersion: v1
+          metadata:
+            namespace: kube-system
+            name: kube-scheduler
+          spec:
+            restartPolicy: Always
+            hostNetwork: true
+            containers:
+            - name: kube-scheduler
+              image: ${container_images.kube_scheduler}
+              command:
+              - kube-scheduler
+              - "--config=${controller_mount_path}/kube-scheduler.yaml"
+              - "--v=2"
+              livenessProbe:
+                httpGet:
+                  scheme: HTTP
+                  host: 127.0.0.1
+                  port: 10251
+                  path: "/healthz"
+                initialDelaySeconds: 15
+                timeoutSeconds: 15
+              volumeMounts:
+              - name: config-volume
+                mountPath: "${controller_mount_path}"
+                readOnly: true
+            volumes:
+            - name: config-volume
+              hostPath:
+                path: "${controller_mount_path}"

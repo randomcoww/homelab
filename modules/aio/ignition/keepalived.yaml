@@ -8,10 +8,6 @@ systemd:
       dropins:
         - name: 10-dependency.conf
           contents: |
-            [Unit]
-            Requires=nftables.service
-            PartOf=nftables.service
-
             [Service]
             EnvironmentFile=
             Environment=KEEPALIVED_OPTIONS="-D -P"

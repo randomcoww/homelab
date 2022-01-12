@@ -32,8 +32,9 @@ output "ignition_snippets" {
       tap_interfaces      = local.tap_interfaces
       netnums             = var.netnums
     }),
-    templatefile("${path.module}/ignition/nftables.yaml", {
-      interfaces = local.tap_interfaces
+    templatefile("${path.module}/ignition/gateway.yaml", {
+      interfaces    = local.tap_interfaces
+      nftables_name = "gateway_rules"
     }),
     templatefile("${path.module}/ignition/keepalived.yaml", {
       interfaces                  = local.tap_interfaces

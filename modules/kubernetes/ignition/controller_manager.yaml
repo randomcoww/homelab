@@ -1,0 +1,75 @@
+---
+variant: fcos
+version: 1.4.0
+storage:
+  files:
+    - path: ${controller_mount_path}/kube-controller-manager.kubeconfig
+      mode: 0644
+      contents:
+        inline: |-
+          kind: Config
+          apiVersion: v1
+          clusters:
+          - cluster:
+              certificate-authority: ${controller_mount_path}/kubernetes-ca.pem
+              server: ${apiserver_local_endpoint}
+            name: ${cluster_name}
+          contexts:
+          - context:
+              cluster: ${cluster_name}
+              user: system:kube-controller-manager
+            name: default
+          current-context: default
+          preferences: {}
+          users:
+          - name: system:kube-controller-manager
+            user:
+              client-certificate: ${controller_mount_path}/kube-controller-manager.pem
+              client-key: ${controller_mount_path}/kube-controller-manager-key.pem
+    - path: ${kubelet_path}/manifests/kube-controller-manager.yaml
+      mode: 0644
+      contents:
+        inline: |-
+          ---
+          kind: Pod
+          apiVersion: v1
+          metadata:
+            namespace: kube-system
+            name: kube-controller-manager
+          spec:
+            hostNetwork: true
+            restartPolicy: Always
+            containers:
+            - name: kube-controller-manager
+              image: ${container_images.kube_controller_manager}
+              command:
+              - kube-controller-manager
+              - "--allocate-node-cidrs=true"
+              - "--bind-address=0.0.0.0"
+              - "--cluster-cidr=${networks.kubernetes.network}/${networks.kubernetes.cidr}"
+              - "--cluster-name=${cluster_name}"
+              - "--cluster-signing-cert-file=${controller_mount_path}/kubernetes-ca.pem"
+              - "--cluster-signing-key-file=${controller_mount_path}/kubernetes-ca-key.pem"
+              - "--kubeconfig=${controller_mount_path}/kube-controller-manager.kubeconfig"
+              - "--leader-elect=true"
+              - "--root-ca-file=${controller_mount_path}/kubernetes-ca.pem"
+              - "--service-account-private-key-file=${controller_mount_path}/service-account-key.pem"
+              - "--service-cluster-ip-range=${networks.kubernetes_service.network}/${networks.kubernetes_service.cidr}"
+              - "--use-service-account-credentials=true"
+              - "--v=2"
+              volumeMounts:
+              - name: config-volume
+                mountPath: "${controller_mount_path}"
+                readOnly: true
+              livenessProbe:
+                httpGet:
+                  scheme: HTTP
+                  host: 127.0.0.1
+                  port: 10252
+                  path: "/healthz"
+                initialDelaySeconds: 15
+                timeoutSeconds: 15
+            volumes:
+            - name: config-volume
+              hostPath:
+                path: "${controller_mount_path}"

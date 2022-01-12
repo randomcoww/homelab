@@ -66,6 +66,16 @@ locals {
         private_key_pem    = tls_private_key.ssh-ca.private_key_pem
         public_key_openssh = tls_private_key.ssh-ca.public_key_openssh
       }
+      etcd = {
+        algorithm       = tls_private_key.etcd-ca.algorithm
+        private_key_pem = tls_private_key.etcd-ca.private_key_pem
+        cert_pem        = tls_self_signed_cert.etcd-ca.cert_pem
+      }
+      kubernetes = {
+        algorithm       = tls_private_key.kubernetes-ca.algorithm
+        private_key_pem = tls_private_key.kubernetes-ca.private_key_pem
+        cert_pem        = tls_self_signed_cert.kubernetes-ca.cert_pem
+      }
     }
 
     # http path to kubernetes matchbox
@@ -153,5 +163,54 @@ resource "ssh_client_cert" "ssh-client" {
     "permit-port-forwarding",
     "permit-pty",
     "permit-user-rc",
+  ]
+}
+
+# kubernetes #
+resource "tls_private_key" "kubernetes-ca" {
+  algorithm   = "ECDSA"
+  ecdsa_curve = "P521"
+}
+
+resource "tls_self_signed_cert" "kubernetes-ca" {
+  key_algorithm   = tls_private_key.kubernetes-ca.algorithm
+  private_key_pem = tls_private_key.kubernetes-ca.private_key_pem
+
+  validity_period_hours = 8760
+  is_ca_certificate     = true
+
+  subject {
+    common_name  = "kubernetes"
+    organization = "kubernetes"
+  }
+
+  allowed_uses = [
+    "cert_signing",
+    "crl_signing",
+    "digital_signature",
+  ]
+}
+
+resource "tls_private_key" "etcd-ca" {
+  algorithm   = "ECDSA"
+  ecdsa_curve = "P521"
+}
+
+resource "tls_self_signed_cert" "etcd-ca" {
+  key_algorithm   = tls_private_key.etcd-ca.algorithm
+  private_key_pem = tls_private_key.etcd-ca.private_key_pem
+
+  validity_period_hours = 8760
+  is_ca_certificate     = true
+
+  subject {
+    common_name  = "etcd"
+    organization = "etcd"
+  }
+
+  allowed_uses = [
+    "key_encipherment",
+    "digital_signature",
+    "cert_signing",
   ]
 }
