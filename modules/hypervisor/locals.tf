@@ -23,4 +23,20 @@ locals {
       }
     }
   }
+
+  module_ignition_snippets = [
+    for f in fileset(".", "${path.module}/ignition/*.yaml") :
+    templatefile(f, {
+      certs = local.certs.libvirt
+    })
+  ]
+
+  libvirt_endpoints = {
+    for network_name, network in var.networks :
+    network_name => concat([
+      for interface in values(var.interfaces) :
+      "qemu://${cidrhost(interface.prefix, var.host_netnum)}/system"
+      if lookup(interface, "enable_netnum", false)
+    ])
+  }
 }

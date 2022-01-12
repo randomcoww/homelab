@@ -21,28 +21,22 @@ systemd:
               ${container_images.hyperkube} \
                 kubelet \
                   $KUBELET_COMMON_ARGS \
-                  --bootstrap-kubeconfig=${kubelet_path}/bootstrap.kubeconfig \
-                  --cert-dir=${kubelet_path} \
-                  --config=${kubelet_path}/kubelet-config-worker.yaml \
+                  --cert-dir=${kubelet_config_path} \
+                  --config=${kubelet_config_path}/kubelet-config-worker.yaml \
                   --feature-gates=GracefulNodeShutdown=true \
-                  --kubeconfig=${kubelet_path}/kubelet.kubeconfig \
+                  --kubeconfig=${kubelet_config_path}/kubelet.kubeconfig \
                   --network-plugin=cni \
                   --node-labels=${join(",", [
                     for k, v in  lookup(p, "node_labels", {}) :
                     "${k}=${v}"
                   ])} \
+                  --node-ip=${kubelet_node_ip} \
                   --register-node=true \
-                  --volume-plugin-dir=${kubelet_path}/volumeplugins
+                  --volume-plugin-dir=${kubelet_config_path}/volumeplugins
 
 storage:
   files:
-    - path: /etc/sysctl.d/hugepages.conf
-      mode: 0644
-      contents:
-        inline: |
-          # use for mayastor malloc
-          vm.nr_hugepages = 128
-    - path: /etc/modules-load.d/worker.conf
+    - path: /etc/modules-load.d/kubernetes-worker.conf
       mode: 0644
       contents:
         inline: |
@@ -51,7 +45,7 @@ storage:
           # mayastor nvmeof
           nvme-tcp
 
-    - path: ${kubelet_path}/kubelet-config-worker.yaml
+    - path: ${kubelet_config_path}/kubelet-config-worker.yaml
       mode: 0644
       contents:
         inline: |-
@@ -63,12 +57,12 @@ storage:
             webhook:
               enabled: true
             x509:
-              clientCAFile: "${kubelet_path}/kubernetes-ca.pem"
+              clientCAFile: "${certs.kubernetes.ca_cert.path}"
           authorization:
             mode: Webhook
-          clusterDomain: "${domains.kubernetes_cluster}"
+          clusterDomain: "${kubernetes_cluster_domain}"
           clusterDNS:
-          - "${services.kubernetes_dns.vip}"
+          - "${cidrhost(kubernetes_service_network.prefix, kubernetes_dns_netnum)}"
           runtimeRequestTimeout: "15m"
           rotateCertificates: true
           serverTLSBootstrap: true
@@ -76,26 +70,27 @@ storage:
           shutdownGracePeriodCriticalPods: "60s"
           containerLogMaxSize: "10Mi"
           containerLogMaxFiles: 2
-    - path: ${kubelet_path}/bootstrap.kubeconfig
+
+    - path: ${kubelet_config_path}/kubelet.kubeconfig
       mode: 0644
       contents:
         inline: |-
+          kind: Config
           apiVersion: v1
           clusters:
           - cluster:
-              certificate-authority: ${kubelet_path}/kubernetes-ca.pem
-              server: ${apiserver_endpoint}
+              certificate-authority: ${certs.kubernetes.ca_cert.path}
+              server: https://${apiserver_ip}:${apiserver_port}
             name: ${cluster_name}
           contexts:
           - context:
               cluster: ${cluster_name}
-              user: kubelet-bootstrap
+              user: system:node
             name: default
           current-context: default
-          kind: Config
           preferences: {}
           users:
-          - name: kubelet-bootstrap
+          - name: system:node
             user:
-              client-certificate: ${kubelet_path}/bootstrap.pem
-              client-key: ${kubelet_path}/bootstrap-key.pem
+              client-certificate: ${certs.kubernetes.kubelet_cert.path}
+              client-key: ${certs.kubernetes.kubelet_key.path}

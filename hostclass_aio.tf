@@ -58,10 +58,10 @@ locals {
 }
 
 # templates #
-module "template-aio" {
+module "template-aio-gateway_base" {
   for_each = local.aio_hostclass_config.hosts
 
-  source              = "./modules/aio"
+  source              = "./modules/gateway_base"
   hostname            = each.value.hostname
   user                = local.config.users.admin
   networks            = local.config.networks
@@ -69,19 +69,17 @@ module "template-aio" {
   tap_interfaces      = each.value.tap_interfaces
   container_images    = local.config.container_images
   dhcp_server_subnet  = local.aio_hostclass_config.dhcp_server_subnet
-  netnums = {
-    host = each.value.netnum
-    vrrp = local.aio_hostclass_config.vrrp_netnum
-  }
-  kea_peers = {
-    for host_key, host in local.aio_hostclass_config.hosts :
-    host_key => {
-      hostname = host.hostname
-      role     = lookup(host, "kea_ha_role", "backup")
-      netnum   = host.netnum
-      port     = local.config.ports.kea_peer
+  kea_peer_port       = local.config.ports.kea_peer
+  host_netnum         = each.value.netnum
+  vrrp_netnum         = local.aio_hostclass_config.vrrp_netnum
+  kea_peers = [
+    for host in values(local.aio_hostclass_config.hosts) :
+    {
+      name   = host.hostname
+      role   = lookup(host, "kea_ha_role", "backup")
+      netnum = host.netnum
     }
-  }
+  ]
   internal_dns_ip        = local.config.internal_dns_ip
   internal_domain        = local.config.domains.internal
   container_storage_path = "${each.value.disks.pv.partitions[0].mount_path}/containers"
@@ -102,7 +100,7 @@ module "template-aio-ssh_server" {
   key_id     = each.value.hostname
   user_names = [local.config.users.admin.name]
   valid_principals = compact(concat([each.value.hostname, "127.0.0.1"], flatten([
-    for interface in values(module.template-aio[each.key].interfaces) :
+    for interface in values(module.template-aio-gateway_base[each.key].interfaces) :
     try(cidrhost(interface.prefix, each.value.netnum), null)
   ])))
   ssh_ca = local.config.ca.ssh
@@ -111,9 +109,25 @@ module "template-aio-ssh_server" {
 module "template-aio-hypervisor" {
   for_each = local.aio_hostclass_config.hosts
 
-  source     = "./modules/hypervisor"
-  interfaces = module.template-aio[each.key].interfaces
-  libvirt_ca = local.config.ca.libvirt
+  source      = "./modules/hypervisor"
+  interfaces  = module.template-aio-gateway_base[each.key].interfaces
+  host_netnum = each.value.netnum
+  libvirt_ca  = local.config.ca.libvirt
+}
+
+module "template-aio-etcd" {
+  for_each = local.aio_hostclass_config.hosts
+
+  source           = "./modules/etcd"
+  etcd_peer_port   = local.config.ports.etcd_peer
+  etcd_client_port = local.config.ports.etcd_client
+  etcd_hosts = [
+    for host in values(local.aio_hostclass_config.hosts) :
+    {
+      name   = host.hostname
+      netnum = host.netnum
+    }
+  ]
 }
 
 # combine and render a single ignition file #

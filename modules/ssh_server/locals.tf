@@ -26,4 +26,12 @@ locals {
       content = ssh_host_cert.ssh-host.cert_authorized_key
     }
   }
+
+  module_ignition_snippets = [
+    for f in fileset(".", "${path.module}/ignition/*.yaml") :
+    templatefile(f, {
+      users = local.users
+      certs = local.certs
+    })
+  ]
 }

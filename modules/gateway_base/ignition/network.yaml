@@ -106,13 +106,13 @@ storage:
           %{~ if lookup(interface, "enable_netnum", false) ~}
 
           [Address]
-          Address=${cidrhost(interface.prefix, netnums.host)}/${interface.cidr}
+          Address=${cidrhost(interface.prefix, host_netnum)}/${interface.cidr}
           AddPrefixRoute=false
 
           [Route]
           Protocol=kernel
           Scope=link
-          PreferredSource=${cidrhost(interface.prefix, netnums.host)}
+          PreferredSource=${cidrhost(interface.prefix, host_netnum)}
           Destination=${interface.prefix}
           Metric=${lookup(interface, "metric", 1024)}
           %{~ endif ~}

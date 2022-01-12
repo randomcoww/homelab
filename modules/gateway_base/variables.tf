@@ -30,11 +30,12 @@ variable "container_images" {
   default = {}
 }
 
-variable "netnums" {
-  type = object({
-    host = number
-    vrrp = number
-  })
+variable "host_netnum" {
+  type = number
+}
+
+variable "vrrp_netnum" {
+  type = number
 }
 
 variable "dhcp_server_subnet" {
@@ -45,7 +46,11 @@ variable "dhcp_server_subnet" {
 }
 
 variable "kea_peers" {
-  type = map(map(string))
+  type = list(map(string))
+}
+
+variable "kea_peer_port" {
+  type = number
 }
 
 variable "internal_dns_ip" {

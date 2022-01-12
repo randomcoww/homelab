@@ -51,7 +51,7 @@ storage:
               ${interface.interface_name}
             }
             virtual_ipaddress {
-              ${cidrhost(interface.prefix, netnums.vrrp)}
+              ${cidrhost(interface.prefix, vrrp_netnum)}
             }
           }
           %{~ endif ~}
@@ -103,7 +103,7 @@ storage:
         inline: |
           [Route]
           GatewayOnLink=true
-          Gateway=${cidrhost(interfaces.sync.prefix, netnums.vrrp)}
+          Gateway=${cidrhost(interfaces.sync.prefix, vrrp_netnum)}
           Destination=0.0.0.0/0
           Table=${vrrp_slave_default_route.table_id}
 

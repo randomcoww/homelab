@@ -19,7 +19,7 @@ resource "tls_cert_request" "libvirt" {
 
   ip_addresses = concat(["127.0.0.1"], [
     for interface in values(local.interfaces) :
-    cidrhost(interface.prefix, var.netnums.host)
+    cidrhost(interface.prefix, var.host_netnum)
     if lookup(interface, "enable_netnum", false)
   ])
 }

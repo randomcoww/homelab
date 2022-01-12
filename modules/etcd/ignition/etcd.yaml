@@ -1,0 +1,79 @@
+---
+variant: fcos
+version: 1.4.0
+storage:
+  files:
+    - path: ${static_pod_manifest_path}/etcd-wrapper.yaml
+      mode: 0644
+      contents:
+        inline: |-
+          ---
+          kind: Pod
+          apiVersion: v1
+          metadata:
+            namespace: kube-system
+            name: etcd
+          spec:
+            hostNetwork: true
+            restartPolicy: Always
+            containers:
+            - name: etcd-wrapper
+              image: ${container_images.etcd_wrapper}
+              args:
+              - "--name=${hostname}"
+              - "--host-cert-file=${cert_path}/etcd.pem"
+              - "--host-key-file=${cert_path}/etcd-key.pem"
+              - "--host-trusted-ca-file=${cert_path}/etcd-ca.pem"
+              - "--host-peer-cert-file=${cert_path}/etcd.pem"
+              - "--host-peer-key-file=${cert_path}/etcd-key.pem"
+              - "--host-peer-trusted-ca-file=${cert_path}/etcd-ca.pem"
+              - "--initial-advertise-peer-urls=https://${cidrhost(network_prefix, host_netnum)}:${etcd_peer_port}"
+              - "--listen-peer-urls=https://${cidrhost(network_prefix, host_netnum)}:${etcd_peer_port}"
+              - "--listen-client-urls=https://127.0.0.1:${etcd_client_port},https://${cidrhost(network_prefix, host_netnum)}:${etcd_client_port}"
+              - "--advertise-client-urls=https://${cidrhost(network_prefix, host_netnum)}:${etcd_client_port}"
+              - "--initial-cluster-token=${etcd_cluster_token}"
+              - "--initial-cluster=${join(",", [
+                  for etcd_host in etcd_hosts :
+                  "${etcd_peer.name}=https://${cidrhost(network_prefix, etcd_peer.netnum)}:${etcd_peer_port}"
+              ])}"
+              - "--etcd-servers=${join(",", [
+                  for etcd_host in etcd_hosts :
+                  "https://${cidrhost(network_prefix, etcd_peer.netnum)}:${etcd_client_port}"
+              ])}"
+              - "--host-backup-file=${static_pod_config_path}/etcd/etcd.db"
+              - "--host-etcd-manifest-file=${static_pod_manifest_path}/etcd.json"
+              - "--etcd-image=${container_images.etcd}"
+              - "--client-cert-file=${cert_path}/etcd-client.pem"
+              - "--client-key-file=${cert_path}/etcd-client-key.pem"
+              - "--s3-backup-path=${etcd_s3_backup_bucket}/${etcd_cluster_token}"
+              - "--backup-interval=30m"
+              - "--healthcheck-interval=10s"
+              - "--pod-update-interval=1m"
+              env:
+              - name: AWS_ACCESS_KEY_ID
+                value: "${aws_access_key_id}"
+              - name: AWS_SECRET_ACCESS_KEY
+                value: "${aws_secret_access_key}"
+              - name: AWS_DEFAULT_REGION
+                value: "${aws_region}"
+              - name: AWS_SDK_LOAD_CONFIG
+                value: "1"
+              volumeMounts:
+              - name: config-volume
+                mountPath: "${cert_path}"
+                readOnly: true
+              - name: etcd-restore-volume
+                mountPath: "${static_pod_config_path}/etcd"
+              - name: manifest-volume
+                mountPath: "${static_pod_manifest_path}/kube-etcd.json"
+            volumes:
+            - name: config-volume
+              hostPath:
+                path: "${cert_path}"
+            - name: etcd-restore-volume
+              hostPath:
+                path: "${static_pod_config_path}/etcd"
+            - name: manifest-volume
+              hostPath:
+                type: FileOrCreate
+                path: "${static_pod_manifest_path}/kube-etcd.json"

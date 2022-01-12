@@ -29,7 +29,7 @@ locals {
     templatefile("${local.common_ignition_template_path}/server.yaml", {}),
     templatefile("${local.common_ignition_template_path}/masterless_kubelet.yaml", {
       kubelet_config_path     = "/var/lib/kubelet/config"
-      kubelet_node_ip         = cidrhost(local.tap_interfaces.lan.prefix, var.netnums.host)
+      kubelet_node_ip         = cidrhost(local.tap_interfaces.lan.prefix, var.host_netnum)
       kubelet_container_image = var.container_images.kubelet
     }),
     templatefile("${local.common_ignition_template_path}/container_storage_path.yaml", {
@@ -45,7 +45,8 @@ locals {
       hostname                 = var.hostname
       interfaces               = local.tap_interfaces
       hardware_interfaces      = local.hardware_interfaces
-      netnums                  = var.netnums
+      host_netnum              = var.host_netnum
+      vrrp_netnum              = var.vrrp_netnum
 
       # gateway #
       nftables_name = "gateway_rules"

@@ -3,7 +3,8 @@ variant: fcos
 version: 1.4.0
 storage:
   files:
-    - path: ${controller_mount_path}/encryption-config.yaml
+    # apiserver #
+    - path: ${controller_config_path}/encryption-config.yaml
       mode: 0644
       contents:
         inline: |-
@@ -19,7 +20,8 @@ storage:
             #   - name: key1
             #     secret: ${encryption_config_secret}
             - identity: {}
-    - path: ${kubelet_path}/manifests/kube-apiserver.yaml
+
+    - path: ${static_pod_manifest_path}/kube-apiserver.yaml
       mode: 0644
       contents:
         inline: |-
@@ -41,26 +43,26 @@ storage:
               - "--allow-privileged=true"
               - "--authorization-mode=Node,RBAC"
               - "--bind-address=0.0.0.0"
-              - "--client-ca-file=${controller_mount_path}/kubernetes-ca.pem"
+              - "--client-ca-file=${certs.kubernetes.ca_cert.path}"
               - "--enable-admission-plugins=NamespaceLifecycle,NodeRestriction,LimitRanger,ServiceAccount,DefaultStorageClass,ResourceQuota"
-              - "--encryption-provider-config=${controller_mount_path}/encryption-config.yaml"
-              - "--etcd-cafile=${controller_mount_path}/etcd-ca.pem"
-              - "--etcd-certfile=${controller_mount_path}/etcd-client.pem"
-              - "--etcd-keyfile=${controller_mount_path}/etcd-client-key.pem"
-              - "--etcd-servers=${etcd_local_endpoint}"
+              - "--encryption-provider-config=${controller_config_path}/encryption-config.yaml"
+              - "--etcd-cafile=${certs.etcd.ca_cert.path}"
+              - "--etcd-certfile=${certs.etcd.client_cert.path}"
+              - "--etcd-keyfile=${certs.etcd.client_key.path}"
+              - "--etcd-servers=https://${etcd_cluster_ip}:${etcd_client_port}"
               - "--event-ttl=1h"
-              - "--kubelet-certificate-authority=${controller_mount_path}/kubernetes-ca.pem"
-              - "--kubelet-client-certificate=${controller_mount_path}/kubernetes.pem"
-              - "--kubelet-client-key=${controller_mount_path}/kubernetes-key.pem"
+              - "--kubelet-certificate-authority=${certs.kubernetes.ca_cert.path}"
+              - "--kubelet-client-certificate=${certs.kubernetes.cluster_cert.path}"
+              - "--kubelet-client-key=${certs.kubernetes.cluster_key.path}"
               - "--kubelet-preferred-address-types=InternalDNS,InternalIP"
               - "--runtime-config=api/all=true"
-              - "--secure-port=${services.kubernetes_apiserver.ports.secure}"
+              - "--secure-port=${apiserver_port}"
               - "--service-account-issuer=https://kubernetes.default.svc"
-              - "--service-account-key-file=${controller_mount_path}/service-account.pem"
-              - "--service-account-signing-key-file=${controller_mount_path}/service-account-key.pem"
-              - "--service-cluster-ip-range=${networks.kubernetes_service.network}/${networks.kubernetes_service.cidr}"
-              - "--tls-cert-file=${controller_mount_path}/kubernetes.pem"
-              - "--tls-private-key-file=${controller_mount_path}/kubernetes-key.pem"
+              - "--service-account-key-file=${certs.kubernetes.service_account_cert.path}"
+              - "--service-account-signing-key-file=${certs.kubernetes.service_account_key.path}"
+              - "--service-cluster-ip-range=${kubernetes_service_network.prefix}"
+              - "--tls-cert-file=${certs.kubernetes.cluster_cert.path}"
+              - "--tls-private-key-file=${certs.kubernetes.cluster_key.path}"
               - "--v=2"
               env:
               - name: INTERNAL_IP
@@ -69,13 +71,13 @@ storage:
                     fieldPath: status.hostIP
               volumeMounts:
               - name: config-apiserver
-                mountPath: "${controller_mount_path}"
+                mountPath: "${controller_config_path}"
                 readOnly: true
               readinessProbe:
                 httpGet:
                   scheme: HTTPS
                   host: 127.0.0.1
-                  port: ${services.kubernetes_apiserver.ports.secure}
+                  port: ${apiserver_port}
                   path: "/readyz"
                 initialDelaySeconds: 15
                 timeoutSeconds: 15
@@ -83,41 +85,11 @@ storage:
                 httpGet:
                   scheme: HTTPS
                   host: 127.0.0.1
-                  port: ${services.kubernetes_apiserver.ports.secure}
+                  port: ${apiserver_port}
                   path: "/healthz"
                 initialDelaySeconds: 15
                 timeoutSeconds: 15
-            - name: keepalived
-              image: ${container_images.keepalived}
-              securityContext:
-                capabilities:
-                  add:
-                  - NET_ADMIN
-              args: [ "-P", "-D", "-f", "/etc/keepalived/keepalived.conf" ]
-              readinessProbe:
-                httpGet:
-                  scheme: HTTPS
-                  host: 127.0.0.1
-                  port: ${services.kubernetes_apiserver.ports.secure}
-                  path: "/readyz"
-                initialDelaySeconds: 15
-                timeoutSeconds: 15
-              livenessProbe:
-                httpGet:
-                  scheme: HTTPS
-                  host: 127.0.0.1
-                  port: ${services.kubernetes_apiserver.ports.secure}
-                  path: "/healthz"
-                initialDelaySeconds: 15
-                timeoutSeconds: 15
-              volumeMounts:
-              - name: config-keepalived
-                mountPath: /etc/keepalived/keepalived.conf
-                readOnly: true
             volumes:
             - name: config-apiserver
               hostPath:
-                path: "${controller_mount_path}"
-            - name: config-keepalived
-              hostPath:
-                path: ${pod_mount_path}/keepalived/keepalived.conf
+                path: "${controller_config_path}"

@@ -17,7 +17,7 @@ storage:
             Multicast {
               IPv4_address 225.0.0.50
               Group 3780
-              IPv4_interface ${cidrhost(interfaces.sync.prefix, netnums.host)}
+              IPv4_interface ${cidrhost(interfaces.sync.prefix, host_netnum)}
               Interface ${interfaces.sync.interface_name}
               SndSocketBuffer 24985600
               RcvSocketBuffer 24985600
@@ -40,13 +40,13 @@ storage:
               }
               Address Ignore {
                 IPv4_address 127.0.0.1
-                IPv4_address ${cidrhost(interfaces.sync.prefix, netnums.host)}/${interfaces.sync.cidr}
+                IPv4_address ${cidrhost(interfaces.sync.prefix, host_netnum)}/${interfaces.sync.cidr}
                 %{~ for network_name, interface in interfaces ~}
                 %{~ if lookup(interface, "enable_netnum", false) ~}
-                IPv4_address ${cidrhost(interface.prefix, netnums.host)}
+                IPv4_address ${cidrhost(interface.prefix, host_netnum)}
                 %{~ endif ~}
                 %{~ if lookup(interface, "enable_vrrp_netnum", false) ~}
-                IPv4_address ${cidrhost(interface.prefix, netnums.vrrp)}
+                IPv4_address ${cidrhost(interface.prefix, vrrp_netnum)}
                 %{~ endif ~}
                 %{~ endfor ~}
               }

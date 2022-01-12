@@ -2,6 +2,10 @@ variable "interfaces" {
   type = map(map(string))
 }
 
+variable "host_netnum" {
+  type = number
+}
+
 variable "libvirt_ca" {
   type = object({
     algorithm       = string

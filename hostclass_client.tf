@@ -23,7 +23,7 @@ locals {
 module "template-client" {
   for_each = local.client_hostclass_config.hosts
 
-  source                    = "./modules/client"
+  source                    = "./modules/client_base"
   hostname                  = each.value.hostname
   user                      = local.config.users.client
   ssh_ca_public_key_openssh = local.config.ca.ssh.public_key_openssh

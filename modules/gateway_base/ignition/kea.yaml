@@ -10,8 +10,8 @@ storage:
         inline: |-
           ${jsonencode({
             "Control-agent" = {
-              http-host = cidrhost(interfaces.sync.prefix, netnums.host)
-              http-port = kea_peers[name].port
+              http-host = cidrhost(interfaces.sync.prefix, host_netnum)
+              http-port = kea_peer_port
               control-sockets = {
                 dhcp4 = {
                   socket-type = "unix",
@@ -62,11 +62,11 @@ storage:
                         mode = "load-balancing"
                         max-unacked-clients = 0
                         peers =  [
-                          for kea_peer in values(kea_peers) :
+                          for i, kea_peer in kea_peers :
                           {
-                            name = kea_peer.hostname
+                            name = kea_peer.name
                             role = kea_peer.role
-                            url = "http://${cidrhost(interfaces.sync.prefix, kea_peer.netnums)}:${kea_peer.port}/"
+                            url = "http://${cidrhost(interfaces.sync.prefix, kea_peer.netnums)}:${kea_peer_port}/"
                             auto-failover = true
                           }
                         ]
@@ -96,7 +96,7 @@ storage:
                 for network_name, interface in interfaces :
                 {
                   subnet = interface.prefix,
-                  next-server = cidrhost(interface.prefix, netnums.host)
+                  next-server = cidrhost(interface.prefix, host_netnum)
                   option-data = [
                     {
                       name = "routers"
