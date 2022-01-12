@@ -48,12 +48,12 @@ output "ignition_snippets" {
       container_images    = var.container_images
       netnums             = var.netnums
     }),
+    templatefile("${path.module}/ignition/hypervisor.yaml", {
+      certs = local.certs.libvirt
+    }),
     templatefile("${path.root}/common_templates/ignition/base.yaml", {
       users    = [var.user]
       hostname = var.hostname
-    }),
-    templatefile("${path.root}/common_templates/ignition/hypervisor.yaml", {
-      certs = local.certs.libvirt
     }),
     templatefile("${path.root}/common_templates/ignition/server.yaml", {
     }),
@@ -70,4 +70,15 @@ output "ignition_snippets" {
 
 output "interfaces" {
   value = local.tap_interfaces
+}
+
+output "libvirt_endpoints" {
+  value = {
+    for network_name, network in var.networks :
+    network_name => concat([
+      for tap_interface in values(local.tap_interfaces) :
+      "qemu://${cidrhost(tap_interface.prefix, var.netnums.host)}/system"
+      if lookup(tap_interface, "enable_netnum", false)
+    ])
+  }
 }
