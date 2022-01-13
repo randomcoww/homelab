@@ -1,11 +1,11 @@
-resource "tls_private_key" "ca" {
+resource "tls_private_key" "kubernetes-ca" {
   algorithm   = "ECDSA"
   ecdsa_curve = "P521"
 }
 
-resource "tls_self_signed_cert" "ca" {
-  key_algorithm   = tls_private_key.ca.algorithm
-  private_key_pem = tls_private_key.ca.private_key_pem
+resource "tls_self_signed_cert" "kubernetes-ca" {
+  key_algorithm   = tls_private_key.kubernetes-ca.algorithm
+  private_key_pem = tls_private_key.kubernetes-ca.private_key_pem
 
   validity_period_hours = 8760
   is_ca_certificate     = true

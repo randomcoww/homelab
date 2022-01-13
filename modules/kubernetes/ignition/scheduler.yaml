@@ -25,7 +25,7 @@ storage:
           apiVersion: v1
           clusters:
           - cluster:
-              certificate-authority: ${certs.kubernetes.ca_cert.path}
+              certificate-authority: ${kubernetes_certs.ca_cert.path}
               server: https://${apiserver_ip}:${apiserver_port}
             name: ${cluster_name}
           contexts:
@@ -38,8 +38,8 @@ storage:
           users:
           - name: system:kube-scheduler
             user:
-              client-certificate: ${certs.kubernetes.scheduler_cert.path}
-              client-key: ${certs.kubernetes.scheduler_key.path}
+              client-certificate: ${kubernetes_certs.scheduler_cert.path}
+              client-key: ${kubernetes_certs.scheduler_key.path}
 
     - path: ${static_pod_manifest_path}/kube-scheduler.yaml
       mode: 0644

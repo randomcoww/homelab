@@ -18,39 +18,47 @@ variable "host_netnum" {
   type = number
 }
 
-variable "etcd_hosts" {
-  type = list(map(string))
+variable "vip_netnum" {
+  type = number
 }
 
-variable "etcd_cluster_token" {
-  type = string
+variable "apiserver_port" {
+  type = number
+}
+
+variable "etcd_servers" {
+  type = list(string)
 }
 
 variable "etcd_client_port" {
   type = number
 }
 
-variable "etcd_peer_port" {
-  type = number
-}
-
-variable "aws_access_key_id" {
+variable "kubernetes_cluster_name" {
   type = string
 }
 
-variable "aws_secret_access_key" {
+variable "kubernetes_service_network_prefix" {
   type = string
 }
 
-variable "aws_region" {
+variable "kubernetes_network_prefix" {
   type = string
 }
 
-variable "etcd_s3_backup_path" {
+variable "kubelet_node_labels" {
+  type = map(string)
+}
+
+variable "kubernetes_cluster_domain" {
   type = string
 }
 
-variable "etcd_ca" {
+variable "encryption_config_secret" {
+  type = string
+}
+
+variable "kubernetes_ca" {
   type = object({
     algorithm       = string
     private_key_pem = string

@@ -1,5 +1,5 @@
 resource "tls_private_key" "controller-manager" {
-  algorithm   = tls_private_key.ca.algorithm
+  algorithm   = tls_private_key.kubernetes-ca.algorithm
   ecdsa_curve = "P521"
 }
 
@@ -15,9 +15,9 @@ resource "tls_cert_request" "controller-manager" {
 
 resource "tls_locally_signed_cert" "controller-manager" {
   cert_request_pem   = tls_cert_request.controller-manager.cert_request_pem
-  ca_key_algorithm   = tls_private_key.ca.algorithm
-  ca_private_key_pem = tls_private_key.ca.private_key_pem
-  ca_cert_pem        = tls_self_signed_cert.ca.cert_pem
+  ca_key_algorithm   = tls_private_key.kubernetes-ca.algorithm
+  ca_private_key_pem = tls_private_key.kubernetes-ca.private_key_pem
+  ca_cert_pem        = tls_self_signed_cert.kubernetes-ca.cert_pem
 
   validity_period_hours = 8760
 

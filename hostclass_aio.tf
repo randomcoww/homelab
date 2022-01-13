@@ -55,6 +55,7 @@ locals {
       }
     }
   }
+  etcd_cluster_token = "2201"
 }
 
 # templates #
@@ -118,6 +119,60 @@ module "template-aio-hypervisor" {
   libvirt_ca = local.config.ca.libvirt
 }
 
+# kubernetes #
+module "kubernetes-common-default" {
+  source             = "./modules/kubernetes_common"
+  etcd_s3_backup_key = "randomcoww-etcd-backup/2201"
+}
+
+module "template-aio-etcd" {
+  for_each = local.aio_hostclass_config.hosts
+
+  source           = "./modules/etcd"
+  hostname         = each.value.hostname
+  container_images = local.config.container_images
+  common_certs     = module.kubernetes-common-default.certs
+  network_prefix   = local.config.networks.lan.prefix
+  host_netnum      = each.value.netnum
+  etcd_hosts = [
+    for host in values(local.aio_hostclass_config.hosts) :
+    {
+      name   = host.hostname
+      netnum = host.netnum
+    }
+  ]
+  etcd_client_port      = local.config.ports.etcd_client
+  etcd_peer_port        = local.config.ports.etcd_peer
+  etcd_cluster_token    = local.etcd_cluster_token
+  aws_access_key_id     = module.kubernetes-common-default.aws_s3_backup_credentials.access_key_id
+  aws_secret_access_key = module.kubernetes-common-default.aws_s3_backup_credentials.access_key_secret
+  aws_region            = local.config.aws_region
+  etcd_s3_backup_path   = "randomcoww-etcd-backup/${local.etcd_cluster_token}"
+  etcd_ca               = module.kubernetes-common-default.ca.etcd
+}
+
+module "template-aio-kubernetes" {
+  for_each = local.aio_hostclass_config.hosts
+
+  source                            = "./modules/kubernetes"
+  hostname                          = each.value.hostname
+  container_images                  = local.config.container_images
+  common_certs                      = module.kubernetes-common-default.certs
+  network_prefix                    = local.config.networks.lan.prefix
+  host_netnum                       = each.value.netnum
+  vip_netnum                        = local.aio_hostclass_config.vrrp_netnum
+  apiserver_port                    = local.config.ports.apiserver
+  etcd_client_port                  = local.config.ports.etcd_client
+  etcd_servers                      = [module.template-aio-etcd[each.key].local_client_endpoint]
+  kubernetes_cluster_name           = "cluster-${local.etcd_cluster_token}"
+  kubernetes_cluster_domain         = local.config.domains.kubernetes
+  kubernetes_service_network_prefix = local.config.networks.kubernetes.prefix
+  kubernetes_network_prefix         = local.config.networks.kubernetes_service.prefix
+  kubelet_node_labels               = {}
+  encryption_config_secret          = module.kubernetes-common-default.encryption_config_secret
+  kubernetes_ca                     = module.kubernetes-common-default.ca.kubernetes
+}
+
 # combine and render a single ignition file #
 data "ct_config" "aio" {
   for_each = local.aio_hostclass_config.hosts
@@ -133,6 +188,8 @@ EOT
     module.template-aio-disks[each.key].ignition_snippets,
     module.template-aio-ssh_server[each.key].ignition_snippets,
     module.template-aio-hypervisor[each.key].ignition_snippets,
+    module.template-aio-etcd[each.key].ignition_snippets,
+    module.template-aio-kubernetes[each.key].ignition_snippets,
   )
 }
 

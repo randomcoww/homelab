@@ -39,36 +39,31 @@ storage:
               image: ${container_images.kube_apiserver}
               command:
               - kube-apiserver
-              - "--advertise-address=$(INTERNAL_IP)"
+              - "--advertise-address=${cidrhost(network_prefix, host_netnum)}"
               - "--allow-privileged=true"
               - "--authorization-mode=Node,RBAC"
               - "--bind-address=0.0.0.0"
-              - "--client-ca-file=${certs.kubernetes.ca_cert.path}"
+              - "--client-ca-file=${kubernetes_certs.ca_cert.path}"
               - "--enable-admission-plugins=NamespaceLifecycle,NodeRestriction,LimitRanger,ServiceAccount,DefaultStorageClass,ResourceQuota"
               - "--encryption-provider-config=${controller_config_path}/encryption-config.yaml"
-              - "--etcd-cafile=${certs.etcd.ca_cert.path}"
-              - "--etcd-certfile=${certs.etcd.client_cert.path}"
-              - "--etcd-keyfile=${certs.etcd.client_key.path}"
-              - "--etcd-servers=https://${etcd_cluster_ip}:${etcd_client_port}"
+              - "--etcd-cafile=${etcd_certs.ca_cert.path}"
+              - "--etcd-certfile=${etcd_certs.client_cert.path}"
+              - "--etcd-keyfile=${etcd_certs.client_key.path}"
+              - "--etcd-servers=${join(",", etcd_servers)}"
               - "--event-ttl=1h"
-              - "--kubelet-certificate-authority=${certs.kubernetes.ca_cert.path}"
-              - "--kubelet-client-certificate=${certs.kubernetes.cluster_cert.path}"
-              - "--kubelet-client-key=${certs.kubernetes.cluster_key.path}"
+              - "--kubelet-certificate-authority=${kubernetes_certs.ca_cert.path}"
+              - "--kubelet-client-certificate=${kubernetes_certs.server_cert.path}"
+              - "--kubelet-client-key=${kubernetes_certs.server_key.path}"
               - "--kubelet-preferred-address-types=InternalDNS,InternalIP"
               - "--runtime-config=api/all=true"
               - "--secure-port=${apiserver_port}"
               - "--service-account-issuer=https://kubernetes.default.svc"
-              - "--service-account-key-file=${certs.kubernetes.service_account_cert.path}"
-              - "--service-account-signing-key-file=${certs.kubernetes.service_account_key.path}"
-              - "--service-cluster-ip-range=${kubernetes_service_network.prefix}"
-              - "--tls-cert-file=${certs.kubernetes.cluster_cert.path}"
-              - "--tls-private-key-file=${certs.kubernetes.cluster_key.path}"
+              - "--service-account-key-file=${kubernetes_certs.service_account_cert.path}"
+              - "--service-account-signing-key-file=${kubernetes_certs.service_account_key.path}"
+              - "--service-cluster-ip-range=${kubernetes_service_network_prefix}"
+              - "--tls-cert-file=${kubernetes_certs.server_cert.path}"
+              - "--tls-private-key-file=${kubernetes_certs.server_key.path}"
               - "--v=2"
-              env:
-              - name: INTERNAL_IP
-                valueFrom:
-                  fieldRef:
-                    fieldPath: status.hostIP
               volumeMounts:
               - name: config-apiserver
                 mountPath: "${controller_config_path}"

@@ -27,10 +27,10 @@ systemd:
                   --kubeconfig=${kubelet_config_path}/kubelet.kubeconfig \
                   --network-plugin=cni \
                   --node-labels=${join(",", [
-                    for k, v in  lookup(p, "node_labels", {}) :
-                    "${k}=${v}"
+                    for node_label, value in kubelet_node_labels :
+                    "${node_label}=${value}"
                   ])} \
-                  --node-ip=${kubelet_node_ip} \
+                  --node-ip=${cidrhost(network_prefix, host_netnum)} \
                   --register-node=true \
                   --volume-plugin-dir=${kubelet_config_path}/volumeplugins
 
@@ -57,12 +57,12 @@ storage:
             webhook:
               enabled: true
             x509:
-              clientCAFile: "${certs.kubernetes.ca_cert.path}"
+              clientCAFile: "${kubernetes_certs.ca_cert.path}"
           authorization:
             mode: Webhook
           clusterDomain: "${kubernetes_cluster_domain}"
           clusterDNS:
-          - "${cidrhost(kubernetes_service_network.prefix, kubernetes_dns_netnum)}"
+          - "${cidrhost(kubernetes_service_network_prefix, kubernetes_dns_netnum)}"
           runtimeRequestTimeout: "15m"
           rotateCertificates: true
           serverTLSBootstrap: true
@@ -79,7 +79,7 @@ storage:
           apiVersion: v1
           clusters:
           - cluster:
-              certificate-authority: ${certs.kubernetes.ca_cert.path}
+              certificate-authority: ${kubernetes_certs.ca_cert.path}
               server: https://${apiserver_ip}:${apiserver_port}
             name: ${cluster_name}
           contexts:
@@ -92,5 +92,5 @@ storage:
           users:
           - name: system:node
             user:
-              client-certificate: ${certs.kubernetes.kubelet_cert.path}
-              client-key: ${certs.kubernetes.kubelet_key.path}
+              client-certificate: ${kubernetes_certs.kubelet_cert.path}
+              client-key: ${kubernetes_certs.kubelet_key.path}
