@@ -1,9 +1,9 @@
-variable "interfaces" {
-  type = map(map(string))
+variable "dns_names" {
+  type = list(string)
 }
 
-variable "host_netnum" {
-  type = number
+variable "ip_addresses" {
+  type = list(string)
 }
 
 variable "libvirt_ca" {

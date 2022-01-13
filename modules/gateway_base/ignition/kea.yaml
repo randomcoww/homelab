@@ -100,7 +100,7 @@ storage:
                   option-data = [
                     {
                       name = "routers"
-                      data = cidrhost(interface.prefix, netnums.vrrp)
+                      data = cidrhost(interface.prefix, vrrp_netnum)
                     },
                     {
                       name = "interface-mtu"
@@ -108,12 +108,12 @@ storage:
                     },
                     {
                       name = "domain-name-servers"
-                      data = cidrhost(interface.prefix, netnums.vrrp)
+                      data = cidrhost(interface.prefix, vrrp_netnum)
                     },
                   ]
                   pools = [
                     {
-                      pool = cidrsubnet(interface.prefix, dhcp_server.newbit, dhcp_server.netnum)
+                      pool = cidrsubnet(interface.prefix, dhcp_server_subnet.newbit, dhcp_server_subnet.netnum)
                     }
                   ]
                 }

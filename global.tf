@@ -78,11 +78,11 @@ locals {
         private_key_pem = tls_private_key.etcd-ca.private_key_pem
         cert_pem        = tls_self_signed_cert.etcd-ca.cert_pem
       }
-      kubernetes = {
-        algorithm       = tls_private_key.kubernetes-ca.algorithm
-        private_key_pem = tls_private_key.kubernetes-ca.private_key_pem
-        cert_pem        = tls_self_signed_cert.kubernetes-ca.cert_pem
-      }
+      # kubernetes = {
+      #   algorithm       = tls_private_key.kubernetes-ca.algorithm
+      #   private_key_pem = tls_private_key.kubernetes-ca.private_key_pem
+      #   cert_pem        = tls_self_signed_cert.kubernetes-ca.cert_pem
+      # }
     }
 
     # http path to kubernetes matchbox
@@ -90,6 +90,8 @@ locals {
 
     # kubernetes external dns
     internal_dns_ip = "192.168.126.126"
+
+    aws_region = "us-west-2"
   }
 }
 

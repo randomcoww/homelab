@@ -109,25 +109,13 @@ module "template-aio-ssh_server" {
 module "template-aio-hypervisor" {
   for_each = local.aio_hostclass_config.hosts
 
-  source      = "./modules/hypervisor"
-  interfaces  = module.template-aio-gateway_base[each.key].interfaces
-  host_netnum = each.value.netnum
-  libvirt_ca  = local.config.ca.libvirt
-}
-
-module "template-aio-etcd" {
-  for_each = local.aio_hostclass_config.hosts
-
-  source           = "./modules/etcd"
-  etcd_peer_port   = local.config.ports.etcd_peer
-  etcd_client_port = local.config.ports.etcd_client
-  etcd_hosts = [
-    for host in values(local.aio_hostclass_config.hosts) :
-    {
-      name   = host.hostname
-      netnum = host.netnum
-    }
-  ]
+  source    = "./modules/hypervisor"
+  dns_names = [each.value.hostname]
+  ip_addresses = compact(concat(["127.0.0.1"], flatten([
+    for interface in values(module.template-aio-gateway_base[each.key].interfaces) :
+    try(cidrhost(interface.prefix, each.value.netnum), null)
+  ])))
+  libvirt_ca = local.config.ca.libvirt
 }
 
 # combine and render a single ignition file #
@@ -141,7 +129,7 @@ version: 1.4.0
 EOT
   strict  = true
   snippets = concat(
-    module.template-aio[each.key].ignition_snippets,
+    module.template-aio-gateway_base[each.key].ignition_snippets,
     module.template-aio-disks[each.key].ignition_snippets,
     module.template-aio-ssh_server[each.key].ignition_snippets,
     module.template-aio-hypervisor[each.key].ignition_snippets,

@@ -10,18 +10,11 @@ resource "tls_cert_request" "libvirt" {
   private_key_pem = tls_private_key.libvirt.private_key_pem
 
   subject {
-    common_name = var.hostname
+    common_name = var.dns_names[0]
   }
 
-  dns_names = [
-    var.hostname,
-  ]
-
-  ip_addresses = concat(["127.0.0.1"], [
-    for interface in values(local.interfaces) :
-    cidrhost(interface.prefix, var.host_netnum)
-    if lookup(interface, "enable_netnum", false)
-  ])
+  dns_names    = var.dns_names
+  ip_addresses = var.ip_addresses
 }
 
 resource "tls_locally_signed_cert" "libvirt" {

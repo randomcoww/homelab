@@ -28,9 +28,11 @@ locals {
     }),
     templatefile("${local.common_ignition_template_path}/server.yaml", {}),
     templatefile("${local.common_ignition_template_path}/masterless_kubelet.yaml", {
-      kubelet_config_path     = "/var/lib/kubelet/config"
-      kubelet_node_ip         = cidrhost(local.tap_interfaces.lan.prefix, var.host_netnum)
-      kubelet_container_image = var.container_images.kubelet
+      kubelet_config_path      = "/var/lib/kubelet/config"
+      kubelet_node_ip          = cidrhost(local.tap_interfaces.lan.prefix, var.host_netnum)
+      kubelet_container_image  = var.container_images.kubelet
+      static_pod_manifest_path = "/var/lib/kubelet/manifests"
+      static_pod_config_path   = "/var/lib/kubelet/podconfig"
     }),
     templatefile("${local.common_ignition_template_path}/container_storage_path.yaml", {
       container_storage_path = var.container_storage_path
@@ -42,6 +44,7 @@ locals {
     templatefile(f, {
       static_pod_manifest_path = "/var/lib/kubelet/manifests"
       static_pod_config_path   = "/var/lib/kubelet/podconfig"
+      container_images         = var.container_images
       hostname                 = var.hostname
       interfaces               = local.tap_interfaces
       hardware_interfaces      = local.hardware_interfaces
@@ -56,6 +59,8 @@ locals {
       kea_shared_path          = "/var/lib/kea"
       kea_hooks_libraries_path = "/usr/local/lib/kea/hooks"
       kea_peers                = var.kea_peers
+      kea_peer_port            = var.kea_peer_port
+      pxeboot_file_name        = var.pxeboot_file_name
 
       # dns #
       internal_dns_ip             = var.internal_dns_ip
