@@ -53,6 +53,7 @@ systemd:
           --fail-swap-on=false \
           --container-runtime=remote \
           --container-runtime-endpoint=unix:///run/containerd/containerd.sock \
+          --node-ip=${try(cidrhost(network_prefix, host_netnum), "")} \
           --v=2"
         ExecStartPre=/usr/bin/mkdir -p \
           ${kubelet_config_path} \
@@ -66,7 +67,6 @@ systemd:
             kubelet \
               $KUBELET_COMMON_ARGS \
               --config=${kubelet_config_path}/kubelet-config-common.yaml \
-              --node-ip=${cidrhost(network_prefix, host_netnum)} \
               --register-node=false
         Restart=always
         RestartSec=10

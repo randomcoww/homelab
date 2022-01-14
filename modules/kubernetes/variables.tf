@@ -46,14 +46,6 @@ variable "kubernetes_pod_network_prefix" {
   type = string
 }
 
-variable "kubelet_node_labels" {
-  type = map(string)
-}
-
-variable "kubernetes_cluster_domain" {
-  type = string
-}
-
 variable "encryption_config_secret" {
   type = string
 }

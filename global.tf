@@ -91,13 +91,15 @@ locals {
       }
     }
 
-    # http path to kubernetes matchbox
+    # http path to kubernetes matchbox #
     pxeboot_file_name = "http://192.168.126.127/boot.ipxe"
 
-    # kubernetes external dns
-    internal_dns_ip    = "192.168.126.126"
-    etcd_cluster_token = "22011"
-    aws_region         = "us-west-2"
+    # kubernetes #
+    kubernetes_cluster_name       = "default-cluster"
+    kubernetes_cluster_dns_netnum = 10
+    aws_region                    = "us-west-2"
+    # provided by kubernetes external-dns
+    internal_dns_ip = "192.168.126.126"
   }
 }
 

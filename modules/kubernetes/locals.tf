@@ -4,11 +4,11 @@ locals {
   certs = {
     kubernetes = {
       for cert_name, cert in merge(var.common_certs.kubernetes, {
-        server_cert = {
-          content = tls_locally_signed_cert.server.cert_pem
+        apiserver_cert = {
+          content = tls_locally_signed_cert.apiserver.cert_pem
         }
-        server_key = {
-          content = tls_private_key.server.private_key_pem
+        apiserver_key = {
+          content = tls_private_key.apiserver.private_key_pem
         }
       }) :
       cert_name => merge(cert, {
@@ -45,11 +45,6 @@ locals {
       controller_config_path            = local.controller_config_path
       static_pod_manifest_path          = "/var/lib/kubelet/manifests"
       static_pod_config_path            = "/var/lib/kubelet/podconfig"
-
-      # kubelet #
-      kubelet_config_path       = local.controller_config_path
-      kubelet_node_labels       = var.kubelet_node_labels
-      kubernetes_cluster_domain = var.kubernetes_cluster_domain
     })
   ]
 }

@@ -128,8 +128,8 @@ storage:
       contents:
         inline: |-
           ---
-          apiVersion: v1
           kind: Pod
+          apiVersion: v1
           metadata:
             name: kea
           spec:

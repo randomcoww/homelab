@@ -52,8 +52,8 @@ storage:
               - "--etcd-servers=${join(",", etcd_servers)}"
               - "--event-ttl=1h"
               - "--kubelet-certificate-authority=${kubernetes_certs.ca_cert.path}"
-              - "--kubelet-client-certificate=${kubernetes_certs.server_cert.path}"
-              - "--kubelet-client-key=${kubernetes_certs.server_key.path}"
+              - "--kubelet-client-certificate=${kubernetes_certs.apiserver_cert.path}"
+              - "--kubelet-client-key=${kubernetes_certs.apiserver_key.path}"
               - "--kubelet-preferred-address-types=InternalDNS,InternalIP"
               - "--runtime-config=api/all=true"
               - "--secure-port=${apiserver_port}"
@@ -61,8 +61,8 @@ storage:
               - "--service-account-key-file=${kubernetes_certs.service_account_cert.path}"
               - "--service-account-signing-key-file=${kubernetes_certs.service_account_key.path}"
               - "--service-cluster-ip-range=${kubernetes_service_network_prefix}"
-              - "--tls-cert-file=${kubernetes_certs.server_cert.path}"
-              - "--tls-private-key-file=${kubernetes_certs.server_key.path}"
+              - "--tls-cert-file=${kubernetes_certs.apiserver_cert.path}"
+              - "--tls-private-key-file=${kubernetes_certs.apiserver_key.path}"
               - "--v=2"
               volumeMounts:
               - name: config-apiserver

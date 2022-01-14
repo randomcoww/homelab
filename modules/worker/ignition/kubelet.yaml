@@ -21,6 +21,7 @@ systemd:
               ${container_images.hyperkube} \
                 kubelet \
                   $KUBELET_COMMON_ARGS \
+                  --bootstrap-kubeconfig=${kubelet_config_path}/bootstrap.kubeconfig \
                   --cert-dir=${kubelet_config_path} \
                   --config=${kubelet_config_path}/kubelet-config-worker.yaml \
                   --feature-gates=GracefulNodeShutdown=true \
@@ -30,7 +31,6 @@ systemd:
                     for node_label, value in kubelet_node_labels :
                     "${node_label}=${value}"
                   ])} \
-                  --node-ip=${cidrhost(network_prefix, host_netnum)} \
                   --register-node=true \
                   --volume-plugin-dir=${kubelet_config_path}/volumeplugins
 
@@ -57,10 +57,14 @@ storage:
             webhook:
               enabled: true
             x509:
-              clientCAFile: "${kubernetes_certs.ca_cert.path}"
+              clientCAFile: "${worker_certs.ca_cert.path}"
           authorization:
             mode: Webhook
+          staticPodPath: ${static_pod_manifest_path}
           clusterDomain: "${kubernetes_cluster_domain}"
+          clusterDNS:
+          - "${cidrhost(kubernetes_pod_network_prefix, kubernetes_cluster_dns_netnum)}"
+          resolvConf: "/run/systemd/resolve/resolv.conf"
           runtimeRequestTimeout: "15m"
           rotateCertificates: true
           serverTLSBootstrap: true
@@ -69,7 +73,7 @@ storage:
           containerLogMaxSize: "10Mi"
           containerLogMaxFiles: 2
 
-    - path: ${kubelet_config_path}/kubelet.kubeconfig
+    - path: ${kubelet_config_path}/bootstrap.kubeconfig
       mode: 0644
       contents:
         inline: |-
@@ -77,18 +81,18 @@ storage:
           apiVersion: v1
           clusters:
           - cluster:
-              certificate-authority: ${kubernetes_certs.ca_cert.path}
+              certificate-authority: ${worker_certs.ca_cert.path}
               server: https://${apiserver_ip}:${apiserver_port}
             name: ${cluster_name}
           contexts:
           - context:
               cluster: ${cluster_name}
-              user: system:node
+              user: kubelet-bootstrap
             name: default
           current-context: default
           preferences: {}
           users:
-          - name: system:node
+          - name: kubelet-bootstrap
             user:
-              client-certificate: ${kubernetes_certs.kubelet_cert.path}
-              client-key: ${kubernetes_certs.kubelet_key.path}
+              client-certificate: ${worker_certs.bootstrap_cert.path}
+              client-key: ${worker_certs.bootstrap_key.path}

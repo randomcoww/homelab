@@ -19,17 +19,28 @@ locals {
       scheduler_key = {
         content = tls_private_key.scheduler.private_key_pem
       }
-      kubelet_cert = {
-        content = tls_locally_signed_cert.kubelet.cert_pem
-      }
-      kubelet_key = {
-        content = tls_private_key.kubelet.private_key_pem
-      }
       service_account_cert = {
         content = tls_private_key.service-account.public_key_pem
       }
       service_account_key = {
         content = tls_private_key.service-account.private_key_pem
+      }
+      bootstrap_cert = {
+        content = tls_locally_signed_cert.bootstrap.cert_pem
+      }
+      bootstrap_key = {
+        content = tls_private_key.bootstrap.private_key_pem
+      }
+    }
+    worker = {
+      ca_cert = {
+        content = tls_self_signed_cert.kubernetes-ca.cert_pem
+      }
+      bootstrap_cert = {
+        content = tls_locally_signed_cert.bootstrap.cert_pem
+      }
+      bootstrap_key = {
+        content = tls_private_key.bootstrap.private_key_pem
       }
     }
     etcd = {
