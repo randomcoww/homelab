@@ -42,7 +42,7 @@ variable "kubernetes_service_network_prefix" {
   type = string
 }
 
-variable "kubernetes_network_prefix" {
+variable "kubernetes_pod_network_prefix" {
   type = string
 }
 

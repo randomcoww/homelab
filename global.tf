@@ -40,7 +40,7 @@ locals {
       wan = {
         vlan_id = 30
       }
-      kubernetes = {
+      kubernetes_pod = {
         network = "10.244.0.0"
         cidr    = 16
       }
@@ -95,9 +95,9 @@ locals {
     pxeboot_file_name = "http://192.168.126.127/boot.ipxe"
 
     # kubernetes external dns
-    internal_dns_ip = "192.168.126.126"
-
-    aws_region = "us-west-2"
+    internal_dns_ip    = "192.168.126.126"
+    etcd_cluster_token = "22011"
+    aws_region         = "us-west-2"
   }
 }
 

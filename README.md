@@ -68,6 +68,13 @@ tw terraform output -raw ssh_client_cert_authorized_key > $KEY-cert.pub
 virsh -c qemu+ssh://fcos@hypervisor-0.local/system list --all
 ```
 
+### Write admin kubeconfig
+
+```
+mkdir -p ~/.kube && \
+  tw terraform output -raw kubeconfig_admin > ~/.kube/config
+```
+
 ### Cleanup
 
 ```

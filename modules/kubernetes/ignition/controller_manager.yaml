@@ -48,7 +48,7 @@ storage:
               - kube-controller-manager
               - "--allocate-node-cidrs=true"
               - "--bind-address=0.0.0.0"
-              - "--cluster-cidr=${kubernetes_network_prefix}"
+              - "--cluster-cidr=${kubernetes_pod_network_prefix}"
               - "--cluster-name=${cluster_name}"
               - "--cluster-signing-cert-file=${kubernetes_certs.ca_cert.path}"
               - "--cluster-signing-key-file=${kubernetes_certs.ca_key.path}"

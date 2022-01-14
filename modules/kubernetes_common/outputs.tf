@@ -31,3 +31,11 @@ output "aws_s3_backup_credentials" {
 output "etcd_s3_backup_key" {
   value = var.etcd_s3_backup_key
 }
+
+output "admin" {
+  value = {
+    ca_pem          = tls_private_key.kubernetes-ca.private_key_pem
+    cert_pem        = tls_locally_signed_cert.admin.cert_pem
+    private_key_pem = tls_private_key.admin.private_key_pem
+  }
+}

@@ -36,7 +36,7 @@ locals {
       # controller #
       cluster_name                      = var.kubernetes_cluster_name
       kubernetes_service_network_prefix = var.kubernetes_service_network_prefix
-      kubernetes_network_prefix         = var.kubernetes_network_prefix
+      kubernetes_pod_network_prefix     = var.kubernetes_pod_network_prefix
       etcd_servers                      = var.etcd_servers
       etcd_client_port                  = var.etcd_client_port
       apiserver_ip                      = "127.0.0.1"
@@ -47,7 +47,6 @@ locals {
       static_pod_config_path            = "/var/lib/kubelet/podconfig"
 
       # kubelet #
-      kubernetes_dns_netnum     = 10
       kubelet_config_path       = local.controller_config_path
       kubelet_node_labels       = var.kubelet_node_labels
       kubernetes_cluster_domain = var.kubernetes_cluster_domain

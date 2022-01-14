@@ -55,7 +55,6 @@ locals {
       }
     }
   }
-  etcd_cluster_token = "22011"
 }
 
 # templates #
@@ -165,7 +164,7 @@ module "template-aio-etcd" {
   ]
   etcd_client_port      = local.config.ports.etcd_client
   etcd_peer_port        = local.config.ports.etcd_peer
-  etcd_cluster_token    = local.etcd_cluster_token
+  etcd_cluster_token    = local.config.etcd_cluster_token
   aws_access_key_id     = module.kubernetes-common.aws_s3_backup_credentials.access_key_id
   aws_secret_access_key = module.kubernetes-common.aws_s3_backup_credentials.access_key_secret
   aws_region            = local.config.aws_region
@@ -186,10 +185,10 @@ module "template-aio-kubernetes" {
   apiserver_port                    = local.config.ports.apiserver
   etcd_client_port                  = local.config.ports.etcd_client
   etcd_servers                      = [module.template-aio-etcd[each.key].local_client_endpoint]
-  kubernetes_cluster_name           = "cluster-${local.etcd_cluster_token}"
+  kubernetes_cluster_name           = "cluster-${local.config.etcd_cluster_token}"
   kubernetes_cluster_domain         = local.config.domains.kubernetes
-  kubernetes_service_network_prefix = local.config.networks.kubernetes.prefix
-  kubernetes_network_prefix         = local.config.networks.kubernetes_service.prefix
+  kubernetes_service_network_prefix = local.config.networks.kubernetes_service.prefix
+  kubernetes_pod_network_prefix     = local.config.networks.kubernetes_pod.prefix
   kubelet_node_labels               = {}
   encryption_config_secret          = module.kubernetes-common.encryption_config_secret
   kubernetes_ca                     = module.kubernetes-common.ca.kubernetes
