@@ -55,24 +55,41 @@ locals {
       }
     }
   }
-  etcd_cluster_token = "2201"
+  etcd_cluster_token = "22011"
 }
 
 # templates #
-module "template-aio-gateway_base" {
+module "template-aio-base" {
   for_each = local.aio_hostclass_config.hosts
 
-  source              = "./modules/gateway_base"
-  hostname            = each.value.hostname
-  user                = local.config.users.admin
+  source                 = "./modules/base"
+  hostname               = each.value.hostname
+  users                  = [local.config.users.admin]
+  container_storage_path = "${each.value.disks.pv.partitions[0].mount_path}/containers"
+}
+
+module "template-aio-server" {
+  for_each = local.aio_hostclass_config.hosts
+
+  source              = "./modules/server"
   networks            = local.config.networks
   hardware_interfaces = each.value.hardware_interfaces
   tap_interfaces      = each.value.tap_interfaces
-  container_images    = local.config.container_images
-  dhcp_server_subnet  = local.aio_hostclass_config.dhcp_server_subnet
-  kea_peer_port       = local.config.ports.kea_peer
   host_netnum         = each.value.netnum
-  vrrp_netnum         = local.aio_hostclass_config.vrrp_netnum
+}
+
+module "template-aio-gateway" {
+  for_each = local.aio_hostclass_config.hosts
+
+  source             = "./modules/gateway"
+  hostname           = each.value.hostname
+  user               = local.config.users.admin
+  interfaces         = module.template-aio-server[each.key].interfaces
+  container_images   = local.config.container_images
+  dhcp_server_subnet = local.aio_hostclass_config.dhcp_server_subnet
+  kea_peer_port      = local.config.ports.kea_peer
+  host_netnum        = each.value.netnum
+  vrrp_netnum        = local.aio_hostclass_config.vrrp_netnum
   kea_peers = [
     for host in values(local.aio_hostclass_config.hosts) :
     {
@@ -81,10 +98,9 @@ module "template-aio-gateway_base" {
       netnum = host.netnum
     }
   ]
-  internal_dns_ip        = local.config.internal_dns_ip
-  internal_domain        = local.config.domains.internal
-  container_storage_path = "${each.value.disks.pv.partitions[0].mount_path}/containers"
-  pxeboot_file_name      = local.config.pxeboot_file_name
+  internal_dns_ip   = local.config.internal_dns_ip
+  internal_domain   = local.config.domains.internal
+  pxeboot_file_name = local.config.pxeboot_file_name
 }
 
 module "template-aio-disks" {
@@ -101,8 +117,9 @@ module "template-aio-ssh_server" {
   key_id     = each.value.hostname
   user_names = [local.config.users.admin.name]
   valid_principals = compact(concat([each.value.hostname, "127.0.0.1"], flatten([
-    for interface in values(module.template-aio-gateway_base[each.key].interfaces) :
+    for interface in values(module.template-aio-server[each.key].interfaces) :
     try(cidrhost(interface.prefix, each.value.netnum), null)
+    if lookup(interface, "enable_netnum", false)
   ])))
   ssh_ca = local.config.ca.ssh
 }
@@ -113,16 +130,21 @@ module "template-aio-hypervisor" {
   source    = "./modules/hypervisor"
   dns_names = [each.value.hostname]
   ip_addresses = compact(concat(["127.0.0.1"], flatten([
-    for interface in values(module.template-aio-gateway_base[each.key].interfaces) :
+    for interface in values(module.template-aio-server[each.key].interfaces) :
     try(cidrhost(interface.prefix, each.value.netnum), null)
+    if lookup(interface, "enable_netnum", false)
   ])))
   libvirt_ca = local.config.ca.libvirt
 }
 
 # kubernetes #
-module "kubernetes-common-default" {
-  source             = "./modules/kubernetes_common"
-  etcd_s3_backup_key = "randomcoww-etcd-backup/2201"
+module "template-aio-kubelet" {
+  for_each = local.aio_hostclass_config.hosts
+
+  source           = "./modules/kubelet"
+  container_images = local.config.container_images
+  network_prefix   = local.config.networks.lan.prefix
+  host_netnum      = each.value.netnum
 }
 
 module "template-aio-etcd" {
@@ -131,7 +153,7 @@ module "template-aio-etcd" {
   source           = "./modules/etcd"
   hostname         = each.value.hostname
   container_images = local.config.container_images
-  common_certs     = module.kubernetes-common-default.certs
+  common_certs     = module.kubernetes-common.certs
   network_prefix   = local.config.networks.lan.prefix
   host_netnum      = each.value.netnum
   etcd_hosts = [
@@ -144,11 +166,11 @@ module "template-aio-etcd" {
   etcd_client_port      = local.config.ports.etcd_client
   etcd_peer_port        = local.config.ports.etcd_peer
   etcd_cluster_token    = local.etcd_cluster_token
-  aws_access_key_id     = module.kubernetes-common-default.aws_s3_backup_credentials.access_key_id
-  aws_secret_access_key = module.kubernetes-common-default.aws_s3_backup_credentials.access_key_secret
+  aws_access_key_id     = module.kubernetes-common.aws_s3_backup_credentials.access_key_id
+  aws_secret_access_key = module.kubernetes-common.aws_s3_backup_credentials.access_key_secret
   aws_region            = local.config.aws_region
-  etcd_s3_backup_path   = "randomcoww-etcd-backup/${local.etcd_cluster_token}"
-  etcd_ca               = module.kubernetes-common-default.ca.etcd
+  etcd_s3_backup_path   = module.kubernetes-common.etcd_s3_backup_key
+  etcd_ca               = module.kubernetes-common.ca.etcd
 }
 
 module "template-aio-kubernetes" {
@@ -157,7 +179,7 @@ module "template-aio-kubernetes" {
   source                            = "./modules/kubernetes"
   hostname                          = each.value.hostname
   container_images                  = local.config.container_images
-  common_certs                      = module.kubernetes-common-default.certs
+  common_certs                      = module.kubernetes-common.certs
   network_prefix                    = local.config.networks.lan.prefix
   host_netnum                       = each.value.netnum
   vip_netnum                        = local.aio_hostclass_config.vrrp_netnum
@@ -169,8 +191,8 @@ module "template-aio-kubernetes" {
   kubernetes_service_network_prefix = local.config.networks.kubernetes.prefix
   kubernetes_network_prefix         = local.config.networks.kubernetes_service.prefix
   kubelet_node_labels               = {}
-  encryption_config_secret          = module.kubernetes-common-default.encryption_config_secret
-  kubernetes_ca                     = module.kubernetes-common-default.ca.kubernetes
+  encryption_config_secret          = module.kubernetes-common.encryption_config_secret
+  kubernetes_ca                     = module.kubernetes-common.ca.kubernetes
 }
 
 # combine and render a single ignition file #
@@ -184,10 +206,13 @@ version: 1.4.0
 EOT
   strict  = true
   snippets = concat(
-    module.template-aio-gateway_base[each.key].ignition_snippets,
+    module.template-aio-base[each.key].ignition_snippets,
+    module.template-aio-server[each.key].ignition_snippets,
+    module.template-aio-gateway[each.key].ignition_snippets,
     module.template-aio-disks[each.key].ignition_snippets,
     module.template-aio-ssh_server[each.key].ignition_snippets,
     module.template-aio-hypervisor[each.key].ignition_snippets,
+    module.template-aio-kubelet[each.key].ignition_snippets,
     module.template-aio-etcd[each.key].ignition_snippets,
     module.template-aio-kubernetes[each.key].ignition_snippets,
   )

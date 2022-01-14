@@ -20,14 +20,20 @@ locals {
 }
 
 # templates #
-module "template-client" {
+module "template-client-base" {
   for_each = local.client_hostclass_config.hosts
 
-  source                    = "./modules/client_base"
-  hostname                  = each.value.hostname
-  user                      = local.config.users.client
+  source                 = "./modules/base"
+  hostname               = each.value.hostname
+  users                  = [local.config.users.client]
+  container_storage_path = "${each.value.disks.pv.partitions[0].mount_path}/containers"
+}
+
+module "template-client-desktop" {
+  for_each = local.client_hostclass_config.hosts
+
+  source                    = "./modules/desktop"
   ssh_ca_public_key_openssh = local.config.ca.ssh.public_key_openssh
-  container_storage_path    = "${each.value.disks.pv.partitions[0].mount_path}/containers"
 }
 
 module "template-client-disks" {
@@ -48,7 +54,8 @@ version: 1.4.0
 EOT
   strict  = true
   snippets = concat(
-    module.template-client[each.key].ignition_snippets,
+    module.template-client-base[each.key].ignition_snippets,
+    module.template-client-desktop[each.key].ignition_snippets,
     module.template-client-disks[each.key].ignition_snippets,
   )
 }

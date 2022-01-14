@@ -27,3 +27,7 @@ output "aws_s3_backup_credentials" {
     access_key_secret = aws_iam_access_key.etcd-s3-backup.secret
   }
 }
+
+output "etcd_s3_backup_key" {
+  value = var.etcd_s3_backup_key
+}

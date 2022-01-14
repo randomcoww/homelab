@@ -163,3 +163,9 @@ storage:
         inline: |
           profile=gpu-hq
           hwdec=vaapi
+
+    # ssh-ca client #
+    - path: /etc/ssh/ssh_known_hosts
+      mode: 0644
+      contents:
+        inline: "@cert-authority * ${ssh_ca_authorized_key}"

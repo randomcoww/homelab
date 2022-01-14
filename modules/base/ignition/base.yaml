@@ -14,14 +14,6 @@ systemd:
             [Service]
             ExecStart=
             ExecStart=/usr/sbin/fstrim --all --verbose --quiet
-    # systemd-networkd work around "could not connect to dbus: permission denied"
-    - name: systemd-networkd.service
-      enabled: true
-      dropins:
-        - name: 10-require-dbus.conf
-          contents: |
-            [Unit]
-            After=dbus.socket
     # use systemd-resolved mdns instead of avahi
     - name: systemd-resolved.service
       enabled: true
@@ -29,9 +21,24 @@ systemd:
       mask: true
     - name: avahi-daemon.socket
       mask: true
+    # temperature monitoring for hardware
+    - name: lm_sensors.service
+      enabled: true
+      dropins:
+        - name: 10-exclude-vm.conf
+          contents: |
+            [Unit]
+            ConditionVirtualization=!vm
+            ConditionVirtualization=!container
 
 storage:
   files:
+    - path: /etc/hostname
+      mode: 0644
+      contents:
+        inline:
+          ${hostname}
+
     # Disable local DNS for systemd-networkd #
     - path: /etc/systemd/resolved.conf.d/10-disable-dns-stub.conf
       mode: 0644
@@ -92,28 +99,27 @@ storage:
         inline: |
           kernel.printk=4
           fs.inotify.max_user_watches=524288
-    # systemd-networkd defaults #
-    - path: /etc/systemd/network/90-default.network
+
+    # move root container storage off of RAM disk
+    - path: /etc/containers/storage.conf
+      overwrite: true
+      contents:
+        inline: |
+          [storage]
+          driver = "overlay"
+          runroot = "/run/containers/storage"
+          graphroot = "${container_storage_path}"
+
+          [storage.options]
+          additionalimagestores = []
+
+          [storage.options.overlay]
+          mountopt = "nodev,metacopy=on"
+
+    # when using network manager 
+    - path: /etc/NetworkManager/conf.d/base.conf
       mode: 0644
       contents:
         inline: |
-          [Match]
-          Virtualization=!vm
-          Virtualization=!container
-          Name=en*
-
-          [Link]
-          ARP=false
-          RequiredForOnline=false
-
-          [Network]
-          LinkLocalAddressing=false
-          DHCP=false
-    # ignore lid operations for running on laptop
-    - path: /etc/systemd/logind.conf.d/10-ignore-lid-switch.conf
-      contents:
-        inline: |-
-          [Login]
-          HandleLidSwitch=ignore
-          HandleLidSwitchExternalPower=ignore
-          HandleLidSwitchDocked=ignore
+          [main]
+          no-auto-default=*

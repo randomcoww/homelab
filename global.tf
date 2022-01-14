@@ -180,3 +180,10 @@ resource "ssh_client_cert" "ssh-client" {
     "permit-user-rc",
   ]
 }
+
+# kubernetes #
+module "kubernetes-common" {
+  source              = "./modules/kubernetes_common"
+  etcd_s3_backup_user = "etcd_s3_backup_user-220011"
+  etcd_s3_backup_key  = "randomcoww-etcd-backup/22011"
+}

@@ -6,23 +6,8 @@ variable "hostname" {
   type = string
 }
 
-variable "networks" {
-  type = map(object({
-    network = optional(string)
-    cidr    = optional(string)
-    prefix  = optional(string)
-    vlan_id = optional(number)
-  }))
-  default = {}
-}
-
-variable "tap_interfaces" {
+variable "interfaces" {
   type = map(map(string))
-}
-
-variable "hardware_interfaces" {
-  type    = any
-  default = {}
 }
 
 variable "container_images" {
@@ -62,9 +47,5 @@ variable "internal_domain" {
 }
 
 variable "pxeboot_file_name" {
-  type = string
-}
-
-variable "container_storage_path" {
   type = string
 }

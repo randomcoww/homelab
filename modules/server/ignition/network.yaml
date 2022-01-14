@@ -1,8 +1,41 @@
 ---
 variant: fcos
 version: 1.4.0
+systemd:
+  units:
+    # systemd-networkd work around "could not connect to dbus: permission denied"
+    - name: systemd-networkd.service
+      enabled: true
+      dropins:
+        - name: 10-require-dbus.conf
+          contents: |
+            [Unit]
+            After=dbus.socket
+    - name: systemd-networkd-wait-online.service
+      enabled: true
+    - name: NetworkManager.service
+      mask: true
+    - name: NetworkManager-wait-online.service
+      mask: true
+
 storage:
   files:
+    # systemd-networkd defaults #
+    - path: /etc/systemd/network/90-default.network
+      mode: 0644
+      contents:
+        inline: |
+          [Match]
+          Name=en*
+
+          [Link]
+          ARP=false
+          RequiredForOnline=false
+
+          [Network]
+          LinkLocalAddressing=false
+          DHCP=false
+
     # hardware interface #
     %{~ for hardware_interface_name, hardware_interface in hardware_interfaces ~}
     - path: /etc/systemd/network/10-${hardware_interface_name}.link
@@ -10,6 +43,8 @@ storage:
       contents:
         inline: |
           [Match]
+          Virtualization=!vm
+          Virtualization=!container
           PermanentMACAddress=${hardware_interface.mac}
 
           [Link]
@@ -21,6 +56,8 @@ storage:
       contents:
         inline: |
           [Match]
+          Virtualization=!vm
+          Virtualization=!container
           Name=${hardware_interface_name}
 
           [Link]
@@ -51,6 +88,8 @@ storage:
       contents:
         inline: |
           [Match]
+          Virtualization=!vm
+          Virtualization=!container
           Name=${hardware_interface_name}-${network_name}
 
           [Link]

@@ -1,46 +1,10 @@
 ---
 variant: fcos
 version: 1.4.0
-systemd:
-  units:
-    - name: containerd.service
-      enabled: true
-      dropins:
-        - name: 11-nvidia-config.conf
-          contents: |
-            [Service]
-            ExecStart=
-            ExecStart=/usr/bin/containerd -c /etc/containerd/config-nvidia.toml
-
 storage:
   files:
     # containerd needs `no-cgroups = false` but podman needs `no-cgroups = true`
     # /etc/containers/containers.conf.d/<config>.conf would be better here but it is not working
-    - path: /etc/containerd/config-nvidia.toml
-      mode: 0644
-      overwrite: true
-      contents:
-        inline: |-
-          oom_score = -999
-          version = 2
-
-          [plugins]
-            [plugins."io.containerd.grpc.v1.cri"]
-              disable_tcp_service = true
-
-              [plugins."io.containerd.grpc.v1.cri".containerd]
-                default_runtime_name = "nvidia"
-
-                [plugins."io.containerd.grpc.v1.cri".containerd.runtimes]
-                  [plugins."io.containerd.grpc.v1.cri".containerd.runtimes.nvidia]
-                    runtime_type = "io.containerd.runc.v2"
-                    runtime_engine = ""
-                    runtime_root = ""
-                    privileged_without_host_devices = false
-                    base_runtime_spec = ""
-
-                    [plugins."io.containerd.grpc.v1.cri".containerd.runtimes.nvidia.options]
-                      BinaryName = "nvidia-container-runtime"
     - path: /etc/containers/containers.conf
       overwrite: true
       contents:

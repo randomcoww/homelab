@@ -20,14 +20,6 @@ version: 1.4.0
 #     # - mlx4_core.port_type_array=2
 #     # - mlx4_core.probe_vf=8
 
-storage:
-  files:
-    - path: /etc/hostname
-      mode: 0644
-      contents:
-        inline:
-          ${hostname}
-
 passwd:
   users:
     ${indent(4, yamlencode(

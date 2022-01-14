@@ -1,5 +1,5 @@
 resource "aws_iam_user" "etcd-s3-backup" {
-  name = "etcd-s3-backup"
+  name = var.etcd_s3_backup_user
 }
 
 resource "aws_iam_user_policy" "etcd-s3-backup-access" {

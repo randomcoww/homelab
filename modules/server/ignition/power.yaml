@@ -1,0 +1,13 @@
+---
+variant: fcos
+version: 1.4.0
+storage:
+  files:
+    # ignore lid operations for running on laptop
+    - path: /etc/systemd/logind.conf.d/10-ignore-lid-switch.conf
+      contents:
+        inline: |-
+          [Login]
+          HandleLidSwitch=ignore
+          HandleLidSwitchExternalPower=ignore
+          HandleLidSwitchDocked=ignore
