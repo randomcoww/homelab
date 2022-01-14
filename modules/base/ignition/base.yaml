@@ -123,3 +123,6 @@ storage:
         inline: |
           [main]
           no-auto-default=*
+
+          [connection]
+          connection.mdns=2
