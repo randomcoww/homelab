@@ -3,9 +3,11 @@ variable "container_images" {
 }
 
 variable "network_prefix" {
-  type = string
+  type    = string
+  default = null
 }
 
 variable "host_netnum" {
-  type = number
+  type    = number
+  default = null
 }

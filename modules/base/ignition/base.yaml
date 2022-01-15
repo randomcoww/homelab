@@ -86,6 +86,19 @@ storage:
       contents:
         inline: |
           ip_vs
+    # mayastor nvmeof #
+    - path: /etc/modules-load.d/20-nvmeof.conf
+      mode: 0644
+      contents:
+        inline: |
+          nvme-tcp
+    # DNS reply from unexpected source #
+    - path: /etc/modules-load.d/20-dns-reply.conf
+      mode: 0644
+      contents:
+        inline: |
+          br_netfilter
+    # Keepalived VIP #
     - path: /etc/sysctl.d/20-keepalived.conf
       mode: 0644
       contents:
@@ -100,7 +113,7 @@ storage:
           kernel.printk=4
           fs.inotify.max_user_watches=524288
 
-    # move root container storage off of RAM disk
+    # move root container storage off of RAM disk #
     - path: /etc/containers/storage.conf
       overwrite: true
       contents:
@@ -116,7 +129,7 @@ storage:
           [storage.options.overlay]
           mountopt = "nodev,metacopy=on"
 
-    # when using network manager 
+    # Enable mdns when using network manager #
     - path: /etc/NetworkManager/conf.d/base.conf
       mode: 0644
       contents:

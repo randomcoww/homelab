@@ -13,7 +13,7 @@ locals {
           phy0 = {
             mac   = "8c-8c-aa-e3-58-62"
             mtu   = 9000
-            vlans = ["lan", "sync", "wan"]
+            vlans = ["sync", "wan"]
           }
           wlan0 = {
             mac = "b4-0e-de-fb-28-95"
@@ -21,23 +21,23 @@ locals {
         }
         tap_interfaces = {
           lan = {
-            hardware_interface_name = "phy0"
-            enable_mdns             = true
-            enable_netnum           = true
-            enable_vrrp_netnum      = true
-            enable_dhcp_server      = true
-            mtu                     = 9000
+            bridge_interface_name = "phy0"
+            enable_mdns           = true
+            enable_netnum         = true
+            enable_vrrp_netnum    = true
+            enable_dhcp_server    = true
+            mtu                   = 9000
           }
           sync = {
-            hardware_interface_name = "phy0"
-            enable_netnum           = true
-            enable_vrrp_netnum      = true
-            mtu                     = 9000
+            bridge_interface_name = "phy0-sync"
+            enable_netnum         = true
+            enable_vrrp_netnum    = true
+            mtu                   = 9000
           }
           wan = {
-            hardware_interface_name = "phy0"
-            enable_dhcp             = true
-            macaddress              = "52-54-00-63-6e-b3"
+            bridge_interface_name = "phy0-wan"
+            enable_dhcp           = true
+            macaddress            = "52-54-00-63-6e-b3"
           }
         }
         disks = {
@@ -190,21 +190,9 @@ module "template-aio-kubernetes" {
   kubernetes_pod_network_prefix     = local.config.networks.kubernetes_pod.prefix
   encryption_config_secret          = module.kubernetes-common.encryption_config_secret
   kubernetes_ca                     = module.kubernetes-common.ca.kubernetes
-}
-
-module "template-aio-worker" {
-  for_each = local.aio_hostclass_config.hosts
-
-  source                        = "./modules/worker"
-  container_images              = local.config.container_images
-  common_certs                  = module.kubernetes-common.certs
-  apiserver_ip                  = "127.0.0.1"
-  apiserver_port                = local.config.ports.apiserver
-  kubernetes_cluster_name       = local.config.kubernetes_cluster_name
-  kubernetes_cluster_domain     = local.config.domains.kubernetes
-  kubernetes_pod_network_prefix = local.config.networks.kubernetes_pod.prefix
-  kubernetes_cluster_dns_netnum = local.config.kubernetes_cluster_dns_netnum
-  kubelet_node_labels           = {}
+  kubernetes_cluster_domain         = local.config.domains.kubernetes
+  kubernetes_cluster_dns_netnum     = local.config.kubernetes_cluster_dns_netnum
+  kubelet_node_labels               = {}
 }
 
 # combine and render a single ignition file #
@@ -227,7 +215,6 @@ EOT
     module.template-aio-kubelet[each.key].ignition_snippets,
     module.template-aio-etcd[each.key].ignition_snippets,
     module.template-aio-kubernetes[each.key].ignition_snippets,
-    module.template-aio-worker[each.key].ignition_snippets,
   )
 }
 

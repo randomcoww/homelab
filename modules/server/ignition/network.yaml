@@ -67,30 +67,37 @@ storage:
           [Network]
           LinkLocalAddressing=false
           DHCP=false
-          %{~ for network_name, network in hardware_interface.vlans ~}
-          VLAN=${hardware_interface_name}-${network_name}
+          %{~ for network_name, vlan in hardware_interface.vlans ~}
+          VLAN=${vlan.interface_name}
+          %{~ endfor ~}
+          %{~ for network_name, interface in interfaces ~}
+          %{~ if interface.bridge_interface_name == hardware_interface_name ~}
+          %{~ if lookup(interface, "enable_netnum", false) || lookup(interface, "enable_dhcp", false) ~}
+          MACVTAP=${interface.interface_name}
+          %{~ endif ~}
+          %{~ endif ~}
           %{~ endfor ~}
 
     # VLAN interfaces
-    %{~ for network_name, network in hardware_interface.vlans ~}
-    - path: /etc/systemd/network/20-${hardware_interface_name}-${network_name}.netdev
+    %{~ for network_name, vlan in hardware_interface.vlans ~}
+    - path: /etc/systemd/network/20-${vlan.interface_name}.netdev
       mode: 0644
       contents:
         inline: |
           [NetDev]
-          Name=${hardware_interface_name}-${network_name}
+          Name=${vlan.interface_name}
           Kind=vlan
 
           [VLAN]
-          Id=${network.vlan_id}
-    - path: /etc/systemd/network/22-${hardware_interface_name}-${network_name}.network
+          Id=${vlan.vlan_id}
+    - path: /etc/systemd/network/22-${vlan.interface_name}.network
       mode: 0644
       contents:
         inline: |
           [Match]
           Virtualization=!vm
           Virtualization=!container
-          Name=${hardware_interface_name}-${network_name}
+          Name=${vlan.interface_name}
 
           [Link]
           ARP=false
@@ -100,7 +107,7 @@ storage:
           LinkLocalAddressing=false
           DHCP=false
           %{~ if can(interfaces[network_name]) ~}
-          %{~ if interfaces[network_name].hardware_interface_name == hardware_interface_name ~}
+          %{~ if interfaces[network_name].bridge_interface_name == vlan.interface_name ~}
           %{~ if lookup(interfaces[network_name], "enable_netnum", false) || lookup(interfaces[network_name], "enable_dhcp", false) ~}
           MACVTAP=${interfaces[network_name].interface_name}
           %{~ endif ~}

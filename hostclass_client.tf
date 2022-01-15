@@ -43,6 +43,29 @@ module "template-client-disks" {
   disks  = each.value.disks
 }
 
+# kubernetes #
+module "template-client-kubelet" {
+  for_each = local.client_hostclass_config.hosts
+
+  source           = "./modules/kubelet"
+  container_images = local.config.container_images
+}
+
+module "template-client-worker" {
+  for_each = local.client_hostclass_config.hosts
+
+  source                        = "./modules/worker"
+  container_images              = local.config.container_images
+  common_certs                  = module.kubernetes-common.certs
+  apiserver_ip                  = cidrhost(local.config.networks.lan.prefix, local.aio_hostclass_config.vrrp_netnum)
+  apiserver_port                = local.config.ports.apiserver
+  kubernetes_cluster_name       = local.config.kubernetes_cluster_name
+  kubernetes_cluster_domain     = local.config.domains.kubernetes
+  kubernetes_pod_network_prefix = local.config.networks.kubernetes_pod.prefix
+  kubernetes_cluster_dns_netnum = local.config.kubernetes_cluster_dns_netnum
+  kubelet_node_labels           = {}
+}
+
 # combine and render a single ignition file #
 data "ct_config" "client" {
   for_each = local.client_hostclass_config.hosts
@@ -57,6 +80,8 @@ EOT
     module.template-client-base[each.key].ignition_snippets,
     module.template-client-desktop[each.key].ignition_snippets,
     module.template-client-disks[each.key].ignition_snippets,
+    module.template-client-kubelet[each.key].ignition_snippets,
+    module.template-client-worker[each.key].ignition_snippets,
   )
 }
 

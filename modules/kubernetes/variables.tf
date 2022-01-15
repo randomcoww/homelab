@@ -57,3 +57,15 @@ variable "kubernetes_ca" {
     cert_pem        = string
   })
 }
+
+variable "kubernetes_cluster_domain" {
+  type = string
+}
+
+variable "kubernetes_cluster_dns_netnum" {
+  type = number
+}
+
+variable "kubelet_node_labels" {
+  type = map(string)
+}

@@ -1,0 +1,88 @@
+---
+variant: fcos
+version: 1.4.0
+systemd:
+  units:
+    - name: iscsid.service
+      enabled: true
+    - name: kubelet.service
+      enabled: true
+      dropins:
+        - name: 10-worker.conf
+          contents: |
+            [Unit]
+            After=iscsid.service
+            Wants=iscsid.service
+            [Service]
+            ExecStart=
+            ExecStart=/usr/bin/podman run --rm -it \
+              $KUBELET_PODMAN_OPTS \
+              -v /etc/systemd:/etc/systemd \
+              ${container_images.hyperkube} \
+                kubelet \
+                  $KUBELET_COMMON_ARGS \
+                  --cert-dir=${controller_config_path} \
+                  --config=${controller_config_path}/kubelet-config-worker.yaml \
+                  --feature-gates=GracefulNodeShutdown=true \
+                  --kubeconfig=${controller_config_path}/kubelet.kubeconfig \
+                  --network-plugin=cni \
+                  --node-labels=${join(",", [
+                    for node_label, value in kubelet_node_labels :
+                    "${node_label}=${value}"
+                  ])} \
+                  --register-node=true \
+                  --volume-plugin-dir=${controller_config_path}/volumeplugins
+
+storage:
+  files:
+    - path: ${controller_config_path}/kubelet-config-worker.yaml
+      mode: 0644
+      contents:
+        inline: |-
+          kind: KubeletConfiguration
+          apiVersion: kubelet.config.k8s.io/v1beta1
+          authentication:
+            anonymous:
+              enabled: false
+            webhook:
+              enabled: true
+            x509:
+              clientCAFile: "${kubernetes_certs.ca_cert.path}"
+          authorization:
+            mode: Webhook
+          staticPodPath: ${static_pod_manifest_path}
+          clusterDomain: "${kubernetes_cluster_domain}"
+          clusterDNS:
+          - "${cidrhost(kubernetes_pod_network_prefix, kubernetes_cluster_dns_netnum)}"
+          resolvConf: "/run/systemd/resolve/resolv.conf"
+          runtimeRequestTimeout: "15m"
+          shutdownGracePeriod: "120s"
+          shutdownGracePeriodCriticalPods: "60s"
+          containerLogMaxSize: "10Mi"
+          containerLogMaxFiles: 2
+          tlsCertFile: ${kubernetes_certs.kubelet_cert.path}
+          tlsPrivateKeyFile: ${kubernetes_certs.kubelet_key.path}
+
+    - path: ${controller_config_path}/kubelet.kubeconfig
+      mode: 0644
+      contents:
+        inline: |-
+          kind: Config
+          apiVersion: v1
+          clusters:
+          - cluster:
+              certificate-authority: ${kubernetes_certs.ca_cert.path}
+              server: https://${apiserver_ip}:${apiserver_port}
+            name: ${cluster_name}
+          contexts:
+          - context:
+              cluster: ${cluster_name}
+              user: system:node:${hostname}
+            name: default
+          current-context: default
+          preferences: {}
+          users:
+          - name: system:node:${hostname}
+            user:
+              client-certificate: ${kubernetes_certs.kubelet_cert.path}
+              client-key: ${kubernetes_certs.kubelet_key.path}

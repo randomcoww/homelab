@@ -66,7 +66,7 @@ systemd:
           ${kubelet_container_image} \
             kubelet \
               $KUBELET_COMMON_ARGS \
-              --config=${kubelet_config_path}/kubelet-config-common.yaml \
+              --config=${kubelet_config_path}/kubelet-config.yaml \
               --register-node=false
         Restart=always
         RestartSec=10
@@ -122,7 +122,7 @@ storage:
                     [plugins."io.containerd.grpc.v1.cri".containerd.runtimes.nvidia.options]
                       BinaryName = "nvidia-container-runtime"
 
-    - path: ${kubelet_config_path}/kubelet-config-common.yaml
+    - path: ${kubelet_config_path}/kubelet-config.yaml
       mode: 0644
       contents:
         inline: |-

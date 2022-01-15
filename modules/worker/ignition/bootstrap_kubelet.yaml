@@ -8,7 +8,7 @@ systemd:
     - name: kubelet.service
       enabled: true
       dropins:
-        - name: 10-worker.conf
+        - name: 20-bootstrap-worker.conf
           contents: |
             [Unit]
             After=iscsid.service
@@ -23,7 +23,7 @@ systemd:
                   $KUBELET_COMMON_ARGS \
                   --bootstrap-kubeconfig=${kubelet_config_path}/bootstrap.kubeconfig \
                   --cert-dir=${kubelet_config_path} \
-                  --config=${kubelet_config_path}/kubelet-config-worker.yaml \
+                  --config=${kubelet_config_path}/kubelet-config-bootstrap-worker.yaml \
                   --feature-gates=GracefulNodeShutdown=true \
                   --kubeconfig=${kubelet_config_path}/kubelet.kubeconfig \
                   --network-plugin=cni \
@@ -36,16 +36,7 @@ systemd:
 
 storage:
   files:
-    - path: /etc/modules-load.d/kubernetes-worker.conf
-      mode: 0644
-      contents:
-        inline: |
-          # kube-dns reply from unexpected source
-          br_netfilter
-          # mayastor nvmeof
-          nvme-tcp
-
-    - path: ${kubelet_config_path}/kubelet-config-worker.yaml
+    - path: ${kubelet_config_path}/kubelet-config-bootstrap-worker.yaml
       mode: 0644
       contents:
         inline: |-

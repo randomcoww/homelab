@@ -14,7 +14,9 @@ locals {
     hardware_interface_name => merge(hardware_interface, {
       vlans = {
         for i, network_name in lookup(hardware_interface, "vlans", []) :
-        network_name => var.networks[network_name]
+        network_name => merge(var.networks[network_name], {
+          interface_name = "${hardware_interface_name}-${network_name}"
+        })
       }
     })
   }

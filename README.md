@@ -84,14 +84,11 @@ tw find . -name '*.tf' -exec terraform fmt '{}' \;
 ### Image build
 
 ```
-mkdir -p build
-export TMPDIR=$(pwd)/build
-
 TF_VERSION=1.1.2
 LIBVIRT_VERSION=0.1.10
 SSH_VERSION=0.1.3
 
-podman build \
+buildah build \
   --build-arg TF_VERSION=$TF_VERSION \
   --build-arg LIBVIRT_VERSION=$LIBVIRT_VERSION \
   --build-arg SSH_VERSION=$SSH_VERSION \
@@ -100,5 +97,5 @@ podman build \
 ```
 
 ```
-podman push ghcr.io/randomcoww/tw:latest
+buildah push ghcr.io/randomcoww/tw:latest
 ```
