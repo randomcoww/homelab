@@ -148,6 +148,10 @@ storage:
             - name: kea-dhcp4
               image: ${container_images.kea}
               args: [ "kea-dhcp4", "-c", "/etc/kea/kea-dhcp4.conf" ]
+              securityContext:
+                capabilities:
+                  add:
+                  - NET_RAW
               volumeMounts:
               - name: kea-share
                 mountPath: "${kea_shared_path}"

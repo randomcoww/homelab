@@ -4,7 +4,7 @@ version: 1.4.0
 systemd:
   units:
     # Default podman CNI is read early by containerd and messes with initial container launches
-    - name: containerd.service
+    - name: crio.service
       enabled: true
       dropins:
         - name: 10-kubelet.conf
@@ -41,7 +41,7 @@ systemd:
           -v /usr/lib/os-release:/etc/os-release \
           -v /sys/fs/cgroup:/sys/fs/cgroup:ro \
           -v /sys/fs/cgroup/systemd:/sys/fs/cgroup/systemd \
-          -v /var/lib/containerd:/var/lib/containerd:z \
+          -v /var/lib/crio:/var/lib/crio:z \
           -v /opt/cni/bin:/opt/cni/bin:z \
           -v ${kubelet_config_path}:${kubelet_config_path}:rshared,z \
           -v ${static_pod_manifest_path}:${static_pod_manifest_path}:rshared,z \
@@ -52,7 +52,8 @@ systemd:
           --lock-file=/var/run/lock/kubelet.lock \
           --fail-swap-on=false \
           --container-runtime=remote \
-          --container-runtime-endpoint=unix:///run/containerd/containerd.sock \
+          --container-runtime-endpoint=unix:///run/crio/crio.sock \
+          --runtime-request-timeout=10m \
           --node-ip=${try(cidrhost(network_prefix, host_netnum), "")} \
           --v=2"
         ExecStartPre=/usr/bin/mkdir -p \
@@ -77,39 +78,21 @@ systemd:
 
 storage:
   files:
-    - path: /etc/containerd/config.toml
+    - path: /etc/crio/crio.conf.d/10-custom.conf
       mode: 0644
       overwrite: true
       contents:
         inline: |-
-          oom_score = -999
-          version = 2
-          [plugins]
-            [plugins."io.containerd.grpc.v1.cri"]
-              disable_tcp_service = true
-              [plugins."io.containerd.grpc.v1.cri".containerd]
-                default_runtime_name = "runc"
-                [plugins."io.containerd.grpc.v1.cri".containerd.runtimes.runc]
-                  runtime_type = "io.containerd.runc.v2"
-                  [plugins."io.containerd.grpc.v1.cri".containerd.runtimes.runc.options]
-                    BinaryName = "crun"
-    # - path: /etc/containerd/config.toml
-    #   mode: 0644
-    #   overwrite: true
-    #   contents:
-    #     inline: |-
-    #       oom_score = -999
-    #       version = 2
-    #       [plugins]
-    #         [plugins."io.containerd.grpc.v1.cri"]
-    #           disable_tcp_service = true
-    #           [plugins."io.containerd.grpc.v1.cri".containerd]
-    #             default_runtime_name = "nvidia"
-    #             [plugins."io.containerd.grpc.v1.cri".containerd.runtimes]
-    #               [plugins."io.containerd.grpc.v1.cri".containerd.runtimes.nvidia]
-    #                 runtime_type = "io.containerd.runc.v2"
-    #                 [plugins."io.containerd.grpc.v1.cri".containerd.runtimes.nvidia.options]
-    #                   BinaryName = "nvidia-container-runtime"
+          [crio.runtime]
+          default_runtime="crun"
+          conmon_cgroup="pod"
+          cgroup_manager="cgroupfs"
+
+          [crio.runtime.runtimes.crun]
+          runtime_path="/usr/bin/crun"
+
+          [crio.network]
+          plugin_dirs=["/usr/libexec/cni/","/opt/cni/bin/"]
 
     - path: ${kubelet_config_path}/kubelet-config.yaml
       mode: 0644
