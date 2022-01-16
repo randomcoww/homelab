@@ -47,9 +47,6 @@ storage:
             LockFile /run/conntrack.lock
             NetlinkBufferSize 2097152
             NetlinkBufferSizeMaxGrowth 8388608
-            UNIX {
-              Path /var/run/conntrackd.ctl
-            }
             Filter From Kernelspace {
               Protocol Accept {
                 TCP
