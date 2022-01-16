@@ -32,8 +32,8 @@ systemd:
           -v /sys/fs/cgroup/systemd:/sys/fs/cgroup/systemd \
           -v /var/lib/crio:/var/lib/crio:z \
           -v /var/log:/var/log \
-          -v /var/run/lock:/var/run/lock:z" \
-          -v ${static_pod_manifest_path}:${static_pod_manifest_path}:z
+          -v /var/run/lock:/var/run/lock:z \
+          -v ${static_pod_manifest_path}:${static_pod_manifest_path}:z"
         Environment=KUBELET_COMMON_ARGS="--exit-on-lock-contention \
           --lock-file=/var/run/lock/kubelet.lock \
           --fail-swap-on=false \

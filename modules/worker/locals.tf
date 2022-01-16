@@ -21,7 +21,7 @@ locals {
       apiserver_port                = var.apiserver_port
       kubelet_node_labels           = var.kubelet_node_labels
       static_pod_manifest_path      = var.static_pod_manifest_path
-      kubelet_root_path             = "/var/lib/kubelet"
+      kubelet_root_path             = "/var/lib/kubelet/root"
       certs_path                    = local.certs_path
       config_path                   = "/var/lib/kubelet/config"
       kubelet_port                  = var.kubelet_port
