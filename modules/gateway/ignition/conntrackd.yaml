@@ -2,10 +2,28 @@
 ---
 variant: fcos
 version: 1.4.0
+systemd:
+  units:
+    - name: conntrackd.service
+      enabled: true
+      dropins:
+        # change to notify:
+        # https://manpages.debian.org/testing/conntrackd/conntrackd.conf.5.en.html#Systemd
+        # relocate lockfile:
+        # lockfile under /var/lock cannot be accessed for some reason
+        - name: 10-notify.conf
+          contents: |
+            [Service]
+            Type=notify
+
+            ExecStartPre=
+            ExecStartPre=/bin/rm -f /run/conntrack.lock
+
 storage:
   files:
-    - path: ${static_pod_config_path}/conntrackd/conntrackd.conf
+    - path: /etc/conntrackd/conntrackd.conf
       mode: 0644
+      overwrite: true
       contents:
         inline: |-
           Sync {
@@ -25,9 +43,8 @@ storage:
             }
           }
           General {
-            Systemd off
-            LogFile /dev/stdout
-            Syslog off
+            Systemd on
+            LockFile /run/conntrack.lock
             NetlinkBufferSize 2097152
             NetlinkBufferSizeMaxGrowth 8388608
             UNIX {
@@ -52,34 +69,3 @@ storage:
               }
             }
           }
-    # pod manifests #
-    - path: ${static_pod_manifest_path}/conntrackd.yaml
-      mode: 0644
-      contents:
-        inline: |-
-          ---
-          apiVersion: v1
-          kind: Pod
-          metadata:
-            namespace: kube-system
-            name: conntrackd
-          spec:
-            restartPolicy: Always
-            hostNetwork: true
-            containers:
-            - name: conntrackd
-              image: ${container_images.conntrackd}
-              args: [ "-C", "/etc/conntrackd/conntrackd.conf" ]
-              securityContext:
-                capabilities:
-                  add:
-                  - NET_ADMIN
-                  - SYS_NICE
-              volumeMounts:
-              - name: config-volume
-                mountPath: /etc/conntrackd/conntrackd.conf
-                readOnly: true
-            volumes:
-            - name: config-volume
-              hostPath:
-                path: ${static_pod_config_path}/conntrackd/conntrackd.conf
