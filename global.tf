@@ -72,7 +72,6 @@ locals {
       kube_apiserver          = "ghcr.io/randomcoww/kubernetes:kube-master-v1.22.4"
       kube_controller_manager = "ghcr.io/randomcoww/kubernetes:kube-master-v1.22.4"
       kube_scheduler          = "ghcr.io/randomcoww/kubernetes:kube-master-v1.22.4"
-      hyperkube               = "ghcr.io/randomcoww/kubernetes:kubelet-v1.22.4"
       kube_proxy              = "ghcr.io/randomcoww/kubernetes:kube-proxy-v1.22.4"
       etcd_wrapper            = "ghcr.io/randomcoww/etcd-wrapper:latest"
       etcd                    = "ghcr.io/randomcoww/etcd:v3.5.1"
@@ -80,7 +79,7 @@ locals {
       tftpd                   = "ghcr.io/randomcoww/tftpd-ipxe:master"
       coredns                 = "docker.io/coredns/coredns:latest"
       flannel                 = "ghcr.io/randomcoww/flannel:v0.15.0"
-      cni_plugins             = "ghcr.io/randomcoww/cni-plugins:latest"
+      flannel-cni-plugin      = "rancher/mirrored-flannelcni-flannel-cni-plugin:v1.0.0"
     }
 
     ca = {
@@ -99,12 +98,12 @@ locals {
     # http path to kubernetes matchbox #
     pxeboot_file_name = "http://192.168.126.127/boot.ipxe"
 
-    # kubernetes #
     kubernetes_cluster_name       = "default-cluster"
     kubernetes_cluster_dns_netnum = 10
-    aws_region                    = "us-west-2"
-    # provided by kubernetes external-dns
+    static_pod_manifest_path      = "/var/lib/kubelet/manifests"
+
     internal_dns_ip = "192.168.126.126"
+    aws_region      = "us-west-2"
   }
 }
 

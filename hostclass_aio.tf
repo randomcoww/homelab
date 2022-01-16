@@ -97,9 +97,10 @@ module "template-aio-gateway" {
       netnum = host.netnum
     }
   ]
-  internal_dns_ip   = local.config.internal_dns_ip
-  internal_domain   = local.config.domains.internal
-  pxeboot_file_name = local.config.pxeboot_file_name
+  internal_dns_ip          = local.config.internal_dns_ip
+  internal_domain          = local.config.domains.internal
+  pxeboot_file_name        = local.config.pxeboot_file_name
+  static_pod_manifest_path = local.config.static_pod_manifest_path
 }
 
 module "template-aio-disks" {
@@ -140,10 +141,11 @@ module "template-aio-hypervisor" {
 module "template-aio-kubelet" {
   for_each = local.aio_hostclass_config.hosts
 
-  source           = "./modules/kubelet"
-  container_images = local.config.container_images
-  network_prefix   = local.config.networks.lan.prefix
-  host_netnum      = each.value.netnum
+  source                   = "./modules/kubelet"
+  container_images         = local.config.container_images
+  network_prefix           = local.config.networks.lan.prefix
+  host_netnum              = each.value.netnum
+  static_pod_manifest_path = local.config.static_pod_manifest_path
 }
 
 module "template-aio-etcd" {
@@ -162,14 +164,15 @@ module "template-aio-etcd" {
       netnum = host.netnum
     }
   ]
-  etcd_client_port      = local.config.ports.etcd_client
-  etcd_peer_port        = local.config.ports.etcd_peer
-  etcd_cluster_token    = local.config.kubernetes_cluster_name
-  aws_access_key_id     = module.kubernetes-common.aws_s3_backup_credentials.access_key_id
-  aws_secret_access_key = module.kubernetes-common.aws_s3_backup_credentials.access_key_secret
-  aws_region            = local.config.aws_region
-  etcd_s3_backup_path   = module.kubernetes-common.etcd_s3_backup_key
-  etcd_ca               = module.kubernetes-common.ca.etcd
+  etcd_client_port         = local.config.ports.etcd_client
+  etcd_peer_port           = local.config.ports.etcd_peer
+  etcd_cluster_token       = local.config.kubernetes_cluster_name
+  aws_access_key_id        = module.kubernetes-common.aws_s3_backup_credentials.access_key_id
+  aws_secret_access_key    = module.kubernetes-common.aws_s3_backup_credentials.access_key_secret
+  aws_region               = local.config.aws_region
+  etcd_s3_backup_path      = module.kubernetes-common.etcd_s3_backup_key
+  etcd_ca                  = module.kubernetes-common.ca.etcd
+  static_pod_manifest_path = local.config.static_pod_manifest_path
 }
 
 module "template-aio-kubernetes" {
@@ -192,6 +195,7 @@ module "template-aio-kubernetes" {
   kubernetes_pod_network_prefix     = local.config.networks.kubernetes_pod.prefix
   encryption_config_secret          = module.kubernetes-common.encryption_config_secret
   kubernetes_ca                     = module.kubernetes-common.ca.kubernetes
+  static_pod_manifest_path          = local.config.static_pod_manifest_path
 }
 
 module "template-aio-worker" {
@@ -208,6 +212,7 @@ module "template-aio-worker" {
   kubernetes_pod_network_prefix = local.config.networks.kubernetes_pod.prefix
   kubernetes_cluster_dns_netnum = local.config.kubernetes_cluster_dns_netnum
   kubelet_node_labels           = {}
+  static_pod_manifest_path      = local.config.static_pod_manifest_path
 }
 
 # combine and render a single ignition file #

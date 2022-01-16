@@ -2,13 +2,12 @@ locals {
   module_ignition_snippets = [
     for f in fileset(".", "${path.module}/ignition/*.yaml") :
     templatefile(f, {
-      static_pod_manifest_path = "/var/lib/kubelet/manifests"
-      static_pod_config_path   = "/var/lib/kubelet/podconfig"
       container_images         = var.container_images
       hostname                 = var.hostname
       interfaces               = var.interfaces
       host_netnum              = var.host_netnum
       vrrp_netnum              = var.vrrp_netnum
+      static_pod_manifest_path = var.static_pod_manifest_path
 
       # gateway #
       nftables_name = "gateway_rules"

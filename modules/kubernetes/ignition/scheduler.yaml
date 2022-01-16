@@ -6,18 +6,18 @@ version: 1.4.0
 storage:
   files:
     # scheduler #
-    - path: ${controller_config_path}/kube-scheduler.yaml
+    - path: ${config_path}/kube-scheduler.yaml
       mode: 0644
       contents:
         inline: |-
           kind: KubeSchedulerConfiguration
           apiVersion: kubescheduler.config.k8s.io/v1beta1
           clientConnection:
-            kubeconfig: "${controller_config_path}/kube-scheduler.kubeconfig"
+            kubeconfig: "${config_path}/kube-scheduler.kubeconfig"
           leaderElection:
             leaderElect: true
 
-    - path: ${controller_config_path}/kube-scheduler.kubeconfig
+    - path: ${config_path}/kube-scheduler.kubeconfig
       mode: 0644
       contents:
         inline: |-
@@ -59,7 +59,7 @@ storage:
               image: ${container_images.kube_scheduler}
               command:
               - kube-scheduler
-              - "--config=${controller_config_path}/kube-scheduler.yaml"
+              - "--config=${config_path}/kube-scheduler.yaml"
               - "--secure-port=${scheduler_port}"
               - "--bind-address=0.0.0.0"
               - "--v=2"
@@ -81,9 +81,16 @@ storage:
                 timeoutSeconds: 15
               volumeMounts:
               - name: config-volume
-                mountPath: "${controller_config_path}"
+                mountPath: "${config_path}"
+                readOnly: true
+              - name: certs
+                mountPath: "${certs_path}"
                 readOnly: true
             volumes:
             - name: config-volume
               hostPath:
-                path: "${controller_config_path}"
+                path: "${config_path}"
+            - name: certs
+              hostPath:
+                path: "${certs_path}"
+                

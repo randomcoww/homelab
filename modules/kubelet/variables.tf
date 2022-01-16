@@ -11,3 +11,8 @@ variable "host_netnum" {
   type    = number
   default = null
 }
+
+variable "static_pod_manifest_path" {
+  type    = string
+  default = "/var/lib/kubelet/manifests"
+}

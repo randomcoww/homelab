@@ -50,6 +50,11 @@ variable "etcd_s3_backup_path" {
   type = string
 }
 
+variable "static_pod_manifest_path" {
+  type    = string
+  default = "/var/lib/kubelet/manifests"
+}
+
 variable "etcd_ca" {
   type = object({
     algorithm       = string

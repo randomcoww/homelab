@@ -1,5 +1,5 @@
 locals {
-  certs_path = "/var/lib/kubelet/config"
+  certs_path = "/var/lib/etcd/pki"
 
   certs = {
     etcd = {
@@ -20,14 +20,15 @@ locals {
   module_ignition_snippets = [
     for f in fileset(".", "${path.module}/ignition/*.yaml") :
     templatefile(f, {
-      hostname                 = var.hostname
-      container_images         = var.container_images
-      etcd_certs               = local.certs.etcd
-      network_prefix           = var.network_prefix
-      host_netnum              = var.host_netnum
-      certs_path               = local.certs_path
-      static_pod_manifest_path = "/var/lib/kubelet/manifests"
-      static_pod_config_path   = "/var/lib/kubelet/podconfig"
+      hostname         = var.hostname
+      container_images = var.container_images
+      etcd_certs       = local.certs.etcd
+      network_prefix   = var.network_prefix
+      host_netnum      = var.host_netnum
+      certs_path       = local.certs_path
+
+      static_pod_manifest_path = var.static_pod_manifest_path
+      backup_path              = "/var/lib/etcd/backup"
       etcd_pod_manifest_name   = "etcd.json"
       etcd_hosts               = var.etcd_hosts
       etcd_cluster_token       = var.etcd_cluster_token

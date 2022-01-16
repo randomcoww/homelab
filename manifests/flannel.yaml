@@ -102,19 +102,17 @@ spec:
       - operator: "Exists"
         effect: "NoSchedule"
       initContainers:
-      - name: install-cni-plugins
-        imagePullPolicy: Always
-        image: ghcr.io/randomcoww/cni-plugins:latest
+      - name: install-cni-plugin
+        image: rancher/mirrored-flannelcni-flannel-cni-plugin:v1.0.0
         command:
-        - tar
+        - cp
         args:
-        - xvzf
-        - /cni-plugins.tgz
-        - -C
-        - /opt/cni/bin/
+        - -f
+        - /flannel
+        - /opt/cni/bin/flannel
         volumeMounts:
-        - name: cni-plugins
-          mountPath: "/opt/cni/bin"
+        - name: cni-plugin
+          mountPath: /opt/cni/bin
       - name: install-cni
         imagePullPolicy: Always
         image: ghcr.io/randomcoww/flannel:v0.15.0
@@ -155,7 +153,7 @@ spec:
         - name: flannel-cfg
           mountPath: /etc/kube-flannel/
       volumes:
-      - name: cni-plugins
+      - name: cni-plugin
         hostPath:
           path: "/opt/cni/bin"
       - name: run

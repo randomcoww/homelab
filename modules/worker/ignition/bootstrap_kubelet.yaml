@@ -14,29 +14,33 @@ systemd:
             After=iscsid.service
             Wants=iscsid.service
             [Service]
+            ExecStartPre=/usr/bin/mkdir -p \
+              ${kubelet_root_path}
             ExecStart=
             ExecStart=/usr/bin/podman run --rm -it \
               $KUBELET_PODMAN_OPTS \
-              -v /etc/systemd:/etc/systemd \
-              ${container_images.hyperkube} \
+              -v ${kubelet_root_path}:${kubelet_root_path}:rshared,z \
+              -v ${certs_path}:${certs_path} \
+              -v ${config_path}:${config_path} \
+              ${container_images.kubelet} \
                 kubelet \
                   $KUBELET_COMMON_ARGS \
-                  --bootstrap-kubeconfig=${kubelet_config_path}/bootstrap.kubeconfig \
-                  --cert-dir=${kubelet_config_path} \
-                  --config=${kubelet_config_path}/kubelet-config-bootstrap-worker.yaml \
+                  --root-dir=${kubelet_root_path} \
+                  --bootstrap-kubeconfig=${config_path}/bootstrap.kubeconfig \
+                  --cert-dir=${certs_path} \
+                  --config=${config_path}/kubelet-config-bootstrap-worker.yaml \
                   --feature-gates=GracefulNodeShutdown=true \
-                  --kubeconfig=${kubelet_config_path}/kubelet.kubeconfig \
+                  --kubeconfig=${config_path}/kubelet.kubeconfig \
                   --network-plugin=cni \
+                  --register-node=true \
                   --node-labels=${join(",", [
                     for node_label, value in kubelet_node_labels :
                     "${node_label}=${value}"
-                  ])} \
-                  --register-node=true \
-                  --volume-plugin-dir=${kubelet_config_path}/volumeplugins
+                  ])}
 
 storage:
   files:
-    - path: ${kubelet_config_path}/kubelet-config-bootstrap-worker.yaml
+    - path: ${config_path}/kubelet-config-bootstrap-worker.yaml
       mode: 0644
       contents:
         inline: |-
@@ -66,7 +70,7 @@ storage:
           containerLogMaxSize: "10Mi"
           containerLogMaxFiles: 2
 
-    - path: ${kubelet_config_path}/bootstrap.kubeconfig
+    - path: ${config_path}/bootstrap.kubeconfig
       mode: 0644
       contents:
         inline: |-
@@ -89,3 +93,11 @@ storage:
             user:
               client-certificate: ${worker_certs.bootstrap_cert.path}
               client-key: ${worker_certs.bootstrap_key.path}
+
+    # certs #
+    %{~ for cert in values(worker_certs) ~}
+    - path: ${cert.path}
+      mode: 0644
+      contents:
+        inline: "${replace(cert.content, "\n", "\\n")}"
+    %{~ endfor ~}

@@ -40,7 +40,7 @@ storage:
                   for etcd_host in etcd_hosts :
                   "https://${cidrhost(network_prefix, etcd_host.netnum)}:${etcd_client_port}"
               ])}"
-              - "--host-backup-file=${static_pod_config_path}/etcd/etcd.db"
+              - "--host-backup-file=${backup_path}/etcd.db"
               - "--host-etcd-manifest-file=${static_pod_manifest_path}/${etcd_pod_manifest_name}"
               - "--etcd-image=${container_images.etcd}"
               - "--client-cert-file=${etcd_certs.client_cert.path}"
@@ -59,20 +59,20 @@ storage:
               - name: AWS_SDK_LOAD_CONFIG
                 value: "1"
               volumeMounts:
-              - name: config-volume
+              - name: certs-volume
                 mountPath: "${certs_path}"
                 readOnly: true
-              - name: etcd-restore-volume
-                mountPath: "${static_pod_config_path}/etcd"
+              - name: backup-volume
+                mountPath: "${backup_path}"
               - name: manifest-volume
                 mountPath: "${static_pod_manifest_path}/${etcd_pod_manifest_name}"
             volumes:
-            - name: config-volume
+            - name: certs-volume
               hostPath:
                 path: "${certs_path}"
-            - name: etcd-restore-volume
+            - name: backup-volume
               hostPath:
-                path: "${static_pod_config_path}/etcd"
+                path: "${backup_path}"
             - name: manifest-volume
               hostPath:
                 type: FileOrCreate

@@ -37,3 +37,8 @@ variable "kubelet_node_labels" {
 variable "kubernetes_cluster_domain" {
   type = string
 }
+
+variable "static_pod_manifest_path" {
+  type    = string
+  default = "/var/lib/kubelet/manifests"
+}

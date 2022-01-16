@@ -27,16 +27,13 @@ systemd:
           -v /etc/pki/ca-trust:/etc/pki/ca-trust:ro \
           -v /usr/lib/modules:/lib/modules:ro \
           -v /etc/machine-id:/etc/machine-id:ro \
-          -v /usr/lib/os-release:/etc/os-release \
+          -v /usr/lib/os-release:/etc/os-release:ro \
           -v /sys/fs/cgroup:/sys/fs/cgroup:ro \
           -v /sys/fs/cgroup/systemd:/sys/fs/cgroup/systemd \
           -v /var/lib/crio:/var/lib/crio:z \
-          -v /opt/cni/bin:/opt/cni/bin:z \
-          -v ${kubelet_config_path}:${kubelet_config_path}:rshared,z \
-          -v ${static_pod_manifest_path}:${static_pod_manifest_path}:rshared,z \
-          -v ${static_pod_config_path}:${static_pod_config_path}:rshared,z \
           -v /var/log:/var/log \
-          -v /var/run/lock:/var/run/lock:z"
+          -v /var/run/lock:/var/run/lock:z" \
+          -v ${static_pod_manifest_path}:${static_pod_manifest_path}:z
         Environment=KUBELET_COMMON_ARGS="--exit-on-lock-contention \
           --lock-file=/var/run/lock/kubelet.lock \
           --fail-swap-on=false \
@@ -46,17 +43,17 @@ systemd:
           --node-ip=${try(cidrhost(network_prefix, host_netnum), "")} \
           --v=2"
         ExecStartPre=/usr/bin/mkdir -p \
-          ${kubelet_config_path} \
-          /var/log/containers \
-          /opt/cni/bin
+          ${static_pod_manifest_path} \
+          /var/log/containers
         ExecStartPre=-/usr/bin/podman kill kubelet
         ExecStartPre=-/usr/bin/podman rm kubelet
         ExecStart=/usr/bin/podman run --rm -it \
           $KUBELET_PODMAN_OPTS \
+          -v ${config_path}:${config_path}:z \
           ${kubelet_container_image} \
             kubelet \
               $KUBELET_COMMON_ARGS \
-              --config=${kubelet_config_path}/kubelet-config.yaml \
+              --config=${config_path}/kubelet-config.yaml \
               --register-node=false
         Restart=always
         RestartSec=10
@@ -83,7 +80,7 @@ storage:
           [crio.network]
           plugin_dirs=["/usr/libexec/cni/","/opt/cni/bin/"]
 
-    - path: ${kubelet_config_path}/kubelet-config.yaml
+    - path: ${config_path}/kubelet-config.yaml
       mode: 0644
       contents:
         inline: |-

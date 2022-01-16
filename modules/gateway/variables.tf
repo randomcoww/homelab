@@ -49,3 +49,8 @@ variable "internal_domain" {
 variable "pxeboot_file_name" {
   type = string
 }
+
+variable "static_pod_manifest_path" {
+  type    = string
+  default = "/var/lib/kubelet/manifests"
+}

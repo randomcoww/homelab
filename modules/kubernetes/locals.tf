@@ -1,5 +1,5 @@
 locals {
-  controller_config_path = "/var/lib/kubelet/config"
+  certs_path = "/var/lib/kubernetes/pki"
 
   certs = {
     kubernetes = {
@@ -12,13 +12,13 @@ locals {
         }
       }) :
       cert_name => merge(cert, {
-        path = "${local.controller_config_path}/kubernetes-${cert_name}.pem"
+        path = "${local.certs_path}/kubernetes-${cert_name}.pem"
       })
     }
     etcd = {
       for cert_name, cert in var.common_certs.etcd :
       cert_name => merge(cert, {
-        path = "${local.controller_config_path}/etcd-${cert_name}.pem"
+        path = "${local.certs_path}/etcd-${cert_name}.pem"
       })
     }
   }
@@ -44,9 +44,9 @@ locals {
       controller_manager_port           = var.controller_manager_port
       scheduler_port                    = var.scheduler_port
       encryption_config_secret          = var.encryption_config_secret
-      controller_config_path            = local.controller_config_path
-      static_pod_manifest_path          = "/var/lib/kubelet/manifests"
-      static_pod_config_path            = "/var/lib/kubelet/podconfig"
+      static_pod_manifest_path          = var.static_pod_manifest_path
+      certs_path                        = local.certs_path
+      config_path                       = "/var/lib/kubernetes/config"
     })
   ]
 }

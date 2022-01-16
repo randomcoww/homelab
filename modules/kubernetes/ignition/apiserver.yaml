@@ -4,7 +4,7 @@ version: 1.4.0
 storage:
   files:
     # apiserver #
-    - path: ${controller_config_path}/encryption-config.yaml
+    - path: ${config_path}/encryption-config.yaml
       mode: 0644
       contents:
         inline: |-
@@ -45,7 +45,7 @@ storage:
               - "--bind-address=0.0.0.0"
               - "--client-ca-file=${kubernetes_certs.ca_cert.path}"
               - "--enable-admission-plugins=NamespaceLifecycle,NodeRestriction,LimitRanger,ServiceAccount,DefaultStorageClass,ResourceQuota"
-              - "--encryption-provider-config=${controller_config_path}/encryption-config.yaml"
+              - "--encryption-provider-config=${config_path}/encryption-config.yaml"
               - "--etcd-cafile=${etcd_certs.ca_cert.path}"
               - "--etcd-certfile=${etcd_certs.client_cert.path}"
               - "--etcd-keyfile=${etcd_certs.client_key.path}"
@@ -66,7 +66,10 @@ storage:
               - "--v=2"
               volumeMounts:
               - name: config-apiserver
-                mountPath: "${controller_config_path}"
+                mountPath: "${config_path}"
+                readOnly: true
+              - name: certs
+                mountPath: "${certs_path}"
                 readOnly: true
               readinessProbe:
                 httpGet:
@@ -87,4 +90,7 @@ storage:
             volumes:
             - name: config-apiserver
               hostPath:
-                path: "${controller_config_path}"
+                path: "${config_path}"
+            - name: certs
+              hostPath:
+                path: "${certs_path}"

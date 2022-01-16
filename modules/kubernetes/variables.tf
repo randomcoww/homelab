@@ -58,6 +58,16 @@ variable "encryption_config_secret" {
   type = string
 }
 
+variable "static_pod_manifest_path" {
+  type    = string
+  default = "/var/lib/kubelet/manifests"
+}
+
+variable "controller_config_path" {
+  type    = string
+  default = "/etc/kubernetes"
+}
+
 variable "kubernetes_ca" {
   type = object({
     algorithm       = string

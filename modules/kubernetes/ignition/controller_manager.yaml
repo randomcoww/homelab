@@ -4,7 +4,7 @@ version: 1.4.0
 storage:
   files:
     # controller #
-    - path: ${controller_config_path}/kube-controller-manager.kubeconfig
+    - path: ${config_path}/kube-controller-manager.kubeconfig
       mode: 0644
       contents:
         inline: |-
@@ -52,7 +52,7 @@ storage:
               - "--cluster-name=${cluster_name}"
               - "--cluster-signing-cert-file=${kubernetes_certs.ca_cert.path}"
               - "--cluster-signing-key-file=${kubernetes_certs.ca_key.path}"
-              - "--kubeconfig=${controller_config_path}/kube-controller-manager.kubeconfig"
+              - "--kubeconfig=${config_path}/kube-controller-manager.kubeconfig"
               - "--leader-elect=true"
               - "--root-ca-file=${kubernetes_certs.ca_cert.path}"
               - "--service-account-private-key-file=${kubernetes_certs.service_account_key.path}"
@@ -62,7 +62,10 @@ storage:
               - "--v=2"
               volumeMounts:
               - name: config-volume
-                mountPath: "${controller_config_path}"
+                mountPath: "${config_path}"
+                readOnly: true
+              - name: certs
+                mountPath: "${certs_path}"
                 readOnly: true
               readinessProbe:
                 httpGet:
@@ -83,4 +86,7 @@ storage:
             volumes:
             - name: config-volume
               hostPath:
-                path: "${controller_config_path}"
+                path: "${config_path}"
+            - name: certs
+              hostPath:
+                path: "${certs_path}"

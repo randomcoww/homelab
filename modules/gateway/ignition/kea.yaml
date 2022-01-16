@@ -4,8 +4,9 @@ version: 1.4.0
 storage:
   files:
     # kea HA handler #
-    - path: ${static_pod_config_path}/kea/kea-ctrl-agent.conf
+    - path: /etc/kea/kea-ctrl-agent.conf
       mode: 0644
+      overwrite: true
       contents:
         inline: |-
           ${jsonencode({
@@ -22,7 +23,7 @@ storage:
           })}
 
     # kea for lan network #
-    - path: ${static_pod_config_path}/kea/kea-dhcp4.conf
+    - path: /etc/kea/kea-dhcp4.conf
       mode: 0644
       overwrite: true
       contents:
@@ -166,7 +167,7 @@ storage:
               emptyDir: {}
             - name: config-kea-ctrl-agent
               hostPath:
-                path: ${static_pod_config_path}/kea/kea-ctrl-agent.conf
+                path: /etc/kea/kea-ctrl-agent.conf
             - name: config-kea-dhcp4
               hostPath:
-                path: ${static_pod_config_path}/kea/kea-dhcp4.conf
+                path: /etc/kea/kea/kea-dhcp4.conf

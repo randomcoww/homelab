@@ -3,8 +3,9 @@ variant: fcos
 version: 1.4.0
 storage:
   files:
-    - path: ${static_pod_config_path}/coredns/Corefile
+    - path: /etc/coredns/Corefile
       mode: 0644
+      overwrite: true
       contents:
         inline: |-
           ${internal_domain}. {
@@ -70,7 +71,7 @@ storage:
             volumes:
             - name: config-coredns
               hostPath:
-                path: ${static_pod_config_path}/coredns/Corefile
+                path: /etc/coredns/Corefile
 
     - path: /etc/systemd/network/22-${interfaces.wan.interface_name}.network.d/10-upstream-dns.conf
       mode: 0644
