@@ -51,10 +51,13 @@ locals {
     }
 
     ports = {
-      kea_peer    = 58080
-      apiserver   = 58081
-      etcd_client = 58082
-      etcd_peer   = 58083
+      kea_peer                = 58080
+      apiserver               = 58081
+      controller_manager_port = 50252
+      scheduler_port          = 50251
+      kubelet                 = 50250
+      etcd_client             = 58082
+      etcd_peer               = 58083
     }
 
     domains = {
@@ -76,6 +79,8 @@ locals {
       kea                     = "ghcr.io/randomcoww/kea:2.0.0"
       tftpd                   = "ghcr.io/randomcoww/tftpd-ipxe:master"
       coredns                 = "docker.io/coredns/coredns:latest"
+      flannel                 = "ghcr.io/randomcoww/flannel:v0.15.0"
+      cni_plugins             = "ghcr.io/randomcoww/cni-plugins:latest"
     }
 
     ca = {

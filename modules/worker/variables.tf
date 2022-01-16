@@ -14,6 +14,10 @@ variable "apiserver_port" {
   type = number
 }
 
+variable "kubelet_port" {
+  type = number
+}
+
 variable "kubernetes_cluster_name" {
   type = string
 }

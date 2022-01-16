@@ -10,12 +10,6 @@ locals {
         apiserver_key = {
           content = tls_private_key.apiserver.private_key_pem
         }
-        kubelet_cert = {
-          content = tls_locally_signed_cert.kubelet.cert_pem
-        }
-        kubelet_key = {
-          content = tls_private_key.kubelet.private_key_pem
-        }
       }) :
       cert_name => merge(cert, {
         path = "${local.controller_config_path}/kubernetes-${cert_name}.pem"
@@ -39,7 +33,7 @@ locals {
       host_netnum      = var.host_netnum
       vip_netnum       = var.vip_netnum
 
-      # general #
+      # controller #
       cluster_name                      = var.kubernetes_cluster_name
       kubernetes_service_network_prefix = var.kubernetes_service_network_prefix
       kubernetes_pod_network_prefix     = var.kubernetes_pod_network_prefix
@@ -47,16 +41,12 @@ locals {
       etcd_client_port                  = var.etcd_client_port
       apiserver_ip                      = "127.0.0.1"
       apiserver_port                    = var.apiserver_port
+      controller_manager_port           = var.controller_manager_port
+      scheduler_port                    = var.scheduler_port
       encryption_config_secret          = var.encryption_config_secret
       controller_config_path            = local.controller_config_path
       static_pod_manifest_path          = "/var/lib/kubelet/manifests"
       static_pod_config_path            = "/var/lib/kubelet/podconfig"
-
-      # kubelet #
-      hostname                      = var.hostname
-      kubernetes_cluster_domain     = var.kubernetes_cluster_domain
-      kubernetes_cluster_dns_netnum = var.kubernetes_cluster_dns_netnum
-      kubelet_node_labels           = var.kubelet_node_labels
     })
   ]
 }

@@ -26,6 +26,14 @@ variable "apiserver_port" {
   type = number
 }
 
+variable "controller_manager_port" {
+  type = number
+}
+
+variable "scheduler_port" {
+  type = number
+}
+
 variable "etcd_servers" {
   type = list(string)
 }
@@ -56,16 +64,4 @@ variable "kubernetes_ca" {
     private_key_pem = string
     cert_pem        = string
   })
-}
-
-variable "kubernetes_cluster_domain" {
-  type = string
-}
-
-variable "kubernetes_cluster_dns_netnum" {
-  type = number
-}
-
-variable "kubelet_node_labels" {
-  type = map(string)
 }

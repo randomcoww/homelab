@@ -58,16 +58,25 @@ storage:
               - "--service-account-private-key-file=${kubernetes_certs.service_account_key.path}"
               - "--service-cluster-ip-range=${kubernetes_service_network_prefix}"
               - "--use-service-account-credentials=true"
+              - "--secure-port=${controller_manager_port}"
               - "--v=2"
               volumeMounts:
               - name: config-volume
                 mountPath: "${controller_config_path}"
                 readOnly: true
+              readinessProbe:
+                httpGet:
+                  scheme: HTTPS
+                  host: 127.0.0.1
+                  port: ${controller_manager_port}
+                  path: "/readyz"
+                initialDelaySeconds: 15
+                timeoutSeconds: 15
               livenessProbe:
                 httpGet:
-                  scheme: HTTP
+                  scheme: HTTPS
                   host: 127.0.0.1
-                  port: 10252
+                  port: ${controller_manager_port}
                   path: "/healthz"
                 initialDelaySeconds: 15
                 timeoutSeconds: 15

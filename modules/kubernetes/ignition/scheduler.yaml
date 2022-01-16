@@ -60,12 +60,22 @@ storage:
               command:
               - kube-scheduler
               - "--config=${controller_config_path}/kube-scheduler.yaml"
+              - "--secure-port=${scheduler_port}"
+              - "--bind-address=0.0.0.0"
               - "--v=2"
+              readinessProbe:
+                httpGet:
+                  scheme: HTTPS
+                  host: 127.0.0.1
+                  port: ${scheduler_port}
+                  path: "/readyz"
+                initialDelaySeconds: 15
+                timeoutSeconds: 15
               livenessProbe:
                 httpGet:
-                  scheme: HTTP
+                  scheme: HTTPS
                   host: 127.0.0.1
-                  port: 10251
+                  port: ${scheduler_port}
                   path: "/healthz"
                 initialDelaySeconds: 15
                 timeoutSeconds: 15

@@ -183,6 +183,8 @@ module "template-aio-kubernetes" {
   host_netnum                       = each.value.netnum
   vip_netnum                        = local.aio_hostclass_config.vrrp_netnum
   apiserver_port                    = local.config.ports.apiserver
+  controller_manager_port           = local.config.ports.controller_manager_port
+  scheduler_port                    = local.config.ports.scheduler_port
   etcd_client_port                  = local.config.ports.etcd_client
   etcd_servers                      = [module.template-aio-etcd[each.key].local_client_endpoint]
   kubernetes_cluster_name           = local.config.kubernetes_cluster_name
@@ -190,9 +192,22 @@ module "template-aio-kubernetes" {
   kubernetes_pod_network_prefix     = local.config.networks.kubernetes_pod.prefix
   encryption_config_secret          = module.kubernetes-common.encryption_config_secret
   kubernetes_ca                     = module.kubernetes-common.ca.kubernetes
-  kubernetes_cluster_domain         = local.config.domains.kubernetes
-  kubernetes_cluster_dns_netnum     = local.config.kubernetes_cluster_dns_netnum
-  kubelet_node_labels               = {}
+}
+
+module "template-aio-worker" {
+  for_each = local.aio_hostclass_config.hosts
+
+  source                        = "./modules/worker"
+  container_images              = local.config.container_images
+  common_certs                  = module.kubernetes-common.certs
+  apiserver_ip                  = "127.0.0.1"
+  apiserver_port                = local.config.ports.apiserver
+  kubelet_port                  = local.config.ports.kubelet
+  kubernetes_cluster_name       = local.config.kubernetes_cluster_name
+  kubernetes_cluster_domain     = local.config.domains.kubernetes
+  kubernetes_pod_network_prefix = local.config.networks.kubernetes_pod.prefix
+  kubernetes_cluster_dns_netnum = local.config.kubernetes_cluster_dns_netnum
+  kubelet_node_labels           = {}
 }
 
 # combine and render a single ignition file #
@@ -215,6 +230,7 @@ EOT
     module.template-aio-kubelet[each.key].ignition_snippets,
     module.template-aio-etcd[each.key].ignition_snippets,
     module.template-aio-kubernetes[each.key].ignition_snippets,
+    module.template-aio-worker[each.key].ignition_snippets,
   )
 }
 

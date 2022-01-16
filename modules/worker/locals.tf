@@ -22,6 +22,7 @@ locals {
       kubelet_config_path           = local.controller_config_path
       kubelet_node_labels           = var.kubelet_node_labels
       static_pod_manifest_path      = "/var/lib/kubelet/manifests"
+      kubelet_port                  = 50250
       kubernetes_cluster_domain     = var.kubernetes_cluster_domain
       kubernetes_cluster_dns_netnum = var.kubernetes_cluster_dns_netnum
     })

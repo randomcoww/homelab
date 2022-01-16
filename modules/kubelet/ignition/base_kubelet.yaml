@@ -77,6 +77,22 @@ systemd:
 
 storage:
   files:
+    - path: /etc/containerd/config.toml
+      mode: 0644
+      overwrite: true
+      contents:
+        inline: |-
+          oom_score = -999
+          version = 2
+          [plugins]
+            [plugins."io.containerd.grpc.v1.cri"]
+              disable_tcp_service = true
+              [plugins."io.containerd.grpc.v1.cri".containerd]
+                default_runtime_name = "runc"
+                [plugins."io.containerd.grpc.v1.cri".containerd.runtimes.runc]
+                  runtime_type = "io.containerd.runc.v2"
+                  [plugins."io.containerd.grpc.v1.cri".containerd.runtimes.runc.options]
+                    BinaryName = "crun"
     # - path: /etc/containerd/config.toml
     #   mode: 0644
     #   overwrite: true
@@ -87,40 +103,13 @@ storage:
     #       [plugins]
     #         [plugins."io.containerd.grpc.v1.cri"]
     #           disable_tcp_service = true
-    #           [plugins."io.containerd.grpc.v1.cri".cni]
-    #             bin_dir = "/opt/cni/bin"
-    #             conf_dir = "/etc/cni/net.d"
-    #             max_conf_num = 1
     #           [plugins."io.containerd.grpc.v1.cri".containerd]
-    #             default_runtime_name = "runc"
-    - path: /etc/containerd/config.toml
-      mode: 0644
-      overwrite: true
-      contents:
-        inline: |-
-          oom_score = -999
-          version = 2
-
-          [plugins]
-            [plugins."io.containerd.grpc.v1.cri"]
-              disable_tcp_service = true
-              [plugins."io.containerd.grpc.v1.cri".cni]
-                bin_dir = "/opt/cni/bin"
-                conf_dir = "/etc/cni/net.d"
-                max_conf_num = 1
-              [plugins."io.containerd.grpc.v1.cri".containerd]
-                default_runtime_name = "nvidia"
-
-                [plugins."io.containerd.grpc.v1.cri".containerd.runtimes]
-                  [plugins."io.containerd.grpc.v1.cri".containerd.runtimes.nvidia]
-                    runtime_type = "io.containerd.runc.v2"
-                    runtime_engine = ""
-                    runtime_root = ""
-                    privileged_without_host_devices = false
-                    base_runtime_spec = ""
-
-                    [plugins."io.containerd.grpc.v1.cri".containerd.runtimes.nvidia.options]
-                      BinaryName = "nvidia-container-runtime"
+    #             default_runtime_name = "nvidia"
+    #             [plugins."io.containerd.grpc.v1.cri".containerd.runtimes]
+    #               [plugins."io.containerd.grpc.v1.cri".containerd.runtimes.nvidia]
+    #                 runtime_type = "io.containerd.runc.v2"
+    #                 [plugins."io.containerd.grpc.v1.cri".containerd.runtimes.nvidia.options]
+    #                   BinaryName = "nvidia-container-runtime"
 
     - path: ${kubelet_config_path}/kubelet-config.yaml
       mode: 0644
@@ -135,6 +124,7 @@ storage:
               enabled: false
           authorization:
             mode: AlwaysAllow
+          enableServer: false
           staticPodPath: ${static_pod_manifest_path}
           makeIPTablesUtilChains: false
           containerLogMaxSize: "10Mi"

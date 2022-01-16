@@ -51,6 +51,8 @@ storage:
               clientCAFile: "${worker_certs.ca_cert.path}"
           authorization:
             mode: Webhook
+          address: 0.0.0.0
+          port: ${kubelet_port}
           staticPodPath: ${static_pod_manifest_path}
           clusterDomain: "${kubernetes_cluster_domain}"
           clusterDNS:
