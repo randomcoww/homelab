@@ -15,9 +15,10 @@ systemd:
           contents: |
             [Service]
             Type=notify
-
             ExecStartPre=
             ExecStartPre=/bin/rm -f /run/conntrack.lock
+            Restart=always
+            RestartSec=3
 
 storage:
   files:

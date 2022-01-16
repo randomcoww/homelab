@@ -3,19 +3,8 @@ variant: fcos
 version: 1.4.0
 systemd:
   units:
-    # Default podman CNI is read early by containerd and messes with initial container launches
     - name: crio.service
       enabled: true
-      dropins:
-        - name: 10-kubelet.conf
-          contents: |
-            [Service]
-            ExecStartPre=/usr/bin/mkdir -p \
-              /etc/cni/net.d
-            ExecStartPre=/usr/bin/rm -f \
-              /etc/cni/net.d/87-podman-bridge.conflist
-            KillMode=mixed
-
     - name: kubelet.service
       enabled: true
       contents: |

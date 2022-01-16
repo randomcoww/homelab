@@ -11,6 +11,8 @@ systemd:
             [Service]
             EnvironmentFile=
             Environment=KEEPALIVED_OPTIONS="-D -P"
+            Restart=always
+            RestartSec=3
 
 storage:
   files:
