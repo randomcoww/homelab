@@ -21,6 +21,7 @@ resource "tls_cert_request" "apiserver" {
     "127.0.0.1",
     cidrhost(var.network_prefix, var.host_netnum),
     cidrhost(var.network_prefix, var.vip_netnum),
+    cidrhost(var.kubernetes_service_network_prefix, var.kubernetes_service_network_apiserver_netnum),
   ])
 }
 

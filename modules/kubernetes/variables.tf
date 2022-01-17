@@ -54,6 +54,10 @@ variable "kubernetes_pod_network_prefix" {
   type = string
 }
 
+variable "kubernetes_service_network_apiserver_netnum" {
+  type = number
+}
+
 variable "encryption_config_secret" {
   type = string
 }

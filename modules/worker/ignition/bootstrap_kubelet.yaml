@@ -3,40 +3,29 @@ variant: fcos
 version: 1.4.0
 systemd:
   units:
-    - name: iscsid.service
-      enabled: true
     - name: kubelet.service
       enabled: true
       dropins:
         - name: 20-bootstrap-worker.conf
           contents: |
-            [Unit]
-            After=iscsid.service
-            Wants=iscsid.service
             [Service]
             ExecStartPre=/usr/bin/mkdir -p \
               ${kubelet_root_path}
             ExecStart=
-            ExecStart=/usr/bin/podman run --rm -it \
-              $KUBELET_PODMAN_OPTS \
-              -v ${kubelet_root_path}:${kubelet_root_path}:rshared,z \
-              -v ${certs_path}:${certs_path} \
-              -v ${config_path}:${config_path} \
-              ${container_images.kubelet} \
-                kubelet \
-                  $KUBELET_COMMON_ARGS \
-                  --root-dir=${kubelet_root_path} \
-                  --bootstrap-kubeconfig=${config_path}/bootstrap.kubeconfig \
-                  --cert-dir=${certs_path} \
-                  --config=${config_path}/kubelet-config-bootstrap-worker.yaml \
-                  --feature-gates=GracefulNodeShutdown=true \
-                  --kubeconfig=${config_path}/kubelet.kubeconfig \
-                  --network-plugin=cni \
-                  --register-node=true \
-                  --node-labels=${join(",", [
-                    for node_label, value in kubelet_node_labels :
-                    "${node_label}=${value}"
-                  ])}
+            ExecStart=/usr/bin/kubelet \
+              $KUBELET_COMMON_ARGS \
+              --root-dir=${kubelet_root_path} \
+              --bootstrap-kubeconfig=${config_path}/bootstrap.kubeconfig \
+              --cert-dir=${certs_path} \
+              --config=${config_path}/kubelet-config-bootstrap-worker.yaml \
+              --feature-gates=GracefulNodeShutdown=true \
+              --kubeconfig=${config_path}/kubelet.kubeconfig \
+              --network-plugin=cni \
+              --register-node=true \
+              --node-labels=${join(",", [
+                for node_label, value in kubelet_node_labels :
+                "${node_label}=${value}"
+              ])}
 
 storage:
   files:
@@ -60,7 +49,7 @@ storage:
           staticPodPath: ${static_pod_manifest_path}
           clusterDomain: "${kubernetes_cluster_domain}"
           clusterDNS:
-          - "${cidrhost(kubernetes_pod_network_prefix, kubernetes_cluster_dns_netnum)}"
+          - "${cidrhost(kubernetes_service_network_prefix, kubernetes_service_network_dns_netnum)}"
           resolvConf: "/run/systemd/resolve/resolv.conf"
           runtimeRequestTimeout: "15m"
           rotateCertificates: true

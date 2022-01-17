@@ -178,41 +178,42 @@ module "template-aio-etcd" {
 module "template-aio-kubernetes" {
   for_each = local.aio_hostclass_config.hosts
 
-  source                            = "./modules/kubernetes"
-  hostname                          = each.value.hostname
-  container_images                  = local.config.container_images
-  common_certs                      = module.kubernetes-common.certs
-  network_prefix                    = local.config.networks.lan.prefix
-  host_netnum                       = each.value.netnum
-  vip_netnum                        = local.aio_hostclass_config.vrrp_netnum
-  apiserver_port                    = local.config.ports.apiserver
-  controller_manager_port           = local.config.ports.controller_manager_port
-  scheduler_port                    = local.config.ports.scheduler_port
-  etcd_client_port                  = local.config.ports.etcd_client
-  etcd_servers                      = [module.template-aio-etcd[each.key].local_client_endpoint]
-  kubernetes_cluster_name           = local.config.kubernetes_cluster_name
-  kubernetes_service_network_prefix = local.config.networks.kubernetes_service.prefix
-  kubernetes_pod_network_prefix     = local.config.networks.kubernetes_pod.prefix
-  encryption_config_secret          = module.kubernetes-common.encryption_config_secret
-  kubernetes_ca                     = module.kubernetes-common.ca.kubernetes
-  static_pod_manifest_path          = local.config.static_pod_manifest_path
+  source                                      = "./modules/kubernetes"
+  hostname                                    = each.value.hostname
+  container_images                            = local.config.container_images
+  common_certs                                = module.kubernetes-common.certs
+  network_prefix                              = local.config.networks.lan.prefix
+  host_netnum                                 = each.value.netnum
+  vip_netnum                                  = local.aio_hostclass_config.vrrp_netnum
+  apiserver_port                              = local.config.ports.apiserver
+  controller_manager_port                     = local.config.ports.controller_manager_port
+  scheduler_port                              = local.config.ports.scheduler_port
+  etcd_client_port                            = local.config.ports.etcd_client
+  etcd_servers                                = [module.template-aio-etcd[each.key].local_client_endpoint]
+  kubernetes_cluster_name                     = local.config.kubernetes_cluster_name
+  kubernetes_service_network_prefix           = local.config.networks.kubernetes_service.prefix
+  kubernetes_pod_network_prefix               = local.config.networks.kubernetes_pod.prefix
+  kubernetes_service_network_apiserver_netnum = local.config.kubernetes_service_network_apiserver_netnum
+  encryption_config_secret                    = module.kubernetes-common.encryption_config_secret
+  kubernetes_ca                               = module.kubernetes-common.ca.kubernetes
+  static_pod_manifest_path                    = local.config.static_pod_manifest_path
 }
 
 module "template-aio-worker" {
   for_each = local.aio_hostclass_config.hosts
 
-  source                        = "./modules/worker"
-  container_images              = local.config.container_images
-  common_certs                  = module.kubernetes-common.certs
-  apiserver_ip                  = "127.0.0.1"
-  apiserver_port                = local.config.ports.apiserver
-  kubelet_port                  = local.config.ports.kubelet
-  kubernetes_cluster_name       = local.config.kubernetes_cluster_name
-  kubernetes_cluster_domain     = local.config.domains.kubernetes
-  kubernetes_pod_network_prefix = local.config.networks.kubernetes_pod.prefix
-  kubernetes_cluster_dns_netnum = local.config.kubernetes_cluster_dns_netnum
-  kubelet_node_labels           = {}
-  static_pod_manifest_path      = local.config.static_pod_manifest_path
+  source                                = "./modules/worker"
+  container_images                      = local.config.container_images
+  common_certs                          = module.kubernetes-common.certs
+  apiserver_ip                          = "127.0.0.1"
+  apiserver_port                        = local.config.ports.apiserver
+  kubelet_port                          = local.config.ports.kubelet
+  kubernetes_cluster_name               = local.config.kubernetes_cluster_name
+  kubernetes_cluster_domain             = local.config.domains.kubernetes
+  kubernetes_service_network_prefix     = local.config.networks.kubernetes_service.prefix
+  kubernetes_service_network_dns_netnum = local.config.kubernetes_service_network_dns_netnum
+  kubelet_node_labels                   = {}
+  static_pod_manifest_path              = local.config.static_pod_manifest_path
 }
 
 # combine and render a single ignition file #

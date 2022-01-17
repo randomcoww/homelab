@@ -170,4 +170,4 @@ storage:
                 path: /etc/kea/kea-ctrl-agent.conf
             - name: config-kea-dhcp4
               hostPath:
-                path: /etc/kea/kea/kea-dhcp4.conf
+                path: /etc/kea/kea-dhcp4.conf

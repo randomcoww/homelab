@@ -22,11 +22,11 @@ variable "kubernetes_cluster_name" {
   type = string
 }
 
-variable "kubernetes_pod_network_prefix" {
+variable "kubernetes_service_network_prefix" {
   type = string
 }
 
-variable "kubernetes_cluster_dns_netnum" {
+variable "kubernetes_service_network_dns_netnum" {
   type = number
 }
 

@@ -98,9 +98,10 @@ locals {
     # http path to kubernetes matchbox #
     pxeboot_file_name = "http://192.168.126.127/boot.ipxe"
 
-    kubernetes_cluster_name       = "default-cluster"
-    kubernetes_cluster_dns_netnum = 10
-    static_pod_manifest_path      = "/var/lib/kubelet/manifests"
+    kubernetes_cluster_name                     = "default-cluster"
+    kubernetes_service_network_dns_netnum       = 10
+    kubernetes_service_network_apiserver_netnum = 1
+    static_pod_manifest_path                    = "/var/lib/kubelet/manifests"
 
     internal_dns_ip = "192.168.126.126"
     aws_region      = "us-west-2"

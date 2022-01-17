@@ -7,60 +7,28 @@ systemd:
       enabled: true
     - name: kubelet.service
       enabled: true
-      contents: |
-        [Unit]
-        Description=Kubelet via Hyperkube
-        After=network.target containerd.service
-        Wants=containerd.service
+      dropins:
+        - name: 10-masterless-common.conf
+          contents: |
+            [Unit]
+            Wants=containerd.service
 
-        [Service]
-        Environment=KUBELET_PODMAN_OPTS="--name kubelet \
-          --security-opt label=disable \
-          --log-driver none \
-          --network host \
-          --pid host \
-          --ipc host \
-          --privileged \
-          -v /run:/run \
-          -v /dev:/dev \
-          -v /etc/ssl/certs:/etc/ssl/certs:ro \
-          -v /etc/pki/ca-trust:/etc/pki/ca-trust:ro \
-          -v /usr/lib/modules:/lib/modules:ro \
-          -v /etc/machine-id:/etc/machine-id:ro \
-          -v /usr/lib/os-release:/etc/os-release:ro \
-          -v /sys/fs/cgroup:/sys/fs/cgroup:ro \
-          -v /sys/fs/cgroup/systemd:/sys/fs/cgroup/systemd \
-          -v /var/lib/crio:/var/lib/crio:z \
-          -v /var/log:/var/log \
-          -v /var/run/lock:/var/run/lock:z \
-          -v ${static_pod_manifest_path}:${static_pod_manifest_path}:z"
-        Environment=KUBELET_COMMON_ARGS="--exit-on-lock-contention \
-          --lock-file=/var/run/lock/kubelet.lock \
-          --fail-swap-on=false \
-          --container-runtime=remote \
-          --container-runtime-endpoint=unix:///run/crio/crio.sock \
-          --runtime-request-timeout=10m \
-          --node-ip=${try(cidrhost(network_prefix, host_netnum), "")} \
-          --v=2"
-        ExecStartPre=/usr/bin/mkdir -p \
-          ${static_pod_manifest_path} \
-          /var/log/containers
-        ExecStartPre=-/usr/bin/podman kill kubelet
-        ExecStartPre=-/usr/bin/podman rm kubelet
-        ExecStart=/usr/bin/podman run --rm -it \
-          $KUBELET_PODMAN_OPTS \
-          -v ${config_path}:${config_path}:z \
-          ${kubelet_container_image} \
-            kubelet \
+            [Service]
+            Environment=KUBELET_COMMON_ARGS="--exit-on-lock-contention \
+              --lock-file=/var/run/lock/kubelet.lock \
+              --fail-swap-on=false \
+              --container-runtime=remote \
+              --container-runtime-endpoint=unix:///run/crio/crio.sock \
+              --runtime-request-timeout=10m \
+              --node-ip=${try(cidrhost(network_prefix, host_netnum), "")} \
+              --v=2"
+            ExecStartPre=/usr/bin/mkdir -p \
+              ${static_pod_manifest_path}
+            ExecStart=
+            ExecStart=/usr/bin/kubelet \
               $KUBELET_COMMON_ARGS \
               --config=${config_path}/kubelet-config.yaml \
               --register-node=false
-        Restart=always
-        RestartSec=10
-        Delegate=true
-
-        [Install]
-        WantedBy=multi-user.target
 
 storage:
   files:
