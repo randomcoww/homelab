@@ -136,8 +136,21 @@ spec:
         args:
         - --ip-masq
         - --kube-subnet-mgr
+        - --iface=lan
+        - --healthz-port=50253
+        resources:
+          requests:
+            cpu: "100m"
+            memory: "50Mi"
+          limits:
+            cpu: "100m"
+            memory: "50Mi"
         securityContext:
-          privileged: true
+          privileged: false
+          capabilities:
+            add:
+            - NET_ADMIN
+            - NET_RAW
         env:
         - name: POD_NAME
           valueFrom:
@@ -149,16 +162,24 @@ spec:
               fieldPath: metadata.namespace
         volumeMounts:
         - name: run
-          mountPath: /run
+          mountPath: /run/flannel
         - name: flannel-cfg
           mountPath: /etc/kube-flannel/
+        livenessProbe:
+          httpGet:
+            scheme: HTTP
+            host: 127.0.0.1
+            port: 50253
+            path: "/healthz"
+          initialDelaySeconds: 15
+          timeoutSeconds: 15
       volumes:
       - name: cni-plugin
         hostPath:
           path: "/opt/cni/bin"
       - name: run
         hostPath:
-          path: /run
+          path: /run/flannel
       - name: cni
         hostPath:
           path: /etc/cni/net.d

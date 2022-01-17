@@ -68,6 +68,7 @@ spec:
         command:
         - kube-proxy
         - "--config=/etc/kube-proxy/kube-proxy-config.yaml"
+        - "--healthz-bind-address=0.0.0.0:50254"
         - "--v=2"
         env:
         - name: KUBERNETES_SERVICE_HOST
@@ -75,7 +76,11 @@ spec:
         - name: KUBERNETES_SERVICE_PORT
           value: "58081"
         securityContext:
-          privileged: true
+          privileged: false
+          capabilities:
+            add:
+            - NET_ADMIN
+            - NET_RAW
         volumeMounts:
         - mountPath: /run/xtables.lock
           name: xtables-lock
@@ -84,6 +89,14 @@ spec:
           readOnly: true
         - name: kube-proxy-config
           mountPath: /etc/kube-proxy/
+        livenessProbe:
+          httpGet:
+            scheme: HTTP
+            host: 127.0.0.1
+            port: 50254
+            path: "/healthz"
+          initialDelaySeconds: 15
+          timeoutSeconds: 15
       volumes:
       - name: xtables-lock
         hostPath:
