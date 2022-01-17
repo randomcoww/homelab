@@ -74,7 +74,7 @@ data:
 apiVersion: apps/v1
 kind: DaemonSet
 metadata:
-  name: kube-flannel-ds-amd64
+  name: flannel-ds
   namespace: kube-system
   labels:
     tier: node
@@ -137,6 +137,7 @@ spec:
         - --ip-masq
         - --kube-subnet-mgr
         - --iface=lan
+        - --healthz-ip=127.0.0.1
         - --healthz-port=50253
         resources:
           requests:
