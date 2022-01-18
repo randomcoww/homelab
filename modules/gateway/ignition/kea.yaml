@@ -67,7 +67,7 @@ storage:
                           {
                             name = kea_peer.name
                             role = kea_peer.role
-                            url = "http://${cidrhost(interfaces.sync.prefix, kea_peer.netnums)}:${kea_peer_port}/"
+                            url = "http://${cidrhost(interfaces.sync.prefix, kea_peer.netnum)}:${kea_peer_port}/"
                             auto-failover = true
                           }
                         ]

@@ -54,7 +54,57 @@ locals {
         volume_paths = [
           "/var/pv/minio"
         ]
+        container_storage_path = "/var/pv/containers"
         kea_ha_role = "primary"
+      }
+      aio-1 = {
+        hostname = "aio-1.${local.config.domains.internal_mdns}"
+        netnum   = 3
+        hardware_interfaces = {
+          phy0 = {
+            mac   = "3c-fd-fe-b2-47-68"
+            mtu   = 9000
+          }
+          phy1 = {
+            mac   = "3c-fd-fe-b2-47-69"
+            mtu   = 9000
+            vlans = ["sync"]
+          }
+          phy2 = {
+            mac   = "3c-fd-fe-b2-47-6a"
+            mtu   = 9000
+            vlans = ["wan"]
+          }
+          phy3 = {
+            mac   = "3c-fd-fe-b2-47-6b"
+            mtu   = 9000
+          }
+        }
+        tap_interfaces = {
+          lan = {
+            bridge_interface_name = "phy0"
+            enable_mdns           = true
+            enable_netnum         = true
+            enable_vrrp_netnum    = true
+            enable_dhcp_server    = true
+            mtu                   = 9000
+          }
+          sync = {
+            bridge_interface_name = "phy1-sync"
+            enable_netnum         = true
+            enable_vrrp_netnum    = true
+            mtu                   = 9000
+          }
+          wan = {
+            bridge_interface_name = "phy2-wan"
+            enable_dhcp           = true
+            macaddress            = "52-54-00-63-6e-b3"
+          }
+        }
+        disks = {}
+        volume_paths = []
+        container_storage_path = "/var/lib/containers"
+        kea_ha_role = "secondary"
       }
     }
   }
@@ -67,7 +117,7 @@ module "template-aio-base" {
   source                 = "./modules/base"
   hostname               = each.value.hostname
   users                  = [local.config.users.admin]
-  container_storage_path = "${each.value.disks.pv.partitions[0].mount_path}/containers"
+  container_storage_path = each.value.container_storage_path
 }
 
 module "template-aio-server" {
