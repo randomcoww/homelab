@@ -51,6 +51,9 @@ locals {
             ]
           }
         }
+        volume_paths = [
+          "/var/pv/minio"
+        ]
         kea_ha_role = "primary"
       }
     }
@@ -216,6 +219,16 @@ module "template-aio-worker" {
   static_pod_manifest_path              = local.config.static_pod_manifest_path
 }
 
+module "template-aio-minio" {
+  for_each = local.aio_hostclass_config.hosts
+
+  source                   = "./modules/minio"
+  minio_container_image    = local.config.container_images.minio
+  minio_port               = local.config.ports.minio
+  volume_paths             = each.value.volume_paths
+  static_pod_manifest_path = local.config.static_pod_manifest_path
+}
+
 # combine and render a single ignition file #
 data "ct_config" "aio" {
   for_each = local.aio_hostclass_config.hosts
@@ -237,6 +250,7 @@ EOT
     module.template-aio-etcd[each.key].ignition_snippets,
     module.template-aio-kubernetes[each.key].ignition_snippets,
     module.template-aio-worker[each.key].ignition_snippets,
+    module.template-aio-minio[each.key].ignition_snippets,
   )
 }
 

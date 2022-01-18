@@ -11,3 +11,13 @@ output "kubeconfig_admin" {
     apiserver_endpoint = "https://${cidrhost(local.config.networks.lan.prefix, local.aio_hostclass_config.vrrp_netnum)}:${local.config.ports.apiserver}"
   }))
 }
+
+output "minio_credentials" {
+  value = {
+    for host_key, host in local.aio_hostclass_config.hosts :
+    host_key => {
+      for k, v in module.template-aio-minio[host_key].minio_credentials :
+      k => nonsensitive(v)
+    }
+  }
+}

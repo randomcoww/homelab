@@ -1,0 +1,63 @@
+---
+variant: fcos
+version: 1.4.0
+storage:
+  files:
+    - path: ${static_pod_manifest_path}/minio.yaml
+      mode: 0644
+      contents:
+        inline: |-
+          ---
+          kind: Pod
+          apiVersion: v1
+          metadata:
+            namespace: kube-system
+            name: minio
+          spec:
+            hostNetwork: true
+            restartPolicy: Always
+            containers:
+            - name: minio
+              image: ${minio_container_image}
+              imagePullPolicy: Always
+              env:
+              - name: INTERNAL_IP
+                valueFrom:
+                  fieldRef:
+                    fieldPath: status.hostIP
+              - name: MINIO_ACCESS_KEY
+                value: ${minio_user}
+              - name: MINIO_SECRET_KEY
+                value: ${minio_password}
+              args:
+              - server
+              - --address
+              - $(INTERNAL_IP):${minio_port}
+              %{~ for i, volume_path in volume_paths ~}
+              %{~ if length(volume_paths) > 1 ~}
+              - https://$(INTERNAL_IP)${volume_path}
+              %{~ else ~}
+              - ${volume_path}
+              %{~ endif ~}
+              %{~ endfor ~}
+              ports:
+              - containerPort: ${minio_port}
+              volumeMounts:
+              %{~ for i, volume_path in volume_paths ~}
+              - name: data${i}
+                mountPath: ${volume_path}
+              %{~ endfor ~}
+              livenessProbe:
+                httpGet:
+                  path: /minio/health/live
+                  port: ${minio_port}
+                initialDelaySeconds: 120
+                periodSeconds: 20
+            volumes:
+            %{~ for i, volume_path in volume_paths ~}
+            - name: data${i}
+              hostPath:
+                path: ${volume_path}
+                type: DirectoryOrCreate
+            %{~ endfor ~}
+          

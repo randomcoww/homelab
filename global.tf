@@ -58,6 +58,7 @@ locals {
       kubelet                 = 50250
       etcd_client             = 58082
       etcd_peer               = 58083
+      minio                   = 50256
     }
 
     domains = {
@@ -80,6 +81,7 @@ locals {
       coredns                 = "docker.io/coredns/coredns:latest"
       flannel                 = "ghcr.io/randomcoww/flannel:v0.15.0"
       flannel-cni-plugin      = "rancher/mirrored-flannelcni-flannel-cni-plugin:v1.0.0"
+      minio                   = "minio/minio:latest"
     }
 
     ca = {

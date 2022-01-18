@@ -12,7 +12,7 @@ storage:
           apiVersion: v1
           metadata:
             namespace: kube-system
-            name: etcd
+            name: etcd-wrapper
           spec:
             hostNetwork: true
             restartPolicy: Always

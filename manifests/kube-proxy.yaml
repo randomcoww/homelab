@@ -76,11 +76,7 @@ spec:
         - name: KUBERNETES_SERVICE_PORT
           value: "58081"
         securityContext:
-          privileged: false
-          capabilities:
-            add:
-            - NET_ADMIN
-            - NET_RAW
+          privileged: true
         volumeMounts:
         - mountPath: /run/xtables.lock
           name: xtables-lock
