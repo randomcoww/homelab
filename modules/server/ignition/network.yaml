@@ -71,7 +71,7 @@ storage:
           VLAN=${vlan.interface_name}
           %{~ endfor ~}
           %{~ for network_name, interface in interfaces ~}
-          %{~ if interface.bridge_interface_name == hardware_interface_name ~}
+          %{~ if interface.source_interface_name == hardware_interface_name ~}
           %{~ if lookup(interface, "enable_netnum", false) || lookup(interface, "enable_dhcp", false) ~}
           MACVTAP=${interface.interface_name}
           %{~ endif ~}
@@ -107,7 +107,7 @@ storage:
           LinkLocalAddressing=false
           DHCP=false
           %{~ if can(interfaces[network_name]) ~}
-          %{~ if interfaces[network_name].bridge_interface_name == vlan.interface_name ~}
+          %{~ if interfaces[network_name].source_interface_name == vlan.interface_name ~}
           %{~ if lookup(interfaces[network_name], "enable_netnum", false) || lookup(interfaces[network_name], "enable_dhcp", false) ~}
           MACVTAP=${interfaces[network_name].interface_name}
           %{~ endif ~}
@@ -125,7 +125,7 @@ storage:
           [NetDev]
           Name=${interface.interface_name}
           Kind=macvtap
-          MACAddress=${lookup(interface, "macaddress", "")}
+          MACAddress=${lookup(interface, "mac", "")}
 
           [MACVTAP]
           Mode=bridge

@@ -7,3 +7,7 @@ output "ignition_snippets" {
 output "interfaces" {
   value = local.tap_interfaces
 }
+
+output "hardware_interfaces" {
+  value = local.hardware_interfaces
+}

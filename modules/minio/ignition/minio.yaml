@@ -3,6 +3,7 @@ variant: fcos
 version: 1.4.0
 storage:
   files:
+    %{~ if length(volume_paths) > 0 ~}
     - path: ${static_pod_manifest_path}/minio.yaml
       mode: 0644
       contents:
@@ -60,4 +61,4 @@ storage:
                 path: ${volume_path}
                 type: DirectoryOrCreate
             %{~ endfor ~}
-          
+    %{~ endif ~}

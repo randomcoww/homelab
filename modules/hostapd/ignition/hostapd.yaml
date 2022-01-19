@@ -1,0 +1,100 @@
+---
+variant: fcos
+version: 1.4.0
+storage:
+  files:
+    - path: ${static_pod_manifest_path}/hostapd.yaml
+      mode: 0644
+      contents:
+        inline: |-
+          ---
+          kind: Pod
+          apiVersion: v1
+          metadata:
+            namespace: kube-system
+            name: hostapd
+          spec:
+            hostNetwork: true
+            restartPolicy: Always
+            containers:
+            - name: hostapd
+              image: ${hostapd_container_image}
+              args:
+              - /etc/hostapd/hostapd.conf
+              securityContext:
+                capabilities:
+                  add:
+                  - NET_RAW
+              volumeMounts:
+              - name: hostapd-config
+                mountPath: /etc/hostapd/hostapd.conf
+                readOnly: true
+            volumes:
+            - name: hostapd-config
+              hostPath:
+                path: /etc/hostapd/hostapd.conf
+
+    - path: /etc/hostapd/hostapd.conf
+      mode: 0644
+      contents:
+        inline: |-
+          interface=${hardware_interface_name}
+          hw_mode=a
+          channel=0
+          ieee80211d=1
+          country_code=US
+          ieee80211n=1
+          ieee80211ac=1         
+          wmm_enabled=1
+
+          ssid=${ssid}
+          auth_algs=1
+          wpa=2
+          wpa_key_mgmt=WPA-PSK
+          rsn_pairwise=CCMP
+          wpa_passphrase=${passphrase}
+
+          ieee80211r=1
+          mobility_domain=${roaming_mobility_domain}
+          ft_psk_generate_local=1
+          nasid=${nasid}
+
+    # After rename e.g. wlan0
+    - path: /etc/systemd/network/12-${hardware_interface_name}.network
+      mode: 0644
+      contents:
+        inline: |
+          [Network]
+          Bridge=${br_interface_name}
+
+    # For bridging to wired NIC e.g. phy0-wlan
+    - path: /etc/systemd/network/22-${vlan_interface_name}.network
+      mode: 0644
+      contents:
+        inline: |
+          [Network]
+          Bridge=${br_interface_name}
+
+    # Bridge them together e.g. br-wlan
+    # This interface will have a macvtap created with IP for gateway and DHCP
+    - path: /etc/systemd/network/22-${br_interface_name}.netdev
+      mode: 0644
+      contents:
+        inline: |
+          [NetDev]
+          Name=br0
+          Kind=${br_interface_name}
+
+    - path: /etc/systemd/network/22-${br_interface_name}.network
+      mode: 0644
+      contents:
+        inline: |
+          [Match]
+          Name=${br_interface_name}
+
+          [Link]
+          ARP=false
+
+          [Network]
+          LinkLocalAddressing=false
+          DHCP=false

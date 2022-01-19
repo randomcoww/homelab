@@ -40,6 +40,11 @@ locals {
       wan = {
         vlan_id = 30
       }
+      wlan = {
+        network = "192.168.62.0"
+        cidr    = 24
+        vlan_id = 90
+      }
       kubernetes_pod = {
         network = "10.244.0.0"
         cidr    = 16
@@ -82,6 +87,7 @@ locals {
       flannel                 = "ghcr.io/randomcoww/flannel:v0.15.0"
       flannel-cni-plugin      = "rancher/mirrored-flannelcni-flannel-cni-plugin:v1.0.0"
       minio                   = "minio/minio:latest"
+      hostapd                 = "ghcr.io/randomcoww/hostapd:latest"
     }
 
     ca = {

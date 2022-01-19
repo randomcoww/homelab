@@ -13,15 +13,16 @@ locals {
           phy0 = {
             mac   = "8c-8c-aa-e3-58-62"
             mtu   = 9000
-            vlans = ["sync", "wan"]
+            vlans = ["sync", "wan", "wlan"]
           }
           wlan0 = {
             mac = "b4-0e-de-fb-28-95"
+            mtu = 9000
           }
         }
         tap_interfaces = {
           lan = {
-            bridge_interface_name = "phy0"
+            source_interface_name = "phy0"
             enable_mdns           = true
             enable_netnum         = true
             enable_vrrp_netnum    = true
@@ -29,15 +30,19 @@ locals {
             mtu                   = 9000
           }
           sync = {
-            bridge_interface_name = "phy0-sync"
+            source_interface_name = "phy0-sync"
             enable_netnum         = true
             enable_vrrp_netnum    = true
             mtu                   = 9000
           }
           wan = {
-            bridge_interface_name = "phy0-wan"
+            source_interface_name = "phy0-wan"
             enable_dhcp           = true
-            macaddress            = "52-54-00-63-6e-b3"
+            mac                   = "52-54-00-63-6e-b3"
+          }
+          wlan = {
+            source_interface_name = "phy0-wlan"
+            enable_dhcp_server    = true
           }
         }
         disks = {
@@ -55,15 +60,15 @@ locals {
           "/var/pv/minio"
         ]
         container_storage_path = "/var/pv/containers"
-        kea_ha_role = "primary"
+        kea_ha_role            = "primary"
       }
       aio-1 = {
         hostname = "aio-1.${local.config.domains.internal_mdns}"
         netnum   = 3
         hardware_interfaces = {
           phy0 = {
-            mac   = "3c-fd-fe-b2-47-68"
-            mtu   = 9000
+            mac = "3c-fd-fe-b2-47-68"
+            mtu = 9000
           }
           phy1 = {
             mac   = "3c-fd-fe-b2-47-69"
@@ -78,11 +83,12 @@ locals {
           phy3 = {
             mac   = "3c-fd-fe-b2-47-6b"
             mtu   = 9000
+            vlans = ["wlan"]
           }
         }
         tap_interfaces = {
           lan = {
-            bridge_interface_name = "phy0"
+            source_interface_name = "phy0"
             enable_mdns           = true
             enable_netnum         = true
             enable_vrrp_netnum    = true
@@ -90,21 +96,25 @@ locals {
             mtu                   = 9000
           }
           sync = {
-            bridge_interface_name = "phy1-sync"
+            source_interface_name = "phy1-sync"
             enable_netnum         = true
             enable_vrrp_netnum    = true
             mtu                   = 9000
           }
           wan = {
-            bridge_interface_name = "phy2-wan"
+            source_interface_name = "phy2-wan"
             enable_dhcp           = true
-            macaddress            = "52-54-00-63-6e-b3"
+            mac                   = "52-54-00-63-6e-b3"
+          }
+          wlan = {
+            source_interface_name = "phy3-wlan"
+            enable_dhcp_server    = true
           }
         }
-        disks = {}
-        volume_paths = []
+        disks                  = {}
+        volume_paths           = []
         container_storage_path = "/var/lib/containers"
-        kea_ha_role = "secondary"
+        kea_ha_role            = "secondary"
       }
     }
   }
@@ -279,6 +289,23 @@ module "template-aio-minio" {
   static_pod_manifest_path = local.config.static_pod_manifest_path
 }
 
+module "template-aio-hostapd" {
+  for_each = {
+    aio-0 = local.aio_hostclass_config.hosts.aio-0
+  }
+
+  source                   = "./modules/hostapd"
+  ssid                     = var.wifi.ssid
+  passphrase               = var.wifi.passphrase
+  roaming_mobility_domain  = "a123"
+  hardware_interface_name  = "wlan0"
+  nasid                    = replace(each.value.hardware_interfaces.wlan0.mac, "-", "")
+  vlan_interface_name      = each.value.tap_interfaces.wlan.source_interface_name
+  br_interface_name        = "br-wlan"
+  hostapd_container_image  = local.config.container_images.hostapd
+  static_pod_manifest_path = local.config.static_pod_manifest_path
+}
+
 # combine and render a single ignition file #
 data "ct_config" "aio" {
   for_each = local.aio_hostclass_config.hosts
@@ -301,6 +328,7 @@ EOT
     module.template-aio-kubernetes[each.key].ignition_snippets,
     module.template-aio-worker[each.key].ignition_snippets,
     module.template-aio-minio[each.key].ignition_snippets,
+    try(module.template-aio-hostapd[each.key].ignition_snippets, []),
   )
 }
 
