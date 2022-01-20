@@ -51,7 +51,7 @@ storage:
           MTUBytes=${lookup(hardware_interface, "mtu", 1500)}
           MACAddressPolicy=persistent
           Name=${hardware_interface_name}
-    - path: /etc/systemd/network/12-${hardware_interface_name}.network
+    - path: /etc/systemd/network/20-${hardware_interface_name}.network
       mode: 0644
       contents:
         inline: |
@@ -70,17 +70,10 @@ storage:
           %{~ for network_name, vlan in hardware_interface.vlans ~}
           VLAN=${vlan.interface_name}
           %{~ endfor ~}
-          %{~ for network_name, interface in interfaces ~}
-          %{~ if interface.source_interface_name == hardware_interface_name ~}
-          %{~ if lookup(interface, "enable_netnum", false) || lookup(interface, "enable_dhcp", false) ~}
-          MACVTAP=${interface.interface_name}
-          %{~ endif ~}
-          %{~ endif ~}
-          %{~ endfor ~}
 
     # VLAN interfaces
     %{~ for network_name, vlan in hardware_interface.vlans ~}
-    - path: /etc/systemd/network/20-${vlan.interface_name}.netdev
+    - path: /etc/systemd/network/12-${vlan.interface_name}.netdev
       mode: 0644
       contents:
         inline: |
@@ -90,7 +83,7 @@ storage:
 
           [VLAN]
           Id=${vlan.vlan_id}
-    - path: /etc/systemd/network/22-${vlan.interface_name}.network
+    - path: /etc/systemd/network/20-${vlan.interface_name}.network
       mode: 0644
       contents:
         inline: |
@@ -106,19 +99,17 @@ storage:
           [Network]
           LinkLocalAddressing=false
           DHCP=false
-          %{~ if can(interfaces[network_name]) ~}
-          %{~ if interfaces[network_name].source_interface_name == vlan.interface_name ~}
-          %{~ if lookup(interfaces[network_name], "enable_netnum", false) || lookup(interfaces[network_name], "enable_dhcp", false) ~}
-          MACVTAP=${interfaces[network_name].interface_name}
-          %{~ endif ~}
-          %{~ endif ~}
-          %{~ endif ~}
     %{~ endfor ~}
     %{~ endfor ~}
 
     # tap interfaces
     %{~ for network_name, interface in interfaces ~}
-    - path: /etc/systemd/network/20-${interface.interface_name}.netdev
+    - path: /etc/systemd/network/20-${interface.source_interface_name}.network.d/10-macvtap.conf
+      contents:
+        inline: |
+          [Network]
+          MACVTAP=${interface.interface_name}
+    - path: /etc/systemd/network/12-${interface.interface_name}.netdev
       mode: 0644
       contents:
         inline: |
@@ -129,7 +120,7 @@ storage:
 
           [MACVTAP]
           Mode=bridge
-    - path: /etc/systemd/network/22-${interface.interface_name}.network
+    - path: /etc/systemd/network/20-${interface.interface_name}.network
       mode: 0644
       contents:
         inline: |

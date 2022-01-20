@@ -1,6 +1,20 @@
 ---
 variant: fcos
 version: 1.4.0
+systemd:
+  units:
+    - name: systemd-rfkill.service
+      mask: true
+    - name: systemd-rfkill.socket
+      mask: true
+    # - name: hostapd.service
+    #   enabled: true
+    #   dropins:
+    #     - name: 10-dependency.conf
+    #       contents: |
+    #         [Unit]
+    #         PartOf=systemd-networkd.service
+
 storage:
   files:
     - path: ${static_pod_manifest_path}/hostapd.yaml
@@ -20,11 +34,10 @@ storage:
             - name: hostapd
               image: ${hostapd_container_image}
               args:
+              - -d
               - /etc/hostapd/hostapd.conf
               securityContext:
-                capabilities:
-                  add:
-                  - NET_RAW
+                privileged: true
               volumeMounts:
               - name: hostapd-config
                 mountPath: /etc/hostapd/hostapd.conf
@@ -39,36 +52,24 @@ storage:
       contents:
         inline: |-
           interface=${hardware_interface_name}
-          hw_mode=a
-          channel=0
-          ieee80211d=1
-          country_code=US
-          ieee80211n=1
-          ieee80211ac=1         
-          wmm_enabled=1
-
-          ssid=${ssid}
+          hw_mode=g
+          channel=4
           auth_algs=1
+          driver=nl80211
           wpa=2
           wpa_key_mgmt=WPA-PSK
+          wpa_pairwise=TKIP
           rsn_pairwise=CCMP
           wpa_passphrase=${passphrase}
-
-          ieee80211r=1
-          mobility_domain=${roaming_mobility_domain}
-          ft_psk_generate_local=1
-          nasid=${nasid}
-
-    # After rename e.g. wlan0
-    - path: /etc/systemd/network/12-${hardware_interface_name}.network
-      mode: 0644
-      contents:
-        inline: |
-          [Network]
-          Bridge=${br_interface_name}
+          ssid=${ssid}
+          ieee80211n=1
+          wmm_enabled=1
+          ctrl_interface=/var/run/hostapd
+          ctrl_interface_group=0
+          bridge=${br_interface_name}
 
     # For bridging to wired NIC e.g. phy0-wlan
-    - path: /etc/systemd/network/22-${vlan_interface_name}.network
+    - path: /etc/systemd/network/20-${vlan_interface_name}.network.d/10-bridge.conf
       mode: 0644
       contents:
         inline: |
@@ -77,15 +78,15 @@ storage:
 
     # Bridge them together e.g. br-wlan
     # This interface will have a macvtap created with IP for gateway and DHCP
-    - path: /etc/systemd/network/22-${br_interface_name}.netdev
+    - path: /etc/systemd/network/12-${br_interface_name}.netdev
       mode: 0644
       contents:
         inline: |
           [NetDev]
-          Name=br0
-          Kind=${br_interface_name}
+          Name=${br_interface_name}
+          Kind=bridge
 
-    - path: /etc/systemd/network/22-${br_interface_name}.network
+    - path: /etc/systemd/network/20-${br_interface_name}.network
       mode: 0644
       contents:
         inline: |

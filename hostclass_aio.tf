@@ -193,7 +193,7 @@ module "template-aio-hostapd" {
   roaming_mobility_domain  = "a123"
   hardware_interface_name  = "wlan0"
   nasid                    = replace(each.value.hardware_interfaces.wlan0.mac, "-", "")
-  vlan_interface_name      = each.value.tap_interfaces.wlan.source_interface_name
+  vlan_interface_name      = "phy0-wlan"
   br_interface_name        = "br-wlan"
   hostapd_container_image  = local.config.container_images.hostapd
   static_pod_manifest_path = local.config.static_pod_manifest_path

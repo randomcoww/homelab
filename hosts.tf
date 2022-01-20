@@ -33,8 +33,11 @@ locals {
           mac                   = "52-54-00-63-6e-b3"
         }
         wlan = {
-          source_interface_name = "phy0-wlan"
+          source_interface_name = "br-wlan"
+          enable_netnum         = true
+          enable_vrrp_netnum    = true
           enable_dhcp_server    = true
+          mtu                   = 1500
         }
       }
       disks = {
