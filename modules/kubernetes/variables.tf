@@ -6,7 +6,11 @@ variable "container_images" {
   type = map(string)
 }
 
-variable "common_certs" {
+variable "kubernetes_common_certs" {
+  type = any
+}
+
+variable "etcd_common_certs" {
   type = any
 }
 

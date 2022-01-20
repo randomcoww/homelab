@@ -6,116 +6,11 @@ locals {
       netnum = 1
     }
     hosts = {
-      aio-0 = {
-        hostname = "aio-0.${local.config.domains.internal_mdns}"
-        netnum   = 1
-        hardware_interfaces = {
-          phy0 = {
-            mac   = "8c-8c-aa-e3-58-62"
-            mtu   = 9000
-            vlans = ["sync", "wan", "wlan"]
-          }
-          wlan0 = {
-            mac = "b4-0e-de-fb-28-95"
-            mtu = 9000
-          }
-        }
-        tap_interfaces = {
-          lan = {
-            source_interface_name = "phy0"
-            enable_mdns           = true
-            enable_netnum         = true
-            enable_vrrp_netnum    = true
-            enable_dhcp_server    = true
-            mtu                   = 9000
-          }
-          sync = {
-            source_interface_name = "phy0-sync"
-            enable_netnum         = true
-            enable_vrrp_netnum    = true
-            mtu                   = 9000
-          }
-          wan = {
-            source_interface_name = "phy0-wan"
-            enable_dhcp           = true
-            mac                   = "52-54-00-63-6e-b3"
-          }
-          wlan = {
-            source_interface_name = "phy0-wlan"
-            enable_dhcp_server    = true
-          }
-        }
-        disks = {
-          pv = {
-            device = "/dev/disk/by-id/nvme-Samsung_SSD_970_EVO_1TB_S5H9NS0N986704R"
-            partitions = [
-              {
-                mount_path = "/var/pv"
-                wipe       = false
-              },
-            ]
-          }
-        }
-        volume_paths = [
-          "/var/pv/minio"
-        ]
-        container_storage_path = "/var/pv/containers"
-        kea_ha_role            = "primary"
-      }
-      aio-1 = {
-        hostname = "aio-1.${local.config.domains.internal_mdns}"
-        netnum   = 3
-        hardware_interfaces = {
-          phy0 = {
-            mac = "3c-fd-fe-b2-47-68"
-            mtu = 9000
-          }
-          phy1 = {
-            mac   = "3c-fd-fe-b2-47-69"
-            mtu   = 9000
-            vlans = ["sync"]
-          }
-          phy2 = {
-            mac   = "3c-fd-fe-b2-47-6a"
-            mtu   = 9000
-            vlans = ["wan"]
-          }
-          phy3 = {
-            mac   = "3c-fd-fe-b2-47-6b"
-            mtu   = 9000
-            vlans = ["wlan"]
-          }
-        }
-        tap_interfaces = {
-          lan = {
-            source_interface_name = "phy0"
-            enable_mdns           = true
-            enable_netnum         = true
-            enable_vrrp_netnum    = true
-            enable_dhcp_server    = true
-            mtu                   = 9000
-          }
-          sync = {
-            source_interface_name = "phy1-sync"
-            enable_netnum         = true
-            enable_vrrp_netnum    = true
-            mtu                   = 9000
-          }
-          wan = {
-            source_interface_name = "phy2-wan"
-            enable_dhcp           = true
-            mac                   = "52-54-00-63-6e-b3"
-          }
-          wlan = {
-            source_interface_name = "phy3-wlan"
-            enable_dhcp_server    = true
-          }
-        }
-        disks                  = {}
-        volume_paths           = []
-        container_storage_path = "/var/lib/containers"
-        kea_ha_role            = "secondary"
-      }
+      aio-0 = merge(local.host_spec.server-laptop, {
+        hostname    = "aio-0.${local.config.domains.internal_mdns}"
+        netnum      = 1
+        kea_ha_role = "primary"
+      })
     }
   }
 }
@@ -217,7 +112,7 @@ module "template-aio-etcd" {
   source           = "./modules/etcd"
   hostname         = each.value.hostname
   container_images = local.config.container_images
-  common_certs     = module.kubernetes-common.certs
+  common_certs     = module.etcd-common.certs
   network_prefix   = local.config.networks.lan.prefix
   host_netnum      = each.value.netnum
   etcd_hosts = [
@@ -230,11 +125,10 @@ module "template-aio-etcd" {
   etcd_client_port         = local.config.ports.etcd_client
   etcd_peer_port           = local.config.ports.etcd_peer
   etcd_cluster_token       = local.config.kubernetes_cluster_name
-  aws_access_key_id        = module.kubernetes-common.aws_s3_backup_credentials.access_key_id
-  aws_secret_access_key    = module.kubernetes-common.aws_s3_backup_credentials.access_key_secret
-  aws_region               = local.config.aws_region
-  etcd_s3_backup_path      = module.kubernetes-common.etcd_s3_backup_key
-  etcd_ca                  = module.kubernetes-common.ca.etcd
+  aws_access_key_id        = module.etcd-common.aws_user_access.id
+  aws_access_key_secret    = module.etcd-common.aws_user_access.secret
+  s3_backup_path           = module.etcd-common.s3_backup_path
+  etcd_ca                  = module.etcd-common.ca.etcd
   static_pod_manifest_path = local.config.static_pod_manifest_path
 }
 
@@ -244,7 +138,8 @@ module "template-aio-kubernetes" {
   source                                      = "./modules/kubernetes"
   hostname                                    = each.value.hostname
   container_images                            = local.config.container_images
-  common_certs                                = module.kubernetes-common.certs
+  kubernetes_common_certs                     = module.kubernetes-common.certs.kubernetes
+  etcd_common_certs                           = module.etcd-common.certs.etcd
   network_prefix                              = local.config.networks.lan.prefix
   host_netnum                                 = each.value.netnum
   vip_netnum                                  = local.aio_hostclass_config.vrrp_netnum
@@ -290,9 +185,7 @@ module "template-aio-minio" {
 }
 
 module "template-aio-hostapd" {
-  for_each = {
-    aio-0 = local.aio_hostclass_config.hosts.aio-0
-  }
+  for_each = local.aio_hostclass_config.hosts
 
   source                   = "./modules/hostapd"
   ssid                     = var.wifi.ssid
@@ -328,7 +221,7 @@ EOT
     module.template-aio-kubernetes[each.key].ignition_snippets,
     module.template-aio-worker[each.key].ignition_snippets,
     module.template-aio-minio[each.key].ignition_snippets,
-    try(module.template-aio-hostapd[each.key].ignition_snippets, []),
+    module.template-aio-hostapd[each.key].ignition_snippets,
   )
 }
 

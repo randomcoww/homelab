@@ -197,8 +197,13 @@ resource "ssh_client_cert" "ssh-client" {
 }
 
 # kubernetes #
+module "etcd-common" {
+  source = "./modules/etcd_common"
+
+  s3_backup_bucket = "randomcoww-etcd-backup"
+  s3_backup_key    = local.config.kubernetes_cluster_name
+}
+
 module "kubernetes-common" {
-  source              = "./modules/kubernetes_common"
-  etcd_s3_backup_user = "etcd_s3_backup_user-220011"
-  etcd_s3_backup_key  = "randomcoww-etcd-backup/22011"
+  source = "./modules/kubernetes_common"
 }

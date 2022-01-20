@@ -17,6 +17,11 @@ locals {
     }
   }
 
+  etcd_cluster_endpoints = [
+    for etcd_host in var.etcd_hosts :
+    "https://${cidrhost(var.network_prefix, etcd_host.netnum)}:${var.etcd_client_port}"
+  ]
+
   module_ignition_snippets = [
     for f in fileset(".", "${path.module}/ignition/*.yaml") :
     templatefile(f, {
@@ -34,12 +39,13 @@ locals {
       etcd_cluster_token       = var.etcd_cluster_token
       etcd_client_port         = var.etcd_client_port
       etcd_peer_port           = var.etcd_peer_port
+      etcd_cluster_endpoints   = local.etcd_cluster_endpoints
 
       # backup #
       aws_access_key_id     = var.aws_access_key_id
-      aws_secret_access_key = var.aws_secret_access_key
+      aws_access_key_secret = var.aws_access_key_secret
       aws_region            = var.aws_region
-      etcd_s3_backup_path   = var.etcd_s3_backup_path
+      s3_backup_path        = var.s3_backup_path
     })
   ]
 }

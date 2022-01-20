@@ -36,16 +36,13 @@ storage:
                   for etcd_host in etcd_hosts :
                   "${etcd_host.name}=https://${cidrhost(network_prefix, etcd_host.netnum)}:${etcd_peer_port}"
               ])}"
-              - "--etcd-servers=${join(",", [
-                  for etcd_host in etcd_hosts :
-                  "https://${cidrhost(network_prefix, etcd_host.netnum)}:${etcd_client_port}"
-              ])}"
+              - "--etcd-servers=${join(",", etcd_cluster_endpoints)}"
               - "--host-backup-file=${backup_path}/etcd.db"
               - "--host-etcd-manifest-file=${static_pod_manifest_path}/${etcd_pod_manifest_name}"
               - "--etcd-image=${container_images.etcd}"
               - "--client-cert-file=${etcd_certs.client_cert.path}"
               - "--client-key-file=${etcd_certs.client_key.path}"
-              - "--s3-backup-path=${etcd_s3_backup_path}"
+              - "--s3-backup-path=${s3_backup_path}"
               - "--backup-interval=30m"
               - "--healthcheck-interval=10s"
               - "--pod-update-interval=1m"
@@ -53,7 +50,7 @@ storage:
               - name: AWS_ACCESS_KEY_ID
                 value: "${aws_access_key_id}"
               - name: AWS_SECRET_ACCESS_KEY
-                value: "${aws_secret_access_key}"
+                value: "${aws_access_key_secret}"
               - name: AWS_DEFAULT_REGION
                 value: "${aws_region}"
               - name: AWS_SDK_LOAD_CONFIG

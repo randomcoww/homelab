@@ -38,15 +38,16 @@ variable "aws_access_key_id" {
   type = string
 }
 
-variable "aws_secret_access_key" {
+variable "aws_access_key_secret" {
   type = string
 }
 
 variable "aws_region" {
-  type = string
+  type    = string
+  default = "us-east-1"
 }
 
-variable "etcd_s3_backup_path" {
+variable "s3_backup_path" {
   type = string
 }
 

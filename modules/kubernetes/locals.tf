@@ -3,7 +3,7 @@ locals {
 
   certs = {
     kubernetes = {
-      for cert_name, cert in merge(var.common_certs.kubernetes, {
+      for cert_name, cert in merge(var.kubernetes_common_certs, {
         apiserver_cert = {
           content = tls_locally_signed_cert.apiserver.cert_pem
         }
@@ -16,7 +16,7 @@ locals {
       })
     }
     etcd = {
-      for cert_name, cert in var.common_certs.etcd :
+      for cert_name, cert in var.etcd_common_certs :
       cert_name => merge(cert, {
         path = "${local.certs_path}/etcd-${cert_name}.pem"
       })
