@@ -1,20 +1,9 @@
 locals {
   client_hostclass_config = {
     hosts = {
-      client-0 = {
-        hostname = "clients-0.${local.config.domains.internal_mdns}"
-        disks = {
-          pv = {
-            device = "/dev/disk/by-id/ata-INTEL_SSDSA2BZ100G3D_CVLV2345008U100AGN"
-            partitions = [
-              {
-                mount_path = "/var/home"
-                wipe       = false
-              },
-            ]
-          }
-        }
-      }
+      client-0 = merge(local.host_spec.client-ws, {
+        hostname    = "client-0.${local.config.domains.internal_mdns}"
+      })
     }
   }
 }
