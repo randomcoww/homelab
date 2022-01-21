@@ -6,6 +6,8 @@ systemd:
     - name: keepalived.service
       enabled: true
       dropins:
+        # Part of networkd:
+        # Adds the policy route for WAN back in on networkd restart
         - name: 10-dependency.conf
           contents: |
             [Unit]
@@ -33,11 +35,7 @@ storage:
           }
           vrrp_sync_group sync {
             group {
-              %{~ for network_name, interface in interfaces ~}
-              %{~ if lookup(interface, "enable_vrrp_netnum", false) ~}
-              ${network_name}
-              %{~ endif ~}
-              %{~ endfor ~}
+              sync
               virtualrule
             }
           }

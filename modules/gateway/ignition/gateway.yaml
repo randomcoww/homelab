@@ -43,8 +43,7 @@ storage:
             chain forward {
               type filter hook forward priority 0; policy drop;
               jump base_checks;
-              oifname ${interfaces.wan.interface_name} accept;
-              iifname ${interfaces.wlan.interface_name} oifname ${interfaces.lan.interface_name} accept;
+              iifname != ${interfaces.wan.interface_name} accept;
             }
 
             chain postrouting {

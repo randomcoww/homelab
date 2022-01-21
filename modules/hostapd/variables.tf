@@ -2,15 +2,11 @@ variable "hardware_interface_name" {
   type = string
 }
 
-variable "vlan_interface_name" {
+variable "source_interface_name" {
   type = string
 }
 
 variable "br_interface_name" {
-  type = string
-}
-
-variable "roaming_mobility_domain" {
   type = string
 }
 
@@ -19,10 +15,6 @@ variable "ssid" {
 }
 
 variable "passphrase" {
-  type = string
-}
-
-variable "nasid" {
   type = string
 }
 

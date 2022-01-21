@@ -4,8 +4,8 @@ locals {
       hardware_interfaces = {
         phy0 = {
           mac   = "8c-8c-aa-e3-58-62"
-          mtu   = 9000
-          vlans = ["sync", "wan", "wlan"]
+          mtu   = 1500
+          vlans = ["sync", "wan"]
         }
         wlan0 = {
           mac = "b4-0e-de-fb-28-95"
@@ -14,30 +14,23 @@ locals {
       }
       tap_interfaces = {
         lan = {
-          source_interface_name = "phy0"
+          source_interface_name = "br-wlan"
           enable_mdns           = true
           enable_netnum         = true
           enable_vrrp_netnum    = true
           enable_dhcp_server    = true
-          mtu                   = 9000
+          mtu                   = 1500
         }
         sync = {
           source_interface_name = "phy0-sync"
           enable_netnum         = true
           enable_vrrp_netnum    = true
-          mtu                   = 9000
+          mtu                   = 1500
         }
         wan = {
           source_interface_name = "phy0-wan"
           enable_dhcp           = true
           mac                   = "52-54-00-63-6e-b3"
-        }
-        wlan = {
-          source_interface_name = "br-wlan"
-          enable_netnum         = true
-          enable_vrrp_netnum    = true
-          enable_dhcp_server    = true
-          mtu                   = 1500
         }
       }
       disks = {
@@ -98,10 +91,6 @@ locals {
           source_interface_name = "phy2-wan"
           enable_dhcp           = true
           mac                   = "52-54-00-63-6e-b3"
-        }
-        wlan = {
-          source_interface_name = "phy3-wlan"
-          enable_dhcp_server    = true
         }
       }
       disks                  = {}

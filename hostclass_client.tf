@@ -2,7 +2,7 @@ locals {
   client_hostclass_config = {
     hosts = {
       client-0 = merge(local.host_spec.client-ws, {
-        hostname    = "client-0.${local.config.domains.internal_mdns}"
+        hostname = "client-0.${local.config.domains.internal_mdns}"
       })
     }
   }

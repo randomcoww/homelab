@@ -7,7 +7,7 @@ systemd:
       mask: true
     - name: systemd-rfkill.socket
       mask: true
-    # Find a better way to do this #
+    # !! Find a better way to do this !!
     - name: rfkill-unblock.service
       enabled: true
       contents: |
@@ -21,14 +21,26 @@ systemd:
 
         [Install]
         WantedBy=multi-user.target
+    # - name: hostapd.service
+    #   enabled: true
+    #   dropins:
+    #     - name: 10-dependency.conf
+    #       contents: |
+    #         [Unit]
+    #         Before=kubelet.service
+
+    #         [Service]
+    #         Restart=always
+    #         RestartSec=3
 
 storage:
   files:
-    - path: /etc/udev/rules.d/10-wlan-4addr.rules
+    - path: /etc/sysctl.d/99-wlan-bridge.conf
       mode: 0644
       contents:
-        inline: |-
-          ACTION=="add", SUBSYSTEM=="ieee80211", KERNEL=="wlp*", RUN+="/usr/sbin/iw dev %k set 4addr on"
+        inline: |
+          net.bridge.bridge-nf-call-iptables=0
+          net.bridge.bridge-nf-call-ip6tables=0
 
     - path: ${static_pod_manifest_path}/hostapd.yaml
       mode: 0644
@@ -80,8 +92,10 @@ storage:
           wmm_enabled=1
           ctrl_interface=/var/run/hostapd
           ctrl_interface_group=0
+          bridge=${br_interface_name}
 
-    # For bridging to wired NIC e.g. phy0-wlan
+    # For bridging to wired NIC e.g. wlan0
+    # This fails until hostapd sets it the first time - this gets added if networkd is later restarted
     - path: /etc/systemd/network/20-${hardware_interface_name}.network.d/10-bridge.conf
       mode: 0644
       contents:
@@ -89,20 +103,13 @@ storage:
           [Network]
           Bridge=${br_interface_name}
 
-          [BridgeVLAN]
-          EgressUntagged=90
-          PVID=90
-
     # For bridging to wired NIC e.g. phy0-wlan
-    - path: /etc/systemd/network/20-${vlan_interface_name}.network.d/10-bridge.conf
+    - path: /etc/systemd/network/20-${source_interface_name}.network.d/10-bridge.conf
       mode: 0644
       contents:
         inline: |
           [Network]
           Bridge=${br_interface_name}
-
-          [BridgeVLAN]
-          VLAN=90
 
     # Bridge them together e.g. br-wlan
     # This interface will have a macvtap created with IP for gateway and DHCP
@@ -113,7 +120,6 @@ storage:
           [NetDev]
           Name=${br_interface_name}
           Kind=bridge
-
     - path: /etc/systemd/network/20-${br_interface_name}.network
       mode: 0644
       contents:
@@ -127,6 +133,3 @@ storage:
           [Network]
           LinkLocalAddressing=false
           DHCP=false
-
-          [Bridge]
-          VLANFiltering=true

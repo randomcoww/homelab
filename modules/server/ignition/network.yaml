@@ -62,6 +62,7 @@ storage:
 
           [Link]
           ARP=false
+          ActivationPolicy=always-up
           MTUBytes=${lookup(hardware_interface, "mtu", 1500)}
 
           [Network]
