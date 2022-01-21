@@ -9,7 +9,7 @@ locals {
         }
         wlan0 = {
           mac = "b4-0e-de-fb-28-95"
-          mtu = 9000
+          mtu = 1500
         }
       }
       tap_interfaces = {

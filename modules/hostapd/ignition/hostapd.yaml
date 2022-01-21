@@ -7,16 +7,29 @@ systemd:
       mask: true
     - name: systemd-rfkill.socket
       mask: true
-    # - name: hostapd.service
-    #   enabled: true
-    #   dropins:
-    #     - name: 10-dependency.conf
-    #       contents: |
-    #         [Unit]
-    #         PartOf=systemd-networkd.service
+    # Find a better way to do this #
+    - name: rfkill-unblock.service
+      enabled: true
+      contents: |
+        [Unit]
+        Before=systemd-networkd.service
+        WantedBy=systemd-networkd.service
+
+        [Service]
+        Type=oneshot
+        ExecStart=/usr/sbin/rfkill unblock all
+
+        [Install]
+        WantedBy=multi-user.target
 
 storage:
   files:
+    - path: /etc/udev/rules.d/10-wlan-4addr.rules
+      mode: 0644
+      contents:
+        inline: |-
+          ACTION=="add", SUBSYSTEM=="ieee80211", KERNEL=="wlp*", RUN+="/usr/sbin/iw dev %k set 4addr on"
+
     - path: ${static_pod_manifest_path}/hostapd.yaml
       mode: 0644
       contents:
@@ -49,6 +62,7 @@ storage:
 
     - path: /etc/hostapd/hostapd.conf
       mode: 0644
+      overwrite: true
       contents:
         inline: |-
           interface=${hardware_interface_name}
@@ -66,7 +80,18 @@ storage:
           wmm_enabled=1
           ctrl_interface=/var/run/hostapd
           ctrl_interface_group=0
-          bridge=${br_interface_name}
+
+    # For bridging to wired NIC e.g. phy0-wlan
+    - path: /etc/systemd/network/20-${hardware_interface_name}.network.d/10-bridge.conf
+      mode: 0644
+      contents:
+        inline: |
+          [Network]
+          Bridge=${br_interface_name}
+
+          [BridgeVLAN]
+          EgressUntagged=90
+          PVID=90
 
     # For bridging to wired NIC e.g. phy0-wlan
     - path: /etc/systemd/network/20-${vlan_interface_name}.network.d/10-bridge.conf
@@ -75,6 +100,9 @@ storage:
         inline: |
           [Network]
           Bridge=${br_interface_name}
+
+          [BridgeVLAN]
+          VLAN=90
 
     # Bridge them together e.g. br-wlan
     # This interface will have a macvtap created with IP for gateway and DHCP
@@ -99,3 +127,6 @@ storage:
           [Network]
           LinkLocalAddressing=false
           DHCP=false
+
+          [Bridge]
+          VLANFiltering=true

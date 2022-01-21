@@ -7,7 +7,7 @@ systemd:
     - name: systemd-networkd.service
       enabled: true
       dropins:
-        - name: 10-require-dbus.conf
+        - name: 10-dependencies.conf
           contents: |
             [Unit]
             After=dbus.socket
