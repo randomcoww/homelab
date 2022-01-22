@@ -14,7 +14,7 @@ systemd:
           contents: |
             [Service]
             Restart=always
-            RestartSec=3
+            RestartSec=6
             EnvironmentFile=
             Environment=OTHER_ARGS="-d"
             ExecStartPre=/usr/sbin/rfkill unblock wlan
@@ -68,17 +68,14 @@ storage:
           channel=4
           auth_algs=1
           driver=nl80211
-          ieee80211n=1
           ieee80211ac=1
           wmm_enabled=1
           wpa=2
-          wpa_key_mgmt=WPA-PSK
-          wpa_pairwise=TKIP
-          rsn_pairwise=CCMP
-          wpa_passphrase=${passphrase}
+          wpa_key_mgmt=SAE
+          wpa_pairwise=CCMP
+          ieee80211w=2
+          sae_password=${passphrase}
           ssid=${ssid}
-          ieee80211n=1
-          wmm_enabled=1
           bridge=${br_interface_name}
 
     # For bridging to wired NIC e.g. wlan0
