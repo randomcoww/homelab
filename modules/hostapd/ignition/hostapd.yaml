@@ -7,31 +7,17 @@ systemd:
       mask: true
     - name: systemd-rfkill.socket
       mask: true
-    # !! Find a better way to do this !!
-    - name: rfkill-unblock.service
+    - name: hostapd.service
       enabled: true
-      contents: |
-        [Unit]
-        Before=systemd-networkd.service
-        WantedBy=systemd-networkd.service
-
-        [Service]
-        Type=oneshot
-        ExecStart=/usr/sbin/rfkill unblock all
-
-        [Install]
-        WantedBy=multi-user.target
-    # - name: hostapd.service
-    #   enabled: true
-    #   dropins:
-    #     - name: 10-dependency.conf
-    #       contents: |
-    #         [Unit]
-    #         Before=kubelet.service
-
-    #         [Service]
-    #         Restart=always
-    #         RestartSec=3
+      dropins:
+        - name: 10-dependency.conf
+          contents: |
+            [Service]
+            Restart=always
+            RestartSec=3
+            EnvironmentFile=
+            Environment=OTHER_ARGS="-d"
+            ExecStartPre=/usr/sbin/rfkill unblock wlan
 
 storage:
   files:
@@ -42,35 +28,35 @@ storage:
           net.bridge.bridge-nf-call-iptables=0
           net.bridge.bridge-nf-call-ip6tables=0
 
-    - path: ${static_pod_manifest_path}/hostapd.yaml
-      mode: 0644
-      contents:
-        inline: |-
-          ---
-          kind: Pod
-          apiVersion: v1
-          metadata:
-            namespace: kube-system
-            name: hostapd
-          spec:
-            hostNetwork: true
-            restartPolicy: Always
-            containers:
-            - name: hostapd
-              image: ${hostapd_container_image}
-              args:
-              - -d
-              - /etc/hostapd/hostapd.conf
-              securityContext:
-                privileged: true
-              volumeMounts:
-              - name: hostapd-config
-                mountPath: /etc/hostapd/hostapd.conf
-                readOnly: true
-            volumes:
-            - name: hostapd-config
-              hostPath:
-                path: /etc/hostapd/hostapd.conf
+    # - path: ${static_pod_manifest_path}/hostapd.yaml
+    #   mode: 0644
+    #   contents:
+    #     inline: |-
+    #       ---
+    #       kind: Pod
+    #       apiVersion: v1
+    #       metadata:
+    #         namespace: kube-system
+    #         name: hostapd
+    #       spec:
+    #         hostNetwork: true
+    #         restartPolicy: Always
+    #         containers:
+    #         - name: hostapd
+    #           image: ${hostapd_container_image}
+    #           args:
+    #           - -d
+    #           - /etc/hostapd/hostapd.conf
+    #           securityContext:
+    #             privileged: true
+    #           volumeMounts:
+    #           - name: hostapd-config
+    #             mountPath: /etc/hostapd/hostapd.conf
+    #             readOnly: true
+    #         volumes:
+    #         - name: hostapd-config
+    #           hostPath:
+    #             path: /etc/hostapd/hostapd.conf
 
     - path: /etc/hostapd/hostapd.conf
       mode: 0644
@@ -82,6 +68,9 @@ storage:
           channel=4
           auth_algs=1
           driver=nl80211
+          ieee80211n=1
+          ieee80211ac=1
+          wmm_enabled=1
           wpa=2
           wpa_key_mgmt=WPA-PSK
           wpa_pairwise=TKIP
@@ -90,8 +79,6 @@ storage:
           ssid=${ssid}
           ieee80211n=1
           wmm_enabled=1
-          ctrl_interface=/var/run/hostapd
-          ctrl_interface_group=0
           bridge=${br_interface_name}
 
     # For bridging to wired NIC e.g. wlan0

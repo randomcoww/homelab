@@ -101,7 +101,7 @@ locals {
     client-ws = {
       disks = {
         pv = {
-          device = "/dev/disk/by-id/ata-INTEL_SSDSA2BZ100G3D_CVLV2345008U100AGN"
+          device = "/dev/disk/by-id/nvme-SKHynix_HFS512GDE9X084N_CYA8N037413008I5H"
           partitions = [
             {
               mount_path = "/var/home"
