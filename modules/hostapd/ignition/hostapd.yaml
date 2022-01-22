@@ -64,12 +64,16 @@ storage:
       contents:
         inline: |-
           interface=${hardware_interface_name}
+          preamble=1
           hw_mode=g
           channel=4
           auth_algs=1
           driver=nl80211
           ieee80211ac=1
+          ieee80211n=1
+          require_ht=1
           wmm_enabled=1
+          ht_capab=[LDPC][HT40-][HT40+][SHORT-GI-20][SHORT-GI-40][TX-STBC][RX-STBC1][DSSS_CCK-40]
           wpa=2
           wpa_key_mgmt=SAE
           wpa_pairwise=CCMP
@@ -77,6 +81,8 @@ storage:
           sae_password=${passphrase}
           ssid=${ssid}
           bridge=${br_interface_name}
+          ctrl_interface=/var/run/hostapd
+          ctrl_interface_group=0
 
     # For bridging to wired NIC e.g. wlan0
     # This fails until hostapd sets it the first time - this gets added if networkd is later restarted
