@@ -192,7 +192,7 @@ module "template-aio-hostapd" {
   passphrase               = var.wifi.passphrase
   hardware_interface_name  = "wlan0"
   source_interface_name    = "phy0"
-  br_interface_name        = "br-wlan"
+  bridge_interface_mtu     = each.value.hardware_interfaces.phy0.mtu
   hostapd_container_image  = local.config.container_images.hostapd
   static_pod_manifest_path = local.config.static_pod_manifest_path
 }

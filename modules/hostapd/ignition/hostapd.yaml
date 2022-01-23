@@ -116,7 +116,7 @@ storage:
       contents:
         inline: |
           [Network]
-          Bridge=${br_interface_name}
+          Bridge=${bridge_interface_name}
 
     # For bridging to wired NIC e.g. phy0-wlan
     - path: /etc/systemd/network/20-${source_interface_name}.network.d/10-bridge.conf
@@ -124,25 +124,26 @@ storage:
       contents:
         inline: |
           [Network]
-          Bridge=${br_interface_name}
+          Bridge=${bridge_interface_name}
 
     # Bridge them together e.g. br-wlan
     # This interface will have a macvtap created with IP for gateway and DHCP
-    - path: /etc/systemd/network/12-${br_interface_name}.netdev
+    - path: /etc/systemd/network/12-${bridge_interface_name}.netdev
       mode: 0644
       contents:
         inline: |
           [NetDev]
-          Name=${br_interface_name}
+          Name=${bridge_interface_name}
           Kind=bridge
-    - path: /etc/systemd/network/20-${br_interface_name}.network
+    - path: /etc/systemd/network/20-${bridge_interface_name}.network
       mode: 0644
       contents:
         inline: |
           [Match]
-          Name=${br_interface_name}
+          Name=${bridge_interface_name}
 
           [Link]
+          MTUBytes=${bridge_interface_mtu}
           ARP=false
 
           [Network]

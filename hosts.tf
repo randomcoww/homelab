@@ -4,12 +4,12 @@ locals {
       hardware_interfaces = {
         phy0 = {
           mac   = "8c-8c-aa-e3-58-62"
-          mtu   = 1500
+          mtu   = 9000
           vlans = ["sync", "wan"]
         }
         wlan0 = {
           mac = "b4-0e-de-fb-28-95"
-          mtu = 1500
+          mtu = 9000
         }
       }
       tap_interfaces = {
@@ -19,13 +19,13 @@ locals {
           enable_netnum         = true
           enable_vrrp_netnum    = true
           enable_dhcp_server    = true
-          mtu                   = 1500
+          mtu                   = 9000
         }
         sync = {
           source_interface_name = "phy0-sync"
           enable_netnum         = true
           enable_vrrp_netnum    = true
-          mtu                   = 1500
+          mtu                   = 9000
         }
         wan = {
           source_interface_name = "phy0-wan"

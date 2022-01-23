@@ -6,8 +6,14 @@ variable "source_interface_name" {
   type = string
 }
 
-variable "br_interface_name" {
-  type = string
+variable "bridge_interface_name" {
+  type    = string
+  default = "br-wlan"
+}
+
+variable "bridge_interface_mtu" {
+  type    = number
+  default = 1500
 }
 
 variable "ssid" {

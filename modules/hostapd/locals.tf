@@ -4,7 +4,8 @@ locals {
     templatefile(f, {
       hardware_interface_name  = var.hardware_interface_name
       source_interface_name    = var.source_interface_name
-      br_interface_name        = var.br_interface_name
+      bridge_interface_name    = var.bridge_interface_name
+      bridge_interface_mtu     = var.bridge_interface_mtu
       ssid                     = var.ssid
       passphrase               = var.passphrase
       hostapd_container_image  = var.hostapd_container_image
