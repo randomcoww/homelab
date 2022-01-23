@@ -12,7 +12,6 @@ systemd:
           contents: |
             [Unit]
             PartOf=systemd-networkd.service
-            PartOf=hostapd.service
 
             [Service]
             EnvironmentFile=
@@ -29,53 +28,32 @@ storage:
         inline: |-
           global_defs {
             vrrp_version 3
-            vrrp_iptables
             nftables keepalived
             dynamic_interfaces allow_if_changes
             max_auto_priority -1
           }
-          vrrp_sync_group sync {
-            group {
-              sync
-              virtualrule
-            }
-          }
-          %{~ for network_name, interface in interfaces ~}
-          %{~ if lookup(interface, "enable_vrrp_netnum", false) ~}
-          vrrp_instance ${network_name} {
+          vrrp_instance gateway {
             nopreempt
             state BACKUP
-            advert_int 0.02
+            advert_int 0.1
             virtual_router_id 100
-            interface ${interface.interface_name}
-            use_vmac ${interface.vmac_interface_name}
-            priority 250
-            garp_master_refresh 1
-            track_interface {
-              ${interface.interface_name}
-            }
-            virtual_ipaddress {
-              ${cidrhost(interface.prefix, vrrp_netnum)}
-            }
-          }
-          %{~ endif ~}
-          %{~ endfor ~}
-          vrrp_instance virtualrule {
-            nopreempt
-            state BACKUP
-            advert_int 0.02
-            virtual_router_id 110
             interface ${interfaces.sync.interface_name}
             priority 250
             garp_master_refresh 1
+            dont_track_primary
             track_interface {
               ${interfaces.wan.interface_name}
             }
+            virtual_ipaddress {
+              %{~ for network_name, interface in interfaces ~}
+              %{~ if lookup(interface, "enable_vrrp_netnum", false) ~}
+              ${cidrhost(interface.prefix, vrrp_netnum)} dev ${interface.interface_name} use_vmac
+              %{~ endif ~}
+              %{~ endfor ~}
+              0.0.0.0 dev ${interfaces.wan.interface_name}
+            }
             virtual_rules {
               to all lookup ${vrrp_master_default_route.table_id} priority ${vrrp_master_default_route.table_priority}
-            }
-            virtual_ipaddress {
-              0.0.0.0 dev ${interfaces.wan.interface_name}
             }
           }
 
