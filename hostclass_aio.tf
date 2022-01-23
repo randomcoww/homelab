@@ -127,6 +127,7 @@ module "template-aio-etcd" {
   etcd_cluster_token       = local.config.kubernetes_cluster_name
   aws_access_key_id        = module.etcd-common.aws_user_access.id
   aws_access_key_secret    = module.etcd-common.aws_user_access.secret
+  aws_region               = "us-west-2"
   s3_backup_path           = module.etcd-common.s3_backup_path
   etcd_ca                  = module.etcd-common.ca.etcd
   static_pod_manifest_path = local.config.static_pod_manifest_path
