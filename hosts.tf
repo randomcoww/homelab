@@ -67,9 +67,8 @@ locals {
           vlans = ["wan"]
         }
         phy3 = {
-          mac   = "3c-fd-fe-b2-47-6b"
-          mtu   = 9000
-          vlans = ["wlan"]
+          mac = "3c-fd-fe-b2-47-6b"
+          mtu = 9000
         }
       }
       tap_interfaces = {

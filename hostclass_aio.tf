@@ -48,7 +48,10 @@ module "template-aio-gateway" {
   host_netnum        = each.value.netnum
   vrrp_netnum        = local.aio_hostclass_config.vrrp_netnum
   kea_peers = [
-    for host in values(local.aio_hostclass_config.hosts) :
+    for host in concat(
+      values(local.aio_hostclass_config.hosts),
+      values(local.router_hostclass_config.hosts),
+    ) :
     {
       name   = host.hostname
       role   = lookup(host, "kea_ha_role", "backup")
