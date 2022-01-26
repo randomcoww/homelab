@@ -85,6 +85,8 @@ storage:
     #           hostPath:
     #             path: /etc/hostapd/hostapd.conf
 
+    # Roaming reference (untested)
+    # https://www.reddit.com/r/ledeproject/comments/6o8skj/nearly_working_80211r_ft_roaming/
     - path: /etc/hostapd/hostapd.conf
       mode: 0644
       overwrite: true
@@ -109,6 +111,17 @@ storage:
           ssid=${ssid}
           ctrl_interface=/var/run/hostapd
           ctrl_interface_group=0
+
+          bssid=${bssid}
+          mobility_domain=${hostapd_mobility_domain}
+          pmk_r1_push=1
+          r0_key_lifetime=10000
+          r1_key_holder=${nas_identifier}
+          nas_identifier=${nas_identifier}
+          %{~ for member in hostapd_roaming_members ~}
+          r0kh=${member.bssid} ${member.nas_identifier} ${hostapd_encryption_key}
+          r1kh=${member.bssid} ${member.bssid} ${hostapd_encryption_key}
+          %{~ endfor ~}
 
     # For bridging to wired NIC e.g. wlan0
     - path: /etc/systemd/network/20-${hardware_interface_name}.network.d/10-bridge.conf

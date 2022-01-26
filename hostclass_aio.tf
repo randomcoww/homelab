@@ -199,6 +199,16 @@ module "template-aio-hostapd" {
   bridge_interface_mtu     = each.value.hardware_interfaces.phy0.mtu
   hostapd_container_image  = local.config.container_images.hostapd
   static_pod_manifest_path = local.config.static_pod_manifest_path
+  bssid                    = replace(each.value.hardware_interfaces.wlan0.mac, "-", ":")
+  hostapd_mobility_domain  = random_id.hostapd_mobility_domain.hex
+  hostapd_encryption_key   = random_id.hostapd_encryption_key.hex
+  hostapd_roaming_members = [
+    for host in values(local.aio_hostclass_config.hosts) :
+    {
+      name  = host.hostname
+      bssid = replace(host.hardware_interfaces.wlan0.mac, "-", ":")
+    }
+  ]
 }
 
 # combine and render a single ignition file #
