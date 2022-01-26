@@ -1,0 +1,21 @@
+---
+variant: fcos
+version: 1.4.0
+storage:
+  files:
+    # Rename interfaces
+    %{~ for hardware_interface_name, hardware_interface in hardware_interfaces ~}
+    - path: /etc/systemd/network/10-${hardware_interface_name}.link
+      mode: 0644
+      contents:
+        inline: |
+          [Match]
+          Virtualization=!vm
+          Virtualization=!container
+          PermanentMACAddress=${hardware_interface.mac}
+
+          [Link]
+          MTUBytes=${lookup(hardware_interface, "mtu", 1500)}
+          MACAddressPolicy=persistent
+          Name=${hardware_interface_name}
+    %{~ endfor ~}

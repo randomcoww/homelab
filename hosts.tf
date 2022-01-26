@@ -98,6 +98,16 @@ locals {
     }
 
     client-ws = {
+      hardware_interfaces = {
+        lan = {
+          mac = "84-a9-38-0f-aa-76"
+          mtu = 9000
+        }
+        wlan0 = {
+          mac = "42-5b-7d-9f-1a-90"
+          mtu = 9000
+        }
+      }
       disks = {
         pv = {
           device = "/dev/disk/by-id/nvme-SKHynix_HFS512GDE9X084N_CYA8N037413008I5H"

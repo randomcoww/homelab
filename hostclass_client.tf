@@ -23,6 +23,7 @@ module "template-client-desktop" {
 
   source                    = "./modules/desktop"
   ssh_ca_public_key_openssh = local.config.ca.ssh.public_key_openssh
+  hardware_interfaces       = each.value.hardware_interfaces
 }
 
 module "template-client-disks" {
