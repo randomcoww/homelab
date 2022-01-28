@@ -59,7 +59,7 @@ data:
         pods insecure
         fallthrough in-addr.arpa ip6.arpa
       }
-      forward . ${cidrhost(kubernetes_service_network_prefix, kubernetes_service_network_dns_netnum)}
+      forward . ${internal_dns_ip}
       cache 30
       reload
       loadbalance

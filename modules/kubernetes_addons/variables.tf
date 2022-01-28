@@ -38,6 +38,10 @@ variable "kubernetes_cluster_name" {
   type = string
 }
 
+variable "internal_dns_ip" {
+  type = string
+}
+
 variable "kubernetes_ca" {
   type = object({
     algorithm       = string

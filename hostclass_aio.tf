@@ -227,6 +227,7 @@ module "template-aio-kubernetes_addons_manager" {
   kubernetes_common_certs               = module.kubernetes-common.certs.kubernetes
   kubernetes_ca                         = module.kubernetes-common.ca.kubernetes
   static_pod_manifest_path              = local.config.static_pod_manifest_path
+  internal_dns_ip                       = cidrhost(local.config.networks.lan.prefix, local.aio_hostclass_config.vrrp_netnum)
 }
 
 

@@ -44,6 +44,7 @@ locals {
       kubernetes_service_network_prefix     = var.kubernetes_service_network_prefix
       kubernetes_service_network_dns_netnum = var.kubernetes_service_network_dns_netnum
       kubernetes_cluster_domain             = var.kubernetes_cluster_domain
+      internal_dns_ip                       = var.internal_dns_ip
     })
   }
 
