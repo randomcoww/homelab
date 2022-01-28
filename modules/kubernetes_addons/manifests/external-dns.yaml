@@ -1,7 +1,7 @@
 apiVersion: v1
 kind: ServiceAccount
 metadata:
-  name: coredns
+  name: external-dns
   namespace: kube-system
 
 ---
@@ -10,15 +10,14 @@ kind: ClusterRole
 metadata:
   labels:
     kubernetes.io/bootstrapping: rbac-defaults
-  name: system:coredns
+  name: external-dns
 rules:
 - apiGroups: [""]
-  resources: ["endpoints", "services", "pods", "namespaces"]
-  resources: ["namespaces"]
-  verbs: ["list", "watch"]
-- apiGroups: ["discovery.k8s.io"]
-  resources: ["endpointslices"]
-  verbs: ["list", "watch"]
+  resources: ["endpoints", "pods", "services", "nodes"]
+  verbs: ["get", "watch", "list"]
+- apiGroups: ["extensions", "networking.k8s.io"]
+  resources: ["ingresses"]
+  verbs: ["get", "list", "watch"]
 
 ---
 apiVersion: rbac.authorization.k8s.io/v1
@@ -28,32 +27,30 @@ metadata:
     rbac.authorization.kubernetes.io/autoupdate: "true"
   labels:
     kubernetes.io/bootstrapping: rbac-defaults
-  name: system:coredns
+  name: external-dns
 roleRef:
   apiGroup: rbac.authorization.k8s.io
   kind: ClusterRole
-  name: system:coredns
+  name: external-dns
 subjects:
 - kind: ServiceAccount
-  name: coredns
+  name: external-dns
   namespace: kube-system
 
 ---
 apiVersion: v1
 kind: ConfigMap
 metadata:
-  name: coredns
+  name: external-dns
   namespace: kube-system
 data:
   Corefile: |
     .:53 {
       errors
       health
-      kubernetes ${kubernetes_cluster_domain} in-addr.arpa ip6.arp {
-        pods insecure
+      etcd ${internal_domain} in-addr.arpa ip6.arp {
         fallthrough in-addr.arpa ip6.arpa
       }
-      forward . ${internal_dns_ip}
       cache 30
       reload
       loadbalance
@@ -62,11 +59,10 @@ data:
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: coredns
+  name: external-dns
   namespace: kube-system
   labels:
-    k8s-app: kube-dns
-    kubernetes.io/name: "CoreDNS"
+    k8s-app: external-dns
 spec:
   replicas: 1
   strategy:
@@ -75,19 +71,18 @@ spec:
       maxUnavailable: 1
   selector:
     matchLabels:
-      k8s-app: kube-dns
+      k8s-app: external-dns
   template:
     metadata:
       labels:
-        k8s-app: kube-dns
+        k8s-app: external-dns
     spec:
-      priorityClassName: system-cluster-critical
-      serviceAccountName: coredns
+      serviceAccountName: external-dns
       tolerations:
       - key: "CriticalAddonsOnly"
         operator: "Exists"
       nodeSelector:
-        kubernetes.io/os: linux
+        beta.kubernetes.io/os: linux
       containers:
       - name: coredns
         image: "${container_images.coredns}"
@@ -111,36 +106,60 @@ spec:
           timeoutSeconds: 5
           successThreshold: 1
           failureThreshold: 5
+      - name: etcd
+        image: ${container_images.etcd}
+        command: [ "/usr/local/bin/etcd" ]
+      - name: external-dns
+        image: ${container_images.external_dns}
+        args:
+        - --source=service
+        - --source=ingress
+        - --provider=coredns
+        - --log-level=debug
+        - --domain-filter=${internal_domain}
       dnsPolicy: Default
       volumes:
       - name: config-volume
         configMap:
-          name: coredns
+          name: external-dns
           items:
           - key: Corefile
             path: Corefile
 
 ---
-apiVersion: v1
 kind: Service
+apiVersion: v1
 metadata:
-  name: kube-dns
+  name: external-dns-tcp
   namespace: kube-system
   annotations:
-    prometheus.io/port: "9153"
-    prometheus.io/scrape: "true"
-  labels:
-    k8s-app: kube-dns
-    kubernetes.io/name: "CoreDNS"
+    metallb.universe.tf/allow-shared-ip: external-dns
 spec:
-  type: ClusterIP
-  clusterIP: ${cidrhost(kubernetes_service_network_prefix, kubernetes_service_network_dns_netnum)}
+  type: LoadBalancer
+  loadBalancerIP: ${kubernetes_external_dns_ip}
   ports:
-  - name: dns
+  - name: default
     port: 53
-    protocol: UDP
-  - name: dns-tcp
-    port: 53
+    targetPort: 53
     protocol: TCP
   selector:
-    k8s-app: kube-dns
+    k8s-app: external-dns
+
+---
+kind: Service
+apiVersion: v1
+metadata:
+  name: external-dns-udp
+  namespace: kube-system
+  annotations:
+    metallb.universe.tf/allow-shared-ip: external-dns
+spec:
+  type: LoadBalancer
+  loadBalancerIP: ${kubernetes_external_dns_ip}
+  ports:
+  - name: default
+    port: 53
+    targetPort: 53
+    protocol: UDP
+  selector:
+    k8s-app: external-dns

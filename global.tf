@@ -89,6 +89,7 @@ locals {
       minio                   = "minio/minio:latest"
       hostapd                 = "ghcr.io/randomcoww/hostapd:latest"
       kapprover               = "ghcr.io/randomcoww/kapprover:latest"
+      external_dns            = "k8s.gcr.io/external-dns/external-dns:v0.10.2"
     }
 
     ca = {
@@ -105,8 +106,7 @@ locals {
     }
 
     # http path to kubernetes matchbox #
-    pxeboot_file_name = "http://192.168.126.127/boot.ipxe"
-
+    aws_region                                  = "us-west-2"
     kubernetes_cluster_name                     = "default-cluster"
     kubernetes_service_network_dns_netnum       = 10
     kubernetes_service_network_apiserver_netnum = 1
@@ -116,9 +116,8 @@ locals {
       newbit = 2
       netnum = 1
     }
-
-    internal_dns_ip = "192.168.126.126"
-    aws_region      = "us-west-2"
+    metallb_external_dns_netnum = 1
+    metallb_pxeboot_netnum      = 2
   }
 }
 

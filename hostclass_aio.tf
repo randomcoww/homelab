@@ -58,9 +58,15 @@ module "template-aio-gateway" {
       netnum = host.netnum
     }
   ]
-  internal_dns_ip          = local.config.internal_dns_ip
-  internal_domain          = local.config.domains.internal
-  pxeboot_file_name        = local.config.pxeboot_file_name
+  internal_dns_ip = cidrhost(
+    cidrsubnet(local.config.networks.lan.prefix, local.config.metallb_subnet.newbit, local.config.metallb_subnet.netnum),
+    local.config.metallb_external_dns_netnum
+  )
+  internal_domain = local.config.domains.internal
+  pxeboot_file_name = "http://${cidrhost(
+    cidrsubnet(local.config.networks.lan.prefix, local.config.metallb_subnet.newbit, local.config.metallb_subnet.netnum),
+    local.config.metallb_external_dns_netnum
+  )}/boot.ipxe"
   static_pod_manifest_path = local.config.static_pod_manifest_path
 }
 
@@ -223,13 +229,18 @@ module "template-aio-kubernetes_addons_manager" {
   kubernetes_service_network_dns_netnum = local.config.kubernetes_service_network_dns_netnum
   flannel_host_gateway_interface_name   = "lan"
   kubernetes_cluster_name               = local.config.kubernetes_cluster_name
-  kubernetes_cluster_domain             = local.config.domains.internal
+  kubernetes_cluster_domain             = local.config.domains.kubernetes
+  internal_domain                       = local.config.domains.internal
   kubernetes_common_certs               = module.kubernetes-common.certs.kubernetes
   kubernetes_ca                         = module.kubernetes-common.ca.kubernetes
   static_pod_manifest_path              = local.config.static_pod_manifest_path
   internal_dns_ip                       = cidrhost(local.config.networks.lan.prefix, local.aio_hostclass_config.vrrp_netnum)
-  metallb_network_prefix                = local.config.networks.lan.prefix
-  metallb_subnet                        = local.config.metallb_subnet
+  kubernetes_external_dns_ip = cidrhost(
+    cidrsubnet(local.config.networks.lan.prefix, local.config.metallb_subnet.newbit, local.config.metallb_subnet.netnum),
+    local.config.metallb_external_dns_netnum
+  )
+  metallb_network_prefix = local.config.networks.lan.prefix
+  metallb_subnet         = local.config.metallb_subnet
 }
 
 

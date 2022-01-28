@@ -33,6 +33,7 @@ locals {
     "apps/v1/Deployment",
     "apps/v1/ReplicaSet",
     "apps/v1/StatefulSet",
+    "networking.k8s.io/v1/IngressClass",
   ]
 
   addon_manifests = merge({
@@ -44,14 +45,18 @@ locals {
       kubernetes_service_network_prefix     = var.kubernetes_service_network_prefix
       kubernetes_service_network_dns_netnum = var.kubernetes_service_network_dns_netnum
       kubernetes_cluster_domain             = var.kubernetes_cluster_domain
+      internal_domain                       = var.internal_domain
       internal_dns_ip                       = var.internal_dns_ip
+      kubernetes_external_dns_ip            = var.kubernetes_external_dns_ip
       metallb_network_prefix                = var.metallb_network_prefix
       metallb_subnet                        = var.metallb_subnet
     })
     # remote resources
     }, {
-    "metallb-namespace.yaml" = data.http.metallb-namespace.body
-    "metallb.yaml"           = data.http.metallb.body
+    "metallb-namespace.yaml"        = data.http.metallb-namespace.body
+    "metallb.yaml"                  = data.http.metallb.body
+    # Currently fails with SELinux
+    "nginx-ingress-controller.yaml" = data.http.nginx-ingress-controller.body
   })
 
   addon_manifests_hcl = {

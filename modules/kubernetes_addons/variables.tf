@@ -34,7 +34,15 @@ variable "kubernetes_cluster_domain" {
   type = string
 }
 
+variable "internal_domain" {
+  type = string
+}
+
 variable "kubernetes_cluster_name" {
+  type = string
+}
+
+variable "kubernetes_external_dns_ip" {
   type = string
 }
 

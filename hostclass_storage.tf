@@ -58,9 +58,15 @@ module "template-router-gateway" {
       netnum = host.netnum
     }
   ]
-  internal_dns_ip          = local.config.internal_dns_ip
-  internal_domain          = local.config.domains.internal
-  pxeboot_file_name        = local.config.pxeboot_file_name
+  internal_dns_ip = cidrhost(
+    cidrsubnet(local.config.networks.lan.prefix, local.config.metallb_subnet.newbit, local.config.metallb_subnet.netnum),
+    local.config.metallb_external_dns_netnum
+  )
+  internal_domain = local.config.domains.internal
+  pxeboot_file_name = "http://${cidrhost(
+    cidrsubnet(local.config.networks.lan.prefix, local.config.metallb_subnet.newbit, local.config.metallb_subnet.netnum),
+    local.config.metallb_external_dns_netnum
+  )}/boot.ipxe"
   static_pod_manifest_path = local.config.static_pod_manifest_path
 }
 
