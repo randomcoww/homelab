@@ -36,6 +36,13 @@ locals {
     "networking.k8s.io/v1/IngressClass",
   ]
 
+  remote_manifests = {
+    "nvidia-device-plugins.yaml"    = "https://raw.githubusercontent.com/NVIDIA/k8s-device-plugin/v0.10.0/nvidia-device-plugin.yml"
+    "metallb-namespace.yaml"        = "https://raw.githubusercontent.com/metallb/metallb/v0.11.0/manifests/namespace.yaml"
+    "metallb.yaml"                  = "https://raw.githubusercontent.com/metallb/metallb/v0.11.0/manifests/metallb.yaml"
+    "nginx-ingress-controller.yaml" = "https://raw.githubusercontent.com/kubernetes/ingress-nginx/controller-v1.1.1/deploy/static/provider/baremetal/deploy.yaml"
+  }
+
   addon_manifests = merge({
     for f in fileset(".", "${path.module}/manifests/*.yaml") :
     basename(f) => templatefile(f, {
@@ -51,13 +58,11 @@ locals {
       metallb_network_prefix                = var.metallb_network_prefix
       metallb_subnet                        = var.metallb_subnet
     })
-    # remote resources
     }, {
-    "metallb-namespace.yaml"        = data.http.metallb-namespace.body
-    "metallb.yaml"                  = data.http.metallb.body
-    # Currently fails with SELinux
-    "nginx-ingress-controller.yaml" = data.http.nginx-ingress-controller.body
-  })
+    for file_name in keys(local.remote_manifests) :
+    file_name => data.http.remote-manifests[file_name].body
+    }
+  )
 
   addon_manifests_hcl = {
     for file_name, manifests in local.addon_manifests :
