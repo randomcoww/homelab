@@ -67,14 +67,6 @@ storage:
               - name: certs
                 mountPath: "${certs_path}"
                 readOnly: true
-              readinessProbe:
-                httpGet:
-                  scheme: HTTPS
-                  host: 127.0.0.1
-                  port: ${controller_manager_port}
-                  path: "/readyz"
-                initialDelaySeconds: 15
-                timeoutSeconds: 15
               livenessProbe:
                 httpGet:
                   scheme: HTTPS

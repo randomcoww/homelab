@@ -63,14 +63,6 @@ storage:
               - "--secure-port=${scheduler_port}"
               - "--bind-address=0.0.0.0"
               - "--v=2"
-              readinessProbe:
-                httpGet:
-                  scheme: HTTPS
-                  host: 127.0.0.1
-                  port: ${scheduler_port}
-                  path: "/readyz"
-                initialDelaySeconds: 15
-                timeoutSeconds: 15
               livenessProbe:
                 httpGet:
                   scheme: HTTPS
