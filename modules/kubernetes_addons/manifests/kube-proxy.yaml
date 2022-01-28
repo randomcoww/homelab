@@ -3,12 +3,16 @@ kind: ServiceAccount
 metadata:
   name: kube-proxy
   namespace: kube-system
+  labels:
+    addonmanager.kubernetes.io/mode: Reconcile
 
 ---
 kind: ClusterRoleBinding
 apiVersion: rbac.authorization.k8s.io/v1
 metadata:
   name: system:kube-proxy
+  labels:
+    addonmanager.kubernetes.io/mode: Reconcile
 subjects:
   - kind: ServiceAccount
     name: kube-proxy
@@ -24,12 +28,14 @@ kind: ConfigMap
 metadata:
   name: kube-proxy-config
   namespace: kube-system
+  labels:
+    addonmanager.kubernetes.io/mode: Reconcile
 data:
   kube-proxy-config.yaml: |-
     kind: KubeProxyConfiguration
     apiVersion: kubeproxy.config.k8s.io/v1alpha1
     mode: "ipvs"
-    clusterCIDR: "10.244.0.0/16"
+    clusterCIDR: "${kubernetes_pod_network_prefix}"
     healthzBindAddress: "127.0.0.1:50254"
     ipvs:
       strictARP: true
@@ -39,6 +45,7 @@ kind: DaemonSet
 metadata:
   labels:
     k8s-app: kube-proxy
+    addonmanager.kubernetes.io/mode: Reconcile
   name: kube-proxy
   namespace: kube-system
 spec:
@@ -65,7 +72,7 @@ spec:
       containers:
       - name: kube-proxy
         imagePullPolicy: Always
-        image: ghcr.io/randomcoww/kubernetes:kube-proxy-v1.22.4
+        image: ${container_images.kube_proxy}
         command:
         - kube-proxy
         - "--config=/etc/kube-proxy/kube-proxy-config.yaml"

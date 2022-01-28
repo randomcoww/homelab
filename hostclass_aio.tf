@@ -211,6 +211,25 @@ module "template-aio-hostapd" {
   ]
 }
 
+module "template-aio-kubernetes_addons_manager" {
+  for_each = local.aio_hostclass_config.hosts
+
+  source                                = "./modules/kubernetes_addons"
+  container_images                      = local.config.container_images
+  apiserver_ip                          = "127.0.0.1"
+  apiserver_port                        = local.config.ports.apiserver
+  kubernetes_pod_network_prefix         = local.config.networks.kubernetes_pod.prefix
+  kubernetes_service_network_prefix     = local.config.networks.kubernetes_service.prefix
+  kubernetes_service_network_dns_netnum = local.config.kubernetes_service_network_dns_netnum
+  flannel_host_gateway_interface_name   = "lan"
+  kubernetes_cluster_name               = local.config.kubernetes_cluster_name
+  kubernetes_cluster_domain             = local.config.domains.internal
+  kubernetes_common_certs               = module.kubernetes-common.certs.kubernetes
+  kubernetes_ca                         = module.kubernetes-common.ca.kubernetes
+  static_pod_manifest_path              = local.config.static_pod_manifest_path
+}
+
+
 # combine and render a single ignition file #
 data "ct_config" "aio" {
   for_each = local.aio_hostclass_config.hosts
@@ -234,6 +253,7 @@ EOT
     module.template-aio-worker[each.key].ignition_snippets,
     module.template-aio-minio[each.key].ignition_snippets,
     module.template-aio-hostapd[each.key].ignition_snippets,
+    module.template-aio-kubernetes_addons_manager[each.key].ignition_snippets,
   )
 }
 

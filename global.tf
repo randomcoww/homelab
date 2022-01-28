@@ -78,6 +78,7 @@ locals {
       kube_controller_manager = "ghcr.io/randomcoww/kubernetes:kube-master-v1.22.4"
       kube_scheduler          = "ghcr.io/randomcoww/kubernetes:kube-master-v1.22.4"
       kube_proxy              = "ghcr.io/randomcoww/kubernetes:kube-proxy-v1.22.4"
+      kube_addons_manager     = "ghcr.io/randomcoww/kubernetes-addon-manager:master"
       etcd_wrapper            = "ghcr.io/randomcoww/etcd-wrapper:latest"
       etcd                    = "ghcr.io/randomcoww/etcd:v3.5.1"
       kea                     = "ghcr.io/randomcoww/kea:2.0.0"
@@ -87,6 +88,7 @@ locals {
       flannel-cni-plugin      = "rancher/mirrored-flannelcni-flannel-cni-plugin:v1.0.0"
       minio                   = "minio/minio:latest"
       hostapd                 = "ghcr.io/randomcoww/hostapd:latest"
+      kapprover               = "ghcr.io/randomcoww/kapprover:latest"
     }
 
     ca = {

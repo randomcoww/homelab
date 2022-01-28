@@ -2,6 +2,8 @@ kind: ClusterRole
 apiVersion: rbac.authorization.k8s.io/v1
 metadata:
   name: flannel
+  labels:
+    addonmanager.kubernetes.io/mode: Reconcile
 rules:
 - apiGroups: [""]
   resources: ["pods"]
@@ -18,6 +20,8 @@ kind: ClusterRoleBinding
 apiVersion: rbac.authorization.k8s.io/v1
 metadata:
   name: flannel
+  labels:
+    addonmanager.kubernetes.io/mode: Reconcile
 roleRef:
   apiGroup: rbac.authorization.k8s.io
   kind: ClusterRole
@@ -33,6 +37,8 @@ kind: ServiceAccount
 metadata:
   name: flannel
   namespace: kube-system
+  labels:
+    addonmanager.kubernetes.io/mode: Reconcile
 
 ---
 kind: ConfigMap
@@ -43,6 +49,7 @@ metadata:
   labels:
     tier: node
     app: flannel
+    addonmanager.kubernetes.io/mode: Reconcile
 data:
   cni-conf.json: |
     {
@@ -65,7 +72,7 @@ data:
     }
   net-conf.json: |
     {
-      "Network": "10.244.0.0/16",
+      "Network": "${kubernetes_pod_network_prefix}",
       "Backend": {
         "Type": "host-gw"
       }
@@ -79,6 +86,7 @@ metadata:
   labels:
     tier: node
     app: flannel
+    addonmanager.kubernetes.io/mode: Reconcile
 spec:
   selector:
     matchLabels:
@@ -103,7 +111,7 @@ spec:
         effect: "NoSchedule"
       initContainers:
       - name: install-cni-plugin
-        image: rancher/mirrored-flannelcni-flannel-cni-plugin:v1.0.0
+        image: ${container_images.flannel-cni-plugin}
         command:
         - cp
         args:
@@ -114,8 +122,7 @@ spec:
         - name: cni-plugin
           mountPath: /opt/cni/bin
       - name: install-cni
-        imagePullPolicy: Always
-        image: ghcr.io/randomcoww/flannel:v0.15.0
+        image: ${container_images.flannel}
         command:
         - cp
         args:
@@ -129,16 +136,13 @@ spec:
           mountPath: /etc/kube-flannel/
       containers:
       - name: kube-flannel
-        imagePullPolicy: Always
-        image: ghcr.io/randomcoww/flannel:v0.15.0
+        image: ${container_images.flannel}
         command:
         - /opt/bin/flanneld
         args:
         - --ip-masq
         - --kube-subnet-mgr
-        - --iface=lan
-        - --healthz-ip=127.0.0.1
-        - --healthz-port=50253
+        - --iface=${flannel_host_gateway_interface_name}
         resources:
           requests:
             cpu: "100m"
@@ -149,9 +153,7 @@ spec:
         securityContext:
           privileged: false
           capabilities:
-            add:
-            - NET_ADMIN
-            - NET_RAW
+            add: ["NET_ADMIN", "NET_RAW"]
         env:
         - name: POD_NAME
           valueFrom:
@@ -166,14 +168,8 @@ spec:
           mountPath: /run/flannel
         - name: flannel-cfg
           mountPath: /etc/kube-flannel/
-        livenessProbe:
-          httpGet:
-            scheme: HTTP
-            host: 127.0.0.1
-            port: 50253
-            path: "/healthz"
-          initialDelaySeconds: 15
-          timeoutSeconds: 15
+        - name: xtables-lock
+          mountPath: /run/xtables.lock
       volumes:
       - name: cni-plugin
         hostPath:
@@ -187,3 +183,7 @@ spec:
       - name: flannel-cfg
         configMap:
           name: kube-flannel-cfg
+      - name: xtables-lock
+        hostPath:
+          path: /run/xtables.lock
+          type: FileOrCreate
