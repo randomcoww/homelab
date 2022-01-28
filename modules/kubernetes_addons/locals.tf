@@ -35,7 +35,7 @@ locals {
     "apps/v1/StatefulSet",
   ]
 
-  addon_manifests = {
+  addon_manifests = merge({
     for f in fileset(".", "${path.module}/manifests/*.yaml") :
     basename(f) => templatefile(f, {
       container_images                      = var.container_images
@@ -45,7 +45,36 @@ locals {
       kubernetes_service_network_dns_netnum = var.kubernetes_service_network_dns_netnum
       kubernetes_cluster_domain             = var.kubernetes_cluster_domain
       internal_dns_ip                       = var.internal_dns_ip
+      metallb_network_prefix                = var.metallb_network_prefix
+      metallb_subnet                        = var.metallb_subnet
     })
+    # remote resources
+    }, {
+    "metallb-namespace.yaml" = data.http.metallb-namespace.body
+    "metallb.yaml"           = data.http.metallb.body
+  })
+
+  addon_manifests_hcl = {
+    for file_name, manifests in local.addon_manifests :
+    file_name => [
+      for resource in compact(flatten(regexall("(?ms)(.*?)^---", "${manifests}\n---"))) :
+      yamldecode(resource)
+    ]
+  }
+
+  # force inject addonmanager.kubernetes.io/mode label
+  modified_addon_manifests = {
+    for file_name, manifests in local.addon_manifests_hcl :
+    file_name => join("---\n", [
+      for manifest in manifests :
+      yamlencode(merge(manifest, {
+        metadata = merge(manifest.metadata, {
+          labels = merge(lookup(manifest.metadata, "labels", {}), {
+            "addonmanager.kubernetes.io/mode" : "EnsureExists"
+        }) })
+      }))
+      if can(manifest.metadata)
+    ])
   }
 
   module_ignition_snippets = [
@@ -59,7 +88,7 @@ locals {
       apiserver_port            = var.apiserver_port
       container_images          = var.container_images
       addons_manager_certs      = local.certs.addons_manager
-      addon_manifests           = local.addon_manifests
+      addon_manifests           = local.modified_addon_manifests
       certs_path                = local.certs_path
       addons_resource_whitelist = local.addons_resource_whitelist
     })

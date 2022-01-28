@@ -3,8 +3,6 @@ kind: ServiceAccount
 metadata:
   name: coredns
   namespace: kube-system
-  labels:
-    addonmanager.kubernetes.io/mode: Reconcile
 
 ---
 apiVersion: rbac.authorization.k8s.io/v1
@@ -12,7 +10,6 @@ kind: ClusterRole
 metadata:
   labels:
     kubernetes.io/bootstrapping: rbac-defaults
-    addonmanager.kubernetes.io/mode: Reconcile
   name: system:coredns
 rules:
 - apiGroups: [""]
@@ -72,7 +69,6 @@ metadata:
   namespace: kube-system
   labels:
     k8s-app: kube-dns
-    addonmanager.kubernetes.io/mode: Reconcile
     kubernetes.io/name: "CoreDNS"
 spec:
   replicas: 1
@@ -139,7 +135,6 @@ metadata:
   labels:
     k8s-app: kube-dns
     kubernetes.io/name: "CoreDNS"
-    addonmanager.kubernetes.io/mode: Reconcile
 spec:
   type: ClusterIP
   clusterIP: ${cidrhost(kubernetes_service_network_prefix, kubernetes_service_network_dns_netnum)}

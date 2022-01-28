@@ -28,8 +28,6 @@ kind: ConfigMap
 metadata:
   name: kube-proxy-config
   namespace: kube-system
-  labels:
-    addonmanager.kubernetes.io/mode: Reconcile
 data:
   kube-proxy-config.yaml: |-
     kind: KubeProxyConfiguration
@@ -45,7 +43,6 @@ kind: DaemonSet
 metadata:
   labels:
     k8s-app: kube-proxy
-    addonmanager.kubernetes.io/mode: Reconcile
   name: kube-proxy
   namespace: kube-system
 spec:

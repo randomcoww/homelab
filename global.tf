@@ -112,6 +112,11 @@ locals {
     kubernetes_service_network_apiserver_netnum = 1
     static_pod_manifest_path                    = "/var/lib/kubelet/manifests"
 
+    metallb_subnet = {
+      newbit = 2
+      netnum = 1
+    }
+
     internal_dns_ip = "192.168.126.126"
     aws_region      = "us-west-2"
   }

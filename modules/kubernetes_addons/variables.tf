@@ -53,3 +53,14 @@ variable "kubernetes_ca" {
 variable "static_pod_manifest_path" {
   type = string
 }
+
+variable "metallb_network_prefix" {
+  type = string
+}
+
+variable "metallb_subnet" {
+  type = object({
+    newbit = number
+    netnum = number
+  })
+}
