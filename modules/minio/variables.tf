@@ -6,6 +6,10 @@ variable "minio_port" {
   type = number
 }
 
+variable "minio_console_port" {
+  type = number
+}
+
 variable "volume_paths" {
   type    = list(string)
   default = []

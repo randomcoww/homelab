@@ -44,7 +44,7 @@ locals {
           ]
         }
       }
-      volume_paths = [
+      minio_volume_paths = [
         "/var/pv/minio"
       ]
       container_storage_path = "/var/pv/containers"
@@ -119,7 +119,7 @@ locals {
           ]
         }
       }
-      volume_paths = [
+      minio_volume_paths = [
         "/var/home/minio"
       ]
       container_storage_path = "/var/home/containers"

@@ -39,10 +39,8 @@ locals {
   ]
 
   remote_manifests = {
-    "nvidia-device-plugins.yaml"    = "https://raw.githubusercontent.com/NVIDIA/k8s-device-plugin/v0.10.0/nvidia-device-plugin.yml"
-    "metallb-namespace.yaml"        = "https://raw.githubusercontent.com/metallb/metallb/v0.11.0/manifests/namespace.yaml"
-    "metallb.yaml"                  = "https://raw.githubusercontent.com/metallb/metallb/v0.11.0/manifests/metallb.yaml"
-    "nginx-ingress-controller.yaml" = "https://raw.githubusercontent.com/kubernetes/ingress-nginx/controller-v1.1.1/deploy/static/provider/baremetal/deploy.yaml"
+    "metallb-namespace.yaml" = "https://raw.githubusercontent.com/metallb/metallb/v0.11.0/manifests/namespace.yaml"
+    "metallb.yaml"           = "https://raw.githubusercontent.com/metallb/metallb/v0.11.0/manifests/metallb.yaml"
   }
 
   addon_manifests = merge({

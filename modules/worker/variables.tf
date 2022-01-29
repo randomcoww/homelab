@@ -42,3 +42,13 @@ variable "static_pod_manifest_path" {
   type    = string
   default = "/var/lib/kubelet/manifests"
 }
+
+variable "container_storage_path" {
+  type    = string
+  default = "/var/lib/containers/storage"
+}
+
+variable "container_tmp_path" {
+  type    = string
+  default = "/var/lib/containers/tmp"
+}

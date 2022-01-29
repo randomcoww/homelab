@@ -22,6 +22,10 @@ storage:
               image: ${minio_container_image}
               imagePullPolicy: Always
               env:
+              - name: NODE_NAME
+                valueFrom:
+                  fieldRef:
+                    fieldPath: spec.nodeName
               - name: INTERNAL_IP
                 valueFrom:
                   fieldRef:
@@ -30,13 +34,15 @@ storage:
                 value: ${minio_user}
               - name: MINIO_SECRET_KEY
                 value: ${minio_password}
+              - name: MINIO_ADDRESS
+                value: $(INTERNAL_IP):${minio_port}
+              - name: MINIO_CONSOLE_ADDRESS
+                value: $(INTERNAL_IP):${minio_console_port}
               args:
               - server
-              - --address
-              - $(INTERNAL_IP):${minio_port}
               %{~ for i, volume_path in volume_paths ~}
               %{~ if length(volume_paths) > 1 ~}
-              - https://$(INTERNAL_IP)${volume_path}
+              - http://$(INTERNAL_IP)${volume_path}
               %{~ else ~}
               - ${volume_path}
               %{~ endif ~}

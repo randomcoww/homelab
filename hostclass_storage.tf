@@ -19,10 +19,9 @@ locals {
 module "template-router-base" {
   for_each = local.router_hostclass_config.hosts
 
-  source                 = "./modules/base"
-  hostname               = each.value.hostname
-  users                  = [local.config.users.admin]
-  container_storage_path = each.value.container_storage_path
+  source   = "./modules/base"
+  hostname = each.value.hostname
+  users    = [local.config.users.admin]
 }
 
 module "template-router-server" {

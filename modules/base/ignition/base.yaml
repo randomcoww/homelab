@@ -98,6 +98,12 @@ storage:
       contents:
         inline: |
           br_netfilter
+    # Turn on Nvidia GPU #
+    - path: /etc/modules-load.d/20-acpi-call.conf
+      mode: 0644
+      contents:
+        inline: |
+          acpi_call
     # Keepalived VIP #
     - path: /etc/sysctl.d/20-keepalived.conf
       mode: 0644
@@ -112,22 +118,6 @@ storage:
         inline: |
           kernel.printk=4
           fs.inotify.max_user_watches=524288
-
-    # move root container storage off of RAM disk #
-    - path: /etc/containers/storage.conf
-      overwrite: true
-      contents:
-        inline: |
-          [storage]
-          driver = "overlay"
-          runroot = "/run/containers/storage"
-          graphroot = "${container_storage_path}"
-
-          [storage.options]
-          additionalimagestores = []
-
-          [storage.options.overlay]
-          mountopt = "nodev,metacopy=on"
 
     # Enable mdns when using network manager #
     - path: /etc/NetworkManager/conf.d/base.conf

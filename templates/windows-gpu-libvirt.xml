@@ -1,0 +1,127 @@
+<domain type='kvm' xmlns:qemu="http://libvirt.org/schemas/domain/qemu/1.0">
+  <name>windows-gpu</name>
+  <memory unit='GiB'>8</memory>
+  <currentMemory unit='GiB'>8</currentMemory>
+  <memoryBacking>
+    <nosharepages/>
+    <locked/>
+  </memoryBacking>
+  <vcpu placement='static'>8</vcpu>
+  <os>
+    <type machine='q35'>hvm</type>
+    <loader readonly='yes' type='pflash'>/usr/share/OVMF/OVMF_CODE.fd</loader>
+    <nvram template='/usr/share/OVMF/OVMF_VARS.fd'/>
+  </os>
+  <features>
+    <acpi>
+      <table type="slic">/var/pv/qemu/SSDT1.dat</table>
+    </acpi>
+    <acpi/>
+    <apic/>
+    <pae/>
+    <hyperv>
+      <vpindex state='on'/>
+      <synic state='on'/>
+      <stimer state='on'/>
+      <reset state='on'/>
+      <relaxed state='on'/>
+      <vapic state='on'/>
+      <spinlocks state='on' retries='8191'/>
+      <vendor_id state='on' value='KeenlyKVM'/>
+    </hyperv>
+    <kvm>
+      <hidden state='on'/>
+    </kvm>
+    <vmport state='off'/>
+  </features>
+  <cpu mode='host-passthrough' check='none'>
+    <topology sockets='1' cores='4' threads='2'/>
+    <feature policy='require' name='topoext'/>
+    <cache level='3' mode='emulate'/>
+  </cpu>
+  <clock offset='localtime'>
+    <timer name='hypervclock' present='yes'/>
+  </clock>
+  <pm>
+    <suspend-to-mem enabled='no'/>
+    <suspend-to-disk enabled='no'/>
+  </pm>
+  <devices>
+    <emulator>/usr/bin/qemu-kvm</emulator>
+    <disk type='file' device='disk'>
+      <driver name='qemu' type='raw' cache='none' io='native' discard='unmap'/>
+      <source file='/var/pv/qemu/windows-gpu.img'/>
+      <target dev='sda' bus='scsi'/>
+      <boot order='2'/>
+    </disk>
+    <disk type='network' device='cdrom'>
+      <driver name='qemu' type='raw'/>
+      <source protocol="http" name="boot/Win10_21H2_English_x64.iso">
+        <host name="aio-0.local" port="50256"/>
+      </source>
+      <target dev='sdb' bus='sata'/>
+      <readonly/>
+      <boot order='1'/>
+    </disk>
+    <disk type='network' device='cdrom'>
+      <driver name='qemu' type='raw'/>
+      <source protocol="http" name="boot/virtio-win.iso">
+        <host name="aio-0.local" port="50256"/>
+      </source>
+      <target dev='sdc' bus='sata'/>
+      <readonly/>
+    </disk>
+    <controller type='scsi' model='virtio-scsi'/>
+    <controller type='usb' model='nec-xhci'/>
+    <interface type='bridge'>
+      <source bridge='br-wlan'/>
+      <model type='virtio'/>
+    </interface>
+    <input type='mouse' bus='virtio'/>
+    <input type='keyboard' bus='virtio'/>
+    <sound model='usb'/>
+    <hostdev mode='subsystem' type='pci' managed='yes'>
+      <driver name='vfio'/>
+      <source>
+        <address domain='0x0000' bus='0x01' slot='0x00' function='0x0'/>
+      </source>
+      <address type='pci' domain='0x0000' bus='0x01' slot='0x00' function='0x0' multifunction='on'/>
+      <rom file='/var/pv/qemu/vbios.bin'/>
+    </hostdev>
+    <hostdev mode='subsystem' type='pci' managed='yes'>
+      <driver name='vfio'/>
+      <source>
+        <address domain='0x0000' bus='0x01' slot='0x00' function='0x1'/>
+      </source>
+      <address type='pci' domain='0x0000' bus='0x01' slot='0x00' function='0x1' multifunction='on'/>
+    </hostdev>
+    <hostdev mode='subsystem' type='pci' managed='yes'>
+      <driver name='vfio'/>
+      <source>
+        <address domain='0x0000' bus='0x01' slot='0x00' function='0x2'/>
+      </source>
+      <address type='pci' domain='0x0000' bus='0x01' slot='0x00' function='0x2' multifunction='on'/>
+    </hostdev>
+    <hostdev mode='subsystem' type='pci' managed='yes'>
+      <driver name='vfio'/>
+      <source>
+        <address domain='0x0000' bus='0x01' slot='0x00' function='0x3'/>
+      </source>
+      <address type='pci' domain='0x0000' bus='0x01' slot='0x00' function='0x3' multifunction='on'/>
+    </hostdev>
+    <graphics type='spice' port='5900'>
+      <listen type='address' address='0.0.0.0'/>
+    </graphics>
+    <video>
+      <model type='virtio'/>
+    </video>
+    <memballoon model='none'/>
+    <rng model='virtio'>
+      <backend model='random'>/dev/urandom</backend>
+    </rng>
+  </devices>
+  <qemu:commandline>
+    <qemu:arg value="-acpitable"/>
+    <qemu:arg value="file=/var/pv/qemu/SSDT1.dat"/>
+  </qemu:commandline>
+</domain>

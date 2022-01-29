@@ -19,10 +19,9 @@ locals {
 module "template-aio-base" {
   for_each = local.aio_hostclass_config.hosts
 
-  source                 = "./modules/base"
-  hostname               = each.value.hostname
-  users                  = [local.config.users.admin]
-  container_storage_path = each.value.container_storage_path
+  source   = "./modules/base"
+  hostname = each.value.hostname
+  users    = [local.config.users.admin]
 }
 
 module "template-aio-server" {
@@ -182,6 +181,8 @@ module "template-aio-worker" {
   kubernetes_service_network_dns_netnum = local.config.kubernetes_service_network_dns_netnum
   kubelet_node_labels                   = {}
   static_pod_manifest_path              = local.config.static_pod_manifest_path
+  container_storage_path                = "${each.value.container_storage_path}/storage"
+  container_tmp_path                    = "${each.value.container_storage_path}/tmp"
 }
 
 module "template-aio-minio" {
@@ -190,7 +191,8 @@ module "template-aio-minio" {
   source                   = "./modules/minio"
   minio_container_image    = local.config.container_images.minio
   minio_port               = local.config.ports.minio
-  volume_paths             = each.value.volume_paths
+  minio_console_port       = local.config.ports.minio_console
+  volume_paths             = each.value.minio_volume_paths
   static_pod_manifest_path = local.config.static_pod_manifest_path
 }
 

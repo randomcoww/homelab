@@ -64,6 +64,7 @@ locals {
       etcd_client             = 58082
       etcd_peer               = 58083
       minio                   = 50256
+      minio_console           = 50257
     }
 
     domains = {

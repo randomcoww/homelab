@@ -81,6 +81,15 @@ mkdir -p ~/.kube && \
 tw find . -name '*.tf' -exec terraform fmt '{}' \;
 ```
 
+### Hypervisor
+
+TODO: Try KubeVirt
+
+```
+virsh -c qemu+ssh://fcos@aio-0.local/system list --all
+
+```
+
 ### Image build
 
 ```

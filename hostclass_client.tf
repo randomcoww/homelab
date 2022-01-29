@@ -12,10 +12,9 @@ locals {
 module "template-client-base" {
   for_each = local.client_hostclass_config.hosts
 
-  source                 = "./modules/base"
-  hostname               = each.value.hostname
-  users                  = [local.config.users.client]
-  container_storage_path = "${each.value.disks.pv.partitions[0].mount_path}/containers"
+  source   = "./modules/base"
+  hostname = each.value.hostname
+  users    = [local.config.users.client]
 }
 
 module "template-client-desktop" {
@@ -55,6 +54,8 @@ module "template-client-worker" {
   kubernetes_service_network_prefix     = local.config.networks.kubernetes_service.prefix
   kubernetes_service_network_dns_netnum = local.config.kubernetes_service_network_dns_netnum
   kubelet_node_labels                   = {}
+  container_storage_path                = "${each.value.container_storage_path}/storage"
+  container_tmp_path                    = "${each.value.container_storage_path}/tmp"
 }
 
 # combine and render a single ignition file #

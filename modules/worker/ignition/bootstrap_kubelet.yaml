@@ -6,12 +6,14 @@ systemd:
     - name: crio.service
       enabled: true
       dropins:
-        - name: 10-delete-default-cni.conf
+        - name: 10-worker.conf
           contents: |
             [Service]
             ExecStartPre=/usr/bin/rm -f \
               /etc/cni/net.d/100-crio-bridge.conf \
               /etc/cni/net.d/200-loopback.conf
+            ExecStart=
+            ExecStart=/usr/bin/crio --big-files-temporary-dir=${container_tmp_path}
     - name: kubelet.service
       enabled: true
       dropins:
@@ -38,6 +40,14 @@ systemd:
 
 storage:
   files:
+    - path: /etc/crio/crio.conf.d/20-storage.conf
+      mode: 0644
+      overwrite: true
+      contents:
+        inline: |-
+          [crio]
+          root="${container_storage_path}"
+
     - path: ${config_path}/kubelet-config-bootstrap-worker.yaml
       mode: 0644
       contents:
