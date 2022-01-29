@@ -222,7 +222,7 @@ module "template-aio-kubernetes_addons_manager" {
 
   source                                = "./modules/kubernetes_addons"
   container_images                      = local.config.container_images
-  apiserver_ip                          = "127.0.0.1"
+  apiserver_ip                          = cidrhost(local.config.networks.lan.prefix, local.aio_hostclass_config.vrrp_netnum)
   apiserver_port                        = local.config.ports.apiserver
   kubernetes_pod_network_prefix         = local.config.networks.kubernetes_pod.prefix
   kubernetes_service_network_prefix     = local.config.networks.kubernetes_service.prefix

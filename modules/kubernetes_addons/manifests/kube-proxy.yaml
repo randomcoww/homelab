@@ -3,16 +3,12 @@ kind: ServiceAccount
 metadata:
   name: kube-proxy
   namespace: kube-system
-  labels:
-    addonmanager.kubernetes.io/mode: Reconcile
 
 ---
 kind: ClusterRoleBinding
 apiVersion: rbac.authorization.k8s.io/v1
 metadata:
   name: system:kube-proxy
-  labels:
-    addonmanager.kubernetes.io/mode: Reconcile
 subjects:
   - kind: ServiceAccount
     name: kube-proxy
@@ -76,9 +72,9 @@ spec:
         - "--v=2"
         env:
         - name: KUBERNETES_SERVICE_HOST
-          value: "192.168.126.2"
+          value: "${apiserver_ip}"
         - name: KUBERNETES_SERVICE_PORT
-          value: "58081"
+          value: "${apiserver_port}"
         securityContext:
           privileged: true
         volumeMounts:

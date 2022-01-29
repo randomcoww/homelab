@@ -57,6 +57,8 @@ locals {
       kubernetes_external_dns_ip            = var.kubernetes_external_dns_ip
       metallb_network_prefix                = var.metallb_network_prefix
       metallb_subnet                        = var.metallb_subnet
+      apiserver_ip                          = var.apiserver_ip
+      apiserver_port                        = var.apiserver_port
     })
     }, {
     for file_name in keys(local.remote_manifests) :
