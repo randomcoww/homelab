@@ -28,7 +28,6 @@ locals {
       kubelet_port                          = var.kubelet_port
       kubernetes_cluster_domain             = var.kubernetes_cluster_domain
       container_storage_path                = var.container_storage_path
-      container_tmp_path                    = var.container_tmp_path
     })
   ]
 }

@@ -47,8 +47,3 @@ variable "container_storage_path" {
   type    = string
   default = "/var/lib/containers/storage"
 }
-
-variable "container_tmp_path" {
-  type    = string
-  default = "/var/lib/containers/tmp"
-}

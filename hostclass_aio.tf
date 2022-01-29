@@ -181,8 +181,7 @@ module "template-aio-worker" {
   kubernetes_service_network_dns_netnum = local.config.kubernetes_service_network_dns_netnum
   kubelet_node_labels                   = {}
   static_pod_manifest_path              = local.config.static_pod_manifest_path
-  container_storage_path                = "${each.value.container_storage_path}/storage"
-  container_tmp_path                    = "${each.value.container_storage_path}/tmp"
+  container_storage_path                = each.value.container_storage_path
 }
 
 module "template-aio-minio" {

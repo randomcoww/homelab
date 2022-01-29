@@ -12,8 +12,6 @@ systemd:
             ExecStartPre=/usr/bin/rm -f \
               /etc/cni/net.d/100-crio-bridge.conf \
               /etc/cni/net.d/200-loopback.conf
-            ExecStart=
-            ExecStart=/usr/bin/crio --big-files-temporary-dir=${container_tmp_path}
     - name: kubelet.service
       enabled: true
       dropins:
@@ -48,6 +46,8 @@ storage:
           [crio]
           root="${container_storage_path}"
 
+          [crio.image]
+          big_files_temporary_dir="${container_storage_path}"
     - path: ${config_path}/kubelet-config-bootstrap-worker.yaml
       mode: 0644
       contents:

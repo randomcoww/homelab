@@ -54,8 +54,7 @@ module "template-client-worker" {
   kubernetes_service_network_prefix     = local.config.networks.kubernetes_service.prefix
   kubernetes_service_network_dns_netnum = local.config.kubernetes_service_network_dns_netnum
   kubelet_node_labels                   = {}
-  container_storage_path                = "${each.value.container_storage_path}/storage"
-  container_tmp_path                    = "${each.value.container_storage_path}/tmp"
+  container_storage_path                = each.value.container_storage_path
 }
 
 # combine and render a single ignition file #
