@@ -34,6 +34,8 @@ locals {
     "apps/v1/ReplicaSet",
     "apps/v1/StatefulSet",
     "networking.k8s.io/v1/IngressClass",
+    "networking.k8s.io/v1/NetworkPolicy",
+    "apiextensions.k8s.io/v1/CustomResourceDefinition",
   ]
 
   remote_manifests = {
