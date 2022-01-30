@@ -108,7 +108,7 @@ locals {
 
     # http path to kubernetes matchbox #
     aws_region                                  = "us-west-2"
-    kubernetes_cluster_name                     = "default-cluster"
+    kubernetes_cluster_name                     = "aio-prod"
     kubernetes_service_network_dns_netnum       = 10
     kubernetes_service_network_apiserver_netnum = 1
     static_pod_manifest_path                    = "/var/lib/kubelet/manifests"
