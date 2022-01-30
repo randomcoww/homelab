@@ -77,6 +77,11 @@ storage:
           shutdownGracePeriodCriticalPods: "60s"
           containerLogMaxSize: "10Mi"
           containerLogMaxFiles: 2
+          evictionHard:
+            imagefs.available: 1%
+            memory.available: 100Mi
+            nodefs.available: 1%
+            nodefs.inodesFree: 1%
 
     - path: ${config_path}/bootstrap.kubeconfig
       mode: 0644
