@@ -43,10 +43,8 @@ metadata:
   name: ${resource_name}-syncthing-tls
 data:
   %{~ for member in syncthing_members ~}
-  cert-${member.pod_name}: |-
-    ${indent(4, chomp(member.cert))}
-  key-${member.pod_name}: |-
-    ${indent(4, chomp(member.key))}
+  cert-${member.pod_name}: ${replace(base64encode(chomp(member.cert)), "\n", "")}
+  key-${member.pod_name}: ${replace(base64encode(chomp(member.key)), "\n", "")}
   %{~ endfor ~}
 type: Opaque
 
@@ -56,12 +54,9 @@ kind: Secret
 metadata:
   name: ${resource_name}-matchbox-tls
 data:
-  ca.crt: |-
-    ${indent(4, chomp(matchbox_certs.ca))}
-  server.crt: |-
-    ${indent(4, chomp(matchbox_certs.cert))}
-  server.key: |-
-    ${indent(4, chomp(matchbox_certs.key))}
+  ca.crt: ${replace(base64encode(chomp(matchbox_certs.ca)), "\n", "")}
+  server.crt: ${replace(base64encode(chomp(matchbox_certs.cert)), "\n", "")}
+  server.key: ${replace(base64encode(chomp(matchbox_certs.key)), "\n", "")}
 type: Opaque
 
 ---
@@ -70,6 +65,7 @@ kind: StatefulSet
 metadata:
   name: ${resource_name}
 spec:
+  serviceName: ${resource_name}
   replicas: ${pod_count}
   selector:
     matchLabels:
@@ -79,12 +75,17 @@ spec:
       labels:
         app: ${resource_name}
     spec:
-      containers:
-      - name: syncthing
+      # Syncthing requires config.xml to be writable
+      # Copy into shared volume
+      initContainers:
+      - name: syncthing-init
         image: ${container_images.syncthing}
         command:
-        - -home
-        - ${syncthing_home_path}
+        - cp
+        - /tmp/config.xml
+        - /tmp/cert.pem
+        - /tmp/key.pem
+        - ${syncthing_home_path}/
         env:
         - name: POD_NAME
           valueFrom:
@@ -92,21 +93,34 @@ spec:
               fieldPath: metadata.name
         volumeMounts:
         - name: syncthing-config
-          mountPath: ${syncthing_home_path}/config.xml
+          mountPath: /tmp/config.xml
           subPath: config.xml
         - name: syncthing-tls
-          mountPath: ${syncthing_home_path}/cert.pem
+          mountPath: /tmp/cert.pem
           subPathExpr: cert-$(POD_NAME)
         - name: syncthing-tls
-          mountPath: ${syncthing_home_path}/key.pem
+          mountPath: /tmp/key.pem
           subPathExpr: key-$(POD_NAME)
+        - name: syncthing-data
+          mountPath: ${syncthing_home_path}
+      containers:
+      - name: syncthing
+        image: ${container_images.syncthing}
+        command:
+        - syncthing
+        args:
+        - --home
+        - ${syncthing_home_path}
+        volumeMounts:
         - name: matchbox-data
           mountPath: ${matchbox_path}
+        - name: syncthing-data
+          mountPath: ${syncthing_home_path}
       - name: matchbox
         image: ${container_images.matchbox}
         args:
-        - -address=127.0.0.1:${internal_pxeboot_http_port}
-        - -rpc-address=127.0.0.1:${internal_pxeboot_api_port}
+        - -address=0.0.0.0:${internal_pxeboot_http_port}
+        - -rpc-address=0.0.0.0:${internal_pxeboot_api_port}
         - -assets-path=${matchbox_path}
         - -data-path=${matchbox_path}
         volumeMounts:
@@ -126,12 +140,14 @@ spec:
         configMap:
           name: ${resource_name}-syncthing-config
       - name: syncthing-tls
-        configMap:
-          name: ${resource_name}-syncthing-tls
+        secret:
+          secretName: ${resource_name}-syncthing-tls
       - name: matchbox-tls
-        configMap:
-          name: ${resource_name}-matchbox-tls
+        secret:
+          secretName: ${resource_name}-matchbox-tls
       - name: matchbox-data
+        emptyDir: {}
+      - name: syncthing-data
         emptyDir: {}
 
 ---
