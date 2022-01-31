@@ -1,7 +1,7 @@
 FROM golang:alpine AS MODULES
 
-ARG LIBVIRT_VERSION
 ARG SSH_VERSION
+ARG SYNCTHING_VERSION
 
 RUN set -x \
   \
@@ -10,19 +10,18 @@ RUN set -x \
     libvirt-dev \
     g++ \
   \
-  && cd .. \
-  && git clone -b v${LIBVIRT_VERSION} https://github.com/randomcoww/terraform-provider-libvirt.git \
-  && cd terraform-provider-libvirt \
-  && mkdir -p ${GOPATH}/bin/github.com/randomcoww/libvirt/${LIBVIRT_VERSION}/linux_amd64 \
-  && GO111MODULE=on GOOS=linux go build -v -ldflags '-s -w' \
-    -o ${GOPATH}/bin/github.com/randomcoww/libvirt/${LIBVIRT_VERSION}/linux_amd64/terraform-provider-libvirt_v${LIBVIRT_VERSION} \
-  \
-  && cd .. \
   && git clone -b v${SSH_VERSION} https://github.com/randomcoww/terraform-provider-ssh.git \
   && cd terraform-provider-ssh \
   && mkdir -p ${GOPATH}/bin/github.com/randomcoww/ssh/${SSH_VERSION}/linux_amd64 \
   && CGO_ENABLED=0 GO111MODULE=on GOOS=linux go build -v -ldflags '-s -w' \
-    -o ${GOPATH}/bin/github.com/randomcoww/ssh/${SSH_VERSION}/linux_amd64/terraform-provider-ssh_v${SSH_VERSION}
+    -o ${GOPATH}/bin/github.com/randomcoww/ssh/${SSH_VERSION}/linux_amd64/terraform-provider-ssh_v${SSH_VERSION} \
+  \
+  && cd .. \
+  && git clone -b v${SYNCTHING_VERSION} https://github.com/randomcoww/terraform-provider-syncthing.git \
+  && cd terraform-provider-syncthing \
+  && mkdir -p ${GOPATH}/bin/github.com/randomcoww/syncthing/${SYNCTHING_VERSION}/linux_amd64 \
+  && CGO_ENABLED=0 GO111MODULE=on GOOS=linux go build -v -ldflags '-s -w' \
+    -o ${GOPATH}/bin/github.com/randomcoww/syncthing/${SYNCTHING_VERSION}/linux_amd64/terraform-provider-syncthing_v${SYNCTHING_VERSION}
 
 FROM alpine:edge
 

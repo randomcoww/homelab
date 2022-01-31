@@ -64,8 +64,8 @@ module "template-aio-gateway" {
   internal_domain = local.config.domains.internal
   pxeboot_file_name = "http://${cidrhost(
     cidrsubnet(local.config.networks.lan.prefix, local.config.metallb_subnet.newbit, local.config.metallb_subnet.netnum),
-    local.config.metallb_external_dns_netnum
-  )}/boot.ipxe"
+    local.config.metallb_pxeboot_netnum
+  )}}:${local.config.ports.internal_pxeboot_http}/boot.ipxe"
   static_pod_manifest_path = local.config.static_pod_manifest_path
 }
 
@@ -153,8 +153,8 @@ module "template-aio-kubernetes" {
   host_netnum                                 = each.value.netnum
   vip_netnum                                  = local.aio_hostclass_config.vrrp_netnum
   apiserver_port                              = local.config.ports.apiserver
-  controller_manager_port                     = local.config.ports.controller_manager_port
-  scheduler_port                              = local.config.ports.scheduler_port
+  controller_manager_port                     = local.config.ports.controller_manager
+  scheduler_port                              = local.config.ports.scheduler
   etcd_client_port                            = local.config.ports.etcd_client
   etcd_servers                                = [module.template-aio-etcd[each.key].local_client_endpoint]
   kubernetes_cluster_name                     = local.config.kubernetes_cluster_name

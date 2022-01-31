@@ -56,15 +56,17 @@ locals {
     }
 
     ports = {
-      kea_peer                = 58080
-      apiserver               = 58081
-      controller_manager_port = 50252
-      scheduler_port          = 50251
-      kubelet                 = 50250
-      etcd_client             = 58082
-      etcd_peer               = 58083
-      minio                   = 50256
-      minio_console           = 50257
+      kea_peer              = 58080
+      apiserver             = 58081
+      controller_manager    = 50252
+      scheduler             = 50251
+      kubelet               = 50250
+      etcd_client           = 58082
+      etcd_peer             = 58083
+      minio                 = 50256
+      minio_console         = 50257
+      internal_pxeboot_http = 80
+      internal_pxeboot_api  = 50259
     }
 
     domains = {
@@ -91,6 +93,8 @@ locals {
       hostapd                 = "ghcr.io/randomcoww/hostapd:latest"
       kapprover               = "ghcr.io/randomcoww/kapprover:latest"
       external_dns            = "k8s.gcr.io/external-dns/external-dns:v0.10.2"
+      matchbox                = "quay.io/poseidon/matchbox:latest"
+      syncthing               = "docker.io/syncthing/syncthing:latest"
     }
 
     ca = {
@@ -221,4 +225,26 @@ resource "random_id" "hostapd_encryption_key" {
 
 resource "random_id" "hostapd_mobility_domain" {
   byte_length = 2
+}
+
+# matchbox deployment for kubernetes #
+module "template-aio-pxeboot_manifests" {
+  source                 = "./modules/pxeboot"
+  container_images       = local.config.container_images
+  resource_name          = "pxeboot"
+  pod_count              = 2
+  allowed_network_prefix = local.config.networks.kubernetes_pod.prefix
+  internal_pxeboot_ip = (cidrhost(
+    cidrsubnet(local.config.networks.lan.prefix, local.config.metallb_subnet.newbit, local.config.metallb_subnet.netnum),
+    local.config.metallb_pxeboot_netnum
+  ))
+  internal_pxeboot_http_port = local.config.ports.internal_pxeboot_http
+  internal_pxeboot_api_port  = local.config.ports.internal_pxeboot_api
+}
+
+resource "local_file" "pxeboot_manifests" {
+  for_each = module.template-aio-pxeboot_manifests.manifests
+
+  content  = each.value
+  filename = "./output/manifests/${each.key}"
 }

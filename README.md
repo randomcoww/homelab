@@ -94,13 +94,13 @@ virsh -c qemu+ssh://fcos@aio-0.local/system list --all
 
 ```
 TF_VERSION=1.1.2
-LIBVIRT_VERSION=0.1.10
-SSH_VERSION=0.1.3
+SSH_VERSION=0.1.4
+SYNCTHING_VERSION=0.1.2
 
 buildah build \
   --build-arg TF_VERSION=$TF_VERSION \
-  --build-arg LIBVIRT_VERSION=$LIBVIRT_VERSION \
   --build-arg SSH_VERSION=$SSH_VERSION \
+  --build-arg SYNCTHING_VERSION=$SYNCTHING_VERSION \
   -f Dockerfile \
   -t ghcr.io/randomcoww/tw:latest
 ```

@@ -1,0 +1,169 @@
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: ${resource_name}-syncthing-config
+data:
+  config.xml: |-
+    <configuration>
+      <folder id="matchbox-data" label="matchbox-data" path="${matchbox_path}" type="sendreceive" fsWatcherEnabled="true" fsWatcherDelayS="1" rescanIntervalS="10" autoNormalize="false">
+        %{~ for member in syncthing_members ~}
+        <device id="${member.device_id}"></device>
+        %{~ endfor ~}
+        <maxConflicts>1</maxConflicts>
+        <copyOwnershipFromParent>true</copyOwnershipFromParent>
+      </folder>
+      %{~ for member in syncthing_members ~}
+      <device id="${member.device_id}" compression="never" skipIntroductionRemovals="true">
+        <address>dynamic</address>
+        <autoAcceptFolders>true</autoAcceptFolders>
+        <allowedNetwork>${allowed_network_prefix}</allowedNetwork>
+      </device>
+      %{~endfor~}
+      <gui enabled="false"/>
+      <options>
+        <listenAddress>tcp://0.0.0.0:${syncthing_peer_port}</listenAddress>
+        <globalAnnounceEnabled>false</globalAnnounceEnabled>
+        <localAnnounceEnabled>true</localAnnounceEnabled>
+        <reconnectionIntervalS>5</reconnectionIntervalS>
+        <relaysEnabled>false</relaysEnabled>
+        <startBrowser>false</startBrowser>
+        <natEnabled>false</natEnabled>
+        <urAccepted>-1</urAccepted>
+        <autoUpgradeIntervalH>0</autoUpgradeIntervalH>
+        <defaultFolderPath></defaultFolderPath>
+        <crashReportingEnabled>false</crashReportingEnabled>
+      </options>
+    </configuration>
+
+---
+apiVersion: v1
+kind: Secret
+metadata:
+  name: ${resource_name}-syncthing-tls
+data:
+  %{~ for member in syncthing_members ~}
+  cert-${member.pod_name}: |-
+    ${indent(4, chomp(member.cert))}
+  key-${member.pod_name}: |-
+    ${indent(4, chomp(member.key))}
+  %{~ endfor ~}
+type: Opaque
+
+---
+apiVersion: v1
+kind: Secret
+metadata:
+  name: ${resource_name}-matchbox-tls
+data:
+  ca.crt: |-
+    ${indent(4, chomp(matchbox_certs.ca))}
+  server.crt: |-
+    ${indent(4, chomp(matchbox_certs.cert))}
+  server.key: |-
+    ${indent(4, chomp(matchbox_certs.key))}
+type: Opaque
+
+---
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: ${resource_name}
+spec:
+  replicas: ${pod_count}
+  selector:
+    matchLabels:
+      app: ${resource_name}
+  template:
+    metadata:
+      labels:
+        app: ${resource_name}
+    spec:
+      containers:
+      - name: syncthing
+        image: ${container_images.syncthing}
+        command:
+        - -home
+        - ${syncthing_home_path}
+        env:
+        - name: POD_NAME
+          valueFrom:
+            fieldRef:
+              fieldPath: metadata.name
+        volumeMounts:
+        - name: syncthing-config
+          mountPath: ${syncthing_home_path}/config.xml
+          subPath: config.xml
+        - name: syncthing-tls
+          mountPath: ${syncthing_home_path}/cert.pem
+          subPathExpr: cert-$(POD_NAME)
+        - name: syncthing-tls
+          mountPath: ${syncthing_home_path}/key.pem
+          subPathExpr: key-$(POD_NAME)
+        - name: matchbox-data
+          mountPath: ${matchbox_path}
+      - name: matchbox
+        image: ${container_images.matchbox}
+        args:
+        - -address=127.0.0.1:${internal_pxeboot_http_port}
+        - -rpc-address=127.0.0.1:${internal_pxeboot_api_port}
+        - -assets-path=${matchbox_path}
+        - -data-path=${matchbox_path}
+        volumeMounts:
+        - name: matchbox-tls
+          mountPath: /etc/matchbox/ca.crt
+          subPath: ca.crt
+        - name: matchbox-tls
+          mountPath: /etc/matchbox/server.crt
+          subPath: server.crt
+        - name: matchbox-tls
+          mountPath: /etc/matchbox/server.key
+          subPath: server.key
+        - name: matchbox-data
+          mountPath: ${matchbox_path}
+      volumes:
+      - name: syncthing-config
+        configMap:
+          name: ${resource_name}-syncthing-config
+      - name: syncthing-tls
+        configMap:
+          name: ${resource_name}-syncthing-tls
+      - name: matchbox-tls
+        configMap:
+          name: ${resource_name}-matchbox-tls
+      - name: matchbox-data
+        emptyDir: {}
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: ${resource_name}-sync
+  labels:
+    app: ${resource_name}
+spec:
+  clusterIP: None
+  ports:
+  - port: ${syncthing_peer_port}
+  selector:
+    app: ${resource_name}
+
+---
+kind: Service
+apiVersion: v1
+metadata:
+  name: ${resource_name}
+spec:
+  type: LoadBalancer
+  loadBalancerIP: ${internal_pxeboot_ip}
+  ports:
+  - name: rpc
+    port: ${internal_pxeboot_api_port}
+    targetPort: ${internal_pxeboot_api_port}
+    protocol: TCP
+  - name: http
+    port: ${internal_pxeboot_http_port}
+    targetPort: ${internal_pxeboot_http_port}
+    protocol: TCP
+  selector:
+    app: ${resource_name}
