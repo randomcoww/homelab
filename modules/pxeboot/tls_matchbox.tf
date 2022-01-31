@@ -1,5 +1,5 @@
 resource "tls_private_key" "matchbox" {
-  algorithm   = "ECDSA"
+  algorithm   = tls_private_key.matchbox-ca.algorithm
   ecdsa_curve = "P521"
 }
 

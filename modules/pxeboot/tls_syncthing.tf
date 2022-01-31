@@ -1,7 +1,7 @@
 resource "tls_private_key" "syncthing" {
   count = var.pod_count
 
-  algorithm   = "ECDSA"
+  algorithm   = tls_private_key.syncthing-ca.algorithm
   ecdsa_curve = "P384"
 }
 

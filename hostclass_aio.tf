@@ -65,7 +65,7 @@ module "template-aio-gateway" {
   pxeboot_file_name = "http://${cidrhost(
     cidrsubnet(local.config.networks.lan.prefix, local.config.metallb_subnet.newbit, local.config.metallb_subnet.netnum),
     local.config.metallb_pxeboot_netnum
-  )}}:${local.config.ports.internal_pxeboot_http}/boot.ipxe"
+  )}:${local.config.ports.internal_pxeboot_http}/boot.ipxe"
   static_pod_manifest_path = local.config.static_pod_manifest_path
 }
 
