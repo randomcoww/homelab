@@ -20,13 +20,14 @@ locals {
     basename(f) => templatefile(f, {
       container_images           = var.container_images
       resource_name              = var.resource_name
+      namespace                  = "default"
       pod_count                  = var.pod_count
       syncthing_members          = local.syncthing_members
       matchbox_certs             = local.matchbox_certs
       allowed_network_prefix     = var.allowed_network_prefix
       syncthing_home_path        = "/var/lib/syncthing"
       matchbox_path              = "/var/lib/matchbox"
-      syncthing_peer_port        = 50001
+      syncthing_peer_port        = 22000
       internal_pxeboot_ip        = var.internal_pxeboot_ip
       internal_pxeboot_api_port  = var.internal_pxeboot_api_port
       internal_pxeboot_http_port = var.internal_pxeboot_http_port

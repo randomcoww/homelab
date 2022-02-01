@@ -14,7 +14,6 @@ metadata:
 rules:
 - apiGroups: [""]
   resources: ["endpoints", "services", "pods", "namespaces"]
-  resources: ["namespaces"]
   verbs: ["list", "watch"]
 - apiGroups: ["discovery.k8s.io"]
   resources: ["endpointslices"]

@@ -3,10 +3,11 @@ apiVersion: v1
 kind: ConfigMap
 metadata:
   name: ${resource_name}-syncthing-config
+  namespace: ${namespace}
 data:
   config.xml: |-
     <configuration>
-      <folder id="matchbox-data" label="matchbox-data" path="${matchbox_path}" type="sendreceive" fsWatcherEnabled="true" fsWatcherDelayS="1" rescanIntervalS="10" autoNormalize="false">
+      <folder id="matchbox-data" label="matchbox-data" path="${matchbox_path}" type="sendreceive" fsWatcherEnabled="true" fsWatcherDelayS="1" rescanIntervalS="10" ignorePerms="true" autoNormalize="false">
         %{~ for member in syncthing_members ~}
         <device id="${member.device_id}"></device>
         %{~ endfor ~}
@@ -15,16 +16,15 @@ data:
       </folder>
       %{~ for member in syncthing_members ~}
       <device id="${member.device_id}" compression="never" skipIntroductionRemovals="true">
-        <address>dynamic</address>
+        <address>${member.pod_name}.${resource_name}.${namespace}:${syncthing_peer_port}</address>
         <autoAcceptFolders>true</autoAcceptFolders>
-        <allowedNetwork>${allowed_network_prefix}</allowedNetwork>
       </device>
       %{~endfor~}
       <gui enabled="false"/>
       <options>
-        <listenAddress>tcp://0.0.0.0:${syncthing_peer_port}</listenAddress>
+        <listenAddress>0.0.0.0:${syncthing_peer_port}</listenAddress>
         <globalAnnounceEnabled>false</globalAnnounceEnabled>
-        <localAnnounceEnabled>true</localAnnounceEnabled>
+        <localAnnounceEnabled>false</localAnnounceEnabled>
         <reconnectionIntervalS>5</reconnectionIntervalS>
         <relaysEnabled>false</relaysEnabled>
         <startBrowser>false</startBrowser>
@@ -41,6 +41,7 @@ apiVersion: v1
 kind: Secret
 metadata:
   name: ${resource_name}-syncthing-tls
+  namespace: ${namespace}
 data:
   %{~ for member in syncthing_members ~}
   cert-${member.pod_name}: ${replace(base64encode(chomp(member.cert)), "\n", "")}
@@ -53,6 +54,7 @@ apiVersion: v1
 kind: Secret
 metadata:
   name: ${resource_name}-matchbox-tls
+  namespace: ${namespace}
 data:
   ca.crt: ${replace(base64encode(chomp(matchbox_certs.ca)), "\n", "")}
   server.crt: ${replace(base64encode(chomp(matchbox_certs.cert)), "\n", "")}
@@ -64,6 +66,7 @@ apiVersion: apps/v1
 kind: StatefulSet
 metadata:
   name: ${resource_name}
+  namespace: ${namespace}
 spec:
   serviceName: ${resource_name}
   replicas: ${pod_count}
@@ -75,6 +78,16 @@ spec:
       labels:
         app: ${resource_name}
     spec:
+      affinity:
+        podAntiAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+          - labelSelector:
+              matchExpressions:
+              - key: app
+                operator: In
+                values:
+                - ${resource_name}
+            topologyKey: "kubernetes.io/hostname"
       # Syncthing requires config.xml to be writable
       # Copy into shared volume
       initContainers:
@@ -155,6 +168,7 @@ apiVersion: v1
 kind: Service
 metadata:
   name: ${resource_name}-sync
+  namespace: ${namespace}
   labels:
     app: ${resource_name}
 spec:
@@ -169,6 +183,9 @@ kind: Service
 apiVersion: v1
 metadata:
   name: ${resource_name}
+  namespace: ${namespace}
+  labels:
+    app: ${resource_name}
 spec:
   type: LoadBalancer
   loadBalancerIP: ${internal_pxeboot_ip}
