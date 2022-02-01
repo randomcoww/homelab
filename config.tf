@@ -1,4 +1,3 @@
-# these variables are processed into local.config.<entry>
 locals {
   preprocess = {
     users = {
@@ -124,127 +123,20 @@ locals {
     metallb_external_dns_netnum = 1
     metallb_pxeboot_netnum      = 2
   }
-}
 
-# SSH CA #
-resource "tls_private_key" "ssh-ca" {
-  algorithm   = "ECDSA"
-  ecdsa_curve = "P521"
-}
 
-# libvirt CA #
-resource "tls_private_key" "libvirt-ca" {
-  algorithm   = "ECDSA"
-  ecdsa_curve = "P521"
-}
+  # cleanup some of the "preprocess" entries above
+  config = merge(local.preprocess, {
+    users = {
+      for user_name, user in local.preprocess.users :
+      user_name => merge(user, lookup(var.users, user_name, {}))
+    }
 
-resource "tls_self_signed_cert" "libvirt-ca" {
-  key_algorithm   = tls_private_key.libvirt-ca.algorithm
-  private_key_pem = tls_private_key.libvirt-ca.private_key_pem
-
-  validity_period_hours = 8760
-  is_ca_certificate     = true
-
-  subject {
-    common_name  = "libvirt"
-    organization = "libvirt"
-  }
-
-  allowed_uses = [
-    "cert_signing",
-    "crl_signing",
-    "digital_signature",
-  ]
-}
-
-# libvirt client #
-resource "tls_private_key" "libvirt-client" {
-  algorithm   = tls_private_key.libvirt-ca.algorithm
-  ecdsa_curve = "P521"
-}
-
-resource "tls_cert_request" "libvirt-client" {
-  key_algorithm   = tls_private_key.libvirt-client.algorithm
-  private_key_pem = tls_private_key.libvirt-client.private_key_pem
-
-  subject {
-    common_name = "libvirt"
-  }
-}
-
-resource "tls_locally_signed_cert" "libvirt-client" {
-  cert_request_pem   = tls_cert_request.libvirt-client.cert_request_pem
-  ca_key_algorithm   = tls_private_key.libvirt-ca.algorithm
-  ca_private_key_pem = tls_private_key.libvirt-ca.private_key_pem
-  ca_cert_pem        = tls_self_signed_cert.libvirt-ca.cert_pem
-
-  validity_period_hours = 8760
-
-  allowed_uses = [
-    "key_encipherment",
-    "digital_signature",
-    "server_auth",
-    "client_auth",
-  ]
-}
-
-# SSH client #
-resource "ssh_client_cert" "ssh-client" {
-  ca_key_algorithm      = tls_private_key.ssh-ca.algorithm
-  ca_private_key_pem    = tls_private_key.ssh-ca.private_key_pem
-  key_id                = var.ssh_client.key_id
-  public_key_openssh    = var.ssh_client.public_key
-  early_renewal_hours   = var.ssh_client.early_renewal_hours
-  validity_period_hours = var.ssh_client.validity_period_hours
-  valid_principals      = []
-
-  extensions = [
-    "permit-agent-forwarding",
-    "permit-port-forwarding",
-    "permit-pty",
-    "permit-user-rc",
-  ]
-}
-
-# kubernetes #
-module "etcd-common" {
-  source = "./modules/etcd_common"
-
-  s3_backup_bucket = "randomcoww-etcd-backup"
-  s3_backup_key    = local.config.kubernetes_cluster_name
-}
-
-module "kubernetes-common" {
-  source = "./modules/kubernetes_common"
-}
-
-# Hostapd #
-resource "random_id" "hostapd_encryption_key" {
-  byte_length = 64
-}
-
-resource "random_id" "hostapd_mobility_domain" {
-  byte_length = 2
-}
-
-# matchbox deployment for kubernetes #
-module "template-aio-pxeboot_manifests" {
-  source                 = "./modules/pxeboot"
-  container_images       = local.config.container_images
-  resource_name          = "pxeboot"
-  pod_count              = 2
-  allowed_network_prefix = local.config.networks.kubernetes_pod.prefix
-  internal_pxeboot_ip = (cidrhost(
-    cidrsubnet(local.config.networks.lan.prefix, local.config.metallb_subnet.newbit, local.config.metallb_subnet.netnum),
-    local.config.metallb_pxeboot_netnum
-  ))
-  internal_pxeboot_http_port = local.config.ports.internal_pxeboot_http
-  internal_pxeboot_api_port  = local.config.ports.internal_pxeboot_api
-}
-
-resource "local_file" "pxeboot_manifests" {
-  for_each = module.template-aio-pxeboot_manifests.manifests
-
-  content  = each.value
-  filename = "./output/manifests/${each.key}"
+    networks = {
+      for network_name, network in local.preprocess.networks :
+      network_name => merge(network, try({
+        prefix = "${network.network}/${network.cidr}"
+      }, {}))
+    }
+  })
 }

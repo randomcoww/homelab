@@ -218,32 +218,20 @@ module "template-aio-hostapd" {
   ]
 }
 
+# Add addons to image
 module "template-aio-kubernetes_addons_manager" {
   for_each = local.aio_hostclass_config.hosts
 
-  source                                = "./modules/kubernetes_addons"
-  container_images                      = local.config.container_images
-  apiserver_ip                          = cidrhost(local.config.networks.lan.prefix, local.aio_hostclass_config.vrrp_netnum)
-  apiserver_port                        = local.config.ports.apiserver
-  kubernetes_pod_network_prefix         = local.config.networks.kubernetes_pod.prefix
-  kubernetes_service_network_prefix     = local.config.networks.kubernetes_service.prefix
-  kubernetes_service_network_dns_netnum = local.config.kubernetes_service_network_dns_netnum
-  flannel_host_gateway_interface_name   = "lan"
-  kubernetes_cluster_name               = local.config.kubernetes_cluster_name
-  kubernetes_cluster_domain             = local.config.domains.kubernetes
-  internal_domain                       = local.config.domains.internal
-  kubernetes_common_certs               = module.kubernetes-common.certs.kubernetes
-  kubernetes_ca                         = module.kubernetes-common.ca.kubernetes
-  static_pod_manifest_path              = local.config.static_pod_manifest_path
-  internal_dns_ip                       = cidrhost(local.config.networks.lan.prefix, local.aio_hostclass_config.vrrp_netnum)
-  kubernetes_external_dns_ip = cidrhost(
-    cidrsubnet(local.config.networks.lan.prefix, local.config.metallb_subnet.newbit, local.config.metallb_subnet.netnum),
-    local.config.metallb_external_dns_netnum
-  )
-  metallb_network_prefix = local.config.networks.lan.prefix
-  metallb_subnet         = local.config.metallb_subnet
+  source                   = "./modules/kubernetes_addons_manager"
+  container_images         = local.config.container_images
+  apiserver_ip             = cidrhost(local.config.networks.lan.prefix, local.aio_hostclass_config.vrrp_netnum)
+  apiserver_port           = local.config.ports.apiserver
+  kubernetes_common_certs  = module.kubernetes-common.certs.kubernetes
+  kubernetes_cluster_name  = local.config.kubernetes_cluster_name
+  kubernetes_ca            = module.kubernetes-common.ca.kubernetes
+  static_pod_manifest_path = local.config.static_pod_manifest_path
+  addon_manifests          = local.kubernetes_addons_manifests
 }
-
 
 # combine and render a single ignition file #
 data "ct_config" "aio" {

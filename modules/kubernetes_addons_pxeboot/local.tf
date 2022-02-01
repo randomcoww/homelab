@@ -15,7 +15,7 @@ locals {
     key  = tls_private_key.matchbox.private_key_pem
   }
 
-  manifests = {
+  addon_manifests = {
     for f in fileset(".", "${path.module}/manifests/*.yaml") :
     basename(f) => templatefile(f, {
       container_images           = var.container_images

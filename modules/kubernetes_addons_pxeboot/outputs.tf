@@ -1,5 +1,5 @@
-output "manifests" {
-  value = local.manifests
+output "addon_manifests" {
+  value = local.addon_manifests
 }
 
 output "ca" {
