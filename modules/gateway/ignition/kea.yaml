@@ -163,6 +163,12 @@ storage:
             - name: tftpd
               image: ${container_images.tftpd}
               args: [ "--address", "0.0.0.0:69", "--verbose" ]
+              securityContext:
+                capabilities:
+                  add:
+                  - SYS_CHROOT
+                  - SETUID
+                  - SETGID
             volumes:
             - name: kea-share
               emptyDir: {}
