@@ -35,9 +35,9 @@ storage:
               - name: MINIO_SECRET_KEY
                 value: ${minio_password}
               - name: MINIO_ADDRESS
-                value: $(INTERNAL_IP):${minio_port}
+                value: 0.0.0.0:${minio_port}
               - name: MINIO_CONSOLE_ADDRESS
-                value: $(INTERNAL_IP):${minio_console_port}
+                value: 0.0.0.0:${minio_console_port}
               args:
               - server
               %{~ for i, volume_path in volume_paths ~}
