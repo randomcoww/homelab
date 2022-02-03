@@ -21,16 +21,15 @@ systemd:
 storage:
   files:
     # systemd-networkd defaults #
-    - path: /etc/systemd/network/90-default.network
+    - path: /etc/systemd/network/99-default.network
       mode: 0644
       contents:
         inline: |
           [Match]
-          Name=en*
+          Name=*
 
           [Link]
-          ARP=false
-          RequiredForOnline=false
+          Unmanaged=true
 
           [Network]
           LinkLocalAddressing=false

@@ -38,6 +38,9 @@ locals {
           mtu   = 9000
           vlans = ["sync", "wan"]
         }
+        wlan0 = {
+          mac = "b4-b5-b6-74-79-15"
+        }
       }
       disks = {
         pv = {
