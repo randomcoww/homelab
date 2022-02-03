@@ -14,6 +14,8 @@ storage:
           metadata:
             namespace: kube-system
             name: minio
+            labels:
+              app: minio
           spec:
             hostNetwork: true
             restartPolicy: Always

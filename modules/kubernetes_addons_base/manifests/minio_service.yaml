@@ -1,0 +1,19 @@
+---
+kind: Service
+apiVersion: v1
+metadata:
+  name: minio
+  namespace: kube-system
+  annotations:
+    external-dns.alpha.kubernetes.io/internal-hostname: minio.fuzzybunny.internal
+spec:
+  type: LoadBalancer
+  ports:
+  - name: api
+    port: 50256
+    protocol: TCP
+  - name: console
+    port: 50257
+    protocol: TCP
+  selector:
+    app: minio
