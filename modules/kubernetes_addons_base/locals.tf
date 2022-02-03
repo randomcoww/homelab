@@ -15,6 +15,9 @@ locals {
       metallb_subnet                        = var.metallb_subnet
       apiserver_ip                          = var.apiserver_ip
       apiserver_port                        = var.apiserver_port
+      kubernetes_minio_ip                   = var.kubernetes_minio_ip
+      minio_port                            = var.minio_port
+      minio_console_port                    = var.minio_console_port
     })
   }
 }

@@ -18,6 +18,12 @@ module "addons-base" {
   )
   metallb_network_prefix = local.networks.lan.prefix
   metallb_subnet         = local.kubernetes.metallb_subnet
+  kubernetes_minio_ip = cidrhost(
+    cidrsubnet(local.networks.lan.prefix, local.kubernetes.metallb_subnet.newbit, local.kubernetes.metallb_subnet.netnum),
+    local.kubernetes.metallb_minio_netnum
+  )
+  minio_port         = local.ports.minio
+  minio_console_port = local.ports.minio_console
 }
 
 locals {

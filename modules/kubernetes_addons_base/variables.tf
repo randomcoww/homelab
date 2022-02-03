@@ -46,6 +46,18 @@ variable "internal_dns_ip" {
   type = string
 }
 
+variable "kubernetes_minio_ip" {
+  type = string
+}
+
+variable "minio_port" {
+  type = number
+}
+
+variable "minio_console_port" {
+  type = number
+}
+
 variable "metallb_network_prefix" {
   type = string
 }

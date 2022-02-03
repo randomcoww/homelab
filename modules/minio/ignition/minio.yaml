@@ -33,9 +33,9 @@ storage:
                   fieldRef:
                     fieldPath: status.hostIP
               - name: MINIO_ACCESS_KEY
-                value: ${minio_user}
+                value: ${minio_credentials.access_key_id}
               - name: MINIO_SECRET_KEY
-                value: ${minio_password}
+                value: ${minio_credentials.secret_access_key}
               - name: MINIO_ADDRESS
                 value: 0.0.0.0:${minio_port}
               - name: MINIO_CONSOLE_ADDRESS

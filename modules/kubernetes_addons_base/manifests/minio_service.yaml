@@ -5,15 +5,16 @@ metadata:
   name: minio
   namespace: kube-system
   annotations:
-    external-dns.alpha.kubernetes.io/internal-hostname: minio.fuzzybunny.internal
+    external-dns.alpha.kubernetes.io/internal-hostname: minio.${kubernetes_cluster_domain}
 spec:
   type: LoadBalancer
+  loadBalancerIP: ${kubernetes_minio_ip}
   ports:
   - name: api
-    port: 50256
+    port: ${minio_port}
     protocol: TCP
   - name: console
-    port: 50257
+    port: ${minio_console_port}
     protocol: TCP
   selector:
     app: minio

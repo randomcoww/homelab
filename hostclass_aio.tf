@@ -1,3 +1,41 @@
+locals {
+  # host classes #
+  aio_hostclass_config = {
+    vrrp_netnum = 2
+    dhcp_server_subnet = {
+      newbit = 1
+      netnum = 1
+    }
+    hosts = {
+      aio-0 = merge(local.host_spec.server-laptop, {
+        hostname    = "aio-0.${local.domains.internal_mdns}"
+        kea_ha_role = "primary"
+        tap_interfaces = {
+          lan = {
+            source_interface_name = "br-wlan"
+            enable_mdns           = true
+            enable_netnum         = true
+            enable_vrrp_netnum    = true
+            enable_dhcp_server    = true
+            mtu                   = 9000
+          }
+          sync = {
+            source_interface_name = "phy0-sync"
+            enable_netnum         = true
+            enable_vrrp_netnum    = true
+            mtu                   = 9000
+          }
+          wan = {
+            source_interface_name = "phy0-wan"
+            enable_dhcp           = true
+            mac                   = "52-54-00-63-6e-b3"
+          }
+        }
+      })
+    }
+  }
+}
+
 # templates #
 module "template-aio-base" {
   for_each = local.aio_hostclass_config.hosts
@@ -32,7 +70,7 @@ module "template-aio-gateway" {
   kea_peers = [
     for host in concat(
       values(local.aio_hostclass_config.hosts),
-      values(local.router_hostclass_config.hosts),
+      values(local.client_hostclass_config.hosts),
     ) :
     {
       name   = host.hostname
@@ -177,6 +215,10 @@ module "template-aio-minio" {
   minio_console_port       = local.ports.minio_console
   volume_paths             = each.value.minio_volume_paths
   static_pod_manifest_path = local.kubernetes.static_pod_manifest_path
+  minio_credentials = {
+    access_key_id     = random_password.minio-access-key-id.result
+    secret_access_key = random_password.minio-secret-access-key.result
+  }
 }
 
 module "template-aio-hostapd" {
@@ -191,8 +233,8 @@ module "template-aio-hostapd" {
   hostapd_container_image  = local.container_images.hostapd
   static_pod_manifest_path = local.kubernetes.static_pod_manifest_path
   bssid                    = replace(each.value.hardware_interfaces.wlan0.mac, "-", ":")
-  hostapd_mobility_domain  = random_id.hostapd_mobility_domain.hex
-  hostapd_encryption_key   = random_id.hostapd_encryption_key.hex
+  hostapd_mobility_domain  = random_id.hostapd-mobility-domain.hex
+  hostapd_encryption_key   = random_id.hostapd-encryption-key.hex
   hostapd_roaming_members = [
     for host in values(local.aio_hostclass_config.hosts) :
     {
@@ -234,14 +276,4 @@ resource "local_file" "aio" {
 
   content  = data.ct_config.aio[each.key].rendered
   filename = "./output/ignition/${each.key}.ign"
-}
-
-output "minio_credentials" {
-  value = {
-    for host_key, host in local.aio_hostclass_config.hosts :
-    host_key => {
-      for k, v in module.template-aio-minio[host_key].minio_credentials :
-      k => nonsensitive(v)
-    }
-  }
 }

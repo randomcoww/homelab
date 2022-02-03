@@ -12,6 +12,7 @@ locals {
     }
     metallb_external_dns_netnum = 1
     metallb_pxeboot_netnum      = 2
+    metallb_minio_netnum        = 3
   }
 
   container_images = {

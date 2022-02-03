@@ -1,6 +1,6 @@
 provider "matchbox" {
-  endpoint    = local.provider.endpoint
-  client_cert = local.provider.cert_pem
-  client_key  = local.provider.key_pem
-  ca          = local.provider.ca_pem
+  endpoint    = local.matchbox_api_endpoint
+  client_cert = file("output/certs/matchbox-cert.pem")
+  client_key  = file("output/certs/matchbox-key.pem")
+  ca          = file("output/certs/matchbox-ca.pem")
 }
