@@ -8,10 +8,7 @@ locals {
           lan = {
             source_interface_name = "phy0"
             enable_mdns           = true
-            enable_netnum         = true
-            enable_vrrp_netnum    = true
-            enable_dhcp_server    = true
-            mtu                   = 9000
+            enable_dhcp           = true
           }
         }
       })
@@ -43,33 +40,6 @@ module "template-client-disks" {
 
   source = "./modules/disks"
   disks  = each.value.disks
-}
-
-module "template-client-ssh_server" {
-  for_each = local.client_hostclass_config.hosts
-
-  source     = "./modules/ssh_server"
-  key_id     = each.value.hostname
-  user_names = [local.users.admin.name]
-  valid_principals = compact(concat([each.value.hostname, "127.0.0.1"], flatten([
-    for interface in values(module.template-client-server[each.key].interfaces) :
-    try(cidrhost(interface.prefix, each.value.netnum), null)
-    if lookup(interface, "enable_netnum", false)
-  ])))
-  ssh_ca = module.ssh-server-common.ca.ssh
-}
-
-module "template-client-hypervisor" {
-  for_each = local.client_hostclass_config.hosts
-
-  source    = "./modules/hypervisor"
-  dns_names = [each.value.hostname]
-  ip_addresses = compact(concat(["127.0.0.1"], flatten([
-    for interface in values(module.template-client-server[each.key].interfaces) :
-    try(cidrhost(interface.prefix, each.value.netnum), null)
-    if lookup(interface, "enable_netnum", false)
-  ])))
-  libvirt_ca = module.hypervisor-common.ca.libvirt
 }
 
 # kubernetes #
@@ -119,6 +89,7 @@ EOT
   strict  = true
   snippets = concat(
     module.template-client-base[each.key].ignition_snippets,
+    module.template-client-server[each.key].ignition_snippets,
     module.template-client-disks[each.key].ignition_snippets,
     module.template-client-kubelet[each.key].ignition_snippets,
     module.template-client-worker[each.key].ignition_snippets,
