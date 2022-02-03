@@ -15,6 +15,19 @@ locals {
         path = "${local.certs_path}/kubernetes-${cert_name}.pem"
       })
     }
+    addons_manager = {
+      for cert_name, cert in merge(var.kubernetes_common_certs, {
+        cert = {
+          content = tls_locally_signed_cert.addons-manager.cert_pem
+        }
+        key = {
+          content = tls_private_key.addons-manager.private_key_pem
+        }
+      }) :
+      cert_name => merge(cert, {
+        path = "${local.certs_path}/addons-manager-${cert_name}.pem"
+      })
+    }
     etcd = {
       for cert_name, cert in var.etcd_common_certs :
       cert_name => merge(cert, {
@@ -22,6 +35,27 @@ locals {
       })
     }
   }
+
+  addons_resource_whitelist = [
+    "core/v1/ConfigMap",
+    "core/v1/Endpoints",
+    "core/v1/Namespace",
+    "core/v1/PersistentVolumeClaim",
+    "core/v1/PersistentVolume",
+    "core/v1/Pod",
+    "core/v1/ReplicationController",
+    "core/v1/Secret",
+    "core/v1/Service",
+    "batch/v1/Job",
+    "batch/v1/CronJob",
+    "apps/v1/DaemonSet",
+    "apps/v1/Deployment",
+    "apps/v1/ReplicaSet",
+    "apps/v1/StatefulSet",
+    "networking.k8s.io/v1/IngressClass",
+    "networking.k8s.io/v1/NetworkPolicy",
+    "apiextensions.k8s.io/v1/CustomResourceDefinition",
+  ]
 
   module_ignition_snippets = [
     for f in fileset(".", "${path.module}/ignition/*.yaml") :
@@ -32,6 +66,7 @@ locals {
       network_prefix   = var.network_prefix
       host_netnum      = var.host_netnum
       vip_netnum       = var.vip_netnum
+      config_path      = "/var/lib/kubernetes/config"
 
       # controller #
       cluster_name                      = var.kubernetes_cluster_name
@@ -46,7 +81,11 @@ locals {
       encryption_config_secret          = var.encryption_config_secret
       static_pod_manifest_path          = var.static_pod_manifest_path
       certs_path                        = local.certs_path
-      config_path                       = "/var/lib/kubernetes/config"
+
+      # addon manager #
+      addons_resource_whitelist = local.addons_resource_whitelist
+      addons_manager_certs      = local.certs.addons_manager
+      addon_manifests_path      = var.addon_manifests_path
     })
   ]
 }

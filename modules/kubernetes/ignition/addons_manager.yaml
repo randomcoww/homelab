@@ -48,7 +48,7 @@ storage:
               - name: ADDON_MANAGER_LEADER_ELECTION
                 value: "false"
               - name: ADDON_PATH
-                value: ${kubernetes_addons_path}
+                value: ${addon_manifests_path}
               - name: KUBECTL_OPTS
                 value: "--kubeconfig=${config_path}/kube-addons-manager.kubeconfig"
               - name: KUBECTL_PRUNE_WHITELIST_OVERRIDE
@@ -61,7 +61,7 @@ storage:
               - cluster-addons-bootstrap
               volumeMounts:
               - name: addons-path
-                mountPath: "${kubernetes_addons_path}"
+                mountPath: "${addon_manifests_path}"
                 readOnly: true
               - name: config-volume
                 mountPath: "${config_path}"
@@ -72,7 +72,7 @@ storage:
             volumes:
             - name: addons-path
               hostPath:
-                path: "${kubernetes_addons_path}"
+                path: "${addon_manifests_path}"
             - name: config-volume
               hostPath:
                 path: "${config_path}"
@@ -86,12 +86,4 @@ storage:
       mode: 0644
       contents:
         inline: "${replace(cert.content, "\n", "\\n")}"
-    %{~ endfor ~}
-
-    %{~ for file_name, manifest_content in addon_manifests ~}
-    - path: ${kubernetes_addons_path}/${file_name}
-      mode: 0644
-      contents:
-        inline: |-
-          ${indent(10, manifest_content)}
     %{~ endfor ~}

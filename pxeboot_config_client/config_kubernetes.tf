@@ -1,0 +1,1 @@
+../config_kubernetes.tf

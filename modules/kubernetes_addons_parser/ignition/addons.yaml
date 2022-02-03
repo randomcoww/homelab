@@ -1,0 +1,12 @@
+---
+variant: fcos
+version: 1.4.0
+storage:
+  files:
+    %{~ for file_name, manifest_content in addon_manifests ~}
+    - path: ${addon_manifests_path}/${file_name}
+      mode: 0644
+      contents:
+        inline: |-
+          ${indent(10, manifest_content)}
+    %{~ endfor ~}

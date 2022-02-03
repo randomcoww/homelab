@@ -2,7 +2,7 @@
 
 ### Provisioning
 
-#### Setup tw (terraform wrapper) command
+Define the `tw` (terraform wrapper) command
 
 ```bash
 tw() {
@@ -20,16 +20,16 @@ tw() {
 
 ### Define secrets
 
-#### Generate SSH key as needed
+Generate new SSH key (as needed)
 
-```
+```bash
 KEY=$HOME/.ssh/id_ecdsa
 ssh-keygen -q -t ecdsa -N '' -f $KEY 2>/dev/null <<< y >/dev/null
 ```
 
-#### Update secrets file
+Create `secrets.tfvars` file
 
-```
+```bash
 KEY=$HOME/.ssh/id_ecdsa
 cat > secrets.tfvars <<EOF
 users = {
@@ -49,48 +49,57 @@ ssh_client = {
 EOF
 ```
 
-### Run
+### Create bootable image for the server
 
-```
+Generate a CoreOS ignition file
+
+```bash
 tw terraform apply -var-file=secrets.tfvars
 ```
 
-### Sign local SSH key
+[Generate the server image and embed the ignition file](https://github.com/randomcoww/fedora-coreos-config-custom/blob/master/builds/server/README.md)
 
-```
-KEY=$HOME/.ssh/id_ecdsa
-tw terraform output -raw ssh_client_cert_authorized_key > $KEY-cert.pub
-```
+### Access kubernetes
 
-#### Hit libvirt over SSH
+Write admin kubeconfig
 
-```
-virsh -c qemu+ssh://fcos@hypervisor-0.local/system list --all
-```
-
-### Write admin kubeconfig
-
-```
+```bash
 mkdir -p ~/.kube && \
   tw terraform output -raw kubeconfig_admin > ~/.kube/config
 ```
 
-### Cleanup
+### Create PXE boot entry for client device
+
+This should work once `pxeboot-*` and `metallb` pods are running
+
+```bash
+kubectl get pod -A
+```
+
+```bash
+tw terraform -chdir=pxeboot_config_client apply
+```
+
+### Sign SSH key for SSH access to server
+
+```bash
+KEY=$HOME/.ssh/id_ecdsa
+tw terraform output -raw ssh_client_cert_authorized_key > $KEY-cert.pub
+```
+
+Libvirt is also accessible via SSH (TODO: Try KubeVirt)
+
+```bash
+virsh -c qemu+ssh://fcos@aio-0.local/system list --all
+```
+
+### Cleanup terraform file formatting for checkin
 
 ```
 tw find . -name '*.tf' -exec terraform fmt '{}' \;
 ```
 
-### Hypervisor
-
-TODO: Try KubeVirt
-
-```
-virsh -c qemu+ssh://fcos@aio-0.local/system list --all
-
-```
-
-### Image build
+### Build terrafrom wrapper image
 
 ```
 TF_VERSION=1.1.2

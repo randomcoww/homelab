@@ -1,6 +1,6 @@
 locals {
   host_spec = {
-    server-laptop = {
+    aio-0 = {
       hardware_interfaces = {
         phy0 = {
           mac   = "8c-8c-aa-e3-58-62"
@@ -50,7 +50,7 @@ locals {
       container_storage_path = "/var/pv/containers"
     }
 
-    server-supermicro = {
+    router-0 = {
       hardware_interfaces = {
         phy0 = {
           mac = "3c-fd-fe-b2-47-68"
@@ -97,7 +97,7 @@ locals {
       container_storage_path = "/var/lib/containers"
     }
 
-    client-ws = {
+    client-0 = {
       hardware_interfaces = {
         lan = {
           mac = "84-a9-38-0f-aa-76"
@@ -123,6 +123,45 @@ locals {
         "/var/home/minio"
       ]
       container_storage_path = "/var/home/containers"
+    }
+  }
+
+  # host classes #
+  aio_hostclass_config = {
+    vrrp_netnum = 2
+    dhcp_server_subnet = {
+      newbit = 1
+      netnum = 1
+    }
+    hosts = {
+      aio-0 = merge(local.host_spec.aio-0, {
+        hostname    = "aio-0.${local.domains.internal_mdns}"
+        netnum      = 1
+        kea_ha_role = "primary"
+      })
+    }
+  }
+
+  client_hostclass_config = {
+    hosts = {
+      client-0 = merge(local.host_spec.client-0, {
+        hostname = "client-0.${local.domains.internal_mdns}"
+      })
+    }
+  }
+
+  router_hostclass_config = {
+    vrrp_netnum = 2
+    dhcp_server_subnet = {
+      newbit = 1
+      netnum = 1
+    }
+    hosts = {
+      router-0 = merge(local.host_spec.router-0, {
+        hostname    = "router-0.${local.domains.internal_mdns}"
+        netnum      = 3
+        kea_ha_role = "secondary"
+      })
     }
   }
 }

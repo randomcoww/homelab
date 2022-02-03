@@ -71,6 +71,10 @@ variable "static_pod_manifest_path" {
   default = "/var/lib/kubelet/manifests"
 }
 
+variable "addon_manifests_path" {
+  type = string
+}
+
 variable "controller_config_path" {
   type    = string
   default = "/etc/kubernetes"

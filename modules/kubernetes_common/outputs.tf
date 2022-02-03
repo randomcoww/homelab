@@ -15,11 +15,3 @@ output "certs" {
 output "encryption_config_secret" {
   value = base64encode(chomp(random_string.encryption-config-secret.result))
 }
-
-output "admin" {
-  value = {
-    ca_pem          = tls_self_signed_cert.kubernetes-ca.cert_pem
-    private_key_pem = tls_private_key.admin.private_key_pem
-    cert_pem        = tls_locally_signed_cert.admin.cert_pem
-  }
-}
