@@ -20,7 +20,7 @@ locals {
     "nvidia.NVreg_RegistryDwords=EnableBrightnessControl=1",
   ]
 
-  matchbox_api_endpoint = "http://${local.matchbox_ip}:${local.ports.internal_pxeboot_api}"
+  matchbox_api_endpoint = "http://${local.matchbox_ip}:${local.ports.internal_pxeboot_http}"
   image_store_endpoint  = "http://${local.image_store_ip}:${local.ports.minio}"
   image_store_base_path = "boot"
   kernel_image_name     = "${local.client_image_name_base}-live-kernel-x86_64"
