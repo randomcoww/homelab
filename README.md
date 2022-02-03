@@ -57,7 +57,7 @@ Generate a CoreOS ignition file
 tw terraform apply -var-file=secrets.tfvars
 ```
 
-[Generate the server image and embed the ignition file](https://github.com/randomcoww/fedora-coreos-config-custom/blob/master/builds/server/README.md)
+[Generate the server image and embed the ignition file](https://github.com/randomcoww/fedora-coreos-config-custom)
 
 ### Access kubernetes
 
