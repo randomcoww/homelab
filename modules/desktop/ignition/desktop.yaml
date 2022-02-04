@@ -56,9 +56,6 @@ storage:
           pref("browser.warnOnQuit", false);
           // nuke bookmarks (works after first run)
           lockPref("browser.toolbars.bookmarks.visibility", "never");
-          // local sync
-          pref("services.sync.engine.passwords", false);
-          pref("services.sync.syncInterval", 30000);
           // disable as much disk cache as possible
           pref("browser.cache.disk.enable", false);
           pref("browser.cache.disk.smart_size.enabled", false);
@@ -147,6 +144,16 @@ storage:
 
           [org/gnome/system/location]
           enabled=true
+
+          [org/gnome/terminal/legacy/profiles:]
+          default='${gnome_terminal_profile_uuid}'
+
+          [org/gnome/terminal/legacy/profiles:/:${gnome_terminal_profile_uuid}]
+          background-color='rgb(0,0,0)'
+          bold-is-bright=true
+          foreground-color='rgb(255,255,255)'
+          palette=['rgb(46,52,54)', 'rgb(204,0,0)', 'rgb(78,154,6)', 'rgb(196,160,0)', 'rgb(52,101,164)', 'rgb(117,80,123)', 'rgb(6,152,154)', 'rgb(211,215,207)', 'rgb(85,87,83)', 'rgb(239,41,41)', 'rgb(138,226,52)', 'rgb(252,233,79)', 'rgb(114,159,207)', 'rgb(173,127,168)', 'rgb(52,226,226)', 'rgb(238,238,236)']
+          visible-name='default'
 
     # misc configs #
     - path: /etc/tmux.conf
