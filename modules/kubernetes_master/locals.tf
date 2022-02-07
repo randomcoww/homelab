@@ -56,6 +56,8 @@ locals {
       certs_path               = local.certs_path
       certs                    = local.certs
       etcd_certs               = local.etcd_certs
+      container_images         = var.container_images
+      ports                    = var.ports
     }))
   ]
 }

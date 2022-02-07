@@ -31,10 +31,9 @@ output "template_params" {
     service_network = local.service_network
 
     apiserver_vip             = var.apiserver_vip
-    ports                     = var.ports
+    apiserver_port            = var.apiserver_port
     etcd_cluster_endpoints    = var.etcd_cluster_endpoints
     cluster_domain            = var.cluster_domain
-    container_images          = var.container_images
     encryption_config_secret  = base64encode(chomp(random_string.encryption-config-secret.result))
     addons_resource_whitelist = local.addons_resource_whitelist
   }

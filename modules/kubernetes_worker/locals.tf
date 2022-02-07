@@ -25,6 +25,7 @@ locals {
       config_path              = "/var/lib/kubelet/config"
       certs                    = local.certs
       kubelet_node_labels      = var.kubelet_node_labels
+      ports                    = var.ports
     }))
   ]
 }

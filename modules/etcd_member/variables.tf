@@ -14,14 +14,10 @@ variable "template_params" {
   type = any
 }
 
-variable "etcd_container_image" {
-  type = string
-}
-
-variable "etcd_wrapper_container_image" {
-  type = string
-}
-
 variable "static_pod_manifest_path" {
   type = string
+}
+
+variable "container_images" {
+  type = map(string)
 }

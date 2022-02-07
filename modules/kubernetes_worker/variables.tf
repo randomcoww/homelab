@@ -21,3 +21,7 @@ variable "container_storage_path" {
 variable "static_pod_manifest_path" {
   type = string
 }
+
+variable "ports" {
+  type = map(string)
+}

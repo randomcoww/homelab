@@ -56,14 +56,13 @@ module "ignition-kubelet-base" {
 module "ignition-etcd" {
   for_each = module.etcd-cluster.member_template_params
 
-  source                       = "./modules/etcd_member"
-  ca                           = module.etcd-cluster.ca
-  peer_ca                      = module.etcd-cluster.peer_ca
-  certs                        = module.etcd-cluster.certs
-  template_params              = each.value
-  etcd_container_image         = local.container_images.etcd
-  etcd_wrapper_container_image = local.container_images.etcd_wrapper
-  static_pod_manifest_path     = local.kubernetes.static_pod_manifest_path
+  source                   = "./modules/etcd_member"
+  ca                       = module.etcd-cluster.ca
+  peer_ca                  = module.etcd-cluster.peer_ca
+  certs                    = module.etcd-cluster.certs
+  template_params          = each.value
+  static_pod_manifest_path = local.kubernetes.static_pod_manifest_path
+  container_images         = local.container_images
 }
 
 module "ignition-kubernetes-master" {
@@ -82,6 +81,8 @@ module "ignition-kubernetes-master" {
   template_params          = module.kubernetes-common.template_params
   addon_manifests_path     = local.kubernetes.addon_manifests_path
   static_pod_manifest_path = local.kubernetes.static_pod_manifest_path
+  container_images         = local.container_images
+  ports                    = local.ports
 }
 
 module "ignition-kubernetes-worker" {
@@ -99,6 +100,7 @@ module "ignition-kubernetes-worker" {
   kubelet_node_labels      = {}
   container_storage_path   = each.value.container_storage_path
   static_pod_manifest_path = local.kubernetes.static_pod_manifest_path
+  ports                    = local.ports
 }
 
 module "ignition-hypervisor" {

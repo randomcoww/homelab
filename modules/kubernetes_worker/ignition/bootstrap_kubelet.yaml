@@ -92,7 +92,7 @@ storage:
           clusters:
           - cluster:
               certificate-authority: ${certs.ca_cert.path}
-              server: https://${apiserver_vip}:${ports.apiserver}
+              server: https://${apiserver_vip}:${apiserver_port}
             name: ${cluster_name}
           contexts:
           - context:

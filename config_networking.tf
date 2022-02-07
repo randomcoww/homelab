@@ -55,6 +55,10 @@ locals {
   })
 
   ports = {
+    apiserver             = 58081
+    controller_manager    = 50252
+    scheduler             = 50251
+    kubelet               = 50250
     kea_peer              = 58080
     etcd_client           = 58082
     etcd_peer             = 58083

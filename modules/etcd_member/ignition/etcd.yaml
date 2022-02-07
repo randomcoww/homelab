@@ -18,7 +18,7 @@ storage:
             restartPolicy: Always
             containers:
             - name: etcd-wrapper
-              image: ${etcd_wrapper_container_image}
+              image: ${container_images.etcd_wrapper}
               args:
               - "--name=$(NODE_NAME)"
               - "--host-cert-file=${certs.cert.path}"
@@ -36,7 +36,7 @@ storage:
               - "--etcd-servers=${join(",", cluster_endpoints)}"
               - "--host-backup-file=${backup_path}/${etcd_backup_file}"
               - "--host-etcd-manifest-file=${static_pod_manifest_path}/${etcd_manifest_file}"
-              - "--etcd-image=${etcd_container_image}"
+              - "--etcd-image=${container_images.etcd}"
               - "--client-cert-file=${certs.client_cert.path}"
               - "--client-key-file=${certs.client_key.path}"
               - "--s3-backup-path=${s3_backup_path}"

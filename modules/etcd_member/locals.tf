@@ -30,14 +30,13 @@ locals {
   module_ignition_snippets = [
     for f in fileset(".", "${path.module}/ignition/*.yaml") :
     templatefile(f, merge(var.template_params, {
-      static_pod_manifest_path     = var.static_pod_manifest_path
-      certs_path                   = local.certs_path
-      backup_path                  = "/var/lib/etcd/backup"
-      etcd_manifest_file           = "etcd.json"
-      etcd_backup_file             = "etcd.db"
-      certs                        = local.certs
-      etcd_container_image         = var.etcd_container_image
-      etcd_wrapper_container_image = var.etcd_wrapper_container_image
+      static_pod_manifest_path = var.static_pod_manifest_path
+      certs_path               = local.certs_path
+      backup_path              = "/var/lib/etcd/backup"
+      etcd_manifest_file       = "etcd.json"
+      etcd_backup_file         = "etcd.db"
+      certs                    = local.certs
+      container_images         = var.container_images
     }))
   ]
 }

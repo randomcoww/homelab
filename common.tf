@@ -1,7 +1,6 @@
 # etcd #
 module "etcd-cluster" {
-  source = "./modules/etcd_cluster"
-
+  source        = "./modules/etcd_cluster"
   cluster_token = "aio-prod-3"
   cluster_hosts = {
     for host_key in [
@@ -21,16 +20,15 @@ module "etcd-cluster" {
 
 # kubernetes #
 module "kubernetes-common" {
-  source = "./modules/kubernetes_common"
-
+  source                 = "./modules/kubernetes_common"
   cluster_name           = "aio-prod-3"
   apiserver_vip          = local.networks.lan.vips.vrrp
+  apiserver_port         = local.ports.apiserver
   etcd_cluster_endpoints = module.etcd-cluster.cluster_endpoints
 }
 
 module "kubernetes-admin" {
-  source = "./modules/kubernetes_admin"
-
+  source          = "./modules/kubernetes_admin"
   ca              = module.kubernetes-common.ca
   template_params = module.kubernetes-common.template_params
 }
@@ -68,7 +66,6 @@ module "hypervisor-common" {
 # hostapd #
 module "hostapd-common" {
   source = "./modules/hostapd_common"
-
   roaming_interfaces = {
     for host_key in [
       "aio-0",

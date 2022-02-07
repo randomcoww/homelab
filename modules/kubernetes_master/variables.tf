@@ -25,3 +25,11 @@ variable "addon_manifests_path" {
 variable "static_pod_manifest_path" {
   type = string
 }
+
+variable "container_images" {
+  type = map(string)
+}
+
+variable "ports" {
+  type = map(string)
+}
