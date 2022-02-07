@@ -1,0 +1,81 @@
+---
+variant: fcos
+version: 1.4.0
+storage:
+  files:
+    # controller #
+    - path: ${config_path}/kube-addons-manager.kubeconfig
+      mode: 0644
+      contents:
+        inline: |-
+          kind: Config
+          apiVersion: v1
+          clusters:
+          - cluster:
+              certificate-authority: ${certs.ca_cert.path}
+              server: https://127.0.0.1:${ports.apiserver}
+            name: ${cluster_name}
+          contexts:
+          - context:
+              cluster: ${cluster_name}
+              user: kube-addons-manager
+            name: default
+          current-context: default
+          preferences: {}
+          users:
+          - name: kube-addons-manager
+            user:
+              client-certificate: ${certs.addons_manager_cert.path}
+              client-key: ${certs.addons_manager_key.path}
+
+    - path: ${static_pod_manifest_path}/kube-addons-manager.yaml
+      mode: 0644
+      contents:
+        inline: |-
+          ---
+          kind: Pod
+          apiVersion: v1
+          metadata:
+            namespace: kube-system
+            name: kube-addons-manager
+          spec:
+            hostNetwork: true
+            restartPolicy: Always
+            containers:
+            - name: kube-addons-manager
+              image: ${container_images.kube_addons_manager}
+              env:
+              - name: ADDON_MANAGER_LEADER_ELECTION
+                value: "false"
+              - name: ADDON_PATH
+                value: ${addon_manifests_path}
+              - name: KUBECTL_OPTS
+                value: "--kubeconfig=${config_path}/kube-addons-manager.kubeconfig"
+              - name: KUBECTL_PRUNE_WHITELIST_OVERRIDE
+                value: "${join(" ", addons_resource_whitelist)}"
+              - name: HOSTNAME
+                valueFrom:
+                  fieldRef:
+                    fieldPath: spec.nodeName
+              command:
+              - cluster-addons-bootstrap
+              volumeMounts:
+              - name: addons-path
+                mountPath: "${addon_manifests_path}"
+                readOnly: true
+              - name: config-volume
+                mountPath: "${config_path}"
+                readOnly: true
+              - name: certs
+                mountPath: "${certs_path}"
+                readOnly: true
+            volumes:
+            - name: addons-path
+              hostPath:
+                path: "${addon_manifests_path}"
+            - name: config-volume
+              hostPath:
+                path: "${config_path}"
+            - name: certs
+              hostPath:
+                path: "${certs_path}"

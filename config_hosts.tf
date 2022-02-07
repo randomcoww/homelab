@@ -1,7 +1,8 @@
 locals {
-  host_spec = {
-    server-laptop = {
-      netnum = 1
+  base_hosts = {
+    aio-0 = {
+      vrrp_netnum = 2
+      netnum      = 1
       hardware_interfaces = {
         phy0 = {
           mac   = "8c-8c-aa-e3-58-62"
@@ -9,8 +10,36 @@ locals {
           vlans = ["sync", "wan"]
         }
         wlan0 = {
-          mac = "b4-0e-de-fb-28-95"
-          mtu = 9000
+          mac          = "b4-0e-de-fb-28-95"
+          mtu          = 9000
+          enable_4addr = true
+        }
+      }
+      bridge_interfaces = {
+        br-lan = {
+          interfaces = ["phy0", "wlan0"]
+          mtu        = 9000
+        }
+      }
+      tap_interfaces = {
+        lan = {
+          source_interface_name = "br-lan"
+          enable_mdns           = true
+          enable_netnum         = true
+          enable_vrrp_netnum    = true
+          enable_dhcp_server    = true
+          mtu                   = 9000
+        }
+        sync = {
+          source_interface_name = "phy0-sync"
+          enable_netnum         = true
+          enable_vrrp_netnum    = true
+          mtu                   = 9000
+        }
+        wan = {
+          source_interface_name = "phy0-wan"
+          enable_dhcp           = true
+          mac                   = "52-54-00-63-6e-b3"
         }
       }
       disks = {
@@ -30,7 +59,7 @@ locals {
       container_storage_path = "/var/pv/containers"
     }
 
-    client-laptop = {
+    client-0 = {
       netnum = 3
       hardware_interfaces = {
         phy0 = {
@@ -40,6 +69,20 @@ locals {
         }
         wlan0 = {
           mac = "b4-b5-b6-74-79-15"
+          mtu = 9000
+        }
+      }
+      bridge_interfaces = {
+        br-lan = {
+          interfaces = ["phy0"]
+          mtu        = 9000
+        }
+      }
+      tap_interfaces = {
+        lan = {
+          source_interface_name = "br-lan"
+          enable_mdns           = true
+          enable_dhcp           = true
         }
       }
       disks = {
@@ -59,7 +102,7 @@ locals {
       container_storage_path = "/var/home/containers"
     }
 
-    supermicro-server = {
+    store-0 = {
       netnum = 4
       hardware_interfaces = {
         phy0 = {
@@ -81,9 +124,13 @@ locals {
           mtu = 9000
         }
       }
-      disks                  = {}
-      volume_paths           = []
-      container_storage_path = "/var/lib/containers"
     }
+  }
+
+  hosts = {
+    for host_key, host in local.base_hosts :
+    host_key => merge(host, {
+      hostname = "${host_key}.${local.domains.internal_mdns}"
+    })
   }
 }

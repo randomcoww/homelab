@@ -1,18 +1,8 @@
 locals {
   kubernetes = {
-    cluster_name                     = "aio-prod-1"
-    service_network_dns_netnum       = 10
-    service_network_apiserver_netnum = 1
-    static_pod_manifest_path         = "/var/lib/kubelet/manifests"
-    addon_manifests_path             = "/var/lib/kubernetes/addons"
-
-    metallb_subnet = {
-      newbit = 2
-      netnum = 1
-    }
-    metallb_external_dns_netnum = 1
-    metallb_pxeboot_netnum      = 2
-    metallb_minio_netnum        = 3
+    cluster_name             = "aio-prod-1"
+    static_pod_manifest_path = "/var/lib/kubelet/manifests"
+    addon_manifests_path     = "/var/lib/kubernetes/addons"
   }
 
   container_images = {

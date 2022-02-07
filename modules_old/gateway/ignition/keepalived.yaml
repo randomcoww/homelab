@@ -1,0 +1,95 @@
+---
+variant: fcos
+version: 1.4.0
+systemd:
+  units:
+    - name: keepalived.service
+      enabled: true
+      dropins:
+        # Part of networkd:
+        # Adds the policy route for WAN back in on networkd restart
+        - name: 10-dependency.conf
+          contents: |
+            [Unit]
+            PartOf=systemd-networkd.service
+
+            [Service]
+            EnvironmentFile=
+            Environment=KEEPALIVED_OPTIONS="-D -P"
+            Restart=always
+            RestartSec=3
+
+storage:
+  files:
+    - path: /etc/keepalived/keepalived.conf
+      mode: 0644
+      overwrite: true
+      contents:
+        inline: |-
+          global_defs {
+            vrrp_version 3
+            nftables keepalived
+            dynamic_interfaces allow_if_changes
+            max_auto_priority -1
+          }
+          vrrp_instance gateway {
+            nopreempt
+            state BACKUP
+            advert_int 0.1
+            virtual_router_id ${vrrp_netnum % 255}
+            interface ${interfaces.sync.interface_name}
+            priority 250
+            garp_master_refresh 1
+            dont_track_primary
+            track_interface {
+              ${interfaces.wan.interface_name}
+            }
+            virtual_ipaddress {
+              %{~ for network_name, interface in interfaces ~}
+              %{~ if lookup(interface.vips, "vrrp", false) ~}
+              ${interface.vips.vrrp} dev ${interface.interface_name} use_vmac
+              %{~ endif ~}
+              %{~ endfor ~}
+              0.0.0.0 dev ${interfaces.wan.interface_name}
+            }
+            virtual_rules {
+              to all lookup ${vrrp_master_default_route.table_id} priority ${vrrp_master_default_route.table_priority}
+            }
+          }
+
+    # Create fallback route so backup node can access the internet through the wan interface
+    - path: /etc/systemd/network/20-${interfaces.wan.interface_name}.network.d/20-master-default-route.conf
+      mode: 0644
+      contents:
+        inline: |
+          [Link]
+          RequiredForOnline=false
+
+          [DHCP]
+          Anonymize=true
+          # Needed to request IP on each gateway
+          RequestBroadcast=true
+          UseMTU=true
+          UseDNS=false
+          UseNTP=false
+          SendHostname=false
+          UseHostname=false
+          UseDomains=false
+          UseTimezone=false
+          ClientIdentifier=mac
+          RouteTable=${vrrp_master_default_route.table_id}
+
+    - path: /etc/systemd/network/20-${interfaces.sync.interface_name}.network.d/20-slave-default-route.conf
+      mode: 0644
+      contents:
+        inline: |
+          [Route]
+          Scope=global
+          GatewayOnLink=true
+          Gateway=${cidrhost(interfaces.sync.prefix, vrrp_netnum)}
+          Destination=0.0.0.0/0
+          Table=${vrrp_slave_default_route.table_id}
+
+          [RoutingPolicyRule]
+          Table=${vrrp_slave_default_route.table_id}
+          Priority=${vrrp_slave_default_route.table_priority}

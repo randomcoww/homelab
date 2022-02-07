@@ -1,0 +1,88 @@
+
+
+---
+variant: fcos
+version: 1.4.0
+storage:
+  files:
+    # scheduler #
+    - path: ${config_path}/kube-scheduler.yaml
+      mode: 0644
+      contents:
+        inline: |-
+          kind: KubeSchedulerConfiguration
+          apiVersion: kubescheduler.config.k8s.io/v1beta1
+          clientConnection:
+            kubeconfig: "${config_path}/kube-scheduler.kubeconfig"
+          leaderElection:
+            leaderElect: true
+
+    - path: ${config_path}/kube-scheduler.kubeconfig
+      mode: 0644
+      contents:
+        inline: |-
+          kind: Config
+          apiVersion: v1
+          clusters:
+          - cluster:
+              certificate-authority: ${certs.ca_cert.path}
+              server: https://127.0.0.1:${ports.apiserver}
+            name: ${cluster_name}
+          contexts:
+          - context:
+              cluster: ${cluster_name}
+              user: system:kube-scheduler
+            name: default
+          current-context: default
+          preferences: {}
+          users:
+          - name: system:kube-scheduler
+            user:
+              client-certificate: ${certs.scheduler_cert.path}
+              client-key: ${certs.scheduler_key.path}
+
+    - path: ${static_pod_manifest_path}/kube-scheduler.yaml
+      mode: 0644
+      contents:
+        inline: |-
+          ---
+          kind: Pod
+          apiVersion: v1
+          metadata:
+            namespace: kube-system
+            name: kube-scheduler
+          spec:
+            restartPolicy: Always
+            hostNetwork: true
+            containers:
+            - name: kube-scheduler
+              image: ${container_images.kube_scheduler}
+              command:
+              - kube-scheduler
+              - "--config=${config_path}/kube-scheduler.yaml"
+              - "--secure-port=${ports.scheduler}"
+              - "--bind-address=0.0.0.0"
+              - "--v=2"
+              livenessProbe:
+                httpGet:
+                  scheme: HTTPS
+                  host: 127.0.0.1
+                  port: ${ports.scheduler}
+                  path: "/healthz"
+                initialDelaySeconds: 15
+                timeoutSeconds: 15
+              volumeMounts:
+              - name: config-volume
+                mountPath: "${config_path}"
+                readOnly: true
+              - name: certs
+                mountPath: "${certs_path}"
+                readOnly: true
+            volumes:
+            - name: config-volume
+              hostPath:
+                path: "${config_path}"
+            - name: certs
+              hostPath:
+                path: "${certs_path}"
+                

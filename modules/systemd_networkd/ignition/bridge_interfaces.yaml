@@ -1,0 +1,66 @@
+---
+variant: fcos
+version: 1.4.0
+systemd:
+  units:
+    # Try enabling 4addr in case this is a wifi interface
+    # Allow failure for wired interface
+    - name: hostapd-4addr.service
+      enabled: true
+      contents: |
+        [Unit]
+        Before=systemd-networkd.service
+        WantedBy=systemd-networkd.service
+
+        [Service]
+        Type=oneshot
+        %{~ for interface in distinct(flatten([
+          for bridge_interface in values(bridge_interfaces) :
+          bridge_interface.interfaces
+        ])) ~}
+        ExecStart=-/usr/sbin/iw dev ${interface} set 4addr on
+        %{~ endfor ~}
+        RemainAfterExit=yes
+
+        [Install]
+        WantedBy=multi-user.target
+
+storage:
+  files:
+    %{~ for bridge_interface_name, bridge_interface in bridge_interfaces ~}
+    %{~ for port_interface_name in bridge_interface.interfaces ~}
+    # For bridging to wired NIC e.g. wlan0
+    - path: /etc/systemd/network/20-${port_interface_name}.network.d/10-bridge.conf
+      mode: 0644
+      contents:
+        inline: |
+          [Network]
+          Bridge=${bridge_interface_name}
+    %{~ endfor ~}
+
+    # Bridge them together e.g. br-wlan
+    # This interface will have a macvtap created with IP for gateway and DHCP
+    - path: /etc/systemd/network/12-${bridge_interface_name}.netdev
+      mode: 0644
+      contents:
+        inline: |
+          [NetDev]
+          Name=${bridge_interface_name}
+          Kind=bridge
+    - path: /etc/systemd/network/20-${bridge_interface_name}.network
+      mode: 0644
+      contents:
+        inline: |
+          [Match]
+          Virtualization=!vm
+          Virtualization=!container
+          Name=${bridge_interface_name}
+
+          [Link]
+          ARP=false
+          MTUBytes=${lookup(bridge_interface, "mtu", 1500)}
+
+          [Network]
+          LinkLocalAddressing=false
+          DHCP=false
+    %{~ endfor ~}

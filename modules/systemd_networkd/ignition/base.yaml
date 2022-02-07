@@ -1,0 +1,51 @@
+---
+variant: fcos
+version: 1.4.0
+systemd:
+  units:
+    # systemd-networkd work around "could not connect to dbus: permission denied"
+    - name: systemd-networkd.service
+      enabled: true
+      dropins:
+        - name: 10-dependencies.conf
+          contents: |
+            [Unit]
+            After=dbus.socket
+    - name: systemd-networkd-wait-online.service
+      enabled: true
+    - name: NetworkManager.service
+      mask: true
+    - name: NetworkManager-wait-online.service
+      mask: true
+
+storage:
+  files:
+    - path: /etc/sysctl.d/99-wlan-bridge.conf
+      mode: 0644
+      contents:
+        inline: |
+          net.bridge.bridge-nf-call-iptables=0
+          net.bridge.bridge-nf-call-ip6tables=0
+
+    # systemd-networkd defaults #
+    - path: /etc/systemd/network/99-default.network
+      mode: 0644
+      contents:
+        inline: |
+          [Match]
+          Name=*
+
+          [Link]
+          Unmanaged=true
+
+          [Network]
+          LinkLocalAddressing=false
+          DHCP=false
+    # ignore lid operations for running as server on laptop
+    - path: /etc/systemd/logind.conf.d/10-ignore-lid-switch.conf
+      contents:
+        inline: |-
+          [Login]
+          HandleLidSwitch=ignore
+          HandleLidSwitchExternalPower=ignore
+          HandleLidSwitchDocked=ignore

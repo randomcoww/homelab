@@ -80,6 +80,13 @@ kubectl get pod -A
 tw terraform -chdir=pxeboot_config_client apply
 ```
 
+### Write minio config
+
+```
+mkdir -p ~/.mc && \
+  tw terraform output -raw minio_config > ~/.mc/config.json
+```
+
 ### Sign SSH key for SSH access to server
 
 ```bash

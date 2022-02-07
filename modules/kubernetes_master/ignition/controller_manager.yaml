@@ -1,0 +1,84 @@
+---
+variant: fcos
+version: 1.4.0
+storage:
+  files:
+    # controller #
+    - path: ${config_path}/kube-controller-manager.kubeconfig
+      mode: 0644
+      contents:
+        inline: |-
+          kind: Config
+          apiVersion: v1
+          clusters:
+          - cluster:
+              certificate-authority: ${certs.ca_cert.path}
+              server: https://127.0.0.1:${ports.apiserver}
+            name: ${cluster_name}
+          contexts:
+          - context:
+              cluster: ${cluster_name}
+              user: system:kube-controller-manager
+            name: default
+          current-context: default
+          preferences: {}
+          users:
+          - name: system:kube-controller-manager
+            user:
+              client-certificate: ${certs.controller_manager_cert.path}
+              client-key: ${certs.controller_manager_key.path}
+
+    - path: ${static_pod_manifest_path}/kube-controller-manager.yaml
+      mode: 0644
+      contents:
+        inline: |-
+          ---
+          kind: Pod
+          apiVersion: v1
+          metadata:
+            namespace: kube-system
+            name: kube-controller-manager
+          spec:
+            hostNetwork: true
+            restartPolicy: Always
+            containers:
+            - name: kube-controller-manager
+              image: ${container_images.kube_controller_manager}
+              command:
+              - kube-controller-manager
+              - "--allocate-node-cidrs=true"
+              - "--bind-address=0.0.0.0"
+              - "--cluster-cidr=${pod_network.prefix}"
+              - "--cluster-name=${cluster_name}"
+              - "--cluster-signing-cert-file=${certs.ca_cert.path}"
+              - "--cluster-signing-key-file=${certs.ca_key.path}"
+              - "--kubeconfig=${config_path}/kube-controller-manager.kubeconfig"
+              - "--leader-elect=true"
+              - "--root-ca-file=${certs.ca_cert.path}"
+              - "--service-account-private-key-file=${certs.service_account_key.path}"
+              - "--service-cluster-ip-range=${service_network.prefix}"
+              - "--use-service-account-credentials=true"
+              - "--secure-port=${ports.controller_manager}"
+              - "--v=2"
+              volumeMounts:
+              - name: config-volume
+                mountPath: "${config_path}"
+                readOnly: true
+              - name: certs
+                mountPath: "${certs_path}"
+                readOnly: true
+              livenessProbe:
+                httpGet:
+                  scheme: HTTPS
+                  host: 127.0.0.1
+                  port: ${ports.controller_manager}
+                  path: "/healthz"
+                initialDelaySeconds: 15
+                timeoutSeconds: 15
+            volumes:
+            - name: config-volume
+              hostPath:
+                path: "${config_path}"
+            - name: certs
+              hostPath:
+                path: "${certs_path}"
