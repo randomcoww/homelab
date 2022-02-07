@@ -18,6 +18,7 @@ module "etcd-cluster" {
   s3_backup_bucket = "randomcoww-etcd-backup"
 }
 
+
 # kubernetes #
 module "kubernetes-common" {
   source = "./modules/kubernetes_common"
@@ -26,6 +27,18 @@ module "kubernetes-common" {
   apiserver_vip          = local.networks.lan.vips.vrrp
   etcd_cluster_endpoints = module.etcd-cluster.cluster_endpoints
 }
+
+module "kubernetes-admin" {
+  source = "./modules/kubernetes_admin"
+
+  ca              = module.kubernetes-common.ca
+  template_params = module.kubernetes-common.template_params
+}
+
+output "admin_kubeconfig" {
+  value = nonsensitive(module.kubernetes-admin.kubeconfig)
+}
+
 
 # ssh #
 module "ssh-common" {
@@ -41,10 +54,16 @@ module "ssh-client" {
   ca                    = module.ssh-common.ca
 }
 
+output "ssh_client_cert_authorized_key" {
+  value = module.ssh-client.ssh_client_cert_authorized_key
+}
+
+
 # libvirt #
 module "hypervisor-common" {
   source = "./modules/hypervisor_common"
 }
+
 
 # hostapd #
 module "hostapd-common" {
@@ -105,34 +124,6 @@ module "hostapd-common" {
 #     local.kubernetes.metallb_pxeboot_netnum
 #   )}:${local.ports.internal_pxeboot_http}/boot.ipxe"
 #   static_pod_manifest_path = local.kubernetes.static_pod_manifest_path
-# }
-
-
-
-
-
-# module "ignition-kubernetes-worker" {
-#   for_each = {
-#     for host_key in [
-#       "aio-0",
-#       "client-0",
-#     ] :
-#     host_key => local.hosts[host_key]
-#   }
-
-#   source                                = "./modules/worker"
-#   container_images                      = local.container_images
-#   common_certs                          = module.kubernetes-common.certs
-#   apiserver_ip                          = "127.0.0.1"
-#   apiserver_port                        = local.ports.apiserver
-#   kubelet_port                          = local.ports.kubelet
-#   kubernetes_cluster_name               = local.kubernetes.cluster_name
-#   kubernetes_cluster_domain             = local.domains.kubernetes
-#   kubernetes_service_network_prefix     = local.networks.kubernetes_service.prefix
-#   kubernetes_service_network_dns_netnum = local.kubernetes.service_network_dns_netnum
-#   kubelet_node_labels                   = {}
-#   static_pod_manifest_path              = local.kubernetes.static_pod_manifest_path
-#   container_storage_path                = each.value.container_storage_path
 # }
 
 # module "ignition-minio" {

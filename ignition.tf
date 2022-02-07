@@ -143,7 +143,6 @@ module "ignition-hostapd" {
 }
 
 
-
 # combine and render a single ignition file #
 data "ct_config" "ignition" {
   for_each = {
@@ -156,13 +155,12 @@ data "ct_config" "ignition" {
       try(module.ignition-etcd[host_key].ignition_snippets, []),
       try(module.ignition-kubernetes-master[host_key].ignition_snippets, []),
       try(module.ignition-kubernetes-worker[host_key].ignition_snippets, []),
+      try(module.ignition-ssh-server[host_key].ignition_snippets, []),
       try(module.ignition-hypervisor[host_key].ignition_snippets, []),
       try(module.ignition-hostapd[host_key].ignition_snippets, []),
 
       # try(module.ignition-gateway[host_key].ignition_snippets, []),
-      # try(module.ignition-hostapd[host_key].ignition_snippets, []),
       # try(module.ignition-minio[host_key].ignition_snippets, []),
-      # try(module.ignition-ssh-server[host_key].ignition_snippets, []),
     ])
   }
   content  = <<EOT
