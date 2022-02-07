@@ -4,25 +4,25 @@ locals {
     {
       name = user_name
       ssh_authorized_keys = [
-        "cert-authority ${chomp(var.ssh_ca.public_key_openssh)}"
+        "cert-authority ${chomp(var.ca.public_key_openssh)}"
       ]
     }
   ]
 
   certs = {
     ca_authorized_key = {
-      content = var.ssh_ca.public_key_openssh
+      content = var.ca.public_key_openssh
     }
     server_private_key = {
-      path    = "/etc/ssh/ssh_host_${lower(var.ssh_ca.algorithm)}_key"
+      path    = "/etc/ssh/ssh_host_${lower(var.ca.algorithm)}_key"
       content = tls_private_key.ssh-host.private_key_pem
     }
     server_public_key = {
-      path    = "/etc/ssh/ssh_host_${lower(var.ssh_ca.algorithm)}_key.pub"
+      path    = "/etc/ssh/ssh_host_${lower(var.ca.algorithm)}_key.pub"
       content = tls_private_key.ssh-host.public_key_openssh
     }
     server_certificate = {
-      path    = "/etc/ssh/ssh_host_${lower(var.ssh_ca.algorithm)}_key-cert.pub"
+      path    = "/etc/ssh/ssh_host_${lower(var.ca.algorithm)}_key-cert.pub"
       content = ssh_host_cert.ssh-host.cert_authorized_key
     }
   }

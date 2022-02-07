@@ -1,9 +1,8 @@
-variable "user_names" {
-  type    = list(string)
-  default = []
+variable "key_id" {
+  type = string
 }
 
-variable "key_id" {
+variable "public_key_openssh" {
   type = string
 }
 
@@ -22,7 +21,7 @@ variable "validity_period_hours" {
   default = 8760
 }
 
-variable "ssh_ca" {
+variable "ca" {
   type = object({
     algorithm          = string
     private_key_pem    = string

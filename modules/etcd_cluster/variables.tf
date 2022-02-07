@@ -4,7 +4,7 @@ variable "cluster_token" {
 }
 
 variable "cluster_hosts" {
-  type = list(object({
+  type = map(object({
     hostname    = string
     ip          = string
     client_port = number

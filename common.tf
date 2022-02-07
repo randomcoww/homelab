@@ -1,22 +1,24 @@
+# etcd #
 module "etcd-cluster" {
   source = "./modules/etcd_cluster"
 
   cluster_token = "aio-prod-3"
-  cluster_hosts = [
+  cluster_hosts = {
     for host_key in [
       "aio-0",
     ] :
-    {
+    host_key => {
       hostname    = local.hosts[host_key].hostname
       ip          = cidrhost(local.networks.lan.prefix, local.hosts[host_key].netnum)
       client_port = local.ports.etcd_client
       peer_port   = local.ports.etcd_peer
     }
-  ]
+  }
   aws_region       = "us-west-2"
   s3_backup_bucket = "randomcoww-etcd-backup"
 }
 
+# kubernetes #
 module "kubernetes-common" {
   source = "./modules/kubernetes_common"
 
@@ -25,9 +27,43 @@ module "kubernetes-common" {
   etcd_cluster_endpoints = module.etcd-cluster.cluster_endpoints
 }
 
+# ssh #
+module "ssh-common" {
+  source = "./modules/ssh_common"
+}
+
+module "ssh-client" {
+  source                = "./modules/ssh_client"
+  key_id                = var.ssh_client.key_id
+  public_key_openssh    = var.ssh_client.public_key
+  early_renewal_hours   = var.ssh_client.early_renewal_hours
+  validity_period_hours = var.ssh_client.validity_period_hours
+  ca                    = module.ssh-common.ca
+}
+
+# libvirt #
 module "hypervisor-common" {
   source = "./modules/hypervisor_common"
 }
+
+# hostapd #
+module "hostapd-common" {
+  source = "./modules/hostapd_common"
+
+  roaming_interfaces = {
+    for host_key in [
+      "aio-0",
+    ] :
+    host_key => {
+      interface_name = "wlan0"
+      mac            = module.ignition-systemd-networkd[host_key].hardware_interfaces.wlan0.mac
+    }
+  }
+  ssid       = var.wifi.ssid
+  passphrase = var.wifi.passphrase
+}
+
+
 
 
 

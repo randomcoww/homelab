@@ -29,7 +29,7 @@ storage:
       overwrite: true
       contents:
         inline: |-
-          interface=${hardware_interface_name}
+          interface=${interface_name}
           preamble=1
           hw_mode=g
           channel=4
@@ -53,12 +53,12 @@ storage:
           ctrl_interface_group=0
 
           bssid=${bssid}
-          mobility_domain=${hostapd_mobility_domain}
+          mobility_domain=${mobility_domain}
           pmk_r1_push=1
           r0_key_lifetime=10000
           r1_key_holder=${nas_identifier}
           nas_identifier=${nas_identifier}
-          %{~ for member in hostapd_roaming_members ~}
-          r0kh=${member.bssid} ${member.nas_identifier} ${hostapd_encryption_key}
-          r1kh=${member.bssid} ${member.bssid} ${hostapd_encryption_key}
+          %{~ for member in roaming_members ~}
+          r0kh=${member.bssid} ${member.nas_identifier} ${encryption_key}
+          r1kh=${member.bssid} ${member.bssid} ${encryption_key}
           %{~ endfor ~}

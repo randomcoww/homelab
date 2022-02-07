@@ -116,6 +116,32 @@ module "ignition-hypervisor" {
   dns_names    = [each.value.hostname]
 }
 
+module "ignition-ssh-server" {
+  for_each = {
+    for host_key in [
+      "aio-0",
+    ] :
+    host_key => local.hosts[host_key]
+  }
+
+  source     = "./modules/ssh_server"
+  key_id     = each.value.hostname
+  user_names = [local.users.admin.name]
+  valid_principals = [
+    each.value.hostname,
+    "127.0.0.1",
+    cidrhost(local.networks.lan.prefix, each.value.netnum),
+  ]
+  ca = module.ssh-common.ca
+}
+
+module "ignition-hostapd" {
+  for_each = module.hostapd-common.template_params
+
+  source          = "./modules/hostapd"
+  template_params = each.value
+}
+
 
 
 # combine and render a single ignition file #
@@ -131,6 +157,7 @@ data "ct_config" "ignition" {
       try(module.ignition-kubernetes-master[host_key].ignition_snippets, []),
       try(module.ignition-kubernetes-worker[host_key].ignition_snippets, []),
       try(module.ignition-hypervisor[host_key].ignition_snippets, []),
+      try(module.ignition-hostapd[host_key].ignition_snippets, []),
 
       # try(module.ignition-gateway[host_key].ignition_snippets, []),
       # try(module.ignition-hostapd[host_key].ignition_snippets, []),
