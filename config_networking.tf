@@ -55,8 +55,7 @@ locals {
   })
 
   ports = {
-    kea_peer = 58080
-
+    kea_peer              = 58080
     etcd_client           = 58082
     etcd_peer             = 58083
     minio                 = 50256

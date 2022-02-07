@@ -25,6 +25,10 @@ module "kubernetes-common" {
   etcd_cluster_endpoints = module.etcd-cluster.cluster_endpoints
 }
 
+module "hypervisor-common" {
+  source = "./modules/hypervisor_common"
+}
+
 
 
 # module "ignition-gateway" {

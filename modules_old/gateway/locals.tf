@@ -2,18 +2,16 @@ locals {
   module_ignition_snippets = [
     for f in fileset(".", "${path.module}/ignition/*.yaml") :
     templatefile(f, {
-      container_images         = var.container_images
-      hostname                 = var.hostname
-      interfaces               = var.interfaces
-      host_netnum              = var.host_netnum
-      vrrp_netnum              = var.vrrp_netnum
-      static_pod_manifest_path = var.static_pod_manifest_path
+      container_images = var.container_images
+      hostname         = var.hostname
+      interfaces       = var.interfaces
+      host_netnum      = var.host_netnum
+      vrrp_netnum      = var.vrrp_netnum
 
       # gateway #
       nftables_name = "gateway_rules"
 
       # kea #
-      dhcp_server_subnet       = var.dhcp_server_subnet
       kea_shared_path          = "/var/lib/kea"
       kea_hooks_libraries_path = "/usr/local/lib/kea/hooks"
       kea_peers                = var.kea_peers
@@ -35,6 +33,8 @@ locals {
         table_id       = 240
         table_priority = 32780
       }
+
+      static_pod_manifest_path = var.static_pod_manifest_path
     })
   ]
 }

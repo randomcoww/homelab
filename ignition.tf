@@ -101,6 +101,20 @@ module "ignition-kubernetes-worker" {
   static_pod_manifest_path = local.kubernetes.static_pod_manifest_path
 }
 
+module "ignition-hypervisor" {
+  for_each = {
+    for host_key in [
+      "aio-0",
+    ] :
+    host_key => local.hosts[host_key]
+  }
+
+  source       = "./modules/hypervisor_server"
+  ca           = module.hypervisor-common.ca
+  certs        = module.hypervisor-common.certs
+  ip_addresses = [cidrhost(local.networks.lan.prefix, each.value.netnum)]
+  dns_names    = [each.value.hostname]
+}
 
 
 
@@ -116,9 +130,10 @@ data "ct_config" "ignition" {
       try(module.ignition-etcd[host_key].ignition_snippets, []),
       try(module.ignition-kubernetes-master[host_key].ignition_snippets, []),
       try(module.ignition-kubernetes-worker[host_key].ignition_snippets, []),
+      try(module.ignition-hypervisor[host_key].ignition_snippets, []),
+
       # try(module.ignition-gateway[host_key].ignition_snippets, []),
       # try(module.ignition-hostapd[host_key].ignition_snippets, []),
-      # try(module.ignition-hypervisor[host_key].ignition_snippets, []),
       # try(module.ignition-minio[host_key].ignition_snippets, []),
       # try(module.ignition-ssh-server[host_key].ignition_snippets, []),
     ])

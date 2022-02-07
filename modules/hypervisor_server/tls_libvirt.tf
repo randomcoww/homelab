@@ -1,7 +1,7 @@
 ## servercert and clientcert on hypervisors
 ## https://wiki.libvirt.org/page/TLSCreateClientCerts
 resource "tls_private_key" "libvirt" {
-  algorithm   = var.libvirt_ca.algorithm
+  algorithm   = var.ca.algorithm
   ecdsa_curve = "P521"
 }
 
@@ -19,9 +19,9 @@ resource "tls_cert_request" "libvirt" {
 
 resource "tls_locally_signed_cert" "libvirt" {
   cert_request_pem   = tls_cert_request.libvirt.cert_request_pem
-  ca_key_algorithm   = var.libvirt_ca.algorithm
-  ca_private_key_pem = var.libvirt_ca.private_key_pem
-  ca_cert_pem        = var.libvirt_ca.cert_pem
+  ca_key_algorithm   = var.ca.algorithm
+  ca_private_key_pem = var.ca.private_key_pem
+  ca_cert_pem        = var.ca.cert_pem
 
   validity_period_hours = 8760
 
