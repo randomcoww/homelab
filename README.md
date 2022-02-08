@@ -74,31 +74,26 @@ mkdir -p ~/.kube && \
 
 ### Create PXE boot entry for client device
 
-```bash
-kubectl get pod -A
-```
-
-### Write minio config
+Write minio config
 
 ```bash
 mkdir -p ~/.mc && \
   tw terraform output -json minio_endpoint > ~/.mc/config.json
 ```
 
-Merge with existing config
+[Build and upload client image to minio](https://github.com/randomcoww/fedora-coreos-config-custom/blob/master/builds/client/README.md). This should be accessible once `minio-*` and `metallb` pods are running.
+
+Merge with existing config (optional)
+
 ```bash
 jq -s '.[0] * .[1]' ~/.mc/config.json new_config.json
 ```
 
-This should be accessible once `minio-*` and `metallb` pods are running
-
-### Add PXE boot entry for client device
+Write matchbox PXE boot config. This should be accessible once `pxeboot-*` and `metallb` pods are running.
 
 ```bash
 tw terraform -chdir=pxeboot_config_client apply
 ```
-
-This should be accessible once `pxeboot-*` and `metallb` pods are running
 
 ### Sign SSH key for SSH access to server
 
