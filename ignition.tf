@@ -2,6 +2,7 @@ module "ignition-base" {
   for_each = {
     for host_key in [
       "aio-0",
+      "client-0",
     ] :
     host_key => local.hosts[host_key]
   }
@@ -15,6 +16,7 @@ module "ignition-systemd-networkd" {
   for_each = {
     for host_key in [
       "aio-0",
+      "client-0",
     ] :
     host_key => local.hosts[host_key]
   }
@@ -66,6 +68,7 @@ module "ignition-disks" {
   for_each = {
     for host_key in [
       "aio-0",
+      "client-0",
     ] :
     host_key => local.hosts[host_key]
   }
@@ -79,6 +82,7 @@ module "ignition-kubelet-base" {
   for_each = {
     for host_key in [
       "aio-0",
+      "client-0",
     ] :
     host_key => local.hosts[host_key]
   }
@@ -124,6 +128,7 @@ module "ignition-kubernetes-worker" {
   for_each = {
     for host_key in [
       "aio-0",
+      "client-0",
     ] :
     host_key => local.hosts[host_key]
   }
@@ -200,6 +205,18 @@ module "ignition-addons-parser" {
   addon_manifests_path = local.kubernetes.addon_manifests_path
 }
 
+module "ignition-desktop" {
+  for_each = {
+    for host_key in [
+      "client-0",
+    ] :
+    host_key => local.hosts[host_key]
+  }
+
+  source                    = "./modules/desktop"
+  ssh_ca_public_key_openssh = module.ssh-common.ca.public_key_openssh
+}
+
 
 # combine and render a single ignition file #
 data "ct_config" "ignition" {
@@ -218,6 +235,7 @@ data "ct_config" "ignition" {
       try(module.ignition-libvirt[host_key].ignition_snippets, []),
       try(module.ignition-hostapd[host_key].ignition_snippets, []),
       try(module.ignition-addons-parser[host_key].ignition_snippets, []),
+      try(module.ignition-desktop[host_key].ignition_snippets, []),
     ])
   }
   content  = <<EOT
