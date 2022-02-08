@@ -34,72 +34,6 @@ storage:
         inline: |
           ${indent(10, udev_steam_vr)}
 
-    # Disable wayland for nvidia
-    - path: /etc/gdm/custom.conf
-      mode: 0644
-      overwrite: true
-      contents:
-        inline: |
-          [daemon]
-          WaylandEnable=false
-          DefaultSession=gnome-xorg.desktop
-
-    # firefox
-    - path: /etc/firefox/pref/autoconfig.js
-      mode: 0644
-      contents:
-        inline: |
-          pref("general.config.filename", "mozilla.cfg");
-          pref("general.config.obscure_value", 0);
-    - path: /etc/firefox/pref/mozilla.cfg
-      mode: 0644
-      contents:
-        inline: |
-          //
-          // startup
-          pref("browser.startup.homepage", "about:blank");
-          pref("browser.startup.page", 3);
-          pref("browser.aboutConfig.showWarning", false);
-          pref("browser.tabs.warnOnClose", false);
-          pref("browser.tabs.warnOnCloseOtherTabs", false);
-          pref("browser.tabs.warnOnOpen", false);
-          pref("browser.warnOnQuit", false);
-          // nuke bookmarks (works after first run)
-          lockPref("browser.toolbars.bookmarks.visibility", "never");
-          // disable as much disk cache as possible
-          pref("browser.cache.disk.enable", false);
-          pref("browser.cache.disk.smart_size.enabled", false);
-          pref("browser.cache.disk_cache_ssl", false);
-          pref("browser.cache.offline.enable", false);
-          pref("browser.sessionstore.interval", 300000);
-          pref("browser.cache.memory.enable", true);
-          pref("browser.cache.memory.capacity", -1);
-          pref("browser.cache.memory.max_entry_size", 51200);
-          // performance
-          pref("layers.acceleration.force-enabled", true);
-          pref("gfx.webrender.all", true);
-          pref("gfx.webrender.enabled", true);
-          pref("widget.wayland-dmabuf-vaapi.enabled", true);
-          // privacy (https://github.com/arkenfox/user.js/blob/master/user.js)
-          pref("browser.safebrowsing.downloads.remote.enabled", false);
-          pref("browser.safebrowsing.malware.enabled", false);
-          pref("browser.safebrowsing.phishing.enabled", false);
-          pref("extensions.pocket.enabled", false);
-          pref("privacy.resistFingerprinting", true);
-          pref("privacy.trackingprotection.enabled", true);
-          pref("toolkit.telemetry.unified", false);
-          pref("toolkit.telemetry.enabled", false);
-          pref("toolkit.telemetry.archive.enabled", false);
-          pref("toolkit.telemetry.newProfilePing.enabled", false);
-          pref("toolkit.telemetry.shutdownPingSender.enabled", false);
-          pref("toolkit.telemetry.updatePing.enabled", false);
-          pref("toolkit.telemetry.bhrPing.enabled", false);
-          pref("toolkit.telemetry.firstShutdownPing.enabled", false);
-          pref("toolkit.telemetry.coverage.opt-out", true);
-          pref("toolkit.coverage.opt-out", true);
-          pref("network.trr.mode", 0);
-          pref("signon.rememberSignons", false);
-
     # gnome desktop config #
     - path: /etc/dconf/db/local.d/00-custom
       mode: 0644
@@ -154,16 +88,6 @@ storage:
 
           [org/gnome/system/location]
           enabled=true
-
-          [org/gnome/terminal/legacy/profiles:]
-          default='${gnome_terminal_profile_uuid}'
-
-          [org/gnome/terminal/legacy/profiles:/:${gnome_terminal_profile_uuid}]
-          background-color='rgb(0,0,0)'
-          bold-is-bright=true
-          foreground-color='rgb(255,255,255)'
-          palette=['rgb(46,52,54)', 'rgb(204,0,0)', 'rgb(78,154,6)', 'rgb(196,160,0)', 'rgb(52,101,164)', 'rgb(117,80,123)', 'rgb(6,152,154)', 'rgb(211,215,207)', 'rgb(85,87,83)', 'rgb(239,41,41)', 'rgb(138,226,52)', 'rgb(252,233,79)', 'rgb(114,159,207)', 'rgb(173,127,168)', 'rgb(52,226,226)', 'rgb(238,238,236)']
-          visible-name='default'
 
     # misc configs #
     - path: /etc/tmux.conf

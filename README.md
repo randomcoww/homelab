@@ -74,14 +74,8 @@ mkdir -p ~/.kube && \
 
 ### Create PXE boot entry for client device
 
-This should work once `pxeboot-*` and `metallb` pods are running
-
 ```bash
 kubectl get pod -A
-```
-
-```bash
-tw terraform -chdir=pxeboot_config_client apply
 ```
 
 ### Write minio config
@@ -96,10 +90,15 @@ Merge with existing config
 jq -s '.[0] * .[1]' ~/.mc/config.json new_config.json
 ```
 
-Access minio
+This should be accessible once `minio-*` and `metallb` pods are running
+
+### Add PXE boot entry for client device
+
 ```bash
-mc ls minio
+tw terraform -chdir=pxeboot_config_client apply
 ```
+
+This should be accessible once `pxeboot-*` and `metallb` pods are running
 
 ### Sign SSH key for SSH access to server
 
