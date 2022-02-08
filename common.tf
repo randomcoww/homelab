@@ -22,7 +22,7 @@ module "etcd-cluster" {
 module "kubernetes-common" {
   source                 = "./modules/kubernetes_common"
   cluster_name           = "aio-prod-3"
-  apiserver_vip          = local.networks.lan.vips.vrrp
+  apiserver_vip          = local.networks.lan.vips.apiserver
   apiserver_port         = local.ports.apiserver
   etcd_cluster_endpoints = module.etcd-cluster.cluster_endpoints
 }
@@ -58,8 +58,8 @@ output "ssh_client_cert_authorized_key" {
 
 
 # libvirt #
-module "hypervisor-common" {
-  source = "./modules/hypervisor_common"
+module "libvirt-common" {
+  source = "./modules/libvirt_common"
 }
 
 
@@ -82,46 +82,6 @@ module "hostapd-common" {
 
 
 
-
-# module "ignition-gateway" {
-#   for_each = {
-#     for host_key in [
-#       "aio-0",
-#     ] :
-#     host_key => local.hosts[host_key]
-#   }
-
-#   source             = "./modules/gateway"
-#   hostname           = each.value.hostname
-#   user               = local.users.admin
-#   interfaces         = module.ignition-systemd-networkd[each.key].interfaces
-#   container_images   = local.container_images
-#   dhcp_server_subnet = local.dhcp_server_subnet
-#   kea_peer_port      = local.ports.kea_peer
-#   host_netnum        = each.value.netnum
-#   vrrp_netnum        = each.value.vrrp_netnum
-#   kea_peers = [
-#     for i, host in [
-#       local.hosts.aio-0,
-#       local.hosts.client-0,
-#     ] :
-#     {
-#       name   = host.hostname
-#       netnum = host.netnum
-#       role   = try(element(["primary", "secondary"], i), "backup")
-#     }
-#   ]
-#   internal_dns_ip = cidrhost(
-#     cidrsubnet(local.networks.lan.prefix, local.kubernetes.metallb_subnet.newbit, local.kubernetes.metallb_subnet.netnum),
-#     local.kubernetes.metallb_external_dns_netnum
-#   )
-#   internal_domain = local.domains.internal
-#   pxeboot_file_name = "http://${cidrhost(
-#     cidrsubnet(local.networks.lan.prefix, local.kubernetes.metallb_subnet.newbit, local.kubernetes.metallb_subnet.netnum),
-#     local.kubernetes.metallb_pxeboot_netnum
-#   )}:${local.ports.internal_pxeboot_http}/boot.ipxe"
-#   static_pod_manifest_path = local.kubernetes.static_pod_manifest_path
-# }
 
 # module "ignition-minio" {
 #   for_each = {

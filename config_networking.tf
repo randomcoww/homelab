@@ -6,20 +6,14 @@ locals {
       cidr    = 23
       vlan_id = 1
       netnums = {
-        vrrp = 2
-      }
-      dhcp_range = {
-        newbit = 1
-        netnum = 1
+        apiserver      = 2
+        forwarding_dns = 2
       }
     }
     sync = {
       network = "192.168.190.0"
       cidr    = 29
       vlan_id = 60
-      netnums = {
-        vrrp = 2
-      }
     }
     wan = {
       vlan_id = 30
@@ -27,8 +21,9 @@ locals {
     metallb = {
       prefix = cidrsubnet("192.168.126.0/23", 2, 1)
       netnums = {
-        minio        = 10
-        external_dns = 11
+        minio            = 10
+        external_dns     = 11
+        internal_pxeboot = 12
       }
     }
   }

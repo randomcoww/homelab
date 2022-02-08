@@ -42,7 +42,7 @@ storage:
                 interfaces = [
                   for network_name, interface in interfaces :
                   interface.interface_name
-                  if lookup(interface, "dhcp_range", false) && lookup(interface, "enable_netnum", false)
+                  if lookup(interface, "enable_dhcp_server", false) && lookup(interface, "enable_netnum", false)
                 ]
               }
               control-socket = {
@@ -114,11 +114,11 @@ storage:
                   ]
                   pools = [
                     {
-                      pool = interface.dhcp_range.prefix
+                      pool = cidrsubnet(interface.prefix, dhcp_subnet.newbit, dhcp_subnet.netnum)
                     }
                   ]
                 }
-                if lookup(interface, "dhcp_range", false) && lookup(interface, "enable_netnum", false)
+                if lookup(interface, "enable_dhcp_server", false) && lookup(interface, "enable_netnum", false)
               ]
             }
           })}

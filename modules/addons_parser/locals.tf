@@ -22,4 +22,12 @@ locals {
       if can(manifest.metadata)
     ])
   }
+
+  module_ignition_snippets = [
+    for f in fileset(".", "${path.module}/ignition/*.yaml") :
+    templatefile(f, {
+      addon_manifests      = local.modified_addon_manifests
+      addon_manifests_path = var.addon_manifests_path
+    })
+  ]
 }

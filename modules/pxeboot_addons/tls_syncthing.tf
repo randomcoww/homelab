@@ -1,12 +1,12 @@
 resource "tls_private_key" "syncthing" {
-  count = var.pod_count
+  count = var.replica_count
 
   algorithm   = tls_private_key.syncthing-ca.algorithm
   ecdsa_curve = "P384"
 }
 
 resource "tls_cert_request" "syncthing" {
-  count = var.pod_count
+  count = var.replica_count
 
   key_algorithm   = tls_private_key.syncthing[count.index].algorithm
   private_key_pem = tls_private_key.syncthing[count.index].private_key_pem
@@ -17,7 +17,7 @@ resource "tls_cert_request" "syncthing" {
 }
 
 resource "tls_locally_signed_cert" "syncthing" {
-  count = var.pod_count
+  count = var.replica_count
 
   cert_request_pem   = tls_cert_request.syncthing[count.index].cert_request_pem
   ca_key_algorithm   = tls_private_key.syncthing-ca.algorithm
@@ -35,7 +35,7 @@ resource "tls_locally_signed_cert" "syncthing" {
 }
 
 data "syncthing" "syncthing" {
-  count = var.pod_count
+  count = var.replica_count
 
   cert_pem        = tls_locally_signed_cert.syncthing[count.index].cert_pem
   private_key_pem = tls_private_key.syncthing[count.index].private_key_pem

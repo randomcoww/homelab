@@ -10,4 +10,4 @@ data:
     - name: default
       protocol: layer2
       addresses:
-      - ${metallb_subnet}
+      - ${metallb_network_prefix}

@@ -27,6 +27,41 @@ module "ignition-systemd-networkd" {
   networks            = local.networks
 }
 
+module "ignition-gateway" {
+  for_each = {
+    for host_key in [
+      "aio-0",
+    ] :
+    host_key => local.hosts[host_key]
+  }
+
+  source                   = "./modules/gateway"
+  interfaces               = module.ignition-systemd-networkd[each.key].tap_interfaces
+  container_images         = local.container_images
+  host_netnum              = each.value.netnum
+  vrrp_netnum              = each.value.vrrp_netnum
+  internal_domain          = local.domains.internal
+  internal_domain_dns_ip   = local.networks.metallb.vips.external_dns
+  static_pod_manifest_path = local.kubernetes.static_pod_manifest_path
+  hostname                 = each.value.hostname
+  dhcp_subnet = {
+    newbit = 1
+    netnum = 1
+  }
+  kea_peers = [
+    for i, host_key in [
+      "aio-0",
+    ] :
+    {
+      name   = host_key
+      netnum = local.hosts[host_key].netnum
+      role   = try(element(["primary", "secondary"], i), "backup")
+    }
+  ]
+  kea_peer_port     = local.ports.kea_peer
+  pxeboot_file_name = "http://${local.networks.metallb.vips.internal_pxeboot}:${local.ports.internal_pxeboot_http}/boot.ipxe"
+}
+
 module "ignition-disks" {
   for_each = {
     for host_key in [
@@ -103,7 +138,7 @@ module "ignition-kubernetes-worker" {
   ports                    = local.ports
 }
 
-module "ignition-hypervisor" {
+module "ignition-libvirt" {
   for_each = {
     for host_key in [
       "aio-0",
@@ -111,9 +146,9 @@ module "ignition-hypervisor" {
     host_key => local.hosts[host_key]
   }
 
-  source       = "./modules/hypervisor_server"
-  ca           = module.hypervisor-common.ca
-  certs        = module.hypervisor-common.certs
+  source       = "./modules/libvirt"
+  ca           = module.libvirt-common.ca
+  certs        = module.libvirt-common.certs
   ip_addresses = [cidrhost(local.networks.lan.prefix, each.value.netnum)]
   dns_names    = [each.value.hostname]
 }
@@ -144,6 +179,23 @@ module "ignition-hostapd" {
   template_params = each.value
 }
 
+module "ignition-addons-parser" {
+  for_each = {
+    for host_key in [
+      "aio-0",
+    ] :
+    host_key => local.hosts[host_key]
+  }
+
+  source = "./modules/addons_parser"
+  manifests = merge(
+    module.kubernetes-system-addons.manifests,
+    module.pxeboot-addons.manifests,
+  )
+  addon_manifests_path = local.kubernetes.addon_manifests_path
+}
+
+
 
 # combine and render a single ignition file #
 data "ct_config" "ignition" {
@@ -152,17 +204,16 @@ data "ct_config" "ignition" {
     host_key => flatten([
       try(module.ignition-base[host_key].ignition_snippets, []),
       try(module.ignition-systemd-networkd[host_key].ignition_snippets, []),
+      try(module.ignition-gateway[host_key].ignition_snippets, []),
       try(module.ignition-disks[host_key].ignition_snippets, []),
       try(module.ignition-kubelet-base[host_key].ignition_snippets, []),
       try(module.ignition-etcd[host_key].ignition_snippets, []),
       try(module.ignition-kubernetes-master[host_key].ignition_snippets, []),
       try(module.ignition-kubernetes-worker[host_key].ignition_snippets, []),
       try(module.ignition-ssh-server[host_key].ignition_snippets, []),
-      try(module.ignition-hypervisor[host_key].ignition_snippets, []),
+      try(module.ignition-libvirt[host_key].ignition_snippets, []),
       try(module.ignition-hostapd[host_key].ignition_snippets, []),
-
-      # try(module.ignition-gateway[host_key].ignition_snippets, []),
-      # try(module.ignition-minio[host_key].ignition_snippets, []),
+      try(module.ignition-addons-parser[host_key].ignition_snippets, []),
     ])
   }
   content  = <<EOT

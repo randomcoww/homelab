@@ -48,7 +48,7 @@ data:
     .:53 {
       errors
       health
-      kubernetes ${kubernetes_cluster_domain} in-addr.arpa ip6.arp {
+      kubernetes ${cluster_domain} in-addr.arpa ip6.arp {
         pods insecure
         fallthrough in-addr.arpa ip6.arpa
       }
@@ -133,7 +133,7 @@ metadata:
     kubernetes.io/name: "CoreDNS"
 spec:
   type: ClusterIP
-  clusterIP: ${cidrhost(kubernetes_service_network_prefix, kubernetes_service_network_dns_netnum)}
+  clusterIP: ${service_network.vips.dns}
   ports:
   - name: dns
     port: 53

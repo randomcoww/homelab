@@ -1,6 +1,6 @@
 locals {
   syncthing_members = [
-    for i in range(var.pod_count) :
+    for i in range(var.replica_count) :
     {
       pod_name  = "${var.resource_name}-${i}"
       device_id = data.syncthing.syncthing[i].device_id
@@ -20,11 +20,10 @@ locals {
     basename(f) => templatefile(f, {
       container_images           = var.container_images
       resource_name              = var.resource_name
-      namespace                  = "default"
-      pod_count                  = var.pod_count
+      namespace                  = var.resource_namespace
+      replica_count              = var.replica_count
       syncthing_members          = local.syncthing_members
       matchbox_certs             = local.matchbox_certs
-      allowed_network_prefix     = var.allowed_network_prefix
       syncthing_home_path        = "/var/lib/syncthing"
       matchbox_path              = "/var/lib/matchbox"
       syncthing_peer_port        = 22000

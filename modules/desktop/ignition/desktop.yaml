@@ -66,9 +66,9 @@ storage:
           pref("browser.cache.memory.capacity", -1);
           pref("browser.cache.memory.max_entry_size", 51200);
           // performance
-          // pref("layers.acceleration.force-enabled", true);
-          // pref("gfx.webrender.all", true);
-          // pref("gfx.webrender.enabled", true);
+          pref("layers.acceleration.force-enabled", true);
+          pref("gfx.webrender.all", true);
+          pref("gfx.webrender.enabled", true);
           pref("widget.wayland-dmabuf-vaapi.enabled", true);
           // privacy (https://github.com/arkenfox/user.js/blob/master/user.js)
           pref("browser.safebrowsing.downloads.remote.enabled", false);

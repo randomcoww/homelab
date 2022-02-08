@@ -1,17 +1,14 @@
-variable "container_images" {
-  type = map(string)
-}
-
 variable "resource_name" {
   type = string
 }
 
-variable "pod_count" {
-  type = number
+variable "resource_namespace" {
+  type    = string
+  default = "default"
 }
 
-variable "allowed_network_prefix" {
-  type = string
+variable "replica_count" {
+  type = number
 }
 
 variable "internal_pxeboot_ip" {
@@ -24,4 +21,8 @@ variable "internal_pxeboot_http_port" {
 
 variable "internal_pxeboot_api_port" {
   type = number
+}
+
+variable "container_images" {
+  type = map(string)
 }

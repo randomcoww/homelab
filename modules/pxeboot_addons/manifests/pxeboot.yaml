@@ -69,7 +69,7 @@ metadata:
   namespace: ${namespace}
 spec:
   serviceName: ${resource_name}
-  replicas: ${pod_count}
+  replicas: ${replica_count}
   selector:
     matchLabels:
       app: ${resource_name}
