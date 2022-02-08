@@ -46,6 +46,10 @@ ssh_client = {
   early_renewal_hours = 168
   validity_period_hours = 336
 }
+wifi = {
+  ssid = "ssid"
+  passphrase = "passphrase"
+}
 EOF
 ```
 
