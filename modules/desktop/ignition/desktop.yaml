@@ -34,6 +34,16 @@ storage:
         inline: |
           ${indent(10, udev_steam_vr)}
 
+    # Disable wayland for nvidia
+    - path: /etc/gdm/custom.conf
+      mode: 0644
+      overwrite: true
+      contents:
+        inline: |
+          [daemon]
+          WaylandEnable=false
+          DefaultSession=gnome-xorg.desktop
+
     # firefox
     - path: /etc/firefox/pref/autoconfig.js
       mode: 0644
