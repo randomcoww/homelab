@@ -84,7 +84,7 @@ tw terraform -chdir=pxeboot_config_client apply
 
 ```
 mkdir -p ~/.mc && \
-  tw terraform output -raw minio_config > ~/.mc/config.json
+  tw terraform output -json minio_endpoint > ~/.mc/config.json
 ```
 
 ### Sign SSH key for SSH access to server

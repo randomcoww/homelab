@@ -1,4 +1,8 @@
 locals {
+  pxeboot_image_builds = {
+    client = "fedora-silverblue-35.20220203.0"
+  }
+
   pxeboot = {
     matchbox_ip = cidrhost(
       cidrsubnet(local.networks.lan.prefix, local.kubernetes.metallb_subnet.newbit, local.kubernetes.metallb_subnet.netnum),
@@ -31,9 +35,9 @@ locals {
           "nvidia-drm.modeset=1",
           "nvidia.NVreg_RegistryDwords=EnableBrightnessControl=1",
         ]
-        kernel_image_name = "fedora-silverblue-35.20220203.0-live-kernel-x86_64"
-        initrd_image_name = "fedora-silverblue-35.20220203.0-live-initramfs.x86_64.img"
-        rootfs_image_name = "fedora-silverblue-35.20220203.0-live-rootfs.x86_64.img"
+        kernel_image_name = "${local.pxeboot_image_builds.client}-live-kernel-x86_64"
+        initrd_image_name = "${local.pxeboot_image_builds.client}-live-initramfs.x86_64.img"
+        rootfs_image_name = "${local.pxeboot_image_builds.client}-live-rootfs.x86_64.img"
       }
     }
   }

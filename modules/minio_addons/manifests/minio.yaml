@@ -1,0 +1,108 @@
+---
+apiVersion: v1
+kind: Secret
+metadata:
+  name: ${resource_name}-credentials
+  namespace: ${namespace}
+data:
+  access_key_id: ${replace(base64encode(chomp(access_key_id)), "\n", "")}
+  secret_access_key: ${replace(base64encode(chomp(secret_access_key)), "\n", "")}
+type: Opaque
+
+---
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: ${resource_name}
+  namespace: ${namespace}
+spec:
+  serviceName: ${resource_name}
+  replicas: ${replica_count}
+  selector:
+    matchLabels:
+      app: ${resource_name}
+  template:
+    metadata:
+      labels:
+        app: ${resource_name}
+    spec:
+      nodeSelector:
+        %{~ for label, value in node_selector ~}
+        ${label}: ${value}
+        %{~ endfor ~}
+      containers:
+      - name: minio
+        image: ${container_images.minio}
+        imagePullPolicy: Always
+        env:
+        - name: INTERNAL_IP
+          valueFrom:
+            fieldRef:
+              fieldPath: status.hostIP
+        - name: MINIO_ACCESS_KEY
+          valueFrom:
+            secretKeyRef:
+              name: minio-credentials
+              key: access_key_id
+        - name: MINIO_SECRET_KEY
+          valueFrom:
+            secretKeyRef:
+              name: minio-credentials
+              key: secret_access_key
+        - name: MINIO_ADDRESS
+          value: 0.0.0.0:${minio_port}
+        - name: MINIO_CONSOLE_ADDRESS
+          value: 0.0.0.0:${minio_console_port}
+        args:
+        - server
+        %{~ for i, volume_path in volume_paths ~}
+        %{~ if length(volume_paths) > 1 ~}
+        - http://$(INTERNAL_IP)${volume_path}
+        %{~ else ~}
+        - ${volume_path}
+        %{~ endif ~}
+        %{~ endfor ~}
+        volumeMounts:
+        %{~ for i, volume_path in volume_paths ~}
+        - name: data${i}
+          mountPath: ${volume_path}
+        %{~ endfor ~}
+        livenessProbe:
+          httpGet:
+            path: /minio/health/live
+            port: ${minio_port}
+          initialDelaySeconds: 120
+          periodSeconds: 20
+      volumes:
+      - name: minio-credentials
+        secret:
+          secretName: ${resource_name}-credentials
+      %{~ for i, volume_path in volume_paths ~}
+      - name: data${i}
+        hostPath:
+          path: ${volume_path}
+          type: DirectoryOrCreate
+      %{~ endfor ~}
+
+---
+kind: Service
+apiVersion: v1
+metadata:
+  name: ${resource_name}
+  namespace: ${namespace}
+  labels:
+    app: ${resource_name}
+spec:
+  type: LoadBalancer
+  loadBalancerIP: ${minio_ip}
+  ports:
+  - name: api
+    port: ${minio_port}
+    targetPort: ${minio_port}
+    protocol: TCP
+  - name: console
+    port: ${minio_console_port}
+    targetPort: ${minio_console_port}
+    protocol: TCP
+  selector:
+    app: ${resource_name}

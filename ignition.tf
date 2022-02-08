@@ -132,7 +132,7 @@ module "ignition-kubernetes-worker" {
   ca                       = module.kubernetes-common.ca
   certs                    = module.kubernetes-common.certs
   template_params          = module.kubernetes-common.template_params
-  kubelet_node_labels      = {}
+  kubelet_node_labels      = { host_key = each.key }
   container_storage_path   = each.value.container_storage_path
   static_pod_manifest_path = local.kubernetes.static_pod_manifest_path
   ports                    = local.ports
@@ -191,10 +191,14 @@ module "ignition-addons-parser" {
   manifests = merge(
     module.kubernetes-system-addons.manifests,
     module.pxeboot-addons.manifests,
+    module.minio-addons.manifests,
+    {
+      for file_name, data in data.http.remote-kubernetes-addons :
+      file_name => data.body
+    },
   )
   addon_manifests_path = local.kubernetes.addon_manifests_path
 }
-
 
 
 # combine and render a single ignition file #

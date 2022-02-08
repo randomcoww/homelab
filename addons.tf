@@ -9,6 +9,16 @@ module "kubernetes-system-addons" {
   container_images       = local.container_images
 }
 
+data "http" "remote-kubernetes-addons" {
+  for_each = {
+    "nvidia-device-plugins.yaml" = "https://raw.githubusercontent.com/NVIDIA/k8s-device-plugin/v0.10.0/nvidia-device-plugin.yml"
+    "metallb-namespace.yaml"     = "https://raw.githubusercontent.com/metallb/metallb/v0.11.0/manifests/namespace.yaml"
+    "metallb.yaml"               = "https://raw.githubusercontent.com/metallb/metallb/v0.11.0/manifests/metallb.yaml"
+  }
+  url = each.value
+}
+
+
 # pxeboot #
 module "pxeboot-addons" {
   source                     = "./modules/pxeboot_addons"
@@ -65,4 +75,23 @@ resource "local_file" "pxeboot_certs" {
 
   filename = "./output/certs/${each.key}"
   content  = each.value
+}
+
+
+# minio addon for aio-0 host #
+module "minio-addons" {
+  source             = "./modules/minio_addons"
+  resource_name      = "minio"
+  resource_namespace = "default"
+  replica_count      = 1
+  minio_ip           = local.networks.metallb.vips.minio
+  minio_port         = local.ports.minio
+  minio_console_port = local.ports.minio_console
+  node_selector      = { "host_key" = "aio-0" }
+  volume_paths       = local.hosts.aio-0.minio_volume_paths
+  container_images   = local.container_images
+}
+
+output "minio_endpoint" {
+  value = module.minio-addons.endpoint
 }
