@@ -1,6 +1,9 @@
 locals {
   base_hosts = {
     aio-0 = {
+      users = [
+        "admin"
+      ]
       vrrp_netnum = 2
       netnum      = 1
       hardware_interfaces = {
@@ -60,6 +63,9 @@ locals {
     }
 
     client-0 = {
+      users = [
+        "client"
+      ]
       netnum = 3
       hardware_interfaces = {
         phy0 = {
@@ -103,6 +109,9 @@ locals {
     }
 
     store-0 = {
+      users = [
+        "admin"
+      ]
       netnum = 4
       hardware_interfaces = {
         phy0 = {

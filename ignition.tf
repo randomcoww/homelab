@@ -9,7 +9,10 @@ module "ignition-base" {
 
   source   = "./modules/base"
   hostname = each.value.hostname
-  users    = [local.users.admin]
+  users    = [
+    for user_key in each.value.users :
+    local.users[user_key]
+  ]
 }
 
 module "ignition-systemd-networkd" {
