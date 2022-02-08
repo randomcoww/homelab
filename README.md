@@ -69,7 +69,7 @@ Write admin kubeconfig
 
 ```bash
 mkdir -p ~/.kube && \
-  tw terraform output -raw kubeconfig_admin > ~/.kube/config
+  tw terraform output -raw admin_kubeconfig > ~/.kube/config
 ```
 
 ### Create PXE boot entry for client device
@@ -89,6 +89,16 @@ tw terraform -chdir=pxeboot_config_client apply
 ```bash
 mkdir -p ~/.mc && \
   tw terraform output -json minio_endpoint > ~/.mc/config.json
+```
+
+Merge with existing config
+```bash
+jq -s '.[0] * .[1]' ~/.mc/config.json new_config.json
+```
+
+Access minio
+```bash
+mc ls minio
 ```
 
 ### Sign SSH key for SSH access to server

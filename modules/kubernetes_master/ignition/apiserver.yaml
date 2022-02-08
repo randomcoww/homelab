@@ -68,7 +68,7 @@ storage:
               - name: NODE_IP
                 valueFrom:
                   fieldRef:
-                    status.hostIP
+                    fieldPath: status.hostIP
               volumeMounts:
               - name: config-apiserver
                 mountPath: "${config_path}"

@@ -39,6 +39,22 @@ storage:
         inline:
           ${hostname}
 
+    # No swap - disable hibernation
+    - path: /etc/systemd/sleep.conf.d/10-disable-hibernate
+      mode: 0644
+      contents:
+        inline: |
+          [Sleep]
+          AllowHibernation=no
+          AllowSuspendThenHibernate=no
+          AllowHybridSleep=no
+    - path: /etc/systemd/logind.conf.d/10-disable-hibernate
+      mode: 0644
+      contents:
+        inline: |
+          [Login]
+          HibernateKeyIgnoreInhibited=no
+
     # Disable local DNS for systemd-networkd #
     - path: /etc/systemd/resolved.conf.d/10-disable-dns-stub.conf
       mode: 0644

@@ -73,7 +73,6 @@ storage:
                 path: "${backup_path}"
             - name: manifest-volume
               hostPath:
-                type: FileOrCreate
                 path: "${static_pod_manifest_path}"
 
     # certs #
