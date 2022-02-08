@@ -66,7 +66,7 @@ locals {
       users = [
         "client"
       ]
-      netnum = 3
+      netnum = null
       hardware_interfaces = {
         phy0 = {
           mac   = "84-a9-38-0f-aa-76"
@@ -131,6 +131,14 @@ locals {
         phy3 = {
           mac = "3c-fd-fe-b2-47-6b"
           mtu = 9000
+        }
+      }
+      bridge_interfaces = {}
+      tap_interfaces = {
+        lan = {
+          source_interface_name = "phy0"
+          enable_mdns           = true
+          enable_dhcp           = true
         }
       }
     }
