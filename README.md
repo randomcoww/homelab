@@ -86,7 +86,7 @@ tw terraform -chdir=pxeboot_config_client apply
 
 ### Write minio config
 
-```
+```bash
 mkdir -p ~/.mc && \
   tw terraform output -json minio_endpoint > ~/.mc/config.json
 ```
@@ -106,13 +106,13 @@ virsh -c qemu+ssh://fcos@aio-0.local/system list --all
 
 ### Cleanup terraform file formatting for checkin
 
-```
+```bash
 tw find . -name '*.tf' -exec terraform fmt '{}' \;
 ```
 
 ### Build terrafrom wrapper image
 
-```
+```bash
 TF_VERSION=1.1.2
 SSH_VERSION=0.1.4
 SYNCTHING_VERSION=0.1.2
@@ -125,6 +125,6 @@ buildah build \
   -t ghcr.io/randomcoww/tw:latest
 ```
 
-```
+```bash
 buildah push ghcr.io/randomcoww/tw:latest
 ```
