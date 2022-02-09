@@ -59,7 +59,7 @@ storage:
                   parameters = {
                     high-availability = [
                       {
-                        this-server-name = hostname
+                        this-server-name = kea_server_name
                         mode = "load-balancing"
                         max-unacked-clients = 0
                         peers =  [

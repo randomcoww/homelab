@@ -18,7 +18,7 @@ locals {
       upstream_dns_tls_servername = "dns.quad9.net"
 
       # kea #
-      hostname                 = var.hostname
+      kea_server_name          = var.kea_server_name
       kea_shared_path          = "/var/lib/kea"
       kea_hooks_libraries_path = "/usr/local/lib/kea/hooks"
       kea_peers                = var.kea_peers

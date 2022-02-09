@@ -26,7 +26,7 @@ variable "static_pod_manifest_path" {
   type = string
 }
 
-variable "hostname" {
+variable "kea_server_name" {
   type = string
 }
 

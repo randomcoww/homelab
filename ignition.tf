@@ -36,6 +36,7 @@ module "ignition-gateway" {
   for_each = {
     for host_key in [
       "aio-0",
+      "client-0",
     ] :
     host_key => local.hosts[host_key]
   }
@@ -48,7 +49,7 @@ module "ignition-gateway" {
   internal_domain          = local.domains.internal
   internal_domain_dns_ip   = local.networks.metallb.vips.external_dns
   static_pod_manifest_path = local.kubernetes.static_pod_manifest_path
-  hostname                 = each.value.hostname
+  kea_server_name          = each.key
   dhcp_subnet = {
     newbit = 1
     netnum = 1
@@ -56,6 +57,7 @@ module "ignition-gateway" {
   kea_peers = [
     for i, host_key in [
       "aio-0",
+      "client-0",
     ] :
     {
       name   = host_key

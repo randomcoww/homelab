@@ -13,9 +13,8 @@ locals {
           vlans = ["sync", "wan"]
         }
         wlan0 = {
-          mac          = "b4-0e-de-fb-28-95"
-          mtu          = 9000
-          enable_4addr = true
+          mac = "b4-0e-de-fb-28-95"
+          mtu = 9000
         }
       }
       bridge_interfaces = {
@@ -66,7 +65,8 @@ locals {
       users = [
         "client"
       ]
-      netnum = null
+      vrrp_netnum = 2
+      netnum      = 3
       hardware_interfaces = {
         phy0 = {
           mac   = "84-a9-38-0f-aa-76"
@@ -88,7 +88,21 @@ locals {
         lan = {
           source_interface_name = "br-lan"
           enable_mdns           = true
+          enable_netnum         = true
+          enable_vrrp_netnum    = true
+          enable_dhcp_server    = true
+          mtu                   = 9000
+        }
+        sync = {
+          source_interface_name = "phy0-sync"
+          enable_netnum         = true
+          enable_vrrp_netnum    = true
+          mtu                   = 9000
+        }
+        wan = {
+          source_interface_name = "phy0-wan"
           enable_dhcp           = true
+          mac                   = "52-54-00-63-6e-b3"
         }
       }
       disks = {
