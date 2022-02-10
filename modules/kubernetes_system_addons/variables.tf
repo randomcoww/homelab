@@ -18,11 +18,6 @@ variable "metallb_network_prefix" {
   type = string
 }
 
-variable "flannel_host_gateway_interface_name" {
-  type    = string
-  default = "lan"
-}
-
 variable "container_images" {
   type = map(string)
 }

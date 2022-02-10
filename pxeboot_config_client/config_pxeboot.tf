@@ -12,7 +12,7 @@ locals {
 
     hosts = {
       client-0 = {
-        boot_interface = "phy0"
+        selector_mac = "84-a9-38-0f-aa-76"
         boot_args = [
           "systemd.unified_cgroup_hierarchy=0",
           "intel_iommu=on",

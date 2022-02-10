@@ -19,7 +19,6 @@ module "ignition-systemd-networkd" {
   for_each = {
     for host_key in [
       "aio-0",
-      "client-0",
     ] :
     host_key => local.hosts[host_key]
   }
@@ -36,7 +35,6 @@ module "ignition-gateway" {
   for_each = {
     for host_key in [
       "aio-0",
-      "client-0",
     ] :
     host_key => local.hosts[host_key]
   }
@@ -57,7 +55,6 @@ module "ignition-gateway" {
   kea_peers = [
     for i, host_key in [
       "aio-0",
-      "client-0",
     ] :
     {
       name   = host_key

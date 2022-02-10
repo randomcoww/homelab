@@ -1,30 +1,6 @@
 ---
 variant: fcos
 version: 1.4.0
-systemd:
-  units:
-    # Try enabling 4addr in case this is a wifi interface
-    # Allow failure for wired interface
-    - name: hostapd-4addr.service
-      enabled: true
-      contents: |
-        [Unit]
-        Before=systemd-networkd.service
-        WantedBy=systemd-networkd.service
-
-        [Service]
-        Type=oneshot
-        %{~ for interface in distinct(flatten([
-          for bridge_interface in values(bridge_interfaces) :
-          bridge_interface.interfaces
-        ])) ~}
-        ExecStart=-/usr/sbin/iw dev ${interface} set 4addr on
-        %{~ endfor ~}
-        RemainAfterExit=yes
-
-        [Install]
-        WantedBy=multi-user.target
-
 storage:
   files:
     %{~ for bridge_interface_name, bridge_interface in bridge_interfaces ~}

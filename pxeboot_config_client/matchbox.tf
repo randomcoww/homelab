@@ -22,6 +22,6 @@ resource "matchbox_group" "pxeboot" {
   profile = matchbox_profile.pxeboot[each.key].name
   name    = each.key
   selector = {
-    mac = local.hosts[each.key].hardware_interfaces[each.value.boot_interface].mac
+    mac = each.value.selector_mac
   }
 }

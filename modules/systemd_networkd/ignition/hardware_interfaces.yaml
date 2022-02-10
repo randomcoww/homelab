@@ -3,7 +3,8 @@ variant: fcos
 version: 1.4.0
 systemd:
   units:
-    - name: hostapd-4addr.service
+    # This allows bridging wifi devices
+    - name: enable-4addr.service
       enabled: true
       contents: |
         [Unit]
@@ -12,8 +13,8 @@ systemd:
 
         [Service]
         Type=oneshot
-         %{~ for hardware_interface_name, hardware_interface in hardware_interfaces ~}
-         %{~ if lookup(hardware_interface, "enable_4addr", false) ~}
+        %{~ for hardware_interface_name, hardware_interface in hardware_interfaces ~}
+        %{~ if lookup(hardware_interface, "enable_4addr", false) ~}
         ExecStart=/usr/sbin/iw dev ${hardware_interface_name} set 4addr on
         %{~ endif ~}
         %{~ endfor ~}
