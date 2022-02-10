@@ -45,32 +45,34 @@ metadata:
     app: flannel
 data:
   cni-conf.json: |
-    {
-      "name": "cbr0",
-      "cniVersion": "0.3.1",
-      "plugins": [
+    ${jsonencode({
+      name = "cbr0"
+      cniVersion = "0.3.1"
+      plugins = [
         {
-          "type": "flannel",
-          "delegate": {
-            "hairpinMode": true,
-            "isDefaultGateway": true
+          type = "flannel"
+          delegate = {
+            type = "bridge"
+            hairpinMode = true
+            isDefaultGateway = true
+            bridge = cni_bridge_interface_name
           }
         },
         {
-          "type": "portmap",
-          "capabilities": {
-            "portMappings": true
+          type = "portmap"
+          capabilities = {
+            portMappings = true
           }
-        }
+        },
       ]
-    }
+    })}
   net-conf.json: |
-    {
-      "Network": "${pod_network.prefix}",
-      "Backend": {
-        "Type": "host-gw"
+    ${jsonencode({
+      Network = pod_network.prefix
+      Backend = {
+        Type = "host-gw"
       }
-    }
+    })}
 ---
 apiVersion: apps/v1
 kind: DaemonSet

@@ -15,7 +15,7 @@ storage:
               http-port = kea_peer_port
               control-sockets = {
                 dhcp4 = {
-                  socket-type = "unix",
+                  socket-type = "unix"
                   socket-name = "${kea_shared_path}/kea-dhcp4-ctrl.sock"
                 }
               }
@@ -51,11 +51,11 @@ storage:
               }
               hooks-libraries = length(kea_peers) > 1 ? [
                 {
-                  library = "${kea_hooks_libraries_path}/libdhcp_lease_cmds.so",
+                  library = "${kea_hooks_libraries_path}/libdhcp_lease_cmds.so"
                   parameters = {}
                 },
                 {
-                  library = "${kea_hooks_libraries_path}/libdhcp_ha.so",
+                  library = "${kea_hooks_libraries_path}/libdhcp_ha.so"
                   parameters = {
                     high-availability = [
                       {
@@ -75,7 +75,7 @@ storage:
                     ]
                   }
                 },
-              ] : [],
+              ] : []
               client-classes = [
                 {
                   name = "ipxe_detected"

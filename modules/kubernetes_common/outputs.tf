@@ -26,9 +26,10 @@ output "certs" {
 
 output "template_params" {
   value = {
-    cluster_name    = var.cluster_name
-    pod_network     = local.pod_network
-    service_network = local.service_network
+    cluster_name              = var.cluster_name
+    pod_network               = local.pod_network
+    service_network           = local.service_network
+    cni_bridge_interface_name = local.cni_bridge_interface_name
 
     apiserver_vip             = var.apiserver_vip
     apiserver_port            = var.apiserver_port

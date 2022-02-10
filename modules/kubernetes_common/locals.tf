@@ -31,6 +31,8 @@ locals {
     prefix = "10.244.0.0/16"
   }
 
+  cni_bridge_interface_name = "cni0"
+
   addons_resource_whitelist = [
     "core/v1/ConfigMap",
     "core/v1/Endpoints",

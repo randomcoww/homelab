@@ -38,6 +38,13 @@ systemd:
 
 storage:
   files:
+    # nf_call_iptables disabled gloablly except for CNI
+    - path: /etc/udev/rules.d/10-cni-nf-call-iptables.rules
+      mode: 0644
+      contents:
+        inline: |
+          SUBSYSTEM=="net", ACTION=="add", KERNEL=="${cni_bridge_interface_name}", ATTR{bridge/nf_call_iptables}="1"
+
     - path: /etc/crio/crio.conf.d/20-storage.conf
       mode: 0644
       overwrite: true

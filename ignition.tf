@@ -205,6 +205,7 @@ module "ignition-addons-parser" {
     },
   )
   addon_manifests_path = local.kubernetes.addon_manifests_path
+  default_create_mode  = "Reconcile"
 }
 
 module "ignition-desktop" {
