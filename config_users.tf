@@ -8,7 +8,6 @@ locals {
         "sudo",
         "systemd-journal",
         "wheel",
-        "libvirt",
       ]
     }
     client = {

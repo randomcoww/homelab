@@ -6,7 +6,6 @@ locals {
   }
 
   container_images = {
-    kubelet                 = "ghcr.io/randomcoww/kubernetes:kubelet-v1.22.4"
     kube_apiserver          = "ghcr.io/randomcoww/kubernetes:kube-master-v1.22.4"
     kube_controller_manager = "ghcr.io/randomcoww/kubernetes:kube-master-v1.22.4"
     kube_scheduler          = "ghcr.io/randomcoww/kubernetes:kube-master-v1.22.4"
