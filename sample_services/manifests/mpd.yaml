@@ -58,6 +58,16 @@ spec:
       labels:
         app: mpd
     spec:
+      affinity:
+        podAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+          - labelSelector:
+              matchExpressions:
+              - key: app
+                operator: In
+                values:
+                - syncthing
+            topologyKey: "kubernetes.io/hostname"
       dnsPolicy: ClusterFirstWithHostNet
       restartPolicy: Always
       containers:
