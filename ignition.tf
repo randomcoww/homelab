@@ -182,6 +182,7 @@ module "ignition-addons-parser" {
   source = "./modules/addons_parser"
   manifests = merge(
     module.kubernetes-system-addons.manifests,
+    module.syncthing-addons.manifests,
     module.pxeboot-addons.manifests,
     module.minio-addons.manifests,
     {

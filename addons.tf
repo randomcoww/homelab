@@ -19,12 +19,26 @@ data "http" "remote-kubernetes-addons" {
 }
 
 
+# syncthing for "good enough" async replication of small data #
+# any service can use path under /var/pv/sync #
+module "syncthing-addons" {
+  source             = "./modules/syncthing_addons"
+  resource_name      = "syncthing"
+  resource_namespace = "default"
+  replica_count      = 2
+  sync_data_path     = "/var/pv/sync"
+  container_images   = local.container_images
+}
+
+
 # pxeboot #
 module "pxeboot-addons" {
   source                     = "./modules/pxeboot_addons"
   resource_name              = "pxeboot"
+  affinity_resource_name     = "syncthing"
   resource_namespace         = "default"
   replica_count              = 2
+  matchbox_path              = "/var/pv/sync/matchbox"
   internal_pxeboot_ip        = local.networks.metallb.vips.internal_pxeboot
   internal_pxeboot_http_port = local.ports.internal_pxeboot_http
   internal_pxeboot_api_port  = local.ports.internal_pxeboot_api
@@ -94,23 +108,4 @@ module "minio-addons" {
 
 output "minio_endpoint" {
   value = module.minio-addons.endpoint
-}
-
-
-# syncthing fpr "good enough" async data replication #
-# shared path under /var/pv #
-module "syncthing-addons" {
-  source             = "./modules/syncthing_addons"
-  resource_name      = "syncthing"
-  resource_namespace = "default"
-  replica_count      = 2
-  sync_data_path     = "/var/pv/sync"
-  container_images   = local.container_images
-}
-
-resource "local_file" "syncthing-addons" {
-  for_each = module.syncthing-addons.manifests
-
-  content  = each.value
-  filename = "./output/manifests/${each.key}"
 }

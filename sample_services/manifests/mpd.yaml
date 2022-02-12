@@ -43,12 +43,11 @@ data:
 
 ---
 apiVersion: apps/v1
-kind: StatefulSet
+kind: Deployment
 metadata:
   name: mpd
   namespace: default
 spec:
-  serviceName: mpd
   replicas: 1
   selector:
     matchLabels:

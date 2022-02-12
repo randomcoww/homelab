@@ -6,57 +6,6 @@ metadata:
 
 ---
 apiVersion: v1
-kind: ConfigMap
-metadata:
-  name: ${resource_name}-syncthing-config
-  namespace: ${namespace}
-data:
-  config.xml: |-
-    <configuration>
-      <folder id="matchbox-data" label="matchbox-data" path="${matchbox_path}" type="sendreceive" fsWatcherEnabled="true" fsWatcherDelayS="1" rescanIntervalS="10" ignorePerms="true" autoNormalize="false">
-        %{~ for member in syncthing_members ~}
-        <device id="${member.device_id}"></device>
-        %{~ endfor ~}
-        <maxConflicts>1</maxConflicts>
-        <copyOwnershipFromParent>true</copyOwnershipFromParent>
-      </folder>
-      %{~ for member in syncthing_members ~}
-      <device id="${member.device_id}" compression="never" skipIntroductionRemovals="true">
-        <address>${member.pod_name}.${resource_name}.${namespace}:${syncthing_peer_port}</address>
-        <autoAcceptFolders>true</autoAcceptFolders>
-      </device>
-      %{~endfor~}
-      <gui enabled="false"/>
-      <options>
-        <listenAddress>0.0.0.0:${syncthing_peer_port}</listenAddress>
-        <globalAnnounceEnabled>false</globalAnnounceEnabled>
-        <localAnnounceEnabled>false</localAnnounceEnabled>
-        <reconnectionIntervalS>5</reconnectionIntervalS>
-        <relaysEnabled>false</relaysEnabled>
-        <startBrowser>false</startBrowser>
-        <natEnabled>false</natEnabled>
-        <urAccepted>-1</urAccepted>
-        <autoUpgradeIntervalH>0</autoUpgradeIntervalH>
-        <defaultFolderPath></defaultFolderPath>
-        <crashReportingEnabled>false</crashReportingEnabled>
-      </options>
-    </configuration>
-
----
-apiVersion: v1
-kind: Secret
-metadata:
-  name: ${resource_name}-syncthing-tls
-  namespace: ${namespace}
-data:
-  %{~ for member in syncthing_members ~}
-  cert-${member.pod_name}: ${replace(base64encode(chomp(member.cert)), "\n", "")}
-  key-${member.pod_name}: ${replace(base64encode(chomp(member.key)), "\n", "")}
-  %{~ endfor ~}
-type: Opaque
-
----
-apiVersion: v1
 kind: Secret
 metadata:
   name: ${resource_name}-matchbox-tls
@@ -69,12 +18,11 @@ type: Opaque
 
 ---
 apiVersion: apps/v1
-kind: StatefulSet
+kind: Deployment
 metadata:
   name: ${resource_name}
   namespace: ${namespace}
 spec:
-  serviceName: ${resource_name}
   replicas: ${replica_count}
   selector:
     matchLabels:
@@ -85,6 +33,15 @@ spec:
         app: ${resource_name}
     spec:
       affinity:
+        podAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+          - labelSelector:
+              matchExpressions:
+              - key: app
+                operator: In
+                values:
+                - ${affinity_resource_name}
+            topologyKey: "kubernetes.io/hostname"
         podAntiAffinity:
           requiredDuringSchedulingIgnoredDuringExecution:
           - labelSelector:
@@ -94,47 +51,7 @@ spec:
                 values:
                 - ${resource_name}
             topologyKey: "kubernetes.io/hostname"
-      # Syncthing requires config.xml to be writable
-      # Copy into shared volume
-      initContainers:
-      - name: syncthing-init
-        image: ${container_images.syncthing}
-        command:
-        - cp
-        - /tmp/config.xml
-        - /tmp/cert.pem
-        - /tmp/key.pem
-        - ${syncthing_home_path}/
-        env:
-        - name: POD_NAME
-          valueFrom:
-            fieldRef:
-              fieldPath: metadata.name
-        volumeMounts:
-        - name: syncthing-config
-          mountPath: /tmp/config.xml
-          subPath: config.xml
-        - name: syncthing-tls
-          mountPath: /tmp/cert.pem
-          subPathExpr: cert-$(POD_NAME)
-        - name: syncthing-tls
-          mountPath: /tmp/key.pem
-          subPathExpr: key-$(POD_NAME)
-        - name: syncthing-data
-          mountPath: ${syncthing_home_path}
       containers:
-      - name: syncthing
-        image: ${container_images.syncthing}
-        command:
-        - syncthing
-        args:
-        - --home
-        - ${syncthing_home_path}
-        volumeMounts:
-        - name: matchbox-data
-          mountPath: ${matchbox_path}
-        - name: syncthing-data
-          mountPath: ${syncthing_home_path}
       - name: matchbox
         image: ${container_images.matchbox}
         args:
@@ -165,9 +82,8 @@ spec:
         secret:
           secretName: ${resource_name}-matchbox-tls
       - name: matchbox-data
-        emptyDir: {}
-      - name: syncthing-data
-        emptyDir: {}
+        hostPath:
+          path: ${matchbox_path}
 
 ---
 kind: Service
