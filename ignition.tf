@@ -145,21 +145,6 @@ module "ignition-kubernetes-worker" {
   ports                    = local.ports
 }
 
-module "ignition-libvirt" {
-  for_each = {
-    for host_key in [
-      "aio-0",
-    ] :
-    host_key => local.hosts[host_key]
-  }
-
-  source       = "./modules/libvirt"
-  ca           = module.libvirt-common.ca
-  certs        = module.libvirt-common.certs
-  ip_addresses = [cidrhost(local.networks.lan.prefix, each.value.netnum)]
-  dns_names    = [each.value.hostname]
-}
-
 module "ignition-ssh-server" {
   for_each = {
     for host_key in [
@@ -235,7 +220,6 @@ data "ct_config" "ignition" {
       try(module.ignition-kubernetes-master[host_key].ignition_snippets, []),
       try(module.ignition-kubernetes-worker[host_key].ignition_snippets, []),
       try(module.ignition-ssh-server[host_key].ignition_snippets, []),
-      try(module.ignition-libvirt[host_key].ignition_snippets, []),
       try(module.ignition-hostapd[host_key].ignition_snippets, []),
       try(module.ignition-addons-parser[host_key].ignition_snippets, []),
       try(module.ignition-desktop[host_key].ignition_snippets, []),
