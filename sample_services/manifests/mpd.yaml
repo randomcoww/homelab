@@ -99,11 +99,13 @@ spec:
         - containerPort: 8001
           protocol: TCP
         volumeMounts:
-        - mountPath: /etc/mpd.conf
-          name: mpd-config
+        - name: mpd-config
+          mountPath: /etc/mpd.conf
           subPath: mpd.conf
-        - mountPath: /mpd/music
-          name: mpd-data
+        - name: mpd-cache
+          mountPath: /mpd/cache
+        - name: mpd-data
+          mountPath: /mpd/music
           mountPropagation: HostToContainer
       - name: ympd
         imagePullPolicy: Always
@@ -116,12 +118,15 @@ spec:
       - name: mpd-config
         configMap:
           name: mpd-config
-      - name: devfuse
+      - name: mpd-cache
         hostPath:
-          path: /dev/fuse
+          path: /var/pv/sync/mpd
       - name: mpd-data
         hostPath:
           path: /tmp/mpd-data
+      - name: devfuse
+        hostPath:
+          path: /dev/fuse
 
 ---
 kind: Service

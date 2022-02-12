@@ -13,7 +13,7 @@ metadata:
 data:
   config.xml: |-
     <configuration>
-      <folder id="matchbox-data" label="matchbox-data" path="${matchbox_path}" type="sendreceive" fsWatcherEnabled="true" fsWatcherDelayS="1" rescanIntervalS="10" ignorePerms="true" autoNormalize="false">
+      <folder id="sync-data" label="sync-data" path="${sync_data_path}" type="sendreceive" fsWatcherEnabled="true" fsWatcherDelayS="1" rescanIntervalS="10" ignorePerms="true" autoNormalize="false">
         %{~ for member in syncthing_members ~}
         <device id="${member.device_id}"></device>
         %{~ endfor ~}
@@ -53,18 +53,6 @@ data:
   cert-${member.pod_name}: ${replace(base64encode(chomp(member.cert)), "\n", "")}
   key-${member.pod_name}: ${replace(base64encode(chomp(member.key)), "\n", "")}
   %{~ endfor ~}
-type: Opaque
-
----
-apiVersion: v1
-kind: Secret
-metadata:
-  name: ${resource_name}-matchbox-tls
-  namespace: ${namespace}
-data:
-  ca.crt: ${replace(base64encode(chomp(matchbox_certs.ca)), "\n", "")}
-  server.crt: ${replace(base64encode(chomp(matchbox_certs.cert)), "\n", "")}
-  server.key: ${replace(base64encode(chomp(matchbox_certs.key)), "\n", "")}
 type: Opaque
 
 ---
@@ -131,29 +119,10 @@ spec:
         - --home
         - ${syncthing_home_path}
         volumeMounts:
-        - name: matchbox-data
-          mountPath: ${matchbox_path}
         - name: syncthing-data
           mountPath: ${syncthing_home_path}
-      - name: matchbox
-        image: ${container_images.matchbox}
-        args:
-        - -address=0.0.0.0:${internal_pxeboot_http_port}
-        - -rpc-address=0.0.0.0:${internal_pxeboot_api_port}
-        - -assets-path=${matchbox_path}
-        - -data-path=${matchbox_path}
-        volumeMounts:
-        - name: matchbox-tls
-          mountPath: /etc/matchbox/ca.crt
-          subPath: ca.crt
-        - name: matchbox-tls
-          mountPath: /etc/matchbox/server.crt
-          subPath: server.crt
-        - name: matchbox-tls
-          mountPath: /etc/matchbox/server.key
-          subPath: server.key
-        - name: matchbox-data
-          mountPath: ${matchbox_path}
+        - name: sync-data
+          mountPath: ${sync_data_path}
       volumes:
       - name: syncthing-config
         configMap:
@@ -161,33 +130,23 @@ spec:
       - name: syncthing-tls
         secret:
           secretName: ${resource_name}-syncthing-tls
-      - name: matchbox-tls
-        secret:
-          secretName: ${resource_name}-matchbox-tls
-      - name: matchbox-data
-        emptyDir: {}
       - name: syncthing-data
         emptyDir: {}
+      - name: sync-data
+        hostPath:
+          path: ${sync_data_path}
 
 ---
-kind: Service
 apiVersion: v1
+kind: Service
 metadata:
   name: ${resource_name}
   namespace: ${namespace}
   labels:
     app: ${resource_name}
 spec:
-  type: LoadBalancer
-  loadBalancerIP: ${internal_pxeboot_ip}
+  clusterIP: None
   ports:
-  - name: rpc
-    port: ${internal_pxeboot_api_port}
-    targetPort: ${internal_pxeboot_api_port}
-    protocol: TCP
-  - name: http
-    port: ${internal_pxeboot_http_port}
-    targetPort: ${internal_pxeboot_http_port}
-    protocol: TCP
+  - port: ${syncthing_peer_port}
   selector:
     app: ${resource_name}

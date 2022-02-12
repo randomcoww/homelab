@@ -95,3 +95,22 @@ module "minio-addons" {
 output "minio_endpoint" {
   value = module.minio-addons.endpoint
 }
+
+
+# syncthing fpr "good enough" async data replication #
+# shared path under /var/pv #
+module "syncthing-addons" {
+  source             = "./modules/syncthing_addons"
+  resource_name      = "syncthing"
+  resource_namespace = "default"
+  replica_count      = 2
+  sync_data_path     = "/var/pv/sync"
+  container_images   = local.container_images
+}
+
+resource "local_file" "syncthing-addons" {
+  for_each = module.syncthing-addons.manifests
+
+  content  = each.value
+  filename = "./output/manifests/${each.key}"
+}
