@@ -32,10 +32,15 @@ spec:
       labels:
         app: ${resource_name}
     spec:
-      nodeSelector:
-        %{~ for label, value in node_selector ~}
-        ${label}: ${value}
-        %{~ endfor ~}
+      affinity:
+        nodeAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+            nodeSelectorTerms:
+            - matchExpressions:
+              - key: host-class
+                operator: In
+                values:
+                - ${affinity_host_class}
       containers:
       - name: minio
         image: ${container_images.minio}

@@ -23,12 +23,12 @@ locals {
           "rd.driver.blacklist=nouveau",
           "modprobe.blacklist=nouveau",
           "nvidia-drm.modeset=1",
-          # Brightness control in wayland
-          # "nvidia.NVreg_RegistryDwords=EnableBrightnessControl=1",
           # VFIO passthrough
           # "vfio-pci.ids=10de:ffffffff:ffffffff:ffffffff:00030000:ffff00ff,10de:ffffffff:ffffffff:ffffffff:00040300:ffffffff",
           # "vfio-pci.ids=1002:ffffffff:ffffffff:ffffffff:00030000:ffff00ff,1002:ffffffff:ffffffff:ffffffff:00040300:ffffffff,10de:ffffffff:ffffffff:ffffffff:00030000:ffff00ff,10de:ffffffff:ffffffff:ffffffff:00040300:ffffffff",
           # "video=efifb:off",
+          # Brightness control in wayland
+          # "nvidia.NVreg_RegistryDwords=EnableBrightnessControl=1",
         ]
         kernel_image_name = "${local.pxeboot_image_builds.client}-live-kernel-x86_64"
         initrd_image_name = "${local.pxeboot_image_builds.client}-live-initramfs.x86_64.img"

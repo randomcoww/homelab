@@ -1,7 +1,7 @@
 # etcd #
 module "etcd-cluster" {
   source        = "./modules/etcd_cluster"
-  cluster_token = "aio-prod-3"
+  cluster_token = local.kubernetes.cluster_name
   cluster_hosts = {
     for host_key in [
       "aio-0",
@@ -21,7 +21,7 @@ module "etcd-cluster" {
 # kubernetes #
 module "kubernetes-common" {
   source                 = "./modules/kubernetes_common"
-  cluster_name           = "aio-prod-3"
+  cluster_name           = local.kubernetes.cluster_name
   apiserver_vip          = local.networks.lan.vips.apiserver
   apiserver_port         = local.ports.apiserver
   etcd_cluster_endpoints = module.etcd-cluster.cluster_endpoints

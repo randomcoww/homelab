@@ -1,6 +1,7 @@
 locals {
   base_hosts = {
     aio-0 = {
+      hostclass = "aio"
       users = [
         "admin"
       ]
@@ -63,6 +64,7 @@ locals {
     }
 
     client-0 = {
+      hostclass = "client"
       users = [
         "client"
       ]
@@ -84,6 +86,7 @@ locals {
     }
 
     store-0 = {
+      hostclass = "store"
       users = [
         "admin"
       ]

@@ -135,11 +135,14 @@ module "ignition-kubernetes-worker" {
     host_key => local.hosts[host_key]
   }
 
-  source                   = "./modules/kubernetes_worker"
-  ca                       = module.kubernetes-common.ca
-  certs                    = module.kubernetes-common.certs
-  template_params          = module.kubernetes-common.template_params
-  kubelet_node_labels      = { host_key = each.key }
+  source          = "./modules/kubernetes_worker"
+  ca              = module.kubernetes-common.ca
+  certs           = module.kubernetes-common.certs
+  template_params = module.kubernetes-common.template_params
+  kubelet_node_labels = {
+    host-key   = each.key
+    host-class = each.value.hostclass
+  }
   container_storage_path   = each.value.container_storage_path
   static_pod_manifest_path = local.kubernetes.static_pod_manifest_path
   ports                    = local.ports

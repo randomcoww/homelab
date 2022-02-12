@@ -1,6 +1,6 @@
 locals {
   kubernetes = {
-    cluster_name             = "aio-prod-1"
+    cluster_name             = "aio-prod-4"
     static_pod_manifest_path = "/var/lib/kubelet/manifests"
     addon_manifests_path     = "/var/lib/kubernetes/addons"
   }

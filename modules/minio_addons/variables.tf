@@ -23,9 +23,8 @@ variable "minio_console_port" {
   type = number
 }
 
-variable "node_selector" {
-  type    = map(string)
-  default = {}
+variable "affinity_host_class" {
+  type = string
 }
 
 variable "volume_paths" {
