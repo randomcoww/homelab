@@ -19,11 +19,11 @@ locals {
           "iommu=pt",
           "enforcing=0",
           "elevator=noop",
-          "rd.driver.pre=vfio-pci",
           "rd.driver.blacklist=nouveau",
           "modprobe.blacklist=nouveau",
           "nvidia-drm.modeset=1",
           # VFIO passthrough
+          # "rd.driver.pre=vfio-pci",
           # "vfio-pci.ids=10de:ffffffff:ffffffff:ffffffff:00030000:ffff00ff,10de:ffffffff:ffffffff:ffffffff:00040300:ffffffff",
           # "vfio-pci.ids=1002:ffffffff:ffffffff:ffffffff:00030000:ffff00ff,1002:ffffffff:ffffffff:ffffffff:00040300:ffffffff,10de:ffffffff:ffffffff:ffffffff:00030000:ffff00ff,10de:ffffffff:ffffffff:ffffffff:00040300:ffffffff",
           # "video=efifb:off",
