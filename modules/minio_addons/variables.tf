@@ -23,8 +23,8 @@ variable "minio_console_port" {
   type = number
 }
 
-variable "affinity_host_class" {
-  type = string
+variable "minio_hosts" {
+  type = list(string)
 }
 
 variable "volume_paths" {

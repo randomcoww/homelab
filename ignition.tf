@@ -139,11 +139,11 @@ module "ignition-kubernetes-worker" {
   ca              = module.kubernetes-common.ca
   certs           = module.kubernetes-common.certs
   template_params = module.kubernetes-common.template_params
-  kubelet_node_labels = {
-    host-key   = each.key
-    host-class = each.value.hostclass
+  node_labels = {
+    host-key = each.key
   }
-  container_storage_path   = each.value.container_storage_path
+  register_with_taints     = lookup(each.value, "kubernetes_worker_taints", {})
+  container_storage_path   = lookup(each.value, "container_storage_path", null)
   static_pod_manifest_path = local.kubernetes.static_pod_manifest_path
   ports                    = local.ports
 }

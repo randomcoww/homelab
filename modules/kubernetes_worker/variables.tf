@@ -10,7 +10,11 @@ variable "template_params" {
   type = any
 }
 
-variable "kubelet_node_labels" {
+variable "node_labels" {
+  type = map(string)
+}
+
+variable "register_with_taints" {
   type = map(string)
 }
 

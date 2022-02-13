@@ -37,10 +37,12 @@ spec:
           requiredDuringSchedulingIgnoredDuringExecution:
             nodeSelectorTerms:
             - matchExpressions:
-              - key: host-class
+              - key: host-key
                 operator: In
                 values:
-                - ${affinity_host_class}
+                %{~ for host_key in minio_hosts ~}
+                - ${host_key}
+                %{~ endfor ~}
       containers:
       - name: minio
         image: ${container_images.minio}

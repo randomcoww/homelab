@@ -71,13 +71,13 @@ spec:
           subPath: server.key
         - name: matchbox-data
           mountPath: ${matchbox_path}
+        livenessProbe:
+          tcpSocket:
+            port: ${internal_pxeboot_api_port}
+          initialDelaySeconds: 5
+          periodSeconds: 10
+          timeoutSeconds: 5
       volumes:
-      - name: syncthing-config
-        configMap:
-          name: ${resource_name}-syncthing-config
-      - name: syncthing-tls
-        secret:
-          secretName: ${resource_name}-syncthing-tls
       - name: matchbox-tls
         secret:
           secretName: ${resource_name}-matchbox-tls

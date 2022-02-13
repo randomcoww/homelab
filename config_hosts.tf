@@ -1,7 +1,6 @@
 locals {
   base_hosts = {
     aio-0 = {
-      hostclass = "aio"
       users = [
         "admin"
       ]
@@ -64,7 +63,6 @@ locals {
     }
 
     client-0 = {
-      hostclass = "client"
       users = [
         "client"
       ]
@@ -83,10 +81,12 @@ locals {
         "/var/home/minio"
       ]
       container_storage_path = "/var/home/containers"
+      kubernetes_worker_taints = {
+        "nvidia.com/gpu" = "true:NoSchedule"
+      }
     }
 
     store-0 = {
-      hostclass = "store"
       users = [
         "admin"
       ]

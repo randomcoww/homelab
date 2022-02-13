@@ -82,14 +82,9 @@ spec:
     spec:
       priorityClassName: system-cluster-critical
       serviceAccountName: coredns
-      tolerations:
-      - key: "CriticalAddonsOnly"
-        operator: "Exists"
-      nodeSelector:
-        kubernetes.io/os: linux
       containers:
       - name: coredns
-        image: "${container_images.coredns}"
+        image: ${container_images.coredns}
         imagePullPolicy: Always
         args: [ "-conf", "/etc/coredns/Corefile" ]
         volumeMounts:

@@ -31,8 +31,12 @@ systemd:
               --kubeconfig=${config_path}/kubelet.kubeconfig \
               --network-plugin=cni \
               --register-node=true \
+              --register-with-taints=${join(",", [
+                for taint, value in register_with_taints :
+                "${taint}=${value}"
+              ])} \
               --node-labels=${join(",", [
-                for node_label, value in kubelet_node_labels :
+                for node_label, value in node_labels :
                 "${node_label}=${value}"
               ])}
 

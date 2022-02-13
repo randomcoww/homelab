@@ -94,16 +94,16 @@ resource "local_file" "pxeboot_certs" {
 
 # minio addon for aio-0 host #
 module "minio-addons" {
-  source              = "./modules/minio_addons"
-  resource_name       = "minio"
-  resource_namespace  = "default"
-  replica_count       = 1
-  minio_ip            = local.networks.metallb.vips.minio
-  minio_port          = local.ports.minio
-  minio_console_port  = local.ports.minio_console
-  affinity_host_class = "aio"
-  volume_paths        = local.hosts.aio-0.minio_volume_paths
-  container_images    = local.container_images
+  source             = "./modules/minio_addons"
+  resource_name      = "minio"
+  resource_namespace = "default"
+  replica_count      = 1
+  minio_ip           = local.networks.metallb.vips.minio
+  minio_port         = local.ports.minio
+  minio_console_port = local.ports.minio_console
+  minio_hosts        = ["aio-0"]
+  volume_paths       = local.hosts.aio-0.minio_volume_paths
+  container_images   = local.container_images
 }
 
 output "minio_endpoint" {
