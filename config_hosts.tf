@@ -82,7 +82,7 @@ locals {
       ]
       container_storage_path = "/var/home/containers"
       kubernetes_worker_taints = {
-        "nvidia.com/gpu" = "true:NoSchedule"
+        # "nvidia.com/gpu" = "true:NoSchedule"
       }
     }
 
