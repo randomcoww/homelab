@@ -57,12 +57,6 @@ output "ssh_client_cert_authorized_key" {
 }
 
 
-# libvirt #
-module "libvirt-common" {
-  source = "./modules/libvirt_common"
-}
-
-
 # hostapd #
 module "hostapd-common" {
   source = "./modules/hostapd_common"

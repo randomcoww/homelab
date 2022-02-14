@@ -13,17 +13,17 @@ locals {
       client-0 = {
         selector_mac = "84-a9-38-0f-aa-76"
         boot_args = [
-          "systemd.unified_cgroup_hierarchy=0",
-          "intel_iommu=on",
-          "amd_iommu=on",
-          "iommu=pt",
-          "enforcing=0",
           "elevator=noop",
+          "enforcing=0",
           "rd.driver.blacklist=nouveau",
           "modprobe.blacklist=nouveau",
           "nvidia_drm.modeset=1",
+          # Backlight control for dedicated mode
           # "nvidia.NVreg_RegistryDwords=EnableBrightnessControl=1",
           # VFIO passthrough
+          # "intel_iommu=on",
+          # "amd_iommu=on",
+          # "iommu=pt",
           # "rd.driver.pre=vfio-pci",
           # "vfio-pci.ids=10de:ffffffff:ffffffff:ffffffff:00030000:ffff00ff,10de:ffffffff:ffffffff:ffffffff:00040300:ffffffff",
           # "vfio-pci.ids=1002:ffffffff:ffffffff:ffffffff:00030000:ffff00ff,1002:ffffffff:ffffffff:ffffffff:00040300:ffffffff,10de:ffffffff:ffffffff:ffffffff:00030000:ffff00ff,10de:ffffffff:ffffffff:ffffffff:00040300:ffffffff",
