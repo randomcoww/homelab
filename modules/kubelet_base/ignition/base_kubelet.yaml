@@ -39,8 +39,7 @@ storage:
         inline: |-
           [crio.runtime]
           default_runtime="crun"
-          conmon_cgroup="pod"
-          cgroup_manager="cgroupfs"
+          hooks_dir=["/usr/share/containers/oci/hooks.d"]
 
           [crio.runtime.runtimes.crun]
           runtime_path="/usr/bin/crun"
@@ -54,6 +53,7 @@ storage:
         inline: |-
           kind: KubeletConfiguration
           apiVersion: kubelet.config.k8s.io/v1beta1
+          cgroupDriver: systemd
           authentication:
             anonymous:
               enabled: true

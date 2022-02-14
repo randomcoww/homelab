@@ -59,12 +59,21 @@ storage:
 
           [crio.image]
           big_files_temporary_dir="${container_storage_path}"
+    - path: /etc/containers/storage.conf.d/10-root.conf
+      mode: 0644
+      overwrite: true
+      contents:
+        inline: |-
+          [storage]
+          graphroot="${container_storage_path}"
+
     - path: ${config_path}/kubelet-config-bootstrap-worker.yaml
       mode: 0644
       contents:
         inline: |-
           kind: KubeletConfiguration
           apiVersion: kubelet.config.k8s.io/v1beta1
+          cgroupDriver: systemd
           authentication:
             anonymous:
               enabled: false
