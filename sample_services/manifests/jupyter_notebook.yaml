@@ -1,0 +1,76 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: jupyter
+  namespace: default
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: jupyter
+  template:
+    metadata:
+      labels:
+        app: jupyter
+    spec:
+      affinity:
+        podAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+          - labelSelector:
+              matchExpressions:
+              - key: app
+                operator: In
+                values:
+                - syncthing
+            topologyKey: "kubernetes.io/hostname"
+      dnsPolicy: ClusterFirstWithHostNet
+      restartPolicy: Always
+      containers:
+      - name: jupyter
+        imagePullPolicy: Always
+        image: docker.io/tensorflow/tensorflow:2.7.1-gpu-jupyter
+        resources:
+          limits:
+            nvidia.com/gpu: 1
+        command: ["jupyter", "notebook", "--notebook-dir=/tf", "--ip=0.0.0.0", "--port=8888", "--no-browser", "--allow-root"]
+        volumeMounts:
+        - name: notebooks
+          mountPath: /tf/notebooks
+      volumes:
+      - name: notebooks
+        hostPath:
+          path: /var/pv/sync/jupyter-notebook
+
+---
+kind: Service
+apiVersion: v1
+metadata:
+  name: jupyter
+  namespace: default
+spec:
+  ports:
+  - name: http
+    port: 8888
+  selector:
+    app: jupyter
+
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: jupyter
+  namespace: default
+spec:
+  ingressClassName: nginx
+  rules:
+  - host: jupyter.fuzzybunny.internal
+    http:
+      paths:
+      - path: /
+        pathType: Prefix
+        backend:
+          service:
+            name: jupyter
+            port:
+              name: http
