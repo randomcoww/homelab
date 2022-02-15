@@ -1,0 +1,20 @@
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: external-dns
+  labels:
+    helm.sh/chart: "{{ .Chart.Name }}-{{ .Chart.Version | replace "+" "_" }}"
+    k8s-app: external-dns
+data:
+  Corefile: |
+    . {
+      errors
+      health
+      etcd {{ .Values.cluster_domain }} in-addr.arpa ip6.arp {
+        fallthrough in-addr.arpa ip6.arpa
+      }
+      cache 30
+      reload
+      loadbalance
+    }

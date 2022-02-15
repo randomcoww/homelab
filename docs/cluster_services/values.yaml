@@ -1,0 +1,15 @@
+images:
+  coredns: ""
+  etcd: ""
+  external_dns: ""
+  flannel_cni_plugins: ""
+  flannel: ""
+  kapprover: ""
+  kube_proxy: ""
+
+cni_bridge_interface_name: ""
+pod_network_prefix: ""
+apiserver_ip: ""
+apiserver_port: ""
+external_dns_ip: ""
+cluster_domain: ""
