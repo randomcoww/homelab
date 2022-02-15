@@ -182,19 +182,10 @@ module "ignition-addons-parser" {
     host_key => local.hosts[host_key]
   }
 
-  source = "./modules/addons_parser"
-  manifests = merge(
-    module.kubernetes-system-addons.manifests,
-    module.syncthing-addons.manifests,
-    module.pxeboot-addons.manifests,
-    module.minio-addons.manifests,
-    {
-      for file_name, data in data.http.remote-kubernetes-addons :
-      file_name => data.body
-    },
-  )
+  source               = "./modules/addons_parser"
+  manifests            = local.kubernetes_system_addons
   addon_manifests_path = local.kubernetes.addon_manifests_path
-  default_create_mode  = "Reconcile"
+  default_create_mode  = "EnsureExists"
 }
 
 module "ignition-desktop" {

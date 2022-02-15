@@ -37,6 +37,11 @@ output "admin_kubeconfig" {
   value = nonsensitive(module.kubernetes-admin.kubeconfig)
 }
 
+resource "local_file" "admin_kubeconfig" {
+  content  = nonsensitive(module.kubernetes-admin.kubeconfig)
+  filename = "./output/kubeconfig/${module.kubernetes-common.template_params.cluster_name}.kubeconfig"
+}
+
 
 # ssh #
 module "ssh-common" {

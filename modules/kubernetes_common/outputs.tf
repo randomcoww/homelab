@@ -1,21 +1,3 @@
-# output "ca" {
-#   value = {
-#     kubernetes = {
-#       algorithm       = tls_private_key.kubernetes-ca.algorithm
-#       private_key_pem = tls_private_key.kubernetes-ca.private_key_pem
-#       cert_pem        = tls_self_signed_cert.kubernetes-ca.cert_pem
-#     }
-#   }
-# }
-
-# output "certs" {
-#   value = local.certs
-# }
-
-# output "encryption_config_secret" {
-#   value = base64encode(chomp(random_string.encryption-config-secret.result))
-# }
-
 output "ca" {
   value = local.ca
 }
@@ -30,7 +12,6 @@ output "template_params" {
     pod_network               = local.pod_network
     service_network           = local.service_network
     cni_bridge_interface_name = local.cni_bridge_interface_name
-
     apiserver_vip             = var.apiserver_vip
     apiserver_port            = var.apiserver_port
     etcd_cluster_endpoints    = var.etcd_cluster_endpoints

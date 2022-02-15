@@ -109,3 +109,27 @@ module "minio-addons" {
 output "minio_endpoint" {
   value = module.minio-addons.endpoint
 }
+
+
+locals {
+  kubernetes_system_addons = merge(
+    module.kubernetes-system-addons.manifests,
+    {
+      for file_name, data in data.http.remote-kubernetes-addons :
+      file_name => data.body
+    },
+  )
+
+  kubernetes_app_addons = merge(
+    module.syncthing-addons.manifests,
+    module.pxeboot-addons.manifests,
+    module.minio-addons.manifests,
+  )
+}
+
+resource "local_file" "addons" {
+  for_each = local.kubernetes_addons
+
+  content  = each.value
+  filename = "./output/manifests/${each.key}"
+}
