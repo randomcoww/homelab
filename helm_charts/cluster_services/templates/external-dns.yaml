@@ -3,7 +3,7 @@ kind: ServiceAccount
 metadata:
   name: external-dns
   labels:
-    helm.sh/chart: {{ .Chart.Name }}-{{ .Chart.Version | replace "+" "_" }}
+    helm.sh/chart: "{{ .Chart.Name }}-{{ .Chart.Version | replace "+" "_" }}"
     k8s-app: external-dns
 
 ---
@@ -12,7 +12,7 @@ kind: ClusterRole
 metadata:
   name: external-dns
   labels:
-    helm.sh/chart: {{ .Chart.Name }}-{{ .Chart.Version | replace "+" "_" }}
+    helm.sh/chart: "{{ .Chart.Name }}-{{ .Chart.Version | replace "+" "_" }}"
     k8s-app: external-dns
 rules:
 - apiGroups: [""]
@@ -28,7 +28,7 @@ kind: ClusterRoleBinding
 metadata:
   name: external-dns
   labels:
-    helm.sh/chart: {{ .Chart.Name }}-{{ .Chart.Version | replace "+" "_" }}
+    helm.sh/chart: "{{ .Chart.Name }}-{{ .Chart.Version | replace "+" "_" }}"
     k8s-app: external-dns
 roleRef:
   apiGroup: rbac.authorization.k8s.io
@@ -55,11 +55,11 @@ spec:
     matchLabels:
       k8s-app: external-dns
   template:
-    annotations:
-      checksum/config: {{ include (print $.Template.BasePath "/external-dns-configmap.yaml") . | sha256sum }}
     metadata:
       labels:
         k8s-app: external-dns
+      annotations:
+        checksum/config: {{ include (print $.Template.BasePath "/external-dns-configmap.yaml") . | sha256sum }}
     spec:
       priorityClassName: system-cluster-critical
       serviceAccountName: external-dns
@@ -138,7 +138,7 @@ apiVersion: v1
 metadata:
   name: external-dns-udp
   labels:
-    helm.sh/chart: {{ .Chart.Name }}-{{ .Chart.Version | replace "+" "_" }}
+    helm.sh/chart: "{{ .Chart.Name }}-{{ .Chart.Version | replace "+" "_" }}"
     k8s-app: external-dns
   annotations:
     metallb.universe.tf/allow-shared-ip: external-dns

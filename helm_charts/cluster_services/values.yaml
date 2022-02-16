@@ -2,7 +2,7 @@ images:
   coredns: "docker.io/coredns/coredns:latest"
   etcd: ""
   external_dns: "k8s.gcr.io/external-dns/external-dns:v0.10.2"
-  flannel_cni_plugins: "rancher/mirrored-flannelcni-flannel-cni-plugin:v1.0.0"
+  flannel_cni_plugin: "rancher/mirrored-flannelcni-flannel-cni-plugin:v1.0.0"
   flannel: ""
   kapprover: ""
   kube_proxy: ""

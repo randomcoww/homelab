@@ -37,11 +37,11 @@ spec:
   updateStrategy:
     type: RollingUpdate
   template:
-    annotations:
-      checksum/config: {{ include (print $.Template.BasePath "/kube-proxy-config.yaml") . | sha256sum }}
     metadata:
       labels:
         k8s-app: kube-proxy
+      annotations:
+        checksum/config: {{ include (print $.Template.BasePath "/kube-proxy-config.yaml") . | sha256sum }}
     spec:
       priorityClassName: system-node-critical
       hostNetwork: true

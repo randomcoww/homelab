@@ -57,11 +57,11 @@ spec:
   updateStrategy:
     type: RollingUpdate
   template:
-    annotations:
-      checksum/config: {{ include (print $.Template.BasePath "/flannel-configmap.yaml") . | sha256sum }}
     metadata:
       labels:
         k8s-app: flannel
+      annotations:
+        checksum/config: {{ include (print $.Template.BasePath "/flannel-configmap.yaml") . | sha256sum }}
     spec:
       priorityClassName: system-node-critical
       hostNetwork: true
@@ -73,7 +73,7 @@ spec:
         effect: NoSchedule
       initContainers:
       - name: install-cni-plugin
-        image: {{ .Values.images.flannel_cni_plugins }}
+        image: {{ .Values.images.flannel_cni_plugin }}
         command:
         - cp
         args:
