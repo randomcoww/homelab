@@ -3,12 +3,12 @@ entries:
   cluster_services:
   - apiVersion: v2
     appVersion: 1.16.0
-    created: "2022-02-15T19:14:29.523411508-08:00"
+    created: "2022-02-15T22:59:45.445300832-08:00"
     description: Basic cluster services with minimal configuration
-    digest: fd8327856d5d96217288aa63f1dd0c5ee71a0f713025d923c40ac0c7802b3e46
+    digest: eae07f7dbabf4f05b49fd19af75e31d99878aa5ed14cd5c67abb915f6e38b2a0
     name: cluster_services
     type: application
     urls:
     - https://randomcoww.github.io/terraform-infra/cluster_services-0.1.0.tgz
     version: 0.1.0
-generated: "2022-02-15T19:14:29.522848932-08:00"
+generated: "2022-02-15T22:59:45.444923267-08:00"

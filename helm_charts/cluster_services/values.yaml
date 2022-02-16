@@ -1,15 +1,15 @@
 images:
-  coredns: ""
+  coredns: "docker.io/coredns/coredns:latest"
   etcd: ""
-  external_dns: ""
-  flannel_cni_plugins: ""
+  external_dns: "k8s.gcr.io/external-dns/external-dns:v0.10.2"
+  flannel_cni_plugins: "rancher/mirrored-flannelcni-flannel-cni-plugin:v1.0.0"
   flannel: ""
   kapprover: ""
   kube_proxy: ""
 
-cni_bridge_interface_name: ""
-pod_network_prefix: ""
-apiserver_ip: ""
-apiserver_port: ""
+cni_bridge_interface_name: "cni0"
+pod_network_prefix: "10.244.0.0/16"
+apiserver_ip: "10.96.0.1"
+apiserver_port: 443
 external_dns_ip: ""
-cluster_domain: ""
+internal_domain: ""

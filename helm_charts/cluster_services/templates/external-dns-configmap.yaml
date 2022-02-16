@@ -11,7 +11,7 @@ data:
     . {
       errors
       health
-      etcd {{ .Values.cluster_domain }} in-addr.arpa ip6.arp {
+      etcd {{ .Values.internal_domain }} in-addr.arpa ip6.arp {
         fallthrough in-addr.arpa ip6.arpa
       }
       cache 30
