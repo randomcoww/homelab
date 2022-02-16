@@ -4,7 +4,7 @@ kind: ConfigMap
 metadata:
   name: kube-proxy
   labels:
-    helm.sh/chart: "{{ .Chart.Name }}-{{ .Chart.Version | replace "+" "_" }}"
+    helm.sh/chart: {{ .Chart.Name }}-{{ .Chart.Version | replace "+" "_" }}
     k8s-app: kube-proxy
 data:
   kube-proxy-config.yaml: |-

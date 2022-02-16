@@ -3,7 +3,7 @@ apiVersion: rbac.authorization.k8s.io/v1
 metadata:
   name: flannel
   labels:
-    helm.sh/chart: "{{ .Chart.Name }}-{{ .Chart.Version | replace "+" "_" }}"
+    helm.sh/chart: {{ .Chart.Name }}-{{ .Chart.Version | replace "+" "_" }}
     k8s-app: flannel
 rules:
 - apiGroups: [""]
@@ -22,7 +22,7 @@ apiVersion: rbac.authorization.k8s.io/v1
 metadata:
   name: flannel
   labels:
-    helm.sh/chart: "{{ .Chart.Name }}-{{ .Chart.Version | replace "+" "_" }}"
+    helm.sh/chart: {{ .Chart.Name }}-{{ .Chart.Version | replace "+" "_" }}
     k8s-app: flannel
 roleRef:
   apiGroup: rbac.authorization.k8s.io
@@ -39,7 +39,7 @@ kind: ServiceAccount
 metadata:
   name: flannel
   labels:
-    helm.sh/chart: "{{ .Chart.Name }}-{{ .Chart.Version | replace "+" "_" }}"
+    helm.sh/chart: {{ .Chart.Name }}-{{ .Chart.Version | replace "+" "_" }}
     k8s-app: flannel
 
 ---
@@ -48,7 +48,7 @@ kind: DaemonSet
 metadata:
   name: flannel-ds
   labels:
-    helm.sh/chart: "{{ .Chart.Name }}-{{ .Chart.Version | replace "+" "_" }}"
+    helm.sh/chart: {{ .Chart.Name }}-{{ .Chart.Version | replace "+" "_" }}
     k8s-app: flannel
 spec:
   selector:
@@ -73,7 +73,7 @@ spec:
         effect: NoSchedule
       initContainers:
       - name: install-cni-plugin
-        image: {{ .Values.imagess.flannel_cni_plugins }}
+        image: {{ .Values.images.flannel_cni_plugins }}
         command:
         - cp
         args:
@@ -84,7 +84,7 @@ spec:
         - name: cni-plugin
           mountPath: /opt/cni/bin
       - name: install-cni
-        image: {{ .Values.image.flannel }}
+        image: {{ .Values.images.flannel }}
         command:
         - cp
         args:
@@ -98,7 +98,7 @@ spec:
           mountPath: /etc/kube-flannel/
       containers:
       - name: kube-flannel
-        image: {{ .Values.imagess.flannel }}
+        image: {{ .Values.images.flannel }}
         command:
         - /opt/bin/flanneld
         args:

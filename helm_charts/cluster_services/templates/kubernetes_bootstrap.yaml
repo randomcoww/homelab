@@ -5,7 +5,7 @@ kind: ClusterRoleBinding
 metadata:
   name: kubelet-bootstrap
   labels:
-    helm.sh/chart: "{{ .Chart.Name }}-{{ .Chart.Version | replace "+" "_" }}"
+    helm.sh/chart: {{ .Chart.Name }}-{{ .Chart.Version | replace "+" "_" }}
     k8s-app: bootstrap
 roleRef:
   apiGroup: rbac.authorization.k8s.io
@@ -22,7 +22,7 @@ kind: ClusterRoleBinding
 metadata:
   name: node-client-auto-approve-csr
   labels:
-    helm.sh/chart: "{{ .Chart.Name }}-{{ .Chart.Version | replace "+" "_" }}"
+    helm.sh/chart: {{ .Chart.Name }}-{{ .Chart.Version | replace "+" "_" }}
     k8s-app: bootstrap
 roleRef:
   apiGroup: rbac.authorization.k8s.io
@@ -39,7 +39,7 @@ kind: ClusterRoleBinding
 metadata:
   name: auto-approve-renewals-for-nodes
   labels:
-    helm.sh/chart: "{{ .Chart.Name }}-{{ .Chart.Version | replace "+" "_" }}"
+    helm.sh/chart: {{ .Chart.Name }}-{{ .Chart.Version | replace "+" "_" }}
     k8s-app: bootstrap
 subjects:
 - kind: Group
@@ -60,7 +60,7 @@ metadata:
     rbac.authorization.kubernetes.io/autoupdate: "true"
   labels:
     kubernetes.io/bootstrapping: rbac-defaults
-    helm.sh/chart: "{{ .Chart.Name }}-{{ .Chart.Version | replace "+" "_" }}"
+    helm.sh/chart: {{ .Chart.Name }}-{{ .Chart.Version | replace "+" "_" }}
     k8s-app: bootstrap
 rules:
 - apiGroups: [""]
@@ -79,7 +79,7 @@ kind: ClusterRoleBinding
 metadata:
   name: system:kube-apiserver
   labels:
-    helm.sh/chart: "{{ .Chart.Name }}-{{ .Chart.Version | replace "+" "_" }}"
+    helm.sh/chart: {{ .Chart.Name }}-{{ .Chart.Version | replace "+" "_" }}
     k8s-app: bootstrap
 roleRef:
   apiGroup: rbac.authorization.k8s.io
