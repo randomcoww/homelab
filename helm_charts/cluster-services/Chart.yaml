@@ -1,5 +1,5 @@
 apiVersion: v2
-name: cluster_services
+name: cluster-services
 description: Basic cluster services with minimal configuration
 
 # A chart can be either an 'application' or a 'library' chart.
