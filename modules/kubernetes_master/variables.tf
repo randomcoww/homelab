@@ -1,3 +1,7 @@
+variable "cluster_name" {
+  type = string
+}
+
 variable "ca" {
   type = map(string)
 }
@@ -14,11 +18,7 @@ variable "etcd_certs" {
   type = any
 }
 
-variable "template_params" {
-  type = any
-}
-
-variable "addon_manifests_path" {
+variable "encryption_config_secret" {
   type = string
 }
 
@@ -26,10 +26,34 @@ variable "static_pod_manifest_path" {
   type = string
 }
 
-variable "container_images" {
-  type = map(string)
+variable "etcd_cluster_endpoints" {
+  type = list(string)
 }
 
-variable "ports" {
+variable "service_network" {
+  type = any
+}
+
+variable "pod_network" {
+  type = any
+}
+
+variable "apiserver_ips" {
+  type = list(string)
+}
+
+variable "apiserver_port" {
+  type = number
+}
+
+variable "controller_manager_port" {
+  type = number
+}
+
+variable "scheduler_port" {
+  type = number
+}
+
+variable "container_images" {
   type = map(string)
 }

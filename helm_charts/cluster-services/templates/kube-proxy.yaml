@@ -61,7 +61,7 @@ spec:
         - --v=2
         env:
         - name: KUBERNETES_SERVICE_HOST
-          value: "{{ .Values.apiserver_ip }}"
+          value: "{{ .Values.service_network_apiserver_ip }}"
         - name: KUBERNETES_SERVICE_PORT
           value: "{{ .Values.apiserver_port }}"
         securityContext:

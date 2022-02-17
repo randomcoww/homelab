@@ -63,6 +63,12 @@ tw terraform apply -var-file=secrets.tfvars
 
 [Generate the server image and embed the ignition file](https://github.com/randomcoww/fedora-coreos-config-custom)
 
+### Deploy helm charts
+
+```bash
+tw terraform -chdir=helm_client apply
+```
+
 ### Access kubernetes
 
 Write admin kubeconfig

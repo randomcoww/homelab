@@ -56,7 +56,7 @@ storage:
               - "--kubelet-client-key=${certs.apiserver_key.path}"
               - "--kubelet-preferred-address-types=InternalDNS,InternalIP"
               - "--runtime-config=api/all=true"
-              - "--secure-port=${ports.apiserver}"
+              - "--secure-port=${apiserver_port}"
               - "--service-account-issuer=https://kubernetes.default.svc"
               - "--service-account-key-file=${certs.service_account_cert.path}"
               - "--service-account-signing-key-file=${certs.service_account_key.path}"
@@ -80,7 +80,7 @@ storage:
                 httpGet:
                   scheme: HTTPS
                   host: 127.0.0.1
-                  port: ${ports.apiserver}
+                  port: ${apiserver_port}
                   path: "/readyz"
                 initialDelaySeconds: 15
                 timeoutSeconds: 15
@@ -88,7 +88,7 @@ storage:
                 httpGet:
                   scheme: HTTPS
                   host: 127.0.0.1
-                  port: ${ports.apiserver}
+                  port: ${apiserver_port}
                   path: "/healthz"
                 initialDelaySeconds: 15
                 timeoutSeconds: 15

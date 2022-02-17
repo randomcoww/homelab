@@ -1,3 +1,5 @@
+# base system #
+
 module "ignition-base" {
   for_each = {
     for host_key in [
@@ -29,6 +31,20 @@ module "ignition-systemd-networkd" {
   bridge_interfaces   = each.value.bridge_interfaces
   tap_interfaces      = each.value.tap_interfaces
   networks            = local.networks
+}
+
+module "ignition-kubelet-base" {
+  for_each = {
+    for host_key in [
+      "aio-0",
+      "client-0",
+    ] :
+    host_key => local.hosts[host_key]
+  }
+
+  source                   = "./modules/kubelet_base"
+  node_ip                  = try(cidrhost(local.networks.lan.prefix, each.value.netnum), "")
+  static_pod_manifest_path = local.kubernetes.static_pod_manifest_path
 }
 
 module "ignition-gateway" {
@@ -79,73 +95,10 @@ module "ignition-disks" {
   disks  = each.value.disks
 }
 
-# masterless kubelet
-module "ignition-kubelet-base" {
-  for_each = {
-    for host_key in [
-      "aio-0",
-      "client-0",
-    ] :
-    host_key => local.hosts[host_key]
-  }
+# SSH CA #
 
-  source                   = "./modules/kubelet_base"
-  node_ip                  = try(cidrhost(local.networks.lan.prefix, each.value.netnum), "")
-  static_pod_manifest_path = local.kubernetes.static_pod_manifest_path
-}
-
-module "ignition-etcd" {
-  for_each = module.etcd-cluster.member_template_params
-
-  source                   = "./modules/etcd_member"
-  ca                       = module.etcd-cluster.ca
-  peer_ca                  = module.etcd-cluster.peer_ca
-  certs                    = module.etcd-cluster.certs
-  template_params          = each.value
-  static_pod_manifest_path = local.kubernetes.static_pod_manifest_path
-  container_images         = local.container_images
-}
-
-module "ignition-kubernetes-master" {
-  for_each = {
-    for host_key in [
-      "aio-0",
-    ] :
-    host_key => local.hosts[host_key]
-  }
-
-  source                   = "./modules/kubernetes_master"
-  ca                       = module.kubernetes-common.ca
-  etcd_ca                  = module.etcd-cluster.ca
-  certs                    = module.kubernetes-common.certs
-  etcd_certs               = module.etcd-cluster.certs
-  template_params          = module.kubernetes-common.template_params
-  addon_manifests_path     = local.kubernetes.addon_manifests_path
-  static_pod_manifest_path = local.kubernetes.static_pod_manifest_path
-  container_images         = local.container_images
-  ports                    = local.ports
-}
-
-module "ignition-kubernetes-worker" {
-  for_each = {
-    for host_key in [
-      "aio-0",
-      "client-0",
-    ] :
-    host_key => local.hosts[host_key]
-  }
-
-  source          = "./modules/kubernetes_worker"
-  ca              = module.kubernetes-common.ca
-  certs           = module.kubernetes-common.certs
-  template_params = module.kubernetes-common.template_params
-  node_labels = {
-    host-key = each.key
-  }
-  register_with_taints     = lookup(each.value, "kubernetes_worker_taints", {})
-  container_storage_path   = lookup(each.value, "container_storage_path", null)
-  static_pod_manifest_path = local.kubernetes.static_pod_manifest_path
-  ports                    = local.ports
+module "ssh-ca" {
+  source = "./modules/ssh_ca"
 }
 
 module "ignition-ssh-server" {
@@ -164,29 +117,48 @@ module "ignition-ssh-server" {
     "127.0.0.1",
     cidrhost(local.networks.lan.prefix, each.value.netnum),
   ]
-  ca = module.ssh-common.ca
+  ca = module.ssh-ca.ca
 }
 
-module "ignition-hostapd" {
-  for_each = module.hostapd-common.template_params
-
-  source          = "./modules/hostapd"
-  template_params = each.value
+module "ssh-client" {
+  source                = "./modules/ssh_client"
+  key_id                = var.ssh_client.key_id
+  public_key_openssh    = var.ssh_client.public_key
+  early_renewal_hours   = var.ssh_client.early_renewal_hours
+  validity_period_hours = var.ssh_client.validity_period_hours
+  ca                    = module.ssh-ca.ca
 }
 
-module "ignition-addons-parser" {
-  for_each = {
+output "ssh_client_cert_authorized_key" {
+  value = module.ssh-client.ssh_client_cert_authorized_key
+}
+
+# hostpad #
+
+module "hostapd-roaming" {
+  source = "./modules/hostapd_roaming"
+  members = {
     for host_key in [
       "aio-0",
     ] :
-    host_key => local.hosts[host_key]
+    host_key => {
+      interface_name = "wlan0"
+      mac            = module.ignition-systemd-networkd[host_key].hardware_interfaces.wlan0.mac
+    }
   }
-
-  source               = "./modules/addons_parser"
-  manifests            = local.kubernetes_system_addons
-  addon_manifests_path = local.kubernetes.addon_manifests_path
-  default_create_mode  = "EnsureExists"
 }
+
+module "ignition-hostapd" {
+  for_each = module.hostapd-roaming.members
+
+  source          = "./modules/hostapd"
+  host_key        = each.key
+  ssid            = var.wifi.ssid
+  passphrase      = var.wifi.passphrase
+  roaming_members = module.hostapd-roaming.members
+}
+
+# client desktop environment #
 
 module "ignition-desktop" {
   for_each = {
@@ -197,41 +169,116 @@ module "ignition-desktop" {
   }
 
   source                    = "./modules/desktop"
-  ssh_ca_public_key_openssh = module.ssh-common.ca.public_key_openssh
+  ssh_ca_public_key_openssh = module.ssh-ca.ca.public_key_openssh
 }
 
+# etcd #
 
-# combine and render a single ignition file #
-data "ct_config" "ignition" {
-  for_each = {
-    for host_key in keys(local.hosts) :
-    host_key => flatten([
-      try(module.ignition-base[host_key].ignition_snippets, []),
-      try(module.ignition-systemd-networkd[host_key].ignition_snippets, []),
-      try(module.ignition-gateway[host_key].ignition_snippets, []),
-      try(module.ignition-disks[host_key].ignition_snippets, []),
-      try(module.ignition-kubelet-base[host_key].ignition_snippets, []),
-      try(module.ignition-etcd[host_key].ignition_snippets, []),
-      try(module.ignition-kubernetes-master[host_key].ignition_snippets, []),
-      try(module.ignition-kubernetes-worker[host_key].ignition_snippets, []),
-      try(module.ignition-ssh-server[host_key].ignition_snippets, []),
-      try(module.ignition-hostapd[host_key].ignition_snippets, []),
-      try(module.ignition-addons-parser[host_key].ignition_snippets, []),
-      try(module.ignition-desktop[host_key].ignition_snippets, []),
-    ])
+module "etcd-cluster" {
+  source        = "./modules/etcd_cluster"
+  cluster_token = local.kubernetes.etcd_cluster_token
+  cluster_hosts = {
+    for host_key in [
+      "aio-0",
+    ] :
+    host_key => {
+      hostname    = local.hosts[host_key].hostname
+      ip          = cidrhost(local.networks.lan.prefix, local.hosts[host_key].netnum)
+      client_port = local.ports.etcd_client
+      peer_port   = local.ports.etcd_peer
+    }
   }
-  content  = <<EOT
----
-variant: fcos
-version: 1.4.0
-EOT
-  strict   = true
-  snippets = each.value
+  aws_region       = "us-west-2"
+  s3_backup_bucket = "randomcoww-etcd-backup"
 }
 
-resource "local_file" "ignition" {
-  for_each = local.hosts
+module "ignition-etcd" {
+  for_each = module.etcd-cluster.members
 
-  content  = data.ct_config.ignition[each.key].rendered
-  filename = "./output/ignition/${each.key}.ign"
+  source                   = "./modules/etcd_member"
+  ca                       = module.etcd-cluster.ca
+  peer_ca                  = module.etcd-cluster.peer_ca
+  certs                    = module.etcd-cluster.certs
+  cluster                  = module.etcd-cluster.cluster
+  backup                   = module.etcd-cluster.backup
+  member                   = each.value
+  static_pod_manifest_path = local.kubernetes.static_pod_manifest_path
+  container_images         = local.container_images
+}
+
+# kubernetes #
+
+module "kubernetes-ca" {
+  source = "./modules/kubernetes_ca"
+}
+
+module "ignition-kubernetes-master" {
+  for_each = {
+    for host_key in [
+      "aio-0",
+    ] :
+    host_key => local.hosts[host_key]
+  }
+
+  source                   = "./modules/kubernetes_master"
+  cluster_name             = local.kubernetes.cluster_name
+  ca                       = module.kubernetes-ca.ca
+  etcd_ca                  = module.etcd-cluster.ca
+  certs                    = module.kubernetes-ca.certs
+  etcd_certs               = module.etcd-cluster.certs
+  etcd_cluster_endpoints   = module.etcd-cluster.cluster.cluster_endpoints
+  encryption_config_secret = module.kubernetes-ca.encryption_config_secret
+  service_network          = local.networks.kubernetes_service
+  pod_network              = local.networks.kubernetes_pod
+  apiserver_ips = [
+    cidrhost(local.networks.lan.prefix, each.value.netnum),
+    local.networks.lan.vips.apiserver,
+  ]
+  static_pod_manifest_path = local.kubernetes.static_pod_manifest_path
+  container_images         = local.container_images
+  apiserver_port           = local.ports.apiserver
+  controller_manager_port  = local.ports.controller_manager
+  scheduler_port           = local.ports.scheduler
+}
+
+module "ignition-kubernetes-worker" {
+  for_each = {
+    for host_key in [
+      "aio-0",
+      "client-0",
+    ] :
+    host_key => local.hosts[host_key]
+  }
+
+  source                    = "./modules/kubernetes_worker"
+  cluster_name              = local.kubernetes.cluster_name
+  ca                        = module.kubernetes-ca.ca
+  certs                     = module.kubernetes-ca.certs
+  node_labels               = { host-key = each.key }
+  container_storage_path    = lookup(each.value, "container_storage_path", null)
+  cni_bridge_interface_name = local.kubernetes.cni_bridge_interface_name
+  apiserver_ip              = local.networks.lan.vips.apiserver
+  service_network           = local.networks.kubernetes_service
+  pod_network               = local.networks.kubernetes_pod
+  cluster_domain            = local.domains.kubernetes
+  static_pod_manifest_path  = local.kubernetes.static_pod_manifest_path
+  apiserver_port            = local.ports.apiserver
+  kubelet_port              = local.ports.kubelet
+}
+
+module "kubernetes-admin" {
+  source         = "./modules/kubernetes_admin"
+  cluster_name   = local.kubernetes.cluster_name
+  ca             = module.kubernetes-ca.ca
+  apiserver_ip   = local.networks.lan.vips.apiserver
+  apiserver_port = local.ports.apiserver
+}
+
+output "admin_kubeconfig" {
+  value = nonsensitive(module.kubernetes-admin.kubeconfig)
+}
+
+resource "local_file" "admin_kubeconfig" {
+  content  = nonsensitive(module.kubernetes-admin.kubeconfig)
+  filename = "./output/kubeconfig/${local.kubernetes.cluster_name}.kubeconfig"
 }

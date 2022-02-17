@@ -29,7 +29,7 @@ locals {
 
   module_ignition_snippets = [
     for f in fileset(".", "${path.module}/ignition/*.yaml") :
-    templatefile(f, merge(var.template_params, {
+    templatefile(f, merge(var.cluster, var.member, var.backup, {
       static_pod_manifest_path = var.static_pod_manifest_path
       certs_path               = local.certs_path
       backup_path              = "/var/lib/etcd/backup"

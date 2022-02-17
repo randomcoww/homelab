@@ -1,3 +1,7 @@
+variable "cluster_name" {
+  type = string
+}
+
 variable "ca" {
   type = object({
     algorithm       = string
@@ -6,6 +10,10 @@ variable "ca" {
   })
 }
 
-variable "template_params" {
-  type = any
+variable "apiserver_ip" {
+  type = string
+}
+
+variable "apiserver_port" {
+  type = number
 }

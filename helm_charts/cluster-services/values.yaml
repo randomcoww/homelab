@@ -9,7 +9,10 @@ images:
 
 cni_bridge_interface_name: "cni0"
 pod_network_prefix: "10.244.0.0/16"
-apiserver_ip: "10.96.0.1"
+service_network_apiserver_ip: "10.96.0.1"
+service_network_dns_ip: "10.96.0.10"
 apiserver_port: 443
 external_dns_ip: ""
 internal_domain: ""
+cluster_domain: "cluster.local"
+forwarding_dns_ip: ""

@@ -17,16 +17,22 @@ locals {
 
   module_ignition_snippets = [
     for f in fileset(".", "${path.module}/ignition/*.yaml") :
-    templatefile(f, merge(var.template_params, {
-      static_pod_manifest_path = var.static_pod_manifest_path
-      container_storage_path   = var.container_storage_path
-      kubelet_root_path        = "/var/lib/kubelet/root"
-      certs_path               = local.certs_path
-      config_path              = "/var/lib/kubelet/config"
-      certs                    = local.certs
-      node_labels              = var.node_labels
-      register_with_taints     = var.register_with_taints
-      ports                    = var.ports
-    }))
+    templatefile(f, {
+      cluster_name              = var.cluster_name
+      container_storage_path    = var.container_storage_path
+      kubelet_root_path         = "/var/lib/kubelet/root"
+      certs_path                = local.certs_path
+      config_path               = "/var/lib/kubelet/config"
+      certs                     = local.certs
+      node_labels               = var.node_labels
+      apiserver_ip              = var.apiserver_ip
+      service_network           = var.service_network
+      pod_network               = var.pod_network
+      cni_bridge_interface_name = var.cni_bridge_interface_name
+      cluster_domain            = var.cluster_domain
+      static_pod_manifest_path  = var.static_pod_manifest_path
+      apiserver_port            = var.apiserver_port
+      kubelet_port              = var.kubelet_port
+    })
   ]
 }

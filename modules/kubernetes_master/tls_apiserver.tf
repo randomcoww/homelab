@@ -16,10 +16,9 @@ resource "tls_cert_request" "apiserver" {
     "kubernetes.default",
   ]
 
-  ip_addresses = compact([
+  ip_addresses = concat(var.apiserver_ips, [
     "127.0.0.1",
-    var.template_params.apiserver_vip,
-    var.template_params.service_network.vips.apiserver,
+    var.service_network.vips.apiserver,
   ])
 }
 

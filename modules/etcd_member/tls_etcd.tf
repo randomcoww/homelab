@@ -8,17 +8,17 @@ resource "tls_cert_request" "etcd" {
   private_key_pem = tls_private_key.etcd.private_key_pem
 
   subject {
-    common_name  = var.template_params.hostname
+    common_name  = var.member.hostname
     organization = "etcd"
   }
 
   dns_names = [
-    var.template_params.hostname,
+    var.member.hostname,
   ]
 
   ip_addresses = [
     "127.0.0.1",
-    var.template_params.ip,
+    var.member.ip,
   ]
 }
 

@@ -49,8 +49,6 @@ storage:
           ieee80211w=2
           sae_password=${passphrase}
           ssid=${ssid}
-          ctrl_interface=/var/run/hostapd
-          ctrl_interface_group=0
 
           bssid=${bssid}
           mobility_domain=${mobility_domain}
@@ -58,7 +56,7 @@ storage:
           r0_key_lifetime=10000
           r1_key_holder=${nas_identifier}
           nas_identifier=${nas_identifier}
-          %{~ for member in roaming_members ~}
-          r0kh=${member.bssid} ${member.nas_identifier} ${encryption_key}
-          r1kh=${member.bssid} ${member.bssid} ${encryption_key}
+          %{~ for member in members ~}
+          r0kh=${member.bssid} ${member.nas_identifier} ${member.encryption_key}
+          r1kh=${member.bssid} ${member.bssid} ${member.encryption_key}
           %{~ endfor ~}

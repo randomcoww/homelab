@@ -11,7 +11,10 @@ locals {
     }
   }
 
-  kubeconfig = templatefile("${path.module}/manifests/kubeconfig_admin.yaml", merge(var.template_params, {
-    certs = local.certs
-  }))
+  kubeconfig = templatefile("${path.module}/manifests/kubeconfig_admin.yaml", {
+    cluster_name   = var.cluster_name
+    certs          = local.certs
+    apiserver_ip   = var.apiserver_ip
+    apiserver_port = var.apiserver_port
+  })
 }

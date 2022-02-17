@@ -19,11 +19,6 @@ locals {
     }
   }
 
-  aws_user_access = {
-    id     = aws_iam_access_key.s3-backup.id
-    secret = aws_iam_access_key.s3-backup.secret
-  }
-
   s3_backup_path = "${var.s3_backup_bucket}/${var.cluster_token}"
 
   cluster_endpoints = [

@@ -1,3 +1,7 @@
+variable "cluster_name" {
+  type = string
+}
+
 variable "ca" {
   type = map(string)
 }
@@ -6,15 +10,7 @@ variable "certs" {
   type = any
 }
 
-variable "template_params" {
-  type = any
-}
-
 variable "node_labels" {
-  type = map(string)
-}
-
-variable "register_with_taints" {
   type = map(string)
 }
 
@@ -26,6 +22,30 @@ variable "static_pod_manifest_path" {
   type = string
 }
 
-variable "ports" {
-  type = map(string)
+variable "cni_bridge_interface_name" {
+  type = string
+}
+
+variable "cluster_domain" {
+  type = string
+}
+
+variable "apiserver_ip" {
+  type = string
+}
+
+variable "service_network" {
+  type = any
+}
+
+variable "pod_network" {
+  type = any
+}
+
+variable "apiserver_port" {
+  type = number
+}
+
+variable "kubelet_port" {
+  type = number
 }

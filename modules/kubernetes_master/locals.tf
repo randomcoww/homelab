@@ -21,12 +21,6 @@ locals {
       scheduler_key = {
         content = tls_private_key.scheduler.private_key_pem
       }
-      addons_manager_cert = {
-        content = tls_locally_signed_cert.addons-manager.cert_pem
-      }
-      addons_manager_key = {
-        content = tls_private_key.addons-manager.private_key_pem
-      }
     }) :
     cert_name => merge(cert, {
       path = "${local.certs_path}/kubbernetes-${cert_name}.pem"
@@ -49,15 +43,21 @@ locals {
 
   module_ignition_snippets = [
     for f in fileset(".", "${path.module}/ignition/*.yaml") :
-    templatefile(f, merge(var.template_params, {
-      static_pod_manifest_path = var.static_pod_manifest_path
-      addon_manifests_path     = var.addon_manifests_path
+    templatefile(f, {
       config_path              = "/var/lib/kubernetes/config"
-      certs_path               = local.certs_path
+      cluster_name             = var.cluster_name
       certs                    = local.certs
       etcd_certs               = local.etcd_certs
+      certs_path               = local.certs_path
+      static_pod_manifest_path = var.static_pod_manifest_path
+      service_network          = var.service_network
+      pod_network              = var.pod_network
+      etcd_cluster_endpoints   = var.etcd_cluster_endpoints
+      encryption_config_secret = var.encryption_config_secret
       container_images         = var.container_images
-      ports                    = var.ports
-    }))
+      apiserver_port           = var.apiserver_port
+      controller_manager_port  = var.controller_manager_port
+      scheduler_port           = var.scheduler_port
+    })
   ]
 }

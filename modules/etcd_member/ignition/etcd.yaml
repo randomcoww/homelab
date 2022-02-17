@@ -27,10 +27,10 @@ storage:
               - "--host-peer-cert-file=${certs.peer_cert.path}"
               - "--host-peer-key-file=${certs.peer_key.path}"
               - "--host-peer-trusted-ca-file=${certs.peer_ca_cert.path}"
-              - "--initial-advertise-peer-urls=${peer_url}"
-              - "--listen-peer-urls=${peer_url}"
-              - "--advertise-client-urls=${client_url}"
-              - "--listen-client-urls=${join(",", [local_client_url, client_url])}"
+              - "--initial-advertise-peer-urls=${join(",", initial_advertise_peer_urls)}"
+              - "--listen-peer-urls=${join(",", listen_peer_urls)}"
+              - "--advertise-client-urls=${join(",", advertise_client_urls)}"
+              - "--listen-client-urls=${join(",", listen_client_urls)}"
               - "--initial-cluster-token=${cluster_token}"
               - "--initial-cluster=${join(",", initial_cluster)}"
               - "--etcd-servers=${join(",", cluster_endpoints)}"
@@ -49,9 +49,9 @@ storage:
                   fieldRef:
                     fieldPath: spec.nodeName
               - name: AWS_ACCESS_KEY_ID
-                value: "${aws_user_access.id}"
+                value: "${aws_access_key_id}"
               - name: AWS_SECRET_ACCESS_KEY
-                value: "${aws_user_access.secret}"
+                value: "${aws_access_key_secret}"
               - name: AWS_DEFAULT_REGION
                 value: "${aws_region}"
               - name: AWS_SDK_LOAD_CONFIG

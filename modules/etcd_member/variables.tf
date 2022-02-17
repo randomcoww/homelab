@@ -7,11 +7,40 @@ variable "peer_ca" {
 }
 
 variable "certs" {
-  type = any
+  type = map(object({
+    content = string
+    path    = optional(string)
+  }))
 }
 
-variable "template_params" {
-  type = any
+variable "cluster" {
+  type = object({
+    cluster_token     = string
+    cluster_endpoints = list(string)
+    initial_cluster   = list(string)
+  })
+}
+
+variable "backup" {
+  type = object({
+    aws_access_key_id     = string
+    aws_access_key_secret = string
+    s3_backup_path        = string
+    aws_region            = string
+  })
+}
+
+variable "member" {
+  type = object({
+    hostname                    = string
+    ip                          = string
+    client_port                 = string
+    peer_port                   = string
+    initial_advertise_peer_urls = list(string)
+    listen_peer_urls            = list(string)
+    advertise_client_urls       = list(string)
+    listen_client_urls          = list(string)
+  })
 }
 
 variable "static_pod_manifest_path" {
