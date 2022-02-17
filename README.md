@@ -1,6 +1,6 @@
 ## Terraform configs for provisioning homelab resources
 
-### Provisioning
+### Configure environment
 
 Define the `tw` (terraform wrapper) command
 
@@ -17,8 +17,6 @@ tw() {
   rc=$?; set +x; return $rc
 }
 ```
-
-### Define secrets
 
 Generate new SSH key (as needed)
 
@@ -63,19 +61,10 @@ tw terraform apply -var-file=secrets.tfvars
 
 [Generate the server image and embed the ignition file](https://github.com/randomcoww/fedora-coreos-config-custom)
 
-### Deploy helm charts
+### Deploy services to kubernetes
 
 ```bash
 tw terraform -chdir=helm_client apply
-```
-
-### Access kubernetes
-
-Write admin kubeconfig
-
-```bash
-mkdir -p ~/.kube && \
-  tw terraform output -raw admin_kubeconfig > ~/.kube/config
 ```
 
 ### Create PXE boot entry for client device
@@ -87,31 +76,34 @@ mkdir -p ~/.mc && \
   tw terraform output -json minio_endpoint > ~/.mc/config.json
 ```
 
-[Build and upload client image to minio](https://github.com/randomcoww/fedora-coreos-config-custom/blob/master/builds/client/README.md). This should be accessible once `minio-*` and `metallb` pods are running.
-
-Merge with existing config (optional)
+Merge with existing config if there is one
 
 ```bash
 jq -s '.[0] * .[1]' ~/.mc/config.json new_config.json
 ```
 
-Write matchbox PXE boot config. This should be accessible once `pxeboot-*` and `metallb` pods are running.
+[Build and upload client image to minio](https://github.com/randomcoww/fedora-coreos-config-custom/blob/master/builds/client/README.md)
+
+Write matchbox PXE boot config
 
 ```bash
 tw terraform -chdir=pxeboot_config_client apply
 ```
 
-### Sign SSH key for SSH access to server
+### Server access
+
+Write admin kubeconfig
+
+```bash
+mkdir -p ~/.kube && \
+  tw terraform output -raw admin_kubeconfig > ~/.kube/config
+```
+
+Sign SSH key
 
 ```bash
 KEY=$HOME/.ssh/id_ecdsa
 tw terraform output -raw ssh_client_cert_authorized_key > $KEY-cert.pub
-```
-
-Libvirt is also accessible via SSH (TODO: Try KubeVirt)
-
-```bash
-virsh -c qemu+ssh://fcos@aio-0.local/system list --all
 ```
 
 ### Cleanup terraform file formatting for checkin
