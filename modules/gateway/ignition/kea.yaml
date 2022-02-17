@@ -143,7 +143,7 @@ storage:
               args: [ "kea-ctrl-agent", "-c", "/etc/kea/kea-ctrl-agent.conf" ]
               volumeMounts:
               - name: kea-share
-                mountPath: "${kea_shared_path}"
+                mountPath: ${kea_shared_path}
               - name: config-kea-ctrl-agent
                 mountPath: /etc/kea/kea-ctrl-agent.conf
                 readOnly: true
@@ -156,7 +156,7 @@ storage:
                   - NET_RAW
               volumeMounts:
               - name: kea-share
-                mountPath: "${kea_shared_path}"
+                mountPath: ${kea_shared_path}
               - name: config-kea-dhcp4
                 mountPath: /etc/kea/kea-dhcp4.conf
                 readOnly: true

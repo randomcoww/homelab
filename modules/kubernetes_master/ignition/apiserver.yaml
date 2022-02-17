@@ -39,31 +39,31 @@ storage:
               image: ${container_images.kube_apiserver}
               command:
               - kube-apiserver
-              - "--advertise-address=$(NODE_IP)"
-              - "--allow-privileged=true"
-              - "--authorization-mode=Node,RBAC"
-              - "--bind-address=0.0.0.0"
-              - "--client-ca-file=${certs.ca_cert.path}"
-              - "--enable-admission-plugins=NamespaceLifecycle,NodeRestriction,LimitRanger,ServiceAccount,DefaultStorageClass,ResourceQuota"
-              - "--encryption-provider-config=${config_path}/encryption-config.yaml"
-              - "--etcd-cafile=${etcd_certs.ca_cert.path}"
-              - "--etcd-certfile=${etcd_certs.client_cert.path}"
-              - "--etcd-keyfile=${etcd_certs.client_key.path}"
-              - "--etcd-servers=${join(",", etcd_cluster_endpoints)}"
-              - "--event-ttl=1h"
-              - "--kubelet-certificate-authority=${certs.ca_cert.path}"
-              - "--kubelet-client-certificate=${certs.apiserver_cert.path}"
-              - "--kubelet-client-key=${certs.apiserver_key.path}"
-              - "--kubelet-preferred-address-types=InternalDNS,InternalIP"
-              - "--runtime-config=api/all=true"
-              - "--secure-port=${apiserver_port}"
-              - "--service-account-issuer=https://kubernetes.default.svc"
-              - "--service-account-key-file=${certs.service_account_cert.path}"
-              - "--service-account-signing-key-file=${certs.service_account_key.path}"
-              - "--service-cluster-ip-range=${service_network.prefix}"
-              - "--tls-cert-file=${certs.apiserver_cert.path}"
-              - "--tls-private-key-file=${certs.apiserver_key.path}"
-              - "--v=2"
+              - --advertise-address=$(NODE_IP)
+              - --allow-privileged=true
+              - --authorization-mode=Node,RBAC
+              - --bind-address=0.0.0.0
+              - --client-ca-file=${certs.ca_cert.path}
+              - --enable-admission-plugins=NamespaceLifecycle,NodeRestriction,LimitRanger,ServiceAccount,DefaultStorageClass,ResourceQuota
+              - --encryption-provider-config=${config_path}/encryption-config.yaml
+              - --etcd-cafile=${etcd_certs.ca_cert.path}
+              - --etcd-certfile=${etcd_certs.client_cert.path}
+              - --etcd-keyfile=${etcd_certs.client_key.path}
+              - --etcd-servers=${join(",", etcd_cluster_endpoints)}
+              - --event-ttl=1h
+              - --kubelet-certificate-authority=${certs.ca_cert.path}
+              - --kubelet-client-certificate=${certs.apiserver_cert.path}
+              - --kubelet-client-key=${certs.apiserver_key.path}
+              - --kubelet-preferred-address-types=InternalDNS,InternalIP
+              - --runtime-config=api/all=true
+              - --secure-port=${apiserver_port}
+              - --service-account-issuer=https://kubernetes.default.svc
+              - --service-account-key-file=${certs.service_account_cert.path}
+              - --service-account-signing-key-file=${certs.service_account_key.path}
+              - --service-cluster-ip-range=${service_network.prefix}
+              - --tls-cert-file=${certs.apiserver_cert.path}
+              - --tls-private-key-file=${certs.apiserver_key.path}
+              - --v=2
               env:
               - name: NODE_IP
                 valueFrom:
@@ -71,17 +71,17 @@ storage:
                     fieldPath: status.hostIP
               volumeMounts:
               - name: config-apiserver
-                mountPath: "${config_path}"
+                mountPath: ${config_path}
                 readOnly: true
               - name: certs
-                mountPath: "${certs_path}"
+                mountPath: ${certs_path}
                 readOnly: true
               readinessProbe:
                 httpGet:
                   scheme: HTTPS
                   host: 127.0.0.1
                   port: ${apiserver_port}
-                  path: "/readyz"
+                  path: /readyz
                 initialDelaySeconds: 15
                 timeoutSeconds: 15
               livenessProbe:
@@ -89,13 +89,13 @@ storage:
                   scheme: HTTPS
                   host: 127.0.0.1
                   port: ${apiserver_port}
-                  path: "/healthz"
+                  path: /healthz
                 initialDelaySeconds: 15
                 timeoutSeconds: 15
             volumes:
             - name: config-apiserver
               hostPath:
-                path: "${config_path}"
+                path: ${config_path}
             - name: certs
               hostPath:
-                path: "${certs_path}"
+                path: ${certs_path}

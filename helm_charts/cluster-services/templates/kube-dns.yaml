@@ -68,7 +68,7 @@ spec:
         checksum/config: {{ include (print $.Template.BasePath "/kube-dns-configmap.yaml") . | sha256sum }}
     spec:
       priorityClassName: system-cluster-critical
-      serviceAccountName: coredns
+      serviceAccountName: kube-dns
       containers:
       - name: coredns
         image: {{ .Values.images.coredns }}
@@ -88,14 +88,6 @@ spec:
           httpGet:
             path: /health
             port: 8080
-          initialDelaySeconds: 60
-          timeoutSeconds: 5
-          successThreshold: 1
-          failureThreshold: 5
-        readinessProbe:
-          httpGet:
-            path: /ready
-            port: 8081
           initialDelaySeconds: 60
           timeoutSeconds: 5
           successThreshold: 1

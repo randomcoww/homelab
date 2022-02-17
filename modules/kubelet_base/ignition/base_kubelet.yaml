@@ -64,5 +64,5 @@ storage:
           enableServer: false
           staticPodPath: ${static_pod_manifest_path}
           makeIPTablesUtilChains: false
-          containerLogMaxSize: "10Mi"
+          containerLogMaxSize: 10Mi
           containerLogMaxFiles: 2

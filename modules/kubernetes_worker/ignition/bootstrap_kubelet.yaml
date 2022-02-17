@@ -76,22 +76,22 @@ storage:
             webhook:
               enabled: true
             x509:
-              clientCAFile: "${certs.ca_cert.path}"
+              clientCAFile: ${certs.ca_cert.path}
           authorization:
             mode: Webhook
           address: 0.0.0.0
           port: ${kubelet_port}
           staticPodPath: ${static_pod_manifest_path}
-          clusterDomain: "${cluster_domain}"
+          clusterDomain: ${cluster_domain}
           clusterDNS:
-          - "${service_network.vips.dns}"
-          resolvConf: "/run/systemd/resolve/resolv.conf"
-          runtimeRequestTimeout: "15m"
+          - ${service_network.vips.dns}
+          resolvConf: /run/systemd/resolve/resolv.conf
+          runtimeRequestTimeout: 15m
           rotateCertificates: true
           serverTLSBootstrap: true
-          shutdownGracePeriod: "120s"
-          shutdownGracePeriodCriticalPods: "60s"
-          containerLogMaxSize: "10Mi"
+          shutdownGracePeriod: 120s
+          shutdownGracePeriodCriticalPods: 60s
+          containerLogMaxSize: 10Mi
           containerLogMaxFiles: 2
           evictionHard:
             imagefs.available: 1%

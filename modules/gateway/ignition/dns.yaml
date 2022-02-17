@@ -39,7 +39,7 @@ storage:
             hostNetwork: true
             containers:
             - name: coredns
-              image: "${container_images.coredns}"
+              image: ${container_images.coredns}
               resources:
                 limits:
                   memory: 170Mi

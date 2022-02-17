@@ -46,39 +46,39 @@ storage:
               image: ${container_images.kube_controller_manager}
               command:
               - kube-controller-manager
-              - "--allocate-node-cidrs=true"
-              - "--bind-address=0.0.0.0"
-              - "--cluster-cidr=${pod_network.prefix}"
-              - "--cluster-name=${cluster_name}"
-              - "--cluster-signing-cert-file=${certs.ca_cert.path}"
-              - "--cluster-signing-key-file=${certs.ca_key.path}"
-              - "--kubeconfig=${config_path}/kube-controller-manager.kubeconfig"
-              - "--leader-elect=true"
-              - "--root-ca-file=${certs.ca_cert.path}"
-              - "--service-account-private-key-file=${certs.service_account_key.path}"
-              - "--service-cluster-ip-range=${service_network.prefix}"
-              - "--use-service-account-credentials=true"
-              - "--secure-port=${controller_manager_port}"
-              - "--v=2"
+              - --allocate-node-cidrs=true
+              - --bind-address=0.0.0.0
+              - --cluster-cidr=${pod_network.prefix}
+              - --cluster-name=${cluster_name}
+              - --cluster-signing-cert-file=${certs.ca_cert.path}
+              - --cluster-signing-key-file=${certs.ca_key.path}
+              - --kubeconfig=${config_path}/kube-controller-manager.kubeconfig
+              - --leader-elect=true
+              - --root-ca-file=${certs.ca_cert.path}
+              - --service-account-private-key-file=${certs.service_account_key.path}
+              - --service-cluster-ip-range=${service_network.prefix}
+              - --use-service-account-credentials=true
+              - --secure-port=${controller_manager_port}
+              - --v=2
               volumeMounts:
               - name: config-volume
-                mountPath: "${config_path}"
+                mountPath: ${config_path}
                 readOnly: true
               - name: certs
-                mountPath: "${certs_path}"
+                mountPath: ${certs_path}
                 readOnly: true
               livenessProbe:
                 httpGet:
                   scheme: HTTPS
                   host: 127.0.0.1
                   port: ${controller_manager_port}
-                  path: "/healthz"
+                  path: /healthz
                 initialDelaySeconds: 15
                 timeoutSeconds: 15
             volumes:
             - name: config-volume
               hostPath:
-                path: "${config_path}"
+                path: ${config_path}
             - name: certs
               hostPath:
-                path: "${certs_path}"
+                path: ${certs_path}

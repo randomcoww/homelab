@@ -84,14 +84,6 @@ spec:
           timeoutSeconds: 5
           successThreshold: 1
           failureThreshold: 5
-        readinessProbe:
-          httpGet:
-            path: /ready
-            port: 8081
-          initialDelaySeconds: 60
-          timeoutSeconds: 5
-          successThreshold: 1
-          failureThreshold: 5
       - name: etcd
         image: {{ .Values.images.etcd }}
         command: [ "/usr/local/bin/etcd" ]
