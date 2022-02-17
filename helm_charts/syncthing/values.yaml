@@ -4,8 +4,4 @@ home_path: "/var/lib/syncthing"
 peer_port: 22000
 data_path: ""
 secret_data:
-  cert-pod-0: "crt"
-  key-pod-0: "key"
-config: |
-  <configuration>
-  </configuration>
+config: ""

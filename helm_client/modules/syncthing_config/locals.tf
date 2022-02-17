@@ -9,16 +9,12 @@ locals {
     }
   ]
 
-  config_xml = {
-    for f in fileset(".", "${path.module}/config/config.xml") :
-    basename(f) => templatefile(f, {
-      container_images    = var.container_images
-      resource_name       = var.resource_name
-      namespace           = var.resource_namespace
-      syncthing_members   = local.syncthing_members
-      syncthing_home_path = "/var/lib/syncthing"
-      syncthing_peer_port = 22000
-      sync_data_path      = var.sync_data_path
-    })
-  }
+  config_xml = templatefile("${path.module}/config/config.xml", {
+    resource_name       = var.resource_name
+    namespace           = var.resource_namespace
+    syncthing_members   = local.syncthing_members
+    syncthing_home_path = "/var/lib/syncthing"
+    syncthing_peer_port = 22000
+    sync_data_path      = var.sync_data_path
+  })
 }

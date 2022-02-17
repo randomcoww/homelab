@@ -62,24 +62,28 @@ resource "helm_release" "nginx_ingress" {
   create_namespace = true
 }
 
-# module "syncthing-addon" {
-#   source             = "./modules/syncthing"
-#   resource_name      = "syncthing"
-#   resource_namespace = "default"
-#   replica_count      = 2
-#   sync_data_path     = "/var/pv/sync"
-# }
+module "syncthing-addon" {
+  source             = "./modules/syncthing_config"
+  replica_count      = 2
+  resource_name      = "syncthing"
+  resource_namespace = "default"
+  sync_data_path     = "/var/pv/sync"
+}
 
-# resource "helm_release" "syncthing" {
-#   name       = "syncthing"
-#   namespace  = "default"
-#   repository = "https://randomcoww.github.io/terraform-infra/"
-#   chart      = "syncthing"
-#   values = yamlencode({
-#     replica_count = 2
-#     image         = local.container_images.syncthing
-#     data_path     = "/var/pv/sync"
-#     secret_data   = module.syncthing-addon.secret
-#     config        = module.syncthing-addon.config
-#   })
-# }
+resource "helm_release" "syncthing" {
+  name       = "syncthing"
+  namespace  = "default"
+  repository = "https://randomcoww.github.io/terraform-infra/"
+  chart      = "syncthing"
+  version    = "0.1.1"
+  wait       = false
+  values = [
+    yamlencode({
+      replica_count = 2
+      data_path     = "/var/pv/sync"
+      image         = local.container_images.syncthing
+      secret_data   = module.syncthing-addon.secret
+      config        = module.syncthing-addon.config
+    })
+  ]
+}
