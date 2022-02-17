@@ -3,7 +3,7 @@ entries:
   cluster-services:
   - apiVersion: v2
     appVersion: 1.16.0
-    created: "2022-02-16T21:43:01.334091329-08:00"
+    created: "2022-02-16T23:02:19.296077746-08:00"
     description: Basic cluster services with minimal configuration
     digest: 177de5b5eae3f5c627e0ee9517bcc004fc9f3b0f15b603144f1c513e719d96b8
     name: cluster-services
@@ -11,4 +11,15 @@ entries:
     urls:
     - https://randomcoww.github.io/terraform-infra/cluster-services-0.1.0.tgz
     version: 0.1.0
-generated: "2022-02-16T21:43:01.333708456-08:00"
+  syncthing:
+  - apiVersion: v2
+    appVersion: 1.16.0
+    created: "2022-02-16T23:02:19.29622581-08:00"
+    description: A Helm chart for Kubernetes
+    digest: fa9a8eb17a2eeed610401bb07aeaabcd344a9241ea1bf34abefad04a13f6ad1e
+    name: syncthing
+    type: application
+    urls:
+    - https://randomcoww.github.io/terraform-infra/syncthing-0.1.0.tgz
+    version: 0.1.0
+generated: "2022-02-16T23:02:19.295760525-08:00"
