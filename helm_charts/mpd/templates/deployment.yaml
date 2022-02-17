@@ -1,0 +1,145 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ .Chart.Name }}
+  labels:
+    helm.sh/chart: {{ .Chart.Name }}-{{ .Chart.Version | replace "+" "_" }}
+    app: {{ .Chart.Name }}
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: {{ .Chart.Name }}
+  template:
+    metadata:
+      labels:
+        app: {{ .Chart.Name }}
+      annotations:
+        checksum/secret: {{ include (print $.Template.BasePath "/configmap.yaml") . | sha256sum }}
+    spec:
+      affinity:
+        podAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+          - labelSelector:
+              matchExpressions:
+              - key: app
+                operator: In
+                values:
+                - {{ .Values.affinity }}
+            topologyKey: kubernetes.io/hostname
+      dnsPolicy: ClusterFirstWithHostNet
+      restartPolicy: Always
+      containers:
+      - name: mount-data
+        imagePullPolicy: Always
+        image: {{ .Values.images.rclone }}
+        lifecycle:
+          preStop:
+            exec:
+              command: ["/bin/sh","-c","umount -f /mpd/music"]
+        securityContext:
+          privileged: true
+          capabilities:
+            add:
+            - SYS_ADMIN
+        args:
+        - "mount"
+        - ":s3:{{ .Values.minio_bucket }}/"
+        - "/mpd/music"
+        - "--s3-provider=Minio"
+        - "--s3-endpoint={{ .Values.minio_endpoint }}"
+        - "--allow-other"
+        - "--allow-non-empty"
+        - "--vfs-cache-mode=off"
+        - "--no-modtime"
+        - "--read-only"
+        volumeMounts:
+        - name: devfuse
+          mountPath: /dev/fuse
+        - name: mpd-data
+          mountPath: /mpd/music
+          mountPropagation: Bidirectional
+      - name: mpd
+        imagePullPolicy: Always
+        image: {{ .Values.images.mpd }}
+        ports:
+        - containerPort: 8000
+          protocol: TCP
+        volumeMounts:
+        - name: mpd-config
+          mountPath: /etc/mpd.conf
+          subPath: mpd.conf
+        - name: mpd-cache
+          mountPath: /mpd/cache
+        - name: mpd-data
+          mountPath: /mpd/music
+          mountPropagation: HostToContainer
+      - name: ympd
+        imagePullPolicy: Always
+        image: {{ .Values.images.ympd }}
+        args: ["-h", "127.0.0.1", "-p", "6600", "-w", "8080"]
+        ports:
+        - containerPort: 8080
+          protocol: TCP
+      volumes:
+      - name: mpd-config
+        configMap:
+          name: {{ .Chart.Name }}
+      - name: mpd-cache
+        hostPath:
+          path: /var/pv/sync/mpd
+      - name: mpd-data
+        hostPath:
+          path: /tmp/mpd-data
+      - name: devfuse
+        hostPath:
+          path: /dev/fuse
+
+---
+kind: Service
+apiVersion: v1
+metadata:
+  name: {{ .Chart.Name }}
+  labels:
+    helm.sh/chart: {{ .Chart.Name }}-{{ .Chart.Version | replace "+" "_" }}
+    app: {{ .Chart.Name }}
+spec:
+  ports:
+  - name: flac
+    port: 8000
+  - name: control
+    port: 8080
+  selector:
+    app: mpd
+
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: {{ .Chart.Name }}
+  labels:
+    helm.sh/chart: {{ .Chart.Name }}-{{ .Chart.Version | replace "+" "_" }}
+    app: {{ .Chart.Name }}
+spec:
+  ingressClassName: nginx
+  rules:
+  - host: {{ .Values.control_dns_name }}
+    http:
+      paths:
+      - path: /
+        pathType: Prefix
+        backend:
+          service:
+            name: {{ .Chart.Name }}
+            port:
+              name: control
+  - host: {{ .Values.stream_dns_name }}
+    http:
+      paths:
+      - path: /
+        pathType: Prefix
+        backend:
+          service:
+            name: {{ .Chart.Name }}
+            port:
+              name: flac

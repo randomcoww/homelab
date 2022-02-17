@@ -101,6 +101,9 @@ locals {
     external_dns            = "k8s.gcr.io/external-dns/external-dns:v0.10.2"
     matchbox                = "quay.io/poseidon/matchbox:latest"
     syncthing               = "docker.io/syncthing/syncthing:latest"
+    rclone                  = "rclone/rclone:latest"
+    mpd                     = "ghcr.io/randomcoww/mpd:0.23.5"
+    ympd                    = "ghcr.io/randomcoww/ympd:latest"
   }
 
   kubernetes = {

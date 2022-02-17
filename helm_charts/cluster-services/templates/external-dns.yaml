@@ -94,7 +94,7 @@ spec:
         - --source=ingress
         - --provider=coredns
         - --log-level=debug
-        - --domain-filter={{ .Values.cluster_domain }}
+        - --domain-filter={{ .Values.internal_domain }}
       dnsPolicy: Default
       volumes:
       - name: config-volume

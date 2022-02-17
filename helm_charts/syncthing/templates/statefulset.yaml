@@ -28,7 +28,7 @@ spec:
                 operator: In
                 values:
                 - {{ .Chart.Name }}
-            topologyKey: "kubernetes.io/hostname"
+            topologyKey: kubernetes.io/hostname
       # Syncthing requires config.xml to be writable
       # Copy into shared volume
       initContainers:

@@ -1,0 +1,9 @@
+replica_count: 2
+image: "minio/minio:latest"
+node_affinity: ""
+minio_ip: ""
+minio_port: 9000
+minio_console_port: 9001
+volume_path: ""
+access_key_id: ""
+secret_access_key: ""

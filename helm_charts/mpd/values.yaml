@@ -1,0 +1,9 @@
+images:
+  rclone: "rclone/rclone:latest"
+  mpd: ""
+  ympd: ""
+affinity: ""
+minio_bucket: ""
+minio_endpoint: ""
+control_dns_name: ""
+stream_dns_name: ""
