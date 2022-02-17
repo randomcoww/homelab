@@ -3,18 +3,18 @@ entries:
   cluster-services:
   - apiVersion: v2
     appVersion: 1.16.0
-    created: "2022-02-17T01:50:17.754566539-08:00"
+    created: "2022-02-17T02:19:53.581586563-08:00"
     description: Basic cluster services with minimal configuration
-    digest: abb268197e678619d0cf201dabb7129cece846d0abd21396e5d8615ce430ff7f
+    digest: 4f802fbc5d3c945f4bc7a2d84153fe7531a751ca5f186a01a3b246b7ff7b2a54
     name: cluster-services
     type: application
     urls:
-    - https://randomcoww.github.io/terraform-infra/cluster-services-0.1.4.tgz
-    version: 0.1.4
+    - https://randomcoww.github.io/terraform-infra/cluster-services-0.1.5.tgz
+    version: 0.1.5
   syncthing:
   - apiVersion: v2
     appVersion: 1.16.0
-    created: "2022-02-17T01:50:17.754754064-08:00"
+    created: "2022-02-17T02:19:53.581876126-08:00"
     description: Async data replication between nodes
     digest: bc8ca0bbcc18bbc7b84a3da7f635db766bf7c427aceac81a4c994fb0fd200274
     name: syncthing
@@ -22,4 +22,4 @@ entries:
     urls:
     - https://randomcoww.github.io/terraform-infra/syncthing-0.1.0.tgz
     version: 0.1.0
-generated: "2022-02-17T01:50:17.754168162-08:00"
+generated: "2022-02-17T02:19:53.580872221-08:00"
