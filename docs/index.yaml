@@ -3,18 +3,18 @@ entries:
   cluster-services:
   - apiVersion: v2
     appVersion: 1.16.0
-    created: "2022-02-17T12:10:37.448702028-08:00"
+    created: "2022-02-17T12:23:42.091181424-08:00"
     description: Basic cluster services with minimal configuration
-    digest: 4f802fbc5d3c945f4bc7a2d84153fe7531a751ca5f186a01a3b246b7ff7b2a54
+    digest: 7c8f28b2a0f34ba7046d0d8a992bbb37c05198277e7f22eeec34409e828e8e85
     name: cluster-services
     type: application
     urls:
-    - https://randomcoww.github.io/terraform-infra/cluster-services-0.1.5.tgz
-    version: 0.1.5
+    - https://randomcoww.github.io/terraform-infra/cluster-services-0.1.6.tgz
+    version: 0.1.6
   matchbox:
   - apiVersion: v2
     appVersion: 1.16.0
-    created: "2022-02-17T12:10:37.448840315-08:00"
+    created: "2022-02-17T12:23:42.091348905-08:00"
     description: Matchbox PXE boot
     digest: fa19f0605f61eeac290f450d708057360d07d2da9c533d523d8245daf99de4ca
     name: matchbox
@@ -25,7 +25,7 @@ entries:
   minio:
   - apiVersion: v2
     appVersion: 1.16.0
-    created: "2022-02-17T12:10:37.44897902-08:00"
+    created: "2022-02-17T12:23:42.09150535-08:00"
     description: Minio
     digest: 2111330f7093d2491f83f20eac615ca873af7a5e000ab63430b711f368c95d24
     name: minio
@@ -36,7 +36,7 @@ entries:
   mpd:
   - apiVersion: v2
     appVersion: 1.16.0
-    created: "2022-02-17T12:10:37.449113396-08:00"
+    created: "2022-02-17T12:23:42.091653136-08:00"
     description: MPD on internal minio
     digest: 90ba00c434acc1340f524c044816333318ffbe4ec258073425da084bcebb92d8
     name: mpd
@@ -47,7 +47,7 @@ entries:
   syncthing:
   - apiVersion: v2
     appVersion: 1.16.0
-    created: "2022-02-17T12:10:37.449234921-08:00"
+    created: "2022-02-17T12:23:42.09178367-08:00"
     description: Async data replication between nodes
     digest: c039fe9b23807e3f966194466ea9b3956c68025e45d7a0853776c5c2ba5272fd
     name: syncthing
@@ -55,4 +55,4 @@ entries:
     urls:
     - https://randomcoww.github.io/terraform-infra/syncthing-0.1.1.tgz
     version: 0.1.1
-generated: "2022-02-17T12:10:37.448366158-08:00"
+generated: "2022-02-17T12:23:42.09078989-08:00"
