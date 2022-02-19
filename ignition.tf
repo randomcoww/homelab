@@ -5,6 +5,7 @@ module "ignition-base" {
     for host_key in [
       "aio-0",
       "client-0",
+      "store-0",
     ] :
     host_key => local.hosts[host_key]
   }
@@ -21,6 +22,7 @@ module "ignition-systemd-networkd" {
   for_each = {
     for host_key in [
       "aio-0",
+      "store-0",
     ] :
     host_key => local.hosts[host_key]
   }
@@ -38,6 +40,7 @@ module "ignition-kubelet-base" {
     for host_key in [
       "aio-0",
       "client-0",
+      "store-0",
     ] :
     host_key => local.hosts[host_key]
   }
@@ -105,6 +108,7 @@ module "ignition-ssh-server" {
   for_each = {
     for host_key in [
       "aio-0",
+      "store-0",
     ] :
     host_key => local.hosts[host_key]
   }
