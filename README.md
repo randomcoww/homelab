@@ -130,3 +130,12 @@ buildah build \
 ```bash
 buildah push ghcr.io/randomcoww/tw:latest
 ```
+
+### Updating helm charts
+
+Full example: https://github.com/technosophos/tscharts
+
+```bash
+helm package helm_charts/<chart>
+helm repo index --url https://randomcoww.github.io/terraform-infra docs/
+```
