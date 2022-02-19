@@ -5,7 +5,7 @@ resource "helm_release" "cluster_services" {
   namespace  = "kube-system"
   repository = "https://randomcoww.github.io/terraform-infra/"
   chart      = "cluster-services"
-  version    = "0.1.6"
+  version    = "0.1.7"
   wait       = false
   values = [
     yamlencode({
