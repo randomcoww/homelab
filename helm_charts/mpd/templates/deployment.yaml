@@ -120,6 +120,8 @@ metadata:
   labels:
     helm.sh/chart: {{ .Chart.Name }}-{{ .Chart.Version | replace "+" "_" }}
     app: {{ .Chart.Name }}
+  annotations:
+    nginx.org/websocket-services: {{ .Chart.Name }}
 spec:
   ingressClassName: nginx
   rules:
