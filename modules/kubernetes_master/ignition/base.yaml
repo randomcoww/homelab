@@ -8,11 +8,11 @@ storage:
     - path: ${cert.path}
       mode: 0644
       contents:
-        inline: ${replace(cert.content, "\n", "\\n")}
+        inline: "${replace(cert.content, "\n", "\\n")}"
     %{~ endfor ~}
     %{~ for cert in values(etcd_certs) ~}
     - path: ${cert.path}
       mode: 0644
       contents:
-        inline: ${replace(cert.content, "\n", "\\n")}
+        inline: "${replace(cert.content, "\n", "\\n")}"
     %{~ endfor ~}

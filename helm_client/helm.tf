@@ -200,7 +200,7 @@ resource "helm_release" "mpd" {
   namespace  = "default"
   repository = "https://randomcoww.github.io/terraform-infra/"
   chart      = "mpd"
-  version    = "0.1.2"
+  version    = "0.1.3"
   wait       = false
   values = [
     yamlencode({

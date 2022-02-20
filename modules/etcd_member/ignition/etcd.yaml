@@ -20,29 +20,29 @@ storage:
             - name: etcd-wrapper
               image: ${container_images.etcd_wrapper}
               args:
-              - "--name=$(NODE_NAME)"
-              - "--host-cert-file=${certs.cert.path}"
-              - "--host-key-file=${certs.key.path}"
-              - "--host-trusted-ca-file=${certs.ca_cert.path}"
-              - "--host-peer-cert-file=${certs.peer_cert.path}"
-              - "--host-peer-key-file=${certs.peer_key.path}"
-              - "--host-peer-trusted-ca-file=${certs.peer_ca_cert.path}"
-              - "--initial-advertise-peer-urls=${join(",", initial_advertise_peer_urls)}"
-              - "--listen-peer-urls=${join(",", listen_peer_urls)}"
-              - "--advertise-client-urls=${join(",", advertise_client_urls)}"
-              - "--listen-client-urls=${join(",", listen_client_urls)}"
-              - "--initial-cluster-token=${cluster_token}"
-              - "--initial-cluster=${join(",", initial_cluster)}"
-              - "--etcd-servers=${join(",", cluster_endpoints)}"
-              - "--host-backup-file=${backup_path}/${etcd_backup_file}"
-              - "--host-etcd-manifest-file=${static_pod_manifest_path}/${etcd_manifest_file}"
-              - "--etcd-image=${container_images.etcd}"
-              - "--client-cert-file=${certs.client_cert.path}"
-              - "--client-key-file=${certs.client_key.path}"
-              - "--s3-backup-path=${s3_backup_path}"
-              - "--backup-interval=30m"
-              - "--healthcheck-interval=10s"
-              - "--pod-update-interval=1m"
+              - --name=$(NODE_NAME)
+              - --host-cert-file=${certs.cert.path}
+              - --host-key-file=${certs.key.path}
+              - --host-trusted-ca-file=${certs.ca_cert.path}
+              - --host-peer-cert-file=${certs.peer_cert.path}
+              - --host-peer-key-file=${certs.peer_key.path}
+              - --host-peer-trusted-ca-file=${certs.peer_ca_cert.path}
+              - --initial-advertise-peer-urls=${join(",", initial_advertise_peer_urls)}
+              - --listen-peer-urls=${join(",", listen_peer_urls)}
+              - --advertise-client-urls=${join(",", advertise_client_urls)}
+              - --listen-client-urls=${join(",", listen_client_urls)}
+              - --initial-cluster-token=${cluster_token}
+              - --initial-cluster=${join(",", initial_cluster)}
+              - --host-backup-file=${backup_path}/${etcd_backup_file}
+              - --host-etcd-manifest-file=${static_pod_manifest_path}/${etcd_manifest_file}
+              - --etcd-image=${container_images.etcd}
+              - --client-cert-file=${certs.client_cert.path}
+              - --client-key-file=${certs.client_key.path}
+              - --cluster-client-urls=${join(",", cluster_endpoints)}
+              - --s3-backup-path=${s3_backup_path}
+              - --backup-interval=30m
+              - --healthcheck-interval=5s
+              - --pod-update-wait=40s
               env:
               - name: NODE_NAME
                 valueFrom:
@@ -58,22 +58,22 @@ storage:
                 value: "1"
               volumeMounts:
               - name: certs-volume
-                mountPath: "${certs_path}"
+                mountPath: ${certs_path}
                 readOnly: true
               - name: backup-volume
-                mountPath: "${backup_path}"
+                mountPath: ${backup_path}
               - name: manifest-volume
-                mountPath: "${static_pod_manifest_path}"
+                mountPath: ${static_pod_manifest_path}
             volumes:
             - name: certs-volume
               hostPath:
-                path: "${certs_path}"
+                path: ${certs_path}
             - name: backup-volume
               hostPath:
-                path: "${backup_path}"
+                path: ${backup_path}
             - name: manifest-volume
               hostPath:
-                path: "${static_pod_manifest_path}"
+                path: ${static_pod_manifest_path}
 
     # certs #
     %{~ for cert in values(certs) ~}
