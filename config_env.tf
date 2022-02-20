@@ -24,6 +24,7 @@ locals {
         minio            = 10
         external_dns     = 11
         internal_pxeboot = 12
+        ingress          = 13
       }
     }
     kubernetes_service = {

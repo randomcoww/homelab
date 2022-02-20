@@ -9,16 +9,7 @@ resource "helm_release" "cluster_services" {
   wait       = false
   values = [
     yamlencode({
-      images = {
-        coredns            = local.container_images.coredns
-        etcd               = local.container_images.etcd
-        external_dns       = local.container_images.external_dns
-        flannel_cni_plugin = local.container_images.flannel_cni_plugin
-        flannel            = local.container_images.flannel
-        kapprover          = local.container_images.kapprover
-        kube_proxy         = local.container_images.kube_proxy
-        etcd               = local.container_images.etcd
-      }
+      images                    = local.container_images
       pod_network_prefix        = local.networks.kubernetes_pod.prefix
       service_network_dns_ip    = local.networks.kubernetes_service.vips.dns
       apiserver_ip              = local.networks.lan.vips.apiserver
@@ -66,6 +57,16 @@ resource "helm_release" "nginx_ingress" {
   chart            = "ingress-nginx"
   namespace        = "ingress-nginx"
   create_namespace = true
+
+  values = [
+    yamlencode({
+      controller = {
+        service = {
+          externalIPs = [local.networks.metallb.vips.ingress]
+        }
+      }
+    })
+  ]
 }
 
 # nvidia device plugin #
@@ -204,11 +205,7 @@ resource "helm_release" "mpd" {
   wait       = false
   values = [
     yamlencode({
-      images = {
-        rclone = local.container_images.rclone
-        mpd    = local.container_images.mpd
-        ympd   = local.container_images.ympd
-      }
+      images           = local.container_images
       affinity         = "syncthing"
       minio_endpoint   = "http://minio-0.minio.default.svc:${local.ports.minio}"
       minio_bucket     = "music"
