@@ -22,6 +22,17 @@ systemd:
 
 storage:
   files:
+    # Enable mdns when using network manager #
+    - path: /etc/NetworkManager/conf.d/base.conf
+      mode: 0644
+      contents:
+        inline: |
+          [main]
+          no-auto-default=*
+
+          [connection]
+          connection.mdns=2
+
     # controller support in steam flatpak
     - path: /etc/udev/rules.d/62-steam-input.rules
       mode: 0644

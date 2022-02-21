@@ -134,14 +134,3 @@ storage:
         inline: |
           kernel.printk=4
           fs.inotify.max_user_watches=524288
-
-    # Enable mdns when using network manager #
-    - path: /etc/NetworkManager/conf.d/base.conf
-      mode: 0644
-      contents:
-        inline: |
-          [main]
-          no-auto-default=*
-
-          [connection]
-          connection.mdns=2

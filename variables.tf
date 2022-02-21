@@ -20,3 +20,13 @@ variable "wifi" {
     passphrase = string
   })
 }
+
+variable "wireguard_client" {
+  type = object({
+    private_key = string
+    public_key  = string
+    dns         = string
+    address     = string
+    endpoint    = string
+  })
+}
