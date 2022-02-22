@@ -1,0 +1,99 @@
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: {{ .Chart.Name }}
+  labels:
+    helm.sh/chart: {{ .Chart.Name }}-{{ .Chart.Version | replace "+" "_" }}
+    app: {{ .Chart.Name }}
+spec:
+  serviceName: {{ .Chart.Name }}
+  replicas: {{ .Values.replica_count }}
+  selector:
+    matchLabels:
+      app: {{ .Chart.Name }}
+  template:
+    metadata:
+      labels:
+        app: {{ .Chart.Name }}
+      annotations:
+        checksum/config: {{ include (print $.Template.BasePath "/configmap.yaml") . | sha256sum }}
+        checksum/secret: {{ include (print $.Template.BasePath "/secret.yaml") . | sha256sum }}
+    spec:
+      affinity:
+        podAntiAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+          - labelSelector:
+              matchExpressions:
+              - key: app
+                operator: In
+                values:
+                - {{ .Chart.Name }}
+            topologyKey: kubernetes.io/hostname
+      # Syncthing requires config.xml to be writable
+      # Copy into shared volume
+      initContainers:
+      - name: syncthing-init
+        image: {{ .Values.image }}
+        command:
+        - cp
+        - /tmp/config.xml
+        - /tmp/cert.pem
+        - /tmp/key.pem
+        - {{ .Values.home_path }}/
+        env:
+        - name: POD_NAME
+          valueFrom:
+            fieldRef:
+              fieldPath: metadata.name
+        volumeMounts:
+        - name: syncthing-config
+          mountPath: /tmp/config.xml
+          subPath: config.xml
+        - name: syncthing-tls
+          mountPath: /tmp/cert.pem
+          subPathExpr: cert-$(POD_NAME)
+        - name: syncthing-tls
+          mountPath: /tmp/key.pem
+          subPathExpr: key-$(POD_NAME)
+        - name: syncthing-data
+          mountPath: {{ .Values.home_path }}
+      containers:
+      - name: syncthing
+        image: {{ .Values.image }}
+        command:
+        - syncthing
+        args:
+        - --home
+        - {{ .Values.home_path }}
+        volumeMounts:
+        - name: syncthing-data
+          mountPath: {{ .Values.home_path }}
+        - name: sync-data
+          mountPath: {{ .Values.data_path }}
+      volumes:
+      - name: syncthing-config
+        configMap:
+          name: {{ .Chart.Name }}
+      - name: syncthing-tls
+        secret:
+          secretName: {{ .Chart.Name }}
+      - name: syncthing-data
+        emptyDir: {}
+      - name: sync-data
+        hostPath:
+          path: {{ .Values.data_path }}
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ .Chart.Name }}
+  labels:
+    app: {{ .Chart.Name }}
+    helm.sh/chart: {{ .Chart.Name }}-{{ .Chart.Version | replace "+" "_" }}
+spec:
+  clusterIP: None
+  ports:
+  - port: {{ .Values.peer_port }}
+  selector:
+    app: {{ .Chart.Name }}

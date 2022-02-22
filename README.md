@@ -1,215 +1,141 @@
 ## Terraform configs for provisioning homelab resources
 
-### Provisioning
+### Configure environment
 
-#### Setup tw (terraform wrapper) command
+Define the `tw` (terraform wrapper) command
 
 ```bash
 tw() {
-    set -x
-    podman run -it --rm --security-opt label=disable \
-        -v $HOME/.aws:/root/.aws \
-        -v $(pwd):/root/mnt \
-        -v /var/cache:/var/cache \
-        -w /root/mnt/resources \
-        --net=host \
-        ghcr.io/randomcoww/tw:latest "$@"
-    rc=$?; set +x; return $rc
+  set -x
+  podman run -it --rm --security-opt label=disable \
+    -v $HOME/.aws:/root/.aws \
+    -v $(pwd):/tf \
+    -v /var/cache:/var/cache \
+    -w /tf \
+    --net=host \
+    ghcr.io/randomcoww/tw:latest "$@"
+  rc=$?; set +x; return $rc
 }
 ```
 
-#### Define secrets
+Generate new SSH key (as needed)
 
-```bash
-cat > secrets.tfvars <<EOF
-users = {
-  client = {
-    password = "$(echo 'password' | mkpasswd -m sha-512 -s)"
-  }
-}
-wireguard_config = {
-  Interface = {
-    PrivateKey =
-    Address    =
-    DNS        =
-  }
-  Peer = {
-    PublicKey  =
-    AllowedIPs =
-    Endpoint   =
-  }
-}
-EOF
-```
-
-#### Create bootable hypervisor and client images
-
-Hypervisor images are live USB disks created using [Fedora CoreOS assembler](https://github.com/coreos/coreos-assembler)
-
-```bash
-tw terraform apply \
-    -var-file=secrets.tfvars \
-    -target=module.template-hypervisor \
-    -target=local_file.ignition
-```
-
-**Host images**
-
-Run build from https://github.com/randomcoww/fedora-coreos-config-custom.git. Write generated ISO file to disk (USB flash drive is sufficient) and boot from it.
-
-#### Start VMs
-
-**kvm-0.local**
-
-| Guest | IP | vCPU | Memory |
-|-------|----|------|--------|
-| ns-0.local | 192.168.127.222 | 1 | 3 |
-| controller-0.local | 192.168.127.219 | 2 | 8 |
-| controller-1.local | 192.168.127.220 | 2 | 8 |
-| ns-1.local | 192.168.127.223 | 1 | 3 |
-| controller-2.local | 192.168.127.221 | 2 | 8 |
-| worker-0.local |  | 4 | 20 |
-| gateway-0.local |  | 1 | 2 |
-| gateway-1.local |  | 1 | 2 |
-
-```bash
-tw terraform apply \
-    -var-file=secrets.tfvars \
-    -target=module.ignition-kvm-0 \
-    -target=module.libvirt-kvm-0
-```
-
-#### Start kubernetes addons
-
-```bash
-tw terraform apply \
-    -var-file=secrets.tfvars \
-    -target=null_resource.kubernetes_resources
-
-tw terraform apply \
-    -var-file=secrets.tfvars \
-    -target=module.kubernetes-namespaces
-
-tw terraform apply \
-    -var-file=secrets.tfvars \
-    -target=module.kubernetes-addons
-```
-
----
-
-### Remote access
-
-**SSH**
-
-Generate a new key as needed
 ```bash
 KEY=$HOME/.ssh/id_ecdsa
 ssh-keygen -q -t ecdsa -N '' -f $KEY 2>/dev/null <<< y >/dev/null
 ```
 
-Sign public key
+Create `secrets.tfvars` file
+
 ```bash
 KEY=$HOME/.ssh/id_ecdsa
-tw terraform apply \
-    -auto-approve \
-    -var="ssh_client_public_key=$(cat $KEY.pub)" \
-    -target=null_resource.output && \
-tw terraform output -raw ssh-client-certificate > $KEY-cert.pub
+cat > secrets.tfvars <<EOF
+users = {
+  admin = {
+    password_hash = "$(echo 'password' | mkpasswd -m sha-512 -s)"
+  }
+  client = {
+    password_hash = "$(echo 'password' | mkpasswd -m sha-512 -s)"
+  }
+}
+ssh_client = {
+  key_id = "$(whoami)"
+  public_key = "ssh_client_public_key=$(cat $KEY.pub)"
+  early_renewal_hours = 168
+  validity_period_hours = 336
+}
+wifi = {
+  ssid = "ssid"
+  passphrase = "passphrase"
+}
+EOF
 ```
 
-Access Libvirt through SSH
+### Create bootable image for the server
+
+Generate a CoreOS ignition file
+
 ```bash
-virsh -c qemu+ssh://fcos@kvm-0.local/system
+tw terraform apply -var-file=secrets.tfvars
 ```
 
-**Kubeconfig**
+[Generate a bootable device for the server](https://github.com/randomcoww/fedora-coreos-config-custom/blob/master/builds/server/README.md)
+
+### Deploy services to kubernetes
 
 ```bash
-tw terraform apply \
-    -auto-approve \
-    -target=null_resource.output && \
+tw terraform -chdir=helm_client apply
+```
+
+### Create PXE boot entry for client device
+
+Write minio config
+
+```bash
+mkdir -p ~/.mc && \
+  tw terraform output -json minio_endpoint > ~/.mc/config.json
+```
+
+Merge with existing config if there is one
+
+```bash
+jq -s '.[0] * .[1]' ~/.mc/config.json new_config.json
+```
+
+[Build and upload client image to minio](https://github.com/randomcoww/fedora-coreos-config-custom/blob/master/builds/client/README.md)
+
+Write matchbox PXE boot config
+
+```bash
+tw terraform -chdir=pxeboot_config_client apply
+```
+
+### Server access
+
+Write admin kubeconfig
+
+```bash
 mkdir -p ~/.kube && \
-tw terraform output -raw kubeconfig > ~/.kube/config
+  tw terraform output -raw admin_kubeconfig > ~/.kube/config
 ```
 
----
-
-### Cleanup and generate README
+Sign SSH key
 
 ```bash
-tw find ../ -name '*.tf' -exec terraform fmt '{}' \;
-
-tw terraform apply \
-    -auto-approve \
-    -target=local_file.readme
+KEY=$HOME/.ssh/id_ecdsa
+tw terraform output -raw ssh_client_cert_authorized_key > $KEY-cert.pub
 ```
 
----
-
-### Start services
-
-#### MetalLb
-
-https://metallb.universe.tf/installation/#installation-by-manifest
+### Cleanup terraform file formatting for checkin
 
 ```bash
-kubectl apply -f https://raw.githubusercontent.com/metallb/metallb/main/manifests/metallb.yaml
+tw find . -name '*.tf' -exec terraform fmt '{}' \;
 ```
 
-#### Traefik
+### Build terrafrom wrapper image
 
 ```bash
-kubectl apply -f services/traefik.yaml
-```
+TF_VERSION=1.1.2
+SSH_VERSION=0.1.4
+SYNCTHING_VERSION=0.1.2
 
-#### Minio
-
-```bash
-kubectl apply -f services/minio.yaml
-```
-
-#### iPXE and ignition host for hardware hosts
-
-```bash
-kubectl apply -f services/matchbox.yaml
-
-tw terraform apply \
-    -var-file=secrets.tfvars \
-    -target=null_resource.tls_ipxe_client
-
-tw terraform apply \
-    -var-file=secrets.tfvars \
-    -target=module.ignition-ipxe
-```
-
-#### Misc services
-
-```bash
-kubectl apply -f services/common-psp.yaml
-kubectl apply -f services/transmission
-kubectl apply -f services/mpd
-```
-
-### Image build
-
-```
-mkdir -p build
-export TMPDIR=$(pwd)/build
-
-LIBVIRT_VERSION=0.1.10
-SSH_VERSION=0.1.3
-MATCHBOX_VERSION=0.5.0
-CT_VERSION=0.9.1
-
-podman build \
-  --build-arg LIBVIRT_VERSION=$LIBVIRT_VERSION \
+buildah build \
+  --build-arg TF_VERSION=$TF_VERSION \
   --build-arg SSH_VERSION=$SSH_VERSION \
-  --build-arg MATCHBOX_VERSION=$MATCHBOX_VERSION \
-  --build-arg CT_VERSION=$CT_VERSION \
+  --build-arg SYNCTHING_VERSION=$SYNCTHING_VERSION \
   -f Dockerfile \
   -t ghcr.io/randomcoww/tw:latest
 ```
 
+```bash
+buildah push ghcr.io/randomcoww/tw:latest
 ```
-podman push ghcr.io/randomcoww/tw:latest
+
+### Updating helm charts
+
+Full example: https://github.com/technosophos/tscharts
+
+```bash
+helm package helm_charts/<chart>
+helm repo index --url https://randomcoww.github.io/terraform-infra docs/
 ```

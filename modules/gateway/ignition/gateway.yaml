@@ -1,0 +1,54 @@
+---
+variant: fcos
+version: 1.4.0
+systemd:
+  units:
+    - name: nftables.service
+      enabled: true
+      dropins:
+        - name: 10-namespace.conf
+          contents: |
+            [Service]
+            ExecReload=
+            ExecStop=
+            ExecReload=/sbin/nft 'delete table ${nftables_name}; include "/etc/sysconfig/nftables.conf";'
+            ExecStop=/sbin/nft delete table ${nftables_name}
+
+storage:
+  files:
+    - path: /etc/sysconfig/nftables.conf
+      mode: 0644
+      overwrite: true
+      contents:
+        inline: |-
+          table ip ${nftables_name} {
+            chain base_checks {
+              ct state {established, related} accept;
+              ct state invalid drop;
+              ip protocol icmp icmp type { echo-request, echo-reply, time-exceeded, parameter-problem, destination-unreachable } accept;
+            }
+
+            chain input {
+              type filter hook input priority 0; policy drop;
+              jump base_checks;
+
+              iifname "lo" accept;
+              iifname != "lo" ip daddr 127.0.0.1/8 drop;
+
+              iifname != ${interfaces.wan.interface_name} udp sport bootps udp dport bootpc accept;
+              iifname != ${interfaces.wan.interface_name} pkttype multicast accept;
+              iifname != ${interfaces.wan.interface_name} accept;
+            }
+
+            chain forward {
+              type filter hook forward priority 0; policy drop;
+              jump base_checks;
+              iifname != ${interfaces.wan.interface_name} accept;
+            }
+
+            chain postrouting {
+              type nat hook postrouting priority 100; policy accept;
+              oifname ${interfaces.wan.interface_name} masquerade;
+            }
+          }
+          ;

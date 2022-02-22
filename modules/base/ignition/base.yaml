@@ -1,0 +1,130 @@
+---
+variant: fcos
+version: 1.4.0
+systemd:
+  units:
+    - name: chronyd.service
+      enabled: true
+    # enable trim on all disks
+    - name: fstrim.service
+      enabled: true
+      dropins:
+        - name: 10-all.conf
+          contents: |
+            [Service]
+            ExecStart=
+            ExecStart=/usr/sbin/fstrim --all --verbose --quiet
+    # use systemd-resolved mdns instead of avahi
+    - name: systemd-resolved.service
+      enabled: true
+    - name: avahi-daemon.service
+      mask: true
+    - name: avahi-daemon.socket
+      mask: true
+    # temperature monitoring for hardware
+    - name: lm_sensors.service
+      enabled: true
+      dropins:
+        - name: 10-exclude-vm.conf
+          contents: |
+            [Unit]
+            ConditionVirtualization=!vm
+            ConditionVirtualization=!container
+
+storage:
+  files:
+    - path: /etc/hostname
+      mode: 0644
+      contents:
+        inline:
+          ${hostname}
+
+    # No swap - disable hibernation
+    - path: /etc/systemd/sleep.conf.d/10-disable-hibernate
+      mode: 0644
+      contents:
+        inline: |
+          [Sleep]
+          AllowHibernation=no
+          AllowSuspendThenHibernate=no
+          AllowHybridSleep=no
+    - path: /etc/systemd/logind.conf.d/10-disable-hibernate
+      mode: 0644
+      contents:
+        inline: |
+          [Login]
+          HibernateKeyIgnoreInhibited=no
+
+    # Disable local DNS for systemd-networkd #
+    - path: /etc/systemd/resolved.conf.d/10-disable-dns-stub.conf
+      mode: 0644
+      contents:
+        inline: |
+          [Resolve]
+          FallbackDNS=
+          DNSStubListener=false
+          MulticastDNS=true
+          LLMNR=false
+    # Block password SSH #
+    - path: /etc/ssh/sshd_config.d/10-block-password.conf
+      mode: 0644
+      contents:
+        inline: |
+          PasswordAuthentication no
+    # Systemd for live image #
+    - path: /etc/systemd/journald.conf.d/10-live-boot-config.conf
+      mode: 0644
+      contents:
+        inline: |
+          [Journal]
+          Storage=volatile
+          RuntimeMaxUse=10M
+          SystemMaxUse=10M
+          SystemMaxFileSize=10M
+          ForwardToSyslog=false
+          ForwardToConsole=false
+    - path: /etc/systemd/system.conf.d/10-live-boot-config.conf
+      mode: 0644
+      contents:
+        inline: |
+          [Manager]
+          DumpCore=false
+    # Disable speaker #
+    - path: /etc/modprobe.d/10-blacklist-pcspk.conf
+      mode: 0644
+      contents:
+        inline: |
+          blacklist pcspkr
+          blacklist snd_pcsp
+    # Keepalived lvs #
+    - path: /etc/modules-load.d/20-keepalived.conf
+      mode: 0644
+      contents:
+        inline: |
+          ip_vs
+    # mayastor nvmeof #
+    - path: /etc/modules-load.d/20-nvmeof.conf
+      mode: 0644
+      contents:
+        inline: |
+          nvme-tcp
+    # DNS reply from unexpected source #
+    - path: /etc/modules-load.d/20-dns-reply.conf
+      mode: 0644
+      contents:
+        inline: |
+          br_netfilter
+    # Keepalived VIP #
+    - path: /etc/sysctl.d/20-keepalived.conf
+      mode: 0644
+      contents:
+        inline: |
+          net.ipv4.ip_forward=1
+          net.ipv4.ip_nonlocal_bind=1
+    # common #
+    - path: /etc/sysctl.d/10-common.conf
+      mode: 0644
+      contents:
+        inline: |
+          kernel.printk=4
+          fs.inotify.max_user_watches=524288

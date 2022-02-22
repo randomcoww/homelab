@@ -1,0 +1,57 @@
+---
+variant: fcos
+version: 1.4.0
+storage:
+  files:
+    # tap interfaces
+    %{~ for network_name, tap_interface in tap_interfaces ~}
+    - path: /etc/systemd/network/20-${tap_interface.source_interface_name}.network.d/10-macvtap.conf
+      contents:
+        inline: |
+          [Network]
+          MACVTAP=${tap_interface.interface_name}
+    - path: /etc/systemd/network/12-${tap_interface.interface_name}.netdev
+      mode: 0644
+      contents:
+        inline: |
+          [NetDev]
+          Name=${tap_interface.interface_name}
+          Kind=macvtap
+          MACAddress=${lookup(tap_interface, "mac", "")}
+
+          [MACVTAP]
+          Mode=bridge
+    - path: /etc/systemd/network/20-${tap_interface.interface_name}.network
+      mode: 0644
+      contents:
+        inline: |
+          [Match]
+          Name=${tap_interface.interface_name}
+          %{~ if !lookup(tap_interface, "enable_dhcp", false) ~}
+
+          [Link]
+          MTUBytes=${lookup(tap_interface, "mtu", 1500)}
+          %{~ endif ~}
+
+          [DHCP]
+          UseMTU=true
+          RouteMetric=${lookup(tap_interface, "metric", 1024)}
+
+          [Network]
+          LinkLocalAddressing=${lookup(tap_interface, "enable_linklocal", false)}
+          DHCP=${lookup(tap_interface, "enable_dhcp", false)}
+          MulticastDNS=${lookup(tap_interface, "enable_mdns", false)}
+          %{~ if lookup(tap_interface, "enable_netnum", false) ~}
+
+          [Address]
+          Address=${cidrhost(tap_interface.prefix, host_netnum)}/${tap_interface.cidr}
+          AddPrefixRoute=false
+
+          [Route]
+          Protocol=kernel
+          Scope=link
+          PreferredSource=${cidrhost(tap_interface.prefix, host_netnum)}
+          Destination=${tap_interface.prefix}
+          Metric=${lookup(tap_interface, "metric", 1024)}
+          %{~ endif ~}
+    %{~ endfor ~}

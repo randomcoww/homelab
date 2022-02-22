@@ -1,0 +1,123 @@
+---
+variant: fcos
+version: 1.4.0
+systemd:
+  units:
+    - name: geoclue.service
+      enabled: true
+    - name: default-dconf-update.service
+      enabled: true
+      contents: |
+        [Unit]
+        ConditionFirstBoot=true
+        ConditionDirectoryNotEmpty=/etc/dconf/db/local.d/
+
+        [Service]
+        Type=oneshot
+        RemainAfterExit=true
+        ExecStart=/usr/bin/dconf update
+
+        [Install]
+        WantedBy=graphical.target
+
+storage:
+  files:
+    # Enable mdns when using network manager #
+    - path: /etc/NetworkManager/conf.d/base.conf
+      mode: 0644
+      contents:
+        inline: |
+          [main]
+          no-auto-default=*
+
+          [connection]
+          connection.mdns=2
+
+    # controller support in steam flatpak
+    - path: /etc/udev/rules.d/62-steam-input.rules
+      mode: 0644
+      contents:
+        inline: |
+          ${indent(10, udev_steam_input)}
+    - path: /etc/udev/rules.d/62-steam-vr.rules
+      mode: 0644
+      contents:
+        inline: |
+          ${indent(10, udev_steam_vr)}
+
+    # gnome desktop config #
+    - path: /etc/dconf/db/local.d/00-custom
+      mode: 0644
+      contents:
+        inline: |
+          [org/gnome/system/location]
+          enabled=false
+
+          [org/gnome/desktop/datetime]
+          automatic-timezone=true
+
+          [org/gnome/settings-daemon/plugins/color]
+          night-light-enabled=true
+          night-light-schedule-automatic=true
+
+          [org/gnome/settings-daemon/plugins/power]
+          ambient-enabled=false
+          idle-dim=false
+
+          [org/gnome/desktop/media-handling]
+          automount=false
+          autorun-never=true
+
+          [org/gnome/desktop/sound]
+          event-sounds=false
+
+          [org/gnome/desktop/session]
+          idle-delay=uint32 3600
+
+          [org/gnome/desktop/peripherals/touchpad]
+          tap-to-click=true
+          two-finger-scrolling-enabled=true
+
+          [org/gnome/desktop/privacy]
+          disable-camera=true
+          disable-microphone=true
+          old-files-age=uint32 1
+          remember-recent-files=false
+          remove-old-temp-files=true
+          remove-old-trash-files=true
+          report-technical-problems=false
+
+          [org/gnome/software]
+          first-run=false
+          show-nonfree-prompt=false
+
+          [org/gnome/desktop/notifications]
+          show-in-lock-screen=false
+
+          [org/gnome/desktop/interface]
+          enable-hot-corners=false
+
+          [org/gnome/system/location]
+          enabled=true
+
+    # misc configs #
+    - path: /etc/tmux.conf
+      mode: 0644
+      contents:
+        inline: |
+          set -g history-limit 10000
+          set -g mouse on
+          set-option -s set-clipboard off
+          bind-key -T copy-mode MouseDragEnd1Pane send-keys -X copy-pipe-and-cancel "xclip -in -sel clip"
+    - path: /etc/mpv/mpv.conf
+      mode: 0644
+      contents:
+        inline: |
+          profile=gpu-hq
+          hwdec=vaapi
+
+    # ssh-ca client #
+    - path: /etc/ssh/ssh_known_hosts
+      mode: 0644
+      contents:
+        inline: "@cert-authority * ${ssh_ca_authorized_key}"

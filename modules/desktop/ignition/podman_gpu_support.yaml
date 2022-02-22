@@ -1,0 +1,52 @@
+---
+variant: fcos
+version: 1.4.0
+storage:
+  files:
+    # podman gpu support sets "no-cgroups = true"
+    # doesn't work with crio or cotnainerd
+    - path: /etc/nvidia-container-runtime/config-podman.toml
+      overwrite: true
+      mode: 0644
+      contents:
+        inline: |
+          disable-require = false
+
+          [nvidia-container-cli]
+          environment = []
+          load-kmods = true
+          no-cgroups = true
+          ldconfig = "@/sbin/ldconfig"
+
+          [nvidia-container-runtime]
+    - path: /etc/containers/oci/hooks.d/oci-nvidia-hook.json
+      overwrite: true
+      mode: 0644
+      contents:
+        inline: |
+          ${jsonencode({
+            version = "1.0.0"
+            hook = {
+              path = "/usr/bin/nvidia-container-toolkit"
+              args = [
+                "nvidia-container-toolkit",
+                "-config",
+                "/etc/nvidia-container-runtime/config-podman.toml",
+                "prestart",
+              ]
+              env = [
+                "PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin",
+              ]
+            }
+            when = {
+              always = true
+              commands = [".*"]
+            }
+            stages = ["prestart"]
+          })}
+    - path: /etc/containers/containers.conf.d/10-podman.conf
+      mode: 0644
+      contents:
+        inline: |
+          [engine]
+          hooks_dir=["/etc/containers/oci/hooks.d"]

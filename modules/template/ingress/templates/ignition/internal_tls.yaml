@@ -1,9 +1,0 @@
----
-variant: fcos
-version: 1.4.0
-storage:
-  files:
-    - path: ${internal_tls_path}
-      mode: 0644
-      contents:
-        inline: "${replace(tls_internal_ca, "\n", "\\n")}"

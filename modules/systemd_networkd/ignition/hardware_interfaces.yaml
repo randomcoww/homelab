@@ -1,0 +1,93 @@
+---
+variant: fcos
+version: 1.4.0
+systemd:
+  units:
+    # This allows bridging wifi devices
+    - name: enable-4addr.service
+      enabled: true
+      contents: |
+        [Unit]
+        Before=systemd-networkd.service
+        WantedBy=systemd-networkd.service
+
+        [Service]
+        Type=oneshot
+        %{~ for hardware_interface_name, hardware_interface in hardware_interfaces ~}
+        %{~ if lookup(hardware_interface, "enable_4addr", false) ~}
+        ExecStart=/usr/sbin/iw dev ${hardware_interface_name} set 4addr on
+        %{~ endif ~}
+        %{~ endfor ~}
+        RemainAfterExit=yes
+
+        [Install]
+        WantedBy=multi-user.target
+
+storage:
+  files:
+    # hardware interface #
+    %{~ for hardware_interface_name, hardware_interface in hardware_interfaces ~}
+    - path: /etc/systemd/network/10-${hardware_interface_name}.link
+      mode: 0644
+      contents:
+        inline: |
+          [Match]
+          Virtualization=!vm
+          Virtualization=!container
+          PermanentMACAddress=${hardware_interface.mac}
+
+          [Link]
+          MTUBytes=${lookup(hardware_interface, "mtu", 1500)}
+          MACAddressPolicy=persistent
+          Name=${hardware_interface_name}
+    - path: /etc/systemd/network/20-${hardware_interface_name}.network
+      mode: 0644
+      contents:
+        inline: |
+          [Match]
+          Virtualization=!vm
+          Virtualization=!container
+          Name=${hardware_interface_name}
+
+          [Link]
+          ARP=false
+          ActivationPolicy=always-up
+          MTUBytes=${lookup(hardware_interface, "mtu", 1500)}
+
+          [Network]
+          LinkLocalAddressing=false
+          DHCP=false
+          %{~ for network_name, vlan in hardware_interface.vlans ~}
+          VLAN=${vlan.interface_name}
+          %{~ endfor ~}
+
+    # VLAN interfaces
+    %{~ for network_name, vlan in hardware_interface.vlans ~}
+    - path: /etc/systemd/network/12-${vlan.interface_name}.netdev
+      mode: 0644
+      contents:
+        inline: |
+          [NetDev]
+          Name=${vlan.interface_name}
+          Kind=vlan
+
+          [VLAN]
+          Id=${vlan.vlan_id}
+    - path: /etc/systemd/network/20-${vlan.interface_name}.network
+      mode: 0644
+      contents:
+        inline: |
+          [Match]
+          Virtualization=!vm
+          Virtualization=!container
+          Name=${vlan.interface_name}
+
+          [Link]
+          ARP=false
+          MTUBytes=${lookup(hardware_interface, "mtu", 1500)}
+
+          [Network]
+          LinkLocalAddressing=false
+          DHCP=false
+    %{~ endfor ~}
+    %{~ endfor ~}

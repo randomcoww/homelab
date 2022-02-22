@@ -1,0 +1,180 @@
+---
+variant: fcos
+version: 1.4.0
+storage:
+  files:
+    # kea HA handler #
+    - path: /etc/kea/kea-ctrl-agent.conf
+      mode: 0644
+      overwrite: true
+      contents:
+        inline: |-
+          ${jsonencode({
+            "Control-agent" = {
+              http-host = cidrhost(interfaces.sync.prefix, host_netnum)
+              http-port = kea_peer_port
+              control-sockets = {
+                dhcp4 = {
+                  socket-type = "unix"
+                  socket-name = "${kea_shared_path}/kea-dhcp4-ctrl.sock"
+                }
+              }
+            }
+          })}
+
+    # kea for lan network #
+    - path: /etc/kea/kea-dhcp4.conf
+      mode: 0644
+      overwrite: true
+      contents:
+        inline: |
+          ${jsonencode({
+             Dhcp4 = {
+              valid-lifetime = 7200
+              renew-timer = 1800
+              rebind-timer = 3600
+              lease-database = {
+                type = "memfile"
+                persist = true
+                name = "${kea_shared_path}/kea-leases4.csv"
+              }
+              interfaces-config = {
+                interfaces = [
+                  for network_name, interface in interfaces :
+                  interface.interface_name
+                  if lookup(interface, "enable_dhcp_server", false) && lookup(interface, "enable_netnum", false)
+                ]
+              }
+              control-socket = {
+                socket-type = "unix"
+                socket-name = "${kea_shared_path}/kea-dhcp4-ctrl.sock"
+              }
+              hooks-libraries = length(kea_peers) > 1 ? [
+                {
+                  library = "${kea_hooks_libraries_path}/libdhcp_lease_cmds.so"
+                  parameters = {}
+                },
+                {
+                  library = "${kea_hooks_libraries_path}/libdhcp_ha.so"
+                  parameters = {
+                    high-availability = [
+                      {
+                        this-server-name = kea_server_name
+                        mode = "load-balancing"
+                        max-unacked-clients = 0
+                        peers =  [
+                          for i, kea_peer in kea_peers :
+                          {
+                            name = kea_peer.name
+                            role = kea_peer.role
+                            url = "http://${cidrhost(interfaces.sync.prefix, kea_peer.netnum)}:${kea_peer_port}/"
+                            auto-failover = true
+                          }
+                        ]
+                      },
+                    ]
+                  }
+                },
+              ] : []
+              client-classes = [
+                {
+                  name = "ipxe_detected"
+                  test = "substring(option[77].hex,0,4) == 'iPXE'"
+                  boot-file-name = "${pxeboot_file_name}"
+                },
+                {
+                  name = "ipxe"
+                  test = "not(substring(option[77].hex,0,4) == 'iPXE') and (option[93].hex == 0x0000)"
+                  boot-file-name = "/undionly.kpxe"
+                },
+                {
+                  name = "ipxe_efi"
+                  test = "not(substring(option[77].hex,0,4) == 'iPXE') and (option[93].hex == 0x0007)"
+                  boot-file-name = "/ipxe.efi"
+                },
+              ]
+              subnet4 = [
+                for network_name, interface in interfaces :
+                {
+                  subnet = interface.prefix,
+                  next-server = cidrhost(interface.prefix, host_netnum)
+                  option-data = [
+                    {
+                      name = "routers"
+                      data = cidrhost(interface.prefix, vrrp_netnum)
+                    },
+                    {
+                      name = "interface-mtu"
+                      data = format("%s", interface.mtu)
+                    },
+                    {
+                      name = "domain-name-servers"
+                      data = cidrhost(interface.prefix, vrrp_netnum)
+                    },
+                  ]
+                  pools = [
+                    {
+                      pool = cidrsubnet(interface.prefix, dhcp_subnet.newbit, dhcp_subnet.netnum)
+                    }
+                  ]
+                }
+                if lookup(interface, "enable_dhcp_server", false) && lookup(interface, "enable_netnum", false)
+              ]
+            }
+          })}
+
+    # pod manifests #
+    - path: ${static_pod_manifest_path}/kea.yaml
+      mode: 0644
+      contents:
+        inline: |-
+          ---
+          kind: Pod
+          apiVersion: v1
+          metadata:
+            name: kea
+            namespace: kube-system
+          spec:
+            restartPolicy: Always
+            hostNetwork: true
+            containers:
+            - name: kea-control-agent
+              image: ${container_images.kea}
+              args: [ "kea-ctrl-agent", "-c", "/etc/kea/kea-ctrl-agent.conf" ]
+              volumeMounts:
+              - name: kea-share
+                mountPath: ${kea_shared_path}
+              - name: config-kea-ctrl-agent
+                mountPath: /etc/kea/kea-ctrl-agent.conf
+                readOnly: true
+            - name: kea-dhcp4
+              image: ${container_images.kea}
+              args: [ "kea-dhcp4", "-c", "/etc/kea/kea-dhcp4.conf" ]
+              securityContext:
+                capabilities:
+                  add:
+                  - NET_RAW
+              volumeMounts:
+              - name: kea-share
+                mountPath: ${kea_shared_path}
+              - name: config-kea-dhcp4
+                mountPath: /etc/kea/kea-dhcp4.conf
+                readOnly: true
+            - name: tftpd
+              image: ${container_images.tftpd}
+              args: [ "--address", "0.0.0.0:69", "--verbose" ]
+              securityContext:
+                capabilities:
+                  add:
+                  - SYS_CHROOT
+                  - SETUID
+                  - SETGID
+            volumes:
+            - name: kea-share
+              emptyDir: {}
+            - name: config-kea-ctrl-agent
+              hostPath:
+                path: /etc/kea/kea-ctrl-agent.conf
+            - name: config-kea-dhcp4
+              hostPath:
+                path: /etc/kea/kea-dhcp4.conf

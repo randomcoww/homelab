@@ -1,0 +1,42 @@
+---
+variant: fcos
+version: 1.4.0
+storage:
+  files:
+    %{~ for bridge_interface_name, bridge_interface in bridge_interfaces ~}
+    %{~ for port_interface_name in bridge_interface.interfaces ~}
+    # For bridging to wired NIC e.g. wlan0
+    - path: /etc/systemd/network/20-${port_interface_name}.network.d/10-bridge.conf
+      mode: 0644
+      contents:
+        inline: |
+          [Network]
+          Bridge=${bridge_interface_name}
+    %{~ endfor ~}
+
+    # Bridge them together e.g. br-wlan
+    # This interface will have a macvtap created with IP for gateway and DHCP
+    - path: /etc/systemd/network/12-${bridge_interface_name}.netdev
+      mode: 0644
+      contents:
+        inline: |
+          [NetDev]
+          Name=${bridge_interface_name}
+          Kind=bridge
+    - path: /etc/systemd/network/20-${bridge_interface_name}.network
+      mode: 0644
+      contents:
+        inline: |
+          [Match]
+          Virtualization=!vm
+          Virtualization=!container
+          Name=${bridge_interface_name}
+
+          [Link]
+          ARP=false
+          MTUBytes=${lookup(bridge_interface, "mtu", 1500)}
+
+          [Network]
+          LinkLocalAddressing=false
+          DHCP=false
+    %{~ endfor ~}

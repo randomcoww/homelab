@@ -1,0 +1,45 @@
+---
+variant: fcos
+version: 1.4.0
+systemd:
+  units:
+    %{~ for name, disk in disks ~}
+    %{~ for partition in disk.partitions ~}
+    - name: ${partition.systemd_unit_name}.mount
+      enabled: true
+      contents: |
+        [Mount]
+        What=${partition.device}
+        Where=${partition.mount_path}
+        Type=${partition.format}
+        Options=${join(",", partition.mount_options)}
+
+        [Install]
+        WantedBy=local-fs.target
+    %{~ endfor ~}
+    %{~ endfor ~}
+
+storage:
+  disks:
+    %{~ for name, disk in disks ~}
+    - device: ${disk.device}
+      wipe_table: ${disk.wipe}
+      partitions:
+      %{~ for partition in disk.partitions ~}
+      - label: ${partition.label}
+        number: ${partition.number}
+        start_mib: ${partition.start_mib}
+        size_mib: ${partition.size_mib}
+        wipe_partition_entry: ${partition.wipe}
+      %{~ endfor ~}
+    %{~ endfor ~}
+  filesystems:
+    %{~ for name, disk in disks ~}
+    %{~ for partition in disk.partitions ~}
+    - path: ${partition.mount_path}
+      device: ${partition.device}
+      format: ${partition.format}
+      wipe_filesystem: ${partition.wipe}
+      label: ${partition.label}
+    %{~ endfor ~}
+    %{~ endfor ~}

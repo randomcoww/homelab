@@ -1,0 +1,84 @@
+---
+variant: fcos
+version: 1.4.0
+storage:
+  files:
+    - path: ${static_pod_manifest_path}/etcd-wrapper.yaml
+      mode: 0644
+      contents:
+        inline: |-
+          ---
+          kind: Pod
+          apiVersion: v1
+          metadata:
+            namespace: kube-system
+            name: etcd-wrapper
+          spec:
+            hostNetwork: true
+            restartPolicy: Always
+            containers:
+            - name: etcd-wrapper
+              image: ${container_images.etcd_wrapper}
+              args:
+              - --name=$(NODE_NAME)
+              - --host-cert-file=${certs.cert.path}
+              - --host-key-file=${certs.key.path}
+              - --host-trusted-ca-file=${certs.ca_cert.path}
+              - --host-peer-cert-file=${certs.peer_cert.path}
+              - --host-peer-key-file=${certs.peer_key.path}
+              - --host-peer-trusted-ca-file=${certs.peer_ca_cert.path}
+              - --initial-advertise-peer-urls=${join(",", initial_advertise_peer_urls)}
+              - --listen-peer-urls=${join(",", listen_peer_urls)}
+              - --advertise-client-urls=${join(",", advertise_client_urls)}
+              - --listen-client-urls=${join(",", listen_client_urls)}
+              - --initial-cluster-token=${cluster_token}
+              - --initial-cluster=${join(",", initial_cluster)}
+              - --host-backup-file=${backup_path}/${etcd_backup_file}
+              - --host-etcd-manifest-file=${static_pod_manifest_path}/${etcd_manifest_file}
+              - --etcd-image=${container_images.etcd}
+              - --client-cert-file=${certs.client_cert.path}
+              - --client-key-file=${certs.client_key.path}
+              - --cluster-client-urls=${join(",", cluster_endpoints)}
+              - --s3-backup-path=${s3_backup_path}
+              - --backup-interval=30m
+              - --healthcheck-interval=5s
+              - --pod-update-wait=40s
+              env:
+              - name: NODE_NAME
+                valueFrom:
+                  fieldRef:
+                    fieldPath: spec.nodeName
+              - name: AWS_ACCESS_KEY_ID
+                value: "${aws_access_key_id}"
+              - name: AWS_SECRET_ACCESS_KEY
+                value: "${aws_access_key_secret}"
+              - name: AWS_DEFAULT_REGION
+                value: "${aws_region}"
+              - name: AWS_SDK_LOAD_CONFIG
+                value: "1"
+              volumeMounts:
+              - name: certs-volume
+                mountPath: ${certs_path}
+                readOnly: true
+              - name: backup-volume
+                mountPath: ${backup_path}
+              - name: manifest-volume
+                mountPath: ${static_pod_manifest_path}
+            volumes:
+            - name: certs-volume
+              hostPath:
+                path: ${certs_path}
+            - name: backup-volume
+              hostPath:
+                path: ${backup_path}
+            - name: manifest-volume
+              hostPath:
+                path: ${static_pod_manifest_path}
+
+    # certs #
+    %{~ for cert in values(certs) ~}
+    - path: ${cert.path}
+      mode: 0644
+      contents:
+        inline: "${replace(cert.content, "\n", "\\n")}"
+    %{~ endfor ~}

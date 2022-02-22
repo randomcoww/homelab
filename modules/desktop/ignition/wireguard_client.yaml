@@ -1,0 +1,32 @@
+---
+variant: fcos
+version: 1.4.0
+storage:
+  files:
+    # Custom fwmark: https://lists.zx2c4.com/pipermail/wireguard/2020-September/005849.html
+    - path: /etc/NetworkManager/system-connections/${wireguard_client.interface_name}.nmconnection
+      mode: 0400
+      overwrite: true
+      contents:
+        inline: |-
+          [connection]
+          id=${wireguard_client.interface_name}
+          type=wireguard
+          interface-name=${wireguard_client.interface_name}
+          permissions=
+          autoconnect=false
+
+          [wireguard]
+          fwmark=19052
+          private-key=${wireguard_client.private_key}
+
+          [wireguard-peer.${wireguard_client.public_key}]
+          endpoint=${wireguard_client.endpoint}
+          allowed-ips=0.0.0.0/0;
+
+          [ipv4]
+          address1=${wireguard_client.address}
+          dns=${wireguard_client.dns};
+          dns-priority=-50
+          dns-search=~;
+          method=manual

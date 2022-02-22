@@ -1,9 +1,7 @@
 FROM golang:alpine AS MODULES
 
-ARG LIBVIRT_VERSION
 ARG SSH_VERSION
-ARG MATCHBOX_VERSION
-ARG CT_VERSION
+ARG SYNCTHING_VERSION
 
 RUN set -x \
   \
@@ -12,38 +10,22 @@ RUN set -x \
     libvirt-dev \
     g++ \
   \
-  && cd .. \
-  && git clone -b v${LIBVIRT_VERSION} https://github.com/randomcoww/terraform-provider-libvirt.git \
-  && cd terraform-provider-libvirt \
-  && mkdir -p ${GOPATH}/bin/github.com/randomcoww/libvirt/${LIBVIRT_VERSION}/linux_amd64 \
-  && GO111MODULE=on GOOS=linux go build -v -ldflags '-s -w' \
-    -o ${GOPATH}/bin/github.com/randomcoww/libvirt/${LIBVIRT_VERSION}/linux_amd64/terraform-provider-libvirt_v${LIBVIRT_VERSION} \
-  \
-  && cd .. \
   && git clone -b v${SSH_VERSION} https://github.com/randomcoww/terraform-provider-ssh.git \
   && cd terraform-provider-ssh \
   && mkdir -p ${GOPATH}/bin/github.com/randomcoww/ssh/${SSH_VERSION}/linux_amd64 \
   && CGO_ENABLED=0 GO111MODULE=on GOOS=linux go build -v -ldflags '-s -w' \
     -o ${GOPATH}/bin/github.com/randomcoww/ssh/${SSH_VERSION}/linux_amd64/terraform-provider-ssh_v${SSH_VERSION} \
   \
-  ## Pull master but give it an arbitrary version because it is required
   && cd .. \
-  && git clone https://github.com/poseidon/terraform-provider-matchbox.git \
-  && cd terraform-provider-matchbox \
-  && mkdir -p ${GOPATH}/bin/github.com/poseidon/matchbox/${MATCHBOX_VERSION}/linux_amd64 \
+  && git clone -b v${SYNCTHING_VERSION} https://github.com/randomcoww/terraform-provider-syncthing.git \
+  && cd terraform-provider-syncthing \
+  && mkdir -p ${GOPATH}/bin/github.com/randomcoww/syncthing/${SYNCTHING_VERSION}/linux_amd64 \
   && CGO_ENABLED=0 GO111MODULE=on GOOS=linux go build -v -ldflags '-s -w' \
-    -o ${GOPATH}/bin/github.com/poseidon/matchbox/${MATCHBOX_VERSION}/linux_amd64/terraform-provider-matchbox_v${MATCHBOX_VERSION} \
-  \
-  && cd .. \
-  && git clone -b v${CT_VERSION} https://github.com/poseidon/terraform-provider-ct.git \
-  && cd terraform-provider-ct \
-  && mkdir -p ${GOPATH}/bin/github.com/poseidon/ct/${CT_VERSION}/linux_amd64 \
-  && CGO_ENABLED=0 GO111MODULE=on GOOS=linux go build -v -ldflags '-s -w' \
-    -o ${GOPATH}/bin/github.com/poseidon/ct/${CT_VERSION}/linux_amd64/terraform-provider-ct_v${CT_VERSION}
+    -o ${GOPATH}/bin/github.com/randomcoww/syncthing/${SYNCTHING_VERSION}/linux_amd64/terraform-provider-syncthing_v${SYNCTHING_VERSION}
 
 FROM alpine:edge
 
-ARG TF_VERSION=1.1.0
+ARG TF_VERSION
 
 ENV HOME /root
 WORKDIR $HOME

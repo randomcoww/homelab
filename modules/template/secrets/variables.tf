@@ -1,3 +1,0 @@
-variable "secrets" {
-  type = any
-}

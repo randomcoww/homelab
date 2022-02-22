@@ -1,0 +1,38 @@
+---
+kind: ConfigMap
+apiVersion: v1
+metadata:
+  name: flannel
+  labels:
+    helm.sh/chart: {{ .Chart.Name }}-{{ .Chart.Version | replace "+" "_" }}
+    k8s-app: flannel
+data:
+  cni-conf.json: |
+    {
+      "name": "cbr0",
+      "cniVersion": "0.3.1",
+      "plugins": [
+        {
+          "type": "flannel",
+          "delegate": {
+            "type": "bridge",
+            "hairpinMode": true,
+            "isDefaultGateway": true,
+            "bridge": "{{ .Values.cni_bridge_interface_name }}"
+          }
+        },
+        {
+          "type": "portmap",
+          "capabilities": {
+            "portMappings": true
+          }
+        }
+      ]
+    }
+  net-conf.json: |
+    {
+      "Network": "{{ .Values.pod_network_prefix }}",
+      "Backend": {
+        "Type": "host-gw"
+      }
+    }
