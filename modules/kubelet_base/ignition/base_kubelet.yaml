@@ -5,13 +5,22 @@ systemd:
   units:
     - name: crio.service
       enabled: true
+      dropins:
+        - name: 10-local-fs-wait.conf
+          contents: |
+            [Unit]
+            Wants=local-fs.target
+            After=local-fs.target
     - name: kubelet.service
       enabled: true
       dropins:
         - name: 10-masterless-common.conf
           contents: |
             [Unit]
-            Wants=containerd.service
+            Wants=crio.service
+            After=crio.service
+            Wants=local-fs.target
+            After=local-fs.target
 
             [Service]
             Environment=KUBELET_COMMON_ARGS="--exit-on-lock-contention \

@@ -86,39 +86,22 @@ locals {
       }
     }
 
-    store-0 = {
+    remote-0 = {
       users = [
-        "admin"
+        "client"
       ]
-      netnum = 4
-      hardware_interfaces = {
-        phy0 = {
-          mac = "3c-fd-fe-b2-47-68"
-          mtu = 9000
-        }
-        phy1 = {
-          mac   = "3c-fd-fe-b2-47-69"
-          mtu   = 9000
-          vlans = ["sync"]
-        }
-        phy2 = {
-          mac   = "3c-fd-fe-b2-47-6a"
-          mtu   = 9000
-          vlans = ["wan"]
-        }
-        phy3 = {
-          mac = "3c-fd-fe-b2-47-6b"
-          mtu = 9000
+      disks = {
+        pv = {
+          device = "/dev/disk/by-id/nvme-SKHynix_HFS512GDE9X084N_CYA8N037413008I5H"
+          partitions = [
+            {
+              mount_path = "/var/home"
+              wipe       = false
+            },
+          ]
         }
       }
-      bridge_interfaces = {}
-      tap_interfaces = {
-        lan = {
-          source_interface_name = "phy0"
-          enable_mdns           = true
-          enable_dhcp           = true
-        }
-      }
+      container_storage_path = "/var/home/containers"
     }
   }
 

@@ -14,6 +14,7 @@ storage:
           type=wireguard
           interface-name=${wireguard_client.interface_name}
           permissions=
+          autoconnect=false
 
           [wireguard]
           fwmark=19052
@@ -29,9 +30,3 @@ storage:
           dns-priority=-50
           dns-search=~;
           method=manual
-
-          [ipv6]
-          addr-gen-mode=stable-privacy
-          dns-priority=-50
-          dns-search=
-          method=disabled
