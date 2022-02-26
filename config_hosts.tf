@@ -103,6 +103,59 @@ locals {
       }
       container_storage_path = "/var/home/containers"
     }
+
+    # temp until getting a dedicated server..
+    temp-0 = {
+      users = [
+        "client"
+      ]
+      vrrp_netnum = 2
+      netnum      = 3
+      hardware_interfaces = {
+        phy0 = {
+          mac   = "84-a9-38-0f-aa-76"
+          mtu   = 9000
+          vlans = ["sync", "wan"]
+        }
+      }
+      bridge_interfaces = {}
+      tap_interfaces = {
+        lan = {
+          source_interface_name = "phy0"
+          enable_mdns           = true
+          enable_netnum         = true
+          enable_vrrp_netnum    = true
+          enable_dhcp_server    = true
+          mtu                   = 9000
+        }
+        sync = {
+          source_interface_name = "phy0-sync"
+          enable_netnum         = true
+          enable_vrrp_netnum    = true
+          mtu                   = 9000
+        }
+        wan = {
+          source_interface_name = "phy0-wan"
+          enable_dhcp           = true
+          mac                   = "52-54-00-63-6e-b3"
+        }
+      }
+      disks = {
+        pv = {
+          device = "/dev/disk/by-id/nvme-SKHynix_HFS512GDE9X084N_CYA8N037413008I5H"
+          partitions = [
+            {
+              mount_path = "/var/home"
+              wipe       = false
+            },
+          ]
+        }
+      }
+      minio_volume_paths = [
+        "/var/home/minio"
+      ]
+      container_storage_path = "/var/home/containers"
+    }
   }
 
   hosts = {
