@@ -4,7 +4,6 @@ variant: fcos
 version: 1.4.0
 systemd:
   units:
-    # This service seems to interfere with desktop functions when used on a box with a DE
     - name: conntrackd.service
       enabled: true
       dropins:
