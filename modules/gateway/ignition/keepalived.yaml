@@ -63,7 +63,7 @@ storage:
       contents:
         inline: |
           [Link]
-          RequiredForOnline=false
+          # RequiredForOnline=false
 
           [DHCP]
           Anonymize=true

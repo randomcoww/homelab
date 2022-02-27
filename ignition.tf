@@ -113,7 +113,6 @@ module "ignition-ssh-server" {
   for_each = {
     for host_key in [
       "aio-0",
-      "temp-0",
     ] :
     host_key => local.hosts[host_key]
   }

@@ -4,8 +4,9 @@ variant: fcos
 version: 1.4.0
 systemd:
   units:
+    # This service seems to interfere with desktop functions when used on a box with a DE
     - name: conntrackd.service
-      enabled: true
+      # enabled: true
       dropins:
         # change to notify:
         # https://manpages.debian.org/testing/conntrackd/conntrackd.conf.5.en.html#Systemd
@@ -42,14 +43,14 @@ storage:
               Checksum on
             }
           }
-          UNIX {
-            Path /var/run/conntrackd.ctl
-          }
           General {
             Systemd on
             LockFile /run/conntrack.lock
             NetlinkBufferSize 2097152
             NetlinkBufferSizeMaxGrowth 8388608
+            UNIX {
+              Path /var/run/conntrackd.ctl
+            }
             Filter From Kernelspace {
               Protocol Accept {
                 TCP

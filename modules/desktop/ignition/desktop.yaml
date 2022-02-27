@@ -3,8 +3,8 @@ variant: fcos
 version: 1.4.0
 systemd:
   units:
-    - name: geoclue.service
-      enabled: true
+    # - name: geoclue.service
+    #   enabled: true
     - name: default-dconf-update.service
       enabled: true
       contents: |
