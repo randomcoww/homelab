@@ -139,3 +139,7 @@ Full example: https://github.com/technosophos/tscharts
 helm package helm_charts/<chart>
 helm repo index --url https://randomcoww.github.io/terraform-infra docs/
 ```
+
+### Container builds
+
+All custom container build Dockerfiles are at https://github.com/randomcoww/container-builds
