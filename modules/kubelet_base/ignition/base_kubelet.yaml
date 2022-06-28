@@ -25,12 +25,8 @@ systemd:
             [Service]
             Environment=KUBELET_COMMON_ARGS="--exit-on-lock-contention \
               --lock-file=/var/run/lock/kubelet.lock \
-              --container-runtime=remote \
               --container-runtime-endpoint=unix:///run/crio/crio.sock \
-              --runtime-request-timeout=10m \
               --node-ip=${node_ip} \
-              --cgroups-per-qos=false \
-              --enforce-node-allocatable= \
               --v=2"
             ExecStartPre=/usr/bin/mkdir -p \
               ${static_pod_manifest_path}
@@ -63,6 +59,7 @@ storage:
           kind: KubeletConfiguration
           apiVersion: kubelet.config.k8s.io/v1beta1
           cgroupDriver: systemd
+          cgroupsPerQOS: false
           authentication:
             anonymous:
               enabled: true
@@ -77,3 +74,4 @@ storage:
           containerLogMaxFiles: 2
           registerNode: false
           failSwapOn: false
+          enforceNodeAllocatable: []

@@ -67,6 +67,7 @@ storage:
           kind: KubeletConfiguration
           apiVersion: kubelet.config.k8s.io/v1beta1
           cgroupDriver: systemd
+          cgroupsPerQOS: false
           authentication:
             anonymous:
               enabled: false
@@ -99,6 +100,7 @@ storage:
             GracefulNodeShutdown: true
           registerNode: true
           failSwapOn: false
+          enforceNodeAllocatable: []
 
     - path: ${config_path}/bootstrap.kubeconfig
       mode: 0644
