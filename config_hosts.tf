@@ -8,12 +8,12 @@ locals {
       netnum      = 1
       hardware_interfaces = {
         phy0 = {
-          mac   = "8c-8c-aa-e3-58-62"
+          mac   = "1c-83-41-30-e4-b5"
           mtu   = 9000
           vlans = ["sync", "wan"]
         }
         wlan0 = {
-          mac          = "b4-0e-de-fb-28-95"
+          mac          = "90-cc-df-ae-c0-f9"
           mtu          = 9000
           enable_4addr = true
         }
@@ -47,7 +47,7 @@ locals {
       }
       disks = {
         pv = {
-          device = "/dev/disk/by-id/nvme-Samsung_SSD_970_EVO_1TB_S5H9NS0N986704R"
+          device = "/dev/disk/by-id/usb-Kingston_DataTraveler_3.0_408D5CBECAC3E420C93C7B4F-0:0"
           partitions = [
             {
               mount_path = "/var/pv"
@@ -82,7 +82,7 @@ locals {
       ]
       container_storage_path = "/var/home/containers"
       kubernetes_worker_taints = {
-        # "nvidia.com/gpu" = "true:NoSchedule"
+        "nvidia.com/gpu" = "true:NoSchedule"
       }
     }
 

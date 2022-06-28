@@ -27,10 +27,7 @@ systemd:
               --bootstrap-kubeconfig=${config_path}/bootstrap.kubeconfig \
               --cert-dir=${certs_path} \
               --config=${config_path}/kubelet-config-bootstrap-worker.yaml \
-              --feature-gates=GracefulNodeShutdown=true \
               --kubeconfig=${config_path}/kubelet.kubeconfig \
-              --network-plugin=cni \
-              --register-node=true \
               --node-labels=${join(",", [
                 for node_label, value in node_labels :
                 "${node_label}=${value}"
@@ -70,6 +67,7 @@ storage:
           kind: KubeletConfiguration
           apiVersion: kubelet.config.k8s.io/v1beta1
           cgroupDriver: systemd
+          cgroupsPerQOS: false
           authentication:
             anonymous:
               enabled: false
@@ -98,6 +96,11 @@ storage:
             memory.available: 100Mi
             nodefs.available: 1%
             nodefs.inodesFree: 1%
+          featureGates:
+            GracefulNodeShutdown: true
+          registerNode: true
+          failSwapOn: false
+          enforceNodeAllocatable: []
 
     - path: ${config_path}/bootstrap.kubeconfig
       mode: 0644
