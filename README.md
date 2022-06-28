@@ -73,7 +73,8 @@ Write minio config
 
 ```bash
 mkdir -p ~/.mc && \
-  tw terraform output -json minio_endpoint > ~/.mc/config.json
+  tw terraform -chdir=helm_client output \
+  -json minio_endpoint > ~/.mc/config.json
 ```
 
 Merge with existing config if there is one
