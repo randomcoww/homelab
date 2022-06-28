@@ -25,19 +25,19 @@ systemd:
             [Service]
             Environment=KUBELET_COMMON_ARGS="--exit-on-lock-contention \
               --lock-file=/var/run/lock/kubelet.lock \
-              --fail-swap-on=false \
               --container-runtime=remote \
               --container-runtime-endpoint=unix:///run/crio/crio.sock \
               --runtime-request-timeout=10m \
               --node-ip=${node_ip} \
+              --cgroups-per-qos=false \
+              --enforce-node-allocatable= \
               --v=2"
             ExecStartPre=/usr/bin/mkdir -p \
               ${static_pod_manifest_path}
             ExecStart=
             ExecStart=/usr/bin/kubelet \
               $KUBELET_COMMON_ARGS \
-              --config=${config_path}/kubelet-config.yaml \
-              --register-node=false
+              --config=${config_path}/kubelet-config.yaml
 
 storage:
   files:
@@ -75,3 +75,5 @@ storage:
           makeIPTablesUtilChains: false
           containerLogMaxSize: 10Mi
           containerLogMaxFiles: 2
+          registerNode: false
+          failSwapOn: false

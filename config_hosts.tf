@@ -8,12 +8,12 @@ locals {
       netnum      = 1
       hardware_interfaces = {
         phy0 = {
-          mac   = "8c-8c-aa-e3-58-62"
+          mac   = "1c-83-41-30-e4-b5"
           mtu   = 9000
           vlans = ["sync", "wan"]
         }
         wlan0 = {
-          mac          = "b4-0e-de-fb-28-95"
+          mac          = "90-cc-df-ae-c0-f9"
           mtu          = 9000
           enable_4addr = true
         }
@@ -47,7 +47,7 @@ locals {
       }
       disks = {
         pv = {
-          device = "/dev/disk/by-id/nvme-Samsung_SSD_970_EVO_1TB_S5H9NS0N986704R"
+          device = "/dev/disk/by-id/usb-Kingston_DataTraveler_3.0_408D5CBECAC3E420C93C7B4F-0:0"
           partitions = [
             {
               mount_path = "/var/pv"
@@ -82,7 +82,7 @@ locals {
       ]
       container_storage_path = "/var/home/containers"
       kubernetes_worker_taints = {
-        # "nvidia.com/gpu" = "true:NoSchedule"
+        "nvidia.com/gpu" = "true:NoSchedule"
       }
     }
 
@@ -101,59 +101,6 @@ locals {
           ]
         }
       }
-      container_storage_path = "/var/home/containers"
-    }
-
-    # temp until getting a dedicated server..
-    temp-0 = {
-      users = [
-        "client"
-      ]
-      vrrp_netnum = 2
-      netnum      = 3
-      hardware_interfaces = {
-        phy0 = {
-          mac   = "84-a9-38-0f-aa-76"
-          mtu   = 9000
-          vlans = ["sync", "wan"]
-        }
-      }
-      bridge_interfaces = {}
-      tap_interfaces = {
-        lan = {
-          source_interface_name = "phy0"
-          enable_mdns           = true
-          enable_netnum         = true
-          enable_vrrp_netnum    = true
-          enable_dhcp_server    = true
-          mtu                   = 9000
-        }
-        sync = {
-          source_interface_name = "phy0-sync"
-          enable_netnum         = true
-          enable_vrrp_netnum    = true
-          mtu                   = 9000
-        }
-        wan = {
-          source_interface_name = "phy0-wan"
-          enable_dhcp           = true
-          mac                   = "52-54-00-63-6e-b3"
-        }
-      }
-      disks = {
-        pv = {
-          device = "/dev/disk/by-id/nvme-SKHynix_HFS512GDE9X084N_CYA8N037413008I5H"
-          partitions = [
-            {
-              mount_path = "/var/home"
-              wipe       = false
-            },
-          ]
-        }
-      }
-      minio_volume_paths = [
-        "/var/home/minio"
-      ]
       container_storage_path = "/var/home/containers"
     }
   }
