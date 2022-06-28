@@ -73,14 +73,15 @@ Write minio config
 
 ```bash
 mkdir -p ~/.mc && \
-  tw terraform -chdir=helm_client output \
+tw terraform -chdir=helm_client output \
   -json minio_endpoint > ~/.mc/config.json
 ```
 
-Merge with existing config if there is one
+Download minio client `mc`
 
 ```bash
-jq -s '.[0] * .[1]' ~/.mc/config.json new_config.json
+wget https://dl.min.io/client/mc/release/linux-amd64/mc
+chmod +x mc
 ```
 
 [Build and upload client image to minio](https://github.com/randomcoww/fedora-coreos-config-custom/blob/master/builds/client/README.md)
@@ -119,17 +120,17 @@ tw find . -name '*.tf' -exec terraform fmt '{}' \;
 TF_VERSION=1.1.2
 SSH_VERSION=0.1.4
 SYNCTHING_VERSION=0.1.2
+TAG=ghcr.io/randomcoww/tw:latest
 
 buildah build \
+  --dns 9.9.9.9 \
   --build-arg TF_VERSION=$TF_VERSION \
   --build-arg SSH_VERSION=$SSH_VERSION \
   --build-arg SYNCTHING_VERSION=$SYNCTHING_VERSION \
   -f Dockerfile \
-  -t ghcr.io/randomcoww/tw:latest
-```
+  -t $TAG && \
 
-```bash
-buildah push ghcr.io/randomcoww/tw:latest
+buildah push $TAG
 ```
 
 ### Updating helm charts

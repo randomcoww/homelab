@@ -47,7 +47,7 @@ locals {
       }
       disks = {
         pv = {
-          device = "/dev/disk/by-id/usb-Kingston_DataTraveler_3.0_408D5CBECAC3E420C93C7B4F-0:0"
+          device = "/dev/disk/by-id/nvme-VICKTER_NVME_SSD_WLN020A01087"
           partitions = [
             {
               mount_path = "/var/pv"
