@@ -77,12 +77,25 @@ tw terraform -chdir=helm_client output \
   -json minio_endpoint > ~/.mc/config.json
 ```
 
+---
+
+TODO: Handle minio in terraform
+
 Download minio client `mc`
 
 ```bash
 wget https://dl.min.io/client/mc/release/linux-amd64/mc
 chmod +x mc
 ```
+
+Make `boot` bucket
+
+```
+mc mb minio/boot
+mc policy set download minio/boot
+```
+
+---
 
 [Build and upload client image to minio](https://github.com/randomcoww/fedora-coreos-config-custom/blob/master/builds/client/README.md)
 

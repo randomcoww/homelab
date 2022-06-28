@@ -1,6 +1,6 @@
 locals {
   pxeboot_image_builds = {
-    client = "fedora-silverblue-35.20220221.0"
+    client = "fedora-silverblue-35.20220628.0"
   }
 
   pxeboot = {
