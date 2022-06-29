@@ -3,7 +3,7 @@ entries:
   cluster-services:
   - apiVersion: v2
     appVersion: 1.16.0
-    created: "2022-02-20T01:23:09.028517064-08:00"
+    created: "2022-06-28T17:42:12.993611066-07:00"
     description: Basic cluster services with minimal configuration
     digest: c840de7bd83bb9d0bea64a8e60731d3bf0d646152a952ff5ab6eaa03878050ef
     name: cluster-services
@@ -14,7 +14,7 @@ entries:
   matchbox:
   - apiVersion: v2
     appVersion: 1.16.0
-    created: "2022-02-20T01:23:09.02897348-08:00"
+    created: "2022-06-28T17:42:12.99378609-07:00"
     description: Matchbox PXE boot
     digest: fa19f0605f61eeac290f450d708057360d07d2da9c533d523d8245daf99de4ca
     name: matchbox
@@ -25,7 +25,7 @@ entries:
   minio:
   - apiVersion: v2
     appVersion: 1.16.0
-    created: "2022-02-20T01:23:09.02937095-08:00"
+    created: "2022-06-28T17:42:12.993950219-07:00"
     description: Minio
     digest: 2111330f7093d2491f83f20eac615ca873af7a5e000ab63430b711f368c95d24
     name: minio
@@ -33,21 +33,10 @@ entries:
     urls:
     - https://randomcoww.github.io/terraform-infra/minio-0.1.1.tgz
     version: 0.1.1
-  mpd:
-  - apiVersion: v2
-    appVersion: 1.16.0
-    created: "2022-02-20T01:23:09.029671828-08:00"
-    description: MPD on internal minio
-    digest: 41b2fdbaa548b635c18772c57c5ad1372f84340bd7d884559d8232479b6aa121
-    name: mpd
-    type: application
-    urls:
-    - https://randomcoww.github.io/terraform-infra/mpd-0.1.3.tgz
-    version: 0.1.3
   syncthing:
   - apiVersion: v2
     appVersion: 1.16.0
-    created: "2022-02-20T01:23:09.030048485-08:00"
+    created: "2022-06-28T17:42:12.994095769-07:00"
     description: Async data replication between nodes
     digest: c039fe9b23807e3f966194466ea9b3956c68025e45d7a0853776c5c2ba5272fd
     name: syncthing
@@ -55,4 +44,4 @@ entries:
     urls:
     - https://randomcoww.github.io/terraform-infra/syncthing-0.1.1.tgz
     version: 0.1.1
-generated: "2022-02-20T01:23:09.02748578-08:00"
+generated: "2022-06-28T17:42:12.993206472-07:00"
