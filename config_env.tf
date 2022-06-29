@@ -88,7 +88,6 @@ locals {
     kube_controller_manager = "ghcr.io/randomcoww/kubernetes:kube-master-v1.24.1"
     kube_scheduler          = "ghcr.io/randomcoww/kubernetes:kube-master-v1.24.1"
     kube_proxy              = "ghcr.io/randomcoww/kubernetes:kube-proxy-v1.24.1"
-    kube_addons_manager     = "ghcr.io/randomcoww/kubernetes-addon-manager:master"
     etcd_wrapper            = "ghcr.io/randomcoww/etcd-wrapper:latest"
     etcd                    = "ghcr.io/randomcoww/etcd:v3.5.4"
     kea                     = "ghcr.io/randomcoww/kea:2.0.2"
@@ -101,9 +100,6 @@ locals {
     external_dns            = "k8s.gcr.io/external-dns/external-dns:v0.12.0"
     matchbox                = "quay.io/poseidon/matchbox:latest"
     syncthing               = "docker.io/syncthing/syncthing:latest"
-    rclone                  = "rclone/rclone:latest"
-    mpd                     = "ghcr.io/randomcoww/mpd:0.23.7"
-    ympd                    = "ghcr.io/randomcoww/ympd:latest"
   }
 
   kubernetes = {

@@ -193,24 +193,3 @@ output "minio_endpoint" {
     }
   }
 }
-
-# mpd #
-
-resource "helm_release" "mpd" {
-  name       = "mpd"
-  namespace  = "default"
-  repository = "https://randomcoww.github.io/terraform-infra/"
-  chart      = "mpd"
-  version    = "0.1.3"
-  wait       = false
-  values = [
-    yamlencode({
-      images           = local.container_images
-      affinity         = "syncthing"
-      minio_endpoint   = "http://minio-0.minio.default.svc:${local.ports.minio}"
-      minio_bucket     = "music"
-      control_dns_name = "mpd.${local.domains.internal}"
-      stream_dns_name  = "s.${local.domains.internal}"
-    })
-  ]
-}
