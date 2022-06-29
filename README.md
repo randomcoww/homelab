@@ -151,7 +151,7 @@ buildah push $TAG
 Full example: https://github.com/technosophos/tscharts
 
 ```bash
-helm package helm_charts/<chart>
+helm package helm_charts/<chart> -d docs/
 helm repo index --url https://randomcoww.github.io/terraform-infra docs/
 ```
 

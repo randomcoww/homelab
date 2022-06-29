@@ -3,9 +3,9 @@ entries:
   cluster-services:
   - apiVersion: v2
     appVersion: 1.16.0
-    created: "2022-06-28T17:42:12.993611066-07:00"
+    created: "2022-06-28T17:48:12.177488898-07:00"
     description: Basic cluster services with minimal configuration
-    digest: c840de7bd83bb9d0bea64a8e60731d3bf0d646152a952ff5ab6eaa03878050ef
+    digest: ca9f5435addb2a17ae750bf62d3bbfb5f83944d4bb7b4ce93c6ff870fc5b01fe
     name: cluster-services
     type: application
     urls:
@@ -14,9 +14,9 @@ entries:
   matchbox:
   - apiVersion: v2
     appVersion: 1.16.0
-    created: "2022-06-28T17:42:12.99378609-07:00"
+    created: "2022-06-28T17:48:12.177656798-07:00"
     description: Matchbox PXE boot
-    digest: fa19f0605f61eeac290f450d708057360d07d2da9c533d523d8245daf99de4ca
+    digest: 7d1daa53e4ad84ca84bbf8dfdbd8cdf320154398a1434f4cf2ab2d246dc96b99
     name: matchbox
     type: application
     urls:
@@ -25,9 +25,9 @@ entries:
   minio:
   - apiVersion: v2
     appVersion: 1.16.0
-    created: "2022-06-28T17:42:12.993950219-07:00"
+    created: "2022-06-28T17:48:12.177825187-07:00"
     description: Minio
-    digest: 2111330f7093d2491f83f20eac615ca873af7a5e000ab63430b711f368c95d24
+    digest: 3fb10efae6f3064a1aa3c0a6250583e0acbd69717b196fe8a4c91603dae9f448
     name: minio
     type: application
     urls:
@@ -36,12 +36,12 @@ entries:
   syncthing:
   - apiVersion: v2
     appVersion: 1.16.0
-    created: "2022-06-28T17:42:12.994095769-07:00"
+    created: "2022-06-28T17:48:12.177976465-07:00"
     description: Async data replication between nodes
-    digest: c039fe9b23807e3f966194466ea9b3956c68025e45d7a0853776c5c2ba5272fd
+    digest: 0c486a88096cf748922ba4268dcfa0c497daf3e44122268574165e46dd785cce
     name: syncthing
     type: application
     urls:
     - https://randomcoww.github.io/terraform-infra/syncthing-0.1.1.tgz
     version: 0.1.1
-generated: "2022-06-28T17:42:12.993206472-07:00"
+generated: "2022-06-28T17:48:12.177081999-07:00"
