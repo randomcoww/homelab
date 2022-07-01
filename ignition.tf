@@ -4,6 +4,7 @@ module "ignition-base" {
   for_each = {
     for host_key in [
       "aio-0",
+      "aio-1",
       "client-0",
       "remote-0",
     ] :
@@ -22,6 +23,8 @@ module "ignition-systemd-networkd" {
   for_each = {
     for host_key in [
       "aio-0",
+      "aio-1",
+      "client-0",
     ] :
     host_key => local.hosts[host_key]
   }
@@ -38,6 +41,7 @@ module "ignition-kubelet-base" {
   for_each = {
     for host_key in [
       "aio-0",
+      "aio-1",
       "client-0",
     ] :
     host_key => local.hosts[host_key]
@@ -52,6 +56,7 @@ module "ignition-gateway" {
   for_each = {
     for host_key in [
       "aio-0",
+      "aio-1",
     ] :
     host_key => local.hosts[host_key]
   }
@@ -72,6 +77,7 @@ module "ignition-gateway" {
   kea_peers = [
     for i, host_key in [
       "aio-0",
+      "aio-1",
     ] :
     {
       name   = host_key
@@ -87,6 +93,7 @@ module "ignition-disks" {
   for_each = {
     for host_key in [
       "aio-0",
+      "aio-1",
       "client-0",
       "remote-0",
     ] :
@@ -107,6 +114,7 @@ module "ignition-ssh-server" {
   for_each = {
     for host_key in [
       "aio-0",
+      "aio-1",
     ] :
     host_key => local.hosts[host_key]
   }
@@ -142,6 +150,7 @@ module "hostapd-roaming" {
   members = {
     for host_key in [
       "aio-0",
+      "aio-1",
     ] :
     host_key => {
       interface_name = "wlan0"
@@ -184,6 +193,8 @@ module "etcd-cluster" {
   cluster_hosts = {
     for host_key in [
       "aio-0",
+      "aio-1",
+      "client-0",
     ] :
     host_key => {
       hostname    = local.hosts[host_key].hostname
@@ -220,6 +231,7 @@ module "ignition-kubernetes-master" {
   for_each = {
     for host_key in [
       "aio-0",
+      "aio-1",
     ] :
     host_key => local.hosts[host_key]
   }
@@ -249,6 +261,7 @@ module "ignition-kubernetes-worker" {
   for_each = {
     for host_key in [
       "aio-0",
+      "aio-1",
       "client-0",
     ] :
     host_key => local.hosts[host_key]
