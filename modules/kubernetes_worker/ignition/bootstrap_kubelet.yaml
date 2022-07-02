@@ -41,6 +41,12 @@ storage:
       contents:
         inline: |
           SUBSYSTEM=="net", ACTION=="add", KERNEL=="${cni_bridge_interface_name}", ATTR{bridge/nf_call_iptables}="1"
+    # https://mayastor.gitbook.io/introduction/quickstart/preparing-the-cluster #
+    - path: /etc/sysctl.d/50-mayastor.conf
+      mode: 0644
+      contents:
+        inline: |
+          vm.nr_hugepages=1024
 
     - path: /etc/crio/crio.conf.d/20-storage.conf
       mode: 0644
