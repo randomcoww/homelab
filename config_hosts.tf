@@ -128,7 +128,7 @@ locals {
       users = [
         "client"
       ]
-      netnum      = 4
+      netnum = 4
       hardware_interfaces = {
         phy0 = {
           mac   = "84-a9-38-0f-aa-76"
