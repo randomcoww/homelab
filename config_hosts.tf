@@ -56,9 +56,6 @@ locals {
           ]
         }
       }
-      minio_volume_paths = [
-        "/var/pv/minio"
-      ]
       container_storage_path = "/var/pv/containers"
       kubernetes_worker_labels = {
         "minio-data"        = "true"
@@ -122,9 +119,6 @@ locals {
           ]
         }
       }
-      minio_volume_paths = [
-        "/var/pv/minio"
-      ]
       container_storage_path = "/var/pv/containers"
       kubernetes_worker_labels = {
         "minio-data"        = "true"
@@ -164,16 +158,13 @@ locals {
           device = "/dev/disk/by-id/nvme-SKHynix_HFS512GDE9X084N_CYA8N037413008I5H"
           partitions = [
             {
-              mount_path = "/var/home"
+              mount_path = "/var/pv"
               wipe       = false
             },
           ]
         }
       }
-      minio_volume_paths = [
-        "/var/home/minio"
-      ]
-      container_storage_path = "/var/home/containers"
+      container_storage_path = "/var/pv/containers"
       kubernetes_worker_taints = [
         {
           key    = "nvidia.com/gpu"
@@ -195,13 +186,13 @@ locals {
           device = "/dev/disk/by-id/nvme-SKHynix_HFS512GDE9X084N_CYA8N037413008I5H"
           partitions = [
             {
-              mount_path = "/var/home"
+              mount_path = "/var/pv"
               wipe       = false
             },
           ]
         }
       }
-      container_storage_path = "/var/home/containers"
+      container_storage_path = "/var/pv/containers"
     }
   }
 

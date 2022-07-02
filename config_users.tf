@@ -13,7 +13,7 @@ locals {
     client = {
       name     = "randomcoww"
       uid      = 10000
-      home_dir = "/var/home/randomcoww"
+      home_dir = "/var/pv/randomcoww"
       groups = [
         "adm",
         "sudo",

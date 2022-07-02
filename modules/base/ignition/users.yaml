@@ -20,6 +20,16 @@ version: 1.4.0
 #     # - mlx4_core.port_type_array=2
 #     # - mlx4_core.probe_vf=8
 
+storage:
+  links:
+  %{~ for _, user in users ~}
+  %{~ if lookup(user, "home_dir", "/var/home/${user.name}") != "/var/home/${user.name}" ~}
+  - path: /var/home/${user.name}
+    overwrite: true
+    target: ${user.home_dir}
+  %{~ endif ~}
+  %{~ endfor ~}
+
 passwd:
   users:
     ${indent(4, yamlencode(
