@@ -142,6 +142,7 @@ locals {
           source_interface_name = "phy0"
           enable_mdns           = true
           enable_netnum         = true
+          enable_dhcp           = true
           mtu                   = 9000
         }
         wan = {
