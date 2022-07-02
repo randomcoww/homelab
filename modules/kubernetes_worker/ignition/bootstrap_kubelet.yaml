@@ -101,6 +101,9 @@ storage:
           registerNode: true
           failSwapOn: false
           enforceNodeAllocatable: []
+          %{~ if length(node_taints) > 0 ~}
+          ${indent(10, yamlencode({registerWithTaints = node_taints}))}
+          %{~ endif ~}
 
     - path: ${config_path}/bootstrap.kubeconfig
       mode: 0644

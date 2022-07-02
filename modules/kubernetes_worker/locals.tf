@@ -25,6 +25,7 @@ locals {
       config_path               = "/var/lib/kubelet/config"
       certs                     = local.certs
       node_labels               = var.node_labels
+      node_taints               = var.node_taints
       apiserver_ip              = var.apiserver_ip
       service_network           = var.service_network
       pod_network               = var.pod_network

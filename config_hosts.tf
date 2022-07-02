@@ -60,6 +60,10 @@ locals {
         "/var/pv/minio"
       ]
       container_storage_path = "/var/pv/containers"
+      kubernetes_worker_labels = {
+        "minio-data"        = "true"
+        "openebs.io/engine" = "mayastor"
+      }
     }
 
     aio-1 = {
@@ -122,6 +126,10 @@ locals {
         "/var/pv/minio"
       ]
       container_storage_path = "/var/pv/containers"
+      kubernetes_worker_labels = {
+        "minio-data"        = "true"
+        "openebs.io/engine" = "mayastor"
+      }
     }
 
     client-0 = {
@@ -166,8 +174,15 @@ locals {
         "/var/home/minio"
       ]
       container_storage_path = "/var/home/containers"
-      kubernetes_worker_taints = {
-        "nvidia.com/gpu" = "true:NoSchedule"
+      kubernetes_worker_taints = [
+        {
+          key    = "nvidia.com/gpu"
+          effect = "NoSchedule"
+          value  = "true"
+        }
+      ]
+      kubernetes_worker_labels = {
+        "openebs.io/engine" = "mayastor"
       }
     }
 

@@ -14,6 +14,10 @@ variable "node_labels" {
   type = map(string)
 }
 
+variable "node_taints" {
+  type = any
+}
+
 variable "container_storage_path" {
   type = string
 }

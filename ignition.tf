@@ -271,7 +271,8 @@ module "ignition-kubernetes-worker" {
   cluster_name              = local.kubernetes.cluster_name
   ca                        = module.kubernetes-ca.ca
   certs                     = module.kubernetes-ca.certs
-  node_labels               = { host-key = each.key }
+  node_labels               = merge({ host-key = each.key }, lookup(each.value, "kubernetes_worker_labels", {}))
+  node_taints               = lookup(each.value, "kubernetes_worker_taints", [])
   container_storage_path    = lookup(each.value, "container_storage_path", null)
   cni_bridge_interface_name = local.kubernetes.cni_bridge_interface_name
   apiserver_ip              = local.networks.lan.vips.apiserver
