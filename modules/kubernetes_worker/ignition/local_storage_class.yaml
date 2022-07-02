@@ -1,0 +1,25 @@
+---
+variant: fcos
+version: 1.4.0
+systemd:
+  units:
+    %{~ for v in local_storage_volumes ~}
+    - name: ${v.systemd_unit_name}.mount
+      enabled: true
+      contents: |
+        [Mount]
+        What=${v.path}
+        Where=${v.target}
+        Type=none
+        Options=bind
+
+        [Install]
+        WantedBy=local-fs.target
+    %{~ endfor ~}
+
+storage:
+  directories:
+    %{~ for v in local_storage_volumes ~}
+    - path: ${v.path}
+    - path: ${v.target}
+    %{~ endfor ~}

@@ -22,6 +22,22 @@ variable "container_storage_path" {
   type = string
 }
 
+# build for https://github.com/kubernetes-sigs/sig-storage-local-static-provisioner
+# volumes can be directories but must be bind mounted from elsewhere
+variable "local_storage_class_path" {
+  type = string
+}
+
+variable "local_storage_class_mount_path" {
+  type = string
+}
+
+variable "local_storage_class_volume_count" {
+  type    = number
+  default = 10
+}
+#
+
 variable "static_pod_manifest_path" {
   type = string
 }

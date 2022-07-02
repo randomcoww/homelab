@@ -107,5 +107,7 @@ locals {
     cluster_name              = "prod-5"
     static_pod_manifest_path  = "/var/lib/kubelet/manifests"
     cni_bridge_interface_name = "cni0"
+    local_storage_class_path  = "/var/tmp/local_storage"
+    local_storage_class       = "local-storage"
   }
 }

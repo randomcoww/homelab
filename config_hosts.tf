@@ -56,9 +56,11 @@ locals {
           ]
         }
       }
-      container_storage_path = "/var/pv/containers"
+      container_storage_path         = "/var/pv/containers"
+      local_storage_class_mount_path = "/var/pv/local_storage_mount"
       kubernetes_worker_labels = {
         "minio-data"        = "true"
+        "vrrp"              = "true"
         "openebs.io/engine" = "mayastor"
       }
     }
@@ -119,9 +121,11 @@ locals {
           ]
         }
       }
-      container_storage_path = "/var/pv/containers"
+      container_storage_path         = "/var/pv/containers"
+      local_storage_class_mount_path = "/var/pv/local_storage_mount"
       kubernetes_worker_labels = {
         "minio-data"        = "true"
+        "vrrp"              = "true"
         "openebs.io/engine" = "mayastor"
       }
     }
@@ -164,7 +168,8 @@ locals {
           ]
         }
       }
-      container_storage_path = "/var/home/containers"
+      container_storage_path         = "/var/home/containers"
+      local_storage_class_mount_path = "/var/home/local_storage_mount"
       kubernetes_worker_taints = [
         {
           key    = "nvidia.com/gpu"
