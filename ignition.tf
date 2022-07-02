@@ -261,7 +261,6 @@ module "ignition-kubernetes-worker" {
     for host_key in [
       "aio-0",
       "aio-1",
-      "client-0",
     ] :
     host_key => local.hosts[host_key]
   }

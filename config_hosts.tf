@@ -158,13 +158,13 @@ locals {
           device = "/dev/disk/by-id/nvme-SKHynix_HFS512GDE9X084N_CYA8N037413008I5H"
           partitions = [
             {
-              mount_path = "/var/pv"
+              mount_path = "/var/home"
               wipe       = false
             },
           ]
         }
       }
-      container_storage_path = "/var/pv/containers"
+      container_storage_path = "/var/home/containers"
       kubernetes_worker_taints = [
         {
           key    = "nvidia.com/gpu"
@@ -186,13 +186,13 @@ locals {
           device = "/dev/disk/by-id/nvme-SKHynix_HFS512GDE9X084N_CYA8N037413008I5H"
           partitions = [
             {
-              mount_path = "/var/pv"
+              mount_path = "/var/home"
               wipe       = false
             },
           ]
         }
       }
-      container_storage_path = "/var/pv/containers"
+      container_storage_path = "/var/home/containers"
     }
   }
 
