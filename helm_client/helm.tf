@@ -69,6 +69,40 @@ resource "helm_release" "nginx_ingress" {
   ]
 }
 
+# local-storage storage class #
+
+resource "helm_release" "local-storage-provisioner" {
+  name       = "local-storage-provisioner"
+  namespace  = "kube-system"
+  repository = "https://randomcoww.github.io/sig-storage-local-static-provisioner/"
+  chart      = "provisioner"
+  version    = "2.6.0-alpha.1"
+  wait       = false
+  values = [
+    yamlencode({
+      common = {
+        mountDevVolume = false
+      }
+      classes = [
+        {
+          name        = local.kubernetes.local_storage_class
+          hostDir     = local.kubernetes.local_storage_class_path
+          volumeMode  = "Filesystem"
+          namePattern = "*"
+          fsType      = "xfs"
+          blockCleanerCommand = [
+            "/scripts/quick_reset.sh"
+          ]
+          storageClass = {
+            reclaimPolicy  = "Delete"
+            isDefaultClass = true
+          }
+        }
+      ]
+    })
+  ]
+}
+
 # nvidia device plugin #
 
 resource "helm_release" "nvidia_device_plugin" {
@@ -145,7 +179,7 @@ resource "local_file" "matchbox_client_cert" {
   content  = each.value
 }
 
-# minio #
+# minio with hostNetwork #
 
 resource "random_password" "minio-access-key-id" {
   length  = 30
@@ -162,19 +196,69 @@ resource "helm_release" "minio" {
   namespace  = "default"
   repository = "https://randomcoww.github.io/terraform-infra/"
   chart      = "minio"
-  version    = "0.1.1"
   wait       = false
   values = [
     yamlencode({
-      replica_count      = 1
-      image              = local.container_images.minio
-      node_affinity      = "aio-0.local"
-      minio_ip           = local.networks.metallb.vips.minio
-      minio_port         = local.ports.minio
-      minio_console_port = local.ports.minio_console
-      volume_path        = "/var/pv/minio"
-      access_key_id      = replace(base64encode(chomp(random_password.minio-access-key-id.result)), "\n", "")
-      secret_access_key  = replace(base64encode(chomp(random_password.minio-secret-access-key.result)), "\n", "")
+      clusterDomain = local.domains.kubernetes
+      mode          = "distributed"
+      rootUser      = random_password.minio-access-key-id.result
+      rootPassword  = random_password.minio-secret-access-key.result
+      persistence = {
+        storageClass = local.kubernetes.local_storage_class
+        size         = "300Gi"
+      }
+      drivesPerNode = 2
+      replicas      = 2
+      ingress = {
+        enabled          = true
+        ingressClassName = "nginx"
+        hosts = [
+          "minio.${local.domains.internal}"
+        ]
+      }
+      consoleIngress = {
+        enabled          = true
+        ingressClassName = "nginx"
+        hosts = [
+          "mc.${local.domains.internal}"
+        ]
+      }
+      resources = {
+        requests = {
+          memory = "4Gi"
+        }
+      }
+      affinity = {
+        nodeAffinity = {
+          requiredDuringSchedulingIgnoredDuringExecution = {
+            nodeSelectorTerms = [
+              {
+                matchExpressions = [
+                  {
+                    key      = "minio-data"
+                    operator = "In"
+                    values = [
+                      "true"
+                    ]
+                  }
+                ]
+              }
+            ]
+          }
+        }
+      }
+      buckets = [
+        {
+          name   = "boot"
+          policy = "download"
+        },
+        {
+          name = "music"
+        },
+        {
+          name = "video"
+        }
+      ]
     })
   ]
 }
