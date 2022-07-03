@@ -3,7 +3,7 @@ entries:
   cluster-services:
   - apiVersion: v2
     appVersion: 1.16.0
-    created: "2022-06-28T17:48:12.177488898-07:00"
+    created: "2022-07-03T22:42:17.105863798Z"
     description: Basic cluster services with minimal configuration
     digest: ca9f5435addb2a17ae750bf62d3bbfb5f83944d4bb7b4ce93c6ff870fc5b01fe
     name: cluster-services
@@ -14,7 +14,7 @@ entries:
   matchbox:
   - apiVersion: v2
     appVersion: 1.16.0
-    created: "2022-06-28T17:48:12.177656798-07:00"
+    created: "2022-07-03T22:42:17.106202112Z"
     description: Matchbox PXE boot
     digest: 7d1daa53e4ad84ca84bbf8dfdbd8cdf320154398a1434f4cf2ab2d246dc96b99
     name: matchbox
@@ -23,20 +23,32 @@ entries:
     - https://randomcoww.github.io/terraform-infra/matchbox-0.1.1.tgz
     version: 0.1.1
   minio:
-  - apiVersion: v2
-    appVersion: 1.16.0
-    created: "2022-06-28T17:48:12.177825187-07:00"
-    description: Minio
-    digest: 3fb10efae6f3064a1aa3c0a6250583e0acbd69717b196fe8a4c91603dae9f448
+  - apiVersion: v1
+    appVersion: RELEASE.2022-05-08T23-50-31Z
+    created: "2022-07-03T22:42:17.108174796Z"
+    description: Multi-Cloud Object Storage
+    digest: baeba220030d0ac4964641d67f724f93c97c83e2de7e2f848f4302fb7aa30e8d
+    home: https://min.io
+    icon: https://min.io/resources/img/logo/MINIO_wordmark.png
+    keywords:
+    - minio
+    - storage
+    - object-storage
+    - s3
+    - cluster
+    maintainers:
+    - email: dev@minio.io
+      name: MinIO, Inc
     name: minio
-    type: application
+    sources:
+    - https://github.com/minio/minio
     urls:
-    - https://randomcoww.github.io/terraform-infra/minio-0.1.1.tgz
-    version: 0.1.1
+    - https://randomcoww.github.io/terraform-infra/minio-4.0.2.tgz
+    version: 4.0.2
   syncthing:
   - apiVersion: v2
     appVersion: 1.16.0
-    created: "2022-06-28T17:48:12.177976465-07:00"
+    created: "2022-07-03T22:42:17.108861481Z"
     description: Async data replication between nodes
     digest: 0c486a88096cf748922ba4268dcfa0c497daf3e44122268574165e46dd785cce
     name: syncthing
@@ -44,4 +56,4 @@ entries:
     urls:
     - https://randomcoww.github.io/terraform-infra/syncthing-0.1.1.tgz
     version: 0.1.1
-generated: "2022-06-28T17:48:12.177081999-07:00"
+generated: "2022-07-03T22:42:17.099350832Z"
