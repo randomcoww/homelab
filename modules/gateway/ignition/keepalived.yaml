@@ -47,7 +47,7 @@ storage:
             virtual_ipaddress {
               %{~ for network_name, interface in interfaces ~}
               %{~ if lookup(interface, "enable_vrrp_netnum", false) ~}
-              ${cidrhost(interface.prefix, vrrp_netnum)} dev ${interface.interface_name} use_vmac
+              ${cidrhost(interface.prefix, vrrp_netnum)} dev ${interface.interface_name}%{if lookup(interface, "enable_vmac", false)} use_vmac%{endif}
               %{~ endif ~}
               %{~ endfor ~}
               0.0.0.0 dev ${interfaces.wan.interface_name}

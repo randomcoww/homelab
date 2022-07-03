@@ -30,6 +30,7 @@ locals {
           enable_mdns           = true
           enable_netnum         = true
           enable_vrrp_netnum    = true
+          enable_vmac           = true
           enable_dhcp_server    = true
           mtu                   = 9000
         }
@@ -95,6 +96,7 @@ locals {
           enable_mdns           = true
           enable_netnum         = true
           enable_vrrp_netnum    = true
+          enable_vmac           = true
           enable_dhcp_server    = true
           mtu                   = 9000
         }
