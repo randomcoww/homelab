@@ -39,15 +39,15 @@ storage:
             virtual_router_id ${vrrp_netnum % 255}
             interface ${interfaces.sync.interface_name}
             priority 250
+            garp_master_delay 1
             garp_master_refresh 1
-            dont_track_primary
             track_interface {
               ${interfaces.wan.interface_name}
             }
             virtual_ipaddress {
               %{~ for network_name, interface in interfaces ~}
               %{~ if lookup(interface, "enable_vrrp_netnum", false) ~}
-              ${cidrhost(interface.prefix, vrrp_netnum)} dev ${interface.interface_name}%{if lookup(interface, "enable_vmac", false)} use_vmac%{endif}
+              ${cidrhost(interface.prefix, vrrp_netnum)} dev ${interface.interface_name} use_vmac
               %{~ endif ~}
               %{~ endfor ~}
               0.0.0.0 dev ${interfaces.wan.interface_name}
