@@ -3,7 +3,7 @@ entries:
   cluster-services:
   - apiVersion: v2
     appVersion: 1.16.0
-    created: "2022-07-04T07:15:30.437510537Z"
+    created: "2022-07-04T07:34:08.201948336Z"
     description: Basic cluster services with minimal configuration
     digest: ca9f5435addb2a17ae750bf62d3bbfb5f83944d4bb7b4ce93c6ff870fc5b01fe
     name: cluster-services
@@ -14,12 +14,12 @@ entries:
   matchbox:
   - apiVersion: v2
     appVersion: 1.16.0
-    created: "2022-07-04T07:15:30.437727187Z"
+    created: "2022-07-04T07:34:08.202123639Z"
     description: Matchbox PXE boot
-    digest: 40586aedf704c4b1d0b2d45d40f65c05de99c9036b913f3d4bdbe567e87f3263
+    digest: 22bb05c5c568dae1ff94c769ac2e99b4c4af0cd5055c3a2db5b39500d1373da2
     name: matchbox
     type: application
     urls:
-    - https://randomcoww.github.io/terraform-infra/matchbox-0.1.4.tgz
-    version: 0.1.4
-generated: "2022-07-04T07:15:30.437104406Z"
+    - https://randomcoww.github.io/terraform-infra/matchbox-0.1.5.tgz
+    version: 0.1.5
+generated: "2022-07-04T07:34:08.20161966Z"
