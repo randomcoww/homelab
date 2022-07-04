@@ -218,14 +218,14 @@ resource "helm_release" "minio" {
         enabled          = true
         ingressClassName = "nginx"
         hosts = [
-          "minio.${local.domains.internal}",
+          local.ingress.minio,
         ]
       }
       consoleIngress = {
         enabled          = true
         ingressClassName = "nginx"
         hosts = [
-          "mc.${local.domains.internal}",
+          local.ingress.minio_console,
         ]
       }
       resources = {
@@ -252,12 +252,6 @@ resource "helm_release" "minio" {
           }
         }
       }
-      buckets = [
-        {
-          name   = "boot"
-          policy = "download"
-        },
-      ]
     }),
   ]
 }
@@ -267,7 +261,7 @@ output "minio_endpoint" {
     version = "10"
     aliases = {
       minio = {
-        url       = "http://${local.networks.metallb.vips.minio}:${local.ports.minio}"
+        url       = "http://${local.ingress.minio}"
         accessKey = nonsensitive(random_password.minio-access-key-id.result)
         secretKey = nonsensitive(random_password.minio-secret-access-key.result)
         api       = "S3v4"

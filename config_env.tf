@@ -21,7 +21,6 @@ locals {
     metallb = {
       prefix = cidrsubnet("192.168.126.0/23", 2, 1)
       netnums = {
-        minio            = 10
         external_dns     = 11
         internal_pxeboot = 12
         ingress          = 13
@@ -71,8 +70,6 @@ locals {
     kea_peer              = 58080
     etcd_client           = 58082
     etcd_peer             = 58083
-    minio                 = 50256
-    minio_console         = 50257
     internal_pxeboot_http = 80
     internal_pxeboot_api  = 50259
   }
@@ -81,6 +78,11 @@ locals {
     internal_mdns = "local"
     internal      = "fuzzybunny.internal"
     kubernetes    = "cluster.internal"
+  }
+
+  ingress = {
+    minio         = "minio.${local.domains.internal}"
+    minio_console = "mc.${local.domains.internal}"
   }
 
   container_images = {

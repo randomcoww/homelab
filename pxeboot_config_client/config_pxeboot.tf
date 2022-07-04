@@ -7,7 +7,7 @@ locals {
   pxeboot = {
     matchbox_http_endpoint = "http://${local.networks.metallb.vips.internal_pxeboot}:${local.ports.internal_pxeboot_http}"
     matchbox_api_endpoint  = "${local.networks.metallb.vips.internal_pxeboot}:${local.ports.internal_pxeboot_api}"
-    image_store_endpoint   = "http://${local.networks.metallb.vips.minio}:${local.ports.minio}"
+    image_store_endpoint   = "http://${local.ingress.minio}"
     image_store_base_path  = "boot"
 
     hosts = {
