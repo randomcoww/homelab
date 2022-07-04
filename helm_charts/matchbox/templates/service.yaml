@@ -1,0 +1,19 @@
+kind: Service
+apiVersion: v1
+metadata:
+  name: {{ .Chart.Name }}
+  labels:
+    helm.sh/chart: {{ .Chart.Name }}-{{ .Chart.Version | replace "+" "_" }}
+    app: {{ .Chart.Name }}
+spec:
+  type: LoadBalancer
+  loadBalancerIP: {{ .Values.loadBalancerIP }}
+  ports:
+  - name: matchbox-api
+    port: {{ .Values.matchbox.apiPort }}
+  - name: matchbox-http
+    port: {{ .Values.matchbox.httpPort }}
+  - name: syncthing-peer
+    port: {{ .Values.syncthing.peerPort }}
+  selector:
+    app: {{ .Chart.Name }}

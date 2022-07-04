@@ -36,7 +36,6 @@ storage:
           auth_algs=1
           driver=nl80211
           ieee80211ac=1
-          ieee80211n=1
           require_ht=1
           wmm_enabled=1
           ht_capab=${join("", [
@@ -49,11 +48,12 @@ storage:
           ieee80211w=2
           sae_password=${passphrase}
           ssid=${ssid}
+          disassoc_low_ack=1
 
           bssid=${bssid}
           mobility_domain=${mobility_domain}
           pmk_r1_push=1
-          r0_key_lifetime=10000
+          ft_psk_generate_local=1
           r1_key_holder=${nas_identifier}
           nas_identifier=${nas_identifier}
           %{~ for member in members ~}

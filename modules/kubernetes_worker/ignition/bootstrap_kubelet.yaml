@@ -28,6 +28,7 @@ systemd:
               --cert-dir=${certs_path} \
               --config=${config_path}/kubelet-config-bootstrap-worker.yaml \
               --kubeconfig=${config_path}/kubelet.kubeconfig \
+              --feature-gates=GracefulNodeShutdown=true \
               --node-labels=${join(",", [
                 for node_label, value in node_labels :
                 "${node_label}=${value}"

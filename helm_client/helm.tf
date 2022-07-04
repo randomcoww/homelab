@@ -99,48 +99,10 @@ resource "helm_release" "local-storage-provisioner" {
             "/scripts/quick_reset.sh",
           ]
           storageClass = {
-            reclaimPolicy  = "Delete"
             isDefaultClass = true
           }
         },
       ]
-    }),
-  ]
-}
-
-# nvidia device plugin #
-
-resource "helm_release" "nvidia_device_plugin" {
-  name       = "nvidia-device-plugin"
-  repository = "https://nvidia.github.io/k8s-device-plugin"
-  chart      = "nvidia-device-plugin"
-  namespace  = "kube-system"
-}
-
-# syncthing #
-
-module "syncthing-addon" {
-  source             = "./modules/syncthing_config"
-  replica_count      = 2
-  resource_name      = "syncthing"
-  resource_namespace = "default"
-  sync_data_path     = "/var/pv/sync"
-}
-
-resource "helm_release" "syncthing" {
-  name       = "syncthing"
-  namespace  = "default"
-  repository = "https://randomcoww.github.io/terraform-infra/"
-  chart      = "syncthing"
-  version    = "0.1.1"
-  wait       = false
-  values = [
-    yamlencode({
-      replica_count = 2
-      data_path     = "/var/pv/sync"
-      image         = local.container_images.syncthing
-      secret_data   = module.syncthing-addon.secret
-      config        = module.syncthing-addon.config
     }),
   ]
 }
@@ -152,23 +114,39 @@ module "matchbox-certs" {
   internal_pxeboot_ip = local.networks.metallb.vips.internal_pxeboot
 }
 
+module "syncthing-addon" {
+  source             = "./modules/syncthing_config"
+  replica_count      = 2
+  resource_name      = "matchbox"
+  resource_namespace = "default"
+  service_name       = "matchbox"
+  sync_data_path     = "/var/tmp/syncthing"
+}
+
 resource "helm_release" "matchbox" {
   name       = "matchbox"
   namespace  = "default"
   repository = "https://randomcoww.github.io/terraform-infra/"
   chart      = "matchbox"
-  version    = "0.1.1"
+  version    = "0.1.6"
   wait       = false
   values = [
     yamlencode({
-      replica_count              = 2
-      data_path                  = "/var/pv/sync/matchbox"
-      affinity                   = "syncthing"
-      image                      = local.container_images.matchbox
-      secret_data                = module.matchbox-certs.secret
-      internal_pxeboot_http_port = local.ports.internal_pxeboot_http
-      internal_pxeboot_api_port  = local.ports.internal_pxeboot_api
-      internal_pxeboot_ip        = local.networks.metallb.vips.internal_pxeboot
+      replicaCount   = 2
+      loadBalancerIP = local.networks.metallb.vips.internal_pxeboot
+      matchbox = {
+        image    = local.container_images.matchbox
+        secret   = module.matchbox-certs.secret
+        httpPort = local.ports.internal_pxeboot_http
+        apiPort  = local.ports.internal_pxeboot_api
+      }
+      syncthing = {
+        image    = local.container_images.syncthing
+        podName  = "syncthing"
+        secret   = module.syncthing-addon.secret
+        config   = module.syncthing-addon.config
+        dataPath = "/var/tmp/syncthing"
+      }
     }),
   ]
 }

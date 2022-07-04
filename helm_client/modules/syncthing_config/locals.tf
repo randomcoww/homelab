@@ -10,7 +10,7 @@ locals {
   ]
 
   config_xml = templatefile("${path.module}/config/config.xml", {
-    resource_name       = var.resource_name
+    service_name        = var.service_name
     namespace           = var.resource_namespace
     syncthing_members   = local.syncthing_members
     syncthing_home_path = "/var/lib/syncthing"

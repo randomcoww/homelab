@@ -7,6 +7,10 @@ variable "resource_namespace" {
   default = "default"
 }
 
+variable "service_name" {
+  type = string
+}
+
 variable "replica_count" {
   type = number
 }

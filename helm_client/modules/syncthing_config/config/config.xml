@@ -8,7 +8,7 @@
   </folder>
   %{~ for member in syncthing_members ~}
   <device id="${member.device_id}" compression="never" skipIntroductionRemovals="true">
-    <address>${member.pod_name}.${resource_name}.${namespace}:${syncthing_peer_port}</address>
+    <address>${member.pod_name}.${service_name}.${namespace}:${syncthing_peer_port}</address>
     <autoAcceptFolders>true</autoAcceptFolders>
   </device>
   %{~endfor~}

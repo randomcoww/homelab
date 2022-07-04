@@ -1,0 +1,110 @@
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: {{ .Chart.Name }}
+  labels:
+    helm.sh/chart: {{ .Chart.Name }}-{{ .Chart.Version | replace "+" "_" }}
+    app: {{ .Chart.Name }}
+spec:
+  serviceName: {{ .Chart.Name }}
+  replicas: {{ .Values.replicaCount }}
+  selector:
+    matchLabels:
+      app: {{ .Chart.Name }}
+  template:
+    metadata:
+      labels:
+        app: {{ .Chart.Name }}
+      annotations:
+        checksum/config: {{ include (print $.Template.BasePath "/configmap.yaml") . | sha256sum }}
+        checksum/secret: {{ include (print $.Template.BasePath "/secret.yaml") . | sha256sum }}
+    spec:
+      affinity:
+        podAntiAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+          - labelSelector:
+              matchExpressions:
+              - key: app
+                operator: In
+                values:
+                - {{ .Chart.Name }}
+            topologyKey: kubernetes.io/hostname
+      initContainers:
+      - name: {{ .Values.syncthing.podName }}-init
+        image: {{ .Values.syncthing.image }}
+        command:
+        - cp
+        - /tmp/config.xml
+        - /tmp/cert.pem
+        - /tmp/key.pem
+        - {{ .Values.syncthing.homePath }}/
+        env:
+        - name: POD_NAME
+          valueFrom:
+            fieldRef:
+              fieldPath: metadata.name
+        volumeMounts:
+        - name: syncthing-config
+          mountPath: /tmp/config.xml
+          subPath: config.xml
+        - name: syncthing-tls
+          mountPath: /tmp/cert.pem
+          subPathExpr: cert-$(POD_NAME)
+        - name: syncthing-tls
+          mountPath: /tmp/key.pem
+          subPathExpr: key-$(POD_NAME)
+        - name: syncthing-home
+          mountPath: {{ .Values.syncthing.homePath }}
+      containers:
+      - name: {{ .Values.syncthing.podName }}
+        image: {{ .Values.syncthing.image }}
+        command:
+        - syncthing
+        args:
+        - --home
+        - {{ .Values.syncthing.homePath }}
+        volumeMounts:
+        - name: syncthing-home
+          mountPath: {{ .Values.syncthing.homePath }}
+        - name: data
+          mountPath: {{ .Values.syncthing.dataPath }}
+        ports:
+        - name: syncthing-peer
+          containerPort: {{ .Values.syncthing.peerPort }}
+      - name: {{ .Chart.Name }}
+        image: {{ .Values.matchbox.image }}
+        args:
+        - -address=0.0.0.0:{{ .Values.matchbox.httpPort }}
+        - -rpc-address=0.0.0.0:{{ .Values.matchbox.apiPort }}
+        - -assets-path={{ .Values.matchbox.dataPath }}
+        - -data-path={{ .Values.matchbox.dataPath }}
+        volumeMounts:
+        - name: matchbox-tls
+          mountPath: /etc/matchbox
+        - name: data
+          mountPath: {{ .Values.matchbox.dataPath }}
+        ports:
+        - name: matchbox-api
+          containerPort: {{ .Values.matchbox.apiPort }}
+        - name: matchbox-http
+          containerPort: {{ .Values.matchbox.httpPort }}
+        livenessProbe:
+          tcpSocket:
+            port: {{ .Values.matchbox.apiPort }}
+          initialDelaySeconds: 5
+          periodSeconds: 10
+          timeoutSeconds: 5
+      volumes:
+      - name: syncthing-home
+        emptyDir: {}
+      - name: syncthing-config
+        configMap:
+          name: {{ .Chart.Name }}-{{ .Values.syncthing.podName }}
+      - name: syncthing-tls
+        secret:
+          secretName: {{ .Chart.Name }}-{{ .Values.syncthing.podName }}
+      - name: matchbox-tls
+        secret:
+          secretName: {{ .Chart.Name }}
+      - name: data
+        emptyDir: {}

@@ -1,7 +1,0 @@
-replica_count: 2
-image: "docker.io/syncthing/syncthing:latest"
-home_path: "/var/lib/syncthing"
-peer_port: 22000
-data_path: ""
-secret_data:
-config: ""

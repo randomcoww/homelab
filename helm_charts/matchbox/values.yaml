@@ -1,9 +1,20 @@
-replica_count: 2
-image: "quay.io/poseidon/matchbox:latest"
-data_path: ""
-secret_data: ""
-config: ""
-affinity: ""
-internal_pxeboot_http_port: 8080
-internal_pxeboot_api_port: 8081
-internal_pxeboot_ip: ""
+replicaCount: 2
+loadBalancerIP: ""
+matchbox:
+  image: "quay.io/poseidon/matchbox:latest"
+  dataPath: "/var/tmp/matchbox"
+  secret: 
+    ca.crt: "ca"
+    server.crt: "crt"
+    server.key: "key"
+  httpPort: 8080
+  apiPort: 8081
+
+syncthing:
+  image: "docker.io/syncthing/syncthing:latest"
+  podName: "syncthing"
+  homePath: "/var/lib/syncthing"
+  peerPort: 22000
+  dataPath: "/var/tmp/syncthing"
+  secret:
+  config: "config"
