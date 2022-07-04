@@ -3,7 +3,7 @@ loadBalancerIP: ""
 matchbox:
   image: "quay.io/poseidon/matchbox:latest"
   dataPath: "/var/tmp/matchbox"
-  secret: 
+  secret:
     ca.crt: "ca"
     server.crt: "crt"
     server.key: "key"
