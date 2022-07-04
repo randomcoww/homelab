@@ -95,7 +95,6 @@ locals {
     coredns                 = "docker.io/coredns/coredns:latest"
     flannel                 = "ghcr.io/randomcoww/flannel:v0.18.1"
     flannel_cni_plugin      = "rancher/mirrored-flannelcni-flannel-cni-plugin:v1.1.0"
-    minio                   = "minio/minio:latest"
     kapprover               = "ghcr.io/randomcoww/kapprover:latest"
     external_dns            = "k8s.gcr.io/external-dns/external-dns:v0.12.0"
     matchbox                = "quay.io/poseidon/matchbox:latest"

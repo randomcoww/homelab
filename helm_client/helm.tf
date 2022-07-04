@@ -20,7 +20,7 @@ resource "helm_release" "cluster_services" {
       cluster_domain            = local.domains.kubernetes
       cni_bridge_interface_name = local.kubernetes.cni_bridge_interface_name
       kube_proxy_port           = local.ports.kube_proxy
-    })
+    }),
   ]
 }
 
@@ -40,7 +40,7 @@ resource "helm_release" "metlallb" {
             name     = "default"
             protocol = "layer2"
             addresses = [
-              local.networks.metallb.prefix
+              local.networks.metallb.prefix,
             ]
           },
         ]
@@ -62,10 +62,15 @@ resource "helm_release" "nginx_ingress" {
     yamlencode({
       controller = {
         service = {
-          externalIPs = [local.networks.metallb.vips.ingress]
+          externalIPs = [
+            local.networks.metallb.vips.ingress,
+          ]
+        }
+        config = {
+          proxy-body-size = "256m"
         }
       }
-    })
+    }),
   ]
 }
 
@@ -91,15 +96,15 @@ resource "helm_release" "local-storage-provisioner" {
           namePattern = "*"
           fsType      = "xfs"
           blockCleanerCommand = [
-            "/scripts/quick_reset.sh"
+            "/scripts/quick_reset.sh",
           ]
           storageClass = {
             reclaimPolicy  = "Delete"
             isDefaultClass = true
           }
-        }
+        },
       ]
-    })
+    }),
   ]
 }
 
@@ -136,7 +141,7 @@ resource "helm_release" "syncthing" {
       image         = local.container_images.syncthing
       secret_data   = module.syncthing-addon.secret
       config        = module.syncthing-addon.config
-    })
+    }),
   ]
 }
 
@@ -164,7 +169,7 @@ resource "helm_release" "matchbox" {
       internal_pxeboot_http_port = local.ports.internal_pxeboot_http
       internal_pxeboot_api_port  = local.ports.internal_pxeboot_api
       internal_pxeboot_ip        = local.networks.metallb.vips.internal_pxeboot
-    })
+    }),
   ]
 }
 
@@ -213,14 +218,14 @@ resource "helm_release" "minio" {
         enabled          = true
         ingressClassName = "nginx"
         hosts = [
-          "minio.${local.domains.internal}"
+          "minio.${local.domains.internal}",
         ]
       }
       consoleIngress = {
         enabled          = true
         ingressClassName = "nginx"
         hosts = [
-          "mc.${local.domains.internal}"
+          "mc.${local.domains.internal}",
         ]
       }
       resources = {
@@ -238,11 +243,11 @@ resource "helm_release" "minio" {
                     key      = "minio-data"
                     operator = "In"
                     values = [
-                      "true"
+                      "true",
                     ]
-                  }
+                  },
                 ]
-              }
+              },
             ]
           }
         }
@@ -252,14 +257,8 @@ resource "helm_release" "minio" {
           name   = "boot"
           policy = "download"
         },
-        {
-          name = "music"
-        },
-        {
-          name = "video"
-        }
       ]
-    })
+    }),
   ]
 }
 
