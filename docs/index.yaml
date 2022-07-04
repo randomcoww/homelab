@@ -3,7 +3,7 @@ entries:
   cluster-services:
   - apiVersion: v2
     appVersion: 1.16.0
-    created: "2022-07-04T07:51:54.748509992Z"
+    created: "2022-07-04T22:49:09.947596265Z"
     description: Basic cluster services with minimal configuration
     digest: ca9f5435addb2a17ae750bf62d3bbfb5f83944d4bb7b4ce93c6ff870fc5b01fe
     name: cluster-services
@@ -14,7 +14,7 @@ entries:
   matchbox:
   - apiVersion: v2
     appVersion: 1.16.0
-    created: "2022-07-04T07:51:54.748676356Z"
+    created: "2022-07-04T22:49:09.947801601Z"
     description: Matchbox PXE boot
     digest: 40667226d31e5da4226f80c72bd4122f491d23ce830a55cb1208d0e91e8dfaf0
     name: matchbox
@@ -22,4 +22,15 @@ entries:
     urls:
     - https://randomcoww.github.io/terraform-infra/matchbox-0.1.6.tgz
     version: 0.1.6
-generated: "2022-07-04T07:51:54.748142554Z"
+  mpd:
+  - apiVersion: v2
+    appVersion: 1.16.0
+    created: "2022-07-04T22:49:09.948034314Z"
+    description: A Helm chart for Kubernetes
+    digest: 3802fac14843261da1c3573b6f819d786f2fc2a220afb8e96ec3ef9b54c23d64
+    name: mpd
+    type: application
+    urls:
+    - https://randomcoww.github.io/terraform-infra/mpd-0.1.0.tgz
+    version: 0.1.0
+generated: "2022-07-04T22:49:09.947109956Z"
