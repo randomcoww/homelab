@@ -208,7 +208,7 @@ resource "helm_release" "minio" {
       }
       resources = {
         requests = {
-          memory = "4Gi"
+          memory = "8Gi"
         }
       }
       affinity = {
