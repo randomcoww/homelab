@@ -3,7 +3,7 @@ entries:
   cluster-services:
   - apiVersion: v2
     appVersion: 1.16.0
-    created: "2022-07-04T00:20:58.585823583Z"
+    created: "2022-07-04T06:42:38.568302595Z"
     description: Basic cluster services with minimal configuration
     digest: ca9f5435addb2a17ae750bf62d3bbfb5f83944d4bb7b4ce93c6ff870fc5b01fe
     name: cluster-services
@@ -14,23 +14,12 @@ entries:
   matchbox:
   - apiVersion: v2
     appVersion: 1.16.0
-    created: "2022-07-04T00:20:58.585969482Z"
+    created: "2022-07-04T06:42:38.568519245Z"
     description: Matchbox PXE boot
-    digest: 7d1daa53e4ad84ca84bbf8dfdbd8cdf320154398a1434f4cf2ab2d246dc96b99
+    digest: 4c90d4bd3b102775e95942d20b6c4c51267c293a47807c951befad4dba9b08d0
     name: matchbox
     type: application
     urls:
-    - https://randomcoww.github.io/terraform-infra/matchbox-0.1.1.tgz
-    version: 0.1.1
-  syncthing:
-  - apiVersion: v2
-    appVersion: 1.16.0
-    created: "2022-07-04T00:20:58.586104557Z"
-    description: Async data replication between nodes
-    digest: 0c486a88096cf748922ba4268dcfa0c497daf3e44122268574165e46dd785cce
-    name: syncthing
-    type: application
-    urls:
-    - https://randomcoww.github.io/terraform-infra/syncthing-0.1.1.tgz
-    version: 0.1.1
-generated: "2022-07-04T00:20:58.585487643Z"
+    - https://randomcoww.github.io/terraform-infra/matchbox-0.1.2.tgz
+    version: 0.1.2
+generated: "2022-07-04T06:42:38.567890108Z"
