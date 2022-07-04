@@ -199,7 +199,7 @@ resource "random_password" "minio-secret-access-key" {
 resource "helm_release" "minio" {
   name       = "minio"
   namespace  = "default"
-  repository = "https://randomcoww.github.io/terraform-infra/"
+  repository = "https://charts.min.io/"
   chart      = "minio"
   wait       = false
   values = [
