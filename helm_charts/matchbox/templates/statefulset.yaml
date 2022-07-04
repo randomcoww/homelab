@@ -29,6 +29,7 @@ spec:
                 values:
                 - {{ .Chart.Name }}
             topologyKey: kubernetes.io/hostname
+      restartPolicy: Always
       initContainers:
       - name: {{ .Values.syncthing.podName }}-init
         image: {{ .Values.syncthing.image }}

@@ -3,11 +3,6 @@ variant: fcos
 version: 1.4.0
 systemd:
   units:
-    - name: systemd-rfkill.service
-      mask: true
-    - name: systemd-rfkill.socket
-      mask: true
-    # rfkill can trip any time... try unblocking before each hostapd start
     - name: hostapd.service
       enabled: true
       dropins:
@@ -18,7 +13,6 @@ systemd:
             RestartSec=6
             EnvironmentFile=
             Environment=OTHER_ARGS="-d"
-            ExecStartPre=/usr/sbin/rfkill unblock wlan
 
 storage:
   files:
