@@ -107,14 +107,14 @@ resource "helm_release" "local-storage-provisioner" {
   ]
 }
 
-# matchbox #
+# matchbox with data sync #
 
 module "matchbox-certs" {
   source              = "./modules/matchbox_certs"
   internal_pxeboot_ip = local.networks.metallb.vips.internal_pxeboot
 }
 
-module "syncthing-addon" {
+module "matchbox-syncthing" {
   source             = "./modules/syncthing_config"
   replica_count      = 2
   resource_name      = "matchbox"
@@ -143,8 +143,8 @@ resource "helm_release" "matchbox" {
       syncthing = {
         image    = local.container_images.syncthing
         podName  = "syncthing"
-        secret   = module.syncthing-addon.secret
-        config   = module.syncthing-addon.config
+        secret   = module.matchbox-syncthing.secret
+        config   = module.matchbox-syncthing.config
         dataPath = "/var/tmp/syncthing"
       }
     }),
@@ -247,4 +247,49 @@ output "minio_endpoint" {
       }
     }
   }
+}
+
+# mpd with cache sync #
+
+module "mpd-syncthing" {
+  source             = "./modules/syncthing_config"
+  replica_count      = 2
+  resource_name      = "mpd"
+  resource_namespace = "default"
+  service_name       = "mpd"
+  sync_data_path     = "/var/tmp/syncthing"
+}
+
+resource "helm_release" "mpd" {
+  name       = "mpd"
+  namespace  = "default"
+  repository = "https://randomcoww.github.io/terraform-infra/"
+  chart      = "mpd"
+  version    = "0.1.0"
+  wait       = false
+  values = [
+    yamlencode({
+      replicaCount  = 2
+      minioEndPoint = "http://minio.default:9000"
+      minioBucket   = "music"
+      mpd = {
+        image          = local.container_images.mpd
+        streamHostName = local.ingress.mpd_stream
+      }
+      ympd = {
+        image        = local.container_images.ympd
+        httpHostName = local.ingress.mpd_control
+      }
+      rclone = {
+        image = local.container_images.rclone
+      }
+      syncthing = {
+        image    = local.container_images.syncthing
+        podName  = "syncthing"
+        secret   = module.mpd-syncthing.secret
+        config   = module.mpd-syncthing.config
+        dataPath = "/var/tmp/syncthing"
+      }
+    }),
+  ]
 }

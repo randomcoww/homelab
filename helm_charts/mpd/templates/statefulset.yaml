@@ -73,29 +73,40 @@ spec:
         ports:
         - name: syncthing-peer
           containerPort: {{ .Values.syncthing.peerPort }}
-      - name: {{ .Chart.Name }}
-        image: {{ .Values.matchbox.image }}
-        args:
-        - -address=0.0.0.0:{{ .Values.matchbox.httpPort }}
-        - -rpc-address=0.0.0.0:{{ .Values.matchbox.apiPort }}
-        - -assets-path={{ .Values.matchbox.dataPath }}
-        - -data-path={{ .Values.matchbox.dataPath }}
+      - name: mpd
+        imagePullPolicy: Always
+        image: {{ .Values.mpd.image }}
         volumeMounts:
-        - name: matchbox-tls
-          mountPath: /etc/matchbox
+        - name: mpd-config
+          mountPath: /etc/mpd.conf
+          subPath: mpd.conf
         - name: data
-          mountPath: {{ .Values.matchbox.dataPath }}
+          mountPath: {{ .Values.mpd.cachePath }}
         ports:
-        - name: matchbox-api
-          containerPort: {{ .Values.matchbox.apiPort }}
-        - name: matchbox-http
-          containerPort: {{ .Values.matchbox.httpPort }}
-        livenessProbe:
-          tcpSocket:
-            port: {{ .Values.matchbox.apiPort }}
-          initialDelaySeconds: 5
-          periodSeconds: 10
-          timeoutSeconds: 5
+        - containerPort: {{ .Values.mpd.streamPort }}
+      - name: ympd
+        imagePullPolicy: Always
+        image: {{ .Values.ympd.image }}
+        args: ["-h", "127.0.0.1", "-p", "{{ .Values.mpd.controlPort }}", "-w", "{{ .Values.ympd.httpPort }}"]
+        ports:
+        - containerPort: {{ .Values.ympd.httpPort }}
+      - name: rclone
+        imagePullPolicy: Always
+        image: {{ .Values.rclone.image }}
+        args:
+        - serve
+        - webdav
+        - --addr=127.0.0.1:{{ .Values.rclone.webDavPort }}
+        - :s3:{{ .Values.minioBucket }}
+        - --s3-provider=Minio
+        - --s3-endpoint={{ .Values.minioEndPoint }}
+        - --no-modtime
+        - --read-only
+        env:
+        - name: NODE_IP
+          valueFrom:
+            fieldRef:
+              fieldPath: status.hostIP
       volumes:
       - name: syncthing-home
         emptyDir: {}
@@ -105,8 +116,8 @@ spec:
       - name: syncthing-tls
         secret:
           secretName: {{ .Chart.Name }}-{{ .Values.syncthing.podName }}
-      - name: matchbox-tls
-        secret:
-          secretName: {{ .Chart.Name }}
+      - name: mpd-config
+        configMap:
+          name: mpd
       - name: data
         emptyDir: {}

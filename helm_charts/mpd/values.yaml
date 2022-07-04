@@ -1,0 +1,28 @@
+# Default values for mpd.
+# This is a YAML-formatted file.
+# Declare variables to be passed into your templates.
+
+replicaCount: 2
+minioEndPoint: http://minio.default:9000
+minioBucket: music
+mpd:
+  image: ghcr.io/randomcoww/mpd:0.23.7
+  cachePath: /mpd/cache
+  streamPort: 8000
+  controlPort: 6600
+  streamHostName: mpd.local
+ympd:
+  image: ghcr.io/randomcoww/ympd:latest
+  httpPort: 8080
+  httpHostName: ympd.local
+rclone:
+  image: docker.io/rclone/rclone:latest
+  webDavPort: 8081
+syncthing:
+  image: docker.io/syncthing/syncthing:latest
+  podName: syncthing
+  homePath: /var/lib/syncthing
+  peerPort: 22000
+  dataPath: /var/tmp/syncthing
+  secret:
+  config: config

@@ -1,0 +1,42 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ .Chart.Name }}
+  labels:
+    helm.sh/chart: {{ .Chart.Name }}-{{ .Chart.Version | replace "+" "_" }}
+    app: {{ .Chart.Name }}
+data:
+  mpd.conf: |
+    user "mpd"
+    bind_to_address "127.0.0.1"
+    port "{{ .Values.mpd.controlPort }}"
+    music_directory "http://127.0.0.1:{{ .Values.rclone.webDavPort }}/"
+    playlist_directory "{{ .Values.mpd.cachePath }}/playlists"
+    db_file "{{ .Values.mpd.cachePath }}/tag_cache"
+    state_file "{{ .Values.mpd.cachePath }}/state"
+    sticker_file "{{ .Values.mpd.cachePath }}/sticker.sql"
+    filesystem_charset "UTF-8"
+    audio_output {
+      type "httpd"
+      name "HTTP FLAC-3"
+      tags "yes"
+      format "48000:24:2"
+      always_on "yes"
+      encoder "flac"
+      compression "3"
+      port "{{ .Values.mpd.streamPort }}"
+      bind_to_address "0.0.0.0"
+      max_clients "0"
+    }
+
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ .Chart.Name }}-{{ .Values.syncthing.podName }}
+  labels:
+    helm.sh/chart: {{ .Chart.Name }}-{{ .Chart.Version | replace "+" "_" }}
+    app: {{ .Chart.Name }}
+data:
+  config.xml: |-
+{{ .Values.syncthing.config | indent 4 }}

@@ -83,6 +83,8 @@ locals {
   ingress = {
     minio         = "minio.${local.domains.internal}"
     minio_console = "mc.${local.domains.internal}"
+    mpd_stream    = "s.${local.domains.internal}"
+    mpd_control   = "mpd.${local.domains.internal}"
   }
 
   container_images = {
@@ -101,6 +103,9 @@ locals {
     external_dns            = "k8s.gcr.io/external-dns/external-dns:v0.12.0"
     matchbox                = "quay.io/poseidon/matchbox:latest"
     syncthing               = "docker.io/syncthing/syncthing:latest"
+    rclone                  = "docker.io/rclone/rclone:latest"
+    mpd                     = "ghcr.io/randomcoww/mpd:0.23.7"
+    ympd                    = "ghcr.io/randomcoww/ympd:latest"
   }
 
   kubernetes = {

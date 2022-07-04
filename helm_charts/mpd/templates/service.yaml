@@ -1,0 +1,50 @@
+kind: Service
+apiVersion: v1
+metadata:
+  name: {{ .Chart.Name }}
+  labels:
+    helm.sh/chart: {{ .Chart.Name }}-{{ .Chart.Version | replace "+" "_" }}
+    app: {{ .Chart.Name }}
+spec:
+  type: ClusterIP
+  ports:
+  - name: mpd-stream
+    port: {{ .Values.mpd.streamPort }}
+  - name: ympd-http
+    port: {{ .Values.ympd.httpPort }}
+  - name: syncthing-peer
+    port: {{ .Values.syncthing.peerPort }}
+  selector:
+    app: {{ .Chart.Name }}
+
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  labels:
+    helm.sh/chart: {{ .Chart.Name }}-{{ .Chart.Version | replace "+" "_" }}
+    app: {{ .Chart.Name }}
+  name: {{ .Chart.Name }}
+spec:
+  ingressClassName: nginx
+  rules:
+  - host: {{ .Values.ympd.httpHostName }}
+    http:
+      paths:
+      - backend:
+          service:
+            name: {{ .Chart.Name }}
+            port:
+              number: {{ .Values.ympd.httpPort }}
+        path: /
+        pathType: Prefix
+  - host: {{ .Values.mpd.streamHostName }}
+    http:
+      paths:
+      - path: /
+        pathType: Prefix
+        backend:
+          service:
+            name: {{ .Chart.Name }}
+            port:
+              number: {{ .Values.mpd.streamPort }}
