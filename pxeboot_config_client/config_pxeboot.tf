@@ -34,6 +34,30 @@ locals {
         initrd_image_name = "${local.pxeboot_image_builds.client}-live-initramfs.x86_64.img"
         rootfs_image_name = "${local.pxeboot_image_builds.client}-live-rootfs.x86_64.img"
       }
+      aio-0 = {
+        selector_mac = "1c-83-41-30-e4-b5"
+        boot_args = [
+          "elevator=noop",
+          "enforcing=0",
+          "rfkill.master_switch_mode=2",
+          "rfkill.default_state=1",
+        ]
+        kernel_image_name = "${local.pxeboot_image_builds.server}-live-kernel-x86_64"
+        initrd_image_name = "${local.pxeboot_image_builds.server}-live-initramfs.x86_64.img"
+        rootfs_image_name = "${local.pxeboot_image_builds.server}-live-rootfs.x86_64.img"
+      }
+      aio-1 = {
+        selector_mac = "1c-83-41-30-e2-54"
+        boot_args = [
+          "elevator=noop",
+          "enforcing=0",
+          "rfkill.master_switch_mode=2",
+          "rfkill.default_state=1",
+        ]
+        kernel_image_name = "${local.pxeboot_image_builds.server}-live-kernel-x86_64"
+        initrd_image_name = "${local.pxeboot_image_builds.server}-live-initramfs.x86_64.img"
+        rootfs_image_name = "${local.pxeboot_image_builds.server}-live-rootfs.x86_64.img"
+      }
     }
   }
 }
