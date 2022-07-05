@@ -3,7 +3,7 @@ entries:
   cluster-services:
   - apiVersion: v2
     appVersion: 1.16.0
-    created: "2022-07-05T02:50:01.481992157Z"
+    created: "2022-07-05T03:32:48.99966849Z"
     description: Basic cluster services with minimal configuration
     digest: ca9f5435addb2a17ae750bf62d3bbfb5f83944d4bb7b4ce93c6ff870fc5b01fe
     name: cluster-services
@@ -14,7 +14,17 @@ entries:
   matchbox:
   - apiVersion: v2
     appVersion: 1.16.0
-    created: "2022-07-05T02:50:01.482246033Z"
+    created: "2022-07-05T03:32:48.999990531Z"
+    description: Matchbox PXE boot
+    digest: d9dd4c5f0ac9c5065f26e5e6416b01e6475f587a8e30d5216b6c57a840e693ff
+    name: matchbox
+    type: application
+    urls:
+    - https://randomcoww.github.io/terraform-infra/matchbox-0.1.7.tgz
+    version: 0.1.7
+  - apiVersion: v2
+    appVersion: 1.16.0
+    created: "2022-07-05T03:32:48.999832618Z"
     description: Matchbox PXE boot
     digest: 40667226d31e5da4226f80c72bd4122f491d23ce830a55cb1208d0e91e8dfaf0
     name: matchbox
@@ -25,7 +35,7 @@ entries:
   minio:
   - apiVersion: v1
     appVersion: RELEASE.2022-05-08T23-50-31Z
-    created: "2022-07-05T02:50:01.484367412Z"
+    created: "2022-07-05T03:32:49.007680969Z"
     description: Multi-Cloud Object Storage
     digest: 4bd3cd30df81b9dc2ff1f7066f9aa9ed303cada3b1609715bafd21773cd2d54d
     home: https://min.io
@@ -48,7 +58,17 @@ entries:
   mpd:
   - apiVersion: v2
     appVersion: 1.16.0
-    created: "2022-07-05T02:50:01.484634558Z"
+    created: "2022-07-05T03:32:49.008059862Z"
+    description: A Helm chart for Kubernetes
+    digest: 9dcf00c1365dcdcdff4a0c8c2654fe922536b32188f82eb05d999f823df221f9
+    name: mpd
+    type: application
+    urls:
+    - https://randomcoww.github.io/terraform-infra/mpd-0.1.1.tgz
+    version: 0.1.1
+  - apiVersion: v2
+    appVersion: 1.16.0
+    created: "2022-07-05T03:32:49.007875689Z"
     description: A Helm chart for Kubernetes
     digest: 3802fac14843261da1c3573b6f819d786f2fc2a220afb8e96ec3ef9b54c23d64
     name: mpd
@@ -56,4 +76,4 @@ entries:
     urls:
     - https://randomcoww.github.io/terraform-infra/mpd-0.1.0.tgz
     version: 0.1.0
-generated: "2022-07-05T02:50:01.48154461Z"
+generated: "2022-07-05T03:32:48.999315858Z"
