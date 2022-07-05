@@ -3,6 +3,10 @@ variant: fcos
 version: 1.4.0
 systemd:
   units:
+    # This just fails
+    - name: nvidia-powerd.service
+      enabled: false
+
     # - name: geoclue.service
     #   enabled: true
     - name: default-dconf-update.service

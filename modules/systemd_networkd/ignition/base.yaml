@@ -11,6 +11,8 @@ systemd:
           contents: |
             [Unit]
             After=dbus.socket
+    - name: systemd-network-generator.service
+      mask: true
     - name: systemd-networkd-wait-online.service
       enabled: true
     - name: NetworkManager.service
@@ -26,7 +28,7 @@ storage:
         inline: |
           net.bridge.bridge-nf-call-iptables=0
     # systemd-networkd defaults #
-    - path: /etc/systemd/network/99-default.network
+    - path: /etc/systemd/network/91-default.network
       mode: 0644
       contents:
         inline: |

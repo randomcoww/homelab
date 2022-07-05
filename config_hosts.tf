@@ -143,6 +143,10 @@ locals {
           mtu   = 9000
           vlans = ["wan"]
         }
+        wlan0 = {
+          mac = "b4-b5-b6-74-79-15"
+          mtu = 9000
+        }
       }
       bridge_interfaces = {}
       tap_interfaces = {
