@@ -1,0 +1,25 @@
+diff --git a/helm/minio/templates/statefulset.yaml b/helm/minio/templates/statefulset.yaml
+index b4160f0c1..31b8501c7 100644
+--- a/helm/minio/templates/statefulset.yaml
++++ b/helm/minio/templates/statefulset.yaml
+@@ -94,6 +94,8 @@ spec:
+ {{ if .Values.serviceAccount.create }}
+       serviceAccountName: {{ .Values.serviceAccount.name }}
+ {{- end }}
++      hostNetwork: true
++      dnsPolicy: ClusterFirstWithHostNet
+       containers:
+         - name: {{ .Chart.Name }}
+           image: {{ .Values.image.repository }}:{{ .Values.image.tag }}
+@@ -125,11 +127,6 @@ spec:
+               mountPath: "/tmp/minio-config-env"
+             {{- end }}
+             {{- include "minio.tlsKeysVolumeMount" . | indent 12 }}
+-          ports:
+-            - name: {{ $scheme }}
+-              containerPort: {{ .Values.minioAPIPort }}
+-            - name: {{ $scheme }}-console
+-              containerPort: {{ .Values.minioConsolePort }}
+           env:
+             - name: MINIO_ROOT_USER
+               valueFrom:
