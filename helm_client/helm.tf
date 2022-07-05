@@ -90,7 +90,7 @@ resource "helm_release" "local-storage-provisioner" {
       }
       classes = [
         {
-          name        = local.kubernetes.local_storage_class
+          name        = "local-storage"
           hostDir     = local.kubernetes.local_storage_class_path
           volumeMode  = "Filesystem"
           namePattern = "*"
@@ -110,8 +110,8 @@ resource "helm_release" "local-storage-provisioner" {
 # matchbox with data sync #
 
 module "matchbox-certs" {
-  source              = "./modules/matchbox_certs"
-  internal_pxeboot_ip = local.networks.metallb.vips.internal_pxeboot
+  source        = "./modules/matchbox_certs"
+  api_listen_ip = local.networks.lan.vips.matchbox
 }
 
 module "matchbox-syncthing" {
@@ -128,23 +128,60 @@ resource "helm_release" "matchbox" {
   namespace  = "default"
   repository = "https://randomcoww.github.io/terraform-infra/"
   chart      = "matchbox"
-  version    = "0.1.6"
+  version    = "0.1.7"
   wait       = false
   values = [
     yamlencode({
-      replicaCount   = 2
-      loadBalancerIP = local.networks.metallb.vips.internal_pxeboot
+      replicaCount = 2
+      affinity = {
+        nodeAffinity = {
+          requiredDuringSchedulingIgnoredDuringExecution = {
+            nodeSelectorTerms = [
+              {
+                matchExpressions = [
+                  {
+                    key      = "vrrp"
+                    operator = "In"
+                    values = [
+                      "true",
+                    ]
+                  },
+                ]
+              },
+            ]
+          }
+        }
+        podAntiAffinity = {
+          requiredDuringSchedulingIgnoredDuringExecution = [
+            {
+              labelSelector = {
+                matchExpressions = [
+                  {
+                    key      = "app"
+                    operator = "In"
+                    values = [
+                      "matchbox",
+                    ]
+                  }
+                ]
+              }
+              topologyKey = "kubernetes.io/hostname"
+            }
+          ]
+        }
+      }
       matchbox = {
-        image    = local.container_images.matchbox
+        image    = local.helm_container_images.matchbox
         secret   = module.matchbox-certs.secret
-        httpPort = local.ports.internal_pxeboot_http
-        apiPort  = local.ports.internal_pxeboot_api
+        httpPort = local.ports.matchbox_http
+        apiPort  = local.ports.matchbox_api
       }
       syncthing = {
-        image    = local.container_images.syncthing
+        image    = local.helm_container_images.syncthing
         podName  = "syncthing"
         secret   = module.matchbox-syncthing.secret
         config   = module.matchbox-syncthing.config
+        peerPort = local.ports.matchbox_sync
         dataPath = "/var/tmp/syncthing"
       }
     }),
@@ -177,7 +214,7 @@ resource "random_password" "minio-secret-access-key" {
 resource "helm_release" "minio" {
   name       = "minio"
   namespace  = "default"
-  repository = "https://charts.min.io/"
+  repository = "https://randomcoww.github.io/terraform-infra/"
   chart      = "minio"
   wait       = false
   values = [
@@ -186,26 +223,13 @@ resource "helm_release" "minio" {
       mode          = "distributed"
       rootUser      = random_password.minio-access-key-id.result
       rootPassword  = random_password.minio-secret-access-key.result
+      minioAPIPort  = local.ports.minio
       persistence = {
-        storageClass = local.kubernetes.local_storage_class
+        storageClass = "local-storage"
         size         = "300Gi"
       }
       drivesPerNode = 2
       replicas      = 2
-      ingress = {
-        enabled          = true
-        ingressClassName = "nginx"
-        hosts = [
-          local.ingress.minio,
-        ]
-      }
-      consoleIngress = {
-        enabled          = true
-        ingressClassName = "nginx"
-        hosts = [
-          local.ingress.minio_console,
-        ]
-      }
       resources = {
         requests = {
           memory = "8Gi"
@@ -219,6 +243,13 @@ resource "helm_release" "minio" {
                 matchExpressions = [
                   {
                     key      = "minio-data"
+                    operator = "In"
+                    values = [
+                      "true",
+                    ]
+                  },
+                  {
+                    key      = "vrrp"
                     operator = "In"
                     values = [
                       "true",
@@ -239,7 +270,7 @@ output "minio_endpoint" {
     version = "10"
     aliases = {
       minio = {
-        url       = "http://${local.ingress.minio}"
+        url       = "http://${local.networks.lan.vips.minio}:${local.ports.minio}"
         accessKey = nonsensitive(random_password.minio-access-key-id.result)
         secretKey = nonsensitive(random_password.minio-secret-access-key.result)
         api       = "S3v4"
@@ -247,6 +278,79 @@ output "minio_endpoint" {
       }
     }
   }
+}
+
+# hostapd #
+
+resource "helm_release" "hostapd" {
+  name       = "hostapd"
+  namespace  = "default"
+  repository = "https://randomcoww.github.io/terraform-infra/"
+  chart      = "hostapd"
+  version    = "0.1.2"
+  wait       = false
+  values = [
+    yamlencode({
+      replicaCount = 2
+      image        = local.helm_container_images.hostapd
+      config       = <<EOF
+interface=wlan0
+preamble=1
+hw_mode=g
+channel=4
+auth_algs=1
+driver=nl80211
+ieee80211n=1
+require_ht=1
+wmm_enabled=1
+disassoc_low_ack=1
+ht_capab=[LDPC][HT40-][HT40+][SHORT-GI-40][TX-STBC][RX-STBC1][DSSS_CCK-40]
+wpa=2
+wpa_key_mgmt=WPA-PSK
+wpa_pairwise=CCMP
+ieee80211w=2
+wpa_passphrase=${var.wifi.passphrase}
+ssid=${var.wifi.ssid}
+EOF
+      affinity = {
+        nodeAffinity = {
+          requiredDuringSchedulingIgnoredDuringExecution = {
+            nodeSelectorTerms = [
+              {
+                matchExpressions = [
+                  {
+                    key      = "wlan"
+                    operator = "In"
+                    values = [
+                      "true",
+                    ]
+                  },
+                ]
+              },
+            ]
+          }
+        }
+        podAntiAffinity = {
+          requiredDuringSchedulingIgnoredDuringExecution = [
+            {
+              labelSelector = {
+                matchExpressions = [
+                  {
+                    key      = "app"
+                    operator = "In"
+                    values = [
+                      "hostapd",
+                    ]
+                  }
+                ]
+              }
+              topologyKey = "kubernetes.io/hostname"
+            }
+          ]
+        }
+      }
+    }),
+  ]
 }
 
 # mpd with cache sync #
@@ -265,26 +369,64 @@ resource "helm_release" "mpd" {
   namespace  = "default"
   repository = "https://randomcoww.github.io/terraform-infra/"
   chart      = "mpd"
-  version    = "0.1.0"
+  version    = "0.1.1"
   wait       = false
   values = [
     yamlencode({
       replicaCount  = 2
-      minioEndPoint = "http://minio.default:9000"
+      minioEndPoint = "http://minio.default:${local.ports.minio}"
       minioBucket   = "music"
+      affinity = {
+        podAffinity = {
+          requiredDuringSchedulingIgnoredDuringExecution = [
+            {
+              labelSelector = {
+                matchExpressions = [
+                  {
+                    key      = "app"
+                    operator = "In"
+                    values = [
+                      "minio",
+                    ]
+                  }
+                ]
+              }
+              topologyKey = "kubernetes.io/hostname"
+            }
+          ]
+        }
+        podAntiAffinity = {
+          requiredDuringSchedulingIgnoredDuringExecution = [
+            {
+              labelSelector = {
+                matchExpressions = [
+                  {
+                    key      = "app"
+                    operator = "In"
+                    values = [
+                      "mpd",
+                    ]
+                  }
+                ]
+              }
+              topologyKey = "kubernetes.io/hostname"
+            }
+          ]
+        }
+      }
       mpd = {
-        image          = local.container_images.mpd
-        streamHostName = local.ingress.mpd_stream
+        image          = local.helm_container_images.mpd
+        streamHostName = local.helm_ingress.mpd_stream
       }
       ympd = {
-        image        = local.container_images.ympd
-        httpHostName = local.ingress.mpd_control
+        image        = local.helm_container_images.ympd
+        httpHostName = local.helm_ingress.mpd_control
       }
       rclone = {
-        image = local.container_images.rclone
+        image = local.helm_container_images.rclone
       }
       syncthing = {
-        image    = local.container_images.syncthing
+        image    = local.helm_container_images.syncthing
         podName  = "syncthing"
         secret   = module.mpd-syncthing.secret
         config   = module.mpd-syncthing.config

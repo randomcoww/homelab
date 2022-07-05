@@ -17,7 +17,7 @@ resource "tls_cert_request" "matchbox" {
 
   ip_addresses = [
     "127.0.0.1",
-    var.internal_pxeboot_ip
+    var.api_listen_ip
   ]
 }
 

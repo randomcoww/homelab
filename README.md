@@ -64,7 +64,8 @@ tw terraform apply -var-file=secrets.tfvars
 ### Deploy services to kubernetes
 
 ```bash
-tw terraform -chdir=helm_client apply
+tw terraform -chdir=helm_client \
+  apply -var-file=secrets.tfvars
 ```
 
 ### Create PXE boot entry for client device

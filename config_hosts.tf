@@ -60,6 +60,8 @@ locals {
       local_storage_class_mount_path = "/var/pv/local_storage_mount"
       kubernetes_worker_labels = {
         "minio-data"        = "true"
+        "wlan"              = "true"
+        "vrrp"              = "true"
         "openebs.io/engine" = "mayastor"
       }
     }
@@ -124,6 +126,8 @@ locals {
       local_storage_class_mount_path = "/var/pv/local_storage_mount"
       kubernetes_worker_labels = {
         "minio-data"        = "true"
+        "wlan"              = "true"
+        "vrrp"              = "true"
         "openebs.io/engine" = "mayastor"
       }
     }

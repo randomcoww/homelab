@@ -1,0 +1,6 @@
+replicaCount: 1
+image: "ghcr.io/randomcoww/hostapd:latest"
+config: |
+  interface=wlan0
+  driver=nl80211
+affinity:

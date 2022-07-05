@@ -1,0 +1,45 @@
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: {{ .Chart.Name }}
+  labels:
+    helm.sh/chart: {{ .Chart.Name }}-{{ .Chart.Version | replace "+" "_" }}
+    app: {{ .Chart.Name }}
+spec:
+  serviceName: {{ .Chart.Name }}
+  replicas: {{ .Values.replicaCount }}
+  selector:
+    matchLabels:
+      app: {{ .Chart.Name }}
+  template:
+    metadata:
+      labels:
+        app: {{ .Chart.Name }}
+      annotations:
+        checksum/secret: {{ include (print $.Template.BasePath "/secret.yaml") . | sha256sum }}
+    spec:
+{{- with .Values.affinity }}
+      affinity:
+{{ toYaml . | indent 8 }}
+{{- end }}
+      hostNetwork: true
+      restartPolicy: Always
+      containers:
+      - name: {{ .Chart.Name }}
+        image: {{ .Values.image }}
+        args:
+        - -d
+        - /etc/hostapd/hostapd.conf
+        securityContext:
+          privileged: false
+          capabilities:
+            add: ["NET_ADMIN"]
+        volumeMounts:
+        - name: hostapd-config
+          mountPath: /etc/hostapd/hostapd.conf
+          subPath: hostapd.conf
+          readOnly: true
+      volumes:
+      - name: hostapd-config
+        secret:
+          secretName: {{ .Chart.Name }}

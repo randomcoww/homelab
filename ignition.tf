@@ -86,7 +86,7 @@ module "ignition-gateway" {
     }
   ]
   kea_peer_port     = local.ports.kea_peer
-  pxeboot_file_name = "http://${local.networks.metallb.vips.internal_pxeboot}:${local.ports.internal_pxeboot_http}/boot.ipxe"
+  pxeboot_file_name = "http://${local.networks.lan.vips.matchbox}:${local.ports.matchbox_http}/boot.ipxe"
 }
 
 module "ignition-disks" {
@@ -141,32 +141,6 @@ module "ssh-client" {
 
 output "ssh_client_cert_authorized_key" {
   value = module.ssh-client.ssh_client_cert_authorized_key
-}
-
-# hostpad #
-
-module "hostapd-roaming" {
-  source = "./modules/hostapd_roaming"
-  members = {
-    for host_key in [
-      "aio-0",
-      "aio-1",
-    ] :
-    host_key => {
-      interface_name = "wlan0"
-      mac            = module.ignition-systemd-networkd[host_key].hardware_interfaces.wlan0.mac
-    }
-  }
-}
-
-module "ignition-hostapd" {
-  for_each = module.hostapd-roaming.members
-
-  source          = "./modules/hostapd"
-  host_key        = each.key
-  ssid            = var.wifi.ssid
-  passphrase      = var.wifi.passphrase
-  roaming_members = module.hostapd-roaming.members
 }
 
 # client desktop environment #

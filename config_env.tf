@@ -8,6 +8,8 @@ locals {
       netnums = {
         apiserver      = 2
         forwarding_dns = 2
+        matchbox       = 2
+        minio          = 2
       }
     }
     sync = {
@@ -21,9 +23,8 @@ locals {
     metallb = {
       prefix = cidrsubnet("192.168.126.0/23", 2, 1)
       netnums = {
-        external_dns     = 11
-        internal_pxeboot = 12
-        ingress          = 13
+        external_dns = 11
+        ingress      = 13
       }
     }
     kubernetes_service = {
@@ -62,29 +63,24 @@ locals {
   })
 
   ports = {
-    apiserver             = 58081
-    controller_manager    = 50252
-    scheduler             = 50251
-    kubelet               = 50250
-    kube_proxy            = 50254
-    kea_peer              = 58080
-    etcd_client           = 58082
-    etcd_peer             = 58083
-    internal_pxeboot_http = 80
-    internal_pxeboot_api  = 50259
+    apiserver          = 58081
+    controller_manager = 50252
+    scheduler          = 50251
+    kubelet            = 50250
+    kube_proxy         = 50254
+    kea_peer           = 58080
+    etcd_client        = 58082
+    etcd_peer          = 58083
+    matchbox_http      = 80
+    matchbox_api       = 50259
+    matchbox_sync      = 50260
+    minio              = 9000
   }
 
   domains = {
     internal_mdns = "local"
     internal      = "fuzzybunny.internal"
     kubernetes    = "cluster.internal"
-  }
-
-  ingress = {
-    minio         = "minio.${local.domains.internal}"
-    minio_console = "mc.${local.domains.internal}"
-    mpd_stream    = "s.${local.domains.internal}"
-    mpd_control   = "mpd.${local.domains.internal}"
   }
 
   container_images = {
@@ -101,11 +97,6 @@ locals {
     flannel_cni_plugin      = "rancher/mirrored-flannelcni-flannel-cni-plugin:v1.1.0"
     kapprover               = "ghcr.io/randomcoww/kapprover:latest"
     external_dns            = "k8s.gcr.io/external-dns/external-dns:v0.12.0"
-    matchbox                = "quay.io/poseidon/matchbox:latest"
-    syncthing               = "docker.io/syncthing/syncthing:latest"
-    rclone                  = "docker.io/rclone/rclone:latest"
-    mpd                     = "ghcr.io/randomcoww/mpd:0.23.7"
-    ympd                    = "ghcr.io/randomcoww/ympd:latest"
   }
 
   kubernetes = {
@@ -114,6 +105,5 @@ locals {
     static_pod_manifest_path  = "/var/lib/kubelet/manifests"
     cni_bridge_interface_name = "cni0"
     local_storage_class_path  = "/var/tmp/local_storage"
-    local_storage_class       = "local-storage"
   }
 }

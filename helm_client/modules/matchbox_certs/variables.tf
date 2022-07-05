@@ -1,3 +1,3 @@
-variable "internal_pxeboot_ip" {
+variable "api_listen_ip" {
   type = string
 }

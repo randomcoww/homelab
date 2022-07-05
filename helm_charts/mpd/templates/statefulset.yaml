@@ -19,16 +19,10 @@ spec:
         checksum/config: {{ include (print $.Template.BasePath "/configmap.yaml") . | sha256sum }}
         checksum/secret: {{ include (print $.Template.BasePath "/secret.yaml") . | sha256sum }}
     spec:
+{{- with .Values.affinity }}
       affinity:
-        podAntiAffinity:
-          requiredDuringSchedulingIgnoredDuringExecution:
-          - labelSelector:
-              matchExpressions:
-              - key: app
-                operator: In
-                values:
-                - {{ .Chart.Name }}
-            topologyKey: kubernetes.io/hostname
+{{ toYaml . | indent 8 }}
+{{- end }}
       dnsPolicy: ClusterFirstWithHostNet
       restartPolicy: Always
       initContainers:

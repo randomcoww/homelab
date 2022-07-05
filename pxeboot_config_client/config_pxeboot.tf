@@ -1,13 +1,13 @@
 locals {
   pxeboot_image_builds = {
     client = "fedora-silverblue-35.20220701.0"
-    server = "fedora-coreos-36.20220701.0"
+    server = "fedora-coreos-36.20220704.0"
   }
 
   pxeboot = {
-    matchbox_http_endpoint = "http://${local.networks.metallb.vips.internal_pxeboot}:${local.ports.internal_pxeboot_http}"
-    matchbox_api_endpoint  = "${local.networks.metallb.vips.internal_pxeboot}:${local.ports.internal_pxeboot_api}"
-    image_store_endpoint   = "http://${local.ingress.minio}"
+    matchbox_http_endpoint = "http://${local.networks.lan.vips.matchbox}:${local.ports.matchbox_http}"
+    matchbox_api_endpoint  = "${local.networks.lan.vips.matchbox}:${local.ports.matchbox_api}"
+    image_store_endpoint   = "http://${local.networks.lan.vips.minio}:${local.ports.minio}"
     image_store_base_path  = "boot"
 
     hosts = {
