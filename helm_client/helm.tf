@@ -103,6 +103,14 @@ resource "helm_release" "local-storage-provisioner" {
           }
         },
       ]
+      daemonset = {
+        tolerations = [
+          {
+            effect   = "NoSchedule"
+            operator = "Exists"
+          }
+        ]
+      }
     }),
   ]
 }
