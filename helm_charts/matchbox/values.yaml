@@ -1,5 +1,5 @@
 replicaCount: 2
-loadBalancerIP: ""
+rollingUpdateWaitSeconds: 20
 matchbox:
   image: "quay.io/poseidon/matchbox:latest"
   dataPath: "/var/tmp/matchbox"

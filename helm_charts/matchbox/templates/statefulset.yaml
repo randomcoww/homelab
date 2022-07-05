@@ -8,6 +8,9 @@ metadata:
 spec:
   serviceName: {{ .Chart.Name }}
   replicas: {{ .Values.replicaCount }}
+  updateStrategy:
+    type: RollingUpdate
+  minReadySeconds: {{ .Values.rollingUpdateWaitSeconds }}
   selector:
     matchLabels:
       app: {{ .Chart.Name }}
