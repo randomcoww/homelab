@@ -107,6 +107,15 @@ resource "helm_release" "local-storage-provisioner" {
   ]
 }
 
+# nvidia device plugin #
+
+resource "helm_release" "nvidia_device_plugin" {
+  name       = "nvidia-device-plugin"
+  repository = "https://nvidia.github.io/k8s-device-plugin"
+  chart      = "nvidia-device-plugin"
+  namespace  = "kube-system"
+}
+
 # matchbox with data sync #
 
 module "matchbox-certs" {
