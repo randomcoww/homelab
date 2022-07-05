@@ -3,7 +3,7 @@ entries:
   cluster-services:
   - apiVersion: v2
     appVersion: 1.16.0
-    created: "2022-07-05T06:09:23.644779142Z"
+    created: "2022-07-05T06:10:43.940941551Z"
     description: Basic cluster services with minimal configuration
     digest: ca9f5435addb2a17ae750bf62d3bbfb5f83944d4bb7b4ce93c6ff870fc5b01fe
     name: cluster-services
@@ -14,7 +14,7 @@ entries:
   hostapd:
   - apiVersion: v2
     appVersion: 1.16.0
-    created: "2022-07-05T06:09:23.644893473Z"
+    created: "2022-07-05T06:10:43.941119927Z"
     description: A Helm chart for Kubernetes
     digest: 28bf9f72d68f0dda488998ef5e9478b7562aab0d5ad7aeb3a9a4ffd767e93fcf
     name: hostapd
@@ -25,7 +25,17 @@ entries:
   matchbox:
   - apiVersion: v2
     appVersion: 1.16.0
-    created: "2022-07-05T06:09:23.645056693Z"
+    created: "2022-07-05T06:10:43.941599881Z"
+    description: Matchbox PXE boot
+    digest: 78d4c8140c9dfa321975e9ba64ddd37577126ed0cecd0e42bef4d57100e4a567
+    name: matchbox
+    type: application
+    urls:
+    - https://randomcoww.github.io/terraform-infra/matchbox-0.1.8.tgz
+    version: 0.1.8
+  - apiVersion: v2
+    appVersion: 1.16.0
+    created: "2022-07-05T06:10:43.941339859Z"
     description: Matchbox PXE boot
     digest: d9dd4c5f0ac9c5065f26e5e6416b01e6475f587a8e30d5216b6c57a840e693ff
     name: matchbox
@@ -36,7 +46,7 @@ entries:
   minio:
   - apiVersion: v1
     appVersion: RELEASE.2022-05-08T23-50-31Z
-    created: "2022-07-05T06:09:23.646756505Z"
+    created: "2022-07-05T06:10:43.943533802Z"
     description: Multi-Cloud Object Storage
     digest: 4bd3cd30df81b9dc2ff1f7066f9aa9ed303cada3b1609715bafd21773cd2d54d
     home: https://min.io
@@ -59,7 +69,7 @@ entries:
   mpd:
   - apiVersion: v2
     appVersion: 1.16.0
-    created: "2022-07-05T06:09:23.647347996Z"
+    created: "2022-07-05T06:10:43.944043368Z"
     description: A Helm chart for Kubernetes
     digest: fb18f3b4c65005a197422d6dd960849b17045b155e4ce5d6f695ba840debb5bc
     name: mpd
@@ -69,7 +79,7 @@ entries:
     version: 0.1.2
   - apiVersion: v2
     appVersion: 1.16.0
-    created: "2022-07-05T06:09:23.647051726Z"
+    created: "2022-07-05T06:10:43.943851932Z"
     description: A Helm chart for Kubernetes
     digest: 9dcf00c1365dcdcdff4a0c8c2654fe922536b32188f82eb05d999f823df221f9
     name: mpd
@@ -80,7 +90,7 @@ entries:
   webdav:
   - apiVersion: v2
     appVersion: 1.16.0
-    created: "2022-07-05T06:09:23.647556334Z"
+    created: "2022-07-05T06:10:43.944157211Z"
     description: A Helm chart for Kubernetes
     digest: 1b2666598ee1ea371da8ccb0be039d6a072ced6c7bbb48983f155505b9d6e901
     name: webdav
@@ -88,4 +98,4 @@ entries:
     urls:
     - https://randomcoww.github.io/terraform-infra/webdav-0.1.0.tgz
     version: 0.1.0
-generated: "2022-07-05T06:09:23.644443272Z"
+generated: "2022-07-05T06:10:43.940494633Z"
