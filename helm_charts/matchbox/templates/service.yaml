@@ -1,0 +1,15 @@
+kind: Service
+apiVersion: v1
+metadata:
+  name: {{ .Chart.Name }}
+  labels:
+    helm.sh/chart: {{ .Chart.Name }}-{{ .Chart.Version | replace "+" "_" }}
+    app: {{ .Chart.Name }}
+spec:
+  type: ClusterIP
+  clusterIP: None
+  ports:
+  - name: syncthing-peer
+    port: {{ .Values.syncthing.peerPort }}
+  selector:
+    app: {{ .Chart.Name }}

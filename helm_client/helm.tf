@@ -115,12 +115,13 @@ module "matchbox-certs" {
 }
 
 module "matchbox-syncthing" {
-  source             = "./modules/syncthing_config"
-  replica_count      = 2
-  resource_name      = "matchbox"
-  resource_namespace = "default"
-  service_name       = "matchbox"
-  sync_data_path     = "/var/tmp/syncthing"
+  source              = "./modules/syncthing_config"
+  replica_count       = 2
+  resource_name       = "matchbox"
+  resource_namespace  = "default"
+  service_name        = "matchbox"
+  sync_data_path      = "/var/tmp/syncthing"
+  syncthing_peer_port = local.ports.matchbox_sync
 }
 
 resource "helm_release" "matchbox" {
@@ -128,7 +129,7 @@ resource "helm_release" "matchbox" {
   namespace  = "default"
   repository = "https://randomcoww.github.io/terraform-infra/"
   chart      = "matchbox"
-  version    = "0.1.8"
+  version    = "0.1.9"
   wait       = false
   values = [
     yamlencode({

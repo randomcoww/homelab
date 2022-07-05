@@ -14,7 +14,7 @@ locals {
     namespace           = var.resource_namespace
     syncthing_members   = local.syncthing_members
     syncthing_home_path = "/var/lib/syncthing"
-    syncthing_peer_port = 22000
+    syncthing_peer_port = var.syncthing_peer_port
     sync_data_path      = var.sync_data_path
   })
 }

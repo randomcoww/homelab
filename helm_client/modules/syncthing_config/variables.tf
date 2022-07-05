@@ -18,3 +18,8 @@ variable "replica_count" {
 variable "sync_data_path" {
   type = string
 }
+
+variable "syncthing_peer_port" {
+  type    = number
+  default = 22000
+}
