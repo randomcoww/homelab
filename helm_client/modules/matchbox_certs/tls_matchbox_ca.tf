@@ -16,8 +16,9 @@ resource "tls_self_signed_cert" "matchbox-ca" {
   }
 
   allowed_uses = [
-    "cert_signing",
     "key_encipherment",
+    "digital_signature",
+    "cert_signing",
     "server_auth",
     "client_auth",
   ]
