@@ -68,7 +68,7 @@ tw terraform -chdir=helm_client \
   apply -var-file=secrets.tfvars
 ```
 
-### Create PXE boot entry for client device
+### Create PXE boot entry for nodes
 
 Write minio config
 
