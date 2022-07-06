@@ -1,0 +1,65 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ .Chart.Name }}
+  labels:
+    helm.sh/chart: {{ .Chart.Name }}-{{ .Chart.Version | replace "+" "_" }}
+    app: {{ .Chart.Name }}
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: {{ .Chart.Name }}
+  template:
+    metadata:
+      labels:
+        app: {{ .Chart.Name }}
+      annotations:
+        checksum/config: {{ include (print $.Template.BasePath "/configmap.yaml") . | sha256sum }}
+        checksum/pvc: {{ include (print $.Template.BasePath "/pvc.yaml") . | sha256sum }}
+    spec:
+{{- with .Values.affinity }}
+      affinity:
+{{ toYaml . | indent 8 }}
+{{- end }}
+      dnsPolicy: ClusterFirstWithHostNet
+      restartPolicy: Always
+      containers:
+      - name: mpd
+        imagePullPolicy: Always
+        image: {{ .Values.mpd.image }}
+        volumeMounts:
+        - name: mpd-config
+          mountPath: /etc/mpd.conf
+          subPath: mpd.conf
+        - name: mpd-cache
+          mountPath: {{ .Values.mpd.cachePath }}
+        ports:
+{{- range $audioOutput := .Values.audioOutputs }}
+        - containerPort: {{ $audioOutput.port }}
+{{- end }}
+      - name: ympd
+        imagePullPolicy: Always
+        image: {{ .Values.ympd.image }}
+        args: ["-h", "127.0.0.1", "-p", "{{ .Values.mpd.controlPort }}", "-w", "{{ .Values.ympd.uiPort }}"]
+        ports:
+        - containerPort: {{ .Values.ympd.uiPort }}
+      - name: rclone
+        imagePullPolicy: Always
+        image: {{ .Values.rclone.image }}
+        args:
+        - serve
+        - webdav
+        - --addr=127.0.0.1:{{ .Values.rclone.webDavPort }}
+        - :s3:{{ .Values.rclone.minioBucket }}
+        - --s3-provider=Minio
+        - --s3-endpoint={{ .Values.rclone.minioEndPoint }}
+        - --no-modtime
+        - --read-only
+      volumes:
+      - name: mpd-config
+        configMap:
+          name: mpd
+      - name: mpd-cache
+        persistentVolumeClaim:
+          claimName: mpd-cache

@@ -1,26 +1,28 @@
-replicaCount: 2
-rollingUpdateWaitSeconds: 20
-minioEndPoint: http://minio.default:9000
-minioBucket: music
-storageClass: local-storage
 mpd:
   image: ghcr.io/randomcoww/mpd:0.23.7
   cachePath: /mpd/cache
-  streamPort: 8000
+  streamIngress: mpd.local
   controlPort: 6600
-  streamHostName: mpd.local
+
 ympd:
   image: ghcr.io/randomcoww/ympd:latest
-  httpPort: 8080
-  httpHostName: ympd.local
+  uiPort: 8080
+  uiIngress: ympd.local
+
 rclone:
   image: docker.io/rclone/rclone:latest
-  webDavPort: 8081
-syncthing:
-  image: docker.io/syncthing/syncthing:latest
-  podName: syncthing
-  homePath: /var/lib/syncthing
-  peerPort: 22000
-  dataPath: /var/tmp/syncthing
-  secret:
-  config: config
+  minioEndPoint: http://minio.default:9000
+  minioBucket: music
+  webDavPort: 58080
+
+storageClass: local-storage
+audioOutputs:
+# - name: flac-3
+#   port: 8082
+#   config:
+#     tags: yes
+#     format: "48000:24:2"
+#     always_on: yes
+#     encoder: flac
+#     compression: 3
+#     max_clients: 0

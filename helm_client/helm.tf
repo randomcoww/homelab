@@ -371,86 +371,46 @@ EOF
   ]
 }
 
-# mpd with cache sync #
-
-module "mpd-syncthing" {
-  source             = "./modules/syncthing_config"
-  replica_count      = 2
-  resource_name      = "mpd"
-  resource_namespace = "default"
-  service_name       = "mpd"
-  sync_data_path     = "/var/tmp/syncthing"
-}
+# mpd #
 
 resource "helm_release" "mpd" {
   name       = "mpd"
   namespace  = "default"
   repository = "https://randomcoww.github.io/terraform-infra/"
   chart      = "mpd"
-  version    = "0.1.4"
+  version    = "0.2.2"
   wait       = false
   values = [
     yamlencode({
-      replicaCount  = 2
-      minioEndPoint = "http://minio.default:${local.ports.minio}"
-      minioBucket   = "music"
-      storageClass  = "local-storage"
-      affinity = {
-        podAffinity = {
-          requiredDuringSchedulingIgnoredDuringExecution = [
-            {
-              labelSelector = {
-                matchExpressions = [
-                  {
-                    key      = "app"
-                    operator = "In"
-                    values = [
-                      "minio",
-                    ]
-                  }
-                ]
-              }
-              topologyKey = "kubernetes.io/hostname"
-            }
-          ]
-        }
-        podAntiAffinity = {
-          requiredDuringSchedulingIgnoredDuringExecution = [
-            {
-              labelSelector = {
-                matchExpressions = [
-                  {
-                    key      = "app"
-                    operator = "In"
-                    values = [
-                      "mpd",
-                    ]
-                  }
-                ]
-              }
-              topologyKey = "kubernetes.io/hostname"
-            }
-          ]
-        }
-      }
       mpd = {
-        image          = local.helm_container_images.mpd
-        streamHostName = local.helm_ingress.mpd_stream
+        image         = local.helm_container_images.mpd
+        cachePath     = "/mpd/cache"
+        streamIngress = local.helm_ingress.mpd_stream
       }
       ympd = {
-        image        = local.helm_container_images.ympd
-        httpHostName = local.helm_ingress.mpd_control
+        image     = local.helm_container_images.ympd
+        uiIngress = local.helm_ingress.mpd_control
       }
       rclone = {
-        image = local.helm_container_images.rclone
+        image         = local.helm_container_images.rclone
+        minioEndPoint = "http://minio.default:${local.ports.minio}"
+        minioBucket   = "music"
       }
-      syncthing = {
-        image    = local.helm_container_images.syncthing
-        podName  = "syncthing"
-        secret   = module.mpd-syncthing.secret
-        config   = module.mpd-syncthing.config
-        dataPath = "/var/tmp/syncthing"
-      }
+      storageClass = "local-storage"
+      audioOutputs = [
+        {
+          name = "flac-3"
+          port = 8180
+          config = {
+            tags        = "yes"
+            format      = "48000:24:2"
+            always_on   = "yes"
+            encoder     = "flac"
+            compression = 3
+            max_clients = 0
+          }
+        }
+      ]
     }),
   ]
 }

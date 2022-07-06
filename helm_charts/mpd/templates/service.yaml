@@ -8,12 +8,12 @@ metadata:
 spec:
   type: ClusterIP
   ports:
-  - name: mpd-stream
-    port: {{ .Values.mpd.streamPort }}
-  - name: ympd-http
-    port: {{ .Values.ympd.httpPort }}
-  - name: syncthing-peer
-    port: {{ .Values.syncthing.peerPort }}
+  - name: ympd-ui
+    port: {{ .Values.ympd.uiPort }}
+{{- range $audioOutput := .Values.audioOutputs }}
+  - name: {{ $audioOutput.name }}
+    port: {{ $audioOutput.port }}
+{{- end }}
   selector:
     app: {{ .Chart.Name }}
 
@@ -28,23 +28,25 @@ metadata:
 spec:
   ingressClassName: nginx
   rules:
-  - host: {{ .Values.ympd.httpHostName }}
+  - host: {{ .Values.ympd.uiIngress }}
     http:
       paths:
       - backend:
           service:
             name: {{ .Chart.Name }}
             port:
-              number: {{ .Values.ympd.httpPort }}
+              number: {{ .Values.ympd.uiPort }}
         path: /
         pathType: Prefix
-  - host: {{ .Values.mpd.streamHostName }}
+  - host: {{ .Values.mpd.streamIngress }}
     http:
       paths:
-      - path: /
+{{- range $audioOutput := .Values.audioOutputs }}
+      - path: /{{ $audioOutput.name }}
         pathType: Prefix
         backend:
           service:
-            name: {{ .Chart.Name }}
+            name: {{ $.Chart.Name }}
             port:
-              number: {{ .Values.mpd.streamPort }}
+              number: {{ $audioOutput.port }}
+{{- end }}
