@@ -2,6 +2,7 @@ replicaCount: 2
 rollingUpdateWaitSeconds: 20
 minioEndPoint: http://minio.default:9000
 minioBucket: music
+storageClass: local-storage
 mpd:
   image: ghcr.io/randomcoww/mpd:0.23.7
   cachePath: /mpd/cache

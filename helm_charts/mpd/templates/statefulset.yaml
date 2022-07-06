@@ -65,7 +65,7 @@ spec:
         volumeMounts:
         - name: syncthing-home
           mountPath: {{ .Values.syncthing.homePath }}
-        - name: data
+        - name: mpd-cache
           mountPath: {{ .Values.syncthing.dataPath }}
         ports:
         - name: syncthing-peer
@@ -77,7 +77,7 @@ spec:
         - name: mpd-config
           mountPath: /etc/mpd.conf
           subPath: mpd.conf
-        - name: data
+        - name: mpd-cache
           mountPath: {{ .Values.mpd.cachePath }}
         ports:
         - containerPort: {{ .Values.mpd.streamPort }}
@@ -116,5 +116,14 @@ spec:
       - name: mpd-config
         configMap:
           name: mpd
-      - name: data
-        emptyDir: {}
+  volumeClaimTemplates:
+  - metadata:
+      name: mpd-cache
+    spec:
+      accessModes:
+      - ReadWriteOnce
+      resources:
+        requests:
+          storage: 1Gi
+      storageClassName: {{ .Values.storageClass }}
+      volumeMode: Filesystem

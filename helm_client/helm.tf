@@ -387,13 +387,14 @@ resource "helm_release" "mpd" {
   namespace  = "default"
   repository = "https://randomcoww.github.io/terraform-infra/"
   chart      = "mpd"
-  version    = "0.1.2"
+  version    = "0.1.4"
   wait       = false
   values = [
     yamlencode({
       replicaCount  = 2
       minioEndPoint = "http://minio.default:${local.ports.minio}"
       minioBucket   = "music"
+      storageClass  = "local-storage"
       affinity = {
         podAffinity = {
           requiredDuringSchedulingIgnoredDuringExecution = [
