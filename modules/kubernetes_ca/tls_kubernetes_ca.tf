@@ -16,8 +16,10 @@ resource "tls_self_signed_cert" "kubernetes-ca" {
   }
 
   allowed_uses = [
-    "cert_signing",
-    "crl_signing",
+    "key_encipherment",
     "digital_signature",
+    "cert_signing",
+    "server_auth",
+    "client_auth",
   ]
 }

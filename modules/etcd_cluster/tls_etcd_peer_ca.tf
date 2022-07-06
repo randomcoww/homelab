@@ -11,13 +11,15 @@ resource "tls_self_signed_cert" "etcd-peer-ca" {
   is_ca_certificate     = true
 
   subject {
-    common_name  = "etcd"
-    organization = "etcd"
+    common_name  = "etcd-peer"
+    organization = "etcd-peer"
   }
 
   allowed_uses = [
     "key_encipherment",
     "digital_signature",
     "cert_signing",
+    "server_auth",
+    "client_auth",
   ]
 }

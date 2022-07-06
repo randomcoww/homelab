@@ -19,5 +19,7 @@ resource "tls_self_signed_cert" "etcd-ca" {
     "key_encipherment",
     "digital_signature",
     "cert_signing",
+    "server_auth",
+    "client_auth",
   ]
 }
