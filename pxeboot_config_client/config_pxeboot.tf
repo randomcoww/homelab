@@ -35,7 +35,7 @@ locals {
         rootfs_image_name = "${local.pxeboot_image_builds.client}-live-rootfs.x86_64.img"
       }
       aio-0 = {
-        selector_mac = "1c-83-41-30-e4-b5"
+        selector_mac = "1c-83-41-30-e2-23"
         boot_args = [
           "elevator=noop",
           "enforcing=0",

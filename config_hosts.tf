@@ -8,12 +8,12 @@ locals {
       netnum      = 1
       hardware_interfaces = {
         phy0 = {
-          mac   = "1c-83-41-30-e4-b5"
+          mac   = "1c-83-41-30-e2-23"
           mtu   = 9000
           vlans = ["sync", "wan"]
         }
         wlan0 = {
-          mac          = "90-cc-df-ae-c0-f9"
+          mac          = "a8-7e-ea-c5-3f-46"
           mtu          = 9000
           enable_4addr = true
         }
@@ -47,7 +47,7 @@ locals {
       }
       disks = {
         pv = {
-          device = "/dev/disk/by-id/nvme-VICKTER_NVME_SSD_WLN020A01087"
+          device = "/dev/disk/by-id/nvme-VICKTER_NVME_SSD_WLN020A01247"
           partitions = [
             {
               mount_path = "/var/pv"
@@ -185,6 +185,7 @@ locals {
       ]
       kubernetes_worker_labels = {
         "openebs.io/engine" = "mayastor"
+        "nvidia.com/gpu"    = "true"
       }
     }
 

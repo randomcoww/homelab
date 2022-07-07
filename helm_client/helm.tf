@@ -122,6 +122,29 @@ resource "helm_release" "nvidia_device_plugin" {
   repository = "https://nvidia.github.io/k8s-device-plugin"
   chart      = "nvidia-device-plugin"
   namespace  = "kube-system"
+  values = [
+    yamlencode({
+      affinity = {
+        nodeAffinity = {
+          requiredDuringSchedulingIgnoredDuringExecution = {
+            nodeSelectorTerms = [
+              {
+                matchExpressions = [
+                  {
+                    key      = "nvidia.com/gpu"
+                    operator = "In"
+                    values = [
+                      "true",
+                    ]
+                  }
+                ]
+              },
+            ]
+          }
+        }
+      }
+    })
+  ]
 }
 
 # matchbox with data sync #
