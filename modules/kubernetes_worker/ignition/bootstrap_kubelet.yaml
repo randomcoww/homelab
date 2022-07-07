@@ -28,7 +28,6 @@ systemd:
               --cert-dir=${certs_path} \
               --config=${config_path}/kubelet-config-bootstrap-worker.yaml \
               --kubeconfig=${config_path}/kubelet.kubeconfig \
-              --feature-gates=GracefulNodeShutdown=true \
               --node-labels=${join(",", [
                 for node_label, value in node_labels :
                 "${node_label}=${value}"
@@ -42,13 +41,6 @@ storage:
       contents:
         inline: |
           SUBSYSTEM=="net", ACTION=="add", KERNEL=="${cni_bridge_interface_name}", ATTR{bridge/nf_call_iptables}="1"
-    # https://mayastor.gitbook.io/introduction/quickstart/preparing-the-cluster #
-    - path: /etc/sysctl.d/50-mayastor.conf
-      mode: 0644
-      contents:
-        inline: |
-          vm.nr_hugepages=1024
-
     - path: /etc/crio/crio.conf.d/20-storage.conf
       mode: 0644
       overwrite: true
@@ -103,8 +95,6 @@ storage:
             memory.available: 100Mi
             nodefs.available: 1%
             nodefs.inodesFree: 1%
-          featureGates:
-            GracefulNodeShutdown: true
           registerNode: true
           failSwapOn: false
           enforceNodeAllocatable: []

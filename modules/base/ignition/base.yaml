@@ -102,12 +102,6 @@ storage:
       contents:
         inline: |
           ip_vs
-    # mayastor nvmeof #
-    - path: /etc/modules-load.d/20-nvmeof.conf
-      mode: 0644
-      contents:
-        inline: |
-          nvme-tcp
     # DNS reply from unexpected source #
     - path: /etc/modules-load.d/20-dns-reply.conf
       mode: 0644

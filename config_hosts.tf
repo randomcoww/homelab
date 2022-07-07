@@ -59,10 +59,9 @@ locals {
       container_storage_path         = "/var/pv/containers"
       local_storage_class_mount_path = "/var/pv/local_storage_mount"
       kubernetes_worker_labels = {
-        "minio-data"        = "true"
-        "wlan"              = "true"
-        "vrrp"              = "true"
-        "openebs.io/engine" = "mayastor"
+        "minio-data" = "true"
+        "wlan"       = "true"
+        "vrrp"       = "true"
       }
     }
 
@@ -125,10 +124,9 @@ locals {
       container_storage_path         = "/var/pv/containers"
       local_storage_class_mount_path = "/var/pv/local_storage_mount"
       kubernetes_worker_labels = {
-        "minio-data"        = "true"
-        "wlan"              = "true"
-        "vrrp"              = "true"
-        "openebs.io/engine" = "mayastor"
+        "minio-data" = "true"
+        "wlan"       = "true"
+        "vrrp"       = "true"
       }
     }
 
@@ -184,8 +182,7 @@ locals {
         }
       ]
       kubernetes_worker_labels = {
-        "openebs.io/engine" = "mayastor"
-        "nvidia.com/gpu"    = "true"
+        "nvidia.com/gpu" = "true"
       }
     }
 
