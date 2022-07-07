@@ -58,6 +58,12 @@ storage:
         inline: |-
           [storage]
           graphroot="${container_storage_path}"
+    # Enable node graceful shutdown
+    - path: /etc/systemd/logind.conf.d/10-kubelet-graceful-shutdown.conf
+      contents:
+        inline: |-
+          [Login]
+          InhibitDelayMaxSec=120
 
     - path: ${config_path}/kubelet-config-bootstrap-worker.yaml
       mode: 0644
