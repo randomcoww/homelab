@@ -56,8 +56,11 @@ locals {
       encryption_config_secret = var.encryption_config_secret
       container_images         = var.container_images
       apiserver_port           = var.apiserver_port
+      apiserver_internal_port  = var.apiserver_internal_port
       controller_manager_port  = var.controller_manager_port
       scheduler_port           = var.scheduler_port
+      apiserver_members        = var.apiserver_members
+      nginx_config_path        = var.nginx_config_path
     })
   ]
 }

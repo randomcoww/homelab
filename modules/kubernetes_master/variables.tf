@@ -38,12 +38,22 @@ variable "pod_network" {
   type = any
 }
 
-variable "apiserver_ips" {
+variable "apiserver_cert_ips" {
   type = list(string)
 }
 
 variable "apiserver_port" {
   type = number
+}
+
+variable "apiserver_internal_port" {
+  type = number
+}
+
+variable "apiserver_members" {
+  type = list(object({
+    ip = string
+  }))
 }
 
 variable "controller_manager_port" {
@@ -56,4 +66,9 @@ variable "scheduler_port" {
 
 variable "container_images" {
   type = map(string)
+}
+
+variable "nginx_config_path" {
+  type    = string
+  default = "/etc/nginx/conf.d"
 }

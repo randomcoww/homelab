@@ -63,12 +63,14 @@ locals {
   })
 
   ports = {
+    kea_peer           = 58080
+    dns_internal       = 51053
     apiserver          = 58081
+    apiserver_internal = 58181
     controller_manager = 50252
     scheduler          = 50251
     kubelet            = 50250
     kube_proxy         = 50254
-    kea_peer           = 58080
     etcd_client        = 58082
     etcd_peer          = 58083
     matchbox_http      = 80

@@ -111,7 +111,7 @@ storage:
           clusters:
           - cluster:
               certificate-authority: ${certs.ca_cert.path}
-              server: https://${apiserver_ip}:${apiserver_port}
+              server: ${apiserver_endpoint}
             name: ${cluster_name}
           contexts:
           - context:

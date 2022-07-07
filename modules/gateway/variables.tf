@@ -26,6 +26,11 @@ variable "static_pod_manifest_path" {
   type = string
 }
 
+variable "nginx_config_path" {
+  type    = string
+  default = "/etc/nginx/conf.d"
+}
+
 variable "kea_server_name" {
   type = string
 }
@@ -46,6 +51,16 @@ variable "kea_peers" {
 }
 
 variable "kea_peer_port" {
+  type = number
+}
+
+variable "dns_members" {
+  type = list(object({
+    netnum = number
+  }))
+}
+
+variable "dns_internal_port" {
   type = number
 }
 

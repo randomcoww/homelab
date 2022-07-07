@@ -26,7 +26,7 @@ locals {
       pxeboot_file_name        = var.pxeboot_file_name
       dhcp_subnet              = var.dhcp_subnet
 
-      # keepalived #
+      # loadbalancer #
       vrrp_master_default_route = {
         table_id       = 250
         table_priority = 32770
@@ -35,6 +35,9 @@ locals {
         table_id       = 240
         table_priority = 32780
       }
+      dns_internal_port = var.dns_internal_port
+      dns_members       = var.dns_members
+      nginx_config_path = var.nginx_config_path
     })
   ]
 }

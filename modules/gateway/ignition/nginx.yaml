@@ -1,0 +1,22 @@
+---
+variant: fcos
+version: 1.4.0
+systemd:
+  units:
+    - name: nginx.service
+      enabled: true
+
+storage:
+  files:
+    - path: /etc/nginx/nginx.conf
+      mode: 0644
+      overwrite: true
+      contents:
+        inline: |-
+          load_module /usr/lib64/nginx/modules/ngx_stream_module.so;
+          events {
+            worker_connections 4096;
+          }
+          stream {
+            include ${nginx_config_path}/*;
+          }

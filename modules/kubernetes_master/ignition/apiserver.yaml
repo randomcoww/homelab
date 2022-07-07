@@ -57,7 +57,7 @@ storage:
               - --kubelet-client-key=${certs.apiserver_key.path}
               - --kubelet-preferred-address-types=InternalDNS,InternalIP
               - --runtime-config=api/all=true
-              - --secure-port=${apiserver_port}
+              - --secure-port=${apiserver_internal_port}
               - --service-account-issuer=https://kubernetes.default.svc
               - --service-account-key-file=${certs.service_account_cert.path}
               - --service-account-signing-key-file=${certs.service_account_key.path}
@@ -100,3 +100,17 @@ storage:
             - name: certs
               hostPath:
                 path: ${certs_path}
+
+    - path: ${nginx_config_path}/kube-apiserver.conf
+      mode: 0644
+      contents:
+        inline: |
+          upstream kube-apiserver {
+            %{~ for _, apiserver_member in apiserver_members ~}
+            server ${apiserver_member.ip}:${apiserver_internal_port} fail_timeout=2s;
+            %{~ endfor ~}
+          }
+          server {
+            listen ${apiserver_port};
+            proxy_pass kube-apiserver;
+          }

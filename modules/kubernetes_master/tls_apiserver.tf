@@ -15,11 +15,7 @@ resource "tls_cert_request" "apiserver" {
   dns_names = [
     "kubernetes.default",
   ]
-
-  ip_addresses = concat(var.apiserver_ips, [
-    "127.0.0.1",
-    var.service_network.vips.apiserver,
-  ])
+  ip_addresses = var.apiserver_cert_ips
 }
 
 resource "tls_locally_signed_cert" "apiserver" {

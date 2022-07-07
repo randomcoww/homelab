@@ -36,13 +36,12 @@ locals {
       certs                     = local.certs
       node_labels               = var.node_labels
       node_taints               = var.node_taints
-      apiserver_ip              = var.apiserver_ip
+      apiserver_endpoint        = var.apiserver_endpoint
       service_network           = var.service_network
       pod_network               = var.pod_network
       cni_bridge_interface_name = var.cni_bridge_interface_name
       cluster_domain            = var.cluster_domain
       static_pod_manifest_path  = var.static_pod_manifest_path
-      apiserver_port            = var.apiserver_port
       kubelet_port              = var.kubelet_port
     })
   ]

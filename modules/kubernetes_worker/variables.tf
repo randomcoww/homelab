@@ -50,7 +50,7 @@ variable "cluster_domain" {
   type = string
 }
 
-variable "apiserver_ip" {
+variable "apiserver_endpoint" {
   type = string
 }
 
@@ -60,10 +60,6 @@ variable "service_network" {
 
 variable "pod_network" {
   type = any
-}
-
-variable "apiserver_port" {
-  type = number
 }
 
 variable "kubelet_port" {
