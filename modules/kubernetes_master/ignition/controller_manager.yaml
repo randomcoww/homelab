@@ -39,6 +39,7 @@ storage:
             namespace: kube-system
             name: kube-controller-manager
           spec:
+            priorityClassName: system-node-critical
             hostNetwork: true
             restartPolicy: Always
             containers:

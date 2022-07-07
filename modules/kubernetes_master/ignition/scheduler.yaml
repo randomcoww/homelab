@@ -50,6 +50,7 @@ storage:
             namespace: kube-system
             name: kube-scheduler
           spec:
+            priorityClassName: system-node-critical
             restartPolicy: Always
             hostNetwork: true
             containers:

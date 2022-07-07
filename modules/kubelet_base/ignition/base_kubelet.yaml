@@ -37,6 +37,13 @@ systemd:
 
 storage:
   files:
+    # Enable node graceful shutdown
+    - path: /etc/systemd/logind.conf.d/10-kubelet-graceful-shutdown.conf
+      contents:
+        inline: |-
+          [Login]
+          InhibitDelayMaxSec=180
+
     - path: /etc/crio/crio.conf.d/10-custom.conf
       mode: 0644
       overwrite: true
@@ -70,6 +77,8 @@ storage:
           enableServer: false
           staticPodPath: ${static_pod_manifest_path}
           makeIPTablesUtilChains: false
+          shutdownGracePeriod: 180s
+          shutdownGracePeriodCriticalPods: 60s
           containerLogMaxSize: 10Mi
           containerLogMaxFiles: 2
           registerNode: false

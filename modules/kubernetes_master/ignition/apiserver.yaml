@@ -32,6 +32,7 @@ storage:
             namespace: kube-system
             name: kube-apiserver
           spec:
+            priorityClassName: system-node-critical
             hostNetwork: true
             restartPolicy: Always
             containers:
