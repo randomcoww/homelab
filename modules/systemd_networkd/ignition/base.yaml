@@ -27,7 +27,8 @@ storage:
       contents:
         inline: |
           net.bridge.bridge-nf-call-iptables=0
-    # systemd-networkd defaults #
+    # systemd-networkd defaults
+    # CNI may fail if systemd-networkd tries to manage it
     - path: /etc/systemd/network/91-default.network
       mode: 0644
       contents:
@@ -41,11 +42,3 @@ storage:
           [Network]
           LinkLocalAddressing=false
           DHCP=false
-    # ignore lid operations for running as server on laptop
-    - path: /etc/systemd/logind.conf.d/10-ignore-lid-switch.conf
-      contents:
-        inline: |-
-          [Login]
-          HandleLidSwitch=ignore
-          HandleLidSwitchExternalPower=ignore
-          HandleLidSwitchDocked=ignore
