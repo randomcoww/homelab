@@ -8,7 +8,7 @@ storage:
       mode: 0644
       overwrite: true
       contents:
-        inline: |-
+        inline: |
           ${jsonencode({
             "Control-agent" = {
               http-host = cidrhost(interfaces.sync.prefix, host_netnum)
@@ -130,7 +130,7 @@ storage:
     - path: ${static_pod_manifest_path}/kea.yaml
       mode: 0644
       contents:
-        inline: |-
+        inline: |
           ---
           kind: Pod
           apiVersion: v1

@@ -7,7 +7,7 @@ storage:
       mode: 0644
       overwrite: true
       contents:
-        inline: |-
+        inline: |
           ${internal_domain}. {
             errors
             forward . ${internal_domain_dns_ip}
@@ -27,7 +27,7 @@ storage:
     - path: ${static_pod_manifest_path}/coredns.yaml
       mode: 0644
       contents:
-        inline: |-
+        inline: |
           ---
           apiVersion: v1
           kind: Pod

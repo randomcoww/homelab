@@ -6,5 +6,5 @@ metadata:
     helm.sh/chart: {{ .Chart.Name }}-{{ .Chart.Version | replace "+" "_" }}
     app: {{ .Chart.Name }}
 data:
-  config.xml: |-
+  config.xml: |
 {{ .Values.syncthing.config | indent 4 }}

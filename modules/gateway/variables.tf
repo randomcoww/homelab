@@ -26,9 +26,9 @@ variable "static_pod_manifest_path" {
   type = string
 }
 
-variable "nginx_config_path" {
+variable "haproxy_config_path" {
   type    = string
-  default = "/etc/nginx/conf.d"
+  default = "/etc/haproxy/haproxy.cfg.d"
 }
 
 variable "kea_server_name" {

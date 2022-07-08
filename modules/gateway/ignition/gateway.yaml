@@ -20,7 +20,7 @@ storage:
       mode: 0644
       overwrite: true
       contents:
-        inline: |-
+        inline: |
           table ip ${nftables_name} {
             chain base_checks {
               ct state {established, related} accept;

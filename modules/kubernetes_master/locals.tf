@@ -60,7 +60,7 @@ locals {
       controller_manager_port  = var.controller_manager_port
       scheduler_port           = var.scheduler_port
       apiserver_members        = var.apiserver_members
-      nginx_config_path        = var.nginx_config_path
+      haproxy_config_path      = var.haproxy_config_path
     })
   ]
 }

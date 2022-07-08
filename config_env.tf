@@ -17,6 +17,11 @@ locals {
       cidr    = 29
       vlan_id = 60
     }
+    etcd = {
+      network = "192.168.191.0"
+      cidr    = 29
+      vlan_id = 70
+    }
     wan = {
       vlan_id = 30
     }
@@ -102,8 +107,8 @@ locals {
   }
 
   kubernetes = {
-    etcd_cluster_token        = "prod-5"
-    cluster_name              = "prod-5"
+    etcd_cluster_token        = "prod-6"
+    cluster_name              = "prod-6"
     static_pod_manifest_path  = "/var/lib/kubelet/manifests"
     cni_bridge_interface_name = "cni0"
     local_storage_class_path  = "/var/tmp/local_storage"

@@ -12,7 +12,7 @@ locals {
     ignition-kubernetes-worker = ["aio-0", "aio-1", "client-0"]
   }
 
-  # use this instead of members_base #
+  # use this instead of base_members #
   members = {
     for key, members in local.base_members :
     key => {
@@ -148,7 +148,8 @@ module "etcd-cluster" {
     for host_key, host in local.members.ignition-etcd :
     host_key => {
       hostname    = host.hostname
-      ip          = cidrhost(local.networks.lan.prefix, host.netnum)
+      client_ip   = cidrhost(local.networks.lan.prefix, host.netnum)
+      peer_ip     = cidrhost(local.networks.etcd.prefix, host.netnum)
       client_port = local.ports.etcd_client
       peer_port   = local.ports.etcd_peer
     }
@@ -199,7 +200,8 @@ module "ignition-kubernetes-master" {
   apiserver_members = [
     for i, host_key in sort(keys(local.members.ignition-kubernetes-master)) :
     {
-      ip = cidrhost(local.networks.lan.prefix, local.hosts[host_key].netnum),
+      name = host_key
+      ip   = cidrhost(local.networks.lan.prefix, local.hosts[host_key].netnum),
     }
   ]
   static_pod_manifest_path = local.kubernetes.static_pod_manifest_path

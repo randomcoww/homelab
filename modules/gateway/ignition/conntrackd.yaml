@@ -26,7 +26,7 @@ storage:
       mode: 0644
       overwrite: true
       contents:
-        inline: |-
+        inline: |
           Sync {
             Mode FTFW {
               StartupResync on

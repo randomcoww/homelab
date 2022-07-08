@@ -52,7 +52,8 @@ variable "apiserver_internal_port" {
 
 variable "apiserver_members" {
   type = list(object({
-    ip = string
+    name = string
+    ip   = string
   }))
 }
 
@@ -68,7 +69,7 @@ variable "container_images" {
   type = map(string)
 }
 
-variable "nginx_config_path" {
+variable "haproxy_config_path" {
   type    = string
-  default = "/etc/nginx/conf.d"
+  default = "/etc/haproxy/haproxy.cfg.d"
 }

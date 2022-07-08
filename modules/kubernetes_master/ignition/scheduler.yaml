@@ -7,7 +7,7 @@ storage:
     - path: ${config_path}/kube-scheduler.yaml
       mode: 0644
       contents:
-        inline: |-
+        inline: |
           kind: KubeSchedulerConfiguration
           apiVersion: kubescheduler.config.k8s.io/v1beta2
           clientConnection:
@@ -18,7 +18,7 @@ storage:
     - path: ${config_path}/kube-scheduler.kubeconfig
       mode: 0644
       contents:
-        inline: |-
+        inline: |
           kind: Config
           apiVersion: v1
           clusters:
@@ -42,7 +42,7 @@ storage:
     - path: ${static_pod_manifest_path}/kube-scheduler.yaml
       mode: 0644
       contents:
-        inline: |-
+        inline: |
           ---
           kind: Pod
           apiVersion: v1

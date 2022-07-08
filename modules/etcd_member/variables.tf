@@ -33,7 +33,8 @@ variable "backup" {
 variable "member" {
   type = object({
     hostname                    = string
-    ip                          = string
+    client_ip                   = string
+    peer_ip                     = string
     client_port                 = string
     peer_port                   = string
     initial_advertise_peer_urls = list(string)

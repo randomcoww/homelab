@@ -25,7 +25,7 @@ storage:
       mode: 0644
       overwrite: true
       contents:
-        inline: |-
+        inline: |
           global_defs {
             vrrp_version 3
             nftables keepalived

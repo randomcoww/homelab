@@ -40,7 +40,7 @@ storage:
     # Enable node graceful shutdown
     - path: /etc/systemd/logind.conf.d/10-kubelet-graceful-shutdown.conf
       contents:
-        inline: |-
+        inline: |
           [Login]
           InhibitDelayMaxSec=180
 
@@ -48,7 +48,7 @@ storage:
       mode: 0644
       overwrite: true
       contents:
-        inline: |-
+        inline: |
           [crio.runtime]
           default_runtime="crun"
           hooks_dir=["/usr/share/containers/oci/hooks.d"]
@@ -62,7 +62,7 @@ storage:
     - path: ${config_path}/kubelet-config.yaml
       mode: 0644
       contents:
-        inline: |-
+        inline: |
           kind: KubeletConfiguration
           apiVersion: kubelet.config.k8s.io/v1beta1
           cgroupDriver: systemd

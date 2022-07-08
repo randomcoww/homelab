@@ -45,7 +45,7 @@ storage:
       mode: 0644
       overwrite: true
       contents:
-        inline: |-
+        inline: |
           [crio]
           root="${container_storage_path}"
 
@@ -55,14 +55,14 @@ storage:
       mode: 0644
       overwrite: true
       contents:
-        inline: |-
+        inline: |
           [storage]
           graphroot="${container_storage_path}"
 
     - path: ${config_path}/kubelet-config-bootstrap-worker.yaml
       mode: 0644
       contents:
-        inline: |-
+        inline: |
           kind: KubeletConfiguration
           apiVersion: kubelet.config.k8s.io/v1beta1
           cgroupDriver: systemd
@@ -105,7 +105,7 @@ storage:
     - path: ${config_path}/bootstrap.kubeconfig
       mode: 0644
       contents:
-        inline: |-
+        inline: |
           kind: Config
           apiVersion: v1
           clusters:

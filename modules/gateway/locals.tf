@@ -36,7 +36,7 @@ locals {
         table_id       = 240
         table_priority = 32780
       }
-      nginx_config_path = var.nginx_config_path
+      haproxy_config_path = var.haproxy_config_path
     })
   ]
 }

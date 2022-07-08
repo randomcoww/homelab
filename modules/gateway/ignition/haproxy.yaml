@@ -1,0 +1,36 @@
+---
+variant: fcos
+version: 1.4.0
+systemd:
+  units:
+    - name: haproxy.service
+      enabled: true
+      dropins:
+        - name: 10-config-directory.conf
+          contents: |
+            [Service]
+            ExecStartPre=
+            ExecStart=
+            ExecReload=
+            ExecStartPre=/usr/bin/mkdir -p ${haproxy_config_path}
+            ExecStartPre=/usr/sbin/haproxy -f ${haproxy_config_path} -c -q
+            ExecStart=/usr/sbin/haproxy -Ws -f ${haproxy_config_path} -p $PIDFILE
+            ExecReload=/usr/sbin/haproxy -f ${haproxy_config_path} -c -q
+
+storage:
+  files:
+    - path: ${haproxy_config_path}/00-default.cfg
+      mode: 0644
+      overwrite: true
+      contents:
+        inline: |
+          defaults
+            mode tcp
+            option dontlognull
+            timeout http-request 4s
+            timeout queue 1m
+            timeout connect 4s
+            timeout client 86400s
+            timeout server 86400s
+            timeout tunnel 86400s
+          

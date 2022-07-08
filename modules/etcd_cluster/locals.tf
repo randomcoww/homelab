@@ -23,11 +23,11 @@ locals {
 
   cluster_endpoints = [
     for host in var.cluster_hosts :
-    "https://${host.ip}:${host.client_port}"
+    "https://${host.client_ip}:${host.client_port}"
   ]
 
   initial_cluster = [
     for host in var.cluster_hosts :
-    "${host.hostname}=https://${host.ip}:${host.peer_port}"
+    "${host.hostname}=https://${host.peer_ip}:${host.peer_port}"
   ]
 }

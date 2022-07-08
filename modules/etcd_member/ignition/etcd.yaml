@@ -6,7 +6,7 @@ storage:
     - path: ${static_pod_manifest_path}/etcd-wrapper.yaml
       mode: 0644
       contents:
-        inline: |-
+        inline: |
           ---
           kind: Pod
           apiVersion: v1
@@ -41,8 +41,8 @@ storage:
               - --cluster-client-urls=${join(",", cluster_endpoints)}
               - --s3-backup-path=${s3_backup_path}
               - --backup-interval=30m
-              - --healthcheck-interval=5s
-              - --pod-update-wait=40s
+              - --healthcheck-interval=2s
+              - --pod-update-wait=120s
               env:
               - name: NODE_NAME
                 valueFrom:
