@@ -116,7 +116,8 @@ metadata:
     metallb.universe.tf/allow-shared-ip: external-dns
 spec:
   type: LoadBalancer
-  loadBalancerIP: {{ .Values.external_dns_ip }}
+  externalIPs:
+  - {{ .Values.external_dns_ip }}
   ports:
   - name: default
     port: 53
@@ -136,7 +137,8 @@ metadata:
     metallb.universe.tf/allow-shared-ip: external-dns
 spec:
   type: LoadBalancer
-  loadBalancerIP: {{ .Values.external_dns_ip }}
+  externalIPs:
+  - {{ .Values.external_dns_ip }}
   ports:
   - name: default
     port: 53
