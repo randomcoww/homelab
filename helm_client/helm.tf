@@ -5,7 +5,7 @@ resource "helm_release" "cluster_services" {
   namespace  = "kube-system"
   repository = "https://randomcoww.github.io/terraform-infra/"
   chart      = "cluster-services"
-  version    = "0.1.7"
+  version    = "0.1.8"
   wait       = false
   values = [
     yamlencode({
@@ -34,17 +34,6 @@ resource "helm_release" "metlallb" {
   create_namespace = true
   values = [
     yamlencode({
-      configInline = {
-        address-pools = [
-          {
-            name     = "default"
-            protocol = "layer2"
-            addresses = [
-              local.networks.metallb.prefix,
-            ]
-          },
-        ]
-      }
     })
   ]
 }
