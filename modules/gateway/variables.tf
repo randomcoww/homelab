@@ -35,13 +35,6 @@ variable "kea_server_name" {
   type = string
 }
 
-variable "dhcp_subnet" {
-  type = object({
-    newbit = number
-    netnum = number
-  })
-}
-
 variable "kea_peers" {
   type = list(object({
     name   = string
@@ -54,14 +47,17 @@ variable "kea_peer_port" {
   type = number
 }
 
+variable "dhcp_subnet" {
+  type = object({
+    newbit = number
+    netnum = number
+  })
+}
+
 variable "dns_members" {
   type = list(object({
     netnum = number
   }))
-}
-
-variable "dns_internal_port" {
-  type = number
 }
 
 variable "pxeboot_file_name" {

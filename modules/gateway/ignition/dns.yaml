@@ -46,7 +46,7 @@ storage:
                 requests:
                   cpu: 100m
                   memory: 70Mi
-              args: [ "-conf", "/etc/coredns/Corefile", "-dns.port", "${dns_internal_port}" ]
+              args: [ "-conf", "/etc/coredns/Corefile" ]
               livenessProbe:
                 httpGet:
                   path: /health
@@ -81,22 +81,3 @@ storage:
           DNS=${upstream_dns_ip}#${upstream_dns_tls_servername}
           DNSOverTLS=true
           DNSDefaultRoute=true
-
-    - path: ${nginx_config_path}/coredns.conf
-      mode: 0644
-      contents:
-        inline: |
-          upstream coredns {
-            %{~ for network_name, interface in interfaces ~}
-            %{~ if lookup(interface, "enable_vrrp_netnum", false) && lookup(interface, "enable_netnum", false) ~}
-            %{~ for _, dns_member in dns_members ~}
-            server ${cidrhost(interface.prefix, dns_member.netnum)}:${dns_internal_port} fail_timeout=2s;
-            %{~ endfor ~}
-            %{~ endif ~}
-            %{~ endfor ~}
-          }
-          server {
-            listen 53 udp;
-            listen 53;
-            proxy_pass coredns;
-          }

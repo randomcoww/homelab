@@ -25,6 +25,7 @@ locals {
       kea_peer_port            = var.kea_peer_port
       pxeboot_file_name        = var.pxeboot_file_name
       dhcp_subnet              = var.dhcp_subnet
+      dns_members              = var.dns_members
 
       # loadbalancer #
       vrrp_master_default_route = {
@@ -35,8 +36,6 @@ locals {
         table_id       = 240
         table_priority = 32780
       }
-      dns_internal_port = var.dns_internal_port
-      dns_members       = var.dns_members
       nginx_config_path = var.nginx_config_path
     })
   ]

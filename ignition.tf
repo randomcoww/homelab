@@ -85,7 +85,6 @@ module "ignition-gateway" {
     newbit = 1
     netnum = 1
   }
-  dns_internal_port = local.ports.dns_internal
   pxeboot_file_name = "http://${local.networks.lan.vips.matchbox}:${local.ports.matchbox_http}/boot.ipxe"
 }
 

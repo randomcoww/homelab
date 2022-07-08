@@ -109,7 +109,10 @@ storage:
                     },
                     {
                       name = "domain-name-servers"
-                      data = cidrhost(interface.prefix, vrrp_netnum)
+                      data = join(",", [
+                        for _, dns_member in dns_members :
+                        cidrhost(interface.prefix, dns_member.netnum)
+                      ])
                     },
                   ]
                   pools = [

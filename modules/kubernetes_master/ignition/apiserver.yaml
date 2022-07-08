@@ -107,7 +107,7 @@ storage:
         inline: |
           upstream kube-apiserver {
             %{~ for _, apiserver_member in apiserver_members ~}
-            server ${apiserver_member.ip}:${apiserver_internal_port} fail_timeout=2s;
+            server ${apiserver_member.ip}:${apiserver_internal_port} max_fails=2;
             %{~ endfor ~}
           }
           server {
