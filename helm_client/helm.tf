@@ -250,10 +250,18 @@ resource "helm_release" "minio" {
   values = [
     yamlencode({
       clusterDomain = local.domains.kubernetes
-      mode          = "distributed"
-      rootUser      = random_password.minio-access-key-id.result
-      rootPassword  = random_password.minio-secret-access-key.result
-      minioAPIPort  = local.ports.minio
+      image = {
+        repository = element(split(":", local.helm_container_images.minio), 0)
+        tag        = element(split(":", local.helm_container_images.minio), 1)
+      }
+      mcImage = {
+        repository = element(split(":", local.helm_container_images.mc), 0)
+        tag        = element(split(":", local.helm_container_images.mc), 1)
+      }
+      mode         = "distributed"
+      rootUser     = random_password.minio-access-key-id.result
+      rootPassword = random_password.minio-secret-access-key.result
+      minioAPIPort = local.ports.minio
       persistence = {
         storageClass = "local-storage"
         size         = "300Gi"
