@@ -41,8 +41,8 @@ storage:
               - --cluster-client-urls=${join(",", cluster_endpoints)}
               - --s3-backup-path=${s3_backup_path}
               - --backup-interval=30m
-              - --healthcheck-interval=2s
-              - --pod-update-wait=120s
+              - --healthcheck-interval=10s
+              - --pod-update-wait=60s
               env:
               - name: NODE_NAME
                 valueFrom:
