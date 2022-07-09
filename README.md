@@ -1,4 +1,4 @@
-## Terraform configs for provisioning homelab resources
+## Ignition builds for homelab servers and clients
 
 ### Configure environment
 
