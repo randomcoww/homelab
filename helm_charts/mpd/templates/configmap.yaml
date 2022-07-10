@@ -7,7 +7,6 @@ metadata:
     app: {{ .Chart.Name }}
 data:
   mpd.conf: |
-    user "mpd"
     bind_to_address "127.0.0.1"
     port "{{ .Values.mpd.controlPort }}"
     music_directory "http://127.0.0.1:{{ .Values.rclone.webDavPort }}/"
@@ -16,11 +15,6 @@ data:
     state_file "{{ .Values.mpd.cachePath }}/state"
     sticker_file "{{ .Values.mpd.cachePath }}/sticker.sql"
     filesystem_charset "UTF-8"
-    audio_output {
-      type "null"
-      name "null"
-      mixer_type "none"
-    }
 {{- range $audioOutput := .Values.audioOutputs }}
     audio_output {
       type "httpd"

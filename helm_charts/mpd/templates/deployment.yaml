@@ -24,10 +24,25 @@ spec:
 {{- end }}
       dnsPolicy: ClusterFirstWithHostNet
       restartPolicy: Always
+      initContainers:
+      - name: mpd-init
+        image: {{ .Values.mpd.image }}
+        command:
+        - sh
+        - -c
+        - |
+          mkdir -p {{ .Values.mpd.cachePath }}/playlists && \
+          touch \
+            {{ .Values.mpd.cachePath }}/tag_cache \
+            {{ .Values.mpd.cachePath }}/state \
+            {{ .Values.mpd.cachePath }}/sticker.sql
+        volumeMounts:
+        - name: mpd-cache
+          mountPath: {{ .Values.mpd.cachePath }}
       containers:
       - name: mpd
-        imagePullPolicy: Always
         image: {{ .Values.mpd.image }}
+        args: ["--stdout", "/etc/mpd.conf"]
         volumeMounts:
         - name: mpd-config
           mountPath: /etc/mpd.conf
