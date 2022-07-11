@@ -69,7 +69,8 @@ locals {
 
   ports = {
     kea_peer           = 58080
-    dns_internal       = 51053
+    gateway_dns        = 53
+    pxe_tftp           = 69
     apiserver          = 58081
     apiserver_internal = 58181
     controller_manager = 50252

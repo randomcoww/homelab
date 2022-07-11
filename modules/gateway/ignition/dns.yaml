@@ -46,7 +46,7 @@ storage:
                 requests:
                   cpu: 100m
                   memory: 70Mi
-              args: [ "-conf", "/etc/coredns/Corefile" ]
+              args: [ "-conf", "/etc/coredns/Corefile", "-dns.port", "${coredns_port}" ]
               livenessProbe:
                 httpGet:
                   path: /health

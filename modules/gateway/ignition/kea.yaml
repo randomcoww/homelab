@@ -165,7 +165,7 @@ storage:
                 readOnly: true
             - name: tftpd
               image: ${container_images.tftpd}
-              args: [ "--address", "0.0.0.0:69", "--verbose" ]
+              args: [ "--address", "0.0.0.0:${tftp_port}", "--verbose" ]
               securityContext:
                 capabilities:
                   add:

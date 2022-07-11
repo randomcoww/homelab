@@ -16,6 +16,7 @@ locals {
       internal_domain_dns_ip      = var.internal_domain_dns_ip
       upstream_dns_ip             = "9.9.9.9"
       upstream_dns_tls_servername = "dns.quad9.net"
+      coredns_port                = var.coredns_port
 
       # kea #
       kea_server_name          = var.kea_server_name
@@ -23,6 +24,7 @@ locals {
       kea_hooks_libraries_path = "/usr/local/lib/kea/hooks"
       kea_peers                = var.kea_peers
       kea_peer_port            = var.kea_peer_port
+      tftp_port                = var.tftp_port
       pxeboot_file_name        = var.pxeboot_file_name
       dhcp_subnet              = var.dhcp_subnet
       dns_members              = var.dns_members

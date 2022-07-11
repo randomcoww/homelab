@@ -47,6 +47,14 @@ variable "kea_peer_port" {
   type = number
 }
 
+variable "tftp_port" {
+  type = number
+}
+
+variable "coredns_port" {
+  type = number
+}
+
 variable "dhcp_subnet" {
   type = object({
     newbit = number

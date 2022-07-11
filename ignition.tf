@@ -75,12 +75,14 @@ module "ignition-gateway" {
       role   = try(element(["primary", "secondary"], i), "backup")
     }
   ]
+  tftp_port = local.ports.pxe_tftp
   dns_members = [
     for i, host_key in sort(keys(local.members.ignition-gateway)) :
     {
       netnum = local.hosts[host_key].netnum
     }
   ]
+  coredns_port = local.ports.gateway_dns
   dhcp_subnet = {
     newbit = 1
     netnum = 1
