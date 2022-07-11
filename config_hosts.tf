@@ -65,8 +65,6 @@ locals {
       local_storage_class_mount_path = "/var/pv/local_storage_mount"
       kubernetes_worker_labels = {
         "minio-data" = "true"
-        "wlan"       = "true"
-        "vrrp"       = "true"
       }
     }
 
@@ -135,8 +133,6 @@ locals {
       local_storage_class_mount_path = "/var/pv/local_storage_mount"
       kubernetes_worker_labels = {
         "minio-data" = "true"
-        "wlan"       = "true"
-        "vrrp"       = "true"
       }
     }
 
@@ -220,10 +216,19 @@ locals {
     }
   }
 
+  host_roles = transpose(local.base_members)
   hosts = {
     for host_key, host in local.base_hosts :
     host_key => merge(host, {
       hostname = "${host_key}.${local.domains.internal_mdns}"
+      kubernetes_worker_labels = merge(
+        {
+          for role in lookup(local.host_roles, host_key, []) :
+          "role-${role}" => "true"
+        },
+        { "host-key" = host_key },
+        lookup(host, "kubernetes_worker_labels", {}),
+      )
     })
   }
 }

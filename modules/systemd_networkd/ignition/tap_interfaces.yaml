@@ -44,8 +44,9 @@ storage:
           %{~ if lookup(tap_interface, "enable_netnum", false) ~}
 
           [Address]
-          Address=${cidrhost(tap_interface.prefix, host_netnum)}/${tap_interface.cidr}
+          Address=${cidrhost(tap_interface.prefix, host_netnum)}/%{ if lookup(tap_interface, "enable_dhcp", false) }32%{ else }${tap_interface.cidr}%{ endif }
           AddPrefixRoute=false
+          %{~ if !lookup(tap_interface, "enable_dhcp", false) ~}
 
           [Route]
           Protocol=kernel
@@ -53,5 +54,6 @@ storage:
           PreferredSource=${cidrhost(tap_interface.prefix, host_netnum)}
           Destination=${tap_interface.prefix}
           Metric=${lookup(tap_interface, "metric", 1024)}
+          %{~ endif ~}
           %{~ endif ~}
     %{~ endfor ~}

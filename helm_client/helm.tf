@@ -121,10 +121,7 @@ resource "helm_release" "nvidia_device_plugin" {
                 matchExpressions = [
                   {
                     key      = "nvidia.com/gpu"
-                    operator = "In"
-                    values = [
-                      "true",
-                    ]
+                    operator = "Exists"
                   }
                 ]
               },
@@ -170,11 +167,8 @@ resource "helm_release" "matchbox" {
               {
                 matchExpressions = [
                   {
-                    key      = "vrrp"
-                    operator = "In"
-                    values = [
-                      "true",
-                    ]
+                    key      = "role-gateway"
+                    operator = "Exists"
                   },
                 ]
               },
@@ -281,17 +275,11 @@ resource "helm_release" "minio" {
                 matchExpressions = [
                   {
                     key      = "minio-data"
-                    operator = "In"
-                    values = [
-                      "true",
-                    ]
+                    operator = "Exists"
                   },
                   {
-                    key      = "vrrp"
-                    operator = "In"
-                    values = [
-                      "true",
-                    ]
+                    key      = "role-gateway"
+                    operator = "Exists"
                   },
                 ]
               },
@@ -357,11 +345,8 @@ EOF
               {
                 matchExpressions = [
                   {
-                    key      = "wlan"
-                    operator = "In"
-                    values = [
-                      "true",
-                    ]
+                    key      = "role-gateway"
+                    operator = "Exists"
                   },
                 ]
               },

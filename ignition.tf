@@ -1,15 +1,15 @@
 locals {
   base_members = {
-    ignition-base              = ["aio-0", "aio-1", "client-0", "remote-0"]
-    ignition-systemd-networkd  = ["aio-0", "aio-1", "client-0"]
-    ignition-kubelet-base      = ["aio-0", "aio-1", "client-0"]
-    ignition-gateway           = ["aio-0", "aio-1"]
-    ignition-disks             = ["aio-0", "aio-1", "client-0", "remote-0"]
-    ignition-ssh-server        = ["aio-0", "aio-1"]
-    ignition-desktop           = ["client-0", "remote-0"]
-    ignition-etcd              = ["aio-0", "aio-1", "client-0"]
-    ignition-kubernetes-master = ["aio-0", "aio-1"]
-    ignition-kubernetes-worker = ["aio-0", "aio-1", "client-0"]
+    base              = ["aio-0", "aio-1", "client-0", "remote-0"]
+    systemd-networkd  = ["aio-0", "aio-1", "client-0"]
+    kubelet-base      = ["aio-0", "aio-1", "client-0"]
+    gateway           = ["aio-0", "aio-1"]
+    disks             = ["aio-0", "aio-1", "client-0", "remote-0"]
+    ssh-server        = ["aio-0", "aio-1"]
+    desktop           = ["client-0", "remote-0"]
+    etcd              = ["aio-0", "aio-1", "client-0"]
+    kubernetes-master = ["aio-0", "aio-1"]
+    kubernetes-worker = ["aio-0", "aio-1", "client-0"]
   }
 
   # use this instead of base_members #
@@ -25,7 +25,7 @@ locals {
 # base system #
 
 module "ignition-base" {
-  for_each = local.members.ignition-base
+  for_each = local.members.base
   source   = "./modules/base"
 
   hostname = each.value.hostname
@@ -36,7 +36,7 @@ module "ignition-base" {
 }
 
 module "ignition-systemd-networkd" {
-  for_each = local.members.ignition-systemd-networkd
+  for_each = local.members.systemd-networkd
   source   = "./modules/systemd_networkd"
 
   host_netnum         = each.value.netnum
@@ -47,7 +47,7 @@ module "ignition-systemd-networkd" {
 }
 
 module "ignition-kubelet-base" {
-  for_each = local.members.ignition-kubelet-base
+  for_each = local.members.kubelet-base
   source   = "./modules/kubelet_base"
 
   node_ip                  = try(cidrhost(local.networks.lan.prefix, each.value.netnum), "")
@@ -55,7 +55,7 @@ module "ignition-kubelet-base" {
 }
 
 module "ignition-gateway" {
-  for_each = local.members.ignition-gateway
+  for_each = local.members.gateway
   source   = "./modules/gateway"
 
   interfaces               = module.ignition-systemd-networkd[each.key].tap_interfaces
@@ -68,7 +68,7 @@ module "ignition-gateway" {
   kea_server_name          = each.key
   kea_peer_port            = local.ports.kea_peer
   kea_peers = [
-    for i, host_key in sort(keys(local.members.ignition-gateway)) :
+    for i, host_key in sort(keys(local.members.gateway)) :
     {
       name   = host_key
       netnum = local.hosts[host_key].netnum
@@ -77,7 +77,7 @@ module "ignition-gateway" {
   ]
   tftp_port = local.ports.pxe_tftp
   dns_members = [
-    for i, host_key in sort(keys(local.members.ignition-gateway)) :
+    for i, host_key in sort(keys(local.members.gateway)) :
     {
       netnum = local.hosts[host_key].netnum
     }
@@ -91,7 +91,7 @@ module "ignition-gateway" {
 }
 
 module "ignition-disks" {
-  for_each = local.members.ignition-disks
+  for_each = local.members.disks
   source   = "./modules/disks"
 
   disks = each.value.disks
@@ -104,7 +104,7 @@ module "ssh-ca" {
 }
 
 module "ignition-ssh-server" {
-  for_each = local.members.ignition-ssh-server
+  for_each = local.members.ssh-server
   source   = "./modules/ssh_server"
 
   key_id     = each.value.hostname
@@ -134,7 +134,7 @@ output "ssh_client_cert_authorized_key" {
 # client desktop environment #
 
 module "ignition-desktop" {
-  for_each = local.members.ignition-desktop
+  for_each = local.members.desktop
   source   = "./modules/desktop"
 
   ssh_ca_public_key_openssh = module.ssh-ca.ca.public_key_openssh
@@ -147,7 +147,7 @@ module "etcd-cluster" {
 
   cluster_token = local.kubernetes.etcd_cluster_token
   cluster_hosts = {
-    for host_key, host in local.members.ignition-etcd :
+    for host_key, host in local.members.etcd :
     host_key => {
       hostname    = host.hostname
       client_ip   = cidrhost(local.networks.lan.prefix, host.netnum)
@@ -181,7 +181,7 @@ module "kubernetes-ca" {
 }
 
 module "ignition-kubernetes-master" {
-  for_each = local.members.ignition-kubernetes-master
+  for_each = local.members.kubernetes-master
   source   = "./modules/kubernetes_master"
 
   cluster_name             = local.kubernetes.cluster_name
@@ -200,7 +200,7 @@ module "ignition-kubernetes-master" {
     local.networks.kubernetes_service.vips.apiserver,
   ]
   apiserver_members = [
-    for i, host_key in sort(keys(local.members.ignition-kubernetes-master)) :
+    for i, host_key in sort(keys(local.members.kubernetes-master)) :
     {
       name = host_key
       ip   = cidrhost(local.networks.lan.prefix, local.hosts[host_key].netnum),
@@ -215,13 +215,13 @@ module "ignition-kubernetes-master" {
 }
 
 module "ignition-kubernetes-worker" {
-  for_each = local.members.ignition-kubernetes-worker
+  for_each = local.members.kubernetes-worker
   source   = "./modules/kubernetes_worker"
 
   cluster_name                   = local.kubernetes.cluster_name
   ca                             = module.kubernetes-ca.ca
   certs                          = module.kubernetes-ca.certs
-  node_labels                    = merge({ host-key = each.key }, lookup(each.value, "kubernetes_worker_labels", {}))
+  node_labels                    = lookup(each.value, "kubernetes_worker_labels", {})
   node_taints                    = lookup(each.value, "kubernetes_worker_taints", [])
   container_storage_path         = lookup(each.value, "container_storage_path", null)
   local_storage_class_path       = local.kubernetes.local_storage_class_path
