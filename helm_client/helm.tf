@@ -34,7 +34,7 @@ resource "helm_release" "metlallb" {
   create_namespace = true
   values = [
     yamlencode({
-    })
+    }),
   ]
 }
 
@@ -65,40 +65,45 @@ resource "helm_release" "nginx_ingress" {
 
 # local-storage storage class #
 
-resource "helm_release" "local-storage-provisioner" {
-  name       = "local-storage-provisioner"
+resource "helm_release" "local-path-provisioner" {
+  name       = "local-path-provisioner"
   namespace  = "kube-system"
-  repository = "https://randomcoww.github.io/sig-storage-local-static-provisioner/"
-  chart      = "provisioner"
-  version    = "2.6.0-alpha.1"
+  repository = "https://charts.containeroo.ch"
+  chart      = "local-path-provisioner"
+  version    = "0.0.22"
   wait       = false
   values = [
     yamlencode({
-      common = {
-        mountDevVolume = false
+      storageClass = {
+        name = "local-path"
       }
-      classes = [
+      nodePathMap = [
         {
-          name        = "local-storage"
-          hostDir     = local.kubernetes.local_storage_class_path
-          volumeMode  = "Filesystem"
-          namePattern = "*"
-          fsType      = "xfs"
-          blockCleanerCommand = [
-            "/scripts/quick_reset.sh",
-          ]
-          storageClass = {
-            isDefaultClass = true
-          }
+          node  = "DEFAULT_PATH_FOR_NON_LISTED_NODES"
+          paths = [local.kubernetes.local_storage_class_path]
         },
       ]
-      daemonset = {
-        tolerations = [
-          {
-            effect   = "NoSchedule"
-            operator = "Exists"
+      tolerations = [
+        {
+          effect   = "NoSchedule"
+          operator = "Exists"
+        },
+      ]
+      affinity = {
+        nodeAffinity = {
+          requiredDuringSchedulingIgnoredDuringExecution = {
+            nodeSelectorTerms = [
+              {
+                matchExpressions = [
+                  {
+                    key      = "minio-data"
+                    operator = "Exists"
+                  },
+                ]
+              },
+            ]
           }
-        ]
+        }
       }
     }),
   ]
@@ -122,7 +127,7 @@ resource "helm_release" "nvidia_device_plugin" {
                   {
                     key      = "nvidia.com/gpu"
                     operator = "Exists"
-                  }
+                  },
                 ]
               },
             ]
@@ -186,7 +191,7 @@ resource "helm_release" "matchbox" {
                     values = [
                       "matchbox",
                     ]
-                  }
+                  },
                 ]
               }
               topologyKey = "kubernetes.io/hostname"
@@ -257,8 +262,7 @@ resource "helm_release" "minio" {
       rootPassword = random_password.minio-secret-access-key.result
       minioAPIPort = local.ports.minio
       persistence = {
-        storageClass = "local-storage"
-        size         = "300Gi"
+        storageClass = "local-path"
       }
       drivesPerNode = 2
       replicas      = 2
@@ -364,7 +368,7 @@ EOF
                     values = [
                       "hostapd",
                     ]
-                  }
+                  },
                 ]
               }
               topologyKey = "kubernetes.io/hostname"
@@ -401,7 +405,7 @@ resource "helm_release" "mpd" {
         minioEndPoint = "http://minio.default:${local.ports.minio}"
         minioBucket   = "music"
       }
-      storageClass = "local-storage"
+      storageClass = "local-path"
       audioOutputs = [
         {
           name = "flac-3"
@@ -414,7 +418,7 @@ resource "helm_release" "mpd" {
             compression = 3
             max_clients = 0
           }
-        }
+        },
       ]
     }),
   ]

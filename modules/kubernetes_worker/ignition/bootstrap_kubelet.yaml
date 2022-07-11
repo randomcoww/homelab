@@ -35,7 +35,7 @@ systemd:
 
 storage:
   files:
-    # nf_call_iptables disabled gloablly except for CNI
+    # nf_call_iptables disabled gloablly except for CNI #
     - path: /etc/udev/rules.d/10-cni-nf-call-iptables.rules
       mode: 0644
       contents:

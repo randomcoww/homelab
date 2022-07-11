@@ -218,21 +218,19 @@ module "ignition-kubernetes-worker" {
   for_each = local.members.kubernetes-worker
   source   = "./modules/kubernetes_worker"
 
-  cluster_name                   = local.kubernetes.cluster_name
-  ca                             = module.kubernetes-ca.ca
-  certs                          = module.kubernetes-ca.certs
-  node_labels                    = lookup(each.value, "kubernetes_worker_labels", {})
-  node_taints                    = lookup(each.value, "kubernetes_worker_taints", [])
-  container_storage_path         = lookup(each.value, "container_storage_path", null)
-  local_storage_class_path       = local.kubernetes.local_storage_class_path
-  local_storage_class_mount_path = each.value.local_storage_class_mount_path
-  cni_bridge_interface_name      = local.kubernetes.cni_bridge_interface_name
-  apiserver_endpoint             = "https://${local.networks.lan.vips.apiserver}:${local.ports.apiserver}"
-  service_network                = local.networks.kubernetes_service
-  pod_network                    = local.networks.kubernetes_pod
-  cluster_domain                 = local.domains.kubernetes
-  static_pod_manifest_path       = local.kubernetes.static_pod_manifest_path
-  kubelet_port                   = local.ports.kubelet
+  cluster_name              = local.kubernetes.cluster_name
+  ca                        = module.kubernetes-ca.ca
+  certs                     = module.kubernetes-ca.certs
+  node_labels               = lookup(each.value, "kubernetes_worker_labels", {})
+  node_taints               = lookup(each.value, "kubernetes_worker_taints", [])
+  container_storage_path    = each.value.container_storage_path
+  cni_bridge_interface_name = local.kubernetes.cni_bridge_interface_name
+  apiserver_endpoint        = "https://${local.networks.lan.vips.apiserver}:${local.ports.apiserver}"
+  service_network           = local.networks.kubernetes_service
+  pod_network               = local.networks.kubernetes_pod
+  cluster_domain            = local.domains.kubernetes
+  static_pod_manifest_path  = local.kubernetes.static_pod_manifest_path
+  kubelet_port              = local.ports.kubelet
 }
 
 module "kubernetes-admin" {

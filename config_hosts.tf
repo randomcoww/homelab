@@ -61,8 +61,7 @@ locals {
           ]
         }
       }
-      container_storage_path         = "/var/pv/containers"
-      local_storage_class_mount_path = "/var/pv/local_storage_mount"
+      container_storage_path = "/var/pv/containers"
       kubernetes_worker_labels = {
         "minio-data" = "true"
       }
@@ -129,8 +128,7 @@ locals {
           ]
         }
       }
-      container_storage_path         = "/var/pv/containers"
-      local_storage_class_mount_path = "/var/pv/local_storage_mount"
+      container_storage_path = "/var/pv/containers"
       kubernetes_worker_labels = {
         "minio-data" = "true"
       }
@@ -183,8 +181,7 @@ locals {
           ]
         }
       }
-      container_storage_path         = "/var/home/containers"
-      local_storage_class_mount_path = "/var/home/local_storage_mount"
+      container_storage_path = "/var/home/containers"
       kubernetes_worker_taints = [
         {
           key    = "nvidia.com/gpu"

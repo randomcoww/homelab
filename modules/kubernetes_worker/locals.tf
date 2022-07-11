@@ -15,21 +15,11 @@ locals {
     })
   }
 
-  local_storage_volumes = [
-    for i in range(var.local_storage_class_volume_count) :
-    {
-      path              = "${var.local_storage_class_mount_path}/vol${i}"
-      target            = "${var.local_storage_class_path}/vol${i}"
-      systemd_unit_name = join("-", compact(split("/", replace("${var.local_storage_class_path}/vol${i}", "-", "\\x2d"))))
-    }
-  ]
-
   module_ignition_snippets = [
     for f in fileset(".", "${path.module}/ignition/*.yaml") :
     templatefile(f, {
       cluster_name              = var.cluster_name
       container_storage_path    = var.container_storage_path
-      local_storage_volumes     = local.local_storage_volumes
       kubelet_root_path         = "/var/lib/kubelet/root"
       certs_path                = local.certs_path
       config_path               = "/var/lib/kubelet/config"
