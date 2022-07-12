@@ -55,13 +55,14 @@ locals {
           device = "/dev/disk/by-id/nvme-VICKTER_NVME_SSD_WLN020A01247"
           partitions = [
             {
-              mount_path = local.pv_mount_base_path
+              mount_path = "/var/pv"
               wipe       = false
             },
           ]
         }
       }
-      container_storage_path = "${local.pv_mount_base_path}/containers"
+      container_storage_path = "/var/pv/containers"
+      local_provisioner_path = "/var/pv/local_path_provisioner"
       kubernetes_worker_labels = {
         "minio-data" = "true"
       }
@@ -122,13 +123,14 @@ locals {
           device = "/dev/disk/by-id/nvme-VICKTER_NVME_SSD_WLN020A01227"
           partitions = [
             {
-              mount_path = local.pv_mount_base_path
+              mount_path = "/var/pv"
               wipe       = false
             },
           ]
         }
       }
-      container_storage_path = "${local.pv_mount_base_path}/containers"
+      container_storage_path = "/var/pv/containers"
+      local_provisioner_path = "/var/pv/local_path_provisioner"
       kubernetes_worker_labels = {
         "minio-data" = "true"
       }
@@ -175,13 +177,14 @@ locals {
           device = "/dev/disk/by-id/nvme-SKHynix_HFS512GDE9X084N_CYA8N037413008I5H"
           partitions = [
             {
-              mount_path = local.pv_mount_base_path
+              mount_path = "/var/home"
               wipe       = false
             },
           ]
         }
       }
-      container_storage_path = "${local.pv_mount_base_path}/containers"
+      container_storage_path = "/var/home/containers"
+      local_provisioner_path = "/var/home/local_path_provisioner"
       kubernetes_worker_taints = [
         {
           key    = "nvidia.com/gpu"
@@ -203,14 +206,27 @@ locals {
           device = "/dev/disk/by-id/nvme-SKHynix_HFS512GDE9X084N_CYA8N037413008I5H"
           partitions = [
             {
-              mount_path = local.pv_mount_base_path
+              mount_path = "/var/home"
               wipe       = false
             },
           ]
         }
       }
-      container_storage_path = "${local.pv_mount_base_path}/containers"
+      container_storage_path = "/var/home/containers"
     }
+  }
+
+  base_members = {
+    base              = ["aio-0", "aio-1", "client-0", "remote-0"]
+    systemd-networkd  = ["aio-0", "aio-1", "client-0"]
+    kubelet-base      = ["aio-0", "aio-1", "client-0"]
+    gateway           = ["aio-0", "aio-1"]
+    disks             = ["aio-0", "aio-1", "client-0", "remote-0"]
+    ssh-server        = ["aio-0", "aio-1"]
+    desktop           = ["client-0", "remote-0"]
+    etcd              = ["aio-0", "aio-1", "client-0"]
+    kubernetes-master = ["aio-0", "aio-1"]
+    kubernetes-worker = ["aio-0", "aio-1", "client-0"]
   }
 
   host_roles = transpose(local.base_members)
@@ -227,5 +243,14 @@ locals {
         lookup(host, "kubernetes_worker_labels", {}),
       )
     })
+  }
+
+  # use this instead of base_members #
+  members = {
+    for key, members in local.base_members :
+    key => {
+      for host_key in members :
+      host_key => local.hosts[host_key]
+    }
   }
 }

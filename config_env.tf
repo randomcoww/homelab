@@ -114,6 +114,5 @@ locals {
     cluster_name              = "prod-6"
     static_pod_manifest_path  = "/var/lib/kubelet/manifests"
     cni_bridge_interface_name = "cni0"
-    local_storage_class_path  = "${local.pv_mount_base_path}/local_path_provisioner"
   }
 }

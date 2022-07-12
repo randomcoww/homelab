@@ -77,12 +77,18 @@ resource "helm_release" "local-path-provisioner" {
       storageClass = {
         name = "local-path"
       }
-      nodePathMap = [
+      nodePathMap = flatten(concat([
+        for _, node in local.hosts :
+        try({
+          node  = node.hostname
+          paths = [node.local_provisioner_path]
+        }, [])
+        ], [
         {
           node  = "DEFAULT_PATH_FOR_NON_LISTED_NODES"
-          paths = [local.kubernetes.local_storage_class_path]
+          paths = ["/var/tmp/local_path_provisioner"]
         },
-      ]
+      ]))
       tolerations = [
         {
           effect   = "NoSchedule"

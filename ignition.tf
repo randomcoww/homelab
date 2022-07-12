@@ -1,27 +1,3 @@
-locals {
-  base_members = {
-    base              = ["aio-0", "aio-1", "client-0", "remote-0"]
-    systemd-networkd  = ["aio-0", "aio-1", "client-0"]
-    kubelet-base      = ["aio-0", "aio-1", "client-0"]
-    gateway           = ["aio-0", "aio-1"]
-    disks             = ["aio-0", "aio-1", "client-0", "remote-0"]
-    ssh-server        = ["aio-0", "aio-1"]
-    desktop           = ["client-0", "remote-0"]
-    etcd              = ["aio-0", "aio-1", "client-0"]
-    kubernetes-master = ["aio-0", "aio-1"]
-    kubernetes-worker = ["aio-0", "aio-1", "client-0"]
-  }
-
-  # use this instead of base_members #
-  members = {
-    for key, members in local.base_members :
-    key => {
-      for host_key in members :
-      host_key => local.hosts[host_key]
-    }
-  }
-}
-
 # base system #
 
 module "ignition-base" {
