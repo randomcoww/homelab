@@ -13,7 +13,7 @@ locals {
     client = {
       name     = "randomcoww"
       uid      = 10000
-      home_dir = "/var/home/randomcoww"
+      home_dir = "${local.pv_mount_base_path}/randomcoww"
       groups = [
         "adm",
         "sudo",

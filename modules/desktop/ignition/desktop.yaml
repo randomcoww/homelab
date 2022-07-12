@@ -6,9 +6,6 @@ systemd:
     # This just fails
     - name: nvidia-powerd.service
       enabled: false
-
-    # - name: geoclue.service
-    #   enabled: true
     - name: default-dconf-update.service
       enabled: true
       contents: |
