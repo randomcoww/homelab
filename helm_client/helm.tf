@@ -89,22 +89,6 @@ resource "helm_release" "local-path-provisioner" {
           operator = "Exists"
         },
       ]
-      affinity = {
-        nodeAffinity = {
-          requiredDuringSchedulingIgnoredDuringExecution = {
-            nodeSelectorTerms = [
-              {
-                matchExpressions = [
-                  {
-                    key      = "minio-data"
-                    operator = "Exists"
-                  },
-                ]
-              },
-            ]
-          }
-        }
-      }
     }),
   ]
 }
