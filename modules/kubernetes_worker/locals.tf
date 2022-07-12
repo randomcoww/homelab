@@ -20,7 +20,7 @@ locals {
     templatefile(f, {
       cluster_name              = var.cluster_name
       container_storage_path    = var.container_storage_path
-      kubelet_root_path         = "/var/lib/kubelet/root"
+      kubelet_root_path         = "/var/lib/kubelet"
       certs_path                = local.certs_path
       config_path               = "/var/lib/kubelet/config"
       certs                     = local.certs

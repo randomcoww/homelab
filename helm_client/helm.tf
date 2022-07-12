@@ -99,6 +99,55 @@ resource "helm_release" "local-path-provisioner" {
   ]
 }
 
+# openebs #
+
+resource "helm_release" "openebs" {
+  name       = "openebs"
+  namespace  = "openebs"
+  repository = "https://openebs.github.io/charts"
+  chart      = "openebs"
+  version    = "3.2.0"
+  wait       = false
+  create_namespace = true
+  values = [
+    yamlencode({
+      apiserver = {
+        enabled = true
+        sparse = {
+          enabled = true
+        }
+      }
+      localprovisioner = {
+        enabled = true
+        basePath = "/var/pv/openebs/local"
+      }
+      snapshotOperator = {
+        enabled = false
+      }
+      jiva = {
+        enabled = true
+        replicas = 2
+        defaultStoragePath = "/var/pv/openebs"
+      }
+      ndmOperator = {
+        enabled = false
+      }
+      ndm = {
+        enabled = false
+        sparse = {
+          path = "/var/pv/openebs/sparse"
+        }
+      }
+      webhook = {
+        enabled = false
+      }
+      cstor = {
+        enabled = false
+      }
+    }),
+  ]
+}
+
 # nvidia device plugin #
 
 resource "helm_release" "nvidia_device_plugin" {
@@ -395,7 +444,7 @@ resource "helm_release" "mpd" {
         minioEndPoint = "http://minio.default:${local.ports.minio}"
         minioBucket   = "music"
       }
-      storageClass = "local-path"
+      storageClass = "openebs-jiva-csi-default"
       audioOutputs = [
         {
           name = "flac-3"
