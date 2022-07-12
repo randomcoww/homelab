@@ -137,7 +137,6 @@ SYNCTHING_VERSION=0.1.2
 TAG=ghcr.io/randomcoww/tw:latest
 
 buildah build \
-  --dns 9.9.9.9 \
   --build-arg TF_VERSION=$TF_VERSION \
   --build-arg SSH_VERSION=$SSH_VERSION \
   --build-arg SYNCTHING_VERSION=$SYNCTHING_VERSION \
