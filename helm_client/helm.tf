@@ -134,9 +134,6 @@ resource "helm_release" "openebs" {
       }
       ndm = {
         enabled = false
-        sparse = {
-          path = "/var/pv/openebs/sparse"
-        }
       }
       webhook = {
         enabled = false
