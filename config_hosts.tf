@@ -55,14 +55,14 @@ locals {
           device = "/dev/disk/by-id/nvme-VICKTER_NVME_SSD_WLN020A01247"
           partitions = [
             {
-              mount_path = "/var/pv"
+              mount_path = local.pv_mount_path
               wipe       = false
             },
           ]
         }
       }
-      container_storage_path = "/var/pv/containers"
-      local_provisioner_path = "/var/pv/local_path_provisioner"
+      container_storage_path = "${local.pv_mount_path}/containers"
+      local_provisioner_path = "${local.pv_mount_path}/local_path_provisioner"
       kubernetes_worker_labels = {
         "minio-data" = "true"
       }
@@ -123,14 +123,14 @@ locals {
           device = "/dev/disk/by-id/nvme-VICKTER_NVME_SSD_WLN020A01227"
           partitions = [
             {
-              mount_path = "/var/pv"
+              mount_path = local.pv_mount_path
               wipe       = false
             },
           ]
         }
       }
-      container_storage_path = "/var/pv/containers"
-      local_provisioner_path = "/var/pv/local_path_provisioner"
+      container_storage_path = "${local.pv_mount_path}/containers"
+      local_provisioner_path = "${local.pv_mount_path}/local_path_provisioner"
       kubernetes_worker_labels = {
         "minio-data" = "true"
       }
@@ -177,18 +177,18 @@ locals {
           device = "/dev/disk/by-id/nvme-SKHynix_HFS512GDE9X084N_CYA8N037413008I5H"
           partitions = [
             {
-              mount_path = "/var/home"
+              mount_path = local.pv_mount_path
               wipe       = false
             },
           ]
         }
       }
-      container_storage_path = "/var/home/containers"
-      local_provisioner_path = "/var/home/local_path_provisioner"
+      container_storage_path = "${local.pv_mount_path}/containers"
+      local_provisioner_path = "${local.pv_mount_path}/local_path_provisioner"
       kubernetes_worker_taints = [
         {
-          key    = "nvidia.com/gpu"
-          effect = "NoSchedule"
+          key    = "node.kubernetes.io/unschedulable"
+          effect = "NoExecute"
           value  = "true"
         }
       ]
@@ -206,13 +206,13 @@ locals {
           device = "/dev/disk/by-id/nvme-SKHynix_HFS512GDE9X084N_CYA8N037413008I5H"
           partitions = [
             {
-              mount_path = "/var/home"
+              mount_path = local.pv_mount_path
               wipe       = false
             },
           ]
         }
       }
-      container_storage_path = "/var/home/containers"
+      container_storage_path = "${local.pv_mount_path}/containers"
     }
   }
 

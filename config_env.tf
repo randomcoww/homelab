@@ -1,5 +1,5 @@
 locals {
-  pv_mount_base_path = "/var/pv"
+  pv_mount_path = "/var/home"
 
   # do not use #
   base_networks = {

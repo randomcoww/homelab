@@ -86,15 +86,9 @@ resource "helm_release" "local-path-provisioner" {
         ], [
         {
           node  = "DEFAULT_PATH_FOR_NON_LISTED_NODES"
-          paths = ["/var/tmp/local_path_provisioner"]
+          paths = ["${local.pv_mount_path}/local_path_provisioner"]
         },
       ]))
-      tolerations = [
-        {
-          effect   = "NoSchedule"
-          operator = "Exists"
-        },
-      ]
     }),
   ]
 }
@@ -102,12 +96,12 @@ resource "helm_release" "local-path-provisioner" {
 # openebs #
 
 resource "helm_release" "openebs" {
-  name       = "openebs"
-  namespace  = "openebs"
-  repository = "https://openebs.github.io/charts"
-  chart      = "openebs"
-  version    = "3.2.0"
-  wait       = false
+  name             = "openebs"
+  namespace        = "openebs"
+  repository       = "https://openebs.github.io/charts"
+  chart            = "openebs"
+  version          = "3.2.0"
+  wait             = false
   create_namespace = true
   values = [
     yamlencode({
@@ -118,16 +112,16 @@ resource "helm_release" "openebs" {
         }
       }
       localprovisioner = {
-        enabled = true
-        basePath = "/var/pv/openebs/local"
+        enabled  = true
+        basePath = "${local.pv_mount_path}/openebs/local"
       }
       snapshotOperator = {
         enabled = false
       }
       jiva = {
-        enabled = true
-        replicas = 2
-        defaultStoragePath = "/var/pv/openebs"
+        enabled            = true
+        replicas           = 2
+        defaultStoragePath = "${local.pv_mount_path}/openebs"
       }
       ndmOperator = {
         enabled = false
@@ -170,6 +164,12 @@ resource "helm_release" "nvidia_device_plugin" {
           }
         }
       }
+      tolerations = [
+        {
+          effect   = "NoExecute"
+          operator = "Exists"
+        },
+      ]
     })
   ]
 }
@@ -453,6 +453,7 @@ resource "helm_release" "mpd" {
             encoder     = "flac"
             compression = 3
             max_clients = 0
+            auto_update = "yes"
           }
         },
       ]
