@@ -93,6 +93,10 @@ locals {
     kubernetes    = "cluster.internal"
   }
 
+  ingress = {
+    minio = "minio.${local.domains.internal}"
+  }
+
   container_images = {
     kube_apiserver          = "ghcr.io/randomcoww/kubernetes:kube-master-v1.24.1"
     kube_controller_manager = "ghcr.io/randomcoww/kubernetes:kube-master-v1.24.1"

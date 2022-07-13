@@ -300,6 +300,13 @@ resource "helm_release" "minio" {
       persistence = {
         storageClass = "local-path"
       }
+      ingress = {
+        enabled          = true
+        ingressClassName = "nginx"
+        hosts = [
+          local.ingress.minio
+        ]
+      }
       drivesPerNode = 2
       replicas      = 2
       resources = {
@@ -336,7 +343,7 @@ output "minio_endpoint" {
     version = "10"
     aliases = {
       minio = {
-        url       = "http://${local.networks.lan.vips.minio}:${local.ports.minio}"
+        url       = "http://${local.ingress.minio}"
         accessKey = nonsensitive(random_password.minio-access-key-id.result)
         secretKey = nonsensitive(random_password.minio-secret-access-key.result)
         api       = "S3v4"
