@@ -89,16 +89,6 @@ resource "helm_release" "cert_manager" {
   ]
 }
 
-resource "tls_private_key" "letsencrypt" {
-  algorithm   = "ECDSA"
-  ecdsa_curve = "P521"
-}
-
-resource "local_file" "letsencrypt_key" {
-  filename = "./output/certs/letsencrypt.key"
-  content  = chomp(tls_private_key.letsencrypt.private_key_pem)
-}
-
 # local-storage storage class #
 
 resource "helm_release" "local-path-provisioner" {
