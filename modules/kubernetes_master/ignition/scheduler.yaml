@@ -60,7 +60,7 @@ storage:
               - kube-scheduler
               - --config=${config_path}/kube-scheduler.yaml
               - --secure-port=${scheduler_port}
-              - --bind-address=0.0.0.0
+              - --bind-address=127.0.0.1
               - --v=2
               livenessProbe:
                 httpGet:

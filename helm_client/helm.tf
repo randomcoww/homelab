@@ -336,13 +336,6 @@ resource "helm_release" "minio" {
       persistence = {
         storageClass = "local-path"
       }
-      ingress = {
-        enabled          = false
-        ingressClassName = "nginx"
-        hosts = [
-          local.ingress.minio
-        ]
-      }
       drivesPerNode = 2
       replicas      = 2
       resources = {

@@ -48,7 +48,7 @@ storage:
               command:
               - kube-controller-manager
               - --allocate-node-cidrs=true
-              - --bind-address=0.0.0.0
+              - --bind-address=127.0.0.1
               - --cluster-cidr=${pod_network.prefix}
               - --cluster-name=${cluster_name}
               - --cluster-signing-cert-file=${certs.ca_cert.path}
