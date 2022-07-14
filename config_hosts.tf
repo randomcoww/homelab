@@ -239,7 +239,6 @@ locals {
           for role in lookup(local.host_roles, host_key, []) :
           "role-${role}" => "true"
         },
-        { "host-key" = host_key },
         lookup(host, "kubernetes_worker_labels", {}),
       )
     })

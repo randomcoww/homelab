@@ -1,13 +1,11 @@
 mpd:
   image: ghcr.io/randomcoww/mpd:0.23.7
-  cachePath: /mpd/cache
-  streamIngress: mpd.local
   controlPort: 6600
+  cachePath: /mpd/cache
 
 ympd:
   image: ghcr.io/randomcoww/ympd:latest
   uiPort: 8080
-  uiIngress: ympd.local
 
 rclone:
   image: docker.io/rclone/rclone:latest
@@ -15,6 +13,10 @@ rclone:
   minioBucket: music
   webDavPort: 58080
 
+ingress: mpd.local
+ingressClass: nginx
+certIssueer: letsencrypt
+certSecretName: mpd-tls
 storageClass: local-storage
 audioOutputs:
 # - name: flac-3

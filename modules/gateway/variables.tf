@@ -14,6 +14,10 @@ variable "vrrp_netnum" {
   type = number
 }
 
+variable "external_ingress_ip" {
+  type = string
+}
+
 variable "internal_domain" {
   type = string
 }

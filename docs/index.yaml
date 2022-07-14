@@ -3,7 +3,7 @@ entries:
   cluster-services:
   - apiVersion: v2
     appVersion: 1.16.0
-    created: "2022-07-14T06:40:26.347790295Z"
+    created: "2022-07-14T07:01:31.706592224Z"
     description: Basic cluster services with minimal configuration
     digest: 50a4352f9eb00caca217ee29ab1c508166bf5ef401219bb5fbda98bf5830727d
     name: cluster-services
@@ -14,7 +14,7 @@ entries:
   hostapd:
   - apiVersion: v2
     appVersion: 1.16.0
-    created: "2022-07-14T06:40:26.34793808Z"
+    created: "2022-07-14T07:01:31.706744131Z"
     description: A Helm chart for Kubernetes
     digest: 28bf9f72d68f0dda488998ef5e9478b7562aab0d5ad7aeb3a9a4ffd767e93fcf
     name: hostapd
@@ -25,7 +25,7 @@ entries:
   matchbox:
   - apiVersion: v2
     appVersion: 1.16.0
-    created: "2022-07-14T06:40:26.348124698Z"
+    created: "2022-07-14T07:01:31.706946882Z"
     description: Matchbox PXE boot
     digest: d25ee994fdf2fcabcc50d384f1f1b1e8bc53f5117a8d9266030a1a939745f8cc
     name: matchbox
@@ -36,7 +36,7 @@ entries:
   minio:
   - apiVersion: v1
     appVersion: RELEASE.2022-05-08T23-50-31Z
-    created: "2022-07-14T06:40:26.349965731Z"
+    created: "2022-07-14T07:01:31.708786518Z"
     description: Multi-Cloud Object Storage
     digest: 4bd3cd30df81b9dc2ff1f7066f9aa9ed303cada3b1609715bafd21773cd2d54d
     home: https://min.io
@@ -59,7 +59,7 @@ entries:
   mpd:
   - apiVersion: v2
     appVersion: 1.16.0
-    created: "2022-07-14T06:40:26.350887854Z"
+    created: "2022-07-14T07:01:31.70903753Z"
     description: A Helm chart for Kubernetes
     digest: 17b423e01647745ba0336b66a16e1d9ce939d07b88e5b0300043f380702a67dd
     name: mpd
@@ -67,84 +67,4 @@ entries:
     urls:
     - https://randomcoww.github.io/terraform-infra/mpd-0.2.12.tgz
     version: 0.2.12
-  - apiVersion: v2
-    appVersion: 1.16.0
-    created: "2022-07-14T06:40:26.350573077Z"
-    description: A Helm chart for Kubernetes
-    digest: 7de701b5bb4507a0333fcbd49449a2e2345f9512e9a1ea3d769a2a1b5a6dd38e
-    name: mpd
-    type: application
-    urls:
-    - https://randomcoww.github.io/terraform-infra/mpd-0.2.11.tgz
-    version: 0.2.11
-  - apiVersion: v2
-    appVersion: 1.16.0
-    created: "2022-07-14T06:40:26.35026675Z"
-    description: A Helm chart for Kubernetes
-    digest: 6c185407d6e4c6649062ea7ed77d6376e39d75a672db876c50f37bbf49c002ee
-    name: mpd
-    type: application
-    urls:
-    - https://randomcoww.github.io/terraform-infra/mpd-0.2.10.tgz
-    version: 0.2.10
-  - apiVersion: v2
-    appVersion: 1.16.0
-    created: "2022-07-14T06:40:26.352504206Z"
-    description: A Helm chart for Kubernetes
-    digest: 71217601026d7fc0ae0defaa1129276d3592d79189101e12a52fda0ff12f853a
-    name: mpd
-    type: application
-    urls:
-    - https://randomcoww.github.io/terraform-infra/mpd-0.2.9.tgz
-    version: 0.2.9
-  - apiVersion: v2
-    appVersion: 1.16.0
-    created: "2022-07-14T06:40:26.352260946Z"
-    description: A Helm chart for Kubernetes
-    digest: 247354e9f07b471e09f5116c2a7f11f44c8f835fdabf349742414916e4c03805
-    name: mpd
-    type: application
-    urls:
-    - https://randomcoww.github.io/terraform-infra/mpd-0.2.8.tgz
-    version: 0.2.8
-  - apiVersion: v2
-    appVersion: 1.16.0
-    created: "2022-07-14T06:40:26.352010423Z"
-    description: A Helm chart for Kubernetes
-    digest: 9992ee047e9f20e5c1e7bdd23aba82538c69946682a6a9468cfa99933b492a26
-    name: mpd
-    type: application
-    urls:
-    - https://randomcoww.github.io/terraform-infra/mpd-0.2.7.tgz
-    version: 0.2.7
-  - apiVersion: v2
-    appVersion: 1.16.0
-    created: "2022-07-14T06:40:26.351717087Z"
-    description: A Helm chart for Kubernetes
-    digest: db8714e1937255c75b49c5f35a5b6de0673966a3a7e33541f95587747ba66249
-    name: mpd
-    type: application
-    urls:
-    - https://randomcoww.github.io/terraform-infra/mpd-0.2.6.tgz
-    version: 0.2.6
-  - apiVersion: v2
-    appVersion: 1.16.0
-    created: "2022-07-14T06:40:26.351483606Z"
-    description: A Helm chart for Kubernetes
-    digest: c6795e6f75962baae22158a793a38a7f407d63f02fbb70780b3788c3205a7ca7
-    name: mpd
-    type: application
-    urls:
-    - https://randomcoww.github.io/terraform-infra/mpd-0.2.5.tgz
-    version: 0.2.5
-  - apiVersion: v2
-    appVersion: 1.16.0
-    created: "2022-07-14T06:40:26.351172739Z"
-    description: A Helm chart for Kubernetes
-    digest: aa74a284315d7f9405dfabcb2658cbe795ae613d7a5226b5c61161a123e02d0f
-    name: mpd
-    type: application
-    urls:
-    - https://randomcoww.github.io/terraform-infra/mpd-0.2.4.tgz
-    version: 0.2.4
-generated: "2022-07-14T06:40:26.347342538Z"
+generated: "2022-07-14T07:01:31.706171357Z"

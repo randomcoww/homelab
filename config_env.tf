@@ -30,8 +30,8 @@ locals {
     metallb = {
       prefix = cidrsubnet("192.168.126.0/23", 2, 1)
       netnums = {
-        external_dns = 11
-        ingress      = 13
+        external_dns     = 11
+        external_ingress = 12
       }
     }
     kubernetes_service = {
@@ -81,7 +81,7 @@ locals {
     kube_proxy         = 50254
     etcd_client        = 58082
     etcd_peer          = 58083
-    matchbox_http      = 80
+    matchbox_http      = 58084
     matchbox_api       = 50259
     matchbox_sync      = 50260
     minio              = 9000
@@ -89,7 +89,7 @@ locals {
 
   domains = {
     internal_mdns = "local"
-    internal      = "fuzzybunny.internal"
+    internal      = "fuzzybunny.mooo.com"
     kubernetes    = "cluster.internal"
   }
 

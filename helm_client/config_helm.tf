@@ -1,7 +1,6 @@
 locals {
   helm_ingress = {
-    mpd_stream  = "s.${local.domains.internal}"
-    mpd_control = "mpd.${local.domains.internal}"
+    mpd = local.domains.internal
   }
 
   helm_container_images = {

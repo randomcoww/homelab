@@ -29,25 +29,31 @@ storage:
             }
 
             chain input {
-              type filter hook input priority 0; policy drop;
+              type filter hook input priority filter; policy drop;
               jump base_checks;
 
-              iifname "lo" accept;
-              iifname != "lo" ip daddr 127.0.0.1/8 drop;
+              iifname lo accept;
+              iifname != lo ip daddr 127.0.0.1/8 drop;
 
-              iifname != ${interfaces.wan.interface_name} udp sport bootps udp dport bootpc accept;
-              iifname != ${interfaces.wan.interface_name} pkttype multicast accept;
+              iifname ${interfaces.wan.interface_name} ct status dnat accept;
+              # iifname != ${interfaces.wan.interface_name} udp sport bootps udp dport bootpc accept;
+              # iifname != ${interfaces.wan.interface_name} pkttype multicast accept;
               iifname != ${interfaces.wan.interface_name} accept;
             }
 
             chain forward {
-              type filter hook forward priority 0; policy drop;
+              type filter hook forward priority filter; policy drop;
               jump base_checks;
               iifname != ${interfaces.wan.interface_name} accept;
             }
 
+            chain prerouting {
+              type nat hook prerouting priority dstnat; policy accept;
+              iifname ${interfaces.wan.interface_name} tcp dport { http, https, 30000-32768 } dnat to ${external_ingress_ip}
+            }
+
             chain postrouting {
-              type nat hook postrouting priority 100; policy accept;
+              type nat hook postrouting priority srcnat; policy accept;
               oifname ${interfaces.wan.interface_name} masquerade;
             }
           }

@@ -25,22 +25,26 @@ metadata:
     helm.sh/chart: {{ .Chart.Name }}-{{ .Chart.Version | replace "+" "_" }}
     app: {{ .Chart.Name }}
   name: {{ .Chart.Name }}
+  annotations:
+    # kubernetes.io/ingress.class: "{{ .Values.ingressClass }}"
+    cert-manager.io/issuer: "{{ .Values.certIssuer }}"
 spec:
-  ingressClassName: nginx
+  ingressClassName: {{ .Values.ingressClass }}
+  tls:
+  - hosts:
+    - {{ .Values.ingress }}
+    secretName: {{ .Values.certSecretName }}
   rules:
-  - host: {{ .Values.ympd.uiIngress }}
+  - host: {{ .Values.ingress }}
     http:
       paths:
-      - backend:
+      - path: /
+        pathType: Prefix
+        backend:
           service:
             name: {{ .Chart.Name }}
             port:
               number: {{ .Values.ympd.uiPort }}
-        path: /
-        pathType: Prefix
-  - host: {{ .Values.mpd.streamIngress }}
-    http:
-      paths:
 {{- range $audioOutput := .Values.audioOutputs }}
       - path: /{{ $audioOutput.name }}
         pathType: Prefix

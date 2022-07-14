@@ -38,6 +38,7 @@ module "ignition-gateway" {
   container_images         = local.container_images
   host_netnum              = each.value.netnum
   vrrp_netnum              = each.value.vrrp_netnum
+  external_ingress_ip      = local.networks.metallb.vips.external_ingress
   internal_domain          = local.domains.internal
   internal_domain_dns_ip   = local.networks.metallb.vips.external_dns
   static_pod_manifest_path = local.kubernetes.static_pod_manifest_path

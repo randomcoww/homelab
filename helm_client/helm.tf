@@ -46,13 +46,20 @@ resource "helm_release" "nginx_ingress" {
   chart            = "ingress-nginx"
   namespace        = "ingress-nginx"
   create_namespace = true
-
   values = [
     yamlencode({
       controller = {
+        ingressClassResource = {
+          enabled = true
+          name    = "nginx"
+        }
+        ingressClass = "nginx"
         service = {
+          annotations = {
+            "metallb.universe.tf/address-pool" = "public-ips"
+          }
           externalIPs = [
-            local.networks.metallb.vips.ingress,
+            local.networks.metallb.vips.external_ingress,
           ]
         }
         config = {
@@ -61,6 +68,35 @@ resource "helm_release" "nginx_ingress" {
       }
     }),
   ]
+}
+
+# cert-manager #
+
+resource "helm_release" "cert_manager" {
+  name             = "cert-manager"
+  repository       = "https://charts.jetstack.io"
+  chart            = "cert-manager"
+  namespace        = "cert-manager"
+  create_namespace = true
+
+  values = [
+    yamlencode({
+      installCRDs = true
+      prometheus = {
+        enabled = false
+      }
+    }),
+  ]
+}
+
+resource "tls_private_key" "letsencrypt" {
+  algorithm   = "ECDSA"
+  ecdsa_curve = "P521"
+}
+
+resource "local_file" "letsencrypt_key" {
+  filename = "./output/certs/letsencrypt.key"
+  content  = chomp(tls_private_key.letsencrypt.private_key_pem)
 }
 
 # local-storage storage class #
@@ -301,7 +337,7 @@ resource "helm_release" "minio" {
         storageClass = "local-path"
       }
       ingress = {
-        enabled          = true
+        enabled          = false
         ingressClassName = "nginx"
         hosts = [
           local.ingress.minio
@@ -314,6 +350,7 @@ resource "helm_release" "minio" {
           memory = "8Gi"
         }
       }
+      users = []
       affinity = {
         nodeAffinity = {
           requiredDuringSchedulingIgnoredDuringExecution = {
@@ -343,7 +380,7 @@ output "minio_endpoint" {
     version = "10"
     aliases = {
       minio = {
-        url       = "http://${local.ingress.minio}"
+        url       = "http://${local.networks.lan.vips.minio}:${local.ports.minio}"
         accessKey = nonsensitive(random_password.minio-access-key-id.result)
         secretKey = nonsensitive(random_password.minio-secret-access-key.result)
         api       = "S3v4"
@@ -430,25 +467,27 @@ resource "helm_release" "mpd" {
   namespace  = "default"
   repository = "https://randomcoww.github.io/terraform-infra/"
   chart      = "mpd"
-  version    = "0.2.4"
+  version    = "0.2.12"
   wait       = false
   values = [
     yamlencode({
       mpd = {
-        image         = local.helm_container_images.mpd
-        cachePath     = "/mpd/cache"
-        streamIngress = local.helm_ingress.mpd_stream
+        image     = local.helm_container_images.mpd
+        cachePath = "/mpd/cache"
       }
       ympd = {
-        image     = local.helm_container_images.ympd
-        uiIngress = local.helm_ingress.mpd_control
+        image = local.helm_container_images.ympd
       }
       rclone = {
         image         = local.helm_container_images.rclone
         minioEndPoint = "http://minio.default:${local.ports.minio}"
         minioBucket   = "music"
       }
-      storageClass = "openebs-jiva-csi-default"
+      ingress        = local.helm_ingress.mpd
+      ingressClass   = "nginx"
+      certIssuer     = "letsencrypt-prod"
+      certSecretName = "mpd-tls"
+      storageClass   = "openebs-jiva-csi-default"
       audioOutputs = [
         {
           name = "flac-3"
