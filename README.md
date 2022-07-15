@@ -27,26 +27,49 @@ ssh-keygen -q -t ecdsa -N '' -f $KEY 2>/dev/null <<< y >/dev/null
 
 Create `secrets.tfvars` file
 
+---
+See Authelia password hash generation https://www.authelia.com/reference/guides/passwords/#user--password-file
+```
+podman run docker.io/authelia/authelia:latest authelia hash-password -- 'password'
+```
+---
+
 ```bash
 KEY=$HOME/.ssh/id_ecdsa
 cat > secrets.tfvars <<EOF
+# System users
 users = {
-  admin = {
-    password_hash = "$(echo 'password' | mkpasswd -m sha-512 -s)"
-  }
+  admin = {}
   client = {
     password_hash = "$(echo 'password' | mkpasswd -m sha-512 -s)"
   }
 }
+
+# System SSH CA signing
 ssh_client = {
   key_id = "$(whoami)"
   public_key = "ssh_client_public_key=$(cat $KEY.pub)"
   early_renewal_hours = 168
   validity_period_hours = 336
 }
+
+# Hostapd users
 wifi = {
   ssid = "ssid"
   passphrase = "passphrase"
+}
+
+# Cert-manager letsencrypt profile
+letsencrypt_email = "user@domain"
+
+# Service SSO users
+authelia_users = {
+  username = {
+    displayname = "John Smith"
+    email = "user@domain"
+    password = "authelia-password-hash"
+    groups = []
+  }
 }
 EOF
 ```
