@@ -648,7 +648,7 @@ resource "helm_release" "mpd" {
   namespace  = "default"
   repository = "https://randomcoww.github.io/terraform-infra/"
   chart      = "mpd"
-  version    = "0.2.15"
+  version    = "0.2.16"
   wait       = false
   values = [
     yamlencode({
@@ -697,13 +697,14 @@ EOF
           }
         },
         {
-          name = "wave"
+          name = "lame-9"
           port = 8181
           config = {
             tags        = "yes"
             format      = "48000:24:2"
             always_on   = "yes"
-            encoder     = "wave"
+            encoder     = "lame"
+            quality = 9
             max_clients = 0
           }
         },
