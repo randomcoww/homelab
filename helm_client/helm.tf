@@ -174,10 +174,10 @@ resource "helm_release" "authelia_users" {
             name = "authelia-users"
           }
           type = "Opaque"
-          data = {
-            "users_database.yml" = replace(base64encode(chomp(yamlencode({
+          stringData = {
+            "users_database.yml" = yamlencode({
               users = var.authelia_users
-            }))), "\n", "")
+            })
           }
         },
       ]
@@ -578,31 +578,33 @@ resource "helm_release" "hostapd" {
   namespace  = "default"
   repository = "https://randomcoww.github.io/terraform-infra/"
   chart      = "hostapd"
-  version    = "0.1.2"
+  version    = "0.1.3"
   wait       = false
   values = [
     yamlencode({
       replicaCount = 2
       image        = local.helm_container_images.hostapd
-      config       = <<EOF
-interface=wlan0
-preamble=1
-hw_mode=g
-channel=4
-auth_algs=1
-driver=nl80211
-ieee80211n=1
-require_ht=1
-wmm_enabled=1
-disassoc_low_ack=1
-ht_capab=[LDPC][HT40-][HT40+][SHORT-GI-40][TX-STBC][RX-STBC1][DSSS_CCK-40]
-wpa=2
-wpa_key_mgmt=WPA-PSK
-wpa_pairwise=CCMP
-ieee80211w=2
-wpa_passphrase=${var.wifi.passphrase}
-ssid=${var.wifi.ssid}
-EOF
+      config = {
+        interface        = "wlan0"
+        preamble         = 1
+        hw_mode          = "g"
+        channel          = 4
+        auth_algs        = 1
+        driver           = "nl80211"
+        ieee80211n       = 1
+        require_ht       = 1
+        wmm_enabled      = 1
+        disassoc_low_ack = 1
+        ht_capab = "[${join("][", [
+          "LDPC", "HT40-", "HT40+", "SHORT-GI-40", "TX-STBC", "RX-STBC1", "DSSS_CCK-40",
+        ])}]"
+        wpa            = 2
+        wpa_key_mgmt   = "WPA-PSK"
+        wpa_pairwise   = "CCMP"
+        ieee80211w     = 2
+        wpa_passphrase = var.wifi.passphrase
+        ssid           = var.wifi.ssid
+      }
       affinity = {
         nodeAffinity = {
           requiredDuringSchedulingIgnoredDuringExecution = {
@@ -704,7 +706,7 @@ EOF
             format      = "48000:24:2"
             always_on   = "yes"
             encoder     = "lame"
-            quality = 9
+            quality     = 9
             max_clients = 0
           }
         },
