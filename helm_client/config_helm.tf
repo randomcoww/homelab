@@ -1,6 +1,7 @@
 locals {
   helm_ingress = {
-    mpd = local.domains.internal
+    mpd  = "mpd.${local.domains.internal}"
+    auth = "auth.${local.domains.internal}"
   }
 
   helm_container_images = {

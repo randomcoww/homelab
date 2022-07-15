@@ -90,12 +90,16 @@ resource "helm_release" "cert_manager" {
 }
 
 resource "helm_release" "cert_issuer" {
-  name             = "cert-issuer"
-  repository       = "https://randomcoww.github.io/terraform-infra/"
-  chart            = "helm-wrapper"
-  namespace        = "cert-manager"
-  create_namespace = true
-  version          = "0.1.0"
+  for_each = {
+    authelia = true,
+    default  = true,
+  }
+
+  name       = "cert-issuer-${each.key}"
+  repository = "https://randomcoww.github.io/terraform-infra/"
+  chart      = "helm-wrapper"
+  namespace  = each.key
+  version    = "0.1.0"
   values = [
     yamlencode({
       manifests = [
@@ -153,71 +157,143 @@ resource "helm_release" "cert_issuer" {
     }),
   ]
   depends_on = [
-    helm_release.cert_manager
+    helm_release.cert_manager,
   ]
 }
 
 # authelia #
 
-# resource "helm_release" "authelia" {
-#   name             = "authelia"
-#   repository       = "https://charts.authelia.com"
-#   chart            = "authelia"
-#   namespace        = "authelia"
-#   create_namespace = true
+resource "helm_release" "authelia_users" {
+  name             = "authelia-users"
+  repository       = "https://randomcoww.github.io/terraform-infra/"
+  chart            = "helm-wrapper"
+  namespace        = "authelia"
+  create_namespace = true
+  version          = "0.1.0"
+  values = [
+    yamlencode({
+      manifests = [
+        {
+          apiVersion = "v1"
+          kind       = "Secret"
+          metadata = {
+            name = "authelia-users"
+          }
+          type = "Opaque"
+          data = {
+            "users_database.yml" = replace(base64encode(chomp(yamlencode({
+              users = {
+                for user_name, user in var.authelia_users :
+                user_name => {
+                  displayname = user_name
+                  password    = user.password
+                  email       = user.email
+                  groups      = user.groups
+                }
+              }
+            }))), "\n", "")
+          }
+        },
+      ]
+    })
+  ]
+}
 
-#   values = [
-#     yamlencode({
-#       domain = local.domains.internal
-#       ingress = {
-#         enabled = true
-#         annotations = {
-#           "kubernetes.io/ingress.class" = "nginx"
-#         }
-#         certManager = true
-#         subdomain   = "auth"
-#         tls = {
-#           enabled = true
-#           secret  = "authelia-tls"
-#         }
-#       }
-#       configMap = {
-#         authentication_backend = {
-#           password_reset = {
-#             disable = true
-#           }
-#           ldap = {
-#             enabled = false
-#           }
-#           file = {
-#             enabled = true
-#             path    = "/config/users_database.yml"
-#           }
-#         }
-#         storage = {
-#           local = {
-#             enabled = true
-#             path    = "/config/db.sqlite3"
-#           }
-#           mysql = {
-#             enabled = false
-#           }
-#           postgres = {
-#             enabled = false
-#           }
-#         }
-#         notifier = {
-#           filesystem = {
-#             enabled = true
-#           }
-#           smtp = {
-#             enabled = false
-#           }
-#         }
-#       }
-#     }),
-#   ]
-# }
+resource "helm_release" "authelia" {
+  name             = "authelia"
+  repository       = "https://charts.authelia.com"
+  chart            = "authelia"
+  namespace        = "authelia"
+  create_namespace = true
+  wait             = false
+  values = [
+    yamlencode({
+      domain = local.domains.internal
+      ingress = {
+        enabled = true
+        annotations = {
+          "cert-manager.io/issuer" = "letsencrypt-prod"
+        }
+        certManager = true
+        className   = "nginx"
+        subdomain   = "auth"
+        tls = {
+          enabled = true
+          secret  = "authelia-tls"
+        }
+      }
+      pod = {
+        kind = "Deployment"
+        extraVolumeMounts = [
+          {
+            name      = "authelia-users"
+            mountPath = "/authelia/users_database.yml"
+            subPath   = "users_database.yml"
+          }
+        ]
+        extraVolumes = [
+          {
+            name = "authelia-users"
+            secret = {
+              secretName = "authelia-users"
+            }
+          }
+        ]
+      }
+      configMap = {
+        authentication_backend = {
+          password_reset = {
+            disable = true
+          }
+          ldap = {
+            enabled = false
+          }
+          file = {
+            enabled = true
+            path    = "/authelia/users_database.yml"
+          }
+        }
+        access_control = {
+          default_policy = "one_factor"
+        }
+        theme = "dark"
+        session = {
+          redis = {
+            enabled = false
+          }
+        }
+        storage = {
+          local = {
+            enabled = true
+            path    = "/config/db.sqlite3"
+          }
+          mysql = {
+            enabled = false
+          }
+          postgres = {
+            enabled = false
+          }
+        }
+        notifier = {
+          disable_startup_check = true
+          filesystem = {
+            enabled = true
+          }
+          smtp = {
+            enabled = false
+          }
+        }
+      }
+      persistence = {
+        enabled      = true
+        storageClass = "openebs-jiva-csi-default"
+      }
+    }),
+  ]
+  depends_on = [
+    helm_release.authelia_users,
+  ]
+}
 
 
 # local-storage storage class #
@@ -581,7 +657,7 @@ resource "helm_release" "mpd" {
   namespace  = "default"
   repository = "https://randomcoww.github.io/terraform-infra/"
   chart      = "mpd"
-  version    = "0.2.12"
+  version    = "0.2.14"
   wait       = false
   values = [
     yamlencode({
@@ -597,11 +673,21 @@ resource "helm_release" "mpd" {
         minioEndPoint = "http://minio.default:${local.ports.minio}"
         minioBucket   = "music"
       }
-      ingress        = local.helm_ingress.mpd
-      ingressClass   = "nginx"
-      certIssuer     = "letsencrypt-prod"
-      certSecretName = "mpd-tls"
-      storageClass   = "openebs-jiva-csi-default"
+      ingress = {
+        host           = local.helm_ingress.mpd
+        className      = "nginx"
+        certSecretName = "mpd-tls"
+        annotations = {
+          "cert-manager.io/issuer"                            = "letsencrypt-prod"
+          "nginx.ingress.kubernetes.io/auth-response-headers" = "Remote-User,Remote-Name,Remote-Groups,Remote-Email"
+          "nginx.ingress.kubernetes.io/auth-signin"           = "https://${local.helm_ingress.auth}"
+          "nginx.ingress.kubernetes.io/auth-snippet"          = <<EOF
+proxy_set_header X-Forwarded-Method $request_method;
+EOF
+          "nginx.ingress.kubernetes.io/auth-url"              = "http://authelia.authelia.svc.${local.domains.kubernetes}/api/verify"
+        }
+      }
+      storageClass = "openebs-jiva-csi-default"
       audioOutputs = [
         {
           name = "flac-3"

@@ -25,17 +25,18 @@ metadata:
     helm.sh/chart: {{ .Chart.Name }}-{{ .Chart.Version | replace "+" "_" }}
     app: {{ .Chart.Name }}
   name: {{ .Chart.Name }}
+{{- with .Values.ingress.annotations }}
   annotations:
-    # kubernetes.io/ingress.class: "{{ .Values.ingressClass }}"
-    cert-manager.io/issuer: "{{ .Values.certIssuer }}"
+{{ toYaml . | indent 4 }}
+{{- end }}
 spec:
-  ingressClassName: {{ .Values.ingressClass }}
+  ingressClassName: {{ .Values.ingress.className }}
   tls:
   - hosts:
-    - {{ .Values.ingress }}
-    secretName: {{ .Values.certSecretName }}
+    - {{ .Values.ingress.host }}
+    secretName: {{ .Values.ingress.certSecretName }}
   rules:
-  - host: {{ .Values.ingress }}
+  - host: {{ .Values.ingress.host }}
     http:
       paths:
       - path: /

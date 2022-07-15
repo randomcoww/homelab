@@ -13,10 +13,12 @@ rclone:
   minioBucket: music
   webDavPort: 58080
 
-ingress: mpd.local
-ingressClass: nginx
-certIssueer: letsencrypt
-certSecretName: mpd-tls
+ingress:
+  annotations:
+  host: mpd.local
+  className: nginx
+  certSecretName: mpd-tls
+
 storageClass: local-storage
 audioOutputs:
 # - name: flac-3
