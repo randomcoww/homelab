@@ -26,6 +26,10 @@ variable "internal_domain_dns_ip" {
   type = string
 }
 
+variable "pod_network" {
+  type = any
+}
+
 variable "static_pod_manifest_path" {
   type = string
 }

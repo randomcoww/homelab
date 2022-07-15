@@ -14,7 +14,7 @@ resource "helm_release" "cluster_services" {
       service_network_dns_ip    = local.networks.kubernetes_service.vips.dns
       apiserver_ip              = local.networks.lan.vips.apiserver
       apiserver_port            = local.ports.apiserver
-      external_dns_ip           = local.networks.metallb.vips.external_dns
+      external_dns_ip           = local.networks.lan.vips.external_dns
       forwarding_dns_ip         = local.networks.lan.vips.forwarding_dns
       internal_domain           = local.domains.internal
       cluster_domain            = local.domains.kubernetes
@@ -59,7 +59,7 @@ resource "helm_release" "nginx_ingress" {
             "metallb.universe.tf/address-pool" = "public-ips"
           }
           externalIPs = [
-            local.networks.metallb.vips.external_ingress,
+            local.networks.service.vips.external_ingress,
           ]
         }
         config = {
@@ -88,6 +88,69 @@ resource "helm_release" "cert_manager" {
     }),
   ]
 }
+
+# authelia #
+
+# resource "helm_release" "authelia" {
+#   name             = "authelia"
+#   repository       = "https://charts.authelia.com"
+#   chart            = "authelia"
+#   namespace        = "authelia"
+#   create_namespace = true
+
+#   values = [
+#     yamlencode({
+#       domain = local.domains.internal
+#       ingress = {
+#         enabled = true
+#         annotations = {
+#           "kubernetes.io/ingress.class" = "nginx"
+#         }
+#         certManager = true
+#         subdomain   = "auth"
+#         tls = {
+#           enabled = true
+#           secret  = "authelia-tls"
+#         }
+#       }
+#       configMap = {
+#         authentication_backend = {
+#           password_reset = {
+#             disable = true
+#           }
+#           ldap = {
+#             enabled = false
+#           }
+#           file = {
+#             enabled = true
+#             path    = "/config/users_database.yml"
+#           }
+#         }
+#         storage = {
+#           local = {
+#             enabled = true
+#             path    = "/config/db.sqlite3"
+#           }
+#           mysql = {
+#             enabled = false
+#           }
+#           postgres = {
+#             enabled = false
+#           }
+#         }
+#         notifier = {
+#           filesystem = {
+#             enabled = true
+#           }
+#           smtp = {
+#             enabled = false
+#           }
+#         }
+#       }
+#     }),
+#   ]
+# }
+
 
 # local-storage storage class #
 

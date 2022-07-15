@@ -38,10 +38,11 @@ module "ignition-gateway" {
   container_images         = local.container_images
   host_netnum              = each.value.netnum
   vrrp_netnum              = each.value.vrrp_netnum
-  external_ingress_ip      = local.networks.metallb.vips.external_ingress
+  external_ingress_ip      = local.networks.service.vips.external_ingress
   internal_domain          = local.domains.internal
-  internal_domain_dns_ip   = local.networks.metallb.vips.external_dns
+  internal_domain_dns_ip   = local.networks.lan.vips.external_dns
   static_pod_manifest_path = local.kubernetes.static_pod_manifest_path
+  pod_network              = local.networks.kubernetes_pod
   kea_server_name          = each.key
   kea_peer_port            = local.ports.kea_peer
   kea_peers = [

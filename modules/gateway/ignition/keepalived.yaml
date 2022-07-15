@@ -79,14 +79,14 @@ storage:
           ClientIdentifier=mac
           RouteTable=${vrrp_master_default_route.table_id}
 
-    - path: /etc/systemd/network/20-${interfaces.sync.interface_name}.network.d/20-slave-default-route.conf
+    - path: /etc/systemd/network/20-${interfaces.lan.interface_name}.network.d/20-slave-default-route.conf
       mode: 0644
       contents:
         inline: |
           [Route]
           Scope=global
           GatewayOnLink=true
-          Gateway=${cidrhost(interfaces.sync.prefix, vrrp_netnum)}
+          Gateway=${cidrhost(interfaces.lan.prefix, vrrp_netnum)}
           Destination=0.0.0.0/0
           Table=${vrrp_slave_default_route.table_id}
 

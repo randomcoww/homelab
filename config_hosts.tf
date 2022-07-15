@@ -10,7 +10,7 @@ locals {
         phy0 = {
           mac   = "1c-83-41-30-e2-23"
           mtu   = 9000
-          vlans = ["sync", "etcd", "wan"]
+          vlans = ["sync", "etcd", "service", "wan"]
         }
         wlan0 = {
           mac          = "a8-7e-ea-c5-3f-46"
@@ -36,11 +36,15 @@ locals {
         sync = {
           source_interface_name = "phy0-sync"
           enable_netnum         = true
-          enable_vrrp_netnum    = true
           mtu                   = 9000
         }
         etcd = {
           source_interface_name = "phy0-etcd"
+          enable_netnum         = true
+          mtu                   = 9000
+        }
+        service = {
+          source_interface_name = "phy0-service"
           enable_netnum         = true
           mtu                   = 9000
         }
@@ -78,7 +82,7 @@ locals {
         phy0 = {
           mac   = "1c-83-41-30-e2-54"
           mtu   = 9000
-          vlans = ["sync", "etcd", "wan"]
+          vlans = ["sync", "etcd", "service", "wan"]
         }
         wlan0 = {
           mac          = "fc-b3-bc-dc-4e-fc"
@@ -104,11 +108,15 @@ locals {
         sync = {
           source_interface_name = "phy0-sync"
           enable_netnum         = true
-          enable_vrrp_netnum    = true
           mtu                   = 9000
         }
         etcd = {
           source_interface_name = "phy0-etcd"
+          enable_netnum         = true
+          mtu                   = 9000
+        }
+        service = {
+          source_interface_name = "phy0-service"
           enable_netnum         = true
           mtu                   = 9000
         }
@@ -145,7 +153,7 @@ locals {
         phy0 = {
           mac   = "84-a9-38-0f-aa-76"
           mtu   = 9000
-          vlans = ["etcd", "wan"]
+          vlans = ["etcd", "service"]
         }
         wlan0 = {
           mac = "b4-b5-b6-74-79-15"
@@ -166,10 +174,10 @@ locals {
           enable_netnum         = true
           mtu                   = 9000
         }
-        wan = {
-          source_interface_name = "phy0-wan"
-          enable_dhcp           = false
-          mac                   = "52-54-00-63-6e-b3"
+        service = {
+          source_interface_name = "phy0-service"
+          enable_netnum         = true
+          mtu                   = 9000
         }
       }
       disks = {

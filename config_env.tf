@@ -12,6 +12,7 @@ locals {
         forwarding_dns = 2
         matchbox       = 2
         minio          = 2
+        external_dns   = 128
       }
     }
     sync = {
@@ -24,15 +25,16 @@ locals {
       cidr    = 29
       vlan_id = 70
     }
+    service = {
+      network = "192.168.192.0"
+      cidr    = 26
+      vlan_id = 80
+      netnums = {
+        external_ingress = 32
+      }
+    }
     wan = {
       vlan_id = 30
-    }
-    metallb = {
-      prefix = cidrsubnet("192.168.126.0/23", 2, 1)
-      netnums = {
-        external_dns     = 11
-        external_ingress = 12
-      }
     }
     kubernetes_service = {
       network = "10.96.0.0"
