@@ -90,22 +90,16 @@ resource "helm_release" "cert_manager" {
 }
 
 resource "helm_release" "cert_issuer" {
-  for_each = {
-    authelia = true,
-    default  = true,
-  }
-
-  name       = "cert-issuer-${each.key}"
+  name       = "cert-issuer"
   repository = "https://randomcoww.github.io/terraform-infra/"
   chart      = "helm-wrapper"
-  namespace  = each.key
   version    = "0.1.0"
   values = [
     yamlencode({
       manifests = [
         {
           apiVersion = "cert-manager.io/v1"
-          kind       = "Issuer"
+          kind       = "ClusterIssuer"
           metadata = {
             name = "letsencrypt-prod"
           }
@@ -130,7 +124,7 @@ resource "helm_release" "cert_issuer" {
         },
         {
           apiVersion = "cert-manager.io/v1"
-          kind       = "Issuer"
+          kind       = "ClusterIssuer"
           metadata = {
             name = "letsencrypt-staging"
           }
