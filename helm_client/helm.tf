@@ -220,7 +220,7 @@ resource "helm_release" "authelia" {
         extraVolumeMounts = [
           {
             name      = "authelia-users"
-            mountPath = "/authelia/users_database.yml"
+            mountPath = "/config/users_database.yml"
             subPath   = "users_database.yml"
           }
         ]
@@ -243,7 +243,7 @@ resource "helm_release" "authelia" {
           }
           file = {
             enabled = true
-            path    = "/authelia/users_database.yml"
+            path    = "/config/users_database.yml"
           }
         }
         access_control = {
@@ -251,6 +251,8 @@ resource "helm_release" "authelia" {
         }
         theme = "dark"
         session = {
+          inactivity           = "1h"
+          expiration           = "1h"
           remember_me_duration = 0
           redis = {
             enabled = false
@@ -262,7 +264,6 @@ resource "helm_release" "authelia" {
         storage = {
           local = {
             enabled = true
-            path    = "/config/db.sqlite3"
           }
           mysql = {
             enabled = false
