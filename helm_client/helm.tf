@@ -223,7 +223,8 @@ resource "helm_release" "authelia" {
         }
       }
       pod = {
-        kind = "Deployment"
+        replicas = 1
+        kind     = "Deployment"
         extraVolumeMounts = [
           {
             name      = "authelia-users"
@@ -258,9 +259,13 @@ resource "helm_release" "authelia" {
         }
         theme = "dark"
         session = {
+          remember_me_duration = 0
           redis = {
             enabled = false
           }
+        }
+        regulation = {
+          max_retries = 4
         }
         storage = {
           local = {
@@ -285,8 +290,7 @@ resource "helm_release" "authelia" {
         }
       }
       persistence = {
-        enabled      = true
-        storageClass = "openebs-jiva-csi-default"
+        enabled = false
       }
     }),
   ]
