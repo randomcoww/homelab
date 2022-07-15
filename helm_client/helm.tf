@@ -182,15 +182,7 @@ resource "helm_release" "authelia_users" {
           type = "Opaque"
           data = {
             "users_database.yml" = replace(base64encode(chomp(yamlencode({
-              users = {
-                for user_name, user in var.authelia_users :
-                user_name => {
-                  displayname = user_name
-                  password    = user.password
-                  email       = user.email
-                  groups      = user.groups
-                }
-              }
+              users = var.authelia_users
             }))), "\n", "")
           }
         },
