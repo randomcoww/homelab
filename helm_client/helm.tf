@@ -648,7 +648,7 @@ resource "helm_release" "mpd" {
   namespace  = "default"
   repository = "https://randomcoww.github.io/terraform-infra/"
   chart      = "mpd"
-  version    = "0.2.14"
+  version    = "0.2.15"
   wait       = false
   values = [
     yamlencode({
@@ -679,6 +679,10 @@ EOF
         }
       }
       storageClass = "openebs-jiva-csi-default"
+      config = {
+        filesystem_charset = "UTF-8"
+        auto_update        = "yes"
+      }
       audioOutputs = [
         {
           name = "flac-3"
@@ -690,7 +694,17 @@ EOF
             encoder     = "flac"
             compression = 3
             max_clients = 0
-            auto_update = "yes"
+          }
+        },
+        {
+          name = "wave"
+          port = 8181
+          config = {
+            tags        = "yes"
+            format      = "48000:24:2"
+            always_on   = "yes"
+            encoder     = "wave"
+            max_clients = 0
           }
         },
       ]

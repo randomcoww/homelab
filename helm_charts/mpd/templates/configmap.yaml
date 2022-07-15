@@ -14,7 +14,9 @@ data:
     db_file "{{ .Values.mpd.cachePath }}/tag_cache"
     state_file "{{ .Values.mpd.cachePath }}/state"
     sticker_file "{{ .Values.mpd.cachePath }}/sticker.sql"
-    filesystem_charset "UTF-8"
+{{- range $k, $v := .Values.config }}
+    {{ $k }} "{{ $v }}"
+{{- end }}
 {{- range $audioOutput := .Values.audioOutputs }}
     audio_output {
       type "httpd"

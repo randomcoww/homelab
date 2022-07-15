@@ -20,6 +20,8 @@ ingress:
   certSecretName: mpd-tls
 
 storageClass: local-storage
+config:
+# filesystem_charset: UTF-8
 audioOutputs:
 # - name: flac-3
 #   port: 8082
