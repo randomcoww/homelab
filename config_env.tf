@@ -86,7 +86,7 @@ locals {
     matchbox_http      = 58084
     matchbox_api       = 50259
     matchbox_sync      = 50260
-    minio              = 9000
+    minio              = 30000
   }
 
   domains = {

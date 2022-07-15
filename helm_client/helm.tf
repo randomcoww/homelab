@@ -46,6 +46,7 @@ resource "helm_release" "nginx_ingress" {
   chart            = "ingress-nginx"
   namespace        = "ingress-nginx"
   create_namespace = true
+  version          = "4.2.0"
   values = [
     yamlencode({
       controller = {
@@ -191,6 +192,7 @@ resource "helm_release" "authelia" {
   chart            = "authelia"
   namespace        = "authelia"
   create_namespace = true
+  version          = "0.8.38"
   wait             = false
   values = [
     yamlencode({
@@ -286,7 +288,6 @@ resource "helm_release" "authelia" {
   ]
 }
 
-
 # local-storage storage class #
 
 resource "helm_release" "local-path-provisioner" {
@@ -370,6 +371,7 @@ resource "helm_release" "nvidia_device_plugin" {
   repository = "https://nvidia.github.io/k8s-device-plugin"
   chart      = "nvidia-device-plugin"
   namespace  = "kube-system"
+  version    = "0.12.2"
   values = [
     yamlencode({
       affinity = {
@@ -503,24 +505,16 @@ resource "random_password" "minio-secret-access-key" {
 resource "helm_release" "minio" {
   name       = "minio"
   namespace  = "default"
-  repository = "https://randomcoww.github.io/terraform-infra/"
+  repository = "https://charts.min.io/"
   chart      = "minio"
+  version    = "4.0.4"
   wait       = false
   values = [
     yamlencode({
       clusterDomain = local.domains.kubernetes
-      image = {
-        repository = element(split(":", local.helm_container_images.minio), 0)
-        tag        = element(split(":", local.helm_container_images.minio), 1)
-      }
-      mcImage = {
-        repository = element(split(":", local.helm_container_images.mc), 0)
-        tag        = element(split(":", local.helm_container_images.mc), 1)
-      }
-      mode         = "distributed"
-      rootUser     = random_password.minio-access-key-id.result
-      rootPassword = random_password.minio-secret-access-key.result
-      minioAPIPort = local.ports.minio
+      mode          = "distributed"
+      rootUser      = random_password.minio-access-key-id.result
+      rootPassword  = random_password.minio-secret-access-key.result
       persistence = {
         storageClass = "local-path"
       }
@@ -530,6 +524,14 @@ resource "helm_release" "minio" {
         requests = {
           memory = "8Gi"
         }
+      }
+      consoleService = {
+        type      = "ClusterIP"
+        clusterIP = "None"
+      }
+      service = {
+        type     = "NodePort"
+        nodePort = local.ports.minio
       }
       users = []
       affinity = {
@@ -663,7 +665,7 @@ resource "helm_release" "mpd" {
       }
       rclone = {
         image         = local.helm_container_images.rclone
-        minioEndPoint = "http://minio.default:${local.ports.minio}"
+        minioEndPoint = "http://minio.default:9000"
         minioBucket   = "music"
       }
       ingress = {
