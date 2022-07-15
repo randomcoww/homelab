@@ -4,3 +4,7 @@ variable "wifi" {
     passphrase = string
   })
 }
+
+variable "letsencrypt_email" {
+  type = string
+}

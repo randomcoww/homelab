@@ -78,7 +78,7 @@ resource "helm_release" "cert_manager" {
   chart            = "cert-manager"
   namespace        = "cert-manager"
   create_namespace = true
-
+  wait             = true
   values = [
     yamlencode({
       installCRDs = true
@@ -86,6 +86,74 @@ resource "helm_release" "cert_manager" {
         enabled = false
       }
     }),
+  ]
+}
+
+resource "helm_release" "cert_issuer" {
+  name             = "cert-issuer"
+  repository       = "https://randomcoww.github.io/terraform-infra/"
+  chart            = "helm-wrapper"
+  namespace        = "cert-manager"
+  create_namespace = true
+  version          = "0.1.0"
+  values = [
+    yamlencode({
+      manifests = [
+        {
+          apiVersion = "cert-manager.io/v1"
+          kind       = "Issuer"
+          metadata = {
+            name = "letsencrypt-prod"
+          }
+          spec = {
+            acme = {
+              server = "https://acme-v02.api.letsencrypt.org/directory"
+              email  = var.letsencrypt_email
+              privateKeySecretRef = {
+                name = "letsencrypt-prod"
+              }
+              solvers = [
+                {
+                  http01 = {
+                    ingress = {
+                      class = "nginx"
+                    }
+                  }
+                }
+              ]
+            }
+          }
+        },
+        {
+          apiVersion = "cert-manager.io/v1"
+          kind       = "Issuer"
+          metadata = {
+            name = "letsencrypt-staging"
+          }
+          spec = {
+            acme = {
+              server = "https://acme-staging-v02.api.letsencrypt.org/directory"
+              email  = var.letsencrypt_email
+              privateKeySecretRef = {
+                name = "letsencrypt-staging"
+              }
+              solvers = [
+                {
+                  http01 = {
+                    ingress = {
+                      class = "nginx"
+                    }
+                  }
+                }
+              ]
+            }
+          }
+        },
+      ]
+    }),
+  ]
+  depends_on = [
+    helm_release.cert_manager
   ]
 }
 
