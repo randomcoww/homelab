@@ -169,7 +169,9 @@ Each node may be PXE booted now and boot disks are no longer needed as long as t
 
 ### Server access
 
-#### Sign SSH key (valid for `validity_period_hours` as configured in `secrets.tfvars`)
+#### Sign SSH key
+
+This is valid for `validity_period_hours` as configured in `secrets.tfvars`)
 
 ```bash
 KEY=$HOME/.ssh/id_ecdsa
