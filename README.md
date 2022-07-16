@@ -1,4 +1,4 @@
-## Provisioning steps
+## Provisioning
 
 ### Environment
 
@@ -166,6 +166,10 @@ tw terraform -chdir=pxeboot_config_client apply
 ```
 
 Each node may be PXE booted now and boot disks are no longer needed as long as two or more nodes are running.
+
+---
+
+## Maintenance
 
 ### Server access
 
