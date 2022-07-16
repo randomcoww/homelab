@@ -1,6 +1,6 @@
-## Ignition builds for homelab servers and clients
+## Provisioning steps
 
-### Configure environment
+### Environment
 
 Define the `tw` (terraform wrapper) command
 
@@ -18,25 +18,24 @@ tw() {
 }
 ```
 
-Generate new SSH key (as needed)
+### Define secrets
+
+Generate SSH key as needed
 
 ```bash
 KEY=$HOME/.ssh/id_ecdsa
 ssh-keygen -q -t ecdsa -N '' -f $KEY 2>/dev/null <<< y >/dev/null
 ```
 
-Create `secrets.tfvars` file
+Generate Authelia user password
 
----
-See Authelia password hash generation https://www.authelia.com/reference/guides/passwords/#user--password-file
-```
-podman run docker.io/authelia/authelia:latest authelia hash-password -- 'password'
-```
----
+See https://www.authelia.com/reference/guides/passwords/#user--password-file
+
+Create `secrets.tfvars` file
 
 ```bash
 KEY=$HOME/.ssh/id_ecdsa
-cat > secrets.tfvars <<EOF
+cat > secrets-2.tfvars <<EOF
 # System users
 users = {
   admin = {}
@@ -67,7 +66,7 @@ authelia_users = {
   username = {
     displayname = "John Smith"
     email = "user@domain"
-    password = "authelia-password-hash"
+    password = "$(podman run docker.io/authelia/authelia:latest authelia hash-password -- 'password' | sed 's:.*\: ::')"
     groups = []
   }
 }
@@ -76,15 +75,34 @@ EOF
 
 ### Create bootable image for the server
 
-Generate a CoreOS ignition file
+Generate CoreOS ignition for all nodes under `output`
 
 ```bash
 tw terraform apply -var-file=secrets.tfvars
 ```
 
-[Generate a bootable device for the server](https://github.com/randomcoww/fedora-coreos-config-custom/blob/master/builds/server/README.md)
+### Create bootable OS images
+
+See [fedora-coreos-config-custom](https://github.com/randomcoww/fedora-coreos-config-custom/blob/master/builds/server/README.md)
+
+Embed the ignition files generated above into the image to allow them to boot configured.
 
 ### Deploy services to kubernetes
+
+Write admin kubeconfig
+
+```bash
+mkdir -p ~/.kube && \
+  tw terraform output -raw admin_kubeconfig > ~/.kube/config
+```
+
+Check that `kubernetes` service is up
+
+```bash
+kubectl get svc
+```
+
+Once Kubernetes is up deploy helm charts
 
 ```bash
 tw terraform -chdir=helm_client \
@@ -101,9 +119,9 @@ tw terraform -chdir=helm_client output \
   -json minio_endpoint > ~/.mc/config.json
 ```
 
----
+Create and configure buckets
 
-TODO: Handle minio in terraform
+TODO: Handle this in terraform or helm
 
 Download minio client `mc`
 
@@ -119,9 +137,9 @@ mc mb minio/boot
 mc policy set download minio/boot
 ```
 
----
+Push OS images generated previously into Minio
 
-[Build and upload client image to minio](https://github.com/randomcoww/fedora-coreos-config-custom/blob/master/builds/client/README.md)
+See [fedora-coreos-config-custom](https://github.com/randomcoww/fedora-coreos-config-custom/blob/master/builds/server/README.md)
 
 Write matchbox PXE boot config
 
@@ -129,27 +147,29 @@ Write matchbox PXE boot config
 tw terraform -chdir=pxeboot_config_client apply
 ```
 
+Each node may be PXE booted now and boot disks are no longer needed as long as two or more nodes are running.
+
 ### Server access
 
-Write admin kubeconfig
-
-```bash
-mkdir -p ~/.kube && \
-  tw terraform output -raw admin_kubeconfig > ~/.kube/config
-```
-
-Sign SSH key
+Sign SSH key (valid for `validity_period_hours` as configured in `secrets.tfvars`)
 
 ```bash
 KEY=$HOME/.ssh/id_ecdsa
 tw terraform output -raw ssh_client_cert_authorized_key > $KEY-cert.pub
 ```
 
-### Cleanup terraform file formatting for checkin
+### Updating helm charts
+
+Full example: https://github.com/technosophos/tscharts
 
 ```bash
-tw find . -name '*.tf' -exec terraform fmt '{}' \;
+helm package helm_charts/<chart> -d docs/
+helm repo index --url https://randomcoww.github.io/terraform-infra docs/
 ```
+
+### Container builds
+
+All custom container build Dockerfiles are at https://github.com/randomcoww/container-builds
 
 ### Build terrafrom wrapper image
 
@@ -169,15 +189,8 @@ buildah build \
 buildah push $TAG
 ```
 
-### Updating helm charts
-
-Full example: https://github.com/technosophos/tscharts
+### Cleanup terraform file formatting
 
 ```bash
-helm package helm_charts/<chart> -d docs/
-helm repo index --url https://randomcoww.github.io/terraform-infra docs/
+tw find . -name '*.tf' -exec terraform fmt '{}' \;
 ```
-
-### Container builds
-
-All custom container build Dockerfiles are at https://github.com/randomcoww/container-builds
