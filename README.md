@@ -2,7 +2,7 @@
 
 ### Environment
 
-Define the `tw` (terraform wrapper) command
+#### Define the `tw` (terraform wrapper) command
 
 ```bash
 tw() {
@@ -20,18 +20,16 @@ tw() {
 
 ### Define secrets
 
-Generate SSH key as needed
+#### Generate SSH key as needed
 
 ```bash
 KEY=$HOME/.ssh/id_ecdsa
 ssh-keygen -q -t ecdsa -N '' -f $KEY 2>/dev/null <<< y >/dev/null
 ```
 
-Reference:
+#### Create `secrets.tfvars` file
 
-[Authelia user password generation](https://www.authelia.com/reference/guides/passwords/#user--password-file)
-
-Create `secrets.tfvars` file
+Reference: [Authelia user password generation](https://www.authelia.com/reference/guides/passwords/#user--password-file)
 
 ```bash
 KEY=$HOME/.ssh/id_ecdsa
@@ -75,13 +73,13 @@ EOF
 
 ### Create bootable OS images
 
-Generate CoreOS ignition for all nodes
+#### Generate CoreOS ignition for all nodes
 
 ```bash
 tw terraform apply -var-file=secrets.tfvars
 ```
 
-Create custom CoreOS images
+#### Create custom CoreOS images
 
 Run [fedora-coreos-config-custom](https://github.com/randomcoww/fedora-coreos-config-custom/blob/master/builds/server/README.md)
 
@@ -89,20 +87,20 @@ Embed the ignition files generated above into the image to allow them to boot co
 
 ### Deploy services to kubernetes
 
-Write admin kubeconfig
+#### Write admin kubeconfig
 
 ```bash
 mkdir -p ~/.kube && \
   tw terraform output -raw admin_kubeconfig > ~/.kube/config
 ```
 
-Check that `kubernetes` service is up
+#### Check that `kubernetes` service is up
 
 ```bash
 kubectl get svc
 ```
 
-Once Kubernetes is up deploy helm charts
+#### Once Kubernetes is up deploy helm charts
 
 ```bash
 tw terraform -chdir=helm_client \
@@ -111,7 +109,7 @@ tw terraform -chdir=helm_client \
 
 ### Create PXE boot entry for nodes
 
-Write minio config
+#### Write minio config
 
 ```bash
 mkdir -p ~/.mc && \
@@ -119,7 +117,7 @@ tw terraform -chdir=helm_client output \
   -json minio_endpoint > ~/.mc/config.json
 ```
 
-Create and configure buckets
+#### Create and configure buckets
 
 TODO: Handle this in terraform or helm
 
@@ -137,11 +135,11 @@ mc mb minio/boot
 mc policy set download minio/boot
 ```
 
-Push OS images generated previously into Minio
+#### Push OS images generated previously into Minio
 
 See [fedora-coreos-config-custom](https://github.com/randomcoww/fedora-coreos-config-custom/blob/master/builds/server/README.md)
 
-Write matchbox PXE boot config
+#### Write matchbox PXE boot config
 
 ```bash
 tw terraform -chdir=pxeboot_config_client apply
@@ -151,7 +149,7 @@ Each node may be PXE booted now and boot disks are no longer needed as long as t
 
 ### Server access
 
-Sign SSH key (valid for `validity_period_hours` as configured in `secrets.tfvars`)
+#### Sign SSH key (valid for `validity_period_hours` as configured in `secrets.tfvars`)
 
 ```bash
 KEY=$HOME/.ssh/id_ecdsa
