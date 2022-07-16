@@ -33,7 +33,7 @@ Reference: [Authelia user password generation](https://www.authelia.com/referenc
 
 ```bash
 KEY=$HOME/.ssh/id_ecdsa
-cat > secrets-2.tfvars <<EOF
+cat > secrets.tfvars <<EOF
 # System users
 users = {
   admin = {}
