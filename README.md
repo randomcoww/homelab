@@ -27,9 +27,9 @@ KEY=$HOME/.ssh/id_ecdsa
 ssh-keygen -q -t ecdsa -N '' -f $KEY 2>/dev/null <<< y >/dev/null
 ```
 
-Generate Authelia user password
+Reference:
 
-See https://www.authelia.com/reference/guides/passwords/#user--password-file
+[Authelia user password generation](https://www.authelia.com/reference/guides/passwords/#user--password-file)
 
 Create `secrets.tfvars` file
 
@@ -73,17 +73,17 @@ authelia_users = {
 EOF
 ```
 
-### Create bootable image for the server
+### Create bootable OS images
 
-Generate CoreOS ignition for all nodes under `output`
+Generate CoreOS ignition for all nodes
 
 ```bash
 tw terraform apply -var-file=secrets.tfvars
 ```
 
-### Create bootable OS images
+Create custom CoreOS images
 
-See [fedora-coreos-config-custom](https://github.com/randomcoww/fedora-coreos-config-custom/blob/master/builds/server/README.md)
+Run [fedora-coreos-config-custom](https://github.com/randomcoww/fedora-coreos-config-custom/blob/master/builds/server/README.md)
 
 Embed the ignition files generated above into the image to allow them to boot configured.
 
