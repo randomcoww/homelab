@@ -107,6 +107,8 @@ tw terraform -chdir=helm_client \
   apply -var-file=secrets.tfvars
 ```
 
+This will provision services used in following steps
+
 ### Create PXE boot entry for nodes
 
 #### Prepare minio client
@@ -130,7 +132,13 @@ tw terraform -chdir=helm_client output \
 
 TODO: Handle this in terraform or helm
 
-Make `boot` bucket for PXE boot images
+Check that minio pods are running
+
+```bash
+kubectl get po -l app=minio
+```
+
+Once pods are running make the `boot` bucket for holding PXE boot images
 
 ```
 mc mb minio/boot
@@ -142,6 +150,14 @@ mc policy set download minio/boot
 See [fedora-coreos-config-custom](https://github.com/randomcoww/fedora-coreos-config-custom/blob/master/builds/server/README.md)
 
 #### Write matchbox PXE boot config
+
+Check that matchbox pods are running
+
+```bash
+kubectl get po -l app=matchbox
+```
+
+Once pods are running write PXE boot configuration for all nodes to matchbox
 
 ```bash
 tw terraform -chdir=pxeboot_config_client apply
