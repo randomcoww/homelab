@@ -83,7 +83,7 @@ tw terraform apply -var-file=secrets.tfvars
 
 See [fedora-coreos-config-custom](https://github.com/randomcoww/fedora-coreos-config-custom/blob/master/builds/server/README.md)
 
-Embed the ignition files generated above into the image to allow them to boot configured.
+Embed the ignition files generated above into the image to allow them to boot configured
 
 ### Deploy services to kubernetes
 
@@ -165,9 +165,7 @@ Once pods are running write PXE boot configuration for all nodes to matchbox
 tw terraform -chdir=pxeboot_config_client apply
 ```
 
-Each node may be PXE booted now and boot disks are no longer needed as long as two or more nodes are running.
-
----
+Each node may be PXE booted now and boot disks are no longer needed as long as two or more nodes are running
 
 ## Maintenance
 
