@@ -81,7 +81,7 @@ tw terraform apply -var-file=secrets.tfvars
 
 #### Create custom CoreOS images
 
-Run [fedora-coreos-config-custom](https://github.com/randomcoww/fedora-coreos-config-custom/blob/master/builds/server/README.md)
+See [fedora-coreos-config-custom](https://github.com/randomcoww/fedora-coreos-config-custom/blob/master/builds/server/README.md)
 
 Embed the ignition files generated above into the image to allow them to boot configured.
 
@@ -109,7 +109,16 @@ tw terraform -chdir=helm_client \
 
 ### Create PXE boot entry for nodes
 
-#### Write minio config
+#### Prepare minio client
+
+Download `mc`
+
+```bash
+wget https://dl.min.io/client/mc/release/linux-amd64/mc
+chmod +x mc
+```
+
+Write configuration for `mc`
 
 ```bash
 mkdir -p ~/.mc && \
@@ -121,14 +130,7 @@ tw terraform -chdir=helm_client output \
 
 TODO: Handle this in terraform or helm
 
-Download minio client `mc`
-
-```bash
-wget https://dl.min.io/client/mc/release/linux-amd64/mc
-chmod +x mc
-```
-
-Make `boot` bucket
+Make `boot` bucket for PXE boot images
 
 ```
 mc mb minio/boot
