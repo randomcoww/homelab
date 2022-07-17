@@ -3,7 +3,7 @@ entries:
   cluster-services:
   - apiVersion: v2
     appVersion: 1.16.0
-    created: "2022-07-16T19:21:53.508157671-07:00"
+    created: "2022-07-16T19:48:24.475085099-07:00"
     description: Basic cluster services with minimal configuration
     digest: 50a4352f9eb00caca217ee29ab1c508166bf5ef401219bb5fbda98bf5830727d
     name: cluster-services
@@ -14,7 +14,7 @@ entries:
   helm-wrapper:
   - apiVersion: v2
     appVersion: 1.16.0
-    created: "2022-07-16T19:21:53.508378512-07:00"
+    created: "2022-07-16T19:48:24.475218986-07:00"
     description: Wrap any manifest in helm to use terraform helm provider
     digest: aed2ee8657c15c0a823c2acf5a1772dab88249b042ff3368d0ea2039746ba50b
     name: helm-wrapper
@@ -25,7 +25,7 @@ entries:
   hostapd:
   - apiVersion: v2
     appVersion: 1.16.0
-    created: "2022-07-16T19:21:53.508642165-07:00"
+    created: "2022-07-16T19:48:24.475381369-07:00"
     description: A Helm chart for Kubernetes
     digest: 8867540ff9787bd4347fa8ebf42eb2c735c80d3039c3ab233b5087749ace9d46
     name: hostapd
@@ -36,7 +36,17 @@ entries:
   matchbox:
   - apiVersion: v2
     appVersion: 1.16.0
-    created: "2022-07-16T19:21:53.509232609-07:00"
+    created: "2022-07-16T19:48:24.476730016-07:00"
+    description: Matchbox PXE boot
+    digest: fe069b30d23b305eb23804d9fd3e3f4bb9c5242e692f432c609510dd1cf1c454
+    name: matchbox
+    type: application
+    urls:
+    - https://randomcoww.github.io/terraform-infra/matchbox-0.2.1.tgz
+    version: 0.2.1
+  - apiVersion: v2
+    appVersion: 1.16.0
+    created: "2022-07-16T19:48:24.476451696-07:00"
     description: Matchbox PXE boot
     digest: 5535f8d6517fe2e249b0b49ff15f74e94f220a12a63717b67bb7ffd265d738cd
     name: matchbox
@@ -46,7 +56,7 @@ entries:
     version: 0.2.0
   - apiVersion: v2
     appVersion: 1.16.0
-    created: "2022-07-16T19:21:53.508951705-07:00"
+    created: "2022-07-16T19:48:24.476087191-07:00"
     description: Matchbox PXE boot
     digest: d25ee994fdf2fcabcc50d384f1f1b1e8bc53f5117a8d9266030a1a939745f8cc
     name: matchbox
@@ -57,7 +67,7 @@ entries:
   mpd:
   - apiVersion: v2
     appVersion: 1.16.0
-    created: "2022-07-16T19:21:53.509528948-07:00"
+    created: "2022-07-16T19:48:24.476946666-07:00"
     description: A Helm chart for Kubernetes
     digest: d5ac1a0e21ee693a65b26f8554543a526dd5aafe31d45c07318dde66826de14b
     name: mpd
@@ -65,4 +75,4 @@ entries:
     urls:
     - https://randomcoww.github.io/terraform-infra/mpd-0.2.16.tgz
     version: 0.2.16
-generated: "2022-07-16T19:21:53.507257129-07:00"
+generated: "2022-07-16T19:48:24.47463853-07:00"
