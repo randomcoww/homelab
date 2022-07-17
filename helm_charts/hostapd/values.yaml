@@ -1,4 +1,10 @@
-replicaCount: 1
+config: {}
+
+StatefulSet:
+  replicaCount: 2
+  updateStrategy: "RollingUpdate"
+  minReadySeconds: 5
+
 image: "ghcr.io/randomcoww/hostapd:latest"
-config:
-affinity:
+
+affinity: {}

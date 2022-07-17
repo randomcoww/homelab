@@ -1,27 +1,38 @@
 apiVersion: apps/v1
 kind: StatefulSet
 metadata:
-  name: {{ .Chart.Name }}
+  name: {{ template "hostapd.fullname" . }}
   labels:
-    helm.sh/chart: {{ .Chart.Name }}-{{ .Chart.Version | replace "+" "_" }}
-    app: {{ .Chart.Name }}
+    app: {{ template "hostapd.name" . }}
+    chart: {{ template "hostapd.chart" . }}
+    release: "{{ .Release.Name }}"
 spec:
-  serviceName: {{ .Chart.Name }}
-  replicas: {{ .Values.replicaCount }}
+  serviceName: {{ template "hostapd.fullname" . }}
+  replicas: {{ .Values.StatefulSet.replicaCount }}
+  updateStrategy:
+    type: {{ .Values.StatefulSet.updateStrategy }}
+  minReadySeconds: {{ .Values.StatefulSet.minReadySeconds }}
   selector:
     matchLabels:
-      app: {{ .Chart.Name }}
+      app: {{ template "hostapd.name" . }}
+      release: {{ .Release.Name }}
   template:
     metadata:
       labels:
-        app: {{ .Chart.Name }}
+        app: {{ template "hostapd.name" . }}
+        release: {{ .Release.Name }}
       annotations:
         checksum/secret: {{ include (print $.Template.BasePath "/secret.yaml") . | sha256sum }}
     spec:
-{{- with .Values.affinity }}
+    {{- with .Values.affinity }}
       affinity:
 {{ toYaml . | indent 8 }}
-{{- end }}
+    {{- end }}
+    {{- with .Values.tolerations }}
+      tolerations:
+{{ toYaml . | indent 8 }}
+    {{- end }}
+      dnsPolicy: ClusterFirstWithHostNet
       hostNetwork: true
       restartPolicy: Always
       containers:
@@ -42,4 +53,4 @@ spec:
       volumes:
       - name: hostapd-config
         secret:
-          secretName: {{ .Chart.Name }}
+          secretName: {{ template "hostapd.fullname" . }}

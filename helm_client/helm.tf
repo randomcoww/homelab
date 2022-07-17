@@ -430,6 +430,9 @@ resource "helm_release" "matchbox" {
       syncthingSecret = module.matchbox-syncthing.secret
       matchboxSecret  = module.matchbox-certs.secret
       sharedDataPath  = "/var/tmp/matchbox"
+      StatefulSet = {
+        replicaCount = 2
+      }
       affinity = {
         nodeAffinity = {
           requiredDuringSchedulingIgnoredDuringExecution = {
@@ -580,11 +583,10 @@ resource "helm_release" "hostapd" {
   namespace  = "default"
   repository = "https://randomcoww.github.io/terraform-infra/"
   chart      = "hostapd"
-  version    = "0.1.3"
+  version    = "0.1.4"
   wait       = false
   values = [
     yamlencode({
-      replicaCount = 2
       image        = local.helm_container_images.hostapd
       config = {
         interface        = "wlan0"
@@ -606,6 +608,9 @@ resource "helm_release" "hostapd" {
         ieee80211w     = 2
         wpa_passphrase = var.wifi.passphrase
         ssid           = var.wifi.ssid
+      }
+      StatefulSet = {
+        replicaCount = 2
       }
       affinity = {
         nodeAffinity = {
