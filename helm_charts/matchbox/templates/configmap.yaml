@@ -1,10 +1,11 @@
 apiVersion: v1
 kind: ConfigMap
 metadata:
-  name: {{ .Chart.Name }}-{{ .Values.syncthing.podName }}
+  name: {{ template "matchbox.fullname" . }}-syncthing
   labels:
-    helm.sh/chart: {{ .Chart.Name }}-{{ .Chart.Version | replace "+" "_" }}
-    app: {{ .Chart.Name }}
+    app: {{ template "matchbox.name" . }}
+    chart: {{ template "matchbox.chart" . }}
+    release: {{ .Release.Name }}
 data:
   config.xml: |
-{{ .Values.syncthing.config | indent 4 }}
+{{ .Values.syncthingConfig | indent 4 }}

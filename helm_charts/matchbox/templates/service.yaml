@@ -1,15 +1,38 @@
-kind: Service
 apiVersion: v1
+kind: Service
 metadata:
-  name: {{ .Chart.Name }}
+  name: {{ template "matchbox.fullname" . }}
   labels:
-    helm.sh/chart: {{ .Chart.Name }}-{{ .Chart.Version | replace "+" "_" }}
-    app: {{ .Chart.Name }}
+    app: {{ template "matchbox.name" . }}
+    chart: {{ template "matchbox.chart" . }}
+    release: {{ .Release.Name }}
 spec:
+{{- if (or (eq .Values.service.type "ClusterIP" "") (empty .Values.service.type)) }}
   type: ClusterIP
-  clusterIP: None
+  {{- if not (empty .Values.service.clusterIP) }}
+  clusterIP: {{ .Values.service.clusterIP }}
+  {{end}}
+{{- else if eq .Values.service.type "LoadBalancer" }}
+  type: {{ .Values.service.type }}
+{{- else }}
+  type: {{ .Values.service.type }}
+{{- end }}
   ports:
-  - name: syncthing-peer
-    port: {{ .Values.syncthing.peerPort }}
+    - name: matchbox
+      port: {{ .Values.service.port }}
+      protocol: TCP
+{{- if (and (eq .Values.service.type "NodePort") ( .Values.service.nodePort)) }}
+      nodePort: {{ .Values.service.nodePort }}
+{{- else }}
+      targetPort: {{ .Values.ports.matchbox }}
+{{- end}}
+
+{{- if .Values.service.externalIPs }}
+  externalIPs:
+{{- range $i , $ip := .Values.service.externalIPs }}
+  - {{ $ip }}
+{{- end }}
+{{- end }}
   selector:
-    app: {{ .Chart.Name }}
+    app: {{ template "matchbox.name" . }}
+    release: {{ .Release.Name }}

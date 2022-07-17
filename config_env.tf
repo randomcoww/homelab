@@ -83,9 +83,8 @@ locals {
     kube_proxy         = 50254
     etcd_client        = 58082
     etcd_peer          = 58083
-    matchbox_http      = 58084
-    matchbox_api       = 50259
-    matchbox_sync      = 50260
+    matchbox_http      = 30001
+    matchbox_api       = 30002
     minio              = 30000
   }
 

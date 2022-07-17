@@ -412,9 +412,9 @@ module "matchbox-syncthing" {
   replica_count       = 2
   resource_name       = "matchbox"
   resource_namespace  = "default"
-  service_name        = "matchbox"
-  sync_data_path      = "/var/tmp/syncthing"
-  syncthing_peer_port = local.ports.matchbox_sync
+  service_name        = "matchbox-sync"
+  sync_data_path      = "/var/tmp/matchbox"
+  syncthing_peer_port = 22000
 }
 
 resource "helm_release" "matchbox" {
@@ -422,11 +422,14 @@ resource "helm_release" "matchbox" {
   namespace  = "default"
   repository = "https://randomcoww.github.io/terraform-infra/"
   chart      = "matchbox"
-  version    = "0.1.9"
+  version    = "0.2.2"
   wait       = false
   values = [
     yamlencode({
-      replicaCount = 2
+      syncthingConfig = module.matchbox-syncthing.config
+      syncthingSecret = module.matchbox-syncthing.secret
+      matchboxSecret  = module.matchbox-certs.secret
+      sharedDataPath  = "/var/tmp/matchbox"
       affinity = {
         nodeAffinity = {
           requiredDuringSchedulingIgnoredDuringExecution = {
@@ -461,19 +464,16 @@ resource "helm_release" "matchbox" {
           ]
         }
       }
-      matchbox = {
-        image    = local.helm_container_images.matchbox
-        secret   = module.matchbox-certs.secret
-        httpPort = local.ports.matchbox_http
-        apiPort  = local.ports.matchbox_api
+      syncService = {
+        port = 22000
       }
-      syncthing = {
-        image    = local.helm_container_images.syncthing
-        podName  = "syncthing"
-        secret   = module.matchbox-syncthing.secret
-        config   = module.matchbox-syncthing.config
-        peerPort = local.ports.matchbox_sync
-        dataPath = "/var/tmp/syncthing"
+      apiService = {
+        type     = "NodePort"
+        nodePort = local.ports.matchbox_api
+      }
+      service = {
+        type     = "NodePort"
+        nodePort = local.ports.matchbox_http
       }
     }),
   ]

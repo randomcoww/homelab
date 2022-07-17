@@ -189,6 +189,8 @@ helm package helm_charts/<chart> -d docs/
 helm repo index --url https://randomcoww.github.io/terraform-infra docs/
 ```
 
+New chart should appear in https://randomcoww.github.io/terraform-infra/index.yaml
+
 ### Container builds
 
 All custom container build Dockerfiles are at https://github.com/randomcoww/container-builds

@@ -1,20 +1,45 @@
-replicaCount: 2
-rollingUpdateWaitSeconds: 20
-matchbox:
-  image: "quay.io/poseidon/matchbox:latest"
-  dataPath: "/var/tmp/matchbox"
-  secret:
-    ca.crt: "ca"
-    server.crt: "crt"
-    server.key: "key"
-  httpPort: 8080
-  apiPort: 8081
+syncthingConfig: ""
 
-syncthing:
-  image: "docker.io/syncthing/syncthing:latest"
-  podName: "syncthing"
-  homePath: "/var/lib/syncthing"
-  peerPort: 22000
-  dataPath: "/var/tmp/syncthing"
-  secret:
-  config: "config"
+syncthingSecret:
+  # cert-pod-0: "crt"
+  # key-pod-0: "key"
+
+matchboxSecret:
+  # ca.crt: "ca"
+  # server.crt: "crt"
+  # server.key: "key"
+
+syncthingHomePath: "/var/lib/syncthing"
+sharedDataPath: "/var/tmp/matchbox"
+
+StatefulSet:
+  replicaCount: 2
+  updateStrategy: "RollingUpdate"
+  minReadySeconds: 20
+
+images:
+  matchbox: "quay.io/poseidon/matchbox:latest"
+  syncthing: "docker.io/syncthing/syncthing:latest"
+
+ports:
+  syncthingPeer: 22000
+  matchbox: 8080
+  matchboxAPI: 8081
+
+affinity: {}
+tolerations: {}
+
+syncService:
+  port: 22000
+
+service:
+  type: NodePort
+  clusterIP: ~
+  port: 8080
+  nodePort: 30010
+
+apiService:
+  type: NodePort
+  clusterIP: ~
+  port: 8081
+  nodePort: 30011

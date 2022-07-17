@@ -1,43 +1,71 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ template "matchbox.fullname" . }}-sync
+  labels:
+    app: {{ template "matchbox.name" . }}
+    chart: {{ template "matchbox.chart" . }}
+    release: "{{ .Release.Name }}"
+spec:
+  type: ClusterIP
+  publishNotReadyAddresses: true
+  clusterIP: None
+  ports:
+  - name: syncthing-peer
+    port: {{ .Values.ports.syncthingPeer }}
+    protocol: TCP
+    targetPort: {{ .Values.syncService.port }}
+  selector:
+    app: {{ template "matchbox.name" . }}
+    release: {{ .Release.Name }}
+
+---
 apiVersion: apps/v1
 kind: StatefulSet
 metadata:
-  name: {{ .Chart.Name }}
+  name: {{ template "matchbox.fullname" . }}
   labels:
-    helm.sh/chart: {{ .Chart.Name }}-{{ .Chart.Version | replace "+" "_" }}
-    app: {{ .Chart.Name }}
+    app: {{ template "matchbox.name" . }}
+    chart: {{ template "matchbox.chart" . }}
+    release: "{{ .Release.Name }}"
 spec:
-  serviceName: {{ .Chart.Name }}
-  replicas: {{ .Values.replicaCount }}
+  serviceName: {{ template "matchbox.fullname" . }}-sync
+  replicas: {{ .Values.StatefulSet.replicaCount }}
   updateStrategy:
-    type: RollingUpdate
-  minReadySeconds: {{ .Values.rollingUpdateWaitSeconds }}
+    type: {{ .Values.StatefulSet.updateStrategy }}
+  minReadySeconds: {{ .Values.StatefulSet.minReadySeconds }}
   selector:
     matchLabels:
-      app: {{ .Chart.Name }}
+      app: {{ template "matchbox.name" . }}
+      release: {{ .Release.Name }}
   template:
     metadata:
       labels:
-        app: {{ .Chart.Name }}
+        app: {{ template "matchbox.name" . }}
+        release: {{ .Release.Name }}
       annotations:
         checksum/config: {{ include (print $.Template.BasePath "/configmap.yaml") . | sha256sum }}
         checksum/secret: {{ include (print $.Template.BasePath "/secret.yaml") . | sha256sum }}
     spec:
-{{- with .Values.affinity }}
+    {{- with .Values.affinity }}
       affinity:
 {{ toYaml . | indent 8 }}
-{{- end }}
+    {{- end }}
+    {{- with .Values.tolerations }}
+      tolerations:
+{{ toYaml . | indent 8 }}
+    {{- end }}
       dnsPolicy: ClusterFirstWithHostNet
-      hostNetwork: true
       restartPolicy: Always
       initContainers:
-      - name: {{ .Values.syncthing.podName }}-init
-        image: {{ .Values.syncthing.image }}
+      - name: {{ .Chart.Name }}-init
+        image: {{ .Values.images.syncthing }}
         command:
         - cp
         - /tmp/config.xml
         - /tmp/cert.pem
         - /tmp/key.pem
-        - {{ .Values.syncthing.homePath }}/
+        - {{ .Values.syncthingHomePath }}/
         env:
         - name: POD_NAME
           valueFrom:
@@ -54,43 +82,43 @@ spec:
           mountPath: /tmp/key.pem
           subPathExpr: key-$(POD_NAME)
         - name: syncthing-home
-          mountPath: {{ .Values.syncthing.homePath }}
+          mountPath: {{ .Values.syncthingHomePath }}
       containers:
-      - name: {{ .Values.syncthing.podName }}
-        image: {{ .Values.syncthing.image }}
+      - name: {{ .Chart.Name }}-sync
+        image: {{ .Values.images.syncthing }}
         command:
         - syncthing
         args:
         - --home
-        - {{ .Values.syncthing.homePath }}
+        - {{ .Values.syncthingHomePath }}
         volumeMounts:
         - name: syncthing-home
-          mountPath: {{ .Values.syncthing.homePath }}
-        - name: data
-          mountPath: {{ .Values.syncthing.dataPath }}
+          mountPath: {{ .Values.syncthingHomePath }}
+        - name: shared-data
+          mountPath: {{ .Values.sharedDataPath }}
         ports:
         - name: syncthing-peer
-          containerPort: {{ .Values.syncthing.peerPort }}
+          containerPort: {{ .Values.ports.syncthingPeer }}
       - name: {{ .Chart.Name }}
-        image: {{ .Values.matchbox.image }}
+        image: {{ .Values.images.matchbox }}
         args:
-        - -address=0.0.0.0:{{ .Values.matchbox.httpPort }}
-        - -rpc-address=0.0.0.0:{{ .Values.matchbox.apiPort }}
-        - -assets-path={{ .Values.matchbox.dataPath }}
-        - -data-path={{ .Values.matchbox.dataPath }}
+        - -address=0.0.0.0:{{ .Values.ports.matchbox }}
+        - -rpc-address=0.0.0.0:{{ .Values.ports.matchboxAPI }}
+        - -assets-path={{ .Values.sharedDataPath }}
+        - -data-path={{ .Values.sharedDataPath }}
         volumeMounts:
         - name: matchbox-tls
           mountPath: /etc/matchbox
-        - name: data
-          mountPath: {{ .Values.matchbox.dataPath }}
+        - name: shared-data
+          mountPath: {{ .Values.sharedDataPath }}
         ports:
         - name: matchbox-api
-          containerPort: {{ .Values.matchbox.apiPort }}
-        - name: matchbox-http
-          containerPort: {{ .Values.matchbox.httpPort }}
+          containerPort: {{ .Values.ports.matchboxAPI }}
+        - name: matchbox
+          containerPort: {{ .Values.ports.matchbox }}
         livenessProbe:
           tcpSocket:
-            port: {{ .Values.matchbox.apiPort }}
+            port: {{ .Values.ports.matchboxAPI }}
           initialDelaySeconds: 5
           periodSeconds: 10
           timeoutSeconds: 5
@@ -99,12 +127,12 @@ spec:
         emptyDir: {}
       - name: syncthing-config
         configMap:
-          name: {{ .Chart.Name }}-{{ .Values.syncthing.podName }}
+          name: {{ template "matchbox.fullname" . }}-syncthing
       - name: syncthing-tls
         secret:
-          secretName: {{ .Chart.Name }}-{{ .Values.syncthing.podName }}
+          secretName: {{ template "matchbox.fullname" . }}-syncthing
       - name: matchbox-tls
         secret:
-          secretName: {{ .Chart.Name }}
-      - name: data
+          secretName: {{ template "matchbox.fullname" . }}
+      - name: shared-data
         emptyDir: {}
