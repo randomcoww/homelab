@@ -1,0 +1,41 @@
+{{ $scheme := "http" }}
+{{- if .Values.tls.enabled }}
+{{ $scheme = "https" }}
+{{ end }}
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ template "mpd.fullname" . }}-ui
+  labels:
+    app: {{ template "mpd.name" . }}
+    chart: {{ template "mpd.chart" . }}
+    release: {{ .Release.Name }}
+spec:
+{{- if (or (eq .Values.uiService.type "ClusterIP" "") (empty .Values.uiService.type)) }}
+  type: ClusterIP
+  {{- if not (empty .Values.uiService.clusterIP) }}
+  clusterIP: {{ .Values.uiService.clusterIP }}
+  {{end}}
+{{- else if eq .Values.uiService.type "LoadBalancer" }}
+  type: {{ .Values.uiService.type }}
+{{- else }}
+  type: {{ .Values.uiService.type }}
+{{- end }}
+  ports:
+    - name: {{ $scheme }}
+      port: {{ .Values.uiService.port }}
+      protocol: TCP
+{{- if (and (eq .Values.uiService.type "NodePort") ( .Values.uiService.nodePort)) }}
+      nodePort: {{ .Values.uiService.nodePort }}
+{{- else }}
+      targetPort: {{ .Values.ports.ympd }}
+{{- end}}
+{{- if .Values.uiService.externalIPs }}
+  externalIPs:
+{{- range $i , $ip := .Values.uiService.externalIPs }}
+  - {{ $ip }}
+{{- end }}
+{{- end }}
+  selector:
+    app: {{ template "mpd.name" . }}
+    release: {{ .Release.Name }}

@@ -1,57 +1,42 @@
-kind: Service
+{{- if .Values.audioOutputs -}}
 apiVersion: v1
+kind: Service
 metadata:
-  name: {{ .Chart.Name }}
+  name: {{ template "mpd.fullname" . }}
   labels:
-    helm.sh/chart: {{ .Chart.Name }}-{{ .Chart.Version | replace "+" "_" }}
-    app: {{ .Chart.Name }}
+    app: {{ template "mpd.name" . }}
+    chart: {{ template "mpd.chart" . }}
+    release: {{ .Release.Name }}
 spec:
+{{- if (or (eq .Values.service.type "ClusterIP" "") (empty .Values.service.type)) }}
   type: ClusterIP
+  {{- if not (empty .Values.service.clusterIP) }}
+  clusterIP: {{ .Values.service.clusterIP }}
+  {{end}}
+{{- else if eq .Values.service.type "LoadBalancer" }}
+  type: {{ .Values.service.type }}
+{{- else }}
+  type: {{ .Values.service.type }}
+{{- end }}
   ports:
-  - name: ympd-ui
-    port: {{ .Values.ympd.uiPort }}
 {{- range $audioOutput := .Values.audioOutputs }}
-  - name: {{ $audioOutput.name }}
-    port: {{ $audioOutput.port }}
+    - name: {{ $audioOutput.name }}
+      port: {{ $audioOutput.port }}
+      protocol: TCP
+{{- if (and (eq $.Values.service.type "NodePort") ( $audioOutput.nodePort)) }}
+      nodePort: {{ $audioOutput.nodePort }}
+{{- else }}
+      targetPort: {{ $audioOutput.port }}
+{{- end }}
+{{- end }}
+
+{{- if .Values.service.externalIPs }}
+  externalIPs:
+{{- range $i , $ip := .Values.service.externalIPs }}
+  - {{ $ip }}
+{{- end }}
 {{- end }}
   selector:
-    app: {{ .Chart.Name }}
-
----
-apiVersion: networking.k8s.io/v1
-kind: Ingress
-metadata:
-  labels:
-    helm.sh/chart: {{ .Chart.Name }}-{{ .Chart.Version | replace "+" "_" }}
-    app: {{ .Chart.Name }}
-  name: {{ .Chart.Name }}
-{{- with .Values.ingress.annotations }}
-  annotations:
-{{ toYaml . | indent 4 }}
-{{- end }}
-spec:
-  ingressClassName: {{ .Values.ingress.className }}
-  tls:
-  - hosts:
-    - {{ .Values.ingress.host }}
-    secretName: {{ .Values.ingress.certSecretName }}
-  rules:
-  - host: {{ .Values.ingress.host }}
-    http:
-      paths:
-      - path: /
-        pathType: Prefix
-        backend:
-          service:
-            name: {{ .Chart.Name }}
-            port:
-              number: {{ .Values.ympd.uiPort }}
-{{- range $audioOutput := .Values.audioOutputs }}
-      - path: /{{ $audioOutput.name }}
-        pathType: Prefix
-        backend:
-          service:
-            name: {{ $.Chart.Name }}
-            port:
-              number: {{ $audioOutput.port }}
+    app: {{ template "mpd.name" . }}
+    release: {{ .Release.Name }}
 {{- end }}

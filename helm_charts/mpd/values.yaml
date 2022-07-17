@@ -1,34 +1,90 @@
-mpd:
-  image: ghcr.io/randomcoww/mpd:0.23.7
-  controlPort: 6600
-  cachePath: /mpd/cache
-
-ympd:
-  image: ghcr.io/randomcoww/ympd:latest
-  uiPort: 8080
-
-rclone:
-  image: docker.io/rclone/rclone:latest
-  minioEndPoint: http://minio.default:9000
-  minioBucket: music
-  webDavPort: 58080
-
-ingress:
-  annotations:
-  host: mpd.local
-  className: nginx
-  certSecretName: mpd-tls
-
-storageClass: local-storage
 config:
-# filesystem_charset: UTF-8
+  # filesystem_charset: UTF-8
 audioOutputs:
 # - name: flac-3
 #   port: 8082
 #   config:
-#     tags: yes
+#     tags: "yes"
 #     format: "48000:24:2"
-#     always_on: yes
+#     always_on: "yes"
 #     encoder: flac
 #     compression: 3
 #     max_clients: 0
+# - name: lame-9
+#   port: 8083
+#   config:
+#     tags: "yes"
+#     format: "48000:24:2"
+#     always_on: "yes"
+#     encoder: lame
+#     quality: 9
+#     max_clients: 0
+
+tls:
+  enabled: true
+
+minioEndPoint: http://minio.default.svc:9000
+minioBucket: music
+
+# Needs common local database - only works with 1 PV
+persistence:
+  accessMode: ReadWriteOnce
+  size: 100M
+  storageClass: local-path
+
+images:
+  mpd: ghcr.io/randomcoww/mpd:0.23.8
+  ympd: ghcr.io/randomcoww/ympd:latest
+  rclone: docker.io/rclone/rclone:latest
+
+ports:
+  ympd: 8080
+  mpdControl: 6600
+  rclone: 8081
+
+mpdCachePath: /mpd/cache
+
+affinity: {}
+tolerations: {}
+
+service:
+  type: ClusterIP
+
+uiService:
+  type: ClusterIP
+  port: 8080
+
+ingress:
+  enabled: true
+  annotations:
+    # "cert-manager.io/issuer":                            "letsencrypt"
+    # "nginx.ingress.kubernetes.io/auth-response-headers": "Remote-User,Remote-Name,Remote-Groups,Remote-Email"
+    # "nginx.ingress.kubernetes.io/auth-signin":          "https://auth.local"
+    # "nginx.ingress.kubernetes.io/auth-snippet": |
+    #   proxy_set_header X-Forwarded-Method $request_method;
+    # "nginx.ingress.kubernetes.io/auth-url":              "http://ath.default.svc/api/verify"
+  ingressClassName: nginx
+  tls:
+  # - secretName: chart-example-tls
+  #   hosts:
+  #     - chart-example.local
+  hosts:
+  # - chart-example.local
+
+uiIngress:
+  enabled: true
+  annotations:
+    # "cert-manager.io/issuer":                            "letsencrypt"
+    # "nginx.ingress.kubernetes.io/auth-response-headers": "Remote-User,Remote-Name,Remote-Groups,Remote-Email"
+    # "nginx.ingress.kubernetes.io/auth-signin":          "https://auth.local"
+    # "nginx.ingress.kubernetes.io/auth-snippet": |
+    #   proxy_set_header X-Forwarded-Method $request_method;
+    # "nginx.ingress.kubernetes.io/auth-url":              "http://ath.default.svc/api/verify"
+  path: /
+  ingressClassName: nginx
+  tls:
+  # - secretName: chart-example-tls
+  #   hosts:
+  #     - chart-example.local
+  hosts:
+  # - chart-example.local

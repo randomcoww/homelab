@@ -1,83 +1,100 @@
 apiVersion: apps/v1
 kind: StatefulSet
 metadata:
-  name: {{ .Chart.Name }}
+  name: {{ template "mpd.fullname" . }}
   labels:
-    helm.sh/chart: {{ .Chart.Name }}-{{ .Chart.Version | replace "+" "_" }}
-    app: {{ .Chart.Name }}
+    app: {{ template "mpd.name" . }}
+    chart: {{ template "mpd.chart" . }}
+    release: "{{ .Release.Name }}"
 spec:
-  serviceName: {{ .Chart.Name }}
+  serviceName: {{ template "mpd.fullname" . }}
+  # Needs common database - only works with 1 replica
   replicas: 1
-  updateStrategy:
-    type: RollingUpdate
   selector:
     matchLabels:
-      app: {{ .Chart.Name }}
+      app: {{ template "mpd.name" . }}
+      release: {{ .Release.Name }}
   template:
     metadata:
       labels:
-        app: {{ .Chart.Name }}
+        app: {{ template "mpd.name" . }}
+        release: {{ .Release.Name }}
       annotations:
-        checksum/config: {{ include (print $.Template.BasePath "/configmap.yaml") . | sha256sum }}
-        checksum/pvc: {{ include (print $.Template.BasePath "/pvc.yaml") . | sha256sum }}
+        checksum/config: {{ include (print $.Template.BasePath "/secret.yaml") . | sha256sum }}
     spec:
-{{- with .Values.affinity }}
+    {{- with .Values.affinity }}
       affinity:
 {{ toYaml . | indent 8 }}
-{{- end }}
+    {{- end }}
+    {{- with .Values.tolerations }}
+      tolerations:
+{{ toYaml . | indent 8 }}
+    {{- end }}
       dnsPolicy: ClusterFirstWithHostNet
       restartPolicy: Always
       initContainers:
-      - name: mpd-init
-        image: {{ .Values.mpd.image }}
+      - name: {{ .Chart.Name }}-init
+        image: {{ .Values.images.mpd }}
         command:
         - sh
         - -c
         - |
-          mkdir -p {{ .Values.mpd.cachePath }}/playlists && \
+          mkdir -p {{ .Values.mpdCachePath }}/playlists && \
           touch \
-            {{ .Values.mpd.cachePath }}/tag_cache \
-            {{ .Values.mpd.cachePath }}/state \
-            {{ .Values.mpd.cachePath }}/sticker.sql
+            {{ .Values.mpdCachePath }}/tag_cache \
+            {{ .Values.mpdCachePath }}/state \
+            {{ .Values.mpdCachePath }}/sticker.sql
         volumeMounts:
         - name: mpd-cache
-          mountPath: {{ .Values.mpd.cachePath }}
+          mountPath: {{ .Values.mpdCachePath }}
       containers:
-      - name: mpd
-        image: {{ .Values.mpd.image }}
+      - name: {{ .Chart.Name }}
+        image: {{ .Values.images.mpd }}
         args: ["--stdout", "/etc/mpd.conf"]
         volumeMounts:
         - name: mpd-config
           mountPath: /etc/mpd.conf
           subPath: mpd.conf
         - name: mpd-cache
-          mountPath: {{ .Values.mpd.cachePath }}
+          mountPath: {{ .Values.mpdCachePath }}
         ports:
-{{- range $audioOutput := .Values.audioOutputs }}
+        {{- range $audioOutput := .Values.audioOutputs }}
         - containerPort: {{ $audioOutput.port }}
-{{- end }}
-      - name: ympd
-        imagePullPolicy: Always
-        image: {{ .Values.ympd.image }}
-        args: ["-h", "127.0.0.1", "-p", "{{ .Values.mpd.controlPort }}", "-w", "{{ .Values.ympd.uiPort }}"]
+        {{- end }}
+      - name: {{ .Chart.Name }}-ympd
+        image: {{ .Values.images.ympd }}
+        args: ["-h", "127.0.0.1", "-p", "{{ .Values.ports.mpdControl }}", "-w", "{{ .Values.ports.ympd }}"]
         ports:
-        - containerPort: {{ .Values.ympd.uiPort }}
-      - name: rclone
+        - containerPort: {{ .Values.ports.ympd }}
+      - name: {{ .Chart.Name }}-rclone
         imagePullPolicy: Always
-        image: {{ .Values.rclone.image }}
+        image: {{ .Values.images.rclone }}
         args:
-        - serve
-        - webdav
-        - --addr=127.0.0.1:{{ .Values.rclone.webDavPort }}
-        - :s3:{{ .Values.rclone.minioBucket }}
-        - --s3-provider=Minio
-        - --s3-endpoint={{ .Values.rclone.minioEndPoint }}
-        - --no-modtime
-        - --read-only
+        - "serve"
+        - "webdav"
+        - "--addr=127.0.0.1:{{ .Values.ports.rclone }}"
+        - ":s3:{{ .Values.minioBucket }}"
+        - "--s3-provider=Minio"
+        - "--s3-endpoint={{ .Values.minioEndPoint }}"
+        - "--no-modtime"
+        - "--read-only"
       volumes:
       - name: mpd-config
-        configMap:
-          name: mpd
-      - name: mpd-cache
-        persistentVolumeClaim:
-          claimName: mpd-cache
+        secret:
+          secretName: {{ template "mpd.fullname" . }}
+  volumeClaimTemplates:
+  - metadata:
+      name: mpd-cache
+    {{- if .Values.persistence.annotations }}
+      annotations:
+{{ toYaml .Values.persistence.annotations | trimSuffix "\n" | indent 8 }}
+    {{- end }}
+    spec:
+      accessModes:
+      - {{ .Values.persistence.accessMode | quote }}
+      resources:
+        requests:
+          storage: {{ .Values.persistence.size | quote }}
+    {{- if .Values.persistence.storageClass }}
+      storageClassName: "{{ .Values.persistence.storageClass }}"
+    {{- end }}

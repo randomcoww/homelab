@@ -587,7 +587,7 @@ resource "helm_release" "hostapd" {
   wait       = false
   values = [
     yamlencode({
-      image        = local.helm_container_images.hostapd
+      image = local.helm_container_images.hostapd
       config = {
         interface        = "wlan0"
         preamble         = 1
@@ -657,37 +657,10 @@ resource "helm_release" "mpd" {
   namespace  = "default"
   repository = "https://randomcoww.github.io/terraform-infra/"
   chart      = "mpd"
-  version    = "0.2.16"
+  version    = "0.3.2"
   wait       = false
   values = [
     yamlencode({
-      mpd = {
-        image     = local.helm_container_images.mpd
-        cachePath = "/mpd/cache"
-      }
-      ympd = {
-        image = local.helm_container_images.ympd
-      }
-      rclone = {
-        image         = local.helm_container_images.rclone
-        minioEndPoint = "http://minio.default:9000"
-        minioBucket   = "music"
-      }
-      ingress = {
-        host           = local.helm_ingress.mpd
-        className      = "nginx"
-        certSecretName = "mpd-tls"
-        annotations = {
-          "cert-manager.io/issuer"                            = "letsencrypt-prod"
-          "nginx.ingress.kubernetes.io/auth-response-headers" = "Remote-User,Remote-Name,Remote-Groups,Remote-Email"
-          "nginx.ingress.kubernetes.io/auth-signin"           = "https://${local.helm_ingress.auth}"
-          "nginx.ingress.kubernetes.io/auth-snippet"          = <<EOF
-proxy_set_header X-Forwarded-Method $request_method;
-EOF
-          "nginx.ingress.kubernetes.io/auth-url"              = "http://authelia.authelia.svc.${local.domains.kubernetes}/api/verify"
-        }
-      }
-      storageClass = "openebs-jiva-csi-default"
       config = {
         filesystem_charset = "UTF-8"
         auto_update        = "yes"
@@ -718,6 +691,65 @@ EOF
           }
         },
       ]
+      minioEndPoint = "http://minio.default:9000"
+      minioBucket   = "music"
+      persistence = {
+        storageClass = "openebs-jiva-csi-default"
+      }
+      images = {
+        mpd    = local.helm_container_images.mpd
+        ympd   = local.helm_container_images.ympd
+        rclone = local.helm_container_images.rclone
+      }
+      ingress = {
+        enabled          = true
+        ingressClassName = "nginx"
+        annotations = {
+          "cert-manager.io/issuer"                            = "letsencrypt-prod"
+          "nginx.ingress.kubernetes.io/auth-response-headers" = "Remote-User,Remote-Name,Remote-Groups,Remote-Email"
+          "nginx.ingress.kubernetes.io/auth-signin"           = "https://${local.helm_ingress.auth}"
+          "nginx.ingress.kubernetes.io/auth-snippet"          = <<EOF
+proxy_set_header X-Forwarded-Method $request_method;
+EOF
+          "nginx.ingress.kubernetes.io/auth-url"              = "http://authelia.authelia.svc.${local.domains.kubernetes}/api/verify"
+        }
+        tls = [
+          {
+            secretName = "mpd-tls"
+            hosts = [
+              local.helm_ingress.mpd,
+            ]
+          },
+        ]
+        hosts = [
+          local.helm_ingress.mpd,
+        ]
+      }
+      uiIngress = {
+        enabled          = true
+        ingressClassName = "nginx"
+        path             = "/"
+        annotations = {
+          "cert-manager.io/issuer"                            = "letsencrypt-prod"
+          "nginx.ingress.kubernetes.io/auth-response-headers" = "Remote-User,Remote-Name,Remote-Groups,Remote-Email"
+          "nginx.ingress.kubernetes.io/auth-signin"           = "https://${local.helm_ingress.auth}"
+          "nginx.ingress.kubernetes.io/auth-snippet"          = <<EOF
+proxy_set_header X-Forwarded-Method $request_method;
+EOF
+          "nginx.ingress.kubernetes.io/auth-url"              = "http://authelia.authelia.svc.${local.domains.kubernetes}/api/verify"
+        }
+        tls = [
+          {
+            secretName = "mpd-tls"
+            hosts = [
+              local.helm_ingress.mpd,
+            ]
+          },
+        ]
+        hosts = [
+          local.helm_ingress.mpd,
+        ]
+      }
     }),
   ]
 }
