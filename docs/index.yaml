@@ -3,7 +3,17 @@ entries:
   cluster-services:
   - apiVersion: v2
     appVersion: 1.16.0
-    created: "2022-07-18T13:15:07.335407243-07:00"
+    created: "2022-07-18T13:20:37.455141434-07:00"
+    description: Basic cluster services with minimal configuration
+    digest: 7921c439650aafb191dfc0e3bbecb41ba24a5e5bc2988f4984b0518b15ea5120
+    name: cluster-services
+    type: application
+    urls:
+    - https://randomcoww.github.io/terraform-infra/cluster-services-0.2.4.tgz
+    version: 0.2.4
+  - apiVersion: v2
+    appVersion: 1.16.0
+    created: "2022-07-18T13:20:37.454702687-07:00"
     description: Basic cluster services with minimal configuration
     digest: 598a7d62e6f0b54e3ff8e0996817aaa9bdbd6ed78d441ba7fd1b53235e62445c
     name: cluster-services
@@ -13,7 +23,7 @@ entries:
     version: 0.2.3
   - apiVersion: v2
     appVersion: 1.16.0
-    created: "2022-07-18T13:15:07.334509215-07:00"
+    created: "2022-07-18T13:20:37.454185507-07:00"
     description: Basic cluster services with minimal configuration
     digest: 62a3a551071dfc1d60f937a45e2d78125e88e8ec77fee8db26fbb5d01b6833a8
     name: cluster-services
@@ -23,7 +33,7 @@ entries:
     version: 0.2.2
   - apiVersion: v2
     appVersion: 1.16.0
-    created: "2022-07-18T13:15:07.334274616-07:00"
+    created: "2022-07-18T13:20:37.453918641-07:00"
     description: Basic cluster services with minimal configuration
     digest: a0cd5a1ec7350e3449b54d0ed9e7bc83b9700e96e5f8bc6ab7917fab958c4e09
     name: cluster-services
@@ -33,7 +43,7 @@ entries:
     version: 0.2.0
   - apiVersion: v2
     appVersion: 1.16.0
-    created: "2022-07-18T13:15:07.333997762-07:00"
+    created: "2022-07-18T13:20:37.453648143-07:00"
     description: Basic cluster services with minimal configuration
     digest: 50a4352f9eb00caca217ee29ab1c508166bf5ef401219bb5fbda98bf5830727d
     name: cluster-services
@@ -44,7 +54,7 @@ entries:
   external-dns:
   - apiVersion: v2
     appVersion: 1.16.0
-    created: "2022-07-18T13:15:07.338332783-07:00"
+    created: "2022-07-18T13:20:37.458496782-07:00"
     description: external-dns
     digest: d450d221f7ae17209120e4cf71a183a4ffa3184f7efc3d1f35f2718b16d8e137
     name: external-dns
@@ -54,7 +64,7 @@ entries:
     version: 0.1.9
   - apiVersion: v2
     appVersion: 1.16.0
-    created: "2022-07-18T13:15:07.338058653-07:00"
+    created: "2022-07-18T13:20:37.458192061-07:00"
     description: external-dns
     digest: a9a4e45039ab207c289d99cd9be6d905486327f29ed59bb5def2ae1dd9b0917d
     name: external-dns
@@ -64,7 +74,7 @@ entries:
     version: 0.1.8
   - apiVersion: v2
     appVersion: 1.16.0
-    created: "2022-07-18T13:15:07.337712307-07:00"
+    created: "2022-07-18T13:20:37.457770285-07:00"
     description: external-dns
     digest: 8ae05ebb2b5fd847e995abb0b7f1e0741ec42c0e383c69c2e791c757c66041d0
     name: external-dns
@@ -74,7 +84,7 @@ entries:
     version: 0.1.7
   - apiVersion: v2
     appVersion: 1.16.0
-    created: "2022-07-18T13:15:07.337465904-07:00"
+    created: "2022-07-18T13:20:37.457418422-07:00"
     description: external-dns
     digest: 2415a24f63663fd1b9934fc8dd9cbc8f272f5ebdc51d0cb0d66ce370f5073bf9
     name: external-dns
@@ -84,7 +94,7 @@ entries:
     version: 0.1.6
   - apiVersion: v2
     appVersion: 1.16.0
-    created: "2022-07-18T13:15:07.337234937-07:00"
+    created: "2022-07-18T13:20:37.45706132-07:00"
     description: external-dns
     digest: 56dd738f9e0882e4b429d8cd086e5e0653e35d28bb7ffba0a0b61e106f9728a2
     name: external-dns
@@ -94,7 +104,7 @@ entries:
     version: 0.1.5
   - apiVersion: v2
     appVersion: 1.16.0
-    created: "2022-07-18T13:15:07.336953474-07:00"
+    created: "2022-07-18T13:20:37.456776504-07:00"
     description: external-dns
     digest: 6ba05c20b4d9a056cbaa0c198d827b92ca39d38cb42b366d4dbd22ddcf6d9565
     name: external-dns
@@ -104,7 +114,7 @@ entries:
     version: 0.1.4
   - apiVersion: v2
     appVersion: 1.16.0
-    created: "2022-07-18T13:15:07.336711472-07:00"
+    created: "2022-07-18T13:20:37.456509498-07:00"
     description: external-dns
     digest: 657343051a62f84f3a87364d151d4dd88a4a4544a5b3d47124e7bb1ca6593d93
     name: external-dns
@@ -114,7 +124,7 @@ entries:
     version: 0.1.3
   - apiVersion: v2
     appVersion: 1.16.0
-    created: "2022-07-18T13:15:07.336448586-07:00"
+    created: "2022-07-18T13:20:37.456215603-07:00"
     description: external-dns
     digest: 19d9b86a6c3990f92077b3911b0f9997ecb553994f1722a85dbac694d9177bc4
     name: external-dns
@@ -124,7 +134,7 @@ entries:
     version: 0.1.2
   - apiVersion: v2
     appVersion: 1.16.0
-    created: "2022-07-18T13:15:07.336179904-07:00"
+    created: "2022-07-18T13:20:37.455856546-07:00"
     description: external-dns
     digest: 375b0486bbcef4a629c89f4842405be46f605c25faf469a70c279519c789148d
     name: external-dns
@@ -134,7 +144,7 @@ entries:
     version: 0.1.1
   - apiVersion: v2
     appVersion: 1.16.0
-    created: "2022-07-18T13:15:07.335874206-07:00"
+    created: "2022-07-18T13:20:37.455508803-07:00"
     description: external-dns
     digest: 6cf67376ac0bbc817937384d5c59a82f1c745da552fd30b192f5c37e0bba8a92
     name: external-dns
@@ -145,7 +155,7 @@ entries:
   helm-wrapper:
   - apiVersion: v2
     appVersion: 1.16.0
-    created: "2022-07-18T13:15:07.33844467-07:00"
+    created: "2022-07-18T13:20:37.458645824-07:00"
     description: Wrap any manifest in helm to use terraform helm provider
     digest: 989d53ce105071d0d3dab9d3d82727313d60bf4d4399ce72ae3cdfbe641df53f
     name: helm-wrapper
@@ -156,7 +166,7 @@ entries:
   hostapd:
   - apiVersion: v2
     appVersion: 1.16.0
-    created: "2022-07-18T13:15:07.338615713-07:00"
+    created: "2022-07-18T13:20:37.458890481-07:00"
     description: A Helm chart for Kubernetes
     digest: e071fad30fd8707a319d80656a38cdd00e6a4824f95e46204ef403c789e749a4
     name: hostapd
@@ -167,7 +177,7 @@ entries:
   kube-dns:
   - apiVersion: v2
     appVersion: 1.16.0
-    created: "2022-07-18T13:15:07.338902903-07:00"
+    created: "2022-07-18T13:20:37.459305272-07:00"
     description: kube-dns
     digest: 4df12e37b29b24bd2da08e25803bea114304e48c87ec3be4162fd2c7b02dfce6
     name: kube-dns
@@ -178,7 +188,7 @@ entries:
   matchbox:
   - apiVersion: v2
     appVersion: 1.16.0
-    created: "2022-07-18T13:15:07.339149166-07:00"
+    created: "2022-07-18T13:20:37.459634787-07:00"
     description: Matchbox PXE boot
     digest: a035bdd819d9ab963a5a60701f538a3a84e6e0ca77cee16ae4660d827faf556f
     name: matchbox
@@ -189,7 +199,7 @@ entries:
   mpd:
   - apiVersion: v2
     appVersion: 1.16.0
-    created: "2022-07-18T13:15:07.339417638-07:00"
+    created: "2022-07-18T13:20:37.460033794-07:00"
     description: A Helm chart for Kubernetes
     digest: b4485f10b6dca08a36213022afb9f969310c6d7b3971432a7cda90b67de7ca40
     name: mpd
@@ -197,4 +207,4 @@ entries:
     urls:
     - https://randomcoww.github.io/terraform-infra/mpd-0.3.2.tgz
     version: 0.3.2
-generated: "2022-07-18T13:15:07.333528284-07:00"
+generated: "2022-07-18T13:20:37.453239777-07:00"
