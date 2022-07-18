@@ -3,9 +3,9 @@ entries:
   cluster-services:
   - apiVersion: v2
     appVersion: 1.16.0
-    created: "2022-07-18T00:52:52.668573752-07:00"
+    created: "2022-07-18T02:15:23.524537331-07:00"
     description: Basic cluster services with minimal configuration
-    digest: c8f32eb50d4223d2473f970ed75a221c3c8b125a0cacaeff038818ed0cfc12f7
+    digest: a0cd5a1ec7350e3449b54d0ed9e7bc83b9700e96e5f8bc6ab7917fab958c4e09
     name: cluster-services
     type: application
     urls:
@@ -13,7 +13,7 @@ entries:
     version: 0.2.0
   - apiVersion: v2
     appVersion: 1.16.0
-    created: "2022-07-18T00:52:52.668308213-07:00"
+    created: "2022-07-18T02:15:23.52430343-07:00"
     description: Basic cluster services with minimal configuration
     digest: 50a4352f9eb00caca217ee29ab1c508166bf5ef401219bb5fbda98bf5830727d
     name: cluster-services
@@ -21,10 +21,21 @@ entries:
     urls:
     - https://randomcoww.github.io/terraform-infra/cluster-services-0.1.8.tgz
     version: 0.1.8
+  external-dns:
+  - apiVersion: v2
+    appVersion: 1.16.0
+    created: "2022-07-18T02:15:23.524795257-07:00"
+    description: external-dns
+    digest: b4541b1fc128ada8f7f94470b7427d08c642a26d0d4dffd2e6530d077041ff91
+    name: external-dns
+    type: application
+    urls:
+    - https://randomcoww.github.io/terraform-infra/external-dns-0.1.0.tgz
+    version: 0.1.0
   helm-wrapper:
   - apiVersion: v2
     appVersion: 1.16.0
-    created: "2022-07-18T00:52:52.668684032-07:00"
+    created: "2022-07-18T02:15:23.524893804-07:00"
     description: Wrap any manifest in helm to use terraform helm provider
     digest: aed2ee8657c15c0a823c2acf5a1772dab88249b042ff3368d0ea2039746ba50b
     name: helm-wrapper
@@ -35,7 +46,7 @@ entries:
   hostapd:
   - apiVersion: v2
     appVersion: 1.16.0
-    created: "2022-07-18T00:52:52.668873933-07:00"
+    created: "2022-07-18T02:15:23.52529777-07:00"
     description: A Helm chart for Kubernetes
     digest: 424e23facff051dac6a9a9a0d8870baecbc9d21cbd8fb4ae66c7d8e06f91d8c0
     name: hostapd
@@ -46,7 +57,7 @@ entries:
   kube-dns:
   - apiVersion: v2
     appVersion: 1.16.0
-    created: "2022-07-18T00:52:52.669221187-07:00"
+    created: "2022-07-18T02:15:23.526215074-07:00"
     description: kube-dns
     digest: 4df12e37b29b24bd2da08e25803bea114304e48c87ec3be4162fd2c7b02dfce6
     name: kube-dns
@@ -57,7 +68,7 @@ entries:
   matchbox:
   - apiVersion: v2
     appVersion: 1.16.0
-    created: "2022-07-18T00:52:52.669990706-07:00"
+    created: "2022-07-18T02:15:23.526778699-07:00"
     description: Matchbox PXE boot
     digest: a035bdd819d9ab963a5a60701f538a3a84e6e0ca77cee16ae4660d827faf556f
     name: matchbox
@@ -68,7 +79,7 @@ entries:
   mpd:
   - apiVersion: v2
     appVersion: 1.16.0
-    created: "2022-07-18T00:52:52.670385522-07:00"
+    created: "2022-07-18T02:15:23.527156823-07:00"
     description: A Helm chart for Kubernetes
     digest: f48892fd174e17f9503ac2737435ca80987cabe64670831825e12bfe523ad3f9
     name: mpd
@@ -76,4 +87,4 @@ entries:
     urls:
     - https://randomcoww.github.io/terraform-infra/mpd-0.3.2.tgz
     version: 0.3.2
-generated: "2022-07-18T00:52:52.667857872-07:00"
+generated: "2022-07-18T02:15:23.523897299-07:00"
