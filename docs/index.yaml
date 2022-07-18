@@ -3,7 +3,7 @@ entries:
   cluster-services:
   - apiVersion: v2
     appVersion: 1.16.0
-    created: "2022-07-18T10:57:38.074487381-07:00"
+    created: "2022-07-18T11:22:14.781855545-07:00"
     description: Basic cluster services with minimal configuration
     digest: a0cd5a1ec7350e3449b54d0ed9e7bc83b9700e96e5f8bc6ab7917fab958c4e09
     name: cluster-services
@@ -13,7 +13,7 @@ entries:
     version: 0.2.0
   - apiVersion: v2
     appVersion: 1.16.0
-    created: "2022-07-18T10:57:38.074296013-07:00"
+    created: "2022-07-18T11:22:14.781598875-07:00"
     description: Basic cluster services with minimal configuration
     digest: 50a4352f9eb00caca217ee29ab1c508166bf5ef401219bb5fbda98bf5830727d
     name: cluster-services
@@ -24,7 +24,17 @@ entries:
   external-dns:
   - apiVersion: v2
     appVersion: 1.16.0
-    created: "2022-07-18T10:57:38.076046744-07:00"
+    created: "2022-07-18T11:22:14.784621915-07:00"
+    description: external-dns
+    digest: 6ba05c20b4d9a056cbaa0c198d827b92ca39d38cb42b366d4dbd22ddcf6d9565
+    name: external-dns
+    type: application
+    urls:
+    - https://randomcoww.github.io/terraform-infra/external-dns-0.1.4.tgz
+    version: 0.1.4
+  - apiVersion: v2
+    appVersion: 1.16.0
+    created: "2022-07-18T11:22:14.784214038-07:00"
     description: external-dns
     digest: 657343051a62f84f3a87364d151d4dd88a4a4544a5b3d47124e7bb1ca6593d93
     name: external-dns
@@ -34,7 +44,7 @@ entries:
     version: 0.1.3
   - apiVersion: v2
     appVersion: 1.16.0
-    created: "2022-07-18T10:57:38.075205846-07:00"
+    created: "2022-07-18T11:22:14.783763348-07:00"
     description: external-dns
     digest: 19d9b86a6c3990f92077b3911b0f9997ecb553994f1722a85dbac694d9177bc4
     name: external-dns
@@ -44,7 +54,7 @@ entries:
     version: 0.1.2
   - apiVersion: v2
     appVersion: 1.16.0
-    created: "2022-07-18T10:57:38.074962237-07:00"
+    created: "2022-07-18T11:22:14.783322505-07:00"
     description: external-dns
     digest: 375b0486bbcef4a629c89f4842405be46f605c25faf469a70c279519c789148d
     name: external-dns
@@ -54,7 +64,7 @@ entries:
     version: 0.1.1
   - apiVersion: v2
     appVersion: 1.16.0
-    created: "2022-07-18T10:57:38.07472638-07:00"
+    created: "2022-07-18T11:22:14.782349676-07:00"
     description: external-dns
     digest: 6cf67376ac0bbc817937384d5c59a82f1c745da552fd30b192f5c37e0bba8a92
     name: external-dns
@@ -65,7 +75,7 @@ entries:
   helm-wrapper:
   - apiVersion: v2
     appVersion: 1.16.0
-    created: "2022-07-18T10:57:38.076185031-07:00"
+    created: "2022-07-18T11:22:14.784754056-07:00"
     description: Wrap any manifest in helm to use terraform helm provider
     digest: aed2ee8657c15c0a823c2acf5a1772dab88249b042ff3368d0ea2039746ba50b
     name: helm-wrapper
@@ -76,7 +86,7 @@ entries:
   hostapd:
   - apiVersion: v2
     appVersion: 1.16.0
-    created: "2022-07-18T10:57:38.07642864-07:00"
+    created: "2022-07-18T11:22:14.784978877-07:00"
     description: A Helm chart for Kubernetes
     digest: 424e23facff051dac6a9a9a0d8870baecbc9d21cbd8fb4ae66c7d8e06f91d8c0
     name: hostapd
@@ -87,7 +97,7 @@ entries:
   kube-dns:
   - apiVersion: v2
     appVersion: 1.16.0
-    created: "2022-07-18T10:57:38.076801387-07:00"
+    created: "2022-07-18T11:22:14.785496685-07:00"
     description: kube-dns
     digest: 4df12e37b29b24bd2da08e25803bea114304e48c87ec3be4162fd2c7b02dfce6
     name: kube-dns
@@ -98,7 +108,7 @@ entries:
   matchbox:
   - apiVersion: v2
     appVersion: 1.16.0
-    created: "2022-07-18T10:57:38.077142845-07:00"
+    created: "2022-07-18T11:22:14.785969376-07:00"
     description: Matchbox PXE boot
     digest: a035bdd819d9ab963a5a60701f538a3a84e6e0ca77cee16ae4660d827faf556f
     name: matchbox
@@ -109,7 +119,7 @@ entries:
   mpd:
   - apiVersion: v2
     appVersion: 1.16.0
-    created: "2022-07-18T10:57:38.077581732-07:00"
+    created: "2022-07-18T11:22:14.786576093-07:00"
     description: A Helm chart for Kubernetes
     digest: f48892fd174e17f9503ac2737435ca80987cabe64670831825e12bfe523ad3f9
     name: mpd
@@ -117,4 +127,4 @@ entries:
     urls:
     - https://randomcoww.github.io/terraform-infra/mpd-0.3.2.tgz
     version: 0.3.2
-generated: "2022-07-18T10:57:38.073910416-07:00"
+generated: "2022-07-18T11:22:14.781137988-07:00"
