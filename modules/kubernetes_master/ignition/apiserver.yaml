@@ -77,20 +77,20 @@ storage:
               - name: certs
                 mountPath: ${certs_path}
                 readOnly: true
-              readinessProbe:
-                httpGet:
-                  scheme: HTTPS
-                  host: 127.0.0.1
-                  port: ${apiserver_port}
-                  path: /readyz
-                initialDelaySeconds: 15
-                timeoutSeconds: 15
               livenessProbe:
                 httpGet:
                   scheme: HTTPS
                   host: 127.0.0.1
                   port: ${apiserver_port}
                   path: /healthz
+                initialDelaySeconds: 15
+                timeoutSeconds: 15
+              readinessProbe:
+                httpGet:
+                  scheme: HTTPS
+                  host: 127.0.0.1
+                  port: ${apiserver_port}
+                  path: /readyz
                 initialDelaySeconds: 15
                 timeoutSeconds: 15
             volumes:

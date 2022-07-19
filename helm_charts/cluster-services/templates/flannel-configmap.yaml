@@ -1,16 +1,17 @@
----
+{{- $fullName := "flannel" -}}
 kind: ConfigMap
 apiVersion: v1
 metadata:
-  name: flannel
+  name: {{ $fullName }}
   labels:
-    helm.sh/chart: {{ .Chart.Name }}-{{ .Chart.Version | replace "+" "_" }}
-    k8s-app: flannel
+    app: {{ $fullName }}
+    chart: {{ template "cluster-services.chart" . }}
+    release: "{{ .Release.Name }}"
 data:
   cni-conf.json: |
     {
       "name": "cbr0",
-      "cniVersion": "0.3.1",
+      "cniVersion": "{{ .Values.cniVersion }}",
       "plugins": [
         {
           "type": "flannel",
@@ -18,7 +19,7 @@ data:
             "type": "bridge",
             "hairpinMode": true,
             "isDefaultGateway": true,
-            "bridge": "{{ .Values.cni_bridge_interface_name }}"
+            "bridge": "{{ .Values.cniInterfaceName }}"
           }
         },
         {
@@ -31,7 +32,7 @@ data:
     }
   net-conf.json: |
     {
-      "Network": "{{ .Values.pod_network_prefix }}",
+      "Network": "{{ .Values.podNetworkPrefix }}",
       "Backend": {
         "Type": "host-gw"
       }

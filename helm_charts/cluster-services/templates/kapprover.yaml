@@ -1,19 +1,22 @@
+{{- $fullName := "kapprover" -}}
 apiVersion: v1
 kind: ServiceAccount
 metadata:
-  name: kubelet-approver
+  name: {{ $fullName }}
   labels:
-    helm.sh/chart: {{ .Chart.Name }}-{{ .Chart.Version | replace "+" "_" }}
-    k8s-app: kubelet-approver
+    app: {{ $fullName }}
+    chart: {{ template "cluster-services.chart" . }}
+    release: "{{ .Release.Name }}"
 
 ---
 apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRole
 metadata:
-  name: kubelet-approver
+  name: {{ $fullName }}
   labels:
-    helm.sh/chart: {{ .Chart.Name }}-{{ .Chart.Version | replace "+" "_" }}
-    k8s-app: kubelet-approver
+    app: {{ $fullName }}
+    chart: {{ template "cluster-services.chart" . }}
+    release: "{{ .Release.Name }}"
 rules:
 - apiGroups: ["certificates.k8s.io"]
   resources: ["certificatesigningrequests"]
@@ -30,42 +33,45 @@ rules:
 kind: ClusterRoleBinding
 apiVersion: rbac.authorization.k8s.io/v1
 metadata:
-  name: kubelet-approver
+  name: {{ $fullName }}
   labels:
-    helm.sh/chart: {{ .Chart.Name }}-{{ .Chart.Version | replace "+" "_" }}
-    k8s-app: kubelet-approver
+    app: {{ $fullName }}
+    chart: {{ template "cluster-services.chart" . }}
+    release: "{{ .Release.Name }}"
 roleRef:
   apiGroup: rbac.authorization.k8s.io
   kind: ClusterRole
-  name: kubelet-approver
+  name: {{ $fullName }}
 subjects:
 - kind: ServiceAccount
-  name: kubelet-approver
+  name: {{ $fullName }}
   namespace: {{ .Release.Namespace }}
 
 ---
 kind: Deployment
 apiVersion: apps/v1
 metadata:
-  name: kubelet-approver
+  name: {{ $fullName }}
   labels:
-    helm.sh/chart: {{ .Chart.Name }}-{{ .Chart.Version | replace "+" "_" }}
-    k8s-app: kubelet-approver
+    app: {{ $fullName }}
+    chart: {{ template "cluster-services.chart" . }}
+    release: "{{ .Release.Name }}"
 spec:
   replicas: 1
   selector:
     matchLabels:
-      k8s-app: kubelet-approver
+      app: {{ $fullName }}
+      release: {{ .Release.Name }}
   template:
     metadata:
       labels:
-        k8s-app: kubelet-approver
+        app: {{ $fullName }}
+        release: {{ .Release.Name }}
     spec:
       priorityClassName: system-cluster-critical
-      serviceAccountName: kubelet-approver
+      serviceAccountName: {{ $fullName }}
       containers:
-      - name: kubelet-approver
-        imagePullPolicy: Always
+      - name: {{ $fullName }}
         image: {{ .Values.images.kapprover }}
         resources:
           requests:

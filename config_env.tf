@@ -8,11 +8,10 @@ locals {
       cidr    = 23
       vlan_id = 1
       netnums = {
-        apiserver      = 2
-        forwarding_dns = 2
-        matchbox       = 2
-        minio          = 2
-        external_dns   = 128
+        apiserver    = 2
+        matchbox     = 2
+        minio        = 2
+        external_dns = 128
       }
     }
     sync = {
@@ -98,16 +97,11 @@ locals {
     kube_apiserver          = "ghcr.io/randomcoww/kubernetes:kube-master-v1.24.1"
     kube_controller_manager = "ghcr.io/randomcoww/kubernetes:kube-master-v1.24.1"
     kube_scheduler          = "ghcr.io/randomcoww/kubernetes:kube-master-v1.24.1"
-    kube_proxy              = "ghcr.io/randomcoww/kubernetes:kube-proxy-v1.24.1"
     etcd_wrapper            = "ghcr.io/randomcoww/etcd-wrapper:latest"
     etcd                    = "ghcr.io/randomcoww/etcd:v3.5.4"
     kea                     = "ghcr.io/randomcoww/kea:2.0.2"
     tftpd                   = "ghcr.io/randomcoww/tftpd-ipxe:master"
     coredns                 = "docker.io/coredns/coredns:latest"
-    flannel                 = "ghcr.io/randomcoww/flannel:v0.18.1"
-    flannel_cni_plugin      = "rancher/mirrored-flannelcni-flannel-cni-plugin:v1.1.0"
-    kapprover               = "ghcr.io/randomcoww/kapprover:latest"
-    external_dns            = "k8s.gcr.io/external-dns/external-dns:v0.12.0"
   }
 
   kubernetes = {

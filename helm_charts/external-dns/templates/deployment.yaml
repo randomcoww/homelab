@@ -1,0 +1,84 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ template "external-dns.fullname" . }}
+  labels:
+    app: {{ template "external-dns.name" . }}
+    chart: {{ template "external-dns.chart" . }}
+    release: "{{ .Release.Name }}"
+spec:
+  replicas: {{ .Values.replicaCount }}
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxUnavailable: {{ .Values.rollingUpdate.maxUnavailable }}
+      maxSurge: {{ .Values.rollingUpdate.maxSurge }}
+  selector:
+    matchLabels:
+      app: {{ template "external-dns.name" . }}
+      release: {{ .Release.Name }}
+  template:
+    metadata:
+      labels:
+        app: {{ template "external-dns.name" . }}
+        release: {{ .Release.Name }}
+      annotations:
+        checksum/config: {{ include (print $.Template.BasePath "/configmap.yaml") . | sha256sum }}
+    spec:
+    {{- with .Values.affinity }}
+      affinity:
+{{ toYaml . | indent 8 }}
+    {{- end }}
+    {{- with .Values.tolerations }}
+      tolerations:
+{{ toYaml . | indent 8 }}
+    {{- end }}
+  {{- if .Values.priorityClassName }}
+      priorityClassName: "{{ .Values.priorityClassName }}"
+  {{- end }}
+{{ if .Values.serviceAccount.create }}
+      serviceAccountName: {{ .Values.serviceAccount.name }}
+{{- end }}
+      dnsPolicy: Default
+      containers:
+      - name: {{ template "external-dns.fullname" . }}
+        image: {{ .Values.images.externalDNS }}
+        args:
+        - "--source=service"
+        - "--source=ingress"
+        - "--provider=coredns"
+        - "--log-level=debug"
+        - "--domain-filter={{ .Values.internalDomain }}"
+    {{- with .Values.externalDNSLivenessProbe }}
+        livenessProbe:
+{{ toYaml . | indent 10 }}
+    {{- end }}
+    {{- with .Values.externalDNSReadinessProbe }}
+        readinessProbe:
+{{ toYaml . | indent 10 }}
+    {{- end }}
+      - name: {{ template "external-dns.fullname" . }}-coredns
+        image: {{ .Values.images.coreDNS }}
+        args: [ "-conf", "/etc/coredns/Corefile" ]
+        volumeMounts:
+        - name: config
+          mountPath: /etc/coredns/Corefile
+          subPath: Corefile
+        ports:
+{{ include "coredns.containerPorts" . | indent 8 }}
+    {{- with .Values.coreDNSLivenessProbe }}
+        livenessProbe:
+{{ toYaml . | indent 10 }}
+    {{- end }}
+    {{- with .Values.coreDNSReadinessProbe }}
+        readinessProbe:
+
+{{ toYaml . | indent 10 }}
+    {{- end }}
+      - name: {{ template "external-dns.fullname" . }}-etcd
+        image: {{ .Values.images.etcd }}
+        command: [ "etcd" ]
+      volumes:
+      - name: config
+        configMap:
+          name: {{ template "external-dns.fullname" . }}

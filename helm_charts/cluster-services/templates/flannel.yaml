@@ -1,10 +1,12 @@
+{{- $fullName := "flannel" -}}
 kind: ClusterRole
 apiVersion: rbac.authorization.k8s.io/v1
 metadata:
-  name: flannel
+  name: {{ $fullName }}
   labels:
-    helm.sh/chart: {{ .Chart.Name }}-{{ .Chart.Version | replace "+" "_" }}
-    k8s-app: flannel
+    app: {{ $fullName }}
+    chart: {{ template "cluster-services.chart" . }}
+    release: "{{ .Release.Name }}"
 rules:
 - apiGroups: [""]
   resources: ["pods"]
@@ -20,60 +22,63 @@ rules:
 kind: ClusterRoleBinding
 apiVersion: rbac.authorization.k8s.io/v1
 metadata:
-  name: flannel
+  name: {{ $fullName }}
   labels:
-    helm.sh/chart: {{ .Chart.Name }}-{{ .Chart.Version | replace "+" "_" }}
-    k8s-app: flannel
+    app: {{ $fullName }}
+    chart: {{ template "cluster-services.chart" . }}
+    release: "{{ .Release.Name }}"
 roleRef:
   apiGroup: rbac.authorization.k8s.io
   kind: ClusterRole
-  name: flannel
+  name: {{ $fullName }}
 subjects:
 - kind: ServiceAccount
-  name: flannel
+  name: {{ $fullName }}
   namespace: {{ .Release.Namespace }}
 
 ---
 apiVersion: v1
 kind: ServiceAccount
 metadata:
-  name: flannel
+  name: {{ $fullName }}
   labels:
-    helm.sh/chart: {{ .Chart.Name }}-{{ .Chart.Version | replace "+" "_" }}
-    k8s-app: flannel
+    app: {{ $fullName }}
+    chart: {{ template "cluster-services.chart" . }}
+    release: "{{ .Release.Name }}"
 
 ---
 apiVersion: apps/v1
 kind: DaemonSet
 metadata:
-  name: flannel-ds
+  name: {{ $fullName }}
   labels:
-    helm.sh/chart: {{ .Chart.Name }}-{{ .Chart.Version | replace "+" "_" }}
-    k8s-app: flannel
+    app: {{ $fullName }}
+    chart: {{ template "cluster-services.chart" . }}
+    release: "{{ .Release.Name }}"
 spec:
   selector:
     matchLabels:
-      k8s-app: flannel
-  updateStrategy:
-    type: RollingUpdate
+      app: {{ $fullName }}
+      release: {{ .Release.Name }}
   template:
     metadata:
       labels:
-        k8s-app: flannel
+        app: {{ $fullName }}
+        release: {{ .Release.Name }}
       annotations:
         checksum/config: {{ include (print $.Template.BasePath "/flannel-configmap.yaml") . | sha256sum }}
     spec:
-      priorityClassName: system-node-critical
       hostNetwork: true
-      serviceAccountName: flannel
+      priorityClassName: system-node-critical
+      serviceAccountName: {{ $fullName }}
       tolerations:
       - operator: Exists
         effect: NoExecute
       - operator: Exists
         effect: NoSchedule
       initContainers:
-      - name: install-cni-plugin
-        image: {{ .Values.images.flannel_cni_plugin }}
+      - name: {{ $fullName }}-cni-plugin
+        image: {{ .Values.images.flannelCNIPlugin }}
         command:
         - cp
         args:
@@ -83,7 +88,7 @@ spec:
         volumeMounts:
         - name: cni-plugin
           mountPath: /opt/cni/bin
-      - name: install-cni
+      - name: {{ $fullName }}-install-cni
         image: {{ .Values.images.flannel }}
         command:
         - cp
@@ -97,7 +102,7 @@ spec:
         - name: flannel-cfg
           mountPath: /etc/kube-flannel/
       containers:
-      - name: kube-flannel
+      - name: {{ $fullName }}
         image: {{ .Values.images.flannel }}
         command:
         - /opt/bin/flanneld

@@ -5,8 +5,9 @@ kind: ClusterRoleBinding
 metadata:
   name: kubelet-bootstrap
   labels:
-    helm.sh/chart: {{ .Chart.Name }}-{{ .Chart.Version | replace "+" "_" }}
-    k8s-app: bootstrap
+    app: {{ template "cluster-services.name" . }}
+    chart: {{ template "cluster-services.chart" . }}
+    release: "{{ .Release.Name }}"
 roleRef:
   apiGroup: rbac.authorization.k8s.io
   kind: ClusterRole
@@ -22,8 +23,9 @@ kind: ClusterRoleBinding
 metadata:
   name: node-client-auto-approve-csr
   labels:
-    helm.sh/chart: {{ .Chart.Name }}-{{ .Chart.Version | replace "+" "_" }}
-    k8s-app: bootstrap
+    app: {{ template "cluster-services.name" . }}
+    chart: {{ template "cluster-services.chart" . }}
+    release: "{{ .Release.Name }}"
 roleRef:
   apiGroup: rbac.authorization.k8s.io
   kind: ClusterRole
@@ -39,8 +41,9 @@ kind: ClusterRoleBinding
 metadata:
   name: auto-approve-renewals-for-nodes
   labels:
-    helm.sh/chart: {{ .Chart.Name }}-{{ .Chart.Version | replace "+" "_" }}
-    k8s-app: bootstrap
+    app: {{ template "cluster-services.name" . }}
+    chart: {{ template "cluster-services.chart" . }}
+    release: "{{ .Release.Name }}"
 subjects:
 - kind: Group
   name: system:nodes
@@ -60,8 +63,9 @@ metadata:
     rbac.authorization.kubernetes.io/autoupdate: "true"
   labels:
     kubernetes.io/bootstrapping: rbac-defaults
-    helm.sh/chart: {{ .Chart.Name }}-{{ .Chart.Version | replace "+" "_" }}
-    k8s-app: bootstrap
+    app: {{ template "cluster-services.name" . }}
+    chart: {{ template "cluster-services.chart" . }}
+    release: "{{ .Release.Name }}"
 rules:
 - apiGroups: [""]
   resources: ["nodes/proxy", "nodes/stats", "nodes/log", "nodes/spec", "nodes/metrics"]
@@ -79,8 +83,9 @@ kind: ClusterRoleBinding
 metadata:
   name: system:kube-apiserver
   labels:
-    helm.sh/chart: {{ .Chart.Name }}-{{ .Chart.Version | replace "+" "_" }}
-    k8s-app: bootstrap
+    app: {{ template "cluster-services.name" . }}
+    chart: {{ template "cluster-services.chart" . }}
+    release: "{{ .Release.Name }}"
 roleRef:
   apiGroup: rbac.authorization.k8s.io
   kind: ClusterRole

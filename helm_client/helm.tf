@@ -5,21 +5,256 @@ resource "helm_release" "cluster_services" {
   namespace  = "kube-system"
   repository = "https://randomcoww.github.io/terraform-infra/"
   chart      = "cluster-services"
-  version    = "0.1.8"
+  version    = "0.2.4"
   wait       = false
   values = [
     yamlencode({
-      images                    = local.container_images
-      pod_network_prefix        = local.networks.kubernetes_pod.prefix
-      service_network_dns_ip    = local.networks.kubernetes_service.vips.dns
-      apiserver_ip              = local.networks.lan.vips.apiserver
-      apiserver_port            = local.ports.apiserver
-      external_dns_ip           = local.networks.lan.vips.external_dns
-      forwarding_dns_ip         = local.networks.lan.vips.forwarding_dns
-      internal_domain           = local.domains.internal
-      cluster_domain            = local.domains.kubernetes
-      cni_bridge_interface_name = local.kubernetes.cni_bridge_interface_name
-      kube_proxy_port           = local.ports.kube_proxy
+      images = {
+        flannelCNIPlugin = local.helm_container_images.flannel_cni_plugin
+        flannel          = local.helm_container_images.flannel
+        kapprover        = local.helm_container_images.kapprover
+        kubeProxy        = local.helm_container_images.kube_proxy
+      }
+      ports = {
+        kubeProxy = local.ports.kube_proxy
+        apiServer = local.ports.apiserver
+      }
+      apiServerIP      = local.networks.lan.vips.apiserver
+      cniInterfaceName = local.kubernetes.cni_bridge_interface_name
+      podNetworkPrefix = local.networks.kubernetes_pod.prefix
+      internalDomain   = local.domains.internal
+    }),
+  ]
+}
+
+# coredns #
+
+resource "helm_release" "kube_dns" {
+  name       = "kube-dns"
+  namespace  = "kube-system"
+  repository = "https://coredns.github.io/helm"
+  chart      = "coredns"
+  version    = "1.19.4"
+  wait       = false
+  values = [
+    yamlencode({
+      image = {
+        repository = split(":", local.container_images.coredns)[0]
+        tag        = split(":", local.container_images.coredns)[1]
+      }
+      replicaCount = 2
+      serviceType  = "ClusterIP"
+      serviceAccount = {
+        create = false
+      }
+      service = {
+        clusterIP = local.networks.kubernetes_service.vips.dns
+      }
+      affinity = {
+        nodeAffinity = {
+          requiredDuringSchedulingIgnoredDuringExecution = {
+            nodeSelectorTerms = [
+              {
+                matchExpressions = [
+                  {
+                    key      = "role-gateway"
+                    operator = "Exists"
+                  },
+                ]
+              },
+            ]
+          }
+        }
+      }
+      priorityClassName = "system-cluster-critical"
+      servers = [
+        {
+          zones = [
+            {
+              zone = "${local.domains.kubernetes}."
+            },
+          ]
+          port = 53
+          plugins = [
+            {
+              name = "errors"
+            },
+            {
+              name = "health"
+            },
+            {
+              name = "ready"
+            },
+            {
+              name        = "kubernetes"
+              parameters  = "${local.domains.kubernetes} in-addr.arpa ip6.arpa"
+              configBlock = <<EOF
+pods insecure
+fallthrough in-addr.arpa ip6.arpa
+ttl 30
+EOF
+            },
+            {
+              name = "reload"
+            },
+            {
+              name = "loadbalance"
+            },
+            {
+              name       = "cache"
+              parameters = 10
+            },
+          ]
+        },
+        {
+          zones = [
+            {
+              zone = "."
+            },
+          ]
+          port = 53
+          plugins = [
+            {
+              name = "errors"
+            },
+            {
+              name = "health"
+            },
+            {
+              name = "ready"
+            },
+            {
+              name       = "forward"
+              parameters = ". /etc/resolv.conf"
+            },
+            {
+              name = "reload"
+            },
+            {
+              name = "loadbalance"
+            },
+            {
+              name       = "cache"
+              parameters = 10
+            },
+          ]
+        },
+      ]
+    }),
+  ]
+}
+
+# coredns with external-dns #
+
+resource "helm_release" "external_dns" {
+  name       = "external-dns"
+  namespace  = "kube-system"
+  repository = "https://randomcoww.github.io/terraform-infra/"
+  chart      = "external-dns"
+  version    = "0.1.10"
+  wait       = false
+  values = [
+    yamlencode({
+      internalDomain = local.domains.internal
+      images = {
+        coreDNS     = local.container_images.coredns
+        externalDNS = local.helm_container_images.external_dns
+        etcd        = local.container_images.etcd
+      }
+      serviceAccount = {
+        create = true
+        name   = "external-dns"
+      }
+      priorityClassName = "system-cluster-critical"
+      Deployment = {
+        replicaCount = 2
+      }
+      service = {
+        type = "LoadBalancer"
+        externalIPs = [
+          local.networks.lan.vips.external_dns
+        ]
+      }
+      affinity = {
+        nodeAffinity = {
+          requiredDuringSchedulingIgnoredDuringExecution = {
+            nodeSelectorTerms = [
+              {
+                matchExpressions = [
+                  {
+                    key      = "role-gateway"
+                    operator = "Exists"
+                  },
+                ]
+              },
+            ]
+          }
+        }
+      }
+      coreDNSLivenessProbe = {
+        httpGet = {
+          path   = "/health"
+          host   = "127.0.0.1"
+          port   = 8080
+          scheme = "HTTP"
+        }
+        initialDelaySeconds = 60
+        periodSeconds       = 10
+        timeoutSeconds      = 5
+        failureThreshold    = 5
+        successThreshold    = 1
+      }
+      # coreDNSReadinessProbe = {
+      #   httpGet = {
+      #     path   = "/ready"
+      #     host   = "127.0.0.1"
+      #     port   = 8181
+      #     scheme = "HTTP"
+      #   }
+      #   initialDelaySeconds = 60
+      #   periodSeconds       = 10
+      #   timeoutSeconds      = 5
+      #   failureThreshold    = 5
+      #   successThreshold    = 1
+      # }
+      servers = [
+        {
+          zones = [
+            {
+              zone = "."
+            },
+          ]
+          port = 53
+          plugins = [
+            {
+              name = "errors"
+            },
+            {
+              name = "health"
+            },
+            {
+              name = "ready"
+            },
+            {
+              name        = "etcd"
+              parameters  = "${local.domains.internal} in-addr.arpa ip6.arpa"
+              configBlock = <<EOF
+fallthrough in-addr.arpa ip6.arpa
+EOF
+            },
+            {
+              name = "reload"
+            },
+            {
+              name = "loadbalance"
+            },
+            {
+              name       = "cache"
+              parameters = 10
+            },
+          ]
+        },
+      ]
     }),
   ]
 }
@@ -422,7 +657,7 @@ resource "helm_release" "matchbox" {
   namespace  = "default"
   repository = "https://randomcoww.github.io/terraform-infra/"
   chart      = "matchbox"
-  version    = "0.2.2"
+  version    = "0.2.3"
   wait       = false
   values = [
     yamlencode({
@@ -657,7 +892,7 @@ resource "helm_release" "mpd" {
   namespace  = "default"
   repository = "https://randomcoww.github.io/terraform-infra/"
   chart      = "mpd"
-  version    = "0.3.2"
+  version    = "0.3.4"
   wait       = false
   values = [
     yamlencode({

@@ -10,6 +10,7 @@ storage:
         inline: |
           ${internal_domain}. {
             errors
+            health
             forward . ${internal_domain_dns_ip}
           }
           . {
@@ -19,9 +20,9 @@ storage:
               tls_servername ${upstream_dns_tls_servername}
               health_check 20s
             }
-            cache 30
             reload
             loadbalance
+            cache 30
           }
 
     - path: ${static_pod_manifest_path}/coredns.yaml
@@ -51,11 +52,13 @@ storage:
                 httpGet:
                   path: /health
                   port: 8080
+                  host: 127.0.0.1
                   scheme: HTTP
-                initialDelaySeconds: 15
+                initialDelaySeconds: 60
+                periodSeconds: 10
                 timeoutSeconds: 5
-                successThreshold: 1
                 failureThreshold: 5
+                successThreshold: 1
               securityContext:
                 allowPrivilegeEscalation: false
                 capabilities:
