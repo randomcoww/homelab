@@ -9,7 +9,7 @@ locals {
     hostapd            = "ghcr.io/randomcoww/hostapd:latest"
     syncthing          = "docker.io/syncthing/syncthing:latest"
     rclone             = "docker.io/rclone/rclone:latest"
-    mpd                = "ghcr.io/randomcoww/mpd:0.23.8"
+    mpd                = "ghcr.io/randomcoww/mpd:0.23.8-2"
     ympd               = "ghcr.io/randomcoww/ympd:latest"
     flannel            = "ghcr.io/randomcoww/flannel:v0.18.1"
     flannel_cni_plugin = "rancher/mirrored-flannelcni-flannel-cni-plugin:v1.1.0"
