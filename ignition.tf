@@ -26,7 +26,7 @@ module "ignition-kubelet-base" {
   for_each = local.members.kubelet-base
   source   = "./modules/kubelet_base"
 
-  node_ip                  = try(cidrhost(local.networks.lan.prefix, each.value.netnum), "")
+  node_ip                  = cidrhost(local.networks.lan.prefix, each.value.netnum)
   static_pod_manifest_path = local.kubernetes.static_pod_manifest_path
 }
 
@@ -38,11 +38,11 @@ module "ignition-gateway" {
   container_images         = local.container_images
   host_netnum              = each.value.netnum
   vrrp_netnum              = each.value.vrrp_netnum
-  external_ingress_ip      = local.networks.service.vips.external_ingress
+  external_ingress_ip      = local.vips.external_ingress
   internal_domain          = local.domains.internal
-  internal_domain_dns_ip   = local.networks.lan.vips.external_dns
+  internal_domain_dns_ip   = local.vips.external_dns
   static_pod_manifest_path = local.kubernetes.static_pod_manifest_path
-  pod_network              = local.networks.kubernetes_pod
+  pod_network_prefix       = local.networks.kubernetes_pod.prefix
   kea_server_name          = each.key
   kea_peer_port            = local.ports.kea_peer
   kea_peers = [
@@ -65,7 +65,7 @@ module "ignition-gateway" {
     newbit = 1
     netnum = 1
   }
-  pxeboot_file_name = "http://${local.networks.lan.vips.matchbox}:${local.ports.matchbox_http}/boot.ipxe"
+  pxeboot_file_name = "http://${local.vips.matchbox}:${local.ports.matchbox_http}/boot.ipxe"
 }
 
 module "ignition-disks" {
@@ -169,13 +169,13 @@ module "ignition-kubernetes-master" {
   etcd_certs               = module.etcd-cluster.certs
   etcd_cluster_endpoints   = module.etcd-cluster.cluster.cluster_endpoints
   encryption_config_secret = module.kubernetes-ca.encryption_config_secret
-  service_network          = local.networks.kubernetes_service
-  pod_network              = local.networks.kubernetes_pod
+  service_network_prefix   = local.networks.kubernetes_service.prefix
+  pod_network_prefix       = local.networks.kubernetes_pod.prefix
   apiserver_cert_ips = [
     cidrhost(local.networks.lan.prefix, each.value.netnum),
-    local.networks.lan.vips.apiserver,
+    local.vips.apiserver,
     "127.0.0.1",
-    local.networks.kubernetes_service.vips.apiserver,
+    local.vips.cluster_apiserver,
   ]
   apiserver_members = [
     for i, host_key in sort(keys(local.members.kubernetes-master)) :
@@ -203,9 +203,8 @@ module "ignition-kubernetes-worker" {
   node_taints               = lookup(each.value, "kubernetes_worker_taints", [])
   container_storage_path    = each.value.container_storage_path
   cni_bridge_interface_name = local.kubernetes.cni_bridge_interface_name
-  apiserver_endpoint        = "https://${local.networks.lan.vips.apiserver}:${local.ports.apiserver}"
-  service_network           = local.networks.kubernetes_service
-  pod_network               = local.networks.kubernetes_pod
+  apiserver_endpoint        = "https://${local.vips.apiserver}:${local.ports.apiserver}"
+  cluster_dns_ip            = local.vips.cluster_dns
   cluster_domain            = local.domains.kubernetes
   static_pod_manifest_path  = local.kubernetes.static_pod_manifest_path
   kubelet_port              = local.ports.kubelet
@@ -216,7 +215,7 @@ module "kubernetes-admin" {
 
   cluster_name   = local.kubernetes.cluster_name
   ca             = module.kubernetes-ca.ca
-  apiserver_ip   = local.networks.lan.vips.apiserver
+  apiserver_ip   = local.vips.apiserver
   apiserver_port = local.ports.apiserver
 }
 

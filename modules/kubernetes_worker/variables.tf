@@ -38,12 +38,8 @@ variable "apiserver_endpoint" {
   type = string
 }
 
-variable "service_network" {
-  type = any
-}
-
-variable "pod_network" {
-  type = any
+variable "cluster_dns_ip" {
+  type = string
 }
 
 variable "kubelet_port" {

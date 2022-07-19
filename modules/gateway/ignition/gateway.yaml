@@ -38,7 +38,7 @@ storage:
               ip saddr ${interfaces.etcd.prefix} accept;
               ip saddr ${interfaces.sync.prefix} accept;
               ip saddr ${interfaces.lan.prefix} accept;
-              ip saddr ${pod_network.prefix} accept;
+              ip saddr ${pod_network_prefix} accept;
               iifname ${interfaces.wan.interface_name} ct status dnat accept;
             }
 
@@ -46,7 +46,7 @@ storage:
               type filter hook forward priority filter; policy drop;
               jump base_checks;
               ip saddr ${interfaces.lan.prefix} accept;
-              ip saddr ${pod_network.prefix} accept;
+              ip saddr ${pod_network_prefix} accept;
             }
 
             chain prerouting {

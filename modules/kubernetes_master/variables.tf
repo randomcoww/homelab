@@ -30,12 +30,12 @@ variable "etcd_cluster_endpoints" {
   type = list(string)
 }
 
-variable "service_network" {
-  type = any
+variable "service_network_prefix" {
+  type = string
 }
 
-variable "pod_network" {
-  type = any
+variable "pod_network_prefix" {
+  type = string
 }
 
 variable "apiserver_cert_ips" {

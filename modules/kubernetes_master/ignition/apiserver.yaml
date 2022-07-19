@@ -61,7 +61,7 @@ storage:
               - --service-account-issuer=https://kubernetes.default.svc
               - --service-account-key-file=${certs.service_account_cert.path}
               - --service-account-signing-key-file=${certs.service_account_key.path}
-              - --service-cluster-ip-range=${service_network.prefix}
+              - --service-cluster-ip-range=${service_network_prefix}
               - --tls-cert-file=${certs.apiserver_cert.path}
               - --tls-private-key-file=${certs.apiserver_key.path}
               - --v=2

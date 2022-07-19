@@ -50,8 +50,8 @@ locals {
       etcd_certs               = local.etcd_certs
       certs_path               = local.certs_path
       static_pod_manifest_path = var.static_pod_manifest_path
-      service_network          = var.service_network
-      pod_network              = var.pod_network
+      service_network_prefix   = var.service_network_prefix
+      pod_network_prefix       = var.pod_network_prefix
       etcd_cluster_endpoints   = var.etcd_cluster_endpoints
       encryption_config_secret = var.encryption_config_secret
       container_images         = var.container_images

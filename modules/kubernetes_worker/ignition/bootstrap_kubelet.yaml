@@ -83,7 +83,7 @@ storage:
           staticPodPath: ${static_pod_manifest_path}
           clusterDomain: ${cluster_domain}
           clusterDNS:
-          - ${service_network.vips.dns}
+          - ${cluster_dns_ip}
           resolvConf: /run/systemd/resolve/resolv.conf
           runtimeRequestTimeout: 15m
           rotateCertificates: true

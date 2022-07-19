@@ -19,7 +19,7 @@ resource "helm_release" "cluster_services" {
         kubeProxy = local.ports.kube_proxy
         apiServer = local.ports.apiserver
       }
-      apiServerIP      = local.networks.lan.vips.apiserver
+      apiServerIP      = local.vips.apiserver
       cniInterfaceName = local.kubernetes.cni_bridge_interface_name
       podNetworkPrefix = local.networks.kubernetes_pod.prefix
       internalDomain   = local.domains.internal
@@ -48,7 +48,7 @@ resource "helm_release" "kube_dns" {
         create = false
       }
       service = {
-        clusterIP = local.networks.kubernetes_service.vips.dns
+        clusterIP = local.vips.cluster_dns
       }
       affinity = {
         nodeAffinity = {
@@ -172,7 +172,7 @@ resource "helm_release" "external_dns" {
       service = {
         type = "LoadBalancer"
         externalIPs = [
-          local.networks.lan.vips.external_dns,
+          local.vips.external_dns,
         ]
       }
       affinity = {
@@ -295,7 +295,7 @@ resource "helm_release" "nginx_ingress" {
             "metallb.universe.tf/address-pool" = "public-ips"
           }
           externalIPs = [
-            local.networks.service.vips.external_ingress,
+            local.vips.external_ingress,
           ]
         }
         config = {
@@ -639,7 +639,7 @@ resource "helm_release" "nvidia_device_plugin" {
 
 module "matchbox-certs" {
   source        = "./modules/matchbox_certs"
-  api_listen_ip = local.networks.lan.vips.matchbox
+  api_listen_ip = local.vips.matchbox
 }
 
 module "matchbox-syncthing" {
@@ -801,7 +801,7 @@ output "minio_endpoint" {
     version = "10"
     aliases = {
       minio = {
-        url       = "http://${local.networks.lan.vips.minio}:${local.ports.minio}"
+        url       = "http://${local.vips.minio}:${local.ports.minio}"
         accessKey = nonsensitive(random_password.minio-access-key-id.result)
         secretKey = nonsensitive(random_password.minio-secret-access-key.result)
         api       = "S3v4"

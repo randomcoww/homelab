@@ -11,7 +11,7 @@ locals {
       # nftables #
       nftables_name       = "gateway_rules"
       external_ingress_ip = var.external_ingress_ip
-      pod_network         = var.pod_network
+      pod_network_prefix  = var.pod_network_prefix
 
       # dns #
       internal_domain             = var.internal_domain

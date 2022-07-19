@@ -27,8 +27,7 @@ locals {
       node_labels               = var.node_labels
       node_taints               = var.node_taints
       apiserver_endpoint        = var.apiserver_endpoint
-      service_network           = var.service_network
-      pod_network               = var.pod_network
+      cluster_dns_ip            = var.cluster_dns_ip
       cni_bridge_interface_name = var.cni_bridge_interface_name
       cluster_domain            = var.cluster_domain
       static_pod_manifest_path  = var.static_pod_manifest_path

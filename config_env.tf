@@ -39,8 +39,8 @@ locals {
       network = "10.96.0.0"
       cidr    = 12
       netnums = {
-        apiserver = 1
-        dns       = 10
+        cluster_apiserver = 1
+        cluster_dns       = 10
       }
     }
     kubernetes_pod = {
@@ -69,6 +69,12 @@ locals {
         })
     }, {}))
   })
+
+  vips = merge([
+    for _, network in local.networks :
+    try(network.vips)
+    ]...
+  )
 
   ports = {
     kea_peer           = 58080

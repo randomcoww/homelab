@@ -5,9 +5,9 @@ locals {
   }
 
   pxeboot = {
-    matchbox_http_endpoint = "http://${local.networks.lan.vips.matchbox}:${local.ports.matchbox_http}"
-    matchbox_api_endpoint  = "${local.networks.lan.vips.matchbox}:${local.ports.matchbox_api}"
-    image_store_endpoint   = "http://${local.networks.lan.vips.minio}:${local.ports.minio}"
+    matchbox_http_endpoint = "http://${local.vips.matchbox}:${local.ports.matchbox_http}"
+    matchbox_api_endpoint  = "${local.vips.matchbox}:${local.ports.matchbox_api}"
+    image_store_endpoint   = "http://${local.vips.minio}:${local.ports.minio}"
     image_store_base_path  = "boot"
 
     hosts = {

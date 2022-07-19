@@ -1,6 +1,5 @@
 variable "node_ip" {
-  type    = string
-  default = ""
+  type = string
 }
 
 variable "static_pod_manifest_path" {
