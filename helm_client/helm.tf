@@ -172,7 +172,7 @@ resource "helm_release" "external_dns" {
       service = {
         type = "LoadBalancer"
         externalIPs = [
-          local.networks.lan.vips.external_dns
+          local.networks.lan.vips.external_dns,
         ]
       }
       affinity = {
@@ -353,7 +353,7 @@ resource "helm_release" "cert_issuer" {
                       class = "nginx"
                     }
                   }
-                }
+                },
               ]
             }
           }
@@ -378,7 +378,7 @@ resource "helm_release" "cert_issuer" {
                       class = "nginx"
                     }
                   }
-                }
+                },
               ]
             }
           }
@@ -453,7 +453,7 @@ resource "helm_release" "authelia" {
             name      = "authelia-users"
             mountPath = "/config/users_database.yml"
             subPath   = "users_database.yml"
-          }
+          },
         ]
         extraVolumes = [
           {
@@ -461,7 +461,7 @@ resource "helm_release" "authelia" {
             secret = {
               secretName = "authelia-users"
             }
-          }
+          },
         ]
       }
       configMap = {
@@ -698,7 +698,7 @@ resource "helm_release" "matchbox" {
                 ]
               }
               topologyKey = "kubernetes.io/hostname"
-            }
+            },
           ]
         }
       }
@@ -877,7 +877,7 @@ resource "helm_release" "hostapd" {
                 ]
               }
               topologyKey = "kubernetes.io/hostname"
-            }
+            },
           ]
         }
       }
