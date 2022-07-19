@@ -11,7 +11,7 @@ spec:
   type: {{ .Values.service.type }}
 {{- if .Values.service.clusterIP }}
   clusterIP: {{ .Values.service.clusterIP }}
-{{end}}
+{{- end }}
   ports:
 {{- range $audioOutput := .Values.audioOutputs }}
   - name: {{ $audioOutput.name }}
