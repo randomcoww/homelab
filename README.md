@@ -153,7 +153,7 @@ See [fedora-coreos-config-custom](https://github.com/randomcoww/fedora-coreos-co
 
 #### Write matchbox PXE boot config
 
-Update image tags [here](https://github.com/randomcoww/terraform-infra/blob/master/pxeboot_config_client/config_pxeboot.tf#L2) with those generated in previous step
+Update image tags [here](https://github.com/randomcoww/terraform-infra/blob/master/config_pxeboot.tf#L2) with those pushed in previous step
 
 Check that matchbox pods are running
 
