@@ -1,7 +1,16 @@
 locals {
   pxeboot_image_builds = {
-    client = "fedora-silverblue-35.20220711.0"
-    server = "fedora-coreos-36.20220711.0"
+    silverblue = "fedora-silverblue-35.20220720.0"
+    coreos     = "fedora-coreos-36.20220711.0"
+  }
+
+  image_set = {
+    for type, tag in local.pxeboot_image_builds :
+    type => {
+      kernel_image_name = "${tag}-live-kernel-x86_64"
+      initrd_image_name = "${tag}-live-initramfs.x86_64.img"
+      rootfs_image_name = "${tag}-live-rootfs.x86_64.img"
+    }
   }
 
   pxeboot = {
@@ -11,17 +20,14 @@ locals {
     image_store_base_path  = "boot"
 
     hosts = {
-      client-0 = {
-        selector_mac = "84-a9-38-0f-aa-76"
+      "84-a9-38-0f-aa-76" = merge(local.image_set.silverblue, {
+        ignition = "client-0"
         boot_args = [
-          "elevator=noop",
           "enforcing=0",
           "rd.driver.blacklist=nouveau",
           "modprobe.blacklist=nouveau",
           "nvidia_drm.modeset=1",
-          # Backlight control for dedicated mode
           # "nvidia.NVreg_RegistryDwords=EnableBrightnessControl=1",
-          # VFIO passthrough
           # "intel_iommu=on",
           # "amd_iommu=on",
           # "iommu=pt",
@@ -30,34 +36,25 @@ locals {
           # "vfio-pci.ids=1002:ffffffff:ffffffff:ffffffff:00030000:ffff00ff,1002:ffffffff:ffffffff:ffffffff:00040300:ffffffff,10de:ffffffff:ffffffff:ffffffff:00030000:ffff00ff,10de:ffffffff:ffffffff:ffffffff:00040300:ffffffff",
           # "video=efifb:off",
         ]
-        kernel_image_name = "${local.pxeboot_image_builds.client}-live-kernel-x86_64"
-        initrd_image_name = "${local.pxeboot_image_builds.client}-live-initramfs.x86_64.img"
-        rootfs_image_name = "${local.pxeboot_image_builds.client}-live-rootfs.x86_64.img"
-      }
-      aio-0 = {
-        selector_mac = "1c-83-41-30-e2-23"
+      })
+
+      "1c-83-41-30-e2-23" = merge(local.image_set.coreos, {
+        ignition = "aio-0"
         boot_args = [
-          "elevator=noop",
           "enforcing=0",
           "rfkill.master_switch_mode=2",
           "rfkill.default_state=1",
         ]
-        kernel_image_name = "${local.pxeboot_image_builds.server}-live-kernel-x86_64"
-        initrd_image_name = "${local.pxeboot_image_builds.server}-live-initramfs.x86_64.img"
-        rootfs_image_name = "${local.pxeboot_image_builds.server}-live-rootfs.x86_64.img"
-      }
-      aio-1 = {
-        selector_mac = "1c-83-41-30-e2-54"
+      })
+
+      "1c-83-41-30-e2-54" = merge(local.image_set.coreos, {
+        ignition = "aio-1"
         boot_args = [
-          "elevator=noop",
           "enforcing=0",
           "rfkill.master_switch_mode=2",
           "rfkill.default_state=1",
         ]
-        kernel_image_name = "${local.pxeboot_image_builds.server}-live-kernel-x86_64"
-        initrd_image_name = "${local.pxeboot_image_builds.server}-live-initramfs.x86_64.img"
-        rootfs_image_name = "${local.pxeboot_image_builds.server}-live-rootfs.x86_64.img"
-      }
+      })
     }
   }
 }

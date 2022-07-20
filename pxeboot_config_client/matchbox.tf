@@ -5,6 +5,7 @@ resource "matchbox_profile" "pxeboot" {
   kernel = "${local.pxeboot.image_store_endpoint}/${local.pxeboot.image_store_base_path}/${each.value.kernel_image_name}"
   initrd = ["${local.pxeboot.image_store_endpoint}/${local.pxeboot.image_store_base_path}/${each.value.initrd_image_name}"]
   args = concat([
+    "elevator=noop",
     "rd.neednet=1",
     "ignition.firstboot",
     "ignition.platform.id=metal",
@@ -13,7 +14,7 @@ resource "matchbox_profile" "pxeboot" {
     "coreos.live.rootfs_url=${local.pxeboot.image_store_endpoint}/${local.pxeboot.image_store_base_path}/${each.value.rootfs_image_name}",
     "ip=dhcp",
   ], each.value.boot_args)
-  raw_ignition = file("output/ignition/${each.key}.ign")
+  raw_ignition = file("output/ignition/${each.value.ignition}.ign")
 }
 
 resource "matchbox_group" "pxeboot" {
@@ -22,6 +23,6 @@ resource "matchbox_group" "pxeboot" {
   profile = matchbox_profile.pxeboot[each.key].name
   name    = each.key
   selector = {
-    mac = each.value.selector_mac
+    mac = each.key
   }
 }
