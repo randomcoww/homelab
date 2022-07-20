@@ -99,7 +99,13 @@ locals {
     kubernetes    = "cluster.internal"
   }
 
+  ingress_hosts = {
+    mpd  = "mpd.${local.domains.internal}"
+    auth = "auth.${local.domains.internal}"
+  }
+
   container_images = {
+    # Igntion
     kube_apiserver          = "ghcr.io/randomcoww/kubernetes:kube-master-v1.24.1"
     kube_controller_manager = "ghcr.io/randomcoww/kubernetes:kube-master-v1.24.1"
     kube_scheduler          = "ghcr.io/randomcoww/kubernetes:kube-master-v1.24.1"
@@ -108,6 +114,19 @@ locals {
     kea                     = "ghcr.io/randomcoww/kea:2.0.2"
     tftpd                   = "ghcr.io/randomcoww/tftpd-ipxe:master"
     coredns                 = "docker.io/coredns/coredns:latest"
+
+    # Helm
+    matchbox           = "quay.io/poseidon/matchbox:latest"
+    hostapd            = "ghcr.io/randomcoww/hostapd:latest"
+    syncthing          = "docker.io/syncthing/syncthing:latest"
+    rclone             = "docker.io/rclone/rclone:latest"
+    mpd                = "ghcr.io/randomcoww/mpd:0.23.8-2"
+    ympd               = "ghcr.io/randomcoww/ympd:latest"
+    flannel            = "ghcr.io/randomcoww/flannel:v0.18.1"
+    flannel_cni_plugin = "rancher/mirrored-flannelcni-flannel-cni-plugin:v1.1.0"
+    kapprover          = "ghcr.io/randomcoww/kapprover:latest"
+    external_dns       = "k8s.gcr.io/external-dns/external-dns:v0.12.0"
+    kube_proxy         = "ghcr.io/randomcoww/kubernetes:kube-proxy-v1.24.1"
   }
 
   kubernetes = {

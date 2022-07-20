@@ -10,10 +10,10 @@ resource "helm_release" "cluster_services" {
   values = [
     yamlencode({
       images = {
-        flannelCNIPlugin = local.helm_container_images.flannel_cni_plugin
-        flannel          = local.helm_container_images.flannel
-        kapprover        = local.helm_container_images.kapprover
-        kubeProxy        = local.helm_container_images.kube_proxy
+        flannelCNIPlugin = local.container_images.flannel_cni_plugin
+        flannel          = local.container_images.flannel
+        kapprover        = local.container_images.kapprover
+        kubeProxy        = local.container_images.kube_proxy
       }
       ports = {
         kubeProxy = local.ports.kube_proxy
@@ -158,7 +158,7 @@ resource "helm_release" "external_dns" {
       internalDomain = local.domains.internal
       images = {
         coreDNS     = local.container_images.coredns
-        externalDNS = local.helm_container_images.external_dns
+        externalDNS = local.container_images.external_dns
         etcd        = local.container_images.etcd
       }
       serviceAccount = {
@@ -439,7 +439,7 @@ resource "helm_release" "authelia" {
         }
         certManager = true
         className   = "nginx"
-        subdomain   = "auth"
+        subdomain   = split(".", local.ingress_hosts.auth)[0]
         tls = {
           enabled = true
           secret  = "authelia-tls"
@@ -822,7 +822,7 @@ resource "helm_release" "hostapd" {
   wait       = false
   values = [
     yamlencode({
-      image = local.helm_container_images.hostapd
+      image = local.container_images.hostapd
       config = {
         interface        = "wlan0"
         preamble         = 1
@@ -932,9 +932,9 @@ resource "helm_release" "mpd" {
         storageClass = "openebs-jiva-csi-default"
       }
       images = {
-        mpd    = local.helm_container_images.mpd
-        ympd   = local.helm_container_images.ympd
-        rclone = local.helm_container_images.rclone
+        mpd    = local.container_images.mpd
+        ympd   = local.container_images.ympd
+        rclone = local.container_images.rclone
       }
       ingress = {
         enabled          = true
@@ -942,7 +942,7 @@ resource "helm_release" "mpd" {
         annotations = {
           "cert-manager.io/issuer"                            = "letsencrypt-prod"
           "nginx.ingress.kubernetes.io/auth-response-headers" = "Remote-User,Remote-Name,Remote-Groups,Remote-Email"
-          "nginx.ingress.kubernetes.io/auth-signin"           = "https://${local.helm_ingress.auth}"
+          "nginx.ingress.kubernetes.io/auth-signin"           = "https://${local.ingress_hosts.auth}"
           "nginx.ingress.kubernetes.io/auth-snippet"          = <<EOF
 proxy_set_header X-Forwarded-Method $request_method;
 EOF
@@ -952,12 +952,12 @@ EOF
           {
             secretName = "mpd-tls"
             hosts = [
-              local.helm_ingress.mpd,
+              local.ingress_hosts.mpd,
             ]
           },
         ]
         hosts = [
-          local.helm_ingress.mpd,
+          local.ingress_hosts.mpd,
         ]
       }
       uiIngress = {
@@ -967,7 +967,7 @@ EOF
         annotations = {
           "cert-manager.io/issuer"                            = "letsencrypt-prod"
           "nginx.ingress.kubernetes.io/auth-response-headers" = "Remote-User,Remote-Name,Remote-Groups,Remote-Email"
-          "nginx.ingress.kubernetes.io/auth-signin"           = "https://${local.helm_ingress.auth}"
+          "nginx.ingress.kubernetes.io/auth-signin"           = "https://${local.ingress_hosts.auth}"
           "nginx.ingress.kubernetes.io/auth-snippet"          = <<EOF
 proxy_set_header X-Forwarded-Method $request_method;
 EOF
@@ -977,12 +977,12 @@ EOF
           {
             secretName = "mpd-tls"
             hosts = [
-              local.helm_ingress.mpd,
+              local.ingress_hosts.mpd,
             ]
           },
         ]
         hosts = [
-          local.helm_ingress.mpd,
+          local.ingress_hosts.mpd,
         ]
       }
     }),

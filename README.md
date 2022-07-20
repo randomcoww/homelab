@@ -76,7 +76,8 @@ EOF
 #### Generate CoreOS ignition for all nodes
 
 ```bash
-tw terraform apply -var-file=secrets.tfvars
+tw terraform -chdir=ignition_config \
+  apply -var-file=secrets.tfvars
 ```
 
 #### Create custom CoreOS images
@@ -91,7 +92,8 @@ Embed the ignition files generated above into the image to allow them to boot co
 
 ```bash
 mkdir -p ~/.kube && \
-  tw terraform output -raw admin_kubeconfig > ~/.kube/config
+tw terraform -chdir=ignition_config \
+  output -raw admin_kubeconfig > ~/.kube/config
 ```
 
 #### Check that `kubernetes` service is up
@@ -124,8 +126,8 @@ Write configuration for `mc`
 
 ```bash
 mkdir -p ~/.mc && \
-tw terraform -chdir=helm_client output \
-  -json minio_endpoint > ~/.mc/config.json
+tw terraform -chdir=helm_client \
+  output -json minio_endpoint > ~/.mc/config.json
 ```
 
 #### Create and configure buckets
@@ -177,7 +179,8 @@ This is valid for `validity_period_hours` as configured in `secrets.tfvars`
 
 ```bash
 KEY=$HOME/.ssh/id_ecdsa
-tw terraform output -raw ssh_client_cert_authorized_key > $KEY-cert.pub
+tw terraform -chdir=ignition_config \
+  output -raw ssh_client_cert_authorized_key > $KEY-cert.pub
 ```
 
 ### Updating helm charts
