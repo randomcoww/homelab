@@ -12,6 +12,7 @@ locals {
         matchbox     = 2
         minio        = 2
         external_dns = 128
+        gow          = 129
       }
     }
     sync = {
