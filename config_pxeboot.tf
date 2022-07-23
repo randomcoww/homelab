@@ -1,6 +1,6 @@
 locals {
   pxeboot_image_builds = {
-    silverblue = "fedora-silverblue-35.20220720.0"
+    silverblue = "fedora-silverblue-36.20220723.0"
     coreos     = "fedora-coreos-36.20220711.0"
   }
 
@@ -24,9 +24,9 @@ locals {
         ignition = "client-0"
         boot_args = [
           "enforcing=0",
-          "rd.driver.blacklist=nouveau",
-          "modprobe.blacklist=nouveau",
-          "nvidia_drm.modeset=1",
+          # "rd.driver.blacklist=nouveau",
+          # "modprobe.blacklist=nouveau",
+          # "nvidia_drm.modeset=1",
           # "nvidia.NVreg_RegistryDwords=EnableBrightnessControl=1",
           # "intel_iommu=on",
           # "amd_iommu=on",
