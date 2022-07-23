@@ -635,6 +635,20 @@ resource "helm_release" "nvidia_device_plugin" {
   ]
 }
 
+# amd device plugin #
+
+resource "helm_release" "amd_gpu" {
+  name       = "amd-gpu"
+  repository = "https://radeonopencompute.github.io/k8s-device-plugin/"
+  chart      = "amd-gpu"
+  namespace  = "kube-system"
+  version    = "0.3.0"
+  values = [
+    yamlencode({
+    })
+  ]
+}
+
 # matchbox with data sync #
 
 module "matchbox-certs" {
@@ -991,93 +1005,82 @@ EOF
 
 # games on whales https://github.com/games-on-whales #
 
-data "helm_template" "gow" {
-  name             = "gow"
-  namespace        = "gow"
-  repository       = "https://k8s-at-home.com/charts/"
-  chart            = "games-on-whales"
-  version          = "1.7.2"
-  wait             = false
-  create_namespace = true
-  values = [
-    yamlencode({
-      ingress = {
-        main = {
-          enabled = false
-        }
-      }
-      service = {
-        main = {
-          annotations = {
-            "metallb.universe.tf/address-pool" = "gow"
-          }
-          type = "LoadBalancer"
-          externalIPs = [
-            local.vips.gow,
-          ]
-        }
-        udp = {
-          annotations = {
-            "metallb.universe.tf/address-pool" = "gow"
-          }
-          type = "LoadBalancer"
-          externalIPs = [
-            local.vips.gow,
-          ]
-        }
-      }
-      persistence = {
-        home = {
-          enabled      = true
-          type         = "pvc"
-          accessMode   = "ReadWriteOnce"
-          size         = "40Gi"
-          storageClass = "local-path"
-        }
-      }
-      resources = {
-        limits = {
-          "nvidia.com/gpu" = 1
-        }
-      }
-      tolerations = [
-        {
-          effect   = "NoExecute"
-          operator = "Exists"
-        },
-      ]
-      sunshine = {
-        image = {
-          tag = "edge"
-        }
-      }
-      xorg = {
-        image = {
-          tag = "edge"
-        }
-      }
-      pulse = {
-        image = {
-          tag = "edge"
-        }
-      }
-      steam = {
-        enabled = true
-        image = {
-          tag = "edge"
-        }
-      }
-      retroarch = {
-        enabled = false
-      }
-      firefox = {
-        enabled = false
-      }
-    })
-  ]
-}
-
-# resource "local_file" "gow" {
-#   filename = "./output/temp/gow.yaml"
-#   content  = data.helm_template.gow.manifest
+# resource "helm_release" "gow" {
+#   name             = "gow"
+#   namespace        = "gow"
+#   repository       = "https://k8s-at-home.com/charts/"
+#   chart            = "games-on-whales"
+#   version          = "1.7.2"
+#   wait             = false
+#   create_namespace = true
+#   values = [
+#     yamlencode({
+#       ingress = {
+#         main = {
+#           enabled = false
+#         }
+#       }
+#       service = {
+#         main = {
+#           annotations = {
+#             "metallb.universe.tf/address-pool" = "gow"
+#           }
+#           type = "LoadBalancer"
+#           externalIPs = [
+#             local.vips.gow,
+#           ]
+#         }
+#         udp = {
+#           annotations = {
+#             "metallb.universe.tf/address-pool" = "gow"
+#           }
+#           type = "LoadBalancer"
+#           externalIPs = [
+#             local.vips.gow,
+#           ]
+#         }
+#       }
+#       persistence = {
+#         home = {
+#           enabled      = true
+#           type         = "pvc"
+#           accessMode   = "ReadWriteOnce"
+#           size         = "40Gi"
+#           storageClass = "local-path"
+#         }
+#       }
+#       resources = {
+#         limits = {
+#           "amd.com/gpu" = 1
+#         }
+#       }
+#       sunshine = {
+#         image = {
+#           tag = "edge"
+#         }
+#       }
+#       xorg = {
+#         image = {
+#           tag = "edge"
+#         }
+#       }
+#       pulseaudio = {
+#         image = {
+#           tag = "edge"
+#         }
+#       }
+#       steam = {
+#         enabled = true
+#         image = {
+#           tag = "edge"
+#         }
+#       }
+#       retroarch = {
+#         enabled = false
+#       }
+#       firefox = {
+#         enabled = false
+#       }
+#     })
+#   ]
 # }
