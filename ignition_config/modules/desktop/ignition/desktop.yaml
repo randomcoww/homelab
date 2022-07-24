@@ -5,13 +5,9 @@ systemd:
   units:
     - name: sshd.service
       enabled: false
-    - name: default-dconf-update.service
+    - name: dconf-update.service
       enabled: true
       contents: |
-        [Unit]
-        ConditionFirstBoot=true
-        ConditionDirectoryNotEmpty=/etc/dconf/db/local.d/
-
         [Service]
         Type=oneshot
         RemainAfterExit=true
