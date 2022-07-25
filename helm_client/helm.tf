@@ -771,10 +771,10 @@ resource "helm_release" "minio" {
         storageClass = "local-path"
       }
       drivesPerNode = 2
-      replicas      = 2
+      replicas      = 3
       resources = {
         requests = {
-          memory = "8Gi"
+          memory = "4Gi"
         }
       }
       consoleService = {
@@ -806,6 +806,12 @@ resource "helm_release" "minio" {
           }
         }
       }
+      tolerations = [
+        {
+          effect   = "NoExecute"
+          operator = "Exists"
+        },
+      ]
     }),
   ]
 }
