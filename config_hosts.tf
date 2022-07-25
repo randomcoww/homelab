@@ -68,7 +68,6 @@ locals {
       container_storage_path = "${local.pv_mount_path}/containers"
       local_provisioner_path = "${local.pv_mount_path}/local_path_provisioner"
       kubernetes_worker_labels = {
-        "minio-data" = "true"
       }
     }
 
@@ -140,7 +139,6 @@ locals {
       container_storage_path = "${local.pv_mount_path}/containers"
       local_provisioner_path = "${local.pv_mount_path}/local_path_provisioner"
       kubernetes_worker_labels = {
-        "minio-data" = "true"
       }
     }
 

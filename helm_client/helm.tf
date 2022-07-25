@@ -793,17 +793,31 @@ resource "helm_release" "minio" {
               {
                 matchExpressions = [
                   {
-                    key      = "minio-data"
-                    operator = "Exists"
-                  },
-                  {
-                    key      = "role-gateway"
+                    key      = "role-disks"
                     operator = "Exists"
                   },
                 ]
               },
             ]
           }
+        }
+        podAntiAffinity = {
+          requiredDuringSchedulingIgnoredDuringExecution = [
+            {
+              labelSelector = {
+                matchExpressions = [
+                  {
+                    key      = "app"
+                    operator = "In"
+                    values = [
+                      "minio",
+                    ]
+                  },
+                ]
+              }
+              topologyKey = "kubernetes.io/hostname"
+            },
+          ]
         }
       }
       tolerations = [
