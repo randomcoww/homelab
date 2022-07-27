@@ -861,7 +861,7 @@ resource "helm_release" "hostapd" {
         interface        = "wlan0"
         preamble         = 1
         hw_mode          = "g"
-        channel          = 4
+        channel          = 1
         auth_algs        = 1
         driver           = "nl80211"
         ieee80211n       = 1

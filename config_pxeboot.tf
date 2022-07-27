@@ -1,7 +1,7 @@
 locals {
   pxeboot_image_builds = {
+    coreos     = "fedora-coreos-36.20220727.0"
     silverblue = "fedora-silverblue-35.20220720.0"
-    coreos     = "fedora-coreos-36.20220711.0"
   }
 
   image_set = {
@@ -44,6 +44,7 @@ locals {
           "enforcing=0",
           "rfkill.master_switch_mode=2",
           "rfkill.default_state=1",
+          "cfg80211.ieee80211_regdom=US",
         ]
       })
 
@@ -53,6 +54,7 @@ locals {
           "enforcing=0",
           "rfkill.master_switch_mode=2",
           "rfkill.default_state=1",
+          "cfg80211.ieee80211_regdom=US",
         ]
       })
     }
