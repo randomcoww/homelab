@@ -1,7 +1,8 @@
 locals {
   pxeboot_image_builds = {
-    coreos     = "fedora-coreos-36.20220727.0"
-    silverblue = "fedora-silverblue-35.20220720.0"
+    coreos            = "fedora-coreos-36.20220727.0"
+    silverblue        = "fedora-silverblue-36.20220729.0"
+    silverblue-nvidia = "fedora-silverblue-35.20220720.0"
   }
 
   image_set = {
@@ -20,7 +21,7 @@ locals {
     image_store_base_path  = "boot"
 
     hosts = {
-      "84-a9-38-0f-aa-76" = merge(local.image_set.silverblue, {
+      "84-a9-38-0f-aa-76" = merge(local.image_set.silverblue-nvidia, {
         ignition = "client-0"
         boot_args = [
           "enforcing=0",
