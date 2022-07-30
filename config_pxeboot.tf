@@ -1,7 +1,7 @@
 locals {
   pxeboot_image_builds = {
     coreos            = "fedora-coreos-36.20220727.0"
-    silverblue        = "fedora-silverblue-36.20220729.0"
+    silverblue        = "fedora-silverblue-36.20220730.0"
     silverblue-nvidia = "fedora-silverblue-35.20220720.0"
   }
 
@@ -22,7 +22,7 @@ locals {
 
     hosts = {
       "84-a9-38-0f-aa-76" = merge(local.image_set.silverblue-nvidia, {
-        ignition = "client-0"
+        ignition = "de-0"
         boot_args = [
           "enforcing=0",
           "rd.driver.blacklist=nouveau",
@@ -40,7 +40,7 @@ locals {
       })
 
       "1c-83-41-30-e2-23" = merge(local.image_set.coreos, {
-        ignition = "aio-0"
+        ignition = "gw-0"
         boot_args = [
           "enforcing=0",
           "rfkill.master_switch_mode=2",
@@ -50,7 +50,7 @@ locals {
       })
 
       "1c-83-41-30-e2-54" = merge(local.image_set.coreos, {
-        ignition = "aio-1"
+        ignition = "gw-1"
         boot_args = [
           "enforcing=0",
           "rfkill.master_switch_mode=2",

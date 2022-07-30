@@ -43,12 +43,12 @@ module "ignition-gateway" {
   internal_domain_dns_ip   = local.vips.external_dns
   static_pod_manifest_path = local.kubernetes.static_pod_manifest_path
   pod_network_prefix       = local.networks.kubernetes_pod.prefix
-  kea_server_name          = each.key
+  kea_server_name          = each.value.hostname
   kea_peer_port            = local.ports.kea_peer
   kea_peers = [
     for i, host_key in sort(keys(local.members.gateway)) :
     {
-      name   = host_key
+      name   = local.hosts[host_key].hostname
       netnum = local.hosts[host_key].netnum
       role   = try(element(["primary", "secondary"], i), "backup")
     }

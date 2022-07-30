@@ -1,6 +1,6 @@
 locals {
   base_hosts = {
-    aio-0 = {
+    gw-0 = {
       users = [
         "admin"
       ]
@@ -67,11 +67,9 @@ locals {
       }
       container_storage_path = "${local.pv_mount_path}/containers"
       local_provisioner_path = "${local.pv_mount_path}/local_path_provisioner"
-      kubernetes_worker_labels = {
-      }
     }
 
-    aio-1 = {
+    gw-1 = {
       users = [
         "admin"
       ]
@@ -138,11 +136,9 @@ locals {
       }
       container_storage_path = "${local.pv_mount_path}/containers"
       local_provisioner_path = "${local.pv_mount_path}/local_path_provisioner"
-      kubernetes_worker_labels = {
-      }
     }
 
-    client-0 = {
+    de-0 = {
       users = [
         "client"
       ]
@@ -158,10 +154,15 @@ locals {
           mtu = 9000
         }
       }
-      bridge_interfaces = {}
+      bridge_interfaces = {
+        br-lan = {
+          interfaces = ["phy0"]
+          mtu        = 9000
+        }
+      }
       tap_interfaces = {
         lan = {
-          source_interface_name = "phy0"
+          source_interface_name = "br-lan"
           enable_mdns           = true
           enable_netnum         = true
           enable_dhcp           = true
@@ -203,7 +204,7 @@ locals {
       }
     }
 
-    remote-0 = {
+    re-0 = {
       users = [
         "client"
       ]
@@ -223,23 +224,24 @@ locals {
   }
 
   base_members = {
-    base              = ["aio-0", "aio-1", "client-0", "remote-0"]
-    systemd-networkd  = ["aio-0", "aio-1", "client-0"]
-    kubelet-base      = ["aio-0", "aio-1", "client-0"]
-    gateway           = ["aio-0", "aio-1"]
-    disks             = ["aio-0", "aio-1", "client-0", "remote-0"]
-    ssh-server        = ["aio-0", "aio-1"]
-    desktop           = ["client-0", "remote-0"]
-    etcd              = ["aio-0", "aio-1", "client-0"]
-    kubernetes-master = ["aio-0", "aio-1"]
-    kubernetes-worker = ["aio-0", "aio-1", "client-0"]
+    base              = ["gw-0", "gw-1", "de-0", "re-0"]
+    systemd-networkd  = ["gw-0", "gw-1", "de-0"]
+    kubelet-base      = ["gw-0", "gw-1", "de-0"]
+    gateway           = ["gw-0", "gw-1"]
+    disks             = ["gw-0", "gw-1", "de-0", "re-0"]
+    ssh-server        = ["gw-0", "gw-1"]
+    desktop           = ["de-0", "re-0"]
+    etcd              = ["gw-0", "gw-1", "de-0"]
+    kubernetes-master = ["gw-0", "gw-1"]
+    kubernetes-worker = ["gw-0", "gw-1", "de-0"]
   }
 
   host_roles = transpose(local.base_members)
   hosts = {
     for host_key, host in local.base_hosts :
-    host_key => merge(host, {
+    host_key => merge({
       hostname = "${host_key}.${local.domains.internal_mdns}"
+      }, host, {
       kubernetes_worker_labels = merge(
         {
           for role in lookup(local.host_roles, host_key, []) :
