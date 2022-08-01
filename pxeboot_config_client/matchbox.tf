@@ -7,12 +7,12 @@ resource "matchbox_profile" "pxeboot" {
   args = concat([
     "elevator=noop",
     "rd.neednet=1",
+    "ip=dhcp",
     "ignition.firstboot",
     "ignition.platform.id=metal",
     "initrd=${each.value.initrd_image_name}",
     "ignition.config.url=${local.pxeboot.matchbox_http_endpoint}/ignition?mac=$${mac:hexhyp}",
     "coreos.live.rootfs_url=${local.pxeboot.image_store_endpoint}/${local.pxeboot.image_store_base_path}/${each.value.rootfs_image_name}",
-    "ip=dhcp",
   ], each.value.boot_args)
   raw_ignition = file("output/ignition/${each.value.ignition}.ign")
 }

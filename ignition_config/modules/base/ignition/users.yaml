@@ -28,3 +28,18 @@ passwd:
         should_exist = false
       }])
     ))}
+
+storage:
+  files:
+    - path: /etc/sudoers.d/coreos-sudo-group
+      overwrite: true
+      mode: 0600
+      contents:
+        inline: |
+          %sudo ALL=(ALL) NOPASSWD: ALL
+    - path: /etc/security/pwquality.conf.d/20-disable-dict.conf
+      overwrite: true
+      mode: 0644
+      contents:
+        inline: |
+          dictcheck = 0

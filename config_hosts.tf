@@ -205,6 +205,7 @@ locals {
     }
 
     re-0 = {
+      hostname = "remote"
       users = [
         "client"
       ]
