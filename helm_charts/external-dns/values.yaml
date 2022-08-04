@@ -24,6 +24,8 @@ service:
   port: 53
   nodePort: 30053
 
+dataSources: []
+
 servers:
 # - zones:
 #   - zone: .

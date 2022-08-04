@@ -44,11 +44,11 @@ spec:
       - name: {{ template "external-dns.fullname" . }}
         image: {{ .Values.images.externalDNS }}
         args:
-        - "--source=service"
-        - "--source=ingress"
+        {{- range $i , $source := .Values.dataSources }}
+        - "--source={{ $source }}"
+        {{- end }}
         - "--provider=coredns"
         - "--log-level=debug"
-        - "--domain-filter={{ .Values.internalDomain }}"
     {{- with .Values.externalDNSLivenessProbe }}
         livenessProbe:
 {{ toYaml . | indent 10 }}

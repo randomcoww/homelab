@@ -2,7 +2,7 @@ locals {
   pxeboot_image_builds = {
     coreos            = "fedora-coreos-36.20220803.0"
     silverblue        = "fedora-silverblue-36.20220803.0"
-    silverblue-nvidia = "fedora-silverblue-35.20220720.0"
+    silverblue-nvidia = "fedora-silverblue-35.20220804.0"
     printer           = "printer-compat"
   }
 
@@ -16,13 +16,13 @@ locals {
   }
 
   pxeboot = {
-    matchbox_http_endpoint = "http://${local.vips.matchbox}:${local.ports.matchbox_http}"
-    matchbox_api_endpoint  = "${local.vips.matchbox}:${local.ports.matchbox_api}"
-    image_store_endpoint   = "http://${local.vips.minio}:${local.ports.minio}"
-    image_store_base_path  = "boot"
+    matchbox_endpoint     = "http://${local.vips.matchbox}:${local.ports.matchbox}"
+    matchbox_api_endpoint = "${local.vips.matchbox}:${local.ports.matchbox_api}"
+    image_store_endpoint  = "http://${local.vips.minio}:${local.ports.minio}"
+    image_store_base_path = "boot"
 
     hosts = {
-      "84-a9-38-0f-aa-76" = merge(local.image_set.silverblue, {
+      "84-a9-38-0f-aa-76" = merge(local.image_set.silverblue-nvidia, {
         ignition = "de-0"
         boot_args = [
           "enforcing=0",

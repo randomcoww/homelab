@@ -176,7 +176,7 @@ resource "helm_release" "external_dns" {
   namespace  = "kube-system"
   repository = "https://randomcoww.github.io/terraform-infra/"
   chart      = "external-dns"
-  version    = "0.1.10"
+  version    = "0.1.11"
   wait       = false
   values = [
     yamlencode({
@@ -194,6 +194,10 @@ resource "helm_release" "external_dns" {
       Deployment = {
         replicaCount = 2
       }
+      dataSources = [
+        "service",
+        "ingress",
+      ]
       service = {
         type      = "LoadBalancer"
         clusterIP = local.vips.cluster_external_dns
@@ -322,6 +326,7 @@ resource "helm_release" "nginx_ingress" {
         }
         config = {
           proxy-body-size = "256m"
+          ssl-redirect    = "true"
         }
       }
     }),
@@ -753,7 +758,7 @@ resource "helm_release" "matchbox" {
   namespace  = "default"
   repository = "https://randomcoww.github.io/terraform-infra/"
   chart      = "matchbox"
-  version    = "0.2.4"
+  version    = "0.2.5"
   wait       = false
   values = [
     yamlencode({
@@ -798,16 +803,32 @@ resource "helm_release" "matchbox" {
           ]
         }
       }
+      ports = {
+        matchbox    = local.ports.matchbox
+        matchboxAPI = local.ports.matchbox_api
+      }
       syncService = {
         port = 22000
       }
       apiService = {
-        type     = "NodePort"
-        nodePort = local.ports.matchbox_api
+        annotations = {
+          "metallb.universe.tf/address-pool" = "matchbox"
+        }
+        type = "LoadBalancer"
+        port = local.ports.matchbox_api
+        externalIPs = [
+          local.vips.matchbox,
+        ]
       }
       service = {
-        type     = "NodePort"
-        nodePort = local.ports.matchbox_http
+        annotations = {
+          "metallb.universe.tf/address-pool" = "matchbox"
+        }
+        type = "LoadBalancer"
+        port = local.ports.matchbox
+        externalIPs = [
+          local.vips.matchbox,
+        ]
       }
     }),
   ]
@@ -856,7 +877,7 @@ resource "helm_release" "minio" {
       }
       drivesPerNode = 2
       replicas      = 3
-      minioAPIPort  = 9000
+      minioAPIPort  = local.ports.minio
       resources = {
         requests = {
           memory = "10Gi"
@@ -867,7 +888,11 @@ resource "helm_release" "minio" {
         clusterIP = "None"
       }
       service = {
-        port = 9000
+        type = "LoadBalancer"
+        port = local.ports.minio
+        externalIPs = [
+          local.vips.minio,
+        ]
       }
       ingress = {
         enabled          = true

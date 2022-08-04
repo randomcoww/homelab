@@ -65,7 +65,7 @@ module "ignition-gateway" {
     newbit = 1
     netnum = 1
   }
-  pxeboot_file_name = "http://${local.vips.matchbox}:${local.ports.matchbox_http}/boot.ipxe"
+  pxeboot_file_name = "http://${local.vips.matchbox}:${local.ports.matchbox}/boot.ipxe"
 }
 
 module "ignition-disks" {

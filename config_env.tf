@@ -9,6 +9,8 @@ locals {
       vlan_id = 1
       netnums = {
         external_dns = 128
+        minio        = 127
+        matchbox     = 126
       }
     }
     sync = {
@@ -35,8 +37,6 @@ locals {
       vlan_id = 90
       netnums = {
         apiserver = 2
-        minio     = 2
-        matchbox  = 2
       }
     }
     wan = {
@@ -96,9 +96,9 @@ locals {
     kube_proxy         = 50254
     etcd_client        = 58082
     etcd_peer          = 58083
-    matchbox_http      = 30001
+    matchbox           = 30001
     matchbox_api       = 30002
-    minio              = 30000
+    minio              = 9000
   }
 
   domains = {
@@ -121,7 +121,7 @@ locals {
     etcd_wrapper            = "ghcr.io/randomcoww/etcd-wrapper:latest"
     etcd                    = "ghcr.io/randomcoww/etcd:v3.5.4"
     kea                     = "ghcr.io/randomcoww/kea:2.0.2"
-    tftpd                   = "ghcr.io/randomcoww/tftpd-ipxe:master"
+    tftpd                   = "ghcr.io/randomcoww/tftpd-ipxe:20220804"
     coredns                 = "docker.io/coredns/coredns:latest"
 
     # Helm
