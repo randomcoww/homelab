@@ -53,7 +53,7 @@ resource "helm_release" "mpd" {
         enabled          = true
         ingressClassName = "nginx"
         annotations = {
-          "cert-manager.io/issuer"                            = "letsencrypt-prod"
+          "cert-manager.io/cluster-issuer"                    = "letsencrypt-prod"
           "nginx.ingress.kubernetes.io/auth-response-headers" = "Remote-User,Remote-Name,Remote-Groups,Remote-Email"
           "nginx.ingress.kubernetes.io/auth-signin"           = "https://${local.ingress_hosts.auth}"
           "nginx.ingress.kubernetes.io/auth-snippet"          = <<EOF
@@ -78,7 +78,7 @@ EOF
         ingressClassName = "nginx"
         path             = "/"
         annotations = {
-          "cert-manager.io/issuer"                            = "letsencrypt-prod"
+          "cert-manager.io/cluster-issuer"                    = "letsencrypt-prod"
           "nginx.ingress.kubernetes.io/auth-response-headers" = "Remote-User,Remote-Name,Remote-Groups,Remote-Email"
           "nginx.ingress.kubernetes.io/auth-signin"           = "https://${local.ingress_hosts.auth}"
           "nginx.ingress.kubernetes.io/auth-snippet"          = <<EOF
