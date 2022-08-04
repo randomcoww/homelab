@@ -100,9 +100,34 @@ EOF
             {
               name = "loadbalance"
             },
+          ]
+        },
+        {
+          zones = [
             {
-              name       = "cache"
-              parameters = 10
+              zone = "${local.domains.internal}."
+            },
+          ]
+          port = 53
+          plugins = [
+            {
+              name = "errors"
+            },
+            {
+              name = "health"
+            },
+            {
+              name = "ready"
+            },
+            {
+              name       = "forward"
+              parameters = ". ${local.vips.cluster_external_dns}"
+            },
+            {
+              name = "reload"
+            },
+            {
+              name = "loadbalance"
             },
           ]
         },
@@ -135,7 +160,7 @@ EOF
             },
             {
               name       = "cache"
-              parameters = 10
+              parameters = 30
             },
           ]
         },
@@ -170,7 +195,8 @@ resource "helm_release" "external_dns" {
         replicaCount = 2
       }
       service = {
-        type = "LoadBalancer"
+        type      = "LoadBalancer"
+        clusterIP = local.vips.cluster_external_dns
         externalIPs = [
           local.vips.external_dns,
         ]
@@ -248,10 +274,6 @@ EOF
             {
               name = "loadbalance"
             },
-            {
-              name       = "cache"
-              parameters = 10
-            },
           ]
         },
       ]
@@ -325,6 +347,57 @@ resource "helm_release" "cert_manager" {
   ]
 }
 
+resource "tls_private_key" "letsencrypt-prod" {
+  algorithm = "RSA"
+  rsa_bits  = 4096
+}
+
+resource "tls_private_key" "letsencrypt-staging" {
+  algorithm = "RSA"
+  rsa_bits  = 4096
+}
+
+resource "helm_release" "cert_issuer_secrets" {
+  name             = "cert-issuer"
+  repository       = "https://randomcoww.github.io/terraform-infra/"
+  chart            = "helm-wrapper"
+  namespace        = "cert-manager"
+  create_namespace = true
+  wait             = true
+  version          = "0.1.0"
+  values = [
+    yamlencode({
+      manifests = [
+        {
+          apiVersion = "v1"
+          kind       = "Secret"
+          metadata = {
+            name = "letsencrypt-prod"
+          }
+          stringData = {
+            "tls.key" = chomp(tls_private_key.letsencrypt-prod.private_key_pem)
+          }
+          type = "Opaque"
+        },
+        {
+          apiVersion = "v1"
+          kind       = "Secret"
+          metadata = {
+            name = "letsencrypt-staging"
+          }
+          stringData = {
+            "tls.key" = chomp(tls_private_key.letsencrypt-staging.private_key_pem)
+          }
+          type = "Opaque"
+        }
+      ]
+    }),
+  ]
+  depends_on = [
+    helm_release.cert_manager,
+  ]
+}
+
 resource "helm_release" "cert_issuer" {
   name       = "cert-issuer"
   repository = "https://randomcoww.github.io/terraform-infra/"
@@ -346,6 +419,7 @@ resource "helm_release" "cert_issuer" {
               privateKeySecretRef = {
                 name = "letsencrypt-prod"
               }
+              disableAccountKeyGeneration = true
               solvers = [
                 {
                   http01 = {
@@ -371,6 +445,7 @@ resource "helm_release" "cert_issuer" {
               privateKeySecretRef = {
                 name = "letsencrypt-staging"
               }
+              disableAccountKeyGeneration = true
               solvers = [
                 {
                   http01 = {
@@ -388,6 +463,7 @@ resource "helm_release" "cert_issuer" {
   ]
   depends_on = [
     helm_release.cert_manager,
+    helm_release.cert_issuer_secrets,
   ]
 }
 
@@ -435,7 +511,7 @@ resource "helm_release" "authelia" {
       ingress = {
         enabled = true
         annotations = {
-          "cert-manager.io/issuer" = "letsencrypt-prod"
+          "cert-manager.io/cluster-issuer" = "letsencrypt-prod"
         }
         certManager = true
         className   = "nginx"
@@ -760,13 +836,15 @@ resource "random_password" "minio-secret-access-key" {
   special = false
 }
 
+# data "helm_template" "minio" {
 resource "helm_release" "minio" {
-  name       = "minio"
-  namespace  = "default"
-  repository = "https://charts.min.io/"
-  chart      = "minio"
-  version    = "4.0.4"
-  wait       = false
+  name             = "minio"
+  namespace        = "minio"
+  repository       = "https://charts.min.io/"
+  chart            = "minio"
+  version          = "4.0.7"
+  wait             = false
+  create_namespace = true
   values = [
     yamlencode({
       clusterDomain = local.domains.kubernetes
@@ -778,9 +856,10 @@ resource "helm_release" "minio" {
       }
       drivesPerNode = 2
       replicas      = 3
+      minioAPIPort  = 9000
       resources = {
         requests = {
-          memory = "4Gi"
+          memory = "8Gi"
         }
       }
       consoleService = {
@@ -788,8 +867,26 @@ resource "helm_release" "minio" {
         clusterIP = "None"
       }
       service = {
-        type     = "NodePort"
-        nodePort = local.ports.minio
+        port = 9000
+      }
+      ingress = {
+        enabled          = true
+        ingressClassName = "nginx"
+        path             = "/"
+        annotations = {
+          "cert-manager.io/cluster-issuer" = "letsencrypt-prod"
+        }
+        tls = [
+          {
+            secretName = "minio-tls"
+            hosts = [
+              local.ingress_hosts.minio,
+            ]
+          },
+        ]
+        hosts = [
+          local.ingress_hosts.minio,
+        ]
       }
       users = []
       affinity = {
@@ -841,7 +938,7 @@ output "minio_endpoint" {
     version = "10"
     aliases = {
       minio = {
-        url       = "http://${local.vips.minio}:${local.ports.minio}"
+        url       = "https://${local.ingress_hosts.minio}"
         accessKey = nonsensitive(random_password.minio-access-key-id.result)
         secretKey = nonsensitive(random_password.minio-secret-access-key.result)
         api       = "S3v4"

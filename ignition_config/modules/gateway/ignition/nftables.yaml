@@ -37,6 +37,7 @@ storage:
 
               ip saddr ${interfaces.etcd.prefix} accept;
               ip saddr ${interfaces.sync.prefix} accept;
+              ip saddr ${interfaces.kubernetes.prefix} accept;
               ip saddr ${interfaces.lan.prefix} accept;
               ip saddr ${pod_network_prefix} accept;
               iifname ${interfaces.wan.interface_name} ct status dnat accept;
@@ -45,8 +46,9 @@ storage:
             chain forward {
               type filter hook forward priority filter; policy drop;
               jump base_checks;
-              ip saddr ${interfaces.lan.prefix} accept;
+              ip saddr ${interfaces.kubernetes.prefix} accept;
               ip saddr ${pod_network_prefix} accept;
+              ip saddr ${interfaces.lan.prefix} accept;
             }
 
             chain prerouting {
@@ -56,6 +58,7 @@ storage:
 
             chain postrouting {
               type nat hook postrouting priority srcnat; policy accept;
+              ip saddr ${interfaces.kubernetes.prefix} oifname ${interfaces.wan.interface_name} masquerade;
               ip saddr ${interfaces.lan.prefix} oifname ${interfaces.wan.interface_name} masquerade;
             }
           }

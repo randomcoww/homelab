@@ -8,11 +8,7 @@ locals {
       cidr    = 23
       vlan_id = 1
       netnums = {
-        apiserver    = 2
-        matchbox     = 2
-        minio        = 2
         external_dns = 128
-        gow          = 129
       }
     }
     sync = {
@@ -33,6 +29,16 @@ locals {
         external_ingress = 32
       }
     }
+    kubernetes = {
+      network = "192.168.193.0"
+      cidr    = 26
+      vlan_id = 90
+      netnums = {
+        apiserver = 2
+        minio     = 2
+        matchbox  = 2
+      }
+    }
     wan = {
       vlan_id = 30
     }
@@ -40,8 +46,9 @@ locals {
       network = "10.96.0.0"
       cidr    = 12
       netnums = {
-        cluster_apiserver = 1
-        cluster_dns       = 10
+        cluster_apiserver    = 1
+        cluster_dns          = 10
+        cluster_external_dns = 11
       }
     }
     kubernetes_pod = {
@@ -101,8 +108,9 @@ locals {
   }
 
   ingress_hosts = {
-    mpd  = "mpd.${local.domains.internal}"
-    auth = "auth.${local.domains.internal}"
+    mpd   = "mpd.${local.domains.internal}"
+    auth  = "auth.${local.domains.internal}"
+    minio = "minio.${local.domains.internal}"
   }
 
   container_images = {

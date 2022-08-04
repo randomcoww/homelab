@@ -26,7 +26,7 @@ module "ignition-kubelet-base" {
   for_each = local.members.kubelet-base
   source   = "./modules/kubelet_base"
 
-  node_ip                  = cidrhost(local.networks.lan.prefix, each.value.netnum)
+  node_ip                  = cidrhost(local.networks.kubernetes.prefix, each.value.netnum)
   static_pod_manifest_path = local.kubernetes.static_pod_manifest_path
 }
 
@@ -128,7 +128,7 @@ module "etcd-cluster" {
     for host_key, host in local.members.etcd :
     host_key => {
       hostname    = host.hostname
-      client_ip   = cidrhost(local.networks.lan.prefix, host.netnum)
+      client_ip   = cidrhost(local.networks.kubernetes.prefix, host.netnum)
       peer_ip     = cidrhost(local.networks.etcd.prefix, host.netnum)
       client_port = local.ports.etcd_client
       peer_port   = local.ports.etcd_peer
@@ -172,7 +172,7 @@ module "ignition-kubernetes-master" {
   service_network_prefix   = local.networks.kubernetes_service.prefix
   pod_network_prefix       = local.networks.kubernetes_pod.prefix
   apiserver_cert_ips = [
-    cidrhost(local.networks.lan.prefix, each.value.netnum),
+    cidrhost(local.networks.kubernetes.prefix, each.value.netnum),
     local.vips.apiserver,
     "127.0.0.1",
     local.vips.cluster_apiserver,
@@ -181,7 +181,7 @@ module "ignition-kubernetes-master" {
     for i, host_key in sort(keys(local.members.kubernetes-master)) :
     {
       name = host_key
-      ip   = cidrhost(local.networks.lan.prefix, local.hosts[host_key].netnum),
+      ip   = cidrhost(local.networks.kubernetes.prefix, local.hosts[host_key].netnum),
     }
   ]
   static_pod_manifest_path = local.kubernetes.static_pod_manifest_path

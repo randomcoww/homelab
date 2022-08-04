@@ -10,7 +10,7 @@ locals {
         phy0 = {
           mac   = "1c-83-41-30-e2-23"
           mtu   = 9000
-          vlans = ["sync", "etcd", "service", "wan"]
+          vlans = ["sync", "etcd", "service", "kubernetes", "wan"]
         }
         wlan0 = {
           mac          = "a8-7e-ea-c5-3f-46"
@@ -48,6 +48,12 @@ locals {
           enable_netnum         = true
           mtu                   = 9000
         }
+        kubernetes = {
+          source_interface_name = "phy0-kubernetes"
+          enable_netnum         = true
+          enable_vrrp_netnum    = true
+          mtu                   = 9000
+        }
         wan = {
           source_interface_name = "phy0-wan"
           enable_dhcp           = true
@@ -79,7 +85,7 @@ locals {
         phy0 = {
           mac   = "1c-83-41-30-e2-54"
           mtu   = 9000
-          vlans = ["sync", "etcd", "service", "wan"]
+          vlans = ["sync", "etcd", "service", "kubernetes", "wan"]
         }
         wlan0 = {
           mac          = "fc-b3-bc-dc-4e-fc"
@@ -117,6 +123,12 @@ locals {
           enable_netnum         = true
           mtu                   = 9000
         }
+        kubernetes = {
+          source_interface_name = "phy0-kubernetes"
+          enable_netnum         = true
+          enable_vrrp_netnum    = true
+          mtu                   = 9000
+        }
         wan = {
           source_interface_name = "phy0-wan"
           enable_dhcp           = true
@@ -147,7 +159,7 @@ locals {
         phy0 = {
           mac   = "84-a9-38-0f-aa-76"
           mtu   = 9000
-          vlans = ["etcd", "service"]
+          vlans = ["etcd", "service", "kubernetes"]
         }
         wlan0 = {
           mac = "b4-b5-b6-74-79-15"
@@ -164,7 +176,6 @@ locals {
         lan = {
           source_interface_name = "br-lan"
           enable_mdns           = true
-          enable_netnum         = true
           enable_dhcp           = true
           mtu                   = 9000
         }
@@ -175,6 +186,11 @@ locals {
         }
         service = {
           source_interface_name = "phy0-service"
+          enable_netnum         = true
+          mtu                   = 9000
+        }
+        kubernetes = {
+          source_interface_name = "phy0-kubernetes"
           enable_netnum         = true
           mtu                   = 9000
         }

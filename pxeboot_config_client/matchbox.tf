@@ -10,6 +10,7 @@ resource "matchbox_profile" "pxeboot" {
     "ip=dhcp",
     "ignition.firstboot",
     "ignition.platform.id=metal",
+    "coreos.no_persist_ip",
     "initrd=${each.value.initrd_image_name}",
     "ignition.config.url=${local.pxeboot.matchbox_http_endpoint}/ignition?mac=$${mac:hexhyp}",
     "coreos.live.rootfs_url=${local.pxeboot.image_store_endpoint}/${local.pxeboot.image_store_base_path}/${each.value.rootfs_image_name}",

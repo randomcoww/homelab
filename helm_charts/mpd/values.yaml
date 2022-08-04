@@ -57,9 +57,9 @@ uiService:
 ingress:
   enabled: true
   annotations:
-    # "cert-manager.io/issuer":                            "letsencrypt"
+    # "cert-manager.io/cluster-issuer":                    "letsencrypt"
     # "nginx.ingress.kubernetes.io/auth-response-headers": "Remote-User,Remote-Name,Remote-Groups,Remote-Email"
-    # "nginx.ingress.kubernetes.io/auth-signin":          "https://auth.local"
+    # "nginx.ingress.kubernetes.io/auth-signin":           "https://auth.local"
     # "nginx.ingress.kubernetes.io/auth-snippet": |
     #   proxy_set_header X-Forwarded-Method $request_method;
     # "nginx.ingress.kubernetes.io/auth-url":              "http://ath.default.svc/api/verify"
@@ -74,9 +74,9 @@ ingress:
 uiIngress:
   enabled: true
   annotations:
-    # "cert-manager.io/issuer":                            "letsencrypt"
+    # "cert-manager.io/cluster-issuer":                    "letsencrypt"
     # "nginx.ingress.kubernetes.io/auth-response-headers": "Remote-User,Remote-Name,Remote-Groups,Remote-Email"
-    # "nginx.ingress.kubernetes.io/auth-signin":          "https://auth.local"
+    # "nginx.ingress.kubernetes.io/auth-signin":           "https://auth.local"
     # "nginx.ingress.kubernetes.io/auth-snippet": |
     #   proxy_set_header X-Forwarded-Method $request_method;
     # "nginx.ingress.kubernetes.io/auth-url":              "http://ath.default.svc/api/verify"
