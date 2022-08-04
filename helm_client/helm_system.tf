@@ -859,7 +859,7 @@ resource "helm_release" "minio" {
       minioAPIPort  = 9000
       resources = {
         requests = {
-          memory = "8Gi"
+          memory = "10Gi"
         }
       }
       consoleService = {
