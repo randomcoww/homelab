@@ -26,6 +26,9 @@ service:
 
 dataSources: []
 
+hostNetwork:
+  enabled: false
+
 servers:
 # - zones:
 #   - zone: .
