@@ -1,0 +1,15 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ template "kea.fullname" . }}
+  labels:
+    app: {{ template "kea.name" . }}
+    chart: {{ template "kea.chart" . }}
+    release: {{ .Release.Name }}
+data:
+{{- range $i , $peer := .Values.peers }}
+  kea-dhcp4-{{ $peer.podName }}: |
+    {{ $peer.dhcp4Config }}
+  kea-ctrl-agent-{{ $peer.podName }}: |
+    {{ $peer.ctrlAgentConfig }}
+{{- end }}

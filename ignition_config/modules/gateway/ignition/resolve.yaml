@@ -1,0 +1,13 @@
+---
+variant: fcos
+version: 1.4.0
+storage:
+  files:
+    - path: /etc/systemd/network/20-${interfaces.wan.interface_name}.network.d/10-upstream-dns.conf
+      mode: 0644
+      contents:
+        inline: |
+          [Network]
+          DNS=${upstream_dns_ip}#${upstream_dns_tls_servername}
+          DNSOverTLS=true
+          DNSDefaultRoute=true

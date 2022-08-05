@@ -53,14 +53,18 @@ storage:
             Filter From Kernelspace {
               Protocol Accept {
                 TCP
-                UDP
               }
-              Address Accept {
+              Address Ignore {
                 %{~ for network_name, interface in interfaces ~}
-                %{~ if lookup(interface, "enable_dhcp_server", false) && lookup(interface, "enable_netnum", false) ~}
-                IPv4_address ${cidrsubnet(interface.prefix, dhcp_subnet.newbit, dhcp_subnet.netnum)}
+                %{~ if lookup(interface, "enable_vrrp_netnum", false) ~}
+                IPv4_address ${cidrhost(interface.prefix, host_netnum)}
+                IPv4_address ${cidrhost(interface.prefix, vrrp_netnum)}
+                %{~ else ~}
+                ${try("IPv4_address ${interface.prefix}", "")}
                 %{~ endif ~}
                 %{~ endfor ~}
+                IPv4_address 127.0.0.1
+                IPv6_address ::1
               }
               State Accept {
                 ESTABLISHED CLOSED TIME_WAIT CLOSE_WAIT for TCP

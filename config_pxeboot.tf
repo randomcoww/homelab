@@ -1,7 +1,7 @@
 locals {
   pxeboot_image_builds = {
     coreos            = "fedora-coreos-36.20220803.0"
-    silverblue        = "fedora-silverblue-36.20220803.0"
+    silverblue        = "fedora-silverblue-36.20220804.0"
     silverblue-nvidia = "fedora-silverblue-35.20220804.0"
     printer           = "printer-compat"
   }
@@ -22,14 +22,14 @@ locals {
     image_store_base_path = "boot"
 
     hosts = {
-      "84-a9-38-0f-aa-76" = merge(local.image_set.silverblue-nvidia, {
+      "84-a9-38-0f-aa-76" = merge(local.image_set.silverblue, {
         ignition = "de-0"
         boot_args = [
           "enforcing=0",
           "rfkill.default_state=1",
-          "rd.driver.blacklist=nouveau",
-          "modprobe.blacklist=nouveau",
-          "nvidia_drm.modeset=1",
+          # "rd.driver.blacklist=nouveau",
+          # "modprobe.blacklist=nouveau",
+          # "nvidia_drm.modeset=1",
           # "nvidia.NVreg_RegistryDwords=EnableBrightnessControl=1",
           # "intel_iommu=on",
           # "amd_iommu=on",

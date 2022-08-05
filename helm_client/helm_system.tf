@@ -74,7 +74,7 @@ resource "helm_release" "kube_dns" {
               zone = "${local.domains.kubernetes}."
             },
           ]
-          port = 53
+          port = local.ports.gateway_dns
           plugins = [
             {
               name = "errors"
@@ -108,7 +108,7 @@ EOF
               zone = "${local.domains.internal}."
             },
           ]
-          port = 53
+          port = local.ports.gateway_dns
           plugins = [
             {
               name = "errors"
@@ -137,7 +137,7 @@ EOF
               zone = "."
             },
           ]
-          port = 53
+          port = local.ports.gateway_dns
           plugins = [
             {
               name = "errors"
@@ -176,7 +176,7 @@ resource "helm_release" "external_dns" {
   namespace  = "kube-system"
   repository = "https://randomcoww.github.io/terraform-infra/"
   chart      = "external-dns"
-  version    = "0.1.11"
+  version    = "0.1.12"
   wait       = false
   values = [
     yamlencode({
@@ -199,11 +199,11 @@ resource "helm_release" "external_dns" {
         "ingress",
       ]
       service = {
-        type      = "LoadBalancer"
+        type      = "ClusterIP"
         clusterIP = local.vips.cluster_external_dns
-        externalIPs = [
-          local.vips.external_dns,
-        ]
+      }
+      hostNetwork = {
+        enabled = true
       }
       affinity = {
         nodeAffinity = {
@@ -251,10 +251,10 @@ resource "helm_release" "external_dns" {
         {
           zones = [
             {
-              zone = "."
+              zone = "${local.domains.internal}."
             },
           ]
-          port = 53
+          port = local.ports.gateway_dns
           plugins = [
             {
               name = "errors"
@@ -280,6 +280,39 @@ EOF
             },
           ]
         },
+        {
+          zones = [
+            {
+              zone = "."
+            },
+          ]
+          port = local.ports.gateway_dns
+          plugins = [
+            {
+              name = "errors"
+            },
+            {
+              name = "health"
+            },
+            {
+              name = "ready"
+            },
+            {
+              name       = "forward"
+              parameters = ". /etc/resolv.conf"
+            },
+            {
+              name = "reload"
+            },
+            {
+              name = "loadbalance"
+            },
+            {
+              name       = "cache"
+              parameters = 30
+            },
+          ]
+        }
       ]
     }),
   ]
@@ -733,6 +766,107 @@ resource "helm_release" "amd_gpu" {
         },
       ]
     })
+  ]
+}
+
+# kea #
+
+module "kea-config" {
+  source        = "./modules/kea_config"
+  resource_name = "kea"
+  service_ips = [
+    local.vips.cluster_kea_primary, local.vips.cluster_kea_secondary
+  ]
+  shared_data_path = "/var/lib/kea"
+  kea_peer_port    = local.ports.kea_peer
+  ipxe_file_url    = "http://${local.vips.matchbox}:${local.ports.matchbox}/boot.ipxe"
+  tftp_server      = local.vips.matchbox
+  cluster_domain   = local.domains.kubernetes
+  networks = [
+    for _, network in local.networks :
+    {
+      prefix = network.prefix
+      routers = [
+        cidrhost(network.prefix, local.vrrp_netnum),
+      ]
+      domain_name_servers = [
+        for _, member in local.members.gateway :
+        cidrhost(network.prefix, member.netnum)
+      ]
+      mtu = network.mtu
+      pools = [
+        cidrsubnet(network.prefix, 1, 1),
+      ]
+    } if lookup(network, "enable_dhcp_server", false)
+  ]
+}
+
+resource "helm_release" "kea" {
+  name       = "kea"
+  namespace  = "default"
+  repository = "https://randomcoww.github.io/terraform-infra/"
+  chart      = "kea"
+  version    = "0.1.7"
+  wait       = false
+  values = [
+    yamlencode({
+      images = {
+        kea = local.container_images.kea
+      }
+      peers = [
+        for _, peer in module.kea-config.config :
+        {
+          serviceIP       = peer.service_ip
+          podName         = peer.pod_name
+          dhcp4Config     = peer.dhcp4_config
+          ctrlAgentConfig = peer.ctrl_agent_config
+        }
+      ]
+      sharedDataPath = "/var/lib/kea"
+      StatefulSet = {
+        replicaCount = 2
+      }
+      affinity = {
+        nodeAffinity = {
+          requiredDuringSchedulingIgnoredDuringExecution = {
+            nodeSelectorTerms = [
+              {
+                matchExpressions = [
+                  {
+                    key      = "role-gateway"
+                    operator = "Exists"
+                  },
+                ]
+              },
+            ]
+          }
+        }
+        podAntiAffinity = {
+          requiredDuringSchedulingIgnoredDuringExecution = [
+            {
+              labelSelector = {
+                matchExpressions = [
+                  {
+                    key      = "app"
+                    operator = "In"
+                    values = [
+                      "kea",
+                    ]
+                  },
+                ]
+              }
+              topologyKey = "kubernetes.io/hostname"
+            },
+          ]
+        }
+      }
+      ports = {
+        keaPeer = local.ports.kea_peer
+      }
+      peerService = {
+        port = local.ports.kea_peer
+      }
+    }),
   ]
 }
 

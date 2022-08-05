@@ -1,0 +1,110 @@
+{{- range $i , $peer := .Values.peers }}
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ template "kea.fullname" $ }}-{{ $i }}
+  labels:
+    app: {{ template "kea.name" $ }}
+    chart: {{ template "kea.chart" $ }}
+    release: "{{ $.Release.Name }}"
+spec:
+  type: ClusterIP
+  publishNotReadyAddresses: true
+  clusterIP: {{ $peer.serviceIP }}
+  ports:
+  - name: kea-peer
+    port: {{ $.Values.ports.keaPeer }}
+    protocol: TCP
+    targetPort: {{ $.Values.peerService.port }}
+  selector:
+    app: {{ template "kea.name" $ }}
+    release: {{ $.Release.Name }}
+    statefulset.kubernetes.io/pod-name: {{ template "kea.fullname" $ }}-{{ $i }}
+
+{{- end }}
+---
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: {{ template "kea.fullname" . }}
+  labels:
+    app: {{ template "kea.name" . }}
+    chart: {{ template "kea.chart" . }}
+    release: "{{ .Release.Name }}"
+spec:
+  serviceName: {{ template "kea.fullname" . }}
+  replicas: {{ .Values.StatefulSet.replicaCount }}
+  updateStrategy:
+    type: {{ .Values.StatefulSet.updateStrategy }}
+  minReadySeconds: {{ .Values.StatefulSet.minReadySeconds }}
+  selector:
+    matchLabels:
+      app: {{ template "kea.name" . }}
+      release: {{ .Release.Name }}
+  template:
+    metadata:
+      labels:
+        app: {{ template "kea.name" . }}
+        release: {{ .Release.Name }}
+      annotations:
+        checksum/config: {{ include (print $.Template.BasePath "/configmap.yaml") . | sha256sum }}
+    spec:
+    {{- with .Values.affinity }}
+      affinity:
+{{ toYaml . | indent 8 }}
+    {{- end }}
+    {{- with .Values.tolerations }}
+      tolerations:
+{{ toYaml . | indent 8 }}
+    {{- end }}
+      hostNetwork: true
+      dnsPolicy: ClusterFirstWithHostNet
+      restartPolicy: Always
+      containers:
+      - name: {{ .Chart.Name }}-control-agent
+        image: {{ .Values.images.kea }}
+        args:
+        - "kea-ctrl-agent"
+        - "-c"
+        - "/etc/kea/kea-ctrl-agent.conf"
+        env:
+        - name: POD_NAME
+          valueFrom:
+            fieldRef:
+              fieldPath: metadata.name
+        volumeMounts:       
+        - name: shared-data
+          mountPath: {{ .Values.sharedDataPath }}
+        - name: kea-config
+          mountPath: /etc/kea/kea-ctrl-agent.conf
+          subPathExpr: kea-ctrl-agent-$(POD_NAME)
+          readOnly: true
+      - name: {{ .Chart.Name }}
+        image: {{ .Values.images.kea }}
+        args:
+        - "kea-dhcp4"
+        - "-c"
+        - "/etc/kea/kea-dhcp4.conf"
+        env:
+        - name: POD_NAME
+          valueFrom:
+            fieldRef:
+              fieldPath: metadata.name
+        securityContext:
+          capabilities:
+            add:
+            - NET_RAW
+        volumeMounts:
+        - name: shared-data
+          mountPath: {{ .Values.sharedDataPath }}
+        - name: kea-config
+          mountPath: /etc/kea/kea-dhcp4.conf
+          subPathExpr: kea-dhcp4-$(POD_NAME)
+          readOnly: true
+      volumes:
+      - name: shared-data
+        emptyDir: {}
+      - name: kea-config
+        configMap:
+          name: {{ template "kea.fullname" . }}

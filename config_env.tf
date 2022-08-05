@@ -1,27 +1,35 @@
 locals {
   pv_mount_path = "/var/home"
 
+  vrrp_netnum = 2
+
   # do not use #
   base_networks = {
     lan = {
-      network = "192.168.126.0"
-      cidr    = 23
-      vlan_id = 1
+      network            = "192.168.126.0"
+      cidr               = 23
+      vlan_id            = 1
+      enable_mdns        = true
+      enable_vrrp_netnum = true
+      enable_dhcp_server = true
       netnums = {
-        external_dns = 128
-        minio        = 127
         matchbox     = 126
+        minio        = 127
+        external_dns = 128
       }
+      mtu = 9000
     }
     sync = {
       network = "192.168.190.0"
       cidr    = 29
       vlan_id = 60
+      mtu     = 9000
     }
     etcd = {
       network = "192.168.191.0"
       cidr    = 29
       vlan_id = 70
+      mtu     = 9000
     }
     service = {
       network = "192.168.192.0"
@@ -30,14 +38,17 @@ locals {
       netnums = {
         external_ingress = 32
       }
+      mtu = 9000
     }
     kubernetes = {
-      network = "192.168.193.0"
-      cidr    = 26
-      vlan_id = 90
+      network            = "192.168.193.0"
+      cidr               = 26
+      vlan_id            = 90
+      enable_vrrp_netnum = true
       netnums = {
-        apiserver = 2
+        apiserver = local.vrrp_netnum
       }
+      mtu = 9000
     }
     wan = {
       vlan_id = 30
@@ -46,9 +57,11 @@ locals {
       network = "10.96.0.0"
       cidr    = 12
       netnums = {
-        cluster_apiserver    = 1
-        cluster_dns          = 10
-        cluster_external_dns = 11
+        cluster_apiserver     = 1
+        cluster_dns           = 10
+        cluster_external_dns  = 11
+        cluster_kea_primary   = 12
+        cluster_kea_secondary = 13
       }
     }
     kubernetes_pod = {
@@ -120,11 +133,11 @@ locals {
     kube_scheduler          = "ghcr.io/randomcoww/kubernetes:kube-master-v1.24.1"
     etcd_wrapper            = "ghcr.io/randomcoww/etcd-wrapper:latest"
     etcd                    = "ghcr.io/randomcoww/etcd:v3.5.4"
-    kea                     = "ghcr.io/randomcoww/kea:2.0.2"
-    coredns                 = "docker.io/coredns/coredns:latest"
 
     # Helm
+    kea                = "ghcr.io/randomcoww/kea:2.0.2"
     matchbox           = "quay.io/poseidon/matchbox:latest"
+    coredns            = "docker.io/coredns/coredns:latest"
     tftpd              = "ghcr.io/randomcoww/tftpd-ipxe:20220804"
     hostapd            = "ghcr.io/randomcoww/hostapd:latest"
     syncthing          = "docker.io/syncthing/syncthing:latest"

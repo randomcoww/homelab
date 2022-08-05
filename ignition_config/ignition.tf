@@ -37,35 +37,10 @@ module "ignition-gateway" {
   interfaces               = module.ignition-systemd-networkd[each.key].tap_interfaces
   container_images         = local.container_images
   host_netnum              = each.value.netnum
-  vrrp_netnum              = each.value.vrrp_netnum
+  vrrp_netnum              = local.vrrp_netnum
   external_ingress_ip      = local.vips.external_ingress
-  internal_domain          = local.domains.internal
-  internal_domain_dns_ip   = local.vips.external_dns
   static_pod_manifest_path = local.kubernetes.static_pod_manifest_path
   pod_network_prefix       = local.networks.kubernetes_pod.prefix
-  kea_server_name          = each.value.hostname
-  kea_peer_port            = local.ports.kea_peer
-  kea_peers = [
-    for i, host_key in sort(keys(local.members.gateway)) :
-    {
-      name   = local.hosts[host_key].hostname
-      netnum = local.hosts[host_key].netnum
-      role   = try(element(["primary", "secondary"], i), "backup")
-    }
-  ]
-  tftp_port = local.ports.pxe_tftp
-  dns_members = [
-    for i, host_key in sort(keys(local.members.gateway)) :
-    {
-      netnum = local.hosts[host_key].netnum
-    }
-  ]
-  coredns_port = local.ports.gateway_dns
-  dhcp_subnet = {
-    newbit = 1
-    netnum = 1
-  }
-  pxeboot_file_name = "http://${local.vips.matchbox}:${local.ports.matchbox}/boot.ipxe"
 }
 
 module "ignition-disks" {

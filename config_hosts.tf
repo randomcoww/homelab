@@ -4,8 +4,7 @@ locals {
       users = [
         "admin"
       ]
-      vrrp_netnum = 2
-      netnum      = 1
+      netnum = 1
       hardware_interfaces = {
         phy0 = {
           mac   = "1c-83-41-30-e2-23"
@@ -27,32 +26,23 @@ locals {
       tap_interfaces = {
         lan = {
           source_interface_name = "br-lan"
-          enable_mdns           = true
           enable_netnum         = true
-          enable_vrrp_netnum    = true
-          enable_dhcp_server    = true
-          mtu                   = 9000
         }
         sync = {
           source_interface_name = "phy0-sync"
           enable_netnum         = true
-          mtu                   = 9000
         }
         etcd = {
           source_interface_name = "phy0-etcd"
           enable_netnum         = true
-          mtu                   = 9000
         }
         service = {
           source_interface_name = "phy0-service"
           enable_netnum         = true
-          mtu                   = 9000
         }
         kubernetes = {
           source_interface_name = "phy0-kubernetes"
           enable_netnum         = true
-          enable_vrrp_netnum    = true
-          mtu                   = 9000
         }
         wan = {
           source_interface_name = "phy0-wan"
@@ -79,8 +69,7 @@ locals {
       users = [
         "admin"
       ]
-      vrrp_netnum = 2
-      netnum      = 3
+      netnum = 3
       hardware_interfaces = {
         phy0 = {
           mac   = "1c-83-41-30-e2-54"
@@ -102,32 +91,23 @@ locals {
       tap_interfaces = {
         lan = {
           source_interface_name = "br-lan"
-          enable_mdns           = true
           enable_netnum         = true
-          enable_vrrp_netnum    = true
-          enable_dhcp_server    = true
-          mtu                   = 9000
         }
         sync = {
           source_interface_name = "phy0-sync"
           enable_netnum         = true
-          mtu                   = 9000
         }
         etcd = {
           source_interface_name = "phy0-etcd"
           enable_netnum         = true
-          mtu                   = 9000
         }
         service = {
           source_interface_name = "phy0-service"
           enable_netnum         = true
-          mtu                   = 9000
         }
         kubernetes = {
           source_interface_name = "phy0-kubernetes"
           enable_netnum         = true
-          enable_vrrp_netnum    = true
-          mtu                   = 9000
         }
         wan = {
           source_interface_name = "phy0-wan"
@@ -175,24 +155,19 @@ locals {
       tap_interfaces = {
         lan = {
           source_interface_name = "br-lan"
-          enable_mdns           = true
           enable_dhcp           = true
-          mtu                   = 9000
         }
         etcd = {
           source_interface_name = "phy0-etcd"
           enable_netnum         = true
-          mtu                   = 9000
         }
         service = {
           source_interface_name = "phy0-service"
           enable_netnum         = true
-          mtu                   = 9000
         }
         kubernetes = {
           source_interface_name = "phy0-kubernetes"
           enable_netnum         = true
-          mtu                   = 9000
         }
       }
       disks = {
