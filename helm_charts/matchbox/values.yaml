@@ -31,6 +31,9 @@ ports:
 affinity: {}
 tolerations: {}
 
+hostNetwork:
+  enabled: false
+
 syncService:
   port: 22000
 

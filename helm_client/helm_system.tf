@@ -892,7 +892,7 @@ resource "helm_release" "matchbox" {
   namespace  = "default"
   repository = "https://randomcoww.github.io/terraform-infra/"
   chart      = "matchbox"
-  version    = "0.2.7"
+  version    = "0.2.8"
   wait       = false
   values = [
     yamlencode({

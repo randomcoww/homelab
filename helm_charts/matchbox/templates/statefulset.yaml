@@ -56,6 +56,10 @@ spec:
 {{ toYaml . | indent 8 }}
     {{- end }}
       restartPolicy: Always
+{{ if .Values.hostNetwork.enabled }}
+      dnsPolicy: ClusterFirstWithHostNet
+      hostNetwork: true
+{{- end }}
       initContainers:
       - name: {{ .Chart.Name }}-init
         image: {{ .Values.images.syncthing }}
