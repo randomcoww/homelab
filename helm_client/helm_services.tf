@@ -5,7 +5,7 @@ resource "helm_release" "mpd" {
   namespace  = "default"
   repository = "https://randomcoww.github.io/terraform-infra/"
   chart      = "mpd"
-  version    = "0.3.5"
+  version    = "0.3.6"
   wait       = false
   values = [
     yamlencode({
@@ -39,7 +39,7 @@ resource "helm_release" "mpd" {
           }
         },
       ]
-      minioEndPoint = "http://minio.default:9000"
+      minioEndPoint = "http://minio.minio:9000"
       minioBucket   = "music"
       persistence = {
         storageClass = "openebs-jiva-csi-default"
