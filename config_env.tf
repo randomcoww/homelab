@@ -96,8 +96,8 @@ locals {
     kube_proxy         = 50254
     etcd_client        = 58082
     etcd_peer          = 58083
-    matchbox           = 30001
-    matchbox_api       = 30002
+    matchbox           = 50100
+    matchbox_api       = 50101
     minio              = 9000
   }
 
@@ -121,11 +121,11 @@ locals {
     etcd_wrapper            = "ghcr.io/randomcoww/etcd-wrapper:latest"
     etcd                    = "ghcr.io/randomcoww/etcd:v3.5.4"
     kea                     = "ghcr.io/randomcoww/kea:2.0.2"
-    tftpd                   = "ghcr.io/randomcoww/tftpd-ipxe:20220804"
     coredns                 = "docker.io/coredns/coredns:latest"
 
     # Helm
     matchbox           = "quay.io/poseidon/matchbox:latest"
+    tftpd              = "ghcr.io/randomcoww/tftpd-ipxe:20220804"
     hostapd            = "ghcr.io/randomcoww/hostapd:latest"
     syncthing          = "docker.io/syncthing/syncthing:latest"
     rclone             = "docker.io/rclone/rclone:latest"

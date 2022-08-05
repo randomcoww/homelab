@@ -55,17 +55,16 @@ spec:
       tolerations:
 {{ toYaml . | indent 8 }}
     {{- end }}
-      dnsPolicy: ClusterFirstWithHostNet
       restartPolicy: Always
       initContainers:
       - name: {{ .Chart.Name }}-init
         image: {{ .Values.images.syncthing }}
         command:
-        - cp
-        - /tmp/config.xml
-        - /tmp/cert.pem
-        - /tmp/key.pem
-        - {{ .Values.syncthingHomePath }}/
+        - "cp"
+        - "/tmp/config.xml"
+        - "/tmp/cert.pem"
+        - "/tmp/key.pem"
+        - "{{ .Values.syncthingHomePath }}/"
         env:
         - name: POD_NAME
           valueFrom:
@@ -102,10 +101,10 @@ spec:
       - name: {{ .Chart.Name }}
         image: {{ .Values.images.matchbox }}
         args:
-        - -address=0.0.0.0:{{ .Values.ports.matchbox }}
-        - -rpc-address=0.0.0.0:{{ .Values.ports.matchboxAPI }}
-        - -assets-path={{ .Values.sharedDataPath }}
-        - -data-path={{ .Values.sharedDataPath }}
+        - "-address=0.0.0.0:{{ .Values.ports.matchbox }}"
+        - "-rpc-address=0.0.0.0:{{ .Values.ports.matchboxAPI }}"
+        - "-assets-path={{ .Values.sharedDataPath }}"
+        - "-data-path={{ .Values.sharedDataPath }}"
         volumeMounts:
         - name: matchbox-tls
           mountPath: /etc/matchbox
@@ -122,6 +121,21 @@ spec:
           initialDelaySeconds: 5
           periodSeconds: 10
           timeoutSeconds: 5
+      - name: {{ .Chart.Name }}-tftpd
+        image: {{ .Values.images.tftpd }}
+        args:
+        - "--address"
+        - "0.0.0.0:{{ .Values.ports.tftpd }}"
+        - "--verbose"
+        securityContext:
+          capabilities:
+            add:
+            - SYS_CHROOT
+            - SETUID
+            - SETGID
+        ports:
+        - name: tftpd
+          containerPort: {{ .Values.ports.tftpd }}
       volumes:
       - name: syncthing-home
         emptyDir: {}

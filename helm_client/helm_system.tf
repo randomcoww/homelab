@@ -758,10 +758,15 @@ resource "helm_release" "matchbox" {
   namespace  = "default"
   repository = "https://randomcoww.github.io/terraform-infra/"
   chart      = "matchbox"
-  version    = "0.2.5"
+  version    = "0.2.7"
   wait       = false
   values = [
     yamlencode({
+      images = {
+        matchbox  = local.container_images.matchbox
+        syncthing = local.container_images.syncthing
+        tftpd     = local.container_images.tftpd
+      }
       syncthingConfig = module.matchbox-syncthing.config
       syncthingSecret = module.matchbox-syncthing.secret
       matchboxSecret  = module.matchbox-certs.secret
@@ -806,6 +811,7 @@ resource "helm_release" "matchbox" {
       ports = {
         matchbox    = local.ports.matchbox
         matchboxAPI = local.ports.matchbox_api
+        tftpd       = local.ports.pxe_tftp
       }
       syncService = {
         port = 22000
@@ -826,6 +832,16 @@ resource "helm_release" "matchbox" {
         }
         type = "LoadBalancer"
         port = local.ports.matchbox
+        externalIPs = [
+          local.vips.matchbox,
+        ]
+      }
+      tftpdService = {
+        annotations = {
+          "metallb.universe.tf/address-pool" = "matchbox"
+        }
+        type = "LoadBalancer"
+        port = local.ports.pxe_tftp
         externalIPs = [
           local.vips.matchbox,
         ]
