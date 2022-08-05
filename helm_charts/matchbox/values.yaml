@@ -20,13 +20,11 @@ StatefulSet:
 images:
   matchbox: "quay.io/poseidon/matchbox:latest"
   syncthing: "docker.io/syncthing/syncthing:latest"
-  tftpd: "ghcr.io/randomcoww/tftpd-ipxe:20220804"
 
 ports:
   syncthingPeer: 22000
   matchbox: 8080
   matchboxAPI: 8081
-  tftpd: 69
 
 affinity: {}
 tolerations: {}

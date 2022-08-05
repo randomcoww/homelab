@@ -10,10 +10,6 @@ variable "ipxe_file_url" {
   type = string
 }
 
-variable "tftp_server" {
-  type = string
-}
-
 variable "cluster_domain" {
   type = string
 }
@@ -24,6 +20,7 @@ variable "networks" {
     mtu                 = number
     routers             = list(string)
     domain_name_servers = list(string)
+    tftp_server         = string
     pools               = list(string)
   }))
 }

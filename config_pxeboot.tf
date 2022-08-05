@@ -22,14 +22,14 @@ locals {
     image_store_base_path = "boot"
 
     hosts = {
-      "84-a9-38-0f-aa-76" = merge(local.image_set.silverblue, {
+      "84-a9-38-0f-aa-76" = merge(local.image_set.silverblue-nvidia, {
         ignition = "de-0"
         boot_args = [
           "enforcing=0",
           "rfkill.default_state=1",
-          # "rd.driver.blacklist=nouveau",
-          # "modprobe.blacklist=nouveau",
-          # "nvidia_drm.modeset=1",
+          "rd.driver.blacklist=nouveau",
+          "modprobe.blacklist=nouveau",
+          "nvidia_drm.modeset=1",
           # "nvidia.NVreg_RegistryDwords=EnableBrightnessControl=1",
           # "intel_iommu=on",
           # "amd_iommu=on",

@@ -77,11 +77,11 @@ locals {
               boot-file-name = "/ipxe.efi"
             },
           ]
-          next-server = var.tftp_server
           subnet4 = [
             for network_name, network in var.networks :
             {
-              subnet = network.prefix,
+              subnet      = network.prefix,
+              next-server = network.tftp_server
               option-data = [
                 {
                   name = "routers"

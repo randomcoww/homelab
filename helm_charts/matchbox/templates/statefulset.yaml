@@ -125,21 +125,6 @@ spec:
           initialDelaySeconds: 5
           periodSeconds: 10
           timeoutSeconds: 5
-      - name: {{ .Chart.Name }}-tftpd
-        image: {{ .Values.images.tftpd }}
-        args:
-        - "--address"
-        - "0.0.0.0:{{ .Values.ports.tftpd }}"
-        - "--verbose"
-        securityContext:
-          capabilities:
-            add:
-            - SYS_CHROOT
-            - SETUID
-            - SETGID
-        ports:
-        - name: tftpd
-          containerPort: {{ .Values.ports.tftpd }}
       volumes:
       - name: syncthing-home
         emptyDir: {}

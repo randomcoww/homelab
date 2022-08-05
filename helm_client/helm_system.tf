@@ -780,7 +780,6 @@ module "kea-config" {
   shared_data_path = "/var/lib/kea"
   kea_peer_port    = local.ports.kea_peer
   ipxe_file_url    = "http://${local.vips.matchbox}:${local.ports.matchbox}/boot.ipxe"
-  tftp_server      = local.vips.matchbox
   cluster_domain   = local.domains.kubernetes
   networks = [
     for _, network in local.networks :
@@ -793,7 +792,8 @@ module "kea-config" {
         for _, member in local.members.gateway :
         cidrhost(network.prefix, member.netnum)
       ]
-      mtu = network.mtu
+      tftp_server = cidrhost(network.prefix, local.vrrp_netnum)
+      mtu         = network.mtu
       pools = [
         cidrsubnet(network.prefix, 1, 1),
       ]
@@ -806,12 +806,13 @@ resource "helm_release" "kea" {
   namespace  = "default"
   repository = "https://randomcoww.github.io/terraform-infra/"
   chart      = "kea"
-  version    = "0.1.7"
+  version    = "0.1.8"
   wait       = false
   values = [
     yamlencode({
       images = {
-        kea = local.container_images.kea
+        kea   = local.container_images.kea
+        tftpd = local.container_images.tftpd
       }
       peers = [
         for _, peer in module.kea-config.config :
@@ -862,6 +863,7 @@ resource "helm_release" "kea" {
       }
       ports = {
         keaPeer = local.ports.kea_peer
+        tftpd   = local.ports.pxe_tftp
       }
       peerService = {
         port = local.ports.kea_peer
@@ -892,14 +894,13 @@ resource "helm_release" "matchbox" {
   namespace  = "default"
   repository = "https://randomcoww.github.io/terraform-infra/"
   chart      = "matchbox"
-  version    = "0.2.8"
+  version    = "0.2.9"
   wait       = false
   values = [
     yamlencode({
       images = {
         matchbox  = local.container_images.matchbox
         syncthing = local.container_images.syncthing
-        tftpd     = local.container_images.tftpd
       }
       syncthingConfig = module.matchbox-syncthing.config
       syncthingSecret = module.matchbox-syncthing.secret
@@ -945,7 +946,6 @@ resource "helm_release" "matchbox" {
       ports = {
         matchbox    = local.ports.matchbox
         matchboxAPI = local.ports.matchbox_api
-        tftpd       = local.ports.pxe_tftp
       }
       syncService = {
         port = 22000
