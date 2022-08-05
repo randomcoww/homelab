@@ -12,12 +12,7 @@ locals {
       enable_mdns        = true
       enable_vrrp_netnum = true
       enable_dhcp_server = true
-      netnums = {
-        matchbox     = 126
-        minio        = 127
-        external_dns = 128
-      }
-      mtu = 9000
+      mtu                = 9000
     }
     sync = {
       network = "192.168.190.0"
@@ -37,6 +32,8 @@ locals {
       vlan_id = 80
       netnums = {
         external_ingress = 32
+        matchbox         = 33
+        minio            = 34
       }
       mtu = 9000
     }
