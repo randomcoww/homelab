@@ -45,6 +45,9 @@ spec:
         - name: config
           mountPath: /tmp/settings.json
           subPath: settings.json
+        - name: config
+          mountPath: {{ index .Values "transmission" "config" "script-torrent-done-filename" }}
+          subPath: done.sh
         - name: transmission-home
           mountPath: {{ .Values.transmission.homePath }}
       - name: {{ .Chart.Name }}-wg
@@ -76,6 +79,7 @@ spec:
       - name: config
         secret:
           secretName: {{ template "transmission.fullname" . }}
+          defaultMode: 0755
   volumeClaimTemplates:
   - metadata:
       name: transmission-home

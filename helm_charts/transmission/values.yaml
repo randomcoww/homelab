@@ -38,6 +38,8 @@ transmission:
   config:
     download-dir: /var/lib/transmission/download
     incomplete-dir: /var/lib/transmission/incomplete
+    script-torrent-done-filename: /torrentdone.sh
+  doneScript:
 
 wireguard:
   config:

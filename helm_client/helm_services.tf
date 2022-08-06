@@ -107,7 +107,7 @@ resource "helm_release" "transmission" {
   namespace  = "default"
   repository = "https://randomcoww.github.io/terraform-infra/"
   chart      = "transmission"
-  version    = "0.1.3"
+  version    = "0.1.4"
   wait       = false
   values = [
     yamlencode({
@@ -154,37 +154,66 @@ EOF
       transmission = {
         homePath = "/var/lib/transmission"
         config = {
-          bind-address-ipv4           = "0.0.0.0"
-          blocklist-enabled           = true
-          blocklist-url               = "http://list.iblocklist.com/?list=ydxerpxkpcfqjaybcssw&fileformat=p2p&archiveformat=gz"
-          download-dir                = "/var/lib/transmission/downloads"
-          incomplete-dir              = "/var/lib/transmission/incomplete"
-          incomplete-dir-enabled      = true
-          download-queue-enabled      = true
-          download-queue-size         = 20
-          encryption                  = 2
-          max-peers-global            = 1000
-          message-level               = 2
-          peer-limit-global           = 1000
-          peer-limit-per-torrent      = 1000
-          port-forwarding-enabled     = false
-          preallocation               = 0
-          queue-stalled-enabled       = true
-          queue-stalled-minutes       = 5
-          ratio-limit                 = 0
-          ratio-limit-enabled         = true
-          rename-partial-files        = true
-          rpc-authentication-required = false
-          rpc-host-whitelist-enabled  = false
-          rpc-port                    = local.ports.transmission
-          rpc-url                     = "/transmission/"
-          rpc-whitelist-enabled       = false
-          script-torrent-done-enabled = false
-          speed-limit-down-enabled    = false
-          speed-limit-up              = 10
-          speed-limit-up-enabled      = true
-          start-added-torrents        = true
+          bind-address-ipv4            = "0.0.0.0"
+          blocklist-enabled            = true
+          blocklist-url                = "http://list.iblocklist.com/?list=ydxerpxkpcfqjaybcssw&fileformat=p2p&archiveformat=gz"
+          download-dir                 = "/var/lib/transmission/downloads"
+          incomplete-dir               = "/var/lib/transmission/incomplete"
+          incomplete-dir-enabled       = true
+          download-queue-enabled       = true
+          download-queue-size          = 20
+          encryption                   = 2
+          max-peers-global             = 1000
+          message-level                = 2
+          peer-limit-global            = 1000
+          peer-limit-per-torrent       = 1000
+          port-forwarding-enabled      = false
+          preallocation                = 0
+          queue-stalled-enabled        = true
+          queue-stalled-minutes        = 5
+          ratio-limit                  = 0
+          ratio-limit-enabled          = true
+          rename-partial-files         = true
+          rpc-authentication-required  = false
+          rpc-host-whitelist-enabled   = false
+          rpc-port                     = local.ports.transmission
+          rpc-url                      = "/transmission/"
+          rpc-whitelist-enabled        = false
+          script-torrent-done-enabled  = true
+          script-torrent-done-filename = "/torrentdone.sh",
+          speed-limit-down-enabled     = false
+          speed-limit-up               = 10
+          speed-limit-up-enabled       = true
+          start-added-torrents         = true
         }
+        doneScript = <<EOF
+#!/bin/sh
+set -xe
+#  * TR_APP_VERSION
+#  * TR_TIME_LOCALTIME
+#  * TR_TORRENT_DIR
+#  * TR_TORRENT_HASH
+#  * TR_TORRENT_ID
+#  * TR_TORRENT_NAME
+
+function upload() {
+  set -xe
+  curl -X PUT -T "$1" "https://${local.kubernetes_ingress_endpoints.minio}/test/$(jq -rn --arg x "$1" '$x|@uri')"
+}
+export -f upload
+
+cd "$TR_TORRENT_DIR"
+
+transmission-remote 127.0.0.1:${local.ports.transmission} \
+  --torrent "$TR_TORRENT_ID" \
+  --verify
+
+find "$TR_TORRENT_NAME" -type f -exec sh -c "upload '{}'" \;
+
+transmission-remote 127.0.0.1:${local.ports.transmission} \
+  --torrent "$TR_TORRENT_ID" \
+  --remove-and-delete
+EOF
       }
       wireguard = {
         config = {
