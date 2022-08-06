@@ -102,6 +102,106 @@ EOF
   ]
 }
 
+resource "helm_release" "transmission" {
+  name       = "transmission"
+  namespace  = "default"
+  repository = "https://randomcoww.github.io/terraform-infra/"
+  chart      = "transmission"
+  version    = "0.1.3"
+  wait       = false
+  values = [
+    yamlencode({
+      persistence = {
+        storageClass = "openebs-jiva-csi-default"
+        size         = "50Gi"
+      }
+      images = {
+        transmission = local.container_images.transmission
+        wireguard    = local.container_images.wireguard
+      }
+      ports = {
+        transmission = local.ports.transmission
+      }
+      service = {
+        type = "ClusterIP"
+        port = local.ports.transmission
+      }
+      ingress = {
+        enabled          = true
+        ingressClassName = "nginx"
+        path             = "/"
+        annotations = {
+          "cert-manager.io/cluster-issuer"                    = "letsencrypt-prod"
+          "nginx.ingress.kubernetes.io/auth-response-headers" = "Remote-User,Remote-Name,Remote-Groups,Remote-Email"
+          "nginx.ingress.kubernetes.io/auth-signin"           = "https://${local.kubernetes_ingress_endpoints.auth}"
+          "nginx.ingress.kubernetes.io/auth-snippet"          = <<EOF
+proxy_set_header X-Forwarded-Method $request_method;
+EOF
+          "nginx.ingress.kubernetes.io/auth-url"              = "http://${local.kubernetes_service_endpoints.authelia}/api/verify"
+        }
+        tls = [
+          {
+            secretName = "transmission-tls"
+            hosts = [
+              local.kubernetes_ingress_endpoints.transmission,
+            ]
+          },
+        ]
+        hosts = [
+          local.kubernetes_ingress_endpoints.transmission,
+        ]
+      }
+      transmission = {
+        homePath = "/var/lib/transmission"
+        config = {
+          bind-address-ipv4           = "0.0.0.0"
+          blocklist-enabled           = true
+          blocklist-url               = "http://list.iblocklist.com/?list=ydxerpxkpcfqjaybcssw&fileformat=p2p&archiveformat=gz"
+          download-dir                = "/var/lib/transmission/downloads"
+          incomplete-dir              = "/var/lib/transmission/incomplete"
+          incomplete-dir-enabled      = true
+          download-queue-enabled      = true
+          download-queue-size         = 20
+          encryption                  = 2
+          max-peers-global            = 1000
+          message-level               = 2
+          peer-limit-global           = 1000
+          peer-limit-per-torrent      = 1000
+          port-forwarding-enabled     = false
+          preallocation               = 0
+          queue-stalled-enabled       = true
+          queue-stalled-minutes       = 5
+          ratio-limit                 = 0
+          ratio-limit-enabled         = true
+          rename-partial-files        = true
+          rpc-authentication-required = false
+          rpc-host-whitelist-enabled  = false
+          rpc-port                    = local.ports.transmission
+          rpc-url                     = "/transmission/"
+          rpc-whitelist-enabled       = false
+          script-torrent-done-enabled = false
+          speed-limit-down-enabled    = false
+          speed-limit-up              = 10
+          speed-limit-up-enabled      = true
+          start-added-torrents        = true
+        }
+      }
+      wireguard = {
+        config = {
+          Interface = merge(var.wireguard.Interface, {
+            PostUp = <<EOT
+nft add table ip filter && nft add chain ip filter output { type filter hook output priority 0 \; } && nft insert rule ip filter output oifname != "%i" mark != $(wg show %i fwmark) fib daddr type != local tcp sport != ${local.ports.transmission} reject
+EOT
+          })
+          Peer = merge(var.wireguard.Peer, {
+            PersistentKeepalive = 25
+          })
+        }
+      }
+    })
+  ]
+}
+
 # games on whales https://github.com/games-on-whales #
 
 # resource "helm_release" "gow" {

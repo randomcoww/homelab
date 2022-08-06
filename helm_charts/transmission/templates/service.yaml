@@ -1,0 +1,35 @@
+{{ $scheme := "http" }}
+{{- if .Values.tls.enabled }}
+{{ $scheme = "https" }}
+{{ end }}
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ template "transmission.fullname" . }}
+  labels:
+    app: {{ template "transmission.name" . }}
+    chart: {{ template "transmission.chart" . }}
+    release: {{ .Release.Name }}
+spec:
+  type: {{ .Values.service.type }}
+{{- if .Values.service.clusterIP }}
+  clusterIP: {{ .Values.service.clusterIP }}
+{{- end }}
+  ports:
+  - name: {{ $scheme }}
+    port: {{ .Values.service.port }}
+    protocol: TCP
+{{- if (and (eq .Values.service.type "NodePort") ( .Values.service.nodePort)) }}
+    nodePort: {{ .Values.service.nodePort }}
+{{- else }}
+    targetPort: {{ .Values.ports.transmission }}
+{{- end }}
+{{- if .Values.service.externalIPs }}
+  externalIPs:
+{{- range $i , $ip := .Values.service.externalIPs }}
+  - {{ $ip }}
+{{- end }}
+{{- end }}
+  selector:
+    app: {{ template "transmission.name" . }}
+    release: {{ .Release.Name }}

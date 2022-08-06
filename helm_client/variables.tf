@@ -13,3 +13,10 @@ variable "authelia_users" {
   type    = any
   default = {}
 }
+
+variable "wireguard" {
+  type = object({
+    Interface = map(string)
+    Peer      = map(string)
+  })
+}

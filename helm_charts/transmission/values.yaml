@@ -1,0 +1,45 @@
+service:
+  type: ClusterIP
+
+ingress:
+  enabled: true
+  annotations:
+    # "cert-manager.io/cluster-issuer":                    "letsencrypt"
+    # "nginx.ingress.kubernetes.io/auth-response-headers": "Remote-User,Remote-Name,Remote-Groups,Remote-Email"
+    # "nginx.ingress.kubernetes.io/auth-signin":           "https://auth.local"
+    # "nginx.ingress.kubernetes.io/auth-snippet": |
+    #   proxy_set_header X-Forwarded-Method $request_method;
+    # "nginx.ingress.kubernetes.io/auth-url":              "http://auth.default.svc/api/verify"
+  ingressClassName: nginx
+  tls:
+  # - secretName: chart-example-tls
+  #   hosts:
+  #     - chart-example.local
+  hosts:
+  # - chart-example.local
+
+ports:
+  transmission: 9091
+
+persistence:
+  accessMode: ReadWriteOnce
+  size: 50Gi
+  storageClass: local-path
+
+tls:
+  enabled: true
+
+images:
+  transmission: ghcr.io/randomcoww/transmission:latest
+  wireguard: ghcr.io/randomcoww/wireguard:latest
+
+transmission:
+  homePath: /var/lib/transmission
+  config:
+    download-dir: /var/lib/transmission/download
+    incomplete-dir: /var/lib/transmission/incomplete
+
+wireguard:
+  config:
+    Interface: {}
+    Peer: {}

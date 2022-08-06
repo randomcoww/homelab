@@ -1,0 +1,94 @@
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: {{ template "transmission.fullname" . }}
+  labels:
+    app: {{ template "transmission.name" . }}
+    chart: {{ template "transmission.chart" . }}
+    release: "{{ .Release.Name }}"
+spec:
+  serviceName: {{ template "transmission.fullname" . }}
+  # Only supports 1 replica
+  replicas: 1
+  selector:
+    matchLabels:
+      app: {{ template "transmission.name" . }}
+      release: {{ .Release.Name }}
+  template:
+    metadata:
+      labels:
+        app: {{ template "transmission.name" . }}
+        release: {{ .Release.Name }}
+      annotations:
+        checksum/config: {{ include (print $.Template.BasePath "/secret.yaml") . | sha256sum }}
+    spec:
+    {{- with .Values.affinity }}
+      affinity:
+{{ toYaml . | indent 8 }}
+    {{- end }}
+    {{- with .Values.tolerations }}
+      tolerations:
+{{ toYaml . | indent 8 }}
+    {{- end }}
+      dnsPolicy: ClusterFirstWithHostNet
+      restartPolicy: Always
+      initContainers:
+      - name: {{ .Chart.Name }}-init
+        image: {{ .Values.images.transmission }}
+        command:
+        - "sh"
+        - "-c"
+        - |
+          set -x \
+          && cp -n /tmp/settings.json {{ .Values.transmission.homePath }}/
+        volumeMounts:
+        - name: config
+          mountPath: /tmp/settings.json
+          subPath: settings.json
+        - name: transmission-home
+          mountPath: {{ .Values.transmission.homePath }}
+      - name: {{ .Chart.Name }}-wg
+        image: {{ .Values.images.wireguard }}
+        args:
+        - "up"
+        - "wg0"
+        securityContext:
+          privileged: true
+          capabilities:
+            add:
+            - NET_ADMIN
+        volumeMounts:
+        - name: config
+          mountPath: /etc/wireguard/wg0.conf
+          subPath: wg0.conf
+      containers:
+      - name: {{ .Chart.Name }}
+        image: {{ .Values.images.transmission }}
+        args: 
+        - "--config-dir"
+        - "{{ .Values.transmission.homePath }}"
+        volumeMounts:
+        - name: transmission-home
+          mountPath: {{ .Values.transmission.homePath }}
+        ports:
+        - containerPort: {{ .Values.ports.transmission }}
+      volumes:
+      - name: config
+        secret:
+          secretName: {{ template "transmission.fullname" . }}
+  volumeClaimTemplates:
+  - metadata:
+      name: transmission-home
+    {{- if .Values.persistence.annotations }}
+      annotations:
+{{ toYaml .Values.persistence.annotations | trimSuffix "\n" | indent 8 }}
+    {{- end }}
+    spec:
+      accessModes:
+      - {{ .Values.persistence.accessMode | quote }}
+      resources:
+        requests:
+          storage: {{ .Values.persistence.size | quote }}
+    {{- if .Values.persistence.storageClass }}
+      storageClassName: "{{ .Values.persistence.storageClass }}"
+    {{- end }}

@@ -117,6 +117,8 @@ locals {
     kapprover          = "ghcr.io/randomcoww/kapprover:latest"
     external_dns       = "k8s.gcr.io/external-dns/external-dns:v0.12.0"
     kube_proxy         = "ghcr.io/randomcoww/kubernetes:kube-proxy-v1.24.1"
+    transmission       = "ghcr.io/randomcoww/transmission:latest"
+    wireguard          = "ghcr.io/randomcoww/wireguard:latest"
   }
 
   kubernetes = {
@@ -133,9 +135,10 @@ locals {
   }
 
   kubernetes_ingress_endpoints = {
-    mpd   = "mpd.${local.domains.internal}"
-    auth  = "auth.${local.domains.internal}"
-    minio = "minio.${local.domains.internal}"
+    mpd          = "mpd.${local.domains.internal}"
+    auth         = "auth.${local.domains.internal}"
+    minio        = "minio.${local.domains.internal}"
+    transmission = "t.${local.domains.internal}"
   }
 
   kubernetes_service_endpoints = {
@@ -158,5 +161,6 @@ locals {
     matchbox           = 50100
     matchbox_api       = 50101
     minio              = 9000
+    transmission       = 9091
   }
 }
