@@ -64,7 +64,7 @@ spec:
       containers:
       - name: {{ .Chart.Name }}
         image: {{ .Values.images.transmission }}
-        args: 
+        args:
         - "--config-dir"
         - "{{ .Values.transmission.homePath }}"
         volumeMounts:
