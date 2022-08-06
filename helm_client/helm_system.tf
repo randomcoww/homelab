@@ -536,10 +536,10 @@ resource "helm_release" "authelia_users" {
 }
 
 resource "helm_release" "authelia" {
-  name             = "authelia"
+  name             = split(".", local.kubernetes_service_endpoints.authelia)[0]
+  namespace        = split(".", local.kubernetes_service_endpoints.authelia)[1]
   repository       = "https://charts.authelia.com"
   chart            = "authelia"
-  namespace        = "authelia"
   create_namespace = true
   version          = "0.8.38"
   wait             = false
@@ -553,7 +553,7 @@ resource "helm_release" "authelia" {
         }
         certManager = true
         className   = "nginx"
-        subdomain   = split(".", local.ingress_hosts.auth)[0]
+        subdomain   = split(".", local.kubernetes_ingress_endpoints.auth)[0]
         tls = {
           enabled = true
           secret  = "authelia-tls"
@@ -723,22 +723,6 @@ resource "helm_release" "nvidia_device_plugin" {
   version    = "0.12.2"
   values = [
     yamlencode({
-      affinity = {
-        nodeAffinity = {
-          requiredDuringSchedulingIgnoredDuringExecution = {
-            nodeSelectorTerms = [
-              {
-                matchExpressions = [
-                  {
-                    key      = "nvidia.com/gpu"
-                    operator = "Exists"
-                  },
-                ]
-              },
-            ]
-          }
-        }
-      }
       tolerations = [
         {
           effect   = "NoExecute"
@@ -1009,8 +993,8 @@ resource "random_password" "minio-secret-access-key" {
 
 # data "helm_template" "minio" {
 resource "helm_release" "minio" {
-  name             = "minio"
-  namespace        = "minio"
+  name             = split(".", local.kubernetes_service_endpoints.minio)[0]
+  namespace        = split(".", local.kubernetes_service_endpoints.minio)[1]
   repository       = "https://charts.min.io/"
   chart            = "minio"
   version          = "4.0.7"
@@ -1055,12 +1039,12 @@ resource "helm_release" "minio" {
           {
             secretName = "minio-tls"
             hosts = [
-              local.ingress_hosts.minio,
+              local.kubernetes_ingress_endpoints.minio,
             ]
           },
         ]
         hosts = [
-          local.ingress_hosts.minio,
+          local.kubernetes_ingress_endpoints.minio,
         ]
       }
       users = []
@@ -1113,7 +1097,7 @@ output "minio_endpoint" {
     version = "10"
     aliases = {
       minio = {
-        url       = "https://${local.ingress_hosts.minio}"
+        url       = "https://${local.kubernetes_ingress_endpoints.minio}"
         accessKey = nonsensitive(random_password.minio-access-key-id.result)
         secretKey = nonsensitive(random_password.minio-secret-access-key.result)
         api       = "S3v4"
