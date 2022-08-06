@@ -39,7 +39,7 @@ resource "helm_release" "mpd" {
           }
         },
       ]
-      minioEndPoint = "http://minio.minio:9000"
+      minioEndPoint = "http://${local.kubernetes_service_endpoints.minio}:${local.ports.minio}"
       minioBucket   = "music"
       persistence = {
         storageClass = "openebs-jiva-csi-default"
@@ -55,22 +55,22 @@ resource "helm_release" "mpd" {
         annotations = {
           "cert-manager.io/cluster-issuer"                    = "letsencrypt-prod"
           "nginx.ingress.kubernetes.io/auth-response-headers" = "Remote-User,Remote-Name,Remote-Groups,Remote-Email"
-          "nginx.ingress.kubernetes.io/auth-signin"           = "https://${local.ingress_hosts.auth}"
+          "nginx.ingress.kubernetes.io/auth-signin"           = "https://${local.kubernetes_ingress_endpoints.auth}"
           "nginx.ingress.kubernetes.io/auth-snippet"          = <<EOF
 proxy_set_header X-Forwarded-Method $request_method;
 EOF
-          "nginx.ingress.kubernetes.io/auth-url"              = "http://authelia.authelia.svc.${local.domains.kubernetes}/api/verify"
+          "nginx.ingress.kubernetes.io/auth-url"              = "http://${local.kubernetes_service_endpoints.authelia}/api/verify"
         }
         tls = [
           {
             secretName = "mpd-tls"
             hosts = [
-              local.ingress_hosts.mpd,
+              local.kubernetes_ingress_endpoints.mpd,
             ]
           },
         ]
         hosts = [
-          local.ingress_hosts.mpd,
+          local.kubernetes_ingress_endpoints.mpd,
         ]
       }
       uiIngress = {
@@ -80,22 +80,22 @@ EOF
         annotations = {
           "cert-manager.io/cluster-issuer"                    = "letsencrypt-prod"
           "nginx.ingress.kubernetes.io/auth-response-headers" = "Remote-User,Remote-Name,Remote-Groups,Remote-Email"
-          "nginx.ingress.kubernetes.io/auth-signin"           = "https://${local.ingress_hosts.auth}"
+          "nginx.ingress.kubernetes.io/auth-signin"           = "https://${local.kubernetes_ingress_endpoints.auth}"
           "nginx.ingress.kubernetes.io/auth-snippet"          = <<EOF
 proxy_set_header X-Forwarded-Method $request_method;
 EOF
-          "nginx.ingress.kubernetes.io/auth-url"              = "http://authelia.authelia.svc.${local.domains.kubernetes}/api/verify"
+          "nginx.ingress.kubernetes.io/auth-url"              = "http://${local.kubernetes_service_endpoints.authelia}/api/verify"
         }
         tls = [
           {
             secretName = "mpd-tls"
             hosts = [
-              local.ingress_hosts.mpd,
+              local.kubernetes_ingress_endpoints.mpd,
             ]
           },
         ]
         hosts = [
-          local.ingress_hosts.mpd,
+          local.kubernetes_ingress_endpoints.mpd,
         ]
       }
     }),

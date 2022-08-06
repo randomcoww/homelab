@@ -94,35 +94,6 @@ locals {
     ]...
   )
 
-  ports = {
-    kea_peer           = 58080
-    gateway_dns        = 53
-    pxe_tftp           = 69
-    apiserver          = 58081
-    apiserver_internal = 58181
-    controller_manager = 50252
-    scheduler          = 50251
-    kubelet            = 50250
-    kube_proxy         = 50254
-    etcd_client        = 58082
-    etcd_peer          = 58083
-    matchbox           = 50100
-    matchbox_api       = 50101
-    minio              = 9000
-  }
-
-  domains = {
-    internal_mdns = "local"
-    internal      = "fuzzybunny.mooo.com"
-    kubernetes    = "cluster.internal"
-  }
-
-  ingress_hosts = {
-    mpd   = "mpd.${local.domains.internal}"
-    auth  = "auth.${local.domains.internal}"
-    minio = "minio.${local.domains.internal}"
-  }
-
   container_images = {
     # Igntion
     kube_apiserver          = "ghcr.io/randomcoww/kubernetes:kube-master-v1.24.1"
@@ -153,5 +124,39 @@ locals {
     cluster_name              = "prod-6"
     static_pod_manifest_path  = "/var/lib/kubelet/manifests"
     cni_bridge_interface_name = "cni0"
+  }
+
+  domains = {
+    internal_mdns = "local"
+    internal      = "fuzzybunny.mooo.com"
+    kubernetes    = "cluster.internal"
+  }
+
+  kubernetes_ingress_endpoints = {
+    mpd   = "mpd.${local.domains.internal}"
+    auth  = "auth.${local.domains.internal}"
+    minio = "minio.${local.domains.internal}"
+  }
+
+  kubernetes_service_endpoints = {
+    minio    = "minio.minio.svc.${local.domains.kubernetes}"
+    authelia = "authelia.authelia.svc.${local.domains.kubernetes}"
+  }
+
+  ports = {
+    kea_peer           = 58080
+    gateway_dns        = 53
+    pxe_tftp           = 69
+    apiserver          = 58081
+    apiserver_internal = 58181
+    controller_manager = 50252
+    scheduler          = 50251
+    kubelet            = 50250
+    kube_proxy         = 50254
+    etcd_client        = 58082
+    etcd_peer          = 58083
+    matchbox           = 50100
+    matchbox_api       = 50101
+    minio              = 9000
   }
 }
