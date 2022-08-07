@@ -30,7 +30,6 @@ spec:
       tolerations:
 {{ toYaml . | indent 8 }}
     {{- end }}
-      dnsPolicy: ClusterFirstWithHostNet
       restartPolicy: Always
       initContainers:
       - name: {{ .Chart.Name }}-init
@@ -40,14 +39,11 @@ spec:
         - "-c"
         - |
           set -x \
-          && cp -n /tmp/settings.json {{ .Values.transmission.homePath }}/
+          && cp -f /tmp/settings.json {{ .Values.transmission.homePath }}/
         volumeMounts:
         - name: config
           mountPath: /tmp/settings.json
           subPath: settings.json
-        - name: config
-          mountPath: {{ index .Values "transmission" "config" "script-torrent-done-filename" }}
-          subPath: done.sh
         - name: transmission-home
           mountPath: {{ .Values.transmission.homePath }}
       - name: {{ .Chart.Name }}-wg
@@ -73,6 +69,9 @@ spec:
         volumeMounts:
         - name: transmission-home
           mountPath: {{ .Values.transmission.homePath }}
+        - name: config
+          mountPath: {{ index .Values "transmission" "config" "script-torrent-done-filename" }}
+          subPath: done.sh
         ports:
         - containerPort: {{ .Values.ports.transmission }}
       volumes:

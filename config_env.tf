@@ -107,18 +107,18 @@ locals {
     matchbox           = "quay.io/poseidon/matchbox:latest"
     coredns            = "docker.io/coredns/coredns:latest"
     tftpd              = "ghcr.io/randomcoww/tftpd-ipxe:20220804"
-    hostapd            = "ghcr.io/randomcoww/hostapd:latest"
+    hostapd            = "ghcr.io/randomcoww/hostapd:20220807"
     syncthing          = "docker.io/syncthing/syncthing:latest"
     rclone             = "docker.io/rclone/rclone:latest"
     mpd                = "ghcr.io/randomcoww/mpd:0.23.8-2"
-    ympd               = "ghcr.io/randomcoww/ympd:latest"
+    ympd               = "ghcr.io/randomcoww/ympd:20220807"
     flannel            = "ghcr.io/randomcoww/flannel:v0.18.1"
     flannel_cni_plugin = "rancher/mirrored-flannelcni-flannel-cni-plugin:v1.1.0"
     kapprover          = "ghcr.io/randomcoww/kapprover:latest"
     external_dns       = "k8s.gcr.io/external-dns/external-dns:v0.12.0"
     kube_proxy         = "ghcr.io/randomcoww/kubernetes:kube-proxy-v1.24.1"
-    transmission       = "ghcr.io/randomcoww/transmission:latest"
-    wireguard          = "ghcr.io/randomcoww/wireguard:latest"
+    transmission       = "ghcr.io/randomcoww/transmission:20220807"
+    wireguard          = "ghcr.io/randomcoww/wireguard:20220807"
   }
 
   kubernetes = {
@@ -144,6 +144,12 @@ locals {
   kubernetes_service_endpoints = {
     minio    = "minio.minio.svc.${local.domains.kubernetes}"
     authelia = "authelia.authelia.svc.${local.domains.kubernetes}"
+  }
+
+  minio_buckets = {
+    image_store  = "boot"
+    music        = "music"
+    transmission = "downloads"
   }
 
   ports = {

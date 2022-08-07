@@ -18,8 +18,7 @@ locals {
   pxeboot = {
     matchbox_endpoint     = "http://${local.vips.matchbox}:${local.ports.matchbox}"
     matchbox_api_endpoint = "${local.vips.matchbox}:${local.ports.matchbox_api}"
-    image_store_endpoint  = "http://${local.vips.minio}:${local.ports.minio}"
-    image_store_base_path = "boot"
+    image_store_endpoint  = "http://${local.vips.minio}:${local.ports.minio}/${local.minio_buckets.image_store}"
 
     hosts = {
       "84-a9-38-0f-aa-76" = merge(local.image_set.silverblue-nvidia, {
