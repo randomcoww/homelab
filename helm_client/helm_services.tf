@@ -211,12 +211,13 @@ transmission-remote 127.0.0.1:${local.ports.transmission} \
   --remove-and-delete
 EOF
       }
+      # Add local routes https://hub.docker.com/r/linuxserver/wireguard
       wireguard = {
-        enabled = false
+        enabled = true
         config = {
           Interface = merge(var.wireguard.Interface, {
             PostUp = <<EOT
-nft add table ip filter && nft add chain ip filter output { type filter hook output priority 0 \; } && nft insert rule ip filter output oifname != "%i" mark != $(wg show %i fwmark) fib daddr type != local ip daddr != { ${local.networks.kubernetes_service.prefix}, ${local.networks.kubernetes_pod.prefix} } reject
+DROUTE=$(ip route | grep default | awk '{print $3}') && ip route add ${local.networks.kubernetes_service.prefix} via $DROUTE && nft add table ip filter && nft add chain ip filter output { type filter hook output priority 0 \; } && nft insert rule ip filter output oifname != "%i" mark != $(wg show %i fwmark) fib daddr type != local ip daddr != { ${local.networks.kubernetes_service.prefix}, ${local.networks.kubernetes_pod.prefix} } reject
 EOT
           })
           Peer = merge(var.wireguard.Peer, {
