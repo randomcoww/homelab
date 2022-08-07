@@ -216,7 +216,7 @@ EOF
         enabled = true
         config = {
           Interface = merge({
-            for k, v in var.wireguard.Interface :
+            for k, v in var.wireguard_client.Interface :
             k => v
             if k != "DNS"
             }, {
@@ -224,7 +224,7 @@ EOF
 DROUTE=$(ip route | grep default | awk '{print $3}') && ip route add ${local.networks.kubernetes_service.prefix} via $DROUTE && nft add table ip filter && nft add chain ip filter output { type filter hook output priority 0 \; } && nft insert rule ip filter output oifname != "%i" mark != $(wg show %i fwmark) fib daddr type != local ip daddr != { ${local.networks.kubernetes_service.prefix}, ${local.networks.kubernetes_pod.prefix} } reject
 EOT
           })
-          Peer = merge(var.wireguard.Peer, {
+          Peer = merge(var.wireguard_client.Peer, {
             PersistentKeepalive = 25
           })
         }

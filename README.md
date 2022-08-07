@@ -68,6 +68,19 @@ authelia_users = {
     groups = []
   }
 }
+
+wireguard_client = {
+  Interface = {
+    PrivateKey = ""
+    Address = ""
+    DNS = ""
+  }
+  Peer = {
+    PublicKey = ""
+    AllowedIPs = ""
+    Endpoint = ""
+  }
+}
 EOF
 ```
 

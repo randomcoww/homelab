@@ -14,7 +14,7 @@ variable "authelia_users" {
   default = {}
 }
 
-variable "wireguard" {
+variable "wireguard_client" {
   type = object({
     Interface = map(string)
     Peer      = map(string)
