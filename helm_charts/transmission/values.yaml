@@ -42,6 +42,7 @@ transmission:
   doneScript:
 
 wireguard:
+  enabled: true
   config:
     Interface: {}
     Peer: {}

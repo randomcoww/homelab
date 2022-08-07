@@ -40,7 +40,7 @@ resource "helm_release" "mpd" {
         },
       ]
       minioEndPoint = "http://${local.kubernetes_service_endpoints.minio}:${local.ports.minio}"
-      minioBucket   = "music"
+      minioBucket   = local.minio_buckets.music
       persistence = {
         storageClass = "openebs-jiva-csi-default"
       }
@@ -107,7 +107,7 @@ resource "helm_release" "transmission" {
   namespace  = "default"
   repository = "https://randomcoww.github.io/terraform-infra/"
   chart      = "transmission"
-  version    = "0.1.4"
+  version    = "0.1.7"
   wait       = false
   values = [
     yamlencode({
@@ -180,12 +180,14 @@ EOF
           rpc-url                      = "/transmission/"
           rpc-whitelist-enabled        = false
           script-torrent-done-enabled  = true
-          script-torrent-done-filename = "/torrentdone.sh",
+          script-torrent-done-filename = "/torrentdone.sh"
           speed-limit-down-enabled     = false
           speed-limit-up               = 10
           speed-limit-up-enabled       = true
           start-added-torrents         = true
         }
+        # https://unix.stackexchange.com/questions/389705/understanding-the-exec-option-of-find
+        # https://unix.stackexchange.com/questions/134693/break-out-of-find-if-an-exec-fails
         doneScript = <<EOF
 #!/bin/sh
 set -xe
@@ -195,20 +197,14 @@ set -xe
 #  * TR_TORRENT_HASH
 #  * TR_TORRENT_ID
 #  * TR_TORRENT_NAME
-
-function upload() {
-  set -xe
-  curl -X PUT -T "$1" "https://${local.kubernetes_ingress_endpoints.minio}/test/$(jq -rn --arg x "$1" '$x|@uri')"
-}
-export -f upload
-
 cd "$TR_TORRENT_DIR"
 
 transmission-remote 127.0.0.1:${local.ports.transmission} \
   --torrent "$TR_TORRENT_ID" \
   --verify
 
-find "$TR_TORRENT_NAME" -type f -exec sh -c "upload '{}'" \;
+find "$TR_TORRENT_NAME" -type f -exec sh -c 'curl -X PUT -T "$2" $1/$(printf "$2" | jq -sRr @uri) || kill $PPID' \
+  sh "http://${local.kubernetes_service_endpoints.minio}:${local.ports.minio}/${local.minio_buckets.transmission}" {} \;
 
 transmission-remote 127.0.0.1:${local.ports.transmission} \
   --torrent "$TR_TORRENT_ID" \
@@ -216,10 +212,11 @@ transmission-remote 127.0.0.1:${local.ports.transmission} \
 EOF
       }
       wireguard = {
+        enabled = false
         config = {
           Interface = merge(var.wireguard.Interface, {
             PostUp = <<EOT
-nft add table ip filter && nft add chain ip filter output { type filter hook output priority 0 \; } && nft insert rule ip filter output oifname != "%i" mark != $(wg show %i fwmark) fib daddr type != local tcp sport != ${local.ports.transmission} reject
+nft add table ip filter && nft add chain ip filter output { type filter hook output priority 0 \; } && nft insert rule ip filter output oifname != "%i" mark != $(wg show %i fwmark) fib daddr type != local ip daddr != { ${local.networks.kubernetes_service.prefix}, ${local.networks.kubernetes_pod.prefix} } reject
 EOT
           })
           Peer = merge(var.wireguard.Peer, {

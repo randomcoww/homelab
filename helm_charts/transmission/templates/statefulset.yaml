@@ -46,6 +46,7 @@ spec:
           subPath: settings.json
         - name: transmission-home
           mountPath: {{ .Values.transmission.homePath }}
+    {{- if .Values.wireguard.enabled }}
       - name: {{ .Chart.Name }}-wg
         image: {{ .Values.images.wireguard }}
         args:
@@ -60,6 +61,7 @@ spec:
         - name: config
           mountPath: /etc/wireguard/wg0.conf
           subPath: wg0.conf
+    {{- end }}
       containers:
       - name: {{ .Chart.Name }}
         image: {{ .Values.images.transmission }}
