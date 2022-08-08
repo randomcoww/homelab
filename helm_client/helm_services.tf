@@ -5,25 +5,16 @@ resource "helm_release" "webdav" {
   namespace  = split(".", local.kubernetes_service_endpoints.webdav)[1]
   repository = "https://randomcoww.github.io/terraform-infra/"
   chart      = "webdav"
-  version    = "0.1.3"
+  version    = "0.1.5"
   wait       = false
   values = [
     yamlencode({
       images = {
         rclone = local.container_images.rclone
       }
-      service = {
-        type = "ClusterIP"
-      }
       replicaCount  = 2
       minioEndPoint = "http://${local.kubernetes_service_endpoints.minio}:${local.ports.minio}"
-      minioBuckets = [
-        for i, bucket in values(local.minio_buckets) :
-        {
-          name = bucket
-          port = 8090 + i
-        }
-      ]
+      minioBucket   = "downloads"
       affinity = {
         podAntiAffinity = {
           requiredDuringSchedulingIgnoredDuringExecution = [

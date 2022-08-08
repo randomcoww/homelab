@@ -33,18 +33,16 @@ spec:
     {{- end }}
       restartPolicy: Always
       containers:
-      {{- range $minioBucket := .Values.minioBuckets }}
-      - name: {{ $.Chart.Name }}-{{ $minioBucket.name }}
-        image: {{ $.Values.images.rclone }}
+      - name: {{ .Chart.Name }}
+        image: {{ .Values.images.rclone }}
         args:
         - "serve"
         - "webdav"
-        - "--addr=0.0.0.0:{{ $minioBucket.port }}"
-        - ":s3:{{ $minioBucket.name }}"
+        - "--addr=0.0.0.0:{{ .Values.ports.rclone }}"
+        - ":s3:{{ .Values.minioBucket }}"
         - "--s3-provider=Minio"
-        - "--s3-endpoint={{ $.Values.minioEndPoint }}"
+        - "--s3-endpoint={{ .Values.minioEndPoint }}"
         - "--no-modtime"
         - "--read-only"
         ports:
-        - containerPort: {{ $minioBucket.port }}
-      {{- end }}
+        - containerPort: {{ .Values.ports.rclone }}

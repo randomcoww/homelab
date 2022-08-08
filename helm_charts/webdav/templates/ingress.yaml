@@ -1,6 +1,6 @@
 {{- if .Values.ingress.enabled -}}
-{{- if .Values.minioBuckets -}}
 {{- $fullName := include "webdav.fullname" . -}}
+{{- $servicePort := .Values.ports.rclone -}}
 {{- $ingressPath := .Values.ingress.path -}}
 apiVersion: {{ template "webdav.ingress.apiVersion" . }}
 kind: Ingress
@@ -36,18 +36,15 @@ spec:
   {{- range .Values.ingress.hosts }}
     - http:
         paths:
-        {{- range $minioBucket := $.Values.minioBuckets }}
-          - path: /{{ $minioBucket.name }}
+          - path: {{ $ingressPath }}
             pathType: Prefix
             backend:
               service:
                 name: {{ $fullName }}
                 port:
-                  number: {{ $minioBucket.port }}
-        {{- end }}
+                  number: {{ $servicePort }}
       {{- if . }}
       host: {{ . | quote }}
       {{- end }}
   {{- end }}
-{{- end }}
 {{- end }}

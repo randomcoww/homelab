@@ -7,20 +7,20 @@ rollingUpdate:
   maxSurge: 25%
 
 minioEndPoint: http://minio.default.svc:9000
-minioBuckets:
-# - name: bucket1
-#   port: 8085
-# - name: bucket2
-#   port: 8086
+minioBucket: bucket
 
 images:
   rclone: docker.io/rclone/rclone:latest
+
+ports:
+  rclone: 8080
 
 affinity: {}
 tolerations: {}
 
 service:
   type: ClusterIP
+  port: 8080
 
 ingress:
   enabled: true
@@ -31,6 +31,7 @@ ingress:
     # "nginx.ingress.kubernetes.io/auth-snippet": |
     #   proxy_set_header X-Forwarded-Method $request_method;
     # "nginx.ingress.kubernetes.io/auth-url":              "http://ath.default.svc/api/verify"
+  path: /
   ingressClassName: nginx
   tls:
   # - secretName: chart-example-tls
