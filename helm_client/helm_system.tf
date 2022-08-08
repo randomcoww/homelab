@@ -344,6 +344,7 @@ resource "helm_release" "nginx_ingress" {
   values = [
     yamlencode({
       controller = {
+        kind = "DaemonSet"
         ingressClassResource = {
           enabled = true
           name    = "nginx"
@@ -362,6 +363,12 @@ resource "helm_release" "nginx_ingress" {
           proxy-body-size = "256m"
           ssl-redirect    = "true"
         }
+        tolerations = [
+          {
+            effect   = "NoExecute"
+            operator = "Exists"
+          },
+        ]
       }
     }),
   ]
