@@ -356,6 +356,7 @@ resource "helm_release" "nginx_ingress" {
           externalIPs = [
             local.vips.external_ingress,
           ]
+          externalTrafficPolicy = "Local"
         }
         config = {
           proxy-body-size = "256m"
@@ -592,7 +593,30 @@ resource "helm_release" "authelia" {
           }
         }
         access_control = {
-          default_policy = "one_factor"
+          default_policy = "deny"
+          rules = [
+            {
+              domain = local.kubernetes_ingress_endpoints.minio
+              policy = "bypass"
+              networks = [
+                local.networks.lan.prefix,
+                local.networks.service.prefix,
+                local.networks.kubernetes.prefix,
+              ]
+            },
+            {
+              domain = local.kubernetes_ingress_endpoints.mpd
+              policy = "one_factor"
+            },
+            {
+              domain = local.kubernetes_ingress_endpoints.transmission
+              policy = "one_factor"
+            },
+            {
+              domain = local.kubernetes_ingress_endpoints.webdav
+              policy = "one_factor"
+            }
+          ]
         }
         theme = "dark"
         session = {
@@ -1033,7 +1057,13 @@ resource "helm_release" "minio" {
         ingressClassName = "nginx"
         path             = "/"
         annotations = {
-          "cert-manager.io/cluster-issuer" = "letsencrypt-prod"
+          "cert-manager.io/cluster-issuer"                    = "letsencrypt-prod"
+          "nginx.ingress.kubernetes.io/auth-response-headers" = "Remote-User,Remote-Name,Remote-Groups,Remote-Email"
+          "nginx.ingress.kubernetes.io/auth-signin"           = "https://${local.kubernetes_ingress_endpoints.auth}"
+          "nginx.ingress.kubernetes.io/auth-snippet"          = <<EOF
+proxy_set_header X-Forwarded-Method $request_method;
+EOF
+          "nginx.ingress.kubernetes.io/auth-url"              = "http://${local.kubernetes_service_endpoints.authelia}/api/verify"
         }
         tls = [
           {
