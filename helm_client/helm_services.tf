@@ -270,7 +270,7 @@ transmission-remote 127.0.0.1:${local.ports.transmission} \
   --torrent "$TR_TORRENT_ID" \
   --verify
 
-find "$TR_TORRENT_NAME" -type f -exec sh -c 'curl -X PUT -T "$2" $1/$(printf "$2" | jq -sRr @uri) || kill $PPID' \
+find "$TR_TORRENT_NAME" -type f -exec sh -c 'curl -X PUT -T "'$2'" $1/$(printf "$2" | jq -sRr @uri) || kill $PPID' \
   sh "http://${local.kubernetes_service_endpoints.minio}:${local.ports.minio}/${local.minio_buckets.transmission}" {} \;
 
 transmission-remote 127.0.0.1:${local.ports.transmission} \
