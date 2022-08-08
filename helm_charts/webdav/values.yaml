@@ -1,0 +1,40 @@
+tls:
+  enabled: true
+
+replicaCount: 2
+rollingUpdate:
+  maxUnavailable: 1
+  maxSurge: 25%
+
+minioEndPoint: http://minio.default.svc:9000
+minioBuckets:
+# - name: bucket1
+#   port: 8085
+# - name: bucket2
+#   port: 8086
+
+images:
+  rclone: docker.io/rclone/rclone:latest
+
+affinity: {}
+tolerations: {}
+
+service:
+  type: ClusterIP
+
+ingress:
+  enabled: true
+  annotations:
+    # "cert-manager.io/cluster-issuer":                    "letsencrypt"
+    # "nginx.ingress.kubernetes.io/auth-response-headers": "Remote-User,Remote-Name,Remote-Groups,Remote-Email"
+    # "nginx.ingress.kubernetes.io/auth-signin":           "https://auth.local"
+    # "nginx.ingress.kubernetes.io/auth-snippet": |
+    #   proxy_set_header X-Forwarded-Method $request_method;
+    # "nginx.ingress.kubernetes.io/auth-url":              "http://ath.default.svc/api/verify"
+  ingressClassName: nginx
+  tls:
+  # - secretName: chart-example-tls
+  #   hosts:
+  #     - chart-example.local
+  hosts:
+  # - chart-example.local

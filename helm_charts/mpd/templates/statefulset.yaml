@@ -30,7 +30,6 @@ spec:
       tolerations:
 {{ toYaml . | indent 8 }}
     {{- end }}
-      dnsPolicy: ClusterFirstWithHostNet
       restartPolicy: Always
       initContainers:
       - name: {{ .Chart.Name }}-init
@@ -67,7 +66,6 @@ spec:
         ports:
         - containerPort: {{ .Values.ports.ympd }}
       - name: {{ .Chart.Name }}-rclone
-        imagePullPolicy: Always
         image: {{ .Values.images.rclone }}
         args:
         - "serve"

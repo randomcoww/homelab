@@ -1,0 +1,39 @@
+{{- if .Values.minioBuckets -}}
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ template "webdav.fullname" . }}
+  labels:
+    app: {{ template "webdav.name" . }}
+    chart: {{ template "webdav.chart" . }}
+    release: {{ .Release.Name }}
+{{- if .Values.service.annotations }}
+  annotations:
+{{ toYaml .Values.service.annotations | indent 4 }}
+{{- end }}
+spec:
+  type: {{ .Values.service.type }}
+{{- if .Values.service.clusterIP }}
+  clusterIP: {{ .Values.service.clusterIP }}
+{{- end }}
+  ports:
+{{- range $minioBucket := .Values.minioBuckets }}
+  - name: {{ $minioBucket.name }}
+    port: {{ $minioBucket.port }}
+    protocol: TCP
+{{- if (and (eq $.Values.service.type "NodePort") ( $minioBucket.nodePort)) }}
+    nodePort: {{ $minioBucket.nodePort }}
+{{- else }}
+    targetPort: {{ $minioBucket.port }}
+{{- end }}
+{{- end }}
+{{- if .Values.service.externalIPs }}
+  externalIPs:
+{{- range $i , $ip := .Values.service.externalIPs }}
+  - {{ $ip }}
+{{- end }}
+{{- end }}
+  selector:
+    app: {{ template "webdav.name" . }}
+    release: {{ .Release.Name }}
+{{- end }}

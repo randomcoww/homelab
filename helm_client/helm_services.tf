@@ -1,3 +1,77 @@
+# webdav for minio #
+
+resource "helm_release" "webdav" {
+  name       = split(".", local.kubernetes_service_endpoints.webdav)[0]
+  namespace  = split(".", local.kubernetes_service_endpoints.webdav)[1]
+  repository = "https://randomcoww.github.io/terraform-infra/"
+  chart      = "webdav"
+  version    = "0.1.3"
+  wait       = false
+  values = [
+    yamlencode({
+      images = {
+        rclone = local.container_images.rclone
+      }
+      service = {
+        type = "ClusterIP"
+      }
+      replicaCount  = 2
+      minioEndPoint = "http://${local.kubernetes_service_endpoints.minio}:${local.ports.minio}"
+      minioBuckets = [
+        for i, bucket in values(local.minio_buckets) :
+        {
+          name = bucket
+          port = 8090 + i
+        }
+      ]
+      affinity = {
+        podAntiAffinity = {
+          requiredDuringSchedulingIgnoredDuringExecution = [
+            {
+              labelSelector = {
+                matchExpressions = [
+                  {
+                    key      = "app"
+                    operator = "In"
+                    values = [
+                      "webdav",
+                    ]
+                  },
+                ]
+              }
+              topologyKey = "kubernetes.io/hostname"
+            },
+          ]
+        }
+      }
+      ingress = {
+        enabled          = true
+        ingressClassName = "nginx"
+        annotations = {
+          "cert-manager.io/cluster-issuer"                    = "letsencrypt-prod"
+          "nginx.ingress.kubernetes.io/auth-response-headers" = "Remote-User,Remote-Name,Remote-Groups,Remote-Email"
+          "nginx.ingress.kubernetes.io/auth-signin"           = "https://${local.kubernetes_ingress_endpoints.auth}"
+          "nginx.ingress.kubernetes.io/auth-snippet"          = <<EOF
+proxy_set_header X-Forwarded-Method $request_method;
+EOF
+          "nginx.ingress.kubernetes.io/auth-url"              = "http://${local.kubernetes_service_endpoints.authelia}/api/verify"
+        }
+        tls = [
+          {
+            secretName = "webdav-tls"
+            hosts = [
+              local.kubernetes_ingress_endpoints.webdav,
+            ]
+          },
+        ]
+        hosts = [
+          local.kubernetes_ingress_endpoints.webdav,
+        ]
+      }
+    })
+  ]
+}
+
 # mpd #
 
 resource "helm_release" "mpd" {
@@ -5,7 +79,7 @@ resource "helm_release" "mpd" {
   namespace  = "default"
   repository = "https://randomcoww.github.io/terraform-infra/"
   chart      = "mpd"
-  version    = "0.3.6"
+  version    = "0.3.7"
   wait       = false
   values = [
     yamlencode({
@@ -101,6 +175,8 @@ EOF
     }),
   ]
 }
+
+# transmission with minio storage #
 
 resource "helm_release" "transmission" {
   name       = "transmission"
