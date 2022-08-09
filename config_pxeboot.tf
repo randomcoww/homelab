@@ -1,7 +1,7 @@
 locals {
   pxeboot_image_builds = {
     coreos            = "fedora-coreos-36.20220809.0"
-    silverblue        = "fedora-silverblue-36.20220804.0"
+    silverblue        = "fedora-silverblue-36.20220809.0"
     silverblue-nvidia = "fedora-silverblue-35.20220804.0"
     printer           = "printer-compat"
   }
@@ -49,7 +49,7 @@ locals {
         ]
       })
 
-      "84-a9-38-0f-aa-76" = merge(local.image_set.silverblue-nvidia, {
+      "84-a9-38-0f-aa-76" = merge(local.image_set.silverblue, {
         ignition = "re-0"
         boot_args = [
           "enforcing=0",
@@ -60,8 +60,8 @@ locals {
           "rd.driver.blacklist=nouveau",
           "modprobe.blacklist=nouveau",
           "nvidia_drm.modeset=1",
-          # "rd.driver.pre=vfio-pci",
-          # "vfio-pci.ids=10de:ffffffff:ffffffff:ffffffff:00030000:ffff00ff,10de:ffffffff:ffffffff:ffffffff:00040300:ffffffff",
+          "rd.driver.pre=vfio-pci",
+          "vfio-pci.ids=10de:ffffffff:ffffffff:ffffffff:00030000:ffff00ff,10de:ffffffff:ffffffff:ffffffff:00040300:ffffffff",
           # "vfio-pci.ids=1002:ffffffff:ffffffff:ffffffff:00030000:ffff00ff,1002:ffffffff:ffffffff:ffffffff:00040300:ffffffff,10de:ffffffff:ffffffff:ffffffff:00030000:ffff00ff,10de:ffffffff:ffffffff:ffffffff:00040300:ffffffff",
           # "nvidia.NVreg_RegistryDwords=EnableBrightnessControl=1",
           # "video=efifb:off",

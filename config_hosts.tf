@@ -235,18 +235,14 @@ locals {
       ]
       hardware_interfaces = {
         phy0 = {
-          mac = "52-54-00-1a-61-1a"
-          mtu = 9000
+          mac         = "52-54-00-1a-61-1a"
+          enable_dhcp = true
+          enable_arp  = true
+          mtu         = 9000
         }
       }
-      bridge_interfaces = {
-      }
-      tap_interfaces = {
-        lan = {
-          source_interface_name = "phy0"
-          enable_dhcp           = true
-        }
-      }
+      bridge_interfaces = {}
+      tap_interfaces    = {}
     }
   }
 
