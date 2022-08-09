@@ -270,8 +270,12 @@ transmission-remote 127.0.0.1:${local.ports.transmission} \
   --torrent "$TR_TORRENT_ID" \
   --verify
 
-find "$TR_TORRENT_NAME" -type f -exec sh -c 'curl -X PUT -T "'$2'" $1/$(printf "$2" | jq -sRr @uri) || kill $PPID' \
-  sh "http://${local.kubernetes_service_endpoints.minio}:${local.ports.minio}/${local.minio_buckets.transmission}" {} \;
+minio-client \
+  -endpoint="${local.kubernetes_service_endpoints.minio}:${local.ports.minio}" \
+  -bucket="${local.minio_buckets.transmission}" \
+  -access-key-id="${random_password.minio-access-key-id.result}" \
+  -secret-access-key="${random_password.minio-secret-access-key.result}" \
+  -path="$TR_TORRENT_NAME"
 
 transmission-remote 127.0.0.1:${local.ports.transmission} \
   --torrent "$TR_TORRENT_ID" \

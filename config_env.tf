@@ -117,7 +117,7 @@ locals {
     kapprover          = "ghcr.io/randomcoww/kapprover:latest"
     external_dns       = "k8s.gcr.io/external-dns/external-dns:v0.12.0"
     kube_proxy         = "ghcr.io/randomcoww/kubernetes:kube-proxy-v1.24.1"
-    transmission       = "ghcr.io/randomcoww/transmission:20220807"
+    transmission       = "ghcr.io/randomcoww/transmission:20220809"
     wireguard          = "ghcr.io/randomcoww/wireguard:20220807"
   }
 

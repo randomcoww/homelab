@@ -622,7 +622,7 @@ resource "helm_release" "authelia" {
             {
               domain = local.kubernetes_ingress_endpoints.webdav
               policy = "one_factor"
-            }
+            },
           ]
         }
         theme = "dark"
