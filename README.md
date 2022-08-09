@@ -182,7 +182,7 @@ tw terraform -chdir=pxeboot_config_client apply
 
 Each node may be PXE booted now and boot disks are no longer needed as long as two or more nodes are running
 
-#### Desktop VM with GPU passthrough
+### Desktop VM with GPU passthrough
 
 Enable a combination of the following `boot_args` in [PXE boot params](config_pxeboot.tf).
 
@@ -198,7 +198,7 @@ Delect and stub all AMD GPUs:
 vfio-pci.ids=1002:ffffffff:ffffffff:ffffffff:00030000:ffff00ff,1002:ffffffff:ffffffff:ffffffff:00040300:ffffffff
 ```
 
-Update the following evdev input devices in [the passthrough libvirt config](libvirt/de-1-pt.xml) to match current hardware.
+Update the following evdev input devices in the [passthrough libvirt config](libvirt/de-1-pt.xml) to match current hardware.
 
 ```xml
 <devices>
