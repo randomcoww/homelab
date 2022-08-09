@@ -896,7 +896,7 @@ module "matchbox-certs" {
 
 module "matchbox-syncthing" {
   source              = "./modules/syncthing_config"
-  replica_count       = 2
+  replica_count       = 3
   resource_name       = "matchbox"
   resource_namespace  = "default"
   service_name        = "matchbox-sync"
@@ -922,7 +922,7 @@ resource "helm_release" "matchbox" {
       matchboxSecret  = module.matchbox-certs.secret
       sharedDataPath  = "/var/tmp/matchbox"
       StatefulSet = {
-        replicaCount = 2
+        replicaCount = 3
       }
       affinity = {
         podAntiAffinity = {
