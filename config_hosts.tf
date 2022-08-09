@@ -200,15 +200,10 @@ locals {
           mtu = 9000
         }
       }
-      bridge_interfaces = {
-        br-lan = {
-          interfaces = ["phy0"]
-          mtu        = 9000
-        }
-      }
+      bridge_interfaces = {}
       tap_interfaces = {
         lan = {
-          source_interface_name = "br-lan"
+          source_interface_name = "phy0"
           enable_dhcp           = true
         }
       }
@@ -230,7 +225,6 @@ locals {
       # not needed
       netnum = 0
       users = [
-        "admin",
         "client",
       ]
       hardware_interfaces = {
@@ -238,6 +232,7 @@ locals {
           mac         = "52-54-00-1a-61-1a"
           enable_dhcp = true
           enable_arp  = true
+          enable_mdns = true
           mtu         = 9000
         }
       }
@@ -252,7 +247,7 @@ locals {
     kubelet-base      = ["gw-0", "gw-1", "q-0"]
     gateway           = ["gw-0", "gw-1"]
     disks             = ["gw-0", "gw-1", "q-0", "re-0"]
-    ssh-server        = ["gw-0", "gw-1", "q-0", "de-1"]
+    ssh-server        = ["gw-0", "gw-1", "q-0"]
     desktop           = ["de-1", "re-0"]
     etcd              = ["gw-0", "gw-1", "q-0"]
     kubernetes-master = ["gw-0", "gw-1"]

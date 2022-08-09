@@ -55,6 +55,7 @@ storage:
           [Network]
           LinkLocalAddressing=false
           DHCP=${lookup(hardware_interface, "enable_dhcp", false)}
+          MulticastDNS=${lookup(hardware_interface, "enable_mdns", false)}
           %{~ for network_name, vlan in hardware_interface.vlans ~}
           VLAN=${vlan.interface_name}
           %{~ endfor ~}
