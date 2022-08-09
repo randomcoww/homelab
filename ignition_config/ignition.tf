@@ -62,11 +62,14 @@ module "ignition-ssh-server" {
 
   key_id     = each.value.hostname
   user_names = [local.users.admin.name]
-  valid_principals = [
+  valid_principals = concat([
     each.value.hostname,
     "127.0.0.1",
-    cidrhost(local.networks.lan.prefix, each.value.netnum),
-  ]
+    ], [
+    for _, interface in module.ignition-systemd-networkd[each.key].tap_interfaces :
+    cidrhost(interface.prefix, each.value.netnum)
+    if lookup(interface, "enable_netnum", false)
+  ])
   ca = module.ssh-ca.ca
 }
 

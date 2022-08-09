@@ -2,7 +2,7 @@ locals {
   base_hosts = {
     gw-0 = {
       users = [
-        "admin"
+        "admin",
       ]
       netnum = 1
       hardware_interfaces = {
@@ -67,7 +67,7 @@ locals {
 
     gw-1 = {
       users = [
-        "admin"
+        "admin",
       ]
       netnum = 3
       hardware_interfaces = {
@@ -130,32 +130,37 @@ locals {
       local_provisioner_path = "${local.pv_mount_path}/local_path_provisioner"
     }
 
-    de-0 = {
+    q-0 = {
       users = [
-        "client"
+        "admin",
       ]
-      netnum = 4
+      netnum = 5
       hardware_interfaces = {
         phy0 = {
-          mac   = "84-a9-38-0f-aa-76"
+          mac   = "7c-83-34-b2-d9-8b"
           mtu   = 9000
-          vlans = ["etcd", "service", "kubernetes"]
+          vlans = ["sync", "etcd", "service", "kubernetes", "wan"]
         }
         wlan0 = {
-          mac = "b4-b5-b6-74-79-15"
-          mtu = 9000
+          mac          = "8c-b8-7e-2a-24-ca"
+          mtu          = 9000
+          enable_4addr = true
         }
       }
       bridge_interfaces = {
         br-lan = {
-          interfaces = ["phy0"]
+          interfaces = ["phy0", "wlan0"]
           mtu        = 9000
         }
       }
       tap_interfaces = {
         lan = {
           source_interface_name = "br-lan"
-          enable_dhcp           = true
+          enable_netnum         = true
+        }
+        sync = {
+          source_interface_name = "phy0-sync"
+          enable_netnum         = true
         }
         etcd = {
           source_interface_name = "phy0-etcd"
@@ -169,10 +174,15 @@ locals {
           source_interface_name = "phy0-kubernetes"
           enable_netnum         = true
         }
+        wan = {
+          source_interface_name = "phy0-wan"
+          enable_dhcp           = true
+          mac                   = "52-54-00-63-6e-b3"
+        }
       }
       disks = {
         pv = {
-          device = "/dev/disk/by-id/nvme-SKHynix_HFS512GDE9X084N_CYA8N037413008I5H"
+          device = "/dev/disk/by-id/ata-NGFF_2280_512GB_SSD_2022051401231"
           partitions = [
             {
               mount_path = local.pv_mount_path
@@ -190,16 +200,33 @@ locals {
           value  = "true"
         }
       ]
-      kubernetes_worker_labels = {
-        "nvidia.com/gpu" = "true"
-      }
     }
 
     re-0 = {
       hostname = "remote"
+      # not needed
+      netnum = 0
       users = [
-        "client"
+        "client",
       ]
+      hardware_interfaces = {
+        phy0 = {
+          mac = "84-a9-38-0f-aa-76"
+          mtu = 9000
+        }
+      }
+      bridge_interfaces = {
+        br-lan = {
+          interfaces = ["phy0"]
+          mtu        = 9000
+        }
+      }
+      tap_interfaces = {
+        lan = {
+          source_interface_name = "br-lan"
+          enable_dhcp           = true
+        }
+      }
       disks = {
         pv = {
           device = "/dev/disk/by-id/nvme-SKHynix_HFS512GDE9X084N_CYA8N037413008I5H"
@@ -213,19 +240,46 @@ locals {
       }
       container_storage_path = "${local.pv_mount_path}/containers"
     }
+
+    de-1 = {
+      # not needed
+      netnum = 0
+      users = [
+        "admin",
+        "client",
+      ]
+      hardware_interfaces = {
+        phy0 = {
+          mac = "52-54-00-1a-61-1a"
+          mtu = 9000
+        }
+      }
+      bridge_interfaces = {
+        br-lan = {
+          interfaces = ["phy0"]
+          mtu        = 9000
+        }
+      }
+      tap_interfaces = {
+        lan = {
+          source_interface_name = "br-lan"
+          enable_dhcp           = true
+        }
+      }
+    }
   }
 
   base_members = {
-    base              = ["gw-0", "gw-1", "de-0", "re-0"]
-    systemd-networkd  = ["gw-0", "gw-1", "de-0"]
-    kubelet-base      = ["gw-0", "gw-1", "de-0"]
-    gateway           = ["gw-0", "gw-1"]
-    disks             = ["gw-0", "gw-1", "de-0", "re-0"]
-    ssh-server        = ["gw-0", "gw-1"]
-    desktop           = ["de-0", "re-0"]
-    etcd              = ["gw-0", "gw-1", "de-0"]
+    base              = ["gw-0", "gw-1", "q-0", "de-1", "re-0"]
+    systemd-networkd  = ["gw-0", "gw-1", "q-0", "de-1", "re-0"]
+    kubelet-base      = ["gw-0", "gw-1", "q-0"]
+    gateway           = ["gw-0", "gw-1", "q-0"]
+    disks             = ["gw-0", "gw-1", "q-0", "re-0"]
+    ssh-server        = ["gw-0", "gw-1", "q-0", "de-1"]
+    desktop           = ["de-1", "re-0"]
+    etcd              = ["gw-0", "gw-1", "q-0"]
     kubernetes-master = ["gw-0", "gw-1"]
-    kubernetes-worker = ["gw-0", "gw-1", "de-0"]
+    kubernetes-worker = ["gw-0", "gw-1", "q-0"]
   }
 
   host_roles = transpose(local.base_members)
