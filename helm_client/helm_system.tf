@@ -50,22 +50,6 @@ resource "helm_release" "kube_dns" {
       service = {
         clusterIP = local.vips.cluster_dns
       }
-      affinity = {
-        nodeAffinity = {
-          requiredDuringSchedulingIgnoredDuringExecution = {
-            nodeSelectorTerms = [
-              {
-                matchExpressions = [
-                  {
-                    key      = "role-gateway"
-                    operator = "Exists"
-                  },
-                ]
-              },
-            ]
-          }
-        }
-      }
       priorityClassName = "system-cluster-critical"
       servers = [
         {
@@ -925,20 +909,6 @@ resource "helm_release" "matchbox" {
         replicaCount = 2
       }
       affinity = {
-        nodeAffinity = {
-          requiredDuringSchedulingIgnoredDuringExecution = {
-            nodeSelectorTerms = [
-              {
-                matchExpressions = [
-                  {
-                    key      = "role-gateway"
-                    operator = "Exists"
-                  },
-                ]
-              },
-            ]
-          }
-        }
         podAntiAffinity = {
           requiredDuringSchedulingIgnoredDuringExecution = [
             {
