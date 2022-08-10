@@ -107,7 +107,7 @@ locals {
     matchbox           = "quay.io/poseidon/matchbox:latest"
     coredns            = "docker.io/coredns/coredns:latest"
     tftpd              = "ghcr.io/randomcoww/tftpd-ipxe:20220804"
-    hostapd            = "ghcr.io/randomcoww/hostapd:20220807"
+    hostapd            = "ghcr.io/randomcoww/hostapd:2.10"
     syncthing          = "docker.io/syncthing/syncthing:latest"
     rclone             = "docker.io/rclone/rclone:latest"
     mpd                = "ghcr.io/randomcoww/mpd:0.23.8-2"

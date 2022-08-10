@@ -1153,15 +1153,15 @@ resource "helm_release" "hostapd" {
         require_ht       = 1
         wmm_enabled      = 1
         disassoc_low_ack = 1
+        wpa              = 2
+        wpa_key_mgmt     = "SAE"
+        wpa_pairwise     = "CCMP"
+        ieee80211w       = 2
+        sae_password     = var.wifi.passphrase
+        ssid             = var.wifi.ssid
         ht_capab = "[${join("][", [
           "LDPC", "HT40-", "HT40+", "SHORT-GI-40", "TX-STBC", "RX-STBC1", "DSSS_CCK-40",
         ])}]"
-        wpa            = 2
-        wpa_key_mgmt   = "WPA-PSK"
-        wpa_pairwise   = "CCMP"
-        ieee80211w     = 2
-        wpa_passphrase = var.wifi.passphrase
-        ssid           = var.wifi.ssid
       }
       StatefulSet = {
         replicaCount = 2
