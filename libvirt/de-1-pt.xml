@@ -27,6 +27,12 @@
       <model type='virtio-net'/>
       <boot order='1'/>
     </interface>
+    <!-- <controller type='scsi' model='virtio-scsi'/>
+    <disk type='file' device='disk'>
+      <driver name='qemu' type='raw'/>
+      <source file='/var/home/libvirt/de-1-pt.img'/>
+      <target dev='sda' bus='scsi'/>
+    </disk> -->
     <console>
       <target type='virtio'/>
     </console>
