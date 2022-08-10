@@ -182,42 +182,6 @@ tw terraform -chdir=pxeboot_config_client apply
 
 Each node may be PXE booted now and boot disks are no longer needed as long as two or more nodes are running
 
-### Desktop VM with GPU passthrough
-
-Enable a combination of the following `boot_args` in [PXE boot params](config_pxeboot.tf).
-
-Delect and stub all Nvidia GPUs:
-
-```
-vfio-pci.ids=10de:ffffffff:ffffffff:ffffffff:00030000:ffff00ff,10de:ffffffff:ffffffff:ffffffff:00040300:ffffffff
-```
-
-Delect and stub all AMD GPUs:
-
-```
-vfio-pci.ids=1002:ffffffff:ffffffff:ffffffff:00030000:ffff00ff,1002:ffffffff:ffffffff:ffffffff:00040300:ffffffff
-```
-
-Update the following evdev input devices in the [passthrough libvirt config](libvirt/de-1-pt.xml) to match current hardware.
-
-```xml
-<devices>
-  <input type='evdev'>
-    <source dev='/dev/input/by-id/usb-Logitech_USB_Receiver-if02-event-mouse'/>
-  </input>
-  <input type='evdev'>
-    <source dev='/dev/input/by-id/usb-MOSART_Semi._wireless_dongle-event-kbd' grab='all' repeat='on'/>
-  </input>
-</devices>
-```
-
-Define and launch. This will produce no video unless a display is attached to the GPU being passed through.
-
-```bash
-virsh define libvirt/de-1-pt.xml
-virsh start de-1-pt
-```
-
 ## Maintenance
 
 ### Server access
@@ -270,3 +234,43 @@ buildah push $TAG
 ```bash
 tw find . -name '*.tf' -exec terraform fmt '{}' \;
 ```
+
+## Desktop VM with GPU passthrough
+
+> This is currently just a POC and serves nothing
+
+Enable a combination of the following `boot_args` in [PXE boot params](config_pxeboot.tf)
+
+Stub all Nvidia GPUs:
+
+```
+vfio-pci.ids=10de:ffffffff:ffffffff:ffffffff:00030000:ffff00ff,10de:ffffffff:ffffffff:ffffffff:00040300:ffffffff
+```
+
+Stub all AMD GPUs:
+
+```
+vfio-pci.ids=1002:ffffffff:ffffffff:ffffffff:00030000:ffff00ff,1002:ffffffff:ffffffff:ffffffff:00040300:ffffffff
+```
+
+Update the following evdev input devices in the [libvirt config](libvirt/de-1-pt.xml) to match current hardware
+
+```xml
+<devices>
+  <input type='evdev'>
+    <source dev='/dev/input/by-id/usb-Logitech_USB_Receiver-if02-event-mouse'/>
+  </input>
+  <input type='evdev'>
+    <source dev='/dev/input/by-id/usb-MOSART_Semi._wireless_dongle-event-kbd' grab='all' repeat='on'/>
+  </input>
+</devices>
+```
+
+Define and launch guest
+
+```bash
+virsh define libvirt/de-1-pt.xml
+virsh start de-1-pt
+```
+
+No video output is available unless a display is attached to the GPU being passed through
