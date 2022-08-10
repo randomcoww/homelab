@@ -53,6 +53,7 @@ locals {
         ignition = "re-0"
         boot_args = [
           "enforcing=0",
+          # "rfkill.master_switch_mode=2",
           "rfkill.default_state=1",
           "intel_iommu=on",
           "amd_iommu=on",
@@ -71,7 +72,6 @@ locals {
         ignition = "de-1"
         boot_args = [
           "enforcing=0",
-          "rfkill.default_state=1",
           "rd.driver.blacklist=nouveau",
           "modprobe.blacklist=nouveau",
           "nvidia_drm.modeset=1",
