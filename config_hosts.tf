@@ -199,6 +199,10 @@ locals {
           mac = "84-a9-38-0f-aa-76"
           mtu = 9000
         }
+        wlan0 = {
+          mac = "b4-b5-b6-74-79-15"
+          mtu = 9000
+        }
       }
       bridge_interfaces = {}
       tap_interfaces = {
