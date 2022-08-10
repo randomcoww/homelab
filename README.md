@@ -34,7 +34,6 @@ Reference: [Authelia user password generation](https://www.authelia.com/referenc
 ```bash
 KEY=$HOME/.ssh/id_ecdsa
 cat > secrets.tfvars <<EOF
-# System users
 users = {
   admin = {}
   client = {
@@ -42,7 +41,6 @@ users = {
   }
 }
 
-# System SSH CA signing
 ssh_client = {
   key_id = "$(whoami)"
   public_key = "ssh_client_public_key=$(cat $KEY.pub)"
@@ -50,16 +48,13 @@ ssh_client = {
   validity_period_hours = 336
 }
 
-# Hostapd users
-wifi = {
+hostapd = {
   ssid = "ssid"
   passphrase = "passphrase"
 }
 
-# Cert-manager letsencrypt profile
 letsencrypt_email = "user@domain"
 
-# Service SSO users
 authelia_users = {
   username = {
     displayname = "John Smith"

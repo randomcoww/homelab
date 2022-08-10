@@ -1157,8 +1157,8 @@ resource "helm_release" "hostapd" {
         wpa_key_mgmt     = "SAE"
         wpa_pairwise     = "CCMP"
         ieee80211w       = 2
-        sae_password     = var.wifi.passphrase
-        ssid             = var.wifi.ssid
+        sae_password     = var.hostapd.passphrase
+        ssid             = var.hostapd.ssid
         ht_capab = "[${join("][", [
           "LDPC", "HT40-", "HT40+", "SHORT-GI-40", "TX-STBC", "RX-STBC1", "DSSS_CCK-40",
         ])}]"

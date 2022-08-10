@@ -1,4 +1,4 @@
-variable "wifi" {
+variable "hostapd" {
   type = object({
     ssid       = string
     passphrase = string
