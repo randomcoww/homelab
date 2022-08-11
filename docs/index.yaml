@@ -3,7 +3,7 @@ entries:
   cluster-services:
   - apiVersion: v2
     appVersion: 1.16.0
-    created: "2022-08-11T23:45:34.794537053Z"
+    created: "2022-08-11T23:51:09.136949195Z"
     description: Basic cluster services with minimal configuration
     digest: 97337dfcefc0ae6fb3ac0b78b79b21c2bd37c866d227e28ead235154b0fe68fd
     name: cluster-services
@@ -14,7 +14,7 @@ entries:
   external-dns:
   - apiVersion: v2
     appVersion: 1.16.0
-    created: "2022-08-11T23:45:34.794776681Z"
+    created: "2022-08-11T23:51:09.13733116Z"
     description: external-dns
     digest: 95e923be269cf80fb55fe07235e911c20130465abf54d7a2b99fae0895d383d1
     name: external-dns
@@ -25,7 +25,7 @@ entries:
   helm-wrapper:
   - apiVersion: v2
     appVersion: 1.16.0
-    created: "2022-08-11T23:45:34.794868663Z"
+    created: "2022-08-11T23:51:09.137454012Z"
     description: Wrap any manifest in helm to use terraform helm provider
     digest: c6928c02113687f2197bbce9d1936c8f7a80e6f1c7b8e52026c30926e1243408
     name: helm-wrapper
@@ -36,7 +36,7 @@ entries:
   hostapd:
   - apiVersion: v2
     appVersion: 1.16.0
-    created: "2022-08-11T23:45:34.795762989Z"
+    created: "2022-08-11T23:51:09.138569109Z"
     description: A Helm chart for Kubernetes
     digest: 309a552e47af52275d82f3ef468490b91d137b2b548e878ffd95dbd7951cddb0
     name: hostapd
@@ -46,7 +46,7 @@ entries:
     version: 0.1.6
   - apiVersion: v2
     appVersion: 1.16.0
-    created: "2022-08-11T23:45:34.795586428Z"
+    created: "2022-08-11T23:51:09.138133854Z"
     description: A Helm chart for Kubernetes
     digest: 93c9c935073bd19d0b297aaf188cc37134b3e5aa54718d6c82929374950c851e
     name: hostapd
@@ -56,7 +56,7 @@ entries:
     version: 0.1.5
   - apiVersion: v2
     appVersion: 1.16.0
-    created: "2022-08-11T23:45:34.795020778Z"
+    created: "2022-08-11T23:51:09.13763176Z"
     description: A Helm chart for Kubernetes
     digest: 1071546aae15b8af029fd1f9d46e155f9941cb96f29f709fe807611b70d67a11
     name: hostapd
@@ -67,7 +67,7 @@ entries:
   kea:
   - apiVersion: v2
     appVersion: 1.16.0
-    created: "2022-08-11T23:45:34.795959943Z"
+    created: "2022-08-11T23:51:09.138817048Z"
     description: Kea
     digest: 40c2c873cc2824d51f78aa572b131dfd5d391757d063ae0c5bf4c2e46fa1282c
     name: kea
@@ -78,7 +78,7 @@ entries:
   kube-dns:
   - apiVersion: v2
     appVersion: 1.16.0
-    created: "2022-08-11T23:45:34.796307337Z"
+    created: "2022-08-11T23:51:09.139131965Z"
     description: kube-dns
     digest: 4df12e37b29b24bd2da08e25803bea114304e48c87ec3be4162fd2c7b02dfce6
     name: kube-dns
@@ -89,7 +89,17 @@ entries:
   matchbox:
   - apiVersion: v2
     appVersion: 1.16.0
-    created: "2022-08-11T23:45:34.796664439Z"
+    created: "2022-08-11T23:51:09.139701945Z"
+    description: Matchbox PXE boot
+    digest: 09e856f06db21711728037ff6bbf1b569d6fc660a2e1b7d6b3d101ad44faf4f4
+    name: matchbox
+    type: application
+    urls:
+    - https://randomcoww.github.io/terraform-infra/matchbox-0.2.11.tgz
+    version: 0.2.11
+  - apiVersion: v2
+    appVersion: 1.16.0
+    created: "2022-08-11T23:51:09.139422507Z"
     description: Matchbox PXE boot
     digest: 227f2dc9d341c0df41473d4c16379a280babe335782aaa4a7f43f610700d15be
     name: matchbox
@@ -99,7 +109,7 @@ entries:
     version: 0.2.10
   - apiVersion: v2
     appVersion: 1.16.0
-    created: "2022-08-11T23:45:34.797023496Z"
+    created: "2022-08-11T23:51:09.139933681Z"
     description: Matchbox PXE boot
     digest: d40415680d993686c023f0a23dd2e751f8d40619d545a31a564c9dd53336400f
     name: matchbox
@@ -110,7 +120,7 @@ entries:
   mpd:
   - apiVersion: v2
     appVersion: 1.16.0
-    created: "2022-08-11T23:45:34.797383601Z"
+    created: "2022-08-11T23:51:09.14023449Z"
     description: A Helm chart for Kubernetes
     digest: aa18072344a0660147bb5902769201ac85cb6d094ff330761af1dc17a066d845
     name: mpd
@@ -121,7 +131,7 @@ entries:
   transmission:
   - apiVersion: v2
     appVersion: 1.16.0
-    created: "2022-08-11T23:45:34.797661363Z"
+    created: "2022-08-11T23:51:09.140545287Z"
     description: A Helm chart for Kubernetes
     digest: 67d910e992674c0ca3420eb812ca54e8e6e7eb776c684de126e7b01e77be1222
     name: transmission
@@ -132,7 +142,7 @@ entries:
   webdav:
   - apiVersion: v2
     appVersion: 1.16.0
-    created: "2022-08-11T23:45:34.797907625Z"
+    created: "2022-08-11T23:51:09.140772273Z"
     description: A Helm chart for Kubernetes
     digest: ccb33a8b962817d8699e579d58443c9c82ae049101142d6e8cf0e1b9c9781d19
     name: webdav
@@ -140,4 +150,4 @@ entries:
     urls:
     - https://randomcoww.github.io/terraform-infra/webdav-0.1.5.tgz
     version: 0.1.5
-generated: "2022-08-11T23:45:34.794224161Z"
+generated: "2022-08-11T23:51:09.136550607Z"
