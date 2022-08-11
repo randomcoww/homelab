@@ -13,10 +13,3 @@ variable "ssh_client" {
     validity_period_hours = number
   })
 }
-
-variable "wifi" {
-  type = object({
-    ssid       = string
-    passphrase = string
-  })
-}
