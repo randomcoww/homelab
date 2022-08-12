@@ -1154,7 +1154,7 @@ resource "helm_release" "hostapd" {
   namespace  = "default"
   repository = "https://randomcoww.github.io/terraform-infra/"
   chart      = "hostapd"
-  version    = "0.1.6"
+  version    = "0.1.7"
   wait       = false
   values = [
     yamlencode({

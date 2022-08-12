@@ -39,7 +39,6 @@ spec:
       - name: {{ .Chart.Name }}
         image: {{ .Values.image }}
         args:
-        - -d
         - /etc/hostapd/hostapd.conf
         env:
         - name: POD_NAME
