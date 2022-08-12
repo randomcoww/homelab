@@ -8,9 +8,9 @@ output "ca" {
 
 output "secret" {
   value = {
-    "ca.crt"     = replace(base64encode(chomp(tls_self_signed_cert.matchbox-ca.cert_pem)), "\n", "")
-    "server.crt" = replace(base64encode(chomp(tls_locally_signed_cert.matchbox.cert_pem)), "\n", "")
-    "server.key" = replace(base64encode(chomp(tls_private_key.matchbox.private_key_pem)), "\n", "")
+    ca   = tls_self_signed_cert.matchbox-ca.cert_pem
+    cert = tls_locally_signed_cert.matchbox.cert_pem
+    key  = tls_private_key.matchbox.private_key_pem
   }
 }
 

@@ -1,4 +1,6 @@
-config: {}
+peers:
+# - podName: "hostapd-0"
+#   config: {}
 
 StatefulSet:
   replicaCount: 2

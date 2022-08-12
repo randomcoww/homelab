@@ -2,12 +2,13 @@ output "config" {
   value = local.config_xml
 }
 
-output "secret" {
-  value = merge([
+output "peers" {
+  value = [
     for member in local.syncthing_members :
     {
-      "cert-${member.pod_name}" = replace(base64encode(chomp(member.cert)), "\n", "")
-      "key-${member.pod_name}"  = replace(base64encode(chomp(member.key)), "\n", "")
+      pod_name = member.pod_name
+      cert     = member.cert
+      key      = member.key
     }
-  ]...)
+  ]
 }

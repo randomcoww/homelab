@@ -840,7 +840,7 @@ resource "helm_release" "kea" {
       ]
       sharedDataPath = "/var/lib/kea"
       StatefulSet = {
-        replicaCount = 2
+        replicaCount = length(module.kea-config.config)
       }
       affinity = {
         nodeAffinity = {
@@ -909,7 +909,7 @@ resource "helm_release" "matchbox" {
   namespace  = "default"
   repository = "https://randomcoww.github.io/terraform-infra/"
   chart      = "matchbox"
-  version    = "0.2.9"
+  version    = "0.2.13"
   wait       = false
   values = [
     yamlencode({
@@ -917,12 +917,23 @@ resource "helm_release" "matchbox" {
         matchbox  = local.container_images.matchbox
         syncthing = local.container_images.syncthing
       }
+      peers = [
+        for _, peer in module.matchbox-syncthing.peers :
+        {
+          podName       = peer.pod_name
+          syncthingCert = chomp(peer.cert)
+          syncthingKey  = chomp(peer.key)
+        }
+      ]
       syncthingConfig = module.matchbox-syncthing.config
-      syncthingSecret = module.matchbox-syncthing.secret
-      matchboxSecret  = module.matchbox-certs.secret
-      sharedDataPath  = "/var/tmp/matchbox"
+      matchboxSecret = {
+        ca   = chomp(module.matchbox-certs.secret.ca)
+        cert = chomp(module.matchbox-certs.secret.cert)
+        key  = chomp(module.matchbox-certs.secret.key)
+      }
+      sharedDataPath = "/var/tmp/matchbox"
       StatefulSet = {
-        replicaCount = 3
+        replicaCount = length(module.matchbox-syncthing.peers)
       }
       affinity = {
         podAntiAffinity = {
@@ -1132,39 +1143,66 @@ output "minio_endpoint" {
 
 # hostapd #
 
+module "hostapd-roaming" {
+  source        = "./modules/hostapd_roaming"
+  resource_name = "hostapd"
+  replica_count = 2
+}
+
 resource "helm_release" "hostapd" {
   name       = "hostapd"
   namespace  = "default"
   repository = "https://randomcoww.github.io/terraform-infra/"
   chart      = "hostapd"
-  version    = "0.1.4"
+  version    = "0.1.6"
   wait       = false
   values = [
     yamlencode({
       image = local.container_images.hostapd
-      config = {
-        interface        = "wlan0"
-        preamble         = 1
-        hw_mode          = "g"
-        channel          = 1
-        auth_algs        = 1
-        driver           = "nl80211"
-        ieee80211n       = 1
-        require_ht       = 1
-        wmm_enabled      = 1
-        disassoc_low_ack = 1
-        wpa              = 2
-        wpa_key_mgmt     = "SAE"
-        wpa_pairwise     = "CCMP"
-        ieee80211w       = 2
-        sae_password     = var.hostapd.passphrase
-        ssid             = var.hostapd.ssid
-        ht_capab = "[${join("][", [
-          "LDPC", "HT40-", "HT40+", "SHORT-GI-40", "TX-STBC", "RX-STBC1", "DSSS_CCK-40",
-        ])}]"
-      }
+      peers = [
+        for _, peer in module.hostapd-roaming.peers :
+        {
+          podName = peer.pod_name
+          config = {
+            interface        = "wlan0"
+            preamble         = 1
+            hw_mode          = "g"
+            channel          = 1
+            auth_algs        = 1
+            driver           = "nl80211"
+            ieee80211n       = 1
+            require_ht       = 1
+            wmm_enabled      = 1
+            disassoc_low_ack = 1
+            wpa              = 2
+            wpa_key_mgmt     = "SAE"
+            wpa_pairwise     = "CCMP"
+            ieee80211w       = 2
+            sae_password     = var.hostapd.passphrase
+            ssid             = var.hostapd.ssid
+            ht_capab = "[${join("][", [
+              "LDPC", "HT40-", "HT40+", "SHORT-GI-40", "TX-STBC", "RX-STBC1", "DSSS_CCK-40",
+            ])}]"
+            # roaming
+            bssid                 = peer.bssid
+            mobility_domain       = peer.mobility_domain
+            pmk_r1_push           = 1
+            ft_psk_generate_local = 1
+            r1_key_holder         = peer.r1_key_holder
+            nas_identifier        = peer.nas_identifier
+            r0kh = [
+              for _, p in module.hostapd-roaming.peers :
+              "${p.bssid} ${p.nas_identifier} ${p.encryption_key}"
+            ]
+            r1kh = [
+              for _, p in module.hostapd-roaming.peers :
+              "${p.bssid} ${p.bssid} ${p.encryption_key}"
+            ]
+          }
+        }
+      ]
       StatefulSet = {
-        replicaCount = 2
+        replicaCount = length(module.hostapd-roaming.peers)
       }
       affinity = {
         nodeAffinity = {

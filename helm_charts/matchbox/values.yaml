@@ -1,13 +1,14 @@
 syncthingConfig: ""
 
-syncthingSecret:
-  # cert-pod-0: "crt"
-  # key-pod-0: "key"
+peers:
+# - podName: "matchbox-0"
+#   syncthingCert:
+#   syncthingKey:
 
 matchboxSecret:
-  # ca.crt: "ca"
-  # server.crt: "crt"
-  # server.key: "key"
+  # ca: "ca"
+  # cert: "cert"
+  # key: "key"
 
 syncthingHomePath: "/var/lib/syncthing"
 sharedDataPath: "/var/tmp/matchbox"

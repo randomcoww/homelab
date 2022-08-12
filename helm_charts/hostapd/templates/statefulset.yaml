@@ -41,6 +41,11 @@ spec:
         args:
         - -d
         - /etc/hostapd/hostapd.conf
+        env:
+        - name: POD_NAME
+          valueFrom:
+            fieldRef:
+              fieldPath: metadata.name
         securityContext:
           privileged: false
           capabilities:
@@ -48,7 +53,7 @@ spec:
         volumeMounts:
         - name: hostapd-config
           mountPath: /etc/hostapd/hostapd.conf
-          subPath: hostapd.conf
+          subPathExpr: hostapd-$(POD_NAME)
           readOnly: true
       volumes:
       - name: hostapd-config
