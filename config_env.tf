@@ -67,30 +67,19 @@ locals {
     }
   }
 
-  base_networks_temp_1 = merge(local.base_networks, {
+  networks = merge(local.base_networks, {
     for network_name, network in local.base_networks :
     network_name => merge(network, try({
       prefix = "${network.network}/${network.cidr}"
     }, {}))
   })
 
-  networks = merge(local.base_networks_temp_1, {
-    for network_name, network in local.base_networks_temp_1 :
-    network_name => merge(network, {
-      vips = try({
+  vips = merge([
+    for _, network in local.networks :
+      try({
         for service, netnum in network.netnums :
         service => cidrhost(network.prefix, netnum)
       }, {})
-      }, try({
-        dhcp_range = merge(network.dhcp_range, {
-          prefix = cidrsubnet(network.prefix, network.dhcp_range.newbit, network.dhcp_range.netnum)
-        })
-    }, {}))
-  })
-
-  vips = merge([
-    for _, network in local.networks :
-    try(network.vips)
     ]...
   )
 
