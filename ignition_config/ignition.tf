@@ -41,12 +41,27 @@ module "ignition-gateway" {
   external_ingress_ip      = local.vips.external_ingress
   static_pod_manifest_path = local.kubernetes.static_pod_manifest_path
   pod_network_prefix       = local.networks.kubernetes_pod.prefix
-  members = {
-    for host_key, host in local.members.gateway :
-    host_key => {
-      netnum = host.netnum
-    }
-  }
+  conntrackd_ipv6_ignore = [
+    "::1",
+  ]
+  conntrackd_ipv4_ignore = concat([
+    "127.0.0.1",
+    ], [
+    for _, network in local.networks :
+    network.prefix
+    if lookup(network, "enable_prefix", false) && !lookup(network, "enable_vrrp_netnum", false)
+    ], [
+    for _, network in local.networks :
+    cidrhost(network.prefix, local.vrrp_netnum)
+    if lookup(network, "enable_vrrp_netnum", false)
+    ], flatten([
+      for _, host in local.members.gateway :
+      [
+        for _, network in local.networks :
+        cidrhost(network.prefix, host.netnum)
+        if lookup(network, "enable_vrrp_netnum", false)
+      ]
+  ]))
 }
 
 module "ignition-disks" {

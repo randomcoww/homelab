@@ -70,7 +70,8 @@ locals {
   networks = merge(local.base_networks, {
     for network_name, network in local.base_networks :
     network_name => merge(network, try({
-      prefix = "${network.network}/${network.cidr}"
+      prefix        = "${network.network}/${network.cidr}"
+      enable_prefix = true
     }, {}))
   })
 

@@ -26,8 +26,9 @@ locals {
         table_id       = 240
         table_priority = 32780
       }
-      haproxy_config_path = var.haproxy_config_path
-      members             = var.members
+      haproxy_config_path    = var.haproxy_config_path
+      conntrackd_ipv4_ignore = var.conntrackd_ipv4_ignore
+      conntrackd_ipv6_ignore = var.conntrackd_ipv6_ignore
     })
   ]
 }

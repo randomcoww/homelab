@@ -31,8 +31,10 @@ variable "haproxy_config_path" {
   default = "/etc/haproxy/haproxy.cfg.d"
 }
 
-variable "members" {
-  type = map(object({
-    netnum = number
-  }))
+variable "conntrackd_ipv4_ignore" {
+  type = list(string)
+}
+
+variable "conntrackd_ipv6_ignore" {
+  type = list(string)
 }

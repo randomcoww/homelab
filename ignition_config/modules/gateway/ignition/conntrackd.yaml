@@ -26,9 +26,10 @@ storage:
       contents:
         inline: |
           Sync {
-            Mode FTFW {
+            Mode NOTRACK {
               StartupResync on
               DisableExternalCache on
+              DisableInternalCache on
             }
             Multicast {
               IPv4_address 225.0.0.50
@@ -53,18 +54,12 @@ storage:
                 TCP
               }
               Address Ignore {
-                %{~ for network_name, interface in interfaces ~}
-                %{~ if lookup(interface, "enable_vrrp_netnum", false) ~}
-                IPv4_address ${cidrhost(interface.prefix, vrrp_netnum)}
-                %{~ for _, member in members ~}
-                IPv4_address ${cidrhost(interface.prefix, member.netnum)}
+                %{~ for _, address in conntrackd_ipv4_ignore ~}
+                IPv4_address ${address}
                 %{~ endfor ~}
-                %{~ else ~}
-                ${try("IPv4_address ${interface.prefix}", "")}
-                %{~ endif ~}
+                %{~ for _, address in conntrackd_ipv6_ignore ~}
+                IPv6_address ${address}
                 %{~ endfor ~}
-                IPv4_address 127.0.0.1
-                IPv6_address ::1
               }
               State Accept {
                 ESTABLISHED CLOSED TIME_WAIT CLOSE_WAIT for TCP
