@@ -50,18 +50,8 @@ module "ignition-gateway" {
     for _, network in local.networks :
     network.prefix
     if lookup(network, "enable_prefix", false) && !lookup(network, "enable_vrrp_netnum", false)
-    ], [
-    for _, network in local.networks :
-    cidrhost(network.prefix, local.vrrp_netnum)
-    if lookup(network, "enable_vrrp_netnum", false)
-    ], flatten([
-      for _, host in local.members.gateway :
-      [
-        for _, network in local.networks :
-        cidrhost(network.prefix, host.netnum)
-        if lookup(network, "enable_vrrp_netnum", false)
-      ]
-  ]))
+    ]
+  )
 }
 
 module "ignition-disks" {
