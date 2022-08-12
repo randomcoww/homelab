@@ -27,6 +27,7 @@ locals {
         table_priority = 32780
       }
       haproxy_config_path = var.haproxy_config_path
+      members             = var.members
     })
   ]
 }

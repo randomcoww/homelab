@@ -76,10 +76,10 @@ locals {
 
   vips = merge([
     for _, network in local.networks :
-      try({
-        for service, netnum in network.netnums :
-        service => cidrhost(network.prefix, netnum)
-      }, {})
+    try({
+      for service, netnum in network.netnums :
+      service => cidrhost(network.prefix, netnum)
+    }, {})
     ]...
   )
 

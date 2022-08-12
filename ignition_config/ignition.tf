@@ -41,6 +41,12 @@ module "ignition-gateway" {
   external_ingress_ip      = local.vips.external_ingress
   static_pod_manifest_path = local.kubernetes.static_pod_manifest_path
   pod_network_prefix       = local.networks.kubernetes_pod.prefix
+  members = {
+    for host_key, host in local.members.gateway :
+    host_key => {
+      netnum = host.netnum
+    }
+  }
 }
 
 module "ignition-disks" {

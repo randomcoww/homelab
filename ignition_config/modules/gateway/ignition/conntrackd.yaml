@@ -1,0 +1,73 @@
+---
+variant: fcos
+version: 1.4.0
+systemd:
+  units:
+    - name: conntrackd.service
+      enabled: true
+      dropins:
+        # change to notify:
+        # https://manpages.debian.org/testing/conntrackd/conntrackd.conf.5.en.html#Systemd
+        # relocate lockfile:
+        # lockfile under /var/lock cannot be accessed for some reason
+        - name: 10-notify.conf
+          contents: |
+            [Service]
+            Type=notify
+            ExecStartPre=
+            ExecStartPre=/bin/rm -f /run/conntrack.lock
+            Restart=always
+            RestartSec=3
+storage:
+  files:
+    - path: /etc/conntrackd/conntrackd.conf
+      mode: 0644
+      overwrite: true
+      contents:
+        inline: |
+          Sync {
+            Mode FTFW {
+              StartupResync on
+              DisableExternalCache on
+            }
+            Multicast {
+              IPv4_address 225.0.0.50
+              Group 3780
+              IPv4_interface ${cidrhost(interfaces.sync.prefix, host_netnum)}
+              Interface ${interfaces.sync.interface_name}
+              SndSocketBuffer 24985600
+              RcvSocketBuffer 24985600
+              Checksum on
+            }
+          }
+          General {
+            Systemd on
+            LockFile /run/conntrack.lock
+            NetlinkBufferSize 2097152
+            NetlinkBufferSizeMaxGrowth 8388608
+            UNIX {
+              Path /var/run/conntrackd.ctl
+            }
+            Filter From Kernelspace {
+              Protocol Accept {
+                TCP
+              }
+              Address Ignore {
+                %{~ for network_name, interface in interfaces ~}
+                %{~ if lookup(interface, "enable_vrrp_netnum", false) ~}
+                IPv4_address ${cidrhost(interface.prefix, vrrp_netnum)}
+                %{~ for _, member in members ~}
+                IPv4_address ${cidrhost(interface.prefix, member.netnum)}
+                %{~ endfor ~}
+                %{~ else ~}
+                ${try("IPv4_address ${interface.prefix}", "")}
+                %{~ endif ~}
+                %{~ endfor ~}
+                IPv4_address 127.0.0.1
+                IPv6_address ::1
+              }
+              State Accept {
+                ESTABLISHED CLOSED TIME_WAIT CLOSE_WAIT for TCP
+              }
+            }
+          } 

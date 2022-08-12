@@ -30,3 +30,9 @@ variable "haproxy_config_path" {
   type    = string
   default = "/etc/haproxy/haproxy.cfg.d"
 }
+
+variable "members" {
+  type = map(object({
+    netnum = number
+  }))
+}
