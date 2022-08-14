@@ -39,7 +39,7 @@ locals {
           "cfg80211.ieee80211_regdom=US",
         ]
       })
-      "7c-83-34-b2-d9-8b" = merge(local.image_set.coreos, {
+      "1c-83-41-30-bd-6f" = merge(local.image_set.coreos, {
         ignition = "q-0"
         boot_args = [
           "enforcing=0",

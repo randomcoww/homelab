@@ -13,6 +13,9 @@ locals {
       enable_vrrp_netnum = true
       enable_dhcp_server = true
       mtu                = 9000
+      netnums = {
+        sunshine = 8
+      }
     }
     sync = {
       network = "192.168.190.0"
@@ -130,6 +133,7 @@ locals {
     minio        = "minio.${local.domains.internal}"
     transmission = "t.${local.domains.internal}"
     webdav       = "w.${local.domains.internal}"
+    sunshine     = "s.${local.domains.internal}"
   }
 
   kubernetes_service_endpoints = {
