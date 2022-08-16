@@ -191,9 +191,7 @@ resource "helm_release" "external_dns" {
         name   = "external-dns"
       }
       priorityClassName = "system-cluster-critical"
-      Deployment = {
-        replicaCount = 2
-      }
+      replicaCount      = 3
       dataSources = [
         "service",
         "ingress",
@@ -320,17 +318,17 @@ EOF
 
 # metallb #
 
-resource "helm_release" "metlallb" {
-  name             = "metallb"
-  repository       = "https://metallb.github.io/metallb"
-  chart            = "metallb"
-  namespace        = "metallb-system"
-  create_namespace = true
-  values = [
-    yamlencode({
-    }),
-  ]
-}
+# resource "helm_release" "metlallb" {
+#   name             = "metallb"
+#   repository       = "https://metallb.github.io/metallb"
+#   chart            = "metallb"
+#   namespace        = "metallb-system"
+#   create_namespace = true
+#   values = [
+#     yamlencode({
+#     }),
+#   ]
+# }
 
 # nginx ingress #
 

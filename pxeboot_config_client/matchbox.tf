@@ -6,6 +6,10 @@ resource "matchbox_profile" "pxeboot" {
   initrd = ["${local.pxeboot.image_store_endpoint}/${each.value.initrd_image_name}"]
   args = concat([
     "elevator=noop",
+    "intel_iommu=on",
+    "amd_iommu=on",
+    "iommu=pt",
+    "rd.driver.pre=vfio-pci",
     "rd.neednet=1",
     "ip=dhcp",
     "ignition.firstboot",

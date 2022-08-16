@@ -12,7 +12,7 @@ storage:
           apiVersion: v1
           clusters:
           - cluster:
-              certificate-authority: ${certs.ca_cert.path}
+              certificate-authority-data: ${replace(base64encode(chomp(certs.ca_cert.content)), "\n", "")}
               server: https://127.0.0.1:${apiserver_port}
             name: ${cluster_name}
           contexts:
@@ -25,8 +25,8 @@ storage:
           users:
           - name: system:kube-controller-manager
             user:
-              client-certificate: ${certs.controller_manager_cert.path}
-              client-key: ${certs.controller_manager_key.path}
+              client-certificate-data: ${replace(base64encode(chomp(certs.controller_manager_cert.content)), "\n", "")}
+              client-key-data: ${replace(base64encode(chomp(certs.controller_manager_key.content)), "\n", "")}
 
     - path: ${static_pod_manifest_path}/kube-controller-manager.yaml
       mode: 0644

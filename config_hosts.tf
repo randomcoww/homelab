@@ -250,6 +250,18 @@ locals {
       }
       bridge_interfaces = {}
       tap_interfaces    = {}
+      disks = {
+        pv = {
+          device = "/dev/sda"
+          partitions = [
+            {
+              mount_path = local.pv_mount_path
+              wipe       = false
+            },
+          ]
+        }
+      }
+      container_storage_path = "${local.pv_mount_path}/containers"
     }
   }
 
@@ -258,7 +270,7 @@ locals {
     systemd-networkd  = ["gw-0", "gw-1", "q-0", "de-1", "re-0"]
     kubelet-base      = ["gw-0", "gw-1", "q-0"]
     gateway           = ["gw-0", "gw-1", "q-0"]
-    disks             = ["gw-0", "gw-1", "q-0", "re-0"]
+    disks             = ["gw-0", "gw-1", "q-0", "de-1", "re-0"]
     ssh-server        = ["gw-0", "gw-1", "q-0"]
     desktop           = ["de-1", "re-0"]
     etcd              = ["gw-0", "gw-1", "q-0"]

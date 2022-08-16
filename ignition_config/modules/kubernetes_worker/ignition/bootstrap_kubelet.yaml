@@ -5,13 +5,6 @@ systemd:
   units:
     - name: crio.service
       enabled: true
-      dropins:
-        - name: 10-worker.conf
-          contents: |
-            [Service]
-            ExecStartPre=/usr/bin/rm -f \
-              /etc/cni/net.d/100-crio-bridge.conf \
-              /etc/cni/net.d/200-loopback.conf
     - name: kubelet.service
       enabled: true
       dropins:
@@ -112,7 +105,7 @@ storage:
           apiVersion: v1
           clusters:
           - cluster:
-              certificate-authority: ${certs.ca_cert.path}
+              certificate-authority-data: ${replace(base64encode(chomp(certs.ca_cert.content)), "\n", "")}
               server: ${apiserver_endpoint}
             name: ${cluster_name}
           contexts:
@@ -125,8 +118,8 @@ storage:
           users:
           - name: kubelet-bootstrap
             user:
-              client-certificate: ${certs.bootstrap_cert.path}
-              client-key: ${certs.bootstrap_key.path}
+              client-certificate-data: ${replace(base64encode(chomp(certs.bootstrap_cert.content)), "\n", "")}
+              client-key-data: ${replace(base64encode(chomp(certs.bootstrap_key.content)), "\n", "")}
 
     # certs #
     %{~ for cert in values(certs) ~}

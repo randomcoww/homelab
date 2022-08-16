@@ -46,7 +46,7 @@ locals {
       vlan_id            = 90
       enable_vrrp_netnum = true
       netnums = {
-        apiserver = local.vrrp_netnum
+        apiserver = 4
       }
       mtu = 9000
     }
@@ -92,6 +92,7 @@ locals {
     kube_apiserver          = "ghcr.io/randomcoww/kubernetes:kube-master-v1.24.1"
     kube_controller_manager = "ghcr.io/randomcoww/kubernetes:kube-master-v1.24.1"
     kube_scheduler          = "ghcr.io/randomcoww/kubernetes:kube-master-v1.24.1"
+    kube_vip                = "ghcr.io/kube-vip/kube-vip:v0.5.0"
     etcd_wrapper            = "ghcr.io/randomcoww/etcd-wrapper:latest"
     etcd                    = "ghcr.io/randomcoww/etcd:v3.5.4"
 
@@ -153,7 +154,6 @@ locals {
     gateway_dns        = 53
     pxe_tftp           = 69
     apiserver          = 58081
-    apiserver_internal = 58181
     controller_manager = 50252
     scheduler          = 50251
     kubelet            = 50250

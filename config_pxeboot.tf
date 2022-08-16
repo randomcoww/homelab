@@ -1,6 +1,6 @@
 locals {
   pxeboot_image_builds = {
-    coreos            = "fedora-coreos-36.20220809.0"
+    coreos            = "fedora-coreos-36.20220816.0"
     silverblue        = "fedora-silverblue-36.20220809.0"
     silverblue-nvidia = "fedora-silverblue-35.20220804.0"
     printer           = "printer-compat"
@@ -55,13 +55,9 @@ locals {
           "enforcing=0",
           # "rfkill.master_switch_mode=2",
           "rfkill.default_state=1",
-          "intel_iommu=on",
-          "amd_iommu=on",
-          "iommu=pt",
           "rd.driver.blacklist=nouveau",
           "modprobe.blacklist=nouveau",
           "nvidia_drm.modeset=1",
-          "rd.driver.pre=vfio-pci",
           # "vfio-pci.ids=10de:ffffffff:ffffffff:ffffffff:00030000:ffff00ff,10de:ffffffff:ffffffff:ffffffff:00040300:ffffffff",
           # "vfio-pci.ids=1002:ffffffff:ffffffff:ffffffff:00030000:ffff00ff,1002:ffffffff:ffffffff:ffffffff:00040300:ffffffff,10de:ffffffff:ffffffff:ffffffff:00030000:ffff00ff,10de:ffffffff:ffffffff:ffffffff:00040300:ffffffff",
           # "nvidia.NVreg_RegistryDwords=EnableBrightnessControl=1",
