@@ -26,11 +26,6 @@ variable "static_pod_manifest_path" {
   type = string
 }
 
-variable "haproxy_config_path" {
-  type    = string
-  default = "/etc/haproxy/haproxy.cfg.d"
-}
-
 variable "conntrackd_ipv4_ignore" {
   type = list(string)
 }
