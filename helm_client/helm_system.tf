@@ -349,7 +349,7 @@ resource "helm_release" "nginx_ingress" {
         }
         ingressClass = "nginx"
         service = {
-          type = "ClusterIP"
+          type = "LoadBalancer"
           externalIPs = [
             local.services.external_ingress.ip,
           ]
