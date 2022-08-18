@@ -1,0 +1,44 @@
+---
+apiVersion: apps/v1
+kind: DaemonSet
+metadata:
+  name: {{ template "kea.fullname" . }}-tftpd
+  labels:
+    app: {{ template "kea.name" . }}
+    chart: {{ template "kea.chart" . }}
+    release: "{{ .Release.Name }}"
+spec:
+  selector:
+    matchLabels:
+      app: {{ template "kea.name" . }}
+      release: {{ .Release.Name }}
+  template:
+    metadata:
+      labels:
+        app: {{ template "kea.name" . }}
+        release: {{ .Release.Name }}
+    spec:
+    {{- with .Values.affinity }}
+      affinity:
+{{ toYaml . | indent 8 }}
+    {{- end }}
+    {{- with .Values.tolerations }}
+      tolerations:
+{{ toYaml . | indent 8 }}
+    {{- end }}
+      hostNetwork: true
+      dnsPolicy: ClusterFirstWithHostNet
+      restartPolicy: Always
+      containers:
+      - name: {{ .Chart.Name }}-tftpd
+        image: {{ .Values.images.tftpd }}
+        args:
+        - "--address"
+        - "0.0.0.0:{{ .Values.ports.tftpd }}"
+        - "--verbose"
+        securityContext:
+          capabilities:
+            add:
+            - SYS_CHROOT
+            - SETUID
+            - SETGID

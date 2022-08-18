@@ -44,6 +44,7 @@ locals {
   module_ignition_snippets = [
     for f in fileset(".", "${path.module}/ignition/*.yaml") :
     templatefile(f, {
+      interfaces               = var.interfaces
       config_path              = "/var/lib/kubernetes/config"
       cluster_name             = var.cluster_name
       certs                    = local.certs
@@ -55,12 +56,16 @@ locals {
       etcd_cluster_endpoints   = var.etcd_cluster_endpoints
       encryption_config_secret = var.encryption_config_secret
       container_images         = var.container_images
+      apiserver_vip            = var.apiserver_vip
+      apiserver_members        = var.apiserver_members
       apiserver_port           = var.apiserver_port
       apiserver_internal_port  = var.apiserver_internal_port
       controller_manager_port  = var.controller_manager_port
       scheduler_port           = var.scheduler_port
-      apiserver_members        = var.apiserver_members
       haproxy_config_path      = var.haproxy_config_path
+      keepalived_config_path   = var.keepalived_config_path
+      keepalived_services      = var.keepalived_services
+      virtual_router_id        = 11
     })
   ]
 }

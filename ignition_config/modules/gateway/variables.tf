@@ -10,10 +10,6 @@ variable "host_netnum" {
   type = number
 }
 
-variable "vrrp_netnum" {
-  type = number
-}
-
 variable "external_ingress_ip" {
   type = string
 }
@@ -32,4 +28,16 @@ variable "conntrackd_ipv4_ignore" {
 
 variable "conntrackd_ipv6_ignore" {
   type = list(string)
+}
+
+variable "keepalived_config_path" {
+  type    = string
+  default = "/etc/keepalived/keepalived.conf.d"
+}
+
+variable "keepalived_services" {
+  type = list(object({
+    ip  = string
+    dev = string
+  }))
 }

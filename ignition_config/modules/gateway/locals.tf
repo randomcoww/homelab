@@ -5,7 +5,6 @@ locals {
       container_images         = var.container_images
       interfaces               = var.interfaces
       host_netnum              = var.host_netnum
-      vrrp_netnum              = var.vrrp_netnum
       static_pod_manifest_path = var.static_pod_manifest_path
 
       # nftables #
@@ -28,6 +27,9 @@ locals {
       }
       conntrackd_ipv4_ignore = var.conntrackd_ipv4_ignore
       conntrackd_ipv6_ignore = var.conntrackd_ipv6_ignore
+      keepalived_config_path = var.keepalived_config_path
+      keepalived_services    = var.keepalived_services
+      virtual_router_id      = 10
     })
   ]
 }

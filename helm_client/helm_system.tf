@@ -19,7 +19,7 @@ resource "helm_release" "cluster_services" {
         kubeProxy = local.ports.kube_proxy
         apiServer = local.ports.apiserver
       }
-      apiServerIP      = local.vips.apiserver
+      apiServerIP      = local.services.apiserver.ip
       cniInterfaceName = local.kubernetes.cni_bridge_interface_name
       podNetworkPrefix = local.networks.kubernetes_pod.prefix
       internalDomain   = local.domains.internal
@@ -48,7 +48,7 @@ resource "helm_release" "kube_dns" {
         create = false
       }
       service = {
-        clusterIP = local.vips.cluster_dns
+        clusterIP = local.services.cluster_dns.ip
       }
       affinity = {
         nodeAffinity = {
@@ -121,7 +121,7 @@ EOF
             },
             {
               name       = "forward"
-              parameters = ". ${local.vips.cluster_external_dns}"
+              parameters = ". ${local.services.cluster_external_dns.ip}"
             },
             {
               name = "reload"
@@ -191,17 +191,17 @@ resource "helm_release" "external_dns" {
         name   = "external-dns"
       }
       priorityClassName = "system-cluster-critical"
-      replicaCount      = 3
+      replicaCount      = 2
       dataSources = [
         "service",
         "ingress",
       ]
       service = {
         type      = "ClusterIP"
-        clusterIP = local.vips.cluster_external_dns
-      }
-      hostNetwork = {
-        enabled = true
+        clusterIP = local.services.cluster_external_dns.ip
+        externalIPs = [
+          local.services.external_dns.ip
+        ]
       }
       affinity = {
         nodeAffinity = {
@@ -219,19 +219,19 @@ resource "helm_release" "external_dns" {
           }
         }
       }
-      coreDNSLivenessProbe = {
-        httpGet = {
-          path   = "/health"
-          host   = "127.0.0.1"
-          port   = 8080
-          scheme = "HTTP"
-        }
-        initialDelaySeconds = 60
-        periodSeconds       = 10
-        timeoutSeconds      = 5
-        failureThreshold    = 5
-        successThreshold    = 1
-      }
+      # coreDNSLivenessProbe = {
+      #   httpGet = {
+      #     path   = "/health"
+      #     host   = "127.0.0.1"
+      #     port   = 8080
+      #     scheme = "HTTP"
+      #   }
+      #   initialDelaySeconds = 60
+      #   periodSeconds       = 10
+      #   timeoutSeconds      = 5
+      #   failureThreshold    = 5
+      #   successThreshold    = 1
+      # }
       # coreDNSReadinessProbe = {
       #   httpGet = {
       #     path   = "/ready"
@@ -349,11 +349,9 @@ resource "helm_release" "nginx_ingress" {
         }
         ingressClass = "nginx"
         service = {
-          annotations = {
-            "metallb.universe.tf/address-pool" = "public-ips"
-          }
+          type = "ClusterIP"
           externalIPs = [
-            local.vips.external_ingress,
+            local.services.external_ingress.ip,
           ]
           externalTrafficPolicy = "Local"
         }
@@ -788,24 +786,23 @@ module "kea-config" {
   source        = "./modules/kea_config"
   resource_name = "kea"
   service_ips = [
-    local.vips.cluster_kea_primary, local.vips.cluster_kea_secondary
+    local.services.cluster_kea_primary.ip, local.services.cluster_kea_secondary.ip
   ]
   shared_data_path = "/var/lib/kea"
   kea_peer_port    = local.ports.kea_peer
-  ipxe_file_url    = "http://${local.vips.matchbox}:${local.ports.matchbox}/boot.ipxe"
+  ipxe_file_url    = "http://${local.services.matchbox.ip}:${local.ports.matchbox}/boot.ipxe"
   cluster_domain   = local.domains.kubernetes
   networks = [
     for _, network in local.networks :
     {
       prefix = network.prefix
       routers = [
-        cidrhost(network.prefix, local.vrrp_netnum),
+        local.services.gateway.ip,
       ]
       domain_name_servers = [
-        for _, member in local.members.gateway :
-        cidrhost(network.prefix, member.netnum)
+        local.services.external_dns.ip
       ]
-      tftp_server = cidrhost(network.prefix, local.vrrp_netnum)
+      tftp_server = local.services.gateway.ip
       mtu         = network.mtu
       pools = [
         cidrsubnet(network.prefix, 1, 1),
@@ -819,7 +816,7 @@ resource "helm_release" "kea" {
   namespace  = "default"
   repository = "https://randomcoww.github.io/terraform-infra/"
   chart      = "kea"
-  version    = "0.1.8"
+  version    = "0.1.10"
   wait       = false
   values = [
     yamlencode({
@@ -889,7 +886,7 @@ resource "helm_release" "kea" {
 
 module "matchbox-certs" {
   source        = "./modules/matchbox_certs"
-  api_listen_ip = local.vips.matchbox
+  api_listen_ip = local.services.matchbox.ip
 }
 
 module "matchbox-syncthing" {
@@ -961,33 +958,17 @@ resource "helm_release" "matchbox" {
         port = 22000
       }
       apiService = {
-        annotations = {
-          "metallb.universe.tf/address-pool" = "matchbox"
-        }
-        type = "LoadBalancer"
+        type = "ClusterIP"
         port = local.ports.matchbox_api
         externalIPs = [
-          local.vips.matchbox,
+          local.services.matchbox.ip,
         ]
       }
       service = {
-        annotations = {
-          "metallb.universe.tf/address-pool" = "matchbox"
-        }
-        type = "LoadBalancer"
+        type = "ClusterIP"
         port = local.ports.matchbox
         externalIPs = [
-          local.vips.matchbox,
-        ]
-      }
-      tftpdService = {
-        annotations = {
-          "metallb.universe.tf/address-pool" = "matchbox"
-        }
-        type = "LoadBalancer"
-        port = local.ports.pxe_tftp
-        externalIPs = [
-          local.vips.matchbox,
+          local.services.matchbox.ip,
         ]
       }
     }),
@@ -1017,7 +998,6 @@ resource "random_password" "minio-secret-access-key" {
   special = false
 }
 
-# data "helm_template" "minio" {
 resource "helm_release" "minio" {
   name             = split(".", local.kubernetes_service_endpoints.minio)[0]
   namespace        = split(".", local.kubernetes_service_endpoints.minio)[1]
@@ -1048,10 +1028,10 @@ resource "helm_release" "minio" {
         clusterIP = "None"
       }
       service = {
-        type = "LoadBalancer"
+        type = "ClusterIP"
         port = local.ports.minio
         externalIPs = [
-          local.vips.minio,
+          local.services.minio.ip,
         ]
       }
       ingress = {

@@ -1,0 +1,34 @@
+---
+variant: fcos
+version: 1.4.0
+systemd:
+  units:
+    - name: keepalived.service
+      enabled: true
+      dropins:
+        # Part of networkd:
+        # Adds the policy route for WAN back in on networkd restart
+        - name: 10-dependency.conf
+          contents: |
+            [Unit]
+            ConditionDirectoryNotEmpty=${keepalived_config_path}
+
+            [Service]
+            EnvironmentFile=
+            Environment=KEEPALIVED_OPTIONS="-D -P"
+            Restart=always
+            RestartSec=3
+
+storage:
+  files:
+    - path: /etc/keepalived/keepalived.conf
+      mode: 0644
+      overwrite: true
+      contents:
+        inline: |
+          global_defs {
+            vrrp_version 3
+            nftables keepalived
+            max_auto_priority -1
+          }
+          include ${keepalived_config_path}/*.conf

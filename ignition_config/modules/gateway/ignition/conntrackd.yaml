@@ -54,17 +54,18 @@ storage:
                 TCP
               }
               Address Ignore {
+                IPv4_address 127.0.0.1
+                IPv6_address ::1
+                %{~ for _, interface in interfaces ~}
+                %{~ if lookup(interface, "enable_vrrp_netnum", false) ~}
+                IPv4_address ${cidrhost(interface.prefix, host_netnum)}
+                %{~ endif ~}
+                %{~ endfor ~}
                 %{~ for _, address in conntrackd_ipv6_ignore ~}
                 IPv6_address ${address}
                 %{~ endfor ~}
                 %{~ for _, address in conntrackd_ipv4_ignore ~}
                 IPv4_address ${address}
-                %{~ endfor ~}
-                %{~ for _, interface in interfaces ~}
-                %{~ if lookup(interface, "enable_vrrp_netnum", false) ~}
-                IPv4_address ${cidrhost(interface.prefix, host_netnum)}
-                IPv4_address ${cidrhost(interface.prefix, vrrp_netnum)}
-                %{~ endif ~}
                 %{~ endfor ~}
               }
               State Accept {

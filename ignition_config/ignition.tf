@@ -37,21 +37,36 @@ module "ignition-gateway" {
   interfaces               = module.ignition-systemd-networkd[each.key].tap_interfaces
   container_images         = local.container_images
   host_netnum              = each.value.netnum
-  vrrp_netnum              = local.vrrp_netnum
-  external_ingress_ip      = local.vips.external_ingress
+  external_ingress_ip      = local.services.external_ingress.ip
   static_pod_manifest_path = local.kubernetes.static_pod_manifest_path
   pod_network_prefix       = local.networks.kubernetes_pod.prefix
-  conntrackd_ipv6_ignore = [
-    "::1",
+  keepalived_services = [
+    {
+      ip  = "0.0.0.0"
+      dev = "wan"
+    },
+    {
+      ip  = local.services.gateway.ip
+      dev = local.services.gateway.network.name
+    },
   ]
-  conntrackd_ipv4_ignore = concat([
-    "127.0.0.1",
+  conntrackd_ipv4_ignore = sort(distinct(concat([
+    for _, service in local.services :
+    service.ip
+    if lookup(service.network, "enable_vrrp_netnum", false)
     ], [
     for _, network in local.networks :
     network.prefix
     if lookup(network, "enable_prefix", false) && !lookup(network, "enable_vrrp_netnum", false)
     ]
-  )
+  )))
+  conntrackd_ipv6_ignore = [
+  ]
+}
+
+module "ignition-vrrp" {
+  for_each = local.members.vrrp
+  source   = "./modules/vrrp"
 }
 
 module "ignition-disks" {
@@ -151,6 +166,7 @@ module "ignition-kubernetes-master" {
   for_each = local.members.kubernetes-master
   source   = "./modules/kubernetes_master"
 
+  interfaces               = module.ignition-systemd-networkd[each.key].tap_interfaces
   cluster_name             = local.kubernetes.cluster_name
   ca                       = module.kubernetes-ca.ca
   etcd_ca                  = module.etcd-cluster.ca
@@ -160,18 +176,29 @@ module "ignition-kubernetes-master" {
   encryption_config_secret = module.kubernetes-ca.encryption_config_secret
   service_network_prefix   = local.networks.kubernetes_service.prefix
   pod_network_prefix       = local.networks.kubernetes_pod.prefix
+  apiserver_vip            = local.services.apiserver.ip
   apiserver_cert_ips = [
     cidrhost(local.networks.kubernetes.prefix, each.value.netnum),
-    local.vips.apiserver,
+    local.services.apiserver.ip,
+    local.services.cluster_apiserver.ip,
     "127.0.0.1",
-    local.vips.cluster_apiserver,
+  ]
+  apiserver_cert_dns_names = [
+    for i, _ in split(".", "kubernetes.default.svc.${local.domains.kubernetes}") :
+    join(".", slice(split(".", "kubernetes.default.svc.${local.domains.kubernetes}"), 0, i + 1))
   ]
   apiserver_members = [
-    for i, host_key in sort(keys(local.members.kubernetes-master)) :
+    for host_key, host in local.members.kubernetes-master :
     {
-      name = host_key
-      ip   = cidrhost(local.networks.kubernetes.prefix, local.hosts[host_key].netnum),
+      hostname = host.hostname
+      ip       = cidrhost(local.networks.kubernetes.prefix, host.netnum),
     }
+  ]
+  keepalived_services = [
+    {
+      ip  = local.services.apiserver.ip
+      dev = local.services.apiserver.network.name
+    },
   ]
   static_pod_manifest_path = local.kubernetes.static_pod_manifest_path
   container_images         = local.container_images
@@ -192,8 +219,8 @@ module "ignition-kubernetes-worker" {
   node_taints               = lookup(each.value, "kubernetes_worker_taints", [])
   container_storage_path    = each.value.container_storage_path
   cni_bridge_interface_name = local.kubernetes.cni_bridge_interface_name
-  apiserver_endpoint        = "https://${local.vips.apiserver}:${local.ports.apiserver}"
-  cluster_dns_ip            = local.vips.cluster_dns
+  apiserver_endpoint        = "https://${local.services.apiserver.ip}:${local.ports.apiserver}"
+  cluster_dns_ip            = local.services.cluster_dns.ip
   cluster_domain            = local.domains.kubernetes
   static_pod_manifest_path  = local.kubernetes.static_pod_manifest_path
   kubelet_port              = local.ports.kubelet
@@ -204,7 +231,7 @@ module "kubernetes-admin" {
 
   cluster_name   = local.kubernetes.cluster_name
   ca             = module.kubernetes-ca.ca
-  apiserver_ip   = local.vips.apiserver
+  apiserver_ip   = local.services.apiserver.ip
   apiserver_port = local.ports.apiserver
 }
 

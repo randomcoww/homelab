@@ -102,18 +102,6 @@ spec:
           mountPath: /etc/kea/kea-dhcp4.conf
           subPathExpr: kea-dhcp4-$(POD_NAME)
           readOnly: true
-      - name: {{ .Chart.Name }}-tftpd
-        image: {{ .Values.images.tftpd }}
-        args:
-        - "--address"
-        - "0.0.0.0:{{ .Values.ports.tftpd }}"
-        - "--verbose"
-        securityContext:
-          capabilities:
-            add:
-            - SYS_CHROOT
-            - SETUID
-            - SETGID
       volumes:
       - name: shared-data
         emptyDir: {}

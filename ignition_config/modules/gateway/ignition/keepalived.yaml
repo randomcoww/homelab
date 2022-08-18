@@ -1,56 +1,25 @@
 ---
 variant: fcos
 version: 1.4.0
-systemd:
-  units:
-    - name: keepalived.service
-      enabled: true
-      dropins:
-        # Part of networkd:
-        # Adds the policy route for WAN back in on networkd restart
-        - name: 10-dependency.conf
-          contents: |
-            [Unit]
-            PartOf=systemd-networkd.service
-
-            [Service]
-            EnvironmentFile=
-            Environment=KEEPALIVED_OPTIONS="-D -P"
-            Restart=always
-            RestartSec=3
-
 storage:
   files:
-    - path: /etc/keepalived/keepalived.conf
+    - path: ${keepalived_config_path}/20-gateway.conf
       mode: 0644
-      overwrite: true
       contents:
         inline: |
-          global_defs {
-            vrrp_version 3
-            nftables keepalived
-            dynamic_interfaces allow_if_changes
-            max_auto_priority -1
-          }
           vrrp_instance gateway {
             nopreempt
             state BACKUP
             advert_int 0.1
-            virtual_router_id ${vrrp_netnum % 255}
+            virtual_router_id ${virtual_router_id}
             interface ${interfaces.sync.interface_name}
             priority 250
             garp_master_delay 1
             garp_master_refresh 1
-            track_interface {
-              ${interfaces.wan.interface_name}
-            }
             virtual_ipaddress {
-              %{~ for network_name, interface in interfaces ~}
-              %{~ if lookup(interface, "enable_vrrp_netnum", false) ~}
-              ${cidrhost(interface.prefix, vrrp_netnum)} dev ${interface.interface_name} use_vmac
-              %{~ endif ~}
+              %{~ for _, service in keepalived_services ~}
+              ${service.ip} dev ${service.dev} use_vmac
               %{~ endfor ~}
-              0.0.0.0 dev ${interfaces.wan.interface_name}
             }
             virtual_rules {
               to all lookup ${vrrp_master_default_route.table_id} priority ${vrrp_master_default_route.table_priority}
@@ -86,7 +55,7 @@ storage:
           [Route]
           Scope=global
           GatewayOnLink=true
-          Gateway=${cidrhost(interfaces.lan.prefix, vrrp_netnum)}
+          Gateway=${cidrhost(interfaces.lan.prefix, interfaces.lan.netnums.gateway)}
           Destination=0.0.0.0/0
           Table=${vrrp_slave_default_route.table_id}
 

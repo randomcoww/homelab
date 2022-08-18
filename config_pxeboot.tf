@@ -1,6 +1,6 @@
 locals {
   pxeboot_image_builds = {
-    coreos            = "fedora-coreos-36.20220816.0"
+    coreos            = "fedora-coreos-36.20220817.0"
     silverblue        = "fedora-silverblue-36.20220809.0"
     silverblue-nvidia = "fedora-silverblue-35.20220804.0"
     printer           = "printer-compat"
@@ -16,9 +16,9 @@ locals {
   }
 
   pxeboot = {
-    matchbox_endpoint     = "http://${local.vips.matchbox}:${local.ports.matchbox}"
-    matchbox_api_endpoint = "${local.vips.matchbox}:${local.ports.matchbox_api}"
-    image_store_endpoint  = "http://${local.vips.minio}:${local.ports.minio}/${local.minio_buckets.image_store}"
+    matchbox_endpoint     = "http://${local.services.matchbox.ip}:${local.ports.matchbox}"
+    matchbox_api_endpoint = "${local.services.matchbox.ip}:${local.ports.matchbox_api}"
+    image_store_endpoint  = "http://${local.services.minio.ip}:${local.ports.minio}/${local.minio_buckets.image_store}"
 
     hosts = {
       "1c-83-41-30-e2-23" = merge(local.image_set.coreos, {

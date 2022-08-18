@@ -1,8 +1,6 @@
 locals {
   pv_mount_path = "/var/home"
 
-  vrrp_netnum = 2
-
   # do not use #
   base_networks = {
     lan = {
@@ -14,6 +12,7 @@ locals {
       enable_dhcp_server = true
       mtu                = 9000
       netnums = {
+        gateway  = 2
         sunshine = 8
       }
     }
@@ -34,6 +33,7 @@ locals {
       cidr    = 26
       vlan_id = 80
       netnums = {
+        external_dns     = 31
         external_ingress = 32
         matchbox         = 33
         minio            = 34
@@ -73,16 +73,20 @@ locals {
   networks = merge(local.base_networks, {
     for network_name, network in local.base_networks :
     network_name => merge(network, try({
+      name          = network_name
       prefix        = "${network.network}/${network.cidr}"
       enable_prefix = true
     }, {}))
   })
 
-  vips = merge([
-    for _, network in local.networks :
+  services = merge([
+    for network_name, network in local.networks :
     try({
       for service, netnum in network.netnums :
-      service => cidrhost(network.prefix, netnum)
+      service => {
+        ip      = cidrhost(network.prefix, netnum)
+        network = local.networks[network_name]
+      }
     }, {})
     ]...
   )
@@ -154,6 +158,7 @@ locals {
     gateway_dns        = 53
     pxe_tftp           = 69
     apiserver          = 58081
+    apiserver_internal = 58181
     controller_manager = 50252
     scheduler          = 50251
     kubelet            = 50250

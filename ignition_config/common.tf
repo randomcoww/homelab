@@ -6,6 +6,7 @@ data "ct_config" "ignition" {
       try(module.ignition-base[host_key].ignition_snippets, []),
       try(module.ignition-systemd-networkd[host_key].ignition_snippets, []),
       try(module.ignition-gateway[host_key].ignition_snippets, []),
+      try(module.ignition-vrrp[host_key].ignition_snippets, []),
       try(module.ignition-disks[host_key].ignition_snippets, []),
       try(module.ignition-kubelet-base[host_key].ignition_snippets, []),
       try(module.ignition-etcd[host_key].ignition_snippets, []),

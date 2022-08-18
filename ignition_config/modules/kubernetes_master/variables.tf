@@ -1,3 +1,7 @@
+variable "interfaces" {
+  type = any
+}
+
 variable "cluster_name" {
   type = string
 }
@@ -38,7 +42,22 @@ variable "pod_network_prefix" {
   type = string
 }
 
+variable "apiserver_vip" {
+  type = string
+}
+
+variable "apiserver_members" {
+  type = list(object({
+    hostname = string
+    ip       = string
+  }))
+}
+
 variable "apiserver_cert_ips" {
+  type = list(string)
+}
+
+variable "apiserver_cert_dns_names" {
   type = list(string)
 }
 
@@ -48,13 +67,6 @@ variable "apiserver_port" {
 
 variable "apiserver_internal_port" {
   type = number
-}
-
-variable "apiserver_members" {
-  type = list(object({
-    name = string
-    ip   = string
-  }))
 }
 
 variable "controller_manager_port" {
@@ -72,4 +84,16 @@ variable "container_images" {
 variable "haproxy_config_path" {
   type    = string
   default = "/etc/haproxy/haproxy.cfg.d"
+}
+
+variable "keepalived_config_path" {
+  type    = string
+  default = "/etc/keepalived/keepalived.conf.d"
+}
+
+variable "keepalived_services" {
+  type = list(object({
+    ip  = string
+    dev = string
+  }))
 }

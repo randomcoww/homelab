@@ -139,7 +139,7 @@ locals {
         phy0 = {
           mac   = "1c-83-41-30-bd-6f"
           mtu   = 9000
-          vlans = ["sync", "etcd", "service", "kubernetes", "wan"]
+          vlans = ["etcd", "service", "kubernetes"]
         }
         wlan0 = {
           mac          = "8c-55-4a-d0-b1-2d"
@@ -156,10 +156,7 @@ locals {
       tap_interfaces = {
         lan = {
           source_interface_name = "br-lan"
-          enable_netnum         = true
-        }
-        sync = {
-          source_interface_name = "phy0-sync"
+          enable_dhcp           = true
           enable_netnum         = true
         }
         etcd = {
@@ -173,11 +170,6 @@ locals {
         kubernetes = {
           source_interface_name = "phy0-kubernetes"
           enable_netnum         = true
-        }
-        wan = {
-          source_interface_name = "phy0-wan"
-          enable_dhcp           = true
-          mac                   = "52-54-00-63-6e-b3"
         }
       }
       disks = {
@@ -269,12 +261,13 @@ locals {
     base              = ["gw-0", "gw-1", "q-0", "de-1", "re-0"]
     systemd-networkd  = ["gw-0", "gw-1", "q-0", "de-1", "re-0"]
     kubelet-base      = ["gw-0", "gw-1", "q-0"]
-    gateway           = ["gw-0", "gw-1", "q-0"]
+    gateway           = ["gw-0", "gw-1"]
+    vrrp              = ["gw-0", "gw-1", "q-0"]
     disks             = ["gw-0", "gw-1", "q-0", "de-1", "re-0"]
     ssh-server        = ["gw-0", "gw-1", "q-0"]
     desktop           = ["de-1", "re-0"]
     etcd              = ["gw-0", "gw-1", "q-0"]
-    kubernetes-master = ["gw-0", "gw-1", "q-0"]
+    kubernetes-master = ["gw-0", "gw-1"]
     kubernetes-worker = ["gw-0", "gw-1", "q-0"]
   }
 
