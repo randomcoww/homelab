@@ -13,11 +13,9 @@ StatefulSet:
 
 images:
   kea: "ghcr.io/randomcoww/kea:2.0.2"
-  tftpd: "ghcr.io/randomcoww/tftpd-ipxe:20220804"
 
 ports:
   keaPeer: 22000
-  tftpd: 69
 
 affinity: {}
 tolerations: {}

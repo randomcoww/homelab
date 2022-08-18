@@ -811,18 +811,52 @@ module "kea-config" {
   ]
 }
 
+resource "helm_release" "tftpd" {
+  name       = "tftpd"
+  namespace  = "default"
+  repository = "https://randomcoww.github.io/terraform-infra/"
+  chart      = "tftpd"
+  version    = "0.1.1"
+  wait       = false
+  values = [
+    yamlencode({
+      images = {
+        tftpd = local.container_images.tftpd
+      }
+      affinity = {
+        nodeAffinity = {
+          requiredDuringSchedulingIgnoredDuringExecution = {
+            nodeSelectorTerms = [
+              {
+                matchExpressions = [
+                  {
+                    key      = "role-gateway"
+                    operator = "Exists"
+                  },
+                ]
+              },
+            ]
+          }
+        }
+      }
+      ports = {
+        tftpd   = local.ports.pxe_tftp
+      }
+    }),
+  ]
+}
+
 resource "helm_release" "kea" {
   name       = "kea"
   namespace  = "default"
   repository = "https://randomcoww.github.io/terraform-infra/"
   chart      = "kea"
-  version    = "0.1.10"
+  version    = "0.1.14"
   wait       = false
   values = [
     yamlencode({
       images = {
-        kea   = local.container_images.kea
-        tftpd = local.container_images.tftpd
+        kea = local.container_images.kea
       }
       peers = [
         for _, peer in module.kea-config.config :
@@ -873,7 +907,6 @@ resource "helm_release" "kea" {
       }
       ports = {
         keaPeer = local.ports.kea_peer
-        tftpd   = local.ports.pxe_tftp
       }
       peerService = {
         port = local.ports.kea_peer

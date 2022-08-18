@@ -2,20 +2,20 @@
 apiVersion: apps/v1
 kind: DaemonSet
 metadata:
-  name: {{ template "kea.fullname" . }}-tftpd
+  name: {{ template "tftpd.fullname" . }}
   labels:
-    app: {{ template "kea.name" . }}
-    chart: {{ template "kea.chart" . }}
+    app: {{ template "tftpd.name" . }}
+    chart: {{ template "tftpd.chart" . }}
     release: "{{ .Release.Name }}"
 spec:
   selector:
     matchLabels:
-      app: {{ template "kea.name" . }}
+      app: {{ template "tftpd.name" . }}
       release: {{ .Release.Name }}
   template:
     metadata:
       labels:
-        app: {{ template "kea.name" . }}
+        app: {{ template "tftpd.name" . }}
         release: {{ .Release.Name }}
     spec:
     {{- with .Values.affinity }}
@@ -30,7 +30,7 @@ spec:
       dnsPolicy: ClusterFirstWithHostNet
       restartPolicy: Always
       containers:
-      - name: {{ .Chart.Name }}-tftpd
+      - name: {{ .Chart.Name }}
         image: {{ .Values.images.tftpd }}
         args:
         - "--address"
