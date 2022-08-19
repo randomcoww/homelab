@@ -118,19 +118,23 @@ resource "helm_release" "kube_dns" {
         clusterIP = local.services.cluster_dns.ip
       }
       affinity = {
-        nodeAffinity = {
-          requiredDuringSchedulingIgnoredDuringExecution = {
-            nodeSelectorTerms = [
-              {
+        podAntiAffinity = {
+          requiredDuringSchedulingIgnoredDuringExecution = [
+            {
+              labelSelector = {
                 matchExpressions = [
                   {
-                    key      = "role-gateway"
-                    operator = "Exists"
+                    key      = "app"
+                    operator = "In"
+                    values = [
+                      "kube-dns",
+                    ]
                   },
                 ]
-              },
-            ]
-          }
+              }
+              topologyKey = "kubernetes.io/hostname"
+            },
+          ]
         }
       }
       priorityClassName = "system-cluster-critical"
@@ -243,10 +247,11 @@ resource "helm_release" "external_dns" {
   namespace  = "kube-system"
   repository = "https://randomcoww.github.io/terraform-infra/"
   chart      = "external-dns"
-  version    = "0.1.12"
+  version    = "0.1.14"
   wait       = false
   values = [
     yamlencode({
+      mode           = "DaemonSet"
       internalDomain = local.domains.internal
       images = {
         coreDNS     = local.container_images.coredns
@@ -257,8 +262,11 @@ resource "helm_release" "external_dns" {
         create = true
         name   = "external-dns"
       }
+      hostNetwork = {
+        enabled = true
+      }
       priorityClassName = "system-cluster-critical"
-      replicaCount      = 2
+      # replicaCount      = 2
       dataSources = [
         "service",
         "ingress",
@@ -266,9 +274,6 @@ resource "helm_release" "external_dns" {
       service = {
         type      = "ClusterIP"
         clusterIP = local.services.cluster_external_dns.ip
-        externalIPs = [
-          local.services.external_dns.ip
-        ]
       }
       affinity = {
         nodeAffinity = {
@@ -277,8 +282,12 @@ resource "helm_release" "external_dns" {
               {
                 matchExpressions = [
                   {
-                    key      = "role-gateway"
-                    operator = "Exists"
+                    key      = "kubernetes.io/hostname"
+                    operator = "In"
+                    values = [
+                      for _, member in local.members.gateway :
+                      member.hostname
+                    ]
                   },
                 ]
               },
@@ -286,32 +295,32 @@ resource "helm_release" "external_dns" {
           }
         }
       }
-      # coreDNSLivenessProbe = {
-      #   httpGet = {
-      #     path   = "/health"
-      #     host   = "127.0.0.1"
-      #     port   = 8080
-      #     scheme = "HTTP"
-      #   }
-      #   initialDelaySeconds = 60
-      #   periodSeconds       = 10
-      #   timeoutSeconds      = 5
-      #   failureThreshold    = 5
-      #   successThreshold    = 1
-      # }
-      # coreDNSReadinessProbe = {
-      #   httpGet = {
-      #     path   = "/ready"
-      #     host   = "127.0.0.1"
-      #     port   = 8181
-      #     scheme = "HTTP"
-      #   }
-      #   initialDelaySeconds = 60
-      #   periodSeconds       = 10
-      #   timeoutSeconds      = 5
-      #   failureThreshold    = 5
-      #   successThreshold    = 1
-      # }
+      coreDNSLivenessProbe = {
+        httpGet = {
+          path   = "/health"
+          host   = "127.0.0.1"
+          port   = 8080
+          scheme = "HTTP"
+        }
+        initialDelaySeconds = 30
+        periodSeconds       = 10
+        timeoutSeconds      = 5
+        failureThreshold    = 5
+        successThreshold    = 1
+      }
+      coreDNSReadinessProbe = {
+        httpGet = {
+          path   = "/ready"
+          host   = "127.0.0.1"
+          port   = 8181
+          scheme = "HTTP"
+        }
+        initialDelaySeconds = 30
+        periodSeconds       = 10
+        timeoutSeconds      = 5
+        failureThreshold    = 5
+        successThreshold    = 1
+      }
       servers = [
         {
           zones = [
@@ -325,10 +334,12 @@ resource "helm_release" "external_dns" {
               name = "errors"
             },
             {
-              name = "health"
+              name       = "health"
+              parameters = "127.0.0.1:8080"
             },
             {
-              name = "ready"
+              name       = "ready"
+              parameters = "127.0.0.1:8181"
             },
             {
               name        = "etcd"
@@ -357,10 +368,12 @@ EOF
               name = "errors"
             },
             {
-              name = "health"
+              name       = "health"
+              parameters = "127.0.0.1:8080"
             },
             {
-              name = "ready"
+              name       = "ready"
+              parameters = "127.0.0.1:8181"
             },
             {
               name       = "forward"
@@ -382,20 +395,6 @@ EOF
     }),
   ]
 }
-
-# metallb #
-
-# resource "helm_release" "metlallb" {
-#   name             = "metallb"
-#   repository       = "https://metallb.github.io/metallb"
-#   chart            = "metallb"
-#   namespace        = "metallb-system"
-#   create_namespace = true
-#   values = [
-#     yamlencode({
-#     }),
-#   ]
-# }
 
 # nginx ingress #
 
@@ -736,18 +735,12 @@ resource "helm_release" "local-path-provisioner" {
       storageClass = {
         name = "local-path"
       }
-      nodePathMap = flatten(concat([
-        for _, node in local.hosts :
-        try({
-          node  = node.hostname
-          paths = [node.local_provisioner_path]
-        }, [])
-        ], [
+      nodePathMap = [
         {
           node  = "DEFAULT_PATH_FOR_NON_LISTED_NODES"
           paths = ["${local.pv_mount_path}/local_path_provisioner"]
         },
-      ]))
+      ]
     }),
   ]
 }
@@ -858,7 +851,8 @@ module "kea-config" {
         local.services.gateway.ip,
       ]
       domain_name_servers = [
-        local.services.external_dns.ip
+        for _, member in local.members.gateway :
+        cidrhost(network.prefix, member.netnum)
       ]
       tftp_server = local.services.gateway.ip
       mtu         = network.mtu
@@ -888,8 +882,12 @@ resource "helm_release" "tftpd" {
               {
                 matchExpressions = [
                   {
-                    key      = "role-gateway"
-                    operator = "Exists"
+                    key      = "kubernetes.io/hostname"
+                    operator = "In"
+                    values = [
+                      for _, member in local.members.gateway :
+                      member.hostname
+                    ]
                   },
                 ]
               },
@@ -930,20 +928,6 @@ resource "helm_release" "kea" {
         replicaCount = length(module.kea-config.config)
       }
       affinity = {
-        nodeAffinity = {
-          requiredDuringSchedulingIgnoredDuringExecution = {
-            nodeSelectorTerms = [
-              {
-                matchExpressions = [
-                  {
-                    key      = "role-gateway"
-                    operator = "Exists"
-                  },
-                ]
-              },
-            ]
-          }
-        }
         podAntiAffinity = {
           requiredDuringSchedulingIgnoredDuringExecution = [
             {
@@ -1136,8 +1120,12 @@ resource "helm_release" "minio" {
               {
                 matchExpressions = [
                   {
-                    key      = "role-disks"
-                    operator = "Exists"
+                    key      = "kubernetes.io/hostname"
+                    operator = "In"
+                    values = [
+                      for _, member in local.members.disks :
+                      member.hostname
+                    ]
                   },
                 ]
               },
@@ -1258,8 +1246,12 @@ resource "helm_release" "hostapd" {
               {
                 matchExpressions = [
                   {
-                    key      = "role-gateway"
-                    operator = "Exists"
+                    key      = "kubernetes.io/hostname"
+                    operator = "In"
+                    values = [
+                      for _, member in local.members.gateway :
+                      member.hostname
+                    ]
                   },
                 ]
               },

@@ -1,3 +1,5 @@
+mode: Deployment
+
 internalDomain: internal-dns.local
 
 images:

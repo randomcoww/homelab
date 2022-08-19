@@ -284,15 +284,7 @@ locals {
     for host_key, host in local.base_hosts :
     host_key => merge({
       hostname = "${host_key}.${local.domains.internal_mdns}"
-      }, host, {
-      kubernetes_worker_labels = merge(
-        {
-          for role in lookup(local.host_roles, host_key, []) :
-          "role-${role}" => "true"
-        },
-        lookup(host, "kubernetes_worker_labels", {}),
-      )
-    })
+    }, host)
   }
 
   # use this instead of base_members #
