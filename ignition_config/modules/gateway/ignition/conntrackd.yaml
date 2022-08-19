@@ -12,12 +12,17 @@ systemd:
         # lockfile under /var/lock cannot be accessed for some reason
         - name: 10-notify.conf
           contents: |
+            [Unit]
+            After=keepalived.service
+            Requisite=keepalived.service
+
             [Service]
             Type=notify
             ExecStartPre=
             ExecStartPre=/bin/rm -f /run/conntrack.lock
             Restart=always
             RestartSec=3
+
 storage:
   files:
     - path: /etc/conntrackd/conntrackd.conf

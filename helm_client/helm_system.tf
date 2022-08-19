@@ -27,6 +27,73 @@ resource "helm_release" "cluster_services" {
   ]
 }
 
+# kube-router #
+
+# resource "helm_release" "kube_router" {
+#   name       = "kube-router"
+#   namespace  = "kube-system"
+#   repository = "https://charts.enix.io/"
+#   chart      = "kube-router"
+#   version    = "1.8.0"
+#   wait       = false
+#   values = [
+#     yamlencode({
+#       kubeRouter = {
+#         cni = {
+#           install = true
+#           config = jsonencode({
+#             cniVersion = "0.3.0"
+#             name       = "kube-router"
+#             plugins = [
+#               {
+#                 name             = "kubernetes"
+#                 type             = "bridge"
+#                 bridge           = local.kubernetes.cni_bridge_interface_name
+#                 isDefaultGateway = true
+#                 hairpinMode      = true
+#                 ipam = {
+#                   type = "host-local"
+#                 }
+#               },
+#               {
+#                 type = "portmap"
+#                 capabilities = {
+#                   snat         = true
+#                   portMappings = true
+#                 }
+#               },
+#             ]
+#           })
+#         }
+#         router = {
+#           nodesFullMesh           = true
+#           enablePodEgress         = true
+#           enableOverlay           = true
+#           enableIbgp              = true
+#           enableCni               = true
+#           clusterAsn              = 65000
+#           bgpGracefulRestart      = true
+#           advertisePodCidr        = true
+#           advertiseLoadbalancerIp = true
+#           advertiseExternalIp     = true
+#           advertiseClusterIp      = true
+#         }
+#         firewall = {
+#           enabled = true
+#         }
+#         serviceProxy = {
+#           enabled                 = true
+#           nodeportBindonAllIp     = true
+#           masqueradeAll           = true
+#           ipvsPermitAll           = true
+#           ipvsGracefulTermination = true
+#           hairpinMode             = true
+#         }
+#       }
+#     }),
+#   ]
+# }
+
 # coredns #
 
 resource "helm_release" "kube_dns" {
@@ -840,7 +907,7 @@ resource "helm_release" "tftpd" {
         }
       }
       ports = {
-        tftpd   = local.ports.pxe_tftp
+        tftpd = local.ports.pxe_tftp
       }
     }),
   ]

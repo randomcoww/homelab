@@ -96,18 +96,17 @@ locals {
     kube_apiserver          = "ghcr.io/randomcoww/kubernetes:kube-master-v1.24.1"
     kube_controller_manager = "ghcr.io/randomcoww/kubernetes:kube-master-v1.24.1"
     kube_scheduler          = "ghcr.io/randomcoww/kubernetes:kube-master-v1.24.1"
-    kube_vip                = "ghcr.io/kube-vip/kube-vip:v0.5.0"
     etcd_wrapper            = "ghcr.io/randomcoww/etcd-wrapper:latest"
     etcd                    = "ghcr.io/randomcoww/etcd:v3.5.4"
 
     # Helm
     kea                = "ghcr.io/randomcoww/kea:2.0.2"
     matchbox           = "quay.io/poseidon/matchbox:latest"
-    coredns            = "docker.io/coredns/coredns:latest"
+    coredns            = "k8s.gcr.io/coredns/coredns:v1.9.3"
     tftpd              = "ghcr.io/randomcoww/tftpd-ipxe:20220804"
     hostapd            = "ghcr.io/randomcoww/hostapd:2.10"
-    syncthing          = "docker.io/syncthing/syncthing:latest"
-    rclone             = "docker.io/rclone/rclone:latest"
+    syncthing          = "docker.io/syncthing/syncthing:1.20"
+    rclone             = "mirror.gcr.io/rclone/rclone:latest"
     mpd                = "ghcr.io/randomcoww/mpd:0.23.8-2"
     ympd               = "ghcr.io/randomcoww/ympd:20220807"
     flannel            = "ghcr.io/randomcoww/flannel:v0.18.1"
@@ -142,9 +141,10 @@ locals {
   }
 
   kubernetes_service_endpoints = {
-    minio    = "minio.minio.svc.${local.domains.kubernetes}"
-    authelia = "authelia.authelia.svc.${local.domains.kubernetes}"
-    webdav   = "webdav.default.svc.${local.domains.kubernetes}"
+    kubernetes = "kubernetes.default.svc.${local.domains.kubernetes}"
+    minio      = "minio.minio.svc.${local.domains.kubernetes}"
+    authelia   = "authelia.authelia.svc.${local.domains.kubernetes}"
+    webdav     = "webdav.default.svc.${local.domains.kubernetes}"
   }
 
   minio_buckets = {
