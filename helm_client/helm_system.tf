@@ -666,15 +666,6 @@ resource "helm_release" "authelia" {
           default_policy = "deny"
           rules = [
             {
-              domain = local.kubernetes_ingress_endpoints.minio
-              policy = "bypass"
-              networks = [
-                local.networks.lan.prefix,
-                local.networks.service.prefix,
-                local.networks.kubernetes.prefix,
-              ]
-            },
-            {
               domain = local.kubernetes_ingress_endpoints.mpd
               policy = "one_factor"
             },
@@ -1103,7 +1094,7 @@ resource "helm_release" "minio" {
   namespace        = split(".", local.kubernetes_service_endpoints.minio)[1]
   repository       = "https://charts.min.io/"
   chart            = "minio"
-  version          = "4.0.7"
+  version          = "4.0.12"
   wait             = false
   create_namespace = true
   values = [
@@ -1135,29 +1126,7 @@ resource "helm_release" "minio" {
         ]
       }
       ingress = {
-        enabled          = true
-        ingressClassName = "nginx"
-        path             = "/"
-        annotations = {
-          "cert-manager.io/cluster-issuer"                    = "letsencrypt-prod"
-          "nginx.ingress.kubernetes.io/auth-response-headers" = "Remote-User,Remote-Name,Remote-Groups,Remote-Email"
-          "nginx.ingress.kubernetes.io/auth-signin"           = "https://${local.kubernetes_ingress_endpoints.auth}"
-          "nginx.ingress.kubernetes.io/auth-snippet"          = <<EOF
-proxy_set_header X-Forwarded-Method $request_method;
-EOF
-          "nginx.ingress.kubernetes.io/auth-url"              = "http://${local.kubernetes_service_endpoints.authelia}/api/verify"
-        }
-        tls = [
-          {
-            secretName = "minio-tls"
-            hosts = [
-              local.kubernetes_ingress_endpoints.minio,
-            ]
-          },
-        ]
-        hosts = [
-          local.kubernetes_ingress_endpoints.minio,
-        ]
+        enabled = false
       }
       users = []
       affinity = {
@@ -1209,7 +1178,7 @@ output "minio_endpoint" {
     version = "10"
     aliases = {
       minio = {
-        url       = "https://${local.kubernetes_ingress_endpoints.minio}"
+        url       = "http://${local.services.minio.ip}:${local.ports.minio}"
         accessKey = nonsensitive(random_password.minio-access-key-id.result)
         secretKey = nonsensitive(random_password.minio-secret-access-key.result)
         api       = "S3v4"

@@ -134,10 +134,8 @@ locals {
   kubernetes_ingress_endpoints = {
     mpd          = "mpd.${local.domains.internal}"
     auth         = "auth.${local.domains.internal}"
-    minio        = "minio.${local.domains.internal}"
     transmission = "t.${local.domains.internal}"
     webdav       = "w.${local.domains.internal}"
-    sunshine     = "s.${local.domains.internal}"
   }
 
   kubernetes_service_endpoints = {
