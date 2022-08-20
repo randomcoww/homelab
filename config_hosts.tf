@@ -221,7 +221,6 @@ locals {
         }
         service = {
           source_interface_name = "phy0-service"
-          enable_netnum         = true
         }
       }
       disks = {
