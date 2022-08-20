@@ -27,6 +27,11 @@
       <model type='virtio-net'/>
       <boot order='1'/>
     </interface>
+    <interface type='direct' trustGuestRxFilters='yes'>
+      <mac address='52:54:00:1a:61:1b'/>
+      <source dev='service' mode='bridge'/>
+      <model type='virtio-net'/>
+    </interface>
     <controller type='scsi' model='virtio-scsi'/>
     <disk type='file' device='disk'>
       <driver name='qemu' type='raw'/>

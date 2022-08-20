@@ -204,8 +204,9 @@ locals {
       ]
       hardware_interfaces = {
         phy0 = {
-          mac = "84-a9-38-0f-aa-76"
-          mtu = 9000
+          mac   = "84-a9-38-0f-aa-76"
+          mtu   = 9000
+          vlans = ["service"]
         }
         wlan0 = {
           mac = "b4-b5-b6-74-79-15"
@@ -217,6 +218,10 @@ locals {
         lan = {
           source_interface_name = "phy0"
           enable_dhcp           = true
+        }
+        service = {
+          source_interface_name = "phy0-service"
+          enable_netnum         = true
         }
       }
       disks = {
@@ -239,12 +244,17 @@ locals {
         "client",
       ]
       hardware_interfaces = {
-        phy0 = {
-          mac           = "52-54-00-1a-61-1a"
-          enable_dhcp   = true
+        lan = {
+          mac         = "52-54-00-1a-61-1a"
+          enable_dhcp = true
+          enable_arp  = true
+          enable_mdns = true
+          mtu         = 9000
+        }
+        service = {
+          mac           = "52-54-00-1a-61-1b"
           enable_netnum = true
           enable_arp    = true
-          enable_mdns   = true
           mtu           = 9000
         }
       }
