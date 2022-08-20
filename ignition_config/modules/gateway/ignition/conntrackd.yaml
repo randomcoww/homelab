@@ -62,7 +62,7 @@ storage:
                 IPv4_address 127.0.0.1
                 IPv6_address ::1
                 %{~ for _, interface in interfaces ~}
-                %{~ if lookup(interface, "enable_vrrp_netnum", false) ~}
+                %{~ if lookup(interface, "enable_gateway", false) ~}
                 IPv4_address ${cidrhost(interface.prefix, host_netnum)}
                 %{~ endif ~}
                 %{~ endfor ~}

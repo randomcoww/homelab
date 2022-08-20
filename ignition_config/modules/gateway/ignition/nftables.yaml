@@ -58,7 +58,11 @@ storage:
 
             chain postrouting {
               type nat hook postrouting priority srcnat; policy accept;
-              ip saddr ${interfaces.lan.prefix} oifname ${interfaces.wan.interface_name} masquerade;
+              %{~ for _, interface in interfaces ~}
+              %{~ if lookup(interface, "enable_gateway", false) ~}
+              ip saddr ${interface.prefix} oifname ${interfaces.wan.interface_name} masquerade;
+              %{~ endif ~}
+              %{~ endfor ~}
             }
           }
           ;

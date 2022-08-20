@@ -8,12 +8,11 @@ locals {
       cidr               = 23
       vlan_id            = 1
       enable_mdns        = true
-      enable_vrrp_netnum = true
+      enable_gateway     = true
       enable_dhcp_server = true
       mtu                = 9000
       netnums = {
-        gateway  = 2
-        sunshine = 8
+        gateway = 2
       }
     }
     sync = {
@@ -41,10 +40,9 @@ locals {
       mtu = 9000
     }
     kubernetes = {
-      network            = "192.168.193.0"
-      cidr               = 26
-      vlan_id            = 90
-      enable_vrrp_netnum = true
+      network = "192.168.193.0"
+      cidr    = 26
+      vlan_id = 90
       netnums = {
         apiserver = 4
       }

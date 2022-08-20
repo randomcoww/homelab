@@ -53,11 +53,11 @@ module "ignition-gateway" {
   conntrackd_ipv4_ignore = sort(distinct(concat([
     for _, service in local.services :
     service.ip
-    if lookup(service.network, "enable_vrrp_netnum", false)
+    if lookup(service.network, "enable_gateway", false)
     ], [
     for _, network in local.networks :
     network.prefix
-    if lookup(network, "enable_prefix", false) && !lookup(network, "enable_vrrp_netnum", false)
+    if lookup(network, "enable_prefix", false) && !lookup(network, "enable_gateway", false)
     ]
   )))
   conntrackd_ipv6_ignore = [
