@@ -28,8 +28,6 @@ storage:
       contents:
         inline: |
           [Match]
-          Virtualization=!vm
-          Virtualization=!container
           Name=${bridge_interface_name}
 
           [Link]

@@ -32,7 +32,6 @@ storage:
       contents:
         inline: |
           [Match]
-          Virtualization=!container
           PermanentMACAddress=${hardware_interface.mac}
 
           [Link]
@@ -44,7 +43,6 @@ storage:
       contents:
         inline: |
           [Match]
-          Virtualization=!container
           MACAddress=${hardware_interface.mac}
 
           [Link]
@@ -82,7 +80,6 @@ storage:
       contents:
         inline: |
           [Match]
-          Virtualization=!container
           Name=${vlan.interface_name}
 
           [Link]
