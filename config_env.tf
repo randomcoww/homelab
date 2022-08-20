@@ -49,7 +49,8 @@ locals {
       mtu = 9000
     }
     wan = {
-      vlan_id = 30
+      vlan_id         = 30
+      disable_require = true
     }
     kubernetes_service = {
       network = "10.96.0.0"

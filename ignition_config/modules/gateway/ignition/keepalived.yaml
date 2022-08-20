@@ -31,9 +31,6 @@ storage:
       mode: 0644
       contents:
         inline: |
-          [Link]
-          # RequiredForOnline=false
-
           [DHCP]
           Anonymize=true
           # Needed to request IP on each gateway

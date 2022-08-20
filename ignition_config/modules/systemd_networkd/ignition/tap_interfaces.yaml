@@ -27,9 +27,10 @@ storage:
         inline: |
           [Match]
           Name=${tap_interface.interface_name}
-          %{~ if !lookup(tap_interface, "enable_dhcp", false) ~}
 
           [Link]
+          RequiredForOnline=${!lookup(tap_interface, "disable_require", false)}
+          %{~ if !lookup(tap_interface, "enable_dhcp", false) ~}
           MTUBytes=${lookup(tap_interface, "mtu", 1500)}
           %{~ endif ~}
 
