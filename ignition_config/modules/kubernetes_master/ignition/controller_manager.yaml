@@ -60,6 +60,7 @@ storage:
               - --service-cluster-ip-range=${service_network_prefix}
               - --use-service-account-credentials=true
               - --secure-port=${controller_manager_port}
+              - --feature-gates=NodeOutOfServiceVolumeDetach=true
               - --v=2
               volumeMounts:
               - name: config-volume
