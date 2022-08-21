@@ -160,7 +160,6 @@ locals {
         }
         sync = {
           source_interface_name = "phy0-sync"
-          enable_netnum         = true
         }
         etcd = {
           source_interface_name = "phy0-etcd"
@@ -288,10 +287,10 @@ locals {
     vrrp              = ["gw-0", "gw-1"]
     disks             = ["gw-0", "gw-1", "q-0", "de-1", "re-0"]
     ssh-server        = ["gw-0", "gw-1", "q-0"]
-    desktop           = ["de-1", "re-0"]
     etcd              = ["gw-0", "gw-1", "q-0"]
     kubernetes-master = ["gw-0", "gw-1"]
     kubernetes-worker = ["gw-0", "gw-1", "q-0"]
+    desktop           = ["de-1", "re-0"]
   }
 
   host_roles = transpose(local.base_members)
