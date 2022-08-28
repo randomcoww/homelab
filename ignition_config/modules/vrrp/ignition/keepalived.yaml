@@ -11,6 +11,7 @@ systemd:
         - name: 10-dependency.conf
           contents: |
             [Unit]
+            PartOf=systemd-networkd.service
             ConditionDirectoryNotEmpty=${keepalived_config_path}
 
             [Service]
@@ -29,6 +30,7 @@ storage:
           global_defs {
             vrrp_version 3
             nftables keepalived
+            dynamic_interfaces allow_if_changes
             max_auto_priority -1
           }
           include ${keepalived_config_path}/*.conf

@@ -12,13 +12,17 @@ storage:
             state BACKUP
             advert_int 0.1
             virtual_router_id ${virtual_router_id}
+            dont_track_primary
             interface ${interfaces.sync.interface_name}
             priority 250
             garp_master_delay 1
             garp_master_refresh 1
+            track_interface {
+              ${interfaces.wan.interface_name}
+            }
             virtual_ipaddress {
               %{~ for _, service in keepalived_services ~}
-              ${service.ip} dev ${service.dev} use_vmac
+              ${service.ip} dev ${service.dev} use_vmac no_track
               %{~ endfor ~}
             }
             virtual_rules {
@@ -33,7 +37,6 @@ storage:
         inline: |
           [DHCP]
           Anonymize=true
-          # Needed to request IP on each gateway
           RequestBroadcast=true
           UseMTU=true
           UseDNS=false
@@ -51,7 +54,6 @@ storage:
         inline: |
           [Route]
           Scope=global
-          GatewayOnLink=true
           Gateway=${cidrhost(interfaces.lan.prefix, interfaces.lan.netnums.gateway)}
           Destination=0.0.0.0/0
           Table=${vrrp_slave_default_route.table_id}
