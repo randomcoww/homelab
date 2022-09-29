@@ -133,6 +133,7 @@ locals {
     q-0 = {
       users = [
         "admin",
+        "client",
       ]
       netnum = 5
       hardware_interfaces = {
@@ -167,7 +168,7 @@ locals {
         }
         service = {
           source_interface_name = "phy0-service"
-          enable_netnum         = true
+          enable_netnum         = false
         }
         kubernetes = {
           source_interface_name = "phy0-kubernetes"
@@ -191,6 +192,13 @@ locals {
       }
       container_storage_path = "${local.pv_mount_path}/containers"
       local_provisioner_path = "${local.pv_mount_path}/local_path_provisioner"
+      # kubernetes_worker_taints = [
+      #   {
+      #     key    = "node.kubernetes.io/unschedulable"
+      #     effect = "NoExecute"
+      #     value  = "true"
+      #   },
+      # ]
     }
 
     re-0 = {
@@ -289,8 +297,8 @@ locals {
     ssh-server        = ["gw-0", "gw-1", "q-0"]
     etcd              = ["gw-0", "gw-1", "q-0"]
     kubernetes-master = ["gw-0", "gw-1"]
-    kubernetes-worker = ["gw-0", "gw-1", "q-0"]
-    desktop           = ["de-1", "re-0"]
+    kubernetes-worker = ["gw-0", "gw-1"]
+    desktop           = ["de-1", "re-0", "q-0"]
   }
 
   host_roles = transpose(local.base_members)

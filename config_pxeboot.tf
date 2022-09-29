@@ -1,7 +1,7 @@
 locals {
   pxeboot_image_builds = {
     coreos            = "fedora-coreos-36.20220818.0"
-    silverblue        = "fedora-silverblue-36.20220809.0"
+    silverblue        = "fedora-silverblue-36.20220928.0"
     silverblue-nvidia = "fedora-silverblue-35.20220904.0"
     printer           = "printer-compat"
   }
@@ -39,7 +39,7 @@ locals {
           "cfg80211.ieee80211_regdom=US",
         ]
       })
-      "1c-83-41-30-bd-6f" = merge(local.image_set.coreos, {
+      "1c-83-41-30-bd-6f" = merge(local.image_set.silverblue, {
         ignition = "q-0"
         boot_args = [
           "enforcing=0",
