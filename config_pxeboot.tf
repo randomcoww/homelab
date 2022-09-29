@@ -1,7 +1,7 @@
 locals {
   pxeboot_image_builds = {
-    coreos            = "fedora-coreos-36.20220818.0"
-    silverblue        = "fedora-silverblue-36.20220928.0"
+    coreos            = "fedora-coreos-36.20220929.0"
+    silverblue        = "fedora-silverblue-36.20220929.0"
     silverblue-nvidia = "fedora-silverblue-35.20220904.0"
     printer           = "printer-compat"
   }
