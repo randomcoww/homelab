@@ -133,7 +133,6 @@ locals {
     q-0 = {
       users = [
         "admin",
-        "client",
       ]
       netnum = 5
       hardware_interfaces = {
@@ -161,6 +160,7 @@ locals {
         }
         sync = {
           source_interface_name = "phy0-sync"
+          enable_netnum         = false
         }
         etcd = {
           source_interface_name = "phy0-etcd"
@@ -168,7 +168,7 @@ locals {
         }
         service = {
           source_interface_name = "phy0-service"
-          enable_netnum         = false
+          enable_netnum         = true
         }
         kubernetes = {
           source_interface_name = "phy0-kubernetes"
@@ -210,7 +210,7 @@ locals {
       ]
       hardware_interfaces = {
         phy0 = {
-          mac   = "84-a9-38-0f-aa-76"
+          mac   = "88-a4-c2-0d-eb-e7"
           mtu   = 9000
           vlans = ["service"]
         }
@@ -296,9 +296,9 @@ locals {
     disks             = ["gw-0", "gw-1", "q-0", "de-1", "re-0"]
     ssh-server        = ["gw-0", "gw-1", "q-0"]
     etcd              = ["gw-0", "gw-1", "q-0"]
-    kubernetes-master = ["gw-0", "gw-1"]
-    kubernetes-worker = ["gw-0", "gw-1"]
-    desktop           = ["de-1", "re-0", "q-0"]
+    kubernetes-master = ["gw-0", "gw-1", "q-0"]
+    kubernetes-worker = ["gw-0", "gw-1", "q-0"]
+    desktop           = ["de-1", "re-0"]
   }
 
   host_roles = transpose(local.base_members)
