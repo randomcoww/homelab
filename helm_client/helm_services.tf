@@ -168,7 +168,7 @@ EOF
 }
 
 # transmission with minio storage #
-/*
+
 resource "helm_release" "transmission" {
   name       = "transmission"
   namespace  = "default"
@@ -303,4 +303,3 @@ EOT
     })
   ]
 }
-*/

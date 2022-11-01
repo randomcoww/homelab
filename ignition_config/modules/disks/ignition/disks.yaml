@@ -8,6 +8,9 @@ systemd:
     - name: ${partition.systemd_unit_name}.mount
       enabled: true
       contents: |
+        [Unit]
+        ConditionPathExists=${partition.device}
+
         [Mount]
         What=${partition.device}
         Where=${partition.mount_path}

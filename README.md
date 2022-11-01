@@ -42,14 +42,14 @@ users = {
 }
 
 ssh_client = {
-  key_id = "$(whoami)"
-  public_key = "ssh_client_public_key=$(cat $KEY.pub)"
-  early_renewal_hours = 168
+  key_id                = "$(whoami)"
+  public_key            = "ssh_client_public_key=$(cat $KEY.pub)"
+  early_renewal_hours   = 168
   validity_period_hours = 336
 }
 
 hostapd = {
-  ssid = "ssid"
+  ssid       = "ssid"
   passphrase = "passphrase"
 }
 
@@ -58,22 +58,22 @@ letsencrypt_email = "user@domain"
 authelia_users = {
   username = {
     displayname = "John Smith"
-    email = "user@domain"
-    password = "$(podman run docker.io/authelia/authelia:latest authelia hash-password -- 'password' | sed 's:.*\: ::')"
-    groups = []
+    email       = "user@domain"
+    password    = "$(podman run docker.io/authelia/authelia:latest authelia hash-password -- 'password' | sed 's:.*\: ::')"
+    groups      = []
   }
 }
 
 wireguard_client = {
   Interface = {
     PrivateKey = ""
-    Address = ""
-    DNS = ""
+    Address    = ""
+    DNS        = ""
   }
   Peer = {
-    PublicKey = ""
+    PublicKey  = ""
     AllowedIPs = ""
-    Endpoint = ""
+    Endpoint   = ""
   }
 }
 EOF
@@ -234,18 +234,18 @@ tw find . -name '*.tf' -exec terraform fmt '{}' \;
 
 > This is currently just a POC and serves nothing
 
-Enable a combination of the following `boot_args` in [PXE boot params](config_pxeboot.tf)
+Enable a combination of the following `vfio-pci.ids` kargs in [PXE boot params](config_pxeboot.tf)
 
 Stub all Nvidia GPUs:
 
 ```
-vfio-pci.ids=10de:ffffffff:ffffffff:ffffffff:00030000:ffff00ff,10de:ffffffff:ffffffff:ffffffff:00040300:ffffffff
+10de:ffffffff:ffffffff:ffffffff:00030000:ffff00ff,10de:ffffffff:ffffffff:ffffffff:00040300:ffffffff
 ```
 
 Stub all AMD GPUs:
 
 ```
-vfio-pci.ids=1002:ffffffff:ffffffff:ffffffff:00030000:ffff00ff,1002:ffffffff:ffffffff:ffffffff:00040300:ffffffff
+1002:ffffffff:ffffffff:ffffffff:00030000:ffff00ff,1002:ffffffff:ffffffff:ffffffff:00040300:ffffffff
 ```
 
 Update the following evdev input devices in the [libvirt config](libvirt/de-1-pt.xml) to match current hardware
