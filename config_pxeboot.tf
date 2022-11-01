@@ -1,7 +1,7 @@
 locals {
   pxeboot_image_builds = {
     coreos            = "fedora-coreos-36.20220929.0"
-    silverblue        = "fedora-silverblue-36.20220929.0"
+    silverblue        = "fedora-silverblue-36.20221031.0"
     silverblue-nvidia = "fedora-silverblue-35.20220904.0"
     printer           = "printer-compat"
   }
@@ -50,15 +50,15 @@ locals {
       })
 
       "88-a4-c2-0d-eb-e7" = merge(local.image_set.silverblue-nvidia, {
-        ignition = "re-0"
+        ignition = "de-0"
         boot_args = [
           "enforcing=0",
-          # "rfkill.master_switch_mode=2",
+          "rfkill.master_switch_mode=2",
           "rfkill.default_state=1",
+          "cfg80211.ieee80211_regdom=US",
           "rd.driver.blacklist=nouveau",
           "modprobe.blacklist=nouveau",
           "nvidia_drm.modeset=1",
-          "nvidia.NVreg_RegistryDwords=EnableBrightnessControl=1",
           # "vfio-pci.ids=10de:ffffffff:ffffffff:ffffffff:00030000:ffff00ff,10de:ffffffff:ffffffff:ffffffff:00040300:ffffffff",
           # "vfio-pci.ids=1002:ffffffff:ffffffff:ffffffff:00030000:ffff00ff,1002:ffffffff:ffffffff:ffffffff:00040300:ffffffff,10de:ffffffff:ffffffff:ffffffff:00030000:ffff00ff,10de:ffffffff:ffffffff:ffffffff:00040300:ffffffff",
           # "video=efifb:off",

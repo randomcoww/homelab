@@ -201,8 +201,7 @@ locals {
       # ]
     }
 
-    re-0 = {
-      hostname = "remote"
+    de-0 = {
       # not needed
       netnum = 0
       users = [
@@ -288,17 +287,17 @@ locals {
   }
 
   base_members = {
-    base              = ["gw-0", "gw-1", "q-0", "de-1", "re-0"]
-    systemd-networkd  = ["gw-0", "gw-1", "q-0", "de-1", "re-0"]
+    base              = ["gw-0", "gw-1", "q-0", "de-0", "de-1"]
+    systemd-networkd  = ["gw-0", "gw-1", "q-0", "de-0", "de-1"]
     kubelet-base      = ["gw-0", "gw-1", "q-0"]
     gateway           = ["gw-0", "gw-1", "q-0"]
     vrrp              = ["gw-0", "gw-1"]
-    disks             = ["gw-0", "gw-1", "q-0", "de-1", "re-0"]
+    disks             = ["gw-0", "gw-1", "q-0", "de-0", "de-1"]
     ssh-server        = ["gw-0", "gw-1", "q-0"]
     etcd              = ["gw-0", "gw-1", "q-0"]
     kubernetes-master = ["gw-0", "gw-1", "q-0"]
     kubernetes-worker = ["gw-0", "gw-1", "q-0"]
-    desktop           = ["de-1", "re-0"]
+    desktop           = ["de-0", "de-1"]
   }
 
   host_roles = transpose(local.base_members)

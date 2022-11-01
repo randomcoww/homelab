@@ -14,7 +14,6 @@ systemd:
             [Service]
             ExecStart=
             ExecStart=/usr/sbin/fstrim --all --verbose --quiet
-    # use systemd-resolved mdns instead of avahi
     - name: systemd-resolved.service
       enabled: true
     - name: avahi-daemon.service
