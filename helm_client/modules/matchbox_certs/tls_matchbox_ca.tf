@@ -4,7 +4,6 @@ resource "tls_private_key" "matchbox-ca" {
 }
 
 resource "tls_self_signed_cert" "matchbox-ca" {
-  key_algorithm   = tls_private_key.matchbox-ca.algorithm
   private_key_pem = tls_private_key.matchbox-ca.private_key_pem
 
   validity_period_hours = 8760

@@ -4,7 +4,6 @@ resource "tls_private_key" "etcd-peer-ca" {
 }
 
 resource "tls_self_signed_cert" "etcd-peer-ca" {
-  key_algorithm   = tls_private_key.etcd-peer-ca.algorithm
   private_key_pem = tls_private_key.etcd-peer-ca.private_key_pem
 
   validity_period_hours = 8760

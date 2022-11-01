@@ -5,7 +5,6 @@ resource "tls_private_key" "etcd-client" {
 }
 
 resource "tls_cert_request" "etcd-client" {
-  key_algorithm   = tls_private_key.etcd-client.algorithm
   private_key_pem = tls_private_key.etcd-client.private_key_pem
 
   subject {
@@ -16,7 +15,6 @@ resource "tls_cert_request" "etcd-client" {
 
 resource "tls_locally_signed_cert" "etcd-client" {
   cert_request_pem   = tls_cert_request.etcd-client.cert_request_pem
-  ca_key_algorithm   = var.etcd_ca.algorithm
   ca_private_key_pem = var.etcd_ca.private_key_pem
   ca_cert_pem        = var.etcd_ca.cert_pem
 

@@ -8,7 +8,6 @@ resource "tls_private_key" "syncthing" {
 resource "tls_cert_request" "syncthing" {
   count = var.replica_count
 
-  key_algorithm   = tls_private_key.syncthing[count.index].algorithm
   private_key_pem = tls_private_key.syncthing[count.index].private_key_pem
 
   subject {
@@ -20,7 +19,6 @@ resource "tls_locally_signed_cert" "syncthing" {
   count = var.replica_count
 
   cert_request_pem   = tls_cert_request.syncthing[count.index].cert_request_pem
-  ca_key_algorithm   = tls_private_key.syncthing-ca.algorithm
   ca_private_key_pem = tls_private_key.syncthing-ca.private_key_pem
   ca_cert_pem        = tls_self_signed_cert.syncthing-ca.cert_pem
 

@@ -4,7 +4,6 @@ resource "tls_private_key" "syncthing-ca" {
 }
 
 resource "tls_self_signed_cert" "syncthing-ca" {
-  key_algorithm   = tls_private_key.syncthing-ca.algorithm
   private_key_pem = tls_private_key.syncthing-ca.private_key_pem
 
   validity_period_hours = 8760
