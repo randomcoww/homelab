@@ -12,14 +12,10 @@ storage:
             state BACKUP
             advert_int 0.1
             virtual_router_id ${virtual_router_id}
-            dont_track_primary
             interface ${interfaces.sync.interface_name}
             priority 250
             garp_master_delay 1
             garp_master_refresh 1
-            track_interface {
-              ${interfaces.wan.interface_name}
-            }
             virtual_ipaddress {
               %{~ for _, service in keepalived_services ~}
               ${service.ip} dev ${service.dev} use_vmac no_track
