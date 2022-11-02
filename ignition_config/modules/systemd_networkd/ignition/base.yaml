@@ -22,7 +22,8 @@ systemd:
 
 storage:
   files:
-    - path: /etc/sysctl.d/99-wlan-bridge.conf
+    # needed if bridging wlan
+    - path: /etc/sysctl.d/99-bridge-iptables.conf
       mode: 0644
       contents:
         inline: |
