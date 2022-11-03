@@ -22,7 +22,7 @@ storage:
               %{~ endfor ~}
             }
             virtual_rules {
-              to all lookup ${vrrp_master_default_route.table_id} priority ${vrrp_master_default_route.table_priority}
+              to all lookup ${vrrp_master_default_route.table_id} priority ${vrrp_master_default_route.table_priority} no_track
             }
           }
 

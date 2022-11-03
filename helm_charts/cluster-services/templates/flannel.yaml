@@ -119,9 +119,10 @@ spec:
             cpu: 100m
             memory: 50Mi
         securityContext:
-          privileged: false
           capabilities:
-            add: ["NET_ADMIN", "NET_RAW"]
+            add:
+            - NET_ADMIN
+            - NET_RAW
         env:
         - name: POD_NAME
           valueFrom:

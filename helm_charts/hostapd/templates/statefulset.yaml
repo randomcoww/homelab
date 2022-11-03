@@ -46,9 +46,9 @@ spec:
             fieldRef:
               fieldPath: metadata.name
         securityContext:
-          privileged: false
           capabilities:
-            add: ["NET_ADMIN"]
+            add:
+            - NET_ADMIN
         volumeMounts:
         - name: hostapd-config
           mountPath: /etc/hostapd/hostapd.conf

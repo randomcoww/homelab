@@ -54,9 +54,6 @@ spec:
         - "wg0"
         securityContext:
           privileged: true
-          capabilities:
-            add:
-            - NET_ADMIN
         volumeMounts:
         - name: config
           mountPath: /etc/wireguard/wg0.conf
