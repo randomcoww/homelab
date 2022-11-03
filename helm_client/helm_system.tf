@@ -1181,7 +1181,7 @@ output "minio_endpoint" {
 module "hostapd-roaming" {
   source        = "./modules/hostapd_roaming"
   resource_name = "hostapd"
-  replica_count = 2
+  replica_count = 1
 }
 
 resource "helm_release" "hostapd" {
@@ -1251,6 +1251,14 @@ resource "helm_release" "hostapd" {
                     operator = "In"
                     values = [
                       for _, member in local.members.gateway :
+                      member.hostname
+                    ]
+                  },
+                  {
+                    key      = "kubernetes.io/hostname"
+                    operator = "NotIn"
+                    values = [
+                      for _, member in local.members.vrrp :
                       member.hostname
                     ]
                   },
