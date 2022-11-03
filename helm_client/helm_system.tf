@@ -101,7 +101,7 @@ resource "helm_release" "kube_dns" {
   namespace  = "kube-system"
   repository = "https://coredns.github.io/helm"
   chart      = "coredns"
-  version    = "1.19.4"
+  version    = "1.19.5"
   wait       = false
   values = [
     yamlencode({
@@ -404,7 +404,7 @@ resource "helm_release" "nginx_ingress" {
   chart            = "ingress-nginx"
   namespace        = "ingress-nginx"
   create_namespace = true
-  version          = "4.2.0"
+  version          = "4.3.0"
   values = [
     yamlencode({
       controller = {
@@ -611,7 +611,7 @@ resource "helm_release" "authelia" {
   repository       = "https://charts.authelia.com"
   chart            = "authelia"
   create_namespace = true
-  version          = "0.8.38"
+  version          = "0.8.45"
   wait             = false
   values = [
     yamlencode({
@@ -752,7 +752,7 @@ resource "helm_release" "openebs" {
   namespace        = "openebs"
   repository       = "https://openebs.github.io/charts"
   chart            = "openebs"
-  version          = "3.2.0"
+  version          = "3.3.0"
   wait             = false
   create_namespace = true
   values = [
@@ -818,7 +818,7 @@ resource "helm_release" "amd_gpu" {
   repository = "https://radeonopencompute.github.io/k8s-device-plugin/"
   chart      = "amd-gpu"
   namespace  = "kube-system"
-  version    = "0.3.0"
+  version    = "0.5.0"
   values = [
     yamlencode({
       tolerations = [
@@ -1078,7 +1078,7 @@ resource "helm_release" "minio" {
   namespace        = split(".", local.kubernetes_service_endpoints.minio)[1]
   repository       = "https://charts.min.io/"
   chart            = "minio"
-  version          = "4.0.12"
+  version          = "5.0.0"
   wait             = false
   create_namespace = true
   values = [
@@ -1201,6 +1201,7 @@ resource "helm_release" "hostapd" {
           config = {
             interface        = "wlan0"
             preamble         = 1
+            noscan           = 1
             hw_mode          = "g"
             channel          = 1
             auth_algs        = 1
