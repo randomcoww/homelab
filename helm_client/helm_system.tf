@@ -1219,7 +1219,6 @@ resource "helm_release" "hostapd" {
             ht_capab = "[${join("][", [
               "LDPC", "HT40-", "HT40+", "SHORT-GI-40", "TX-STBC", "RX-STBC1", "DSSS_CCK-40",
             ])}]"
-            # roaming
             bssid                 = peer.bssid
             mobility_domain       = peer.mobility_domain
             pmk_r1_push           = 1
