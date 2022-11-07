@@ -152,7 +152,7 @@ Once pods are running make the `boot` bucket for holding PXE boot images
 
 ```
 mc mb minio/boot
-mc policy set download minio/boot
+mc anonymous set download minio/boot
 ```
 
 #### Push OS images generated previously into Minio

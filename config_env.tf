@@ -106,7 +106,7 @@ locals {
     hostapd            = "ghcr.io/randomcoww/hostapd:2.10"
     syncthing          = "docker.io/syncthing/syncthing:1.20"
     rclone             = "mirror.gcr.io/rclone/rclone:latest"
-    mpd                = "ghcr.io/randomcoww/mpd:0.23.8-2"
+    mpd                = "ghcr.io/randomcoww/mpd:0.23.10"
     ympd               = "ghcr.io/randomcoww/ympd:20220807"
     flannel            = "ghcr.io/randomcoww/flannel:v0.18.1"
     flannel_cni_plugin = "docker.io/flannelcni/flannel-cni-plugin:v1.1.0"
@@ -147,7 +147,9 @@ locals {
   minio_buckets = {
     image_store  = "boot"
     music        = "music"
+    video        = "video"
     transmission = "downloads"
+    ebook        = "ebook"
   }
 
   ports = {

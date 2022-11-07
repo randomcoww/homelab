@@ -14,7 +14,7 @@ resource "helm_release" "webdav" {
       }
       replicaCount  = 2
       minioEndPoint = "http://${local.kubernetes_service_endpoints.minio}:${local.ports.minio}"
-      minioBucket   = "downloads"
+      minioBucket   = local.minio_buckets.video
       affinity = {
         podAntiAffinity = {
           requiredDuringSchedulingIgnoredDuringExecution = [
