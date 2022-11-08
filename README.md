@@ -236,13 +236,13 @@ tw find . -name '*.tf' -exec terraform fmt '{}' \;
 
 Enable a combination of the following `vfio-pci.ids` kargs in [PXE boot params](config_pxeboot.tf)
 
-Stub all Nvidia GPUs:
+Stub all Nvidia GPUs
 
 ```
 10de:ffffffff:ffffffff:ffffffff:00030000:ffff00ff,10de:ffffffff:ffffffff:ffffffff:00040300:ffffffff
 ```
 
-Stub all AMD GPUs:
+Stub all AMD GPUs
 
 ```
 1002:ffffffff:ffffffff:ffffffff:00030000:ffff00ff,1002:ffffffff:ffffffff:ffffffff:00040300:ffffffff
@@ -259,6 +259,12 @@ Update the following evdev input devices in the [libvirt config](libvirt/de-1-pt
     <source dev='/dev/input/by-id/usb-MOSART_Semi._wireless_dongle-event-kbd' grab='all' repeat='on'/>
   </input>
 </devices>
+```
+
+Create persistent disk for home
+
+```bash
+dd if=/dev/zero of=/var/home/qemu/de-1-pt.img bs=1G count=0 seek=100G
 ```
 
 Define and launch guest
