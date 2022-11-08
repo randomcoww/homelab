@@ -928,6 +928,24 @@ resource "helm_release" "kea" {
         replicaCount = length(module.kea-config.config)
       }
       affinity = {
+        nodeAffinity = {
+          requiredDuringSchedulingIgnoredDuringExecution = {
+            nodeSelectorTerms = [
+              {
+                matchExpressions = [
+                  {
+                    key      = "kubernetes.io/hostname"
+                    operator = "In"
+                    values = [
+                      for _, member in local.members.gateway :
+                      member.hostname
+                    ]
+                  },
+                ]
+              },
+            ]
+          }
+        }
         podAntiAffinity = {
           requiredDuringSchedulingIgnoredDuringExecution = [
             {
