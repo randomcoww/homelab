@@ -29,7 +29,7 @@ storage:
           Name=${tap_interface.interface_name}
 
           [Link]
-          RequiredForOnline=${!lookup(tap_interface, "disable_require", false)}
+          RequiredForOnline=${lookup(tap_interface, "enable_netnum", false) || !lookup(tap_interface, "enable_dhcp", false)}
           %{~ if !lookup(tap_interface, "enable_dhcp", false) ~}
           MTUBytes=${lookup(tap_interface, "mtu", 1500)}
           %{~ endif ~}

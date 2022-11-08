@@ -49,7 +49,7 @@ storage:
           ARP=${lookup(hardware_interface, "enable_arp", false)}
           ActivationPolicy=always-up
           MTUBytes=${lookup(hardware_interface, "mtu", 1500)}
-          RequiredForOnline=${!lookup(hardware_interface, "disable_require", false)}
+          RequiredForOnline=${lookup(hardware_interface, "enable_netnum", false) || !lookup(hardware_interface, "enable_dhcp", false)}
 
           [DHCP]
           UseMTU=true

@@ -214,13 +214,12 @@ locals {
           vlans = ["service"]
         }
         wlan0 = {
-          mac             = "b4-b5-b6-74-79-15"
-          enable_dhcp     = true
-          enable_arp      = true
-          enable_mdns     = true
-          disable_require = true
-          metric          = 2048
-          mtu             = 9000
+          mac         = "b4-b5-b6-74-79-15"
+          enable_dhcp = true
+          enable_arp  = true
+          enable_mdns = true
+          metric      = 2048
+          mtu         = 9000
         }
       }
       bridge_interfaces = {}
@@ -228,10 +227,6 @@ locals {
         lan = {
           source_interface_name = "phy0"
           enable_dhcp           = true
-          disable_require       = true
-        }
-        service = {
-          source_interface_name = "phy0-service"
         }
       }
       disks = {
@@ -255,18 +250,11 @@ locals {
       ]
       hardware_interfaces = {
         lan = {
-          mac             = "52-54-00-1a-61-1a"
-          enable_dhcp     = true
-          enable_arp      = true
-          enable_mdns     = true
-          disable_require = true
-          mtu             = 9000
-        }
-        service = {
-          mac           = "52-54-00-1a-61-1b"
-          enable_netnum = true
-          enable_arp    = true
-          mtu           = 9000
+          mac         = "52-54-00-1a-61-1a"
+          enable_dhcp = true
+          enable_arp  = true
+          enable_mdns = true
+          mtu         = 9000
         }
       }
       bridge_interfaces = {}
