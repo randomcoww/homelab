@@ -1222,7 +1222,6 @@ resource "helm_release" "hostapd" {
             noscan           = 1
             hw_mode          = "g"
             channel          = 6
-            auth_algs        = 1
             driver           = "nl80211"
             ieee80211n       = 1
             require_ht       = 1
@@ -1247,7 +1246,7 @@ resource "helm_release" "hostapd" {
             # ieee80211ac                  = 1
             # require_vht                  = 1
             # vht_capab = "[${join("][", [
-            #   "RXLDPC", "TX-STBC-2BY1", "RX-STBC-1", "MAX-A-MPDU-LEN-EXP3", "RX-ANTENNA-PATTERN", "TX-ANTENNA-PATTERN", "SHORT-GI-80", "SU-BEAMFORMEE", "MU-BEAMFORMEE",
+            #   "RXLDPC", "TX-STBC-2BY1", "RX-STBC-1", "MAX-A-MPDU-LEN-EXP3", "RX-ANTENNA-PATTERN", "TX-ANTENNA-PATTERN", "SHORT-GI-80",
             # ])}]"
             bssid                 = peer.bssid
             mobility_domain       = peer.mobility_domain
