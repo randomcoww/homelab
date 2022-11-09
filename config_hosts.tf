@@ -211,7 +211,7 @@ locals {
         phy0 = {
           mac   = "88-a4-c2-0d-eb-e7"
           mtu   = 9000
-          vlans = ["service"]
+          vlans = []
         }
         wlan0 = {
           mac         = "b4-b5-b6-74-79-15"
@@ -222,10 +222,15 @@ locals {
           mtu         = 9000
         }
       }
-      bridge_interfaces = {}
+      bridge_interfaces = {
+        br-lan = {
+          interfaces = ["phy0"]
+          mtu        = 9000
+        }
+      }
       tap_interfaces = {
         lan = {
-          source_interface_name = "phy0"
+          source_interface_name = "br-lan"
           enable_dhcp           = true
         }
       }

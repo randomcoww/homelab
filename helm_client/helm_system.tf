@@ -1221,7 +1221,7 @@ resource "helm_release" "hostapd" {
             preamble         = 1
             noscan           = 1
             hw_mode          = "g"
-            channel          = 1
+            channel          = 6
             auth_algs        = 1
             driver           = "nl80211"
             ieee80211n       = 1
@@ -1231,12 +1231,24 @@ resource "helm_release" "hostapd" {
             wpa              = 2
             wpa_key_mgmt     = "SAE"
             wpa_pairwise     = "CCMP"
+            country_code     = "US"
+            ieee80211d       = 1
+            ieee80211h       = 1
             ieee80211w       = 2
             sae_password     = var.hostapd.passphrase
             ssid             = var.hostapd.ssid
             ht_capab = "[${join("][", [
               "LDPC", "HT40-", "HT40+", "SHORT-GI-40", "TX-STBC", "RX-STBC1", "DSSS_CCK-40",
             ])}]"
+            # hw_mode                      = "a"
+            # channel                      = 149
+            # vht_oper_chwidth             = 1
+            # vht_oper_centr_freq_seg0_idx = 155
+            # ieee80211ac                  = 1
+            # require_vht                  = 1
+            # vht_capab = "[${join("][", [
+            #   "RXLDPC", "TX-STBC-2BY1", "RX-STBC-1", "MAX-A-MPDU-LEN-EXP3", "RX-ANTENNA-PATTERN", "TX-ANTENNA-PATTERN", "SHORT-GI-80", "SU-BEAMFORMEE", "MU-BEAMFORMEE",
+            # ])}]"
             bssid                 = peer.bssid
             mobility_domain       = peer.mobility_domain
             pmk_r1_push           = 1
