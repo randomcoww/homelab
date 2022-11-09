@@ -51,6 +51,7 @@ storage:
           [Route]
           Scope=global
           Gateway=${cidrhost(interfaces.lan.prefix, interfaces.lan.netnums.gateway)}
+          GatewayOnLink=true
           Destination=0.0.0.0/0
           Table=${vrrp_slave_default_route.table_id}
 
