@@ -264,7 +264,7 @@ Update the following evdev input devices in the [libvirt config](libvirt/de-1-pt
 Create persistent disk for home
 
 ```bash
-dd if=/dev/zero of=/var/home/qemu/de-1-pt.img bs=1G count=0 seek=100G
+dd if=/dev/zero of=/var/home/qemu/de-1-pt.img bs=1G count=0 seek=100
 ```
 
 Define and launch guest
