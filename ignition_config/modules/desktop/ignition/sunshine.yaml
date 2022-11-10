@@ -1,0 +1,32 @@
+---
+variant: fcos
+version: 1.4.0
+systemd:
+  units:
+    # /usr/bin is read-only - copy to /opt/bin to modify
+    - name: copy-sunshine.service
+      enabled: true
+      contents: |
+        [Service]
+        Type=oneshot
+        RemainAfterExit=true
+        ExecStartPre=/usr/bin/mkdir -p /opt/bin
+        ExecStartPre=/usr/bin/cp -Ln /usr/bin/sunshine /opt/bin
+        ExecStart=/usr/sbin/setcap cap_sys_admin+p /opt/bin/sunshine
+
+        [Install]
+        WantedBy=graphical.target
+
+storage:
+  files:
+    - path: /etc/systemd/user/sunshine.service
+      mode: 0644
+      contents:
+        inline: |
+          [Unit]
+          Wants=copy-sunshine.service
+          After=copy-sunshine.service
+
+          [Service]
+          ExecStartPre=/opt/bin/sunshine --creds ${sunshine.username} ${sunshine.password}
+          ExecStart=/opt/bin/sunshine

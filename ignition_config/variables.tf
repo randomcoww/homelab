@@ -13,3 +13,10 @@ variable "ssh_client" {
     validity_period_hours = number
   })
 }
+
+variable "sunshine" {
+  type = object({
+    username = string
+    password = string
+  })
+}
