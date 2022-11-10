@@ -30,3 +30,6 @@ storage:
           [Service]
           ExecStartPre=/opt/bin/sunshine --creds ${sunshine.username} ${sunshine.password}
           ExecStart=/opt/bin/sunshine
+  # links:
+  #   - path: /etc/systemd/user/graphical-session.target.wants/sunshine.service
+  #     target: /etc/systemd/user/sunshine.service
