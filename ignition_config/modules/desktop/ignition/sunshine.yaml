@@ -19,6 +19,7 @@ systemd:
 
 storage:
   files:
+    # these dependencies work for gnome wayland
     - path: /etc/systemd/user/sunshine.service
       mode: 0644
       contents:
