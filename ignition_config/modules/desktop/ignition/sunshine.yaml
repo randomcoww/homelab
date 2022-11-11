@@ -32,8 +32,12 @@ storage:
 
           [Service]
           Slice=session.slice
-          ExecStartPre=/opt/bin/sunshine --creds ${sunshine.username} ${sunshine.password}
-          ExecStart=/opt/bin/sunshine
+          ExecStartPre=/opt/bin/sunshine --creds ${sunshine_username} ${sunshine_password}
+          ExecStart=/opt/bin/sunshine ${join(" ", [
+            for k, v in sunshine_config :
+            "${k}=${v}"
+          ])}
+          Restart=on-failure
 
           [Install]
           WantedBy=gnome-session.target

@@ -6,9 +6,10 @@ variable "wlan_interface" {
   type = string
 }
 
-variable "sunshine" {
-  type = object({
-    username = string
-    password = string
-  })
+variable "sunshine_username" {
+  type = string
+}
+
+variable "sunshine_password" {
+  type = string
 }
