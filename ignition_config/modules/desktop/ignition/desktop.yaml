@@ -71,9 +71,12 @@ storage:
 
           [org/gnome/desktop/remote-desktop/rdp]
           screen-share-mode='extend'
+          view-only=true
 
           [org/gnome/nautilus/preferences]
           default-folder-viewer='list-view'
+          search-filter-time-type='last_modified'
+          show-delete-permanently=true
 
           [org/gnome/settings-daemon/plugins/color]
           night-light-enabled=true
@@ -109,12 +112,6 @@ storage:
 
           [org/gtk/settings/file-chooser]
           show-hidden=true
-          show-size-column=true
-          show-type-column=true
-          sort-column='name'
-          sort-directories-first=false
-          sort-order='ascending'
-          type-format='category'
 
     # misc configs #
     - path: /etc/tmux.conf
