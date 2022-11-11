@@ -36,29 +36,18 @@ storage:
       mode: 0644
       contents:
         inline: |
-          [org/gnome/system/location]
-          enabled=false
-
           [org/gnome/desktop/datetime]
           automatic-timezone=true
-
-          [org/gnome/settings-daemon/plugins/color]
-          night-light-enabled=true
-          night-light-schedule-automatic=true
-
-          [org/gnome/settings-daemon/plugins/power]
-          ambient-enabled=false
-          idle-dim=false
 
           [org/gnome/desktop/media-handling]
           automount=false
           autorun-never=true
 
-          [org/gnome/desktop/sound]
-          event-sounds=false
-
           [org/gnome/desktop/session]
           idle-delay=uint32 3600
+
+          [org/gnome/desktop/sound]
+          event-sounds=false
 
           [org/gnome/desktop/peripherals/touchpad]
           tap-to-click=true
@@ -73,10 +62,6 @@ storage:
           remove-old-trash-files=true
           report-technical-problems=false
 
-          [org/gnome/software]
-          first-run=false
-          show-nonfree-prompt=false
-
           [org/gnome/desktop/notifications]
           show-in-lock-screen=false
 
@@ -87,20 +72,26 @@ storage:
           [org/gnome/desktop/remote-desktop/rdp]
           screen-share-mode='extend'
 
-          [org/gnome/system/location]
-          enabled=true
-
           [org/gnome/nautilus/preferences]
           default-folder-viewer='list-view'
 
-          [org/gtk/settings/file-chooser]
-          show-hidden=true
-          show-size-column=true
-          show-type-column=true
-          sort-column='name'
-          sort-directories-first=false
-          sort-order='ascending'
-          type-format='category'
+          [org/gnome/settings-daemon/plugins/color]
+          night-light-enabled=true
+          night-light-schedule-automatic=true
+
+          [org/gnome/settings-daemon/plugins/power]
+          ambient-enabled=false
+          idle-dim=false
+
+          [org/gnome/shell/app-switcher]
+          current-workspace-only=true
+
+          [org/gnome/software]
+          first-run=false
+          show-nonfree-prompt=false
+
+          [org/gnome/system/location]
+          enabled=true
 
           [org/gnome/terminal/legacy/profiles:]
           list=['00000000-0000-0000-0000-000000000000']
@@ -115,6 +106,15 @@ storage:
           palette=['rgb(7,54,66)', 'rgb(220,50,47)', 'rgb(133,153,0)', 'rgb(181,137,0)', 'rgb(38,139,210)', 'rgb(211,54,130)', 'rgb(42,161,152)', 'rgb(238,232,213)', 'rgb(0,43,54)', 'rgb(203,75,22)', 'rgb(88,110,117)', 'rgb(101,123,131)', 'rgb(131,148,150)', 'rgb(108,113,196)', 'rgb(147,161,161)', 'rgb(253,246,227)']
           use-system-font=false
           use-theme-colors=false
+
+          [org/gtk/settings/file-chooser]
+          show-hidden=true
+          show-size-column=true
+          show-type-column=true
+          sort-column='name'
+          sort-directories-first=false
+          sort-order='ascending'
+          type-format='category'
 
     # misc configs #
     - path: /etc/tmux.conf
