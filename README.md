@@ -64,11 +64,6 @@ authelia_users = {
   }
 }
 
-sunshine = {
-  username = "username"
-  password = "password"
-}
-
 wireguard_client = {
   Interface = {
     PrivateKey = ""
