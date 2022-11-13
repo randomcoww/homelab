@@ -666,6 +666,14 @@ resource "helm_release" "authelia" {
           rules = [
             {
               domain = local.kubernetes_ingress_endpoints.mpd
+              networks = [
+                local.networks.lan.prefix,
+                local.networks.service.prefix,
+              ]
+              policy = "bypass"
+            },
+            {
+              domain = local.kubernetes_ingress_endpoints.mpd
               policy = "one_factor"
             },
             {

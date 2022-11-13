@@ -180,7 +180,7 @@ resource "helm_release" "transmission" {
     yamlencode({
       persistence = {
         storageClass = "openebs-jiva-csi-default"
-        size         = "50Gi"
+        size         = "80Gi"
       }
       images = {
         transmission = local.container_images.transmission
