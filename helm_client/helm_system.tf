@@ -1146,6 +1146,10 @@ resource "helm_release" "minio" {
       ingress = {
         enabled = false
       }
+      environment = {
+        MINIO_API_REQUESTS_MAX      = 1600
+        MINIO_API_REQUESTS_DEADLINE = "2m"
+      }
       users = []
       affinity = {
         nodeAffinity = {
