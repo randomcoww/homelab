@@ -674,6 +674,14 @@ resource "helm_release" "authelia" {
             },
             {
               domain = local.kubernetes_ingress_endpoints.webdav
+              networks = [
+                local.networks.lan.prefix,
+                local.networks.service.prefix,
+              ]
+              policy = "bypass"
+            },
+            {
+              domain = local.kubernetes_ingress_endpoints.webdav
               policy = "one_factor"
             },
           ]
