@@ -29,70 +29,72 @@ resource "helm_release" "cluster_services" {
 
 # kube-router #
 
-# resource "helm_release" "kube_router" {
-#   name       = "kube-router"
-#   namespace  = "kube-system"
-#   repository = "https://charts.enix.io/"
-#   chart      = "kube-router"
-#   version    = "1.8.0"
-#   wait       = false
-#   values = [
-#     yamlencode({
-#       kubeRouter = {
-#         cni = {
-#           install = true
-#           config = jsonencode({
-#             cniVersion = "0.3.0"
-#             name       = "kube-router"
-#             plugins = [
-#               {
-#                 name             = "kubernetes"
-#                 type             = "bridge"
-#                 bridge           = local.kubernetes.cni_bridge_interface_name
-#                 isDefaultGateway = true
-#                 hairpinMode      = true
-#                 ipam = {
-#                   type = "host-local"
-#                 }
-#               },
-#               {
-#                 type = "portmap"
-#                 capabilities = {
-#                   snat         = true
-#                   portMappings = true
-#                 }
-#               },
-#             ]
-#           })
-#         }
-#         router = {
-#           nodesFullMesh           = true
-#           enablePodEgress         = true
-#           enableOverlay           = true
-#           enableIbgp              = true
-#           enableCni               = true
-#           clusterAsn              = 65000
-#           bgpGracefulRestart      = true
-#           advertisePodCidr        = true
-#           advertiseLoadbalancerIp = true
-#           advertiseExternalIp     = true
-#           advertiseClusterIp      = true
-#         }
-#         firewall = {
-#           enabled = true
-#         }
-#         serviceProxy = {
-#           enabled                 = true
-#           nodeportBindonAllIp     = true
-#           masqueradeAll           = true
-#           ipvsPermitAll           = true
-#           ipvsGracefulTermination = true
-#           hairpinMode             = true
-#         }
-#       }
-#     }),
-#   ]
-# }
+/*
+resource "helm_release" "kube_router" {
+  name       = "kube-router"
+  namespace  = "kube-system"
+  repository = "https://charts.enix.io/"
+  chart      = "kube-router"
+  version    = "1.8.0"
+  wait       = false
+  values = [
+    yamlencode({
+      kubeRouter = {
+        cni = {
+          install = true
+          config = jsonencode({
+            cniVersion = "0.3.0"
+            name       = "kube-router"
+            plugins = [
+              {
+                name             = "kubernetes"
+                type             = "bridge"
+                bridge           = local.kubernetes.cni_bridge_interface_name
+                isDefaultGateway = true
+                hairpinMode      = true
+                ipam = {
+                  type = "host-local"
+                }
+              },
+              {
+                type = "portmap"
+                capabilities = {
+                  snat         = true
+                  portMappings = true
+                }
+              },
+            ]
+          })
+        }
+        router = {
+          nodesFullMesh           = true
+          enablePodEgress         = true
+          enableOverlay           = true
+          enableIbgp              = true
+          enableCni               = true
+          clusterAsn              = 65000
+          bgpGracefulRestart      = true
+          advertisePodCidr        = true
+          advertiseLoadbalancerIp = true
+          advertiseExternalIp     = true
+          advertiseClusterIp      = true
+        }
+        firewall = {
+          enabled = true
+        }
+        serviceProxy = {
+          enabled                 = true
+          nodeportBindonAllIp     = true
+          masqueradeAll           = true
+          ipvsPermitAll           = true
+          ipvsGracefulTermination = true
+          hairpinMode             = true
+        }
+      }
+    }),
+  ]
+}
+*/
 
 # coredns #
 
@@ -809,26 +811,29 @@ resource "helm_release" "openebs" {
 
 # nvidia device plugin #
 
-# resource "helm_release" "nvidia_device_plugin" {
-#   name       = "nvidia-device-plugin"
-#   repository = "https://nvidia.github.io/k8s-device-plugin"
-#   chart      = "nvidia-device-plugin"
-#   namespace  = "kube-system"
-#   version    = "0.12.2"
-#   values = [
-#     yamlencode({
-#       tolerations = [
-#         {
-#           effect   = "NoExecute"
-#           operator = "Exists"
-#         },
-#       ]
-#     })
-#   ]
-# }
+/*
+resource "helm_release" "nvidia_device_plugin" {
+  name       = "nvidia-device-plugin"
+  repository = "https://nvidia.github.io/k8s-device-plugin"
+  chart      = "nvidia-device-plugin"
+  namespace  = "kube-system"
+  version    = "0.12.2"
+  values = [
+    yamlencode({
+      tolerations = [
+        {
+          effect   = "NoExecute"
+          operator = "Exists"
+        },
+      ]
+    })
+  ]
+}
+*/
 
 # amd device plugin #
 
+/*
 resource "helm_release" "amd_gpu" {
   name       = "amd-gpu"
   repository = "https://radeonopencompute.github.io/k8s-device-plugin/"
@@ -846,6 +851,7 @@ resource "helm_release" "amd_gpu" {
     })
   ]
 }
+*/
 
 # kea #
 
