@@ -1118,7 +1118,7 @@ resource "helm_release" "minio" {
   namespace        = split(".", local.kubernetes_service_endpoints.minio)[1]
   repository       = "https://charts.min.io/"
   chart            = "minio"
-  version          = "5.0.1"
+  version          = "5.0.0"
   wait             = false
   create_namespace = true
   values = [
