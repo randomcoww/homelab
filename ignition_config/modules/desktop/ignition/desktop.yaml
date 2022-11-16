@@ -66,8 +66,9 @@ storage:
           show-in-lock-screen=false
 
           [org/gnome/desktop/interface]
-          enable-hot-corners=false
           color-scheme='prefer-dark'
+          enable-animations=false
+          enable-hot-corners=false
 
           [org/gnome/desktop/remote-desktop/rdp]
           screen-share-mode='extend'

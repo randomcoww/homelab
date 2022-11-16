@@ -22,13 +22,14 @@ systemd:
 
 storage:
   files:
+    # vrrp_version 3 causes checksum error
     - path: /etc/keepalived/keepalived.conf
       mode: 0644
       overwrite: true
       contents:
         inline: |
           global_defs {
-            vrrp_version 3
+            vrrp_version 2
             nftables keepalived
             max_auto_priority -1
           }
