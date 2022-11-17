@@ -14,12 +14,10 @@ systemd:
             [Service]
             ExecStart=
             ExecStart=/usr/sbin/fstrim --all --verbose --quiet
+    - name: systemd-network-generator.service
+      mask: true
     - name: systemd-resolved.service
       enabled: true
-    - name: avahi-daemon.service
-      mask: true
-    - name: avahi-daemon.socket
-      mask: true
     # temperature monitoring for hardware
     - name: lm_sensors.service
       enabled: true
@@ -39,7 +37,7 @@ storage:
           ${hostname}
 
     # No swap - disable hibernation
-    - path: /etc/systemd/sleep.conf.d/10-disable-hibernate
+    - path: /etc/systemd/sleep.conf.d/10-disable-hibernate.conf
       mode: 0644
       contents:
         inline: |
@@ -56,8 +54,15 @@ storage:
           [Resolve]
           FallbackDNS=
           DNSStubListener=false
-          MulticastDNS=true
           LLMNR=false
+    # Enable mDNS #
+    - path: /etc/systemd/resolved.conf.d/10-enable-mdns.conf
+      mode: 0644
+      contents:
+        inline: |
+          [Resolve]
+          MulticastDNS=true
+
     # Block password SSH #
     - path: /etc/ssh/sshd_config.d/10-block-password.conf
       mode: 0644
@@ -115,3 +120,9 @@ storage:
         inline: |
           kernel.printk=4
           fs.inotify.max_user_watches=524288
+    # needed if bridging wlan
+    - path: /etc/sysctl.d/99-bridge-iptables.conf
+      mode: 0644
+      contents:
+        inline: |
+          net.bridge.bridge-nf-call-iptables=0

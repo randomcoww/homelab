@@ -11,8 +11,6 @@ systemd:
           contents: |
             [Unit]
             After=dbus.socket
-    - name: systemd-network-generator.service
-      mask: true
     - name: systemd-networkd-wait-online.service
       enabled: true
     - name: NetworkManager.service
@@ -22,12 +20,6 @@ systemd:
 
 storage:
   files:
-    # needed if bridging wlan
-    - path: /etc/sysctl.d/99-bridge-iptables.conf
-      mode: 0644
-      contents:
-        inline: |
-          net.bridge.bridge-nf-call-iptables=0
     # systemd-networkd defaults
     # CNI may fail if systemd-networkd tries to manage it
     - path: /etc/systemd/network/91-default.network

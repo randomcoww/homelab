@@ -1,0 +1,14 @@
+---
+variant: fcos
+version: 1.4.0
+systemd:
+  units:
+    # systemd-networkd work around "could not connect to dbus: permission denied"
+    - name: systemd-networkd.service
+      mask: true
+    - name: systemd-networkd-wait-online.service
+      mask: true
+    - name: NetworkManager.service
+      enabled: true
+    - name: NetworkManager-wait-online.service
+      enabled: true

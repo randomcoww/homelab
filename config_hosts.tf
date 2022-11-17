@@ -47,7 +47,6 @@ locals {
         wan = {
           source_interface_name = "phy0-wan"
           enable_dhcp           = true
-          mac                   = "52-54-00-63-6e-b3"
         }
       }
       disks = {
@@ -112,7 +111,6 @@ locals {
         wan = {
           source_interface_name = "phy0-wan"
           enable_dhcp           = true
-          mac                   = "52-54-00-63-6e-b3"
         }
       }
       disks = {
@@ -176,7 +174,7 @@ locals {
         }
         wan = {
           source_interface_name = "phy0-wan"
-          mac                   = "52-54-00-63-6e-b3"
+          enable_dhcp           = false
         }
       }
       disks = {
@@ -192,13 +190,6 @@ locals {
       }
       container_storage_path = "${local.pv_mount_path}/containers"
       local_provisioner_path = "${local.pv_mount_path}/local_path_provisioner"
-      # kubernetes_worker_taints = [
-      #   {
-      #     key    = "node.kubernetes.io/unschedulable"
-      #     effect = "NoExecute"
-      #     value  = "true"
-      #   },
-      # ]
     }
 
     de-0 = {
@@ -246,54 +237,32 @@ locals {
         }
       }
       container_storage_path = "${local.pv_mount_path}/containers"
-    }
-
-    de-1 = {
-      netnum = 8
-      users = [
-        "client",
-      ]
-      hardware_interfaces = {
-        lan = {
-          mac         = "52-54-00-1a-61-1a"
-          enable_dhcp = true
-          enable_arp  = true
-          enable_mdns = true
-          mtu         = 9000
-        }
-      }
-      bridge_interfaces = {}
-      tap_interfaces    = {}
-      disks = {
-        pv = {
-          device = "/dev/sda"
-          partitions = [
-            {
-              mount_path = local.pv_mount_path
-              wipe       = false
-            },
-          ]
-        }
-      }
-      container_storage_path = "${local.pv_mount_path}/containers"
+      # local_provisioner_path = "${local.pv_mount_path}/local_path_provisioner"
+      # kubernetes_worker_taints = [
+      #   {
+      #     key    = "node.kubernetes.io/unschedulable"
+      #     effect = "NoSchedule"
+      #     value  = "true"
+      #   },
+      # ]
     }
   }
 
   base_members = {
-    base              = ["gw-0", "gw-1", "q-0", "de-0", "de-1"]
-    systemd-networkd  = ["gw-0", "gw-1", "q-0", "de-0", "de-1"]
+    base              = ["gw-0", "gw-1", "q-0", "de-0"]
+    systemd-networkd  = ["gw-0", "gw-1", "q-0", "de-0"]
+    network-manager   = []
     kubelet-base      = ["gw-0", "gw-1", "q-0"]
     gateway           = ["gw-0", "gw-1", "q-0"]
     vrrp              = ["gw-0", "gw-1"]
-    disks             = ["gw-0", "gw-1", "q-0", "de-0", "de-1"]
+    disks             = ["gw-0", "gw-1", "q-0", "de-0"]
     ssh-server        = ["gw-0", "gw-1", "q-0"]
     etcd              = ["gw-0", "gw-1", "q-0"]
-    kubernetes-master = ["gw-0", "gw-1", "q-0"]
+    kubernetes-master = ["gw-0", "gw-1"]
     kubernetes-worker = ["gw-0", "gw-1", "q-0"]
-    desktop           = ["de-0", "de-1"]
+    desktop           = ["de-0"]
   }
 
-  host_roles = transpose(local.base_members)
   hosts = {
     for host_key, host in local.base_hosts :
     host_key => merge({

@@ -22,6 +22,11 @@ module "ignition-systemd-networkd" {
   networks            = local.networks
 }
 
+module "ignition-network-manager" {
+  for_each = local.members.network-manager
+  source   = "./modules/network_manager"
+}
+
 module "ignition-kubelet-base" {
   for_each = local.members.kubelet-base
   source   = "./modules/kubelet_base"

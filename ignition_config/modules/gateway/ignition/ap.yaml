@@ -1,8 +1,0 @@
-# Hack to set regulatory domain
----
-variant: fcos
-version: 1.4.0
-storage:
-  links:
-    # - path: /etc/localtime
-    #   target: /usr/share/zoneinfo/America/New_York

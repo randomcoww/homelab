@@ -1,8 +1,7 @@
 locals {
   pxeboot_image_builds = {
-    coreos            = "fedora-coreos-37.20221116.0"
-    silverblue        = "fedora-silverblue-37.20221116.0"
-    silverblue-nvidia = "fedora-silverblue-35.20221103.0"
+    coreos     = "fedora-coreos-37.20221116.0"
+    silverblue = "fedora-silverblue-37.20221116.0"
   }
 
   image_set = {
@@ -62,15 +61,6 @@ locals {
           # "vfio-pci.ids=1002:ffffffff:ffffffff:ffffffff:00030000:ffff00ff,1002:ffffffff:ffffffff:ffffffff:00040300:ffffffff,10de:ffffffff:ffffffff:ffffffff:00030000:ffff00ff,10de:ffffffff:ffffffff:ffffffff:00040300:ffffffff",
           # "video=efifb:off",
           "cfg80211.ieee80211_regdom=US",
-        ]
-      })
-      "52-54-00-1a-61-1a" = merge(local.image_set.silverblue-nvidia, {
-        ignition = "de-1"
-        boot_args = [
-          "enforcing=0",
-          "rd.driver.blacklist=nouveau",
-          "modprobe.blacklist=nouveau",
-          "nvidia_drm.modeset=1",
         ]
       })
     }

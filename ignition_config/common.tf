@@ -5,6 +5,7 @@ data "ct_config" "ignition" {
     host_key => flatten([
       try(module.ignition-base[host_key].ignition_snippets, []),
       try(module.ignition-systemd-networkd[host_key].ignition_snippets, []),
+      try(module.ignition-network-manager[host_key].ignition_snippets, []),
       try(module.ignition-gateway[host_key].ignition_snippets, []),
       try(module.ignition-vrrp[host_key].ignition_snippets, []),
       try(module.ignition-disks[host_key].ignition_snippets, []),
