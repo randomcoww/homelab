@@ -20,8 +20,8 @@ systemd:
 
 storage:
   files:
-    # systemd-networkd defaults
-    # CNI may fail if systemd-networkd tries to manage it
+    # systemd-networkd defaults should be unmanaged=true
+    # CNI may fail if systemd-networkd tries to manage the interface
     - path: /etc/systemd/network/91-default.network
       mode: 0644
       contents:

@@ -1,0 +1,21 @@
+---
+variant: fcos
+version: 1.4.0
+systemd:
+  units:
+    - name: rfkill-unblock-wlan.service
+      enabled: true
+      contents: |
+        [Unit]
+        ConditionVirtualization=!vm
+        ConditionVirtualization=!container
+        Before=network.target
+        Wants=network.target
+
+        [Service]
+        Type=oneshot
+        RemainAfterExit=true
+        ExecStart=/usr/sbin/rfkill unblock wlan
+
+        [Install]
+        WantedBy=multi-user.target
