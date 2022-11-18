@@ -53,7 +53,7 @@ locals {
       "88-a4-c2-0d-eb-e7" = merge(local.image_set.silverblue, {
         ignition = "de-0"
         boot_args = [
-          "enforcing=0",
+          "enforcing=1",
           "rfkill.default_state=1",
           "rd.driver.blacklist=nouveau",
           "modprobe.blacklist=nouveau",
