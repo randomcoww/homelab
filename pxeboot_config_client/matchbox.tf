@@ -5,7 +5,6 @@ resource "matchbox_profile" "pxeboot" {
   kernel = "${local.pxeboot.image_store_endpoint}/${each.value.kernel_image_name}"
   initrd = ["${local.pxeboot.image_store_endpoint}/${each.value.initrd_image_name}"]
   args = concat([
-    "elevator=noop",
     "intel_iommu=on",
     "amd_iommu=on",
     "iommu=pt",
