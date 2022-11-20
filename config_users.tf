@@ -3,7 +3,7 @@ locals {
   base_users = {
     admin = {
       name     = "fcos"
-      home_dir = "/var/local/home/fcos"
+      home_dir = "/var/home/fcos"
       groups = [
         "adm",
         "sudo",
@@ -14,7 +14,7 @@ locals {
     client = {
       name     = "randomcoww"
       uid      = 10000
-      home_dir = "${local.pv_mount_path}/randomcoww"
+      home_dir = "/var/home/randomcoww"
       groups = [
         "adm",
         "sudo",

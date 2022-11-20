@@ -60,7 +60,7 @@ locals {
           ]
         }
       }
-      container_storage_path = "${local.pv_mount_path}/containers"
+      container_storage_path = "${local.pv_mount_path}/storage"
       local_provisioner_path = "${local.pv_mount_path}/local_path_provisioner"
     }
 
@@ -124,7 +124,7 @@ locals {
           ]
         }
       }
-      container_storage_path = "${local.pv_mount_path}/containers"
+      container_storage_path = "${local.pv_mount_path}/storage"
       local_provisioner_path = "${local.pv_mount_path}/local_path_provisioner"
     }
 
@@ -188,7 +188,7 @@ locals {
           ]
         }
       }
-      container_storage_path = "${local.pv_mount_path}/containers"
+      container_storage_path = "${local.pv_mount_path}/storage"
       local_provisioner_path = "${local.pv_mount_path}/local_path_provisioner"
     }
 
@@ -236,8 +236,8 @@ locals {
           ]
         }
       }
-      container_storage_path = "${local.pv_mount_path}/containers"
-      # local_provisioner_path = "${local.pv_mount_path}/local_path_provisioner"
+      container_storage_path = "/var/home/containers"
+      # local_provisioner_path = "/var/home/local_path_provisioner"
       # kubernetes_worker_taints = [
       #   {
       #     key    = "node.kubernetes.io/unschedulable"
