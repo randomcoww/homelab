@@ -150,9 +150,6 @@ resource "helm_release" "kube_dns" {
           port = local.ports.gateway_dns
           plugins = [
             {
-              name = "errors"
-            },
-            {
               name = "health"
             },
             {
@@ -276,9 +273,6 @@ resource "helm_release" "external_dns" {
           ]
           port = local.ports.gateway_dns
           plugins = [
-            {
-              name = "errors"
-            },
             {
               name = "health"
             },
