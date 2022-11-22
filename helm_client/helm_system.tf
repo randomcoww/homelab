@@ -144,7 +144,7 @@ resource "helm_release" "kube_dns" {
         {
           zones = [
             {
-              zone = "${local.domains.kubernetes}."
+              zone = "."
             },
           ]
           port = local.ports.gateway_dns
@@ -168,43 +168,12 @@ ttl 30
 EOF
             },
             {
-              name = "reload"
-            },
-            {
-              name = "loadbalance"
-            },
-          ]
-        },
-        {
-          zones = [
-            {
-              zone = "."
-            },
-          ]
-          port = local.ports.gateway_dns
-          plugins = [
-            {
-              name = "errors"
-            },
-            {
-              name = "health"
-            },
-            {
-              name = "ready"
-            },
-            {
               name        = "forward"
               parameters  = ". tls://${local.upstream_dns_ip}"
               configBlock = <<EOF
 tls_servername ${local.upstream_dns_tls_servername}
 health_check 5s
 EOF
-            },
-            {
-              name = "reload"
-            },
-            {
-              name = "loadbalance"
             },
             {
               name       = "cache"
@@ -302,40 +271,6 @@ resource "helm_release" "external_dns" {
         {
           zones = [
             {
-              zone = "${local.domains.internal}."
-            },
-          ]
-          port = local.ports.gateway_dns
-          plugins = [
-            {
-              name = "errors"
-            },
-            {
-              name       = "health"
-              parameters = "127.0.0.1:8080"
-            },
-            {
-              name       = "ready"
-              parameters = "127.0.0.1:8181"
-            },
-            {
-              name        = "etcd"
-              parameters  = "${local.domains.internal} in-addr.arpa ip6.arpa"
-              configBlock = <<EOF
-fallthrough in-addr.arpa ip6.arpa
-EOF
-            },
-            {
-              name = "reload"
-            },
-            {
-              name = "loadbalance"
-            },
-          ]
-        },
-        {
-          zones = [
-            {
               zone = "."
             },
           ]
@@ -345,12 +280,17 @@ EOF
               name = "errors"
             },
             {
-              name       = "health"
-              parameters = "127.0.0.1:8080"
+              name = "health"
             },
             {
-              name       = "ready"
-              parameters = "127.0.0.1:8181"
+              name = "ready"
+            },
+            {
+              name        = "etcd"
+              parameters  = "${local.domains.internal} in-addr.arpa ip6.arpa"
+              configBlock = <<EOF
+fallthrough in-addr.arpa ip6.arpa
+EOF
             },
             {
               name        = "forward"
@@ -361,17 +301,11 @@ health_check 5s
 EOF
             },
             {
-              name = "reload"
-            },
-            {
-              name = "loadbalance"
-            },
-            {
               name       = "cache"
               parameters = 30
             },
           ]
-        }
+        },
       ]
     }),
   ]
@@ -1097,7 +1031,7 @@ resource "helm_release" "minio" {
   namespace        = split(".", local.kubernetes_service_endpoints.minio)[1]
   repository       = "https://charts.min.io/"
   chart            = "minio"
-  version          = "5.0.1"
+  version          = "5.0.0"
   wait             = false
   create_namespace = true
   values = [
@@ -1132,8 +1066,7 @@ resource "helm_release" "minio" {
         enabled = false
       }
       environment = {
-        MINIO_API_REQUESTS_MAX      = 1600
-        MINIO_API_REQUESTS_DEADLINE = "2m"
+        MINIO_API_REQUESTS_MAX = 1600
       }
       users = []
       affinity = {
