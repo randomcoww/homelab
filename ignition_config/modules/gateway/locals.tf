@@ -12,10 +12,6 @@ locals {
       external_ingress_ip = var.external_ingress_ip
       pod_network_prefix  = var.pod_network_prefix
 
-      # dns #
-      upstream_dns_ip             = "9.9.9.9"
-      upstream_dns_tls_servername = "dns.quad9.net"
-
       # loadbalancer #
       vrrp_master_default_route = {
         table_id       = 250

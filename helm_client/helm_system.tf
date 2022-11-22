@@ -178,35 +178,6 @@ EOF
         {
           zones = [
             {
-              zone = "${local.domains.internal}."
-            },
-          ]
-          port = local.ports.gateway_dns
-          plugins = [
-            {
-              name = "errors"
-            },
-            {
-              name = "health"
-            },
-            {
-              name = "ready"
-            },
-            {
-              name       = "forward"
-              parameters = ". ${local.services.cluster_external_dns.ip}"
-            },
-            {
-              name = "reload"
-            },
-            {
-              name = "loadbalance"
-            },
-          ]
-        },
-        {
-          zones = [
-            {
               zone = "."
             },
           ]
@@ -222,8 +193,12 @@ EOF
               name = "ready"
             },
             {
-              name       = "forward"
-              parameters = ". /etc/resolv.conf"
+              name        = "forward"
+              parameters  = ". tls://${local.upstream_dns_ip}"
+              configBlock = <<EOF
+tls_servername ${local.upstream_dns_tls_servername}
+health_check 5s
+EOF
             },
             {
               name = "reload"
@@ -249,7 +224,7 @@ resource "helm_release" "external_dns" {
   namespace  = "kube-system"
   repository = "https://randomcoww.github.io/terraform-infra/"
   chart      = "external-dns"
-  version    = "0.1.14"
+  version    = "0.1.15"
   wait       = false
   values = [
     yamlencode({
@@ -378,8 +353,12 @@ EOF
               parameters = "127.0.0.1:8181"
             },
             {
-              name       = "forward"
-              parameters = ". /etc/resolv.conf"
+              name        = "forward"
+              parameters  = ". tls://${local.upstream_dns_ip}"
+              configBlock = <<EOF
+tls_servername ${local.upstream_dns_tls_servername}
+health_check 5s
+EOF
             },
             {
               name = "reload"
@@ -1118,7 +1097,7 @@ resource "helm_release" "minio" {
   namespace        = split(".", local.kubernetes_service_endpoints.minio)[1]
   repository       = "https://charts.min.io/"
   chart            = "minio"
-  version          = "5.0.0"
+  version          = "5.0.1"
   wait             = false
   create_namespace = true
   values = [

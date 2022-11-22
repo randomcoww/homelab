@@ -41,7 +41,7 @@ spec:
       serviceAccountName: {{ .Values.serviceAccount.name }}
 {{- end }}
 {{ if .Values.hostNetwork.enabled }}
-      dnsPolicy: ClusterFirstWithHostNet
+      dnsPolicy: Default
       hostNetwork: true
 {{- end }}
       containers:

@@ -169,4 +169,7 @@ locals {
     minio              = 9000
     transmission       = 9091
   }
+
+  upstream_dns_ip             = "9.9.9.9"
+  upstream_dns_tls_servername = "dns.quad9.net"
 }

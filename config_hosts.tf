@@ -174,7 +174,7 @@ locals {
         }
         wan = {
           source_interface_name = "phy0-wan"
-          enable_dhcp           = false
+          enable_dhcp           = true
         }
       }
       disks = {

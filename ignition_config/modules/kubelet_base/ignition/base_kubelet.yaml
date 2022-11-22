@@ -52,6 +52,7 @@ storage:
           [crio.runtime]
           default_runtime="crun"
           hooks_dir=["/usr/share/containers/oci/hooks.d"]
+          selinux=true
 
           [crio.runtime.runtimes.crun]
           runtime_path="/usr/bin/crun"
