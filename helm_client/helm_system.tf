@@ -331,8 +331,10 @@ resource "helm_release" "nginx_ingress" {
           externalTrafficPolicy = "Local"
         }
         config = {
-          proxy-body-size = "256m"
-          ssl-redirect    = "true"
+          ignore-invalid-headers = "off"
+          proxy-body-size        = 0
+          proxy-buffering        = "off"
+          ssl-redirect           = "true"
         }
         tolerations = [
           {
@@ -1025,11 +1027,15 @@ resource "helm_release" "minio" {
   namespace        = split(".", local.kubernetes_service_endpoints.minio)[1]
   repository       = "https://charts.min.io/"
   chart            = "minio"
-  version          = "5.0.0"
+  version          = "5.0.1"
   wait             = false
   create_namespace = true
   values = [
     yamlencode({
+      image = {
+        repository = split(":", local.container_images.minio)[0]
+        tag        = split(":", local.container_images.minio)[1]
+      }
       clusterDomain = local.domains.kubernetes
       mode          = "distributed"
       rootUser      = random_password.minio-access-key-id.result
@@ -1042,7 +1048,7 @@ resource "helm_release" "minio" {
       minioAPIPort  = local.ports.minio
       resources = {
         requests = {
-          memory = "10Gi"
+          memory = "8Gi"
         }
       }
       consoleService = {
@@ -1058,9 +1064,28 @@ resource "helm_release" "minio" {
       }
       ingress = {
         enabled = false
+        # ingressClassName = "nginx"
+        # annotations = {
+        #   "cert-manager.io/cluster-issuer"                    = "letsencrypt-prod"
+        #   "nginx.ingress.kubernetes.io/proxy-http-version"    = "1.1"
+        #   "nginx.ingress.kubernetes.io/proxy-connect-timeout" = 300
+        # }
+        # tls = [
+        #   {
+        #     secretName = "minio-tls"
+        #     hosts = [
+        #       local.kubernetes_ingress_endpoints.minio,
+        #     ]
+        #   },
+        # ]
+        # hosts = [
+        #   local.kubernetes_ingress_endpoints.minio,
+        # ]
       }
       environment = {
-        MINIO_API_REQUESTS_MAX = 1600
+        MINIO_API_REQUESTS_DEADLINE  = "2m"
+        MINIO_STORAGE_CLASS_STANDARD = "EC:2"
+        MINIO_STORAGE_CLASS_RRS      = "EC:2"
       }
       users = []
       affinity = {
@@ -1128,6 +1153,7 @@ output "minio_endpoint" {
 
 # hostapd #
 
+/*
 module "hostapd-roaming" {
   source        = "./modules/hostapd_roaming"
   resource_name = "hostapd"
@@ -1250,3 +1276,4 @@ resource "helm_release" "hostapd" {
     }),
   ]
 }
+*/

@@ -19,7 +19,7 @@ locals {
       }
       bridge_interfaces = {
         br-lan = {
-          interfaces = ["phy0", "wlan0"]
+          interfaces = ["phy0"]
           mtu        = 9000
         }
       }
@@ -55,6 +55,7 @@ locals {
           partitions = [
             {
               mount_path = local.pv_mount_path
+              format     = "ext4"
               wipe       = false
             },
           ]
@@ -83,7 +84,7 @@ locals {
       }
       bridge_interfaces = {
         br-lan = {
-          interfaces = ["phy0", "wlan0"]
+          interfaces = ["phy0"]
           mtu        = 9000
         }
       }
@@ -119,6 +120,7 @@ locals {
           partitions = [
             {
               mount_path = local.pv_mount_path
+              format     = "ext4"
               wipe       = false
             },
           ]
@@ -147,7 +149,7 @@ locals {
       }
       bridge_interfaces = {
         br-lan = {
-          interfaces = ["phy0", "wlan0"]
+          interfaces = ["phy0"]
           mtu        = 9000
         }
       }
@@ -183,6 +185,7 @@ locals {
           partitions = [
             {
               mount_path = local.pv_mount_path
+              format     = "ext4"
               wipe       = false
             },
           ]

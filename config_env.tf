@@ -99,9 +99,10 @@ locals {
     etcd                    = "ghcr.io/randomcoww/etcd:v3.5.4"
 
     # Helm
+    minio              = "docker.io/minio/minio:latest"
     kea                = "ghcr.io/randomcoww/kea:2.0.2"
     matchbox           = "quay.io/poseidon/matchbox:latest"
-    coredns            = "k8s.gcr.io/coredns/coredns:v1.9.3"
+    coredns            = "docker.io/coredns/coredns:1.10.0"
     tftpd              = "ghcr.io/randomcoww/tftpd-ipxe:20220804"
     hostapd            = "ghcr.io/randomcoww/hostapd:2.10"
     syncthing          = "docker.io/syncthing/syncthing:1.20"
@@ -135,6 +136,7 @@ locals {
     auth         = "auth.${local.domains.internal}"
     transmission = "t.${local.domains.internal}"
     webdav       = "w.${local.domains.internal}"
+    minio        = "m.${local.domains.internal}"
   }
 
   kubernetes_service_endpoints = {
