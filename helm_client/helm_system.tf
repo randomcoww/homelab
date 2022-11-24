@@ -484,6 +484,11 @@ resource "helm_release" "cert_issuer" {
     helm_release.cert_manager,
     helm_release.cert_issuer_secrets,
   ]
+  lifecycle {
+    replace_triggered_by = [
+      helm_release.cert_issuer_secrets,
+    ]
+  }
 }
 
 # authelia #
@@ -495,6 +500,7 @@ resource "helm_release" "authelia_users" {
   namespace        = "authelia"
   create_namespace = true
   version          = "0.1.0"
+  wait             = true
   values = [
     yamlencode({
       manifests = [
@@ -507,7 +513,13 @@ resource "helm_release" "authelia_users" {
           type = "Opaque"
           stringData = {
             "users_database.yml" = yamlencode({
-              users = var.authelia_users
+              users = {
+                for _, user in local.users :
+                user.name => merge({
+                  displayname = user.name
+                }, user.sso)
+                if length(keys(user.sso)) > 0
+              }
             })
           }
         },
@@ -646,6 +658,11 @@ resource "helm_release" "authelia" {
   depends_on = [
     helm_release.authelia_users,
   ]
+  lifecycle {
+    replace_triggered_by = [
+      helm_release.authelia_users,
+    ]
+  }
 }
 
 # local-storage storage class #

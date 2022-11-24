@@ -23,7 +23,10 @@ version: 1.4.0
 passwd:
   users:
     ${indent(4, yamlencode(
-      concat(users, [{
+      concat([
+        for _, user in users :
+        merge({name = user.name}, user.unix)
+      ], [{
         name = "core"
         should_exist = false
       }])

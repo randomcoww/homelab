@@ -37,7 +37,12 @@ cat > secrets.tfvars <<EOF
 users = {
   admin = {}
   client = {
-    password_hash = "$(echo 'password' | mkpasswd -m sha-512 -s)"
+    unix = {
+      password_hash = "$(echo 'password' | mkpasswd -m sha-512 -s)"
+    }
+    sso = {
+      password = "$(podman run docker.io/authelia/authelia:latest authelia hash-password -- 'password' | sed 's:.*\: ::')"
+    }
   }
 }
 
@@ -54,15 +59,6 @@ hostapd = {
 }
 
 letsencrypt_email = "user@domain"
-
-authelia_users = {
-  username = {
-    displayname = "John Smith"
-    email       = "user@domain"
-    password    = "$(podman run docker.io/authelia/authelia:latest authelia hash-password -- 'password' | sed 's:.*\: ::')"
-    groups      = []
-  }
-}
 
 wireguard_client = {
   Interface = {

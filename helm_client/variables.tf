@@ -5,13 +5,14 @@ variable "hostapd" {
   })
 }
 
-variable "letsencrypt_email" {
-  type = string
-}
-
-variable "authelia_users" {
+# User override (local.preprocess.users)
+variable "users" {
   type    = any
   default = {}
+}
+
+variable "letsencrypt_email" {
+  type = string
 }
 
 variable "wireguard_client" {
