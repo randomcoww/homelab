@@ -1,14 +1,11 @@
-variable "hostapd" {
-  type = object({
-    ssid       = string
-    passphrase = string
-  })
-}
-
 # User override (local.preprocess.users)
 variable "users" {
   type    = any
   default = {}
+}
+
+variable "hostapd" {
+  type = map(string)
 }
 
 variable "letsencrypt_email" {

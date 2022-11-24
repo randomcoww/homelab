@@ -1191,8 +1191,9 @@ resource "helm_release" "hostapd" {
         for _, peer in module.hostapd-roaming.peers :
         {
           podName = peer.pod_name
-          config = {
+          config = merge({
             interface        = "wlan0"
+            bridge           = "br-lan"
             preamble         = 1
             noscan           = 1
             auth_algs        = 1
@@ -1210,8 +1211,6 @@ resource "helm_release" "hostapd" {
             ieee80211d       = 1
             ieee80211h       = 1
             ieee80211w       = 2
-            sae_password     = var.hostapd.passphrase
-            ssid             = var.hostapd.ssid
             ht_capab = "[${join("][", [
               "LDPC", "HT40-", "HT40+", "SHORT-GI-40", "TX-STBC", "RX-STBC1", "DSSS_CCK-40",
             ])}]"
@@ -1238,7 +1237,7 @@ resource "helm_release" "hostapd" {
               for _, p in module.hostapd-roaming.peers :
               "${p.bssid} ${p.bssid} ${p.encryption_key}"
             ]
-          }
+          }, var.hostapd)
         }
       ]
       StatefulSet = {

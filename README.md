@@ -54,8 +54,8 @@ ssh_client = {
 }
 
 hostapd = {
-  ssid       = "ssid"
-  passphrase = "passphrase"
+  ssid         = "ssid"
+  sae_password = "passphrase"
 }
 
 letsencrypt_email = "user@domain"
