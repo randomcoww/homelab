@@ -193,6 +193,13 @@ locals {
       }
       container_storage_path = "${local.pv_mount_path}/storage"
       local_provisioner_path = "${local.pv_mount_path}/local_path_provisioner"
+      # kubernetes_worker_taints = [
+      #   {
+      #     key    = "node.kubernetes.io/unschedulable"
+      #     effect = "NoSchedule"
+      #     value  = "true"
+      #   },
+      # ]
     }
 
     de-0 = {
@@ -233,21 +240,12 @@ locals {
           device = "/dev/disk/by-id/nvme-SKHynix_HFS512GDE9X084N_CYA8N037413008I5H"
           partitions = [
             {
-              mount_path = local.pv_mount_path
+              mount_path = "/var/home"
               wipe       = false
             },
           ]
         }
       }
-      container_storage_path = "/var/home/containers"
-      # local_provisioner_path = "/var/home/local_path_provisioner"
-      # kubernetes_worker_taints = [
-      #   {
-      #     key    = "node.kubernetes.io/unschedulable"
-      #     effect = "NoSchedule"
-      #     value  = "true"
-      #   },
-      # ]
     }
   }
 

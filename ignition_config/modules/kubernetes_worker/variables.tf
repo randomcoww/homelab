@@ -19,7 +19,8 @@ variable "node_taints" {
 }
 
 variable "container_storage_path" {
-  type = string
+  type    = string
+  default = "/var/lib/containers/storage"
 }
 
 variable "static_pod_manifest_path" {
