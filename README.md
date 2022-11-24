@@ -38,7 +38,7 @@ users = {
   admin = {}
   client = {
     unix = {
-      password_hash = "$(echo 'password' | mkpasswd -m sha-512 -s)"
+      password_hash = "$(echo 'password' | openssl passwd -6 -stdin)"
     }
     sso = {
       password = "$(podman run docker.io/authelia/authelia:latest authelia hash-password -- 'password' | sed 's:.*\: ::')"
