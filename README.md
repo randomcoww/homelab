@@ -33,15 +33,19 @@ Reference: [Authelia user password generation](https://www.authelia.com/referenc
 
 ```bash
 KEY=$HOME/.ssh/id_ecdsa
+PASSWORD='password'
+EMAIL='email'
+WIREGUARD_CONFIG='filepath'
+
 cat > secrets.tfvars <<EOF
 users = {
   admin = {}
   client = {
     unix = {
-      password_hash = "$(echo 'password' | openssl passwd -6 -stdin)"
+      password_hash = "$(echo $PASSWORD | openssl passwd -6 -stdin)"
     }
     sso = {
-      password = "$(podman run docker.io/authelia/authelia:latest authelia hash-password -- 'password' | sed 's:.*\: ::')"
+      password = "$(podman run docker.io/authelia/authelia:latest authelia hash-password -- "$PASSWORD" | sed 's:.*\: ::')"
     }
   }
 }
@@ -53,18 +57,17 @@ ssh_client = {
   validity_period_hours = 336
 }
 
-letsencrypt_email = "user@domain"
+letsencrypt_email = "$EMAIL"
 
 wireguard_client = {
   Interface = {
-    PrivateKey = ""
-    Address    = ""
-    DNS        = ""
+    PrivateKey = "$(cat $WIREGUARD_CONFIG | grep PrivateKey | sed 's:.*\ = ::')"
+    Address    = "$(cat $WIREGUARD_CONFIG | grep Address | sed 's:.*\ = ::')"
   }
   Peer = {
-    PublicKey  = ""
-    AllowedIPs = ""
-    Endpoint   = ""
+    PublicKey  = "$(cat $WIREGUARD_CONFIG | grep PublicKey | sed 's:.*\ = ::')"
+    AllowedIPs = "$(cat $WIREGUARD_CONFIG | grep AllowedIPs | sed 's:.*\ = ::')"
+    Endpoint   = "$(cat $WIREGUARD_CONFIG | grep Endpoint | sed 's:.*\ = ::')"
   }
 }
 EOF
