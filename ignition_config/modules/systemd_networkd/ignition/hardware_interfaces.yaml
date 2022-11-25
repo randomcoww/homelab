@@ -4,24 +4,24 @@ version: 1.4.0
 systemd:
   units:
     # This allows bridging wifi devices
-    - name: enable-4addr.service
-      enabled: true
-      contents: |
-        [Unit]
-        Before=systemd-networkd.service
-        WantedBy=systemd-networkd.service
+    # - name: enable-4addr.service
+    #   enabled: true
+    #   contents: |
+    #     [Unit]
+    #     Before=systemd-networkd.service
+    #     WantedBy=systemd-networkd.service
 
-        [Service]
-        Type=oneshot
-        %{~ for hardware_interface_name, hardware_interface in hardware_interfaces ~}
-        %{~ if lookup(hardware_interface, "enable_4addr", false) ~}
-        ExecStart=/usr/sbin/iw dev ${hardware_interface_name} set 4addr on
-        %{~ endif ~}
-        %{~ endfor ~}
-        RemainAfterExit=yes
+    #     [Service]
+    #     Type=oneshot
+    #     %{~ for hardware_interface_name, hardware_interface in hardware_interfaces ~}
+    #     %{~ if lookup(hardware_interface, "enable_4addr", false) ~}
+    #     ExecStart=/usr/sbin/iw dev ${hardware_interface_name} set 4addr on
+    #     %{~ endif ~}
+    #     %{~ endfor ~}
+    #     RemainAfterExit=yes
 
-        [Install]
-        WantedBy=multi-user.target
+    #     [Install]
+    #     WantedBy=multi-user.target
 
 storage:
   files:

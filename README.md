@@ -53,11 +53,6 @@ ssh_client = {
   validity_period_hours = 336
 }
 
-hostapd = {
-  ssid         = "ssid"
-  sae_password = "passphrase"
-}
-
 letsencrypt_email = "user@domain"
 
 wireguard_client = {

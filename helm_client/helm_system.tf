@@ -1,12 +1,13 @@
 # basic system #
 
 resource "helm_release" "cluster_services" {
-  name       = "cluster-services"
-  namespace  = "kube-system"
-  repository = "https://randomcoww.github.io/terraform-infra/"
-  chart      = "cluster-services"
-  version    = "0.2.4"
-  wait       = false
+  name         = "cluster-services"
+  namespace    = "kube-system"
+  repository   = "https://randomcoww.github.io/terraform-infra/"
+  chart        = "cluster-services"
+  version      = "0.2.4"
+  wait         = false
+  reuse_values = true
   values = [
     yamlencode({
       images = {
@@ -27,84 +28,16 @@ resource "helm_release" "cluster_services" {
   ]
 }
 
-# kube-router #
-
-/*
-resource "helm_release" "kube_router" {
-  name       = "kube-router"
-  namespace  = "kube-system"
-  repository = "https://charts.enix.io/"
-  chart      = "kube-router"
-  version    = "1.8.0"
-  wait       = false
-  values = [
-    yamlencode({
-      kubeRouter = {
-        cni = {
-          install = true
-          config = jsonencode({
-            cniVersion = "0.3.0"
-            name       = "kube-router"
-            plugins = [
-              {
-                name             = "kubernetes"
-                type             = "bridge"
-                bridge           = local.kubernetes.cni_bridge_interface_name
-                isDefaultGateway = true
-                hairpinMode      = true
-                ipam = {
-                  type = "host-local"
-                }
-              },
-              {
-                type = "portmap"
-                capabilities = {
-                  snat         = true
-                  portMappings = true
-                }
-              },
-            ]
-          })
-        }
-        router = {
-          nodesFullMesh           = true
-          enablePodEgress         = true
-          enableOverlay           = true
-          enableIbgp              = true
-          enableCni               = true
-          clusterAsn              = 65000
-          bgpGracefulRestart      = true
-          advertisePodCidr        = true
-          advertiseLoadbalancerIp = true
-          advertiseExternalIp     = true
-          advertiseClusterIp      = true
-        }
-        firewall = {
-          enabled = true
-        }
-        serviceProxy = {
-          enabled                 = true
-          nodeportBindonAllIp     = true
-          masqueradeAll           = true
-          ipvsPermitAll           = true
-          ipvsGracefulTermination = true
-          hairpinMode             = true
-        }
-      }
-    }),
-  ]
-}
-*/
-
 # coredns #
 
 resource "helm_release" "kube_dns" {
-  name       = "kube-dns"
-  namespace  = "kube-system"
-  repository = "https://coredns.github.io/helm"
-  chart      = "coredns"
-  version    = "1.19.5"
-  wait       = false
+  name         = "kube-dns"
+  namespace    = "kube-system"
+  repository   = "https://coredns.github.io/helm"
+  chart        = "coredns"
+  version      = "1.19.5"
+  wait         = false
+  reuse_values = true
   values = [
     yamlencode({
       image = {
@@ -186,12 +119,13 @@ EOF
 # coredns with external-dns #
 
 resource "helm_release" "external_dns" {
-  name       = "external-dns"
-  namespace  = "kube-system"
-  repository = "https://randomcoww.github.io/terraform-infra/"
-  chart      = "external-dns"
-  version    = "0.1.15"
-  wait       = false
+  name         = "external-dns"
+  namespace    = "kube-system"
+  repository   = "https://randomcoww.github.io/terraform-infra/"
+  chart        = "external-dns"
+  version      = "0.1.15"
+  wait         = false
+  reuse_values = true
   values = [
     yamlencode({
       mode           = "DaemonSet"
@@ -314,6 +248,7 @@ resource "helm_release" "nginx_ingress" {
   namespace        = "ingress-nginx"
   create_namespace = true
   version          = "4.3.0"
+  reuse_values     = true
   values = [
     yamlencode({
       controller = {
@@ -356,6 +291,7 @@ resource "helm_release" "cert_manager" {
   namespace        = "cert-manager"
   create_namespace = true
   wait             = true
+  reuse_values     = true
   values = [
     yamlencode({
       installCRDs = true
@@ -384,6 +320,7 @@ resource "helm_release" "cert_issuer_secrets" {
   create_namespace = true
   wait             = true
   version          = "0.1.0"
+  reuse_values     = true
   values = [
     yamlencode({
       manifests = [
@@ -418,10 +355,11 @@ resource "helm_release" "cert_issuer_secrets" {
 }
 
 resource "helm_release" "cert_issuer" {
-  name       = "cert-issuer"
-  repository = "https://randomcoww.github.io/terraform-infra/"
-  chart      = "helm-wrapper"
-  version    = "0.1.0"
+  name         = "cert-issuer"
+  repository   = "https://randomcoww.github.io/terraform-infra/"
+  chart        = "helm-wrapper"
+  version      = "0.1.0"
+  reuse_values = true
   values = [
     yamlencode({
       manifests = [
@@ -501,6 +439,7 @@ resource "helm_release" "authelia_users" {
   create_namespace = true
   version          = "0.1.0"
   wait             = true
+  reuse_values     = true
   values = [
     yamlencode({
       manifests = [
@@ -536,6 +475,7 @@ resource "helm_release" "authelia" {
   create_namespace = true
   version          = "0.8.45"
   wait             = false
+  reuse_values     = true
   values = [
     yamlencode({
       domain = local.domains.internal
@@ -668,12 +608,13 @@ resource "helm_release" "authelia" {
 # local-storage storage class #
 
 resource "helm_release" "local-path-provisioner" {
-  name       = "local-path-provisioner"
-  namespace  = "kube-system"
-  repository = "https://charts.containeroo.ch"
-  chart      = "local-path-provisioner"
-  version    = "0.0.22"
-  wait       = false
+  name         = "local-path-provisioner"
+  namespace    = "kube-system"
+  repository   = "https://charts.containeroo.ch"
+  chart        = "local-path-provisioner"
+  version      = "0.0.22"
+  wait         = false
+  reuse_values = true
   values = [
     yamlencode({
       storageClass = {
@@ -699,6 +640,7 @@ resource "helm_release" "openebs" {
   version          = "3.3.0"
   wait             = false
   create_namespace = true
+  reuse_values     = true
   values = [
     yamlencode({
       apiserver = {
@@ -735,50 +677,6 @@ resource "helm_release" "openebs" {
   ]
 }
 
-# nvidia device plugin #
-
-/*
-resource "helm_release" "nvidia_device_plugin" {
-  name       = "nvidia-device-plugin"
-  repository = "https://nvidia.github.io/k8s-device-plugin"
-  chart      = "nvidia-device-plugin"
-  namespace  = "kube-system"
-  version    = "0.12.2"
-  values = [
-    yamlencode({
-      tolerations = [
-        {
-          effect   = "NoExecute"
-          operator = "Exists"
-        },
-      ]
-    })
-  ]
-}
-*/
-
-# amd device plugin #
-
-/*
-resource "helm_release" "amd_gpu" {
-  name       = "amd-gpu"
-  repository = "https://radeonopencompute.github.io/k8s-device-plugin/"
-  chart      = "amd-gpu"
-  namespace  = "kube-system"
-  version    = "0.5.0"
-  values = [
-    yamlencode({
-      tolerations = [
-        {
-          effect   = "NoExecute"
-          operator = "Exists"
-        },
-      ]
-    })
-  ]
-}
-*/
-
 # kea #
 
 module "kea-config" {
@@ -812,12 +710,13 @@ module "kea-config" {
 }
 
 resource "helm_release" "tftpd" {
-  name       = "tftpd"
-  namespace  = "default"
-  repository = "https://randomcoww.github.io/terraform-infra/"
-  chart      = "tftpd"
-  version    = "0.1.1"
-  wait       = false
+  name         = "tftpd"
+  namespace    = "default"
+  repository   = "https://randomcoww.github.io/terraform-infra/"
+  chart        = "tftpd"
+  version      = "0.1.1"
+  wait         = false
+  reuse_values = true
   values = [
     yamlencode({
       images = {
@@ -851,12 +750,13 @@ resource "helm_release" "tftpd" {
 }
 
 resource "helm_release" "kea" {
-  name       = "kea"
-  namespace  = "default"
-  repository = "https://randomcoww.github.io/terraform-infra/"
-  chart      = "kea"
-  version    = "0.1.14"
-  wait       = false
+  name         = "kea"
+  namespace    = "default"
+  repository   = "https://randomcoww.github.io/terraform-infra/"
+  chart        = "kea"
+  version      = "0.1.14"
+  wait         = false
+  reuse_values = true
   values = [
     yamlencode({
       images = {
@@ -941,12 +841,13 @@ module "matchbox-syncthing" {
 }
 
 resource "helm_release" "matchbox" {
-  name       = "matchbox"
-  namespace  = "default"
-  repository = "https://randomcoww.github.io/terraform-infra/"
-  chart      = "matchbox"
-  version    = "0.2.13"
-  wait       = false
+  name         = "matchbox"
+  namespace    = "default"
+  repository   = "https://randomcoww.github.io/terraform-infra/"
+  chart        = "matchbox"
+  version      = "0.2.13"
+  wait         = false
+  reuse_values = true
   values = [
     yamlencode({
       images = {
@@ -1047,6 +948,7 @@ resource "helm_release" "minio" {
   version          = "5.0.1"
   wait             = false
   create_namespace = true
+  reuse_values     = true
   values = [
     yamlencode({
       image = {
@@ -1168,8 +1070,50 @@ output "minio_endpoint" {
   }
 }
 
-# hostapd #
+# amd device plugin #
 
+resource "helm_release" "amd_gpu" {
+  name         = "amd-gpu"
+  repository   = "https://radeonopencompute.github.io/k8s-device-plugin/"
+  chart        = "amd-gpu"
+  namespace    = "kube-system"
+  version      = "0.5.0"
+  reuse_values = true
+  values = [
+    yamlencode({
+      tolerations = [
+        {
+          effect   = "NoExecute"
+          operator = "Exists"
+        },
+      ]
+    })
+  ]
+}
+
+# nvidia device plugin #
+/*
+resource "helm_release" "nvidia_device_plugin" {
+  name         = "nvidia-device-plugin"
+  repository   = "https://nvidia.github.io/k8s-device-plugin"
+  chart        = "nvidia-device-plugin"
+  namespace    = "kube-system"
+  version      = "0.12.2"
+  reuse_values = true
+  values = [
+    yamlencode({
+      tolerations = [
+        {
+          effect   = "NoExecute"
+          operator = "Exists"
+        },
+      ]
+    })
+  ]
+}
+*/
+
+# hostapd #
 /*
 module "hostapd-roaming" {
   source        = "./modules/hostapd_roaming"
@@ -1178,12 +1122,13 @@ module "hostapd-roaming" {
 }
 
 resource "helm_release" "hostapd" {
-  name       = "hostapd"
-  namespace  = "default"
-  repository = "https://randomcoww.github.io/terraform-infra/"
-  chart      = "hostapd"
-  version    = "0.1.7"
-  wait       = false
+  name         = "hostapd"
+  namespace    = "default"
+  repository   = "https://randomcoww.github.io/terraform-infra/"
+  chart        = "hostapd"
+  version      = "0.1.7"
+  wait         = false
+  reuse_values = true
   values = [
     yamlencode({
       image = local.container_images.hostapd
@@ -1193,7 +1138,6 @@ resource "helm_release" "hostapd" {
           podName = peer.pod_name
           config = merge({
             interface        = "wlan0"
-            bridge           = "br-lan"
             preamble         = 1
             noscan           = 1
             auth_algs        = 1

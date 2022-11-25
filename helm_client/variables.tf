@@ -4,10 +4,6 @@ variable "users" {
   default = {}
 }
 
-variable "hostapd" {
-  type = map(string)
-}
-
 variable "letsencrypt_email" {
   type = string
 }

@@ -13,6 +13,7 @@ systemd:
             ConditionVirtualization=!container
 
             [Service]
+            ExecStartPre=/usr/sbin/rfkill unblock wlan
             ExecStart=
             ExecStart=/usr/sbin/wpa_supplicant -c /etc/wpa_supplicant/wpa_supplicant.conf -u -i ${wlan_interface}
 

@@ -1,12 +1,13 @@
 # webdav for minio #
 
 resource "helm_release" "webdav" {
-  name       = split(".", local.kubernetes_service_endpoints.webdav)[0]
-  namespace  = split(".", local.kubernetes_service_endpoints.webdav)[1]
-  repository = "https://randomcoww.github.io/terraform-infra/"
-  chart      = "webdav"
-  version    = "0.1.5"
-  wait       = false
+  name         = split(".", local.kubernetes_service_endpoints.webdav)[0]
+  namespace    = split(".", local.kubernetes_service_endpoints.webdav)[1]
+  repository   = "https://randomcoww.github.io/terraform-infra/"
+  chart        = "webdav"
+  version      = "0.1.5"
+  wait         = false
+  reuse_values = true
   values = [
     yamlencode({
       images = {
@@ -66,12 +67,13 @@ EOF
 # mpd #
 
 resource "helm_release" "mpd" {
-  name       = "mpd"
-  namespace  = "default"
-  repository = "https://randomcoww.github.io/terraform-infra/"
-  chart      = "mpd"
-  version    = "0.3.7"
-  wait       = false
+  name         = "mpd"
+  namespace    = "default"
+  repository   = "https://randomcoww.github.io/terraform-infra/"
+  chart        = "mpd"
+  version      = "0.3.7"
+  wait         = false
+  reuse_values = true
   values = [
     yamlencode({
       config = {
@@ -170,12 +172,13 @@ EOF
 # transmission with minio storage #
 
 resource "helm_release" "transmission" {
-  name       = "transmission"
-  namespace  = "default"
-  repository = "https://randomcoww.github.io/terraform-infra/"
-  chart      = "transmission"
-  version    = "0.1.7"
-  wait       = false
+  name         = "transmission"
+  namespace    = "default"
+  repository   = "https://randomcoww.github.io/terraform-infra/"
+  chart        = "transmission"
+  version      = "0.1.7"
+  wait         = false
+  reuse_values = true
   values = [
     yamlencode({
       persistence = {
