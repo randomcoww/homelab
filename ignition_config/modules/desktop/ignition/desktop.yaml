@@ -82,7 +82,6 @@ storage:
 
           [org/gnome/desktop/remote-desktop/rdp]
           screen-share-mode='extend'
-          view-only=true
 
           [org/gnome/nautilus/preferences]
           default-folder-viewer='list-view'
