@@ -108,13 +108,13 @@ locals {
     syncthing          = "docker.io/syncthing/syncthing:1.20"
     rclone             = "mirror.gcr.io/rclone/rclone:latest"
     mpd                = "ghcr.io/randomcoww/mpd:0.23.10"
-    ympd               = "ghcr.io/randomcoww/ympd:20220807"
+    ympd               = "ghcr.io/randomcoww/ympd:20221126"
     flannel            = "ghcr.io/randomcoww/flannel:v0.18.1"
     flannel_cni_plugin = "docker.io/flannelcni/flannel-cni-plugin:v1.1.0"
     kapprover          = "ghcr.io/randomcoww/kapprover:latest"
     external_dns       = "k8s.gcr.io/external-dns/external-dns:v0.12.0"
     kube_proxy         = "ghcr.io/randomcoww/kubernetes:kube-proxy-v1.24.1"
-    transmission       = "ghcr.io/randomcoww/transmission:20221102"
+    transmission       = "ghcr.io/randomcoww/transmission:20221126"
     wireguard          = "ghcr.io/randomcoww/wireguard:20220807"
   }
 
