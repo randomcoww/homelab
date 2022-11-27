@@ -45,7 +45,7 @@ users = {
       password_hash = "$(echo $PASSWORD | openssl passwd -6 -stdin)"
     }
     sso = {
-      password = "$(podman run docker.io/authelia/authelia:latest authelia hash-password -- "$PASSWORD" | sed 's:.*\: ::')"
+      password = "$(podman run --rm docker.io/authelia/authelia:latest authelia hash-password -- "$PASSWORD" | sed 's:.*\: ::')"
     }
   }
 }
