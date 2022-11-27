@@ -1,7 +1,7 @@
 locals {
   pxeboot_image_builds = {
     coreos     = "fedora-coreos-37.20221125.0"
-    silverblue = "fedora-silverblue-37.20221126.0"
+    silverblue = "fedora-silverblue-37.20221127.0"
   }
 
   image_set = {
@@ -55,8 +55,8 @@ locals {
         boot_args = [
           "enforcing=1",
           "rfkill.default_state=1",
-          "rd.driver.blacklist=nouveau",
-          "modprobe.blacklist=nouveau",
+          # "rd.driver.blacklist=nouveau",
+          # "modprobe.blacklist=nouveau",
           # "nvidia_drm.modeset=1",
           # "vfio-pci.ids=10de:ffffffff:ffffffff:ffffffff:00030000:ffff00ff,10de:ffffffff:ffffffff:ffffffff:00040300:ffffffff",
           # "vfio-pci.ids=1002:ffffffff:ffffffff:ffffffff:00030000:ffff00ff,1002:ffffffff:ffffffff:ffffffff:00040300:ffffffff,10de:ffffffff:ffffffff:ffffffff:00030000:ffff00ff,10de:ffffffff:ffffffff:ffffffff:00040300:ffffffff",
