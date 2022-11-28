@@ -216,7 +216,7 @@ locals {
           mac         = "32-57-14-7a-aa-10"
           enable_dhcp = true
           enable_arp  = true
-          metric      = 4096
+          metric      = 512
         }
         wlan0 = {
           mac         = "b4-b5-b6-74-79-15"
