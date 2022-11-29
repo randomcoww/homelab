@@ -13,7 +13,6 @@ locals {
         }
         wlan0 = {
           mac = "a8-7e-ea-c5-3f-46"
-          mtu = 9000
         }
       }
       bridge_interfaces = {
@@ -77,7 +76,6 @@ locals {
         }
         wlan0 = {
           mac = "fc-b3-bc-dc-4e-fc"
-          mtu = 9000
         }
       }
       bridge_interfaces = {
@@ -141,7 +139,6 @@ locals {
         }
         wlan0 = {
           mac = "8c-55-4a-d0-b1-2d"
-          mtu = 9000
         }
       }
       bridge_interfaces = {
@@ -224,7 +221,6 @@ locals {
           enable_arp  = true
           enable_mdns = true
           metric      = 2048
-          mtu         = 9000
         }
       }
       bridge_interfaces = {

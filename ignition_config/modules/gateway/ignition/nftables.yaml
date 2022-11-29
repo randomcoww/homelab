@@ -41,6 +41,8 @@ storage:
               ip saddr ${interfaces.lan.prefix} accept;
               ip saddr ${pod_network_prefix} accept;
               iifname ${interfaces.wan.interface_name} ct status dnat accept;
+              iifname != ${interfaces.wan.interface_name} udp sport bootps udp dport bootpc accept;
+              iifname != ${interfaces.wan.interface_name} pkttype multicast accept;
             }
 
             chain forward {

@@ -24,9 +24,6 @@ locals {
         boot_args = [
           "systemd.unit=multi-user.target",
           "enforcing=0",
-          "rfkill.master_switch_mode=2",
-          "rfkill.default_state=1",
-          "cfg80211.ieee80211_regdom=US",
         ]
       })
       "1c-83-41-30-e2-54" = merge(local.image_set.coreos, {
@@ -34,9 +31,6 @@ locals {
         boot_args = [
           "systemd.unit=multi-user.target",
           "enforcing=0",
-          "rfkill.master_switch_mode=2",
-          "rfkill.default_state=1",
-          "cfg80211.ieee80211_regdom=US",
         ]
       })
       "1c-83-41-30-bd-6f" = merge(local.image_set.coreos, {
@@ -44,9 +38,6 @@ locals {
         boot_args = [
           "systemd.unit=multi-user.target",
           "enforcing=0",
-          "rfkill.master_switch_mode=2",
-          "rfkill.default_state=1",
-          "cfg80211.ieee80211_regdom=US",
         ]
       })
 
@@ -61,7 +52,6 @@ locals {
           # "vfio-pci.ids=10de:ffffffff:ffffffff:ffffffff:00030000:ffff00ff,10de:ffffffff:ffffffff:ffffffff:00040300:ffffffff",
           # "vfio-pci.ids=1002:ffffffff:ffffffff:ffffffff:00030000:ffff00ff,1002:ffffffff:ffffffff:ffffffff:00040300:ffffffff,10de:ffffffff:ffffffff:ffffffff:00030000:ffff00ff,10de:ffffffff:ffffffff:ffffffff:00040300:ffffffff",
           # "video=efifb:off",
-          "cfg80211.ieee80211_regdom=US",
         ]
       })
     }
