@@ -35,7 +35,7 @@ resource "helm_release" "kube_dns" {
   namespace    = "kube-system"
   repository   = "https://coredns.github.io/helm"
   chart        = "coredns"
-  version      = "1.19.5"
+  version      = "1.19.7"
   wait         = false
   reuse_values = true
   values = [
@@ -247,7 +247,7 @@ resource "helm_release" "nginx_ingress" {
   chart            = "ingress-nginx"
   namespace        = "ingress-nginx"
   create_namespace = true
-  version          = "4.3.0"
+  version          = "4.4.0"
   reuse_values     = true
   values = [
     yamlencode({
@@ -473,7 +473,7 @@ resource "helm_release" "authelia" {
   repository       = "https://charts.authelia.com"
   chart            = "authelia"
   create_namespace = true
-  version          = "0.8.45"
+  version          = "0.8.48"
   wait             = false
   reuse_values     = true
   values = [
@@ -637,7 +637,7 @@ resource "helm_release" "openebs" {
   namespace        = "openebs"
   repository       = "https://openebs.github.io/charts"
   chart            = "openebs"
-  version          = "3.3.0"
+  version          = "3.3.1"
   wait             = false
   create_namespace = true
   reuse_values     = true
