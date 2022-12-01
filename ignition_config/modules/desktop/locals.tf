@@ -7,9 +7,10 @@ locals {
       udev_steam_vr         = data.http.udev-60-steam-vr.response_body
       wlan_interface        = var.wlan_interface
       sunshine_config = {
-        min_threads             = 8
+        min_threads             = 1
         origin_web_ui_allowed   = "pc"
         origin_pin_allowed      = "pc"
+        upnp                    = "off"
         key_rightalt_to_key_win = "enabled"
       }
     })
