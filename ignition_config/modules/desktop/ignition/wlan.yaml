@@ -14,6 +14,7 @@ systemd:
 
             [Service]
             ExecStartPre=/usr/sbin/rfkill unblock wlan
+            ExecStartPre=/usr/sbin/iw dev ${wlan_interface} set power_save off
             ExecStart=
             ExecStart=/usr/sbin/wpa_supplicant -c /etc/wpa_supplicant/wpa_supplicant.conf -u -i ${wlan_interface}
 
