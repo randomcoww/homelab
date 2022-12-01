@@ -17,6 +17,8 @@ systemd:
         [Install]
         WantedBy=graphical.target
 
+# enables sunshine systemd user unit
+# ignition doesn't support systemd --user
 storage:
   files:
     # these dependencies work for gnome wayland
@@ -38,9 +40,6 @@ storage:
             "${k}=${v}"
           ])}
           Restart=on-failure
-
-          [Install]
-          WantedBy=gnome-session.target
   links:
     - path: /etc/systemd/user/gnome-session.target.wants/sunshine.service
       target: /etc/systemd/user/sunshine.service
