@@ -34,7 +34,6 @@ Reference: [Authelia user password generation](https://www.authelia.com/referenc
 ```bash
 KEY=$HOME/.ssh/id_ecdsa
 PASSWORD='password'
-EMAIL='email'
 WIREGUARD_CONFIG='filepath'
 
 cat > secrets.tfvars <<EOF
@@ -57,7 +56,7 @@ ssh_client = {
   validity_period_hours = 336
 }
 
-letsencrypt_email = "$EMAIL"
+letsencrypt_email = ""
 
 wireguard_client = {
   Interface = {
@@ -69,6 +68,13 @@ wireguard_client = {
     AllowedIPs = "$(cat $WIREGUARD_CONFIG | grep AllowedIPs | sed 's:.*\ = ::')"
     Endpoint   = "$(cat $WIREGUARD_CONFIG | grep Endpoint | sed 's:.*\ = ::')"
   }
+}
+
+hostapd = {
+  sae_password = "$PASSWORD"
+  ssid         = ""
+  country_code = ""
+  channel      = 100
 }
 EOF
 ```

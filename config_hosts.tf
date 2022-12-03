@@ -60,7 +60,6 @@ locals {
         }
       }
       container_storage_path = "${local.pv_mount_path}/storage"
-      local_provisioner_path = "${local.pv_mount_path}/local_path_provisioner"
     }
 
     gw-1 = {
@@ -123,7 +122,6 @@ locals {
         }
       }
       container_storage_path = "${local.pv_mount_path}/storage"
-      local_provisioner_path = "${local.pv_mount_path}/local_path_provisioner"
     }
 
     q-0 = {
@@ -186,19 +184,11 @@ locals {
         }
       }
       container_storage_path = "${local.pv_mount_path}/storage"
-      local_provisioner_path = "${local.pv_mount_path}/local_path_provisioner"
-      # kubernetes_worker_taints = [
-      #   {
-      #     key    = "node.kubernetes.io/unschedulable"
-      #     effect = "NoSchedule"
-      #     value  = "true"
-      #   },
-      # ]
     }
 
     de-0 = {
       # not needed
-      netnum = 0
+      netnum = 6
       users = [
         "client",
       ]
@@ -206,7 +196,7 @@ locals {
         phy0 = {
           mac   = "88-a4-c2-0d-eb-e7"
           mtu   = 9000
-          vlans = []
+          vlans = ["service", "kubernetes"]
         }
         # mobile
         phy1 = {
@@ -234,6 +224,14 @@ locals {
           source_interface_name = "br-lan"
           enable_dhcp           = true
         }
+        service = {
+          source_interface_name = "phy0-service"
+          enable_netnum         = true
+        }
+        kubernetes = {
+          source_interface_name = "phy0-kubernetes"
+          enable_netnum         = true
+        }
       }
       disks = {
         pv = {
@@ -246,6 +244,14 @@ locals {
           ]
         }
       }
+      container_storage_path = "/var/home/storage"
+      kubernetes_worker_taints = [
+        {
+          key    = "node.kubernetes.io/unschedulable"
+          effect = "NoSchedule"
+          value  = "true"
+        },
+      ]
     }
   }
 
@@ -253,14 +259,14 @@ locals {
     base              = ["gw-0", "gw-1", "q-0", "de-0"]
     systemd-networkd  = ["gw-0", "gw-1", "q-0", "de-0"]
     network-manager   = []
-    kubelet-base      = ["gw-0", "gw-1", "q-0"]
+    kubelet-base      = ["gw-0", "gw-1", "q-0", "de-0"]
     gateway           = ["gw-0", "gw-1", "q-0"]
     vrrp              = ["gw-0", "gw-1"]
     disks             = ["gw-0", "gw-1", "q-0", "de-0"]
     ssh-server        = ["gw-0", "gw-1", "q-0"]
     etcd              = ["gw-0", "gw-1", "q-0"]
     kubernetes-master = ["gw-0", "gw-1"]
-    kubernetes-worker = ["gw-0", "gw-1", "q-0"]
+    kubernetes-worker = ["gw-0", "gw-1", "q-0", "de-0"]
     desktop           = ["de-0"]
   }
 

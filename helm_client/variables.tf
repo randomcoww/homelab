@@ -14,3 +14,7 @@ variable "wireguard_client" {
     Peer      = map(string)
   })
 }
+
+variable "hostapd" {
+  type = map(string)
+}

@@ -271,12 +271,6 @@ resource "helm_release" "nginx_ingress" {
           proxy-buffering        = "off"
           ssl-redirect           = "true"
         }
-        tolerations = [
-          {
-            effect   = "NoExecute"
-            operator = "Exists"
-          },
-        ]
       }
     }),
   ]
@@ -1045,12 +1039,6 @@ resource "helm_release" "minio" {
           ]
         }
       }
-      tolerations = [
-        {
-          effect   = "NoExecute"
-          operator = "Exists"
-        },
-      ]
     }),
   ]
 }
@@ -1114,7 +1102,7 @@ resource "helm_release" "nvidia_device_plugin" {
 */
 
 # hostapd #
-/*
+
 module "hostapd-roaming" {
   source        = "./modules/hostapd_roaming"
   resource_name = "hostapd"
@@ -1126,7 +1114,7 @@ resource "helm_release" "hostapd" {
   namespace    = "default"
   repository   = "https://randomcoww.github.io/terraform-infra/"
   chart        = "hostapd"
-  version      = "0.1.7"
+  version      = "0.1.8"
   wait         = false
   reuse_values = true
   values = [
@@ -1137,36 +1125,47 @@ resource "helm_release" "hostapd" {
         {
           podName = peer.pod_name
           config = merge({
-            interface        = "wlan0"
-            preamble         = 1
-            noscan           = 1
-            auth_algs        = 1
-            hw_mode          = "g"
-            channel          = 6
-            driver           = "nl80211"
-            ieee80211n       = 1
-            require_ht       = 1
-            wmm_enabled      = 1
-            disassoc_low_ack = 1
-            wpa              = 2
-            wpa_key_mgmt     = "SAE"
-            wpa_pairwise     = "CCMP"
-            country_code     = "US"
-            ieee80211d       = 1
-            ieee80211h       = 1
-            ieee80211w       = 2
+            # sae_password=
+            # ssid=
+            # country_code=
+            # # one of: 36 44 52 60 100 108 116 124 132 140 149 157 184 192
+            # channel=
+            # # channel + 6: 42 58 106 122 138 155
+            vht_oper_centr_freq_seg0_idx = var.hostapd.channel + 6
+            interface                    = "wlan0"
+            bridge                       = "br-lan"
+            driver                       = "nl80211"
+            noscan                       = 1
+            preamble                     = 1
+            wpa                          = 2
+            wpa_key_mgmt                 = "SAE"
+            wpa_pairwise                 = "CCMP"
+            group_cipher                 = "CCMP"
+            ieee80211n                   = 1
+            require_ht                   = 1
+            hw_mode                      = "a"
+            ieee80211ac                  = 1
+            vht_oper_chwidth             = 1
+            require_vht                  = 1
+            ieee80211d                   = 1
+            ieee80211h                   = 0
+            ieee80211w                   = 2
+            ignore_broadcast_ssid        = 0
+            auth_algs                    = 1
+            wmm_enabled                  = 1
+            disassoc_low_ack             = 0
+            ap_max_inactivity            = 900
             ht_capab = "[${join("][", [
-              "LDPC", "HT40-", "HT40+", "SHORT-GI-40", "TX-STBC", "RX-STBC1", "DSSS_CCK-40",
+              "HT40-", "HT40+", "SHORT-GI-20", "SHORT-GI-40",
+              "LDPC", "TX-STBC", "RX-STBC1", "MAX-AMSDU-7935",
             ])}]"
-            # hw_mode                      = "a"
-            # channel                      = 149
-            # vht_oper_chwidth             = 1
-            # vht_oper_centr_freq_seg0_idx = 155
-            # ieee80211ac                  = 1
-            # require_vht                  = 1
-            # vht_capab = "[${join("][", [
-            #   "RXLDPC", "TX-STBC-2BY1", "RX-STBC-1", "MAX-A-MPDU-LEN-EXP3", "RX-ANTENNA-PATTERN", "TX-ANTENNA-PATTERN", "SHORT-GI-80",
-            # ])}]"
+            vht_capab = "[${join("][", [
+              "RXLDPC", "TX-STBC-2BY1", "RX-STBC-1", "SHORT-GI-80",
+              "MAX-MPDU-11454", "MAX-A-MPDU-LEN-EXP3",
+              "BF-ANTENNA-1", "SOUNDING-DIMENSION-1", "SU-BEAMFORMEE",
+              "BF-ANTENNA-2", "SOUNDING-DIMENSION-2", "MU-BEAMFORMEE",
+              "RX-ANTENNA-PATTERN", "TX-ANTENNA-PATTERN",
+            ])}]"
             bssid                 = peer.bssid
             mobility_domain       = peer.mobility_domain
             pmk_r1_push           = 1
@@ -1197,15 +1196,7 @@ resource "helm_release" "hostapd" {
                     key      = "kubernetes.io/hostname"
                     operator = "In"
                     values = [
-                      for _, member in local.members.gateway :
-                      member.hostname
-                    ]
-                  },
-                  {
-                    key      = "kubernetes.io/hostname"
-                    operator = "NotIn"
-                    values = [
-                      for _, member in local.members.vrrp :
+                      for _, member in local.members.desktop :
                       member.hostname
                     ]
                   },
@@ -1233,7 +1224,12 @@ resource "helm_release" "hostapd" {
           ]
         }
       }
+      tolerations = [
+        {
+          effect   = "NoSchedule"
+          operator = "Exists"
+        },
+      ]
     }),
   ]
 }
-*/
