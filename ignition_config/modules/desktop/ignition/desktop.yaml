@@ -51,6 +51,11 @@ storage:
       mode: 0644
       contents:
         inline: |
+          [org/gnome/desktop/background]
+          color-shading-type='solid'
+          primary-color='#000000000000'
+          secondary-color='#000000000000'
+
           [org/gnome/desktop/datetime]
           automatic-timezone=true
 
@@ -59,7 +64,10 @@ storage:
           autorun-never=true
 
           [org/gnome/desktop/screensaver]
+          color-shading-type='solid'
           lock-delay=uint32 3600
+          primary-color='#000000000000'
+          secondary-color='#000000000000'
 
           [org/gnome/desktop/search-providers]
           disable-external=true
