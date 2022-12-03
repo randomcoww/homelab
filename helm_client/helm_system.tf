@@ -1226,7 +1226,7 @@ resource "helm_release" "hostapd" {
       }
       tolerations = [
         {
-          effect   = "NoSchedule"
+          key      = "node-role.kubernetes.io/de"
           operator = "Exists"
         },
       ]

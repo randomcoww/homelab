@@ -247,9 +247,12 @@ locals {
       container_storage_path = "/var/home/storage"
       kubernetes_worker_taints = [
         {
-          key    = "node.kubernetes.io/unschedulable"
+          key    = "node-role.kubernetes.io/de"
           effect = "NoSchedule"
-          value  = "true"
+        },
+        {
+          key    = "node-role.kubernetes.io/de"
+          effect = "NoExecute"
         },
       ]
     }
