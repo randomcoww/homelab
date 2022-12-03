@@ -4,7 +4,7 @@ locals {
     admin = {
       name = "fcos"
       unix = {
-        home_dir = "/var/home/fcos"
+        home_dir = "${local.mounts.home_path}/fcos"
         groups = [
           "adm",
           "sudo",
@@ -17,7 +17,7 @@ locals {
       name = "randomcoww"
       unix = {
         uid      = 10000
-        home_dir = "/var/home/randomcoww"
+        home_dir = "${local.mounts.home_path}/randomcoww"
         groups = [
           "adm",
           "sudo",

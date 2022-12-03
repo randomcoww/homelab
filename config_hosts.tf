@@ -52,14 +52,14 @@ locals {
           device = "/dev/disk/by-id/nvme-VICKTER_NVME_SSD_WLN020A01247"
           partitions = [
             {
-              mount_path = local.pv_mount_path
+              mount_path = local.mounts.containers_path
               format     = "ext4"
               wipe       = false
             },
           ]
         }
       }
-      container_storage_path = "${local.pv_mount_path}/storage"
+      container_storage_path = "${local.mounts.containers_path}/storage"
     }
 
     gw-1 = {
@@ -114,14 +114,14 @@ locals {
           device = "/dev/disk/by-id/nvme-VICKTER_NVME_SSD_WLN020A01227"
           partitions = [
             {
-              mount_path = local.pv_mount_path
+              mount_path = local.mounts.containers_path
               format     = "ext4"
               wipe       = false
             },
           ]
         }
       }
-      container_storage_path = "${local.pv_mount_path}/storage"
+      container_storage_path = "${local.mounts.containers_path}/storage"
     }
 
     q-0 = {
@@ -176,14 +176,14 @@ locals {
           device = "/dev/disk/by-id/nvme-VICKTER_NVME_SSD_WLN020A00286"
           partitions = [
             {
-              mount_path = local.pv_mount_path
+              mount_path = local.mounts.containers_path
               format     = "ext4"
               wipe       = false
             },
           ]
         }
       }
-      container_storage_path = "${local.pv_mount_path}/storage"
+      container_storage_path = "${local.mounts.containers_path}/storage"
     }
 
     de-0 = {
@@ -238,13 +238,13 @@ locals {
           device = "/dev/disk/by-id/nvme-SKHynix_HFS512GDE9X084N_CYA8N037413008I5H"
           partitions = [
             {
-              mount_path = "/var/home"
+              mount_path = local.mounts.home_path
               wipe       = false
             },
           ]
         }
       }
-      container_storage_path = "/var/home/storage"
+      container_storage_path = "${local.mounts.containers_path}/storage"
       kubernetes_worker_taints = [
         {
           key    = "node-role.kubernetes.io/de"

@@ -617,7 +617,7 @@ resource "helm_release" "local-path-provisioner" {
       nodePathMap = [
         {
           node  = "DEFAULT_PATH_FOR_NON_LISTED_NODES"
-          paths = ["${local.pv_mount_path}/local_path_provisioner"]
+          paths = ["${local.mounts.containers_path}/local_path_provisioner"]
         },
       ]
     }),
@@ -645,7 +645,7 @@ resource "helm_release" "openebs" {
       }
       localprovisioner = {
         enabled  = true
-        basePath = "${local.pv_mount_path}/openebs/local"
+        basePath = "${local.mounts.containers_path}/openebs/local"
       }
       snapshotOperator = {
         enabled = false
@@ -653,7 +653,7 @@ resource "helm_release" "openebs" {
       jiva = {
         enabled            = true
         replicas           = 2
-        defaultStoragePath = "${local.pv_mount_path}/openebs"
+        defaultStoragePath = "${local.mounts.containers_path}/openebs"
       }
       ndmOperator = {
         enabled = false
