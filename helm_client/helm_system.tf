@@ -526,6 +526,7 @@ resource "helm_release" "authelia" {
               networks = [
                 local.networks.lan.prefix,
                 local.networks.service.prefix,
+                local.networks.kubernetes.prefix,
               ]
               policy = "bypass"
             },
@@ -542,6 +543,7 @@ resource "helm_release" "authelia" {
               networks = [
                 local.networks.lan.prefix,
                 local.networks.service.prefix,
+                local.networks.kubernetes.prefix,
               ]
               policy = "bypass"
             },
