@@ -520,15 +520,21 @@ resource "helm_release" "authelia" {
         }
         access_control = {
           default_policy = "deny"
-          rules = [
+          networks = [
             {
-              domain = local.kubernetes_ingress_endpoints.mpd
+              name = "whitelist"
               networks = [
                 local.networks.lan.prefix,
                 local.networks.service.prefix,
                 local.networks.kubernetes.prefix,
               ]
-              policy = "bypass"
+            },
+          ]
+          rules = [
+            {
+              domain   = local.kubernetes_ingress_endpoints.mpd
+              networks = ["whitelist"]
+              policy   = "bypass"
             },
             {
               domain = local.kubernetes_ingress_endpoints.mpd
@@ -539,13 +545,9 @@ resource "helm_release" "authelia" {
               policy = "one_factor"
             },
             {
-              domain = local.kubernetes_ingress_endpoints.webdav
-              networks = [
-                local.networks.lan.prefix,
-                local.networks.service.prefix,
-                local.networks.kubernetes.prefix,
-              ]
-              policy = "bypass"
+              domain   = local.kubernetes_ingress_endpoints.webdav
+              networks = ["whitelist"]
+              policy   = "bypass"
             },
             {
               domain = local.kubernetes_ingress_endpoints.webdav
