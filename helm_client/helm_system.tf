@@ -1157,7 +1157,7 @@ resource "helm_release" "hostapd" {
             ignore_broadcast_ssid        = 0
             auth_algs                    = 1
             wmm_enabled                  = 1
-            disassoc_low_ack             = 1
+            disassoc_low_ack             = 0
             ap_max_inactivity            = 900
             ht_capab = "[${join("][", [
               "HT40-", "HT40+", "SHORT-GI-20", "SHORT-GI-40",
