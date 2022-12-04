@@ -1063,7 +1063,7 @@ output "minio_endpoint" {
 }
 
 # amd device plugin #
-
+/*
 resource "helm_release" "amd_gpu" {
   name         = "amd-gpu"
   repository   = "https://radeonopencompute.github.io/k8s-device-plugin/"
@@ -1082,6 +1082,7 @@ resource "helm_release" "amd_gpu" {
     })
   ]
 }
+*/
 
 # nvidia device plugin #
 /*
