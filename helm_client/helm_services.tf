@@ -256,8 +256,6 @@ EOF
           speed-limit-up-enabled       = true
           start-added-torrents         = true
         }
-        # https://unix.stackexchange.com/questions/389705/understanding-the-exec-option-of-find
-        # https://unix.stackexchange.com/questions/134693/break-out-of-find-if-an-exec-fails
         doneScript = <<EOF
 #!/bin/sh
 set -xe

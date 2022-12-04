@@ -80,7 +80,7 @@ resource "helm_release" "kube_dns" {
               zone = "."
             },
           ]
-          port = local.ports.gateway_dns
+          port = 53
           plugins = [
             {
               name = "health"
