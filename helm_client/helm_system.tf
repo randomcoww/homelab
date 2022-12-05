@@ -143,7 +143,6 @@ resource "helm_release" "external_dns" {
         enabled = true
       }
       priorityClassName = "system-cluster-critical"
-      # replicaCount      = 2
       dataSources = [
         "service",
         "ingress",
@@ -163,6 +162,14 @@ resource "helm_release" "external_dns" {
                     operator = "In"
                     values = [
                       for _, member in local.members.gateway :
+                      member.hostname
+                    ]
+                  },
+                  {
+                    key      = "kubernetes.io/hostname"
+                    operator = "In"
+                    values = [
+                      for _, member in local.members.vrrp :
                       member.hostname
                     ]
                   },
@@ -695,8 +702,7 @@ module "kea-config" {
         local.services.gateway.ip,
       ]
       domain_name_servers = [
-        for _, member in local.members.gateway :
-        cidrhost(network.prefix, member.netnum)
+        local.services.gateway.ip,
       ]
       tftp_server = local.services.gateway.ip
       mtu         = network.mtu
@@ -731,6 +737,14 @@ resource "helm_release" "tftpd" {
                     operator = "In"
                     values = [
                       for _, member in local.members.gateway :
+                      member.hostname
+                    ]
+                  },
+                  {
+                    key      = "kubernetes.io/hostname"
+                    operator = "In"
+                    values = [
+                      for _, member in local.members.vrrp :
                       member.hostname
                     ]
                   },
