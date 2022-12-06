@@ -963,10 +963,6 @@ resource "helm_release" "minio" {
   reuse_values     = true
   values = [
     yamlencode({
-      image = {
-        repository = split(":", local.container_images.minio)[0]
-        tag        = split(":", local.container_images.minio)[1]
-      }
       clusterDomain = local.domains.kubernetes
       mode          = "distributed"
       rootUser      = random_password.minio-access-key-id.result

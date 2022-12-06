@@ -102,7 +102,6 @@ locals {
     etcd                    = "ghcr.io/randomcoww/etcd:v3.5.6"
 
     # Helm
-    minio              = "docker.io/minio/minio:RELEASE.2022-12-02T19-19-22Z"
     kea                = "ghcr.io/randomcoww/kea:2.2.0"
     matchbox           = "quay.io/poseidon/matchbox:v0.9.1-44-ge4d51492"
     coredns            = "docker.io/coredns/coredns:1.10.0"
