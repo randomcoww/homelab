@@ -1,13 +1,12 @@
 # webdav for minio #
 
 resource "helm_release" "webdav" {
-  name         = split(".", local.kubernetes_service_endpoints.webdav)[0]
-  namespace    = split(".", local.kubernetes_service_endpoints.webdav)[1]
-  repository   = "https://randomcoww.github.io/terraform-infra/"
-  chart        = "webdav"
-  version      = "0.1.5"
-  wait         = false
-  reuse_values = true
+  name       = split(".", local.kubernetes_service_endpoints.webdav)[0]
+  namespace  = split(".", local.kubernetes_service_endpoints.webdav)[1]
+  repository = "https://randomcoww.github.io/terraform-infra/"
+  chart      = "webdav"
+  version    = "0.1.5"
+  wait       = false
   values = [
     yamlencode({
       images = {
@@ -71,14 +70,14 @@ resource "helm_release" "mpd" {
   namespace  = "default"
   repository = "https://randomcoww.github.io/terraform-infra/"
   chart      = "mpd"
-  version    = "0.4.3"
+  version    = "0.4.6"
   wait       = false
-  # reuse_values = true
   values = [
     yamlencode({
       config = {
         filesystem_charset = "UTF-8"
         auto_update        = "yes"
+        metadata_to_use    = "AlbumArtist,Artist,Album,Title,Track,Disc,Genre,Name"
       }
       audioOutputs = [
         {
@@ -172,13 +171,12 @@ EOF
 # transmission with minio storage #
 
 resource "helm_release" "transmission" {
-  name         = "transmission"
-  namespace    = "default"
-  repository   = "https://randomcoww.github.io/terraform-infra/"
-  chart        = "transmission"
-  version      = "0.1.7"
-  wait         = false
-  reuse_values = true
+  name       = "transmission"
+  namespace  = "default"
+  repository = "https://randomcoww.github.io/terraform-infra/"
+  chart      = "transmission"
+  version    = "0.1.7"
+  wait       = false
   values = [
     yamlencode({
       persistence = {
