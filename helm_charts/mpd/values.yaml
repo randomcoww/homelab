@@ -41,7 +41,9 @@ ports:
   mympd: 8080
   rclone: 8081
 
-mpdCachePath: /mpd/cache
+paths:
+  mpdSocket: /run/mpd
+  mpdCache: /var/lib/mpd
 
 affinity: {}
 tolerations: {}

@@ -38,14 +38,14 @@ spec:
         - sh
         - -c
         - |
-          mkdir -p {{ .Values.mpdCachePath }}/playlists && \
+          mkdir -p {{ .Values.paths.mpdCache }}/playlists && \
           touch \
-            {{ .Values.mpdCachePath }}/tag_cache \
-            {{ .Values.mpdCachePath }}/state \
-            {{ .Values.mpdCachePath }}/sticker.sql
+            {{ .Values.paths.mpdCache }}/tag_cache \
+            {{ .Values.paths.mpdCache }}/state \
+            {{ .Values.paths.mpdCache }}/sticker.sql
         volumeMounts:
         - name: mpd-cache
-          mountPath: {{ .Values.mpdCachePath }}
+          mountPath: {{ .Values.paths.mpdCache }}
       containers:
       - name: {{ .Chart.Name }}
         image: {{ .Values.images.mpd }}
@@ -55,7 +55,9 @@ spec:
           mountPath: /etc/mpd.conf
           subPath: mpd.conf
         - name: mpd-cache
-          mountPath: {{ .Values.mpdCachePath }}
+          mountPath: {{ .Values.paths.mpdCache }}
+        - name: mpd-socket
+          mountPath: {{ .Values.paths.mpdSocket }}
         ports:
         {{- range $audioOutput := .Values.audioOutputs }}
         - containerPort: {{ $audioOutput.port }}
@@ -65,10 +67,17 @@ spec:
         ports:
         - containerPort: {{ .Values.ports.mympd }}
         env:
+        - name: MPD_HOST
+          value: "{{ .Values.paths.mpdSocket }}/socket"
         - name: MYMPD_SSL
           value: "false"
+        - name: MYMPD_HTTP_HOST
+          value: "0.0.0.0"
         - name: MYMPD_HTTP_PORT
           value: "{{ .Values.ports.mympd }}"
+        volumeMounts:
+        - name: mpd-socket
+          mountPath: {{ .Values.paths.mpdSocket }}
       - name: {{ .Chart.Name }}-rclone
         image: {{ .Values.images.rclone }}
         args:
@@ -84,6 +93,9 @@ spec:
       - name: mpd-config
         secret:
           secretName: {{ template "mpd.fullname" . }}
+      - name: mpd-socket
+        emptyDir:
+          medium: Memory
   volumeClaimTemplates:
   - metadata:
       name: mpd-cache
