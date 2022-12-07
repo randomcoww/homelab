@@ -26,7 +26,7 @@ spec:
 {{- if (and (eq .Values.uiService.type "NodePort") ( .Values.uiService.nodePort)) }}
     nodePort: {{ .Values.uiService.nodePort }}
 {{- else }}
-    targetPort: {{ .Values.ports.ympd }}
+    targetPort: {{ .Values.ports.mympd }}
 {{- end }}
 {{- if .Values.uiService.externalIPs }}
   externalIPs:

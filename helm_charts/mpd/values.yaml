@@ -34,11 +34,11 @@ persistence:
 
 images:
   mpd: ghcr.io/randomcoww/mpd:0.23.8
-  ympd: ghcr.io/randomcoww/ympd:latest
+  mympd: ghcr.io/randomcoww/mympd:latest
   rclone: docker.io/rclone/rclone:latest
 
 ports:
-  ympd: 8080
+  mympd: 80
   mpdControl: 6600
   rclone: 8081
 

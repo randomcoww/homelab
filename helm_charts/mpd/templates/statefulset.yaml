@@ -60,11 +60,10 @@ spec:
         {{- range $audioOutput := .Values.audioOutputs }}
         - containerPort: {{ $audioOutput.port }}
         {{- end }}
-      - name: {{ .Chart.Name }}-ympd
-        image: {{ .Values.images.ympd }}
-        args: ["-h", "127.0.0.1", "-p", "{{ .Values.ports.mpdControl }}", "-w", "{{ .Values.ports.ympd }}"]
+      - name: {{ .Chart.Name }}-mympd
+        image: {{ .Values.images.mympd }}
         ports:
-        - containerPort: {{ .Values.ports.ympd }}
+        - containerPort: {{ .Values.ports.mympd }}
       - name: {{ .Chart.Name }}-rclone
         image: {{ .Values.images.rclone }}
         args:

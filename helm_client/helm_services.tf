@@ -67,13 +67,13 @@ EOF
 # mpd #
 
 resource "helm_release" "mpd" {
-  name         = "mpd"
-  namespace    = "default"
-  repository   = "https://randomcoww.github.io/terraform-infra/"
-  chart        = "mpd"
-  version      = "0.3.7"
-  wait         = false
-  reuse_values = true
+  name       = "mpd"
+  namespace  = "default"
+  repository = "https://randomcoww.github.io/terraform-infra/"
+  chart      = "mpd"
+  version    = "0.4.2"
+  wait       = false
+  # reuse_values = true
   values = [
     yamlencode({
       config = {
@@ -113,7 +113,7 @@ resource "helm_release" "mpd" {
       }
       images = {
         mpd    = local.container_images.mpd
-        ympd   = local.container_images.ympd
+        mympd  = local.container_images.mympd
         rclone = local.container_images.rclone
       }
       ingress = {

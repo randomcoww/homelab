@@ -1,6 +1,6 @@
 {{- if .Values.uiIngress.enabled -}}
 {{- $fullName := include "mpd.fullname" . -}}
-{{- $servicePort := .Values.ports.ympd -}}
+{{- $servicePort := .Values.ports.mympd -}}
 {{- $ingressPath := .Values.uiIngress.path -}}
 apiVersion: {{ template "mpd.ingress.apiVersion" . }}
 kind: Ingress
