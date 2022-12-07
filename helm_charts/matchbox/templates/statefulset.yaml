@@ -127,7 +127,8 @@ spec:
           timeoutSeconds: 5
       volumes:
       - name: syncthing-home
-        emptyDir: {}
+        emptyDir:
+          medium: Memory
       - name: syncthing-config
         configMap:
           name: {{ template "matchbox.fullname" . }}-syncthing
@@ -138,4 +139,5 @@ spec:
         secret:
           secretName: {{ template "matchbox.fullname" . }}
       - name: shared-data
-        emptyDir: {}
+        emptyDir:
+          medium: Memory

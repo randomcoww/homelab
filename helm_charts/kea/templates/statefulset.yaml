@@ -104,7 +104,8 @@ spec:
           readOnly: true
       volumes:
       - name: shared-data
-        emptyDir: {}
+        emptyDir:
+          medium: Memory
       - name: kea-config
         configMap:
           name: {{ template "kea.fullname" . }}
