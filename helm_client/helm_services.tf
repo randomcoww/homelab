@@ -90,7 +90,7 @@ resource "helm_release" "mpd" {
             always_on   = "yes"
             encoder     = "flac"
             compression = 3
-            max_clients = 0
+            max_clients = 2
           }
         },
         {
@@ -102,7 +102,7 @@ resource "helm_release" "mpd" {
             always_on   = "yes"
             encoder     = "lame"
             quality     = 9
-            max_clients = 0
+            max_clients = 2
           }
         },
       ]
