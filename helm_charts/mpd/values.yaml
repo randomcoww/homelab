@@ -38,8 +38,7 @@ images:
   rclone: docker.io/rclone/rclone:latest
 
 ports:
-  mympd: 80
-  mpdControl: 6600
+  mympd: 8080
   rclone: 8081
 
 mpdCachePath: /mpd/cache

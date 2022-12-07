@@ -71,7 +71,7 @@ resource "helm_release" "mpd" {
   namespace  = "default"
   repository = "https://randomcoww.github.io/terraform-infra/"
   chart      = "mpd"
-  version    = "0.4.2"
+  version    = "0.4.3"
   wait       = false
   # reuse_values = true
   values = [

@@ -110,7 +110,7 @@ locals {
     syncthing          = "docker.io/syncthing/syncthing:1.22"
     rclone             = "docker.io/rclone/rclone:1.60"
     mpd                = "ghcr.io/randomcoww/mpd:0.23.11"
-    mympd              = "ghcr.io/randomcoww/mympd:v10.1.5"
+    mympd              = "ghcr.io/jcorporation/mympd/mympd:10.1.5"
     flannel            = "docker.io/flannelcni/flannel:v0.20.2"
     flannel_cni_plugin = "docker.io/flannelcni/flannel-cni-plugin:v1.2.0"
     kapprover          = "ghcr.io/randomcoww/kapprover:latest"

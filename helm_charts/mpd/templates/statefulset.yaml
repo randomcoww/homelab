@@ -64,6 +64,11 @@ spec:
         image: {{ .Values.images.mympd }}
         ports:
         - containerPort: {{ .Values.ports.mympd }}
+        env:
+        - name: MYMPD_SSL
+          value: "false"
+        - name: MYMPD_HTTP_PORT
+          value: "{{ .Values.ports.mympd }}"
       - name: {{ .Chart.Name }}-rclone
         image: {{ .Values.images.rclone }}
         args:
