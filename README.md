@@ -108,7 +108,8 @@ export asset_path=$(pwd)/../coreos/builds/latest/x86_64
 tw terraform -chdir=bootstrap_server apply \
   -var network_name=$network \
   -var listen_ip=$listen_ip \
-  -var assets_path=$asset_path
+  -var assets_path=$asset_path \
+  -var manifests_path=./output/manifests
 ```
 
 Launch manifest with kubelet

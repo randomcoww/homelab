@@ -9,3 +9,7 @@ variable "listen_ip" {
 variable "assets_path" {
   type = string
 }
+
+variable "manifests_path" {
+  type = string
+}

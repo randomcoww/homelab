@@ -3,7 +3,7 @@ locals {
   listen_ip      = var.listen_ip
   manifests = {
     for f in fileset(".", "${path.module}/manifests/*.yaml") :
-    f => templatefile(f, {
+    basename(f) => templatefile(f, {
       container_images = local.container_images
       ports            = local.ports
       config_path      = "/etc/bootstrap"
@@ -61,6 +61,6 @@ locals {
 resource "local_file" "bootstrap_manifests" {
   for_each = local.manifests
 
-  filename = "./output/${each.key}"
+  filename = "${var.manifests_path}/${each.key}"
   content  = each.value
 }
