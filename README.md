@@ -99,17 +99,16 @@ Embed the ignition files generated above into the image to allow them to boot co
 Asset path should be the build path of `fedora-coreos-config-custom`
 
 ```bash
-export network=lan
-export listen_ip=$(ip -j addr show $network | jq -r 'map(.addr_info) | map(map(select(.family == "inet").local)) | flatten | .[0]')
-export asset_path=$(pwd)/../coreos/builds/latest/x86_64
+export host_ip=$(ip -br addr show lan | awk '{print $3}')
+export assets_path=$(pwd)/../coreos/builds/latest/x86_64
+export manifests_path=./output/manifests
 ```
 
 ```bash
 tw terraform -chdir=bootstrap_server apply \
-  -var network_name=$network \
-  -var listen_ip=$listen_ip \
-  -var assets_path=$asset_path \
-  -var manifests_path=./output/manifests
+  -var host_ip=$host_ip \
+  -var assets_path=$assets_path \
+  -var manifests_path=$manifests_path
 ```
 
 Launch manifest with kubelet
@@ -122,7 +121,7 @@ Populate bootstrap service with PXE boot configuration
 
 ```bash
 tw terraform -chdir=bootstrap_client apply \
-  -var listen_ip=$listen_ip
+  -var host_ip=$host_ip
 ```
 
 Stop service after PXE boot stack is launched on Kubernetes
@@ -131,10 +130,9 @@ Stop service after PXE boot stack is launched on Kubernetes
 sudo rm /var/lib/kubelet/manifests/bootstrap.yaml
 
 tw terraform -chdir=bootstrap_server destroy \
-  -var network_name=$network \
-  -var listen_ip=$listen_ip \
-  -var assets_path=$asset_path \
-  -var manifests_path=./output/manifests
+  -var host_ip=$host_ip \
+  -var assets_path=$assets_path \
+  -var manifests_path=$manifests_path
 ```
 
 ### Deploy services to kubernetes

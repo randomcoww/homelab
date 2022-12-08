@@ -1,3 +1,3 @@
-variable "listen_ip" {
+variable "host_ip" {
   type = string
 }

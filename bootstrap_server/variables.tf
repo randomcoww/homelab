@@ -1,8 +1,4 @@
-variable "network_name" {
-  type = string
-}
-
-variable "listen_ip" {
+variable "host_ip" {
   type = string
 }
 
