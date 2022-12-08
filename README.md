@@ -94,6 +94,42 @@ See [fedora-coreos-config-custom](https://github.com/randomcoww/fedora-coreos-co
 
 Embed the ignition files generated above into the image to allow them to boot configured
 
+### Launch local bootstrap service to PXE boot servers
+
+Asset path should be the build path of `fedora-coreos-config-custom`
+
+```bash
+export network=lan
+export listen_ip=$(ip -j addr show $network | jq -r 'map(.addr_info) | map(map(select(.family == "inet").local)) | flatten | .[]')
+export asset_path=$(pwd)/../coreos/builds/latest/x86_64
+```
+
+```bash
+tw terraform -chdir=bootstrap_server apply \
+  -var network_name=$network \
+  -var listen_ip=$listen_ip \
+  -var assets_path=$asset_path
+```
+
+Launch manifest with kubelet
+
+```bash
+sudo cp output/manifests/bootstrap.yaml /var/lib/kubelet/manifests
+```
+
+Populate bootstrap service with PXE boot configuration
+
+```bash
+tw terraform -chdir=bootstrap_client apply \
+  -var listen_ip=$listen_ip
+```
+
+Stop service after PXE boot stack is launched on Kubernetes
+
+```bash
+sudo rm /var/lib/kubelet/manifests/bootstrap.yaml
+```
+
 ### Deploy services to kubernetes
 
 #### Write admin kubeconfig

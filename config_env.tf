@@ -121,8 +121,8 @@ locals {
   }
 
   kubernetes = {
-    etcd_cluster_token        = "prod-6"
-    cluster_name              = "prod-6"
+    etcd_cluster_token        = "prod-7"
+    cluster_name              = "prod-7"
     static_pod_manifest_path  = "/var/lib/kubelet/manifests"
     cni_bridge_interface_name = "cni0"
   }

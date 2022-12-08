@@ -1,6 +1,6 @@
 locals {
   pxeboot_image_builds = {
-    coreos     = "fedora-coreos-37.20221130.0"
+    coreos     = "fedora-coreos-37.20221207.0"
     silverblue = "fedora-silverblue-37.20221206.0"
   }
 
@@ -14,10 +14,6 @@ locals {
   }
 
   pxeboot = {
-    matchbox_endpoint     = "http://${local.services.matchbox.ip}:${local.ports.matchbox}"
-    matchbox_api_endpoint = "${local.services.matchbox.ip}:${local.ports.matchbox_api}"
-    image_store_endpoint  = "http://${local.services.minio.ip}:${local.ports.minio}/${local.minio_buckets.image_store}"
-
     hosts = {
       "1c-83-41-30-e2-23" = merge(local.image_set.coreos, {
         ignition = "gw-0"
@@ -58,5 +54,38 @@ locals {
         ]
       })
     }
+  }
+}
+
+resource "matchbox_profile" "pxeboot" {
+  for_each = local.pxeboot.hosts
+
+  name   = each.key
+  kernel = "${local.image_store_endpoint}/${each.value.kernel_image_name}"
+  initrd = ["${local.image_store_endpoint}/${each.value.initrd_image_name}"]
+  args = concat([
+    "intel_iommu=on",
+    "amd_iommu=on",
+    "iommu=pt",
+    "rd.driver.pre=vfio-pci",
+    "rd.neednet=1",
+    "ip=dhcp",
+    "ignition.firstboot",
+    "ignition.platform.id=metal",
+    "coreos.no_persist_ip",
+    "initrd=${each.value.initrd_image_name}",
+    "ignition.config.url=${local.matchbox_endpoint}/ignition?mac=$${mac:hexhyp}",
+    "coreos.live.rootfs_url=${local.image_store_endpoint}/${each.value.rootfs_image_name}",
+  ], each.value.boot_args)
+  raw_ignition = file("output/ignition/${each.value.ignition}.ign")
+}
+
+resource "matchbox_group" "pxeboot" {
+  for_each = local.pxeboot.hosts
+
+  profile = matchbox_profile.pxeboot[each.key].name
+  name    = each.key
+  selector = {
+    mac = each.key
   }
 }
