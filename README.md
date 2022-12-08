@@ -100,7 +100,7 @@ Asset path should be the build path of `fedora-coreos-config-custom`
 
 ```bash
 export network=lan
-export listen_ip=$(ip -j addr show $network | jq -r 'map(.addr_info) | map(map(select(.family == "inet").local)) | flatten | .[]')
+export listen_ip=$(ip -j addr show $network | jq -r 'map(.addr_info) | map(map(select(.family == "inet").local)) | flatten | .[0]')
 export asset_path=$(pwd)/../coreos/builds/latest/x86_64
 ```
 
