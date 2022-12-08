@@ -129,6 +129,12 @@ Stop service after PXE boot stack is launched on Kubernetes
 
 ```bash
 sudo rm /var/lib/kubelet/manifests/bootstrap.yaml
+
+tw terraform -chdir=bootstrap_server destroy \
+  -var network_name=$network \
+  -var listen_ip=$listen_ip \
+  -var assets_path=$asset_path \
+  -var manifests_path=./output/manifests
 ```
 
 ### Deploy services to kubernetes
