@@ -137,7 +137,6 @@ locals {
     mpd          = "mpd.${local.domains.internal}"
     auth         = "auth.${local.domains.internal}"
     transmission = "t.${local.domains.internal}"
-    webdav       = "w.${local.domains.internal}"
     minio        = "m.${local.domains.internal}"
   }
 
@@ -145,13 +144,11 @@ locals {
     kubernetes = "kubernetes.default.svc.${local.domains.kubernetes}"
     minio      = "minio.minio.svc.${local.domains.kubernetes}"
     authelia   = "authelia.authelia.svc.${local.domains.kubernetes}"
-    webdav     = "webdav.default.svc.${local.domains.kubernetes}"
   }
 
   minio_buckets = {
     image_store  = "boot"
     music        = "music"
-    video        = "video"
     transmission = "downloads"
     ebook        = "ebook"
   }

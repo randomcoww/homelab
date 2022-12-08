@@ -50,7 +50,7 @@ spec:
     image: ${container_images.tftpd}
     args:
     - "--address"
-    - "0.0.0.0:69"
+    - "0.0.0.0:${ports.pxe_tftp}"
     - "--verbose"
     securityContext:
       capabilities:
