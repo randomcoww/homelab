@@ -95,6 +95,11 @@ fallthrough in-addr.arpa ip6.arpa
 ttl 30
 EOF
             },
+            # cert-manager uses to verify resources internally
+            {
+              name       = "forward"
+              parameters = "${local.domains.internal} dns://${local.services.cluster_external_dns.ip}"
+            },
             {
               name        = "forward"
               parameters  = ". tls://${local.upstream_dns_ip}"
@@ -287,6 +292,7 @@ resource "helm_release" "cert_manager" {
   chart            = "cert-manager"
   namespace        = "cert-manager"
   create_namespace = true
+  version          = "1.9.2"
   wait             = true
   values = [
     yamlencode({
@@ -298,14 +304,30 @@ resource "helm_release" "cert_manager" {
   ]
 }
 
+resource "null_resource" "letsencrypt-id" {
+  triggers = {
+    id = var.letsencrypt_email
+  }
+}
+
 resource "tls_private_key" "letsencrypt-prod" {
   algorithm = "RSA"
   rsa_bits  = 4096
+  lifecycle {
+    replace_triggered_by = [
+      null_resource.letsencrypt-id,
+    ]
+  }
 }
 
 resource "tls_private_key" "letsencrypt-staging" {
   algorithm = "RSA"
   rsa_bits  = 4096
+  lifecycle {
+    replace_triggered_by = [
+      null_resource.letsencrypt-id,
+    ]
+  }
 }
 
 resource "helm_release" "cert_issuer_secrets" {
@@ -340,12 +362,9 @@ resource "helm_release" "cert_issuer_secrets" {
             "tls.key" = chomp(tls_private_key.letsencrypt-staging.private_key_pem)
           }
           type = "Opaque"
-        }
+        },
       ]
     }),
-  ]
-  depends_on = [
-    helm_release.cert_manager,
   ]
 }
 
@@ -418,6 +437,7 @@ resource "helm_release" "cert_issuer" {
   ]
   lifecycle {
     replace_triggered_by = [
+      helm_release.cert_manager,
       helm_release.cert_issuer_secrets,
     ]
   }
