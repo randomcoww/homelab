@@ -7,7 +7,7 @@ terraform {
   }
   required_providers {
     helm = {
-      source  = "hashicorp/helm"
+      source = "hashicorp/helm"
     }
   }
 }

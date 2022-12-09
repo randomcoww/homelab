@@ -7,7 +7,7 @@ terraform {
   }
   required_providers {
     ct = {
-      source  = "poseidon/ct"
+      source = "poseidon/ct"
     }
     ssh = {
       source = "github.com/randomcoww/ssh"
