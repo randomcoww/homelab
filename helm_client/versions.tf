@@ -1,8 +1,14 @@
 terraform {
+  backend "s3" {
+    bucket  = "randomcoww-tfstate"
+    key     = "helm_client-22.tfstate"
+    region  = "us-west-2"
+    encrypt = true
+  }
   required_providers {
     helm = {
       source  = "hashicorp/helm"
-      version = "2.4.1"
+      version = "2.7.1"
     }
   }
 }
