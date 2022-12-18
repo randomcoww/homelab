@@ -26,11 +26,6 @@ locals {
               boot-file-name = "http://${local.listen_ip}:${local.ports.matchbox}/boot.ipxe"
             },
             {
-              name           = "ipxe"
-              test           = "not(substring(option[77].hex,0,4) == 'iPXE') and (option[93].hex == 0x0000)"
-              boot-file-name = "/undionly.kpxe"
-            },
-            {
               name           = "ipxe_efi"
               test           = "not(substring(option[77].hex,0,4) == 'iPXE') and (option[93].hex == 0x0007)"
               boot-file-name = "/ipxe.efi"

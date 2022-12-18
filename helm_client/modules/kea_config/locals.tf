@@ -67,15 +67,21 @@ locals {
               boot-file-name = var.ipxe_file_url
             },
             {
-              name           = "ipxe"
-              test           = "not(substring(option[77].hex,0,4) == 'iPXE') and (option[93].hex == 0x0000)"
-              boot-file-name = "/undionly.kpxe"
-            },
-            {
               name           = "ipxe_efi"
               test           = "not(substring(option[77].hex,0,4) == 'iPXE') and (option[93].hex == 0x0007)"
               boot-file-name = "/ipxe.efi"
             },
+            # {
+            #   name           = "HTTPClient"
+            #   test           = "not(substring(option[77].hex,0,4) == 'iPXE') and (option[93].hex == 0x0010)"
+            #   boot-file-name = "http://boot.ipxe.org/ipxe.efi"
+            #   option-data = [
+            #     {
+            #       name = "vendor-class-identifier"
+            #       data = "HTTPClient"
+            #     },
+            #   ]
+            # },
           ]
           subnet4 = [
             for network_name, network in var.networks :
