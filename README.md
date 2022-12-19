@@ -192,8 +192,8 @@ kubectl get po -l app=minio
 Once pods are running make the `boot` bucket for holding PXE boot images
 
 ```
-mc mb minio/boot
-mc anonymous set download minio/boot
+mc mb m/boot
+mc anonymous set download m/boot
 ```
 
 #### Push OS images generated previously into Minio

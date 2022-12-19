@@ -1057,7 +1057,7 @@ output "minio_endpoint" {
   value = {
     version = "10"
     aliases = {
-      minio = {
+      m = {
         url       = "http://${local.services.minio.ip}:${local.ports.minio}"
         accessKey = nonsensitive(random_password.minio-access-key-id.result)
         secretKey = nonsensitive(random_password.minio-secret-access-key.result)
