@@ -12,6 +12,8 @@ locals {
         origin_pin_allowed      = "pc"
         upnp                    = "off"
         key_rightalt_to_key_win = "enabled"
+        sunshine_name           = "sunshine"
+        output_name             = 0
       }
     })
   ]
