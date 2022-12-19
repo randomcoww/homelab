@@ -86,6 +86,6 @@ resource "matchbox_group" "pxeboot" {
   profile = matchbox_profile.pxeboot[each.key].name
   name    = each.key
   selector = {
-    mac = each.key
+    mac = replace(each.key, "-", ":")
   }
 }
