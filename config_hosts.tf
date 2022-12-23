@@ -235,8 +235,80 @@ locals {
         }
       }
       disks = {
+        # pv = {
+        #   device = "/dev/disk/by-id/nvme-SKHynix_HFS512GDE9X084N_CYA8N037413008I5H"
+        #   partitions = [
+        #     {
+        #       mount_path = local.mounts.home_path
+        #       wipe       = false
+        #     },
+        #   ]
+        # }
+      }
+      container_storage_path = "${local.mounts.home_path}/storage"
+      kubernetes_worker_taints = [
+        {
+          key    = "node-role.kubernetes.io/de"
+          effect = "NoSchedule"
+        },
+        {
+          key    = "node-role.kubernetes.io/de"
+          effect = "NoExecute"
+        },
+      ]
+    }
+
+    de-1 = {
+      # not needed
+      netnum = 7
+      users = [
+        "client",
+      ]
+      hardware_interfaces = {
+        phy0 = {
+          mac   = "58-47-ca-70-38-16"
+          mtu   = 9000
+          vlans = ["service", "kubernetes"]
+        }
+        # mobile
+        phy1 = {
+          mac         = "32-57-14-7a-aa-10"
+          enable_dhcp = true
+          enable_arp  = true
+          metric      = 512
+        }
+        wlan0 = {
+          mac         = "10-6f-d9-73-84-6b"
+          enable_dhcp = true
+          enable_arp  = true
+          enable_mdns = true
+          metric      = 2048
+        }
+      }
+      bridge_interfaces = {
+        br-lan = {
+          interfaces = ["phy0"]
+          mtu        = 9000
+        }
+      }
+      tap_interfaces = {
+        lan = {
+          source_interface_name = "br-lan"
+          enable_dhcp           = true
+          enable_netnum         = true
+        }
+        service = {
+          source_interface_name = "phy0-service"
+          enable_netnum         = true
+        }
+        kubernetes = {
+          source_interface_name = "phy0-kubernetes"
+          enable_netnum         = true
+        }
+      }
+      disks = {
         pv = {
-          device = "/dev/disk/by-id/nvme-SKHynix_HFS512GDE9X084N_CYA8N037413008I5H"
+          device = "/dev/disk/by-id/nvme-KINGSTON_OM8PGP4512Q-A0_50026B7282E59E03"
           partitions = [
             {
               mount_path = local.mounts.home_path
@@ -260,18 +332,18 @@ locals {
   }
 
   base_members = {
-    base              = ["gw-0", "gw-1", "q-0", "de-0"]
-    systemd-networkd  = ["gw-0", "gw-1", "q-0", "de-0"]
+    base              = ["gw-0", "gw-1", "q-0", "de-0", "de-1"]
+    systemd-networkd  = ["gw-0", "gw-1", "q-0", "de-0", "de-1"]
     network-manager   = []
-    kubelet-base      = ["gw-0", "gw-1", "q-0", "de-0"]
+    kubelet-base      = ["gw-0", "gw-1", "q-0", "de-0", "de-1"]
     gateway           = ["gw-0", "gw-1", "q-0"]
     vrrp              = ["gw-0", "gw-1"]
-    disks             = ["gw-0", "gw-1", "q-0", "de-0"]
+    disks             = ["gw-0", "gw-1", "q-0", "de-0", "de-1"]
     ssh-server        = ["gw-0", "gw-1", "q-0"]
     etcd              = ["gw-0", "gw-1", "q-0"]
     kubernetes-master = ["gw-0", "gw-1"]
-    kubernetes-worker = ["gw-0", "gw-1", "q-0", "de-0"]
-    desktop           = ["de-0"]
+    kubernetes-worker = ["gw-0", "gw-1", "q-0", "de-0", "de-1"]
+    desktop           = ["de-0", "de-1"]
   }
 
   hosts = {

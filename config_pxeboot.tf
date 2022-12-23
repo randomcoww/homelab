@@ -45,12 +45,19 @@ locals {
           # "rd.driver.blacklist=nouveau",
           # "modprobe.blacklist=nouveau",
           # "nvidia_drm.modeset=1",
-          # "vfio-pci.ids=10de:ffffffff:ffffffff:ffffffff:00030000:ffff00ff,10de:ffffffff:ffffffff:ffffffff:00040300:ffffffff",
-          # "vfio-pci.ids=1002:ffffffff:ffffffff:ffffffff:00030000:ffff00ff,1002:ffffffff:ffffffff:ffffffff:00040300:ffffffff,10de:ffffffff:ffffffff:ffffffff:00030000:ffff00ff,10de:ffffffff:ffffffff:ffffffff:00040300:ffffffff",
-          # "video=efifb:off",
           # "mlx4_core.num_vfs=8",
           # "mlx4_core.port_type_array=2",
           # "mlx4_core.probe_vf=8",
+        ]
+      })
+      "58-47-ca-70-38-16" = merge(local.image_set.silverblue, {
+        ignition = "de-1"
+        boot_args = [
+          "enforcing=0",
+          "rfkill.default_state=1",
+          # "vfio-pci.ids=10de:ffffffff:ffffffff:ffffffff:00030000:ffff00ff,10de:ffffffff:ffffffff:ffffffff:00040300:ffffffff",
+          # "vfio-pci.ids=1002:ffffffff:ffffffff:ffffffff:00030000:ffff00ff,1002:ffffffff:ffffffff:ffffffff:00040300:ffffffff,10de:ffffffff:ffffffff:ffffffff:00030000:ffff00ff,10de:ffffffff:ffffffff:ffffffff:00040300:ffffffff",
+          # "video=efifb:off",
         ]
       })
     }
