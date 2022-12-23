@@ -316,3 +316,21 @@ virsh start de-1-pt
 ```
 
 No video output is available unless a display is attached to the GPU being passed through
+
+## Personal desktop setup
+
+```bash
+flatpak --user remote-add --if-not-exists flathub https://flathub.org/repo/flathub.flatpakrepo
+
+flatpak --user -y install flathub \
+  com.brave.Browser \
+  com.visualstudio.code \
+  org.kde.krita \
+  org.inkscape.Inkscape \
+  org.blender.Blender \
+  io.mpv.Mpv \
+  org.nomacs.ImageLounge \
+  com.valvesoftware.Steam \
+  net.lutris.Lutris \
+  com.heroicgameslauncher.hgl
+```
