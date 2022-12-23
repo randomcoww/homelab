@@ -186,78 +186,6 @@ locals {
       container_storage_path = "${local.mounts.containers_path}/storage"
     }
 
-    de-0 = {
-      # not needed
-      netnum = 6
-      users = [
-        "client",
-      ]
-      hardware_interfaces = {
-        phy0 = {
-          mac   = "88-a4-c2-0d-eb-e7"
-          mtu   = 9000
-          vlans = ["service", "kubernetes"]
-        }
-        # mobile
-        phy1 = {
-          mac         = "32-57-14-7a-aa-10"
-          enable_dhcp = true
-          enable_arp  = true
-          metric      = 512
-        }
-        wlan0 = {
-          mac         = "b4-b5-b6-74-79-15"
-          enable_dhcp = true
-          enable_arp  = true
-          enable_mdns = true
-          metric      = 2048
-        }
-      }
-      bridge_interfaces = {
-        br-lan = {
-          interfaces = ["phy0"]
-          mtu        = 9000
-        }
-      }
-      tap_interfaces = {
-        lan = {
-          source_interface_name = "br-lan"
-          enable_dhcp           = true
-          enable_netnum         = true
-        }
-        service = {
-          source_interface_name = "phy0-service"
-          enable_netnum         = true
-        }
-        kubernetes = {
-          source_interface_name = "phy0-kubernetes"
-          enable_netnum         = true
-        }
-      }
-      disks = {
-        # pv = {
-        #   device = "/dev/disk/by-id/nvme-SKHynix_HFS512GDE9X084N_CYA8N037413008I5H"
-        #   partitions = [
-        #     {
-        #       mount_path = local.mounts.home_path
-        #       wipe       = false
-        #     },
-        #   ]
-        # }
-      }
-      container_storage_path = "${local.mounts.home_path}/storage"
-      kubernetes_worker_taints = [
-        {
-          key    = "node-role.kubernetes.io/de"
-          effect = "NoSchedule"
-        },
-        {
-          key    = "node-role.kubernetes.io/de"
-          effect = "NoExecute"
-        },
-      ]
-    }
-
     de-1 = {
       # not needed
       netnum = 7
@@ -332,18 +260,18 @@ locals {
   }
 
   base_members = {
-    base              = ["gw-0", "gw-1", "q-0", "de-0", "de-1"]
-    systemd-networkd  = ["gw-0", "gw-1", "q-0", "de-0", "de-1"]
+    base              = ["gw-0", "gw-1", "q-0", "de-1"]
+    systemd-networkd  = ["gw-0", "gw-1", "q-0", "de-1"]
     network-manager   = []
-    kubelet-base      = ["gw-0", "gw-1", "q-0", "de-0", "de-1"]
+    kubelet-base      = ["gw-0", "gw-1", "q-0", "de-1"]
     gateway           = ["gw-0", "gw-1", "q-0"]
     vrrp              = ["gw-0", "gw-1"]
-    disks             = ["gw-0", "gw-1", "q-0", "de-0", "de-1"]
+    disks             = ["gw-0", "gw-1", "q-0", "de-1"]
     ssh-server        = ["gw-0", "gw-1", "q-0"]
     etcd              = ["gw-0", "gw-1", "q-0"]
     kubernetes-master = ["gw-0", "gw-1"]
-    kubernetes-worker = ["gw-0", "gw-1", "q-0", "de-0", "de-1"]
-    desktop           = ["de-0", "de-1"]
+    kubernetes-worker = ["gw-0", "gw-1", "q-0", "de-1"]
+    desktop           = ["de-1"]
   }
 
   hosts = {
