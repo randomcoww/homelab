@@ -14,7 +14,7 @@ resource "helm_release" "webdav" {
       }
       replicaCount  = 2
       minioEndPoint = "http://${local.kubernetes_service_endpoints.minio}:${local.ports.minio}"
-      minioBucket   = local.minio_buckets.video
+      minioBucket   = local.minio_buckets.video.name
       affinity = {
         podAntiAffinity = {
           requiredDuringSchedulingIgnoredDuringExecution = [
@@ -107,7 +107,7 @@ resource "helm_release" "mpd" {
         },
       ]
       minioEndPoint = "http://${local.kubernetes_service_endpoints.minio}:${local.ports.minio}"
-      minioBucket   = local.minio_buckets.music
+      minioBucket   = local.minio_buckets.music.name
       persistence = {
         storageClass = "openebs-jiva-csi-default"
       }
@@ -272,7 +272,7 @@ transmission-remote 127.0.0.1:${local.ports.transmission} \
 
 minio-client \
   -endpoint="${local.kubernetes_service_endpoints.minio}:${local.ports.minio}" \
-  -bucket="${local.minio_buckets.transmission}" \
+  -bucket="${local.minio_buckets.transmission.name}" \
   -access-key-id="${random_password.minio-access-key-id.result}" \
   -secret-access-key="${random_password.minio-secret-access-key.result}" \
   -path="$TR_TORRENT_NAME"

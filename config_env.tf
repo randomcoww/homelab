@@ -146,13 +146,6 @@ locals {
     authelia   = "authelia.authelia.svc.${local.domains.kubernetes}"
   }
 
-  minio_buckets = {
-    image_store  = "boot"
-    music        = "music"
-    transmission = "downloads"
-    ebook        = "ebook"
-  }
-
   ports = {
     kea_peer           = 58080
     gateway_dns        = 53
@@ -169,6 +162,29 @@ locals {
     matchbox_api       = 50101
     minio              = 9000
     transmission       = 9091
+  }
+
+  minio_buckets = {
+    image_store = {
+      name   = "boot"
+      policy = "download"
+    }
+    music = {
+      name   = "music"
+      policy = "download"
+    }
+    transmission = {
+      name   = "downloads"
+      policy = "none"
+    }
+    ebook = {
+      name   = "ebook"
+      policy = "none"
+    }
+    video = {
+      name   = "video"
+      policy = "none"
+    }
   }
 
   upstream_dns_ip             = "9.9.9.9"

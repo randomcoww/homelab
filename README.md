@@ -162,7 +162,7 @@ This will provision services used in following steps
 
 ### Create PXE boot entry for nodes
 
-#### Prepare minio client
+#### MinIO access
 
 Download `mc`
 
@@ -177,23 +177,6 @@ Write configuration for `mc`
 mkdir -p ~/.mc && \
 tw terraform -chdir=helm_client \
   output -json minio_endpoint > ~/.mc/config.json
-```
-
-#### Create and configure buckets
-
-TODO: Handle this in terraform or helm
-
-Check that minio pods are running
-
-```bash
-kubectl get po -l app=minio
-```
-
-Once pods are running make the `boot` bucket for holding PXE boot images
-
-```
-mc mb m/boot
-mc anonymous set download m/boot
 ```
 
 #### Push OS images generated previously into Minio

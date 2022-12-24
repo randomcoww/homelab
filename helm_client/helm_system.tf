@@ -954,7 +954,7 @@ resource "helm_release" "minio" {
   namespace        = split(".", local.kubernetes_service_endpoints.minio)[1]
   repository       = "https://charts.min.io/"
   chart            = "minio"
-  version          = "5.0.1"
+  version          = "5.0.4"
   wait             = false
   create_namespace = true
   values = [
@@ -1010,7 +1010,17 @@ resource "helm_release" "minio" {
         MINIO_STORAGE_CLASS_STANDARD = "EC:2"
         MINIO_STORAGE_CLASS_RRS      = "EC:2"
       }
-      users = []
+      buckets = [
+        for bucket in local.minio_buckets :
+        merge(bucket, {
+          purge      = false
+          versioning = false
+        })
+      ]
+      users          = []
+      policies       = []
+      customCommands = []
+      svcaccts       = []
       affinity = {
         nodeAffinity = {
           requiredDuringSchedulingIgnoredDuringExecution = {
