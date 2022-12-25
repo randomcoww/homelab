@@ -94,14 +94,19 @@ See [fedora-coreos-config-custom](https://github.com/randomcoww/fedora-coreos-co
 
 Embed the ignition files generated above into the image to allow them to boot configured
 
-### Launch local bootstrap service to PXE boot servers
+### Launch temporary local bootstrap service to PXE boot servers
 
-Asset path should be the build path of `fedora-coreos-config-custom`
+Asset path should be the `coreos` build path of `fedora-coreos-config-custom`
 
 ```bash
+export VARIANT=coreos
 export host_ip=$(ip -br addr show lan | awk '{print $3}')
-export assets_path=$(pwd)/../coreos/builds/latest/x86_64
+export assets_path=$(pwd)/../$VARIANT/builds/latest/x86_64
 export manifests_path=./output/manifests
+
+echo host_ip=$host_ip
+echo assets_path=$assets_path
+echo manifests_path=$manifests_path
 ```
 
 ```bash
@@ -254,6 +259,24 @@ buildah push $TAG
 tw find . -name '*.tf' -exec terraform fmt '{}' \;
 ```
 
+## Personal desktop setup
+
+```bash
+flatpak --user remote-add --if-not-exists flathub https://flathub.org/repo/flathub.flatpakrepo
+
+flatpak --user -y install flathub \
+  com.brave.Browser \
+  com.visualstudio.code \
+  org.kde.krita \
+  org.inkscape.Inkscape \
+  org.blender.Blender \
+  io.mpv.Mpv \
+  org.nomacs.ImageLounge \
+  com.valvesoftware.Steam \
+  net.lutris.Lutris \
+  com.heroicgameslauncher.hgl
+```
+
 ## Desktop VM with GPU passthrough
 
 > This is currently just a POC and serves nothing
@@ -299,21 +322,3 @@ virsh start de-1-pt
 ```
 
 No video output is available unless a display is attached to the GPU being passed through
-
-## Personal desktop setup
-
-```bash
-flatpak --user remote-add --if-not-exists flathub https://flathub.org/repo/flathub.flatpakrepo
-
-flatpak --user -y install flathub \
-  com.brave.Browser \
-  com.visualstudio.code \
-  org.kde.krita \
-  org.inkscape.Inkscape \
-  org.blender.Blender \
-  io.mpv.Mpv \
-  org.nomacs.ImageLounge \
-  com.valvesoftware.Steam \
-  net.lutris.Lutris \
-  com.heroicgameslauncher.hgl
-```
