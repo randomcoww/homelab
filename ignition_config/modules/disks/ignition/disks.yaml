@@ -44,5 +44,11 @@ storage:
       format: ${partition.format}
       wipe_filesystem: ${partition.wipe}
       label: ${partition.label}
+      %{~ if length(lookup(partition, "options", [])) > 0 ~}
+      options:
+        %{~ for option in partition.options ~}
+        - ${option}
+        %{~ endfor ~}
+      %{~ endif ~}
     %{~ endfor ~}
     %{~ endfor ~}

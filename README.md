@@ -96,12 +96,12 @@ Embed the ignition files generated above into the image to allow them to boot co
 
 ### Launch temporary local bootstrap service to PXE boot servers
 
-Asset path should be the `coreos` build path of `fedora-coreos-config-custom`
+Asset path should contains PXE image builds of `fedora-coreos-config-custom`
 
 ```bash
 export VARIANT=coreos
 export host_ip=$(ip -br addr show lan | awk '{print $3}')
-export assets_path=$(pwd)/../$VARIANT/builds/latest/x86_64
+export assets_path=${HOME}/store/boot
 export manifests_path=./output/manifests
 
 echo host_ip=$host_ip
