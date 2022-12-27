@@ -53,8 +53,9 @@ locals {
           partitions = [
             {
               mount_path = local.mounts.containers_path
-              format     = "ext4"
+              format     = "xfs"
               wipe       = false
+              options    = ["-s", "size=4096"]
             },
           ]
         }
@@ -115,8 +116,9 @@ locals {
           partitions = [
             {
               mount_path = local.mounts.containers_path
-              format     = "ext4"
+              format     = "xfs"
               wipe       = false
+              options    = ["-s", "size=4096"]
             },
           ]
         }
@@ -177,8 +179,9 @@ locals {
           partitions = [
             {
               mount_path = local.mounts.containers_path
-              format     = "ext4"
+              format     = "xfs"
               wipe       = false
+              options    = ["-s", "size=4096"]
             },
           ]
         }
@@ -239,7 +242,9 @@ locals {
           partitions = [
             {
               mount_path = local.mounts.home_path
+              format     = "xfs"
               wipe       = false
+              # options    = ["-s", "size=4096"]
             },
           ]
         }
