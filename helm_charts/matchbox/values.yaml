@@ -47,9 +47,3 @@ apiService:
   clusterIP: ~
   port: 8081
   nodePort: 30011
-
-tftpdService:
-  type: NodePort
-  clusterIP: ~
-  port: 69
-  nodePort: 69
