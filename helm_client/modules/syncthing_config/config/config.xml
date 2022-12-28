@@ -6,6 +6,8 @@
     %{~ endfor ~}
     <maxConflicts>1</maxConflicts>
     <copyOwnershipFromParent>true</copyOwnershipFromParent>
+    <syncOwnership>true</syncOwnership>
+    <sendOwnership>true</sendOwnership>
   </folder>
   %{~ endfor ~}
   %{~ for member in syncthing_members ~}
