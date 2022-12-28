@@ -15,6 +15,12 @@ locals {
     syncthing_members   = local.syncthing_members
     syncthing_home_path = "/var/lib/syncthing"
     syncthing_peer_port = var.syncthing_peer_port
-    sync_data_path      = var.sync_data_path
+    sync_data_paths = [
+      for path in var.sync_data_paths :
+      {
+        path  = path
+        label = join("-", compact(split("/", replace(path, "-", "\\x2d"))))
+      }
+    ]
   })
 }

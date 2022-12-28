@@ -15,8 +15,8 @@ variable "replica_count" {
   type = number
 }
 
-variable "sync_data_path" {
-  type = string
+variable "sync_data_paths" {
+  type = list(string)
 }
 
 variable "syncthing_peer_port" {

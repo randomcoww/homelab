@@ -846,7 +846,7 @@ module "matchbox-syncthing" {
   resource_name       = "matchbox"
   resource_namespace  = "default"
   service_name        = "matchbox-sync"
-  sync_data_path      = "/var/tmp/matchbox"
+  sync_data_paths     = ["/var/tmp/matchbox"]
   syncthing_peer_port = 22000
 }
 
