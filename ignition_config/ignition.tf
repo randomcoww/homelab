@@ -91,8 +91,11 @@ module "ignition-ssh-server" {
   for_each = local.members.ssh-server
   source   = "./modules/ssh_server"
 
-  key_id     = each.value.hostname
-  user_names = [local.users.admin.name]
+  key_id = each.value.hostname
+  user_names = [
+    for user in each.value.users :
+    local.users[user].name
+  ]
   valid_principals = concat([
     each.value.hostname,
     "127.0.0.1",
