@@ -245,7 +245,7 @@ locals {
               mount_path = local.mounts.home_path
               format     = "xfs"
               wipe       = false
-              # options    = ["-s", "size=4096"]
+              options    = ["-s", "size=4096"]
             },
           ]
         }
