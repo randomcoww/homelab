@@ -270,6 +270,7 @@ flatpak --user -y install flathub \
   org.kde.krita \
   org.inkscape.Inkscape \
   org.blender.Blender \
+  com.github.xournalpp.xournalpp \
   io.mpv.Mpv \
   org.nomacs.ImageLounge \
   com.valvesoftware.Steam \
