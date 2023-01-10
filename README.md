@@ -190,7 +190,7 @@ See [fedora-coreos-config-custom](https://github.com/randomcoww/fedora-coreos-co
 
 #### Write matchbox PXE boot config
 
-Update image tags [here](https://github.com/randomcoww/terraform-infra/blob/master/config_pxeboot.tf#L2) with those pushed in previous step
+Update image tags [here](https://github.com/randomcoww/homelab/blob/master/config_pxeboot.tf#L2) with those pushed in previous step
 
 Check that matchbox pods are running
 
@@ -226,10 +226,10 @@ Full example: https://github.com/technosophos/tscharts
 
 ```bash
 helm package helm_charts/<chart> -d docs/
-helm repo index --url https://randomcoww.github.io/terraform-infra docs/
+helm repo index --url https://randomcoww.github.io/homelab docs/
 ```
 
-New chart should appear in https://randomcoww.github.io/terraform-infra/index.yaml
+New chart should appear in https://randomcoww.github.io/homelab/index.yaml
 
 ### Container builds
 

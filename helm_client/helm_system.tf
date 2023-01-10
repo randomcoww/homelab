@@ -3,7 +3,7 @@
 resource "helm_release" "cluster_services" {
   name       = "cluster-services"
   namespace  = "kube-system"
-  repository = "https://randomcoww.github.io/terraform-infra/"
+  repository = "https://randomcoww.github.io/homelab/"
   chart      = "cluster-services"
   version    = "0.2.4"
   wait       = false
@@ -124,7 +124,7 @@ EOF
 resource "helm_release" "external_dns" {
   name       = "external-dns"
   namespace  = "kube-system"
-  repository = "https://randomcoww.github.io/terraform-infra/"
+  repository = "https://randomcoww.github.io/homelab/"
   chart      = "external-dns"
   version    = "0.1.15"
   wait       = false
@@ -332,7 +332,7 @@ resource "tls_private_key" "letsencrypt-staging" {
 
 resource "helm_release" "cert_issuer_secrets" {
   name             = "cert-issuer"
-  repository       = "https://randomcoww.github.io/terraform-infra/"
+  repository       = "https://randomcoww.github.io/homelab/"
   chart            = "helm-wrapper"
   namespace        = "cert-manager"
   create_namespace = true
@@ -370,7 +370,7 @@ resource "helm_release" "cert_issuer_secrets" {
 
 resource "helm_release" "cert_issuer" {
   name       = "cert-issuer"
-  repository = "https://randomcoww.github.io/terraform-infra/"
+  repository = "https://randomcoww.github.io/homelab/"
   chart      = "helm-wrapper"
   version    = "0.1.0"
   values = [
@@ -447,7 +447,7 @@ resource "helm_release" "cert_issuer" {
 
 resource "helm_release" "authelia_users" {
   name             = "authelia-users"
-  repository       = "https://randomcoww.github.io/terraform-infra/"
+  repository       = "https://randomcoww.github.io/homelab/"
   chart            = "helm-wrapper"
   namespace        = "authelia"
   create_namespace = true
@@ -716,7 +716,7 @@ module "kea-config" {
 resource "helm_release" "tftpd" {
   name       = "tftpd"
   namespace  = "default"
-  repository = "https://randomcoww.github.io/terraform-infra/"
+  repository = "https://randomcoww.github.io/homelab/"
   chart      = "tftpd"
   version    = "0.1.1"
   wait       = false
@@ -763,7 +763,7 @@ resource "helm_release" "tftpd" {
 resource "helm_release" "kea" {
   name       = "kea"
   namespace  = "default"
-  repository = "https://randomcoww.github.io/terraform-infra/"
+  repository = "https://randomcoww.github.io/homelab/"
   chart      = "kea"
   version    = "0.1.15"
   wait       = false
@@ -853,7 +853,7 @@ module "matchbox-syncthing" {
 resource "helm_release" "matchbox" {
   name       = "matchbox"
   namespace  = "default"
-  repository = "https://randomcoww.github.io/terraform-infra/"
+  repository = "https://randomcoww.github.io/homelab/"
   chart      = "matchbox"
   version    = "0.2.14"
   wait       = false
@@ -1131,7 +1131,7 @@ module "hostapd-roaming" {
 resource "helm_release" "hostapd" {
   name       = "hostapd"
   namespace  = "default"
-  repository = "https://randomcoww.github.io/terraform-infra/"
+  repository = "https://randomcoww.github.io/homelab/"
   chart      = "hostapd"
   version    = "0.1.8"
   wait       = false

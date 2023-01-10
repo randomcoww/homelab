@@ -3,122 +3,133 @@ entries:
   cluster-services:
   - apiVersion: v2
     appVersion: 1.16.0
-    created: "2022-12-07T11:09:13.987631567-08:00"
+    created: "2023-01-10T12:05:18.348156781-08:00"
     description: Basic cluster services with minimal configuration
-    digest: 97337dfcefc0ae6fb3ac0b78b79b21c2bd37c866d227e28ead235154b0fe68fd
+    digest: 622b2294390ec8ef51480be3eaec5ac7f2c50aa099ffaa1ab28b83365a27254b
     name: cluster-services
     type: application
     urls:
-    - https://randomcoww.github.io/terraform-infra/cluster-services-0.2.4.tgz
+    - https://randomcoww.github.io/homelab/cluster-services-0.2.4.tgz
     version: 0.2.4
   external-dns:
   - apiVersion: v2
     appVersion: 1.16.0
-    created: "2022-12-07T11:09:13.988037768-08:00"
+    created: "2023-01-10T12:05:18.348515271-08:00"
     description: external-dns
-    digest: fba8bb494de114b878969f3a86c034b71cba32025d25090882e3d971d77eebff
+    digest: ff9fc8a348069b7dd31acedf6f6249d19931a3666e1ca0e5ec7de4ad89278181
     name: external-dns
     type: application
     urls:
-    - https://randomcoww.github.io/terraform-infra/external-dns-0.1.15.tgz
+    - https://randomcoww.github.io/homelab/external-dns-0.1.15.tgz
     version: 0.1.15
   helm-wrapper:
   - apiVersion: v2
     appVersion: 1.16.0
-    created: "2022-12-07T11:09:13.988239611-08:00"
+    created: "2023-01-10T12:05:18.348658657-08:00"
     description: Wrap any manifest in helm to use terraform helm provider
-    digest: c6928c02113687f2197bbce9d1936c8f7a80e6f1c7b8e52026c30926e1243408
+    digest: c1305f3c2535b5569c210cbf28f1bd566b6f37777a6c413fcdbe3b30f959240a
     name: helm-wrapper
     type: application
     urls:
-    - https://randomcoww.github.io/terraform-infra/helm-wrapper-0.1.0.tgz
+    - https://randomcoww.github.io/homelab/helm-wrapper-0.1.0.tgz
     version: 0.1.0
   hostapd:
   - apiVersion: v2
     appVersion: 1.16.0
-    created: "2022-12-07T11:09:13.988988456-08:00"
+    created: "2023-01-10T12:05:18.348864253-08:00"
     description: A Helm chart for Kubernetes
-    digest: 9ddab944d9c0f2ba74bbc064135264ff723143a2cb9b97e40cfb46eea5f0a815
+    digest: 18ef6358a9b3afeaf10f5b046a98cf221125f6a451d272f2c74a0e8c5991dd47
     name: hostapd
     type: application
     urls:
-    - https://randomcoww.github.io/terraform-infra/hostapd-0.1.8.tgz
+    - https://randomcoww.github.io/homelab/hostapd-0.1.8.tgz
     version: 0.1.8
   kea:
   - apiVersion: v2
     appVersion: 1.16.0
-    created: "2022-12-07T11:09:13.989176889-08:00"
+    created: "2023-01-10T12:05:18.349114605-08:00"
     description: Kea
-    digest: a15c3d98396c8b4c74f33afd73718972f5121d60d98d0d6efcafeabb00791c55
+    digest: e4221c6b11064dd30e511b9ccf6b9f8aaa36615227d3f5fbff7781249b70da25
     name: kea
     type: application
     urls:
-    - https://randomcoww.github.io/terraform-infra/kea-0.1.15.tgz
+    - https://randomcoww.github.io/homelab/kea-0.1.15.tgz
     version: 0.1.15
   kube-dns:
   - apiVersion: v2
     appVersion: 1.16.0
-    created: "2022-12-07T11:09:13.98948126-08:00"
+    created: "2023-01-10T12:05:18.349502622-08:00"
     description: kube-dns
     digest: 4df12e37b29b24bd2da08e25803bea114304e48c87ec3be4162fd2c7b02dfce6
     name: kube-dns
     type: application
     urls:
-    - https://randomcoww.github.io/terraform-infra/kube-dns-0.1.0.tgz
+    - https://randomcoww.github.io/homelab/kube-dns-0.1.0.tgz
     version: 0.1.0
   matchbox:
   - apiVersion: v2
     appVersion: 1.16.0
-    created: "2022-12-07T11:09:13.989749383-08:00"
+    created: "2023-01-10T12:05:18.349861273-08:00"
     description: Matchbox PXE boot
-    digest: 2a218068cfe1050a62a6540de8dd2f0a486b25360c3c3cbd6a6f3f7ac1397655
+    digest: cba665ac04f08302d675ec4ea99865bbffb75c6ef5b6a96e3ce90ee77d9af306
     name: matchbox
     type: application
     urls:
-    - https://randomcoww.github.io/terraform-infra/matchbox-0.2.14.tgz
+    - https://randomcoww.github.io/homelab/matchbox-0.2.14.tgz
     version: 0.2.14
   mpd:
   - apiVersion: v2
     appVersion: 1.16.0
-    created: "2022-12-07T11:09:13.990064929-08:00"
+    created: "2023-01-10T12:05:18.350281422-08:00"
     description: A Helm chart for Kubernetes
-    digest: 4c16d532569775cf4f48345f5cda437783c620d2fc584f95336e7deb09344d09
+    digest: f3e9bf4a6cf1ef2618cdd6209e34028f6dd8fc6edfcf2d523d1f61b38bb3b69b
     name: mpd
     type: application
     urls:
-    - https://randomcoww.github.io/terraform-infra/mpd-0.4.6.tgz
+    - https://randomcoww.github.io/homelab/mpd-0.4.6.tgz
     version: 0.4.6
+  syncthing:
+  - apiVersion: v2
+    appVersion: 1.16.0
+    created: "2023-01-10T12:05:18.350527536-08:00"
+    description: syncthing
+    digest: 06bca957a54424cb6d58d067eea573b49a88defdc27653fbaeb0b917d41add87
+    name: syncthing
+    type: application
+    urls:
+    - https://randomcoww.github.io/homelab/syncthing-0.1.0.tgz
+    version: 0.1.0
   tftpd:
   - apiVersion: v2
     appVersion: 1.16.0
-    created: "2022-12-07T11:09:13.99021893-08:00"
+    created: "2023-01-10T12:05:18.350718093-08:00"
     description: TFTPD
-    digest: 6d99964dddcbc26b0fe22a6a7d6207a692d83ad1e80d9fa3e3718bf3cf472855
+    digest: 55773b597e9aad0ad95426dc40a780d0786479311f1f0b4f39aed82bea88a0c6
     name: tftpd
     type: application
     urls:
-    - https://randomcoww.github.io/terraform-infra/tftpd-0.1.1.tgz
+    - https://randomcoww.github.io/homelab/tftpd-0.1.1.tgz
     version: 0.1.1
   transmission:
   - apiVersion: v2
     appVersion: 1.16.0
-    created: "2022-12-07T11:09:13.990473225-08:00"
+    created: "2023-01-10T12:05:18.351075291-08:00"
     description: A Helm chart for Kubernetes
-    digest: 67d910e992674c0ca3420eb812ca54e8e6e7eb776c684de126e7b01e77be1222
+    digest: 3dc8a7d65e6f7c6a205046b6bcce2b0ef257f9d4ba48f634ccaba6a30870fbfc
     name: transmission
     type: application
     urls:
-    - https://randomcoww.github.io/terraform-infra/transmission-0.1.7.tgz
+    - https://randomcoww.github.io/homelab/transmission-0.1.7.tgz
     version: 0.1.7
   webdav:
   - apiVersion: v2
     appVersion: 1.16.0
-    created: "2022-12-07T11:09:13.990715646-08:00"
+    created: "2023-01-10T12:05:18.351374056-08:00"
     description: A Helm chart for Kubernetes
-    digest: ccb33a8b962817d8699e579d58443c9c82ae049101142d6e8cf0e1b9c9781d19
+    digest: 2eb8cb9f1cd32f9051ce0387fa780c17ac28e810846a6a8ec08f5ccbff24fdd9
     name: webdav
     type: application
     urls:
-    - https://randomcoww.github.io/terraform-infra/webdav-0.1.5.tgz
+    - https://randomcoww.github.io/homelab/webdav-0.1.5.tgz
     version: 0.1.5
-generated: "2022-12-07T11:09:13.987160344-08:00"
+generated: "2023-01-10T12:05:18.347530094-08:00"
