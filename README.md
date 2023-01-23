@@ -278,7 +278,7 @@ flatpak --user -y install flathub \
   com.heroicgameslauncher.hgl
 ```
 
-## Desktop VM with GPU passthrough
+## :construction: Desktop VM with GPU passthrough :construction:
 
 > This is currently just a POC and serves nothing
 
