@@ -3,7 +3,7 @@ entries:
   cluster-services:
   - apiVersion: v2
     appVersion: 1.16.0
-    created: "2023-02-01T10:43:16.305227163-08:00"
+    created: "2023-02-01T12:36:27.608989498-08:00"
     description: Basic cluster services with minimal configuration
     digest: 622b2294390ec8ef51480be3eaec5ac7f2c50aa099ffaa1ab28b83365a27254b
     name: cluster-services
@@ -14,7 +14,7 @@ entries:
   external-dns:
   - apiVersion: v2
     appVersion: 1.16.0
-    created: "2023-02-01T10:43:16.305529345-08:00"
+    created: "2023-02-01T12:36:27.609233809-08:00"
     description: external-dns
     digest: ff9fc8a348069b7dd31acedf6f6249d19931a3666e1ca0e5ec7de4ad89278181
     name: external-dns
@@ -25,7 +25,7 @@ entries:
   helm-wrapper:
   - apiVersion: v2
     appVersion: 1.16.0
-    created: "2023-02-01T10:43:16.305698801-08:00"
+    created: "2023-02-01T12:36:27.609802525-08:00"
     description: Wrap any manifest in helm to use terraform helm provider
     digest: c1305f3c2535b5569c210cbf28f1bd566b6f37777a6c413fcdbe3b30f959240a
     name: helm-wrapper
@@ -36,7 +36,7 @@ entries:
   hostapd:
   - apiVersion: v2
     appVersion: 1.16.0
-    created: "2023-02-01T10:43:16.305881232-08:00"
+    created: "2023-02-01T12:36:27.61006412-08:00"
     description: A Helm chart for Kubernetes
     digest: 18ef6358a9b3afeaf10f5b046a98cf221125f6a451d272f2c74a0e8c5991dd47
     name: hostapd
@@ -47,7 +47,7 @@ entries:
   kea:
   - apiVersion: v2
     appVersion: 1.16.0
-    created: "2023-02-01T10:43:16.306090065-08:00"
+    created: "2023-02-01T12:36:27.610330924-08:00"
     description: Kea
     digest: e4221c6b11064dd30e511b9ccf6b9f8aaa36615227d3f5fbff7781249b70da25
     name: kea
@@ -58,7 +58,7 @@ entries:
   kube-dns:
   - apiVersion: v2
     appVersion: 1.16.0
-    created: "2023-02-01T10:43:16.307115489-08:00"
+    created: "2023-02-01T12:36:27.610747918-08:00"
     description: kube-dns
     digest: 4df12e37b29b24bd2da08e25803bea114304e48c87ec3be4162fd2c7b02dfce6
     name: kube-dns
@@ -69,7 +69,7 @@ entries:
   matchbox:
   - apiVersion: v2
     appVersion: 1.16.0
-    created: "2023-02-01T10:43:16.307442138-08:00"
+    created: "2023-02-01T12:36:27.611081792-08:00"
     description: Matchbox PXE boot
     digest: cba665ac04f08302d675ec4ea99865bbffb75c6ef5b6a96e3ce90ee77d9af306
     name: matchbox
@@ -80,7 +80,7 @@ entries:
   mpd:
   - apiVersion: v2
     appVersion: 1.16.0
-    created: "2023-02-01T10:43:16.307779347-08:00"
+    created: "2023-02-01T12:36:27.61133002-08:00"
     description: A Helm chart for Kubernetes
     digest: f3e9bf4a6cf1ef2618cdd6209e34028f6dd8fc6edfcf2d523d1f61b38bb3b69b
     name: mpd
@@ -91,7 +91,7 @@ entries:
   simulation:
   - apiVersion: v2
     appVersion: 1.16.0
-    created: "2023-02-01T10:43:16.308306513-08:00"
+    created: "2023-02-01T12:36:27.611551908-08:00"
     description: A Helm chart for Kubernetes
     digest: 1ce2fe92693ed2d15afa4366c348690fb9ba5ec83ca6b062054ed1ab693e8d2e
     name: simulation
@@ -99,20 +99,10 @@ entries:
     urls:
     - https://randomcoww.github.io/homelab/simulation-0.1.1.tgz
     version: 0.1.1
-  - apiVersion: v2
-    appVersion: 1.16.0
-    created: "2023-02-01T10:43:16.308090547-08:00"
-    description: A Helm chart for Kubernetes
-    digest: 702d93c61bff840be443340c5c9654de56471b310c90f85f4bcfd0bfa6d4b3d2
-    name: simulation
-    type: application
-    urls:
-    - https://randomcoww.github.io/homelab/simulation-0.1.0.tgz
-    version: 0.1.0
   stream-server:
   - apiVersion: v2
     appVersion: 1.16.0
-    created: "2023-02-01T10:43:16.308727173-08:00"
+    created: "2023-02-01T12:36:27.611726044-08:00"
     description: A Helm chart for Kubernetes
     digest: bdd14b8978425f105a984ae0bf7065abcec0dc226f2544d1ad6ab2f989c57087
     name: stream-server
@@ -120,20 +110,10 @@ entries:
     urls:
     - https://randomcoww.github.io/homelab/stream-server-0.1.3.tgz
     version: 0.1.3
-  - apiVersion: v2
-    appVersion: 1.16.0
-    created: "2023-02-01T10:43:16.308564209-08:00"
-    description: A Helm chart for Kubernetes
-    digest: b7ab7e3bc19af79bfc1d729281f214a4e71b16e15c0113a6f325f47ea832408c
-    name: stream-server
-    type: application
-    urls:
-    - https://randomcoww.github.io/homelab/stream-server-0.1.2.tgz
-    version: 0.1.2
   tftpd:
   - apiVersion: v2
     appVersion: 1.16.0
-    created: "2023-02-01T10:43:16.30893885-08:00"
+    created: "2023-02-01T12:36:27.611819564-08:00"
     description: TFTPD
     digest: 55773b597e9aad0ad95426dc40a780d0786479311f1f0b4f39aed82bea88a0c6
     name: tftpd
@@ -144,7 +124,7 @@ entries:
   transmission:
   - apiVersion: v2
     appVersion: 1.16.0
-    created: "2023-02-01T10:43:16.309244459-08:00"
+    created: "2023-02-01T12:36:27.612016614-08:00"
     description: A Helm chart for Kubernetes
     digest: 3dc8a7d65e6f7c6a205046b6bcce2b0ef257f9d4ba48f634ccaba6a30870fbfc
     name: transmission
@@ -155,7 +135,7 @@ entries:
   webdav:
   - apiVersion: v2
     appVersion: 1.16.0
-    created: "2023-02-01T10:43:16.309510491-08:00"
+    created: "2023-02-01T12:36:27.612194777-08:00"
     description: A Helm chart for Kubernetes
     digest: 2eb8cb9f1cd32f9051ce0387fa780c17ac28e810846a6a8ec08f5ccbff24fdd9
     name: webdav
@@ -163,4 +143,4 @@ entries:
     urls:
     - https://randomcoww.github.io/homelab/webdav-0.1.5.tgz
     version: 0.1.5
-generated: "2023-02-01T10:43:16.304853283-08:00"
+generated: "2023-02-01T12:36:27.608701503-08:00"
