@@ -138,6 +138,7 @@ locals {
     auth         = "auth.${local.domains.internal}"
     transmission = "t.${local.domains.internal}"
     minio        = "m.${local.domains.internal}"
+    pl           = "pl.${local.domains.internal}"
   }
 
   kubernetes_service_endpoints = {

@@ -84,8 +84,7 @@ EOF
 #### Generate CoreOS ignition for all nodes
 
 ```bash
-tw terraform -chdir=ignition_config \
-  apply -var-file=secrets.tfvars
+tw terraform -chdir=ignition_config apply -var-file=secrets.tfvars
 ```
 
 #### Create custom CoreOS images
@@ -125,8 +124,7 @@ sudo cp output/manifests/bootstrap.yaml /var/lib/kubelet/manifests
 Populate bootstrap service with PXE boot configuration
 
 ```bash
-tw terraform -chdir=bootstrap_client apply \
-  -var host_ip=$host_ip
+tw terraform -chdir=bootstrap_client apply -var host_ip=$host_ip
 ```
 
 Stop service after PXE boot stack is launched on Kubernetes
@@ -146,8 +144,7 @@ tw terraform -chdir=bootstrap_server destroy \
 
 ```bash
 mkdir -p ~/.kube && \
-tw terraform -chdir=ignition_config \
-  output -raw admin_kubeconfig > ~/.kube/config
+tw terraform -chdir=ignition_config output -raw admin_kubeconfig > ~/.kube/config
 ```
 
 #### Check that `kubernetes` service is up
@@ -159,8 +156,7 @@ kubectl get svc
 #### Once Kubernetes is up deploy helm charts
 
 ```bash
-tw terraform -chdir=helm_client \
-  apply -var-file=secrets.tfvars
+tw terraform -chdir=helm_client apply -var-file=secrets.tfvars
 ```
 
 This will provision services used in following steps
@@ -216,8 +212,7 @@ This is valid for `validity_period_hours` as configured in `secrets.tfvars`
 
 ```bash
 KEY=$HOME/.ssh/id_ecdsa
-tw terraform -chdir=ignition_config \
-  output -raw ssh_client_cert_authorized_key > $KEY-cert.pub
+tw terraform -chdir=ignition_config output -raw ssh_client_cert_authorized_key > $KEY-cert.pub
 ```
 
 ### Updating helm charts
