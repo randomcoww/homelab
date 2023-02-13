@@ -138,7 +138,7 @@ tw terraform -chdir=bootstrap_server destroy \
   -var manifests_path=$manifests_path
 ```
 
-### Deploy services to kubernetes
+### Deploy services to Kubernetes
 
 #### Write admin kubeconfig
 
