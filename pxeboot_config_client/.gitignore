@@ -1,7 +1,0 @@
-.terraform
-.terraform.*
-*.tfstate
-*.tfstate.*
-secrets.tfvars
-*.log
-output/*

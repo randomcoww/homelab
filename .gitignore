@@ -4,4 +4,4 @@
 *.tfstate.*
 secrets.tfvars
 *.log
-output/*
+output/
