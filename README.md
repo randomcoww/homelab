@@ -270,7 +270,8 @@ flatpak --user -y install flathub \
   org.nomacs.ImageLounge \
   com.valvesoftware.Steam \
   net.lutris.Lutris \
-  com.heroicgameslauncher.hgl
+  com.heroicgameslauncher.hgl \
+  io.github.hmlendea.geforcenow-electron
 ```
 
 ## :construction: Desktop VM with GPU passthrough :construction:
