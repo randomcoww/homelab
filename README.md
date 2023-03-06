@@ -271,7 +271,8 @@ flatpak --user -y install flathub \
   com.valvesoftware.Steam \
   net.lutris.Lutris \
   com.heroicgameslauncher.hgl \
-  io.github.hmlendea.geforcenow-electron
+  io.github.hmlendea.geforcenow-electron \
+  com.github.johnfactotum.Foliate
 ```
 
 ## :construction: Desktop VM with GPU passthrough :construction:
