@@ -265,14 +265,15 @@ flatpak --user -y install flathub \
   org.kde.krita \
   org.inkscape.Inkscape \
   org.blender.Blender \
+  flathub org.godotengine.Godot \
   com.github.xournalpp.xournalpp \
   io.mpv.Mpv \
   org.nomacs.ImageLounge \
+  com.github.johnfactotum.Foliate \
   com.valvesoftware.Steam \
   net.lutris.Lutris \
   com.heroicgameslauncher.hgl \
-  io.github.hmlendea.geforcenow-electron \
-  com.github.johnfactotum.Foliate
+  io.github.hmlendea.geforcenow-electron
 ```
 
 ## :construction: Desktop VM with GPU passthrough :construction:
