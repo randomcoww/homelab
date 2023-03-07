@@ -265,7 +265,7 @@ flatpak --user -y install flathub \
   org.kde.krita \
   org.inkscape.Inkscape \
   org.blender.Blender \
-  flathub org.godotengine.Godot \
+  org.godotengine.Godot \
   com.github.xournalpp.xournalpp \
   io.mpv.Mpv \
   org.nomacs.ImageLounge \
