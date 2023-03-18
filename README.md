@@ -269,7 +269,7 @@ flatpak --user -y install flathub \
   com.github.xournalpp.xournalpp \
   io.mpv.Mpv \
   org.nomacs.ImageLounge \
-  com.github.johnfactotum.Foliate \
+  org.kde.okular \
   com.valvesoftware.Steam \
   net.lutris.Lutris \
   com.heroicgameslauncher.hgl \
