@@ -271,8 +271,9 @@ flatpak --user -y install flathub \
   org.nomacs.ImageLounge \
   org.kde.okular \
   com.valvesoftware.Steam \
-  net.lutris.Lutris \
   com.heroicgameslauncher.hgl \
+  net.lutris.Lutris \
+  net.davidotek.pupgui2 \
   io.github.hmlendea.geforcenow-electron
 ```
 
