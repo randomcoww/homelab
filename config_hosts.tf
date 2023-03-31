@@ -191,7 +191,6 @@ locals {
     }
 
     de-1 = {
-      # not needed
       netnum = 7
       users = [
         "client",
@@ -239,7 +238,7 @@ locals {
       }
       disks = {
         pv = {
-          device = "/dev/disk/by-id/nvme-KINGSTON_OM8PGP4512Q-A0_50026B7282E59E03"
+          device = "/dev/disk/by-id/nvme-Samsung_SSD_970_EVO_Plus_1TB_S6S1NS0W106465F"
           partitions = [
             {
               mount_path = local.mounts.home_path
