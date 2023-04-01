@@ -71,10 +71,11 @@ wireguard_client = {
 }
 
 hostapd = {
-  sae_password = "$PASSWORD"
-  ssid         = ""
-  country_code = ""
-  channel      = 100
+  sae_password   = "$PASSWORD"
+  wpa_passphrase = "$PASSWORD"
+  ssid           = ""
+  country_code   = ""
+  channel        = 100
 }
 EOF
 ```
