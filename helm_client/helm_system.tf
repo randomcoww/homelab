@@ -1152,7 +1152,7 @@ resource "helm_release" "hostapd" {
             # country_code=
             # # one of: 36 44 52 60 100 108 116 124 132 140 149 157 184 192
             # channel=
-            # # channel + 6: 42 58 106 122 138 155
+            # # one of: 42 58 106 122 138 155
             vht_oper_centr_freq_seg0_idx = var.hostapd.channel + 6
             interface                    = "wlan0"
             bridge                       = "br-lan"
