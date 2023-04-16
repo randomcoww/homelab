@@ -216,17 +216,6 @@ KEY=$HOME/.ssh/id_ecdsa
 tw terraform -chdir=ignition_config output -raw ssh_client_cert_authorized_key > $KEY-cert.pub
 ```
 
-### Updating helm charts
-
-Full example: https://github.com/technosophos/tscharts
-
-```bash
-helm package helm_charts/<chart> -d docs/
-helm repo index --url https://randomcoww.github.io/homelab docs/
-```
-
-New chart should appear in https://randomcoww.github.io/homelab/index.yaml
-
 ### Container builds
 
 All custom container build Dockerfiles are at https://github.com/randomcoww/container-builds
