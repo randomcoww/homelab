@@ -25,7 +25,6 @@ systemd:
             [Service]
             Environment=KUBELET_COMMON_ARGS="--exit-on-lock-contention \
               --lock-file=/var/run/lock/kubelet.lock \
-              --container-runtime-endpoint=unix:///run/crio/crio.sock \
               --node-ip=${node_ip} \
               --v=2"
             ExecStartPre=/usr/bin/mkdir -p \
@@ -71,6 +70,7 @@ storage:
         inline: |
           kind: KubeletConfiguration
           apiVersion: kubelet.config.k8s.io/v1beta1
+          containerRuntimeEndpoint: unix:///run/crio/crio.sock
           cgroupDriver: systemd
           cgroupsPerQOS: false
           authentication:
@@ -83,8 +83,9 @@ storage:
           enableServer: false
           staticPodPath: ${static_pod_manifest_path}
           makeIPTablesUtilChains: false
-          shutdownGracePeriod: 180s
-          shutdownGracePeriodCriticalPods: 60s
+          shutdownGracePeriodByPodPriority:
+          - priority: 0
+            shutdownGracePeriodSeconds: 180
           containerLogMaxSize: 10Mi
           containerLogMaxFiles: 2
           registerNode: false

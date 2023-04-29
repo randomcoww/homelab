@@ -60,6 +60,7 @@ storage:
         inline: |
           kind: KubeletConfiguration
           apiVersion: kubelet.config.k8s.io/v1beta1
+          containerRuntimeEndpoint: unix:///run/crio/crio.sock
           cgroupDriver: systemd
           cgroupsPerQOS: false
           authentication:
@@ -81,8 +82,9 @@ storage:
           runtimeRequestTimeout: 15m
           rotateCertificates: true
           serverTLSBootstrap: true
-          shutdownGracePeriod: 180s
-          shutdownGracePeriodCriticalPods: 60s
+          shutdownGracePeriodByPodPriority:
+          - priority: 0
+            shutdownGracePeriodSeconds: 180
           containerLogMaxSize: 10Mi
           containerLogMaxFiles: 2
           evictionHard:

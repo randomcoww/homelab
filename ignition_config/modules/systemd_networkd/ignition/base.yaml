@@ -34,4 +34,3 @@ storage:
 
           [Network]
           LinkLocalAddressing=false
-          DHCP=false

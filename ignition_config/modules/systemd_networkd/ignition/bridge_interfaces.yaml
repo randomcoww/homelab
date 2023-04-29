@@ -32,9 +32,9 @@ storage:
 
           [Link]
           ARP=false
+          RequiredForOnline=false
           MTUBytes=${lookup(bridge_interface, "mtu", 1500)}
 
           [Network]
           LinkLocalAddressing=false
-          DHCP=false
     %{~ endfor ~}

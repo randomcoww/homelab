@@ -46,18 +46,13 @@ storage:
           MACAddress=${hardware_interface.mac}
 
           [Link]
-          ARP=${lookup(hardware_interface, "enable_arp", false)}
+          ARP=false
+          RequiredForOnline=false
           MTUBytes=${lookup(hardware_interface, "mtu", 1500)}
-          RequiredForOnline=${lookup(hardware_interface, "enable_netnum", false) || !lookup(hardware_interface, "enable_dhcp", false)}
-
-          [DHCP]
-          UseMTU=true
-          RouteMetric=${lookup(hardware_interface, "metric", 1024)}
+          ActivationPolicy=always-up
 
           [Network]
           LinkLocalAddressing=false
-          DHCP=${lookup(hardware_interface, "enable_dhcp", false)}
-          MulticastDNS=${lookup(hardware_interface, "enable_mdns", false)}
           %{~ for network_name, vlan in hardware_interface.vlans ~}
           VLAN=${vlan.interface_name}
           %{~ endfor ~}
@@ -83,10 +78,10 @@ storage:
 
           [Link]
           ARP=false
+          RequiredForOnline=false
           MTUBytes=${lookup(hardware_interface, "mtu", 1500)}
 
           [Network]
           LinkLocalAddressing=false
-          DHCP=false
     %{~ endfor ~}
     %{~ endfor ~}
