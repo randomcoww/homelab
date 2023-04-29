@@ -117,7 +117,7 @@ locals {
     external_dns       = "k8s.gcr.io/external-dns/external-dns:v0.13.4"
     kube_proxy         = "ghcr.io/randomcoww/kubernetes:kube-proxy-v1.27.1"
     transmission       = "ghcr.io/randomcoww/transmission:20230429"
-    wireguard          = "ghcr.io/randomcoww/wireguard:20220807"
+    wireguard          = "ghcr.io/randomcoww/wireguard:20230429"
   }
 
   kubernetes = {
