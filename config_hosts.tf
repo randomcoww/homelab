@@ -18,7 +18,7 @@ locals {
       }
       tap_interfaces = {
         lan = {
-          source_interface_name = "phy0-lan"
+          source_interface_name = "phy0"
           enable_netnum         = true
         }
         sync = {
@@ -76,7 +76,7 @@ locals {
       }
       tap_interfaces = {
         lan = {
-          source_interface_name = "phy0-lan"
+          source_interface_name = "phy0"
           enable_netnum         = true
         }
         sync = {
@@ -135,7 +135,7 @@ locals {
       }
       tap_interfaces = {
         lan = {
-          source_interface_name = "phy0-lan"
+          source_interface_name = "phy0"
           enable_netnum         = true
         }
         sync = {
