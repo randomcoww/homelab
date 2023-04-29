@@ -26,6 +26,7 @@ locals {
       host_netnum         = var.host_netnum
       tap_interfaces      = local.tap_interfaces
       hardware_interfaces = local.hardware_interfaces
+      wlan_interfaces     = var.wlan_interfaces
       bridge_interfaces   = var.bridge_interfaces
     })
   ]

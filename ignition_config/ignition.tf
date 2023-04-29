@@ -18,6 +18,7 @@ module "ignition-systemd-networkd" {
   host_netnum         = each.value.netnum
   hardware_interfaces = each.value.hardware_interfaces
   bridge_interfaces   = each.value.bridge_interfaces
+  wlan_interfaces     = each.value.wlan_interfaces
   tap_interfaces      = each.value.tap_interfaces
   networks            = local.networks
 }

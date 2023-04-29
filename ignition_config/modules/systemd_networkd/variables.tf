@@ -16,6 +16,11 @@ variable "hardware_interfaces" {
   default = {}
 }
 
+variable "wlan_interfaces" {
+  type    = any
+  default = {}
+}
+
 variable "networks" {
   type = any
 }

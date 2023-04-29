@@ -1,0 +1,39 @@
+---
+variant: fcos
+version: 1.4.0
+storage:
+  files:
+    # wlan interface #
+    %{~ for wlan_interface_name, wlan_interface in wlan_interfaces ~}
+    - path: /etc/systemd/network/10-${wlan_interface_name}.link
+      mode: 0644
+      contents:
+        inline: |
+          [Match]
+          PermanentMACAddress=${wlan_interface.mac}
+
+          [Link]
+          MTUBytes=${lookup(wlan_interface, "mtu", 1500)}
+          Name=${wlan_interface_name}
+    - path: /etc/systemd/network/20-${wlan_interface_name}.network
+      mode: 0644
+      contents:
+        inline: |
+          [Match]
+          Name=${wlan_interface_name}
+
+          [Link]
+          RequiredForOnline=false
+          %{~ if !lookup(wlan_interface, "enable_dhcp", false) ~}
+          MTUBytes=${lookup(wlan_interface, "mtu", 1500)}
+          %{~ endif ~}
+
+          [DHCP]
+          UseMTU=true
+          RouteMetric=${lookup(wlan_interface, "metric", 1024)}
+
+          [Network]
+          LinkLocalAddressing=false
+          DHCP=${lookup(wlan_interface, "enable_dhcp", false)}
+          MulticastDNS=${lookup(wlan_interface, "enable_mdns", false)}
+    %{~ endfor ~}

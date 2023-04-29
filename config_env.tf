@@ -55,6 +55,9 @@ locals {
       vlan_id = 30
       mac     = "52-54-00-63-6e-b3"
     }
+    fallback = {
+      metric = 512
+    }
     kubernetes_service = {
       network = "10.96.0.0"
       cidr    = 12

@@ -11,19 +11,14 @@ locals {
           mtu   = 9000
           vlans = ["sync", "etcd", "service", "kubernetes", "wan"]
         }
-        wlan0 = {
-          mac = "a8-7e-ea-c5-3f-46"
-        }
+      }
+      wlan_interfaces = {
       }
       bridge_interfaces = {
-        br-lan = {
-          interfaces = ["phy0"]
-          mtu        = 9000
-        }
       }
       tap_interfaces = {
         lan = {
-          source_interface_name = "br-lan"
+          source_interface_name = "phy0-lan"
           enable_netnum         = true
         }
         sync = {
@@ -74,19 +69,14 @@ locals {
           mtu   = 9000
           vlans = ["sync", "etcd", "service", "kubernetes", "wan"]
         }
-        wlan0 = {
-          mac = "fc-b3-bc-dc-4e-fc"
-        }
+      }
+      wlan_interfaces = {
       }
       bridge_interfaces = {
-        br-lan = {
-          interfaces = ["phy0"]
-          mtu        = 9000
-        }
       }
       tap_interfaces = {
         lan = {
-          source_interface_name = "br-lan"
+          source_interface_name = "phy0-lan"
           enable_netnum         = true
         }
         sync = {
@@ -138,19 +128,14 @@ locals {
           mtu   = 9000
           vlans = ["sync", "etcd", "service", "kubernetes", "wan"]
         }
-        wlan0 = {
-          mac = "8c-55-4a-d0-b1-2d"
-        }
+      }
+      wlan_interfaces = {
       }
       bridge_interfaces = {
-        br-lan = {
-          interfaces = ["phy0"]
-          mtu        = 9000
-        }
       }
       tap_interfaces = {
         lan = {
-          source_interface_name = "br-lan"
+          source_interface_name = "phy0-lan"
           enable_netnum         = true
         }
         sync = {
@@ -203,15 +188,13 @@ locals {
         }
         # mobile
         phy1 = {
-          mac         = "32-57-14-7a-aa-10"
-          enable_dhcp = true
-          enable_arp  = true
-          metric      = 512
+          mac = "32-57-14-7a-aa-10"
         }
+      }
+      wlan_interfaces = {
         wlan0 = {
           mac         = "10-6f-d9-73-84-6b"
           enable_dhcp = true
-          enable_arp  = true
           enable_mdns = true
           metric      = 2048
         }
@@ -234,6 +217,10 @@ locals {
         kubernetes = {
           source_interface_name = "phy0-kubernetes"
           enable_netnum         = true
+        }
+        fallback = {
+          source_interface_name = "phy1"
+          enable_dhcp           = true
         }
       }
       disks = {
