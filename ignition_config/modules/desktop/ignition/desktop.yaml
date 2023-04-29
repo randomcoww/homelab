@@ -15,6 +15,14 @@ systemd:
 
         [Install]
         WantedBy=graphical.target
+    # https://github.com/coreos/fedora-coreos-tracker/issues/1296
+    - name: systemd-userdbd.service
+      dropins:
+        - name: 10-disable-private.conf
+          contents: |
+            [Service]
+            PrivateTmp=false
+            PrivateDevices=false
 
 storage:
   files:
