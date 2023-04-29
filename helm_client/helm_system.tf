@@ -34,7 +34,7 @@ resource "helm_release" "kube_dns" {
   namespace  = "kube-system"
   repository = "https://coredns.github.io/helm"
   chart      = "coredns"
-  version    = "1.19.7"
+  version    = "1.22.0"
   wait       = false
   values = [
     yamlencode({
@@ -256,7 +256,7 @@ resource "helm_release" "nginx_ingress" {
   chart            = "ingress-nginx"
   namespace        = "ingress-nginx"
   create_namespace = true
-  version          = "4.4.0"
+  version          = "4.6.0"
   values = [
     yamlencode({
       controller = {
@@ -292,7 +292,7 @@ resource "helm_release" "cert_manager" {
   chart            = "cert-manager"
   namespace        = "cert-manager"
   create_namespace = true
-  version          = "1.9.2"
+  version          = "1.11.1"
   wait             = true
   values = [
     yamlencode({
@@ -486,7 +486,7 @@ resource "helm_release" "authelia" {
   repository       = "https://charts.authelia.com"
   chart            = "authelia"
   create_namespace = true
-  version          = "0.8.48"
+  version          = "0.8.57"
   wait             = false
   values = [
     yamlencode({
@@ -623,7 +623,7 @@ resource "helm_release" "local-path-provisioner" {
   namespace  = "kube-system"
   repository = "https://charts.containeroo.ch"
   chart      = "local-path-provisioner"
-  version    = "0.0.22"
+  version    = "0.0.24"
   wait       = false
   values = [
     yamlencode({
@@ -647,7 +647,7 @@ resource "helm_release" "openebs" {
   namespace        = "openebs"
   repository       = "https://openebs.github.io/charts"
   chart            = "openebs"
-  version          = "3.3.1"
+  version          = "3.6.0"
   wait             = false
   create_namespace = true
   values = [
@@ -959,7 +959,7 @@ resource "helm_release" "minio" {
   namespace        = split(".", local.kubernetes_service_endpoints.minio)[1]
   repository       = "https://charts.min.io/"
   chart            = "minio"
-  version          = "5.0.4"
+  version          = "5.0.8"
   wait             = false
   create_namespace = true
   values = [
