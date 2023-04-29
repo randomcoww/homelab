@@ -641,7 +641,7 @@ resource "helm_release" "local-path-provisioner" {
 }
 
 # openebs #
-
+/*
 resource "helm_release" "openebs" {
   name             = "openebs"
   namespace        = "openebs"
@@ -685,6 +685,7 @@ resource "helm_release" "openebs" {
     }),
   ]
 }
+*/
 
 # kea #
 

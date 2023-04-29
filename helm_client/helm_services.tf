@@ -109,7 +109,9 @@ resource "helm_release" "mpd" {
       minioEndPoint = "http://${local.kubernetes_service_endpoints.minio}:${local.ports.minio}"
       minioBucket   = local.minio_buckets.music.name
       persistence = {
-        storageClass = "openebs-jiva-csi-default"
+        accessMode   = "ReadWriteOnce"
+        storageClass = "local-path"
+        size         = "1Gi"
       }
       images = {
         mpd    = local.container_images.mpd
@@ -181,8 +183,9 @@ resource "helm_release" "transmission" {
   values = [
     yamlencode({
       persistence = {
-        storageClass = "openebs-jiva-csi-default"
-        size         = "80Gi"
+        accessMode   = "ReadWriteOnce"
+        storageClass = "local-path"
+        size         = "32Gi"
       }
       images = {
         transmission = local.container_images.transmission
