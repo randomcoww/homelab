@@ -151,7 +151,7 @@ locals {
   }
 
   ports = {
-    kea_peer           = 58080
+    kea_peer           = 50060
     gateway_dns        = 53
     pxe_tftp           = 69
     apiserver          = 58081
