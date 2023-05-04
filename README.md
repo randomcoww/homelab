@@ -223,7 +223,7 @@ All custom container build Dockerfiles are at https://github.com/randomcoww/cont
 ### Build terrafrom wrapper image
 
 ```bash
-TF_VERSION=1.3.3
+TF_VERSION=1.4.6
 SSH_VERSION=0.1.4
 SYNCTHING_VERSION=0.1.2
 TAG=ghcr.io/randomcoww/tw:latest

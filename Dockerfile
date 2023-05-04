@@ -1,4 +1,4 @@
-FROM golang:alpine AS MODULES
+FROM docker.io/golang:alpine AS MODULES
 
 ARG SSH_VERSION
 ARG SYNCTHING_VERSION
