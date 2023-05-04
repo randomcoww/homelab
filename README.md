@@ -263,8 +263,7 @@ flatpak --user -y install flathub \
   com.valvesoftware.Steam \
   com.heroicgameslauncher.hgl \
   net.lutris.Lutris \
-  net.davidotek.pupgui2 \
-  io.github.hmlendea.geforcenow-electron
+  net.davidotek.pupgui2
 ```
 
 ## :construction: Desktop VM with GPU passthrough :construction:
