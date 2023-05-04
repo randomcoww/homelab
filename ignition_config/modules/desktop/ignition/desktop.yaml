@@ -52,10 +52,10 @@ storage:
               args = {}
             }
           ]
-    - path: /etc/environment
-      append:
-        - inline: |
-            RADV_PERFTEST=gpl
+    # - path: /etc/environment
+    #   append:
+    #     - inline: |
+    #         RADV_PERFTEST=gpl
 
     # gnome desktop config #
     # remote desktop https://www.reddit.com/r/gnome/comments/uz5as7/gnome_has_made_it_super_simple_to_extend_your/
