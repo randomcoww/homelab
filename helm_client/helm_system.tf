@@ -256,7 +256,7 @@ resource "helm_release" "nginx_ingress" {
   chart            = "ingress-nginx"
   namespace        = "ingress-nginx"
   create_namespace = true
-  version          = "4.6.0"
+  version          = "4.6.1"
   values = [
     yamlencode({
       controller = {
@@ -271,7 +271,7 @@ resource "helm_release" "nginx_ingress" {
           externalIPs = [
             local.services.external_ingress.ip,
           ]
-          externalTrafficPolicy = "Local"
+          # externalTrafficPolicy = "Local"
         }
         config = {
           ignore-invalid-headers = "off"
@@ -549,11 +549,11 @@ resource "helm_release" "authelia" {
             },
           ]
           rules = [
-            {
-              domain   = local.kubernetes_ingress_endpoints.mpd
-              networks = ["whitelist"]
-              policy   = "bypass"
-            },
+            # {
+            #   domain   = local.kubernetes_ingress_endpoints.mpd
+            #   networks = ["whitelist"]
+            #   policy   = "bypass"
+            # },
             {
               domain = local.kubernetes_ingress_endpoints.mpd
               policy = "one_factor"
