@@ -20,7 +20,7 @@ data "ct_config" "ignition" {
   content  = <<EOT
 ---
 variant: fcos
-version: 1.4.0
+version: 1.5.0
 EOT
   strict   = true
   snippets = each.value
