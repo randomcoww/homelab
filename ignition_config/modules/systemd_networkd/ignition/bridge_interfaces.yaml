@@ -37,4 +37,5 @@ storage:
 
           [Network]
           LinkLocalAddressing=false
+          MulticastDNS=false
     %{~ endfor ~}

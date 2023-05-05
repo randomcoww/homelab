@@ -51,11 +51,12 @@ storage:
               ip saddr ${interfaces.kubernetes.prefix} accept;
               ip saddr ${pod_network_prefix} accept;
               ip saddr ${interfaces.lan.prefix} accept;
+              ct status dnat accept;
             }
 
             chain prerouting {
               type nat hook prerouting priority dstnat; policy accept;
-              iifname ${interfaces.wan.interface_name} tcp dport { http, https } dnat to ${external_ingress_ip}
+              iifname ${interfaces.wan.interface_name} tcp dport { http, https } dnat to ${external_ingress_ip};
             }
 
             chain postrouting {

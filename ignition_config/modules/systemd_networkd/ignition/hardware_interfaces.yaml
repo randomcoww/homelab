@@ -53,6 +53,7 @@ storage:
 
           [Network]
           LinkLocalAddressing=false
+          MulticastDNS=false
           %{~ for network_name, vlan in hardware_interface.vlans ~}
           VLAN=${vlan.interface_name}
           %{~ endfor ~}
@@ -83,5 +84,6 @@ storage:
 
           [Network]
           LinkLocalAddressing=false
+          MulticastDNS=false
     %{~ endfor ~}
     %{~ endfor ~}
