@@ -85,7 +85,7 @@ storage:
           disable-external=true
 
           [org/gnome/desktop/session]
-          idle-delay=uint32 0
+          idle-delay=uint32 3600
 
           [org/gnome/desktop/sound]
           event-sounds=false
