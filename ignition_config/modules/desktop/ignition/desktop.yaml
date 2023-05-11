@@ -161,6 +161,12 @@ storage:
           [org/gtk/settings/file-chooser]
           show-hidden=true
 
+    - path: /var/lib/gdm/.config/monitors.xml
+      mode: 0644
+      contents:
+        inline: |
+          ${indent(10, monitors_config)}
+
     # misc configs #
     - path: /etc/tmux.conf
       mode: 0644
