@@ -202,7 +202,6 @@ locals {
       bridge_interfaces = {
         br-lan = {
           interfaces = ["phy0"]
-          mtu        = 9000
         }
       }
       tap_interfaces = {
