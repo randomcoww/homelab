@@ -48,7 +48,6 @@ storage:
           [Link]
           ARP=false
           RequiredForOnline=false
-          MTUBytes=${lookup(hardware_interface, "mtu", 1500)}
           ActivationPolicy=always-up
 
           [Network]
@@ -80,7 +79,6 @@ storage:
           [Link]
           ARP=false
           RequiredForOnline=false
-          MTUBytes=${lookup(hardware_interface, "mtu", 1500)}
 
           [Network]
           LinkLocalAddressing=false
