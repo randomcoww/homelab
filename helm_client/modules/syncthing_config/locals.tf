@@ -3,7 +3,7 @@ locals {
     for i in range(var.replica_count) :
     {
       pod_name  = "${var.resource_name}-${i}"
-      device_id = data.syncthing.syncthing[i].device_id
+      device_id = data.syncthing_device.syncthing[i].id
       cert      = tls_locally_signed_cert.syncthing[i].cert_pem
       key       = tls_private_key.syncthing[i].private_key_pem
     }

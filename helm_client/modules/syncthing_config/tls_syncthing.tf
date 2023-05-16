@@ -32,7 +32,7 @@ resource "tls_locally_signed_cert" "syncthing" {
   ]
 }
 
-data "syncthing" "syncthing" {
+data "syncthing_device" "syncthing" {
   count = var.replica_count
 
   cert_pem        = tls_locally_signed_cert.syncthing[count.index].cert_pem
