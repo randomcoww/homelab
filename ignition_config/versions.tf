@@ -10,7 +10,7 @@ terraform {
       source = "poseidon/ct"
     }
     ssh = {
-      source = "github.com/randomcoww/ssh"
+      source = "randomcoww/ssh"
     }
   }
 }

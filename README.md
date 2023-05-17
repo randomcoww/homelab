@@ -8,12 +8,13 @@
 tw() {
   set -x
   podman run -it --rm --security-opt label=disable \
-    -v $HOME/.aws:/root/.aws \
+    --entrypoint='' \
     -v $(pwd):/tf \
-    -v /var/cache:/var/cache \
+    -v $HOME/.aws:/root/.aws \
+    -v $HOME/.kube:/root/.kube \
     -w /tf \
     --net=host \
-    ghcr.io/randomcoww/tw:latest "$@"
+    docker.io/hashicorp/terraform:latest "$@"
   rc=$?; set +x; return $rc
 }
 ```
@@ -213,30 +214,12 @@ This is valid for `validity_period_hours` as configured in `secrets.tfvars`
 
 ```bash
 KEY=$HOME/.ssh/id_ecdsa
-tw terraform -chdir=ignition_config output -raw ssh_client_cert_authorized_key > $KEY-cert.pub
+tw terraform -chdir=ignition_config output -raw ssh_user_cert_authorized_key > $KEY-cert.pub
 ```
 
 ### Container builds
 
 All custom container build Dockerfiles are at https://github.com/randomcoww/container-builds
-
-### Build terrafrom wrapper image
-
-```bash
-TF_VERSION=1.4.6
-SSH_VERSION=0.1.4
-SYNCTHING_VERSION=0.1.2
-TAG=ghcr.io/randomcoww/tw:latest
-
-buildah build \
-  --build-arg TF_VERSION=$TF_VERSION \
-  --build-arg SSH_VERSION=$SSH_VERSION \
-  --build-arg SYNCTHING_VERSION=$SYNCTHING_VERSION \
-  -f Dockerfile \
-  -t $TAG && \
-
-buildah push $TAG
-```
 
 ### Cleanup terraform file formatting
 

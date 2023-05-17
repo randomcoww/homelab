@@ -118,8 +118,8 @@ module "ssh-client" {
   ca                    = module.ssh-ca.ca
 }
 
-output "ssh_client_cert_authorized_key" {
-  value = module.ssh-client.ssh_client_cert_authorized_key
+output "ssh_user_cert_authorized_key" {
+  value = module.ssh-client.ssh_user_cert_authorized_key
 }
 
 # client desktop environment #
