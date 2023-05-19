@@ -30,12 +30,9 @@ storage:
 
           [Link]
           RequiredForOnline=${lookup(tap_interface, "enable_netnum", false)}
-          %{~ if !lookup(tap_interface, "enable_dhcp", false) ~}
           MTUBytes=${lookup(tap_interface, "mtu", 1500)}
-          %{~ endif ~}
 
           [DHCP]
-          UseMTU=true
           RouteMetric=${lookup(tap_interface, "metric", 1024)}
 
           [Network]

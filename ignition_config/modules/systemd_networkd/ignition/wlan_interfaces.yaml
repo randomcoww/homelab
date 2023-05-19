@@ -24,12 +24,9 @@ storage:
 
           [Link]
           RequiredForOnline=false
-          %{~ if !lookup(wlan_interface, "enable_dhcp", false) ~}
           MTUBytes=${lookup(wlan_interface, "mtu", 1500)}
-          %{~ endif ~}
 
           [DHCP]
-          UseMTU=true
           RouteMetric=${lookup(wlan_interface, "metric", 1024)}
 
           [Network]
