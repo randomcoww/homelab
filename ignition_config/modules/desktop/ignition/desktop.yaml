@@ -150,6 +150,7 @@ storage:
           [org/gnome/terminal/legacy/profiles:/:00000000-0000-0000-0000-000000000000]
           audible-bell=false
           background-color='rgb(0,0,0)'
+          background-transparency-percent=20
           bold-is-bright=true
           font='Monospace 13'
           foreground-color='rgb(255,255,255)'
