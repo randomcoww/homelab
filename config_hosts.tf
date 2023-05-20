@@ -197,7 +197,6 @@ locals {
           enable_dhcp = true
           enable_mdns = true
           metric      = 2048
-          mtu         = 1500
         }
       }
       bridge_interfaces = {
@@ -209,7 +208,6 @@ locals {
         lan = {
           source_interface_name = "br-lan"
           enable_dhcp           = true
-          mtu                   = 1500
         }
         service = {
           source_interface_name = "phy0-service"
