@@ -250,6 +250,12 @@ flatpak --user -y install flathub \
   io.github.hmlendea.geforcenow-electron
 ```
 
+#### Save monitor configuration
+
+```bash
+cp ~/.config/monitors.xml ignition_config/modules/desktop/resources/
+```
+
 ## :construction: Desktop VM with GPU passthrough :construction:
 
 > This is currently just a POC and serves nothing

@@ -93,6 +93,16 @@ storage:
           [org/gnome/desktop/peripherals/mouse]
           accel-profile='flat'
 
+          [org/gnome/desktop/peripherals/tablets/${tablet_config.device}]
+          mapping='absolute'
+          output=['${join("', '", tablet_config.output)}']
+
+          %{~ for k, v in tablet_config.keybinds ~}
+          [org/gnome/desktop/peripherals/tablets/${tablet_config.device}/${k}]
+          action='keybinding'
+          keybinding='${v}'
+
+          %{~ endfor ~}
           [org/gnome/desktop/peripherals/touchpad]
           tap-to-click=true
           two-finger-scrolling-enabled=true

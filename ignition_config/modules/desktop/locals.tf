@@ -15,6 +15,18 @@ locals {
         key_rightalt_to_key_win = "enabled"
         output_name             = 0
       }
+      tablet_config = {
+        device = "256c:006d"
+        output = ["HAT", "Kamvas Pro 13", "demoset-1"]
+        keybinds = {
+          "buttonA" = "<Control>z"
+          "buttonC" = "s"
+          "buttonD" = "f"
+          "buttonE" = "<Shift>f"
+          "buttonF" = "Shift_L"
+          "buttonG" = "Control_L"
+        }
+      }
     })
   ]
 }
