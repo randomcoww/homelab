@@ -5,16 +5,6 @@ systemd:
   units:
     - name: sshd.service
       enabled: false
-    - name: dconf-update.service
-      enabled: true
-      contents: |
-        [Service]
-        Type=oneshot
-        RemainAfterExit=true
-        ExecStart=/usr/bin/dconf update
-
-        [Install]
-        WantedBy=graphical.target
     # https://github.com/coreos/fedora-coreos-tracker/issues/1296
     - name: systemd-userdbd.service
       dropins:
@@ -178,7 +168,11 @@ storage:
       contents:
         inline: |
           ${indent(10, monitors_config)}
-
+    - path: /etc/skel/.config/monitors.xml
+      mode: 0644
+      contents:
+        inline: |
+          ${indent(10, monitors_config)}
     # misc configs #
     - path: /etc/tmux.conf
       mode: 0644
@@ -193,3 +187,22 @@ storage:
       mode: 0644
       contents:
         inline: "@cert-authority * ${ssh_ca_authorized_key}"
+    # systemd user unit
+    # ignition doesn't support systemd --user
+    - path: /etc/systemd/user/dconf-load.service
+      mode: 0644
+      contents:
+        inline: |
+          [Unit]
+          Wants=gnome-session-initialized.target
+          After=gnome-session-initialized.target
+
+          [Service]
+          Type=oneshot
+          RemainAfterExit=true
+          Slice=session.slice
+          ExecStart=/bin/sh -c "dconf load / < /etc/dconf/db/local.d/00-custom"
+
+  links:
+    - path: /etc/systemd/user/gnome-session.target.wants/dconf-load.service
+      target: /etc/systemd/user/dconf-load.service
