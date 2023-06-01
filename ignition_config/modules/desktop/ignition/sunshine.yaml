@@ -17,8 +17,6 @@ systemd:
         [Install]
         WantedBy=graphical.target
 
-# enables sunshine systemd user unit
-# ignition doesn't support systemd --user
 storage:
   files:
     - path: /etc/skel/.config/sunshine/apps.json
@@ -26,6 +24,9 @@ storage:
       contents:
         inline: |
           ${indent(10, jsonencode(sunshine.apps))}
+
+    # systemd user unit
+    # ignition doesn't support systemd --user
     # these dependencies work for gnome wayland
     # register client: curl http://localhost:47989/pin/<PIN>
     - path: /etc/systemd/user/sunshine.service

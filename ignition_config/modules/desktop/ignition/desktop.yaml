@@ -183,6 +183,7 @@ storage:
       contents:
         inline: |
           ${indent(10, monitors_config)}
+
     # systemd user unit
     # ignition doesn't support systemd --user
     - path: /etc/systemd/user/dconf-load.service
@@ -198,11 +199,22 @@ storage:
           RemainAfterExit=true
           Slice=session.slice
           ExecStart=/bin/sh -c "dconf load / < /etc/dconf/db/local.d/00-custom"
+    - path: /etc/systemd/user/copy-skel.service
+      mode: 0644
+      contents:
+        inline: |
+          [Service]
+          Type=oneshot
+          RemainAfterExit=true
+          Slice=session.slice
+          ExecStart=/usr/bin/cp -r /etc/skel/. %h
 
   links:
     # enable user systemd unit #
     - path: /etc/systemd/user/gnome-session.target.wants/dconf-load.service
       target: /etc/systemd/user/dconf-load.service
+    # - path: /etc/systemd/user/basic.target.wants/copy-skel.service
+    #   target: /etc/systemd/user/copy-skel.service
     # copy monitor layout to gdm login #
     - path: /var/lib/gdm/.config/monitors.xml
       target: /etc/skel/.config/monitors.xml
