@@ -21,6 +21,11 @@ systemd:
 # ignition doesn't support systemd --user
 storage:
   files:
+    - path: /etc/skel/.config/sunshine/apps.json
+      mode: 0644
+      contents:
+        inline: |
+          ${indent(10, jsonencode(sunshine.apps))}
     # these dependencies work for gnome wayland
     # register client: curl http://localhost:47989/pin/<PIN>
     - path: /etc/systemd/user/sunshine.service
@@ -36,7 +41,7 @@ storage:
           [Service]
           Slice=session.slice
           ExecStart=/opt/bin/sunshine ${join(" ", [
-            for k, v in sunshine_config :
+            for k, v in sunshine.config :
             "${k}=${v}"
           ])}
           Restart=on-failure

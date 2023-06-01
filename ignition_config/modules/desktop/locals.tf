@@ -7,13 +7,27 @@ locals {
       udev_steam_vr         = data.http.udev-60-steam-vr.response_body
       wlan_interface        = var.wlan_interface
       monitors_config       = data.local_file.monitors.content
-      sunshine_config = {
-        min_threads             = 1
-        origin_web_ui_allowed   = "pc"
-        origin_pin_allowed      = "pc"
-        upnp                    = "off"
-        key_rightalt_to_key_win = "enabled"
-        output_name             = 0
+      sunshine = {
+        config = {
+          key_rightalt_to_key_win = "enabled"
+          min_log_level           = "none"
+          min_threads             = 1
+          origin_web_ui_allowed   = "pc"
+          origin_pin_allowed      = "pc"
+          output_name             = 0
+          upnp                    = "off"
+        }
+        apps = {
+          env = {
+            PATH = "$(PATH):$(HOME)/.local/bin"
+          }
+          apps = [
+            {
+              name       = "Desktop"
+              image-path = "desktop.png"
+            }
+          ]
+        }
       }
       tablet_config = {
         device = "256c:006d"

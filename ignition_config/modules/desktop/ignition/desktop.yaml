@@ -163,16 +163,6 @@ storage:
           [org/gtk/settings/file-chooser]
           show-hidden=true
 
-    - path: /var/lib/gdm/.config/monitors.xml
-      mode: 0644
-      contents:
-        inline: |
-          ${indent(10, monitors_config)}
-    - path: /etc/skel/.config/monitors.xml
-      mode: 0644
-      contents:
-        inline: |
-          ${indent(10, monitors_config)}
     # misc configs #
     - path: /etc/tmux.conf
       mode: 0644
@@ -187,6 +177,12 @@ storage:
       mode: 0644
       contents:
         inline: "@cert-authority * ${ssh_ca_authorized_key}"
+    # monitor layout #
+    - path: /etc/skel/.config/monitors.xml
+      mode: 0644
+      contents:
+        inline: |
+          ${indent(10, monitors_config)}
     # systemd user unit
     # ignition doesn't support systemd --user
     - path: /etc/systemd/user/dconf-load.service
@@ -204,5 +200,9 @@ storage:
           ExecStart=/bin/sh -c "dconf load / < /etc/dconf/db/local.d/00-custom"
 
   links:
+    # enable user systemd unit #
     - path: /etc/systemd/user/gnome-session.target.wants/dconf-load.service
       target: /etc/systemd/user/dconf-load.service
+    # copy monitor layout to gdm login #
+    - path: /var/lib/gdm/.config/monitors.xml
+      target: /etc/skel/.config/monitors.xml
