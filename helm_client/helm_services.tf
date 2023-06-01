@@ -1,3 +1,25 @@
+locals {
+  # https://www.authelia.com/overview/security/measures/
+  nginx_ingress_annotations = {
+    "cert-manager.io/cluster-issuer"                    = "letsencrypt-prod"
+    "nginx.ingress.kubernetes.io/auth-response-headers" = "Remote-User,Remote-Name,Remote-Groups,Remote-Email"
+    "nginx.ingress.kubernetes.io/auth-signin"           = "https://${local.kubernetes_ingress_endpoints.auth}"
+    "nginx.ingress.kubernetes.io/auth-snippet"          = <<EOF
+proxy_set_header X-Forwarded-Method $request_method;
+EOF
+    "nginx.ingress.kubernetes.io/auth-url"              = "http://${local.kubernetes_service_endpoints.authelia}/api/verify"
+    "nginx.ingress.kubernetes.io/server-snippet"        = <<EOF
+add_header X-Content-Type-Options "nosniff" always;
+add_header Referrer-Policy "strict-origin-when-cross-origin" always;
+add_header X-Frame-Options "SAMEORIGIN" always;
+add_header X-XSS-Protection "0" always;
+add_header Permissions-Policy "interest-cohort=()";
+add_header Pragma "no-cache";
+add_header Cache-Control "no-store";
+EOF
+  }
+}
+
 # webdav for minio #
 /*
 resource "helm_release" "webdav" {
@@ -121,15 +143,7 @@ resource "helm_release" "mpd" {
       ingress = {
         enabled          = true
         ingressClassName = "nginx"
-        annotations = {
-          "cert-manager.io/cluster-issuer"                    = "letsencrypt-prod"
-          "nginx.ingress.kubernetes.io/auth-response-headers" = "Remote-User,Remote-Name,Remote-Groups,Remote-Email"
-          "nginx.ingress.kubernetes.io/auth-signin"           = "https://${local.kubernetes_ingress_endpoints.auth}"
-          "nginx.ingress.kubernetes.io/auth-snippet"          = <<EOF
-proxy_set_header X-Forwarded-Method $request_method;
-EOF
-          "nginx.ingress.kubernetes.io/auth-url"              = "http://${local.kubernetes_service_endpoints.authelia}/api/verify"
-        }
+        annotations      = local.nginx_ingress_annotations
         tls = [
           {
             secretName = "mpd-tls"
@@ -146,15 +160,7 @@ EOF
         enabled          = true
         ingressClassName = "nginx"
         path             = "/"
-        annotations = {
-          "cert-manager.io/cluster-issuer"                    = "letsencrypt-prod"
-          "nginx.ingress.kubernetes.io/auth-response-headers" = "Remote-User,Remote-Name,Remote-Groups,Remote-Email"
-          "nginx.ingress.kubernetes.io/auth-signin"           = "https://${local.kubernetes_ingress_endpoints.auth}"
-          "nginx.ingress.kubernetes.io/auth-snippet"          = <<EOF
-proxy_set_header X-Forwarded-Method $request_method;
-EOF
-          "nginx.ingress.kubernetes.io/auth-url"              = "http://${local.kubernetes_service_endpoints.authelia}/api/verify"
-        }
+        annotations      = local.nginx_ingress_annotations
         tls = [
           {
             secretName = "mpd-tls"
@@ -202,15 +208,7 @@ resource "helm_release" "transmission" {
         enabled          = true
         ingressClassName = "nginx"
         path             = "/"
-        annotations = {
-          "cert-manager.io/cluster-issuer"                    = "letsencrypt-prod"
-          "nginx.ingress.kubernetes.io/auth-response-headers" = "Remote-User,Remote-Name,Remote-Groups,Remote-Email"
-          "nginx.ingress.kubernetes.io/auth-signin"           = "https://${local.kubernetes_ingress_endpoints.auth}"
-          "nginx.ingress.kubernetes.io/auth-snippet"          = <<EOF
-proxy_set_header X-Forwarded-Method $request_method;
-EOF
-          "nginx.ingress.kubernetes.io/auth-url"              = "http://${local.kubernetes_service_endpoints.authelia}/api/verify"
-        }
+        annotations      = local.nginx_ingress_annotations
         tls = [
           {
             secretName = "transmission-tls"
