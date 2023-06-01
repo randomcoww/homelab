@@ -36,7 +36,7 @@ resource "helm_release" "webdav" {
       }
       replicaCount  = 2
       minioEndPoint = "http://${local.kubernetes_service_endpoints.minio}:${local.ports.minio}"
-      minioBucket   = local.minio_buckets.video.name
+      minioBucket   = local.minio_buckets.ebook.name
       affinity = {
         podAntiAffinity = {
           requiredDuringSchedulingIgnoredDuringExecution = [
@@ -60,15 +60,7 @@ resource "helm_release" "webdav" {
       ingress = {
         enabled          = true
         ingressClassName = "nginx"
-        annotations = {
-          "cert-manager.io/cluster-issuer"                    = "letsencrypt-prod"
-          "nginx.ingress.kubernetes.io/auth-response-headers" = "Remote-User,Remote-Name,Remote-Groups,Remote-Email"
-          "nginx.ingress.kubernetes.io/auth-signin"           = "https://${local.kubernetes_ingress_endpoints.auth}"
-          "nginx.ingress.kubernetes.io/auth-snippet"          = <<EOF
-proxy_set_header X-Forwarded-Method $request_method;
-EOF
-          "nginx.ingress.kubernetes.io/auth-url"              = "http://${local.kubernetes_service_endpoints.authelia}/api/verify"
-        }
+        annotations      = local.nginx_ingress_annotations
         tls = [
           {
             secretName = "webdav-tls"
