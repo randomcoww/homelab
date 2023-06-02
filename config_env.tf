@@ -169,7 +169,7 @@ locals {
   }
 
   minio_buckets = {
-    image_store = {
+    boot = {
       name   = "boot"
       policy = "download"
     }
@@ -177,16 +177,16 @@ locals {
       name   = "music"
       policy = "download"
     }
-    transmission = {
+    downloads = {
       name   = "downloads"
       policy = "none"
     }
-    ebook = {
-      name   = "ebook"
+    pictures = {
+      name   = "pictures"
       policy = "none"
     }
-    video = {
-      name   = "video"
+    videos = {
+      name   = "videos"
       policy = "none"
     }
   }

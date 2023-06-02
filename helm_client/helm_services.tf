@@ -265,7 +265,7 @@ transmission-remote 127.0.0.1:${local.ports.transmission} \
 
 minio-client \
   -endpoint="${local.kubernetes_service_endpoints.minio}:${local.ports.minio}" \
-  -bucket="${local.minio_buckets.transmission.name}" \
+  -bucket="${local.minio_buckets.downloads.name}" \
   -access-key-id="${random_password.minio-access-key-id.result}" \
   -secret-access-key="${random_password.minio-secret-access-key.result}" \
   -path="$TR_TORRENT_NAME"
