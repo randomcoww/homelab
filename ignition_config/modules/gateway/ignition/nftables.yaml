@@ -56,7 +56,7 @@ storage:
 
             chain prerouting {
               type nat hook prerouting priority dstnat; policy accept;
-              iifname ${interfaces.wan.interface_name} tcp dport { http, https } dnat to ${external_ingress_ip};
+              iifname ${interfaces.wan.interface_name} tcp dport http dnat to ${external_ingress_ip};
             }
 
             chain postrouting {
