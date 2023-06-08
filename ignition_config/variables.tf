@@ -13,3 +13,7 @@ variable "ssh_client" {
     validity_period_hours = number
   })
 }
+
+variable "aws_region" {
+  type = string
+}

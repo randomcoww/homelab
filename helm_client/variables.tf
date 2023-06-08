@@ -18,3 +18,7 @@ variable "wireguard_client" {
 variable "hostapd" {
   type = map(string)
 }
+
+variable "aws_region" {
+  type = string
+}

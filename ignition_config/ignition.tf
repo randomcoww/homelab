@@ -148,7 +148,7 @@ module "etcd-cluster" {
       peer_port   = local.ports.etcd_peer
     }
   }
-  aws_region       = "us-west-2"
+  aws_region       = var.aws_region
   s3_backup_bucket = "randomcoww-etcd-backup"
 }
 

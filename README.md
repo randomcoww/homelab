@@ -78,6 +78,8 @@ hostapd = {
   country_code   = ""
   channel        = 100
 }
+
+aws_region = "us-west-2"
 EOF
 ```
 

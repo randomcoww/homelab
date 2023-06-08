@@ -556,7 +556,7 @@ resource "helm_release" "authelia" {
             # },
             {
               domain = local.kubernetes_ingress_endpoints.mpd
-              policy = "one_factor"
+              policy = "bypass"
             },
             {
               domain = local.kubernetes_ingress_endpoints.transmission
@@ -565,6 +565,10 @@ resource "helm_release" "authelia" {
             {
               domain = local.kubernetes_ingress_endpoints.pl
               policy = "one_factor"
+            },
+            {
+              domain = local.kubernetes_ingress_endpoints.vaultwarden
+              policy = "bypass"
             },
           ]
         }

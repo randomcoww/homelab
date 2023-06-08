@@ -205,10 +205,8 @@ locals {
         }
       }
       tap_interfaces = {
-        # Add a fixed IP to lan for bootstrap PXE boot
         lan = {
           source_interface_name = "br-lan"
-          enable_netnum         = true
           enable_dhcp           = true
         }
         service = {

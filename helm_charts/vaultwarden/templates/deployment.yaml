@@ -1,0 +1,86 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ template "vaultwarden.fullname" . }}
+  labels:
+    app: {{ template "vaultwarden.name" . }}
+    chart: {{ template "vaultwarden.chart" . }}
+    release: "{{ .Release.Name }}"
+spec:
+  # only supports 1 replica
+  replicas: 1
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxUnavailable: {{ .Values.rollingUpdate.maxUnavailable }}
+      maxSurge: {{ .Values.rollingUpdate.maxSurge }}
+  selector:
+    matchLabels:
+      app: {{ template "vaultwarden.name" . }}
+      release: {{ .Release.Name }}
+  template:
+    metadata:
+      labels:
+        app: {{ template "vaultwarden.name" . }}
+        release: {{ .Release.Name }}
+    spec:
+    {{- with .Values.affinity }}
+      affinity:
+{{ toYaml . | indent 8 }}
+    {{- end }}
+    {{- with .Values.tolerations }}
+      tolerations:
+{{ toYaml . | indent 8 }}
+    {{- end }}
+      restartPolicy: Always
+      initContainers:
+      - name: {{ .Chart.Name }}-init
+        image: {{ .Values.images.litestream }}
+        args:
+        - "restore"
+        - "-if-replica-exists"
+        - "-v"
+        - "-o"
+        - "/{{ .Values.dataPath }}/{{ .Values.dbFile }}"
+        - "s3://{{ .Values.backup.s3Resource }}"
+        env:
+        - name: LITESTREAM_ACCESS_KEY_ID
+          value: "{{ .Values.backup.accessKeyID }}"
+        - name: LITESTREAM_SECRET_ACCESS_KEY
+          value: "{{ .Values.backup.secretAccessKey }}"
+        volumeMounts:
+        - name: vaultwarden-data
+          mountPath: "/{{ .Values.dataPath }}"
+      containers:
+      - name: {{ .Chart.Name }}
+        image: {{ .Values.images.vaultwarden }}
+        env:
+        - name: DATA_FOLDER
+          value: "{{ .Values.dataPath }}"
+        - name: DATABASE_URL
+          value: "{{ .Values.dataPath }}/{{ .Values.dbFile }}"
+        - name: ROCKET_PORT
+          value: "{{ .Values.ports.vaultwarden }}"
+        volumeMounts:
+        - name: vaultwarden-data
+          mountPath: "/{{ .Values.dataPath }}"
+        ports:
+        - containerPort: {{ .Values.ports.vaultwarden }}
+      - name: {{ .Chart.Name }}-litestream
+        image: {{ .Values.images.litestream }}
+        args:
+        - "replicate"
+        - "/{{ .Values.dataPath }}/{{ .Values.dbFile }}"
+        - "s3://{{ .Values.backup.s3Resource }}"
+        env:
+        - name: LITESTREAM_ACCESS_KEY_ID
+          value: "{{ .Values.backup.accessKeyID }}"
+        - name: LITESTREAM_SECRET_ACCESS_KEY
+          value: "{{ .Values.backup.secretAccessKey }}"
+        volumeMounts:
+        - name: vaultwarden-data
+          mountPath: "/{{ .Values.dataPath }}"
+      volumes:
+      - name: vaultwarden-data
+        emptyDir:
+          medium: Memory

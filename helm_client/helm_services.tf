@@ -18,6 +18,11 @@ add_header Pragma "no-cache";
 add_header Cache-Control "no-store";
 EOF
   }
+  vaultwarden = {
+    backup_user   = "vw"
+    backup_bucket = "randomcoww-vw"
+    backup_path   = "sqlite"
+  }
 }
 
 # webdav for minio #
@@ -73,7 +78,7 @@ resource "helm_release" "webdav" {
           local.kubernetes_ingress_endpoints.webdav,
         ]
       }
-    })
+    }),
   ]
 }
 */
@@ -293,6 +298,78 @@ EOT
           })
         }
       }
-    })
+    }),
+  ]
+}
+
+# vaultwarden #
+
+resource "aws_iam_user" "vaultwarden-backup" {
+  name = local.vaultwarden.backup_user
+}
+
+resource "aws_iam_user_policy" "vaultwarden-backup" {
+  name = aws_iam_user.vaultwarden-backup.name
+  user = aws_iam_user.vaultwarden-backup.name
+  policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [
+      {
+        Effect = "Allow"
+        Action = "*"
+        Resource = [
+          "arn:aws:s3:::${local.vaultwarden.backup_bucket}",
+          "arn:aws:s3:::${local.vaultwarden.backup_bucket}/${local.vaultwarden.backup_path}",
+          "arn:aws:s3:::${local.vaultwarden.backup_bucket}/${local.vaultwarden.backup_path}/*",
+        ]
+      },
+    ]
+  })
+}
+
+resource "aws_iam_access_key" "vaultwarden-backup" {
+  user = aws_iam_user.vaultwarden-backup.name
+}
+
+resource "helm_release" "vaultwarden" {
+  name       = "vaultwarden"
+  namespace  = "default"
+  repository = "https://randomcoww.github.io/repos/helm/"
+  chart      = "vaultwarden"
+  version    = "0.1.3"
+  wait       = false
+  values = [
+    yamlencode({
+      images = {
+        vaultwarden = local.container_images.vaultwarden
+        litestream  = local.container_images.litestream
+      }
+      service = {
+        type = "ClusterIP"
+        port = local.ports.vaultwarden
+      }
+      backup = {
+        accessKeyID     = aws_iam_access_key.vaultwarden-backup.id
+        secretAccessKey = aws_iam_access_key.vaultwarden-backup.secret
+        s3Resource      = "${local.vaultwarden.backup_bucket}/${local.vaultwarden.backup_path}/db.sqlite3"
+      }
+      ingress = {
+        enabled          = true
+        ingressClassName = "nginx"
+        path             = "/"
+        annotations      = local.nginx_ingress_annotations
+        tls = [
+          {
+            secretName = "vaultwarden-tls"
+            hosts = [
+              local.kubernetes_ingress_endpoints.vaultwarden,
+            ]
+          },
+        ]
+        hosts = [
+          local.kubernetes_ingress_endpoints.vaultwarden,
+        ]
+      }
+    }),
   ]
 }

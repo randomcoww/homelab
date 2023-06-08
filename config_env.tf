@@ -121,6 +121,8 @@ locals {
     kube_proxy         = "ghcr.io/randomcoww/kubernetes:kube-proxy-v1.27.1"
     transmission       = "ghcr.io/randomcoww/transmission:20230429"
     wireguard          = "ghcr.io/randomcoww/wireguard:20230429"
+    vaultwarden        = "docker.io/vaultwarden/server:1.28.1-alpine"
+    litestream         = "docker.io/litestream/litestream:latest"
   }
 
   kubernetes = {
@@ -142,6 +144,7 @@ locals {
     transmission = "t.${local.domains.internal}"
     minio        = "m.${local.domains.internal}"
     pl           = "pl.${local.domains.internal}"
+    vaultwarden  = "vw.${local.domains.internal}"
   }
 
   kubernetes_service_endpoints = {
@@ -166,6 +169,7 @@ locals {
     matchbox_api       = 50101
     minio              = 9000
     transmission       = 9091
+    vaultwarden        = 8080
   }
 
   minio_buckets = {
