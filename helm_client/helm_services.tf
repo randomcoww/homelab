@@ -336,7 +336,7 @@ resource "helm_release" "vaultwarden" {
   namespace  = "default"
   repository = "https://randomcoww.github.io/repos/helm/"
   chart      = "vaultwarden"
-  version    = "0.1.3"
+  version    = "0.1.8"
   wait       = false
   values = [
     yamlencode({
@@ -348,6 +348,7 @@ resource "helm_release" "vaultwarden" {
         type = "ClusterIP"
         port = local.ports.vaultwarden
       }
+      domain = "https://${local.kubernetes_ingress_endpoints.vaultwarden}"
       backup = {
         accessKeyID     = aws_iam_access_key.vaultwarden-backup.id
         secretAccessKey = aws_iam_access_key.vaultwarden-backup.secret
@@ -357,7 +358,10 @@ resource "helm_release" "vaultwarden" {
         enabled          = true
         ingressClassName = "nginx"
         path             = "/"
-        annotations      = local.nginx_ingress_annotations
+        annotations = merge(local.nginx_ingress_annotations, {
+          "nginx.ingress.kubernetes.io/proxy-read-timeout" = "3600"
+          "nginx.ingress.kubernetes.io/proxy-send-timeout" = "3600"
+        })
         tls = [
           {
             secretName = "vaultwarden-tls"

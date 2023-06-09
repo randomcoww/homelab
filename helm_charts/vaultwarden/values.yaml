@@ -28,6 +28,8 @@ backup:
   secretAccessKey: "secret_access_key"
   s3Resource: "bucket/path/db.sqlite3"
 
+domain: ""
+
 ingress:
   enabled: true
   annotations:

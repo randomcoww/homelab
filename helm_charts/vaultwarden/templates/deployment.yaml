@@ -61,6 +61,8 @@ spec:
           value: "{{ .Values.dataPath }}/{{ .Values.dbFile }}"
         - name: ROCKET_PORT
           value: "{{ .Values.ports.vaultwarden }}"
+        - name: DOMAIN
+          value: "{{ .Values.domain }}"
         volumeMounts:
         - name: vaultwarden-data
           mountPath: "/{{ .Values.dataPath }}"
