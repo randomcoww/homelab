@@ -38,6 +38,8 @@ PASSWORD='password'
 WIREGUARD_CONFIG='filepath'
 
 cat > secrets.tfvars <<EOF
+aws_region = "us-west-2"
+
 users = {
   admin = {}
   client = {
@@ -58,6 +60,7 @@ ssh_client = {
 }
 
 letsencrypt_email = ""
+duckdns_token     = ""
 
 wireguard_client = {
   Interface = {
@@ -78,8 +81,6 @@ hostapd = {
   country_code   = ""
   channel        = 100
 }
-
-aws_region = "us-west-2"
 EOF
 ```
 

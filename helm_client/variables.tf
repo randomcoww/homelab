@@ -22,3 +22,7 @@ variable "hostapd" {
 variable "aws_region" {
   type = string
 }
+
+variable "duckdns_token" {
+  type = string
+}

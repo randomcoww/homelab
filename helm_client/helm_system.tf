@@ -300,6 +300,10 @@ resource "helm_release" "cert_manager" {
       prometheus = {
         enabled = false
       }
+      extraArgs = [
+        "--dns01-recursive-nameservers-only",
+        "--dns01-recursive-nameservers=${local.upstream_dns_ip}:53",
+      ]
     }),
   ]
 }
@@ -331,7 +335,7 @@ resource "tls_private_key" "letsencrypt-staging" {
 }
 
 resource "helm_release" "cert_issuer_secrets" {
-  name             = "cert-issuer"
+  name             = "cert-issuer-secrets"
   repository       = "https://randomcoww.github.io/repos/helm/"
   chart            = "helm-wrapper"
   namespace        = "cert-manager"
@@ -441,6 +445,24 @@ resource "helm_release" "cert_issuer" {
       helm_release.cert_issuer_secrets,
     ]
   }
+}
+
+# duckdns #
+
+resource "helm_release" "duckdns" {
+  name       = "duckdns"
+  repository = "https://ebrianne.github.io/helm-charts"
+  chart      = "duckdns-go"
+  wait       = true
+  version    = "1.0.5"
+  values = [
+    yamlencode({
+      duckdns = {
+        token   = var.duckdns_token
+        domains = local.domains.internal
+      }
+    }),
+  ]
 }
 
 # authelia #
