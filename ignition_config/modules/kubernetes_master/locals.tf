@@ -23,7 +23,7 @@ locals {
       }
     }) :
     cert_name => merge(cert, {
-      path = "${local.certs_path}/kubbernetes-${cert_name}.pem"
+      path = "${local.certs_path}/kubernetes-${cert_name}.pem"
     })
   }
 
