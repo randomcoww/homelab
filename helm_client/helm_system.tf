@@ -349,7 +349,7 @@ resource "helm_release" "cert_issuer_secrets" {
           apiVersion = "v1"
           kind       = "Secret"
           metadata = {
-            name = "letsencrypt-prod"
+            name = local.cert_issuer_prod
           }
           stringData = {
             "tls.key" = chomp(tls_private_key.letsencrypt-prod.private_key_pem)
@@ -360,7 +360,7 @@ resource "helm_release" "cert_issuer_secrets" {
           apiVersion = "v1"
           kind       = "Secret"
           metadata = {
-            name = "letsencrypt-staging"
+            name = local.cert_issuer_staging
           }
           stringData = {
             "tls.key" = chomp(tls_private_key.letsencrypt-staging.private_key_pem)
@@ -411,14 +411,14 @@ resource "helm_release" "cert_issuer" {
           apiVersion = "cert-manager.io/v1"
           kind       = "ClusterIssuer"
           metadata = {
-            name = "letsencrypt-prod"
+            name = local.cert_issuer_prod
           }
           spec = {
             acme = {
               server = "https://acme-v02.api.letsencrypt.org/directory"
               email  = var.letsencrypt.email
               privateKeySecretRef = {
-                name = "letsencrypt-prod"
+                name = local.cert_issuer_prod
               }
               disableAccountKeyGeneration = true
               solvers = [
@@ -453,14 +453,14 @@ resource "helm_release" "cert_issuer" {
           apiVersion = "cert-manager.io/v1"
           kind       = "ClusterIssuer"
           metadata = {
-            name = "letsencrypt-staging"
+            name = local.cert_issuer_staging
           }
           spec = {
             acme = {
               server = "https://acme-staging-v02.api.letsencrypt.org/directory"
               email  = var.letsencrypt.email
               privateKeySecretRef = {
-                name = "letsencrypt-staging"
+                name = local.cert_issuer_staging
               }
               disableAccountKeyGeneration = true
               solvers = [
@@ -541,7 +541,7 @@ resource "helm_release" "authelia" {
       ingress = {
         enabled = true
         annotations = {
-          "cert-manager.io/cluster-issuer" = "letsencrypt-prod"
+          "cert-manager.io/cluster-issuer" = local.cert_issuer_prod
         }
         certManager = true
         className   = "nginx"
@@ -1044,11 +1044,7 @@ resource "helm_release" "minio" {
       ingress = {
         enabled = false
         # ingressClassName = "nginx"
-        # annotations = {
-        #   "cert-manager.io/cluster-issuer"                    = "letsencrypt-prod"
-        #   "nginx.ingress.kubernetes.io/proxy-http-version"    = "1.1"
-        #   "nginx.ingress.kubernetes.io/proxy-connect-timeout" = 300
-        # }
+        # annotations      = local.nginx_ingress_annotations
         # tls = [
         #   {
         #     secretName = "minio-tls"
