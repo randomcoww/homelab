@@ -292,7 +292,7 @@ resource "helm_release" "cert_manager" {
   chart            = "cert-manager"
   namespace        = "cert-manager"
   create_namespace = true
-  version          = "1.11.1"
+  version          = "1.12.1"
   wait             = true
   values = [
     yamlencode({
@@ -310,7 +310,7 @@ resource "helm_release" "cert_manager" {
 
 resource "null_resource" "letsencrypt-id" {
   triggers = {
-    id = var.letsencrypt_email
+    id = var.letsencrypt.email
   }
 }
 
@@ -372,6 +372,33 @@ resource "helm_release" "cert_issuer_secrets" {
   ]
 }
 
+resource "helm_release" "cloudflare_token" {
+  name             = "cloudflare-token"
+  repository       = "https://randomcoww.github.io/repos/helm/"
+  chart            = "helm-wrapper"
+  namespace        = "cert-manager"
+  create_namespace = true
+  wait             = true
+  version          = "0.1.0"
+  values = [
+    yamlencode({
+      manifests = [
+        {
+          apiVersion = "v1"
+          kind       = "Secret"
+          metadata = {
+            name = "cloudflare-token"
+          }
+          stringData = {
+            token = var.cloudflare.token
+          }
+          type = "Opaque"
+        },
+      ]
+    }),
+  ]
+}
+
 resource "helm_release" "cert_issuer" {
   name       = "cert-issuer"
   repository = "https://randomcoww.github.io/repos/helm/"
@@ -389,12 +416,28 @@ resource "helm_release" "cert_issuer" {
           spec = {
             acme = {
               server = "https://acme-v02.api.letsencrypt.org/directory"
-              email  = var.letsencrypt_email
+              email  = var.letsencrypt.email
               privateKeySecretRef = {
                 name = "letsencrypt-prod"
               }
               disableAccountKeyGeneration = true
               solvers = [
+                {
+                  dns01 = {
+                    cloudflare = {
+                      email = var.cloudflare.email
+                      apiTokenSecretRef = {
+                        name = "cloudflare-token"
+                        key  = "token"
+                      }
+                    }
+                  }
+                  selector = {
+                    dnsZones = [
+                      local.domains.internal
+                    ]
+                  }
+                },
                 {
                   http01 = {
                     ingress = {
@@ -415,7 +458,7 @@ resource "helm_release" "cert_issuer" {
           spec = {
             acme = {
               server = "https://acme-staging-v02.api.letsencrypt.org/directory"
-              email  = var.letsencrypt_email
+              email  = var.letsencrypt.email
               privateKeySecretRef = {
                 name = "letsencrypt-staging"
               }
@@ -445,24 +488,6 @@ resource "helm_release" "cert_issuer" {
       helm_release.cert_issuer_secrets,
     ]
   }
-}
-
-# duckdns #
-
-resource "helm_release" "duckdns" {
-  name       = "duckdns"
-  repository = "https://ebrianne.github.io/helm-charts"
-  chart      = "duckdns-go"
-  wait       = true
-  version    = "1.0.5"
-  values = [
-    yamlencode({
-      duckdns = {
-        token   = var.duckdns_token
-        domains = local.domains.internal
-      }
-    }),
-  ]
 }
 
 # authelia #

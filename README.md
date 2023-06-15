@@ -59,8 +59,13 @@ ssh_client = {
   validity_period_hours = 336
 }
 
-letsencrypt_email = ""
-duckdns_token     = ""
+letsencrypt = {
+  email = ""
+}
+cloudflare = {
+  email = ""
+  token = ""
+}
 
 wireguard_client = {
   Interface = {

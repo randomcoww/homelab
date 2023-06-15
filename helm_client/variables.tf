@@ -1,11 +1,24 @@
+variable "aws_region" {
+  type = string
+}
+
 # User override (local.preprocess.users)
 variable "users" {
   type    = any
   default = {}
 }
 
-variable "letsencrypt_email" {
-  type = string
+variable "letsencrypt" {
+  type = object({
+    email = string
+  })
+}
+
+variable "cloudflare" {
+  type = object({
+    email = string
+    token = string
+  })
 }
 
 variable "wireguard_client" {
@@ -17,12 +30,4 @@ variable "wireguard_client" {
 
 variable "hostapd" {
   type = map(string)
-}
-
-variable "aws_region" {
-  type = string
-}
-
-variable "duckdns_token" {
-  type = string
 }

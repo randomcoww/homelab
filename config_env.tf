@@ -134,7 +134,7 @@ locals {
 
   domains = {
     internal_mdns = "local"
-    internal      = "acow.duckdns.org"
+    internal      = "fuzzybunny.win"
     kubernetes    = "cluster.internal"
   }
 
