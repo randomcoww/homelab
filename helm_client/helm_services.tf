@@ -309,7 +309,7 @@ resource "helm_release" "vaultwarden" {
   namespace  = "default"
   repository = "https://randomcoww.github.io/repos/helm/"
   chart      = "vaultwarden"
-  version    = "0.1.8"
+  version    = "0.1.9"
   wait       = false
   values = [
     yamlencode({
@@ -326,6 +326,15 @@ resource "helm_release" "vaultwarden" {
         accessKeyID     = aws_iam_access_key.vaultwarden-backup.id
         secretAccessKey = aws_iam_access_key.vaultwarden-backup.secret
         s3Resource      = "${local.vaultwarden.backup_bucket}/${local.vaultwarden.backup_path}/db.sqlite3"
+      }
+      vaultwarden = {
+        SENDS_ALLOWED            = false
+        EMERGENCY_ACCESS_ALLOWED = false
+        PASSWORD_HINTS_ALLOWED   = false
+        SIGNUPS_DOMAINS_WHITELIST = join(",", [
+          local.domains.internal,
+          local.domains.internal_mdns,
+        ])
       }
       ingress = {
         enabled          = true
