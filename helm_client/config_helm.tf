@@ -5,12 +5,13 @@ locals {
   # https://www.authelia.com/overview/security/measures/
   nginx_ingress_annotations = {
     "cert-manager.io/cluster-issuer"                    = local.cert_issuer_prod
+    "nginx.ingress.kubernetes.io/auth-method"           = "GET"
+    "nginx.ingress.kubernetes.io/auth-url"              = "http://${local.kubernetes_service_endpoints.authelia}/api/verify"
+    "nginx.ingress.kubernetes.io/auth-signin"           = "https://${local.kubernetes_ingress_endpoints.auth}?rm=$request_method"
     "nginx.ingress.kubernetes.io/auth-response-headers" = "Remote-User,Remote-Name,Remote-Groups,Remote-Email"
-    "nginx.ingress.kubernetes.io/auth-signin"           = "https://${local.kubernetes_ingress_endpoints.auth}"
     "nginx.ingress.kubernetes.io/auth-snippet"          = <<EOF
 proxy_set_header X-Forwarded-Method $request_method;
 EOF
-    "nginx.ingress.kubernetes.io/auth-url"              = "http://${local.kubernetes_service_endpoints.authelia}/api/verify"
     "nginx.ingress.kubernetes.io/server-snippet"        = <<EOF
 add_header X-Content-Type-Options "nosniff" always;
 add_header Referrer-Policy "strict-origin-when-cross-origin" always;
