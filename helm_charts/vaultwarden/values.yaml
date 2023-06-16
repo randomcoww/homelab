@@ -30,6 +30,9 @@ backup:
 
 domain: ""
 
+vaultwarden:
+  # ENV: value
+
 ingress:
   enabled: true
   annotations:

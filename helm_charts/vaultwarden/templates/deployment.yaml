@@ -63,6 +63,10 @@ spec:
           value: "{{ .Values.ports.vaultwarden }}"
         - name: DOMAIN
           value: "{{ .Values.domain }}"
+        {{- range $k, $v := .Values.vaultwarden }}
+        - name: {{ $k }}
+          value: "{{ $v }}"
+        {{- end }}
         volumeMounts:
         - name: vaultwarden-data
           mountPath: "/{{ .Values.dataPath }}"
