@@ -12,6 +12,7 @@ resource "cloudflare_zone_settings_override" "internal" {
     min_tls_version          = "1.3"
     opportunistic_encryption = "on"
     universal_ssl            = "on"
+    websockets               = "on"
   }
 }
 
