@@ -331,10 +331,7 @@ resource "helm_release" "vaultwarden" {
         SENDS_ALLOWED            = false
         EMERGENCY_ACCESS_ALLOWED = false
         PASSWORD_HINTS_ALLOWED   = false
-        SIGNUPS_DOMAINS_WHITELIST = join(",", [
-          local.domains.internal,
-          local.domains.internal_mdns,
-        ])
+        SIGNUPS_ALLOWED          = false
       }
       ingress = {
         enabled          = true
