@@ -2,6 +2,19 @@ data "cloudflare_zone" "internal" {
   name = local.domains.internal
 }
 
+resource "cloudflare_zone_settings_override" "internal" {
+  zone_id = data.cloudflare_zone.internal.id
+  settings {
+    always_use_https         = "on"
+    tls_1_3                  = "on"
+    automatic_https_rewrites = "on"
+    ssl                      = "full"
+    min_tls_version          = "1.3"
+    opportunistic_encryption = "on"
+    universal_ssl            = "on"
+  }
+}
+
 data "cloudflare_api_token_permission_groups" "all" {
 }
 
