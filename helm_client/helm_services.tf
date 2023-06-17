@@ -356,3 +356,33 @@ resource "helm_release" "vaultwarden" {
     }),
   ]
 }
+
+# External tunnel #
+
+resource "helm_release" "cloudflare_tunnel" {
+  name       = "cloudflare-tunnel"
+  namespace  = "default"
+  repository = "https://cloudflare.github.io/helm-charts/"
+  chart      = "cloudflare-tunnel"
+  version    = "0.2.0"
+  wait       = false
+  values = [
+    yamlencode({
+      cloudflare = {
+        account    = var.cloudflare.account_id
+        tunnelName = cloudflare_tunnel.homelab.name
+        tunnelId   = cloudflare_tunnel.homelab.id
+        secret     = cloudflare_tunnel.homelab.secret
+        ingress = [
+          {
+            hostname = "*.${local.domains.internal}"
+            service  = "https://${local.kubernetes_service_endpoints.nginx}"
+          },
+        ]
+      }
+      image = {
+        tag = "2023.6.0-amd64"
+      }
+    }),
+  ]
+}

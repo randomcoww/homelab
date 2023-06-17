@@ -151,6 +151,7 @@ locals {
     kubernetes = "kubernetes.default.svc.${local.domains.kubernetes}"
     minio      = "minio.minio.svc.${local.domains.kubernetes}"
     authelia   = "authelia.authelia.svc.${local.domains.kubernetes}"
+    nginx      = "ingress-nginx-controller.ingress-nginx.svc.${local.domains.kubernetes}"
   }
 
   ports = {

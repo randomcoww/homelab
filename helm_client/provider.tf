@@ -7,3 +7,8 @@ provider "helm" {
 provider "aws" {
   region = var.aws_region
 }
+
+provider "cloudflare" {
+  email   = var.cloudflare.email
+  api_key = var.cloudflare.api_key
+}

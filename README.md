@@ -63,8 +63,9 @@ letsencrypt = {
   email = ""
 }
 cloudflare = {
-  email = ""
-  token = ""
+  email      = ""
+  account_id = ""
+  api_token  = ""
 }
 
 wireguard_client = {

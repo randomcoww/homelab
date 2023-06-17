@@ -16,8 +16,9 @@ variable "letsencrypt" {
 
 variable "cloudflare" {
   type = object({
-    email = string
-    token = string
+    email      = string
+    account_id = string
+    api_key    = string
   })
 }
 

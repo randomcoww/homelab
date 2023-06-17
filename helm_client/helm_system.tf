@@ -254,7 +254,7 @@ resource "helm_release" "nginx_ingress" {
   name             = "ingress-nginx"
   repository       = "https://kubernetes.github.io/ingress-nginx"
   chart            = "ingress-nginx"
-  namespace        = "ingress-nginx"
+  namespace        = split(".", local.kubernetes_service_endpoints.nginx)[1]
   create_namespace = true
   version          = "4.6.1"
   values = [
@@ -271,7 +271,7 @@ resource "helm_release" "nginx_ingress" {
           externalIPs = [
             local.services.external_ingress.ip,
           ]
-          # externalTrafficPolicy = "Local"
+          externalTrafficPolicy = "Local"
         }
         config = {
           ignore-invalid-headers = "off"
@@ -390,7 +390,7 @@ resource "helm_release" "cloudflare_token" {
             name = "cloudflare-token"
           }
           stringData = {
-            token = var.cloudflare.token
+            token = cloudflare_api_token.dns_edit.id
           }
           type = "Opaque"
         },
@@ -596,14 +596,10 @@ resource "helm_release" "authelia" {
             },
           ]
           rules = [
-            # {
-            #   domain   = local.kubernetes_ingress_endpoints.mpd
-            #   networks = ["whitelist"]
-            #   policy   = "bypass"
-            # },
             {
-              domain = local.kubernetes_ingress_endpoints.mpd
-              policy = "bypass"
+              domain   = local.kubernetes_ingress_endpoints.mpd
+              networks = ["whitelist"]
+              policy   = "bypass"
             },
             {
               domain = local.kubernetes_ingress_endpoints.transmission
