@@ -527,6 +527,11 @@ resource "helm_release" "authelia_users" {
   ]
 }
 
+resource "random_password" "authelia-storage-secret" {
+  length  = 64
+  special = false
+}
+
 resource "helm_release" "authelia" {
   name             = split(".", local.kubernetes_service_endpoints.authelia)[0]
   namespace        = split(".", local.kubernetes_service_endpoints.authelia)[1]
@@ -610,10 +615,31 @@ resource "helm_release" "authelia" {
               policy = "one_factor"
             },
             {
+              domain    = local.kubernetes_ingress_endpoints.vaultwarden
+              resources = ["^/admin.*"]
+              networks  = ["whitelist"]
+              policy    = "bypass"
+            },
+            {
+              domain    = local.kubernetes_ingress_endpoints.vaultwarden
+              resources = ["^/admin.*"]
+              policy    = "deny"
+            },
+            {
               domain = local.kubernetes_ingress_endpoints.vaultwarden
               policy = "bypass"
             },
           ]
+        }
+        default_2fa_method = "totp"
+        totp = {
+          disable = false
+        }
+        duo_api = {
+          disable = true
+        }
+        webauthn = {
+          disable = true
         }
         theme = "dark"
         session = {
@@ -628,6 +654,7 @@ resource "helm_release" "authelia" {
           max_retries = 4
         }
         storage = {
+          encryption_key = random_password.authelia-storage-secret.result
           local = {
             enabled = true
           }
@@ -644,6 +671,11 @@ resource "helm_release" "authelia" {
             enabled = true
           }
           smtp = {
+            enabled = false
+          }
+        }
+        telemetry = {
+          metrics = {
             enabled = false
           }
         }

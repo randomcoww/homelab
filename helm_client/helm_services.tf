@@ -305,6 +305,7 @@ resource "helm_release" "vaultwarden" {
         EMERGENCY_ACCESS_ALLOWED = false
         PASSWORD_HINTS_ALLOWED   = false
         SIGNUPS_ALLOWED          = false
+        INVITATIONS_ALLOWED      = false
       }
       ingress = {
         enabled          = true
