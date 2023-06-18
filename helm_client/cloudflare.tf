@@ -16,17 +16,17 @@ resource "cloudflare_zone_settings_override" "internal" {
   }
 }
 
-resource "cloudflare_filter" "geo_filter" {
-  zone_id     = data.cloudflare_zone.internal.id
-  description = "Block non-US IPs"
-  expression  = "(ip.geoip.country ne \"US\")"
-}
+resource "cloudflare_ruleset" "geo_filter" {
+  zone_id = data.cloudflare_zone.internal.id
+  name    = "Block non-US IPs"
+  kind    = "zone"
+  phase   = "http_request_firewall_custom"
 
-resource "cloudflare_firewall_rule" "geo_filter" {
-  zone_id     = data.cloudflare_zone.internal.id
-  description = "Block non-US IPs"
-  filter_id   = cloudflare_filter.geo_filter.id
-  action      = "block"
+  rules {
+    action     = "block"
+    expression = "(ip.geoip.country ne \"US\")"
+    enabled    = true
+  }
 }
 
 data "cloudflare_api_token_permission_groups" "all" {
@@ -38,9 +38,10 @@ resource "cloudflare_api_token" "dns_edit" {
   policy {
     permission_groups = [
       data.cloudflare_api_token_permission_groups.all.zone["DNS Write"],
+      data.cloudflare_api_token_permission_groups.all.zone["Zone Read"],
     ]
     resources = {
-      "com.cloudflare.api.account.zone.${data.cloudflare_zone.internal.id}" = "*"
+      "com.cloudflare.api.account.zone.*" = "*"
     }
   }
 }

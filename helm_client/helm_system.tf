@@ -296,6 +296,9 @@ resource "helm_release" "cert_manager" {
   wait             = true
   values = [
     yamlencode({
+      deploymentAnnotations = {
+        "certmanager.k8s.io/disable-validation" = "true"
+      }
       installCRDs = true
       prometheus = {
         enabled = false
@@ -390,7 +393,7 @@ resource "helm_release" "cloudflare_token" {
             name = "cloudflare-token"
           }
           stringData = {
-            token = cloudflare_api_token.dns_edit.id
+            token = cloudflare_api_token.dns_edit.value
           }
           type = "Opaque"
         },
@@ -425,7 +428,6 @@ resource "helm_release" "cert_issuer" {
                 {
                   dns01 = {
                     cloudflare = {
-                      email = var.cloudflare.email
                       apiTokenSecretRef = {
                         name = "cloudflare-token"
                         key  = "token"
