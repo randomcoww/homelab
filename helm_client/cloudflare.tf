@@ -16,6 +16,19 @@ resource "cloudflare_zone_settings_override" "internal" {
   }
 }
 
+resource "cloudflare_filter" "geo_filter" {
+  zone_id     = data.cloudflare_zone.internal.id
+  description = "Block non-US IPs"
+  expression  = "(ip.geoip.country ne \"US\")"
+}
+
+resource "cloudflare_firewall_rule" "geo_filter" {
+  zone_id     = data.cloudflare_zone.internal.id
+  description = "Block non-US IPs"
+  filter_id   = cloudflare_filter.geo_filter.id
+  action      = "block"
+}
+
 data "cloudflare_api_token_permission_groups" "all" {
 }
 
