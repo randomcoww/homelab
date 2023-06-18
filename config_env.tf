@@ -145,6 +145,7 @@ locals {
     minio        = "m.${local.domains.internal}"
     pl           = "pl.${local.domains.internal}"
     vaultwarden  = "vw.${local.domains.internal}"
+    webdav       = "w.${local.domains.internal}"
   }
 
   kubernetes_service_endpoints = {
@@ -152,6 +153,7 @@ locals {
     minio      = "minio.minio.svc.${local.domains.kubernetes}"
     authelia   = "authelia.authelia.svc.${local.domains.kubernetes}"
     nginx      = "ingress-nginx-controller.ingress-nginx.svc.${local.domains.kubernetes}"
+    webdav     = "webdav.default.svc.${local.domains.kubernetes}"
   }
 
   ports = {
@@ -193,6 +195,10 @@ locals {
     videos = {
       name   = "videos"
       policy = "none"
+    }
+    backup = {
+      name   = "backup"
+      policy = "download"
     }
   }
 

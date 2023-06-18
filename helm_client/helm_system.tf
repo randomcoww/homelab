@@ -631,6 +631,11 @@ resource "helm_release" "authelia" {
               domain = local.kubernetes_ingress_endpoints.vaultwarden
               policy = "bypass"
             },
+            {
+              domain   = local.kubernetes_ingress_endpoints.webdav
+              networks = ["whitelist"]
+              policy   = "one_factor"
+            },
           ]
         }
         default_2fa_method = "totp"

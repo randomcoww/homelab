@@ -1,5 +1,5 @@
 # webdav for minio #
-/*
+
 resource "helm_release" "webdav" {
   name       = split(".", local.kubernetes_service_endpoints.webdav)[0]
   namespace  = split(".", local.kubernetes_service_endpoints.webdav)[1]
@@ -14,7 +14,7 @@ resource "helm_release" "webdav" {
       }
       replicaCount  = 2
       minioEndPoint = "http://${local.kubernetes_service_endpoints.minio}:${local.ports.minio}"
-      minioBucket   = local.minio_buckets.pictures.name
+      minioBucket   = local.minio_buckets.backup.name
       affinity = {
         podAntiAffinity = {
           requiredDuringSchedulingIgnoredDuringExecution = [
@@ -54,7 +54,6 @@ resource "helm_release" "webdav" {
     }),
   ]
 }
-*/
 
 # mpd #
 
