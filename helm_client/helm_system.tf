@@ -609,12 +609,14 @@ resource "helm_release" "authelia" {
               policy   = "bypass"
             },
             {
-              domain = local.kubernetes_ingress_endpoints.transmission
-              policy = "one_factor"
+              domain   = local.kubernetes_ingress_endpoints.transmission
+              networks = ["whitelist"]
+              policy   = "one_factor"
             },
             {
-              domain = local.kubernetes_ingress_endpoints.pl
-              policy = "one_factor"
+              domain   = local.kubernetes_ingress_endpoints.pl
+              networks = ["whitelist"]
+              policy   = "one_factor"
             },
             {
               domain    = local.kubernetes_ingress_endpoints.vaultwarden
