@@ -188,7 +188,7 @@ Write configuration for `mc`
 ```bash
 mkdir -p ~/.mc && \
 tw terraform -chdir=helm_client \
-  output -json minio_endpoint > ~/.mc/config.json
+  output -json mc_config > ~/.mc/config.json
 ```
 
 #### Push OS images generated previously into Minio

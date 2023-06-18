@@ -28,4 +28,9 @@ EOF
     backup_bucket = "randomcoww-vw"
     backup_path   = "sqlite"
   }
+
+  s3_backup = {
+    backup_user   = "backup"
+    backup_bucket = "randomcoww-backup"
+  }
 }

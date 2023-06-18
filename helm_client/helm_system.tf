@@ -1143,21 +1143,6 @@ resource "helm_release" "minio" {
   ]
 }
 
-output "minio_endpoint" {
-  value = {
-    version = "10"
-    aliases = {
-      m = {
-        url       = "http://${local.services.minio.ip}:${local.ports.minio}"
-        accessKey = nonsensitive(random_password.minio-access-key-id.result)
-        secretKey = nonsensitive(random_password.minio-secret-access-key.result)
-        api       = "S3v4"
-        path      = "auto"
-      }
-    }
-  }
-}
-
 # amd device plugin #
 /*
 resource "helm_release" "amd_gpu" {

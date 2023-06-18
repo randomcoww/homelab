@@ -14,7 +14,7 @@ resource "helm_release" "webdav" {
       }
       replicaCount  = 2
       minioEndPoint = "http://${local.kubernetes_service_endpoints.minio}:${local.ports.minio}"
-      minioBucket   = local.minio_buckets.ebook.name
+      minioBucket   = local.minio_buckets.pictures.name
       affinity = {
         podAntiAffinity = {
           requiredDuringSchedulingIgnoredDuringExecution = [
@@ -331,7 +331,7 @@ resource "helm_release" "vaultwarden" {
   ]
 }
 
-# External tunnel #
+# cloudflare tunnel #
 
 resource "helm_release" "cloudflare_tunnel" {
   name       = "cloudflare-tunnel"

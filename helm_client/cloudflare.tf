@@ -67,11 +67,11 @@ resource "cloudflare_tunnel_config" "homelab" {
       # need to remove default params from terrafrom
       origin_request {
         no_tls_verify          = true
-        tls_timeout            = 0
+        tls_timeout            = "0s"
         proxy_address          = ""
-        tcp_keep_alive         = 0
-        connect_timeout        = 0
-        keep_alive_timeout     = 0
+        tcp_keep_alive         = "0s"
+        connect_timeout        = "0s"
+        keep_alive_timeout     = "0s"
         keep_alive_connections = 0
       }
     }
