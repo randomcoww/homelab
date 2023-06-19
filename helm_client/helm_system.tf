@@ -271,7 +271,7 @@ resource "helm_release" "nginx_ingress" {
           externalIPs = [
             local.services.external_ingress.ip,
           ]
-          externalTrafficPolicy = "Local"
+          # externalTrafficPolicy = "Local"
         }
         config = {
           ignore-invalid-headers = "off"
