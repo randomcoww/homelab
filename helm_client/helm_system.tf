@@ -1152,6 +1152,36 @@ resource "helm_release" "minio" {
   ]
 }
 
+# cloudflare tunnel #
+
+resource "helm_release" "cloudflare_tunnel" {
+  name       = "cloudflare-tunnel"
+  namespace  = "default"
+  repository = "https://cloudflare.github.io/helm-charts/"
+  chart      = "cloudflare-tunnel"
+  version    = "0.2.0"
+  wait       = false
+  values = [
+    yamlencode({
+      cloudflare = {
+        account    = var.cloudflare.account_id
+        tunnelName = cloudflare_tunnel.homelab.name
+        tunnelId   = cloudflare_tunnel.homelab.id
+        secret     = cloudflare_tunnel.homelab.secret
+        ingress = [
+          {
+            hostname = "*.${local.domains.internal}"
+            service  = "https://${local.kubernetes_service_endpoints.nginx}"
+          },
+        ]
+      }
+      image = {
+        tag = "2023.6.0-amd64"
+      }
+    }),
+  ]
+}
+
 # amd device plugin #
 /*
 resource "helm_release" "amd_gpu" {
@@ -1193,135 +1223,3 @@ resource "helm_release" "nvidia_device_plugin" {
   ]
 }
 */
-
-# hostapd #
-
-module "hostapd-roaming" {
-  source        = "./modules/hostapd_roaming"
-  resource_name = "hostapd"
-  replica_count = 1
-}
-
-resource "helm_release" "hostapd" {
-  name       = "hostapd"
-  namespace  = "default"
-  repository = "https://randomcoww.github.io/repos/helm/"
-  chart      = "hostapd"
-  version    = "0.1.8"
-  wait       = false
-  values = [
-    yamlencode({
-      image = local.container_images.hostapd
-      peers = [
-        for _, peer in module.hostapd-roaming.peers :
-        {
-          podName = peer.pod_name
-          config = merge({
-            # sae_password=
-            # ssid=
-            # country_code=
-            # # one of: 36 44 52 60 100 108 116 124 132 140 149 157 184 192
-            # channel=
-            # # one of: 42 58 106 122 138 155
-            vht_oper_centr_freq_seg0_idx = var.hostapd.channel + 6
-            interface                    = "wlan0"
-            bridge                       = "br-lan"
-            driver                       = "nl80211"
-            noscan                       = 1
-            preamble                     = 1
-            wpa                          = 2
-            wpa_key_mgmt                 = "SAE"
-            wpa_pairwise                 = "CCMP"
-            group_cipher                 = "CCMP"
-            hw_mode                      = "a"
-            require_ht                   = 1
-            require_vht                  = 1
-            ieee80211n                   = 1
-            ieee80211ax                  = 1
-            ieee80211d                   = 1
-            ieee80211h                   = 0
-            ieee80211w                   = 2
-            vht_oper_chwidth             = 1
-            ignore_broadcast_ssid        = 0
-            auth_algs                    = 1
-            wmm_enabled                  = 1
-            disassoc_low_ack             = 0
-            ap_max_inactivity            = 900
-            ht_capab = "[${join("][", [
-              "HT40-", "HT40+", "SHORT-GI-20", "SHORT-GI-40",
-              "LDPC", "TX-STBC", "RX-STBC1", "MAX-AMSDU-7935",
-            ])}]"
-            vht_capab = "[${join("][", [
-              "RXLDPC", "TX-STBC-2BY1", "RX-STBC-1", "SHORT-GI-80",
-              "MAX-MPDU-11454", "MAX-A-MPDU-LEN-EXP3",
-              "BF-ANTENNA-1", "SOUNDING-DIMENSION-1", "SU-BEAMFORMEE",
-              "BF-ANTENNA-2", "SOUNDING-DIMENSION-2", "MU-BEAMFORMEE",
-              "RX-ANTENNA-PATTERN", "TX-ANTENNA-PATTERN",
-            ])}]"
-            bssid                 = peer.bssid
-            mobility_domain       = peer.mobility_domain
-            pmk_r1_push           = 1
-            ft_psk_generate_local = 1
-            r1_key_holder         = peer.r1_key_holder
-            nas_identifier        = peer.nas_identifier
-            r0kh = [
-              for _, p in module.hostapd-roaming.peers :
-              "${p.bssid} ${p.nas_identifier} ${p.encryption_key}"
-            ]
-            r1kh = [
-              for _, p in module.hostapd-roaming.peers :
-              "${p.bssid} ${p.bssid} ${p.encryption_key}"
-            ]
-          }, var.hostapd)
-        }
-      ]
-      StatefulSet = {
-        replicaCount = length(module.hostapd-roaming.peers)
-      }
-      affinity = {
-        nodeAffinity = {
-          requiredDuringSchedulingIgnoredDuringExecution = {
-            nodeSelectorTerms = [
-              {
-                matchExpressions = [
-                  {
-                    key      = "kubernetes.io/hostname"
-                    operator = "In"
-                    values = [
-                      for _, member in local.members.desktop :
-                      member.hostname
-                    ]
-                  },
-                ]
-              },
-            ]
-          }
-        }
-        podAntiAffinity = {
-          requiredDuringSchedulingIgnoredDuringExecution = [
-            {
-              labelSelector = {
-                matchExpressions = [
-                  {
-                    key      = "app"
-                    operator = "In"
-                    values = [
-                      "hostapd",
-                    ]
-                  },
-                ]
-              }
-              topologyKey = "kubernetes.io/hostname"
-            },
-          ]
-        }
-      }
-      tolerations = [
-        {
-          key      = "node-role.kubernetes.io/de"
-          operator = "Exists"
-        },
-      ]
-    }),
-  ]
-}
