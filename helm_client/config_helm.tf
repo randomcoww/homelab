@@ -23,6 +23,12 @@ add_header Cache-Control "no-store";
 EOF
   }
 
+  authelia = {
+    backup_user   = "authelia"
+    backup_bucket = "randomcoww-authelia"
+    backup_path   = "sqlite"
+  }
+
   vaultwarden = {
     backup_user   = "vw"
     backup_bucket = "randomcoww-vw"

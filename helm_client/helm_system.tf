@@ -535,9 +535,11 @@ resource "random_password" "authelia-storage-secret" {
 }
 
 resource "helm_release" "authelia" {
-  name             = split(".", local.kubernetes_service_endpoints.authelia)[0]
-  namespace        = split(".", local.kubernetes_service_endpoints.authelia)[1]
-  repository       = "https://charts.authelia.com"
+  name      = split(".", local.kubernetes_service_endpoints.authelia)[0]
+  namespace = split(".", local.kubernetes_service_endpoints.authelia)[1]
+  # repository       = "https://charts.authelia.com"
+  ## forked chart for litestream sqlite backup
+  repository       = "https://randomcoww.github.io/repos/helm/"
   chart            = "authelia"
   create_namespace = true
   version          = "0.8.57"
@@ -545,6 +547,14 @@ resource "helm_release" "authelia" {
   values = [
     yamlencode({
       domain = local.domains.internal
+      ## forked chart params
+      backup = {
+        image           = local.container_images.litestream
+        s3Resource      = "${local.authelia.backup_bucket}/${local.authelia.backup_path}/db.sqlite3"
+        accessKeyID     = aws_iam_access_key.authelia-backup.id
+        secretAccessKey = aws_iam_access_key.authelia-backup.secret
+      }
+      ##
       ingress = {
         enabled = true
         annotations = {
@@ -578,6 +588,23 @@ resource "helm_release" "authelia" {
         ]
       }
       configMap = {
+        telemetry = {
+          metrics = {
+            enabled = false
+          }
+        }
+        default_redirection_url = "https://${local.kubernetes_ingress_endpoints.auth}"
+        default_2fa_method      = "totp"
+        theme                   = "dark"
+        totp = {
+          disable = false
+        }
+        webauthn = {
+          disable = true
+        }
+        duo_api = {
+          disable = true
+        }
         authentication_backend = {
           password_reset = {
             disable = true
@@ -588,6 +615,37 @@ resource "helm_release" "authelia" {
           file = {
             enabled = true
             path    = "/config/users_database.yml"
+          }
+        }
+        session = {
+          inactivity           = "1h"
+          expiration           = "1h"
+          remember_me_duration = 0
+          redis = {
+            enabled = false
+          }
+        }
+        regulation = {
+          max_retries = 4
+        }
+        storage = {
+          local = {
+            enabled = true
+          }
+          mysql = {
+            enabled = false
+          }
+          postgres = {
+            enabled = false
+          }
+        }
+        notifier = {
+          disable_startup_check = true
+          filesystem = {
+            enabled = true
+          }
+          smtp = {
+            enabled = false
           }
         }
         access_control = {
@@ -609,20 +667,18 @@ resource "helm_release" "authelia" {
               policy   = "bypass"
             },
             {
-              domain   = local.kubernetes_ingress_endpoints.transmission
-              networks = ["whitelist"]
-              policy   = "one_factor"
+              domain = local.kubernetes_ingress_endpoints.transmission
+              policy = "two_factor"
             },
             {
-              domain   = local.kubernetes_ingress_endpoints.pl
-              networks = ["whitelist"]
-              policy   = "one_factor"
+              domain = local.kubernetes_ingress_endpoints.pl
+              policy = "two_factor"
             },
             {
               domain    = local.kubernetes_ingress_endpoints.vaultwarden
               resources = ["^/admin.*"]
               networks  = ["whitelist"]
-              policy    = "bypass"
+              policy    = "two_factor"
             },
             {
               domain    = local.kubernetes_ingress_endpoints.vaultwarden
@@ -636,57 +692,14 @@ resource "helm_release" "authelia" {
             {
               domain   = local.kubernetes_ingress_endpoints.webdav
               networks = ["whitelist"]
-              policy   = "one_factor"
+              policy   = "two_factor"
             },
           ]
         }
-        default_2fa_method = "totp"
-        totp = {
-          disable = false
-        }
-        duo_api = {
-          disable = true
-        }
-        webauthn = {
-          disable = true
-        }
-        theme = "dark"
-        session = {
-          inactivity           = "1h"
-          expiration           = "1h"
-          remember_me_duration = 0
-          redis = {
-            enabled = false
-          }
-        }
-        regulation = {
-          max_retries = 4
-        }
-        storage = {
-          encryption_key = random_password.authelia-storage-secret.result
-          local = {
-            enabled = true
-          }
-          mysql = {
-            enabled = false
-          }
-          postgres = {
-            enabled = false
-          }
-        }
-        notifier = {
-          disable_startup_check = true
-          filesystem = {
-            enabled = true
-          }
-          smtp = {
-            enabled = false
-          }
-        }
-        telemetry = {
-          metrics = {
-            enabled = false
-          }
+      }
+      secret = {
+        storageEncryptionKey = {
+          value = random_password.authelia-storage-secret.result
         }
       }
       persistence = {
