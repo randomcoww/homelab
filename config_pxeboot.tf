@@ -36,8 +36,8 @@ locals {
           "enforcing=0",
         ]
       })
-      "58-47-ca-70-38-16" = merge(local.image_set.silverblue, {
-        ignition = "de-1"
+      "58-47-ca-71-4d-ce" = merge(local.image_set.silverblue, {
+        ignition = "de-0"
         boot_args = [
           "enforcing=0",
           # "vfio-pci.ids=10de:ffffffff:ffffffff:ffffffff:00030000:ffff00ff,10de:ffffffff:ffffffff:ffffffff:00040300:ffffffff",

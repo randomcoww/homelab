@@ -175,14 +175,14 @@ locals {
       container_storage_path = "${local.mounts.containers_path}/storage"
     }
 
-    de-1 = {
-      netnum = 7
+    de-0 = {
+      netnum = 8
       users = [
         "client",
       ]
       hardware_interfaces = {
         phy0 = {
-          mac   = "58-47-ca-70-38-16"
+          mac   = "58-47-ca-71-4d-ce"
           mtu   = 9000
           vlans = ["service", "kubernetes"]
         }
@@ -193,7 +193,7 @@ locals {
       }
       wlan_interfaces = {
         wlan0 = {
-          mac         = "10-6f-d9-73-84-6b"
+          mac         = "10-6f-d9-cf-d5-71"
           enable_dhcp = true
           enable_mdns = true
           metric      = 2048
@@ -250,18 +250,18 @@ locals {
   }
 
   base_members = {
-    base              = ["gw-0", "gw-1", "q-0", "de-1"]
-    systemd-networkd  = ["gw-0", "gw-1", "q-0", "de-1"]
+    base              = ["gw-0", "gw-1", "q-0", "de-0"]
+    systemd-networkd  = ["gw-0", "gw-1", "q-0", "de-0"]
     network-manager   = []
-    kubelet-base      = ["gw-0", "gw-1", "q-0", "de-1"]
+    kubelet-base      = ["gw-0", "gw-1", "q-0", "de-0"]
     gateway           = ["gw-0", "gw-1", "q-0"]
     vrrp              = ["gw-0", "gw-1"]
-    disks             = ["gw-0", "gw-1", "q-0", "de-1"]
+    disks             = ["gw-0", "gw-1", "q-0", "de-0"]
     ssh-server        = ["gw-0", "gw-1", "q-0"]
     etcd              = ["gw-0", "gw-1", "q-0"]
     kubernetes-master = ["gw-0", "gw-1"]
-    kubernetes-worker = ["gw-0", "gw-1", "q-0", "de-1"]
-    desktop           = ["de-1"]
+    kubernetes-worker = ["gw-0", "gw-1", "q-0", "de-0"]
+    desktop           = ["de-0"]
   }
 
   hosts = {
