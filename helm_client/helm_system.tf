@@ -436,7 +436,7 @@ resource "helm_release" "cert_issuer" {
                   }
                   selector = {
                     dnsZones = [
-                      local.domains.internal
+                      local.domains.internal,
                     ]
                   }
                 },
@@ -466,6 +466,21 @@ resource "helm_release" "cert_issuer" {
               }
               disableAccountKeyGeneration = true
               solvers = [
+                {
+                  dns01 = {
+                    cloudflare = {
+                      apiTokenSecretRef = {
+                        name = "cloudflare-token"
+                        key  = "token"
+                      }
+                    }
+                  }
+                  selector = {
+                    dnsZones = [
+                      local.domains.internal,
+                    ]
+                  }
+                },
                 {
                   http01 = {
                     ingress = {
