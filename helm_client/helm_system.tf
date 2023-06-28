@@ -1,12 +1,12 @@
 # basic system #
 
-resource "helm_release" "cluster_services" {
+resource "helm_release" "cluster-services" {
   name       = "cluster-services"
   namespace  = "kube-system"
   repository = "https://randomcoww.github.io/repos/helm/"
   chart      = "cluster-services"
-  version    = "0.2.4"
   wait       = false
+  version    = "0.2.4"
   values = [
     yamlencode({
       images = {
@@ -29,13 +29,13 @@ resource "helm_release" "cluster_services" {
 
 # coredns #
 
-resource "helm_release" "kube_dns" {
+resource "helm_release" "kube-dns" {
   name       = "kube-dns"
   namespace  = "kube-system"
   repository = "https://coredns.github.io/helm"
   chart      = "coredns"
-  version    = "1.22.0"
   wait       = false
+  version    = "1.22.0"
   values = [
     yamlencode({
       image = {
@@ -121,13 +121,13 @@ EOF
 
 # coredns with external-dns #
 
-resource "helm_release" "external_dns" {
+resource "helm_release" "external-dns" {
   name       = "external-dns"
   namespace  = "kube-system"
   repository = "https://randomcoww.github.io/repos/helm/"
   chart      = "external-dns"
-  version    = "0.1.15"
   wait       = false
+  version    = "0.1.15"
   values = [
     yamlencode({
       mode           = "DaemonSet"
@@ -250,12 +250,13 @@ EOF
 
 # nginx ingress #
 
-resource "helm_release" "nginx_ingress" {
+resource "helm_release" "nginx-ingress" {
   name             = "ingress-nginx"
   repository       = "https://kubernetes.github.io/ingress-nginx"
   chart            = "ingress-nginx"
   namespace        = split(".", local.kubernetes_service_endpoints.nginx)[1]
   create_namespace = true
+  wait             = false
   version          = "4.6.1"
   values = [
     yamlencode({
@@ -286,14 +287,14 @@ resource "helm_release" "nginx_ingress" {
 
 # cert-manager #
 
-resource "helm_release" "cert_manager" {
+resource "helm_release" "cert-manager" {
   name             = "cert-manager"
   repository       = "https://charts.jetstack.io"
   chart            = "cert-manager"
   namespace        = "cert-manager"
   create_namespace = true
+  wait             = false
   version          = "1.12.1"
-  wait             = true
   values = [
     yamlencode({
       deploymentAnnotations = {
@@ -337,7 +338,7 @@ resource "tls_private_key" "letsencrypt-staging" {
   }
 }
 
-resource "helm_release" "cert_issuer_secrets" {
+resource "helm_release" "cert-issuer-secrets" {
   name             = "cert-issuer-secrets"
   repository       = "https://randomcoww.github.io/repos/helm/"
   chart            = "helm-wrapper"
@@ -375,7 +376,7 @@ resource "helm_release" "cert_issuer_secrets" {
   ]
 }
 
-resource "helm_release" "cloudflare_token" {
+resource "helm_release" "cloudflare-token" {
   name             = "cloudflare-token"
   repository       = "https://randomcoww.github.io/repos/helm/"
   chart            = "helm-wrapper"
@@ -402,10 +403,11 @@ resource "helm_release" "cloudflare_token" {
   ]
 }
 
-resource "helm_release" "cert_issuer" {
+resource "helm_release" "cert-issuer" {
   name       = "cert-issuer"
   repository = "https://randomcoww.github.io/repos/helm/"
   chart      = "helm-wrapper"
+  wait       = false
   version    = "0.1.0"
   values = [
     yamlencode({
@@ -496,27 +498,27 @@ resource "helm_release" "cert_issuer" {
     }),
   ]
   depends_on = [
-    helm_release.cert_manager,
-    helm_release.cert_issuer_secrets,
+    helm_release.cert-manager,
+    helm_release.cert-issuer-secrets,
   ]
   lifecycle {
     replace_triggered_by = [
-      helm_release.cert_manager,
-      helm_release.cert_issuer_secrets,
+      helm_release.cert-manager,
+      helm_release.cert-issuer-secrets,
     ]
   }
 }
 
 # authelia #
 
-resource "helm_release" "authelia_users" {
+resource "helm_release" "authelia-users" {
   name             = "authelia-users"
   repository       = "https://randomcoww.github.io/repos/helm/"
   chart            = "helm-wrapper"
   namespace        = "authelia"
   create_namespace = true
-  version          = "0.1.0"
   wait             = true
+  version          = "0.1.0"
   values = [
     yamlencode({
       manifests = [
@@ -540,7 +542,7 @@ resource "helm_release" "authelia_users" {
           }
         },
       ]
-    })
+    }),
   ]
 }
 
@@ -557,8 +559,8 @@ resource "helm_release" "authelia" {
   repository       = "https://randomcoww.github.io/repos/helm/"
   chart            = "authelia"
   create_namespace = true
-  version          = "0.8.57"
   wait             = false
+  version          = "0.8.57"
   values = [
     yamlencode({
       domain = local.domains.internal
@@ -723,11 +725,11 @@ resource "helm_release" "authelia" {
     }),
   ]
   depends_on = [
-    helm_release.authelia_users,
+    helm_release.authelia-users,
   ]
   lifecycle {
     replace_triggered_by = [
-      helm_release.authelia_users,
+      helm_release.authelia-users,
     ]
   }
 }
@@ -739,8 +741,8 @@ resource "helm_release" "local-path-provisioner" {
   namespace  = "kube-system"
   repository = "https://charts.containeroo.ch"
   chart      = "local-path-provisioner"
-  version    = "0.0.24"
   wait       = false
+  version    = "0.0.24"
   values = [
     yamlencode({
       storageClass = {
@@ -763,9 +765,9 @@ resource "helm_release" "openebs" {
   namespace        = "openebs"
   repository       = "https://openebs.github.io/charts"
   chart            = "openebs"
-  version          = "3.6.0"
-  wait             = false
   create_namespace = true
+  wait             = false
+  version          = "3.6.0"
   values = [
     yamlencode({
       apiserver = {
@@ -839,8 +841,8 @@ resource "helm_release" "tftpd" {
   namespace  = "default"
   repository = "https://randomcoww.github.io/repos/helm/"
   chart      = "tftpd"
-  version    = "0.1.1"
   wait       = false
+  version    = "0.1.1"
   values = [
     yamlencode({
       images = {
@@ -886,8 +888,8 @@ resource "helm_release" "kea" {
   namespace  = "default"
   repository = "https://randomcoww.github.io/repos/helm/"
   chart      = "kea"
-  version    = "0.1.15"
   wait       = false
+  version    = "0.1.15"
   values = [
     yamlencode({
       images = {
@@ -976,8 +978,8 @@ resource "helm_release" "matchbox" {
   namespace  = "default"
   repository = "https://randomcoww.github.io/repos/helm/"
   chart      = "matchbox"
-  version    = "0.2.14"
   wait       = false
+  version    = "0.2.14"
   values = [
     yamlencode({
       images = {
@@ -1047,7 +1049,7 @@ resource "helm_release" "matchbox" {
   ]
 }
 
-resource "local_file" "matchbox_client_cert" {
+resource "local_file" "matchbox-client-cert" {
   for_each = {
     "matchbox-ca.pem"   = module.matchbox-certs.client.ca
     "matchbox-cert.pem" = module.matchbox-certs.client.cert
@@ -1075,9 +1077,9 @@ resource "helm_release" "minio" {
   namespace        = split(".", local.kubernetes_service_endpoints.minio)[1]
   repository       = "https://charts.min.io/"
   chart            = "minio"
-  version          = "5.0.8"
-  wait             = false
   create_namespace = true
+  wait             = false
+  version          = "5.0.8"
   values = [
     yamlencode({
       clusterDomain = local.domains.kubernetes
@@ -1182,13 +1184,13 @@ resource "helm_release" "minio" {
 
 # cloudflare tunnel #
 
-resource "helm_release" "cloudflare_tunnel" {
+resource "helm_release" "cloudflare-tunnel" {
   name       = "cloudflare-tunnel"
   namespace  = "default"
   repository = "https://cloudflare.github.io/helm-charts/"
   chart      = "cloudflare-tunnel"
-  version    = "0.2.0"
   wait       = false
+  version    = "0.2.0"
   values = [
     yamlencode({
       cloudflare = {
@@ -1212,12 +1214,13 @@ resource "helm_release" "cloudflare_tunnel" {
 
 # amd device plugin #
 /*
-resource "helm_release" "amd_gpu" {
-  name         = "amd-gpu"
-  repository   = "https://radeonopencompute.github.io/k8s-device-plugin/"
-  chart        = "amd-gpu"
-  namespace    = "kube-system"
-  version      = "0.5.0"
+resource "helm_release" "amd-gpu" {
+  name       = "amd-gpu"
+  repository = "https://radeonopencompute.github.io/k8s-device-plugin/"
+  chart      = "amd-gpu"
+  namespace  = "kube-system"
+  wait       = false
+  version    = "0.5.0"
   values = [
     yamlencode({
       tolerations = [
@@ -1233,12 +1236,13 @@ resource "helm_release" "amd_gpu" {
 
 # nvidia device plugin #
 /*
-resource "helm_release" "nvidia_device_plugin" {
-  name         = "nvidia-device-plugin"
-  repository   = "https://nvidia.github.io/k8s-device-plugin"
-  chart        = "nvidia-device-plugin"
-  namespace    = "kube-system"
-  version      = "0.12.2"
+resource "helm_release" "nvidia-device-plugin" {
+  name       = "nvidia-device-plugin"
+  repository = "https://nvidia.github.io/k8s-device-plugin"
+  chart      = "nvidia-device-plugin"
+  namespace  = "kube-system"
+  wait       = false
+  version    = "0.12.2"
   values = [
     yamlencode({
       tolerations = [

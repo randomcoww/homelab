@@ -5,8 +5,8 @@ resource "helm_release" "webdav" {
   namespace  = split(".", local.kubernetes_service_endpoints.webdav)[1]
   repository = "https://randomcoww.github.io/repos/helm/"
   chart      = "webdav"
-  version    = "0.1.5"
   wait       = false
+  version    = "0.1.5"
   values = [
     yamlencode({
       images = {
@@ -62,8 +62,8 @@ resource "helm_release" "mpd" {
   namespace  = "default"
   repository = "https://randomcoww.github.io/repos/helm/"
   chart      = "mpd"
-  version    = "0.4.6"
   wait       = false
+  version    = "0.4.6"
   values = [
     yamlencode({
       config = {
@@ -153,8 +153,8 @@ resource "helm_release" "transmission" {
   namespace  = "default"
   repository = "https://randomcoww.github.io/repos/helm/"
   chart      = "transmission"
-  version    = "0.1.7"
   wait       = false
+  version    = "0.1.7"
   values = [
     yamlencode({
       persistence = {
@@ -281,8 +281,8 @@ resource "helm_release" "vaultwarden" {
   namespace  = "default"
   repository = "https://randomcoww.github.io/repos/helm/"
   chart      = "vaultwarden"
-  version    = "0.1.9"
   wait       = false
+  version    = "0.1.9"
   values = [
     yamlencode({
       images = {
@@ -343,8 +343,8 @@ resource "helm_release" "hostapd" {
   namespace  = "default"
   repository = "https://randomcoww.github.io/repos/helm/"
   chart      = "hostapd"
-  version    = "0.1.8"
   wait       = false
+  version    = "0.1.8"
   values = [
     yamlencode({
       image = local.container_images.hostapd
