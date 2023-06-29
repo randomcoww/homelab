@@ -1,0 +1,14 @@
+---
+variant: fcos
+version: 1.5.0
+storage:
+  files:
+    - path: /etc/systemd/user/opentabletdriver.service.d/10-dependencies.conf
+      contents:
+        inline: |
+          [Unit]
+          After=org.gnome.SettingsDaemon.Wacom.target
+  links:
+    # opentabletdriver
+    - path: /etc/systemd/user/gnome-session.target.wants/opentabletdriver.service
+      target: /usr/lib/systemd/user/opentabletdriver.service

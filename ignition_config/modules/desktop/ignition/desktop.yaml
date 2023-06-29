@@ -203,9 +203,6 @@ storage:
     # reload dconf
     - path: /etc/systemd/user/gnome-session.target.wants/dconf-load.service
       target: /etc/systemd/user/dconf-load.service
-    # opentabletdriver
-    - path: /etc/systemd/user/gnome-session.target.wants/opentabletdriver.service
-      target: /usr/lib/systemd/user/opentabletdriver.service
     # override user defaults
     # - path: /etc/systemd/user/basic.target.wants/copy-skel.service
     #   target: /etc/systemd/user/copy-skel.service
