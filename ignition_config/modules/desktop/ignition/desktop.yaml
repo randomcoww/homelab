@@ -206,6 +206,6 @@ storage:
     # override user defaults
     # - path: /etc/systemd/user/basic.target.wants/copy-skel.service
     #   target: /etc/systemd/user/copy-skel.service
-    # copy monitor layout to gdm login #
+    # copy monitor layout to gdm login
     - path: /var/lib/gdm/.config/monitors.xml
       target: /etc/skel/.config/monitors.xml

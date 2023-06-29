@@ -47,5 +47,5 @@ storage:
           ])}
           Restart=on-failure
   links:
-    - path: /etc/systemd/user/gnome-session.target.wants/sunshine.service
+    - path: /etc/systemd/user/graphical-session.target.wants/sunshine.service
       target: /etc/systemd/user/sunshine.service

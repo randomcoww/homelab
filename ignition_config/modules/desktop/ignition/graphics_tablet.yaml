@@ -7,8 +7,9 @@ storage:
       contents:
         inline: |
           [Unit]
-          After=org.gnome.SettingsDaemon.Wacom.target
+          Wants=gnome-session-initialized.target
+          After=gnome-session-initialized.target
   links:
-    # opentabletdriver
-    - path: /etc/systemd/user/gnome-session.target.wants/opentabletdriver.service
+    # enable opentabletdriver
+    - path: /etc/systemd/user/graphical-session.target.wants/opentabletdriver.service
       target: /usr/lib/systemd/user/opentabletdriver.service
