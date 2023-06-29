@@ -83,6 +83,8 @@ storage:
             mode: AlwaysAllow
           enableServer: false
           staticPodPath: ${static_pod_manifest_path}
+          imageGCHighThresholdPercent: 1
+          imageGCLowThresholdPercent: 0
           makeIPTablesUtilChains: false
           shutdownGracePeriodByPodPriority:
           - priority: 0

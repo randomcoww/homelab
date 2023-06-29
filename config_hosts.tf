@@ -235,7 +235,7 @@ locals {
           ]
         }
       }
-      container_storage_path = "${local.mounts.home_path}/storage"
+      container_storage_path = "${local.mounts.home_path}/containers/storage"
       kubernetes_worker_taints = [
         {
           key    = "node-role.kubernetes.io/de"
