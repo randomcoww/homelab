@@ -3,37 +3,33 @@ locals {
   base_users = {
     admin = {
       name = "fcos"
-      unix = {
-        home_dir = "${local.mounts.home_path}/fcos"
-        groups = [
-          "adm",
-          "sudo",
-          "systemd-journal",
-          "wheel",
-        ]
-      }
+      groups = [
+        "adm",
+        "sudo",
+        "systemd-journal",
+        "wheel",
+      ]
     }
     client = {
       name = "randomcoww"
-      unix = {
-        uid      = 10000
-        home_dir = "${local.mounts.home_path}/randomcoww"
-        groups = [
-          "adm",
-          "sudo",
-          "systemd-journal",
-          "wheel",
-        ]
-      }
+      uid  = 10000
+      groups = [
+        "adm",
+        "sudo",
+        "systemd-journal",
+        "wheel",
+      ]
     }
   }
 
   users = merge(local.base_users, {
     for type, user in local.base_users :
-    type => {
-      name = user.name
-      unix = merge(lookup(user, "unix", {}), lookup(lookup(var.users, type, {}), "unix", {}))
-      sso  = merge(lookup(user, "sso", {}), lookup(lookup(var.users, type, {}), "sso", {}))
-    }
+    type => merge(
+      {
+        home_dir = "${local.mounts.home_path}/${user.name}"
+      },
+      user,
+      lookup(var.users, type, {}),
+    )
   })
 }
