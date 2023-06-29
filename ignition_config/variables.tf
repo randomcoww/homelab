@@ -17,3 +17,10 @@ variable "ssh_client" {
 variable "aws_region" {
   type = string
 }
+
+variable "wireguard_client" {
+  type = object({
+    Interface = map(string)
+    Peer      = map(string)
+  })
+}
