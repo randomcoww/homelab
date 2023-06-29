@@ -21,13 +21,18 @@ variable "cloudflare" {
   })
 }
 
+variable "hostapd" {
+  type = map(string)
+}
+
+variable "authelia_users" {
+  type    = any
+  default = {}
+}
+
 variable "wireguard_client" {
   type = object({
     Interface = map(string)
     Peer      = map(string)
   })
-}
-
-variable "hostapd" {
-  type = map(string)
 }

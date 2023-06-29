@@ -531,13 +531,7 @@ resource "helm_release" "authelia-users" {
           type = "Opaque"
           stringData = {
             "users_database.yml" = yamlencode({
-              users = {
-                for _, user in local.users :
-                user.name => merge({
-                  displayname = user.name
-                }, user.sso)
-                if length(keys(user.sso)) > 0
-              }
+              users = var.authelia_users
             })
           }
         },
