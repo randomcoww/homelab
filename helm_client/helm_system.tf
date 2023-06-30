@@ -226,7 +226,7 @@ resource "helm_release" "external-dns" {
               name        = "etcd"
               parameters  = "${local.domains.internal} in-addr.arpa ip6.arpa"
               configBlock = <<EOF
-fallthrough in-addr.arpa ip6.arpa
+fallthrough
 EOF
             },
             {
