@@ -33,9 +33,16 @@ ssh-keygen -q -t ecdsa -N '' -f $KEY 2>/dev/null <<< y >/dev/null
 Reference: [Authelia user password generation](https://www.authelia.com/reference/guides/passwords/#user--password-file)
 
 ```bash
-KEY=$HOME/.ssh/id_ecdsa
-PASSWORD='password'
-WIREGUARD_CONFIG='filepath'
+USERNAME="$(whoami)"
+PASSWORD=
+SSH_PUBLIC_KEY="$HOME/.ssh/id_ecdsa"
+WIREGUARD_CONFIG=
+EMAIL=
+CLOUDFLARE_API_TOKEN=
+CLOUDFLARE_ACCOUNT_ID=
+AP_SSID=
+AP_COUNTRY_CODE=
+AP_CHANNEL=
 
 cat > secrets.tfvars <<EOF
 aws_region = "us-west-2"
@@ -43,28 +50,39 @@ aws_region = "us-west-2"
 users = {
   admin = {}
   client = {
-    unix = {
-      password_hash = "$(echo $PASSWORD | openssl passwd -6 -stdin)"
-    }
-    sso = {
-      password = "$(podman run --rm docker.io/authelia/authelia:latest authelia hash-password -- "$PASSWORD" | sed 's:.*\: ::')"
-    }
+    password_hash = "$(echo $PASSWORD | openssl passwd -6 -stdin)"
   }
 }
 
 ssh_client = {
-  key_id                = "$(whoami)"
-  public_key            = "ssh_client_public_key=$(cat $KEY.pub)"
+  key_id                = "$USERNAME"
+  public_key            = "ssh_client_public_key=$(cat $SSH_PUBLIC_KEY.pub)"
   early_renewal_hours   = 168
   validity_period_hours = 336
 }
 
 letsencrypt = {
-  email = ""
+  email = "$EMAIL"
 }
+
 cloudflare = {
-  api_token  = ""
-  account_id = ""
+  api_token  = "$CLOUDFLARE_API_TOKEN"
+  account_id = "$CLOUDFLARE_ACCOUNT_ID"
+}
+
+authelia_users = {
+  $USERNAME = {
+    displayname = "$USERNAME"
+    password    = "$(podman run --rm docker.io/authelia/authelia:latest authelia hash-password -- "$PASSWORD" | sed 's:.*\: ::')"
+  }
+}
+
+hostapd = {
+  sae_password   = "$PASSWORD"
+  wpa_passphrase = "$PASSWORD"
+  ssid           = "$AP_SSID"
+  country_code   = "$AP_COUNTRY_CODE"
+  channel        = $AP_CHANNEL
 }
 
 wireguard_client = {
@@ -77,14 +95,6 @@ wireguard_client = {
     AllowedIPs = "$(cat $WIREGUARD_CONFIG | grep AllowedIPs | sed 's:.*\ = ::')"
     Endpoint   = "$(cat $WIREGUARD_CONFIG | grep Endpoint | sed 's:.*\ = ::')"
   }
-}
-
-hostapd = {
-  sae_password   = "$PASSWORD"
-  wpa_passphrase = "$PASSWORD"
-  ssid           = ""
-  country_code   = ""
-  channel        = 100
 }
 EOF
 ```
