@@ -237,7 +237,7 @@ tw terraform -chdir=ignition_config output -raw ssh_user_cert_authorized_key > $
 
 ### Container builds
 
-All custom container build Dockerfiles are at https://github.com/randomcoww/container-builds
+All custom container build Containerfiles are at https://github.com/randomcoww/container-builds
 
 ### Cleanup terraform file formatting
 
