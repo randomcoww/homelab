@@ -164,7 +164,7 @@ tw terraform -chdir=bootstrap_server destroy \
 
 ```bash
 mkdir -p ~/.kube && \
-tw terraform -chdir=ignition_config output -raw admin_kubeconfig > ~/.kube/config
+tw terraform -chdir=ignition_config output -raw admin_kubeconfig > ~/.kube/prod
 ```
 
 #### Check that `kubernetes` service is up
