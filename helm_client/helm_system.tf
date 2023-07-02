@@ -1200,7 +1200,8 @@ resource "helm_release" "cloudflare-tunnel" {
         ]
       }
       image = {
-        tag = "2023.6.0-amd64"
+        repository = split(":", local.container_images.cloudflared)[0]
+        tag        = split(":", local.container_images.cloudflared)[1]
       }
     }),
   ]
