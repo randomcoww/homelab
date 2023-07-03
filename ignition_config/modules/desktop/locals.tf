@@ -6,7 +6,6 @@ locals {
       udev_steam_input      = data.http.udev-60-steam-input.response_body
       udev_steam_vr         = data.http.udev-60-steam-vr.response_body
       wlan_interface        = var.wlan_interface
-      wireguard_client      = var.wireguard_client
       monitors_config       = data.local_file.monitors.content
       sunshine = {
         config = {

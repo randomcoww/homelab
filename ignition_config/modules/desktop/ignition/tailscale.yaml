@@ -1,0 +1,7 @@
+---
+variant: fcos
+version: 1.5.0
+systemd:
+  units:
+    - name: tailscaled.service
+      enabled: true
