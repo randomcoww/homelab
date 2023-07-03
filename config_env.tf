@@ -146,6 +146,7 @@ locals {
     pl           = "pl.${local.domains.internal}"
     vaultwarden  = "vw.${local.domains.internal}"
     webdav       = "w.${local.domains.internal}"
+    matchbox     = "ign.${local.domains.internal}"
   }
 
   kubernetes_service_endpoints = {
@@ -168,7 +169,7 @@ locals {
     kube_proxy         = 50254
     etcd_client        = 58082
     etcd_peer          = 58083
-    matchbox           = 50100
+    matchbox           = 80
     matchbox_api       = 50101
     minio              = 80
     transmission       = 9091

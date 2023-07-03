@@ -1038,6 +1038,9 @@ resource "helm_release" "matchbox" {
         externalIPs = [
           local.services.matchbox.ip,
         ]
+        annotations = {
+          "external-dns.alpha.kubernetes.io/hostname" = local.kubernetes_ingress_endpoints.matchbox
+        }
       }
     }),
   ]
