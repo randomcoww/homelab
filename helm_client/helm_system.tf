@@ -1026,14 +1026,14 @@ resource "helm_release" "matchbox" {
         port = 22000
       }
       apiService = {
-        type = "ClusterIP"
+        type = "LoadBalancer"
         port = local.ports.matchbox_api
         externalIPs = [
           local.services.matchbox.ip,
         ]
       }
       service = {
-        type = "ClusterIP"
+        type = "LoadBalancer"
         port = local.ports.matchbox
         externalIPs = [
           local.services.matchbox.ip,
@@ -1054,7 +1054,7 @@ resource "local_file" "matchbox-client-cert" {
   content  = each.value
 }
 
-# minio with hostNetwork #
+# minio #
 
 resource "random_password" "minio-access-key-id" {
   length  = 30
@@ -1096,11 +1096,14 @@ resource "helm_release" "minio" {
         clusterIP = "None"
       }
       service = {
-        type = "ClusterIP"
+        type = "LoadBalancer"
         port = local.ports.minio
         externalIPs = [
           local.services.minio.ip,
         ]
+        annotations = {
+          "external-dns.alpha.kubernetes.io/hostname" = local.kubernetes_ingress_endpoints.minio
+        }
       }
       ingress = {
         enabled = false

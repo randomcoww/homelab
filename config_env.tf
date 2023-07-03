@@ -35,7 +35,6 @@ locals {
       cidr    = 26
       vlan_id = 80
       netnums = {
-        external_dns     = 31
         external_ingress = 32
         matchbox         = 33
         minio            = 34
