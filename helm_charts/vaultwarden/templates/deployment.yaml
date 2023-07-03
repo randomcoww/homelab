@@ -23,6 +23,8 @@ spec:
       labels:
         app: {{ template "vaultwarden.name" . }}
         release: {{ .Release.Name }}
+      annotations:
+        checksum/secret: {{ include (print $.Template.BasePath "/secret.yaml") . | sha256sum }}
     spec:
     {{- with .Values.affinity }}
       affinity:
@@ -45,9 +47,15 @@ spec:
         - "s3://{{ .Values.backup.s3Resource }}"
         env:
         - name: LITESTREAM_ACCESS_KEY_ID
-          value: "{{ .Values.backup.accessKeyID }}"
+          valueFrom:
+            secretKeyRef:
+              name: {{ template "vaultwarden.fullname" . }}
+              key: ACCESS_KEY_ID
         - name: LITESTREAM_SECRET_ACCESS_KEY
-          value: "{{ .Values.backup.secretAccessKey }}"
+          valueFrom:
+            secretKeyRef:
+              name: {{ template "vaultwarden.fullname" . }}
+              key: SECRET_ACCESS_KEY
         volumeMounts:
         - name: vaultwarden-data
           mountPath: "/{{ .Values.dataPath }}"
@@ -80,9 +88,15 @@ spec:
         - "s3://{{ .Values.backup.s3Resource }}"
         env:
         - name: LITESTREAM_ACCESS_KEY_ID
-          value: "{{ .Values.backup.accessKeyID }}"
+          valueFrom:
+            secretKeyRef:
+              name: {{ template "vaultwarden.fullname" . }}
+              key: ACCESS_KEY_ID
         - name: LITESTREAM_SECRET_ACCESS_KEY
-          value: "{{ .Values.backup.secretAccessKey }}"
+          valueFrom:
+            secretKeyRef:
+              name: {{ template "vaultwarden.fullname" . }}
+              key: SECRET_ACCESS_KEY
         volumeMounts:
         - name: vaultwarden-data
           mountPath: "/{{ .Values.dataPath }}"
