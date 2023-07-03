@@ -36,3 +36,9 @@ variable "wireguard_client" {
     Peer      = map(string)
   })
 }
+
+variable "tailscale" {
+  type = object({
+    auth_key = string
+  })
+}

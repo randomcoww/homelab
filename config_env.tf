@@ -123,6 +123,7 @@ locals {
     vaultwarden        = "docker.io/vaultwarden/server:1.28.1-alpine"
     litestream         = "docker.io/litestream/litestream:latest"
     cloudflared        = "docker.io/cloudflare/cloudflared:2023.6.0-amd64"
+    tailscale          = "ghcr.io/tailscale/tailscale:v1.44.0"
   }
 
   kubernetes = {

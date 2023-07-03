@@ -43,6 +43,7 @@ CLOUDFLARE_ACCOUNT_ID=
 AP_SSID=
 AP_COUNTRY_CODE=
 AP_CHANNEL=
+TS_AUTH_KEY=
 
 cat > secrets.tfvars <<EOF
 aws_region = "us-west-2"
@@ -95,6 +96,10 @@ wireguard_client = {
     AllowedIPs = "$(cat $WIREGUARD_CONFIG | grep AllowedIPs | sed 's:.*\ = ::')"
     Endpoint   = "$(cat $WIREGUARD_CONFIG | grep Endpoint | sed 's:.*\ = ::')"
   }
+}
+
+tailscale = {
+  auth_key = "$TS_AUTH_KEY"
 }
 EOF
 ```

@@ -1,0 +1,51 @@
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: {{ template "tailscale.fullname" . }}
+  labels:
+    app: {{ template "tailscale.name" . }}
+    chart: {{ template "tailscale.chart" . }}
+    release: "{{ .Release.Name }}"
+spec:
+  serviceName: {{ template "tailscale.fullname" . }}
+  # Only supports 1 replica
+  replicas: 1
+  selector:
+    matchLabels:
+      app: {{ template "tailscale.name" . }}
+      release: {{ .Release.Name }}
+  template:
+    metadata:
+      labels:
+        app: {{ template "tailscale.name" . }}
+        release: {{ .Release.Name }}
+      annotations:
+        checksum/secret: {{ include (print $.Template.BasePath "/secret.yaml") . | sha256sum }}
+    spec:
+      serviceAccountName: {{ template "tailscale.name" . }}
+    {{- with .Values.affinity }}
+      affinity:
+{{ toYaml . | indent 8 }}
+    {{- end }}
+    {{- with .Values.tolerations }}
+      tolerations:
+{{ toYaml . | indent 8 }}
+    {{- end }}
+      restartPolicy: Always
+      containers:
+      - name: {{ .Chart.Name }}
+        image: {{ .Values.images.tailscale }}
+        env:
+        {{- range $k, $v := .Values.additionalParameters }}
+        - name: {{ $k }}
+          value: {{ join "," $v | quote }}
+        {{- end }}
+        - name: TS_USERSPACE
+          value: "true"
+        - name: TS_KUBE_SECRET
+          value: {{ .Values.kubeSecret }}
+        - name: TS_AUTH_KEY
+          valueFrom:
+            secretKeyRef:
+              name: {{ template "tailscale.fullname" . }}
+              key: TS_AUTHKEY

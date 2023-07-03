@@ -678,8 +678,9 @@ resource "helm_release" "authelia" {
               policy   = "bypass"
             },
             {
-              domain = local.kubernetes_ingress_endpoints.transmission
-              policy = "two_factor"
+              domain   = local.kubernetes_ingress_endpoints.transmission
+              networks = ["whitelist"]
+              policy   = "two_factor"
             },
             {
               domain = local.kubernetes_ingress_endpoints.pl
@@ -697,8 +698,9 @@ resource "helm_release" "authelia" {
               policy    = "deny"
             },
             {
-              domain = local.kubernetes_ingress_endpoints.vaultwarden
-              policy = "bypass"
+              domain   = local.kubernetes_ingress_endpoints.vaultwarden
+              networks = ["whitelist"]
+              policy   = "bypass"
             },
             {
               domain   = local.kubernetes_ingress_endpoints.webdav
@@ -1207,6 +1209,39 @@ resource "helm_release" "cloudflare-tunnel" {
       image = {
         repository = split(":", local.container_images.cloudflared)[0]
         tag        = split(":", local.container_images.cloudflared)[1]
+      }
+    }),
+  ]
+}
+
+# tailscale #
+
+resource "helm_release" "tailscale" {
+  name             = "tailscale"
+  namespace        = "tailscale"
+  repository       = "https://randomcoww.github.io/repos/helm/"
+  chart            = "tailscale"
+  create_namespace = true
+  wait             = false
+  version          = "0.1.3"
+  values = [
+    yamlencode({
+      images = {
+        tailscale = local.container_images.tailscale
+      }
+      authKey    = var.tailscale.auth_key
+      kubeSecret = "tailscale-state"
+      additionalParameters = {
+        TS_ACCEPT_DNS = false
+        TS_EXTRA_ARGS = [
+          "--advertise-exit-node",
+        ]
+        TS_ROUTES = [
+          local.networks.lan.prefix,
+          local.networks.service.prefix,
+          local.networks.kubernetes_service.prefix,
+          local.networks.kubernetes_pod.prefix,
+        ]
       }
     }),
   ]
