@@ -170,7 +170,7 @@ locals {
     etcd_peer          = 58083
     matchbox           = 50100
     matchbox_api       = 50101
-    minio              = 9000
+    minio              = 80
     transmission       = 9091
     vaultwarden        = 8080
   }

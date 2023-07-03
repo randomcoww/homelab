@@ -1085,7 +1085,6 @@ resource "helm_release" "minio" {
       }
       drivesPerNode = 2
       replicas      = 3
-      minioAPIPort  = local.ports.minio
       resources = {
         requests = {
           memory = "8Gi"
