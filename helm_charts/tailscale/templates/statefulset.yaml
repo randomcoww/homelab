@@ -35,13 +35,15 @@ spec:
       containers:
       - name: {{ .Chart.Name }}
         image: {{ .Values.images.tailscale }}
+        securityContext:
+          privileged: true
         env:
         {{- range $k, $v := .Values.additionalParameters }}
         - name: {{ $k }}
           value: {{ join "," $v | quote }}
         {{- end }}
         - name: TS_USERSPACE
-          value: "true"
+          value: "false"
         - name: TS_KUBE_SECRET
           value: {{ .Values.kubeSecret }}
         - name: TS_AUTH_KEY
