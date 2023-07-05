@@ -6,7 +6,7 @@ resource "helm_release" "cluster-services" {
   repository = "https://randomcoww.github.io/repos/helm/"
   chart      = "cluster-services"
   wait       = false
-  version    = "0.2.4"
+  version    = "0.2.5"
   values = [
     yamlencode({
       images = {
@@ -1223,7 +1223,7 @@ resource "helm_release" "tailscale" {
   chart            = "tailscale"
   create_namespace = true
   wait             = false
-  version          = "0.1.3"
+  version          = "0.1.6"
   values = [
     yamlencode({
       images = {
