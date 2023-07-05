@@ -71,9 +71,6 @@ spec:
         volumeMounts:
         - mountPath: /run/xtables.lock
           name: xtables-lock
-        - mountPath: /lib/modules
-          name: lib-modules
-          readOnly: true
         - name: kube-proxy-config
           mountPath: /etc/kube-proxy/
         livenessProbe:
@@ -89,9 +86,6 @@ spec:
         hostPath:
           path: /run/xtables.lock
           type: FileOrCreate
-      - name: lib-modules
-        hostPath:
-          path: /lib/modules
       - name: kube-proxy-config
         configMap:
           name: {{ $fullName }}
