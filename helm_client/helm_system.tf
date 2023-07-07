@@ -1239,6 +1239,7 @@ resource "helm_release" "tailscale" {
         TS_ROUTES = [
           local.networks.lan.prefix,
           local.networks.service.prefix,
+          local.networks.kubernetes.prefix,
           local.networks.kubernetes_service.prefix,
           local.networks.kubernetes_pod.prefix,
         ]

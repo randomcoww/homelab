@@ -7,6 +7,7 @@ locals {
       udev_steam_vr         = data.http.udev-60-steam-vr.response_body
       wlan_interface        = var.wlan_interface
       monitors_config       = data.local_file.monitors.content
+      persistent_path       = var.persistent_path
       sunshine = {
         config = {
           key_rightalt_to_key_win = "enabled"

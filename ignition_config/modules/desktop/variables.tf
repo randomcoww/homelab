@@ -5,3 +5,7 @@ variable "ssh_ca_public_key_openssh" {
 variable "wlan_interface" {
   type = string
 }
+
+variable "persistent_path" {
+  type = string
+}

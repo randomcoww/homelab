@@ -55,7 +55,7 @@ locals {
           ]
         }
       }
-      container_storage_path = "${local.mounts.containers_path}/storage"
+      persistent_path = local.mounts.containers_path
     }
 
     gw-1 = {
@@ -113,7 +113,7 @@ locals {
           ]
         }
       }
-      container_storage_path = "${local.mounts.containers_path}/storage"
+      persistent_path = local.mounts.containers_path
     }
 
     q-0 = {
@@ -172,7 +172,7 @@ locals {
           ]
         }
       }
-      container_storage_path = "${local.mounts.containers_path}/storage"
+      persistent_path = local.mounts.containers_path
     }
 
     de-0 = {
@@ -235,7 +235,7 @@ locals {
           ]
         }
       }
-      container_storage_path = "${local.mounts.home_path}/containers/storage"
+      persistent_path = local.mounts.home_path
       kubernetes_worker_taints = [
         {
           key    = "node-role.kubernetes.io/de"
