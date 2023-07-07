@@ -661,26 +661,14 @@ resource "helm_release" "authelia" {
         }
         access_control = {
           default_policy = "deny"
-          networks = [
-            {
-              name = "whitelist"
-              networks = [
-                local.networks.lan.prefix,
-                local.networks.service.prefix,
-                local.networks.kubernetes.prefix,
-              ]
-            },
-          ]
           rules = [
             {
-              domain   = local.kubernetes_ingress_endpoints.mpd
-              networks = ["whitelist"]
-              policy   = "bypass"
+              domain = local.kubernetes_ingress_endpoints.mpd
+              policy = "two_factor"
             },
             {
-              domain   = local.kubernetes_ingress_endpoints.transmission
-              networks = ["whitelist"]
-              policy   = "two_factor"
+              domain = local.kubernetes_ingress_endpoints.transmission
+              policy = "two_factor"
             },
             {
               domain = local.kubernetes_ingress_endpoints.pl
@@ -689,23 +677,15 @@ resource "helm_release" "authelia" {
             {
               domain    = local.kubernetes_ingress_endpoints.vaultwarden
               resources = ["^/admin.*"]
-              networks  = ["whitelist"]
               policy    = "two_factor"
             },
             {
-              domain    = local.kubernetes_ingress_endpoints.vaultwarden
-              resources = ["^/admin.*"]
-              policy    = "deny"
+              domain = local.kubernetes_ingress_endpoints.vaultwarden
+              policy = "bypass"
             },
             {
-              domain   = local.kubernetes_ingress_endpoints.vaultwarden
-              networks = ["whitelist"]
-              policy   = "bypass"
-            },
-            {
-              domain   = local.kubernetes_ingress_endpoints.webdav
-              networks = ["whitelist"]
-              policy   = "two_factor"
+              domain = local.kubernetes_ingress_endpoints.webdav
+              policy = "two_factor"
             },
           ]
         }
@@ -1184,7 +1164,7 @@ resource "helm_release" "minio" {
 }
 
 # cloudflare tunnel #
-
+/*
 resource "helm_release" "cloudflare-tunnel" {
   name       = "cloudflare-tunnel"
   namespace  = "default"
@@ -1213,6 +1193,7 @@ resource "helm_release" "cloudflare-tunnel" {
     }),
   ]
 }
+*/
 
 # tailscale #
 
