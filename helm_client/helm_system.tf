@@ -142,7 +142,7 @@ resource "helm_release" "external-dns" {
         name   = "external-dns"
       }
       hostNetwork = {
-        enabled = true
+        enabled = false
       }
       priorityClassName = "system-cluster-critical"
       dataSources = [
@@ -150,8 +150,11 @@ resource "helm_release" "external-dns" {
         "ingress",
       ]
       service = {
-        type      = "ClusterIP"
+        type      = "LoadBalancer"
         clusterIP = local.services.cluster_external_dns.ip
+        externalIPs = [
+          local.services.external_dns.ip,
+        ]
       }
       affinity = {
         nodeAffinity = {
@@ -184,7 +187,6 @@ resource "helm_release" "external-dns" {
       coreDNSLivenessProbe = {
         httpGet = {
           path   = "/health"
-          host   = "127.0.0.1"
           port   = 8080
           scheme = "HTTP"
         }
@@ -197,7 +199,6 @@ resource "helm_release" "external-dns" {
       coreDNSReadinessProbe = {
         httpGet = {
           path   = "/ready"
-          host   = "127.0.0.1"
           port   = 8181
           scheme = "HTTP"
         }
@@ -801,9 +802,9 @@ module "kea-config" {
         local.services.gateway.ip,
       ]
       domain_name_servers = [
-        local.services.gateway.ip,
+        local.services.external_dns.ip,
       ]
-      tftp_server = local.services.gateway.ip
+      tftp_server = local.services.tftp.ip
       mtu         = network.mtu
       pools = [
         cidrsubnet(network.prefix, 1, 1),

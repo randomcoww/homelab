@@ -66,7 +66,6 @@ servers:
 coreDNSLivenessProbe: {}
   # httpGet:
   #   path: /health
-  #   host: 127.0.0.1
   #   port: 8080
   #   scheme: HTTP
   # initialDelaySeconds: 60
@@ -78,7 +77,6 @@ coreDNSLivenessProbe: {}
 coreDNSReadinessProbe: {}
   # httpGet:
   #   path: /ready
-  #   host: 127.0.0.1
   #   port: 8181
   #   scheme: HTTP
   # initialDelaySeconds: 30
