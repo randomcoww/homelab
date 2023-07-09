@@ -28,6 +28,12 @@ backup:
   secretAccessKey: "secret_access_key"
   s3Resource: "bucket/path/db.sqlite3"
 
+smtp:
+  # host: ""
+  # port: ""
+  # username: "username"
+  # password: "password"
+
 domain: ""
 
 vaultwarden:
