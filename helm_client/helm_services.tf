@@ -282,7 +282,7 @@ resource "helm_release" "vaultwarden" {
   repository = "https://randomcoww.github.io/repos/helm/"
   chart      = "vaultwarden"
   wait       = false
-  version    = "0.1.10"
+  version    = "0.1.11"
   values = [
     yamlencode({
       images = {
@@ -299,12 +299,22 @@ resource "helm_release" "vaultwarden" {
         secretAccessKey = aws_iam_access_key.vaultwarden-backup.secret
         s3Resource      = "${local.vaultwarden.backup_bucket}/${local.vaultwarden.backup_path}/db.sqlite3"
       }
+      smtp = {
+        username = var.smtp.username
+        password = var.smtp.password
+      }
       vaultwarden = {
         SENDS_ALLOWED            = false
         EMERGENCY_ACCESS_ALLOWED = false
         PASSWORD_HINTS_ALLOWED   = false
         SIGNUPS_ALLOWED          = false
-        INVITATIONS_ALLOWED      = false
+        INVITATIONS_ALLOWED      = true
+        DISABLE_ADMIN_TOKEN      = true
+        SMTP_HOST                = var.smtp.host
+        SMTP_PORT                = var.smtp.port
+        SMTP_FROM_NAME           = "Vaultwarden"
+        SMTP_SECURITY            = "starttls"
+        SMTP_AUTH_MECHANISM      = "Plain"
       }
       ingress = {
         enabled          = true
