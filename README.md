@@ -38,6 +38,7 @@ PASSWORD=
 SSH_PUBLIC_KEY="$HOME/.ssh/id_ecdsa"
 WIREGUARD_CONFIG=
 EMAIL=
+GMAIL_PASSWORD=
 CLOUDFLARE_API_TOKEN=
 CLOUDFLARE_ACCOUNT_ID=
 AP_SSID=
@@ -72,9 +73,8 @@ cloudflare = {
 }
 
 authelia_users = {
-  $USERNAME = {
-    displayname = "$USERNAME"
-    password    = "$(podman run --rm docker.io/authelia/authelia:latest authelia hash-password -- "$PASSWORD" | sed 's:.*\: ::')"
+  $EMAIL = {
+    password = "$(podman run --rm docker.io/authelia/authelia:latest authelia hash-password -- "$PASSWORD" | sed 's:.*\: ::')"
   }
 }
 
@@ -84,6 +84,13 @@ hostapd = {
   ssid           = "$AP_SSID"
   country_code   = "$AP_COUNTRY_CODE"
   channel        = $AP_CHANNEL
+}
+
+smtp = {
+  host     = "smtp.gmail.com"
+  port     = 587
+  username = "$EMAIL"
+  password = "$GMAIL_PASSWORD"
 }
 
 wireguard_client = {

@@ -532,7 +532,13 @@ resource "helm_release" "authelia-users" {
           type = "Opaque"
           stringData = {
             "users_database.yml" = yamlencode({
-              users = var.authelia_users
+              users = {
+                for email, user in var.authelia_users :
+                email => merge({
+                  email       = email
+                  displayname = email
+                }, user)
+              }
             })
           }
         },
@@ -653,11 +659,13 @@ resource "helm_release" "authelia" {
         }
         notifier = {
           disable_startup_check = true
-          filesystem = {
-            enabled = true
-          }
           smtp = {
-            enabled = false
+            enabled       = true
+            enabledSecret = true
+            host          = var.smtp.host
+            port          = var.smtp.port
+            username      = var.smtp.username
+            sender        = var.smtp.username
           }
         }
         access_control = {
@@ -694,6 +702,9 @@ resource "helm_release" "authelia" {
       secret = {
         storageEncryptionKey = {
           value = random_password.authelia-storage-secret.result
+        }
+        smtp = {
+          value = var.smtp.password
         }
       }
       persistence = {
