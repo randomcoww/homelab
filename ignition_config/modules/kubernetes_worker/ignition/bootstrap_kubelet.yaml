@@ -80,6 +80,7 @@ storage:
           - ${cluster_dns_ip}
           imageGCHighThresholdPercent: 1
           imageGCLowThresholdPercent: 0
+          imageMinimumGCAge: 1h
           resolvConf: /run/systemd/resolve/resolv.conf
           runtimeRequestTimeout: 15m
           rotateCertificates: true
