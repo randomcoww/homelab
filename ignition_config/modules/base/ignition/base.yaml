@@ -27,6 +27,28 @@ systemd:
             [Unit]
             ConditionVirtualization=!vm
             ConditionVirtualization=!container
+    # configure nftables service as template
+    - name: nftables.service
+      mask: false
+    - name: nftables@.service
+      enabled: true
+      contents: |
+        [Unit]
+        Wants=network-pre.target
+        Before=network-pre.target
+        ConditionFileNotEmpty=/etc/nftables/%i.conf
+
+        [Service]
+        Type=oneshot
+        ProtectSystem=full
+        ProtectHome=true
+        ExecStart=/sbin/nft -f /etc/nftables/%i.conf
+        ExecReload=/sbin/nft 'delete table %i; include "/etc/nftables/%i.conf";'
+        ExecStop=/sbin/nft delete table %i
+        RemainAfterExit=yes
+
+        [Install]
+        WantedBy=multi-user.target
 
 storage:
   files:
@@ -47,21 +69,15 @@ storage:
           AllowHybridSleep=no
 
     # Disable local DNS for systemd-networkd #
-    - path: /etc/systemd/resolved.conf.d/10-disable-dns-stub.conf
+    - path: /etc/systemd/resolved.conf.d/10-mdns.conf
       mode: 0644
       contents:
         inline: |
           [Resolve]
           FallbackDNS=
           DNSStubListener=false
-          LLMNR=false
-    # Enable mDNS #
-    - path: /etc/systemd/resolved.conf.d/10-enable-mdns.conf
-      mode: 0644
-      contents:
-        inline: |
-          [Resolve]
           MulticastDNS=true
+          LLMNR=false
 
     # Block password SSH #
     - path: /etc/ssh/sshd_config.d/10-block-password.conf

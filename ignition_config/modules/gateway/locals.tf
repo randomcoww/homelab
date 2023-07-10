@@ -8,7 +8,7 @@ locals {
       static_pod_manifest_path = var.static_pod_manifest_path
 
       # nftables #
-      nftables_name       = "gateway_rules"
+      nftables_name       = "gateway"
       external_ingress_ip = var.external_ingress_ip
       pod_network_prefix  = var.pod_network_prefix
 

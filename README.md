@@ -73,7 +73,7 @@ cloudflare = {
 }
 
 authelia_users = {
-  $EMAIL = {
+  "$EMAIL" = {
     password = "$(podman run --rm docker.io/authelia/authelia:latest authelia hash-password -- "$PASSWORD" | sed 's:.*\: ::')"
   }
 }
