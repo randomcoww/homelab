@@ -10,6 +10,9 @@ systemd:
       dropins:
         - name: 20-bootstrap-worker.conf
           contents: |
+            [Unit]
+            ConditionKernelCommandLine=ignition.config.url
+
             [Service]
             ExecStartPre=/usr/bin/mkdir -p \
               ${kubelet_root_path}

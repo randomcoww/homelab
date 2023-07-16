@@ -38,6 +38,7 @@ storage:
           After=gnome-session-initialized.target
           Wants=copy-sunshine.service
           After=copy-sunshine.service
+          ConditionKernelCommandLine=ignition.config.url
 
           [Service]
           Slice=session.slice

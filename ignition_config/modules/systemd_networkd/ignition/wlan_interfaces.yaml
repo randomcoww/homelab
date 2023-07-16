@@ -25,6 +25,7 @@ storage:
           [Link]
           RequiredForOnline=false
           MTUBytes=${lookup(wlan_interface, "mtu", 1500)}
+          ActivationPolicy=always-up
 
           [DHCP]
           RouteMetric=${lookup(wlan_interface, "metric", 1024)}
