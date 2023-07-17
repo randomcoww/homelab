@@ -122,7 +122,7 @@ locals {
     kube_proxy         = "ghcr.io/randomcoww/kubernetes:kube-proxy-v1.27.1"
     transmission       = "ghcr.io/randomcoww/transmission:20230429"
     wireguard          = "ghcr.io/randomcoww/wireguard:20230429"
-    vaultwarden        = "docker.io/vaultwarden/server:1.28.1-alpine"
+    vaultwarden        = "docker.io/vaultwarden/server:1.29.0-alpine"
     litestream         = "docker.io/litestream/litestream:latest"
     cloudflared        = "docker.io/cloudflare/cloudflared:2023.6.0-amd64"
     tailscale          = "ghcr.io/randomcoww/tailscale:1.44.0"

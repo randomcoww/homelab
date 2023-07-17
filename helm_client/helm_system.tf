@@ -307,7 +307,7 @@ resource "helm_release" "cert-manager" {
       }
       extraArgs = [
         "--dns01-recursive-nameservers-only",
-        "--dns01-recursive-nameservers=${local.upstream_dns_ip}:53",
+        "--dns01-recursive-nameservers=${local.upstream_dns.ip}:53",
       ]
     }),
   ]
