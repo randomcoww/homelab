@@ -206,6 +206,8 @@ locals {
     }
   }
 
-  upstream_dns_ip             = "9.9.9.9"
-  upstream_dns_tls_servername = "dns.quad9.net"
+  upstream_dns = {
+    ip             = "9.9.9.9"
+    tls_servername = "dns.quad9.net"
+  }
 }

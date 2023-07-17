@@ -41,3 +41,10 @@ variable "keepalived_services" {
     dev = string
   }))
 }
+
+variable "upstream_dns" {
+  type = object({
+    ip             = string
+    tls_servername = string
+  })
+}

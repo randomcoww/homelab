@@ -26,6 +26,7 @@ locals {
       keepalived_config_path = var.keepalived_config_path
       keepalived_services    = var.keepalived_services
       virtual_router_id      = 10
+      upstream_dns           = var.upstream_dns
     })
   ]
 }

@@ -68,6 +68,7 @@ module "ignition-gateway" {
   )))
   conntrackd_ipv6_ignore = [
   ]
+  upstream_dns = local.upstream_dns
 }
 
 module "ignition-vrrp" {

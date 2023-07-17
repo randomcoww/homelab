@@ -102,9 +102,9 @@ EOF
             },
             {
               name        = "forward"
-              parameters  = ". tls://${local.upstream_dns_ip}"
+              parameters  = ". tls://${local.upstream_dns.ip}"
               configBlock = <<EOF
-tls_servername ${local.upstream_dns_tls_servername}
+tls_servername ${local.upstream_dns.tls_servername}
 health_check 5s
 EOF
             },
@@ -232,9 +232,9 @@ EOF
             },
             {
               name        = "forward"
-              parameters  = ". tls://${local.upstream_dns_ip}"
+              parameters  = ". tls://${local.upstream_dns.ip}"
               configBlock = <<EOF
-tls_servername ${local.upstream_dns_tls_servername}
+tls_servername ${local.upstream_dns.tls_servername}
 health_check 5s
 EOF
             },
