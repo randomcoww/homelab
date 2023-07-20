@@ -1240,7 +1240,7 @@ resource "helm_release" "fuse-device-plugin" {
       manifests = [
         {
           apiVersion = "apps/v1"
-          kind = "DaemonSet"
+          kind       = "DaemonSet"
           metadata = {
             name = "fuse-device-plugin-daemonset"
           }
@@ -1261,7 +1261,7 @@ resource "helm_release" "fuse-device-plugin" {
                 containers = [
                   {
                     image = local.container_images.fuse_device_plugin
-                    name = "fuse-device-plugin-ctr"
+                    name  = "fuse-device-plugin-ctr"
                     securityContext = {
                       allowPrivilegeEscalation = false
                       capabilities = {
@@ -1272,7 +1272,7 @@ resource "helm_release" "fuse-device-plugin" {
                     }
                     volumeMounts = [
                       {
-                        name = "device-plugin"
+                        name      = "device-plugin"
                         mountPath = "/var/lib/kubelet/device-plugins"
                       },
                     ]
