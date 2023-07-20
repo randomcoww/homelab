@@ -669,20 +669,8 @@ resource "helm_release" "authelia" {
           }
         }
         access_control = {
-          default_policy = "deny"
+          default_policy = "two_factor"
           rules = [
-            {
-              domain = local.kubernetes_ingress_endpoints.mpd
-              policy = "two_factor"
-            },
-            {
-              domain = local.kubernetes_ingress_endpoints.transmission
-              policy = "two_factor"
-            },
-            {
-              domain = local.kubernetes_ingress_endpoints.pl
-              policy = "two_factor"
-            },
             {
               domain    = local.kubernetes_ingress_endpoints.vaultwarden
               resources = ["^/admin.*"]
@@ -691,10 +679,6 @@ resource "helm_release" "authelia" {
             {
               domain = local.kubernetes_ingress_endpoints.vaultwarden
               policy = "bypass"
-            },
-            {
-              domain = local.kubernetes_ingress_endpoints.webdav
-              policy = "two_factor"
             },
           ]
         }
@@ -1237,6 +1221,76 @@ resource "helm_release" "tailscale" {
           local.networks.kubernetes_pod.prefix,
         ]
       }
+    }),
+  ]
+}
+
+# fuse device plugin #
+
+resource "helm_release" "fuse-device-plugin" {
+  name             = "fuse-device-plugin"
+  repository       = "https://randomcoww.github.io/repos/helm/"
+  chart            = "helm-wrapper"
+  namespace        = "kube-system"
+  create_namespace = true
+  wait             = true
+  version          = "0.1.0"
+  values = [
+    yamlencode({
+      manifests = [
+        {
+          apiVersion = "apps/v1"
+          kind = "DaemonSet"
+          metadata = {
+            name = "fuse-device-plugin-daemonset"
+          }
+          spec = {
+            selector = {
+              matchLabels = {
+                name = "fuse-device-plugin-ds"
+              }
+            }
+            template = {
+              metadata = {
+                labels = {
+                  name = "fuse-device-plugin-ds"
+                }
+              }
+              spec = {
+                hostNetwork = true
+                containers = [
+                  {
+                    image = local.container_images.fuse_device_plugin
+                    name = "fuse-device-plugin-ctr"
+                    securityContext = {
+                      allowPrivilegeEscalation = false
+                      capabilities = {
+                        drop = [
+                          "ALL",
+                        ]
+                      },
+                    }
+                    volumeMounts = [
+                      {
+                        name = "device-plugin"
+                        mountPath = "/var/lib/kubelet/device-plugins"
+                      },
+                    ]
+                  },
+                ]
+                volumes = [
+                  {
+                    name = "device-plugin"
+                    hostPath = {
+                      path = "/var/lib/kubelet/device-plugins"
+                    }
+                  },
+                ]
+              }
+            }
+          }
+        },
+      ]
     }),
   ]
 }

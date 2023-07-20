@@ -35,8 +35,8 @@ spec:
       - name: {{ .Chart.Name }}-init
         image: {{ .Values.images.mpd }}
         command:
-        - sh
-        - -c
+        - "sh"
+        - "-c"
         - |
           mkdir -p {{ .Values.paths.mpdCache }}/playlists && \
           touch \

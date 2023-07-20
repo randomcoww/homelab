@@ -126,6 +126,8 @@ locals {
     litestream         = "docker.io/litestream/litestream:latest"
     cloudflared        = "docker.io/cloudflare/cloudflared:2023.6.0-amd64"
     tailscale          = "ghcr.io/randomcoww/tailscale:1.44.0"
+    dev                = "ghcr.io/randomcoww/dev:20230720"
+    fuse_device_plugin = "soolaugust/fuse-device-plugin:v1.0"
   }
 
   kubernetes = {
@@ -150,6 +152,7 @@ locals {
     vaultwarden  = "vw.${local.domains.internal}"
     webdav       = "w.${local.domains.internal}"
     matchbox     = "ign.${local.domains.internal}"
+    dev          = "dev.${local.domains.internal}"
   }
 
   kubernetes_service_endpoints = {
@@ -177,6 +180,7 @@ locals {
     minio              = 80
     transmission       = 9091
     vaultwarden        = 8080
+    dev                = 8080
   }
 
   minio_buckets = {

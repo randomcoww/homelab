@@ -22,8 +22,8 @@ spec:
       value: |
         ${indent(8, jsonencode(kea_config))}
     command:
-    - sh
-    - -c
+    - "sh"
+    - "-c"
     - |
       echo -e "$ca" > ${config_path}/ca.crt && \
       echo -e "$cert" > ${config_path}/server.crt && \
