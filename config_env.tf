@@ -126,8 +126,8 @@ locals {
     litestream         = "docker.io/litestream/litestream:latest"
     cloudflared        = "docker.io/cloudflare/cloudflared:2023.6.0-amd64"
     tailscale          = "ghcr.io/randomcoww/tailscale:1.44.0"
-    dev                = "ghcr.io/randomcoww/dev:20230720"
     fuse_device_plugin = "soolaugust/fuse-device-plugin:v1.0"
+    dev                = "ghcr.io/randomcoww/dev:20230720.1"
   }
 
   kubernetes = {
