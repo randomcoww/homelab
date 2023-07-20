@@ -157,17 +157,17 @@ resource "helm_release" "transmission" {
   version    = "0.1.7"
   values = [
     yamlencode({
-      persistence = {
-        accessMode   = "ReadWriteOnce"
-        storageClass = "local-path"
-        size         = "32Gi"
-      }
       images = {
         transmission = local.container_images.transmission
         wireguard    = local.container_images.wireguard
       }
       ports = {
         transmission = local.ports.transmission
+      }
+      persistence = {
+        accessMode   = "ReadWriteOnce"
+        storageClass = "local-path"
+        size         = "32Gi"
       }
       service = {
         type = "ClusterIP"
@@ -468,6 +468,54 @@ resource "helm_release" "hostapd" {
           operator = "Exists"
         },
       ]
+    }),
+  ]
+}
+
+# dev #
+
+resource "helm_release" "dev" {
+  name       = "dev"
+  namespace  = "default"
+  repository = "https://randomcoww.github.io/repos/helm/"
+  chart      = "dev"
+  wait       = false
+  version    = "0.1.13"
+  values = [
+    yamlencode({
+      images = {
+        dev = local.container_images.dev
+      }
+      persistence = {
+        accessMode   = "ReadWriteOnce"
+        storageClass = "local-path"
+        size         = "64Gi"
+      }
+      service = {
+        type = "ClusterIP"
+        port = local.ports.dev
+      }
+      dev = {
+        mountPath = "/home/podman"
+      }
+      domain = "https://${local.kubernetes_ingress_endpoints.dev}"
+      ingress = {
+        enabled          = true
+        ingressClassName = "nginx"
+        path             = "/"
+        annotations      = local.nginx_ingress_annotations
+        tls = [
+          {
+            secretName = "dev-tls"
+            hosts = [
+              local.kubernetes_ingress_endpoints.dev,
+            ]
+          },
+        ]
+        hosts = [
+          local.kubernetes_ingress_endpoints.dev,
+        ]
+      }
     }),
   ]
 }

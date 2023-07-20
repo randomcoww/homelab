@@ -1,0 +1,63 @@
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: {{ template "dev.fullname" . }}
+  labels:
+    app: {{ template "dev.name" . }}
+    chart: {{ template "dev.chart" . }}
+    release: "{{ .Release.Name }}"
+spec:
+  serviceName: {{ template "dev.fullname" . }}
+  # Only supports 1 replica
+  replicas: 1
+  selector:
+    matchLabels:
+      app: {{ template "dev.name" . }}
+      release: {{ .Release.Name }}
+  template:
+    metadata:
+      labels:
+        app: {{ template "dev.name" . }}
+        release: {{ .Release.Name }}
+    spec:
+    {{- with .Values.affinity }}
+      affinity:
+{{ toYaml . | indent 8 }}
+    {{- end }}
+    {{- with .Values.tolerations }}
+      tolerations:
+{{ toYaml . | indent 8 }}
+    {{- end }}
+      restartPolicy: Always
+      containers:
+      - name: {{ .Chart.Name }}
+        image: {{ .Values.images.dev }}
+        args:
+        - "--bind-addr=0.0.0.0:{{ .Values.ports.dev }}"
+        - "--auth=none"
+        volumeMounts:
+        - name: dev-mount
+          mountPath: {{ .Values.dev.mountPath }}
+        ports:
+        - containerPort: {{ .Values.ports.dev }}
+        securityContext:
+          runAsUser: {{ .Values.dev.uid }}
+        resources:
+          limits:
+            github.com/fuse: 1
+  volumeClaimTemplates:
+  - metadata:
+      name: dev-mount
+    {{- if .Values.persistence.annotations }}
+      annotations:
+{{ toYaml .Values.persistence.annotations | trimSuffix "\n" | indent 8 }}
+    {{- end }}
+    spec:
+      accessModes:
+      - {{ .Values.persistence.accessMode | quote }}
+      resources:
+        requests:
+          storage: {{ .Values.persistence.size | quote }}
+    {{- if .Values.persistence.storageClass }}
+      storageClassName: "{{ .Values.persistence.storageClass }}"
+    {{- end }}
