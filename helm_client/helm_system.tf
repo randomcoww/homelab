@@ -1296,14 +1296,14 @@ resource "helm_release" "fuse-device-plugin" {
 }
 
 # amd device plugin #
-/*
+
 resource "helm_release" "amd-gpu" {
   name       = "amd-gpu"
   repository = "https://radeonopencompute.github.io/k8s-device-plugin/"
   chart      = "amd-gpu"
   namespace  = "kube-system"
   wait       = false
-  version    = "0.5.0"
+  version    = "0.8.0"
   values = [
     yamlencode({
       tolerations = [
@@ -1311,11 +1311,14 @@ resource "helm_release" "amd-gpu" {
           effect   = "NoExecute"
           operator = "Exists"
         },
+        {
+          key      = "node-role.kubernetes.io/de"
+          operator = "Exists"
+        },
       ]
-    })
+    }),
   ]
 }
-*/
 
 # nvidia device plugin #
 /*
@@ -1333,8 +1336,12 @@ resource "helm_release" "nvidia-device-plugin" {
           effect   = "NoExecute"
           operator = "Exists"
         },
+        {
+          key      = "node-role.kubernetes.io/de"
+          operator = "Exists"
+        },
       ]
-    })
+    }),
   ]
 }
 */
