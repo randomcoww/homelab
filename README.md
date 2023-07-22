@@ -150,7 +150,7 @@ tw terraform -chdir=bootstrap_server apply \
 Launch manifest with kubelet
 
 ```bash
-sudo cp output/manifests/bootstrap.yaml /var/lib/kubelet/manifests
+sudo podman play kube output/manifests/bootstrap.yaml
 ```
 
 Populate bootstrap service with PXE boot configuration
@@ -162,7 +162,7 @@ tw terraform -chdir=bootstrap_client apply -var host_ip=$host_ip
 Stop service after PXE boot stack is launched on Kubernetes
 
 ```bash
-sudo rm /var/lib/kubelet/manifests/bootstrap.yaml
+sudo podman play kube output/manifests/bootstrap.yaml --down
 
 tw terraform -chdir=bootstrap_server destroy \
   -var host_ip=$host_ip \
