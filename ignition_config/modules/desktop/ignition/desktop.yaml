@@ -68,7 +68,7 @@ storage:
 
           [org/gnome/desktop/screensaver]
           color-shading-type='solid'
-          lock-delay=uint32 3600
+          lock-delay=uint32 0
           primary-color='#000000000000'
           secondary-color='#000000000000'
 
@@ -76,7 +76,7 @@ storage:
           disable-external=true
 
           [org/gnome/desktop/session]
-          idle-delay=uint32 900
+          idle-delay=uint32 0
 
           [org/gnome/desktop/sound]
           event-sounds=false
