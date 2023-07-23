@@ -45,9 +45,10 @@ spec:
             add:
             - AUDIT_WRITE
           runAsUser: {{ .Values.dev.uid }}
+      {{- with .Values.resources }}
         resources:
-          limits:
-            github.com/fuse: 1
+{{ toYaml . | indent 10 }}
+      {{- end }}
   volumeClaimTemplates:
   - metadata:
       name: dev-mount

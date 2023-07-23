@@ -480,7 +480,7 @@ resource "helm_release" "dev" {
   repository = "https://randomcoww.github.io/repos/helm/"
   chart      = "dev"
   wait       = false
-  version    = "0.1.14"
+  version    = "0.1.15"
   values = [
     yamlencode({
       images = {
@@ -515,6 +515,12 @@ resource "helm_release" "dev" {
         hosts = [
           local.kubernetes_ingress_endpoints.dev,
         ]
+      }
+      resources = {
+        limits = {
+          "github.com/fuse" = 1
+          "amd.com/gpu"     = 1
+        }
       }
     }),
   ]
