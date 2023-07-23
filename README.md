@@ -257,6 +257,12 @@ All custom container build Containerfiles are at https://github.com/randomcoww/c
 tw find . -name '*.tf' -exec terraform fmt '{}' \;
 ```
 
+#### Save monitor configuration
+
+```bash
+cp ~/.config/monitors.xml ignition_config/modules/desktop/resources/
+```
+
 ## Personal desktop setup
 
 ```bash
@@ -280,10 +286,22 @@ flatpak --user -y install flathub \
   io.github.hmlendea.geforcenow-electron
 ```
 
-#### Save monitor configuration
+Mac desktop
 
 ```bash
-cp ~/.config/monitors.xml ignition_config/modules/desktop/resources/
+brew install \
+  helm \
+  podman \
+  kubernetes-cli \
+  minio-mc
+
+brew install --cask \
+  blender \
+  brave-browser \
+  godot \
+  moonlight \
+  tailscale \
+  visual-studio-code
 ```
 
 ## :construction: Desktop VM with GPU passthrough :construction:
