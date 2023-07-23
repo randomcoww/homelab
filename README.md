@@ -257,12 +257,6 @@ All custom container build Containerfiles are at https://github.com/randomcoww/c
 tw find . -name '*.tf' -exec terraform fmt '{}' \;
 ```
 
-#### Save monitor configuration
-
-```bash
-cp ~/.config/monitors.xml ignition_config/modules/desktop/resources/
-```
-
 ## Personal desktop setup
 
 ```bash
@@ -302,6 +296,12 @@ brew install --cask \
   moonlight \
   tailscale \
   visual-studio-code
+```
+
+#### Save monitor configuration
+
+```bash
+cp ~/.config/monitors.xml ignition_config/modules/desktop/resources/
 ```
 
 ## :construction: Desktop VM with GPU passthrough :construction:
