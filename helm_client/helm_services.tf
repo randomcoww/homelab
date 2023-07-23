@@ -480,7 +480,7 @@ resource "helm_release" "dev" {
   repository = "https://randomcoww.github.io/repos/helm/"
   chart      = "dev"
   wait       = false
-  version    = "0.1.13"
+  version    = "0.1.14"
   values = [
     yamlencode({
       images = {

@@ -41,6 +41,9 @@ spec:
         ports:
         - containerPort: {{ .Values.ports.dev }}
         securityContext:
+          capabilities:
+            add:
+            - AUDIT_WRITE
           runAsUser: {{ .Values.dev.uid }}
         resources:
           limits:
