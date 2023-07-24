@@ -294,8 +294,7 @@ brew install --cask \
   inkscape \
   moonlight \
   tailscale \
-  visual-studio-code \
-  xournal-plus-plus
+  visual-studio-code
 ```
 
 #### Save monitor configuration
