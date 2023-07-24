@@ -269,14 +269,12 @@ flatpak --user -y install flathub \
   org.blender.Blender \
   org.godotengine.Godot \
   com.github.xournalpp.xournalpp \
-  io.mpv.Mpv \
   org.nomacs.ImageLounge \
   org.kde.okular \
   com.valvesoftware.Steam \
   com.heroicgameslauncher.hgl \
   net.lutris.Lutris \
-  net.davidotek.pupgui2 \
-  io.github.hmlendea.geforcenow-electron
+  net.davidotek.pupgui2
 ```
 
 Mac desktop
@@ -296,7 +294,8 @@ brew install --cask \
   inkscape \
   moonlight \
   tailscale \
-  visual-studio-code
+  visual-studio-code \
+  xournal-plus-plus
 ```
 
 #### Save monitor configuration
