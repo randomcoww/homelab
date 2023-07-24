@@ -292,6 +292,7 @@ brew install --cask \
   blender \
   brave-browser \
   godot \
+  huiontablet \
   inkscape \
   moonlight \
   tailscale \
