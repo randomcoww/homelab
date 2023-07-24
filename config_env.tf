@@ -127,7 +127,7 @@ locals {
     cloudflared        = "docker.io/cloudflare/cloudflared:2023.6.0-amd64"
     tailscale          = "ghcr.io/randomcoww/tailscale:1.44.0"
     fuse_device_plugin = "soolaugust/fuse-device-plugin:v1.0"
-    dev                = "ghcr.io/randomcoww/dev:20230723.1"
+    dev                = "ghcr.io/randomcoww/dev:20230724.4"
   }
 
   kubernetes = {
