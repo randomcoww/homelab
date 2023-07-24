@@ -265,7 +265,6 @@ flatpak --user remote-add --if-not-exists flathub https://flathub.org/repo/flath
 flatpak --user -y install flathub \
   com.brave.Browser \
   com.visualstudio.code \
-  org.kde.krita \
   org.inkscape.Inkscape \
   org.blender.Blender \
   org.godotengine.Godot \
@@ -293,6 +292,7 @@ brew install --cask \
   blender \
   brave-browser \
   godot \
+  inkscape \
   moonlight \
   tailscale \
   visual-studio-code
