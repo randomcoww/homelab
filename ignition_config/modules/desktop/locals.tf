@@ -15,7 +15,7 @@ locals {
           min_threads             = 1
           origin_web_ui_allowed   = "pc"
           origin_pin_allowed      = "pc"
-          output_name             = 0
+          output_name             = 1
           upnp                    = "off"
         }
         apps = {

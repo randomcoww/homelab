@@ -47,6 +47,7 @@ storage:
         - inline: |
             OCL_ICD_VENDORS=/etc/OpenCL/vendors/rusticl.icd
             RUSTICL_ENABLE=radeonsi
+            # MUTTER_DEBUG_DISABLE_HW_CURSORS=1
 
     # gnome desktop config #
     # remote desktop https://www.reddit.com/r/gnome/comments/uz5as7/gnome_has_made_it_super_simple_to_extend_your/
