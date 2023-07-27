@@ -182,10 +182,6 @@ storage:
       mode: 0644
       contents:
         inline: |
-          [Unit]
-          Wants=gnome-session-initialized.target
-          After=gnome-session-initialized.target
-
           [Service]
           Type=oneshot
           RemainAfterExit=true
@@ -203,7 +199,7 @@ storage:
 
   links:
     # reload dconf
-    - path: /etc/systemd/user/gnome-session.target.wants/dconf-load.service
+    - path: /etc/systemd/user/graphical-session.target.wants/dconf-load.service
       target: /etc/systemd/user/dconf-load.service
     # override user defaults
     # - path: /etc/systemd/user/basic.target.wants/copy-skel.service
