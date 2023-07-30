@@ -257,7 +257,7 @@ locals {
     gateway           = ["gw-0", "gw-1", "q-0"]
     vrrp              = ["gw-0", "gw-1"]
     disks             = ["gw-0", "gw-1", "q-0", "de-0"]
-    ssh-server        = ["gw-0", "gw-1", "q-0"]
+    ssh-server        = ["gw-0", "gw-1", "q-0", "de-0"]
     etcd              = ["gw-0", "gw-1", "q-0"]
     kubernetes-master = ["gw-0", "gw-1"]
     kubernetes-worker = ["gw-0", "gw-1", "q-0", "de-0"]
