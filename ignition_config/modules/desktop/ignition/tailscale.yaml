@@ -13,5 +13,4 @@ systemd:
             ExecStart=/usr/sbin/tailscaled \
               --state=${persistent_path}/tailscale/tailscaled.state \
               --socket=/run/tailscale/tailscaled.sock \
-              --port=$PORT \
-              $FLAGS
+              --port=$${PORT} $FLAGS
