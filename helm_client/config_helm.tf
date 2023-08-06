@@ -29,8 +29,10 @@ add_header Cache-Control "no-store";
 EOF
     "nginx.ingress.kubernetes.io/location-snippets"     = <<EOF
 proxy_http_version 1.1;
+proxy_set_header Host $host;
 proxy_set_header Upgrade $http_upgrade;
 proxy_set_header Connection $connection_upgrade;
+proxy_set_header Accept-Encoding gzip;
 EOF
   }
 
