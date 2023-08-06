@@ -43,6 +43,7 @@ storage:
           After=gnome-session.target
           Wants=copy-sunshine.service
           After=copy-sunshine.service
+          ConditionKernelCommandLine=coreos.live.rootfs_url
 
           [Service]
           Slice=session.slice

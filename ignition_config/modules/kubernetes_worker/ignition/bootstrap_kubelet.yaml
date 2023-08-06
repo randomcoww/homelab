@@ -10,6 +10,9 @@ systemd:
       dropins:
         - name: 20-bootstrap-worker.conf
           contents: |
+            [Unit]
+            ConditionKernelCommandLine=coreos.live.rootfs_url
+
             [Service]
             ExecStartPre=/usr/bin/mkdir -p \
               ${kubelet_root_path}
