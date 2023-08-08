@@ -7,6 +7,9 @@ systemd:
       dropins:
         - name: 10-state-path.conf
           contents: |
+            [Unit]
+            ConditionKernelCommandLine=!coreos.live.rootfs_url
+
             [Service]
             ExecStartPre=/usr/bin/mkdir -p ${persistent_path}/tailscale/
             ExecStart=
