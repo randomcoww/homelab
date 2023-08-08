@@ -799,7 +799,8 @@ module "kea-config" {
       domain_name_servers = [
         local.services.external_dns.ip,
       ]
-      tftp_server = local.services.tftp.ip
+      # use existing VIP for now
+      tftp_server = local.services.apiserver.ip
       mtu         = network.mtu
       pools = [
         cidrsubnet(network.prefix, 1, 1),
@@ -826,14 +827,6 @@ resource "helm_release" "tftpd" {
             nodeSelectorTerms = [
               {
                 matchExpressions = [
-                  {
-                    key      = "kubernetes.io/hostname"
-                    operator = "In"
-                    values = [
-                      for _, member in local.members.gateway :
-                      member.hostname
-                    ]
-                  },
                   {
                     key      = "kubernetes.io/hostname"
                     operator = "In"
