@@ -16,7 +16,6 @@ locals {
       mtu                = 9000
       netnums = {
         gateway = 2
-        tftp    = 2
       }
     }
     sync = {

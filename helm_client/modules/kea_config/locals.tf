@@ -74,7 +74,7 @@ locals {
             # {
             #   name           = "HTTPClient"
             #   test           = "not(substring(option[77].hex,0,4) == 'iPXE') and (option[93].hex == 0x0010)"
-            #   boot-file-name = "http://boot.ipxe.org/ipxe.efi"
+            #   boot-file-name = "https://boot.ipxe.org/ipxe.efi"
             #   option-data = [
             #     {
             #       name = "vendor-class-identifier"
