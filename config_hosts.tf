@@ -184,7 +184,7 @@ locals {
         phy0 = {
           mac   = "58-47-ca-71-4d-ce"
           mtu   = 9000
-          vlans = ["service", "kubernetes"]
+          vlans = ["kubernetes"]
         }
         # mobile
         phy1 = {
@@ -208,10 +208,6 @@ locals {
         lan = {
           source_interface_name = "br-lan"
           enable_dhcp           = true
-        }
-        service = {
-          source_interface_name = "phy0-service"
-          enable_netnum         = true
         }
         kubernetes = {
           source_interface_name = "phy0-kubernetes"
