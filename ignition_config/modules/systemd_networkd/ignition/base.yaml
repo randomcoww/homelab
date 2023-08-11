@@ -13,6 +13,12 @@ systemd:
             After=dbus.socket
     - name: systemd-networkd-wait-online.service
       enabled: true
+      dropins:
+        - name: 10-short-delay.conf
+          contents: |
+            [Service]
+            ExecStart=
+            ExecStart=/usr/lib/systemd/systemd-networkd-wait-online --timeout=10
     - name: NetworkManager.service
       mask: true
     - name: NetworkManager-wait-online.service
