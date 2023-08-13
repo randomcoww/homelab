@@ -5,4 +5,3 @@
 secrets.tfvars
 *.log
 output/
-resources/
