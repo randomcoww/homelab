@@ -48,9 +48,13 @@
       <y>0</y>
       <scale>1</scale>
       <primary>yes</primary>
+      <transform>
+        <rotation>right</rotation>
+        <flipped>no</flipped>
+      </transform>
       <monitor>
         <monitorspec>
-          <connector>DP-1</connector>
+          <connector>DP-2</connector>
           <vendor>GSM</vendor>
           <product>16MQ70</product>
           <serial>205NZXE045234</serial>

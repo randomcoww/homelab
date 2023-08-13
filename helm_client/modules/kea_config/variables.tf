@@ -6,7 +6,15 @@ variable "service_ips" {
   type = list(string)
 }
 
-variable "ipxe_file_url" {
+variable "tftp_server" {
+  type = string
+}
+
+variable "ipxe_boot_path" {
+  type = string
+}
+
+variable "ipxe_script_url" {
   type = string
 }
 
@@ -20,7 +28,6 @@ variable "networks" {
     mtu                 = number
     routers             = list(string)
     domain_name_servers = list(string)
-    tftp_server         = string
     pools               = list(string)
   }))
 }

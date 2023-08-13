@@ -787,7 +787,9 @@ module "kea-config" {
   ]
   shared_data_path = "/var/lib/kea"
   kea_peer_port    = local.ports.kea_peer
-  ipxe_file_url    = "http://${local.services.matchbox.ip}:${local.ports.matchbox}/boot.ipxe"
+  tftp_server      = local.services.apiserver.ip
+  ipxe_boot_path   = "/ipxe.efi"
+  ipxe_script_url  = "http://${local.services.matchbox.ip}:${local.ports.matchbox}/boot.ipxe"
   cluster_domain   = local.domains.kubernetes
   networks = [
     for _, network in local.networks :
@@ -800,8 +802,7 @@ module "kea-config" {
         local.services.external_dns.ip,
       ]
       # use existing VIP for now
-      tftp_server = local.services.apiserver.ip
-      mtu         = network.mtu
+      mtu = network.mtu
       pools = [
         cidrsubnet(network.prefix, 1, 1),
       ]

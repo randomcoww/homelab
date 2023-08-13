@@ -64,12 +64,13 @@ locals {
             {
               name           = "ipxe_detected"
               test           = "substring(option[77].hex,0,4) == 'iPXE'"
-              boot-file-name = var.ipxe_file_url
+              boot-file-name = var.ipxe_script_url
             },
             {
               name           = "ipxe_efi"
               test           = "not(substring(option[77].hex,0,4) == 'iPXE') and (option[93].hex == 0x0007)"
-              boot-file-name = "/ipxe.efi"
+              next-server    = var.tftp_server
+              boot-file-name = var.ipxe_boot_path
             },
             # {
             #   name           = "HTTPClient"
@@ -86,8 +87,7 @@ locals {
           subnet4 = [
             for network_name, network in var.networks :
             {
-              subnet      = network.prefix,
-              next-server = network.tftp_server
+              subnet = network.prefix,
               option-data = [
                 {
                   name = "routers"
