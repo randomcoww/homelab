@@ -734,47 +734,41 @@ resource "helm_release" "local-path-provisioner" {
   ]
 }
 
-# openebs #
+# mayastor #
 /*
-resource "helm_release" "openebs" {
-  name             = "openebs"
-  namespace        = "openebs"
-  repository       = "https://openebs.github.io/charts"
-  chart            = "openebs"
+resource "helm_release" "mayastor" {
+  name             = "mayastor"
+  namespace        = "mayastor"
+  repository       = "https://openebs.github.io/mayastor-extensions/"
+  chart            = "mayastor"
   create_namespace = true
   wait             = false
-  version          = "3.6.0"
+  version          = "2.3.0"
   values = [
     yamlencode({
-      apiserver = {
-        enabled = true
-        sparse = {
-          enabled = true
+      base = {
+        metrics = {
+          enabled = false
+        }
+        jaeger = {
+          enabled = false
         }
       }
-      localprovisioner = {
-        enabled  = true
-        basePath = "${local.mounts.containers_path}/openebs/local"
+      etcd = {
+        persistence = {
+          storageClass = "local-path"
+        }
       }
-      snapshotOperator = {
+      eventing = {
         enabled = false
       }
-      jiva = {
-        enabled            = true
-        replicas           = 2
-        defaultStoragePath = "${local.mounts.containers_path}/openebs"
-      }
-      ndmOperator = {
+      loki-stack = {
         enabled = false
       }
-      ndm = {
-        enabled = false
-      }
-      webhook = {
-        enabled = false
-      }
-      cstor = {
-        enabled = false
+      obs = {
+        callhome = {
+          enabled = false
+        }
       }
     }),
   ]
@@ -1269,10 +1263,6 @@ resource "helm_release" "amd-gpu" {
     yamlencode({
       tolerations = [
         {
-          effect   = "NoExecute"
-          operator = "Exists"
-        },
-        {
           key      = "node-role.kubernetes.io/de"
           operator = "Exists"
         },
@@ -1282,21 +1272,37 @@ resource "helm_release" "amd-gpu" {
 }
 
 # nvidia device plugin #
-/*
+
 resource "helm_release" "nvidia-device-plugin" {
   name       = "nvidia-device-plugin"
   repository = "https://nvidia.github.io/k8s-device-plugin"
   chart      = "nvidia-device-plugin"
   namespace  = "kube-system"
   wait       = false
-  version    = "0.12.2"
+  version    = "0.14.1"
   values = [
     yamlencode({
+      affinity = {
+        nodeAffinity = {
+          requiredDuringSchedulingIgnoredDuringExecution = {
+            nodeSelectorTerms = [
+              {
+                matchExpressions = [
+                  {
+                    key      = "kubernetes.io/hostname"
+                    operator = "In"
+                    values = [
+                      for _, member in local.members.desktop :
+                      member.hostname
+                    ]
+                  },
+                ]
+              },
+            ]
+          }
+        }
+      }
       tolerations = [
-        {
-          effect   = "NoExecute"
-          operator = "Exists"
-        },
         {
           key      = "node-role.kubernetes.io/de"
           operator = "Exists"
@@ -1305,4 +1311,3 @@ resource "helm_release" "nvidia-device-plugin" {
     }),
   ]
 }
-*/
