@@ -105,7 +105,7 @@ locals {
     etcd                    = "gcr.io/etcd-development/etcd:v3.5.8-amd64"
 
     # Helm
-    kea                = "ghcr.io/randomcoww/kea:2.2.0"
+    kea                = "ghcr.io/randomcoww/kea:2.4.0"
     matchbox           = "quay.io/poseidon/matchbox:v0.10.0-13-gd0d5e9d5-amd64"
     coredns            = "docker.io/coredns/coredns:1.10.1"
     tftpd              = "ghcr.io/randomcoww/tftpd-ipxe:20230429"
