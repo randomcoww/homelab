@@ -1,9 +1,12 @@
 {{- range $i , $peer := .Values.peers }}
+
+# Kea peers need IPs to talk to for HA
+# Create a service to assign to each pod
 ---
 apiVersion: v1
 kind: Service
 metadata:
-  name: {{ template "kea.fullname" $ }}-{{ $i }}
+  name: {{ template "kea.fullname" $ }}-{{ $i }}-peer
   labels:
     app: {{ template "kea.name" $ }}
     chart: {{ template "kea.chart" $ }}
@@ -17,6 +20,29 @@ spec:
     port: {{ $.Values.ports.keaPeer }}
     protocol: TCP
     targetPort: {{ $.Values.peerService.port }}
+  selector:
+    app: {{ template "kea.name" $ }}
+    release: {{ $.Release.Name }}
+    statefulset.kubernetes.io/pod-name: {{ template "kea.fullname" $ }}-{{ $i }}
+
+# Create headless service for tftp that exposes the IP of the node (for hostNetwork pods)
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ template "kea.fullname" $ }}-{{ $i }}
+  labels:
+    app: {{ template "kea.name" $ }}
+    chart: {{ template "kea.chart" $ }}
+    release: "{{ $.Release.Name }}"
+spec:
+  type: ClusterIP
+  clusterIP: None
+  ports:
+  - name: kea-peer
+    port: {{ $.Values.ports.tftpd }}
+    protocol: UDP
+    targetPort: {{ $.Values.tftpdService.port }}
   selector:
     app: {{ template "kea.name" $ }}
     release: {{ $.Release.Name }}
@@ -102,6 +128,18 @@ spec:
           mountPath: /etc/kea/kea-dhcp4.conf
           subPathExpr: kea-dhcp4-$(POD_NAME)
           readOnly: true
+      - name: {{ .Chart.Name }}-tftpd
+        image: {{ .Values.images.tftpd }}
+        args:
+        - "--address"
+        - "0.0.0.0:{{ .Values.ports.tftpd }}"
+        - "--verbose"
+        securityContext:
+          capabilities:
+            add:
+            - SYS_CHROOT
+            - SETUID
+            - SETGID
       volumes:
       - name: shared-data
         emptyDir:

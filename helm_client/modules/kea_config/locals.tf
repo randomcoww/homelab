@@ -62,19 +62,19 @@ locals {
           ] : []
           client-classes = [
             {
-              name           = "ipxe_detected"
+              name           = "XClient_iPXE"
               test           = "substring(option[77].hex,0,4) == 'iPXE'"
               boot-file-name = var.ipxe_script_url
             },
             {
-              name           = "ipxe_efi"
-              test           = "not(substring(option[77].hex,0,4) == 'iPXE') and (option[93].hex == 0x0007)"
-              next-server    = var.tftp_server
-              boot-file-name = var.ipxe_boot_path
+              name            = "EFI_x86-64"
+              test            = "option[93].hex == 0x0007"
+              server-hostname = "${peer.name}.${var.namespace}.svc.${var.cluster_domain}"
+              boot-file-name  = var.ipxe_boot_path
             },
             # {
             #   name           = "HTTPClient"
-            #   test           = "not(substring(option[77].hex,0,4) == 'iPXE') and (option[93].hex == 0x0010)"
+            #   test           = "option[93].hex == 0x0010"
             #   boot-file-name = "https://boot.ipxe.org/ipxe.efi"
             #   option-data = [
             #     {

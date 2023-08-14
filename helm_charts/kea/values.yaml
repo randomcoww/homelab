@@ -16,6 +16,7 @@ images:
 
 ports:
   keaPeer: 22000
+  tftpd: 69
 
 affinity: {}
 tolerations: {}

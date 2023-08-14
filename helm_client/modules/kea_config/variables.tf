@@ -1,3 +1,11 @@
+variable "cluster_domain" {
+  type = string
+}
+
+variable "namespace" {
+  type = string
+}
+
 variable "resource_name" {
   type = string
 }
@@ -6,19 +14,11 @@ variable "service_ips" {
   type = list(string)
 }
 
-variable "tftp_server" {
-  type = string
-}
-
 variable "ipxe_boot_path" {
   type = string
 }
 
 variable "ipxe_script_url" {
-  type = string
-}
-
-variable "cluster_domain" {
   type = string
 }
 

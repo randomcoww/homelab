@@ -49,6 +49,9 @@ resource "helm_release" "kube-dns" {
       }
       service = {
         clusterIP = local.services.cluster_dns.ip
+        externalIPs = [
+          local.services.external_dns.ip,
+        ]
       }
       affinity = {
         podAntiAffinity = {
@@ -150,11 +153,8 @@ resource "helm_release" "external-dns" {
         "ingress",
       ]
       service = {
-        type      = "LoadBalancer"
+        type      = "ClusterIP"
         clusterIP = local.services.cluster_external_dns.ip
-        externalIPs = [
-          local.services.external_dns.ip,
-        ]
       }
       affinity = {
         nodeAffinity = {
@@ -680,6 +680,10 @@ resource "helm_release" "authelia" {
               domain = local.kubernetes_ingress_endpoints.vaultwarden
               policy = "bypass"
             },
+            {
+              domain = local.kubernetes_ingress_endpoints.minio
+              policy = "bypass"
+            },
           ]
         }
       }
@@ -787,10 +791,10 @@ module "kea-config" {
   ]
   shared_data_path = "/var/lib/kea"
   kea_peer_port    = local.ports.kea_peer
-  tftp_server      = local.services.apiserver.ip
   ipxe_boot_path   = "/ipxe.efi"
   ipxe_script_url  = "http://${local.services.matchbox.ip}:${local.ports.matchbox}/boot.ipxe"
   cluster_domain   = local.domains.kubernetes
+  namespace        = "default"
   networks = [
     for _, network in local.networks :
     {
@@ -810,56 +814,18 @@ module "kea-config" {
   ]
 }
 
-resource "helm_release" "tftpd" {
-  name       = "tftpd"
-  namespace  = "default"
-  repository = "https://randomcoww.github.io/repos/helm/"
-  chart      = "tftpd"
-  wait       = false
-  version    = "0.1.1"
-  values = [
-    yamlencode({
-      images = {
-        tftpd = local.container_images.tftpd
-      }
-      affinity = {
-        nodeAffinity = {
-          requiredDuringSchedulingIgnoredDuringExecution = {
-            nodeSelectorTerms = [
-              {
-                matchExpressions = [
-                  {
-                    key      = "kubernetes.io/hostname"
-                    operator = "In"
-                    values = [
-                      for _, member in local.members.vrrp :
-                      member.hostname
-                    ]
-                  },
-                ]
-              },
-            ]
-          }
-        }
-      }
-      ports = {
-        tftpd = local.ports.pxe_tftp
-      }
-    }),
-  ]
-}
-
 resource "helm_release" "kea" {
   name       = "kea"
   namespace  = "default"
   repository = "https://randomcoww.github.io/repos/helm/"
   chart      = "kea"
   wait       = false
-  version    = "0.1.15"
+  version    = "0.1.16"
   values = [
     yamlencode({
       images = {
-        kea = local.container_images.kea
+        kea   = local.container_images.kea
+        tftpd = local.container_images.tftpd
       }
       peers = [
         for _, peer in module.kea-config.config :
@@ -914,9 +880,13 @@ resource "helm_release" "kea" {
       }
       ports = {
         keaPeer = local.ports.kea_peer
+        tftpd   = local.ports.pxe_tftp
       }
       peerService = {
         port = local.ports.kea_peer
+      }
+      tftpdService = {
+        port = local.ports.pxe_tftp
       }
     }),
   ]
@@ -1048,7 +1018,7 @@ resource "helm_release" "minio" {
   chart            = "minio"
   create_namespace = true
   wait             = false
-  version          = "5.0.8"
+  version          = "5.0.13"
   values = [
     yamlencode({
       clusterDomain = local.domains.kubernetes
@@ -1070,30 +1040,27 @@ resource "helm_release" "minio" {
         clusterIP = "None"
       }
       service = {
-        type = "LoadBalancer"
+        type = "ClusterIP"
         port = local.ports.minio
         externalIPs = [
           local.services.minio.ip,
         ]
-        annotations = {
-          "external-dns.alpha.kubernetes.io/hostname" = local.kubernetes_ingress_endpoints.minio
-        }
       }
       ingress = {
-        enabled = false
-        # ingressClassName = "nginx"
-        # annotations      = local.nginx_ingress_annotations
-        # tls = [
-        #   {
-        #     secretName = "minio-tls"
-        #     hosts = [
-        #       local.kubernetes_ingress_endpoints.minio,
-        #     ]
-        #   },
-        # ]
-        # hosts = [
-        #   local.kubernetes_ingress_endpoints.minio,
-        # ]
+        enabled          = true
+        ingressClassName = "nginx"
+        annotations      = local.nginx_ingress_annotations
+        tls = [
+          {
+            secretName = "minio-tls"
+            hosts = [
+              local.kubernetes_ingress_endpoints.minio,
+            ]
+          },
+        ]
+        hosts = [
+          local.kubernetes_ingress_endpoints.minio,
+        ]
       }
       environment = {
         MINIO_API_REQUESTS_DEADLINE  = "2m"

@@ -3,7 +3,7 @@ output "mc_config" {
     version = "10"
     aliases = {
       m = {
-        url       = "http://${local.kubernetes_ingress_endpoints.minio}:${local.ports.minio}"
+        url       = "https://${local.kubernetes_ingress_endpoints.minio}"
         accessKey = nonsensitive(random_password.minio-access-key-id.result)
         secretKey = nonsensitive(random_password.minio-secret-access-key.result)
         api       = "S3v4"
