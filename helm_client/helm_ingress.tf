@@ -35,6 +35,64 @@ resource "helm_release" "nginx-ingress" {
   ]
 }
 
+resource "helm_release" "cloudflare-token" {
+  name             = "cloudflare-token"
+  repository       = "https://randomcoww.github.io/repos/helm/"
+  chart            = "helm-wrapper"
+  namespace        = "cert-manager"
+  create_namespace = true
+  wait             = true
+  version          = "0.1.0"
+  values = [
+    yamlencode({
+      manifests = [
+        {
+          apiVersion = "v1"
+          kind       = "Secret"
+          metadata = {
+            name = "cloudflare-token"
+          }
+          stringData = {
+            token = cloudflare_api_token.dns_edit.value
+          }
+          type = "Opaque"
+        },
+      ]
+    }),
+  ]
+}
+
+# cloudflare tunnel #
+/*
+resource "helm_release" "cloudflare-tunnel" {
+  name       = "cloudflare-tunnel"
+  namespace  = "default"
+  repository = "https://cloudflare.github.io/helm-charts/"
+  chart      = "cloudflare-tunnel"
+  wait       = false
+  version    = "0.2.0"
+  values = [
+    yamlencode({
+      cloudflare = {
+        account    = var.cloudflare.account_id
+        tunnelName = cloudflare_tunnel.homelab.name
+        tunnelId   = cloudflare_tunnel.homelab.id
+        secret     = cloudflare_tunnel.homelab.secret
+        ingress = [
+          {
+            hostname = "*.${local.domains.internal}"
+            service  = "https://${local.kubernetes_service_endpoints.nginx}"
+          },
+        ]
+      }
+      image = {
+        repository = split(":", local.container_images.cloudflared)[0]
+        tag        = split(":", local.container_images.cloudflared)[1]
+      }
+    }),
+  ]
+}
+*/
 # cert-manager #
 
 resource "helm_release" "cert-manager" {
@@ -126,64 +184,6 @@ resource "helm_release" "cert-issuer-secrets" {
   ]
 }
 
-resource "helm_release" "cloudflare-token" {
-  name             = "cloudflare-token"
-  repository       = "https://randomcoww.github.io/repos/helm/"
-  chart            = "helm-wrapper"
-  namespace        = "cert-manager"
-  create_namespace = true
-  wait             = true
-  version          = "0.1.0"
-  values = [
-    yamlencode({
-      manifests = [
-        {
-          apiVersion = "v1"
-          kind       = "Secret"
-          metadata = {
-            name = "cloudflare-token"
-          }
-          stringData = {
-            token = cloudflare_api_token.dns_edit.value
-          }
-          type = "Opaque"
-        },
-      ]
-    }),
-  ]
-}
-
-# cloudflare tunnel #
-/*
-resource "helm_release" "cloudflare-tunnel" {
-  name       = "cloudflare-tunnel"
-  namespace  = "default"
-  repository = "https://cloudflare.github.io/helm-charts/"
-  chart      = "cloudflare-tunnel"
-  wait       = false
-  version    = "0.2.0"
-  values = [
-    yamlencode({
-      cloudflare = {
-        account    = var.cloudflare.account_id
-        tunnelName = cloudflare_tunnel.homelab.name
-        tunnelId   = cloudflare_tunnel.homelab.id
-        secret     = cloudflare_tunnel.homelab.secret
-        ingress = [
-          {
-            hostname = "*.${local.domains.internal}"
-            service  = "https://${local.kubernetes_service_endpoints.nginx}"
-          },
-        ]
-      }
-      image = {
-        repository = split(":", local.container_images.cloudflared)[0]
-        tag        = split(":", local.container_images.cloudflared)[1]
-      }
-    }),
-  ]
-}
-*/
 resource "helm_release" "cert-issuer" {
   name       = "cert-issuer"
   repository = "https://randomcoww.github.io/repos/helm/"

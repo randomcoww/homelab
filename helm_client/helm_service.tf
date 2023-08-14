@@ -472,7 +472,7 @@ resource "helm_release" "hostapd" {
   ]
 }
 
-# dev #
+# code-server #
 
 resource "helm_release" "dev" {
   name       = "dev"
