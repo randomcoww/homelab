@@ -140,6 +140,7 @@ resource "helm_release" "mayastor" {
         }
       }
       etcd = {
+        clusterDomain = local.domains.kubernetes
         persistence = {
           storageClass = "local-path"
         }
