@@ -26,6 +26,9 @@ add_header X-XSS-Protection "0" always;
 add_header Permissions-Policy "interest-cohort=()";
 add_header Pragma "no-cache";
 add_header Cache-Control "no-store";
+client_max_body_size 0;
+proxy_buffering off;
+proxy_request_buffering off;
 EOF
     "nginx.ingress.kubernetes.io/location-snippets"     = <<EOF
 proxy_http_version 1.1;
