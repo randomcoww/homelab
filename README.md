@@ -197,13 +197,6 @@ This will provision services used in following steps
 
 #### MinIO access
 
-Download `mc`
-
-```bash
-wget https://dl.min.io/client/mc/release/linux-amd64/mc
-chmod +x mc
-```
-
 Write configuration for `mc`
 
 ```bash
@@ -277,6 +270,12 @@ flatpak --user -y install flathub \
   com.heroicgameslauncher.hgl \
   net.lutris.Lutris \
   net.davidotek.pupgui2
+```
+
+```bash
+mkdir -p $HOME/bin
+wget -O $HOME/bin/mc https://dl.min.io/client/mc/release/linux-amd64/mc
+chmod +x $HOME/bin/mc
 ```
 
 #### Mac desktop
