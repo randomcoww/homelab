@@ -259,6 +259,8 @@ tw find . -name '*.tf' -exec terraform fmt '{}' \;
 
 ## Personal desktop setup
 
+#### Silverblue desktop
+
 ```bash
 flatpak --user remote-add --if-not-exists flathub https://flathub.org/repo/flathub.flatpakrepo
 
@@ -277,7 +279,7 @@ flatpak --user -y install flathub \
   net.davidotek.pupgui2
 ```
 
-Mac desktop
+#### Mac desktop
 
 ```bash
 brew install \
