@@ -34,33 +34,32 @@ resource "helm_release" "minio" {
           memory = "8Gi"
         }
       }
-      consoleService = {
-        type      = "ClusterIP"
-        clusterIP = "None"
-      }
       service = {
-        type = "ClusterIP"
+        type = "LoadBalancer"
         port = local.ports.minio
         externalIPs = [
           local.services.minio.ip,
         ]
+        annotations = {
+          "external-dns.alpha.kubernetes.io/hostname" = local.kubernetes_ingress_endpoints.minio
+        }
       }
-      ingress = {
-        enabled          = true
-        ingressClassName = "nginx"
-        annotations      = local.nginx_ingress_annotations
-        tls = [
-          {
-            secretName = "minio-tls"
-            hosts = [
-              local.kubernetes_ingress_endpoints.minio,
-            ]
-          },
-        ]
-        hosts = [
-          local.kubernetes_ingress_endpoints.minio,
-        ]
-      }
+      # ingress = {
+      #   enabled          = true
+      #   ingressClassName = "nginx"
+      #   annotations      = local.nginx_ingress_annotations
+      #   tls = [
+      #     {
+      #       secretName = "minio-tls"
+      #       hosts = [
+      #         local.kubernetes_ingress_endpoints.minio,
+      #       ]
+      #     },
+      #   ]
+      #   hosts = [
+      #     local.kubernetes_ingress_endpoints.minio,
+      #   ]
+      # }
       environment = {
         MINIO_API_REQUESTS_DEADLINE  = "2m"
         MINIO_STORAGE_CLASS_STANDARD = "EC:2"
@@ -117,6 +116,28 @@ resource "helm_release" "minio" {
       }
     }),
   ]
+}
+
+output "mc_config" {
+  value = {
+    version = "10"
+    aliases = {
+      m = {
+        url       = "http://${local.kubernetes_ingress_endpoints.minio}:${local.ports.minio}"
+        accessKey = nonsensitive(random_password.minio-access-key-id.result)
+        secretKey = nonsensitive(random_password.minio-secret-access-key.result)
+        api       = "S3v4"
+        path      = "auto"
+      }
+      s3 = {
+        url       = "https://s3.amazonaws.com"
+        accessKey = aws_iam_access_key.s3-backup.id
+        secretKey = nonsensitive(aws_iam_access_key.s3-backup.secret)
+        api       = "S3v4"
+        path      = "auto"
+      }
+    }
+  }
 }
 
 # mayastor #
