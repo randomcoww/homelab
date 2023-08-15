@@ -69,7 +69,7 @@ locals {
             {
               name            = "EFI_x86-64"
               test            = "option[93].hex == 0x0007"
-              server-hostname = "${peer.name}.${var.namespace}.svc.${var.cluster_domain}"
+              server-hostname = "${peer.name}.${var.resource_name}.${var.namespace}.svc.${var.cluster_domain}"
               boot-file-name  = var.ipxe_boot_path
             },
             # {

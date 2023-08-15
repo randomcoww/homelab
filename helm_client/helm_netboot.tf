@@ -22,7 +22,6 @@ module "kea-config" {
       domain_name_servers = [
         local.services.external_dns.ip,
       ]
-      # use existing VIP for now
       mtu = network.mtu
       pools = [
         cidrsubnet(network.prefix, 1, 1),
@@ -37,7 +36,7 @@ resource "helm_release" "kea" {
   repository = "https://randomcoww.github.io/repos/helm/"
   chart      = "kea"
   wait       = false
-  version    = "0.1.16"
+  version    = "0.1.18"
   values = [
     yamlencode({
       images = {
@@ -101,9 +100,6 @@ resource "helm_release" "kea" {
       }
       peerService = {
         port = local.ports.kea_peer
-      }
-      tftpdService = {
-        port = local.ports.pxe_tftp
       }
     }),
   ]

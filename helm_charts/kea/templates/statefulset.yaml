@@ -6,7 +6,7 @@
 apiVersion: v1
 kind: Service
 metadata:
-  name: {{ template "kea.fullname" $ }}-{{ $i }}-peer
+  name: {{ template "kea.fullname" $ }}-{{ $i }}
   labels:
     app: {{ template "kea.name" $ }}
     chart: {{ template "kea.chart" $ }}
@@ -25,12 +25,13 @@ spec:
     release: {{ $.Release.Name }}
     statefulset.kubernetes.io/pod-name: {{ template "kea.fullname" $ }}-{{ $i }}
 
+{{- end }}
 # Create headless service for tftp that exposes the IP of the node (for hostNetwork pods)
 ---
 apiVersion: v1
 kind: Service
 metadata:
-  name: {{ template "kea.fullname" $ }}-{{ $i }}
+  name: {{ template "kea.fullname" $ }}
   labels:
     app: {{ template "kea.name" $ }}
     chart: {{ template "kea.chart" $ }}
@@ -38,17 +39,10 @@ metadata:
 spec:
   type: ClusterIP
   clusterIP: None
-  ports:
-  - name: kea-peer
-    port: {{ $.Values.ports.tftpd }}
-    protocol: UDP
-    targetPort: {{ $.Values.tftpdService.port }}
   selector:
     app: {{ template "kea.name" $ }}
     release: {{ $.Release.Name }}
-    statefulset.kubernetes.io/pod-name: {{ template "kea.fullname" $ }}-{{ $i }}
 
-{{- end }}
 ---
 apiVersion: apps/v1
 kind: StatefulSet
