@@ -46,7 +46,7 @@ resource "helm_release" "minio" {
       }
       # ingress = {
       #   enabled          = true
-      #   ingressClassName = "nginx"
+      #   ingressClassName = local.ingress_classes.ingress_nginx
       #   annotations      = local.nginx_ingress_annotations
       #   tls = [
       #     {

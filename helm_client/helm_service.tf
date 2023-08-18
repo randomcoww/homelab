@@ -37,7 +37,7 @@ resource "helm_release" "webdav" {
       }
       ingress = {
         enabled          = true
-        ingressClassName = "nginx"
+        ingressClassName = local.ingress_classes.ingress_nginx
         annotations      = local.nginx_ingress_annotations
         tls = [
           {
@@ -111,7 +111,7 @@ resource "helm_release" "mpd" {
       }
       ingress = {
         enabled          = true
-        ingressClassName = "nginx"
+        ingressClassName = local.ingress_classes.ingress_nginx
         annotations      = local.nginx_ingress_annotations
         tls = [
           {
@@ -127,7 +127,7 @@ resource "helm_release" "mpd" {
       }
       uiIngress = {
         enabled          = true
-        ingressClassName = "nginx"
+        ingressClassName = local.ingress_classes.ingress_nginx
         path             = "/"
         annotations      = local.nginx_ingress_annotations
         tls = [
@@ -175,7 +175,7 @@ resource "helm_release" "transmission" {
       }
       ingress = {
         enabled          = true
-        ingressClassName = "nginx"
+        ingressClassName = local.ingress_classes.ingress_nginx_external
         path             = "/"
         annotations      = local.nginx_ingress_annotations
         tls = [
@@ -318,7 +318,7 @@ resource "helm_release" "vaultwarden" {
       }
       ingress = {
         enabled          = true
-        ingressClassName = "nginx"
+        ingressClassName = local.ingress_classes.ingress_nginx
         path             = "/"
         annotations = merge(local.nginx_ingress_annotations, {
           "nginx.ingress.kubernetes.io/proxy-read-timeout" = "3600"
@@ -501,7 +501,7 @@ resource "helm_release" "dev" {
       domain = "https://${local.kubernetes_ingress_endpoints.dev}"
       ingress = {
         enabled          = true
-        ingressClassName = "nginx"
+        ingressClassName = local.ingress_classes.ingress_nginx
         path             = "/"
         annotations      = local.nginx_ingress_annotations
         tls = [

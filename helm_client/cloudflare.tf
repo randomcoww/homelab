@@ -64,7 +64,7 @@ resource "cloudflare_tunnel_config" "homelab" {
     ingress_rule {
       hostname = "*.${local.domains.internal}"
       path     = ""
-      service  = "https://${local.kubernetes_service_endpoints.nginx}"
+      service  = "https://${local.kubernetes_service_endpoints.ingress_nginx_external}"
       # need to remove default params from terrafrom
       origin_request {
         no_tls_verify          = true

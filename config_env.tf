@@ -35,10 +35,11 @@ locals {
       cidr    = 26
       vlan_id = 80
       netnums = {
-        external_dns     = 31
-        external_ingress = 32
-        matchbox         = 33
-        minio            = 34
+        external_dns           = 31
+        ingress_nginx          = 32
+        ingress_nginx_external = 35
+        matchbox               = 33
+        minio                  = 34
       }
       mtu = 9000
     }
@@ -154,12 +155,18 @@ locals {
     dev          = "dev.${local.domains.internal}"
   }
 
+  ingress_classes = {
+    ingress_nginx          = "ingress-nginx"
+    ingress_nginx_external = "ingress-nginx-external"
+  }
+
   kubernetes_service_endpoints = {
-    kubernetes = "kubernetes.default.svc.${local.domains.kubernetes}"
-    minio      = "minio.minio.svc.${local.domains.kubernetes}"
-    authelia   = "authelia.authelia.svc.${local.domains.kubernetes}"
-    nginx      = "ingress-nginx-controller.ingress-nginx.svc.${local.domains.kubernetes}"
-    webdav     = "webdav.default.svc.${local.domains.kubernetes}"
+    kubernetes             = "kubernetes.default.svc.${local.domains.kubernetes}"
+    minio                  = "minio.minio.svc.${local.domains.kubernetes}"
+    authelia               = "authelia.authelia.svc.${local.domains.kubernetes}"
+    ingress_nginx          = "${local.ingress_classes.ingress_nginx}-controller.ingress-nginx.svc.${local.domains.kubernetes}"
+    ingress_nginx_external = "${local.ingress_classes.ingress_nginx_external}-controller.ingress-nginx.svc.${local.domains.kubernetes}"
+    webdav                 = "webdav.default.svc.${local.domains.kubernetes}"
   }
 
   ports = {

@@ -1,10 +1,12 @@
 # nginx ingress #
 
-resource "helm_release" "nginx-ingress" {
-  name             = "ingress-nginx"
+resource "helm_release" "ingress-nginx" {
+  for_each = local.ingress_classes
+
+  name             = each.value
   repository       = "https://kubernetes.github.io/ingress-nginx"
   chart            = "ingress-nginx"
-  namespace        = split(".", local.kubernetes_service_endpoints.nginx)[1]
+  namespace        = split(".", local.kubernetes_service_endpoints[each.key])[1]
   create_namespace = true
   wait             = false
   version          = "4.6.1"
@@ -13,14 +15,15 @@ resource "helm_release" "nginx-ingress" {
       controller = {
         kind = "DaemonSet"
         ingressClassResource = {
-          enabled = true
-          name    = "nginx"
+          enabled         = true
+          name            = each.value
+          controllerValue = "k8s.io/${each.value}"
         }
-        ingressClass = "nginx"
+        ingressClass = each.value
         service = {
           type = "LoadBalancer"
           externalIPs = [
-            local.services.external_ingress.ip,
+            local.services[each.key].ip,
           ]
           # externalTrafficPolicy = "Local"
         }
@@ -63,7 +66,7 @@ resource "helm_release" "cloudflare-token" {
 }
 
 # cloudflare tunnel #
-/*
+
 resource "helm_release" "cloudflare-tunnel" {
   name       = "cloudflare-tunnel"
   namespace  = "default"
@@ -81,7 +84,7 @@ resource "helm_release" "cloudflare-tunnel" {
         ingress = [
           {
             hostname = "*.${local.domains.internal}"
-            service  = "https://${local.kubernetes_service_endpoints.nginx}"
+            service  = "https://${local.kubernetes_service_endpoints.ingress_nginx_external}"
           },
         ]
       }
@@ -92,7 +95,7 @@ resource "helm_release" "cloudflare-tunnel" {
     }),
   ]
 }
-*/
+
 # cert-manager #
 
 resource "helm_release" "cert-manager" {
@@ -226,7 +229,7 @@ resource "helm_release" "cert-issuer" {
                 {
                   http01 = {
                     ingress = {
-                      class = "nginx"
+                      class = local.ingress_classes.ingress_nginx_external
                     }
                   }
                 },
@@ -267,7 +270,7 @@ resource "helm_release" "cert-issuer" {
                 {
                   http01 = {
                     ingress = {
-                      class = "nginx"
+                      class = local.ingress_classes.ingress_nginx_external
                     }
                   }
                 },
@@ -359,7 +362,7 @@ resource "helm_release" "authelia" {
           "cert-manager.io/cluster-issuer" = local.cert_issuer_prod
         }
         certManager = true
-        className   = "nginx"
+        className   = local.ingress_classes.ingress_nginx_external
         subdomain   = split(".", local.kubernetes_ingress_endpoints.auth)[0]
         tls = {
           enabled = true
