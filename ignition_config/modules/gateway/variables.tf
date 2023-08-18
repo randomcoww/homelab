@@ -10,10 +10,6 @@ variable "host_netnum" {
   type = number
 }
 
-variable "external_ingress_ip" {
-  type = string
-}
-
 variable "pod_network_prefix" {
   type = string
 }

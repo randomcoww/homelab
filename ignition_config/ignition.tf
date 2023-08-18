@@ -43,7 +43,6 @@ module "ignition-gateway" {
   interfaces               = module.ignition-systemd-networkd[each.key].tap_interfaces
   container_images         = local.container_images
   host_netnum              = each.value.netnum
-  external_ingress_ip      = local.services.external_ingress.ip
   static_pod_manifest_path = local.kubernetes.static_pod_manifest_path
   pod_network_prefix       = local.networks.kubernetes_pod.prefix
   keepalived_services = [
