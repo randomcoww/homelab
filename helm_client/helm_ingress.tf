@@ -32,6 +32,7 @@ resource "helm_release" "ingress-nginx" {
           proxy-body-size        = 0
           proxy-buffering        = "off"
           ssl-redirect           = "true"
+          use-forwarded-headers  = "true"
         }
       }
     }),
@@ -258,13 +259,6 @@ resource "helm_release" "cert-issuer" {
                     dnsZones = [
                       local.domains.internal,
                     ]
-                  }
-                },
-                {
-                  http01 = {
-                    ingress = {
-                      class = local.ingress_classes.ingress_nginx_external
-                    }
                   }
                 },
               ]
