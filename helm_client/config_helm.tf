@@ -39,6 +39,13 @@ proxy_set_header Accept-Encoding gzip;
 EOF
   }
 
+  tls_wildcard = {
+    secretName = "${local.domains.internal}-tls"
+    hosts = [
+      "*.${local.domains.internal}",
+    ]
+  }
+
   authelia = {
     backup_user   = "authelia"
     backup_bucket = "randomcoww-authelia"

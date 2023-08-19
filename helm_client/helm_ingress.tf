@@ -226,13 +226,6 @@ resource "helm_release" "cert-issuer" {
                     ]
                   }
                 },
-                {
-                  http01 = {
-                    ingress = {
-                      class = local.ingress_classes.ingress_nginx_external
-                    }
-                  }
-                },
               ]
             }
           }
@@ -366,7 +359,7 @@ resource "helm_release" "authelia" {
         subdomain   = split(".", local.kubernetes_ingress_endpoints.auth)[0]
         tls = {
           enabled = true
-          secret  = "authelia-tls"
+          secret  = local.tls_wildcard.secretName
         }
       }
       pod = {

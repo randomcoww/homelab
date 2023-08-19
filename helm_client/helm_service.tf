@@ -40,12 +40,7 @@ resource "helm_release" "webdav" {
         ingressClassName = local.ingress_classes.ingress_nginx
         annotations      = local.nginx_ingress_annotations
         tls = [
-          {
-            secretName = "webdav-tls"
-            hosts = [
-              local.kubernetes_ingress_endpoints.webdav,
-            ]
-          },
+          local.tls_wildcard,
         ]
         hosts = [
           local.kubernetes_ingress_endpoints.webdav,
@@ -179,12 +174,7 @@ resource "helm_release" "transmission" {
         path             = "/"
         annotations      = local.nginx_ingress_annotations
         tls = [
-          {
-            secretName = "transmission-tls"
-            hosts = [
-              local.kubernetes_ingress_endpoints.transmission,
-            ]
-          },
+          local.tls_wildcard,
         ]
         hosts = [
           local.kubernetes_ingress_endpoints.transmission,
@@ -325,12 +315,7 @@ resource "helm_release" "vaultwarden" {
           "nginx.ingress.kubernetes.io/proxy-send-timeout" = "3600"
         })
         tls = [
-          {
-            secretName = "vaultwarden-tls"
-            hosts = [
-              local.kubernetes_ingress_endpoints.vaultwarden,
-            ]
-          },
+          local.tls_wildcard,
         ]
         hosts = [
           local.kubernetes_ingress_endpoints.vaultwarden,
@@ -505,12 +490,7 @@ resource "helm_release" "dev" {
         path             = "/"
         annotations      = local.nginx_ingress_annotations
         tls = [
-          {
-            secretName = "dev-tls"
-            hosts = [
-              local.kubernetes_ingress_endpoints.dev,
-            ]
-          },
+          local.tls_wildcard,
         ]
         hosts = [
           local.kubernetes_ingress_endpoints.dev,

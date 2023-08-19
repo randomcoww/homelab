@@ -49,12 +49,7 @@ resource "helm_release" "minio" {
       #   ingressClassName = local.ingress_classes.ingress_nginx
       #   annotations      = local.nginx_ingress_annotations
       #   tls = [
-      #     {
-      #       secretName = "minio-tls"
-      #       hosts = [
-      #         local.kubernetes_ingress_endpoints.minio,
-      #       ]
-      #     },
+      #     local.tls_wildcard,
       #   ]
       #   hosts = [
       #     local.kubernetes_ingress_endpoints.minio,
