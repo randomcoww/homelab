@@ -119,7 +119,6 @@ locals {
     q-0 = {
       users = [
         "admin",
-        "client",
       ]
       netnum = 5
       hardware_interfaces = {

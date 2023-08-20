@@ -18,6 +18,8 @@ locals {
         "sudo",
         "systemd-journal",
         "wheel",
+        "video",
+        "input",
       ]
     }
   }
