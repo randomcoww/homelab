@@ -1,0 +1,74 @@
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: {{ template "desktop.fullname" . }}
+  labels:
+    app: {{ template "desktop.name" . }}
+    chart: {{ template "desktop.chart" . }}
+    release: "{{ .Release.Name }}"
+spec:
+  serviceName: {{ template "desktop.fullname" . }}
+  # Only supports 1 replica
+  replicas: 1
+  selector:
+    matchLabels:
+      app: {{ template "desktop.name" . }}
+      release: {{ .Release.Name }}
+  template:
+    metadata:
+      labels:
+        app: {{ template "desktop.name" . }}
+        release: {{ .Release.Name }}
+    spec:
+    {{- with .Values.affinity }}
+      affinity:
+{{ toYaml . | indent 8 }}
+    {{- end }}
+    {{- with .Values.tolerations }}
+      tolerations:
+{{ toYaml . | indent 8 }}
+    {{- end }}
+      restartPolicy: Always
+      containers:
+      - name: {{ .Chart.Name }}
+        image: {{ .Values.images.desktop }}
+        volumeMounts:
+        - name: desktop-home
+          mountPath: /home/{{ .Values.desktop.user }}
+        ports:
+        - containerPort: {{ .Values.ports.desktop }}
+        securityContext:
+          privileged: true
+        env:
+        - name: USER
+          value: {{ .Values.desktop.user }}
+        - name: HOME
+          value: /home/{{ .Values.desktop.user }}
+        - name: UID
+          value: {{ .Values.desktop.uid | quote }}
+        - name: XDG_RUNTIME_DIR
+          value: /run/user/{{ .Values.desktop.uid }}
+        - name: DEVICE
+          value: {{ .Values.desktop.device }}
+        - name: DISPLAY
+          value: {{ .Values.desktop.display }}
+      {{- with .Values.resources }}
+        resources:
+{{ toYaml . | indent 10 }}
+      {{- end }}
+  volumeClaimTemplates:
+  - metadata:
+      name: desktop-home
+    {{- if .Values.persistence.annotations }}
+      annotations:
+{{ toYaml .Values.persistence.annotations | trimSuffix "\n" | indent 8 }}
+    {{- end }}
+    spec:
+      accessModes:
+      - {{ .Values.persistence.accessMode | quote }}
+      resources:
+        requests:
+          storage: {{ .Values.persistence.size | quote }}
+    {{- if .Values.persistence.storageClass }}
+      storageClassName: "{{ .Values.persistence.storageClass }}"
+    {{- end }}

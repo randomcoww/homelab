@@ -476,6 +476,9 @@ resource "helm_release" "dev" {
         storageClass = "local-path"
         size         = "64Gi"
       }
+      ports = {
+        dev = local.ports.dev
+      }
       service = {
         type = "ClusterIP"
         port = local.ports.dev
@@ -483,7 +486,6 @@ resource "helm_release" "dev" {
       dev = {
         mountPath = "/home/podman"
       }
-      domain = "https://${local.kubernetes_ingress_endpoints.dev}"
       ingress = {
         enabled          = true
         ingressClassName = local.ingress_classes.ingress_nginx
@@ -500,6 +502,59 @@ resource "helm_release" "dev" {
         limits = {
           "github.com/fuse" = 1
           "amd.com/gpu"     = 1
+        }
+      }
+    }),
+  ]
+}
+
+# kasm-desktop #
+
+resource "helm_release" "kasm-desktop" {
+  name       = "kasm-desktop"
+  namespace  = "default"
+  repository = "https://randomcoww.github.io/repos/helm/"
+  chart      = "kasm-desktop"
+  wait       = false
+  version    = "0.1.2"
+  values = [
+    yamlencode({
+      images = {
+        desktop = local.container_images.kasm_desktop
+      }
+      persistence = {
+        accessMode   = "ReadWriteOnce"
+        storageClass = "local-path"
+        size         = "64Gi"
+      }
+      ports = {
+        desktop = local.ports.kasm_desktop
+      }
+      service = {
+        type = "ClusterIP"
+        port = local.ports.kasm_desktop
+      }
+      desktop = {
+        user    = "kasm-user"
+        uid     = "10000"
+        device  = "/dev/dri/renderD128"
+        display = ":1"
+      }
+      ingress = {
+        enabled          = true
+        ingressClassName = local.ingress_classes.ingress_nginx
+        path             = "/"
+        annotations      = local.nginx_ingress_annotations
+        tls = [
+          local.tls_wildcard,
+        ]
+        hosts = [
+          local.kubernetes_ingress_endpoints.kasm_desktop,
+        ]
+      }
+      resources = {
+        limits = {
+          "amd.com/gpu" = 1
         }
       }
     }),

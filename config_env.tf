@@ -128,6 +128,7 @@ locals {
     tailscale          = "ghcr.io/randomcoww/tailscale:1.44.0"
     fuse_device_plugin = "soolaugust/fuse-device-plugin:v1.0"
     dev                = "ghcr.io/randomcoww/dev:20230726.5"
+    kasm_desktop       = "ghcr.io/randomcoww/kasm-desktop:20230822.2"
   }
 
   kubernetes = {
@@ -153,6 +154,7 @@ locals {
     webdav       = "w.${local.domains.internal}"
     matchbox     = "ign.${local.domains.internal}"
     dev          = "dev.${local.domains.internal}"
+    kasm_desktop = "k.${local.domains.internal}"
   }
 
   ingress_classes = {
@@ -187,6 +189,7 @@ locals {
     transmission       = 9091
     vaultwarden        = 8080
     dev                = 8080
+    kasm_desktop       = 6901
   }
 
   minio_buckets = {
