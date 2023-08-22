@@ -28,7 +28,7 @@ storage:
       mode: 0644
       contents:
         inline: |
-          KERNEL=="uinput", SUBSYSTEM=="misc", OPTIONS+="static_node=uinput", TAG+="uaccess"
+          KERNEL=="uinput", SUBSYSTEM=="misc", MODE="0660", GROUP="uinput", OPTIONS+="static_node=uinput", TAG+="uaccess"
 
     # systemd user unit
     # ignition doesn't support systemd --user

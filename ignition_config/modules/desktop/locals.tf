@@ -12,10 +12,8 @@ locals {
         config = {
           key_rightalt_to_key_win = "enabled"
           min_log_level           = "none"
-          min_threads             = 1
           origin_web_ui_allowed   = "pc"
           origin_pin_allowed      = "pc"
-          output_name             = 1
           upnp                    = "off"
         }
         apps = {
