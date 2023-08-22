@@ -298,6 +298,34 @@ brew install --cask \
   visual-studio-code
 ```
 
+#### ChromeOS config
+
+```bash
+vsh termina
+lxc config set penguin security.nesting true
+lxc restart penguin
+```
+
+```bash
+sudo apt install -y \
+  kubernetes-client \
+  podman \
+  flatpak
+```
+
+Populate `/etc/subuid` and `/etc/subgid`
+
+```bash
+$(whoami):100000:65536
+```
+
+Populate `/etc/containers/containers.conf`
+
+```bash
+[containers]
+keyring = false
+```
+
 #### Save monitor configuration
 
 ```bash
