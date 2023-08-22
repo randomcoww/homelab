@@ -128,7 +128,7 @@ locals {
     tailscale          = "ghcr.io/randomcoww/tailscale:1.44.0"
     fuse_device_plugin = "soolaugust/fuse-device-plugin:v1.0"
     dev                = "ghcr.io/randomcoww/dev:20230726.5"
-    kasm_desktop       = "ghcr.io/randomcoww/kasm-desktop:20230822.2"
+    kasm_desktop       = "ghcr.io/randomcoww/kasm-desktop:20230822.4"
   }
 
   kubernetes = {
