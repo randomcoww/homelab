@@ -278,6 +278,10 @@ wget -O $HOME/bin/mc https://dl.min.io/client/mc/release/linux-amd64/mc
 chmod +x $HOME/bin/mc
 ```
 
+```bash
+cp ~/.config/monitors.xml ignition_config/modules/desktop/resources/
+```
+
 #### Mac desktop
 
 ```bash
@@ -324,12 +328,6 @@ Populate `/etc/containers/containers.conf`
 ```bash
 [containers]
 keyring = false
-```
-
-#### Save monitor configuration
-
-```bash
-cp ~/.config/monitors.xml ignition_config/modules/desktop/resources/
 ```
 
 ## :construction: Desktop VM with GPU passthrough :construction:
