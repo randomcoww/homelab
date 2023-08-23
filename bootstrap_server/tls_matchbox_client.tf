@@ -27,7 +27,7 @@ resource "tls_locally_signed_cert" "matchbox-client" {
   ]
 }
 
-resource "local_file" "bootstrap_certs" {
+resource "local_file" "bootstrap-client-certs" {
   for_each = {
     "matchbox-bootstrap-ca.pem"   = tls_self_signed_cert.matchbox-ca.cert_pem
     "matchbox-bootstrap-cert.pem" = tls_locally_signed_cert.matchbox-client.cert_pem

@@ -21,29 +21,28 @@ locals {
           }
           client-classes = [
             {
-              name           = "ipxe_detected"
+              name           = "XClient_iPXE"
               test           = "substring(option[77].hex,0,4) == 'iPXE'"
               boot-file-name = "http://${local.listen_ip}:${local.ports.matchbox}/boot.ipxe"
             },
             {
-              name           = "ipxe_efi"
-              test           = "not(substring(option[77].hex,0,4) == 'iPXE') and (option[93].hex == 0x0007)"
-              boot-file-name = "/ipxe.efi"
+              name           = "EFI_x86-64"
+              test           = "option[93].hex == 0x0007"
+              next-server    = local.listen_ip
+              boot-file-name = var.ipxe_boot_path
             },
           ]
           subnet4 = [
             {
-              subnet      = local.network_prefix
-              next-server = local.listen_ip
+              subnet = local.network_prefix
               pools = [
                 {
                   pool = local.network_prefix
                 }
               ]
               require-client-classes = [
-                "ipxe_detected",
-                "ipxe",
-                "ipxe_efi",
+                "XClient_iPXE",
+                "EFI_x86-64",
               ]
             },
           ]
@@ -53,9 +52,9 @@ locals {
   }
 }
 
-resource "local_file" "bootstrap_manifests" {
-  for_each = local.manifests
+# Outputs
 
-  filename = "${var.manifests_path}/${each.key}"
-  content  = each.value
+output "manifest" {
+  value     = join("\n---\n", values(local.manifests))
+  sensitive = true
 }
