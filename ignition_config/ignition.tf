@@ -108,20 +108,6 @@ module "ignition-ssh-server" {
   ca = module.ssh-ca.ca
 }
 
-module "ssh-client" {
-  source = "./modules/ssh_client"
-
-  key_id                = var.ssh_client.key_id
-  public_key_openssh    = var.ssh_client.public_key
-  early_renewal_hours   = var.ssh_client.early_renewal_hours
-  validity_period_hours = var.ssh_client.validity_period_hours
-  ca                    = module.ssh-ca.ca
-}
-
-output "ssh_user_cert_authorized_key" {
-  value = module.ssh-client.ssh_user_cert_authorized_key
-}
-
 # client desktop environment #
 
 module "ignition-desktop" {
@@ -237,20 +223,64 @@ module "ignition-kubernetes-worker" {
   kubelet_port              = local.ports.kubelet
 }
 
-module "kubernetes-admin" {
-  source = "./modules/kubernetes_admin"
+# Render all
 
-  cluster_name   = local.kubernetes.cluster_name
-  ca             = module.kubernetes-ca.ca
-  apiserver_ip   = local.services.apiserver.ip
-  apiserver_port = local.ports.apiserver
+data "ct_config" "ignition" {
+  for_each = {
+    for host_key in keys(local.hosts) :
+    host_key => flatten([
+      try(module.ignition-base[host_key].ignition_snippets, []),
+      try(module.ignition-systemd-networkd[host_key].ignition_snippets, []),
+      try(module.ignition-network-manager[host_key].ignition_snippets, []),
+      try(module.ignition-gateway[host_key].ignition_snippets, []),
+      try(module.ignition-vrrp[host_key].ignition_snippets, []),
+      try(module.ignition-disks[host_key].ignition_snippets, []),
+      try(module.ignition-kubelet-base[host_key].ignition_snippets, []),
+      try(module.ignition-etcd[host_key].ignition_snippets, []),
+      try(module.ignition-kubernetes-master[host_key].ignition_snippets, []),
+      try(module.ignition-kubernetes-worker[host_key].ignition_snippets, []),
+      try(module.ignition-ssh-server[host_key].ignition_snippets, []),
+      try(module.ignition-desktop[host_key].ignition_snippets, []),
+    ])
+  }
+  content  = <<EOT
+---
+variant: fcos
+version: 1.5.0
+EOT
+  strict   = true
+  snippets = each.value
 }
 
-output "admin_kubeconfig" {
-  value = nonsensitive(module.kubernetes-admin.kubeconfig)
+# Outputs
+
+output "ignition" {
+  value = {
+    for host_key, content in data.ct_config.ignition :
+    host_key => content.rendered
+  }
+  sensitive = true
 }
 
-resource "local_file" "admin_kubeconfig" {
-  content  = nonsensitive(module.kubernetes-admin.kubeconfig)
-  filename = "./output/kubeconfig/${local.kubernetes.cluster_name}.kubeconfig"
+output "ssh_ca" {
+  value     = module.ssh-ca.ca
+  sensitive = true
+}
+
+output "kubernetes" {
+  value = {
+    apiserver_endpoint = "https://${local.services.apiserver.ip}:${local.ports.apiserver}"
+    cluster_name       = local.kubernetes.cluster_name
+    ca                 = module.kubernetes-ca.ca
+  }
+  sensitive = true
+}
+
+# Write local files so that PXE update can work during outage
+
+resource "local_file" "ignition" {
+  for_each = local.hosts
+
+  content  = data.ct_config.ignition[each.key].rendered
+  filename = "./output/ignition/${each.key}.ign"
 }

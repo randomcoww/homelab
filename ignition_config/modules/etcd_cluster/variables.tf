@@ -14,7 +14,8 @@ variable "cluster_hosts" {
 }
 
 variable "aws_region" {
-  type = string
+  type    = string
+  default = "us-west-2"
 }
 
 variable "s3_backup_bucket" {
