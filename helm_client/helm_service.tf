@@ -501,7 +501,6 @@ resource "helm_release" "dev" {
       resources = {
         limits = {
           "github.com/fuse" = 1
-          "amd.com/gpu"     = 1
         }
       }
     }),
