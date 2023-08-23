@@ -32,6 +32,7 @@ output "ssh_user_cert_authorized_key" {
 }
 
 output "kubeconfig" {
-  value = nonsensitive(module.kubernetes-client.kubeconfig)
+  value     = module.kubernetes-client.kubeconfig
+  sensitive = true
 }
 
