@@ -5,6 +5,8 @@
 #### Define the `tw` (terraform wrapper) command
 
 ```bash
+mkdir -p $HOME/.kube $HOME/.aws
+
 tw() {
   set -x
   podman run -it --rm --security-opt label=disable \
@@ -12,6 +14,7 @@ tw() {
     -v $(pwd):/tf \
     -v $HOME/.aws:/root/.aws \
     -v $HOME/.kube:/root/.kube \
+    -e KUBE_CONFIG_PATH=/root/.kube/config \
     -w /tf \
     --net=host \
     docker.io/hashicorp/terraform:latest "$@"
@@ -19,94 +22,21 @@ tw() {
 }
 ```
 
-### Define secrets
+#### Create `ignition_config/secrets.tfvars` file
 
-#### Generate SSH key as needed
+Generate Linux password hash
 
 ```bash
-KEY=$HOME/.ssh/id_ecdsa
-ssh-keygen -q -t ecdsa -N '' -f $KEY 2>/dev/null <<< y >/dev/null
+LINUX_PASSWORD_HASH=$(echo $PASSWORD | openssl passwd -6 -stdin)
 ```
 
-#### Create `secrets.tfvars` file
-
-Reference: [Authelia user password generation](https://www.authelia.com/reference/guides/passwords/#user--password-file)
-
 ```bash
-USERNAME="$(whoami)"
-PASSWORD=
-SSH_PUBLIC_KEY="$HOME/.ssh/id_ecdsa"
-WIREGUARD_CONFIG=
-EMAIL=
-GMAIL_PASSWORD=
-CLOUDFLARE_API_TOKEN=
-CLOUDFLARE_ACCOUNT_ID=
-AP_SSID=
-AP_COUNTRY_CODE=
-AP_CHANNEL=
-TS_AUTH_KEY=
-
-cat > secrets.tfvars <<EOF
-aws_region = "us-west-2"
-
+cat > ignition_config/secrets.tfvars <<EOF
 users = {
   admin = {}
   client = {
-    password_hash = "$(echo $PASSWORD | openssl passwd -6 -stdin)"
+    password_hash = "$LINUX_PASSWORD_HASH"
   }
-}
-
-ssh_client = {
-  key_id                = "$USERNAME"
-  public_key            = "ssh_client_public_key=$(cat $SSH_PUBLIC_KEY.pub)"
-  early_renewal_hours   = 168
-  validity_period_hours = 336
-}
-
-letsencrypt = {
-  email = "$EMAIL"
-}
-
-cloudflare = {
-  api_token  = "$CLOUDFLARE_API_TOKEN"
-  account_id = "$CLOUDFLARE_ACCOUNT_ID"
-}
-
-authelia_users = {
-  "$EMAIL" = {
-    password = "$(podman run --rm docker.io/authelia/authelia:latest authelia hash-password -- "$PASSWORD" | sed 's:.*\: ::')"
-  }
-}
-
-hostapd = {
-  sae_password   = "$PASSWORD"
-  wpa_passphrase = "$PASSWORD"
-  ssid           = "$AP_SSID"
-  country_code   = "$AP_COUNTRY_CODE"
-  channel        = $AP_CHANNEL
-}
-
-smtp = {
-  host     = "smtp.gmail.com"
-  port     = 587
-  username = "$EMAIL"
-  password = "$GMAIL_PASSWORD"
-}
-
-wireguard_client = {
-  Interface = {
-    PrivateKey = "$(cat $WIREGUARD_CONFIG | grep PrivateKey | sed 's:.*\ = ::')"
-    Address    = "$(cat $WIREGUARD_CONFIG | grep Address | sed 's:.*\ = ::')"
-  }
-  Peer = {
-    PublicKey  = "$(cat $WIREGUARD_CONFIG | grep PublicKey | sed 's:.*\ = ::')"
-    AllowedIPs = "$(cat $WIREGUARD_CONFIG | grep AllowedIPs | sed 's:.*\ = ::')"
-    Endpoint   = "$(cat $WIREGUARD_CONFIG | grep Endpoint | sed 's:.*\ = ::')"
-  }
-}
-
-tailscale = {
-  auth_key = "$TS_AUTH_KEY"
 }
 EOF
 ```
@@ -116,7 +46,30 @@ EOF
 #### Generate CoreOS ignition for all nodes
 
 ```bash
+tw terraform -chdir=ignition_config init
 tw terraform -chdir=ignition_config apply -var-file=secrets.tfvars
+```
+
+#### Generate client credentials
+
+```bash
+cat > client/secrets.tfvars <<EOF
+ssh_client = {
+  key_id                = "$(whoami)"
+  public_key            = "ssh_client_public_key=$(cat $HOME/.ssh/id_ecdsa.pub)"
+  early_renewal_hours   = 168
+  validity_period_hours = 336
+}
+EOF
+```
+
+```bash
+tw terraform -chdir=client init
+tw terraform -chdir=client apply -var-file=secrets.tfvars
+
+tw terraform -chdir=client output -raw kubeconfig > $HOME/.kube/config
+SSH_KEY=$HOME/.ssh/id_ecdsa
+tw terraform -chdir=client output -raw ssh_user_cert_authorized_key > $SSH_KEY-cert.pub
 ```
 
 #### Create custom CoreOS images
@@ -127,30 +80,28 @@ Embed the ignition files generated above into the image to allow them to boot co
 
 ### Launch temporary local bootstrap service to PXE boot servers
 
-Asset path should contains PXE image builds of `fedora-coreos-config-custom`
+`assets_path` should contains PXE image builds of `fedora-coreos-config-custom`
 
 ```bash
-export VARIANT=coreos
 export host_ip=$(ip -br addr show lan | awk '{print $3}')
 export assets_path=${HOME}/store/boot
-export manifests_path=./output/manifests
 
 echo host_ip=$host_ip
 echo assets_path=$assets_path
-echo manifests_path=$manifests_path
 ```
 
 ```bash
+tw terraform -chdir=bootstrap_server init
 tw terraform -chdir=bootstrap_server apply \
   -var host_ip=$host_ip \
-  -var assets_path=$assets_path \
-  -var manifests_path=$manifests_path
+  -var assets_path=$assets_path
 ```
 
 Launch manifest with kubelet
 
 ```bash
-sudo podman play kube output/manifests/bootstrap.yaml
+tw terraform -chdir=bootstrap_server output -raw manifest > bootstrap.yaml
+sudo podman play kube bootstrap.yaml
 ```
 
 Populate bootstrap service with PXE boot configuration
@@ -162,22 +113,14 @@ tw terraform -chdir=bootstrap_client apply -var host_ip=$host_ip
 Stop service after PXE boot stack is launched on Kubernetes
 
 ```bash
-sudo podman play kube output/manifests/bootstrap.yaml --down
+sudo podman play kube bootstrap.yaml --down
 
 tw terraform -chdir=bootstrap_server destroy \
   -var host_ip=$host_ip \
-  -var assets_path=$assets_path \
-  -var manifests_path=$manifests_path
+  -var assets_path=$assets_path
 ```
 
 ### Deploy services to Kubernetes
-
-#### Write admin kubeconfig
-
-```bash
-mkdir -p ~/.kube && \
-tw terraform -chdir=ignition_config output -raw admin_kubeconfig > ~/.kube/config
-```
 
 #### Check that `kubernetes` service is up
 
@@ -185,9 +128,81 @@ tw terraform -chdir=ignition_config output -raw admin_kubeconfig > ~/.kube/confi
 kubectl get svc
 ```
 
-#### Once Kubernetes is up deploy helm charts
+#### Create `helm_client/secrets.tfvars` file
+
+Define secrets
+
+[Generate Authelia password hash](https://www.authelia.com/reference/guides/passwords/#user--password-file)
 
 ```bash
+PASSWORD=
+LETSENCRYPT_USER=
+GMAIL_USER=
+GMAIL_PASSWORD=
+CLOUDFLARE_API_TOKEN=
+CLOUDFLARE_ACCOUNT_ID=
+AP_SSID=
+AP_COUNTRY_CODE=
+AP_CHANNEL=
+TS_AUTH_KEY=
+WG_PRIVATE_KEY=
+WG_ADDRESS=
+WG_PUBLIC_KEY=
+WG_ENDPOINT=
+ASSWORD_HASH=$(podman run --rm docker.io/authelia/authelia:latest authelia hash-password -- "$PASSWORD" | sed 's:.*\: ::')
+```
+
+```bash
+cat > helm_client/secrets.tfvars <<EOF
+letsencrypt = {
+  email = "$LETSENCRYPT_USER"
+}
+
+cloudflare = {
+  api_token  = "$CLOUDFLARE_API_TOKEN"
+  account_id = "$CLOUDFLARE_ACCOUNT_ID"
+}
+
+authelia_users = {
+  "$GMAIL_USER" = {
+    password = "$AUTHELIA_PASSWORD_HASH"
+  }
+}
+
+hostapd = {
+  sae_password = "$PASSWORD"
+  ssid         = "$AP_SSID"
+  country_code = "$AP_COUNTRY_CODE"
+  channel      = $AP_CHANNEL
+}
+
+smtp = {
+  host     = "smtp.gmail.com"
+  port     = 587
+  username = "$GMAIL_USER"
+  password = "$GMAIL_PASSWORD"
+}
+
+tailscale = {
+  auth_key = "$TS_AUTH_KEY"
+}
+
+wireguard_client = {
+  Interface = {
+    PrivateKey = "$WG_PRIVATE_KEY"
+    Address    = "$WG_ADDRESS"
+  }
+  Peer = {
+    PublicKey  = "$WG_PUBLIC_KEY"
+    AllowedIPs = "0.0.0.0/0,::0/0"
+    Endpoint   = "$WG_ENDPOINT"
+  }
+}
+EOF
+```
+
+```bash
+tw terraform -chdir=helm_client init
 tw terraform -chdir=helm_client apply -var-file=secrets.tfvars
 ```
 
@@ -222,27 +237,11 @@ kubectl get po -l app=matchbox
 Once pods are running write PXE boot configuration for all nodes to matchbox
 
 ```bash
+tw terraform -chdir=pxeboot_config_client init
 tw terraform -chdir=pxeboot_config_client apply
 ```
 
 Each node may be PXE booted now and boot disks are no longer needed as long as two or more nodes are running
-
-## Maintenance
-
-### Server access
-
-#### Sign SSH key
-
-This is valid for `validity_period_hours` as configured in `secrets.tfvars`
-
-```bash
-KEY=$HOME/.ssh/id_ecdsa
-tw terraform -chdir=ignition_config output -raw ssh_user_cert_authorized_key > $KEY-cert.pub
-```
-
-### Container builds
-
-All custom container build Containerfiles are at https://github.com/randomcoww/container-builds
 
 ### Cleanup terraform file formatting
 
@@ -272,11 +271,15 @@ flatpak --user -y install flathub \
   net.davidotek.pupgui2
 ```
 
+Install Minio client
+
 ```bash
 mkdir -p $HOME/bin
 wget -O $HOME/bin/mc https://dl.min.io/client/mc/release/linux-amd64/mc
 chmod +x $HOME/bin/mc
 ```
+
+Save monitor config
 
 ```bash
 cp ~/.config/monitors.xml ignition_config/modules/desktop/resources/
@@ -302,7 +305,7 @@ brew install --cask \
   visual-studio-code
 ```
 
-#### ChromeOS config
+#### ChromeOS desktop
 
 ```bash
 vsh termina
