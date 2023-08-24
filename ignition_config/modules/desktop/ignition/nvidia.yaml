@@ -1,0 +1,19 @@
+---
+variant: fcos
+version: 1.5.0
+storage:
+  files:
+    - path: /etc/X11/xorg.conf.d/10-nvidia.conf
+      overwrite: true
+      mode: 0644
+      contents:
+        inline: |
+          Section "OutputClass"
+            Identifier "nvidia"
+            MatchDriver "nvidia-drm"
+            Driver "nvidia"
+            Option "AllowEmptyInitialConfiguration"
+            Option "PrimaryGPU" "yes"
+            Option "SLI" "Auto"
+            Option "BaseMosaic" "on"
+          EndSection
