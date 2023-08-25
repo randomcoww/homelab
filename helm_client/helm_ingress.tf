@@ -451,7 +451,7 @@ resource "helm_release" "authelia" {
               policy = "bypass"
             },
             {
-              domain = local.kubernetes_ingress_endpoints.minio
+              domain = local.kubernetes_ingress_endpoints.headscale
               policy = "bypass"
             },
           ]
@@ -478,6 +478,63 @@ resource "helm_release" "authelia" {
       helm_release.authelia-users,
     ]
   }
+}
+
+# headscale #
+
+resource "random_id" "private-key" {
+  byte_length = 32
+}
+
+resource "random_id" "noise-private-key" {
+  byte_length = 32
+}
+
+resource "helm_release" "headscale" {
+  name             = "headscale"
+  namespace        = "headscale"
+  repository       = "https://randomcoww.github.io/repos/helm/"
+  chart            = "headscale"
+  create_namespace = true
+  wait             = false
+  version          = "0.1.3"
+  values = [
+    yamlencode({
+      images = {
+        headscale  = local.container_images.headscale
+        litestream = local.container_images.litestream
+      }
+      ports = {
+        headscale = local.ports.headscale
+      }
+      serverURL       = "https://${local.kubernetes_ingress_endpoints.headscale}"
+      privateKey      = random_id.private-key.hex
+      noisePrivateKey = random_id.noise-private-key.hex
+      service = {
+        type = "ClusterIP"
+        port = local.ports.headscale
+      }
+      dataPath = "/etc/headscale"
+      dbFile   = "db.sqlite3"
+      backup = {
+        accessKeyID     = aws_iam_access_key.headscale-backup.id
+        secretAccessKey = aws_iam_access_key.headscale-backup.secret
+        s3Resource      = "${local.headscale.backup_bucket}/${local.headscale.backup_path}/db.sqlite3"
+      }
+      ingress = {
+        enabled          = true
+        ingressClassName = local.ingress_classes.ingress_nginx_external
+        path             = "/"
+        annotations      = local.nginx_ingress_annotations
+        tls = [
+          local.tls_wildcard,
+        ]
+        hosts = [
+          local.kubernetes_ingress_endpoints.headscale,
+        ]
+      }
+    }),
+  ]
 }
 
 # tailscale #

@@ -170,7 +170,7 @@ resource "helm_release" "transmission" {
       }
       ingress = {
         enabled          = true
-        ingressClassName = local.ingress_classes.ingress_nginx_external
+        ingressClassName = local.ingress_classes.ingress_nginx
         path             = "/"
         annotations      = local.nginx_ingress_annotations
         tls = [
@@ -310,10 +310,7 @@ resource "helm_release" "vaultwarden" {
         enabled          = true
         ingressClassName = local.ingress_classes.ingress_nginx
         path             = "/"
-        annotations = merge(local.nginx_ingress_annotations, {
-          "nginx.ingress.kubernetes.io/proxy-read-timeout" = "3600"
-          "nginx.ingress.kubernetes.io/proxy-send-timeout" = "3600"
-        })
+        annotations      = local.nginx_ingress_annotations
         tls = [
           local.tls_wildcard,
         ]

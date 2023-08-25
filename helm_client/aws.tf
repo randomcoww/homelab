@@ -56,6 +56,35 @@ resource "aws_iam_access_key" "authelia-backup" {
   user = aws_iam_user.authelia-backup.name
 }
 
+# headscale sqlite stream #
+
+resource "aws_iam_user" "headscale-backup" {
+  name = local.headscale.backup_user
+}
+
+resource "aws_iam_user_policy" "headscale-backup" {
+  name = aws_iam_user.headscale-backup.name
+  user = aws_iam_user.headscale-backup.name
+  policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [
+      {
+        Effect = "Allow"
+        Action = "*"
+        Resource = [
+          "arn:aws:s3:::${local.headscale.backup_bucket}",
+          "arn:aws:s3:::${local.headscale.backup_bucket}/${local.headscale.backup_path}",
+          "arn:aws:s3:::${local.headscale.backup_bucket}/${local.headscale.backup_path}/*",
+        ]
+      },
+    ]
+  })
+}
+
+resource "aws_iam_access_key" "headscale-backup" {
+  user = aws_iam_user.headscale-backup.name
+}
+
 # file backup #
 
 resource "aws_iam_user" "s3-backup" {

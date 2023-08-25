@@ -1,0 +1,48 @@
+tls:
+  enabled: true
+
+rollingUpdate:
+  maxUnavailable: 1
+  maxSurge: 25%
+
+images:
+  headscale: docker.io/headscale/headscale:0.22.3
+  litestream: docker.io/litestream/litestream:latest
+
+serverURL: ""
+
+ports:
+  headscale: 8080
+
+affinity: {}
+tolerations: {}
+
+service:
+  type: ClusterIP
+  port: 8080
+
+dataPath: "/etc/headscale"
+dbFile: "db.sqlite3"
+
+backup:
+  accessKeyID: "access_key_id"
+  secretAccessKey: "secret_access_key"
+  s3Resource: "bucket/path/db.sqlite3"
+
+ingress:
+  enabled: true
+  annotations:
+    # "cert-manager.io/cluster-issuer":                    "letsencrypt"
+    # "nginx.ingress.kubernetes.io/auth-response-headers": "Remote-User,Remote-Name,Remote-Groups,Remote-Email"
+    # "nginx.ingress.kubernetes.io/auth-signin":           "https://auth.local"
+    # "nginx.ingress.kubernetes.io/auth-snippet": |
+    #   proxy_set_header X-Forwarded-Method $request_method;
+    # "nginx.ingress.kubernetes.io/auth-url":              "http://ath.default.svc/api/verify"
+  path: /
+  ingressClassName: nginx
+  tls:
+  # - secretName: chart-example-tls
+  #   hosts:
+  #     - chart-example.local
+  hosts:
+  # - chart-example.local

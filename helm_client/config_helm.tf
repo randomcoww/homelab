@@ -55,6 +55,12 @@ EOF
     backup_path   = "sqlite"
   }
 
+  headscale = {
+    backup_user   = "ts"
+    backup_bucket = "randomcoww-ts"
+    backup_path   = "sqlite"
+  }
+
   s3_backup = {
     backup_user   = "backup"
     backup_bucket = "randomcoww-backup"

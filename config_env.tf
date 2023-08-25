@@ -129,6 +129,7 @@ locals {
     fuse_device_plugin = "soolaugust/fuse-device-plugin:v1.0"
     dev                = "ghcr.io/randomcoww/dev:20230823.1"
     kasm_desktop       = "ghcr.io/randomcoww/kasm-desktop:20230822.4"
+    headscale          = "docker.io/headscale/headscale:0.22.3"
   }
 
   kubernetes = {
@@ -155,6 +156,7 @@ locals {
     matchbox     = "ign.${local.domains.internal}"
     dev          = "dev.${local.domains.internal}"
     kasm_desktop = "k.${local.domains.internal}"
+    headscale    = "ts.${local.domains.internal}"
   }
 
   ingress_classes = {
@@ -190,6 +192,7 @@ locals {
     vaultwarden        = 8080
     dev                = 8080
     kasm_desktop       = 6901
+    headscale          = 8080
   }
 
   minio_buckets = {
