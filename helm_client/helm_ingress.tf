@@ -67,7 +67,7 @@ resource "helm_release" "cloudflare-token" {
 }
 
 # cloudflare tunnel #
-
+/*
 resource "helm_release" "cloudflare-tunnel" {
   name       = "cloudflare-tunnel"
   namespace  = "default"
@@ -96,7 +96,7 @@ resource "helm_release" "cloudflare-tunnel" {
     }),
   ]
 }
-
+*/
 # cert-manager #
 
 resource "helm_release" "cert-manager" {
@@ -489,7 +489,7 @@ resource "random_id" "private-key" {
 resource "random_id" "noise-private-key" {
   byte_length = 32
 }
-
+/*
 resource "helm_release" "headscale" {
   name             = "headscale"
   namespace        = "headscale"
@@ -536,7 +536,7 @@ resource "helm_release" "headscale" {
     }),
   ]
 }
-
+*/
 # tailscale #
 
 resource "helm_release" "tailscale" {
