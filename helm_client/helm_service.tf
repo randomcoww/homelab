@@ -505,7 +505,7 @@ resource "helm_release" "dev" {
 }
 
 # kasm-desktop #
-
+/*
 resource "helm_release" "kasm-desktop" {
   name       = "kasm-desktop"
   namespace  = "default"
@@ -556,3 +556,4 @@ resource "helm_release" "kasm-desktop" {
     }),
   ]
 }
+*/
