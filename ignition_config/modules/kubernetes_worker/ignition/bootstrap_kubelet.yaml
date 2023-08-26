@@ -126,6 +126,24 @@ storage:
             user:
               client-certificate-data: ${replace(base64encode(chomp(certs.bootstrap_cert.content)), "\n", "")}
               client-key-data: ${replace(base64encode(chomp(certs.bootstrap_key.content)), "\n", "")}
+    # for containers using uinput
+    - path: /etc/udev/rules.d/85-uinput.rules
+      mode: 0644
+      contents:
+        inline: |
+          KERNEL=="uinput", MODE="0660", GROUP="input", OPTIONS+="static_node=uinput", TAG+="uaccess"
+    # mayastor hugepages #
+    - path: /etc/sysctl.d/20-hugepages.conf
+      mode: 0644
+      contents:
+        inline: |
+          vm.nr_hugepages=1024
+    # mayastor #
+    - path: /etc/modules-load.d/20-nvme-tcp.conf
+      mode: 0644
+      contents:
+        inline: |
+          nvme_tcp
 
     # certs #
     %{~ for cert in values(certs) ~}

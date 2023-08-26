@@ -122,12 +122,6 @@ storage:
       contents:
         inline: |
           br_netfilter
-    # mayastor #
-    - path: /etc/modules-load.d/20-nvme-tcp.conf
-      mode: 0644
-      contents:
-        inline: |
-          nvme_tcp
     # Keepalived VIP #
     - path: /etc/sysctl.d/20-keepalived.conf
       mode: 0644
@@ -148,9 +142,3 @@ storage:
       contents:
         inline: |
           net.bridge.bridge-nf-call-iptables=0
-    # mayastor hugepages #
-    - path: /etc/sysctl.d/20-hugepages.conf
-      mode: 0644
-      contents:
-        inline: |
-          vm.nr_hugepages=1024
