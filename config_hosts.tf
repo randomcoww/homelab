@@ -286,17 +286,17 @@ locals {
         }
       }
       disks = {
-        # pv = {
-        #   device = "/dev/disk/by-id/nvme-Samsung_SSD_970_EVO_Plus_1TB_S6S1NS0W106465F"
-        #   partitions = [
-        #     {
-        #       mount_path = local.mounts.home_path
-        #       format     = "xfs"
-        #       wipe       = false
-        #       options    = ["-s", "size=4096"]
-        #     },
-        #   ]
-        # }
+        pv = {
+          device = "/dev/disk/by-id/nvme-Samsung_SSD_970_EVO_Plus_1TB_S6S1NS0W106465F"
+          partitions = [
+            {
+              mount_path = local.mounts.home_path
+              format     = "xfs"
+              wipe       = false
+              options    = ["-s", "size=4096"]
+            },
+          ]
+        }
       }
       persistent_path = local.mounts.home_path
       kubernetes_worker_taints = [
