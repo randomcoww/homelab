@@ -3,6 +3,17 @@ variant: fcos
 version: 1.5.0
 storage:
   files:
+    # always allow wayland for nvidia
+    # should run after 61-gdm
+    - path: /etc/udev/rules.d/64-nvidia-wayland.rules
+      overwrite: true
+      mode: 0644
+      contents:
+        inline: |
+          KERNEL=="nvidia_drm"
+          RUN+="/usr/libexec/gdm-runtime-config set daemon PreferredDisplayServer wayland"
+          RUN+="/usr/libexec/gdm-runtime-config set daemon WaylandEnable true"
+
     # podman gpu support sets "no-cgroups = true"
     # doesn't work with crio or cotnainerd
     - path: /etc/nvidia-container-runtime/config-podman.toml
