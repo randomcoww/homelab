@@ -55,7 +55,7 @@ storage:
             }
             stages = ["prestart"]
           })}
-    - path: /etc/containers/containers.conf.d/10-podman.conf
+    - path: /etc/containers/containers.conf.d/10-hooks.conf
       mode: 0644
       contents:
         inline: |
