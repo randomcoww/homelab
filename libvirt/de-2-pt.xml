@@ -35,10 +35,12 @@
     </disk>
     <input type='mouse' bus='virtio'/>
     <input type='keyboard' bus='virtio'/>
-    <video>
-      <model type='virtio'/>
-    </video>
-    <graphics type='spice' port='5900'/>
+    <input type='evdev'>
+      <source dev='/dev/input/by-id/usb-Logitech_USB_Receiver-if02-event-mouse'/>
+    </input>
+    <input type='evdev'>
+      <source dev='/dev/input/by-id/usb-MOSART_Semi._wireless_dongle-event-kbd' grab='all' repeat='on'/>
+    </input>
     <hostdev mode='subsystem' type='pci' managed='yes'>
       <driver name='vfio'/>
       <source>

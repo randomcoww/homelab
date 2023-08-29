@@ -69,10 +69,10 @@
       <source dev='lan' mode='bridge'/>
       <model type='virtio-net'/>
     </interface>
+    <sound model='usb'/>
     <input type='mouse' bus='virtio'/>
     <input type='keyboard' bus='virtio'/>
     <graphics type='spice' port='5900'/>
-    <sound model='usb'/>
     <video>
       <model type='virtio'/>
     </video>
