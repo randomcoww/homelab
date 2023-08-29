@@ -229,10 +229,8 @@ locals {
       }
       wlan_interfaces = {
         wlan0 = {
-          mac         = "7c-66-ef-f4-57-a8"
-          enable_dhcp = true
-          enable_mdns = true
-          metric      = 2048
+          mac    = "7c-66-ef-f4-57-a8"
+          metric = 2048
         }
       }
       bridge_interfaces = {
