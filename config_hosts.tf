@@ -12,10 +12,6 @@ locals {
           vlans = ["sync", "etcd", "service", "kubernetes", "wan"]
         }
       }
-      wlan_interfaces = {
-      }
-      bridge_interfaces = {
-      }
       tap_interfaces = {
         lan = {
           source_interface_name = "phy0"
@@ -70,10 +66,6 @@ locals {
           vlans = ["sync", "etcd", "service", "kubernetes", "wan"]
         }
       }
-      wlan_interfaces = {
-      }
-      bridge_interfaces = {
-      }
       tap_interfaces = {
         lan = {
           source_interface_name = "phy0"
@@ -127,10 +119,6 @@ locals {
           mtu   = 9000
           vlans = ["sync", "etcd", "service", "kubernetes", "wan"]
         }
-      }
-      wlan_interfaces = {
-      }
-      bridge_interfaces = {
       }
       tap_interfaces = {
         lan = {
@@ -190,14 +178,6 @@ locals {
           mac = "32-57-14-7a-aa-10"
         }
       }
-      wlan_interfaces = {
-        # wlan0 = {
-        #   mac         = "10-6f-d9-cf-d5-71"
-        #   enable_dhcp = true
-        #   enable_mdns = true
-        #   metric      = 2048
-        # }
-      }
       bridge_interfaces = {
         br-lan = {
           interfaces = ["phy0"]
@@ -218,17 +198,6 @@ locals {
         }
       }
       disks = {
-        # pv = {
-        #   device = "/dev/disk/by-id/nvme-Samsung_SSD_970_EVO_Plus_1TB_S6S1NS0W106465F"
-        #   partitions = [
-        #     {
-        #       mount_path = local.mounts.home_path
-        #       format     = "xfs"
-        #       wipe       = false
-        #       options    = ["-s", "size=4096"]
-        #     },
-        #   ]
-        # }
       }
       persistent_path = local.mounts.home_path
       kubernetes_worker_taints = [
@@ -310,21 +279,54 @@ locals {
         },
       ]
     }
+
+    v-0 = {
+      netnum = 10
+      users = [
+        "client",
+      ]
+      virtual_interfaces = {
+        lan = {
+          mac         = "52-54-00-1a-61-1a"
+          mtu         = 9000
+          enable_dhcp = true
+        }
+        kubernetes = {
+          mac           = "52-54-00-1a-61-1b"
+          mtu           = 9000
+          enable_netnum = true
+        }
+      }
+      disks = {
+        pv = {
+          device = "/dev/disk/by-id/scsi-0QEMU_QEMU_HARDDISK_drive-scsi0-0-0-0"
+          partitions = [
+            {
+              mount_path = local.mounts.home_path
+              format     = "xfs"
+              wipe       = false
+              options    = ["-s", "size=4096"]
+            },
+          ]
+        }
+      }
+      persistent_path = local.mounts.home_path
+    }
   }
 
   base_members = {
-    base              = ["gw-0", "gw-1", "q-0", "de-0", "de-1"]
-    systemd-networkd  = ["gw-0", "gw-1", "q-0", "de-0", "de-1"]
+    base              = ["gw-0", "gw-1", "q-0", "de-0", "de-1", "v-0"]
+    systemd-networkd  = ["gw-0", "gw-1", "q-0", "de-0", "de-1", "v-0"]
     network-manager   = []
     kubelet-base      = ["gw-0", "gw-1", "q-0", "de-0", "de-1"]
     gateway           = ["gw-0", "gw-1", "q-0"]
     vrrp              = ["gw-0", "gw-1"]
-    disks             = ["gw-0", "gw-1", "q-0", "de-0", "de-1"]
-    ssh-server        = ["gw-0", "gw-1", "q-0", "de-0", "de-1"]
+    disks             = ["gw-0", "gw-1", "q-0", "de-0", "de-1", "v-0"]
+    ssh-server        = ["gw-0", "gw-1", "q-0", "de-0", "de-1", "v-0"]
     etcd              = ["gw-0", "gw-1", "q-0"]
     kubernetes-master = ["gw-0", "gw-1"]
     kubernetes-worker = ["gw-0", "gw-1", "q-0", "de-0", "de-1"]
-    desktop           = ["de-0", "de-1"]
+    desktop           = ["de-0", "de-1", "v-0"]
   }
 
   hosts = {

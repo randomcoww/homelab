@@ -6,6 +6,10 @@ variable "tap_interfaces" {
   type = map(map(string))
 }
 
+variable "virtual_interfaces" {
+  type = map(map(string))
+}
+
 variable "bridge_interfaces" {
   type    = any
   default = {}

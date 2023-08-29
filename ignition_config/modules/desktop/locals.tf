@@ -12,8 +12,8 @@ locals {
         config = {
           key_rightalt_to_key_win = "enabled"
           min_log_level           = "none"
-          origin_web_ui_allowed   = "pc"
-          origin_pin_allowed      = "pc"
+          origin_web_ui_allowed   = "lan"
+          origin_pin_allowed      = "lan"
           upnp                    = "off"
         }
         apps = {
