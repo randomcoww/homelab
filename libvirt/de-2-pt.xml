@@ -1,8 +1,8 @@
 <domain type='kvm'>
-  <name>de-1-pt</name>
-  <memory unit='GiB'>8</memory>
-  <currentMemory unit='GiB'>8</currentMemory>
-  <vcpu placement='static'>8</vcpu>
+  <name>de-2-pt</name>
+  <memory unit='GiB'>16</memory>
+  <currentMemory unit='GiB'>16</currentMemory>
+  <vcpu placement='static'>6</vcpu>
   <os>
     <type arch='x86_64' machine='q35'>hvm</type>
     <loader readonly='yes' type='pflash'>/usr/share/OVMF/OVMF_CODE.fd</loader>
@@ -15,7 +15,7 @@
     <vmport state='off'/>
   </features>
   <cpu mode='host-passthrough'>
-    <topology sockets='1' cores='8' threads='1'/>
+    <topology sockets='1' cores='6' threads='1'/>
     <cache level='3' mode='emulate'/>
     <feature policy='require' name='topoext'/>
   </cpu>
@@ -30,24 +30,15 @@
     <controller type='scsi' model='virtio-scsi'/>
     <disk type='file' device='disk'>
       <driver name='qemu' type='raw'/>
-      <source file='/var/home/qemu/de-1-pt.img'/>
+      <source file='/var/home/qemu/de-2-pt.img'/>
       <target dev='sda' bus='scsi'/>
     </disk>
-    <console>
-      <target type='virtio'/>
-    </console>
     <input type='mouse' bus='virtio'/>
     <input type='keyboard' bus='virtio'/>
-    <input type='evdev'>
-      <source dev='/dev/input/by-id/usb-Logitech_USB_Receiver-if02-event-mouse'/>
-    </input>
-    <input type='evdev'>
-      <source dev='/dev/input/by-id/usb-MOSART_Semi._wireless_dongle-event-kbd' grab='all' repeat='on'/>
-    </input>
-    <channel type='spicevmc'>
-      <target type='virtio' name='com.redhat.spice.0'/>
-      <address type='virtio-serial'/>
-    </channel>
+    <video>
+      <model type='virtio'/>
+    </video>
+    <graphics type='spice' port='5900'/>
     <hostdev mode='subsystem' type='pci' managed='yes'>
       <driver name='vfio'/>
       <source>
