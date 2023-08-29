@@ -169,48 +169,21 @@ locals {
       ]
       hardware_interfaces = {
         phy0 = {
-          mac   = "58-47-ca-71-4d-ce"
-          mtu   = 9000
-          vlans = ["kubernetes"]
-        }
-        # mobile
-        phy1 = {
-          mac = "32-57-14-7a-aa-10"
-        }
-      }
-      bridge_interfaces = {
-        br-lan = {
-          interfaces = ["phy0"]
+          mac = "58-47-ca-71-4d-ce"
+          mtu = 9000
         }
       }
       tap_interfaces = {
         lan = {
-          source_interface_name = "br-lan"
-          enable_dhcp           = true
-        }
-        kubernetes = {
-          source_interface_name = "phy0-kubernetes"
-          enable_netnum         = true
-        }
-        fallback = {
-          source_interface_name = "phy1"
+          source_interface_name = "phy0"
           enable_dhcp           = true
         }
       }
       disks = {
       }
       persistent_path = local.mounts.home_path
-      kubernetes_worker_taints = [
-        {
-          key    = "node-role.kubernetes.io/de"
-          effect = "NoSchedule"
-        },
-        {
-          key    = "node-role.kubernetes.io/de"
-          effect = "NoExecute"
-        },
-      ]
     }
+
     de-1 = {
       netnum = 9
       users = [
