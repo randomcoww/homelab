@@ -180,6 +180,17 @@ locals {
         }
       }
       disks = {
+        pv = {
+          device = "/dev/disk/by-id/nvme-Samsung_SSD_970_EVO_Plus_1TB_S6S1NS0W106465F"
+          partitions = [
+            {
+              mount_path = local.mounts.home_path
+              format     = "xfs"
+              wipe       = false
+              options    = ["-s", "size=4096"]
+            },
+          ]
+        }
       }
       persistent_path = local.mounts.home_path
     }
@@ -289,14 +300,14 @@ locals {
     base              = ["gw-0", "gw-1", "q-0", "de-0", "de-1", "v-0"]
     systemd-networkd  = ["gw-0", "gw-1", "q-0", "de-0", "de-1", "v-0"]
     network-manager   = []
-    kubelet-base      = ["gw-0", "gw-1", "q-0", "de-0", "de-1"]
+    kubelet-base      = ["gw-0", "gw-1", "q-0", "de-1"]
     gateway           = ["gw-0", "gw-1", "q-0"]
     vrrp              = ["gw-0", "gw-1"]
     disks             = ["gw-0", "gw-1", "q-0", "de-0", "de-1", "v-0"]
     ssh-server        = ["gw-0", "gw-1", "q-0", "de-0", "de-1", "v-0"]
     etcd              = ["gw-0", "gw-1", "q-0"]
     kubernetes-master = ["gw-0", "gw-1"]
-    kubernetes-worker = ["gw-0", "gw-1", "q-0", "de-0", "de-1"]
+    kubernetes-worker = ["gw-0", "gw-1", "q-0", "de-1"]
     desktop           = ["de-0", "de-1", "v-0"]
   }
 
