@@ -49,13 +49,6 @@ storage:
     #     inline: |
     #       OCL_ICD_VENDORS=/etc/OpenCL/vendors/rusticl.icd
     #       RUSTICL_ENABLE=radeonsi
-    # Show cursor in sunshine stream under wayland
-    # https://github.com/LizardByte/Sunshine/issues/93
-    # - path: /etc/environment.d/10-sunshine-hack.conf
-    #   mode: 0644
-    #   contents:
-    #     inline: |
-    #       MUTTER_DEBUG_DISABLE_HW_CURSORS=1
 
     # gnome desktop config #
     # remote desktop https://www.reddit.com/r/gnome/comments/uz5as7/gnome_has_made_it_super_simple_to_extend_your/

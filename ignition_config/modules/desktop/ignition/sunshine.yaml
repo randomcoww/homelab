@@ -25,6 +25,13 @@ storage:
         inline: |
           ${indent(10, jsonencode(sunshine.apps))}
 
+    # Show cursor in sunshine stream under wayland
+    # https://github.com/LizardByte/Sunshine/issues/93
+    # - path: /etc/environment.d/10-sunshine-hack.conf
+    #   mode: 0644
+    #   contents:
+    #     inline: |
+    #       MUTTER_DEBUG_DISABLE_HW_CURSORS=1
     # systemd user unit
     # ignition doesn't support systemd --user
     # these dependencies work for gnome wayland
