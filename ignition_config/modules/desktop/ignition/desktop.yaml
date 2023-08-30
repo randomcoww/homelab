@@ -176,6 +176,13 @@ storage:
       contents:
         inline: |
           ${indent(10, monitors_config)}
+    # vscode #
+    - path: /etc/skel/.config/code-flags.conf
+      mode: 0644
+      contents:
+        inline: |
+          --enable-features=UseOzonePlatform,WaylandWindow
+          --ozone-platform-hint=auto
 
     # systemd user unit
     # ignition doesn't support systemd --user
