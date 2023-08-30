@@ -14,14 +14,6 @@ storage:
           RUN+="/usr/libexec/gdm-runtime-config set daemon PreferredDisplayServer wayland"
           RUN+="/usr/libexec/gdm-runtime-config set daemon WaylandEnable true"
 
-    - path: /etc/environment.d/10-nvidia-wayland.conf
-      mode: 0644
-      contents:
-        inline: |
-          XWAYLAND_NO_GLAMOR=1
-          # GBM_BACKEND=nvidia-drm
-          # __GLX_VENDOR_LIBRARY_NAME=nvidia
-
     # podman gpu support sets "no-cgroups = true"
     # doesn't work with crio or cotnainerd
     - path: /etc/nvidia-container-runtime/config-podman.toml
