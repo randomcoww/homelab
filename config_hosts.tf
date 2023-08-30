@@ -213,7 +213,7 @@ locals {
       }
       wlan_interfaces = {
         wlan0 = {
-          mac    = "7c-66-ef-f4-57-a8"
+          mac    = "10-6f-d9-cf-d5-71"
           metric = 2048
         }
       }
