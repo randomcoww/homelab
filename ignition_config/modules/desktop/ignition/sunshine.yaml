@@ -29,11 +29,11 @@ storage:
     # Also waiting for
     # https://gitlab.gnome.org/GNOME/mutter/-/issues/2980
     # https://gitlab.gnome.org/GNOME/mutter/-/issues/1939
-    # - path: /etc/environment.d/10-sunshine-hack.conf
-    #   mode: 0644
-    #   contents:
-    #     inline: |
-    #       MUTTER_DEBUG_DISABLE_HW_CURSORS=1
+    - path: /etc/environment.d/10-sunshine-hack.conf
+      mode: 0644
+      contents:
+        inline: |
+          MUTTER_DEBUG_DISABLE_HW_CURSORS=1
 
     # systemd user unit
     # ignition doesn't support systemd --user
