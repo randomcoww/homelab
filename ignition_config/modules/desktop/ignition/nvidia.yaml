@@ -5,7 +5,7 @@ storage:
   files:
     # always allow wayland for nvidia
     # should run after 61-gdm
-    - path: /etc/udev/rules.d/64-nvidia-wayland.rules
+    - path: /etc/udev/rules.d/99-nvidia-wayland.rules
       overwrite: true
       mode: 0644
       contents:
@@ -13,6 +13,14 @@ storage:
           KERNEL=="nvidia_drm"
           RUN+="/usr/libexec/gdm-runtime-config set daemon PreferredDisplayServer wayland"
           RUN+="/usr/libexec/gdm-runtime-config set daemon WaylandEnable true"
+
+    - path: /etc/environment.d/10-nvidia-wayland.conf
+      mode: 0644
+      contents:
+        inline: |
+          XWAYLAND_NO_GLAMOR=1
+          # GBM_BACKEND=nvidia-drm
+          # __GLX_VENDOR_LIBRARY_NAME=nvidia
 
     # podman gpu support sets "no-cgroups = true"
     # doesn't work with crio or cotnainerd
