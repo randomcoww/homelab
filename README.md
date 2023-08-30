@@ -27,6 +27,7 @@ tw() {
 Generate Linux password hash
 
 ```bash
+PASSWORD=
 LINUX_PASSWORD_HASH=$(echo $PASSWORD | openssl passwd -6 -stdin)
 ```
 
@@ -149,7 +150,7 @@ WG_PRIVATE_KEY=
 WG_ADDRESS=
 WG_PUBLIC_KEY=
 WG_ENDPOINT=
-ASSWORD_HASH=$(podman run --rm docker.io/authelia/authelia:latest authelia hash-password -- "$PASSWORD" | sed 's:.*\: ::')
+PASSWORD_HASH=$(podman run --rm docker.io/authelia/authelia:latest authelia hash-password -- "$PASSWORD" | sed 's:.*\: ::')
 ```
 
 ```bash
