@@ -52,6 +52,9 @@ locals {
         }
       }
       persistent_path = local.mounts.containers_path
+      kubernetes_worker_labels = {
+        minio = true
+      }
     }
 
     gw-1 = {
@@ -106,6 +109,9 @@ locals {
         }
       }
       persistent_path = local.mounts.containers_path
+      kubernetes_worker_labels = {
+        minio = true
+      }
     }
 
     q-0 = {
@@ -160,6 +166,9 @@ locals {
         }
       }
       persistent_path = local.mounts.containers_path
+      kubernetes_worker_labels = {
+        minio = true
+      }
     }
 
     de-0 = {
@@ -198,13 +207,14 @@ locals {
     de-1 = {
       netnum = 9
       users = [
+        "admin",
         "client",
       ]
       hardware_interfaces = {
         phy0 = {
           mac   = "74-56-3c-c3-10-68"
           mtu   = 9000
-          vlans = ["kubernetes"]
+          vlans = ["service", "kubernetes"]
         }
         # mobile
         phy1 = {
@@ -226,6 +236,10 @@ locals {
         lan = {
           source_interface_name = "br-lan"
           enable_dhcp           = true
+        }
+        service = {
+          source_interface_name = "phy0-service"
+          enable_netnum         = true
         }
         kubernetes = {
           source_interface_name = "phy0-kubernetes"
@@ -250,6 +264,10 @@ locals {
         }
       }
       persistent_path = local.mounts.home_path
+      kubernetes_worker_labels = {
+        hostapd = true
+        nvidia  = true
+      }
       kubernetes_worker_taints = [
         {
           key    = "node-role.kubernetes.io/de"

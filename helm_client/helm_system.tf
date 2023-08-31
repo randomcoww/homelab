@@ -334,6 +334,42 @@ resource "helm_release" "fuse-device-plugin" {
                     }
                   },
                 ]
+                tolerations = [
+                  {
+                    key      = "node.kubernetes.io/not-ready"
+                    operator = "Exists"
+                    effect   = "NoExecute"
+                  },
+                  {
+                    key      = "node.kubernetes.io/unreachable"
+                    operator = "Exists"
+                    effect   = "NoExecute"
+                  },
+                  {
+                    key      = "node.kubernetes.io/disk-pressure"
+                    operator = "Exists"
+                    effect   = "NoSchedule"
+                  },
+                  {
+                    key      = "node.kubernetes.io/memory-pressure"
+                    operator = "Exists"
+                    effect   = "NoSchedule"
+                  },
+                  {
+                    key      = "node.kubernetes.io/pid-pressure"
+                    operator = "Exists"
+                    effect   = "NoSchedule"
+                  },
+                  {
+                    key      = "node.kubernetes.io/unschedulable"
+                    operator = "Exists"
+                    effect   = "NoSchedule"
+                  },
+                  {
+                    key      = "node-role.kubernetes.io/de"
+                    operator = "Exists"
+                  },
+                ]
               }
             }
           }
@@ -382,12 +418,8 @@ resource "helm_release" "nvidia-device-plugin" {
               {
                 matchExpressions = [
                   {
-                    key      = "kubernetes.io/hostname"
-                    operator = "In"
-                    values = [
-                      for _, member in local.members.desktop :
-                      member.hostname
-                    ]
+                    key      = "nvidia"
+                    operator = "Exists"
                   },
                 ]
               },

@@ -78,12 +78,8 @@ resource "helm_release" "minio" {
               {
                 matchExpressions = [
                   {
-                    key      = "kubernetes.io/hostname"
-                    operator = "In"
-                    values = [
-                      for _, member in local.members.disks :
-                      member.hostname
-                    ]
+                    key      = "minio"
+                    operator = "Exists"
                   },
                 ]
               },

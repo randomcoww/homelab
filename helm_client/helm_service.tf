@@ -413,12 +413,8 @@ resource "helm_release" "hostapd" {
               {
                 matchExpressions = [
                   {
-                    key      = "kubernetes.io/hostname"
-                    operator = "In"
-                    values = [
-                      for _, member in local.members.desktop :
-                      member.hostname
-                    ]
+                    key      = "hostapd"
+                    operator = "Exists"
                   },
                 ]
               },
@@ -498,8 +494,15 @@ resource "helm_release" "dev" {
       resources = {
         limits = {
           "github.com/fuse" = 1
+          "nvidia.com/gpu"  = 1
         }
       }
+      tolerations = [
+        {
+          key      = "node-role.kubernetes.io/de"
+          operator = "Exists"
+        },
+      ]
     }),
   ]
 }

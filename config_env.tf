@@ -127,7 +127,7 @@ locals {
     cloudflared        = "docker.io/cloudflare/cloudflared:2023.8.0"
     tailscale          = "ghcr.io/randomcoww/tailscale:1.44.0"
     fuse_device_plugin = "soolaugust/fuse-device-plugin:v1.0"
-    dev                = "ghcr.io/randomcoww/dev:20230823.1"
+    dev                = "ghcr.io/randomcoww/dev:20230831.1"
     kasm_desktop       = "ghcr.io/randomcoww/kasm-desktop:20230822.4"
     headscale          = "docker.io/headscale/headscale:0.22.3"
   }
