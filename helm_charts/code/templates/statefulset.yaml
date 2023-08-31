@@ -1,23 +1,23 @@
 apiVersion: apps/v1
 kind: StatefulSet
 metadata:
-  name: {{ template "dev.fullname" . }}
+  name: {{ template "code.fullname" . }}
   labels:
-    app: {{ template "dev.name" . }}
-    chart: {{ template "dev.chart" . }}
+    app: {{ template "code.name" . }}
+    chart: {{ template "code.chart" . }}
     release: "{{ .Release.Name }}"
 spec:
-  serviceName: {{ template "dev.fullname" . }}
+  serviceName: {{ template "code.fullname" . }}
   # Only supports 1 replica
   replicas: 1
   selector:
     matchLabels:
-      app: {{ template "dev.name" . }}
+      app: {{ template "code.name" . }}
       release: {{ .Release.Name }}
   template:
     metadata:
       labels:
-        app: {{ template "dev.name" . }}
+        app: {{ template "code.name" . }}
         release: {{ .Release.Name }}
     spec:
     {{- with .Values.affinity }}
@@ -31,27 +31,27 @@ spec:
       restartPolicy: Always
       containers:
       - name: {{ .Chart.Name }}
-        image: {{ .Values.images.dev }}
+        image: {{ .Values.images.code }}
         args:
-        - "--bind-addr=0.0.0.0:{{ .Values.ports.dev }}"
+        - "--bind-addr=0.0.0.0:{{ .Values.ports.code }}"
         - "--auth=none"
         volumeMounts:
-        - name: dev-mount
-          mountPath: {{ .Values.dev.mountPath }}
+        - name: code-mount
+          mountPath: {{ .Values.code.mountPath }}
         ports:
-        - containerPort: {{ .Values.ports.dev }}
+        - containerPort: {{ .Values.ports.code }}
         securityContext:
           capabilities:
             add:
             - AUDIT_WRITE
-          runAsUser: {{ .Values.dev.uid }}
+          runAsUser: {{ .Values.code.uid }}
       {{- with .Values.resources }}
         resources:
 {{ toYaml . | indent 10 }}
       {{- end }}
   volumeClaimTemplates:
   - metadata:
-      name: dev-mount
+      name: code-mount
     {{- if .Values.persistence.annotations }}
       annotations:
 {{ toYaml .Values.persistence.annotations | trimSuffix "\n" | indent 8 }}

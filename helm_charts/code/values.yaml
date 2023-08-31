@@ -19,7 +19,7 @@ ingress:
   # - chart-example.local
 
 ports:
-  dev: 8080
+  code: 8080
 
 persistence:
   accessMode: ReadWriteOnce
@@ -30,9 +30,9 @@ tls:
   enabled: true
 
 images:
-  dev: "ghcr.io/randomcoww/dev:20230720"
+  code: "ghcr.io/randomcoww/code-server:20230720"
 
-dev:
+code:
   mountPath: /home/podman
   uid: 1000
 

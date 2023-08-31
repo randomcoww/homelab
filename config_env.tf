@@ -127,7 +127,7 @@ locals {
     cloudflared        = "docker.io/cloudflare/cloudflared:2023.8.0"
     tailscale          = "ghcr.io/randomcoww/tailscale:1.44.0"
     fuse_device_plugin = "soolaugust/fuse-device-plugin:v1.0"
-    dev                = "ghcr.io/randomcoww/dev:20230831.1"
+    code_server        = "ghcr.io/randomcoww/code-server:20230831.1"
     kasm_desktop       = "ghcr.io/randomcoww/kasm-desktop:20230822.4"
     headscale          = "docker.io/headscale/headscale:0.22.3"
   }
@@ -154,7 +154,7 @@ locals {
     vaultwarden  = "vw.${local.domains.internal}"
     webdav       = "w.${local.domains.internal}"
     matchbox     = "ign.${local.domains.internal}"
-    dev          = "dev.${local.domains.internal}"
+    code         = "code.${local.domains.internal}"
     kasm_desktop = "k.${local.domains.internal}"
     headscale    = "ts.${local.domains.internal}"
   }
@@ -190,7 +190,7 @@ locals {
     minio              = 80
     transmission       = 9091
     vaultwarden        = 8080
-    dev                = 8080
+    code               = 8080
     kasm_desktop       = 6901
     headscale          = 8080
   }

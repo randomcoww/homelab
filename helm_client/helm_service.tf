@@ -452,17 +452,17 @@ resource "helm_release" "hostapd" {
 
 # code-server #
 
-resource "helm_release" "dev" {
-  name       = "dev"
+resource "helm_release" "code" {
+  name       = "code"
   namespace  = "default"
   repository = "https://randomcoww.github.io/repos/helm/"
-  chart      = "dev"
+  chart      = "code"
   wait       = false
   version    = "0.1.15"
   values = [
     yamlencode({
       images = {
-        dev = local.container_images.dev
+        code = local.container_images.code_server
       }
       persistence = {
         accessMode   = "ReadWriteOnce"
@@ -470,13 +470,13 @@ resource "helm_release" "dev" {
         size         = "64Gi"
       }
       ports = {
-        dev = local.ports.dev
+        code = local.ports.code
       }
       service = {
         type = "ClusterIP"
-        port = local.ports.dev
+        port = local.ports.code
       }
-      dev = {
+      code = {
         mountPath = "/home/podman"
       }
       ingress = {
@@ -488,13 +488,12 @@ resource "helm_release" "dev" {
           local.tls_wildcard,
         ]
         hosts = [
-          local.kubernetes_ingress_endpoints.dev,
+          local.kubernetes_ingress_endpoints.code,
         ]
       }
       resources = {
         limits = {
           "github.com/fuse" = 1
-          "nvidia.com/gpu"  = 1
         }
       }
       tolerations = [

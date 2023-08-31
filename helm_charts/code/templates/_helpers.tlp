@@ -1,10 +1,10 @@
 {{/* vim: set filetype=mustache: */}}
 
-{{- define "dev.name" -}}
+{{- define "code.name" -}}
 {{- default .Chart.Name .Values.nameOverride | trunc 63 | trimSuffix "-" -}}
 {{- end -}}
 
-{{- define "dev.fullname" -}}
+{{- define "code.fullname" -}}
 {{- if .Values.fullnameOverride -}}
 {{- .Values.fullnameOverride | trunc 63 | trimSuffix "-" -}}
 {{- else -}}
@@ -17,11 +17,11 @@
 {{- end -}}
 {{- end -}}
 
-{{- define "dev.chart" -}}
+{{- define "code.chart" -}}
 {{- printf "%s-%s" .Chart.Name .Chart.Version | replace "+" "_" | trunc 63 | trimSuffix "-" -}}
 {{- end -}}
 
-{{- define "dev.ingress.apiVersion" -}}
+{{- define "code.ingress.apiVersion" -}}
 {{- if semverCompare "<1.14-0" .Capabilities.KubeVersion.GitVersion -}}
 {{- print "extensions/v1beta1" -}}
 {{- else if semverCompare "<1.19-0" .Capabilities.KubeVersion.GitVersion -}}

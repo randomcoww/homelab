@@ -5,10 +5,10 @@
 apiVersion: v1
 kind: Service
 metadata:
-  name: {{ template "dev.fullname" . }}
+  name: {{ template "code.fullname" . }}
   labels:
-    app: {{ template "dev.name" . }}
-    chart: {{ template "dev.chart" . }}
+    app: {{ template "code.name" . }}
+    chart: {{ template "code.chart" . }}
     release: {{ .Release.Name }}
 spec:
   type: {{ .Values.service.type }}
@@ -22,7 +22,7 @@ spec:
 {{- if (and (eq .Values.service.type "NodePort") ( .Values.service.nodePort)) }}
     nodePort: {{ .Values.service.nodePort }}
 {{- else }}
-    targetPort: {{ .Values.ports.dev }}
+    targetPort: {{ .Values.ports.code }}
 {{- end }}
 {{- if .Values.service.externalIPs }}
   externalIPs:
@@ -31,5 +31,5 @@ spec:
 {{- end }}
 {{- end }}
   selector:
-    app: {{ template "dev.name" . }}
+    app: {{ template "code.name" . }}
     release: {{ .Release.Name }}

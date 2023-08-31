@@ -1,14 +1,14 @@
 {{- if .Values.ingress.enabled -}}
-{{- $fullName := include "dev.fullname" . -}}
-{{- $servicePort := .Values.ports.dev -}}
+{{- $fullName := include "code.fullname" . -}}
+{{- $servicePort := .Values.ports.code -}}
 {{- $ingressPath := .Values.ingress.path -}}
-apiVersion: {{ template "dev.ingress.apiVersion" . }}
+apiVersion: {{ template "code.ingress.apiVersion" . }}
 kind: Ingress
 metadata:
   name: {{ $fullName }}
   labels:
-    app: {{ template "dev.name" . }}
-    chart: {{ template "dev.chart" . }}
+    app: {{ template "code.name" . }}
+    chart: {{ template "code.chart" . }}
     release: {{ .Release.Name }}
 {{- with .Values.ingress.labels }}
 {{ toYaml . | indent 4 }}
