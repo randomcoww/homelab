@@ -201,7 +201,7 @@ locals {
           ]
         }
       }
-      persistent_path = local.mounts.home_path
+      persistent_path = local.mounts.containers_path
     }
 
     de-1 = {
@@ -255,7 +255,7 @@ locals {
           device = "/dev/disk/by-id/nvme-Samsung_SSD_970_EVO_Plus_2TB_S59CNM0W609225K"
           partitions = [
             {
-              mount_path = local.mounts.containers_path
+              mount_path = local.mounts.home_path
               format     = "xfs"
               wipe       = false
               options    = ["-s", "size=4096"]
@@ -310,7 +310,7 @@ locals {
           ]
         }
       }
-      persistent_path = local.mounts.home_path
+      persistent_path = local.mounts.containers_path
     }
   }
 
