@@ -467,7 +467,7 @@ resource "helm_release" "code" {
       persistence = {
         accessMode   = "ReadWriteOnce"
         storageClass = "local-path"
-        size         = "64Gi"
+        size         = "128Gi"
       }
       ports = {
         code = local.ports.code
@@ -494,6 +494,7 @@ resource "helm_release" "code" {
       resources = {
         limits = {
           "github.com/fuse" = 1
+          "nvidia.com/gpu"  = 1
         }
       }
       tolerations = [
