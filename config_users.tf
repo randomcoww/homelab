@@ -20,7 +20,8 @@ locals {
         "wheel",
         "video",
         "input",
-      ]
+      ],
+      home_dir = "${local.mounts.containers_path}/home/randomcoww"
     }
   }
 

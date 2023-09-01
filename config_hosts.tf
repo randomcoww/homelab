@@ -252,10 +252,10 @@ locals {
       }
       disks = {
         pv = {
-          device = "/dev/disk/by-id/nvme-Samsung_SSD_970_EVO_Plus_1TB_S6S1NS0W106465F"
+          device = "/dev/disk/by-id/nvme-Samsung_SSD_970_EVO_Plus_2TB_S59CNM0W609225K"
           partitions = [
             {
-              mount_path = local.mounts.home_path
+              mount_path = local.mounts.containers_path
               format     = "xfs"
               wipe       = false
               options    = ["-s", "size=4096"]
@@ -263,7 +263,7 @@ locals {
           ]
         }
       }
-      persistent_path = local.mounts.home_path
+      persistent_path = local.mounts.containers_path
       kubernetes_worker_labels = {
         hostapd = true
         nvidia  = true
