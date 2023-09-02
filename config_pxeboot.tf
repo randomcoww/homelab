@@ -88,6 +88,7 @@ resource "matchbox_profile" "pxeboot" {
     "initrd=${each.value.initrd_image_name}",
     "ignition.config.url=${local.matchbox_endpoint}/ignition?mac=$${mac:hexhyp}",
     "coreos.live.rootfs_url=${local.image_store_endpoint}/${each.value.rootfs_image_name}",
+    "numa=off",
   ], each.value.boot_args)
   # Write local files so that this step can work without access to ignition tfstate on S3
   raw_ignition = file("output/ignition/${each.value.ignition}.ign")
