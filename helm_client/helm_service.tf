@@ -109,12 +109,7 @@ resource "helm_release" "mpd" {
         ingressClassName = local.ingress_classes.ingress_nginx
         annotations      = local.nginx_ingress_annotations
         tls = [
-          {
-            secretName = "mpd-tls"
-            hosts = [
-              local.kubernetes_ingress_endpoints.mpd,
-            ]
-          },
+          local.tls_wildcard,
         ]
         hosts = [
           local.kubernetes_ingress_endpoints.mpd,
@@ -126,12 +121,7 @@ resource "helm_release" "mpd" {
         path             = "/"
         annotations      = local.nginx_ingress_annotations
         tls = [
-          {
-            secretName = "mpd-tls"
-            hosts = [
-              local.kubernetes_ingress_endpoints.mpd,
-            ]
-          },
+          local.tls_wildcard,
         ]
         hosts = [
           local.kubernetes_ingress_endpoints.mpd,
