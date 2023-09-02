@@ -27,9 +27,6 @@ locals {
   users = merge(local.base_users, {
     for type, user in local.base_users :
     type => merge(
-      {
-        home_dir = "${local.mounts.home_path}/${user.name}"
-      },
       user,
       lookup(var.users, type, {}),
     )

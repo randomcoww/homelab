@@ -24,10 +24,19 @@ locals {
     })
   }
 
+  bind_mounts = [
+    for mount in var.bind_mounts :
+    merge(mount, {
+      systemd_unit_name = join("-", compact(split("/", replace(mount.path, "-", "\\x2d"))))
+      systemd_require   = join("-", compact(split("/", replace(mount.systemd_require, "-", "\\x2d"))))
+    })
+  ]
+
   module_ignition_snippets = [
     for f in fileset(".", "${path.module}/ignition/*.yaml") :
     templatefile(f, {
-      disks = local.disks
+      disks       = local.disks
+      bind_mounts = local.bind_mounts
     })
   ]
 }

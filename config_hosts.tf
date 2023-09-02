@@ -51,7 +51,6 @@ locals {
           ]
         }
       }
-      persistent_path = local.mounts.containers_path
       kubernetes_worker_labels = {
         minio = true
       }
@@ -108,7 +107,6 @@ locals {
           ]
         }
       }
-      persistent_path = local.mounts.containers_path
       kubernetes_worker_labels = {
         minio = true
       }
@@ -165,7 +163,6 @@ locals {
           ]
         }
       }
-      persistent_path = local.mounts.containers_path
       kubernetes_worker_labels = {
         minio = true
       }
@@ -201,7 +198,6 @@ locals {
           ]
         }
       }
-      persistent_path = local.mounts.containers_path
     }
 
     de-1 = {
@@ -263,7 +259,13 @@ locals {
           ]
         }
       }
-      persistent_path = local.mounts.containers_path
+      bind_mounts = [
+        {
+          path            = local.mounts.containers_path
+          target          = "${local.mounts.home_path}/containers"
+          systemd_require = local.mounts.home_path
+        },
+      ]
       kubernetes_worker_labels = {
         hostapd = true
         nvidia  = true
@@ -283,6 +285,7 @@ locals {
     v-0 = {
       netnum = 10
       users = [
+        "admin",
         "client",
       ]
       virtual_interfaces = {
@@ -310,7 +313,13 @@ locals {
           ]
         }
       }
-      persistent_path = local.mounts.containers_path
+      bind_mounts = [
+        {
+          path            = local.mounts.containers_path
+          target          = "${local.mounts.home_path}/containers"
+          systemd_require = local.mounts.home_path
+        },
+      ]
     }
   }
 

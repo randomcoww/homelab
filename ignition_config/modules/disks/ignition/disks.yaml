@@ -21,6 +21,23 @@ systemd:
         WantedBy=local-fs.target
     %{~ endfor ~}
     %{~ endfor ~}
+    %{~ for mount in bind_mounts ~}
+    - name: ${mount.systemd_unit_name}.mount
+      enabled: true
+      contents: |
+        [Unit]
+        Requires=${mount.systemd_require}.mount
+        After=${mount.systemd_require}.mount
+
+        [Mount]
+        What=${mount.path}
+        Where=${mount.target}
+        Type=none
+        Options=bind
+
+        [Install]
+        WantedBy=local-fs.target
+    %{~ endfor ~}
 
 storage:
   disks:
