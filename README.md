@@ -67,8 +67,13 @@ EOF
 ```bash
 tw terraform -chdir=client init
 tw terraform -chdir=client apply -auto-approve -var-file=secrets.tfvars
+```
 
+```bash
 tw terraform -chdir=client output -raw kubeconfig > $HOME/.kube/config
+```
+
+```bash
 SSH_KEY=$HOME/.ssh/id_ecdsa
 tw terraform -chdir=client output -raw ssh_user_cert_authorized_key > $SSH_KEY-cert.pub
 ```
