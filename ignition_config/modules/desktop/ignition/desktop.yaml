@@ -3,8 +3,6 @@ variant: fcos
 version: 1.5.0
 systemd:
   units:
-    - name: sshd.service
-      enabled: false
     # https://github.com/coreos/fedora-coreos-tracker/issues/1296
     - name: systemd-userdbd.service
       dropins:
@@ -68,7 +66,7 @@ storage:
 
     # gnome desktop config #
     # remote desktop https://www.reddit.com/r/gnome/comments/uz5as7/gnome_has_made_it_super_simple_to_extend_your/
-    - path: /etc/dconf/db/local.d/00-custom
+    - path: /etc/dconf/db/local.d/10-custom.conf
       mode: 0644
       contents:
         inline: |
@@ -203,21 +201,9 @@ storage:
           Type=oneshot
           RemainAfterExit=true
           Slice=session.slice
-          ExecStart=/bin/sh -c "dconf load / < /etc/dconf/db/local.d/00-custom"
-    - path: /etc/systemd/user/copy-skel.service
-      mode: 0644
-      contents:
-        inline: |
-          [Service]
-          Type=oneshot
-          RemainAfterExit=true
-          Slice=session.slice
-          ExecStart=/usr/bin/cp -r /etc/skel/. %h
+          ExecStart=/bin/sh -c "cat /etc/dconf/db/local.d/*.conf | dconf load /"
 
   links:
     # reload dconf
     - path: /etc/systemd/user/graphical-session.target.wants/dconf-load.service
       target: /etc/systemd/user/dconf-load.service
-    # override user defaults
-    # - path: /etc/systemd/user/basic.target.wants/copy-skel.service
-    #   target: /etc/systemd/user/copy-skel.service
