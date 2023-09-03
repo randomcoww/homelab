@@ -187,18 +187,11 @@ storage:
       contents:
         inline: "@cert-authority * ${ssh_ca_authorized_key}"
     # monitor layout #
-    - path: /etc/skel/.config/monitors.xml
+    - path: /var/lib/gdm/.config/monitors.xml
       mode: 0644
       contents:
         inline: |
           ${indent(10, monitors_config)}
-    # vscode #
-    - path: /etc/skel/.config/code-flags.conf
-      mode: 0644
-      contents:
-        inline: |
-          --enable-features=UseOzonePlatform,WaylandWindow
-          --ozone-platform-hint=auto
 
     # systemd user unit
     # ignition doesn't support systemd --user
@@ -228,6 +221,3 @@ storage:
     # override user defaults
     # - path: /etc/systemd/user/basic.target.wants/copy-skel.service
     #   target: /etc/systemd/user/copy-skel.service
-    # copy monitor layout to gdm login
-    - path: /var/lib/gdm/.config/monitors.xml
-      target: /etc/skel/.config/monitors.xml

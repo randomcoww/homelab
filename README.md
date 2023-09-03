@@ -262,7 +262,7 @@ tw find . -name '*.tf' -exec terraform fmt '{}' \;
 ```bash
 flatpak --user remote-add --if-not-exists flathub https://flathub.org/repo/flathub.flatpakrepo
 
-flatpak --user -y install flathub \
+flatpak --user -y install --or-update flathub \
   com.brave.Browser \
   com.visualstudio.code \
   org.inkscape.Inkscape \
@@ -276,6 +276,11 @@ flatpak --user -y install flathub \
   net.lutris.Lutris \
   net.davidotek.pupgui2
 ```
+Manual settings for now
+
+- Add `--socket=wayland` to vscode flatpak arg
+- Add `--ozone-platform-hint=wayland` to vscode arg
+- Add `--ozone-platform-hint=wayland --enable-features=WebRTCPipeWireCapturer` to brave arg
 
 Install Minio client
 
@@ -290,6 +295,8 @@ Save monitor config
 ```bash
 cp ~/.config/monitors.xml ignition_config/modules/desktop/resources/
 ```
+
+
 
 #### Mac desktop
 
