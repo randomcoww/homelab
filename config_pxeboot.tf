@@ -36,14 +36,6 @@ locals {
           "enforcing=0",
         ]
       })
-      # "58-47-ca-71-4d-ce" = merge(local.image_set.silverblue, {
-      #   ignition = "de-0"
-      #   boot_args = [
-      #     "enforcing=0",
-      #     "rd.driver.blacklist=nouveau",
-      #     "modprobe.blacklist=nouveau",
-      #   ]
-      # })
       "74-56-3c-c3-10-68" = merge(local.image_set.silverblue, {
         ignition = "de-1"
         boot_args = [

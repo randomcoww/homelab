@@ -168,45 +168,6 @@ locals {
       }
     }
 
-    de-0 = {
-      netnum = 8
-      users = [
-        "client",
-      ]
-      hardware_interfaces = {
-        phy0 = {
-          mac = "58-47-ca-71-4d-ce"
-          mtu = 9000
-        }
-      }
-      tap_interfaces = {
-        lan = {
-          source_interface_name = "phy0"
-          enable_dhcp           = true
-        }
-      }
-      disks = {
-        pv = {
-          device = "/dev/disk/by-id/nvme-Samsung_SSD_970_EVO_Plus_1TB_S6S1NS0W106465F"
-          partitions = [
-            {
-              mount_path = local.mounts.home_path
-              format     = "xfs"
-              wipe       = false
-              options    = ["-s", "size=4096"]
-            },
-          ]
-        }
-      }
-      bind_mounts = [
-        {
-          path            = local.mounts.containers_path
-          target          = "${local.mounts.home_path}/containers"
-          systemd_require = local.mounts.home_path
-        },
-      ]
-    }
-
     de-1 = {
       netnum = 9
       users = [
@@ -331,18 +292,18 @@ locals {
   }
 
   base_members = {
-    base              = ["gw-0", "gw-1", "q-0", "de-0", "de-1", "v-0"]
-    systemd-networkd  = ["gw-0", "gw-1", "q-0", "de-0", "de-1", "v-0"]
+    base              = ["gw-0", "gw-1", "q-0", "de-1", "v-0"]
+    systemd-networkd  = ["gw-0", "gw-1", "q-0", "de-1", "v-0"]
     network-manager   = []
     kubelet-base      = ["gw-0", "gw-1", "q-0", "de-1"]
     gateway           = ["gw-0", "gw-1", "q-0"]
     vrrp              = ["gw-0", "gw-1"]
-    disks             = ["gw-0", "gw-1", "q-0", "de-0", "de-1", "v-0"]
-    ssh-server        = ["gw-0", "gw-1", "q-0", "de-0", "de-1", "v-0"]
+    disks             = ["gw-0", "gw-1", "q-0", "de-1", "v-0"]
+    ssh-server        = ["gw-0", "gw-1", "q-0", "de-1", "v-0"]
     etcd              = ["gw-0", "gw-1", "q-0"]
     kubernetes-master = ["gw-0", "gw-1"]
     kubernetes-worker = ["gw-0", "gw-1", "q-0", "de-1"]
-    desktop           = ["de-0", "de-1", "v-0"]
+    desktop           = ["de-1", "v-0"]
   }
 
   hosts = {
