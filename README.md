@@ -66,7 +66,7 @@ EOF
 
 ```bash
 tw terraform -chdir=client init
-tw terraform -chdir=client apply -var-file=secrets.tfvars
+tw terraform -chdir=client apply -auto-approve -var-file=secrets.tfvars
 
 tw terraform -chdir=client output -raw kubeconfig > $HOME/.kube/config
 SSH_KEY=$HOME/.ssh/id_ecdsa
