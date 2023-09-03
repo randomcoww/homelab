@@ -198,6 +198,13 @@ locals {
           ]
         }
       }
+      bind_mounts = [
+        {
+          path            = local.mounts.containers_path
+          target          = "${local.mounts.home_path}/containers"
+          systemd_require = local.mounts.home_path
+        },
+      ]
     }
 
     de-1 = {

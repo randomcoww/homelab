@@ -30,8 +30,8 @@ systemd:
         After=${mount.systemd_require}.mount
 
         [Mount]
-        What=${mount.path}
-        Where=${mount.target}
+        What=${mount.target}
+        Where=${mount.path}
         Type=none
         Options=bind
 
