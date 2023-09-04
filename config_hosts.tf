@@ -171,7 +171,6 @@ locals {
     de-1 = {
       netnum = 9
       users = [
-        "admin",
         "client",
       ]
       hardware_interfaces = {
@@ -253,7 +252,6 @@ locals {
     v-0 = {
       netnum = 10
       users = [
-        "admin",
         "client",
       ]
       virtual_interfaces = {
