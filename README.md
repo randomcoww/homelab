@@ -278,6 +278,7 @@ flatpak --user -y install --or-update flathub \
 ```
 Manual settings for now
 
+- Add `--socket=wayland` to godot flatpak arg
 - Add `--socket=wayland` to vscode flatpak arg
 - Add `--ozone-platform-hint=wayland` to vscode arg
 - Add `--ozone-platform-hint=wayland --enable-features=WebRTCPipeWireCapturer` to brave arg
@@ -289,14 +290,6 @@ mkdir -p $HOME/bin
 wget -O $HOME/bin/mc https://dl.min.io/client/mc/release/linux-amd64/mc
 chmod +x $HOME/bin/mc
 ```
-
-Save monitor config
-
-```bash
-cp ~/.config/monitors.xml ignition_config/modules/desktop/resources/
-```
-
-
 
 #### Mac desktop
 

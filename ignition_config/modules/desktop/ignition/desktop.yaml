@@ -168,12 +168,6 @@ storage:
       mode: 0644
       contents:
         inline: "@cert-authority * ${ssh_ca_authorized_key}"
-    # monitor layout #
-    - path: /var/lib/gdm/.config/monitors.xml
-      mode: 0644
-      contents:
-        inline: |
-          ${indent(10, monitors_config)}
 
     # systemd user unit
     # ignition doesn't support systemd --user

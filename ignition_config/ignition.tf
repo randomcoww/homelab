@@ -117,7 +117,6 @@ module "ignition-desktop" {
   source   = "./modules/desktop"
 
   ssh_ca_public_key_openssh = module.ssh-ca.ca.public_key_openssh
-  wlan_interface            = "wlan0"
 }
 
 # etcd #
