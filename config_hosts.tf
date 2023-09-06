@@ -205,15 +205,9 @@ locals {
       # ignition doesn't support provisioning lvm device so so systemd mount only
       mounts = [
         {
-          device     = "/dev/disk/by-label/pv"
+          device     = "/dev/disk/by-label/home"
           mount_path = local.mounts.home_path
           format     = "xfs"
-          bind_mounts = [
-            {
-              relative_path = "containers"
-              mount_path    = local.mounts.containers_path
-            },
-          ]
         },
       ]
     }

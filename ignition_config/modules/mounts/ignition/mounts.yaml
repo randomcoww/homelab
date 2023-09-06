@@ -26,23 +26,4 @@ systemd:
 
         [Install]
         WantedBy=local-fs.target
-
-    %{~ for bind_mount in mount.bind_mounts ~}
-    - name: ${bind_mount.mount_unit_name}.mount
-      enabled: true
-      contents: |
-        [Unit]
-        ConditionPathExists=${mount.device}
-        Requires=${mount.mount_unit_name}.mount
-        After=${mount.mount_unit_name}.mount
-
-        [Mount]
-        What=${mount.mount_path}/${bind_mount.relative_path}
-        Where=${bind_mount.mount_path}
-        Type=none
-        Options=bind
-
-        [Install]
-        WantedBy=local-fs.target
-    %{~ endfor ~}
     %{~ endfor ~}

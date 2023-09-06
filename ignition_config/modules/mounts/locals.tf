@@ -7,12 +7,6 @@ locals {
       mount_options    = lookup(mount, "mount_options", ["noatime", "nodiratime", "discard"])
       format           = lookup(mount, "format", "xfs")
       mount_timeout    = lookup(mount, "mount_timeout", 10)
-      bind_mounts = [
-        for j, bind_mount in lookup(mount, "bind_mounts", []) :
-        merge(bind_mount, {
-          mount_unit_name = join("-", compact(split("/", replace(bind_mount.mount_path, "-", "\\x2d"))))
-        })
-      ]
     })
   ]
 

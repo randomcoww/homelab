@@ -325,10 +325,10 @@ Install RW_LEGACY firmware from https://mrchromebox.tech/#fwscript
 Boot to Linux and create a home directory
 
 ```bash
-sudo lvcreate -V 100G -T $VG_NAME/thinpool -n linux-home
-sudo mkfs.xfs -s size=4096 -L pv /dev/$VG_NAME/linux-home
+sudo lvcreate -V 100G -T $VG_NAME/thinpool -n home
+sudo mkfs.xfs -s size=4096 -L home /dev/$VG_NAME/home
 
-sudo mount /dev/disk/by-label/pv /mnt
+sudo mount /dev/disk/by-label/home /mnt
 sudo mkdir -p /mnt/$(whoami)
 sudo chown $(id -u):$(id -g) /mnt/$(whoami)
 cp -r /etc/skel/. /mnt/$(whoami)
