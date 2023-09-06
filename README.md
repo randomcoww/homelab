@@ -331,8 +331,8 @@ sudo mkfs.xfs -s size=4096 -L pv /dev/$VG_NAME/linux-home
 sudo mount /dev/disk/by-label/pv /mnt
 sudo mkdir -p /mnt/$(whoami)
 sudo chown $(id -u):$(id -g) /mnt/$(whoami)
-sudo umount /mnt
 cp -r /etc/skel/. /mnt/$(whoami)
+sudo umount /mnt
 ```
 
 ## :construction: Desktop VM with GPU passthrough :construction:
