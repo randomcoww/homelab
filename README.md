@@ -322,6 +322,19 @@ sudo crossystem dev_boot_altfw=1
 
 Install RW_LEGACY firmware from https://mrchromebox.tech/#fwscript
 
+Boot to Linux and create a home directory
+
+```bash
+sudo lvcreate -V 100G -T $VG_NAME/thinpool -n linux-home
+sudo mkfs.xfs -s size=4096 -L pv /dev/$VG_NAME/linux-home
+
+sudo mount /dev/disk/by-label/pv /mnt
+sudo mkdir -p /mnt/$(whoami)
+sudo chown $(id -u):$(id -g) /mnt/$(whoami)
+sudo umount /mnt
+cp -r /etc/skel/. /mnt/$(whoami)
+```
+
 ## :construction: Desktop VM with GPU passthrough :construction:
 
 > This is currently just a POC and serves nothing
