@@ -1,0 +1,39 @@
+---
+variant: fcos
+version: 1.5.0
+systemd:
+  units:
+    %{~ for mount in mounts ~}
+    - name: ${mount.systemd_unit_name}.mount
+      enabled: true
+      contents: |
+        [Unit]
+        ConditionPathExists=${mount.device}
+
+        [Mount]
+        What=${mount.device}
+        Where=${mount.mount_path}
+        Type=${mount.format}
+        Options=${join(",", mount.mount_options)}
+
+        [Install]
+        WantedBy=local-fs.target
+
+    %{~ for bind_mount in mount.bind_mounts ~}
+    - name: ${bind_mount.systemd_unit_name}.mount
+      enabled: true
+      contents: |
+        [Unit]
+        Requires=${mount.systemd_unit_name}.mount
+        After=${mount.systemd_unit_name}.mount
+
+        [Mount]
+        What=${mount.mount_path}/${bind_mount.relative_path}
+        Where=${bind_mount.mount_path}
+        Type=none
+        Options=bind
+
+        [Install]
+        WantedBy=local-fs.target
+    %{~ endfor ~}
+    %{~ endfor ~}

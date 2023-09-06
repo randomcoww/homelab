@@ -15,11 +15,3 @@ variable "disks" {
   type    = any
   default = {}
 }
-
-variable "bind_mounts" {
-  type = list(object({
-    path            = string
-    target          = string
-    systemd_require = string
-  }))
-}

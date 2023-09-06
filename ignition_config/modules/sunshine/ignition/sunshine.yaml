@@ -7,6 +7,9 @@ systemd:
     - name: copy-sunshine.service
       enabled: true
       contents: |
+        [Unit]
+        ConditionPathExists=/usr/bin/sunshine
+
         [Service]
         Type=oneshot
         RemainAfterExit=true
@@ -46,7 +49,7 @@ storage:
           [Unit]
           Wants=gnome-session.target
           After=gnome-session.target
-          Wants=copy-sunshine.service
+          Requires=copy-sunshine.service
           After=copy-sunshine.service
           ConditionKernelCommandLine=coreos.live.rootfs_url
 

@@ -15,6 +15,12 @@ locals {
           mount_timeout     = lookup(partition, "mount_timeout", 10)
           start_mib         = lookup(partition, "start_mib", 0)
           size_mib          = lookup(partition, "size_mib", 0)
+          bind_mounts = [
+            for j, bind_mount in lookup(partition, "bind_mounts", []) :
+            merge(bind_mount, {
+              systemd_unit_name = join("-", compact(split("/", replace(bind_mount.mount_path, "-", "\\x2d"))))
+            })
+          ]
         })
       ]
       wipe = lookup(disk, "wipe", alltrue([
@@ -24,19 +30,10 @@ locals {
     })
   }
 
-  bind_mounts = [
-    for mount in var.bind_mounts :
-    merge(mount, {
-      systemd_unit_name = join("-", compact(split("/", replace(mount.path, "-", "\\x2d"))))
-      systemd_require   = join("-", compact(split("/", replace(mount.systemd_require, "-", "\\x2d"))))
-    })
-  ]
-
   module_ignition_snippets = [
     for f in fileset(".", "${path.module}/ignition/*.yaml") :
     templatefile(f, {
-      disks       = local.disks
-      bind_mounts = local.bind_mounts
+      disks = local.disks
     })
   ]
 }

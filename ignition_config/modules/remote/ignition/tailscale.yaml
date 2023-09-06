@@ -1,0 +1,17 @@
+---
+variant: fcos
+version: 1.5.0
+systemd:
+  units:
+    - name: tailscaled.service
+      enabled: true
+      dropins:
+        - name: 10-state-path.conf
+          contents: |
+            [Service]
+            ExecStartPre=/usr/bin/mkdir -p ${persistent_path}/tailscale/
+            ExecStart=
+            ExecStart=/usr/sbin/tailscaled \
+              --state=${persistent_path}/tailscale/tailscaled.state \
+              --socket=/run/tailscale/tailscaled.sock \
+              --port=$${PORT} $FLAGS

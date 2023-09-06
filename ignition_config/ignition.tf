@@ -80,8 +80,14 @@ module "ignition-disks" {
   for_each = local.members.disks
   source   = "./modules/disks"
 
-  disks       = lookup(each.value, "disks", {})
-  bind_mounts = lookup(each.value, "bind_mounts", [])
+  disks = lookup(each.value, "disks", {})
+}
+
+module "ignition-mounts" {
+  for_each = local.members.mounts
+  source   = "./modules/mounts"
+
+  mounts = lookup(each.value, "mounts", {})
 }
 
 # SSH CA #
@@ -108,15 +114,6 @@ module "ignition-ssh-server" {
     if lookup(interface, "enable_netnum", false)
   ])
   ca = module.ssh-ca.ca
-}
-
-# client desktop environment #
-
-module "ignition-desktop" {
-  for_each = local.members.desktop
-  source   = "./modules/desktop"
-
-  ssh_ca_public_key_openssh = module.ssh-ca.ca.public_key_openssh
 }
 
 # etcd #
@@ -223,6 +220,30 @@ module "ignition-kubernetes-worker" {
   kubelet_port              = local.ports.kubelet
 }
 
+# client desktop environment #
+
+module "ignition-desktop" {
+  for_each = local.members.desktop
+  source   = "./modules/desktop"
+
+  ssh_ca_public_key_openssh = module.ssh-ca.ca.public_key_openssh
+}
+
+module "ignition-sunshine" {
+  for_each = local.members.sunshine
+  source   = "./modules/sunshine"
+}
+
+# remote client #
+
+module "ignition-remote" {
+  for_each = local.members.remote
+  source   = "./modules/remote"
+
+  wlan_interface  = "wlan0"
+  persistent_path = "${local.mounts.home_path}/tailscale"
+}
+
 # Render all
 
 data "ct_config" "ignition" {
@@ -235,12 +256,15 @@ data "ct_config" "ignition" {
       try(module.ignition-gateway[host_key].ignition_snippets, []),
       try(module.ignition-vrrp[host_key].ignition_snippets, []),
       try(module.ignition-disks[host_key].ignition_snippets, []),
+      try(module.ignition-mounts[host_key].ignition_snippets, []),
       try(module.ignition-kubelet-base[host_key].ignition_snippets, []),
       try(module.ignition-etcd[host_key].ignition_snippets, []),
       try(module.ignition-kubernetes-master[host_key].ignition_snippets, []),
       try(module.ignition-kubernetes-worker[host_key].ignition_snippets, []),
       try(module.ignition-ssh-server[host_key].ignition_snippets, []),
       try(module.ignition-desktop[host_key].ignition_snippets, []),
+      try(module.ignition-sunshine[host_key].ignition_snippets, []),
+      try(module.ignition-remote[host_key].ignition_snippets, []),
     ])
   }
   content  = <<EOT
