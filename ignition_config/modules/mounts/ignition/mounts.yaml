@@ -4,7 +4,15 @@ version: 1.5.0
 systemd:
   units:
     %{~ for mount in mounts ~}
-    - name: ${mount.systemd_unit_name}.mount
+    - name: ${mount.device_unit_name}.device
+      enabled: true
+      dropins:
+        - name: 10-dependencies.conf
+          contents: |
+            [Unit]
+            ConditionPathExists=${mount.device}
+
+    - name: ${mount.mount_unit_name}.mount
       enabled: true
       contents: |
         [Unit]
@@ -20,12 +28,13 @@ systemd:
         WantedBy=local-fs.target
 
     %{~ for bind_mount in mount.bind_mounts ~}
-    - name: ${bind_mount.systemd_unit_name}.mount
+    - name: ${bind_mount.mount_unit_name}.mount
       enabled: true
       contents: |
         [Unit]
-        Requires=${mount.systemd_unit_name}.mount
-        After=${mount.systemd_unit_name}.mount
+        ConditionPathExists=${mount.device}
+        Requires=${mount.mount_unit_name}.mount
+        After=${mount.mount_unit_name}.mount
 
         [Mount]
         What=${mount.mount_path}/${bind_mount.relative_path}

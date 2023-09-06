@@ -353,6 +353,7 @@ locals {
     desktop           = ["de-0", "de-1", "v-0"]
     sunshine          = ["de-1", "v-0"]
     remote            = ["de-0"]
+    chromebook-hacks  = ["de-0"]
   }
 
   hosts = {

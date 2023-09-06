@@ -5,7 +5,7 @@ systemd:
   units:
     %{~ for name, disk in disks ~}
     %{~ for partition in disk.partitions ~}
-    - name: ${partition.systemd_unit_name}.mount
+    - name: ${partition.mount_unit_name}.mount
       enabled: true
       contents: |
         [Unit]
@@ -21,12 +21,12 @@ systemd:
         WantedBy=local-fs.target
 
     %{~ for bind_mount in partition.bind_mounts ~}
-    - name: ${bind_mount.systemd_unit_name}.mount
+    - name: ${bind_mount.mount_unit_name}.mount
       enabled: true
       contents: |
         [Unit]
-        Requires=${partition.systemd_unit_name}.mount
-        After=${partition.systemd_unit_name}.mount
+        Requires=${partition.mount_unit_name}.mount
+        After=${partition.mount_unit_name}.mount
 
         [Mount]
         What=${partition.mount_path}/${bind_mount.relative_path}

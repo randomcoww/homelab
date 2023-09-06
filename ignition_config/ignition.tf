@@ -87,7 +87,7 @@ module "ignition-mounts" {
   for_each = local.members.mounts
   source   = "./modules/mounts"
 
-  mounts = lookup(each.value, "mounts", {})
+  mounts = lookup(each.value, "mounts", [])
 }
 
 # SSH CA #
@@ -244,6 +244,13 @@ module "ignition-remote" {
   persistent_path = "${local.mounts.home_path}/tailscale"
 }
 
+# chromebook hacks #
+
+module "ignition-chromebook-hacks" {
+  for_each = local.members.chromebook-hacks
+  source   = "./modules/chromebook_hacks"
+}
+
 # Render all
 
 data "ct_config" "ignition" {
@@ -265,6 +272,7 @@ data "ct_config" "ignition" {
       try(module.ignition-desktop[host_key].ignition_snippets, []),
       try(module.ignition-sunshine[host_key].ignition_snippets, []),
       try(module.ignition-remote[host_key].ignition_snippets, []),
+      try(module.ignition-chromebook-hacks[host_key].ignition_snippets, []),
     ])
   }
   content  = <<EOT
