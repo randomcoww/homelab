@@ -22,6 +22,12 @@ systemd:
 
 storage:
   files:
+    - path: /etc/udev/rules.d/85-uinput.rules
+      mode: 0644
+      contents:
+        inline: |
+          KERNEL=="uinput", SUBSYSTEM=="misc", OPTIONS+="static_node=uinput", TAG+="uaccess"
+
     - path: /etc/skel/.config/sunshine/apps.json
       mode: 0644
       contents:
