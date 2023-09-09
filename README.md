@@ -276,11 +276,11 @@ flatpak --user -y install --or-update flathub \
   net.lutris.Lutris \
   net.davidotek.pupgui2
 ```
-Manual settings for now
+Manual settings for `$HOME/.local/share/flatpak/exports/share/applications/*.desktop`
 
-- Add `--socket=wayland` to godot flatpak arg
 - Add `--socket=wayland` to vscode flatpak arg
-- Add `--ozone-platform-hint=wayland` to vscode arg
+- Add `--socket=wayland` to godot flatpak arg
+- Add `--ozone-platform-hint=wayland --enable-features=WaylandWindowDecorations` to vscode arg
 - Add `--ozone-platform-hint=wayland --enable-features=WebRTCPipeWireCapturer` to brave arg
 
 Install Minio client
