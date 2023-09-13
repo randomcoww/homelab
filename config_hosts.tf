@@ -221,7 +221,7 @@ locals {
         phy0 = {
           mac   = "74-56-3c-c3-10-68"
           mtu   = 9000
-          vlans = ["service", "kubernetes"]
+          vlans = ["service", "kubernetes", "remote"]
         }
         # mobile
         phy1 = {
@@ -230,8 +230,7 @@ locals {
       }
       wlan_interfaces = {
         wlan0 = {
-          mac    = "10-6f-d9-cf-d5-71"
-          metric = 2048
+          mac = "10-6f-d9-cf-d5-71"
         }
       }
       bridge_interfaces = {
@@ -254,6 +253,10 @@ locals {
         }
         fallback = {
           source_interface_name = "phy1"
+          enable_dhcp           = true
+        }
+        remote = {
+          source_interface_name = "phy0-remote"
           enable_dhcp           = true
         }
       }

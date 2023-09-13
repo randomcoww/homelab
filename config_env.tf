@@ -74,6 +74,12 @@ locals {
       network = "10.244.0.0"
       cidr    = 16
     }
+    # send client DHCP for remote stream
+    remote = {
+      vlan_id = 120
+      mtu     = 1500
+      metric  = 2048
+    }
   }
 
   networks = merge(local.base_networks, {
@@ -102,7 +108,7 @@ locals {
     kube_apiserver          = "ghcr.io/randomcoww/kubernetes:kube-master-v1.27.1"
     kube_controller_manager = "ghcr.io/randomcoww/kubernetes:kube-master-v1.27.1"
     kube_scheduler          = "ghcr.io/randomcoww/kubernetes:kube-master-v1.27.1"
-    etcd_wrapper            = "ghcr.io/randomcoww/etcd-wrapper:latest"
+    etcd_wrapper            = "ghcr.io/randomcoww/etcd-wrapper:20230908"
     etcd                    = "gcr.io/etcd-development/etcd:v3.5.8-amd64"
 
     # Helm
