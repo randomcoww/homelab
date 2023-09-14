@@ -26,7 +26,7 @@ storage:
           RequiredForOnline=false
           MTUBytes=${lookup(virtual_interface, "mtu", 1500)}
 
-          [DHCP]
+          [DHCPv4]
           RouteMetric=${lookup(virtual_interface, "metric", 1024)}
 
           [Network]

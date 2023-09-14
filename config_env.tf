@@ -53,11 +53,12 @@ locals {
       mtu = 9000
     }
     wan = {
-      vlan_id = 30
-      mac     = "52-54-00-63-6e-b3"
-    }
-    fallback = {
-      metric = 512
+      vlan_id              = 30
+      mac                  = "52-54-00-63-6e-b3"
+      enable_use_dns       = false
+      enable_use_ntp       = false
+      enable_send_hostname = false
+      enable_use_hostname  = false
     }
     kubernetes_service = {
       network = "10.96.0.0"
@@ -74,11 +75,21 @@ locals {
       network = "10.244.0.0"
       cidr    = 16
     }
-    # send client DHCP for remote stream
+    # mobile device fallback
+    fallback = {
+      metric               = 512
+      enable_use_ntp       = false
+      enable_send_hostname = false
+      enable_use_hostname  = false
+    }
+    # get dhcp from another network lan
     remote = {
-      vlan_id = 120
-      mtu     = 1500
-      metric  = 2048
+      vlan_id             = 120
+      mtu                 = 1500
+      enable_use_routes   = false
+      enable_use_dns      = false
+      enable_use_ntp      = false
+      enable_use_hostname = false
     }
   }
 

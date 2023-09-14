@@ -31,16 +31,8 @@ storage:
       mode: 0644
       contents:
         inline: |
-          [DHCP]
-          Anonymize=true
+          [DHCPv4]
           RequestBroadcast=true
-          UseMTU=true
-          UseDNS=false
-          UseNTP=false
-          SendHostname=false
-          UseHostname=false
-          UseDomains=false
-          UseTimezone=false
           ClientIdentifier=mac
           RouteTable=${vrrp_master_default_route.table_id}
     # Set global DNS - DNS via DHCP only resolves through the wan link when using systemd-resolve
