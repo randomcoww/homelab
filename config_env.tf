@@ -240,7 +240,7 @@ locals {
   }
 
   upstream_dns = {
-    ip             = "9.9.9.9"
-    tls_servername = "dns.quad9.net"
+    ip             = "1.1.1.1"
+    tls_servername = "one.one.one.one"
   }
 }
