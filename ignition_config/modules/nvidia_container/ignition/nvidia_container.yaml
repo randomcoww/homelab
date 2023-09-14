@@ -1,0 +1,75 @@
+---
+variant: fcos
+version: 1.5.0
+storage:
+  files:
+    ## crio support ##
+
+    # need overwrite full default config
+    - path: /etc/nvidia-container-runtime/config.toml
+      overwrite: true
+      mode: 0644
+      contents:
+        inline: |
+          supported-driver-capabilities = "compute,display,graphics,ngx,utility,video"
+
+          [nvidia-container-runtime]
+          runtimes = ["crun"]
+    - path: /etc/crio/crio.conf.d/20-nvidia.conf
+      mode: 0644
+      overwrite: true
+      contents:
+        inline: |
+          [crio.runtime]
+          default_runtime="nvidia"
+
+          [crio.runtime.runtimes.nvidia]
+          runtime_path = "/usr/bin/nvidia-container-runtime"
+          runtime_type = "oci"
+
+    ## podman support ##
+
+    # must set "no-cgroups = true" in addition to default setting above
+    - path: /etc/nvidia-container-runtime/config-podman.toml
+      overwrite: true
+      mode: 0644
+      contents:
+        inline: |
+          supported-driver-capabilities = "compute,display,graphics,ngx,utility,video"
+
+          [nvidia-container-cli]
+          no-cgroups = true
+
+          [nvidia-container-runtime]
+          runtimes = ["crun"]
+    - path: /etc/containers/oci/hooks.d/oci-nvidia-hook.json
+      overwrite: true
+      mode: 0644
+      contents:
+        inline: |
+          ${jsonencode({
+            version = "1.0.0"
+            hook = {
+              path = "/usr/bin/nvidia-container-toolkit"
+              args = [
+                "nvidia-container-toolkit",
+                "-config",
+                "/etc/nvidia-container-runtime/config-podman.toml",
+                "prestart",
+              ]
+              env = [
+                "PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin",
+              ]
+            }
+            when = {
+              always = true
+              commands = [".*"]
+            }
+            stages = ["prestart"]
+          })}
+    - path: /etc/containers/containers.conf.d/10-hooks.conf
+      mode: 0644
+      contents:
+        inline: |
+          [engine]
+          hooks_dir=["/etc/containers/oci/hooks.d"]

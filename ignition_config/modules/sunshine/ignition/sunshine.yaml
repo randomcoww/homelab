@@ -66,6 +66,26 @@ storage:
             "${k}=${v}"
           ])}
           Restart=on-failure
+
+    # Prevent the user from logging out
+    # Prevent the user from user switching
+    - path: /etc/dconf/db/local.d/20-disable-logout.conf
+      mode: 0644
+      contents:
+        inline: |
+          [org/gnome/desktop/lockdown]
+          disable-log-out=true
+          disable-user-switching=true
+          user-administration-disabled=true
+
+    - path: /etc/dconf/db/local.d/locks/lockdown
+      mode: 0644
+      contents:
+        inline: |
+          /org/gnome/desktop/lockdown/disable-log-out
+          /org/gnome/desktop/lockdown/disable-user-switching
+          /org/gnome/desktop/lockdown/user-administration-disabled
+
   links:
     - path: /etc/systemd/user/graphical-session.target.wants/sunshine.service
       target: /etc/systemd/user/sunshine.service

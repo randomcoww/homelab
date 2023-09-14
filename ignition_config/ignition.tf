@@ -220,6 +220,11 @@ module "ignition-kubernetes-worker" {
   kubelet_port              = local.ports.kubelet
 }
 
+module "ignition-nvidia-container" {
+  for_each = local.members.nvidia-container
+  source   = "./modules/nvidia_container"
+}
+
 # client desktop environment #
 
 module "ignition-desktop" {
@@ -268,6 +273,7 @@ data "ct_config" "ignition" {
       try(module.ignition-etcd[host_key].ignition_snippets, []),
       try(module.ignition-kubernetes-master[host_key].ignition_snippets, []),
       try(module.ignition-kubernetes-worker[host_key].ignition_snippets, []),
+      try(module.ignition-nvidia-container[host_key].ignition_snippets, []),
       try(module.ignition-ssh-server[host_key].ignition_snippets, []),
       try(module.ignition-desktop[host_key].ignition_snippets, []),
       try(module.ignition-sunshine[host_key].ignition_snippets, []),
