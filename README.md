@@ -310,8 +310,44 @@ brew install --cask \
   tailscale \
   visual-studio-code
 ```
+### ChromeOS penguin setup
 
-#### ChromeOS desktop
+```bash
+vsh termina
+lxc config set penguin security.nesting true
+lxc restart penguin
+```
+
+```bash
+sudo apt install -y \
+  kubernetes-client \
+  podman \
+  flatpak
+
+flatpak --user remote-add --if-not-exists flathub https://flathub.org/repo/flathub.flatpakrepo
+
+flatpak --user -y install flathub \
+  com.visualstudio.code \
+  org.inkscape.Inkscape \
+  org.blender.Blender
+```
+
+Install helm https://helm.sh/docs/intro/install/
+
+Populate `/etc/subuid` and `/etc/subgid`
+
+```bash
+echo $(whoami):100000:65536 | sudo tee -a /etc/subuid /etc/subgid
+```
+
+Populate `/etc/containers/containers.conf`
+
+```bash
+[containers]
+keyring = false
+```
+
+#### Chromebook Linux dual-boot
 
 Enable developer mode and run as `chronos`
 
