@@ -55,8 +55,6 @@ storage:
           [Unit]
           Wants=gnome-session.target
           After=gnome-session.target
-          Requires=copy-sunshine.service
-          After=copy-sunshine.service
           ConditionKernelCommandLine=coreos.live.rootfs_url
 
           [Service]
