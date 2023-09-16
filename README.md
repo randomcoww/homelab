@@ -22,8 +22,6 @@ tw() {
 
 #### Create `ignition_config/secrets.tfvars` file
 
-Generate Linux password hash
-
 ```bash
 PASSWORD=
 LINUX_PASSWORD_HASH=$(echo $PASSWORD | openssl passwd -6 -stdin)
@@ -42,9 +40,7 @@ EOF
 
 #### Create `helm_client/secrets.tfvars` file
 
-Define secrets
-
-[Generate Authelia password hash](https://www.authelia.com/reference/guides/passwords/#user--password-file)
+Reference: [Generate Authelia password hash](https://www.authelia.com/reference/guides/passwords/#user--password-file)
 
 ```bash
 PASSWORD=
