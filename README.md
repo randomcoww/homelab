@@ -1,5 +1,3 @@
-## Provisioning
-
 ### Environment
 
 #### Define the `tw` (terraform wrapper) command
@@ -40,98 +38,6 @@ users = {
   }
 }
 EOF
-```
-
-### Create bootable OS images
-
-#### Generate CoreOS ignition for all nodes
-
-```bash
-tw terraform -chdir=ignition_config init
-tw terraform -chdir=ignition_config apply -var-file=secrets.tfvars
-```
-
-#### Generate client credentials
-
-```bash
-cat > client/secrets.tfvars <<EOF
-ssh_client = {
-  key_id                = "$(whoami)"
-  public_key            = "ssh_client_public_key=$(cat $HOME/.ssh/id_ecdsa.pub)"
-  early_renewal_hours   = 168
-  validity_period_hours = 336
-}
-EOF
-```
-
-```bash
-tw terraform -chdir=client init
-tw terraform -chdir=client apply -auto-approve -var-file=secrets.tfvars
-```
-
-```bash
-tw terraform -chdir=client output -raw kubeconfig > $HOME/.kube/config
-```
-
-```bash
-SSH_KEY=$HOME/.ssh/id_ecdsa
-tw terraform -chdir=client output -raw ssh_user_cert_authorized_key > $SSH_KEY-cert.pub
-```
-
-#### Create custom CoreOS images
-
-See [fedora-coreos-config-custom](https://github.com/randomcoww/fedora-coreos-config-custom/blob/master/builds/server/README.md)
-
-Embed the ignition files generated above into the image to allow them to boot configured
-
-### Launch temporary local bootstrap service to PXE boot servers
-
-`assets_path` should contains PXE image builds of `fedora-coreos-config-custom`
-
-```bash
-export host_ip=$(ip -br addr show lan | awk '{print $3}')
-export assets_path=${HOME}/store/boot
-
-echo host_ip=$host_ip
-echo assets_path=$assets_path
-```
-
-```bash
-tw terraform -chdir=bootstrap_server init
-tw terraform -chdir=bootstrap_server apply \
-  -var host_ip=$host_ip \
-  -var assets_path=$assets_path
-```
-
-Launch manifest with kubelet
-
-```bash
-tw terraform -chdir=bootstrap_server output -raw manifest > bootstrap.yaml
-sudo podman play kube bootstrap.yaml
-```
-
-Populate bootstrap service with PXE boot configuration
-
-```bash
-tw terraform -chdir=bootstrap_client apply -var host_ip=$host_ip
-```
-
-Stop service after PXE boot stack is launched on Kubernetes
-
-```bash
-sudo podman play kube bootstrap.yaml --down
-
-tw terraform -chdir=bootstrap_server destroy \
-  -var host_ip=$host_ip \
-  -var assets_path=$assets_path
-```
-
-### Deploy services to Kubernetes
-
-#### Check that `kubernetes` service is up
-
-```bash
-kubectl get svc
 ```
 
 #### Create `helm_client/secrets.tfvars` file
@@ -207,12 +113,112 @@ wireguard_client = {
 EOF
 ```
 
+#### Create `client/secrets.tfvars` file
+
+```bash
+cat > client/secrets.tfvars <<EOF
+ssh_client = {
+  key_id                = "$(whoami)"
+  public_key            = "ssh_client_public_key=$(cat $HOME/.ssh/id_ecdsa.pub)"
+  early_renewal_hours   = 168
+  validity_period_hours = 336
+}
+EOF
+```
+
+---
+
+### Create bootable OS images
+
+#### Generate CoreOS ignition for all nodes
+
+```bash
+tw terraform -chdir=ignition_config init
+tw terraform -chdir=ignition_config apply -var-file=secrets.tfvars
+```
+
+#### Create custom CoreOS images
+
+See [fedora-coreos-config-custom](https://github.com/randomcoww/fedora-coreos-config-custom/blob/master/builds/server/README.md)
+
+Embed the ignition files generated above into the image to allow them to boot configured
+
+---
+
+### Launch initial bootstrap on workstation to PXE boot servers
+
+`assets_path` should contains PXE image builds of `fedora-coreos-config-custom`
+
+```bash
+export host_ip=$(ip -br addr show lan | awk '{print $3}')
+export assets_path=${HOME}/store/boot
+
+echo host_ip=$host_ip
+echo assets_path=$assets_path
+```
+
+```bash
+tw terraform -chdir=bootstrap_server init
+tw terraform -chdir=bootstrap_server apply \
+  -var host_ip=$host_ip \
+  -var assets_path=$assets_path
+```
+
+Launch manifest with Podman
+
+```bash
+tw terraform -chdir=bootstrap_server output -raw manifest > bootstrap.yaml
+sudo podman play kube bootstrap.yaml
+```
+
+Populate bootstrap service with PXE boot configuration
+
+```bash
+tw terraform -chdir=bootstrap_client apply -var host_ip=$host_ip
+```
+
+Stop service after PXE boot stack is launched on Kubernetes
+
+```bash
+sudo podman play kube bootstrap.yaml --down
+
+tw terraform -chdir=bootstrap_server destroy \
+  -var host_ip=$host_ip \
+  -var assets_path=$assets_path
+```
+
+---
+
+### Write client credentials
+
+```bash
+tw terraform -chdir=client init
+tw terraform -chdir=client apply -auto-approve -var-file=secrets.tfvars
+
+tw terraform -chdir=client output -raw kubeconfig > $HOME/.kube/config
+
+SSH_KEY=$HOME/.ssh/id_ecdsa
+tw terraform -chdir=client output -raw ssh_user_cert_authorized_key > $SSH_KEY-cert.pub
+```
+
+---
+
+### Deploy services to Kubernetes
+
+#### Check that `kubernetes` service is up
+
+```bash
+kubectl get svc
+```
+
 ```bash
 tw terraform -chdir=helm_client init
 tw terraform -chdir=helm_client apply -var-file=secrets.tfvars
 ```
 
 This will provision services used in following steps
+
+---
 
 ### Create PXE boot entry for nodes
 
@@ -247,17 +253,13 @@ tw terraform -chdir=pxeboot_config_client init
 tw terraform -chdir=pxeboot_config_client apply
 ```
 
-Each node may be PXE booted now and boot disks are no longer needed as long as two or more nodes are running
+Each node may be PXE booted now and the bootstrap server is no longer needed
 
-### Cleanup terraform file formatting
+---
 
-```bash
-tw find . -name '*.tf' -exec terraform fmt '{}' \;
-```
+### Desktop setup
 
-## Personal desktop setup
-
-#### Silverblue desktop
+#### Fedora Silverblue
 
 ```bash
 flatpak --user remote-add --if-not-exists flathub https://flathub.org/repo/flathub.flatpakrepo
@@ -276,7 +278,8 @@ flatpak --user -y install --or-update flathub \
   net.lutris.Lutris \
   net.davidotek.pupgui2
 ```
-Manual settings for `$HOME/.local/share/flatpak/exports/share/applications/*.desktop`
+
+Manual changes needed in `$HOME/.local/share/flatpak/exports/share/applications/*.desktop` for now
 
 - Add `--socket=wayland` to vscode flatpak arg
 - Add `--socket=wayland` to godot flatpak arg
@@ -291,7 +294,7 @@ wget -O $HOME/bin/mc https://dl.min.io/client/mc/release/linux-amd64/mc
 chmod +x $HOME/bin/mc
 ```
 
-#### Mac desktop
+#### Mac
 
 ```bash
 brew install \
@@ -310,7 +313,8 @@ brew install --cask \
   tailscale \
   visual-studio-code
 ```
-### ChromeOS penguin setup
+
+#### ChromeOS Crostini
 
 ```bash
 vsh termina
@@ -328,7 +332,6 @@ flatpak --user remote-add --if-not-exists flathub https://flathub.org/repo/flath
 
 flatpak --user -y install flathub \
   com.visualstudio.code \
-  org.inkscape.Inkscape \
   org.blender.Blender
 ```
 
@@ -347,7 +350,7 @@ Populate `/etc/containers/containers.conf`
 keyring = false
 ```
 
-#### Chromebook Linux dual-boot
+#### ChromeOS Linux dual-boot
 
 Enable developer mode and run as `chronos`
 
@@ -371,9 +374,9 @@ cp -r /etc/skel/. /mnt/$(whoami)
 sudo umount /mnt
 ```
 
-## :construction: Desktop VM with GPU passthrough :construction:
+---
 
-> This is currently just a POC and serves nothing
+### Desktop VM with GPU passthrough (unused)
 
 Enable a combination of the following `vfio-pci.ids` kargs in [PXE boot params](config_pxeboot.tf)
 
@@ -416,3 +419,13 @@ virsh start de-1-pt
 ```
 
 No video output is available unless a display is attached to the GPU being passed through
+
+---
+
+### Committing
+
+Formatting for terraform files
+
+```bash
+tw find . -name '*.tf' -exec terraform fmt '{}' \;
+```
