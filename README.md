@@ -333,17 +333,13 @@ flatpak --user -y install flathub \
 
 Install helm https://helm.sh/docs/intro/install/
 
-Populate `/etc/subuid` and `/etc/subgid`
-
 ```bash
 echo $(whoami):100000:65536 | sudo tee -a /etc/subuid /etc/subgid
-```
 
-Populate `/etc/containers/containers.conf`
-
-```bash
+sudo tee /etc/containers/containers.conf > /dev/null <<EOF
 [containers]
 keyring = false
+EOF
 ```
 
 #### ChromeOS Linux dual-boot
