@@ -5,26 +5,3 @@ systemd:
   units:
     - name: wpa_supplicant.service
       enabled: true
-      dropins:
-        - name: 10-interface.conf
-          contents: |
-            [Unit]
-            ConditionVirtualization=!vm
-            ConditionVirtualization=!container
-            [Service]
-            ExecStartPre=/usr/sbin/rfkill unblock wlan
-            ExecStartPre=/usr/sbin/iw dev ${wlan_interface} set power_save off
-            ExecStart=
-            ExecStart=/usr/sbin/wpa_supplicant -c /etc/wpa_supplicant/wpa_supplicant.conf -u -i ${wlan_interface}
-storage:
-  files:
-    # wifi
-    - path: /etc/wpa_supplicant/wpa_supplicant.conf
-      overwrite: true
-      mode: 0644
-      contents:
-        inline: |
-          ctrl_interface=/var/run/wpa_supplicant
-          ctrl_interface_group=wheel
-          update_config=1
-          ap_scan=1

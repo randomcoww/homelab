@@ -84,9 +84,9 @@ locals {
     }
     # get dhcp from another network lan
     remote = {
+      metric              = 2048
       vlan_id             = 120
       mtu                 = 1500
-      enable_use_routes   = false
       enable_use_dns      = false
       enable_use_ntp      = false
       enable_use_hostname = false

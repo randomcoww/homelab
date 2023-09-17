@@ -168,39 +168,11 @@ locals {
       }
     }
 
+    # laptop
     de-0 = {
-      netnum = 8
       users = [
         "client",
       ]
-      hardware_interfaces = {
-        # usb adapter
-        phy0 = {
-          mac = "f8-e4-3b-9e-e8-3c"
-          mtu = 9000
-        }
-        # mobile
-        phy1 = {
-          mac = "32-57-14-7a-aa-10"
-        }
-      }
-      wlan_interfaces = {
-        wlan0 = {
-          mac         = "ac-5a-fc-c3-56-a9"
-          enable_dhcp = true
-          metric      = 2048
-        }
-      }
-      tap_interfaces = {
-        lan = {
-          source_interface_name = "phy0"
-          enable_dhcp           = true
-        }
-        fallback = {
-          source_interface_name = "phy1"
-          enable_dhcp           = true
-        }
-      }
       # same as disk but a hack to use an existing lvm on chromeos
       # ignition doesn't support provisioning lvm device so so systemd mount only
       mounts = [
@@ -212,6 +184,7 @@ locals {
       ]
     }
 
+    # desktop
     de-1 = {
       netnum = 9
       users = [
@@ -336,8 +309,8 @@ locals {
 
   base_members = {
     base              = ["gw-0", "gw-1", "q-0", "de-0", "de-1", "v-0"]
-    systemd-networkd  = ["gw-0", "gw-1", "q-0", "de-0", "de-1", "v-0"]
-    network-manager   = []
+    systemd-networkd  = ["gw-0", "gw-1", "q-0", "de-1", "v-0"]
+    network-manager   = ["de-0"]
     kubelet-base      = ["gw-0", "gw-1", "q-0", "de-1"]
     gateway           = ["gw-0", "gw-1", "q-0"]
     vrrp              = ["gw-0", "gw-1"]
