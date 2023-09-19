@@ -105,6 +105,7 @@ storage:
           color-scheme='prefer-dark'
           enable-animations=false
           enable-hot-corners=false
+          show-battery-percentage=true
 
           [org/gnome/desktop/remote-desktop/rdp]
           screen-share-mode='extend'

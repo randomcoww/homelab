@@ -246,7 +246,7 @@ module "ignition-remote" {
   source   = "./modules/remote"
 
   wlan_interface  = "wlan0"
-  persistent_path = "${local.mounts.home_path}/tailscale"
+  persistent_path = local.mounts.home_path
 }
 
 # chromebook hacks #
