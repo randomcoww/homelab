@@ -1,7 +1,7 @@
 terraform {
   backend "s3" {
     bucket  = "randomcoww-tfstate"
-    key     = "stateful_resources-23.tfstate"
+    key     = "cluster_resources-23.tfstate"
     region  = "us-west-2"
     encrypt = true
   }
