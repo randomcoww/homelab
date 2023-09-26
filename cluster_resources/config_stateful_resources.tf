@@ -17,6 +17,10 @@ locals {
         bucket = "randomcoww-authelia-2"
         path   = "litestream"
       }
+      documents = {
+        bucket = "randomcoww-documents-2"
+        path   = "documents"
+      }
     } :
     name => merge(res, {
       resource = join("/", concat([res.bucket], compact(split("/", res.path))))

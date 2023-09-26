@@ -36,7 +36,7 @@ resource "helm_release" "minio" {
       }
       service = {
         type = "LoadBalancer"
-        port = local.ports.minio
+        port = local.service_ports.minio
         externalIPs = [
           local.services.minio.ip,
         ]
@@ -107,29 +107,6 @@ resource "helm_release" "minio" {
       }
     }),
   ]
-}
-
-output "mc_config" {
-  value = {
-    version = "10"
-    aliases = {
-      m = {
-        url       = "http://${local.kubernetes_ingress_endpoints.minio}:${local.ports.minio}"
-        accessKey = random_password.minio-access-key-id.result
-        secretKey = random_password.minio-secret-access-key.result
-        api       = "S3v4"
-        path      = "auto"
-      }
-      s3 = {
-        url       = "https://s3.amazonaws.com"
-        accessKey = aws_iam_access_key.s3-backup.id
-        secretKey = aws_iam_access_key.s3-backup.secret
-        api       = "S3v4"
-        path      = "auto"
-      }
-    }
-  }
-  sensitive = true
 }
 
 # mayastor #

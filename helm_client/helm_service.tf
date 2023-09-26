@@ -195,7 +195,7 @@ resource "helm_release" "transmission" {
           rename-partial-files         = true
           rpc-authentication-required  = false
           rpc-host-whitelist-enabled   = false
-          rpc-port                     = local.ports.transmission
+          rpc-port                     = local.service_ports.transmission
           rpc-url                      = "/transmission/"
           rpc-whitelist-enabled        = false
           script-torrent-done-enabled  = true
@@ -271,7 +271,7 @@ resource "helm_release" "vaultwarden" {
       }
       service = {
         type = "ClusterIP"
-        port = local.ports.vaultwarden
+        port = local.service_ports.vaultwarden
       }
       domain = "https://${local.kubernetes_ingress_endpoints.vaultwarden}"
       backup = {
@@ -460,11 +460,11 @@ resource "helm_release" "code" {
         size         = "128Gi"
       }
       ports = {
-        code = local.ports.code
+        code = local.service_ports.code
       }
       service = {
         type = "ClusterIP"
-        port = local.ports.code
+        port = local.service_ports.code
       }
       code = {
         mountPath = "/home/podman"
@@ -517,11 +517,11 @@ resource "helm_release" "kasm-desktop" {
         size         = "64Gi"
       }
       ports = {
-        desktop = local.ports.kasm_desktop
+        desktop = local.service_ports.kasm_desktop
       }
       service = {
         type = "ClusterIP"
-        port = local.ports.kasm_desktop
+        port = local.service_ports.kasm_desktop
       }
       desktop = {
         user    = "kasm-user"

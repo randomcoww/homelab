@@ -3,7 +3,7 @@ variant: fcos
 version: 1.5.0
 systemd:
   units:
-    - name: nftables@${nftables_name}.service
+    - name: nftables@gateway.service
       enabled: true
 
 storage:

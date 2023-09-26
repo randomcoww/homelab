@@ -1,4 +1,8 @@
 locals {
+  states = {
+    cluster_resources = "cluster_resources-23.tfstate"
+  }
+
   mounts = {
     containers_path = "/var/lib/containers"
     home_path       = "/var/home"
@@ -11,8 +15,8 @@ locals {
       cidr               = 23
       vlan_id            = 1
       enable_mdns        = true
-      enable_gateway     = true
       enable_dhcp_server = true
+      enable_dns         = true
       mtu                = 9000
       netnums = {
         gateway = 2
@@ -53,12 +57,8 @@ locals {
       mtu = 9000
     }
     wan = {
-      vlan_id              = 30
-      mac                  = "52-54-00-63-6e-b3"
-      enable_use_dns       = false
-      enable_use_ntp       = false
-      enable_send_hostname = false
-      enable_use_hostname  = false
+      vlan_id = 30
+      mac     = "52-54-00-63-6e-b3"
     }
     kubernetes_service = {
       network = "10.96.0.0"
@@ -77,28 +77,21 @@ locals {
     }
     # mobile device fallback
     fallback = {
-      metric               = 512
-      enable_use_ntp       = false
-      enable_send_hostname = false
-      enable_use_hostname  = false
+      metric = 512
     }
     # get dhcp from another network lan
     remote = {
-      metric              = 2048
-      vlan_id             = 120
-      mtu                 = 1500
-      enable_use_dns      = false
-      enable_use_ntp      = false
-      enable_use_hostname = false
+      metric  = 2048
+      vlan_id = 120
+      mtu     = 1500
     }
   }
 
   networks = merge(local.base_networks, {
     for network_name, network in local.base_networks :
     network_name => merge(network, try({
-      name          = network_name
-      prefix        = "${network.network}/${network.cidr}"
-      enable_prefix = true
+      name   = network_name
+      prefix = "${network.network}/${network.cidr}"
     }, {}))
   })
 
@@ -146,11 +139,9 @@ locals {
     fuse_device_plugin = "soolaugust/fuse-device-plugin:v1.0"
     code_server        = "ghcr.io/randomcoww/code-server:20230902.1-tensorflow"
     kasm_desktop       = "ghcr.io/randomcoww/kasm-desktop:20230822.4"
-    headscale          = "docker.io/headscale/headscale:0.22.3"
   }
 
   kubernetes = {
-    etcd_cluster_token        = "prod-9"
     cluster_name              = "prod-9"
     static_pod_manifest_path  = "/var/lib/kubelet/manifests"
     cni_bridge_interface_name = "cni0"
@@ -173,7 +164,6 @@ locals {
     matchbox     = "ign.${local.domains.internal}"
     code         = "code.${local.domains.internal}"
     kasm_desktop = "k.${local.domains.internal}"
-    headscale    = "ts.${local.domains.internal}"
   }
 
   ingress_classes = {
@@ -182,7 +172,7 @@ locals {
   }
 
   kubernetes_service_endpoints = {
-    kubernetes             = "kubernetes.default.svc.${local.domains.kubernetes}"
+    apiserver              = "kubernetes.default.svc.${local.domains.kubernetes}"
     minio                  = "minio.minio.svc.${local.domains.kubernetes}"
     authelia               = "authelia.authelia.svc.${local.domains.kubernetes}"
     ingress_nginx          = "${local.ingress_classes.ingress_nginx}-controller.ingress-nginx.svc.${local.domains.kubernetes}"
@@ -194,8 +184,8 @@ locals {
     kea_peer           = 50060
     gateway_dns        = 53
     pxe_tftp           = 69
-    apiserver          = 58081
-    apiserver_internal = 58181
+    apiserver_ha       = 58081
+    apiserver          = 58181
     controller_manager = 50252
     scheduler          = 50251
     kubelet            = 50250
@@ -204,12 +194,14 @@ locals {
     etcd_peer          = 58083
     matchbox           = 80
     matchbox_api       = 50101
-    minio              = 80
-    transmission       = 9091
-    vaultwarden        = 8080
-    code               = 8080
-    kasm_desktop       = 6901
-    headscale          = 8080
+  }
+
+  service_ports = {
+    minio        = 80
+    transmission = 9091
+    vaultwarden  = 8080
+    code         = 8080
+    kasm_desktop = 6901
   }
 
   minio_buckets = {

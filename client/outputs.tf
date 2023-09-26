@@ -12,3 +12,26 @@ output "kubeconfig" {
   })
   sensitive = true
 }
+
+output "mc_config" {
+  value = {
+    version = "10"
+    aliases = {
+      m = {
+        url       = "http://${local.services.minio.ip}:${local.service_ports.minio}"
+        accessKey = data.terraform_remote_state.sr.outputs.minio.acces_key_id
+        secretKey = data.terraform_remote_state.sr.outputs.minio.secret_access_key
+        api       = "S3v4"
+        path      = "auto"
+      }
+      s3 = {
+        url       = "https://s3.amazonaws.com"
+        accessKey = data.terraform_remote_state.sr.outputs.s3.documents.access_key_id
+        secretKey = data.terraform_remote_state.sr.outputs.s3.documents.secret_access_key
+        api       = "S3v4"
+        path      = "auto"
+      }
+    }
+  }
+  sensitive = true
+}
