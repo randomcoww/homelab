@@ -3,11 +3,13 @@ variable "host_netnum" {
 }
 
 variable "tap_interfaces" {
-  type = map(map(string))
+  type    = any
+  default = {}
 }
 
 variable "virtual_interfaces" {
-  type = map(map(string))
+  type    = any
+  default = {}
 }
 
 variable "bridge_interfaces" {
@@ -23,8 +25,4 @@ variable "hardware_interfaces" {
 variable "wlan_interfaces" {
   type    = any
   default = {}
-}
-
-variable "networks" {
-  type = any
 }

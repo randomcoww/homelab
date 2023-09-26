@@ -1,7 +1,3 @@
-variable "interfaces" {
-  type = any
-}
-
 variable "container_images" {
   type = map(string)
 }
@@ -10,32 +6,44 @@ variable "host_netnum" {
   type = number
 }
 
-variable "pod_network_prefix" {
-  type = string
-}
-
 variable "static_pod_manifest_path" {
   type = string
 }
 
-variable "conntrackd_ipv4_ignore" {
+variable "accept_prefixes" {
   type = list(string)
 }
 
-variable "conntrackd_ipv6_ignore" {
+variable "forward_prefixes" {
   type = list(string)
 }
 
-variable "keepalived_config_path" {
-  type    = string
-  default = "/etc/keepalived/keepalived.conf.d"
+variable "conntrackd_ignore_prefixes" {
+  type = list(string)
 }
 
-variable "keepalived_services" {
-  type = list(object({
-    ip  = string
-    dev = string
-  }))
+variable "wan_interface_name" {
+  type = string
+}
+
+variable "sync_interface_name" {
+  type = string
+}
+
+variable "sync_prefix" {
+  type = string
+}
+
+variable "lan_interface_name" {
+  type = string
+}
+
+variable "lan_prefix" {
+  type = string
+}
+
+variable "lan_vip" {
+  type = string
 }
 
 variable "upstream_dns" {
@@ -43,4 +51,9 @@ variable "upstream_dns" {
     ip             = string
     tls_servername = string
   })
+}
+
+variable "keepalived_config_path" {
+  type    = string
+  default = "/etc/keepalived/keepalived.conf.d"
 }

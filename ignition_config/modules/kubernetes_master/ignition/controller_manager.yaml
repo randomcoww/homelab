@@ -12,7 +12,7 @@ storage:
           apiVersion: v1
           clusters:
           - cluster:
-              certificate-authority-data: ${replace(base64encode(chomp(certs.ca_cert.content)), "\n", "")}
+              certificate-authority-data: ${replace(base64encode(chomp(pki.ca_cert.content)), "\n", "")}
               server: https://127.0.0.1:${apiserver_port}
             name: ${cluster_name}
           contexts:
@@ -25,8 +25,8 @@ storage:
           users:
           - name: system:kube-controller-manager
             user:
-              client-certificate-data: ${replace(base64encode(chomp(certs.controller_manager_cert.content)), "\n", "")}
-              client-key-data: ${replace(base64encode(chomp(certs.controller_manager_key.content)), "\n", "")}
+              client-certificate-data: ${replace(base64encode(chomp(pki.controller_manager_cert.content)), "\n", "")}
+              client-key-data: ${replace(base64encode(chomp(pki.controller_manager_key.content)), "\n", "")}
 
     - path: ${static_pod_manifest_path}/kube-controller-manager.yaml
       mode: 0644
@@ -40,6 +40,7 @@ storage:
             name: kube-controller-manager
           spec:
             priorityClassName: system-node-critical
+            priority: 2000001000
             hostNetwork: true
             restartPolicy: Always
             containers:
@@ -49,15 +50,15 @@ storage:
               - kube-controller-manager
               - --allocate-node-cidrs=true
               - --bind-address=127.0.0.1
-              - --cluster-cidr=${pod_network_prefix}
+              - --cluster-cidr=${kubernetes_pod_prefix}
               - --cluster-name=${cluster_name}
-              - --cluster-signing-cert-file=${certs.ca_cert.path}
-              - --cluster-signing-key-file=${certs.ca_key.path}
+              - --cluster-signing-cert-file=${pki.ca_cert.path}
+              - --cluster-signing-key-file=${pki.ca_key.path}
               - --kubeconfig=${config_path}/kube-controller-manager.kubeconfig
               - --leader-elect=true
-              - --root-ca-file=${certs.ca_cert.path}
-              - --service-account-private-key-file=${certs.service_account_key.path}
-              - --service-cluster-ip-range=${service_network_prefix}
+              - --root-ca-file=${pki.ca_cert.path}
+              - --service-account-private-key-file=${pki.service_account_key.path}
+              - --service-cluster-ip-range=${kubernetes_service_prefix}
               - --use-service-account-credentials=true
               - --secure-port=${controller_manager_port}
               - --feature-gates=NodeOutOfServiceVolumeDetach=true
@@ -67,7 +68,7 @@ storage:
                 mountPath: ${config_path}
                 readOnly: true
               - name: certs
-                mountPath: ${certs_path}
+                mountPath: ${pki_path}
                 readOnly: true
               livenessProbe:
                 httpGet:
@@ -83,4 +84,4 @@ storage:
                 path: ${config_path}
             - name: certs
               hostPath:
-                path: ${certs_path}
+                path: ${pki_path}

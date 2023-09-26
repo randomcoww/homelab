@@ -21,7 +21,7 @@ systemd:
               $KUBELET_COMMON_ARGS \
               --root-dir=${kubelet_root_path} \
               --bootstrap-kubeconfig=${config_path}/bootstrap.kubeconfig \
-              --cert-dir=${certs_path} \
+              --cert-dir=${pki_path} \
               --config=${config_path}/kubelet-config-bootstrap-worker.yaml \
               --kubeconfig=${config_path}/kubelet.kubeconfig \
               --node-labels=${join(",", [
@@ -70,7 +70,7 @@ storage:
             webhook:
               enabled: true
             x509:
-              clientCAFile: ${certs.ca_cert.path}
+              clientCAFile: ${pki.ca_cert.path}
           authorization:
             mode: Webhook
           address: 0.0.0.0
@@ -111,7 +111,7 @@ storage:
           apiVersion: v1
           clusters:
           - cluster:
-              certificate-authority-data: ${replace(base64encode(chomp(certs.ca_cert.content)), "\n", "")}
+              certificate-authority-data: ${replace(base64encode(chomp(pki.ca_cert.content)), "\n", "")}
               server: ${apiserver_endpoint}
             name: ${cluster_name}
           contexts:
@@ -124,8 +124,8 @@ storage:
           users:
           - name: kubelet-bootstrap
             user:
-              client-certificate-data: ${replace(base64encode(chomp(certs.bootstrap_cert.content)), "\n", "")}
-              client-key-data: ${replace(base64encode(chomp(certs.bootstrap_key.content)), "\n", "")}
+              client-certificate-data: ${replace(base64encode(chomp(pki.bootstrap_cert.content)), "\n", "")}
+              client-key-data: ${replace(base64encode(chomp(pki.bootstrap_key.content)), "\n", "")}
     # mayastor hugepages #
     - path: /etc/sysctl.d/20-hugepages.conf
       mode: 0644
@@ -139,8 +139,8 @@ storage:
         inline: |
           nvme_tcp
 
-    # certs #
-    %{~ for cert in values(certs) ~}
+    # pki #
+    %{~ for cert in values(pki) ~}
     - path: ${cert.path}
       mode: 0644
       contents:

@@ -1,8 +1,14 @@
 locals {
-  certs_path = "/var/lib/etcd/pki"
+  pki_path = "/var/lib/etcd/pki"
 
-  certs = {
-    for cert_name, cert in merge(var.certs, {
+  pki = {
+    for cert_name, cert in {
+      ca_cert = {
+        content = var.ca.cert_pem
+      }
+      peer_ca_cert = {
+        content = var.peer_ca.cert_pem
+      }
       cert = {
         content = tls_locally_signed_cert.etcd.cert_pem
       }
@@ -21,22 +27,50 @@ locals {
       client_key = {
         content = tls_private_key.etcd-client.private_key_pem
       }
-    }) :
+    } :
     cert_name => merge(cert, {
-      path = "${local.certs_path}/${cert_name}.pem"
+      path = "${local.pki_path}/${cert_name}.pem"
     })
   }
 
   module_ignition_snippets = [
     for f in fileset(".", "${path.module}/ignition/*.yaml") :
-    templatefile(f, merge(var.cluster, var.member, var.backup, {
+    templatefile(f, {
+      container_images = var.container_images
+      cluster_token    = var.cluster_token
+      pki_path         = local.pki_path
+      pki              = local.pki
+      backup_resource  = var.s3_backup_resource
+
+      initial_advertise_peer_urls = join(",", [
+        for _, ip in var.listen_ips :
+        "https://${ip}:${var.peer_port}"
+      ])
+      listen_peer_urls = join(",", [
+        for _, ip in concat(["127.0.0.1"], var.listen_ips) :
+        "https://${ip}:${var.peer_port}"
+      ])
+      advertise_client_urls = join(",", [
+        for _, ip in var.listen_ips :
+        "https://${ip}:${var.client_port}"
+      ])
+      listen_client_urls = join(",", [
+        for _, ip in concat(["127.0.0.1"], var.listen_ips) :
+        "https://${ip}:${var.client_port}"
+      ])
+      initial_cluster = join(",", [
+        for hostname, ip in var.cluster_members :
+        "${hostname}=https://${ip}:${var.peer_port}"
+      ])
+      # for etcd-wrapper client
+      initial_cluster_clients = join(",", [
+        for hostname, ip in var.cluster_members :
+        "${hostname}=https://${ip}:${var.client_port}"
+      ])
+
+      etcd_pod_manifest_file   = "etcd.json"
+      etcd_snapshot_path       = "/var/lib/etcd/snapshot/etcd.db"
       static_pod_manifest_path = var.static_pod_manifest_path
-      certs_path               = local.certs_path
-      backup_path              = "/var/lib/etcd/backup"
-      etcd_manifest_file       = "etcd.json"
-      etcd_backup_file         = "etcd.db"
-      certs                    = local.certs
-      container_images         = var.container_images
-    }))
+    })
   ]
 }

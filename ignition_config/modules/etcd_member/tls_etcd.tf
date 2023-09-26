@@ -11,10 +11,7 @@ resource "tls_cert_request" "etcd" {
     organization = "etcd"
   }
 
-  ip_addresses = [
-    "127.0.0.1",
-    var.member.client_ip,
-  ]
+  ip_addresses = concat(["127.0.0.1"], var.listen_ips)
 }
 
 resource "tls_locally_signed_cert" "etcd" {

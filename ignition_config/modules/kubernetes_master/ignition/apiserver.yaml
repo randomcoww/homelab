@@ -3,23 +3,6 @@ variant: fcos
 version: 1.5.0
 storage:
   files:
-    # apiserver #
-    - path: ${config_path}/encryption-config.yaml
-      mode: 0644
-      contents:
-        inline: |
-          kind: EncryptionConfig
-          apiVersion: v1
-          resources:
-          - resources:
-            - secrets
-            providers:
-            # - secretbox:
-            #   keys:
-            #   - name: key1
-            #     secret: ${encryption_config_secret}
-            - identity: {}
-
     - path: ${static_pod_manifest_path}/kube-apiserver.yaml
       mode: 0644
       contents:
@@ -32,6 +15,7 @@ storage:
             name: kube-apiserver
           spec:
             priorityClassName: system-node-critical
+            priority: 2000001000
             hostNetwork: true
             restartPolicy: Always
             containers:
@@ -43,25 +27,24 @@ storage:
               - --allow-privileged=true
               - --authorization-mode=Node,RBAC
               - --bind-address=0.0.0.0
-              - --client-ca-file=${certs.ca_cert.path}
-              - --encryption-provider-config=${config_path}/encryption-config.yaml
-              - --etcd-cafile=${etcd_certs.ca_cert.path}
-              - --etcd-certfile=${etcd_certs.client_cert.path}
-              - --etcd-keyfile=${etcd_certs.client_key.path}
-              - --etcd-servers=${join(",", etcd_cluster_endpoints)}
+              - --client-ca-file=${pki.ca_cert.path}
+              - --etcd-cafile=${etcd_pki.ca_cert.path}
+              - --etcd-certfile=${etcd_pki.client_cert.path}
+              - --etcd-keyfile=${etcd_pki.client_key.path}
+              - --etcd-servers=${etcd_cluster_endpoints}
               - --event-ttl=1h
-              - --kubelet-certificate-authority=${certs.ca_cert.path}
-              - --kubelet-client-certificate=${certs.apiserver_cert.path}
-              - --kubelet-client-key=${certs.apiserver_key.path}
+              - --kubelet-certificate-authority=${pki.ca_cert.path}
+              - --kubelet-client-certificate=${pki.apiserver_cert.path}
+              - --kubelet-client-key=${pki.apiserver_key.path}
               - --kubelet-preferred-address-types=InternalDNS,InternalIP
               - --runtime-config=api/all=true
-              - --secure-port=${apiserver_internal_port}
+              - --secure-port=${apiserver_port}
               - --service-account-issuer=https://kubernetes.default.svc
-              - --service-account-key-file=${certs.service_account_cert.path}
-              - --service-account-signing-key-file=${certs.service_account_key.path}
-              - --service-cluster-ip-range=${service_network_prefix}
-              - --tls-cert-file=${certs.apiserver_cert.path}
-              - --tls-private-key-file=${certs.apiserver_key.path}
+              - --service-account-key-file=${pki.service_account_cert.path}
+              - --service-account-signing-key-file=${pki.service_account_key.path}
+              - --service-cluster-ip-range=${kubernetes_service_prefix}
+              - --tls-cert-file=${pki.apiserver_cert.path}
+              - --tls-private-key-file=${pki.apiserver_key.path}
               - --v=2
               env:
               - name: NODE_IP
@@ -69,17 +52,14 @@ storage:
                   fieldRef:
                     fieldPath: status.hostIP
               volumeMounts:
-              - name: config-apiserver
-                mountPath: ${config_path}/encryption-config.yaml
-                readOnly: true
               - name: certs
-                mountPath: ${certs_path}
+                mountPath: ${pki_path}
                 readOnly: true
               livenessProbe:
                 httpGet:
                   scheme: HTTPS
                   host: 127.0.0.1
-                  port: ${apiserver_internal_port}
+                  port: ${apiserver_port}
                   path: /healthz
                 initialDelaySeconds: 15
                 timeoutSeconds: 15
@@ -87,15 +67,11 @@ storage:
                 httpGet:
                   scheme: HTTPS
                   host: 127.0.0.1
-                  port: ${apiserver_internal_port}
+                  port: ${apiserver_port}
                   path: /readyz
                 initialDelaySeconds: 15
                 timeoutSeconds: 15
             volumes:
-            - name: config-apiserver
-              hostPath:
-                path: ${config_path}/encryption-config.yaml
-                type: File
             - name: certs
               hostPath:
-                path: ${certs_path}
+                path: ${pki_path}

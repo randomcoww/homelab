@@ -3,7 +3,7 @@ output "s3" {
     for name, res in local.s3_resources :
     name => {
       resource          = res.resource
-      acces_key_id      = aws_iam_access_key.s3[name].id
+      access_key_id     = aws_iam_access_key.s3[name].id
       secret_access_key = aws_iam_access_key.s3[name].secret
       aws_region        = var.aws_region
     }
@@ -49,8 +49,18 @@ output "kubernetes_ca" {
 
 output "kubernetes_service_account" {
   value = {
+    algorithm       = tls_private_key.service-account.algorithm
     public_key_pem  = tls_private_key.service-account.public_key_pem
     private_key_pem = tls_private_key.service-account.private_key_pem
+  }
+  sensitive = true
+}
+
+output "kubernetes_endpoint" {
+  value = {
+    apiserver_endpoint = "https://${local.services.apiserver.ip}:${local.ports.apiserver_ha}"
+    cluster_name       = local.kubernetes.cluster_name
+    ca                 = tls_self_signed_cert.kubernetes-ca.cert_pem
   }
   sensitive = true
 }

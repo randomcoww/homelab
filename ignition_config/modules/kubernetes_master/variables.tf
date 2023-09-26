@@ -1,71 +1,72 @@
-variable "interfaces" {
-  type = any
-}
-
 variable "cluster_name" {
   type = string
 }
 
 variable "ca" {
-  type = map(string)
+  type = object({
+    algorithm       = string
+    private_key_pem = string
+    cert_pem        = string
+  })
 }
 
 variable "etcd_ca" {
+  type = object({
+    algorithm       = string
+    private_key_pem = string
+    cert_pem        = string
+  })
+}
+
+variable "service_account" {
+  type = object({
+    algorithm       = string
+    private_key_pem = string
+    public_key_pem  = string
+  })
+}
+
+variable "etcd_cluster_members" {
   type = map(string)
 }
 
-variable "certs" {
-  type = any
+variable "apiserver_listen_ips" {
+  type = list(string)
 }
 
-variable "etcd_certs" {
-  type = any
-}
-
-variable "encryption_config_secret" {
+variable "cluster_apiserver_endpoint" {
   type = string
+}
+
+variable "cluster_members" {
+  type = map(string)
 }
 
 variable "static_pod_manifest_path" {
   type = string
 }
 
-variable "etcd_cluster_endpoints" {
-  type = list(string)
+variable "container_images" {
+  type = map(string)
 }
 
-variable "service_network_prefix" {
+variable "kubernetes_service_prefix" {
   type = string
 }
 
-variable "pod_network_prefix" {
+variable "kubernetes_pod_prefix" {
   type = string
-}
-
-variable "apiserver_vip" {
-  type = string
-}
-
-variable "apiserver_members" {
-  type = list(object({
-    hostname = string
-    ip       = string
-  }))
-}
-
-variable "apiserver_cert_ips" {
-  type = list(string)
-}
-
-variable "apiserver_cert_dns_names" {
-  type = list(string)
 }
 
 variable "apiserver_port" {
   type = number
 }
 
-variable "apiserver_internal_port" {
+variable "apiserver_ha_port" {
+  type = number
+}
+
+variable "etcd_client_port" {
   type = number
 }
 
@@ -77,8 +78,16 @@ variable "scheduler_port" {
   type = number
 }
 
-variable "container_images" {
-  type = map(string)
+variable "sync_interface_name" {
+  type = string
+}
+
+variable "apiserver_interface_name" {
+  type = string
+}
+
+variable "apiserver_vip" {
+  type = string
 }
 
 variable "haproxy_config_path" {
@@ -89,11 +98,4 @@ variable "haproxy_config_path" {
 variable "keepalived_config_path" {
   type    = string
   default = "/etc/keepalived/keepalived.conf.d"
-}
-
-variable "keepalived_services" {
-  type = list(object({
-    ip  = string
-    dev = string
-  }))
 }

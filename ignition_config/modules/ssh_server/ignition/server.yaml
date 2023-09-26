@@ -8,6 +8,12 @@ systemd:
 
 storage:
   files:
+    # Ignition creates SSH configs in .ssh/authorized_keys.d/ignition
+    - path: /etc/ssh/sshd_config.d/22-ignition.conf
+      mode: 0644
+      contents:
+        inline: |
+          AuthorizedKeysFile .ssh/authorized_keys .ssh/authorized_keys.d/ignition
     - path: /etc/ssh/sshd_config.d/10-block-password.conf
       mode: 0644
       contents:
@@ -17,28 +23,16 @@ storage:
       mode: 0644
       contents:
         inline: |
-          HostKey ${certs.server_private_key.path}
-          HostCertificate ${certs.server_certificate.path}
-    # Ignition creates SSH configs in .ssh/authorized_keys.d/ignition
-    - path: /etc/ssh/sshd_config.d/22-ignition.conf
-      mode: 0644
-      contents:
-        inline: |
-          AuthorizedKeysFile .ssh/authorized_keys .ssh/authorized_keys.d/ignition
+          HostKey ${pki.server_private_key.path}
+          HostCertificate ${pki.server_certificate.path}
 
     # certs #
-    - path: ${certs.server_private_key.path}
-      mode: 0600
+    %{~ for cert in values(pki) ~}
+    - path: ${cert.path}
+      mode: 0644
       contents:
-        inline: "${replace(certs.server_private_key.content, "\n", "\\n")}"
-    - path: ${certs.server_public_key.path}
-      mode: 0600
-      contents:
-        inline: "${certs.server_public_key.content}"
-    - path: ${certs.server_certificate.path}
-      mode: 0600
-      contents:
-        inline: "${certs.server_certificate.content}"
+        inline: "${replace(cert.content, "\n", "\\n")}"
+    %{~ endfor ~}
 
 passwd:
   users:

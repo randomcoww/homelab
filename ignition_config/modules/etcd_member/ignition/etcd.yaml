@@ -14,6 +14,8 @@ storage:
             namespace: kube-system
             name: etcd-wrapper
           spec:
+            priorityClassName: system-node-critical
+            priority: 2000001000
             hostNetwork: true
             restartPolicy: Always
             containers:
@@ -21,25 +23,25 @@ storage:
               image: ${container_images.etcd_wrapper}
               args:
               - --name=$(NODE_NAME)
-              - --host-cert-file=${certs.cert.path}
-              - --host-key-file=${certs.key.path}
-              - --host-trusted-ca-file=${certs.ca_cert.path}
-              - --host-peer-cert-file=${certs.peer_cert.path}
-              - --host-peer-key-file=${certs.peer_key.path}
-              - --host-peer-trusted-ca-file=${certs.peer_ca_cert.path}
-              - --initial-advertise-peer-urls=${join(",", initial_advertise_peer_urls)}
-              - --listen-peer-urls=${join(",", listen_peer_urls)}
-              - --advertise-client-urls=${join(",", advertise_client_urls)}
-              - --listen-client-urls=${join(",", listen_client_urls)}
+              - --host-cert-file=${pki.cert.path}
+              - --host-key-file=${pki.key.path}
+              - --host-trusted-ca-file=${pki.ca_cert.path}
+              - --host-peer-cert-file=${pki.peer_cert.path}
+              - --host-peer-key-file=${pki.peer_key.path}
+              - --host-peer-trusted-ca-file=${pki.peer_ca_cert.path}
+              - --initial-advertise-peer-urls=${initial_advertise_peer_urls}
+              - --listen-peer-urls=${listen_peer_urls}
+              - --advertise-client-urls=${advertise_client_urls}
+              - --listen-client-urls=${listen_client_urls}
               - --initial-cluster-token=${cluster_token}
-              - --initial-cluster=${join(",", initial_cluster)}
-              - --host-backup-file=${backup_path}/${etcd_backup_file}
-              - --host-etcd-manifest-file=${static_pod_manifest_path}/${etcd_manifest_file}
+              - --initial-cluster=${initial_cluster}
+              - --host-backup-file=${etcd_snapshot_path}
+              - --host-etcd-manifest-file=${static_pod_manifest_path}/${etcd_pod_manifest_file}
               - --etcd-image=${container_images.etcd}
-              - --client-cert-file=${certs.client_cert.path}
-              - --client-key-file=${certs.client_key.path}
-              - --cluster-client-urls=${join(",", cluster_endpoints)}
-              - --s3-backup-path=${s3_backup_path}
+              - --client-cert-file=${pki.client_cert.path}
+              - --client-key-file=${pki.client_key.path}
+              - --initial-cluster-clients=${initial_cluster_clients}
+              - --s3-backup-path=${backup_resource.resource}
               - --backup-interval=30m
               - --healthcheck-interval=10s
               - --pod-update-wait=60s
@@ -49,34 +51,34 @@ storage:
                   fieldRef:
                     fieldPath: spec.nodeName
               - name: AWS_ACCESS_KEY_ID
-                value: "${aws_access_key_id}"
+                value: "${backup_resource.access_key_id}"
               - name: AWS_SECRET_ACCESS_KEY
-                value: "${aws_access_key_secret}"
+                value: "${backup_resource.secret_access_key}"
               - name: AWS_DEFAULT_REGION
-                value: "${aws_region}"
+                value: "${backup_resource.aws_region}"
               - name: AWS_SDK_LOAD_CONFIG
                 value: "1"
               volumeMounts:
               - name: certs-volume
-                mountPath: ${certs_path}
+                mountPath: ${pki_path}
                 readOnly: true
               - name: backup-volume
-                mountPath: ${backup_path}
+                mountPath: ${dirname(etcd_snapshot_path)}
               - name: manifest-volume
                 mountPath: ${static_pod_manifest_path}
             volumes:
             - name: certs-volume
               hostPath:
-                path: ${certs_path}
+                path: ${pki_path}
             - name: backup-volume
               hostPath:
-                path: ${backup_path}
+                path: ${dirname(etcd_snapshot_path)}
             - name: manifest-volume
               hostPath:
                 path: ${static_pod_manifest_path}
 
     # certs #
-    %{~ for cert in values(certs) ~}
+    %{~ for cert in values(pki) ~}
     - path: ${cert.path}
       mode: 0644
       contents:

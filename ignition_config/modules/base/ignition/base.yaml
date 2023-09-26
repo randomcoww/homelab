@@ -36,14 +36,14 @@ systemd:
         [Unit]
         Wants=network-pre.target
         Before=network-pre.target
-        ConditionFileNotEmpty=/etc/nftables/%i.conf
+        ConditionFileNotEmpty=/etc/nftables/%i.nft
 
         [Service]
         Type=oneshot
         ProtectSystem=full
         ProtectHome=true
-        ExecStart=/sbin/nft -f /etc/nftables/%i.conf
-        ExecReload=/sbin/nft 'delete table %i; include "/etc/nftables/%i.conf";'
+        ExecStart=/sbin/nft -f /etc/nftables/%i.nft
+        ExecReload=/sbin/nft 'delete table %i; include "/etc/nftables/%i.nft";'
         ExecStop=/sbin/nft delete table %i
         RemainAfterExit=yes
 
