@@ -12,3 +12,12 @@ systemd:
       enabled: true
     - name: NetworkManager-wait-online.service
       enabled: true
+
+storage:
+  files:
+    - path: /etc/NetworkManager/conf.d/10-mdns.conf
+      mode: 0644
+      contents:
+        inline: |
+          [connection]
+          connection.mdns=2
