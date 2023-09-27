@@ -140,16 +140,14 @@ tw terraform -chdir=cluster_resources init
 tw terraform -chdir=cluster_resources apply -var-file=secrets.tfvars
 ```
 
-Generate CoreOS ignition for all nodes
+Generate CoreOS ignition for servers
 
 ```bash
 tw terraform -chdir=ignition_config init
 tw terraform -chdir=ignition_config apply -var-file=secrets.tfvars
 ```
 
-Create custom CoreOS images
-
-See [fedora-coreos-config-custom](https://github.com/randomcoww/fedora-coreos-config-custom/blob/master/builds/server/README.md)
+Create custom CoreOS images (see [fedora-coreos-config-custom](https://github.com/randomcoww/fedora-coreos-config-custom/blob/master/builds/server/README.md))
 
 ---
 
@@ -238,7 +236,7 @@ tw terraform -chdir=helm_client apply -var-file=secrets.tfvars
 
 ### Conifgure PXE boot from cluster
 
-Push CoreOS images generated previously into Minio (see [fedora-coreos-config-custom](https://github.com/randomcoww/fedora-coreos-config-c)ustom/blob/master/builds/server/README.md)
+Push CoreOS images generated previously into Minio (see [fedora-coreos-config-custom](https://github.com/randomcoww/fedora-coreos-config-custom/blob/master/builds/server/README.md))
 
 Update image tags [here](https://github.com/randomcoww/homelab/blob/master/config_pxeboot.tf#L2) with those pushed in previous step
 
@@ -255,7 +253,7 @@ tw terraform -chdir=pxeboot_config_client init
 tw terraform -chdir=pxeboot_config_client apply
 ```
 
-Server will now be able to PXE boot from the cluster as long as only one node is taken down at a time
+Each node will now be able to PXE boot from the cluster as long as only one node is taken down at a time
 
 ---
 
