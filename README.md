@@ -155,7 +155,10 @@ Create custom CoreOS images (see [fedora-coreos-config-custom](https://github.co
 
 Launch bootstrap DHCP service on a workstation on the same network as the server
 
-Path `assets_path` should contains PXE image builds of `fedora-coreos-config-custom`
+Path `assets_path` should contains PXE image builds from [fedora-coreos-config-custom](https://github.com/randomcoww/fedora-coreos-config-custom/blob/master/builds/server/README.md)
+
+Update image tags [here](https://github.com/randomcoww/homelab/blob/master/config_pxeboot.tf#L2) to match image file names
+
 
 ```bash
 export interface=lan
