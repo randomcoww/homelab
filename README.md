@@ -20,6 +20,20 @@ tw() {
 }
 ```
 
+#### Create `cluster_resources/secrets.tfvars` file
+
+```bash
+CLOUDFLARE_API_TOKEN=
+CLOUDFLARE_ACCOUNT_ID=
+```
+
+```bash
+cat > cluster_resources/secrets.tfvars <<EOF
+cloudflare_api_token  = "$CLOUDFLARE_API_TOKEN"
+cloudflare_account_id = "$CLOUDFLARE_ACCOUNT_ID"
+EOF
+```
+
 #### Create `ignition_config/secrets.tfvars` file
 
 ```bash
@@ -47,8 +61,6 @@ PASSWORD=
 LETSENCRYPT_USER=
 GMAIL_USER=
 GMAIL_PASSWORD=
-CLOUDFLARE_API_TOKEN=
-CLOUDFLARE_ACCOUNT_ID=
 AP_SSID=
 AP_COUNTRY_CODE=
 AP_CHANNEL=
@@ -64,11 +76,6 @@ PASSWORD_HASH=$(podman run --rm docker.io/authelia/authelia:latest authelia hash
 cat > helm_client/secrets.tfvars <<EOF
 letsencrypt = {
   email = "$LETSENCRYPT_USER"
-}
-
-cloudflare = {
-  api_token  = "$CLOUDFLARE_API_TOKEN"
-  account_id = "$CLOUDFLARE_ACCOUNT_ID"
 }
 
 authelia_users = {
@@ -115,7 +122,7 @@ EOF
 cat > client/secrets.tfvars <<EOF
 ssh_client = {
   key_id                = "$(whoami)"
-  public_key            = "ssh_client_public_key=$(cat $HOME/.ssh/id_ecdsa.pub)"
+  public_key_openssh    = "ssh_client_public_key=$(cat $HOME/.ssh/id_ecdsa.pub)"
   early_renewal_hours   = 168
   validity_period_hours = 336
 }
@@ -125,6 +132,13 @@ EOF
 ---
 
 ### Create bootable OS images
+
+#### Generate cluster resources
+
+```bash
+tw terraform -chdir=cluster_resources init
+tw terraform -chdir=cluster_resources apply -var-file=secrets.tfvars
+```
 
 #### Generate CoreOS ignition for all nodes
 
@@ -146,7 +160,8 @@ Embed the ignition files generated above into the image to allow them to boot co
 `assets_path` should contains PXE image builds of `fedora-coreos-config-custom`
 
 ```bash
-export host_ip=$(ip -br addr show lan | awk '{print $3}')
+export interface=lan
+export host_ip=$(ip -br addr show $interface | awk '{print $3}')
 export assets_path=${HOME}/store/boot
 
 echo host_ip=$host_ip
@@ -170,6 +185,7 @@ sudo podman play kube bootstrap.yaml
 Populate bootstrap service with PXE boot configuration
 
 ```bash
+tw terraform -chdir=bootstrap_client init
 tw terraform -chdir=bootstrap_client apply -var host_ip=$host_ip
 ```
 
@@ -195,6 +211,10 @@ tw terraform -chdir=client output -raw kubeconfig > $HOME/.kube/config
 
 SSH_KEY=$HOME/.ssh/id_ecdsa
 tw terraform -chdir=client output -raw ssh_user_cert_authorized_key > $SSH_KEY-cert.pub
+
+mkdir -p ~/.mc && \
+tw terraform -chdir=client \
+  output -json mc_config > ~/.mc/config.json
 ```
 
 ---
@@ -217,16 +237,6 @@ This will provision services used in following steps
 ---
 
 ### Create PXE boot entry for nodes
-
-#### MinIO access
-
-Write configuration for `mc`
-
-```bash
-mkdir -p ~/.mc && \
-tw terraform -chdir=helm_client \
-  output -json mc_config > ~/.mc/config.json
-```
 
 #### Push OS images generated previously into Minio
 

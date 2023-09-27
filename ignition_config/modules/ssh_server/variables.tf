@@ -3,11 +3,11 @@ variable "user_names" {
   default = []
 }
 
-variable "key_id" {
+variable "hostname" {
   type = string
 }
 
-variable "valid_principals" {
+variable "node_ips" {
   type    = list(string)
   default = []
 }

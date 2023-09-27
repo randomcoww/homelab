@@ -3,20 +3,21 @@ variant: fcos
 version: 1.5.0
 systemd:
   units:
-    - name: nftables@${nftables_name}.service
+    - name: nftables@gateway.service
       enabled: true
 
 storage:
   files:
-    - path: /etc/nftables/${nftables_name}.conf
+    - path: /etc/nftables/gateway.nft
       mode: 0644
       overwrite: true
       contents:
         inline: |
-          table ip ${nftables_name} {
+          table ip gateway {
             chain base_checks {
               ct state {established, related} accept;
               ct state invalid drop;
+              ct status dnat accept;
               ip protocol icmp icmp type { echo-request, echo-reply, time-exceeded, parameter-problem, destination-unreachable } accept;
             }
 
@@ -27,23 +28,20 @@ storage:
               iifname lo accept;
               iifname != lo ip daddr 127.0.0.1/8 drop;
 
-              ip saddr ${interfaces.etcd.prefix} accept;
-              ip saddr ${interfaces.sync.prefix} accept;
-              ip saddr ${interfaces.kubernetes.prefix} accept;
-              ip saddr ${interfaces.lan.prefix} accept;
-              ip saddr ${pod_network_prefix} accept;
-              iifname ${interfaces.wan.interface_name} ct status dnat accept;
-              iifname != ${interfaces.wan.interface_name} udp sport bootps udp dport bootpc accept;
-              iifname != ${interfaces.wan.interface_name} pkttype multicast accept;
+              %{~ for _, prefix in accept_prefixes ~}
+              ip saddr ${prefix} accept;
+              %{~ endfor ~}
+              iifname != ${wan_interface_name} udp sport bootps udp dport bootpc accept;
+              iifname != ${wan_interface_name} pkttype multicast accept;
             }
 
             chain forward {
               type filter hook forward priority filter; policy drop;
               jump base_checks;
-              ip saddr ${interfaces.kubernetes.prefix} accept;
-              ip saddr ${pod_network_prefix} accept;
-              ip saddr ${interfaces.lan.prefix} accept;
-              ct status dnat accept;
+
+              %{~ for _, prefix in forward_prefixes ~}
+              ip saddr ${prefix} accept;
+              %{~ endfor ~}
             }
 
             chain prerouting {
@@ -52,11 +50,7 @@ storage:
 
             chain postrouting {
               type nat hook postrouting priority srcnat; policy accept;
-              %{~ for _, interface in interfaces ~}
-              %{~ if lookup(interface, "enable_gateway", false) ~}
-              ip saddr ${interface.prefix} oifname ${interfaces.wan.interface_name} masquerade;
-              %{~ endif ~}
-              %{~ endfor ~}
+              ip saddr ${lan_prefix} oifname ${wan_interface_name} masquerade;
             }
           }
           ;

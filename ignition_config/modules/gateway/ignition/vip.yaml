@@ -12,14 +12,13 @@ storage:
             state BACKUP
             advert_int 0.1
             virtual_router_id ${virtual_router_id}
-            interface ${interfaces.sync.interface_name}
+            interface ${sync_interface_name}
             priority 250
             garp_master_delay 1
             garp_master_refresh 1
             virtual_ipaddress {
-              %{~ for _, service in keepalived_services ~}
-              ${service.ip} dev ${service.dev} use_vmac no_track
-              %{~ endfor ~}
+              0.0.0.0 dev ${wan_interface_name} use_vmac no_track
+              ${lan_vip} dev ${lan_interface_name} use_vmac
             }
             virtual_rules {
               to all lookup ${vrrp_master_default_route.table_id} priority ${vrrp_master_default_route.table_priority}
@@ -27,7 +26,7 @@ storage:
           }
 
     # Create fallback route so backup node can access the internet through the wan interface
-    - path: /etc/systemd/network/20-${interfaces.wan.interface_name}.network.d/20-master-default-route.conf
+    - path: /etc/systemd/network/20-${wan_interface_name}.network.d/20-master-default-route.conf
       mode: 0644
       contents:
         inline: |
@@ -43,13 +42,13 @@ storage:
           [Resolve]
           DNS=${upstream_dns.ip}#${upstream_dns.tls_servername}
           DNSOverTLS=true
-    - path: /etc/systemd/network/20-${interfaces.lan.interface_name}.network.d/20-slave-default-route.conf
+    - path: /etc/systemd/network/20-${lan_interface_name}.network.d/20-slave-default-route.conf
       mode: 0644
       contents:
         inline: |
           [Route]
           Scope=global
-          Gateway=${cidrhost(interfaces.lan.prefix, interfaces.lan.netnums.gateway)}
+          Gateway=${lan_vip}
           GatewayOnLink=true
           Destination=0.0.0.0/0
           Table=${vrrp_slave_default_route.table_id}

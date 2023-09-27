@@ -1,3 +1,12 @@
+data "terraform_remote_state" "sr" {
+  backend = "s3"
+  config = {
+    bucket = "randomcoww-tfstate"
+    key    = local.states.cluster_resources
+    region = local.aws_region
+  }
+}
+
 # base system #
 
 module "ignition-base" {
@@ -21,7 +30,6 @@ module "ignition-systemd-networkd" {
   wlan_interfaces     = lookup(each.value, "wlan_interfaces", {})
   virtual_interfaces  = lookup(each.value, "virtual_interfaces", {})
   tap_interfaces      = lookup(each.value, "tap_interfaces", {})
-  networks            = local.networks
 }
 
 module "ignition-network-manager" {
@@ -41,33 +49,36 @@ module "ignition-gateway" {
   for_each = local.members.gateway
   source   = "./modules/gateway"
 
-  interfaces               = module.ignition-systemd-networkd[each.key].tap_interfaces
   container_images         = local.container_images
   host_netnum              = each.value.netnum
   static_pod_manifest_path = local.kubernetes.static_pod_manifest_path
-  pod_network_prefix       = local.networks.kubernetes_pod.prefix
-  keepalived_services = [
-    {
-      ip  = "0.0.0.0"
-      dev = "wan"
-    },
-    {
-      ip  = local.services.gateway.ip
-      dev = local.services.gateway.network.name
-    },
+
+  accept_prefixes = [
+    local.networks.etcd.prefix,
+    local.networks.sync.prefix,
+    local.networks.lan.prefix,
+    local.networks.kubernetes.prefix,
+    local.networks.kubernetes_pod.prefix,
   ]
-  conntrackd_ipv4_ignore = sort(distinct(concat([
-    for _, service in local.services :
-    service.ip
-    if lookup(service.network, "enable_gateway", false)
-    ], [
-    for _, network in local.networks :
-    network.prefix
-    if lookup(network, "enable_prefix", false) && !lookup(network, "enable_gateway", false)
-    ]
-  )))
-  conntrackd_ipv6_ignore = [
+  forward_prefixes = [
+    local.networks.lan.prefix,
+    local.networks.kubernetes.prefix,
+    local.networks.kubernetes_pod.prefix
   ]
+  conntrackd_ignore_prefixes = sort(
+    setsubtract(compact([
+      for _, network in local.networks :
+      try(network.prefix, "")
+    ]), [local.services.gateway.network.prefix])
+  )
+
+  wan_interface_name  = each.value.tap_interfaces.wan.interface_name
+  sync_interface_name = each.value.tap_interfaces.sync.interface_name
+  sync_prefix         = local.networks.sync.prefix
+  lan_interface_name  = each.value.tap_interfaces[local.services.gateway.network.name].interface_name
+  lan_prefix          = local.services.gateway.network.prefix
+  lan_vip             = local.services.gateway.ip
+
   upstream_dns = local.upstream_dns
 }
 
@@ -92,114 +103,92 @@ module "ignition-mounts" {
 
 # SSH CA #
 
-module "ssh-ca" {
-  source = "./modules/ssh_ca"
-}
-
 module "ignition-ssh-server" {
   for_each = local.members.ssh-server
   source   = "./modules/ssh_server"
 
-  key_id = each.value.hostname
+  hostname = each.value.hostname
   user_names = [
     for user in each.value.users :
     local.users[user].name
   ]
-  valid_principals = concat([
-    each.value.hostname,
-    "127.0.0.1",
-    ], [
-    for _, interface in module.ignition-systemd-networkd[each.key].tap_interfaces :
-    cidrhost(interface.prefix, each.value.netnum)
-    if lookup(interface, "enable_netnum", false)
+  node_ips = sort([
+    for _, network in each.value.networks :
+    cidrhost(network.prefix, each.value.netnum)
+    if lookup(network, "enable_netnum", false)
   ])
-  ca = module.ssh-ca.ca
+  ca = data.terraform_remote_state.sr.outputs.ssh_ca
+}
+
+module "ignition-ssh-client" {
+  for_each = local.members.ssh-client
+  source   = "./modules/ssh_client"
+
+  public_key_openssh = data.terraform_remote_state.sr.outputs.ssh_ca.public_key_openssh
 }
 
 # etcd #
 
-module "etcd-cluster" {
-  source = "./modules/etcd_cluster"
-
-  cluster_token = local.kubernetes.etcd_cluster_token
-  cluster_hosts = {
-    for host_key, host in local.members.etcd :
-    host_key => {
-      hostname    = host.hostname
-      client_ip   = cidrhost(local.networks.kubernetes.prefix, host.netnum)
-      peer_ip     = cidrhost(local.networks.etcd.prefix, host.netnum)
-      client_port = local.ports.etcd_client
-      peer_port   = local.ports.etcd_peer
-    }
-  }
-  aws_region       = var.aws_region
-  s3_backup_bucket = "randomcoww-etcd-backup"
-}
-
 module "ignition-etcd" {
-  for_each = module.etcd-cluster.members
+  for_each = local.members.etcd
   source   = "./modules/etcd_member"
 
-  ca                       = module.etcd-cluster.ca
-  peer_ca                  = module.etcd-cluster.peer_ca
-  certs                    = module.etcd-cluster.certs
-  cluster                  = module.etcd-cluster.cluster
-  backup                   = module.etcd-cluster.backup
-  member                   = each.value
+  cluster_token = local.kubernetes.cluster_name
+  ca            = data.terraform_remote_state.sr.outputs.etcd_ca
+  peer_ca       = data.terraform_remote_state.sr.outputs.etcd_peer_ca
+  cluster_members = {
+    for host_key, host in local.members.etcd :
+    host.hostname => cidrhost(local.networks.etcd.prefix, host.netnum)
+  }
+  listen_ips = sort([
+    cidrhost(local.networks.etcd.prefix, each.value.netnum)
+  ])
+  client_port              = local.ports.etcd_client
+  peer_port                = local.ports.etcd_peer
+  s3_backup_resource       = data.terraform_remote_state.sr.outputs.s3.etcd
   static_pod_manifest_path = local.kubernetes.static_pod_manifest_path
   container_images         = local.container_images
 }
 
 # kubernetes #
 
-module "kubernetes-ca" {
-  source = "./modules/kubernetes_ca"
-}
-
 module "ignition-kubernetes-master" {
   for_each = local.members.kubernetes-master
   source   = "./modules/kubernetes_master"
 
-  interfaces               = module.ignition-systemd-networkd[each.key].tap_interfaces
-  cluster_name             = local.kubernetes.cluster_name
-  ca                       = module.kubernetes-ca.ca
-  etcd_ca                  = module.etcd-cluster.ca
-  certs                    = module.kubernetes-ca.certs
-  etcd_certs               = module.etcd-cluster.certs
-  etcd_cluster_endpoints   = module.etcd-cluster.cluster.cluster_endpoints
-  encryption_config_secret = module.kubernetes-ca.encryption_config_secret
-  service_network_prefix   = local.networks.kubernetes_service.prefix
-  pod_network_prefix       = local.networks.kubernetes_pod.prefix
-  apiserver_vip            = local.services.apiserver.ip
-  apiserver_cert_ips = [
+  # interfaces               = module.ignition-systemd-networkd[each.key].tap_interfaces
+  cluster_name    = local.kubernetes.cluster_name
+  ca              = data.terraform_remote_state.sr.outputs.kubernetes_ca
+  etcd_ca         = data.terraform_remote_state.sr.outputs.etcd_ca
+  service_account = data.terraform_remote_state.sr.outputs.kubernetes_service_account
+  etcd_cluster_members = {
+    for host_key, host in local.members.etcd :
+    host.hostname => cidrhost(local.networks.etcd.prefix, host.netnum)
+  }
+  apiserver_listen_ips = sort([
     cidrhost(local.networks.kubernetes.prefix, each.value.netnum),
     local.services.apiserver.ip,
     local.services.cluster_apiserver.ip,
-    "127.0.0.1",
-  ]
-  apiserver_cert_dns_names = [
-    for i, _ in split(".", "kubernetes.default.svc.${local.domains.kubernetes}") :
-    join(".", slice(split(".", "kubernetes.default.svc.${local.domains.kubernetes}"), 0, i + 1))
-  ]
-  apiserver_members = [
+  ])
+  cluster_apiserver_endpoint = local.kubernetes_service_endpoints.apiserver
+  cluster_members = {
     for host_key, host in local.members.kubernetes-master :
-    {
-      hostname = host.hostname
-      ip       = cidrhost(local.networks.kubernetes.prefix, host.netnum),
-    }
-  ]
-  keepalived_services = [
-    {
-      ip  = local.services.apiserver.ip
-      dev = local.services.apiserver.network.name
-    },
-  ]
+    host.hostname => cidrhost(local.networks.kubernetes.prefix, host.netnum)
+  }
   static_pod_manifest_path = local.kubernetes.static_pod_manifest_path
   container_images         = local.container_images
-  apiserver_port           = local.ports.apiserver
-  apiserver_internal_port  = local.ports.apiserver_internal
-  controller_manager_port  = local.ports.controller_manager
-  scheduler_port           = local.ports.scheduler
+
+  kubernetes_service_prefix = local.networks.kubernetes_service.prefix
+  kubernetes_pod_prefix     = local.networks.kubernetes_pod.prefix
+  apiserver_port            = local.ports.apiserver
+  apiserver_ha_port         = local.ports.apiserver_ha
+  etcd_client_port          = local.ports.etcd_client
+  controller_manager_port   = local.ports.controller_manager
+  scheduler_port            = local.ports.scheduler
+
+  sync_interface_name      = each.value.tap_interfaces.sync.interface_name
+  apiserver_interface_name = each.value.tap_interfaces[local.services.apiserver.network.name].interface_name
+  apiserver_vip            = local.services.apiserver.ip
 }
 
 module "ignition-kubernetes-worker" {
@@ -207,13 +196,12 @@ module "ignition-kubernetes-worker" {
   source   = "./modules/kubernetes_worker"
 
   cluster_name              = local.kubernetes.cluster_name
-  ca                        = module.kubernetes-ca.ca
-  certs                     = module.kubernetes-ca.certs
+  ca                        = data.terraform_remote_state.sr.outputs.kubernetes_ca
   node_labels               = lookup(each.value, "kubernetes_worker_labels", {})
   node_taints               = lookup(each.value, "kubernetes_worker_taints", [])
   container_storage_path    = "${local.mounts.containers_path}/storage"
   cni_bridge_interface_name = local.kubernetes.cni_bridge_interface_name
-  apiserver_endpoint        = "https://${local.services.apiserver.ip}:${local.ports.apiserver}"
+  apiserver_endpoint        = "https://${local.services.apiserver.ip}:${local.ports.apiserver_ha}"
   cluster_dns_ip            = local.services.cluster_dns.ip
   cluster_domain            = local.domains.kubernetes
   static_pod_manifest_path  = local.kubernetes.static_pod_manifest_path
@@ -230,8 +218,6 @@ module "ignition-nvidia-container" {
 module "ignition-desktop" {
   for_each = local.members.desktop
   source   = "./modules/desktop"
-
-  ssh_ca_public_key_openssh = module.ssh-ca.ca.public_key_openssh
 }
 
 module "ignition-sunshine" {
@@ -275,6 +261,7 @@ data "ct_config" "ignition" {
       try(module.ignition-kubernetes-worker[host_key].ignition_snippets, []),
       try(module.ignition-nvidia-container[host_key].ignition_snippets, []),
       try(module.ignition-ssh-server[host_key].ignition_snippets, []),
+      try(module.ignition-ssh-client[host_key].ignition_snippets, []),
       try(module.ignition-desktop[host_key].ignition_snippets, []),
       try(module.ignition-sunshine[host_key].ignition_snippets, []),
       try(module.ignition-remote[host_key].ignition_snippets, []),
@@ -296,20 +283,6 @@ output "ignition" {
   value = {
     for host_key, content in data.ct_config.ignition :
     host_key => content.rendered
-  }
-  sensitive = true
-}
-
-output "ssh_ca" {
-  value     = module.ssh-ca.ca
-  sensitive = true
-}
-
-output "kubernetes" {
-  value = {
-    apiserver_endpoint = "https://${local.services.apiserver.ip}:${local.ports.apiserver}"
-    cluster_name       = local.kubernetes.cluster_name
-    ca                 = module.kubernetes-ca.ca
   }
   sensitive = true
 }

@@ -1,46 +1,45 @@
+variable "cluster_token" {
+  type = string
+}
+
 variable "ca" {
-  type = map(string)
+  type = object({
+    algorithm       = string
+    private_key_pem = string
+    cert_pem        = string
+  })
 }
 
 variable "peer_ca" {
+  type = object({
+    algorithm       = string
+    private_key_pem = string
+    cert_pem        = string
+  })
+}
+
+variable "cluster_members" {
   type = map(string)
 }
 
-variable "certs" {
-  type = map(object({
-    content = string
-    path    = optional(string)
-  }))
+variable "listen_ips" {
+  type = list(string)
 }
 
-variable "cluster" {
-  type = object({
-    cluster_token     = string
-    cluster_endpoints = list(string)
-    initial_cluster   = list(string)
-  })
+variable "client_port" {
+  type = number
 }
 
-variable "backup" {
-  type = object({
-    aws_access_key_id     = string
-    aws_access_key_secret = string
-    s3_backup_path        = string
-    aws_region            = string
-  })
+variable "peer_port" {
+  type = number
 }
 
-variable "member" {
+variable "s3_backup_resource" {
   type = object({
-    hostname                    = string
-    client_ip                   = string
-    peer_ip                     = string
-    client_port                 = string
-    peer_port                   = string
-    initial_advertise_peer_urls = list(string)
-    listen_peer_urls            = list(string)
-    advertise_client_urls       = list(string)
-    listen_client_urls          = list(string)
+    access_key_id     = string
+    secret_access_key = string
+    resource          = string
+    aws_region        = string
   })
 }
 

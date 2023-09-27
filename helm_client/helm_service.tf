@@ -195,7 +195,7 @@ resource "helm_release" "transmission" {
           rename-partial-files         = true
           rpc-authentication-required  = false
           rpc-host-whitelist-enabled   = false
-          rpc-port                     = local.ports.transmission
+          rpc-port                     = local.service_ports.transmission
           rpc-url                      = "/transmission/"
           rpc-whitelist-enabled        = false
           script-torrent-done-enabled  = true
@@ -271,13 +271,13 @@ resource "helm_release" "vaultwarden" {
       }
       service = {
         type = "ClusterIP"
-        port = local.ports.vaultwarden
+        port = local.service_ports.vaultwarden
       }
       domain = "https://${local.kubernetes_ingress_endpoints.vaultwarden}"
       backup = {
-        accessKeyID     = aws_iam_access_key.vaultwarden-backup.id
-        secretAccessKey = aws_iam_access_key.vaultwarden-backup.secret
-        s3Resource      = "${local.vaultwarden.backup_bucket}/${local.vaultwarden.backup_path}/db.sqlite3"
+        accessKeyID     = data.terraform_remote_state.sr.outputs.s3.vaultwarden.access_key_id
+        secretAccessKey = data.terraform_remote_state.sr.outputs.s3.vaultwarden.secret_access_key
+        s3Resource      = "${data.terraform_remote_state.sr.outputs.s3.vaultwarden.resource}/db.sqlite3"
       }
       smtp = {
         username = var.smtp.username
@@ -460,11 +460,11 @@ resource "helm_release" "code" {
         size         = "128Gi"
       }
       ports = {
-        code = local.ports.code
+        code = local.service_ports.code
       }
       service = {
         type = "ClusterIP"
-        port = local.ports.code
+        port = local.service_ports.code
       }
       code = {
         mountPath = "/home/podman"
@@ -517,11 +517,11 @@ resource "helm_release" "kasm-desktop" {
         size         = "64Gi"
       }
       ports = {
-        desktop = local.ports.kasm_desktop
+        desktop = local.service_ports.kasm_desktop
       }
       service = {
         type = "ClusterIP"
-        port = local.ports.kasm_desktop
+        port = local.service_ports.kasm_desktop
       }
       desktop = {
         user    = "kasm-user"

@@ -1,6 +1,13 @@
+data "terraform_remote_state" "bootstrap-server" {
+  backend = "local"
+  config = {
+    path = "../bootstrap_server/terraform.tfstate"
+  }
+}
+
 provider "matchbox" {
   endpoint    = local.matchbox_api_endpoint
-  client_cert = file("output/certs/matchbox-bootstrap-cert.pem")
-  client_key  = file("output/certs/matchbox-bootstrap-key.pem")
-  ca          = file("output/certs/matchbox-bootstrap-ca.pem")
+  client_cert = data.terraform_remote_state.bootstrap-server.outputs.matchbox_client.cert_pem
+  client_key  = data.terraform_remote_state.bootstrap-server.outputs.matchbox_client.private_key_pem
+  ca          = data.terraform_remote_state.bootstrap-server.outputs.matchbox_ca.cert_pem
 }

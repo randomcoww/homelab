@@ -34,14 +34,9 @@ storage:
 
           [DHCPv4]
           RouteMetric=${lookup(tap_interface, "metric", 1024)}
-          UseRoutes=${lookup(tap_interface, "enable_use_routes", true)}
-          UseMTU=${lookup(tap_interface, "enable_use_mtu", true)}
-          UseDNS=${lookup(tap_interface, "enable_use_dns", true)}
-          UseNTP=${lookup(tap_interface, "enable_use_ntp", true)}
-          SendHostname=${lookup(tap_interface, "enable_send_hostname", true)}
-          UseHostname=${lookup(tap_interface, "enable_use_hostname", true)}
-          UseDomains=${lookup(tap_interface, "enable_use_domains", false)}
-          UseTimezone=${lookup(tap_interface, "enable_use_timezone", false)}
+          UseDNS=${lookup(tap_interface, "enable_dns", false)}
+          UseNTP=false
+          UseHostname=false
 
           [Network]
           LinkLocalAddressing=${lookup(tap_interface, "enable_linklocal", false)}

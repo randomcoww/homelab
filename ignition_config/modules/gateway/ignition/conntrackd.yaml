@@ -39,8 +39,8 @@ storage:
             Multicast {
               IPv4_address 225.0.0.50
               Group 3780
-              IPv4_interface ${cidrhost(interfaces.sync.prefix, host_netnum)}
-              Interface ${interfaces.sync.interface_name}
+              IPv4_interface ${cidrhost(sync_prefix, host_netnum)}
+              Interface ${sync_interface_name}
               SndSocketBuffer 24985600
               RcvSocketBuffer 24985600
               Checksum on
@@ -61,16 +61,9 @@ storage:
               Address Ignore {
                 IPv4_address 127.0.0.1
                 IPv6_address ::1
-                %{~ for _, interface in interfaces ~}
-                %{~ if lookup(interface, "enable_gateway", false) ~}
-                IPv4_address ${cidrhost(interface.prefix, host_netnum)}
-                %{~ endif ~}
-                %{~ endfor ~}
-                %{~ for _, address in conntrackd_ipv6_ignore ~}
-                IPv6_address ${address}
-                %{~ endfor ~}
-                %{~ for _, address in conntrackd_ipv4_ignore ~}
-                IPv4_address ${address}
+                IPv4_address ${lan_vip}
+                %{~ for _, prefix in conntrackd_ignore_prefixes ~}
+                IPv4_address ${prefix}
                 %{~ endfor ~}
               }
               State Accept {

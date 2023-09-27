@@ -317,6 +317,7 @@ locals {
     disks             = ["gw-0", "gw-1", "q-0", "de-1", "v-0"]
     mounts            = ["de-0"]
     ssh-server        = ["gw-0", "gw-1", "q-0", "de-1", "v-0"]
+    ssh-client        = ["de-0", "de-1", "v-0"]
     etcd              = ["gw-0", "gw-1", "q-0"]
     kubernetes-master = ["gw-0", "gw-1"]
     kubernetes-worker = ["gw-0", "gw-1", "q-0", "de-1"]
@@ -327,11 +328,50 @@ locals {
     chromebook-hacks  = ["de-0"]
   }
 
-  hosts = {
+  base_hosts_1 = {
     for host_key, host in local.base_hosts :
-    host_key => merge({
+    host_key => merge(host, {
       hostname = "${host_key}.${local.domains.internal_mdns}"
-    }, host)
+
+      tap_interfaces = {
+        for network_name, tap_interface in lookup(host, "tap_interfaces", {}) :
+        network_name => merge(local.networks[network_name], tap_interface, {
+          interface_name = network_name
+        })
+      }
+
+      virtual_interfaces = {
+        for network_name, virtual_interface in lookup(host, "virtual_interfaces", {}) :
+        network_name => merge(local.networks[network_name], virtual_interface, {
+          interface_name = network_name
+        })
+      }
+
+      hardware_interfaces = {
+        for hardware_interface_name, hardware_interface in lookup(host, "hardware_interfaces", {}) :
+        hardware_interface_name => merge(hardware_interface, {
+          vlans = {
+            for i, network_name in lookup(hardware_interface, "vlans", []) :
+            network_name => merge(local.networks[network_name], {
+              interface_name = "${hardware_interface_name}-${network_name}"
+            })
+          }
+        })
+      }
+    })
+  }
+
+  hosts = {
+    for host_key, host in local.base_hosts_1 :
+    host_key => merge(host, {
+      networks = {
+        for network_name, interface in merge(
+          host.tap_interfaces,
+          host.virtual_interfaces,
+        ) :
+        network_name => merge(local.networks[network_name], interface)
+      }
+    })
   }
 
   # use this instead of base_members #

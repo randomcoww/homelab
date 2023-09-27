@@ -8,7 +8,7 @@ storage:
       contents:
         inline: |
           frontend kube-apiserver
-            bind :::${apiserver_port} v4v6
+            bind :::${apiserver_ha_port} v4v6
             mode tcp
             default_backend kube-apiserver
 
@@ -18,26 +18,24 @@ storage:
             mode tcp
             balance leastconn
             default-server verify none check-ssl rise 2 fall 2 maxconn 5000 maxqueue 5000 weight 100
-            %{~ for _, apiserver_member in apiserver_members ~}
-            server ${apiserver_member.hostname} ${apiserver_member.ip}:${apiserver_internal_port} check
+            %{~ for hostname, ip in cluster_members ~}
+            server ${hostname} ${ip}:${apiserver_port} check
             %{~ endfor ~}
 
     - path: ${keepalived_config_path}/50-kube-apiserver.conf
       mode: 0644
       contents:
         inline: |
-          vrrp_instance kubernetes-master {
+          vrrp_instance kube-apiserver {
             nopreempt
             state BACKUP
             advert_int 0.1
             virtual_router_id ${virtual_router_id}
-            interface ${interfaces.sync.interface_name}
+            interface ${sync_interface_name}
             priority 250
             garp_master_delay 1
             garp_master_refresh 1
             virtual_ipaddress {
-              %{~ for _, service in keepalived_services ~}
-              ${service.ip} dev ${service.dev} use_vmac
-              %{~ endfor ~}
+              ${apiserver_vip} dev ${apiserver_interface_name} use_vmac
             }
           }

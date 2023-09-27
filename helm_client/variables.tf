@@ -1,8 +1,3 @@
-variable "aws_region" {
-  type    = string
-  default = "us-west-2"
-}
-
 # User override (local.preprocess.users)
 variable "users" {
   type    = any

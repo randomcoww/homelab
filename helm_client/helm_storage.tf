@@ -1,15 +1,5 @@
 # minio #
 
-resource "random_password" "minio-access-key-id" {
-  length  = 30
-  special = false
-}
-
-resource "random_password" "minio-secret-access-key" {
-  length  = 30
-  special = false
-}
-
 resource "helm_release" "minio" {
   name             = split(".", local.kubernetes_service_endpoints.minio)[0]
   namespace        = split(".", local.kubernetes_service_endpoints.minio)[1]
@@ -22,8 +12,8 @@ resource "helm_release" "minio" {
     yamlencode({
       clusterDomain = local.domains.kubernetes
       mode          = "distributed"
-      rootUser      = random_password.minio-access-key-id.result
-      rootPassword  = random_password.minio-secret-access-key.result
+      rootUser      = data.terraform_remote_state.sr.outputs.minio.access_key_id
+      rootPassword  = data.terraform_remote_state.sr.outputs.minio.secret_access_key
       persistence = {
         storageClass = "local-path"
       }
@@ -36,7 +26,7 @@ resource "helm_release" "minio" {
       }
       service = {
         type = "LoadBalancer"
-        port = local.ports.minio
+        port = local.service_ports.minio
         externalIPs = [
           local.services.minio.ip,
         ]
@@ -107,29 +97,6 @@ resource "helm_release" "minio" {
       }
     }),
   ]
-}
-
-output "mc_config" {
-  value = {
-    version = "10"
-    aliases = {
-      m = {
-        url       = "http://${local.kubernetes_ingress_endpoints.minio}:${local.ports.minio}"
-        accessKey = random_password.minio-access-key-id.result
-        secretKey = random_password.minio-secret-access-key.result
-        api       = "S3v4"
-        path      = "auto"
-      }
-      s3 = {
-        url       = "https://s3.amazonaws.com"
-        accessKey = aws_iam_access_key.s3-backup.id
-        secretKey = aws_iam_access_key.s3-backup.secret
-        api       = "S3v4"
-        path      = "auto"
-      }
-    }
-  }
-  sensitive = true
 }
 
 # mayastor #

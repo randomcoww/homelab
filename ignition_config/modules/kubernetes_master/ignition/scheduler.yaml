@@ -23,7 +23,7 @@ storage:
           apiVersion: v1
           clusters:
           - cluster:
-              certificate-authority-data: ${replace(base64encode(chomp(certs.ca_cert.content)), "\n", "")}
+              certificate-authority-data: ${replace(base64encode(chomp(pki.ca_cert.content)), "\n", "")}
               server: https://127.0.0.1:${apiserver_port}
             name: ${cluster_name}
           contexts:
@@ -36,8 +36,8 @@ storage:
           users:
           - name: system:kube-scheduler
             user:
-              client-certificate-data: ${replace(base64encode(chomp(certs.scheduler_cert.content)), "\n", "")}
-              client-key-data: ${replace(base64encode(chomp(certs.scheduler_key.content)), "\n", "")}
+              client-certificate-data: ${replace(base64encode(chomp(pki.scheduler_cert.content)), "\n", "")}
+              client-key-data: ${replace(base64encode(chomp(pki.scheduler_key.content)), "\n", "")}
 
     - path: ${static_pod_manifest_path}/kube-scheduler.yaml
       mode: 0644
@@ -51,6 +51,7 @@ storage:
             name: kube-scheduler
           spec:
             priorityClassName: system-node-critical
+            priority: 2000001000
             restartPolicy: Always
             hostNetwork: true
             containers:

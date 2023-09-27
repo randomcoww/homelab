@@ -3,11 +3,11 @@ variable "cluster_name" {
 }
 
 variable "ca" {
-  type = map(string)
-}
-
-variable "certs" {
-  type = any
+  type = object({
+    algorithm       = string
+    private_key_pem = string
+    cert_pem        = string
+  })
 }
 
 variable "node_labels" {
@@ -16,11 +16,6 @@ variable "node_labels" {
 
 variable "node_taints" {
   type = any
-}
-
-variable "container_storage_path" {
-  type    = string
-  default = "/var/lib/containers/storage"
 }
 
 variable "static_pod_manifest_path" {
@@ -45,4 +40,9 @@ variable "cluster_dns_ip" {
 
 variable "kubelet_port" {
   type = number
+}
+
+variable "container_storage_path" {
+  type    = string
+  default = "/var/lib/containers/storage"
 }

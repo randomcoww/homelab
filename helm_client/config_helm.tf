@@ -42,27 +42,4 @@ EOF
       "*.${local.domains.internal}",
     ]
   }
-
-  authelia = {
-    backup_user   = "authelia"
-    backup_bucket = "randomcoww-authelia"
-    backup_path   = "sqlite"
-  }
-
-  vaultwarden = {
-    backup_user   = "vw"
-    backup_bucket = "randomcoww-vw"
-    backup_path   = "sqlite"
-  }
-
-  headscale = {
-    backup_user   = "ts"
-    backup_bucket = "randomcoww-ts"
-    backup_path   = "sqlite"
-  }
-
-  s3_backup = {
-    backup_user   = "backup"
-    backup_bucket = "randomcoww-backup"
-  }
 }

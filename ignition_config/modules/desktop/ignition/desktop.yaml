@@ -164,12 +164,6 @@ storage:
           set -g mouse on
           set-option -s set-clipboard off
           bind-key -T copy-mode MouseDragEnd1Pane send-keys -X copy-pipe-and-cancel "xclip -in -sel clip"
-    # ssh-ca client #
-    - path: /etc/ssh/ssh_known_hosts
-      mode: 0644
-      contents:
-        inline: "@cert-authority * ${ssh_ca_authorized_key}"
-
     # systemd user unit
     # ignition doesn't support systemd --user
     - path: /etc/systemd/user/dconf-load.service

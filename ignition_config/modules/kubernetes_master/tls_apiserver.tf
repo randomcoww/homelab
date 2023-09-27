@@ -11,8 +11,11 @@ resource "tls_cert_request" "apiserver" {
     organization = "kubernetes"
   }
 
-  ip_addresses = var.apiserver_cert_ips
-  dns_names    = var.apiserver_cert_dns_names
+  ip_addresses = concat(["127.0.0.1"], var.apiserver_listen_ips)
+  dns_names = [
+    for i, _ in split(".", var.cluster_apiserver_endpoint) :
+    join(".", slice(split(".", var.cluster_apiserver_endpoint), 0, i + 1))
+  ]
 }
 
 resource "tls_locally_signed_cert" "apiserver" {
