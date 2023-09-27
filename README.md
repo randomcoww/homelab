@@ -1,6 +1,6 @@
-### Environment
+### Configure environment
 
-#### Define the `tw` (terraform wrapper) command
+Define the `tw` (terraform wrapper) command
 
 ```bash
 mkdir -p $HOME/.kube $HOME/.aws
@@ -20,7 +20,7 @@ tw() {
 }
 ```
 
-#### Create `cluster_resources/secrets.tfvars` file
+Create `cluster_resources/secrets.tfvars` file
 
 ```bash
 CLOUDFLARE_API_TOKEN=
@@ -34,7 +34,7 @@ cloudflare_account_id = "$CLOUDFLARE_ACCOUNT_ID"
 EOF
 ```
 
-#### Create `ignition_config/secrets.tfvars` file
+Create `ignition_config/secrets.tfvars` file
 
 ```bash
 PASSWORD=
@@ -52,7 +52,20 @@ users = {
 EOF
 ```
 
-#### Create `helm_client/secrets.tfvars` file
+Create `client/secrets.tfvars` file
+
+```bash
+cat > client/secrets.tfvars <<EOF
+ssh_client = {
+  key_id                = "$(whoami)"
+  public_key_openssh    = "ssh_client_public_key=$(cat $HOME/.ssh/id_ecdsa.pub)"
+  early_renewal_hours   = 168
+  validity_period_hours = 336
+}
+EOF
+```
+
+Create `helm_client/secrets.tfvars` file
 
 Reference: [Generate Authelia password hash](https://www.authelia.com/reference/guides/passwords/#user--password-file)
 
@@ -116,53 +129,40 @@ wireguard_client = {
 EOF
 ```
 
-#### Create `client/secrets.tfvars` file
-
-```bash
-cat > client/secrets.tfvars <<EOF
-ssh_client = {
-  key_id                = "$(whoami)"
-  public_key_openssh    = "ssh_client_public_key=$(cat $HOME/.ssh/id_ecdsa.pub)"
-  early_renewal_hours   = 168
-  validity_period_hours = 336
-}
-EOF
-```
-
 ---
 
-### Create bootable OS images
+### Generate server ignition configuration
 
-#### Generate cluster resources
+Generate cluster resources
 
 ```bash
 tw terraform -chdir=cluster_resources init
 tw terraform -chdir=cluster_resources apply -var-file=secrets.tfvars
 ```
 
-#### Generate CoreOS ignition for all nodes
+Generate CoreOS ignition for all nodes
 
 ```bash
 tw terraform -chdir=ignition_config init
 tw terraform -chdir=ignition_config apply -var-file=secrets.tfvars
 ```
 
-#### Create custom CoreOS images
+Create custom CoreOS images
 
 See [fedora-coreos-config-custom](https://github.com/randomcoww/fedora-coreos-config-custom/blob/master/builds/server/README.md)
 
-Embed the ignition files generated above into the image to allow them to boot configured
-
 ---
 
-### Launch initial bootstrap on workstation to PXE boot servers
+### Bootstrap servers
 
-`assets_path` should contains PXE image builds of `fedora-coreos-config-custom`
+Launch bootstrap DHCP service on a workstation on the same network as the server
+
+Path `assets_path` should contains PXE image builds of `fedora-coreos-config-custom`
 
 ```bash
 export interface=lan
 export host_ip=$(ip -br addr show $interface | awk '{print $3}')
-export assets_path=${HOME}/store/boot
+export assets_path=${HOME}/bootstrap_images
 
 echo host_ip=$host_ip
 echo assets_path=$assets_path
@@ -175,21 +175,23 @@ tw terraform -chdir=bootstrap_server apply \
   -var assets_path=$assets_path
 ```
 
-Launch manifest with Podman
+Launch bootstrap service with Podman
 
 ```bash
 tw terraform -chdir=bootstrap_server output -raw manifest > bootstrap.yaml
 sudo podman play kube bootstrap.yaml
 ```
 
-Populate bootstrap service with PXE boot configuration
+Push PXE boot and ignition configuration to bootstrap service
 
 ```bash
 tw terraform -chdir=bootstrap_client init
 tw terraform -chdir=bootstrap_client apply -var host_ip=$host_ip
 ```
 
-Stop service after PXE boot stack is launched on Kubernetes
+Start all servers and allow them to PXE boot
+
+Bootstrap service can be stopped once servers are up
 
 ```bash
 sudo podman play kube bootstrap.yaml --down
@@ -201,7 +203,9 @@ tw terraform -chdir=bootstrap_server destroy \
 
 ---
 
-### Write client credentials
+### Deploy services to Kubernetes
+
+Write client credentials
 
 ```bash
 tw terraform -chdir=client init
@@ -217,32 +221,24 @@ tw terraform -chdir=client \
   output -json mc_config > ~/.mc/config.json
 ```
 
----
-
-### Deploy services to Kubernetes
-
-#### Check that `kubernetes` service is up
+Check that `kubernetes` service is up
 
 ```bash
 kubectl get svc
 ```
+
+Launch all services on Kubernetes
 
 ```bash
 tw terraform -chdir=helm_client init
 tw terraform -chdir=helm_client apply -var-file=secrets.tfvars
 ```
 
-This will provision services used in following steps
-
 ---
 
-### Create PXE boot entry for nodes
+### Conifgure PXE boot from cluster
 
-#### Push OS images generated previously into Minio
-
-See [fedora-coreos-config-custom](https://github.com/randomcoww/fedora-coreos-config-custom/blob/master/builds/server/README.md)
-
-#### Write matchbox PXE boot config
+Push CoreOS images generated previously into Minio (see [fedora-coreos-config-custom](https://github.com/randomcoww/fedora-coreos-config-c)ustom/blob/master/builds/server/README.md)
 
 Update image tags [here](https://github.com/randomcoww/homelab/blob/master/config_pxeboot.tf#L2) with those pushed in previous step
 
@@ -252,14 +248,14 @@ Check that matchbox pods are running
 kubectl get po -l app=matchbox
 ```
 
-Once pods are running write PXE boot configuration for all nodes to matchbox
+Push PXE boot and ignition configuration to cluster bootstrap service
 
 ```bash
 tw terraform -chdir=pxeboot_config_client init
 tw terraform -chdir=pxeboot_config_client apply
 ```
 
-Each node may be PXE booted now and the bootstrap server is no longer needed
+Server will now be able to PXE boot from the cluster as long as only one node is taken down at a time
 
 ---
 
@@ -341,8 +337,6 @@ flatpak --user -y install flathub \
   org.blender.Blender
 ```
 
-Install helm https://helm.sh/docs/intro/install/
-
 ```bash
 echo $(whoami):100000:65536 | sudo tee -a /etc/subuid /etc/subgid
 
@@ -351,6 +345,8 @@ sudo tee /etc/containers/containers.conf > /dev/null <<EOF
 keyring = false
 EOF
 ```
+
+Install helm https://helm.sh/docs/intro/install/
 
 #### ChromeOS Linux dual-boot
 
@@ -363,7 +359,7 @@ sudo crossystem dev_boot_altfw=1
 
 Install RW_LEGACY firmware from https://mrchromebox.tech/#fwscript
 
-Boot to Linux and create a home directory
+Boot Linux from USB and create a home directory
 
 ```bash
 sudo lvcreate -V 100G -T $VG_NAME/thinpool -n home
