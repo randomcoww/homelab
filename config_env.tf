@@ -1,4 +1,6 @@
 locals {
+  aws_region = "us-west-2"
+
   states = {
     cluster_resources = "cluster_resources-23.tfstate"
   }

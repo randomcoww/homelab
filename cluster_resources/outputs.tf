@@ -5,7 +5,7 @@ output "s3" {
       resource          = res.resource
       access_key_id     = aws_iam_access_key.s3[name].id
       secret_access_key = aws_iam_access_key.s3[name].secret
-      aws_region        = var.aws_region
+      aws_region        = local.aws_region
     }
   }
   sensitive = true
@@ -56,15 +56,6 @@ output "kubernetes_service_account" {
   sensitive = true
 }
 
-output "kubernetes_endpoint" {
-  value = {
-    apiserver_endpoint = "https://${local.services.apiserver.ip}:${local.ports.apiserver_ha}"
-    cluster_name       = local.kubernetes.cluster_name
-    ca                 = tls_self_signed_cert.kubernetes-ca.cert_pem
-  }
-  sensitive = true
-}
-
 ##
 
 output "ssh_ca" {
@@ -72,6 +63,15 @@ output "ssh_ca" {
     algorithm          = tls_private_key.ssh-ca.algorithm
     private_key_pem    = tls_private_key.ssh-ca.private_key_pem
     public_key_openssh = tls_private_key.ssh-ca.public_key_openssh
+  }
+  sensitive = true
+}
+
+output "matchbox_ca" {
+  value = {
+    algorithm       = tls_private_key.matchbox-ca.algorithm
+    private_key_pem = tls_private_key.matchbox-ca.private_key_pem
+    cert_pem        = tls_self_signed_cert.matchbox-ca.cert_pem
   }
   sensitive = true
 }
@@ -85,15 +85,15 @@ output "authelia" {
 
 output "letsencrypt" {
   value = {
-    private_key_pem         = chomp(tls_private_key.letsencrypt-prod.private_key_pem)
-    staging_private_key_pem = chomp(tls_private_key.letsencrypt-staging.private_key_pem)
+    private_key_pem         = tls_private_key.letsencrypt-prod.private_key_pem
+    staging_private_key_pem = tls_private_key.letsencrypt-staging.private_key_pem
   }
   sensitive = true
 }
 
 output "minio" {
   value = {
-    acces_key_id      = random_password.minio-access-key-id.result
+    access_key_id     = random_password.minio-access-key-id.result
     secret_access_key = random_password.minio-secret-access-key.result
   }
   sensitive = true

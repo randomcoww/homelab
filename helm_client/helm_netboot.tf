@@ -107,11 +107,6 @@ resource "helm_release" "kea" {
 
 # matchbox with data sync #
 
-module "matchbox-certs" {
-  source        = "./modules/matchbox_certs"
-  api_listen_ip = local.services.matchbox.ip
-}
-
 module "matchbox-syncthing" {
   source              = "./modules/syncthing_config"
   replica_count       = 3
@@ -145,9 +140,9 @@ resource "helm_release" "matchbox" {
       ]
       syncthingConfig = module.matchbox-syncthing.config
       matchboxSecret = {
-        ca   = chomp(module.matchbox-certs.secret.ca)
-        cert = chomp(module.matchbox-certs.secret.cert)
-        key  = chomp(module.matchbox-certs.secret.key)
+        ca   = chomp(data.terraform_remote_state.sr.outputs.matchbox_ca.cert_pem)
+        cert = chomp(tls_locally_signed_cert.matchbox.cert_pe)
+        key  = chomp(tls_private_key.matchbox.private_key_pem)
       }
       sharedDataPath = "/var/tmp/matchbox"
       StatefulSet = {
@@ -199,15 +194,4 @@ resource "helm_release" "matchbox" {
       }
     }),
   ]
-}
-
-resource "local_file" "matchbox-client-cert" {
-  for_each = {
-    "matchbox-ca.pem"   = module.matchbox-certs.client.ca
-    "matchbox-cert.pem" = module.matchbox-certs.client.cert
-    "matchbox-key.pem"  = module.matchbox-certs.client.key
-  }
-
-  filename = "./output/certs/${each.key}"
-  content  = each.value
 }

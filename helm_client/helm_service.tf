@@ -275,9 +275,9 @@ resource "helm_release" "vaultwarden" {
       }
       domain = "https://${local.kubernetes_ingress_endpoints.vaultwarden}"
       backup = {
-        accessKeyID     = aws_iam_access_key.vaultwarden-backup.id
-        secretAccessKey = aws_iam_access_key.vaultwarden-backup.secret
-        s3Resource      = "${local.vaultwarden.backup_bucket}/${local.vaultwarden.backup_path}/db.sqlite3"
+        accessKeyID     = data.terraform_remote_state.sr.outputs.s3.vaultwarden.access_key_id
+        secretAccessKey = data.terraform_remote_state.sr.outputs.s3.vaultwarden.secret_access_key
+        s3Resource      = "${data.terraform_remote_state.sr.outputs.s3.vaultwarden.resource}/db.sqlite3"
       }
       smtp = {
         username = var.smtp.username

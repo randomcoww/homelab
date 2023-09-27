@@ -9,8 +9,5 @@ terraform {
     ct = {
       source = "poseidon/ct"
     }
-    ssh = {
-      source = "randomcoww/ssh"
-    }
   }
 }

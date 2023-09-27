@@ -124,32 +124,6 @@ resource "helm_release" "cert-manager" {
   ]
 }
 
-resource "null_resource" "letsencrypt-id" {
-  triggers = {
-    id = var.letsencrypt.email
-  }
-}
-
-resource "tls_private_key" "letsencrypt-prod" {
-  algorithm = "RSA"
-  rsa_bits  = 4096
-  lifecycle {
-    replace_triggered_by = [
-      null_resource.letsencrypt-id,
-    ]
-  }
-}
-
-resource "tls_private_key" "letsencrypt-staging" {
-  algorithm = "RSA"
-  rsa_bits  = 4096
-  lifecycle {
-    replace_triggered_by = [
-      null_resource.letsencrypt-id,
-    ]
-  }
-}
-
 resource "helm_release" "cert-issuer-secrets" {
   name             = "cert-issuer-secrets"
   repository       = "https://randomcoww.github.io/repos/helm/"
@@ -168,7 +142,7 @@ resource "helm_release" "cert-issuer-secrets" {
             name = local.cert_issuer_prod
           }
           stringData = {
-            "tls.key" = chomp(tls_private_key.letsencrypt-prod.private_key_pem)
+            "tls.key" = chomp(data.terraform_remote_state.sr.outputs.letsencrypt.private_key_pem)
           }
           type = "Opaque"
         },
@@ -179,7 +153,7 @@ resource "helm_release" "cert-issuer-secrets" {
             name = local.cert_issuer_staging
           }
           stringData = {
-            "tls.key" = chomp(tls_private_key.letsencrypt-staging.private_key_pem)
+            "tls.key" = chomp(data.terraform_remote_state.sr.outputs.letsencrypt.staging_private_key_pem)
           }
           type = "Opaque"
         },
@@ -317,11 +291,6 @@ resource "helm_release" "authelia-users" {
   ]
 }
 
-resource "random_password" "authelia-storage-secret" {
-  length  = 64
-  special = false
-}
-
 resource "helm_release" "authelia" {
   name      = split(".", local.kubernetes_service_endpoints.authelia)[0]
   namespace = split(".", local.kubernetes_service_endpoints.authelia)[1]
@@ -338,9 +307,9 @@ resource "helm_release" "authelia" {
       ## forked chart params
       backup = {
         image           = local.container_images.litestream
-        s3Resource      = "${local.authelia.backup_bucket}/${local.authelia.backup_path}/db.sqlite3"
-        accessKeyID     = aws_iam_access_key.authelia-backup.id
-        secretAccessKey = aws_iam_access_key.authelia-backup.secret
+        accessKeyID     = data.terraform_remote_state.sr.outputs.s3.authelia.access_key_id
+        secretAccessKey = data.terraform_remote_state.sr.outputs.s3.authelia.secret_access_key
+        s3Resource      = "${data.terraform_remote_state.sr.outputs.s3.authelia.resource}/db.sqlite3"
       }
       ##
       ingress = {
@@ -480,63 +449,6 @@ resource "helm_release" "authelia" {
   }
 }
 
-# headscale #
-
-resource "random_id" "private-key" {
-  byte_length = 32
-}
-
-resource "random_id" "noise-private-key" {
-  byte_length = 32
-}
-/*
-resource "helm_release" "headscale" {
-  name             = "headscale"
-  namespace        = "headscale"
-  repository       = "https://randomcoww.github.io/repos/helm/"
-  chart            = "headscale"
-  create_namespace = true
-  wait             = false
-  version          = "0.1.3"
-  values = [
-    yamlencode({
-      images = {
-        headscale  = local.container_images.headscale
-        litestream = local.container_images.litestream
-      }
-      ports = {
-        headscale = local.ports.headscale
-      }
-      serverURL       = "https://${local.kubernetes_ingress_endpoints.headscale}"
-      privateKey      = random_id.private-key.hex
-      noisePrivateKey = random_id.noise-private-key.hex
-      service = {
-        type = "ClusterIP"
-        port = local.ports.headscale
-      }
-      dataPath = "/etc/headscale"
-      dbFile   = "db.sqlite3"
-      backup = {
-        accessKeyID     = aws_iam_access_key.headscale-backup.id
-        secretAccessKey = aws_iam_access_key.headscale-backup.secret
-        s3Resource      = "${local.headscale.backup_bucket}/${local.headscale.backup_path}/db.sqlite3"
-      }
-      ingress = {
-        enabled          = true
-        ingressClassName = local.ingress_classes.ingress_nginx_external
-        path             = "/"
-        annotations      = local.nginx_ingress_annotations
-        tls = [
-          local.tls_wildcard,
-        ]
-        hosts = [
-          local.kubernetes_ingress_endpoints.headscale,
-        ]
-      }
-    }),
-  ]
-}
-*/
 # tailscale #
 
 resource "helm_release" "tailscale" {

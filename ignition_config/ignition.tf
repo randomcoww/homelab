@@ -3,7 +3,7 @@ data "terraform_remote_state" "sr" {
   config = {
     bucket = "randomcoww-tfstate"
     key    = local.states.cluster_resources
-    region = var.aws_region
+    region = local.aws_region
   }
 }
 

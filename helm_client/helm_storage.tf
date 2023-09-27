@@ -1,15 +1,5 @@
 # minio #
 
-resource "random_password" "minio-access-key-id" {
-  length  = 30
-  special = false
-}
-
-resource "random_password" "minio-secret-access-key" {
-  length  = 30
-  special = false
-}
-
 resource "helm_release" "minio" {
   name             = split(".", local.kubernetes_service_endpoints.minio)[0]
   namespace        = split(".", local.kubernetes_service_endpoints.minio)[1]
@@ -22,8 +12,8 @@ resource "helm_release" "minio" {
     yamlencode({
       clusterDomain = local.domains.kubernetes
       mode          = "distributed"
-      rootUser      = random_password.minio-access-key-id.result
-      rootPassword  = random_password.minio-secret-access-key.result
+      rootUser      = data.terraform_remote_state.sr.outputs.minio.access_key_id
+      rootPassword  = data.terraform_remote_state.sr.outputs.minio.secret_access_key
       persistence = {
         storageClass = "local-path"
       }

@@ -160,7 +160,8 @@ Embed the ignition files generated above into the image to allow them to boot co
 `assets_path` should contains PXE image builds of `fedora-coreos-config-custom`
 
 ```bash
-export host_ip=$(ip -br addr show lan | awk '{print $3}')
+export interface=lan
+export host_ip=$(ip -br addr show $interface | awk '{print $3}')
 export assets_path=${HOME}/store/boot
 
 echo host_ip=$host_ip
@@ -184,6 +185,7 @@ sudo podman play kube bootstrap.yaml
 Populate bootstrap service with PXE boot configuration
 
 ```bash
+tw terraform -chdir=bootstrap_client init
 tw terraform -chdir=bootstrap_client apply -var host_ip=$host_ip
 ```
 
