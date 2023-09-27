@@ -184,7 +184,7 @@ Push PXE boot and ignition configuration to bootstrap service
 
 ```bash
 tw terraform -chdir=bootstrap_client init
-tw terraform -chdir=bootstrap_client apply -var host_ip=$host_ip
+tw terraform -chdir=bootstrap_client apply
 ```
 
 Start all servers and allow them to PXE boot
@@ -214,9 +214,8 @@ tw terraform -chdir=client output -raw kubeconfig > $HOME/.kube/config
 SSH_KEY=$HOME/.ssh/id_ecdsa
 tw terraform -chdir=client output -raw ssh_user_cert_authorized_key > $SSH_KEY-cert.pub
 
-mkdir -p ~/.mc && \
-tw terraform -chdir=client \
-  output -json mc_config > ~/.mc/config.json
+mkdir -p $HOME/.mc
+tw terraform -chdir=client output -json mc_config > $HOME/.mc/config.json
 ```
 
 Check that `kubernetes` service is up

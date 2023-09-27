@@ -1,3 +1,12 @@
+output "manifest" {
+  value     = join("\n---\n", values(local.manifests))
+  sensitive = true
+}
+
+output "matchbox_endpoint" {
+  value = "http://${local.listen_ip}:${local.ports.matchbox}"
+}
+
 output "matchbox_ca" {
   value = {
     algorithm       = tls_private_key.matchbox-ca.algorithm

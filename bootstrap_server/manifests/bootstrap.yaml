@@ -50,7 +50,7 @@ spec:
     image: ${container_images.tftpd}
     args:
     - "--address"
-    - "0.0.0.0:${ports.pxe_tftp}"
+    - "0.0.0.0:${tftp_port}"
     - "--verbose"
     securityContext:
       capabilities:
@@ -61,8 +61,8 @@ spec:
   - name: matchbox
     image: ${container_images.matchbox}
     args:
-    - "-address=0.0.0.0:${ports.matchbox}"
-    - "-rpc-address=127.0.0.1:${ports.matchbox_api}"
+    - "-address=0.0.0.0:${matchbox_port}"
+    - "-rpc-address=127.0.0.1:${matchbox_api_port}"
     - "-ca-file=${config_path}/ca.crt"
     - "-cert-file=${config_path}/server.crt"
     - "-key-file=${config_path}/server.key"
