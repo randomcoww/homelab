@@ -4,13 +4,15 @@ locals {
   manifests = {
     for f in fileset(".", "${path.module}/manifests/*.yaml") :
     basename(f) => templatefile(f, {
-      container_images = local.container_images
-      ports            = local.ports
-      config_path      = "/etc/bootstrap"
-      assets_path      = abspath(var.assets_path)
-      ca               = chomp(tls_self_signed_cert.matchbox-ca.cert_pem)
-      cert             = chomp(tls_locally_signed_cert.matchbox.cert_pem)
-      key              = chomp(tls_private_key.matchbox.private_key_pem)
+      container_images  = local.container_images
+      matchbox_port     = local.ports.matchbox
+      matchbox_api_port = local.ports.matchbox_api
+      tftp_port         = local.ports.pxe_tftp
+      config_path       = "/etc/bootstrap"
+      assets_path       = abspath(var.assets_path)
+      ca                = chomp(tls_self_signed_cert.matchbox-ca.cert_pem)
+      cert              = chomp(tls_locally_signed_cert.matchbox.cert_pem)
+      key               = chomp(tls_private_key.matchbox.private_key_pem)
       kea_config = {
         Dhcp4 = {
           valid-lifetime = 300
@@ -50,11 +52,4 @@ locals {
       }
     })
   }
-}
-
-# Outputs
-
-output "manifest" {
-  value     = join("\n---\n", values(local.manifests))
-  sensitive = true
 }

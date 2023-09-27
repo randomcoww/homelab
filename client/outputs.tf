@@ -23,7 +23,7 @@ output "matchbox_client" {
 }
 
 output "kubeconfig" {
-  value = templatefile("./manifests/kubeconfig_admin.yaml", {
+  value = templatefile("${path.module}/manifests/kubeconfig_admin.yaml", {
     cluster_name       = local.kubernetes.cluster_name
     apiserver_endpoint = "https://${local.services.apiserver.ip}:${local.ports.apiserver_ha}"
     ca_cert_pem        = data.terraform_remote_state.sr.outputs.kubernetes_ca.cert_pem
