@@ -23,7 +23,7 @@ storage:
               image: ${container_images.etcd_wrapper}
               args:
               # etcd args
-              - --name=$(NODE_NAME)
+              - --name=${name}
               - --trusted-ca-file=${pki.ca_cert.path}
               - --peer-trusted-ca-file=${pki.peer_ca_cert.path}
               - --cert-file=${pki.cert.path}
@@ -85,7 +85,7 @@ storage:
     # certs #
     %{~ for cert in values(pki) ~}
     - path: ${cert.path}
-      mode: 0644
+      mode: 0600
       contents:
         inline: "${replace(cert.content, "\n", "\\n")}"
     %{~ endfor ~}

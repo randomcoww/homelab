@@ -13,7 +13,7 @@ resource "helm_release" "webdav" {
         rclone = local.container_images.rclone
       }
       replicaCount  = 2
-      minioEndPoint = "http://${local.kubernetes_service_endpoints.minio}:${local.ports.minio}"
+      minioEndPoint = "http://${local.kubernetes_service_endpoints.minio}:${local.service_ports.minio}"
       minioBucket   = local.minio_buckets.backup.name
       affinity = {
         podAntiAffinity = {
@@ -92,7 +92,7 @@ resource "helm_release" "mpd" {
           }
         },
       ]
-      minioEndPoint = "http://${local.kubernetes_service_endpoints.minio}:${local.ports.minio}"
+      minioEndPoint = "http://${local.kubernetes_service_endpoints.minio}:${local.service_ports.minio}"
       minioBucket   = local.minio_buckets.music.name
       persistence = {
         accessMode   = "ReadWriteOnce"
@@ -147,7 +147,7 @@ resource "helm_release" "transmission" {
         wireguard    = local.container_images.wireguard
       }
       ports = {
-        transmission = local.ports.transmission
+        transmission = local.service_ports.transmission
       }
       persistence = {
         accessMode   = "ReadWriteOnce"
@@ -156,7 +156,7 @@ resource "helm_release" "transmission" {
       }
       service = {
         type = "ClusterIP"
-        port = local.ports.transmission
+        port = local.service_ports.transmission
       }
       ingress = {
         enabled          = true
@@ -216,18 +216,18 @@ set -xe
 #  * TR_TORRENT_NAME
 cd "$TR_TORRENT_DIR"
 
-transmission-remote 127.0.0.1:${local.ports.transmission} \
+transmission-remote 127.0.0.1:${local.service_ports.transmission} \
   --torrent "$TR_TORRENT_ID" \
   --verify
 
 minio-client \
-  -endpoint="${local.kubernetes_service_endpoints.minio}:${local.ports.minio}" \
+  -endpoint="${local.kubernetes_service_endpoints.minio}:${local.service_ports.minio}" \
   -bucket="${local.minio_buckets.downloads.name}" \
-  -access-key-id="${random_password.minio-access-key-id.result}" \
-  -secret-access-key="${random_password.minio-secret-access-key.result}" \
+  -access-key-id="${data.terraform_remote_state.sr.outputs.minio.access_key_id}" \
+  -secret-access-key="${data.terraform_remote_state.sr.outputs.minio.secret_access_key}" \
   -path="$TR_TORRENT_NAME"
 
-transmission-remote 127.0.0.1:${local.ports.transmission} \
+transmission-remote 127.0.0.1:${local.service_ports.transmission} \
   --torrent "$TR_TORRENT_ID" \
   --remove-and-delete
 EOF

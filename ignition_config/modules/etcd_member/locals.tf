@@ -38,6 +38,7 @@ locals {
     templatefile(f, {
       container_images = var.container_images
       cluster_token    = var.cluster_token
+      name             = var.name
       pki_path         = local.pki_path
       pki              = local.pki
       initial_advertise_peer_urls = join(",", [

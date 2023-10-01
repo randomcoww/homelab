@@ -141,7 +141,7 @@ resource "helm_release" "matchbox" {
       syncthingConfig = module.matchbox-syncthing.config
       matchboxSecret = {
         ca   = chomp(data.terraform_remote_state.sr.outputs.matchbox_ca.cert_pem)
-        cert = chomp(tls_locally_signed_cert.matchbox.cert_pe)
+        cert = chomp(tls_locally_signed_cert.matchbox.cert_pem)
         key  = chomp(tls_private_key.matchbox.private_key_pem)
       }
       sharedDataPath = "/var/tmp/matchbox"

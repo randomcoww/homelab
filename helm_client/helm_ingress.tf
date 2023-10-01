@@ -57,7 +57,7 @@ resource "helm_release" "cloudflare-token" {
             name = "cloudflare-token"
           }
           stringData = {
-            token = cloudflare_api_token.dns_edit.value
+            token = data.terraform_remote_state.sr.outputs.cloudflare_dns_api_token
           }
           type = "Opaque"
         },
@@ -419,16 +419,12 @@ resource "helm_release" "authelia" {
               domain = local.kubernetes_ingress_endpoints.vaultwarden
               policy = "bypass"
             },
-            {
-              domain = local.kubernetes_ingress_endpoints.headscale
-              policy = "bypass"
-            },
           ]
         }
       }
       secret = {
         storageEncryptionKey = {
-          value = random_password.authelia-storage-secret.result
+          value = data.terraform_remote_state.sr.outputs.authelia.storage_secret
         }
         smtp = {
           value = var.smtp.password

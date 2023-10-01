@@ -55,7 +55,6 @@ storage:
           [Unit]
           Wants=gnome-session.target
           After=gnome-session.target
-          ConditionKernelCommandLine=coreos.live.rootfs_url
 
           [Service]
           Slice=session.slice

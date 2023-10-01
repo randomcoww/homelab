@@ -134,11 +134,12 @@ module "ignition-etcd" {
   source   = "./modules/etcd_member"
 
   cluster_token = local.kubernetes.cluster_name
+  name          = each.key
   ca            = data.terraform_remote_state.sr.outputs.etcd_ca
   peer_ca       = data.terraform_remote_state.sr.outputs.etcd_peer_ca
   cluster_members = {
     for host_key, host in local.members.etcd :
-    host.hostname => cidrhost(local.networks.etcd.prefix, host.netnum)
+    host_key => cidrhost(local.networks.etcd.prefix, host.netnum)
   }
   listen_ips = sort([
     cidrhost(local.networks.etcd.prefix, each.value.netnum)

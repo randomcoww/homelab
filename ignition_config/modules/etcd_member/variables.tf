@@ -2,6 +2,10 @@ variable "cluster_token" {
   type = string
 }
 
+variable "name" {
+  type = string
+}
+
 variable "ca" {
   type = object({
     algorithm       = string

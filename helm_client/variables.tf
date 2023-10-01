@@ -1,4 +1,3 @@
-# User override (local.preprocess.users)
 variable "users" {
   type    = any
   default = {}
@@ -7,13 +6,6 @@ variable "users" {
 variable "letsencrypt" {
   type = object({
     email = string
-  })
-}
-
-variable "cloudflare" {
-  type = object({
-    api_token  = string
-    account_id = string
   })
 }
 

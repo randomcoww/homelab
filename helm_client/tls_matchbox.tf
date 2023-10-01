@@ -16,7 +16,7 @@ resource "tls_cert_request" "matchbox" {
 
   ip_addresses = [
     "127.0.0.1",
-    var.api_listen_ip
+    local.services.matchbox.ip,
   ]
 }
 

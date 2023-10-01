@@ -9,7 +9,6 @@ systemd:
       enabled: true
       contents: |
         [Unit]
-        ConditionKernelCommandLine=coreos.live.rootfs_url
         Wants=crio.service
         After=crio.service
         Wants=local-fs.target
@@ -18,21 +17,20 @@ systemd:
         After=network-online.target
 
         [Service]
-        Environment=KUBELET_COMMON_ARGS="--exit-on-lock-contention \
-          --lock-file=/var/run/lock/kubelet.lock \
-          --container-runtime-endpoint=unix:///run/crio/crio.sock \
-          --node-ip=${node_ip} \
-          --v=2"
         ExecStartPre=/usr/bin/mkdir -p \
           ${kubelet_root_path}
-        ExecStart=
         ExecStart=/usr/bin/kubelet \
-          $KUBELET_COMMON_ARGS \
           --root-dir=${kubelet_root_path} \
           --bootstrap-kubeconfig=${config_path}/bootstrap.kubeconfig \
           --cert-dir=${pki_path} \
           --config=${config_path}/kubelet-config-bootstrap-worker.yaml \
           --kubeconfig=${config_path}/kubelet.kubeconfig \
+          --exit-on-lock-contention \
+          --lock-file=/var/run/lock/kubelet.lock \
+          --container-runtime-endpoint=unix:///run/crio/crio.sock \
+          --node-ip=${node_ip} \
+          --lock-file=/var/run/lock/kubelet-worker.lock \
+          --v=2 \
           --node-labels=${join(",", [
             for node_label, value in node_labels :
             "${node_label}=${value}"
@@ -156,7 +154,7 @@ storage:
     # pki #
     %{~ for cert in values(pki) ~}
     - path: ${cert.path}
-      mode: 0644
+      mode: 0600
       contents:
         inline: "${replace(cert.content, "\n", "\\n")}"
     %{~ endfor ~}
