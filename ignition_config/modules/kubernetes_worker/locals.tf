@@ -27,6 +27,7 @@ locals {
       node_labels               = var.node_labels
       node_taints               = var.node_taints
       apiserver_endpoint        = var.apiserver_endpoint
+      node_ip                   = var.node_ip
       cluster_dns_ip            = var.cluster_dns_ip
       cluster_domain            = var.cluster_domain
       kubelet_port              = var.kubelet_port

@@ -5,29 +5,44 @@ systemd:
   units:
     - name: crio.service
       enabled: true
-    - name: kubelet.service
+    - name: kubelet-worker.service
       enabled: true
-      dropins:
-        - name: 20-bootstrap-worker.conf
-          contents: |
-            [Unit]
-            ConditionKernelCommandLine=coreos.live.rootfs_url
+      contents: |
+        [Unit]
+        ConditionKernelCommandLine=coreos.live.rootfs_url
+        Wants=crio.service
+        After=crio.service
+        Wants=local-fs.target
+        After=local-fs.target
+        Wants=network-online.target
+        After=network-online.target
 
-            [Service]
-            ExecStartPre=/usr/bin/mkdir -p \
-              ${kubelet_root_path}
-            ExecStart=
-            ExecStart=/usr/bin/kubelet \
-              $KUBELET_COMMON_ARGS \
-              --root-dir=${kubelet_root_path} \
-              --bootstrap-kubeconfig=${config_path}/bootstrap.kubeconfig \
-              --cert-dir=${pki_path} \
-              --config=${config_path}/kubelet-config-bootstrap-worker.yaml \
-              --kubeconfig=${config_path}/kubelet.kubeconfig \
-              --node-labels=${join(",", [
-                for node_label, value in node_labels :
-                "${node_label}=${value}"
-              ])}
+        [Service]
+        Environment=KUBELET_COMMON_ARGS="--exit-on-lock-contention \
+          --lock-file=/var/run/lock/kubelet.lock \
+          --container-runtime-endpoint=unix:///run/crio/crio.sock \
+          --node-ip=${node_ip} \
+          --v=2"
+        ExecStartPre=/usr/bin/mkdir -p \
+          ${kubelet_root_path}
+        ExecStart=
+        ExecStart=/usr/bin/kubelet \
+          $KUBELET_COMMON_ARGS \
+          --root-dir=${kubelet_root_path} \
+          --bootstrap-kubeconfig=${config_path}/bootstrap.kubeconfig \
+          --cert-dir=${pki_path} \
+          --config=${config_path}/kubelet-config-bootstrap-worker.yaml \
+          --kubeconfig=${config_path}/kubelet.kubeconfig \
+          --node-labels=${join(",", [
+            for node_label, value in node_labels :
+            "${node_label}=${value}"
+          ])}
+        Restart=always
+        StartLimitInterval=0
+        RestartSec=10
+
+        [Install]
+        WantedBy=multi-user.target
 
 storage:
   files:
@@ -75,7 +90,6 @@ storage:
             mode: Webhook
           address: 0.0.0.0
           port: ${kubelet_port}
-          staticPodPath: ${static_pod_manifest_path}
           clusterDomain: ${cluster_domain}
           clusterDNS:
           - ${cluster_dns_ip}
