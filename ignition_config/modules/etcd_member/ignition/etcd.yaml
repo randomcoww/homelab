@@ -22,29 +22,33 @@ storage:
             - name: etcd-wrapper
               image: ${container_images.etcd_wrapper}
               args:
+              # etcd args
               - --name=$(NODE_NAME)
-              - --host-cert-file=${pki.cert.path}
-              - --host-key-file=${pki.key.path}
-              - --host-trusted-ca-file=${pki.ca_cert.path}
-              - --host-peer-cert-file=${pki.peer_cert.path}
-              - --host-peer-key-file=${pki.peer_key.path}
-              - --host-peer-trusted-ca-file=${pki.peer_ca_cert.path}
+              - --trusted-ca-file=${pki.ca_cert.path}
+              - --peer-trusted-ca-file=${pki.peer_ca_cert.path}
+              - --cert-file=${pki.cert.path}
+              - --key-file=${pki.key.path}
+              - --peer-cert-file=${pki.peer_cert.path}
+              - --peer-key-file=${pki.peer_key.path}
               - --initial-advertise-peer-urls=${initial_advertise_peer_urls}
               - --listen-peer-urls=${listen_peer_urls}
               - --advertise-client-urls=${advertise_client_urls}
               - --listen-client-urls=${listen_client_urls}
               - --initial-cluster-token=${cluster_token}
               - --initial-cluster=${initial_cluster}
-              - --host-backup-file=${etcd_snapshot_path}
-              - --host-etcd-manifest-file=${static_pod_manifest_path}/${etcd_pod_manifest_file}
+              # pod manifest args
               - --etcd-image=${container_images.etcd}
+              - --etcd-snaphot-file=${etcd_snapshot_file}
+              - --etcd-pod-name=etcd
+              - --etcd-pod-manifest-file=${etcd_pod_manifest_file}
+              # etcd-wrapper args
               - --client-cert-file=${pki.client_cert.path}
               - --client-key-file=${pki.client_key.path}
               - --initial-cluster-clients=${initial_cluster_clients}
-              - --s3-backup-path=${backup_resource.resource}
-              - --backup-interval=30m
-              - --healthcheck-interval=10s
-              - --pod-update-wait=60s
+              - --s3-backup-resource=${backup_resource.resource}
+              - --healthcheck-interval=${healthcheck_interval}
+              - --healthcheck-fail-count-allowed=${healthcheck_fail_count_allowed}
+              - --backup-interval=${backup_interval}
               env:
               - name: NODE_NAME
                 valueFrom:
@@ -63,19 +67,20 @@ storage:
                 mountPath: ${pki_path}
                 readOnly: true
               - name: backup-volume
-                mountPath: ${dirname(etcd_snapshot_path)}
+                mountPath: ${dirname(etcd_snapshot_file)}
               - name: manifest-volume
-                mountPath: ${static_pod_manifest_path}
+                mountPath: ${dirname(etcd_pod_manifest_file)}
             volumes:
             - name: certs-volume
               hostPath:
                 path: ${pki_path}
             - name: backup-volume
               hostPath:
-                path: ${dirname(etcd_snapshot_path)}
+                path: ${dirname(etcd_snapshot_file)}
+                DirectoryOrCreate: true
             - name: manifest-volume
               hostPath:
-                path: ${static_pod_manifest_path}
+                path: ${dirname(etcd_pod_manifest_file)}
 
     # certs #
     %{~ for cert in values(pki) ~}

@@ -9,11 +9,11 @@ tw() {
   set -x
   podman run -it --rm --security-opt label=disable \
     --entrypoint='' \
-    -v $(pwd):/tf \
+    -v $(pwd):$(pwd) \
     -v $HOME/.aws:/root/.aws \
     -v $HOME/.kube:/root/.kube \
     -e KUBE_CONFIG_PATH=/root/.kube/config \
-    -w /tf \
+    -w $(pwd) \
     --net=host \
     docker.io/hashicorp/terraform:latest "$@"
   rc=$?; set +x; return $rc

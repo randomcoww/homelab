@@ -40,8 +40,6 @@ locals {
       cluster_token    = var.cluster_token
       pki_path         = local.pki_path
       pki              = local.pki
-      backup_resource  = var.s3_backup_resource
-
       initial_advertise_peer_urls = join(",", [
         for _, ip in var.listen_ips :
         "https://${ip}:${var.peer_port}"
@@ -62,15 +60,19 @@ locals {
         for hostname, ip in var.cluster_members :
         "${hostname}=https://${ip}:${var.peer_port}"
       ])
-      # for etcd-wrapper client
+
+      # etcd-wrapper client params
       initial_cluster_clients = join(",", [
         for hostname, ip in var.cluster_members :
         "${hostname}=https://${ip}:${var.client_port}"
       ])
-
-      etcd_pod_manifest_file   = "etcd.json"
-      etcd_snapshot_path       = "/var/lib/etcd/snapshot/etcd.db"
-      static_pod_manifest_path = var.static_pod_manifest_path
+      healthcheck_interval           = "6s"
+      healthcheck_fail_count_allowed = 16
+      backup_resource                = var.s3_backup_resource
+      backup_interval                = "15m"
+      etcd_snapshot_file             = "/var/lib/etcd/snapshot/etcd.db"
+      etcd_pod_manifest_file         = "${var.static_pod_manifest_path}/etcd.json"
+      static_pod_manifest_path       = var.static_pod_manifest_path
     })
   ]
 }
