@@ -198,7 +198,6 @@ module "ignition-kubernetes-worker" {
 
   cluster_name              = local.kubernetes.cluster_name
   ca                        = data.terraform_remote_state.sr.outputs.kubernetes_ca
-  node_ip                   = cidrhost(local.networks.kubernetes.prefix, each.value.netnum)
   node_labels               = lookup(each.value, "kubernetes_worker_labels", {})
   node_taints               = lookup(each.value, "kubernetes_worker_taints", [])
   container_storage_path    = "${local.mounts.containers_path}/storage"

@@ -34,10 +34,6 @@ variable "apiserver_endpoint" {
   type = string
 }
 
-variable "node_ip" {
-  type = string
-}
-
 variable "cluster_dns_ip" {
   type = string
 }

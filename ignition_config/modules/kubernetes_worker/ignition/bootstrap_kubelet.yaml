@@ -5,42 +5,26 @@ systemd:
   units:
     - name: crio.service
       enabled: true
-    - name: kubelet-worker.service
+    - name: kubelet.service
       enabled: true
-      contents: |
-        [Unit]
-        Wants=crio.service
-        After=crio.service
-        Wants=local-fs.target
-        After=local-fs.target
-        Wants=network-online.target
-        After=network-online.target
-
-        [Service]
-        ExecStartPre=/usr/bin/mkdir -p \
-          ${kubelet_root_path}
-        ExecStart=/usr/bin/kubelet \
-          --root-dir=${kubelet_root_path} \
-          --bootstrap-kubeconfig=${config_path}/bootstrap.kubeconfig \
-          --cert-dir=${pki_path} \
-          --config=${config_path}/kubelet-config-bootstrap-worker.yaml \
-          --kubeconfig=${config_path}/kubelet.kubeconfig \
-          --exit-on-lock-contention \
-          --lock-file=/var/run/lock/kubelet.lock \
-          --container-runtime-endpoint=unix:///run/crio/crio.sock \
-          --node-ip=${node_ip} \
-          --lock-file=/var/run/lock/kubelet-worker.lock \
-          --v=2 \
-          --node-labels=${join(",", [
-            for node_label, value in node_labels :
-            "${node_label}=${value}"
-          ])}
-        Restart=always
-        StartLimitInterval=0
-        RestartSec=10
-
-        [Install]
-        WantedBy=multi-user.target
+      dropins:
+        - name: 20-bootstrap-worker.conf
+          contents: |
+            [Service]
+            ExecStartPre=/usr/bin/mkdir -p \
+              ${kubelet_root_path}
+            ExecStart=
+            ExecStart=/usr/bin/kubelet \
+              $KUBELET_COMMON_ARGS \
+              --root-dir=${kubelet_root_path} \
+              --bootstrap-kubeconfig=${config_path}/bootstrap.kubeconfig \
+              --cert-dir=${pki_path} \
+              --config=${config_path}/kubelet-config-bootstrap-worker.yaml \
+              --kubeconfig=${config_path}/kubelet.kubeconfig \
+              --node-labels=${join(",", [
+                for node_label, value in node_labels :
+                "${node_label}=${value}"
+              ])}
 
 storage:
   files:
@@ -86,6 +70,7 @@ storage:
               clientCAFile: ${pki.ca_cert.path}
           authorization:
             mode: Webhook
+          staticPodPath: ${static_pod_manifest_path}
           address: 0.0.0.0
           port: ${kubelet_port}
           clusterDomain: ${cluster_domain}

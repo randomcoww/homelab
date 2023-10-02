@@ -23,16 +23,17 @@ systemd:
             After=local-fs.target
 
             [Service]
+            Environment=KUBELET_COMMON_ARGS="--exit-on-lock-contention \
+              --lock-file=/var/run/lock/kubelet.lock \
+              --container-runtime-endpoint=unix:///run/crio/crio.sock \
+              --node-ip=${node_ip} \
+              --v=2"
             ExecStartPre=/usr/bin/mkdir -p \
               ${static_pod_manifest_path}
             ExecStart=
             ExecStart=/usr/bin/kubelet \
-              --config=${config_path}/kubelet-config.yaml \
-              --exit-on-lock-contention \
-              --lock-file=/var/run/lock/kubelet.lock \
-              --container-runtime-endpoint=unix:///run/crio/crio.sock \
-              --node-ip=${node_ip} \
-              --v=2
+              $KUBELET_COMMON_ARGS \
+              --config=${config_path}/kubelet-config.yaml
 
 storage:
   files:
