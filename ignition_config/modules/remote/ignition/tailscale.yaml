@@ -8,6 +8,10 @@ systemd:
       dropins:
         - name: 10-state-path.conf
           contents: |
+            [Unit]
+            Wants=local-fs.target
+            After=local-fs.target
+
             [Service]
             ExecStartPre=/usr/bin/mkdir -p ${persistent_path}/tailscale/
             ExecStart=
