@@ -3,6 +3,7 @@ locals {
     gw-0 = {
       users = [
         "admin",
+        "client",
       ]
       netnum = 1
       hardware_interfaces = {
@@ -59,6 +60,7 @@ locals {
     gw-1 = {
       users = [
         "admin",
+        "client",
       ]
       netnum = 3
       hardware_interfaces = {
@@ -115,6 +117,7 @@ locals {
     q-0 = {
       users = [
         "admin",
+        "client",
       ]
       netnum = 5
       hardware_interfaces = {
