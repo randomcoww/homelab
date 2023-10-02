@@ -19,6 +19,7 @@ resource "aws_iam_user_policy" "s3" {
         Effect = "Allow"
         Action = "*"
         Resource = [
+          "arn:aws:s3:::${each.value.bucket}",
           "arn:aws:s3:::${each.value.resource}",
           "arn:aws:s3:::${each.value.resource}/*",
         ]
