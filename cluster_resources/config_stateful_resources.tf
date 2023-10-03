@@ -18,7 +18,7 @@ locals {
         path   = "litestream"
       }
       documents = {
-        bucket = "randomcoww-documents-2"
+        bucket = "randomcoww-backup-2"
         path   = "documents"
       }
     } :

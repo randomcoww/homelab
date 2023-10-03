@@ -1,6 +1,9 @@
-resource "aws_s3_bucket" "s3" {
-  for_each = local.s3_resources
-  bucket   = each.value.bucket
+resource "aws_s3_bucket" "bucket" {
+  for_each = {
+    for _, res in local.s3_resources :
+    res.bucket => true
+  }
+  bucket = each.key
 }
 
 resource "aws_iam_user" "s3" {
