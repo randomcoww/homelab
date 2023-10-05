@@ -314,7 +314,7 @@ locals {
     base              = ["gw-0", "gw-1", "q-0", "de-0", "de-1", "v-0"]
     systemd-networkd  = ["gw-0", "gw-1", "q-0", "de-1", "v-0"]
     network-manager   = ["de-0"]
-    kubelet-base      = ["gw-0", "gw-1", "q-0", "de-1"]
+    kubelet-base      = ["gw-0", "gw-1", "q-0", "de-0", "de-1"]
     gateway           = ["gw-0", "gw-1", "q-0"]
     vrrp              = ["gw-0", "gw-1"]
     disks             = ["gw-0", "gw-1", "q-0", "de-1", "v-0"]

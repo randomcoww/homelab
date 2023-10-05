@@ -41,7 +41,7 @@ module "ignition-kubelet-base" {
   for_each = local.members.kubelet-base
   source   = "./modules/kubelet_base"
 
-  node_ip                  = cidrhost(local.networks.kubernetes.prefix, each.value.netnum)
+  node_ip                  = try(cidrhost(local.networks.kubernetes.prefix, each.value.netnum), "")
   static_pod_manifest_path = local.kubernetes.static_pod_manifest_path
 }
 
