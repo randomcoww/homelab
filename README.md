@@ -15,7 +15,7 @@ tw() {
     -e KUBE_CONFIG_PATH=/root/.kube/config \
     -w $(pwd) \
     --net=host \
-    docker.io/hashicorp/terraform:latest "$@"
+    docker.io/hashicorp/terraform:1.4.7 "$@"
   rc=$?; set +x; return $rc
 }
 ```
