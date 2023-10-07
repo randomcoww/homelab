@@ -171,22 +171,6 @@ locals {
       }
     }
 
-    # laptop
-    de-0 = {
-      users = [
-        "client",
-      ]
-      # same as disk but a hack to use an existing lvm on chromeos
-      # ignition doesn't support provisioning lvm device so so systemd mount only
-      mounts = [
-        {
-          device     = "/dev/disk/by-label/home"
-          mount_path = local.mounts.home_path
-          format     = "xfs"
-        },
-      ]
-    }
-
     # desktop
     de-1 = {
       netnum = 9
@@ -271,6 +255,38 @@ locals {
       ]
     }
 
+    # chromebook
+    de-0 = {
+      users = [
+        "client",
+      ]
+      # same as disk but a hack to use an existing lvm on chromeos
+      # ignition doesn't support provisioning lvm device so so systemd mount only
+      mounts = [
+        {
+          device     = "/dev/disk/by-label/home"
+          mount_path = local.mounts.home_path
+          format     = "xfs"
+        },
+      ]
+    }
+
+    # backup laptop
+    de-2 = {
+      users = [
+        "client",
+      ]
+      # same as disk but a hack to use an existing lvm on chromeos
+      # ignition doesn't support provisioning lvm device so so systemd mount only
+      mounts = [
+        {
+          device     = "/dev/disk/by-label/home"
+          mount_path = local.mounts.home_path
+          format     = "xfs"
+        },
+      ]
+    }
+
     v-0 = {
       netnum = 10
       users = [
@@ -311,23 +327,23 @@ locals {
   }
 
   base_members = {
-    base              = ["gw-0", "gw-1", "q-0", "de-0", "de-1", "v-0"]
+    base              = ["gw-0", "gw-1", "q-0", "de-0", "de-2", "de-1", "v-0"]
     systemd-networkd  = ["gw-0", "gw-1", "q-0", "de-1", "v-0"]
-    network-manager   = ["de-0"]
+    network-manager   = ["de-0", "de-2"]
     gateway           = ["gw-0", "gw-1", "q-0"]
     vrrp              = ["gw-0", "gw-1"]
     disks             = ["gw-0", "gw-1", "q-0", "de-1", "v-0"]
-    mounts            = ["de-0"]
+    mounts            = ["de-0", "de-2"]
     ssh-server        = ["gw-0", "gw-1", "q-0", "de-1", "v-0"]
-    ssh-client        = ["de-0", "de-1", "v-0"]
+    ssh-client        = ["de-0", "de-2", "de-1", "v-0"]
     etcd              = ["gw-0", "gw-1", "q-0"]
-    kubelet-base      = ["gw-0", "gw-1", "q-0", "de-0", "de-1"]
+    kubelet-base      = ["gw-0", "gw-1", "q-0", "de-0", "de-2", "de-1"]
     kubernetes-master = ["gw-0", "gw-1"]
     kubernetes-worker = ["gw-0", "gw-1", "q-0", "de-1"]
     nvidia-container  = ["de-1"]
-    desktop           = ["de-0", "de-1", "v-0"]
+    desktop           = ["de-0", "de-2", "de-1", "v-0"]
     sunshine          = ["de-1", "v-0"]
-    remote            = ["de-0"]
+    remote            = ["de-0", "de-2"]
     chromebook-hacks  = ["de-0"]
   }
 
