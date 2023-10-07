@@ -41,8 +41,3 @@ variable "cluster_dns_ip" {
 variable "kubelet_port" {
   type = number
 }
-
-variable "container_storage_path" {
-  type    = string
-  default = "/var/lib/containers/storage"
-}

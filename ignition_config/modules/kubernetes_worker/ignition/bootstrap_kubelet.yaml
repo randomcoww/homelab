@@ -34,23 +34,6 @@ storage:
       contents:
         inline: |
           SUBSYSTEM=="net", ACTION=="add", KERNEL=="${cni_bridge_interface_name}", ATTR{bridge/nf_call_iptables}="1"
-    - path: /etc/crio/crio.conf.d/20-storage.conf
-      mode: 0644
-      overwrite: true
-      contents:
-        inline: |
-          [crio]
-          root="${container_storage_path}"
-
-          [crio.image]
-          big_files_temporary_dir="${container_storage_path}"
-    - path: /etc/containers/storage.conf.d/10-root.conf
-      mode: 0644
-      overwrite: true
-      contents:
-        inline: |
-          [storage]
-          graphroot="${container_storage_path}"
 
     - path: ${config_path}/kubelet-config-bootstrap-worker.yaml
       mode: 0644

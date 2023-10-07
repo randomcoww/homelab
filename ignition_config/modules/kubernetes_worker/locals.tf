@@ -33,7 +33,6 @@ locals {
       cni_bridge_interface_name = var.cni_bridge_interface_name
 
       static_pod_manifest_path = var.static_pod_manifest_path
-      container_storage_path   = var.container_storage_path
       kubelet_root_path        = "/var/lib/kubelet"
       config_path              = "/var/lib/kubelet/config"
     })

@@ -43,6 +43,7 @@ module "ignition-kubelet-base" {
 
   node_ip                  = try(cidrhost(local.networks.kubernetes.prefix, each.value.netnum), "")
   static_pod_manifest_path = local.kubernetes.static_pod_manifest_path
+  container_storage_path   = "${local.mounts.containers_path}/storage"
 }
 
 module "ignition-gateway" {
@@ -200,7 +201,6 @@ module "ignition-kubernetes-worker" {
   ca                        = data.terraform_remote_state.sr.outputs.kubernetes_ca
   node_labels               = lookup(each.value, "kubernetes_worker_labels", {})
   node_taints               = lookup(each.value, "kubernetes_worker_taints", [])
-  container_storage_path    = "${local.mounts.containers_path}/storage"
   cni_bridge_interface_name = local.kubernetes.cni_bridge_interface_name
   apiserver_endpoint        = "https://${local.services.apiserver.ip}:${local.ports.apiserver_ha}"
   cluster_dns_ip            = local.services.cluster_dns.ip
