@@ -232,8 +232,8 @@ module "ignition-remote" {
   for_each = local.members.remote
   source   = "./modules/remote"
 
-  wlan_interface  = "wlan0"
-  persistent_path = local.mounts.home_path
+  wlan_interface       = "wlan0"
+  tailscale_ssm_access = data.terraform_remote_state.sr.outputs.ssm.tailscale
 }
 
 # chromebook hacks #

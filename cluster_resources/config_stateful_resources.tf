@@ -27,6 +27,12 @@ locals {
     })
   }
 
+  ssm_resources = {
+    tailscale = {
+      resource = "tailscale-secret"
+    }
+  }
+
   cloudflare_tunnels = {
     # type = map(object({
     #   zone              = string

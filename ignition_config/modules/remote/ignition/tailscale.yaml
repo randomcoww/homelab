@@ -1,6 +1,16 @@
 ---
 variant: fcos
 version: 1.5.0
+storage:
+  files:
+    - path: /var/lib/tailscale/aws_credentials
+      mode: 0600
+      contents:
+        inline: |
+          AWS_ACCESS_KEY_ID=${tailscale_ssm_access.access_key_id}
+          AWS_SECRET_ACCESS_KEY=${tailscale_ssm_access.secret_access_key}
+          AWS_REGION=${tailscale_ssm_access.aws_region}
+
 systemd:
   units:
     - name: tailscaled.service
@@ -8,14 +18,10 @@ systemd:
       dropins:
         - name: 10-state-path.conf
           contents: |
-            [Unit]
-            Wants=local-fs.target
-            After=local-fs.target
-
             [Service]
-            ExecStartPre=/usr/bin/mkdir -p ${persistent_path}/tailscale/
+            EnvironmentFile=/var/lib/tailscale/aws_credentials
             ExecStart=
             ExecStart=/usr/sbin/tailscaled \
-              --state=${persistent_path}/tailscale/tailscaled.state \
+              --state=arn:aws:ssm:${tailscale_ssm_access.aws_region}::parameter/${tailscale_ssm_access.resource}/%H \
               --socket=/run/tailscale/tailscaled.sock \
               --port=$${PORT} $FLAGS
