@@ -27,7 +27,7 @@ resource "cloudflare_ruleset" "geo_filter" {
 
   rules {
     action     = "block"
-    expression = "(ip.geoip.country ne \"${each.value.country_code}\")"
+    expression = "(not ip.geoip.country in {\"${join("\" \"", each.value.country_whitelist)}\"})"
     enabled    = true
   }
 }
@@ -48,7 +48,6 @@ resource "cloudflare_tunnel_config" "tunnel" {
   for_each   = local.cloudflare_tunnels
   account_id = var.cloudflare_account_id
   tunnel_id  = cloudflare_tunnel.tunnel[each.key].id
-
   config {
     ingress_rule {
       hostname = "*.${each.value.zone}"

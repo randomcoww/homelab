@@ -29,10 +29,18 @@ locals {
 
   cloudflare_tunnels = {
     # type = map(object({
-    #   zone         = string
-    #   path         = string
-    #   country_code = string
-    #   service      = string
+    #   zone              = string
+    #   path              = string
+    #   country_whitelist = list(string)
+    #   service           = string
     # }))
+    external = {
+      zone = local.domains.internal
+      path = "/"
+      country_whitelist = [
+        "US", "JP",
+      ]
+      service = "tcp://${local.kubernetes_service_endpoints.ingress_nginx_external}:443"
+    }
   }
 }
