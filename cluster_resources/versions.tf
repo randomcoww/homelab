@@ -10,5 +10,8 @@ terraform {
     cloudflare = {
       source = "cloudflare/cloudflare"
     }
+    tailscale = {
+      source = "tailscale/tailscale"
+    }
   }
 }

@@ -9,6 +9,11 @@ affinity: {}
 tolerations: {}
 
 authKey: ""
-kubeSecret: ""
 # additionalParameters:
 #   TS_ACCEPT_DNS: true
+
+ssm:
+  resource: "tailscale-secret"
+  awsRegion: "us-west-2"
+  accessKeyID: ""
+  secretAccessKey: ""

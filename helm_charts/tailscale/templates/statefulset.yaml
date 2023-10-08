@@ -38,16 +38,38 @@ spec:
         securityContext:
           privileged: true
         env:
+        - name: POD_NAME
+          valueFrom:
+            fieldRef:
+              fieldPath: metadata.name
         {{- range $k, $v := .Values.additionalParameters }}
         - name: {{ $k }}
           value: {{ join "," $v | quote }}
         {{- end }}
+        - name: TS_STATE_DIR
+          value: "/varlib/tailscale"
+        - name: KUBERNETES_SERVICE_HOST
+          value: ""
+        - name: TS_KUBE_SECRET
+          value: ""
         - name: TS_USERSPACE
           value: "false"
-        - name: TS_KUBE_SECRET
-          value: {{ .Values.kubeSecret }}
+        - name: TS_TAILSCALED_EXTRA_ARGS
+          value: "--state=arn:aws:ssm:{{ .Values.ssm.awsRegion }}::parameter/{{ .Values.ssm.resource }}/$(POD_NAME)"
         - name: TS_AUTH_KEY
           valueFrom:
             secretKeyRef:
               name: {{ template "tailscale.fullname" . }}
               key: TS_AUTHKEY
+        - name : AWS_REGION
+          value: "{{ .Values.ssm.awsRegion }}"
+        - name: AWS_ACCESS_KEY_ID
+          valueFrom:
+            secretKeyRef:
+              name: {{ template "tailscale.fullname" . }}
+              key: AWS_ACCESS_KEY_ID
+        - name: AWS_SECRET_ACCESS_KEY
+          valueFrom:
+            secretKeyRef:
+              name: {{ template "tailscale.fullname" . }}
+              key: AWS_SECRET_ACCESS_KEY

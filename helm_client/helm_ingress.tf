@@ -446,7 +446,7 @@ resource "helm_release" "authelia" {
 }
 
 # tailscale #
-
+/*
 resource "helm_release" "tailscale" {
   name             = "tailscale"
   namespace        = "tailscale"
@@ -462,6 +462,45 @@ resource "helm_release" "tailscale" {
       }
       authKey    = var.tailscale.auth_key
       kubeSecret = "tailscale-state"
+      additionalParameters = {
+        TS_ACCEPT_DNS = false
+        TS_EXTRA_ARGS = [
+          "--advertise-exit-node",
+        ]
+        TS_ROUTES = [
+          local.networks.lan.prefix,
+          local.networks.service.prefix,
+          local.networks.kubernetes.prefix,
+          local.networks.kubernetes_service.prefix,
+          local.networks.kubernetes_pod.prefix,
+        ]
+      }
+    }),
+  ]
+}
+*/
+
+# tailscale with ssm secret #
+resource "helm_release" "tailscale-ssm" {
+  name             = "tailscale-ssm"
+  namespace        = "tailscale"
+  repository       = "https://randomcoww.github.io/repos/helm/"
+  chart            = "tailscale"
+  create_namespace = true
+  wait             = false
+  version          = "0.1.8"
+  values = [
+    yamlencode({
+      images = {
+        tailscale = local.container_images.tailscale
+      }
+      authKey = var.tailscale.auth_key
+      ssm = {
+        awsRegion       = data.terraform_remote_state.sr.outputs.ssm.tailscale.aws_region
+        accessKeyID     = data.terraform_remote_state.sr.outputs.ssm.tailscale.access_key_id
+        secretAccessKey = data.terraform_remote_state.sr.outputs.ssm.tailscale.secret_access_key
+        resource        = data.terraform_remote_state.sr.outputs.ssm.tailscale.resource
+      }
       additionalParameters = {
         TS_ACCEPT_DNS = false
         TS_EXTRA_ARGS = [
