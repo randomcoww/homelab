@@ -45,7 +45,7 @@ storage:
               - --client-cert-file=${pki.client_cert.path}
               - --client-key-file=${pki.client_key.path}
               - --initial-cluster-clients=${initial_cluster_clients}
-              - --s3-backup-resource=${backup_resource.resource}
+              - --s3-backup-resource=${s3_resource}
               - --healthcheck-interval=${healthcheck_interval}
               - --healthcheck-fail-count-allowed=${healthcheck_fail_count_allowed}
               - --backup-interval=${backup_interval}
@@ -55,11 +55,9 @@ storage:
                   fieldRef:
                     fieldPath: spec.nodeName
               - name: AWS_ACCESS_KEY_ID
-                value: "${backup_resource.access_key_id}"
+                value: "${access_key_id}"
               - name: AWS_SECRET_ACCESS_KEY
-                value: "${backup_resource.secret_access_key}"
-              - name: AWS_DEFAULT_REGION
-                value: "${backup_resource.aws_region}"
+                value: "${secret_access_key}"
               - name: AWS_SDK_LOAD_CONFIG
                 value: "1"
               volumeMounts:
