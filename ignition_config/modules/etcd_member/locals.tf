@@ -71,11 +71,11 @@ locals {
       healthcheck_fail_count_allowed = 16
       etcd_pod_manifest_file         = "${var.static_pod_manifest_path}/etcd.json"
       static_pod_manifest_path       = var.static_pod_manifest_path
-      access_key_id                  = var.s3_backup_resource.access_key_id
-      secret_access_key              = var.s3_backup_resource.secret_access_key
-      s3_resource                    = "${var.s3_backup_resource.resource}/etcd.db"
-      backup_interval                = "15m"
-      etcd_snapshot_file             = "/var/lib/etcd/snapshot/etcd.db"
+      backup_resource = merge(var.s3_backup_resource, {
+        resource = "${var.s3_backup_resource.resource}/etcd.db"
+        interval = "15m"
+      })
+      etcd_snapshot_file = "/var/lib/etcd/snapshot/etcd.db"
     })
   ]
 }
