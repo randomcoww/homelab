@@ -114,7 +114,7 @@ locals {
     kube_apiserver          = "ghcr.io/randomcoww/kubernetes:kube-master-v1.27.1"
     kube_controller_manager = "ghcr.io/randomcoww/kubernetes:kube-master-v1.27.1"
     kube_scheduler          = "ghcr.io/randomcoww/kubernetes:kube-master-v1.27.1"
-    etcd_wrapper            = "ghcr.io/randomcoww/etcd-wrapper:20231009"
+    etcd_wrapper            = "ghcr.io/randomcoww/etcd-wrapper:20231010"
     etcd                    = "gcr.io/etcd-development/etcd:v3.5.8-amd64"
 
     # Helm
@@ -140,7 +140,6 @@ locals {
     tailscale          = "ghcr.io/randomcoww/tailscale:1.44.0"
     fuse_device_plugin = "soolaugust/fuse-device-plugin:v1.0"
     code_server        = "ghcr.io/randomcoww/code-server:20230902.1-tensorflow"
-    kasm_desktop       = "ghcr.io/randomcoww/kasm-desktop:20230822.4"
   }
 
   kubernetes = {
@@ -165,7 +164,6 @@ locals {
     webdav       = "w.${local.domains.internal}"
     matchbox     = "ign.${local.domains.internal}"
     code         = "code.${local.domains.internal}"
-    kasm_desktop = "k.${local.domains.internal}"
   }
 
   ingress_classes = {
@@ -203,7 +201,6 @@ locals {
     transmission = 9091
     vaultwarden  = 8080
     code         = 8080
-    kasm_desktop = 6901
   }
 
   minio_buckets = {
