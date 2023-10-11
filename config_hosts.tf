@@ -334,7 +334,7 @@ locals {
     vrrp              = ["gw-0", "gw-1"]
     disks             = ["gw-0", "gw-1", "q-0", "de-1", "v-0"]
     mounts            = ["de-0", "de-2"]
-    ssh-server        = ["gw-0", "gw-1", "q-0", "de-1", "v-0"]
+    ssh-server        = ["gw-0", "gw-1", "q-0", "de-2", "de-1", "v-0"]
     ssh-client        = ["de-0", "de-2", "de-1", "v-0"]
     etcd              = ["gw-0", "gw-1", "q-0"]
     kubelet-base      = ["gw-0", "gw-1", "q-0", "de-0", "de-2", "de-1"]

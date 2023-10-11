@@ -26,6 +26,22 @@ storage:
           HostKey ${pki.server_private_key.path}
           HostCertificate ${pki.server_certificate.path}
 
+    # prevent hibernate
+    - path: /etc/systemd/logind.conf.d/10-disable-hibernate
+      mode: 0644
+      contents:
+        inline: |
+          [Login]
+          HibernateKeyIgnoreInhibited=no
+    # ignore lid operations for running as server on laptop
+    - path: /etc/systemd/logind.conf.d/10-ignore-lid-switch.conf
+      contents:
+        inline: |
+          [Login]
+          HandleLidSwitch=ignore
+          HandleLidSwitchExternalPower=ignore
+          HandleLidSwitchDocked=ignore
+
     # certs #
     %{~ for cert in values(pki) ~}
     - path: ${cert.path}
