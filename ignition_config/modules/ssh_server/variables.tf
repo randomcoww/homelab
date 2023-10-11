@@ -1,8 +1,3 @@
-variable "user_names" {
-  type    = list(string)
-  default = []
-}
-
 variable "hostname" {
   type = string
 }

@@ -109,10 +109,6 @@ module "ignition-ssh-server" {
   source   = "./modules/ssh_server"
 
   hostname = each.value.hostname
-  user_names = [
-    for user in each.value.users :
-    local.users[user].name
-  ]
   node_ips = sort([
     for _, network in each.value.networks :
     cidrhost(network.prefix, each.value.netnum)
