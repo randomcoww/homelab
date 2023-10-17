@@ -32,9 +32,9 @@ spec:
       containers:
       - name: {{ .Chart.Name }}
         image: {{ .Values.images.code }}
-        args:
-        - "--bind-addr=0.0.0.0:{{ .Values.ports.code }}"
-        - "--auth=none"
+        env:
+        - name: CODE_PORT
+          value: "{{ .Values.ports.code }}"
         volumeMounts:
         - name: code-mount
           mountPath: {{ .Values.code.mountPath }}

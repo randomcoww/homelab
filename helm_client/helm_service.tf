@@ -448,7 +448,7 @@ resource "helm_release" "code" {
   repository = "https://randomcoww.github.io/repos/helm/"
   chart      = "code"
   wait       = false
-  version    = "0.1.15"
+  version    = "0.1.17"
   values = [
     yamlencode({
       images = {
@@ -468,6 +468,7 @@ resource "helm_release" "code" {
       }
       code = {
         mountPath = "/home/podman"
+        uid       = 0
       }
       ingress = {
         enabled          = true
