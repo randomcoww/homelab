@@ -343,7 +343,7 @@ locals {
     nvidia-container  = ["de-1"]
     desktop           = ["de-0", "de-2", "de-1", "v-0"]
     sunshine          = ["de-1", "v-0"]
-    remote            = ["de-0", "de-2"]
+    remote            = ["de-0", "de-2", "de-1", "v-0"]
     chromebook-hacks  = ["de-0"]
   }
 

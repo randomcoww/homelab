@@ -12,6 +12,8 @@ systemd:
       enabled: true
     - name: NetworkManager-wait-online.service
       enabled: true
+    - name: wpa_supplicant.service
+      enabled: true
 
 storage:
   files:
