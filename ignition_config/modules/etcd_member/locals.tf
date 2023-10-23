@@ -58,14 +58,14 @@ locals {
         "https://${ip}:${var.client_port}"
       ])
       initial_cluster = join(",", [
-        for hostname, ip in var.cluster_members :
-        "${hostname}=https://${ip}:${var.peer_port}"
+        for host_key, ip in var.cluster_members :
+        "${host_key}=https://${ip}:${var.peer_port}"
       ])
 
       # etcd-wrapper client params
       initial_cluster_clients = join(",", [
-        for hostname, ip in var.cluster_members :
-        "${hostname}=https://${ip}:${var.client_port}"
+        for host_key, ip in var.cluster_members :
+        "${host_key}=https://${ip}:${var.client_port}"
       ])
       healthcheck_interval           = "6s"
       healthcheck_fail_count_allowed = 16

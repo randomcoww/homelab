@@ -1,8 +1,8 @@
-variable "hostname" {
+variable "key_id" {
   type = string
 }
 
-variable "node_ips" {
+variable "valid_principals" {
   type    = list(string)
   default = []
 }

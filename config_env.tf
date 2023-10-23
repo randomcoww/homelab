@@ -152,6 +152,7 @@ locals {
     internal_mdns = "local"
     internal      = "fuzzybunny.win"
     kubernetes    = "cluster.internal"
+    tailscale     = "fawn-turtle.ts.net"
   }
 
   kubernetes_ingress_endpoints = {

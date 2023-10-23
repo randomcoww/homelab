@@ -350,7 +350,8 @@ locals {
   base_hosts_1 = {
     for host_key, host in local.base_hosts :
     host_key => merge(host, {
-      hostname = "${host_key}.${local.domains.internal_mdns}"
+      hostname           = "${host_key}.${local.domains.internal_mdns}"
+      tailscale_hostname = "${host_key}.${local.domains.tailscale}"
 
       tap_interfaces = {
         for network_name, tap_interface in lookup(host, "tap_interfaces", {}) :

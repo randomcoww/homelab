@@ -108,12 +108,16 @@ module "ignition-ssh-server" {
   for_each = local.members.ssh-server
   source   = "./modules/ssh_server"
 
-  hostname = each.value.hostname
-  node_ips = sort([
+  key_id = each.value.hostname
+  valid_principals = sort(concat([
     for _, network in each.value.networks :
     cidrhost(network.prefix, each.value.netnum)
     if lookup(network, "enable_netnum", false)
-  ])
+    ], [
+    each.value.hostname,
+    each.value.tailscale_hostname,
+    "127.0.0.1",
+  ]))
   ca = data.terraform_remote_state.sr.outputs.ssh_ca
 }
 
@@ -161,7 +165,7 @@ module "ignition-kubernetes-master" {
   service_account = data.terraform_remote_state.sr.outputs.kubernetes_service_account
   etcd_cluster_members = {
     for host_key, host in local.members.etcd :
-    host.hostname => cidrhost(local.networks.etcd.prefix, host.netnum)
+    host_key => cidrhost(local.networks.etcd.prefix, host.netnum)
   }
   apiserver_listen_ips = sort([
     cidrhost(local.networks.kubernetes.prefix, each.value.netnum),
@@ -171,7 +175,7 @@ module "ignition-kubernetes-master" {
   cluster_apiserver_endpoint = local.kubernetes_service_endpoints.apiserver
   cluster_members = {
     for host_key, host in local.members.kubernetes-master :
-    host.hostname => cidrhost(local.networks.kubernetes.prefix, host.netnum)
+    host_key => cidrhost(local.networks.kubernetes.prefix, host.netnum)
   }
   static_pod_manifest_path = local.kubernetes.static_pod_manifest_path
   container_images         = local.container_images

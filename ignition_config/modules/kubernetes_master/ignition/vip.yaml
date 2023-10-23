@@ -18,8 +18,8 @@ storage:
             mode tcp
             balance leastconn
             default-server verify none check-ssl rise 2 fall 2 maxconn 5000 maxqueue 5000 weight 100
-            %{~ for hostname, ip in cluster_members ~}
-            server ${hostname} ${ip}:${apiserver_port} check
+            %{~ for host_key, ip in cluster_members ~}
+            server ${host_key} ${ip}:${apiserver_port} check
             %{~ endfor ~}
 
     - path: ${keepalived_config_path}/50-kube-apiserver.conf
