@@ -488,7 +488,7 @@ resource "helm_release" "tailscale-ssm" {
   chart            = "tailscale"
   create_namespace = true
   wait             = false
-  version          = "0.1.8"
+  version          = "0.1.9"
   values = [
     yamlencode({
       images = {

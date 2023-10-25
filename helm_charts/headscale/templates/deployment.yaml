@@ -42,7 +42,6 @@ spec:
         args:
         - "restore"
         - "-if-replica-exists"
-        - "-v"
         - "-o"
         - "{{ .Values.dataPath }}/{{ .Values.dbFile }}"
         - "s3://{{ .Values.backup.s3Resource }}"
