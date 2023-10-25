@@ -46,7 +46,7 @@ locals {
         "https://${ip}:${var.peer_port}"
       ])
       listen_peer_urls = join(",", [
-        for _, ip in concat(["127.0.0.1"], var.listen_ips) :
+        for _, ip in var.listen_ips :
         "https://${ip}:${var.peer_port}"
       ])
       advertise_client_urls = join(",", [
