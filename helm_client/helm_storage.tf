@@ -108,7 +108,7 @@ resource "helm_release" "mayastor" {
   chart            = "mayastor"
   create_namespace = true
   wait             = false
-  version          = "2.3.0"
+  version          = "2.4.0"
   values = [
     yamlencode({
       base = {

@@ -300,7 +300,7 @@ resource "helm_release" "authelia" {
   chart            = "authelia"
   create_namespace = true
   wait             = false
-  version          = "0.8.57"
+  version          = "0.8.58"
   values = [
     yamlencode({
       domain = local.domains.internal
@@ -312,6 +312,9 @@ resource "helm_release" "authelia" {
         s3Resource      = "${data.terraform_remote_state.sr.outputs.s3.authelia.resource}/db.sqlite3"
       }
       ##
+      service = {
+        type = "ClusterIP"
+      }
       ingress = {
         enabled = true
         annotations = {
