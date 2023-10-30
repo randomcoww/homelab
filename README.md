@@ -82,7 +82,7 @@ WG_PRIVATE_KEY=
 WG_ADDRESS=
 WG_PUBLIC_KEY=
 WG_ENDPOINT=
-PASSWORD_HASH=$(podman run --rm docker.io/authelia/authelia:latest authelia hash-password -- "$PASSWORD" | sed 's:.*\: ::')
+AUTHELIA_PASSWORD_HASH=$(podman run --rm docker.io/authelia/authelia:latest authelia hash-password -- "$PASSWORD" | sed 's:.*\: ::')
 ```
 
 ```bash
