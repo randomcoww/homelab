@@ -48,15 +48,6 @@ locals {
           # "video=efifb:off",
         ]
       })
-      "52-54-00-1a-61-1a" = merge(local.image_set.silverblue, {
-        ignition = "v-0"
-        boot_args = [
-          "enforcing=0",
-          "rd.driver.blacklist=nouveau",
-          "modprobe.blacklist=nouveau",
-          "nvidia-drm.modeset=1",
-        ]
-      })
     }
   }
 }

@@ -286,64 +286,26 @@ locals {
         },
       ]
     }
-
-    v-0 = {
-      netnum = 10
-      users = [
-        "client",
-      ]
-      virtual_interfaces = {
-        lan = {
-          mac         = "52-54-00-1a-61-1a"
-          mtu         = 9000
-          enable_dhcp = true
-        }
-        kubernetes = {
-          mac           = "52-54-00-1a-61-1b"
-          mtu           = 9000
-          enable_netnum = true
-        }
-      }
-      disks = {
-        pv = {
-          device = "/dev/disk/by-id/scsi-0QEMU_QEMU_HARDDISK_drive-scsi0-0-0-0"
-          partitions = [
-            {
-              mount_path = local.mounts.home_path
-              format     = "xfs"
-              wipe       = false
-              options    = ["-s", "size=4096"]
-              bind_mounts = [
-                {
-                  relative_path = "containers"
-                  mount_path    = local.mounts.containers_path
-                },
-              ]
-            },
-          ]
-        }
-      }
-    }
   }
 
   base_members = {
-    base              = ["gw-0", "gw-1", "q-0", "de-0", "de-2", "de-1", "v-0"]
-    systemd-networkd  = ["gw-0", "gw-1", "q-0", "de-1", "v-0"]
+    base              = ["gw-0", "gw-1", "q-0", "de-0", "de-2", "de-1"]
+    systemd-networkd  = ["gw-0", "gw-1", "q-0", "de-1"]
     network-manager   = ["de-0", "de-2"]
     gateway           = ["gw-0", "gw-1", "q-0"]
     vrrp              = ["gw-0", "gw-1"]
-    disks             = ["gw-0", "gw-1", "q-0", "de-1", "v-0"]
+    disks             = ["gw-0", "gw-1", "q-0", "de-1"]
     mounts            = ["de-0", "de-2"]
-    ssh-server        = ["gw-0", "gw-1", "q-0", "de-2", "de-1", "v-0"]
-    ssh-client        = ["de-0", "de-2", "de-1", "v-0"]
+    ssh-server        = ["gw-0", "gw-1", "q-0", "de-2", "de-1"]
+    ssh-client        = ["de-0", "de-2", "de-1"]
     etcd              = ["gw-0", "gw-1", "q-0"]
     kubelet-base      = ["gw-0", "gw-1", "q-0", "de-0", "de-2", "de-1"]
     kubernetes-master = ["gw-0", "gw-1"]
     kubernetes-worker = ["gw-0", "gw-1", "q-0", "de-1"]
     nvidia-container  = ["de-1"]
-    desktop           = ["de-0", "de-2", "de-1", "v-0"]
-    sunshine          = ["de-1", "v-0"]
-    remote            = ["de-0", "de-2", "de-1", "v-0"]
+    desktop           = ["de-0", "de-2", "de-1"]
+    sunshine          = ["de-1"]
+    remote            = ["de-0", "de-2", "de-1"]
     chromebook-hacks  = ["de-0"]
   }
 
