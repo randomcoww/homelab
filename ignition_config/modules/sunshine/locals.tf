@@ -5,10 +5,10 @@ locals {
       sunshine = {
         config = {
           key_rightalt_to_key_win = "enabled"
-          min_log_level           = "error"
           origin_web_ui_allowed   = "pc"
           origin_pin_allowed      = "pc"
           upnp                    = "off"
+          output_name             = 1
         }
         apps = {
           env = {
