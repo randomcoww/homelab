@@ -257,14 +257,14 @@ locals {
         nvidia  = true
       }
       kubernetes_worker_taints = [
-        {
-          key    = "node-role.kubernetes.io/de"
-          effect = "NoSchedule"
-        },
-        {
-          key    = "node-role.kubernetes.io/de"
-          effect = "NoExecute"
-        },
+        # {
+        #   key    = "node-role.kubernetes.io/de"
+        #   effect = "NoSchedule"
+        # },
+        # {
+        #   key    = "node-role.kubernetes.io/de"
+        #   effect = "NoExecute"
+        # },
       ]
     }
 
@@ -302,23 +302,23 @@ locals {
   }
 
   base_members = {
-    base              = ["q-0", "de-0", "de-2", "de-1"]
-    systemd-networkd  = ["q-0", "de-1"]
+    base              = ["de-0", "de-2", "de-1"]
+    systemd-networkd  = ["de-1"]
     network-manager   = ["de-0", "de-2"]
-    gateway           = ["q-0", "de-1"]
-    vrrp              = ["q-0", "de-1"]
-    disks             = ["q-0", "de-1"]
+    gateway           = ["de-1"]
+    vrrp              = ["de-1"]
+    disks             = ["de-1"]
     mounts            = ["de-0", "de-2"]
-    ssh-server        = ["q-0", "de-2", "de-1"]
+    ssh-server        = ["de-2", "de-1"]
     ssh-client        = ["de-0", "de-2", "de-1"]
-    etcd              = ["q-0"]
-    kubelet-base      = ["q-0", "de-0", "de-2", "de-1"]
-    kubernetes-master = ["q-0"]
-    kubernetes-worker = ["q-0", "de-1"]
+    etcd              = ["de-1"]
+    kubelet-base      = ["de-0", "de-2", "de-1"]
+    kubernetes-master = ["de-1"]
+    kubernetes-worker = ["de-1"]
     nvidia-container  = ["de-1"]
     desktop           = ["de-0", "de-2", "de-1"]
     sunshine          = ["de-1"]
-    remote            = ["de-0", "de-2", "de-1"]
+    remote            = ["de-2", "de-1"]
     chromebook-hacks  = ["de-0"]
   }
 
