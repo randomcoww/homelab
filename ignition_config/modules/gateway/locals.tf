@@ -15,7 +15,6 @@ locals {
       lan_vip                    = var.lan_vip
       static_pod_manifest_path   = var.static_pod_manifest_path
       keepalived_config_path     = var.keepalived_config_path
-      upstream_dns               = var.upstream_dns
 
       virtual_router_id = 10
       vrrp_master_default_route = {

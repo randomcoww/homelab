@@ -173,7 +173,7 @@ locals {
 
     # desktop
     de-1 = {
-      netnum = 9
+      netnum = 6
       users = [
         "client",
       ]
@@ -181,7 +181,7 @@ locals {
         phy0 = {
           mac   = "74-56-3c-c3-10-68"
           mtu   = 9000
-          vlans = ["service", "kubernetes", "remote"]
+          vlans = ["sync", "etcd", "service", "kubernetes", "wan", "remote"]
         }
         # mobile
         phy1 = {
@@ -201,7 +201,16 @@ locals {
       tap_interfaces = {
         lan = {
           source_interface_name = "br-lan"
+          enable_netnum         = true
           enable_dhcp           = true
+        }
+        sync = {
+          source_interface_name = "phy0-sync"
+          enable_netnum         = true
+        }
+        etcd = {
+          source_interface_name = "phy0-etcd"
+          enable_netnum         = true
         }
         service = {
           source_interface_name = "phy0-service"
@@ -210,6 +219,10 @@ locals {
         kubernetes = {
           source_interface_name = "phy0-kubernetes"
           enable_netnum         = true
+        }
+        wan = {
+          source_interface_name = "phy0-wan"
+          enable_dhcp           = true
         }
         fallback = {
           source_interface_name = "phy1"
@@ -289,19 +302,19 @@ locals {
   }
 
   base_members = {
-    base              = ["gw-0", "gw-1", "q-0", "de-0", "de-2", "de-1"]
-    systemd-networkd  = ["gw-0", "gw-1", "q-0", "de-1"]
+    base              = ["q-0", "de-0", "de-2", "de-1"]
+    systemd-networkd  = ["q-0", "de-1"]
     network-manager   = ["de-0", "de-2"]
-    gateway           = ["gw-0", "gw-1", "q-0"]
-    vrrp              = ["gw-0", "gw-1"]
-    disks             = ["gw-0", "gw-1", "q-0", "de-1"]
+    gateway           = ["q-0", "de-1"]
+    vrrp              = ["q-0", "de-1"]
+    disks             = ["q-0", "de-1"]
     mounts            = ["de-0", "de-2"]
-    ssh-server        = ["gw-0", "gw-1", "q-0", "de-2", "de-1"]
+    ssh-server        = ["q-0", "de-2", "de-1"]
     ssh-client        = ["de-0", "de-2", "de-1"]
-    etcd              = ["gw-0", "gw-1", "q-0"]
-    kubelet-base      = ["gw-0", "gw-1", "q-0", "de-0", "de-2", "de-1"]
-    kubernetes-master = ["gw-0", "gw-1"]
-    kubernetes-worker = ["gw-0", "gw-1", "q-0", "de-1"]
+    etcd              = ["q-0"]
+    kubelet-base      = ["q-0", "de-0", "de-2", "de-1"]
+    kubernetes-master = ["q-0"]
+    kubernetes-worker = ["q-0", "de-1"]
     nvidia-container  = ["de-1"]
     desktop           = ["de-0", "de-2", "de-1"]
     sunshine          = ["de-1"]

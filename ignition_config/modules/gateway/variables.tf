@@ -46,13 +46,6 @@ variable "lan_vip" {
   type = string
 }
 
-variable "upstream_dns" {
-  type = object({
-    ip             = string
-    tls_servername = string
-  })
-}
-
 variable "keepalived_config_path" {
   type    = string
   default = "/etc/keepalived/keepalived.conf.d"

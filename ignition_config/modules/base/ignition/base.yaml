@@ -74,7 +74,7 @@ storage:
       contents:
         inline: |
           [Resolve]
-          FallbackDNS=
+          FallbackDNS=${upstream_dns.ip}#${upstream_dns.tls_servername}
           DNSStubListener=false
           MulticastDNS=true
           LLMNR=false

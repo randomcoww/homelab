@@ -18,6 +18,7 @@ module "ignition-base" {
     for user_key in each.value.users :
     local.users[user_key]
   ]
+  upstream_dns = local.upstream_dns
 }
 
 module "ignition-systemd-networkd" {
@@ -79,8 +80,6 @@ module "ignition-gateway" {
   lan_interface_name  = each.value.tap_interfaces[local.services.gateway.network.name].interface_name
   lan_prefix          = local.services.gateway.network.prefix
   lan_vip             = local.services.gateway.ip
-
-  upstream_dns = local.upstream_dns
 }
 
 module "ignition-vrrp" {
