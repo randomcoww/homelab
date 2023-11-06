@@ -77,13 +77,8 @@ locals {
       network = "10.244.0.0"
       cidr    = 16
     }
-    # mobile device fallback
-    fallback = {
-      metric = 512
-    }
     # get dhcp from another network lan
     remote = {
-      metric  = 2048
       vlan_id = 120
       mtu     = 1500
     }
