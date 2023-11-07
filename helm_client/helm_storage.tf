@@ -7,7 +7,7 @@ resource "helm_release" "minio" {
   chart            = "minio"
   create_namespace = true
   wait             = false
-  version          = "5.0.13"
+  version          = "5.0.14"
   values = [
     yamlencode({
       clusterDomain = local.domains.kubernetes
@@ -18,7 +18,7 @@ resource "helm_release" "minio" {
         storageClass = "local-path"
       }
       drivesPerNode = 2
-      replicas      = 2
+      replicas      = 1
       resources = {
         requests = {
           memory = "8Gi"
@@ -47,8 +47,8 @@ resource "helm_release" "minio" {
       # }
       environment = {
         MINIO_API_REQUESTS_DEADLINE  = "2m"
-        MINIO_STORAGE_CLASS_STANDARD = "EC:2"
-        MINIO_STORAGE_CLASS_RRS      = "EC:2"
+        # MINIO_STORAGE_CLASS_STANDARD = "EC:2"
+        # MINIO_STORAGE_CLASS_RRS      = "EC:2"
       }
       buckets = [
         for bucket in local.minio_buckets :
