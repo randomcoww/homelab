@@ -79,6 +79,8 @@ locals {
     }
     # get dhcp from another network lan
     remote = {
+      network = "192.168.1.0"
+      cidr    = 24
       vlan_id = 120
       mtu     = 1500
     }
