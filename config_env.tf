@@ -77,13 +77,6 @@ locals {
       network = "10.244.0.0"
       cidr    = 16
     }
-    # get dhcp from another network lan
-    remote = {
-      network = "192.168.1.0"
-      cidr    = 24
-      vlan_id = 120
-      mtu     = 1500
-    }
   }
 
   networks = merge(local.base_networks, {

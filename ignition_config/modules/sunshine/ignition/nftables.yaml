@@ -1,0 +1,24 @@
+---
+variant: fcos
+version: 1.5.0
+systemd:
+  units:
+    - name: nftables@sunshine.service
+      enabled: true
+
+storage:
+  files:
+    - path: /etc/nftables/sunshine.nft
+      mode: 0644
+      overwrite: true
+      contents:
+        inline: |
+          table ip sunshine {
+            chain input {
+              type filter hook input priority filter; policy drop;
+
+              udp dport { 47998, 47999, 48000, 48002 } accept;
+              tcp dport { 47984, 47989, 47990, 48010 } accept;
+            }
+          }
+          ;

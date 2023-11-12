@@ -10,7 +10,7 @@ locals {
         phy0 = {
           mac   = "74-56-3c-c3-10-68"
           mtu   = 9000
-          vlans = ["sync", "etcd", "service", "kubernetes", "wan", "remote"]
+          vlans = ["sync", "etcd", "service", "kubernetes", "wan"]
         }
       }
       wlan_interfaces = {
@@ -48,12 +48,6 @@ locals {
         wan = {
           source_interface_name = "phy0-wan"
           enable_dhcp           = true
-        }
-        remote = {
-          source_interface_name = "phy0-remote"
-          enable_mdns           = true
-          enable_dhcp           = true
-          enable_dhcp_route     = false
         }
       }
       disks = {

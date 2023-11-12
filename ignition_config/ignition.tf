@@ -61,7 +61,6 @@ module "ignition-gateway" {
     local.networks.lan.prefix,
     local.networks.kubernetes.prefix,
     local.networks.kubernetes_pod.prefix,
-    local.networks.remote.prefix,
   ]
   forward_prefixes = [
     local.networks.lan.prefix,
