@@ -81,6 +81,10 @@ module "ignition-gateway" {
   lan_prefix          = local.services.gateway.network.prefix
   lan_vip             = local.services.gateway.ip
   internal_dns_vip    = local.services.external_dns.ip
+  internal_dns_domains = [
+    local.domains.internal,
+    local.domains.kubernetes,
+  ]
 }
 
 module "ignition-vrrp" {

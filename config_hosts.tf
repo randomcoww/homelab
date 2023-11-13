@@ -27,7 +27,6 @@ locals {
         lan = {
           source_interface_name = "br-lan"
           enable_netnum         = true
-          enable_dhcp           = true
         }
         sync = {
           source_interface_name = "phy0-sync"

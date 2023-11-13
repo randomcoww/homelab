@@ -49,5 +49,6 @@ storage:
           Table=${vrrp_slave_default_route.table_id}
           Priority=${vrrp_slave_default_route.table_priority}
 
-          [DNS]
+          [Network]
           DNS=${internal_dns_vip}
+          Domains=${join(" ", internal_dns_domains)}
