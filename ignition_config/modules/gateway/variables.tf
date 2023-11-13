@@ -46,6 +46,10 @@ variable "lan_vip" {
   type = string
 }
 
+variable "internal_dns_vip" {
+  type = string
+}
+
 variable "keepalived_config_path" {
   type    = string
   default = "/etc/keepalived/keepalived.conf.d"

@@ -48,3 +48,6 @@ storage:
           [RoutingPolicyRule]
           Table=${vrrp_slave_default_route.table_id}
           Priority=${vrrp_slave_default_route.table_priority}
+
+          [DNS]
+          DNS=${internal_dns_vip}

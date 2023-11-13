@@ -13,6 +13,7 @@ locals {
       lan_interface_name         = var.lan_interface_name
       lan_prefix                 = var.lan_prefix
       lan_vip                    = var.lan_vip
+      internal_dns_vip           = var.internal_dns_vip
       static_pod_manifest_path   = var.static_pod_manifest_path
       keepalived_config_path     = var.keepalived_config_path
 

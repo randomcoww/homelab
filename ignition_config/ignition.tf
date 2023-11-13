@@ -80,6 +80,7 @@ module "ignition-gateway" {
   lan_interface_name  = each.value.tap_interfaces[local.services.gateway.network.name].interface_name
   lan_prefix          = local.services.gateway.network.prefix
   lan_vip             = local.services.gateway.ip
+  internal_dns_vip    = local.services.external_dns.ip
 }
 
 module "ignition-vrrp" {
