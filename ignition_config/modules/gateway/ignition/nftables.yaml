@@ -3,18 +3,18 @@ variant: fcos
 version: 1.5.0
 systemd:
   units:
-    - name: nftables@gateway.service
+    - name: nftables@${nftables_namespace}.service
       enabled: true
 
 storage:
   files:
-    - path: /etc/nftables/gateway.nft
+    - path: /etc/nftables/${nftables_namespace}.nft
       mode: 0644
       overwrite: true
       contents:
         inline: |
-          table ip gateway {
-            chain base_checks {
+          table ip ${nftables_namespace} {
+            chain base-checks {
               ct state {established, related} accept;
               ct state invalid drop;
               ct status dnat accept;
@@ -23,7 +23,7 @@ storage:
 
             chain input {
               type filter hook input priority filter; policy drop;
-              jump base_checks;
+              jump base-checks;
 
               iifname lo accept;
               iifname != lo ip daddr 127.0.0.1/8 drop;
@@ -37,7 +37,7 @@ storage:
 
             chain forward {
               type filter hook forward priority filter; policy drop;
-              jump base_checks;
+              jump base-checks;
 
               %{~ for _, prefix in forward_prefixes ~}
               ip saddr ${prefix} accept;

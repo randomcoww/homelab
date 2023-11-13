@@ -16,7 +16,8 @@ locals {
       static_pod_manifest_path   = var.static_pod_manifest_path
       keepalived_config_path     = var.keepalived_config_path
 
-      virtual_router_id = 10
+      nftables_namespace = "gateway"
+      virtual_router_id  = 10
       vrrp_master_default_route = {
         table_id       = 250
         table_priority = 32770

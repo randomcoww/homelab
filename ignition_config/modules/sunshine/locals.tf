@@ -2,6 +2,7 @@ locals {
   module_ignition_snippets = [
     for f in fileset(".", "${path.module}/ignition/*.yaml") :
     templatefile(f, {
+      nftables_namespace = "sunshine"
       sunshine = {
         config = {
           key_rightalt_to_key_win = "enabled"
