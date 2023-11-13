@@ -9,7 +9,7 @@ storage:
         inline: |
           vrrp_instance gateway {
             preempt
-            state MASTER
+            state BACKUP
             advert_int 0.1
             virtual_router_id ${virtual_router_id}
             interface ${sync_interface_name}
