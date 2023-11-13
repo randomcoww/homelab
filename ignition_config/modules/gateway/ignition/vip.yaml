@@ -51,4 +51,4 @@ storage:
 
           [Network]
           DNS=${internal_dns_vip}
-          Domains=${join(" ", internal_dns_domains)}
+          Domains=~${join(" ~", internal_dns_domains)}
