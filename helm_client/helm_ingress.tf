@@ -449,6 +449,7 @@ resource "helm_release" "authelia" {
 }
 
 # tailscale with ssm secret #
+/*
 resource "helm_release" "tailscale-ssm" {
   name             = "tailscale-ssm"
   namespace        = "tailscale"
@@ -485,3 +486,4 @@ resource "helm_release" "tailscale-ssm" {
     }),
   ]
 }
+*/
