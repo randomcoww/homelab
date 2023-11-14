@@ -448,11 +448,12 @@ resource "helm_release" "code" {
   repository = "https://randomcoww.github.io/repos/helm/"
   chart      = "code"
   wait       = false
-  version    = "0.1.17"
+  version    = "0.1.18"
   values = [
     yamlencode({
       images = {
-        code = local.container_images.code_server
+        code      = local.container_images.code_server
+        tailscale = local.container_images.tailscale
       }
       persistence = {
         accessMode   = "ReadWriteOnce"
@@ -487,6 +488,26 @@ resource "helm_release" "code" {
           "github.com/fuse" = 1
           "nvidia.com/gpu"  = 1
         }
+      }
+      authKey = var.tailscale.auth_key
+      ssm = {
+        awsRegion       = data.terraform_remote_state.sr.outputs.ssm.tailscale.aws_region
+        accessKeyID     = data.terraform_remote_state.sr.outputs.ssm.tailscale.access_key_id
+        secretAccessKey = data.terraform_remote_state.sr.outputs.ssm.tailscale.secret_access_key
+        resource        = data.terraform_remote_state.sr.outputs.ssm.tailscale.resource
+      }
+      additionalParameters = {
+        TS_ACCEPT_DNS = true
+        TS_EXTRA_ARGS = [
+          "--advertise-exit-node",
+        ]
+        TS_ROUTES = [
+          local.networks.lan.prefix,
+          local.networks.service.prefix,
+          local.networks.kubernetes.prefix,
+          local.networks.kubernetes_service.prefix,
+          local.networks.kubernetes_pod.prefix,
+        ]
       }
       tolerations = [
         {
