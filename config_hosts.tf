@@ -94,9 +94,9 @@ locals {
       # ignition doesn't support provisioning lvm device so so systemd mount only
       mounts = [
         {
-          device     = "/dev/disk/by-label/home"
+          device     = "/dev/H3F03NEV207BX1ZE/unencrypted"
           mount_path = local.mounts.home_path
-          format     = "xfs"
+          format     = "ext4"
         },
       ]
     }
