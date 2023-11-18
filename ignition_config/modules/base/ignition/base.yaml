@@ -122,6 +122,12 @@ storage:
       contents:
         inline: |
           br_netfilter
+    # Image build #
+    - path: /etc/modules-load.d/20-uinput.conf
+      mode: 0644
+      contents:
+        inline: |
+          uinput
     # Keepalived VIP #
     - path: /etc/sysctl.d/20-keepalived.conf
       mode: 0644
