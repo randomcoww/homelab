@@ -22,7 +22,7 @@ storage:
             }
 
             chain input {
-              type filter hook input priority filter; policy drop;
+              type filter hook input priority filter + 2; policy drop;
               jump base-checks;
 
               iifname lo accept;
@@ -36,7 +36,7 @@ storage:
             }
 
             chain forward {
-              type filter hook forward priority filter; policy drop;
+              type filter hook forward priority filter + 2; policy drop;
               jump base-checks;
 
               %{~ for _, prefix in forward_prefixes ~}
