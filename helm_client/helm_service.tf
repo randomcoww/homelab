@@ -430,12 +430,6 @@ resource "helm_release" "hostapd" {
           ]
         }
       }
-      tolerations = [
-        {
-          key      = "node-role.kubernetes.io/de"
-          operator = "Exists"
-        },
-      ]
     }),
   ]
 }
@@ -512,25 +506,19 @@ resource "helm_release" "code" {
           ]
         }
       }
-      tolerations = [
-        {
-          key      = "node-role.kubernetes.io/de"
-          operator = "Exists"
-        },
-      ]
     }),
   ]
 }
 
 # kasm-desktop #
-/*
+
 resource "helm_release" "kasm-desktop" {
   name       = "kasm-desktop"
   namespace  = "default"
   repository = "https://randomcoww.github.io/repos/helm/"
   chart      = "kasm-desktop"
   wait       = false
-  version    = "0.1.2"
+  version    = "0.1.3"
   values = [
     yamlencode({
       images = {
@@ -568,10 +556,10 @@ resource "helm_release" "kasm-desktop" {
       }
       resources = {
         limits = {
-          "amd.com/gpu" = 1
+          "github.com/fuse" = 1
+          "amd.com/gpu"     = 1
         }
       }
     }),
   ]
 }
-*/
