@@ -35,6 +35,8 @@ spec:
         volumeMounts:
         - name: desktop-home
           mountPath: /home/{{ .Values.desktop.user }}
+        - mountPath: /dev/shm
+          name: dshm
         ports:
         - containerPort: {{ .Values.ports.desktop }}
         securityContext:
@@ -52,6 +54,10 @@ spec:
           value: {{ .Values.desktop.device }}
         - name: DISPLAY
           value: {{ .Values.desktop.display }}
+      volumes:
+      - name: dshm
+        emptyDir:
+          medium: Memory
       {{- with .Values.resources }}
         resources:
 {{ toYaml . | indent 10 }}
