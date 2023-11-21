@@ -54,6 +54,8 @@ spec:
           value: {{ .Values.desktop.device }}
         - name: DISPLAY
           value: {{ .Values.desktop.display }}
+        - name: NVIDIA_DRIVER_CAPABILITIES
+          value: all
       volumes:
       - name: dshm
         emptyDir:
