@@ -46,6 +46,7 @@ locals {
         ingress_nginx_external = 35
         matchbox               = 33
         minio                  = 34
+        kasm_sunshine          = 36
       }
       mtu = 9000
     }
@@ -130,7 +131,7 @@ locals {
     tailscale          = "ghcr.io/randomcoww/tailscale:1.52.1"
     fuse_device_plugin = "soolaugust/fuse-device-plugin:v1.0"
     code_server        = "ghcr.io/randomcoww/code-server:20231115.3-tensorflow"
-    kasm_desktop       = "ghcr.io/randomcoww/kasm-desktop:20231119.4"
+    kasm_desktop       = "ghcr.io/randomcoww/kasm-desktop:20231122.6"
   }
 
   kubernetes = {
@@ -147,16 +148,17 @@ locals {
   }
 
   kubernetes_ingress_endpoints = {
-    mpd          = "mpd.${local.domains.internal}"
-    auth         = "auth.${local.domains.internal}"
-    transmission = "t.${local.domains.internal}"
-    minio        = "m.${local.domains.internal}"
-    pl           = "pl.${local.domains.internal}"
-    vaultwarden  = "vw.${local.domains.internal}"
-    webdav       = "w.${local.domains.internal}"
-    matchbox     = "ign.${local.domains.internal}"
-    code         = "code.${local.domains.internal}"
-    kasm_desktop = "k.${local.domains.internal}"
+    mpd           = "mpd.${local.domains.internal}"
+    auth          = "auth.${local.domains.internal}"
+    transmission  = "t.${local.domains.internal}"
+    minio         = "m.${local.domains.internal}"
+    pl            = "pl.${local.domains.internal}"
+    vaultwarden   = "vw.${local.domains.internal}"
+    webdav        = "w.${local.domains.internal}"
+    matchbox      = "ign.${local.domains.internal}"
+    code          = "code.${local.domains.internal}"
+    kasm_desktop  = "k.${local.domains.internal}"
+    kasm_sunshine = "ks.${local.domains.internal}"
   }
 
   ingress_classes = {

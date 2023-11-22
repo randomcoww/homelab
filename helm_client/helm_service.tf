@@ -518,7 +518,7 @@ resource "helm_release" "kasm-desktop" {
   repository = "https://randomcoww.github.io/repos/helm/"
   chart      = "kasm-desktop"
   wait       = false
-  version    = "0.1.3"
+  version    = "0.1.4"
   values = [
     yamlencode({
       images = {
@@ -535,6 +535,15 @@ resource "helm_release" "kasm-desktop" {
       service = {
         type = "ClusterIP"
         port = local.service_ports.kasm_desktop
+      }
+      sunshineService = {
+        type = "ClusterIP"
+        annotations = {
+          "external-dns.alpha.kubernetes.io/hostname" = local.kubernetes_ingress_endpoints.kasm_sunshine
+        }
+        externalIPs = [
+          local.services.kasm_sunshine.ip,
+        ]
       }
       desktop = {
         user    = "kasm-user"
@@ -556,8 +565,7 @@ resource "helm_release" "kasm-desktop" {
       }
       resources = {
         limits = {
-          "github.com/fuse" = 1
-          "amd.com/gpu"     = 1
+          "amd.com/gpu" = 1
         }
       }
     }),

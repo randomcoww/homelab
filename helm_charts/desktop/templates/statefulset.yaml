@@ -35,12 +35,16 @@ spec:
         volumeMounts:
         - name: desktop-home
           mountPath: /home/{{ .Values.desktop.user }}
-        - mountPath: /dev/shm
-          name: dshm
+        - name: dshm
+          mountPath: /dev/shm
         ports:
         - containerPort: {{ .Values.ports.desktop }}
-        securityContext:
-          privileged: true
+        {{- range $port := .Values.ports.sunshineTCP }}
+        - containerPort: {{ $port }}
+        {{- end }}
+        {{- range $port := .Values.ports.sunshineUDP }}
+        - containerPort: {{ $port }}
+        {{- end }}
         env:
         - name: USER
           value: {{ .Values.desktop.user }}
@@ -54,16 +58,14 @@ spec:
           value: {{ .Values.desktop.device }}
         - name: DISPLAY
           value: {{ .Values.desktop.display }}
-        - name: NVIDIA_DRIVER_CAPABILITIES
-          value: all
-      volumes:
-      - name: dshm
-        emptyDir:
-          medium: Memory
       {{- with .Values.resources }}
         resources:
 {{ toYaml . | indent 10 }}
       {{- end }}
+      volumes:
+      - name: dshm
+        emptyDir:
+          medium: Memory
   volumeClaimTemplates:
   - metadata:
       name: desktop-home

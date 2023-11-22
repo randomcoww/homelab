@@ -1,6 +1,9 @@
 service:
   type: ClusterIP
 
+sunshineService;:
+  type: ClusterIP
+
 ingress:
   enabled: true
   annotations:
@@ -20,6 +23,16 @@ ingress:
 
 ports:
   desktop: 6091
+  sunshineTCP:
+  - 47984
+  - 47989
+  - 47990
+  - 48010
+  sunshineUDP:
+  - 47998
+  - 47999
+  - 48000
+  - 48002
 
 persistence:
   accessMode: ReadWriteOnce
