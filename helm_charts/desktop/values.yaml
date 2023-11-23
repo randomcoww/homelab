@@ -51,5 +51,7 @@ desktop:
   device: /dev/dri/renderD128
   display: :1
 
+additionalEnvs: {}
+
 affinity: {}
 tolerations: {}

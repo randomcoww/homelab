@@ -44,6 +44,7 @@ spec:
         {{- end }}
         {{- range $port := .Values.ports.sunshineUDP }}
         - containerPort: {{ $port }}
+          protocol: "UDP"
         {{- end }}
         env:
         - name: USER
@@ -58,6 +59,10 @@ spec:
           value: {{ .Values.desktop.device }}
         - name: DISPLAY
           value: {{ .Values.desktop.display }}
+        {{- range $name, $value := .Values.additionalEnvs }}
+        - name: {{ $name }}
+          value: {{ $value }}
+        {{- end }}
       {{- with .Values.resources }}
         resources:
 {{ toYaml . | indent 10 }}

@@ -518,7 +518,7 @@ resource "helm_release" "kasm-desktop" {
   repository = "https://randomcoww.github.io/repos/helm/"
   chart      = "kasm-desktop"
   wait       = false
-  version    = "0.1.4"
+  version    = "0.1.6"
   values = [
     yamlencode({
       images = {
@@ -550,6 +550,10 @@ resource "helm_release" "kasm-desktop" {
         uid     = "10000"
         device  = "/dev/dri/renderD128"
         display = ":0"
+      }
+      additionalEnvs = {
+        VK_ICD_FILENAMES = "/usr/share/vulkan/icd.d/radeon_icd.i686.json:/usr/share/vulkan/icd.d/radeon_icd.x86_64.json"
+        AMD_VULKAN_ICD   = "RADV"
       }
       ingress = {
         enabled          = true
