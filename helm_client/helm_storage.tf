@@ -47,11 +47,8 @@ resource "helm_release" "minio" {
       # }
       environment = {
         MINIO_API_REQUESTS_DEADLINE  = "2m"
-        MINIO_STORAGE_CLASS_STANDARD = "EC:1"
-        MINIO_STORAGE_CLASS_RRS      = "EC:1"
-        # For 3 replicas
-        # MINIO_STORAGE_CLASS_STANDARD = "EC:2"
-        # MINIO_STORAGE_CLASS_RRS      = "EC:2"
+        MINIO_STORAGE_CLASS_STANDARD = "EC:2"
+        MINIO_STORAGE_CLASS_RRS      = "EC:2"
       }
       buckets = [
         for bucket in local.minio_buckets :
