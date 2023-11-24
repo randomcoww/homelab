@@ -26,6 +26,7 @@ systemd:
 storage:
   files:
     # hardware interface #
+    # setting MTUBytes here seems to breaks networkd in f39
     %{~ for hardware_interface_name, hardware_interface in hardware_interfaces ~}
     - path: /etc/systemd/network/10-${hardware_interface_name}.link
       mode: 0644
@@ -35,9 +36,8 @@ storage:
           PermanentMACAddress=${hardware_interface.mac}
 
           [Link]
-          MTUBytes=${lookup(hardware_interface, "mtu", 1500)}
+          # MTUBytes=${lookup(hardware_interface, "mtu", 1500)}
           Name=${hardware_interface_name}
-    # rename may not work on primary interface due to pxe boot - match by mac
     - path: /etc/systemd/network/20-${hardware_interface_name}.network
       mode: 0644
       contents:
