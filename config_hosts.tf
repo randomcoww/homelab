@@ -116,25 +116,63 @@ locals {
         },
       ]
     }
+
+    v-0 = {
+      netnum = 10
+      users = [
+        "client",
+      ]
+      virtual_interfaces = {
+        lan = {
+          mac         = "52-54-00-1a-61-1a"
+          mtu         = 9000
+          enable_dhcp = true
+        }
+        kubernetes = {
+          mac           = "52-54-00-1a-61-1b"
+          mtu           = 9000
+          enable_netnum = true
+        }
+      }
+      # disks = {
+      #   pv = {
+      #     device = "/dev/disk/by-id/scsi-0QEMU_QEMU_HARDDISK_drive-scsi0-0-0-0"
+      #     partitions = [
+      #       {
+      #         mount_path = local.mounts.home_path
+      #         format     = "xfs"
+      #         wipe       = false
+      #         options    = ["-s", "size=4096"]
+      #         bind_mounts = [
+      #           {
+      #             relative_path = "containers"
+      #             mount_path    = local.mounts.containers_path
+      #           },
+      #         ]
+      #       },
+      #     ]
+      #   }
+      # }
+    }
   }
 
   base_members = {
-    base              = ["de-0", "de-2", "de-1"]
-    systemd-networkd  = ["de-1"]
+    base              = ["de-0", "de-2", "de-1", "v-0"]
+    systemd-networkd  = ["de-1", "v-0"]
     network-manager   = ["de-0", "de-2"]
     gateway           = ["de-1"]
     vrrp              = ["de-1"]
     disks             = ["de-1"]
     mounts            = ["de-0", "de-2"]
-    ssh-server        = ["de-2", "de-1"]
-    ssh-client        = ["de-0", "de-2", "de-1"]
+    ssh-server        = ["de-2", "de-1", "v-0"]
+    ssh-client        = ["de-0", "de-2", "v-0"]
     etcd              = ["de-1"]
-    kubelet-base      = ["de-0", "de-2", "de-1"]
+    kubelet-base      = ["de-0", "de-2", "de-1", "v-0"]
     kubernetes-master = ["de-1"]
-    kubernetes-worker = ["de-1"]
-    nvidia-container  = ["de-1"]
-    desktop           = ["de-0", "de-2", "de-1"]
-    sunshine          = ["de-1"]
+    kubernetes-worker = ["de-1", "v-0"]
+    nvidia-container  = ["de-1", "v-0"]
+    desktop           = ["de-0", "de-2", "v-0"]
+    sunshine          = []
     remote            = ["de-0", "de-2"]
     chromebook-hacks  = ["de-0"]
   }
