@@ -15,25 +15,23 @@ locals {
 
   pxeboot = {
     hosts = {
-      "74-56-3c-c3-10-68" = merge(local.image_set.coreos, {
-        ignition = "de-1"
+      "1c-83-41-30-e2-54" = merge(local.image_set.coreos, {
+        ignition = "gw-0"
         boot_args = [
+          "systemd.unit=multi-user.target",
           "enforcing=0",
-          # "rd.driver.blacklist=nouveau",
-          # "modprobe.blacklist=nouveau",
-          # "nvidia-drm.modeset=1",
-          "vfio-pci.ids=10de:ffffffff:ffffffff:ffffffff:00030000:ffff00ff,10de:ffffffff:ffffffff:ffffffff:00040300:ffffffff",
-          # "vfio-pci.ids=1002:ffffffff:ffffffff:ffffffff:00030000:ffff00ff,1002:ffffffff:ffffffff:ffffffff:00040300:ffffffff,10de:ffffffff:ffffffff:ffffffff:00030000:ffff00ff,10de:ffffffff:ffffffff:ffffffff:00040300:ffffffff",
-          # "video=efifb:off",
         ]
       })
-      "52-54-00-1a-61-1a" = merge(local.image_set.silverblue, {
-        ignition = "v-0"
+      "74-56-3c-c3-10-68" = merge(local.image_set.coreos, {
+        ignition = "de-1"
         boot_args = [
           "enforcing=0",
           "rd.driver.blacklist=nouveau",
           "modprobe.blacklist=nouveau",
           "nvidia-drm.modeset=1",
+          # "vfio-pci.ids=10de:ffffffff:ffffffff:ffffffff:00030000:ffff00ff,10de:ffffffff:ffffffff:ffffffff:00040300:ffffffff",
+          # "vfio-pci.ids=1002:ffffffff:ffffffff:ffffffff:00030000:ffff00ff,1002:ffffffff:ffffffff:ffffffff:00040300:ffffffff,10de:ffffffff:ffffffff:ffffffff:00030000:ffff00ff,10de:ffffffff:ffffffff:ffffffff:00040300:ffffffff",
+          # "video=efifb:off",
         ]
       })
     }

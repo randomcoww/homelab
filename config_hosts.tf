@@ -1,6 +1,61 @@
 locals {
   base_hosts = {
-    # desktop
+    gw-0 = {
+      users = [
+        "admin",
+      ]
+      netnum = 1
+      hardware_interfaces = {
+        phy0 = {
+          mac   = "1c-83-41-30-e2-54"
+          mtu   = 9000
+          vlans = ["sync", "etcd", "service", "kubernetes", "wan"]
+        }
+      }
+      tap_interfaces = {
+        lan = {
+          source_interface_name = "phy0"
+          enable_netnum         = true
+        }
+        sync = {
+          source_interface_name = "phy0-sync"
+          enable_netnum         = true
+        }
+        etcd = {
+          source_interface_name = "phy0-etcd"
+          enable_netnum         = true
+        }
+        service = {
+          source_interface_name = "phy0-service"
+          enable_netnum         = true
+        }
+        kubernetes = {
+          source_interface_name = "phy0-kubernetes"
+          enable_netnum         = true
+        }
+        wan = {
+          source_interface_name = "phy0-wan"
+          enable_dhcp           = true
+        }
+      }
+      disks = {
+        pv = {
+          device = "/dev/disk/by-id/nvme-VICKTER_NVME_SSD_WLN020A01227"
+          partitions = [
+            {
+              mount_path = local.mounts.containers_path
+              format     = "xfs"
+              wipe       = false
+              options    = ["-s", "size=4096"]
+            },
+          ]
+        }
+      }
+      kubernetes_worker_labels = {
+        minio = true
+      }
+    }
+
     de-1 = {
       netnum = 6
       users = [
@@ -101,8 +156,8 @@ locals {
       ]
     }
 
-    # backup laptop
-    de-2 = {
+    # remote laptop
+    r-0 = {
       users = [
         "client",
       ]
@@ -116,64 +171,26 @@ locals {
         },
       ]
     }
-
-    v-0 = {
-      netnum = 10
-      users = [
-        "client",
-      ]
-      virtual_interfaces = {
-        lan = {
-          mac         = "52-54-00-1a-61-1a"
-          mtu         = 9000
-          enable_dhcp = true
-        }
-        kubernetes = {
-          mac           = "52-54-00-1a-61-1b"
-          mtu           = 9000
-          enable_netnum = true
-        }
-      }
-      # disks = {
-      #   pv = {
-      #     device = "/dev/disk/by-id/scsi-0QEMU_QEMU_HARDDISK_drive-scsi0-0-0-0"
-      #     partitions = [
-      #       {
-      #         mount_path = local.mounts.home_path
-      #         format     = "xfs"
-      #         wipe       = false
-      #         options    = ["-s", "size=4096"]
-      #         bind_mounts = [
-      #           {
-      #             relative_path = "containers"
-      #             mount_path    = local.mounts.containers_path
-      #           },
-      #         ]
-      #       },
-      #     ]
-      #   }
-      # }
-    }
   }
 
   base_members = {
-    base              = ["de-0", "de-2", "de-1", "v-0"]
-    systemd-networkd  = ["de-1", "v-0"]
-    network-manager   = ["de-0", "de-2"]
-    gateway           = ["de-1"]
-    vrrp              = ["de-1"]
-    disks             = ["de-1"]
-    mounts            = ["de-0", "de-2"]
-    ssh-server        = ["de-2", "de-1", "v-0"]
-    ssh-client        = ["de-0", "de-2", "v-0"]
-    etcd              = ["de-1"]
-    kubelet-base      = ["de-0", "de-2", "de-1", "v-0"]
-    kubernetes-master = ["de-1"]
-    kubernetes-worker = ["de-1", "v-0"]
-    nvidia-container  = ["de-1", "v-0"]
-    desktop           = ["de-0", "de-2", "v-0"]
+    base              = ["gw-0", "de-0", "de-1", "r-0"]
+    systemd-networkd  = ["gw-0", "de-1"]
+    network-manager   = ["de-0", "r-0"]
+    gateway           = ["gw-0", "de-1"]
+    vrrp              = ["gw-0", "de-1"]
+    disks             = ["gw-0", "de-1"]
+    mounts            = ["de-0", "r-0"]
+    ssh-server        = ["gw-0", "de-1", "r-0"]
+    ssh-client        = ["de-0", "r-0"]
+    etcd              = ["gw-0"]
+    kubelet-base      = ["gw-0", "de-0", "de-1", "r-0"]
+    kubernetes-master = ["gw-0"]
+    kubernetes-worker = ["gw-0", "de-1"]
+    nvidia-container  = ["de-1"]
+    desktop           = ["de-0", "r-0"]
     sunshine          = []
-    remote            = ["de-0", "de-2"]
+    remote            = ["de-0", "r-0"]
     chromebook-hacks  = ["de-0"]
   }
 
