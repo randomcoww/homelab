@@ -1,7 +1,7 @@
 locals {
   pxeboot_image_builds = {
     coreos     = "fedora-coreos-39.20231124.0"
-    silverblue = "fedora-silverblue-39.20231123.0"
+    silverblue = "fedora-silverblue-39.20231124.0"
   }
 
   image_set = {
@@ -22,7 +22,7 @@ locals {
           "enforcing=0",
         ]
       })
-      "74-56-3c-c3-10-68" = merge(local.image_set.coreos, {
+      "74-56-3c-c3-10-68" = merge(local.image_set.silverblue, {
         ignition = "de-1"
         boot_args = [
           "enforcing=0",

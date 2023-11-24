@@ -156,34 +156,6 @@ resource "helm_release" "external-dns" {
         type      = "ClusterIP"
         clusterIP = local.services.cluster_external_dns.ip
       }
-      affinity = {
-        nodeAffinity = {
-          requiredDuringSchedulingIgnoredDuringExecution = {
-            nodeSelectorTerms = [
-              {
-                matchExpressions = [
-                  {
-                    key      = "kubernetes.io/hostname"
-                    operator = "In"
-                    values = [
-                      for _, member in local.members.gateway :
-                      member.hostname
-                    ]
-                  },
-                  {
-                    key      = "kubernetes.io/hostname"
-                    operator = "In"
-                    values = [
-                      for _, member in local.members.vrrp :
-                      member.hostname
-                    ]
-                  },
-                ]
-              },
-            ]
-          }
-        }
-      }
       coreDNSLivenessProbe = {
         httpGet = {
           path   = "/health"
