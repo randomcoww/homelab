@@ -7,7 +7,7 @@ locals {
       netnum = 1
       hardware_interfaces = {
         phy0 = {
-          mac   = "1c-83-41-30-e2-54"
+          mac   = "1c-83-41-30-e2-23"
           mtu   = 9000
           vlans = ["sync", "etcd", "service", "kubernetes", "wan"]
         }
@@ -40,7 +40,62 @@ locals {
       }
       disks = {
         pv = {
-          device = "/dev/disk/by-id/nvme-VICKTER_NVME_SSD_WLN020A01227"
+          device = "/dev/disk/by-id/nvme-VICKTER_NVME_SSD_WLN020A01247"
+          partitions = [
+            {
+              mount_path = local.mounts.containers_path
+              format     = "xfs"
+              wipe       = false
+              options    = ["-s", "size=4096"]
+            },
+          ]
+        }
+      }
+      kubernetes_worker_labels = {
+        minio = true
+      }
+    }
+    gw-1 = {
+      users = [
+        "admin",
+      ]
+      netnum = 3
+      hardware_interfaces = {
+        phy0 = {
+          mac   = "1c-83-41-30-bd-6f"
+          mtu   = 9000
+          vlans = ["sync", "etcd", "service", "kubernetes", "wan"]
+        }
+      }
+      tap_interfaces = {
+        lan = {
+          source_interface_name = "phy0"
+          enable_netnum         = true
+        }
+        sync = {
+          source_interface_name = "phy0-sync"
+          enable_netnum         = false
+        }
+        etcd = {
+          source_interface_name = "phy0-etcd"
+          enable_netnum         = true
+        }
+        service = {
+          source_interface_name = "phy0-service"
+          enable_netnum         = true
+        }
+        kubernetes = {
+          source_interface_name = "phy0-kubernetes"
+          enable_netnum         = true
+        }
+        wan = {
+          source_interface_name = "phy0-wan"
+          enable_dhcp           = true
+        }
+      }
+      disks = {
+        pv = {
+          device = "/dev/disk/by-id/nvme-VICKTER_NVME_SSD_WLN020A00286"
           partitions = [
             {
               mount_path = local.mounts.containers_path
@@ -174,19 +229,19 @@ locals {
   }
 
   base_members = {
-    base              = ["gw-0", "de-0", "de-1", "r-0"]
-    systemd-networkd  = ["gw-0", "de-1"]
+    base              = ["gw-0", "gw-1", "de-0", "de-1", "r-0"]
+    systemd-networkd  = ["gw-0", "gw-1", "de-1"]
     network-manager   = ["de-0", "r-0"]
-    gateway           = ["gw-0", "de-1"]
-    vrrp              = ["gw-0", "de-1"]
-    disks             = ["gw-0", "de-1"]
+    gateway           = ["gw-0", "gw-1", "de-1"]
+    vrrp              = ["gw-0", "gw-1", "de-1"]
+    disks             = ["gw-0", "gw-1", "de-1"]
     mounts            = ["de-0", "r-0"]
-    ssh-server        = ["gw-0", "de-1", "r-0"]
+    ssh-server        = ["gw-0", "gw-1", "de-1", "r-0"]
     ssh-client        = ["de-0", "de-1", "r-0"]
-    etcd              = ["gw-0"]
-    kubelet-base      = ["gw-0", "de-0", "de-1", "r-0"]
-    kubernetes-master = ["gw-0"]
-    kubernetes-worker = ["gw-0", "de-1"]
+    etcd              = ["gw-0", "gw-1", "de-1"]
+    kubelet-base      = ["gw-0", "gw-1", "de-0", "de-1", "r-0"]
+    kubernetes-master = ["gw-0", "gw-1"]
+    kubernetes-worker = ["gw-0", "gw-1", "de-1"]
     nvidia-container  = ["de-1"]
     desktop           = ["de-0", "de-1", "r-0"]
     sunshine          = []

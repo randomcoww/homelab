@@ -15,8 +15,15 @@ locals {
 
   pxeboot = {
     hosts = {
-      "1c-83-41-30-e2-54" = merge(local.image_set.coreos, {
+      "1c-83-41-30-e2-23" = merge(local.image_set.coreos, {
         ignition = "gw-0"
+        boot_args = [
+          "systemd.unit=multi-user.target",
+          "enforcing=0",
+        ]
+      })
+      "1c-83-41-30-bd-6f" = merge(local.image_set.coreos, {
+        ignition = "gw-1"
         boot_args = [
           "systemd.unit=multi-user.target",
           "enforcing=0",
