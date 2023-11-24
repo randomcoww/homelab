@@ -232,7 +232,7 @@ locals {
     base              = ["gw-0", "gw-1", "de-0", "de-1", "r-0"]
     systemd-networkd  = ["gw-0", "gw-1", "de-1"]
     network-manager   = ["de-0", "r-0"]
-    gateway           = ["gw-0", "gw-1", "de-1"]
+    gateway           = ["gw-0", "gw-1"]
     vrrp              = ["gw-0", "gw-1", "de-1"]
     disks             = ["gw-0", "gw-1", "de-1"]
     mounts            = ["de-0", "r-0"]
