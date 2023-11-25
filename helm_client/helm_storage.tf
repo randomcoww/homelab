@@ -18,7 +18,7 @@ resource "helm_release" "minio" {
         storageClass = "local-path"
       }
       drivesPerNode = 2
-      replicas      = 2
+      replicas      = 3
       resources = {
         requests = {
           memory = "8Gi"
