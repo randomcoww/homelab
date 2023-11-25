@@ -228,12 +228,14 @@ locals {
     }
   }
 
+  # include de-1 in gateway but not vrrp
+  # static routes will be set but keepalived will not run and will always act as BACKUP
   base_members = {
     base              = ["gw-0", "gw-1", "de-0", "de-1", "r-0"]
     systemd-networkd  = ["gw-0", "gw-1", "de-1"]
     network-manager   = ["de-0", "r-0"]
     gateway           = ["gw-0", "gw-1", "de-1"]
-    vrrp              = ["gw-0", "gw-1", "de-1"]
+    vrrp              = ["gw-0", "gw-1"]
     disks             = ["gw-0", "gw-1", "de-1"]
     mounts            = ["de-0", "r-0"]
     ssh-server        = ["gw-0", "gw-1", "de-1", "r-0"]

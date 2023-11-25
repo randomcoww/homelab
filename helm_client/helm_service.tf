@@ -518,7 +518,7 @@ resource "helm_release" "kasm-desktop" {
   repository = "https://randomcoww.github.io/repos/helm/"
   chart      = "kasm-desktop"
   wait       = false
-  version    = "0.1.7"
+  version    = "0.1.6"
   values = [
     yamlencode({
       images = {
@@ -548,7 +548,7 @@ resource "helm_release" "kasm-desktop" {
       desktop = {
         user    = "kasm-user"
         uid     = "10000"
-        device  = "/dev/dri/renderD128"
+        device  = "/dev/dri/renderD129"
         display = ":0"
       }
       additionalEnvs = {

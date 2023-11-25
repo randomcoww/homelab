@@ -37,8 +37,6 @@ spec:
           mountPath: /home/{{ .Values.desktop.user }}
         - name: dshm
           mountPath: /dev/shm
-        - name: dri
-          mountPath: {{ .Values.desktop.device }}
         ports:
         - containerPort: {{ .Values.ports.desktop }}
         {{- range $port := .Values.ports.sunshineTCP }}
@@ -73,9 +71,6 @@ spec:
       - name: dshm
         emptyDir:
           medium: Memory
-      - name: dri
-        hostPath:
-          path: {{ .Values.desktop.device }}
   volumeClaimTemplates:
   - metadata:
       name: desktop-home

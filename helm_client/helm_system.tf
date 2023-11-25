@@ -360,7 +360,7 @@ resource "helm_release" "amd-gpu" {
   chart      = "amd-gpu"
   namespace  = "kube-system"
   wait       = false
-  version    = "0.8.0"
+  version    = "0.10.0"
   values = [
     yamlencode({
       tolerations = [
@@ -381,7 +381,7 @@ resource "helm_release" "nvidia-device-plugin" {
   chart      = "nvidia-device-plugin"
   namespace  = "kube-system"
   wait       = false
-  version    = "0.14.1"
+  version    = "0.14.3"
   values = [
     yamlencode({
       affinity = {
