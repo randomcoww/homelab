@@ -518,7 +518,7 @@ resource "helm_release" "kasm-desktop" {
   repository = "https://randomcoww.github.io/repos/helm/"
   chart      = "kasm-desktop"
   wait       = false
-  version    = "0.1.6"
+  version    = "0.1.7"
   values = [
     yamlencode({
       images = {
