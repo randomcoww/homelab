@@ -46,11 +46,12 @@ variable "lan_vip" {
   type = string
 }
 
-variable "upstream_dns" {
-  type = object({
-    ip             = string
-    tls_servername = string
-  })
+variable "internal_dns_vip" {
+  type = string
+}
+
+variable "internal_dns_domains" {
+  type = list(string)
 }
 
 variable "keepalived_config_path" {

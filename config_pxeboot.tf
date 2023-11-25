@@ -1,7 +1,7 @@
 locals {
   pxeboot_image_builds = {
-    coreos     = "fedora-coreos-38.20230701.0"
-    silverblue = "fedora-silverblue-38.20230914.0"
+    coreos     = "fedora-coreos-39.20231125.0"
+    silverblue = "fedora-silverblue-39.20231124.0"
   }
 
   image_set = {
@@ -22,15 +22,8 @@ locals {
           "enforcing=0",
         ]
       })
-      "1c-83-41-30-e2-54" = merge(local.image_set.coreos, {
-        ignition = "gw-1"
-        boot_args = [
-          "systemd.unit=multi-user.target",
-          "enforcing=0",
-        ]
-      })
       "1c-83-41-30-bd-6f" = merge(local.image_set.coreos, {
-        ignition = "q-0"
+        ignition = "gw-1"
         boot_args = [
           "systemd.unit=multi-user.target",
           "enforcing=0",

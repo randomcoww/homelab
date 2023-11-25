@@ -20,6 +20,7 @@ systemd:
           contents: |
             [Service]
             EnvironmentFile=/var/lib/tailscale/aws_credentials
+            Environment=TS_DEBUG_FIREWALL_MODE=nftables
             ExecStart=
             ExecStart=/usr/sbin/tailscaled \
               --state=arn:aws:ssm:${tailscale_ssm_access.aws_region}::parameter/${tailscale_ssm_access.resource}/%H \

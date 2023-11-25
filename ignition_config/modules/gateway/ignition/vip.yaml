@@ -8,7 +8,7 @@ storage:
       contents:
         inline: |
           vrrp_instance gateway {
-            nopreempt
+            preempt
             state BACKUP
             advert_int 0.1
             virtual_router_id ${virtual_router_id}
@@ -34,14 +34,6 @@ storage:
           RequestBroadcast=true
           ClientIdentifier=mac
           RouteTable=${vrrp_master_default_route.table_id}
-    # Set global DNS - DNS via DHCP only resolves through the wan link when using systemd-resolve
-    - path: /etc/systemd/resolved.conf.d/10-gateway-dns.conf
-      mode: 0644
-      contents:
-        inline: |
-          [Resolve]
-          DNS=${upstream_dns.ip}#${upstream_dns.tls_servername}
-          DNSOverTLS=true
     - path: /etc/systemd/network/20-${lan_interface_name}.network.d/20-slave-default-route.conf
       mode: 0644
       contents:
@@ -56,3 +48,7 @@ storage:
           [RoutingPolicyRule]
           Table=${vrrp_slave_default_route.table_id}
           Priority=${vrrp_slave_default_route.table_priority}
+
+          [Network]
+          DNS=${internal_dns_vip}
+          Domains=~${join(" ~", internal_dns_domains)}

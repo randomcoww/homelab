@@ -68,13 +68,13 @@ storage:
           AllowSuspendThenHibernate=no
           AllowHybridSleep=no
 
-    # Disable local DNS for systemd-networkd #
-    - path: /etc/systemd/resolved.conf.d/10-mdns.conf
+    - path: /etc/systemd/resolved.conf.d/10-base.conf
       mode: 0644
       contents:
         inline: |
           [Resolve]
-          FallbackDNS=
+          DNS=${upstream_dns.ip}#${upstream_dns.tls_servername}
+          Domains=~.
           DNSStubListener=false
           MulticastDNS=true
           LLMNR=false
@@ -122,6 +122,12 @@ storage:
       contents:
         inline: |
           br_netfilter
+    # Image build #
+    - path: /etc/modules-load.d/20-uinput.conf
+      mode: 0644
+      contents:
+        inline: |
+          uinput
     # Keepalived VIP #
     - path: /etc/sysctl.d/20-keepalived.conf
       mode: 0644

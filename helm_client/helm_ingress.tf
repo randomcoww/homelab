@@ -448,42 +448,8 @@ resource "helm_release" "authelia" {
   }
 }
 
-# tailscale #
-/*
-resource "helm_release" "tailscale" {
-  name             = "tailscale"
-  namespace        = "tailscale"
-  repository       = "https://randomcoww.github.io/repos/helm/"
-  chart            = "tailscale"
-  create_namespace = true
-  wait             = false
-  version          = "0.1.6"
-  values = [
-    yamlencode({
-      images = {
-        tailscale = local.container_images.tailscale
-      }
-      authKey    = var.tailscale.auth_key
-      kubeSecret = "tailscale-state"
-      additionalParameters = {
-        TS_ACCEPT_DNS = false
-        TS_EXTRA_ARGS = [
-          "--advertise-exit-node",
-        ]
-        TS_ROUTES = [
-          local.networks.lan.prefix,
-          local.networks.service.prefix,
-          local.networks.kubernetes.prefix,
-          local.networks.kubernetes_service.prefix,
-          local.networks.kubernetes_pod.prefix,
-        ]
-      }
-    }),
-  ]
-}
-*/
-
 # tailscale with ssm secret #
+/*
 resource "helm_release" "tailscale-ssm" {
   name             = "tailscale-ssm"
   namespace        = "tailscale"
@@ -520,3 +486,4 @@ resource "helm_release" "tailscale-ssm" {
     }),
   ]
 }
+*/

@@ -46,6 +46,7 @@ locals {
         ingress_nginx_external = 35
         matchbox               = 33
         minio                  = 34
+        kasm_sunshine          = 36
       }
       mtu = 9000
     }
@@ -76,16 +77,6 @@ locals {
     kubernetes_pod = {
       network = "10.244.0.0"
       cidr    = 16
-    }
-    # mobile device fallback
-    fallback = {
-      metric = 512
-    }
-    # get dhcp from another network lan
-    remote = {
-      metric  = 2048
-      vlan_id = 120
-      mtu     = 1500
     }
   }
 
@@ -137,13 +128,14 @@ locals {
     vaultwarden        = "docker.io/vaultwarden/server:1.29.0-alpine"
     litestream         = "docker.io/litestream/litestream:latest"
     cloudflared        = "docker.io/cloudflare/cloudflared:2023.8.0"
-    tailscale          = "ghcr.io/randomcoww/tailscale:1.44.0"
+    tailscale          = "ghcr.io/randomcoww/tailscale:1.52.1"
     fuse_device_plugin = "soolaugust/fuse-device-plugin:v1.0"
-    code_server        = "ghcr.io/randomcoww/code-server:20231017.3-tensorflow"
+    code_server        = "ghcr.io/randomcoww/code-server:20231115.3-tensorflow"
+    kasm_desktop       = "ghcr.io/randomcoww/kasm-desktop:20231123.7"
   }
 
   kubernetes = {
-    cluster_name              = "prod-9"
+    cluster_name              = "prod-10"
     static_pod_manifest_path  = "/var/lib/kubelet/manifests"
     cni_bridge_interface_name = "cni0"
   }
@@ -156,15 +148,17 @@ locals {
   }
 
   kubernetes_ingress_endpoints = {
-    mpd          = "mpd.${local.domains.internal}"
-    auth         = "auth.${local.domains.internal}"
-    transmission = "t.${local.domains.internal}"
-    minio        = "m.${local.domains.internal}"
-    pl           = "pl.${local.domains.internal}"
-    vaultwarden  = "vw.${local.domains.internal}"
-    webdav       = "w.${local.domains.internal}"
-    matchbox     = "ign.${local.domains.internal}"
-    code         = "code.${local.domains.internal}"
+    mpd           = "mpd.${local.domains.internal}"
+    auth          = "auth.${local.domains.internal}"
+    transmission  = "t.${local.domains.internal}"
+    minio         = "m.${local.domains.internal}"
+    pl            = "pl.${local.domains.internal}"
+    vaultwarden   = "vw.${local.domains.internal}"
+    webdav        = "w.${local.domains.internal}"
+    matchbox      = "ign.${local.domains.internal}"
+    code          = "code.${local.domains.internal}"
+    kasm_desktop  = "k.${local.domains.internal}"
+    kasm_sunshine = "ks.${local.domains.internal}"
   }
 
   ingress_classes = {
@@ -202,6 +196,7 @@ locals {
     transmission = 9091
     vaultwarden  = 8080
     code         = 8080
+    kasm_desktop = 6901
   }
 
   minio_buckets = {

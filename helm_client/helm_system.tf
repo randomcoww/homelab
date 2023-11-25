@@ -42,7 +42,7 @@ resource "helm_release" "kube-dns" {
         repository = split(":", local.container_images.coredns)[0]
         tag        = split(":", local.container_images.coredns)[1]
       }
-      replicaCount = 2
+      replicaCount = 3
       serviceType  = "ClusterIP"
       serviceAccount = {
         create = false
@@ -140,6 +140,7 @@ resource "helm_release" "external-dns" {
         externalDNS = local.container_images.external_dns
         etcd        = local.container_images.etcd
       }
+      replicaCount = 3
       serviceAccount = {
         create = true
         name   = "external-dns"
@@ -155,34 +156,6 @@ resource "helm_release" "external-dns" {
       service = {
         type      = "ClusterIP"
         clusterIP = local.services.cluster_external_dns.ip
-      }
-      affinity = {
-        nodeAffinity = {
-          requiredDuringSchedulingIgnoredDuringExecution = {
-            nodeSelectorTerms = [
-              {
-                matchExpressions = [
-                  {
-                    key      = "kubernetes.io/hostname"
-                    operator = "In"
-                    values = [
-                      for _, member in local.members.gateway :
-                      member.hostname
-                    ]
-                  },
-                  {
-                    key      = "kubernetes.io/hostname"
-                    operator = "In"
-                    values = [
-                      for _, member in local.members.vrrp :
-                      member.hostname
-                    ]
-                  },
-                ]
-              },
-            ]
-          }
-        }
       }
       coreDNSLivenessProbe = {
         httpGet = {
@@ -387,7 +360,7 @@ resource "helm_release" "amd-gpu" {
   chart      = "amd-gpu"
   namespace  = "kube-system"
   wait       = false
-  version    = "0.8.0"
+  version    = "0.10.0"
   values = [
     yamlencode({
       tolerations = [
@@ -408,7 +381,7 @@ resource "helm_release" "nvidia-device-plugin" {
   chart      = "nvidia-device-plugin"
   namespace  = "kube-system"
   wait       = false
-  version    = "0.14.1"
+  version    = "0.14.3"
   values = [
     yamlencode({
       affinity = {

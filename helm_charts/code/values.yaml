@@ -30,7 +30,8 @@ tls:
   enabled: true
 
 images:
-  code: "ghcr.io/randomcoww/code-server:20230720"
+  code: ghcr.io/randomcoww/code-server:20230720
+  tailscale: ghcr.io/tailscale/tailscale:v1.44.0
 
 code:
   mountPath: /home/podman
@@ -38,3 +39,14 @@ code:
 
 affinity: {}
 tolerations: {}
+
+tailscale:
+  authKey: ""
+  # additionalParameters:
+  #   TS_ACCEPT_DNS: true
+
+  ssm:
+    resource: "tailscale-secret"
+    awsRegion: "us-west-2"
+    accessKeyID: ""
+    secretAccessKey: ""

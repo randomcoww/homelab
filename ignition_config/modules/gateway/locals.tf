@@ -13,11 +13,13 @@ locals {
       lan_interface_name         = var.lan_interface_name
       lan_prefix                 = var.lan_prefix
       lan_vip                    = var.lan_vip
+      internal_dns_vip           = var.internal_dns_vip
+      internal_dns_domains       = var.internal_dns_domains
       static_pod_manifest_path   = var.static_pod_manifest_path
       keepalived_config_path     = var.keepalived_config_path
-      upstream_dns               = var.upstream_dns
 
-      virtual_router_id = 10
+      nftables_namespace = "gateway"
+      virtual_router_id  = 10
       vrrp_master_default_route = {
         table_id       = 250
         table_priority = 32770

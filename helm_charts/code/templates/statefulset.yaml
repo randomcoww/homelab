@@ -45,10 +45,53 @@ spec:
             add:
             - AUDIT_WRITE
           runAsUser: {{ .Values.code.uid }}
-      {{- with .Values.resources }}
+      {{- with .Values.code.resources }}
         resources:
 {{ toYaml . | indent 10 }}
       {{- end }}
+      - name: {{ .Chart.Name }}-tailscale
+        image: {{ .Values.images.tailscale }}
+        securityContext:
+          privileged: true
+        env:
+        - name: POD_NAME
+          valueFrom:
+            fieldRef:
+              fieldPath: metadata.name
+        {{- range $k, $v := .Values.tailscale.additionalParameters }}
+        - name: {{ $k }}
+          value: {{ join "," $v | quote }}
+        {{- end }}
+        - name: TS_STATE_DIR
+          value: "/varlib/tailscale"
+        - name: KUBERNETES_SERVICE_HOST
+          value: ""
+        - name: TS_KUBE_SECRET
+          value: ""
+        - name: TS_USERSPACE
+          value: "false"
+        - name: TS_TAILSCALED_EXTRA_ARGS
+          value: "--state=arn:aws:ssm:{{ .Values.tailscale.ssm.awsRegion }}::parameter/{{ .Values.tailscale.ssm.resource }}/$(POD_NAME)"
+        - name: TS_AUTH_KEY
+          valueFrom:
+            secretKeyRef:
+              name: {{ template "code.fullname" . }}
+              key: TS_AUTHKEY
+        - name : AWS_REGION
+          valueFrom:
+            secretKeyRef:
+              name: {{ template "code.fullname" . }}
+              key: AWS_REGION
+        - name: AWS_ACCESS_KEY_ID
+          valueFrom:
+            secretKeyRef:
+              name: {{ template "code.fullname" . }}
+              key: AWS_ACCESS_KEY_ID
+        - name: AWS_SECRET_ACCESS_KEY
+          valueFrom:
+            secretKeyRef:
+              name: {{ template "code.fullname" . }}
+              key: AWS_SECRET_ACCESS_KEY
   volumeClaimTemplates:
   - metadata:
       name: code-mount

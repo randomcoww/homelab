@@ -273,7 +273,6 @@ flatpak --user -y install --or-update flathub \
   org.blender.Blender \
   org.godotengine.Godot \
   com.github.xournalpp.xournalpp \
-  org.nomacs.ImageLounge \
   org.kde.okular \
   com.valvesoftware.Steam \
   com.heroicgameslauncher.hgl \
@@ -333,8 +332,7 @@ sudo apt install -y \
 flatpak --user remote-add --if-not-exists flathub https://flathub.org/repo/flathub.flatpakrepo
 
 flatpak --user -y install flathub \
-  com.visualstudio.code \
-  org.blender.Blender
+  com.brave.Browser
 ```
 
 ```bash

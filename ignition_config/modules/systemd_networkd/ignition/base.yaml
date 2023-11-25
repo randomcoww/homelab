@@ -6,11 +6,6 @@ systemd:
     # systemd-networkd work around "could not connect to dbus: permission denied"
     - name: systemd-networkd.service
       enabled: true
-      dropins:
-        - name: 10-dependencies.conf
-          contents: |
-            [Unit]
-            After=dbus.socket
     - name: systemd-networkd-wait-online.service
       enabled: true
       dropins:

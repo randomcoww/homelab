@@ -7,7 +7,7 @@ resource "helm_release" "minio" {
   chart            = "minio"
   create_namespace = true
   wait             = false
-  version          = "5.0.13"
+  version          = "5.0.14"
   values = [
     yamlencode({
       clusterDomain = local.domains.kubernetes
