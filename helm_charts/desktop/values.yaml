@@ -48,7 +48,6 @@ images:
 desktop:
   user: kasm-user
   uid: "1000"
-  device: /dev/dri/renderD128
   display: :1
 
 additionalEnvs: {}

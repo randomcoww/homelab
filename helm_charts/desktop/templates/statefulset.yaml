@@ -55,8 +55,6 @@ spec:
           value: {{ .Values.desktop.uid | quote }}
         - name: XDG_RUNTIME_DIR
           value: /run/user/{{ .Values.desktop.uid }}
-        - name: DEVICE
-          value: {{ .Values.desktop.device }}
         - name: DISPLAY
           value: {{ .Values.desktop.display }}
         {{- range $name, $value := .Values.additionalEnvs }}
