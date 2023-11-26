@@ -130,8 +130,8 @@ locals {
     cloudflared        = "docker.io/cloudflare/cloudflared:2023.8.0"
     tailscale          = "ghcr.io/randomcoww/tailscale:1.52.1"
     fuse_device_plugin = "soolaugust/fuse-device-plugin:v1.0"
-    code_server        = "ghcr.io/randomcoww/code-server:20231115.3-tensorflow"
-    kasm_desktop       = "ghcr.io/randomcoww/kasm-desktop:20231125.8"
+    code_server        = "ghcr.io/randomcoww/code-server:20231126.4-tensorflow"
+    kasm_desktop       = "ghcr.io/randomcoww/kasm-desktop:20231126.5"
   }
 
   kubernetes = {
