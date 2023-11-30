@@ -83,6 +83,9 @@ WG_ADDRESS=
 WG_PUBLIC_KEY=
 WG_ENDPOINT=
 AUTHELIA_PASSWORD_HASH=$(podman run --rm docker.io/authelia/authelia:latest authelia hash-password -- "$PASSWORD" | sed 's:.*\: ::')
+APCA_API_KEY_ID=
+APCA_API_SECRET_KEY=
+APCA_API_BASE_URL=
 ```
 
 ```bash
@@ -125,6 +128,12 @@ wireguard_client = {
     AllowedIPs = "0.0.0.0/0,::0/0"
     Endpoint   = "$WG_ENDPOINT"
   }
+}
+
+alpaca = {
+  api_key_id     = "$APCA_API_KEY_ID"
+  api_secret_key = "$APCA_API_SECRET_KEY"
+  api_base_url   = "$APCA_API_BASE_URL"
 }
 EOF
 ```

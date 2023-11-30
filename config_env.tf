@@ -47,6 +47,7 @@ locals {
         matchbox               = 33
         minio                  = 34
         kasm_sunshine          = 36
+        alpaca_stream          = 37
       }
       mtu = 9000
     }
@@ -132,6 +133,7 @@ locals {
     fuse_device_plugin = "soolaugust/fuse-device-plugin:v1.0"
     code_server        = "ghcr.io/randomcoww/code-server:20231126.4-tensorflow"
     kasm_desktop       = "ghcr.io/randomcoww/kasm-desktop:20231126.9"
+    alpaca_stream      = "ghcr.io/randomcoww/alpaca-stream-server:20230518.1"
   }
 
   kubernetes = {
@@ -159,6 +161,7 @@ locals {
     code          = "code.${local.domains.internal}"
     kasm_desktop  = "k.${local.domains.internal}"
     kasm_sunshine = "ks.${local.domains.internal}"
+    alpaca_stream = "alpaca-stream.${local.domains.internal}"
   }
 
   ingress_classes = {
@@ -192,11 +195,12 @@ locals {
   }
 
   service_ports = {
-    minio        = 80
-    transmission = 9091
-    vaultwarden  = 8080
-    code         = 8080
-    kasm_desktop = 6901
+    minio         = 80
+    transmission  = 9091
+    vaultwarden   = 8080
+    code          = 8080
+    kasm_desktop  = 6901
+    alpaca_stream = 38081
   }
 
   minio_buckets = {
