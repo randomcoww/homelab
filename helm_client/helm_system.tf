@@ -104,6 +104,10 @@ EOF
               parameters = "${local.domains.internal} dns://${local.services.cluster_external_dns.ip}"
             },
             {
+              name       = "forward"
+              parameters = "${local.domains.internal_mdns} dns://${local.services.mdns_resolver.ip}"
+            },
+            {
               name        = "forward"
               parameters  = ". tls://${local.upstream_dns.ip}"
               configBlock = <<EOF
@@ -202,6 +206,10 @@ resource "helm_release" "external-dns" {
               configBlock = <<EOF
 fallthrough
 EOF
+            },
+            {
+              name       = "forward"
+              parameters = "${local.domains.internal_mdns} dns://${local.services.mdns_resolver.ip}"
             },
             {
               name        = "forward"

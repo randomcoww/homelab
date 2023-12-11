@@ -21,7 +21,8 @@ locals {
       enable_dns         = true
       mtu                = 9000
       netnums = {
-        gateway = 2
+        gateway       = 2
+        mdns_resolver = 4
       }
     }
     sync = {

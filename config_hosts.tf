@@ -74,7 +74,7 @@ locals {
         }
         sync = {
           source_interface_name = "phy0-sync"
-          enable_netnum         = false
+          enable_netnum         = true
         }
         etcd = {
           source_interface_name = "phy0-etcd"
@@ -235,6 +235,7 @@ locals {
     systemd-networkd  = ["gw-0", "gw-1", "de-1"]
     network-manager   = ["de-0", "r-0"]
     gateway           = ["gw-0", "gw-1", "de-1"]
+    mdns-resolver     = ["gw-0", "gw-1"]
     vrrp              = ["gw-0", "gw-1"]
     disks             = ["gw-0", "gw-1", "de-1"]
     mounts            = ["de-0", "r-0"]

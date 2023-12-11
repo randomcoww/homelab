@@ -1,0 +1,11 @@
+---
+variant: fcos
+version: 1.5.0
+storage:
+  files:
+    - path: /etc/systemd/resolved.conf.d/12-mdns-resolver.conf
+      mode: 0644
+      contents:
+        inline: |
+          [Resolve]
+          DNSStubListenerExtra=0.0.0.0:53

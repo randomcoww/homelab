@@ -83,8 +83,18 @@ module "ignition-gateway" {
   internal_dns_vip    = local.services.external_dns.ip
   internal_dns_domains = [
     local.domains.internal,
+    local.domains.internal_mdns,
     local.domains.kubernetes,
   ]
+}
+
+module "ignition-mdns-resolver" {
+  for_each = local.members.mdns-resolver
+  source   = "./modules/mdns_resolver"
+
+  sync_interface_name = each.value.tap_interfaces.sync.interface_name
+  mdns_interface_name = each.value.tap_interfaces[local.services.mdns_resolver.network.name].interface_name
+  mdns_resolver_vip   = local.services.mdns_resolver.ip
 }
 
 module "ignition-vrrp" {
@@ -257,6 +267,7 @@ data "ct_config" "ignition" {
       try(module.ignition-systemd-networkd[host_key].ignition_snippets, []),
       try(module.ignition-network-manager[host_key].ignition_snippets, []),
       try(module.ignition-gateway[host_key].ignition_snippets, []),
+      try(module.ignition-mdns-resolver[host_key].ignition_snippets, []),
       try(module.ignition-vrrp[host_key].ignition_snippets, []),
       try(module.ignition-disks[host_key].ignition_snippets, []),
       try(module.ignition-mounts[host_key].ignition_snippets, []),

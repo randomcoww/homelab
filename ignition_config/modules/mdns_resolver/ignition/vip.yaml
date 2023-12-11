@@ -1,0 +1,22 @@
+---
+variant: fcos
+version: 1.5.0
+storage:
+  files:
+    - path: ${keepalived_config_path}/50-mdns-resolver.conf
+      mode: 0644
+      contents:
+        inline: |
+          vrrp_instance mdns-resolver {
+            preempt
+            state BACKUP
+            advert_int 0.1
+            virtual_router_id ${virtual_router_id}
+            interface ${sync_interface_name}
+            priority 250
+            garp_master_delay 1
+            garp_master_refresh 1
+            virtual_ipaddress {
+              ${mdns_resolver_vip} dev ${mdns_interface_name} use_vmac
+            }
+          }
