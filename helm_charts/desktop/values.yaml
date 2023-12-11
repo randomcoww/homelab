@@ -54,3 +54,5 @@ additionalEnvs: {}
 
 affinity: {}
 tolerations: {}
+
+sshKnownHosts: ""

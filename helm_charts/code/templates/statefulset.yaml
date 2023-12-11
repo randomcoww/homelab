@@ -38,6 +38,10 @@ spec:
         volumeMounts:
         - name: code-mount
           mountPath: {{ .Values.code.mountPath }}
+        - name: secret
+          mountPath: /etc/ssh/ssh_known_hosts
+          subPathExpr: ssh_known_hosts
+          readOnly: true
         ports:
         - containerPort: {{ .Values.ports.code }}
         securityContext:
@@ -92,6 +96,10 @@ spec:
             secretKeyRef:
               name: {{ template "code.fullname" . }}
               key: AWS_SECRET_ACCESS_KEY
+      volumes:
+      - name: secret
+        secret:
+          secretName: {{ template "code.fullname" . }}
   volumeClaimTemplates:
   - metadata:
       name: code-mount

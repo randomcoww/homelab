@@ -50,3 +50,5 @@ tailscale:
     awsRegion: "us-west-2"
     accessKeyID: ""
     secretAccessKey: ""
+
+sshKnownHosts: ""

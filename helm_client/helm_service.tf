@@ -442,7 +442,7 @@ resource "helm_release" "code" {
   repository = "https://randomcoww.github.io/repos/helm/"
   chart      = "code"
   wait       = false
-  version    = "0.1.19"
+  version    = "0.1.21"
   values = [
     yamlencode({
       images = {
@@ -483,6 +483,7 @@ resource "helm_release" "code" {
           local.kubernetes_ingress_endpoints.code,
         ]
       }
+      sshKnownHosts = "@cert-authority * ${data.terraform_remote_state.sr.outputs.ssh_ca.public_key_openssh}"
       tailscale = {
         authKey = var.tailscale.auth_key
         ssm = {
@@ -492,7 +493,7 @@ resource "helm_release" "code" {
           resource        = data.terraform_remote_state.sr.outputs.ssm.tailscale.resource
         }
         additionalParameters = {
-          TS_ACCEPT_DNS          = true
+          TS_ACCEPT_DNS          = false
           TS_DEBUG_FIREWALL_MODE = "nftables"
           TS_EXTRA_ARGS = [
             "--advertise-exit-node",
@@ -518,7 +519,7 @@ resource "helm_release" "kasm-desktop" {
   repository = "https://randomcoww.github.io/repos/helm/"
   chart      = "kasm-desktop"
   wait       = false
-  version    = "0.1.7"
+  version    = "0.1.9"
   values = [
     yamlencode({
       images = {
@@ -550,6 +551,7 @@ resource "helm_release" "kasm-desktop" {
         uid     = "10000"
         display = ":0"
       }
+      sshKnownHosts = "@cert-authority * ${data.terraform_remote_state.sr.outputs.ssh_ca.public_key_openssh}"
       additionalEnvs = {
         VK_ICD_FILENAMES = "/usr/share/vulkan/icd.d/radeon_icd.i686.json:/usr/share/vulkan/icd.d/radeon_icd.x86_64.json"
         AMD_VULKAN_ICD   = "RADV"

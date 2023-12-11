@@ -37,6 +37,10 @@ spec:
           mountPath: /home/{{ .Values.desktop.user }}
         - name: dshm
           mountPath: /dev/shm
+        - name: secret
+          mountPath: /etc/ssh/ssh_known_hosts
+          subPathExpr: ssh_known_hosts
+          readOnly: true
         ports:
         - containerPort: {{ .Values.ports.desktop }}
         {{- range $port := .Values.ports.sunshineTCP }}
@@ -69,6 +73,9 @@ spec:
       - name: dshm
         emptyDir:
           medium: Memory
+      - name: secret
+        secret:
+          secretName: {{ template "desktop.fullname" . }}
   volumeClaimTemplates:
   - metadata:
       name: desktop-home
