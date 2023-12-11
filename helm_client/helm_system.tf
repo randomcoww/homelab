@@ -105,7 +105,7 @@ EOF
             },
             {
               name       = "forward"
-              parameters = "${local.domains.internal_mdns} dns://${local.services.mdns_resolver.ip}"
+              parameters = "${local.domains.internal_mdns} dns://${local.services.gateway.ip}:${local.ports.gateway_dns}"
             },
             {
               name        = "forward"
@@ -192,7 +192,7 @@ resource "helm_release" "external-dns" {
               zone = "."
             },
           ]
-          port = local.ports.gateway_dns
+          port = 53
           plugins = [
             {
               name = "health"
@@ -209,7 +209,7 @@ EOF
             },
             {
               name       = "forward"
-              parameters = "${local.domains.internal_mdns} dns://${local.services.mdns_resolver.ip}"
+              parameters = "${local.domains.internal_mdns} dns://${local.services.gateway.ip}:${local.ports.gateway_dns}"
             },
             {
               name        = "forward"
@@ -392,22 +392,6 @@ resource "helm_release" "nvidia-device-plugin" {
   version    = "0.14.3"
   values = [
     yamlencode({
-      affinity = {
-        nodeAffinity = {
-          requiredDuringSchedulingIgnoredDuringExecution = {
-            nodeSelectorTerms = [
-              {
-                matchExpressions = [
-                  {
-                    key      = "nvidia"
-                    operator = "Exists"
-                  },
-                ]
-              },
-            ]
-          }
-        }
-      }
       tolerations = [
         {
           key      = "node-role.kubernetes.io/de"

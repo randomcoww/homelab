@@ -21,8 +21,7 @@ locals {
       enable_dns         = true
       mtu                = 9000
       netnums = {
-        gateway       = 2
-        mdns_resolver = 4
+        gateway = 2
       }
     }
     sync = {
@@ -180,8 +179,8 @@ locals {
   }
 
   ports = {
-    kea_peer           = 50060
     gateway_dns        = 53
+    kea_peer           = 50060
     pxe_tftp           = 69
     apiserver_ha       = 58081
     apiserver          = 58181

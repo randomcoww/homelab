@@ -46,12 +46,8 @@ variable "lan_vip" {
   type = string
 }
 
-variable "internal_dns_vip" {
-  type = string
-}
-
-variable "internal_dns_domains" {
-  type = list(string)
+variable "dns_port" {
+  type = number
 }
 
 variable "keepalived_config_path" {
