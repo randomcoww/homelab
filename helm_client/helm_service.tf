@@ -435,7 +435,7 @@ resource "helm_release" "hostapd" {
 }
 
 # code-server #
-
+/*
 resource "helm_release" "code" {
   name       = "code"
   namespace  = "default"
@@ -455,11 +455,11 @@ resource "helm_release" "code" {
         size         = "128Gi"
       }
       ports = {
-        code = local.service_ports.code
+        code = local.service_ports.code_server
       }
       service = {
         type = "ClusterIP"
-        port = local.service_ports.code
+        port = local.service_ports.code_server
       }
       code = {
         mountPath = "/home/podman"
@@ -480,7 +480,7 @@ resource "helm_release" "code" {
           local.tls_wildcard,
         ]
         hosts = [
-          local.kubernetes_ingress_endpoints.code,
+          local.kubernetes_ingress_endpoints.code_server,
         ]
       }
       sshKnownHosts = "@cert-authority * ${data.terraform_remote_state.sr.outputs.ssh_ca.public_key_openssh}"
@@ -510,32 +510,81 @@ resource "helm_release" "code" {
     }),
   ]
 }
-
+*/
 # kasm-desktop #
 
 resource "helm_release" "kasm-desktop" {
-  name       = "kasm-desktop"
+  name       = "desktop"
   namespace  = "default"
   repository = "https://randomcoww.github.io/repos/helm/"
   chart      = "kasm-desktop"
   wait       = false
-  version    = "0.1.9"
+  version    = "0.2.2"
   values = [
     yamlencode({
       images = {
-        desktop = local.container_images.kasm_desktop
+        desktop   = local.container_images.kasm_desktop
+        tailscale = local.container_images.tailscale
       }
       persistence = {
         accessMode   = "ReadWriteOnce"
         storageClass = "local-path"
         size         = "64Gi"
       }
-      ports = {
-        desktop = local.service_ports.kasm_desktop
+      user          = "kasm-user"
+      uid           = 10000
+      sshKnownHosts = "@cert-authority * ${data.terraform_remote_state.sr.outputs.ssh_ca.public_key_openssh}"
+      tailscale = {
+        authKey = var.tailscale.auth_key
+        ssm = {
+          awsRegion       = data.terraform_remote_state.sr.outputs.ssm.tailscale.aws_region
+          accessKeyID     = data.terraform_remote_state.sr.outputs.ssm.tailscale.access_key_id
+          secretAccessKey = data.terraform_remote_state.sr.outputs.ssm.tailscale.secret_access_key
+          resource        = data.terraform_remote_state.sr.outputs.ssm.tailscale.resource
+        }
+        additionalEnvs = {
+          TS_ACCEPT_DNS          = false
+          TS_DEBUG_FIREWALL_MODE = "nftables"
+          TS_EXTRA_ARGS = [
+            "--advertise-exit-node",
+          ]
+          TS_ROUTES = [
+            local.networks.lan.prefix,
+            local.networks.service.prefix,
+            local.networks.kubernetes.prefix,
+            local.networks.kubernetes_service.prefix,
+            local.networks.kubernetes_pod.prefix,
+          ]
+        }
       }
-      service = {
+      kasm = {
+        display = ":0"
+        additionalEnvs = {
+          VK_ICD_FILENAMES           = "/usr/share/vulkan/icd.d/radeon_icd.i686.json:/usr/share/vulkan/icd.d/radeon_icd.x86_64.json"
+          AMD_VULKAN_ICD             = "RADV"
+          RESOLUTION                 = "2560x1600"
+          NVIDIA_DRIVER_CAPABILITIES = "all"
+          # NVIDIA_VISIBLE_DEVICES     = "all"
+        }
+        resources = {
+          limits = {
+            "github.com/fuse" = 1
+            "amd.com/gpu"     = 1
+            "nvidia.com/gpu"  = 1
+          }
+        }
+      }
+      ports = {
+        kasm = local.service_ports.kasm_desktop
+        code = local.service_ports.code_server
+      }
+      kasmService = {
         type = "ClusterIP"
         port = local.service_ports.kasm_desktop
+      }
+      codeService = {
+        type = "ClusterIP"
+        port = local.service_ports.code_server
       }
       sunshineService = {
         type = "LoadBalancer"
@@ -546,18 +595,7 @@ resource "helm_release" "kasm-desktop" {
           local.services.kasm_sunshine.ip,
         ]
       }
-      desktop = {
-        user    = "kasm-user"
-        uid     = "10000"
-        display = ":0"
-      }
-      sshKnownHosts = "@cert-authority * ${data.terraform_remote_state.sr.outputs.ssh_ca.public_key_openssh}"
-      additionalEnvs = {
-        VK_ICD_FILENAMES = "/usr/share/vulkan/icd.d/radeon_icd.i686.json:/usr/share/vulkan/icd.d/radeon_icd.x86_64.json"
-        AMD_VULKAN_ICD   = "RADV"
-        RESOLUTION       = "2560x1600"
-      }
-      ingress = {
+      kasmIngress = {
         enabled          = true
         ingressClassName = local.ingress_classes.ingress_nginx
         path             = "/"
@@ -569,10 +607,17 @@ resource "helm_release" "kasm-desktop" {
           local.kubernetes_ingress_endpoints.kasm_desktop,
         ]
       }
-      resources = {
-        limits = {
-          "amd.com/gpu" = 1
-        }
+      codeIngress = {
+        enabled          = true
+        ingressClassName = local.ingress_classes.ingress_nginx
+        path             = "/"
+        annotations      = local.nginx_ingress_annotations
+        tls = [
+          local.tls_wildcard,
+        ]
+        hosts = [
+          local.kubernetes_ingress_endpoints.code_server,
+        ]
       }
     }),
   ]
