@@ -1,30 +1,30 @@
-{{- if .Values.ingress.enabled -}}
+{{- if .Values.kasmIngress.enabled -}}
 {{- $fullName := include "desktop.fullname" . -}}
-{{- $servicePort := .Values.ports.desktop -}}
-{{- $ingressPath := .Values.ingress.path -}}
+{{- $servicePort := .Values.ports.kasm -}}
+{{- $ingressPath := .Values.kasmIngress.path -}}
 apiVersion: {{ template "desktop.ingress.apiVersion" . }}
 kind: Ingress
 metadata:
-  name: {{ $fullName }}
+  name: {{ $fullName }}-kasm
   labels:
     app: {{ template "desktop.name" . }}
     chart: {{ template "desktop.chart" . }}
     release: {{ .Release.Name }}
-{{- with .Values.ingress.labels }}
+{{- with .Values.kasmIngress.labels }}
 {{ toYaml . | indent 4 }}
 {{- end }}
 
-{{- with .Values.ingress.annotations }}
+{{- with .Values.kasmIngress.annotations }}
   annotations:
 {{ toYaml . | indent 4 }}
 {{- end }}
 spec:
-{{- if .Values.ingress.ingressClassName }}
-  ingressClassName: {{ .Values.ingress.ingressClassName }}
+{{- if .Values.kasmIngress.ingressClassName }}
+  ingressClassName: {{ .Values.kasmIngress.ingressClassName }}
 {{- end }}
-{{- if .Values.ingress.tls }}
+{{- if .Values.kasmIngress.tls }}
   tls:
-  {{- range .Values.ingress.tls }}
+  {{- range .Values.kasmIngress.tls }}
     - hosts:
       {{- range .hosts }}
         - {{ . | quote }}
@@ -33,14 +33,14 @@ spec:
   {{- end }}
 {{- end }}
   rules:
-  {{- range .Values.ingress.hosts }}
+  {{- range .Values.kasmIngress.hosts }}
     - http:
         paths:
           - path: {{ $ingressPath }}
             pathType: Prefix
             backend:
               service:
-                name: {{ $fullName }}
+                name: {{ $fullName }}-kasm
                 port:
                   number: {{ $servicePort }}
       {{- if . }}

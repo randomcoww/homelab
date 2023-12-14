@@ -19,6 +19,8 @@ spec:
       labels:
         app: {{ template "desktop.name" . }}
         release: {{ .Release.Name }}
+      annotations:
+        checksum/config: {{ include (print $.Template.BasePath "/secret.yaml") . | sha256sum }}
     spec:
     {{- with .Values.affinity }}
       affinity:
@@ -30,11 +32,28 @@ spec:
     {{- end }}
       restartPolicy: Always
       containers:
-      - name: {{ .Chart.Name }}
+      - name: {{ .Chart.Name }}-kasm
         image: {{ .Values.images.desktop }}
+        env:
+        - name: USER
+          value: {{ .Values.user }}
+        - name: HOME
+          value: /home/{{ .Values.user }}
+        - name: UID
+          value: {{ .Values.uid | quote }}
+        - name: CODE_PORT
+          value: "{{ .Values.ports.code }}"
+        - name: XDG_RUNTIME_DIR
+          value: /run/user/{{ .Values.uid }}
+        - name: DISPLAY
+          value: {{ .Values.kasm.display }}
+        {{- range $k, $v := .Values.kasm.additionalEnvs }}
+        - name: {{ $k }}
+          value: {{ join "," $v | quote }}
+        {{- end }}
         volumeMounts:
         - name: desktop-home
-          mountPath: /home/{{ .Values.desktop.user }}
+          mountPath: /home/{{ .Values.user }}
         - name: dshm
           mountPath: /dev/shm
         - name: secret
@@ -42,7 +61,8 @@ spec:
           subPathExpr: ssh_known_hosts
           readOnly: true
         ports:
-        - containerPort: {{ .Values.ports.desktop }}
+        - containerPort: {{ .Values.ports.code }}
+        - containerPort: {{ .Values.ports.kasm }}
         {{- range $port := .Values.ports.sunshineTCP }}
         - containerPort: {{ $port }}
         {{- end }}
@@ -50,25 +70,57 @@ spec:
         - containerPort: {{ $port }}
           protocol: "UDP"
         {{- end }}
-        env:
-        - name: USER
-          value: {{ .Values.desktop.user }}
-        - name: HOME
-          value: /home/{{ .Values.desktop.user }}
-        - name: UID
-          value: {{ .Values.desktop.uid | quote }}
-        - name: XDG_RUNTIME_DIR
-          value: /run/user/{{ .Values.desktop.uid }}
-        - name: DISPLAY
-          value: {{ .Values.desktop.display }}
-        {{- range $name, $value := .Values.additionalEnvs }}
-        - name: {{ $name }}
-          value: {{ $value }}
-        {{- end }}
-      {{- with .Values.resources }}
+        securityContext:
+          capabilities:
+            add:
+            - AUDIT_WRITE
+      {{- with .Values.kasm.resources }}
         resources:
 {{ toYaml . | indent 10 }}
       {{- end }}
+      - name: {{ .Chart.Name }}-tailscale
+        image: {{ .Values.images.tailscale }}
+        securityContext:
+          privileged: true
+        env:
+        - name: POD_NAME
+          valueFrom:
+            fieldRef:
+              fieldPath: metadata.name
+        {{- range $k, $v := .Values.tailscale.additionalEnvs }}
+        - name: {{ $k }}
+          value: {{ join "," $v | quote }}
+        {{- end }}
+        - name: TS_STATE_DIR
+          value: "/varlib/tailscale"
+        - name: KUBERNETES_SERVICE_HOST
+          value: ""
+        - name: TS_KUBE_SECRET
+          value: ""
+        - name: TS_USERSPACE
+          value: "false"
+        - name: TS_TAILSCALED_EXTRA_ARGS
+          value: "--state=arn:aws:ssm:{{ .Values.tailscale.ssm.awsRegion }}::parameter/{{ .Values.tailscale.ssm.resource }}/$(POD_NAME)"
+        - name: TS_AUTH_KEY
+          valueFrom:
+            secretKeyRef:
+              name: {{ template "desktop.fullname" . }}
+              key: TS_AUTHKEY
+        - name : AWS_REGION
+          valueFrom:
+            secretKeyRef:
+              name: {{ template "desktop.fullname" . }}
+              key: AWS_REGION
+        - name: AWS_ACCESS_KEY_ID
+          valueFrom:
+            secretKeyRef:
+              name: {{ template "desktop.fullname" . }}
+              key: AWS_ACCESS_KEY_ID
+        - name: AWS_SECRET_ACCESS_KEY
+          valueFrom:
+            secretKeyRef:
+              name: {{ template "desktop.fullname" . }}
+              key: AWS_SECRET_ACCESS_KEY
       volumes:
       - name: dshm
         emptyDir:

@@ -1,0 +1,50 @@
+{{- if .Values.codeIngress.enabled -}}
+{{- $fullName := include "desktop.fullname" . -}}
+{{- $servicePort := .Values.ports.code -}}
+{{- $ingressPath := .Values.codeIngress.path -}}
+apiVersion: {{ template "desktop.ingress.apiVersion" . }}
+kind: Ingress
+metadata:
+  name: {{ $fullName }}-code
+  labels:
+    app: {{ template "desktop.name" . }}
+    chart: {{ template "desktop.chart" . }}
+    release: {{ .Release.Name }}
+{{- with .Values.codeIngress.labels }}
+{{ toYaml . | indent 4 }}
+{{- end }}
+
+{{- with .Values.codeIngress.annotations }}
+  annotations:
+{{ toYaml . | indent 4 }}
+{{- end }}
+spec:
+{{- if .Values.codeIngress.ingressClassName }}
+  ingressClassName: {{ .Values.codeIngress.ingressClassName }}
+{{- end }}
+{{- if .Values.codeIngress.tls }}
+  tls:
+  {{- range .Values.codeIngress.tls }}
+    - hosts:
+      {{- range .hosts }}
+        - {{ . | quote }}
+      {{- end }}
+      secretName: {{ .secretName }}
+  {{- end }}
+{{- end }}
+  rules:
+  {{- range .Values.codeIngress.hosts }}
+    - http:
+        paths:
+          - path: {{ $ingressPath }}
+            pathType: Prefix
+            backend:
+              service:
+                name: {{ $fullName }}-code
+                port:
+                  number: {{ $servicePort }}
+      {{- if . }}
+      host: {{ . | quote }}
+      {{- end }}
+  {{- end }}
+{{- end }}
