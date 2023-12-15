@@ -529,7 +529,9 @@ resource "helm_release" "desktop" {
       }
       user          = "kasm-user"
       uid           = 10000
-      sshKnownHosts = "@cert-authority * ${data.terraform_remote_state.sr.outputs.ssh_ca.public_key_openssh}"
+      sshKnownHosts = [
+        "@cert-authority * ${data.terraform_remote_state.sr.outputs.ssh_ca.public_key_openssh}"
+      ]
       kasm = {
         display = ":0"
         additionalEnvs = {
