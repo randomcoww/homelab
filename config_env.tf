@@ -131,8 +131,8 @@ locals {
     cloudflared        = "docker.io/cloudflare/cloudflared:2023.8.0"
     tailscale          = "ghcr.io/randomcoww/tailscale:1.52.1"
     fuse_device_plugin = "docker.io/soolaugust/fuse-device-plugin:v1.0"
-    code_server        = "ghcr.io/randomcoww/code-server:20231126.4-tensorflow"
-    kasm_desktop       = "ghcr.io/randomcoww/kasm-desktop:20231212.3"
+    code_server        = "ghcr.io/randomcoww/code-server:20231215.3-tensorflow"
+    kasm_desktop       = "ghcr.io/randomcoww/kasm-desktop:20231214.5"
     alpaca_stream      = "ghcr.io/randomcoww/alpaca-stream-server:20230518.1"
   }
 
@@ -158,7 +158,7 @@ locals {
     vaultwarden   = "vw.${local.domains.internal}"
     webdav        = "w.${local.domains.internal}"
     matchbox      = "ign.${local.domains.internal}"
-    code          = "code.${local.domains.internal}"
+    code_server   = "code.${local.domains.internal}"
     kasm_desktop  = "k.${local.domains.internal}"
     kasm_sunshine = "ks.${local.domains.internal}"
     alpaca_stream = "alpaca-stream.${local.domains.internal}"
@@ -198,7 +198,7 @@ locals {
     minio         = 80
     transmission  = 9091
     vaultwarden   = 8080
-    code          = 8080
+    code_server   = 8080
     kasm_desktop  = 6901
     alpaca_stream = 38081
   }
