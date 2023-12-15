@@ -435,35 +435,26 @@ resource "helm_release" "hostapd" {
 }
 
 # code-server #
-/*
+
 resource "helm_release" "code" {
   name       = "code"
   namespace  = "default"
   repository = "https://randomcoww.github.io/repos/helm/"
   chart      = "code"
   wait       = false
-  version    = "0.1.21"
+  version    = "0.1.22"
   values = [
     yamlencode({
       images = {
         code      = local.container_images.code_server
         tailscale = local.container_images.tailscale
       }
-      persistence = {
-        accessMode   = "ReadWriteOnce"
-        storageClass = "local-path"
-        size         = "128Gi"
-      }
-      ports = {
-        code = local.service_ports.code_server
-      }
-      service = {
-        type = "ClusterIP"
-        port = local.service_ports.code_server
-      }
+      user = "code"
+      uid  = 10000
+      sshKnownHosts = [
+        "@cert-authority * ${data.terraform_remote_state.sr.outputs.ssh_ca.public_key_openssh}"
+      ]
       code = {
-        mountPath = "/home/podman"
-        uid       = 0
         resources = {
           limits = {
             "github.com/fuse" = 1
@@ -471,19 +462,6 @@ resource "helm_release" "code" {
           }
         }
       }
-      ingress = {
-        enabled          = true
-        ingressClassName = local.ingress_classes.ingress_nginx
-        path             = "/"
-        annotations      = local.nginx_ingress_annotations
-        tls = [
-          local.tls_wildcard,
-        ]
-        hosts = [
-          local.kubernetes_ingress_endpoints.code_server,
-        ]
-      }
-      sshKnownHosts = "@cert-authority * ${data.terraform_remote_state.sr.outputs.ssh_ca.public_key_openssh}"
       tailscale = {
         authKey = var.tailscale.auth_key
         ssm = {
@@ -492,8 +470,8 @@ resource "helm_release" "code" {
           secretAccessKey = data.terraform_remote_state.sr.outputs.ssm.tailscale.secret_access_key
           resource        = data.terraform_remote_state.sr.outputs.ssm.tailscale.resource
         }
-        additionalParameters = {
-          TS_ACCEPT_DNS          = false
+        additionalEnvs = {
+          TS_ACCEPT_DNS          = true
           TS_DEBUG_FIREWALL_MODE = "nftables"
           TS_EXTRA_ARGS = [
             "--advertise-exit-node",
@@ -507,12 +485,36 @@ resource "helm_release" "code" {
           ]
         }
       }
+      ports = {
+        code = local.service_ports.code_server
+      }
+      service = {
+        type = "ClusterIP"
+        port = local.service_ports.code_server
+      }
+      ingress = {
+        enabled          = true
+        ingressClassName = local.ingress_classes.ingress_nginx
+        path             = "/"
+        annotations      = local.nginx_ingress_annotations
+        tls = [
+          local.tls_wildcard,
+        ]
+        hosts = [
+          local.kubernetes_ingress_endpoints.code_server,
+        ]
+      }
+      persistence = {
+        accessMode   = "ReadWriteOnce"
+        storageClass = "local-path"
+        size         = "128Gi"
+      }
     }),
   ]
 }
-*/
-# kasm-desktop #
 
+# kasm-desktop #
+/*
 resource "helm_release" "kasm-desktop" {
   name       = "desktop"
   namespace  = "default"
@@ -562,15 +564,18 @@ resource "helm_release" "kasm-desktop" {
         additionalEnvs = {
           VK_ICD_FILENAMES           = "/usr/share/vulkan/icd.d/radeon_icd.i686.json:/usr/share/vulkan/icd.d/radeon_icd.x86_64.json"
           AMD_VULKAN_ICD             = "RADV"
+          # VK_ICD_FILENAMES           = "/usr/share/vulkan/icd.d/nvidia_icd.x86_64.json"
           RESOLUTION                 = "2560x1600"
+          # NVIDIA_DRIVER_CAPABILITIES = "compute,graphics,utility,display"
           NVIDIA_DRIVER_CAPABILITIES = "all"
-          # NVIDIA_VISIBLE_DEVICES     = "all"
+          NVIDIA_VISIBLE_DEVICES     = "all"
+          NVIDIA_DISABLE_REQUIRE     = "1"
         }
         resources = {
           limits = {
             "github.com/fuse" = 1
             "amd.com/gpu"     = 1
-            "nvidia.com/gpu"  = 1
+            # "nvidia.com/gpu"  = 1
           }
         }
       }
@@ -608,21 +613,21 @@ resource "helm_release" "kasm-desktop" {
         ]
       }
       codeIngress = {
-        enabled          = true
-        ingressClassName = local.ingress_classes.ingress_nginx
-        path             = "/"
-        annotations      = local.nginx_ingress_annotations
-        tls = [
-          local.tls_wildcard,
-        ]
-        hosts = [
-          local.kubernetes_ingress_endpoints.code_server,
-        ]
+        enabled          = false
+        # ingressClassName = local.ingress_classes.ingress_nginx
+        # path             = "/"
+        # annotations      = local.nginx_ingress_annotations
+        # tls = [
+        #   local.tls_wildcard,
+        # ]
+        # hosts = [
+        #   local.kubernetes_ingress_endpoints.code_server,
+        # ]
       }
     }),
   ]
 }
-
+*/
 # alpaca stream broadcast #
 
 resource "helm_release" "alpaca-stream" {
