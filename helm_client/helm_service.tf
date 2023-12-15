@@ -514,7 +514,7 @@ resource "helm_release" "code" {
 }
 
 # kasm-desktop #
-
+/*
 resource "helm_release" "desktop" {
   name       = "desktop"
   namespace  = "default"
@@ -582,7 +582,7 @@ resource "helm_release" "desktop" {
     }),
   ]
 }
-
+*/
 # alpaca stream broadcast #
 
 resource "helm_release" "alpaca-stream" {
