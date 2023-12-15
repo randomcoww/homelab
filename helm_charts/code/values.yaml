@@ -1,3 +1,31 @@
+user: code
+uid: 10000
+sshKnownHosts:
+# - @cert-authority *
+
+code:
+  # additionalEnvs:
+
+tailscale:
+  authKey: ""
+  ssm:
+    resource: "tailscale-secret"
+    awsRegion: "us-west-2"
+    accessKeyID: ""
+    secretAccessKey: ""
+  # additionalEnvs:
+  #   TS_ACCEPT_DNS: true
+
+images:
+  code: ghcr.io/randomcoww/code-server:20230720
+  tailscale: ghcr.io/tailscale/tailscale:v1.44.0
+
+ports:
+  code: 8080
+
+tls:
+  enabled: true
+
 service:
   type: ClusterIP
 
@@ -18,37 +46,10 @@ ingress:
   hosts:
   # - chart-example.local
 
-ports:
-  code: 8080
-
 persistence:
   accessMode: ReadWriteOnce
-  size: 50Gi
+  size: 128Gi
   storageClass: local-path
-
-tls:
-  enabled: true
-
-images:
-  code: ghcr.io/randomcoww/code-server:20230720
-  tailscale: ghcr.io/tailscale/tailscale:v1.44.0
-
-code:
-  mountPath: /home/podman
-  uid: 1000
 
 affinity: {}
 tolerations: {}
-
-tailscale:
-  authKey: ""
-  # additionalParameters:
-  #   TS_ACCEPT_DNS: true
-
-  ssm:
-    resource: "tailscale-secret"
-    awsRegion: "us-west-2"
-    accessKeyID: ""
-    secretAccessKey: ""
-
-sshKnownHosts: ""

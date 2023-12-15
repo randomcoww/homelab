@@ -33,11 +33,21 @@ spec:
       - name: {{ .Chart.Name }}
         image: {{ .Values.images.code }}
         env:
+        - name: USER
+          value: {{ .Values.user }}
+        - name: HOME
+          value: /home/{{ .Values.user }}
+        - name: UID
+          value: {{ .Values.uid | quote }}
         - name: CODE_PORT
-          value: "{{ .Values.ports.code }}"
+          value: {{ .Values.ports.code | quote }}
+        {{- range $k, $v := .Values.code.additionalEnvs }}
+        - name: {{ $k }}
+          value: {{ join "," $v | quote }}
+        {{- end }}
         volumeMounts:
-        - name: code-mount
-          mountPath: {{ .Values.code.mountPath }}
+        - name: code-home
+          mountPath: /home/{{ .Values.user }}
         - name: secret
           mountPath: /etc/ssh/ssh_known_hosts
           subPathExpr: ssh_known_hosts
@@ -48,7 +58,6 @@ spec:
           capabilities:
             add:
             - AUDIT_WRITE
-          runAsUser: {{ .Values.code.uid }}
       {{- with .Values.code.resources }}
         resources:
 {{ toYaml . | indent 10 }}
@@ -62,12 +71,12 @@ spec:
           valueFrom:
             fieldRef:
               fieldPath: metadata.name
-        {{- range $k, $v := .Values.tailscale.additionalParameters }}
+        {{- range $k, $v := .Values.tailscale.additionalEnvs }}
         - name: {{ $k }}
           value: {{ join "," $v | quote }}
         {{- end }}
         - name: TS_STATE_DIR
-          value: "/varlib/tailscale"
+          value: "/var/lib/tailscale"
         - name: KUBERNETES_SERVICE_HOST
           value: ""
         - name: TS_KUBE_SECRET
@@ -102,7 +111,7 @@ spec:
           secretName: {{ template "code.fullname" . }}
   volumeClaimTemplates:
   - metadata:
-      name: code-mount
+      name: code-home
     {{- if .Values.persistence.annotations }}
       annotations:
 {{ toYaml .Values.persistence.annotations | trimSuffix "\n" | indent 8 }}

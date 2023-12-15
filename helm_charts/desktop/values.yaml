@@ -1,9 +1,7 @@
-tls:
-  enabled: true
-
 user: kasm-user
 uid: 10000
-sshKnownHosts: ""
+sshKnownHosts:
+# - @cert-authority *
 
 kasm:
   display: :0
@@ -15,33 +13,15 @@ tailscale:
 
 images:
   desktop: ghcr.io/randomcoww/kasm-desktop:20230720
-  tailscale: ghcr.io/tailscale/tailscale:v1.44.0
+
+tls:
+  enabled: true
 
 kasmService:
   type: ClusterIP
 
-codeService:
-  type: ClusterIP
-
 sunshineService;:
   type: LoadBalancer
-
-codeIngress:
-  enabled: true
-  annotations:
-    # "cert-manager.io/cluster-issuer":                    "letsencrypt"
-    # "nginx.ingress.kubernetes.io/auth-response-headers": "Remote-User,Remote-Name,Remote-Groups,Remote-Email"
-    # "nginx.ingress.kubernetes.io/auth-signin":           "https://auth.local"
-    # "nginx.ingress.kubernetes.io/auth-snippet": |
-    #   proxy_set_header X-Forwarded-Method $request_method;
-    # "nginx.ingress.kubernetes.io/auth-url":              "http://auth.default.svc/api/verify"
-  ingressClassName: nginx
-  tls:
-  # - secretName: chart-example-tls
-  #   hosts:
-  #     - chart-example.local
-  hosts:
-  # - chart-example.local
 
 kasmIngress:
   enabled: true
@@ -61,7 +41,6 @@ kasmIngress:
   # - chart-example.local
 
 ports:
-  code: 8080
   kasm: 6091
   sunshineTCP:
   - 47984
@@ -79,5 +58,5 @@ tolerations: {}
 
 persistence:
   accessMode: ReadWriteOnce
-  size: 50Gi
+  size: 128Gi
   storageClass: local-path
