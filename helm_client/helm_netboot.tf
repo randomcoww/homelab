@@ -131,20 +131,6 @@ resource "helm_release" "matchbox" {
         replicaCount = length(module.matchbox-syncthing.peers)
       }
       affinity = {
-        nodeAffinity = {
-          requiredDuringSchedulingIgnoredDuringExecution = {
-            nodeSelectorTerms = [
-              {
-                matchExpressions = [
-                  {
-                    key      = "kea"
-                    operator = "Exists"
-                  },
-                ]
-              },
-            ]
-          }
-        }
         podAntiAffinity = {
           requiredDuringSchedulingIgnoredDuringExecution = [
             {
