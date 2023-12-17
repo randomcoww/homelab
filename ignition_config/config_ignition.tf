@@ -1,4 +1,26 @@
 locals {
+  base_users = {
+    admin = {
+      name = "fcos"
+      groups = [
+        "adm",
+        "sudo",
+        "systemd-journal",
+        "wheel",
+      ]
+    }
+    client = {
+      name = "randomcoww"
+      uid  = 10000
+      groups = [
+        "adm",
+        "sudo",
+        "systemd-journal",
+        "wheel",
+      ],
+    }
+  }
+
   base_hosts = {
     gw-0 = {
       users = [
@@ -337,6 +359,16 @@ locals {
     })
   }
 
+  # finalized local vars #
+
+  users = merge(local.base_users, {
+    for type, user in local.base_users :
+    type => merge(
+      user,
+      lookup(var.users, type, {}),
+    )
+  })
+
   hosts = {
     for host_key, host in local.base_hosts_1 :
     host_key => merge(host, {
@@ -350,7 +382,6 @@ locals {
     })
   }
 
-  # use this instead of base_members #
   members = {
     for key, members in local.base_members :
     key => {
