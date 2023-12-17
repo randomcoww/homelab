@@ -116,7 +116,7 @@ locals {
       users = [
         "admin",
       ]
-      netnum = 6
+      netnum = 5
       hardware_interfaces = {
         phy0 = {
           mac   = "1c-83-41-30-e2-54"
@@ -181,10 +181,10 @@ locals {
     }
 
     de-1 = {
-      netnum = 3
       users = [
         "client",
       ]
+      netnum = 6
       hardware_interfaces = {
         phy0 = {
           mac   = "74-56-3c-c3-10-68"
@@ -192,9 +192,19 @@ locals {
           vlans = ["service", "kubernetes"]
         }
       }
+      wlan_interfaces = {
+        wlan0 = {
+          mac = "10-6f-d9-cf-d5-71"
+        }
+      }
+      bridge_interfaces = {
+        br-lan = {
+          interfaces = ["phy0"]
+        }
+      }
       tap_interfaces = {
         lan = {
-          source_interface_name = "phy0"
+          source_interface_name = "br-lan"
           enable_dhcp           = true
         }
         service = {

@@ -29,6 +29,13 @@ locals {
           "enforcing=0",
         ]
       })
+      "1c-83-41-30-e2-54" = merge(local.image_set.coreos, {
+        ignition = "q-0"
+        boot_args = [
+          "systemd.unit=multi-user.target",
+          "enforcing=0",
+        ]
+      })
       "74-56-3c-c3-10-68" = merge(local.image_set.silverblue, {
         ignition = "de-1"
         boot_args = [
