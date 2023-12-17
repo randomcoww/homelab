@@ -1,5 +1,5 @@
 <domain type='kvm'>
-  <name>v-0-pt</name>
+  <name>v-0</name>
   <memory unit='GiB'>24</memory>
   <currentMemory unit='GiB'>24</currentMemory>
   <vcpu placement='static'>10</vcpu>
