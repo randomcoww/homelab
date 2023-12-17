@@ -1,5 +1,5 @@
 locals {
-  network_prefix = cidrsubnet(var.host_ip, 0, 0)
+  network_prefix = cidrsubnet(var.host_ip, 1, 1)
   listen_ip      = split("/", var.host_ip)[0]
   manifests = {
     for f in fileset(".", "${path.module}/manifests/*.yaml") :
