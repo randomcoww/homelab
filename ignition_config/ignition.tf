@@ -1,14 +1,3 @@
-data "terraform_remote_state" "sr" {
-  backend = "s3"
-  config = {
-    bucket = "randomcoww-tfstate"
-    key    = local.states.cluster_resources
-    region = local.aws_region
-  }
-}
-
-# base system #
-
 module "ignition-base" {
   for_each = local.members.base
   source   = "./modules/base"

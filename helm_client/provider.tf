@@ -1,19 +1,3 @@
-data "terraform_remote_state" "sr" {
-  backend = "s3"
-  config = {
-    bucket = "randomcoww-tfstate"
-    key    = local.states.cluster_resources
-    region = local.aws_region
-  }
-}
-
-data "terraform_remote_state" "client" {
-  backend = "local"
-  config = {
-    path = "../client/terraform.tfstate"
-  }
-}
-
 provider "helm" {
   kubernetes {
     host                   = "https://${local.services.apiserver.ip}:${local.ports.apiserver_ha}"

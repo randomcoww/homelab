@@ -235,3 +235,19 @@ locals {
     tls_servername = "one.one.one.one"
   }
 }
+
+data "terraform_remote_state" "sr" {
+  backend = "s3"
+  config = {
+    bucket = "randomcoww-tfstate"
+    key    = local.states.cluster_resources
+    region = local.aws_region
+  }
+}
+
+data "terraform_remote_state" "client" {
+  backend = "local"
+  config = {
+    path = "../client/terraform.tfstate"
+  }
+}
