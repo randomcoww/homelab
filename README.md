@@ -172,7 +172,7 @@ Update image tags [here](https://github.com/randomcoww/homelab/blob/master/confi
 ```bash
 export interface=lan
 export host_ip=$(ip -br addr show $interface | awk '{print $3}')
-export assets_path=${HOME}/bootstrap_images
+export assets_path=${HOME}/store/boot
 
 echo host_ip=$host_ip
 echo assets_path=$assets_path
