@@ -1,6 +1,5 @@
 locals {
-  network_prefix = cidrsubnet(var.host_ip, 1, 1)
-  listen_ip      = split("/", var.host_ip)[0]
+  listen_ip = split("/", var.host_ip)[0]
   manifests = {
     for f in fileset(".", "${path.module}/manifests/*.yaml") :
     basename(f) => templatefile(f, {
@@ -36,10 +35,10 @@ locals {
           ]
           subnet4 = [
             {
-              subnet = local.network_prefix
+              subnet = cidrsubnet(var.host_ip, 0, 0)
               pools = [
                 {
-                  pool = local.network_prefix
+                  pool = cidrsubnet(var.host_ip, 1, 1)
                 }
               ]
               require-client-classes = [
