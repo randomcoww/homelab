@@ -397,7 +397,7 @@ Stub all AMD GPUs
 1002:ffffffff:ffffffff:ffffffff:00030000:ffff00ff,1002:ffffffff:ffffffff:ffffffff:00040300:ffffffff
 ```
 
-Update the following evdev input devices in the [libvirt config](libvirt/de-1-pt.xml) to match current hardware
+Update the following evdev input devices in the [libvirt config](libvirt/v-0.xml) to match current hardware
 
 ```xml
 <devices>
@@ -413,14 +413,14 @@ Update the following evdev input devices in the [libvirt config](libvirt/de-1-pt
 Create persistent disk for home
 
 ```bash
-dd if=/dev/zero of=/var/home/qemu/de-1-pt.img bs=1G count=0 seek=100
+dd if=/dev/zero of=/var/home/qemu/v-0.img bs=1G count=0 seek=100
 ```
 
 Define and launch guest
 
 ```bash
-virsh define libvirt/de-1-pt.xml
-virsh start de-1-pt
+virsh define libvirt/v-0.xml
+virsh start v-0
 ```
 
 No video output is available unless a display is attached to the GPU being passed through
