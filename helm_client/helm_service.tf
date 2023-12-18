@@ -317,7 +317,7 @@ resource "helm_release" "vaultwarden" {
 module "hostapd-roaming" {
   source        = "./modules/hostapd_roaming"
   resource_name = "hostapd"
-  replica_count = 1
+  replica_count = 2
 }
 
 resource "helm_release" "hostapd" {
