@@ -132,7 +132,7 @@ locals {
     tailscale          = "ghcr.io/randomcoww/tailscale:1.52.1"
     fuse_device_plugin = "docker.io/soolaugust/fuse-device-plugin:v1.0"
     code_server        = "ghcr.io/randomcoww/code-server:20231215.3-tensorflow"
-    kasm_desktop       = "ghcr.io/randomcoww/kasm-desktop:20231214.5"
+    kasm_desktop       = "ghcr.io/randomcoww/kasm-desktop:20231220.3"
     alpaca_stream      = "ghcr.io/randomcoww/alpaca-stream-server:20230518.1"
   }
 
