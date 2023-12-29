@@ -113,7 +113,7 @@ locals {
     kea                = "ghcr.io/randomcoww/kea:2.4.0"
     matchbox           = "quay.io/poseidon/matchbox:v0.10.0-13-gd0d5e9d5-amd64"
     coredns            = "docker.io/coredns/coredns:1.10.1"
-    tftpd              = "ghcr.io/randomcoww/tftpd-ipxe:20230429"
+    tftpd              = "ghcr.io/randomcoww/tftpd-ipxe:20231229.3"
     hostapd            = "ghcr.io/randomcoww/hostapd:2.10"
     syncthing          = "docker.io/syncthing/syncthing:1.23"
     rclone             = "docker.io/rclone/rclone:1.62"
