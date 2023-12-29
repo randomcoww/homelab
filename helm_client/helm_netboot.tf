@@ -57,6 +57,20 @@ resource "helm_release" "kea" {
         replicaCount = length(module.kea-config.config)
       }
       affinity = {
+        nodeAffinity = {
+          requiredDuringSchedulingIgnoredDuringExecution = {
+            nodeSelectorTerms = [
+              {
+                matchExpressions = [
+                  {
+                    key      = "kea"
+                    operator = "Exists"
+                  },
+                ]
+              },
+            ]
+          }
+        }
         podAntiAffinity = {
           requiredDuringSchedulingIgnoredDuringExecution = [
             {
