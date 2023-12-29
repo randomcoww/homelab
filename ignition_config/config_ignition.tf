@@ -209,12 +209,7 @@ locals {
       netnum = 6
       hardware_interfaces = {
         phy0 = {
-          mac   = "58-47-ca-74-39-ae"
-          mtu   = 9000
-          vlans = ["service", "kubernetes"]
-        }
-        phy1 = {
-          mac   = "58-47-ca-74-39-af"
+          mac   = "74-56-3c-c3-10-68"
           mtu   = 9000
           vlans = ["service", "kubernetes"]
         }
