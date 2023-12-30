@@ -1,8 +1,9 @@
 locals {
   aws_region = "us-west-2"
 
-  states = {
-    cluster_resources = "cluster_resources-23.tfstate"
+  cluster_resources = {
+    bucket = "randomcoww-tfstate"
+    state  = "cluster_resources-23.tfstate"
   }
 
   mounts = {
@@ -113,7 +114,7 @@ locals {
     kea                = "ghcr.io/randomcoww/kea:2.4.0"
     matchbox           = "quay.io/poseidon/matchbox:v0.10.0-13-gd0d5e9d5-amd64"
     coredns            = "docker.io/coredns/coredns:1.10.1"
-    tftpd              = "ghcr.io/randomcoww/tftpd-ipxe:20231229.4"
+    tftpd              = "ghcr.io/randomcoww/tftpd-ipxe:20231229.3"
     hostapd            = "ghcr.io/randomcoww/hostapd:2.10"
     syncthing          = "docker.io/syncthing/syncthing:1.23"
     rclone             = "docker.io/rclone/rclone:1.62"
@@ -233,21 +234,5 @@ locals {
   upstream_dns = {
     ip             = "1.1.1.1"
     tls_servername = "one.one.one.one"
-  }
-}
-
-data "terraform_remote_state" "sr" {
-  backend = "s3"
-  config = {
-    bucket = "randomcoww-tfstate"
-    key    = local.states.cluster_resources
-    region = local.aws_region
-  }
-}
-
-data "terraform_remote_state" "client" {
-  backend = "local"
-  config = {
-    path = "../client/terraform.tfstate"
   }
 }
