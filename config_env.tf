@@ -130,7 +130,7 @@ locals {
     vaultwarden        = "docker.io/vaultwarden/server:1.29.0-alpine"
     litestream         = "docker.io/litestream/litestream:latest"
     cloudflared        = "docker.io/cloudflare/cloudflared:2023.8.0"
-    tailscale          = "ghcr.io/randomcoww/tailscale:1.52.1"
+    tailscale          = "ghcr.io/randomcoww/tailscale:1.56.1"
     fuse_device_plugin = "docker.io/soolaugust/fuse-device-plugin:v1.0"
     code_server        = "ghcr.io/randomcoww/code-server:20231215.3-tensorflow"
     kasm_desktop       = "ghcr.io/randomcoww/kasm-desktop:20231220.3"
