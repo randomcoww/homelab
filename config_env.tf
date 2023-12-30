@@ -65,6 +65,8 @@ locals {
       vlan_id = 30
       mac     = "52-54-00-63-6e-b3"
     }
+    mobile = {
+    }
     kubernetes_service = {
       network = "10.96.0.0"
       cidr    = 12

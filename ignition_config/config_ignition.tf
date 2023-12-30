@@ -213,6 +213,10 @@ locals {
           mtu   = 9000
           vlans = ["service", "kubernetes"]
         }
+        # mobile
+        phy1 = {
+          mac = "32-57-14-7a-aa-10"
+        }
       }
       wlan_interfaces = {
         wlan0 = {
@@ -237,6 +241,11 @@ locals {
           source_interface_name = "phy0-kubernetes"
           enable_netnum         = true
         }
+        mobile = {
+          source_interface_name = "phy1"
+          enable_dhcp           = true
+          metric                = 512
+        }
       }
       disks = {
         pv = {
@@ -256,6 +265,9 @@ locals {
             },
           ]
         }
+      }
+      kubernetes_worker_labels = {
+        hostapd = true
       }
       kubernetes_worker_taints = [
         # {
