@@ -101,6 +101,10 @@ locals {
                   name = "interface-mtu"
                   data = format("%s", network.mtu)
                 },
+                {
+                  name = "domain-search"
+                  data = join(",", network.domain_search)
+                },
               ]
               pools = [
                 for _, pool in network.pools :

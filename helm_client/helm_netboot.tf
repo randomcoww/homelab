@@ -22,6 +22,11 @@ module "kea-config" {
       domain_name_servers = [
         local.services.external_dns.ip,
       ]
+      domain_search = [
+        local.domains.internal_mdns,
+        local.domains.internal,
+        local.domains.kubernetes,
+      ]
       mtu = network.mtu
       pools = [
         cidrsubnet(network.prefix, 1, 1),

@@ -28,6 +28,7 @@ variable "networks" {
     mtu                 = number
     routers             = list(string)
     domain_name_servers = list(string)
+    domain_search       = list(string)
     pools               = list(string)
   }))
 }

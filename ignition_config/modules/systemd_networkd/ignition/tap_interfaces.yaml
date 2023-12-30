@@ -37,6 +37,7 @@ storage:
           UseDNS=${lookup(tap_interface, "enable_dns", false)}
           UseNTP=false
           UseHostname=false
+          UseDomains=${lookup(tap_interface, "enable_dns", false)}
           UseRoutes=${!lookup(tap_interface, "enable_netnum", false)}
 
           [Network]
