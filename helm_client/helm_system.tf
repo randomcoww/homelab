@@ -398,6 +398,22 @@ resource "helm_release" "nvidia-device-plugin" {
           operator = "Exists"
         },
       ]
+      affinity = {
+        nodeAffinity = {
+          requiredDuringSchedulingIgnoredDuringExecution = {
+            nodeSelectorTerms = [
+              {
+                matchExpressions = [
+                  {
+                    key      = "nvidia"
+                    operator = "Exists"
+                  },
+                ]
+              },
+            ]
+          }
+        }
+      }
     }),
   ]
 }

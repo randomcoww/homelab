@@ -174,10 +174,10 @@ locals {
 
   kubernetes_service_endpoints = {
     apiserver              = "kubernetes.default.svc.${local.domains.kubernetes}"
-    minio                  = "minio.minio"
     authelia               = "authelia.authelia.svc.${local.domains.kubernetes}"
-    ingress_nginx          = "${local.ingress_classes.ingress_nginx}-controller.ingress-nginx.svc.${local.domains.kubernetes}"
-    ingress_nginx_external = "${local.ingress_classes.ingress_nginx_external}-controller.ingress-nginx.svc.${local.domains.kubernetes}"
+    ingress_nginx          = "${local.ingress_classes.ingress_nginx}-controller.ingress-nginx"
+    ingress_nginx_external = "${local.ingress_classes.ingress_nginx_external}-controller.ingress-nginx"
+    minio                  = "minio.minio"
     webdav                 = "webdav.default"
   }
 

@@ -268,6 +268,7 @@ locals {
       }
       kubernetes_worker_labels = {
         hostapd = true
+        nvidia  = true
       }
       kubernetes_worker_taints = [
         # {
