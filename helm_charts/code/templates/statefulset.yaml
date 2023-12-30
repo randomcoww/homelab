@@ -29,6 +29,10 @@ spec:
 {{ toYaml . | indent 8 }}
     {{- end }}
       restartPolicy: Always
+      dnsConfig:
+        options:
+        - name: ndots
+          value: "2"
       containers:
       - name: {{ .Chart.Name }}
         image: {{ .Values.images.code }}
