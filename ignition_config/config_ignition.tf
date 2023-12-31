@@ -196,9 +196,8 @@ locals {
         }
       }
       kubernetes_worker_labels = {
-        hostapd = true
-        minio   = true
-        kea     = true
+        minio = true
+        kea   = true
       }
     }
 
