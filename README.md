@@ -289,32 +289,6 @@ flatpak --user -y install --or-update flathub \
   net.davidotek.pupgui2
 ```
 
-#### Fedora toolbox for steam
-
-```bash
-toolbox create -r 39
-toolbox enter fedora-toolbox-39
-
-sudo tee /etc/yum.repos.d/cuda.repo > /dev/null <<EOF
-[cuda-fedora]
-name=cuda-fedora37-\$basearch
-baseurl=https://developer.download.nvidia.com/compute/cuda/repos/fedora37/\$basearch
-enabled=1
-gpgcheck=1
-gpgkey=https://developer.download.nvidia.com/compute/cuda/repos/fedora37/\$basearch/D42D0685.pub
-EOF
-
-sudo dnf install -y \
-  https://mirrors.rpmfusion.org/free/fedora/rpmfusion-free-release-$(rpm -E %fedora).noarch.rpm \
-  https://mirrors.rpmfusion.org/nonfree/fedora/rpmfusion-nonfree-release-$(rpm -E %fedora).noarch.rpm
-
-sudo dnf install -y --setopt=install_weak_deps=False --best \
-  nvidia-drivers \
-  cuda-drivers \
-  vulkan-tools \
-  steam
-```
-
 Install Minio client
 
 ```bash
