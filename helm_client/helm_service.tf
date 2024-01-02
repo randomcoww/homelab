@@ -1,5 +1,5 @@
 # webdav for minio #
-
+/*
 resource "helm_release" "webdav" {
   name       = split(".", local.kubernetes_service_endpoints.webdav)[0]
   namespace  = split(".", local.kubernetes_service_endpoints.webdav)[1]
@@ -49,7 +49,7 @@ resource "helm_release" "webdav" {
     }),
   ]
 }
-
+*/
 # mpd #
 
 resource "helm_release" "mpd" {
