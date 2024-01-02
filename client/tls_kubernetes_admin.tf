@@ -9,7 +9,7 @@ resource "tls_cert_request" "kubernetes-admin" {
   private_key_pem = tls_private_key.kubernetes-admin.private_key_pem
 
   subject {
-    common_name  = "admin"
+    common_name  = "kube-apiserver-kubelet-client"
     organization = "system:masters"
   }
 }
@@ -24,7 +24,6 @@ resource "tls_locally_signed_cert" "kubernetes-admin" {
   allowed_uses = [
     "key_encipherment",
     "digital_signature",
-    "server_auth",
     "client_auth",
   ]
 }
