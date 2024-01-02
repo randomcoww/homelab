@@ -300,7 +300,7 @@ resource "helm_release" "authelia" {
   chart            = "authelia"
   create_namespace = true
   wait             = false
-  version          = "0.8.58"
+  version          = "0.8.59"
   values = [
     yamlencode({
       domain = local.domains.internal

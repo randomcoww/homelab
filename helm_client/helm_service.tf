@@ -262,7 +262,7 @@ resource "helm_release" "vaultwarden" {
   repository = "https://randomcoww.github.io/repos/helm/"
   chart      = "vaultwarden"
   wait       = false
-  version    = "0.1.12"
+  version    = "0.1.13"
   values = [
     yamlencode({
       images = {
