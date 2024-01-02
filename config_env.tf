@@ -106,9 +106,9 @@ locals {
 
   container_images = {
     # Igntion
-    kube_apiserver          = "ghcr.io/randomcoww/kubernetes:kube-master-v1.27.1"
-    kube_controller_manager = "ghcr.io/randomcoww/kubernetes:kube-master-v1.27.1"
-    kube_scheduler          = "ghcr.io/randomcoww/kubernetes:kube-master-v1.27.1"
+    kube_apiserver          = "ghcr.io/randomcoww/kubernetes:kube-master-v1.29.0"
+    kube_controller_manager = "ghcr.io/randomcoww/kubernetes:kube-master-v1.29.0"
+    kube_scheduler          = "ghcr.io/randomcoww/kubernetes:kube-master-v1.29.0"
     etcd_wrapper            = "ghcr.io/randomcoww/etcd-wrapper:20231010"
     etcd                    = "gcr.io/etcd-development/etcd:v3.5.8-amd64"
 
@@ -126,7 +126,7 @@ locals {
     flannel_cni_plugin = "docker.io/flannelcni/flannel-cni-plugin:v1.2.0-amd64"
     kapprover          = "ghcr.io/randomcoww/kapprover:latest"
     external_dns       = "k8s.gcr.io/external-dns/external-dns:v0.13.4"
-    kube_proxy         = "ghcr.io/randomcoww/kubernetes:kube-proxy-v1.27.1"
+    kube_proxy         = "ghcr.io/randomcoww/kubernetes:kube-proxy-v1.29.0"
     transmission       = "ghcr.io/randomcoww/transmission:20230429"
     wireguard          = "ghcr.io/randomcoww/wireguard:20230429"
     vaultwarden        = "docker.io/vaultwarden/server:1.29.0-alpine"
