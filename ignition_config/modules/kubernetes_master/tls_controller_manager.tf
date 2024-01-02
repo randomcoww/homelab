@@ -7,8 +7,7 @@ resource "tls_cert_request" "controller-manager" {
   private_key_pem = tls_private_key.controller-manager.private_key_pem
 
   subject {
-    common_name  = "system:kube-controller-manager"
-    organization = "system:kube-controller-manager"
+    common_name = "system:kube-controller-manager"
   }
 }
 
@@ -22,7 +21,6 @@ resource "tls_locally_signed_cert" "controller-manager" {
   allowed_uses = [
     "key_encipherment",
     "digital_signature",
-    "server_auth",
     "client_auth",
   ]
 }

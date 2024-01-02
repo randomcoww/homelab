@@ -7,8 +7,7 @@ resource "tls_cert_request" "scheduler" {
   private_key_pem = tls_private_key.scheduler.private_key_pem
 
   subject {
-    common_name  = "system:kube-scheduler"
-    organization = "system:kube-scheduler"
+    common_name = "system:kube-scheduler"
   }
 }
 
@@ -22,7 +21,6 @@ resource "tls_locally_signed_cert" "scheduler" {
   allowed_uses = [
     "key_encipherment",
     "digital_signature",
-    "server_auth",
     "client_auth",
   ]
 }

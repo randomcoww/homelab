@@ -7,8 +7,7 @@ resource "tls_cert_request" "apiserver" {
   private_key_pem = tls_private_key.apiserver.private_key_pem
 
   subject {
-    common_name  = "kubernetes"
-    organization = "kubernetes"
+    common_name = "kube-apiserver"
   }
 
   ip_addresses = concat(["127.0.0.1"], var.apiserver_listen_ips)
@@ -29,6 +28,5 @@ resource "tls_locally_signed_cert" "apiserver" {
     "key_encipherment",
     "digital_signature",
     "server_auth",
-    "client_auth",
   ]
 }

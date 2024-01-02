@@ -8,8 +8,7 @@ resource "tls_cert_request" "etcd-client" {
   private_key_pem = tls_private_key.etcd-client.private_key_pem
 
   subject {
-    common_name  = "etcd"
-    organization = "etcd"
+    common_name = "wrapper-etcd-client"
   }
 }
 
@@ -23,7 +22,6 @@ resource "tls_locally_signed_cert" "etcd-client" {
   allowed_uses = [
     "key_encipherment",
     "digital_signature",
-    "server_auth",
     "client_auth",
   ]
 }

@@ -7,8 +7,7 @@ resource "tls_cert_request" "etcd-peer" {
   private_key_pem = tls_private_key.etcd-peer.private_key_pem
 
   subject {
-    common_name  = "etcd"
-    organization = "etcd"
+    common_name = "kube-etcd-peer"
   }
 
   ip_addresses = concat(["127.0.0.1"], var.listen_ips)
