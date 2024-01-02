@@ -139,7 +139,7 @@ resource "helm_release" "transmission" {
   repository = "https://randomcoww.github.io/repos/helm/"
   chart      = "transmission"
   wait       = false
-  version    = "0.1.7"
+  version    = "0.1.8"
   values = [
     yamlencode({
       images = {

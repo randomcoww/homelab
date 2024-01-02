@@ -31,6 +31,10 @@ spec:
 {{ toYaml . | indent 8 }}
     {{- end }}
       restartPolicy: Always
+      dnsConfig:
+        options:
+        - name: ndots
+          value: "2"
       initContainers:
       - name: {{ .Chart.Name }}-init
         image: {{ .Values.images.transmission }}
