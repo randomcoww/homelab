@@ -45,6 +45,7 @@ storage:
           DHCP=${lookup(tap_interface, "enable_dhcp", false)}
           MulticastDNS=${lookup(tap_interface, "enable_mdns", false)}
           ConfigureWithoutCarrier=true
+          KeepConfiguration=dhcp
           %{~ if lookup(tap_interface, "enable_netnum", false) ~}
 
           [Address]
