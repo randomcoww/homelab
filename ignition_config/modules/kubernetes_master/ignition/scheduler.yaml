@@ -9,7 +9,7 @@ storage:
       contents:
         inline: |
           kind: KubeSchedulerConfiguration
-          apiVersion: kubescheduler.config.k8s.io/v1beta2
+          apiVersion: kubescheduler.config.k8s.io/v1
           clientConnection:
             kubeconfig: ${config_path}/kube-scheduler.kubeconfig
           leaderElection:
