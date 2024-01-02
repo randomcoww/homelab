@@ -72,7 +72,7 @@ locals {
       etcd_pod_manifest_file         = "${var.static_pod_manifest_path}/etcd.json"
       static_pod_manifest_path       = var.static_pod_manifest_path
       backup_resource = merge(var.s3_backup_resource, {
-        resource = "${var.s3_backup_resource.resource}/etcd.db"
+        resource = "${var.s3_backup_resource.resource}/${var.name}.db"
         interval = "15m"
       })
       etcd_snapshot_file = "/var/lib/etcd/snapshot/etcd.db"
