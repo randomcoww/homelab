@@ -116,7 +116,7 @@ locals {
     kea                = "ghcr.io/randomcoww/kea:2.4.0"
     matchbox           = "quay.io/poseidon/matchbox:v0.10.0-13-gd0d5e9d5-amd64"
     coredns            = "docker.io/coredns/coredns:1.10.1"
-    tftpd              = "ghcr.io/randomcoww/tftpd-ipxe:20231229.3"
+    tftpd              = "ghcr.io/randomcoww/tftpd-ipxe:20240104.0"
     hostapd            = "ghcr.io/randomcoww/hostapd:2.10"
     syncthing          = "docker.io/syncthing/syncthing:1.23"
     rclone             = "docker.io/rclone/rclone:1.62"
@@ -134,7 +134,7 @@ locals {
     cloudflared        = "docker.io/cloudflare/cloudflared:2023.8.0"
     tailscale          = "ghcr.io/randomcoww/tailscale:1.56.1"
     fuse_device_plugin = "docker.io/soolaugust/fuse-device-plugin:v1.0"
-    code_server        = "ghcr.io/randomcoww/code-server:20231215.3-tensorflow"
+    code_server        = "ghcr.io/randomcoww/code-server:20240102.3-tensorflow"
     kasm_desktop       = "ghcr.io/randomcoww/kasm-desktop:20231220.3"
     alpaca_stream      = "ghcr.io/randomcoww/alpaca-stream-server:20230518.1"
   }
