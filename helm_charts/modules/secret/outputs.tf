@@ -5,9 +5,8 @@ output "manifest" {
     metadata = {
       name = var.name
       labels = {
-        app     = var.name
-        chart   = var.name
-        release = "${var.name}-${var.release}"
+        app     = var.app
+        release = var.release
       }
       annotations = var.annotations
     }

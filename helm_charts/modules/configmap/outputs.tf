@@ -5,15 +5,14 @@ output "manifest" {
     metadata = {
       name = var.name
       labels = {
-        app     = var.name
-        chart   = var.name
-        release = "${var.name}-${var.release}"
+        app     = var.app
+        release = var.release
       }
       annotations = var.annotations
     }
     data = {
       for k, values in var.data :
-      k => join("\n", values)
+      k => try(join("\n", values), values)
     }
   })
 }

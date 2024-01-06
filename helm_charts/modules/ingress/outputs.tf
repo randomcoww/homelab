@@ -5,9 +5,8 @@ output "manifest" {
     metadata = {
       name = var.name
       labels = {
-        app     = var.name
-        chart   = var.name
-        release = "${var.name}-${var.release}"
+        app     = var.app
+        release = var.release
       }
       # https://www.authelia.com/overview/security/measures/
       annotations = merge({
@@ -82,8 +81,8 @@ EOF
       ]
       selector = {
         matchLabels = {
-          app     = var.name
-          release = "${var.name}-${var.release}"
+          app     = var.app
+          release = var.release
         }
       }
     }, var.spec)

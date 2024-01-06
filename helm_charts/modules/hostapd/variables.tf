@@ -2,12 +2,19 @@ variable "name" {
   type = string
 }
 
+variable "namespace" {
+  type    = string
+  default = "default"
+}
+
 variable "release" {
   type = string
 }
 
-variable "image" {
-  type = string
+variable "images" {
+  type = object({
+    hostapd = string
+  })
 }
 
 variable "replicas" {

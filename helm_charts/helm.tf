@@ -1,8 +1,10 @@
 module "hostapd" {
-  source   = "./modules/hostapd"
-  name     = "hostapd"
-  release  = "0.1.8"
-  image    = local.container_images.hostapd
+  source  = "./modules/hostapd"
+  name    = "hostapd"
+  release = "0.1.8"
+  images = {
+    hostapd = local.container_images.hostapd
+  }
   replicas = 2
   affinity = {
     nodeAffinity = {
@@ -67,6 +69,67 @@ module "hostapd" {
 
 resource "local_file" "hostapd" {
   for_each = module.hostapd.manifests
+  content  = each.value
+  filename = "${path.module}/output/charts/${each.key}"
+}
+
+module "kea" {
+  source  = "./modules/kea"
+  name    = "kea"
+  release = "0.1.18"
+  images = {
+    kea   = local.container_images.kea
+    tftpd = local.container_images.tftpd
+  }
+  affinity = {
+    nodeAffinity = {
+      requiredDuringSchedulingIgnoredDuringExecution = {
+        nodeSelectorTerms = [
+          {
+            matchExpressions = [
+              {
+                key      = "kea"
+                operator = "Exists"
+              },
+            ]
+          },
+        ]
+      }
+    }
+  }
+  service_ips = [
+    local.services.cluster_kea_primary.ip,
+    local.services.cluster_kea_secondary.ip,
+  ]
+  ports = {
+    kea_peer = local.ports.kea_peer
+    tftpd    = local.ports.tftpd
+  }
+  ipxe_boot_path  = "/ipxe.efi"
+  ipxe_script_url = "http://${local.services.matchbox.ip}:${local.ports.matchbox}/boot.ipxe"
+  networks = [
+    for _, network in local.networks :
+    {
+      prefix = network.prefix
+      routers = [
+        local.services.gateway.ip,
+      ]
+      domain_name_servers = [
+        local.services.external_dns.ip,
+      ]
+      domain_search = [
+        local.domains.internal,
+      ]
+      mtu = network.mtu
+      pools = [
+        cidrsubnet(network.prefix, 1, 1),
+      ]
+    } if lookup(network, "enable_dhcp_server", false)
+  ]
+}
+
+resource "local_file" "kea" {
+  for_each = module.kea.manifests
   content  = each.value
   filename = "${path.module}/output/charts/${each.key}"
 }

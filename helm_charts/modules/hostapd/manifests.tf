@@ -46,6 +46,7 @@ locals {
 module "secret" {
   source  = "../secret"
   name    = var.name
+  app     = var.name
   release = var.release
   data = {
     for i, config in local.peer_configs :
@@ -62,6 +63,7 @@ module "secret" {
 module "statefulset" {
   source   = "../statefulset"
   name     = var.name
+  app      = var.name
   release  = var.release
   affinity = var.affinity
   replicas = var.replicas
@@ -74,7 +76,7 @@ module "statefulset" {
     containers = [
       {
         name  = var.name
-        image = var.image
+        image = var.images.hostapd
         args = [
           "/etc/hostapd/hostapd.conf"
         ]

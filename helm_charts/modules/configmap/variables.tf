@@ -2,11 +2,11 @@ variable "name" {
   type = string
 }
 
-variable "release" {
+variable "app" {
   type = string
 }
 
-variable "strategy" {
+variable "release" {
   type = string
 }
 

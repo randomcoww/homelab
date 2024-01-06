@@ -2,6 +2,10 @@ variable "name" {
   type = string
 }
 
+variable "app" {
+  type = string
+}
+
 variable "release" {
   type = string
 }

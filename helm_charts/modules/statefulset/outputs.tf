@@ -5,13 +5,12 @@ output "manifest" {
     metadata = {
       name = var.name
       labels = {
-        app     = var.name
-        chart   = var.name
-        release = "${var.name}-${var.release}"
+        app     = var.app
+        release = var.release
       }
     }
     spec = {
-      serviceName = var.name
+      serviceName = var.app
       replicas    = var.replicas
       updateStrategy = {
         type = "RollingUpdate"
@@ -19,15 +18,15 @@ output "manifest" {
       minReadySeconds = var.min_ready_seconds
       selector = {
         matchLabels = {
-          app     = var.name
-          release = "${var.name}-${var.release}"
+          app     = var.app
+          release = var.release
         }
       }
       template = {
         metadata = {
           labels = {
-            app     = var.name
-            release = "${var.name}-${var.release}"
+            app     = var.app
+            release = var.release
           }
           annotations = var.annotations
         }
@@ -42,7 +41,7 @@ output "manifest" {
                         key      = "app"
                         operator = "In"
                         values = [
-                          var.name,
+                          var.app,
                         ]
                       },
                     ]
