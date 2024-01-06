@@ -6,7 +6,7 @@ locals {
       container_images  = local.container_images
       matchbox_port     = local.ports.matchbox
       matchbox_api_port = local.ports.matchbox_api
-      tftp_port         = local.ports.pxe_tftp
+      tftp_port         = local.ports.tftpd
       config_path       = "/etc/bootstrap"
       assets_path       = abspath(var.assets_path)
       ca                = chomp(tls_self_signed_cert.matchbox-ca.cert_pem)

@@ -95,7 +95,7 @@ resource "helm_release" "kea" {
       }
       ports = {
         keaPeer = local.ports.kea_peer
-        tftpd   = local.ports.pxe_tftp
+        tftpd   = local.ports.tftpd
       }
       peerService = {
         port = local.ports.kea_peer
