@@ -9,7 +9,7 @@ resource "tls_cert_request" "kubernetes-admin" {
   private_key_pem = tls_private_key.kubernetes-admin.private_key_pem
 
   subject {
-    common_name  = "kube-apiserver-kubelet-client"
+    common_name  = local.kubernetes.admin_username
     organization = "system:masters"
   }
 }
