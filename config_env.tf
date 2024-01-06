@@ -1,11 +1,6 @@
 locals {
   aws_region = "us-west-2"
 
-  cluster_resources = {
-    bucket = "randomcoww-tfstate"
-    state  = "cluster_resources-23.tfstate"
-  }
-
   mounts = {
     containers_path = "/var/lib/containers"
     home_path       = "/var/home"

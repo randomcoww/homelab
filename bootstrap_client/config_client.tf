@@ -10,10 +10,3 @@ data "terraform_remote_state" "bootstrap-server" {
     path = "../bootstrap_server/terraform.tfstate"
   }
 }
-
-data "terraform_remote_state" "client" {
-  backend = "local"
-  config = {
-    path = "../client/terraform.tfstate"
-  }
-}

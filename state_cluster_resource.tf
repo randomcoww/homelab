@@ -1,8 +1,8 @@
 data "terraform_remote_state" "sr" {
   backend = "s3"
   config = {
-    bucket = local.cluster_resources.bucket
-    key    = local.cluster_resources.state
+    bucket = "randomcoww-tfstate"
+    key    = "cluster_resources-23.tfstate"
     region = local.aws_region
   }
 }

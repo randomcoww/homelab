@@ -43,19 +43,3 @@ EOF
     ]
   }
 }
-
-data "terraform_remote_state" "sr" {
-  backend = "s3"
-  config = {
-    bucket = local.cluster_resources.bucket
-    key    = local.cluster_resources.state
-    region = local.aws_region
-  }
-}
-
-data "terraform_remote_state" "client" {
-  backend = "local"
-  config = {
-    path = "../client/terraform.tfstate"
-  }
-}
