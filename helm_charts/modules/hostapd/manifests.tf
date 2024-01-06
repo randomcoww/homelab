@@ -121,19 +121,3 @@ module "statefulset" {
     ]
   }
 }
-
-resource "local_file" "hostapd" {
-  for_each = {
-    "Chart.yaml" = yamlencode({
-      apiVersion = "v2"
-      name       = var.name
-      version    = var.release
-      type       = "application"
-      appVersion = var.image
-    })
-    "templates/secret.yaml"      = module.secret.manifest
-    "templates/statefulset.yaml" = module.statefulset.manifest
-  }
-  content  = each.value
-  filename = "${var.chart_path}/${var.name}/${each.key}"
-}

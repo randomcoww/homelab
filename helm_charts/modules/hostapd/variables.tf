@@ -27,7 +27,3 @@ variable "bssid_base" {
 variable "config" {
   type = any
 }
-
-variable "chart_path" {
-  type = string
-}

@@ -1,6 +1,5 @@
 module "hostapd" {
   source   = "./modules/hostapd"
-  chart_path = "${path.module}/output/charts"
   name     = "hostapd"
   release  = "0.1.8"
   image    = local.container_images.hostapd
@@ -64,4 +63,10 @@ module "hostapd" {
       "RX-ANTENNA-PATTERN", "TX-ANTENNA-PATTERN",
     ])}]"
   }, var.hostapd)
+}
+
+resource "local_file" "hostapd" {
+  for_each = module.hostapd.manifests
+  content  = each.value
+  filename = "${path.module}/output/charts/${each.key}"
 }
