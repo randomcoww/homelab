@@ -205,3 +205,54 @@ resource "local_file" "vaultwarden" {
   content  = each.value
   filename = "${path.module}/output/charts/${each.key}"
 }
+
+module "authelia" {
+  source         = "./modules/authelia"
+  name           = "authelia"
+  namespace      = "authelia"
+  release        = "0.1.1"
+  source_release = "0.8.58"
+  images = {
+    litestream = local.container_images.litestream
+  }
+  users = {
+    for email, user in var.authelia_users :
+    email => merge({
+      email       = email
+      displayname = email
+    }, user)
+  }
+  access_control = {
+    default_policy = "two_factor"
+    rules = [
+      {
+        domain    = local.kubernetes_ingress_endpoints.vaultwarden
+        resources = ["^/admin.*"]
+        policy    = "two_factor"
+      },
+      {
+        domain = local.kubernetes_ingress_endpoints.vaultwarden
+        policy = "bypass"
+      },
+    ]
+  }
+  service_hostname       = local.kubernetes_ingress_endpoints.auth
+  jwt_token              = data.terraform_remote_state.sr.outputs.authelia.jwt_token
+  storage_secret         = data.terraform_remote_state.sr.outputs.authelia.storage_secret
+  session_encryption_key = data.terraform_remote_state.sr.outputs.authelia.session_encryption_key
+  smtp_host              = var.smtp.host
+  smtp_port              = var.smtp.port
+  smtp_username          = var.smtp.username
+  smtp_password          = var.smtp.password
+  ingress_class_name     = local.ingress_classes.ingress_nginx
+  ingress_cert_issuer    = local.cert_issuer_prod
+  s3_db_resource         = "${data.terraform_remote_state.sr.outputs.s3.authelia.resource}/db.sqlite3"
+  s3_access_key_id       = data.terraform_remote_state.sr.outputs.s3.authelia.access_key_id
+  s3_secret_access_key   = data.terraform_remote_state.sr.outputs.s3.authelia.secret_access_key
+}
+
+resource "local_file" "authelia" {
+  for_each = module.authelia.manifests
+  content  = each.value
+  filename = "${path.module}/output/charts/${each.key}"
+}
