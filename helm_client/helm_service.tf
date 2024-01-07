@@ -1,3 +1,35 @@
+# kea #
+
+resource "helm_release" "kea" {
+  name  = "kea"
+  chart = "${path.module}/output/charts/kea"
+  wait  = false
+}
+
+# matchbox with data sync #
+
+resource "helm_release" "matchbox" {
+  name  = "matchbox"
+  chart = "${path.module}/output/charts/matchbox"
+  wait  = false
+}
+
+# vaultwarden #
+
+resource "helm_release" "vaultwarden" {
+  name  = "vaultwarden"
+  chart = "${path.module}/output/charts/vaultwarden"
+  wait  = false
+}
+
+# hostapd #
+
+resource "helm_release" "hostapd" {
+  name  = "hostapd"
+  chart = "${path.module}/output/charts/hostapd"
+  wait  = false
+}
+
 # mpd #
 
 resource "helm_release" "mpd" {
@@ -200,22 +232,6 @@ EOT
       }
     }),
   ]
-}
-
-# vaultwarden #
-
-resource "helm_release" "vaultwarden" {
-  name  = "vaultwarden"
-  chart = "${path.module}/output/charts/vaultwarden"
-  wait  = false
-}
-
-# hostapd #
-
-resource "helm_release" "hostapd" {
-  name  = "hostapd"
-  chart = "${path.module}/output/charts/hostapd"
-  wait  = false
 }
 
 # alpaca stream broadcast #
