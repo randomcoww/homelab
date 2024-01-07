@@ -24,7 +24,7 @@ module "secret-matchbox" {
   data = {
     "ca.crt"     = chomp(var.ca.cert_pem)
     "server.crt" = chomp(tls_locally_signed_cert.matchbox.cert_pem)
-    "server.crt" = chomp(tls_private_key.matchbox.private_key_pem)
+    "server.key" = chomp(tls_private_key.matchbox.private_key_pem)
   }
 }
 
@@ -150,8 +150,8 @@ module "statefulset" {
         args = [
           "-address=0.0.0.0:${var.ports.matchbox}",
           "-rpc-address=0.0.0.0:${var.ports.matchbox_api}",
-          "-assets-path=${local.syncthing_home_path}",
-          "-data-path=${local.syncthing_home_path}",
+          "-assets-path=${local.shared_data_path}",
+          "-data-path=${local.shared_data_path}",
         ]
         volumeMounts = [
           {

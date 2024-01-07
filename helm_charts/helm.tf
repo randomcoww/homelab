@@ -137,7 +137,7 @@ resource "local_file" "kea" {
 module "matchbox" {
   source   = "./modules/matchbox"
   name     = "matchbox"
-  release  = "0.2.14"
+  release  = "0.2.16"
   replicas = 3
   images = {
     matchbox  = local.container_images.matchbox

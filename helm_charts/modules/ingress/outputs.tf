@@ -79,12 +79,6 @@ EOF
           ]
         }
       ]
-      selector = {
-        matchLabels = {
-          app     = var.app
-          release = var.release
-        }
-      }
     }, var.spec)
   })
 }

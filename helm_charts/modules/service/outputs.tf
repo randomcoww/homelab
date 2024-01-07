@@ -12,10 +12,8 @@ output "manifest" {
     }
     spec = merge({
       selector = {
-        matchLabels = {
-          app     = var.app
-          release = var.release
-        }
+        app     = var.app
+        release = var.release
       }
     }, var.spec)
   })
