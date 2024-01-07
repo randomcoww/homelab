@@ -24,16 +24,6 @@ variable "annotations" {
   default = {}
 }
 
-variable "affinity" {
-  type    = any
-  default = {}
-}
-
-variable "tolerations" {
-  type    = any
-  default = {}
-}
-
 variable "spec" {
   type    = any
   default = {}
@@ -48,9 +38,5 @@ variable "auth_url" {
 }
 
 variable "auth_signin" {
-  type = string
-}
-
-variable "wildcard_domain" {
   type = string
 }

@@ -257,59 +257,9 @@ EOT
 # vaultwarden #
 
 resource "helm_release" "vaultwarden" {
-  name       = "vaultwarden"
-  namespace  = "default"
-  repository = "https://randomcoww.github.io/repos/helm/"
-  chart      = "vaultwarden"
-  wait       = false
-  version    = "0.1.13"
-  values = [
-    yamlencode({
-      images = {
-        vaultwarden = local.container_images.vaultwarden
-        litestream  = local.container_images.litestream
-      }
-      service = {
-        type = "ClusterIP"
-        port = local.service_ports.vaultwarden
-      }
-      domain = "https://${local.kubernetes_ingress_endpoints.vaultwarden}"
-      backup = {
-        accessKeyID     = data.terraform_remote_state.sr.outputs.s3.vaultwarden.access_key_id
-        secretAccessKey = data.terraform_remote_state.sr.outputs.s3.vaultwarden.secret_access_key
-        s3Resource      = "${data.terraform_remote_state.sr.outputs.s3.vaultwarden.resource}/db.sqlite3"
-      }
-      smtp = {
-        username = var.smtp.username
-        password = var.smtp.password
-      }
-      vaultwarden = {
-        SENDS_ALLOWED            = false
-        EMERGENCY_ACCESS_ALLOWED = false
-        PASSWORD_HINTS_ALLOWED   = false
-        SIGNUPS_ALLOWED          = false
-        INVITATIONS_ALLOWED      = true
-        DISABLE_ADMIN_TOKEN      = true
-        SMTP_HOST                = var.smtp.host
-        SMTP_PORT                = var.smtp.port
-        SMTP_FROM_NAME           = "Vaultwarden"
-        SMTP_SECURITY            = "starttls"
-        SMTP_AUTH_MECHANISM      = "Plain"
-      }
-      ingress = {
-        enabled          = true
-        ingressClassName = local.ingress_classes.ingress_nginx
-        path             = "/"
-        annotations      = local.nginx_ingress_annotations
-        tls = [
-          local.tls_wildcard,
-        ]
-        hosts = [
-          local.kubernetes_ingress_endpoints.vaultwarden,
-        ]
-      }
-    }),
-  ]
+  name  = "vaultwarden"
+  chart = "${path.module}/output/charts/vaultwarden"
+  wait  = false
 }
 
 # hostapd #

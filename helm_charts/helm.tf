@@ -158,3 +158,45 @@ resource "local_file" "matchbox" {
   content  = each.value
   filename = "${path.module}/output/charts/${each.key}"
 }
+
+module "vaultwarden" {
+  source  = "./modules/vaultwarden"
+  name    = "vaultwarden"
+  release = "0.1.14"
+  images = {
+    vaultwarden = local.container_images.vaultwarden
+    litestream  = local.container_images.litestream
+  }
+  ports = {
+    vaultwarden = local.service_ports.vaultwarden
+  }
+  service_hostname = local.kubernetes_ingress_endpoints.vaultwarden
+  additional_envs = {
+    SENDS_ALLOWED            = false
+    EMERGENCY_ACCESS_ALLOWED = false
+    PASSWORD_HINTS_ALLOWED   = false
+    SIGNUPS_ALLOWED          = false
+    INVITATIONS_ALLOWED      = true
+    DISABLE_ADMIN_TOKEN      = true
+    SMTP_FROM_NAME           = "Vaultwarden"
+    SMTP_SECURITY            = "starttls"
+    SMTP_AUTH_MECHANISM      = "Plain"
+  }
+  smtp_host            = var.smtp.host
+  smtp_port            = var.smtp.port
+  smtp_username        = var.smtp.username
+  smtp_password        = var.smtp.password
+  ingress_class_name   = local.ingress_classes.ingress_nginx
+  ingress_cert_issuer  = "letsencrypt-prod"
+  ingress_auth_url     = "http://${local.kubernetes_service_endpoints.authelia}/api/verify"
+  ingress_auth_signin  = "https://${local.kubernetes_ingress_endpoints.auth}?rm=$request_method"
+  s3_db_resource       = "${data.terraform_remote_state.sr.outputs.s3.vaultwarden.resource}/db.sqlite3"
+  s3_access_key_id     = data.terraform_remote_state.sr.outputs.s3.vaultwarden.access_key_id
+  s3_secret_access_key = data.terraform_remote_state.sr.outputs.s3.vaultwarden.secret_access_key
+}
+
+resource "local_file" "vaultwarden" {
+  for_each = module.vaultwarden.manifests
+  content  = each.value
+  filename = "${path.module}/output/charts/${each.key}"
+}

@@ -52,6 +52,8 @@ EOF
             paths = [
               for path in rule.paths :
               {
+                path     = path.path
+                pathType = "Prefix"
                 backend = {
                   service = {
                     name = path.service
@@ -59,8 +61,6 @@ EOF
                       number = path.port
                     }
                   }
-                  path     = path.path
-                  pathType = "Prefix"
                 }
               }
             ]
@@ -70,7 +70,7 @@ EOF
       tls = [
         for wildcard_domain in distinct([
           for rule in var.rules :
-          join(".", compact(slice(split(".", rule.host), 1, length(rule.host))))
+          join(".", slice(compact(split(".", rule.host)), 1, length(compact(split(".", rule.host)))))
         ]) :
         {
           secretName = "${wildcard_domain}-tls"
