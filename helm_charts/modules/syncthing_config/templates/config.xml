@@ -1,0 +1,33 @@
+<configuration>
+  %{~ for p in sync_data_paths ~}
+  <folder id="${p.label}" label="${p.label}" path="${p.path}" type="sendreceive" fsWatcherEnabled="true" fsWatcherDelayS="1" rescanIntervalS="10" ignorePerms="true" autoNormalize="false">
+    %{~ for member in syncthing_members ~}
+    <device id="${member.device_id}"></device>
+    %{~ endfor ~}
+    <maxConflicts>1</maxConflicts>
+    <copyOwnershipFromParent>true</copyOwnershipFromParent>
+    <syncOwnership>true</syncOwnership>
+    <sendOwnership>true</sendOwnership>
+  </folder>
+  %{~ endfor ~}
+  %{~ for member in syncthing_members ~}
+  <device id="${member.device_id}" compression="never" skipIntroductionRemovals="true">
+    <address>${member.pod_name}.${app}.${namespace}.svc:${syncthing_peer_port}</address>
+    <autoAcceptFolders>true</autoAcceptFolders>
+  </device>
+  %{~ endfor ~}
+  <gui enabled="false"/>
+  <options>
+    <listenAddress>0.0.0.0:${syncthing_peer_port}</listenAddress>
+    <globalAnnounceEnabled>false</globalAnnounceEnabled>
+    <localAnnounceEnabled>false</localAnnounceEnabled>
+    <reconnectionIntervalS>5</reconnectionIntervalS>
+    <relaysEnabled>false</relaysEnabled>
+    <startBrowser>false</startBrowser>
+    <natEnabled>false</natEnabled>
+    <urAccepted>-1</urAccepted>
+    <autoUpgradeIntervalH>0</autoUpgradeIntervalH>
+    <defaultFolderPath></defaultFolderPath>
+    <crashReportingEnabled>false</crashReportingEnabled>
+  </options>
+</configuration>

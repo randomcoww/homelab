@@ -1,11 +1,11 @@
 module "hostapd" {
-  source  = "./modules/hostapd"
-  name    = "hostapd"
-  release = "0.1.8"
+  source   = "./modules/hostapd"
+  name     = "hostapd"
+  release  = "0.1.8"
+  replicas = 2
   images = {
     hostapd = local.container_images.hostapd
   }
-  replicas = 2
   affinity = {
     nodeAffinity = {
       requiredDuringSchedulingIgnoredDuringExecution = {
@@ -130,6 +130,31 @@ module "kea" {
 
 resource "local_file" "kea" {
   for_each = module.kea.manifests
+  content  = each.value
+  filename = "${path.module}/output/charts/${each.key}"
+}
+
+module "matchbox" {
+  source   = "./modules/matchbox"
+  name     = "matchbox"
+  release  = "0.2.14"
+  replicas = 3
+  images = {
+    matchbox  = local.container_images.matchbox
+    syncthing = local.container_images.syncthing
+  }
+  ports = {
+    matchbox       = local.ports.matchbox
+    matchbox_api   = local.ports.matchbox_api
+    syncthing_peer = 22000
+  }
+  service_ip       = local.services.matchbox.ip
+  service_hostname = local.kubernetes_ingress_endpoints.matchbox
+  ca               = data.terraform_remote_state.sr.outputs.matchbox_ca
+}
+
+resource "local_file" "matchbox" {
+  for_each = module.matchbox.manifests
   content  = each.value
   filename = "${path.module}/output/charts/${each.key}"
 }

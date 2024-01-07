@@ -160,9 +160,8 @@ module "service-peer" {
   app     = var.name
   release = var.release
   spec = {
-    type                     = "ClusterIP"
-    clusterIP                = each.value.ip
-    publishNotReadyAddresses = true
+    type      = "ClusterIP"
+    clusterIP = each.value.ip
     ports = [
       {
         name       = "kea-peer"
@@ -188,7 +187,7 @@ module "statefulset" {
   replicas          = length(local.configs)
   min_ready_seconds = 30
   annotations = {
-    "checksum/secret" = sha256(module.configmap.manifest)
+    "checksum/configmap" = sha256(module.configmap.manifest)
   }
   spec = {
     hostNetwork = true
