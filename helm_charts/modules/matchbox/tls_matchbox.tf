@@ -12,6 +12,7 @@ resource "tls_cert_request" "matchbox" {
   }
 
   dns_names = [
+    var.service_hostname
   ]
 
   ip_addresses = [
