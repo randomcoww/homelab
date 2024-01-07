@@ -174,7 +174,6 @@ locals {
     ingress_nginx          = "${local.ingress_classes.ingress_nginx}-controller.ingress-nginx"
     ingress_nginx_external = "${local.ingress_classes.ingress_nginx_external}-controller.ingress-nginx"
     minio                  = "minio.minio"
-    webdav                 = "webdav.default"
   }
 
   ports = {

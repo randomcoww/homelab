@@ -257,8 +257,8 @@ resource "helm_release" "cert-issuer" {
 # authelia #
 
 resource "helm_release" "authelia" {
-  name      = "authelia"
-  namespace = "authelia"
+  name      = split(".", local.kubernetes_service_endpoints.authelia)[0]
+  namespace = split(".", local.kubernetes_service_endpoints.authelia)[1]
   chart     = "${path.module}/output/charts/authelia"
   wait      = false
 }

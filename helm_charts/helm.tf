@@ -208,8 +208,8 @@ resource "local_file" "vaultwarden" {
 
 module "authelia" {
   source         = "./modules/authelia"
-  name           = "authelia"
-  namespace      = "authelia"
+  name           = split(".", local.kubernetes_service_endpoints.authelia)[0]
+  namespace      = split(".", local.kubernetes_service_endpoints.authelia)[1]
   release        = "0.1.1"
   source_release = "0.8.58"
   images = {
