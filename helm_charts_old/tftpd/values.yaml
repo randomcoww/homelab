@@ -1,8 +1,0 @@
-images:
-  tftpd: "ghcr.io/randomcoww/tftpd-ipxe:20220804"
-
-ports:
-  tftpd: 69
-
-affinity: {}
-tolerations: {}
