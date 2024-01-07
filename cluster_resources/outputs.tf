@@ -91,7 +91,9 @@ output "matchbox_ca" {
 
 output "authelia" {
   value = {
-    storage_secret = random_password.authelia-storage-secret.result
+    storage_secret         = random_password.authelia-storage-secret.result
+    session_encryption_key = random_password.authelia-session-encryption-key.result
+    jwt_token              = random_password.authelia-jwt-token.result
   }
   sensitive = true
 }
