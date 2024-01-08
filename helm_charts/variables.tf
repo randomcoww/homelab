@@ -1,21 +1,19 @@
-variable "users" {
+variable "authelia_users" {
   type    = any
   default = {}
-}
-
-variable "letsencrypt" {
-  type = object({
-    email = string
-  })
 }
 
 variable "hostapd" {
   type = map(string)
 }
 
-variable "authelia_users" {
-  type    = any
-  default = {}
+variable "smtp" {
+  type = object({
+    host     = string
+    port     = string
+    username = string
+    password = string
+  })
 }
 
 variable "wireguard_client" {
@@ -30,15 +28,6 @@ variable "wireguard_client" {
 variable "tailscale" {
   type = object({
     auth_key = string
-  })
-}
-
-variable "smtp" {
-  type = object({
-    host     = string
-    port     = string
-    username = string
-    password = string
   })
 }
 
