@@ -172,7 +172,6 @@ module "service-peer" {
     ]
     selector = {
       app                                  = var.name
-      release                              = var.release
       "statefulset.kubernetes.io/pod-name" = each.key
     }
   }
