@@ -256,3 +256,76 @@ resource "local_file" "authelia" {
   content  = each.value
   filename = "${path.module}/output/charts/${each.key}"
 }
+
+module "kube_dns" {
+  source         = "./modules/kube_dns"
+  name           = "kube-dns"
+  namespace      = "kube-system"
+  release        = "0.1.1"
+  source_release = "1.29.0"
+  replicas       = 3
+  images = {
+    etcd         = local.container_images.etcd
+    external_dns = local.container_images.external_dns
+  }
+  service_cluster_ip = local.services.cluster_dns.ip
+  service_ip         = local.services.external_dns.ip
+  servers = [
+    {
+      zones = [
+        {
+          zone = "."
+        },
+      ]
+      port = 53
+      plugins = [
+        {
+          name = "health"
+        },
+        {
+          name = "ready"
+        },
+        {
+          name        = "kubernetes"
+          parameters  = "${local.domains.kubernetes} in-addr.arpa ip6.arpa"
+          configBlock = <<EOF
+pods insecure
+fallthrough in-addr.arpa ip6.arpa
+ttl 30
+EOF
+        },
+        {
+          name        = "etcd"
+          parameters  = "${local.domains.internal} in-addr.arpa ip6.arpa"
+          configBlock = <<EOF
+fallthrough
+EOF
+        },
+        # mDNS
+        {
+          name       = "forward"
+          parameters = "${local.domains.internal_mdns} dns://${local.services.gateway.ip}:${local.ports.gateway_dns}"
+        },
+        # public DNS
+        {
+          name        = "forward"
+          parameters  = ". tls://${local.upstream_dns.ip}"
+          configBlock = <<EOF
+tls_servername ${local.upstream_dns.tls_servername}
+health_check 5s
+EOF
+        },
+        {
+          name       = "cache"
+          parameters = 30
+        },
+      ]
+    },
+  ]
+}
+
+resource "local_file" "kube_dns" {
+  for_each = module.kube_dns.manifests
+  content  = each.value
+  filename = "${path.module}/output/charts/${each.key}"
+}

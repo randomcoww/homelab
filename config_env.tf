@@ -68,7 +68,6 @@ locals {
       netnums = {
         cluster_apiserver     = 1
         cluster_dns           = 10
-        cluster_external_dns  = 11
         cluster_kea_primary   = 12
         cluster_kea_secondary = 13
       }
@@ -110,7 +109,6 @@ locals {
     # Helm
     kea                = "ghcr.io/randomcoww/kea:2.4.0"
     matchbox           = "quay.io/poseidon/matchbox:v0.10.0-13-gd0d5e9d5-amd64"
-    coredns            = "docker.io/coredns/coredns:1.10.1"
     tftpd              = "ghcr.io/randomcoww/tftpd-ipxe:20240104.0"
     hostapd            = "ghcr.io/randomcoww/hostapd:2.10"
     syncthing          = "docker.io/syncthing/syncthing:1.23"
