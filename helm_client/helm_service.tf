@@ -1,33 +1,20 @@
-# kea #
-
-resource "helm_release" "kea" {
-  name  = "kea"
-  chart = "${path.module}/output/charts/kea"
-  wait  = false
-}
-
-# matchbox with data sync #
-
-resource "helm_release" "matchbox" {
-  name  = "matchbox"
-  chart = "${path.module}/output/charts/matchbox"
-  wait  = false
-}
-
-# vaultwarden #
-
-resource "helm_release" "vaultwarden" {
-  name  = "vaultwarden"
-  chart = "${path.module}/output/charts/vaultwarden"
-  wait  = false
-}
-
-# hostapd #
-
-resource "helm_release" "hostapd" {
-  name  = "hostapd"
-  chart = "${path.module}/output/charts/hostapd"
-  wait  = false
+resource "helm_release" "local" {
+  for_each = {
+    for f in fileset("./output/charts", "*/values.yaml") :
+    dirname(f) => {
+      namespace = yamldecode(file("./output/charts/${f}")).Release.Namespace
+      chart     = "./output/charts/${dirname(f)}"
+      values    = file("./output/charts/${f}")
+    }
+  }
+  name             = each.key
+  namespace        = each.value.namespace
+  create_namespace = true
+  chart            = each.value.chart
+  timeout          = 600
+  values = [
+    each.value.values
+  ]
 }
 
 # minio #

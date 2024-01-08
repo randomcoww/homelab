@@ -27,15 +27,6 @@ resource "helm_release" "cluster-services" {
   ]
 }
 
-# coredns #
-
-resource "helm_release" "kube-dns" {
-  name      = "kube-dns"
-  namespace = "kube-system"
-  chart     = "${path.module}/output/charts/kube-dns"
-  wait      = false
-}
-
 # local-storage storage class #
 
 resource "helm_release" "local-path-provisioner" {

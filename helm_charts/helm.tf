@@ -7,7 +7,7 @@ module "hostapd" {
   source   = "./modules/hostapd"
   name     = "hostapd"
   release  = "0.1.8"
-  replicas = 2
+  replicas = 1
   images = {
     hostapd = local.container_images.hostapd
   }
@@ -72,12 +72,6 @@ module "hostapd" {
   }, var.hostapd)
 }
 
-resource "local_file" "hostapd" {
-  for_each = module.hostapd.manifests
-  content  = each.value
-  filename = "${path.module}/output/charts/${each.key}"
-}
-
 module "kea" {
   source  = "./modules/kea"
   name    = "kea"
@@ -131,12 +125,6 @@ module "kea" {
       ]
     } if lookup(network, "enable_dhcp_server", false)
   ]
-}
-
-resource "local_file" "kea" {
-  for_each = module.kea.manifests
-  content  = each.value
-  filename = "${path.module}/output/charts/${each.key}"
 }
 
 module "matchbox" {
@@ -200,12 +188,6 @@ module "vaultwarden" {
   s3_secret_access_key = data.terraform_remote_state.sr.outputs.s3.vaultwarden.secret_access_key
 }
 
-resource "local_file" "vaultwarden" {
-  for_each = module.vaultwarden.manifests
-  content  = each.value
-  filename = "${path.module}/output/charts/${each.key}"
-}
-
 module "authelia" {
   source         = "./modules/authelia"
   name           = split(".", local.kubernetes_service_endpoints.authelia)[0]
@@ -249,12 +231,6 @@ module "authelia" {
   s3_db_resource         = "${data.terraform_remote_state.sr.outputs.s3.authelia.resource}/db.sqlite3"
   s3_access_key_id       = data.terraform_remote_state.sr.outputs.s3.authelia.access_key_id
   s3_secret_access_key   = data.terraform_remote_state.sr.outputs.s3.authelia.secret_access_key
-}
-
-resource "local_file" "authelia" {
-  for_each = module.authelia.manifests
-  content  = each.value
-  filename = "${path.module}/output/charts/${each.key}"
 }
 
 module "kube_dns" {
@@ -323,8 +299,14 @@ EOF
   ]
 }
 
-resource "local_file" "kube_dns" {
-  for_each = module.kube_dns.manifests
+resource "local_file" "manifests" {
+  for_each = merge(
+    module.hostapd.manifests,
+    module.kea.manifests,
+    module.vaultwarden.manifests,
+    module.authelia.manifests,
+    module.kube_dns.manifests,
+  )
   content  = each.value
   filename = "${path.module}/output/charts/${each.key}"
 }
