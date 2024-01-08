@@ -24,9 +24,12 @@ resource "tls_locally_signed_cert" "apiserver" {
 
   validity_period_hours = 8760
 
+  # Add both server and client here
+  # This is reused for kubelet-client
   allowed_uses = [
     "key_encipherment",
     "digital_signature",
     "server_auth",
+    "client_auth",
   ]
 }
