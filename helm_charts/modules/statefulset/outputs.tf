@@ -18,15 +18,13 @@ output "manifest" {
       minReadySeconds = var.min_ready_seconds
       selector = {
         matchLabels = {
-          app     = var.app
-          release = var.release
+          app = var.app
         }
       }
       template = {
         metadata = {
           labels = {
-            app     = var.app
-            release = var.release
+            app = var.app
           }
           annotations = var.annotations
         }

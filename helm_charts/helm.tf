@@ -75,7 +75,7 @@ module "hostapd" {
 module "kea" {
   source  = "./modules/kea"
   name    = "kea"
-  release = "0.1.18"
+  release = "0.1.19"
   images = {
     kea   = local.container_images.kea
     tftpd = local.container_images.tftpd
