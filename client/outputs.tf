@@ -39,7 +39,7 @@ output "kubeconfig" {
       {
         context = {
           cluster = local.kubernetes.cluster_name
-          user    = local.kubernetes.admin_username
+          user    = "kubernetes-super-admin"
         }
         name = "default"
       }
@@ -48,7 +48,7 @@ output "kubeconfig" {
     preferences     = {}
     users = [
       {
-        name = local.kubernetes.admin_username
+        name = "kubernetes-super-admin"
         user = {
           as-user-extra           = {}
           client-certificate-data = replace(base64encode(chomp(tls_locally_signed_cert.kubernetes-admin.cert_pem)), "\n", "")
