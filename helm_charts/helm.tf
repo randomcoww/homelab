@@ -3,6 +3,12 @@ locals {
   cert_issuer_staging = "letsencrypt-staging"
 }
 
+module "bootstrap" {
+  source  = "./modules/bootstrap"
+  name    = "bootstrap"
+  release = "0.1.1"
+}
+
 module "hostapd" {
   source   = "./modules/hostapd"
   name     = "hostapd"
@@ -387,6 +393,7 @@ EOF
 
 resource "local_file" "manifests" {
   for_each = merge(
+    module.bootstrap.manifests,
     module.hostapd.manifests,
     module.kea.manifests,
     module.vaultwarden.manifests,

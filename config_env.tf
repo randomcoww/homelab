@@ -136,7 +136,6 @@ locals {
     cluster_name              = "prod-10"
     static_pod_manifest_path  = "/var/lib/kubelet/manifests"
     cni_bridge_interface_name = "cni0"
-    admin_username            = "admin"
   }
 
   domains = {
