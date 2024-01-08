@@ -9,8 +9,9 @@ resource "helm_release" "local" {
   }
   name             = each.key
   namespace        = each.value.namespace
-  create_namespace = true
   chart            = each.value.chart
+  create_namespace = true
+  wait             = true
   timeout          = 600
   values = [
     each.value.values
@@ -25,7 +26,8 @@ resource "helm_release" "minio" {
   repository       = "https://charts.min.io/"
   chart            = "minio"
   create_namespace = true
-  wait             = false
+  wait             = true
+  timeout          = 600
   version          = "5.0.14"
   values = [
     yamlencode({
@@ -235,129 +237,6 @@ resource "helm_release" "mpd" {
         hosts = [
           local.kubernetes_ingress_endpoints.mpd,
         ]
-      }
-    }),
-  ]
-}
-
-# transmission with minio storage #
-
-resource "helm_release" "transmission" {
-  name       = "transmission"
-  namespace  = "default"
-  repository = "https://randomcoww.github.io/repos/helm/"
-  chart      = "transmission"
-  wait       = false
-  version    = "0.1.8"
-  values = [
-    yamlencode({
-      images = {
-        transmission = local.container_images.transmission
-        wireguard    = local.container_images.wireguard
-      }
-      ports = {
-        transmission = local.service_ports.transmission
-      }
-      persistence = {
-        accessMode   = "ReadWriteOnce"
-        storageClass = "local-path"
-        size         = "32Gi"
-      }
-      service = {
-        type = "ClusterIP"
-        port = local.service_ports.transmission
-      }
-      ingress = {
-        enabled          = true
-        ingressClassName = local.ingress_classes.ingress_nginx
-        path             = "/"
-        annotations      = local.nginx_ingress_annotations
-        tls = [
-          local.tls_wildcard,
-        ]
-        hosts = [
-          local.kubernetes_ingress_endpoints.transmission,
-        ]
-      }
-      transmission = {
-        homePath = "/var/lib/transmission"
-        config = {
-          bind-address-ipv4            = "0.0.0.0"
-          blocklist-enabled            = true
-          blocklist-url                = "http://list.iblocklist.com/?list=ydxerpxkpcfqjaybcssw&fileformat=p2p&archiveformat=gz"
-          download-dir                 = "/var/lib/transmission/downloads"
-          incomplete-dir               = "/var/lib/transmission/incomplete"
-          incomplete-dir-enabled       = true
-          download-queue-enabled       = true
-          download-queue-size          = 20
-          encryption                   = 2
-          max-peers-global             = 1000
-          message-level                = 2
-          peer-limit-global            = 1000
-          peer-limit-per-torrent       = 1000
-          port-forwarding-enabled      = false
-          preallocation                = 0
-          queue-stalled-enabled        = true
-          queue-stalled-minutes        = 5
-          ratio-limit                  = 0
-          ratio-limit-enabled          = true
-          rename-partial-files         = true
-          rpc-authentication-required  = false
-          rpc-host-whitelist-enabled   = false
-          rpc-port                     = local.service_ports.transmission
-          rpc-url                      = "/transmission/"
-          rpc-whitelist-enabled        = false
-          script-torrent-done-enabled  = true
-          script-torrent-done-filename = "/torrentdone.sh"
-          speed-limit-down-enabled     = false
-          speed-limit-up               = 10
-          speed-limit-up-enabled       = true
-          start-added-torrents         = true
-        }
-        doneScript = <<EOF
-#!/bin/sh
-set -xe
-#  * TR_APP_VERSION
-#  * TR_TIME_LOCALTIME
-#  * TR_TORRENT_DIR
-#  * TR_TORRENT_HASH
-#  * TR_TORRENT_ID
-#  * TR_TORRENT_NAME
-cd "$TR_TORRENT_DIR"
-
-transmission-remote 127.0.0.1:${local.service_ports.transmission} \
-  --torrent "$TR_TORRENT_ID" \
-  --verify
-
-minio-client \
-  -endpoint="${local.kubernetes_service_endpoints.minio}:${local.service_ports.minio}" \
-  -bucket="${local.minio_buckets.downloads.name}" \
-  -access-key-id="${data.terraform_remote_state.sr.outputs.minio.access_key_id}" \
-  -secret-access-key="${data.terraform_remote_state.sr.outputs.minio.secret_access_key}" \
-  -path="$TR_TORRENT_NAME"
-
-transmission-remote 127.0.0.1:${local.service_ports.transmission} \
-  --torrent "$TR_TORRENT_ID" \
-  --remove-and-delete
-EOF
-      }
-      # Add local routes https://hub.docker.com/r/linuxserver/wireguard
-      wireguard = {
-        enabled = true
-        config = {
-          Interface = merge({
-            for k, v in var.wireguard_client.Interface :
-            k => v
-            if k != "DNS"
-            }, {
-            PostUp = <<EOT
-nft add table ip filter && nft add chain ip filter output { type filter hook output priority 0 \; } && nft insert rule ip filter output oifname != "%i" mark != $(wg show %i fwmark) fib daddr type != local ip daddr != ${local.networks.kubernetes_service.prefix} ip daddr != ${local.networks.kubernetes_pod.prefix} reject && ip route add ${local.networks.kubernetes_service.prefix} via $(ip route | grep default | awk '{print $3}')
-EOT
-          })
-          Peer = merge(var.wireguard_client.Peer, {
-            PersistentKeepalive = 25
-          })
-        }
       }
     }),
   ]

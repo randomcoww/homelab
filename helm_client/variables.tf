@@ -20,8 +20,10 @@ variable "authelia_users" {
 
 variable "wireguard_client" {
   type = object({
-    Interface = map(string)
-    Peer      = map(string)
+    private_key = string
+    public_key  = string
+    address     = string
+    endpoint    = string
   })
 }
 

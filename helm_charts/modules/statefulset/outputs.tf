@@ -61,6 +61,7 @@ output "manifest" {
           }
         }, var.spec)
       }
+      volumeClaimTemplates = var.volume_claim_templates
     }
   })
 }

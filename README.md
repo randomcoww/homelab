@@ -119,15 +119,10 @@ tailscale = {
 }
 
 wireguard_client = {
-  Interface = {
-    PrivateKey = "$WG_PRIVATE_KEY"
-    Address    = "$WG_ADDRESS"
-  }
-  Peer = {
-    PublicKey  = "$WG_PUBLIC_KEY"
-    AllowedIPs = "0.0.0.0/0,::0/0"
-    Endpoint   = "$WG_ENDPOINT"
-  }
+  private_key = "$WG_PRIVATE_KEY"
+  public_key  = "$WG_PUBLIC_KEY"
+  address     = "$WG_ADDRESS"
+  endpoint    = "$WG_ENDPOINT"
 }
 
 alpaca = {

@@ -39,3 +39,8 @@ variable "spec" {
   type    = any
   default = {}
 }
+
+variable "volume_claim_templates" {
+  type    = any
+  default = []
+}
