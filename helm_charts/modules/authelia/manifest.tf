@@ -165,6 +165,15 @@ data "helm_template" "authelia" {
   ]
 }
 
+module "metadata" {
+  source      = "../metadata"
+  name        = var.name
+  namespace   = var.namespace
+  release     = var.release
+  app_version = var.source_release
+  manifests   = local.manifests
+}
+
 locals {
   db_path = "/config/db.sqlite3"
 

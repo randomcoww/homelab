@@ -123,6 +123,22 @@ locals {
   }
 }
 
+module "metadata" {
+  source      = "../metadata"
+  name        = var.name
+  namespace   = var.namespace
+  release     = var.release
+  app_version = split(":", var.images.kea)[1]
+  manifests = merge({
+    "templates/configmap.yaml"   = module.configmap.manifest
+    "templates/service.yaml"     = module.service.manifest
+    "templates/statefulset.yaml" = module.statefulset.manifest
+    }, {
+    for k, service in module.service-peer :
+    "templates/service-${k}.yaml" => service.manifest
+  })
+}
+
 module "configmap" {
   source  = "../configmap"
   name    = var.name

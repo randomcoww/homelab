@@ -43,6 +43,18 @@ locals {
   ]
 }
 
+module "metadata" {
+  source      = "../metadata"
+  name        = var.name
+  namespace   = var.namespace
+  release     = var.release
+  app_version = split(":", var.images.hostapd)[1]
+  manifests = {
+    "templates/secret.yaml"      = module.secret.manifest
+    "templates/statefulset.yaml" = module.statefulset.manifest
+  }
+}
+
 module "secret" {
   source  = "../secret"
   name    = var.name

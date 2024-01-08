@@ -3,6 +3,21 @@ locals {
   shared_data_path    = "/var/tmp/matchbox"
 }
 
+module "metadata" {
+  source      = "../metadata"
+  name        = var.name
+  namespace   = var.namespace
+  release     = var.release
+  app_version = split(":", var.images.matchbox)[1]
+  manifests = {
+    "templates/service.yaml"          = module.service.manifest
+    "templates/service-peer.yaml"     = module.service-peer.manifest
+    "templates/secret-matchbox.yaml"  = module.secret-matchbox.manifest
+    "templates/secret-syncthing.yaml" = module.secret-syncthing.manifest
+    "templates/statefulset.yaml"      = module.statefulset.manifest
+  }
+}
+
 module "syncthing-config" {
   source              = "../syncthing_config"
   name                = var.name

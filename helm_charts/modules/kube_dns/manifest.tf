@@ -61,6 +61,15 @@ data "helm_template" "coredns" {
   ]
 }
 
+module "metadata" {
+  source      = "../metadata"
+  name        = var.name
+  namespace   = var.namespace
+  release     = var.release
+  app_version = var.source_release
+  manifests   = local.manifests
+}
+
 locals {
   s = yamldecode(data.helm_template.coredns.manifests["templates/clusterrole.yaml"])
   manifests = merge(data.helm_template.coredns.manifests, {
