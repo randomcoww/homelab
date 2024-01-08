@@ -261,7 +261,7 @@ module "kube_dns" {
   source         = "./modules/kube_dns"
   name           = "kube-dns"
   namespace      = "kube-system"
-  release        = "0.1.1"
+  release        = "0.1.4"
   source_release = "1.29.0"
   replicas       = 3
   images = {
@@ -291,7 +291,6 @@ module "kube_dns" {
           configBlock = <<EOF
 pods insecure
 fallthrough in-addr.arpa ip6.arpa
-ttl 30
 EOF
         },
         {
