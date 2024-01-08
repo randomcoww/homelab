@@ -34,8 +34,8 @@ storage:
               - --etcd-servers=${etcd_cluster_endpoints}
               - --event-ttl=1h
               - --kubelet-certificate-authority=${pki.ca_cert.path}
-              - --kubelet-client-certificate=${pki.apiserver_cert.path}
-              - --kubelet-client-key=${pki.apiserver_key.path}
+              - --kubelet-client-certificate=${pki.kubelet_client_cert.path}
+              - --kubelet-client-key=${pki.kubelet_client_key.path}
               - --kubelet-preferred-address-types=InternalDNS,InternalIP
               - --runtime-config=api/all=true
               - --secure-port=${apiserver_port}

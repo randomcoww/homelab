@@ -21,6 +21,12 @@ locals {
       apiserver_key = {
         content = tls_private_key.apiserver.private_key_pem
       }
+      kubelet_client_cert = {
+        content = tls_locally_signed_cert.kubelet-client.cert_pem
+      }
+      kubelet_client_key = {
+        content = tls_private_key.kubelet-client.private_key_pem
+      }
       controller_manager_cert = {
         content = tls_locally_signed_cert.controller-manager.cert_pem
       }

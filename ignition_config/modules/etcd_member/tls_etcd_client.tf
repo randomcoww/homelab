@@ -8,7 +8,7 @@ resource "tls_cert_request" "etcd-client" {
   private_key_pem = tls_private_key.etcd-client.private_key_pem
 
   subject {
-    common_name = "wrapper-etcd-client"
+    common_name = "etcd-wrapper-etcd-client"
   }
 }
 

@@ -30,6 +30,5 @@ resource "tls_locally_signed_cert" "apiserver" {
     "key_encipherment",
     "digital_signature",
     "server_auth",
-    "client_auth",
   ]
 }
