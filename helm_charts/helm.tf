@@ -419,7 +419,7 @@ PrivateKey=${var.wireguard_client.private_key}
 PostUp=nft add table ip filter && nft add chain ip filter output { type filter hook output priority 0 \; } && nft insert rule ip filter output oifname != "%i" mark != $(wg show %i fwmark) fib daddr type != local ip daddr != ${local.networks.kubernetes_service.prefix} ip daddr != ${local.networks.kubernetes_pod.prefix} reject && ip route add ${local.networks.kubernetes_service.prefix} via $(ip route | grep default | awk '{print $3}')
 
 [Peer]
-AllowedIPs=0.0.0.0/0,::0/0
+AllowedIPs=0.0.0.0/0
 Endpoint=${var.wireguard_client.endpoint}
 PublicKey=${var.wireguard_client.public_key}
 PersistentKeepalive=25
@@ -439,11 +439,11 @@ resource "local_file" "manifests" {
     module.kube_proxy.manifests,
     module.flannel.manifests,
     module.kapprover.manifests,
-    module.hostapd.manifests,
+    module.kube_dns.manifests,
     module.kea.manifests,
     module.vaultwarden.manifests,
     module.authelia.manifests,
-    module.kube_dns.manifests,
+    module.hostapd.manifests,
     module.transmission.manifests,
   )
   content  = each.value
