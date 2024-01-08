@@ -194,6 +194,37 @@ module "statefulset" {
     dnsPolicy   = "ClusterFirstWithHostNet"
     containers = [
       {
+        name  = "${var.name}-control-agent"
+        image = var.images.kea
+        args = [
+          "kea-ctrl-agent",
+          "-c",
+          "/etc/kea/kea-ctrl-agent.conf",
+        ]
+        env = [
+          {
+            name = "POD_NAME"
+            valueFrom = {
+              fieldRef = {
+                fieldPath = "metadata.name"
+              }
+            }
+          }
+        ]
+        volumeMounts = [
+          {
+            name      = "shared-data"
+            mountPath = local.shared_data_path
+          },
+          {
+            name        = "kea-config"
+            mountPath   = "/etc/kea/kea-ctrl-agent.conf"
+            subPathExpr = "kea-ctrl-agent-$(POD_NAME)"
+            readOnly    = true
+          },
+        ]
+      },
+      {
         name  = var.name
         image = var.images.kea
         args = [
@@ -227,37 +258,6 @@ module "statefulset" {
             name        = "kea-config"
             mountPath   = "/etc/kea/kea-dhcp4.conf"
             subPathExpr = "kea-dhcp4-$(POD_NAME)"
-            readOnly    = true
-          },
-        ]
-      },
-      {
-        name  = "${var.name}-control-agent"
-        image = var.images.kea
-        args = [
-          "kea-ctrl-agent",
-          "-c",
-          "/etc/kea/kea-ctrl-agent.conf",
-        ]
-        env = [
-          {
-            name = "POD_NAME"
-            valueFrom = {
-              fieldRef = {
-                fieldPath = "metadata.name"
-              }
-            }
-          }
-        ]
-        volumeMounts = [
-          {
-            name      = "shared-data"
-            mountPath = local.shared_data_path
-          },
-          {
-            name        = "kea-config"
-            mountPath   = "/etc/kea/kea-ctrl-agent.conf"
-            subPathExpr = "kea-ctrl-agent-$(POD_NAME)"
             readOnly    = true
           },
         ]
