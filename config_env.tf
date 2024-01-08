@@ -120,7 +120,7 @@ locals {
     kapprover          = "ghcr.io/randomcoww/kapprover:latest"
     external_dns       = "k8s.gcr.io/external-dns/external-dns:v0.13.4"
     kube_proxy         = "ghcr.io/randomcoww/kubernetes:kube-proxy-v1.29.0"
-    transmission       = "ghcr.io/randomcoww/transmission:20230429"
+    transmission       = "ghcr.io/randomcoww/transmission:20240108.1"
     wireguard          = "ghcr.io/randomcoww/wireguard:20230429"
     vaultwarden        = "docker.io/vaultwarden/server:1.29.0-alpine"
     litestream         = "docker.io/litestream/litestream:latest"
