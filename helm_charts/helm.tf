@@ -4,9 +4,51 @@ locals {
 }
 
 module "bootstrap" {
-  source  = "./modules/bootstrap"
-  name    = "bootstrap"
-  release = "0.1.1"
+  source    = "./modules/bootstrap"
+  name      = "bootstrap"
+  namespace = "kube-system"
+  release   = "0.1.1"
+}
+
+module "kube_proxy" {
+  source    = "./modules/kube_proxy"
+  name      = "kube-proxy"
+  namespace = "kube-system"
+  release   = "0.1.2"
+  images = {
+    kube_proxy = local.container_images.kube_proxy
+  }
+  ports = {
+    kube_proxy     = local.ports.kube_proxy
+    kube_apiserver = local.ports.apiserver
+  }
+  kubernetes_pod_prefix = local.networks.kubernetes_pod.prefix
+  kube_apiserver_ip     = local.services.apiserver.ip
+}
+
+module "flannel" {
+  source    = "./modules/flannel"
+  name      = "flannel"
+  namespace = "kube-system"
+  release   = "0.1.2"
+  images = {
+    flannel            = local.container_images.flannel
+    flannel_cni_plugin = local.container_images.flannel_cni_plugin
+  }
+  kubernetes_pod_prefix     = local.networks.kubernetes_pod.prefix
+  cni_bridge_interface_name = local.kubernetes.cni_bridge_interface_name
+  cni_version               = "0.3.1"
+}
+
+module "kapprover" {
+  source    = "./modules/kapprover"
+  name      = "kapprover"
+  namespace = "kube-system"
+  release   = "0.1.1"
+  replicas  = 2
+  images = {
+    kapprover = local.container_images.kapprover
+  }
 }
 
 module "hostapd" {
@@ -394,6 +436,9 @@ EOF
 resource "local_file" "manifests" {
   for_each = merge(
     module.bootstrap.manifests,
+    module.kube_proxy.manifests,
+    module.flannel.manifests,
+    module.kapprover.manifests,
     module.hostapd.manifests,
     module.kea.manifests,
     module.vaultwarden.manifests,
