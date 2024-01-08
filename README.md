@@ -89,11 +89,7 @@ APCA_API_BASE_URL=
 ```
 
 ```bash
-cat > helm_client/secrets.tfvars <<EOF
-letsencrypt = {
-  email = "$LETSENCRYPT_USER"
-}
-
+cat > helm_charts/secrets.tfvars <<EOF
 authelia_users = {
   "$GMAIL_USER" = {
     password = "$AUTHELIA_PASSWORD_HASH"
@@ -114,15 +110,33 @@ smtp = {
   password = "$GMAIL_PASSWORD"
 }
 
-tailscale = {
-  auth_key = "$TS_AUTH_KEY"
-}
-
 wireguard_client = {
   private_key = "$WG_PRIVATE_KEY"
   public_key  = "$WG_PUBLIC_KEY"
   address     = "$WG_ADDRESS"
   endpoint    = "$WG_ENDPOINT"
+}
+
+tailscale = {
+  auth_key = "$TS_AUTH_KEY"
+}
+
+alpaca = {
+  api_key_id     = "$APCA_API_KEY_ID"
+  api_secret_key = "$APCA_API_SECRET_KEY"
+  api_base_url   = "$APCA_API_BASE_URL"
+}
+EOF
+```
+
+```bash
+cat > helm_client/secrets.tfvars <<EOF
+letsencrypt = {
+  email = "$LETSENCRYPT_USER"
+}
+
+tailscale = {
+  auth_key = "$TS_AUTH_KEY"
 }
 
 alpaca = {
