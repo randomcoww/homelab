@@ -209,7 +209,7 @@ module "vaultwarden" {
     litestream  = local.container_images.litestream
   }
   ports = {
-    vaultwarden = local.service_ports.vaultwarden
+    vaultwarden = 8080
   }
   service_hostname = local.kubernetes_ingress_endpoints.vaultwarden
   exrtra_envs = {
@@ -356,7 +356,7 @@ module "code" {
     tailscale   = local.container_images.tailscale
   }
   ports = {
-    code_server = local.service_ports.transmission
+    code_server = 8080
   }
   user = "code"
   uid  = 10000
@@ -502,6 +502,56 @@ module "alpaca_stream" {
   alpaca_api_base_url   = var.alpaca.api_base_url
 }
 
+module "mpd" {
+  source  = "./modules/mpd"
+  name    = "mpd"
+  release = "0.1.1"
+  images = {
+    mpd    = local.container_images.mpd
+    mympd  = local.container_images.mympd
+    rclone = local.container_images.rclone
+  }
+  ports = {
+    mympd             = 8080
+    rclone            = 8081
+    audio_output_base = 8082
+  }
+  audio_outputs = [
+    {
+      name = "flac-3"
+      config = {
+        tags        = "yes"
+        format      = "48000:24:2"
+        always_on   = "yes"
+        encoder     = "flac"
+        compression = 3
+        max_clients = 2
+      }
+    },
+    {
+      name = "lame-9"
+      config = {
+        tags        = "yes"
+        format      = "48000:24:2"
+        always_on   = "yes"
+        encoder     = "lame"
+        quality     = 9
+        max_clients = 2
+      }
+    },
+  ]
+  s3_endpoint = "http://${local.kubernetes_service_endpoints.minio}:${local.service_ports.minio}"
+  s3_resource = local.minio_buckets.music.name
+
+  service_hostname    = local.kubernetes_ingress_endpoints.mpd
+  ingress_class_name  = local.ingress_classes.ingress_nginx
+  ingress_cert_issuer = local.cert_issuer_prod
+  ingress_auth_url    = "http://${local.kubernetes_service_endpoints.authelia}/api/verify"
+  ingress_auth_signin = "https://${local.kubernetes_ingress_endpoints.auth}?rm=$request_method"
+  volume_claim_size   = "1Gi"
+  storage_class       = "local-path"
+}
+
 resource "local_file" "manifests" {
   for_each = merge(
     module.bootstrap.manifests,
@@ -516,6 +566,7 @@ resource "local_file" "manifests" {
     module.code.manifests,
     module.transmission.manifests,
     module.alpaca_stream.manifests,
+    module.mpd.manifests,
   )
   content  = each.value
   filename = "${path.module}/output/charts/${each.key}"

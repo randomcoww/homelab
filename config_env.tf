@@ -192,9 +192,6 @@ locals {
   service_ports = {
     minio         = 80
     transmission  = 9091
-    vaultwarden   = 8080
-    code_server   = 8080
-    kasm_desktop  = 6901
     alpaca_stream = 38081
   }
 
