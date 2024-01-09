@@ -113,7 +113,7 @@ locals {
     hostapd            = "ghcr.io/randomcoww/hostapd:2.10"
     syncthing          = "docker.io/syncthing/syncthing:1.27"
     rclone             = "docker.io/rclone/rclone:1.65"
-    mpd                = "ghcr.io/randomcoww/mpd:0.23.15"
+    mpd                = "ghcr.io/randomcoww/mpd:0.23.12"
     mympd              = "ghcr.io/jcorporation/mympd/mympd:13.0.6"
     flannel            = "docker.io/flannel/flannel:v0.24.0"
     flannel_cni_plugin = "docker.io/flannel/flannel-cni-plugin:v1.2.0"
