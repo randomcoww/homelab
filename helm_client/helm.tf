@@ -12,7 +12,7 @@ resource "helm_release" "local" {
   chart            = each.value.chart
   create_namespace = true
   wait             = true
-  timeout          = 600
+  timeout          = 300
   values = [
     each.value.values
   ]
