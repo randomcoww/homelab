@@ -547,6 +547,45 @@ module "mpd" {
   storage_class       = "local-path"
 }
 
+module "kasm_desktop" {
+  source  = "./modules/kasm_desktop"
+  name    = "kasm-desktop"
+  release = "0.1.1"
+  images = {
+    kasm_desktop = local.container_images.kasm_desktop
+  }
+  user = "kasm-user"
+  uid  = 10000
+  ssh_known_hosts = [
+    "@cert-authority * ${data.terraform_remote_state.sr.outputs.ssh_ca.public_key_openssh}",
+  ]
+  extra_envs = {
+    VK_ICD_FILENAMES = join(":", [
+      "/usr/share/vulkan/icd.d/radeon_icd.i686.json",
+      "/usr/share/vulkan/icd.d/radeon_icd.x86_64.json",
+    ])
+    AMD_VULKAN_ICD = "RADV"
+    RESOLUTION     = "2560x1600"
+  }
+  resources = {
+    limits = {
+      "github.com/fuse" = 1
+      "amd.com/gpu"     = 1
+    }
+  }
+
+  sunshine_service_hostname = local.kubernetes_ingress_endpoints.sunshine
+  sunshine_service_ip       = local.services.sunshine.ip
+
+  kasm_service_hostname = local.kubernetes_ingress_endpoints.kasm
+  ingress_class_name    = local.ingress_classes.ingress_nginx
+  ingress_cert_issuer   = local.kubernetes.cert_issuer_prod
+  ingress_auth_url      = "http://${local.kubernetes_service_endpoints.authelia}/api/verify"
+  ingress_auth_signin   = "https://${local.kubernetes_ingress_endpoints.auth}?rm=$request_method"
+  volume_claim_size     = "128Gi"
+  storage_class         = "local-path"
+}
+
 resource "local_file" "manifests" {
   for_each = merge(
     module.bootstrap.manifests,
@@ -562,6 +601,7 @@ resource "local_file" "manifests" {
     module.transmission.manifests,
     module.alpaca_stream.manifests,
     module.mpd.manifests,
+    module.kasm_desktop.manifests,
   )
   content  = each.value
   filename = "${path.module}/output/charts/${each.key}"

@@ -42,7 +42,7 @@ locals {
         ingress_nginx_external = 35
         matchbox               = 33
         minio                  = 34
-        kasm_sunshine          = 36
+        sunshine               = 36
         alpaca_stream          = 37
       }
       mtu = 9000
@@ -158,8 +158,8 @@ locals {
     webdav        = "w.${local.domains.internal}"
     matchbox      = "ign.${local.domains.internal}"
     code_server   = "code.${local.domains.internal}"
-    kasm_desktop  = "k.${local.domains.internal}"
-    kasm_sunshine = "ks.${local.domains.internal}"
+    kasm          = "k.${local.domains.internal}"
+    sunshine      = "sun.${local.domains.internal}"
     alpaca_stream = "alpaca-stream.${local.domains.internal}"
   }
 
