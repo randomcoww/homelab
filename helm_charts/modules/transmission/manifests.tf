@@ -169,6 +169,7 @@ module "statefulset" {
         name = "transmission-home"
       }
       spec = {
+        accessModes = var.storage_access_modes
         resources = {
           requests = {
             storage = var.volume_claim_size

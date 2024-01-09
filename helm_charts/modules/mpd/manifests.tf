@@ -228,14 +228,15 @@ EOF
     {
       metadata = {
         name = "mpd-cache"
-        spec = {
-          resources = {
-            requests = {
-              storage = var.volume_claim_size
-            }
+      }
+      spec = {
+        accessModes = var.storage_access_modes
+        resources = {
+          requests = {
+            storage = var.volume_claim_size
           }
-          storageClassName = var.storage_class
         }
+        storageClassName = var.storage_class
       }
     }
   ]

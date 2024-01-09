@@ -104,3 +104,10 @@ variable "volume_claim_size" {
 variable "storage_class" {
   type = string
 }
+
+variable "storage_access_modes" {
+  type = list(string)
+  default = [
+    "ReadWriteOnce",
+  ]
+}
