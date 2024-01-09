@@ -1,3 +1,23 @@
+resource "helm_release" "local" {
+  for_each = {
+    for f in fileset("./output/charts", "*/values.yaml") :
+    dirname(f) => {
+      namespace = yamldecode(file("./output/charts/${f}")).Release.Namespace
+      chart     = "./output/charts/${dirname(f)}"
+      values    = file("./output/charts/${f}")
+    }
+  }
+  name             = each.key
+  namespace        = each.value.namespace
+  chart            = each.value.chart
+  create_namespace = true
+  wait             = true
+  timeout          = 600
+  values = [
+    each.value.values
+  ]
+}
+
 # local-storage storage class #
 
 resource "helm_release" "local-path-provisioner" {
@@ -327,7 +347,7 @@ resource "helm_release" "cert-issuer-secrets" {
           apiVersion = "v1"
           kind       = "Secret"
           metadata = {
-            name = local.cert_issuer_prod
+            name = local.kubernetes.cert_issuer_prod
           }
           stringData = {
             "tls.key" = chomp(data.terraform_remote_state.sr.outputs.letsencrypt.private_key_pem)
@@ -338,7 +358,7 @@ resource "helm_release" "cert-issuer-secrets" {
           apiVersion = "v1"
           kind       = "Secret"
           metadata = {
-            name = local.cert_issuer_staging
+            name = local.kubernetes.cert_issuer_staging
           }
           stringData = {
             "tls.key" = chomp(data.terraform_remote_state.sr.outputs.letsencrypt.staging_private_key_pem)
@@ -363,14 +383,14 @@ resource "helm_release" "cert-issuer" {
           apiVersion = "cert-manager.io/v1"
           kind       = "ClusterIssuer"
           metadata = {
-            name = local.cert_issuer_prod
+            name = local.kubernetes.cert_issuer_prod
           }
           spec = {
             acme = {
               server = "https://acme-v02.api.letsencrypt.org/directory"
               email  = data.terraform_remote_state.sr.outputs.letsencrypt.username
               privateKeySecretRef = {
-                name = local.cert_issuer_prod
+                name = local.kubernetes.cert_issuer_prod
               }
               disableAccountKeyGeneration = true
               solvers = [
@@ -397,14 +417,14 @@ resource "helm_release" "cert-issuer" {
           apiVersion = "cert-manager.io/v1"
           kind       = "ClusterIssuer"
           metadata = {
-            name = local.cert_issuer_staging
+            name = local.kubernetes.cert_issuer_staging
           }
           spec = {
             acme = {
               server = "https://acme-staging-v02.api.letsencrypt.org/directory"
               email  = data.terraform_remote_state.sr.outputs.letsencrypt.username
               privateKeySecretRef = {
-                name = local.cert_issuer_staging
+                name = local.kubernetes.cert_issuer_staging
               }
               disableAccountKeyGeneration = true
               solvers = [
@@ -580,6 +600,76 @@ resource "helm_release" "mayastor" {
         callhome = {
           enabled = false
         }
+      }
+    }),
+  ]
+}
+*/
+# kasm-desktop #
+/*
+resource "helm_release" "desktop" {
+  name       = "desktop"
+  namespace  = "default"
+  repository = "https://randomcoww.github.io/repos/helm/"
+  chart      = "desktop"
+  wait       = false
+  version    = "0.2.3"
+  values = [
+    yamlencode({
+      images = {
+        desktop = local.container_images.kasm_desktop
+      }
+      user          = "kasm-user"
+      uid           = 10000
+      sshKnownHosts = [
+        "@cert-authority * ${data.terraform_remote_state.sr.outputs.ssh_ca.public_key_openssh}"
+      ]
+      kasm = {
+        display = ":0"
+        additionalEnvs = {
+          VK_ICD_FILENAMES = "/usr/share/vulkan/icd.d/radeon_icd.i686.json:/usr/share/vulkan/icd.d/radeon_icd.x86_64.json"
+          AMD_VULKAN_ICD   = "RADV"
+          RESOLUTION       = "2560x1600"
+        }
+        resources = {
+          limits = {
+            "github.com/fuse" = 1
+            "amd.com/gpu"     = 1
+          }
+        }
+      }
+      ports = {
+        kasm = local.service_ports.kasm_desktop
+      }
+      kasmService = {
+        type = "ClusterIP"
+        port = local.service_ports.kasm_desktop
+      }
+      sunshineService = {
+        type = "LoadBalancer"
+        annotations = {
+          "external-dns.alpha.kubernetes.io/hostname" = local.kubernetes_ingress_endpoints.kasm_sunshine
+        }
+        externalIPs = [
+          local.services.kasm_sunshine.ip,
+        ]
+      }
+      kasmIngress = {
+        enabled          = true
+        ingressClassName = local.ingress_classes.ingress_nginx
+        path             = "/"
+        annotations      = local.nginx_ingress_annotations
+        tls = [
+          local.tls_wildcard,
+        ]
+        hosts = [
+          local.kubernetes_ingress_endpoints.kasm_desktop,
+        ]
+      }
+      persistence = {
+        accessMode   = "ReadWriteOnce"
+        storageClass = "local-path"
+        size         = "128Gi"
       }
     }),
   ]
