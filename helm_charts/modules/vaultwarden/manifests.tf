@@ -178,7 +178,7 @@ module "deployment" {
             }
           },
           ], [
-          for k, v in var.additional_envs :
+          for k, v in var.exrtra_envs :
           {
             name  = tostring(k)
             value = tostring(v)

@@ -212,7 +212,7 @@ module "vaultwarden" {
     vaultwarden = local.service_ports.vaultwarden
   }
   service_hostname = local.kubernetes_ingress_endpoints.vaultwarden
-  additional_envs = {
+  exrtra_envs = {
     SENDS_ALLOWED            = false
     EMERGENCY_ACCESS_ALLOWED = false
     PASSWORD_HINTS_ALLOWED   = false
@@ -347,6 +347,59 @@ EOF
   ]
 }
 
+module "code" {
+  source  = "./modules/code_server"
+  name    = "code"
+  release = "0.1.1"
+  images = {
+    code_server = local.container_images.code_server
+    tailscale   = local.container_images.tailscale
+  }
+  ports = {
+    code_server = local.service_ports.transmission
+  }
+  user = "code"
+  uid  = 10000
+  ssh_known_hosts = [
+    "@cert-authority * ${data.terraform_remote_state.sr.outputs.ssh_ca.public_key_openssh}",
+  ]
+  code_server_resources = {
+    limits = {
+      "github.com/fuse" = 1
+      "nvidia.com/gpu"  = 1
+    }
+  }
+
+  tailscale_auth_key = var.tailscale.auth_key
+  tailscale_extra_envs = {
+    TS_ACCEPT_DNS          = true
+    TS_DEBUG_FIREWALL_MODE = "nftables"
+    TS_EXTRA_ARGS = join(",", [
+      "--advertise-exit-node",
+    ])
+    TS_ROUTES = join(",", [
+      local.networks.lan.prefix,
+      local.networks.service.prefix,
+      local.networks.kubernetes.prefix,
+      local.networks.kubernetes_service.prefix,
+      local.networks.kubernetes_pod.prefix,
+    ])
+  }
+
+  aws_region             = data.terraform_remote_state.sr.outputs.ssm.tailscale.aws_region
+  ssm_access_key_id      = data.terraform_remote_state.sr.outputs.ssm.tailscale.access_key_id
+  ssm_secret_access_key  = data.terraform_remote_state.sr.outputs.ssm.tailscale.secret_access_key
+  ssm_tailscale_resource = data.terraform_remote_state.sr.outputs.ssm.tailscale.resource
+
+  service_hostname    = local.kubernetes_ingress_endpoints.code_server
+  ingress_class_name  = local.ingress_classes.ingress_nginx
+  ingress_cert_issuer = local.cert_issuer_prod
+  ingress_auth_url    = "http://${local.kubernetes_service_endpoints.authelia}/api/verify"
+  ingress_auth_signin = "https://${local.kubernetes_ingress_endpoints.auth}?rm=$request_method"
+  volume_claim_size   = "128Gi"
+  storage_class       = "local-path"
+}
+
 module "transmission" {
   source  = "./modules/transmission"
   name    = "transmission"
@@ -444,6 +497,7 @@ resource "local_file" "manifests" {
     module.vaultwarden.manifests,
     module.authelia.manifests,
     module.hostapd.manifests,
+    module.code.manifests,
     module.transmission.manifests,
   )
   content  = each.value

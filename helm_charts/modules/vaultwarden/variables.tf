@@ -33,8 +33,9 @@ variable "service_hostname" {
   type = string
 }
 
-variable "additional_envs" {
-  type = map(string)
+variable "exrtra_envs" {
+  type    = map(any)
+  default = {}
 }
 
 variable "smtp_host" {
