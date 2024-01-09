@@ -25,12 +25,14 @@ Create `cluster_resources/secrets.tfvars` file
 ```bash
 CLOUDFLARE_API_TOKEN=
 CLOUDFLARE_ACCOUNT_ID=
+LETSENCRYPT_USER=
 ```
 
 ```bash
 cat > cluster_resources/secrets.tfvars <<EOF
 cloudflare_api_token  = "$CLOUDFLARE_API_TOKEN"
 cloudflare_account_id = "$CLOUDFLARE_ACCOUNT_ID"
+letsencrypt_username  = "$LETSENCRYPT_USER"
 EOF
 ```
 
@@ -71,7 +73,6 @@ Reference: [Generate Authelia password hash](https://www.authelia.com/reference/
 
 ```bash
 PASSWORD=
-LETSENCRYPT_USER=
 GMAIL_USER=
 GMAIL_PASSWORD=
 AP_SSID=
@@ -125,14 +126,6 @@ alpaca = {
   api_key_id     = "$APCA_API_KEY_ID"
   api_secret_key = "$APCA_API_SECRET_KEY"
   api_base_url   = "$APCA_API_BASE_URL"
-}
-EOF
-```
-
-```bash
-cat > helm_client/secrets.tfvars <<EOF
-letsencrypt = {
-  email = "$LETSENCRYPT_USER"
 }
 EOF
 ```
@@ -246,7 +239,7 @@ Deploy helm charts to Kubernetes
 
 ```bash
 tw terraform -chdir=helm_client init
-tw terraform -chdir=helm_client apply -var-file=secrets.tfvars
+tw terraform -chdir=helm_client apply
 ```
 
 ---

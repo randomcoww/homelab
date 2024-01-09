@@ -102,6 +102,7 @@ output "letsencrypt" {
   value = {
     private_key_pem         = tls_private_key.letsencrypt-prod.private_key_pem
     staging_private_key_pem = tls_private_key.letsencrypt-staging.private_key_pem
+    username                = var.letsencrypt_username
   }
   sensitive = true
 }

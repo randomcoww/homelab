@@ -368,7 +368,7 @@ resource "helm_release" "cert-issuer" {
           spec = {
             acme = {
               server = "https://acme-v02.api.letsencrypt.org/directory"
-              email  = var.letsencrypt.email
+              email  = data.terraform_remote_state.sr.outputs.letsencrypt.username
               privateKeySecretRef = {
                 name = local.cert_issuer_prod
               }
@@ -402,7 +402,7 @@ resource "helm_release" "cert-issuer" {
           spec = {
             acme = {
               server = "https://acme-staging-v02.api.letsencrypt.org/directory"
-              email  = var.letsencrypt.email
+              email  = data.terraform_remote_state.sr.outputs.letsencrypt.username
               privateKeySecretRef = {
                 name = local.cert_issuer_staging
               }
