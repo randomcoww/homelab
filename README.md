@@ -137,14 +137,14 @@ EOF
 Generate cluster resources
 
 ```bash
-tw terraform -chdir=cluster_resources init
+tw terraform -chdir=cluster_resources init && \
 tw terraform -chdir=cluster_resources apply -var-file=secrets.tfvars
 ```
 
 Generate CoreOS ignition for servers
 
 ```bash
-tw terraform -chdir=ignition_config init
+tw terraform -chdir=ignition_config init && \
 tw terraform -chdir=ignition_config apply -var-file=secrets.tfvars
 ```
 
@@ -171,7 +171,7 @@ echo assets_path=$assets_path
 ```
 
 ```bash
-tw terraform -chdir=bootstrap_server init
+tw terraform -chdir=bootstrap_server init && \
 tw terraform -chdir=bootstrap_server apply \
   -var host_ip=$host_ip \
   -var assets_path=$assets_path
@@ -187,7 +187,7 @@ sudo podman play kube bootstrap.yaml
 Push PXE boot and ignition configuration to bootstrap service
 
 ```bash
-tw terraform -chdir=bootstrap_client init
+tw terraform -chdir=bootstrap_client init && \
 tw terraform -chdir=bootstrap_client apply
 ```
 
@@ -210,7 +210,7 @@ tw terraform -chdir=bootstrap_server destroy \
 Write client credentials
 
 ```bash
-tw terraform -chdir=client init
+tw terraform -chdir=client init && \
 tw terraform -chdir=client apply -auto-approve -var-file=secrets.tfvars
 
 tw terraform -chdir=client output -raw kubeconfig > $HOME/.kube/config
@@ -228,17 +228,12 @@ Check that `kubernetes` service is up
 kubectl get svc
 ```
 
-Render services as local helm charts
-
-```bash
-tw terraform -chdir=helm_charts init
-tw terraform -chdir=helm_charts apply -var-file=secrets.tfvars
-```
-
 Deploy helm charts to Kubernetes
 
 ```bash
-tw terraform -chdir=helm_client init
+tw terraform -chdir=helm_charts init && \
+tw terraform -chdir=helm_client init && \
+tw terraform -chdir=helm_charts apply -var-file=secrets.tfvars && \
 tw terraform -chdir=helm_client apply
 ```
 
@@ -259,7 +254,7 @@ kubectl get po -l app=matchbox
 Push PXE boot and ignition configuration to cluster bootstrap service
 
 ```bash
-tw terraform -chdir=pxeboot_config_client init
+tw terraform -chdir=pxeboot_config_client init && \
 tw terraform -chdir=pxeboot_config_client apply
 ```
 
