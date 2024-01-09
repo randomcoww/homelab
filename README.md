@@ -135,10 +135,6 @@ letsencrypt = {
   email = "$LETSENCRYPT_USER"
 }
 
-tailscale = {
-  auth_key = "$TS_AUTH_KEY"
-}
-
 alpaca = {
   api_key_id     = "$APCA_API_KEY_ID"
   api_secret_key = "$APCA_API_SECRET_KEY"
