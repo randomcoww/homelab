@@ -11,7 +11,7 @@ resource "helm_release" "local" {
   namespace        = each.value.namespace
   chart            = each.value.chart
   create_namespace = true
-  wait             = true
+  wait             = false
   timeout          = 300
   values = [
     each.value.values
@@ -50,7 +50,7 @@ resource "helm_release" "fuse-device-plugin" {
   chart            = "helm-wrapper"
   namespace        = "kube-system"
   create_namespace = true
-  wait             = true
+  wait             = false
   version          = "0.1.0"
   values = [
     yamlencode({
@@ -217,7 +217,7 @@ resource "helm_release" "ingress-nginx" {
   namespace        = split(".", local.kubernetes_service_endpoints[each.key])[1]
   create_namespace = true
   wait             = false
-  version          = "4.6.1"
+  version          = "4.9.0"
   values = [
     yamlencode({
       controller = {
@@ -233,7 +233,6 @@ resource "helm_release" "ingress-nginx" {
           externalIPs = [
             local.services[each.key].ip,
           ]
-          # externalTrafficPolicy = "Local"
         }
         config = {
           ignore-invalid-headers = "off"
@@ -241,6 +240,7 @@ resource "helm_release" "ingress-nginx" {
           proxy-buffering        = "off"
           ssl-redirect           = "true"
           use-forwarded-headers  = "true"
+          keep-alive             = "false"
         }
       }
     }),
@@ -253,7 +253,7 @@ resource "helm_release" "cloudflare-token" {
   chart            = "helm-wrapper"
   namespace        = "cert-manager"
   create_namespace = true
-  wait             = true
+  wait             = false
   version          = "0.1.0"
   values = [
     yamlencode({
@@ -338,7 +338,7 @@ resource "helm_release" "cert-issuer-secrets" {
   chart            = "helm-wrapper"
   namespace        = "cert-manager"
   create_namespace = true
-  wait             = true
+  wait             = false
   version          = "0.1.0"
   values = [
     yamlencode({
@@ -470,7 +470,7 @@ resource "helm_release" "minio" {
   repository       = "https://charts.min.io/"
   chart            = "minio"
   create_namespace = true
-  wait             = true
+  wait             = false
   timeout          = 600
   version          = "5.0.14"
   values = [
