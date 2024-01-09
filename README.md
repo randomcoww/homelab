@@ -235,7 +235,7 @@ tw terraform -chdir=helm_charts init
 tw terraform -chdir=helm_client init
 
 tw terraform -chdir=helm_charts apply -var-file=secrets.tfvars && \
-tw terraform -chdir=helm_client apply -auto-approve
+tw terraform -chdir=helm_client apply
 ```
 
 ---
