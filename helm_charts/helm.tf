@@ -1,8 +1,3 @@
-locals {
-  cert_issuer_prod    = "letsencrypt-prod"
-  cert_issuer_staging = "letsencrypt-staging"
-}
-
 module "bootstrap" {
   source    = "./modules/bootstrap"
   name      = "bootstrap"
@@ -228,7 +223,7 @@ module "vaultwarden" {
   smtp_username        = var.smtp.username
   smtp_password        = var.smtp.password
   ingress_class_name   = local.ingress_classes.ingress_nginx
-  ingress_cert_issuer  = local.cert_issuer_prod
+  ingress_cert_issuer  = local.kubernetes.cert_issuer_prod
   ingress_auth_url     = "http://${local.kubernetes_service_endpoints.authelia}/api/verify"
   ingress_auth_signin  = "https://${local.kubernetes_ingress_endpoints.auth}?rm=$request_method"
   s3_db_resource       = "${data.terraform_remote_state.sr.outputs.s3.vaultwarden.resource}/db.sqlite3"
@@ -275,7 +270,7 @@ module "authelia" {
   smtp_username          = var.smtp.username
   smtp_password          = var.smtp.password
   ingress_class_name     = local.ingress_classes.ingress_nginx
-  ingress_cert_issuer    = local.cert_issuer_prod
+  ingress_cert_issuer    = local.kubernetes.cert_issuer_prod
   s3_db_resource         = "${data.terraform_remote_state.sr.outputs.s3.authelia.resource}/db.sqlite3"
   s3_access_key_id       = data.terraform_remote_state.sr.outputs.s3.authelia.access_key_id
   s3_secret_access_key   = data.terraform_remote_state.sr.outputs.s3.authelia.secret_access_key
@@ -393,7 +388,7 @@ module "code" {
 
   service_hostname    = local.kubernetes_ingress_endpoints.code_server
   ingress_class_name  = local.ingress_classes.ingress_nginx
-  ingress_cert_issuer = local.cert_issuer_prod
+  ingress_cert_issuer = local.kubernetes.cert_issuer_prod
   ingress_auth_url    = "http://${local.kubernetes_service_endpoints.authelia}/api/verify"
   ingress_auth_signin = "https://${local.kubernetes_ingress_endpoints.auth}?rm=$request_method"
   volume_claim_size   = "128Gi"
@@ -479,7 +474,7 @@ PersistentKeepalive=25
 EOF
   service_hostname    = local.kubernetes_ingress_endpoints.transmission
   ingress_class_name  = local.ingress_classes.ingress_nginx
-  ingress_cert_issuer = local.cert_issuer_prod
+  ingress_cert_issuer = local.kubernetes.cert_issuer_prod
   ingress_auth_url    = "http://${local.kubernetes_service_endpoints.authelia}/api/verify"
   ingress_auth_signin = "https://${local.kubernetes_ingress_endpoints.auth}?rm=$request_method"
   volume_claim_size   = "32Gi"
@@ -545,7 +540,7 @@ module "mpd" {
 
   service_hostname    = local.kubernetes_ingress_endpoints.mpd
   ingress_class_name  = local.ingress_classes.ingress_nginx
-  ingress_cert_issuer = local.cert_issuer_prod
+  ingress_cert_issuer = local.kubernetes.cert_issuer_prod
   ingress_auth_url    = "http://${local.kubernetes_service_endpoints.authelia}/api/verify"
   ingress_auth_signin = "https://${local.kubernetes_ingress_endpoints.auth}?rm=$request_method"
   volume_claim_size   = "1Gi"
