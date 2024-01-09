@@ -601,7 +601,7 @@ resource "local_file" "manifests" {
     module.transmission.manifests,
     module.alpaca_stream.manifests,
     module.mpd.manifests,
-    module.kasm_desktop.manifests,
+    # module.kasm_desktop.manifests,
   )
   content  = each.value
   filename = "${path.module}/output/charts/${each.key}"
