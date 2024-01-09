@@ -134,12 +134,6 @@ cat > helm_client/secrets.tfvars <<EOF
 letsencrypt = {
   email = "$LETSENCRYPT_USER"
 }
-
-alpaca = {
-  api_key_id     = "$APCA_API_KEY_ID"
-  api_secret_key = "$APCA_API_SECRET_KEY"
-  api_base_url   = "$APCA_API_BASE_URL"
-}
 EOF
 ```
 
@@ -241,7 +235,14 @@ Check that `kubernetes` service is up
 kubectl get svc
 ```
 
-Launch all services on Kubernetes
+Render services as local helm charts
+
+```bash
+tw terraform -chdir=helm_charts init
+tw terraform -chdir=helm_charts apply -var-file=secrets.tfvars
+```
+
+Deploy helm charts to Kubernetes
 
 ```bash
 tw terraform -chdir=helm_client init

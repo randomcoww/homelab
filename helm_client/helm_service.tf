@@ -99,37 +99,6 @@ resource "helm_release" "mpd" {
   ]
 }
 
-# alpaca stream broadcast #
-
-resource "helm_release" "alpaca-stream" {
-  name       = "alpaca-stream-server"
-  namespace  = "default"
-  repository = "https://randomcoww.github.io/repos/helm/"
-  chart      = "stream-server"
-  version    = "0.1.7"
-  wait       = false
-  values = [
-    yamlencode({
-      images = {
-        stream_server = local.container_images.alpaca_stream
-      }
-      service = {
-        type = "LoadBalancer"
-        port = local.service_ports.alpaca_stream
-        externalIPs = [
-          local.services.alpaca_stream.ip,
-        ]
-        annotations = {
-          "external-dns.alpha.kubernetes.io/hostname" = local.kubernetes_ingress_endpoints.alpaca_stream
-        }
-      }
-      alpaca_api_key_id     = var.alpaca.api_key_id
-      alpaca_api_secret_key = var.alpaca.api_secret_key
-      alpaca_api_base_url   = var.alpaca.api_base_url
-    }),
-  ]
-}
-
 # kasm-desktop #
 /*
 resource "helm_release" "desktop" {

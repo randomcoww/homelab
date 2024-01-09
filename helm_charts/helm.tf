@@ -486,6 +486,22 @@ EOF
   storage_class       = "local-path"
 }
 
+module "alpaca_stream" {
+  source  = "./modules/alpaca_stream"
+  name    = "alpaca-stream"
+  release = "0.1.1"
+  images = {
+    alpaca_stream = local.container_images.alpaca_stream
+  }
+  ports = {
+    alpaca_stream = local.service_ports.alpaca_stream
+  }
+  service_hostname      = local.kubernetes_ingress_endpoints.alpaca_stream
+  alpaca_api_key_id     = var.alpaca.api_key_id
+  alpaca_api_secret_key = var.alpaca.api_secret_key
+  alpaca_api_base_url   = var.alpaca.api_base_url
+}
+
 resource "local_file" "manifests" {
   for_each = merge(
     module.bootstrap.manifests,
@@ -499,6 +515,7 @@ resource "local_file" "manifests" {
     module.hostapd.manifests,
     module.code.manifests,
     module.transmission.manifests,
+    module.alpaca_stream.manifests,
   )
   content  = each.value
   filename = "${path.module}/output/charts/${each.key}"
