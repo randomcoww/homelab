@@ -499,9 +499,8 @@ module "mpd" {
   name    = "mpd"
   release = "0.2.1"
   images = {
-    mpd    = local.container_images.mpd
-    mympd  = local.container_images.mympd
-    rclone = local.container_images.rclone
+    mpd   = local.container_images.mpd
+    mympd = local.container_images.mympd
   }
   ports = {
     mympd             = 8080

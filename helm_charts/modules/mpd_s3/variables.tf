@@ -13,9 +13,8 @@ variable "release" {
 
 variable "images" {
   type = object({
-    mpd    = string
-    mympd  = string
-    rclone = string
+    mpd   = string
+    mympd = string
   })
 }
 
