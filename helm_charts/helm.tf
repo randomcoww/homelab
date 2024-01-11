@@ -192,12 +192,6 @@ module "matchbox" {
   ca               = data.terraform_remote_state.sr.outputs.matchbox_ca
 }
 
-resource "local_file" "matchbox" {
-  for_each = module.matchbox.manifests
-  content  = each.value
-  filename = "${path.module}/output/charts/${each.key}"
-}
-
 module "vaultwarden" {
   source  = "./modules/vaultwarden"
   name    = "vaultwarden"
@@ -501,9 +495,9 @@ module "alpaca_stream" {
 }
 
 module "mpd" {
-  source  = "./modules/mpd"
+  source  = "./modules/mpd_s3"
   name    = "mpd"
-  release = "0.1.1"
+  release = "0.2.1"
   images = {
     mpd    = local.container_images.mpd
     mympd  = local.container_images.mympd
@@ -538,16 +532,20 @@ module "mpd" {
       }
     },
   ]
-  s3_endpoint = "http://${local.kubernetes_service_endpoints.minio}:${local.service_ports.minio}"
-  s3_resource = local.minio_buckets.music.name
+  s3_endpoint       = "http://${local.kubernetes_service_endpoints.minio}:${local.service_ports.minio}"
+  s3_music_resource = local.minio_buckets.music.name
+  s3_cache_resource = local.minio_buckets.mpd.name
+  resources = {
+    limits = {
+      "github.com/fuse" = 1
+    }
+  }
 
   service_hostname    = local.kubernetes_ingress_endpoints.mpd
   ingress_class_name  = local.ingress_classes.ingress_nginx
   ingress_cert_issuer = local.kubernetes.cert_issuer_prod
   ingress_auth_url    = "http://${local.kubernetes_service_endpoints.authelia}/api/verify"
   ingress_auth_signin = "https://${local.kubernetes_ingress_endpoints.auth}?rm=$request_method"
-  volume_claim_size   = "1Gi"
-  storage_class       = "local-path"
 }
 
 module "kasm_desktop" {
@@ -591,6 +589,7 @@ module "kasm_desktop" {
 
 resource "local_file" "manifests" {
   for_each = merge(
+    module.matchbox.manifests,
     module.bootstrap.manifests,
     module.kube_proxy.manifests,
     module.flannel.manifests,
