@@ -234,6 +234,7 @@ resource "helm_release" "ingress-nginx" {
             local.services[each.key].ip,
           ]
         }
+        allowSnippetAnnotations = true
         config = {
           ignore-invalid-headers = "off"
           proxy-body-size        = 0
