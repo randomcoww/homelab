@@ -163,7 +163,11 @@ module "deployment" {
           }
         ]
         securityContext = {
-          privileged = true
+          capabilities = {
+            add = [
+              "SYS_ADMIN",
+            ]
+          }
         }
         resources = var.resources
       },
