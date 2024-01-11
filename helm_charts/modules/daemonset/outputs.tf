@@ -31,7 +31,7 @@ output "manifest" {
               {
                 name  = "ndots"
                 value = "2"
-              }
+              },
             ]
           }
         }, var.spec)

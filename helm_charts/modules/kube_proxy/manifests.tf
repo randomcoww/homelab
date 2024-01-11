@@ -148,7 +148,7 @@ module "daemonset" {
         configMap = {
           name = var.name
         }
-      }
+      },
     ]
   }
 }

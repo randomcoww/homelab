@@ -250,7 +250,7 @@ module "daemonset" {
           {
             name      = "xtables-lock"
             mountPath = "/run/xtables.lock"
-          }
+          },
         ]
       }
     ]
@@ -285,7 +285,7 @@ module "daemonset" {
           path = "/run/xtables.lock"
           type = "FileOrCreate"
         }
-      }
+      },
     ]
   }
 }

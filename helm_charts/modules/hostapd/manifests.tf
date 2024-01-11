@@ -90,7 +90,7 @@ module "statefulset" {
         name  = var.name
         image = var.images.hostapd
         args = [
-          "/etc/hostapd/hostapd.conf"
+          "/etc/hostapd/hostapd.conf",
         ]
         env = [
           {

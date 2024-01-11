@@ -294,7 +294,7 @@ module "statefulset" {
             ]
           }
         }
-      }
+      },
     ]
     volumes = [
       {

@@ -98,7 +98,7 @@ module "statefulset" {
           {
             name  = "CODE_PORT"
             value = tostring(var.ports.code_server)
-          }
+          },
           ], [
           for k, v in var.code_server_extra_envs :
           {
@@ -121,7 +121,7 @@ module "statefulset" {
         ports = [
           {
             containerPort = var.ports.code_server
-          }
+          },
         ]
         securityContext = {
           capabilities = {
@@ -230,6 +230,6 @@ module "statefulset" {
         }
         storageClassName = var.storage_class
       }
-    }
+    },
   ]
 }

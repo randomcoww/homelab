@@ -188,7 +188,7 @@ module "statefulset" {
         securityContext = {
           capabilities = {
             add = [
-              "AUDIT_WRITE"
+              "AUDIT_WRITE",
             ]
           }
         }
@@ -224,6 +224,6 @@ module "statefulset" {
         }
         storageClassName = var.storage_class
       }
-    }
+    },
   ]
 }

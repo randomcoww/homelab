@@ -128,7 +128,7 @@ EOF
             mountPath = local.mpd_cache_path
           },
         ]
-      }
+      },
     ]
     containers = [
       {
@@ -180,18 +180,18 @@ EOF
           {
             name  = "MYMPD_HTTP_PORT"
             value = tostring(var.ports.mympd)
-          }
+          },
         ]
         ports = [
           {
             containerPort = var.ports.mympd
-          }
+          },
         ]
         volumeMounts = [
           {
             name      = "mpd-socket"
             mountPath = local.mpd_socket_path
-          }
+          },
         ]
       },
       {
@@ -207,7 +207,7 @@ EOF
           "--no-modtime",
           "--read-only",
         ]
-      }
+      },
     ]
     volumes = [
       {
@@ -238,6 +238,6 @@ EOF
         }
         storageClassName = var.storage_class
       }
-    }
+    },
   ]
 }

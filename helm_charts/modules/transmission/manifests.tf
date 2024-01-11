@@ -149,9 +149,9 @@ module "statefulset" {
         ports = [
           {
             containerPort = var.ports.transmission
-          }
+          },
         ]
-      }
+      },
     ]
     volumes = [
       {

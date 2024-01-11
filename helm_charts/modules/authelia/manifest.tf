@@ -265,7 +265,7 @@ locals {
                 {
                   name  = "ndots"
                   value = "2"
-                }
+                },
               ]
             }
           })

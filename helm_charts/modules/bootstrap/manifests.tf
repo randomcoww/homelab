@@ -25,7 +25,7 @@ locals {
         apiGroup = "rbac.authorization.k8s.io"
         kind     = "User"
         name     = var.kube_node_bootstrap_user
-      }
+      },
     ]
   }
 
@@ -49,7 +49,7 @@ locals {
         apiGroup = "rbac.authorization.k8s.io"
         kind     = "User"
         name     = var.kube_node_bootstrap_user
-      }
+      },
     ]
   }
 
@@ -73,7 +73,7 @@ locals {
         apiGroup = "rbac.authorization.k8s.io"
         kind     = "Group"
         name     = "system:nodes"
-      }
+      },
     ]
   }
 
@@ -109,7 +109,7 @@ locals {
         apiGroups = [""]
         resources = ["pods/exec"]
         verbs     = ["create"]
-      }
+      },
     ]
   }
 
@@ -133,7 +133,7 @@ locals {
         apiGroup = "rbac.authorization.k8s.io"
         kind     = "User"
         name     = var.kube_kubelet_access_user
-      }
+      },
     ]
   }
 }
