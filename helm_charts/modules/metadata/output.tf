@@ -12,10 +12,7 @@ output "manifests" {
         Name      = var.name
         Namespace = var.namespace
       }
-      files = {
-        for path, content in var.manifests :
-        "${var.name}/${path}" => sha256(content)
-      }
+      checksum = sha256(join("\n", values(var.manifests)))
     })
     }, {
     for path, content in var.manifests :
