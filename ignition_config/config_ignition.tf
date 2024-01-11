@@ -146,19 +146,9 @@ locals {
           vlans = ["sync", "etcd", "service", "kubernetes", "wan"]
         }
       }
-      wlan_interfaces = {
-        wlan0 = {
-          mac = "10-6f-d9-cf-d5-71"
-        }
-      }
-      bridge_interfaces = {
-        br-lan = {
-          interfaces = ["phy0"]
-        }
-      }
       tap_interfaces = {
         lan = {
-          source_interface_name = "br-lan"
+          source_interface_name = "phy0"
           enable_netnum         = true
         }
         sync = {
@@ -219,7 +209,7 @@ locals {
       }
       wlan_interfaces = {
         wlan0 = {
-          mac = "7c-66-ef-f4-57-a8"
+          mac = "10-6f-d9-cf-d5-71"
         }
       }
       bridge_interfaces = {
