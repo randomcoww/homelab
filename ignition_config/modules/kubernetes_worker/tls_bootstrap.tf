@@ -27,8 +27,7 @@ resource "tls_cert_request" "bootstrap" {
   private_key_pem = tls_private_key.bootstrap.private_key_pem
 
   subject {
-    common_name  = "kubelet-bootstrap"
-    organization = "system:node-bootstrapper"
+    common_name = var.kube_node_bootstrap_user
   }
 }
 

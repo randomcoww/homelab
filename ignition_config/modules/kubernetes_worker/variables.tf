@@ -41,3 +41,7 @@ variable "cluster_dns_ip" {
 variable "kubelet_port" {
   type = number
 }
+
+variable "kube_node_bootstrap_user" {
+  type = string
+}

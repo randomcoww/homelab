@@ -176,6 +176,7 @@ module "ignition-kubernetes-master" {
   etcd_client_port          = local.ports.etcd_client
   controller_manager_port   = local.ports.controller_manager
   scheduler_port            = local.ports.scheduler
+  kube_kubelet_access_user  = local.kubernetes.kubelet_access_user
 
   sync_interface_name      = each.value.tap_interfaces.sync.interface_name
   apiserver_interface_name = each.value.tap_interfaces[local.services.apiserver.network.name].interface_name
@@ -196,6 +197,7 @@ module "ignition-kubernetes-worker" {
   cluster_domain            = local.domains.kubernetes
   static_pod_manifest_path  = local.kubernetes.static_pod_manifest_path
   kubelet_port              = local.ports.kubelet
+  kube_node_bootstrap_user  = local.kubernetes.node_bootstrap_user
 }
 
 module "ignition-nvidia-container" {

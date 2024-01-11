@@ -90,6 +90,10 @@ variable "apiserver_vip" {
   type = string
 }
 
+variable "kube_kubelet_access_user" {
+  type = string
+}
+
 variable "haproxy_config_path" {
   type    = string
   default = "/etc/haproxy/haproxy.cfg.d"

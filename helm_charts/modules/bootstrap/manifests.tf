@@ -23,8 +23,8 @@ locals {
     subjects = [
       {
         apiGroup = "rbac.authorization.k8s.io"
-        kind     = "Group"
-        name     = "system:node-bootstrapper"
+        kind     = "User"
+        name     = var.kube_node_bootstrap_user
       }
     ]
   }
@@ -47,8 +47,8 @@ locals {
     subjects = [
       {
         apiGroup = "rbac.authorization.k8s.io"
-        kind     = "Group"
-        name     = "system:node-bootstrapper"
+        kind     = "User"
+        name     = var.kube_node_bootstrap_user
       }
     ]
   }
@@ -132,7 +132,7 @@ locals {
       {
         apiGroup = "rbac.authorization.k8s.io"
         kind     = "User"
-        name     = "kube-apiserver-kubelet-client"
+        name     = var.kube_kubelet_access_user
       }
     ]
   }
