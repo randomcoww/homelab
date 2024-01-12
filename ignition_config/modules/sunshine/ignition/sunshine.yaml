@@ -22,15 +22,6 @@ systemd:
 
 storage:
   files:
-    - path: ${sunshine.config.cert}
-      mode: 0644
-      contents:
-        inline: "${replace(ca_cert, "\n", "\\n")}"
-    - path: ${sunshine.config.pkey}
-      mode: 0644
-      contents:
-        inline: "${replace(ca_key, "\n", "\\n")}"
-
     - path: /etc/udev/rules.d/85-uinput.rules
       mode: 0644
       contents:
@@ -45,8 +36,6 @@ storage:
 
     # systemd user unit
     # ignition doesn't support systemd --user
-    # these dependencies work for gnome wayland
-    # register client: curl http://localhost:47989/pin/<PIN>
     - path: /etc/systemd/user/sunshine.service
       mode: 0644
       contents:
@@ -82,6 +71,7 @@ storage:
           /org/gnome/desktop/lockdown/disable-user-switching
           /org/gnome/desktop/lockdown/user-administration-disabled
 
+  # install user systemd manually
   links:
     - path: /etc/systemd/user/graphical-session.target.wants/sunshine.service
       target: /etc/systemd/user/sunshine.service
