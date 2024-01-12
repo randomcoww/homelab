@@ -200,7 +200,7 @@ locals {
         phy0 = {
           mac   = "74-56-3c-c3-10-68"
           mtu   = 9000
-          vlans = ["service", "kubernetes"]
+          vlans = ["service", "kubernetes", "wan"]
         }
         # mobile
         phy1 = {
@@ -230,6 +230,15 @@ locals {
           source_interface_name = "phy0-kubernetes"
           enable_netnum         = true
         }
+        # shares resource over double NAT LAN
+        wan = {
+          source_interface_name = "phy0-wan"
+          mac                   = ""
+          metric                = 4096
+          enable_dhcp           = true
+          enable_dns            = false
+        }
+        # backup WAN on mobile data
         mobile = {
           source_interface_name = "phy1"
           enable_dhcp           = true
@@ -322,7 +331,7 @@ locals {
     kubernetes-worker = ["gw-0", "gw-1", "q-0", "de-1"]
     nvidia-container  = ["de-1"]
     desktop           = ["de-0", "de-1", "r-0"]
-    sunshine          = []
+    sunshine          = ["de-1"]
     remote            = ["de-0", "r-0"]
     chromebook-hacks  = ["de-0"]
   }

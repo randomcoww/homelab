@@ -22,27 +22,26 @@ systemd:
 
 storage:
   files:
+    - path: ${sunshine.config.cert}
+      mode: 0644
+      contents:
+        inline: "${replace(ca_cert, "\n", "\\n")}"
+    - path: ${sunshine.config.pkey}
+      mode: 0644
+      contents:
+        inline: "${replace(ca_key, "\n", "\\n")}"
+
     - path: /etc/udev/rules.d/85-uinput.rules
       mode: 0644
       contents:
         inline: |
           KERNEL=="uinput", SUBSYSTEM=="misc", OPTIONS+="static_node=uinput", TAG+="uaccess"
 
-    - path: /etc/skel/.config/sunshine/apps.json
+    - path: ${sunshine.config.file_apps}
       mode: 0644
       contents:
         inline: |
           ${indent(10, jsonencode(sunshine.apps))}
-    # Show cursor in sunshine stream under wayland
-    # https://github.com/LizardByte/Sunshine/issues/93
-    # Also waiting for
-    # https://gitlab.gnome.org/GNOME/mutter/-/issues/2980
-    # https://gitlab.gnome.org/GNOME/mutter/-/issues/1939
-    - path: /etc/environment.d/10-sunshine-hack.conf
-      mode: 0644
-      contents:
-        inline: |
-          MUTTER_DEBUG_DISABLE_HW_CURSORS=1
 
     # systemd user unit
     # ignition doesn't support systemd --user

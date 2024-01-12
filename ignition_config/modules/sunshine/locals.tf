@@ -2,6 +2,8 @@ locals {
   module_ignition_snippets = [
     for f in fileset(".", "${path.module}/ignition/*.yaml") :
     templatefile(f, {
+      ca_cert            = var.ca.cert_pem
+      ca_key             = var.ca.private_key_pem
       nftables_namespace = "sunshine"
       sunshine = {
         config = {
@@ -9,7 +11,9 @@ locals {
           origin_web_ui_allowed   = "pc"
           origin_pin_allowed      = "pc"
           upnp                    = "off"
-          output_name             = 1
+          cert                    = "/etc/sunshine/credentials/cacert.pem"
+          pkey                    = "/etc/sunshine/credentials/cakey.pem"
+          file_apps               = "/etc/sunshine/apps.json"
         }
         apps = {
           env = {

@@ -215,6 +215,8 @@ module "ignition-desktop" {
 module "ignition-sunshine" {
   for_each = local.members.sunshine
   source   = "./modules/sunshine"
+
+  ca = data.terraform_remote_state.sr.outputs.sunshine_ca
 }
 
 # remote client #
