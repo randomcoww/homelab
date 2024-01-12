@@ -89,15 +89,6 @@ output "matchbox_ca" {
   sensitive = true
 }
 
-output "sunshine_ca" {
-  value = {
-    algorithm       = tls_private_key.sunshine-ca.algorithm
-    private_key_pem = tls_private_key.sunshine-ca.private_key_pem
-    cert_pem        = tls_self_signed_cert.sunshine-ca.cert_pem
-  }
-  sensitive = true
-}
-
 output "authelia" {
   value = {
     storage_secret         = random_password.authelia-storage-secret.result
