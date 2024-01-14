@@ -44,7 +44,7 @@ module "service" {
     type = "ClusterIP"
     ports = [
       {
-        name       = "matchbox"
+        name       = "transmission"
         port       = var.ports.transmission
         protocol   = "TCP"
         targetPort = var.ports.transmission
