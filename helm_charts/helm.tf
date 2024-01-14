@@ -449,8 +449,6 @@ transmission-remote 127.0.0.1:${local.service_ports.transmission} \
 minio-client \
   -endpoint="${local.kubernetes_service_endpoints.minio}:${local.service_ports.minio}" \
   -bucket="${local.minio_buckets.downloads.name}" \
-  -access-key-id="${data.terraform_remote_state.sr.outputs.minio.access_key_id}" \
-  -secret-access-key="${data.terraform_remote_state.sr.outputs.minio.secret_access_key}" \
   -path="$TR_TORRENT_NAME"
 
 transmission-remote 127.0.0.1:${local.service_ports.transmission} \
