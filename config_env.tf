@@ -214,7 +214,7 @@ locals {
     }
     downloads = {
       name   = "downloads"
-      policy = "public"
+      policy = "upload"
     }
     pictures = {
       name   = "pictures"

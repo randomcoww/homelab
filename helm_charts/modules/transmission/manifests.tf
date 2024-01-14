@@ -33,7 +33,6 @@ module "secret" {
       rpc-bind-address             = "0.0.0.0"
       rpc-port                     = var.ports.transmission
       rpc-enabled                  = true
-      rpc-host-whitelist-enabled   = false
     }))
   }
 }
