@@ -149,7 +149,7 @@ EOF
       {
         name = "config"
         secret = {
-          secretName  = var.name
+          secretName = var.name
         }
       },
     ]
