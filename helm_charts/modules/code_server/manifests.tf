@@ -126,7 +126,7 @@ module "statefulset" {
         securityContext = {
           capabilities = {
             add = [
-              "AUDIT_WRITE"
+              "AUDIT_WRITE",
             ]
           }
         }
