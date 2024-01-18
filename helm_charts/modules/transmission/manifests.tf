@@ -91,26 +91,6 @@ module "deployment" {
     dnsPolicy = "ClusterFirstWithHostNet"
     initContainers = [
       {
-        name  = "${var.name}-init"
-        image = var.images.transmission
-        command = [
-          "cp",
-          "/tmp/settings.json",
-          "${local.transmission_home_path}/",
-        ]
-        volumeMounts = [
-          {
-            name      = "config"
-            mountPath = "/tmp/settings.json"
-            subPath   = "settings.json"
-          },
-          {
-            name      = "transmission-home"
-            mountPath = local.transmission_home_path
-          },
-        ]
-      },
-      {
         name  = "${var.name}-wg"
         image = var.images.wireguard
         args = [
@@ -133,14 +113,23 @@ module "deployment" {
       {
         name  = var.name
         image = var.images.transmission
-        args = [
-          "--config-dir",
-          local.transmission_home_path,
+        command = [
+          "sh",
+          "-c",
+          <<EOF
+set -e
+cp /tmp/settings.json ${local.transmission_home_path}/
+
+exec transmission-daemon \
+  --foreground \
+  --config-dir ${local.transmission_home_path}
+EOF
         ]
         volumeMounts = [
           {
-            name      = "transmission-home"
-            mountPath = local.transmission_home_path
+            name      = "config"
+            mountPath = "/tmp/settings.json"
+            subPath   = "settings.json"
           },
           {
             name      = "config"
@@ -161,12 +150,6 @@ module "deployment" {
         name = "config"
         secret = {
           secretName  = var.name
-          defaultMode = 493
-        }
-      },
-      {
-        name = "transmission-home"
-        emptyDir = {
         }
       },
     ]
