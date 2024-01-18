@@ -70,3 +70,8 @@ variable "storage_access_modes" {
     "ReadWriteOnce",
   ]
 }
+
+variable "resources" {
+  type    = map(any)
+  default = {}
+}

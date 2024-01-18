@@ -10,10 +10,10 @@ module "metadata" {
   release     = var.release
   app_version = split(":", var.images.transmission)[1]
   manifests = {
-    "templates/service.yaml"     = module.service.manifest
-    "templates/ingress.yaml"     = module.ingress.manifest
-    "templates/secret.yaml"      = module.secret.manifest
-    "templates/statefulset.yaml" = module.statefulset.manifest
+    "templates/service.yaml"    = module.service.manifest
+    "templates/ingress.yaml"    = module.ingress.manifest
+    "templates/secret.yaml"     = module.secret.manifest
+    "templates/deployment.yaml" = module.deployment.manifest
   }
 }
 
@@ -78,8 +78,8 @@ module "ingress" {
   ]
 }
 
-module "statefulset" {
-  source   = "../statefulset"
+module "deployment" {
+  source   = "../deployment"
   name     = var.name
   app      = var.name
   release  = var.release
@@ -153,6 +153,7 @@ module "statefulset" {
             containerPort = var.ports.transmission
           },
         ]
+        resources = var.resources
       },
     ]
     volumes = [
@@ -163,22 +164,11 @@ module "statefulset" {
           defaultMode = 493
         }
       },
+      {
+        name = "transmission-home"
+        emptyDir = {
+        }
+      },
     ]
   }
-  volume_claim_templates = [
-    {
-      metadata = {
-        name = "transmission-home"
-      }
-      spec = {
-        accessModes = var.storage_access_modes
-        resources = {
-          requests = {
-            storage = var.volume_claim_size
-          }
-        }
-        storageClassName = var.storage_class
-      }
-    },
-  ]
 }
