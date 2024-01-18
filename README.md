@@ -277,11 +277,11 @@ flatpak --user -y install --or-update flathub \
   org.blender.Blender \
   org.godotengine.Godot \
   com.github.xournalpp.xournalpp \
-  org.kde.okular \
   com.valvesoftware.Steam \
   com.heroicgameslauncher.hgl \
   net.lutris.Lutris \
-  net.davidotek.pupgui2
+  net.davidotek.pupgui2 \
+  org.gabmus.hydrapaper
 ```
 
 Install Minio client
