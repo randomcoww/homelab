@@ -404,32 +404,26 @@ module "transmission" {
     transmission = local.service_ports.transmission
   }
   transmission_settings = {
-    blocklist-enabled           = true
-    blocklist-url               = "http://list.iblocklist.com/?list=ydxerpxkpcfqjaybcssw&fileformat=p2p&archiveformat=gz"
-    incomplete-dir-enabled      = true
-    download-queue-enabled      = true
-    download-queue-size         = 20
-    encryption                  = 2
-    max-peers-global            = 1000
-    message-level               = 2
-    peer-limit-global           = 1000
-    peer-limit-per-torrent      = 1000
-    port-forwarding-enabled     = false
-    preallocation               = 0
-    queue-stalled-enabled       = true
-    queue-stalled-minutes       = 5
-    ratio-limit                 = 0
-    ratio-limit-enabled         = true
-    rename-partial-files        = true
-    rpc-authentication-required = false
-    rpc-host-whitelist-enabled  = false
-    rpc-url                     = "/transmission/"
-    rpc-whitelist-enabled       = false
-    script-torrent-done-enabled = true
-    speed-limit-down-enabled    = false
-    speed-limit-up              = 10
-    speed-limit-up-enabled      = true
-    start-added-torrents        = true
+    blocklist-enabled            = true
+    blocklist-url                = "http://list.iblocklist.com/?list=ydxerpxkpcfqjaybcssw&fileformat=p2p&archiveformat=gz"
+    download-queue-enabled       = true
+    encryption                   = 2
+    max-peers-global             = 1000
+    port-forwarding-enabled      = false
+    preallocation                = 0
+    queue-stalled-enabled        = true
+    ratio-limit                  = 0
+    ratio-limit-enabled          = true
+    rename-partial-files         = true
+    rpc-authentication-required  = false
+    rpc-host-whitelist-enabled   = false
+    rpc-url                      = "/transmission/"
+    rpc-whitelist-enabled        = false
+    script-torrent-done-enabled  = true
+    speed-limit-down-enabled     = false
+    speed-limit-up-enabled       = true
+    start-added-torrents         = true
+    trash-original-torrent-files = true
   }
   torrent_done_script = <<EOF
 #!/bin/sh

@@ -28,8 +28,6 @@ module "secret" {
     "settings.json" = jsonencode(merge(var.transmission_settings, {
       bind-address-ipv4            = "0.0.0.0"
       script-torrent-done-filename = local.torrent_done_script
-      download-dir                 = "${local.transmission_home_path}/downloads"
-      incomplete-dir               = "${local.transmission_home_path}/incomplete"
       rpc-bind-address             = "0.0.0.0"
       rpc-port                     = var.ports.transmission
       rpc-enabled                  = true
