@@ -231,9 +231,9 @@ kubectl get svc
 Deploy helm charts to Kubernetes
 
 ```bash
-tw terraform -chdir=helm_charts init
 tw terraform -chdir=helm_client init
 
+tw terraform -chdir=helm_charts init && \
 tw terraform -chdir=helm_charts apply -var-file=secrets.tfvars && \
 tw terraform -chdir=helm_client apply
 ```
