@@ -116,7 +116,10 @@ module "deployment" {
           "-c",
           <<EOF
 set -e
-cp /tmp/settings.json ${local.transmission_home_path}/
+mkdir -p ${local.transmission_home_path}
+cp \
+  /tmp/settings.json \
+  ${local.transmission_home_path}
 
 exec transmission-daemon \
   --foreground \
