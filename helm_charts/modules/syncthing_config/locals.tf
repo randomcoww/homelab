@@ -1,11 +1,11 @@
 locals {
   syncthing_members = [
-    for i in range(var.replicas) :
+    for _, hostname in var.hostnames :
     {
-      pod_name  = "${var.name}-${i}"
-      device_id = data.syncthing_device.syncthing[i].id
-      cert      = tls_locally_signed_cert.syncthing[i].cert_pem
-      key       = tls_private_key.syncthing[i].private_key_pem
+      hostname  = hostname
+      device_id = data.syncthing_device.syncthing[hostname].id
+      cert      = tls_locally_signed_cert.syncthing[hostname].cert_pem
+      key       = tls_private_key.syncthing[hostname].private_key_pem
     }
   ]
 }

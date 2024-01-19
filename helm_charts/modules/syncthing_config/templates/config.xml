@@ -12,7 +12,7 @@
   %{~ endfor ~}
   %{~ for member in syncthing_members ~}
   <device id="${member.device_id}" compression="never" skipIntroductionRemovals="true">
-    <address>${member.pod_name}.${app}.${namespace}.svc:${syncthing_peer_port}</address>
+    <address>${member.hostname}:${syncthing_peer_port}</address>
     <autoAcceptFolders>true</autoAcceptFolders>
   </device>
   %{~ endfor ~}

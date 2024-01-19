@@ -1,19 +1,6 @@
-variable "name" {
-  type = string
-}
-
-variable "app" {
-  type = string
-}
-
-variable "namespace" {
-  type    = string
-  default = "default"
-}
-
-variable "replicas" {
-  type    = number
-  default = 1
+variable "hostnames" {
+  type    = list(string)
+  default = []
 }
 
 variable "ports" {
