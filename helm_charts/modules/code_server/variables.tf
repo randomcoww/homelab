@@ -15,13 +15,20 @@ variable "images" {
   type = object({
     code_server = string
     tailscale   = string
+    syncthing   = string
   })
 }
 
 variable "ports" {
   type = object({
-    code_server = number
+    code_server    = number
+    syncthing_peer = number
   })
+}
+
+variable "sync_replicas" {
+  type    = number
+  default = 1
 }
 
 variable "affinity" {

@@ -1,3 +1,67 @@
+locals {
+  syncthing_home_path = "/var/lib/syncthing"
+  code_home_path      = "/home/${var.user}"
+  sync_pod_name       = "${var.name}-sync"
+
+  syncthing_container = {
+    name  = "${var.name}-syncthing"
+    image = var.images.syncthing
+    command = [
+      "sh",
+      "-c",
+      <<EOF
+set -e
+mkdir -p ${local.syncthing_home_path}
+cp \
+  /tmp/config.xml \
+  /tmp/cert.pem \
+  /tmp/key.pem \
+  ${local.syncthing_home_path}
+
+exec syncthing \
+  --home ${local.syncthing_home_path}
+EOF
+    ]
+    env = [
+      {
+        name = "POD_NAME"
+        valueFrom = {
+          fieldRef = {
+            fieldPath = "metadata.name"
+          }
+        }
+      },
+    ]
+    volumeMounts = [
+      {
+        name      = "secret"
+        mountPath = "/tmp/config.xml"
+        subPath   = "config.xml"
+      },
+      {
+        name        = "secret"
+        mountPath   = "/tmp/cert.pem"
+        subPathExpr = "cert-$(POD_NAME)"
+      },
+      {
+        name        = "secret"
+        mountPath   = "/tmp/key.pem"
+        subPathExpr = "key-$(POD_NAME)"
+      },
+      {
+        name      = "code-home"
+        mountPath = local.code_home_path
+      },
+    ]
+    ports = [
+      {
+        name          = "syncthing-peer"
+        containerPort = var.ports.syncthing_peer
+      },
+    ]
+  }
+}
+
 module "metadata" {
   source      = "../metadata"
   name        = var.name
@@ -5,10 +69,27 @@ module "metadata" {
   release     = var.release
   app_version = split(":", var.images.code_server)[1]
   manifests = {
-    "templates/secret.yaml"      = module.secret.manifest
-    "templates/service.yaml"     = module.service.manifest
-    "templates/ingress.yaml"     = module.ingress.manifest
-    "templates/statefulset.yaml" = module.statefulset.manifest
+    "templates/secret.yaml"           = module.secret.manifest
+    "templates/service.yaml"          = module.service.manifest
+    "templates/service-peer.yaml"     = module.service-peer.manifest
+    "templates/ingress.yaml"          = module.ingress.manifest
+    "templates/statefulset.yaml"      = module.statefulset.manifest
+    "templates/statefulset-sync.yaml" = module.statefulset-sync.manifest
+  }
+}
+
+module "syncthing-config" {
+  source = "../syncthing_config"
+  hostnames = concat([
+    "${var.name}-0.${var.name}.${var.namespace}.svc"
+    ], [
+    for i in range(var.sync_replicas) :
+    "${local.sync_pod_name}-${i}.${var.name}.${var.namespace}.svc"
+  ])
+  syncthing_home_path = local.syncthing_home_path
+  sync_data_paths     = [local.code_home_path]
+  ports = {
+    syncthing_peer = var.ports.syncthing_peer
   }
 }
 
@@ -17,12 +98,20 @@ module "secret" {
   name    = var.name
   app     = var.name
   release = var.release
-  data = {
+  data = merge({
     TS_AUTHKEY        = var.tailscale_auth_key
     ACCESS_KEY_ID     = var.ssm_access_key_id
     SECRET_ACCESS_KEY = var.ssm_secret_access_key
     ssh_known_hosts   = join("\n", var.ssh_known_hosts)
-  }
+    }, {
+    "config.xml" = module.syncthing-config.config
+    }, {
+    for peer in module.syncthing-config.peers :
+    "cert-${split(".", peer.hostname)[0]}" => peer.cert
+    }, {
+    for peer in module.syncthing-config.peers :
+    "key-${split(".", peer.hostname)[0]}" => peer.key
+  })
 }
 
 module "service" {
@@ -40,6 +129,21 @@ module "service" {
         targetPort = var.ports.code_server
       },
     ]
+    selector = {
+      app                                  = var.name
+      "statefulset.kubernetes.io/pod-name" = "${var.name}-0"
+    }
+  }
+}
+
+module "service-peer" {
+  source  = "../service"
+  name    = "${var.name}-peer"
+  app     = var.name
+  release = var.release
+  spec = {
+    type      = "ClusterIP"
+    clusterIP = "None"
   }
 }
 
@@ -62,6 +166,48 @@ module "ingress" {
           path    = "/"
         }
       ]
+    },
+  ]
+}
+
+module "statefulset-sync" {
+  source   = "../statefulset"
+  name     = local.sync_pod_name
+  app      = var.name
+  release  = var.release
+  affinity = var.affinity
+  replicas = var.sync_replicas
+  annotations = {
+    "checksum/secret" = sha256(module.secret.manifest)
+  }
+  spec = {
+    dnsPolicy = "ClusterFirstWithHostNet"
+    containers = [
+      local.syncthing_container,
+    ]
+    volumes = [
+      {
+        name = "secret"
+        secret = {
+          secretName = var.name
+        }
+      },
+    ]
+  }
+  volume_claim_templates = [
+    {
+      metadata = {
+        name = "code-home"
+      }
+      spec = {
+        accessModes = var.storage_access_modes
+        resources = {
+          requests = {
+            storage = var.volume_claim_size
+          }
+        }
+        storageClassName = var.storage_class
+      }
     },
   ]
 }
@@ -89,7 +235,7 @@ module "statefulset" {
           },
           {
             name  = "HOME"
-            value = "/home/${var.user}"
+            value = local.code_home_path
           },
           {
             name  = "UID"
@@ -109,7 +255,7 @@ module "statefulset" {
         volumeMounts = [
           {
             name      = "code-home"
-            mountPath = "/home/${var.user}"
+            mountPath = local.code_home_path
           },
           {
             name        = "secret"
@@ -206,6 +352,7 @@ module "statefulset" {
           }
         ])
       },
+      local.syncthing_container,
     ]
     volumes = [
       {

@@ -346,9 +346,12 @@ module "code" {
   images = {
     code_server = local.container_images.code_server
     tailscale   = local.container_images.tailscale
+    syncthing   = local.container_images.syncthing
   }
+  sync_replicas = 1
   ports = {
-    code_server = 8080
+    code_server    = 8080
+    syncthing_peer = 22000
   }
   user = "code"
   uid  = 10000

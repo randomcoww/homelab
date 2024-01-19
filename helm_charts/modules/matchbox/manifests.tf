@@ -154,7 +154,7 @@ module "statefulset" {
         }
       },
       {
-        name  = "${var.name}-sync"
+        name  = "${var.name}-syncthing"
         image = var.images.syncthing
         command = [
           "sh",
