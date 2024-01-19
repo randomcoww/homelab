@@ -13,6 +13,8 @@ tw() {
     -v $HOME/.aws:/root/.aws \
     -v $HOME/.kube:/root/.kube \
     -e KUBE_CONFIG_PATH=/root/.kube/config \
+    -e AWS_ACCESS_KEY_ID=$AWS_ACCESS_KEY_ID \
+    -e AWS_SECRET_ACCESS_KEY=$AWS_SECRET_ACCESS_KEY \
     -w $(pwd) \
     --net=host \
     docker.io/hashicorp/terraform:1.4.7 "$@"
