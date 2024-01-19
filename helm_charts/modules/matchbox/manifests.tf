@@ -19,11 +19,11 @@ module "metadata" {
 }
 
 module "syncthing-config" {
-  source              = "../syncthing_config"
-  name                = var.name
-  app                 = var.name
-  namespace           = var.namespace
-  replicas            = var.replicas
+  source = "../syncthing_config"
+  hostnames = [
+    for i in range(var.replicas) :
+    "${var.name}-${i}.${var.name}.${var.namespace}.svc"
+  ]
   syncthing_home_path = local.syncthing_home_path
   sync_data_paths     = [local.shared_data_path]
   ports = {
@@ -52,10 +52,10 @@ module "secret-syncthing" {
     "config.xml" = module.syncthing-config.config
     }, {
     for peer in module.syncthing-config.peers :
-    "cert-${peer.pod_name}" => peer.cert
+    "cert-${split(".", peer.hostname)[0]}" => peer.cert
     }, {
     for peer in module.syncthing-config.peers :
-    "key-${peer.pod_name}" => peer.key
+    "key-${split(".", peer.hostname)[0]}" => peer.key
   })
 }
 
@@ -114,50 +114,6 @@ module "statefulset" {
   spec = {
     hostNetwork = true
     dnsPolicy   = "ClusterFirstWithHostNet"
-    initContainers = [
-      {
-        name  = "${var.name}-init"
-        image = var.images.syncthing
-        command = [
-          "cp",
-          "/tmp/config.xml",
-          "/tmp/cert.pem",
-          "/tmp/key.pem",
-          "${local.syncthing_home_path}/",
-        ]
-        env = [
-          {
-            name = "POD_NAME"
-            valueFrom = {
-              fieldRef = {
-                fieldPath = "metadata.name"
-              }
-            }
-          },
-        ]
-        volumeMounts = [
-          {
-            name      = "syncthing-secret"
-            mountPath = "/tmp/config.xml"
-            subPath   = "config.xml"
-          },
-          {
-            name        = "syncthing-secret"
-            mountPath   = "/tmp/cert.pem"
-            subPathExpr = "cert-$(POD_NAME)"
-          },
-          {
-            name        = "syncthing-secret"
-            mountPath   = "/tmp/key.pem"
-            subPathExpr = "key-$(POD_NAME)"
-          },
-          {
-            name      = "syncthing-home"
-            mountPath = local.syncthing_home_path
-          },
-        ]
-      },
-    ]
     containers = [
       {
         name  = var.name
@@ -201,16 +157,46 @@ module "statefulset" {
         name  = "${var.name}-sync"
         image = var.images.syncthing
         command = [
-          "syncthing",
+          "sh",
+          "-c",
+          <<EOF
+set -e
+mkdir -p ${local.syncthing_home_path}
+cp \
+  /tmp/config.xml \
+  /tmp/cert.pem \
+  /tmp/key.pem \
+  ${local.syncthing_home_path}
+
+exec syncthing \
+  --home ${local.syncthing_home_path}
+EOF
         ]
-        args = [
-          "--home",
-          local.syncthing_home_path,
+        env = [
+          {
+            name = "POD_NAME"
+            valueFrom = {
+              fieldRef = {
+                fieldPath = "metadata.name"
+              }
+            }
+          },
         ]
         volumeMounts = [
           {
-            name      = "syncthing-home"
-            mountPath = local.syncthing_home_path
+            name      = "syncthing-secret"
+            mountPath = "/tmp/config.xml"
+            subPath   = "config.xml"
+          },
+          {
+            name        = "syncthing-secret"
+            mountPath   = "/tmp/cert.pem"
+            subPathExpr = "cert-$(POD_NAME)"
+          },
+          {
+            name        = "syncthing-secret"
+            mountPath   = "/tmp/key.pem"
+            subPathExpr = "key-$(POD_NAME)"
           },
           {
             name      = "shared-data"
@@ -226,12 +212,6 @@ module "statefulset" {
       },
     ]
     volumes = [
-      {
-        name = "syncthing-home"
-        emptyDir = {
-          medium = "Memory"
-        }
-      },
       {
         name = "shared-data"
         emptyDir = {
