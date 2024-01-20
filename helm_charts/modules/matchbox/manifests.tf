@@ -25,7 +25,9 @@ module "syncthing-config" {
     "${var.name}-${i}.${var.name}.${var.namespace}.svc"
   ]
   syncthing_home_path = local.syncthing_home_path
-  sync_data_paths     = [local.shared_data_path]
+  sync_data_paths = [
+    local.shared_data_path,
+  ]
   ports = {
     syncthing_peer = var.ports.syncthing_peer
   }

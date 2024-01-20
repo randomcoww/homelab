@@ -87,7 +87,9 @@ module "syncthing-config" {
     "${local.sync_pod_name}-${i}.${var.name}.${var.namespace}.svc"
   ])
   syncthing_home_path = local.syncthing_home_path
-  sync_data_paths     = [local.code_home_path]
+  sync_data_paths = [
+    "${local.code_home_path}/project",
+  ]
   ports = {
     syncthing_peer = var.ports.syncthing_peer
   }
