@@ -60,9 +60,8 @@ resource "matchbox_profile" "pxeboot" {
   kernel = "${local.image_store_endpoint}/${each.value.kernel_image_name}"
   initrd = ["${local.image_store_endpoint}/${each.value.initrd_image_name}"]
   args = concat([
-    "intel_iommu=on",
-    "amd_iommu=on",
     "iommu=pt",
+    "amd_iommu=pt",
     "rd.driver.pre=vfio-pci",
     "rd.neednet=1",
     "ip=dhcp",
