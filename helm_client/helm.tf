@@ -142,33 +142,6 @@ resource "helm_release" "ingress-nginx" {
   ]
 }
 
-resource "helm_release" "cloudflare-token" {
-  name             = "cloudflare-token"
-  repository       = "https://randomcoww.github.io/repos/helm/"
-  chart            = "helm-wrapper"
-  namespace        = "cert-manager"
-  create_namespace = true
-  wait             = false
-  version          = "0.1.0"
-  values = [
-    yamlencode({
-      manifests = [
-        {
-          apiVersion = "v1"
-          kind       = "Secret"
-          metadata = {
-            name = "cloudflare-token"
-          }
-          stringData = {
-            token = data.terraform_remote_state.sr.outputs.cloudflare_dns_api_token
-          }
-          type = "Opaque"
-        },
-      ]
-    }),
-  ]
-}
-
 # cloudflare tunnel #
 /*
 resource "helm_release" "cloudflare-tunnel" {
@@ -227,17 +200,27 @@ resource "helm_release" "cert-manager" {
   ]
 }
 
-resource "helm_release" "cert-issuer-secrets" {
-  name             = "cert-issuer-secrets"
-  repository       = "https://randomcoww.github.io/repos/helm/"
-  chart            = "helm-wrapper"
-  namespace        = "cert-manager"
-  create_namespace = true
-  wait             = false
-  version          = "0.1.0"
+resource "helm_release" "cert-issuer" {
+  name       = "cert-issuer"
+  repository = "https://randomcoww.github.io/repos/helm/"
+  chart      = "helm-wrapper"
+  namespace  = "cert-manager"
+  wait       = false
+  version    = "0.1.0"
   values = [
     yamlencode({
       manifests = [
+        {
+          apiVersion = "v1"
+          kind       = "Secret"
+          metadata = {
+            name = "cloudflare-token"
+          }
+          stringData = {
+            token = data.terraform_remote_state.sr.outputs.cloudflare_dns_api_token
+          }
+          type = "Opaque"
+        },
         {
           apiVersion = "v1"
           kind       = "Secret"
@@ -260,20 +243,6 @@ resource "helm_release" "cert-issuer-secrets" {
           }
           type = "Opaque"
         },
-      ]
-    }),
-  ]
-}
-
-resource "helm_release" "cert-issuer" {
-  name       = "cert-issuer"
-  repository = "https://randomcoww.github.io/repos/helm/"
-  chart      = "helm-wrapper"
-  wait       = false
-  version    = "0.1.0"
-  values = [
-    yamlencode({
-      manifests = [
         {
           apiVersion = "cert-manager.io/v1"
           kind       = "ClusterIssuer"
@@ -347,12 +316,10 @@ resource "helm_release" "cert-issuer" {
   ]
   depends_on = [
     helm_release.cert-manager,
-    helm_release.cert-issuer-secrets,
   ]
   lifecycle {
     replace_triggered_by = [
       helm_release.cert-manager,
-      helm_release.cert-issuer-secrets,
     ]
   }
 }
