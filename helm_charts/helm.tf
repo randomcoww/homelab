@@ -49,6 +49,72 @@ module "kapprover" {
   }
 }
 
+module "kube_dns" {
+  source         = "./modules/kube_dns"
+  name           = "kube-dns"
+  namespace      = "kube-system"
+  release        = "0.1.4"
+  source_release = "1.29.0"
+  replicas       = 3
+  images = {
+    etcd         = local.container_images.etcd
+    external_dns = local.container_images.external_dns
+  }
+  service_cluster_ip = local.services.cluster_dns.ip
+  service_ip         = local.services.external_dns.ip
+  servers = [
+    {
+      zones = [
+        {
+          zone = "."
+        },
+      ]
+      port = 53
+      plugins = [
+        {
+          name = "health"
+        },
+        {
+          name = "ready"
+        },
+        {
+          name        = "kubernetes"
+          parameters  = "${local.domains.kubernetes} in-addr.arpa ip6.arpa"
+          configBlock = <<EOF
+pods insecure
+fallthrough in-addr.arpa ip6.arpa
+EOF
+        },
+        {
+          name        = "etcd"
+          parameters  = "${local.domains.internal} in-addr.arpa ip6.arpa"
+          configBlock = <<EOF
+fallthrough
+EOF
+        },
+        # mDNS
+        {
+          name       = "forward"
+          parameters = "${local.domains.internal_mdns} dns://${local.services.gateway.ip}:${local.ports.gateway_dns}"
+        },
+        # public DNS
+        {
+          name        = "forward"
+          parameters  = ". tls://${local.upstream_dns.ip}"
+          configBlock = <<EOF
+tls_servername ${local.upstream_dns.tls_servername}
+health_check 5s
+EOF
+        },
+        {
+          name       = "cache"
+          parameters = 30
+        },
+      ]
+    },
+  ]
+}
+
 module "fuse_device_plugin" {
   source    = "./modules/fuse_device_plugin"
   name      = "fuse-device-plugin"
@@ -58,6 +124,106 @@ module "fuse_device_plugin" {
     fuse_device_plugin = local.container_images.fuse_device_plugin
   }
   kubelet_root_path = local.kubernetes.kubelet_root_path
+}
+
+module "matchbox" {
+  source   = "./modules/matchbox"
+  name     = "matchbox"
+  release  = "0.2.16"
+  replicas = 3
+  images = {
+    matchbox  = local.container_images.matchbox
+    syncthing = local.container_images.syncthing
+  }
+  ports = {
+    matchbox       = local.ports.matchbox
+    matchbox_api   = local.ports.matchbox_api
+    syncthing_peer = 22000
+  }
+  service_ip       = local.services.matchbox.ip
+  service_hostname = local.kubernetes_ingress_endpoints.matchbox
+  ca               = data.terraform_remote_state.sr.outputs.matchbox_ca
+}
+
+module "vaultwarden" {
+  source  = "./modules/vaultwarden"
+  name    = "vaultwarden"
+  release = "0.1.14"
+  images = {
+    vaultwarden = local.container_images.vaultwarden
+    litestream  = local.container_images.litestream
+  }
+  ports = {
+    vaultwarden = 8080
+  }
+  service_hostname = local.kubernetes_ingress_endpoints.vaultwarden
+  exrtra_envs = {
+    SENDS_ALLOWED            = false
+    EMERGENCY_ACCESS_ALLOWED = false
+    PASSWORD_HINTS_ALLOWED   = false
+    SIGNUPS_ALLOWED          = false
+    INVITATIONS_ALLOWED      = true
+    DISABLE_ADMIN_TOKEN      = true
+    SMTP_FROM_NAME           = "Vaultwarden"
+    SMTP_SECURITY            = "starttls"
+    SMTP_AUTH_MECHANISM      = "Plain"
+  }
+  smtp_host            = var.smtp.host
+  smtp_port            = var.smtp.port
+  smtp_username        = var.smtp.username
+  smtp_password        = var.smtp.password
+  ingress_class_name   = local.ingress_classes.ingress_nginx
+  ingress_cert_issuer  = local.kubernetes.cert_issuer_prod
+  ingress_auth_url     = "http://${local.kubernetes_service_endpoints.authelia}/api/verify"
+  ingress_auth_signin  = "https://${local.kubernetes_ingress_endpoints.auth}?rm=$request_method"
+  s3_db_resource       = "${data.terraform_remote_state.sr.outputs.s3.vaultwarden.resource}/db.sqlite3"
+  s3_access_key_id     = data.terraform_remote_state.sr.outputs.s3.vaultwarden.access_key_id
+  s3_secret_access_key = data.terraform_remote_state.sr.outputs.s3.vaultwarden.secret_access_key
+}
+
+module "authelia" {
+  source         = "./modules/authelia"
+  name           = split(".", local.kubernetes_service_endpoints.authelia)[0]
+  namespace      = split(".", local.kubernetes_service_endpoints.authelia)[1]
+  release        = "0.1.1"
+  source_release = "0.8.58"
+  images = {
+    litestream = local.container_images.litestream
+  }
+  users = {
+    for email, user in var.authelia_users :
+    email => merge({
+      email       = email
+      displayname = email
+    }, user)
+  }
+  access_control = {
+    default_policy = "two_factor"
+    rules = [
+      {
+        domain    = local.kubernetes_ingress_endpoints.vaultwarden
+        resources = ["^/admin.*"]
+        policy    = "two_factor"
+      },
+      {
+        domain = local.kubernetes_ingress_endpoints.vaultwarden
+        policy = "bypass"
+      },
+    ]
+  }
+  service_hostname       = local.kubernetes_ingress_endpoints.auth
+  jwt_token              = data.terraform_remote_state.sr.outputs.authelia.jwt_token
+  storage_secret         = data.terraform_remote_state.sr.outputs.authelia.storage_secret
+  session_encryption_key = data.terraform_remote_state.sr.outputs.authelia.session_encryption_key
+  smtp_host              = var.smtp.host
+  smtp_port              = var.smtp.port
+  smtp_username          = var.smtp.username
+  smtp_password          = var.smtp.password
+  ingress_class_name     = local.ingress_classes.ingress_nginx
+  ingress_cert_issuer    = local.kubernetes.cert_issuer_prod
+  s3_db_resource         = "${data.terraform_remote_state.sr.outputs.s3.authelia.resource}/db.sqlite3"
+  s3_access_key_id       = data.terraform_remote_state.sr.outputs.s3.authelia.access_key_id
+  s3_secret_access_key   = data.terraform_remote_state.sr.outputs.s3.authelia.secret_access_key
 }
 
 module "hostapd" {
@@ -181,172 +347,6 @@ module "kea" {
         cidrsubnet(network.prefix, 1, 1),
       ]
     } if lookup(network, "enable_dhcp_server", false)
-  ]
-}
-
-module "matchbox" {
-  source   = "./modules/matchbox"
-  name     = "matchbox"
-  release  = "0.2.16"
-  replicas = 3
-  images = {
-    matchbox  = local.container_images.matchbox
-    syncthing = local.container_images.syncthing
-  }
-  ports = {
-    matchbox       = local.ports.matchbox
-    matchbox_api   = local.ports.matchbox_api
-    syncthing_peer = 22000
-  }
-  service_ip       = local.services.matchbox.ip
-  service_hostname = local.kubernetes_ingress_endpoints.matchbox
-  ca               = data.terraform_remote_state.sr.outputs.matchbox_ca
-}
-
-module "vaultwarden" {
-  source  = "./modules/vaultwarden"
-  name    = "vaultwarden"
-  release = "0.1.14"
-  images = {
-    vaultwarden = local.container_images.vaultwarden
-    litestream  = local.container_images.litestream
-  }
-  ports = {
-    vaultwarden = 8080
-  }
-  service_hostname = local.kubernetes_ingress_endpoints.vaultwarden
-  exrtra_envs = {
-    SENDS_ALLOWED            = false
-    EMERGENCY_ACCESS_ALLOWED = false
-    PASSWORD_HINTS_ALLOWED   = false
-    SIGNUPS_ALLOWED          = false
-    INVITATIONS_ALLOWED      = true
-    DISABLE_ADMIN_TOKEN      = true
-    SMTP_FROM_NAME           = "Vaultwarden"
-    SMTP_SECURITY            = "starttls"
-    SMTP_AUTH_MECHANISM      = "Plain"
-  }
-  smtp_host            = var.smtp.host
-  smtp_port            = var.smtp.port
-  smtp_username        = var.smtp.username
-  smtp_password        = var.smtp.password
-  ingress_class_name   = local.ingress_classes.ingress_nginx
-  ingress_cert_issuer  = local.kubernetes.cert_issuer_prod
-  ingress_auth_url     = "http://${local.kubernetes_service_endpoints.authelia}/api/verify"
-  ingress_auth_signin  = "https://${local.kubernetes_ingress_endpoints.auth}?rm=$request_method"
-  s3_db_resource       = "${data.terraform_remote_state.sr.outputs.s3.vaultwarden.resource}/db.sqlite3"
-  s3_access_key_id     = data.terraform_remote_state.sr.outputs.s3.vaultwarden.access_key_id
-  s3_secret_access_key = data.terraform_remote_state.sr.outputs.s3.vaultwarden.secret_access_key
-}
-
-module "authelia" {
-  source         = "./modules/authelia"
-  name           = split(".", local.kubernetes_service_endpoints.authelia)[0]
-  namespace      = split(".", local.kubernetes_service_endpoints.authelia)[1]
-  release        = "0.1.1"
-  source_release = "0.8.58"
-  images = {
-    litestream = local.container_images.litestream
-  }
-  users = {
-    for email, user in var.authelia_users :
-    email => merge({
-      email       = email
-      displayname = email
-    }, user)
-  }
-  access_control = {
-    default_policy = "two_factor"
-    rules = [
-      {
-        domain    = local.kubernetes_ingress_endpoints.vaultwarden
-        resources = ["^/admin.*"]
-        policy    = "two_factor"
-      },
-      {
-        domain = local.kubernetes_ingress_endpoints.vaultwarden
-        policy = "bypass"
-      },
-    ]
-  }
-  service_hostname       = local.kubernetes_ingress_endpoints.auth
-  jwt_token              = data.terraform_remote_state.sr.outputs.authelia.jwt_token
-  storage_secret         = data.terraform_remote_state.sr.outputs.authelia.storage_secret
-  session_encryption_key = data.terraform_remote_state.sr.outputs.authelia.session_encryption_key
-  smtp_host              = var.smtp.host
-  smtp_port              = var.smtp.port
-  smtp_username          = var.smtp.username
-  smtp_password          = var.smtp.password
-  ingress_class_name     = local.ingress_classes.ingress_nginx
-  ingress_cert_issuer    = local.kubernetes.cert_issuer_prod
-  s3_db_resource         = "${data.terraform_remote_state.sr.outputs.s3.authelia.resource}/db.sqlite3"
-  s3_access_key_id       = data.terraform_remote_state.sr.outputs.s3.authelia.access_key_id
-  s3_secret_access_key   = data.terraform_remote_state.sr.outputs.s3.authelia.secret_access_key
-}
-
-module "kube_dns" {
-  source         = "./modules/kube_dns"
-  name           = "kube-dns"
-  namespace      = "kube-system"
-  release        = "0.1.4"
-  source_release = "1.29.0"
-  replicas       = 3
-  images = {
-    etcd         = local.container_images.etcd
-    external_dns = local.container_images.external_dns
-  }
-  service_cluster_ip = local.services.cluster_dns.ip
-  service_ip         = local.services.external_dns.ip
-  servers = [
-    {
-      zones = [
-        {
-          zone = "."
-        },
-      ]
-      port = 53
-      plugins = [
-        {
-          name = "health"
-        },
-        {
-          name = "ready"
-        },
-        {
-          name        = "kubernetes"
-          parameters  = "${local.domains.kubernetes} in-addr.arpa ip6.arpa"
-          configBlock = <<EOF
-pods insecure
-fallthrough in-addr.arpa ip6.arpa
-EOF
-        },
-        {
-          name        = "etcd"
-          parameters  = "${local.domains.internal} in-addr.arpa ip6.arpa"
-          configBlock = <<EOF
-fallthrough
-EOF
-        },
-        # mDNS
-        {
-          name       = "forward"
-          parameters = "${local.domains.internal_mdns} dns://${local.services.gateway.ip}:${local.ports.gateway_dns}"
-        },
-        # public DNS
-        {
-          name        = "forward"
-          parameters  = ". tls://${local.upstream_dns.ip}"
-          configBlock = <<EOF
-tls_servername ${local.upstream_dns.tls_servername}
-health_check 5s
-EOF
-        },
-        {
-          name       = "cache"
-          parameters = 30
-        },
-      ]
-    },
   ]
 }
 
