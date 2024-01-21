@@ -49,6 +49,17 @@ module "kapprover" {
   }
 }
 
+module "fuse_device_plugin" {
+  source    = "./modules/fuse_device_plugin"
+  name      = "fuse-device-plugin"
+  namespace = "kube-system"
+  release   = "0.1.1"
+  images = {
+    fuse_device_plugin = local.container_images.fuse_device_plugin
+  }
+  kubelet_root_path = local.kubernetes.kubelet_root_path
+}
+
 module "hostapd" {
   source   = "./modules/hostapd"
   name     = "hostapd"
@@ -583,6 +594,7 @@ module "kasm_desktop" {
 
 resource "local_file" "manifests" {
   for_each = merge(
+    module.fuse_device_plugin.manifests,
     module.matchbox.manifests,
     module.bootstrap.manifests,
     module.kube_proxy.manifests,
