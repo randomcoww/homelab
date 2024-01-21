@@ -90,7 +90,7 @@ resource "helm_release" "fuse-device-plugin" {
                     volumeMounts = [
                       {
                         name      = "device-plugin"
-                        mountPath = "/var/lib/kubelet/device-plugins"
+                        mountPath = "${local.kubernetes.kubelet_root_path}/device-plugins"
                       },
                     ]
                   },
@@ -99,7 +99,7 @@ resource "helm_release" "fuse-device-plugin" {
                   {
                     name = "device-plugin"
                     hostPath = {
-                      path = "/var/lib/kubelet/device-plugins"
+                      path = "${local.kubernetes.kubelet_root_path}/device-plugins"
                     }
                   },
                 ]

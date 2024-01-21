@@ -18,6 +18,10 @@ variable "node_taints" {
   type = any
 }
 
+variable "kubelet_root_path" {
+  type = string
+}
+
 variable "static_pod_manifest_path" {
   type = string
 }

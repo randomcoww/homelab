@@ -195,6 +195,7 @@ module "ignition-kubernetes-worker" {
   apiserver_endpoint        = "https://${local.services.apiserver.ip}:${local.ports.apiserver_ha}"
   cluster_dns_ip            = local.services.cluster_dns.ip
   cluster_domain            = local.domains.kubernetes
+  kubelet_root_path         = local.kubernetes.kubelet_root_path
   static_pod_manifest_path  = local.kubernetes.static_pod_manifest_path
   kubelet_port              = local.ports.kubelet
   kube_node_bootstrap_user  = local.kubernetes.node_bootstrap_user

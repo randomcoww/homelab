@@ -134,6 +134,7 @@ locals {
 
   kubernetes = {
     cluster_name              = "prod-10"
+    kubelet_root_path         = "/var/lib/kubelet"
     static_pod_manifest_path  = "/var/lib/kubelet/manifests"
     cni_bridge_interface_name = "cni0"
 
