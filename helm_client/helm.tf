@@ -201,12 +201,10 @@ resource "helm_release" "cert-manager" {
 }
 
 resource "helm_release" "cert-issuer" {
-  name       = "cert-issuer"
-  repository = "https://randomcoww.github.io/repos/helm/"
-  chart      = "helm-wrapper"
-  namespace  = "cert-manager"
-  wait       = false
-  version    = "0.1.0"
+  name      = "cert-issuer"
+  chart     = "./local/helm-wrapper"
+  namespace = "cert-manager"
+  wait      = false
   values = [
     yamlencode({
       manifests = [
