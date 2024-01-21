@@ -181,7 +181,7 @@ resource "helm_release" "cert-manager" {
   chart            = "cert-manager"
   namespace        = "cert-manager"
   create_namespace = true
-  wait             = false
+  wait             = true
   version          = "1.12.1"
   values = [
     yamlencode({
@@ -317,11 +317,6 @@ resource "helm_release" "cert-issuer" {
   depends_on = [
     helm_release.cert-manager,
   ]
-  lifecycle {
-    replace_triggered_by = [
-      helm_release.cert-manager,
-    ]
-  }
 }
 
 # minio #
