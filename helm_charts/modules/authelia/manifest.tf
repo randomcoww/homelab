@@ -19,13 +19,11 @@ module "secret-custom" {
 }
 
 data "helm_template" "authelia" {
-  name             = var.name
-  namespace        = var.namespace
-  repository       = "https://charts.authelia.com"
-  chart            = "authelia"
-  create_namespace = true
-  wait             = false
-  version          = var.source_release
+  name       = var.name
+  namespace  = var.namespace
+  repository = "https://charts.authelia.com"
+  chart      = "authelia"
+  version    = var.source_release
   values = [
     yamlencode({
       domain = join(".", slice(compact(split(".", var.service_hostname)), 1, length(compact(split(".", var.service_hostname)))))
