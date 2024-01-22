@@ -114,17 +114,17 @@ module "deployment" {
         command = [
           "sh",
           "-c",
-          <<EOF
-set -e
-mkdir -p ${local.transmission_home_path}
-cp \
-  /tmp/settings.json \
-  ${local.transmission_home_path}
+          <<-EOF
+          set -e
+          mkdir -p ${local.transmission_home_path}
+          cp \
+            /tmp/settings.json \
+            ${local.transmission_home_path}
 
-exec transmission-daemon \
-  --foreground \
-  --config-dir ${local.transmission_home_path}
-EOF
+          exec transmission-daemon \
+            --foreground \
+            --config-dir ${local.transmission_home_path}
+          EOF
         ]
         volumeMounts = [
           {

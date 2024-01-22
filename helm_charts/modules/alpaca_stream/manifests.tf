@@ -74,7 +74,7 @@ module "deployment" {
         ports = [
           {
             containerPort = var.ports.alpaca_stream
-          }
+          },
         ]
       },
     ]

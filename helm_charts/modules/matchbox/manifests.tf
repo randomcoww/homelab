@@ -161,18 +161,18 @@ module "statefulset" {
         command = [
           "sh",
           "-c",
-          <<EOF
-set -e
-mkdir -p ${local.syncthing_home_path}
-cp \
-  /tmp/config.xml \
-  /tmp/cert.pem \
-  /tmp/key.pem \
-  ${local.syncthing_home_path}
+          <<-EOF
+          set -e
+          mkdir -p ${local.syncthing_home_path}
+          cp \
+            /tmp/config.xml \
+            /tmp/cert.pem \
+            /tmp/key.pem \
+            ${local.syncthing_home_path}
 
-exec syncthing \
-  --home ${local.syncthing_home_path}
-EOF
+          exec syncthing \
+            --home ${local.syncthing_home_path}
+          EOF
         ]
         env = [
           {

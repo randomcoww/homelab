@@ -80,17 +80,17 @@ module "kube_dns" {
         {
           name        = "kubernetes"
           parameters  = "${local.domains.kubernetes} in-addr.arpa ip6.arpa"
-          configBlock = <<EOF
-pods insecure
-fallthrough in-addr.arpa ip6.arpa
-EOF
+          configBlock = <<-EOF
+          pods insecure
+          fallthrough in-addr.arpa ip6.arpa
+          EOF
         },
         {
           name        = "etcd"
           parameters  = "${local.domains.internal} in-addr.arpa ip6.arpa"
-          configBlock = <<EOF
-fallthrough
-EOF
+          configBlock = <<-EOF
+          fallthrough
+          EOF
         },
         # mDNS
         {
@@ -101,10 +101,10 @@ EOF
         {
           name        = "forward"
           parameters  = ". tls://${local.upstream_dns.ip}"
-          configBlock = <<EOF
-tls_servername ${local.upstream_dns.tls_servername}
-health_check 5s
-EOF
+          configBlock = <<-EOF
+          tls_servername ${local.upstream_dns.tls_servername}
+          health_check 5s
+          EOF
         },
         {
           name       = "cache"
@@ -439,42 +439,42 @@ module "transmission" {
     start-added-torrents         = true
     trash-original-torrent-files = true
   }
-  torrent_done_script = <<EOF
-#!/bin/sh
-set -xe
-#  * TR_APP_VERSION
-#  * TR_TIME_LOCALTIME
-#  * TR_TORRENT_DIR
-#  * TR_TORRENT_HASH
-#  * TR_TORRENT_ID
-#  * TR_TORRENT_NAME
-cd "$TR_TORRENT_DIR"
+  torrent_done_script = <<-EOF
+  #!/bin/sh
+  set -xe
+  #  * TR_APP_VERSION
+  #  * TR_TIME_LOCALTIME
+  #  * TR_TORRENT_DIR
+  #  * TR_TORRENT_HASH
+  #  * TR_TORRENT_ID
+  #  * TR_TORRENT_NAME
+  cd "$TR_TORRENT_DIR"
 
-transmission-remote 127.0.0.1:${local.service_ports.transmission} \
-  --torrent "$TR_TORRENT_ID" \
-  --verify
+  transmission-remote 127.0.0.1:${local.service_ports.transmission} \
+    --torrent "$TR_TORRENT_ID" \
+    --verify
 
-minio-client \
-  -endpoint="${local.kubernetes_service_endpoints.minio}:${local.service_ports.minio}" \
-  -bucket="${local.minio_buckets.downloads.name}" \
-  -path="$TR_TORRENT_NAME"
+  minio-client \
+    -endpoint="${local.kubernetes_service_endpoints.minio}:${local.service_ports.minio}" \
+    -bucket="${local.minio_buckets.downloads.name}" \
+    -path="$TR_TORRENT_NAME"
 
-transmission-remote 127.0.0.1:${local.service_ports.transmission} \
-  --torrent "$TR_TORRENT_ID" \
-  --remove-and-delete
-EOF
-  wireguard_config    = <<EOF
-[Interface]
-Address=${var.wireguard_client.address}
-PrivateKey=${var.wireguard_client.private_key}
-PostUp=nft add table ip filter && nft add chain ip filter output { type filter hook output priority 0 \; } && nft insert rule ip filter output oifname != "%i" mark != $(wg show %i fwmark) fib daddr type != local ip daddr != ${local.networks.kubernetes_service.prefix} ip daddr != ${local.networks.kubernetes_pod.prefix} reject && ip route add ${local.networks.kubernetes_service.prefix} via $(ip route | grep default | awk '{print $3}')
+  transmission-remote 127.0.0.1:${local.service_ports.transmission} \
+    --torrent "$TR_TORRENT_ID" \
+    --remove-and-delete
+  EOF
+  wireguard_config    = <<-EOF
+  [Interface]
+  Address=${var.wireguard_client.address}
+  PrivateKey=${var.wireguard_client.private_key}
+  PostUp=nft add table ip filter && nft add chain ip filter output { type filter hook output priority 0 \; } && nft insert rule ip filter output oifname != "%i" mark != $(wg show %i fwmark) fib daddr type != local ip daddr != ${local.networks.kubernetes_service.prefix} ip daddr != ${local.networks.kubernetes_pod.prefix} reject && ip route add ${local.networks.kubernetes_service.prefix} via $(ip route | grep default | awk '{print $3}')
 
-[Peer]
-AllowedIPs=0.0.0.0/0
-Endpoint=${var.wireguard_client.endpoint}
-PublicKey=${var.wireguard_client.public_key}
-PersistentKeepalive=25
-EOF
+  [Peer]
+  AllowedIPs=0.0.0.0/0
+  Endpoint=${var.wireguard_client.endpoint}
+  PublicKey=${var.wireguard_client.public_key}
+  PersistentKeepalive=25
+  EOF
   service_hostname    = local.kubernetes_ingress_endpoints.transmission
   ingress_class_name  = local.ingress_classes.ingress_nginx
   ingress_cert_issuer = local.kubernetes.cert_issuer_prod

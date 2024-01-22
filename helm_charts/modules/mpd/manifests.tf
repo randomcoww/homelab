@@ -114,13 +114,13 @@ module "statefulset" {
         command = [
           "sh",
           "-c",
-          <<EOF
-mkdir -p ${local.mpd_cache_path}/playlists && \
-touch \
-  ${local.mpd_cache_path}/tag_cache \
-  ${local.mpd_cache_path}/state \
-  ${local.mpd_cache_path}/sticker.sql
-EOF
+          <<-EOF
+          mkdir -p ${local.mpd_cache_path}/playlists && \
+          touch \
+            ${local.mpd_cache_path}/tag_cache \
+            ${local.mpd_cache_path}/state \
+            ${local.mpd_cache_path}/sticker.sql
+          EOF
         ]
         volumeMounts = [
           {
