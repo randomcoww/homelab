@@ -1,32 +1,48 @@
-resource "helm_release" "local" {
+resource "helm_release" "wrapper" {
   for_each = {
-    for f in fileset("./output/charts", "*/values.yaml") :
-    dirname(f) => {
-      namespace = yamldecode(file("./output/charts/${f}")).Release.Namespace
-      chart     = "./output/charts/${dirname(f)}"
-      values    = file("./output/charts/${f}")
-    }
+    for chart in [
+      module.mpd.chart,
+      module.transmission.chart,
+      module.alpaca_stream.chart,
+      module.hostapd.chart,
+      module.code.chart,
+      module.vaultwarden.chart,
+      module.authelia.chart,
+      module.kube_dns.chart,
+      module.kea.chart,
+      module.flannel.chart,
+      module.kapprover.chart,
+      module.fuse_device_plugin.chart,
+      module.matchbox.chart,
+      module.bootstrap.chart,
+      module.kube_proxy.chart,
+    ] :
+    chart.name => chart
   }
+  chart            = "./local/helm-wrapper"
   name             = each.key
   namespace        = each.value.namespace
-  chart            = each.value.chart
   create_namespace = true
   wait             = false
   timeout          = 300
+  max_history      = 2
   values = [
-    each.value.values
+    yamlencode({
+      manifests = values(each.value.manifests)
+    }),
   ]
 }
 
 # local-storage storage class #
 
 resource "helm_release" "local-path-provisioner" {
-  name       = "local-path-provisioner"
-  namespace  = "kube-system"
-  repository = "https://charts.containeroo.ch"
-  chart      = "local-path-provisioner"
-  wait       = false
-  version    = "0.0.24"
+  name        = "local-path-provisioner"
+  namespace   = "kube-system"
+  repository  = "https://charts.containeroo.ch"
+  chart       = "local-path-provisioner"
+  wait        = false
+  version     = "0.0.24"
+  max_history = 2
   values = [
     yamlencode({
       storageClass = {
@@ -45,12 +61,13 @@ resource "helm_release" "local-path-provisioner" {
 # amd device plugin #
 
 resource "helm_release" "amd-gpu" {
-  name       = "amd-gpu"
-  repository = "https://radeonopencompute.github.io/k8s-device-plugin/"
-  chart      = "amd-gpu"
-  namespace  = "kube-system"
-  wait       = false
-  version    = "0.10.0"
+  name        = "amd-gpu"
+  repository  = "https://rocm.github.io/k8s-device-plugin/"
+  chart       = "amd-gpu"
+  namespace   = "kube-system"
+  wait        = false
+  version     = "0.10.0"
+  max_history = 2
   values = [
     yamlencode({
       tolerations = [
@@ -66,12 +83,13 @@ resource "helm_release" "amd-gpu" {
 # nvidia device plugin #
 
 resource "helm_release" "nvidia-device-plugin" {
-  name       = "nvidia-device-plugin"
-  repository = "https://nvidia.github.io/k8s-device-plugin"
-  chart      = "nvidia-device-plugin"
-  namespace  = "kube-system"
-  wait       = false
-  version    = "0.14.3"
+  name        = "nvidia-device-plugin"
+  repository  = "https://nvidia.github.io/k8s-device-plugin"
+  chart       = "nvidia-device-plugin"
+  namespace   = "kube-system"
+  wait        = false
+  version     = "0.14.3"
+  max_history = 2
   values = [
     yamlencode({
       tolerations = [
@@ -112,6 +130,7 @@ resource "helm_release" "ingress-nginx" {
   create_namespace = true
   wait             = false
   version          = "4.9.0"
+  max_history      = 2
   values = [
     yamlencode({
       controller = {
@@ -145,12 +164,13 @@ resource "helm_release" "ingress-nginx" {
 # cloudflare tunnel #
 /*
 resource "helm_release" "cloudflare-tunnel" {
-  name       = "cloudflare-tunnel"
-  namespace  = "default"
-  repository = "https://cloudflare.github.io/helm-charts/"
-  chart      = "cloudflare-tunnel"
-  wait       = false
-  version    = "0.2.0"
+  name        = "cloudflare-tunnel"
+  namespace   = "default"
+  repository  = "https://cloudflare.github.io/helm-charts/"
+  chart       = "cloudflare-tunnel"
+  wait        = false
+  version     = "0.2.0"
+  max_history = 2
   values = [
     yamlencode({
       cloudflare = {
@@ -173,6 +193,7 @@ resource "helm_release" "cloudflare-tunnel" {
   ]
 }
 */
+
 # cert-manager #
 
 resource "helm_release" "cert-manager" {
@@ -183,6 +204,7 @@ resource "helm_release" "cert-manager" {
   create_namespace = true
   wait             = true
   version          = "1.12.1"
+  max_history      = 2
   values = [
     yamlencode({
       deploymentAnnotations = {
@@ -201,10 +223,11 @@ resource "helm_release" "cert-manager" {
 }
 
 resource "helm_release" "cert-issuer" {
-  name      = "cert-issuer"
-  chart     = "./local/helm-wrapper"
-  namespace = "cert-manager"
-  wait      = false
+  name        = "cert-issuer"
+  chart       = "./local/helm-wrapper"
+  namespace   = "cert-manager"
+  wait        = false
+  max_history = 2
   values = [
     yamlencode({
       manifests = [
@@ -328,6 +351,7 @@ resource "helm_release" "minio" {
   wait             = false
   timeout          = 600
   version          = "5.0.14"
+  max_history      = 2
   values = [
     yamlencode({
       clusterDomain = local.domains.kubernetes
@@ -429,6 +453,7 @@ resource "helm_release" "mayastor" {
   create_namespace = true
   wait             = false
   version          = "2.5.0"
+  max_history      = 2
   values = [
     yamlencode({
       base = {

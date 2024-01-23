@@ -92,7 +92,7 @@ APCA_API_BASE_URL=
 ```
 
 ```bash
-cat > helm_charts/secrets.tfvars <<EOF
+cat > helm_client/secrets.tfvars <<EOF
 authelia_users = {
   "$GMAIL_USER" = {
     password = "$AUTHELIA_PASSWORD_HASH"
@@ -234,10 +234,7 @@ Deploy helm charts to Kubernetes
 
 ```bash
 tw terraform -chdir=helm_client init
-
-tw terraform -chdir=helm_charts init && \
-tw terraform -chdir=helm_charts apply -var-file=secrets.tfvars && \
-tw terraform -chdir=helm_client apply
+tw terraform -chdir=helm_client apply -var-file=secrets.tfvars
 ```
 
 ---
