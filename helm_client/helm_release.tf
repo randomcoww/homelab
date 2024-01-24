@@ -200,6 +200,7 @@ resource "helm_release" "cert-manager" {
   namespace        = "cert-manager"
   create_namespace = true
   wait             = true
+  timeout          = 600
   version          = "1.13.3"
   max_history      = 2
   values = [
@@ -345,7 +346,7 @@ resource "helm_release" "minio" {
   repository       = "https://charts.min.io/"
   chart            = "minio"
   create_namespace = true
-  wait             = false
+  wait             = true
   timeout          = 600
   version          = "5.0.15"
   max_history      = 2
