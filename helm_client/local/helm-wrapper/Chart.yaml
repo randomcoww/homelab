@@ -3,4 +3,3 @@ name: helm-wrapper
 description: Wrap manifests in helm to deploy using terraform helm provider
 type: application
 version: 0.1.0
-appVersion: "0.1.0"
