@@ -16,6 +16,8 @@ resource "helm_release" "wrapper" {
       module.matchbox.chart,
       module.bootstrap.chart,
       module.kube_proxy.chart,
+      # module.kasm_desktop.chart,
+      # module.headscale.chart,
     ] :
     chart.name => chart
   }

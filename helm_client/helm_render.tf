@@ -207,6 +207,10 @@ module "authelia" {
         domain = local.kubernetes_ingress_endpoints.vaultwarden
         policy = "bypass"
       },
+      {
+        domain = local.kubernetes_ingress_endpoints.headscale
+        policy = "bypass"
+      },
     ]
   }
   service_hostname       = local.kubernetes_ingress_endpoints.auth
@@ -580,4 +584,29 @@ module "kasm_desktop" {
   nginx_ingress_annotations = local.nginx_ingress_annotations
   volume_claim_size         = "128Gi"
   storage_class             = "local-path"
+}
+
+# Not working with cloudflare tunnel
+# https://github.com/cloudflare/cloudflared/issues/990
+module "headscale" {
+  source  = "./modules/headscale"
+  name    = "headscale"
+  release = "0.1.0"
+  images = {
+    headscale  = local.container_images.headscale
+    litestream = local.container_images.litestream
+  }
+  ports = {
+    headscale      = 8080
+    headscale_grpc = 50443
+  }
+  network_prefix            = local.networks.headscale.prefix
+  private_key               = data.terraform_remote_state.sr.outputs.headscale.private_key
+  noise_private_key         = data.terraform_remote_state.sr.outputs.headscale.noise_private_key
+  service_hostname          = local.kubernetes_ingress_endpoints.headscale
+  ingress_class_name        = local.ingress_classes.ingress_nginx_external
+  nginx_ingress_annotations = local.nginx_ingress_annotations
+  s3_db_resource            = "${data.terraform_remote_state.sr.outputs.s3.headscale.resource}/db.sqlite3"
+  s3_access_key_id          = data.terraform_remote_state.sr.outputs.s3.headscale.access_key_id
+  s3_secret_access_key      = data.terraform_remote_state.sr.outputs.s3.headscale.secret_access_key
 }

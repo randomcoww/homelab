@@ -76,6 +76,10 @@ locals {
       network = "10.244.0.0"
       cidr    = 16
     }
+    headscale = {
+      network = "100.64.0.0"
+      cidr    = 16
+    }
   }
 
   networks = merge(local.base_networks, {
@@ -129,6 +133,7 @@ locals {
     code_server        = "ghcr.io/randomcoww/code-server:20240118.1-tensorflow"
     kasm_desktop       = "ghcr.io/randomcoww/kasm-desktop:20231220.3"
     alpaca_stream      = "ghcr.io/randomcoww/alpaca-stream-server:20230518.1"
+    headscale          = "docker.io/headscale/headscale:0.22"
   }
 
   kubernetes = {
@@ -164,6 +169,7 @@ locals {
     sunshine      = "sun.${local.domains.internal}"
     alpaca_stream = "alpaca-stream.${local.domains.internal}"
     speedtest     = "speedtest.${local.domains.internal}"
+    headscale     = "headscale.${local.domains.internal}"
   }
 
   ingress_classes = {
