@@ -168,17 +168,15 @@ module "vaultwarden" {
     SMTP_SECURITY            = "starttls"
     SMTP_AUTH_MECHANISM      = "Plain"
   }
-  smtp_host            = var.smtp.host
-  smtp_port            = var.smtp.port
-  smtp_username        = var.smtp.username
-  smtp_password        = var.smtp.password
-  ingress_class_name   = local.ingress_classes.ingress_nginx
-  ingress_cert_issuer  = local.kubernetes.cert_issuer_prod
-  ingress_auth_url     = "http://${local.kubernetes_service_endpoints.authelia}/api/verify"
-  ingress_auth_signin  = "https://${local.kubernetes_ingress_endpoints.auth}?rm=$request_method"
-  s3_db_resource       = "${data.terraform_remote_state.sr.outputs.s3.vaultwarden.resource}/db.sqlite3"
-  s3_access_key_id     = data.terraform_remote_state.sr.outputs.s3.vaultwarden.access_key_id
-  s3_secret_access_key = data.terraform_remote_state.sr.outputs.s3.vaultwarden.secret_access_key
+  smtp_host                 = var.smtp.host
+  smtp_port                 = var.smtp.port
+  smtp_username             = var.smtp.username
+  smtp_password             = var.smtp.password
+  ingress_class_name        = local.ingress_classes.ingress_nginx
+  nginx_ingress_annotations = local.nginx_ingress_annotations
+  s3_db_resource            = "${data.terraform_remote_state.sr.outputs.s3.vaultwarden.resource}/db.sqlite3"
+  s3_access_key_id          = data.terraform_remote_state.sr.outputs.s3.vaultwarden.access_key_id
+  s3_secret_access_key      = data.terraform_remote_state.sr.outputs.s3.vaultwarden.secret_access_key
 }
 
 module "authelia" {
@@ -219,7 +217,7 @@ module "authelia" {
   smtp_port              = var.smtp.port
   smtp_username          = var.smtp.username
   smtp_password          = var.smtp.password
-  ingress_class_name     = local.ingress_classes.ingress_nginx
+  ingress_class_name     = local.ingress_classes.ingress_nginx_external
   ingress_cert_issuer    = local.kubernetes.cert_issuer_prod
   s3_db_resource         = "${data.terraform_remote_state.sr.outputs.s3.authelia.resource}/db.sqlite3"
   s3_access_key_id       = data.terraform_remote_state.sr.outputs.s3.authelia.access_key_id
@@ -397,13 +395,11 @@ module "code" {
   ssm_secret_access_key  = data.terraform_remote_state.sr.outputs.ssm.tailscale.secret_access_key
   ssm_tailscale_resource = data.terraform_remote_state.sr.outputs.ssm.tailscale.resource
 
-  service_hostname    = local.kubernetes_ingress_endpoints.code_server
-  ingress_class_name  = local.ingress_classes.ingress_nginx
-  ingress_cert_issuer = local.kubernetes.cert_issuer_prod
-  ingress_auth_url    = "http://${local.kubernetes_service_endpoints.authelia}/api/verify"
-  ingress_auth_signin = "https://${local.kubernetes_ingress_endpoints.auth}?rm=$request_method"
-  volume_claim_size   = "128Gi"
-  storage_class       = "local-path"
+  service_hostname          = local.kubernetes_ingress_endpoints.code_server
+  ingress_class_name        = local.ingress_classes.ingress_nginx
+  nginx_ingress_annotations = local.nginx_ingress_annotations
+  volume_claim_size         = "128Gi"
+  storage_class             = "local-path"
 }
 
 module "transmission" {
@@ -439,7 +435,7 @@ module "transmission" {
     start-added-torrents         = true
     trash-original-torrent-files = true
   }
-  torrent_done_script = <<-EOF
+  torrent_done_script       = <<-EOF
   #!/bin/sh
   set -xe
   #  * TR_APP_VERSION
@@ -463,7 +459,7 @@ module "transmission" {
     --torrent "$TR_TORRENT_ID" \
     --remove-and-delete
   EOF
-  wireguard_config    = <<-EOF
+  wireguard_config          = <<-EOF
   [Interface]
   Address=${var.wireguard_client.address}
   PrivateKey=${var.wireguard_client.private_key}
@@ -475,13 +471,11 @@ module "transmission" {
   PublicKey=${var.wireguard_client.public_key}
   PersistentKeepalive=25
   EOF
-  service_hostname    = local.kubernetes_ingress_endpoints.transmission
-  ingress_class_name  = local.ingress_classes.ingress_nginx
-  ingress_cert_issuer = local.kubernetes.cert_issuer_prod
-  ingress_auth_url    = "http://${local.kubernetes_service_endpoints.authelia}/api/verify"
-  ingress_auth_signin = "https://${local.kubernetes_ingress_endpoints.auth}?rm=$request_method"
-  volume_claim_size   = "32Gi"
-  storage_class       = "local-path"
+  service_hostname          = local.kubernetes_ingress_endpoints.transmission
+  ingress_class_name        = local.ingress_classes.ingress_nginx
+  nginx_ingress_annotations = local.nginx_ingress_annotations
+  volume_claim_size         = "32Gi"
+  storage_class             = "local-path"
 }
 
 module "alpaca_stream" {
@@ -546,11 +540,9 @@ module "mpd" {
     }
   }
 
-  service_hostname    = local.kubernetes_ingress_endpoints.mpd
-  ingress_class_name  = local.ingress_classes.ingress_nginx
-  ingress_cert_issuer = local.kubernetes.cert_issuer_prod
-  ingress_auth_url    = "http://${local.kubernetes_service_endpoints.authelia}/api/verify"
-  ingress_auth_signin = "https://${local.kubernetes_ingress_endpoints.auth}?rm=$request_method"
+  service_hostname          = local.kubernetes_ingress_endpoints.mpd
+  ingress_class_name        = local.ingress_classes.ingress_nginx
+  nginx_ingress_annotations = local.nginx_ingress_annotations
 }
 
 module "kasm_desktop" {
@@ -583,11 +575,9 @@ module "kasm_desktop" {
   sunshine_service_hostname = local.kubernetes_ingress_endpoints.sunshine
   sunshine_service_ip       = local.services.sunshine.ip
 
-  kasm_service_hostname = local.kubernetes_ingress_endpoints.kasm
-  ingress_class_name    = local.ingress_classes.ingress_nginx
-  ingress_cert_issuer   = local.kubernetes.cert_issuer_prod
-  ingress_auth_url      = "http://${local.kubernetes_service_endpoints.authelia}/api/verify"
-  ingress_auth_signin   = "https://${local.kubernetes_ingress_endpoints.auth}?rm=$request_method"
-  volume_claim_size     = "128Gi"
-  storage_class         = "local-path"
+  kasm_service_hostname     = local.kubernetes_ingress_endpoints.kasm
+  ingress_class_name        = local.ingress_classes.ingress_nginx
+  nginx_ingress_annotations = local.nginx_ingress_annotations
+  volume_claim_size         = "128Gi"
+  storage_class             = "local-path"
 }

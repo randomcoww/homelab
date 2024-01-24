@@ -162,22 +162,22 @@ resource "helm_release" "ingress-nginx" {
 }
 
 # cloudflare tunnel #
-/*
+
 resource "helm_release" "cloudflare-tunnel" {
   name        = "cloudflare-tunnel"
   namespace   = "default"
   repository  = "https://cloudflare.github.io/helm-charts/"
   chart       = "cloudflare-tunnel"
   wait        = false
-  version     = "0.2.0"
+  version     = "0.3.0"
   max_history = 2
   values = [
     yamlencode({
       cloudflare = {
-        account    = var.cloudflare.account_id
-        tunnelName = cloudflare_tunnel.homelab.name
-        tunnelId   = cloudflare_tunnel.homelab.id
-        secret     = cloudflare_tunnel.homelab.secret
+        account    = data.terraform_remote_state.sr.outputs.cloudflare_tunnels.external.account_id
+        tunnelName = data.terraform_remote_state.sr.outputs.cloudflare_tunnels.external.name
+        tunnelId   = data.terraform_remote_state.sr.outputs.cloudflare_tunnels.external.id
+        secret     = data.terraform_remote_state.sr.outputs.cloudflare_tunnels.external.secret
         ingress = [
           {
             hostname = "*.${local.domains.internal}"
@@ -185,14 +185,9 @@ resource "helm_release" "cloudflare-tunnel" {
           },
         ]
       }
-      image = {
-        repository = split(":", local.container_images.cloudflared)[0]
-        tag        = split(":", local.container_images.cloudflared)[1]
-      }
     }),
   ]
 }
-*/
 
 # cert-manager #
 
@@ -383,7 +378,7 @@ resource "helm_release" "minio" {
       #   ingressClassName = local.ingress_classes.ingress_nginx
       #   annotations      = local.nginx_ingress_annotations
       #   tls = [
-      #     local.tls_wildcard,
+      #     local.ingress_tls_common,
       #   ]
       #   hosts = [
       #     local.kubernetes_ingress_endpoints.minio,
@@ -443,45 +438,37 @@ resource "helm_release" "minio" {
   ]
 }
 
-# mayastor #
-/*
-resource "helm_release" "mayastor" {
-  name             = "mayastor"
-  namespace        = "mayastor"
-  repository       = "https://openebs.github.io/mayastor-extensions/"
-  chart            = "mayastor"
-  create_namespace = true
-  wait             = false
-  version          = "2.5.0"
-  max_history      = 2
+resource "helm_release" "speedtest" {
+  name        = "speedtest"
+  repository  = "https://openspeedtest.github.io/Helm-chart/"
+  chart       = "openspeedtest"
+  wait        = false
+  version     = "0.1.2"
+  max_history = 2
   values = [
     yamlencode({
-      base = {
-        metrics = {
-          enabled = false
-        }
-        jaeger = {
-          enabled = false
-        }
+      service = {
+        type = "ClusterIP"
       }
-      etcd = {
-        clusterDomain = local.domains.kubernetes
-        persistence = {
-          storageClass = "local-path"
-        }
+      ingress = {
+        enabled     = true
+        className   = local.ingress_classes.ingress_nginx_external
+        annotations = local.nginx_ingress_annotations
+        tls = [
+          local.ingress_tls_common,
+        ]
+        hosts = [
+          {
+            host = local.kubernetes_ingress_endpoints.speedtest
+            paths = [
+              {
+                path     = "/"
+                pathType = "Prefix"
+              },
+            ]
+          },
+        ]
       }
-      eventing = {
-        enabled = false
-      }
-      loki-stack = {
-        enabled = false
-      }
-      obs = {
-        callhome = {
-          enabled = false
-        }
-      }
-    }),
+    })
   ]
 }
-*/

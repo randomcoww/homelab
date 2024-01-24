@@ -72,16 +72,8 @@ variable "ingress_class_name" {
   type = string
 }
 
-variable "ingress_cert_issuer" {
-  type = string
-}
-
-variable "ingress_auth_url" {
-  type = string
-}
-
-variable "ingress_auth_signin" {
-  type = string
+variable "nginx_ingress_annotations" {
+  type = map(string)
 }
 
 variable "tailscale_auth_key" {

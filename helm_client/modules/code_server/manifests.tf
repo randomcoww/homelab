@@ -155,9 +155,7 @@ module "ingress" {
   app                = var.name
   release            = var.release
   ingress_class_name = var.ingress_class_name
-  cert_issuer        = var.ingress_cert_issuer
-  auth_url           = var.ingress_auth_url
-  auth_signin        = var.ingress_auth_signin
+  annotations        = var.nginx_ingress_annotations
   rules = [
     {
       host = var.service_hostname

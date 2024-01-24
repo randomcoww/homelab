@@ -46,7 +46,7 @@ locals {
       country_whitelist = [
         "US", "JP",
       ]
-      service = "tcp://${local.kubernetes_service_endpoints.ingress_nginx_external}:443"
+      service = "https://${local.kubernetes_service_endpoints.ingress_nginx_external}"
     }
   }
 }

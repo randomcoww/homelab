@@ -124,7 +124,6 @@ locals {
     wireguard          = "ghcr.io/randomcoww/wireguard:20240109"
     vaultwarden        = "docker.io/vaultwarden/server:1.30.1-alpine"
     litestream         = "docker.io/litestream/litestream:latest"
-    cloudflared        = "docker.io/cloudflare/cloudflared:2023.8.0"
     tailscale          = "ghcr.io/randomcoww/tailscale:1.56.1"
     fuse_device_plugin = "docker.io/soolaugust/fuse-device-plugin:v1.0"
     code_server        = "ghcr.io/randomcoww/code-server:20240118.1-tensorflow"
@@ -164,6 +163,7 @@ locals {
     kasm          = "k.${local.domains.internal}"
     sunshine      = "sun.${local.domains.internal}"
     alpaca_stream = "alpaca-stream.${local.domains.internal}"
+    speedtest     = "speedtest.${local.domains.internal}"
   }
 
   ingress_classes = {

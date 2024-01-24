@@ -29,6 +29,16 @@ output "cloudflare_dns_api_token" {
   sensitive = true
 }
 
+output "cloudflare_tunnels" {
+  value = {
+    for tunnel in cloudflare_tunnel.tunnel :
+    tunnel.name => merge(tunnel, {
+      account_id = var.cloudflare_account_id
+    })
+  }
+  sensitive = true
+}
+
 # etcd
 
 output "etcd_ca" {
