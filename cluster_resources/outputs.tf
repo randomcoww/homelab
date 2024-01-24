@@ -124,3 +124,10 @@ output "minio" {
   }
   sensitive = true
 }
+
+output "headscale" {
+  value = {
+    private_key       = random_id.private-key.hex
+    noise_private_key = random_id.noise-private-key.hex
+  }
+}

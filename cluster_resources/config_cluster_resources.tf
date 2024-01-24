@@ -17,6 +17,10 @@ locals {
         bucket = "randomcoww-authelia-2"
         path   = "litestream"
       }
+      headscale = {
+        bucket = "randomcoww-headscale-1"
+        path   = "litestream"
+      }
       documents = {
         bucket = "randomcoww-backup-2"
         path   = "documents"
