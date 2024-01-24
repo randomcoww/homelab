@@ -9,10 +9,10 @@ module "metadata" {
   release     = var.release
   app_version = split(":", var.images.vaultwarden)[1]
   manifests = {
-    "templates/secret.yaml"     = module.secret.manifest
-    "templates/service.yaml"    = module.service.manifest
-    "templates/ingress.yaml"    = module.ingress.manifest
-    "templates/deployment.yaml" = module.deployment.manifest
+    "templates/secret.yaml"      = module.secret.manifest
+    "templates/service.yaml"     = module.service.manifest
+    "templates/ingress.yaml"     = module.ingress.manifest
+    "templates/statefulset.yaml" = module.statefulset.manifest
   }
 }
 
@@ -68,8 +68,8 @@ module "ingress" {
   ]
 }
 
-module "deployment" {
-  source   = "../deployment"
+module "statefulset" {
+  source   = "../statefulset"
   name     = var.name
   app      = var.name
   release  = var.release

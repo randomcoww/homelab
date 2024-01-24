@@ -45,7 +45,7 @@ data "helm_template" "authelia" {
       }
       pod = {
         replicas = 1
-        kind     = "Deployment"
+        kind     = "StatefulSet"
         annotations = {
           "checksum/custom" = sha256(module.secret-custom.manifest)
         }
@@ -182,6 +182,9 @@ locals {
       spec = merge(local.s.spec, {
         template = merge(local.s.spec.template, {
           spec = merge(local.s.spec.template.spec, {
+            strategy = {
+              type = "Recreate"
+            }
             initContainers = [
               {
                 name  = "${var.name}-init"
