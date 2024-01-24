@@ -541,7 +541,7 @@ module "mpd" {
   }
 
   service_hostname          = local.kubernetes_ingress_endpoints.mpd
-  ingress_class_name        = local.ingress_classes.ingress_nginx
+  ingress_class_name        = local.ingress_classes.ingress_nginx_external
   nginx_ingress_annotations = local.nginx_ingress_annotations
 }
 
