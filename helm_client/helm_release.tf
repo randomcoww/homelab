@@ -43,7 +43,7 @@ resource "helm_release" "local-path-provisioner" {
   repository  = "https://charts.containeroo.ch"
   chart       = "local-path-provisioner"
   wait        = false
-  version     = "0.0.24"
+  version     = "0.0.25"
   max_history = 2
   values = [
     yamlencode({
@@ -68,7 +68,7 @@ resource "helm_release" "amd-gpu" {
   chart       = "amd-gpu"
   namespace   = "kube-system"
   wait        = false
-  version     = "0.10.0"
+  version     = "0.11.0"
   max_history = 2
   values = [
     yamlencode({
@@ -200,7 +200,7 @@ resource "helm_release" "cert-manager" {
   namespace        = "cert-manager"
   create_namespace = true
   wait             = true
-  version          = "1.12.1"
+  version          = "1.13.3"
   max_history      = 2
   values = [
     yamlencode({
@@ -347,7 +347,7 @@ resource "helm_release" "minio" {
   create_namespace = true
   wait             = false
   timeout          = 600
-  version          = "5.0.14"
+  version          = "5.0.15"
   max_history      = 2
   values = [
     yamlencode({

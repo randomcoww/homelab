@@ -31,6 +31,7 @@ locals {
     proxy_set_header Accept-Encoding gzip;
     EOF
   }
+
   ingress_tls_common = {
     secretName = "${local.domains.internal}-tls"
     hosts = [
