@@ -70,10 +70,10 @@ locals {
               boot-file-name = var.ipxe_script_url
             },
             {
-              name            = "EFI_x86-64"
-              test            = "option[93].hex == 0x0007"
-              server-hostname = "${peer.name}.${var.name}.${var.namespace}.svc"
-              boot-file-name  = var.ipxe_boot_path
+              name           = "EFI_x86-64"
+              test           = "option[93].hex == 0x0007"
+              next-server    = "$POD_IP"
+              boot-file-name = var.ipxe_boot_path
             },
             # {
             #   name           = "HTTPClient"
@@ -131,7 +131,6 @@ module "metadata" {
   app_version = split(":", var.images.kea)[1]
   manifests = merge({
     "templates/configmap.yaml"   = module.configmap.manifest
-    "templates/service.yaml"     = module.service.manifest
     "templates/statefulset.yaml" = module.statefulset.manifest
     }, {
     for k, service in module.service-peer :
@@ -153,20 +152,6 @@ module "configmap" {
   })
 }
 
-# Create DNS entries that point to host IP (with hostNetwork: true)
-# tftp will not work as a service without workarounds and needs direct access to the host
-module "service" {
-  source  = "../service"
-  name    = var.name
-  app     = var.name
-  release = var.release
-  spec = {
-    type                     = "ClusterIP"
-    clusterIP                = "None"
-    publishNotReadyAddresses = true
-  }
-}
-
 # Kea peers must know the IP (not DNS name) of all peers
 # Create a service for each pod with a known IP
 module "service-peer" {
@@ -177,8 +162,9 @@ module "service-peer" {
   app     = var.name
   release = var.release
   spec = {
-    type      = "ClusterIP"
-    clusterIP = each.value.ip
+    type                     = "ClusterIP"
+    clusterIP                = each.value.ip
+    publishNotReadyAddresses = true
     ports = [
       {
         name       = "kea-peer"
@@ -212,10 +198,14 @@ module "statefulset" {
       {
         name  = "${var.name}-control-agent"
         image = var.images.kea
-        args = [
-          "kea-ctrl-agent",
+        command = [
+          "sh",
           "-c",
-          "/etc/kea/kea-ctrl-agent.conf",
+          <<-EOF
+          set -e
+          cat /etc/kea/kea-ctrl-agent.tpl | envsubst > /etc/kea/kea-ctrl-agent.conf
+          exec kea-ctrl-agent -c /etc/kea/kea-ctrl-agent.conf
+          EOF
         ]
         env = [
           {
@@ -225,7 +215,15 @@ module "statefulset" {
                 fieldPath = "metadata.name"
               }
             }
-          }
+          },
+          {
+            name = "POD_IP"
+            valueFrom = {
+              fieldRef = {
+                fieldPath = "status.podIP"
+              }
+            }
+          },
         ]
         volumeMounts = [
           {
@@ -234,7 +232,7 @@ module "statefulset" {
           },
           {
             name        = "kea-config"
-            mountPath   = "/etc/kea/kea-ctrl-agent.conf"
+            mountPath   = "/etc/kea/kea-ctrl-agent.tpl"
             subPathExpr = "kea-ctrl-agent-$(POD_NAME)"
             readOnly    = true
           },
@@ -243,10 +241,14 @@ module "statefulset" {
       {
         name  = var.name
         image = var.images.kea
-        args = [
-          "kea-dhcp4",
+        command = [
+          "sh",
           "-c",
-          "/etc/kea/kea-dhcp4.conf",
+          <<-EOF
+          set -e
+          cat /etc/kea/kea-dhcp4.tpl | envsubst > /etc/kea/kea-dhcp4.conf
+          exec kea-dhcp4 -c /etc/kea/kea-dhcp4.conf
+          EOF
         ]
         env = [
           {
@@ -254,6 +256,14 @@ module "statefulset" {
             valueFrom = {
               fieldRef = {
                 fieldPath = "metadata.name"
+              }
+            }
+          },
+          {
+            name = "POD_IP"
+            valueFrom = {
+              fieldRef = {
+                fieldPath = "status.podIP"
               }
             }
           },
@@ -272,7 +282,7 @@ module "statefulset" {
           },
           {
             name        = "kea-config"
-            mountPath   = "/etc/kea/kea-dhcp4.conf"
+            mountPath   = "/etc/kea/kea-dhcp4.tpl"
             subPathExpr = "kea-dhcp4-$(POD_NAME)"
             readOnly    = true
           },
