@@ -162,9 +162,8 @@ module "service-peer" {
   app     = var.name
   release = var.release
   spec = {
-    type                     = "ClusterIP"
-    clusterIP                = each.value.ip
-    publishNotReadyAddresses = true
+    type      = "ClusterIP"
+    clusterIP = each.value.ip
     ports = [
       {
         name       = "kea-peer"
