@@ -202,7 +202,7 @@ locals {
   }
 
   service_ports = {
-    minio         = 80
+    minio         = 9000
     transmission  = 9091
     alpaca_stream = 38081
   }

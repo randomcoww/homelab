@@ -376,17 +376,17 @@ resource "helm_release" "minio" {
           "external-dns.alpha.kubernetes.io/hostname" = local.kubernetes_ingress_endpoints.minio
         }
       }
-      # ingress = {
-      #   enabled          = true
-      #   ingressClassName = local.ingress_classes.ingress_nginx
-      #   annotations      = local.nginx_ingress_annotations
-      #   tls = [
-      #     local.ingress_tls_common,
-      #   ]
-      #   hosts = [
-      #     local.kubernetes_ingress_endpoints.minio,
-      #   ]
-      # }
+      ingress = {
+        enabled          = false
+        ingressClassName = local.ingress_classes.ingress_nginx
+        annotations      = local.nginx_ingress_annotations
+        tls = [
+          local.ingress_tls_common,
+        ]
+        hosts = [
+          local.kubernetes_ingress_endpoints.minio,
+        ]
+      }
       environment = {
         MINIO_API_REQUESTS_DEADLINE  = "2m"
         MINIO_STORAGE_CLASS_STANDARD = "EC:2"
@@ -456,7 +456,7 @@ resource "helm_release" "speedtest" {
       ingress = {
         enabled     = true
         className   = local.ingress_classes.ingress_nginx_external
-        annotations = local.nginx_ingress_annotations
+        annotations = local.nginx_ingress_auth_annotations
         tls = [
           local.ingress_tls_common,
         ]

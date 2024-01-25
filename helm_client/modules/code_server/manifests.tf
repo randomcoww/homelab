@@ -144,8 +144,9 @@ module "service-peer" {
   app     = var.name
   release = var.release
   spec = {
-    type      = "ClusterIP"
-    clusterIP = "None"
+    type                     = "ClusterIP"
+    clusterIP                = "None"
+    publishNotReadyAddresses = true
   }
 }
 

@@ -173,7 +173,7 @@ module "vaultwarden" {
   smtp_username             = var.smtp.username
   smtp_password             = var.smtp.password
   ingress_class_name        = local.ingress_classes.ingress_nginx
-  nginx_ingress_annotations = local.nginx_ingress_annotations
+  nginx_ingress_annotations = local.nginx_ingress_auth_annotations
   s3_db_resource            = "${data.terraform_remote_state.sr.outputs.s3.vaultwarden.resource}/db.sqlite3"
   s3_access_key_id          = data.terraform_remote_state.sr.outputs.s3.vaultwarden.access_key_id
   s3_secret_access_key      = data.terraform_remote_state.sr.outputs.s3.vaultwarden.secret_access_key
@@ -205,10 +205,6 @@ module "authelia" {
       },
       {
         domain = local.kubernetes_ingress_endpoints.vaultwarden
-        policy = "bypass"
-      },
-      {
-        domain = local.kubernetes_ingress_endpoints.headscale
         policy = "bypass"
       },
     ]
@@ -401,7 +397,7 @@ module "code" {
 
   service_hostname          = local.kubernetes_ingress_endpoints.code_server
   ingress_class_name        = local.ingress_classes.ingress_nginx
-  nginx_ingress_annotations = local.nginx_ingress_annotations
+  nginx_ingress_annotations = local.nginx_ingress_auth_annotations
   volume_claim_size         = "128Gi"
   storage_class             = "local-path"
 }
@@ -477,7 +473,7 @@ module "transmission" {
   EOF
   service_hostname          = local.kubernetes_ingress_endpoints.transmission
   ingress_class_name        = local.ingress_classes.ingress_nginx
-  nginx_ingress_annotations = local.nginx_ingress_annotations
+  nginx_ingress_annotations = local.nginx_ingress_auth_annotations
   volume_claim_size         = "32Gi"
   storage_class             = "local-path"
 }
@@ -546,7 +542,7 @@ module "mpd" {
 
   service_hostname          = local.kubernetes_ingress_endpoints.mpd
   ingress_class_name        = local.ingress_classes.ingress_nginx_external
-  nginx_ingress_annotations = local.nginx_ingress_annotations
+  nginx_ingress_annotations = local.nginx_ingress_auth_annotations
 }
 
 module "kasm_desktop" {
@@ -581,7 +577,7 @@ module "kasm_desktop" {
 
   kasm_service_hostname     = local.kubernetes_ingress_endpoints.kasm
   ingress_class_name        = local.ingress_classes.ingress_nginx
-  nginx_ingress_annotations = local.nginx_ingress_annotations
+  nginx_ingress_annotations = local.nginx_ingress_auth_annotations
   volume_claim_size         = "128Gi"
   storage_class             = "local-path"
 }
