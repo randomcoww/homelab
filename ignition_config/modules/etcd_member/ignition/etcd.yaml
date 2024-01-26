@@ -36,6 +36,7 @@ storage:
               - --listen-client-urls=${listen_client_urls}
               - --initial-cluster-token=${cluster_token}
               - --initial-cluster=${initial_cluster}
+              - --auto-compaction-retention=${tostring(auto_compaction_retention)}
               # pod manifest args
               - --etcd-image=${container_images.etcd}
               - --etcd-snaphot-file=${etcd_snapshot_file}
@@ -48,6 +49,7 @@ storage:
               - --s3-backup-resource=${backup_resource.resource}
               - --healthcheck-interval=${healthcheck_interval}
               - --healthcheck-fail-count-allowed=${healthcheck_fail_count_allowed}
+              - --readiness-fail-count-allowed=${readiness_fail_count_allowed}
               - --backup-interval=${backup_resource.interval}
               env:
               - name: NODE_NAME
