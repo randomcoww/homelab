@@ -164,7 +164,7 @@ resource "helm_release" "ingress-nginx" {
 }
 
 # cloudflare tunnel #
-
+/*
 resource "helm_release" "cloudflare-tunnel" {
   name        = "cloudflare-tunnel"
   namespace   = "default"
@@ -190,7 +190,7 @@ resource "helm_release" "cloudflare-tunnel" {
     }),
   ]
 }
-
+*/
 # cert-manager #
 
 resource "helm_release" "cert-manager" {
@@ -444,6 +444,8 @@ resource "helm_release" "minio" {
   ]
 }
 
+# openspeedtest #
+/*
 resource "helm_release" "speedtest" {
   name        = "speedtest"
   repository  = "https://openspeedtest.github.io/Helm-chart/"
@@ -458,7 +460,7 @@ resource "helm_release" "speedtest" {
       }
       ingress = {
         enabled     = true
-        className   = local.ingress_classes.ingress_nginx_external
+        className   = local.ingress_classes.ingress_nginx
         annotations = local.nginx_ingress_auth_annotations
         tls = [
           local.ingress_tls_common,
@@ -478,3 +480,4 @@ resource "helm_release" "speedtest" {
     })
   ]
 }
+*/
