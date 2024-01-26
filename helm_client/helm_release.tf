@@ -229,7 +229,7 @@ resource "helm_release" "cert-issuer" {
   values = [
     yamlencode({
       manifests = [
-        {
+        yamlencode({
           apiVersion = "v1"
           kind       = "Secret"
           metadata = {
@@ -239,8 +239,8 @@ resource "helm_release" "cert-issuer" {
             token = data.terraform_remote_state.sr.outputs.cloudflare_dns_api_token
           }
           type = "Opaque"
-        },
-        {
+        }),
+        yamlencode({
           apiVersion = "v1"
           kind       = "Secret"
           metadata = {
@@ -250,8 +250,8 @@ resource "helm_release" "cert-issuer" {
             "tls.key" = chomp(data.terraform_remote_state.sr.outputs.letsencrypt.private_key_pem)
           }
           type = "Opaque"
-        },
-        {
+        }),
+        yamlencode({
           apiVersion = "v1"
           kind       = "Secret"
           metadata = {
@@ -261,8 +261,8 @@ resource "helm_release" "cert-issuer" {
             "tls.key" = chomp(data.terraform_remote_state.sr.outputs.letsencrypt.staging_private_key_pem)
           }
           type = "Opaque"
-        },
-        {
+        }),
+        yamlencode({
           apiVersion = "cert-manager.io/v1"
           kind       = "ClusterIssuer"
           metadata = {
@@ -295,8 +295,8 @@ resource "helm_release" "cert-issuer" {
               ]
             }
           }
-        },
-        {
+        }),
+        yamlencode({
           apiVersion = "cert-manager.io/v1"
           kind       = "ClusterIssuer"
           metadata = {
@@ -329,7 +329,7 @@ resource "helm_release" "cert-issuer" {
               ]
             }
           }
-        },
+        }),
       ]
     }),
   ]
