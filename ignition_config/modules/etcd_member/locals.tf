@@ -70,7 +70,7 @@ locals {
       healthcheck_interval           = "6s"
       healthcheck_fail_count_allowed = 16
       readiness_fail_count_allowed   = 64
-      auto_compaction_retention      = 2
+      auto_compaction_retention      = 1
       etcd_pod_manifest_file         = "${var.static_pod_manifest_path}/etcd.json"
       static_pod_manifest_path       = var.static_pod_manifest_path
       backup_resource = merge(var.s3_backup_resource, {
