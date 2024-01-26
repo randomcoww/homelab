@@ -61,6 +61,7 @@ storage:
               - --service-cluster-ip-range=${kubernetes_service_prefix}
               - --use-service-account-credentials=true
               - --secure-port=${controller_manager_port}
+              - --terminated-pod-gc-threshold=1
               - --feature-gates=NodeOutOfServiceVolumeDetach=true
               - --v=2
               volumeMounts:

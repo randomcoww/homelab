@@ -262,15 +262,6 @@ Each node will now be able to PXE boot from the cluster as long as only one node
 
 ---
 
-### Cleaning up Kubernetes pods
-
-```bash
-kubectl delete pod --field-selector=status.phase==Failed -A --ignore-not-found=true
-kubectl delete pod --field-selector=status.phase==Succeeded -A --ignore-not-found=true
-```
-
----
-
 ### Desktop setup
 
 #### Fedora Silverblue
