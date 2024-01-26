@@ -229,107 +229,110 @@ resource "helm_release" "cert-issuer" {
   values = [
     yamlencode({
       manifests = [
-        yamlencode({
-          apiVersion = "v1"
-          kind       = "Secret"
-          metadata = {
-            name = "cloudflare-token"
-          }
-          stringData = {
-            token = data.terraform_remote_state.sr.outputs.cloudflare_dns_api_token
-          }
-          type = "Opaque"
-        }),
-        yamlencode({
-          apiVersion = "v1"
-          kind       = "Secret"
-          metadata = {
-            name = local.kubernetes.cert_issuer_prod
-          }
-          stringData = {
-            "tls.key" = chomp(data.terraform_remote_state.sr.outputs.letsencrypt.private_key_pem)
-          }
-          type = "Opaque"
-        }),
-        yamlencode({
-          apiVersion = "v1"
-          kind       = "Secret"
-          metadata = {
-            name = local.kubernetes.cert_issuer_staging
-          }
-          stringData = {
-            "tls.key" = chomp(data.terraform_remote_state.sr.outputs.letsencrypt.staging_private_key_pem)
-          }
-          type = "Opaque"
-        }),
-        yamlencode({
-          apiVersion = "cert-manager.io/v1"
-          kind       = "ClusterIssuer"
-          metadata = {
-            name = local.kubernetes.cert_issuer_prod
-          }
-          spec = {
-            acme = {
-              server = "https://acme-v02.api.letsencrypt.org/directory"
-              email  = data.terraform_remote_state.sr.outputs.letsencrypt.username
-              privateKeySecretRef = {
-                name = local.kubernetes.cert_issuer_prod
-              }
-              disableAccountKeyGeneration = true
-              solvers = [
-                {
-                  dns01 = {
-                    cloudflare = {
-                      apiTokenSecretRef = {
-                        name = "cloudflare-token"
-                        key  = "token"
+        for m in [
+          {
+            apiVersion = "v1"
+            kind       = "Secret"
+            metadata = {
+              name = "cloudflare-token"
+            }
+            stringData = {
+              token = data.terraform_remote_state.sr.outputs.cloudflare_dns_api_token
+            }
+            type = "Opaque"
+          },
+          {
+            apiVersion = "v1"
+            kind       = "Secret"
+            metadata = {
+              name = local.kubernetes.cert_issuer_prod
+            }
+            stringData = {
+              "tls.key" = chomp(data.terraform_remote_state.sr.outputs.letsencrypt.private_key_pem)
+            }
+            type = "Opaque"
+          },
+          {
+            apiVersion = "v1"
+            kind       = "Secret"
+            metadata = {
+              name = local.kubernetes.cert_issuer_staging
+            }
+            stringData = {
+              "tls.key" = chomp(data.terraform_remote_state.sr.outputs.letsencrypt.staging_private_key_pem)
+            }
+            type = "Opaque"
+          },
+          {
+            apiVersion = "cert-manager.io/v1"
+            kind       = "ClusterIssuer"
+            metadata = {
+              name = local.kubernetes.cert_issuer_prod
+            }
+            spec = {
+              acme = {
+                server = "https://acme-v02.api.letsencrypt.org/directory"
+                email  = data.terraform_remote_state.sr.outputs.letsencrypt.username
+                privateKeySecretRef = {
+                  name = local.kubernetes.cert_issuer_prod
+                }
+                disableAccountKeyGeneration = true
+                solvers = [
+                  {
+                    dns01 = {
+                      cloudflare = {
+                        apiTokenSecretRef = {
+                          name = "cloudflare-token"
+                          key  = "token"
+                        }
                       }
                     }
-                  }
-                  selector = {
-                    dnsZones = [
-                      local.domains.internal,
-                    ]
-                  }
-                },
-              ]
-            }
-          }
-        }),
-        yamlencode({
-          apiVersion = "cert-manager.io/v1"
-          kind       = "ClusterIssuer"
-          metadata = {
-            name = local.kubernetes.cert_issuer_staging
-          }
-          spec = {
-            acme = {
-              server = "https://acme-staging-v02.api.letsencrypt.org/directory"
-              email  = data.terraform_remote_state.sr.outputs.letsencrypt.username
-              privateKeySecretRef = {
-                name = local.kubernetes.cert_issuer_staging
+                    selector = {
+                      dnsZones = [
+                        local.domains.internal,
+                      ]
+                    }
+                  },
+                ]
               }
-              disableAccountKeyGeneration = true
-              solvers = [
-                {
-                  dns01 = {
-                    cloudflare = {
-                      apiTokenSecretRef = {
-                        name = "cloudflare-token"
-                        key  = "token"
+            }
+          },
+          {
+            apiVersion = "cert-manager.io/v1"
+            kind       = "ClusterIssuer"
+            metadata = {
+              name = local.kubernetes.cert_issuer_staging
+            }
+            spec = {
+              acme = {
+                server = "https://acme-staging-v02.api.letsencrypt.org/directory"
+                email  = data.terraform_remote_state.sr.outputs.letsencrypt.username
+                privateKeySecretRef = {
+                  name = local.kubernetes.cert_issuer_staging
+                }
+                disableAccountKeyGeneration = true
+                solvers = [
+                  {
+                    dns01 = {
+                      cloudflare = {
+                        apiTokenSecretRef = {
+                          name = "cloudflare-token"
+                          key  = "token"
+                        }
                       }
                     }
-                  }
-                  selector = {
-                    dnsZones = [
-                      local.domains.internal,
-                    ]
-                  }
-                },
-              ]
+                    selector = {
+                      dnsZones = [
+                        local.domains.internal,
+                      ]
+                    }
+                  },
+                ]
+              }
             }
-          }
-        }),
+          },
+        ] :
+        yamlencode(m)
       ]
     }),
   ]
