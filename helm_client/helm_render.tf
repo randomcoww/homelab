@@ -411,7 +411,7 @@ module "transmission" {
     wireguard    = local.container_images.wireguard
   }
   ports = {
-    transmission = local.service_ports.transmission
+    transmission = 9091
   }
   transmission_settings = {
     blocklist-enabled            = true
@@ -444,9 +444,10 @@ module "transmission" {
   #  * TR_TORRENT_HASH
   #  * TR_TORRENT_ID
   #  * TR_TORRENT_NAME
+  #  * TR_RPC_PORT (custom)
   cd "$TR_TORRENT_DIR"
 
-  transmission-remote 127.0.0.1:${local.service_ports.transmission} \
+  transmission-remote $TR_RPC_PORT \
     --torrent "$TR_TORRENT_ID" \
     --verify
 
@@ -455,7 +456,7 @@ module "transmission" {
     -bucket="${local.minio_buckets.downloads.name}" \
     -path="$TR_TORRENT_NAME"
 
-  transmission-remote 127.0.0.1:${local.service_ports.transmission} \
+  transmission-remote $TR_RPC_PORT \
     --torrent "$TR_TORRENT_ID" \
     --remove-and-delete
   EOF
@@ -474,8 +475,6 @@ module "transmission" {
   service_hostname          = local.kubernetes_ingress_endpoints.transmission
   ingress_class_name        = local.ingress_classes.ingress_nginx
   nginx_ingress_annotations = local.nginx_ingress_auth_annotations
-  volume_claim_size         = "32Gi"
-  storage_class             = "local-path"
 }
 
 module "alpaca_stream" {

@@ -1,6 +1,20 @@
 locals {
   transmission_home_path = "/var/lib/transmission"
   torrent_done_script    = "/torrent-done.sh"
+  blocklist_update_job_spec = {
+    restartPolicy = "OnFailure"
+    containers = [
+      {
+        name  = var.name
+        image = var.images.transmission
+        command = [
+          "transmission-remote",
+          "${var.name}.${var.namespace}:${var.ports.transmission}",
+          "--blocklist-update",
+        ]
+      },
+    ]
+  }
 }
 
 module "metadata" {
@@ -14,6 +28,57 @@ module "metadata" {
     "templates/ingress.yaml"    = module.ingress.manifest
     "templates/secret.yaml"     = module.secret.manifest
     "templates/deployment.yaml" = module.deployment.manifest
+    "templates/post-job.yaml" = yamlencode({
+      apiVersion = "batch/v1"
+      kind       = "Job"
+      metadata = {
+        name = "${var.name}-update-blocklist"
+        labels = {
+          app     = var.name
+          release = var.release
+        }
+        annotations = {
+          "helm.sh/hook"               = "post-install,post-upgrade"
+          "helm.sh/hook-delete-policy" = "hook-succeeded,before-hook-creation"
+        }
+      }
+      spec = {
+        template = {
+          metadata = {
+            labels = {
+              app = var.name
+            }
+          }
+          spec = local.blocklist_update_job_spec
+        }
+      }
+    })
+    "templates/cronjob.yaml" = yamlencode({
+      apiVersion = "batch/v1"
+      kind       = "CronJob"
+      metadata = {
+        name = "${var.name}-update-blocklist"
+        labels = {
+          app     = var.name
+          release = var.release
+        }
+      }
+      spec = {
+        schedule = var.blocklist_update_schedule
+        jobTemplate = {
+          spec = {
+            template = {
+              metadata = {
+                labels = {
+                  app = var.name
+                }
+              }
+              spec = local.blocklist_update_job_spec
+            }
+          }
+        }
+      }
+    })
   }
 }
 
@@ -121,8 +186,17 @@ module "deployment" {
 
           exec transmission-daemon \
             --foreground \
+            --rpc-bind-address 0.0.0.0 \
+            --port ${var.ports.transmission} \
+            --no-portmap \
             --config-dir ${local.transmission_home_path}
           EOF
+        ]
+        env = [
+          {
+            name  = "TR_RPC_PORT"
+            value = tostring(var.ports.transmission)
+          },
         ]
         volumeMounts = [
           {

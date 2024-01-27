@@ -36,6 +36,11 @@ variable "transmission_settings" {
   type = map(string)
 }
 
+variable "blocklist_update_schedule" {
+  type    = string
+  default = "0 0 * * *"
+}
+
 variable "service_hostname" {
   type = string
 }
@@ -46,21 +51,6 @@ variable "ingress_class_name" {
 
 variable "nginx_ingress_annotations" {
   type = map(string)
-}
-
-variable "volume_claim_size" {
-  type = string
-}
-
-variable "storage_class" {
-  type = string
-}
-
-variable "storage_access_modes" {
-  type = list(string)
-  default = [
-    "ReadWriteOnce",
-  ]
 }
 
 variable "resources" {
