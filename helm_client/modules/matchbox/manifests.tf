@@ -115,8 +115,7 @@ module "statefulset" {
     "checksum/secret-matchbox"  = sha256(module.secret-matchbox.manifest)
   }
   spec = {
-    hostNetwork = true
-    dnsPolicy   = "ClusterFirstWithHostNet"
+    dnsPolicy = "ClusterFirstWithHostNet"
     containers = [
       {
         name  = var.name

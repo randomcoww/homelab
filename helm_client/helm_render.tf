@@ -136,8 +136,8 @@ module "matchbox" {
     syncthing = local.container_images.syncthing
   }
   ports = {
-    matchbox       = local.ports.matchbox
-    matchbox_api   = local.ports.matchbox_api
+    matchbox       = local.service_ports.matchbox
+    matchbox_api   = local.service_ports.matchbox_api
     syncthing_peer = 22000
   }
   service_ip       = local.services.matchbox.ip
@@ -326,7 +326,7 @@ module "kea" {
     tftpd    = local.ports.tftpd
   }
   ipxe_boot_path  = "/ipxe.efi"
-  ipxe_script_url = "http://${local.services.matchbox.ip}:${local.ports.matchbox}/boot.ipxe"
+  ipxe_script_url = "http://${local.services.matchbox.ip}:${local.service_ports.matchbox}/boot.ipxe"
   networks = [
     for _, network in local.networks :
     {

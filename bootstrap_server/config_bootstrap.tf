@@ -4,8 +4,8 @@ locals {
     for f in fileset(".", "${path.module}/manifests/*.yaml") :
     basename(f) => templatefile(f, {
       container_images  = local.container_images
-      matchbox_port     = local.ports.matchbox
-      matchbox_api_port = local.ports.matchbox_api
+      matchbox_port     = local.service_ports.matchbox
+      matchbox_api_port = local.service_ports.matchbox_api
       tftp_port         = local.ports.tftpd
       config_path       = "/etc/bootstrap"
       assets_path       = abspath(var.assets_path)
@@ -24,7 +24,7 @@ locals {
             {
               name           = "XClient_iPXE"
               test           = "substring(option[77].hex,0,4) == 'iPXE'"
-              boot-file-name = "http://${local.listen_ip}:${local.ports.matchbox}/boot.ipxe"
+              boot-file-name = "http://${local.listen_ip}:${local.service_ports.matchbox}/boot.ipxe"
             },
             {
               name           = "EFI_x86-64"

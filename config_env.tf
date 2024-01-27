@@ -197,11 +197,11 @@ locals {
     kube_proxy         = 50254
     etcd_client        = 58082
     etcd_peer          = 58083
-    matchbox           = 80
-    matchbox_api       = 50101
   }
 
   service_ports = {
+    matchbox      = 80
+    matchbox_api  = 50101
     minio         = 9000
     alpaca_stream = 38081
   }
