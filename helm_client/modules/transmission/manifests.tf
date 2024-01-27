@@ -2,7 +2,6 @@ locals {
   transmission_home_path = "/var/lib/transmission"
   torrent_done_script    = "/torrent-done.sh"
   blocklist_update_job_spec = {
-    restartPolicy = "OnFailure"
     containers = [
       {
         name  = var.name
@@ -49,7 +48,9 @@ module "metadata" {
               app = var.name
             }
           }
-          spec = local.blocklist_update_job_spec
+          spec = merge(local.blocklist_update_job_spec, {
+            restartPolicy = "OnFailure"
+          })
         }
       }
     })
@@ -73,7 +74,9 @@ module "metadata" {
                   app = var.name
                 }
               }
-              spec = local.blocklist_update_job_spec
+              spec = merge(local.blocklist_update_job_spec, {
+                restartPolicy = "Never"
+              })
             }
           }
         }
