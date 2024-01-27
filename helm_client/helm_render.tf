@@ -464,7 +464,10 @@ module "transmission" {
   [Interface]
   Address=${var.wireguard_client.address}
   PrivateKey=${var.wireguard_client.private_key}
-  PostUp=nft add table ip filter && nft add chain ip filter output { type filter hook output priority 0 \; } && nft insert rule ip filter output oifname != "%i" mark != $(wg show %i fwmark) fib daddr type != local ip daddr != ${local.networks.kubernetes_service.prefix} ip daddr != ${local.networks.kubernetes_pod.prefix} reject && ip route add ${local.networks.kubernetes_service.prefix} via $(ip route | grep default | awk '{print $3}')
+  PostUp=nft add table ip filter
+  PostUp=nft add chain ip filter output { type filter hook output priority 0 \; }
+  PostUp=nft insert rule ip filter output oifname != "%i" mark != $(wg show %i fwmark) fib daddr type != local ip daddr != ${local.networks.kubernetes_service.prefix} ip daddr != ${local.networks.kubernetes_pod.prefix} reject
+  PostUp=ip route add ${local.networks.kubernetes_service.prefix} via $(ip -4 route show ${local.networks.kubernetes_pod.prefix} | awk '{print $3}')
 
   [Peer]
   AllowedIPs=0.0.0.0/0

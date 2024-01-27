@@ -104,7 +104,6 @@ module "deployment" {
     "checksum/secret" = sha256(module.secret.manifest)
   }
   spec = {
-    dnsPolicy = "ClusterFirstWithHostNet"
     containers = [
       {
         name  = var.name

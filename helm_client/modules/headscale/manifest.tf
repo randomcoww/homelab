@@ -121,7 +121,6 @@ module "statefulset" {
     "checksum/secret" = sha256(module.secret.manifest)
   }
   spec = {
-    dnsPolicy = "ClusterFirstWithHostNet"
     initContainers = [
       {
         name  = "${var.name}-init"

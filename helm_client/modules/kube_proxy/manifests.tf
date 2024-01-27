@@ -80,6 +80,7 @@ module "daemonset" {
   spec = {
     priorityClassName  = "system-node-critical"
     hostNetwork        = true
+    dnsPolicy          = "ClusterFirstWithHostNet"
     serviceAccountName = var.name
     tolerations = [
       {
