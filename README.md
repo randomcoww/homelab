@@ -273,14 +273,13 @@ flatpak --user -y install --or-update flathub \
   com.brave.Browser \
   com.visualstudio.code \
   org.inkscape.Inkscape \
+  org.kde.krita \
   org.blender.Blender \
-  org.godotengine.Godot \
   com.github.xournalpp.xournalpp \
   com.valvesoftware.Steam \
   com.heroicgameslauncher.hgl \
   net.lutris.Lutris \
-  net.davidotek.pupgui2 \
-  org.gabmus.hydrapaper
+  net.davidotek.pupgui2
 ```
 
 Install Minio client
@@ -303,9 +302,9 @@ brew install \
 brew install --cask \
   blender \
   brave-browser \
-  godot \
   huiontablet \
   inkscape \
+  krita \
   moonlight \
   tailscale \
   visual-studio-code
@@ -325,19 +324,19 @@ sudo apt install -y \
   podman \
   flatpak
 
-flatpak --user remote-add --if-not-exists flathub https://flathub.org/repo/flathub.flatpakrepo
-
-flatpak --user -y install flathub \
-  com.brave.Browser
-```
-
-```bash
 echo $(whoami):100000:65536 | sudo tee -a /etc/subuid /etc/subgid
 
 sudo tee /etc/containers/containers.conf > /dev/null <<EOF
 [containers]
 keyring = false
 EOF
+```
+
+```bash
+flatpak --user remote-add --if-not-exists flathub https://flathub.org/repo/flathub.flatpakrepo
+
+flatpak --user -y install flathub \
+  com.visualstudio.code
 ```
 
 Install helm https://helm.sh/docs/intro/install/
