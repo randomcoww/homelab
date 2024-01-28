@@ -221,7 +221,7 @@ locals {
     }
     downloads = {
       name   = "downloads"
-      policy = "upload"
+      policy = "public"
     }
     pictures = {
       name   = "pictures"
