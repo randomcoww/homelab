@@ -68,6 +68,7 @@ module "metadata" {
         schedule = var.blocklist_update_schedule
         jobTemplate = {
           spec = {
+            ttlSecondsAfterFinished = 21600
             template = {
               metadata = {
                 labels = {
