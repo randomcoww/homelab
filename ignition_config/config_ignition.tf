@@ -125,10 +125,6 @@ locals {
           ]
         }
       }
-      kubernetes_worker_labels = {
-        minio = true
-        kea   = true
-      }
     }
     q-0 = {
       users = [
