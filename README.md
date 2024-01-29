@@ -38,7 +38,7 @@ letsencrypt_username  = "$LETSENCRYPT_USER"
 EOF
 ```
 
-Create `ignition_config/secrets.tfvars` file
+Create `ignition/secrets.tfvars` file
 
 ```bash
 PASSWORD=
@@ -46,7 +46,7 @@ LINUX_PASSWORD_HASH=$(echo $PASSWORD | openssl passwd -6 -stdin)
 ```
 
 ```bash
-cat > ignition_config/secrets.tfvars <<EOF
+cat > ignition/secrets.tfvars <<EOF
 users = {
   admin = {}
   client = {
@@ -146,8 +146,8 @@ tw terraform -chdir=cluster_resources apply -var-file=secrets.tfvars
 Generate CoreOS ignition for servers
 
 ```bash
-tw terraform -chdir=ignition_config init
-tw terraform -chdir=ignition_config apply -var-file=secrets.tfvars
+tw terraform -chdir=ignition init
+tw terraform -chdir=ignition apply -var-file=secrets.tfvars
 ```
 
 Create custom CoreOS images (see [fedora-coreos-config-custom](https://github.com/randomcoww/fedora-coreos-config-custom/blob/master/builds/server/README.md))
