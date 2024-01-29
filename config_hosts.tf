@@ -324,7 +324,6 @@ locals {
 
   base_members = {
     base              = ["gw-0", "gw-1", "q-0", "de-0", "de-1", "r-0"]
-    network-boot      = ["gw-0", "gw-1", "q-0", "de-1"]
     systemd-networkd  = ["gw-0", "gw-1", "q-0", "de-1"]
     network-manager   = ["de-0", "r-0"]
     gateway           = ["gw-0", "gw-1", "q-0"]

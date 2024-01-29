@@ -1,9 +1,9 @@
 resource "matchbox_profile" "pxeboot" {
   for_each = {
-    for key, host in local.members.network-boot :
+    for key, host in local.hosts :
     host.hardware_interfaces[host.network_boot.interface].mac => merge(host.network_boot, {
       ignition = key
-    })
+    }) if lookup(host, "network_boot", null) != null
   }
 
   name   = each.key
