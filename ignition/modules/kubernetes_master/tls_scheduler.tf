@@ -7,7 +7,7 @@ resource "tls_cert_request" "scheduler" {
   private_key_pem = tls_private_key.scheduler.private_key_pem
 
   subject {
-    common_name = "system:kube-scheduler"
+    common_name = var.scheduler_user
   }
 }
 

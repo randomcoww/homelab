@@ -134,6 +134,11 @@ locals {
     node_bootstrap_user = "system:node-bootstrapper"
   }
 
+  vrrp = {
+    haproxy_config_path    = "/etc/haproxy/haproxy.cfg.d"
+    keepalived_config_path = "/etc/keepalived/keepalived.conf.d"
+  }
+
   domains = {
     internal_mdns = "local"
     internal      = "fuzzybunny.win"

@@ -12,8 +12,8 @@ resource "tls_cert_request" "apiserver" {
 
   ip_addresses = concat(["127.0.0.1"], var.apiserver_listen_ips)
   dns_names = [
-    for i, _ in split(".", var.cluster_apiserver_endpoint) :
-    join(".", slice(split(".", var.cluster_apiserver_endpoint), 0, i + 1))
+    for i, _ in split(".", var.cluster_apiserver_hostname) :
+    join(".", slice(split(".", var.cluster_apiserver_hostname), 0, i + 1))
   ]
 }
 

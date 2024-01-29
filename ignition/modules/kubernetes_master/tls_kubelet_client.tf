@@ -7,7 +7,7 @@ resource "tls_cert_request" "kubelet-client" {
   private_key_pem = tls_private_key.kubelet-client.private_key_pem
 
   subject {
-    common_name = var.kube_kubelet_access_user
+    common_name = var.kubelet_access_user
   }
 }
 

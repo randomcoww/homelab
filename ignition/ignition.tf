@@ -153,40 +153,53 @@ module "ignition-kubernetes-master" {
   for_each = local.members.kubernetes-master
   source   = "./modules/kubernetes_master"
 
-  # interfaces               = module.ignition-systemd-networkd[each.key].tap_interfaces
+  ignition_version = "1.5.0"
+
+  name            = "kubernetes-master"
   cluster_name    = local.kubernetes.cluster_name
   ca              = data.terraform_remote_state.sr.outputs.kubernetes_ca
   etcd_ca         = data.terraform_remote_state.sr.outputs.etcd_ca
   service_account = data.terraform_remote_state.sr.outputs.kubernetes_service_account
-  etcd_cluster_members = {
+  members = {
+    for host_key, host in local.members.kubernetes-master :
+    host_key => cidrhost(local.networks.kubernetes.prefix, host.netnum)
+  }
+  etcd_members = {
     for host_key, host in local.members.etcd :
     host_key => cidrhost(local.networks.etcd.prefix, host.netnum)
   }
+  images = {
+    apiserver          = local.container_images.kube_apiserver
+    controller_manager = local.container_images.kube_apiserver
+    scheduler          = local.container_images.kube_apiserver
+  }
+  ports = {
+    apiserver          = local.ports.apiserver_ha
+    apiserver_backend  = local.ports.apiserver
+    controller_manager = local.ports.controller_manager
+    scheduler          = local.ports.scheduler
+    etcd_client        = local.ports.etcd_client
+  }
+  kubelet_access_user        = local.kubernetes.kubelet_access_user
+  cluster_apiserver_hostname = local.kubernetes_service_endpoints.apiserver
+  kubernetes_service_prefix  = local.networks.kubernetes_service.prefix
+  kubernetes_pod_prefix      = local.networks.kubernetes_pod.prefix
+
+  # VIP
+  apiserver_interface_name = each.value.tap_interfaces[local.services.apiserver.network.name].interface_name
+  sync_interface_name      = each.value.tap_interfaces.sync.interface_name
+  apiserver_vip            = local.services.apiserver.ip
   apiserver_listen_ips = sort([
     cidrhost(local.networks.kubernetes.prefix, each.value.netnum),
     local.services.apiserver.ip,
     local.services.cluster_apiserver.ip,
   ])
-  cluster_apiserver_endpoint = local.kubernetes_service_endpoints.apiserver
-  cluster_members = {
-    for host_key, host in local.members.kubernetes-master :
-    host_key => cidrhost(local.networks.kubernetes.prefix, host.netnum)
-  }
-  static_pod_manifest_path = local.kubernetes.static_pod_manifest_path
-  container_images         = local.container_images
+  virtual_router_id = 11
 
-  kubernetes_service_prefix = local.networks.kubernetes_service.prefix
-  kubernetes_pod_prefix     = local.networks.kubernetes_pod.prefix
-  apiserver_port            = local.ports.apiserver
-  apiserver_ha_port         = local.ports.apiserver_ha
-  etcd_client_port          = local.ports.etcd_client
-  controller_manager_port   = local.ports.controller_manager
-  scheduler_port            = local.ports.scheduler
-  kube_kubelet_access_user  = local.kubernetes.kubelet_access_user
-
-  sync_interface_name      = each.value.tap_interfaces.sync.interface_name
-  apiserver_interface_name = each.value.tap_interfaces[local.services.apiserver.network.name].interface_name
-  apiserver_vip            = local.services.apiserver.ip
+  # paths
+  static_pod_path = local.kubernetes.static_pod_manifest_path
+  haproxy_path    = local.vrrp.haproxy_config_path
+  keepalived_path = local.vrrp.keepalived_config_path
 }
 
 module "ignition-kubernetes-worker" {

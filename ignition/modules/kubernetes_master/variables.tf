@@ -1,3 +1,11 @@
+variable "ignition_version" {
+  type = string
+}
+
+variable "name" {
+  type = string
+}
+
 variable "cluster_name" {
   type = string
 }
@@ -26,28 +34,48 @@ variable "service_account" {
   })
 }
 
-variable "etcd_cluster_members" {
+variable "images" {
+  type = object({
+    apiserver          = string
+    controller_manager = string
+    scheduler          = string
+  })
+}
+
+variable "ports" {
+  type = object({
+    apiserver          = number
+    apiserver_backend  = number
+    controller_manager = number
+    scheduler          = number
+    etcd_client        = number
+  })
+}
+
+variable "members" {
   type = map(string)
 }
 
-variable "apiserver_listen_ips" {
-  type = list(string)
+variable "etcd_members" {
+  type = map(string)
 }
 
-variable "cluster_apiserver_endpoint" {
+variable "cluster_apiserver_hostname" {
   type = string
 }
 
-variable "cluster_members" {
-  type = map(string)
-}
-
-variable "static_pod_manifest_path" {
+variable "kubelet_access_user" {
   type = string
 }
 
-variable "container_images" {
-  type = map(string)
+variable "controller_manager_user" {
+  type    = string
+  default = "system:kube-controller-manager"
+}
+
+variable "scheduler_user" {
+  type    = string
+  default = "system:kube-scheduler"
 }
 
 variable "kubernetes_service_prefix" {
@@ -56,26 +84,6 @@ variable "kubernetes_service_prefix" {
 
 variable "kubernetes_pod_prefix" {
   type = string
-}
-
-variable "apiserver_port" {
-  type = number
-}
-
-variable "apiserver_ha_port" {
-  type = number
-}
-
-variable "etcd_client_port" {
-  type = number
-}
-
-variable "controller_manager_port" {
-  type = number
-}
-
-variable "scheduler_port" {
-  type = number
 }
 
 variable "sync_interface_name" {
@@ -90,16 +98,27 @@ variable "apiserver_vip" {
   type = string
 }
 
-variable "kube_kubelet_access_user" {
+variable "apiserver_listen_ips" {
+  type = list(string)
+}
+
+variable "virtual_router_id" {
+  type = number
+}
+
+variable "config_base_path" {
+  type    = string
+  default = "/var/lib"
+}
+
+variable "static_pod_path" {
   type = string
 }
 
-variable "haproxy_config_path" {
-  type    = string
-  default = "/etc/haproxy/haproxy.cfg.d"
+variable "haproxy_path" {
+  type = string
 }
 
-variable "keepalived_config_path" {
-  type    = string
-  default = "/etc/keepalived/keepalived.conf.d"
+variable "keepalived_path" {
+  type = string
 }
