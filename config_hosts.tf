@@ -275,6 +275,9 @@ locals {
         interface = "phy0"
         image     = local.pxeboot_image_set.silverblue
         boot_args = [
+          "iommu=pt",
+          "amd_iommu=pt",
+          "rd.driver.pre=vfio-pci",
           "numa=off",
           "enforcing=0",
           "rd.driver.blacklist=nouveau",
