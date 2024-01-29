@@ -254,8 +254,8 @@ kubectl get po -l app=matchbox
 Push PXE boot and ignition configuration to cluster bootstrap service
 
 ```bash
-tw terraform -chdir=pxeboot_config_client init
-tw terraform -chdir=pxeboot_config_client apply
+tw terraform -chdir=matchbox_client init
+tw terraform -chdir=matchbox_client apply
 ```
 
 Each node will now be able to PXE boot from the cluster as long as only one node is taken down at a time

@@ -1,36 +1,4 @@
 locals {
-  node_labels = {
-    "gw-0.local" = {
-      minio = true
-      kea   = true
-    }
-    "gw-1.local" = {
-      minio = true
-      kea   = true
-    }
-    "q-0.local" = {
-      minio = true
-      kea   = true
-    }
-    "de-1.local" = {
-      hostapd = true
-      nvidia  = true
-    }
-  }
-
-  node_taints = {
-    # "de-1.local" = [
-    #   {
-    #     key    = "node-role.kubernetes.io/de"
-    #     effect = "NoSchedule"
-    #   },
-    #   {
-    #     key    = "node-role.kubernetes.io/de"
-    #     effect = "NoExecute"
-    #   },
-    # ]
-  }
-
   nginx_ingress_annotations = {
     "cert-manager.io/cluster-issuer"                = local.kubernetes.cert_issuer_prod
     "nginx.ingress.kubernetes.io/http-snippet"      = <<-EOF

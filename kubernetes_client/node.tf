@@ -1,5 +1,8 @@
 resource "kubernetes_labels" "labels" {
-  for_each = local.node_labels
+  for_each = {
+    for key, host in local.members.kubernetes-worker :
+    host.hostname => lookup(host, "kubernetes_node_labels", {})
+  }
 
   api_version = "v1"
   kind        = "Node"
@@ -7,17 +10,4 @@ resource "kubernetes_labels" "labels" {
     name = each.key
   }
   labels = each.value
-}
-
-resource "kubernetes_node_taint" "taint" {
-  for_each = local.node_taints
-
-  metadata {
-    name = each.key
-  }
-  taint {
-    key    = each.value.key
-    value  = lookup(each.value, "value", "")
-    effect = each.value.effect
-  }
 }

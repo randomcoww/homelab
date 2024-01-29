@@ -6,7 +6,6 @@ locals {
     home_path       = "/var/home"
   }
 
-  # do not use #
   base_networks = {
     lan = {
       network            = "192.168.126.0"
@@ -82,26 +81,6 @@ locals {
     }
   }
 
-  networks = merge(local.base_networks, {
-    for network_name, network in local.base_networks :
-    network_name => merge(network, try({
-      name   = network_name
-      prefix = "${network.network}/${network.cidr}"
-    }, {}))
-  })
-
-  services = merge([
-    for network_name, network in local.networks :
-    try({
-      for service, netnum in network.netnums :
-      service => {
-        ip      = cidrhost(network.prefix, netnum)
-        network = local.networks[network_name]
-      }
-    }, {})
-    ]...
-  )
-
   container_images = {
     # Igntion
     kube_apiserver          = "ghcr.io/randomcoww/kubernetes:kube-master-v${local.kubernetes.version}"
@@ -134,6 +113,11 @@ locals {
     kasm_desktop       = "ghcr.io/randomcoww/kasm-desktop:20231220.3"
     alpaca_stream      = "ghcr.io/randomcoww/alpaca-stream-server:20230518.1"
     headscale          = "docker.io/headscale/headscale:0.22"
+  }
+
+  pxeboot_images = {
+    coreos     = "fedora-coreos-39.20240120.0"
+    silverblue = "fedora-silverblue-39.20240121.0"
   }
 
   kubernetes = {
@@ -240,5 +224,36 @@ locals {
   upstream_dns = {
     ip             = "1.1.1.1"
     tls_servername = "one.one.one.one"
+  }
+
+  # finalized local vars #
+
+  networks = merge(local.base_networks, {
+    for network_name, network in local.base_networks :
+    network_name => merge(network, try({
+      name   = network_name
+      prefix = "${network.network}/${network.cidr}"
+    }, {}))
+  })
+
+  services = merge([
+    for network_name, network in local.networks :
+    try({
+      for service, netnum in network.netnums :
+      service => {
+        ip      = cidrhost(network.prefix, netnum)
+        network = local.networks[network_name]
+      }
+    }, {})
+    ]...
+  )
+
+  pxeboot_image_set = {
+    for type, tag in local.pxeboot_images :
+    type => {
+      kernel = "${tag}-live-kernel-x86_64"
+      initrd = "${tag}-live-initramfs.x86_64.img"
+      rootfs = "${tag}-live-rootfs.x86_64.img"
+    }
   }
 }

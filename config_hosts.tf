@@ -1,26 +1,4 @@
 locals {
-  base_users = {
-    admin = {
-      name = "fcos"
-      groups = [
-        "adm",
-        "sudo",
-        "systemd-journal",
-        "wheel",
-      ]
-    }
-    client = {
-      name = "randomcoww"
-      uid  = 10000
-      groups = [
-        "adm",
-        "sudo",
-        "systemd-journal",
-        "wheel",
-      ],
-    }
-  }
-
   base_hosts = {
     gw-0 = {
       users = [
@@ -73,7 +51,21 @@ locals {
           ]
         }
       }
+      network_boot = {
+        interface = "phy0"
+        image     = local.pxeboot_image_set.coreos
+        boot_args = [
+          "numa=off",
+          "systemd.unit=multi-user.target",
+          "enforcing=0",
+        ]
+      }
+      kubernetes_node_labels = {
+        minio = true
+        kea   = true
+      }
     }
+
     gw-1 = {
       users = [
         "admin",
@@ -125,7 +117,21 @@ locals {
           ]
         }
       }
+      network_boot = {
+        interface = "phy0"
+        image     = local.pxeboot_image_set.coreos
+        boot_args = [
+          "numa=off",
+          "systemd.unit=multi-user.target",
+          "enforcing=0",
+        ]
+      }
+      kubernetes_node_labels = {
+        minio = true
+        kea   = true
+      }
     }
+
     q-0 = {
       users = [
         "admin",
@@ -176,6 +182,19 @@ locals {
             },
           ]
         }
+      }
+      network_boot = {
+        interface = "phy0"
+        image     = local.pxeboot_image_set.coreos
+        boot_args = [
+          "numa=off",
+          "systemd.unit=multi-user.target",
+          "enforcing=0",
+        ]
+      }
+      kubernetes_node_labels = {
+        minio = true
+        kea   = true
       }
     }
 
@@ -252,6 +271,22 @@ locals {
           ]
         }
       }
+      network_boot = {
+        interface = "phy0"
+        image     = local.pxeboot_image_set.silverblue
+        boot_args = [
+          "numa=off",
+          "enforcing=0",
+          "rd.driver.blacklist=nouveau",
+          "modprobe.blacklist=nouveau",
+          "nvidia-drm.modeset=1",
+          "nvidia.NVreg_OpenRmEnableUnsupportedGpus=1",
+        ]
+      }
+      kubernetes_node_labels = {
+        hostapd = true
+        nvidia  = true
+      }
     }
 
     # chromebook
@@ -287,10 +322,9 @@ locals {
     }
   }
 
-  # include de-1 in gateway but not vrrp
-  # static routes will be set but keepalived will not run and will always act as BACKUP
   base_members = {
     base              = ["gw-0", "gw-1", "q-0", "de-0", "de-1", "r-0"]
+    network-boot      = ["gw-0", "gw-1", "q-0", "de-1"]
     systemd-networkd  = ["gw-0", "gw-1", "q-0", "de-1"]
     network-manager   = ["de-0", "r-0"]
     gateway           = ["gw-0", "gw-1", "q-0"]
@@ -309,6 +343,8 @@ locals {
     remote            = ["r-0"]
     chromebook-hacks  = ["de-0"]
   }
+
+  # finalized local vars #
 
   base_hosts_1 = {
     for host_key, host in local.base_hosts :
@@ -343,16 +379,6 @@ locals {
       }
     })
   }
-
-  # finalized local vars #
-
-  users = merge(local.base_users, {
-    for type, user in local.base_users :
-    type => merge(
-      user,
-      lookup(var.users, type, {}),
-    )
-  })
 
   hosts = {
     for host_key, host in local.base_hosts_1 :
