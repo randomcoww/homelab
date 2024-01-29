@@ -1,7 +1,7 @@
 terraform {
   backend "s3" {
     bucket  = "randomcoww-tfstate"
-    key     = "helm_client-24.tfstate"
+    key     = "kubernetes_client-24.tfstate"
     region  = "us-west-2"
     encrypt = true
   }

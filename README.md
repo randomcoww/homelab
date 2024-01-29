@@ -69,7 +69,7 @@ ssh_client = {
 EOF
 ```
 
-Create `helm_client/secrets.tfvars` file
+Create `kubernetes_client/secrets.tfvars` file
 
 Reference: [Generate Authelia password hash](https://www.authelia.com/reference/guides/passwords/#user--password-file)
 
@@ -92,7 +92,7 @@ APCA_API_BASE_URL=
 ```
 
 ```bash
-cat > helm_client/secrets.tfvars <<EOF
+cat > kubernetes_client/secrets.tfvars <<EOF
 authelia_users = {
   "$GMAIL_USER" = {
     password = "$AUTHELIA_PASSWORD_HASH"
@@ -233,8 +233,8 @@ kubectl get svc
 Deploy helm charts to Kubernetes
 
 ```bash
-tw terraform -chdir=helm_client init
-tw terraform -chdir=helm_client apply -var-file=secrets.tfvars
+tw terraform -chdir=kubernetes_client init
+tw terraform -chdir=kubernetes_client apply -var-file=secrets.tfvars
 ```
 
 ---
