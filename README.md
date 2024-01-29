@@ -143,14 +143,14 @@ tw terraform -chdir=cluster_resources init
 tw terraform -chdir=cluster_resources apply -var-file=secrets.tfvars
 ```
 
-Generate CoreOS ignition for servers
+Generate ignition config for servers
 
 ```bash
 tw terraform -chdir=ignition init
 tw terraform -chdir=ignition apply -var-file=secrets.tfvars
 ```
 
-Create custom CoreOS images (see [fedora-coreos-config-custom](https://github.com/randomcoww/fedora-coreos-config-custom/blob/master/builds/server/README.md))
+Build OS images (see [fedora-coreos-config-custom](https://github.com/randomcoww/fedora-coreos-config-custom))
 
 ---
 
@@ -158,9 +158,9 @@ Create custom CoreOS images (see [fedora-coreos-config-custom](https://github.co
 
 Launch bootstrap DHCP service on a workstation on the same network as the server
 
-Path `assets_path` should contains PXE image builds from [fedora-coreos-config-custom](https://github.com/randomcoww/fedora-coreos-config-custom/blob/master/builds/server/README.md)
+Path `assets_path` should contains PXE image builds from [fedora-coreos-config-custom](https://github.com/randomcoww/fedora-coreos-config-custom)
 
-Update image tags [here](https://github.com/randomcoww/homelab/blob/master/config_pxeboot.tf#L2) to match image file names
+Update image tags under `pxeboot_images` in [environment config](https://github.com/randomcoww/homelab/blob/master/config_env.tf) to match image file names
 
 
 ```bash
@@ -241,9 +241,9 @@ tw terraform -chdir=kubernetes_client apply -var-file=secrets.tfvars
 
 ### Conifgure PXE boot from cluster
 
-Push CoreOS images generated previously into Minio (see [fedora-coreos-config-custom](https://github.com/randomcoww/fedora-coreos-config-custom/blob/master/builds/server/README.md))
+Push images generated previously into Minio (see [fedora-coreos-config-custom](https://github.com/randomcoww/fedora-coreos-config-custom))
 
-Update image tags [here](https://github.com/randomcoww/homelab/blob/master/config_pxeboot.tf#L2) with those pushed in previous step
+Update image tags under `pxeboot_images` in [environment config](https://github.com/randomcoww/homelab/blob/master/config_env.tf) to match image file names
 
 Check that matchbox pods are running
 
