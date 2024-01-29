@@ -4,7 +4,7 @@ output "manifest" {
 }
 
 output "matchbox_endpoint" {
-  value = "http://${local.listen_ip}:${local.ports.matchbox}"
+  value = "http://${local.listen_ip}:${local.service_ports.matchbox}"
 }
 
 output "matchbox_ca" {
