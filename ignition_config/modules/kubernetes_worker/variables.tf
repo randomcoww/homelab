@@ -10,14 +10,6 @@ variable "ca" {
   })
 }
 
-variable "node_labels" {
-  type = map(string)
-}
-
-variable "node_taints" {
-  type = any
-}
-
 variable "kubelet_root_path" {
   type = string
 }

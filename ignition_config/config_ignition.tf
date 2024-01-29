@@ -73,10 +73,6 @@ locals {
           ]
         }
       }
-      kubernetes_worker_labels = {
-        minio = true
-        kea   = true
-      }
     }
     gw-1 = {
       users = [
@@ -185,10 +181,6 @@ locals {
           ]
         }
       }
-      kubernetes_worker_labels = {
-        minio = true
-        kea   = true
-      }
     }
 
     de-1 = {
@@ -264,20 +256,6 @@ locals {
           ]
         }
       }
-      kubernetes_worker_labels = {
-        hostapd = true
-        nvidia  = true
-      }
-      kubernetes_worker_taints = [
-        # {
-        #   key    = "node-role.kubernetes.io/de"
-        #   effect = "NoSchedule"
-        # },
-        # {
-        #   key    = "node-role.kubernetes.io/de"
-        #   effect = "NoExecute"
-        # },
-      ]
     }
 
     # chromebook

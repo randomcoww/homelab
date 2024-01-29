@@ -24,8 +24,6 @@ locals {
       cluster_name              = var.cluster_name
       pki_path                  = local.pki_path
       pki                       = local.pki
-      node_labels               = var.node_labels
-      node_taints               = var.node_taints
       apiserver_endpoint        = var.apiserver_endpoint
       cluster_dns_ip            = var.cluster_dns_ip
       cluster_domain            = var.cluster_domain

@@ -20,11 +20,7 @@ systemd:
               --bootstrap-kubeconfig=${config_path}/bootstrap.kubeconfig \
               --cert-dir=${pki_path} \
               --config=${config_path}/kubelet-config-bootstrap-worker.yaml \
-              --kubeconfig=${config_path}/kubelet.kubeconfig \
-              --node-labels=${join(",", [
-                for node_label, value in node_labels :
-                "${node_label}=${value}"
-              ])}
+              --kubeconfig=${config_path}/kubelet.kubeconfig
 
 storage:
   files:
@@ -79,9 +75,6 @@ storage:
           registerNode: true
           failSwapOn: false
           enforceNodeAllocatable: []
-          %{~ if length(node_taints) > 0 ~}
-          ${indent(10, yamlencode({registerWithTaints = node_taints}))}
-          %{~ endif ~}
 
     - path: ${config_path}/bootstrap.kubeconfig
       mode: 0644

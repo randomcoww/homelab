@@ -189,8 +189,6 @@ module "ignition-kubernetes-worker" {
 
   cluster_name              = local.kubernetes.cluster_name
   ca                        = data.terraform_remote_state.sr.outputs.kubernetes_ca
-  node_labels               = lookup(each.value, "kubernetes_worker_labels", {})
-  node_taints               = lookup(each.value, "kubernetes_worker_taints", [])
   cni_bridge_interface_name = local.kubernetes.cni_bridge_interface_name
   apiserver_endpoint        = "https://${local.services.apiserver.ip}:${local.ports.apiserver_ha}"
   cluster_dns_ip            = local.services.cluster_dns.ip
