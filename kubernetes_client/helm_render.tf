@@ -362,8 +362,8 @@ module "code" {
     code_server    = 8080
     syncthing_peer = 22000
   }
-  user = "code"
-  uid  = 10000
+  user = local.users.client.name
+  uid  = local.users.client.uid
   ssh_known_hosts = [
     "@cert-authority * ${data.terraform_remote_state.sr.outputs.ssh_ca.public_key_openssh}",
   ]
@@ -554,8 +554,8 @@ module "kasm_desktop" {
   images = {
     kasm_desktop = local.container_images.kasm_desktop
   }
-  user = "kasm-user"
-  uid  = 10000
+  user = local.users.client.name
+  uid  = local.users.client.uid
   ssh_known_hosts = [
     "@cert-authority * ${data.terraform_remote_state.sr.outputs.ssh_ca.public_key_openssh}",
   ]

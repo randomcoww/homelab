@@ -5,7 +5,13 @@ module "ignition-base" {
   hostname = each.value.hostname
   users = [
     for user_key in each.value.users :
-    local.users[user_key]
+    merge(local.users, {
+      for type, user in local.users :
+      type => merge(
+        user,
+        lookup(var.users, type, {}),
+      )
+    })[user_key]
   ]
   upstream_dns = local.upstream_dns
 }
