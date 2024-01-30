@@ -1,6 +1,6 @@
 ---
 variant: fcos
-version: 1.5.0
+version: ${ignition_version}
 systemd:
   units:
     # /usr/bin is read-only - copy to /opt/bin to modify

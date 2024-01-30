@@ -2,6 +2,6 @@ variable "ignition_version" {
   type = string
 }
 
-variable "public_key_openssh" {
-  type = string
+variable "sunshine_config" {
+  type = map(string)
 }

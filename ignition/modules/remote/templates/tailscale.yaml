@@ -1,15 +1,15 @@
 ---
 variant: fcos
-version: 1.5.0
+version: ${ignition_version}
 storage:
   files:
     - path: /var/lib/tailscale/aws_credentials
       mode: 0600
       contents:
         inline: |
-          AWS_ACCESS_KEY_ID=${tailscale_ssm_access.access_key_id}
-          AWS_SECRET_ACCESS_KEY=${tailscale_ssm_access.secret_access_key}
-          AWS_REGION=${tailscale_ssm_access.aws_region}
+          AWS_ACCESS_KEY_ID=${ssm_access_key_id}
+          AWS_SECRET_ACCESS_KEY=${ssm_secret_access_key}
+          AWS_REGION=${ssm_region}
 
 systemd:
   units:
@@ -23,6 +23,6 @@ systemd:
             Environment=TS_DEBUG_FIREWALL_MODE=nftables
             ExecStart=
             ExecStart=/usr/sbin/tailscaled \
-              --state=arn:aws:ssm:${tailscale_ssm_access.aws_region}::parameter/${tailscale_ssm_access.resource}/%H \
+              --state=arn:aws:ssm:${ssm_region}::parameter/${ssm_resource}/%H \
               --socket=/run/tailscale/tailscaled.sock \
               --port=$${PORT} $FLAGS

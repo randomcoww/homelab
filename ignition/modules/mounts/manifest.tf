@@ -10,10 +10,11 @@ locals {
     })
   ]
 
-  module_ignition_snippets = [
-    for f in fileset(".", "${path.module}/ignition/*.yaml") :
+  ignition_snippets = [
+    for f in fileset(".", "${path.module}/templates/*.yaml") :
     templatefile(f, {
-      mounts = local.mounts
+      ignition_version = var.ignition_version
+      mounts           = local.mounts
     })
   ]
 }

@@ -1,15 +1,14 @@
 locals {
-  module_ignition_snippets = [
-    for f in fileset(".", "${path.module}/ignition/*.yaml") :
+  ignition_snippets = [
+    for f in fileset(".", "${path.module}/templates/*.yaml") :
     templatefile(f, {
+      ignition_version = var.ignition_version
       sunshine = {
-        config = {
-          key_rightalt_to_key_win = "enabled"
-          origin_web_ui_allowed   = "pc"
-          upnp                    = "off"
-          log_path                = "/dev/null"
-          file_apps               = "/etc/sunshine/apps.json"
-        }
+        config = merge(var.sunshine_config, {
+          upnp      = "off"
+          log_path  = "/dev/null"
+          file_apps = "/etc/sunshine/apps.json"
+        })
         apps = {
           env = {
             PATH = "$(PATH):$(HOME)/.local/bin"

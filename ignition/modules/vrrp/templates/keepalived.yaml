@@ -12,7 +12,7 @@ systemd:
           contents: |
             [Unit]
             PartOf=systemd-networkd.service
-            ConditionDirectoryNotEmpty=${keepalived_config_path}
+            ConditionDirectoryNotEmpty=${keepalived_path}
 
             [Service]
             EnvironmentFile=
@@ -33,4 +33,4 @@ storage:
             nftables keepalived
             max_auto_priority -1
           }
-          include ${keepalived_config_path}/*.conf
+          include ${keepalived_path}/*.conf
