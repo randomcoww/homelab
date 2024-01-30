@@ -1,5 +1,6 @@
 locals {
-  aws_region = "us-west-2"
+  aws_region       = "us-west-2"
+  ignition_version = "1.5.0"
 
   mounts = {
     containers_path = "/var/lib/containers"

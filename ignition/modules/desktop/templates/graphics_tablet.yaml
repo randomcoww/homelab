@@ -1,6 +1,6 @@
 ---
 variant: fcos
-version: 1.5.0
+version: ${ignition_version}
 storage:
   files:
     - path: /etc/systemd/user/opentabletdriver.service.d/10-dependencies.conf
