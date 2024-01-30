@@ -1,3 +1,114 @@
+# kubernetes #
+
+module "ignition-kubernetes-master" {
+  for_each = local.members.kubernetes-master
+  source   = "./modules/kubernetes_master"
+
+  ignition_version = "1.5.0"
+  name             = "kubernetes-master"
+  cluster_name     = local.kubernetes.cluster_name
+  ca               = data.terraform_remote_state.sr.outputs.kubernetes_ca
+  etcd_ca          = data.terraform_remote_state.sr.outputs.etcd_ca
+  service_account  = data.terraform_remote_state.sr.outputs.kubernetes_service_account
+  members = {
+    for host_key, host in local.members.kubernetes-master :
+    host_key => cidrhost(local.networks.kubernetes.prefix, host.netnum)
+  }
+  etcd_members = {
+    for host_key, host in local.members.etcd :
+    host_key => cidrhost(local.networks.etcd.prefix, host.netnum)
+  }
+  images = {
+    apiserver          = local.container_images.kube_apiserver
+    controller_manager = local.container_images.kube_controller_manager
+    scheduler          = local.container_images.kube_scheduler
+  }
+  ports = {
+    apiserver          = local.ports.apiserver_ha
+    apiserver_backend  = local.ports.apiserver
+    controller_manager = local.ports.controller_manager
+    scheduler          = local.ports.scheduler
+    etcd_client        = local.ports.etcd_client
+  }
+  kubelet_access_user        = local.kubernetes.kubelet_access_user
+  cluster_apiserver_endpoint = local.kubernetes_service_endpoints.apiserver
+  kubernetes_service_prefix  = local.networks.kubernetes_service.prefix
+  kubernetes_pod_prefix      = local.networks.kubernetes_pod.prefix
+
+  # VIP
+  apiserver_interface_name = each.value.tap_interfaces[local.services.apiserver.network.name].interface_name
+  sync_interface_name      = each.value.tap_interfaces.sync.interface_name
+  node_ip                  = cidrhost(local.networks.kubernetes.prefix, each.value.netnum)
+  apiserver_ip             = local.services.apiserver.ip
+  cluster_apiserver_ip     = local.services.cluster_apiserver.ip
+  virtual_router_id        = 11
+
+  # paths
+  static_pod_path = local.kubernetes.static_pod_manifest_path
+  haproxy_path    = local.vrrp.haproxy_config_path
+  keepalived_path = local.vrrp.keepalived_config_path
+}
+
+module "ignition-kubernetes-worker" {
+  for_each = local.members.kubernetes-worker
+  source   = "./modules/kubernetes_worker"
+
+  ignition_version = "1.5.0"
+  name             = "kubernetes-worker"
+  cluster_name     = local.kubernetes.cluster_name
+  ca               = data.terraform_remote_state.sr.outputs.kubernetes_ca
+  ports = {
+    kubelet = local.ports.kubelet
+  }
+  node_bootstrap_user = local.kubernetes.node_bootstrap_user
+  cluster_domain      = local.domains.kubernetes
+  apiserver_endpoint  = "https://${local.services.apiserver.ip}:${local.ports.apiserver_ha}"
+
+  cni_bridge_interface_name = local.kubernetes.cni_bridge_interface_name
+  node_ip                   = cidrhost(local.networks.kubernetes.prefix, each.value.netnum)
+  cluster_dns_ip            = local.services.cluster_dns.ip
+
+  # paths
+  kubelet_root_path      = local.kubernetes.kubelet_root_path
+  static_pod_path        = local.kubernetes.static_pod_manifest_path
+  container_storage_path = "${local.mounts.containers_path}/storage"
+}
+
+module "ignition-etcd" {
+  for_each = local.members.etcd
+  source   = "./modules/etcd_member"
+
+  ignition_version = "1.5.0"
+  name             = "etcd"
+  host_key         = each.key
+  cluster_token    = local.kubernetes.cluster_name
+  ca               = data.terraform_remote_state.sr.outputs.etcd_ca
+  peer_ca          = data.terraform_remote_state.sr.outputs.etcd_peer_ca
+  images = {
+    etcd         = local.container_images.etcd
+    etcd_wrapper = local.container_images.etcd_wrapper
+  }
+  ports = {
+    etcd_client = local.ports.etcd_client
+    etcd_peer   = local.ports.etcd_peer
+  }
+
+  members = {
+    for host_key, host in local.members.etcd :
+    host_key => cidrhost(local.networks.etcd.prefix, host.netnum)
+  }
+  etcd_ips = sort([
+    cidrhost(local.networks.etcd.prefix, each.value.netnum)
+  ])
+  s3_resource          = "${data.terraform_remote_state.sr.outputs.s3.etcd.resource}/${local.kubernetes.cluster_name}.db"
+  s3_access_key_id     = data.terraform_remote_state.sr.outputs.s3.etcd.access_key_id
+  s3_secret_access_key = data.terraform_remote_state.sr.outputs.s3.etcd.secret_access_key
+  s3_region            = data.terraform_remote_state.sr.outputs.s3.etcd.aws_region
+  static_pod_path      = local.kubernetes.static_pod_manifest_path
+}
+
+##
+
 module "ignition-base" {
   for_each = local.members.base
   source   = "./modules/base"
@@ -112,103 +223,6 @@ module "ignition-ssh-client" {
   source   = "./modules/ssh_client"
 
   public_key_openssh = data.terraform_remote_state.sr.outputs.ssh_ca.public_key_openssh
-}
-
-# etcd #
-
-module "ignition-etcd" {
-  for_each = local.members.etcd
-  source   = "./modules/etcd_member"
-
-  cluster_token = local.kubernetes.cluster_name
-  name          = each.key
-  ca            = data.terraform_remote_state.sr.outputs.etcd_ca
-  peer_ca       = data.terraform_remote_state.sr.outputs.etcd_peer_ca
-  cluster_members = {
-    for host_key, host in local.members.etcd :
-    host_key => cidrhost(local.networks.etcd.prefix, host.netnum)
-  }
-  listen_ips = sort([
-    cidrhost(local.networks.etcd.prefix, each.value.netnum)
-  ])
-  client_port              = local.ports.etcd_client
-  peer_port                = local.ports.etcd_peer
-  s3_backup_resource       = data.terraform_remote_state.sr.outputs.s3.etcd
-  static_pod_manifest_path = local.kubernetes.static_pod_manifest_path
-  container_images         = local.container_images
-}
-
-# kubernetes #
-
-module "ignition-kubernetes-master" {
-  for_each = local.members.kubernetes-master
-  source   = "./modules/kubernetes_master"
-
-  ignition_version = "1.5.0"
-  name             = "kubernetes-master"
-  cluster_name     = local.kubernetes.cluster_name
-  ca               = data.terraform_remote_state.sr.outputs.kubernetes_ca
-  etcd_ca          = data.terraform_remote_state.sr.outputs.etcd_ca
-  service_account  = data.terraform_remote_state.sr.outputs.kubernetes_service_account
-  members = {
-    for host_key, host in local.members.kubernetes-master :
-    host_key => cidrhost(local.networks.kubernetes.prefix, host.netnum)
-  }
-  etcd_members = {
-    for host_key, host in local.members.etcd :
-    host_key => cidrhost(local.networks.etcd.prefix, host.netnum)
-  }
-  images = {
-    apiserver          = local.container_images.kube_apiserver
-    controller_manager = local.container_images.kube_controller_manager
-    scheduler          = local.container_images.kube_scheduler
-  }
-  ports = {
-    apiserver          = local.ports.apiserver_ha
-    apiserver_backend  = local.ports.apiserver
-    controller_manager = local.ports.controller_manager
-    scheduler          = local.ports.scheduler
-    etcd_client        = local.ports.etcd_client
-  }
-  kubelet_access_user        = local.kubernetes.kubelet_access_user
-  cluster_apiserver_endpoint = local.kubernetes_service_endpoints.apiserver
-  kubernetes_service_prefix  = local.networks.kubernetes_service.prefix
-  kubernetes_pod_prefix      = local.networks.kubernetes_pod.prefix
-
-  # VIP
-  apiserver_interface_name = each.value.tap_interfaces[local.services.apiserver.network.name].interface_name
-  sync_interface_name      = each.value.tap_interfaces.sync.interface_name
-  node_ip                  = cidrhost(local.networks.kubernetes.prefix, each.value.netnum)
-  apiserver_ip             = local.services.apiserver.ip
-  cluster_apiserver_ip     = local.services.cluster_apiserver.ip
-  virtual_router_id        = 11
-
-  # paths
-  static_pod_path = local.kubernetes.static_pod_manifest_path
-  haproxy_path    = local.vrrp.haproxy_config_path
-  keepalived_path = local.vrrp.keepalived_config_path
-}
-
-module "ignition-kubernetes-worker" {
-  for_each = local.members.kubernetes-worker
-  source   = "./modules/kubernetes_worker"
-
-  ignition_version          = "1.5.0"
-  name                      = "kubernetes-worker"
-  cluster_name              = local.kubernetes.cluster_name
-  ca                        = data.terraform_remote_state.sr.outputs.kubernetes_ca
-  cni_bridge_interface_name = local.kubernetes.cni_bridge_interface_name
-  apiserver_endpoint        = "https://${local.services.apiserver.ip}:${local.ports.apiserver_ha}"
-  node_ip                   = cidrhost(local.networks.kubernetes.prefix, each.value.netnum)
-  cluster_dns_ip            = local.services.cluster_dns.ip
-  cluster_domain            = local.domains.kubernetes
-  kubelet_root_path         = local.kubernetes.kubelet_root_path
-  static_pod_path           = local.kubernetes.static_pod_manifest_path
-  container_storage_path    = "${local.mounts.containers_path}/storage"
-  ports = {
-    kubelet = local.ports.kubelet
-  }
-  node_bootstrap_user = local.kubernetes.node_bootstrap_user
 }
 
 module "ignition-nvidia-container" {

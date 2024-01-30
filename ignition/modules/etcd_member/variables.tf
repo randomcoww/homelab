@@ -1,8 +1,16 @@
-variable "cluster_token" {
+variable "ignition_version" {
   type = string
 }
 
 variable "name" {
+  type = string
+}
+
+variable "host_key" {
+  type = string
+}
+
+variable "cluster_token" {
   type = string
 }
 
@@ -22,35 +30,74 @@ variable "peer_ca" {
   })
 }
 
-variable "cluster_members" {
-  type = map(string)
-}
-
-variable "listen_ips" {
-  type = list(string)
-}
-
-variable "client_port" {
-  type = number
-}
-
-variable "peer_port" {
-  type = number
-}
-
-variable "s3_backup_resource" {
+variable "images" {
   type = object({
-    access_key_id     = string
-    secret_access_key = string
-    resource          = string
-    aws_region        = string
+    etcd_wrapper = string
+    etcd         = string
   })
 }
 
-variable "static_pod_manifest_path" {
+variable "ports" {
+  type = object({
+    etcd_client = number
+    etcd_peer   = number
+  })
+}
+
+variable "members" {
+  type = map(string)
+}
+
+variable "etcd_ips" {
+  type = list(string)
+}
+
+variable "s3_resource" {
   type = string
 }
 
-variable "container_images" {
-  type = map(string)
+variable "s3_access_key_id" {
+  type = string
+}
+
+variable "s3_secret_access_key" {
+  type = string
+}
+
+variable "s3_region" {
+  type = string
+}
+
+variable "healthcheck_interval" {
+  type    = string
+  default = "6s"
+}
+
+variable "backup_interval" {
+  type    = string
+  default = "15m"
+}
+
+variable "healthcheck_fail_count_allowed" {
+  type    = number
+  default = 16
+}
+
+variable "readiness_fail_count_allowed" {
+  type    = number
+  default = 64
+}
+
+variable "auto_compaction_retention" {
+  type    = number
+  default = 1
+}
+
+variable "static_pod_path" {
+  type = string
+}
+
+variable "config_base_path" {
+  type    = string
+  default = "/var/lib"
 }
