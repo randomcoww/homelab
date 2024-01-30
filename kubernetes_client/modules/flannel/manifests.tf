@@ -192,8 +192,8 @@ module "daemonset" {
         args = [
           "--ip-masq",
           "--kube-subnet-mgr",
-          "--iface=$(NODE_IP)",
-          "--public-ip=$(NODE_IP)",
+          "--iface=$(POD_IP)",
+          "--public-ip=$(POD_IP)",
         ]
         resources = {
           requests = {
@@ -231,10 +231,10 @@ module "daemonset" {
             }
           },
           {
-            name = "NODE_IP"
+            name = "POD_IP"
             valueFrom = {
               fieldRef = {
-                fieldPath = "status.hostIP"
+                fieldPath = "status.podIP"
               }
             }
           },
