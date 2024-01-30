@@ -178,8 +178,8 @@ locals {
     gateway_dns        = 53
     kea_peer           = 50060
     tftpd              = 69
-    apiserver_ha       = 58081
-    apiserver          = 58181
+    apiserver          = 58081
+    apiserver_backend  = 58181
     controller_manager = 50252
     scheduler          = 50251
     kubelet            = 50250

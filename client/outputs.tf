@@ -30,7 +30,7 @@ output "kubeconfig" {
       {
         cluster = {
           certificate-authority-data = replace(base64encode(chomp(data.terraform_remote_state.sr.outputs.kubernetes_ca.cert_pem)), "\n", "")
-          server                     = "https://${local.services.apiserver.ip}:${local.ports.apiserver_ha}"
+          server                     = "https://${local.services.apiserver.ip}:${local.ports.apiserver}"
         }
         name = local.kubernetes.cluster_name
       }
