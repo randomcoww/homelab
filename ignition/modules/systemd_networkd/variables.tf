@@ -1,3 +1,7 @@
+variable "ignition_version" {
+  type = string
+}
+
 variable "host_netnum" {
   type = number
 }
@@ -17,7 +21,7 @@ variable "bridge_interfaces" {
   default = {}
 }
 
-variable "hardware_interfaces" {
+variable "physical_interfaces" {
   type    = any
   default = {}
 }
