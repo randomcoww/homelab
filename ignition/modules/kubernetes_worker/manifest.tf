@@ -91,6 +91,7 @@ locals {
     templatefile(f, {
       ignition_version          = var.ignition_version
       node_ip                   = var.node_ip
+      config_path               = local.config_path
       kubelet_root_path         = var.kubelet_root_path
       static_pod_path           = var.static_pod_path
       kubelet_config_path       = local.config.kubelet.path

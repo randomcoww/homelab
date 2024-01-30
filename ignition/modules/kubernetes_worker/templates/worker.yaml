@@ -31,6 +31,7 @@ systemd:
               --exit-on-lock-contention \
               --lock-file=/var/run/lock/kubelet.lock \
               --node-ip=${node_ip} \
+              --cert-dir=${config_path} \
               --root-dir=${kubelet_root_path} \
               --bootstrap-kubeconfig=${bootstrap_kubeconfig_path} \
               --config=${kubelet_config_path} \
