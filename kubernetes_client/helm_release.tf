@@ -1,25 +1,25 @@
 resource "helm_release" "wrapper" {
   for_each = {
-    for chart in [
-      module.mpd.chart,
-      module.transmission.chart,
-      module.alpaca_stream.chart,
-      module.hostapd.chart,
-      module.code.chart,
-      module.vaultwarden.chart,
-      module.authelia.chart,
-      module.kube_dns.chart,
-      module.kea.chart,
-      module.flannel.chart,
-      module.kapprover.chart,
-      module.fuse_device_plugin.chart,
-      module.matchbox.chart,
-      module.bootstrap.chart,
-      module.kube_proxy.chart,
-      # module.kasm_desktop.chart,
-      # module.headscale.chart,
+    for m in [
+      module.mpd,
+      module.transmission,
+      module.alpaca_stream,
+      module.hostapd,
+      module.code,
+      module.vaultwarden,
+      module.authelia,
+      module.kube_dns,
+      module.kea,
+      module.flannel,
+      module.kapprover,
+      module.fuse_device_plugin,
+      module.matchbox,
+      module.bootstrap,
+      module.kube_proxy,
+      # module.kasm_desktop,
+      # module.headscale,
     ] :
-    chart.name => chart
+    m.chart.name => m.chart
   }
   chart            = "./local/helm-wrapper"
   name             = each.key

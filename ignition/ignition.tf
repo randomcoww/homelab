@@ -1,4 +1,4 @@
-module "ignition-base" {
+module "base" {
   for_each = local.members.base
   source   = "./modules/base"
 
@@ -19,7 +19,7 @@ module "ignition-base" {
 
 # disk #
 
-module "ignition-disks" {
+module "disks" {
   for_each = local.members.disks
   source   = "./modules/disks"
 
@@ -27,7 +27,7 @@ module "ignition-disks" {
   disks            = lookup(each.value, "disks", {})
 }
 
-module "ignition-mounts" {
+module "mounts" {
   for_each = local.members.mounts
   source   = "./modules/mounts"
 
@@ -37,7 +37,7 @@ module "ignition-mounts" {
 
 # network #
 
-module "ignition-vrrp" {
+module "vrrp" {
   for_each = local.members.vrrp
   source   = "./modules/vrrp"
 
@@ -46,7 +46,7 @@ module "ignition-vrrp" {
   keepalived_path  = local.vrrp.keepalived_config_path
 }
 
-module "ignition-gateway" {
+module "gateway" {
   for_each = local.members.gateway
   source   = "./modules/gateway"
 
@@ -85,7 +85,7 @@ module "ignition-gateway" {
   keepalived_path     = local.vrrp.keepalived_config_path
 }
 
-module "ignition-systemd-networkd" {
+module "systemd-networkd" {
   for_each = local.members.systemd-networkd
   source   = "./modules/systemd_networkd"
 
@@ -98,7 +98,7 @@ module "ignition-systemd-networkd" {
   tap_interfaces      = lookup(each.value, "tap_interfaces", {})
 }
 
-module "ignition-network-manager" {
+module "network-manager" {
   for_each         = local.members.network-manager
   source           = "./modules/network_manager"
   ignition_version = local.ignition_version
@@ -106,7 +106,7 @@ module "ignition-network-manager" {
 
 # kubernetes #
 
-module "ignition-kubernetes-master" {
+module "kubernetes-master" {
   for_each = local.members.kubernetes-master
   source   = "./modules/kubernetes_master"
 
@@ -151,7 +151,7 @@ module "ignition-kubernetes-master" {
   keepalived_path            = local.vrrp.keepalived_config_path
 }
 
-module "ignition-kubernetes-worker" {
+module "kubernetes-worker" {
   for_each = local.members.kubernetes-worker
   source   = "./modules/kubernetes_worker"
 
@@ -173,7 +173,7 @@ module "ignition-kubernetes-worker" {
   container_storage_path    = "${local.mounts.containers_path}/storage"
 }
 
-module "ignition-etcd" {
+module "etcd" {
   for_each = local.members.etcd
   source   = "./modules/etcd_member"
 
@@ -206,7 +206,7 @@ module "ignition-etcd" {
   static_pod_path      = local.kubernetes.static_pod_manifest_path
 }
 
-module "ignition-nvidia-container" {
+module "nvidia-container" {
   for_each = local.members.nvidia-container
   source   = "./modules/nvidia_container"
 
@@ -215,7 +215,7 @@ module "ignition-nvidia-container" {
 
 # SSH CA #
 
-module "ignition-ssh-server" {
+module "ssh-server" {
   for_each = local.members.ssh-server
   source   = "./modules/ssh_server"
 
@@ -233,7 +233,7 @@ module "ignition-ssh-server" {
   ca = data.terraform_remote_state.sr.outputs.ssh_ca
 }
 
-module "ignition-ssh-client" {
+module "ssh-client" {
   for_each = local.members.ssh-client
   source   = "./modules/ssh_client"
 
@@ -243,14 +243,14 @@ module "ignition-ssh-client" {
 
 # desktop environment #
 
-module "ignition-desktop" {
+module "desktop" {
   for_each = local.members.desktop
   source   = "./modules/desktop"
 
   ignition_version = local.ignition_version
 }
 
-module "ignition-sunshine" {
+module "sunshine" {
   for_each = local.members.sunshine
   source   = "./modules/sunshine"
 
@@ -261,7 +261,7 @@ module "ignition-sunshine" {
   }
 }
 
-module "ignition-chromebook-hacks" {
+module "chromebook-hacks" {
   for_each = local.members.chromebook-hacks
   source   = "./modules/chromebook_hacks"
 
@@ -270,7 +270,7 @@ module "ignition-chromebook-hacks" {
 
 # remote client #
 
-module "ignition-remote" {
+module "remote" {
   for_each = local.members.remote
   source   = "./modules/remote"
 
@@ -281,29 +281,32 @@ module "ignition-remote" {
   ssm_region            = data.terraform_remote_state.sr.outputs.ssm.tailscale.aws_region
 }
 
-# Render all
+# render ignition to output and local files
 
 data "ct_config" "ignition" {
   for_each = {
     for host_key in keys(local.hosts) :
     host_key => flatten([
-      try(module.ignition-base[host_key].ignition_snippets, []),
-      try(module.ignition-systemd-networkd[host_key].ignition_snippets, []),
-      try(module.ignition-network-manager[host_key].ignition_snippets, []),
-      try(module.ignition-gateway[host_key].ignition_snippets, []),
-      try(module.ignition-vrrp[host_key].ignition_snippets, []),
-      try(module.ignition-disks[host_key].ignition_snippets, []),
-      try(module.ignition-mounts[host_key].ignition_snippets, []),
-      try(module.ignition-etcd[host_key].ignition_snippets, []),
-      try(module.ignition-kubernetes-master[host_key].ignition_snippets, []),
-      try(module.ignition-kubernetes-worker[host_key].ignition_snippets, []),
-      try(module.ignition-nvidia-container[host_key].ignition_snippets, []),
-      try(module.ignition-ssh-server[host_key].ignition_snippets, []),
-      try(module.ignition-ssh-client[host_key].ignition_snippets, []),
-      try(module.ignition-desktop[host_key].ignition_snippets, []),
-      try(module.ignition-sunshine[host_key].ignition_snippets, []),
-      try(module.ignition-remote[host_key].ignition_snippets, []),
-      try(module.ignition-chromebook-hacks[host_key].ignition_snippets, []),
+      for m in [
+        module.base,
+        module.systemd-networkd,
+        module.network-manager,
+        module.gateway,
+        module.vrrp,
+        module.disks,
+        module.mounts,
+        module.etcd,
+        module.kubernetes-master,
+        module.kubernetes-worker,
+        module.nvidia-container,
+        module.ssh-server,
+        module.ssh-client,
+        module.desktop,
+        module.sunshine,
+        module.remote,
+        module.chromebook-hacks,
+      ] :
+      try(m[host_key].ignition_snippets, [])
     ])
   }
   content  = <<-EOF
@@ -315,8 +318,6 @@ data "ct_config" "ignition" {
   snippets = each.value
 }
 
-# Outputs
-
 output "ignition" {
   value = {
     for host_key, content in data.ct_config.ignition :
@@ -326,7 +327,6 @@ output "ignition" {
 }
 
 # Write local files so that PXE update can work during outage
-
 resource "local_file" "ignition" {
   for_each = local.hosts
 
