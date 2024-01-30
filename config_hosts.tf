@@ -5,7 +5,7 @@ locals {
         "admin",
       ]
       netnum = 1
-      hardware_interfaces = {
+      physical_interfaces = {
         phy0 = {
           mac   = "1c-83-41-30-e2-23"
           mtu   = 9000
@@ -71,7 +71,7 @@ locals {
         "admin",
       ]
       netnum = 3
-      hardware_interfaces = {
+      physical_interfaces = {
         phy0 = {
           mac   = "1c-83-41-30-bd-6f"
           mtu   = 9000
@@ -137,7 +137,7 @@ locals {
         "admin",
       ]
       netnum = 5
-      hardware_interfaces = {
+      physical_interfaces = {
         phy0 = {
           mac   = "1c-83-41-30-e2-54"
           mtu   = 9000
@@ -203,7 +203,7 @@ locals {
         "client",
       ]
       netnum = 6
-      hardware_interfaces = {
+      physical_interfaces = {
         phy0 = {
           mac   = "74-56-3c-c3-10-68"
           mtu   = 9000
@@ -367,8 +367,8 @@ locals {
         })
       }
 
-      hardware_interfaces = {
-        for hardware_interface_name, hardware_interface in lookup(host, "hardware_interfaces", {}) :
+      physical_interfaces = {
+        for hardware_interface_name, hardware_interface in lookup(host, "physical_interfaces", {}) :
         hardware_interface_name => merge(hardware_interface, {
           vlans = {
             for i, network_name in lookup(hardware_interface, "vlans", []) :
