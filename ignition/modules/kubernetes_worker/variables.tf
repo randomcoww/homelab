@@ -20,7 +20,7 @@ variable "ca" {
 
 variable "ports" {
   type = object({
-    kubelet = string
+    kubelet = number
   })
 }
 
