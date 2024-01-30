@@ -60,7 +60,7 @@ variable "etcd_members" {
   type = map(string)
 }
 
-variable "cluster_apiserver_hostname" {
+variable "cluster_apiserver_endpoint" {
   type = string
 }
 
@@ -94,12 +94,16 @@ variable "apiserver_interface_name" {
   type = string
 }
 
-variable "apiserver_vip" {
+variable "node_ip" {
   type = string
 }
 
-variable "apiserver_listen_ips" {
-  type = list(string)
+variable "apiserver_ip" {
+  type = string
+}
+
+variable "cluster_apiserver_ip" {
+  type = string
 }
 
 variable "virtual_router_id" {

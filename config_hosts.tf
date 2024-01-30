@@ -336,7 +336,6 @@ locals {
     ssh-server        = ["gw-0", "gw-1", "q-0", "de-1", "r-0"]
     ssh-client        = ["de-0", "de-1"]
     etcd              = ["gw-0", "gw-1", "q-0"]
-    kubelet-base      = ["gw-0", "gw-1", "q-0", "de-0", "de-1", "r-0"]
     kubernetes-master = ["gw-0", "gw-1"]
     kubernetes-worker = ["gw-0", "gw-1", "q-0", "de-1"]
     nvidia-container  = ["de-1"]

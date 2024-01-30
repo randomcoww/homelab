@@ -33,15 +33,6 @@ module "ignition-network-manager" {
   source   = "./modules/network_manager"
 }
 
-module "ignition-kubelet-base" {
-  for_each = local.members.kubelet-base
-  source   = "./modules/kubelet_base"
-
-  node_ip                  = try(cidrhost(local.networks.kubernetes.prefix, each.value.netnum), "")
-  static_pod_manifest_path = local.kubernetes.static_pod_manifest_path
-  container_storage_path   = "${local.mounts.containers_path}/storage"
-}
-
 module "ignition-gateway" {
   for_each = local.members.gateway
   source   = "./modules/gateway"
@@ -154,12 +145,11 @@ module "ignition-kubernetes-master" {
   source   = "./modules/kubernetes_master"
 
   ignition_version = "1.5.0"
-
-  name            = "kubernetes-master"
-  cluster_name    = local.kubernetes.cluster_name
-  ca              = data.terraform_remote_state.sr.outputs.kubernetes_ca
-  etcd_ca         = data.terraform_remote_state.sr.outputs.etcd_ca
-  service_account = data.terraform_remote_state.sr.outputs.kubernetes_service_account
+  name             = "kubernetes-master"
+  cluster_name     = local.kubernetes.cluster_name
+  ca               = data.terraform_remote_state.sr.outputs.kubernetes_ca
+  etcd_ca          = data.terraform_remote_state.sr.outputs.etcd_ca
+  service_account  = data.terraform_remote_state.sr.outputs.kubernetes_service_account
   members = {
     for host_key, host in local.members.kubernetes-master :
     host_key => cidrhost(local.networks.kubernetes.prefix, host.netnum)
@@ -170,8 +160,8 @@ module "ignition-kubernetes-master" {
   }
   images = {
     apiserver          = local.container_images.kube_apiserver
-    controller_manager = local.container_images.kube_apiserver
-    scheduler          = local.container_images.kube_apiserver
+    controller_manager = local.container_images.kube_controller_manager
+    scheduler          = local.container_images.kube_scheduler
   }
   ports = {
     apiserver          = local.ports.apiserver_ha
@@ -181,20 +171,17 @@ module "ignition-kubernetes-master" {
     etcd_client        = local.ports.etcd_client
   }
   kubelet_access_user        = local.kubernetes.kubelet_access_user
-  cluster_apiserver_hostname = local.kubernetes_service_endpoints.apiserver
+  cluster_apiserver_endpoint = local.kubernetes_service_endpoints.apiserver
   kubernetes_service_prefix  = local.networks.kubernetes_service.prefix
   kubernetes_pod_prefix      = local.networks.kubernetes_pod.prefix
 
   # VIP
   apiserver_interface_name = each.value.tap_interfaces[local.services.apiserver.network.name].interface_name
   sync_interface_name      = each.value.tap_interfaces.sync.interface_name
-  apiserver_vip            = local.services.apiserver.ip
-  apiserver_listen_ips = sort([
-    cidrhost(local.networks.kubernetes.prefix, each.value.netnum),
-    local.services.apiserver.ip,
-    local.services.cluster_apiserver.ip,
-  ])
-  virtual_router_id = 11
+  node_ip                  = cidrhost(local.networks.kubernetes.prefix, each.value.netnum)
+  apiserver_ip             = local.services.apiserver.ip
+  cluster_apiserver_ip     = local.services.cluster_apiserver.ip
+  virtual_router_id        = 11
 
   # paths
   static_pod_path = local.kubernetes.static_pod_manifest_path
@@ -206,16 +193,22 @@ module "ignition-kubernetes-worker" {
   for_each = local.members.kubernetes-worker
   source   = "./modules/kubernetes_worker"
 
+  ignition_version          = "1.5.0"
+  name                      = "kubernetes-worker"
   cluster_name              = local.kubernetes.cluster_name
   ca                        = data.terraform_remote_state.sr.outputs.kubernetes_ca
   cni_bridge_interface_name = local.kubernetes.cni_bridge_interface_name
   apiserver_endpoint        = "https://${local.services.apiserver.ip}:${local.ports.apiserver_ha}"
+  node_ip                   = cidrhost(local.networks.kubernetes.prefix, each.value.netnum)
   cluster_dns_ip            = local.services.cluster_dns.ip
   cluster_domain            = local.domains.kubernetes
   kubelet_root_path         = local.kubernetes.kubelet_root_path
-  static_pod_manifest_path  = local.kubernetes.static_pod_manifest_path
-  kubelet_port              = local.ports.kubelet
-  kube_node_bootstrap_user  = local.kubernetes.node_bootstrap_user
+  static_pod_path           = local.kubernetes.static_pod_manifest_path
+  container_storage_path    = "${local.mounts.containers_path}/storage"
+  ports = {
+    kubelet = local.ports.kubelet
+  }
+  node_bootstrap_user = local.kubernetes.node_bootstrap_user
 }
 
 module "ignition-nvidia-container" {
@@ -265,7 +258,6 @@ data "ct_config" "ignition" {
       try(module.ignition-vrrp[host_key].ignition_snippets, []),
       try(module.ignition-disks[host_key].ignition_snippets, []),
       try(module.ignition-mounts[host_key].ignition_snippets, []),
-      try(module.ignition-kubelet-base[host_key].ignition_snippets, []),
       try(module.ignition-etcd[host_key].ignition_snippets, []),
       try(module.ignition-kubernetes-master[host_key].ignition_snippets, []),
       try(module.ignition-kubernetes-worker[host_key].ignition_snippets, []),

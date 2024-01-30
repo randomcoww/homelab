@@ -93,46 +93,6 @@ locals {
     })
   }
 
-  vip = {
-    haproxy = {
-      path     = "${var.haproxy_path}/${var.name}.cfg"
-      contents = <<-EOF
-      frontend kube-apiserver
-        bind :::${var.ports.apiserver} v4v6
-        mode tcp
-        default_backend kube-apiserver
-
-      backend kube-apiserver
-        option httpchk GET /readyz HTTP/1.0
-        http-check expect status 200
-        mode tcp
-        balance leastconn
-        default-server verify none check-ssl rise 2 fall 2 maxconn 5000 maxqueue 5000 weight 100
-        %{~for i, ip in sort(values(var.members))~}
-        server ${var.name}-${i} ${ip}:${var.ports.apiserver_backend} check
-        %{~endfor~}
-      EOF
-    }
-    keepalived = {
-      path     = "${var.keepalived_path}/${var.name}.conf"
-      contents = <<-EOF
-      vrrp_instance kube-apiserver {
-        preempt
-        state BACKUP
-        advert_int 0.1
-        virtual_router_id ${var.virtual_router_id}
-        interface ${var.sync_interface_name}
-        priority 250
-        garp_master_delay 1
-        garp_master_refresh 1
-        virtual_ipaddress {
-          ${var.apiserver_vip} dev ${var.apiserver_interface_name} use_vmac
-        }
-      }
-      EOF
-    }
-  }
-
   ignition_snippet = yamlencode({
     variant = "fcos"
     version = var.ignition_version
@@ -143,7 +103,44 @@ locals {
           values(local.kubeconfig),
           values(local.config),
           values(local.static_pod),
-          values(local.vip),
+          [
+            {
+              path     = "${var.haproxy_path}/${var.name}.cfg"
+              contents = <<-EOF
+              frontend kube-apiserver
+                bind :::${var.ports.apiserver} v4v6
+                mode tcp
+                default_backend kube-apiserver
+
+              backend kube-apiserver
+                option httpchk GET /readyz HTTP/1.0
+                http-check expect status 200
+                mode tcp
+                balance leastconn
+                default-server verify none check-ssl rise 2 fall 2 maxconn 5000 maxqueue 5000 weight 100
+                %{~for i, ip in sort(values(var.members))~}
+                server ${var.name}-${i} ${ip}:${var.ports.apiserver_backend} check
+                %{~endfor~}
+              EOF
+            },
+            {
+              path     = "${var.keepalived_path}/${var.name}.conf"
+              contents = <<-EOF
+              vrrp_instance kube-apiserver {
+                preempt
+                state BACKUP
+                advert_int 0.1
+                virtual_router_id ${var.virtual_router_id}
+                interface ${var.sync_interface_name}
+                priority 250
+                garp_master_delay 1
+                garp_master_refresh 1
+                virtual_ipaddress {
+                  ${var.apiserver_ip} dev ${var.apiserver_interface_name} use_vmac
+                }
+              EOF
+            },
+          ],
         ) :
         merge({
           mode = 384
@@ -206,7 +203,7 @@ module "apiserver" {
           "--kubelet-preferred-address-types=InternalDNS,InternalIP",
           "--runtime-config=api/all=true",
           "--secure-port=${var.ports.apiserver_backend}",
-          "--service-account-issuer=https://${var.cluster_apiserver_hostname}",
+          "--service-account-issuer=https://${var.cluster_apiserver_endpoint}",
           "--service-account-key-file=${local.pki.service-account-cert.path}",
           "--service-account-signing-key-file=${local.pki.service-account-key.path}",
           "--service-cluster-ip-range=${var.kubernetes_service_prefix}",

@@ -1,3 +1,11 @@
+variable "ignition_version" {
+  type = string
+}
+
+variable "name" {
+  type = string
+}
+
 variable "cluster_name" {
   type = string
 }
@@ -10,15 +18,17 @@ variable "ca" {
   })
 }
 
-variable "kubelet_root_path" {
-  type = string
-}
-
-variable "static_pod_manifest_path" {
-  type = string
+variable "ports" {
+  type = object({
+    kubelet = string
+  })
 }
 
 variable "cni_bridge_interface_name" {
+  type = string
+}
+
+variable "node_bootstrap_user" {
   type = string
 }
 
@@ -30,14 +40,27 @@ variable "apiserver_endpoint" {
   type = string
 }
 
+variable "node_ip" {
+  type = string
+}
+
 variable "cluster_dns_ip" {
   type = string
 }
 
-variable "kubelet_port" {
-  type = number
+variable "config_base_path" {
+  type    = string
+  default = "/var/lib"
 }
 
-variable "kube_node_bootstrap_user" {
+variable "kubelet_root_path" {
+  type = string
+}
+
+variable "static_pod_path" {
+  type = string
+}
+
+variable "container_storage_path" {
   type = string
 }
