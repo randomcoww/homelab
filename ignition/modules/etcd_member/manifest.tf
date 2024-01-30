@@ -74,25 +74,27 @@ locals {
     })
   }
 
-  ignition_snippet = yamlencode({
-    variant = "fcos"
-    version = var.ignition_version
-    storage = {
-      files = [
-        for _, f in concat(
-          values(local.pki),
-          values(local.static_pod),
-        ) :
-        merge({
-          mode = 384
-          }, f, {
-          contents = {
-            inline = f.contents
-          }
-        })
-      ]
-    }
-  })
+  ignition_snippets = [
+    yamlencode({
+      variant = "fcos"
+      version = var.ignition_version
+      storage = {
+        files = [
+          for _, f in concat(
+            values(local.pki),
+            values(local.static_pod),
+          ) :
+          merge({
+            mode = 384
+            }, f, {
+            contents = {
+              inline = f.contents
+            }
+          })
+        ]
+      }
+    })
+  ]
 }
 
 module "etcd-wrapper" {

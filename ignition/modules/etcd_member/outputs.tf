@@ -1,3 +1,3 @@
 output "ignition_snippets" {
-  value = [local.ignition_snippet]
+  value = local.ignition_snippets
 }
