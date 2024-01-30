@@ -48,7 +48,7 @@ locals {
         contents = module.controller-manager-kubeconfig.manifest
       }
       scheduler = {
-        contents = module.controller-manager-kubeconfig.manifest
+        contents = module.scheduler-kubeconfig.manifest
       }
     } :
     key => merge(f, {
@@ -100,8 +100,8 @@ locals {
       name             = var.name
       ports            = var.ports
       backend_servers = {
-        for i, ip in sort(values(var.members)) :
-        "${var.name}-${i}" => "${ip}:${var.ports.apiserver_backend}"
+        for host_key, ip in var.members :
+        "${host_key}" => "${ip}:${var.ports.apiserver_backend}"
       }
       virtual_router_id        = var.virtual_router_id
       sync_interface_name      = var.sync_interface_name
@@ -165,7 +165,7 @@ module "apiserver" {
         image = var.images.apiserver
         command = [
           "kube-apiserver",
-          "--advertise-address=$(NODE_IP)",
+          "--advertise-address=$(POD_IP)",
           "--allow-privileged=true",
           "--authorization-mode=Node,RBAC",
           "--bind-address=0.0.0.0",
@@ -194,13 +194,13 @@ module "apiserver" {
         ]
         env = [
           {
-            name = "NODE_IP"
+            name = "POD_IP"
             valueFrom = {
               fieldRef = {
-                fieldPath = "status.hostIP"
+                fieldPath = "status.podIP"
               }
-            },
-          }
+            }
+          },
         ]
         livenessProbe = {
           httpGet = {
