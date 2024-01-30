@@ -8,7 +8,7 @@ module "bootstrap" {
   kube_kubelet_access_user = local.kubernetes.kubelet_access_user
 }
 
-module "kube_proxy" {
+module "kube-proxy" {
   source    = "./modules/kube_proxy"
   name      = "kube-proxy"
   namespace = "kube-system"
@@ -49,7 +49,7 @@ module "kapprover" {
   }
 }
 
-module "kube_dns" {
+module "kube-dns" {
   source         = "./modules/kube_dns"
   name           = "kube-dns"
   namespace      = "kube-system"
@@ -115,7 +115,7 @@ module "kube_dns" {
   ]
 }
 
-module "fuse_device_plugin" {
+module "fuse-device-plugin" {
   source    = "./modules/fuse_device_plugin"
   name      = "fuse-device-plugin"
   namespace = "kube-system"
@@ -480,7 +480,7 @@ module "transmission" {
   nginx_ingress_annotations = local.nginx_ingress_auth_annotations
 }
 
-module "alpaca_stream" {
+module "alpaca-stream" {
   source  = "./modules/alpaca_stream"
   name    = "alpaca-stream"
   release = "0.1.1"
@@ -547,7 +547,7 @@ module "mpd" {
   nginx_ingress_annotations = local.nginx_ingress_auth_annotations
 }
 
-module "kasm_desktop" {
+module "kasm-desktop" {
   source  = "./modules/kasm_desktop"
   name    = "kasm-desktop"
   release = "0.1.1"
