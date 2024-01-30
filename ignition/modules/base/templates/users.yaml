@@ -1,15 +1,6 @@
 ---
 variant: fcos
-version: 1.5.0
-passwd:
-  users:
-    ${indent(4, yamlencode(
-      concat(users, [{
-        name = "core"
-        should_exist = false
-      }])
-    ))}
-
+version: ${ignition_version}
 storage:
   files:
     - path: /etc/sudoers.d/coreos-sudo-group
