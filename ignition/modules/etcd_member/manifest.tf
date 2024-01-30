@@ -125,6 +125,7 @@ module "etcd-wrapper" {
           "--etcd-image=${var.images.etcd}",
           "--etcd-snaphot-file=${local.etcd_snapshot_file}",
           "--etcd-pod-name=etcd",
+          "--etcd-pod-namespace=$(POD_NAMESPACE)",
           "--etcd-pod-manifest-file=${local.etcd_manifest_file}",
           # etcd-wrapper args
           "--client-cert-file=${local.pki.client-cert.path}",
@@ -136,36 +137,44 @@ module "etcd-wrapper" {
           "--healthcheck-fail-count-allowed=${var.healthcheck_fail_count_allowed}",
           "--readiness-fail-count-allowed=${var.readiness_fail_count_allowed}",
         ]
+        env = [
+          {
+            name = "POD_NAMESPACE"
+            valueFrom = {
+              fieldRef = {
+                fieldPath = "metadata.namespace"
+              }
+            }
+          },
+          {
+            name  = "AWS_ACCESS_KEY_ID"
+            value = var.s3_access_key_id
+          },
+          {
+            name  = "AWS_SECRET_ACCESS_KEY"
+            value = var.s3_secret_access_key
+          },
+          {
+            name  = "AWS_DEFAULT_REGION"
+            value = var.s3_region
+          },
+          {
+            name  = "AWS_SDK_LOAD_CONFIG"
+            value = "1"
+          },
+        ]
+        volumeMounts = [
+          {
+            name      = "config"
+            mountPath = local.config_path
+            readOnly  = true
+          },
+          {
+            name      = "static-pod"
+            mountPath = var.static_pod_path
+          },
+        ]
       },
-    ]
-    env = [
-      {
-        name  = "AWS_ACCESS_KEY_ID"
-        value = var.s3_access_key_id
-      },
-      {
-        name  = "AWS_SECRET_ACCESS_KEY"
-        value = var.s3_secret_access_key
-      },
-      {
-        name  = "AWS_DEFAULT_REGION"
-        value = var.s3_region
-      },
-      {
-        name  = "AWS_SDK_LOAD_CONFIG"
-        value = "1"
-      },
-    ]
-    volumeMounts = [
-      {
-        name      = "config"
-        mountPath = local.config_path
-        readOnly  = true
-      },
-      {
-        name      = "static-pod"
-        mountPath = var.static_pod_path
-      }
     ]
     volumes = [
       {
