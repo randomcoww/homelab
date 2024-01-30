@@ -1,13 +1,19 @@
-variable "container_images" {
-  type = map(string)
+variable "ignition_version" {
+  type = string
+}
+
+variable "name" {
+  type = string
+}
+
+variable "ports" {
+  type = object({
+    gateway_dns = number
+  })
 }
 
 variable "host_netnum" {
   type = number
-}
-
-variable "static_pod_manifest_path" {
-  type = string
 }
 
 variable "accept_prefixes" {
@@ -30,11 +36,11 @@ variable "sync_interface_name" {
   type = string
 }
 
-variable "sync_prefix" {
+variable "lan_interface_name" {
   type = string
 }
 
-variable "lan_interface_name" {
+variable "sync_prefix" {
   type = string
 }
 
@@ -42,15 +48,14 @@ variable "lan_prefix" {
   type = string
 }
 
-variable "lan_vip" {
+variable "lan_gateway_ip" {
   type = string
 }
 
-variable "dns_port" {
+variable "virtual_router_id" {
   type = number
 }
 
-variable "keepalived_config_path" {
-  type    = string
-  default = "/etc/keepalived/keepalived.conf.d"
+variable "keepalived_path" {
+  type = string
 }

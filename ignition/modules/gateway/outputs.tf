@@ -1,5 +1,3 @@
 output "ignition_snippets" {
-  value = concat(
-    local.module_ignition_snippets,
-  )
+  value = local.ignition_snippets
 }

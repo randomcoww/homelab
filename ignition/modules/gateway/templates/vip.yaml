@@ -1,9 +1,9 @@
 ---
 variant: fcos
-version: 1.5.0
+version: ${ignition_version}
 storage:
   files:
-    - path: ${keepalived_config_path}/20-gateway.conf
+    - path: ${keepalived_path}/${name}.conf
       mode: 0644
       contents:
         inline: |
@@ -18,7 +18,7 @@ storage:
             garp_master_refresh 1
             virtual_ipaddress {
               0.0.0.0 dev ${wan_interface_name} use_vmac no_track
-              ${lan_vip} dev ${lan_interface_name} use_vmac
+              ${lan_gateway_ip} dev ${lan_interface_name} use_vmac
             }
             virtual_rules {
               to all lookup ${vrrp_master_default_route.table_id} priority ${vrrp_master_default_route.table_priority}
@@ -31,7 +31,7 @@ storage:
       contents:
         inline: |
           [Resolve]
-          DNSStubListenerExtra=0.0.0.0:${dns_port}
+          DNSStubListenerExtra=0.0.0.0:${ports.gateway_dns}
 
     # Create fallback route so backup node can access the internet through the wan interface
     - path: /etc/systemd/network/20-${wan_interface_name}.network.d/20-master-default-route.conf
@@ -48,7 +48,7 @@ storage:
         inline: |
           [Route]
           Scope=global
-          Gateway=${lan_vip}
+          Gateway=${lan_gateway_ip}
           GatewayOnLink=true
           Destination=0.0.0.0/0
           Table=${vrrp_slave_default_route.table_id}

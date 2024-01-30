@@ -1,19 +1,19 @@
 ---
 variant: fcos
-version: 1.5.0
+version: ${ignition_version}
 systemd:
   units:
-    - name: nftables@${nftables_namespace}.service
+    - name: nftables@${name}.service
       enabled: true
 
 storage:
   files:
-    - path: /etc/nftables/${nftables_namespace}.nft
+    - path: /etc/nftables/${name}.nft
       mode: 0644
       overwrite: true
       contents:
         inline: |
-          table ip ${nftables_namespace} {
+          table ip ${name} {
             chain base-checks {
               ct state {established, related} accept;
               ct state invalid drop;
