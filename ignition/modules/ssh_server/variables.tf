@@ -1,5 +1,17 @@
+variable "ignition_version" {
+  type = string
+}
+
 variable "key_id" {
   type = string
+}
+
+variable "ca" {
+  type = object({
+    algorithm          = string
+    private_key_pem    = string
+    public_key_openssh = string
+  })
 }
 
 variable "valid_principals" {
@@ -15,12 +27,4 @@ variable "early_renewal_hours" {
 variable "validity_period_hours" {
   type    = number
   default = 8760
-}
-
-variable "ca" {
-  type = object({
-    algorithm          = string
-    private_key_pem    = string
-    public_key_openssh = string
-  })
 }
