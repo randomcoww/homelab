@@ -1,0 +1,102 @@
+---
+variant: fcos
+version: ${ignition_version}
+systemd:
+  units:
+    - name: crio.service
+      enabled: true
+      dropins:
+        - name: 10-local-fs-wait.conf
+          contents: |
+            [Unit]
+            Wants=local-fs.target
+            After=local-fs.target
+    - name: kubelet.service
+      enabled: true
+      dropins:
+        - name: 20-bootstrap-worker.conf
+          contents: |
+            [Unit]
+            Wants=crio.service
+            After=crio.service
+            Wants=local-fs.target
+            After=local-fs.target
+
+            [Service]
+            ExecStartPre=/usr/bin/mkdir -p \
+              ${kubelet_root_path} \
+              ${static_pod_path}
+            ExecStart=
+            ExecStart=/usr/bin/kubelet \
+              --exit-on-lock-contention \
+              --lock-file=/var/run/lock/kubelet.lock \
+              --node-ip=${node_ip} \
+              --root-dir=${kubelet_root_path} \
+              --bootstrap-kubeconfig=${bootstrap_kubeconfig_path} \
+              --config=${kubelet_config_path} \
+              --kubeconfig=${kubeconfig_path} \
+              --v=2
+
+storage:
+  files:
+    # nf_call_iptables disabled gloablly except for CNI #
+    - path: /etc/udev/rules.d/10-cni-nf-call-iptables.rules
+      mode: 0644
+      contents:
+        inline: |
+          SUBSYSTEM=="net", ACTION=="add", KERNEL=="${cni_bridge_interface_name}", ATTR{bridge/nf_call_iptables}="1"
+    # inhibit shutdown for graceful node shutdown
+    - path: /etc/systemd/logind.conf.d/10-kubelet-graceful-shutdown.conf
+      mode: 0644
+      contents:
+        inline: |
+          [Login]
+          InhibitDelayMaxSec=180
+    # mayastor hugepages #
+    - path: /etc/sysctl.d/20-hugepages.conf
+      mode: 0644
+      contents:
+        inline: |
+          vm.nr_hugepages=1024
+    # mayastor #
+    - path: /etc/modules-load.d/20-nvme-tcp.conf
+      mode: 0644
+      contents:
+        inline: |
+          nvme_tcp
+    - path: /etc/crio/crio.conf.d/10-custom.conf
+      mode: 0644
+      contents:
+        inline: |
+          [crio]
+          root="${container_storage_path}"
+
+          [crio.api]
+          listen="${crio_socket}"
+
+          [crio.image]
+          big_files_temporary_dir="${container_storage_path}"
+
+          [crio.runtime]
+          default_runtime="crun"
+          hooks_dir=["/usr/share/containers/oci/hooks.d"]
+          selinux=true
+
+          [crio.runtime.runtimes.crun]
+          runtime_path="/usr/bin/crun"
+
+          [crio.network]
+          plugin_dirs=["/usr/libexec/cni","/opt/cni/bin"]
+
+          [crio.metrics]
+          enable_metrics=false
+
+          [crio.tracing]
+          enable_tracing=false
+    - path: /etc/containers/storage.conf.d/10-root.conf
+      mode: 0644
+      contents:
+        inline: |
+          [storage]
+          graphroot="${container_storage_path}"
+

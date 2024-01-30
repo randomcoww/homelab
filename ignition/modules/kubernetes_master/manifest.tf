@@ -93,65 +93,46 @@ locals {
     })
   }
 
-  ignition_snippet = yamlencode({
-    variant = "fcos"
-    version = var.ignition_version
-    storage = {
-      files = [
-        for _, f in concat(
-          values(local.pki),
-          values(local.kubeconfig),
-          values(local.config),
-          values(local.static_pod),
-          [
-            {
-              path     = "${var.haproxy_path}/${var.name}.cfg"
-              contents = <<-EOF
-              frontend kube-apiserver
-                bind :::${var.ports.apiserver} v4v6
-                mode tcp
-                default_backend kube-apiserver
-
-              backend kube-apiserver
-                option httpchk GET /readyz HTTP/1.0
-                http-check expect status 200
-                mode tcp
-                balance leastconn
-                default-server verify none check-ssl rise 2 fall 2 maxconn 5000 maxqueue 5000 weight 100
-                %{~for i, ip in sort(values(var.members))~}
-                server ${var.name}-${i} ${ip}:${var.ports.apiserver_backend} check
-                %{~endfor~}
-              EOF
-            },
-            {
-              path     = "${var.keepalived_path}/${var.name}.conf"
-              contents = <<-EOF
-              vrrp_instance kube-apiserver {
-                preempt
-                state BACKUP
-                advert_int 0.1
-                virtual_router_id ${var.virtual_router_id}
-                interface ${var.sync_interface_name}
-                priority 250
-                garp_master_delay 1
-                garp_master_refresh 1
-                virtual_ipaddress {
-                  ${var.apiserver_ip} dev ${var.apiserver_interface_name} use_vmac
-                }
-              EOF
-            },
-          ],
-        ) :
-        merge({
-          mode = 384
-          }, f, {
-          contents = {
-            inline = f.contents
-          }
-        })
-      ]
-    }
-  })
+  ignition_snippets = concat([
+    for f in fileset(".", "${path.module}/templates/*.yaml") :
+    templatefile(f, {
+      ignition_version = var.ignition_version
+      name             = var.name
+      ports            = var.ports
+      backend_servers = {
+        for i, ip in sort(values(var.members)) :
+        "${var.name}-${i}" => "${ip}:${var.ports.apiserver_backend}"
+      }
+      virtual_router_id        = var.virtual_router_id
+      sync_interface_name      = var.sync_interface_name
+      apiserver_ip             = var.apiserver_ip
+      apiserver_interface_name = var.apiserver_interface_name
+      keepalived_path          = var.keepalived_path
+      haproxy_path             = var.haproxy_path
+    })
+    ], [
+    yamlencode({
+      variant = "fcos"
+      version = var.ignition_version
+      storage = {
+        files = [
+          for _, f in concat(
+            values(local.pki),
+            values(local.kubeconfig),
+            values(local.config),
+            values(local.static_pod),
+          ) :
+          merge({
+            mode = 384
+            }, f, {
+            contents = {
+              inline = f.contents
+            }
+          })
+        ]
+      }
+    }),
+  ])
 }
 
 module "controller-manager-kubeconfig" {
