@@ -2,7 +2,7 @@ locals {
   pki = {
     ca-public-key-openssh = {
       path     = "/etc/ssh/ssh_known_hosts"
-      contents = "cert-authority * ${chomp(var.public_key_openssh)}"
+      contents = "@cert-authority * ${chomp(var.public_key_openssh)}"
       mode     = 420
     }
   }
