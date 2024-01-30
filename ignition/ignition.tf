@@ -259,7 +259,7 @@ module "sunshine" {
   }
 }
 
-# remote client #
+# remote access #
 
 module "remote" {
   for_each = local.members.remote
