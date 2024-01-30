@@ -8,7 +8,7 @@ systemd:
       contents: |
         [Service]
         Type=oneshot
-        ExecStartPre=-/usr/sbin/rmmod cros-ec-typec
+        ExecCondition=/usr/sbin/rmmod cros-ec-typec
         ExecStartPre=-/usr/sbin/rmmod intel-pmc-mux
         ExecStart=-/usr/sbin/modprobe intel-pmc-mux
         ExecStart=-/usr/sbin/modprobe cros-ec-typec

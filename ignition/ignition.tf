@@ -261,13 +261,6 @@ module "sunshine" {
   }
 }
 
-module "chromebook-hacks" {
-  for_each = local.members.chromebook-hacks
-  source   = "./modules/chromebook_hacks"
-
-  ignition_version = local.ignition_version
-}
-
 # remote client #
 
 module "remote" {
@@ -304,7 +297,6 @@ data "ct_config" "ignition" {
         module.desktop,
         module.sunshine,
         module.remote,
-        module.chromebook-hacks,
       ] :
       try(m[host_key].ignition_snippets, [])
     ])

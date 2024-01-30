@@ -342,7 +342,6 @@ locals {
     desktop           = ["de-0", "de-1", "r-0"]
     sunshine          = ["de-1"]
     remote            = ["r-0"]
-    chromebook-hacks  = ["de-0"]
   }
 
   # finalized local vars #
