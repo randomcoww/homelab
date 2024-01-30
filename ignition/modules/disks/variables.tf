@@ -1,3 +1,7 @@
+variable "ignition_version" {
+  type = string
+}
+
 variable "disks" {
   # type = map(object({
   #   device = string
