@@ -12,9 +12,14 @@ locals {
       path     = "/etc/ssh/ssh_host_${lower(var.ca.algorithm)}_key-cert.pub"
       contents = ssh_host_cert.ssh-host.cert_authorized_key
     }
-    ca-public-key-openssh = {
+    authorized-keys = {
       path     = "/etc/ssh/authorized_keys"
       contents = "cert-authority ${chomp(var.ca.public_key_openssh)}"
+      mode     = 420
+    }
+    known-hosts = {
+      path     = "/etc/ssh/ssh_known_hosts"
+      contents = "@cert-authority * ${chomp(var.ca.public_key_openssh)}"
       mode     = 420
     }
   }

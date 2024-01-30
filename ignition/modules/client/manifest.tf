@@ -1,11 +1,11 @@
 locals {
-  pki = {
-    ca-public-key-openssh = {
+  pki = [
+    {
       path     = "/etc/ssh/ssh_known_hosts"
       contents = "@cert-authority * ${chomp(var.public_key_openssh)}"
       mode     = 420
-    }
-  }
+    },
+  ]
 
   ignition_snippets = [
     yamlencode({
@@ -14,7 +14,7 @@ locals {
       storage = {
         files = [
           for _, f in concat(
-            values(local.pki),
+            local.pki,
           ) :
           merge({
             mode = 384

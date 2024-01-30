@@ -60,11 +60,17 @@ storage:
         inline: |
           vm.nr_hugepages=1024
     # mayastor #
-    - path: /etc/modules-load.d/20-nvme-tcp.conf
+    - path: /etc/modules-load.d/20-mayastor.conf
       mode: 0644
       contents:
         inline: |
           nvme_tcp
+    # kube-proxy #
+    - path: /etc/modules-load.d/20-kube-proxy.conf
+      mode: 0644
+      contents:
+        inline: |
+          ip_vs
     - path: /etc/crio/crio.conf.d/10-custom.conf
       mode: 0644
       contents:

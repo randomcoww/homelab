@@ -41,3 +41,12 @@ storage:
           HandleLidSwitch=ignore
           HandleLidSwitchExternalPower=ignore
           HandleLidSwitchDocked=ignore
+    # No swap - disable hibernation
+    - path: /etc/systemd/sleep.conf.d/10-disable-hibernate.conf
+      mode: 0644
+      contents:
+        inline: |
+          [Sleep]
+          AllowHibernation=no
+          AllowSuspendThenHibernate=no
+          AllowHybridSleep=no

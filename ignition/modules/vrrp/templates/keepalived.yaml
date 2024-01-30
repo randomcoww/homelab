@@ -34,3 +34,16 @@ storage:
             max_auto_priority -1
           }
           include ${keepalived_path}/*.conf
+    # VIP #
+    - path: /etc/sysctl.d/20-keepalived.conf
+      mode: 0644
+      contents:
+        inline: |
+          net.ipv4.ip_forward=1
+          net.ipv4.ip_nonlocal_bind=1
+    # LVS #
+    - path: /etc/modules-load.d/20-keepalived.conf
+      mode: 0644
+      contents:
+        inline: |
+          ip_vs

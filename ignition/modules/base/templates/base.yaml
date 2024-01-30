@@ -58,16 +58,6 @@ storage:
         inline:
           ${hostname}
 
-    # No swap - disable hibernation
-    - path: /etc/systemd/sleep.conf.d/10-disable-hibernate.conf
-      mode: 0644
-      contents:
-        inline: |
-          [Sleep]
-          AllowHibernation=no
-          AllowSuspendThenHibernate=no
-          AllowHybridSleep=no
-
     - path: /etc/systemd/resolved.conf.d/10-base.conf
       mode: 0644
       contents:
@@ -78,7 +68,6 @@ storage:
           DNSStubListener=false
           MulticastDNS=true
           LLMNR=false
-
     # Block password SSH #
     - path: /etc/ssh/sshd_config.d/10-block-password.conf
       mode: 0644
@@ -110,12 +99,6 @@ storage:
         inline: |
           blacklist pcspkr
           blacklist snd_pcsp
-    # Keepalived lvs #
-    - path: /etc/modules-load.d/20-keepalived.conf
-      mode: 0644
-      contents:
-        inline: |
-          ip_vs
     # DNS reply from unexpected source #
     - path: /etc/modules-load.d/20-dns-reply.conf
       mode: 0644
@@ -128,13 +111,6 @@ storage:
       contents:
         inline: |
           uinput
-    # Keepalived VIP #
-    - path: /etc/sysctl.d/20-keepalived.conf
-      mode: 0644
-      contents:
-        inline: |
-          net.ipv4.ip_forward=1
-          net.ipv4.ip_nonlocal_bind=1
     # common #
     - path: /etc/sysctl.d/10-common.conf
       mode: 0644

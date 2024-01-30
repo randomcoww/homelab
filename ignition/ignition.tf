@@ -104,6 +104,32 @@ module "network-manager" {
   ignition_version = local.ignition_version
 }
 
+module "server" {
+  for_each = local.members.server
+  source   = "./modules/server"
+
+  ignition_version = local.ignition_version
+  key_id           = each.value.hostname
+  valid_principals = sort(concat([
+    for _, network in each.value.networks :
+    cidrhost(network.prefix, each.value.netnum)
+    if lookup(network, "enable_netnum", false)
+    ], [
+    each.value.hostname,
+    each.value.tailscale_hostname,
+    "127.0.0.1",
+  ]))
+  ca = data.terraform_remote_state.sr.outputs.ssh_ca
+}
+
+module "client" {
+  for_each = local.members.client
+  source   = "./modules/client"
+
+  ignition_version   = local.ignition_version
+  public_key_openssh = data.terraform_remote_state.sr.outputs.ssh_ca.public_key_openssh
+}
+
 # kubernetes #
 
 module "kubernetes-master" {
@@ -213,39 +239,11 @@ module "nvidia-container" {
   ignition_version = local.ignition_version
 }
 
-# SSH CA #
-
-module "ssh-server" {
-  for_each = local.members.ssh-server
-  source   = "./modules/ssh_server"
-
-  ignition_version = local.ignition_version
-  key_id           = each.value.hostname
-  valid_principals = sort(concat([
-    for _, network in each.value.networks :
-    cidrhost(network.prefix, each.value.netnum)
-    if lookup(network, "enable_netnum", false)
-    ], [
-    each.value.hostname,
-    each.value.tailscale_hostname,
-    "127.0.0.1",
-  ]))
-  ca = data.terraform_remote_state.sr.outputs.ssh_ca
-}
-
-module "ssh-client" {
-  for_each = local.members.ssh-client
-  source   = "./modules/ssh_client"
-
-  ignition_version   = local.ignition_version
-  public_key_openssh = data.terraform_remote_state.sr.outputs.ssh_ca.public_key_openssh
-}
-
 # desktop environment #
 
-module "desktop" {
-  for_each = local.members.desktop
-  source   = "./modules/desktop"
+module "desktop-environment" {
+  for_each = local.members.desktop-environment
+  source   = "./modules/desktop_environment"
 
   ignition_version = local.ignition_version
 }
@@ -292,9 +290,9 @@ data "ct_config" "ignition" {
         module.kubernetes-master,
         module.kubernetes-worker,
         module.nvidia-container,
-        module.ssh-server,
-        module.ssh-client,
-        module.desktop,
+        module.server,
+        module.client,
+        module.desktop-environment,
         module.sunshine,
         module.remote,
       ] :
