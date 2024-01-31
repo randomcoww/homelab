@@ -7,9 +7,9 @@ output "ignition" {
 }
 
 # Write local files so that PXE update can work during outage
-# resource "local_file" "ignition" {
-#   for_each = local.hosts
+resource "local_file" "ignition" {
+  for_each = local.hosts
 
-#   content  = data.ct_config.ignition[each.key].rendered
-#   filename = "${path.module}/output/ignition/${each.key}.ign"
-# }
+  content  = data.ct_config.ignition[each.key].rendered
+  filename = "${path.module}/output/ignition/${each.key}.ign"
+}
