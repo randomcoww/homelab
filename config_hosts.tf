@@ -284,6 +284,10 @@ locals {
           "modprobe.blacklist=nouveau",
           "nvidia-drm.modeset=1",
           "nvidia.NVreg_OpenRmEnableUnsupportedGpus=1",
+          ## stub all Nvidia GPUs
+          # "vfio-pci.id=10de:ffffffff:ffffffff:ffffffff:00030000:ffff00ff,10de:ffffffff:ffffffff:ffffffff:00040300:ffffffff",
+          ## stub all AMD GPUs
+          # "vfio-pci.id=1002:ffffffff:ffffffff:ffffffff:00030000:ffff00ff,1002:ffffffff:ffffffff:ffffffff:00040300:ffffffff",
         ]
       }
       kubernetes_node_labels = {
@@ -326,22 +330,24 @@ locals {
   }
 
   base_members = {
-    base                = ["gw-0", "gw-1", "q-0", "de-0", "de-1", "r-0"]
-    systemd-networkd    = ["gw-0", "gw-1", "q-0", "de-1"]
-    network-manager     = ["de-0", "r-0"]
-    gateway             = ["gw-0", "gw-1", "q-0"]
-    vrrp                = ["gw-0", "gw-1"]
-    disks               = ["gw-0", "gw-1", "q-0", "de-1"]
-    mounts              = ["de-0", "r-0"]
-    server              = ["gw-0", "gw-1", "q-0", "de-1", "r-0"]
-    client              = ["de-0", "de-1"]
-    etcd                = ["gw-0", "gw-1", "q-0"]
-    kubernetes-master   = ["gw-0", "gw-1"]
-    kubernetes-worker   = ["gw-0", "gw-1", "q-0", "de-1"]
-    nvidia-container    = ["de-1"]
-    desktop-environment = ["de-0", "de-1", "r-0"]
-    sunshine            = ["de-1"]
-    remote              = ["r-0"]
+    base              = ["gw-0", "gw-1", "q-0", "de-0", "de-1", "r-0"]
+    systemd-networkd  = ["gw-0", "gw-1", "q-0", "de-1"]
+    network-manager   = ["de-0", "r-0"]
+    gateway           = ["gw-0", "gw-1", "q-0"]
+    vrrp              = ["gw-0", "gw-1"]
+    disks             = ["gw-0", "gw-1", "q-0", "de-1"]
+    mounts            = ["de-0", "r-0"]
+    ssh-server        = ["gw-0", "gw-1", "q-0", "de-1", "r-0"]
+    ssh-client        = ["de-0", "de-1"]
+    etcd              = ["gw-0", "gw-1", "q-0"]
+    kubelet-base      = ["gw-0", "gw-1", "q-0", "de-0", "de-1", "r-0"]
+    kubernetes-master = ["gw-0", "gw-1"]
+    kubernetes-worker = ["gw-0", "gw-1", "q-0", "de-1"]
+    nvidia-container  = ["de-1"]
+    desktop           = ["de-0", "de-1", "r-0"]
+    sunshine          = ["de-1"]
+    remote            = ["r-0"]
+    chromebook-hacks  = ["de-0"]
   }
 
   # finalized local vars #

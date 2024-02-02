@@ -262,6 +262,16 @@ Each node will now be able to PXE boot from the cluster as long as only one node
 
 ---
 
+### Committing
+
+Formatting for terraform files
+
+```bash
+tw find . -name '*.tf' -exec terraform fmt '{}' \;
+```
+
+---
+
 ### Desktop setup
 
 #### Fedora Silverblue
@@ -363,60 +373,4 @@ sudo mkdir -p /mnt/$(whoami)
 sudo chown $(id -u):$(id -g) /mnt/$(whoami)
 cp -r /etc/skel/. /mnt/$(whoami)
 sudo umount /mnt
-```
-
----
-
-### Desktop VM with GPU passthrough (unused)
-
-Enable a combination of the following `vfio-pci.ids` kargs in [PXE boot params](config_pxeboot.tf)
-
-Stub all Nvidia GPUs
-
-```
-10de:ffffffff:ffffffff:ffffffff:00030000:ffff00ff,10de:ffffffff:ffffffff:ffffffff:00040300:ffffffff
-```
-
-Stub all AMD GPUs
-
-```
-1002:ffffffff:ffffffff:ffffffff:00030000:ffff00ff,1002:ffffffff:ffffffff:ffffffff:00040300:ffffffff
-```
-
-Update the following evdev input devices in the [libvirt config](libvirt/v-0.xml) to match current hardware
-
-```xml
-<devices>
-  <input type='evdev'>
-    <source dev='/dev/input/by-id/usb-Logitech_USB_Receiver-if02-event-mouse'/>
-  </input>
-  <input type='evdev'>
-    <source dev='/dev/input/by-id/usb-MOSART_Semi._wireless_dongle-event-kbd' grab='all' repeat='on'/>
-  </input>
-</devices>
-```
-
-Create persistent disk for home
-
-```bash
-dd if=/dev/zero of=/var/home/qemu/v-0.img bs=1G count=0 seek=100
-```
-
-Define and launch guest
-
-```bash
-virsh define libvirt/v-0.xml
-virsh start v-0
-```
-
-No video output is available unless a display is attached to the GPU being passed through
-
----
-
-### Committing
-
-Formatting for terraform files
-
-```bash
-tw find . -name '*.tf' -exec terraform fmt '{}' \;
 ```
