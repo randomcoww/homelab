@@ -56,10 +56,10 @@ users = {
 EOF
 ```
 
-Create `client/secrets.tfvars` file
+Create `client_credentials/secrets.tfvars` file
 
 ```bash
-cat > client/secrets.tfvars <<EOF
+cat > client_credentials/secrets.tfvars <<EOF
 ssh_client = {
   key_id                = "$(whoami)"
   public_key_openssh    = "ssh_client_public_key=$(cat $HOME/.ssh/id_ecdsa.pub)"
@@ -143,6 +143,21 @@ tw terraform -chdir=cluster_resources init
 tw terraform -chdir=cluster_resources apply -var-file=secrets.tfvars
 ```
 
+Write client credentials
+
+```bash
+tw terraform -chdir=client_credentials init
+tw terraform -chdir=client_credentials apply -auto-approve -var-file=secrets.tfvars
+
+tw terraform -chdir=client_credentials output -raw kubeconfig > $HOME/.kube/config
+
+SSH_KEY=$HOME/.ssh/id_ecdsa
+tw terraform -chdir=client_credentials output -raw ssh_user_cert_authorized_key > $SSH_KEY-cert.pub
+
+mkdir -p $HOME/.mc
+tw terraform -chdir=client_credentials output -json mc_config > $HOME/.mc/config.json
+```
+
 Generate ignition config for servers
 
 ```bash
@@ -208,21 +223,6 @@ tw terraform -chdir=bootstrap_server destroy \
 ---
 
 ### Deploy services to Kubernetes
-
-Write client credentials
-
-```bash
-tw terraform -chdir=client init
-tw terraform -chdir=client apply -auto-approve -var-file=secrets.tfvars
-
-tw terraform -chdir=client output -raw kubeconfig > $HOME/.kube/config
-
-SSH_KEY=$HOME/.ssh/id_ecdsa
-tw terraform -chdir=client output -raw ssh_user_cert_authorized_key > $SSH_KEY-cert.pub
-
-mkdir -p $HOME/.mc
-tw terraform -chdir=client output -json mc_config > $HOME/.mc/config.json
-```
 
 Check that `kubernetes` service is up
 
