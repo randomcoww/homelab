@@ -301,8 +301,8 @@ locals {
       users = [
         "client",
       ]
-      # same as disk but a hack to use an existing lvm on chromeos
-      # ignition doesn't support provisioning lvm device so so systemd mount only
+      # same as disk but a hack to use an existing lvm
+      # ignition doesn't support provisioning lvm device so run systemd mount only
       mounts = [
         {
           device     = "/dev/H3F03NEV207BX1ZE/unencrypted"
@@ -317,8 +317,6 @@ locals {
       users = [
         "client",
       ]
-      # same as disk but a hack to use an existing lvm on chromeos
-      # ignition doesn't support provisioning lvm device so so systemd mount only
       mounts = [
         {
           device     = "/dev/disk/by-label/home"
