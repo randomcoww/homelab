@@ -148,18 +148,21 @@ locals {
   }
 
   kubernetes_ingress_endpoints = {
-    mpd           = "mpd.${local.domains.internal}"
-    auth          = "auth.${local.domains.internal}"
-    transmission  = "t.${local.domains.internal}"
-    minio         = "m.${local.domains.internal}"
-    vaultwarden   = "vw.${local.domains.internal}"
-    matchbox      = "ign.${local.domains.internal}"
-    code_server   = "code.${local.domains.internal}"
-    kasm          = "k.${local.domains.internal}"
-    sunshine      = "sun.${local.domains.internal}"
-    alpaca_stream = "alpaca-stream.${local.domains.internal}"
-    speedtest     = "speedtest.${local.domains.internal}"
-    headscale     = "headscale.${local.domains.internal}"
+    for k, domain in {
+      mpd           = "mpd"
+      auth          = "auth"
+      transmission  = "t"
+      minio         = "m"
+      vaultwarden   = "vw"
+      matchbox      = "ign"
+      code_server   = "code"
+      kasm          = "k"
+      sunshine      = "sun"
+      alpaca_stream = "alpaca-stream"
+      speedtest     = "speedtest"
+      headscale     = "headscale"
+    } :
+    k => "${domain}.${local.domains.internal}"
   }
 
   ingress_classes = {
