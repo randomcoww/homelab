@@ -291,14 +291,6 @@ locals {
     module.sunshine,
     module.remote,
   ]
-
-  pod_manifests = {
-    for host_key in keys(local.hosts) :
-    host_key => flatten([
-      for m in local.modules_enabled :
-      try(m[host_key].pod_manifests, [])
-    ])
-  }
 }
 
 # render ignition to output and local files

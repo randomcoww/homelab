@@ -14,10 +14,20 @@ resource "local_file" "ignition" {
   filename = "${path.module}/output/ignition/${each.key}.ign"
 }
 
-output "static_pods" {
+output "podlist" {
   value = {
-    for host_key, pod_manifests in local.pod_manifests :
-    host_key => chomp(join("---\n", pod_manifests)) if length(pod_manifests) > 0
+    for host_key in keys(local.hosts) :
+    host_key => chomp(yamlencode({
+      apiVersion = "v1"
+      kind       = "PodList"
+      items = flatten([
+        for m in local.modules_enabled :
+        [
+          for pod in try(m[host_key].pod_manifests, []) :
+          yamldecode(pod)
+        ]
+      ])
+    }))
   }
   sensitive = true
 }
