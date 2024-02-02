@@ -78,7 +78,7 @@ locals {
     }
     headscale = {
       network = "100.64.0.0"
-      cidr    = 16
+      cidr    = 10
     }
   }
 
