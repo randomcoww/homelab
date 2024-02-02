@@ -308,5 +308,5 @@ data "ct_config" "ignition" {
     version = local.ignition_version
   })
   strict   = true
-  snippets = each.value
+  snippets = sort(each.value)
 }
