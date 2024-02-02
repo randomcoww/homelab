@@ -133,6 +133,11 @@ locals {
       }
     }),
   ])
+
+  pod_manifests = [
+    for pod in local.static_pod :
+    pod.contents
+  ]
 }
 
 module "controller-manager-kubeconfig" {

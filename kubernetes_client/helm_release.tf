@@ -1,24 +1,28 @@
+locals {
+  modules_enabled = [
+    module.mpd,
+    module.transmission,
+    module.alpaca-stream,
+    module.hostapd,
+    module.code,
+    module.vaultwarden,
+    module.authelia,
+    module.kube-dns,
+    module.kea,
+    module.flannel,
+    module.kapprover,
+    module.fuse-device-plugin,
+    module.matchbox,
+    module.bootstrap,
+    module.kube-proxy,
+    # module.kasm-desktop,
+    # module.headscale,
+  ]
+}
+
 resource "helm_release" "wrapper" {
   for_each = {
-    for m in [
-      module.mpd,
-      module.transmission,
-      module.alpaca-stream,
-      module.hostapd,
-      module.code,
-      module.vaultwarden,
-      module.authelia,
-      module.kube-dns,
-      module.kea,
-      module.flannel,
-      module.kapprover,
-      module.fuse-device-plugin,
-      module.matchbox,
-      module.bootstrap,
-      module.kube-proxy,
-      # module.kasm-desktop,
-      # module.headscale,
-    ] :
+    for m in local.modules_enabled :
     m.chart.name => m.chart
   }
   chart            = "./local/helm-wrapper"
@@ -398,8 +402,9 @@ resource "helm_release" "minio" {
       buckets = [
         for bucket in local.minio_buckets :
         merge(bucket, {
-          purge      = false
-          versioning = false
+          purge         = false
+          versioning    = false
+          objectlocking = false
         })
       ]
       users          = []
