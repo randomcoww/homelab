@@ -6,15 +6,6 @@ module "secret-custom" {
   data = {
     ACCESS_KEY_ID     = var.s3_access_key_id
     SECRET_ACCESS_KEY = var.s3_secret_access_key
-    "users_database.yaml" = yamlencode({
-      users = {
-        for email, user in var.users :
-        email => merge({
-          email       = email
-          displayname = email
-        }, user)
-      }
-    })
   }
 }
 
@@ -54,11 +45,6 @@ data "helm_template" "authelia" {
             name      = "authelia-data"
             mountPath = "/config"
           },
-          {
-            name      = "authelia-custom"
-            mountPath = "/config/users_database.yaml"
-            subPath   = "users_database.yaml"
-          },
         ]
         extraVolumes = [
           {
@@ -75,47 +61,7 @@ data "helm_template" "authelia" {
           },
         ]
       }
-      configMap = {
-        telemetry = {
-          metrics = {
-            enabled = false
-          }
-        }
-        default_redirection_url = "https://${var.service_hostname}"
-        default_2fa_method      = "totp"
-        theme                   = "dark"
-        totp = {
-          disable = false
-        }
-        webauthn = {
-          disable = true
-        }
-        duo_api = {
-          disable = true
-        }
-        authentication_backend = {
-          password_reset = {
-            disable = true
-          }
-          ldap = {
-            enabled = false
-          }
-          file = {
-            enabled = true
-            path    = "/config/users_database.yaml"
-          }
-        }
-        session = {
-          inactivity           = "4h"
-          expiration           = "4h"
-          remember_me_duration = 0
-          redis = {
-            enabled = false
-          }
-        }
-        regulation = {
-          max_retries = 4
-        }
+      configMap = merge(var.configmap, {
         storage = {
           local = {
             enabled = true
@@ -127,35 +73,8 @@ data "helm_template" "authelia" {
             enabled = false
           }
         }
-        notifier = {
-          disable_startup_check = true
-          smtp = {
-            enabled       = true
-            enabledSecret = true
-            host          = var.smtp_host
-            port          = var.smtp_port
-            username      = var.smtp_username
-            sender        = var.smtp_username
-          }
-        }
-        access_control = merge({
-          default_policy = "two_factor"
-        }, var.access_control)
-      }
-      secret = {
-        jwt = {
-          value = var.jwt_token
-        }
-        storageEncryptionKey = {
-          value = var.storage_secret
-        }
-        session = {
-          value = var.session_encryption_key
-        }
-        smtp = {
-          value = var.smtp_password
-        }
-      }
+      })
+      secret = var.secret
       persistence = {
         enabled = false
       }

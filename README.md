@@ -85,7 +85,6 @@ WG_PRIVATE_KEY=
 WG_ADDRESS=
 WG_PUBLIC_KEY=
 WG_ENDPOINT=
-AUTHELIA_PASSWORD_HASH=$(podman run --rm docker.io/authelia/authelia:latest authelia hash-password -- "$PASSWORD" | sed 's:.*\: ::')
 APCA_API_KEY_ID=
 APCA_API_SECRET_KEY=
 APCA_API_BASE_URL=
@@ -93,12 +92,6 @@ APCA_API_BASE_URL=
 
 ```bash
 cat > kubernetes_client/secrets.tfvars <<EOF
-authelia_users = {
-  "$GMAIL_USER" = {
-    password = "$AUTHELIA_PASSWORD_HASH"
-  }
-}
-
 hostapd = {
   sae_password = "$PASSWORD"
   ssid         = "$AP_SSID"

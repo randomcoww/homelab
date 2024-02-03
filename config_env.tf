@@ -200,7 +200,8 @@ locals {
     matchbox_api  = 50101
     minio         = 9000
     alpaca_stream = 38081
-    lldap         = 6360
+    lldap         = 3890
+    lldap_ldaps   = 6360
   }
 
   minio_buckets = {

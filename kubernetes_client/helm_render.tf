@@ -157,21 +157,22 @@ module "vaultwarden" {
     vaultwarden = 8080
   }
   service_hostname = local.kubernetes_ingress_endpoints.vaultwarden
-  exrtra_envs = {
+  extra_envs = {
     SENDS_ALLOWED            = false
     EMERGENCY_ACCESS_ALLOWED = false
     PASSWORD_HINTS_ALLOWED   = false
     SIGNUPS_ALLOWED          = false
     INVITATIONS_ALLOWED      = true
     DISABLE_ADMIN_TOKEN      = true
+    SMTP_USERNAME            = var.smtp.username
+    SMTP_FROM                = var.smtp.username
+    SMTP_PASSWORD            = var.smtp.password
+    SMTP_HOST                = var.smtp.host
+    SMTP_PORT                = var.smtp.port
     SMTP_FROM_NAME           = "Vaultwarden"
     SMTP_SECURITY            = "starttls"
     SMTP_AUTH_MECHANISM      = "Plain"
   }
-  smtp_host                 = var.smtp.host
-  smtp_port                 = var.smtp.port
-  smtp_username             = var.smtp.username
-  smtp_password             = var.smtp.password
   ingress_class_name        = local.ingress_classes.ingress_nginx
   nginx_ingress_annotations = local.nginx_ingress_auth_annotations
   s3_db_resource            = "${data.terraform_remote_state.sr.outputs.s3.vaultwarden.resource}/db.sqlite3"
@@ -188,40 +189,109 @@ module "authelia" {
   images = {
     litestream = local.container_images.litestream
   }
-  users = {
-    for email, user in var.authelia_users :
-    email => merge({
-      email       = email
-      displayname = email
-    }, user)
+  service_hostname = local.kubernetes_ingress_endpoints.auth
+  configmap = {
+    telemetry = {
+      metrics = {
+        enabled = false
+      }
+    }
+    default_redirection_url = "https://${local.kubernetes_ingress_endpoints.auth}"
+    default_2fa_method      = "totp"
+    theme                   = "dark"
+    totp = {
+      disable = false
+    }
+    webauthn = {
+      disable = true
+    }
+    duo_api = {
+      disable = true
+    }
+    authentication_backend = {
+      password_reset = {
+        disable    = true
+        custom_url = "https://${local.kubernetes_ingress_endpoints.lldap_http}/reset-password/step1"
+      }
+      # https://github.com/lldap/lldap/blob/main/example_configs/authelia_config.yml
+      ldap = {
+        enabled                = true
+        implementation         = "custom"
+        url                    = "ldap://${local.kubernetes_service_endpoints.lldap}:${local.service_ports.lldap}"
+        base_dn                = "dc=${join(",dc=", slice(compact(split(".", local.kubernetes_ingress_endpoints.lldap_http)), 1, length(compact(split(".", local.kubernetes_ingress_endpoints.lldap_http)))))}"
+        username_attribute     = "uid"
+        additional_users_dn    = "ou=people"
+        users_filter           = "(&({username_attribute}={input})(objectClass=person))"
+        additional_groups_dn   = "ou=groups"
+        groups_filter          = "(member={dn})"
+        group_name_attribute   = "cn"
+        mail_attribute         = "mail"
+        display_name_attribute = "displayName"
+        user                   = "uid=${data.terraform_remote_state.sr.outputs.lldap.user},ou=people,dc=${join(",dc=", slice(compact(split(".", local.kubernetes_ingress_endpoints.lldap_http)), 1, length(compact(split(".", local.kubernetes_ingress_endpoints.lldap_http)))))}"
+      }
+      file = {
+        enabled = false
+      }
+    }
+    session = {
+      inactivity           = "4h"
+      expiration           = "4h"
+      remember_me_duration = 0
+      redis = {
+        enabled = false
+      }
+    }
+    regulation = {
+      max_retries = 4
+    }
+    notifier = {
+      disable_startup_check = true
+      smtp = {
+        enabled       = true
+        enabledSecret = true
+        host          = var.smtp.host
+        port          = var.smtp.port
+        username      = var.smtp.username
+        sender        = var.smtp.username
+      }
+    }
+    access_control = {
+      default_policy = "two_factor"
+      rules = [
+        {
+          domain    = local.kubernetes_ingress_endpoints.vaultwarden
+          resources = ["^/admin.*"]
+          policy    = "two_factor"
+        },
+        {
+          domain = local.kubernetes_ingress_endpoints.vaultwarden
+          policy = "bypass"
+        },
+      ]
+    }
   }
-  access_control = {
-    default_policy = "two_factor"
-    rules = [
-      {
-        domain    = local.kubernetes_ingress_endpoints.vaultwarden
-        resources = ["^/admin.*"]
-        policy    = "two_factor"
-      },
-      {
-        domain = local.kubernetes_ingress_endpoints.vaultwarden
-        policy = "bypass"
-      },
-    ]
+  secret = {
+    jwt = {
+      value = data.terraform_remote_state.sr.outputs.authelia.jwt_token
+    }
+    storageEncryptionKey = {
+      value = data.terraform_remote_state.sr.outputs.authelia.storage_secret
+    }
+    session = {
+      value = data.terraform_remote_state.sr.outputs.authelia.session_encryption_key
+    }
+    smtp = {
+      value = var.smtp.password
+    }
+    ldap = {
+      value = data.terraform_remote_state.sr.outputs.lldap.password
+    }
   }
-  service_hostname       = local.kubernetes_ingress_endpoints.auth
-  jwt_token              = data.terraform_remote_state.sr.outputs.authelia.jwt_token
-  storage_secret         = data.terraform_remote_state.sr.outputs.authelia.storage_secret
-  session_encryption_key = data.terraform_remote_state.sr.outputs.authelia.session_encryption_key
-  smtp_host              = var.smtp.host
-  smtp_port              = var.smtp.port
-  smtp_username          = var.smtp.username
-  smtp_password          = var.smtp.password
-  ingress_class_name     = local.ingress_classes.ingress_nginx_external
-  ingress_cert_issuer    = local.kubernetes.cert_issuer_prod
-  s3_db_resource         = "${data.terraform_remote_state.sr.outputs.s3.authelia.resource}/db.sqlite3"
-  s3_access_key_id       = data.terraform_remote_state.sr.outputs.s3.authelia.access_key_id
-  s3_secret_access_key   = data.terraform_remote_state.sr.outputs.s3.authelia.secret_access_key
+  ingress_class_name   = local.ingress_classes.ingress_nginx_external
+  ingress_cert_issuer  = local.kubernetes.cert_issuer_prod
+  s3_db_resource       = "${data.terraform_remote_state.sr.outputs.s3.authelia.resource}/db.sqlite3"
+  s3_access_key_id     = data.terraform_remote_state.sr.outputs.s3.authelia.access_key_id
+  s3_secret_access_key = data.terraform_remote_state.sr.outputs.s3.authelia.secret_access_key
 }
 
 module "lldap" {
@@ -234,20 +304,26 @@ module "lldap" {
     litestream = local.container_images.litestream
   }
   ports = {
-    lldap       = 3890
+    lldap       = local.service_ports.lldap
     lldap_http  = 17170
-    lldap_ldaps = local.service_ports.lldap
+    lldap_ldaps = local.service_ports.lldap_ldaps
   }
-  ca                        = data.terraform_remote_state.sr.outputs.lldap.ca
-  service_hostname          = local.kubernetes_ingress_endpoints.lldap_http
-  jwt_token                 = data.terraform_remote_state.sr.outputs.lldap.jwt_token
-  storage_secret            = data.terraform_remote_state.sr.outputs.lldap.storage_secret
-  admin_user                = data.terraform_remote_state.sr.outputs.lldap.user
-  admin_password            = data.terraform_remote_state.sr.outputs.lldap.password
-  smtp_host                 = var.smtp.host
-  smtp_port                 = var.smtp.port
-  smtp_username             = var.smtp.username
-  smtp_password             = var.smtp.password
+  ca               = data.terraform_remote_state.sr.outputs.lldap.ca
+  service_hostname = local.kubernetes_ingress_endpoints.lldap_http
+  storage_secret   = data.terraform_remote_state.sr.outputs.lldap.storage_secret
+  extra_envs = {
+    LLDAP_VERBOSE                             = true
+    LLDAP_JWT_SECRET                          = data.terraform_remote_state.sr.outputs.lldap.jwt_token
+    LLDAP_LDAP_USER_DN                        = data.terraform_remote_state.sr.outputs.lldap.user
+    LLDAP_LDAP_USER_PASS                      = data.terraform_remote_state.sr.outputs.lldap.password
+    LLDAP_SMTP_OPTIONS__ENABLE_PASSWORD_RESET = true
+    LLDAP_SMTP_OPTIONS__SERVER                = var.smtp.host
+    LLDAP_SMTP_OPTIONS__PORT                  = var.smtp.port
+    LLDAP_SMTP_OPTIONS__SMTP_ENCRYPTION       = "STARTTLS"
+    LLDAP_SMTP_OPTIONS__USER                  = var.smtp.username
+    LLDAP_SMTP_OPTIONS__PASSWORD              = var.smtp.password
+    LLDAP_LDAPS_OPTIONS__ENABLED              = true
+  }
   ingress_class_name        = local.ingress_classes.ingress_nginx
   nginx_ingress_annotations = local.nginx_ingress_annotations
   s3_db_resource            = "${data.terraform_remote_state.sr.outputs.s3.lldap.resource}/users.db"
@@ -629,10 +705,41 @@ module "headscale" {
     headscale      = 8080
     headscale_grpc = 50443
   }
-  network_prefix            = local.networks.headscale.prefix
-  private_key               = data.terraform_remote_state.sr.outputs.headscale.private_key
-  noise_private_key         = data.terraform_remote_state.sr.outputs.headscale.noise_private_key
-  service_hostname          = local.kubernetes_ingress_endpoints.headscale
+  private_key       = data.terraform_remote_state.sr.outputs.headscale.private_key
+  noise_private_key = data.terraform_remote_state.sr.outputs.headscale.noise_private_key
+  service_hostname  = local.kubernetes_ingress_endpoints.headscale
+  extra_config = {
+    grpc_allow_insecure = false
+    ip_prefixes = [
+      local.networks.headscale.prefix,
+    ]
+    derp = {
+      server = {
+        enabled = false
+      }
+      urls = [
+        "https://controlplane.tailscale.com/derpmap/default",
+      ]
+      paths               = []
+      auto_update_enabled = true
+      update_frequency    = "24h"
+    }
+    disable_check_updates             = false
+    ephemeral_node_inactivity_timeout = "30m"
+    node_update_check_interval        = "10s"
+    log = {
+      level = "info"
+    }
+    acl_policy_path = ""
+    dns_config = {
+      override_local_dns = false
+      magic_dns          = true
+    }
+    logtail = {
+      enabled = false
+    }
+    randomize_client_port = false
+  }
   ingress_class_name        = local.ingress_classes.ingress_nginx_external
   nginx_ingress_annotations = local.nginx_ingress_annotations
   s3_db_resource            = "${data.terraform_remote_state.sr.outputs.s3.headscale.resource}/db.sqlite3"

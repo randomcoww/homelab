@@ -25,42 +25,14 @@ variable "service_hostname" {
   type = string
 }
 
-variable "access_control" {
+variable "configmap" {
   type    = any
   default = {}
 }
 
-variable "users" {
+variable "secret" {
   type    = any
   default = {}
-}
-
-variable "smtp_host" {
-  type = string
-}
-
-variable "smtp_port" {
-  type = string
-}
-
-variable "smtp_username" {
-  type = string
-}
-
-variable "smtp_password" {
-  type = string
-}
-
-variable "jwt_token" {
-  type = string
-}
-
-variable "storage_secret" {
-  type = string
-}
-
-variable "session_encryption_key" {
-  type = string
 }
 
 variable "ingress_class_name" {
