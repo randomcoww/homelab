@@ -52,19 +52,19 @@ storage:
       contents:
         inline: |
           [Login]
-          InhibitDelayMaxSec=180
+          InhibitDelayMaxSec=${graceful_shutdown_delay}
     # mayastor hugepages #
-    - path: /etc/sysctl.d/20-hugepages.conf
-      mode: 0644
-      contents:
-        inline: |
-          vm.nr_hugepages=1024
+    # - path: /etc/sysctl.d/20-hugepages.conf
+    #   mode: 0644
+    #   contents:
+    #     inline: |
+    #       vm.nr_hugepages=1024
     # mayastor #
-    - path: /etc/modules-load.d/20-mayastor.conf
-      mode: 0644
-      contents:
-        inline: |
-          nvme_tcp
+    # - path: /etc/modules-load.d/20-mayastor.conf
+    #   mode: 0644
+    #   contents:
+    #     inline: |
+    #       nvme_tcp
     # kube-proxy #
     - path: /etc/modules-load.d/20-kube-proxy.conf
       mode: 0644

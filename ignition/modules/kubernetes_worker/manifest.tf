@@ -100,6 +100,7 @@ locals {
       container_storage_path    = var.container_storage_path
       crio_socket               = local.crio_socket
       cni_bridge_interface_name = var.cni_bridge_interface_name
+      graceful_shutdown_delay   = 480
     })
     ], [
     yamlencode({
