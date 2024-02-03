@@ -1,4 +1,4 @@
-resource "matchbox_profile" "pxeboot" {
+resource "matchbox_profile" "ignition" {
   for_each = {
     for key, host in local.hosts :
     host.physical_interfaces[host.network_boot.interface].mac => merge(host.network_boot, {
@@ -24,8 +24,8 @@ resource "matchbox_profile" "pxeboot" {
   # raw_ignition = file("output/ignition/${each.value.host_key}.ign")
 }
 
-resource "matchbox_group" "pxeboot" {
-  for_each = matchbox_profile.pxeboot
+resource "matchbox_group" "ignition" {
+  for_each = matchbox_profile.ignition
 
   profile = each.key
   name    = each.key
