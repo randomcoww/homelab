@@ -31,10 +31,6 @@ variable "affinity" {
   default = {}
 }
 
-variable "service_hostname" {
-  type = string
-}
-
 variable "ca" {
   type = object({
     algorithm       = string
@@ -43,7 +39,7 @@ variable "ca" {
   })
 }
 
-variable "jwt_token" {
+variable "service_hostname" {
   type = string
 }
 
@@ -51,28 +47,9 @@ variable "storage_secret" {
   type = string
 }
 
-variable "admin_user" {
-  type = string
-}
-
-variable "admin_password" {
-  type = string
-}
-
-variable "smtp_host" {
-  type = string
-}
-
-variable "smtp_port" {
-  type = string
-}
-
-variable "smtp_username" {
-  type = string
-}
-
-variable "smtp_password" {
-  type = string
+variable "extra_envs" {
+  type    = map(any)
+  default = {}
 }
 
 variable "ingress_class_name" {
