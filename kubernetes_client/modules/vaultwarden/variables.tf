@@ -33,25 +33,9 @@ variable "service_hostname" {
   type = string
 }
 
-variable "exrtra_envs" {
+variable "extra_envs" {
   type    = map(any)
   default = {}
-}
-
-variable "smtp_host" {
-  type = string
-}
-
-variable "smtp_port" {
-  type = string
-}
-
-variable "smtp_username" {
-  type = string
-}
-
-variable "smtp_password" {
-  type = string
 }
 
 variable "ingress_class_name" {

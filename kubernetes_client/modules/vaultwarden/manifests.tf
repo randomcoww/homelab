@@ -1,5 +1,11 @@
 locals {
   db_path = "/data/db.sqlite3"
+  extra_envs = merge(var.extra_envs, {
+    DATA_FOLDER  = dirname(local.db_path)
+    DATABASE_URL = local.db_path
+    ROCKET_PORT  = var.ports.vaultwarden
+    DOMAIN       = "https://${var.service_hostname}"
+  })
 }
 
 module "metadata" {
@@ -21,12 +27,13 @@ module "secret" {
   name    = var.name
   app     = var.name
   release = var.release
-  data = {
+  data = merge({
     ACCESS_KEY_ID     = var.s3_access_key_id
     SECRET_ACCESS_KEY = var.s3_secret_access_key
-    SMTP_USERNAME     = var.smtp_username
-    SMTP_PASSWORD     = var.smtp_password
-  }
+    }, {
+    for k, v in local.extra_envs :
+    tostring(k) => tostring(v)
+  })
 }
 
 module "service" {
@@ -122,65 +129,18 @@ module "statefulset" {
       {
         name  = var.name
         image = var.images.vaultwarden
-        env = concat([
+        env = [
+          for k, v in local.extra_envs :
           {
-            name  = "DATA_FOLDER"
-            value = dirname(local.db_path)
-          },
-          {
-            name  = "DATABASE_URL"
-            value = local.db_path
-          },
-          {
-            name  = "ROCKET_PORT"
-            value = tostring(var.ports.vaultwarden)
-          },
-          {
-            name  = "DOMAIN"
-            value = "https://${var.service_hostname}"
-          },
-          {
-            name  = "SMTP_HOST"
-            value = var.smtp_host
-          },
-          {
-            name  = "SMTP_PORT"
-            value = var.smtp_port
-          },
-          {
-            name = "SMTP_FROM"
+            name = tostring(k)
             valueFrom = {
               secretKeyRef = {
                 name = var.name
-                key  = "SMTP_USERNAME"
+                key  = tostring(k)
               }
             }
-          },
-          {
-            name = "SMTP_USERNAME"
-            valueFrom = {
-              secretKeyRef = {
-                name = var.name
-                key  = "SMTP_USERNAME"
-              }
-            }
-          },
-          {
-            name = "SMTP_PASSWORD"
-            valueFrom = {
-              secretKeyRef = {
-                name = var.name
-                key  = "SMTP_PASSWORD"
-              }
-            }
-          },
-          ], [
-          for k, v in var.exrtra_envs :
-          {
-            name  = tostring(k)
-            value = tostring(v)
           }
-        ])
+        ]
         volumeMounts = [
           {
             name      = "vaultwarden-data"
