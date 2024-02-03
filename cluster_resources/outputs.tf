@@ -135,7 +135,10 @@ output "headscale" {
 
 output "lldap" {
   value = {
-    storage_secret = random_password.lldap-storage-secret.result
+    algorithm       = tls_private_key.lldap-ca.algorithm
+    private_key_pem = tls_private_key.lldap-ca.private_key_pem
+    cert_pem        = tls_self_signed_cert.lldap-ca.cert_pem
+    storage_secret  = random_password.lldap-storage-secret.result
   }
   sensitive = true
 }
