@@ -122,7 +122,7 @@ locals {
   }
 
   kubernetes = {
-    version                   = "1.29.0"
+    version                   = "1.29.1"
     cluster_name              = "prod-10"
     kubelet_root_path         = "/var/lib/kubelet"
     static_pod_manifest_path  = "/var/lib/kubelet/manifests"
