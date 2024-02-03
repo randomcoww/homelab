@@ -197,6 +197,7 @@ module "kubernetes-worker" {
   kubelet_root_path         = local.kubernetes.kubelet_root_path
   static_pod_path           = local.kubernetes.static_pod_manifest_path
   container_storage_path    = "${local.mounts.containers_path}/storage"
+  graceful_shutdown_delay   = 480
 }
 
 module "etcd" {

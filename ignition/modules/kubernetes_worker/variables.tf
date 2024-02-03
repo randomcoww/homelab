@@ -64,3 +64,7 @@ variable "static_pod_path" {
 variable "container_storage_path" {
   type = string
 }
+
+variable "graceful_shutdown_delay" {
+  type = number
+}

@@ -64,7 +64,7 @@ locals {
           shutdownGracePeriodByPodPriority = [
             {
               priority                   = 0
-              shutdownGracePeriodSeconds = 180
+              shutdownGracePeriodSeconds = var.graceful_shutdown_delay
             }
           ]
           containerLogMaxSize  = "10Mi"
@@ -100,7 +100,7 @@ locals {
       container_storage_path    = var.container_storage_path
       crio_socket               = local.crio_socket
       cni_bridge_interface_name = var.cni_bridge_interface_name
-      graceful_shutdown_delay   = 480
+      graceful_shutdown_delay   = var.graceful_shutdown_delay
     })
     ], [
     yamlencode({
