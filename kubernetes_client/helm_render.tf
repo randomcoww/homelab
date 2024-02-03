@@ -224,6 +224,39 @@ module "authelia" {
   s3_secret_access_key   = data.terraform_remote_state.sr.outputs.s3.authelia.secret_access_key
 }
 
+module "lldap" {
+  source    = "./modules/lldap"
+  name      = split(".", local.kubernetes_service_endpoints.lldap)[0]
+  namespace = split(".", local.kubernetes_service_endpoints.lldap)[1]
+  release   = "0.1.0"
+  images = {
+    lldap      = local.container_images.lldap
+    litestream = local.container_images.litestream
+  }
+  ports = {
+    lldap       = 3890
+    lldap_http  = 17170
+    lldap_ldaps = local.service_ports.lldap
+  }
+  ca = {
+    algorithm       = data.terraform_remote_state.sr.outputs.lldap.algorithm
+    private_key_pem = data.terraform_remote_state.sr.outputs.lldap.private_key_pem
+    cert_pem        = data.terraform_remote_state.sr.outputs.lldap.cert_pem
+  }
+  service_hostname          = local.kubernetes_ingress_endpoints.lldap_http
+  jwt_token                 = data.terraform_remote_state.sr.outputs.lldap.jwt_token
+  storage_secret            = data.terraform_remote_state.sr.outputs.lldap.storage_secret
+  smtp_host                 = var.smtp.host
+  smtp_port                 = var.smtp.port
+  smtp_username             = var.smtp.username
+  smtp_password             = var.smtp.password
+  ingress_class_name        = local.ingress_classes.ingress_nginx
+  nginx_ingress_annotations = local.nginx_ingress_annotations
+  s3_db_resource            = "${data.terraform_remote_state.sr.outputs.s3.lldap.resource}/users.db"
+  s3_access_key_id          = data.terraform_remote_state.sr.outputs.s3.lldap.access_key_id
+  s3_secret_access_key      = data.terraform_remote_state.sr.outputs.s3.lldap.secret_access_key
+}
+
 module "hostapd" {
   source   = "./modules/hostapd"
   name     = "hostapd"

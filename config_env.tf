@@ -114,6 +114,7 @@ locals {
     kasm_desktop       = "ghcr.io/randomcoww/kasm-desktop:20231220.3"
     alpaca_stream      = "ghcr.io/randomcoww/alpaca-stream-server:20230518.1"
     headscale          = "docker.io/headscale/headscale:0.22"
+    lldap              = "docker.io/lldap/lldap:2024-02-02-alpine"
   }
 
   pxeboot_images = {
@@ -161,6 +162,7 @@ locals {
       alpaca_stream = "alpaca-stream"
       speedtest     = "speedtest"
       headscale     = "headscale"
+      lldap_http    = "ldap"
     } :
     k => "${domain}.${local.domains.internal}"
   }
@@ -176,6 +178,7 @@ locals {
     ingress_nginx          = "${local.ingress_classes.ingress_nginx}-controller.ingress-nginx"
     ingress_nginx_external = "${local.ingress_classes.ingress_nginx_external}-controller.ingress-nginx"
     minio                  = "minio.minio"
+    lldap                  = "lldap.lldap"
   }
 
   ports = {
@@ -197,6 +200,7 @@ locals {
     matchbox_api  = 50101
     minio         = 9000
     alpaca_stream = 38081
+    lldap         = 6360
   }
 
   minio_buckets = {

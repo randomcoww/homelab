@@ -15,6 +15,7 @@ locals {
     module.matchbox,
     module.bootstrap,
     module.kube-proxy,
+    module.lldap,
     # module.kasm-desktop,
     # module.headscale,
   ]
