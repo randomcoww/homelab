@@ -26,7 +26,7 @@ data "helm_template" "authelia" {
   version    = var.source_release
   values = [
     yamlencode({
-      domain = join(".", slice(compact(split(".", var.service_hostname)), 1, length(compact(split(".", var.service_hostname)))))
+      domain = local.domain
       service = {
         type = "ClusterIP"
       }
@@ -40,7 +40,7 @@ data "helm_template" "authelia" {
         subdomain   = compact(split(".", var.service_hostname))[0]
         tls = {
           enabled = true
-          secret  = "${join(".", slice(compact(split(".", var.service_hostname)), 1, length(compact(split(".", var.service_hostname)))))}-tls"
+          secret  = "${local.domain}-tls"
         }
       }
       pod = {
@@ -173,6 +173,7 @@ module "metadata" {
 }
 
 locals {
+  domain  = join(".", slice(compact(split(".", var.service_hostname)), 1, length(compact(split(".", var.service_hostname)))))
   db_path = "/config/db.sqlite3"
 
   s = yamldecode(data.helm_template.authelia.manifests["templates/deployment.yaml"])

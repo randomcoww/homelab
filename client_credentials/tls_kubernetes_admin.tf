@@ -1,7 +1,7 @@
 # admin client
 
 resource "tls_private_key" "kubernetes-admin" {
-  algorithm   = data.terraform_remote_state.sr.outputs.kubernetes_ca.algorithm
+  algorithm   = data.terraform_remote_state.sr.outputs.kubernetes.ca.algorithm
   ecdsa_curve = "P521"
 }
 
@@ -16,8 +16,8 @@ resource "tls_cert_request" "kubernetes-admin" {
 
 resource "tls_locally_signed_cert" "kubernetes-admin" {
   cert_request_pem   = tls_cert_request.kubernetes-admin.cert_request_pem
-  ca_private_key_pem = data.terraform_remote_state.sr.outputs.kubernetes_ca.private_key_pem
-  ca_cert_pem        = data.terraform_remote_state.sr.outputs.kubernetes_ca.cert_pem
+  ca_private_key_pem = data.terraform_remote_state.sr.outputs.kubernetes.ca.private_key_pem
+  ca_cert_pem        = data.terraform_remote_state.sr.outputs.kubernetes.ca.cert_pem
 
   validity_period_hours = 8760
 

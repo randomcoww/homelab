@@ -7,7 +7,7 @@ output "kubernetes_admin" {
     algorithm       = tls_private_key.kubernetes-admin.algorithm
     private_key_pem = tls_private_key.kubernetes-admin.private_key_pem
     cert_pem        = tls_locally_signed_cert.kubernetes-admin.cert_pem
-    ca_cert_pem     = data.terraform_remote_state.sr.outputs.kubernetes_ca.cert_pem
+    ca_cert_pem     = data.terraform_remote_state.sr.outputs.kubernetes.ca.cert_pem
   }
   sensitive = true
 }
@@ -17,7 +17,7 @@ output "matchbox_client" {
     algorithm       = tls_private_key.matchbox-client.algorithm
     private_key_pem = tls_private_key.matchbox-client.private_key_pem
     cert_pem        = tls_locally_signed_cert.matchbox-client.cert_pem
-    ca_cert_pem     = data.terraform_remote_state.sr.outputs.matchbox_ca.cert_pem
+    ca_cert_pem     = data.terraform_remote_state.sr.outputs.matchbox.ca.cert_pem
   }
   sensitive = true
 }
@@ -29,7 +29,7 @@ output "kubeconfig" {
     clusters = [
       {
         cluster = {
-          certificate-authority-data = replace(base64encode(chomp(data.terraform_remote_state.sr.outputs.kubernetes_ca.cert_pem)), "\n", "")
+          certificate-authority-data = replace(base64encode(chomp(data.terraform_remote_state.sr.outputs.kubernetes.ca.cert_pem)), "\n", "")
           server                     = "https://${local.services.apiserver.ip}:${local.ports.apiserver}"
         }
         name = local.kubernetes.cluster_name

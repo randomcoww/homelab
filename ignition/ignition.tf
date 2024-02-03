@@ -119,7 +119,7 @@ module "server" {
     each.value.tailscale_hostname,
     "127.0.0.1",
   ]))
-  ca = data.terraform_remote_state.sr.outputs.ssh_ca
+  ca = data.terraform_remote_state.sr.outputs.ssh.ca
 }
 
 module "client" {
@@ -127,7 +127,7 @@ module "client" {
   source   = "./modules/client"
 
   ignition_version   = local.ignition_version
-  public_key_openssh = data.terraform_remote_state.sr.outputs.ssh_ca.public_key_openssh
+  public_key_openssh = data.terraform_remote_state.sr.outputs.ssh.ca.public_key_openssh
 }
 
 # kubernetes #
@@ -139,9 +139,9 @@ module "kubernetes-master" {
   ignition_version = local.ignition_version
   name             = "kubernetes-master"
   cluster_name     = local.kubernetes.cluster_name
-  ca               = data.terraform_remote_state.sr.outputs.kubernetes_ca
-  etcd_ca          = data.terraform_remote_state.sr.outputs.etcd_ca
-  service_account  = data.terraform_remote_state.sr.outputs.kubernetes_service_account
+  ca               = data.terraform_remote_state.sr.outputs.kubernetes.ca
+  etcd_ca          = data.terraform_remote_state.sr.outputs.etcd.ca
+  service_account  = data.terraform_remote_state.sr.outputs.kubernetes.service_account
   members = {
     for host_key, host in local.members.kubernetes-master :
     host_key => cidrhost(local.networks.kubernetes.prefix, host.netnum)
@@ -184,7 +184,7 @@ module "kubernetes-worker" {
   ignition_version = local.ignition_version
   name             = "kubernetes-worker"
   cluster_name     = local.kubernetes.cluster_name
-  ca               = data.terraform_remote_state.sr.outputs.kubernetes_ca
+  ca               = data.terraform_remote_state.sr.outputs.kubernetes.ca
   ports = {
     kubelet = local.ports.kubelet
   }
@@ -208,8 +208,8 @@ module "etcd" {
   name             = "etcd"
   host_key         = each.key
   cluster_token    = local.kubernetes.cluster_name
-  ca               = data.terraform_remote_state.sr.outputs.etcd_ca
-  peer_ca          = data.terraform_remote_state.sr.outputs.etcd_peer_ca
+  ca               = data.terraform_remote_state.sr.outputs.etcd.ca
+  peer_ca          = data.terraform_remote_state.sr.outputs.etcd.peer_ca
   images = {
     etcd         = local.container_images.etcd
     etcd_wrapper = local.container_images.etcd_wrapper

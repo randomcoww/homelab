@@ -142,7 +142,7 @@ module "matchbox" {
   }
   service_ip       = local.services.matchbox.ip
   service_hostname = local.kubernetes_ingress_endpoints.matchbox
-  ca               = data.terraform_remote_state.sr.outputs.matchbox_ca
+  ca               = data.terraform_remote_state.sr.outputs.matchbox.ca
 }
 
 module "vaultwarden" {
@@ -238,14 +238,12 @@ module "lldap" {
     lldap_http  = 17170
     lldap_ldaps = local.service_ports.lldap
   }
-  ca = {
-    algorithm       = data.terraform_remote_state.sr.outputs.lldap.algorithm
-    private_key_pem = data.terraform_remote_state.sr.outputs.lldap.private_key_pem
-    cert_pem        = data.terraform_remote_state.sr.outputs.lldap.cert_pem
-  }
+  ca                        = data.terraform_remote_state.sr.outputs.lldap.ca
   service_hostname          = local.kubernetes_ingress_endpoints.lldap_http
   jwt_token                 = data.terraform_remote_state.sr.outputs.lldap.jwt_token
   storage_secret            = data.terraform_remote_state.sr.outputs.lldap.storage_secret
+  admin_user                = data.terraform_remote_state.sr.outputs.lldap.user
+  admin_password            = data.terraform_remote_state.sr.outputs.lldap.password
   smtp_host                 = var.smtp.host
   smtp_port                 = var.smtp.port
   smtp_username             = var.smtp.username
@@ -398,7 +396,7 @@ module "code" {
   user = local.users.client.name
   uid  = local.users.client.uid
   ssh_known_hosts = [
-    "@cert-authority * ${data.terraform_remote_state.sr.outputs.ssh_ca.public_key_openssh}",
+    "@cert-authority * ${data.terraform_remote_state.sr.outputs.ssh.ca.public_key_openssh}",
   ]
   code_server_resources = {
     limits = {
@@ -590,7 +588,7 @@ module "kasm-desktop" {
   user = local.users.client.name
   uid  = local.users.client.uid
   ssh_known_hosts = [
-    "@cert-authority * ${data.terraform_remote_state.sr.outputs.ssh_ca.public_key_openssh}",
+    "@cert-authority * ${data.terraform_remote_state.sr.outputs.ssh.ca.public_key_openssh}",
   ]
   extra_envs = {
     VK_ICD_FILENAMES = join(":", [

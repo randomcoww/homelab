@@ -88,18 +88,18 @@ module "secret" {
     ## The sample value is for "example.com", but you can extend it with as
     ## many "dc" as you want, and you don't actually need to own the domain
     ## name.
-    #ldap_base_dn = "dc=example,dc=com"
+    ldap_base_dn = "dc=${join(",dc=", slice(compact(split(".", var.service_hostname)), 1, length(compact(split(".", var.service_hostname)))))}"
 
     ## Admin username.
     ## For the LDAP interface, a value of "admin" here will create the LDAP
     ## user "cn=admin,ou=people,dc=example,dc=com" (with the base DN above).
     ## For the administration interface, this is the username.
-    ldap_user_dn = "${var.smtp_username}"
+    ldap_user_dn = "${var.admin_user}"
 
     ## Admin email.
     ## Email for the admin account. It is only used when initially creating
     ## the admin user, and can safely be omitted.
-    ldap_user_email = "${var.smtp_username}"
+    #ldap_user_email = ""
 
     ## Admin password.
     ## Password for the admin account, both for the LDAP bind and for the
@@ -111,13 +111,13 @@ module "secret" {
     ## in the LLDAP_LDAP_USER_PASS_FILE environment variable
     ## Note: you can create another admin user for user administration, this
     ## is just the default one.
-    #ldap_user_pass = "REPLACE_WITH_PASSWORD"
+    ldap_user_pass = "${var.admin_password}"
 
     ## Force reset of the admin password.
     ## Break glass in case of emergency: if you lost the admin password, you
     ## can set this to true to force a reset of the admin password to the value
     ## of ldap_user_pass above.
-    #force_reset_admin_password = false
+    force_reset_admin_password = true
 
     ## Database URL.
     ## This encodes the type of database (SQlite, MySQL, or PostgreSQL)

@@ -8,6 +8,16 @@ resource "random_password" "lldap-jwt-token" {
   special = true
 }
 
+resource "random_password" "lldap-user" {
+  length  = 64
+  special = false
+}
+
+resource "random_password" "lldap-password" {
+  length  = 64
+  special = false
+}
+
 resource "tls_private_key" "lldap-ca" {
   algorithm = "RSA"
   rsa_bits  = "4096"

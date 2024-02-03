@@ -41,60 +41,60 @@ output "cloudflare_tunnels" {
 
 # etcd
 
-output "etcd_ca" {
+output "etcd" {
   value = {
-    algorithm       = tls_private_key.etcd-ca.algorithm
-    private_key_pem = tls_private_key.etcd-ca.private_key_pem
-    cert_pem        = tls_self_signed_cert.etcd-ca.cert_pem
-  }
-  sensitive = true
-}
-
-output "etcd_peer_ca" {
-  value = {
-    algorithm       = tls_private_key.etcd-peer-ca.algorithm
-    private_key_pem = tls_private_key.etcd-peer-ca.private_key_pem
-    cert_pem        = tls_self_signed_cert.etcd-peer-ca.cert_pem
+    ca = {
+      algorithm       = tls_private_key.etcd-ca.algorithm
+      private_key_pem = tls_private_key.etcd-ca.private_key_pem
+      cert_pem        = tls_self_signed_cert.etcd-ca.cert_pem
+    }
+    peer_ca = {
+      algorithm       = tls_private_key.etcd-peer-ca.algorithm
+      private_key_pem = tls_private_key.etcd-peer-ca.private_key_pem
+      cert_pem        = tls_self_signed_cert.etcd-peer-ca.cert_pem
+    }
   }
   sensitive = true
 }
 
 # kubernetes
 
-output "kubernetes_ca" {
+output "kubernetes" {
   value = {
-    algorithm       = tls_private_key.kubernetes-ca.algorithm
-    private_key_pem = tls_private_key.kubernetes-ca.private_key_pem
-    cert_pem        = tls_self_signed_cert.kubernetes-ca.cert_pem
-  }
-  sensitive = true
-}
-
-output "kubernetes_service_account" {
-  value = {
-    algorithm       = tls_private_key.service-account.algorithm
-    public_key_pem  = tls_private_key.service-account.public_key_pem
-    private_key_pem = tls_private_key.service-account.private_key_pem
+    ca = {
+      algorithm       = tls_private_key.kubernetes-ca.algorithm
+      private_key_pem = tls_private_key.kubernetes-ca.private_key_pem
+      cert_pem        = tls_self_signed_cert.kubernetes-ca.cert_pem
+    }
+    service_account = {
+      algorithm       = tls_private_key.service-account.algorithm
+      public_key_pem  = tls_private_key.service-account.public_key_pem
+      private_key_pem = tls_private_key.service-account.private_key_pem
+    }
   }
   sensitive = true
 }
 
 ##
 
-output "ssh_ca" {
+output "ssh" {
   value = {
-    algorithm          = tls_private_key.ssh-ca.algorithm
-    private_key_pem    = tls_private_key.ssh-ca.private_key_pem
-    public_key_openssh = tls_private_key.ssh-ca.public_key_openssh
+    ca = {
+      algorithm          = tls_private_key.ssh-ca.algorithm
+      private_key_pem    = tls_private_key.ssh-ca.private_key_pem
+      public_key_openssh = tls_private_key.ssh-ca.public_key_openssh
+    }
   }
   sensitive = true
 }
 
-output "matchbox_ca" {
+output "matchbox" {
   value = {
-    algorithm       = tls_private_key.matchbox-ca.algorithm
-    private_key_pem = tls_private_key.matchbox-ca.private_key_pem
-    cert_pem        = tls_self_signed_cert.matchbox-ca.cert_pem
+    ca = {
+      algorithm       = tls_private_key.matchbox-ca.algorithm
+      private_key_pem = tls_private_key.matchbox-ca.private_key_pem
+      cert_pem        = tls_self_signed_cert.matchbox-ca.cert_pem
+    }
   }
   sensitive = true
 }
@@ -135,11 +135,15 @@ output "headscale" {
 
 output "lldap" {
   value = {
-    algorithm       = tls_private_key.lldap-ca.algorithm
-    private_key_pem = tls_private_key.lldap-ca.private_key_pem
-    cert_pem        = tls_self_signed_cert.lldap-ca.cert_pem
-    storage_secret  = random_password.lldap-storage-secret.result
-    jwt_token       = random_password.lldap-jwt-token.result
+    ca = {
+      algorithm       = tls_private_key.lldap-ca.algorithm
+      private_key_pem = tls_private_key.lldap-ca.private_key_pem
+      cert_pem        = tls_self_signed_cert.lldap-ca.cert_pem
+    }
+    user           = random_password.lldap-user.result
+    password       = random_password.lldap-password.result
+    storage_secret = random_password.lldap-storage-secret.result
+    jwt_token      = random_password.lldap-jwt-token.result
   }
   sensitive = true
 }

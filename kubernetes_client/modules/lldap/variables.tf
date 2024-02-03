@@ -43,6 +43,22 @@ variable "ca" {
   })
 }
 
+variable "jwt_token" {
+  type = string
+}
+
+variable "storage_secret" {
+  type = string
+}
+
+variable "admin_user" {
+  type = string
+}
+
+variable "admin_password" {
+  type = string
+}
+
 variable "smtp_host" {
   type = string
 }
@@ -56,14 +72,6 @@ variable "smtp_username" {
 }
 
 variable "smtp_password" {
-  type = string
-}
-
-variable "jwt_token" {
-  type = string
-}
-
-variable "storage_secret" {
   type = string
 }
 
