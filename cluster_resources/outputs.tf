@@ -130,4 +130,12 @@ output "headscale" {
     private_key       = random_id.private-key.hex
     noise_private_key = random_id.noise-private-key.hex
   }
+  sensitive = true
+}
+
+output "lldap" {
+  value = {
+    storage_secret = random_password.lldap-storage-secret.result
+  }
+  sensitive = true
 }

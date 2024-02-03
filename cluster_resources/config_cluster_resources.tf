@@ -21,6 +21,10 @@ locals {
         bucket = "randomcoww-headscale-1"
         path   = "litestream"
       }
+      lldap = {
+        bucket = "randomcoww-lldap-1"
+        path   = "litestream"
+      }
       documents = {
         bucket = "randomcoww-backup-2"
         path   = "documents"
