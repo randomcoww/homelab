@@ -1,6 +1,9 @@
 locals {
-  db_path     = "/data/db.sqlite3"
-  config_path = "/etc/headscale"
+  db_path                = "/data/db.sqlite3"
+  base_path              = "/etc/headscale"
+  config_path            = "${local.base_path}/config.yaml"
+  private_key_path       = "${local.base_path}/private.key"
+  noise_private_key_path = "${local.base_path}/noise_private.key"
 }
 
 module "metadata" {
@@ -32,9 +35,9 @@ module "secret" {
       listen_addr         = "0.0.0.0:${var.ports.headscale}"
       grpc_listen_addr    = "0.0.0.0:${var.ports.headscale_grpc}"
       grpc_allow_insecure = false
-      private_key_path    = "${local.config_path}/private.key"
+      private_key_path    = local.private_key_path
       noise = {
-        private_key_path = "${local.config_path}/noise_private.key"
+        private_key_path = local.noise_private_key_path
       }
       ip_prefixes = [
         var.network_prefix,
@@ -168,7 +171,7 @@ module "statefulset" {
           "headscale",
           "serve",
           "-c",
-          "${local.config_path}/config.yaml",
+          local.config_path,
         ]
         volumeMounts = [
           {
@@ -177,17 +180,17 @@ module "statefulset" {
           },
           {
             name      = "secret"
-            mountPath = "${local.config_path}/config.yaml"
+            mountPath = local.config_path
             subPath   = "config.yaml"
           },
           {
             name      = "secret"
-            mountPath = "${local.config_path}/private.key"
+            mountPath = local.private_key_path
             subPath   = "private.key"
           },
           {
             name      = "secret"
-            mountPath = "${local.config_path}/noise_private.key"
+            mountPath = local.noise_private_key_path
             subPath   = "noise_private.key"
           },
         ]
