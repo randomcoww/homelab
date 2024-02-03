@@ -30,10 +30,6 @@ variable "affinity" {
   default = {}
 }
 
-variable "network_prefix" {
-  type = string
-}
-
 variable "private_key" {
   type = string
 }
@@ -44,6 +40,11 @@ variable "noise_private_key" {
 
 variable "service_hostname" {
   type = string
+}
+
+variable "extra_config" {
+  type    = any
+  default = {}
 }
 
 variable "ingress_class_name" {

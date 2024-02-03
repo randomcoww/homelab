@@ -30,47 +30,17 @@ module "secret" {
     SECRET_ACCESS_KEY   = var.s3_secret_access_key
     "private.key"       = "privkey:${var.private_key}"
     "noise_private.key" = "privkey:${var.noise_private_key}"
-    "config.yaml" = yamlencode({
-      server_url          = "http://${var.service_hostname}"
-      listen_addr         = "0.0.0.0:${var.ports.headscale}"
-      grpc_listen_addr    = "0.0.0.0:${var.ports.headscale_grpc}"
-      grpc_allow_insecure = false
-      private_key_path    = local.private_key_path
+    "config.yaml" = yamlencode(merge(var.extra_config, {
+      server_url       = "http://${var.service_hostname}"
+      listen_addr      = "0.0.0.0:${var.ports.headscale}"
+      grpc_listen_addr = "0.0.0.0:${var.ports.headscale_grpc}"
+      private_key_path = local.private_key_path
       noise = {
         private_key_path = local.noise_private_key_path
       }
-      ip_prefixes = [
-        var.network_prefix,
-      ]
-      derp = {
-        server = {
-          enabled = false
-        }
-        urls = [
-          "https://controlplane.tailscale.com/derpmap/default",
-        ]
-        paths               = []
-        auto_update_enabled = true
-        update_frequency    = "24h"
-      }
-      disable_check_updates             = false
-      ephemeral_node_inactivity_timeout = "30m"
-      node_update_check_interval        = "10s"
-      db_type                           = "sqlite3"
-      db_path                           = local.db_path
-      log = {
-        level = "info"
-      }
-      acl_policy_path = ""
-      dns_config = {
-        override_local_dns = false
-        magic_dns          = true
-      }
-      logtail = {
-        enabled = false
-      }
-      randomize_client_port = false
-    })
+      db_type = "sqlite3"
+      db_path = local.db_path
+    }))
   })
 }
 
