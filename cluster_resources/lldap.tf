@@ -1,16 +1,16 @@
 resource "random_password" "lldap-storage-secret" {
-  length  = 64
+  length  = 128
   special = false
 }
 
 resource "random_password" "lldap-jwt-token" {
   length  = 128
-  special = false
+  special = true
 }
 
 resource "tls_private_key" "lldap-ca" {
-  algorithm   = "ECDSA"
-  ecdsa_curve = "P521"
+  algorithm = "RSA"
+  rsa_bits  = "4096"
 }
 
 resource "tls_self_signed_cert" "lldap-ca" {
