@@ -33,3 +33,20 @@ resource "matchbox_group" "pxeboot" {
     mac = replace(each.key, "-", ":")
   }
 }
+
+resource "matchbox_profile" "podlist" {
+  for_each = data.terraform_remote_state.ign.outputs.podlist
+
+  name           = each.key
+  generic_config = each.value
+}
+
+resource "matchbox_group" "podlist" {
+  for_each = matchbox_profile.podlist
+
+  profile = each.key
+  name    = each.key
+  selector = {
+    node = local.hosts[each.key].hostname
+  }
+}

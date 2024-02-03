@@ -17,7 +17,7 @@ resource "local_file" "ignition" {
 output "podlist" {
   value = {
     for host_key in keys(local.hosts) :
-    host_key => chomp(yamlencode({
+    host_key => yamlencode({
       apiVersion = "v1"
       kind       = "PodList"
       items = flatten([
@@ -27,7 +27,7 @@ output "podlist" {
           yamldecode(pod)
         ]
       ])
-    }))
+    })
   }
   sensitive = true
 }
