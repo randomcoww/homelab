@@ -3,6 +3,11 @@ resource "random_password" "lldap-storage-secret" {
   special = false
 }
 
+resource "random_password" "lldap-jwt-token" {
+  length  = 128
+  special = false
+}
+
 resource "tls_private_key" "lldap-ca" {
   algorithm   = "ECDSA"
   ecdsa_curve = "P521"
