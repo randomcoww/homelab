@@ -190,6 +190,7 @@ module "authelia" {
     litestream = local.container_images.litestream
   }
   service_hostname = local.kubernetes_ingress_endpoints.auth
+  lldap_ca         = data.terraform_remote_state.sr.outputs.lldap.ca
   configmap = {
     telemetry = {
       metrics = {
@@ -215,9 +216,12 @@ module "authelia" {
       }
       # https://github.com/lldap/lldap/blob/main/example_configs/authelia_config.yml
       ldap = {
-        enabled                = true
-        implementation         = "custom"
-        url                    = "ldap://${local.kubernetes_service_endpoints.lldap}:${local.service_ports.lldap}"
+        enabled        = true
+        implementation = "custom"
+        tls = {
+          skip_verify = false
+        }
+        url                    = "ldaps://${local.kubernetes_service_endpoints.lldap}:${local.service_ports.lldap_ldaps}"
         base_dn                = "dc=${join(",dc=", slice(compact(split(".", local.kubernetes_ingress_endpoints.lldap_http)), 1, length(compact(split(".", local.kubernetes_ingress_endpoints.lldap_http)))))}"
         username_attribute     = "uid"
         additional_users_dn    = "ou=people"
@@ -304,7 +308,7 @@ module "lldap" {
     litestream = local.container_images.litestream
   }
   ports = {
-    lldap       = local.service_ports.lldap
+    lldap       = 3890
     lldap_http  = 17170
     lldap_ldaps = local.service_ports.lldap_ldaps
   }
@@ -355,6 +359,7 @@ module "hostapd" {
       }
     }
   }
+  # https://w1.fi/cgit/hostap/plain/hostapd/hostapd.conf
   config = merge({
     # sae_password=
     # ssid=

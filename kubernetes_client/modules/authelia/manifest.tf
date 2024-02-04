@@ -4,8 +4,10 @@ module "secret-custom" {
   app     = var.name
   release = var.release
   data = {
-    ACCESS_KEY_ID     = var.s3_access_key_id
-    SECRET_ACCESS_KEY = var.s3_secret_access_key
+    ACCESS_KEY_ID              = var.s3_access_key_id
+    SECRET_ACCESS_KEY          = var.s3_secret_access_key
+    LDAP_TLS_CERTIFICATE_CHAIN = chomp(tls_locally_signed_cert.lldap.cert_pem)
+    LDAP_TLS_PRIVATE_KEY       = chomp(tls_private_key.lldap.private_key_pem)
   }
 }
 
@@ -45,6 +47,16 @@ data "helm_template" "authelia" {
             name      = "authelia-data"
             mountPath = "/config"
           },
+          {
+            name      = "authelia-custom"
+            mountPath = local.ldap_server_key_path
+            subPath   = "LDAP_TLS_PRIVATE_KEY"
+          },
+          {
+            name      = "authelia-custom"
+            mountPath = local.ldap_server_cert_path
+            subPath   = "LDAP_TLS_CERTIFICATE_CHAIN"
+          },
         ]
         extraVolumes = [
           {
@@ -58,6 +70,16 @@ data "helm_template" "authelia" {
             secret = {
               secretName = "${var.name}-custom"
             }
+          },
+        ]
+        env = [
+          {
+            name  = "AUTHELIA_AUTHENTICATION_BACKEND_LDAP_TLS_PRIVATE_KEY_FILE"
+            value = local.ldap_server_key_path
+          },
+          {
+            name  = "AUTHELIA_AUTHENTICATION_BACKEND_LDAP_TLS_CERTIFICATE_CHAIN_FILE"
+            value = local.ldap_server_cert_path
           },
         ]
       }
@@ -75,6 +97,14 @@ data "helm_template" "authelia" {
         }
       })
       secret = var.secret
+      certificates = {
+        values = [
+          {
+            name  = "lldap-ca.pem"
+            value = var.lldap_ca.cert_pem
+          },
+        ]
+      }
       persistence = {
         enabled = false
       }
@@ -92,8 +122,10 @@ module "metadata" {
 }
 
 locals {
-  domain  = join(".", slice(compact(split(".", var.service_hostname)), 1, length(compact(split(".", var.service_hostname)))))
-  db_path = "/config/db.sqlite3"
+  domain                = join(".", slice(compact(split(".", var.service_hostname)), 1, length(compact(split(".", var.service_hostname)))))
+  db_path               = "/config/db.sqlite3"
+  ldap_server_cert_path = "/custom/server-cert.pem"
+  ldap_server_key_path  = "/custom/server-key.pem"
 
   s = yamldecode(data.helm_template.authelia.manifests["templates/deployment.yaml"])
   manifests = merge(data.helm_template.authelia.manifests, {
@@ -102,9 +134,6 @@ locals {
       spec = merge(local.s.spec, {
         template = merge(local.s.spec.template, {
           spec = merge(local.s.spec.template.spec, {
-            strategy = {
-              type = "Recreate"
-            }
             initContainers = [
               {
                 name  = "${var.name}-init"

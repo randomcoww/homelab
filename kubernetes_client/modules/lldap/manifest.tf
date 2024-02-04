@@ -61,12 +61,6 @@ module "service" {
     type = "ClusterIP"
     ports = [
       {
-        name       = "default"
-        port       = var.ports.lldap
-        protocol   = "TCP"
-        targetPort = var.ports.lldap
-      },
-      {
         name       = "ldaps"
         port       = var.ports.lldap_ldaps
         protocol   = "TCP"
