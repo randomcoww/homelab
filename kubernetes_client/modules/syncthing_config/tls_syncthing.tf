@@ -28,7 +28,6 @@ resource "tls_locally_signed_cert" "syncthing" {
     "key_encipherment",
     "digital_signature",
     "server_auth",
-    "client_auth",
   ]
 }
 
