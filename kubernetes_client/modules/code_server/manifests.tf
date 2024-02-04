@@ -89,6 +89,7 @@ module "syncthing-config" {
   syncthing_home_path = local.syncthing_home_path
   sync_data_paths = [
     "${local.code_home_path}/project",
+    "${local.code_home_path}/.local/share/code-server",
   ]
   ports = {
     syncthing_peer = var.ports.syncthing_peer
