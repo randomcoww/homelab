@@ -41,7 +41,6 @@ EOF
 Create `ignition/secrets.tfvars` file
 
 ```bash
-PASSWORD=
 LINUX_PASSWORD_HASH=$(echo $PASSWORD | openssl passwd -6 -stdin)
 ```
 
@@ -74,9 +73,9 @@ Create `kubernetes_client/secrets.tfvars` file
 Reference: [Generate Authelia password hash](https://www.authelia.com/reference/guides/passwords/#user--password-file)
 
 ```bash
-PASSWORD=
 GMAIL_USER=
 GMAIL_PASSWORD=
+AP_PASSWORD=
 AP_SSID=
 AP_COUNTRY_CODE=
 AP_CHANNEL=
@@ -93,7 +92,7 @@ APCA_API_BASE_URL=
 ```bash
 cat > kubernetes_client/secrets.tfvars <<EOF
 hostapd = {
-  sae_password = "$PASSWORD"
+  sae_password = "$AP_PASSWORD"
   ssid         = "$AP_SSID"
   country_code = "$AP_COUNTRY_CODE"
   channel      = $AP_CHANNEL
