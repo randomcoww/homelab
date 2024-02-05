@@ -141,7 +141,7 @@ locals {
 }
 
 module "controller-manager-kubeconfig" {
-  source             = "../kubeconfig"
+  source             = "../../../modules/kubeconfig"
   cluster_name       = var.cluster_name
   user               = var.controller_manager_user
   apiserver_endpoint = "https://127.0.0.1:${var.ports.apiserver_backend}"
@@ -151,7 +151,7 @@ module "controller-manager-kubeconfig" {
 }
 
 module "scheduler-kubeconfig" {
-  source             = "../kubeconfig"
+  source             = "../../../modules/kubeconfig"
   cluster_name       = var.cluster_name
   user               = var.scheduler_user
   apiserver_endpoint = "https://127.0.0.1:${var.ports.apiserver_backend}"
@@ -161,7 +161,7 @@ module "scheduler-kubeconfig" {
 }
 
 module "apiserver" {
-  source = "../static_pod"
+  source = "../../../modules/static_pod"
   name   = "kube-apiserver"
   spec = {
     containers = [
@@ -248,7 +248,7 @@ module "apiserver" {
 }
 
 module "controller-manager" {
-  source = "../static_pod"
+  source = "../../../modules/static_pod"
   name   = "kube-contoller-manager"
   spec = {
     containers = [
@@ -305,7 +305,7 @@ module "controller-manager" {
 }
 
 module "scheduler" {
-  source = "../static_pod"
+  source = "../../../modules/static_pod"
   name   = "kube-scheduler"
   spec = {
     containers = [

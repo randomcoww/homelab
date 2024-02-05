@@ -103,7 +103,7 @@ locals {
 }
 
 module "etcd-wrapper" {
-  source = "../static_pod"
+  source = "../../../modules/static_pod"
   name   = "etcd-wrapper"
   spec = {
     containers = [
@@ -172,7 +172,6 @@ module "etcd-wrapper" {
           {
             name      = "config"
             mountPath = local.config_path
-            readOnly  = true
           },
           {
             name      = "static-pod"

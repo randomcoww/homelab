@@ -127,7 +127,7 @@ locals {
 }
 
 module "node-bootstrap-kubeconfig" {
-  source             = "../kubeconfig"
+  source             = "../../../modules/kubeconfig"
   cluster_name       = var.cluster_name
   user               = var.node_bootstrap_user
   apiserver_endpoint = var.apiserver_endpoint

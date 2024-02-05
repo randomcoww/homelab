@@ -23,40 +23,7 @@ output "matchbox_client" {
 }
 
 output "kubeconfig" {
-  value = yamlencode({
-    apiVersion = "v1"
-    kind       = "Config"
-    clusters = [
-      {
-        cluster = {
-          certificate-authority-data = replace(base64encode(chomp(data.terraform_remote_state.sr.outputs.kubernetes.ca.cert_pem)), "\n", "")
-          server                     = "https://${local.services.apiserver.ip}:${local.ports.apiserver}"
-        }
-        name = local.kubernetes.cluster_name
-      }
-    ]
-    contexts = [
-      {
-        context = {
-          cluster = local.kubernetes.cluster_name
-          user    = "kubernetes-super-admin"
-        }
-        name = "default"
-      }
-    ]
-    current-context = "default"
-    preferences     = {}
-    users = [
-      {
-        name = "kubernetes-super-admin"
-        user = {
-          as-user-extra           = {}
-          client-certificate-data = replace(base64encode(chomp(tls_locally_signed_cert.kubernetes-admin.cert_pem)), "\n", "")
-          client-key-data         = replace(base64encode(chomp(tls_private_key.kubernetes-admin.private_key_pem)), "\n", "")
-        }
-      }
-    ]
-  })
+  value     = module.admin-kubeconfig.manifest
   sensitive = true
 }
 
