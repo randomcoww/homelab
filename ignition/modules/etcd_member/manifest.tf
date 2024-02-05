@@ -17,7 +17,7 @@ locals {
     "https://${ip}:${var.ports.etcd_client}"
   ])
   listen_client_urls = join(",", [
-    for _, ip in concat(["127.0.0.1"], var.etcd_ips) :
+    for _, ip in distinct(concat(["127.0.0.1"], var.etcd_ips)) :
     "https://${ip}:${var.ports.etcd_client}"
   ])
   initial_cluster = join(",", [
