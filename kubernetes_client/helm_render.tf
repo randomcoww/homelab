@@ -374,7 +374,7 @@ module "hostapd" {
     noscan                       = 1
     preamble                     = 1
     wpa                          = 2
-    wpa_key_mgmt                 = "SAE"
+    wpa_key_mgmt                 = "SAE WPA-EAP-SUITE-B-192"
     wpa_pairwise                 = "CCMP"
     group_cipher                 = "CCMP"
     hw_mode                      = "a"
