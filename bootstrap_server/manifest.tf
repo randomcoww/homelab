@@ -18,14 +18,14 @@ module "bootstrap" {
           <<-EOF
           set -e
           mkdir -p ${local.kea_config_path}
-          echo -e "$kea_config" > ${local.kea_config_path}/kea-dhcp4.conf
+          echo -e "$config" > ${local.kea_config_path}/kea-dhcp4.conf
           exec kea-dhcp4 \
             -c ${local.kea_config_path}/kea-dhcp4.conf
           EOF
         ]
         env = [
           {
-            name = "kea_config"
+            name = "config"
             value = jsonencode({
               Dhcp4 = {
                 valid-lifetime = 300
