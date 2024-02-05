@@ -104,7 +104,7 @@ locals {
 
 module "etcd-wrapper" {
   source = "../../../modules/static_pod"
-  name   = "etcd-wrapper"
+  name   = "${var.name}-wrapper"
   spec = {
     containers = [
       {
