@@ -1,6 +1,5 @@
-output "manifest" {
-  value     = join("\n---\n", values(local.manifests))
-  sensitive = true
+output "pod_manifest" {
+  value = nonsensitive(module.bootstrap.manifest)
 }
 
 output "matchbox_endpoint" {

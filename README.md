@@ -189,7 +189,7 @@ tw terraform -chdir=bootstrap_server apply \
 Launch bootstrap service with Podman
 
 ```bash
-tw terraform -chdir=bootstrap_server output -raw manifest > bootstrap.yaml
+tw terraform -chdir=bootstrap_server output -raw pod_manifest > bootstrap.yaml
 sudo podman play kube bootstrap.yaml
 ```
 
