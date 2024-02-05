@@ -1,7 +1,7 @@
 locals {
   config_path        = "${var.config_base_path}/${var.name}"
   etcd_snapshot_file = "${local.config_path}/etcd-snapshot.db"
-  etcd_manifest_file = "${var.static_pod_path}/etcd.json"
+  etcd_manifest_file = "${var.static_pod_path}/${var.name}.json"
 
   # etcd cluster params
   initial_advertise_peer_urls = join(",", [
@@ -129,7 +129,7 @@ module "etcd-wrapper" {
           # pod manifest args
           "--etcd-image=${var.images.etcd}",
           "--etcd-snaphot-file=${local.etcd_snapshot_file}",
-          "--etcd-pod-name=etcd",
+          "--etcd-pod-name=${var.name}",
           "--etcd-pod-namespace=$(POD_NAMESPACE)",
           "--etcd-pod-manifest-file=${local.etcd_manifest_file}",
           # etcd-wrapper args
