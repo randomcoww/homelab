@@ -13,7 +13,6 @@ output "manifest" {
       priorityClassName = "system-node-critical"
       priority          = 2000001000
       hostNetwork       = true
-      dnsPolicy         = "ClusterFirstWithHostNet"
       restartPolicy     = "Always"
     }, var.spec)
   })
