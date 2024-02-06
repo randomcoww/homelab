@@ -29,6 +29,14 @@ resource "aws_s3_bucket_server_side_encryption_configuration" "bucket" {
   }
 }
 
+resource "aws_s3_bucket_versioning" "bucket" {
+  for_each = aws_s3_bucket.bucket
+  bucket   = each.key
+  versioning_configuration {
+    status = "Suspended"
+  }
+}
+
 resource "aws_iam_user" "s3" {
   for_each = local.s3_resources
   name     = each.key
