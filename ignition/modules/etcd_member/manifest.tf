@@ -163,10 +163,6 @@ module "etcd-wrapper" {
             name  = "AWS_DEFAULT_REGION"
             value = var.s3_region
           },
-          {
-            name  = "AWS_SDK_LOAD_CONFIG"
-            value = "1"
-          },
         ]
         volumeMounts = [
           {
