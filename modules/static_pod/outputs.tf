@@ -14,6 +14,14 @@ output "manifest" {
       priority          = 2000001000
       hostNetwork       = true
       restartPolicy     = "Always"
+      dnsConfig = {
+        options = [
+          {
+            name  = "ndots"
+            value = "2"
+          },
+        ]
+      }
     }, var.spec)
   })
 }
