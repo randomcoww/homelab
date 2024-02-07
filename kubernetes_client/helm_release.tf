@@ -1,6 +1,5 @@
 locals {
   modules_enabled = [
-    module.mpd,
     module.transmission,
     module.alpaca-stream,
     module.hostapd,
@@ -16,6 +15,7 @@ locals {
     module.bootstrap,
     module.kube-proxy,
     module.lldap,
+    # module.mpd,
     # module.headscale,
     # module.kasm-desktop,
   ]
@@ -136,7 +136,7 @@ resource "helm_release" "ingress-nginx" {
   namespace        = split(".", local.kubernetes_service_endpoints[each.key])[1]
   create_namespace = true
   wait             = false
-  version          = "4.9.0"
+  version          = "4.9.1"
   max_history      = 2
   values = [
     yamlencode({
