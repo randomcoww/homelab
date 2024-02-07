@@ -8,6 +8,11 @@ systemd:
 
 storage:
   files:
+    - path: /etc/sysctl.d/20-forward.conf
+      mode: 0644
+      contents:
+        inline: |
+          net.ipv4.ip_forward=1
     - path: /etc/nftables/${name}.nft
       mode: 0644
       overwrite: true
