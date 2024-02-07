@@ -59,11 +59,11 @@ module "configmap" {
     "kube-proxy-config.yaml" = yamlencode({
       kind               = "KubeProxyConfiguration"
       apiVersion         = "kubeproxy.config.k8s.io/v1alpha1"
-      mode               = "ipvs"
+      mode               = "nftables"
       clusterCIDR        = var.kubernetes_pod_prefix
       healthzBindAddress = "127.0.0.1:${var.ports.kube_proxy}"
-      ipvs = {
-        strictARP = true
+      featureGates = {
+        NFTablesProxyMode = true
       }
     })
   }
@@ -115,8 +115,9 @@ module "daemonset" {
         }
         volumeMounts = [
           {
-            mountPath = "/run/xtables.lock"
-            name      = "xtables-lock"
+            name      = "modules"
+            mountPath = "/lib/modules"
+            readOnly  = true
           },
           {
             name      = "kube-proxy-config"
@@ -137,10 +138,9 @@ module "daemonset" {
     ]
     volumes = [
       {
-        name = "xtables-lock"
+        name = "modules"
         hostPath = {
-          path = "/run/xtables.lock"
-          type = "FileOrCreate"
+          path = "/usr/lib/modules"
         }
       },
       {

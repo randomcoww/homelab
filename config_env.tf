@@ -103,7 +103,7 @@ locals {
     flannel_cni_plugin = "docker.io/flannel/flannel-cni-plugin:v1.2.0"
     kapprover          = "ghcr.io/randomcoww/kapprover:20240126"
     external_dns       = "registry.k8s.io/external-dns/external-dns:v0.14.0"
-    kube_proxy         = "ghcr.io/randomcoww/kubernetes:kube-proxy-v${local.kubernetes.version}"
+    kube_proxy         = "ghcr.io/randomcoww/kubernetes:kube-proxy-v${local.kubernetes.version}-2"
     transmission       = "ghcr.io/randomcoww/transmission:20240108.1"
     wireguard          = "ghcr.io/randomcoww/wireguard:20240109"
     vaultwarden        = "docker.io/vaultwarden/server:1.30.1-alpine"

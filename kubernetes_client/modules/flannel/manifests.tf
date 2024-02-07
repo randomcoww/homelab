@@ -247,10 +247,6 @@ module "daemonset" {
             name      = "flannel-cfg"
             mountPath = "/etc/kube-flannel"
           },
-          {
-            name      = "xtables-lock"
-            mountPath = "/run/xtables.lock"
-          },
         ]
       }
     ]
@@ -277,13 +273,6 @@ module "daemonset" {
         name = "flannel-cfg"
         configMap = {
           name = "flannel"
-        }
-      },
-      {
-        name = "xtables-lock"
-        hostPath = {
-          path = "/run/xtables.lock"
-          type = "FileOrCreate"
         }
       },
     ]
