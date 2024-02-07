@@ -13,7 +13,7 @@ storage:
             default_backend kube-apiserver
 
           backend kube-apiserver
-            option httpchk GET /readyz HTTP/1.0
+            option httpchk GET ${apiserver_health_endpoint} HTTP/1.0
             http-check expect status 200
             mode tcp
             balance leastconn

@@ -1,5 +1,6 @@
 locals {
-  config_path = "${var.config_base_path}/${var.name}"
+  config_path               = "${var.config_base_path}/${var.name}"
+  apiserver_health_endpoint = "/livez"
 
   pki = {
     for key, f in {
@@ -103,12 +104,13 @@ locals {
         for host_key, ip in var.members :
         "${host_key}" => "${ip}:${var.ports.apiserver_backend}"
       }
-      virtual_router_id        = var.virtual_router_id
-      sync_interface_name      = var.sync_interface_name
-      apiserver_ip             = var.apiserver_ip
-      apiserver_interface_name = var.apiserver_interface_name
-      keepalived_path          = var.keepalived_path
-      haproxy_path             = var.haproxy_path
+      virtual_router_id         = var.virtual_router_id
+      sync_interface_name       = var.sync_interface_name
+      apiserver_ip              = var.apiserver_ip
+      apiserver_interface_name  = var.apiserver_interface_name
+      apiserver_health_endpoint = local.apiserver_health_endpoint
+      keepalived_path           = var.keepalived_path
+      haproxy_path              = var.haproxy_path
     })
     ], [
     yamlencode({
@@ -212,7 +214,7 @@ module "apiserver" {
             scheme = "HTTPS"
             host   = "127.0.0.1"
             port   = var.ports.apiserver_backend
-            path   = "/healthz"
+            path   = local.apiserver_health_endpoint
           }
           initialDelaySeconds = 15
           timeoutSeconds      = 15
