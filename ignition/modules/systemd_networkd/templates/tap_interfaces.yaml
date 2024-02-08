@@ -48,6 +48,7 @@ storage:
           KeepConfiguration=dhcp
           %{~ if length(lookup(tap_interface, "dns", "")) > 0 ~}
           DNS=${tap_interface.dns}
+          DNSOverTLS=true
           %{~ endif ~}
           %{~ if lookup(tap_interface, "enable_netnum", false) ~}
 
