@@ -25,14 +25,6 @@ storage:
             }
           }
 
-    # Resolve mDNS and forward
-    - path: /etc/systemd/resolved.conf.d/12-mdns-resolver.conf
-      mode: 0644
-      contents:
-        inline: |
-          [Resolve]
-          DNSStubListenerExtra=0.0.0.0:${ports.gateway_dns}
-
     # Create fallback route so backup node can access the internet through the wan interface
     - path: /etc/systemd/network/20-${wan_interface_name}.network.d/20-master-default-route.conf
       mode: 0644

@@ -6,12 +6,6 @@ variable "name" {
   type = string
 }
 
-variable "ports" {
-  type = object({
-    gateway_dns = number
-  })
-}
-
 variable "host_netnum" {
   type = number
 }

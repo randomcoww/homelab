@@ -15,7 +15,6 @@ locals {
       sync_prefix                = var.sync_prefix
       lan_gateway_ip             = var.lan_gateway_ip
       keepalived_path            = var.keepalived_path
-      ports                      = var.ports
 
       virtual_router_id = var.virtual_router_id
       vrrp_master_default_route = {

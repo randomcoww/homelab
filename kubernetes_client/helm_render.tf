@@ -92,11 +92,6 @@ module "kube-dns" {
           fallthrough
           EOF
         },
-        # mDNS
-        {
-          name       = "forward"
-          parameters = "${local.domains.mdns} dns://${local.services.gateway.ip}:${local.host_ports.gateway_dns}"
-        },
         # public DNS
         {
           name        = "forward"
@@ -451,6 +446,7 @@ module "kea" {
       ]
       domain_search = [
         local.domains.public,
+        local.domains.kubernetes,
       ]
       mtu = network.mtu
       pools = [

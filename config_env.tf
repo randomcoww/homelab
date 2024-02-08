@@ -205,7 +205,6 @@ locals {
   }
 
   host_ports = {
-    gateway_dns        = 53
     kea_peer           = 50060
     tftpd              = 69
     apiserver          = 58081

@@ -241,7 +241,8 @@ locals {
           source_interface_name = "phy0-kubernetes"
           enable_netnum         = true
         }
-        # shares resource over double NAT LAN
+        # TODO: remove
+        # Special case share over double NAT LAN
         wan = {
           source_interface_name = "phy0-wan"
           mac                   = ""

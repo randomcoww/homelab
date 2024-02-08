@@ -52,9 +52,6 @@ module "gateway" {
   ignition_version = local.ignition_version
   name             = "gateway"
   host_netnum      = each.value.netnum
-  ports = {
-    gateway_dns = local.host_ports.gateway_dns
-  }
   accept_prefixes = [
     local.networks.etcd.prefix,
     local.networks.sync.prefix,
