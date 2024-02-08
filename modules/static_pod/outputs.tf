@@ -24,4 +24,5 @@ output "manifest" {
       }
     }, var.spec)
   })
+  sensitive = true
 }

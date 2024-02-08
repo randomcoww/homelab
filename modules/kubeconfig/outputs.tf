@@ -31,4 +31,5 @@ output "manifest" {
       },
     ]
   })
+  sensitive = true
 }
