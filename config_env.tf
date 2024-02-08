@@ -171,7 +171,7 @@ locals {
     ingress_nginx_external = "ingress-nginx-external"
   }
 
-  kubernetes_service_endpoints = {
+  kubernetes_services = {
     for name, e in {
       apiserver = {
         name      = "kubernetes"

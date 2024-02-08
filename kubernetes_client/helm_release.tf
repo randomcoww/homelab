@@ -133,7 +133,7 @@ resource "helm_release" "ingress-nginx" {
   name             = each.value
   repository       = "https://kubernetes.github.io/ingress-nginx"
   chart            = "ingress-nginx"
-  namespace        = local.kubernetes_service_endpoints[each.key].namespace
+  namespace        = local.kubernetes_services[each.key].namespace
   create_namespace = true
   wait             = false
   version          = "4.9.1"
@@ -199,7 +199,7 @@ resource "helm_release" "cloudflare-tunnel" {
         ingress = [
           {
             hostname = "*.${local.domains.public}"
-            service  = "https://${local.kubernetes_service_endpoints.ingress_nginx_external.endpoint}"
+            service  = "https://${local.kubernetes_services.ingress_nginx_external.endpoint}"
           },
         ]
       }
@@ -368,8 +368,8 @@ resource "helm_release" "cert-issuer" {
 # minio #
 
 resource "helm_release" "minio" {
-  name             = local.kubernetes_service_endpoints.minio.name
-  namespace        = local.kubernetes_service_endpoints.minio.namespace
+  name             = local.kubernetes_services.minio.name
+  namespace        = local.kubernetes_services.minio.namespace
   repository       = "https://charts.min.io/"
   chart            = "minio"
   create_namespace = true

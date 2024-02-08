@@ -182,8 +182,8 @@ module "vaultwarden" {
 
 module "authelia" {
   source         = "./modules/authelia"
-  name           = local.kubernetes_service_endpoints.authelia.name
-  namespace      = local.kubernetes_service_endpoints.authelia.namespace
+  name           = local.kubernetes_services.authelia.name
+  namespace      = local.kubernetes_services.authelia.namespace
   release        = "0.1.1"
   source_release = "0.8.58"
   images = {
@@ -221,7 +221,7 @@ module "authelia" {
         tls = {
           skip_verify = false
         }
-        url                    = "ldaps://${local.kubernetes_service_endpoints.lldap.endpoint}:${local.service_ports.lldap_ldaps}"
+        url                    = "ldaps://${local.kubernetes_services.lldap.endpoint}:${local.service_ports.lldap_ldaps}"
         base_dn                = "dc=${join(",dc=", slice(compact(split(".", local.kubernetes_ingress_endpoints.lldap_http)), 1, length(compact(split(".", local.kubernetes_ingress_endpoints.lldap_http)))))}"
         username_attribute     = "uid"
         additional_users_dn    = "ou=people"
@@ -300,8 +300,8 @@ module "authelia" {
 
 module "lldap" {
   source    = "./modules/lldap"
-  name      = local.kubernetes_service_endpoints.lldap.name
-  namespace = local.kubernetes_service_endpoints.lldap.namespace
+  name      = local.kubernetes_services.lldap.name
+  namespace = local.kubernetes_services.lldap.namespace
   release   = "0.1.0"
   images = {
     lldap      = local.container_images.lldap
@@ -563,7 +563,7 @@ module "transmission" {
     --verify
 
   minio-client \
-    -endpoint="${local.kubernetes_service_endpoints.minio.endpoint}:${local.service_ports.minio}" \
+    -endpoint="${local.kubernetes_services.minio.endpoint}:${local.service_ports.minio}" \
     -bucket="${local.minio_buckets.downloads.name}" \
     -path="$TR_TORRENT_NAME"
 

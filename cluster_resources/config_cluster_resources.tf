@@ -54,7 +54,7 @@ locals {
       country_whitelist = [
         "US", "JP",
       ]
-      service = "https://${local.kubernetes_service_endpoints.ingress_nginx_external.endpoint}"
+      service = "https://${local.kubernetes_services.ingress_nginx_external.endpoint}"
     }
   }
 }
