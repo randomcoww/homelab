@@ -49,12 +49,12 @@ locals {
     #   service           = string
     # }))
     external = {
-      zone = local.domains.internal
+      zone = local.domains.public
       path = "/"
       country_whitelist = [
         "US", "JP",
       ]
-      service = "https://${local.kubernetes_service_endpoints.ingress_nginx_external}"
+      service = "https://${local.kubernetes_service_endpoints.ingress_nginx_external.endpoint}"
     }
   }
 }

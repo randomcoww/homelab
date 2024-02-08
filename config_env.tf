@@ -97,8 +97,6 @@ locals {
     hostapd            = "ghcr.io/randomcoww/hostapd:2.10-2"
     syncthing          = "docker.io/syncthing/syncthing:1.27"
     rclone             = "docker.io/rclone/rclone:1.65"
-    mpd                = "ghcr.io/randomcoww/mpd:0.23.15.3-s6"
-    mympd              = "ghcr.io/jcorporation/mympd/mympd:13.0.6"
     flannel            = "docker.io/flannel/flannel:v0.24.0"
     flannel_cni_plugin = "docker.io/flannel/flannel-cni-plugin:v1.2.0"
     kapprover          = "ghcr.io/randomcoww/kapprover:20240126"
@@ -115,6 +113,7 @@ locals {
     alpaca_stream      = "ghcr.io/randomcoww/alpaca-stream-server:20230518.1"
     headscale          = "docker.io/headscale/headscale:0.22"
     lldap              = "docker.io/lldap/lldap:2024-02-02-alpine"
+    bsimp              = "ghcr.io/randomcoww/bsimp:20240208.2"
   }
 
   pxeboot_images = {
@@ -142,18 +141,17 @@ locals {
   }
 
   domains = {
-    internal_mdns = "local"
-    internal      = "fuzzybunny.win"
-    kubernetes    = "cluster.internal"
-    tailscale     = "fawn-turtle.ts.net"
+    mdns       = "local"
+    public     = "fuzzybunny.win"
+    kubernetes = "cluster.internal"
+    tailscale  = "fawn-turtle.ts.net"
   }
 
   kubernetes_ingress_endpoints = {
     for k, domain in {
-      mpd           = "mpd"
       auth          = "auth"
       transmission  = "t"
-      minio         = "m"
+      minio         = "minio"
       vaultwarden   = "vw"
       matchbox      = "ign"
       code_server   = "code"
@@ -163,8 +161,9 @@ locals {
       speedtest     = "speedtest"
       headscale     = "headscale"
       lldap_http    = "ldap"
+      bsimp         = "bsimp"
     } :
-    k => "${domain}.${local.domains.internal}"
+    k => "${domain}.${local.domains.public}"
   }
 
   ingress_classes = {
@@ -173,12 +172,35 @@ locals {
   }
 
   kubernetes_service_endpoints = {
-    apiserver              = "kubernetes.default.svc.${local.domains.kubernetes}"
-    authelia               = "authelia.authelia.svc.${local.domains.kubernetes}"
-    ingress_nginx          = "${local.ingress_classes.ingress_nginx}-controller.ingress-nginx"
-    ingress_nginx_external = "${local.ingress_classes.ingress_nginx_external}-controller.ingress-nginx"
-    minio                  = "minio.minio"
-    lldap                  = "lldap.lldap"
+    for name, e in {
+      apiserver = {
+        name      = "kubernetes"
+        namespace = "default"
+      }
+      authelia = {
+        name      = "authelia"
+        namespace = "authelia"
+      }
+      ingress_nginx = {
+        name      = "${local.ingress_classes.ingress_nginx}-controller"
+        namespace = "ingress-nginx"
+      }
+      ingress_nginx_external = {
+        name      = "${local.ingress_classes.ingress_nginx_external}-controller"
+        namespace = "ingress-nginx"
+      }
+      minio = {
+        name      = "minio"
+        namespace = "default"
+      }
+      lldap = {
+        name      = "lldap"
+        namespace = "lldap"
+      }
+    } :
+    name => merge(e, {
+      endpoint = "${e.name}.${e.namespace}"
+    })
   }
 
   ports = {
@@ -210,11 +232,7 @@ locals {
     }
     music = {
       name   = "music"
-      policy = "download"
-    }
-    mpd = {
-      name   = "mpd"
-      policy = "public"
+      policy = "none"
     }
     downloads = {
       name   = "downloads"
