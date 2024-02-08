@@ -38,6 +38,7 @@ storage:
           KeepConfiguration=dhcp
           %{~ if length(lookup(virtual_interface, "dns", "")) > 0 ~}
           DNS=${virtual_interface.dns}
+          DNSOverTLS=opportunistic
           %{~ endif ~}
           %{~ if lookup(virtual_interface, "enable_netnum", false) ~}
 
