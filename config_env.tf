@@ -253,8 +253,8 @@ locals {
   }
 
   upstream_dns = {
-    ip             = "1.1.1.1"
-    tls_servername = "one.one.one.one"
+    ip       = "1.1.1.1"
+    hostname = "one.one.one.one"
   }
 
   # finalized local vars #

@@ -36,7 +36,6 @@ locals {
         wan = {
           source_interface_name = "phy0-wan"
           enable_dhcp           = true
-          dns                   = "${local.upstream_dns.ip}#${local.upstream_dns.tls_servername}"
         }
       }
       disks = {
@@ -103,7 +102,6 @@ locals {
         wan = {
           source_interface_name = "phy0-wan"
           enable_dhcp           = true
-          dns                   = "${local.upstream_dns.ip}#${local.upstream_dns.tls_servername}"
         }
       }
       disks = {
@@ -170,7 +168,6 @@ locals {
         wan = {
           source_interface_name = "phy0-wan"
           enable_dhcp           = true
-          dns                   = "${local.upstream_dns.ip}#${local.upstream_dns.tls_servername}"
         }
       }
       disks = {
@@ -336,6 +333,7 @@ locals {
     base                = ["gw-0", "gw-1", "q-0", "de-0", "de-1", "r-0"]
     systemd-networkd    = ["gw-0", "gw-1", "q-0", "de-1"]
     network-manager     = ["de-0", "r-0"]
+    upstream-dns        = ["gw-0", "gw-1", "q-0"]
     gateway             = ["gw-0", "gw-1", "q-0"]
     vrrp                = ["gw-0", "gw-1"]
     disks               = ["gw-0", "gw-1", "q-0", "de-1"]

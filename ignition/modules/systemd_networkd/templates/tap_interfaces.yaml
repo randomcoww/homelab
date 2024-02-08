@@ -46,10 +46,6 @@ storage:
           MulticastDNS=${lookup(tap_interface, "enable_mdns", false)}
           ConfigureWithoutCarrier=true
           KeepConfiguration=dhcp
-          %{~ if length(lookup(tap_interface, "dns", "")) > 0 ~}
-          DNS=${tap_interface.dns}
-          DNSOverTLS=opportunistic
-          %{~ endif ~}
           %{~ if lookup(tap_interface, "enable_netnum", false) ~}
 
           [Address]

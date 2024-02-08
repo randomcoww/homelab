@@ -100,6 +100,13 @@ module "network-manager" {
   ignition_version = local.ignition_version
 }
 
+module "upstream-dns" {
+  for_each         = local.members.upstream-dns
+  source           = "./modules/upstream_dns"
+  ignition_version = local.ignition_version
+  upstream_dns     = local.upstream_dns
+}
+
 module "server" {
   for_each = local.members.server
   source   = "./modules/server"
@@ -274,6 +281,7 @@ locals {
     module.base,
     module.systemd-networkd,
     module.network-manager,
+    module.upstream-dns,
     module.gateway,
     module.vrrp,
     module.disks,

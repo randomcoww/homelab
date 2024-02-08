@@ -1,0 +1,12 @@
+---
+variant: fcos
+version: ${ignition_version}
+storage:
+  files:
+    - path: /etc/systemd/resolved.conf.d/10-upstream-dns.conf
+      mode: 0644
+      contents:
+        inline: |
+          [Resolve]
+          DNSOverTLS=true
+          DNS=${upstream_dns.ip}#${upstream_dns.hostname}
