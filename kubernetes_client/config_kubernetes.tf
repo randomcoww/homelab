@@ -29,7 +29,7 @@ locals {
 
   nginx_ingress_auth_annotations = merge({
     "nginx.ingress.kubernetes.io/auth-method"           = "GET"
-    "nginx.ingress.kubernetes.io/auth-url"              = "http://${local.kubernetes_service_endpoints.authelia.endpoint}.svc.${local.domains.kubernetes}/api/verify"
+    "nginx.ingress.kubernetes.io/auth-url"              = "http://${local.kubernetes_service_endpoints.authelia.fqdn}/api/verify"
     "nginx.ingress.kubernetes.io/auth-signin"           = "https://${local.kubernetes_ingress_endpoints.auth}?rm=$request_method"
     "nginx.ingress.kubernetes.io/auth-response-headers" = "Remote-User,Remote-Name,Remote-Groups,Remote-Email"
     "nginx.ingress.kubernetes.io/auth-snippet"          = <<-EOF

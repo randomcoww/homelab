@@ -200,6 +200,7 @@ locals {
     } :
     name => merge(e, {
       endpoint = "${e.name}.${e.namespace}"
+      fqdn     = "${e.name}.${e.namespace}.svc.${local.domains.kubernetes}"
     })
   }
 

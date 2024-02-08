@@ -162,7 +162,7 @@ module "kubernetes-master" {
     etcd_client        = local.ports.etcd_client
   }
   kubelet_access_user        = local.kubernetes.kubelet_access_user
-  cluster_apiserver_endpoint = "${local.kubernetes_service_endpoints.apiserver.endpoint}.svc.${local.domains.kubernetes}"
+  cluster_apiserver_endpoint = local.kubernetes_service_endpoints.apiserver.fqdn
   kubernetes_service_prefix  = local.networks.kubernetes_service.prefix
   kubernetes_pod_prefix      = local.networks.kubernetes_pod.prefix
   apiserver_interface_name   = each.value.tap_interfaces[local.services.apiserver.network.name].interface_name
