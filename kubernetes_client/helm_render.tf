@@ -97,7 +97,7 @@ module "kube-dns" {
           name        = "forward"
           parameters  = ". tls://${local.upstream_dns.ip}"
           configBlock = <<-EOF
-          tls_servername ${local.upstream_dns.tls_servername}
+          tls_servername ${local.upstream_dns.hostname}
           health_check 5s
           EOF
         },
