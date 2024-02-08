@@ -164,6 +164,16 @@ resource "helm_release" "ingress-nginx" {
           use-forwarded-headers   = "true"
           keep-alive              = "false"
         }
+        controller = {
+          dnsConfig = {
+            options = [
+              {
+                name  = "ndots"
+                value = "2"
+              },
+            ]
+          }
+        }
       }
     }),
   ]
@@ -222,6 +232,14 @@ resource "helm_release" "cert-manager" {
         "--dns01-recursive-nameservers-only",
         "--dns01-recursive-nameservers=${local.upstream_dns.ip}:53",
       ]
+      podDnsConfig = {
+        options = [
+          {
+            name  = "ndots"
+            value = "2"
+          },
+        ]
+      }
     }),
   ]
 }

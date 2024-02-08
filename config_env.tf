@@ -191,7 +191,7 @@ locals {
       }
       minio = {
         name      = "minio"
-        namespace = "default"
+        namespace = "minio"
       }
       lldap = {
         name      = "lldap"
