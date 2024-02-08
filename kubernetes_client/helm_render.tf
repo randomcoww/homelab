@@ -17,8 +17,8 @@ module "kube-proxy" {
     kube_proxy = local.container_images.kube_proxy
   }
   ports = {
-    kube_proxy     = local.ports.kube_proxy
-    kube_apiserver = local.ports.apiserver
+    kube_proxy     = local.host_ports.kube_proxy
+    kube_apiserver = local.host_ports.apiserver
   }
   kubernetes_pod_prefix = local.networks.kubernetes_pod.prefix
   kube_apiserver_ip     = local.services.apiserver.ip
@@ -95,7 +95,7 @@ module "kube-dns" {
         # mDNS
         {
           name       = "forward"
-          parameters = "${local.domains.mdns} dns://${local.services.gateway.ip}:${local.ports.gateway_dns}"
+          parameters = "${local.domains.mdns} dns://${local.services.gateway.ip}:${local.host_ports.gateway_dns}"
         },
         # public DNS
         {
@@ -221,7 +221,7 @@ module "authelia" {
         tls = {
           skip_verify = false
         }
-        url                    = "ldaps://${local.kubernetes_services.lldap.endpoint}:${local.service_ports.lldap_ldaps}"
+        url                    = "ldaps://${local.kubernetes_services.lldap.endpoint}:${local.service_ports.lldap}"
         base_dn                = "dc=${join(",dc=", slice(compact(split(".", local.kubernetes_ingress_endpoints.lldap_http)), 1, length(compact(split(".", local.kubernetes_ingress_endpoints.lldap_http)))))}"
         username_attribute     = "uid"
         additional_users_dn    = "ou=people"
@@ -310,7 +310,7 @@ module "lldap" {
   ports = {
     lldap       = 3890
     lldap_http  = 17170
-    lldap_ldaps = local.service_ports.lldap_ldaps
+    lldap_ldaps = local.service_ports.lldap
   }
   ca               = data.terraform_remote_state.sr.outputs.lldap.ca
   service_hostname = local.kubernetes_ingress_endpoints.lldap_http
@@ -433,8 +433,8 @@ module "kea" {
     local.services.cluster_kea_secondary.ip,
   ]
   ports = {
-    kea_peer = local.ports.kea_peer
-    tftpd    = local.ports.tftpd
+    kea_peer = local.host_ports.kea_peer
+    tftpd    = local.host_ports.tftpd
   }
   ipxe_boot_path  = "/ipxe.efi"
   ipxe_script_url = "http://${local.services.matchbox.ip}:${local.service_ports.matchbox}/boot.ipxe"

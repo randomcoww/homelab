@@ -204,7 +204,7 @@ locals {
     })
   }
 
-  ports = {
+  host_ports = {
     gateway_dns        = 53
     kea_peer           = 50060
     tftpd              = 69
@@ -223,7 +223,7 @@ locals {
     matchbox_api  = 50101
     minio         = 9000
     alpaca_stream = 38081
-    lldap_ldaps   = 6360
+    lldap         = 6360
   }
 
   minio_buckets = {

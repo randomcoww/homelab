@@ -53,7 +53,7 @@ module "gateway" {
   name             = "gateway"
   host_netnum      = each.value.netnum
   ports = {
-    gateway_dns = local.ports.gateway_dns
+    gateway_dns = local.host_ports.gateway_dns
   }
   accept_prefixes = [
     local.networks.etcd.prefix,
@@ -155,11 +155,11 @@ module "kubernetes-master" {
     scheduler          = local.container_images.kube_scheduler
   }
   ports = {
-    apiserver          = local.ports.apiserver
-    apiserver_backend  = local.ports.apiserver_backend
-    controller_manager = local.ports.controller_manager
-    scheduler          = local.ports.scheduler
-    etcd_client        = local.ports.etcd_client
+    apiserver          = local.host_ports.apiserver
+    apiserver_backend  = local.host_ports.apiserver_backend
+    controller_manager = local.host_ports.controller_manager
+    scheduler          = local.host_ports.scheduler
+    etcd_client        = local.host_ports.etcd_client
   }
   kubelet_access_user        = local.kubernetes.kubelet_access_user
   cluster_apiserver_endpoint = local.kubernetes_services.apiserver.fqdn
@@ -185,11 +185,11 @@ module "kubernetes-worker" {
   cluster_name     = local.kubernetes.cluster_name
   ca               = data.terraform_remote_state.sr.outputs.kubernetes.ca
   ports = {
-    kubelet = local.ports.kubelet
+    kubelet = local.host_ports.kubelet
   }
   node_bootstrap_user       = local.kubernetes.node_bootstrap_user
   cluster_domain            = local.domains.kubernetes
-  apiserver_endpoint        = "https://${local.services.apiserver.ip}:${local.ports.apiserver}"
+  apiserver_endpoint        = "https://${local.services.apiserver.ip}:${local.host_ports.apiserver}"
   cni_bridge_interface_name = local.kubernetes.cni_bridge_interface_name
   node_ip                   = cidrhost(local.networks.kubernetes.prefix, each.value.netnum)
   cluster_dns_ip            = local.services.cluster_dns.ip
@@ -214,8 +214,8 @@ module "etcd" {
     etcd_wrapper = local.container_images.etcd_wrapper
   }
   ports = {
-    etcd_client = local.ports.etcd_client
-    etcd_peer   = local.ports.etcd_peer
+    etcd_client = local.host_ports.etcd_client
+    etcd_peer   = local.host_ports.etcd_peer
   }
 
   members = {
