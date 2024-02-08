@@ -607,6 +607,7 @@ module "alpaca-stream" {
   alpaca_api_base_url   = var.alpaca.api_base_url
 }
 
+# https://github.com/akrylysov/bsimp
 module "bsimp" {
   source  = "./modules/bsimp"
   name    = "bsimp"
@@ -617,6 +618,7 @@ module "bsimp" {
   ports = {
     bsimp = 8080
   }
+  # use external endpoint here - tries to hit this in https if the service is on https (bug?)
   s3_endpoint          = "https://${local.kubernetes_ingress_endpoints.minio}"
   s3_resource          = local.minio_buckets.music.name
   s3_access_key_id     = data.terraform_remote_state.sr.outputs.minio.access_key_id
