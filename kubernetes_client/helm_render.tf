@@ -146,9 +146,10 @@ module "matchbox" {
 }
 
 module "vaultwarden" {
-  source  = "./modules/vaultwarden"
-  name    = "vaultwarden"
-  release = "0.1.14"
+  source    = "./modules/vaultwarden"
+  name      = "vaultwarden"
+  namespace = "vaultwarden"
+  release   = "0.1.14"
   images = {
     vaultwarden = local.container_images.vaultwarden
     litestream  = local.container_images.litestream
