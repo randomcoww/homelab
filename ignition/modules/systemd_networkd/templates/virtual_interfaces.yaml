@@ -36,6 +36,9 @@ storage:
           MulticastDNS=${lookup(virtual_interface, "enable_mdns", false)}
           ConfigureWithoutCarrier=true
           KeepConfiguration=dhcp
+          %{~ if length(lookup(virtual_interface, "dns", "")) > 0 ~}
+          DNS=${virtual_interface.dns}
+          %{~ endif ~}
           %{~ if lookup(virtual_interface, "enable_netnum", false) ~}
 
           [Address]

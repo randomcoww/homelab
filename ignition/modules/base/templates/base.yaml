@@ -63,8 +63,6 @@ storage:
       contents:
         inline: |
           [Resolve]
-          DNS=${upstream_dns.ip}#${upstream_dns.tls_servername}
-          Domains=~.
           DNSStubListener=false
           MulticastDNS=true
           LLMNR=false

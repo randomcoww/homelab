@@ -4,7 +4,6 @@ locals {
     templatefile(f, {
       ignition_version = var.ignition_version
       hostname         = var.hostname
-      upstream_dns     = var.upstream_dns
     })
     ], [
     yamlencode({
