@@ -13,22 +13,14 @@ variable "release" {
 
 variable "images" {
   type = object({
-    mpd   = string
-    mympd = string
+    bsimp = string
   })
 }
 
 variable "ports" {
   type = object({
-    mympd             = number
-    rclone            = number
-    audio_output_base = number
+    bsimp = number
   })
-}
-
-variable "audio_outputs" {
-  type    = list(any)
-  default = []
 }
 
 variable "affinity" {
@@ -36,20 +28,19 @@ variable "affinity" {
   default = {}
 }
 
-variable "extra_configs" {
-  type    = map(any)
-  default = {}
-}
-
-variable "s3_cache_resource" {
-  type = string
-}
-
-variable "s3_music_resource" {
-  type = string
-}
-
 variable "s3_endpoint" {
+  type = string
+}
+
+variable "s3_resource" {
+  type = string
+}
+
+variable "s3_access_key_id" {
+  type = string
+}
+
+variable "s3_secret_access_key" {
   type = string
 }
 
@@ -63,9 +54,4 @@ variable "ingress_class_name" {
 
 variable "nginx_ingress_annotations" {
   type = map(string)
-}
-
-variable "resources" {
-  type    = map(any)
-  default = {}
 }

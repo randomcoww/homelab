@@ -87,7 +87,7 @@ module "kube-dns" {
         },
         {
           name        = "etcd"
-          parameters  = "${local.domains.internal} in-addr.arpa ip6.arpa"
+          parameters  = "${local.domains.public} in-addr.arpa ip6.arpa"
           configBlock = <<-EOF
           fallthrough
           EOF
@@ -95,7 +95,7 @@ module "kube-dns" {
         # mDNS
         {
           name       = "forward"
-          parameters = "${local.domains.internal_mdns} dns://${local.services.gateway.ip}:${local.ports.gateway_dns}"
+          parameters = "${local.domains.mdns} dns://${local.services.gateway.ip}:${local.ports.gateway_dns}"
         },
         # public DNS
         {
@@ -182,8 +182,8 @@ module "vaultwarden" {
 
 module "authelia" {
   source         = "./modules/authelia"
-  name           = split(".", local.kubernetes_service_endpoints.authelia)[0]
-  namespace      = split(".", local.kubernetes_service_endpoints.authelia)[1]
+  name           = local.kubernetes_service_endpoints.authelia.name
+  namespace      = local.kubernetes_service_endpoints.authelia.namespace
   release        = "0.1.1"
   source_release = "0.8.58"
   images = {
@@ -221,7 +221,7 @@ module "authelia" {
         tls = {
           skip_verify = false
         }
-        url                    = "ldaps://${local.kubernetes_service_endpoints.lldap}:${local.service_ports.lldap_ldaps}"
+        url                    = "ldaps://${local.kubernetes_service_endpoints.lldap.endpoint}:${local.service_ports.lldap_ldaps}"
         base_dn                = "dc=${join(",dc=", slice(compact(split(".", local.kubernetes_ingress_endpoints.lldap_http)), 1, length(compact(split(".", local.kubernetes_ingress_endpoints.lldap_http)))))}"
         username_attribute     = "uid"
         additional_users_dn    = "ou=people"
@@ -300,8 +300,8 @@ module "authelia" {
 
 module "lldap" {
   source    = "./modules/lldap"
-  name      = split(".", local.kubernetes_service_endpoints.lldap)[0]
-  namespace = split(".", local.kubernetes_service_endpoints.lldap)[1]
+  name      = local.kubernetes_service_endpoints.lldap.name
+  namespace = local.kubernetes_service_endpoints.lldap.namespace
   release   = "0.1.0"
   images = {
     lldap      = local.container_images.lldap
@@ -449,7 +449,7 @@ module "kea" {
         local.services.external_dns.ip,
       ]
       domain_search = [
-        local.domains.internal,
+        local.domains.public,
       ]
       mtu = network.mtu
       pools = [
@@ -563,7 +563,7 @@ module "transmission" {
     --verify
 
   minio-client \
-    -endpoint="${local.kubernetes_service_endpoints.minio}:${local.service_ports.minio}" \
+    -endpoint="${local.kubernetes_service_endpoints.minio.endpoint}:${local.service_ports.minio}" \
     -bucket="${local.minio_buckets.downloads.name}" \
     -path="$TR_TORRENT_NAME"
 
@@ -607,53 +607,22 @@ module "alpaca-stream" {
   alpaca_api_base_url   = var.alpaca.api_base_url
 }
 
-module "mpd" {
-  source  = "./modules/mpd_s3"
-  name    = "mpd"
-  release = "0.2.2"
+module "bsimp" {
+  source  = "./modules/bsimp"
+  name    = "bsimp"
+  release = "0.1.0"
   images = {
-    mpd   = local.container_images.mpd
-    mympd = local.container_images.mympd
+    bsimp = local.container_images.bsimp
   }
   ports = {
-    mympd             = 8080
-    rclone            = 8081
-    audio_output_base = 8082
+    bsimp = 8080
   }
-  audio_outputs = [
-    {
-      name = "flac-3"
-      config = {
-        tags        = "yes"
-        format      = "48000:24:2"
-        always_on   = "yes"
-        encoder     = "flac"
-        compression = 3
-        max_clients = 2
-      }
-    },
-    {
-      name = "lame-9"
-      config = {
-        tags        = "yes"
-        format      = "48000:24:2"
-        always_on   = "yes"
-        encoder     = "lame"
-        quality     = 9
-        max_clients = 2
-      }
-    },
-  ]
-  s3_endpoint       = "http://${local.kubernetes_service_endpoints.minio}:${local.service_ports.minio}"
-  s3_music_resource = local.minio_buckets.music.name
-  s3_cache_resource = local.minio_buckets.mpd.name
-  resources = {
-    limits = {
-      "github.com/fuse" = 1
-    }
-  }
+  s3_endpoint          = "https://${local.kubernetes_ingress_endpoints.minio}"
+  s3_resource          = local.minio_buckets.music.name
+  s3_access_key_id     = data.terraform_remote_state.sr.outputs.minio.access_key_id
+  s3_secret_access_key = data.terraform_remote_state.sr.outputs.minio.secret_access_key
 
-  service_hostname          = local.kubernetes_ingress_endpoints.mpd
+  service_hostname          = local.kubernetes_ingress_endpoints.bsimp
   ingress_class_name        = local.ingress_classes.ingress_nginx
   nginx_ingress_annotations = local.nginx_ingress_auth_annotations
 }

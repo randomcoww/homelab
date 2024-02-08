@@ -36,6 +36,7 @@ locals {
         wan = {
           source_interface_name = "phy0-wan"
           enable_dhcp           = true
+          dns                   = "${local.upstream_dns.ip}#${local.upstream_dns.tls_servername}"
         }
       }
       disks = {
@@ -102,6 +103,7 @@ locals {
         wan = {
           source_interface_name = "phy0-wan"
           enable_dhcp           = true
+          dns                   = "${local.upstream_dns.ip}#${local.upstream_dns.tls_servername}"
         }
       }
       disks = {
@@ -168,6 +170,7 @@ locals {
         wan = {
           source_interface_name = "phy0-wan"
           enable_dhcp           = true
+          dns                   = "${local.upstream_dns.ip}#${local.upstream_dns.tls_servername}"
         }
       }
       disks = {
@@ -228,6 +231,7 @@ locals {
         lan = {
           source_interface_name = "br-lan"
           enable_dhcp           = true
+          enable_dns            = true
         }
         service = {
           source_interface_name = "phy0-service"
@@ -243,12 +247,12 @@ locals {
           mac                   = ""
           metric                = 4096
           enable_dhcp           = true
-          enable_dns            = false
         }
         # backup WAN on mobile data
         mobile = {
           source_interface_name = "phy1"
           enable_dhcp           = true
+          enable_dns            = true
           metric                = 512
         }
       }
@@ -351,7 +355,7 @@ locals {
   base_hosts_1 = {
     for host_key, host in local.base_hosts :
     host_key => merge(host, {
-      hostname           = "${host_key}.${local.domains.internal_mdns}"
+      hostname           = "${host_key}.${local.domains.mdns}"
       tailscale_hostname = "${host_key}.${local.domains.tailscale}"
 
       tap_interfaces = {

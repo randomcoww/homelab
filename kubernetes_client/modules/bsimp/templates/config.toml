@@ -1,0 +1,9 @@
+[s3]
+region = "local"
+endpoint = "${s3_endpoint}"
+bucket = "${s3_resource}"
+force_path_style = true
+
+[s3.credentials]
+id = "${s3_access_key_id}"
+secret = "${s3_secret_access_key}"

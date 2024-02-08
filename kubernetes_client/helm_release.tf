@@ -15,7 +15,7 @@ locals {
     module.bootstrap,
     module.kube-proxy,
     module.lldap,
-    # module.mpd,
+    module.bsimp,
     # module.headscale,
     # module.kasm-desktop,
   ]
@@ -133,7 +133,7 @@ resource "helm_release" "ingress-nginx" {
   name             = each.value
   repository       = "https://kubernetes.github.io/ingress-nginx"
   chart            = "ingress-nginx"
-  namespace        = split(".", local.kubernetes_service_endpoints[each.key])[1]
+  namespace        = local.kubernetes_service_endpoints[each.key].namespace
   create_namespace = true
   wait             = false
   version          = "4.9.1"
@@ -156,12 +156,13 @@ resource "helm_release" "ingress-nginx" {
         }
         allowSnippetAnnotations = true
         config = {
-          ignore-invalid-headers = "off"
-          proxy-body-size        = 0
-          proxy-buffering        = "off"
-          ssl-redirect           = "true"
-          use-forwarded-headers  = "true"
-          keep-alive             = "false"
+          ignore-invalid-headers  = "off"
+          proxy-body-size         = 0
+          proxy-buffering         = "off"
+          proxy-request-buffering = "off"
+          ssl-redirect            = "true"
+          use-forwarded-headers   = "true"
+          keep-alive              = "false"
         }
       }
     }),
@@ -187,8 +188,8 @@ resource "helm_release" "cloudflare-tunnel" {
         secret     = data.terraform_remote_state.sr.outputs.cloudflare_tunnels.external.secret
         ingress = [
           {
-            hostname = "*.${local.domains.internal}"
-            service  = "https://${local.kubernetes_service_endpoints.ingress_nginx_external}"
+            hostname = "*.${local.domains.public}"
+            service  = "https://${local.kubernetes_service_endpoints.ingress_nginx_external.endpoint}"
           },
         ]
       }
@@ -294,7 +295,7 @@ resource "helm_release" "cert-issuer" {
                     }
                     selector = {
                       dnsZones = [
-                        local.domains.internal,
+                        local.domains.public,
                       ]
                     }
                   },
@@ -328,7 +329,7 @@ resource "helm_release" "cert-issuer" {
                     }
                     selector = {
                       dnsZones = [
-                        local.domains.internal,
+                        local.domains.public,
                       ]
                     }
                   },
@@ -349,8 +350,8 @@ resource "helm_release" "cert-issuer" {
 # minio #
 
 resource "helm_release" "minio" {
-  name             = split(".", local.kubernetes_service_endpoints.minio)[0]
-  namespace        = split(".", local.kubernetes_service_endpoints.minio)[1]
+  name             = local.kubernetes_service_endpoints.minio.name
+  namespace        = local.kubernetes_service_endpoints.minio.namespace
   repository       = "https://charts.min.io/"
   chart            = "minio"
   create_namespace = true
@@ -375,17 +376,14 @@ resource "helm_release" "minio" {
         }
       }
       service = {
-        type = "LoadBalancer"
+        type = "ClusterIP"
         port = local.service_ports.minio
         externalIPs = [
           local.services.minio.ip,
         ]
-        annotations = {
-          "external-dns.alpha.kubernetes.io/hostname" = local.kubernetes_ingress_endpoints.minio
-        }
       }
       ingress = {
-        enabled          = false
+        enabled          = true
         ingressClassName = local.ingress_classes.ingress_nginx
         annotations      = local.nginx_ingress_annotations
         tls = [

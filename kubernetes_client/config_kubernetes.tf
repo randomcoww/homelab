@@ -15,6 +15,7 @@ locals {
     add_header Permissions-Policy "interest-cohort=()";
     add_header Pragma "no-cache";
     add_header Cache-Control "no-store";
+    client_max_body_size 0;
     EOF
     "nginx.ingress.kubernetes.io/location-snippets" = <<-EOF
     proxy_http_version 1.1;
@@ -22,12 +23,13 @@ locals {
     proxy_set_header Upgrade $http_upgrade;
     proxy_set_header Connection $connection_upgrade;
     proxy_set_header Accept-Encoding gzip;
+    chunked_transfer_encoding off;
     EOF
   }
 
   nginx_ingress_auth_annotations = merge({
     "nginx.ingress.kubernetes.io/auth-method"           = "GET"
-    "nginx.ingress.kubernetes.io/auth-url"              = "http://${local.kubernetes_service_endpoints.authelia}/api/verify"
+    "nginx.ingress.kubernetes.io/auth-url"              = "http://${local.kubernetes_service_endpoints.authelia.endpoint}.svc.${local.domains.kubernetes}/api/verify"
     "nginx.ingress.kubernetes.io/auth-signin"           = "https://${local.kubernetes_ingress_endpoints.auth}?rm=$request_method"
     "nginx.ingress.kubernetes.io/auth-response-headers" = "Remote-User,Remote-Name,Remote-Groups,Remote-Email"
     "nginx.ingress.kubernetes.io/auth-snippet"          = <<-EOF
@@ -36,9 +38,9 @@ locals {
   }, local.nginx_ingress_annotations)
 
   ingress_tls_common = {
-    secretName = "${local.domains.internal}-tls"
+    secretName = "${local.domains.public}-tls"
     hosts = [
-      "*.${local.domains.internal}",
+      "*.${local.domains.public}",
     ]
   }
 }
