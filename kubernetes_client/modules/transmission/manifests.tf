@@ -13,6 +13,14 @@ locals {
         ]
       },
     ]
+    dnsConfig = {
+      options = [
+        {
+          name  = "ndots"
+          value = "2"
+        },
+      ]
+    }
   }
 }
 
