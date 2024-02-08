@@ -15,4 +15,5 @@ output "manifest" {
       k => try(join("\n", values), values)
     }
   })
+  sensitive = true
 }
