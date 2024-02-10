@@ -456,6 +456,36 @@ module "kea" {
   ]
 }
 
+module "tailscale" {
+  source  = "./modules/tailscale"
+  name    = "tailscale"
+  release = "0.1.1"
+  images = {
+    tailscale = local.container_images.tailscale
+  }
+
+  tailscale_auth_key = var.tailscale.auth_key
+  tailscale_extra_envs = {
+    TS_ACCEPT_DNS          = true
+    TS_DEBUG_FIREWALL_MODE = "nftables"
+    TS_EXTRA_ARGS = join(",", [
+      "--advertise-exit-node",
+    ])
+    TS_ROUTES = join(",", [
+      local.networks.lan.prefix,
+      local.networks.service.prefix,
+      local.networks.kubernetes.prefix,
+      local.networks.kubernetes_service.prefix,
+      local.networks.kubernetes_pod.prefix,
+    ])
+  }
+
+  aws_region             = data.terraform_remote_state.sr.outputs.ssm.tailscale.aws_region
+  ssm_access_key_id      = data.terraform_remote_state.sr.outputs.ssm.tailscale.access_key_id
+  ssm_secret_access_key  = data.terraform_remote_state.sr.outputs.ssm.tailscale.secret_access_key
+  ssm_tailscale_resource = data.terraform_remote_state.sr.outputs.ssm.tailscale.resource
+}
+
 module "code" {
   source  = "./modules/code_server"
   name    = "code"

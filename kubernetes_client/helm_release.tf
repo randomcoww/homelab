@@ -3,6 +3,7 @@ locals {
     module.transmission,
     module.alpaca-stream,
     module.hostapd,
+    module.tailscale,
     module.code,
     module.vaultwarden,
     module.authelia,
