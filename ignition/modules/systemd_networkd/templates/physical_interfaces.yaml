@@ -4,7 +4,6 @@ version: ${ignition_version}
 storage:
   files:
     # hardware interface #
-    # setting MTUBytes here seems to breaks networkd in f39
     %{~ for physical_interface_name, physical_interface in physical_interfaces ~}
     - path: /etc/systemd/network/10-${physical_interface_name}.link
       mode: 0644
@@ -14,7 +13,7 @@ storage:
           PermanentMACAddress=${physical_interface.mac}
 
           [Link]
-          # MTUBytes=${lookup(physical_interface, "mtu", 1500)}
+          MTUBytes=${lookup(physical_interface, "mtu", 1500)}
           Name=${physical_interface_name}
     - path: /etc/systemd/network/20-${physical_interface_name}.network
       mode: 0644

@@ -4,7 +4,6 @@ version: ${ignition_version}
 storage:
   files:
     # wlan interface #
-    # setting MTUBytes here seems to breaks networkd in f39
     %{~ for wlan_interface_name, wlan_interface in wlan_interfaces ~}
     - path: /etc/systemd/network/10-${wlan_interface_name}.link
       mode: 0644
@@ -14,7 +13,7 @@ storage:
           PermanentMACAddress=${wlan_interface.mac}
 
           [Link]
-          # MTUBytes=${lookup(wlan_interface, "mtu", 1500)}
+          MTUBytes=${lookup(wlan_interface, "mtu", 1500)}
           Name=${wlan_interface_name}
     - path: /etc/systemd/network/20-${wlan_interface_name}.network
       mode: 0644

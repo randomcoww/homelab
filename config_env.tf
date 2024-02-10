@@ -15,7 +15,6 @@ locals {
       enable_mdns        = true
       enable_dhcp_server = true
       enable_dns         = true
-      mtu                = 9000
       netnums = {
         gateway = 2
       }

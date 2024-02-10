@@ -448,7 +448,7 @@ module "kea" {
         local.domains.public,
         local.domains.kubernetes,
       ]
-      mtu = network.mtu
+      mtu = lookup(network, "mtu", 1500)
       pools = [
         cidrsubnet(network.prefix, 1, 1),
       ]
