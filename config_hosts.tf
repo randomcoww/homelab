@@ -228,7 +228,6 @@ locals {
         lan = {
           source_interface_name = "br-lan"
           enable_dhcp           = true
-          enable_dns            = true
         }
         service = {
           source_interface_name = "phy0-service"
