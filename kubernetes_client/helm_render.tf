@@ -466,7 +466,7 @@ module "tailscale" {
 
   tailscale_auth_key = var.tailscale.auth_key
   tailscale_extra_envs = {
-    TS_ACCEPT_DNS          = true
+    TS_ACCEPT_DNS          = false
     TS_DEBUG_FIREWALL_MODE = "nftables"
     TS_EXTRA_ARGS = join(",", [
       "--advertise-exit-node",
@@ -514,14 +514,6 @@ module "code" {
   tailscale_extra_envs = {
     TS_ACCEPT_DNS          = true
     TS_DEBUG_FIREWALL_MODE = "nftables"
-    TS_EXTRA_ARGS = join(",", [
-      "--advertise-exit-node",
-    ])
-    TS_ROUTES = join(",", [
-      local.networks.lan.prefix,
-      local.networks.service.prefix,
-      local.networks.kubernetes.prefix,
-    ])
   }
 
   aws_region             = data.terraform_remote_state.sr.outputs.ssm.tailscale.aws_region
