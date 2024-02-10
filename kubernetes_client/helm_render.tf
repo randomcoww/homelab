@@ -649,7 +649,11 @@ module "kasm-desktop" {
   name    = "kasm-desktop"
   release = "0.1.1"
   images = {
-    kasm_desktop = local.container_images.kasm_desktop
+    kasm = local.container_images.kasm_desktop
+  }
+  ports = {
+    kasm     = 6901
+    sunshine = 47989
   }
   user = local.users.client.name
   uid  = local.users.client.uid

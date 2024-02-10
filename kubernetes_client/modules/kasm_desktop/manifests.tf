@@ -1,17 +1,16 @@
 locals {
-  kasm_port = 6901
-  sunshine_tcp_ports = [
-    47984,
-    47989,
-    47990,
-    48010,
-  ]
-  sunshine_udp_ports = [
-    47998,
-    47999,
-    48000,
-    48002,
-  ]
+  tcp_port_offsets = {
+    https = -5
+    http  = 0
+    web   = 1
+    rtsp  = 21
+  }
+  udp_port_offsets = {
+    video   = 9
+    control = 10
+    audio   = 11
+    mic     = 13
+  }
 }
 
 module "metadata" {
@@ -19,7 +18,7 @@ module "metadata" {
   name        = var.name
   namespace   = var.namespace
   release     = var.release
-  app_version = split(":", var.images.kasm_desktop)[1]
+  app_version = split(":", var.images.kasm)[1]
   manifests = {
     "templates/secret.yaml"           = module.secret.manifest
     "templates/service.yaml"          = module.service.manifest
@@ -49,9 +48,9 @@ module "service" {
     ports = [
       {
         name       = "kasm"
-        port       = local.kasm_port
+        port       = var.ports.kasm
         protocol   = "TCP"
-        targetPort = local.kasm_port
+        targetPort = var.ports.kasm
       },
     ]
   }
@@ -71,20 +70,20 @@ module "service-sunshine" {
       var.sunshine_service_ip
     ]
     ports = concat([
-      for p in local.sunshine_tcp_ports :
+      for name, offset in local.tcp_port_offsets :
       {
-        name       = "sunshine-tcp-${p}"
-        port       = p
+        name       = name
+        port       = var.ports.sunshine + offset
         protocol   = "TCP"
-        targetPort = p
+        targetPort = var.ports.sunshine + offset
       }
       ], [
-      for p in local.sunshine_udp_ports :
+      for name, offset in local.udp_port_offsets :
       {
-        name       = "sunshine-udp-${p}"
-        port       = p
+        name       = name
+        port       = var.ports.sunshine + offset
         protocol   = "UDP"
-        targetPort = p
+        targetPort = var.ports.sunshine + offset
       }
     ])
   }
@@ -103,7 +102,7 @@ module "ingress" {
       paths = [
         {
           service = var.name
-          port    = local.kasm_port
+          port    = var.ports.kasm
           path    = "/"
         }
       ]
@@ -125,7 +124,7 @@ module "statefulset" {
     containers = [
       {
         name  = var.name
-        image = var.images.kasm_desktop
+        image = var.images.kasm
         env = concat([
           {
             name  = "USER"
@@ -142,6 +141,10 @@ module "statefulset" {
           {
             name  = "XDG_RUNTIME_DIR"
             value = "/run/user/${var.uid}"
+          },
+          {
+            name  = "SUNSHINE_PORT"
+            value = tostring(var.ports.sunshine)
           },
           ], [
           for k, v in var.extra_envs :
@@ -168,17 +171,19 @@ module "statefulset" {
         ]
         ports = concat([
           {
-            containerPort = local.kasm_port
+            containerPort = var.ports.kasm
+            protocol      = "TCP"
           },
           ], [
-          for p in local.sunshine_tcp_ports :
+          for name, offset in local.tcp_port_offsets :
           {
-            containerPort = p
+            containerPort = var.ports.sunshine + offset
+            protocol      = "TCP"
           }
           ], [
-          for p in local.sunshine_udp_ports :
+          for name, offset in local.udp_port_offsets :
           {
-            containerPort = p
+            containerPort = var.ports.sunshine + offset
             protocol      = "UDP"
           }
         ])

@@ -13,7 +13,14 @@ variable "release" {
 
 variable "images" {
   type = object({
-    kasm_desktop = string
+    kasm = string
+  })
+}
+
+variable "ports" {
+  type = object({
+    kasm     = number
+    sunshine = number
   })
 }
 
