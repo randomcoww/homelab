@@ -30,6 +30,7 @@ storage:
 
           [Link]
           RequiredForOnline=${lookup(tap_interface, "enable_netnum", false)}
+          MTUBytes=${lookup(tap_interface, "mtu", 1500)}
 
           [DHCPv4]
           RouteMetric=${lookup(tap_interface, "metric", 1024)}
