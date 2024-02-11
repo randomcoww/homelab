@@ -8,7 +8,7 @@ locals {
       physical_interfaces = {
         phy0 = {
           mac   = "1c-83-41-30-e2-23"
-          mtu   = 9000
+          mtu   = local.default_mtu
           vlans = ["sync", "etcd", "service", "kubernetes", "wan"]
         }
       }
@@ -74,7 +74,7 @@ locals {
       physical_interfaces = {
         phy0 = {
           mac   = "1c-83-41-30-bd-6f"
-          mtu   = 9000
+          mtu   = local.default_mtu
           vlans = ["sync", "etcd", "service", "kubernetes", "wan"]
         }
       }
@@ -140,7 +140,7 @@ locals {
       physical_interfaces = {
         phy0 = {
           mac   = "1c-83-41-30-e2-54"
-          mtu   = 9000
+          mtu   = local.default_mtu
           vlans = ["sync", "etcd", "service", "kubernetes", "wan"]
         }
       }
@@ -206,7 +206,7 @@ locals {
       physical_interfaces = {
         phy0 = {
           mac   = "74-56-3c-c3-10-68"
-          mtu   = 9000
+          mtu   = local.default_mtu
           vlans = ["service", "kubernetes", "wan"]
         }
         # mobile

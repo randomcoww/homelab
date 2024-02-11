@@ -24,10 +24,6 @@ variable "ports" {
   })
 }
 
-variable "cni_bridge_interface_name" {
-  type = string
-}
-
 variable "node_bootstrap_user" {
   type = string
 }

@@ -33,9 +33,8 @@ module "flannel" {
     flannel            = local.container_images.flannel
     flannel_cni_plugin = local.container_images.flannel_cni_plugin
   }
-  kubernetes_pod_prefix     = local.networks.kubernetes_pod.prefix
-  cni_bridge_interface_name = local.kubernetes.cni_bridge_interface_name
-  cni_version               = "0.3.1"
+  kubernetes_pod_prefix = local.networks.kubernetes_pod.prefix
+  cni_version           = "0.3.1"
 }
 
 module "kapprover" {

@@ -40,12 +40,6 @@ systemd:
 
 storage:
   files:
-    # nf_call_iptables disabled gloablly except for CNI #
-    - path: /etc/udev/rules.d/10-cni-nf-call-iptables.rules
-      mode: 0644
-      contents:
-        inline: |
-          SUBSYSTEM=="net", ACTION=="add", KERNEL=="${cni_bridge_interface_name}", ATTR{bridge/nf_call_iptables}="1"
     # inhibit shutdown for graceful node shutdown
     - path: /etc/systemd/logind.conf.d/10-kubelet-graceful-shutdown.conf
       mode: 0644
@@ -53,18 +47,6 @@ storage:
         inline: |
           [Login]
           InhibitDelayMaxSec=${graceful_shutdown_delay}
-    # mayastor hugepages #
-    # - path: /etc/sysctl.d/20-hugepages.conf
-    #   mode: 0644
-    #   contents:
-    #     inline: |
-    #       vm.nr_hugepages=1024
-    # mayastor #
-    # - path: /etc/modules-load.d/20-mayastor.conf
-    #   mode: 0644
-    #   contents:
-    #     inline: |
-    #       nvme_tcp
     # kube-proxy #
     - path: /etc/modules-load.d/20-kube-proxy.conf
       mode: 0644
