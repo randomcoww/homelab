@@ -6,6 +6,8 @@ locals {
     containers_path = "/var/lib/containers"
     home_path       = "/var/home"
   }
+  # Setting to 9000 seems to reduce success rate of PXE boot
+  default_mtu = 1500
 
   base_networks = {
     lan = {
@@ -23,13 +25,13 @@ locals {
       network = "192.168.190.0"
       cidr    = 29
       vlan_id = 60
-      mtu     = 9000
+      mtu     = local.default_mtu
     }
     etcd = {
       network = "192.168.191.0"
       cidr    = 29
       vlan_id = 70
-      mtu     = 9000
+      mtu     = local.default_mtu
     }
     service = {
       network = "192.168.192.0"
@@ -44,7 +46,7 @@ locals {
         sunshine               = 36
         alpaca_stream          = 37
       }
-      mtu = 9000
+      mtu = local.default_mtu
     }
     kubernetes = {
       network = "192.168.193.0"
@@ -53,7 +55,7 @@ locals {
       netnums = {
         apiserver = 4
       }
-      mtu = 9000
+      mtu = local.default_mtu
     }
     wan = {
       vlan_id = 30
