@@ -116,14 +116,7 @@ storage:
         inline: |
           kernel.printk=4
           fs.inotify.max_user_watches=524288
-    ## needs to be disabled if bridging wlan interface
-    ## seems to not be needed for CNI if on nftables (?)
-    ## enable for CNI only by adding:
-    # - path: /etc/udev/rules.d/10-cni-nf-call-iptables.rules
-    #   mode: 0644
-    #   contents:
-    #     inline: |
-    #       SUBSYSTEM=="net", ACTION=="add", KERNEL=="CNI_INTERFACE", ATTR{bridge/nf_call_iptables}="1"
+    # needed if bridging wlan
     - path: /etc/sysctl.d/99-bridge-iptables.conf
       mode: 0644
       contents:

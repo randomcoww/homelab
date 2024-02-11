@@ -191,15 +191,16 @@ module "kubernetes-worker" {
   ports = {
     kubelet = local.host_ports.kubelet
   }
-  node_bootstrap_user     = local.kubernetes.node_bootstrap_user
-  cluster_domain          = local.domains.kubernetes
-  apiserver_endpoint      = "https://${local.services.apiserver.ip}:${local.host_ports.apiserver}"
-  node_ip                 = cidrhost(local.networks.kubernetes.prefix, each.value.netnum)
-  cluster_dns_ip          = local.services.cluster_dns.ip
-  kubelet_root_path       = local.kubernetes.kubelet_root_path
-  static_pod_path         = local.kubernetes.static_pod_manifest_path
-  container_storage_path  = "${local.mounts.containers_path}/storage"
-  graceful_shutdown_delay = 480
+  node_bootstrap_user       = local.kubernetes.node_bootstrap_user
+  cluster_domain            = local.domains.kubernetes
+  apiserver_endpoint        = "https://${local.services.apiserver.ip}:${local.host_ports.apiserver}"
+  cni_bridge_interface_name = local.kubernetes.cni_bridge_interface_name
+  node_ip                   = cidrhost(local.networks.kubernetes.prefix, each.value.netnum)
+  cluster_dns_ip            = local.services.cluster_dns.ip
+  kubelet_root_path         = local.kubernetes.kubelet_root_path
+  static_pod_path           = local.kubernetes.static_pod_manifest_path
+  container_storage_path    = "${local.mounts.containers_path}/storage"
+  graceful_shutdown_delay   = 480
 }
 
 module "etcd" {

@@ -1,7 +1,6 @@
 locals {
   aws_region       = "us-west-2"
   ignition_version = "1.5.0"
-  default_mtu      = 1500
 
   mounts = {
     containers_path = "/var/lib/containers"
@@ -24,13 +23,13 @@ locals {
       network = "192.168.190.0"
       cidr    = 29
       vlan_id = 60
-      mtu     = local.default_mtu
+      mtu     = 9000
     }
     etcd = {
       network = "192.168.191.0"
       cidr    = 29
       vlan_id = 70
-      mtu     = local.default_mtu
+      mtu     = 9000
     }
     service = {
       network = "192.168.192.0"
@@ -45,7 +44,7 @@ locals {
         sunshine               = 36
         alpaca_stream          = 37
       }
-      mtu = local.default_mtu
+      mtu = 9000
     }
     kubernetes = {
       network = "192.168.193.0"
@@ -54,7 +53,7 @@ locals {
       netnums = {
         apiserver = 4
       }
-      mtu = local.default_mtu
+      mtu = 9000
     }
     wan = {
       vlan_id = 30
@@ -122,10 +121,11 @@ locals {
   }
 
   kubernetes = {
-    version                  = "1.29.1"
-    cluster_name             = "prod-10"
-    kubelet_root_path        = "/var/lib/kubelet"
-    static_pod_manifest_path = "/var/lib/kubelet/manifests"
+    version                   = "1.29.1"
+    cluster_name              = "prod-10"
+    kubelet_root_path         = "/var/lib/kubelet"
+    static_pod_manifest_path  = "/var/lib/kubelet/manifests"
+    cni_bridge_interface_name = "cni0"
 
     cert_issuer_prod    = "letsencrypt-prod"
     cert_issuer_staging = "letsencrypt-staging"

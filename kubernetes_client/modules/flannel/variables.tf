@@ -25,3 +25,7 @@ variable "kubernetes_pod_prefix" {
 variable "cni_version" {
   type = string
 }
+
+variable "cni_bridge_interface_name" {
+  type = string
+}

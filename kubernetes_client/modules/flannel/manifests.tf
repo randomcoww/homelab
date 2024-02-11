@@ -96,7 +96,7 @@ module "configmap" {
             type             = "bridge"
             hairpinMode      = true
             isDefaultGateway = true
-            bridge           = "cni0"
+            bridge           = var.cni_bridge_interface_name
           }
         },
         {
@@ -104,7 +104,7 @@ module "configmap" {
           capabilities = {
             portMappings = true
           }
-        },
+        }
       ]
     })
     "net-conf.json" = jsonencode({
