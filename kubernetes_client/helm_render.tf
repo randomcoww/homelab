@@ -738,3 +738,119 @@ module "headscale" {
   s3_access_key_id          = data.terraform_remote_state.sr.outputs.s3.headscale.access_key_id
   s3_secret_access_key      = data.terraform_remote_state.sr.outputs.s3.headscale.secret_access_key
 }
+
+module "satisfactory-server" {
+  source  = "./modules/satisfactory"
+  name    = "satisfactory-server"
+  release = "0.1.0"
+  images = {
+    satisfactory_server = local.container_images.satisfactory_server
+  }
+  ports = {
+    beacon = 15000
+    game   = 7777
+    query  = 15777
+  }
+  extra_envs = {
+    AUTOSAVEINTERVAL     = 1200
+    AUTOSAVEONDISCONNECT = false
+    MAXTICKRATE          = 15
+    CRASHREPORT          = false
+    MAXPLAYERS           = 3
+  }
+  config_overrides = {
+    "Engine.ini" = <<-EOF
+    [/Script/EngineSettings.GameMapsSettings]
+    GameDefaultMap=/Game/FactoryGame/Map/GameLevel01/Persistent_Level
+    LocalMapOptions=?sessionName=SatisfactoryServer?Visibility=SV_FriendsOnly?loadgame=savefile?listen?bUseIpSockets?name=Host
+
+    [/Script/Engine.Engine]
+    bSmoothFrameRate=true
+    bUseFixedFrameRate=false
+    SmoothedFrameRateRange=(LowerBound=(Type=Inclusive,Value=5.000000),UpperBound=(Type=Exclusive,Value=15.000000))
+    MinDesiredFrameRate=8.000000
+    FixedFrameRate=15.000000
+    NetClientTicksPerSecond=15
+
+    [/Script/Engine.GarbageCollectionSettings]
+    gc.MaxObjectsInEditor=2162688
+    gc.MaxObjectsInGame=2162688
+    gc.MaxObjectsNotConsideredByGC=476499
+    gc.SizeOfPermanentObjectPool=100378488
+    gc.ActorClusteringEnabled=True
+    gc.BlueprintClusteringEnabled=True
+
+    [/Script/Engine.Player]
+    ConfiguredInternetSpeed=104857600
+    ConfiguredLanSpeed=104857600
+
+    [/script/Engine.StreamingSettings]
+    s.AsyncLoadingThreadEnabled=True
+    s.EventDrivenLoaderEnabled=True
+
+    [/Script/OnlineSubsystemUtils.IpNetDriver]
+    ConnectionTimeout=300.0
+    InitialConnectTimeout=300.0
+    LanServerMaxTickRate=120
+    NetServerMaxTickRate=120
+    MaxNetTickRate=400
+    MaxInternetClientRate=104857600
+    MaxClientRate=104857600
+
+    [/Script/SocketSubsystemEpic.EpicNetDriver]
+    MaxClientRate=104857600
+    MaxInternetClientRate=104857600
+
+    [/Script/FactoryGame.FGSaveSession]
+    mNumRotatingAutosaves=5
+
+    [CrashReportClient]
+    bAgreeToCrashUpload=true
+    bImplicitSend=true
+
+    [SystemSettings]
+    t.MaxFPS=15
+    AllowAsyncRenderThreadUpdates=1
+    AllowAsyncRenderThreadUpdatesDuringGamethreadUpdates=1
+    net.UseRecvMulti=0
+    net.RecvMultiCapacity=8192
+    net.IpNetDriverUseReceiveThread=0
+    net.IpConnectionUseSendTasks=1
+    net.IpNetDriverReceiveThreadQueueMaxPackets=8192
+    net.MaxNetStringSize=67108864
+    net.MaxRPCPerNetUpdate=8
+    tick.AllowAsyncComponentTicks=1
+    tick.AllowConcurrentTickQueue=1
+    tick.AllowAsyncTickDispatch=1
+    tick.AllowAsyncTickCleanup=1
+
+    [ConsoleVariables]
+    wp.Runtime.EnableServerStreaming=0
+    EOF
+  }
+  service_hostname = local.kubernetes_ingress_endpoints.satisfactory_server
+  service_ip       = local.services.satisfactory_server.ip
+  resources = {
+    requests = {
+      memory = "4Gi"
+    }
+  }
+  affinity = {
+    nodeAffinity = {
+      requiredDuringSchedulingIgnoredDuringExecution = {
+        nodeSelectorTerms = [
+          {
+            matchExpressions = [
+              {
+                key      = "client"
+                operator = "DoesNotExist"
+              },
+            ]
+          },
+        ]
+      }
+    }
+  }
+  volume_claim_size = "24Gi"
+  storage_class     = "local-path"
+}

@@ -17,6 +17,7 @@ locals {
     module.kube-proxy,
     module.lldap,
     module.bsimp,
+    # module.satisfactory-server,
     # module.headscale,
     # module.kasm-desktop,
   ]
