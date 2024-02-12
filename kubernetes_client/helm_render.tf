@@ -53,7 +53,6 @@ module "kube-dns" {
   source         = "./modules/kube_dns"
   name           = "kube-dns"
   namespace      = "kube-system"
-  release        = "0.1.4"
   source_release = "1.29.0"
   replicas       = 3
   images = {
@@ -180,7 +179,6 @@ module "authelia" {
   source         = "./modules/authelia"
   name           = local.kubernetes_services.authelia.name
   namespace      = local.kubernetes_services.authelia.namespace
-  release        = "0.1.1"
   source_release = "0.8.58"
   images = {
     litestream = local.container_images.litestream

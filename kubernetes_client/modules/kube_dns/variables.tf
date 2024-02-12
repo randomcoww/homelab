@@ -7,17 +7,13 @@ variable "namespace" {
   default = "default"
 }
 
-variable "release" {
+variable "source_release" {
   type = string
 }
 
 variable "replicas" {
   type    = number
   default = 2
-}
-
-variable "source_release" {
-  type = string
 }
 
 variable "images" {

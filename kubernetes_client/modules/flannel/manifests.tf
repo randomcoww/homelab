@@ -237,6 +237,10 @@ module "daemonset" {
               }
             }
           },
+          {
+            name  = "EVENT_QUEUE_DEPTH"
+            value = "5000"
+          },
         ]
         volumeMounts = [
           {

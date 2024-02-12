@@ -65,7 +65,7 @@ module "metadata" {
   source      = "../metadata"
   name        = var.name
   namespace   = var.namespace
-  release     = var.release
+  release     = var.source_release
   app_version = var.source_release
   manifests   = local.manifests
 }

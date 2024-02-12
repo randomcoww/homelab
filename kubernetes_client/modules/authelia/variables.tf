@@ -7,10 +7,6 @@ variable "namespace" {
   default = "default"
 }
 
-variable "release" {
-  type = string
-}
-
 variable "source_release" {
   type = string
 }

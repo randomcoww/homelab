@@ -2,7 +2,7 @@ module "secret-custom" {
   source  = "../secret"
   name    = "${var.name}-custom"
   app     = var.name
-  release = var.release
+  release = var.source_release
   data = {
     ACCESS_KEY_ID              = var.s3_access_key_id
     SECRET_ACCESS_KEY          = var.s3_secret_access_key
@@ -116,7 +116,7 @@ module "metadata" {
   source      = "../metadata"
   name        = var.name
   namespace   = var.namespace
-  release     = var.release
+  release     = var.source_release
   app_version = var.source_release
   manifests   = local.manifests
 }
