@@ -110,12 +110,6 @@ resource "helm_release" "amd-gpu" {
   max_history = 2
   values = [
     yamlencode({
-      tolerations = [
-        {
-          key      = "node-role.kubernetes.io/de"
-          operator = "Exists"
-        },
-      ]
     }),
   ]
 }
@@ -132,12 +126,6 @@ resource "helm_release" "nvidia-device-plugin" {
   max_history = 2
   values = [
     yamlencode({
-      tolerations = [
-        {
-          key      = "node-role.kubernetes.io/de"
-          operator = "Exists"
-        },
-      ]
       affinity = {
         nodeAffinity = {
           requiredDuringSchedulingIgnoredDuringExecution = {
@@ -498,41 +486,3 @@ resource "helm_release" "minio" {
     }),
   ]
 }
-
-# openspeedtest #
-/*
-resource "helm_release" "speedtest" {
-  name        = "speedtest"
-  repository  = "https://openspeedtest.github.io/Helm-chart/"
-  chart       = "openspeedtest"
-  wait        = false
-  version     = "0.1.2"
-  max_history = 2
-  values = [
-    yamlencode({
-      service = {
-        type = "ClusterIP"
-      }
-      ingress = {
-        enabled     = true
-        className   = local.ingress_classes.ingress_nginx
-        annotations = local.nginx_ingress_auth_annotations
-        tls = [
-          local.ingress_tls_common,
-        ]
-        hosts = [
-          {
-            host = local.kubernetes_ingress_endpoints.speedtest
-            paths = [
-              {
-                path     = "/"
-                pathType = "Prefix"
-              },
-            ]
-          },
-        ]
-      }
-    })
-  ]
-}
-*/

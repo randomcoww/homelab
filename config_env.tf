@@ -163,7 +163,6 @@ locals {
       kasm                = "k"
       sunshine            = "sun"
       alpaca_stream       = "alpaca-stream"
-      speedtest           = "speedtest"
       headscale           = "headscale"
       lldap_http          = "ldap"
       bsimp               = "bsimp"
