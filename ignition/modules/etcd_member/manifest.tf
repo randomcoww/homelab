@@ -37,25 +37,25 @@ locals {
         contents = var.ca.cert_pem
       }
       cert = {
-        contents = tls_locally_signed_cert.etcd.cert_pem
+        contents = tls_locally_signed_cert.kube-etcd.cert_pem
       }
       key = {
-        contents = tls_private_key.etcd.private_key_pem
+        contents = tls_private_key.kube-etcd.private_key_pem
       }
       peer-ca-cert = {
         contents = var.peer_ca.cert_pem
       }
       peer-cert = {
-        contents = tls_locally_signed_cert.etcd-peer.cert_pem
+        contents = tls_locally_signed_cert.kube-etcd-peer.cert_pem
       }
       peer-key = {
-        contents = tls_private_key.etcd-peer.private_key_pem
+        contents = tls_private_key.kube-etcd-peer.private_key_pem
       }
       client-cert = {
-        contents = tls_locally_signed_cert.etcd-client.cert_pem
+        contents = tls_locally_signed_cert.etcd-wrapper-etcd-client.cert_pem
       }
       client-key = {
-        contents = tls_private_key.etcd-client.private_key_pem
+        contents = tls_private_key.etcd-wrapper-etcd-client.private_key_pem
       }
     } :
     key => merge(f, {

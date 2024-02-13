@@ -4,38 +4,47 @@ locals {
 
   pki = {
     for key, f in {
-      ca-cert = {
-        contents = var.ca.cert_pem
+      kubernetes-ca-cert = {
+        contents = var.kubernetes_ca.cert_pem
       }
-      ca-key = {
-        contents = var.ca.private_key_pem
+      kubernetes-ca-key = {
+        contents = var.kubernetes_ca.private_key_pem
+      }
+      apiserver-cert = {
+        contents = tls_locally_signed_cert.kube-apiserver.cert_pem
+      }
+      apiserver-key = {
+        contents = tls_private_key.kube-apiserver.private_key_pem
+      }
+      kubelet-client-cert = {
+        contents = tls_locally_signed_cert.kube-apiserver-kubelet-client.cert_pem
+      }
+      kubelet-client-key = {
+        contents = tls_private_key.kube-apiserver-kubelet-client.private_key_pem
+      }
+      front-proxy-client-ca-cert = {
+        contents = var.front_proxy_ca.cert_pem
+      }
+      front-proxy-client-cert = {
+        contents = tls_locally_signed_cert.front-proxy-client.cert_pem
+      }
+      front-proxy-client-key = {
+        contents = tls_private_key.front-proxy-client.private_key_pem
+      }
+      etcd-ca-cert = {
+        contents = var.etcd_ca.cert_pem
+      }
+      etcd-client-cert = {
+        contents = tls_locally_signed_cert.kube-apiserver-etcd-client.cert_pem
+      }
+      etcd-client-key = {
+        contents = tls_private_key.kube-apiserver-etcd-client.private_key_pem
       }
       service-account-cert = {
         contents = var.service_account.public_key_pem
       }
       service-account-key = {
         contents = var.service_account.private_key_pem
-      }
-      apiserver-cert = {
-        contents = tls_locally_signed_cert.apiserver.cert_pem
-      }
-      apiserver-key = {
-        contents = tls_private_key.apiserver.private_key_pem
-      }
-      kubelet-client-cert = {
-        contents = tls_locally_signed_cert.kubelet-client.cert_pem
-      }
-      kubelet-client-key = {
-        contents = tls_private_key.kubelet-client.private_key_pem
-      }
-      etcd-ca-cert = {
-        contents = var.etcd_ca.cert_pem
-      }
-      etcd-client-cert = {
-        contents = tls_locally_signed_cert.etcd-client.cert_pem
-      }
-      etcd-client-key = {
-        contents = tls_private_key.etcd-client.private_key_pem
       }
     } :
     key => merge(f, {
@@ -147,7 +156,7 @@ module "controller-manager-kubeconfig" {
   cluster_name       = var.cluster_name
   user               = var.controller_manager_user
   apiserver_endpoint = "https://127.0.0.1:${var.ports.apiserver}"
-  ca_cert_pem        = var.ca.cert_pem
+  ca_cert_pem        = var.kubernetes_ca.cert_pem
   client_cert_pem    = tls_locally_signed_cert.controller-manager.cert_pem
   client_key_pem     = tls_private_key.controller-manager.private_key_pem
 }
@@ -157,7 +166,7 @@ module "scheduler-kubeconfig" {
   cluster_name       = var.cluster_name
   user               = var.scheduler_user
   apiserver_endpoint = "https://127.0.0.1:${var.ports.apiserver}"
-  ca_cert_pem        = var.ca.cert_pem
+  ca_cert_pem        = var.kubernetes_ca.cert_pem
   client_cert_pem    = tls_locally_signed_cert.scheduler.cert_pem
   client_key_pem     = tls_private_key.scheduler.private_key_pem
 }
@@ -176,7 +185,7 @@ module "apiserver" {
           "--allow-privileged=true",
           "--authorization-mode=Node,RBAC",
           "--bind-address=0.0.0.0",
-          "--client-ca-file=${local.pki.ca-cert.path}",
+          "--client-ca-file=${local.pki.kubernetes-ca-cert.path}",
           "--etcd-cafile=${local.pki.etcd-ca-cert.path}",
           "--etcd-certfile=${local.pki.etcd-client-cert.path}",
           "--etcd-keyfile=${local.pki.etcd-client-key.path}",
@@ -185,7 +194,16 @@ module "apiserver" {
             "https://${ip}:${var.ports.etcd_client}"
           ])}",
           "--event-ttl=1h",
-          "--kubelet-certificate-authority=${local.pki.ca-cert.path}",
+          ## If not running kubelet on the same node
+          # "--enable-aggregator-routing=true",
+          "--requestheader-allowed-names=${var.front_proxy_client_user}",
+          "--requestheader-extra-headers-prefix=X-Remote-Extra-",
+          "--requestheader-group-headers=X-Remote-Group",
+          "--requestheader-username-headers=X-Remote-User",
+          "--requestheader-client-ca-file=${local.pki.front-proxy-client-ca-cert.path}",
+          "--proxy-client-cert-file=${local.pki.front-proxy-client-cert.path}",
+          "--proxy-client-key-file=${local.pki.front-proxy-client-key.path}",
+          "--kubelet-certificate-authority=${local.pki.kubernetes-ca-cert.path}",
           "--kubelet-client-certificate=${local.pki.kubelet-client-cert.path}",
           "--kubelet-client-key=${local.pki.kubelet-client-key.path}",
           "--kubelet-preferred-address-types=InternalDNS,InternalIP",
@@ -263,11 +281,11 @@ module "controller-manager" {
           "--bind-address=127.0.0.1",
           "--cluster-cidr=${var.kubernetes_pod_prefix}",
           "--cluster-name=${var.cluster_name}",
-          "--cluster-signing-cert-file=${local.pki.ca-cert.path}",
-          "--cluster-signing-key-file=${local.pki.ca-key.path}",
+          "--cluster-signing-cert-file=${local.pki.kubernetes-ca-cert.path}",
+          "--cluster-signing-key-file=${local.pki.kubernetes-ca-key.path}",
           "--kubeconfig=${local.kubeconfig.controller-manager.path}",
           "--leader-elect=true",
-          "--root-ca-file=${local.pki.ca-cert.path}",
+          "--root-ca-file=${local.pki.kubernetes-ca-cert.path}",
           "--service-account-private-key-file=${local.pki.service-account-key.path}",
           "--service-cluster-ip-range=${var.kubernetes_service_prefix}",
           "--use-service-account-credentials=true",

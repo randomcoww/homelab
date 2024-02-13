@@ -66,6 +66,11 @@ output "kubernetes" {
       private_key_pem = tls_private_key.kubernetes-ca.private_key_pem
       cert_pem        = tls_self_signed_cert.kubernetes-ca.cert_pem
     }
+    front_proxy_ca = {
+      algorithm       = tls_private_key.kubernetes-front-proxy-ca.algorithm
+      private_key_pem = tls_private_key.kubernetes-front-proxy-ca.private_key_pem
+      cert_pem        = tls_self_signed_cert.kubernetes-front-proxy-ca.cert_pem
+    }
     service_account = {
       algorithm       = tls_private_key.service-account.algorithm
       public_key_pem  = tls_private_key.service-account.public_key_pem

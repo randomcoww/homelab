@@ -42,6 +42,36 @@ resource "helm_release" "wrapper" {
   ]
 }
 
+resource "helm_release" "metrics-server" {
+  name        = "metrics-server"
+  namespace   = "kube-system"
+  repository  = "https://kubernetes-sigs.github.io/metrics-server"
+  chart       = "metrics-server"
+  wait        = false
+  version     = "3.12.0"
+  max_history = 2
+  values = [
+    yamlencode({
+      replicas = 2
+      defaultArgs = [
+        "--cert-dir=/tmp",
+        "--metric-resolution=15s",
+        "--kubelet-preferred-address-types=InternalIP",
+        "--kubelet-use-node-status-port",
+        "--v=2",
+      ]
+      dnsConfig = {
+        options = [
+          {
+            name  = "ndots"
+            value = "2"
+          },
+        ]
+      }
+    }),
+  ]
+}
+
 # local-storage storage class #
 
 resource "helm_release" "local-path-provisioner" {

@@ -10,7 +10,15 @@ variable "cluster_name" {
   type = string
 }
 
-variable "ca" {
+variable "kubernetes_ca" {
+  type = object({
+    algorithm       = string
+    private_key_pem = string
+    cert_pem        = string
+  })
+}
+
+variable "front_proxy_ca" {
   type = object({
     algorithm       = string
     private_key_pem = string
@@ -64,7 +72,11 @@ variable "cluster_apiserver_endpoint" {
   type = string
 }
 
-variable "kubelet_access_user" {
+variable "kubelet_client_user" {
+  type = string
+}
+
+variable "front_proxy_client_user" {
   type = string
 }
 

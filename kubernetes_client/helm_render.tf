@@ -4,8 +4,8 @@ module "bootstrap" {
   namespace = "kube-system"
   release   = "0.1.1"
 
-  kube_node_bootstrap_user = local.kubernetes.node_bootstrap_user
-  kube_kubelet_access_user = local.kubernetes.kubelet_access_user
+  node_bootstrap_user = local.kubernetes.node_bootstrap_user
+  kubelet_client_user = local.kubernetes.kubelet_client_user
 }
 
 module "kube-proxy" {

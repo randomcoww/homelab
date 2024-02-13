@@ -1,5 +1,5 @@
 locals {
-  kubelet_access_role_name = "system:kube-apiserver-to-kubelet"
+  kubelet_client_role_name = "system:kube-apiserver-to-kubelet"
 
   # node bootstrap #
 
@@ -24,7 +24,7 @@ locals {
       {
         apiGroup = "rbac.authorization.k8s.io"
         kind     = "User"
-        name     = var.kube_node_bootstrap_user
+        name     = var.node_bootstrap_user
       },
     ]
   }
@@ -48,7 +48,7 @@ locals {
       {
         apiGroup = "rbac.authorization.k8s.io"
         kind     = "User"
-        name     = var.kube_node_bootstrap_user
+        name     = var.node_bootstrap_user
       },
     ]
   }
@@ -80,11 +80,11 @@ locals {
   # kube apiserver access to kubelet #
 
   # https://stackoverflow.com/questions/48118125/kubernetes-rbac-role-verbs-to-exec-to-pod
-  kubelet_access_role = {
+  kubelet_client_role = {
     apiVersion = "rbac.authorization.k8s.io/v1"
     kind       = "ClusterRole"
     metadata = {
-      name = local.kubelet_access_role_name
+      name = local.kubelet_client_role_name
       annotations = {
         "rbac.authorization.kubernetes.io/autoupdate" = "true"
       }
@@ -113,7 +113,7 @@ locals {
     ]
   }
 
-  kubelet_access_rolebinding = {
+  kubelet_client_rolebinding = {
     apiVersion = "rbac.authorization.k8s.io/v1"
     kind       = "ClusterRoleBinding"
     metadata = {
@@ -126,13 +126,13 @@ locals {
     roleRef = {
       apiGroup = "rbac.authorization.k8s.io"
       kind     = "ClusterRole"
-      name     = local.kubelet_access_role_name
+      name     = local.kubelet_client_role_name
     }
     subjects = [
       {
         apiGroup = "rbac.authorization.k8s.io"
         kind     = "User"
-        name     = var.kube_kubelet_access_user
+        name     = var.kubelet_client_user
       },
     ]
   }
@@ -148,7 +148,7 @@ module "metadata" {
     "templates/node-bootstrap-rolebinding.yaml" = yamlencode(local.node_bootstrap_rolebinding)
     "templates/node-approver-rolebinding.yaml"  = yamlencode(local.node_approver_rolebinding)
     "templates/node-renewal-rolebinding.yaml"   = yamlencode(local.node_renewal_rolebinding)
-    "templates/kubelet-access-role.yaml"        = yamlencode(local.kubelet_access_role)
-    "templates/kubelet-access-rolebinding.yaml" = yamlencode(local.kubelet_access_rolebinding)
+    "templates/kubelet-access-role.yaml"        = yamlencode(local.kubelet_client_role)
+    "templates/kubelet-access-rolebinding.yaml" = yamlencode(local.kubelet_client_rolebinding)
   }
 }

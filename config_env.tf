@@ -134,8 +134,9 @@ locals {
     cert_issuer_prod    = "letsencrypt-prod"
     cert_issuer_staging = "letsencrypt-staging"
 
-    kubelet_access_user = "kube-apiserver-kubelet-client"
-    node_bootstrap_user = "system:node-bootstrapper"
+    kubelet_client_user     = "kube-apiserver-kubelet-client"
+    front_proxy_client_user = "front-proxy-client"
+    node_bootstrap_user     = "system:node-bootstrapper"
   }
 
   vrrp = {

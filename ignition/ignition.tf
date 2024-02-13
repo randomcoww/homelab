@@ -142,7 +142,8 @@ module "kubernetes-master" {
   ignition_version = local.ignition_version
   name             = "kubernetes-master"
   cluster_name     = local.kubernetes.cluster_name
-  ca               = data.terraform_remote_state.sr.outputs.kubernetes.ca
+  front_proxy_ca   = data.terraform_remote_state.sr.outputs.kubernetes.front_proxy_ca
+  kubernetes_ca    = data.terraform_remote_state.sr.outputs.kubernetes.ca
   etcd_ca          = data.terraform_remote_state.sr.outputs.etcd.ca
   service_account  = data.terraform_remote_state.sr.outputs.kubernetes.service_account
   members = {
@@ -165,7 +166,8 @@ module "kubernetes-master" {
     scheduler          = local.host_ports.scheduler
     etcd_client        = local.host_ports.etcd_client
   }
-  kubelet_access_user        = local.kubernetes.kubelet_access_user
+  kubelet_client_user        = local.kubernetes.kubelet_client_user
+  front_proxy_client_user    = local.kubernetes.front_proxy_client_user
   cluster_apiserver_endpoint = local.kubernetes_services.apiserver.fqdn
   kubernetes_service_prefix  = local.networks.kubernetes_service.prefix
   kubernetes_pod_prefix      = local.networks.kubernetes_pod.prefix

@@ -11,10 +11,10 @@ variable "release" {
   type = string
 }
 
-variable "kube_kubelet_access_user" {
+variable "kubelet_client_user" {
   type = string
 }
 
-variable "kube_node_bootstrap_user" {
+variable "node_bootstrap_user" {
   type = string
 }
