@@ -41,6 +41,9 @@ resource "helm_release" "wrapper" {
       manifests = values(each.value.manifests)
     }),
   ]
+  depends_on = [
+    kubernetes_labels.labels,
+  ]
 }
 
 resource "helm_release" "metrics-server" {
@@ -143,6 +146,9 @@ resource "helm_release" "nvidia-device-plugin" {
         }
       }
     }),
+  ]
+  depends_on = [
+    kubernetes_labels.labels,
   ]
 }
 
@@ -484,5 +490,8 @@ resource "helm_release" "minio" {
         }
       }
     }),
+  ]
+  depends_on = [
+    kubernetes_labels.labels,
   ]
 }
