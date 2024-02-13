@@ -739,6 +739,21 @@ module "headscale" {
   s3_secret_access_key      = data.terraform_remote_state.sr.outputs.s3.headscale.secret_access_key
 }
 
+module "excalidraw" {
+  source  = "./modules/excalidraw"
+  name    = "excalidraw"
+  release = "0.1.0"
+  images = {
+    excalidraw = local.container_images.excalidraw
+  }
+  ports = {
+    excalidraw = 5000
+  }
+  service_hostname          = local.kubernetes_ingress_endpoints.excalidraw
+  ingress_class_name        = local.ingress_classes.ingress_nginx
+  nginx_ingress_annotations = local.nginx_ingress_auth_annotations
+}
+
 module "satisfactory-server" {
   source  = "./modules/satisfactory"
   name    = "satisfactory-server"
