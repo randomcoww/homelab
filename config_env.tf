@@ -116,7 +116,6 @@ locals {
     headscale           = "docker.io/headscale/headscale:0.22"
     lldap               = "docker.io/lldap/lldap:2024-02-02-alpine"
     bsimp               = "ghcr.io/randomcoww/bsimp:20240208.2"
-    excalidraw          = "docker.io/excalidraw/excalidraw:latest"
     satisfactory_server = "wolveix/satisfactory-server:v1.6"
   }
 
@@ -167,7 +166,6 @@ locals {
       lldap_http          = "ldap"
       bsimp               = "bsimp"
       satisfactory_server = "sa"
-      excalidraw          = "draw"
     } :
     k => "${domain}.${local.domains.public}"
   }
