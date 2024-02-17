@@ -142,7 +142,7 @@ module "ingress" {
       host = var.service_hostname
       paths = [
         {
-          service = var.name
+          service = module.service.name
           port    = var.ports.transmission
           path    = "/"
         }
@@ -233,7 +233,7 @@ module "deployment" {
       {
         name = "config"
         secret = {
-          secretName  = var.name
+          secretName  = module.secret.name
           defaultMode = 493
         }
       },

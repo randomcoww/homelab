@@ -276,7 +276,7 @@ module "daemonset" {
       {
         name = "flannel-cfg"
         configMap = {
-          name = "flannel"
+          name = module.configmap.name
         }
       },
     ]

@@ -101,7 +101,7 @@ module "ingress" {
       host = var.kasm_service_hostname
       paths = [
         {
-          service = var.name
+          service = module.service.name
           port    = var.ports.kasm
           path    = "/"
         }
@@ -207,7 +207,7 @@ module "statefulset" {
       {
         name = "secret"
         secret = {
-          secretName = var.name
+          secretName = module.secret.name
         }
       },
     ]

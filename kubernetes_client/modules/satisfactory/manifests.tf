@@ -126,7 +126,7 @@ module "statefulset" {
       {
         name = "overrides"
         configMap = {
-          name = var.name
+          name = module.configmap.name
         }
       },
     ]

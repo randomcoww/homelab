@@ -66,10 +66,10 @@ module "ingress" {
       host = var.service_hostname
       paths = [
         {
-          service = var.name
+          service = module.service.name
           port    = var.ports.vaultwarden
           path    = "/"
-        }
+        },
       ]
     },
   ]
@@ -102,7 +102,7 @@ module "statefulset" {
             name = "LITESTREAM_ACCESS_KEY_ID"
             valueFrom = {
               secretKeyRef = {
-                name = var.name
+                name = module.secret.name
                 key  = "ACCESS_KEY_ID"
               }
             }
@@ -111,7 +111,7 @@ module "statefulset" {
             name = "LITESTREAM_SECRET_ACCESS_KEY"
             valueFrom = {
               secretKeyRef = {
-                name = var.name
+                name = module.secret.name
                 key  = "SECRET_ACCESS_KEY"
               }
             }
@@ -135,7 +135,7 @@ module "statefulset" {
             name = tostring(k)
             valueFrom = {
               secretKeyRef = {
-                name = var.name
+                name = module.secret.name
                 key  = tostring(k)
               }
             }
@@ -166,7 +166,7 @@ module "statefulset" {
             name = "LITESTREAM_ACCESS_KEY_ID"
             valueFrom = {
               secretKeyRef = {
-                name = var.name
+                name = module.secret.name
                 key  = "ACCESS_KEY_ID"
               }
             }
@@ -175,7 +175,7 @@ module "statefulset" {
             name = "LITESTREAM_SECRET_ACCESS_KEY"
             valueFrom = {
               secretKeyRef = {
-                name = var.name
+                name = module.secret.name
                 key  = "SECRET_ACCESS_KEY"
               }
             }

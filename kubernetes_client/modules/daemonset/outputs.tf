@@ -39,3 +39,7 @@ output "manifest" {
     }
   })
 }
+
+output "name" {
+  value = var.name
+}

@@ -68,7 +68,7 @@ data "helm_template" "authelia" {
           {
             name = "authelia-custom"
             secret = {
-              secretName = "${var.name}-custom"
+              secretName = module.secret-custom.name
             }
           },
         ]
@@ -150,7 +150,7 @@ locals {
                     name = "LITESTREAM_ACCESS_KEY_ID"
                     valueFrom = {
                       secretKeyRef = {
-                        name = "${var.name}-custom"
+                        name = module.secret-custom.name
                         key  = "ACCESS_KEY_ID"
                       }
                     }
@@ -159,7 +159,7 @@ locals {
                     name = "LITESTREAM_SECRET_ACCESS_KEY"
                     valueFrom = {
                       secretKeyRef = {
-                        name = "${var.name}-custom"
+                        name = module.secret-custom.name
                         key  = "SECRET_ACCESS_KEY"
                       }
                     }
@@ -187,7 +187,7 @@ locals {
                     name = "LITESTREAM_ACCESS_KEY_ID"
                     valueFrom = {
                       secretKeyRef = {
-                        name = "${var.name}-custom"
+                        name = module.secret-custom.name
                         key  = "ACCESS_KEY_ID"
                       }
                     }
@@ -196,7 +196,7 @@ locals {
                     name = "LITESTREAM_SECRET_ACCESS_KEY"
                     valueFrom = {
                       secretKeyRef = {
-                        name = "${var.name}-custom"
+                        name = module.secret-custom.name
                         key  = "SECRET_ACCESS_KEY"
                       }
                     }

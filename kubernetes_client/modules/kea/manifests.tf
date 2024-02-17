@@ -316,7 +316,7 @@ module "statefulset" {
       {
         name = "kea-config"
         configMap = {
-          name = var.name
+          name = module.configmap.name
         }
       },
     ]

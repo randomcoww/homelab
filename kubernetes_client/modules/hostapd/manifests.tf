@@ -123,7 +123,7 @@ module "statefulset" {
       {
         name = "hostapd-config"
         secret = {
-          secretName = var.name
+          secretName = module.secret.name
         }
       },
       {

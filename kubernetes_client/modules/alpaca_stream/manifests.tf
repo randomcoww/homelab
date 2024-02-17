@@ -63,10 +63,10 @@ module "deployment" {
           "-listen-url",
           "0.0.0.0:${var.ports.alpaca_stream}",
         ]
-        envFrom : [
+        envFrom = [
           {
             secretRef = {
-              name = var.name
+              name = module.secret.name
             }
           },
         ]

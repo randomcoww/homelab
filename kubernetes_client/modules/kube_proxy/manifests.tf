@@ -146,7 +146,7 @@ module "daemonset" {
       {
         name = "kube-proxy-config"
         configMap = {
-          name = var.name
+          name = module.configmap.name
         }
       },
     ]

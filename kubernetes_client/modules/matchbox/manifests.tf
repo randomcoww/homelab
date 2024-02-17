@@ -222,13 +222,13 @@ module "statefulset" {
       {
         name = "matchbox-secret"
         secret = {
-          secretName = "${var.name}-matchbox"
+          secretName = module.secret-matchbox.name
         }
       },
       {
         name = "syncthing-secret"
         secret = {
-          secretName = "${var.name}-syncthing"
+          secretName = module.secret-syncthing.name
         }
       },
     ]

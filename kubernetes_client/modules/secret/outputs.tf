@@ -17,3 +17,7 @@ output "manifest" {
   })
   sensitive = true
 }
+
+output "name" {
+  value = var.name
+}

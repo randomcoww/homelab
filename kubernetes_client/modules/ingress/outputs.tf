@@ -50,3 +50,7 @@ output "manifest" {
     }, var.spec)
   })
 }
+
+output "name" {
+  value = var.name
+}

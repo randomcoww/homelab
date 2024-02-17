@@ -163,7 +163,7 @@ module "ingress" {
       host = var.service_hostname
       paths = [
         {
-          service = var.name
+          service = module.service.name
           port    = var.ports.code_server
           path    = "/"
         }
@@ -190,7 +190,7 @@ module "statefulset-sync" {
       {
         name = "secret"
         secret = {
-          secretName = var.name
+          secretName = module.secret.name
         }
       },
     ]
@@ -317,7 +317,7 @@ module "statefulset" {
             name = "TS_AUTH_KEY"
             valueFrom = {
               secretKeyRef = {
-                name = var.name
+                name = module.secret.name
                 key  = "TS_AUTHKEY"
               }
             }
@@ -330,7 +330,7 @@ module "statefulset" {
             name = "AWS_ACCESS_KEY_ID"
             valueFrom = {
               secretKeyRef = {
-                name = var.name
+                name = module.secret.name
                 key  = "ACCESS_KEY_ID"
               }
             }
@@ -339,7 +339,7 @@ module "statefulset" {
             name = "AWS_SECRET_ACCESS_KEY"
             valueFrom = {
               secretKeyRef = {
-                name = var.name
+                name = module.secret.name
                 key  = "SECRET_ACCESS_KEY"
               }
             }
@@ -358,7 +358,7 @@ module "statefulset" {
       {
         name = "secret"
         secret = {
-          secretName = var.name
+          secretName = module.secret.name
         }
       },
     ]
