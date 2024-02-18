@@ -13,13 +13,10 @@ resource "tls_cert_request" "lldap" {
   }
 
   dns_names = [
-    var.service_hostname,
-    "${var.name}.${var.namespace}",
+    for i, _ in split(".", var.cluster_service_endpoint) :
+    join(".", slice(split(".", var.cluster_service_endpoint), 0, i + 1))
   ]
-
-  ip_addresses = [
-    "127.0.0.1",
-  ]
+  ip_addresses = []
 }
 
 resource "tls_locally_signed_cert" "lldap" {

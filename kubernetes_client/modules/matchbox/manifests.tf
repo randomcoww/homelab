@@ -22,7 +22,7 @@ module "syncthing-config" {
   source = "../syncthing_config"
   hostnames = [
     for i in range(var.replicas) :
-    "${var.name}-${i}.${var.name}.${var.namespace}.svc"
+    "${var.name}-${i}.${var.name}.${var.namespace}"
   ]
   syncthing_home_path = local.syncthing_home_path
   sync_data_paths = [

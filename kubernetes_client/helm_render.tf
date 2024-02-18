@@ -121,10 +121,11 @@ module "fuse-device-plugin" {
 }
 
 module "matchbox" {
-  source   = "./modules/matchbox"
-  name     = "matchbox"
-  release  = "0.2.16"
-  replicas = 3
+  source    = "./modules/matchbox"
+  name      = local.kubernetes_services.matchbox.name
+  namespace = local.kubernetes_services.matchbox.namespace
+  release   = "0.2.16"
+  replicas  = 3
   images = {
     matchbox  = local.container_images.matchbox
     syncthing = local.container_images.syncthing
@@ -134,9 +135,10 @@ module "matchbox" {
     matchbox_api   = local.service_ports.matchbox_api
     syncthing_peer = 22000
   }
-  service_ip       = local.services.matchbox.ip
-  service_hostname = local.kubernetes_ingress_endpoints.matchbox
-  ca               = data.terraform_remote_state.sr.outputs.matchbox.ca
+  service_ip               = local.services.matchbox.ip
+  service_hostname         = local.kubernetes_ingress_endpoints.matchbox
+  ca                       = data.terraform_remote_state.sr.outputs.matchbox.ca
+  cluster_service_endpoint = local.kubernetes_services.matchbox.fqdn
 }
 
 module "vaultwarden" {
@@ -306,9 +308,10 @@ module "lldap" {
     lldap_http  = 17170
     lldap_ldaps = local.service_ports.lldap
   }
-  ca               = data.terraform_remote_state.sr.outputs.lldap.ca
-  service_hostname = local.kubernetes_ingress_endpoints.lldap_http
-  storage_secret   = data.terraform_remote_state.sr.outputs.lldap.storage_secret
+  ca                       = data.terraform_remote_state.sr.outputs.lldap.ca
+  cluster_service_endpoint = local.kubernetes_services.lldap.fqdn
+  service_hostname         = local.kubernetes_ingress_endpoints.lldap_http
+  storage_secret           = data.terraform_remote_state.sr.outputs.lldap.storage_secret
   extra_envs = {
     LLDAP_VERBOSE                             = true
     LLDAP_JWT_SECRET                          = data.terraform_remote_state.sr.outputs.lldap.jwt_token

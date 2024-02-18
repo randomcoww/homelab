@@ -11,13 +11,13 @@ resource "tls_cert_request" "matchbox" {
     organization = "matchbox"
   }
 
-  dns_names = [
+  dns_names = concat([
     var.service_hostname,
-    "${var.name}.${var.namespace}",
-  ]
-
+    ], [
+    for i, _ in split(".", var.cluster_service_endpoint) :
+    join(".", slice(split(".", var.cluster_service_endpoint), 0, i + 1))
+  ])
   ip_addresses = [
-    "127.0.0.1",
     var.service_ip,
   ]
 }

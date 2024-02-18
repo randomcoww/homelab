@@ -43,6 +43,10 @@ variable "service_hostname" {
   type = string
 }
 
+variable "cluster_service_endpoint" {
+  type = string
+}
+
 variable "storage_secret" {
   type = string
 }

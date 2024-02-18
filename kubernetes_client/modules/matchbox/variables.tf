@@ -39,6 +39,10 @@ variable "service_hostname" {
   type = string
 }
 
+variable "cluster_service_endpoint" {
+  type = string
+}
+
 variable "ca" {
   type = object({
     algorithm       = string
