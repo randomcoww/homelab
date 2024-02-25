@@ -25,12 +25,6 @@ locals {
     "${host_key}=https://${ip}:${var.ports.etcd_peer}"
   ])
 
-  # etcd-wrapper access params
-  initial_cluster_clients = join(",", [
-    for host_key, ip in var.members :
-    "${host_key}=https://${ip}:${var.ports.etcd_client}"
-  ])
-
   pki = {
     for key, f in {
       ca-cert = {
@@ -135,7 +129,6 @@ module "etcd-wrapper" {
           # etcd-wrapper args
           "--client-cert-file=${local.pki.client-cert.path}",
           "--client-key-file=${local.pki.client-key.path}",
-          "--initial-cluster-clients=${local.initial_cluster_clients}",
           "--s3-backup-resource=${var.s3_resource}",
           "--healthcheck-interval=${var.healthcheck_interval}",
           "--backup-interval=${var.backup_interval}",

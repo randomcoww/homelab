@@ -89,7 +89,7 @@ locals {
     kube_apiserver          = "ghcr.io/randomcoww/kubernetes:kube-master-v${local.kubernetes.version}"
     kube_controller_manager = "ghcr.io/randomcoww/kubernetes:kube-master-v${local.kubernetes.version}"
     kube_scheduler          = "ghcr.io/randomcoww/kubernetes:kube-master-v${local.kubernetes.version}"
-    etcd_wrapper            = "ghcr.io/randomcoww/etcd-wrapper:20240206.12"
+    etcd_wrapper            = "ghcr.io/randomcoww/etcd-wrapper:20240225.0"
     etcd                    = "gcr.io/etcd-development/etcd:v3.5.11-amd64"
 
     # Helm
@@ -192,6 +192,10 @@ locals {
       ingress_nginx_external = {
         name      = "${local.ingress_classes.ingress_nginx_external}-controller"
         namespace = "ingress-nginx"
+      }
+      matchbox = {
+        name      = "matchbox"
+        namespace = "default"
       }
       minio = {
         name      = "minio"

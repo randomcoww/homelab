@@ -70,7 +70,7 @@ variable "s3_region" {
 
 variable "healthcheck_interval" {
   type    = string
-  default = "6s"
+  default = "2s"
 }
 
 variable "backup_interval" {
@@ -85,7 +85,7 @@ variable "healthcheck_fail_count_allowed" {
 
 variable "readiness_fail_count_allowed" {
   type    = number
-  default = 64
+  default = 32
 }
 
 variable "auto_compaction_retention" {
