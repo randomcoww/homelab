@@ -17,7 +17,7 @@ storage:
             garp_master_delay 1
             garp_master_refresh 1
             virtual_ipaddress {
-              0.0.0.0 dev ${wan_interface_name} use_vmac no_track
+              0.0.0.0 dev ${wan_interface_name} no_track
               ${lan_gateway_ip} dev ${lan_interface_name} use_vmac
             }
             virtual_rules {
