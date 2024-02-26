@@ -90,7 +90,7 @@ locals {
     kube_controller_manager = "ghcr.io/randomcoww/kubernetes:kube-master-v${local.kubernetes.version}"
     kube_scheduler          = "ghcr.io/randomcoww/kubernetes:kube-master-v${local.kubernetes.version}"
     etcd_wrapper            = "ghcr.io/randomcoww/etcd-wrapper:20240226.1"
-    etcd                    = "gcr.io/etcd-development/etcd:v3.5.11-amd64"
+    etcd                    = "gcr.io/etcd-development/etcd:v3.5.12-amd64"
 
     # Helm
     kea                 = "ghcr.io/randomcoww/kea:2.4.1"
@@ -103,7 +103,7 @@ locals {
     flannel_cni_plugin  = "docker.io/flannel/flannel-cni-plugin:v1.2.0"
     kapprover           = "ghcr.io/randomcoww/kapprover:20240126"
     external_dns        = "registry.k8s.io/external-dns/external-dns:v0.14.0"
-    kube_proxy          = "ghcr.io/randomcoww/kubernetes:kube-proxy-v${local.kubernetes.version}-2"
+    kube_proxy          = "ghcr.io/randomcoww/kubernetes:kube-proxy-v${local.kubernetes.version}"
     transmission        = "ghcr.io/randomcoww/transmission:20240108.1"
     wireguard           = "ghcr.io/randomcoww/wireguard:20240109"
     vaultwarden         = "docker.io/vaultwarden/server:1.30.1-alpine"
@@ -120,12 +120,12 @@ locals {
   }
 
   pxeboot_images = {
-    coreos     = "fedora-coreos-39.20240120.0"
+    coreos     = "fedora-coreos-39.20240226.0"
     silverblue = "fedora-silverblue-39.20240226.0"
   }
 
   kubernetes = {
-    version                   = "1.29.1"
+    version                   = "1.29.2"
     cluster_name              = "prod-10"
     kubelet_root_path         = "/var/lib/kubelet"
     static_pod_manifest_path  = "/var/lib/kubelet/manifests"
