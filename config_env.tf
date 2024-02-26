@@ -89,7 +89,7 @@ locals {
     kube_apiserver          = "ghcr.io/randomcoww/kubernetes:kube-master-v${local.kubernetes.version}"
     kube_controller_manager = "ghcr.io/randomcoww/kubernetes:kube-master-v${local.kubernetes.version}"
     kube_scheduler          = "ghcr.io/randomcoww/kubernetes:kube-master-v${local.kubernetes.version}"
-    etcd_wrapper            = "ghcr.io/randomcoww/etcd-wrapper:20240225.0"
+    etcd_wrapper            = "ghcr.io/randomcoww/etcd-wrapper:20240226.1"
     etcd                    = "gcr.io/etcd-development/etcd:v3.5.11-amd64"
 
     # Helm
