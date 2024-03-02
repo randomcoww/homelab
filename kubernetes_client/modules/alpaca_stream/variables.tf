@@ -23,6 +23,10 @@ variable "ports" {
   })
 }
 
+variable "service_ip" {
+  type = string
+}
+
 variable "affinity" {
   type    = any
   default = {}
