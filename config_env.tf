@@ -112,7 +112,7 @@ locals {
     fuse_device_plugin  = "docker.io/soolaugust/fuse-device-plugin:v1.0"
     code_server         = "ghcr.io/randomcoww/code-server:20240118.1-tensorflow"
     kasm_desktop        = "ghcr.io/randomcoww/kasm-desktop:20231220.3"
-    alpaca_stream       = "ghcr.io/randomcoww/alpaca-client:stream-server-20240302.1"
+    alpaca_stream       = "ghcr.io/randomcoww/alpaca-client:stream-server-20240302.2"
     headscale           = "docker.io/headscale/headscale:0.22"
     lldap               = "docker.io/lldap/lldap:2024-02-02-alpine"
     bsimp               = "ghcr.io/randomcoww/bsimp:20240208.2"
