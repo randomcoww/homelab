@@ -153,13 +153,14 @@ storage:
           set -g mouse on
           set-option -s set-clipboard off
           bind-key -T copy-mode MouseDragEnd1Pane send-keys -X copy-pipe-and-cancel "xclip -in -sel clip"
-    - path: /etc/bluetooth/input.conf
+    - path: /etc/bluetooth/main.conf
       mode: 0644
       overwrite: true
       contents:
         inline: |
           [General]
-          UserspaceHID=true
+          FastConnectable=true
+          TemporaryTimeout=0
     # systemd user unit
     # ignition doesn't support systemd --user
     - path: /etc/systemd/user/dconf-load.service
