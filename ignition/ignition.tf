@@ -262,6 +262,7 @@ module "sunshine" {
   sunshine_config = {
     key_rightalt_to_key_win = "enabled"
     origin_web_ui_allowed   = "pc"
+    encoder                 = "nvenc"
   }
 }
 
