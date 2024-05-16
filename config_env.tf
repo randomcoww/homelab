@@ -121,7 +121,7 @@ locals {
 
   pxeboot_images = {
     coreos     = "fedora-coreos-39.20240304.0"
-    silverblue = "fedora-silverblue-39.20240513.0"
+    silverblue = "fedora-silverblue-39.20240516.0"
   }
 
   kubernetes = {
