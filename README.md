@@ -304,7 +304,6 @@ brew install \
 brew install --cask \
   blender \
   brave-browser \
-  huiontablet \
   inkscape \
   krita \
   moonlight \
