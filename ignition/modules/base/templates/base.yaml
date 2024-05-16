@@ -49,7 +49,9 @@ systemd:
 
         [Install]
         WantedBy=multi-user.target
-
+    # does not work with read only system
+    - name: rpm-ostree-fix-shadow-mode.service
+      mask: true
 storage:
   files:
     - path: /etc/hostname
