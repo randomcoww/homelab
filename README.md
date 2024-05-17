@@ -299,7 +299,9 @@ brew install \
   helm \
   podman \
   kubernetes-cli \
-  minio-mc
+  minio-mc \
+  tmux \
+  reattach-to-user-namespace
 
 brew install --cask \
   blender \
@@ -309,6 +311,14 @@ brew install --cask \
   moonlight \
   tailscale \
   visual-studio-code
+```
+
+```bash
+cat > ~/.tmux.conf <<EOF
+set -g mouse on
+set-option -s set-clipboard off
+bind-key -T copy-mode MouseDragEnd1Pane send-keys -X copy-pipe-and-cancel "reattach-to-user-namespace pbcopy"
+EOF
 ```
 
 #### ChromeOS Crostini
