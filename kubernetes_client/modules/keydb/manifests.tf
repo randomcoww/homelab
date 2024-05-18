@@ -76,12 +76,13 @@ EOF
 }
 
 module "statefulset" {
-  source   = "../statefulset"
-  name     = var.name
-  app      = var.name
-  release  = var.release
-  affinity = var.affinity
-  replicas = var.replicas
+  source            = "../statefulset"
+  name              = var.name
+  app               = var.name
+  release           = var.release
+  affinity          = var.affinity
+  replicas          = var.replicas
+  min_ready_seconds = 30
   annotations = {
     "checksum/secret"    = sha256(module.secret.manifest)
     "checksum/configmap" = sha256(module.configmap.manifest)

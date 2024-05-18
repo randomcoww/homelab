@@ -177,7 +177,30 @@ module "vaultwarden" {
   s3_secret_access_key      = data.terraform_remote_state.sr.outputs.s3.vaultwarden.secret_access_key
 }
 
-# Authelia with redis
+resource "tls_private_key" "authelia-redis-ca" {
+  algorithm   = "ECDSA"
+  ecdsa_curve = "P521"
+}
+
+resource "tls_self_signed_cert" "authelia-redis-ca" {
+  private_key_pem = tls_private_key.authelia-redis-ca.private_key_pem
+
+  validity_period_hours = 8760
+  is_ca_certificate     = true
+
+  subject {
+    common_name  = "redis"
+    organization = "redis"
+  }
+
+  allowed_uses = [
+    "key_encipherment",
+    "digital_signature",
+    "cert_signing",
+    "server_auth",
+    "client_auth",
+  ]
+}
 
 module "authelia-redis" {
   source    = "./modules/keydb"
@@ -191,7 +214,11 @@ module "authelia-redis" {
   ports = {
     keydb = local.service_ports.redis
   }
-  ca                       = local.authelia_redis_ca
+  ca = {
+    algorithm       = tls_private_key.authelia-redis-ca.algorithm
+    private_key_pem = tls_private_key.authelia-redis-ca.private_key_pem
+    cert_pem        = tls_self_signed_cert.authelia-redis-ca.cert_pem
+  }
   cluster_service_endpoint = local.kubernetes_services.authelia_redis.fqdn
 }
 
@@ -205,7 +232,11 @@ module "authelia" {
   }
   service_hostname = local.kubernetes_ingress_endpoints.auth
   lldap_ca         = data.terraform_remote_state.sr.outputs.lldap.ca
-  redis_ca         = local.authelia_redis_ca
+  redis_ca = {
+    algorithm       = tls_private_key.authelia-redis-ca.algorithm
+    private_key_pem = tls_private_key.authelia-redis-ca.private_key_pem
+    cert_pem        = tls_self_signed_cert.authelia-redis-ca.cert_pem
+  }
   configmap = {
     telemetry = {
       metrics = {
