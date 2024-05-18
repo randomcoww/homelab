@@ -187,7 +187,7 @@ locals {
         namespace = "authelia"
       }
       authelia_redis = {
-        name      = "authelia-redis"
+        name      = "redis"
         namespace = "authelia"
       }
       ingress_nginx = {
