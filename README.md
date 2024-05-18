@@ -284,8 +284,6 @@ flatpak --user -y install --or-update flathub \
   net.davidotek.pupgui2
 ```
 
-Install Minio client
-
 ```bash
 mkdir -p $HOME/bin
 wget -O $HOME/bin/mc https://dl.min.io/client/mc/release/linux-amd64/mc
