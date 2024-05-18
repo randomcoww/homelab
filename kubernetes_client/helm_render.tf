@@ -177,6 +177,24 @@ module "vaultwarden" {
   s3_secret_access_key      = data.terraform_remote_state.sr.outputs.s3.vaultwarden.secret_access_key
 }
 
+# Authelia with redis
+
+module "authelia-redis" {
+  source    = "./modules/keydb"
+  name      = local.kubernetes_services.authelia_redis.name
+  namespace = local.kubernetes_services.authelia_redis.namespace
+  release   = "0.1.0"
+  replicas  = 3
+  images = {
+    keydb = local.container_images.keydb
+  }
+  ports = {
+    keydb = local.service_ports.redis
+  }
+  ca                       = local.authelia_redis_ca
+  cluster_service_endpoint = local.kubernetes_services.authelia_redis.fqdn
+}
+
 module "authelia" {
   source         = "./modules/authelia"
   name           = local.kubernetes_services.authelia.name
@@ -187,6 +205,7 @@ module "authelia" {
   }
   service_hostname = local.kubernetes_ingress_endpoints.auth
   lldap_ca         = data.terraform_remote_state.sr.outputs.lldap.ca
+  redis_ca         = local.authelia_redis_ca
   configmap = {
     telemetry = {
       metrics = {
@@ -215,7 +234,9 @@ module "authelia" {
         enabled        = true
         implementation = "custom"
         tls = {
-          skip_verify = false
+          enabled         = true
+          skip_verify     = false
+          minimum_version = "TLS1.3"
         }
         url                    = "ldaps://${local.kubernetes_services.lldap.endpoint}:${local.service_ports.lldap}"
         base_dn                = "dc=${join(",dc=", slice(compact(split(".", local.kubernetes_ingress_endpoints.lldap_http)), 1, length(compact(split(".", local.kubernetes_ingress_endpoints.lldap_http)))))}"
@@ -238,7 +259,17 @@ module "authelia" {
       expiration           = "4h"
       remember_me_duration = 0
       redis = {
-        enabled = false
+        enabled = true
+        host    = local.kubernetes_services.authelia_redis.fqdn
+        port    = local.service_ports.redis
+        password = {
+          disabled = true
+        }
+        tls = {
+          enabled         = true
+          skip_verify     = false
+          minimum_version = "TLS1.3"
+        }
       }
     }
     regulation = {

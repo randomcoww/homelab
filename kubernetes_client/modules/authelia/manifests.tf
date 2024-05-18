@@ -4,10 +4,12 @@ module "secret-custom" {
   app     = var.name
   release = var.source_release
   data = {
-    ACCESS_KEY_ID              = var.s3_access_key_id
-    SECRET_ACCESS_KEY          = var.s3_secret_access_key
-    LDAP_TLS_CERTIFICATE_CHAIN = chomp(tls_locally_signed_cert.lldap.cert_pem)
-    LDAP_TLS_PRIVATE_KEY       = chomp(tls_private_key.lldap.private_key_pem)
+    ACCESS_KEY_ID                      = var.s3_access_key_id
+    SECRET_ACCESS_KEY                  = var.s3_secret_access_key
+    LDAP_CLIENT_TLS_CERTIFICATE_CHAIN  = chomp(tls_locally_signed_cert.lldap.cert_pem)
+    LDAP_CLIENT_TLS_PRIVATE_KEY        = chomp(tls_private_key.lldap.private_key_pem)
+    REDIS_CLIENT_TLS_CERTIFICATE_CHAIN = chomp(tls_locally_signed_cert.redis.cert_pem)
+    REDIS_CLIENT_TLS_PRIVATE_KEY       = chomp(tls_private_key.redis.private_key_pem)
   }
 }
 
@@ -49,13 +51,23 @@ data "helm_template" "authelia" {
           },
           {
             name      = "authelia-custom"
-            mountPath = local.ldap_server_key_path
-            subPath   = "LDAP_TLS_PRIVATE_KEY"
+            mountPath = local.ldap_client_key_path
+            subPath   = "LDAP_CLIENT_TLS_PRIVATE_KEY"
           },
           {
             name      = "authelia-custom"
-            mountPath = local.ldap_server_cert_path
-            subPath   = "LDAP_TLS_CERTIFICATE_CHAIN"
+            mountPath = local.ldap_client_cert_path
+            subPath   = "LDAP_CLIENT_TLS_CERTIFICATE_CHAIN"
+          },
+          {
+            name      = "authelia-custom"
+            mountPath = local.redis_client_key_path
+            subPath   = "REDIS_CLIENT_TLS_PRIVATE_KEY"
+          },
+          {
+            name      = "authelia-custom"
+            mountPath = local.redis_client_cert_path
+            subPath   = "REDIS_CLIENT_TLS_CERTIFICATE_CHAIN"
           },
         ]
         extraVolumes = [
@@ -75,11 +87,19 @@ data "helm_template" "authelia" {
         env = [
           {
             name  = "AUTHELIA_AUTHENTICATION_BACKEND_LDAP_TLS_PRIVATE_KEY_FILE"
-            value = local.ldap_server_key_path
+            value = local.ldap_client_key_path
           },
           {
             name  = "AUTHELIA_AUTHENTICATION_BACKEND_LDAP_TLS_CERTIFICATE_CHAIN_FILE"
-            value = local.ldap_server_cert_path
+            value = local.ldap_client_cert_path
+          },
+          {
+            name  = "AUTHELIA_SESSION_REDIS_TLS_PRIVATE_KEY_FILE"
+            value = local.redis_client_key_path
+          },
+          {
+            name  = "AUTHELIA_SESSION_REDIS_TLS_CERTIFICATE_CHAIN_FILE"
+            value = local.redis_client_cert_path
           },
         ]
       }
@@ -103,6 +123,10 @@ data "helm_template" "authelia" {
             name  = "lldap-ca.pem"
             value = var.lldap_ca.cert_pem
           },
+          {
+            name  = "redis-ca.pem"
+            value = var.redis_ca.cert_pem
+          }
         ]
       }
       persistence = {
@@ -122,10 +146,12 @@ module "metadata" {
 }
 
 locals {
-  domain                = join(".", slice(compact(split(".", var.service_hostname)), 1, length(compact(split(".", var.service_hostname)))))
-  db_path               = "/config/db.sqlite3"
-  ldap_server_cert_path = "/custom/server-cert.pem"
-  ldap_server_key_path  = "/custom/server-key.pem"
+  domain                 = join(".", slice(compact(split(".", var.service_hostname)), 1, length(compact(split(".", var.service_hostname)))))
+  db_path                = "/config/db.sqlite3"
+  ldap_client_cert_path  = "/custom/ldap-client-cert.pem"
+  ldap_client_key_path   = "/custom/ldap-client-key.pem"
+  redis_client_cert_path = "/custom/redis-client-cert.pem"
+  redis_client_key_path  = "/custom/redis-client-key.pem"
 
   s = yamldecode(data.helm_template.authelia.manifests["templates/deployment.yaml"])
   manifests = merge(data.helm_template.authelia.manifests, {

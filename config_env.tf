@@ -117,6 +117,7 @@ locals {
     lldap               = "docker.io/lldap/lldap:2024-02-02-alpine"
     bsimp               = "ghcr.io/randomcoww/bsimp:20240208.2"
     satisfactory_server = "wolveix/satisfactory-server:v1.6"
+    keydb               = "docker.io/eqalpha/keydb:alpine_x86_64_v6.3.4"
   }
 
   pxeboot_images = {
@@ -185,6 +186,10 @@ locals {
         name      = "authelia"
         namespace = "authelia"
       }
+      authelia_redis = {
+        name      = "authelia-redis"
+        namespace = "authelia"
+      }
       ingress_nginx = {
         name      = "${local.ingress_classes.ingress_nginx}-controller"
         namespace = "ingress-nginx"
@@ -231,6 +236,7 @@ locals {
     minio         = 9000
     alpaca_stream = 38081
     lldap         = 6360
+    redis         = 6379
   }
 
   minio_buckets = {

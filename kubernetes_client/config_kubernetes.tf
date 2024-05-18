@@ -43,4 +43,37 @@ locals {
       "*.${local.domains.public}",
     ]
   }
+
+  authelia_redis_ca = {
+    algorithm       = tls_private_key.authelia-redis-ca.algorithm
+    private_key_pem = tls_private_key.authelia-redis-ca.private_key_pem
+    cert_pem        = tls_self_signed_cert.authelia-redis-ca.cert_pem
+  }
+}
+
+# authelia redis
+
+resource "tls_private_key" "authelia-redis-ca" {
+  algorithm   = "ECDSA"
+  ecdsa_curve = "P521"
+}
+
+resource "tls_self_signed_cert" "authelia-redis-ca" {
+  private_key_pem = tls_private_key.authelia-redis-ca.private_key_pem
+
+  validity_period_hours = 8760
+  is_ca_certificate     = true
+
+  subject {
+    common_name  = "redis"
+    organization = "redis"
+  }
+
+  allowed_uses = [
+    "key_encipherment",
+    "digital_signature",
+    "cert_signing",
+    "server_auth",
+    "client_auth",
+  ]
 }

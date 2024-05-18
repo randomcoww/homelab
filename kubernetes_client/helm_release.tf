@@ -6,6 +6,7 @@ locals {
     module.tailscale,
     module.code,
     module.vaultwarden,
+    module.authelia-redis,
     module.authelia,
     module.kube-dns,
     module.kea,

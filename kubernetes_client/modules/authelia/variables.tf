@@ -25,6 +25,14 @@ variable "lldap_ca" {
   })
 }
 
+variable "redis_ca" {
+  type = object({
+    algorithm       = string
+    private_key_pem = string
+    cert_pem        = string
+  })
+}
+
 variable "service_hostname" {
   type = string
 }
