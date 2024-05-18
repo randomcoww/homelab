@@ -108,6 +108,7 @@ module "statefulset" {
   name              = var.name
   app               = var.name
   release           = var.release
+  affinity          = var.affinity
   replicas          = var.replicas
   min_ready_seconds = 30
   annotations = {

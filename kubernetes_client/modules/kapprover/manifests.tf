@@ -85,6 +85,7 @@ module "deployment" {
   name     = var.name
   app      = var.name
   release  = var.release
+  affinity = var.affinity
   replicas = var.replicas
   spec = {
     priorityClassName  = "system-cluster-critical"

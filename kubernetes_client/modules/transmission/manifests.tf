@@ -156,6 +156,7 @@ module "deployment" {
   name     = var.name
   app      = var.name
   release  = var.release
+  affinity = var.affinity
   replicas = 1
   annotations = {
     "checksum/secret" = sha256(module.secret.manifest)

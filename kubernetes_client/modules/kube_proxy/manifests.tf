@@ -70,10 +70,11 @@ module "configmap" {
 }
 
 module "daemonset" {
-  source  = "../daemonset"
-  name    = var.name
-  app     = var.name
-  release = var.release
+  source   = "../daemonset"
+  name     = var.name
+  app      = var.name
+  affinity = var.affinity
+  release  = var.release
   annotations = {
     "checksum/configmap" = sha256(module.configmap.manifest)
   }

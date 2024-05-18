@@ -11,6 +11,11 @@ variable "release" {
   type = string
 }
 
+variable "affinity" {
+  type    = any
+  default = {}
+}
+
 variable "images" {
   type = object({
     kube_proxy = string
