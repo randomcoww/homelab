@@ -308,7 +308,8 @@ brew install --cask \
   krita \
   moonlight \
   tailscale \
-  visual-studio-code
+  visual-studio-code \
+  scroll-reverser
 ```
 
 ```bash
