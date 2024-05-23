@@ -52,7 +52,7 @@ resource "helm_release" "metrics-server" {
   repository  = "https://kubernetes-sigs.github.io/metrics-server"
   chart       = "metrics-server"
   wait        = false
-  version     = "3.12.0"
+  version     = "3.12.1"
   max_history = 2
   values = [
     yamlencode({
@@ -84,7 +84,7 @@ resource "helm_release" "local-path-provisioner" {
   repository  = "https://charts.containeroo.ch"
   chart       = "local-path-provisioner"
   wait        = false
-  version     = "0.0.25"
+  version     = "0.0.26"
   max_history = 2
   values = [
     yamlencode({
@@ -109,7 +109,7 @@ resource "helm_release" "amd-gpu" {
   chart       = "amd-gpu"
   namespace   = "kube-system"
   wait        = false
-  version     = "0.11.0"
+  version     = "0.13.0"
   max_history = 2
   values = [
     yamlencode({
@@ -125,7 +125,7 @@ resource "helm_release" "nvidia-device-plugin" {
   chart       = "nvidia-device-plugin"
   namespace   = "kube-system"
   wait        = false
-  version     = "0.14.3"
+  version     = "0.15.0"
   max_history = 2
   values = [
     yamlencode({
@@ -163,7 +163,7 @@ resource "helm_release" "ingress-nginx" {
   namespace        = local.kubernetes_services[each.key].namespace
   create_namespace = true
   wait             = false
-  version          = "4.9.1"
+  version          = "4.10.1"
   max_history      = 2
   values = [
     yamlencode({
@@ -244,7 +244,7 @@ resource "helm_release" "cert-manager" {
   create_namespace = true
   wait             = true
   timeout          = 600
-  version          = "1.13.3"
+  version          = "1.14.5"
   max_history      = 2
   values = [
     yamlencode({
@@ -402,7 +402,7 @@ resource "helm_release" "minio" {
   create_namespace = true
   wait             = true
   timeout          = 600
-  version          = "5.0.15"
+  version          = "5.2.0"
   max_history      = 2
   values = [
     yamlencode({
