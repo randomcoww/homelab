@@ -45,7 +45,6 @@ locals {
         minio                  = 34
         sunshine               = 36
         alpaca_stream          = 37
-        satisfactory_server    = 38
       }
       mtu = local.default_mtu
     }
@@ -93,31 +92,30 @@ locals {
     etcd                    = "gcr.io/etcd-development/etcd:v3.5.12-amd64"
 
     # Helm
-    kea                 = "ghcr.io/randomcoww/kea:2.4.1"
-    matchbox            = "quay.io/poseidon/matchbox:v0.10.0-13-gd0d5e9d5-amd64"
-    tftpd               = "ghcr.io/randomcoww/tftpd-ipxe:20240104.0"
-    hostapd             = "ghcr.io/randomcoww/hostapd:2.10-2"
-    syncthing           = "docker.io/syncthing/syncthing:1.27"
-    rclone              = "docker.io/rclone/rclone:1.66"
-    flannel             = "docker.io/flannel/flannel:v0.25.2"
-    flannel_cni_plugin  = "docker.io/flannel/flannel-cni-plugin:v1.4.1-flannel1"
-    kapprover           = "ghcr.io/randomcoww/kapprover:20240126"
-    external_dns        = "registry.k8s.io/external-dns/external-dns:v0.14.2"
-    kube_proxy          = "ghcr.io/randomcoww/kubernetes:kube-proxy-v${local.kubernetes.version}"
-    transmission        = "ghcr.io/randomcoww/transmission:20240523.1"
-    wireguard           = "ghcr.io/randomcoww/wireguard:20240523"
-    vaultwarden         = "docker.io/vaultwarden/server:1.30.5-alpine"
-    litestream          = "docker.io/litestream/litestream:0.3"
-    tailscale           = "ghcr.io/randomcoww/tailscale:1.66.4"
-    fuse_device_plugin  = "docker.io/soolaugust/fuse-device-plugin:v1.0"
-    code_server         = "ghcr.io/randomcoww/code-server:20240118.1-tensorflow"
-    kasm_desktop        = "ghcr.io/randomcoww/kasm-desktop:20231220.3"
-    alpaca_stream       = "ghcr.io/randomcoww/alpaca-client:stream-server-20240404.20"
-    headscale           = "docker.io/headscale/headscale:0.22"
-    lldap               = "docker.io/lldap/lldap:2024-05-06"
-    bsimp               = "ghcr.io/randomcoww/bsimp:20240523.2"
-    satisfactory_server = "wolveix/satisfactory-server:v1.6"
-    keydb               = "docker.io/eqalpha/keydb:alpine_x86_64_v6.3.4"
+    kea                = "ghcr.io/randomcoww/kea:2.4.1"
+    matchbox           = "quay.io/poseidon/matchbox:v0.10.0-13-gd0d5e9d5-amd64"
+    tftpd              = "ghcr.io/randomcoww/tftpd-ipxe:20240104.0"
+    hostapd            = "ghcr.io/randomcoww/hostapd:2.10-2"
+    syncthing          = "docker.io/syncthing/syncthing:1.27"
+    rclone             = "docker.io/rclone/rclone:1.66"
+    flannel            = "docker.io/flannel/flannel:v0.25.2"
+    flannel_cni_plugin = "docker.io/flannel/flannel-cni-plugin:v1.4.1-flannel1"
+    kapprover          = "ghcr.io/randomcoww/kapprover:20240126"
+    external_dns       = "registry.k8s.io/external-dns/external-dns:v0.14.2"
+    kube_proxy         = "ghcr.io/randomcoww/kubernetes:kube-proxy-v${local.kubernetes.version}"
+    transmission       = "ghcr.io/randomcoww/transmission:20240527.6"
+    wireguard          = "ghcr.io/randomcoww/wireguard:20240523"
+    vaultwarden        = "docker.io/vaultwarden/server:1.30.5-alpine"
+    litestream         = "docker.io/litestream/litestream:0.3"
+    tailscale          = "ghcr.io/randomcoww/tailscale:1.66.4"
+    fuse_device_plugin = "docker.io/soolaugust/fuse-device-plugin:v1.0"
+    code_server        = "ghcr.io/randomcoww/code-server:20240118.1-tensorflow"
+    kasm_desktop       = "ghcr.io/randomcoww/kasm-desktop:20231220.3"
+    alpaca_stream      = "ghcr.io/randomcoww/alpaca-client:stream-server-20240404.20"
+    headscale          = "docker.io/headscale/headscale:0.22"
+    lldap              = "docker.io/lldap/lldap:2024-05-06"
+    bsimp              = "ghcr.io/randomcoww/bsimp:20240523.2"
+    keydb              = "docker.io/eqalpha/keydb:alpine_x86_64_v6.3.4"
   }
 
   pxeboot_images = {
@@ -154,19 +152,18 @@ locals {
 
   kubernetes_ingress_endpoints = {
     for k, domain in {
-      auth                = "auth"
-      transmission        = "t"
-      minio               = "minio"
-      vaultwarden         = "vw"
-      matchbox            = "ign"
-      code_server         = "code"
-      kasm                = "k"
-      sunshine            = "sun"
-      alpaca_stream       = "alpaca-stream"
-      headscale           = "headscale"
-      lldap_http          = "ldap"
-      bsimp               = "bsimp"
-      satisfactory_server = "sa"
+      auth          = "auth"
+      transmission  = "t"
+      minio         = "minio"
+      vaultwarden   = "vw"
+      matchbox      = "ign"
+      code_server   = "code"
+      kasm          = "k"
+      sunshine      = "sun"
+      alpaca_stream = "alpaca-stream"
+      headscale     = "headscale"
+      lldap_http    = "ldap"
+      bsimp         = "bsimp"
     } :
     k => "${domain}.${local.domains.public}"
   }
@@ -262,6 +259,10 @@ locals {
     }
     backup = {
       name   = "backup"
+      policy = "none"
+    }
+    juicefs = {
+      name   = "juicefs"
       policy = "none"
     }
   }

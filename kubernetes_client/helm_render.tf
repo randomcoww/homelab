@@ -598,6 +598,7 @@ module "transmission" {
   images = {
     transmission = local.container_images.transmission
     wireguard    = local.container_images.wireguard
+    litestream   = local.container_images.litestream
   }
   ports = {
     transmission = 9091
@@ -624,7 +625,7 @@ module "transmission" {
     start-added-torrents         = true
     trash-original-torrent-files = true
   }
-  torrent_done_script       = <<-EOF
+  torrent_done_script         = <<-EOF
   #!/bin/sh
   set -xe
   #  * TR_APP_VERSION
@@ -649,7 +650,11 @@ module "transmission" {
     --torrent "$TR_TORRENT_ID" \
     --remove-and-delete
   EOF
-  wireguard_config          = <<-EOF
+  jfs_minio_access_key_id     = data.terraform_remote_state.sr.outputs.minio.access_key_id
+  jfs_minio_secret_access_key = data.terraform_remote_state.sr.outputs.minio.secret_access_key
+  jfs_minio_bucket            = local.minio_buckets.juicefs.name
+  jfs_minio_endpoint          = "${local.kubernetes_services.minio.endpoint}:${local.service_ports.minio}"
+  wireguard_config            = <<-EOF
   [Interface]
   Address=${var.wireguard_client.address}
   PrivateKey=${var.wireguard_client.private_key}
@@ -664,9 +669,9 @@ module "transmission" {
   PublicKey=${var.wireguard_client.public_key}
   PersistentKeepalive=25
   EOF
-  service_hostname          = local.kubernetes_ingress_endpoints.transmission
-  ingress_class_name        = local.ingress_classes.ingress_nginx
-  nginx_ingress_annotations = local.nginx_ingress_auth_annotations
+  service_hostname            = local.kubernetes_ingress_endpoints.transmission
+  ingress_class_name          = local.ingress_classes.ingress_nginx
+  nginx_ingress_annotations   = local.nginx_ingress_auth_annotations
 }
 
 module "alpaca-stream" {
@@ -803,52 +808,4 @@ module "headscale" {
   s3_db_resource            = "${data.terraform_remote_state.sr.outputs.s3.headscale.resource}/db.sqlite3"
   s3_access_key_id          = data.terraform_remote_state.sr.outputs.s3.headscale.access_key_id
   s3_secret_access_key      = data.terraform_remote_state.sr.outputs.s3.headscale.secret_access_key
-}
-
-module "satisfactory-server" {
-  source  = "./modules/satisfactory"
-  name    = "satisfactory-server"
-  release = "0.1.0"
-  images = {
-    satisfactory_server = local.container_images.satisfactory_server
-  }
-  ports = {
-    beacon = 15000
-    game   = 7777
-    query  = 15777
-  }
-  extra_envs = {
-    AUTOSAVEINTERVAL     = 1200
-    AUTOSAVEONDISCONNECT = false
-    MAXTICKRATE          = 15
-    CRASHREPORT          = false
-    MAXPLAYERS           = 3
-  }
-  config_overrides = {
-  }
-  service_hostname = local.kubernetes_ingress_endpoints.satisfactory_server
-  service_ip       = local.services.satisfactory_server.ip
-  resources = {
-    requests = {
-      memory = "4Gi"
-    }
-  }
-  affinity = {
-    nodeAffinity = {
-      requiredDuringSchedulingIgnoredDuringExecution = {
-        nodeSelectorTerms = [
-          {
-            matchExpressions = [
-              {
-                key      = "client"
-                operator = "DoesNotExist"
-              },
-            ]
-          },
-        ]
-      }
-    }
-  }
-  volume_claim_size = "24Gi"
-  storage_class     = "local-path"
 }

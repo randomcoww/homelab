@@ -20,6 +20,7 @@ variable "images" {
   type = object({
     transmission = string
     wireguard    = string
+    litestream   = string
   })
 }
 
@@ -27,6 +28,22 @@ variable "ports" {
   type = object({
     transmission = number
   })
+}
+
+variable "jfs_minio_endpoint" {
+  type = string
+}
+
+variable "jfs_minio_bucket" {
+  type = string
+}
+
+variable "jfs_minio_access_key_id" {
+  type = string
+}
+
+variable "jfs_minio_secret_access_key" {
+  type = string
 }
 
 variable "wireguard_config" {
