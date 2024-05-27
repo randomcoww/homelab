@@ -77,10 +77,6 @@ locals {
       network = "10.244.0.0"
       cidr    = 16
     }
-    headscale = {
-      network = "100.64.0.0"
-      cidr    = 10
-    }
   }
 
   container_images = {
@@ -103,16 +99,14 @@ locals {
     kapprover          = "ghcr.io/randomcoww/kapprover:20240126"
     external_dns       = "registry.k8s.io/external-dns/external-dns:v0.14.2"
     kube_proxy         = "ghcr.io/randomcoww/kubernetes:kube-proxy-v${local.kubernetes.version}"
-    transmission       = "ghcr.io/randomcoww/transmission:20240527.7"
+    transmission       = "ghcr.io/randomcoww/transmission:20240527.10"
     wireguard          = "ghcr.io/randomcoww/wireguard:20240523"
     vaultwarden        = "docker.io/vaultwarden/server:1.30.5-alpine"
     litestream         = "docker.io/litestream/litestream:0.3"
     tailscale          = "ghcr.io/randomcoww/tailscale:1.66.4"
     fuse_device_plugin = "docker.io/soolaugust/fuse-device-plugin:v1.0"
     code_server        = "ghcr.io/randomcoww/code-server:20240118.1-tensorflow"
-    kasm_desktop       = "ghcr.io/randomcoww/kasm-desktop:20231220.3"
     alpaca_stream      = "ghcr.io/randomcoww/alpaca-client:stream-server-20240404.20"
-    headscale          = "docker.io/headscale/headscale:0.22"
     lldap              = "docker.io/lldap/lldap:2024-05-06"
     bsimp              = "ghcr.io/randomcoww/bsimp:20240523.2"
     keydb              = "docker.io/eqalpha/keydb:alpine_x86_64_v6.3.4"
@@ -158,10 +152,8 @@ locals {
       vaultwarden   = "vw"
       matchbox      = "ign"
       code_server   = "code"
-      kasm          = "k"
       sunshine      = "sun"
       alpaca_stream = "alpaca-stream"
-      headscale     = "headscale"
       lldap_http    = "ldap"
       bsimp         = "bsimp"
     } :

@@ -17,10 +17,6 @@ locals {
         bucket = "randomcoww-authelia-2"
         path   = "litestream"
       }
-      headscale = {
-        bucket = "randomcoww-headscale-1"
-        path   = "litestream"
-      }
       lldap = {
         bucket = "randomcoww-lldap-1"
         path   = "litestream"
