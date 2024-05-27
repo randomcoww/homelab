@@ -194,7 +194,7 @@ module "statefulset" {
         }
         volumeMounts = [
           {
-            name      = "config"
+            name      = "secret"
             mountPath = "/etc/wireguard/wg0.conf"
             subPath   = "wg0.conf"
           },
@@ -216,12 +216,12 @@ module "statefulset" {
             mountPath = dirname(local.jfs_db_path)
           },
           {
-            name      = "config"
+            name      = "secret"
             mountPath = "/etc/litestream.yml"
             subPath   = "litestream.yml"
           },
         ]
-      }
+      },
     ]
     containers = [
       {
@@ -230,6 +230,18 @@ module "statefulset" {
         env = [
           {
             name  = "TR_RPC_PORT"
+            value = tostring(var.ports.transmission)
+          },
+          {
+            name  = "TRANSMISSION_HOME_PATH"
+            value = local.transmission_home_path
+          },
+          {
+            name  = "TRANSMISSION_CONF_PATH"
+            value = local.transmission_conf_path
+          },
+          {
+            name  = "TRANSMISSION_PORT"
             value = tostring(var.ports.transmission)
           },
           {
@@ -245,34 +257,22 @@ module "statefulset" {
             value = local.jfs_db_path
           },
           {
-            name  = "TRANSMISSION_HOME_PATH"
-            value = local.transmission_home_path
-          },
-          {
-            name  = "TRANSMISSION_CONF_PATH"
-            value = local.transmission_conf_path
-          },
-          {
-            name  = "TRANSMISSION_PORT"
-            value = tostring(var.ports.transmission)
-          },
-          {
-            name  = "ACCESS_KEY_ID"
+            name  = "JFS_MINIO_ACCESS_KEY_ID"
             value = var.jfs_minio_access_key_id
           },
           {
-            name  = "SECRET_ACCESS_KEY"
+            name  = "JFS_MINIO_SECRET_ACCESS_KEY"
             value = var.jfs_minio_secret_access_key
           },
         ]
         volumeMounts = [
           {
-            name      = "config"
+            name      = "secret"
             mountPath = local.transmission_conf_path
             subPath   = "settings.json"
           },
           {
-            name      = "config"
+            name      = "secret"
             mountPath = local.torrent_done_script
             subPath   = "torrent-done.sh"
           },
@@ -313,7 +313,7 @@ module "statefulset" {
             mountPath = dirname(local.jfs_db_path)
           },
           {
-            name      = "config"
+            name      = "secret"
             mountPath = "/etc/litestream.yml"
             subPath   = "litestream.yml"
           },
@@ -322,7 +322,7 @@ module "statefulset" {
     ]
     volumes = [
       {
-        name = "config"
+        name = "secret"
         secret = {
           secretName  = module.secret.name
           defaultMode = 493
