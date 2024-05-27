@@ -3,7 +3,6 @@ locals {
   transmission_home_path = "/var/lib/transmission"
   transmission_conf_path = "/tmp/settings.json"
   torrent_done_script    = "/torrent-done.sh"
-  cache_mount_path       = "/incomplete"
   blocklist_update_job_spec = {
     containers = [
       {
@@ -256,10 +255,6 @@ module "statefulset" {
           {
             name  = "TRANSMISSION_PORT"
             value = tostring(var.ports.transmission)
-          },
-          {
-            name  = "CACHE_MOUNT_PATH"
-            value = local.cache_mount_path
           },
           {
             name  = "ACCESS_KEY_ID"
