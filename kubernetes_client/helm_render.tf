@@ -566,6 +566,7 @@ module "code" {
   code_server_resources = {
     limits = {
       "github.com/fuse" = 1
+      "nvidia.com/gpu"  = 1
     }
   }
 
