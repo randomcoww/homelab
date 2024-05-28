@@ -30,12 +30,16 @@ module "secret" {
           path = local.jfs_db_path
           replicas = [
             {
-              type              = "s3"
-              bucket            = var.jfs_minio_bucket
-              path              = basename(local.jfs_db_path)
-              endpoint          = "http://${var.jfs_minio_endpoint}"
-              access-key-id     = var.jfs_minio_access_key_id
-              secret-access-key = var.jfs_minio_secret_access_key
+              type                     = "s3"
+              bucket                   = var.jfs_minio_bucket
+              path                     = basename(local.jfs_db_path)
+              endpoint                 = "http://${var.jfs_minio_endpoint}"
+              access-key-id            = var.jfs_minio_access_key_id
+              secret-access-key        = var.jfs_minio_secret_access_key
+              retention                = "2m"
+              retention-check-interval = "2m"
+              sync-interval            = "500ms"
+              snapshot-interval        = "1h"
             },
           ]
         },
