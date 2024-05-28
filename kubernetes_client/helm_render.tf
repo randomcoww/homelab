@@ -553,13 +553,10 @@ module "code" {
   release = "0.1.1"
   images = {
     code_server = local.container_images.code_server
-    tailscale   = local.container_images.tailscale
-    syncthing   = local.container_images.syncthing
+    litestream  = local.container_images.litestream
   }
-  sync_replicas = 1
   ports = {
-    code_server    = 8080
-    syncthing_peer = 22000
+    code_server = 8080
   }
   user = local.users.client.name
   uid  = local.users.client.uid
@@ -569,26 +566,17 @@ module "code" {
   code_server_resources = {
     limits = {
       "github.com/fuse" = 1
-      "nvidia.com/gpu"  = 1
     }
   }
 
-  tailscale_auth_key = var.tailscale.auth_key
-  tailscale_extra_envs = {
-    TS_ACCEPT_DNS          = true
-    TS_DEBUG_FIREWALL_MODE = "nftables"
-  }
-
-  aws_region             = data.terraform_remote_state.sr.outputs.ssm.tailscale.aws_region
-  ssm_access_key_id      = data.terraform_remote_state.sr.outputs.ssm.tailscale.access_key_id
-  ssm_secret_access_key  = data.terraform_remote_state.sr.outputs.ssm.tailscale.secret_access_key
-  ssm_tailscale_resource = data.terraform_remote_state.sr.outputs.ssm.tailscale.resource
+  jfs_minio_access_key_id     = data.terraform_remote_state.sr.outputs.minio.access_key_id
+  jfs_minio_secret_access_key = data.terraform_remote_state.sr.outputs.minio.secret_access_key
+  jfs_minio_bucket            = local.minio_buckets.juicefs.name
+  jfs_minio_endpoint          = "${local.kubernetes_services.minio.fqdn}:${local.service_ports.minio}"
 
   service_hostname          = local.kubernetes_ingress_endpoints.code_server
   ingress_class_name        = local.ingress_classes.ingress_nginx
   nginx_ingress_annotations = local.nginx_ingress_auth_annotations
-  volume_claim_size         = "128Gi"
-  storage_class             = "local-path"
 }
 
 module "transmission" {
