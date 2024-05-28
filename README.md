@@ -278,6 +278,7 @@ flatpak --user -y install --or-update flathub \
   org.kde.krita \
   org.blender.Blender \
   com.github.xournalpp.xournalpp \
+  org.gnome.Loupe \
   com.valvesoftware.Steam \
   com.heroicgameslauncher.hgl \
   net.lutris.Lutris \
