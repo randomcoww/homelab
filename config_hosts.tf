@@ -40,6 +40,7 @@ locals {
       }
       disks = {
         pv = {
+          wipe   = false
           device = "/dev/disk/by-id/nvme-VICKTER_NVME_SSD_WLN020A01247"
           partitions = [
             {
@@ -106,6 +107,7 @@ locals {
       }
       disks = {
         pv = {
+          wipe   = false
           device = "/dev/disk/by-id/nvme-VICKTER_NVME_SSD_WLN020A00286"
           partitions = [
             {
@@ -172,6 +174,7 @@ locals {
       }
       disks = {
         pv = {
+          wipe   = false
           device = "/dev/disk/by-id/nvme-VICKTER_NVME_SSD_WLN020A01227"
           partitions = [
             {
@@ -255,6 +258,7 @@ locals {
       }
       disks = {
         pv = {
+          wipe   = false
           device = "/dev/disk/by-id/nvme-Samsung_SSD_970_EVO_Plus_2TB_S59CNM0W609225K"
           partitions = [
             {

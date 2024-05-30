@@ -1,3 +1,10 @@
+resource "random_password" "luks-key" {
+  for_each = local.partitions
+
+  length  = 512
+  special = false
+}
+
 locals {
   disks = {
     for name, disk in var.disks :
@@ -7,7 +14,8 @@ locals {
         merge(partition, {
           number          = i + 1
           label           = "${name}${i + 1}"
-          device          = join("/", ["/dev/disk/by-partlabel", "${name}${i + 1}"])
+          part            = join("/", ["/dev/disk/by-partlabel", "${name}${i + 1}"])
+          device          = "/dev/disk/by-id/dm-name-${name}${i + 1}"
           mount_unit_name = join("-", compact(split("/", replace(partition.mount_path, "-", "\\x2d"))))
           mount_options   = lookup(partition, "mount_options", ["noatime", "nodiratime", "discard"])
           format          = lookup(partition, "format", "xfs")
@@ -28,6 +36,14 @@ locals {
         lookup(partition, "wipe", false)
       ]))
     })
+  }
+
+  partitions = {
+    for partition in flatten([
+      for _, disk in local.disks :
+      disk.partitions
+    ]) :
+    partition.label => partition
   }
 
   ignition_snippets = concat([
@@ -58,17 +74,26 @@ locals {
             ]
           }
         ]
-        filesystems = [
-          for partition in flatten([
-            for _, disk in local.disks :
-            disk.partitions
-          ]) :
+        luks = [
+          for label, partition in local.partitions :
           {
+            label       = label
+            name        = label
+            device      = partition.part
+            wipe_volume = partition.wipe
+            key_file = {
+              inline = random_password.luks-key[label].result
+            }
+          }
+        ]
+        filesystems = [
+          for label, partition in local.partitions :
+          {
+            label           = label
             path            = partition.mount_path
             device          = partition.device
             format          = partition.format
             wipe_filesystem = partition.wipe
-            label           = partition.label
             options = [
               for option in lookup(partition, "options", []) :
               option
