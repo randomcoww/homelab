@@ -14,7 +14,7 @@ locals {
         merge(partition, {
           number          = i + 1
           label           = "${name}${i + 1}"
-          part            = join("/", ["/dev/disk/by-partlabel", "${name}${i + 1}"])
+          part            = "/dev/disk/by-partlabel/${name}${i + 1}"
           device          = "/dev/disk/by-id/dm-name-${name}${i + 1}"
           mount_unit_name = join("-", compact(split("/", replace(partition.mount_path, "-", "\\x2d"))))
           mount_options   = lookup(partition, "mount_options", ["noatime", "nodiratime", "discard"])
