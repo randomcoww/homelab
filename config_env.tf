@@ -152,7 +152,6 @@ locals {
       vaultwarden   = "vw"
       matchbox      = "ign"
       code_server   = "code"
-      sunshine      = "sun"
       alpaca_stream = "alpaca-stream"
       lldap_http    = "ldap"
       bsimp         = "bsimp"
