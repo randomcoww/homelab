@@ -414,7 +414,7 @@ resource "helm_release" "minio" {
       replicas      = 3
       resources = {
         requests = {
-          memory = "8Gi"
+          memory = "16Gi"
         }
       }
       service = {
