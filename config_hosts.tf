@@ -59,6 +59,7 @@ locals {
           "numa=off",
           "systemd.unit=multi-user.target",
           "enforcing=0",
+          "mitigations=off",
         ]
       }
       kubernetes_node_labels = {
@@ -126,6 +127,7 @@ locals {
           "numa=off",
           "systemd.unit=multi-user.target",
           "enforcing=0",
+          "mitigations=off",
         ]
       }
       kubernetes_node_labels = {
@@ -193,6 +195,7 @@ locals {
           "numa=off",
           "systemd.unit=multi-user.target",
           "enforcing=0",
+          "mitigations=off",
         ]
       }
       kubernetes_node_labels = {
