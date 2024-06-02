@@ -81,6 +81,11 @@ locals {
             name        = label
             device      = partition.part
             wipe_volume = partition.wipe
+            discard     = true
+            open_options = [
+              "--perf-no_read_workqueue",
+              "--perf-no_write_workqueue",
+            ]
             key_file = {
               inline = random_password.luks-key[label].result
             }
