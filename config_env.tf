@@ -89,7 +89,7 @@ locals {
 
     # Helm
     kea                = "ghcr.io/randomcoww/kea:2.4.1"
-    matchbox           = "quay.io/poseidon/matchbox:v0.10.0-13-gd0d5e9d5-amd64"
+    matchbox           = "quay.io/poseidon/matchbox:v0.11.0-amd64"
     tftpd              = "ghcr.io/randomcoww/tftpd-ipxe:20240104.0"
     hostapd            = "ghcr.io/randomcoww/hostapd:2.10-2"
     syncthing          = "docker.io/syncthing/syncthing:1.27"
