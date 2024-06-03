@@ -312,14 +312,14 @@ locals {
       ]
       physical_interfaces = {
         phy0 = {
-          mac   = "74-56-3c-c3-10-68"
+          mac   = "ec-21-e5-72-46-27"
           mtu   = local.default_mtu
           vlans = []
         }
       }
       wlan_interfaces = {
         wlan0 = {
-          mac = "10-6f-d9-cf-d5-71"
+          mac = "3e-b1-a0-f3-9b-34"
         }
       }
       tap_interfaces = {
