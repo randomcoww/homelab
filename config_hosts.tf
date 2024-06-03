@@ -305,27 +305,29 @@ locals {
       }
     }
 
-    # chromebook
-    de-0 = {
-      users = [
-        "client",
-      ]
-      # same as disk but a hack to use an existing lvm
-      # ignition doesn't support provisioning lvm device so run systemd mount only
-      mounts = [
-        {
-          device     = "/dev/H3F03NEV207BX1ZE/unencrypted"
-          mount_path = local.mounts.home_path
-          format     = "ext4"
-        },
-      ]
-    }
-
-    # remote laptop
+    # remote site
     r-0 = {
       users = [
         "client",
       ]
+      physical_interfaces = {
+        phy0 = {
+          mac   = "74-56-3c-c3-10-68"
+          mtu   = local.default_mtu
+          vlans = []
+        }
+      }
+      wlan_interfaces = {
+        wlan0 = {
+          mac = "10-6f-d9-cf-d5-71"
+        }
+      }
+      tap_interfaces = {
+        lan = {
+          source_interface_name = "phy0"
+          enable_dhcp           = true
+        }
+      }
       disks = {
         pv = {
           wipe   = false
@@ -347,24 +349,40 @@ locals {
         }
       }
     }
+
+    # chromebook
+    de-0 = {
+      users = [
+        "client",
+      ]
+      # same as disk but a hack to use an existing lvm
+      # ignition doesn't support provisioning lvm device so run systemd mount only
+      mounts = [
+        {
+          device     = "/dev/H3F03NEV207BX1ZE/unencrypted"
+          mount_path = local.mounts.home_path
+          format     = "ext4"
+        },
+      ]
+    }
   }
 
   base_members = {
     base                = ["gw-0", "gw-1", "q-0", "de-0", "de-1", "r-0"]
-    systemd-networkd    = ["gw-0", "gw-1", "q-0", "de-1"]
-    network-manager     = ["de-0", "r-0"]
-    upstream-dns        = ["gw-0", "gw-1", "q-0"]
+    systemd-networkd    = ["gw-0", "gw-1", "q-0", "de-1", "r-0"]
+    network-manager     = ["de-0"]
+    upstream-dns        = ["gw-0", "gw-1", "q-0", "r-0"]
     gateway             = ["gw-0", "gw-1", "q-0"]
     vrrp                = ["gw-0", "gw-1"]
-    disks               = ["gw-0", "gw-1", "q-0", "de-1"]
-    mounts              = ["de-0", "r-0"]
+    disks               = ["gw-0", "gw-1", "q-0", "de-1", "r-0"]
+    mounts              = ["de-0"]
     server              = ["gw-0", "gw-1", "q-0", "de-1", "r-0"]
     client              = ["de-0", "de-1"]
     etcd                = ["gw-0", "gw-1", "q-0"]
     kubernetes-master   = ["gw-0", "gw-1"]
     kubernetes-worker   = ["gw-0", "gw-1", "q-0", "de-1"]
     nvidia-container    = ["de-1"]
-    desktop-environment = ["de-0", "de-1", "r-0"]
+    desktop-environment = ["de-0", "de-1"]
     sunshine            = ["de-1"]
     remote              = ["de-0", "r-0"]
   }
