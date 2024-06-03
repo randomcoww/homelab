@@ -326,13 +326,26 @@ locals {
       users = [
         "client",
       ]
-      mounts = [
-        {
-          device     = "/dev/disk/by-label/home"
-          mount_path = local.mounts.home_path
-          format     = "xfs"
-        },
-      ]
+      disks = {
+        pv = {
+          wipe   = false
+          device = "/dev/disk/by-id/scsi-SATA_SAMSUNG_MZNLN512_S2SWNX0HC04051"
+          partitions = [
+            {
+              mount_path = local.mounts.home_path
+              format     = "xfs"
+              wipe       = false
+              options    = ["-s", "size=4096"]
+              bind_mounts = [
+                {
+                  relative_path = "containers"
+                  mount_path    = local.mounts.containers_path
+                },
+              ]
+            },
+          ]
+        }
+      }
     }
   }
 
