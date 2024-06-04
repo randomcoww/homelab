@@ -410,8 +410,8 @@ resource "helm_release" "minio" {
       persistence = {
         storageClass = "local-path"
       }
-      drivesPerNode = 2
-      replicas      = 3
+      drivesPerNode = 1
+      replicas      = 4
       resources = {
         requests = {
           memory = "16Gi"
@@ -453,20 +453,6 @@ resource "helm_release" "minio" {
       customCommands = []
       svcaccts       = []
       affinity = {
-        nodeAffinity = {
-          requiredDuringSchedulingIgnoredDuringExecution = {
-            nodeSelectorTerms = [
-              {
-                matchExpressions = [
-                  {
-                    key      = "minio"
-                    operator = "Exists"
-                  },
-                ]
-              },
-            ]
-          }
-        }
         podAntiAffinity = {
           requiredDuringSchedulingIgnoredDuringExecution = [
             {

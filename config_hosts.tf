@@ -63,8 +63,7 @@ locals {
         ]
       }
       kubernetes_node_labels = {
-        minio = true
-        kea   = true
+        kea = true
       }
     }
 
@@ -131,8 +130,7 @@ locals {
         ]
       }
       kubernetes_node_labels = {
-        minio = true
-        kea   = true
+        kea = true
       }
     }
 
@@ -199,8 +197,7 @@ locals {
         ]
       }
       kubernetes_node_labels = {
-        minio = true
-        kea   = true
+        kea = true
       }
     }
 
