@@ -75,7 +75,8 @@ module "metadata" {
         }
       }
       spec = {
-        schedule = var.blocklist_update_schedule
+        schedule          = var.blocklist_update_schedule
+        concurrencyPolicy = "Forbid"
         jobTemplate = {
           spec = {
             ttlSecondsAfterFinished = 21600
