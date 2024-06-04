@@ -298,7 +298,6 @@ locals {
       kubernetes_node_labels = {
         hostapd = true
         nvidia  = true
-        client  = true
       }
     }
 
