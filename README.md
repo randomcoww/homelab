@@ -42,6 +42,7 @@ Create `ignition/secrets.tfvars` file
 
 ```bash
 LINUX_PASSWORD_HASH=$(echo $PASSWORD | openssl passwd -6 -stdin)
+TS_AUTH_KEY=
 ```
 
 ```bash
@@ -51,6 +52,10 @@ users = {
   client = {
     password_hash = "$LINUX_PASSWORD_HASH"
   }
+}
+
+tailscale = {
+  auth_key = "$TS_AUTH_KEY"
 }
 EOF
 ```

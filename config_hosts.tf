@@ -308,12 +308,12 @@ locals {
     # remote site
     r-0 = {
       users = [
-        "client",
+        "admin",
       ]
+      netnum = 7
       physical_interfaces = {
         phy0 = {
           mac   = "ec-21-e5-72-46-27"
-          mtu   = local.default_mtu
           vlans = []
         }
       }
@@ -384,7 +384,7 @@ locals {
     nvidia-container    = ["de-1"]
     desktop-environment = ["de-0", "de-1"]
     sunshine            = ["de-1"]
-    remote              = ["de-0", "r-0"]
+    remote              = ["r-0"]
   }
 
   # finalized local vars #
