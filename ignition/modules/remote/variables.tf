@@ -2,18 +2,16 @@ variable "ignition_version" {
   type = string
 }
 
-variable "ssm_access_key_id" {
+variable "tailscale_state_path" {
   type = string
 }
 
-variable "ssm_secret_access_key" {
+variable "tailscale_auth_key" {
   type = string
 }
 
-variable "ssm_resource" {
-  type = string
-}
-
-variable "ssm_region" {
-  type = string
+variable "images" {
+  type = object({
+    tailscale = string
+  })
 }

@@ -3,31 +3,35 @@ variant: fcos
 version: ${ignition_version}
 storage:
   files:
-    - path: /var/lib/tailscale/aws_credentials
-      mode: 0600
-      contents:
-        inline: |
-          AWS_ACCESS_KEY_ID=${ssm_access_key_id}
-          AWS_SECRET_ACCESS_KEY=${ssm_secret_access_key}
-          AWS_REGION=${ssm_region}
     - path: /etc/sysctl.d/20-forward.conf
       mode: 0644
       contents:
         inline: |
           net.ipv4.ip_forward=1
 
-systemd:
-  units:
-    - name: tailscaled.service
-      enabled: true
-      dropins:
-        - name: 10-state-path.conf
-          contents: |
-            [Service]
-            EnvironmentFile=/var/lib/tailscale/aws_credentials
-            Environment=TS_DEBUG_FIREWALL_MODE=nftables
-            ExecStart=
-            ExecStart=/usr/sbin/tailscaled \
-              --state=arn:aws:ssm:${ssm_region}::parameter/${ssm_resource}/%H \
-              --socket=/run/tailscale/tailscaled.sock \
-              --port=$${PORT} $FLAGS
+    - path: /etc/containers/systemd/tailscale.kube
+      mode: 0600
+      contents:
+        inline: |
+          [Unit]
+          Wants=network-online.target
+          After=network-online.target
+          Wants=local-fs.target
+          After=local-fs.target
+
+          [Service]
+          Restart=always
+          RestartSec=60
+          ExecStartPre=/usr/bin/mkdir -p \
+            ${tailscale_state_path}
+
+          [Kube]
+          Yaml=tailscale.yaml
+
+          [Install]
+          WantedBy=multi-user.target
+
+  # manually enable quadlet
+  links:
+    - path: /etc/systemd/system/multi-user.target.wants/tailscale.kube
+      target: /etc/containers/systemd/tailscale.kube

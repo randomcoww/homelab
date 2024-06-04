@@ -272,11 +272,12 @@ module "remote" {
   for_each = local.members.remote
   source   = "./modules/remote"
 
-  ignition_version      = local.ignition_version
-  ssm_access_key_id     = data.terraform_remote_state.sr.outputs.ssm.tailscale.access_key_id
-  ssm_secret_access_key = data.terraform_remote_state.sr.outputs.ssm.tailscale.secret_access_key
-  ssm_resource          = data.terraform_remote_state.sr.outputs.ssm.tailscale.resource
-  ssm_region            = data.terraform_remote_state.sr.outputs.ssm.tailscale.aws_region
+  ignition_version     = local.ignition_version
+  tailscale_auth_key   = var.tailscale.auth_key
+  tailscale_state_path = "${local.mounts.home_path}/tailscale"
+  images = {
+    tailscale = local.container_images.tailscale
+  }
 }
 
 locals {
