@@ -71,6 +71,9 @@ resource "helm_release" "metrics-server" {
       }
     }),
   ]
+  depends_on = [
+    kubernetes_labels.labels,
+  ]
 }
 
 # local-storage storage class #
@@ -96,6 +99,9 @@ resource "helm_release" "local-path-provisioner" {
       ]
     }),
   ]
+  depends_on = [
+    kubernetes_labels.labels,
+  ]
 }
 
 # amd device plugin #
@@ -111,6 +117,9 @@ resource "helm_release" "amd-gpu" {
   values = [
     yamlencode({
     }),
+  ]
+  depends_on = [
+    kubernetes_labels.labels,
   ]
 }
 
@@ -201,6 +210,9 @@ resource "helm_release" "ingress-nginx" {
       }
     }),
   ]
+  depends_on = [
+    kubernetes_labels.labels,
+  ]
 }
 
 # cloudflare tunnel #
@@ -265,6 +277,9 @@ resource "helm_release" "cert-manager" {
         ]
       }
     }),
+  ]
+  depends_on = [
+    kubernetes_labels.labels,
   ]
 }
 
