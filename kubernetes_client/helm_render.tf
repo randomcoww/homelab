@@ -653,7 +653,7 @@ module "transmission" {
   PostUp=ip route add ${local.networks.kubernetes_service.prefix} via $(ip -4 route show ${local.networks.kubernetes_pod.prefix} | awk '{print $3}')
 
   [Peer]
-  AllowedIPs=0.0.0.0/0
+  AllowedIPs=0.0.0.0/0,::0/0
   Endpoint=${var.wireguard_client.endpoint}
   PublicKey=${var.wireguard_client.public_key}
   PersistentKeepalive=25

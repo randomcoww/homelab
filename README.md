@@ -22,13 +22,30 @@ tw() {
 }
 ```
 
-Create `cluster_resources/secrets.tfvars` file
+Define secrets
 
 ```bash
 CLOUDFLARE_API_TOKEN=
 CLOUDFLARE_ACCOUNT_ID=
 LETSENCRYPT_USER=
+LINUX_PASSWORD_HASH=$(echo $PASSWORD | openssl passwd -6 -stdin)
+GMAIL_USER=
+GMAIL_PASSWORD=
+AP_PASSWORD=
+AP_SSID=
+AP_COUNTRY_CODE=
+AP_CHANNEL=
+TS_AUTH_KEY=
+WG_PRIVATE_KEY=
+WG_ADDRESS=
+WG_PUBLIC_KEY=
+WG_ENDPOINT=
+APCA_API_KEY_ID=
+APCA_API_SECRET_KEY=
+APCA_API_BASE_URL=
 ```
+
+Create `cluster_resources/secrets.tfvars` file
 
 ```bash
 cat > cluster_resources/secrets.tfvars <<EOF
@@ -39,11 +56,6 @@ EOF
 ```
 
 Create `ignition/secrets.tfvars` file
-
-```bash
-LINUX_PASSWORD_HASH=$(echo $PASSWORD | openssl passwd -6 -stdin)
-TS_AUTH_KEY=
-```
 
 ```bash
 cat > ignition/secrets.tfvars <<EOF
@@ -70,29 +82,19 @@ ssh_client = {
   early_renewal_hours   = 168
   validity_period_hours = 336
 }
+
+wireguard_client = {
+  private_key = "$WG_PRIVATE_KEY"
+  public_key  = "$WG_PUBLIC_KEY"
+  address     = "$WG_ADDRESS"
+  endpoint    = "$WG_ENDPOINT"
+}
 EOF
 ```
 
 Create `kubernetes_client/secrets.tfvars` file
 
 Reference: [Generate Authelia password hash](https://www.authelia.com/reference/guides/passwords/#user--password-file)
-
-```bash
-GMAIL_USER=
-GMAIL_PASSWORD=
-AP_PASSWORD=
-AP_SSID=
-AP_COUNTRY_CODE=
-AP_CHANNEL=
-TS_AUTH_KEY=
-WG_PRIVATE_KEY=
-WG_ADDRESS=
-WG_PUBLIC_KEY=
-WG_ENDPOINT=
-APCA_API_KEY_ID=
-APCA_API_SECRET_KEY=
-APCA_API_BASE_URL=
-```
 
 ```bash
 cat > kubernetes_client/secrets.tfvars <<EOF
@@ -153,6 +155,8 @@ tw terraform -chdir=client_credentials output -raw ssh_user_cert_authorized_key 
 
 mkdir -p $HOME/.mc
 tw terraform -chdir=client_credentials output -json mc_config > $HOME/.mc/config.json
+
+tw terraform -chdir=client_credentials output -raw wireguard_config > $HOME/wg0.conf
 ```
 
 Generate ignition config for servers
