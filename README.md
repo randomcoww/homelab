@@ -28,6 +28,7 @@ Define secrets
 CLOUDFLARE_API_TOKEN=
 CLOUDFLARE_ACCOUNT_ID=
 LETSENCRYPT_USER=
+
 LINUX_PASSWORD_HASH=$(echo $PASSWORD | openssl passwd -6 -stdin)
 GMAIL_USER=
 GMAIL_PASSWORD=
@@ -36,10 +37,16 @@ AP_SSID=
 AP_COUNTRY_CODE=
 AP_CHANNEL=
 TS_AUTH_KEY=
-WG_PRIVATE_KEY=
-WG_ADDRESS=
-WG_PUBLIC_KEY=
-WG_ENDPOINT=
+
+WG_CLIENT_PRIVATE_KEY=
+WG_CLIENT_ADDRESS=
+WG_CLIENT_PUBLIC_KEY=
+WG_CLIENT_ENDPOINT=
+WG_TR_PRIVATE_KEY=
+WG_TR_ADDRESS=
+WG_TR_PUBLIC_KEY=
+WG_TR_ENDPOINT=
+
 APCA_API_KEY_ID=
 APCA_API_SECRET_KEY=
 APCA_API_BASE_URL=
@@ -84,10 +91,10 @@ ssh_client = {
 }
 
 wireguard_client = {
-  private_key = "$WG_PRIVATE_KEY"
-  public_key  = "$WG_PUBLIC_KEY"
-  address     = "$WG_ADDRESS"
-  endpoint    = "$WG_ENDPOINT"
+  private_key = "$WG_CLIENT_PRIVATE_KEY"
+  public_key  = "$WG_CLIENT_PUBLIC_KEY"
+  address     = "$WG_CLIENT_ADDRESS"
+  endpoint    = "$WG_CLIENT_ENDPOINT"
 }
 EOF
 ```
@@ -113,10 +120,10 @@ smtp = {
 }
 
 wireguard_client = {
-  private_key = "$WG_PRIVATE_KEY"
-  public_key  = "$WG_PUBLIC_KEY"
-  address     = "$WG_ADDRESS"
-  endpoint    = "$WG_ENDPOINT"
+  private_key = "$WG_TR_PRIVATE_KEY"
+  public_key  = "$WG_TR_PUBLIC_KEY"
+  address     = "$WG_TR_ADDRESS"
+  endpoint    = "$WG_TR_ENDPOINT"
 }
 
 tailscale = {
