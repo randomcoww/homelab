@@ -241,6 +241,9 @@ resource "helm_release" "cloudflare-tunnel" {
       }
     }),
   ]
+  depends_on = [
+    kubernetes_labels.labels,
+  ]
 }
 */
 # cert-manager #
