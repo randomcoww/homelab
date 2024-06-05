@@ -104,25 +104,6 @@ resource "helm_release" "local-path-provisioner" {
   ]
 }
 
-# amd device plugin #
-
-resource "helm_release" "amd-gpu" {
-  name        = "amd-gpu"
-  repository  = "https://rocm.github.io/k8s-device-plugin/"
-  chart       = "amd-gpu"
-  namespace   = "kube-system"
-  wait        = false
-  version     = "0.13.0"
-  max_history = 2
-  values = [
-    yamlencode({
-    }),
-  ]
-  depends_on = [
-    kubernetes_labels.labels,
-  ]
-}
-
 # nvidia device plugin #
 
 resource "helm_release" "nvidia-device-plugin" {
