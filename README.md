@@ -296,7 +296,6 @@ flatpak --user -y install --or-update flathub \
   com.github.xournalpp.xournalpp \
   org.gnome.Loupe \
   com.valvesoftware.Steam \
-  com.heroicgameslauncher.hgl \
   net.lutris.Lutris \
   net.davidotek.pupgui2
 ```
