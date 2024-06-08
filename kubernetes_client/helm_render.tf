@@ -589,9 +589,6 @@ module "transmission" {
     wireguard    = local.container_images.wireguard
     litestream   = local.container_images.litestream
   }
-  ports = {
-    transmission = 9091
-  }
   transmission_settings = {
     blocklist-enabled            = true
     blocklist-url                = "http://list.iblocklist.com/?list=ydxerpxkpcfqjaybcssw&fileformat=p2p&archiveformat=gz"
@@ -613,6 +610,7 @@ module "transmission" {
     speed-limit-up-enabled       = true
     start-added-torrents         = true
     trash-original-torrent-files = true
+    incomplete-dir-enabled       = false
   }
   torrent_done_script         = <<-EOF
   #!/bin/sh

@@ -24,12 +24,6 @@ variable "images" {
   })
 }
 
-variable "ports" {
-  type = object({
-    transmission = number
-  })
-}
-
 variable "jfs_minio_endpoint" {
   type = string
 }

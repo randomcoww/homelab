@@ -2,7 +2,14 @@ locals {
   jfs_db_path            = "/var/lib/jfs/${var.name}.db"
   transmission_home_path = "/var/lib/transmission"
   transmission_conf_path = "/tmp/settings.json"
-  torrent_done_script    = "/torrent-done.sh"
+  transmission_settings = merge({
+    script-torrent-done-filename = "/torrent-done.sh"
+    rpc-port                     = 9091
+    }, var.transmission_settings, {
+    rpc-enabled       = true
+    rpc-bind-address  = "0.0.0.0"
+    bind-address-ipv4 = "0.0.0.0"
+  })
   blocklist_update_job_spec = {
     containers = [
       {
@@ -10,7 +17,7 @@ locals {
         image = var.images.transmission
         command = [
           "transmission-remote",
-          "${var.name}.${var.namespace}:${var.ports.transmission}",
+          "${var.name}.${var.namespace}:${local.transmission_settings.rpc-port}",
           "--blocklist-update",
         ]
       },
@@ -103,15 +110,9 @@ module "secret" {
   app     = var.name
   release = var.release
   data = {
-    "wg0.conf"        = var.wireguard_config
-    "torrent-done.sh" = var.torrent_done_script
-    "settings.json" = jsonencode(merge(var.transmission_settings, {
-      bind-address-ipv4            = "0.0.0.0"
-      script-torrent-done-filename = local.torrent_done_script
-      rpc-bind-address             = "0.0.0.0"
-      rpc-port                     = var.ports.transmission
-      rpc-enabled                  = true
-    }))
+    "wg0.conf"                                                         = var.wireguard_config
+    basename(local.transmission_settings.script-torrent-done-filename) = var.torrent_done_script
+    "settings.json"                                                    = jsonencode(local.transmission_settings)
     "litestream.yml" = yamlencode({
       dbs = [
         {
@@ -146,9 +147,9 @@ module "service" {
     ports = [
       {
         name       = "transmission"
-        port       = var.ports.transmission
+        port       = local.transmission_settings.rpc-port
         protocol   = "TCP"
-        targetPort = var.ports.transmission
+        targetPort = local.transmission_settings.rpc-port
       },
     ]
   }
@@ -167,7 +168,7 @@ module "ingress" {
       paths = [
         {
           service = module.service.name
-          port    = var.ports.transmission
+          port    = local.transmission_settings.rpc-port
           path    = "/"
         }
       ]
@@ -234,11 +235,7 @@ module "statefulset" {
         image = var.images.transmission
         env = [
           {
-            name  = "TR_RPC_PORT"
-            value = tostring(var.ports.transmission)
-          },
-          {
-            name  = "TRANSMISSION_HOME_PATH"
+            name  = "HOME"
             value = local.transmission_home_path
           },
           {
@@ -246,8 +243,8 @@ module "statefulset" {
             value = local.transmission_conf_path
           },
           {
-            name  = "TRANSMISSION_PORT"
-            value = tostring(var.ports.transmission)
+            name  = "TR_RPC_PORT"
+            value = tostring(local.transmission_settings.rpc-port)
           },
           {
             name  = "JFS_RESOURCE_NAME"
@@ -274,12 +271,12 @@ module "statefulset" {
           {
             name      = "secret"
             mountPath = local.transmission_conf_path
-            subPath   = "settings.json"
+            subPath   = basename(local.transmission_conf_path)
           },
           {
             name      = "secret"
-            mountPath = local.torrent_done_script
-            subPath   = "torrent-done.sh"
+            mountPath = local.transmission_settings.script-torrent-done-filename
+            subPath   = basename(local.transmission_settings.script-torrent-done-filename)
           },
           {
             name      = "jfs-data"
@@ -288,7 +285,7 @@ module "statefulset" {
         ]
         ports = [
           {
-            containerPort = var.ports.transmission
+            containerPort = local.transmission_settings.rpc-port
           },
         ]
         resources = merge({
