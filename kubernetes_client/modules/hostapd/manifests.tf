@@ -7,6 +7,7 @@ resource "random_id" "hostapd-mobility-domain" {
 }
 
 locals {
+  config_path = "/etc/hostapd/hostapd.conf"
   ids = [
     for i in range(var.replicas) :
     format("%X", var.bssid_base + i)
@@ -90,7 +91,7 @@ module "statefulset" {
         name  = var.name
         image = var.images.hostapd
         args = [
-          "/etc/hostapd/hostapd.conf",
+          local.config_path,
         ]
         env = [
           {
@@ -108,7 +109,7 @@ module "statefulset" {
         volumeMounts = [
           {
             name        = "hostapd-config"
-            mountPath   = "/etc/hostapd/hostapd.conf"
+            mountPath   = local.config_path
             subPathExpr = "hostapd-$(POD_NAME)"
             readOnly    = true
           },

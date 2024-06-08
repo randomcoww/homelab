@@ -31,6 +31,7 @@ locals {
       ]
     }
   }
+  litestream_config_path = "/etc/litestream.yml"
 }
 
 module "metadata" {
@@ -112,8 +113,8 @@ module "secret" {
   data = {
     "wg0.conf"                                                         = var.wireguard_config
     basename(local.transmission_settings.script-torrent-done-filename) = var.torrent_done_script
-    "settings.json"                                                    = jsonencode(local.transmission_settings)
-    "litestream.yml" = yamlencode({
+    basename(local.transmission_conf_path)                             = jsonencode(local.transmission_settings)
+    basename(local.litestream_config_path) = yamlencode({
       dbs = [
         {
           path = local.jfs_db_path
@@ -213,7 +214,7 @@ module "statefulset" {
           "restore",
           "-if-replica-exists",
           "-config",
-          "/etc/litestream.yml",
+          local.litestream_config_path,
           local.jfs_db_path,
         ]
         volumeMounts = [
@@ -223,8 +224,8 @@ module "statefulset" {
           },
           {
             name      = "secret"
-            mountPath = "/etc/litestream.yml"
-            subPath   = "litestream.yml"
+            mountPath = local.litestream_config_path
+            subPath   = basename(local.litestream_config_path)
           },
         ]
       },
@@ -307,7 +308,7 @@ module "statefulset" {
         args = [
           "replicate",
           "-config",
-          "/etc/litestream.yml",
+          local.litestream_config_path,
         ]
         volumeMounts = [
           {
@@ -316,8 +317,8 @@ module "statefulset" {
           },
           {
             name      = "secret"
-            mountPath = "/etc/litestream.yml"
-            subPath   = "litestream.yml"
+            mountPath = local.litestream_config_path
+            subPath   = basename(local.litestream_config_path)
           },
         ]
       },

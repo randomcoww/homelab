@@ -194,7 +194,7 @@ locals {
                 volumeMounts = [
                   {
                     name      = "authelia-data"
-                    mountPath = "/config"
+                    mountPath = dirname(local.db_path)
                   },
                 ]
               }
@@ -231,7 +231,7 @@ locals {
                 volumeMounts = [
                   {
                     name      = "authelia-data"
-                    mountPath = "/config"
+                    mountPath = dirname(local.db_path)
                   },
                 ]
               },

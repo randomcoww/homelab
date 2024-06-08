@@ -22,7 +22,7 @@ module "secret" {
   app     = var.name
   release = var.release
   data = {
-    "config.toml" = templatefile("${path.module}/templates/config.toml", {
+    basename(local.config_path) = templatefile("${path.module}/templates/config.toml", {
       s3_endpoint          = var.s3_endpoint
       s3_resource          = var.s3_resource
       s3_access_key_id     = var.s3_access_key_id
@@ -98,7 +98,7 @@ module "deployment" {
           {
             name      = "config"
             mountPath = local.config_path
-            subPath   = "config.toml"
+            subPath   = basename(local.config_path)
           },
         ]
       },

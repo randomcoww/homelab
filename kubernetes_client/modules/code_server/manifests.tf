@@ -1,6 +1,7 @@
 locals {
-  jfs_db_path    = "/var/lib/jfs/${var.name}.db"
-  code_home_path = "/home/${var.user}"
+  jfs_db_path            = "/var/lib/jfs/${var.name}.db"
+  code_home_path         = "/home/${var.user}"
+  litestream_config_path = "/etc/litestream.yml"
 }
 
 module "metadata" {
@@ -24,7 +25,7 @@ module "secret" {
   release = var.release
   data = {
     ssh_known_hosts = join("\n", var.ssh_known_hosts)
-    "litestream.yml" = yamlencode({
+    basename(local.litestream_config_path) = yamlencode({
       dbs = [
         {
           path = local.jfs_db_path
@@ -106,7 +107,7 @@ module "statefulset" {
           "restore",
           "-if-replica-exists",
           "-config",
-          "/etc/litestream.yml",
+          local.litestream_config_path,
           local.jfs_db_path,
         ]
         volumeMounts = [
@@ -116,8 +117,8 @@ module "statefulset" {
           },
           {
             name      = "secret"
-            mountPath = "/etc/litestream.yml"
-            subPath   = "litestream.yml"
+            mountPath = local.litestream_config_path
+            subPath   = basename(local.litestream_config_path)
           },
         ]
       },
@@ -203,7 +204,7 @@ module "statefulset" {
         args = [
           "replicate",
           "-config",
-          "/etc/litestream.yml",
+          local.litestream_config_path,
         ]
         volumeMounts = [
           {
@@ -212,8 +213,8 @@ module "statefulset" {
           },
           {
             name      = "secret"
-            mountPath = "/etc/litestream.yml"
-            subPath   = "litestream.yml"
+            mountPath = local.litestream_config_path
+            subPath   = basename(local.litestream_config_path)
           },
         ]
       },
