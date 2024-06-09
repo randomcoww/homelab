@@ -21,6 +21,7 @@ locals {
           ]
         }
       }
+      external_interface_name = var.external_interface_name
     })
   ]
 }

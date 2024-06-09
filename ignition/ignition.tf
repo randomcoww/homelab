@@ -264,6 +264,7 @@ module "sunshine" {
     origin_web_ui_allowed   = "pc"
     encoder                 = "nvenc"
   }
+  external_interface_name = each.value.tap_interfaces.wan.interface_name
 }
 
 # remote access #

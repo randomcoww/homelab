@@ -5,3 +5,7 @@ variable "ignition_version" {
 variable "sunshine_config" {
   type = map(string)
 }
+
+variable "external_interface_name" {
+  type = string
+}
