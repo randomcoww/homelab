@@ -45,6 +45,7 @@ locals {
         minio                  = 34
         sunshine               = 36
         alpaca_stream          = 37
+        alpaca_db              = 38
       }
       mtu = local.default_mtu
     }
@@ -99,7 +100,7 @@ locals {
     kapprover          = "ghcr.io/randomcoww/kapprover:20240126"
     external_dns       = "registry.k8s.io/external-dns/external-dns:v0.14.2"
     kube_proxy         = "ghcr.io/randomcoww/kubernetes:kube-proxy-v${local.kubernetes.version}"
-    transmission       = "ghcr.io/randomcoww/transmission:20240527.11"
+    transmission       = "ghcr.io/randomcoww/transmission:20240608.1"
     wireguard          = "ghcr.io/randomcoww/wireguard:20240523"
     vaultwarden        = "docker.io/vaultwarden/server:1.30.5-alpine"
     litestream         = "docker.io/litestream/litestream:0.3"
@@ -110,6 +111,7 @@ locals {
     lldap              = "docker.io/lldap/lldap:2024-05-06"
     bsimp              = "ghcr.io/randomcoww/bsimp:20240523.2"
     keydb              = "docker.io/eqalpha/keydb:alpine_x86_64_v6.3.4"
+    clickhouse         = "ghcr.io/randomcoww/clickhouse:24.4.2.141.4"
   }
 
   pxeboot_images = {
@@ -153,6 +155,7 @@ locals {
       matchbox      = "ign"
       code_server   = "code"
       alpaca_stream = "alpaca-stream"
+      alpaca_db     = "alpaca-db"
       lldap_http    = "ldap"
       bsimp         = "bsimp"
     } :
@@ -197,6 +200,14 @@ locals {
       lldap = {
         name      = "lldap"
         namespace = "lldap"
+      }
+      alpaca_stream = {
+        name      = "alpaca-stream"
+        namespace = "alpaca"
+      }
+      alpaca_db = {
+        name      = "alpaca-db"
+        namespace = "alpaca"
       }
     } :
     name => merge(e, {
@@ -254,6 +265,10 @@ locals {
     }
     juicefs = {
       name   = "juicefs"
+      policy = "none"
+    }
+    clickhouse = {
+      name   = "clickhouse"
       policy = "none"
     }
   }

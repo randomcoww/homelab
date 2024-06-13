@@ -124,3 +124,9 @@ storage:
       contents:
         inline: |
           net.bridge.bridge-nf-call-iptables=0
+    # clickhouse DB
+    - path: /etc/sysctl.d/99-clickhouse.conf
+      mode: 0644
+      contents:
+        inline: |
+          kernel.task_delayacct=1

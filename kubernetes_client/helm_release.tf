@@ -1,7 +1,6 @@
 locals {
   modules_enabled = [
     module.transmission,
-    module.alpaca-stream,
     module.hostapd,
     module.tailscale,
     module.code,
@@ -18,6 +17,8 @@ locals {
     module.kube-proxy,
     module.lldap,
     module.bsimp,
+    module.alpaca-stream,
+    module.alpaca-db,
   ]
 }
 
