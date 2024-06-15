@@ -15,7 +15,7 @@ locals {
     }, var.clickhouse_config, {
     logger = {
       "@replace" = "replace"
-      level      = "debug"
+      level      = "warning"
       console    = 1
     }
     grpc = {
@@ -45,6 +45,7 @@ locals {
             endpoint             = "http://${var.data_minio_endpoint}/${var.data_minio_bucket}/${var.name}/"
             access_key_id        = var.data_minio_access_key_id
             secret_access_key    = var.data_minio_secret_access_key
+            region               = ""
             support_batch_delete = true
           }
         },
@@ -58,6 +59,42 @@ locals {
           }
         }
       }
+    }
+    asynchronous_metric_log = {
+      "@remove" = "remove"
+    }
+    metric_log = {
+      "@remove" = "remove"
+    }
+    opentelemetry_span_log = {
+      "@remove" = "remove"
+    }
+    zookeeper_log = {
+      "@remove" = "remove"
+    }
+    text_log = {
+      "@remove" = "remove"
+    }
+    session_log = {
+      "@remove" = "remove"
+    }
+    query_thread_log = {
+      "@remove" = "remove"
+    }
+    query_log = {
+      "@remove" = "remove"
+    }
+    query_views_log = {
+      "@remove" = "remove"
+    }
+    part_log = {
+      "@remove" = "remove"
+    }
+    trace_log = {
+      "@remove" = "remove"
+    }
+    crash_log = {
+      "@remove" = "remove"
     }
   })
   jfs_metadata_path = "/var/lib/jfs/${var.name}.db"
