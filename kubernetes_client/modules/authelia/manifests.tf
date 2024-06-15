@@ -1,15 +1,36 @@
-module "secret-custom" {
+module "secret" {
   source  = "../secret"
   name    = "${var.name}-custom"
   app     = var.name
   release = var.source_release
   data = {
-    ACCESS_KEY_ID                      = var.s3_access_key_id
-    SECRET_ACCESS_KEY                  = var.s3_secret_access_key
     LDAP_CLIENT_TLS_CERTIFICATE_CHAIN  = chomp(tls_locally_signed_cert.lldap.cert_pem)
     LDAP_CLIENT_TLS_PRIVATE_KEY        = chomp(tls_private_key.lldap.private_key_pem)
     REDIS_CLIENT_TLS_CERTIFICATE_CHAIN = chomp(tls_locally_signed_cert.redis.cert_pem)
     REDIS_CLIENT_TLS_PRIVATE_KEY       = chomp(tls_private_key.redis.private_key_pem)
+  }
+}
+
+module "secret-litestream" {
+  source  = "../secret"
+  name    = "${var.name}-litestream"
+  app     = var.name
+  release = var.source_release
+  data = {
+    basename(local.litestream_config_path) = yamlencode({
+      dbs = [
+        {
+          path = local.sqlite_path
+          replicas = [
+            {
+              url               = "s3://${var.s3_db_resource}/${basename(local.sqlite_path)}"
+              access-key-id     = var.s3_access_key_id
+              secret-access-key = var.s3_secret_access_key
+            }
+          ]
+        }
+      ]
+    })
   }
 }
 
@@ -42,30 +63,31 @@ data "helm_template" "authelia" {
         replicas = 1
         kind     = "StatefulSet"
         annotations = {
-          "checksum/custom" = sha256(module.secret-custom.manifest)
+          "checksum/secret-custom"     = sha256(module.secret.manifest)
+          "checksum/secret-litestream" = sha256(module.secret-litestream.manifest)
         }
         extraVolumeMounts = [
           {
             name      = "authelia-data"
-            mountPath = "/config"
+            mountPath = dirname(local.sqlite_path)
           },
           {
-            name      = "authelia-custom"
+            name      = "secret-custom"
             mountPath = local.ldap_client_key_path
             subPath   = "LDAP_CLIENT_TLS_PRIVATE_KEY"
           },
           {
-            name      = "authelia-custom"
+            name      = "secret-custom"
             mountPath = local.ldap_client_cert_path
             subPath   = "LDAP_CLIENT_TLS_CERTIFICATE_CHAIN"
           },
           {
-            name      = "authelia-custom"
+            name      = "secret-custom"
             mountPath = local.redis_client_key_path
             subPath   = "REDIS_CLIENT_TLS_PRIVATE_KEY"
           },
           {
-            name      = "authelia-custom"
+            name      = "secret-custom"
             mountPath = local.redis_client_cert_path
             subPath   = "REDIS_CLIENT_TLS_CERTIFICATE_CHAIN"
           },
@@ -78,9 +100,15 @@ data "helm_template" "authelia" {
             }
           },
           {
-            name = "authelia-custom"
+            name = "secret-custom"
             secret = {
-              secretName = module.secret-custom.name
+              secretName = module.secret.name
+            }
+          },
+          {
+            name = "litestream-config"
+            secret = {
+              secretName = module.secret-litestream.name
             }
           },
         ]
@@ -147,7 +175,8 @@ module "metadata" {
 
 locals {
   domain                 = join(".", slice(compact(split(".", var.service_hostname)), 1, length(compact(split(".", var.service_hostname)))))
-  db_path                = "/config/db.sqlite3"
+  litestream_config_path = "/etc/litestream.yml"
+  sqlite_path            = "/config/db.sqlite3"
   ldap_client_cert_path  = "/custom/ldap-client-cert.pem"
   ldap_client_key_path   = "/custom/ldap-client-key.pem"
   redis_client_cert_path = "/custom/redis-client-cert.pem"
@@ -155,83 +184,55 @@ locals {
 
   s = yamldecode(data.helm_template.authelia.manifests["templates/deployment.yaml"])
   manifests = merge(data.helm_template.authelia.manifests, {
-    "templates/secret-custom.yaml" = module.secret-custom.manifest
+    "templates/secret-custom.yaml"     = module.secret.manifest
+    "templates/secret-litestream.yaml" = module.secret-litestream.manifest
     "templates/deployment.yaml" = yamlencode(merge(local.s, {
       spec = merge(local.s.spec, {
         template = merge(local.s.spec.template, {
           spec = merge(local.s.spec.template.spec, {
             initContainers = [
               {
-                name  = "${var.name}-init"
+                name  = "${var.name}-litestream-restore"
                 image = var.images.litestream
                 args = [
                   "restore",
+                  "-if-db-not-exists",
                   "-if-replica-exists",
-                  "-o",
-                  local.db_path,
-                  "s3://${var.s3_db_resource}",
-                ]
-                env = [
-                  {
-                    name = "LITESTREAM_ACCESS_KEY_ID"
-                    valueFrom = {
-                      secretKeyRef = {
-                        name = module.secret-custom.name
-                        key  = "ACCESS_KEY_ID"
-                      }
-                    }
-                  },
-                  {
-                    name = "LITESTREAM_SECRET_ACCESS_KEY"
-                    valueFrom = {
-                      secretKeyRef = {
-                        name = module.secret-custom.name
-                        key  = "SECRET_ACCESS_KEY"
-                      }
-                    }
-                  },
+                  "-config",
+                  local.litestream_config_path,
+                  local.sqlite_path,
                 ]
                 volumeMounts = [
                   {
                     name      = "authelia-data"
-                    mountPath = dirname(local.db_path)
+                    mountPath = dirname(local.sqlite_path)
+                  },
+                  {
+                    name      = "litestream-config"
+                    mountPath = local.litestream_config_path
+                    subPath   = basename(local.litestream_config_path)
                   },
                 ]
               }
             ]
             containers = concat(local.s.spec.template.spec.containers, [
               {
-                name  = "${var.name}-backup"
+                name  = "${var.name}-litestream-replicate"
                 image = var.images.litestream
                 args = [
                   "replicate",
-                  local.db_path,
-                  "s3://${var.s3_db_resource}",
-                ]
-                env = [
-                  {
-                    name = "LITESTREAM_ACCESS_KEY_ID"
-                    valueFrom = {
-                      secretKeyRef = {
-                        name = module.secret-custom.name
-                        key  = "ACCESS_KEY_ID"
-                      }
-                    }
-                  },
-                  {
-                    name = "LITESTREAM_SECRET_ACCESS_KEY"
-                    valueFrom = {
-                      secretKeyRef = {
-                        name = module.secret-custom.name
-                        key  = "SECRET_ACCESS_KEY"
-                      }
-                    }
-                  },
+                  "-config",
+                  local.litestream_config_path,
                 ]
                 volumeMounts = [
                   {
                     name      = "authelia-data"
-                    mountPath = dirname(local.db_path)
+                    mountPath = dirname(local.sqlite_path)
+                  },
+                  {
+                    name      = "litestream-config"
+                    mountPath = local.litestream_config_path
+                    subPath   = basename(local.litestream_config_path)
                   },
                 ]
               },

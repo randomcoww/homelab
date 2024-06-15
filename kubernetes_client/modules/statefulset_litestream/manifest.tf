@@ -62,7 +62,7 @@ module "statefulset" {
     ])
     containers = concat([
       {
-        name  = "${var.name}-litestream-replica"
+        name  = "${var.name}-litestream-replicate"
         image = var.litestream_image
         args = [
           "replicate",
