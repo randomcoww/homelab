@@ -267,10 +267,6 @@ module "statefulset-jfs" {
             containerPort = local.transmission_settings.rpc-port
           },
         ]
-        # needed for bidirectional jfs mount
-        securityContext = {
-          privileged = true
-        }
       },
     ]
     volumes = [

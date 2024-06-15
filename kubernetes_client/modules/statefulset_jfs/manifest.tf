@@ -83,7 +83,11 @@ module "statefulset" {
       ], [
       for _, container in lookup(var.spec, "containers", []) :
       merge(container, {
-        volumeMounts = concat(container.volumeMounts, [
+        securityContext = merge(lookup(container, "securityContext", {}), {
+          # required for bidirectional mount
+          privileged = true
+        })
+        volumeMounts = concat(lookup(container, "volumeMounts", []), [
           {
             name             = "jfs-mount"
             mountPath        = dirname(var.jfs_mount_path)
