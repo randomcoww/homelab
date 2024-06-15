@@ -28,10 +28,11 @@ module "metadata" {
   release     = var.release
   app_version = split(":", var.images.lldap)[1]
   manifests = {
-    "templates/service.yaml"     = module.service.manifest
-    "templates/ingress.yaml"     = module.ingress.manifest
-    "templates/secret.yaml"      = module.secret.manifest
-    "templates/statefulset.yaml" = module.statefulset.manifest
+    "templates/service.yaml"           = module.service.manifest
+    "templates/ingress.yaml"           = module.ingress.manifest
+    "templates/secret.yaml"            = module.secret.manifest
+    "templates/statefulset.yaml"       = module.litestream-statefulset.statefulset
+    "templates/secret-litestream.yaml" = module.litestream-statefulset.secret
   }
 }
 
@@ -41,11 +42,9 @@ module "secret" {
   app     = var.name
   release = var.release
   data = merge({
-    ACCESS_KEY_ID     = var.s3_access_key_id
-    SECRET_ACCESS_KEY = var.s3_secret_access_key
-    storage-secret    = var.storage_secret
-    "ldaps-cert.pem"  = chomp(tls_locally_signed_cert.lldap.cert_pem)
-    "ldaps-key.pem"   = chomp(tls_private_key.lldap.private_key_pem)
+    storage-secret   = var.storage_secret
+    "ldaps-cert.pem" = chomp(tls_locally_signed_cert.lldap.cert_pem)
+    "ldaps-key.pem"  = chomp(tls_private_key.lldap.private_key_pem)
     }, {
     for k, v in local.extra_envs :
     tostring(k) => tostring(v)
@@ -97,56 +96,34 @@ module "ingress" {
   ]
 }
 
-module "statefulset" {
-  source   = "../statefulset"
+module "litestream-statefulset" {
+  source = "../statefulset_litestream"
+  ## litestream settings
+  litestream_image = var.images.litestream
+  litestream_config = {
+    dbs = [
+      {
+        path = local.db_path
+        replicas = [
+          {
+            url               = "s3://${var.s3_db_resource}/${basename(local.db_path)}"
+            access-key-id     = var.s3_access_key_id
+            secret-access-key = var.s3_secret_access_key
+          }
+        ]
+      }
+    ]
+  }
+  sqlite_path = local.db_path
+  ##
   name     = var.name
   app      = var.name
   release  = var.release
   affinity = var.affinity
-  replicas = 1
   annotations = {
     "checksum/secret" = sha256(module.secret.manifest)
   }
   spec = {
-    initContainers = [
-      {
-        name  = "${var.name}-init"
-        image = var.images.litestream
-        args = [
-          "restore",
-          "-if-replica-exists",
-          "-o",
-          local.db_path,
-          "s3://${var.s3_db_resource}",
-        ]
-        env = [
-          {
-            name = "LITESTREAM_ACCESS_KEY_ID"
-            valueFrom = {
-              secretKeyRef = {
-                name = module.secret.name
-                key  = "ACCESS_KEY_ID"
-              }
-            }
-          },
-          {
-            name = "LITESTREAM_SECRET_ACCESS_KEY"
-            valueFrom = {
-              secretKeyRef = {
-                name = module.secret.name
-                key  = "SECRET_ACCESS_KEY"
-              }
-            }
-          },
-        ]
-        volumeMounts = [
-          {
-            name      = "lldap-data"
-            mountPath = dirname(local.db_path)
-          },
-        ]
-      }
-    ]
     containers = [
       {
         name  = var.name
@@ -170,10 +147,6 @@ module "statefulset" {
         ]
         volumeMounts = [
           {
-            name      = "lldap-data"
-            mountPath = dirname(local.db_path)
-          },
-          {
             name      = "secret"
             mountPath = local.storage_secret_path
             subPath   = "storage-secret"
@@ -190,49 +163,8 @@ module "statefulset" {
           },
         ]
       },
-      {
-        name  = "${var.name}-litestream"
-        image = var.images.litestream
-        args = [
-          "replicate",
-          local.db_path,
-          "s3://${var.s3_db_resource}",
-        ]
-        env = [
-          {
-            name = "LITESTREAM_ACCESS_KEY_ID"
-            valueFrom = {
-              secretKeyRef = {
-                name = module.secret.name
-                key  = "ACCESS_KEY_ID"
-              }
-            }
-          },
-          {
-            name = "LITESTREAM_SECRET_ACCESS_KEY"
-            valueFrom = {
-              secretKeyRef = {
-                name = module.secret.name
-                key  = "SECRET_ACCESS_KEY"
-              }
-            }
-          },
-        ]
-        volumeMounts = [
-          {
-            name      = "lldap-data"
-            mountPath = dirname(local.db_path)
-          },
-        ]
-      },
     ]
     volumes = [
-      {
-        name = "lldap-data"
-        emptyDir = {
-          medium = "Memory"
-        }
-      },
       {
         name = "secret"
         secret = {

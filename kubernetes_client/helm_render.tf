@@ -389,7 +389,7 @@ module "lldap" {
   }
   ingress_class_name        = local.ingress_classes.ingress_nginx
   nginx_ingress_annotations = local.nginx_ingress_annotations
-  s3_db_resource            = "${data.terraform_remote_state.sr.outputs.s3.lldap.resource}/users.db"
+  s3_db_resource            = data.terraform_remote_state.sr.outputs.s3.lldap.resource
   s3_access_key_id          = data.terraform_remote_state.sr.outputs.s3.lldap.access_key_id
   s3_secret_access_key      = data.terraform_remote_state.sr.outputs.s3.lldap.secret_access_key
 }
