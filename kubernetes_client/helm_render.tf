@@ -554,6 +554,7 @@ module "code" {
   images = {
     code_server = local.container_images.code_server
     litestream  = local.container_images.litestream
+    juicefs     = local.container_images.juicefs
   }
   ports = {
     code_server = 8080
@@ -713,6 +714,7 @@ module "alpaca-db" {
   images = {
     clickhouse = local.container_images.clickhouse
     litestream = local.container_images.litestream
+    juicefs    = local.container_images.juicefs
   }
   ca = {
     algorithm       = tls_private_key.alpaca-db-ca.algorithm

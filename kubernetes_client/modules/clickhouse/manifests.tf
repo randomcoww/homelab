@@ -1,5 +1,4 @@
 locals {
-  jfs_db_path  = "/var/lib/jfs/${var.name}.db"
   base_path    = "/etc/clickhouse-server"
   config_path  = "${local.base_path}/config.d/server.yaml"
   cert_path    = "${local.base_path}/server.crt"
@@ -11,8 +10,7 @@ locals {
     postgresql_port   = 9005
     https_port        = 8443
     tcp_port_secure   = 9440
-    path              = "/var/lib/clickhouse"
-    tmp_path          = "/var/tmp/clickhouse"
+    path              = "/var/lib/clickhouse/mnt"
     listen_reuse_port = 1
     }, var.clickhouse_config, {
     logger = {
@@ -34,25 +32,25 @@ locals {
       }
     }
     merge_tree = {
-      storage_policy = "all"
+      storage_policy = "s3"
     }
     storage_configuration = {
       "@replace" = "replace"
-      disks = {
-        s3 = {
-          type                    = "object_storage"
-          object_storage_type     = "s3"
-          metadata_type           = "plain_rewritable"
-          endpoint                = "http://${var.data_minio_endpoint}/${var.data_minio_bucket}/${var.name}/db/"
-          access_key_id           = var.data_minio_access_key_id
-          secret_access_key       = var.data_minio_secret_access_key
-          cache_enabled           = true
-          data_cache_enabled      = true
-          enable_filesystem_cache = true
-        }
-      }
+      disks = [
+        {
+          s3 = {
+            type                 = "object_storage"
+            object_storage_type  = "s3"
+            metadata_type        = "plain_rewritable"
+            endpoint             = "http://${var.data_minio_endpoint}/${var.data_minio_bucket}/${var.name}/"
+            access_key_id        = var.data_minio_access_key_id
+            secret_access_key    = var.data_minio_secret_access_key
+            support_batch_delete = true
+          }
+        },
+      ]
       policies = {
-        all = {
+        s3 = {
           volumes = {
             main = {
               disks = "s3"
@@ -62,7 +60,7 @@ locals {
       }
     }
   })
-  litestream_config_path = "/etc/litestream.yml"
+  jfs_metadata_path = "/var/lib/jfs/${var.name}.db"
 }
 
 module "metadata" {
@@ -72,9 +70,10 @@ module "metadata" {
   release     = var.release
   app_version = split(":", var.images.clickhouse)[1]
   manifests = {
-    "templates/service.yaml"     = module.service.manifest
-    "templates/secret.yaml"      = module.secret.manifest
-    "templates/statefulset.yaml" = module.statefulset.manifest
+    "templates/service.yaml"           = module.service.manifest
+    "templates/secret.yaml"            = module.secret.manifest
+    "templates/statefulset.yaml"       = module.statefulset-jfs.statefulset
+    "templates/secret-litestream.yaml" = module.statefulset-jfs.secret
   }
 }
 
@@ -84,28 +83,7 @@ module "secret" {
   app     = var.name
   release = var.release
   data = {
-    basename(local.config_path) = yamlencode(local.clickhouse_config)
-    basename(local.litestream_config_path) = yamlencode({
-      dbs = [
-        {
-          path = local.jfs_db_path
-          replicas = [
-            {
-              type                     = "s3"
-              bucket                   = var.jfs_minio_bucket
-              path                     = basename(local.jfs_db_path)
-              endpoint                 = "http://${var.jfs_minio_endpoint}"
-              access-key-id            = var.jfs_minio_access_key_id
-              secret-access-key        = var.jfs_minio_secret_access_key
-              retention                = "2m"
-              retention-check-interval = "2m"
-              sync-interval            = "500ms"
-              snapshot-interval        = "1h"
-            },
-          ]
-        },
-      ]
-    })
+    basename(local.config_path)  = yamlencode(local.clickhouse_config)
     basename(local.cert_path)    = chomp(tls_locally_signed_cert.clickhouse.cert_pem)
     basename(local.key_path)     = chomp(tls_private_key.clickhouse.private_key_pem)
     basename(local.ca_cert_path) = chomp(var.ca.cert_pem)
@@ -154,76 +132,67 @@ module "service" {
   }
 }
 
-module "statefulset" {
-  source   = "../statefulset"
-  name     = var.name
-  app      = var.name
-  release  = var.release
-  affinity = var.affinity
-  replicas = 1
-  annotations = {
-    "checksum/secret" = sha256(module.secret.manifest)
-  }
-  spec = {
-    initContainers = [
+module "statefulset-jfs" {
+  source = "../statefulset_jfs"
+  ## litestream settings
+  litestream_image = var.images.litestream
+  litestream_config = {
+    dbs = [
       {
-        name  = "${var.name}-init"
-        image = var.images.litestream
-        args = [
-          "restore",
-          "-if-replica-exists",
-          "-config",
-          local.litestream_config_path,
-          local.jfs_db_path,
-        ]
-        volumeMounts = [
+        path = local.jfs_metadata_path
+        replicas = [
           {
-            name      = "jfs-data"
-            mountPath = dirname(local.jfs_db_path)
-          },
-          {
-            name      = "secret"
-            mountPath = local.litestream_config_path
-            subPath   = basename(local.litestream_config_path)
+            type                     = "s3"
+            bucket                   = var.jfs_minio_bucket
+            path                     = basename(local.jfs_metadata_path)
+            endpoint                 = "http://${var.jfs_minio_endpoint}"
+            access-key-id            = var.jfs_minio_access_key_id
+            secret-access-key        = var.jfs_minio_secret_access_key
+            retention                = "2m"
+            retention-check-interval = "2m"
+            sync-interval            = "500ms"
+            snapshot-interval        = "1h"
           },
         ]
       },
     ]
+  }
+  sqlite_path = local.jfs_metadata_path
+
+  ## jfs settings
+  jfs_image                   = var.images.juicefs
+  jfs_mount_path              = local.clickhouse_config.path
+  jfs_minio_resource          = "http://${var.jfs_minio_endpoint}/${var.jfs_minio_bucket}"
+  jfs_minio_access_key_id     = var.jfs_minio_access_key_id
+  jfs_minio_secret_access_key = var.jfs_minio_secret_access_key
+  ##
+
+  name     = var.name
+  app      = var.name
+  release  = var.release
+  affinity = var.affinity
+  annotations = {
+    "checksum/secret" = sha256(module.secret.manifest)
+  }
+  spec = {
     containers = [
       {
         name  = var.name
         image = var.images.clickhouse
-        env = [
-          {
-            name  = "CLICKHOUSE_DATA_PATH"
-            value = local.clickhouse_config.path
-          },
-          {
-            name  = "JFS_RESOURCE_NAME"
-            value = var.name
-          },
-          {
-            name  = "JFS_MINIO_BUCKET"
-            value = "http://${var.jfs_minio_endpoint}/${var.jfs_minio_bucket}"
-          },
-          {
-            name  = "JFS_DB_PATH"
-            value = local.jfs_db_path
-          },
-          {
-            name  = "JFS_MINIO_ACCESS_KEY_ID"
-            value = var.jfs_minio_access_key_id
-          },
-          {
-            name  = "JFS_MINIO_SECRET_ACCESS_KEY"
-            value = var.jfs_minio_secret_access_key
-          },
+        command = [
+          "sh",
+          "-c",
+          <<-EOF
+          set -e
+
+          mountpoint ${local.clickhouse_config.path}
+
+          rm -f ${local.clickhouse_config.path}/status
+          exec clickhouse-server \
+            -C /etc/clickhouse-server/config.xml
+          EOF
         ]
         volumeMounts = [
-          {
-            name      = "jfs-data"
-            mountPath = dirname(local.jfs_db_path)
-          },
           {
             name      = "secret"
             mountPath = local.config_path
@@ -263,38 +232,6 @@ module "statefulset" {
             containerPort = local.clickhouse_config.tcp_port_secure
           },
         ]
-        resources = merge({
-          limits = {
-            "github.com/fuse" = 1
-          }
-        }, var.resources)
-        securityContext = {
-          capabilities = {
-            add = [
-              "SYS_ADMIN",
-            ]
-          }
-        }
-      },
-      {
-        name  = "${var.name}-backup"
-        image = var.images.litestream
-        args = [
-          "replicate",
-          "-config",
-          local.litestream_config_path,
-        ]
-        volumeMounts = [
-          {
-            name      = "jfs-data"
-            mountPath = dirname(local.jfs_db_path)
-          },
-          {
-            name      = "secret"
-            mountPath = local.litestream_config_path
-            subPath   = basename(local.litestream_config_path)
-          },
-        ]
       },
     ]
     volumes = [
@@ -303,12 +240,6 @@ module "statefulset" {
         secret = {
           secretName  = module.secret.name
           defaultMode = 493
-        }
-      },
-      {
-        name = "jfs-data"
-        emptyDir = {
-          medium = "Memory"
         }
       },
     ]

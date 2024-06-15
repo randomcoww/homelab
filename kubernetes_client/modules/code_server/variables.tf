@@ -15,6 +15,7 @@ variable "images" {
   type = object({
     code_server = string
     litestream  = string
+    juicefs     = string
   })
 }
 

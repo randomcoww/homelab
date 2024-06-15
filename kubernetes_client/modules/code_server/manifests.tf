@@ -1,7 +1,6 @@
 locals {
-  jfs_db_path            = "/var/lib/jfs/${var.name}.db"
-  code_home_path         = "/home/${var.user}"
-  litestream_config_path = "/etc/litestream.yml"
+  code_home_path    = "/mnt/home/${var.user}"
+  jfs_metadata_path = "/var/lib/jfs/${var.name}.db"
 }
 
 module "metadata" {
@@ -11,10 +10,11 @@ module "metadata" {
   release     = var.release
   app_version = split(":", var.images.code_server)[1]
   manifests = {
-    "templates/secret.yaml"      = module.secret.manifest
-    "templates/service.yaml"     = module.service.manifest
-    "templates/ingress.yaml"     = module.ingress.manifest
-    "templates/statefulset.yaml" = module.statefulset.manifest
+    "templates/secret.yaml"            = module.secret.manifest
+    "templates/service.yaml"           = module.service.manifest
+    "templates/ingress.yaml"           = module.ingress.manifest
+    "templates/statefulset.yaml"       = module.statefulset-jfs.statefulset
+    "templates/secret-litestream.yaml" = module.statefulset-jfs.secret
   }
 }
 
@@ -25,27 +25,6 @@ module "secret" {
   release = var.release
   data = {
     ssh_known_hosts = join("\n", var.ssh_known_hosts)
-    basename(local.litestream_config_path) = yamlencode({
-      dbs = [
-        {
-          path = local.jfs_db_path
-          replicas = [
-            {
-              type                     = "s3"
-              bucket                   = var.jfs_minio_bucket
-              path                     = basename(local.jfs_db_path)
-              endpoint                 = "http://${var.jfs_minio_endpoint}"
-              access-key-id            = var.jfs_minio_access_key_id
-              secret-access-key        = var.jfs_minio_secret_access_key
-              retention                = "2m"
-              retention-check-interval = "2m"
-              sync-interval            = "500ms"
-              snapshot-interval        = "1h"
-            },
-          ]
-        },
-      ]
-    })
   }
 }
 
@@ -88,94 +67,83 @@ module "ingress" {
   ]
 }
 
-module "statefulset" {
-  source   = "../statefulset"
-  name     = var.name
-  app      = var.name
-  release  = var.release
-  affinity = var.affinity
-  replicas = 1
-  annotations = {
-    "checksum/secret" = sha256(module.secret.manifest)
-  }
-  spec = {
-    initContainers = [
+module "statefulset-jfs" {
+  source = "../statefulset_jfs"
+  ## litestream settings
+  litestream_image = var.images.litestream
+  litestream_config = {
+    dbs = [
       {
-        name  = "${var.name}-init"
-        image = var.images.litestream
-        args = [
-          "restore",
-          "-if-replica-exists",
-          "-config",
-          local.litestream_config_path,
-          local.jfs_db_path,
-        ]
-        volumeMounts = [
+        path = local.jfs_metadata_path
+        replicas = [
           {
-            name      = "jfs-data"
-            mountPath = dirname(local.jfs_db_path)
-          },
-          {
-            name      = "secret"
-            mountPath = local.litestream_config_path
-            subPath   = basename(local.litestream_config_path)
+            type                     = "s3"
+            bucket                   = var.jfs_minio_bucket
+            path                     = basename(local.jfs_metadata_path)
+            endpoint                 = "http://${var.jfs_minio_endpoint}"
+            access-key-id            = var.jfs_minio_access_key_id
+            secret-access-key        = var.jfs_minio_secret_access_key
+            retention                = "2m"
+            retention-check-interval = "2m"
+            sync-interval            = "500ms"
+            snapshot-interval        = "1h"
           },
         ]
       },
     ]
+  }
+  sqlite_path = local.jfs_metadata_path
+
+  ## jfs settings
+  jfs_image                   = var.images.juicefs
+  jfs_mount_path              = dirname(local.code_home_path)
+  jfs_minio_resource          = "http://${var.jfs_minio_endpoint}/${var.jfs_minio_bucket}"
+  jfs_minio_access_key_id     = var.jfs_minio_access_key_id
+  jfs_minio_secret_access_key = var.jfs_minio_secret_access_key
+  ##
+
+  name     = var.name
+  app      = var.name
+  release  = var.release
+  affinity = var.affinity
+  annotations = {
+    "checksum/secret" = sha256(module.secret.manifest)
+  }
+  spec = {
     containers = [
       {
         name  = var.name
         image = var.images.code_server
-        env = concat([
-          {
-            name  = "USER"
-            value = var.user
-          },
-          {
-            name  = "HOME"
-            value = local.code_home_path
-          },
-          {
-            name  = "UID"
-            value = tostring(var.uid)
-          },
-          {
-            name  = "CODE_PORT"
-            value = tostring(var.ports.code_server)
-          },
-          {
-            name  = "JFS_RESOURCE_NAME"
-            value = var.name
-          },
-          {
-            name  = "JFS_MINIO_BUCKET"
-            value = "http://${var.jfs_minio_endpoint}/${var.jfs_minio_bucket}"
-          },
-          {
-            name  = "JFS_DB_PATH"
-            value = local.jfs_db_path
-          },
-          {
-            name  = "JFS_MINIO_ACCESS_KEY_ID"
-            value = var.jfs_minio_access_key_id
-          },
-          {
-            name  = "JFS_MINIO_SECRET_ACCESS_KEY"
-            value = var.jfs_minio_secret_access_key
-          },
-          ], [
+        args = [
+          "bash",
+          "-c",
+          <<-EOF
+          set -xe
+
+          mountpoint ${dirname(local.code_home_path)}
+
+          useradd ${var.user} -d ${local.code_home_path} -m -u ${var.uid}
+          usermod \
+            -G wheel \
+            --add-subuids 100000-165535 \
+            --add-subgids 100000-165535 \
+            ${var.user}
+
+          HOME=${local.code_home_path} \
+          exec s6-setuidgid ${var.user} \
+          code-server \
+            --auth=none \
+            --bind-addr=0.0.0.0:${var.ports.code_server}
+          EOF
+        ]
+        env = [
           for k, v in var.code_server_extra_envs :
           {
             name  = tostring(k)
             value = tostring(v)
           }
-        ])
+        ]
         volumeMounts = [
-          {
-            name      = "jfs-data"
-            mountPath = dirname(local.jfs_db_path)
-          },
           {
             name      = "secret"
             mountPath = "/etc/ssh/ssh_known_hosts"
@@ -188,34 +156,6 @@ module "statefulset" {
             containerPort = var.ports.code_server
           },
         ]
-        resources = merge({
-          limits = {
-            "github.com/fuse" = 1
-          }
-        }, var.code_server_resources)
-        securityContext = {
-          privileged = true
-        }
-      },
-      {
-        name  = "${var.name}-backup"
-        image = var.images.litestream
-        args = [
-          "replicate",
-          "-config",
-          local.litestream_config_path,
-        ]
-        volumeMounts = [
-          {
-            name      = "jfs-data"
-            mountPath = dirname(local.jfs_db_path)
-          },
-          {
-            name      = "secret"
-            mountPath = local.litestream_config_path
-            subPath   = basename(local.litestream_config_path)
-          },
-        ]
       },
     ]
     volumes = [
@@ -223,12 +163,6 @@ module "statefulset" {
         name = "secret"
         secret = {
           secretName = module.secret.name
-        }
-      },
-      {
-        name = "jfs-data"
-        emptyDir = {
-          medium = "Memory"
         }
       },
     ]

@@ -20,6 +20,7 @@ variable "images" {
   type = object({
     clickhouse = string
     litestream = string
+    juicefs    = string
   })
 }
 
