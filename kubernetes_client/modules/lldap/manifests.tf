@@ -31,8 +31,8 @@ module "metadata" {
     "templates/service.yaml"           = module.service.manifest
     "templates/ingress.yaml"           = module.ingress.manifest
     "templates/secret.yaml"            = module.secret.manifest
-    "templates/statefulset.yaml"       = module.litestream-statefulset.statefulset
-    "templates/secret-litestream.yaml" = module.litestream-statefulset.secret
+    "templates/statefulset.yaml"       = module.statefulset-litestream.statefulset
+    "templates/secret-litestream.yaml" = module.statefulset-litestream.secret
   }
 }
 
@@ -96,7 +96,7 @@ module "ingress" {
   ]
 }
 
-module "litestream-statefulset" {
+module "statefulset-litestream" {
   source = "../statefulset_litestream"
   ## litestream settings
   litestream_image = var.images.litestream
