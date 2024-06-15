@@ -21,6 +21,7 @@ variable "images" {
     transmission = string
     wireguard    = string
     litestream   = string
+    juicefs      = string
   })
 }
 

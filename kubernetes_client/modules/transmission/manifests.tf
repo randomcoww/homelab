@@ -1,7 +1,5 @@
 locals {
-  jfs_db_path            = "/var/lib/jfs/${var.name}.db"
-  transmission_home_path = "/var/lib/transmission"
-  transmission_conf_path = "/tmp/settings.json"
+  transmission_home_path = "/var/lib/transmission/mnt"
   transmission_settings = merge({
     script-torrent-done-filename = "/torrent-done.sh"
     rpc-port                     = 9091
@@ -31,7 +29,7 @@ locals {
       ]
     }
   }
-  litestream_config_path = "/etc/litestream.yml"
+  jfs_metadata_path = "/var/lib/jfs/${var.name}.db"
 }
 
 module "metadata" {
@@ -41,10 +39,11 @@ module "metadata" {
   release     = var.release
   app_version = split(":", var.images.transmission)[1]
   manifests = {
-    "templates/service.yaml"     = module.service.manifest
-    "templates/ingress.yaml"     = module.ingress.manifest
-    "templates/secret.yaml"      = module.secret.manifest
-    "templates/statefulset.yaml" = module.statefulset.manifest
+    "templates/service.yaml"           = module.service.manifest
+    "templates/ingress.yaml"           = module.ingress.manifest
+    "templates/secret.yaml"            = module.secret.manifest
+    "templates/statefulset.yaml"       = module.statefulset-jfs.statefulset
+    "templates/secret-litestream.yaml" = module.statefulset-jfs.secret
     "templates/post-job.yaml" = yamlencode({
       apiVersion = "batch/v1"
       kind       = "Job"
@@ -113,28 +112,7 @@ module "secret" {
   data = {
     "wg0.conf"                                                         = var.wireguard_config
     basename(local.transmission_settings.script-torrent-done-filename) = var.torrent_done_script
-    basename(local.transmission_conf_path)                             = jsonencode(local.transmission_settings)
-    basename(local.litestream_config_path) = yamlencode({
-      dbs = [
-        {
-          path = local.jfs_db_path
-          replicas = [
-            {
-              type                     = "s3"
-              bucket                   = var.jfs_minio_bucket
-              path                     = basename(local.jfs_db_path)
-              endpoint                 = "http://${var.jfs_minio_endpoint}"
-              access-key-id            = var.jfs_minio_access_key_id
-              secret-access-key        = var.jfs_minio_secret_access_key
-              retention                = "2m"
-              retention-check-interval = "2m"
-              sync-interval            = "500ms"
-              snapshot-interval        = "1h"
-            },
-          ]
-        },
-      ]
-    })
+    "settings.json"                                                    = jsonencode(local.transmission_settings)
   }
 }
 
@@ -177,13 +155,45 @@ module "ingress" {
   ]
 }
 
-module "statefulset" {
-  source   = "../statefulset"
+module "statefulset-jfs" {
+  source = "../statefulset_jfs"
+  ## litestream settings
+  litestream_image = var.images.litestream
+  litestream_config = {
+    dbs = [
+      {
+        path = local.jfs_metadata_path
+        replicas = [
+          {
+            type                     = "s3"
+            bucket                   = var.jfs_minio_bucket
+            path                     = basename(local.jfs_metadata_path)
+            endpoint                 = "http://${var.jfs_minio_endpoint}"
+            access-key-id            = var.jfs_minio_access_key_id
+            secret-access-key        = var.jfs_minio_secret_access_key
+            retention                = "2m"
+            retention-check-interval = "2m"
+            sync-interval            = "500ms"
+            snapshot-interval        = "1h"
+          },
+        ]
+      },
+    ]
+  }
+  sqlite_path = local.jfs_metadata_path
+
+  ## jfs settings
+  jfs_image                   = var.images.juicefs
+  jfs_mount_path              = local.transmission_home_path
+  jfs_minio_resource          = "http://${var.jfs_minio_endpoint}/${var.jfs_minio_bucket}"
+  jfs_minio_access_key_id     = var.jfs_minio_access_key_id
+  jfs_minio_secret_access_key = var.jfs_minio_secret_access_key
+  ##
+
   name     = var.name
   app      = var.name
   release  = var.release
   affinity = var.affinity
-  replicas = 1
   annotations = {
     "checksum/secret" = sha256(module.secret.manifest)
   }
@@ -207,81 +217,49 @@ module "statefulset" {
           },
         ]
       },
-      {
-        name  = "${var.name}-init"
-        image = var.images.litestream
-        args = [
-          "restore",
-          "-if-replica-exists",
-          "-config",
-          local.litestream_config_path,
-          local.jfs_db_path,
-        ]
-        volumeMounts = [
-          {
-            name      = "jfs-data"
-            mountPath = dirname(local.jfs_db_path)
-          },
-          {
-            name      = "secret"
-            mountPath = local.litestream_config_path
-            subPath   = basename(local.litestream_config_path)
-          },
-        ]
-      },
     ]
     containers = [
       {
         name  = var.name
         image = var.images.transmission
+        command = [
+          "sh",
+          "-c",
+          <<-EOF
+          set -e
+
+          mountpoint $HOME
+          echo -e "$TRANSMISSION_CONFIG" > $HOME/settings.json
+
+          exec transmission-daemon \
+            --foreground \
+            --config-dir $HOME
+          EOF
+        ]
         env = [
           {
             name  = "HOME"
             value = local.transmission_home_path
           },
           {
-            name  = "TRANSMISSION_CONF_PATH"
-            value = local.transmission_conf_path
-          },
-          {
             name  = "TR_RPC_PORT"
             value = tostring(local.transmission_settings.rpc-port)
           },
           {
-            name  = "JFS_RESOURCE_NAME"
-            value = var.name
-          },
-          {
-            name  = "JFS_MINIO_BUCKET"
-            value = "http://${var.jfs_minio_endpoint}/${var.jfs_minio_bucket}"
-          },
-          {
-            name  = "JFS_DB_PATH"
-            value = local.jfs_db_path
-          },
-          {
-            name  = "JFS_MINIO_ACCESS_KEY_ID"
-            value = var.jfs_minio_access_key_id
-          },
-          {
-            name  = "JFS_MINIO_SECRET_ACCESS_KEY"
-            value = var.jfs_minio_secret_access_key
-          },
+            name = "TRANSMISSION_CONFIG"
+            valueFrom = {
+              secretKeyRef = {
+                name = module.secret.name
+                key  = "settings.json"
+              }
+            }
+          }
         ]
         volumeMounts = [
           {
             name      = "secret"
-            mountPath = local.transmission_conf_path
-            subPath   = basename(local.transmission_conf_path)
-          },
-          {
-            name      = "secret"
             mountPath = local.transmission_settings.script-torrent-done-filename
             subPath   = basename(local.transmission_settings.script-torrent-done-filename)
-          },
-          {
-            name      = "jfs-data"
-            mountPath = dirname(local.jfs_db_path)
           },
         ]
         ports = [
@@ -289,38 +267,10 @@ module "statefulset" {
             containerPort = local.transmission_settings.rpc-port
           },
         ]
-        resources = merge({
-          limits = {
-            "github.com/fuse" = 1
-          }
-        }, var.resources)
+        # needed for bidirectional jfs mount
         securityContext = {
-          capabilities = {
-            add = [
-              "SYS_ADMIN",
-            ]
-          }
+          privileged = true
         }
-      },
-      {
-        name  = "${var.name}-backup"
-        image = var.images.litestream
-        args = [
-          "replicate",
-          "-config",
-          local.litestream_config_path,
-        ]
-        volumeMounts = [
-          {
-            name      = "jfs-data"
-            mountPath = dirname(local.jfs_db_path)
-          },
-          {
-            name      = "secret"
-            mountPath = local.litestream_config_path
-            subPath   = basename(local.litestream_config_path)
-          },
-        ]
       },
     ]
     volumes = [
@@ -329,12 +279,6 @@ module "statefulset" {
         secret = {
           secretName  = module.secret.name
           defaultMode = 493
-        }
-      },
-      {
-        name = "jfs-data"
-        emptyDir = {
-          medium = "Memory"
         }
       },
     ]

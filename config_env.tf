@@ -100,7 +100,7 @@ locals {
     kapprover          = "ghcr.io/randomcoww/kapprover:20240126"
     external_dns       = "registry.k8s.io/external-dns/external-dns:v0.14.2"
     kube_proxy         = "ghcr.io/randomcoww/kubernetes:kube-proxy-v${local.kubernetes.version}"
-    transmission       = "ghcr.io/randomcoww/transmission:20240608.1"
+    transmission       = "ghcr.io/randomcoww/transmission:20240615.1"
     wireguard          = "ghcr.io/randomcoww/wireguard:20240523"
     vaultwarden        = "docker.io/vaultwarden/server:1.30.5-alpine"
     litestream         = "docker.io/litestream/litestream:0.3"
@@ -112,6 +112,7 @@ locals {
     bsimp              = "ghcr.io/randomcoww/bsimp:20240523.2"
     keydb              = "docker.io/eqalpha/keydb:alpine_x86_64_v6.3.4"
     clickhouse         = "ghcr.io/randomcoww/clickhouse:24.4.2.141.4"
+    juicefs            = "docker.io/juicedata/mount:ce-v1.1.2"
   }
 
   pxeboot_images = {

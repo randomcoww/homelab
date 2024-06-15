@@ -588,6 +588,7 @@ module "transmission" {
     transmission = local.container_images.transmission
     wireguard    = local.container_images.wireguard
     litestream   = local.container_images.litestream
+    juicefs      = local.container_images.juicefs
   }
   transmission_settings = {
     blocklist-enabled            = true

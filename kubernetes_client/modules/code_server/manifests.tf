@@ -196,7 +196,6 @@ module "statefulset" {
         securityContext = {
           privileged = true
         }
-
       },
       {
         name  = "${var.name}-backup"
