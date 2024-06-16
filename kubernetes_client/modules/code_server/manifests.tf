@@ -55,6 +55,7 @@ module "secret" {
     pull_options = {enable_partial_images = "true", use_hard_links = "false", ostree_repos = ""}
 
     [storage.options.overlay]
+    ignore_chown_errors = "true"
     mountopt = "nodev,fsync=0"
     EOF
   }
