@@ -48,6 +48,7 @@ module "secret" {
     driver = "overlay"
     runroot = "/run/containers/storage"
     graphroot = "/var/lib/containers/storage"
+    rootless_storage_path = "/tmp/containers-user-$UID/storage"
 
     [storage.options]
     additionalimagestores = [
@@ -56,7 +57,6 @@ module "secret" {
     pull_options = {enable_partial_images = "true", use_hard_links = "false", ostree_repos=""}
 
     [storage.options.overlay]
-    ignore_chown_errors = "true"
     mountopt = "nodev,fsync=0"
     EOF
   }
