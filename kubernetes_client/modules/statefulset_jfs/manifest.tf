@@ -19,6 +19,7 @@ module "statefulset" {
       {
         name  = "${var.name}-jfs-format"
         image = var.jfs_image
+        # Add --enable-acl=true in 1.2+
         command = [
           "sh",
           "-c",
@@ -26,10 +27,11 @@ module "statefulset" {
           set -e
 
           exec juicefs format \
+            sqlite3://${var.sqlite_path} \
+            ${var.name} \
             --storage minio \
             --bucket ${var.jfs_minio_resource} \
-            sqlite3://${var.sqlite_path} \
-            ${var.name}
+            --trash-days 0
           EOF
         ]
         env = [
@@ -57,11 +59,14 @@ module "statefulset" {
             ${var.jfs_mount_path}
 
           exec juicefs mount \
+            sqlite3://${var.sqlite_path} \
+            ${var.jfs_mount_path} \
             --storage minio \
             --bucket ${var.jfs_minio_resource} \
-            -o writeback_cache \
-            sqlite3://${var.sqlite_path} \
-            ${var.jfs_mount_path}
+            --no-syslog \
+            --enable-xattr \
+            --enable-ioctl \
+            --backup-meta 0
           EOF
         ]
         volumeMounts = [
