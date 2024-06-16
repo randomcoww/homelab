@@ -237,6 +237,7 @@ module "statefulset-jfs" {
           EOF
         ]
         env = [
+          # default transmission paths go under $HOME
           {
             name  = "HOME"
             value = local.transmission_home_path
