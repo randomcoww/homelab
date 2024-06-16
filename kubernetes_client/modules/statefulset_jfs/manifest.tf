@@ -19,7 +19,6 @@ module "statefulset" {
       {
         name  = "${var.name}-jfs-format"
         image = var.jfs_image
-        # Add --enable-acl=true in 1.2+
         command = [
           "sh",
           "-c",
@@ -66,8 +65,6 @@ module "statefulset" {
             --no-syslog \
             --atime-mode noatime \
             --backup-meta 0 \
-            --enable-xattr \
-            --enable-ioctl \
             -o allow_other,writeback_cache,noatime
           EOF
         ]
