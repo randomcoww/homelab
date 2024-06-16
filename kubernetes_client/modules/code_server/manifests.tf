@@ -51,10 +51,8 @@ module "secret" {
     rootless_storage_path = "/tmp/containers-user-$UID/storage"
 
     [storage.options]
-    additionalimagestores = [
-    ]
-
-    pull_options = {enable_partial_images = "true", use_hard_links = "false", ostree_repos=""}
+    additionalimagestores = []
+    pull_options = {enable_partial_images = "true", use_hard_links = "false", ostree_repos = ""}
 
     [storage.options.overlay]
     mountopt = "nodev,fsync=0"
