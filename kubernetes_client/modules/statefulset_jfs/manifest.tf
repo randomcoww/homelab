@@ -64,9 +64,11 @@ module "statefulset" {
             --storage minio \
             --bucket ${var.jfs_minio_resource} \
             --no-syslog \
+            --atime-mode noatime \
+            --backup-meta 0 \
             --enable-xattr \
             --enable-ioctl \
-            --backup-meta 0
+            -o allow_other,writeback_cache,noatime
           EOF
         ]
         volumeMounts = [
