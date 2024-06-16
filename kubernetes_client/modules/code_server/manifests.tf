@@ -24,7 +24,41 @@ module "secret" {
   app     = var.name
   release = var.release
   data = {
-    ssh_known_hosts = join("\n", var.ssh_known_hosts)
+    ssh_known_hosts            = join("\n", var.ssh_known_hosts)
+    "containers-override.conf" = <<-EOF
+    [containers]
+    userns = "host"
+    ipcns = "host"
+    cgroupns = "host"
+    cgroups = "disabled"
+    log_driver = "k8s-file"
+    volumes = [
+      "/proc:/proc",
+    ]
+    default_sysctls = []
+
+    [engine]
+    cgroup_manager = "cgroupfs"
+    events_logger = "none"
+    runtime = "crun"
+    EOF
+
+    "storage.conf" = <<-EOF
+    [storage]
+    driver = "overlay"
+    runroot = "/run/containers/storage"
+    graphroot = "/var/lib/containers/storage"
+
+    [storage.options]
+    additionalimagestores = [
+    ]
+
+    pull_options = {enable_partial_images = "true", use_hard_links = "false", ostree_repos=""}
+
+    [storage.options.overlay]
+    ignore_chown_errors = "true"
+    mountopt = "nodev,fsync=0"
+    EOF
   }
 }
 
@@ -148,7 +182,16 @@ module "statefulset-jfs" {
             name      = "secret"
             mountPath = "/etc/ssh/ssh_known_hosts"
             subPath   = "ssh_known_hosts"
-            readOnly  = true
+          },
+          {
+            name      = "secret"
+            mountPath = "/etc/containers/containers.conf.d/10-pinp.conf"
+            subPath   = "containers-override.conf"
+          },
+          {
+            name      = "secret"
+            mountPath = "/etc/containers/storage.conf"
+            subPath   = "storage.conf"
           },
         ]
         ports = [
