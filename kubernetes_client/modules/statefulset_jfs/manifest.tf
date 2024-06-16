@@ -65,6 +65,7 @@ module "statefulset" {
             --no-syslog \
             --atime-mode noatime \
             --backup-meta 0 \
+            --no-usage-report true \
             -o allow_other,writeback_cache,noatime
           EOF
         ]
