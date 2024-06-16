@@ -53,18 +53,6 @@ storage:
         inline: |
           [Login]
           InhibitDelayMaxSec=${graceful_shutdown_delay}
-    # mayastor hugepages #
-    # - path: /etc/sysctl.d/20-hugepages.conf
-    #   mode: 0644
-    #   contents:
-    #     inline: |
-    #       vm.nr_hugepages=1024
-    # mayastor #
-    # - path: /etc/modules-load.d/20-mayastor.conf
-    #   mode: 0644
-    #   contents:
-    #     inline: |
-    #       nvme_tcp
     # kube-proxy #
     - path: /etc/modules-load.d/20-kube-proxy.conf
       mode: 0644
@@ -100,10 +88,3 @@ storage:
 
           [crio.tracing]
           enable_tracing=false
-    - path: /etc/containers/storage.conf.d/10-root.conf
-      mode: 0644
-      contents:
-        inline: |
-          [storage]
-          graphroot="${container_storage_path}"
-
