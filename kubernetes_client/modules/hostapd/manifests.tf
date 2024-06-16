@@ -111,7 +111,6 @@ module "statefulset" {
             name        = "hostapd-config"
             mountPath   = local.config_path
             subPathExpr = "hostapd-$(POD_NAME)"
-            readOnly    = true
           },
           {
             name      = "rfkill"

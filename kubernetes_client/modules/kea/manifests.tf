@@ -233,7 +233,6 @@ module "statefulset" {
             name        = "kea-config"
             mountPath   = "/etc/kea/kea-ctrl-agent.tpl"
             subPathExpr = "kea-ctrl-agent-$(POD_NAME)"
-            readOnly    = true
           },
         ]
       },
@@ -283,7 +282,6 @@ module "statefulset" {
             name        = "kea-config"
             mountPath   = "/etc/kea/kea-dhcp4.tpl"
             subPathExpr = "kea-dhcp4-$(POD_NAME)"
-            readOnly    = true
           },
         ]
       },
