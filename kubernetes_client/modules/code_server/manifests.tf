@@ -24,8 +24,8 @@ module "secret" {
   app     = var.name
   release = var.release
   data = {
-    for _, config in var.code_server_extra_configs :
-    basename(config.path) => config.content
+    for i, config in var.code_server_extra_configs :
+    "${i}-${basename(config.path)}" => config.content
   }
 }
 
@@ -153,11 +153,11 @@ module "statefulset-jfs" {
           }
         ]
         volumeMounts = [
-          for _, config in var.code_server_extra_configs :
+          for i, config in var.code_server_extra_configs :
           {
             name      = "config"
             mountPath = config.path
-            subPath   = basename(config.path)
+            subPath   = "${i}-${basename(config.path)}"
           }
         ]
         ports = [
