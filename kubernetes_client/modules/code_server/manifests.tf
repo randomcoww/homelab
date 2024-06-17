@@ -161,6 +161,7 @@ module "statefulset-jfs" {
             containerPort = var.ports.code_server
           },
         ]
+        resources = var.code_server_resources
       },
     ]
     volumes = [

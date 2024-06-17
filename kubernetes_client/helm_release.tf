@@ -4,6 +4,7 @@ locals {
     module.hostapd,
     module.tailscale,
     module.jupyter,
+    module.code,
     module.vaultwarden,
     module.authelia-redis,
     module.authelia,
