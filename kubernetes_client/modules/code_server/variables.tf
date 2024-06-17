@@ -33,12 +33,22 @@ variable "uid" {
   type = number
 }
 
-variable "config_files" {
+variable "code_server_extra_configs" {
   type = list(object({
     path    = string
     content = string
   }))
   default = []
+}
+
+variable "code_server_extra_envs" {
+  type    = map(any)
+  default = {}
+}
+
+variable "code_server_resources" {
+  type    = any
+  default = {}
 }
 
 variable "jfs_minio_endpoint" {
@@ -55,16 +65,6 @@ variable "jfs_minio_access_key_id" {
 
 variable "jfs_minio_secret_access_key" {
   type = string
-}
-
-variable "code_server_extra_envs" {
-  type    = map(any)
-  default = {}
-}
-
-variable "code_server_resources" {
-  type    = any
-  default = {}
 }
 
 variable "affinity" {

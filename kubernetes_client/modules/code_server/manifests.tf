@@ -24,7 +24,7 @@ module "secret" {
   app     = var.name
   release = var.release
   data = {
-    for _, config in var.config_files :
+    for _, config in var.code_server_extra_configs :
     basename(config.path) => config.content
   }
 }
@@ -131,6 +131,9 @@ module "statefulset-jfs" {
             ${var.user}
 
           HOME=${local.code_home_path} \
+          %{~for k, v in var.code_server_extra_envs~}
+          ${k}=${v} \
+          %{~endfor~}
           exec s6-setuidgid ${var.user} \
           code-server \
             --auth=none \
@@ -146,7 +149,7 @@ module "statefulset-jfs" {
           }
         ]
         volumeMounts = [
-          for _, config in var.config_files :
+          for _, config in var.code_server_extra_configs :
           {
             name      = "config"
             mountPath = config.path

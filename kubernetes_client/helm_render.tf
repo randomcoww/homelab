@@ -559,8 +559,12 @@ module "jupyter" {
   ports = {
     code_server = 8080
   }
-  user = local.users.client.name
-  uid  = local.users.client.uid
+  user                      = local.users.client.name
+  uid                       = local.users.client.uid
+  code_server_extra_configs = []
+  code_server_extra_envs = {
+    MC_HOST_m = "http://${data.terraform_remote_state.sr.outputs.minio.access_key_id}:${data.terraform_remote_state.sr.outputs.minio.secret_access_key}@${local.kubernetes_services.minio.fqdn}:${local.service_ports.minio}"
+  }
   code_server_resources = {
     limits = {
       "nvidia.com/gpu" = 1
