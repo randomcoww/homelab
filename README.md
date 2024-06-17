@@ -325,7 +325,8 @@ brew install --cask \
   moonlight \
   tailscale \
   visual-studio-code \
-  scroll-reverser
+  scroll-reverser \
+  phoenix-slides
 ```
 
 ```bash
