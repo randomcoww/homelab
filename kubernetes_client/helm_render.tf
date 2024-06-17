@@ -614,7 +614,8 @@ module "code" {
       events_logger = "none"
       runtime = "crun"
       EOF
-
+    },
+    {
       path    = "/etc/containers/storage.conf"
       content = <<-EOF
       [storage]
@@ -631,16 +632,23 @@ module "code" {
       ignore_chown_errors = "true"
       mountopt = "nodev,fsync=0"
       EOF
-
+    },
+    {
       path    = "/etc/ssh/ssh_known_hosts"
       content = <<-EOF
       @cert-authority * ${data.terraform_remote_state.sr.outputs.ssh.ca.public_key_openssh}
       EOF
-    }
+    },
   ]
   code_server_extra_envs = {
     MC_HOST_m = "http://${data.terraform_remote_state.sr.outputs.minio.access_key_id}:${data.terraform_remote_state.sr.outputs.minio.secret_access_key}@${local.kubernetes_services.minio.fqdn}:${local.service_ports.minio}"
   }
+  code_server_resources = {
+    limits = {
+      "github.com/fuse" = 1
+    }
+  }
+
   jfs_minio_access_key_id     = data.terraform_remote_state.sr.outputs.minio.access_key_id
   jfs_minio_secret_access_key = data.terraform_remote_state.sr.outputs.minio.secret_access_key
   jfs_minio_bucket            = local.minio_buckets.juicefs.name
