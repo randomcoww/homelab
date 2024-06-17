@@ -24,40 +24,8 @@ module "secret" {
   app     = var.name
   release = var.release
   data = {
-    ssh_known_hosts            = join("\n", var.ssh_known_hosts)
-    "containers-override.conf" = <<-EOF
-    [containers]
-    userns = "host"
-    ipcns = "host"
-    cgroupns = "host"
-    cgroups = "disabled"
-    log_driver = "k8s-file"
-    volumes = [
-      "/proc:/proc",
-    ]
-    default_sysctls = []
-
-    [engine]
-    cgroup_manager = "cgroupfs"
-    events_logger = "none"
-    runtime = "crun"
-    EOF
-
-    "storage.conf" = <<-EOF
-    [storage]
-    driver = "overlay"
-    runroot = "/run/containers/storage"
-    graphroot = "/var/lib/containers/storage"
-    rootless_storage_path = "/tmp/containers-user-$UID/storage"
-
-    [storage.options]
-    additionalimagestores = []
-    pull_options = {enable_partial_images = "true", use_hard_links = "false", ostree_repos = ""}
-
-    [storage.options.overlay]
-    ignore_chown_errors = "true"
-    mountopt = "nodev,fsync=0"
-    EOF
+    for _, config in var.config_files :
+    basename(config.path) => config.content
   }
 }
 
@@ -166,6 +134,7 @@ module "statefulset-jfs" {
           exec s6-setuidgid ${var.user} \
           code-server \
             --auth=none \
+            --disable-telemetry \
             --bind-addr=0.0.0.0:${var.ports.code_server}
           EOF
         ]
@@ -177,21 +146,12 @@ module "statefulset-jfs" {
           }
         ]
         volumeMounts = [
+          for _, config in var.config_files :
           {
-            name      = "secret"
-            mountPath = "/etc/ssh/ssh_known_hosts"
-            subPath   = "ssh_known_hosts"
-          },
-          {
-            name      = "secret"
-            mountPath = "/etc/containers/containers.conf.d/10-pinp.conf"
-            subPath   = "containers-override.conf"
-          },
-          {
-            name      = "secret"
-            mountPath = "/etc/containers/storage.conf"
-            subPath   = "storage.conf"
-          },
+            name      = "config"
+            mountPath = config.path
+            subPath   = basename(config.path)
+          }
         ]
         ports = [
           {
@@ -202,7 +162,7 @@ module "statefulset-jfs" {
     ]
     volumes = [
       {
-        name = "secret"
+        name = "config"
         secret = {
           secretName = module.secret.name
         }

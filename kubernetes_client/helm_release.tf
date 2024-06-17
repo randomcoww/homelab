@@ -3,7 +3,7 @@ locals {
     module.transmission,
     module.hostapd,
     module.tailscale,
-    module.code,
+    module.jupyter,
     module.vaultwarden,
     module.authelia-redis,
     module.authelia,

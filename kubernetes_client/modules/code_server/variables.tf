@@ -25,11 +25,6 @@ variable "ports" {
   })
 }
 
-variable "affinity" {
-  type    = any
-  default = {}
-}
-
 variable "user" {
   type = string
 }
@@ -38,8 +33,11 @@ variable "uid" {
   type = number
 }
 
-variable "ssh_known_hosts" {
-  type    = list(string)
+variable "config_files" {
+  type = list(object({
+    path    = string
+    content = string
+  }))
   default = []
 }
 
@@ -65,6 +63,11 @@ variable "code_server_extra_envs" {
 }
 
 variable "code_server_resources" {
+  type    = any
+  default = {}
+}
+
+variable "affinity" {
   type    = any
   default = {}
 }

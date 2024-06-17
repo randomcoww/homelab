@@ -547,12 +547,12 @@ module "tailscale" {
   ssm_tailscale_resource = data.terraform_remote_state.sr.outputs.ssm.tailscale.resource
 }
 
-module "code" {
+module "jupyter" {
   source  = "./modules/code_server"
-  name    = "code"
+  name    = "jupyter"
   release = "0.1.1"
   images = {
-    code_server = local.container_images.code_server
+    code_server = local.container_images.jupyter
     litestream  = local.container_images.litestream
     juicefs     = local.container_images.juicefs
   }
@@ -561,22 +561,17 @@ module "code" {
   }
   user = local.users.client.name
   uid  = local.users.client.uid
-  ssh_known_hosts = [
-    "@cert-authority * ${data.terraform_remote_state.sr.outputs.ssh.ca.public_key_openssh}",
-  ]
   code_server_resources = {
     limits = {
-      "github.com/fuse" = 1
-      "nvidia.com/gpu"  = 1
+      "nvidia.com/gpu" = 1
     }
   }
-
   jfs_minio_access_key_id     = data.terraform_remote_state.sr.outputs.minio.access_key_id
   jfs_minio_secret_access_key = data.terraform_remote_state.sr.outputs.minio.secret_access_key
   jfs_minio_bucket            = local.minio_buckets.juicefs.name
   jfs_minio_endpoint          = "${local.kubernetes_services.minio.fqdn}:${local.service_ports.minio}"
 
-  service_hostname          = local.kubernetes_ingress_endpoints.code_server
+  service_hostname          = local.kubernetes_ingress_endpoints.jupyter
   ingress_class_name        = local.ingress_classes.ingress_nginx
   nginx_ingress_annotations = local.nginx_ingress_auth_annotations
 }
