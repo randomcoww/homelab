@@ -161,14 +161,8 @@ module "statefulset-jfs" {
             containerPort = var.ports.code_server
           },
         ]
-        securityContext = {
-          capabilities = {
-            add = [
-              "AUDIT_WRITE",
-            ]
-          }
-        }
-        resources = var.code_server_resources
+        securityContext = var.code_server_security_context
+        resources       = var.code_server_resources
       },
     ]
     volumes = [

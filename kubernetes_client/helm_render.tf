@@ -570,6 +570,14 @@ module "jupyter" {
       "nvidia.com/gpu" = 1
     }
   }
+  code_server_security_context = {
+    capabilities = {
+      add = [
+        "AUDIT_WRITE",
+      ]
+    }
+  }
+
   jfs_minio_access_key_id     = data.terraform_remote_state.sr.outputs.minio.access_key_id
   jfs_minio_secret_access_key = data.terraform_remote_state.sr.outputs.minio.secret_access_key
   jfs_minio_bucket            = local.minio_buckets.juicefs.name
@@ -646,6 +654,13 @@ module "code" {
   code_server_resources = {
     limits = {
       "github.com/fuse" = 1
+    }
+  }
+  code_server_security_context = {
+    capabilities = {
+      add = [
+        "AUDIT_WRITE",
+      ]
     }
   }
 

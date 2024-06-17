@@ -51,6 +51,11 @@ variable "code_server_resources" {
   default = {}
 }
 
+variable "code_server_security_context" {
+  type    = any
+  default = {}
+}
+
 variable "jfs_minio_endpoint" {
   type = string
 }
