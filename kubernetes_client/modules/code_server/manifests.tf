@@ -130,7 +130,11 @@ module "statefulset-jfs" {
             --add-subgids 100000-165535 \
             ${var.user}
 
+          mkdir -p /run/user/${var.uid}
+          chown ${var.user}:${var.user} /run/user/${var.uid}
+
           HOME=${local.code_home_path} \
+          XDG_RUNTIME_DIR=/run/user/${var.uid} \
           %{~for k, v in var.code_server_extra_envs~}
           ${k}=${v} \
           %{~endfor~}
