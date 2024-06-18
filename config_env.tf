@@ -94,7 +94,6 @@ locals {
     tftpd              = "ghcr.io/randomcoww/tftpd-ipxe:20240104.0"
     hostapd            = "ghcr.io/randomcoww/hostapd:2.10-2"
     syncthing          = "docker.io/syncthing/syncthing:1.27"
-    rclone             = "docker.io/rclone/rclone:1.66"
     flannel            = "docker.io/flannel/flannel:v0.25.2"
     flannel_cni_plugin = "docker.io/flannel/flannel-cni-plugin:v1.4.1-flannel1"
     kapprover          = "ghcr.io/randomcoww/kapprover:20240126"
