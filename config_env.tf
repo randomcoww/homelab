@@ -106,8 +106,8 @@ locals {
     litestream         = "docker.io/litestream/litestream:0.3"
     tailscale          = "ghcr.io/randomcoww/tailscale:1.66.4"
     fuse_device_plugin = "docker.io/soolaugust/fuse-device-plugin:v1.0"
-    jupyter            = "ghcr.io/randomcoww/code-server:20240617.2-tensorflow"
-    code               = "ghcr.io/randomcoww/code-server:20240617.2-podman"
+    jupyter            = "ghcr.io/randomcoww/code-server:tensorflow-20240618.4"
+    code               = "ghcr.io/randomcoww/code-server:podman-20240617.2"
     alpaca_stream      = "ghcr.io/randomcoww/alpaca-client:stream-server-20240404.20"
     lldap              = "docker.io/lldap/lldap:2024-05-06"
     bsimp              = "ghcr.io/randomcoww/bsimp:20240523.2"
@@ -252,7 +252,7 @@ locals {
     }
     downloads = {
       name   = "downloads"
-      policy = "public"
+      policy = "none"
     }
     pictures = {
       name   = "pictures"
