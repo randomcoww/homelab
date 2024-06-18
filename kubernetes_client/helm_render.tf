@@ -154,7 +154,7 @@ module "vaultwarden" {
     vaultwarden = 8080
   }
   service_hostname = local.kubernetes_ingress_endpoints.vaultwarden
-  extra_envs = {
+  extra_configs = {
     SENDS_ALLOWED            = false
     EMERGENCY_ACCESS_ALLOWED = false
     PASSWORD_HINTS_ALLOWED   = false
@@ -374,7 +374,7 @@ module "lldap" {
   cluster_service_endpoint = local.kubernetes_services.lldap.fqdn
   service_hostname         = local.kubernetes_ingress_endpoints.lldap_http
   storage_secret           = data.terraform_remote_state.sr.outputs.lldap.storage_secret
-  extra_envs = {
+  extra_configs = {
     LLDAP_VERBOSE                             = true
     LLDAP_JWT_SECRET                          = data.terraform_remote_state.sr.outputs.lldap.jwt_token
     LLDAP_LDAP_USER_DN                        = data.terraform_remote_state.sr.outputs.lldap.user
@@ -528,19 +528,30 @@ module "tailscale" {
   }
 
   tailscale_auth_key = var.tailscale.auth_key
-  tailscale_extra_envs = {
-    TS_ACCEPT_DNS          = false
-    TS_DEBUG_FIREWALL_MODE = "nftables"
-    TS_EXTRA_ARGS = join(",", [
-      "--advertise-exit-node",
-    ])
-    TS_ROUTES = join(",", [
-      local.networks.lan.prefix,
-      local.networks.service.prefix,
-      local.networks.kubernetes.prefix,
-    ])
-  }
-
+  tailscale_extra_envs = [
+    {
+      name  = "TS_ACCEPT_DNS"
+      value = false
+    },
+    {
+      name  = "TS_DEBUG_FIREWALL_MODE"
+      value = "nftables"
+    },
+    {
+      name = "TS_EXTRA_ARGS"
+      value = join(",", [
+        "--advertise-exit-node",
+      ])
+    },
+    {
+      name = "TS_ROUTES"
+      value = join(",", [
+        local.networks.lan.prefix,
+        local.networks.service.prefix,
+        local.networks.kubernetes.prefix,
+      ])
+    },
+  ]
   aws_region             = data.terraform_remote_state.sr.outputs.ssm.tailscale.aws_region
   ssm_access_key_id      = data.terraform_remote_state.sr.outputs.ssm.tailscale.access_key_id
   ssm_secret_access_key  = data.terraform_remote_state.sr.outputs.ssm.tailscale.secret_access_key
@@ -562,9 +573,12 @@ module "jupyter" {
   user                      = local.users.client.name
   uid                       = local.users.client.uid
   code_server_extra_configs = []
-  code_server_extra_envs = {
-    MC_HOST_m = "http://${data.terraform_remote_state.sr.outputs.minio.access_key_id}:${data.terraform_remote_state.sr.outputs.minio.secret_access_key}@${local.kubernetes_services.minio.fqdn}:${local.service_ports.minio}"
-  }
+  code_server_extra_envs = [
+    {
+      name  = "MC_HOST_m"
+      value = "http://${data.terraform_remote_state.sr.outputs.minio.access_key_id}:${data.terraform_remote_state.sr.outputs.minio.secret_access_key}@${local.kubernetes_services.minio.fqdn}:${local.service_ports.minio}"
+    },
+  ]
   code_server_resources = {
     limits = {
       "nvidia.com/gpu" = 1
@@ -648,9 +662,12 @@ module "code" {
       EOF
     },
   ]
-  code_server_extra_envs = {
-    MC_HOST_m = "http://${data.terraform_remote_state.sr.outputs.minio.access_key_id}:${data.terraform_remote_state.sr.outputs.minio.secret_access_key}@${local.kubernetes_services.minio.fqdn}:${local.service_ports.minio}"
-  }
+  code_server_extra_envs = [
+    {
+      name  = "MC_HOST_m"
+      value = "http://${data.terraform_remote_state.sr.outputs.minio.access_key_id}:${data.terraform_remote_state.sr.outputs.minio.secret_access_key}@${local.kubernetes_services.minio.fqdn}:${local.service_ports.minio}"
+    },
+  ]
   code_server_resources = {
     limits = {
       "github.com/fuse" = 1
@@ -707,6 +724,12 @@ module "transmission" {
     trash-original-torrent-files = true
     incomplete-dir-enabled       = false
   }
+  transmission_extra_envs = [
+    {
+      name  = "MC_HOST_m"
+      value = "http://${data.terraform_remote_state.sr.outputs.minio.access_key_id}:${data.terraform_remote_state.sr.outputs.minio.secret_access_key}@${local.kubernetes_services.minio.endpoint}:${local.service_ports.minio}"
+    },
+  ]
   torrent_done_script         = <<-EOF
   #!/bin/sh
   set -xe
@@ -723,10 +746,9 @@ module "transmission" {
     --torrent "$TR_TORRENT_ID" \
     --verify
 
-  minio-client \
-    -endpoint="${local.kubernetes_services.minio.endpoint}:${local.service_ports.minio}" \
-    -bucket="${local.minio_buckets.downloads.name}" \
-    -path="$TR_TORRENT_NAME"
+  mcli cp -r -q --no-color \
+    "$TR_TORRENT_NAME" \
+    "m/${local.minio_buckets.downloads.name}/"
 
   transmission-remote $TR_RPC_PORT \
     --torrent "$TR_TORRENT_ID" \
