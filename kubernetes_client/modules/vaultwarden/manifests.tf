@@ -1,6 +1,6 @@
 locals {
   db_path = "/data/db.sqlite3"
-  extra_envs = merge(var.extra_envs, {
+  extra_envs = merge(var.extra_configs, {
     DATA_FOLDER  = dirname(local.db_path)
     DATABASE_URL = local.db_path
     ROCKET_PORT  = var.ports.vaultwarden

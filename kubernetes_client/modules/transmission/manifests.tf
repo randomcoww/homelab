@@ -236,7 +236,7 @@ module "statefulset-jfs" {
             --config-dir $HOME
           EOF
         ]
-        env = [
+        env = concat([
           # default transmission paths go under $HOME
           {
             name  = "HOME"
@@ -255,7 +255,13 @@ module "statefulset-jfs" {
               }
             }
           }
-        ]
+          ], [
+          for _, e in var.transmission_extra_envs :
+          {
+            name  = e.name
+            value = tostring(e.value)
+          }
+        ])
         volumeMounts = [
           {
             name      = "secret"

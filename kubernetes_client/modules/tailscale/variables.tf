@@ -23,8 +23,11 @@ variable "affinity" {
 }
 
 variable "tailscale_extra_envs" {
-  type    = map(any)
-  default = {}
+  type = list(object({
+    name  = string
+    value = any
+  }))
+  default = []
 }
 
 variable "tailscale_auth_key" {

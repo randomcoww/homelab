@@ -42,8 +42,11 @@ variable "code_server_extra_configs" {
 }
 
 variable "code_server_extra_envs" {
-  type    = map(any)
-  default = {}
+  type = list(object({
+    name  = string
+    value = any
+  }))
+  default = []
 }
 
 variable "code_server_resources" {

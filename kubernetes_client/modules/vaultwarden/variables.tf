@@ -33,7 +33,7 @@ variable "service_hostname" {
   type = string
 }
 
-variable "extra_envs" {
+variable "extra_configs" {
   type    = map(any)
   default = {}
 }

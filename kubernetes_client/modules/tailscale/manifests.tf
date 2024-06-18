@@ -101,10 +101,10 @@ module "statefulset" {
             }
           },
           ], [
-          for k, v in var.tailscale_extra_envs :
+          for _, e in var.tailscale_extra_envs :
           {
-            name  = tostring(k)
-            value = tostring(v)
+            name  = e.name
+            value = tostring(e.value)
           }
         ])
       },

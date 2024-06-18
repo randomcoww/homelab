@@ -135,8 +135,8 @@ module "statefulset-jfs" {
 
           HOME=${local.code_home_path} \
           XDG_RUNTIME_DIR=/run/user/${var.uid} \
-          %{~for k, v in var.code_server_extra_envs~}
-          ${k}=${v} \
+          %{~for _, e in var.code_server_extra_envs~}
+          ${e.name}=${tostring(e.value)} \
           %{~endfor~}
           exec s6-setuidgid ${var.user} \
           code-server \
@@ -146,10 +146,10 @@ module "statefulset-jfs" {
           EOF
         ]
         env = [
-          for k, v in var.code_server_extra_envs :
+          for _, e in var.code_server_extra_envs :
           {
-            name  = tostring(k)
-            value = tostring(v)
+            name  = e.name
+            value = tostring(e.value)
           }
         ]
         volumeMounts = [

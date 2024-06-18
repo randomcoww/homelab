@@ -51,7 +51,7 @@ variable "storage_secret" {
   type = string
 }
 
-variable "extra_envs" {
+variable "extra_configs" {
   type    = map(any)
   default = {}
 }

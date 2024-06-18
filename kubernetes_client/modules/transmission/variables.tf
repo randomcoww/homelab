@@ -53,6 +53,14 @@ variable "transmission_settings" {
   type = map(string)
 }
 
+variable "transmission_extra_envs" {
+  type = list(object({
+    name  = string
+    value = any
+  }))
+  default = []
+}
+
 variable "blocklist_update_schedule" {
   type    = string
   default = "0 0 * * *"

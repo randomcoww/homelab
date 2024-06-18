@@ -4,7 +4,7 @@ locals {
   storage_secret_path = "${local.base_path}/private_key"
   ldaps_cert_path     = "${local.base_path}/cert.pem"
   ldaps_key_path      = "${local.base_path}/key.pem"
-  extra_envs = merge(var.extra_envs, {
+  extra_envs = merge(var.extra_configs, {
     LLDAP_LDAP_PORT           = var.ports.lldap
     LLDAP_HTTP_PORT           = var.ports.lldap_http
     LLDAP_LDAPS_OPTIONS__PORT = var.ports.lldap_ldaps
