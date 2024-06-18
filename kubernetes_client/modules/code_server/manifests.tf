@@ -116,6 +116,7 @@ module "statefulset-jfs" {
         name  = var.name
         image = var.images.code_server
         args = [
+          "with-contenv",
           "bash",
           "-c",
           <<-EOF
@@ -130,14 +131,7 @@ module "statefulset-jfs" {
             --add-subgids 100000-165535 \
             ${var.user}
 
-          mkdir -p /run/user/${var.uid}
-          chown ${var.user}:${var.user} /run/user/${var.uid}
-
           HOME=${local.code_home_path} \
-          XDG_RUNTIME_DIR=/run/user/${var.uid} \
-          %{~for _, e in var.code_server_extra_envs~}
-          ${e.name}=${tostring(e.value)} \
-          %{~endfor~}
           exec s6-setuidgid ${var.user} \
           code-server \
             --auth=none \

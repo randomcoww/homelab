@@ -644,7 +644,7 @@ module "code" {
       driver = "overlay"
       runroot = "/run/containers/storage"
       graphroot = "/var/lib/containers/storage"
-      rootless_storage_path = "$XDG_RUNTIME_DIR/containers/storage"
+      rootless_storage_path = "/tmp/containers-user-$UID/storage"
 
       [storage.options]
       additionalimagestores = []
