@@ -17,19 +17,7 @@ resource "tailscale_acl" "cluster" {
 
 resource "tailscale_dns_nameservers" "cluster" {
   nameservers = [
-    local.services.external_dns.ip,
     local.upstream_dns.ip,
-  ]
-}
-
-resource "tailscale_dns_preferences" "cluster" {
-  magic_dns = true
-}
-
-resource "tailscale_dns_search_paths" "cluster" {
-  search_paths = [
-    local.domains.public,
-    local.domains.kubernetes,
   ]
 }
 
@@ -42,6 +30,17 @@ resource "tailscale_dns_split_nameservers" "cluster" {
   domain = each.key
   nameservers = [
     local.services.external_dns.ip,
+  ]
+}
+
+resource "tailscale_dns_preferences" "cluster" {
+  magic_dns = true
+}
+
+resource "tailscale_dns_search_paths" "cluster" {
+  search_paths = [
+    local.domains.public,
+    local.domains.kubernetes,
   ]
 }
 
