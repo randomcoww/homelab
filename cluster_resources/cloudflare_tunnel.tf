@@ -40,13 +40,13 @@ resource "random_id" "cloudflare_tunnel_secret" {
 resource "cloudflare_tunnel" "tunnel" {
   for_each   = local.cloudflare_tunnels
   name       = each.key
-  account_id = var.cloudflare_account_id
+  account_id = var.cloudflare.account_id
   secret     = random_id.cloudflare_tunnel_secret[each.key].b64_std
 }
 
 resource "cloudflare_tunnel_config" "tunnel" {
   for_each   = local.cloudflare_tunnels
-  account_id = var.cloudflare_account_id
+  account_id = var.cloudflare.account_id
   tunnel_id  = cloudflare_tunnel.tunnel[each.key].id
   config {
     ingress_rule {

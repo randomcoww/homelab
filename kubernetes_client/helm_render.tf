@@ -527,7 +527,7 @@ module "tailscale" {
     tailscale = local.container_images.tailscale
   }
 
-  tailscale_auth_key = var.tailscale.auth_key
+  tailscale_auth_key = data.terraform_remote_state.sr.outputs.tailscale_auth_key
   tailscale_extra_envs = [
     {
       name  = "TS_ACCEPT_DNS"

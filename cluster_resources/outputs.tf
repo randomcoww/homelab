@@ -33,9 +33,14 @@ output "cloudflare_tunnels" {
   value = {
     for tunnel in cloudflare_tunnel.tunnel :
     tunnel.name => merge(tunnel, {
-      account_id = var.cloudflare_account_id
+      account_id = var.cloudflare.account_id
     })
   }
+  sensitive = true
+}
+
+output "tailscale_auth_key" {
+  value     = tailscale_tailnet_key.auth.key
   sensitive = true
 }
 

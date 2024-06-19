@@ -25,18 +25,19 @@ tw() {
 Define secrets
 
 ```bash
-CLOUDFLARE_API_TOKEN=
-CLOUDFLARE_ACCOUNT_ID=
-LETSENCRYPT_USER=
-
 LINUX_PASSWORD_HASH=$(echo $PASSWORD | openssl passwd -6 -stdin)
-GMAIL_USER=
-GMAIL_PASSWORD=
 AP_PASSWORD=
 AP_SSID=
 AP_COUNTRY_CODE=
 AP_CHANNEL=
-TS_AUTH_KEY=
+
+LETSENCRYPT_USER=
+CLOUDFLARE_API_TOKEN=
+CLOUDFLARE_ACCOUNT_ID=
+GMAIL_USER=
+GMAIL_PASSWORD=
+TS_OAUTH_CLIENT_ID=
+TS_OAUTH_CLIENT_SECRET=
 
 WG_CLIENT_PRIVATE_KEY=
 WG_CLIENT_ADDRESS=
@@ -56,9 +57,17 @@ Create `cluster_resources/secrets.tfvars` file
 
 ```bash
 cat > cluster_resources/secrets.tfvars <<EOF
-cloudflare_api_token  = "$CLOUDFLARE_API_TOKEN"
-cloudflare_account_id = "$CLOUDFLARE_ACCOUNT_ID"
 letsencrypt_username  = "$LETSENCRYPT_USER"
+
+cloudflare = {
+  api_token  = "$CLOUDFLARE_API_TOKEN"
+  account_id = "$CLOUDFLARE_ACCOUNT_ID"
+}
+
+tailscale = {
+  oauth_client_id     = "$TS_OAUTH_CLIENT_ID"
+  oauth_client_secret = "$TS_OAUTH_CLIENT_SECRET"
+}
 EOF
 ```
 
@@ -71,10 +80,6 @@ users = {
   client = {
     password_hash = "$LINUX_PASSWORD_HASH"
   }
-}
-
-tailscale = {
-  auth_key = "$TS_AUTH_KEY"
 }
 EOF
 ```
@@ -124,10 +129,6 @@ wireguard_client = {
   public_key  = "$WG_TR_PUBLIC_KEY"
   address     = "$WG_TR_ADDRESS"
   endpoint    = "$WG_TR_ENDPOINT"
-}
-
-tailscale = {
-  auth_key = "$TS_AUTH_KEY"
 }
 
 alpaca = {
