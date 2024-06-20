@@ -1,12 +1,3 @@
-variable "authelia_users" {
-  type    = any
-  default = {}
-}
-
-variable "hostapd" {
-  type = map(string)
-}
-
 variable "smtp" {
   type = object({
     host     = string

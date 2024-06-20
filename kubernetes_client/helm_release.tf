@@ -1,3 +1,5 @@
+## Hack to release custom charts as local chart
+
 locals {
   modules_enabled = [
     module.transmission,
@@ -45,6 +47,8 @@ resource "helm_release" "wrapper" {
     kubernetes_labels.labels,
   ]
 }
+
+## Release for public charts
 
 resource "helm_release" "metrics-server" {
   name        = "metrics-server"
