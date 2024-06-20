@@ -109,7 +109,6 @@ locals {
     code               = "ghcr.io/randomcoww/code-server:podman-20240617.2"
     alpaca_stream      = "ghcr.io/randomcoww/alpaca-client:stream-server-20240404.20"
     lldap              = "docker.io/lldap/lldap:2024-05-06"
-    bsimp              = "ghcr.io/randomcoww/bsimp:20240523.2"
     keydb              = "docker.io/eqalpha/keydb:alpine_x86_64_v6.3.4"
     clickhouse         = "docker.io/clickhouse/clickhouse-server:24.4-alpine"
     juicefs            = "ghcr.io/randomcoww/juicefs:1.1.2"
@@ -160,7 +159,6 @@ locals {
       alpaca_stream = "alpaca-stream"
       alpaca_db     = "alpaca-db"
       lldap_http    = "ldap"
-      bsimp         = "bsimp"
       qrcode        = "qrcode"
       qrcode_wifi   = "wifi"
     } :
