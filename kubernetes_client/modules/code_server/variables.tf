@@ -19,12 +19,6 @@ variable "images" {
   })
 }
 
-variable "ports" {
-  type = object({
-    code_server = number
-  })
-}
-
 variable "user" {
   type = string
 }

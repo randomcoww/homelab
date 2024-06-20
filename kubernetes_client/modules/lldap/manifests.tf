@@ -1,13 +1,18 @@
 locals {
+  ports = merge(var.ports, {
+    lldap      = 3890
+    lldap_http = 17170
+  })
+
   db_path             = "/data/users.db"
   base_path           = "/var/lib/lldap"
   storage_secret_path = "${local.base_path}/private_key"
   ldaps_cert_path     = "${local.base_path}/cert.pem"
   ldaps_key_path      = "${local.base_path}/key.pem"
   extra_envs = merge(var.extra_configs, {
-    LLDAP_LDAP_PORT           = var.ports.lldap
-    LLDAP_HTTP_PORT           = var.ports.lldap_http
-    LLDAP_LDAPS_OPTIONS__PORT = var.ports.lldap_ldaps
+    LLDAP_LDAP_PORT           = local.ports.lldap
+    LLDAP_HTTP_PORT           = local.ports.lldap_http
+    LLDAP_LDAPS_OPTIONS__PORT = local.ports.lldap_ldaps
 
     LLDAP_DATABASE_URL             = "sqlite://${local.db_path}?mode=rwc"
     LLDAP_LDAPS_OPTIONS__CERT_FILE = local.ldaps_cert_path
@@ -61,15 +66,15 @@ module "service" {
     ports = [
       {
         name       = "ldaps"
-        port       = var.ports.lldap_ldaps
+        port       = local.ports.lldap_ldaps
         protocol   = "TCP"
-        targetPort = var.ports.lldap_ldaps
+        targetPort = local.ports.lldap_ldaps
       },
       {
         name       = "http"
-        port       = var.ports.lldap_http
+        port       = local.ports.lldap_http
         protocol   = "TCP"
-        targetPort = var.ports.lldap_http
+        targetPort = local.ports.lldap_http
       },
     ]
   }
@@ -88,7 +93,7 @@ module "ingress" {
       paths = [
         {
           service = module.service.name
-          port    = var.ports.lldap_http
+          port    = local.ports.lldap_http
           path    = "/"
         }
       ]

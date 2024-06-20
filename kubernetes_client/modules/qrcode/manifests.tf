@@ -1,3 +1,9 @@
+locals {
+  ports = {
+    qrcode = 80
+  }
+}
+
 module "metadata" {
   source      = "../metadata"
   name        = var.name
@@ -24,7 +30,7 @@ module "service" {
     ports = [
       {
         name = "qrcode"
-        port = var.ports.qrcode
+        port = local.ports.qrcode
       },
     ]
   }
@@ -43,7 +49,7 @@ module "ingress" {
       paths = [
         {
           service = module.service.name
-          port    = var.ports.qrcode
+          port    = local.ports.qrcode
           path    = "/"
         },
       ]
@@ -68,7 +74,7 @@ module "ingress-qrcodes" {
       paths = [
         {
           service = module.service.name
-          port    = var.ports.qrcode
+          port    = local.ports.qrcode
           path    = "/"
         },
       ]
@@ -90,7 +96,7 @@ module "deployment" {
         image = var.images.qrcode
         ports = [
           {
-            containerPort = var.ports.qrcode
+            containerPort = local.ports.qrcode
           },
         ]
       },

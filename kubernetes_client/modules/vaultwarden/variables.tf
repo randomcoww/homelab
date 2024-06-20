@@ -18,12 +18,6 @@ variable "images" {
   })
 }
 
-variable "ports" {
-  type = object({
-    vaultwarden = number
-  })
-}
-
 variable "affinity" {
   type    = any
   default = {}

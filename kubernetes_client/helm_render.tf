@@ -131,9 +131,8 @@ module "matchbox" {
     syncthing = local.container_images.syncthing
   }
   ports = {
-    matchbox       = local.service_ports.matchbox
-    matchbox_api   = local.service_ports.matchbox_api
-    syncthing_peer = 22000
+    matchbox     = local.service_ports.matchbox
+    matchbox_api = local.service_ports.matchbox_api
   }
   service_ip               = local.services.matchbox.ip
   service_hostname         = local.kubernetes_ingress_endpoints.matchbox
@@ -149,9 +148,6 @@ module "vaultwarden" {
   images = {
     vaultwarden = local.container_images.vaultwarden
     litestream  = local.container_images.litestream
-  }
-  ports = {
-    vaultwarden = 8080
   }
   service_hostname = local.kubernetes_ingress_endpoints.vaultwarden
   extra_configs = {
@@ -366,8 +362,6 @@ module "lldap" {
     litestream = local.container_images.litestream
   }
   ports = {
-    lldap       = 3890
-    lldap_http  = 17170
     lldap_ldaps = local.service_ports.lldap
   }
   ca                       = data.terraform_remote_state.sr.outputs.lldap.ca
@@ -473,9 +467,6 @@ module "qrcode" {
   release = "0.1.0"
   images = {
     qrcode = local.container_images.qrcode_generator
-  }
-  ports = {
-    qrcode = 80
   }
   service_hostname          = local.kubernetes_ingress_endpoints.qrcode
   ingress_class_name        = local.ingress_classes.ingress_nginx
@@ -592,9 +583,6 @@ module "jupyter" {
     litestream  = local.container_images.litestream
     juicefs     = local.container_images.juicefs
   }
-  ports = {
-    code_server = 8080
-  }
   user                      = local.users.client.name
   uid                       = local.users.client.uid
   code_server_extra_configs = []
@@ -635,9 +623,6 @@ module "code" {
     code_server = local.container_images.code
     litestream  = local.container_images.litestream
     juicefs     = local.container_images.juicefs
-  }
-  ports = {
-    code_server = 8080
   }
   user = local.users.client.name
   uid  = local.users.client.uid
@@ -874,26 +859,4 @@ module "alpaca-db" {
   service_hostname         = local.kubernetes_ingress_endpoints.alpaca_db
   service_ip               = local.services.alpaca_db.ip
   cluster_service_endpoint = local.kubernetes_services.alpaca_db.fqdn
-}
-
-# https://github.com/akrylysov/bsimp
-module "bsimp" {
-  source  = "./modules/bsimp"
-  name    = "bsimp"
-  release = "0.1.0"
-  images = {
-    bsimp = local.container_images.bsimp
-  }
-  ports = {
-    bsimp = 8080
-  }
-  # use external endpoint here - tries to hit this in https if the service is on https (bug?)
-  s3_endpoint          = "https://${local.kubernetes_ingress_endpoints.minio}"
-  s3_resource          = local.minio_buckets.music.name
-  s3_access_key_id     = data.terraform_remote_state.sr.outputs.minio.access_key_id
-  s3_secret_access_key = data.terraform_remote_state.sr.outputs.minio.secret_access_key
-
-  service_hostname          = local.kubernetes_ingress_endpoints.bsimp
-  ingress_class_name        = local.ingress_classes.ingress_nginx
-  nginx_ingress_annotations = local.nginx_ingress_auth_annotations
 }

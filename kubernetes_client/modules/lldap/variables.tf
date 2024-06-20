@@ -20,8 +20,6 @@ variable "images" {
 
 variable "ports" {
   type = object({
-    lldap       = number
-    lldap_http  = number
     lldap_ldaps = number
   })
 }

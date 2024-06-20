@@ -22,12 +22,6 @@ variable "replicas" {
   default = 1
 }
 
-variable "ports" {
-  type = object({
-    qrcode = number
-  })
-}
-
 variable "affinity" {
   type    = any
   default = {}

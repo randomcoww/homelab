@@ -17,7 +17,6 @@ locals {
     module.bootstrap,
     module.kube-proxy,
     module.lldap,
-    module.bsimp,
     module.alpaca-stream,
     module.alpaca-db,
     module.qrcode,

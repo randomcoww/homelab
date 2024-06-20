@@ -1,6 +1,9 @@
 locals {
   syncthing_home_path = "/var/lib/syncthing"
   shared_data_path    = "/var/tmp/matchbox"
+  ports = merge(var.ports, {
+    syncthing_peer = 22000
+  })
 }
 
 module "metadata" {
@@ -29,7 +32,7 @@ module "syncthing-config" {
     local.shared_data_path,
   ]
   ports = {
-    syncthing_peer = var.ports.syncthing_peer
+    syncthing_peer = local.ports.syncthing_peer
   }
 }
 
@@ -77,15 +80,15 @@ module "service" {
     ports = [
       {
         name       = "matchbox"
-        port       = var.ports.matchbox
+        port       = local.ports.matchbox
         protocol   = "TCP"
-        targetPort = var.ports.matchbox
+        targetPort = local.ports.matchbox
       },
       {
         name       = "matchbox-api"
-        port       = var.ports.matchbox_api
+        port       = local.ports.matchbox_api
         protocol   = "TCP"
-        targetPort = var.ports.matchbox_api
+        targetPort = local.ports.matchbox_api
       },
     ]
   }
@@ -121,8 +124,8 @@ module "statefulset" {
         name  = var.name
         image = var.images.matchbox
         args = [
-          "-address=0.0.0.0:${var.ports.matchbox}",
-          "-rpc-address=0.0.0.0:${var.ports.matchbox_api}",
+          "-address=0.0.0.0:${local.ports.matchbox}",
+          "-rpc-address=0.0.0.0:${local.ports.matchbox_api}",
           "-assets-path=${local.shared_data_path}",
           "-data-path=${local.shared_data_path}",
         ]
@@ -139,16 +142,16 @@ module "statefulset" {
         ports = [
           {
             name          = "matchbox"
-            containerPort = var.ports.matchbox
+            containerPort = local.ports.matchbox
           },
           {
             name          = "matchbox-api"
-            containerPort = var.ports.matchbox_api
+            containerPort = local.ports.matchbox_api
           },
         ]
         livenessProbe = {
           tcpSocket = {
-            port = var.ports.matchbox_api
+            port = local.ports.matchbox_api
           }
           initialDelaySeconds = 5
           periodSeconds       = 10
@@ -208,7 +211,7 @@ module "statefulset" {
         ports = [
           {
             name          = "syncthing-peer"
-            containerPort = var.ports.syncthing_peer
+            containerPort = local.ports.syncthing_peer
           },
         ]
       },

@@ -3,9 +3,12 @@ locals {
   extra_envs = merge(var.extra_configs, {
     DATA_FOLDER  = dirname(local.db_path)
     DATABASE_URL = local.db_path
-    ROCKET_PORT  = var.ports.vaultwarden
+    ROCKET_PORT  = local.ports.vaultwarden
     DOMAIN       = "https://${var.service_hostname}"
   })
+  ports = {
+    vaultwarden = 8080
+  }
 }
 
 module "metadata" {
@@ -46,9 +49,9 @@ module "service" {
     ports = [
       {
         name       = "vaultwarden"
-        port       = var.ports.vaultwarden
+        port       = local.ports.vaultwarden
         protocol   = "TCP"
-        targetPort = var.ports.vaultwarden
+        targetPort = local.ports.vaultwarden
       },
     ]
   }
@@ -67,7 +70,7 @@ module "ingress" {
       paths = [
         {
           service = module.service.name
-          port    = var.ports.vaultwarden
+          port    = local.ports.vaultwarden
           path    = "/"
         },
       ]
@@ -149,7 +152,7 @@ module "statefulset" {
         ]
         ports = [
           {
-            containerPort = var.ports.vaultwarden
+            containerPort = local.ports.vaultwarden
           },
         ]
       },

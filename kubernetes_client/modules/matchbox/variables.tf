@@ -30,9 +30,8 @@ variable "images" {
 
 variable "ports" {
   type = object({
-    matchbox       = number
-    matchbox_api   = number
-    syncthing_peer = number
+    matchbox     = number
+    matchbox_api = number
   })
 }
 

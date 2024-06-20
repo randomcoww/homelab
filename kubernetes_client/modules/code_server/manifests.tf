@@ -1,6 +1,9 @@
 locals {
   code_home_path    = "/mnt/home/${var.user}"
   jfs_metadata_path = "/var/lib/jfs/${var.name}.db"
+  ports = {
+    code_server = 8080
+  }
 }
 
 module "metadata" {
@@ -39,9 +42,9 @@ module "service" {
     ports = [
       {
         name       = "code-server"
-        port       = var.ports.code_server
+        port       = local.ports.code_server
         protocol   = "TCP"
-        targetPort = var.ports.code_server
+        targetPort = local.ports.code_server
       },
     ]
   }
@@ -60,7 +63,7 @@ module "ingress" {
       paths = [
         {
           service = module.service.name
-          port    = var.ports.code_server
+          port    = local.ports.code_server
           path    = "/"
         }
       ]
@@ -136,7 +139,7 @@ module "statefulset-jfs" {
           code-server \
             --auth=none \
             --disable-telemetry \
-            --bind-addr=0.0.0.0:${var.ports.code_server}
+            --bind-addr=0.0.0.0:${local.ports.code_server}
           EOF
         ]
         env = [
@@ -156,7 +159,7 @@ module "statefulset-jfs" {
         ]
         ports = [
           {
-            containerPort = var.ports.code_server
+            containerPort = local.ports.code_server
           },
         ]
         securityContext = var.code_server_security_context
