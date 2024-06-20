@@ -26,9 +26,6 @@ Define secrets
 
 ```bash
 LINUX_PASSWORD_HASH=$(echo $PASSWORD | openssl passwd -6 -stdin)
-AP_SSID=
-AP_COUNTRY_CODE=
-AP_CHANNEL=
 
 LETSENCRYPT_USER=
 CLOUDFLARE_API_TOKEN=
@@ -96,12 +93,6 @@ Create `kubernetes_client/secrets.tfvars` file
 
 ```bash
 cat > kubernetes_client/secrets.tfvars <<EOF
-hostapd = {
-  ssid         = "$AP_SSID"
-  country_code = "$AP_COUNTRY_CODE"
-  channel      = $AP_CHANNEL
-}
-
 smtp = {
   host     = "smtp.gmail.com"
   port     = 587
