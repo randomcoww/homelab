@@ -463,6 +463,27 @@ module "hostapd" {
   }, var.hostapd)
 }
 
+module "qrcode" {
+  source  = "./modules/qrcode"
+  name    = "qrcode"
+  release = "0.1.0"
+  images = {
+    qrcode = local.container_images.qrcode_generator
+  }
+  ports = {
+    qrcode = 80
+  }
+  service_hostname          = local.kubernetes_ingress_endpoints.qrcode
+  ingress_class_name        = local.ingress_classes.ingress_nginx
+  nginx_ingress_annotations = local.nginx_ingress_auth_annotations
+  qrcodes = {
+    wifi = {
+      service_hostname = local.kubernetes_ingress_endpoints.qrcode_wifi
+      code             = "WIFI:S:${var.hostapd.ssid};T:WPA;P:${var.hostapd.sae_password};H:false;;"
+    }
+  }
+}
+
 module "kea" {
   source  = "./modules/kea"
   name    = "kea"

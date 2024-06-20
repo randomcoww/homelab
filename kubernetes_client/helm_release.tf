@@ -20,6 +20,7 @@ locals {
     module.bsimp,
     module.alpaca-stream,
     module.alpaca-db,
+    module.qrcode,
   ]
 }
 
