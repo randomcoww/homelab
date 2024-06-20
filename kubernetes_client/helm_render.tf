@@ -394,6 +394,11 @@ module "lldap" {
   s3_secret_access_key      = data.terraform_remote_state.sr.outputs.s3.lldap.secret_access_key
 }
 
+resource "random_password" "hostapd-password" {
+  length  = 32
+  special = false
+}
+
 module "hostapd" {
   source   = "./modules/hostapd"
   name     = "hostapd"
@@ -420,13 +425,12 @@ module "hostapd" {
   }
   # https://w1.fi/cgit/hostap/plain/hostapd/hostapd.conf
   config = merge({
-    # sae_password=
-    # ssid=
-    # country_code=
-    # # one of: 36 44 52 60 100 108 116 124 132 140 149 157 184 192
-    # channel=
-    # # one of: 42 58 106 122 138 155
-    vht_oper_centr_freq_seg0_idx = var.hostapd.channel + 6
+    # ssid:
+    # country_code:
+    # channel: one of 36 44 52 60 100 108 116 124 132 140 149 157 184 192
+    vht_oper_centr_freq_seg0_idx = var.hostapd.channel + 6 # one of 42 58 106 122 138 155
+    ignore_broadcast_ssid        = 1
+    sae_password                 = random_password.hostapd-password.result
     interface                    = "wlan0"
     bridge                       = "br-lan"
     driver                       = "nl80211"
@@ -479,7 +483,7 @@ module "qrcode" {
   qrcodes = {
     wifi = {
       service_hostname = local.kubernetes_ingress_endpoints.qrcode_wifi
-      code             = "WIFI:S:${var.hostapd.ssid};T:WPA;P:${var.hostapd.sae_password};H:false;;"
+      code             = "WIFI:S:${var.hostapd.ssid};T:WPA;P:${random_password.hostapd-password.result};H:true;;"
     }
   }
 }
