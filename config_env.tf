@@ -113,7 +113,7 @@ locals {
     keydb              = "docker.io/eqalpha/keydb:alpine_x86_64_v6.3.4"
     clickhouse         = "docker.io/clickhouse/clickhouse-server:24.4-alpine"
     juicefs            = "ghcr.io/randomcoww/juicefs:1.1.2"
-    qrcode_generator   = "ghcr.io/randomcoww/qrcode-generator:20240620.2"
+    qrcode_generator   = "ghcr.io/randomcoww/qrcode-generator:20240620.4"
   }
 
   pxeboot_images = {
