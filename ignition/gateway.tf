@@ -43,17 +43,3 @@ module "upstream-dns" {
   ignition_version = local.ignition_version
   upstream_dns     = local.upstream_dns
 }
-
-# Remote tailscale node
-
-module "remote" {
-  for_each = local.members.remote
-  source   = "./modules/remote"
-
-  ignition_version     = local.ignition_version
-  tailscale_auth_key   = data.terraform_remote_state.sr.outputs.tailscale_auth_key
-  tailscale_state_path = "${local.mounts.home_path}/tailscale"
-  images = {
-    tailscale = local.container_images.tailscale
-  }
-}
