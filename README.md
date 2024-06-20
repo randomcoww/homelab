@@ -93,13 +93,6 @@ ssh_client = {
   early_renewal_hours   = 168
   validity_period_hours = 336
 }
-
-wireguard_client = {
-  private_key = "$WG_CLIENT_PRIVATE_KEY"
-  public_key  = "$WG_CLIENT_PUBLIC_KEY"
-  address     = "$WG_CLIENT_ADDRESS"
-  endpoint    = "$WG_CLIENT_ENDPOINT"
-}
 EOF
 ```
 
@@ -123,10 +116,10 @@ smtp = {
 }
 
 wireguard_client = {
-  private_key = "$WG_TR_PRIVATE_KEY"
-  public_key  = "$WG_TR_PUBLIC_KEY"
-  address     = "$WG_TR_ADDRESS"
-  endpoint    = "$WG_TR_ENDPOINT"
+  private_key = "$WG_PRIVATE_KEY"
+  public_key  = "$WG_PUBLIC_KEY"
+  address     = "$WG_ADDRESS"
+  endpoint    = "$WG_ENDPOINT"
 }
 
 alpaca = {
@@ -161,8 +154,6 @@ tw terraform -chdir=client_credentials output -raw ssh_user_cert_authorized_key 
 
 mkdir -p $HOME/.mc
 tw terraform -chdir=client_credentials output -json mc_config > $HOME/.mc/config.json
-
-tw terraform -chdir=client_credentials output -raw wireguard_config > $HOME/wg0.conf
 ```
 
 Generate ignition config for servers

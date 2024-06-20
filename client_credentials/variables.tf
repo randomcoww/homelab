@@ -6,12 +6,3 @@ variable "ssh_client" {
     validity_period_hours = number
   })
 }
-
-variable "wireguard_client" {
-  type = object({
-    private_key = string
-    public_key  = string
-    address     = string
-    endpoint    = string
-  })
-}

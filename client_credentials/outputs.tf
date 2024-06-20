@@ -49,18 +49,3 @@ output "mc_config" {
   }
   sensitive = true
 }
-
-output "wireguard_config" {
-  value = <<-EOF
-  [Interface]
-  Address=${var.wireguard_client.address}
-  PrivateKey=${var.wireguard_client.private_key}
-  PostUp=ip route add ${local.networks.service.prefix} via $(ip -4 route show default | awk '{print $3}')
-  PostDown=ip route del ${local.networks.service.prefix} via $(ip -4 route show default | awk '{print $3}')
-
-  [Peer]
-  AllowedIPs=0.0.0.0/0,::0/0
-  Endpoint=${var.wireguard_client.endpoint}
-  PublicKey=${var.wireguard_client.public_key}
-  EOF
-}
