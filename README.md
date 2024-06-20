@@ -26,7 +26,6 @@ Define secrets
 
 ```bash
 LINUX_PASSWORD_HASH=$(echo $PASSWORD | openssl passwd -6 -stdin)
-AP_PASSWORD=
 AP_SSID=
 AP_COUNTRY_CODE=
 AP_CHANNEL=
@@ -111,7 +110,6 @@ Reference: [Generate Authelia password hash](https://www.authelia.com/reference/
 ```bash
 cat > kubernetes_client/secrets.tfvars <<EOF
 hostapd = {
-  sae_password = "$AP_PASSWORD"
   ssid         = "$AP_SSID"
   country_code = "$AP_COUNTRY_CODE"
   channel      = $AP_CHANNEL
