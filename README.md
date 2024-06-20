@@ -94,8 +94,6 @@ EOF
 
 Create `kubernetes_client/secrets.tfvars` file
 
-Reference: [Generate Authelia password hash](https://www.authelia.com/reference/guides/passwords/#user--password-file)
-
 ```bash
 cat > kubernetes_client/secrets.tfvars <<EOF
 hostapd = {
