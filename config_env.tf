@@ -113,6 +113,9 @@ locals {
     clickhouse         = "docker.io/clickhouse/clickhouse-server:24.4-alpine"
     juicefs            = "ghcr.io/randomcoww/juicefs:1.1.2"
     qrcode_generator   = "ghcr.io/randomcoww/qrcode-generator:20240620.4"
+    mpd                = "ghcr.io/randomcoww/mpd:0.23.15"
+    mympd              = "ghcr.io/jcorporation/mympd/mympd:15.0.2"
+    rclone             = "docker.io/rclone/rclone:1.67"
   }
 
   pxeboot_images = {
@@ -161,6 +164,7 @@ locals {
       lldap_http    = "ldap"
       qrcode        = "qrcode"
       qrcode_wifi   = "wifi"
+      mpd           = "mpd"
     } :
     k => "${domain}.${local.domains.public}"
   }

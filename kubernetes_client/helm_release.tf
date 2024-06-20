@@ -20,6 +20,7 @@ locals {
     module.alpaca-stream,
     module.alpaca-db,
     module.qrcode,
+    module.mpd,
   ]
 }
 
