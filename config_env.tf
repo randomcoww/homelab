@@ -281,8 +281,8 @@ locals {
   }
 
   upstream_dns = {
-    ip       = "1.1.1.1"
-    hostname = "one.one.one.one"
+    ip       = "9.9.9.9"
+    hostname = "dns.quad9.net"
   }
 
   # finalized local vars #
