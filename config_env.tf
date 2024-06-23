@@ -1,4 +1,5 @@
 locals {
+  timezone         = "America/Los_Angeles"
   aws_region       = "us-west-2"
   ignition_version = "1.5.0"
 
@@ -281,8 +282,8 @@ locals {
   }
 
   upstream_dns = {
-    ip       = "9.9.9.9"
-    hostname = "dns.quad9.net"
+    ip       = "1.1.1.1"
+    hostname = "one.one.one.one"
   }
 
   # finalized local vars #
