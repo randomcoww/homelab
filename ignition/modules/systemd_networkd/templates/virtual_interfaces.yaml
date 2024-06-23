@@ -28,6 +28,8 @@ storage:
 
           [DHCPv4]
           RouteMetric=${lookup(virtual_interface, "metric", 1024)}
+          RoutesToDNS=false
+          RoutesToNTP=false
 
           [Network]
           LinkLocalAddressing=${lookup(virtual_interface, "enable_linklocal", false)}
