@@ -114,7 +114,6 @@ locals {
         "${host_key}" => "${ip}:${var.ports.apiserver_backend}"
       }
       virtual_router_id         = var.virtual_router_id
-      sync_interface_name       = var.sync_interface_name
       apiserver_ip              = var.apiserver_ip
       apiserver_interface_name  = var.apiserver_interface_name
       apiserver_health_endpoint = local.apiserver_health_endpoint

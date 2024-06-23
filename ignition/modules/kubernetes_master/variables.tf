@@ -98,10 +98,6 @@ variable "kubernetes_pod_prefix" {
   type = string
 }
 
-variable "sync_interface_name" {
-  type = string
-}
-
 variable "apiserver_interface_name" {
   type = string
 }

@@ -19,7 +19,8 @@ locals {
       enable_dhcp_server = true
       enable_dns         = true
       netnums = {
-        gateway = 2
+        gateway   = 2
+        apiserver = 4
       }
     }
     sync = {
@@ -50,12 +51,12 @@ locals {
       }
       mtu = local.default_mtu
     }
+    # worker node IPs
     kubernetes = {
       network = "192.168.193.0"
       cidr    = 26
       vlan_id = 90
       netnums = {
-        apiserver = 4
       }
       mtu = local.default_mtu
     }
