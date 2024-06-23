@@ -1,5 +1,4 @@
 locals {
-  timezone         = "America/Los_Angeles"
   aws_region       = "us-west-2"
   ignition_version = "1.5.0"
 
