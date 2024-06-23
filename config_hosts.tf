@@ -398,13 +398,6 @@ locals {
         })
       }
 
-      virtual_interfaces = {
-        for network_name, virtual_interface in lookup(host, "virtual_interfaces", {}) :
-        network_name => merge(local.networks[network_name], virtual_interface, {
-          interface_name = network_name
-        })
-      }
-
       physical_interfaces = {
         for hardware_interface_name, hardware_interface in lookup(host, "physical_interfaces", {}) :
         hardware_interface_name => merge(hardware_interface, {
@@ -425,7 +418,6 @@ locals {
       networks = {
         for network_name, interface in merge(
           host.tap_interfaces,
-          host.virtual_interfaces,
         ) :
         network_name => merge(local.networks[network_name], interface)
       }

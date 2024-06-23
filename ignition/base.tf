@@ -33,7 +33,6 @@ module "systemd-networkd" {
   host_netnum         = each.value.netnum
   physical_interfaces = lookup(each.value, "physical_interfaces", {})
   bridge_interfaces   = lookup(each.value, "bridge_interfaces", {})
-  virtual_interfaces  = lookup(each.value, "virtual_interfaces", {})
   wlan_interfaces     = lookup(each.value, "wlan_interfaces", {})
   tap_interfaces      = lookup(each.value, "tap_interfaces", {})
 }

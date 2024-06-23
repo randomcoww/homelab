@@ -5,7 +5,6 @@ locals {
       ignition_version    = var.ignition_version
       host_netnum         = var.host_netnum
       tap_interfaces      = var.tap_interfaces
-      virtual_interfaces  = var.virtual_interfaces
       physical_interfaces = var.physical_interfaces
       wlan_interfaces     = var.wlan_interfaces
       bridge_interfaces   = var.bridge_interfaces

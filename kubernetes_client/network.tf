@@ -55,6 +55,7 @@ module "kea" {
       ]
     } if lookup(network, "enable_dhcp_server", false)
   ]
+  timezone = local.timezone
 }
 
 # PXE boot server

@@ -11,11 +11,6 @@ variable "tap_interfaces" {
   default = {}
 }
 
-variable "virtual_interfaces" {
-  type    = any
-  default = {}
-}
-
 variable "bridge_interfaces" {
   type    = any
   default = {}

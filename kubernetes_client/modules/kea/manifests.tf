@@ -108,6 +108,10 @@ locals {
                   name = "domain-search"
                   data = join(",", network.domain_search)
                 },
+                {
+                  name = "tcode"
+                  data = var.timezone
+                }
               ]
               pools = [
                 for _, pool in network.pools :
