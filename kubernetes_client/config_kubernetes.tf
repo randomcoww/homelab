@@ -1,6 +1,4 @@
 locals {
-  timezone = "America/Los_Angeles"
-
   nginx_ingress_annotations = {
     "cert-manager.io/cluster-issuer"                = local.kubernetes.cert_issuer_prod
     "nginx.ingress.kubernetes.io/http-snippet"      = <<-EOF
