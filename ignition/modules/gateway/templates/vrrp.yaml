@@ -35,6 +35,7 @@ storage:
           RequestBroadcast=true
           ClientIdentifier=mac
           RouteTable=${vrrp_master_default_route.table_id}
+          UseTimezone=false
     - path: /etc/systemd/network/20-${lan_interface_name}.network.d/20-slave-default-route.conf
       mode: 0644
       contents:
