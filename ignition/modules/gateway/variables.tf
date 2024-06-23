@@ -34,6 +34,10 @@ variable "lan_interface_name" {
   type = string
 }
 
+variable "cni_interface_name" {
+  type = string
+}
+
 variable "sync_prefix" {
   type = string
 }

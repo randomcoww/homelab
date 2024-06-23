@@ -28,6 +28,7 @@ module "gateway" {
   wan_interface_name  = each.value.tap_interfaces.wan.interface_name
   sync_interface_name = each.value.tap_interfaces.sync.interface_name
   lan_interface_name  = each.value.tap_interfaces[local.services.gateway.network.name].interface_name
+  cni_interface_name  = local.kubernetes.cni_bridge_interface_name
   lan_prefix          = local.services.gateway.network.prefix
   sync_prefix         = local.networks.sync.prefix
   lan_gateway_ip      = local.services.gateway.ip

@@ -11,6 +11,7 @@ locals {
       wan_interface_name         = var.wan_interface_name
       sync_interface_name        = var.sync_interface_name
       lan_interface_name         = var.lan_interface_name
+      cni_interface_name         = var.cni_interface_name
       lan_prefix                 = var.lan_prefix
       sync_prefix                = var.sync_prefix
       lan_gateway_ip             = var.lan_gateway_ip
