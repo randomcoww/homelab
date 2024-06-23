@@ -39,6 +39,8 @@ storage:
           UseHostname=false
           UseDomains=${lookup(tap_interface, "enable_dns", false)}
           UseRoutes=${!lookup(tap_interface, "enable_netnum", false)}
+          RoutesToDNS=false
+          RoutesToNTP=false
 
           [Network]
           LinkLocalAddressing=${lookup(tap_interface, "enable_linklocal", false)}
