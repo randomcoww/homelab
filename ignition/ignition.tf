@@ -7,7 +7,6 @@ locals {
     module.gateway,
     module.vrrp,
     module.disks,
-    module.mounts,
     module.etcd,
     module.kubernetes-master,
     module.kubernetes-worker,

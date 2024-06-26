@@ -1,7 +1,7 @@
 resource "matchbox_profile" "ignition" {
   for_each = {
     for key, host in local.hosts :
-    host.physical_interfaces[host.network_boot.interface].mac => merge(host.network_boot, {
+    host.physical_interfaces[host.network_boot.interface].match_mac => merge(host.network_boot, {
       host_key = key
     }) if lookup(host, "network_boot", null) != null
   }

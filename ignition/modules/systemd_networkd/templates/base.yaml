@@ -32,7 +32,3 @@ storage:
 
           [Link]
           Unmanaged=true
-
-          [Network]
-          LinkLocalAddressing=false
-          MulticastDNS=false

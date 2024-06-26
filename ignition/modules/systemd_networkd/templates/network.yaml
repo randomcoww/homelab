@@ -1,0 +1,67 @@
+---
+variant: fcos
+version: ${ignition_version}
+storage:
+  files:
+    %{~ for name, config in networks ~}
+    - path: /etc/systemd/network/20-${config.interface}.network.d/20-${name}.conf
+      mode: 0644
+      contents:
+        inline: |
+          [Link]
+          ARP=true
+          RequiredForOnline=${lookup(config, "enable_netnum", false)}
+          MTUBytes=${lookup(config, "mtu", 1500)}
+
+          [DHCPv4]
+          RouteMetric=${lookup(config, "metric", 1024)}
+          UseDNS=${lookup(config, "enable_dns", false)}
+          UseNTP=false
+          UseHostname=false
+          UseTimezone=${lookup(config, "enable_dns", false)}
+          UseDomains=${lookup(config, "enable_dns", false)}
+          UseRoutes=${!lookup(config, "enable_netnum", false)}
+          RoutesToDNS=false
+          RoutesToNTP=false
+
+          [Network]
+          LinkLocalAddressing=${lookup(config, "enable_linklocal", false)}
+          DHCP=${lookup(config, "enable_dhcp", false)}
+          MulticastDNS=${lookup(config, "enable_mdns", false)}
+          ConfigureWithoutCarrier=true
+          %{~ if lookup(config, "enable_netnum", false) ~}
+
+          [Address]
+          Address=${cidrhost(config.prefix, host_netnum)}/${config.cidr}
+          AddPrefixRoute=false
+
+          [Route]
+          Protocol=kernel
+          Scope=link
+          PreferredSource=${cidrhost(config.prefix, host_netnum)}
+          Destination=${config.prefix}
+          Metric=${lookup(config, "metric", 1024)}
+          %{~ endif ~}
+    %{~ endfor ~}
+
+    # wifi
+    %{~ for name, config in wlan_networks ~}
+    - path: /etc/systemd/network/20-${config.interface}.network.d/20-${name}.conf
+      mode: 0644
+      contents:
+        inline: |
+          [Link]
+          ARP=true
+          RequiredForOnline=false
+          ActivationPolicy=always-up
+
+          [DHCPv4]
+          RouteMetric=${lookup(config, "metric", 1024)}
+          RoutesToDNS=false
+          RoutesToNTP=false
+
+          [Network]
+          LinkLocalAddressing=false
+          DHCP=${lookup(config, "enable_dhcp", false)}
+          MulticastDNS=${lookup(config, "enable_mdns", false)}
+    %{~ endfor ~}

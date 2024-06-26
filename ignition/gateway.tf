@@ -25,14 +25,14 @@ module "gateway" {
     ]), [local.services.gateway.network.prefix])
   )
 
-  wan_interface_name  = each.value.tap_interfaces.wan.interface_name
-  sync_interface_name = each.value.tap_interfaces.sync.interface_name
-  lan_interface_name  = each.value.tap_interfaces[local.services.gateway.network.name].interface_name
+  wan_interface_name  = each.value.networks.wan.interface
+  sync_interface_name = each.value.networks.sync.interface
+  lan_interface_name  = each.value.networks[local.services.gateway.network.name].interface
   cni_interface_name  = local.kubernetes.cni_bridge_interface_name
   lan_prefix          = local.services.gateway.network.prefix
   sync_prefix         = local.networks.sync.prefix
   lan_gateway_ip      = local.services.gateway.ip
-  virtual_router_id   = 10
+  virtual_router_id   = 13
   keepalived_path     = local.vrrp.keepalived_config_path
 }
 

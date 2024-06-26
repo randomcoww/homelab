@@ -19,8 +19,7 @@ locals {
       enable_dhcp_server = true
       enable_dns         = true
       netnums = {
-        gateway   = 2
-        apiserver = 4
+        gateway = 2
       }
     }
     sync = {
@@ -57,12 +56,12 @@ locals {
       cidr    = 26
       vlan_id = 90
       netnums = {
+        apiserver = 2
       }
       mtu = local.default_mtu
     }
     wan = {
       vlan_id = 30
-      mac     = "52-54-00-63-6e-b3"
     }
     mobile = {
     }

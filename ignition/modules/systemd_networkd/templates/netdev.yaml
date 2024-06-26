@@ -1,0 +1,104 @@
+---
+variant: fcos
+version: ${ignition_version}
+storage:
+  files:
+    # hardware interface #
+    %{~ for name, iface in physical_interfaces ~}
+    - path: /etc/systemd/network/10-${name}.link
+      mode: 0644
+      contents:
+        inline: |
+          [Match]
+          PermanentMACAddress=${iface.match_mac}
+
+          [Link]
+          MTUBytes=${lookup(iface, "mtu", 1500)}
+          Name=${name}
+    - path: /etc/systemd/network/20-${name}.network
+      mode: 0644
+      contents:
+        inline: |
+          [Match]
+          PermanentMACAddress=${iface.match_mac}
+
+          [Link]
+          ARP=false
+          RequiredForOnline=false
+
+          [Network]
+          LinkLocalAddressing=false
+          DHCP=false
+          MulticastDNS=false
+    %{~ endfor ~}
+
+    # bridge interfaces
+    %{~ for name, iface in bridge_interfaces ~}
+    %{~ for _, source in iface.sources ~}
+    - path: /etc/systemd/network/20-${source}.network.d/10-bridge-${name}.conf
+      mode: 0644
+      contents:
+        inline: |
+          [Network]
+          Bridge=${name}
+    %{~ endfor ~}
+    - path: /etc/systemd/network/12-${name}.netdev
+      mode: 0644
+      contents:
+        inline: |
+          [NetDev]
+          Name=${name}
+          Kind=bridge
+          MACAddress=${lookup(iface, "mac", "none")}
+    - path: /etc/systemd/network/20-${name}.network
+      mode: 0644
+      contents:
+        inline: |
+          [Match]
+          Name=${name}
+
+          [Link]
+          ARP=false
+          RequiredForOnline=false
+
+          [Network]
+          LinkLocalAddressing=false
+          DHCP=false
+          MulticastDNS=false
+    %{~ endfor ~}
+
+    # VLAN interfaces
+    %{~ for name, iface in vlan_interfaces ~}
+    - path: /etc/systemd/network/20-${iface.source}.network.d/10-vlan-${name}.conf
+      mode: 0644
+      contents:
+        inline: |
+          [Network]
+          VLAN=${name}
+    - path: /etc/systemd/network/12-${name}.netdev
+      mode: 0644
+      contents:
+        inline: |
+          [NetDev]
+          Name=${name}
+          Kind=vlan
+          MACAddress=${lookup(iface, "mac", "none")}
+
+          [VLAN]
+          Id=${iface.vlan_id}
+    - path: /etc/systemd/network/20-${name}.network
+      mode: 0644
+      contents:
+        inline: |
+          [Match]
+          Name=${name}
+
+          [Link]
+          ARP=false
+          RequiredForOnline=false
+
+          [Network]
+          LinkLocalAddressing=false
+          DHCP=false
+          MulticastDNS=false
+    %{~ endfor ~}

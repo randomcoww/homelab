@@ -7,35 +7,57 @@ locals {
       netnum = 1
       physical_interfaces = {
         phy0 = {
-          mac   = "1c-83-41-30-e2-23"
-          mtu   = local.default_mtu
-          vlans = ["sync", "etcd", "service", "kubernetes", "wan"]
+          match_mac = "1c-83-41-30-e2-23"
+          mtu       = local.default_mtu
         }
       }
-      tap_interfaces = {
+      vlan_interfaces = {
+        phy0-sync = {
+          source  = "phy0"
+          network = "sync"
+        }
+        phy0-etcd = {
+          source  = "phy0"
+          network = "etcd"
+        }
+        phy0-service = {
+          source  = "phy0"
+          network = "service"
+        }
+        phy0-kubernetes = {
+          source  = "phy0"
+          network = "kubernetes"
+        }
+        phy0-wan = {
+          source  = "phy0"
+          network = "wan"
+          mac     = "52-54-00-63-6e-b3"
+        }
+      }
+      networks = {
         lan = {
-          source_interface_name = "phy0"
-          enable_netnum         = true
+          interface     = "phy0"
+          enable_netnum = true
         }
         sync = {
-          source_interface_name = "phy0-sync"
-          enable_netnum         = true
+          interface     = "phy0-sync"
+          enable_netnum = true
         }
         etcd = {
-          source_interface_name = "phy0-etcd"
-          enable_netnum         = true
+          interface     = "phy0-etcd"
+          enable_netnum = true
         }
         service = {
-          source_interface_name = "phy0-service"
-          enable_netnum         = true
+          interface     = "phy0-service"
+          enable_netnum = true
         }
         kubernetes = {
-          source_interface_name = "phy0-kubernetes"
-          enable_netnum         = true
+          interface     = "phy0-kubernetes"
+          enable_netnum = true
         }
         wan = {
-          source_interface_name = "phy0-wan"
-          enable_dhcp           = true
+          interface   = "phy0-wan"
+          enable_dhcp = true
         }
       }
       disks = {
@@ -74,35 +96,57 @@ locals {
       netnum = 3
       physical_interfaces = {
         phy0 = {
-          mac   = "1c-83-41-30-bd-6f"
-          mtu   = local.default_mtu
-          vlans = ["sync", "etcd", "service", "kubernetes", "wan"]
+          match_mac = "1c-83-41-30-bd-6f"
+          mtu       = local.default_mtu
         }
       }
-      tap_interfaces = {
+      vlan_interfaces = {
+        phy0-sync = {
+          source  = "phy0"
+          network = "sync"
+        }
+        phy0-etcd = {
+          source  = "phy0"
+          network = "etcd"
+        }
+        phy0-service = {
+          source  = "phy0"
+          network = "service"
+        }
+        phy0-kubernetes = {
+          source  = "phy0"
+          network = "kubernetes"
+        }
+        phy0-wan = {
+          source  = "phy0"
+          network = "wan"
+          mac     = "52-54-00-63-6e-b3"
+        }
+      }
+      networks = {
         lan = {
-          source_interface_name = "phy0"
-          enable_netnum         = true
+          interface     = "phy0"
+          enable_netnum = true
         }
         sync = {
-          source_interface_name = "phy0-sync"
-          enable_netnum         = true
+          interface     = "phy0-sync"
+          enable_netnum = true
         }
         etcd = {
-          source_interface_name = "phy0-etcd"
-          enable_netnum         = true
+          interface     = "phy0-etcd"
+          enable_netnum = true
         }
         service = {
-          source_interface_name = "phy0-service"
-          enable_netnum         = true
+          interface     = "phy0-service"
+          enable_netnum = true
         }
         kubernetes = {
-          source_interface_name = "phy0-kubernetes"
-          enable_netnum         = true
+          interface     = "phy0-kubernetes"
+          enable_netnum = true
         }
         wan = {
-          source_interface_name = "phy0-wan"
-          enable_dhcp           = true
+          interface   = "phy0-wan"
+          enable_dhcp = true
         }
       }
       disks = {
@@ -141,35 +185,57 @@ locals {
       netnum = 5
       physical_interfaces = {
         phy0 = {
-          mac   = "1c-83-41-30-e2-54"
-          mtu   = local.default_mtu
-          vlans = ["sync", "etcd", "service", "kubernetes", "wan"]
+          match_mac = "1c-83-41-30-e2-54"
+          mtu       = local.default_mtu
         }
       }
-      tap_interfaces = {
+      vlan_interfaces = {
+        phy0-sync = {
+          source  = "phy0"
+          network = "sync"
+        }
+        phy0-etcd = {
+          source  = "phy0"
+          network = "etcd"
+        }
+        phy0-service = {
+          source  = "phy0"
+          network = "service"
+        }
+        phy0-kubernetes = {
+          source  = "phy0"
+          network = "kubernetes"
+        }
+        phy0-wan = {
+          source  = "phy0"
+          network = "wan"
+          mac     = "52-54-00-63-6e-b3"
+        }
+      }
+      networks = {
         lan = {
-          source_interface_name = "phy0"
-          enable_netnum         = true
+          interface     = "phy0"
+          enable_netnum = true
         }
         sync = {
-          source_interface_name = "phy0-sync"
-          enable_netnum         = true
+          interface     = "phy0-sync"
+          enable_netnum = true
         }
         etcd = {
-          source_interface_name = "phy0-etcd"
-          enable_netnum         = true
+          interface     = "phy0-etcd"
+          enable_netnum = true
         }
         service = {
-          source_interface_name = "phy0-service"
-          enable_netnum         = true
+          interface     = "phy0-service"
+          enable_netnum = true
         }
         kubernetes = {
-          source_interface_name = "phy0-kubernetes"
-          enable_netnum         = true
+          interface     = "phy0-kubernetes"
+          enable_netnum = true
         }
         wan = {
-          source_interface_name = "phy0-wan"
-          enable_dhcp           = true
+          interface   = "phy0-wan"
+          enable_dhcp = true
         }
       }
       disks = {
@@ -208,52 +274,61 @@ locals {
       netnum = 6
       physical_interfaces = {
         phy0 = {
-          mac   = "74-56-3c-c3-10-68"
-          mtu   = local.default_mtu
-          vlans = ["service", "kubernetes", "wan"]
+          match_mac = "74-56-3c-c3-10-68"
+          mtu       = local.default_mtu
         }
-        # mobile
-        phy1 = {
-          mac = "32-57-14-7a-aa-10"
-        }
-      }
-      wlan_interfaces = {
         wlan0 = {
-          mac = "10-6f-d9-cf-d5-71"
+          match_mac = "10-6f-d9-cf-d5-71"
+        }
+        # backup WAN on mobile data
+        wlan1 = {
+          match_mac = "32-57-14-7a-aa-10"
         }
       }
       bridge_interfaces = {
         br-lan = {
-          interfaces = ["phy0"]
+          sources = [
+            "phy0",
+          ]
         }
       }
-      tap_interfaces = {
+      vlan_interfaces = {
+        phy0-service = {
+          source  = "phy0"
+          network = "service"
+        }
+        phy0-kubernetes = {
+          source  = "phy0"
+          network = "kubernetes"
+        }
+        phy0-wan = {
+          source  = "phy0"
+          network = "wan"
+        }
+      }
+      networks = {
         lan = {
-          source_interface_name = "br-lan"
-          enable_dhcp           = true
+          interface   = "br-lan"
+          enable_dhcp = true
         }
         service = {
-          source_interface_name = "phy0-service"
-          enable_netnum         = true
+          interface     = "phy0-service"
+          enable_netnum = true
         }
         kubernetes = {
-          source_interface_name = "phy0-kubernetes"
-          enable_netnum         = true
+          interface     = "phy0-kubernetes"
+          enable_netnum = true
         }
-        # TODO: remove
-        # Special case share over double NAT LAN
-        wan = {
-          source_interface_name = "phy0-wan"
-          mac                   = ""
-          metric                = 4096
-          enable_dhcp           = true
-        }
-        # backup WAN on mobile data
         mobile = {
-          source_interface_name = "phy1"
-          enable_dhcp           = true
-          enable_dns            = true
-          metric                = 512
+          interface   = "wlan1"
+          metric      = 512
+          enable_dhcp = true
+          enable_dns  = true
+        }
+        wan = {
+          interface   = "phy0-wan"
+          metric      = 4096
+          enable_dhcp = true
         }
       }
       disks = {
@@ -309,19 +384,17 @@ locals {
       netnum = 7
       physical_interfaces = {
         phy0 = {
-          mac   = "ec-21-e5-72-46-27"
-          vlans = []
+          match_mac = "ec-21-e5-72-46-27"
+          mtu       = local.default_mtu
         }
-      }
-      wlan_interfaces = {
         wlan0 = {
-          mac = "3e-b1-a0-f3-9b-34"
+          match_mac = "3e-b1-a0-f3-9b-34"
         }
       }
-      tap_interfaces = {
+      networks = {
         lan = {
-          source_interface_name = "phy0"
-          enable_dhcp           = true
+          interface   = "phy0"
+          enable_dhcp = true
         }
       }
       disks = {
@@ -351,15 +424,6 @@ locals {
       users = [
         "client",
       ]
-      # same as disk but a hack to use an existing lvm
-      # ignition doesn't support provisioning lvm device so run systemd mount only
-      mounts = [
-        {
-          device     = "/dev/H3F03NEV207BX1ZE/unencrypted"
-          mount_path = local.mounts.home_path
-          format     = "ext4"
-        },
-      ]
     }
   }
 
@@ -371,7 +435,6 @@ locals {
     gateway             = ["gw-0", "gw-1", "q-0"]
     vrrp                = ["gw-0", "gw-1"]
     disks               = ["gw-0", "gw-1", "q-0", "de-1", "r-0"]
-    mounts              = ["de-0"]
     server              = ["gw-0", "gw-1", "q-0", "de-1", "r-0"]
     client              = ["de-0", "de-1"]
     etcd                = ["gw-0", "gw-1", "q-0"]
@@ -385,41 +448,28 @@ locals {
 
   # finalized local vars #
 
-  base_hosts_1 = {
+  hosts = {
     for host_key, host in local.base_hosts :
     host_key => merge(host, {
       hostname           = "${host_key}.${local.domains.mdns}"
       tailscale_hostname = "${host_key}.${local.domains.tailscale}"
 
-      tap_interfaces = {
-        for network_name, tap_interface in lookup(host, "tap_interfaces", {}) :
-        network_name => merge(local.networks[network_name], tap_interface, {
-          interface_name = network_name
-        })
-      }
-
-      physical_interfaces = {
-        for hardware_interface_name, hardware_interface in lookup(host, "physical_interfaces", {}) :
-        hardware_interface_name => merge(hardware_interface, {
-          vlans = {
-            for i, network_name in lookup(hardware_interface, "vlans", []) :
-            network_name => merge(local.networks[network_name], {
-              interface_name = "${hardware_interface_name}-${network_name}"
-            })
-          }
-        })
-      }
-    })
-  }
-
-  hosts = {
-    for host_key, host in local.base_hosts_1 :
-    host_key => merge(host, {
       networks = {
-        for network_name, interface in merge(
-          host.tap_interfaces,
-        ) :
-        network_name => merge(local.networks[network_name], interface)
+        for name, network in lookup(host, "networks", {}) :
+        name => merge(local.networks[name], network)
+      }
+      wlan_networks = {
+        for name, network in lookup(host, "wlan_networks", {}) :
+        name => merge(local.networks[name], network)
+      }
+
+      physical_interfaces = lookup(host, "physical_interfaces", {})
+      bridge_interfaces   = lookup(host, "bridge_interfaces", {})
+      vlan_interfaces = {
+        for name, interface in lookup(host, "vlan_interfaces", {}) :
+        name => merge(interface, {
+          vlan_id = local.networks[interface.network].vlan_id
+        })
       }
     })
   }

@@ -31,10 +31,11 @@ module "systemd-networkd" {
 
   ignition_version    = local.ignition_version
   host_netnum         = each.value.netnum
-  physical_interfaces = lookup(each.value, "physical_interfaces", {})
-  bridge_interfaces   = lookup(each.value, "bridge_interfaces", {})
-  wlan_interfaces     = lookup(each.value, "wlan_interfaces", {})
-  tap_interfaces      = lookup(each.value, "tap_interfaces", {})
+  physical_interfaces = each.value.physical_interfaces
+  bridge_interfaces   = each.value.bridge_interfaces
+  vlan_interfaces     = each.value.vlan_interfaces
+  networks            = each.value.networks
+  wlan_networks       = each.value.wlan_networks
 }
 
 module "network-manager" {

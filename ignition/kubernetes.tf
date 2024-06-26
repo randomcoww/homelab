@@ -11,7 +11,7 @@ module "kubernetes-master" {
   service_account  = data.terraform_remote_state.sr.outputs.kubernetes.service_account
   members = {
     for host_key, host in local.members.kubernetes-master :
-    host_key => cidrhost(local.networks.lan.prefix, host.netnum)
+    host_key => cidrhost(local.networks.kubernetes.prefix, host.netnum)
   }
   etcd_members = {
     for host_key, host in local.members.etcd :
@@ -34,11 +34,11 @@ module "kubernetes-master" {
   cluster_apiserver_endpoint = local.kubernetes_services.apiserver.fqdn
   kubernetes_service_prefix  = local.networks.kubernetes_service.prefix
   kubernetes_pod_prefix      = local.networks.kubernetes_pod.prefix
-  apiserver_interface_name   = each.value.tap_interfaces[local.services.apiserver.network.name].interface_name
-  node_ip                    = cidrhost(local.networks.lan.prefix, each.value.netnum)
+  apiserver_interface_name   = each.value.networks[local.services.apiserver.network.name].interface
+  node_ip                    = cidrhost(local.networks.kubernetes.prefix, each.value.netnum)
   apiserver_ip               = local.services.apiserver.ip
   cluster_apiserver_ip       = local.services.cluster_apiserver.ip
-  virtual_router_id          = 12
+  virtual_router_id          = 14
   static_pod_path            = local.kubernetes.static_pod_manifest_path
   haproxy_path               = local.vrrp.haproxy_config_path
   keepalived_path            = local.vrrp.keepalived_config_path
