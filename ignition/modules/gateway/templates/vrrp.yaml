@@ -17,8 +17,11 @@ storage:
             use_vmac
             vmac_xmit_base
             priority 250
+            garp_master_delay 0
+            garp_master_refresh 8
             virtual_ipaddress {
               ${lan_gateway_ip}
+              0.0.0.0 dev ${wan_interface_name} no_track
             }
             virtual_rules {
               to all lookup ${vrrp_master_default_route.table_id} priority ${vrrp_master_default_route.table_priority}
@@ -47,11 +50,5 @@ storage:
           Table=${vrrp_slave_default_route.table_id}
 
           [RoutingPolicyRule]
-          IncomingInterface=${cni_interface_name}
-          Table=${vrrp_slave_default_route.table_id}
-          Priority=${vrrp_slave_default_route.table_priority}
-
-          [RoutingPolicyRule]
-          IncomingInterface=lo
           Table=${vrrp_slave_default_route.table_id}
           Priority=${vrrp_slave_default_route.table_priority}
