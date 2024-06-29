@@ -51,27 +51,27 @@ module "configmap" {
   data = {
     for hostname, peer in local.peers :
     "${basename(local.config_path)}-${hostname}" => <<-EOF
-bind 0.0.0.0
-port 0
-tls-port ${var.ports.keydb}
-tls-cert-file ${local.cert_path}
-tls-key-file ${local.key_path}
-tls-client-cert-file ${local.client_cert_path}
-tls-client-key-file ${local.client_key_path}
-tls-ca-cert-file ${local.ca_cert_path}
-tls-replication yes
-tls-cluster yes
-tls-protocols "TLSv1.3"
-tls-ciphersuites TLS_CHACHA20_POLY1305_SHA256
-active-replica yes
-multi-master yes
-appendonly yes
-${var.extra_config}
-${join("\n", [
+    bind 0.0.0.0
+    port 0
+    tls-port ${var.ports.keydb}
+    tls-cert-file ${local.cert_path}
+    tls-key-file ${local.key_path}
+    tls-client-cert-file ${local.client_cert_path}
+    tls-client-key-file ${local.client_key_path}
+    tls-ca-cert-file ${local.ca_cert_path}
+    tls-replication yes
+    tls-cluster yes
+    tls-protocols "TLSv1.3"
+    tls-ciphersuites TLS_CHACHA20_POLY1305_SHA256
+    active-replica yes
+    multi-master yes
+    appendonly yes
+    ${var.extra_config}
+    ${join("\n", [
     for k, v in local.peers :
     "replicaof ${v} ${var.ports.keydb}" if hostname != k
 ])}
-EOF
+    EOF
 }
 }
 
@@ -87,6 +87,7 @@ module "statefulset" {
     "checksum/secret"    = sha256(module.secret.manifest)
     "checksum/configmap" = sha256(module.configmap.manifest)
   }
+  volume_claim_templates = var.volume_claim_templates
   spec = {
     containers = [
       {
@@ -105,7 +106,7 @@ module "statefulset" {
             }
           },
         ]
-        volumeMounts = [
+        volumeMounts = concat([
           {
             name      = "keydb-secret"
             mountPath = local.base_path
@@ -115,10 +116,10 @@ module "statefulset" {
             mountPath   = local.config_path
             subPathExpr = "${basename(local.config_path)}-$(POD_NAME)"
           },
-        ]
+        ], var.extra_volume_mounts)
       },
     ]
-    volumes = [
+    volumes = concat([
       {
         name = "keydb-secret"
         secret = {
@@ -131,7 +132,7 @@ module "statefulset" {
           name = module.configmap.name
         }
       },
-    ]
+    ], var.extra_volumes)
   }
 }
 
