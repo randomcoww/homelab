@@ -112,7 +112,7 @@ locals {
     lldap              = "docker.io/lldap/lldap:2024-05-06"
     keydb              = "docker.io/eqalpha/keydb:alpine_x86_64_v6.3.4"
     clickhouse         = "docker.io/clickhouse/clickhouse-server:24.4-alpine"
-    juicefs            = "ghcr.io/randomcoww/juicefs:1.1.2"
+    juicefs            = "ghcr.io/randomcoww/juicefs:1.2.0"
     qrcode_generator   = "ghcr.io/randomcoww/qrcode-generator:20240620.4"
     mpd                = "ghcr.io/randomcoww/mpd:0.23.15"
     mympd              = "ghcr.io/jcorporation/mympd/mympd:15.0.2"
