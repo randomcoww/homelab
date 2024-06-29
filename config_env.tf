@@ -279,6 +279,10 @@ locals {
       name   = "clickhouse"
       policy = "none"
     }
+    litestream = {
+      name   = "litestream"
+      policy = "none"
+    }
   }
 
   upstream_dns = {

@@ -170,11 +170,16 @@ module "authelia" {
       value = data.terraform_remote_state.sr.outputs.lldap.password
     }
   }
-  ingress_class_name   = local.ingress_classes.ingress_nginx_external
-  ingress_cert_issuer  = local.kubernetes.cert_issuer_prod
-  s3_db_resource       = data.terraform_remote_state.sr.outputs.s3.authelia.resource
-  s3_access_key_id     = data.terraform_remote_state.sr.outputs.s3.authelia.access_key_id
-  s3_secret_access_key = data.terraform_remote_state.sr.outputs.s3.authelia.secret_access_key
+  ingress_class_name  = local.ingress_classes.ingress_nginx_external
+  ingress_cert_issuer = local.kubernetes.cert_issuer_prod
+
+  litestream_s3_resource             = data.terraform_remote_state.sr.outputs.s3.authelia.resource
+  litestream_s3_access_key_id        = data.terraform_remote_state.sr.outputs.s3.authelia.access_key_id
+  litestream_s3_secret_access_key    = data.terraform_remote_state.sr.outputs.s3.authelia.secret_access_key
+  litestream_minio_access_key_id     = data.terraform_remote_state.sr.outputs.minio.access_key_id
+  litestream_minio_secret_access_key = data.terraform_remote_state.sr.outputs.minio.secret_access_key
+  litestream_minio_bucket            = local.minio_buckets.litestream.name
+  litestream_minio_endpoint          = "${local.kubernetes_services.minio.endpoint}:${local.service_ports.minio}"
 }
 
 # LDAP
@@ -210,9 +215,14 @@ module "lldap" {
   }
   ingress_class_name        = local.ingress_classes.ingress_nginx
   nginx_ingress_annotations = local.nginx_ingress_annotations
-  s3_db_resource            = data.terraform_remote_state.sr.outputs.s3.lldap.resource
-  s3_access_key_id          = data.terraform_remote_state.sr.outputs.s3.lldap.access_key_id
-  s3_secret_access_key      = data.terraform_remote_state.sr.outputs.s3.lldap.secret_access_key
+
+  litestream_s3_resource             = data.terraform_remote_state.sr.outputs.s3.lldap.resource
+  litestream_s3_access_key_id        = data.terraform_remote_state.sr.outputs.s3.lldap.access_key_id
+  litestream_s3_secret_access_key    = data.terraform_remote_state.sr.outputs.s3.lldap.secret_access_key
+  litestream_minio_access_key_id     = data.terraform_remote_state.sr.outputs.minio.access_key_id
+  litestream_minio_secret_access_key = data.terraform_remote_state.sr.outputs.minio.secret_access_key
+  litestream_minio_bucket            = local.minio_buckets.litestream.name
+  litestream_minio_endpoint          = "${local.kubernetes_services.minio.endpoint}:${local.service_ports.minio}"
 }
 
 # Vaultwarden
@@ -245,7 +255,12 @@ module "vaultwarden" {
   }
   ingress_class_name        = local.ingress_classes.ingress_nginx
   nginx_ingress_annotations = local.nginx_ingress_auth_annotations
-  s3_db_resource            = data.terraform_remote_state.sr.outputs.s3.vaultwarden.resource
-  s3_access_key_id          = data.terraform_remote_state.sr.outputs.s3.vaultwarden.access_key_id
-  s3_secret_access_key      = data.terraform_remote_state.sr.outputs.s3.vaultwarden.secret_access_key
+
+  litestream_s3_resource             = data.terraform_remote_state.sr.outputs.s3.vaultwarden.resource
+  litestream_s3_access_key_id        = data.terraform_remote_state.sr.outputs.s3.vaultwarden.access_key_id
+  litestream_s3_secret_access_key    = data.terraform_remote_state.sr.outputs.s3.vaultwarden.secret_access_key
+  litestream_minio_access_key_id     = data.terraform_remote_state.sr.outputs.minio.access_key_id
+  litestream_minio_secret_access_key = data.terraform_remote_state.sr.outputs.minio.secret_access_key
+  litestream_minio_bucket            = local.minio_buckets.litestream.name
+  litestream_minio_endpoint          = "${local.kubernetes_services.minio.endpoint}:${local.service_ports.minio}"
 }

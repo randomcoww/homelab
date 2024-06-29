@@ -31,13 +31,10 @@ module "secret" {
   name    = var.name
   app     = var.name
   release = var.release
-  data = merge({
-    ACCESS_KEY_ID     = var.s3_access_key_id
-    SECRET_ACCESS_KEY = var.s3_secret_access_key
-    }, {
+  data = {
     for k, v in local.extra_configs :
     tostring(k) => tostring(v)
-  })
+  }
 }
 
 module "service" {
@@ -89,9 +86,23 @@ module "statefulset-litestream" {
         path = local.db_path
         replicas = [
           {
-            url               = "s3://${var.s3_db_resource}/${basename(local.db_path)}"
-            access-key-id     = var.s3_access_key_id
-            secret-access-key = var.s3_secret_access_key
+            name                     = "minio"
+            type                     = "s3"
+            bucket                   = var.litestream_minio_bucket
+            path                     = var.name
+            endpoint                 = "http://${var.litestream_minio_endpoint}"
+            access-key-id            = var.litestream_minio_access_key_id
+            secret-access-key        = var.litestream_minio_secret_access_key
+            retention                = "2m"
+            retention-check-interval = "2m"
+            sync-interval            = "500ms"
+            snapshot-interval        = "1h"
+          },
+          {
+            name              = "s3"
+            url               = "s3://${var.litestream_s3_resource}/${basename(local.db_path)}"
+            access-key-id     = var.litestream_s3_access_key_id
+            secret-access-key = var.litestream_s3_secret_access_key
           },
         ]
       }
