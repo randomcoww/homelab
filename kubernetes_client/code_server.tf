@@ -4,7 +4,6 @@ module "jupyter" {
   release = "0.1.1"
   images = {
     code_server = local.container_images.jupyter
-    litestream  = local.container_images.litestream
     juicefs     = local.container_images.juicefs
   }
   user                      = local.users.client.name
@@ -33,6 +32,13 @@ module "jupyter" {
   jfs_minio_secret_access_key = data.terraform_remote_state.sr.outputs.minio.secret_access_key
   jfs_minio_bucket            = local.minio_buckets.juicefs.name
   jfs_minio_endpoint          = "${local.kubernetes_services.minio.fqdn}:${local.service_ports.minio}"
+  redis_ca = {
+    algorithm       = tls_private_key.jfs-redis-ca.algorithm
+    private_key_pem = tls_private_key.jfs-redis-ca.private_key_pem
+    cert_pem        = tls_self_signed_cert.jfs-redis-ca.cert_pem
+  }
+  redis_endpoint = "${local.kubernetes_services.jfs_redis.endpoint}:${local.service_ports.redis}"
+  redis_db_id    = 3
 
   service_hostname          = local.kubernetes_ingress_endpoints.jupyter
   ingress_class_name        = local.ingress_classes.ingress_nginx
@@ -45,7 +51,6 @@ module "code" {
   release = "0.1.1"
   images = {
     code_server = local.container_images.code
-    litestream  = local.container_images.litestream
     juicefs     = local.container_images.juicefs
   }
   user = local.users.client.name
@@ -119,6 +124,13 @@ module "code" {
   jfs_minio_secret_access_key = data.terraform_remote_state.sr.outputs.minio.secret_access_key
   jfs_minio_bucket            = local.minio_buckets.juicefs.name
   jfs_minio_endpoint          = "${local.kubernetes_services.minio.fqdn}:${local.service_ports.minio}"
+  redis_ca = {
+    algorithm       = tls_private_key.jfs-redis-ca.algorithm
+    private_key_pem = tls_private_key.jfs-redis-ca.private_key_pem
+    cert_pem        = tls_self_signed_cert.jfs-redis-ca.cert_pem
+  }
+  redis_endpoint = "${local.kubernetes_services.jfs_redis.endpoint}:${local.service_ports.redis}"
+  redis_db_id    = 4
 
   service_hostname          = local.kubernetes_ingress_endpoints.code
   ingress_class_name        = local.ingress_classes.ingress_nginx

@@ -2,6 +2,11 @@ variable "name" {
   type = string
 }
 
+variable "namespace" {
+  type    = string
+  default = "default"
+}
+
 variable "app" {
   type = string
 }
@@ -40,18 +45,6 @@ variable "volume_claim_templates" {
   default = []
 }
 
-variable "litestream_image" {
-  type = string
-}
-
-variable "litestream_config" {
-  type = any
-}
-
-variable "sqlite_path" {
-  type = string
-}
-
 variable "jfs_image" {
   type = string
 }
@@ -70,4 +63,20 @@ variable "jfs_minio_access_key_id" {
 
 variable "jfs_minio_secret_access_key" {
   type = string
+}
+
+variable "redis_endpoint" {
+  type = string
+}
+
+variable "redis_db_id" {
+  type = number
+}
+
+variable "redis_ca" {
+  type = object({
+    algorithm       = string
+    private_key_pem = string
+    cert_pem        = string
+  })
 }

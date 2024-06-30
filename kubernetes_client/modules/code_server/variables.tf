@@ -14,7 +14,6 @@ variable "release" {
 variable "images" {
   type = object({
     code_server = string
-    litestream  = string
     juicefs     = string
   })
 }
@@ -67,6 +66,22 @@ variable "jfs_minio_access_key_id" {
 
 variable "jfs_minio_secret_access_key" {
   type = string
+}
+
+variable "redis_endpoint" {
+  type = string
+}
+
+variable "redis_db_id" {
+  type = number
+}
+
+variable "redis_ca" {
+  type = object({
+    algorithm       = string
+    private_key_pem = string
+    cert_pem        = string
+  })
 }
 
 variable "affinity" {

@@ -1,16 +1,32 @@
-module "statefulset" {
-  source = "../statefulset_litestream"
-  ## litestream settings
-  litestream_image  = var.litestream_image
-  litestream_config = var.litestream_config
-  sqlite_path       = var.sqlite_path
-  ##
+locals {
+  cert_path    = "/etc/certs/client.crt"
+  key_path     = "/etc/certs/client.key"
+  ca_cert_path = "/etc/certs/ca.crt"
+}
 
-  name                   = var.name
-  app                    = var.app
-  release                = var.release
-  affinity               = var.affinity
-  annotations            = var.annotations
+module "secret" {
+  source  = "../secret"
+  name    = "${var.name}-jfs"
+  app     = var.name
+  release = var.release
+  data = {
+    basename(local.cert_path)    = tls_locally_signed_cert.redis-client.cert_pem
+    basename(local.key_path)     = tls_private_key.redis-client.private_key_pem
+    basename(local.ca_cert_path) = var.redis_ca.cert_pem
+  }
+}
+
+module "statefulset" {
+  source            = "../statefulset"
+  name              = var.name
+  app               = var.app
+  release           = var.release
+  replicas          = 1
+  affinity          = var.affinity
+  min_ready_seconds = var.min_ready_seconds
+  annotations = merge({
+    "checksum/${module.secret.name}" = sha256(module.secret.manifest)
+  }, var.annotations)
   tolerations            = var.tolerations
   volume_claim_templates = var.volume_claim_templates
   spec = merge(var.spec, {
@@ -26,7 +42,7 @@ module "statefulset" {
           set -e
 
           exec juicefs format \
-            sqlite3://${var.sqlite_path} \
+            'rediss://${var.redis_endpoint}/${var.redis_db_id}?tls-cert-file=${local.cert_path}&tls-key-file=${local.key_path}&tls-ca-cert-file=${local.ca_cert_path}' \
             ${var.name} \
             --storage minio \
             --bucket ${var.jfs_minio_resource} \
@@ -43,6 +59,23 @@ module "statefulset" {
             value = var.jfs_minio_secret_access_key
           },
         ]
+        volumeMounts = [
+          {
+            name      = "jfs-redis-tls"
+            mountPath = local.cert_path
+            subPath   = basename(local.cert_path)
+          },
+          {
+            name      = "jfs-redis-tls"
+            mountPath = local.key_path
+            subPath   = basename(local.key_path)
+          },
+          {
+            name      = "jfs-redis-tls"
+            mountPath = local.ca_cert_path
+            subPath   = basename(local.ca_cert_path)
+          },
+        ]
       },
     ], lookup(var.spec, "initContainers", []))
     containers = concat([
@@ -54,11 +87,10 @@ module "statefulset" {
           "-c",
           <<-EOF
           set -e
-          mkdir -p \
-            ${var.jfs_mount_path}
+          mkdir -p ${var.jfs_mount_path}
 
           exec juicefs mount \
-            sqlite3://${var.sqlite_path} \
+            'rediss://${var.redis_endpoint}/${var.redis_db_id}?tls-cert-file=${local.cert_path}&tls-key-file=${local.key_path}&tls-ca-cert-file=${local.ca_cert_path}' \
             ${var.jfs_mount_path} \
             --storage minio \
             --bucket ${var.jfs_minio_resource} \
@@ -69,11 +101,44 @@ module "statefulset" {
             -o allow_other,writeback_cache,noatime
           EOF
         ]
+        lifecycle = {
+          preStop = {
+            exec = {
+              command = [
+                "sh",
+                "-c",
+                <<-EOF
+                set -e
+
+                while mountpoint ${var.jfs_mount_path}; do
+                juicefs umount ${var.jfs_mount_path}
+                sleep 1
+                done
+                EOF
+              ]
+            }
+          }
+        }
         volumeMounts = [
           {
             name             = "jfs-mount"
             mountPath        = dirname(var.jfs_mount_path)
             mountPropagation = "Bidirectional"
+          },
+          {
+            name      = "jfs-redis-tls"
+            mountPath = local.cert_path
+            subPath   = basename(local.cert_path)
+          },
+          {
+            name      = "jfs-redis-tls"
+            mountPath = local.key_path
+            subPath   = basename(local.key_path)
+          },
+          {
+            name      = "jfs-redis-tls"
+            mountPath = local.ca_cert_path
+            subPath   = basename(local.ca_cert_path)
           },
         ]
         resources = {
@@ -103,6 +168,12 @@ module "statefulset" {
           medium = "Memory"
         }
       },
+      {
+        name = "jfs-redis-tls"
+        secret = {
+          secretName = module.secret.name
+        }
+      }
     ])
   })
 }

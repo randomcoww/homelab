@@ -24,11 +24,11 @@ module "metadata" {
   release     = var.release
   app_version = split(":", var.images.mpd)[1]
   manifests = {
-    "templates/service.yaml"           = module.service.manifest
-    "templates/secret.yaml"            = module.secret.manifest
-    "templates/ingress.yaml"           = module.ingress.manifest
-    "templates/statefulset.yaml"       = module.statefulset-jfs.statefulset
-    "templates/secret-litestream.yaml" = module.statefulset-jfs.secret
+    "templates/service.yaml"     = module.service.manifest
+    "templates/secret.yaml"      = module.secret.manifest
+    "templates/ingress.yaml"     = module.ingress.manifest
+    "templates/statefulset.yaml" = module.statefulset-jfs.statefulset
+    "templates/secret-jfs.yaml"  = module.statefulset-jfs.secret
   }
 }
 
@@ -67,6 +67,8 @@ module "secret" {
     }
     %{~endfor~}
     EOF
+    RCLONE_S3_ACCESS_KEY_ID         = var.data_minio_access_key_id
+    RCLONE_S3_SECRET_ACCESS_KEY     = var.data_minio_secret_access_key
   }
 }
 
@@ -126,32 +128,10 @@ module "ingress" {
 
 module "statefulset-jfs" {
   source = "../statefulset_jfs"
-  ## litestream settings
-  litestream_image = var.images.litestream
-  litestream_config = {
-    dbs = [
-      {
-        path = local.jfs_metadata_path
-        replicas = [
-          {
-            type                     = "s3"
-            bucket                   = var.jfs_minio_bucket
-            path                     = basename(local.jfs_metadata_path)
-            endpoint                 = "http://${var.jfs_minio_endpoint}"
-            access-key-id            = var.jfs_minio_access_key_id
-            secret-access-key        = var.jfs_minio_secret_access_key
-            retention                = "2m"
-            retention-check-interval = "2m"
-            sync-interval            = "500ms"
-            snapshot-interval        = "1h"
-          },
-        ]
-      },
-    ]
-  }
-  sqlite_path = local.jfs_metadata_path
-
   ## jfs settings
+  redis_endpoint              = var.redis_endpoint
+  redis_db_id                 = var.redis_db_id
+  redis_ca                    = var.redis_ca
   jfs_image                   = var.images.juicefs
   jfs_mount_path              = local.mpd_cache_path
   jfs_minio_resource          = "http://${var.jfs_minio_endpoint}/${var.jfs_minio_bucket}"
@@ -183,12 +163,22 @@ module "statefulset-jfs" {
         ]
         env = [
           {
-            name  = "RCLONE_S3_ACCESS_KEY_ID"
-            value = var.data_minio_access_key_id
+            name = "RCLONE_S3_ACCESS_KEY_ID"
+            valueFrom = {
+              secretKeyRef = {
+                name = module.secret.name
+                key  = "RCLONE_S3_ACCESS_KEY_ID"
+              }
+            }
           },
           {
-            name  = "RCLONE_S3_SECRET_ACCESS_KEY"
-            value = var.data_minio_secret_access_key
+            name = "RCLONE_S3_SECRET_ACCESS_KEY"
+            valueFrom = {
+              secretKeyRef = {
+                name = module.secret.name
+                key  = "RCLONE_S3_SECRET_ACCESS_KEY"
+              }
+            }
           },
         ]
       },

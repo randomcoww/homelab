@@ -5,7 +5,6 @@ module "transmission" {
   images = {
     transmission = local.container_images.transmission
     wireguard    = local.container_images.wireguard
-    litestream   = local.container_images.litestream
     juicefs      = local.container_images.juicefs
   }
   transmission_settings = {
@@ -37,7 +36,7 @@ module "transmission" {
       value = "http://${data.terraform_remote_state.sr.outputs.minio.access_key_id}:${data.terraform_remote_state.sr.outputs.minio.secret_access_key}@${local.kubernetes_services.minio.endpoint}:${local.service_ports.minio}"
     },
   ]
-  torrent_done_script         = <<-EOF
+  torrent_done_script = <<-EOF
   #!/bin/sh
   set -xe
   #  * TR_APP_VERSION
@@ -61,11 +60,7 @@ module "transmission" {
     --torrent "$TR_TORRENT_ID" \
     --remove-and-delete
   EOF
-  jfs_minio_access_key_id     = data.terraform_remote_state.sr.outputs.minio.access_key_id
-  jfs_minio_secret_access_key = data.terraform_remote_state.sr.outputs.minio.secret_access_key
-  jfs_minio_bucket            = local.minio_buckets.juicefs.name
-  jfs_minio_endpoint          = "${local.kubernetes_services.minio.endpoint}:${local.service_ports.minio}"
-  wireguard_config            = <<-EOF
+  wireguard_config    = <<-EOF
   [Interface]
   Address=${var.wireguard_client.address}
   PrivateKey=${var.wireguard_client.private_key}
@@ -80,9 +75,22 @@ module "transmission" {
   PublicKey=${var.wireguard_client.public_key}
   PersistentKeepalive=25
   EOF
-  service_hostname            = local.kubernetes_ingress_endpoints.transmission
-  ingress_class_name          = local.ingress_classes.ingress_nginx
-  nginx_ingress_annotations   = local.nginx_ingress_auth_annotations
+
+  jfs_minio_access_key_id     = data.terraform_remote_state.sr.outputs.minio.access_key_id
+  jfs_minio_secret_access_key = data.terraform_remote_state.sr.outputs.minio.secret_access_key
+  jfs_minio_bucket            = local.minio_buckets.juicefs.name
+  jfs_minio_endpoint          = "${local.kubernetes_services.minio.endpoint}:${local.service_ports.minio}"
+  redis_ca = {
+    algorithm       = tls_private_key.jfs-redis-ca.algorithm
+    private_key_pem = tls_private_key.jfs-redis-ca.private_key_pem
+    cert_pem        = tls_self_signed_cert.jfs-redis-ca.cert_pem
+  }
+  redis_endpoint = "${local.kubernetes_services.jfs_redis.endpoint}:${local.service_ports.redis}"
+  redis_db_id    = 1
+
+  service_hostname          = local.kubernetes_ingress_endpoints.transmission
+  ingress_class_name        = local.ingress_classes.ingress_nginx
+  nginx_ingress_annotations = local.nginx_ingress_auth_annotations
 }
 
 # Music stream
@@ -127,6 +135,13 @@ module "mpd" {
   jfs_minio_secret_access_key = data.terraform_remote_state.sr.outputs.minio.secret_access_key
   jfs_minio_bucket            = local.minio_buckets.juicefs.name
   jfs_minio_endpoint          = "${local.kubernetes_services.minio.endpoint}:${local.service_ports.minio}"
+  redis_ca = {
+    algorithm       = tls_private_key.jfs-redis-ca.algorithm
+    private_key_pem = tls_private_key.jfs-redis-ca.private_key_pem
+    cert_pem        = tls_self_signed_cert.jfs-redis-ca.cert_pem
+  }
+  redis_endpoint = "${local.kubernetes_services.jfs_redis.endpoint}:${local.service_ports.redis}"
+  redis_db_id    = 2
 
   data_minio_access_key_id     = data.terraform_remote_state.sr.outputs.minio.access_key_id
   data_minio_secret_access_key = data.terraform_remote_state.sr.outputs.minio.secret_access_key
@@ -136,4 +151,24 @@ module "mpd" {
   service_hostname          = local.kubernetes_ingress_endpoints.mpd
   ingress_class_name        = local.ingress_classes.ingress_nginx
   nginx_ingress_annotations = local.nginx_ingress_auth_annotations
+}
+
+# Webdav
+
+module "webdav-pictures" {
+  source  = "./modules/webdav"
+  name    = "webdav-pictures"
+  release = "0.1.0"
+  images = {
+    rclone = local.container_images.rclone
+  }
+
+  data_minio_access_key_id     = data.terraform_remote_state.sr.outputs.minio.access_key_id
+  data_minio_secret_access_key = data.terraform_remote_state.sr.outputs.minio.secret_access_key
+  data_minio_bucket            = local.minio_buckets.pictures.name
+  data_minio_endpoint          = "${local.kubernetes_services.minio.fqdn}:${local.service_ports.minio}"
+
+  service_hostname          = local.kubernetes_ingress_endpoints.webdav_pictures
+  ingress_class_name        = local.ingress_classes.ingress_nginx
+  nginx_ingress_annotations = local.nginx_ingress_annotations
 }
