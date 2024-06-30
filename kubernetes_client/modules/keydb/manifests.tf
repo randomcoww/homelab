@@ -7,17 +7,19 @@ locals {
   client_key_path  = "${local.base_path}/client.key"
   ca_cert_path     = "${local.base_path}/ca.crt"
   config_path      = "/etc/keydb.conf"
+  name             = split(".", var.cluster_service_endpoint)[0]
+  namespace        = split(".", var.cluster_service_endpoint)[1]
 
   peers = {
     for i, _ in range(var.replicas) :
-    "${var.name}-${i}" => "${var.name}-${i}.${var.cluster_service_endpoint}"
+    "${local.name}-${i}" => "${local.name}-${i}.${var.cluster_service_endpoint}"
   }
 }
 
 module "metadata" {
   source      = "../metadata"
-  name        = var.name
-  namespace   = var.namespace
+  name        = local.name
+  namespace   = local.namespace
   release     = var.release
   app_version = split(":", var.images.keydb)[1]
   manifests = {
@@ -31,8 +33,8 @@ module "metadata" {
 
 module "secret" {
   source  = "../secret"
-  name    = var.name
-  app     = var.name
+  name    = local.name
+  app     = local.name
   release = var.release
   data = {
     basename(local.cert_path)        = chomp(tls_locally_signed_cert.keydb.cert_pem)
@@ -45,8 +47,8 @@ module "secret" {
 
 module "configmap" {
   source  = "../configmap"
-  name    = var.name
-  app     = var.name
+  name    = local.name
+  app     = local.name
   release = var.release
   data = {
     for hostname, peer in local.peers :
@@ -77,8 +79,8 @@ module "configmap" {
 
 module "statefulset" {
   source            = "../statefulset"
-  name              = var.name
-  app               = var.name
+  name              = local.name
+  app               = local.name
   release           = var.release
   affinity          = var.affinity
   replicas          = var.replicas
@@ -91,7 +93,7 @@ module "statefulset" {
   spec = {
     containers = [
       {
-        name  = var.name
+        name  = local.name
         image = var.images.keydb
         args = [
           local.config_path,
@@ -138,8 +140,8 @@ module "statefulset" {
 
 module "service" {
   source  = "../service"
-  name    = var.name
-  app     = var.name
+  name    = local.name
+  app     = local.name
   release = var.release
   spec = {
     type = "ClusterIP"
@@ -156,8 +158,8 @@ module "service" {
 
 module "service-peer" {
   source  = "../service"
-  name    = "${var.name}-peer"
-  app     = var.name
+  name    = "${local.name}-peer"
+  app     = local.name
   release = var.release
   spec = {
     type                     = "ClusterIP"

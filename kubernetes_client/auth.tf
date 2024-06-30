@@ -24,11 +24,10 @@ resource "tls_self_signed_cert" "authelia-redis-ca" {
 }
 
 module "authelia-redis" {
-  source    = "./modules/keydb"
-  name      = local.kubernetes_services.authelia_redis.name
-  namespace = local.kubernetes_services.authelia_redis.namespace
-  release   = "0.1.0"
-  replicas  = 3
+  source                   = "./modules/keydb"
+  cluster_service_endpoint = local.kubernetes_services.authelia_redis.fqdn
+  release                  = "0.1.0"
+  replicas                 = 3
   images = {
     keydb = local.container_images.keydb
   }
@@ -40,7 +39,6 @@ module "authelia-redis" {
     private_key_pem = tls_private_key.authelia-redis-ca.private_key_pem
     cert_pem        = tls_self_signed_cert.authelia-redis-ca.cert_pem
   }
-  cluster_service_endpoint = local.kubernetes_services.authelia_redis.fqdn
 }
 
 module "authelia" {
@@ -185,10 +183,9 @@ module "authelia" {
 # LDAP
 
 module "lldap" {
-  source    = "./modules/lldap"
-  name      = local.kubernetes_services.lldap.name
-  namespace = local.kubernetes_services.lldap.namespace
-  release   = "0.1.0"
+  source                   = "./modules/lldap"
+  cluster_service_endpoint = local.kubernetes_services.lldap.fqdn
+  release                  = "0.1.0"
   images = {
     lldap      = local.container_images.lldap
     litestream = local.container_images.litestream
@@ -196,10 +193,9 @@ module "lldap" {
   ports = {
     lldap_ldaps = local.service_ports.lldap
   }
-  ca                       = data.terraform_remote_state.sr.outputs.lldap.ca
-  cluster_service_endpoint = local.kubernetes_services.lldap.fqdn
-  service_hostname         = local.kubernetes_ingress_endpoints.lldap_http
-  storage_secret           = data.terraform_remote_state.sr.outputs.lldap.storage_secret
+  ca               = data.terraform_remote_state.sr.outputs.lldap.ca
+  service_hostname = local.kubernetes_ingress_endpoints.lldap_http
+  storage_secret   = data.terraform_remote_state.sr.outputs.lldap.storage_secret
   extra_configs = {
     LLDAP_VERBOSE                             = true
     LLDAP_JWT_SECRET                          = data.terraform_remote_state.sr.outputs.lldap.jwt_token

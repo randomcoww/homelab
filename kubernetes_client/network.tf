@@ -61,11 +61,10 @@ module "kea" {
 # PXE boot server
 
 module "matchbox" {
-  source    = "./modules/matchbox"
-  name      = local.kubernetes_services.matchbox.name
-  namespace = local.kubernetes_services.matchbox.namespace
-  release   = "0.2.16"
-  replicas  = 3
+  source                   = "./modules/matchbox"
+  cluster_service_endpoint = local.kubernetes_services.matchbox.fqdn
+  release                  = "0.2.16"
+  replicas                 = 3
   images = {
     matchbox  = local.container_images.matchbox
     syncthing = local.container_images.syncthing
@@ -74,10 +73,9 @@ module "matchbox" {
     matchbox     = local.service_ports.matchbox
     matchbox_api = local.service_ports.matchbox_api
   }
-  service_ip               = local.services.matchbox.ip
-  service_hostname         = local.kubernetes_ingress_endpoints.matchbox
-  ca                       = data.terraform_remote_state.sr.outputs.matchbox.ca
-  cluster_service_endpoint = local.kubernetes_services.matchbox.fqdn
+  service_ip       = local.services.matchbox.ip
+  service_hostname = local.kubernetes_ingress_endpoints.matchbox
+  ca               = data.terraform_remote_state.sr.outputs.matchbox.ca
 }
 
 # Wifi AP

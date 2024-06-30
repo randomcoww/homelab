@@ -24,11 +24,10 @@ resource "tls_self_signed_cert" "jfs-redis-ca" {
 }
 
 module "jfs-redis" {
-  source    = "./modules/keydb"
-  name      = local.kubernetes_services.jfs_redis.name
-  namespace = local.kubernetes_services.jfs_redis.namespace
-  release   = "0.1.0"
-  replicas  = 3
+  source                   = "./modules/keydb"
+  cluster_service_endpoint = local.kubernetes_services.jfs_redis.fqdn
+  release                  = "0.1.0"
+  replicas                 = 3
   images = {
     keydb = local.container_images.keydb
   }
@@ -40,8 +39,7 @@ module "jfs-redis" {
     private_key_pem = tls_private_key.jfs-redis-ca.private_key_pem
     cert_pem        = tls_self_signed_cert.jfs-redis-ca.cert_pem
   }
-  cluster_service_endpoint = local.kubernetes_services.jfs_redis.fqdn
-  extra_config             = <<-EOF
+  extra_config = <<-EOF
   dir /data
   appendfsync always
   EOF

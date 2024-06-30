@@ -1,4 +1,6 @@
 locals {
+  name      = split(".", var.cluster_service_endpoint)[0]
+  namespace = split(".", var.cluster_service_endpoint)[1]
   ports = merge(var.ports, {
     lldap      = 3890
     lldap_http = 17170
@@ -28,8 +30,8 @@ locals {
 
 module "metadata" {
   source      = "../metadata"
-  name        = var.name
-  namespace   = var.namespace
+  name        = local.name
+  namespace   = local.namespace
   release     = var.release
   app_version = split(":", var.images.lldap)[1]
   manifests = {
@@ -43,8 +45,8 @@ module "metadata" {
 
 module "secret" {
   source  = "../secret"
-  name    = var.name
-  app     = var.name
+  name    = local.name
+  app     = local.name
   release = var.release
   data = merge({
     storage-secret   = var.storage_secret
@@ -58,8 +60,8 @@ module "secret" {
 
 module "service" {
   source  = "../service"
-  name    = var.name
-  app     = var.name
+  name    = local.name
+  app     = local.name
   release = var.release
   spec = {
     type = "ClusterIP"
@@ -82,8 +84,8 @@ module "service" {
 
 module "ingress" {
   source             = "../ingress"
-  name               = var.name
-  app                = var.name
+  name               = local.name
+  app                = local.name
   release            = var.release
   ingress_class_name = var.ingress_class_name
   annotations        = var.nginx_ingress_annotations
@@ -114,7 +116,7 @@ module "statefulset-litestream" {
             name                     = "minio"
             type                     = "s3"
             bucket                   = var.litestream_minio_bucket
-            path                     = var.name
+            path                     = local.name
             endpoint                 = "http://${var.litestream_minio_endpoint}"
             access-key-id            = var.litestream_minio_access_key_id
             secret-access-key        = var.litestream_minio_secret_access_key
@@ -135,8 +137,8 @@ module "statefulset-litestream" {
   }
   sqlite_path = local.db_path
   ##
-  name     = var.name
-  app      = var.name
+  name     = local.name
+  app      = local.name
   release  = var.release
   affinity = var.affinity
   annotations = {
@@ -145,7 +147,7 @@ module "statefulset-litestream" {
   spec = {
     containers = [
       {
-        name  = var.name
+        name  = local.name
         image = var.images.lldap
         args = [
           "run",

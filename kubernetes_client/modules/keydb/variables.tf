@@ -1,10 +1,5 @@
-variable "name" {
+variable "cluster_service_endpoint" {
   type = string
-}
-
-variable "namespace" {
-  type    = string
-  default = "default"
 }
 
 variable "release" {
@@ -44,10 +39,6 @@ variable "ports" {
 variable "extra_config" {
   type    = string
   default = ""
-}
-
-variable "cluster_service_endpoint" {
-  type = string
 }
 
 variable "volume_claim_templates" {

@@ -1,4 +1,7 @@
 locals {
+  name      = split(".", var.cluster_service_endpoint)[0]
+  namespace = split(".", var.cluster_service_endpoint)[1]
+
   syncthing_home_path = "/var/lib/syncthing"
   shared_data_path    = "/var/tmp/matchbox"
   ports = merge(var.ports, {
@@ -8,8 +11,8 @@ locals {
 
 module "metadata" {
   source      = "../metadata"
-  name        = var.name
-  namespace   = var.namespace
+  name        = local.name
+  namespace   = local.namespace
   release     = var.release
   app_version = split(":", var.images.matchbox)[1]
   manifests = {
@@ -25,7 +28,7 @@ module "syncthing-config" {
   source = "../syncthing_config"
   hostnames = [
     for i in range(var.replicas) :
-    "${var.name}-${i}.${var.name}.${var.namespace}"
+    "${local.name}-${i}.${var.cluster_service_endpoint}"
   ]
   syncthing_home_path = local.syncthing_home_path
   sync_data_paths = [
@@ -38,8 +41,8 @@ module "syncthing-config" {
 
 module "secret-matchbox" {
   source  = "../secret"
-  name    = "${var.name}-matchbox"
-  app     = var.name
+  name    = "${local.name}-matchbox"
+  app     = local.name
   release = var.release
   data = {
     "ca.crt"     = chomp(var.ca.cert_pem)
@@ -50,8 +53,8 @@ module "secret-matchbox" {
 
 module "secret-syncthing" {
   source  = "../secret"
-  name    = "${var.name}-syncthing"
-  app     = var.name
+  name    = "${local.name}-syncthing"
+  app     = local.name
   release = var.release
   data = merge({
     "config.xml" = module.syncthing-config.config
@@ -66,8 +69,8 @@ module "secret-syncthing" {
 
 module "service" {
   source  = "../service"
-  name    = var.name
-  app     = var.name
+  name    = local.name
+  app     = local.name
   release = var.release
   annotations = {
     "external-dns.alpha.kubernetes.io/hostname" = var.service_hostname
@@ -96,8 +99,8 @@ module "service" {
 
 module "service-peer" {
   source  = "../service"
-  name    = "${var.name}-peer"
-  app     = var.name
+  name    = "${local.name}-peer"
+  app     = local.name
   release = var.release
   spec = {
     type                     = "ClusterIP"
@@ -108,8 +111,8 @@ module "service-peer" {
 
 module "statefulset" {
   source            = "../statefulset"
-  name              = var.name
-  app               = var.name
+  name              = local.name
+  app               = local.name
   release           = var.release
   affinity          = var.affinity
   replicas          = var.replicas
@@ -121,7 +124,7 @@ module "statefulset" {
   spec = {
     containers = [
       {
-        name  = var.name
+        name  = local.name
         image = var.images.matchbox
         args = [
           "-address=0.0.0.0:${local.ports.matchbox}",
@@ -159,7 +162,7 @@ module "statefulset" {
         }
       },
       {
-        name  = "${var.name}-syncthing"
+        name  = "${local.name}-syncthing"
         image = var.images.syncthing
         command = [
           "sh",

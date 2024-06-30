@@ -1,10 +1,5 @@
-variable "name" {
+variable "cluster_service_endpoint" {
   type = string
-}
-
-variable "namespace" {
-  type    = string
-  default = "default"
 }
 
 variable "release" {
@@ -40,10 +35,6 @@ variable "service_ip" {
 }
 
 variable "service_hostname" {
-  type = string
-}
-
-variable "cluster_service_endpoint" {
   type = string
 }
 
