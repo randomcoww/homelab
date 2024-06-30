@@ -186,7 +186,7 @@ locals {
         namespace = "authelia"
       }
       authelia_redis = {
-        name      = "redis"
+        name      = "authelia-redis"
         namespace = "authelia"
       }
       ingress_nginx = {
@@ -216,6 +216,10 @@ locals {
       alpaca_db = {
         name      = "alpaca-db"
         namespace = "alpaca"
+      }
+      jfs_redis = {
+        name      = "jfs-redis"
+        namespace = "jfs"
       }
     } :
     name => merge(e, {

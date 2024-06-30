@@ -23,6 +23,7 @@ locals {
     module.alpaca-db,
     module.qrcode,
     module.mpd,
+    module.jfs-redis,
   ]
 }
 
