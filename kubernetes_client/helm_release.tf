@@ -2,6 +2,7 @@
 
 locals {
   modules_enabled = [
+    module.jfs-redis,
     module.transmission,
     module.hostapd,
     module.tailscale,
@@ -20,10 +21,10 @@ locals {
     module.kube-proxy,
     module.lldap,
     module.alpaca-stream,
-    module.alpaca-db,
+    # module.alpaca-db,
     module.qrcode,
     module.mpd,
-    module.jfs-redis,
+    module.webdav-pictures,
   ]
 }
 

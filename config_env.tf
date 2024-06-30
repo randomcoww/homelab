@@ -153,19 +153,20 @@ locals {
 
   kubernetes_ingress_endpoints = {
     for k, domain in {
-      auth          = "auth"
-      transmission  = "t"
-      minio         = "minio"
-      vaultwarden   = "vw"
-      matchbox      = "ign"
-      jupyter       = "jupyter"
-      code          = "code"
-      alpaca_stream = "alpaca-stream"
-      alpaca_db     = "alpaca-db"
-      lldap_http    = "ldap"
-      qrcode        = "qrcode"
-      qrcode_wifi   = "wifi"
-      mpd           = "mpd"
+      auth            = "auth"
+      transmission    = "t"
+      minio           = "minio"
+      vaultwarden     = "vw"
+      matchbox        = "ign"
+      jupyter         = "jupyter"
+      code            = "code"
+      alpaca_stream   = "alpaca-stream"
+      alpaca_db       = "alpaca-db"
+      lldap_http      = "ldap"
+      qrcode          = "qrcode"
+      qrcode_wifi     = "wifi"
+      mpd             = "mpd"
+      webdav_pictures = "p"
     } :
     k => "${domain}.${local.domains.public}"
   }

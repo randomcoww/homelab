@@ -41,6 +41,7 @@ module "alpaca-stream" {
   alpaca_api_base_url   = var.alpaca.api_base_url
 }
 
+/*
 module "alpaca-db" {
   source    = "./modules/clickhouse"
   name      = local.kubernetes_services.alpaca_db.name
@@ -70,3 +71,4 @@ module "alpaca-db" {
   service_ip               = local.services.alpaca_db.ip
   cluster_service_endpoint = local.kubernetes_services.alpaca_db.fqdn
 }
+*/
