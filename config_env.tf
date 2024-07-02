@@ -240,6 +240,7 @@ locals {
     kube_proxy         = 50254
     etcd_client        = 58082
     etcd_peer          = 58083
+    flannel_healthz    = 58084
   }
 
   service_ports = {

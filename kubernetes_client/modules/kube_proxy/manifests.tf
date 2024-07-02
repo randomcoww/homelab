@@ -125,15 +125,25 @@ module "daemonset" {
             mountPath = "/etc/kube-proxy"
           },
         ]
+        readinessProbe = {
+          httpGet = {
+            scheme = "HTTP"
+            host   = "127.0.0.1"
+            port   = var.ports.kube_proxy
+            path   = "/healthz"
+          }
+          initialDelaySeconds = 15
+          timeoutSeconds      = 15
+        }
         livenessProbe = {
           httpGet = {
-            scheme              = "HTTP"
-            host                = "127.0.0.1"
-            port                = var.ports.kube_proxy
-            path                = "/healthz"
-            initialDelaySeconds = 15
-            timeoutSeconds      = 15
+            scheme = "HTTP"
+            host   = "127.0.0.1"
+            port   = var.ports.kube_proxy
+            path   = "/healthz"
           }
+          initialDelaySeconds = 15
+          timeoutSeconds      = 15
         }
       }
     ]

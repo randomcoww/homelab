@@ -33,6 +33,9 @@ module "flannel" {
     flannel            = local.container_images.flannel
     flannel_cni_plugin = local.container_images.flannel_cni_plugin
   }
+  ports = {
+    healthz = local.host_ports.flannel_healthz
+  }
   kubernetes_pod_prefix     = local.networks.kubernetes_pod.prefix
   cni_bridge_interface_name = local.kubernetes.cni_bridge_interface_name
   cni_version               = "0.3.1"

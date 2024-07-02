@@ -18,6 +18,12 @@ variable "images" {
   })
 }
 
+variable "ports" {
+  type = object({
+    healthz = number
+  })
+}
+
 variable "kubernetes_pod_prefix" {
   type = string
 }

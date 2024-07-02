@@ -193,6 +193,8 @@ module "daemonset" {
           "--kube-subnet-mgr",
           "--iface=$(POD_IP)",
           "--public-ip=$(POD_IP)",
+          "--healthz-ip=127.0.0.1",
+          "--healthz-port=${var.ports.healthz}",
         ]
         resources = {
           requests = {
@@ -242,6 +244,26 @@ module "daemonset" {
             value = "5000"
           },
         ]
+        readinessProbe = {
+          httpGet = {
+            scheme = "HTTP"
+            host   = "127.0.0.1"
+            port   = var.ports.healthz
+            path   = "/healthz"
+          }
+          initialDelaySeconds = 15
+          timeoutSeconds      = 15
+        }
+        livenessProbe = {
+          httpGet = {
+            scheme = "HTTP"
+            host   = "127.0.0.1"
+            port   = var.ports.healthz
+            path   = "/healthz"
+          }
+          initialDelaySeconds = 15
+          timeoutSeconds      = 15
+        }
         volumeMounts = [
           {
             name      = "run"
