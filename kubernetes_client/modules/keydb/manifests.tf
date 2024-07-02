@@ -7,6 +7,7 @@ locals {
   client_key_path  = "${local.base_path}/client.key"
   ca_cert_path     = "${local.base_path}/ca.crt"
   config_path      = "/etc/keydb.conf"
+  socket_path      = "/tmp/keydb.sock"
   name             = split(".", var.cluster_service_endpoint)[0]
   namespace        = split(".", var.cluster_service_endpoint)[1]
 
@@ -55,6 +56,7 @@ module "configmap" {
     "${basename(local.config_path)}-${hostname}" => <<-EOF
     bind 0.0.0.0
     port 0
+    unixsocket ${local.socket_path}
     tls-port ${var.ports.keydb}
     tls-cert-file ${local.cert_path}
     tls-key-file ${local.key_path}
@@ -119,6 +121,30 @@ module "statefulset" {
             subPathExpr = "${basename(local.config_path)}-$(POD_NAME)"
           },
         ], var.extra_volume_mounts)
+        readinessProbe = {
+          exec = {
+            command = [
+              "keydb-cli",
+              "-s",
+              local.socket_path,
+              "ping",
+            ]
+          }
+          initialDelaySeconds = 15
+          timeoutSeconds      = 15
+        }
+        livenessProbe = {
+          exec = {
+            command = [
+              "keydb-cli",
+              "-s",
+              local.socket_path,
+              "ping",
+            ]
+          }
+          initialDelaySeconds = 15
+          timeoutSeconds      = 15
+        }
       },
     ]
     volumes = concat([
