@@ -252,6 +252,24 @@ module "statefulset-jfs" {
             containerPort = local.transmission_settings.rpc-port
           },
         ]
+        readinessProbe = {
+          httpGet = {
+            scheme = "HTTP"
+            port   = local.transmission_settings.rpc-port
+            path   = "/"
+          }
+          initialDelaySeconds = 15
+          timeoutSeconds      = 15
+        }
+        livenessProbe = {
+          httpGet = {
+            scheme = "HTTP"
+            port   = local.transmission_settings.rpc-port
+            path   = "/"
+          }
+          initialDelaySeconds = 15
+          timeoutSeconds      = 15
+        }
       },
     ]
     volumes = [

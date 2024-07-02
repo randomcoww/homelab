@@ -99,6 +99,24 @@ module "deployment" {
             containerPort = local.ports.qrcode
           },
         ]
+        readinessProbe = {
+          httpGet = {
+            scheme = "HTTP"
+            port   = local.ports.qrcode
+            path   = "/"
+          }
+          initialDelaySeconds = 15
+          timeoutSeconds      = 15
+        }
+        livenessProbe = {
+          httpGet = {
+            scheme = "HTTP"
+            port   = local.ports.qrcode
+            path   = "/"
+          }
+          initialDelaySeconds = 15
+          timeoutSeconds      = 15
+        }
       },
     ]
   }

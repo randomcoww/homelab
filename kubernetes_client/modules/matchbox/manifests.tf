@@ -153,20 +153,22 @@ module "statefulset" {
           },
         ]
         readinessProbe = {
-          tcpSocket = {
-            port = local.ports.matchbox_api
+          httpGet = {
+            scheme = "HTTP"
+            port   = local.ports.matchbox
+            path   = "/"
           }
-          initialDelaySeconds = 5
-          periodSeconds       = 10
-          timeoutSeconds      = 5
+          initialDelaySeconds = 15
+          timeoutSeconds      = 15
         }
         livenessProbe = {
-          tcpSocket = {
-            port = local.ports.matchbox_api
+          httpGet = {
+            scheme = "HTTP"
+            port   = local.ports.matchbox
+            path   = "/"
           }
-          initialDelaySeconds = 5
-          periodSeconds       = 10
-          timeoutSeconds      = 5
+          initialDelaySeconds = 15
+          timeoutSeconds      = 15
         }
       },
       {

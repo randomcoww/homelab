@@ -248,6 +248,24 @@ module "statefulset-jfs" {
             containerPort = local.ports.mympd
           },
         ]
+        readinessProbe = {
+          httpGet = {
+            scheme = "HTTP"
+            port   = local.ports.mympd
+            path   = "/"
+          }
+          initialDelaySeconds = 15
+          timeoutSeconds      = 15
+        }
+        livenessProbe = {
+          httpGet = {
+            scheme = "HTTP"
+            port   = local.ports.mympd
+            path   = "/"
+          }
+          initialDelaySeconds = 15
+          timeoutSeconds      = 15
+        }
       },
     ]
     volumes = [
