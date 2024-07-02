@@ -152,6 +152,14 @@ module "statefulset" {
             containerPort = local.ports.matchbox_api
           },
         ]
+        readinessProbe = {
+          tcpSocket = {
+            port = local.ports.matchbox_api
+          }
+          initialDelaySeconds = 5
+          periodSeconds       = 10
+          timeoutSeconds      = 5
+        }
         livenessProbe = {
           tcpSocket = {
             port = local.ports.matchbox_api
