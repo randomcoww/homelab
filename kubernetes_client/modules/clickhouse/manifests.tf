@@ -20,6 +20,7 @@ locals {
   clickhouse_config = merge({
     mysql_port             = 9004
     postgresql_port        = 9005
+    http_port              = 8123
     https_port             = 8443
     interserver_https_port = 9010
     interserver_http_port = {
@@ -381,6 +382,24 @@ module "statefulset" {
             containerPort = local.ports.keeper
           },
         ]
+        readinessProbe = {
+          httpGet = {
+            scheme = "HTTP"
+            port   = local.clickhouse_config.http_port
+            path   = "/ping"
+          }
+          initialDelaySeconds = 15
+          timeoutSeconds      = 15
+        }
+        livenessProbe = {
+          tcpSocket = {
+            scheme = "HTTP"
+            port   = local.clickhouse_config.http_port
+            path   = "/ping"
+          }
+          initialDelaySeconds = 15
+          timeoutSeconds      = 15
+        }
       },
     ]
     volumes = concat([

@@ -20,6 +20,7 @@ locals {
     LLDAP_LDAPS_OPTIONS__CERT_FILE = local.ldaps_cert_path
     LLDAP_LDAPS_OPTIONS__KEY_FILE  = local.ldaps_key_path
     LLDAP_KEY_FILE                 = local.storage_secret_path
+    LLDAP_KEY_SEED                 = ""
 
     LLDAP_HTTP_HOST    = "0.0.0.0"
     LLDAP_LDAP_HOST    = "0.0.0.0"
@@ -183,6 +184,30 @@ module "statefulset-litestream" {
             subPath   = "ldaps-key.pem"
           },
         ]
+        readinessProbe = {
+          exec = {
+            command = [
+              "/app/lldap",
+              "healthcheck",
+              "--config-file",
+              "/data/lldap_config.toml",
+            ]
+          }
+          initialDelaySeconds = 15
+          timeoutSeconds      = 15
+        }
+        livenessProbe = {
+          exec = {
+            command = [
+              "/app/lldap",
+              "healthcheck",
+              "--config-file",
+              "/data/lldap_config.toml",
+            ]
+          }
+          initialDelaySeconds = 15
+          timeoutSeconds      = 15
+        }
       },
     ]
     volumes = [
