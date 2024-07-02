@@ -69,7 +69,6 @@ module "configmap" {
     tls-ciphersuites TLS_CHACHA20_POLY1305_SHA256
     active-replica yes
     multi-master yes
-    appendonly yes
     ${var.extra_config}
     ${join("\n", [
     for k, v in local.peers :

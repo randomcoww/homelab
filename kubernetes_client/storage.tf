@@ -39,4 +39,34 @@ module "jfs-redis" {
     private_key_pem = tls_private_key.jfs-redis-ca.private_key_pem
     cert_pem        = tls_self_signed_cert.jfs-redis-ca.cert_pem
   }
+  extra_config = <<-EOF
+  dir /data
+  appendonly yes
+  appendfsync always
+  repl-diskless-sync yes
+  EOF
+  extra_volume_mounts = [
+    {
+      name      = "data"
+      mountPath = "/data"
+    },
+  ]
+  volume_claim_templates = [
+    {
+      metadata = {
+        name = "data"
+      }
+      spec = {
+        accessModes = [
+          "ReadWriteOnce",
+        ]
+        resources = {
+          requests = {
+            storage = "4Gi"
+          }
+        }
+        storageClassName = "local-path"
+      }
+    },
+  ]
 }
