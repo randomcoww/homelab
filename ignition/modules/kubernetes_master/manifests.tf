@@ -293,6 +293,16 @@ module "controller-manager" {
           "--feature-gates=NodeOutOfServiceVolumeDetach=true",
           "--v=2",
         ]
+        readinessProbe = {
+          httpGet = {
+            scheme = "HTTPS"
+            host   = "127.0.0.1"
+            port   = var.ports.controller_manager
+            path   = "/healthz"
+          }
+          initialDelaySeconds = 15
+          timeoutSeconds      = 15
+        }
         livenessProbe = {
           httpGet = {
             scheme = "HTTPS"
@@ -338,6 +348,16 @@ module "scheduler" {
           "--bind-address=127.0.0.1",
           "--v=2",
         ]
+        readinessProbe = {
+          httpGet = {
+            scheme = "HTTPS"
+            host   = "127.0.0.1"
+            port   = var.ports.scheduler
+            path   = "/healthz"
+          }
+          initialDelaySeconds = 15
+          timeoutSeconds      = 15
+        }
         livenessProbe = {
           httpGet = {
             scheme = "HTTPS"
