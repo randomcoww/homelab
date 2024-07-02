@@ -158,8 +158,6 @@ module "statefulset" {
             port   = local.ports.matchbox
             path   = "/"
           }
-          initialDelaySeconds = 15
-          timeoutSeconds      = 15
         }
         livenessProbe = {
           httpGet = {
@@ -167,8 +165,6 @@ module "statefulset" {
             port   = local.ports.matchbox
             path   = "/"
           }
-          initialDelaySeconds = 15
-          timeoutSeconds      = 15
         }
       },
       {

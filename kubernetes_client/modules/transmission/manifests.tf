@@ -258,8 +258,6 @@ module "statefulset-jfs" {
             port   = local.transmission_settings.rpc-port
             path   = "/"
           }
-          initialDelaySeconds = 15
-          timeoutSeconds      = 15
         }
         livenessProbe = {
           httpGet = {
@@ -267,8 +265,6 @@ module "statefulset-jfs" {
             port   = local.transmission_settings.rpc-port
             path   = "/"
           }
-          initialDelaySeconds = 15
-          timeoutSeconds      = 15
         }
       },
     ]

@@ -193,8 +193,6 @@ module "statefulset-litestream" {
               "/data/lldap_config.toml",
             ]
           }
-          initialDelaySeconds = 15
-          timeoutSeconds      = 15
         }
         livenessProbe = {
           exec = {
@@ -205,8 +203,6 @@ module "statefulset-litestream" {
               "/data/lldap_config.toml",
             ]
           }
-          initialDelaySeconds = 15
-          timeoutSeconds      = 15
         }
       },
     ]

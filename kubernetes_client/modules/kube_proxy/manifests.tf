@@ -132,8 +132,6 @@ module "daemonset" {
             port   = var.ports.kube_proxy
             path   = "/healthz"
           }
-          initialDelaySeconds = 15
-          timeoutSeconds      = 15
         }
         livenessProbe = {
           httpGet = {
@@ -142,8 +140,6 @@ module "daemonset" {
             port   = var.ports.kube_proxy
             path   = "/healthz"
           }
-          initialDelaySeconds = 15
-          timeoutSeconds      = 15
         }
       }
     ]

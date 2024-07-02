@@ -106,8 +106,6 @@ module "deployment" {
             port   = local.ports.rclone
             path   = "/"
           }
-          initialDelaySeconds = 15
-          timeoutSeconds      = 15
         }
         livenessProbe = {
           httpGet = {
@@ -115,8 +113,6 @@ module "deployment" {
             port   = local.ports.rclone
             path   = "/"
           }
-          initialDelaySeconds = 15
-          timeoutSeconds      = 15
         }
       },
     ]

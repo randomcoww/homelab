@@ -146,8 +146,6 @@ module "statefulset-jfs" {
             port   = local.ports.code_server
             path   = "/healthz"
           }
-          initialDelaySeconds = 15
-          timeoutSeconds      = 15
         }
         livenessProbe = {
           httpGet = {
@@ -155,8 +153,6 @@ module "statefulset-jfs" {
             port   = local.ports.code_server
             path   = "/healthz"
           }
-          initialDelaySeconds = 15
-          timeoutSeconds      = 15
         }
         securityContext = var.code_server_security_context
         resources       = var.code_server_resources

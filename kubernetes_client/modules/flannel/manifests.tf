@@ -251,8 +251,6 @@ module "daemonset" {
             port   = var.ports.healthz
             path   = "/healthz"
           }
-          initialDelaySeconds = 15
-          timeoutSeconds      = 15
         }
         livenessProbe = {
           httpGet = {
@@ -261,8 +259,6 @@ module "daemonset" {
             port   = var.ports.healthz
             path   = "/healthz"
           }
-          initialDelaySeconds = 15
-          timeoutSeconds      = 15
         }
         volumeMounts = [
           {

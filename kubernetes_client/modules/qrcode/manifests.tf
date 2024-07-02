@@ -105,8 +105,6 @@ module "deployment" {
             port   = local.ports.qrcode
             path   = "/"
           }
-          initialDelaySeconds = 15
-          timeoutSeconds      = 15
         }
         livenessProbe = {
           httpGet = {
@@ -114,8 +112,6 @@ module "deployment" {
             port   = local.ports.qrcode
             path   = "/"
           }
-          initialDelaySeconds = 15
-          timeoutSeconds      = 15
         }
       },
     ]

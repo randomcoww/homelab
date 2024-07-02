@@ -97,7 +97,8 @@ module "statefulset" {
       {
         name  = local.name
         image = var.images.keydb
-        args = [
+        command = [
+          "keydb-server",
           local.config_path,
         ]
         env = [
@@ -130,8 +131,6 @@ module "statefulset" {
               "ping",
             ]
           }
-          initialDelaySeconds = 15
-          timeoutSeconds      = 15
         }
         livenessProbe = {
           exec = {
@@ -142,8 +141,6 @@ module "statefulset" {
               "ping",
             ]
           }
-          initialDelaySeconds = 15
-          timeoutSeconds      = 15
         }
       },
     ]

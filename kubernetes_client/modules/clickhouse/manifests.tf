@@ -388,8 +388,6 @@ module "statefulset" {
             port   = local.clickhouse_config.http_port
             path   = "/ping"
           }
-          initialDelaySeconds = 15
-          timeoutSeconds      = 15
         }
         livenessProbe = {
           tcpSocket = {
@@ -397,8 +395,6 @@ module "statefulset" {
             port   = local.clickhouse_config.http_port
             path   = "/ping"
           }
-          initialDelaySeconds = 15
-          timeoutSeconds      = 15
         }
       },
     ]
