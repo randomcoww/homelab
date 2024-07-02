@@ -139,6 +139,24 @@ module "statefulset-litestream" {
             containerPort = local.ports.vaultwarden
           },
         ]
+        readinessProbe = {
+          httpGet = {
+            scheme = "HTTP"
+            port   = local.ports.vaultwarden
+            path   = "/alive"
+          }
+          initialDelaySeconds = 15
+          timeoutSeconds      = 15
+        }
+        livenessProbe = {
+          httpGet = {
+            scheme = "HTTP"
+            port   = local.ports.vaultwarden
+            path   = "/alive"
+          }
+          initialDelaySeconds = 15
+          timeoutSeconds      = 15
+        }
       },
     ]
   }
