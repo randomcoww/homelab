@@ -8,8 +8,8 @@ resource "tls_cert_request" "clickhouse" {
   private_key_pem = tls_private_key.clickhouse.private_key_pem
 
   subject {
-    common_name  = var.name
-    organization = var.name
+    common_name  = "clickhouse"
+    organization = "clickhouse"
   }
 
   dns_names = concat([
@@ -19,7 +19,8 @@ resource "tls_cert_request" "clickhouse" {
     var.service_hostname,
   ])
   ip_addresses = [
-    var.service_ip
+    "127.0.0.1",
+    var.service_ip,
   ]
 }
 

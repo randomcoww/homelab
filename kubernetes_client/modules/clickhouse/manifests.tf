@@ -1,25 +1,41 @@
 locals {
+  name      = split(".", var.cluster_service_endpoint)[0]
+  namespace = split(".", var.cluster_service_endpoint)[1]
+  members = [
+    for i in range(var.replicas) :
+    "${local.name}-${i}"
+  ]
+
   base_path    = "/etc/clickhouse-server"
   config_path  = "${local.base_path}/config.d/server.yaml"
   cert_path    = "${local.base_path}/server.crt"
   key_path     = "${local.base_path}/server.key"
   ca_cert_path = "${local.base_path}/ca.crt"
+  ports = {
+    clickhouse = 9440
+    keeper     = 9281
+    raft       = 9444
+  }
 
   clickhouse_config = merge({
-    mysql_port        = 9004
-    postgresql_port   = 9005
-    https_port        = 8443
-    tcp_port_secure   = 9440
-    path              = "/var/lib/clickhouse/mnt"
+    mysql_port             = 9004
+    postgresql_port        = 9005
+    https_port             = 8443
+    interserver_https_port = 9010
+    interserver_http_port = {
+      "@remove" = "remove"
+    }
+    tcp_port_secure   = local.ports.clickhouse
+    path              = "/var/lib/clickhouse"
     listen_reuse_port = 1
-    }, var.clickhouse_config, {
+    }, var.extra_clickhouse_config, {
     logger = {
       "@replace" = "replace"
       level      = "warning"
       console    = 1
     }
     grpc = {
-      enable_ssl       = true
+      enable_ssl       = 1
       ssl_cert_file    = local.cert_path
       ssl_key_file     = local.key_path
       ssl_ca_cert_file = local.ca_cert_path
@@ -30,26 +46,56 @@ locals {
         privateKeyFile  = local.key_path
         caConfig        = local.ca_cert_path
       }
-    }
-    merge_tree = {
-      storage_policy = "s3"
+      client = {
+        caConfig = local.ca_cert_path
+      }
     }
     storage_configuration = {
       "@replace" = "replace"
-      disks = [
-        {
-          s3 = {
-            type                 = "object_storage"
-            object_storage_type  = "s3"
-            metadata_type        = "plain_rewritable"
-            endpoint             = "http://${var.data_minio_endpoint}/${var.data_minio_bucket}/${var.name}/"
-            access_key_id        = var.data_minio_access_key_id
-            secret_access_key    = var.data_minio_secret_access_key
-            region               = ""
-            support_batch_delete = true
-          }
-        },
-      ]
+      disks = {
+        s3 = {
+          type                 = "object_storage"
+          object_storage_type  = "s3"
+          metadata_type        = "local"
+          endpoint             = "http://${var.data_minio_endpoint}/${var.data_minio_bucket}/${local.name}/s3/"
+          access_key_id        = var.data_minio_access_key_id
+          secret_access_key    = var.data_minio_secret_access_key
+          region               = ""
+          support_batch_delete = true
+        }
+        meta_s3 = {
+          type                 = "object_storage"
+          object_storage_type  = "s3"
+          metadata_type        = "plain_rewritable"
+          endpoint             = "http://${var.data_minio_endpoint}/${var.data_minio_bucket}/${local.name}/meta_s3/"
+          access_key_id        = var.data_minio_access_key_id
+          secret_access_key    = var.data_minio_secret_access_key
+          region               = ""
+          support_batch_delete = true
+        }
+        # needs old formatting for keeper storage configs
+        log_s3_plain = {
+          type              = "s3_plain"
+          endpoint          = "http://${var.data_minio_endpoint}/${var.data_minio_bucket}/${local.name}/log/"
+          access_key_id     = var.data_minio_access_key_id
+          secret_access_key = var.data_minio_secret_access_key
+          region            = ""
+        }
+        snapshot_s3_plain = {
+          type              = "s3_plain"
+          endpoint          = "http://${var.data_minio_endpoint}/${var.data_minio_bucket}/${local.name}/snapshot/"
+          access_key_id     = var.data_minio_access_key_id
+          secret_access_key = var.data_minio_secret_access_key
+          region            = ""
+        }
+        state_s3_plain = {
+          type              = "s3_plain"
+          endpoint          = "http://${var.data_minio_endpoint}/${var.data_minio_bucket}/${local.name}/state/"
+          access_key_id     = var.data_minio_access_key_id
+          secret_access_key = var.data_minio_secret_access_key
+          region            = ""
+        }
+      }
       policies = {
         s3 = {
           volumes = {
@@ -58,7 +104,17 @@ locals {
             }
           }
         }
+        meta_s3 = {
+          volumes = {
+            main = {
+              disks = "meta_s3"
+            }
+          }
+        }
       }
+    }
+    merge_tree = {
+      storage_policy = "meta_s3"
     }
     asynchronous_metric_log = {
       "@remove" = "remove"
@@ -96,41 +152,94 @@ locals {
     crash_log = {
       "@remove" = "remove"
     }
+
+    zookeeper = {
+      node = [
+        for _, member in local.members :
+        {
+          host   = "${member}.${var.cluster_service_endpoint}"
+          port   = local.ports.keeper
+          secure = 1
+        }
+      ]
+    }
+
+    remote_servers = {
+      "@replace" = "replace"
+      default = {
+        shard = {
+          replica = [
+            for _, member in local.members :
+            {
+              host   = "${member}.${var.cluster_service_endpoint}"
+              port   = local.ports.clickhouse
+              secure = 1
+            }
+          ]
+        }
+      }
+    }
   })
-  jfs_metadata_path = "/var/lib/jfs/${var.name}.db"
+
+  keeper_config = merge({
+    tcp_port_secure       = local.ports.keeper
+    log_storage_disk      = "log_s3_plain"
+    snapshot_storage_disk = "snapshot_s3_plain"
+    state_storage_disk    = "state_s3_plain"
+    coordination_settings = {
+      force_sync = false
+    }
+    raft_configuration = {
+      secure = true
+      server = [
+        for i, member in local.members :
+        {
+          id       = i + 1
+          hostname = "${member}.${var.cluster_service_endpoint}"
+          port     = local.ports.raft
+        }
+      ]
+    }
+  }, var.extra_keeper_config)
 }
 
 module "metadata" {
   source      = "../metadata"
-  name        = var.name
-  namespace   = var.namespace
+  name        = local.name
+  namespace   = local.namespace
   release     = var.release
   app_version = split(":", var.images.clickhouse)[1]
   manifests = {
-    "templates/service.yaml"           = module.service.manifest
-    "templates/secret.yaml"            = module.secret.manifest
-    "templates/statefulset.yaml"       = module.statefulset-jfs.statefulset
-    "templates/secret-litestream.yaml" = module.statefulset-jfs.secret
+    "templates/service.yaml"      = module.service.manifest
+    "templates/service-peer.yaml" = module.service-peer.manifest
+    "templates/secret.yaml"       = module.secret.manifest
+    "templates/statefulset.yaml"  = module.statefulset.manifest
   }
 }
 
 module "secret" {
   source  = "../secret"
-  name    = var.name
-  app     = var.name
+  name    = local.name
+  app     = local.name
   release = var.release
-  data = {
-    basename(local.config_path)  = yamlencode(local.clickhouse_config)
+  data = merge({
     basename(local.cert_path)    = chomp(tls_locally_signed_cert.clickhouse.cert_pem)
     basename(local.key_path)     = chomp(tls_private_key.clickhouse.private_key_pem)
     basename(local.ca_cert_path) = chomp(var.ca.cert_pem)
-  }
+    }, {
+    for i, member in local.members :
+    "config-${member}" => yamlencode(merge(local.clickhouse_config, {
+      keeper_server = merge(local.keeper_config, {
+        server_id = i + 1
+      })
+    }))
+  })
 }
 
 module "service" {
   source  = "../service"
-  name    = var.name
-  app     = var.name
+  name    = local.name
+  app     = local.name
   release = var.release
   annotations = {
     "external-dns.alpha.kubernetes.io/hostname" = var.service_hostname
@@ -160,61 +269,48 @@ module "service" {
         targetPort = local.clickhouse_config.https_port
       },
       {
-        name       = "tcp"
-        port       = local.clickhouse_config.tcp_port_secure
+        name       = "interserver"
+        port       = local.clickhouse_config.interserver_https_port
         protocol   = "TCP"
-        targetPort = local.clickhouse_config.tcp_port_secure
+        targetPort = local.clickhouse_config.interserver_https_port
+      },
+      {
+        name       = "clickhouse"
+        port       = local.ports.clickhouse
+        protocol   = "TCP"
+        targetPort = local.ports.clickhouse
       },
     ]
   }
 }
 
-module "statefulset-jfs" {
-  source = "../statefulset_jfs"
-  ## litestream settings
-  litestream_image = var.images.litestream
-  litestream_config = {
-    dbs = [
-      {
-        path = local.jfs_metadata_path
-        replicas = [
-          {
-            type                     = "s3"
-            bucket                   = var.jfs_minio_bucket
-            path                     = basename(local.jfs_metadata_path)
-            endpoint                 = "http://${var.jfs_minio_endpoint}"
-            access-key-id            = var.jfs_minio_access_key_id
-            secret-access-key        = var.jfs_minio_secret_access_key
-            retention                = "2m"
-            retention-check-interval = "2m"
-            sync-interval            = "500ms"
-            snapshot-interval        = "1h"
-          },
-        ]
-      },
-    ]
+module "service-peer" {
+  source  = "../service"
+  name    = "${local.name}-peer"
+  app     = local.name
+  release = var.release
+  spec = {
+    type                     = "ClusterIP"
+    clusterIP                = "None"
+    publishNotReadyAddresses = true
   }
-  sqlite_path = local.jfs_metadata_path
+}
 
-  ## jfs settings
-  jfs_image                   = var.images.juicefs
-  jfs_mount_path              = local.clickhouse_config.path
-  jfs_minio_resource          = "http://${var.jfs_minio_endpoint}/${var.jfs_minio_bucket}"
-  jfs_minio_access_key_id     = var.jfs_minio_access_key_id
-  jfs_minio_secret_access_key = var.jfs_minio_secret_access_key
-  ##
-
-  name     = var.name
-  app      = var.name
-  release  = var.release
-  affinity = var.affinity
+module "statefulset" {
+  source            = "../statefulset"
+  name              = local.name
+  app               = local.name
+  release           = var.release
+  replicas          = var.replicas
+  min_ready_seconds = 30
+  affinity          = var.affinity
   annotations = {
     "checksum/secret" = sha256(module.secret.manifest)
   }
   spec = {
     containers = [
       {
-        name  = var.name
+        name  = local.name
         image = var.images.clickhouse
         command = [
           "sh",
@@ -222,18 +318,26 @@ module "statefulset-jfs" {
           <<-EOF
           set -e
 
-          mountpoint ${local.clickhouse_config.path}
-
           rm -f ${local.clickhouse_config.path}/status
           exec clickhouse-server \
-            -C /etc/clickhouse-server/config.xml
+            -C ${local.base_path}/config.xml
           EOF
         ]
-        volumeMounts = [
+        env = [
           {
-            name      = "secret"
-            mountPath = local.config_path
-            subPath   = basename(local.config_path)
+            name = "POD_NAME"
+            valueFrom = {
+              fieldRef = {
+                fieldPath = "metadata.name"
+              }
+            }
+          },
+        ]
+        volumeMounts = concat([
+          {
+            name        = "secret"
+            mountPath   = local.config_path
+            subPathExpr = "config-$(POD_NAME)"
           },
           {
             name      = "secret"
@@ -250,7 +354,7 @@ module "statefulset-jfs" {
             mountPath = local.ca_cert_path
             subPath   = basename(local.ca_cert_path)
           },
-        ]
+        ], var.extra_volume_mounts)
         ports = [
           {
             name          = "mysql"
@@ -265,13 +369,21 @@ module "statefulset-jfs" {
             containerPort = local.clickhouse_config.https_port
           },
           {
-            name          = "tcp"
-            containerPort = local.clickhouse_config.tcp_port_secure
+            name          = "interserver"
+            containerPort = local.clickhouse_config.interserver_https_port
+          },
+          {
+            name          = "clickhouse"
+            containerPort = local.ports.clickhouse
+          },
+          {
+            name          = "keeper"
+            containerPort = local.ports.keeper
           },
         ]
       },
     ]
-    volumes = [
+    volumes = concat([
       {
         name = "secret"
         secret = {
@@ -279,6 +391,7 @@ module "statefulset-jfs" {
           defaultMode = 493
         }
       },
-    ]
+    ], var.extra_volumes)
   }
+  volume_claim_templates = var.volume_claim_templates
 }

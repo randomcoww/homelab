@@ -21,7 +21,7 @@ locals {
     module.kube-proxy,
     module.lldap,
     module.alpaca-stream,
-    # module.alpaca-db,
+    module.alpaca-db,
     module.qrcode,
     module.mpd,
     module.webdav-pictures,

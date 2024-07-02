@@ -1,14 +1,13 @@
-variable "name" {
+variable "cluster_service_endpoint" {
   type = string
-}
-
-variable "namespace" {
-  type    = string
-  default = "default"
 }
 
 variable "release" {
   type = string
+}
+
+variable "replicas" {
+  type = number
 }
 
 variable "affinity" {
@@ -19,8 +18,6 @@ variable "affinity" {
 variable "images" {
   type = object({
     clickhouse = string
-    litestream = string
-    juicefs    = string
   })
 }
 
@@ -30,27 +27,6 @@ variable "ca" {
     private_key_pem = string
     cert_pem        = string
   })
-}
-
-variable "clickhouse_config" {
-  type    = any
-  default = {}
-}
-
-variable "jfs_minio_endpoint" {
-  type = string
-}
-
-variable "jfs_minio_bucket" {
-  type = string
-}
-
-variable "jfs_minio_access_key_id" {
-  type = string
-}
-
-variable "jfs_minio_secret_access_key" {
-  type = string
 }
 
 variable "data_minio_endpoint" {
@@ -73,10 +49,6 @@ variable "service_hostname" {
   type = string
 }
 
-variable "cluster_service_endpoint" {
-  type = string
-}
-
 variable "service_ip" {
   type = string
 }
@@ -84,4 +56,29 @@ variable "service_ip" {
 variable "resources" {
   type    = map(any)
   default = {}
+}
+
+variable "extra_clickhouse_config" {
+  type    = any
+  default = {}
+}
+
+variable "extra_keeper_config" {
+  type    = any
+  default = {}
+}
+
+variable "volume_claim_templates" {
+  type    = any
+  default = []
+}
+
+variable "extra_volumes" {
+  type    = any
+  default = []
+}
+
+variable "extra_volume_mounts" {
+  type    = any
+  default = []
 }
