@@ -2,6 +2,7 @@ locals {
   cert_path    = "/etc/certs/client.crt"
   key_path     = "/etc/certs/client.key"
   ca_cert_path = "/etc/certs/ca.crt"
+  metadata_url = "rediss://${var.redis_endpoint}/${var.redis_db_id}?tls-cert-file=${local.cert_path}&tls-key-file=${local.key_path}&tls-ca-cert-file=${local.ca_cert_path}"
 }
 
 module "secret" {
@@ -41,12 +42,15 @@ module "statefulset" {
           <<-EOF
           set -e
 
-          exec juicefs format \
-            'rediss://${var.redis_endpoint}/${var.redis_db_id}?tls-cert-file=${local.cert_path}&tls-key-file=${local.key_path}&tls-ca-cert-file=${local.ca_cert_path}' \
+          juicefs format \
+            '${local.metadata_url}' \
             ${var.name} \
             --storage minio \
             --bucket ${var.jfs_minio_resource} \
             --trash-days 0
+
+          juicefs fsck \
+            '${local.metadata_url}'
           EOF
         ]
         env = [
@@ -90,7 +94,7 @@ module "statefulset" {
           mkdir -p ${var.jfs_mount_path}
 
           exec juicefs mount \
-            'rediss://${var.redis_endpoint}/${var.redis_db_id}?tls-cert-file=${local.cert_path}&tls-key-file=${local.key_path}&tls-ca-cert-file=${local.ca_cert_path}' \
+            '${local.metadata_url}' \
             ${var.jfs_mount_path} \
             --storage minio \
             --bucket ${var.jfs_minio_resource} \
@@ -98,7 +102,7 @@ module "statefulset" {
             --atime-mode noatime \
             --backup-meta 0 \
             --no-usage-report true \
-            -o allow_other,writeback_cache,noatime
+            -o allow_other,noatime
           EOF
         ]
         lifecycle = {
