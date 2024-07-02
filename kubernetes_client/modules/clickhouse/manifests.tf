@@ -64,16 +64,6 @@ locals {
           region               = ""
           support_batch_delete = true
         }
-        meta_s3 = {
-          type                 = "object_storage"
-          object_storage_type  = "s3"
-          metadata_type        = "plain_rewritable"
-          endpoint             = "http://${var.data_minio_endpoint}/${var.data_minio_bucket}/${local.name}/meta_s3/"
-          access_key_id        = var.data_minio_access_key_id
-          secret_access_key    = var.data_minio_secret_access_key
-          region               = ""
-          support_batch_delete = true
-        }
         # needs old formatting for keeper storage configs
         log_s3_plain = {
           type              = "s3_plain"
@@ -105,17 +95,10 @@ locals {
             }
           }
         }
-        meta_s3 = {
-          volumes = {
-            main = {
-              disks = "meta_s3"
-            }
-          }
-        }
       }
     }
     merge_tree = {
-      storage_policy = "meta_s3"
+      storage_policy = "s3"
     }
     asynchronous_metric_log = {
       "@remove" = "remove"
