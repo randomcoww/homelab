@@ -150,7 +150,7 @@ locals {
     macros = {
       shard = "1"
     }
-    default_profile = "default"
+    default_profile      = "default"
     default_replica_path = "/clickhouse/tables/{shard}/{database}/{table}"
     default_replica_name = "{replica}"
     distributed_ddl = {
