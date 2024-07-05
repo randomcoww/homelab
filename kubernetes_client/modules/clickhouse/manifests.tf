@@ -147,11 +147,21 @@ locals {
         }
       ]
     }
+    macros = {
+      shard = "1"
+    }
+    default_profile = "default"
+    default_replica_path = "/clickhouse/tables/{shard}/{database}/{table}"
+    default_replica_name = "{replica}"
+    distributed_ddl = {
+      profile = "default"
+    }
 
     remote_servers = {
       "@replace" = "replace"
       default = {
         shard = {
+          internal_replication = true
           replica = [
             for _, member in local.members :
             {
@@ -215,6 +225,9 @@ module "secret" {
     "config-${member}" => yamlencode(merge(local.clickhouse_config, {
       keeper_server = merge(local.keeper_config, {
         server_id = i + 1
+      })
+      macros = merge(local.clickhouse_config.macros, {
+        replica = "replica_${i + 1}"
       })
     }))
   })
