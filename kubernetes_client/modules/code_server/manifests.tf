@@ -117,6 +117,7 @@ module "statefulset-jfs" {
           code-server \
             --auth=none \
             --disable-telemetry \
+            --disable-update-check \
             --bind-addr=0.0.0.0:${local.ports.code_server}
           EOF
         ]
