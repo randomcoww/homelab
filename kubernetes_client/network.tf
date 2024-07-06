@@ -161,9 +161,10 @@ module "hostapd" {
 # Render QR code for wifi
 
 module "qrcode" {
-  source  = "./modules/qrcode"
-  name    = "qrcode"
-  release = "0.1.0"
+  source   = "./modules/qrcode"
+  name     = "qrcode"
+  replicas = 2
+  release  = "0.1.0"
   images = {
     qrcode = local.container_images.qrcode_generator
   }
