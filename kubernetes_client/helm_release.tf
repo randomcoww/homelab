@@ -97,6 +97,7 @@ resource "helm_release" "local-path-provisioner" {
   max_history = 2
   values = [
     yamlencode({
+      replicaCount = 2
       storageClass = {
         name = "local-path"
       }
