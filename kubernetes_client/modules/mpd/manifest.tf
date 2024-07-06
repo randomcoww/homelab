@@ -1,9 +1,9 @@
 locals {
   ports = {
-    mpd               = 8000
-    rclone            = 8001
-    mympd             = 8002
-    audio_output_base = 8080
+    mpd               = 7980
+    rclone            = 7981
+    mympd             = 7982
+    audio_output_base = 8000
   }
   audio_outputs = [
     for i, o in var.audio_outputs :
@@ -41,11 +41,12 @@ module "secret" {
     basename(local.mpd_config_path) = <<-EOF
     bind_to_address "${local.mpd_socket_path}"
     music_directory "http://127.0.0.1:${local.ports.rclone}"
-    playlist_directory "${local.mpd_cache_path}"
+    playlist_directory "${local.mpd_cache_path}/playlists"
     state_file "${local.mpd_cache_path}/state"
     database {
       plugin "simple"
       path "${local.mpd_cache_path}/db"
+      cache_directory "${local.mpd_cache_path}/cache"
     }
     input_cache {
       size "1 GB"
@@ -191,6 +192,7 @@ module "statefulset-jfs" {
           set -e
 
           mountpoint ${local.mpd_cache_path}
+          mkdir -p ${local.mpd_cache_path}/playlists
           exec mpd \
             --no-daemon \
             --stdout \
@@ -218,6 +220,18 @@ module "statefulset-jfs" {
       {
         name  = "${var.name}-mympd"
         image = var.images.mympd
+        command = [
+          "sh",
+          "-c",
+          <<-EOF
+          set -e
+
+          mountpoint ${local.mpd_cache_path}
+          mkdir -p ${local.mpd_cache_path}/mympd
+          exec mympd \
+            --workdir ${local.mpd_cache_path}/mympd
+          EOF
+        ]
         env = [
           {
             name  = "MPD_HOST"
@@ -240,10 +254,6 @@ module "statefulset-jfs" {
             value = "simple"
           },
           {
-            name  = "MYMPD_SAVE_CACHES"
-            value = "false"
-          },
-          {
             name  = "MYMPD_STICKERS"
             value = "false"
           },
@@ -263,19 +273,15 @@ module "statefulset-jfs" {
           httpGet = {
             scheme = "HTTP"
             port   = local.ports.mympd
-            path   = "/"
+            path   = "/serverinfo"
           }
-          initialDelaySeconds = 15
-          timeoutSeconds      = 15
         }
         livenessProbe = {
           httpGet = {
             scheme = "HTTP"
             port   = local.ports.mympd
-            path   = "/"
+            path   = "/serverinfo"
           }
-          initialDelaySeconds = 15
-          timeoutSeconds      = 15
         }
       },
     ]
