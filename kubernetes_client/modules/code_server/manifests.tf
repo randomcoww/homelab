@@ -1,6 +1,8 @@
 locals {
   code_home_path    = "/mnt/home/${var.user}"
   jfs_metadata_path = "/var/lib/jfs/${var.name}.db"
+  user_data_path    = "${local.code_home_path}/.local/share/${var.name}"
+  config_path       = "${local.user_data_path}/config.yaml"
   ports = {
     code_server = 8080
   }
@@ -74,12 +76,12 @@ module "ingress" {
 module "statefulset-jfs" {
   source = "../statefulset_jfs"
   ## jfs settings
-  redis_endpoint              = var.redis_endpoint
-  redis_db_id                 = var.redis_db_id
-  redis_ca                    = var.redis_ca
+  jfs_redis_endpoint          = var.jfs_redis_endpoint
+  jfs_redis_db_id             = var.jfs_redis_db_id
+  jfs_redis_ca                = var.jfs_redis_ca
   jfs_image                   = var.images.juicefs
   jfs_mount_path              = dirname(local.code_home_path)
-  jfs_minio_resource          = "http://${var.jfs_minio_endpoint}/${var.jfs_minio_bucket}"
+  jfs_minio_resource          = "http://${var.jfs_minio_endpoint}/${var.jfs_minio_resource}"
   jfs_minio_access_key_id     = var.jfs_minio_access_key_id
   jfs_minio_secret_access_key = var.jfs_minio_secret_access_key
   ##
@@ -118,6 +120,8 @@ module "statefulset-jfs" {
             --auth=none \
             --disable-telemetry \
             --disable-update-check \
+            --config=${local.config_path} \
+            --user-data-dir=${local.user_data_path} \
             --bind-addr=0.0.0.0:${local.ports.code_server}
           EOF
         ]

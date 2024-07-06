@@ -129,12 +129,12 @@ module "ingress" {
 module "statefulset-jfs" {
   source = "../statefulset_jfs"
   ## jfs settings
-  redis_endpoint              = var.redis_endpoint
-  redis_db_id                 = var.redis_db_id
-  redis_ca                    = var.redis_ca
+  jfs_redis_endpoint          = var.jfs_redis_endpoint
+  jfs_redis_db_id             = var.jfs_redis_db_id
+  jfs_redis_ca                = var.jfs_redis_ca
   jfs_image                   = var.images.juicefs
   jfs_mount_path              = local.mpd_cache_path
-  jfs_minio_resource          = "http://${var.jfs_minio_endpoint}/${var.jfs_minio_bucket}"
+  jfs_minio_resource          = "http://${var.jfs_minio_endpoint}/${var.jfs_minio_resource}"
   jfs_minio_access_key_id     = var.jfs_minio_access_key_id
   jfs_minio_secret_access_key = var.jfs_minio_secret_access_key
   ##

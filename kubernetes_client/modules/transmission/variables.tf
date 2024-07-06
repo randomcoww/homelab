@@ -28,7 +28,7 @@ variable "jfs_minio_endpoint" {
   type = string
 }
 
-variable "jfs_minio_bucket" {
+variable "jfs_minio_resource" {
   type = string
 }
 
@@ -40,15 +40,15 @@ variable "jfs_minio_secret_access_key" {
   type = string
 }
 
-variable "redis_endpoint" {
+variable "jfs_redis_endpoint" {
   type = string
 }
 
-variable "redis_db_id" {
+variable "jfs_redis_db_id" {
   type = number
 }
 
-variable "redis_ca" {
+variable "jfs_redis_ca" {
   type = object({
     algorithm       = string
     private_key_pem = string
