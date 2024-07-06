@@ -41,7 +41,6 @@ module "secret" {
     basename(local.mpd_config_path) = <<-EOF
     bind_to_address "${local.mpd_socket_path}"
     music_directory "http://127.0.0.1:${local.ports.rclone}"
-    sticker_file "${local.mpd_cache_path}/sticker.sql"
     playlist_directory "${local.mpd_cache_path}"
     state_file "${local.mpd_cache_path}/state"
     database {
