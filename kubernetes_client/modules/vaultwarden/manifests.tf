@@ -145,8 +145,6 @@ module "statefulset-litestream" {
             port   = local.ports.vaultwarden
             path   = "/alive"
           }
-          initialDelaySeconds = 15
-          timeoutSeconds      = 15
         }
         livenessProbe = {
           httpGet = {
@@ -154,8 +152,6 @@ module "statefulset-litestream" {
             port   = local.ports.vaultwarden
             path   = "/alive"
           }
-          initialDelaySeconds = 15
-          timeoutSeconds      = 15
         }
       },
     ]
