@@ -166,7 +166,7 @@ locals {
       qrcode          = "qrcode"
       qrcode_wifi     = "wifi"
       mpd             = "mpd"
-      webdav_pictures = "p"
+      webdav_pictures = "pictures"
     } :
     k => "${domain}.${local.domains.public}"
   }

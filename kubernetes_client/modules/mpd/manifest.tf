@@ -236,6 +236,18 @@ module "statefulset-jfs" {
             name  = "MYMPD_HTTP_PORT"
             value = tostring(local.ports.mympd)
           },
+          {
+            name  = "MYMPD_ALBUM_MODE"
+            value = "simple"
+          },
+          {
+            name  = "MYMPD_SAVE_CACHES"
+            value = "false"
+          },
+          {
+            name  = "MYMPD_STICKERS"
+            value = "false"
+          },
         ]
         volumeMounts = [
           {
