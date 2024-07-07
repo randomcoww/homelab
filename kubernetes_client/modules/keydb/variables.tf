@@ -36,7 +36,7 @@ variable "ports" {
   })
 }
 
-variable "extra_config" {
+variable "extra_configs" {
   type    = string
   default = ""
 }

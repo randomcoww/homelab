@@ -39,7 +39,7 @@ module "jfs-redis" {
     private_key_pem = tls_private_key.jfs-redis-ca.private_key_pem
     cert_pem        = tls_self_signed_cert.jfs-redis-ca.cert_pem
   }
-  extra_config = <<-EOF
+  extra_configs = <<-EOF
   dir /data
   appendonly yes
   appendfsync always
