@@ -1,16 +1,10 @@
 locals {
   ports = {
-    mpd               = 7980
-    rclone            = 7981
-    mympd             = 7982
-    audio_output_base = 8000
+    mpd_stream = 8000
+    mpd        = 7980
+    rclone     = 7981
+    mympd      = 7982
   }
-  audio_outputs = [
-    for i, o in var.audio_outputs :
-    merge(o, {
-      port = local.ports.audio_output_base + i
-    })
-  ]
   mpd_cache_path    = "/var/lib/mpd/mnt"
   mpd_socket_path   = "/run/mpd/socket"
   mpd_config_path   = "/etc/mpd.conf"
@@ -54,21 +48,38 @@ module "secret" {
     %{~for k, v in var.extra_configs~}
     ${k} "${v}"
     %{~endfor~}
-    %{~for i, o in local.audio_outputs~}
 
     audio_output {
       type "httpd"
-      name "${o.name}"
-      port "${o.port}"
+      name "lame-9"
+      port "${local.ports.mpd_stream}"
       bind_to_address "0.0.0.0"
-      %{~for k, v in o.config~}
-      ${k} "${v}"
-      %{~endfor~}
+      tags "yes"
+      format "48000:24:2"
+      always_on "yes"
+      encoder "lame"
+      quality "9"
+      max_clients "1"
     }
-    %{~endfor~}
+
+    # audio_output {
+    #   type "httpd"
+    #   name "flac-3"
+    #   port "${local.ports.mpd_stream}"
+    #   bind_to_address "0.0.0.0"
+    #   tags "yes"
+    #   format "48000:24:2"
+    #   always_on "yes"
+    #   encoder "flac"
+    #   compression "3"
+    #   max_clients "1"
+    # }
     EOF
-    RCLONE_S3_ACCESS_KEY_ID         = var.data_minio_access_key_id
-    RCLONE_S3_SECRET_ACCESS_KEY     = var.data_minio_secret_access_key
+    mympd_webui_config = jsonencode(merge({
+      enableLocalPlayback = true
+    }, var.mympd_webui_extra_configs))
+    RCLONE_S3_ACCESS_KEY_ID     = var.data_minio_access_key_id
+    RCLONE_S3_SECRET_ACCESS_KEY = var.data_minio_secret_access_key
   }
 }
 
@@ -79,22 +90,14 @@ module "service" {
   release = var.release
   spec = {
     type = "ClusterIP"
-    ports = concat([
+    ports = [
       {
         name       = "mympd"
         port       = local.ports.mympd
         protocol   = "TCP"
         targetPort = local.ports.mympd
       },
-      ], [
-      for o in local.audio_outputs :
-      {
-        name       = o.name
-        port       = o.port
-        protocol   = "TCP"
-        targetPort = o.port
-      }
-    ])
+    ]
   }
 }
 
@@ -108,20 +111,13 @@ module "ingress" {
   rules = [
     {
       host = var.service_hostname
-      paths = concat([
+      paths = [
         {
           service = var.name
           port    = local.ports.mympd
           path    = "/"
-        }
-        ], [
-        for o in local.audio_outputs :
-        {
-          service = var.name
-          port    = o.port
-          path    = "/${o.name}"
-        }
-      ])
+        },
+      ]
     },
   ]
 }
@@ -210,12 +206,6 @@ module "statefulset-jfs" {
             mountPath = dirname(local.mpd_socket_path)
           },
         ]
-        ports = [
-          for o in local.audio_outputs :
-          {
-            containerPort = o.port
-          }
-        ]
       },
       {
         name  = "${var.name}-mympd"
@@ -227,7 +217,9 @@ module "statefulset-jfs" {
           set -e
 
           mountpoint ${local.mpd_cache_path}
-          mkdir -p ${local.mpd_cache_path}/mympd
+          mkdir -p ${local.mpd_cache_path}/mympd/state
+          echo -e "$WEBUI_CONFIG" > ${local.mpd_cache_path}/mympd/state/webui_settings
+
           exec mympd \
             --workdir ${local.mpd_cache_path}/mympd
           EOF
@@ -254,9 +246,22 @@ module "statefulset-jfs" {
             value = "simple"
           },
           {
+            name  = "MYMPD_SAVE_CACHES"
+            value = "false"
+          },
+          {
             name  = "MYMPD_STICKERS"
             value = "false"
           },
+          {
+            name = "WEBUI_CONFIG"
+            valueFrom = {
+              secretKeyRef = {
+                name = module.secret.name
+                key  = "mympd_webui_config"
+              }
+            }
+          }
         ]
         volumeMounts = [
           {

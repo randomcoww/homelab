@@ -106,32 +106,20 @@ module "mpd" {
     litestream = local.container_images.litestream
     juicefs    = local.container_images.juicefs
   }
-  audio_outputs = [
-    {
-      name = "flac-3"
-      config = {
-        tags        = "yes"
-        format      = "48000:24:2"
-        always_on   = "yes"
-        encoder     = "flac"
-        compression = 3
-        max_clients = 2
-      }
-    },
-    {
-      name = "lame-9"
-      config = {
-        tags        = "yes"
-        format      = "48000:24:2"
-        always_on   = "yes"
-        encoder     = "lame"
-        quality     = 9
-        max_clients = 2
-      }
-    },
-  ]
   extra_configs = {
     metadata_to_use = "AlbumArtist,Artist,Album,Title,Track,Disc,Genre,Name,Date"
+  }
+  mympd_webui_extra_configs = {
+    enableHome                = false
+    enableScripting           = false
+    enableTrigger             = false
+    enableTimer               = false
+    enableMounts              = false
+    enablePartitions          = false
+    enableLyrics              = false
+    startupView               = "Queue/Current"
+    musicbrainzLinks          = false
+    radiobrowserStationclicks = false
   }
 
   jfs_minio_access_key_id     = data.terraform_remote_state.sr.outputs.minio.access_key_id

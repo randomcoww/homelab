@@ -30,9 +30,9 @@ variable "extra_configs" {
   default = {}
 }
 
-variable "audio_outputs" {
-  type    = list(any)
-  default = []
+variable "mympd_webui_extra_configs" {
+  type    = map(string)
+  default = {}
 }
 
 variable "jfs_minio_endpoint" {
