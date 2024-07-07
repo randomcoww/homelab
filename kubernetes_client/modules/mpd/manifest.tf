@@ -1,9 +1,8 @@
 locals {
   ports = {
-    mpd_stream = 8000
-    mpd        = 7980
-    rclone     = 7981
-    mympd      = 7982
+    mpd    = 8000
+    mympd  = 7982
+    rclone = 7981
   }
   mpd_cache_path    = "/var/lib/mpd/mnt"
   mpd_socket_path   = "/run/mpd/socket"
@@ -51,35 +50,21 @@ module "secret" {
 
     audio_output {
       type "httpd"
-      name "lame-9"
-      port "${local.ports.mpd_stream}"
-      bind_to_address "0.0.0.0"
+      name "httpd"
+      port "${local.ports.mpd}"
+      bind_to_address "127.0.0.1"
       tags "yes"
       format "48000:24:2"
       always_on "yes"
+      max_clients "0"
       encoder "lame"
       quality "9"
-      max_clients "1"
+      # encoder "flac"
+      # compression "3"
     }
-
-    # audio_output {
-    #   type "httpd"
-    #   name "flac-3"
-    #   port "${local.ports.mpd_stream}"
-    #   bind_to_address "0.0.0.0"
-    #   tags "yes"
-    #   format "48000:24:2"
-    #   always_on "yes"
-    #   encoder "flac"
-    #   compression "3"
-    #   max_clients "1"
-    # }
     EOF
-    mympd_webui_config = jsonencode(merge({
-      enableLocalPlayback = true
-    }, var.mympd_webui_extra_configs))
-    RCLONE_S3_ACCESS_KEY_ID     = var.data_minio_access_key_id
-    RCLONE_S3_SECRET_ACCESS_KEY = var.data_minio_secret_access_key
+    RCLONE_S3_ACCESS_KEY_ID         = var.data_minio_access_key_id
+    RCLONE_S3_SECRET_ACCESS_KEY     = var.data_minio_secret_access_key
   }
 }
 
@@ -217,9 +202,7 @@ module "statefulset-jfs" {
           set -e
 
           mountpoint ${local.mpd_cache_path}
-          mkdir -p ${local.mpd_cache_path}/mympd/state
-          echo -e "$WEBUI_CONFIG" > ${local.mpd_cache_path}/mympd/state/webui_settings
-
+          mkdir -p ${local.mpd_cache_path}/mympd
           exec mympd \
             --workdir ${local.mpd_cache_path}/mympd
           EOF
@@ -253,15 +236,6 @@ module "statefulset-jfs" {
             name  = "MYMPD_STICKERS"
             value = "false"
           },
-          {
-            name = "WEBUI_CONFIG"
-            valueFrom = {
-              secretKeyRef = {
-                name = module.secret.name
-                key  = "mympd_webui_config"
-              }
-            }
-          }
         ]
         volumeMounts = [
           {

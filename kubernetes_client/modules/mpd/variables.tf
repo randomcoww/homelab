@@ -30,11 +30,6 @@ variable "extra_configs" {
   default = {}
 }
 
-variable "mympd_webui_extra_configs" {
-  type    = map(string)
-  default = {}
-}
-
 variable "jfs_minio_endpoint" {
   type = string
 }

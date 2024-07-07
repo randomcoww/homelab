@@ -109,18 +109,6 @@ module "mpd" {
   extra_configs = {
     metadata_to_use = "AlbumArtist,Artist,Album,Title,Track,Disc,Genre,Name,Date"
   }
-  mympd_webui_extra_configs = {
-    enableHome                = false
-    enableScripting           = false
-    enableTrigger             = false
-    enableTimer               = false
-    enableMounts              = false
-    enablePartitions          = false
-    enableLyrics              = false
-    startupView               = "Queue/Current"
-    musicbrainzLinks          = false
-    radiobrowserStationclicks = false
-  }
 
   jfs_minio_access_key_id     = data.terraform_remote_state.sr.outputs.minio.access_key_id
   jfs_minio_secret_access_key = data.terraform_remote_state.sr.outputs.minio.secret_access_key
