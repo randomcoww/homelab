@@ -54,7 +54,7 @@ module "metadata" {
           release = var.release
         }
         annotations = {
-          "helm.sh/hook"               = "post-install"
+          "helm.sh/hook"               = "post-install,post-upgrade"
           "helm.sh/hook-delete-policy" = "hook-succeeded,before-hook-creation"
         }
       }

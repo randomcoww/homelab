@@ -184,6 +184,14 @@ module "statefulset-litestream" {
             subPath   = "ldaps-key.pem"
           },
         ]
+        ports = [
+          {
+            containerPort = local.ports.lldap_http
+          },
+          {
+            containerPort = local.ports.lldap_ldaps
+          },
+        ]
         readinessProbe = {
           exec = {
             command = [

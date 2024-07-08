@@ -354,27 +354,21 @@ module "statefulset" {
         ], var.extra_volume_mounts)
         ports = [
           {
-            name          = "mysql"
             containerPort = local.clickhouse_config.mysql_port
           },
           {
-            name          = "postgresql"
             containerPort = local.clickhouse_config.postgresql_port
           },
           {
-            name          = "https"
             containerPort = local.clickhouse_config.https_port
           },
           {
-            name          = "interserver"
             containerPort = local.clickhouse_config.interserver_https_port
           },
           {
-            name          = "clickhouse"
             containerPort = local.ports.clickhouse
           },
           {
-            name          = "keeper"
             containerPort = local.ports.keeper
           },
         ]

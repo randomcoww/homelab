@@ -93,6 +93,12 @@ module "service" {
         protocol   = "TCP"
         targetPort = local.ports.matchbox_api
       },
+      {
+        name       = "syncthing-peer"
+        port       = local.ports.syncthing_peer
+        protocol   = "TCP"
+        targetPort = local.ports.syncthing_peer
+      },
     ]
   }
 }
@@ -144,11 +150,9 @@ module "statefulset" {
         ]
         ports = [
           {
-            name          = "matchbox"
             containerPort = local.ports.matchbox
           },
           {
-            name          = "matchbox-api"
             containerPort = local.ports.matchbox_api
           },
         ]
@@ -219,7 +223,6 @@ module "statefulset" {
         ]
         ports = [
           {
-            name          = "syncthing-peer"
             containerPort = local.ports.syncthing_peer
           },
         ]

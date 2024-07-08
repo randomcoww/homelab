@@ -110,6 +110,11 @@ module "statefulset" {
             }
           },
         ]
+        ports = [
+          {
+            containerPort = var.ports.keydb
+          },
+        ]
         volumeMounts = concat([
           {
             name      = "keydb-secret"

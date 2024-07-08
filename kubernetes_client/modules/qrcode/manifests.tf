@@ -29,8 +29,10 @@ module "service" {
     type = "ClusterIP"
     ports = [
       {
-        name = "qrcode"
-        port = local.ports.qrcode
+        name       = "qrcode"
+        port       = local.ports.qrcode
+        protocol   = "TCP"
+        targetPort = local.ports.qrcode
       },
     ]
   }
