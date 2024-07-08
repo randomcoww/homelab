@@ -1,3 +1,73 @@
+resource "tls_private_key" "transmission-jfs-metadata-ca" {
+  algorithm   = "ECDSA"
+  ecdsa_curve = "P521"
+}
+
+resource "tls_self_signed_cert" "transmission-jfs-metadata-ca" {
+  private_key_pem = tls_private_key.transmission-jfs-metadata-ca.private_key_pem
+
+  validity_period_hours = 8760
+  is_ca_certificate     = true
+
+  subject {
+    common_name  = "Cockroach"
+    organization = "Cockroach"
+  }
+
+  allowed_uses = [
+    "key_encipherment",
+    "digital_signature",
+    "cert_signing",
+    "server_auth",
+    "client_auth",
+  ]
+}
+
+module "transmission-jfs-metadata" {
+  source                   = "./modules/cockroachdb"
+  cluster_service_endpoint = local.kubernetes_services.transmission_jfs_metadata.fqdn
+  release                  = "0.1.0"
+  replicas                 = 3
+  images = {
+    cockroachdb = local.container_images.cockroachdb
+  }
+  ports = {
+    cockroachdb = local.service_ports.cockroachdb
+  }
+  ca = {
+    algorithm       = tls_private_key.transmission-jfs-metadata-ca.algorithm
+    private_key_pem = tls_private_key.transmission-jfs-metadata-ca.private_key_pem
+    cert_pem        = tls_self_signed_cert.transmission-jfs-metadata-ca.cert_pem
+  }
+  extra_configs = {
+    store = "/data"
+  }
+  extra_volume_mounts = [
+    {
+      name      = "data"
+      mountPath = "/data"
+    },
+  ]
+  volume_claim_templates = [
+    {
+      metadata = {
+        name = "data"
+      }
+      spec = {
+        accessModes = [
+          "ReadWriteOnce",
+        ]
+        resources = {
+          requests = {
+            storage = "4Gi"
+          }
+        }
+        storageClassName = "local-path"
+      }
+    },
+  ]
+}
+
 module "transmission" {
   source  = "./modules/transmission"
   name    = "transmission"
@@ -5,7 +75,7 @@ module "transmission" {
   images = {
     transmission = local.container_images.transmission
     wireguard    = local.container_images.wireguard
-    juicefs      = local.container_images.juicefs
+    jfs          = local.container_images.jfs
   }
   transmission_settings = {
     blocklist-enabled            = true
@@ -78,76 +148,16 @@ module "transmission" {
 
   jfs_minio_access_key_id     = data.terraform_remote_state.sr.outputs.minio.access_key_id
   jfs_minio_secret_access_key = data.terraform_remote_state.sr.outputs.minio.secret_access_key
-  jfs_minio_resource          = "${local.minio_buckets.juicefs.name}/transmission"
+  jfs_minio_resource          = "${local.minio_buckets.jfs.name}/transmission"
   jfs_minio_endpoint          = "${local.kubernetes_services.minio.endpoint}:${local.service_ports.minio}"
-  jfs_redis_ca = {
-    algorithm       = tls_private_key.jfs-redis-ca.algorithm
-    private_key_pem = tls_private_key.jfs-redis-ca.private_key_pem
-    cert_pem        = tls_self_signed_cert.jfs-redis-ca.cert_pem
+  jfs_metadata_ca = {
+    algorithm       = tls_private_key.transmission-jfs-metadata-ca.algorithm
+    private_key_pem = tls_private_key.transmission-jfs-metadata-ca.private_key_pem
+    cert_pem        = tls_self_signed_cert.transmission-jfs-metadata-ca.cert_pem
   }
-  jfs_redis_endpoint = "${local.kubernetes_services.jfs_redis.endpoint}:${local.service_ports.redis}"
-  jfs_redis_db_id    = 1
+  jfs_metadata_endpoint = "${local.kubernetes_services.transmission_jfs_metadata.endpoint}:${local.service_ports.cockroachdb}"
 
   service_hostname          = local.kubernetes_ingress_endpoints.transmission
   ingress_class_name        = local.ingress_classes.ingress_nginx
   nginx_ingress_annotations = local.nginx_ingress_auth_annotations
-}
-
-# Music stream
-
-module "mpd" {
-  source  = "./modules/mpd"
-  name    = "mpd"
-  release = "0.1.0"
-  images = {
-    mpd        = local.container_images.mpd
-    mympd      = local.container_images.mympd
-    rclone     = local.container_images.rclone
-    litestream = local.container_images.litestream
-    juicefs    = local.container_images.juicefs
-  }
-  extra_configs = {
-    metadata_to_use = "AlbumArtist,Artist,Album,Title,Track,Disc,Genre,Name,Date"
-  }
-
-  jfs_minio_access_key_id     = data.terraform_remote_state.sr.outputs.minio.access_key_id
-  jfs_minio_secret_access_key = data.terraform_remote_state.sr.outputs.minio.secret_access_key
-  jfs_minio_resource          = "${local.minio_buckets.juicefs.name}/mpd"
-  jfs_minio_endpoint          = "${local.kubernetes_services.minio.endpoint}:${local.service_ports.minio}"
-  jfs_redis_ca = {
-    algorithm       = tls_private_key.jfs-redis-ca.algorithm
-    private_key_pem = tls_private_key.jfs-redis-ca.private_key_pem
-    cert_pem        = tls_self_signed_cert.jfs-redis-ca.cert_pem
-  }
-  jfs_redis_endpoint = "${local.kubernetes_services.jfs_redis.endpoint}:${local.service_ports.redis}"
-  jfs_redis_db_id    = 2
-
-  data_minio_access_key_id     = data.terraform_remote_state.sr.outputs.minio.access_key_id
-  data_minio_secret_access_key = data.terraform_remote_state.sr.outputs.minio.secret_access_key
-  data_minio_bucket            = local.minio_buckets.music.name
-  data_minio_endpoint          = "${local.kubernetes_services.minio.fqdn}:${local.service_ports.minio}"
-
-  service_hostname          = local.kubernetes_ingress_endpoints.mpd
-  ingress_class_name        = local.ingress_classes.ingress_nginx
-  nginx_ingress_annotations = local.nginx_ingress_auth_annotations
-}
-
-# Webdav
-
-module "webdav-pictures" {
-  source  = "./modules/webdav"
-  name    = "webdav-pictures"
-  release = "0.1.0"
-  images = {
-    rclone = local.container_images.rclone
-  }
-
-  data_minio_access_key_id     = data.terraform_remote_state.sr.outputs.minio.access_key_id
-  data_minio_secret_access_key = data.terraform_remote_state.sr.outputs.minio.secret_access_key
-  data_minio_bucket            = local.minio_buckets.pictures.name
-  data_minio_endpoint          = "${local.kubernetes_services.minio.fqdn}:${local.service_ports.minio}"
-
-  service_hostname          = local.kubernetes_ingress_endpoints.webdav_pictures
-  ingress_class_name        = local.ingress_classes.ingress_nginx
-  nginx_ingress_annotations = local.nginx_ingress_annotations
 }

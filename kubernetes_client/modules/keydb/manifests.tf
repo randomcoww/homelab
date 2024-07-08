@@ -83,8 +83,8 @@ module "statefulset" {
   name              = local.name
   app               = local.name
   release           = var.release
-  affinity          = var.affinity
   replicas          = var.replicas
+  affinity          = var.affinity
   min_ready_seconds = 30
   annotations = {
     "checksum/secret"    = sha256(module.secret.manifest)

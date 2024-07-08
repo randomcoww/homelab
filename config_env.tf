@@ -112,11 +112,12 @@ locals {
     lldap              = "docker.io/lldap/lldap:2024-05-06"
     keydb              = "docker.io/eqalpha/keydb:alpine_x86_64_v6.3.4"
     clickhouse         = "docker.io/clickhouse/clickhouse-server:24.4-alpine"
-    juicefs            = "ghcr.io/randomcoww/juicefs:1.2.0"
+    jfs                = "ghcr.io/randomcoww/juicefs:1.2.0"
     qrcode_generator   = "ghcr.io/randomcoww/qrcode-generator:20240620.4"
     mpd                = "ghcr.io/randomcoww/mpd:0.23.15"
     mympd              = "ghcr.io/jcorporation/mympd/mympd:15.0.2"
     rclone             = "docker.io/rclone/rclone:1.67"
+    cockroachdb        = "docker.io/cockroachdb/cockroach:v24.1.1"
   }
 
   pxeboot_images = {
@@ -190,6 +191,10 @@ locals {
         name      = "authelia-redis"
         namespace = "authelia"
       }
+      authelia_db = {
+        name      = "authelia-db"
+        namespace = "authelia"
+      }
       ingress_nginx = {
         name      = "${local.ingress_classes.ingress_nginx}-controller"
         namespace = "ingress-nginx"
@@ -210,6 +215,10 @@ locals {
         name      = "lldap"
         namespace = "lldap"
       }
+      lldap_db = {
+        name      = "lldap-db"
+        namespace = "lldap"
+      }
       alpaca_stream = {
         name      = "alpaca-stream"
         namespace = "alpaca"
@@ -218,9 +227,17 @@ locals {
         name      = "alpaca-db"
         namespace = "alpaca"
       }
-      jfs_redis = {
-        name      = "jfs-redis"
-        namespace = "jfs"
+      mpd_jfs_metadata = {
+        name      = "mpd-jfs-metadata"
+        namespace = "default"
+      }
+      transmission_jfs_metadata = {
+        name      = "transmission-jfs-metadata"
+        namespace = "default"
+      }
+      code_jfs_metadata = {
+        name      = "code-jfs-metadata"
+        namespace = "default"
       }
     } :
     name => merge(e, {
@@ -250,6 +267,7 @@ locals {
     alpaca_stream = 38081
     lldap         = 6360
     redis         = 6379
+    cockroachdb   = 26257
   }
 
   minio_buckets = {
@@ -277,8 +295,8 @@ locals {
       name   = "backup"
       policy = "none"
     }
-    juicefs = {
-      name   = "juicefs"
+    jfs = {
+      name   = "jfs"
       policy = "none"
     }
     clickhouse = {

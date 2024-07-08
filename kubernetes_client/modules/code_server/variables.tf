@@ -14,7 +14,7 @@ variable "release" {
 variable "images" {
   type = object({
     code_server = string
-    juicefs     = string
+    jfs         = string
   })
 }
 
@@ -68,15 +68,11 @@ variable "jfs_minio_secret_access_key" {
   type = string
 }
 
-variable "jfs_redis_endpoint" {
+variable "jfs_metadata_endpoint" {
   type = string
 }
 
-variable "jfs_redis_db_id" {
-  type = number
-}
-
-variable "jfs_redis_ca" {
+variable "jfs_metadata_ca" {
   type = object({
     algorithm       = string
     private_key_pem = string

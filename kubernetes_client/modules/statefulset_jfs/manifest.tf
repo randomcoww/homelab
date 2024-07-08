@@ -2,9 +2,11 @@ locals {
   cert_path    = "/etc/certs/client.crt"
   key_path     = "/etc/certs/client.key"
   ca_cert_path = "/etc/certs/ca.crt"
-  metadata_url = "rediss://${var.jfs_redis_endpoint}/${var.jfs_redis_db_id}?tls-cert-file=${local.cert_path}&tls-key-file=${local.key_path}&tls-ca-cert-file=${local.ca_cert_path}"
-  jfs_bucket   = join("/", slice(split("/", var.jfs_minio_resource), 0, length(split("/", var.jfs_minio_resource)) - 1))
-  jfs_name     = reverse(split("/", var.jfs_minio_resource))[0]
+  # use default postgres database as root - only one application per postgres deployment
+  metadata_user = "root"
+  metadata_url  = "postgres://${var.jfs_metadata_endpoint}/postgres?sslcert=${local.cert_path}&sslkey=${local.key_path}&sslrootcert=${local.ca_cert_path}"
+  jfs_bucket    = join("/", slice(split("/", var.jfs_minio_resource), 0, length(split("/", var.jfs_minio_resource)) - 1))
+  jfs_name      = reverse(split("/", var.jfs_minio_resource))[0]
 }
 
 module "secret" {
@@ -13,9 +15,9 @@ module "secret" {
   app     = var.name
   release = var.release
   data = {
-    basename(local.cert_path)    = tls_locally_signed_cert.redis-client.cert_pem
-    basename(local.key_path)     = tls_private_key.redis-client.private_key_pem
-    basename(local.ca_cert_path) = var.jfs_redis_ca.cert_pem
+    basename(local.cert_path)    = tls_locally_signed_cert.metadata-client.cert_pem
+    basename(local.key_path)     = tls_private_key.metadata-client.private_key_pem
+    basename(local.ca_cert_path) = var.jfs_metadata_ca.cert_pem
   }
 }
 
@@ -67,17 +69,17 @@ module "statefulset" {
         ]
         volumeMounts = [
           {
-            name      = "jfs-redis-tls"
+            name      = "jfs-metadata-tls"
             mountPath = local.cert_path
             subPath   = basename(local.cert_path)
           },
           {
-            name      = "jfs-redis-tls"
+            name      = "jfs-metadata-tls"
             mountPath = local.key_path
             subPath   = basename(local.key_path)
           },
           {
-            name      = "jfs-redis-tls"
+            name      = "jfs-metadata-tls"
             mountPath = local.ca_cert_path
             subPath   = basename(local.ca_cert_path)
           },
@@ -132,17 +134,17 @@ module "statefulset" {
             mountPropagation = "Bidirectional"
           },
           {
-            name      = "jfs-redis-tls"
+            name      = "jfs-metadata-tls"
             mountPath = local.cert_path
             subPath   = basename(local.cert_path)
           },
           {
-            name      = "jfs-redis-tls"
+            name      = "jfs-metadata-tls"
             mountPath = local.key_path
             subPath   = basename(local.key_path)
           },
           {
-            name      = "jfs-redis-tls"
+            name      = "jfs-metadata-tls"
             mountPath = local.ca_cert_path
             subPath   = basename(local.ca_cert_path)
           },
@@ -175,7 +177,7 @@ module "statefulset" {
         }
       },
       {
-        name = "jfs-redis-tls"
+        name = "jfs-metadata-tls"
         secret = {
           secretName = module.secret.name
         }
