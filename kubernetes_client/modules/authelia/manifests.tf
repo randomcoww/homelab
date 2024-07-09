@@ -4,10 +4,10 @@ module "secret" {
   app     = var.name
   release = var.source_release
   data = {
-    LDAP_CLIENT_TLS_CERTIFICATE_CHAIN  = chomp(tls_locally_signed_cert.lldap.cert_pem)
-    LDAP_CLIENT_TLS_PRIVATE_KEY        = chomp(tls_private_key.lldap.private_key_pem)
-    REDIS_CLIENT_TLS_CERTIFICATE_CHAIN = chomp(tls_locally_signed_cert.redis.cert_pem)
-    REDIS_CLIENT_TLS_PRIVATE_KEY       = chomp(tls_private_key.redis.private_key_pem)
+    basename(local.ldap_client_cert_path)  = tls_locally_signed_cert.lldap.cert_pem
+    basename(local.ldap_client_key_path)   = tls_private_key.lldap.private_key_pem
+    basename(local.redis_client_cert_path) = tls_locally_signed_cert.redis.cert_pem
+    basename(local.redis_client_key_path)  = tls_private_key.redis.private_key_pem
   }
 }
 
@@ -88,22 +88,22 @@ data "helm_template" "authelia" {
           {
             name      = "secret-custom"
             mountPath = local.ldap_client_key_path
-            subPath   = "LDAP_CLIENT_TLS_PRIVATE_KEY"
+            subPath   = basename(local.ldap_client_key_path)
           },
           {
             name      = "secret-custom"
             mountPath = local.ldap_client_cert_path
-            subPath   = "LDAP_CLIENT_TLS_CERTIFICATE_CHAIN"
+            subPath   = basename(local.ldap_client_cert_path)
           },
           {
             name      = "secret-custom"
             mountPath = local.redis_client_key_path
-            subPath   = "REDIS_CLIENT_TLS_PRIVATE_KEY"
+            subPath   = basename(local.redis_client_key_path)
           },
           {
             name      = "secret-custom"
             mountPath = local.redis_client_cert_path
-            subPath   = "REDIS_CLIENT_TLS_CERTIFICATE_CHAIN"
+            subPath   = basename(local.redis_client_cert_path)
           },
         ]
         extraVolumes = [

@@ -50,9 +50,9 @@ module "secret" {
   app     = local.name
   release = var.release
   data = merge({
-    storage-secret   = var.storage_secret
-    "ldaps-cert.pem" = chomp(tls_locally_signed_cert.lldap.cert_pem)
-    "ldaps-key.pem"  = chomp(tls_private_key.lldap.private_key_pem)
+    basename(local.storage_secret_path) = var.storage_secret
+    basename(local.ldaps_cert_path)     = tls_locally_signed_cert.lldap.cert_pem
+    basename(local.ldaps_key_path)      = tls_private_key.lldap.private_key_pem
     }, {
     for k, v in local.extra_envs :
     tostring(k) => tostring(v)
@@ -171,17 +171,17 @@ module "statefulset-litestream" {
           {
             name      = "secret"
             mountPath = local.storage_secret_path
-            subPath   = "storage-secret"
+            subPath   = basename(local.storage_secret_path)
           },
           {
             name      = "secret"
             mountPath = local.ldaps_cert_path
-            subPath   = "ldaps-cert.pem"
+            subPath   = basename(local.ldaps_cert_path)
           },
           {
             name      = "secret"
             mountPath = local.ldaps_key_path
-            subPath   = "ldaps-key.pem"
+            subPath   = basename(local.ldaps_key_path)
           },
         ]
         ports = [

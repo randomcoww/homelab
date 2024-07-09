@@ -41,76 +41,6 @@ module "authelia-redis" {
   }
 }
 
-resource "tls_private_key" "authelia-db-ca" {
-  algorithm   = "ECDSA"
-  ecdsa_curve = "P521"
-}
-
-resource "tls_self_signed_cert" "authelia-db-ca" {
-  private_key_pem = tls_private_key.authelia-db-ca.private_key_pem
-
-  validity_period_hours = 8760
-  is_ca_certificate     = true
-
-  subject {
-    common_name  = "Cockroach"
-    organization = "Cockroach"
-  }
-
-  allowed_uses = [
-    "key_encipherment",
-    "digital_signature",
-    "cert_signing",
-    "server_auth",
-    "client_auth",
-  ]
-}
-
-module "authelia-db" {
-  source                   = "./modules/cockroachdb"
-  cluster_service_endpoint = local.kubernetes_services.authelia_db.fqdn
-  release                  = "0.1.0"
-  replicas                 = 3
-  images = {
-    cockroachdb = local.container_images.cockroachdb
-  }
-  ports = {
-    cockroachdb = local.service_ports.cockroachdb
-  }
-  ca = {
-    algorithm       = tls_private_key.authelia-db-ca.algorithm
-    private_key_pem = tls_private_key.authelia-db-ca.private_key_pem
-    cert_pem        = tls_self_signed_cert.authelia-db-ca.cert_pem
-  }
-  extra_configs = {
-    store = "/data"
-  }
-  extra_volume_mounts = [
-    {
-      name      = "data"
-      mountPath = "/data"
-    },
-  ]
-  volume_claim_templates = [
-    {
-      metadata = {
-        name = "data"
-      }
-      spec = {
-        accessModes = [
-          "ReadWriteOnce",
-        ]
-        resources = {
-          requests = {
-            storage = "4Gi"
-          }
-        }
-        storageClassName = "local-path"
-      }
-    },
-  ]
-}
-
 module "authelia" {
   source         = "./modules/authelia"
   name           = local.kubernetes_services.authelia.name
@@ -180,6 +110,7 @@ module "authelia" {
       remember_me_duration = 0
       redis = {
         enabled = true
+        deploy  = false
         host    = local.kubernetes_services.authelia_redis.fqdn
         port    = local.service_ports.redis
         password = {
