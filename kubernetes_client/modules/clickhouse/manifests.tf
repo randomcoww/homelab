@@ -372,20 +372,21 @@ module "statefulset" {
             containerPort = local.ports.keeper
           },
         ]
-        readinessProbe = {
-          httpGet = {
-            scheme = "HTTP"
-            port   = local.clickhouse_config.http_port
-            path   = "/ping"
-          }
-        }
-        livenessProbe = {
-          tcpSocket = {
-            scheme = "HTTP"
-            port   = local.clickhouse_config.http_port
-            path   = "/ping"
-          }
-        }
+        ## Does not work for provisioning
+        # readinessProbe = {
+        #   httpGet = {
+        #     scheme = "HTTP"
+        #     port   = local.clickhouse_config.http_port
+        #     path   = "/ping"
+        #   }
+        # }
+        # livenessProbe = {
+        #   tcpSocket = {
+        #     scheme = "HTTP"
+        #     port   = local.clickhouse_config.http_port
+        #     path   = "/ping"
+        #   }
+        # }
       },
     ]
     volumes = concat([
