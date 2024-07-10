@@ -452,13 +452,13 @@ resource "helm_release" "minio" {
         MINIO_STORAGE_CLASS_RRS      = "EC:2"
       }
       buckets = [
-        ## This permanently enables versioning and can only be suspended afterwards
-        # for bucket in local.minio_buckets :
-        # merge(bucket, {
-        #   purge         = false
-        #   versioning    = false
-        #   objectlocking = false
-        # })
+        for bucket in local.minio_buckets :
+        merge({
+          purge = false
+          # set to anything other than true or false causes bucket to stay un-versioned
+          versioning    = "hack-do-not-enable"
+          objectlocking = false
+        }, bucket)
       ]
       users          = []
       policies       = []
