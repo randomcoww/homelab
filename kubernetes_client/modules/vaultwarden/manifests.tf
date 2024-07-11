@@ -117,7 +117,7 @@ module "statefulset-litestream" {
   annotations = {
     "checksum/secret" = sha256(module.secret.manifest)
   }
-  spec = {
+  template_spec = {
     containers = [
       {
         name  = var.name

@@ -9,12 +9,11 @@ output "manifest" {
         release = var.release
       }
     }
-    spec = {
+    spec = merge({
       replicas = var.replicas
       strategy = merge({
         type = "RollingUpdate"
       }, var.strategy)
-      minReadySeconds = var.min_ready_seconds
       selector = {
         matchLabels = {
           app = var.app
@@ -58,9 +57,9 @@ output "manifest" {
               },
             ]
           }
-        }, var.spec)
+        }, var.template_spec)
       }
-    }
+    }, var.spec)
   })
 }
 

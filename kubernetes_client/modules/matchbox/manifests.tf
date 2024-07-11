@@ -1,6 +1,8 @@
 locals {
-  name      = split(".", var.cluster_service_endpoint)[0]
-  namespace = split(".", var.cluster_service_endpoint)[1]
+  name                  = split(".", var.cluster_service_endpoint)[0]
+  namespace             = split(".", var.cluster_service_endpoint)[1]
+  peer_name             = "${local.name}-peer"
+  peer_service_endpoint = "${local.peer_name}.${join(".", slice(split(".", var.cluster_service_endpoint), 1, length(split(".", var.cluster_service_endpoint))))}"
 
   syncthing_home_path = "/var/lib/syncthing"
   shared_data_path    = "/var/tmp/matchbox"
@@ -28,7 +30,7 @@ module "syncthing-config" {
   source = "../syncthing_config"
   hostnames = [
     for i in range(var.replicas) :
-    "${local.name}-${i}.${var.cluster_service_endpoint}"
+    "${local.name}-${i}.${local.peer_service_endpoint}"
   ]
   syncthing_home_path = local.syncthing_home_path
   sync_data_paths = [
@@ -93,6 +95,20 @@ module "service" {
         protocol   = "TCP"
         targetPort = local.ports.matchbox_api
       },
+    ]
+  }
+}
+
+module "service-peer" {
+  source  = "../service"
+  name    = local.peer_name
+  app     = local.name
+  release = var.release
+  spec = {
+    type                     = "ClusterIP"
+    clusterIP                = "None"
+    publishNotReadyAddresses = true
+    ports = [
       {
         name       = "syncthing-peer"
         port       = local.ports.syncthing_peer
@@ -103,31 +119,22 @@ module "service" {
   }
 }
 
-module "service-peer" {
-  source  = "../service"
-  name    = "${local.name}-peer"
-  app     = local.name
-  release = var.release
-  spec = {
-    type                     = "ClusterIP"
-    clusterIP                = "None"
-    publishNotReadyAddresses = true
-  }
-}
-
 module "statefulset" {
-  source            = "../statefulset"
-  name              = local.name
-  app               = local.name
-  release           = var.release
-  affinity          = var.affinity
-  replicas          = var.replicas
-  min_ready_seconds = 30
+  source   = "../statefulset"
+  name     = local.name
+  app      = local.name
+  release  = var.release
+  affinity = var.affinity
+  replicas = var.replicas
+  spec = {
+    minReadySeconds = 30
+    serviceName     = local.peer_name
+  }
   annotations = {
     "checksum/secret-syncthing" = sha256(module.secret-syncthing.manifest)
     "checksum/secret-matchbox"  = sha256(module.secret-matchbox.manifest)
   }
-  spec = {
+  template_spec = {
     containers = [
       {
         name  = local.name

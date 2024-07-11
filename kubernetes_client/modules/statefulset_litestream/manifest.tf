@@ -13,18 +13,18 @@ module "secret" {
 }
 
 module "statefulset" {
-  source            = "../statefulset"
-  name              = var.name
-  app               = var.app
-  release           = var.release
-  replicas          = 1
-  min_ready_seconds = var.min_ready_seconds
+  source   = "../statefulset"
+  name     = var.name
+  app      = var.app
+  release  = var.release
+  replicas = 1
   annotations = merge({
     "checksum/${module.secret.name}" = sha256(module.secret.manifest)
   }, var.annotations)
   affinity    = var.affinity
   tolerations = var.tolerations
-  spec = merge(var.spec, {
+  spec        = var.spec
+  template_spec = merge(var.template_spec, {
     initContainers = concat([
       {
         name  = "${var.name}-litestream-restore"
@@ -50,7 +50,7 @@ module "statefulset" {
         ]
       },
       ], [
-      for _, container in lookup(var.spec, "initContainers", []) :
+      for _, container in lookup(var.template_spec, "initContainers", []) :
       merge(container, {
         volumeMounts = concat(lookup(container, "volumeMounts", []), [
           {
@@ -82,7 +82,7 @@ module "statefulset" {
         ]
       },
       ], [
-      for _, container in lookup(var.spec, "containers", []) :
+      for _, container in lookup(var.template_spec, "containers", []) :
       merge(container, {
         volumeMounts = concat(lookup(container, "volumeMounts", []), [
           {
@@ -92,7 +92,7 @@ module "statefulset" {
         ])
       })
     ])
-    volumes = concat(lookup(var.spec, "volumes", []), [
+    volumes = concat(lookup(var.template_spec, "volumes", []), [
       {
         name = "litestream-config"
         secret = {
@@ -107,5 +107,4 @@ module "statefulset" {
       },
     ])
   })
-  volume_claim_templates = var.volume_claim_templates
 }

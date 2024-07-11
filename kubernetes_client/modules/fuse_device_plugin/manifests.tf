@@ -14,7 +14,7 @@ module "daemonset" {
   name    = var.name
   app     = var.name
   release = var.release
-  spec = {
+  template_spec = {
     hostNetwork = true
     dnsPolicy   = "ClusterFirstWithHostNet"
     containers = [

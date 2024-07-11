@@ -20,11 +20,6 @@ variable "strategy" {
   default = {}
 }
 
-variable "min_ready_seconds" {
-  type    = number
-  default = 0
-}
-
 variable "annotations" {
   type    = any
   default = {}
@@ -41,6 +36,11 @@ variable "tolerations" {
 }
 
 variable "spec" {
+  type    = any
+  default = {}
+}
+
+variable "template_spec" {
   type    = any
   default = {}
 }

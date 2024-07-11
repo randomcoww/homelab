@@ -267,7 +267,7 @@ locals {
     alpaca_stream = 38081
     lldap         = 6360
     redis         = 6379
-    cockroachdb   = 26257
+    cockroachdb   = 26258
   }
 
   minio_buckets = {

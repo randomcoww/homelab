@@ -184,17 +184,19 @@ module "service-peer" {
 }
 
 module "statefulset" {
-  source            = "../statefulset"
-  name              = var.name
-  app               = var.name
-  release           = var.release
-  affinity          = var.affinity
-  replicas          = length(local.configs)
-  min_ready_seconds = 30
+  source   = "../statefulset"
+  name     = var.name
+  app      = var.name
+  release  = var.release
+  affinity = var.affinity
+  replicas = length(local.configs)
   annotations = {
     "checksum/configmap" = sha256(module.configmap.manifest)
   }
   spec = {
+    minReadySeconds = 30
+  }
+  template_spec = {
     hostNetwork = true
     dnsPolicy   = "ClusterFirstWithHostNet"
     containers = [

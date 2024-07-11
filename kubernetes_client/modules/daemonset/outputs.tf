@@ -9,7 +9,7 @@ output "manifest" {
         release = var.release
       }
     }
-    spec = {
+    spec = merge({
       selector = {
         matchLabels = {
           app = var.app
@@ -34,9 +34,9 @@ output "manifest" {
               },
             ]
           }
-        }, var.spec)
+        }, var.template_spec)
       }
-    }
+    }, var.spec)
   })
 }
 

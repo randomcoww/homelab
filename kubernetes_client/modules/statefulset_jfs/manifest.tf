@@ -22,20 +22,18 @@ module "secret" {
 }
 
 module "statefulset" {
-  source            = "../statefulset"
-  name              = var.name
-  app               = var.app
-  release           = var.release
-  replicas          = 1
-  affinity          = var.affinity
-  min_ready_seconds = var.min_ready_seconds
+  source   = "../statefulset"
+  name     = var.name
+  app      = var.app
+  release  = var.release
+  replicas = var.replicas
+  affinity = var.affinity
   annotations = merge({
     "checksum/${module.secret.name}" = sha256(module.secret.manifest)
   }, var.annotations)
-  tolerations            = var.tolerations
-  volume_claim_templates = var.volume_claim_templates
-  spec = merge(var.spec, {
-    minReadySeconds = var.min_ready_seconds
+  tolerations = var.tolerations
+  spec        = var.spec
+  template_spec = merge(var.template_spec, {
     initContainers = concat([
       {
         name  = "${var.name}-jfs-format"
@@ -85,7 +83,7 @@ module "statefulset" {
           },
         ]
       },
-    ], lookup(var.spec, "initContainers", []))
+    ], lookup(var.template_spec, "initContainers", []))
     containers = concat([
       {
         name  = "${var.name}-jfs-mount"
@@ -159,7 +157,7 @@ module "statefulset" {
         }
       },
       ], [
-      for _, container in lookup(var.spec, "containers", []) :
+      for _, container in lookup(var.template_spec, "containers", []) :
       merge(container, {
         volumeMounts = concat(lookup(container, "volumeMounts", []), [
           {
@@ -169,7 +167,7 @@ module "statefulset" {
         ])
       })
     ])
-    volumes = concat(lookup(var.spec, "volumes", []), [
+    volumes = concat(lookup(var.template_spec, "volumes", []), [
       {
         name = "jfs-mount"
         emptyDir = {

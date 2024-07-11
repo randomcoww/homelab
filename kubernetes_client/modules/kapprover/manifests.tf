@@ -87,7 +87,7 @@ module "deployment" {
   release  = var.release
   affinity = var.affinity
   replicas = var.replicas
-  spec = {
+  template_spec = {
     priorityClassName  = "system-cluster-critical"
     serviceAccountName = var.name
     containers = [

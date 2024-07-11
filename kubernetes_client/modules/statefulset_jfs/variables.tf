@@ -15,9 +15,9 @@ variable "release" {
   type = string
 }
 
-variable "min_ready_seconds" {
+variable "replicas" {
   type    = number
-  default = 0
+  default = 1
 }
 
 variable "annotations" {
@@ -40,9 +40,9 @@ variable "spec" {
   default = {}
 }
 
-variable "volume_claim_templates" {
+variable "template_spec" {
   type    = any
-  default = []
+  default = {}
 }
 
 variable "jfs_image" {

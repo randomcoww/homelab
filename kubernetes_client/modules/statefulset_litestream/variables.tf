@@ -10,11 +10,6 @@ variable "release" {
   type = string
 }
 
-variable "min_ready_seconds" {
-  type    = number
-  default = 0
-}
-
 variable "annotations" {
   type    = any
   default = {}
@@ -35,9 +30,9 @@ variable "spec" {
   default = {}
 }
 
-variable "volume_claim_templates" {
+variable "template_spec" {
   type    = any
-  default = []
+  default = {}
 }
 
 variable "litestream_image" {

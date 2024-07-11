@@ -1,6 +1,9 @@
 locals {
-  name      = split(".", var.cluster_service_endpoint)[0]
-  namespace = split(".", var.cluster_service_endpoint)[1]
+  name                  = split(".", var.cluster_service_endpoint)[0]
+  namespace             = split(".", var.cluster_service_endpoint)[1]
+  peer_name             = "${local.name}-peer"
+  peer_service_endpoint = "${local.peer_name}.${join(".", slice(split(".", var.cluster_service_endpoint), 1, length(split(".", var.cluster_service_endpoint))))}"
+
   members = [
     for i in range(var.replicas) :
     "${local.name}-${i}"
@@ -141,7 +144,7 @@ locals {
       node = [
         for _, member in local.members :
         {
-          host   = "${member}.${var.cluster_service_endpoint}"
+          host   = "${member}.${local.peer_service_endpoint}"
           port   = local.ports.keeper
           secure = 1
         }
@@ -165,7 +168,7 @@ locals {
           replica = [
             for _, member in local.members :
             {
-              host   = "${member}.${var.cluster_service_endpoint}"
+              host   = "${member}.${local.peer_service_endpoint}"
               port   = local.ports.clickhouse
               secure = 1
             }
@@ -189,7 +192,7 @@ locals {
         for i, member in local.members :
         {
           id       = i + 1
-          hostname = "${member}.${var.cluster_service_endpoint}"
+          hostname = "${member}.${local.peer_service_endpoint}"
           port     = local.ports.raft
         }
       ]
@@ -283,28 +286,53 @@ module "service" {
 
 module "service-peer" {
   source  = "../service"
-  name    = "${local.name}-peer"
+  name    = local.peer_name
   app     = local.name
   release = var.release
   spec = {
     type                     = "ClusterIP"
     clusterIP                = "None"
     publishNotReadyAddresses = true
+    ports = [
+      {
+        name       = "clickhouse"
+        port       = local.ports.clickhouse
+        protocol   = "TCP"
+        targetPort = local.ports.clickhouse
+      },
+      {
+        name       = "keeper"
+        port       = local.ports.keeper
+        protocol   = "TCP"
+        targetPort = local.ports.keeper
+      },
+      {
+        name       = "raft"
+        port       = local.ports.raft
+        protocol   = "TCP"
+        targetPort = local.ports.raft
+      },
+    ]
   }
 }
 
 module "statefulset" {
-  source            = "../statefulset"
-  name              = local.name
-  app               = local.name
-  release           = var.release
-  replicas          = var.replicas
-  min_ready_seconds = 30
-  affinity          = var.affinity
+  source   = "../statefulset"
+  name     = local.name
+  app      = local.name
+  release  = var.release
+  replicas = var.replicas
+  affinity = var.affinity
   annotations = {
     "checksum/secret" = sha256(module.secret.manifest)
   }
   spec = {
+    serviceName          = local.peer_name
+    minReadySeconds      = 30
+    volumeClaimTemplates = var.volume_claim_templates
+    podManagementPolicy  = "Parallel"
+  }
+  template_spec = {
     containers = [
       {
         name  = local.name
@@ -372,21 +400,20 @@ module "statefulset" {
             containerPort = local.ports.keeper
           },
         ]
-        ## Does not work for provisioning
-        # readinessProbe = {
-        #   httpGet = {
-        #     scheme = "HTTP"
-        #     port   = local.clickhouse_config.http_port
-        #     path   = "/ping"
-        #   }
-        # }
-        # livenessProbe = {
-        #   tcpSocket = {
-        #     scheme = "HTTP"
-        #     port   = local.clickhouse_config.http_port
-        #     path   = "/ping"
-        #   }
-        # }
+        livenessProbe = {
+          tcpSocket = {
+            port = local.clickhouse_config.http_port
+          }
+          initialDelaySeconds = 10
+        }
+        readinessProbe = {
+          httpGet = {
+            scheme = "HTTP"
+            port   = local.clickhouse_config.http_port
+            path   = "/ping"
+          }
+          initialDelaySeconds = 10
+        }
       },
     ]
     volumes = concat([
@@ -399,5 +426,4 @@ module "statefulset" {
       },
     ], var.extra_volumes)
   }
-  volume_claim_templates = var.volume_claim_templates
 }

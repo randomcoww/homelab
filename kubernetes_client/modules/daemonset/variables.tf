@@ -29,3 +29,8 @@ variable "spec" {
   type    = any
   default = {}
 }
+
+variable "template_spec" {
+  type    = any
+  default = {}
+}

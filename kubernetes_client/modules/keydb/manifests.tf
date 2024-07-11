@@ -1,19 +1,21 @@
 locals {
   base_path = "/var/lib/keydb"
 
-  cert_path        = "${local.base_path}/keydb.crt"
-  key_path         = "${local.base_path}/keydb.key"
-  client_cert_path = "${local.base_path}/client.crt"
-  client_key_path  = "${local.base_path}/client.key"
-  ca_cert_path     = "${local.base_path}/ca.crt"
-  config_path      = "/etc/keydb.conf"
-  socket_path      = "/tmp/keydb.sock"
-  name             = split(".", var.cluster_service_endpoint)[0]
-  namespace        = split(".", var.cluster_service_endpoint)[1]
+  cert_path             = "${local.base_path}/keydb.crt"
+  key_path              = "${local.base_path}/keydb.key"
+  client_cert_path      = "${local.base_path}/client.crt"
+  client_key_path       = "${local.base_path}/client.key"
+  ca_cert_path          = "${local.base_path}/ca.crt"
+  config_path           = "/etc/keydb.conf"
+  socket_path           = "/tmp/keydb.sock"
+  name                  = split(".", var.cluster_service_endpoint)[0]
+  namespace             = split(".", var.cluster_service_endpoint)[1]
+  peer_name             = "${local.name}-peer"
+  peer_service_endpoint = "${local.peer_name}.${join(".", slice(split(".", var.cluster_service_endpoint), 1, length(split(".", var.cluster_service_endpoint))))}"
 
   peers = {
     for i, _ in range(var.replicas) :
-    "${local.name}-${i}" => "${local.name}-${i}.${var.cluster_service_endpoint}"
+    "${local.name}-${i}" => "${local.name}-${i}.${local.peer_service_endpoint}"
   }
 }
 
@@ -52,7 +54,7 @@ module "configmap" {
   app     = local.name
   release = var.release
   data = {
-    for hostname, peer in local.peers :
+    for hostname, _ in local.peers :
     "${basename(local.config_path)}-${hostname}" => <<-EOF
     bind 0.0.0.0
     port 0
@@ -78,20 +80,61 @@ module "configmap" {
 }
 }
 
+module "service" {
+  source  = "../service"
+  name    = local.name
+  app     = local.name
+  release = var.release
+  spec = {
+    type = "ClusterIP"
+    ports = [
+      {
+        name       = "keydb"
+        port       = var.ports.keydb
+        protocol   = "TCP"
+        targetPort = var.ports.keydb
+      },
+    ]
+  }
+}
+
+module "service-peer" {
+  source  = "../service"
+  name    = local.peer_name
+  app     = local.name
+  release = var.release
+  spec = {
+    type                     = "ClusterIP"
+    clusterIP                = "None"
+    publishNotReadyAddresses = true
+    ports = [
+      {
+        name       = "keydb"
+        port       = var.ports.keydb
+        protocol   = "TCP"
+        targetPort = var.ports.keydb
+      },
+    ]
+  }
+}
+
 module "statefulset" {
-  source            = "../statefulset"
-  name              = local.name
-  app               = local.name
-  release           = var.release
-  replicas          = var.replicas
-  affinity          = var.affinity
-  min_ready_seconds = 30
+  source   = "../statefulset"
+  name     = local.name
+  app      = local.name
+  release  = var.release
+  replicas = var.replicas
+  affinity = var.affinity
   annotations = {
     "checksum/secret"    = sha256(module.secret.manifest)
     "checksum/configmap" = sha256(module.configmap.manifest)
   }
-  volume_claim_templates = var.volume_claim_templates
   spec = {
+    serviceName          = local.peer_name
+    minReadySeconds      = 30
+    volumeClaimTemplates = var.volume_claim_templates
+  }
+  template_spec = {
     containers = [
       {
         name  = local.name
@@ -162,35 +205,5 @@ module "statefulset" {
         }
       },
     ], var.extra_volumes)
-  }
-}
-
-module "service" {
-  source  = "../service"
-  name    = local.name
-  app     = local.name
-  release = var.release
-  spec = {
-    type = "ClusterIP"
-    ports = [
-      {
-        name       = "keydb"
-        port       = var.ports.keydb
-        protocol   = "TCP"
-        targetPort = var.ports.keydb
-      },
-    ]
-  }
-}
-
-module "service-peer" {
-  source  = "../service"
-  name    = "${local.name}-peer"
-  app     = local.name
-  release = var.release
-  spec = {
-    type                     = "ClusterIP"
-    clusterIP                = "None"
-    publishNotReadyAddresses = true
   }
 }

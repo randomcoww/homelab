@@ -91,7 +91,7 @@ module "deployment" {
   release  = var.release
   affinity = var.affinity
   replicas = var.replicas
-  spec = {
+  template_spec = {
     containers = [
       {
         name  = var.name

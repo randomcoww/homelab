@@ -9,13 +9,12 @@ output "manifest" {
         release = var.release
       }
     }
-    spec = {
+    spec = merge({
       serviceName = var.app
       replicas    = var.replicas
       updateStrategy = {
         type = "RollingUpdate"
       }
-      minReadySeconds = var.min_ready_seconds
       selector = {
         matchLabels = {
           app = var.app
@@ -59,10 +58,9 @@ output "manifest" {
               },
             ]
           }
-        }, var.spec)
+        }, var.template_spec)
       }
-      volumeClaimTemplates = var.volume_claim_templates
-    }
+    }, var.spec)
   })
 }
 
