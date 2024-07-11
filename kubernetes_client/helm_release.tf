@@ -21,7 +21,7 @@ locals {
     module.alpaca-stream,
     module.code-jfs-metadata,
     # module.jupyter,
-    # module.code,
+    module.code,
     module.mpd-jfs-metadata,
     module.mpd,
     module.transmission-jfs-metadata,
