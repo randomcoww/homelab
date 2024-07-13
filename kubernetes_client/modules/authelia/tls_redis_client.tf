@@ -8,8 +8,7 @@ resource "tls_cert_request" "redis" {
   private_key_pem = tls_private_key.redis.private_key_pem
 
   subject {
-    common_name  = "keydb"
-    organization = "keydb"
+    common_name = "keydb"
   }
 }
 

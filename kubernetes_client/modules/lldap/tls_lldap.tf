@@ -8,8 +8,7 @@ resource "tls_cert_request" "lldap" {
   private_key_pem = tls_private_key.lldap.private_key_pem
 
   subject {
-    common_name  = "lldap"
-    organization = "lldap"
+    common_name = local.name
   }
 
   dns_names = [

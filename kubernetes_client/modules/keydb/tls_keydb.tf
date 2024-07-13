@@ -8,8 +8,7 @@ resource "tls_cert_request" "keydb" {
   private_key_pem = tls_private_key.keydb.private_key_pem
 
   subject {
-    common_name  = "keydb"
-    organization = "keydb"
+    common_name = local.name
   }
 
   dns_names = [

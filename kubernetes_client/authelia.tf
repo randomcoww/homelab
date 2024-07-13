@@ -10,8 +10,7 @@ resource "tls_self_signed_cert" "authelia-redis-ca" {
   is_ca_certificate     = true
 
   subject {
-    common_name  = "redis"
-    organization = "redis"
+    common_name = "authelia-redis"
   }
 
   allowed_uses = [
@@ -50,7 +49,11 @@ module "authelia" {
     litestream = local.container_images.litestream
   }
   service_hostname = local.kubernetes_ingress_endpoints.auth
-  lldap_ca         = data.terraform_remote_state.sr.outputs.lldap.ca
+  lldap_ca = {
+    algorithm       = tls_private_key.lldap-ca.algorithm
+    private_key_pem = tls_private_key.lldap-ca.private_key_pem
+    cert_pem        = tls_self_signed_cert.lldap-ca.cert_pem
+  }
   redis_ca = {
     algorithm       = tls_private_key.authelia-redis-ca.algorithm
     private_key_pem = tls_private_key.authelia-redis-ca.private_key_pem

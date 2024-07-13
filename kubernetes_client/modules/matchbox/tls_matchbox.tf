@@ -7,8 +7,7 @@ resource "tls_cert_request" "matchbox" {
   private_key_pem = tls_private_key.matchbox.private_key_pem
 
   subject {
-    common_name  = "matchbox"
-    organization = "matchbox"
+    common_name = local.name
   }
 
   dns_names = concat([

@@ -1,3 +1,27 @@
+resource "tls_private_key" "lldap-ca" {
+  algorithm = "RSA"
+  rsa_bits  = "4096"
+}
+
+resource "tls_self_signed_cert" "lldap-ca" {
+  private_key_pem = tls_private_key.lldap-ca.private_key_pem
+
+  validity_period_hours = 8760
+  is_ca_certificate     = true
+
+  subject {
+    common_name = "lldap"
+  }
+
+  allowed_uses = [
+    "key_encipherment",
+    "digital_signature",
+    "cert_signing",
+    "server_auth",
+    "client_auth",
+  ]
+}
+
 module "lldap" {
   source                   = "./modules/lldap"
   cluster_service_endpoint = local.kubernetes_services.lldap.fqdn
@@ -9,7 +33,11 @@ module "lldap" {
   ports = {
     lldap_ldaps = local.service_ports.lldap
   }
-  ca               = data.terraform_remote_state.sr.outputs.lldap.ca
+  ca = {
+    algorithm       = tls_private_key.lldap-ca.algorithm
+    private_key_pem = tls_private_key.lldap-ca.private_key_pem
+    cert_pem        = tls_self_signed_cert.lldap-ca.cert_pem
+  }
   service_hostname = local.kubernetes_ingress_endpoints.lldap_http
   storage_secret   = data.terraform_remote_state.sr.outputs.lldap.storage_secret
   extra_configs = {
