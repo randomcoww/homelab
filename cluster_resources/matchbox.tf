@@ -10,8 +10,7 @@ resource "tls_self_signed_cert" "matchbox-ca" {
   is_ca_certificate     = true
 
   subject {
-    common_name  = "matchbox"
-    organization = "matchbox"
+    common_name = "matchbox"
   }
 
   allowed_uses = [

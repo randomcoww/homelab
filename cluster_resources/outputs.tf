@@ -137,11 +137,6 @@ output "minio" {
 
 output "lldap" {
   value = {
-    ca = {
-      algorithm       = tls_private_key.lldap-ca.algorithm
-      private_key_pem = tls_private_key.lldap-ca.private_key_pem
-      cert_pem        = tls_self_signed_cert.lldap-ca.cert_pem
-    }
     user           = random_password.lldap-user.result
     password       = random_password.lldap-password.result
     storage_secret = random_password.lldap-storage-secret.result
