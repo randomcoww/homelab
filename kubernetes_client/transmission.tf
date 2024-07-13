@@ -10,8 +10,7 @@ resource "tls_self_signed_cert" "transmission-jfs-metadata-ca" {
   is_ca_certificate     = true
 
   subject {
-    common_name  = "Cockroach"
-    organization = "Cockroach"
+    common_name = "transmission"
   }
 
   allowed_uses = [
@@ -24,24 +23,28 @@ resource "tls_self_signed_cert" "transmission-jfs-metadata-ca" {
 }
 
 module "transmission-jfs-metadata" {
-  source                   = "./modules/cockroachdb"
+  source                   = "./modules/keydb"
   cluster_service_endpoint = local.kubernetes_services.transmission_jfs_metadata.fqdn
   release                  = "0.1.0"
-  replicas                 = 3
+  replicas                 = 2
   images = {
-    cockroachdb = local.container_images.cockroachdb
+    keydb = local.container_images.keydb
   }
   ports = {
-    cockroachdb = local.service_ports.cockroachdb
+    keydb = local.service_ports.redis
   }
   ca = {
     algorithm       = tls_private_key.transmission-jfs-metadata-ca.algorithm
     private_key_pem = tls_private_key.transmission-jfs-metadata-ca.private_key_pem
     cert_pem        = tls_self_signed_cert.transmission-jfs-metadata-ca.cert_pem
   }
-  extra_configs = {
-    store = "/data"
-  }
+  extra_configs = <<-EOF
+  dir /data
+  appendonly yes
+  appendfsync always
+  repl-diskless-sync yes
+  repl-diskless-sync-delay 0
+  EOF
   extra_volume_mounts = [
     {
       name      = "data"
@@ -155,7 +158,7 @@ module "transmission" {
     private_key_pem = tls_private_key.transmission-jfs-metadata-ca.private_key_pem
     cert_pem        = tls_self_signed_cert.transmission-jfs-metadata-ca.cert_pem
   }
-  jfs_metadata_endpoint = "${local.kubernetes_services.transmission_jfs_metadata.endpoint}:${local.service_ports.cockroachdb}"
+  jfs_metadata_endpoint = "${local.kubernetes_services.transmission_jfs_metadata.endpoint}:${local.service_ports.redis}"
 
   service_hostname          = local.kubernetes_ingress_endpoints.transmission
   ingress_class_name        = local.ingress_classes.ingress_nginx

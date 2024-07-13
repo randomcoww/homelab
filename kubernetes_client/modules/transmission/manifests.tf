@@ -165,6 +165,7 @@ module "statefulset-jfs" {
   jfs_minio_resource          = "http://${var.jfs_minio_endpoint}/${var.jfs_minio_resource}"
   jfs_minio_access_key_id     = var.jfs_minio_access_key_id
   jfs_minio_secret_access_key = var.jfs_minio_secret_access_key
+  tls_cn                      = "root"
   ##
 
   name     = var.name
