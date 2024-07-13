@@ -12,8 +12,7 @@ resource "tls_cert_request" "cockroachdb" {
   private_key_pem = tls_private_key.cockroachdb[each.key].private_key_pem
 
   subject {
-    common_name  = "node"
-    organization = "Cockroach"
+    common_name = "node"
   }
 
   dns_names = concat([

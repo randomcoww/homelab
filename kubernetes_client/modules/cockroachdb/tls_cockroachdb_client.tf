@@ -8,8 +8,7 @@ resource "tls_cert_request" "cockroachdb-client" {
   private_key_pem = tls_private_key.cockroachdb-client.private_key_pem
 
   subject {
-    common_name  = local.init_client_user
-    organization = "Cockroach"
+    common_name = local.init_client_user
   }
 }
 
