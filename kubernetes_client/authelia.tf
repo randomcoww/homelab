@@ -26,7 +26,7 @@ module "authelia-redis" {
   source                   = "./modules/keydb"
   cluster_service_endpoint = local.kubernetes_services.authelia_redis.fqdn
   release                  = "0.1.0"
-  replicas                 = 3
+  replicas                 = 2
   images = {
     keydb = local.container_images.keydb
   }
