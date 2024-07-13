@@ -3,10 +3,10 @@ locals {
   key_path     = "/etc/certs/client.key"
   ca_cert_path = "/etc/certs/ca.crt"
   # use default postgres database as root - only one application per postgres deployment
-  metadata_user = "root"
-  metadata_url  = "postgres://${var.jfs_metadata_endpoint}/postgres?sslcert=${local.cert_path}&sslkey=${local.key_path}&sslrootcert=${local.ca_cert_path}"
-  jfs_bucket    = join("/", slice(split("/", var.jfs_minio_resource), 0, length(split("/", var.jfs_minio_resource)) - 1))
-  jfs_name      = reverse(split("/", var.jfs_minio_resource))[0]
+  # metadata_url = "postgres://${var.jfs_metadata_endpoint}/postgres?sslcert=${local.cert_path}&sslkey=${local.key_path}&sslrootcert=${local.ca_cert_path}"
+  metadata_url = "rediss://${var.jfs_metadata_endpoint}?tls-cert-file=${local.cert_path}&tls-key-file=${local.key_path}&tls-ca-cert-file=${local.ca_cert_path}"
+  jfs_bucket   = join("/", slice(split("/", var.jfs_minio_resource), 0, length(split("/", var.jfs_minio_resource)) - 1))
+  jfs_name     = reverse(split("/", var.jfs_minio_resource))[0]
 }
 
 module "secret" {
@@ -104,7 +104,7 @@ module "statefulset" {
             --atime-mode noatime \
             --backup-meta 0 \
             --no-usage-report true \
-            -o allow_other,noatime
+            -o allow_other,writeback_cache,noatime
           EOF
         ]
         lifecycle = {

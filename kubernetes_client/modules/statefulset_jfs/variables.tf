@@ -45,6 +45,10 @@ variable "template_spec" {
   default = {}
 }
 
+variable "tls_cn" {
+  type = string
+}
+
 variable "jfs_image" {
   type = string
 }

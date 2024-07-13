@@ -8,8 +8,7 @@ resource "tls_cert_request" "metadata-client" {
   private_key_pem = tls_private_key.metadata-client.private_key_pem
 
   subject {
-    common_name  = local.metadata_user
-    organization = "Cockroach"
+    common_name = var.tls_cn
   }
 }
 
