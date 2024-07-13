@@ -28,8 +28,7 @@ resource "tls_self_signed_cert" "alpaca-db-ca" {
   is_ca_certificate     = true
 
   subject {
-    common_name  = "alpaca-db"
-    organization = "alpaca-db"
+    common_name = "alpaca-db"
   }
 
   allowed_uses = [

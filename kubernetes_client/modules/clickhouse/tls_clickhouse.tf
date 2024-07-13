@@ -8,8 +8,7 @@ resource "tls_cert_request" "clickhouse" {
   private_key_pem = tls_private_key.clickhouse.private_key_pem
 
   subject {
-    common_name  = "clickhouse"
-    organization = "clickhouse"
+    common_name = local.name
   }
 
   dns_names = concat([
