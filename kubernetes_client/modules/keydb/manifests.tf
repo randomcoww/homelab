@@ -66,11 +66,12 @@ module "configmap" {
     tls-client-key-file ${local.client_key_path}
     tls-ca-cert-file ${local.ca_cert_path}
     tls-replication yes
-    tls-cluster yes
     tls-protocols "TLSv1.3"
     tls-ciphersuites TLS_CHACHA20_POLY1305_SHA256
     active-replica yes
     multi-master yes
+    appendonly yes
+    appendfsync always
     ${var.extra_configs}
     ${join("\n", [
     for k, v in local.peers :

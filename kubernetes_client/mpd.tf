@@ -10,8 +10,7 @@ resource "tls_self_signed_cert" "mpd-jfs-metadata-ca" {
   is_ca_certificate     = true
 
   subject {
-    common_name  = "Cockroach"
-    organization = "Cockroach"
+    common_name = "mpd"
   }
 
   allowed_uses = [

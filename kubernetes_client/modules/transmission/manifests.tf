@@ -42,8 +42,7 @@ module "metadata" {
     "templates/service.yaml"     = module.service.manifest
     "templates/ingress.yaml"     = module.ingress.manifest
     "templates/secret.yaml"      = module.secret.manifest
-    "templates/statefulset.yaml" = module.statefulset-jfs.statefulset
-    "templates/secret-jfs.yaml"  = module.statefulset-jfs.secret
+    "templates/statefulset.yaml" = module.statefulset.manifest
     "templates/post-job.yaml" = yamlencode({
       apiVersion = "batch/v1"
       kind       = "Job"
@@ -155,22 +154,12 @@ module "ingress" {
   ]
 }
 
-module "statefulset-jfs" {
-  source = "../statefulset_jfs"
-  ## jfs settings
-  jfs_metadata_endpoint       = var.jfs_metadata_endpoint
-  jfs_metadata_ca             = var.jfs_metadata_ca
-  jfs_image                   = var.images.jfs
-  jfs_mount_path              = local.transmission_home_path
-  jfs_minio_resource          = "http://${var.jfs_minio_endpoint}/${var.jfs_minio_resource}"
-  jfs_minio_access_key_id     = var.jfs_minio_access_key_id
-  jfs_minio_secret_access_key = var.jfs_minio_secret_access_key
-  tls_cn                      = "root"
-  ##
-
+module "statefulset" {
+  source   = "../statefulset"
   name     = var.name
   app      = var.name
   release  = var.release
+  replicas = 1
   affinity = var.affinity
   annotations = {
     "checksum/secret" = sha256(module.secret.manifest)
@@ -206,7 +195,7 @@ module "statefulset-jfs" {
           <<-EOF
           set -e
 
-          mountpoint $HOME
+          mkdir -p $HOME
           echo -e "$TRANSMISSION_CONFIG" > $HOME/settings.json
 
           exec transmission-daemon \

@@ -20,11 +20,10 @@ locals {
     module.alpaca-db,
     module.alpaca-stream,
     module.code-jfs-metadata,
-    # module.jupyter,
     module.code,
+    # module.jupyter,
     module.mpd-jfs-metadata,
     module.mpd,
-    module.transmission-jfs-metadata,
     module.transmission,
     module.webdav-pictures,
   ]

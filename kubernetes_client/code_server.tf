@@ -10,8 +10,7 @@ resource "tls_self_signed_cert" "code-jfs-metadata-ca" {
   is_ca_certificate     = true
 
   subject {
-    common_name  = "Cockroach"
-    organization = "Cockroach"
+    common_name = "code"
   }
 
   allowed_uses = [

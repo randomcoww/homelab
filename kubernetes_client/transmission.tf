@@ -1,76 +1,3 @@
-resource "tls_private_key" "transmission-jfs-metadata-ca" {
-  algorithm   = "ECDSA"
-  ecdsa_curve = "P521"
-}
-
-resource "tls_self_signed_cert" "transmission-jfs-metadata-ca" {
-  private_key_pem = tls_private_key.transmission-jfs-metadata-ca.private_key_pem
-
-  validity_period_hours = 8760
-  is_ca_certificate     = true
-
-  subject {
-    common_name = "transmission"
-  }
-
-  allowed_uses = [
-    "key_encipherment",
-    "digital_signature",
-    "cert_signing",
-    "server_auth",
-    "client_auth",
-  ]
-}
-
-module "transmission-jfs-metadata" {
-  source                   = "./modules/keydb"
-  cluster_service_endpoint = local.kubernetes_services.transmission_jfs_metadata.fqdn
-  release                  = "0.1.0"
-  replicas                 = 2
-  images = {
-    keydb = local.container_images.keydb
-  }
-  ports = {
-    keydb = local.service_ports.redis
-  }
-  ca = {
-    algorithm       = tls_private_key.transmission-jfs-metadata-ca.algorithm
-    private_key_pem = tls_private_key.transmission-jfs-metadata-ca.private_key_pem
-    cert_pem        = tls_self_signed_cert.transmission-jfs-metadata-ca.cert_pem
-  }
-  extra_configs = <<-EOF
-  dir /data
-  appendonly yes
-  appendfsync always
-  repl-diskless-sync yes
-  repl-diskless-sync-delay 0
-  EOF
-  extra_volume_mounts = [
-    {
-      name      = "data"
-      mountPath = "/data"
-    },
-  ]
-  volume_claim_templates = [
-    {
-      metadata = {
-        name = "data"
-      }
-      spec = {
-        accessModes = [
-          "ReadWriteOnce",
-        ]
-        resources = {
-          requests = {
-            storage = "4Gi"
-          }
-        }
-        storageClassName = "local-path"
-      }
-    },
-  ]
-}
-
 module "transmission" {
   source  = "./modules/transmission"
   name    = "transmission"
@@ -78,7 +5,6 @@ module "transmission" {
   images = {
     transmission = local.container_images.transmission
     wireguard    = local.container_images.wireguard
-    jfs          = local.container_images.jfs
   }
   transmission_settings = {
     blocklist-enabled            = true
@@ -148,17 +74,6 @@ module "transmission" {
   PublicKey=${var.wireguard_client.public_key}
   PersistentKeepalive=25
   EOF
-
-  jfs_minio_access_key_id     = data.terraform_remote_state.sr.outputs.minio.access_key_id
-  jfs_minio_secret_access_key = data.terraform_remote_state.sr.outputs.minio.secret_access_key
-  jfs_minio_resource          = "${local.minio_buckets.jfs.name}/transmission"
-  jfs_minio_endpoint          = "${local.kubernetes_services.minio.endpoint}:${local.service_ports.minio}"
-  jfs_metadata_ca = {
-    algorithm       = tls_private_key.transmission-jfs-metadata-ca.algorithm
-    private_key_pem = tls_private_key.transmission-jfs-metadata-ca.private_key_pem
-    cert_pem        = tls_self_signed_cert.transmission-jfs-metadata-ca.cert_pem
-  }
-  jfs_metadata_endpoint = "${local.kubernetes_services.transmission_jfs_metadata.endpoint}:${local.service_ports.redis}"
 
   service_hostname          = local.kubernetes_ingress_endpoints.transmission
   ingress_class_name        = local.ingress_classes.ingress_nginx
