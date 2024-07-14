@@ -10,7 +10,7 @@ resource "tls_self_signed_cert" "authelia-redis-ca" {
   is_ca_certificate     = true
 
   subject {
-    common_name = "authelia-redis"
+    common_name = "authelia"
   }
 
   allowed_uses = [
