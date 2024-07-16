@@ -81,6 +81,14 @@ module "mpd" {
   extra_configs = {
     metadata_to_use = "AlbumArtist,Artist,Album,Title,Track,Disc,Genre,Name,Date"
   }
+  service_hostname          = local.kubernetes_ingress_endpoints.mpd
+  ingress_class_name        = local.ingress_classes.ingress_nginx
+  nginx_ingress_annotations = local.nginx_ingress_auth_annotations
+
+  data_minio_access_key_id     = data.terraform_remote_state.sr.outputs.minio.access_key_id
+  data_minio_secret_access_key = data.terraform_remote_state.sr.outputs.minio.secret_access_key
+  data_minio_bucket            = local.minio_buckets.music.name
+  data_minio_endpoint          = "${local.kubernetes_services.minio.fqdn}:${local.service_ports.minio}"
 
   jfs_minio_access_key_id     = data.terraform_remote_state.sr.outputs.minio.access_key_id
   jfs_minio_secret_access_key = data.terraform_remote_state.sr.outputs.minio.secret_access_key
@@ -92,13 +100,4 @@ module "mpd" {
     cert_pem        = tls_self_signed_cert.mpd-jfs-metadata-ca.cert_pem
   }
   jfs_metadata_endpoint = "${local.kubernetes_services.mpd_jfs_metadata.endpoint}:${local.service_ports.cockroachdb}"
-
-  data_minio_access_key_id     = data.terraform_remote_state.sr.outputs.minio.access_key_id
-  data_minio_secret_access_key = data.terraform_remote_state.sr.outputs.minio.secret_access_key
-  data_minio_bucket            = local.minio_buckets.music.name
-  data_minio_endpoint          = "${local.kubernetes_services.minio.fqdn}:${local.service_ports.minio}"
-
-  service_hostname          = local.kubernetes_ingress_endpoints.mpd
-  ingress_class_name        = local.ingress_classes.ingress_nginx
-  nginx_ingress_annotations = local.nginx_ingress_auth_annotations
 }

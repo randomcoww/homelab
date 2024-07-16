@@ -52,6 +52,23 @@ variable "code_server_security_context" {
   default = {}
 }
 
+variable "affinity" {
+  type    = any
+  default = {}
+}
+
+variable "service_hostname" {
+  type = string
+}
+
+variable "ingress_class_name" {
+  type = string
+}
+
+variable "nginx_ingress_annotations" {
+  type = map(string)
+}
+
 variable "jfs_minio_endpoint" {
   type = string
 }
@@ -78,21 +95,4 @@ variable "jfs_metadata_ca" {
     private_key_pem = string
     cert_pem        = string
   })
-}
-
-variable "affinity" {
-  type    = any
-  default = {}
-}
-
-variable "service_hostname" {
-  type = string
-}
-
-variable "ingress_class_name" {
-  type = string
-}
-
-variable "nginx_ingress_annotations" {
-  type = map(string)
 }

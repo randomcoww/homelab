@@ -96,6 +96,10 @@ module "jupyter" {
       ]
     }
   }
+  service_hostname          = local.kubernetes_ingress_endpoints.jupyter
+  ingress_class_name        = local.ingress_classes.ingress_nginx
+  nginx_ingress_annotations = local.nginx_ingress_auth_annotations
+
   jfs_minio_access_key_id     = data.terraform_remote_state.sr.outputs.minio.access_key_id
   jfs_minio_secret_access_key = data.terraform_remote_state.sr.outputs.minio.secret_access_key
   jfs_minio_resource          = "${local.minio_buckets.jfs.name}/code"
@@ -106,10 +110,6 @@ module "jupyter" {
     cert_pem        = tls_self_signed_cert.code-jfs-metadata-ca.cert_pem
   }
   jfs_metadata_endpoint = "${local.kubernetes_services.code_jfs_metadata.endpoint}:${local.service_ports.cockroachdb}"
-
-  service_hostname          = local.kubernetes_ingress_endpoints.jupyter
-  ingress_class_name        = local.ingress_classes.ingress_nginx
-  nginx_ingress_annotations = local.nginx_ingress_auth_annotations
 }
 
 module "code" {
@@ -186,6 +186,10 @@ module "code" {
       ]
     }
   }
+  service_hostname          = local.kubernetes_ingress_endpoints.code
+  ingress_class_name        = local.ingress_classes.ingress_nginx
+  nginx_ingress_annotations = local.nginx_ingress_auth_annotations
+
   jfs_minio_access_key_id     = data.terraform_remote_state.sr.outputs.minio.access_key_id
   jfs_minio_secret_access_key = data.terraform_remote_state.sr.outputs.minio.secret_access_key
   jfs_minio_resource          = "${local.minio_buckets.jfs.name}/code"
@@ -196,8 +200,4 @@ module "code" {
     cert_pem        = tls_self_signed_cert.code-jfs-metadata-ca.cert_pem
   }
   jfs_metadata_endpoint = "${local.kubernetes_services.code_jfs_metadata.endpoint}:${local.service_ports.cockroachdb}"
-
-  service_hostname          = local.kubernetes_ingress_endpoints.code
-  ingress_class_name        = local.ingress_classes.ingress_nginx
-  nginx_ingress_annotations = local.nginx_ingress_auth_annotations
 }
