@@ -269,7 +269,7 @@ flatpak --user -y install --or-update flathub \
   org.kde.krita \
   org.blender.Blender \
   com.github.xournalpp.xournalpp \
-  org.gnome.Loupe \
+  org.gnome.eog \
   com.valvesoftware.Steam \
   net.lutris.Lutris \
   net.davidotek.pupgui2
