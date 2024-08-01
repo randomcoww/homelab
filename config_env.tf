@@ -108,7 +108,7 @@ locals {
     fuse_device_plugin = "docker.io/soolaugust/fuse-device-plugin:v1.0"
     jupyter            = "ghcr.io/randomcoww/code-server:tensorflow-20240618.4"
     code               = "ghcr.io/randomcoww/code-server:podman-20240617.2"
-    alpaca_stream      = "ghcr.io/randomcoww/alpaca-client:stream-server-20240404.20"
+    alpaca_stream      = "ghcr.io/randomcoww/alpaca-client:stream-server-20240801.4"
     lldap              = "docker.io/lldap/lldap:2024-05-06"
     keydb              = "docker.io/eqalpha/keydb:alpine_x86_64_v6.3.4"
     clickhouse         = "docker.io/clickhouse/clickhouse-server:24.4-alpine"
