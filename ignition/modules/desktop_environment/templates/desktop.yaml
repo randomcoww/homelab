@@ -14,21 +14,6 @@ systemd:
 
 storage:
   files:
-    # airplay discovery for pipewire
-    - path: /etc/pipewire/pipewire.conf.d/roap.conf
-      mode: 0644
-      contents:
-        inline: |
-          context.modules = [
-            {
-              name = libpipewire-module-zeroconf-discover
-              args = {}
-            },
-            {
-              name = libpipewire-module-raop-discover
-              args = {}
-            }
-          ]
     # https://www.reddit.com/r/Fedora/comments/13zcfg9/rocmopencl_rocmopenclruntime_rx_6600_xt_support/
     # - path: /etc/environment.d/10-radeon.conf
     #   mode: 0644
@@ -36,6 +21,12 @@ storage:
     #     inline: |
     #       OCL_ICD_VENDORS=/etc/OpenCL/vendors/rusticl.icd
     #       RUSTICL_ENABLE=radeonsi
+    # Cursor is super stuttery after upgrading to F40. This seems to fix it.
+    - path: /etc/environment.d/10-mouse.conf
+      mode: 0644
+      contents:
+        inline: |
+          MUTTER_DEBUG_DISABLE_HW_CURSORS=1
 
     # gnome desktop config #
     # remote desktop https://www.reddit.com/r/gnome/comments/uz5as7/gnome_has_made_it_super_simple_to_extend_your/
