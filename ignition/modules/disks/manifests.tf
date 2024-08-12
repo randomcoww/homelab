@@ -46,11 +46,20 @@ locals {
     partition.label => partition
   }
 
+  mounts = [
+    for _, mount in var.mounts :
+    merge(mount, {
+      mount_unit_name = join("-", compact(split("/", replace(mount.mount_path, "-", "\\x2d"))))
+      mount_options   = lookup(mount, "mount_options", ["noatime", "nodiratime", "discard"])
+    })
+  ]
+
   ignition_snippets = concat([
     for f in fileset(".", "${path.module}/templates/*.yaml") :
     templatefile(f, {
       ignition_version = var.ignition_version
       disks            = local.disks
+      mounts           = local.mounts
     })
     ], [
     yamlencode({
