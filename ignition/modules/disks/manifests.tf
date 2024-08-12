@@ -94,8 +94,9 @@ locals {
         filesystems = [
           for label, partition in local.partitions :
           {
+            # No need to mount this during ignition. Also skips long relabling step
+            # path            = partition.mount_path
             label           = label
-            path            = partition.mount_path
             device          = partition.device
             format          = partition.format
             wipe_filesystem = partition.wipe
