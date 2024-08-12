@@ -108,7 +108,7 @@ locals {
     fuse_device_plugin = "docker.io/soolaugust/fuse-device-plugin:v1.0"
     jupyter            = "ghcr.io/randomcoww/code-server:tensorflow-20240618.4"
     code               = "ghcr.io/randomcoww/code-server:podman-20240617.2"
-    alpaca_stream      = "ghcr.io/randomcoww/alpaca-client:stream-server-20240801.4"
+    alpaca_stream      = "ghcr.io/randomcoww/alpaca-client:stream-server-20240801.6"
     lldap              = "docker.io/lldap/lldap:2024-05-06"
     keydb              = "docker.io/eqalpha/keydb:alpine_x86_64_v6.3.4"
     clickhouse         = "docker.io/clickhouse/clickhouse-server:24.4-alpine"
@@ -122,7 +122,7 @@ locals {
 
   pxeboot_images = {
     coreos     = "fedora-coreos-39.20240518.0"
-    silverblue = "fedora-silverblue-39.20240606.0"
+    silverblue = "fedora-silverblue-40.20240812.0"
   }
 
   kubernetes = {
