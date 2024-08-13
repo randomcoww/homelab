@@ -90,6 +90,9 @@ storage:
           [org/gnome/desktop/remote-desktop/rdp]
           screen-share-mode='extend'
 
+          [org/gnome/mutter]
+          experimental-features=['variable-refresh-rate']
+
           [org/gnome/nautilus/preferences]
           default-folder-viewer='list-view'
           search-filter-time-type='last_modified'
