@@ -282,7 +282,7 @@ locals {
         }
         # backup WAN on mobile data
         wlan1 = {
-          match_mac = "32-57-14-7a-aa-10"
+          match_mac = "0e-db-ea-3e-3a-78"
         }
       }
       bridge_interfaces = {
