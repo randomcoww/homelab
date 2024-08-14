@@ -180,11 +180,7 @@ module "code" {
     }
   }
   code_server_security_context = {
-    capabilities = {
-      add = [
-        "AUDIT_WRITE",
-      ]
-    }
+    privileged = true
   }
   service_hostname          = local.kubernetes_ingress_endpoints.code
   ingress_class_name        = local.ingress_classes.ingress_nginx
