@@ -34,6 +34,9 @@ storage:
       mode: 0644
       contents:
         inline: |
+          [org/gnome/desktop/a11y/applications]
+          screen-reader-enabled=false
+
           [org/gnome/desktop/background]
           color-shading-type='solid'
           primary-color='#000000000000'
@@ -61,6 +64,10 @@ storage:
           [org/gnome/desktop/sound]
           event-sounds=false
 
+          [org/gnome/login-screen]
+          enable-fingerprint-authentication=false
+          enable-smartcard-authentication=false
+
           [org/gnome/desktop/peripherals/mouse]
           accel-profile='flat'
 
@@ -87,9 +94,6 @@ storage:
           enable-hot-corners=false
           show-battery-percentage=true
 
-          [org/gnome/desktop/remote-desktop/rdp]
-          screen-share-mode='extend'
-
           [org/gnome/mutter]
           experimental-features=['variable-refresh-rate']
 
@@ -114,6 +118,9 @@ storage:
           [org/gnome/software]
           first-run=false
           show-nonfree-prompt=false
+
+          [org/gnome/shell/app-switcher]
+          current-workspace-only=false
 
           [org/gnome/system/location]
           enabled=true
