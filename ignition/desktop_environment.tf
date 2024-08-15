@@ -14,7 +14,7 @@ module "sunshine" {
     key_rightalt_to_key_win = "enabled"
     origin_web_ui_allowed   = "pc"
     encoder                 = "nvenc"
-    output_name             = "1"
+    output_name             = "0"
   }
   external_interface_name = each.value.networks.wan.interface
 }
