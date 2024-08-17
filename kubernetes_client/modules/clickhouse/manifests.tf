@@ -220,9 +220,15 @@ module "secret" {
   app     = local.name
   release = var.release
   data = merge({
-    basename(local.cert_path)    = chomp(tls_locally_signed_cert.clickhouse.cert_pem)
-    basename(local.key_path)     = chomp(tls_private_key.clickhouse.private_key_pem)
+    # basename(local.cert_path)    = chomp(tls_locally_signed_cert.clickhouse.cert_pem)
+    # basename(local.key_path)     = chomp(tls_private_key.clickhouse.private_key_pem)
     basename(local.ca_cert_path) = chomp(var.ca.cert_pem)
+    }, {
+    for i, member in local.members :
+    "cert-${member}" => chomp(tls_locally_signed_cert.clickhouse[member].cert_pem)
+    }, {
+    for i, member in local.members :
+    "key-${member}" => chomp(tls_private_key.clickhouse[member].private_key_pem)
     }, {
     for i, member in local.members :
     "config-${member}" => yamlencode(merge(local.clickhouse_config, {
@@ -344,6 +350,10 @@ module "statefulset" {
           set -e
 
           rm -f ${local.clickhouse_config.path}/status
+
+          mkdir -p ${local.clickhouse_config.path}/flags
+          touch ${local.clickhouse_config.path}/flags/force_restore_data
+
           exec clickhouse-server \
             -C ${local.base_path}/config.xml
           EOF
@@ -365,14 +375,14 @@ module "statefulset" {
             subPathExpr = "config-$(POD_NAME)"
           },
           {
-            name      = "secret"
-            mountPath = local.cert_path
-            subPath   = basename(local.cert_path)
+            name        = "secret"
+            mountPath   = local.cert_path
+            subPathExpr = "cert-$(POD_NAME)"
           },
           {
-            name      = "secret"
-            mountPath = local.key_path
-            subPath   = basename(local.key_path)
+            name        = "secret"
+            mountPath   = local.key_path
+            subPathExpr = "key-$(POD_NAME)"
           },
           {
             name      = "secret"
