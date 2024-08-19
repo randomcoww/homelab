@@ -238,6 +238,7 @@ module "secret" {
       macros = merge(local.clickhouse_config.macros, {
         replica = "replica_${i + 1}"
       })
+      interserver_http_host = "${member}.${local.peer_service_endpoint}"
     }))
   })
 }

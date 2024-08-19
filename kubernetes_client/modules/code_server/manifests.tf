@@ -76,16 +76,16 @@ module "ingress" {
 module "statefulset-jfs" {
   source = "../statefulset_jfs"
   ## jfs settings
-  jfs_metadata_endpoint       = var.jfs_metadata_endpoint
-  jfs_metadata_ca             = var.jfs_metadata_ca
-  jfs_image                   = var.images.jfs
-  jfs_mount_path              = dirname(local.code_home_path)
-  jfs_minio_resource          = "http://${var.jfs_minio_endpoint}/${var.jfs_minio_resource}"
-  jfs_minio_access_key_id     = var.jfs_minio_access_key_id
-  jfs_minio_secret_access_key = var.jfs_minio_secret_access_key
-  tls_cn                      = "root"
+  jfs_image                          = var.images.jfs
+  jfs_mount_path                     = dirname(local.code_home_path)
+  jfs_minio_bucket_endpoint          = var.jfs_minio_bucket_endpoint
+  jfs_minio_access_key_id            = var.jfs_minio_access_key_id
+  jfs_minio_secret_access_key        = var.jfs_minio_secret_access_key
+  litestream_image                   = var.images.litestream
+  litestream_minio_bucket_endpoint   = var.litestream_minio_bucket_endpoint
+  litestream_minio_access_key_id     = var.litestream_minio_access_key_id
+  litestream_minio_secret_access_key = var.litestream_minio_secret_access_key
   ##
-
   name     = var.name
   app      = var.name
   release  = var.release

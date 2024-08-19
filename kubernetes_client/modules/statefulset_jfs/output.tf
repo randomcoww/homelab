@@ -1,9 +1,9 @@
 output "statefulset" {
-  value = module.statefulset.manifest
+  value = module.statefulset-litestream.statefulset
 }
 
 output "secret" {
-  value = module.secret.manifest
+  value = module.statefulset-litestream.secret
 }
 
 output "name" {

@@ -15,6 +15,7 @@ variable "images" {
   type = object({
     code_server = string
     jfs         = string
+    litestream  = string
   })
 }
 
@@ -69,11 +70,7 @@ variable "nginx_ingress_annotations" {
   type = map(string)
 }
 
-variable "jfs_minio_endpoint" {
-  type = string
-}
-
-variable "jfs_minio_resource" {
+variable "jfs_minio_bucket_endpoint" {
   type = string
 }
 
@@ -85,14 +82,14 @@ variable "jfs_minio_secret_access_key" {
   type = string
 }
 
-variable "jfs_metadata_endpoint" {
+variable "litestream_minio_bucket_endpoint" {
   type = string
 }
 
-variable "jfs_metadata_ca" {
-  type = object({
-    algorithm       = string
-    private_key_pem = string
-    cert_pem        = string
-  })
+variable "litestream_minio_access_key_id" {
+  type = string
+}
+
+variable "litestream_minio_secret_access_key" {
+  type = string
 }

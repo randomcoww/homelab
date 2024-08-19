@@ -17,14 +17,13 @@ locals {
     module.tailscale,
     module.hostapd,
     module.qrcode,
-    module.alpaca-db,
+    # module.alpaca-db,
     module.alpaca-stream,
-    module.code-jfs-metadata,
     module.jupyter,
-    module.mpd-jfs-metadata,
     module.mpd,
     module.transmission,
     module.webdav-pictures,
+    module.webdav-videos,
   ]
 }
 

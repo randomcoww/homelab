@@ -22,11 +22,11 @@ locals {
 
   config = merge(var.extra_configs, {
     certs-dir           = local.certs_path
-    listen-addr         = "$(POD_NAME).${var.cluster_service_endpoint}:${local.ports.grpc}"
+    listen-addr         = "0.0.0.0:${local.ports.grpc}"
     advertise-addr      = "$(POD_NAME).${var.cluster_service_endpoint}:${local.ports.grpc}"
-    sql-addr            = "$(POD_NAME).${var.cluster_service_endpoint}:${local.ports.sql}"
+    sql-addr            = "0.0.0.0:${local.ports.sql}"
     advertise-sql-addr  = "$(POD_NAME).${var.cluster_service_endpoint}:${local.ports.sql}"
-    http-addr           = "$(POD_NAME).${var.cluster_service_endpoint}:${local.ports.http}"
+    http-addr           = "0.0.0.0:${local.ports.http}"
     advertise-http-addr = "$(POD_NAME).${var.cluster_service_endpoint}:${local.ports.http}"
     join = join(",", [
       for member in local.members :
@@ -218,6 +218,7 @@ module "statefulset" {
         command = concat([
           "cockroach",
           "start",
+          "--logtostderr",
           ], [
           for k, v in local.config :
           "--${k}=${v}"
