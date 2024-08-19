@@ -301,7 +301,8 @@ brew install --cask \
   tailscale \
   visual-studio-code \
   scroll-reverser \
-  phoenix-slides
+  phoenix-slides \
+  iina
 ```
 
 ```bash
