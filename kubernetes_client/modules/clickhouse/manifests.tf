@@ -60,7 +60,7 @@ locals {
         s3 = {
           type                 = "object_storage"
           object_storage_type  = "s3"
-          metadata_type        = "local"
+          metadata_type        = "plain_rewritable"
           endpoint             = "http://${var.data_minio_endpoint}/${var.data_minio_bucket}/${local.name}/s3/"
           access_key_id        = var.data_minio_access_key_id
           secret_access_key    = var.data_minio_secret_access_key
