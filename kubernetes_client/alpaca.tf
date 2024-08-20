@@ -47,6 +47,8 @@ module "alpaca-db" {
   replicas                 = 3
   images = {
     clickhouse = local.container_images.clickhouse
+    jfs        = local.container_images.jfs
+    litestream = local.container_images.litestream
   }
   ca = {
     algorithm       = tls_private_key.alpaca-db-ca.algorithm
@@ -61,31 +63,11 @@ module "alpaca-db" {
   service_hostname = local.kubernetes_ingress_endpoints.alpaca_db
   service_ip       = local.services.alpaca_db.ip
 
-  extra_clickhouse_config = {
-    path = "/var/lib/clickhouse"
-  }
-  extra_volume_mounts = [
-    {
-      name      = "metadata"
-      mountPath = "/var/lib/clickhouse"
-    },
-  ]
-  volume_claim_templates = [
-    {
-      metadata = {
-        name = "metadata"
-      }
-      spec = {
-        accessModes = [
-          "ReadWriteOnce",
-        ]
-        resources = {
-          requests = {
-            storage = "4Gi"
-          }
-        }
-        storageClassName = "local-path"
-      }
-    },
-  ]
+  jfs_minio_access_key_id            = data.terraform_remote_state.sr.outputs.minio.access_key_id
+  jfs_minio_secret_access_key        = data.terraform_remote_state.sr.outputs.minio.secret_access_key
+  jfs_minio_bucket_endpoint          = "http://${local.kubernetes_services.minio.endpoint}:${local.service_ports.minio}/${local.minio_buckets.jfs.name}"
+  litestream_minio_access_key_id     = data.terraform_remote_state.sr.outputs.minio.access_key_id
+  litestream_minio_secret_access_key = data.terraform_remote_state.sr.outputs.minio.secret_access_key
+  litestream_minio_bucket_endpoint   = "http://${local.kubernetes_services.minio.endpoint}:${local.service_ports.minio}/${local.minio_buckets.litestream.name}"
+
 }

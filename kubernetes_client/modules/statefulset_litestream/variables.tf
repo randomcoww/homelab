@@ -10,6 +10,11 @@ variable "release" {
   type = string
 }
 
+variable "replicas" {
+  type    = number
+  default = 1
+}
+
 variable "annotations" {
   type    = any
   default = {}

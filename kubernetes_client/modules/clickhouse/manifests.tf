@@ -30,7 +30,7 @@ locals {
       "@remove" = "remove"
     }
     tcp_port_secure   = local.ports.clickhouse
-    path              = "/var/lib/clickhouse"
+    path              = "/var/lib/clickhouse/mnt"
     listen_reuse_port = 1
     }, var.extra_clickhouse_config, {
     logger = {
@@ -101,7 +101,8 @@ locals {
       }
     }
     merge_tree = {
-      storage_policy = "s3"
+      storage_policy                        = "s3"
+      allow_remote_fs_zero_copy_replication = false
     }
     asynchronous_metric_log = {
       "@remove" = "remove"
@@ -180,11 +181,16 @@ locals {
 
   keeper_config = merge({
     tcp_port_secure       = local.ports.keeper
+    async_replication     = true
     log_storage_disk      = "log_s3_plain"
     snapshot_storage_disk = "snapshot_s3_plain"
     state_storage_disk    = "state_s3_plain"
     coordination_settings = {
       force_sync = false
+    }
+    feature_flags = {
+      check_not_exists     = 1
+      create_if_not_exists = 1
     }
     raft_configuration = {
       secure = true
@@ -210,7 +216,8 @@ module "metadata" {
     "templates/service.yaml"      = module.service.manifest
     "templates/service-peer.yaml" = module.service-peer.manifest
     "templates/secret.yaml"       = module.secret.manifest
-    "templates/statefulset.yaml"  = module.statefulset.manifest
+    "templates/statefulset.yaml"  = module.statefulset-jfs.statefulset
+    "templates/secret-jfs.yaml"   = module.statefulset-jfs.secret
   }
 }
 
@@ -220,8 +227,6 @@ module "secret" {
   app     = local.name
   release = var.release
   data = merge({
-    # basename(local.cert_path)    = chomp(tls_locally_signed_cert.clickhouse.cert_pem)
-    # basename(local.key_path)     = chomp(tls_private_key.clickhouse.private_key_pem)
     basename(local.ca_cert_path) = chomp(var.ca.cert_pem)
     }, {
     for i, member in local.members :
@@ -323,8 +328,19 @@ module "service-peer" {
   }
 }
 
-module "statefulset" {
-  source   = "../statefulset"
+module "statefulset-jfs" {
+  source = "../statefulset_jfs"
+  ## jfs settings
+  jfs_image                          = var.images.jfs
+  jfs_mount_path                     = local.clickhouse_config.path
+  jfs_minio_bucket_endpoint          = var.jfs_minio_bucket_endpoint
+  jfs_minio_access_key_id            = var.jfs_minio_access_key_id
+  jfs_minio_secret_access_key        = var.jfs_minio_secret_access_key
+  litestream_image                   = var.images.litestream
+  litestream_minio_bucket_endpoint   = var.litestream_minio_bucket_endpoint
+  litestream_minio_access_key_id     = var.litestream_minio_access_key_id
+  litestream_minio_secret_access_key = var.litestream_minio_secret_access_key
+  ##
   name     = local.name
   app      = local.name
   release  = var.release
@@ -350,6 +366,7 @@ module "statefulset" {
           <<-EOF
           set -e
 
+          mountpoint ${local.clickhouse_config.path}
           rm -f ${local.clickhouse_config.path}/status
 
           mkdir -p ${local.clickhouse_config.path}/flags

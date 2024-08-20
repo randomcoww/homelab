@@ -17,7 +17,7 @@ module "statefulset" {
   name     = var.name
   app      = var.app
   release  = var.release
-  replicas = 1
+  replicas = var.replicas
   annotations = merge({
     "checksum/${module.secret.name}" = sha256(module.secret.manifest)
   }, var.annotations)
@@ -36,6 +36,16 @@ module "statefulset" {
           "-config",
           local.config_path,
           var.sqlite_path,
+        ]
+        env = [
+          {
+            name = "POD_NAME"
+            valueFrom = {
+              fieldRef = {
+                fieldPath = "metadata.name"
+              }
+            }
+          },
         ]
         volumeMounts = [
           {
@@ -68,6 +78,16 @@ module "statefulset" {
           "replicate",
           "-config",
           local.config_path,
+        ]
+        env = [
+          {
+            name = "POD_NAME"
+            valueFrom = {
+              fieldRef = {
+                fieldPath = "metadata.name"
+              }
+            }
+          },
         ]
         volumeMounts = [
           {

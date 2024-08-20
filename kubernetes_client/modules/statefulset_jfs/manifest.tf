@@ -19,14 +19,14 @@ module "statefulset-litestream" {
             name                     = "minio"
             type                     = "s3"
             bucket                   = local.litestream_bucket
-            path                     = var.name
+            path                     = "$POD_NAME"
             endpoint                 = local.litestream_endpoint
             access-key-id            = var.litestream_minio_access_key_id
             secret-access-key        = var.litestream_minio_secret_access_key
             retention                = "2m"
             retention-check-interval = "2m"
-            sync-interval            = "500ms"
-            snapshot-interval        = "1h"
+            sync-interval            = "100ms"
+            snapshot-interval        = "20m"
           },
         ]
       },
@@ -37,6 +37,7 @@ module "statefulset-litestream" {
   name        = var.name
   app         = var.app
   release     = var.release
+  replicas    = var.replicas
   affinity    = var.affinity
   tolerations = var.tolerations
   spec        = var.spec
@@ -53,7 +54,7 @@ module "statefulset-litestream" {
 
           juicefs format \
             'sqlite3://${local.db_path}' \
-            ${var.name} \
+            $(POD_NAME) \
             --storage minio \
             --bucket ${local.jfs_endpoint}/${local.jfs_bucket} \
             --trash-days 0
@@ -70,6 +71,14 @@ module "statefulset-litestream" {
           {
             name  = "SECRET_KEY"
             value = var.jfs_minio_secret_access_key
+          },
+          {
+            name = "POD_NAME"
+            valueFrom = {
+              fieldRef = {
+                fieldPath = "metadata.name"
+              }
+            }
           },
         ]
       },

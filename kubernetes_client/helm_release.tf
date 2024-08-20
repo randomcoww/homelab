@@ -17,7 +17,7 @@ locals {
     module.tailscale,
     module.hostapd,
     module.qrcode,
-    # module.alpaca-db,
+    module.alpaca-db,
     module.alpaca-stream,
     module.jupyter,
     module.mpd,
