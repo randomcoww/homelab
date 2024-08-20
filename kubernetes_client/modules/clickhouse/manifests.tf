@@ -8,7 +8,10 @@ locals {
     for i in range(var.replicas) :
     "${local.name}-${i}"
   ]
+  user  = "clickhouse"
+  group = "clickhouse"
 
+  mount_path   = "/var/tmp/clickhouse/mnt"
   base_path    = "/etc/clickhouse-server"
   config_path  = "${local.base_path}/config.d/server.yaml"
   cert_path    = "${local.base_path}/server.crt"
@@ -30,7 +33,7 @@ locals {
       "@remove" = "remove"
     }
     tcp_port_secure   = local.ports.clickhouse
-    path              = "/var/lib/clickhouse/mnt"
+    path              = "/var/lib/clickhouse"
     listen_reuse_port = 1
     }, var.extra_clickhouse_config, {
     logger = {
@@ -332,7 +335,7 @@ module "statefulset-jfs" {
   source = "../statefulset_jfs"
   ## jfs settings
   jfs_image                          = var.images.jfs
-  jfs_mount_path                     = local.clickhouse_config.path
+  jfs_mount_path                     = local.mount_path
   jfs_minio_bucket_endpoint          = var.jfs_minio_bucket_endpoint
   jfs_minio_access_key_id            = var.jfs_minio_access_key_id
   jfs_minio_secret_access_key        = var.jfs_minio_secret_access_key
@@ -366,13 +369,25 @@ module "statefulset-jfs" {
           <<-EOF
           set -e
 
-          mountpoint ${local.clickhouse_config.path}
-          rm -f ${local.clickhouse_config.path}/status
+          mountpoint ${local.mount_path}
+          mkdir -p \
+            ${local.mount_path}/data \
+            ${local.mount_path}/metadata \
+            ${local.mount_path}/store \
+            ${local.clickhouse_config.path}
+          ln -sf \
+            ${local.mount_path}/data \
+            ${local.mount_path}/metadata \
+            ${local.mount_path}/store \
+            ${local.clickhouse_config.path}
+          chown ${local.user}:${local.group} \
+            ${local.mount_path}/data \
+            ${local.mount_path}/metadata \
+            ${local.mount_path}/store \
+            ${local.clickhouse_config.path}
 
-          mkdir -p ${local.clickhouse_config.path}/flags
-          touch ${local.clickhouse_config.path}/flags/force_restore_data
-
-          exec clickhouse-server \
+          exec clickhouse su ${local.user}:${local.group} \
+            clickhouse-server \
             -C ${local.base_path}/config.xml
           EOF
         ]

@@ -1,6 +1,6 @@
 locals {
   home_path  = "/var/lib/transmission"
-  mount_path = "/var/lib/transmission/mnt"
+  mount_path = "/var/tmp/transmission/mnt"
   transmission_settings = merge({
     script-torrent-done-filename = "/torrent-done.sh"
     rpc-port                     = 9091
@@ -211,12 +211,12 @@ module "statefulset-jfs" {
           <<-EOF
           set -e
 
-          mkdir -p $HOME
           mountpoint ${local.mount_path}
           mkdir -p \
             ${local.mount_path}/resume \
             ${local.mount_path}/torrents \
-            ${local.mount_path}/blocklists
+            ${local.mount_path}/blocklists \
+            $HOME
           ln -sf \
             ${local.mount_path}/resume \
             ${local.mount_path}/torrents \
