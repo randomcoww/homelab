@@ -59,6 +59,11 @@ module "statefulset-litestream" {
             --bucket ${local.jfs_endpoint}/${local.jfs_bucket} \
             --trash-days 0
 
+          juicefs gc \
+            'sqlite3://${local.db_path}' \
+            --compact \
+            --delete
+
           juicefs fsck \
             'sqlite3://${local.db_path}'
           EOF
@@ -103,7 +108,7 @@ module "statefulset-litestream" {
             --atime-mode noatime \
             --backup-meta 0 \
             --no-usage-report true \
-            -o allow_other,writeback_cache,noatime
+            -o allow_other,noatime
           EOF
         ]
         lifecycle = {

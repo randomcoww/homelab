@@ -5,6 +5,8 @@ module "transmission" {
   images = {
     transmission = local.container_images.transmission
     wireguard    = local.container_images.wireguard
+    jfs          = local.container_images.jfs
+    litestream   = local.container_images.litestream
   }
   transmission_settings = {
     blocklist-enabled            = true
@@ -27,7 +29,6 @@ module "transmission" {
     speed-limit-up-enabled       = true
     start-added-torrents         = true
     trash-original-torrent-files = true
-    incomplete-dir-enabled       = false
   }
   transmission_extra_envs = [
     {
@@ -78,4 +79,11 @@ module "transmission" {
   service_hostname          = local.kubernetes_ingress_endpoints.transmission
   ingress_class_name        = local.ingress_classes.ingress_nginx
   nginx_ingress_annotations = local.nginx_ingress_auth_annotations
+
+  jfs_minio_access_key_id            = data.terraform_remote_state.sr.outputs.minio.access_key_id
+  jfs_minio_secret_access_key        = data.terraform_remote_state.sr.outputs.minio.secret_access_key
+  jfs_minio_bucket_endpoint          = "http://${local.kubernetes_services.minio.endpoint}:${local.service_ports.minio}/${local.minio_buckets.jfs.name}"
+  litestream_minio_access_key_id     = data.terraform_remote_state.sr.outputs.minio.access_key_id
+  litestream_minio_secret_access_key = data.terraform_remote_state.sr.outputs.minio.secret_access_key
+  litestream_minio_bucket_endpoint   = "http://${local.kubernetes_services.minio.endpoint}:${local.service_ports.minio}/${local.minio_buckets.litestream.name}"
 }

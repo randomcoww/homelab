@@ -1,12 +1,17 @@
 locals {
-  transmission_home_path = "/var/lib/transmission/mnt"
+  home_path  = "/var/lib/transmission"
+  mount_path = "/var/lib/transmission/mnt"
   transmission_settings = merge({
     script-torrent-done-filename = "/torrent-done.sh"
     rpc-port                     = 9091
     }, var.transmission_settings, {
-    rpc-enabled       = true
-    rpc-bind-address  = "0.0.0.0"
-    bind-address-ipv4 = "0.0.0.0"
+    rpc-enabled            = true
+    rpc-bind-address       = "0.0.0.0"
+    bind-address-ipv4      = "0.0.0.0"
+    download-dir           = "${local.mount_path}/downloads"
+    incomplete-dir-enabled = false
+    rename-partial-files   = false
+    trash-can-enabled      = false
   })
   blocklist_update_job_spec = {
     containers = [
@@ -42,7 +47,8 @@ module "metadata" {
     "templates/service.yaml"     = module.service.manifest
     "templates/ingress.yaml"     = module.ingress.manifest
     "templates/secret.yaml"      = module.secret.manifest
-    "templates/statefulset.yaml" = module.statefulset.manifest
+    "templates/statefulset.yaml" = module.statefulset-jfs.statefulset
+    "templates/secret-jfs.yaml"  = module.statefulset-jfs.secret
     "templates/post-job.yaml" = yamlencode({
       apiVersion = "batch/v1"
       kind       = "Job"
@@ -154,12 +160,22 @@ module "ingress" {
   ]
 }
 
-module "statefulset" {
-  source   = "../statefulset"
+module "statefulset-jfs" {
+  source = "../statefulset_jfs"
+  ## jfs settings
+  jfs_image                          = var.images.jfs
+  jfs_mount_path                     = local.mount_path
+  jfs_minio_bucket_endpoint          = var.jfs_minio_bucket_endpoint
+  jfs_minio_access_key_id            = var.jfs_minio_access_key_id
+  jfs_minio_secret_access_key        = var.jfs_minio_secret_access_key
+  litestream_image                   = var.images.litestream
+  litestream_minio_bucket_endpoint   = var.litestream_minio_bucket_endpoint
+  litestream_minio_access_key_id     = var.litestream_minio_access_key_id
+  litestream_minio_secret_access_key = var.litestream_minio_secret_access_key
+  ##
   name     = var.name
   app      = var.name
   release  = var.release
-  replicas = 1
   affinity = var.affinity
   annotations = {
     "checksum/secret" = sha256(module.secret.manifest)
@@ -196,6 +212,16 @@ module "statefulset" {
           set -e
 
           mkdir -p $HOME
+          mountpoint ${local.mount_path}
+          mkdir -p \
+            ${local.mount_path}/resume \
+            ${local.mount_path}/torrents \
+            ${local.mount_path}/blocklists
+          ln -sf \
+            ${local.mount_path}/resume \
+            ${local.mount_path}/torrents \
+            ${local.mount_path}/blocklists \
+            $HOME
           echo -e "$TRANSMISSION_CONFIG" > $HOME/settings.json
 
           exec transmission-daemon \
@@ -207,7 +233,7 @@ module "statefulset" {
           # default transmission paths go under $HOME
           {
             name  = "HOME"
-            value = local.transmission_home_path
+            value = local.home_path
           },
           {
             name  = "TR_RPC_PORT"
