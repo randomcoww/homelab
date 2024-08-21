@@ -155,9 +155,7 @@ locals {
     for k, domain in {
       auth            = "auth"
       transmission    = "t"
-      minio           = "minio"
       vaultwarden     = "vw"
-      matchbox        = "ign"
       jupyter         = "jupyter"
       code            = "code"
       alpaca_stream   = "alpaca-stream"

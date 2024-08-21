@@ -426,22 +426,14 @@ resource "helm_release" "minio" {
         }
       }
       service = {
-        type = "ClusterIP"
+        type = "LoadBalancer"
         port = local.service_ports.minio
         externalIPs = [
           local.services.minio.ip,
         ]
       }
       ingress = {
-        enabled          = true
-        ingressClassName = local.ingress_classes.ingress_nginx
-        annotations      = local.nginx_ingress_annotations
-        tls = [
-          local.ingress_tls_common,
-        ]
-        hosts = [
-          local.kubernetes_ingress_endpoints.minio,
-        ]
+        enabled = false
       }
       environment = {
         MINIO_API_REQUESTS_DEADLINE  = "2m"

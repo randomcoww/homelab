@@ -10,12 +10,10 @@ resource "tls_cert_request" "matchbox" {
     common_name = local.name
   }
 
-  dns_names = concat([
-    var.service_hostname,
-    ], [
+  dns_names = [
     for i, _ in split(".", var.cluster_service_endpoint) :
     join(".", slice(split(".", var.cluster_service_endpoint), 0, i + 1))
-  ])
+  ]
   ip_addresses = [
     var.service_ip,
   ]

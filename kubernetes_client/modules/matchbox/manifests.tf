@@ -74,9 +74,6 @@ module "service" {
   name    = local.name
   app     = local.name
   release = var.release
-  annotations = {
-    "external-dns.alpha.kubernetes.io/hostname" = var.service_hostname
-  }
   spec = {
     type = "LoadBalancer"
     externalIPs = [

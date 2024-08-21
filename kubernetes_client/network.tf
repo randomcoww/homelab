@@ -73,9 +73,8 @@ module "matchbox" {
     matchbox     = local.service_ports.matchbox
     matchbox_api = local.service_ports.matchbox_api
   }
-  service_ip       = local.services.matchbox.ip
-  service_hostname = local.kubernetes_ingress_endpoints.matchbox
-  ca               = data.terraform_remote_state.sr.outputs.matchbox.ca
+  service_ip = local.services.matchbox.ip
+  ca         = data.terraform_remote_state.sr.outputs.matchbox.ca
 }
 
 # Wifi AP

@@ -34,10 +34,6 @@ variable "service_ip" {
   type = string
 }
 
-variable "service_hostname" {
-  type = string
-}
-
 variable "ca" {
   type = object({
     algorithm       = string

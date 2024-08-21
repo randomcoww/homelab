@@ -32,7 +32,7 @@ output "mc_config" {
     version = "10"
     aliases = {
       m = {
-        url       = "https://${local.kubernetes_ingress_endpoints.minio}"
+        url       = "http://${local.services.minio.ip}:${local.service_ports.minio}"
         accessKey = data.terraform_remote_state.sr.outputs.minio.access_key_id
         secretKey = data.terraform_remote_state.sr.outputs.minio.secret_access_key
         api       = "S3v4"
