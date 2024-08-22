@@ -33,7 +33,7 @@ module "kea" {
     kea_peer = local.host_ports.kea_peer
     tftpd    = local.host_ports.tftpd
   }
-  ipxe_boot_path  = "/ipxe.efi"
+  ipxe_boot_path  = "/ipxe-shimx64.efi"
   ipxe_script_url = "http://${local.services.matchbox.ip}:${local.service_ports.matchbox}/boot.ipxe"
   networks = [
     for _, network in local.networks :
