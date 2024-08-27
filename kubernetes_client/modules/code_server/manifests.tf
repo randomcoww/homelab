@@ -110,10 +110,6 @@ module "statefulset" {
             name  = "HOME"
             value = var.home_path
           },
-          {
-            name  = "XDG_RUNTIME_DIR"
-            value = "/run/user/${var.uid}"
-          },
         ])
         volumeMounts = concat([
           for i, config in var.code_server_extra_configs :

@@ -1,0 +1,12 @@
+---
+variant: fcos
+version: ${ignition_version}
+systemd:
+  units:
+    - name: podman.socket
+      enabled: true
+
+storage:
+  links:
+    - path: /etc/systemd/user/sockets.target.wants/podman.socket
+      target: /usr/lib/systemd/user/podman.socket

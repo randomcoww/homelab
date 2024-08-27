@@ -31,19 +31,35 @@ module "jupyter" {
       name  = "MC_HOST_m"
       value = "http://${data.terraform_remote_state.sr.outputs.minio.access_key_id}:${data.terraform_remote_state.sr.outputs.minio.secret_access_key}@${local.kubernetes_services.minio.fqdn}:${local.service_ports.minio}"
     },
+    {
+      name  = "XDG_RUNTIME_DIR"
+      value = "/run/user/${local.users.client.uid}"
+    },
   ]
   code_server_extra_volumes = [
     {
-      name = "run"
+      name = "run-podman"
       hostPath = {
-        path = "/run"
+        path = "/run/podman"
+        type = "Directory"
+      }
+    },
+    {
+      name = "run-user"
+      hostPath = {
+        path = "/run/user/${local.users.client.uid}"
+        type = "Directory"
       }
     },
   ]
   code_server_extra_volume_mounts = [
     {
-      name      = "run"
-      mountPath = "/run"
+      name      = "run-podman"
+      mountPath = "/run/podman"
+    },
+    {
+      name      = "run-user"
+      mountPath = "/run/user/${local.users.client.uid}"
     },
   ]
   code_server_resources = {
