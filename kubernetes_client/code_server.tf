@@ -4,16 +4,46 @@ module "jupyter" {
   release = "0.1.1"
   images = {
     code_server = local.container_images.jupyter
-    jfs         = local.container_images.jfs
-    litestream  = local.container_images.litestream
   }
-  user                      = local.users.client.name
-  uid                       = local.users.client.uid
-  code_server_extra_configs = []
+  ports = {
+    code_server = local.host_ports.jupyter
+  }
+  user      = local.users.client.name
+  uid       = local.users.client.uid
+  home_path = "${local.mounts.home_path}/${local.users.client.name}"
+  code_server_extra_configs = [
+    {
+      path    = "/etc/ssh/ssh_known_hosts"
+      content = "@cert-authority * ${chomp(data.terraform_remote_state.sr.outputs.ssh.ca.public_key_openssh)}"
+    },
+    {
+      path    = "/etc/tmux.conf"
+      content = <<-EOF
+      set -g history-limit 10000
+      set -g mouse on
+      set-option -s set-clipboard off
+      bind-key -T copy-mode MouseDragEnd1Pane send-keys -X copy-pipe-and-cancel "xclip -in -sel clip"
+      EOF
+    }
+  ]
   code_server_extra_envs = [
     {
       name  = "MC_HOST_m"
       value = "http://${data.terraform_remote_state.sr.outputs.minio.access_key_id}:${data.terraform_remote_state.sr.outputs.minio.secret_access_key}@${local.kubernetes_services.minio.fqdn}:${local.service_ports.minio}"
+    },
+  ]
+  code_server_extra_volumes = [
+    {
+      name = "run"
+      hostPath = {
+        path = "/run"
+      }
+    },
+  ]
+  code_server_extra_volume_mounts = [
+    {
+      name      = "run"
+      mountPath = "/run"
     },
   ]
   code_server_resources = {
@@ -28,14 +58,26 @@ module "jupyter" {
       ]
     }
   }
+  affinity = {
+    nodeAffinity = {
+      requiredDuringSchedulingIgnoredDuringExecution = {
+        nodeSelectorTerms = [
+          {
+            matchExpressions = [
+              {
+                key      = "kubernetes.io/hostname"
+                operator = "In"
+                values = [
+                  "de-1.local",
+                ]
+              },
+            ]
+          },
+        ]
+      }
+    }
+  }
   service_hostname          = local.kubernetes_ingress_endpoints.jupyter
   ingress_class_name        = local.ingress_classes.ingress_nginx
   nginx_ingress_annotations = local.nginx_ingress_auth_annotations
-
-  jfs_minio_access_key_id            = data.terraform_remote_state.sr.outputs.minio.access_key_id
-  jfs_minio_secret_access_key        = data.terraform_remote_state.sr.outputs.minio.secret_access_key
-  jfs_minio_bucket_endpoint          = "http://${local.kubernetes_services.minio.endpoint}:${local.service_ports.minio}/${local.minio_buckets.jfs.name}"
-  litestream_minio_access_key_id     = data.terraform_remote_state.sr.outputs.minio.access_key_id
-  litestream_minio_secret_access_key = data.terraform_remote_state.sr.outputs.minio.secret_access_key
-  litestream_minio_bucket_endpoint   = "http://${local.kubernetes_services.minio.endpoint}:${local.service_ports.minio}/${local.minio_buckets.litestream.name}"
 }

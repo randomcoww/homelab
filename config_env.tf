@@ -106,7 +106,7 @@ locals {
     litestream         = "docker.io/litestream/litestream:0.3"
     tailscale          = "ghcr.io/randomcoww/tailscale:1.70.0"
     fuse_device_plugin = "docker.io/soolaugust/fuse-device-plugin:v1.0"
-    jupyter            = "ghcr.io/randomcoww/code-server:tensorflow-20240814.4"
+    jupyter            = "ghcr.io/randomcoww/code-server:tensorflow-20240827.5"
     alpaca_stream      = "ghcr.io/randomcoww/alpaca-client:stream-server-20240801.6"
     lldap              = "docker.io/lldap/lldap:2024-08-08-alpine"
     keydb              = "docker.io/eqalpha/keydb:alpine_x86_64_v6.3.4"
@@ -121,7 +121,7 @@ locals {
 
   pxeboot_images = {
     coreos     = "fedora-coreos-40.20240826.0"
-    silverblue = "fedora-silverblue-40.20240821.0"
+    silverblue = "fedora-silverblue-40.20240827.0"
   }
 
   kubernetes = {
@@ -256,6 +256,7 @@ locals {
     etcd_client        = 58082
     etcd_peer          = 58083
     flannel_healthz    = 58084
+    jupyter            = 58085
   }
 
   service_ports = {

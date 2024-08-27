@@ -1,13 +1,3 @@
-locals {
-  code_home_path    = "/mnt/home/${var.user}"
-  jfs_metadata_path = "/var/lib/jfs/${var.name}.db"
-  user_data_path    = "${local.code_home_path}/.local/share/${var.name}"
-  config_path       = "${local.user_data_path}/config.yaml"
-  ports = {
-    code_server = 8080
-  }
-}
-
 module "metadata" {
   source      = "../metadata"
   name        = var.name
@@ -18,8 +8,7 @@ module "metadata" {
     "templates/secret.yaml"      = module.secret.manifest
     "templates/service.yaml"     = module.service.manifest
     "templates/ingress.yaml"     = module.ingress.manifest
-    "templates/statefulset.yaml" = module.statefulset-jfs.statefulset
-    "templates/secret-jfs.yaml"  = module.statefulset-jfs.secret
+    "templates/statefulset.yaml" = module.statefulset.manifest
   }
 }
 
@@ -44,9 +33,9 @@ module "service" {
     ports = [
       {
         name       = "code-server"
-        port       = local.ports.code_server
+        port       = var.ports.code_server
         protocol   = "TCP"
-        targetPort = local.ports.code_server
+        targetPort = var.ports.code_server
       },
     ]
   }
@@ -65,7 +54,7 @@ module "ingress" {
       paths = [
         {
           service = module.service.name
-          port    = local.ports.code_server
+          port    = var.ports.code_server
           path    = "/"
         }
       ]
@@ -73,19 +62,8 @@ module "ingress" {
   ]
 }
 
-module "statefulset-jfs" {
-  source = "../statefulset_jfs"
-  ## jfs settings
-  jfs_image                          = var.images.jfs
-  jfs_mount_path                     = dirname(local.code_home_path)
-  jfs_minio_bucket_endpoint          = var.jfs_minio_bucket_endpoint
-  jfs_minio_access_key_id            = var.jfs_minio_access_key_id
-  jfs_minio_secret_access_key        = var.jfs_minio_secret_access_key
-  litestream_image                   = var.images.litestream
-  litestream_minio_bucket_endpoint   = var.litestream_minio_bucket_endpoint
-  litestream_minio_access_key_id     = var.litestream_minio_access_key_id
-  litestream_minio_secret_access_key = var.litestream_minio_secret_access_key
-  ##
+module "statefulset" {
+  source   = "../statefulset"
   name     = var.name
   app      = var.name
   release  = var.release
@@ -94,6 +72,7 @@ module "statefulset-jfs" {
     "checksum/secret" = sha256(module.secret.manifest)
   }
   template_spec = {
+    hostNetwork = true
     containers = [
       {
         name  = var.name
@@ -105,57 +84,66 @@ module "statefulset-jfs" {
           <<-EOF
           set -xe
 
-          mountpoint ${dirname(local.code_home_path)}
-
-          useradd ${var.user} -d ${local.code_home_path} -m -u ${var.uid}
+          useradd ${var.user} -d ${var.home_path} -m -u ${var.uid}
           usermod \
             -G wheel \
             --add-subuids 100000-165535 \
             --add-subgids 100000-165535 \
             ${var.user}
 
-          HOME=${local.code_home_path} \
           exec s6-setuidgid ${var.user} \
           code-server \
             --auth=none \
             --disable-telemetry \
             --disable-update-check \
-            --config=${local.config_path} \
-            --user-data-dir=${local.user_data_path} \
-            --bind-addr=0.0.0.0:${local.ports.code_server}
+            --bind-addr=0.0.0.0:${var.ports.code_server}
           EOF
         ]
-        env = [
+        env = concat([
           for _, e in var.code_server_extra_envs :
           {
             name  = e.name
             value = tostring(e.value)
           }
-        ]
-        volumeMounts = [
+          ], [
+          {
+            name  = "HOME"
+            value = var.home_path
+          },
+          {
+            name  = "XDG_RUNTIME_DIR"
+            value = "/run/user/${var.uid}"
+          },
+        ])
+        volumeMounts = concat([
           for i, config in var.code_server_extra_configs :
           {
             name      = "config"
             mountPath = config.path
             subPath   = "${i}-${basename(config.path)}"
           }
-        ]
+          ], [
+          {
+            name      = "home"
+            mountPath = var.home_path
+          }
+        ], var.code_server_extra_volume_mounts)
         ports = [
           {
-            containerPort = local.ports.code_server
+            containerPort = var.ports.code_server
           },
         ]
         readinessProbe = {
           httpGet = {
             scheme = "HTTP"
-            port   = local.ports.code_server
+            port   = var.ports.code_server
             path   = "/healthz"
           }
         }
         livenessProbe = {
           httpGet = {
             scheme = "HTTP"
-            port   = local.ports.code_server
+            port   = var.ports.code_server
             path   = "/healthz"
           }
         }
@@ -163,14 +151,21 @@ module "statefulset-jfs" {
         resources       = var.code_server_resources
       },
     ]
-    volumes = [
+    volumes = concat([
       {
         name = "config"
         secret = {
           secretName = module.secret.name
         }
       },
-    ]
+      ], [
+      {
+        name = "home"
+        hostPath = {
+          path = var.home_path
+        }
+      }
+    ], var.code_server_extra_volumes)
     dnsConfig = {
       options = [
         {

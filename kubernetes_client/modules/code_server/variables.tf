@@ -14,8 +14,12 @@ variable "release" {
 variable "images" {
   type = object({
     code_server = string
-    jfs         = string
-    litestream  = string
+  })
+}
+
+variable "ports" {
+  type = object({
+    code_server = number
   })
 }
 
@@ -25,6 +29,10 @@ variable "user" {
 
 variable "uid" {
   type = number
+}
+
+variable "home_path" {
+  type = string
 }
 
 variable "code_server_extra_configs" {
@@ -70,26 +78,12 @@ variable "nginx_ingress_annotations" {
   type = map(string)
 }
 
-variable "jfs_minio_bucket_endpoint" {
-  type = string
+variable "code_server_extra_volume_mounts" {
+  type    = any
+  default = []
 }
 
-variable "jfs_minio_access_key_id" {
-  type = string
-}
-
-variable "jfs_minio_secret_access_key" {
-  type = string
-}
-
-variable "litestream_minio_bucket_endpoint" {
-  type = string
-}
-
-variable "litestream_minio_access_key_id" {
-  type = string
-}
-
-variable "litestream_minio_secret_access_key" {
-  type = string
+variable "code_server_extra_volumes" {
+  type    = any
+  default = []
 }
