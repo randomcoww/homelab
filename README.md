@@ -162,7 +162,7 @@ Update image tags under `pxeboot_images` in [environment config](https://github.
 
 
 ```bash
-export interface=lan
+export interface=br-lan
 export host_ip=$(ip -br addr show $interface | awk '{print $3}')
 export assets_path=${HOME}/store/boot
 

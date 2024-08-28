@@ -56,7 +56,7 @@ module "ingress" {
           service = module.service.name
           port    = var.ports.code_server
           path    = "/"
-        }
+        },
       ]
     },
   ]
@@ -125,7 +125,7 @@ module "statefulset" {
           {
             name      = "home"
             mountPath = var.home_path
-          }
+          },
         ], var.code_server_extra_volume_mounts)
         ports = [
           {
@@ -163,7 +163,7 @@ module "statefulset" {
         hostPath = {
           path = var.home_path
         }
-      }
+      },
     ], var.code_server_extra_volumes)
     dnsConfig = {
       options = [

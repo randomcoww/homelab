@@ -60,7 +60,7 @@ locals {
         kind      = "ServiceAccount"
         name      = var.name
         namespace = var.namespace
-      }
+      },
     ]
   }
 }
@@ -104,7 +104,7 @@ module "configmap" {
           capabilities = {
             portMappings = true
           }
-        }
+        },
       ]
     })
     "net-conf.json" = jsonencode({
@@ -182,7 +182,6 @@ module "daemonset" {
     ]
     containers = [
       {
-
         name  = var.name
         image = var.images.flannel
         command = [
@@ -270,7 +269,7 @@ module "daemonset" {
             mountPath = "/etc/kube-flannel"
           },
         ]
-      }
+      },
     ]
     volumes = [
       {

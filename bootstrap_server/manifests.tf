@@ -63,7 +63,7 @@ module "bootstrap" {
                 ]
               }
             })
-          }
+          },
         ]
         securityContext = {
           capabilities = {

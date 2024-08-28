@@ -111,7 +111,7 @@ locals {
                 {
                   name = "tcode"
                   data = var.timezone
-                }
+                },
               ]
               pools = [
                 for _, pool in network.pools :
@@ -174,7 +174,7 @@ module "service-peer" {
         port       = var.ports.kea_peer
         protocol   = "TCP"
         targetPort = var.ports.kea_peer
-      }
+      },
     ]
     selector = {
       app                                  = var.name

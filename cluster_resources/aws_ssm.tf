@@ -18,7 +18,7 @@ resource "aws_iam_user_policy" "ssm" {
         Resource = [
           "arn:aws:ssm:${local.aws_region}:${data.aws_caller_identity.caller.account_id}:parameter/${each.value.resource}/*",
         ]
-      }
+      },
     ]
   })
 }

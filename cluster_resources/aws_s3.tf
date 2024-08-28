@@ -57,7 +57,7 @@ resource "aws_iam_user_policy" "s3" {
           "arn:aws:s3:::${each.value.resource}",
           "arn:aws:s3:::${each.value.resource}/*",
         ]
-      }
+      },
     ]
   })
 }

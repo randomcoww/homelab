@@ -31,7 +31,7 @@ locals {
         kind      = "ServiceAccount"
         name      = var.name
         namespace = var.namespace
-      }
+      },
     ]
   }
 }
@@ -141,7 +141,7 @@ module "daemonset" {
             path   = "/healthz"
           }
         }
-      }
+      },
     ]
     volumes = [
       {

@@ -105,7 +105,7 @@ module "statefulset-litestream" {
             secret-access-key = var.litestream_s3_secret_access_key
           },
         ]
-      }
+      },
     ]
   }
   sqlite_path = local.db_path

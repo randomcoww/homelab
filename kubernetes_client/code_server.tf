@@ -24,7 +24,7 @@ module "code" {
       set-option -s set-clipboard off
       bind-key -T copy-mode MouseDragEnd1Pane send-keys -X copy-pipe-and-cancel "xclip -in -sel clip"
       EOF
-    }
+    },
   ]
   code_server_extra_envs = [
     {

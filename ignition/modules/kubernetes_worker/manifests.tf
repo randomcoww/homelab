@@ -65,7 +65,7 @@ locals {
             {
               priority                   = 0
               shutdownGracePeriodSeconds = var.graceful_shutdown_delay
-            }
+            },
           ]
           containerLogMaxSize  = "10Mi"
           containerLogMaxFiles = 2

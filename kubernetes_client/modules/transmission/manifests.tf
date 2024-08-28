@@ -154,7 +154,7 @@ module "ingress" {
           service = module.service.name
           port    = local.transmission_settings.rpc-port
           path    = "/"
-        }
+        },
       ]
     },
   ]

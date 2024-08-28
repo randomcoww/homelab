@@ -223,7 +223,7 @@ locals {
                     subPath   = basename(local.litestream_config_path)
                   },
                 ]
-              }
+              },
             ]
             containers = concat(local.s.spec.template.spec.containers, [
               {

@@ -17,7 +17,7 @@ locals {
             {
               name       = "Desktop"
               image-path = "desktop.png"
-            }
+            },
           ]
         }
       }
