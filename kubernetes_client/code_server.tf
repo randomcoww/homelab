@@ -3,7 +3,7 @@ module "code" {
   name    = "code"
   release = "0.1.1"
   images = {
-    code_server = local.container_images.code
+    code_server = local.container_images.code_server
   }
   ports = {
     code_server = local.host_ports.code
