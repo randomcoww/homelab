@@ -44,7 +44,7 @@ module "authelia" {
   source         = "./modules/authelia"
   name           = local.kubernetes_services.authelia.name
   namespace      = local.kubernetes_services.authelia.namespace
-  source_release = "0.8.58"
+  source_release = "0.9.5"
   images = {
     litestream = local.container_images.litestream
   }
@@ -65,9 +65,8 @@ module "authelia" {
         enabled = false
       }
     }
-    default_redirection_url = "https://${local.kubernetes_ingress_endpoints.auth}"
-    default_2fa_method      = "totp"
-    theme                   = "dark"
+    default_2fa_method = "totp"
+    theme              = "dark"
     totp = {
       disable = false
     }
@@ -76,6 +75,13 @@ module "authelia" {
     }
     duo_api = {
       disable = true
+    }
+    identity_validation = {
+      reset_password = {
+        secret = {
+          value = data.terraform_remote_state.sr.outputs.authelia.jwt_token
+        }
+      }
     }
     authentication_backend = {
       password_reset = {
@@ -91,7 +97,7 @@ module "authelia" {
           skip_verify     = false
           minimum_version = "TLS1.3"
         }
-        url                    = "ldaps://${local.kubernetes_services.lldap.endpoint}:${local.service_ports.lldap}"
+        address                = "ldaps://${local.kubernetes_services.lldap.endpoint}:${local.service_ports.lldap}"
         base_dn                = "dc=${join(",dc=", slice(compact(split(".", local.kubernetes_ingress_endpoints.lldap_http)), 1, length(compact(split(".", local.kubernetes_ingress_endpoints.lldap_http)))))}"
         username_attribute     = "uid"
         additional_users_dn    = "ou=people"
@@ -102,15 +108,21 @@ module "authelia" {
         mail_attribute         = "mail"
         display_name_attribute = "displayName"
         user                   = "uid=${data.terraform_remote_state.sr.outputs.lldap.user},ou=people,dc=${join(",dc=", slice(compact(split(".", local.kubernetes_ingress_endpoints.lldap_http)), 1, length(compact(split(".", local.kubernetes_ingress_endpoints.lldap_http)))))}"
+        password = {
+          value = data.terraform_remote_state.sr.outputs.lldap.password
+        }
       }
       file = {
         enabled = false
       }
     }
     session = {
-      inactivity           = "4h"
-      expiration           = "4h"
-      remember_me_duration = 0
+      inactivity  = "4h"
+      expiration  = "4h"
+      remember_me = 0
+      encryption_key = {
+        value = data.terraform_remote_state.sr.outputs.authelia.session_encryption_key
+      }
       redis = {
         enabled = true
         deploy  = false
@@ -129,6 +141,15 @@ module "authelia" {
     regulation = {
       max_retries = 4
     }
+    storage = {
+      encryption_key = {
+        value = data.terraform_remote_state.sr.outputs.authelia.storage_secret
+      }
+      local = {
+        enabled = true
+        path    = "/config/db.sqlite3"
+      }
+    }
     notifier = {
       disable_startup_check = true
       smtp = {
@@ -138,6 +159,9 @@ module "authelia" {
         port          = var.smtp.port
         username      = var.smtp.username
         sender        = var.smtp.username
+        password = {
+          value = var.smtp.password
+        }
       }
     }
     access_control = {
@@ -153,23 +177,6 @@ module "authelia" {
           policy = "bypass"
         },
       ]
-    }
-  }
-  secret = {
-    jwt = {
-      value = data.terraform_remote_state.sr.outputs.authelia.jwt_token
-    }
-    storageEncryptionKey = {
-      value = data.terraform_remote_state.sr.outputs.authelia.storage_secret
-    }
-    session = {
-      value = data.terraform_remote_state.sr.outputs.authelia.session_encryption_key
-    }
-    smtp = {
-      value = var.smtp.password
-    }
-    ldap = {
-      value = data.terraform_remote_state.sr.outputs.lldap.password
     }
   }
   ingress_class_name  = local.ingress_classes.ingress_nginx_external
