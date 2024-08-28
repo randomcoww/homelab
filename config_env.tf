@@ -87,7 +87,7 @@ locals {
     kube_controller_manager = "ghcr.io/randomcoww/kubernetes:kube-master-${local.kubernetes.version}"
     kube_scheduler          = "ghcr.io/randomcoww/kubernetes:kube-master-${local.kubernetes.version}"
     etcd_wrapper            = "ghcr.io/randomcoww/etcd-wrapper:20240226.2"
-    etcd                    = "gcr.io/etcd-development/etcd:v3.5.12-amd64"
+    etcd                    = "gcr.io/etcd-development/etcd:v3.5.15-amd64"
 
     # Helm
     kea                = "ghcr.io/randomcoww/kea:2.4.1"
@@ -114,7 +114,7 @@ locals {
     jfs                = "ghcr.io/randomcoww/juicefs:1.2.0"
     qrcode_generator   = "ghcr.io/randomcoww/qrcode-generator:20240620.4"
     mpd                = "ghcr.io/randomcoww/mpd:0.23.15"
-    mympd              = "ghcr.io/jcorporation/mympd/mympd:15.0.2"
+    mympd              = "ghcr.io/jcorporation/mympd/mympd:17.0.3"
     rclone             = "docker.io/rclone/rclone:1.67"
     cockroachdb        = "docker.io/cockroachdb/cockroach:v24.1.1"
   }
