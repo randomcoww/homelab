@@ -1,12 +1,12 @@
-module "jupyter" {
+module "code" {
   source  = "./modules/code_server"
-  name    = "jupyter"
+  name    = "code"
   release = "0.1.1"
   images = {
-    code_server = local.container_images.jupyter
+    code_server = local.container_images.code
   }
   ports = {
-    code_server = local.host_ports.jupyter
+    code_server = local.host_ports.code
   }
   user      = local.users.client.name
   uid       = local.users.client.uid
@@ -93,7 +93,7 @@ module "jupyter" {
       }
     }
   }
-  service_hostname          = local.kubernetes_ingress_endpoints.jupyter
+  service_hostname          = local.kubernetes_ingress_endpoints.code
   ingress_class_name        = local.ingress_classes.ingress_nginx
   nginx_ingress_annotations = local.nginx_ingress_auth_annotations
 }

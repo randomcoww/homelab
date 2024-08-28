@@ -19,7 +19,7 @@ locals {
     module.qrcode,
     module.alpaca-db,
     module.alpaca-stream,
-    module.jupyter,
+    module.code,
     module.mpd,
     module.transmission,
     module.webdav-pictures,
