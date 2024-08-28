@@ -56,7 +56,7 @@ module "kube-dns" {
   source         = "./modules/kube_dns"
   name           = "kube-dns"
   namespace      = "kube-system"
-  source_release = "1.29.0"
+  source_release = "1.32.0"
   replicas       = 3
   images = {
     etcd         = local.container_images.etcd

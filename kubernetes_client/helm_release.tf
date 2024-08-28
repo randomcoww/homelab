@@ -92,7 +92,7 @@ resource "helm_release" "local-path-provisioner" {
   repository  = "https://charts.containeroo.ch"
   chart       = "local-path-provisioner"
   wait        = false
-  version     = "0.0.26"
+  version     = "0.0.28"
   max_history = 2
   values = [
     yamlencode({
@@ -121,7 +121,7 @@ resource "helm_release" "nvidia-device-plugin" {
   chart       = "nvidia-device-plugin"
   namespace   = "kube-system"
   wait        = false
-  version     = "0.15.0"
+  version     = "0.16.2"
   max_history = 2
   values = [
     yamlencode({
@@ -159,7 +159,7 @@ resource "helm_release" "ingress-nginx" {
   namespace        = local.kubernetes_services[each.key].namespace
   create_namespace = true
   wait             = false
-  version          = "4.10.1"
+  version          = "4.11.2"
   max_history      = 2
   values = [
     yamlencode({
@@ -246,7 +246,7 @@ resource "helm_release" "cert-manager" {
   create_namespace = true
   wait             = true
   timeout          = 600
-  version          = "1.14.5"
+  version          = "1.15.1"
   max_history      = 2
   values = [
     yamlencode({
