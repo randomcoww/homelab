@@ -85,14 +85,7 @@ module "statefulset" {
           set -xe
 
           useradd ${var.user} -d ${var.home_path} -m -u ${var.uid}
-          usermod \
-            -G wheel \
-            --add-subuids 100000-165535 \
-            --add-subgids 100000-165535 \
-            ${var.user}
-
-          mkdir -p /home
-          ln -s ${var.home_path} /home || true
+          usermod -G wheel ${var.user}
 
           exec s6-setuidgid ${var.user} \
           code-server \
