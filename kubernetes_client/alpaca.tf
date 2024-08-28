@@ -69,5 +69,4 @@ module "alpaca-db" {
   litestream_minio_access_key_id     = data.terraform_remote_state.sr.outputs.minio.access_key_id
   litestream_minio_secret_access_key = data.terraform_remote_state.sr.outputs.minio.secret_access_key
   litestream_minio_bucket_endpoint   = "http://${local.kubernetes_services.minio.endpoint}:${local.service_ports.minio}/${local.minio_buckets.litestream.name}"
-
 }
