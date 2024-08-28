@@ -56,7 +56,6 @@ data "helm_template" "authelia" {
   version    = var.source_release
   values = [
     yamlencode({
-      domain = local.domain
       service = {
         type = "ClusterIP"
       }
@@ -67,7 +66,6 @@ data "helm_template" "authelia" {
         }
         certManager = true
         className   = var.ingress_class_name
-        subdomain   = compact(split(".", var.service_hostname))[0]
         tls = {
           enabled = true
           secret  = "${local.domain}-tls"
@@ -146,17 +144,14 @@ data "helm_template" "authelia" {
         ]
       }
       configMap = merge(var.configmap, {
-        storage = {
-          local = {
-            enabled = true
-          }
-          mysql = {
-            enabled = false
-          }
-          postgres = {
-            enabled = false
-          }
-        }
+        session = merge(var.configmap.session, {
+          cookies = concat(lookup(var.configmap.session, "cookies", []), [
+            {
+              domain    = local.domain
+              subdomain = local.subdomain
+            },
+          ])
+        })
       })
       secret = var.secret
       certificates = {
@@ -189,8 +184,9 @@ module "metadata" {
 
 locals {
   domain                 = join(".", slice(compact(split(".", var.service_hostname)), 1, length(compact(split(".", var.service_hostname)))))
+  subdomain              = compact(split(".", var.service_hostname))[0]
   litestream_config_path = "/etc/litestream.yml"
-  sqlite_path            = "/config/db.sqlite3"
+  sqlite_path            = var.configmap.storage.local.path
   ldap_client_cert_path  = "/custom/ldap-client-cert.pem"
   ldap_client_key_path   = "/custom/ldap-client-key.pem"
   redis_client_cert_path = "/custom/redis-client-cert.pem"
