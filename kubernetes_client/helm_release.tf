@@ -18,7 +18,7 @@ locals {
     module.hostapd,
     module.qrcode,
     module.alpaca-db,
-    module.alpaca-stream,
+    # module.alpaca-stream,
     module.code,
     # module.mpd,
     module.transmission,
