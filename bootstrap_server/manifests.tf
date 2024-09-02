@@ -53,7 +53,7 @@ module "bootstrap" {
                     pools = [
                       {
                         pool = cidrsubnet(var.host_ip, 1, 1)
-                      }
+                      },
                     ]
                     require-client-classes = [
                       "XClient_iPXE",
