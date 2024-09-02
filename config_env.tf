@@ -38,6 +38,7 @@ locals {
       network = "192.168.192.0"
       cidr    = 26
       vlan_id = 80
+      mtu     = local.default_mtu
       netnums = {
         external_dns           = 31
         ingress_nginx          = 32
@@ -48,17 +49,16 @@ locals {
         alpaca_stream          = 37
         alpaca_db              = 38
       }
-      mtu = local.default_mtu
     }
     # worker node IPs
     kubernetes = {
       network = "192.168.193.0"
       cidr    = 26
       vlan_id = 90
+      mtu     = local.default_mtu
       netnums = {
         apiserver = 2
       }
-      mtu = local.default_mtu
     }
     wan = {
       vlan_id = 30
