@@ -266,13 +266,9 @@ flatpak --user -y install --or-update flathub \
   com.brave.Browser \
   com.visualstudio.code \
   org.inkscape.Inkscape \
-  org.kde.krita \
-  org.blender.Blender \
-  com.github.xournalpp.xournalpp \
   org.gnome.eog \
   com.valvesoftware.Steam \
-  net.lutris.Lutris \
-  net.davidotek.pupgui2
+  net.lutris.Lutris
 ```
 
 ```bash
