@@ -18,15 +18,6 @@ systemd:
       mask: true
     - name: systemd-resolved.service
       enabled: true
-    # temperature monitoring for hardware
-    - name: lm_sensors.service
-      enabled: true
-      dropins:
-        - name: 10-exclude-vm.conf
-          contents: |
-            [Unit]
-            ConditionVirtualization=!vm
-            ConditionVirtualization=!container
     # configure nftables service as template
     - name: nftables.service
       mask: false
