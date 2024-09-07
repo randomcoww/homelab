@@ -152,6 +152,8 @@ module "statefulset" {
     "checksum/secret" = sha256(module.secret.manifest)
   }
   template_spec = {
+    # TODO: remove
+    hostNetwork = true
     containers = [
       {
         name  = var.name

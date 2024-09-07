@@ -94,6 +94,11 @@ storage:
           enable-hot-corners=false
           show-battery-percentage=true
 
+          [org/gnome/desktop/lockdown]
+          disable-log-out=true
+          disable-user-switching=true
+          user-administration-disabled=true
+
           [org/gnome/mutter]
           experimental-features=['variable-refresh-rate']
 
@@ -145,6 +150,13 @@ storage:
           [org/gtk/settings/file-chooser]
           show-hidden=true
 
+    - path: /etc/dconf/db/local.d/locks/lockdown
+      mode: 0644
+      contents:
+        inline: |
+          /org/gnome/desktop/lockdown/disable-log-out
+          /org/gnome/desktop/lockdown/disable-user-switching
+          /org/gnome/desktop/lockdown/user-administration-disabled
     # misc configs #
     - path: /etc/tmux.conf
       mode: 0644

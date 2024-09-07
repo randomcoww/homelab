@@ -13,7 +13,7 @@ locals {
     },
     # sunshine input rules
     {
-      path = "/etc/udev/rules.d/85-sunshine-uinput.rules"
+      path     = "/etc/udev/rules.d/85-sunshine-uinput.rules"
       contents = <<-EOF
       KERNEL=="uinput", SUBSYSTEM=="misc", OPTIONS+="static_node=uinput", TAG+="uaccess"
       EOF
