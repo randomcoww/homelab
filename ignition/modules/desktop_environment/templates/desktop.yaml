@@ -3,20 +3,25 @@ variant: fcos
 version: ${ignition_version}
 systemd:
   units:
-    # https://github.com/coreos/fedora-coreos-tracker/issues/1296
-    - name: systemd-userdbd.service
-      dropins:
-        - name: 10-disable-private.conf
-          contents: |
-            [Service]
-            PrivateTmp=false
-            PrivateDevices=false
+    - name: dconf-update.service
+      enabled: true
+      contents: |
+        [Unit]
+        Before=display-manager.service
+
+        [Service]
+        Type=oneshot
+        RemainAfterExit=true
+        ExecStart=/usr/bin/dconf update
+
+        [Install]
+        WantedBy=graphical.target
 
 storage:
   files:
     # gnome desktop config #
     # remote desktop https://www.reddit.com/r/gnome/comments/uz5as7/gnome_has_made_it_super_simple_to_extend_your/
-    - path: /etc/dconf/db/local.d/10-custom.conf
+    - path: /etc/dconf/db/local.d/10-custom
       mode: 0644
       contents:
         inline: |
@@ -156,19 +161,3 @@ storage:
           [General]
           FastConnectable=true
           TemporaryTimeout=0
-    # systemd user unit
-    # ignition doesn't support systemd --user
-    - path: /etc/systemd/user/dconf-load.service
-      mode: 0644
-      contents:
-        inline: |
-          [Service]
-          Type=oneshot
-          RemainAfterExit=true
-          Slice=session.slice
-          ExecStart=/bin/sh -c "cat /etc/dconf/db/local.d/*.conf | dconf load /"
-
-  links:
-    # reload dconf
-    - path: /etc/systemd/user/graphical-session.target.wants/dconf-load.service
-      target: /etc/systemd/user/dconf-load.service
