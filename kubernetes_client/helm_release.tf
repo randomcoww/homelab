@@ -24,6 +24,7 @@ locals {
     module.transmission,
     module.webdav-pictures,
     module.webdav-videos,
+    module.sunshine,
   ]
 }
 

@@ -117,6 +117,7 @@ locals {
     mympd              = "ghcr.io/jcorporation/mympd/mympd:17.0.3"
     rclone             = "docker.io/rclone/rclone:1.67"
     cockroachdb        = "docker.io/cockroachdb/cockroach:v24.1.1"
+    sunshine           = "ghcr.io/randomcoww/sunshine:2024.906.213100"
   }
 
   pxeboot_images = {
@@ -165,6 +166,8 @@ locals {
       mpd             = "mpd"
       webdav_pictures = "pictures"
       webdav_videos   = "videos"
+      sunshine        = "sunshine"
+      sunshine_admin  = "sunadmin"
     } :
     k => "${domain}.${local.domains.public}"
   }

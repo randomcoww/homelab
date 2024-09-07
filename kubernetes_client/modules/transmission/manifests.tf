@@ -1,6 +1,6 @@
 locals {
   home_path  = "/var/lib/transmission"
-  mount_path = "/var/tmp/transmission/mnt"
+  mount_path = "${local.home_path}/mnt"
   transmission_settings = merge({
     script-torrent-done-filename = "/torrent-done.sh"
     rpc-port                     = 9091
