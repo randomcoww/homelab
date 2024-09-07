@@ -117,7 +117,7 @@ locals {
     mympd              = "ghcr.io/jcorporation/mympd/mympd:17.0.3"
     rclone             = "docker.io/rclone/rclone:1.67"
     cockroachdb        = "docker.io/cockroachdb/cockroach:v24.1.1"
-    sunshine           = "ghcr.io/randomcoww/sunshine:2024.906.213100"
+    sunshine           = "ghcr.io/randomcoww/sunshine:2024.906.213100.1"
   }
 
   pxeboot_images = {
