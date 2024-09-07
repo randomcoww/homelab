@@ -1,10 +1,10 @@
 
 
 locals {
-  base_port = 47989
   base_path = "/var/sunshine"
   home_path = "${local.base_path}/mnt"
   # https://docs.lizardbyte.dev/projects/sunshine/en/latest/about/advanced_usage.html#port
+  base_port = 47989
   tcp_ports = {
     https = local.base_port - 5
     http  = local.base_port
@@ -17,17 +17,6 @@ locals {
     audio   = local.base_port + 11
     mic     = local.base_port + 13
   }
-  apps = jsonencode({
-    env = {
-      PATH = "$(PATH):$(HOME)/.local/bin"
-    }
-    apps = [
-      {
-        name       = "Desktop"
-        image-path = "desktop.png"
-      },
-    ]
-  })
   args = merge({
     "origin_web_ui_allowed" = "wan"
     "upnp"                  = "off"
@@ -74,9 +63,21 @@ module "secret" {
   app     = var.name
   release = var.release
   data = merge({
-    basename(local.args.file_apps) = local.apps
-    basename(local.args.cert)      = tls_self_signed_cert.sunshine-ca.cert_pem
-    basename(local.args.pkey)      = tls_private_key.sunshine-ca.private_key_pem
+    basename(local.args.file_apps) = jsonencode({
+      env = {
+        PATH = "$(PATH):$(HOME)/.local/bin"
+      }
+      apps = [
+        {
+          name       = "Desktop"
+          image-path = "desktop.png"
+        },
+      ]
+    })
+    basename(local.args.cert) = tls_self_signed_cert.sunshine-ca.cert_pem
+    basename(local.args.pkey) = tls_private_key.sunshine-ca.private_key_pem
+    username                  = random_password.username.result
+    password                  = random_password.password.result
     }, {
     for i, config in var.sunshine_extra_configs :
     "${i}-${basename(config.path)}" => config.content
@@ -164,9 +165,7 @@ module "statefulset" {
           <<-EOF
           set -e
 
-          mountpoint ${local.home_path}
-          sunshine --creds ${random_password.username.result} ${random_password.password.result}
-
+          sunshine --creds $USERNAME $PASSWORD
           exec sunshine%{for k, v in local.args} ${k}=${v}%{endfor}
           EOF
         ]
@@ -174,6 +173,24 @@ module "statefulset" {
           {
             name  = "HOME"
             value = local.home_path
+          },
+          {
+            name = "USERNAME"
+            valueFrom = {
+              secretKeyRef = {
+                name = module.secret.name
+                key  = "username"
+              }
+            }
+          },
+          {
+            name = "PASSWORD"
+            valueFrom = {
+              secretKeyRef = {
+                name = module.secret.name
+                key  = "password"
+              }
+            }
           },
           ], [
           for _, e in var.sunshine_extra_envs :
