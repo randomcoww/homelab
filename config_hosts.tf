@@ -301,10 +301,6 @@ locals {
           source  = "phy0"
           network = "kubernetes"
         }
-        phy0-wan = {
-          source  = "phy0"
-          network = "wan"
-        }
       }
       networks = {
         lan = {
@@ -324,11 +320,6 @@ locals {
           metric      = 512
           enable_dhcp = true
           enable_dns  = true
-        }
-        wan = {
-          interface   = "phy0-wan"
-          metric      = 4096
-          enable_dhcp = true
         }
       }
       disks = {
@@ -450,7 +441,6 @@ locals {
     kubernetes-worker   = ["gw-0", "gw-1", "q-0", "de-1"]
     nvidia-container    = ["de-1"]
     desktop-environment = ["de-0", "de-1"]
-    sunshine            = ["de-1"]
     remote              = ["r-0"]
   }
 

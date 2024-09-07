@@ -14,7 +14,6 @@ locals {
     module.server,
     module.client,
     module.desktop-environment,
-    module.sunshine,
     module.remote,
   ]
 }

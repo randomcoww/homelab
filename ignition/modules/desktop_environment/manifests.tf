@@ -11,6 +11,13 @@ locals {
       contents = data.http.udev-60-steam-vr.response_body
       mode     = 420
     },
+    # sunshine input rules
+    {
+      path = "/etc/udev/rules.d/85-sunshine-uinput.rules"
+      contents = <<-EOF
+      KERNEL=="uinput", SUBSYSTEM=="misc", OPTIONS+="static_node=uinput", TAG+="uaccess"
+      EOF
+    },
   ]
 
   ignition_snippets = concat([
