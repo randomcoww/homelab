@@ -109,15 +109,3 @@ storage:
         inline: |
           kernel.printk=4
           fs.inotify.max_user_watches=524288
-    # needed if bridging wlan
-    - path: /etc/sysctl.d/99-bridge-iptables.conf
-      mode: 0644
-      contents:
-        inline: |
-          net.bridge.bridge-nf-call-iptables=0
-    # clickhouse DB
-    - path: /etc/sysctl.d/99-clickhouse.conf
-      mode: 0644
-      contents:
-        inline: |
-          kernel.task_delayacct=1

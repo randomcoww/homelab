@@ -88,3 +88,15 @@ storage:
 
           [crio.tracing]
           enable_tracing=false
+    # clickhouse DB
+    - path: /etc/sysctl.d/99-clickhouse.conf
+      mode: 0644
+      contents:
+        inline: |
+          kernel.task_delayacct=1
+    # needed if bridging wlan
+    - path: /etc/sysctl.d/99-bridge-iptables.conf
+      mode: 0644
+      contents:
+        inline: |
+          net.bridge.bridge-nf-call-iptables=0
