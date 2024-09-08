@@ -50,6 +50,7 @@ module "bootstrap" {
                 subnet4 = [
                   {
                     subnet = cidrsubnet(var.host_ip, 0, 0)
+                    id     = 1
                     pools = [
                       {
                         pool = cidrsubnet(var.host_ip, 1, 1)

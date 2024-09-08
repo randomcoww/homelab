@@ -90,7 +90,7 @@ locals {
     etcd                    = "gcr.io/etcd-development/etcd:v3.5.15-amd64"
 
     # Helm
-    kea                = "ghcr.io/randomcoww/kea:2.4.1"
+    kea                = "ghcr.io/randomcoww/kea:2.6.1"
     matchbox           = "quay.io/poseidon/matchbox:v0.11.0-amd64"
     tftpd              = "ghcr.io/randomcoww/tftpd-ipxe:20240822.3"
     hostapd            = "ghcr.io/randomcoww/hostapd:2.10-2"

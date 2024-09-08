@@ -1,129 +1,116 @@
 locals {
-  shared_data_path = "/var/lib/kea"
-
-  peers = [
+  members = [
     for i, ip in var.service_ips :
     {
-      name          = "${var.name}-${i}"
-      role          = try(element(["primary", "secondary"], i), "backup")
-      ip            = ip
-      url           = "http://${ip}:${var.ports.kea_peer}/"
-      auto-failover = true
+      name = "${var.name}-${i}"
+      ip   = ip
+      role = try(element(["primary", "secondary"], i), "backup")
     }
   ]
 
+  subnet_id_base = 1
   configs = {
-    for i, peer in local.peers :
-    peer.name => merge(peer, {
-      ctrl_agent_config = {
-        Control-agent = {
-          http-host = "0.0.0.0"
-          http-port = var.ports.kea_peer
-          control-sockets = {
-            dhcp4 = {
-              socket-type = "unix"
-              socket-name = "${local.shared_data_path}/kea-dhcp4-ctrl.sock"
-            }
-          }
+    for i, member in local.members :
+    member.name => {
+      Dhcp4 = {
+        valid-lifetime = 7200
+        renew-timer    = 1800
+        rebind-timer   = 3600
+        lease-database = {
+          type    = "memfile"
+          persist = true
         }
-      }
-      dhcp4_config = {
-        Dhcp4 = {
-          valid-lifetime = 7200
-          renew-timer    = 1800
-          rebind-timer   = 3600
-          lease-database = {
-            type    = "memfile"
-            persist = true
-            name    = "${local.shared_data_path}/kea-leases4.csv"
-          }
-          interfaces-config = {
-            interfaces = ["*"]
-          }
-          control-socket = {
-            socket-type = "unix"
-            socket-name = "${local.shared_data_path}/kea-dhcp4-ctrl.sock"
-          }
-          hooks-libraries = length(local.peers) > 1 ? [
-            {
-              library    = "${var.kea_hooks_libraries_path}/libdhcp_lease_cmds.so"
-              parameters = {}
-            },
-            {
-              library = "${var.kea_hooks_libraries_path}/libdhcp_ha.so"
-              parameters = {
-                high-availability = [
-                  {
-                    this-server-name    = "${peer.name}"
-                    mode                = "load-balancing"
-                    max-unacked-clients = 0
-                    peers               = local.peers
-                  },
-                ]
+        interfaces-config = {
+          interfaces = ["*"]
+        }
+        hooks-libraries = length(var.service_ips) > 1 ? [
+          {
+            library    = "${var.kea_hooks_libraries_path}/libdhcp_lease_cmds.so"
+            parameters = {}
+          },
+          {
+            library = "${var.kea_hooks_libraries_path}/libdhcp_ha.so"
+            parameters = {
+              high-availability = [
+                {
+                  this-server-name    = member.name
+                  mode                = "load-balancing"
+                  max-unacked-clients = 0
+                  peers = [
+                    for j, peer in local.members :
+                    {
+                      name          = peer.name
+                      role          = peer.role
+                      url           = i == j ? "http://$POD_IP:${var.ports.kea_peer}/" : "http://${peer.ip}:${var.ports.kea_peer}/"
+                      auto-failover = true
+                    }
+                  ]
+                },
+              ]
+            }
+          },
+        ] : []
+        client-classes = [
+          {
+            name           = "XClient_iPXE"
+            test           = "substring(option[77].hex,0,4) == 'iPXE'"
+            boot-file-name = var.ipxe_script_url
+          },
+          {
+            name           = "EFI_x86-64"
+            test           = "option[93].hex == 0x0007"
+            next-server    = "$POD_IP"
+            boot-file-name = var.ipxe_boot_path
+          },
+          # {
+          #   name           = "HTTPClient"
+          #   test           = "option[93].hex == 0x0010"
+          #   boot-file-name = "https://boot.ipxe.org/ipxe.efi"
+          #   option-data = [
+          #     {
+          #       name = "vendor-class-identifier"
+          #       data = "HTTPClient"
+          #     },
+          #   ]
+          # },
+        ]
+        subnet4 = [
+          for i, network in var.networks :
+          {
+            subnet = network.prefix
+            id     = local.subnet_id_base + i
+            option-data = [
+              {
+                name = "routers"
+                data = join(",", network.routers)
+              },
+              {
+                name = "domain-name-servers"
+                data = join(",", network.domain_name_servers)
+              },
+              {
+                name = "interface-mtu"
+                data = format("%s", network.mtu)
+              },
+              {
+                name = "domain-search"
+                data = join(",", network.domain_search)
+              },
+              {
+                name = "tcode"
+                data = var.timezone
+              },
+            ]
+            pools = [
+              for _, pool in network.pools :
+              {
+                pool = pool
               }
-            },
-          ] : []
-          client-classes = [
-            {
-              name           = "XClient_iPXE"
-              test           = "substring(option[77].hex,0,4) == 'iPXE'"
-              boot-file-name = var.ipxe_script_url
-            },
-            {
-              name           = "EFI_x86-64"
-              test           = "option[93].hex == 0x0007"
-              next-server    = "$POD_IP"
-              boot-file-name = var.ipxe_boot_path
-            },
-            # {
-            #   name           = "HTTPClient"
-            #   test           = "option[93].hex == 0x0010"
-            #   boot-file-name = "https://boot.ipxe.org/ipxe.efi"
-            #   option-data = [
-            #     {
-            #       name = "vendor-class-identifier"
-            #       data = "HTTPClient"
-            #     },
-            #   ]
-            # },
-          ]
-          subnet4 = [
-            for network_name, network in var.networks :
-            {
-              subnet = network.prefix,
-              option-data = [
-                {
-                  name = "routers"
-                  data = join(",", network.routers)
-                },
-                {
-                  name = "domain-name-servers"
-                  data = join(",", network.domain_name_servers)
-                },
-                {
-                  name = "interface-mtu"
-                  data = format("%s", network.mtu)
-                },
-                {
-                  name = "domain-search"
-                  data = join(",", network.domain_search)
-                },
-                {
-                  name = "tcode"
-                  data = var.timezone
-                },
-              ]
-              pools = [
-                for _, pool in network.pools :
-                {
-                  pool = pool
-                }
-              ]
-            }
-          ]
-        }
+            ]
+          }
+        ]
       }
-    })
+    }
   }
 }
 
@@ -147,19 +134,19 @@ module "configmap" {
   name    = var.name
   app     = var.name
   release = var.release
-  data = merge({
-    for i, config in local.configs :
-    "kea-dhcp4-${config.name}" => jsonencode(config.dhcp4_config)
-    }, {
-    for i, config in local.configs :
-    "kea-ctrl-agent-${config.name}" => jsonencode(config.ctrl_agent_config)
-  })
+  data = {
+    for host, config in local.configs :
+    "kea-dhcp4-${host}" => jsonencode(config)
+  }
 }
 
 # Kea peers must know the IP (not DNS name) of all peers
 # Create a service for each pod with a known IP
 module "service-peer" {
-  for_each = local.configs
+  for_each = {
+    for _, member in local.members :
+    member.name => member.ip
+  }
 
   source  = "../service"
   name    = each.key
@@ -167,7 +154,7 @@ module "service-peer" {
   release = var.release
   spec = {
     type      = "ClusterIP"
-    clusterIP = each.value.ip
+    clusterIP = each.value
     ports = [
       {
         name       = "kea-peer"
@@ -200,48 +187,6 @@ module "statefulset" {
     hostNetwork = true
     dnsPolicy   = "ClusterFirstWithHostNet"
     containers = [
-      {
-        name  = "${var.name}-control-agent"
-        image = var.images.kea
-        command = [
-          "sh",
-          "-c",
-          <<-EOF
-          set -e
-          cat /etc/kea/kea-ctrl-agent.tpl | envsubst > /etc/kea/kea-ctrl-agent.conf
-          exec kea-ctrl-agent -c /etc/kea/kea-ctrl-agent.conf
-          EOF
-        ]
-        env = [
-          {
-            name = "POD_NAME"
-            valueFrom = {
-              fieldRef = {
-                fieldPath = "metadata.name"
-              }
-            }
-          },
-          {
-            name = "POD_IP"
-            valueFrom = {
-              fieldRef = {
-                fieldPath = "status.podIP"
-              }
-            }
-          },
-        ]
-        volumeMounts = [
-          {
-            name      = "shared-data"
-            mountPath = local.shared_data_path
-          },
-          {
-            name        = "kea-config"
-            mountPath   = "/etc/kea/kea-ctrl-agent.tpl"
-            subPathExpr = "kea-ctrl-agent-$(POD_NAME)"
-          },
-        ]
-      },
       {
         name  = var.name
         image = var.images.kea
@@ -281,10 +226,6 @@ module "statefulset" {
         }
         volumeMounts = [
           {
-            name      = "shared-data"
-            mountPath = local.shared_data_path
-          },
-          {
             name        = "kea-config"
             mountPath   = "/etc/kea/kea-dhcp4.tpl"
             subPathExpr = "kea-dhcp4-$(POD_NAME)"
@@ -311,12 +252,6 @@ module "statefulset" {
       },
     ]
     volumes = [
-      {
-        name = "shared-data"
-        emptyDir = {
-          medium = "Memory"
-        }
-      },
       {
         name = "kea-config"
         configMap = {
