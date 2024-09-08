@@ -75,10 +75,10 @@ locals {
           # },
         ]
         subnet4 = [
-          for i, network in var.networks :
+          for k, network in var.networks :
           {
             subnet = network.prefix
-            id     = local.subnet_id_base + i
+            id     = local.subnet_id_base + k
             option-data = [
               {
                 name = "routers"
