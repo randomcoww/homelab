@@ -4,7 +4,7 @@ version: ${ignition_version}
 storage:
   files:
     - path: ${haproxy_path}/${name}.cfg
-      mode: 420
+      mode: 0644
       contents:
         inline: |
           frontend kube-apiserver
@@ -23,7 +23,7 @@ storage:
             %{~ endfor ~}
 
     - path: ${keepalived_path}/${name}.conf
-      mode: 420
+      mode: 0644
       contents:
         inline: |
           vrrp_instance kube-apiserver {
