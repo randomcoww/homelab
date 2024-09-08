@@ -117,12 +117,12 @@ locals {
     mympd              = "ghcr.io/jcorporation/mympd/mympd:17.0.3"
     rclone             = "docker.io/rclone/rclone:1.67"
     cockroachdb        = "docker.io/cockroachdb/cockroach:v24.1.1"
-    sunshine           = "ghcr.io/randomcoww/sunshine:2024.906.213100.1"
+    sunshine           = "ghcr.io/randomcoww/sunshine:2024.907.154342.2"
   }
 
   pxeboot_images = {
     coreos     = "fedora-coreos-40.20240826.0"
-    silverblue = "fedora-silverblue-40.20240907.0"
+    silverblue = "fedora-silverblue-40.20240908.0"
   }
 
   kubernetes = {
