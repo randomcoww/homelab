@@ -62,11 +62,6 @@ module "code" {
       mountPath = "/run/user/${local.users.client.uid}"
     },
   ]
-  code_server_resources = {
-    limits = {
-      "nvidia.com/gpu" = 1
-    }
-  }
   code_server_security_context = {
     capabilities = {
       add = [

@@ -13,13 +13,6 @@ module "sunshine" {
   ]
   sunshine_extra_volumes = [
     {
-      name = "dev"
-      hostPath = {
-        path = "/dev"
-        type = "Directory"
-      }
-    },
-    {
       name = "run-user"
       hostPath = {
         path = "/run/user/${local.users.client.uid}"
@@ -42,11 +35,6 @@ module "sunshine" {
     },
   ]
   sunshine_extra_volume_mounts = [
-    {
-      name             = "dev"
-      mountPath        = "/dev"
-      mountPropagation = "HostToContainer"
-    },
     {
       name      = "run-user"
       mountPath = "/run/user/${local.users.client.uid}"
