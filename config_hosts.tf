@@ -454,6 +454,7 @@ locals {
     desktop-environment = ["de-0", "de-1"]
     sunshine-hacks      = ["de-1"]
     remote              = ["r-0"]
+    wireguard-client    = ["de-1"]
   }
 
   # finalized local vars #

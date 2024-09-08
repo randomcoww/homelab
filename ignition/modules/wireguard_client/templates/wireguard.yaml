@@ -1,0 +1,79 @@
+# Ref: https://uint.one/posts/configuring-wireguard-using-systemd-networkd-on-nixos/
+---
+variant: fcos
+version: ${ignition_version}
+systemd:
+  units:
+    - name: nftables@${interface}.service
+      enabled: true
+
+storage:
+  files:
+    - path: /etc/systemd/network/12-${interface}.netdev
+      mode: 0644
+      contents:
+        inline: |
+          [NetDev]
+          Name=${interface}
+          Kind=wireguard
+          MTUBytes=${mtu}
+
+          [WireGuard]
+          PrivateKey=${private_key}
+          FirewallMark=${firewall_mark}
+          RouteTable=off
+
+          [WireGuardPeer]
+          PublicKey=${public_key}
+          Endpoint=${endpoint}
+          AllowedIPs=0.0.0.0/0
+          PersistentKeepalive=25
+          RouteTable=off
+
+    - path: /etc/systemd/network/20-${interface}.network
+      mode: 0644
+      contents:
+        inline: |
+          [Match]
+          Name=${interface}
+
+          [Address]
+          Address=${address}
+
+          [RoutingPolicyRule]
+          Family=ipv4
+          SuppressPrefixLength=0
+          Priority=${table_priority_base}
+
+          [RoutingPolicyRule]
+          Family=ipv4
+          InvertRule=true
+          FirewallMark=${firewall_mark}
+          Table=${table_id}
+          Priority=${table_priority_base + 1}
+
+          [Route]
+          Destination=0.0.0.0/0
+          Table=${table_id}
+          Scope=link
+
+    - path: /etc/nftables/${interface}.nft
+      mode: 0644
+      overwrite: true
+      contents:
+        inline: |
+          table inet wg-${interface} {
+            chain preraw {
+              type filter hook prerouting priority raw; policy accept;
+              iifname != "${interface}" ip daddr ${address} fib saddr type != local drop
+            }
+            chain premangle {
+              type filter hook prerouting priority mangle; policy accept;
+              meta l4proto udp meta mark set ct mark
+            }
+            chain postmangle {
+              type filter hook postrouting priority mangle; policy accept;
+              meta l4proto udp meta mark ${firewall_mark} ct mark set meta mark
+            }
+          }
+          ;

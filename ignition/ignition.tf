@@ -16,6 +16,7 @@ locals {
     module.desktop-environment,
     module.remote,
     module.sunshine-hacks,
+    module.wireguard-client,
   ]
 }
 

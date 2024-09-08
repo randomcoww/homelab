@@ -35,10 +35,14 @@ GMAIL_PASSWORD=
 TS_OAUTH_CLIENT_ID=
 TS_OAUTH_CLIENT_SECRET=
 
-WG_PRIVATE_KEY=
-WG_ADDRESS=
-WG_PUBLIC_KEY=
-WG_ENDPOINT=
+WG_1_PRIVATE_KEY=
+WG_1_ADDRESS=
+WG_1_PUBLIC_KEY=
+WG_1_ENDPOINT=
+WG_2_PRIVATE_KEY=
+WG_2_ADDRESS=
+WG_2_PUBLIC_KEY=
+WG_2_ENDPOINT=
 
 APCA_API_KEY_ID=
 APCA_API_SECRET_KEY=
@@ -73,6 +77,13 @@ users = {
     password_hash = "$LINUX_PASSWORD_HASH"
   }
 }
+
+wireguard_client = {
+  private_key = "$WG_2_PRIVATE_KEY"
+  public_key  = "$WG_2_PUBLIC_KEY"
+  address     = "$WG_2_ADDRESS"
+  endpoint    = "$WG_2_ENDPOINT"
+}
 EOF
 ```
 
@@ -101,10 +112,10 @@ smtp = {
 }
 
 wireguard_client = {
-  private_key = "$WG_PRIVATE_KEY"
-  public_key  = "$WG_PUBLIC_KEY"
-  address     = "$WG_ADDRESS"
-  endpoint    = "$WG_ENDPOINT"
+  private_key = "$WG_1_PRIVATE_KEY"
+  public_key  = "$WG_1_PUBLIC_KEY"
+  address     = "$WG_1_ADDRESS"
+  endpoint    = "$WG_1_ENDPOINT"
 }
 
 alpaca = {
@@ -267,8 +278,7 @@ flatpak --user -y install --or-update flathub \
   com.visualstudio.code \
   org.inkscape.Inkscape \
   org.gnome.eog \
-  com.valvesoftware.Steam \
-  net.lutris.Lutris
+  com.valvesoftware.Steam
 ```
 
 ```bash
