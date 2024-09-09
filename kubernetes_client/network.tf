@@ -116,11 +116,10 @@ module "hostapd" {
   # https://w1.fi/cgit/hostap/plain/hostapd/hostapd.conf
   config = {
     country_code                 = "US"
-    channel                      = 36 # one of 36 44 52 60 100 108 116 124 132 140 149 157 184 192
-    vht_oper_centr_freq_seg0_idx = 42 # channel+6 and one of 42 58 106 122 138 155
+    channel                      = 149 # one of 36 44 52 60 100 108 116 124 132 140 149 157 184 192
+    vht_oper_centr_freq_seg0_idx = 155 # channel+6 and one of 42 58 106 122 138 155
     ssid                         = random_password.hostapd-ssid.result
     sae_password                 = random_password.hostapd-password.result
-    ignore_broadcast_ssid        = 1
     interface                    = "wlan0"
     bridge                       = "br-lan"
     driver                       = "nl80211"
