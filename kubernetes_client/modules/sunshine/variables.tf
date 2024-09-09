@@ -13,7 +13,9 @@ variable "release" {
 
 variable "images" {
   type = object({
-    sunshine = string
+    sunshine   = string
+    jfs        = string
+    litestream = string
   })
 }
 
@@ -84,4 +86,28 @@ variable "sunshine_extra_volume_mounts" {
 variable "sunshine_extra_volumes" {
   type    = any
   default = []
+}
+
+variable "jfs_minio_bucket_endpoint" {
+  type = string
+}
+
+variable "jfs_minio_access_key_id" {
+  type = string
+}
+
+variable "jfs_minio_secret_access_key" {
+  type = string
+}
+
+variable "litestream_minio_bucket_endpoint" {
+  type = string
+}
+
+variable "litestream_minio_access_key_id" {
+  type = string
+}
+
+variable "litestream_minio_secret_access_key" {
+  type = string
 }

@@ -1,8 +1,8 @@
 
 
 locals {
-  base_path = "/var/sunshine"
-  home_path = "${local.base_path}/mnt"
+  home_path  = "/var/lib/sunshine"
+  mount_path = "${local.home_path}/.config/sunshine"
   # https://docs.lizardbyte.dev/projects/sunshine/en/latest/about/advanced_usage.html#port
   base_port = 47989
   tcp_ports = {
@@ -20,11 +20,11 @@ locals {
   args = merge({
     "origin_web_ui_allowed" = "wan"
     "upnp"                  = "off"
-    "cert"                  = "${local.base_path}/cacert.pem"
-    "pkey"                  = "${local.base_path}/cakey.pem"
-    "file_apps"             = "${local.base_path}/apps.json"
+    "cert"                  = "${local.home_path}/cacert.pem"
+    "pkey"                  = "${local.home_path}/cakey.pem"
+    "file_apps"             = "${local.home_path}/apps.json"
     "log_path"              = "/dev/null"
-    "port"                  = tostring(local.base_port)
+    "port"                  = local.base_port
     }, {
     for _, arg in var.sunshine_extra_args :
     arg.name => arg.value
@@ -53,7 +53,8 @@ module "metadata" {
     "templates/secret.yaml"      = module.secret.manifest
     "templates/service.yaml"     = module.service.manifest
     "templates/ingress.yaml"     = module.ingress.manifest
-    "templates/statefulset.yaml" = module.statefulset.manifest
+    "templates/statefulset.yaml" = module.statefulset-jfs.statefulset
+    "templates/secret-jfs.yaml"  = module.statefulset-jfs.secret
   }
 }
 
@@ -143,8 +144,19 @@ module "ingress" {
   ]
 }
 
-module "statefulset" {
-  source   = "../statefulset"
+module "statefulset-jfs" {
+  source = "../statefulset_jfs"
+  ## jfs settings
+  jfs_image                          = var.images.jfs
+  jfs_mount_path                     = local.mount_path
+  jfs_minio_bucket_endpoint          = var.jfs_minio_bucket_endpoint
+  jfs_minio_access_key_id            = var.jfs_minio_access_key_id
+  jfs_minio_secret_access_key        = var.jfs_minio_secret_access_key
+  litestream_image                   = var.images.litestream
+  litestream_minio_bucket_endpoint   = var.litestream_minio_bucket_endpoint
+  litestream_minio_access_key_id     = var.litestream_minio_access_key_id
+  litestream_minio_secret_access_key = var.litestream_minio_secret_access_key
+  ##
   name     = var.name
   app      = var.name
   release  = var.release
@@ -163,8 +175,9 @@ module "statefulset" {
           <<-EOF
           set -e
 
-          sunshine --creds $USERNAME $PASSWORD
-          exec sunshine%{for k, v in local.args} ${k}=${v}%{endfor}
+          mountpoint ${local.mount_path}
+          sunshine %{for k, v in local.args} ${k}=${tostring(v)}%{endfor} --creds $USERNAME $PASSWORD
+          exec sunshine%{for k, v in local.args} ${k}=${tostring(v)}%{endfor}
           EOF
         ]
         env = concat([
@@ -213,10 +226,6 @@ module "statefulset" {
             mountPath = local.args.pkey
             subPath   = basename(local.args.pkey)
           },
-          {
-            name      = "home"
-            mountPath = local.home_path
-          },
           ], [
           for i, config in var.sunshine_extra_configs :
           {
@@ -253,12 +262,6 @@ module "statefulset" {
       },
     ]
     volumes = concat([
-      {
-        name = "home"
-        emptyDir = {
-          medium = "Memory"
-        }
-      },
       {
         name = "config"
         secret = {
