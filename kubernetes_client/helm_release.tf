@@ -126,6 +126,24 @@ resource "helm_release" "nvidia-device-plugin" {
   max_history = 2
   values = [
     yamlencode({
+      config = {
+        map = {
+          default = yamlencode({
+            version = "v1"
+            sharing = {
+              mps = {
+                renameByDefault = true
+                resources = [
+                  {
+                    name     = "nvidia.com/gpu"
+                    replicas = 10
+                  },
+                ]
+              }
+            }
+          })
+        }
+      }
     }),
   ]
   depends_on = [

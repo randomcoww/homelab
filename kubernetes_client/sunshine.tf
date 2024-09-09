@@ -34,6 +34,11 @@ module "sunshine" {
       value = "1"
     },
   ]
+  sunshine_resources = {
+    limits = {
+      "nvidia.com/gpu.shared" = 1
+    }
+  }
   sunshine_extra_volume_mounts = [
     {
       name      = "run-user"
