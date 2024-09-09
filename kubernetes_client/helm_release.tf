@@ -126,22 +126,6 @@ resource "helm_release" "nvidia-device-plugin" {
   max_history = 2
   values = [
     yamlencode({
-      affinity = {
-        # nodeAffinity = {
-        #   requiredDuringSchedulingIgnoredDuringExecution = {
-        #     nodeSelectorTerms = [
-        #       {
-        #         matchExpressions = [
-        #           {
-        #             key      = "nvidia"
-        #             operator = "Exists"
-        #           },
-        #         ]
-        #       },
-        #     ]
-        #   }
-        # }
-      }
     }),
   ]
   depends_on = [
