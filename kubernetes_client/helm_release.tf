@@ -127,20 +127,20 @@ resource "helm_release" "nvidia-device-plugin" {
   values = [
     yamlencode({
       affinity = {
-        nodeAffinity = {
-          requiredDuringSchedulingIgnoredDuringExecution = {
-            nodeSelectorTerms = [
-              {
-                matchExpressions = [
-                  {
-                    key      = "nvidia"
-                    operator = "Exists"
-                  },
-                ]
-              },
-            ]
-          }
-        }
+        # nodeAffinity = {
+        #   requiredDuringSchedulingIgnoredDuringExecution = {
+        #     nodeSelectorTerms = [
+        #       {
+        #         matchExpressions = [
+        #           {
+        #             key      = "nvidia"
+        #             operator = "Exists"
+        #           },
+        #         ]
+        #       },
+        #     ]
+        #   }
+        # }
       }
     }),
   ]

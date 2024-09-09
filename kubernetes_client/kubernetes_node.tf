@@ -10,4 +10,5 @@ resource "kubernetes_labels" "labels" {
     name = each.key
   }
   labels = each.value
+  force  = true
 }
