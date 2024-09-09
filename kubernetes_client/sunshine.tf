@@ -37,9 +37,9 @@ module "sunshine" {
     },
   ]
   sunshine_resources = {
-    limits = {
-      "nvidia.com/gpu.shared" = 1
-    }
+    # limits = {
+    #   "nvidia.com/gpu.shared" = 1
+    # }
   }
   sunshine_extra_volume_mounts = [
     {
