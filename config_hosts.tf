@@ -348,6 +348,10 @@ locals {
                   relative_path = "containers"
                   mount_path    = local.mounts.containers_path
                 },
+                {
+                  relative_path = "tmp"
+                  mount_path    = "/var/tmp"
+                },
               ]
             },
           ]
@@ -413,6 +417,10 @@ locals {
                 {
                   relative_path = "containers"
                   mount_path    = local.mounts.containers_path
+                },
+                {
+                  relative_path = "tmp"
+                  mount_path    = "/var/tmp"
                 },
               ]
             },
