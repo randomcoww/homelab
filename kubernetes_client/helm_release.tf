@@ -25,6 +25,7 @@ locals {
     module.webdav-pictures,
     module.webdav-videos,
     module.sunshine,
+    # module.wireproxy,
   ]
 }
 

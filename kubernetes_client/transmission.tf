@@ -66,7 +66,7 @@ module "transmission" {
   PrivateKey=${var.wireguard_client.private_key}
 
   [Peer]
-  AllowedIPs=0.0.0.0/0,::0/0
+  AllowedIPs=0.0.0.0/0
   Endpoint=${var.wireguard_client.endpoint}
   PublicKey=${var.wireguard_client.public_key}
   PersistentKeepalive=25

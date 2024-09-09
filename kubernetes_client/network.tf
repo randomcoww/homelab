@@ -217,3 +217,27 @@ module "tailscale" {
   ssm_secret_access_key  = data.terraform_remote_state.sr.outputs.ssm.tailscale.secret_access_key
   ssm_tailscale_resource = data.terraform_remote_state.sr.outputs.ssm.tailscale.resource
 }
+
+# Wireproxy
+
+module "wireproxy" {
+  source  = "./modules/wireproxy"
+  name    = "wireproxy"
+  release = "0.1.0"
+  images = {
+    wireproxy = local.container_images.wireproxy
+  }
+  service_hostname = local.kubernetes_ingress_endpoints.wireproxy
+  service_ip       = local.services.wireproxy.ip
+  wireguard_config = <<-EOF
+  [Interface]
+  Address=${var.wireguard_client.address}
+  PrivateKey=${var.wireguard_client.private_key}
+
+  [Peer]
+  AllowedIPs=0.0.0.0/0
+  Endpoint=${var.wireguard_client.endpoint}
+  PublicKey=${var.wireguard_client.public_key}
+  PersistentKeepalive=25
+  EOF
+}

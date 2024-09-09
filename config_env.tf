@@ -48,6 +48,7 @@ locals {
         sunshine               = 36
         alpaca_stream          = 37
         alpaca_db              = 38
+        wireproxy              = 39
       }
     }
     # worker node IPs
@@ -118,6 +119,7 @@ locals {
     rclone             = "docker.io/rclone/rclone:1.67"
     cockroachdb        = "docker.io/cockroachdb/cockroach:v24.1.1"
     sunshine           = "ghcr.io/randomcoww/sunshine:2024.907.154342.2"
+    wireproxy          = "ghcr.io/randomcoww/wireproxy:1.0.9.1"
   }
 
   pxeboot_images = {
@@ -168,6 +170,7 @@ locals {
       webdav_videos   = "videos"
       sunshine        = "sunshine"
       sunshine_admin  = "sunadmin"
+      wireproxy       = "wireproxy"
     } :
     k => "${domain}.${local.domains.public}"
   }

@@ -14,6 +14,12 @@ variable "wireguard_client" {
     address     = string
     endpoint    = string
   })
+  default = {
+    private_key = ""
+    public_key  = ""
+    address     = ""
+    endpoint    = ""
+  }
 }
 
 variable "alpaca" {
