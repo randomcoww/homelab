@@ -194,10 +194,6 @@ locals {
         name      = "authelia-redis"
         namespace = "authelia"
       }
-      authelia_db = {
-        name      = "authelia-db"
-        namespace = "authelia"
-      }
       ingress_nginx = {
         name      = "${local.ingress_classes.ingress_nginx}-controller"
         namespace = "ingress-nginx"
@@ -218,10 +214,6 @@ locals {
         name      = "lldap"
         namespace = "lldap"
       }
-      lldap_db = {
-        name      = "lldap-db"
-        namespace = "lldap"
-      }
       alpaca_stream = {
         name      = "alpaca-stream"
         namespace = "alpaca"
@@ -229,18 +221,6 @@ locals {
       alpaca_db = {
         name      = "alpaca-db"
         namespace = "alpaca"
-      }
-      mpd_jfs_metadata = {
-        name      = "mpd-jfs-metadata"
-        namespace = "default"
-      }
-      transmission_jfs_metadata = {
-        name      = "transmission-jfs-metadata"
-        namespace = "default"
-      }
-      code_jfs_metadata = {
-        name      = "code-jfs-metadata"
-        namespace = "default"
       }
     } :
     name => merge(e, {
