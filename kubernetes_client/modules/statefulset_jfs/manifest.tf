@@ -87,11 +87,10 @@ module "statefulset-litestream" {
           },
         ]
       },
-    ], lookup(var.template_spec, "initContainers", []))
-    containers = concat([
       {
-        name  = "${var.name}-jfs-mount"
-        image = var.jfs_image
+        name          = "${var.name}-jfs-mount"
+        image         = var.jfs_image
+        restartPolicy = "Always"
         command = [
           "sh",
           "-c",
@@ -140,7 +139,8 @@ module "statefulset-litestream" {
           privileged = true
         }
       },
-      ], [
+    ], lookup(var.template_spec, "initContainers", []))
+    containers = [
       for _, container in lookup(var.template_spec, "containers", []) :
       merge(container, {
         volumeMounts = concat(lookup(container, "volumeMounts", []), [
@@ -150,7 +150,7 @@ module "statefulset-litestream" {
           },
         ])
       })
-    ])
+    ]
     volumes = concat(lookup(var.template_spec, "volumes", []), [
       {
         name = "jfs-mount"

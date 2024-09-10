@@ -128,10 +128,11 @@ module "statefulset-jfs" {
     "checksum/secret" = sha256(module.secret.manifest)
   }
   template_spec = {
-    containers = [
+    initContainers = [
       {
-        name  = "${var.name}-rclone"
-        image = var.images.rclone
+        name          = "${var.name}-rclone"
+        image         = var.images.rclone
+        restartPolicy = "Always"
         args = [
           "serve",
           "webdav",
@@ -164,8 +165,9 @@ module "statefulset-jfs" {
         ]
       },
       {
-        name  = var.name
-        image = var.images.mpd
+        name          = var.name
+        image         = var.images.mpd
+        restartPolicy = "Always"
         command = [
           "sh",
           "-c",
@@ -192,6 +194,8 @@ module "statefulset-jfs" {
           },
         ]
       },
+    ]
+    containers = [
       {
         name  = "${var.name}-mympd"
         image = var.images.mympd

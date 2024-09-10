@@ -59,21 +59,10 @@ module "statefulset" {
           },
         ]
       },
-      ], [
-      for _, container in lookup(var.template_spec, "initContainers", []) :
-      merge(container, {
-        volumeMounts = concat(lookup(container, "volumeMounts", []), [
-          {
-            name      = "litestream-data"
-            mountPath = dirname(var.sqlite_path)
-          },
-        ])
-      })
-    ])
-    containers = concat([
       {
-        name  = "${var.name}-litestream-replicate"
-        image = var.litestream_image
+        name          = "${var.name}-litestream-replicate"
+        image         = var.litestream_image
+        restartPolicy = "Always"
         args = [
           "replicate",
           "-config",
@@ -102,7 +91,7 @@ module "statefulset" {
         ]
       },
       ], [
-      for _, container in lookup(var.template_spec, "containers", []) :
+      for _, container in lookup(var.template_spec, "initContainers", []) :
       merge(container, {
         volumeMounts = concat(lookup(container, "volumeMounts", []), [
           {
@@ -112,6 +101,17 @@ module "statefulset" {
         ])
       })
     ])
+    containers = [
+      for _, container in lookup(var.template_spec, "containers", []) :
+      merge(container, {
+        volumeMounts = concat(lookup(container, "volumeMounts", []), [
+          {
+            name      = "litestream-data"
+            mountPath = dirname(var.sqlite_path)
+          },
+        ])
+      })
+    ]
     volumes = concat(lookup(var.template_spec, "volumes", []), [
       {
         name = "litestream-config"

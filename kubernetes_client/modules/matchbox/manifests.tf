@@ -132,52 +132,11 @@ module "statefulset" {
     "checksum/secret-matchbox"  = sha256(module.secret-matchbox.manifest)
   }
   template_spec = {
-    containers = [
+    initContainers = [
       {
-        name  = local.name
-        image = var.images.matchbox
-        args = [
-          "-address=0.0.0.0:${local.ports.matchbox}",
-          "-rpc-address=0.0.0.0:${local.ports.matchbox_api}",
-          "-assets-path=${local.shared_data_path}",
-          "-data-path=${local.shared_data_path}",
-        ]
-        volumeMounts = [
-          {
-            name      = "matchbox-secret"
-            mountPath = "/etc/matchbox"
-          },
-          {
-            name      = "shared-data"
-            mountPath = local.shared_data_path
-          },
-        ]
-        ports = [
-          {
-            containerPort = local.ports.matchbox
-          },
-          {
-            containerPort = local.ports.matchbox_api
-          },
-        ]
-        readinessProbe = {
-          httpGet = {
-            scheme = "HTTP"
-            port   = local.ports.matchbox
-            path   = "/"
-          }
-        }
-        livenessProbe = {
-          httpGet = {
-            scheme = "HTTP"
-            port   = local.ports.matchbox
-            path   = "/"
-          }
-        }
-      },
-      {
-        name  = "${local.name}-syncthing"
-        image = var.images.syncthing
+        name          = "${local.name}-syncthing"
+        image         = var.images.syncthing
+        restartPolicy = "Always"
         command = [
           "sh",
           "-c",
@@ -230,6 +189,50 @@ module "statefulset" {
             containerPort = local.ports.syncthing_peer
           },
         ]
+      },
+    ]
+    containers = [
+      {
+        name  = local.name
+        image = var.images.matchbox
+        args = [
+          "-address=0.0.0.0:${local.ports.matchbox}",
+          "-rpc-address=0.0.0.0:${local.ports.matchbox_api}",
+          "-assets-path=${local.shared_data_path}",
+          "-data-path=${local.shared_data_path}",
+        ]
+        volumeMounts = [
+          {
+            name      = "matchbox-secret"
+            mountPath = "/etc/matchbox"
+          },
+          {
+            name      = "shared-data"
+            mountPath = local.shared_data_path
+          },
+        ]
+        ports = [
+          {
+            containerPort = local.ports.matchbox
+          },
+          {
+            containerPort = local.ports.matchbox_api
+          },
+        ]
+        readinessProbe = {
+          httpGet = {
+            scheme = "HTTP"
+            port   = local.ports.matchbox
+            path   = "/"
+          }
+        }
+        livenessProbe = {
+          httpGet = {
+            scheme = "HTTP"
+            port   = local.ports.matchbox
+            path   = "/"
+          }
+        }
       },
     ]
     volumes = [

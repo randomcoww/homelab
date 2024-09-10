@@ -224,11 +224,10 @@ locals {
                   },
                 ]
               },
-            ]
-            containers = concat(local.s.spec.template.spec.containers, [
               {
-                name  = "${var.name}-litestream-replicate"
-                image = var.images.litestream
+                name          = "${var.name}-litestream-replicate"
+                image         = var.images.litestream
+                restartPolicy = "Always"
                 args = [
                   "replicate",
                   "-config",
@@ -246,7 +245,7 @@ locals {
                   },
                 ]
               },
-            ])
+            ]
             dnsConfig = {
               options = [
                 {
