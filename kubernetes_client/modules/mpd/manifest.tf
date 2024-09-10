@@ -16,13 +16,11 @@ module "metadata" {
   namespace   = var.namespace
   release     = var.release
   app_version = split(":", var.images.mpd)[1]
-  manifests = {
-    "templates/service.yaml"     = module.service.manifest
-    "templates/secret.yaml"      = module.secret.manifest
-    "templates/ingress.yaml"     = module.ingress.manifest
-    "templates/statefulset.yaml" = module.statefulset-jfs.statefulset
-    "templates/secret-jfs.yaml"  = module.statefulset-jfs.secret
-  }
+  manifests = merge(module.jfs.chart.manifests, {
+    "templates/service.yaml" = module.service.manifest
+    "templates/secret.yaml"  = module.secret.manifest
+    "templates/ingress.yaml" = module.ingress.manifest
+  })
 }
 
 module "secret" {
@@ -107,7 +105,7 @@ module "ingress" {
   ]
 }
 
-module "statefulset-jfs" {
+module "jfs" {
   source = "../statefulset_jfs"
   ## jfs settings
   jfs_image                          = var.images.jfs

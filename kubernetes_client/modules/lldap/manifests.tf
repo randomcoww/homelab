@@ -35,13 +35,11 @@ module "metadata" {
   namespace   = local.namespace
   release     = var.release
   app_version = split(":", var.images.lldap)[1]
-  manifests = {
-    "templates/service.yaml"           = module.service.manifest
-    "templates/ingress.yaml"           = module.ingress.manifest
-    "templates/secret.yaml"            = module.secret.manifest
-    "templates/statefulset.yaml"       = module.statefulset-litestream.statefulset
-    "templates/secret-litestream.yaml" = module.statefulset-litestream.secret
-  }
+  manifests = merge(module.litestream.chart.manifests, {
+    "templates/service.yaml" = module.service.manifest
+    "templates/ingress.yaml" = module.ingress.manifest
+    "templates/secret.yaml"  = module.secret.manifest
+  })
 }
 
 module "secret" {
@@ -104,7 +102,7 @@ module "ingress" {
   ]
 }
 
-module "statefulset-litestream" {
+module "litestream" {
   source = "../statefulset_litestream"
   ## litestream settings
   litestream_image = var.images.litestream

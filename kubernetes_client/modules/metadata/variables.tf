@@ -12,7 +12,8 @@ variable "release" {
 }
 
 variable "app_version" {
-  type = string
+  type    = string
+  default = "0.1.0"
 }
 
 variable "manifests" {

@@ -6,7 +6,27 @@ locals {
   db_path             = "/var/lib/jfs/jfs.db"
 }
 
-module "statefulset-litestream" {
+module "metadata" {
+  source  = "../metadata"
+  name    = var.name
+  release = var.release
+  manifests = merge(module.litestream.chart.manifests, {
+    "templates/secret-jfs.yaml" = module.secret.manifest
+  })
+}
+
+module "secret" {
+  source  = "../secret"
+  name    = "${var.name}-jfs"
+  app     = var.app
+  release = var.release
+  data = {
+    ACCESS_KEY = var.jfs_minio_access_key_id
+    SECRET_KEY = var.jfs_minio_secret_access_key
+  }
+}
+
+module "litestream" {
   source = "../statefulset_litestream"
   ## litestream settings
   litestream_image = var.litestream_image
@@ -70,12 +90,22 @@ module "statefulset-litestream" {
         ]
         env = [
           {
-            name  = "ACCESS_KEY"
-            value = var.jfs_minio_access_key_id
+            name = "ACCESS_KEY"
+            valueFrom = {
+              secretKeyRef = {
+                name = module.secret.name
+                key  = "ACCESS_KEY"
+              }
+            }
           },
           {
-            name  = "SECRET_KEY"
-            value = var.jfs_minio_secret_access_key
+            name = "SECRET_KEY"
+            valueFrom = {
+              secretKeyRef = {
+                name = module.secret.name
+                key  = "SECRET_KEY"
+              }
+            }
           },
           {
             name = "POD_NAME"

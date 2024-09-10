@@ -2,6 +2,16 @@ locals {
   config_path = "/etc/litestream.yml"
 }
 
+module "metadata" {
+  source  = "../metadata"
+  name    = var.name
+  release = var.release
+  manifests = {
+    "templates/statefulset.yaml"       = module.statefulset.manifest
+    "templates/secret-litestream.yaml" = module.secret.manifest
+  }
+}
+
 module "secret" {
   source  = "../secret"
   name    = "${var.name}-litestream"

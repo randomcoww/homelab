@@ -42,12 +42,10 @@ module "metadata" {
   namespace   = var.namespace
   release     = var.release
   app_version = split(":", var.images.transmission)[1]
-  manifests = {
-    "templates/service.yaml"     = module.service.manifest
-    "templates/ingress.yaml"     = module.ingress.manifest
-    "templates/secret.yaml"      = module.secret.manifest
-    "templates/statefulset.yaml" = module.statefulset-jfs.statefulset
-    "templates/secret-jfs.yaml"  = module.statefulset-jfs.secret
+  manifests = merge(module.jfs.chart.manifests, {
+    "templates/service.yaml" = module.service.manifest
+    "templates/ingress.yaml" = module.ingress.manifest
+    "templates/secret.yaml"  = module.secret.manifest
     "templates/post-job.yaml" = yamlencode({
       apiVersion = "batch/v1"
       kind       = "Job"
@@ -105,7 +103,7 @@ module "metadata" {
         }
       }
     })
-  }
+  })
 }
 
 module "secret" {
@@ -158,7 +156,7 @@ module "ingress" {
   ]
 }
 
-module "statefulset-jfs" {
+module "jfs" {
   source = "../statefulset_jfs"
   ## jfs settings
   jfs_image                          = var.images.jfs

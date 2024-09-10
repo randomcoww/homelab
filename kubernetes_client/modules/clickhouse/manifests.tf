@@ -215,13 +215,11 @@ module "metadata" {
   namespace   = local.namespace
   release     = var.release
   app_version = split(":", var.images.clickhouse)[1]
-  manifests = {
+  manifests = merge(module.jfs.chart.manifests, {
     "templates/service.yaml"      = module.service.manifest
     "templates/service-peer.yaml" = module.service-peer.manifest
     "templates/secret.yaml"       = module.secret.manifest
-    "templates/statefulset.yaml"  = module.statefulset-jfs.statefulset
-    "templates/secret-jfs.yaml"   = module.statefulset-jfs.secret
-  }
+  })
 }
 
 module "secret" {
@@ -331,7 +329,7 @@ module "service-peer" {
   }
 }
 
-module "statefulset-jfs" {
+module "jfs" {
   source = "../statefulset_jfs"
   ## jfs settings
   jfs_image                          = var.images.jfs
