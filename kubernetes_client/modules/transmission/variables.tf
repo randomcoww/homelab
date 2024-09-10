@@ -19,6 +19,8 @@ variable "affinity" {
 variable "images" {
   type = object({
     transmission = string
+    jfs          = string
+    litestream   = string
   })
 }
 

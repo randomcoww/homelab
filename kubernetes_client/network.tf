@@ -231,7 +231,6 @@ module "wireproxy" {
   ports = {
     socks5 = local.service_ports.socks5
   }
-  service_ip       = local.services.wireproxy.ip
   wireguard_config = <<-EOF
   [Interface]
   Address=${var.wireguard_client.address}

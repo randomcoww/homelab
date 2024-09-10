@@ -48,7 +48,6 @@ locals {
         sunshine               = 36
         alpaca_stream          = 37
         alpaca_db              = 38
-        wireproxy              = 39
       }
     }
     # worker node IPs
