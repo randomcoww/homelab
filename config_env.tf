@@ -118,7 +118,7 @@ locals {
     mympd              = "ghcr.io/jcorporation/mympd/mympd:17.0.3"
     rclone             = "docker.io/rclone/rclone:1.67"
     cockroachdb        = "docker.io/cockroachdb/cockroach:v24.1.1"
-    sunshine           = "ghcr.io/randomcoww/sunshine:2024.907.154342.2"
+    sunshine           = "ghcr.io/randomcoww/sunshine:2024.910.1354"
     wireproxy          = "ghcr.io/randomcoww/wireproxy:1.0.9.1"
   }
 
