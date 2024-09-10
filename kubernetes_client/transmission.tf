@@ -4,7 +4,6 @@ module "transmission" {
   release = "0.1.6"
   images = {
     transmission = local.container_images.transmission
-    wireguard    = local.container_images.wireguard
     jfs          = local.container_images.jfs
     litestream   = local.container_images.litestream
   }
@@ -59,17 +58,6 @@ module "transmission" {
   transmission-remote $TR_RPC_PORT \
     --torrent "$TR_TORRENT_ID" \
     --remove-and-delete
-  EOF
-  wireguard_config    = <<-EOF
-  [Interface]
-  Address=${var.wireguard_client.address}
-  PrivateKey=${var.wireguard_client.private_key}
-
-  [Peer]
-  AllowedIPs=0.0.0.0/0
-  Endpoint=${var.wireguard_client.endpoint}
-  PublicKey=${var.wireguard_client.public_key}
-  PersistentKeepalive=25
   EOF
 
   service_hostname          = local.kubernetes_ingress_endpoints.transmission

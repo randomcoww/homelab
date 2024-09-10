@@ -22,14 +22,12 @@ variable "images" {
   })
 }
 
+variable "ports" {
+  type = object({
+    socks5 = number
+  })
+}
+
 variable "wireguard_config" {
-  type = string
-}
-
-variable "service_hostname" {
-  type = string
-}
-
-variable "service_ip" {
   type = string
 }

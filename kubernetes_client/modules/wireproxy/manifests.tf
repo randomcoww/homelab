@@ -1,7 +1,4 @@
 locals {
-  ports = {
-    socks5 = 8080
-  }
   config_path = "/config"
 }
 
@@ -28,7 +25,7 @@ module "secret" {
     ${var.wireguard_config}
 
     [Socks5]
-    BindAddress = 0.0.0.0:${local.ports.socks5}
+    BindAddress = 0.0.0.0:${var.ports.socks5}
     EOF
   }
 }
@@ -38,20 +35,14 @@ module "service" {
   name    = var.name
   app     = var.name
   release = var.release
-  annotations = {
-    "external-dns.alpha.kubernetes.io/hostname" = var.service_hostname
-  }
   spec = {
-    type = "LoadBalancer"
-    externalIPs = [
-      var.service_ip,
-    ]
+    type = "ClusterIP"
     ports = [
       {
         name       = var.name
-        port       = local.ports.socks5
+        port       = var.ports.socks5
         protocol   = "TCP"
-        targetPort = local.ports.socks5
+        targetPort = var.ports.socks5
       },
     ]
   }
@@ -88,17 +79,17 @@ module "deployment" {
         ]
         ports = [
           {
-            containerPort = local.ports.socks5
+            containerPort = var.ports.socks5
           },
         ]
         readinessProbe = {
           tcpSocket = {
-            port = local.ports.socks5
+            port = var.ports.socks5
           }
         }
         livenessProbe = {
           tcpSocket = {
-            port = local.ports.socks5
+            port = var.ports.socks5
           }
         }
       },

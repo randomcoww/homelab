@@ -170,7 +170,6 @@ locals {
       webdav_videos   = "videos"
       sunshine        = "sunshine"
       sunshine_admin  = "sunadmin"
-      wireproxy       = "wireproxy"
     } :
     k => "${domain}.${local.domains.public}"
   }
@@ -222,6 +221,10 @@ locals {
         name      = "alpaca-db"
         namespace = "alpaca"
       }
+      wireproxy = {
+        name      = "wireproxy"
+        namespace = "default"
+      }
     } :
     name => merge(e, {
       endpoint = "${e.name}.${e.namespace}"
@@ -252,6 +255,7 @@ locals {
     lldap         = 6360
     redis         = 6379
     cockroachdb   = 26258
+    socks5        = 10080
   }
 
   minio_buckets = {

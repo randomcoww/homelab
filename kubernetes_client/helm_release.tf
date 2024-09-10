@@ -21,7 +21,7 @@ locals {
     # module.alpaca-stream,
     module.code,
     # module.mpd,
-    module.transmission,
+    # module.transmission,
     module.webdav-pictures,
     module.webdav-videos,
     module.sunshine,

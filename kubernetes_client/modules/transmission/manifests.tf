@@ -34,7 +34,6 @@ locals {
       ]
     }
   }
-  jfs_metadata_path = "/var/lib/jfs/${var.name}.db"
 }
 
 module "metadata" {
@@ -115,7 +114,6 @@ module "secret" {
   app     = var.name
   release = var.release
   data = {
-    "wg0.conf"                                                         = var.wireguard_config
     basename(local.transmission_settings.script-torrent-done-filename) = var.torrent_done_script
     "settings.json"                                                    = jsonencode(local.transmission_settings)
   }
@@ -181,26 +179,6 @@ module "statefulset-jfs" {
     "checksum/secret" = sha256(module.secret.manifest)
   }
   template_spec = {
-    initContainers = [
-      {
-        name  = "${var.name}-wg"
-        image = var.images.wireguard
-        args = [
-          "up",
-          "wg0",
-        ]
-        securityContext = {
-          privileged = true
-        }
-        volumeMounts = [
-          {
-            name      = "secret"
-            mountPath = "/etc/wireguard/wg0.conf"
-            subPath   = "wg0.conf"
-          },
-        ]
-      },
-    ]
     containers = [
       {
         name  = var.name
@@ -215,12 +193,10 @@ module "statefulset-jfs" {
           mkdir -p \
             ${local.mount_path}/resume \
             ${local.mount_path}/torrents \
-            ${local.mount_path}/blocklists \
             $HOME
           ln -sf \
             ${local.mount_path}/resume \
             ${local.mount_path}/torrents \
-            ${local.mount_path}/blocklists \
             $HOME
           echo -e "$TRANSMISSION_CONFIG" > $HOME/settings.json
 
@@ -247,7 +223,7 @@ module "statefulset-jfs" {
                 key  = "settings.json"
               }
             }
-          }
+          },
           ], [
           for _, e in var.transmission_extra_envs :
           {

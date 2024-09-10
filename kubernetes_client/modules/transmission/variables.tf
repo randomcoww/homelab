@@ -19,14 +19,7 @@ variable "affinity" {
 variable "images" {
   type = object({
     transmission = string
-    wireguard    = string
-    jfs          = string
-    litestream   = string
   })
-}
-
-variable "wireguard_config" {
-  type = string
 }
 
 variable "torrent_done_script" {

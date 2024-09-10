@@ -221,13 +221,16 @@ module "tailscale" {
 # Wireproxy
 
 module "wireproxy" {
-  source  = "./modules/wireproxy"
-  name    = "wireproxy"
-  release = "0.1.0"
+  source    = "./modules/wireproxy"
+  name      = local.kubernetes_services.wireproxy.name
+  namespace = local.kubernetes_services.wireproxy.namespace
+  release   = "0.1.0"
   images = {
     wireproxy = local.container_images.wireproxy
   }
-  service_hostname = local.kubernetes_ingress_endpoints.wireproxy
+  ports = {
+    socks5 = local.service_ports.socks5
+  }
   service_ip       = local.services.wireproxy.ip
   wireguard_config = <<-EOF
   [Interface]
