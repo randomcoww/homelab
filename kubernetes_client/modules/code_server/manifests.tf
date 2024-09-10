@@ -106,6 +106,14 @@ module "statefulset" {
             name  = "HOME"
             value = var.home_path
           },
+          {
+            name  = "NVIDIA_VISIBLE_DEVICES"
+            value = "all"
+          },
+          {
+            name  = "NVIDIA_DRIVER_CAPABILITIES"
+            value = "compute,utility"
+          },
         ])
         volumeMounts = concat([
           for i, config in var.code_server_extra_configs :
