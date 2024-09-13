@@ -15,6 +15,13 @@ variable "release" {
   type = string
 }
 
+variable "images" {
+  type = object({
+    jfs        = string
+    litestream = string
+  })
+}
+
 variable "replicas" {
   type    = number
   default = 1
@@ -45,10 +52,6 @@ variable "template_spec" {
   default = {}
 }
 
-variable "jfs_image" {
-  type = string
-}
-
 variable "jfs_mount_path" {
   type = string
 }
@@ -62,10 +65,6 @@ variable "jfs_minio_access_key_id" {
 }
 
 variable "jfs_minio_secret_access_key" {
-  type = string
-}
-
-variable "litestream_image" {
   type = string
 }
 

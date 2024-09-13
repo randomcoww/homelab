@@ -29,7 +29,9 @@ module "secret" {
 module "litestream" {
   source = "../statefulset_litestream"
   ## litestream settings
-  litestream_image = var.litestream_image
+  images = {
+    litestream = var.images.litestream
+  }
   litestream_config = {
     dbs = [
       {
@@ -65,7 +67,7 @@ module "litestream" {
     initContainers = concat([
       {
         name  = "${var.name}-jfs-format"
-        image = var.jfs_image
+        image = var.images.jfs
         command = [
           "sh",
           "-c",
@@ -119,7 +121,7 @@ module "litestream" {
       },
       {
         name          = "${var.name}-jfs-mount"
-        image         = var.jfs_image
+        image         = var.images.jfs
         restartPolicy = "Always"
         command = [
           "sh",

@@ -38,7 +38,7 @@ module "statefulset" {
     initContainers = concat([
       {
         name  = "${var.name}-litestream-restore"
-        image = var.litestream_image
+        image = var.images.litestream
         args = [
           "restore",
           "-if-db-not-exists",
@@ -71,7 +71,7 @@ module "statefulset" {
       },
       {
         name          = "${var.name}-litestream-replicate"
-        image         = var.litestream_image
+        image         = var.images.litestream
         restartPolicy = "Always"
         args = [
           "replicate",

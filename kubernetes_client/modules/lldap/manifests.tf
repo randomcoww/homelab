@@ -105,7 +105,9 @@ module "ingress" {
 module "litestream" {
   source = "../statefulset_litestream"
   ## litestream settings
-  litestream_image = var.images.litestream
+  images = {
+    litestream = var.images.litestream
+  }
   litestream_config = {
     dbs = [
       {

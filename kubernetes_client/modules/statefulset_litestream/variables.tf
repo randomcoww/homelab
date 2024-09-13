@@ -10,6 +10,12 @@ variable "release" {
   type = string
 }
 
+variable "images" {
+  type = object({
+    litestream = string
+  })
+}
+
 variable "replicas" {
   type    = number
   default = 1
@@ -38,10 +44,6 @@ variable "spec" {
 variable "template_spec" {
   type    = any
   default = {}
-}
-
-variable "litestream_image" {
-  type = string
 }
 
 variable "litestream_config" {
