@@ -1,6 +1,5 @@
 locals {
-  base_path = "/var/lib/keydb"
-
+  base_path             = "/var/lib/keydb"
   cert_path             = "${local.base_path}/keydb.crt"
   key_path              = "${local.base_path}/keydb.key"
   client_cert_path      = "${local.base_path}/client.crt"
