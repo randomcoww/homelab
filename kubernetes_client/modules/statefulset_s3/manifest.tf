@@ -96,7 +96,17 @@ module "statefulset" {
           privileged = true
         }
       },
-    ], lookup(var.template_spec, "initContainers", []))
+      ], [
+      for _, container in lookup(var.template_spec, "initContainers", []) :
+      merge(container, {
+        volumeMounts = concat(lookup(container, "volumeMounts", []), [
+          {
+            name      = "s3-mount-shared"
+            mountPath = dirname(var.s3_mount_path)
+          },
+        ])
+      })
+    ])
     containers = [
       for _, container in lookup(var.template_spec, "containers", []) :
       merge(container, {
