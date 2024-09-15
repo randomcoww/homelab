@@ -3,8 +3,8 @@ module "sunshine" {
   name    = "sunshine"
   release = "0.1.1"
   images = {
-    sunshine  = local.container_images.sunshine
-    syncthing = local.container_images.syncthing
+    sunshine   = local.container_images.sunshine
+    mountpoint = local.container_images.mountpoint
   }
   sunshine_extra_envs = [
     {
@@ -70,28 +70,17 @@ module "sunshine" {
       }
     }
   }
-  sync_affinity = {
-    nodeAffinity = {
-      requiredDuringSchedulingIgnoredDuringExecution = {
-        nodeSelectorTerms = [
-          {
-            matchExpressions = [
-              {
-                key      = "kubernetes.io/hostname"
-                operator = "NotIn"
-                values = [
-                  "de-1.local",
-                ]
-              },
-            ]
-          },
-        ]
-      }
-    }
-  }
   service_hostname          = local.kubernetes_ingress_endpoints.sunshine
   service_ip                = local.services.sunshine.ip
   admin_hostname            = local.kubernetes_ingress_endpoints.sunshine_admin
   ingress_class_name        = local.ingress_classes.ingress_nginx
   nginx_ingress_annotations = local.nginx_ingress_auth_annotations
+
+  s3_mount_access_key_id     = data.terraform_remote_state.sr.outputs.minio.access_key_id
+  s3_mount_secret_access_key = data.terraform_remote_state.sr.outputs.minio.secret_access_key
+  s3_mount_endpoint          = "http://${local.services.minio.ip}:${local.service_ports.minio}"
+  s3_mount_bucket            = local.minio_buckets.jfs.name
+  s3_mount_extra_args = [
+    "--uid ${local.users.client.uid}",
+  ]
 }

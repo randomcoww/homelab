@@ -13,13 +13,9 @@ variable "release" {
 
 variable "images" {
   type = object({
-    sunshine  = string
-    syncthing = string
+    sunshine   = string
+    mountpoint = string
   })
-}
-variable "sync_replicas" {
-  type    = number
-  default = 1
 }
 
 variable "sunshine_extra_args" {
@@ -61,11 +57,6 @@ variable "affinity" {
   default = {}
 }
 
-variable "sync_affinity" {
-  type    = any
-  default = {}
-}
-
 variable "service_hostname" {
   type = string
 }
@@ -93,5 +84,26 @@ variable "sunshine_extra_volume_mounts" {
 
 variable "sunshine_extra_volumes" {
   type    = any
+  default = []
+}
+
+variable "s3_mount_access_key_id" {
+  type = string
+}
+
+variable "s3_mount_secret_access_key" {
+  type = string
+}
+
+variable "s3_mount_endpoint" {
+  type = string
+}
+
+variable "s3_mount_bucket" {
+  type = string
+}
+
+variable "s3_mount_extra_args" {
+  type    = list(string)
   default = []
 }

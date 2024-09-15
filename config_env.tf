@@ -106,7 +106,7 @@ locals {
     litestream         = "docker.io/litestream/litestream:0.3"
     tailscale          = "ghcr.io/randomcoww/tailscale:1.70.0"
     fuse_device_plugin = "docker.io/soolaugust/fuse-device-plugin:v1.0"
-    code_server        = "ghcr.io/randomcoww/code-server:20240910.1"
+    code_server        = "ghcr.io/randomcoww/code-server:20240915.2"
     alpaca_stream      = "ghcr.io/randomcoww/alpaca-client:stream-server-20240801.6"
     lldap              = "docker.io/lldap/lldap:2024-08-08-alpine"
     keydb              = "docker.io/eqalpha/keydb:alpine_x86_64_v6.3.4"
@@ -117,8 +117,9 @@ locals {
     mympd              = "ghcr.io/jcorporation/mympd/mympd:17.0.3"
     rclone             = "docker.io/rclone/rclone:1.67"
     cockroachdb        = "docker.io/cockroachdb/cockroach:v24.1.1"
-    sunshine           = "ghcr.io/randomcoww/sunshine:2024.910.1354"
+    sunshine           = "ghcr.io/randomcoww/sunshine:2024.914.221909"
     wireproxy          = "ghcr.io/randomcoww/wireproxy:1.0.9.1"
+    mountpoint         = "ghcr.io/randomcoww/mountpoint:20240915.5"
   }
 
   pxeboot_images = {

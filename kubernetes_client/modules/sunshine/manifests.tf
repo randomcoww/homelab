@@ -49,7 +49,7 @@ module "metadata" {
   namespace   = var.namespace
   release     = var.release
   app_version = split(":", var.images.sunshine)[1]
-  manifests = merge(module.syncthing.chart.manifests, {
+  manifests = merge(module.s3-mount.chart.manifests, {
     "templates/secret.yaml"  = module.secret.manifest
     "templates/service.yaml" = module.service.manifest
     "templates/ingress.yaml" = module.ingress.manifest
@@ -75,8 +75,8 @@ module "secret" {
     })
     basename(local.args.cert) = tls_self_signed_cert.sunshine-ca.cert_pem
     basename(local.args.pkey) = tls_private_key.sunshine-ca.private_key_pem
-    username                  = random_password.username.result
-    password                  = random_password.password.result
+    USERNAME                  = random_password.username.result
+    PASSWORD                  = random_password.password.result
     }, {
     for i, config in var.sunshine_extra_configs :
     "${i}-${basename(config.path)}" => config.content
@@ -90,9 +90,6 @@ module "service" {
   release = var.release
   annotations = {
     "external-dns.alpha.kubernetes.io/hostname" = var.service_hostname
-  }
-  labels = {
-    syncthing-app = var.name
   }
   spec = {
     type = "LoadBalancer"
@@ -145,17 +142,18 @@ module "ingress" {
   ]
 }
 
-module "syncthing" {
-  source = "../statefulset_syncthing"
-  ## syncthing config
+module "s3-mount" {
+  source = "../statefulset_s3"
+  ## s3 config
+  s3_mount_access_key_id     = var.s3_mount_access_key_id
+  s3_mount_secret_access_key = var.s3_mount_secret_access_key
+  s3_mount_endpoint          = var.s3_mount_endpoint
+  s3_mount_bucket            = var.s3_mount_bucket
+  s3_mount_path              = local.mount_path
+  s3_mount_extra_args        = var.s3_mount_extra_args
   images = {
-    syncthing = var.images.syncthing
+    mountpoint = var.images.mountpoint
   }
-  sync_data_paths = [
-    local.mount_path,
-  ]
-  sync_affinity = var.sync_affinity
-  sync_replicas = 1
   ##
   name     = var.name
   app      = var.name
@@ -176,6 +174,7 @@ module "syncthing" {
           <<-EOF
           set -e
 
+          mountpoint ${local.mount_path}
           sunshine %{for k, v in local.args} ${k}=${tostring(v)}%{endfor} --creds $USERNAME $PASSWORD
           exec sunshine%{for k, v in local.args} ${k}=${tostring(v)}%{endfor}
           EOF
@@ -190,7 +189,7 @@ module "syncthing" {
             valueFrom = {
               secretKeyRef = {
                 name = module.secret.name
-                key  = "username"
+                key  = "USERNAME"
               }
             }
           },
@@ -199,7 +198,7 @@ module "syncthing" {
             valueFrom = {
               secretKeyRef = {
                 name = module.secret.name
-                key  = "password"
+                key  = "PASSWORD"
               }
             }
           },
@@ -269,13 +268,5 @@ module "syncthing" {
         }
       },
     ], var.sunshine_extra_volumes)
-    dnsConfig = {
-      options = [
-        {
-          name  = "ndots"
-          value = "1"
-        },
-      ]
-    }
   }
 }
