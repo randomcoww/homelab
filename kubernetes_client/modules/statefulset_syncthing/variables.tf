@@ -26,6 +26,11 @@ variable "replicas" {
   default = 1
 }
 
+variable "labels" {
+  type    = any
+  default = {}
+}
+
 variable "annotations" {
   type    = any
   default = {}

@@ -88,6 +88,9 @@ module "service" {
   annotations = {
     "external-dns.alpha.kubernetes.io/hostname" = var.service_hostname
   }
+  labels = {
+    syncthing-app = var.name
+  }
   spec = {
     type = "LoadBalancer"
     externalIPs = [

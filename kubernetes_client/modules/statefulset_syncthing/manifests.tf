@@ -3,6 +3,7 @@ locals {
     syncthing = 22000
   }
   sync_name           = "${var.name}-syncthing"
+  sync_app            = "${var.app}-syncthing"
   syncthing_home_path = "/var/lib/syncthing"
 
   syncthing_conainer = {
@@ -100,7 +101,7 @@ module "syncthing-config" {
 module "secret" {
   source  = "../secret"
   name    = local.sync_name
-  app     = var.name
+  app     = var.app
   release = var.release
   data = merge({
     "config.xml" = module.syncthing-config.config
@@ -116,7 +117,7 @@ module "secret" {
 module "service" {
   source  = "../service"
   name    = local.sync_name
-  app     = var.name
+  app     = var.app
   release = var.release
   spec = {
     type      = "ClusterIP"
@@ -135,11 +136,14 @@ module "service" {
 module "statefulset-syncthing" {
   source      = "../statefulset"
   name        = local.sync_name
-  app         = var.name
+  app         = var.app
   release     = var.release
   replicas    = var.sync_replicas
   affinity    = var.sync_affinity
   tolerations = var.sync_tolerations
+  labels = merge(var.labels, {
+    syncthing-app = local.sync_app
+  })
   annotations = {
     "checksum/${module.secret.name}" = sha256(module.secret.manifest)
   }
@@ -179,11 +183,14 @@ module "statefulset-syncthing" {
 module "statefulset" {
   source      = "../statefulset"
   name        = var.name
-  app         = var.name
+  app         = var.app
   release     = var.release
   replicas    = var.replicas
   affinity    = var.affinity
   tolerations = var.tolerations
+  labels = merge(var.labels, {
+    syncthing-app = var.app
+  })
   annotations = merge({
     "checksum/${module.secret.name}" = sha256(module.secret.manifest)
   }, var.annotations)
