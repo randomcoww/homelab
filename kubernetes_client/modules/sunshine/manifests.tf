@@ -1,5 +1,6 @@
 locals {
-  home_path = "/var/lib/sunshine"
+  home_path  = "/var/lib/sunshine"
+  mount_path = "${local.home_path}/.config/sunshine"
   # https://docs.lizardbyte.dev/projects/sunshine/en/latest/about/advanced_usage.html#port
   base_port = 47989
   tcp_ports = {
@@ -22,6 +23,8 @@ locals {
     "file_apps"             = "${local.home_path}/apps.json"
     "log_path"              = "/dev/null"
     "port"                  = local.base_port
+    "credentials_file"      = "${local.mount_path}/credentials.json"
+    "file_state"            = "${local.mount_path}/state.json"
     }, {
     for _, arg in var.sunshine_extra_args :
     arg.name => arg.value
@@ -149,7 +152,7 @@ module "syncthing" {
     syncthing = var.images.syncthing
   }
   sync_data_paths = [
-    "${local.home_path}/.config/sunshine",
+    local.mount_path,
   ]
   sync_affinity = var.sync_affinity
   sync_replicas = 1
