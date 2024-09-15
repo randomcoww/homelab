@@ -4,10 +4,9 @@ locals {
     mympd  = 7982
     rclone = 7981
   }
-  mpd_cache_path    = "/var/lib/mpd/mnt"
-  mpd_socket_path   = "/run/mpd/socket"
-  mpd_config_path   = "/etc/mpd.conf"
-  jfs_metadata_path = "/var/lib/jfs/${var.name}.db"
+  mpd_cache_path  = "/var/lib/mpd/mnt"
+  mpd_socket_path = "/run/mpd/socket"
+  mpd_config_path = "/etc/mpd.conf"
 }
 
 module "metadata" {
@@ -16,7 +15,7 @@ module "metadata" {
   namespace   = var.namespace
   release     = var.release
   app_version = split(":", var.images.mpd)[1]
-  manifests = merge(module.jfs.chart.manifests, {
+  manifests = merge(module.s3-mount.chart.manifests, {
     "templates/service.yaml" = module.service.manifest
     "templates/secret.yaml"  = module.secret.manifest
     "templates/ingress.yaml" = module.ingress.manifest
@@ -105,20 +104,18 @@ module "ingress" {
   ]
 }
 
-module "jfs" {
-  source = "../statefulset_jfs"
-  ## jfs settings
+module "s3-mount" {
+  source = "../statefulset_s3"
+  ## s3 config
+  s3_mount_access_key_id     = var.s3_mount_access_key_id
+  s3_mount_secret_access_key = var.s3_mount_secret_access_key
+  s3_mount_endpoint          = var.s3_mount_endpoint
+  s3_mount_bucket            = var.s3_mount_bucket
+  s3_mount_path              = local.mpd_cache_path
+  s3_mount_extra_args        = var.s3_mount_extra_args
   images = {
-    litestream = var.images.litestream
-    jfs        = var.images.jfs
+    mountpoint = var.images.mountpoint
   }
-  jfs_mount_path                     = local.mpd_cache_path
-  jfs_minio_bucket_endpoint          = var.jfs_minio_bucket_endpoint
-  jfs_minio_access_key_id            = var.jfs_minio_access_key_id
-  jfs_minio_secret_access_key        = var.jfs_minio_secret_access_key
-  litestream_minio_bucket_endpoint   = var.litestream_minio_bucket_endpoint
-  litestream_minio_access_key_id     = var.litestream_minio_access_key_id
-  litestream_minio_secret_access_key = var.litestream_minio_secret_access_key
   ##
   name     = var.name
   app      = var.name
