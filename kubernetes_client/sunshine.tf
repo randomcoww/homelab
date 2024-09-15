@@ -3,9 +3,8 @@ module "sunshine" {
   name    = "sunshine"
   release = "0.1.1"
   images = {
-    sunshine   = local.container_images.sunshine
-    jfs        = local.container_images.jfs
-    litestream = local.container_images.litestream
+    sunshine  = local.container_images.sunshine
+    syncthing = local.container_images.syncthing
   }
   sunshine_extra_envs = [
     {
@@ -71,16 +70,28 @@ module "sunshine" {
       }
     }
   }
+  sync_affinity = {
+    nodeAffinity = {
+      requiredDuringSchedulingIgnoredDuringExecution = {
+        nodeSelectorTerms = [
+          {
+            matchExpressions = [
+              {
+                key      = "kubernetes.io/hostname"
+                operator = "NotIn"
+                values = [
+                  "de-1.local",
+                ]
+              },
+            ]
+          },
+        ]
+      }
+    }
+  }
   service_hostname          = local.kubernetes_ingress_endpoints.sunshine
   service_ip                = local.services.sunshine.ip
   admin_hostname            = local.kubernetes_ingress_endpoints.sunshine_admin
   ingress_class_name        = local.ingress_classes.ingress_nginx
   nginx_ingress_annotations = local.nginx_ingress_auth_annotations
-
-  jfs_minio_access_key_id            = data.terraform_remote_state.sr.outputs.minio.access_key_id
-  jfs_minio_secret_access_key        = data.terraform_remote_state.sr.outputs.minio.secret_access_key
-  jfs_minio_bucket_endpoint          = "http://${local.kubernetes_services.minio.endpoint}:${local.service_ports.minio}/${local.minio_buckets.jfs.name}"
-  litestream_minio_access_key_id     = data.terraform_remote_state.sr.outputs.minio.access_key_id
-  litestream_minio_secret_access_key = data.terraform_remote_state.sr.outputs.minio.secret_access_key
-  litestream_minio_bucket_endpoint   = "http://${local.kubernetes_services.minio.endpoint}:${local.service_ports.minio}/${local.minio_buckets.litestream.name}"
 }

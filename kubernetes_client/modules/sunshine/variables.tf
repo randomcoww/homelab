@@ -13,10 +13,13 @@ variable "release" {
 
 variable "images" {
   type = object({
-    sunshine   = string
-    jfs        = string
-    litestream = string
+    sunshine  = string
+    syncthing = string
   })
+}
+variable "sync_replicas" {
+  type    = number
+  default = 1
 }
 
 variable "sunshine_extra_args" {
@@ -58,6 +61,11 @@ variable "affinity" {
   default = {}
 }
 
+variable "sync_affinity" {
+  type    = any
+  default = {}
+}
+
 variable "service_hostname" {
   type = string
 }
@@ -86,28 +94,4 @@ variable "sunshine_extra_volume_mounts" {
 variable "sunshine_extra_volumes" {
   type    = any
   default = []
-}
-
-variable "jfs_minio_bucket_endpoint" {
-  type = string
-}
-
-variable "jfs_minio_access_key_id" {
-  type = string
-}
-
-variable "jfs_minio_secret_access_key" {
-  type = string
-}
-
-variable "litestream_minio_bucket_endpoint" {
-  type = string
-}
-
-variable "litestream_minio_access_key_id" {
-  type = string
-}
-
-variable "litestream_minio_secret_access_key" {
-  type = string
 }

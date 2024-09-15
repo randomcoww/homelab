@@ -1,8 +1,5 @@
-
-
 locals {
-  home_path  = "/var/lib/sunshine"
-  mount_path = "${local.home_path}/.config/sunshine"
+  home_path = "/var/lib/sunshine"
   # https://docs.lizardbyte.dev/projects/sunshine/en/latest/about/advanced_usage.html#port
   base_port = 47989
   tcp_ports = {
@@ -49,7 +46,7 @@ module "metadata" {
   namespace   = var.namespace
   release     = var.release
   app_version = split(":", var.images.sunshine)[1]
-  manifests = merge(module.jfs.chart.manifests, {
+  manifests = merge(module.syncthing.chart.manifests, {
     "templates/secret.yaml"  = module.secret.manifest
     "templates/service.yaml" = module.service.manifest
     "templates/ingress.yaml" = module.ingress.manifest
@@ -142,24 +139,22 @@ module "ingress" {
   ]
 }
 
-module "jfs" {
-  source = "../statefulset_jfs"
-  ## jfs settings
+module "syncthing" {
+  source = "../statefulset_syncthing"
+  ## syncthing config
   images = {
-    litestream = var.images.litestream
-    jfs        = var.images.jfs
+    syncthing = var.images.syncthing
   }
-  jfs_mount_path                     = local.mount_path
-  jfs_minio_bucket_endpoint          = var.jfs_minio_bucket_endpoint
-  jfs_minio_access_key_id            = var.jfs_minio_access_key_id
-  jfs_minio_secret_access_key        = var.jfs_minio_secret_access_key
-  litestream_minio_bucket_endpoint   = var.litestream_minio_bucket_endpoint
-  litestream_minio_access_key_id     = var.litestream_minio_access_key_id
-  litestream_minio_secret_access_key = var.litestream_minio_secret_access_key
+  sync_data_paths = [
+    "${local.home_path}/.config/sunshine",
+  ]
+  sync_affinity = var.sync_affinity
+  sync_replicas = 1
   ##
   name     = var.name
   app      = var.name
   release  = var.release
+  replicas = 1
   affinity = var.affinity
   annotations = {
     "checksum/secret" = sha256(module.secret.manifest)
@@ -175,7 +170,6 @@ module "jfs" {
           <<-EOF
           set -e
 
-          mountpoint ${local.mount_path}
           sunshine %{for k, v in local.args} ${k}=${tostring(v)}%{endfor} --creds $USERNAME $PASSWORD
           exec sunshine%{for k, v in local.args} ${k}=${tostring(v)}%{endfor}
           EOF

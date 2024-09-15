@@ -1,14 +1,7 @@
 locals {
-  name                  = split(".", var.cluster_service_endpoint)[0]
-  namespace             = split(".", var.cluster_service_endpoint)[1]
-  peer_name             = "${local.name}-peer"
-  peer_service_endpoint = "${local.peer_name}.${join(".", slice(split(".", var.cluster_service_endpoint), 1, length(split(".", var.cluster_service_endpoint))))}"
-
-  syncthing_home_path = "/var/lib/syncthing"
-  shared_data_path    = "/var/tmp/matchbox"
-  ports = merge(var.ports, {
-    syncthing_peer = 22000
-  })
+  name      = split(".", var.cluster_service_endpoint)[0]
+  namespace = split(".", var.cluster_service_endpoint)[1]
+  data_path = "/var/lib/matchbox"
 }
 
 module "metadata" {
@@ -17,33 +10,15 @@ module "metadata" {
   namespace   = local.namespace
   release     = var.release
   app_version = split(":", var.images.matchbox)[1]
-  manifests = {
-    "templates/service.yaml"          = module.service.manifest
-    "templates/service-peer.yaml"     = module.service-peer.manifest
-    "templates/secret-matchbox.yaml"  = module.secret-matchbox.manifest
-    "templates/secret-syncthing.yaml" = module.secret-syncthing.manifest
-    "templates/statefulset.yaml"      = module.statefulset.manifest
-  }
+  manifests = merge(module.syncthing.chart.manifests, {
+    "templates/service.yaml" = module.service.manifest
+    "templates/secret.yaml"  = module.secret.manifest
+  })
 }
 
-module "syncthing-config" {
-  source = "../syncthing_config"
-  hostnames = [
-    for i in range(var.replicas) :
-    "${local.name}-${i}.${local.peer_service_endpoint}"
-  ]
-  syncthing_home_path = local.syncthing_home_path
-  sync_data_paths = [
-    local.shared_data_path,
-  ]
-  ports = {
-    syncthing_peer = local.ports.syncthing_peer
-  }
-}
-
-module "secret-matchbox" {
+module "secret" {
   source  = "../secret"
-  name    = "${local.name}-matchbox"
+  name    = local.name
   app     = local.name
   release = var.release
   data = {
@@ -51,22 +26,6 @@ module "secret-matchbox" {
     "server.crt" = chomp(tls_locally_signed_cert.matchbox.cert_pem)
     "server.key" = chomp(tls_private_key.matchbox.private_key_pem)
   }
-}
-
-module "secret-syncthing" {
-  source  = "../secret"
-  name    = "${local.name}-syncthing"
-  app     = local.name
-  release = var.release
-  data = merge({
-    "config.xml" = module.syncthing-config.config
-    }, {
-    for peer in module.syncthing-config.peers :
-    "cert-${split(".", peer.hostname)[0]}" => peer.cert
-    }, {
-    for peer in module.syncthing-config.peers :
-    "key-${split(".", peer.hostname)[0]}" => peer.key
-  })
 }
 
 module "service" {
@@ -82,154 +41,74 @@ module "service" {
     ports = [
       {
         name       = "matchbox"
-        port       = local.ports.matchbox
+        port       = var.ports.matchbox
         protocol   = "TCP"
-        targetPort = local.ports.matchbox
+        targetPort = var.ports.matchbox
       },
       {
         name       = "matchbox-api"
-        port       = local.ports.matchbox_api
+        port       = var.ports.matchbox_api
         protocol   = "TCP"
-        targetPort = local.ports.matchbox_api
+        targetPort = var.ports.matchbox_api
       },
     ]
   }
 }
 
-module "service-peer" {
-  source  = "../service"
-  name    = local.peer_name
-  app     = local.name
-  release = var.release
-  spec = {
-    type                     = "ClusterIP"
-    clusterIP                = "None"
-    publishNotReadyAddresses = true
-    ports = [
-      {
-        name       = "syncthing-peer"
-        port       = local.ports.syncthing_peer
-        protocol   = "TCP"
-        targetPort = local.ports.syncthing_peer
-      },
-    ]
+module "syncthing" {
+  source = "../statefulset_syncthing"
+  ## syncthing config
+  images = {
+    syncthing = var.images.syncthing
   }
-}
-
-module "statefulset" {
-  source   = "../statefulset"
+  sync_data_paths = [
+    local.data_path,
+  ]
+  ##
   name     = local.name
   app      = local.name
   release  = var.release
   affinity = var.affinity
   replicas = var.replicas
-  spec = {
-    minReadySeconds = 30
-    serviceName     = local.peer_name
-  }
   annotations = {
-    "checksum/secret-syncthing" = sha256(module.secret-syncthing.manifest)
-    "checksum/secret-matchbox"  = sha256(module.secret-matchbox.manifest)
+    "checksum/secret" = sha256(module.secret.manifest)
   }
   template_spec = {
-    initContainers = [
-      {
-        name          = "${local.name}-syncthing"
-        image         = var.images.syncthing
-        restartPolicy = "Always"
-        command = [
-          "sh",
-          "-c",
-          <<-EOF
-          set -e
-          mkdir -p ${local.syncthing_home_path}
-          cp \
-            /tmp/config.xml \
-            /tmp/cert.pem \
-            /tmp/key.pem \
-            ${local.syncthing_home_path}
-
-          exec syncthing \
-            --home ${local.syncthing_home_path}
-          EOF
-        ]
-        env = [
-          {
-            name = "POD_NAME"
-            valueFrom = {
-              fieldRef = {
-                fieldPath = "metadata.name"
-              }
-            }
-          },
-        ]
-        volumeMounts = [
-          {
-            name      = "syncthing-secret"
-            mountPath = "/tmp/config.xml"
-            subPath   = "config.xml"
-          },
-          {
-            name        = "syncthing-secret"
-            mountPath   = "/tmp/cert.pem"
-            subPathExpr = "cert-$(POD_NAME)"
-          },
-          {
-            name        = "syncthing-secret"
-            mountPath   = "/tmp/key.pem"
-            subPathExpr = "key-$(POD_NAME)"
-          },
-          {
-            name      = "shared-data"
-            mountPath = local.shared_data_path
-          },
-        ]
-        ports = [
-          {
-            containerPort = local.ports.syncthing_peer
-          },
-        ]
-      },
-    ]
     containers = [
       {
         name  = local.name
         image = var.images.matchbox
         args = [
-          "-address=0.0.0.0:${local.ports.matchbox}",
-          "-rpc-address=0.0.0.0:${local.ports.matchbox_api}",
-          "-assets-path=${local.shared_data_path}",
-          "-data-path=${local.shared_data_path}",
+          "-address=0.0.0.0:${var.ports.matchbox}",
+          "-rpc-address=0.0.0.0:${var.ports.matchbox_api}",
+          "-assets-path=${local.data_path}",
+          "-data-path=${local.data_path}",
         ]
         volumeMounts = [
           {
             name      = "matchbox-secret"
             mountPath = "/etc/matchbox"
           },
-          {
-            name      = "shared-data"
-            mountPath = local.shared_data_path
-          },
         ]
         ports = [
           {
-            containerPort = local.ports.matchbox
+            containerPort = var.ports.matchbox
           },
           {
-            containerPort = local.ports.matchbox_api
+            containerPort = var.ports.matchbox_api
           },
         ]
         readinessProbe = {
           httpGet = {
             scheme = "HTTP"
-            port   = local.ports.matchbox
+            port   = var.ports.matchbox
             path   = "/"
           }
         }
         livenessProbe = {
           httpGet = {
             scheme = "HTTP"
-            port   = local.ports.matchbox
+            port   = var.ports.matchbox
             path   = "/"
           }
         }
@@ -237,21 +116,9 @@ module "statefulset" {
     ]
     volumes = [
       {
-        name = "shared-data"
-        emptyDir = {
-          medium = "Memory"
-        }
-      },
-      {
         name = "matchbox-secret"
         secret = {
-          secretName = module.secret-matchbox.name
-        }
-      },
-      {
-        name = "syncthing-secret"
-        secret = {
-          secretName = module.secret-syncthing.name
+          secretName = module.secret.name
         }
       },
     ]
