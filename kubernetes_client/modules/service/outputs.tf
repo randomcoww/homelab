@@ -11,9 +11,9 @@ output "manifest" {
       annotations = var.annotations
     }
     spec = merge({
-      selector = {
+      selector = merge({
         app = var.app
-      }
+      }, var.labels)
     }, var.spec)
   })
 }

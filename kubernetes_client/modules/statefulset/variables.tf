@@ -10,6 +10,11 @@ variable "release" {
   type = string
 }
 
+variable "labels" {
+  type    = any
+  default = {}
+}
+
 variable "replicas" {
   type    = number
   default = 1

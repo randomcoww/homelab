@@ -10,6 +10,11 @@ variable "release" {
   type = string
 }
 
+variable "labels" {
+  type    = any
+  default = {}
+}
+
 variable "annotations" {
   type    = any
   default = {}

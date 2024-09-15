@@ -20,6 +20,11 @@ variable "strategy" {
   default = {}
 }
 
+variable "labels" {
+  type    = any
+  default = {}
+}
+
 variable "annotations" {
   type    = any
   default = {}

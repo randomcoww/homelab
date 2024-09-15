@@ -16,15 +16,15 @@ output "manifest" {
         type = "RollingUpdate"
       }
       selector = {
-        matchLabels = {
+        matchLabels = merge({
           app = var.app
-        }
+        }, var.labels)
       }
       template = {
         metadata = {
-          labels = {
+          labels = merge({
             app = var.app
-          }
+          }, var.labels)
           annotations = var.annotations
         }
         spec = merge({
