@@ -42,10 +42,11 @@ module "metadata" {
   namespace   = var.namespace
   release     = var.release
   app_version = split(":", var.images.transmission)[1]
-  manifests = merge(module.jfs.chart.manifests, {
-    "templates/service.yaml" = module.service.manifest
-    "templates/ingress.yaml" = module.ingress.manifest
-    "templates/secret.yaml"  = module.secret.manifest
+  manifests = {
+    "templates/service.yaml"     = module.service.manifest
+    "templates/ingress.yaml"     = module.ingress.manifest
+    "templates/secret.yaml"      = module.secret.manifest
+    "templates/statefulset.yaml" = module.statefulset.manifest
     "templates/post-job.yaml" = yamlencode({
       apiVersion = "batch/v1"
       kind       = "Job"
@@ -103,7 +104,7 @@ module "metadata" {
         }
       }
     })
-  })
+  }
 }
 
 module "secret" {
@@ -156,19 +157,8 @@ module "ingress" {
   ]
 }
 
-module "jfs" {
-  source = "../statefulset_jfs"
-  ## jfs settings
-  jfs_image                          = var.images.jfs
-  jfs_mount_path                     = local.mount_path
-  jfs_minio_bucket_endpoint          = var.jfs_minio_bucket_endpoint
-  jfs_minio_access_key_id            = var.jfs_minio_access_key_id
-  jfs_minio_secret_access_key        = var.jfs_minio_secret_access_key
-  litestream_image                   = var.images.litestream
-  litestream_minio_bucket_endpoint   = var.litestream_minio_bucket_endpoint
-  litestream_minio_access_key_id     = var.litestream_minio_access_key_id
-  litestream_minio_secret_access_key = var.litestream_minio_secret_access_key
-  ##
+module "statefulset" {
+  source   = "../statefulset"
   name     = var.name
   app      = var.name
   release  = var.release
@@ -187,7 +177,6 @@ module "jfs" {
           <<-EOF
           set -e
 
-          mountpoint ${local.mount_path}
           mkdir -p \
             ${local.mount_path}/resume \
             ${local.mount_path}/torrents \
