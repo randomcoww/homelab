@@ -94,7 +94,6 @@ locals {
     matchbox           = "quay.io/poseidon/matchbox:v0.11.0-amd64"
     tftpd              = "ghcr.io/randomcoww/tftpd-ipxe:20240822.3"
     hostapd            = "ghcr.io/randomcoww/hostapd:2.10-2"
-    syncthing          = "docker.io/syncthing/syncthing:1.27"
     flannel            = "docker.io/flannel/flannel:v0.25.2"
     flannel_cni_plugin = "docker.io/flannel/flannel-cni-plugin:v1.4.1-flannel1"
     kapprover          = "ghcr.io/randomcoww/kapprover:20240126"
