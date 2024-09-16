@@ -6,7 +6,8 @@ module "mpd" {
     mpd        = local.container_images.mpd
     mympd      = local.container_images.mympd
     rclone     = local.container_images.rclone
-    mountpoint = local.container_images.mountpoint
+    jfs        = local.container_images.jfs
+    litestream = local.container_images.litestream
   }
   extra_configs = {
     metadata_to_use = "AlbumArtist,Artist,Album,Title,Track,Disc,Genre,Name,Date"
@@ -20,8 +21,12 @@ module "mpd" {
   data_minio_bucket            = local.minio_buckets.music.name
   data_minio_endpoint          = "${local.kubernetes_services.minio.fqdn}:${local.service_ports.minio}"
 
-  s3_mount_access_key_id     = data.terraform_remote_state.sr.outputs.minio.access_key_id
-  s3_mount_secret_access_key = data.terraform_remote_state.sr.outputs.minio.secret_access_key
-  s3_mount_endpoint          = "http://${local.services.minio.ip}:${local.service_ports.minio}"
-  s3_mount_bucket            = local.minio_buckets.jfs.name
+  jfs_minio_endpoint                 = "http://${local.kubernetes_services.minio.endpoint}:${local.service_ports.minio}"
+  jfs_minio_bucket                   = local.minio_buckets.jfs.name
+  jfs_minio_access_key_id            = data.terraform_remote_state.sr.outputs.minio.access_key_id
+  jfs_minio_secret_access_key        = data.terraform_remote_state.sr.outputs.minio.secret_access_key
+  litestream_minio_endpoint          = "http://${local.kubernetes_services.minio.endpoint}:${local.service_ports.minio}"
+  litestream_minio_bucket            = local.minio_buckets.litestream.name
+  litestream_minio_access_key_id     = data.terraform_remote_state.sr.outputs.minio.access_key_id
+  litestream_minio_secret_access_key = data.terraform_remote_state.sr.outputs.minio.secret_access_key
 }

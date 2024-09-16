@@ -21,7 +21,8 @@ variable "images" {
     mpd        = string
     mympd      = string
     rclone     = string
-    mountpoint = string
+    jfs        = string
+    litestream = string
   })
 }
 
@@ -63,23 +64,44 @@ variable "nginx_ingress_annotations" {
   type = map(string)
 }
 
-variable "s3_mount_access_key_id" {
+variable "jfs_minio_endpoint" {
   type = string
 }
 
-variable "s3_mount_secret_access_key" {
+variable "jfs_minio_bucket" {
   type = string
 }
 
-variable "s3_mount_endpoint" {
+variable "jfs_minio_prefix" {
+  type    = string
+  default = "$(POD_NAME)"
+}
+
+variable "jfs_minio_access_key_id" {
   type = string
 }
 
-variable "s3_mount_bucket" {
+variable "jfs_minio_secret_access_key" {
   type = string
 }
 
-variable "s3_mount_extra_args" {
-  type    = list(string)
-  default = []
+variable "litestream_minio_endpoint" {
+  type = string
+}
+
+variable "litestream_minio_bucket" {
+  type = string
+}
+
+variable "litestream_minio_prefix" {
+  type    = string
+  default = "$POD_NAME"
+}
+
+variable "litestream_minio_access_key_id" {
+  type = string
+}
+
+variable "litestream_minio_secret_access_key" {
+  type = string
 }

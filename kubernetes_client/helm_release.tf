@@ -20,7 +20,7 @@ locals {
     module.alpaca-db,
     # module.alpaca-stream,
     module.code,
-    # module.mpd,
+    module.mpd,
     module.transmission,
     module.webdav-pictures,
     module.webdav-videos,

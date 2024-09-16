@@ -167,7 +167,17 @@ module "litestream" {
           privileged = true
         }
       },
-    ], lookup(var.template_spec, "initContainers", []))
+      ], [
+      for _, container in lookup(var.template_spec, "initContainers", []) :
+      merge(container, {
+        volumeMounts = concat(lookup(container, "volumeMounts", []), [
+          {
+            name      = "jfs-mount"
+            mountPath = dirname(var.jfs_mount_path)
+          },
+        ])
+      })
+    ])
     containers = [
       for _, container in lookup(var.template_spec, "containers", []) :
       merge(container, {
