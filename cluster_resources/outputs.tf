@@ -31,7 +31,7 @@ output "cloudflare_dns_api_token" {
 
 output "cloudflare_tunnels" {
   value = {
-    for tunnel in cloudflare_tunnel.tunnel :
+    for tunnel in cloudflare_zero_trust_tunnel_cloudflared.tunnel :
     tunnel.name => merge(tunnel, {
       account_id = var.cloudflare.account_id
     })

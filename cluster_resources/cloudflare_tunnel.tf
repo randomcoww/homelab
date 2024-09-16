@@ -37,17 +37,17 @@ resource "random_id" "cloudflare_tunnel_secret" {
   byte_length = 35
 }
 
-resource "cloudflare_tunnel" "tunnel" {
+resource "cloudflare_zero_trust_tunnel_cloudflared" "tunnel" {
   for_each   = local.cloudflare_tunnels
   name       = each.key
   account_id = var.cloudflare.account_id
   secret     = random_id.cloudflare_tunnel_secret[each.key].b64_std
 }
 
-resource "cloudflare_tunnel_config" "tunnel" {
+resource "cloudflare_zero_trust_tunnel_cloudflared_config" "tunnel" {
   for_each   = local.cloudflare_tunnels
   account_id = var.cloudflare.account_id
-  tunnel_id  = cloudflare_tunnel.tunnel[each.key].id
+  tunnel_id  = cloudflare_zero_trust_tunnel_cloudflared.tunnel[each.key].id
   config {
     ingress_rule {
       hostname = "*.${each.value.zone}"
@@ -75,7 +75,7 @@ resource "cloudflare_record" "record" {
   for_each = local.cloudflare_tunnels
   zone_id  = data.cloudflare_zone.zone[each.key].id
   name     = "*"
-  value    = "${cloudflare_tunnel.tunnel[each.key].id}.cfargotunnel.com"
+  content  = "${cloudflare_zero_trust_tunnel_cloudflared.tunnel[each.key].id}.cfargotunnel.com"
   type     = "CNAME"
   proxied  = true
 }
