@@ -371,19 +371,19 @@ module "jfs" {
 
           mountpoint ${local.mount_path}
           mkdir -p \
-            ${local.mount_path}/data \
             ${local.mount_path}/metadata \
             ${local.mount_path}/store \
+            ${local.mount_path}/access \
             ${local.clickhouse_config.path}
           ln -sf \
-            ${local.mount_path}/data \
             ${local.mount_path}/metadata \
             ${local.mount_path}/store \
+            ${local.mount_path}/access \
             ${local.clickhouse_config.path}
           chown ${local.user}:${local.group} \
-            ${local.mount_path}/data \
             ${local.mount_path}/metadata \
             ${local.mount_path}/store \
+            ${local.mount_path}/access \
             ${local.clickhouse_config.path}
 
           exec clickhouse su ${local.user}:${local.group} \
