@@ -21,11 +21,11 @@ locals {
     # module.alpaca-stream,
     module.code,
     module.mpd,
-    module.transmission,
     module.webdav-pictures,
     module.webdav-videos,
     module.sunshine,
     module.wireproxy,
+    # module.transmission,
   ]
 }
 

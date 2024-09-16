@@ -48,6 +48,7 @@ locals {
         sunshine               = 36
         alpaca_stream          = 37
         alpaca_db              = 38
+        wireproxy              = 39
       }
     }
     # worker node IPs
@@ -169,6 +170,7 @@ locals {
       webdav_videos   = "videos"
       sunshine        = "sunshine"
       sunshine_admin  = "sunadmin"
+      wireproxy       = "wireproxy"
     } :
     k => "${domain}.${local.domains.public}"
   }
@@ -254,7 +256,7 @@ locals {
     lldap         = 6360
     redis         = 6379
     cockroachdb   = 26258
-    socks5        = 10080
+    socks5        = 1080
   }
 
   minio_buckets = {

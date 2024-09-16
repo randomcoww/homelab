@@ -35,8 +35,14 @@ module "service" {
   name    = var.name
   app     = var.name
   release = var.release
+  annotations = {
+    "external-dns.alpha.kubernetes.io/hostname" = var.service_hostname
+  }
   spec = {
-    type = "ClusterIP"
+    type = "LoadBalancer"
+    externalIPs = [
+      var.service_ip,
+    ]
     ports = [
       {
         name       = "socks5"
