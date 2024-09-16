@@ -1,9 +1,5 @@
 locals {
-  jfs_endpoint        = join("/", slice(split("/", var.jfs_minio_bucket_endpoint), 0, length(split("/", var.jfs_minio_bucket_endpoint)) - 1))
-  jfs_bucket          = reverse(split("/", var.jfs_minio_bucket_endpoint))[0]
-  litestream_endpoint = join("/", slice(split("/", var.litestream_minio_bucket_endpoint), 0, length(split("/", var.litestream_minio_bucket_endpoint)) - 1))
-  litestream_bucket   = reverse(split("/", var.litestream_minio_bucket_endpoint))[0]
-  db_path             = "/var/lib/jfs/jfs.db"
+  db_path = "/var/lib/jfs/jfs.db"
 }
 
 module "metadata" {
@@ -40,9 +36,9 @@ module "litestream" {
           {
             name                     = "minio"
             type                     = "s3"
-            bucket                   = local.litestream_bucket
-            path                     = "$POD_NAME"
-            endpoint                 = local.litestream_endpoint
+            bucket                   = var.litestream_minio_bucket
+            path                     = var.litestream_minio_prefix
+            endpoint                 = var.litestream_minio_endpoint
             access-key-id            = var.litestream_minio_access_key_id
             secret-access-key        = var.litestream_minio_secret_access_key
             retention                = "2m"
@@ -76,9 +72,9 @@ module "litestream" {
 
           juicefs format \
             'sqlite3://${local.db_path}' \
-            $(POD_NAME) \
+            ${var.jfs_minio_prefix} \
             --storage minio \
-            --bucket ${local.jfs_endpoint}/${local.jfs_bucket} \
+            --bucket ${var.jfs_minio_endpoint}/${var.jfs_minio_bucket} \
             --trash-days 0
 
           juicefs gc \
@@ -134,7 +130,7 @@ module "litestream" {
             'sqlite3://${local.db_path}' \
             ${var.jfs_mount_path} \
             --storage minio \
-            --bucket ${local.jfs_endpoint}/${local.jfs_bucket} \
+            --bucket ${var.jfs_minio_endpoint}/${var.jfs_minio_bucket} \
             --no-syslog \
             --atime-mode noatime \
             --backup-meta 0 \

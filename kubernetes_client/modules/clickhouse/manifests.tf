@@ -337,10 +337,14 @@ module "jfs" {
     jfs        = var.images.jfs
   }
   jfs_mount_path                     = local.mount_path
-  jfs_minio_bucket_endpoint          = var.jfs_minio_bucket_endpoint
+  jfs_minio_endpoint                 = var.jfs_minio_endpoint
+  jfs_minio_bucket                   = var.jfs_minio_bucket
+  jfs_minio_prefix                   = var.jfs_minio_prefix
   jfs_minio_access_key_id            = var.jfs_minio_access_key_id
   jfs_minio_secret_access_key        = var.jfs_minio_secret_access_key
-  litestream_minio_bucket_endpoint   = var.litestream_minio_bucket_endpoint
+  litestream_minio_endpoint          = var.litestream_minio_endpoint
+  litestream_minio_bucket            = var.litestream_minio_bucket
+  litestream_minio_prefix            = var.litestream_minio_prefix
   litestream_minio_access_key_id     = var.litestream_minio_access_key_id
   litestream_minio_secret_access_key = var.litestream_minio_secret_access_key
   ##

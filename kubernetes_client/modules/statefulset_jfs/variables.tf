@@ -56,8 +56,17 @@ variable "jfs_mount_path" {
   type = string
 }
 
-variable "jfs_minio_bucket_endpoint" {
+variable "jfs_minio_endpoint" {
   type = string
+}
+
+variable "jfs_minio_bucket" {
+  type = string
+}
+
+variable "jfs_minio_prefix" {
+  type    = string
+  default = "$(POD_NAME)"
 }
 
 variable "jfs_minio_access_key_id" {
@@ -68,9 +77,19 @@ variable "jfs_minio_secret_access_key" {
   type = string
 }
 
-variable "litestream_minio_bucket_endpoint" {
+variable "litestream_minio_endpoint" {
   type = string
 }
+
+variable "litestream_minio_bucket" {
+  type = string
+}
+
+variable "litestream_minio_prefix" {
+  type    = string
+  default = "$POD_NAME"
+}
+
 
 variable "litestream_minio_access_key_id" {
   type = string

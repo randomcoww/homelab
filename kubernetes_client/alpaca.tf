@@ -63,10 +63,12 @@ module "alpaca-db" {
   service_hostname = local.kubernetes_ingress_endpoints.alpaca_db
   service_ip       = local.services.alpaca_db.ip
 
+  jfs_minio_endpoint                 = "http://${local.kubernetes_services.minio.endpoint}:${local.service_ports.minio}"
+  jfs_minio_bucket                   = local.minio_buckets.jfs.name
   jfs_minio_access_key_id            = data.terraform_remote_state.sr.outputs.minio.access_key_id
   jfs_minio_secret_access_key        = data.terraform_remote_state.sr.outputs.minio.secret_access_key
-  jfs_minio_bucket_endpoint          = "http://${local.kubernetes_services.minio.endpoint}:${local.service_ports.minio}/${local.minio_buckets.jfs.name}"
+  litestream_minio_endpoint          = "http://${local.kubernetes_services.minio.endpoint}:${local.service_ports.minio}"
+  litestream_minio_bucket            = local.minio_buckets.litestream.name
   litestream_minio_access_key_id     = data.terraform_remote_state.sr.outputs.minio.access_key_id
   litestream_minio_secret_access_key = data.terraform_remote_state.sr.outputs.minio.secret_access_key
-  litestream_minio_bucket_endpoint   = "http://${local.kubernetes_services.minio.endpoint}:${local.service_ports.minio}/${local.minio_buckets.litestream.name}"
 }
