@@ -39,7 +39,7 @@ module "service" {
     type = "ClusterIP"
     ports = [
       {
-        name       = var.name
+        name       = "socks5"
         port       = var.ports.socks5
         protocol   = "TCP"
         targetPort = var.ports.socks5

@@ -32,6 +32,10 @@ module "transmission" {
       name  = "MC_HOST_m"
       value = "http://${data.terraform_remote_state.sr.outputs.minio.access_key_id}:${data.terraform_remote_state.sr.outputs.minio.secret_access_key}@${local.kubernetes_services.minio.endpoint}:${local.service_ports.minio}"
     },
+    {
+      name  = "all_proxy"
+      value = "socks5://${local.kubernetes_services.wireproxy.endpoint}:${local.service_ports.socks5}"
+    },
   ]
   torrent_done_script = <<-EOF
   #!/bin/sh
