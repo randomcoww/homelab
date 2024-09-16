@@ -149,6 +149,7 @@ module "s3-mount" {
   s3_mount_secret_access_key = var.s3_mount_secret_access_key
   s3_mount_endpoint          = var.s3_mount_endpoint
   s3_mount_bucket            = var.s3_mount_bucket
+  s3_mount_prefix            = var.name
   s3_mount_path              = local.mount_path
   s3_mount_extra_args        = var.s3_mount_extra_args
   images = {

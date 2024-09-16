@@ -62,6 +62,10 @@ variable "s3_mount_bucket" {
   type = string
 }
 
+variable "s3_mount_prefix" {
+  type = string
+}
+
 variable "s3_mount_path" {
   type = string
 }

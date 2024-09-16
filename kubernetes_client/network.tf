@@ -64,10 +64,10 @@ module "matchbox" {
   source                   = "./modules/matchbox"
   cluster_service_endpoint = local.kubernetes_services.matchbox.fqdn
   release                  = "0.2.16"
-  replicas                 = 3
+  replicas                 = 2
   images = {
-    matchbox  = local.container_images.matchbox
-    syncthing = local.container_images.syncthing
+    matchbox   = local.container_images.matchbox
+    mountpoint = local.container_images.mountpoint
   }
   ports = {
     matchbox     = local.service_ports.matchbox
@@ -75,6 +75,11 @@ module "matchbox" {
   }
   service_ip = local.services.matchbox.ip
   ca         = data.terraform_remote_state.sr.outputs.matchbox.ca
+
+  s3_mount_access_key_id     = data.terraform_remote_state.sr.outputs.minio.access_key_id
+  s3_mount_secret_access_key = data.terraform_remote_state.sr.outputs.minio.secret_access_key
+  s3_mount_endpoint          = "http://${local.services.minio.ip}:${local.service_ports.minio}"
+  s3_mount_bucket            = local.minio_buckets.jfs.name
 }
 
 # Wifi AP

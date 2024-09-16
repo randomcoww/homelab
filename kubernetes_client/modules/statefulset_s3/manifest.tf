@@ -49,7 +49,7 @@ module "statefulset" {
             --auto-unmount \
             --allow-other \
             --no-log \
-            --prefix $(POD_NAME)/ \
+            --prefix ${var.s3_mount_prefix}/ \
             %{~for arg in var.s3_mount_extra_args~}
             ${arg} \
             %{~endfor~}
