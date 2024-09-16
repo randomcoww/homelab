@@ -129,12 +129,6 @@ module "statefulset" {
           secretName = module.secret.name
         }
       },
-      {
-        name = "litestream-data"
-        emptyDir = {
-          medium = "Memory"
-        }
-      },
     ])
   })
 }

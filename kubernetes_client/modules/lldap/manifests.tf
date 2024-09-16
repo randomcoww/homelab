@@ -221,6 +221,12 @@ module "litestream" {
           secretName = module.secret.name
         }
       },
+      {
+        name = "litestream-data"
+        emptyDir = {
+          medium = "Memory"
+        }
+      },
     ]
   }
 }

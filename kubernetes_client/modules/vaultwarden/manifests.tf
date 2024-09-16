@@ -155,5 +155,13 @@ module "litestream" {
         }
       },
     ]
+    volumes = [
+      {
+        name = "litestream-data"
+        emptyDir = {
+          medium = "Memory"
+        }
+      },
+    ]
   }
 }

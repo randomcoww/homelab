@@ -166,6 +166,26 @@ module "statefulset" {
   annotations = {
     "checksum/secret" = sha256(module.secret.manifest)
   }
+  spec = {
+    volumeClaimTemplates = [
+      {
+        metadata = {
+          name = "transmission-resume"
+        }
+        spec = {
+          accessModes = [
+            "ReadWriteOnce",
+          ]
+          resources = {
+            requests = {
+              storage = "40Gi"
+            }
+          }
+          storageClassName = "local-path"
+        }
+      },
+    ]
+  }
   template_spec = {
     containers = [
       {
@@ -223,6 +243,10 @@ module "statefulset" {
             name      = "secret"
             mountPath = local.transmission_settings.script-torrent-done-filename
             subPath   = basename(local.transmission_settings.script-torrent-done-filename)
+          },
+          {
+            name      = "transmission-resume"
+            mountPath = local.mount_path
           },
         ]
         ports = [

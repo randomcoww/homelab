@@ -58,7 +58,26 @@ module "litestream" {
   replicas    = var.replicas
   affinity    = var.affinity
   tolerations = var.tolerations
-  spec        = var.spec
+  spec = merge(var.spec, {
+    volumeClaimTemplates = concat(lookup(var.spec, "volumeClaimTemplates", []), [
+      {
+        metadata = {
+          name = "litestream-data"
+        }
+        spec = {
+          accessModes = [
+            "ReadWriteOnce",
+          ]
+          resources = {
+            requests = {
+              storage = "1Gi"
+            }
+          }
+          storageClassName = "local-path"
+        }
+      },
+    ])
+  })
   template_spec = merge(var.template_spec, {
     initContainers = concat([
       {
