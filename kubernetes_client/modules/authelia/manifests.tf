@@ -32,8 +32,8 @@ module "secret-litestream" {
               secret-access-key        = var.litestream_minio_secret_access_key
               retention                = "2m"
               retention-check-interval = "2m"
-              sync-interval            = "500ms"
-              snapshot-interval        = "1h"
+              sync-interval            = "100ms"
+              snapshot-interval        = "20m"
             },
             {
               name              = "s3"
