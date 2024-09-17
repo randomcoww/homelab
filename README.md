@@ -322,7 +322,10 @@ sudo apt install -y \
   podman \
   flatpak
 
-echo $(whoami):100000:65536 | sudo tee -a /etc/subuid /etc/subgid
+sudo usermod \
+  --add-subuids 100000-165535 \
+  --add-subgids 100000-165535 \
+  $(whoami)
 
 sudo tee /etc/containers/containers.conf > /dev/null <<EOF
 [containers]
