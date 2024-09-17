@@ -102,7 +102,7 @@ locals {
     kube_proxy         = "ghcr.io/randomcoww/kubernetes:kube-proxy-${local.kubernetes.version}"
     vaultwarden        = "docker.io/vaultwarden/server:1.32.0-alpine"
     litestream         = "docker.io/litestream/litestream:0.3"
-    tailscale          = "ghcr.io/randomcoww/tailscale:1.70.0"
+    tailscale          = "ghcr.io/randomcoww/tailscale:1.74.0"
     fuse_device_plugin = "docker.io/soolaugust/fuse-device-plugin:v1.0"
     code_server        = "ghcr.io/randomcoww/code-server:20240915.2"
     alpaca_stream      = "ghcr.io/randomcoww/alpaca-client:stream-server-20240801.6"
@@ -121,7 +121,7 @@ locals {
 
   pxeboot_images = {
     coreos     = "fedora-coreos-40.20240826.0"
-    silverblue = "fedora-silverblue-40.20240908.0"
+    silverblue = "fedora-silverblue-40.20240917.0"
   }
 
   kubernetes = {
