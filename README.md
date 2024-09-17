@@ -35,10 +35,6 @@ GMAIL_PASSWORD=
 TS_OAUTH_CLIENT_ID=
 TS_OAUTH_CLIENT_SECRET=
 
-WG_1_PRIVATE_KEY=
-WG_1_ADDRESS=
-WG_1_PUBLIC_KEY=
-WG_1_ENDPOINT=
 WG_2_PRIVATE_KEY=
 WG_2_ADDRESS=
 WG_2_PUBLIC_KEY=
@@ -109,13 +105,6 @@ smtp = {
   port     = 587
   username = "$GMAIL_USER"
   password = "$GMAIL_PASSWORD"
-}
-
-wireguard_client = {
-  private_key = "$WG_1_PRIVATE_KEY"
-  public_key  = "$WG_1_PUBLIC_KEY"
-  address     = "$WG_1_ADDRESS"
-  endpoint    = "$WG_1_ENDPOINT"
 }
 
 alpaca = {
