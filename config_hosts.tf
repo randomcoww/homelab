@@ -418,37 +418,23 @@ locals {
         }
       }
     }
-
-    # chromebook
-    de-0 = {
-      users = [
-        "client",
-      ]
-      mounts = [
-        {
-          device     = "/dev/H3F03NEV207BX1ZE/unencrypted"
-          mount_path = local.mounts.home_path
-          format     = "ext4"
-        },
-      ]
-    }
   }
 
   base_members = {
-    base                = ["gw-0", "gw-1", "q-0", "de-0", "de-1", "r-0"]
+    base                = ["gw-0", "gw-1", "q-0", "de-1", "r-0"]
     systemd-networkd    = ["gw-0", "gw-1", "q-0", "de-1", "r-0"]
-    network-manager     = ["de-0"]
+    network-manager     = []
     upstream-dns        = ["gw-0", "gw-1", "q-0", "r-0"]
     gateway             = ["gw-0", "gw-1", "q-0"]
     vrrp                = ["gw-0", "gw-1"]
-    disks               = ["gw-0", "gw-1", "q-0", "de-0", "de-1", "r-0"]
+    disks               = ["gw-0", "gw-1", "q-0", "de-1", "r-0"]
     server              = ["gw-0", "gw-1", "q-0", "de-1", "r-0"]
-    client              = ["de-0", "de-1"]
+    client              = ["de-1"]
     etcd                = ["gw-0", "gw-1", "q-0"]
     kubernetes-master   = ["gw-0", "gw-1"]
     kubernetes-worker   = ["gw-0", "gw-1", "q-0", "de-1"]
     nvidia-container    = ["de-1"]
-    desktop-environment = ["de-0", "de-1"]
+    desktop-environment = ["de-1"]
     remote              = ["r-0"]
     wireguard-client    = ["de-1"]
   }
