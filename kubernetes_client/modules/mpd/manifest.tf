@@ -54,10 +54,10 @@ module "secret" {
       format "48000:24:2"
       always_on "yes"
       max_clients "0"
-      encoder "lame"
-      quality "9"
-      # encoder "flac"
-      # compression "3"
+      # encoder "lame"
+      # quality "9"
+      encoder "flac"
+      compression "3"
     }
     EOF
     RCLONE_S3_ACCESS_KEY_ID         = var.data_minio_access_key_id

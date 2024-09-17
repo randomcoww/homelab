@@ -110,14 +110,13 @@ locals {
     lldap              = "docker.io/lldap/lldap:2024-08-08-alpine"
     keydb              = "docker.io/eqalpha/keydb:alpine_x86_64_v6.3.4"
     clickhouse         = "docker.io/clickhouse/clickhouse-server:24.8-alpine"
-    jfs                = "ghcr.io/randomcoww/juicefs:1.2.0"
+    jfs                = "ghcr.io/randomcoww/juicefs:1.2.1"
     qrcode_generator   = "ghcr.io/randomcoww/qrcode-generator:20240620.4"
     mpd                = "ghcr.io/randomcoww/mpd:0.23.15"
-    mympd              = "ghcr.io/jcorporation/mympd/mympd:17.0.3"
-    rclone             = "docker.io/rclone/rclone:1.67"
+    mympd              = "ghcr.io/jcorporation/mympd/mympd:17.0.4"
+    rclone             = "docker.io/rclone/rclone:1.68"
     cockroachdb        = "docker.io/cockroachdb/cockroach:v24.1.1"
     sunshine           = "ghcr.io/randomcoww/sunshine:2024.914.221909"
-    wireproxy          = "ghcr.io/randomcoww/wireproxy:1.0.9.1"
     mountpoint         = "ghcr.io/randomcoww/mountpoint:20240915.5"
   }
 
