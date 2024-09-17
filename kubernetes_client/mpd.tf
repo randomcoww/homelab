@@ -22,7 +22,7 @@ module "mpd" {
   data_minio_endpoint          = "${local.kubernetes_services.minio.fqdn}:${local.service_ports.minio}"
 
   jfs_minio_endpoint                 = "http://${local.kubernetes_services.minio.endpoint}:${local.service_ports.minio}"
-  jfs_minio_bucket                   = local.minio_buckets.jfs.name
+  jfs_minio_bucket                   = local.minio_buckets.fs.name
   jfs_minio_access_key_id            = data.terraform_remote_state.sr.outputs.minio.access_key_id
   jfs_minio_secret_access_key        = data.terraform_remote_state.sr.outputs.minio.secret_access_key
   litestream_minio_endpoint          = "http://${local.kubernetes_services.minio.endpoint}:${local.service_ports.minio}"

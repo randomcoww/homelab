@@ -79,7 +79,7 @@ module "matchbox" {
   s3_mount_access_key_id     = data.terraform_remote_state.sr.outputs.minio.access_key_id
   s3_mount_secret_access_key = data.terraform_remote_state.sr.outputs.minio.secret_access_key
   s3_mount_endpoint          = "http://${local.services.minio.ip}:${local.service_ports.minio}"
-  s3_mount_bucket            = local.minio_buckets.jfs.name
+  s3_mount_bucket            = local.minio_buckets.fs.name
 }
 
 # Wifi AP
