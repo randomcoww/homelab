@@ -35,10 +35,10 @@ GMAIL_PASSWORD=
 TS_OAUTH_CLIENT_ID=
 TS_OAUTH_CLIENT_SECRET=
 
-WG_2_PRIVATE_KEY=
-WG_2_ADDRESS=
-WG_2_PUBLIC_KEY=
-WG_2_ENDPOINT=
+WG_PRIVATE_KEY=
+WG_ADDRESS=
+WG_PUBLIC_KEY=
+WG_ENDPOINT=
 
 APCA_API_KEY_ID=
 APCA_API_SECRET_KEY=
@@ -75,10 +75,10 @@ users = {
 }
 
 wireguard_client = {
-  private_key = "$WG_2_PRIVATE_KEY"
-  public_key  = "$WG_2_PUBLIC_KEY"
-  address     = "$WG_2_ADDRESS"
-  endpoint    = "$WG_2_ENDPOINT"
+  private_key = "$WG_PRIVATE_KEY"
+  public_key  = "$WG_PUBLIC_KEY"
+  address     = "$WG_ADDRESS"
+  endpoint    = "$WG_ENDPOINT"
 }
 EOF
 ```
