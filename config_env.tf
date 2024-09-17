@@ -101,7 +101,6 @@ locals {
     external_dns       = "registry.k8s.io/external-dns/external-dns:v0.14.2"
     kube_proxy         = "ghcr.io/randomcoww/kubernetes:kube-proxy-${local.kubernetes.version}"
     transmission       = "ghcr.io/randomcoww/transmission:20240618.1"
-    wireguard          = "ghcr.io/randomcoww/wireguard:20240523"
     vaultwarden        = "docker.io/vaultwarden/server:1.32.0-alpine"
     litestream         = "docker.io/litestream/litestream:0.3"
     tailscale          = "ghcr.io/randomcoww/tailscale:1.70.0"
