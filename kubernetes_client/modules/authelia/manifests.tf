@@ -35,12 +35,6 @@ module "secret-litestream" {
               sync-interval            = "100ms"
               snapshot-interval        = "20m"
             },
-            {
-              name              = "s3"
-              url               = "s3://${var.litestream_s3_resource}/${basename(local.sqlite_path)}"
-              access-key-id     = var.litestream_s3_access_key_id
-              secret-access-key = var.litestream_s3_secret_access_key
-            },
           ]
         },
       ]

@@ -56,9 +56,6 @@ module "lldap" {
   ingress_class_name        = local.ingress_classes.ingress_nginx
   nginx_ingress_annotations = local.nginx_ingress_annotations
 
-  litestream_s3_resource             = data.terraform_remote_state.sr.outputs.s3.lldap.resource
-  litestream_s3_access_key_id        = data.terraform_remote_state.sr.outputs.s3.lldap.access_key_id
-  litestream_s3_secret_access_key    = data.terraform_remote_state.sr.outputs.s3.lldap.secret_access_key
   litestream_minio_access_key_id     = data.terraform_remote_state.sr.outputs.minio.access_key_id
   litestream_minio_secret_access_key = data.terraform_remote_state.sr.outputs.minio.secret_access_key
   litestream_minio_bucket            = local.minio_buckets.litestream.name

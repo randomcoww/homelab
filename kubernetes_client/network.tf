@@ -185,9 +185,10 @@ module "qrcode" {
 # Tailscale remote access
 
 module "tailscale" {
-  source  = "./modules/tailscale"
-  name    = "tailscale"
-  release = "0.1.1"
+  source    = "./modules/tailscale"
+  name      = "tailscale"
+  namespace = "tailscale"
+  release   = "0.1.1"
   images = {
     tailscale = local.container_images.tailscale
   }
@@ -217,8 +218,4 @@ module "tailscale" {
       ])
     },
   ]
-  aws_region             = data.terraform_remote_state.sr.outputs.ssm.tailscale.aws_region
-  ssm_access_key_id      = data.terraform_remote_state.sr.outputs.ssm.tailscale.access_key_id
-  ssm_secret_access_key  = data.terraform_remote_state.sr.outputs.ssm.tailscale.secret_access_key
-  ssm_tailscale_resource = data.terraform_remote_state.sr.outputs.ssm.tailscale.resource
 }

@@ -182,9 +182,6 @@ module "authelia" {
   ingress_class_name  = local.ingress_classes.ingress_nginx_external
   ingress_cert_issuer = local.kubernetes.cert_issuer_prod
 
-  litestream_s3_resource             = data.terraform_remote_state.sr.outputs.s3.authelia.resource
-  litestream_s3_access_key_id        = data.terraform_remote_state.sr.outputs.s3.authelia.access_key_id
-  litestream_s3_secret_access_key    = data.terraform_remote_state.sr.outputs.s3.authelia.secret_access_key
   litestream_minio_access_key_id     = data.terraform_remote_state.sr.outputs.minio.access_key_id
   litestream_minio_secret_access_key = data.terraform_remote_state.sr.outputs.minio.secret_access_key
   litestream_minio_bucket            = local.minio_buckets.litestream.name

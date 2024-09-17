@@ -1,3 +1,7 @@
+locals {
+  tailscale_state_path = "/var/lib/tailscale/mnt"
+}
+
 module "metadata" {
   source      = "../metadata"
   name        = var.name
@@ -7,6 +11,51 @@ module "metadata" {
   manifests = {
     "templates/secret.yaml"      = module.secret.manifest
     "templates/statefulset.yaml" = module.statefulset.manifest
+    "templates/role.yaml" = yamlencode({
+      apiVersion = "rbac.authorization.k8s.io/v1"
+      kind       = "Role"
+      metadata = {
+        name = var.name
+      }
+      rules = [
+        {
+          apiGroups = [""]
+          resources = ["secrets"]
+          verbs     = ["create"]
+        },
+        {
+          apiGroups     = [""]
+          resourceNames = [module.secret.name]
+          resources     = ["secrets"]
+          verbs         = ["get", "update", "patch"]
+        },
+      ]
+    })
+    "templates/rolebinding.yaml" = yamlencode({
+      apiVersion = "rbac.authorization.k8s.io/v1"
+      kind       = "RoleBinding"
+      metadata = {
+        name = var.name
+      }
+      roleRef = {
+        apiGroup = "rbac.authorization.k8s.io"
+        kind     = "Role"
+        name     = var.name
+      }
+      subjects = [
+        {
+          kind = "ServiceAccount"
+          name = var.name
+        },
+      ]
+    })
+    "templates/serviceaccount.yaml" = yamlencode({
+      apiVersion = "v1"
+      kind       = "ServiceAccount"
+      metadata = {
+        name = var.name
+      }
+    })
   }
 }
 
@@ -16,9 +65,7 @@ module "secret" {
   app     = var.name
   release = var.release
   data = {
-    TS_AUTHKEY        = var.tailscale_auth_key
-    ACCESS_KEY_ID     = var.ssm_access_key_id
-    SECRET_ACCESS_KEY = var.ssm_secret_access_key
+    TS_AUTHKEY = var.tailscale_auth_key
   }
 }
 
@@ -33,41 +80,23 @@ module "statefulset" {
     "checksum/secret" = sha256(module.secret.manifest)
   }
   template_spec = {
+    serviceAccountName = var.name
     containers = [
       {
         name  = var.name
         image = var.images.tailscale
         securityContext = {
+          # https://github.com/tailscale/tailscale/issues/10814
           privileged = true
         }
         env = concat([
           {
-            name = "POD_NAME"
-            valueFrom = {
-              fieldRef = {
-                fieldPath = "metadata.name"
-              }
-            }
-          },
-          {
-            name  = "TS_STATE_DIR"
-            value = "/var/lib/tailscale"
-          },
-          {
-            name  = "KUBERNETES_SERVICE_HOST"
-            value = ""
-          },
-          {
             name  = "TS_KUBE_SECRET"
-            value = "false"
+            value = module.secret.name
           },
           {
             name  = "TS_USERSPACE"
             value = "false"
-          },
-          {
-            name  = "TS_TAILSCALED_EXTRA_ARGS"
-            value = "--state=arn:aws:ssm:${var.aws_region}::parameter/${var.ssm_tailscale_resource}/$(POD_NAME)"
           },
           {
             name = "TS_AUTH_KEY"
@@ -75,28 +104,6 @@ module "statefulset" {
               secretKeyRef = {
                 name = module.secret.name
                 key  = "TS_AUTHKEY"
-              }
-            }
-          },
-          {
-            name  = "AWS_REGION"
-            value = var.aws_region
-          },
-          {
-            name = "AWS_ACCESS_KEY_ID"
-            valueFrom = {
-              secretKeyRef = {
-                name = module.secret.name
-                key  = "ACCESS_KEY_ID"
-              }
-            }
-          },
-          {
-            name = "AWS_SECRET_ACCESS_KEY"
-            valueFrom = {
-              secretKeyRef = {
-                name = module.secret.name
-                key  = "SECRET_ACCESS_KEY"
               }
             }
           },
