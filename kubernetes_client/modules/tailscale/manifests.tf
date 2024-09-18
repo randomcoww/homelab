@@ -1,5 +1,5 @@
 locals {
-  tailscale_state_path = "/var/lib/tailscale/mnt"
+  state_secret_name = "${var.name}-state"
 }
 
 module "metadata" {
@@ -25,7 +25,7 @@ module "metadata" {
         },
         {
           apiGroups     = [""]
-          resourceNames = [module.secret.name]
+          resourceNames = [local.state_secret_name]
           resources     = ["secrets"]
           verbs         = ["get", "update", "patch"]
         },
@@ -92,7 +92,7 @@ module "statefulset" {
         env = concat([
           {
             name  = "TS_KUBE_SECRET"
-            value = module.secret.name
+            value = local.state_secret_name
           },
           {
             name  = "TS_USERSPACE"
