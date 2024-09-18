@@ -216,10 +216,8 @@ module "litestream" {
         }
       },
       {
-        name = "litestream-data"
-        emptyDir = {
-          medium = "Memory"
-        }
+        name     = "litestream-data"
+        emptyDir = {}
       },
     ]
   }

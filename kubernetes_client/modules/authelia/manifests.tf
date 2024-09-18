@@ -100,10 +100,8 @@ data "helm_template" "authelia" {
         ]
         extraVolumes = [
           {
-            name = "authelia-data"
-            emptyDir = {
-              medium = "Memory"
-            }
+            name     = "authelia-data"
+            emptyDir = {}
           },
           {
             name = "secret-custom"

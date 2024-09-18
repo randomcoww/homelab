@@ -88,7 +88,10 @@ module "s3-mount" {
           <<-EOF
           set -e
 
-          mountpoint ${local.data_path}
+          until mountpoint ${local.data_path}; do
+          sleep 1
+          done
+
           exec /matchbox \
             -address=0.0.0.0:${var.ports.matchbox} \
             -rpc-address=0.0.0.0:${var.ports.matchbox_api} \

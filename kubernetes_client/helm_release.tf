@@ -20,10 +20,10 @@ locals {
     module.alpaca-db,
     # module.alpaca-stream,
     module.code,
-    module.mpd,
     module.webdav-pictures,
     module.webdav-videos,
     module.sunshine,
+    module.audioserve,
   ]
 }
 

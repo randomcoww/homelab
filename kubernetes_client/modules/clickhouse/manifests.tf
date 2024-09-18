@@ -369,7 +369,10 @@ module "jfs" {
           <<-EOF
           set -e
 
-          mountpoint ${local.mount_path}
+          until mountpoint ${local.mount_path}; do
+          sleep 1
+          done
+
           mkdir -p \
             ${local.mount_path}/metadata \
             ${local.mount_path}/store \

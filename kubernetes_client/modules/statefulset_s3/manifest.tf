@@ -41,7 +41,7 @@ module "statefulset" {
           set -e
 
           mkdir -p ${var.s3_mount_path}
-          mount-s3 \
+          exec mount-s3 \
             -f \
             --endpoint-url ${var.s3_endpoint} \
             --allow-delete \
@@ -49,7 +49,9 @@ module "statefulset" {
             --auto-unmount \
             --allow-other \
             --no-log \
+            %{~if length(var.s3_prefix) > 0~}
             --prefix ${var.s3_prefix}/ \
+            %{~endif~}
             %{~for arg in var.s3_mount_extra_args~}
             ${arg} \
             %{~endfor~}
@@ -101,8 +103,9 @@ module "statefulset" {
       merge(container, {
         volumeMounts = concat(lookup(container, "volumeMounts", []), [
           {
-            name      = "s3-mount-shared"
-            mountPath = dirname(var.s3_mount_path)
+            name             = "s3-mount-shared"
+            mountPath        = dirname(var.s3_mount_path)
+            mountPropagation = "HostToContainer"
           },
         ])
       })
@@ -112,18 +115,17 @@ module "statefulset" {
       merge(container, {
         volumeMounts = concat(lookup(container, "volumeMounts", []), [
           {
-            name      = "s3-mount-shared"
-            mountPath = dirname(var.s3_mount_path)
+            name             = "s3-mount-shared"
+            mountPath        = dirname(var.s3_mount_path)
+            mountPropagation = "HostToContainer"
           },
         ])
       })
     ]
     volumes = concat(lookup(var.template_spec, "volumes", []), [
       {
-        name = "s3-mount-shared"
-        emptyDir = {
-          medium = "Memory"
-        }
+        name     = "s3-mount-shared"
+        emptyDir = {}
       },
     ])
   })

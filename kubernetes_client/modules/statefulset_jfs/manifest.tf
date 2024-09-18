@@ -191,8 +191,9 @@ module "litestream" {
       merge(container, {
         volumeMounts = concat(lookup(container, "volumeMounts", []), [
           {
-            name      = "jfs-mount"
-            mountPath = dirname(var.jfs_mount_path)
+            name             = "jfs-mount"
+            mountPath        = dirname(var.jfs_mount_path)
+            mountPropagation = "HostToContainer"
           },
         ])
       })
@@ -202,18 +203,17 @@ module "litestream" {
       merge(container, {
         volumeMounts = concat(lookup(container, "volumeMounts", []), [
           {
-            name      = "jfs-mount"
-            mountPath = dirname(var.jfs_mount_path)
+            name             = "jfs-mount"
+            mountPath        = dirname(var.jfs_mount_path)
+            mountPropagation = "HostToContainer"
           },
         ])
       })
     ]
     volumes = concat(lookup(var.template_spec, "volumes", []), [
       {
-        name = "jfs-mount"
-        emptyDir = {
-          medium = "Memory"
-        }
+        name     = "jfs-mount"
+        emptyDir = {}
       },
     ])
   })
