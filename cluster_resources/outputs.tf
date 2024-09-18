@@ -11,19 +11,6 @@ output "s3" {
   sensitive = true
 }
 
-output "ssm" {
-  value = {
-    for name, res in local.ssm_resources :
-    name => {
-      resource          = res.resource
-      access_key_id     = aws_iam_access_key.ssm[name].id
-      secret_access_key = aws_iam_access_key.ssm[name].secret
-      aws_region        = local.aws_region
-    }
-  }
-  sensitive = true
-}
-
 output "cloudflare_dns_api_token" {
   value     = cloudflare_api_token.dns_edit.value
   sensitive = true
