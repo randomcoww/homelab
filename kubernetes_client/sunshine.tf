@@ -51,6 +51,7 @@ module "sunshine" {
     runAsUser  = local.users.client.uid
     fsGroup    = local.users.client.uid
   }
+  storage_class_name = "local-path"
   affinity = {
     nodeAffinity = {
       requiredDuringSchedulingIgnoredDuringExecution = {
@@ -75,12 +76,4 @@ module "sunshine" {
   admin_hostname            = local.kubernetes_ingress_endpoints.sunshine_admin
   ingress_class_name        = local.ingress_classes.ingress_nginx
   nginx_ingress_annotations = local.nginx_ingress_auth_annotations
-
-  s3_mount_access_key_id     = data.terraform_remote_state.sr.outputs.minio.access_key_id
-  s3_mount_secret_access_key = data.terraform_remote_state.sr.outputs.minio.secret_access_key
-  s3_mount_endpoint          = "http://${local.services.minio.ip}:${local.service_ports.minio}"
-  s3_mount_bucket            = local.minio_buckets.fs.name
-  s3_mount_extra_args = [
-    "--uid ${local.users.client.uid}",
-  ]
 }

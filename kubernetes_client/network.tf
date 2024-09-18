@@ -60,6 +60,41 @@ module "kea" {
 
 # PXE boot server
 
+resource "minio_s3_bucket" "matchbox" {
+  bucket        = "matchbox"
+  force_destroy = true
+  depends_on = [
+    helm_release.minio,
+  ]
+}
+
+resource "minio_iam_user" "matchbox" {
+  name          = "matchbox"
+  force_destroy = true
+}
+
+resource "minio_iam_policy" "matchbox" {
+  name = "matchbox"
+  policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [
+      {
+        Effect = "Allow"
+        Action = "*"
+        Resource = [
+          minio_s3_bucket.matchbox.arn,
+          "${minio_s3_bucket.matchbox.arn}/*",
+        ]
+      },
+    ]
+  })
+}
+
+resource "minio_iam_user_policy_attachment" "matchbox" {
+  user_name   = minio_iam_user.matchbox.id
+  policy_name = minio_iam_policy.matchbox.id
+}
+
 module "matchbox" {
   source                   = "./modules/matchbox"
   cluster_service_endpoint = local.kubernetes_services.matchbox.fqdn
@@ -76,10 +111,10 @@ module "matchbox" {
   service_ip = local.services.matchbox.ip
   ca         = data.terraform_remote_state.sr.outputs.matchbox.ca
 
-  s3_mount_access_key_id     = data.terraform_remote_state.sr.outputs.minio.access_key_id
-  s3_mount_secret_access_key = data.terraform_remote_state.sr.outputs.minio.secret_access_key
-  s3_mount_endpoint          = "http://${local.services.minio.ip}:${local.service_ports.minio}"
-  s3_mount_bucket            = local.minio_buckets.fs.name
+  s3_endpoint          = "http://${local.services.minio.ip}:${local.service_ports.minio}"
+  s3_bucket            = minio_s3_bucket.matchbox.id
+  s3_access_key_id     = minio_iam_user.matchbox.id
+  s3_secret_access_key = minio_iam_user.matchbox.secret
 }
 
 # Wifi AP

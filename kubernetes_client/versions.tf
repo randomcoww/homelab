@@ -9,5 +9,8 @@ terraform {
     helm = {
       source = "hashicorp/helm"
     }
+    minio = {
+      source = "aminueza/minio"
+    }
   }
 }

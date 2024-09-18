@@ -22,6 +22,41 @@ resource "tls_self_signed_cert" "lldap-ca" {
   ]
 }
 
+resource "minio_s3_bucket" "lldap" {
+  bucket        = "lldap"
+  force_destroy = false
+  depends_on = [
+    helm_release.minio,
+  ]
+}
+
+resource "minio_iam_user" "lldap" {
+  name          = "lldap"
+  force_destroy = true
+}
+
+resource "minio_iam_policy" "lldap" {
+  name = "lldap"
+  policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [
+      {
+        Effect = "Allow"
+        Action = "*"
+        Resource = [
+          minio_s3_bucket.lldap.arn,
+          "${minio_s3_bucket.lldap.arn}/*",
+        ]
+      },
+    ]
+  })
+}
+
+resource "minio_iam_user_policy_attachment" "lldap" {
+  user_name   = minio_iam_user.lldap.id
+  policy_name = minio_iam_policy.lldap.id
+}
+
 module "lldap" {
   source                   = "./modules/lldap"
   cluster_service_endpoint = local.kubernetes_services.lldap.fqdn
@@ -56,8 +91,9 @@ module "lldap" {
   ingress_class_name        = local.ingress_classes.ingress_nginx
   nginx_ingress_annotations = local.nginx_ingress_annotations
 
-  litestream_minio_access_key_id     = data.terraform_remote_state.sr.outputs.minio.access_key_id
-  litestream_minio_secret_access_key = data.terraform_remote_state.sr.outputs.minio.secret_access_key
-  litestream_minio_bucket            = local.minio_buckets.litestream.name
-  litestream_minio_endpoint          = "${local.kubernetes_services.minio.endpoint}:${local.service_ports.minio}"
+  minio_endpoint          = "http://${local.kubernetes_services.minio.endpoint}:${local.service_ports.minio}"
+  minio_bucket            = minio_s3_bucket.lldap.id
+  minio_access_key_id     = minio_iam_user.lldap.id
+  minio_secret_access_key = minio_iam_user.lldap.secret
+  minio_litestream_prefix = "$POD_NAME/litestream"
 }

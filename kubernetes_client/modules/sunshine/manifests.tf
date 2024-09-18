@@ -49,11 +49,12 @@ module "metadata" {
   namespace   = var.namespace
   release     = var.release
   app_version = split(":", var.images.sunshine)[1]
-  manifests = merge(module.s3-mount.chart.manifests, {
-    "templates/secret.yaml"  = module.secret.manifest
-    "templates/service.yaml" = module.service.manifest
-    "templates/ingress.yaml" = module.ingress.manifest
-  })
+  manifests = {
+    "templates/secret.yaml"      = module.secret.manifest
+    "templates/service.yaml"     = module.service.manifest
+    "templates/ingress.yaml"     = module.ingress.manifest
+    "templates/statefulset.yaml" = module.statefulset.manifest
+  }
 }
 
 module "secret" {
@@ -142,20 +143,8 @@ module "ingress" {
   ]
 }
 
-module "s3-mount" {
-  source = "../statefulset_s3"
-  ## s3 config
-  s3_mount_access_key_id     = var.s3_mount_access_key_id
-  s3_mount_secret_access_key = var.s3_mount_secret_access_key
-  s3_mount_endpoint          = var.s3_mount_endpoint
-  s3_mount_bucket            = var.s3_mount_bucket
-  s3_mount_prefix            = var.name
-  s3_mount_path              = local.mount_path
-  s3_mount_extra_args        = var.s3_mount_extra_args
-  images = {
-    mountpoint = var.images.mountpoint
-  }
-  ##
+module "statefulset" {
+  source   = "../statefulset"
   name     = var.name
   app      = var.name
   release  = var.release
@@ -163,6 +152,26 @@ module "s3-mount" {
   affinity = var.affinity
   annotations = {
     "checksum/secret" = sha256(module.secret.manifest)
+  }
+  spec = {
+    volumeClaimTemplates = [
+      {
+        metadata = {
+          name = "state"
+        }
+        spec = {
+          accessModes = [
+            "ReadWriteOnce",
+          ]
+          resources = {
+            requests = {
+              storage = "1Gi"
+            }
+          }
+          storageClassName = var.storage_class_name
+        }
+      },
+    ]
   }
   template_spec = {
     containers = [
@@ -175,7 +184,6 @@ module "s3-mount" {
           <<-EOF
           set -e
 
-          mountpoint ${local.mount_path}
           sunshine %{for k, v in local.args} ${k}=${tostring(v)}%{endfor} --creds $USERNAME $PASSWORD
           exec sunshine%{for k, v in local.args} ${k}=${tostring(v)}%{endfor}
           EOF
@@ -225,6 +233,10 @@ module "s3-mount" {
             name      = "config"
             mountPath = local.args.pkey
             subPath   = basename(local.args.pkey)
+          },
+          {
+            name      = "state"
+            mountPath = local.mount_path
           },
           ], [
           for i, config in var.sunshine_extra_configs :

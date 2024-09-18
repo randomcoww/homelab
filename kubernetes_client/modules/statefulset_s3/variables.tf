@@ -46,23 +46,23 @@ variable "template_spec" {
   default = {}
 }
 
-variable "s3_mount_access_key_id" {
+variable "s3_endpoint" {
   type = string
 }
 
-variable "s3_mount_secret_access_key" {
+variable "s3_bucket" {
   type = string
 }
 
-variable "s3_mount_endpoint" {
+variable "s3_prefix" {
   type = string
 }
 
-variable "s3_mount_bucket" {
+variable "s3_access_key_id" {
   type = string
 }
 
-variable "s3_mount_prefix" {
+variable "s3_secret_access_key" {
   type = string
 }
 

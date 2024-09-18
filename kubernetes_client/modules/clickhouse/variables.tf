@@ -31,22 +31,6 @@ variable "ca" {
   })
 }
 
-variable "data_minio_endpoint" {
-  type = string
-}
-
-variable "data_minio_bucket" {
-  type = string
-}
-
-variable "data_minio_access_key_id" {
-  type = string
-}
-
-variable "data_minio_secret_access_key" {
-  type = string
-}
-
 variable "service_hostname" {
   type = string
 }
@@ -85,44 +69,30 @@ variable "extra_volume_mounts" {
   default = []
 }
 
-variable "jfs_minio_endpoint" {
+variable "minio_endpoint" {
   type = string
 }
 
-variable "jfs_minio_bucket" {
+variable "minio_bucket" {
   type = string
 }
 
-variable "jfs_minio_prefix" {
-  type    = string
-  default = "$(POD_NAME)"
-}
-
-variable "jfs_minio_access_key_id" {
+variable "minio_access_key_id" {
   type = string
 }
 
-variable "jfs_minio_secret_access_key" {
+variable "minio_secret_access_key" {
   type = string
 }
 
-variable "litestream_minio_endpoint" {
+variable "minio_clickhouse_prefix" {
   type = string
 }
 
-variable "litestream_minio_bucket" {
+variable "minio_jfs_prefix" {
   type = string
 }
 
-variable "litestream_minio_prefix" {
-  type    = string
-  default = "$POD_NAME"
-}
-
-variable "litestream_minio_access_key_id" {
-  type = string
-}
-
-variable "litestream_minio_secret_access_key" {
+variable "minio_litestream_prefix" {
   type = string
 }

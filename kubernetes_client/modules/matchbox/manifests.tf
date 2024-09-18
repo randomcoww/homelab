@@ -58,13 +58,13 @@ module "service" {
 module "s3-mount" {
   source = "../statefulset_s3"
   ## s3 config
-  s3_mount_access_key_id     = var.s3_mount_access_key_id
-  s3_mount_secret_access_key = var.s3_mount_secret_access_key
-  s3_mount_endpoint          = var.s3_mount_endpoint
-  s3_mount_bucket            = var.s3_mount_bucket
-  s3_mount_prefix            = local.name
-  s3_mount_path              = local.data_path
-  s3_mount_extra_args        = var.s3_mount_extra_args
+  s3_endpoint          = var.s3_endpoint
+  s3_bucket            = var.s3_bucket
+  s3_prefix            = local.name
+  s3_access_key_id     = var.s3_access_key_id
+  s3_secret_access_key = var.s3_secret_access_key
+  s3_mount_path        = local.data_path
+  s3_mount_extra_args  = var.s3_mount_extra_args
   images = {
     mountpoint = var.images.mountpoint
   }

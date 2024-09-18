@@ -27,22 +27,6 @@ variable "images" {
   })
 }
 
-variable "data_minio_endpoint" {
-  type = string
-}
-
-variable "data_minio_bucket" {
-  type = string
-}
-
-variable "data_minio_access_key_id" {
-  type = string
-}
-
-variable "data_minio_secret_access_key" {
-  type = string
-}
-
 variable "service_hostname" {
   type = string
 }
@@ -53,4 +37,20 @@ variable "ingress_class_name" {
 
 variable "nginx_ingress_annotations" {
   type = map(string)
+}
+
+variable "minio_endpoint" {
+  type = string
+}
+
+variable "minio_bucket" {
+  type = string
+}
+
+variable "minio_access_key_id" {
+  type = string
+}
+
+variable "minio_secret_access_key" {
+  type = string
 }

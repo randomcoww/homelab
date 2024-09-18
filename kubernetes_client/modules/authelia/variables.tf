@@ -55,18 +55,22 @@ variable "ingress_cert_issuer" {
   type = string
 }
 
-variable "litestream_minio_bucket" {
+variable "minio_endpoint" {
   type = string
 }
 
-variable "litestream_minio_endpoint" {
+variable "minio_bucket" {
   type = string
 }
 
-variable "litestream_minio_access_key_id" {
+variable "minio_litestream_prefix" {
   type = string
 }
 
-variable "litestream_minio_secret_access_key" {
+variable "minio_access_key_id" {
+  type = string
+}
+
+variable "minio_secret_access_key" {
   type = string
 }

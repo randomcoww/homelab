@@ -25,11 +25,11 @@ module "secret-litestream" {
             {
               name                     = "minio"
               type                     = "s3"
-              bucket                   = var.litestream_minio_bucket
-              path                     = var.name
-              endpoint                 = "http://${var.litestream_minio_endpoint}"
-              access-key-id            = var.litestream_minio_access_key_id
-              secret-access-key        = var.litestream_minio_secret_access_key
+              endpoint                 = var.minio_endpoint
+              bucket                   = var.minio_bucket
+              path                     = var.minio_litestream_prefix
+              access-key-id            = var.minio_access_key_id
+              secret-access-key        = var.minio_secret_access_key
               retention                = "2m"
               retention-check-interval = "2m"
               sync-interval            = "100ms"
@@ -206,6 +206,16 @@ locals {
                   local.litestream_config_path,
                   local.sqlite_path,
                 ]
+                env = [
+                  {
+                    name = "POD_NAME"
+                    valueFrom = {
+                      fieldRef = {
+                        fieldPath = "metadata.name"
+                      }
+                    }
+                  },
+                ]
                 volumeMounts = [
                   {
                     name      = "authelia-data"
@@ -226,6 +236,16 @@ locals {
                   "replicate",
                   "-config",
                   local.litestream_config_path,
+                ]
+                env = [
+                  {
+                    name = "POD_NAME"
+                    valueFrom = {
+                      fieldRef = {
+                        fieldPath = "metadata.name"
+                      }
+                    }
+                  },
                 ]
                 volumeMounts = [
                   {

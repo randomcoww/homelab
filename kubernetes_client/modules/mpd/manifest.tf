@@ -60,8 +60,8 @@ module "secret" {
       compression "3"
     }
     EOF
-    RCLONE_S3_ACCESS_KEY_ID         = var.data_minio_access_key_id
-    RCLONE_S3_SECRET_ACCESS_KEY     = var.data_minio_secret_access_key
+    RCLONE_S3_ACCESS_KEY_ID         = var.minio_access_key_id
+    RCLONE_S3_SECRET_ACCESS_KEY     = var.minio_secret_access_key
   }
 }
 
@@ -111,17 +111,13 @@ module "jfs" {
     litestream = var.images.litestream
     jfs        = var.images.jfs
   }
-  jfs_mount_path                     = local.mpd_cache_path
-  jfs_minio_endpoint                 = var.jfs_minio_endpoint
-  jfs_minio_bucket                   = var.jfs_minio_bucket
-  jfs_minio_prefix                   = var.jfs_minio_prefix
-  jfs_minio_access_key_id            = var.jfs_minio_access_key_id
-  jfs_minio_secret_access_key        = var.jfs_minio_secret_access_key
-  litestream_minio_endpoint          = var.litestream_minio_endpoint
-  litestream_minio_bucket            = var.litestream_minio_bucket
-  litestream_minio_prefix            = var.litestream_minio_prefix
-  litestream_minio_access_key_id     = var.litestream_minio_access_key_id
-  litestream_minio_secret_access_key = var.litestream_minio_secret_access_key
+  jfs_mount_path          = local.mpd_cache_path
+  minio_endpoint          = var.minio_endpoint
+  minio_bucket            = var.minio_bucket
+  minio_jfs_prefix        = var.minio_jfs_prefix
+  minio_litestream_prefix = var.minio_litestream_prefix
+  minio_access_key_id     = var.minio_access_key_id
+  minio_secret_access_key = var.minio_secret_access_key
   ##
   name     = var.name
   app      = var.name
@@ -140,9 +136,9 @@ module "jfs" {
           "serve",
           "webdav",
           "--addr=127.0.0.1:${local.ports.rclone}",
-          ":s3:${var.data_minio_bucket}",
+          ":s3:${var.minio_music_bucket}",
           "--s3-provider=Minio",
-          "--s3-endpoint=http://${var.data_minio_endpoint}",
+          "--s3-endpoint=${var.minio_endpoint}",
           "--no-modtime",
           "--read-only",
         ]

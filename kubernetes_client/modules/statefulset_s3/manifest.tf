@@ -14,8 +14,8 @@ module "secret" {
   app     = var.app
   release = var.release
   data = {
-    AWS_ACCESS_KEY_ID     = var.s3_mount_access_key_id
-    AWS_SECRET_ACCESS_KEY = var.s3_mount_secret_access_key
+    AWS_ACCESS_KEY_ID     = var.s3_access_key_id
+    AWS_SECRET_ACCESS_KEY = var.s3_secret_access_key
   }
 }
 
@@ -43,17 +43,17 @@ module "statefulset" {
           mkdir -p ${var.s3_mount_path}
           mount-s3 \
             -f \
-            --endpoint-url ${var.s3_mount_endpoint} \
+            --endpoint-url ${var.s3_endpoint} \
             --allow-delete \
             --allow-overwrite \
             --auto-unmount \
             --allow-other \
             --no-log \
-            --prefix ${var.s3_mount_prefix}/ \
+            --prefix ${var.s3_prefix}/ \
             %{~for arg in var.s3_mount_extra_args~}
             ${arg} \
             %{~endfor~}
-            ${var.s3_mount_bucket} \
+            ${var.s3_bucket} \
             ${var.s3_mount_path}
           EOF
         ]

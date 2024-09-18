@@ -256,38 +256,22 @@ locals {
     socks5        = 1080
   }
 
-  minio_buckets = {
+  minio_data_buckets = {
     boot = {
-      name   = "boot"
-      policy = "download"
+      name = "data-boot"
+      acl  = "public-read"
     }
     music = {
-      name   = "music"
-      policy = "none"
-    }
-    pictures = {
-      name   = "pictures"
-      policy = "none"
-    }
-    videos = {
-      name   = "videos"
-      policy = "none"
+      name = "data-music"
     }
     backup = {
-      name   = "backup"
-      policy = "none"
+      name = "data-backup"
     }
-    fs = {
-      name   = "jfs"
-      policy = "none"
+    pictures = {
+      name = "data-pictures"
     }
-    clickhouse = {
-      name   = "clickhouse"
-      policy = "none"
-    }
-    litestream = {
-      name   = "litestream"
-      policy = "none"
+    videos = {
+      name = "data-videos"
     }
   }
 

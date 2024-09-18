@@ -1,3 +1,40 @@
+resource "minio_s3_bucket" "mpd" {
+  bucket        = "mpd"
+  force_destroy = true
+  depends_on = [
+    helm_release.minio,
+  ]
+}
+
+resource "minio_iam_user" "mpd" {
+  name          = "mpd"
+  force_destroy = true
+}
+
+resource "minio_iam_policy" "mpd" {
+  name = "mpd"
+  policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [
+      {
+        Effect = "Allow"
+        Action = "*"
+        Resource = [
+          minio_s3_bucket.mpd.arn,
+          "${minio_s3_bucket.mpd.arn}/*",
+          minio_s3_bucket.data["music"].arn,
+          "${minio_s3_bucket.data["music"].arn}/*",
+        ]
+      },
+    ]
+  })
+}
+
+resource "minio_iam_user_policy_attachment" "mpd" {
+  user_name   = minio_iam_user.mpd.id
+  policy_name = minio_iam_policy.mpd.id
+}
+
 module "mpd" {
   source  = "./modules/mpd"
   name    = "mpd"
@@ -16,17 +53,11 @@ module "mpd" {
   ingress_class_name        = local.ingress_classes.ingress_nginx
   nginx_ingress_annotations = local.nginx_ingress_auth_annotations
 
-  data_minio_access_key_id     = data.terraform_remote_state.sr.outputs.minio.access_key_id
-  data_minio_secret_access_key = data.terraform_remote_state.sr.outputs.minio.secret_access_key
-  data_minio_bucket            = local.minio_buckets.music.name
-  data_minio_endpoint          = "${local.kubernetes_services.minio.fqdn}:${local.service_ports.minio}"
-
-  jfs_minio_endpoint                 = "http://${local.kubernetes_services.minio.endpoint}:${local.service_ports.minio}"
-  jfs_minio_bucket                   = local.minio_buckets.fs.name
-  jfs_minio_access_key_id            = data.terraform_remote_state.sr.outputs.minio.access_key_id
-  jfs_minio_secret_access_key        = data.terraform_remote_state.sr.outputs.minio.secret_access_key
-  litestream_minio_endpoint          = "http://${local.kubernetes_services.minio.endpoint}:${local.service_ports.minio}"
-  litestream_minio_bucket            = local.minio_buckets.litestream.name
-  litestream_minio_access_key_id     = data.terraform_remote_state.sr.outputs.minio.access_key_id
-  litestream_minio_secret_access_key = data.terraform_remote_state.sr.outputs.minio.secret_access_key
+  minio_endpoint          = "http://${local.kubernetes_services.minio.fqdn}:${local.service_ports.minio}"
+  minio_bucket            = minio_s3_bucket.mpd.id
+  minio_music_bucket      = minio_s3_bucket.data["music"].id
+  minio_access_key_id     = minio_iam_user.mpd.id
+  minio_secret_access_key = minio_iam_user.mpd.secret
+  minio_jfs_prefix        = "$(POD_NAME)"
+  minio_litestream_prefix = "$POD_NAME/litestream"
 }

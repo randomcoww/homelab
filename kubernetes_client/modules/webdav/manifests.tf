@@ -24,8 +24,8 @@ module "secret" {
   app     = var.name
   release = var.release
   data = {
-    RCLONE_S3_ACCESS_KEY_ID     = var.data_minio_access_key_id
-    RCLONE_S3_SECRET_ACCESS_KEY = var.data_minio_secret_access_key
+    RCLONE_S3_ACCESS_KEY_ID     = var.minio_access_key_id
+    RCLONE_S3_SECRET_ACCESS_KEY = var.minio_secret_access_key
   }
 }
 
@@ -87,9 +87,9 @@ module "deployment" {
           "serve",
           "webdav",
           "--addr=0.0.0.0:${local.ports.rclone}",
-          ":s3:${var.data_minio_bucket}",
+          ":s3:${var.minio_bucket}",
           "--s3-provider=Minio",
-          "--s3-endpoint=http://${var.data_minio_endpoint}",
+          "--s3-endpoint=${var.minio_endpoint}",
           "--no-modtime",
           "--read-only",
           "--dir-cache-time=10s",

@@ -17,8 +17,8 @@ module "secret" {
   app     = var.app
   release = var.release
   data = {
-    ACCESS_KEY = var.jfs_minio_access_key_id
-    SECRET_KEY = var.jfs_minio_secret_access_key
+    ACCESS_KEY = var.minio_access_key_id
+    SECRET_KEY = var.minio_secret_access_key
   }
 }
 
@@ -36,11 +36,11 @@ module "litestream" {
           {
             name                     = "minio"
             type                     = "s3"
-            bucket                   = var.litestream_minio_bucket
-            path                     = var.litestream_minio_prefix
-            endpoint                 = var.litestream_minio_endpoint
-            access-key-id            = var.litestream_minio_access_key_id
-            secret-access-key        = var.litestream_minio_secret_access_key
+            endpoint                 = var.minio_endpoint
+            bucket                   = var.minio_bucket
+            path                     = var.minio_litestream_prefix
+            access-key-id            = var.minio_access_key_id
+            secret-access-key        = var.minio_secret_access_key
             retention                = "2m"
             retention-check-interval = "2m"
             sync-interval            = "100ms"
@@ -91,9 +91,9 @@ module "litestream" {
 
           juicefs format \
             'sqlite3://${local.db_path}' \
-            ${var.jfs_minio_prefix} \
+            ${var.minio_jfs_prefix} \
             --storage minio \
-            --bucket ${var.jfs_minio_endpoint}/${var.jfs_minio_bucket} \
+            --bucket ${var.minio_endpoint}/${var.minio_bucket} \
             --trash-days 0
 
           juicefs gc \
@@ -149,7 +149,7 @@ module "litestream" {
             'sqlite3://${local.db_path}' \
             ${var.jfs_mount_path} \
             --storage minio \
-            --bucket ${var.jfs_minio_endpoint}/${var.jfs_minio_bucket} \
+            --bucket ${var.minio_endpoint}/${var.minio_bucket} \
             --no-syslog \
             --atime-mode noatime \
             --backup-meta 0 \

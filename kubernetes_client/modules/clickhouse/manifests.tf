@@ -64,32 +64,32 @@ locals {
           type                 = "object_storage"
           object_storage_type  = "s3"
           metadata_type        = "plain_rewritable"
-          endpoint             = "http://${var.data_minio_endpoint}/${var.data_minio_bucket}/${local.name}/s3/"
-          access_key_id        = var.data_minio_access_key_id
-          secret_access_key    = var.data_minio_secret_access_key
+          endpoint             = "${var.minio_endpoint}/${var.minio_bucket}/${var.minio_clickhouse_prefix}/s3/"
+          access_key_id        = var.minio_access_key_id
+          secret_access_key    = var.minio_secret_access_key
           region               = ""
           support_batch_delete = true
         }
         # needs old formatting for keeper storage configs
         log_s3_plain = {
           type              = "s3_plain"
-          endpoint          = "http://${var.data_minio_endpoint}/${var.data_minio_bucket}/${local.name}/log/"
-          access_key_id     = var.data_minio_access_key_id
-          secret_access_key = var.data_minio_secret_access_key
+          endpoint          = "${var.minio_endpoint}/${var.minio_bucket}/${var.minio_clickhouse_prefix}/log/"
+          access_key_id     = var.minio_access_key_id
+          secret_access_key = var.minio_secret_access_key
           region            = ""
         }
         snapshot_s3_plain = {
           type              = "s3_plain"
-          endpoint          = "http://${var.data_minio_endpoint}/${var.data_minio_bucket}/${local.name}/snapshot/"
-          access_key_id     = var.data_minio_access_key_id
-          secret_access_key = var.data_minio_secret_access_key
+          endpoint          = "${var.minio_endpoint}/${var.minio_bucket}/${var.minio_clickhouse_prefix}/snapshot/"
+          access_key_id     = var.minio_access_key_id
+          secret_access_key = var.minio_secret_access_key
           region            = ""
         }
         state_s3_plain = {
           type              = "s3_plain"
-          endpoint          = "http://${var.data_minio_endpoint}/${var.data_minio_bucket}/${local.name}/state/"
-          access_key_id     = var.data_minio_access_key_id
-          secret_access_key = var.data_minio_secret_access_key
+          endpoint          = "${var.minio_endpoint}/${var.minio_bucket}/${var.minio_clickhouse_prefix}/state/"
+          access_key_id     = var.minio_access_key_id
+          secret_access_key = var.minio_secret_access_key
           region            = ""
         }
       }
@@ -336,17 +336,13 @@ module "jfs" {
     litestream = var.images.litestream
     jfs        = var.images.jfs
   }
-  jfs_mount_path                     = local.mount_path
-  jfs_minio_endpoint                 = var.jfs_minio_endpoint
-  jfs_minio_bucket                   = var.jfs_minio_bucket
-  jfs_minio_prefix                   = var.jfs_minio_prefix
-  jfs_minio_access_key_id            = var.jfs_minio_access_key_id
-  jfs_minio_secret_access_key        = var.jfs_minio_secret_access_key
-  litestream_minio_endpoint          = var.litestream_minio_endpoint
-  litestream_minio_bucket            = var.litestream_minio_bucket
-  litestream_minio_prefix            = var.litestream_minio_prefix
-  litestream_minio_access_key_id     = var.litestream_minio_access_key_id
-  litestream_minio_secret_access_key = var.litestream_minio_secret_access_key
+  jfs_mount_path          = local.mount_path
+  minio_endpoint          = var.minio_endpoint
+  minio_bucket            = var.minio_bucket
+  minio_jfs_prefix        = var.minio_jfs_prefix
+  minio_litestream_prefix = var.minio_litestream_prefix
+  minio_access_key_id     = var.minio_access_key_id
+  minio_secret_access_key = var.minio_secret_access_key
   ##
   name     = local.name
   app      = local.name
