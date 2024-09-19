@@ -28,10 +28,6 @@ module "code" {
   ]
   code_server_extra_envs = [
     {
-      name  = "MC_HOST_m"
-      value = "http://${data.terraform_remote_state.sr.outputs.minio.access_key_id}:${data.terraform_remote_state.sr.outputs.minio.secret_access_key}@${local.kubernetes_services.minio.fqdn}:${local.service_ports.minio}"
-    },
-    {
       name  = "XDG_RUNTIME_DIR"
       value = "/run/user/${local.users.client.uid}"
     },
