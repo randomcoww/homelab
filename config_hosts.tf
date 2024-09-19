@@ -80,7 +80,7 @@ locals {
         boot_args = [
           "numa=off",
           "systemd.unit=multi-user.target",
-          "enforcing=0",
+          "selinux=0",
           "mitigations=off",
         ]
       }
@@ -169,7 +169,7 @@ locals {
         boot_args = [
           "numa=off",
           "systemd.unit=multi-user.target",
-          "enforcing=0",
+          "selinux=0",
           "mitigations=off",
         ]
       }
@@ -258,7 +258,7 @@ locals {
         boot_args = [
           "numa=off",
           "systemd.unit=multi-user.target",
-          "enforcing=0",
+          "selinux=0",
           "mitigations=off",
         ]
       }
@@ -354,7 +354,7 @@ locals {
           "amd_iommu=pt",
           "rd.driver.pre=vfio-pci",
           "numa=off",
-          "enforcing=0",
+          "selinux=0",
           "rd.driver.blacklist=nouveau",
           "modprobe.blacklist=nouveau",
           "nvidia-drm.modeset=1",
