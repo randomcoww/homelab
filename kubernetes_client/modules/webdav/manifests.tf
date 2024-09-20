@@ -1,9 +1,7 @@
 locals {
   ports = {
-    webdav = 8080
+    rclone = 8080
   }
-  data_path         = "/var/lib/caddy/mnt"
-  caddy_config_path = "/etc/caddy/Caddyfile"
 }
 
 module "metadata" {
@@ -11,29 +9,23 @@ module "metadata" {
   name        = var.name
   namespace   = var.namespace
   release     = var.release
-  app_version = split(":", var.images.caddy_webdav)[1]
-  manifests = merge(module.s3-mount.chart.manifests, {
-    "templates/service.yaml"   = module.service.manifest
-    "templates/configmap.yaml" = module.configmap.manifest
-    "templates/ingress.yaml"   = module.ingress.manifest
-  })
+  app_version = split(":", var.images.rclone)[1]
+  manifests = {
+    "templates/service.yaml"    = module.service.manifest
+    "templates/secret.yaml"     = module.secret.manifest
+    "templates/ingress.yaml"    = module.ingress.manifest
+    "templates/deployment.yaml" = module.deployment.manifest
+  }
 }
 
-module "configmap" {
-  source  = "../configmap"
+module "secret" {
+  source  = "../secret"
   name    = var.name
   app     = var.name
   release = var.release
   data = {
-    basename(local.caddy_config_path) = <<-EOF
-    {
-      order webdav before file_server
-    }
-    :${local.ports.webdav} {
-      root * ${local.data_path}
-      webdav
-    }
-    EOF
+    RCLONE_S3_ACCESS_KEY_ID     = var.minio_access_key_id
+    RCLONE_S3_SECRET_ACCESS_KEY = var.minio_secret_access_key
   }
 }
 
@@ -47,9 +39,9 @@ module "service" {
     ports = [
       {
         name       = var.name
-        port       = local.ports.webdav
+        port       = local.ports.rclone
         protocol   = "TCP"
-        targetPort = local.ports.webdav
+        targetPort = local.ports.rclone
       },
     ]
   }
@@ -68,7 +60,7 @@ module "ingress" {
       paths = [
         {
           service = var.name
-          port    = local.ports.webdav
+          port    = local.ports.rclone
           path    = "/"
         },
       ]
@@ -76,75 +68,53 @@ module "ingress" {
   ]
 }
 
-module "s3-mount" {
-  source = "../statefulset_s3"
-  ## s3 config
-  s3_endpoint          = var.s3_endpoint
-  s3_bucket            = var.s3_bucket
-  s3_prefix            = ""
-  s3_access_key_id     = var.s3_access_key_id
-  s3_secret_access_key = var.s3_secret_access_key
-  s3_mount_path        = local.data_path
-  s3_mount_extra_args  = var.s3_mount_extra_args
-  images = {
-    mountpoint = var.images.mountpoint
-  }
-  ##
+module "deployment" {
+  source   = "../deployment"
   name     = var.name
   app      = var.name
   release  = var.release
   affinity = var.affinity
   replicas = var.replicas
   annotations = {
-    "checksum/configmap" = sha256(module.configmap.manifest)
+    "checksum/secret" = sha256(module.secret.manifest)
   }
   template_spec = {
     containers = [
       {
         name  = var.name
-        image = var.images.caddy_webdav
-        command = [
-          "sh",
-          "-c",
-          <<-EOF
-          set -e
-
-          until mountpoint ${local.data_path}; do
-          sleep 1
-          done
-
-          exec caddy run \
-            --config=${local.caddy_config_path}
-          EOF
+        image = var.images.rclone
+        args = [
+          "serve",
+          "webdav",
+          "--addr=0.0.0.0:${local.ports.rclone}",
+          ":s3:${var.minio_bucket}",
+          "--s3-provider=Minio",
+          "--s3-endpoint=${var.minio_endpoint}",
+          "--no-modtime",
+          "--read-only",
+          "--dir-cache-time=10s",
+          "--poll-interval=10s",
         ]
-        volumeMounts = [
+        envFrom = [
           {
-            name      = "config"
-            mountPath = local.caddy_config_path
-            subPath   = basename(local.caddy_config_path)
+            secretRef = {
+              name = module.secret.name
+            }
           },
         ]
         readinessProbe = {
           httpGet = {
             scheme = "HTTP"
-            port   = local.ports.webdav
+            port   = local.ports.rclone
             path   = "/"
           }
         }
         livenessProbe = {
           httpGet = {
             scheme = "HTTP"
-            port   = local.ports.webdav
+            port   = local.ports.rclone
             path   = "/"
           }
-        }
-      },
-    ]
-    volumes = [
-      {
-        name = "config"
-        configMap = {
-          name = module.configmap.name
         }
       },
     ]
