@@ -115,6 +115,7 @@ locals {
     sunshine           = "ghcr.io/randomcoww/sunshine:2024.920.25711-560.35.03"
     mountpoint         = "ghcr.io/randomcoww/mountpoint:20240915.5"
     audioserve         = "docker.io/izderadicka/audioserve:latest"
+    caddy_webdav       = "docker.io/juvenn/caddy-dav:2.8.4"
   }
 
   pxeboot_images = {

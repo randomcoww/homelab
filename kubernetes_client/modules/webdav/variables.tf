@@ -23,7 +23,8 @@ variable "affinity" {
 
 variable "images" {
   type = object({
-    rclone = string
+    caddy_webdav = string
+    mountpoint   = string
   })
 }
 
@@ -39,18 +40,23 @@ variable "nginx_ingress_annotations" {
   type = map(string)
 }
 
-variable "minio_endpoint" {
+variable "s3_endpoint" {
   type = string
 }
 
-variable "minio_bucket" {
+variable "s3_bucket" {
   type = string
 }
 
-variable "minio_access_key_id" {
+variable "s3_access_key_id" {
   type = string
 }
 
-variable "minio_secret_access_key" {
+variable "s3_secret_access_key" {
   type = string
+}
+
+variable "s3_mount_extra_args" {
+  type    = list(string)
+  default = []
 }
