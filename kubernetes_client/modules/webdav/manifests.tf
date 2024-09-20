@@ -92,8 +92,8 @@ module "deployment" {
           "--s3-endpoint=${var.minio_endpoint}",
           "--no-modtime",
           "--read-only",
-          "--dir-cache-time=10s",
-          "--poll-interval=10s",
+          "--dir-cache-time=4s",
+          "--poll-interval=2s",
         ]
         envFrom = [
           {
