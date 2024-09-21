@@ -3,15 +3,15 @@ variant: fcos
 version: ${ignition_version}
 systemd:
   units:
+    # https://docs.chrultrabook.com/docs/installing/post-install.html#fixing-usb-c-on-tigerlake-and-alderlake
     - name: chromebook-usbc-reset.service
       enabled: true
       contents: |
         [Service]
         Type=oneshot
-        ExecCondition=/usr/sbin/rmmod cros-ec-typec
-        ExecStartPre=-/usr/sbin/rmmod intel-pmc-mux
-        ExecStart=-/usr/sbin/modprobe -a intel-pmc-mux cros-ec-typec
         RemainAfterExit=yes
+        ExecStartPre=/usr/sbin/modprobe -r -a cros-ec-typec intel-pmc-mux
+        ExecStart=/usr/sbin/modprobe -a intel-pmc-mux cros-ec-typec
 
         [Install]
         WantedBy=basic.target
