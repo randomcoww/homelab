@@ -1,0 +1,17 @@
+---
+variant: fcos
+version: ${ignition_version}
+systemd:
+  units:
+    - name: chromebook-usbc-reset.service
+      enabled: true
+      contents: |
+        [Service]
+        Type=oneshot
+        ExecCondition=/usr/sbin/rmmod cros-ec-typec
+        ExecStartPre=-/usr/sbin/rmmod intel-pmc-mux
+        ExecStart=-/usr/sbin/modprobe -a intel-pmc-mux cros-ec-typec
+        RemainAfterExit=yes
+
+        [Install]
+        WantedBy=basic.target
