@@ -17,3 +17,7 @@ variable "endpoint" {
 variable "address" {
   type = string
 }
+
+variable "uid" {
+  type = number
+}
