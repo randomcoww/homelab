@@ -18,11 +18,11 @@ storage:
           UseDNS=${lookup(config, "enable_dns", false)}
           UseNTP=false
           UseHostname=false
-          UseTimezone=${lookup(config, "enable_dns", false)}
+          UseTimezone=true
           UseDomains=${lookup(config, "enable_dns", false)}
           UseRoutes=${!lookup(config, "enable_netnum", false)}
-          RoutesToDNS=false
-          RoutesToNTP=false
+          RoutesToDNS=${!lookup(config, "enable_netnum", false)}
+          RoutesToNTP=${!lookup(config, "enable_netnum", false)}
 
           [Network]
           LinkLocalAddressing=${lookup(config, "enable_linklocal", false)}
