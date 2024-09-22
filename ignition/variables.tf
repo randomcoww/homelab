@@ -10,11 +10,15 @@ variable "wireguard_client" {
     public_key  = string
     address     = string
     endpoint    = string
+    dns         = string
+    allowed_ips = string
   })
   default = {
     private_key = ""
     public_key  = ""
     address     = ""
     endpoint    = ""
+    dns         = ""
+    allowed_ips = ""
   }
 }

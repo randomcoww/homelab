@@ -18,6 +18,16 @@ variable "address" {
   type = string
 }
 
+variable "dns" {
+  type    = string
+  default = ""
+}
+
+variable "allowed_ips" {
+  type    = string
+  default = "0.0.0.0/0,::0/0"
+}
+
 variable "uid" {
   type = number
 }

@@ -39,6 +39,8 @@ WG_PRIVATE_KEY=
 WG_ADDRESS=
 WG_PUBLIC_KEY=
 WG_ENDPOINT=
+WG_ALLOWED_IPS=
+WG_DNS=
 
 APCA_API_KEY_ID=
 APCA_API_SECRET_KEY=
@@ -79,6 +81,8 @@ wireguard_client = {
   public_key  = "$WG_PUBLIC_KEY"
   address     = "$WG_ADDRESS"
   endpoint    = "$WG_ENDPOINT"
+  dns         = "$WG_DNS"
+  allowed_ips = "$WG_ALLOWED_IPS"
 }
 EOF
 ```

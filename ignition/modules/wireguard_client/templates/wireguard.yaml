@@ -20,7 +20,9 @@ storage:
           [WireGuardPeer]
           PublicKey=${public_key}
           Endpoint=${endpoint}
-          AllowedIPs=0.0.0.0/0
+          %{~ for _, ip in allowed_ips ~}
+          AllowedIPs=${ip}
+          %{~ endfor ~}
           PersistentKeepalive=25
 
     - path: /etc/systemd/network/20-${interface}.network
@@ -30,8 +32,15 @@ storage:
           [Match]
           Name=${interface}
 
-          [Address]
-          Address=${address}
+          [Network]
+          %{~ for _, ip in address ~}
+          Address=${ip}
+          %{~ endfor ~}
+          %{~ if length(dns) > 0 ~}
+          DNS=${dns}
+          DNSDefaultRoute=true
+          Domains=~.
+          %{~ endif ~}
 
           [RoutingPolicyRule]
           Table=${table_id}

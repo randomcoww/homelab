@@ -16,5 +16,6 @@ module "wireguard-client" {
   public_key       = var.wireguard_client.public_key
   address          = var.wireguard_client.address
   endpoint         = var.wireguard_client.endpoint
+  allowed_ips      = var.wireguard_client.allowed_ips
   uid              = local.users.client.uid
 }

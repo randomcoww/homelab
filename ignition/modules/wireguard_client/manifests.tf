@@ -6,7 +6,9 @@ locals {
       private_key         = var.private_key
       public_key          = var.public_key
       endpoint            = var.endpoint
-      address             = var.address
+      address             = split(",", var.address)
+      dns                 = var.dns
+      allowed_ips         = split(",", var.allowed_ips)
       table_id            = 1000
       table_priority_base = 30000
       firewall_mark       = "0x8888"
