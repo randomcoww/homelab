@@ -60,11 +60,7 @@ locals {
         apiserver = 2
       }
     }
-    wan = {
-      vlan_id = 30
-    }
-    mobile = {
-    }
+    # cluster internal
     kubernetes_service = {
       network = "10.96.0.0"
       cidr    = 12
@@ -78,6 +74,12 @@ locals {
     kubernetes_pod = {
       network = "10.244.0.0"
       cidr    = 16
+    }
+    # external
+    wan = {
+      vlan_id = 30
+    }
+    mobile = {
     }
   }
 

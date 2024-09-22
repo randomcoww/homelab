@@ -54,7 +54,6 @@ storage:
           Priority=${table_priority_base}
           Family=both
 
-    # TODO: remove
     - path: /etc/systemd/network/20-${interface}.network.d/20-local-route.conf
       mode: 0644
       contents:
@@ -63,6 +62,6 @@ storage:
           Name=${interface}
 
           [RoutingPolicyRule]
-          To=192.168.1.0/24
+          To=192.168.0.0/16
           User=${uid}
-          Priority=${table_priority_base - 2}
+          Priority=${table_priority_base}
