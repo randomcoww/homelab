@@ -167,6 +167,17 @@ resource "helm_release" "ingress-nginx" {
     yamlencode({
       controller = {
         kind = "DaemonSet"
+        image = {
+          digest       = ""
+          digestChroot = ""
+        }
+        admissionWebhooks = {
+          patch = {
+            image = {
+              digest = ""
+            }
+          }
+        }
         ingressClassResource = {
           enabled         = true
           name            = each.value
