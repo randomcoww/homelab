@@ -42,19 +42,21 @@ data "helm_template" "coredns" {
       servers           = var.servers
       extraContainers = [
         {
-          name : "${var.name}-external-dns"
-          image : var.images.external_dns
-          args : [
+          name  = "${var.name}-external-dns"
+          image = var.images.external_dns
+          args = [
             "--source=service",
             "--source=ingress",
             "--provider=coredns",
-            "--log-level=debug"
+            "--log-level=debug",
           ]
         },
         {
-          name : "${var.name}-etcd"
-          image : var.images.etcd
-          command : ["etcd"]
+          name  = "${var.name}-etcd"
+          image = var.images.etcd
+          command = [
+            "etcd",
+          ]
         },
       ]
     })
