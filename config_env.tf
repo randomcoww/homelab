@@ -20,6 +20,7 @@ locals {
       enable_dns         = true
       netnums = {
         gateway = 2
+        switch  = 255
       }
     }
     sync = {

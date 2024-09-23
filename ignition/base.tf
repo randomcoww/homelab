@@ -36,6 +36,7 @@ module "systemd-networkd" {
   vlan_interfaces     = each.value.vlan_interfaces
   networks            = each.value.networks
   wlan_networks       = each.value.wlan_networks
+  mdns_domain         = local.domains.mdns
 }
 
 module "network-manager" {

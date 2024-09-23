@@ -57,7 +57,7 @@ storage:
         inline: |
           [Resolve]
           DNSStubListener=false
-          MulticastDNS=true
+          MulticastDNS=false
           LLMNR=false
     # Block password SSH #
     - path: /etc/ssh/sshd_config.d/10-block-password.conf

@@ -1,0 +1,28 @@
+variant: fcos
+version: ${ignition_version}
+systemd:
+  units:
+    - name: avahi-daemon.service
+      enabled: true
+
+storage:
+  files:
+    - path: /etc/avahi/avahi-daemon.conf
+      overwrite: true
+      mode: 0644
+      contents:
+        inline: |
+          [server]
+          domain-name=${mdns_domain}
+          use-ipv4=yes
+          use-ipv6=no
+          allow-interfaces=${join(",", mdns_interfaces)}
+          ratelimit-interval-usec=1000000
+          ratelimit-burst=1000
+
+          [wide-area]
+          enable-wide-area=yes
+
+          [publish]
+          publish-hinfo=no
+          publish-workstation=no

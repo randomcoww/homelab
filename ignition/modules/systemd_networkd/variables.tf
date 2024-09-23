@@ -30,3 +30,7 @@ variable "wlan_networks" {
   type    = any
   default = {}
 }
+
+variable "mdns_domain" {
+  type = string
+}
