@@ -88,7 +88,7 @@ locals {
     kube_apiserver          = "ghcr.io/randomcoww/kubernetes:kube-master-${local.kubernetes.version}"
     kube_controller_manager = "ghcr.io/randomcoww/kubernetes:kube-master-${local.kubernetes.version}"
     kube_scheduler          = "ghcr.io/randomcoww/kubernetes:kube-master-${local.kubernetes.version}"
-    etcd_wrapper            = "ghcr.io/randomcoww/etcd-wrapper:20240902.4"
+    etcd_wrapper            = "ghcr.io/randomcoww/etcd-wrapper:20240923.12"
     etcd                    = "gcr.io/etcd-development/etcd:v3.5.15-amd64"
 
     # Helm
@@ -120,12 +120,12 @@ locals {
   }
 
   pxeboot_images = {
-    coreos     = "fedora-coreos-40.20240919.0"
-    silverblue = "fedora-silverblue-40.20240919.0"
+    coreos     = "fedora-coreos-40.20240923.0"
+    silverblue = "fedora-silverblue-40.20240922.0"
   }
 
   kubernetes = {
-    version                   = "1.30.3"
+    version                   = "1.31.1"
     cluster_name              = "prod-10"
     kubelet_root_path         = "/var/lib/kubelet"
     static_pod_manifest_path  = "/var/lib/kubelet/manifests"
