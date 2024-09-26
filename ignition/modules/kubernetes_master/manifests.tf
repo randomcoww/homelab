@@ -88,14 +88,8 @@ locals {
 
   static_pod = {
     for key, f in {
-      apiserver = {
-        contents = module.apiserver.manifest
-      }
-      controller-manager = {
-        contents = module.controller-manager.manifest
-      }
-      scheduler = {
-        contents = module.scheduler.manifest
+      control-plane = {
+        contents = module.control-plane.manifest
       }
     } :
     key => merge(f, {
@@ -170,9 +164,9 @@ module "scheduler-kubeconfig" {
   client_key_pem     = tls_private_key.scheduler.private_key_pem
 }
 
-module "apiserver" {
+module "control-plane" {
   source = "../../../modules/static_pod"
-  name   = "kube-apiserver"
+  name   = "kube-control-plane"
   spec = {
     containers = [
       {
@@ -254,23 +248,6 @@ module "apiserver" {
           },
         ]
       },
-    ]
-    volumes = [
-      {
-        name = "config"
-        hostPath = {
-          path = local.config_path
-        }
-      },
-    ]
-  }
-}
-
-module "controller-manager" {
-  source = "../../../modules/static_pod"
-  name   = "kube-contoller-manager"
-  spec = {
-    containers = [
       {
         name  = "kube-controller-manager"
         image = var.images.controller_manager
@@ -321,23 +298,6 @@ module "controller-manager" {
           },
         ]
       },
-    ]
-    volumes = [
-      {
-        name = "config"
-        hostPath = {
-          path = local.config_path
-        }
-      },
-    ]
-  }
-}
-
-module "scheduler" {
-  source = "../../../modules/static_pod"
-  name   = "kube-scheduler"
-  spec = {
-    containers = [
       {
         name  = "kube-scheduler"
         image = var.images.scheduler
