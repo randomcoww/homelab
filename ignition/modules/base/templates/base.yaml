@@ -18,28 +18,9 @@ systemd:
       mask: true
     - name: systemd-resolved.service
       enabled: true
-    # configure nftables service as template
+    # configure nftables for each service
     - name: nftables.service
       mask: false
-    - name: nftables@.service
-      enabled: true
-      contents: |
-        [Unit]
-        Wants=network-pre.target
-        Before=network-pre.target
-        ConditionFileNotEmpty=/etc/nftables/%i.nft
-
-        [Service]
-        Type=oneshot
-        ProtectSystem=full
-        ProtectHome=true
-        ExecStart=/sbin/nft -f /etc/nftables/%i.nft
-        ExecReload=/sbin/nft 'delete table %i; include "/etc/nftables/%i.nft";'
-        ExecStop=/sbin/nft delete table %i
-        RemainAfterExit=yes
-
-        [Install]
-        WantedBy=multi-user.target
     # does not work with read only system
     - name: rpm-ostree-fix-shadow-mode.service
       mask: true
