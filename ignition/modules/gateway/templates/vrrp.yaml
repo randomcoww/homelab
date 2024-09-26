@@ -3,7 +3,7 @@ variant: fcos
 version: ${ignition_version}
 storage:
   files:
-    - path: ${keepalived_path}/${name}.conf
+    - path: ${keepalived_path}/gateway.conf
       mode: 0644
       contents:
         inline: |

@@ -3,8 +3,24 @@ variant: fcos
 version: ${ignition_version}
 systemd:
   units:
-    - name: nftables@${name}.service
+    - name: nftables-ip-gateway.service
       enabled: true
+      contents: |
+        [Unit]
+        Wants=network-pre.target
+        Before=network-pre.target
+
+        [Service]
+        Type=oneshot
+        ProtectSystem=full
+        ProtectHome=true
+        ExecStart=/sbin/nft -f /etc/nftables/ip-gateway.nft
+        ExecReload=/sbin/nft 'delete table ip gateway; include "/etc/nftables/ip-gateway.nft";'
+        ExecStop=/sbin/nft delete table ip gateway
+        RemainAfterExit=yes
+
+        [Install]
+        WantedBy=multi-user.target
 
 storage:
   files:
@@ -13,12 +29,12 @@ storage:
       contents:
         inline: |
           net.ipv4.ip_forward=1
-    - path: /etc/nftables/${name}.nft
+    - path: /etc/nftables/ip-gateway.nft
       mode: 0644
       overwrite: true
       contents:
         inline: |
-          table ip ${name} {
+          table ip gateway {
             chain base-checks {
               ct state {established, related} accept;
               ct state invalid drop;
@@ -36,7 +52,6 @@ storage:
               %{~ for _, prefix in accept_prefixes ~}
               ip saddr ${prefix} accept;
               %{~ endfor ~}
-              iifname != ${wan_interface_name} udp sport bootps udp dport bootpc accept;
               iifname != ${wan_interface_name} pkttype multicast accept;
             }
 

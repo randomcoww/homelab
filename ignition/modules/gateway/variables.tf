@@ -2,10 +2,6 @@ variable "ignition_version" {
   type = string
 }
 
-variable "name" {
-  type = string
-}
-
 variable "host_netnum" {
   type = number
 }

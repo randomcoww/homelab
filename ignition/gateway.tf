@@ -4,7 +4,6 @@ module "gateway" {
   source   = "./modules/gateway"
 
   ignition_version = local.ignition_version
-  name             = "gateway"
   host_netnum      = each.value.netnum
   accept_prefixes = [
     local.networks.etcd.prefix,
