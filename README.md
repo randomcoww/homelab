@@ -217,11 +217,18 @@ Check that `kubernetes` service is up
 kubectl get svc
 ```
 
-Deploy helm charts to Kubernetes
+Deploy lower level services and Minio
 
 ```bash
-tw terraform -chdir=kubernetes_client init
-tw terraform -chdir=kubernetes_client apply -var-file=secrets.tfvars
+tw terraform -chdir=kubernetes_bootstrap init
+tw terraform -chdir=kubernetes_bootstrap apply
+```
+
+Deploy services including services dependant on Minio users and policies
+
+```bash
+tw terraform -chdir=kubernetes_service init
+tw terraform -chdir=kubernetes_service apply -var-file=secrets.tfvars
 ```
 
 ---
