@@ -51,7 +51,7 @@ locals {
         alpaca_db              = 38
       }
     }
-    # worker node IPs
+    # kubernetes master IPs
     kubernetes = {
       network = "192.168.193.0"
       cidr    = 26
@@ -97,8 +97,8 @@ locals {
     matchbox           = "quay.io/poseidon/matchbox:v0.11.0-amd64"
     tftpd              = "ghcr.io/randomcoww/tftpd-ipxe:20240822.3"
     hostapd            = "ghcr.io/randomcoww/hostapd:2.10-2"
-    flannel            = "docker.io/flannel/flannel:v0.25.2"
-    flannel_cni_plugin = "docker.io/flannel/flannel-cni-plugin:v1.4.1-flannel1"
+    flannel            = "docker.io/flannel/flannel:v0.25.6"
+    flannel_cni_plugin = "docker.io/flannel/flannel-cni-plugin:v1.5.1-flannel3"
     kapprover          = "ghcr.io/randomcoww/kapprover:20240126"
     external_dns       = "registry.k8s.io/external-dns/external-dns:v0.14.2"
     kube_proxy         = "ghcr.io/randomcoww/kubernetes:kube-proxy-${local.kubernetes.version}"
