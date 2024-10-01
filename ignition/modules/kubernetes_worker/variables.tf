@@ -68,3 +68,7 @@ variable "container_storage_path" {
 variable "graceful_shutdown_delay" {
   type = number
 }
+
+variable "kubernetes_pod_prefix" {
+  type = string
+}

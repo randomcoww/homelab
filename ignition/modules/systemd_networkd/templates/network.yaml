@@ -21,8 +21,8 @@ storage:
           UseTimezone=true
           UseDomains=${lookup(config, "enable_dns", false)}
           UseRoutes=${!lookup(config, "enable_netnum", false)}
-          RoutesToDNS=${!lookup(config, "enable_netnum", false)}
-          RoutesToNTP=${!lookup(config, "enable_netnum", false)}
+          RoutesToDNS=${lookup(config, "enable_dns", false)}
+          RoutesToNTP=false
 
           [Network]
           LinkLocalAddressing=${lookup(config, "enable_linklocal", false)}

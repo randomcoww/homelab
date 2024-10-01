@@ -36,7 +36,10 @@ module "kea" {
   ipxe_boot_path  = "/ipxe.efi"
   ipxe_script_url = "http://${local.services.matchbox.ip}:${local.service_ports.matchbox}/boot.ipxe"
   networks = [
-    for _, network in local.networks :
+    for _, network in [
+      local.networks.priv,
+      local.networks.service,
+    ] :
     {
       prefix = network.prefix
       routers = [
@@ -53,7 +56,7 @@ module "kea" {
       pools = [
         cidrsubnet(network.prefix, 1, 1),
       ]
-    } if lookup(network, "enable_dhcp_server", false)
+    }
   ]
   timezone = local.timezone
 }
@@ -105,8 +108,9 @@ module "matchbox" {
     matchbox     = local.service_ports.matchbox
     matchbox_api = local.service_ports.matchbox_api
   }
-  service_ip = local.services.matchbox.ip
-  ca         = data.terraform_remote_state.sr.outputs.matchbox.ca
+  service_ip     = local.services.matchbox.ip
+  api_service_ip = local.services.matchbox_api.ip
+  ca             = data.terraform_remote_state.sr.outputs.matchbox.ca
 
   s3_endpoint          = "http://${local.services.minio.ip}:${local.service_ports.minio}"
   s3_bucket            = minio_s3_bucket.matchbox.id
@@ -244,8 +248,7 @@ module "tailscale" {
     {
       name = "TS_ROUTES"
       value = join(",", [
-        local.networks.lan.prefix,
-        local.networks.service.prefix,
+        local.networks.priv.prefix,
         local.networks.kubernetes.prefix,
       ])
     },

@@ -35,7 +35,7 @@ locals {
         }
       }
       networks = {
-        lan = {
+        priv = {
           interface     = "phy0"
           enable_netnum = true
         }
@@ -124,7 +124,7 @@ locals {
         }
       }
       networks = {
-        lan = {
+        priv = {
           interface     = "phy0"
           enable_netnum = true
         }
@@ -213,7 +213,7 @@ locals {
         }
       }
       networks = {
-        lan = {
+        priv = {
           interface     = "phy0"
           enable_netnum = true
         }
@@ -285,13 +285,6 @@ locals {
           match_mac = "0e-db-ea-3e-3a-78"
         }
       }
-      bridge_interfaces = {
-        br-lan = {
-          sources = [
-            "phy0",
-          ]
-        }
-      }
       vlan_interfaces = {
         phy0-service = {
           source  = "phy0"
@@ -302,14 +295,21 @@ locals {
           network = "kubernetes"
         }
       }
+      bridge_interfaces = {
+        br-lan = {
+          sources = [
+            "phy0-service",
+          ]
+        }
+      }
       networks = {
-        lan = {
-          interface   = "br-lan"
-          enable_dhcp = true
+        priv = {
+          interface     = "phy0"
+          enable_netnum = true
         }
         service = {
-          interface     = "phy0-service"
-          enable_netnum = true
+          interface   = "br-lan"
+          enable_dhcp = true
         }
         kubernetes = {
           interface     = "phy0-kubernetes"
@@ -358,7 +358,7 @@ locals {
           "rd.driver.blacklist=nouveau",
           "modprobe.blacklist=nouveau",
           "nvidia-drm.modeset=1",
-          # "nvidia-drm.fbdev=1",
+          "nvidia-drm.fbdev=1",
           ## stub all Nvidia GPUs
           # "vfio-pci.id=10de:ffffffff:ffffffff:ffffffff:00030000:ffff00ff,10de:ffffffff:ffffffff:ffffffff:00040300:ffffffff",
           ## stub all AMD GPUs
@@ -387,10 +387,20 @@ locals {
           match_mac = "3e-b1-a0-f3-9b-34"
         }
       }
+      vlan_interfaces = {
+        phy0-service = {
+          source  = "phy0"
+          network = "service"
+        }
+      }
       networks = {
-        lan = {
+        priv = {
           interface   = "phy0"
           enable_dhcp = true
+        }
+        service = {
+          interface     = "phy0-service"
+          enable_netnum = true
         }
       }
       disks = {

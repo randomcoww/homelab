@@ -5,6 +5,8 @@ systemd:
   units:
     - name: sshd.service
       enabled: true
+    - name: nftables-ip@ssh.service
+      enabled: true
 
 storage:
   files:
@@ -25,3 +27,19 @@ storage:
         inline: |
           HostKey ${pki.server-private-key.path}
           HostCertificate ${pki.server-certificate.path}
+    - path: /etc/nftables/ip-ssh.nft
+      mode: 0644
+      overwrite: true
+      contents:
+        inline: |
+          table ip ssh {
+            chain mark-for-accept {
+              meta mark set meta mark | 0x00001000
+            }
+
+            chain input {
+              type filter hook input priority 0; policy accept;
+              tcp dport ssh jump mark-for-accept;
+            }
+          }
+          ;

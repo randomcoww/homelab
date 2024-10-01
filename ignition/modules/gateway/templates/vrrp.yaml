@@ -1,8 +1,47 @@
 ---
 variant: fcos
 version: ${ignition_version}
+systemd:
+  units:
+    - name: nftables-ip@gateway.service
+      enabled: true
+
 storage:
   files:
+    - path: /etc/sysctl.d/20-gateway.conf
+      mode: 0644
+      contents:
+        inline: |
+          net.ipv4.ip_forward=1
+    - path: /etc/nftables/ip-gateway.nft
+      mode: 0644
+      overwrite: true
+      contents:
+        inline: |
+          table ip gateway {
+            chain mark-for-accept {
+              meta mark set meta mark | 0x00001000
+            }
+
+            chain input {
+              type filter hook input priority 0; policy accept;
+              ip daddr ${sync_prefix} pkttype multicast jump mark-for-accept;
+              ip daddr ${lan_prefix} jump mark-for-accept;
+            }
+
+            chain forward {
+              type filter hook forward priority 0; policy accept;
+              ip saddr ${lan_prefix} oifname ${wan_interface_name} jump mark-for-accept;
+              ip daddr ${lan_prefix} jump mark-for-accept;
+            }
+
+            chain postrouting {
+              type nat hook postrouting priority srcnat + 30; policy accept;
+              oifname ${wan_interface_name} masquerade;
+            }
+          }
+          ;
+
     - path: ${keepalived_path}/gateway.conf
       mode: 0644
       contents:

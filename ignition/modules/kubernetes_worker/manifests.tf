@@ -101,6 +101,8 @@ locals {
       crio_socket               = local.crio_socket
       cni_bridge_interface_name = var.cni_bridge_interface_name
       graceful_shutdown_delay   = var.graceful_shutdown_delay
+      kubernetes_pod_prefix     = var.kubernetes_pod_prefix
+      ports                     = var.ports
     })
     ], [
     yamlencode({

@@ -6,14 +6,6 @@ variable "host_netnum" {
   type = number
 }
 
-variable "accept_prefixes" {
-  type = list(string)
-}
-
-variable "forward_prefixes" {
-  type = list(string)
-}
-
 variable "conntrackd_ignore_prefixes" {
   type = list(string)
 }
@@ -35,6 +27,10 @@ variable "sync_prefix" {
 }
 
 variable "lan_prefix" {
+  type = string
+}
+
+variable "network_boot_prefix" {
   type = string
 }
 

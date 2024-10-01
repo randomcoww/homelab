@@ -21,6 +21,24 @@ systemd:
     # configure nftables for each service
     - name: nftables.service
       mask: false
+    - name: nftables-ip@.service
+      enabled: true
+      contents: |
+        [Unit]
+        Wants=network-pre.target
+        Before=network-pre.target
+        ConditionFileNotEmpty=/etc/nftables/ip-%i.nft
+        [Service]
+        Type=oneshot
+        ProtectSystem=full
+        ProtectHome=true
+        ExecStart=/sbin/nft -f /etc/nftables/ip-%i.nft
+        ExecReload=/sbin/nft 'delete table ip %i; include "/etc/nftables/ip-%i.nft";'
+        ExecStop=/sbin/nft delete table ip %i
+        RemainAfterExit=yes
+        [Install]
+        WantedBy=multi-user.target
+
     # does not work with read only system
     - name: rpm-ostree-fix-shadow-mode.service
       mask: true
@@ -90,3 +108,11 @@ storage:
         inline: |
           kernel.printk=4
           fs.inotify.max_user_watches=524288
+    # multipath #
+    # https://blog.fhrnet.eu/2019/03/07/ecmp-on-linux/
+    - path: /etc/sysctl.d/10-multipath.conf
+      mode: 0644
+      contents:
+        inline: |
+          net.ipv4.conf.all.ignore_routes_with_linkdown=1
+          net.ipv4.fib_multipath_use_neigh=1

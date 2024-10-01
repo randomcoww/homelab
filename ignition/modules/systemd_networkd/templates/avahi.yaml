@@ -2,11 +2,31 @@ variant: fcos
 version: ${ignition_version}
 systemd:
   units:
+    - name: nftables-ip@avahi.service
+      enabled: true
     - name: avahi-daemon.service
       enabled: true
 
 storage:
   files:
+    - path: /etc/nftables/ip-avahi.nft
+      mode: 0644
+      overwrite: true
+      contents:
+        inline: |
+          table ip avahi {
+            chain mark-for-accept {
+              meta mark set meta mark | 0x00001000
+            }
+
+            chain input {
+              type filter hook input priority 0; policy accept;
+              %{~ for _, interface in mdns_interfaces ~}
+              iifname ${interface} pkttype multicast jump mark-for-accept;
+              %{~ endfor ~}
+            }
+          }
+          ;
     - path: /etc/avahi/avahi-daemon.conf
       overwrite: true
       mode: 0644

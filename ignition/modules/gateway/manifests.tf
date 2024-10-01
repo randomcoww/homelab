@@ -4,14 +4,13 @@ locals {
     templatefile(f, {
       ignition_version           = var.ignition_version
       host_netnum                = var.host_netnum
-      accept_prefixes            = var.accept_prefixes
-      forward_prefixes           = var.forward_prefixes
       conntrackd_ignore_prefixes = var.conntrackd_ignore_prefixes
       wan_interface_name         = var.wan_interface_name
       sync_interface_name        = var.sync_interface_name
       lan_interface_name         = var.lan_interface_name
       lan_prefix                 = var.lan_prefix
       sync_prefix                = var.sync_prefix
+      network_boot_prefix        = var.network_boot_prefix
       lan_gateway_ip             = var.lan_gateway_ip
       keepalived_path            = var.keepalived_path
 

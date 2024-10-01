@@ -11,8 +11,9 @@ module "metadata" {
   release     = var.release
   app_version = split(":", var.images.matchbox)[1]
   manifests = merge(module.s3-mount.chart.manifests, {
-    "templates/service.yaml" = module.service.manifest
-    "templates/secret.yaml"  = module.secret.manifest
+    "templates/service.yaml"     = module.service.manifest
+    "templates/service-api.yaml" = module.service-api.manifest
+    "templates/secret.yaml"      = module.secret.manifest
   })
 }
 
@@ -45,6 +46,21 @@ module "service" {
         protocol   = "TCP"
         targetPort = var.ports.matchbox
       },
+    ]
+  }
+}
+
+module "service-api" {
+  source  = "../../../modules/service"
+  name    = "${local.name}-api"
+  app     = local.name
+  release = var.release
+  spec = {
+    type = "LoadBalancer"
+    externalIPs = [
+      var.api_service_ip,
+    ]
+    ports = [
       {
         name       = "matchbox-api"
         port       = var.ports.matchbox_api

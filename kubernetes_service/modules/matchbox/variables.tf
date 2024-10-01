@@ -30,6 +30,10 @@ variable "ports" {
   })
 }
 
+variable "api_service_ip" {
+  type = string
+}
+
 variable "service_ip" {
   type = string
 }

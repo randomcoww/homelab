@@ -1,0 +1,28 @@
+---
+variant: fcos
+version: ${ignition_version}
+systemd:
+  units:
+    - name: nftables-ip@network-boot.service
+      enabled: true
+
+storage:
+  files:
+    - path: /etc/nftables/ip-network-boot.nft
+      mode: 0644
+      overwrite: true
+      contents:
+        inline: |
+          table ip network-boot {
+            chain mark-for-accept {
+              meta mark set meta mark | 0x00001000
+            }
+
+            chain input {
+              type filter hook input priority 0; policy accept;
+              ip saddr ${network_boot_prefix} ip daddr ${network_boot_prefix} jump mark-for-accept;
+              ip daddr ${network_boot_prefix} udp sport bootps udp dport bootpc jump mark-for-accept;
+              ip daddr ${network_boot_prefix} pkttype multicast jump mark-for-accept;
+            }
+          }
+          ;

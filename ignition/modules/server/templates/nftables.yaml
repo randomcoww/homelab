@@ -1,0 +1,55 @@
+---
+variant: fcos
+version: ${ignition_version}
+systemd:
+  units:
+    - name: nftables-ip@base.service
+      enabled: true
+
+storage:
+  files:
+    - path: /etc/sysctl.d/20-server.conf
+      mode: 0644
+      contents:
+        inline: |
+          net.ipv4.ip_forward=1
+    - path: /etc/nftables/ip-base.nft
+      mode: 0644
+      overwrite: true
+      contents:
+        inline: |
+          table ip base {
+            chain base-checks {
+              ct state {established, related} jump mark-for-accept;
+              ct state invalid drop;
+              ct status dnat jump mark-for-accept;
+              ip protocol icmp icmp type { echo-request, echo-reply, time-exceeded, parameter-problem, destination-unreachable } jump mark-for-accept;
+            }
+
+            chain input {
+              type filter hook input priority 0; policy accept;
+              jump base-checks;
+              iifname lo jump mark-for-accept;
+              iifname != lo ip daddr 127.0.0.1/8 drop;
+            }
+
+            chain input-drop {
+              type filter hook input priority 20; policy drop;
+              meta mark != 0 accept;
+            }
+
+            chain forward {
+              type filter hook forward priority 0; policy accept;
+              jump base-checks;
+            }
+
+            chain forward-drop {
+              type filter hook forward priority 20; policy drop;
+              meta mark != 0 accept;
+            }
+
+            chain prerouting {
+              type nat hook prerouting priority dstnat + 20; policy accept;
+            }
+          }
+          ;

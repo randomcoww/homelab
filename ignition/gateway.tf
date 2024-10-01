@@ -5,18 +5,6 @@ module "gateway" {
 
   ignition_version = local.ignition_version
   host_netnum      = each.value.netnum
-  accept_prefixes = [
-    local.networks.etcd.prefix,
-    local.networks.sync.prefix,
-    local.networks.lan.prefix,
-    local.networks.kubernetes.prefix,
-    local.networks.kubernetes_pod.prefix,
-  ]
-  forward_prefixes = [
-    local.networks.lan.prefix,
-    local.networks.kubernetes.prefix,
-    local.networks.kubernetes_pod.prefix
-  ]
   conntrackd_ignore_prefixes = sort(
     setsubtract(compact([
       for _, network in local.networks :
@@ -30,6 +18,7 @@ module "gateway" {
   lan_prefix          = local.services.gateway.network.prefix
   sync_prefix         = local.networks.sync.prefix
   lan_gateway_ip      = local.services.gateway.ip
+  network_boot_prefix = local.networks.priv.prefix
   virtual_router_id   = 13
   keepalived_path     = local.vrrp.keepalived_config_path
 }

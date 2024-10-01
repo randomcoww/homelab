@@ -68,7 +68,13 @@ locals {
     })
   }
 
-  ignition_snippets = [
+  ignition_snippets = concat([
+    for f in fileset(".", "${path.module}/templates/*.yaml") :
+    templatefile(f, {
+      ignition_version = var.ignition_version
+      ports            = var.ports
+    })
+    ], [
     yamlencode({
       variant = "fcos"
       version = var.ignition_version
@@ -88,7 +94,7 @@ locals {
         ]
       }
     })
-  ]
+  ])
 
   pod_manifests = [
     for pod in local.static_pod :

@@ -1,8 +1,30 @@
 ---
 variant: fcos
 version: ${ignition_version}
+systemd:
+  units:
+    - name: nftables-ip@kubernetes-master.service
+      enabled: true
+
 storage:
   files:
+    - path: /etc/nftables/ip-kubernetes-master.nft
+      mode: 0644
+      overwrite: true
+      contents:
+        inline: |
+          table ip kubernetes-master {
+            chain mark-for-accept {
+              meta mark set meta mark | 0x00001000
+            }
+
+            chain input {
+              type filter hook input priority 0; policy accept;
+              tcp dport ${ports.apiserver} jump mark-for-accept;
+              tcp dport ${ports.apiserver_backend} jump mark-for-accept;
+            }
+          }
+          ;
     - path: ${haproxy_path}/${name}.cfg
       mode: 0644
       contents:
@@ -22,21 +44,12 @@ storage:
             server ${name} ${server} check
             %{~ endfor ~}
 
-    - path: ${keepalived_path}/${name}.conf
+    - path: /etc/systemd/network/20-lo.network
       mode: 0644
       contents:
         inline: |
-          vrrp_instance kube-apiserver {
-            preempt
-            state BACKUP
-            advert_int 0.1
-            virtual_router_id ${virtual_router_id}
-            interface ${apiserver_interface_name}
-            use_vmac
-            vmac_xmit_base
-            priority 250
-            garp_master_delay 0
-            virtual_ipaddress {
-              ${apiserver_ip}
-            }
-          }
+          [Match]
+          Name=lo
+
+          [Network]
+          Address=${apiserver_ip}/32

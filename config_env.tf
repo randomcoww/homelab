@@ -11,16 +11,32 @@ locals {
   default_mtu = 1500
 
   base_networks = {
-    lan = {
-      network            = "192.168.126.0"
-      cidr               = 23
-      vlan_id            = 1
-      enable_mdns        = true
-      enable_dhcp_server = true
-      enable_dns         = true
+    priv = {
+      network = "192.168.126.0"
+      cidr    = 23
+      vlan_id = 1
+      mtu     = local.default_mtu
       netnums = {
-        gateway = 2
-        switch  = 255
+        switch        = 255
+        ingress_nginx = 32
+        matchbox      = 39
+      }
+    }
+    service = {
+      network     = "192.168.192.0"
+      cidr        = 24
+      vlan_id     = 2048
+      enable_dns  = true
+      enable_mdns = true
+      netnums = {
+        gateway                = 2
+        external_dns           = 31
+        matchbox_api           = 33
+        minio                  = 34
+        ingress_nginx_external = 35
+        sunshine               = 36
+        alpaca_stream          = 37
+        alpaca_db              = 38
       }
     }
     sync = {
@@ -34,22 +50,6 @@ locals {
       cidr    = 29
       vlan_id = 70
       mtu     = local.default_mtu
-    }
-    service = {
-      network = "192.168.192.0"
-      cidr    = 26
-      vlan_id = 80
-      mtu     = local.default_mtu
-      netnums = {
-        external_dns           = 31
-        ingress_nginx          = 32
-        ingress_nginx_external = 35
-        matchbox               = 33
-        minio                  = 34
-        sunshine               = 36
-        alpaca_stream          = 37
-        alpaca_db              = 38
-      }
     }
     # kubernetes master IPs
     kubernetes = {

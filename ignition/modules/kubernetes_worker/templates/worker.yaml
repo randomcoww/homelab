@@ -37,9 +37,33 @@ systemd:
               --config=${kubelet_config_path} \
               --kubeconfig=${kubeconfig_path} \
               --v=2
+    - name: nftables-ip@kubernetes-worker.service
+      enabled: true
 
 storage:
   files:
+    - path: /etc/nftables/ip-kubernetes-worker.nft
+      mode: 0644
+      overwrite: true
+      contents:
+        inline: |
+          table ip kubernetes-worker {
+            chain mark-for-accept {
+              meta mark set meta mark | 0x00001000
+            }
+
+            chain input {
+              type filter hook input priority 0; policy accept;
+              tcp dport ${ports.kubelet} jump mark-for-accept;
+              ip saddr ${kubernetes_pod_prefix} jump mark-for-accept;
+            }
+
+            chain forward {
+              type filter hook forward priority 0; policy accept;
+              ip saddr ${kubernetes_pod_prefix} jump mark-for-accept;
+            }
+          }
+          ;
     # nf_call_iptables disabled gloablly except for CNI #
     - path: /etc/udev/rules.d/10-cni-nf-call-iptables.rules
       mode: 0644
