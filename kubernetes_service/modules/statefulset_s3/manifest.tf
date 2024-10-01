@@ -20,11 +20,14 @@ module "secret" {
 }
 
 module "statefulset" {
-  source      = "../../../modules/statefulset"
-  name        = var.name
-  app         = var.app
-  release     = var.release
-  replicas    = var.replicas
+  source   = "../../../modules/statefulset"
+  name     = var.name
+  app      = var.app
+  release  = var.release
+  replicas = var.replicas
+  annotations = merge({
+    "checksum/${module.secret.name}" = sha256(module.secret.manifest)
+  }, var.annotations)
   affinity    = var.affinity
   tolerations = var.tolerations
   spec        = var.spec

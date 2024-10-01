@@ -15,7 +15,7 @@ resource "tls_cert_request" "matchbox" {
     join(".", slice(split(".", var.cluster_service_endpoint), 0, i + 1))
   ]
   ip_addresses = [
-    var.service_ip,
+    var.api_service_ip,
   ]
 }
 
