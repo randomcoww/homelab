@@ -19,6 +19,7 @@ locals {
       netnums = {
         switch        = 255
         ingress_nginx = 32
+        minio         = 34
         matchbox      = 39
       }
     }
@@ -30,10 +31,8 @@ locals {
       enable_mdns = true
       netnums = {
         gateway                = 2
-        external_dns           = 31
-        matchbox_api           = 33
-        minio                  = 34
         ingress_nginx_external = 35
+        matchbox_api           = 33
         sunshine               = 36
         alpaca_stream          = 37
         alpaca_db              = 38
@@ -58,7 +57,8 @@ locals {
       vlan_id = 90
       mtu     = local.default_mtu
       netnums = {
-        apiserver = 2
+        apiserver    = 2
+        external_dns = 31
       }
     }
     # cluster internal

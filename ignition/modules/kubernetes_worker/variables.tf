@@ -24,6 +24,10 @@ variable "ports" {
   })
 }
 
+variable "host_netnum" {
+  type = number
+}
+
 variable "cni_bridge_interface_name" {
   type = string
 }
@@ -40,7 +44,7 @@ variable "apiserver_endpoint" {
   type = string
 }
 
-variable "node_ip" {
+variable "node_prefix" {
   type = string
 }
 

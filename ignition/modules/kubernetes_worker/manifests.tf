@@ -90,7 +90,7 @@ locals {
     for f in fileset(".", "${path.module}/templates/*.yaml") :
     templatefile(f, {
       ignition_version          = var.ignition_version
-      node_ip                   = var.node_ip
+      node_ip                   = cidrhost(var.node_prefix, var.host_netnum)
       config_path               = local.config_path
       kubelet_root_path         = var.kubelet_root_path
       static_pod_path           = var.static_pod_path
@@ -102,6 +102,7 @@ locals {
       cni_bridge_interface_name = var.cni_bridge_interface_name
       graceful_shutdown_delay   = var.graceful_shutdown_delay
       kubernetes_pod_prefix     = var.kubernetes_pod_prefix
+      node_prefix               = var.node_prefix
       ports                     = var.ports
     })
     ], [

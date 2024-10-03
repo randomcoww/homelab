@@ -56,11 +56,13 @@ storage:
               type filter hook input priority 0; policy accept;
               tcp dport ${ports.kubelet} jump mark-for-accept;
               ip saddr ${kubernetes_pod_prefix} jump mark-for-accept;
+              ip saddr ${node_prefix} jump mark-for-accept;
             }
 
             chain forward {
               type filter hook forward priority 0; policy accept;
               ip saddr ${kubernetes_pod_prefix} jump mark-for-accept;
+              ip saddr ${node_prefix} jump mark-for-accept;
             }
           }
           ;
@@ -123,3 +125,9 @@ storage:
       contents:
         inline: |
           net.bridge.bridge-nf-call-iptables=0
+    # tftp
+    - path: /etc/sysctl.d/99-tftp.conf
+      mode: 0644
+      contents:
+        inline: |
+          net.netfilter.nf_conntrack_helper=1

@@ -24,19 +24,18 @@ storage:
             }
 
             chain input {
-              type filter hook input priority 0; policy accept;
+              type filter hook input priority -10; policy accept;
+              meta mark 0 iifname ${wan_interface_name} drop;
               ip daddr ${sync_prefix} pkttype multicast jump mark-for-accept;
-              ip daddr ${lan_prefix} jump mark-for-accept;
             }
 
             chain forward {
               type filter hook forward priority 0; policy accept;
-              ip saddr ${lan_prefix} oifname ${wan_interface_name} jump mark-for-accept;
-              ip daddr ${lan_prefix} jump mark-for-accept;
+              oifname ${wan_interface_name} jump mark-for-accept;
             }
 
             chain postrouting {
-              type nat hook postrouting priority srcnat + 30; policy accept;
+              type nat hook postrouting priority srcnat + 20; policy accept;
               oifname ${wan_interface_name} masquerade;
             }
           }

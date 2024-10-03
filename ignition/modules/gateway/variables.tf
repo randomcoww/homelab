@@ -26,14 +26,6 @@ variable "sync_prefix" {
   type = string
 }
 
-variable "lan_prefix" {
-  type = string
-}
-
-variable "network_boot_prefix" {
-  type = string
-}
-
 variable "lan_gateway_ip" {
   type = string
 }

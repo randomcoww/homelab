@@ -249,6 +249,7 @@ module "tailscale" {
       name = "TS_ROUTES"
       value = join(",", [
         local.networks.priv.prefix,
+        local.networks.service.prefix,
         local.networks.kubernetes.prefix,
       ])
     },

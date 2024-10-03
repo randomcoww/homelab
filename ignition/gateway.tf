@@ -15,10 +15,8 @@ module "gateway" {
   wan_interface_name  = each.value.networks.wan.interface
   sync_interface_name = each.value.networks.sync.interface
   lan_interface_name  = each.value.networks[local.services.gateway.network.name].interface
-  lan_prefix          = local.services.gateway.network.prefix
   sync_prefix         = local.networks.sync.prefix
   lan_gateway_ip      = local.services.gateway.ip
-  network_boot_prefix = local.networks.priv.prefix
   virtual_router_id   = 13
   keepalived_path     = local.vrrp.keepalived_config_path
 }

@@ -19,6 +19,10 @@ storage:
       contents:
         inline: |
           table ip base {
+            chain mark-for-accept {
+              meta mark set meta mark | 0x00001000
+            }
+
             chain base-checks {
               ct state {established, related} jump mark-for-accept;
               ct state invalid drop;
@@ -26,8 +30,12 @@ storage:
               ip protocol icmp icmp type { echo-request, echo-reply, time-exceeded, parameter-problem, destination-unreachable } jump mark-for-accept;
             }
 
+            ct helper tftp-69 {
+              type "tftp" protocol udp;
+            }
+
             chain input {
-              type filter hook input priority 0; policy accept;
+              type filter hook input priority -20; policy accept;
               jump base-checks;
               iifname lo jump mark-for-accept;
               iifname != lo ip daddr 127.0.0.1/8 drop;
@@ -36,11 +44,21 @@ storage:
             chain input-drop {
               type filter hook input priority 20; policy drop;
               meta mark != 0 accept;
+
+              tcp dport ssh accept;
+              udp sport bootps udp dport bootpc accept;
+              pkttype multicast accept;
+              tcp dport 53 accept;
+              udp dport 53 accept;
+              udp dport 69 ct helper set tftp-69;
             }
 
             chain forward {
-              type filter hook forward priority 0; policy accept;
+              type filter hook forward priority -20; policy accept;
               jump base-checks;
+
+              tcp dport 53 accept;
+              udp dport 53 accept;
             }
 
             chain forward-drop {
@@ -53,3 +71,9 @@ storage:
             }
           }
           ;
+    # tftp
+    - path: /etc/sysctl.d/99-conntrack-helper.conf
+      mode: 0644
+      contents:
+        inline: |
+          net.netfilter.nf_conntrack_helper=1

@@ -392,6 +392,10 @@ locals {
           source  = "phy0"
           network = "service"
         }
+        phy0-kubernetes = {
+          source  = "phy0"
+          network = "kubernetes"
+        }
       }
       networks = {
         priv = {
@@ -400,6 +404,10 @@ locals {
         }
         service = {
           interface     = "phy0-service"
+          enable_netnum = true
+        }
+        kubernetes = {
+          interface     = "phy0-kubernetes"
           enable_netnum = true
         }
       }
