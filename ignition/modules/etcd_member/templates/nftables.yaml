@@ -3,17 +3,17 @@ variant: fcos
 version: ${ignition_version}
 systemd:
   units:
-    - name: nftables-ip@etcd-member.service
+    - name: nftables@etcd-member.service
       enabled: true
 
 storage:
   files:
-    - path: /etc/nftables/ip-etcd-member.nft
+    - path: /etc/nftables/etcd-member.nft
       mode: 0644
       overwrite: true
       contents:
         inline: |
-          table ip etcd-member {
+          table inet etcd-member {
             chain mark-for-accept {
               meta mark set meta mark | 0x00001000
             }

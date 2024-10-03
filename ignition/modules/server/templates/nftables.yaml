@@ -3,7 +3,7 @@ variant: fcos
 version: ${ignition_version}
 systemd:
   units:
-    - name: nftables-ip@base.service
+    - name: nftables@base.service
       enabled: true
 
 storage:
@@ -13,12 +13,12 @@ storage:
       contents:
         inline: |
           net.ipv4.ip_forward=1
-    - path: /etc/nftables/ip-base.nft
+    - path: /etc/nftables/base.nft
       mode: 0644
       overwrite: true
       contents:
         inline: |
-          table ip base {
+          table inet base {
             chain mark-for-accept {
               meta mark set meta mark | 0x00001000
             }
@@ -28,10 +28,6 @@ storage:
               ct state invalid drop;
               ct status dnat jump mark-for-accept;
               ip protocol icmp icmp type { echo-request, echo-reply, time-exceeded, parameter-problem, destination-unreachable } jump mark-for-accept;
-            }
-
-            ct helper tftp-69 {
-              type "tftp" protocol udp;
             }
 
             chain input {
@@ -44,21 +40,12 @@ storage:
             chain input-drop {
               type filter hook input priority 20; policy drop;
               meta mark != 0 accept;
-
               tcp dport ssh accept;
-              udp sport bootps udp dport bootpc accept;
-              pkttype multicast accept;
-              tcp dport 53 accept;
-              udp dport 53 accept;
-              udp dport 69 ct helper set tftp-69;
             }
 
             chain forward {
               type filter hook forward priority -20; policy accept;
               jump base-checks;
-
-              tcp dport 53 accept;
-              udp dport 53 accept;
             }
 
             chain forward-drop {
@@ -71,9 +58,3 @@ storage:
             }
           }
           ;
-    # tftp
-    - path: /etc/sysctl.d/99-conntrack-helper.conf
-      mode: 0644
-      contents:
-        inline: |
-          net.netfilter.nf_conntrack_helper=1

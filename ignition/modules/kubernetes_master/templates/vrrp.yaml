@@ -3,17 +3,17 @@ variant: fcos
 version: ${ignition_version}
 systemd:
   units:
-    - name: nftables-ip@kubernetes-master.service
+    - name: nftables@kubernetes-master.service
       enabled: true
 
 storage:
   files:
-    - path: /etc/nftables/ip-kubernetes-master.nft
+    - path: /etc/nftables/kubernetes-master.nft
       mode: 0644
       overwrite: true
       contents:
         inline: |
-          table ip kubernetes-master {
+          table inet kubernetes-master {
             chain mark-for-accept {
               meta mark set meta mark | 0x00001000
             }

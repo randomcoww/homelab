@@ -37,17 +37,17 @@ systemd:
               --config=${kubelet_config_path} \
               --kubeconfig=${kubeconfig_path} \
               --v=2
-    - name: nftables-ip@kubernetes-worker.service
+    - name: nftables@kubernetes-worker.service
       enabled: true
 
 storage:
   files:
-    - path: /etc/nftables/ip-kubernetes-worker.nft
+    - path: /etc/nftables/kubernetes-worker.nft
       mode: 0644
       overwrite: true
       contents:
         inline: |
-          table ip kubernetes-worker {
+          table inet kubernetes-worker {
             chain mark-for-accept {
               meta mark set meta mark | 0x00001000
             }
@@ -125,9 +125,3 @@ storage:
       contents:
         inline: |
           net.bridge.bridge-nf-call-iptables=0
-    # tftp
-    - path: /etc/sysctl.d/99-tftp.conf
-      mode: 0644
-      contents:
-        inline: |
-          net.netfilter.nf_conntrack_helper=1

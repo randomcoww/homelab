@@ -21,20 +21,20 @@ systemd:
     # configure nftables for each service
     - name: nftables.service
       mask: false
-    - name: nftables-ip@.service
+    - name: nftables@.service
       enabled: true
       contents: |
         [Unit]
         Wants=network-pre.target
         Before=network-pre.target
-        ConditionFileNotEmpty=/etc/nftables/ip-%i.nft
+        ConditionFileNotEmpty=/etc/nftables/%i.nft
         [Service]
         Type=oneshot
         ProtectSystem=full
         ProtectHome=true
-        ExecStart=/sbin/nft -f /etc/nftables/ip-%i.nft
-        ExecReload=/sbin/nft 'delete table ip %i; include "/etc/nftables/ip-%i.nft";'
-        ExecStop=/sbin/nft delete table ip %i
+        ExecStart=/sbin/nft -f /etc/nftables/%i.nft
+        ExecReload=/sbin/nft 'delete table inet %i; include "/etc/nftables/%i.nft";'
+        ExecStop=/sbin/nft delete table inet %i
         RemainAfterExit=yes
         [Install]
         WantedBy=multi-user.target

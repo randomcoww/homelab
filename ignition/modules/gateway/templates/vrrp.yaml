@@ -3,7 +3,7 @@ variant: fcos
 version: ${ignition_version}
 systemd:
   units:
-    - name: nftables-ip@gateway.service
+    - name: nftables@gateway.service
       enabled: true
 
 storage:
@@ -13,12 +13,12 @@ storage:
       contents:
         inline: |
           net.ipv4.ip_forward=1
-    - path: /etc/nftables/ip-gateway.nft
+    - path: /etc/nftables/gateway.nft
       mode: 0644
       overwrite: true
       contents:
         inline: |
-          table ip gateway {
+          table inet gateway {
             chain mark-for-accept {
               meta mark set meta mark | 0x00001000
             }
@@ -26,7 +26,7 @@ storage:
             chain input {
               type filter hook input priority -10; policy accept;
               meta mark 0 iifname ${wan_interface_name} drop;
-              ip daddr ${sync_prefix} pkttype multicast jump mark-for-accept;
+              iifname ${sync_interface_name} pkttype multicast jump mark-for-accept;
             }
 
             chain forward {
