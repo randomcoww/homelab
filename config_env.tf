@@ -18,7 +18,7 @@ locals {
       vlan_id = 50
       mtu     = local.default_mtu
       netnums = {
-        switch = 168
+        switch = 127
       }
     }
     # All clients

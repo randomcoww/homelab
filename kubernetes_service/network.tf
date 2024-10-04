@@ -54,7 +54,7 @@ module "kea" {
       ]
       mtu = lookup(network, "mtu", 1500)
       pools = [
-        cidrsubnet(network.prefix, 1, 0),
+        cidrsubnet(network.prefix, 1, 1),
       ]
     }
   ]
