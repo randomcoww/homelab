@@ -214,7 +214,6 @@ module "tailscale" {
         local.networks.node.prefix,
         local.networks.lan.prefix,
         local.networks.service.prefix,
-        local.networks.kubernetes.prefix,
       ])
     },
   ]
