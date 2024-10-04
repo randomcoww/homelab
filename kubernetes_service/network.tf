@@ -37,8 +37,8 @@ module "kea" {
   ipxe_script_url = "http://${local.services.matchbox.ip}:${local.service_ports.matchbox}/boot.ipxe"
   networks = [
     for _, network in [
-      local.networks.priv,
-      local.networks.service,
+      local.networks.node,
+      local.networks.lan,
     ] :
     {
       prefix = network.prefix
@@ -54,7 +54,7 @@ module "kea" {
       ]
       mtu = lookup(network, "mtu", 1500)
       pools = [
-        cidrsubnet(network.prefix, 1, 1),
+        cidrsubnet(network.prefix, 1, 0),
       ]
     }
   ]
@@ -63,46 +63,14 @@ module "kea" {
 
 # PXE boot server
 
-resource "minio_s3_bucket" "matchbox" {
-  bucket        = "matchbox"
-  force_destroy = true
-}
-
-resource "minio_iam_user" "matchbox" {
-  name          = "matchbox"
-  force_destroy = true
-}
-
-resource "minio_iam_policy" "matchbox" {
-  name = "matchbox"
-  policy = jsonencode({
-    Version = "2012-10-17"
-    Statement = [
-      {
-        Effect = "Allow"
-        Action = "*"
-        Resource = [
-          minio_s3_bucket.matchbox.arn,
-          "${minio_s3_bucket.matchbox.arn}/*",
-        ]
-      },
-    ]
-  })
-}
-
-resource "minio_iam_user_policy_attachment" "matchbox" {
-  user_name   = minio_iam_user.matchbox.id
-  policy_name = minio_iam_policy.matchbox.id
-}
-
 module "matchbox" {
   source                   = "./modules/matchbox"
   cluster_service_endpoint = local.kubernetes_services.matchbox.fqdn
   release                  = "0.2.16"
-  replicas                 = 2
+  replicas                 = 3
   images = {
-    matchbox   = local.container_images.matchbox
-    mountpoint = local.container_images.mountpoint
+    matchbox  = local.container_images.matchbox
+    syncthing = local.container_images.syncthing
   }
   ports = {
     matchbox     = local.service_ports.matchbox
@@ -111,11 +79,6 @@ module "matchbox" {
   service_ip     = local.services.matchbox.ip
   api_service_ip = local.services.matchbox_api.ip
   ca             = data.terraform_remote_state.sr.outputs.matchbox.ca
-
-  s3_endpoint          = "http://${local.services.minio.ip}:${local.service_ports.minio}"
-  s3_bucket            = minio_s3_bucket.matchbox.id
-  s3_access_key_id     = minio_iam_user.matchbox.id
-  s3_secret_access_key = minio_iam_user.matchbox.secret
 }
 
 # Wifi AP
@@ -248,7 +211,8 @@ module "tailscale" {
     {
       name = "TS_ROUTES"
       value = join(",", [
-        local.networks.priv.prefix,
+        local.networks.node.prefix,
+        local.networks.lan.prefix,
         local.networks.service.prefix,
         local.networks.kubernetes.prefix,
       ])

@@ -39,7 +39,7 @@ storage:
 
             chain input-drop {
               type filter hook input priority 20; policy drop;
-              meta mark != 0 accept;
+              meta mark 0x00001000 accept;
               tcp dport ssh accept;
             }
 
@@ -50,7 +50,9 @@ storage:
 
             chain forward-drop {
               type filter hook forward priority 20; policy drop;
-              meta mark != 0 accept;
+              meta mark 0x00001000 accept;
+              tcp dport domain accept;
+              udp dport domain accept;
             }
 
             chain prerouting {

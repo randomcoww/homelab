@@ -11,57 +11,71 @@ locals {
   default_mtu = 1500
 
   base_networks = {
-    priv = {
-      network = "192.168.126.0"
-      cidr    = 23
-      vlan_id = 1
+    # Kubernetes worker and netboot
+    node = {
+      network = "192.168.192.0"
+      cidr    = 24
+      vlan_id = 50
       mtu     = local.default_mtu
       netnums = {
-        switch        = 255
-        ingress_nginx = 32
-        minio         = 34
-        matchbox      = 39
+        switch = 168
       }
     }
-    service = {
-      network     = "192.168.192.0"
+    # All clients
+    lan = {
+      network     = "192.168.200.0"
       cidr        = 24
       vlan_id     = 2048
+      mtu         = local.default_mtu
       enable_dns  = true
       enable_mdns = true
       netnums = {
-        gateway                = 2
+        gateway = 2
+      }
+    }
+    # Kubernetes service external IP and LB
+    service = {
+      network = "192.168.208.0"
+      cidr    = 24
+      vlan_id = 80
+      mtu     = local.default_mtu
+      netnums = {
+        external_dns           = 31
+        minio                  = 34
+        ingress_nginx          = 32
         ingress_nginx_external = 35
         matchbox_api           = 33
         sunshine               = 36
         alpaca_stream          = 37
         alpaca_db              = 38
+        matchbox               = 39
       }
     }
+    # VRRP conntrack sync
     sync = {
-      network = "192.168.190.0"
-      cidr    = 29
+      network = "192.168.224.0"
+      cidr    = 26
       vlan_id = 60
       mtu     = local.default_mtu
     }
+    # Etcd peering
     etcd = {
-      network = "192.168.191.0"
-      cidr    = 29
+      network = "192.168.228.0"
+      cidr    = 26
       vlan_id = 70
       mtu     = local.default_mtu
     }
-    # kubernetes master IPs
+    # Kubernetes master
     kubernetes = {
-      network = "192.168.193.0"
+      network = "192.168.232.0"
       cidr    = 26
       vlan_id = 90
       mtu     = local.default_mtu
       netnums = {
-        apiserver    = 2
-        external_dns = 31
+        apiserver = 2
       }
     }
-    # cluster internal
+    # Cluster internal
     kubernetes_service = {
       network = "10.96.0.0"
       cidr    = 12
@@ -76,7 +90,7 @@ locals {
       network = "10.244.0.0"
       cidr    = 16
     }
-    # external
+    # Main and mobile backup WAN
     wan = {
       vlan_id = 30
     }
@@ -118,6 +132,7 @@ locals {
     sunshine           = "ghcr.io/randomcoww/sunshine:2024.922.10353-560.35.03"
     mountpoint         = "ghcr.io/randomcoww/mountpoint:20240915.5"
     audioserve         = "docker.io/izderadicka/audioserve:latest"
+    syncthing          = "docker.io/syncthing/syncthing:1.27"
   }
 
   pxeboot_images = {

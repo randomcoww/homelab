@@ -10,7 +10,7 @@ module "metadata" {
   namespace   = local.namespace
   release     = var.release
   app_version = split(":", var.images.matchbox)[1]
-  manifests = merge(module.s3-mount.chart.manifests, {
+  manifests = merge(module.syncthing.chart.manifests, {
     "templates/service.yaml"     = module.service.manifest
     "templates/service-api.yaml" = module.service-api.manifest
     "templates/secret.yaml"      = module.secret.manifest
@@ -71,18 +71,14 @@ module "service-api" {
   }
 }
 
-module "s3-mount" {
-  source = "../statefulset_s3"
-  ## s3 config
-  s3_endpoint          = var.s3_endpoint
-  s3_bucket            = var.s3_bucket
-  s3_prefix            = local.name
-  s3_access_key_id     = var.s3_access_key_id
-  s3_secret_access_key = var.s3_secret_access_key
-  s3_mount_path        = local.data_path
-  s3_mount_extra_args  = var.s3_mount_extra_args
+module "syncthing" {
+  source = "../statefulset_syncthing"
+  ## syncthing config
+  sync_data_paths = [
+    local.data_path,
+  ]
   images = {
-    mountpoint = var.images.mountpoint
+    syncthing = var.images.syncthing
   }
   ##
   name     = local.name

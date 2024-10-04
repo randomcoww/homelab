@@ -12,6 +12,14 @@ locals {
         }
       }
       vlan_interfaces = {
+        phy0-lan = {
+          source  = "phy0"
+          network = "lan"
+        }
+        phy0-service = {
+          source  = "phy0"
+          network = "service"
+        }
         phy0-sync = {
           source  = "phy0"
           network = "sync"
@@ -19,10 +27,6 @@ locals {
         phy0-etcd = {
           source  = "phy0"
           network = "etcd"
-        }
-        phy0-service = {
-          source  = "phy0"
-          network = "service"
         }
         phy0-kubernetes = {
           source  = "phy0"
@@ -35,8 +39,16 @@ locals {
         }
       }
       networks = {
-        priv = {
+        node = {
           interface     = "phy0"
+          enable_netnum = true
+        }
+        lan = {
+          interface     = "phy0-lan"
+          enable_netnum = true
+        }
+        service = {
+          interface     = "phy0-service"
           enable_netnum = true
         }
         sync = {
@@ -45,10 +57,6 @@ locals {
         }
         etcd = {
           interface     = "phy0-etcd"
-          enable_netnum = true
-        }
-        service = {
-          interface     = "phy0-service"
           enable_netnum = true
         }
         kubernetes = {
@@ -101,6 +109,14 @@ locals {
         }
       }
       vlan_interfaces = {
+        phy0-lan = {
+          source  = "phy0"
+          network = "lan"
+        }
+        phy0-service = {
+          source  = "phy0"
+          network = "service"
+        }
         phy0-sync = {
           source  = "phy0"
           network = "sync"
@@ -108,10 +124,6 @@ locals {
         phy0-etcd = {
           source  = "phy0"
           network = "etcd"
-        }
-        phy0-service = {
-          source  = "phy0"
-          network = "service"
         }
         phy0-kubernetes = {
           source  = "phy0"
@@ -124,8 +136,16 @@ locals {
         }
       }
       networks = {
-        priv = {
+        node = {
           interface     = "phy0"
+          enable_netnum = true
+        }
+        lan = {
+          interface     = "phy0-lan"
+          enable_netnum = true
+        }
+        service = {
+          interface     = "phy0-service"
           enable_netnum = true
         }
         sync = {
@@ -134,10 +154,6 @@ locals {
         }
         etcd = {
           interface     = "phy0-etcd"
-          enable_netnum = true
-        }
-        service = {
-          interface     = "phy0-service"
           enable_netnum = true
         }
         kubernetes = {
@@ -190,6 +206,14 @@ locals {
         }
       }
       vlan_interfaces = {
+        phy0-lan = {
+          source  = "phy0"
+          network = "lan"
+        }
+        phy0-service = {
+          source  = "phy0"
+          network = "service"
+        }
         phy0-sync = {
           source  = "phy0"
           network = "sync"
@@ -197,10 +221,6 @@ locals {
         phy0-etcd = {
           source  = "phy0"
           network = "etcd"
-        }
-        phy0-service = {
-          source  = "phy0"
-          network = "service"
         }
         phy0-kubernetes = {
           source  = "phy0"
@@ -213,8 +233,16 @@ locals {
         }
       }
       networks = {
-        priv = {
+        node = {
           interface     = "phy0"
+          enable_netnum = true
+        }
+        lan = {
+          interface     = "phy0-lan"
+          enable_netnum = true
+        }
+        service = {
+          interface     = "phy0-service"
           enable_netnum = true
         }
         sync = {
@@ -223,10 +251,6 @@ locals {
         }
         etcd = {
           interface     = "phy0-etcd"
-          enable_netnum = true
-        }
-        service = {
-          interface     = "phy0-service"
           enable_netnum = true
         }
         kubernetes = {
@@ -286,6 +310,10 @@ locals {
         }
       }
       vlan_interfaces = {
+        phy0-lan = {
+          source  = "phy0"
+          network = "lan"
+        }
         phy0-service = {
           source  = "phy0"
           network = "service"
@@ -298,18 +326,22 @@ locals {
       bridge_interfaces = {
         br-lan = {
           sources = [
-            "phy0-service",
+            "phy0-lan",
           ]
         }
       }
       networks = {
-        priv = {
+        node = {
           interface     = "phy0"
           enable_netnum = true
         }
-        service = {
+        lan = {
           interface   = "br-lan"
           enable_dhcp = true
+        }
+        service = {
+          interface     = "phy0-service"
+          enable_netnum = true
         }
         kubernetes = {
           interface     = "phy0-kubernetes"
@@ -388,6 +420,10 @@ locals {
         }
       }
       vlan_interfaces = {
+        phy0-node = {
+          source  = "phy0"
+          network = "service"
+        }
         phy0-service = {
           source  = "phy0"
           network = "service"
@@ -398,7 +434,11 @@ locals {
         }
       }
       networks = {
-        priv = {
+        node = {
+          interface     = "phy0-node"
+          enable_netnum = true
+        }
+        lan = {
           interface   = "phy0"
           enable_dhcp = true
         }
@@ -458,12 +498,12 @@ locals {
     network-manager     = ["de-0"]
     upstream-dns        = ["gw-0", "gw-1", "q-0", "r-0"]
     gateway             = ["gw-0", "gw-1", "q-0"]
-    vrrp                = ["gw-0", "gw-1"]
+    vrrp                = ["gw-0", "gw-1", "q-0"]
     disks               = ["gw-0", "gw-1", "q-0", "de-0", "de-1", "r-0"]
     server              = ["gw-0", "gw-1", "q-0", "de-1", "r-0"]
     client              = ["de-0", "de-1"]
     etcd                = ["gw-0", "gw-1", "q-0"]
-    kubernetes-master   = ["gw-0", "gw-1"]
+    kubernetes-master   = ["gw-0", "gw-1", "q-0"]
     kubernetes-worker   = ["gw-0", "gw-1", "q-0", "de-1"]
     nvidia-container    = ["de-1"]
     desktop-environment = ["de-0", "de-1"]

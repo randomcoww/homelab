@@ -11,7 +11,7 @@ module "kubernetes-master" {
   service_account  = data.terraform_remote_state.sr.outputs.kubernetes.service_account
   members = {
     for host_key, host in local.members.kubernetes-master :
-    host_key => cidrhost(local.networks.kubernetes.prefix, host.netnum)
+    host_key => cidrhost(local.networks[local.services.apiserver.network.name].prefix, host.netnum)
   }
   etcd_members = {
     for host_key, host in local.members.etcd :
@@ -61,7 +61,7 @@ module "kubernetes-worker" {
   apiserver_endpoint        = "https://${local.services.apiserver.ip}:${local.host_ports.apiserver}"
   cni_bridge_interface_name = local.kubernetes.cni_bridge_interface_name
   kubernetes_pod_prefix     = local.networks.kubernetes_pod.prefix
-  node_prefix               = local.networks.kubernetes.prefix
+  node_prefix               = local.networks.node.prefix
   cluster_dns_ip            = local.services.cluster_dns.ip
   kubelet_root_path         = local.kubernetes.kubelet_root_path
   static_pod_path           = local.kubernetes.static_pod_manifest_path
