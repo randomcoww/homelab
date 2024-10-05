@@ -88,8 +88,14 @@ locals {
 
   static_pod = {
     for key, f in {
-      control-plane = {
-        contents = module.control-plane.manifest
+      apiserver = {
+        contents = module.apiserver.manifest
+      }
+      controller-manager = {
+        contents = module.controller-manager.manifest
+      }
+      scheduler = {
+        contents = module.scheduler.manifest
       }
     } :
     key => merge(f, {
@@ -149,7 +155,7 @@ module "controller-manager-kubeconfig" {
   source             = "../../../modules/kubeconfig"
   cluster_name       = var.cluster_name
   user               = var.controller_manager_user
-  apiserver_endpoint = "https://127.0.0.1:${var.ports.apiserver_backend}"
+  apiserver_endpoint = "https://127.0.0.1:${var.ports.apiserver}"
   ca_cert_pem        = var.kubernetes_ca.cert_pem
   client_cert_pem    = tls_locally_signed_cert.controller-manager.cert_pem
   client_key_pem     = tls_private_key.controller-manager.private_key_pem
@@ -159,15 +165,15 @@ module "scheduler-kubeconfig" {
   source             = "../../../modules/kubeconfig"
   cluster_name       = var.cluster_name
   user               = var.scheduler_user
-  apiserver_endpoint = "https://127.0.0.1:${var.ports.apiserver_backend}"
+  apiserver_endpoint = "https://127.0.0.1:${var.ports.apiserver}"
   ca_cert_pem        = var.kubernetes_ca.cert_pem
   client_cert_pem    = tls_locally_signed_cert.scheduler.cert_pem
   client_key_pem     = tls_private_key.scheduler.private_key_pem
 }
 
-module "control-plane" {
+module "apiserver" {
   source = "../../../modules/static_pod"
-  name   = "kube-control-plane"
+  name   = "kube-apiserver"
   spec = {
     containers = [
       {
@@ -249,6 +255,23 @@ module "control-plane" {
           },
         ]
       },
+    ]
+    volumes = [
+      {
+        name = "config"
+        hostPath = {
+          path = local.config_path
+        }
+      },
+    ]
+  }
+}
+
+module "controller-manager" {
+  source = "../../../modules/static_pod"
+  name   = "kube-contoller-manager"
+  spec = {
+    containers = [
       {
         name  = "kube-controller-manager"
         image = var.images.controller_manager
@@ -299,6 +322,23 @@ module "control-plane" {
           },
         ]
       },
+    ]
+    volumes = [
+      {
+        name = "config"
+        hostPath = {
+          path = local.config_path
+        }
+      },
+    ]
+  }
+}
+
+module "scheduler" {
+  source = "../../../modules/static_pod"
+  name   = "kube-scheduler"
+  spec = {
+    containers = [
       {
         name  = "kube-scheduler"
         image = var.images.scheduler
