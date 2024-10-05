@@ -298,14 +298,15 @@ locals {
       bridge_interfaces = {
         br-lan = {
           sources = [
-            "phy0-lan",
+            "phy0",
           ]
         }
       }
       networks = {
         node = {
-          interface   = "br-lan"
-          enable_dhcp = true
+          interface     = "br-lan"
+          enable_dhcp   = true
+          enable_netnum = true
         }
         service = {
           interface     = "phy0-service"
@@ -442,7 +443,7 @@ locals {
     base                = ["gw-0", "gw-1", "q-0", "de-1", "r-0"]
     systemd-networkd    = ["gw-0", "gw-1", "q-0", "de-1", "r-0"]
     network-manager     = []
-    upstream-dns        = ["gw-0", "gw-1", "q-0", "r-0"]
+    upstream-dns        = ["gw-0", "gw-1", "q-0", "de-1", "r-0"]
     gateway             = ["gw-0", "gw-1", "q-0"]
     vrrp                = ["gw-0", "gw-1", "q-0"]
     disks               = ["gw-0", "gw-1", "q-0", "de-1", "r-0"]

@@ -36,7 +36,7 @@ module "kubernetes-master" {
   kubernetes_service_prefix  = local.networks.kubernetes_service.prefix
   kubernetes_pod_prefix      = local.networks.kubernetes_pod.prefix
   apiserver_interface_name   = each.value.networks[local.services.apiserver.network.name].interface
-  node_ip                    = cidrhost(local.networks.kubernetes.prefix, each.value.netnum)
+  node_ip                    = cidrhost(local.networks[local.services.apiserver.network.name].prefix, each.value.netnum)
   apiserver_ip               = local.services.apiserver.ip
   cluster_apiserver_ip       = local.services.cluster_apiserver.ip
   virtual_router_id          = 14
