@@ -21,6 +21,7 @@ locals {
       enable_mdns = true
       netnums = {
         gateway = 2
+        switch  = 127
       }
     }
     # Kubernetes service external IP and LB
@@ -31,14 +32,14 @@ locals {
       mtu     = local.default_mtu
       netnums = {
         external_dns           = 31
-        minio                  = 34
         ingress_nginx          = 32
         ingress_nginx_external = 35
+        matchbox               = 39
         matchbox_api           = 33
+        minio                  = 34
         sunshine               = 36
         alpaca_stream          = 37
         alpaca_db              = 38
-        matchbox               = 39
       }
     }
     # VRRP conntrack sync

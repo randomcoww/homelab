@@ -9,4 +9,4 @@ storage:
         inline: |
           [Resolve]
           DNSOverTLS=true
-          FallbackDNS=${upstream_dns.ip}#${upstream_dns.hostname}
+          DNS=${upstream_dns.ip}#${upstream_dns.hostname}
