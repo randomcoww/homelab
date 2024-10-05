@@ -4,6 +4,7 @@ module "gateway" {
   source   = "./modules/gateway"
 
   ignition_version = local.ignition_version
+  fw_mark          = local.fw_marks.accept
   host_netnum      = each.value.netnum
   conntrackd_ignore_prefixes = sort(
     setsubtract(compact([

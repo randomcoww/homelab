@@ -20,7 +20,7 @@ storage:
         inline: |
           table inet base {
             chain mark-for-accept {
-              meta mark set meta mark | 0x00001000
+              meta mark set meta mark | ${fw_mark}
             }
 
             chain base-checks {
@@ -39,8 +39,8 @@ storage:
 
             chain input-drop {
               type filter hook input priority 20; policy drop;
-              meta mark 0x00001000 accept;
               tcp dport ssh accept;
+              meta mark & ${fw_mark} == ${fw_mark} accept;
             }
 
             chain forward {
@@ -50,9 +50,9 @@ storage:
 
             chain forward-drop {
               type filter hook forward priority 20; policy drop;
-              meta mark 0x00001000 accept;
               tcp dport domain accept;
               udp dport domain accept;
+              meta mark & ${fw_mark} == ${fw_mark} accept;
             }
 
             chain prerouting {

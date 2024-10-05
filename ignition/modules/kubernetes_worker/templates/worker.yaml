@@ -49,7 +49,7 @@ storage:
         inline: |
           table inet kubernetes-worker {
             chain mark-for-accept {
-              meta mark set meta mark | 0x00001000
+              meta mark set meta mark | ${fw_mark}
             }
 
             chain input {

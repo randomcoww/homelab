@@ -91,6 +91,7 @@ locals {
     templatefile(f, {
       ignition_version          = var.ignition_version
       node_ip                   = cidrhost(var.node_prefix, var.host_netnum)
+      fw_mark                   = var.fw_mark
       config_path               = local.config_path
       kubelet_root_path         = var.kubelet_root_path
       static_pod_path           = var.static_pod_path

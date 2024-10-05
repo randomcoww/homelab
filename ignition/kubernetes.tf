@@ -3,6 +3,7 @@ module "kubernetes-master" {
   source   = "./modules/kubernetes_master"
 
   ignition_version = local.ignition_version
+  fw_mark          = local.fw_marks.accept
   name             = "kubernetes-master"
   cluster_name     = local.kubernetes.cluster_name
   front_proxy_ca   = data.terraform_remote_state.sr.outputs.kubernetes.front_proxy_ca
@@ -49,6 +50,7 @@ module "kubernetes-worker" {
   source   = "./modules/kubernetes_worker"
 
   ignition_version = local.ignition_version
+  fw_mark          = local.fw_marks.accept
   name             = "kubernetes-worker"
   cluster_name     = local.kubernetes.cluster_name
   ca               = data.terraform_remote_state.sr.outputs.kubernetes.ca
@@ -74,6 +76,7 @@ module "etcd" {
   source   = "./modules/etcd_member"
 
   ignition_version = local.ignition_version
+  fw_mark          = local.fw_marks.accept
   name             = "etcd"
   host_key         = each.key
   cluster_token    = local.kubernetes.cluster_name

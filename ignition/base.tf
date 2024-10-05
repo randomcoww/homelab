@@ -30,6 +30,7 @@ module "systemd-networkd" {
   source   = "./modules/systemd_networkd"
 
   ignition_version    = local.ignition_version
+  fw_mark             = local.fw_marks.accept
   host_netnum         = each.value.netnum
   physical_interfaces = each.value.physical_interfaces
   bridge_interfaces   = each.value.bridge_interfaces

@@ -12,6 +12,7 @@ module "wireguard-client" {
   source   = "./modules/wireguard_client"
 
   ignition_version = local.ignition_version
+  fw_mark          = local.fw_marks.wireguard
   private_key      = var.wireguard_client.private_key
   public_key       = var.wireguard_client.public_key
   address          = var.wireguard_client.address

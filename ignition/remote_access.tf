@@ -5,6 +5,7 @@ module "server" {
   source   = "./modules/server"
 
   ignition_version = local.ignition_version
+  fw_mark          = local.fw_marks.accept
   key_id           = each.value.hostname
   valid_principals = sort(concat([
     for _, network in each.value.networks :

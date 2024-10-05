@@ -14,7 +14,7 @@ storage:
 
           [WireGuard]
           PrivateKey=${private_key}
-          FirewallMark=${firewall_mark}
+          FirewallMark=${fw_mark}
           RouteTable=${table_id}
 
           [WireGuardPeer]

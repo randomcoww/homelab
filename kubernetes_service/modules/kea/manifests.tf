@@ -79,28 +79,31 @@ locals {
           {
             subnet = network.prefix
             id     = local.subnet_id_base + k
-            option-data = [
-              {
-                name = "routers"
-                data = join(",", network.routers)
-              },
-              {
-                name = "domain-name-servers"
-                data = join(",", network.domain_name_servers)
-              },
+            option-data = concat([
               {
                 name = "interface-mtu"
                 data = format("%s", network.mtu)
               },
               {
-                name = "domain-search"
-                data = join(",", network.domain_search)
-              },
-              {
                 name = "tcode"
                 data = var.timezone
               },
-            ]
+              ], length(network.routers) > 0 ? [
+              {
+                name = "routers"
+                data = join(",", network.routers)
+              }
+              ] : [], length(network.domain_name_servers) > 0 ? [
+              {
+                name = "domain-name-servers"
+                data = join(",", network.domain_name_servers)
+              }
+              ] : [], length(network.domain_search) > 0 ? [
+              {
+                name = "domain-search"
+                data = join(",", network.domain_search)
+              }
+            ] : [])
             pools = [
               for _, pool in network.pools :
               {
@@ -238,7 +241,6 @@ module "statefulset" {
         args = [
           "--address",
           "0.0.0.0:${var.ports.tftpd}",
-          "--verbose",
         ]
         securityContext = {
           capabilities = {

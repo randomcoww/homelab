@@ -11,7 +11,7 @@ locals {
       allowed_ips         = split(",", var.allowed_ips)
       table_id            = 1000
       table_priority_base = 30000
-      firewall_mark       = "0x8888"
+      fw_mark             = var.fw_mark
       interface           = "wg0"
       uid                 = var.uid
     })

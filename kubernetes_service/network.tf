@@ -36,12 +36,8 @@ module "kea" {
   ipxe_boot_path  = "/ipxe.efi"
   ipxe_script_url = "http://${local.services.matchbox.ip}:${local.service_ports.matchbox}/boot.ipxe"
   networks = [
-    for _, network in [
-      local.networks.node,
-      local.networks.lan,
-    ] :
     {
-      prefix = network.prefix
+      prefix = local.networks.node.prefix
       routers = [
         local.services.gateway.ip,
       ]
@@ -52,11 +48,11 @@ module "kea" {
         local.domains.public,
         local.domains.kubernetes,
       ]
-      mtu = lookup(network, "mtu", 1500)
+      mtu = lookup(local.networks.node, "mtu", 1500)
       pools = [
-        cidrsubnet(network.prefix, 1, 1),
+        cidrsubnet(local.networks.node.prefix, 1, 1),
       ]
-    }
+    },
   ]
   timezone = local.timezone
 }
@@ -212,8 +208,6 @@ module "tailscale" {
       name = "TS_ROUTES"
       value = join(",", [
         local.networks.node.prefix,
-        local.networks.lan.prefix,
-        local.networks.service.prefix,
       ])
     },
   ]

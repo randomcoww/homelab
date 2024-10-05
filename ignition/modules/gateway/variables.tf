@@ -2,6 +2,10 @@ variable "ignition_version" {
   type = string
 }
 
+variable "fw_mark" {
+  type = string
+}
+
 variable "host_netnum" {
   type = number
 }

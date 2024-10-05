@@ -3,6 +3,7 @@ locals {
     for f in fileset(".", "${path.module}/templates/*.yaml") :
     templatefile(f, {
       ignition_version    = var.ignition_version
+      fw_mark             = var.fw_mark
       host_netnum         = var.host_netnum
       physical_interfaces = var.physical_interfaces
       bridge_interfaces   = var.bridge_interfaces

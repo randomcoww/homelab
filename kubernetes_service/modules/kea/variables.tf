@@ -46,9 +46,9 @@ variable "networks" {
   type = list(object({
     prefix              = string
     mtu                 = number
-    routers             = list(string)
-    domain_name_servers = list(string)
-    domain_search       = list(string)
+    routers             = optional(list(string), [])
+    domain_name_servers = optional(list(string), [])
+    domain_search       = optional(list(string), [])
     pools               = list(string)
   }))
 }

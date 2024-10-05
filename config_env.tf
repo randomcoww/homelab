@@ -13,17 +13,7 @@ locals {
   base_networks = {
     # Kubernetes worker and netboot
     node = {
-      network = "192.168.192.0"
-      cidr    = 24
-      vlan_id = 50
-      mtu     = local.default_mtu
-      netnums = {
-        switch = 127
-      }
-    }
-    # All clients
-    lan = {
-      network     = "192.168.200.0"
+      network     = "192.168.192.0"
       cidr        = 24
       vlan_id     = 2048
       mtu         = local.default_mtu
@@ -96,6 +86,11 @@ locals {
     }
     mobile = {
     }
+  }
+
+  fw_marks = {
+    accept    = "0x00002000"
+    wireguard = "0x00008000"
   }
 
   container_images = {
