@@ -117,7 +117,9 @@ locals {
       virtual_router_id         = var.virtual_router_id
       apiserver_ip              = var.apiserver_ip
       apiserver_health_endpoint = local.apiserver_health_endpoint
+      apiserver_interface_name  = var.apiserver_interface_name
       haproxy_path              = var.haproxy_path
+      static_routes             = var.static_routes
     })
     ], [
     yamlencode({

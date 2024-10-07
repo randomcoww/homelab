@@ -35,12 +35,28 @@ module "kubernetes-master" {
   cluster_apiserver_endpoint = local.kubernetes_services.apiserver.fqdn
   kubernetes_service_prefix  = local.networks.kubernetes_service.prefix
   kubernetes_pod_prefix      = local.networks.kubernetes_pod.prefix
-  node_ip                    = cidrhost(local.networks[local.services.apiserver.network.name].prefix, each.value.netnum)
+  node_ip                    = cidrhost(each.value.networks[local.services.apiserver.network.name].prefix, each.value.netnum)
   apiserver_ip               = local.services.apiserver.ip
+  apiserver_interface_name   = each.value.networks[local.services.apiserver.network.name].interface
   cluster_apiserver_ip       = local.services.cluster_apiserver.ip
   virtual_router_id          = 14
   static_pod_path            = local.kubernetes.static_pod_manifest_path
   haproxy_path               = local.vrrp.haproxy_config_path
+  # return routes from lan
+  static_routes = [
+    {
+      destination_prefix = each.value.networks[local.services.gateway.network.name].prefix
+      table_id           = 260
+      priority           = 32600
+      routes = [
+        {
+          ip        = local.services.gateway.ip
+          interface = each.value.networks[local.services.gateway.network.name].interface
+          weight    = 1
+        },
+      ]
+    },
+  ]
 }
 
 module "kubernetes-worker" {
@@ -61,7 +77,7 @@ module "kubernetes-worker" {
   apiserver_endpoint        = "https://${local.services.apiserver.ip}:${local.host_ports.apiserver}"
   cni_bridge_interface_name = local.kubernetes.cni_bridge_interface_name
   kubernetes_pod_prefix     = local.networks.kubernetes_pod.prefix
-  node_prefix               = local.networks.node.prefix
+  node_prefix               = each.value.networks.node.prefix
   cluster_dns_ip            = local.services.cluster_dns.ip
   kubelet_root_path         = local.kubernetes.kubelet_root_path
   static_pod_path           = local.kubernetes.static_pod_manifest_path

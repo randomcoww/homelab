@@ -63,6 +63,7 @@ storage:
             }
             virtual_rules {
               to all lookup ${vrrp_master_default_route.table_id} priority ${vrrp_master_default_route.table_priority}
+              to ${lan_prefix} lookup main priority ${master_lan_route_priority}
             }
           }
 

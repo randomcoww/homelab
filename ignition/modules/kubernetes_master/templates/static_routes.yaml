@@ -1,0 +1,33 @@
+---
+variant: fcos
+version: ${ignition_version}
+storage:
+  files:
+    # multipath #
+    # https://blog.fhrnet.eu/2019/03/07/ecmp-on-linux/
+    - path: /etc/sysctl.d/10-multipath.conf
+      mode: 0644
+      contents:
+        inline: |
+          net.ipv4.conf.all.ignore_routes_with_linkdown=1
+          net.ipv4.fib_multipath_use_neigh=1
+    %{~ if length(static_routes) > 0 ~}
+    - path: /etc/systemd/network/20-${apiserver_interface_name}.network.d/20-kubernetes-master-static-routes.conf
+      mode: 0644
+      contents:
+        inline: |
+          %{~ for _, m in static_routes ~}
+          [Route]
+          Destination=${m.destination_prefix}
+          %{~ for _, route in m.routes ~}
+          MultiPathRoute=${route.ip}@${route.interface} ${route.weight}
+          %{~ endfor ~}
+          Table=${m.table_id}
+
+          [RoutingPolicyRule]
+          Priority=${m.priority}
+          Table=${m.table_id}
+          From=${apiserver_ip}/32
+          To=${m.destination_prefix}
+          %{~ endfor ~}
+    %{~ endif ~}

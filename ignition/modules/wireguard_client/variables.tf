@@ -35,3 +35,7 @@ variable "allowed_ips" {
 variable "uid" {
   type = number
 }
+
+variable "table_priority_base" {
+  type = number
+}

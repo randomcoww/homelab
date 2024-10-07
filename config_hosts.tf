@@ -24,6 +24,10 @@ locals {
           source  = "phy0"
           network = "etcd"
         }
+        phy0-kubernetes = {
+          source  = "phy0"
+          network = "kubernetes"
+        }
         phy0-wan = {
           source  = "phy0"
           network = "wan"
@@ -45,6 +49,10 @@ locals {
         }
         etcd = {
           interface     = "phy0-etcd"
+          enable_netnum = true
+        }
+        kubernetes = {
+          interface     = "phy0-kubernetes"
           enable_netnum = true
         }
         wan = {
@@ -105,6 +113,10 @@ locals {
           source  = "phy0"
           network = "etcd"
         }
+        phy0-kubernetes = {
+          source  = "phy0"
+          network = "kubernetes"
+        }
         phy0-wan = {
           source  = "phy0"
           network = "wan"
@@ -126,6 +138,10 @@ locals {
         }
         etcd = {
           interface     = "phy0-etcd"
+          enable_netnum = true
+        }
+        kubernetes = {
+          interface     = "phy0-kubernetes"
           enable_netnum = true
         }
         wan = {
@@ -186,6 +202,10 @@ locals {
           source  = "phy0"
           network = "etcd"
         }
+        phy0-kubernetes = {
+          source  = "phy0"
+          network = "kubernetes"
+        }
         phy0-wan = {
           source  = "phy0"
           network = "wan"
@@ -207,6 +227,10 @@ locals {
         }
         etcd = {
           interface     = "phy0-etcd"
+          enable_netnum = true
+        }
+        kubernetes = {
+          interface     = "phy0-kubernetes"
           enable_netnum = true
         }
         wan = {

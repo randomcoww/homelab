@@ -31,7 +31,6 @@ locals {
       vlan_id = 80
       mtu     = local.default_mtu
       netnums = {
-        apiserver              = 2
         external_dns           = 31
         ingress_nginx          = 32
         ingress_nginx_external = 35
@@ -56,6 +55,16 @@ locals {
       cidr    = 26
       vlan_id = 70
       mtu     = local.default_mtu
+    }
+    # Kubernetes master
+    kubernetes = {
+      network = "192.168.232.0"
+      cidr    = 26
+      vlan_id = 90
+      mtu     = local.default_mtu
+      netnums = {
+        apiserver = 2
+      }
     }
     # Cluster internal
     kubernetes_service = {

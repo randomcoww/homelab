@@ -30,6 +30,10 @@ variable "sync_prefix" {
   type = string
 }
 
+variable "lan_prefix" {
+  type = string
+}
+
 variable "lan_gateway_ip" {
   type = string
 }
@@ -40,4 +44,18 @@ variable "virtual_router_id" {
 
 variable "keepalived_path" {
   type = string
+}
+
+variable "static_routes" {
+  type = list(object({
+    destination_prefix = string
+    table_id           = number
+    priority           = number
+    routes = list(object({
+      ip        = string
+      interface = string
+      weight    = number
+    }))
+  }))
+  default = []
 }

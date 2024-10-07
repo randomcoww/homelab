@@ -16,10 +16,27 @@ module "gateway" {
   wan_interface_name  = each.value.networks.wan.interface
   sync_interface_name = each.value.networks.sync.interface
   lan_interface_name  = each.value.networks[local.services.gateway.network.name].interface
-  sync_prefix         = local.networks.sync.prefix
+  sync_prefix         = each.value.networks.sync.prefix
+  lan_prefix          = each.value.networks[local.services.gateway.network.name].prefix
   lan_gateway_ip      = local.services.gateway.ip
   virtual_router_id   = 13
   keepalived_path     = local.vrrp.keepalived_config_path
+  # from lan to apiservers
+  static_routes = [
+    {
+      destination_prefix = "${local.services.apiserver.ip}/32"
+      table_id           = 260
+      priority           = 32600
+      routes = [
+        for _, m in local.members.kubernetes-master :
+        {
+          ip        = cidrhost(each.value.networks[local.services.apiserver.network.name].prefix, m.netnum)
+          interface = each.value.networks[local.services.apiserver.network.name].interface
+          weight    = 1
+        }
+      ]
+    },
+  ]
 }
 
 # Configure upstream DNS for gateways
