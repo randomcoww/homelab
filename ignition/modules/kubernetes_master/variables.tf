@@ -102,10 +102,6 @@ variable "kubernetes_pod_prefix" {
   type = string
 }
 
-variable "apiserver_interface_name" {
-  type = string
-}
-
 variable "node_ip" {
   type = string
 }
@@ -132,9 +128,5 @@ variable "static_pod_path" {
 }
 
 variable "haproxy_path" {
-  type = string
-}
-
-variable "keepalived_path" {
   type = string
 }

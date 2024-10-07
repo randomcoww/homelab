@@ -116,9 +116,7 @@ locals {
       }
       virtual_router_id         = var.virtual_router_id
       apiserver_ip              = var.apiserver_ip
-      apiserver_interface_name  = var.apiserver_interface_name
       apiserver_health_endpoint = local.apiserver_health_endpoint
-      keepalived_path           = var.keepalived_path
       haproxy_path              = var.haproxy_path
     })
     ], [

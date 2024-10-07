@@ -24,10 +24,6 @@ locals {
           source  = "phy0"
           network = "etcd"
         }
-        phy0-kubernetes = {
-          source  = "phy0"
-          network = "kubernetes"
-        }
         phy0-wan = {
           source  = "phy0"
           network = "wan"
@@ -49,10 +45,6 @@ locals {
         }
         etcd = {
           interface     = "phy0-etcd"
-          enable_netnum = true
-        }
-        kubernetes = {
-          interface     = "phy0-kubernetes"
           enable_netnum = true
         }
         wan = {
@@ -113,10 +105,6 @@ locals {
           source  = "phy0"
           network = "etcd"
         }
-        phy0-kubernetes = {
-          source  = "phy0"
-          network = "kubernetes"
-        }
         phy0-wan = {
           source  = "phy0"
           network = "wan"
@@ -138,10 +126,6 @@ locals {
         }
         etcd = {
           interface     = "phy0-etcd"
-          enable_netnum = true
-        }
-        kubernetes = {
-          interface     = "phy0-kubernetes"
           enable_netnum = true
         }
         wan = {
@@ -202,10 +186,6 @@ locals {
           source  = "phy0"
           network = "etcd"
         }
-        phy0-kubernetes = {
-          source  = "phy0"
-          network = "kubernetes"
-        }
         phy0-wan = {
           source  = "phy0"
           network = "wan"
@@ -227,10 +207,6 @@ locals {
         }
         etcd = {
           interface     = "phy0-etcd"
-          enable_netnum = true
-        }
-        kubernetes = {
-          interface     = "phy0-kubernetes"
           enable_netnum = true
         }
         wan = {
@@ -290,10 +266,6 @@ locals {
           source  = "phy0"
           network = "service"
         }
-        phy0-kubernetes = {
-          source  = "phy0"
-          network = "kubernetes"
-        }
       }
       bridge_interfaces = {
         br-lan = {
@@ -310,10 +282,6 @@ locals {
         }
         service = {
           interface     = "phy0-service"
-          enable_netnum = true
-        }
-        kubernetes = {
-          interface     = "phy0-kubernetes"
           enable_netnum = true
         }
         mobile = {
@@ -393,10 +361,6 @@ locals {
           source  = "phy0"
           network = "service"
         }
-        phy0-kubernetes = {
-          source  = "phy0"
-          network = "kubernetes"
-        }
       }
       networks = {
         node = {
@@ -405,10 +369,6 @@ locals {
         }
         service = {
           interface     = "phy0-service"
-          enable_netnum = true
-        }
-        kubernetes = {
-          interface     = "phy0-kubernetes"
           enable_netnum = true
         }
       }
@@ -450,7 +410,7 @@ locals {
     server              = ["gw-0", "gw-1", "q-0", "de-1", "r-0"]
     client              = ["de-1"]
     etcd                = ["gw-0", "gw-1", "q-0"]
-    kubernetes-master   = ["gw-0", "gw-1", "q-0"]
+    kubernetes-master   = ["gw-0", "gw-1"]
     kubernetes-worker   = ["gw-0", "gw-1", "q-0", "de-1"]
     nvidia-container    = ["de-1"]
     desktop-environment = ["de-1"]
