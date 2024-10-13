@@ -34,6 +34,10 @@ variable "lan_prefix" {
   type = string
 }
 
+variable "apiserver_prefix" {
+  type = string
+}
+
 variable "lan_gateway_ip" {
   type = string
 }
@@ -46,16 +50,14 @@ variable "keepalived_path" {
   type = string
 }
 
-variable "static_routes" {
-  type = list(object({
-    destination_prefix = string
-    table_id           = number
-    priority           = number
-    routes = list(object({
-      ip        = string
-      interface = string
-      weight    = number
-    }))
-  }))
-  default = []
+variable "bird_path" {
+  type = string
+}
+
+variable "bgp_as" {
+  type = number
+}
+
+variable "bgp_peeras" {
+  type = number
 }

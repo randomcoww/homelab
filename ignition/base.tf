@@ -16,13 +16,14 @@ module "base" {
   ]
 }
 
-module "vrrp" {
-  for_each = local.members.vrrp
-  source   = "./modules/vrrp"
+module "ha" {
+  for_each = local.members.ha
+  source   = "./modules/ha"
 
   ignition_version = local.ignition_version
-  haproxy_path     = local.vrrp.haproxy_config_path
-  keepalived_path  = local.vrrp.keepalived_config_path
+  haproxy_path     = local.ha.haproxy_config_path
+  keepalived_path  = local.ha.keepalived_config_path
+  bird_path        = local.ha.bird_config_path
 }
 
 module "systemd-networkd" {

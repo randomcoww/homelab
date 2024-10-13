@@ -5,7 +5,7 @@ locals {
     module.network-manager,
     module.upstream-dns,
     module.gateway,
-    module.vrrp,
+    module.ha,
     module.disks,
     module.etcd,
     module.kubernetes-master,

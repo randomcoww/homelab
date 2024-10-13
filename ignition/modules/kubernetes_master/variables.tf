@@ -10,6 +10,11 @@ variable "name" {
   type = string
 }
 
+variable "namespace" {
+  type    = string
+  default = "kube-system"
+}
+
 variable "cluster_name" {
   type = string
 }
@@ -51,6 +56,7 @@ variable "images" {
     apiserver          = string
     controller_manager = string
     scheduler          = string
+    kube_vip           = string
   })
 }
 
@@ -94,6 +100,11 @@ variable "scheduler_user" {
   default = "system:kube-scheduler"
 }
 
+variable "admin_user" {
+  type    = string
+  default = "default-admin"
+}
+
 variable "kubernetes_service_prefix" {
   type = string
 }
@@ -135,16 +146,19 @@ variable "haproxy_path" {
   type = string
 }
 
-variable "static_routes" {
-  type = list(object({
-    destination_prefix = string
-    table_id           = number
-    priority           = number
-    routes = list(object({
-      ip        = string
-      interface = string
-      weight    = number
-    }))
-  }))
+variable "bgp_as" {
+  type = number
+}
+
+variable "bgp_peeras" {
+  type = number
+}
+
+variable "bgp_peer_ips" {
+  type    = list(string)
   default = []
+}
+
+variable "route_destination_prefix" {
+  type = string
 }

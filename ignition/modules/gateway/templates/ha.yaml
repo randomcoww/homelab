@@ -8,11 +8,14 @@ systemd:
 
 storage:
   files:
+    # https://blog.fhrnet.eu/2019/03/07/ecmp-on-linux/
     - path: /etc/sysctl.d/20-gateway.conf
       mode: 0644
       contents:
         inline: |
           net.ipv4.ip_forward=1
+          net.ipv4.conf.all.ignore_routes_with_linkdown=1
+          net.ipv4.fib_multipath_use_neigh=1
     - path: /etc/nftables/gateway.nft
       mode: 0644
       overwrite: true
@@ -91,3 +94,37 @@ storage:
           [RoutingPolicyRule]
           Table=${vrrp_slave_default_route.table_id}
           Priority=${vrrp_slave_default_route.table_priority}
+    - path: ${bird_path}/gateway.conf
+      mode: 0644
+      contents:
+        inline: |
+          router id ${cidrhost(lan_prefix, host_netnum)};
+          protocol device {
+          }
+
+          protocol direct {
+            disabled;
+          }
+
+          protocol kernel {
+            learn;
+            merge paths;
+            ipv4 {
+              export all;
+            };
+          }
+
+          protocol bfd {
+          }
+
+          protocol bgp apiserver {
+            router id ${cidrhost(lan_prefix, host_netnum)};
+            local ${cidrhost(lan_prefix, host_netnum)} as ${bgp_as};
+            neighbor range ${lan_prefix} as ${bgp_peeras};
+            source address ${cidrhost(lan_prefix, host_netnum)};
+            bfd;
+            ipv4 {
+              import all;
+              export all;
+            };
+          }

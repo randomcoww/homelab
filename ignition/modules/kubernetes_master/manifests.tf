@@ -60,6 +60,9 @@ locals {
       scheduler = {
         contents = module.scheduler-kubeconfig.manifest
       }
+      admin = {
+        contents = module.admin-kubeconfig.manifest
+      }
     } :
     key => merge(f, {
       path = "${local.config_path}/${key}.kubeconfig"
@@ -119,7 +122,9 @@ locals {
       apiserver_health_endpoint = local.apiserver_health_endpoint
       apiserver_interface_name  = var.apiserver_interface_name
       haproxy_path              = var.haproxy_path
-      static_routes             = var.static_routes
+      route_table_id            = 240
+      route_table_priority      = 32600
+      route_destination_prefix  = var.route_destination_prefix
     })
     ], [
     yamlencode({
@@ -171,10 +176,29 @@ module "scheduler-kubeconfig" {
   client_key_pem     = tls_private_key.scheduler.private_key_pem
 }
 
+module "admin-kubeconfig" {
+  source             = "../../../modules/kubeconfig"
+  cluster_name       = var.cluster_name
+  user               = var.admin_user
+  apiserver_endpoint = "https://127.0.0.1:${var.ports.apiserver_backend}"
+  ca_cert_pem        = var.kubernetes_ca.cert_pem
+  client_cert_pem    = tls_locally_signed_cert.admin.cert_pem
+  client_key_pem     = tls_private_key.admin.private_key_pem
+}
+
 module "apiserver" {
-  source = "../../../modules/static_pod"
-  name   = "kube-apiserver"
+  source    = "../../../modules/static_pod"
+  name      = "kube-apiserver"
+  namespace = var.namespace
   spec = {
+    hostAliases = [
+      {
+        hostnames = [
+          "kubernetes"
+        ]
+        ip = "127.0.0.1"
+      },
+    ]
     containers = [
       {
         name  = "kube-apiserver"
@@ -255,6 +279,105 @@ module "apiserver" {
           },
         ]
       },
+      {
+        name  = "kube-vip"
+        image = var.images.kube_vip
+        args = [
+          "manager",
+        ]
+        env = [
+          {
+            name  = "vip_arp"
+            value = "false"
+          },
+          {
+            name  = "port"
+            value = tostring(var.ports.apiserver_backend)
+          },
+          {
+            name  = "vip_interface"
+            value = "lo"
+          },
+          {
+            name = "vip_nodename"
+            valueFrom = {
+              fieldRef = {
+                fieldPath = "spec.nodeName"
+              }
+            }
+          },
+          {
+            name  = "vip_cidr"
+            value = "32"
+          },
+          {
+            name  = "dns_mode"
+            value = "first"
+          },
+          {
+            name  = "cp_namespace"
+            value = var.namespace
+          },
+          {
+            name  = "cp_enable"
+            value = "true"
+          },
+          {
+            name  = "svc_enable"
+            value = "true"
+          },
+          {
+            name  = "svc_leasename"
+            value = "plndr-svcs-lock"
+          },
+          {
+            name  = "bgp_enable"
+            value = "true"
+          },
+          {
+            name = "bgp_routerid"
+            valueFrom = {
+              fieldRef = {
+                fieldPath = "status.podIP"
+              }
+            }
+          },
+          {
+            name  = "bgp_as"
+            value = tostring(var.bgp_as)
+          },
+          {
+            name = "bgp_peers"
+            value = join(",", [
+              for _, ip in var.bgp_peer_ips :
+              "${ip}:${var.bgp_peeras}::false"
+            ])
+          },
+          {
+            name  = "address"
+            value = var.apiserver_ip
+          },
+          {
+            name  = "egress_withnftables"
+            value = "true"
+          },
+        ]
+        securityContext = {
+          capabilities = {
+            add = [
+              "NET_ADMIN",
+              "NET_RAW",
+            ]
+          }
+        }
+        volumeMounts = [
+          {
+            name      = "admin-kubeconfig"
+            mountPath = "/etc/kubernetes/admin.conf"
+            readOnly  = true
+          },
+        ]
+      },
     ]
     volumes = [
       {
@@ -263,13 +386,20 @@ module "apiserver" {
           path = local.config_path
         }
       },
+      {
+        name = "admin-kubeconfig"
+        hostPath = {
+          path = local.kubeconfig.admin.path
+        }
+      },
     ]
   }
 }
 
 module "controller-manager" {
-  source = "../../../modules/static_pod"
-  name   = "kube-contoller-manager"
+  source    = "../../../modules/static_pod"
+  name      = "kube-contoller-manager"
+  namespace = var.namespace
   spec = {
     containers = [
       {
@@ -335,8 +465,9 @@ module "controller-manager" {
 }
 
 module "scheduler" {
-  source = "../../../modules/static_pod"
-  name   = "kube-scheduler"
+  source    = "../../../modules/static_pod"
+  name      = "kube-scheduler"
+  namespace = var.namespace
   spec = {
     containers = [
       {

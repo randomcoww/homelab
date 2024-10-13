@@ -101,6 +101,7 @@ locals {
     kube_scheduler          = "ghcr.io/randomcoww/kubernetes:kube-master-${local.kubernetes.version}"
     etcd_wrapper            = "ghcr.io/randomcoww/etcd-wrapper:20240923.12"
     etcd                    = "gcr.io/etcd-development/etcd:v3.5.15-amd64"
+    kube_vip                = "docker.io/plndr/kube-vip:v0.8.3"
 
     # Helm
     kea                = "ghcr.io/randomcoww/kea:2.6.1"
@@ -132,7 +133,7 @@ locals {
   }
 
   pxeboot_images = {
-    coreos     = "fedora-coreos-40.20240923.0"
+    coreos     = "fedora-coreos-40.20241009.0"
     silverblue = "fedora-silverblue-40.20240922.0"
   }
 
@@ -151,9 +152,12 @@ locals {
     node_bootstrap_user     = "system:node-bootstrapper"
   }
 
-  vrrp = {
+  ha = {
     haproxy_config_path    = "/etc/haproxy/haproxy.cfg.d"
     keepalived_config_path = "/etc/keepalived/keepalived.conf.d"
+    bird_config_path       = "/etc/bird.conf.d"
+    gateway_bgp_as         = 65000
+    apiserver_bgp_as       = 65001
   }
 
   domains = {

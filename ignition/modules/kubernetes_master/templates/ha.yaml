@@ -29,7 +29,6 @@ storage:
             chain input {
               type filter hook input priority 0; policy accept;
               tcp dport ${ports.apiserver} jump mark-for-accept;
-              tcp dport ${ports.apiserver_backend} jump mark-for-accept;
             }
           }
           ;
@@ -51,13 +50,3 @@ storage:
             %{~ for name, server in backend_servers ~}
             server ${name} ${server} check
             %{~ endfor ~}
-
-    - path: /etc/systemd/network/20-lo.network
-      mode: 0644
-      contents:
-        inline: |
-          [Match]
-          Name=lo
-
-          [Network]
-          Address=${apiserver_ip}/32

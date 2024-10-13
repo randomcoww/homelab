@@ -9,3 +9,7 @@ variable "haproxy_path" {
 variable "keepalived_path" {
   type = string
 }
+
+variable "bird_path" {
+  type = string
+}

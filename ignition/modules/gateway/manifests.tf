@@ -11,9 +11,12 @@ locals {
       lan_interface_name         = var.lan_interface_name
       sync_prefix                = var.sync_prefix
       lan_prefix                 = var.lan_prefix
+      apiserver_prefix           = var.apiserver_prefix
       lan_gateway_ip             = var.lan_gateway_ip
       keepalived_path            = var.keepalived_path
-      static_routes              = var.static_routes
+      bird_path                  = var.bird_path
+      bgp_as                     = var.bgp_as
+      bgp_peeras                 = var.bgp_peeras
 
       virtual_router_id = var.virtual_router_id
       vrrp_master_default_route = {
@@ -24,6 +27,7 @@ locals {
         table_id       = 240
         table_priority = 32780
       }
+      # override apiserver return route when master
       master_lan_route_priority = 32000
     })
   ]

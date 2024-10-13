@@ -5,6 +5,7 @@ locals {
       ignition_version = var.ignition_version
       haproxy_path     = var.haproxy_path
       keepalived_path  = var.keepalived_path
+      bird_path        = var.bird_path
     })
   ]
 }

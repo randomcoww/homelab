@@ -22,6 +22,7 @@ module "kubernetes-master" {
     apiserver          = local.container_images.kube_apiserver
     controller_manager = local.container_images.kube_controller_manager
     scheduler          = local.container_images.kube_scheduler
+    kube_vip           = local.container_images.kube_vip
   }
   ports = {
     apiserver          = local.host_ports.apiserver
@@ -41,22 +42,14 @@ module "kubernetes-master" {
   cluster_apiserver_ip       = local.services.cluster_apiserver.ip
   virtual_router_id          = 14
   static_pod_path            = local.kubernetes.static_pod_manifest_path
-  haproxy_path               = local.vrrp.haproxy_config_path
-  # return routes from lan
-  static_routes = [
-    {
-      destination_prefix = each.value.networks[local.services.gateway.network.name].prefix
-      table_id           = 260
-      priority           = 32600
-      routes = [
-        {
-          ip        = local.services.gateway.ip
-          interface = each.value.networks[local.services.gateway.network.name].interface
-          weight    = 1
-        },
-      ]
-    },
+  haproxy_path               = local.ha.haproxy_config_path
+  bgp_as                     = local.ha.apiserver_bgp_as
+  bgp_peeras                 = local.ha.gateway_bgp_as
+  bgp_peer_ips = [
+    for _, m in local.members.gateway :
+    cidrhost(local.networks[local.services.gateway.network.name].prefix, m.netnum)
   ]
+  route_destination_prefix = each.value.networks[local.services.gateway.network.name].prefix
 }
 
 module "kubernetes-worker" {
