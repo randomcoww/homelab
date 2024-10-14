@@ -28,7 +28,7 @@ storage:
 
             chain input {
               type filter hook input priority 0; policy accept;
-              tcp dport ${ports.apiserver} jump mark-for-accept;
+              tcp dport {${ports.apiserver}, ${ports.apiserver_backend}} jump mark-for-accept;
             }
           }
           ;
