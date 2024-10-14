@@ -30,6 +30,7 @@ storage:
               type filter hook input priority -10; policy accept;
               iifname ${wan_interface_name} meta mark & ${fw_mark} == 0x00000000 drop;
               iifname ${sync_interface_name} pkttype multicast jump mark-for-accept;
+              tcp dport 179 jump mark-for-accept;
             }
 
             chain forward {
@@ -120,8 +121,8 @@ storage:
           protocol bgp apiserver {
             router id ${cidrhost(lan_prefix, host_netnum)};
             local ${cidrhost(lan_prefix, host_netnum)} as ${bgp_as};
-            neighbor range ${lan_prefix} as ${bgp_peeras};
-            source address ${cidrhost(lan_prefix, host_netnum)};
+            neighbor range ${apiserver_prefix} as ${bgp_peeras};
+            source address ${cidrhost(apiserver_prefix, host_netnum)};
             bfd;
             ipv4 {
               import all;

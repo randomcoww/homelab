@@ -47,7 +47,7 @@ module "kubernetes-master" {
   bgp_peeras                 = local.ha.gateway_bgp_as
   bgp_peer_ips = [
     for _, m in local.members.gateway :
-    cidrhost(local.networks[local.services.gateway.network.name].prefix, m.netnum)
+    cidrhost(local.networks[local.services.apiserver.network.name].prefix, m.netnum)
   ]
   route_destination_prefix = each.value.networks[local.services.gateway.network.name].prefix
 }
