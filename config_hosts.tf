@@ -428,7 +428,7 @@ locals {
     systemd-networkd    = ["gw-0", "gw-1", "q-0", "de-1", "r-0"]
     upstream-dns        = ["gw-0", "gw-1", "q-0", "r-0"]
     gateway             = ["gw-0", "gw-1", "q-0"]
-    ha                  = ["gw-0", "gw-1", "q-0"]
+    ha                  = ["gw-0", "gw-1", "q-0", "de-1", "r-0"]
     disks               = ["gw-0", "gw-1", "q-0", "de-1", "r-0"]
     server              = ["gw-0", "gw-1", "q-0", "de-1", "r-0"]
     client              = ["de-1"]
