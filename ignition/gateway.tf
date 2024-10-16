@@ -18,13 +18,9 @@ module "gateway" {
   lan_interface_name  = each.value.networks[local.services.gateway.network.name].interface
   sync_prefix         = each.value.networks.sync.prefix
   lan_prefix          = each.value.networks[local.services.gateway.network.name].prefix
-  apiserver_prefix    = each.value.networks[local.services.apiserver.network.name].prefix
   lan_gateway_ip      = local.services.gateway.ip
   virtual_router_id   = 13
   keepalived_path     = local.ha.keepalived_config_path
-  bird_path           = local.ha.bird_config_path
-  bgp_as              = local.ha.gateway_bgp_as
-  bgp_peeras          = local.ha.apiserver_bgp_as
 }
 
 # Configure upstream DNS for gateways

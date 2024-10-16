@@ -40,9 +40,3 @@ module "systemd-networkd" {
   wlan_networks       = each.value.wlan_networks
   mdns_domain         = local.domains.mdns
 }
-
-module "network-manager" {
-  for_each         = local.members.network-manager
-  source           = "./modules/network_manager"
-  ignition_version = local.ignition_version
-}

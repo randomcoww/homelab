@@ -56,7 +56,6 @@ variable "images" {
     apiserver          = string
     controller_manager = string
     scheduler          = string
-    kube_vip           = string
   })
 }
 
@@ -129,10 +128,6 @@ variable "cluster_apiserver_ip" {
   type = string
 }
 
-variable "virtual_router_id" {
-  type = number
-}
-
 variable "config_base_path" {
   type    = string
   default = "/var/lib"
@@ -146,19 +141,18 @@ variable "haproxy_path" {
   type = string
 }
 
+variable "bird_path" {
+  type = string
+}
+
 variable "bgp_as" {
   type = number
 }
 
-variable "bgp_peeras" {
-  type = number
+variable "bgp_range_prefix" {
+  type = string
 }
 
-variable "bgp_peer_ips" {
-  type    = list(string)
-  default = []
-}
-
-variable "route_destination_prefix" {
+variable "bgp_local_ip" {
   type = string
 }

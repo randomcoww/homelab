@@ -80,3 +80,15 @@ variable "graceful_shutdown_delay" {
 variable "kubernetes_pod_prefix" {
   type = string
 }
+
+variable "bird_path" {
+  type = string
+}
+
+variable "bgp_as" {
+  type = number
+}
+
+variable "bgp_neighbors" {
+  type = map(string)
+}

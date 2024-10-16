@@ -426,7 +426,6 @@ locals {
   base_members = {
     base                = ["gw-0", "gw-1", "q-0", "de-1", "r-0"]
     systemd-networkd    = ["gw-0", "gw-1", "q-0", "de-1", "r-0"]
-    network-manager     = []
     upstream-dns        = ["gw-0", "gw-1", "q-0", "r-0"]
     gateway             = ["gw-0", "gw-1", "q-0"]
     ha                  = ["gw-0", "gw-1", "q-0"]

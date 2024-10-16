@@ -22,7 +22,6 @@ module "kubernetes-master" {
     apiserver          = local.container_images.kube_apiserver
     controller_manager = local.container_images.kube_controller_manager
     scheduler          = local.container_images.kube_scheduler
-    kube_vip           = local.container_images.kube_vip
   }
   ports = {
     apiserver          = local.host_ports.apiserver
@@ -40,16 +39,12 @@ module "kubernetes-master" {
   apiserver_ip               = local.services.apiserver.ip
   apiserver_interface_name   = each.value.networks[local.services.apiserver.network.name].interface
   cluster_apiserver_ip       = local.services.cluster_apiserver.ip
-  virtual_router_id          = 14
   static_pod_path            = local.kubernetes.static_pod_manifest_path
   haproxy_path               = local.ha.haproxy_config_path
+  bird_path                  = local.ha.bird_config_path
   bgp_as                     = local.ha.apiserver_bgp_as
-  bgp_peeras                 = local.ha.gateway_bgp_as
-  bgp_peer_ips = [
-    for _, m in local.members.gateway :
-    cidrhost(local.networks[local.services.apiserver.network.name].prefix, m.netnum)
-  ]
-  route_destination_prefix = each.value.networks[local.services.gateway.network.name].prefix
+  bgp_local_ip               = cidrhost(each.value.networks.node.prefix, each.value.netnum)
+  bgp_range_prefix           = each.value.networks.node.prefix
 }
 
 module "kubernetes-worker" {
@@ -76,6 +71,12 @@ module "kubernetes-worker" {
   static_pod_path           = local.kubernetes.static_pod_manifest_path
   container_storage_path    = "${local.mounts.containers_path}/storage"
   graceful_shutdown_delay   = 480
+  bird_path                 = local.ha.bird_config_path
+  bgp_as                    = local.ha.worker_bgp_as
+  bgp_neighbors = {
+    for host_key, host in local.members.kubernetes-master :
+    host_key => cidrhost(each.value.networks.node.prefix, host.netnum)
+  }
 }
 
 module "etcd" {

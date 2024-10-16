@@ -105,6 +105,9 @@ locals {
       kubernetes_pod_prefix     = var.kubernetes_pod_prefix
       node_prefix               = var.node_prefix
       ports                     = var.ports
+      bird_path                 = var.bird_path
+      bgp_as                    = var.bgp_as
+      bgp_neighbors             = var.bgp_neighbors
     })
     ], [
     yamlencode({

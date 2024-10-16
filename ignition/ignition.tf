@@ -2,7 +2,6 @@ locals {
   modules_enabled = [
     module.base,
     module.systemd-networkd,
-    module.network-manager,
     module.upstream-dns,
     module.gateway,
     module.ha,

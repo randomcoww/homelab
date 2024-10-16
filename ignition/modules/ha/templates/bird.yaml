@@ -13,9 +13,47 @@ systemd:
 
 storage:
   files:
+    - path: /etc/sysctl.d/20-bird.conf
+      mode: 0644
+      contents:
+        inline: |
+          net.ipv4.conf.all.ignore_routes_with_linkdown=1
+          net.ipv4.fib_multipath_use_neigh=1
+
     - path: /etc/bird.conf
       mode: 0644
       overwrite: true
       contents:
         inline: |
+          protocol device {
+          }
+
+          protocol direct {
+            disabled;
+          }
+
+          protocol bfd {
+          }
+
+          protocol kernel {
+            merge paths;
+            ipv4 {
+              export all;
+            };
+          }
+
           include "${bird_path}/*.conf";
+    # TODO: limit access for these
+    - path: /etc/nftables/bgp.nft
+      mode: 0644
+      overwrite: true
+      contents:
+        inline: |
+          table inet bgp {
+            chain input {
+              type filter hook input priority 0; policy accept;
+              tcp dport 179 jump mark-for-accept;
+              udp sport 49152-65535 jump mark-for-accept;
+            }
+          }
+          ;

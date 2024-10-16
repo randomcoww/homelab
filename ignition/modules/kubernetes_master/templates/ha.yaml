@@ -13,6 +13,14 @@ systemd:
             [Unit]
             WantedBy=kubelet.service
             Before=kubelet.service
+    - name: bird.service
+      enabled: true
+      dropins:
+        - name: 20-kubelet-dependency.conf
+          contents: |
+            [Unit]
+            WantedBy=kubelet.service
+            Before=kubelet.service
 
 storage:
   files:
@@ -29,10 +37,10 @@ storage:
             chain input {
               type filter hook input priority 0; policy accept;
               tcp dport {${ports.apiserver}, ${ports.apiserver_backend}} jump mark-for-accept;
-              tcp dport 179 jump mark-for-accept;
             }
           }
           ;
+    # haproxy
     - path: ${haproxy_path}/${name}.cfg
       mode: 0644
       contents:
@@ -51,3 +59,33 @@ storage:
             %{~ for name, server in backend_servers ~}
             server ${name} ${server} check
             %{~ endfor ~}
+    # bird
+    - path: /etc/systemd/network/20-lo.network
+      mode: 0644
+      contents:
+        inline: |
+          [Match]
+          Name=lo
+
+          [Network]
+          Address=${apiserver_ip}/32
+    - path: ${bird_path}/apiserver.conf
+      mode: 0644
+      contents:
+        inline: |
+          protocol static apiserver_static {
+            route ${apiserver_ip}/32 via ${bgp_local_ip};
+            ipv4 {
+            };
+          }
+
+          protocol bgp apiserver_bgp {
+            local as ${bgp_as};
+            neighbor range ${bgp_range_prefix} external;
+            bfd {
+            };
+            ipv4 {
+              import all;
+              export where proto = "apiserver_static";
+            };
+          }

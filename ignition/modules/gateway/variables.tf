@@ -34,10 +34,6 @@ variable "lan_prefix" {
   type = string
 }
 
-variable "apiserver_prefix" {
-  type = string
-}
-
 variable "lan_gateway_ip" {
   type = string
 }
@@ -48,16 +44,4 @@ variable "virtual_router_id" {
 
 variable "keepalived_path" {
   type = string
-}
-
-variable "bird_path" {
-  type = string
-}
-
-variable "bgp_as" {
-  type = number
-}
-
-variable "bgp_peeras" {
-  type = number
 }
