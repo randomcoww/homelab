@@ -4,7 +4,8 @@ module "kubernetes-master" {
 
   ignition_version = local.ignition_version
   fw_mark          = local.fw_marks.accept
-  name             = "kubernetes-master"
+  name             = local.kubernetes_services.apiserver_external.name
+  namespace        = local.kubernetes_services.apiserver_external.namespace
   cluster_name     = local.kubernetes.cluster_name
   front_proxy_ca   = data.terraform_remote_state.sr.outputs.kubernetes.front_proxy_ca
   kubernetes_ca    = data.terraform_remote_state.sr.outputs.kubernetes.ca
@@ -39,6 +40,7 @@ module "kubernetes-master" {
   apiserver_ip               = local.services.apiserver.ip
   apiserver_interface_name   = each.value.networks[local.services.apiserver.network.name].interface
   cluster_apiserver_ip       = local.services.cluster_apiserver.ip
+  service_apiserver_ip       = local.services.service_apiserver.ip
   static_pod_path            = local.kubernetes.static_pod_manifest_path
   haproxy_path               = local.ha.haproxy_config_path
   bird_path                  = local.ha.bird_config_path
@@ -53,7 +55,7 @@ module "kubernetes-worker" {
 
   ignition_version = local.ignition_version
   fw_mark          = local.fw_marks.accept
-  name             = "kubernetes-worker"
+  name             = "kube-worker"
   cluster_name     = local.kubernetes.cluster_name
   ca               = data.terraform_remote_state.sr.outputs.kubernetes.ca
   ports = {

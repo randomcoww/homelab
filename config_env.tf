@@ -31,6 +31,7 @@ locals {
       vlan_id = 80
       mtu     = local.default_mtu
       netnums = {
+        service_apiserver      = 2
         external_dns           = 31
         ingress_nginx          = 32
         ingress_nginx_external = 35
@@ -196,6 +197,10 @@ locals {
       apiserver = {
         name      = "kubernetes"
         namespace = "default"
+      }
+      apiserver_external = {
+        name      = "kube-apiserver"
+        namespace = "kube-system"
       }
       authelia = {
         name      = "authelia"

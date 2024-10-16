@@ -174,13 +174,13 @@ module "scheduler-kubeconfig" {
 
 module "apiserver" {
   source    = "../../../modules/static_pod"
-  name      = "kube-apiserver"
+  name      = var.name
   namespace = var.namespace
   spec = {
     hostAliases = [
       {
         hostnames = [
-          "kubernetes"
+          split(".", var.cluster_apiserver_endpoint)[0],
         ]
         ip = "127.0.0.1"
       },

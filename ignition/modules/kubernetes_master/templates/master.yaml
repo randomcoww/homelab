@@ -3,7 +3,7 @@ variant: fcos
 version: ${ignition_version}
 systemd:
   units:
-    - name: nftables@kubernetes-master.service
+    - name: nftables@${name}.service
       enabled: true
     - name: haproxy.service
       enabled: true
@@ -24,12 +24,12 @@ systemd:
 
 storage:
   files:
-    - path: /etc/nftables/kubernetes-master.nft
+    - path: /etc/nftables/${name}.nft
       mode: 0644
       overwrite: true
       contents:
         inline: |
-          table inet kubernetes-master {
+          table inet ${name} {
             chain mark-for-accept {
               meta mark set meta mark | ${fw_mark}
             }
@@ -45,19 +45,19 @@ storage:
       mode: 0644
       contents:
         inline: |
-          frontend kube-apiserver
+          frontend ${name}
             bind :::${ports.apiserver} v4v6
             mode tcp
-            default_backend kube-apiserver
+            default_backend ${name}
 
-          backend kube-apiserver
+          backend ${name}
             option httpchk GET ${apiserver_health_endpoint} HTTP/1.0
             http-check expect status 200
             mode tcp
             balance leastconn
             default-server verify none check-ssl rise 2 fall 2 maxconn 5000 maxqueue 5000 weight 100
-            %{~ for name, server in backend_servers ~}
-            server ${name} ${server} check
+            %{~ for m, server in backend_servers ~}
+            server ${m} ${server} check
             %{~ endfor ~}
     # bird
     - path: /etc/systemd/network/20-lo.network

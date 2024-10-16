@@ -128,6 +128,10 @@ variable "cluster_apiserver_ip" {
   type = string
 }
 
+variable "service_apiserver_ip" {
+  type = string
+}
+
 variable "config_base_path" {
   type    = string
   default = "/var/lib"

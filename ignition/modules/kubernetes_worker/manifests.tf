@@ -90,6 +90,7 @@ locals {
     for f in fileset(".", "${path.module}/templates/*.yaml") :
     templatefile(f, {
       ignition_version          = var.ignition_version
+      name                      = var.name
       node_ip                   = cidrhost(var.node_prefix, var.host_netnum)
       fw_mark                   = var.fw_mark
       config_path               = local.config_path

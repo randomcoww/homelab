@@ -15,6 +15,7 @@ resource "tls_cert_request" "kube-apiserver" {
     var.node_ip,
     var.apiserver_ip,
     var.cluster_apiserver_ip,
+    var.service_apiserver_ip,
   ]
   dns_names = [
     for i, _ in split(".", var.cluster_apiserver_endpoint) :

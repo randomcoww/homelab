@@ -72,6 +72,7 @@ locals {
     for f in fileset(".", "${path.module}/templates/*.yaml") :
     templatefile(f, {
       ignition_version = var.ignition_version
+      name             = var.name
       fw_mark          = var.fw_mark
       ports            = var.ports
     })

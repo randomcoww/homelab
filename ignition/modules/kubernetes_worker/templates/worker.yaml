@@ -37,7 +37,7 @@ systemd:
               --config=${kubelet_config_path} \
               --kubeconfig=${kubeconfig_path} \
               --v=2
-    - name: nftables@kubernetes-worker.service
+    - name: nftables@${name}.service
       enabled: true
     - name: bird.service
       enabled: true
@@ -50,12 +50,12 @@ systemd:
 
 storage:
   files:
-    - path: /etc/nftables/kubernetes-worker.nft
+    - path: /etc/nftables/${name}.nft
       mode: 0644
       overwrite: true
       contents:
         inline: |
-          table inet kubernetes-worker {
+          table inet ${name} {
             chain mark-for-accept {
               meta mark set meta mark | ${fw_mark}
             }

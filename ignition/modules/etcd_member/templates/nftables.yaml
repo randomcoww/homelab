@@ -3,25 +3,24 @@ variant: fcos
 version: ${ignition_version}
 systemd:
   units:
-    - name: nftables@etcd-member.service
+    - name: nftables@${name}.service
       enabled: true
 
 storage:
   files:
-    - path: /etc/nftables/etcd-member.nft
+    - path: /etc/nftables/${name}.nft
       mode: 0644
       overwrite: true
       contents:
         inline: |
-          table inet etcd-member {
+          table inet ${name} {
             chain mark-for-accept {
               meta mark set meta mark | ${fw_mark}
             }
 
             chain input {
               type filter hook input priority 0; policy accept;
-              tcp dport ${ports.etcd_client} jump mark-for-accept;
-              tcp dport ${ports.etcd_peer} jump mark-for-accept;
+              tcp dport {${ports.etcd_client}, ${ports.etcd_peer}} jump mark-for-accept;
             }
           }
           ;
