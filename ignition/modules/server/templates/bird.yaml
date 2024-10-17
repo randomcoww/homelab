@@ -9,8 +9,10 @@ systemd:
         - name: 10-dependency.conf
           contents: |
             [Service]
+            ExecStartPre=
             ExecStartPre=/usr/bin/mkdir -p \
               ${bird_path}
+            ExecStartPre=/usr/sbin/bird -p
 
 storage:
   files:
