@@ -41,6 +41,27 @@ module "kea" {
   timezone = local.timezone
 }
 
+# Kube-vip
+
+module "kube-vip" {
+  source    = "./modules/kube_vip"
+  name      = "kube-vip"
+  namespace = "kube-system"
+  release   = "0.1.0"
+  images = {
+    kube_vip = local.container_images.kube_vip
+  }
+  ports = {
+    apiserver = local.host_ports.apiserver,
+  }
+  bgp_as = 65002
+  bgp_neighbor_ips = [
+    for _, host in local.members.bgp_export :
+    cidrhost(local.networks.node.prefix, host.netnum)
+  ]
+  apiserver_ip = local.services.apiserver.ip
+}
+
 # PXE boot server
 
 module "matchbox" {

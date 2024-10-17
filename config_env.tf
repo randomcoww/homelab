@@ -132,6 +132,7 @@ locals {
     mountpoint         = "ghcr.io/randomcoww/mountpoint:20240915.5"
     audioserve         = "docker.io/izderadicka/audioserve:latest"
     syncthing          = "docker.io/syncthing/syncthing:1.27"
+    kube_vip           = "docker.io/plndr/kube-vip:v0.8.3"
   }
 
   pxeboot_images = {

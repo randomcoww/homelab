@@ -69,6 +69,7 @@ storage:
           %{~ endfor ~}
           # catch all
           protocol bgp {
+            debug all;
             local as ${bgp_as};
             neighbor range ${bgp_range_prefix} internal;
             direct;
