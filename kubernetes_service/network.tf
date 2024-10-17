@@ -9,22 +9,6 @@ module "kea" {
     kea   = local.container_images.kea
     tftpd = local.container_images.tftpd
   }
-  affinity = {
-    nodeAffinity = {
-      requiredDuringSchedulingIgnoredDuringExecution = {
-        nodeSelectorTerms = [
-          {
-            matchExpressions = [
-              {
-                key      = "kea"
-                operator = "Exists"
-              },
-            ]
-          },
-        ]
-      }
-    }
-  }
   service_ips = [
     local.services.cluster_kea_primary.ip,
     local.services.cluster_kea_secondary.ip,
