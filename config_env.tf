@@ -88,6 +88,8 @@ locals {
     }
     mobile = {
     }
+    remote = {
+    }
   }
 
   fw_marks = {

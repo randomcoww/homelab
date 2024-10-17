@@ -356,14 +356,22 @@ locals {
         }
       }
       vlan_interfaces = {
+        phy0-node = {
+          source  = "phy0"
+          network = "node"
+        }
         phy0-service = {
           source  = "phy0"
           network = "service"
         }
       }
       networks = {
+        remote = {
+          interface   = "phy0"
+          enable_dhcp = true
+        }
         node = {
-          interface     = "phy0"
+          interface     = "phy0-node"
           enable_netnum = true
         }
         service = {

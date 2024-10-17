@@ -20,12 +20,12 @@ storage:
           UseHostname=false
           UseTimezone=true
           UseDomains=${lookup(config, "enable_dns", false)}
-          UseRoutes=true
+          UseRoutes=${!lookup(config, "enable_netnum", false)}
           RoutesToDNS=${lookup(config, "enable_dns", false)}
           RoutesToNTP=false
 
           [Network]
-          LinkLocalAddressing=${lookup(config, "enable_linklocal", false)}
+          LinkLocalAddressing=false
           DHCP=${lookup(config, "enable_dhcp", false)}
           MulticastDNS=${lookup(config, "enable_mdns", false)}
           ConfigureWithoutCarrier=true
