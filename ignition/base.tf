@@ -58,11 +58,8 @@ module "server" {
 
   bgp_router_id    = cidrhost(each.value.networks.node.prefix, each.value.netnum)
   bgp_range_prefix = each.value.networks.node.prefix
-  bgp_neighbor_netnums = merge({
-    for host_key, host in local.members.kubernetes-master :
+  bgp_neighbor_netnums = {
+    for host_key, host in local.members.bgp_export :
     host_key => host.netnum if each.key != host_key
-    }, {
-    for host_key, host in local.members.gateway :
-    host_key => host.netnum if each.key != host_key
-  })
+  }
 }
