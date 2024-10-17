@@ -32,7 +32,7 @@ module "admin-kubeconfig" {
   source             = "../modules/kubeconfig"
   cluster_name       = local.kubernetes.cluster_name
   user               = "kubernetes-super-admin"
-  apiserver_endpoint = "https://${local.services.service_apiserver.ip}:${local.host_ports.apiserver}"
+  apiserver_endpoint = "https://${local.services.service_apiserver.ip}:${local.host_ports.apiserver_backend}"
   ca_cert_pem        = data.terraform_remote_state.sr.outputs.kubernetes.ca.cert_pem
   client_cert_pem    = tls_locally_signed_cert.kubernetes-admin.cert_pem
   client_key_pem     = tls_private_key.kubernetes-admin.private_key_pem
