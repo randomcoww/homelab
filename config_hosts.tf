@@ -194,22 +194,9 @@ locals {
           source  = "phy0"
           network = "service"
         }
-        phy0-sync = {
-          source  = "phy0"
-          network = "sync"
-        }
         phy0-etcd = {
           source  = "phy0"
           network = "etcd"
-        }
-        phy0-kubernetes = {
-          source  = "phy0"
-          network = "kubernetes"
-        }
-        phy0-wan = {
-          source  = "phy0"
-          network = "wan"
-          mac     = "52-54-00-63-6e-b3"
         }
       }
       networks = {
@@ -221,21 +208,9 @@ locals {
           interface     = "phy0-service"
           enable_netnum = true
         }
-        sync = {
-          interface     = "phy0-sync"
-          enable_netnum = true
-        }
         etcd = {
           interface     = "phy0-etcd"
           enable_netnum = true
-        }
-        kubernetes = {
-          interface     = "phy0-kubernetes"
-          enable_netnum = true
-        }
-        wan = {
-          interface   = "phy0-wan"
-          enable_dhcp = true
         }
       }
       disks = {
@@ -426,19 +401,18 @@ locals {
   base_members = {
     base                = ["gw-0", "gw-1", "q-0", "de-1", "r-0"]
     systemd-networkd    = ["gw-0", "gw-1", "q-0", "de-1", "r-0"]
-    upstream-dns        = ["gw-0", "gw-1", "q-0", "r-0"]
-    gateway             = ["gw-0", "gw-1", "q-0"]
-    ha                  = ["gw-0", "gw-1", "q-0", "de-1", "r-0"]
-    disks               = ["gw-0", "gw-1", "q-0", "de-1", "r-0"]
     server              = ["gw-0", "gw-1", "q-0", "de-1", "r-0"]
-    client              = ["de-1"]
+    disks               = ["gw-0", "gw-1", "q-0", "de-1", "r-0"]
+    upstream-dns        = ["gw-0", "gw-1", "q-0", "r-0"]
+    gateway             = ["gw-0", "gw-1"]
     etcd                = ["gw-0", "gw-1", "q-0"]
     kubernetes-master   = ["gw-0", "gw-1"]
     kubernetes-worker   = ["gw-0", "gw-1", "q-0", "de-1"]
     nvidia-container    = ["de-1"]
+    client              = ["de-1"]
     desktop-environment = ["de-1"]
-    remote              = ["r-0"]
     wireguard-client    = ["de-1"]
+    remote              = ["r-0"]
   }
 
   # finalized local vars #
