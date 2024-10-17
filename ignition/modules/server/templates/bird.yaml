@@ -1,0 +1,105 @@
+---
+variant: fcos
+version: ${ignition_version}
+systemd:
+  units:
+    - name: bird.service
+      enabled: true
+      dropins:
+        - name: 10-dependency.conf
+          contents: |
+            [Service]
+            ExecStartPre=/usr/bin/mkdir -p \
+              ${bird_path}
+
+storage:
+  files:
+    - path: /etc/sysctl.d/20-bird.conf
+      mode: 0644
+      contents:
+        inline: |
+          net.ipv4.conf.all.ignore_routes_with_linkdown=1
+          net.ipv4.fib_multipath_use_neigh=1
+
+    - path: /etc/bird.conf
+      mode: 0644
+      overwrite: true
+      contents:
+        inline: |
+          router id ${bgp_router_id};
+
+          protocol device {
+          }
+
+          protocol direct {
+            disabled;
+          }
+
+          protocol bfd {
+          }
+
+          ipv4 table ${bird_cache_table_name};
+
+          protocol kernel {
+            merge paths;
+            ipv4 {
+              export all;
+            };
+          }
+
+          %{~ for host_key, netnum in bgp_neighbor_netnums ~}
+          protocol bgp ${replace(host_key, "-", "_")} {
+            local as ${bgp_as};
+            neighbor ${cidrhost(bgp_range_prefix, netnum)} internal;
+            direct;
+            bfd {
+            };
+            ipv4 {
+              import all;
+              export all;
+              table ${bird_cache_table_name};
+            };
+          }
+
+          %{~ endfor ~}
+          # catch all
+          protocol bgp {
+            local as ${bgp_as};
+            neighbor range ${bgp_range_prefix} internal;
+            direct;
+            bfd {
+            };
+            ipv4 {
+              import all;
+              export all;
+              table ${bird_cache_table_name};
+            };
+          }
+
+          include "${bird_path}/*.conf";
+
+          protocol pipe {
+            table master4;
+            peer table ${bird_cache_table_name};
+            export none;
+            import filter {
+              if source = RTS_BGP then {
+                accept;
+              }
+              reject;
+            };
+          }
+    # TODO: limit access for these
+    - path: /etc/nftables/bgp.nft
+      mode: 0644
+      overwrite: true
+      contents:
+        inline: |
+          table inet bgp {
+            chain input {
+              type filter hook input priority 0; policy accept;
+              tcp dport 179 jump mark-for-accept;
+              udp sport 49152-65535 jump mark-for-accept;
+            }
+          }
+          ;

@@ -65,8 +65,24 @@ storage:
             virtual_rules {
               to all lookup ${vrrp_master_default_route.table_id} priority ${vrrp_master_default_route.table_priority}
             }
+            virtual_routes {
+              default dev ${lan_interface_name} table ${vrrp_slave_default_route.table_id}
+            }
           }
-
+    # bird
+    - path: ${bird_path}/gateway.conf
+      mode: 0644
+      contents:
+        inline: |
+          protocol kernel gateway_kernel {
+            learn;
+            kernel table ${vrrp_slave_default_route.table_id};
+            ipv4 {
+              import all;
+              export none;
+              table ${bird_cache_table_name};
+            };
+          }
     # Create fallback route so backup node can access the internet through the wan interface
     - path: /etc/systemd/network/20-${wan_interface_name}.network.d/20-master-default-route.conf
       mode: 0644
@@ -77,17 +93,3 @@ storage:
           ClientIdentifier=mac
           RouteTable=${vrrp_master_default_route.table_id}
           UseTimezone=false
-    - path: /etc/systemd/network/20-${lan_interface_name}.network.d/20-slave-default-route.conf
-      mode: 0644
-      contents:
-        inline: |
-          [Route]
-          Scope=global
-          Gateway=${lan_gateway_ip}
-          GatewayOnLink=true
-          Destination=0.0.0.0/0
-          Table=${vrrp_slave_default_route.table_id}
-
-          [RoutingPolicyRule]
-          Table=${vrrp_slave_default_route.table_id}
-          Priority=${vrrp_slave_default_route.table_priority}

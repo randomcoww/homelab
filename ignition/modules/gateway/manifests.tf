@@ -13,6 +13,8 @@ locals {
       lan_prefix                 = var.lan_prefix
       lan_gateway_ip             = var.lan_gateway_ip
       keepalived_path            = var.keepalived_path
+      bird_path                  = var.bird_path
+      bird_cache_table_name      = var.bird_cache_table_name
 
       virtual_router_id = var.virtual_router_id
       vrrp_master_default_route = {

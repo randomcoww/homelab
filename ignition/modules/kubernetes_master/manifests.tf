@@ -118,9 +118,7 @@ locals {
       apiserver_health_endpoint = local.apiserver_health_endpoint
       haproxy_path              = var.haproxy_path
       bird_path                 = var.bird_path
-      bgp_as                    = var.bgp_as
-      bgp_range_prefix          = var.bgp_range_prefix
-      bgp_local_ip              = var.bgp_local_ip
+      bird_cache_table_name     = var.bird_cache_table_name
     })
     ], [
     yamlencode({

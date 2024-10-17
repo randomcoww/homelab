@@ -32,3 +32,36 @@ variable "validity_period_hours" {
   type    = number
   default = 8760
 }
+
+variable "haproxy_path" {
+  type = string
+}
+
+variable "keepalived_path" {
+  type = string
+}
+
+variable "bird_path" {
+  type = string
+}
+
+variable "bird_cache_table_name" {
+  type = string
+}
+
+variable "bgp_router_id" {
+  type = string
+}
+
+variable "bgp_as" {
+  type    = number
+  default = 65002
+}
+
+variable "bgp_range_prefix" {
+  type = string
+}
+
+variable "bgp_neighbor_netnums" {
+  type = map(number)
+}

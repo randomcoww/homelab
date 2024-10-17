@@ -120,10 +120,6 @@ variable "apiserver_ip" {
   type = string
 }
 
-variable "apiserver_interface_name" {
-  type = string
-}
-
 variable "cluster_apiserver_ip" {
   type = string
 }
@@ -149,14 +145,6 @@ variable "bird_path" {
   type = string
 }
 
-variable "bgp_as" {
-  type = number
-}
-
-variable "bgp_range_prefix" {
-  type = string
-}
-
-variable "bgp_local_ip" {
+variable "bird_cache_table_name" {
   type = string
 }

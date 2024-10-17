@@ -133,20 +133,3 @@ storage:
       contents:
         inline: |
           net.bridge.bridge-nf-call-iptables=0
-    # master route
-    - path: ${bird_path}/worker.conf
-      mode: 0644
-      contents:
-        inline: |
-          %{~ for host_key, ip in bgp_neighbors ~}
-          protocol bgp worker_${replace(host_key, "-", "_")} {
-            local as ${bgp_as};
-            neighbor ${ip} external;
-            bfd {
-            };
-            ipv4 {
-              import all;
-              export all;
-            };
-          }
-          %{~ endfor ~}

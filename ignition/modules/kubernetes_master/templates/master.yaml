@@ -73,19 +73,9 @@ storage:
       mode: 0644
       contents:
         inline: |
-          protocol static apiserver_static {
-            route ${apiserver_ip}/32 via ${bgp_local_ip};
+          protocol static apiserver {
+            route ${apiserver_ip}/32 via "lo";
             ipv4 {
-            };
-          }
-
-          protocol bgp apiserver_bgp {
-            local as ${bgp_as};
-            neighbor range ${bgp_range_prefix} external;
-            bfd {
-            };
-            ipv4 {
-              import all;
-              export where proto = "apiserver_static";
+              table ${bird_cache_table_name};
             };
           }

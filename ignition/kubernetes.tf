@@ -38,15 +38,12 @@ module "kubernetes-master" {
   kubernetes_pod_prefix      = local.networks.kubernetes_pod.prefix
   node_ip                    = cidrhost(each.value.networks[local.services.apiserver.network.name].prefix, each.value.netnum)
   apiserver_ip               = local.services.apiserver.ip
-  apiserver_interface_name   = each.value.networks[local.services.apiserver.network.name].interface
   cluster_apiserver_ip       = local.services.cluster_apiserver.ip
   service_apiserver_ip       = local.services.service_apiserver.ip
   static_pod_path            = local.kubernetes.static_pod_manifest_path
   haproxy_path               = local.ha.haproxy_config_path
   bird_path                  = local.ha.bird_config_path
-  bgp_as                     = local.ha.apiserver_bgp_as
-  bgp_local_ip               = cidrhost(each.value.networks.node.prefix, each.value.netnum)
-  bgp_range_prefix           = each.value.networks.node.prefix
+  bird_cache_table_name      = local.ha.bird_cache_table_name
 }
 
 module "kubernetes-worker" {
@@ -73,12 +70,6 @@ module "kubernetes-worker" {
   static_pod_path           = local.kubernetes.static_pod_manifest_path
   container_storage_path    = "${local.mounts.containers_path}/storage"
   graceful_shutdown_delay   = 480
-  bird_path                 = local.ha.bird_config_path
-  bgp_as                    = local.ha.worker_bgp_as
-  bgp_neighbors = {
-    for host_key, host in local.members.kubernetes-master :
-    host_key => cidrhost(each.value.networks.node.prefix, host.netnum)
-  }
 }
 
 module "etcd" {

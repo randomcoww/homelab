@@ -29,7 +29,17 @@ locals {
     templatefile(f, {
       ignition_version = var.ignition_version
       fw_mark          = var.fw_mark
-      pki              = local.pki
+      # SSH
+      pki = local.pki
+      # HA config
+      haproxy_path          = var.haproxy_path
+      keepalived_path       = var.keepalived_path
+      bird_path             = var.bird_path
+      bird_cache_table_name = var.bird_cache_table_name
+      bgp_router_id         = var.bgp_router_id
+      bgp_range_prefix      = var.bgp_range_prefix
+      bgp_as                = var.bgp_as
+      bgp_neighbor_netnums  = var.bgp_neighbor_netnums
     })
     ], [
     yamlencode({

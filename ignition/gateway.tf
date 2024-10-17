@@ -13,14 +13,16 @@ module "gateway" {
     ]), [local.services.gateway.network.prefix])
   )
 
-  wan_interface_name  = each.value.networks.wan.interface
-  sync_interface_name = each.value.networks.sync.interface
-  lan_interface_name  = each.value.networks[local.services.gateway.network.name].interface
-  sync_prefix         = each.value.networks.sync.prefix
-  lan_prefix          = each.value.networks[local.services.gateway.network.name].prefix
-  lan_gateway_ip      = local.services.gateway.ip
-  virtual_router_id   = 13
-  keepalived_path     = local.ha.keepalived_config_path
+  wan_interface_name    = each.value.networks.wan.interface
+  sync_interface_name   = each.value.networks.sync.interface
+  lan_interface_name    = each.value.networks[local.services.gateway.network.name].interface
+  sync_prefix           = each.value.networks.sync.prefix
+  lan_prefix            = each.value.networks[local.services.gateway.network.name].prefix
+  lan_gateway_ip        = local.services.gateway.ip
+  virtual_router_id     = 13
+  keepalived_path       = local.ha.keepalived_config_path
+  bird_path             = local.ha.bird_config_path
+  bird_cache_table_name = local.ha.bird_cache_table_name
 }
 
 # Configure upstream DNS for gateways

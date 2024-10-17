@@ -45,3 +45,11 @@ variable "virtual_router_id" {
 variable "keepalived_path" {
   type = string
 }
+
+variable "bird_path" {
+  type = string
+}
+
+variable "bird_cache_table_name" {
+  type = string
+}

@@ -4,7 +4,6 @@ locals {
     module.systemd-networkd,
     module.upstream-dns,
     module.gateway,
-    module.ha,
     module.disks,
     module.etcd,
     module.kubernetes-master,

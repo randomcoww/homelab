@@ -156,8 +156,7 @@ locals {
     haproxy_config_path    = "/etc/haproxy/haproxy.cfg.d"
     keepalived_config_path = "/etc/keepalived/keepalived.conf.d"
     bird_config_path       = "/etc/bird.conf.d"
-    apiserver_bgp_as       = 65001
-    worker_bgp_as          = 65000
+    bird_cache_table_name  = "cache"
   }
 
   domains = {
