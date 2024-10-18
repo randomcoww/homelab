@@ -43,7 +43,7 @@ storage:
               # BGP
               tcp dport 179 accept;
               # BFD
-              udp dport 3784 accept;
+              udp dport {3784, 4784} accept;
               meta mark & ${fw_mark} == ${fw_mark} accept;
             }
 
@@ -56,6 +56,8 @@ storage:
               type filter hook forward priority 20; policy drop;
               tcp dport domain accept;
               udp dport domain accept;
+              # BFD
+              udp dport 4784 accept;
               meta mark & ${fw_mark} == ${fw_mark} accept;
             }
 
