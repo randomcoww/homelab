@@ -64,7 +64,7 @@ module "kubernetes-worker" {
   apiserver_endpoint        = "https://${local.services.apiserver.ip}:${local.host_ports.apiserver}"
   cni_bridge_interface_name = local.kubernetes.cni_bridge_interface_name
   kubernetes_pod_prefix     = local.networks.kubernetes_pod.prefix
-  node_prefix               = each.value.networks.node.prefix
+  node_prefix               = each.value.networks.service.prefix
   cluster_dns_ip            = local.services.cluster_dns.ip
   kubelet_root_path         = local.kubernetes.kubelet_root_path
   static_pod_path           = local.kubernetes.static_pod_manifest_path

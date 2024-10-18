@@ -96,7 +96,7 @@ resource "helm_release" "ingress-nginx" {
         }
         ingressClass = each.value
         service = {
-          type = "LoadBalancer"
+          type = "ClusterIP"
           externalIPs = [
             local.services[each.key].ip,
           ]

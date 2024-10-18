@@ -50,6 +50,7 @@ systemd:
 
 storage:
   files:
+    # TODO: limit access
     - path: /etc/nftables/${name}.nft
       mode: 0644
       overwrite: true
@@ -65,12 +66,14 @@ storage:
               tcp dport ${ports.kubelet} jump mark-for-accept;
               ip saddr ${kubernetes_pod_prefix} jump mark-for-accept;
               ip saddr ${node_prefix} jump mark-for-accept;
+              ip daddr ${node_prefix} jump mark-for-accept;
             }
 
             chain forward {
               type filter hook forward priority 0; policy accept;
               ip saddr ${kubernetes_pod_prefix} jump mark-for-accept;
               ip saddr ${node_prefix} jump mark-for-accept;
+              ip daddr ${node_prefix} jump mark-for-accept;
             }
           }
           ;

@@ -217,8 +217,9 @@ resource "helm_release" "minio" {
         }
       }
       service = {
-        type = "LoadBalancer"
-        port = local.service_ports.minio
+        type      = "ClusterIP"
+        port      = local.service_ports.minio
+        clusterIP = local.services.cluster_minio.ip,
         externalIPs = [
           local.services.minio.ip,
         ]

@@ -40,6 +40,10 @@ storage:
             chain input-drop {
               type filter hook input priority 20; policy drop;
               tcp dport ssh accept;
+              # BGP
+              tcp dport 179 accept;
+              # BFD
+              udp dport 3784 accept;
               meta mark & ${fw_mark} == ${fw_mark} accept;
             }
 

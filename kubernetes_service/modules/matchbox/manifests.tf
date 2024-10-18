@@ -35,7 +35,7 @@ module "service" {
   app     = local.name
   release = var.release
   spec = {
-    type = "LoadBalancer"
+    type = "ClusterIP"
     externalIPs = [
       var.service_ip,
     ]
@@ -56,7 +56,7 @@ module "service-api" {
   app     = local.name
   release = var.release
   spec = {
-    type = "LoadBalancer"
+    type = "ClusterIP"
     externalIPs = [
       var.api_service_ip,
     ]

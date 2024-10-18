@@ -76,6 +76,7 @@ locals {
         cluster_dns           = 10
         cluster_kea_primary   = 12
         cluster_kea_secondary = 13
+        cluster_minio         = 14
       }
     }
     kubernetes_pod = {

@@ -8,7 +8,7 @@ data "helm_template" "coredns" {
   values = [
     yamlencode({
       replicaCount = var.replicas
-      serviceType  = "LoadBalancer"
+      serviceType  = "ClusterIP"
       serviceAccount = {
         create = false
       }

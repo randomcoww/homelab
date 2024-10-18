@@ -95,17 +95,3 @@ storage:
               reject;
             };
           }
-    # TODO: limit access for these
-    - path: /etc/nftables/bgp.nft
-      mode: 0644
-      overwrite: true
-      contents:
-        inline: |
-          table inet bgp {
-            chain input {
-              type filter hook input priority 0; policy accept;
-              tcp dport 179 jump mark-for-accept;
-              udp sport 49152-65535 jump mark-for-accept;
-            }
-          }
-          ;

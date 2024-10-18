@@ -43,7 +43,7 @@ module "audioserve" {
   ingress_class_name        = local.ingress_classes.ingress_nginx_external
   nginx_ingress_annotations = local.nginx_ingress_auth_annotations
 
-  s3_endpoint          = "http://${local.services.minio.ip}:${local.service_ports.minio}"
+  s3_endpoint          = "http://${local.services.cluster_minio.ip}:${local.service_ports.minio}"
   s3_bucket            = minio_s3_bucket.data["music"].id
   s3_access_key_id     = minio_iam_user.audioserve.id
   s3_secret_access_key = minio_iam_user.audioserve.secret
