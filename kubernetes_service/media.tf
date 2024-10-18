@@ -198,7 +198,8 @@ module "sunshine" {
     runAsUser  = local.users.client.uid
     fsGroup    = local.users.client.uid
   }
-  storage_class_name = "local-path"
+  loadbalancer_class_name = "kube-vip.io/kube-vip-class"
+  storage_class_name      = "local-path"
   affinity = {
     nodeAffinity = {
       requiredDuringSchedulingIgnoredDuringExecution = {

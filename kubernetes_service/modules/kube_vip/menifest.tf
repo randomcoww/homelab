@@ -187,6 +187,14 @@ module "daemonset" {
             }
           },
           {
+            name = "bgp_sourceip"
+            valueFrom = {
+              fieldRef = {
+                fieldPath = "status.podIP"
+              }
+            }
+          },
+          {
             name  = "bgp_as"
             value = tostring(var.bgp_as)
           },

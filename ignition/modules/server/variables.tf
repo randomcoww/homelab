@@ -58,7 +58,11 @@ variable "bgp_as" {
   default = 65002
 }
 
-variable "bgp_range_prefix" {
+variable "bgp_node_prefix" {
+  type = string
+}
+
+variable "bgp_service_prefix" {
   type = string
 }
 

@@ -32,10 +32,9 @@ module "service" {
     "external-dns.alpha.kubernetes.io/hostname" = var.service_hostname
   }
   spec = {
-    type = "LoadBalancer"
-    externalIPs = [
-      var.service_ip,
-    ]
+    type              = "LoadBalancer"
+    loadBalancerIP    = var.service_ip
+    loadBalancerClass = var.loadbalancer_class_name
     ports = [
       {
         name       = "alpaca-stream"

@@ -69,6 +69,10 @@ variable "extra_volume_mounts" {
   default = []
 }
 
+variable "loadbalancer_class_name" {
+  type = string
+}
+
 variable "minio_endpoint" {
   type = string
 }

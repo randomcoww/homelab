@@ -37,7 +37,8 @@ locals {
       bird_path             = var.bird_path
       bird_cache_table_name = var.bird_cache_table_name
       bgp_router_id         = var.bgp_router_id
-      bgp_range_prefix      = var.bgp_range_prefix
+      bgp_node_prefix       = var.bgp_node_prefix
+      bgp_service_prefix    = var.bgp_service_prefix
       bgp_as                = var.bgp_as
       bgp_neighbor_netnums  = var.bgp_neighbor_netnums
     })

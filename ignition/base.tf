@@ -56,8 +56,9 @@ module "server" {
   bird_path             = local.ha.bird_config_path
   bird_cache_table_name = local.ha.bird_cache_table_name
 
-  bgp_router_id    = cidrhost(each.value.networks.node.prefix, each.value.netnum)
-  bgp_range_prefix = each.value.networks.node.prefix
+  bgp_router_id      = cidrhost(each.value.networks.node.prefix, each.value.netnum)
+  bgp_node_prefix    = each.value.networks.node.prefix
+  bgp_service_prefix = each.value.networks.service.prefix
   bgp_neighbor_netnums = {
     for host_key, host in local.members.bgp_export :
     host_key => host.netnum if each.key != host_key

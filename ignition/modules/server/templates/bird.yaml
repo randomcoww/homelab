@@ -55,7 +55,7 @@ storage:
           %{~ for host_key, netnum in bgp_neighbor_netnums ~}
           protocol bgp ${replace(host_key, "-", "_")} {
             local as ${bgp_as};
-            neighbor ${cidrhost(bgp_range_prefix, netnum)} internal;
+            neighbor ${cidrhost(bgp_node_prefix, netnum)} internal;
             direct;
             bfd {
             };
@@ -68,10 +68,25 @@ storage:
 
           %{~ endfor ~}
           # catch all
-          protocol bgp {
+          protocol bgp node {
             debug all;
             local as ${bgp_as};
-            neighbor range ${bgp_range_prefix} internal;
+            neighbor range ${bgp_node_prefix} internal;
+            direct;
+            bfd {
+            };
+            ipv4 {
+              import all;
+              export all;
+              table ${bird_cache_table_name};
+            };
+          }
+
+          # kube-vip
+          protocol bgp service {
+            debug all;
+            local as ${bgp_as};
+            neighbor range ${bgp_service_prefix} internal;
             direct;
             bfd {
             };

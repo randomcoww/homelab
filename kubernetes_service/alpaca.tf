@@ -9,11 +9,12 @@ module "alpaca-stream" {
   ports = {
     alpaca_stream = local.service_ports.alpaca_stream
   }
-  service_hostname      = local.kubernetes_ingress_endpoints.alpaca_stream
-  service_ip            = local.services.alpaca_stream.ip
-  alpaca_api_key_id     = var.alpaca.api_key_id
-  alpaca_api_secret_key = var.alpaca.api_secret_key
-  alpaca_api_base_url   = var.alpaca.api_base_url
+  service_hostname        = local.kubernetes_ingress_endpoints.alpaca_stream
+  service_ip              = local.services.alpaca_stream.ip
+  loadbalancer_class_name = "kube-vip.io/kube-vip-class"
+  alpaca_api_key_id       = var.alpaca.api_key_id
+  alpaca_api_secret_key   = var.alpaca.api_secret_key
+  alpaca_api_base_url     = var.alpaca.api_base_url
 }
 
 resource "tls_private_key" "alpaca-db-ca" {
@@ -87,8 +88,9 @@ module "alpaca-db" {
     private_key_pem = tls_private_key.alpaca-db-ca.private_key_pem
     cert_pem        = tls_self_signed_cert.alpaca-db-ca.cert_pem
   }
-  service_hostname = local.kubernetes_ingress_endpoints.alpaca_db
-  service_ip       = local.services.alpaca_db.ip
+  service_hostname        = local.kubernetes_ingress_endpoints.alpaca_db
+  service_ip              = local.services.alpaca_db.ip
+  loadbalancer_class_name = "kube-vip.io/kube-vip-class"
 
   minio_endpoint          = "http://${local.kubernetes_services.minio.fqdn}:${local.service_ports.minio}"
   minio_bucket            = minio_s3_bucket.alpaca-db.id

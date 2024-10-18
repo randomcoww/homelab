@@ -57,7 +57,7 @@ module "kube-vip" {
   bgp_as = 65002
   bgp_neighbor_ips = [
     for _, host in local.members.bgp_export :
-    cidrhost(local.networks.node.prefix, host.netnum)
+    cidrhost(local.networks.service.prefix, host.netnum)
   ]
   apiserver_ip = local.services.apiserver.ip
 }

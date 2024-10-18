@@ -47,3 +47,7 @@ variable "alpaca_api_secret_key" {
 variable "alpaca_api_base_url" {
   type = string
 }
+
+variable "loadbalancer_class_name" {
+  type = string
+}
