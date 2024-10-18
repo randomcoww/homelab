@@ -96,10 +96,9 @@ resource "helm_release" "ingress-nginx" {
         }
         ingressClass = each.value
         service = {
-          type = "ClusterIP"
-          externalIPs = [
-            local.services[each.key].ip,
-          ]
+          type              = "LoadBalancer"
+          loadBalancerIP    = local.services[each.key].ip
+          loadBalancerClass = "kube-vip.io/kube-vip-class"
         }
         allowSnippetAnnotations = true
         config = {
