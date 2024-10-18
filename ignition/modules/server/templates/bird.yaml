@@ -54,8 +54,8 @@ storage:
 
           %{~ for host_key, netnum in bgp_neighbor_netnums ~}
           protocol bgp ${replace(host_key, "-", "_")} {
-            local as ${bgp_as};
-            neighbor ${cidrhost(bgp_node_prefix, netnum)} internal;
+            local as ${bgp_node_as};
+            neighbor ${cidrhost(bgp_node_prefix, netnum)} as ${bgp_node_as};
             direct;
             bfd {
             };
@@ -70,8 +70,8 @@ storage:
           # catch all
           protocol bgp node {
             debug all;
-            local as ${bgp_as};
-            neighbor range ${bgp_node_prefix} internal;
+            local as ${bgp_node_as};
+            neighbor range ${bgp_node_prefix} as ${bgp_node_as};
             direct;
             bfd {
             };
@@ -82,11 +82,10 @@ storage:
             };
           }
 
-          # kube-vip
           protocol bgp service {
             debug all;
-            local as ${bgp_as};
-            neighbor range ${bgp_service_prefix} internal;
+            local as ${bgp_node_as};
+            neighbor range ${bgp_service_prefix} as ${bgp_service_as};
             direct;
             bfd {
             };

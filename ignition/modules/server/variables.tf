@@ -53,17 +53,20 @@ variable "bgp_router_id" {
   type = string
 }
 
-variable "bgp_as" {
-  type    = number
-  default = 65002
-}
-
 variable "bgp_node_prefix" {
   type = string
 }
 
+variable "bgp_node_as" {
+  type = number
+}
+
 variable "bgp_service_prefix" {
   type = string
+}
+
+variable "bgp_service_as" {
+  type = number
 }
 
 variable "bgp_neighbor_netnums" {

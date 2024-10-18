@@ -27,6 +27,10 @@ variable "bgp_as" {
   type = number
 }
 
+variable "bgp_peeras" {
+  type = number
+}
+
 variable "bgp_neighbor_ips" {
   type = list(string)
 }

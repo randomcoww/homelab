@@ -161,6 +161,8 @@ locals {
     keepalived_config_path = "/etc/keepalived/keepalived.conf.d"
     bird_config_path       = "/etc/bird.conf.d"
     bird_cache_table_name  = "cache"
+    bgp_node_as            = 65002
+    bgp_service_as         = 65012
   }
 
   domains = {
