@@ -416,7 +416,6 @@ locals {
     disks               = ["gw-0", "gw-1", "q-0", "de-1", "r-0"]
     upstream-dns        = ["gw-0", "gw-1", "q-0", "r-0"]
     gateway             = ["gw-0", "gw-1"]
-    bgp_export          = ["gw-0", "gw-1"]
     kubernetes-master   = ["gw-0", "gw-1"]
     kubernetes-worker   = ["gw-0", "gw-1", "q-0", "de-1"]
     etcd                = ["gw-0", "gw-1", "q-0"]

@@ -61,8 +61,11 @@ module "server" {
   bgp_node_as        = local.ha.bgp_node_as
   bgp_service_prefix = each.value.networks.service.prefix
   bgp_service_as     = local.ha.bgp_service_as
-  bgp_neighbor_netnums = {
-    for host_key, host in local.members.bgp_export :
+  bgp_neighbor_netnums = merge({
+    for host_key, host in local.members.gateway :
     host_key => host.netnum if each.key != host_key
-  }
+    }, {
+    for host_key, host in local.members.kubernetes-master :
+    host_key => host.netnum if each.key != host_key
+  })
 }
