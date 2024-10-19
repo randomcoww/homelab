@@ -114,10 +114,6 @@ locals {
           source  = "phy0"
           network = "etcd"
         }
-        phy0-kubernetes = {
-          source  = "phy0"
-          network = "kubernetes"
-        }
         phy0-wan = {
           source  = "phy0"
           network = "wan"
@@ -139,10 +135,6 @@ locals {
         }
         etcd = {
           interface     = "phy0-etcd"
-          enable_netnum = true
-        }
-        kubernetes = {
-          interface     = "phy0-kubernetes"
           enable_netnum = true
         }
         wan = {
@@ -175,8 +167,6 @@ locals {
         ]
       }
       kubernetes_node_labels = {
-        "node-role.kubernetes.io/master"        = true
-        "node-role.kubernetes.io/control-plane" = true
       }
     }
 
@@ -200,6 +190,10 @@ locals {
           source  = "phy0"
           network = "etcd"
         }
+        phy0-kubernetes = {
+          source  = "phy0"
+          network = "kubernetes"
+        }
       }
       networks = {
         node = {
@@ -212,6 +206,10 @@ locals {
         }
         etcd = {
           interface     = "phy0-etcd"
+          enable_netnum = true
+        }
+        kubernetes = {
+          interface     = "phy0-kubernetes"
           enable_netnum = true
         }
       }
@@ -240,6 +238,8 @@ locals {
         ]
       }
       kubernetes_node_labels = {
+        "node-role.kubernetes.io/master"        = true
+        "node-role.kubernetes.io/control-plane" = true
       }
     }
 
@@ -416,7 +416,7 @@ locals {
     disks               = ["gw-0", "gw-1", "q-0", "de-1", "r-0"]
     upstream-dns        = ["gw-0", "gw-1", "q-0", "r-0"]
     gateway             = ["gw-0", "gw-1"]
-    kubernetes-master   = ["gw-0", "gw-1"]
+    kubernetes-master   = ["gw-0", "q-0"]
     kubernetes-worker   = ["gw-0", "gw-1", "q-0", "de-1"]
     etcd                = ["gw-0", "gw-1", "q-0"]
     nvidia-container    = ["de-1"]

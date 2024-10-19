@@ -175,6 +175,10 @@ module "daemonset" {
             value = "plndr-svcs-lock"
           },
           {
+            name  = "vip_routingtable"
+            value = "true"
+          },
+          {
             name  = "bgp_enable"
             value = "true"
           },
