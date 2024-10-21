@@ -8,6 +8,7 @@ locals {
     module.flannel,
     module.kapprover,
     module.kube-dns,
+    module.kube-vip,
   ]
 }
 
@@ -75,6 +76,28 @@ module "kapprover" {
   images = {
     kapprover = local.container_images.kapprover
   }
+}
+
+# Kube-vip
+
+module "kube-vip" {
+  source    = "./modules/kube_vip"
+  name      = "kube-vip"
+  namespace = "kube-system"
+  release   = "0.1.0"
+  images = {
+    kube_vip = local.container_images.kube_vip
+  }
+  ports = {
+    apiserver = local.host_ports.apiserver,
+  }
+  bgp_as     = local.ha.bgp_service_as
+  bgp_peeras = local.ha.bgp_node_as
+  bgp_neighbor_ips = [
+    for _, host in local.members.gateway :
+    cidrhost(local.networks.service.prefix, host.netnum)
+  ]
+  apiserver_ip = local.services.apiserver.ip
 }
 
 module "kube-dns" {
@@ -217,12 +240,11 @@ resource "helm_release" "minio" {
         }
       }
       service = {
-        type      = "ClusterIP"
-        port      = local.service_ports.minio
-        clusterIP = local.services.cluster_minio.ip,
-        externalIPs = [
-          local.services.minio.ip,
-        ]
+        type              = "LoadBalancer"
+        port              = local.service_ports.minio
+        clusterIP         = local.services.cluster_minio.ip
+        loadBalancerIP    = local.services.minio.ip
+        loadBalancerClass = "kube-vip.io/kube-vip-class"
       }
       ingress = {
         enabled = false

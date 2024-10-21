@@ -8,15 +8,14 @@ data "helm_template" "coredns" {
   values = [
     yamlencode({
       replicaCount = var.replicas
-      serviceType  = "ClusterIP"
+      serviceType  = "LoadBalancer"
       serviceAccount = {
         create = false
       }
       service = {
-        clusterIP = var.service_cluster_ip
-        externalIPs = [
-          var.service_ip,
-        ]
+        clusterIP         = var.service_cluster_ip
+        loadBalancerIP    = var.service_ip
+        loadBalancerClass = "kube-vip.io/kube-vip-class"
       }
       affinity = {
         podAntiAffinity = {
