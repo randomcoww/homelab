@@ -2,7 +2,6 @@
 
 locals {
   modules_enabled = [
-    module.kube-vip,
     module.fuse-device-plugin,
     module.kea,
     module.matchbox,

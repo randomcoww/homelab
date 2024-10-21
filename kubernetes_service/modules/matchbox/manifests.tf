@@ -35,10 +35,9 @@ module "service" {
   app     = local.name
   release = var.release
   spec = {
-    type = "ClusterIP"
-    externalIPs = [
-      var.service_ip,
-    ]
+    type              = "LoadBalancer"
+    loadBalancerIP    = var.service_ip
+    loadBalancerClass = "kube-vip.io/kube-vip-class"
     ports = [
       {
         name       = "matchbox"
@@ -56,10 +55,9 @@ module "service-api" {
   app     = local.name
   release = var.release
   spec = {
-    type = "ClusterIP"
-    externalIPs = [
-      var.api_service_ip,
-    ]
+    type              = "LoadBalancer"
+    loadBalancerIP    = var.api_service_ip
+    loadBalancerClass = "kube-vip.io/kube-vip-class"
     ports = [
       {
         name       = "matchbox-api"
