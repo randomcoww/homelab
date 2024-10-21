@@ -137,7 +137,7 @@ locals {
   }
 
   pxeboot_images = {
-    coreos     = "fedora-coreos-40.20241014.0"
+    coreos     = "fedora-coreos-40.20241021.0"
     silverblue = "fedora-silverblue-40.20241015.0"
   }
 
