@@ -263,6 +263,7 @@ locals {
     etcd_peer          = 58083
     flannel_healthz    = 58084
     code               = 58085
+    bgp                = 179
   }
 
   service_ports = {
