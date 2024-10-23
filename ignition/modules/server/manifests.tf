@@ -42,6 +42,7 @@ locals {
       bgp_service_prefix    = var.bgp_service_prefix
       bgp_service_as        = var.bgp_service_as
       bgp_neighbor_netnums  = var.bgp_neighbor_netnums
+      bgp_port              = var.bgp_port
     })
     ], [
     yamlencode({

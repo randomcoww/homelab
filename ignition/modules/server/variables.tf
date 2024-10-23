@@ -72,3 +72,7 @@ variable "bgp_service_as" {
 variable "bgp_neighbor_netnums" {
   type = map(number)
 }
+
+variable "bgp_port" {
+  type = number
+}

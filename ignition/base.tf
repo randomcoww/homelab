@@ -68,4 +68,5 @@ module "server" {
     for host_key, host in local.members.kubernetes-master :
     host_key => host.netnum if each.key != host_key
   })
+  bgp_port = local.host_ports.bgp
 }
