@@ -24,6 +24,7 @@ storage:
       contents:
         inline: |
           [Sleep]
+          AllowSuspend=no
           AllowHibernation=no
           AllowSuspendThenHibernate=no
           AllowHybridSleep=no
