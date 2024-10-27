@@ -136,6 +136,7 @@ module "statefulset" {
         readinessProbe = {
           httpGet = {
             scheme = "HTTP"
+            host   = "127.0.0.1"
             port   = var.ports.code_server
             path   = "/healthz"
           }
@@ -143,6 +144,7 @@ module "statefulset" {
         livenessProbe = {
           httpGet = {
             scheme = "HTTP"
+            host   = "127.0.0.1"
             port   = var.ports.code_server
             path   = "/healthz"
           }
