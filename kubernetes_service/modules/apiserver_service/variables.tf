@@ -20,3 +20,7 @@ variable "ports" {
     apiserver = number
   })
 }
+
+variable "loadbalancer_class_name" {
+  type = string
+}

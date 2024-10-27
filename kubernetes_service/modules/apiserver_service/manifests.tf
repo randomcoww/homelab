@@ -4,10 +4,9 @@ module "service" {
   app     = var.name
   release = var.release
   spec = {
-    type = "ClusterIP"
-    externalIPs = [
-      var.service_ip,
-    ]
+    type              = "LoadBalancer"
+    loadBalancerIP    = var.service_ip
+    loadBalancerClass = var.loadbalancer_class_name
     ports = [
       {
         name       = var.name
