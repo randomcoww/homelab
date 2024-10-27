@@ -88,8 +88,10 @@ locals {
       vlan_id = 30
     }
     mobile = {
+      vlan_id = 110
     }
     remote = {
+      vlan_id = 120
     }
   }
 
