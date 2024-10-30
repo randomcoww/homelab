@@ -101,31 +101,4 @@ storage:
           LinkLocalAddressing=false
           DHCP=false
           MulticastDNS=false
-    - path: /etc/systemd/network/13-vrf-${iface.network}.netdev
-      mode: 0644
-      contents:
-        inline: |
-          [NetDev]
-          Name=vrf-${iface.network}
-          Kind=vrf
-
-          [VRF]
-          TableId=${1000 + iface.vlan_id}
-    - path: /etc/systemd/network/20-vrf-${iface.network}.network
-      mode: 0644
-      contents:
-        inline: |
-          [Match]
-          Name=vrf-${iface.network}
-
-          [Link]
-          ARP=true
-          RequiredForOnline=true
-          ActivationPolicy=always-up
-    # - path: /etc/systemd/network/20-${name}.network.d/21-vrf.conf
-    #   mode: 0644
-    #   contents:
-    #     inline: |
-    #       [Network]
-    #       VRF=vrf-${iface.network}
     %{~ endfor ~}
