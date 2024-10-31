@@ -306,7 +306,6 @@ brew install --cask \
   moonlight \
   tailscale \
   visual-studio-code \
-  scroll-reverser \
   phoenix-slides \
   iina
 ```
