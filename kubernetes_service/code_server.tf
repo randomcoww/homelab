@@ -59,9 +59,9 @@ module "code" {
     },
   ]
   code_server_resources = {
-    # limits = {
-    #   "nvidia.com/gpu.shared" = 1
-    # }
+    limits = {
+      "nvidia.com/gpu.shared" = 1
+    }
   }
   code_server_security_context = {
     capabilities = {

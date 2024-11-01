@@ -131,7 +131,7 @@ locals {
     qrcode_generator   = "ghcr.io/randomcoww/qrcode-generator:20240620.4"
     rclone             = "docker.io/rclone/rclone:1.68"
     cockroachdb        = "docker.io/cockroachdb/cockroach:v24.1.1"
-    sunshine           = "ghcr.io/randomcoww/sunshine:2024.922.10353-560.35.03"
+    sunshine           = "ghcr.io/randomcoww/sunshine:2024.1101.204249-565.57.01"
     mountpoint         = "ghcr.io/randomcoww/mountpoint:20240915.5"
     audioserve         = "docker.io/izderadicka/audioserve:latest"
     syncthing          = "docker.io/syncthing/syncthing:1.27"
@@ -140,7 +140,7 @@ locals {
 
   pxeboot_images = {
     coreos     = "fedora-coreos-40.20241021.0"
-    silverblue = "fedora-silverblue-40.20241031.0"
+    silverblue = "fedora-silverblue-40.20241101.0"
   }
 
   kubernetes = {

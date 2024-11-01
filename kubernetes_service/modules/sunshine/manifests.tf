@@ -210,6 +210,14 @@ module "statefulset" {
               }
             }
           },
+          {
+            name  = "NVIDIA_VISIBLE_DEVICES"
+            value = "all"
+          },
+          {
+            name  = "NVIDIA_DRIVER_CAPABILITIES"
+            value = "compute,utility"
+          },
           ], [
           for _, e in var.sunshine_extra_envs :
           {

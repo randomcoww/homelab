@@ -337,7 +337,7 @@ locals {
       kubernetes_node_labels = {
         hostapd                  = true
         "nvidia.com/gpu.present" = true
-        # "nvidia.com/mps.capable" = true
+        "nvidia.com/mps.capable" = true
       }
     }
 

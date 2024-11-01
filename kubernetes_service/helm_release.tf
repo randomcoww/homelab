@@ -333,7 +333,7 @@ resource "helm_release" "nvidia-device-plugin" {
   chart       = "nvidia-device-plugin"
   namespace   = "kube-system"
   wait        = false
-  version     = "0.16.2"
+  version     = "0.17.0"
   max_history = 2
   values = [
     yamlencode({
@@ -347,7 +347,7 @@ resource "helm_release" "nvidia-device-plugin" {
                 resources = [
                   {
                     name     = "nvidia.com/gpu"
-                    replicas = 10
+                    replicas = 2
                   },
                 ]
               }
