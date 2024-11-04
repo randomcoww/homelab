@@ -122,7 +122,7 @@ locals {
     litestream         = "docker.io/litestream/litestream:0.3"
     tailscale          = "ghcr.io/randomcoww/tailscale:1.74.0"
     fuse_device_plugin = "docker.io/soolaugust/fuse-device-plugin:v1.0"
-    code_server        = "ghcr.io/randomcoww/code-server:20240915.2"
+    code_server        = "ghcr.io/randomcoww/code-server:20241104.1"
     alpaca_stream      = "ghcr.io/randomcoww/alpaca-client:stream-server-20240801.6"
     lldap              = "docker.io/lldap/lldap:2024-08-08-alpine"
     keydb              = "docker.io/eqalpha/keydb:alpine_x86_64_v6.3.4"
@@ -140,7 +140,7 @@ locals {
 
   pxeboot_images = {
     coreos     = "fedora-coreos-41.20241104.0"
-    silverblue = "fedora-silverblue-41.20241104.0"
+    silverblue = "fedora-silverblue-40.20241101.0"
   }
 
   kubernetes = {

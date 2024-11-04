@@ -31,6 +31,14 @@ module "code" {
       name  = "XDG_RUNTIME_DIR"
       value = "/run/user/${local.users.client.uid}"
     },
+    {
+      name  = "NVIDIA_VISIBLE_DEVICES"
+      value = "all"
+    },
+    {
+      name  = "NVIDIA_DRIVER_CAPABILITIES"
+      value = "compute,utility"
+    },
   ]
   code_server_extra_volumes = [
     {
