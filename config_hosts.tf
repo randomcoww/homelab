@@ -256,6 +256,10 @@ locals {
           source  = "phy0"
           network = "service"
         }
+        phy0-etcd = {
+          source  = "phy0"
+          network = "etcd"
+        }
         phy0-kubernetes = {
           source  = "phy0"
           network = "kubernetes"
@@ -276,6 +280,10 @@ locals {
         }
         service = {
           interface     = "phy0-service"
+          enable_netnum = true
+        }
+        etcd = {
+          interface     = "phy0-etcd"
           enable_netnum = true
         }
         kubernetes = {
