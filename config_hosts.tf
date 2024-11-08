@@ -24,10 +24,6 @@ locals {
           source  = "phy0"
           network = "etcd"
         }
-        phy0-kubernetes = {
-          source  = "phy0"
-          network = "kubernetes"
-        }
         phy0-wan = {
           source  = "phy0"
           network = "wan"
@@ -49,10 +45,6 @@ locals {
         }
         etcd = {
           interface     = "phy0-etcd"
-          enable_netnum = true
-        }
-        kubernetes = {
-          interface     = "phy0-kubernetes"
           enable_netnum = true
         }
         wan = {
@@ -85,8 +77,6 @@ locals {
         ]
       }
       kubernetes_node_labels = {
-        "node-role.kubernetes.io/master"        = true
-        "node-role.kubernetes.io/control-plane" = true
       }
     }
 
@@ -266,6 +256,10 @@ locals {
           source  = "phy0"
           network = "service"
         }
+        phy0-kubernetes = {
+          source  = "phy0"
+          network = "kubernetes"
+        }
       }
       bridge_interfaces = {
         br-lan = {
@@ -282,6 +276,10 @@ locals {
         }
         service = {
           interface     = "phy0-service"
+          enable_netnum = true
+        }
+        kubernetes = {
+          interface     = "phy0-kubernetes"
           enable_netnum = true
         }
         mobile = {
@@ -335,9 +333,11 @@ locals {
         ]
       }
       kubernetes_node_labels = {
-        hostapd                  = true
-        "nvidia.com/gpu.present" = true
-        "nvidia.com/mps.capable" = true
+        "node-role.kubernetes.io/master"        = true
+        "node-role.kubernetes.io/control-plane" = true
+        "hostapd"                               = true
+        "nvidia.com/gpu.present"                = true
+        "nvidia.com/mps.capable"                = true
       }
     }
 
@@ -416,7 +416,7 @@ locals {
     disks               = ["gw-0", "gw-1", "q-0", "de-1", "r-0"]
     upstream-dns        = ["gw-0", "gw-1", "q-0", "r-0"]
     gateway             = ["gw-0", "gw-1"]
-    kubernetes-master   = ["gw-0", "q-0"]
+    kubernetes-master   = ["q-0", "de-1"]
     kubernetes-worker   = ["gw-0", "gw-1", "q-0", "de-1"]
     etcd                = ["gw-0", "gw-1", "q-0"]
     nvidia-container    = ["de-1"]
