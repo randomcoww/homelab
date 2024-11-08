@@ -85,6 +85,26 @@ module "kube-vip" {
     cidrhost(local.networks.service.prefix, host.netnum)
   ]
   apiserver_ip = local.services.apiserver.ip
+  affinity = {
+    nodeAffinity = {
+      requiredDuringSchedulingIgnoredDuringExecution = {
+        nodeSelectorTerms = [
+          {
+            matchExpressions = [
+              {
+                key      = "node-role.kubernetes.io/master"
+                operator = "Exists"
+              },
+              {
+                key      = "node-role.kubernetes.io/control-plane"
+                operator = "Exists"
+              },
+            ]
+          },
+        ]
+      }
+    }
+  }
 }
 
 module "kube-dns" {

@@ -23,6 +23,11 @@ variable "ports" {
   })
 }
 
+variable "affinity" {
+  type    = any
+  default = {}
+}
+
 variable "bgp_as" {
   type = number
 }

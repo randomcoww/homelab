@@ -39,6 +39,22 @@ module "kea" {
     },
   ]
   timezone = local.timezone
+  affinity = {
+    nodeAffinity = {
+      requiredDuringSchedulingIgnoredDuringExecution = {
+        nodeSelectorTerms = [
+          {
+            matchExpressions = [
+              {
+                key      = "node-role.kubernetes.io/gw"
+                operator = "Exists"
+              },
+            ]
+          },
+        ]
+      }
+    }
+  }
 }
 
 # PXE boot server

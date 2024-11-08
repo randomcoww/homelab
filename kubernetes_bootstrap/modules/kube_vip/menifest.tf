@@ -93,30 +93,11 @@ module "metadata" {
 }
 
 module "daemonset" {
-  source  = "../../../modules/daemonset"
-  name    = var.name
-  app     = var.name
-  release = var.release
-  affinity = {
-    nodeAffinity = {
-      requiredDuringSchedulingIgnoredDuringExecution = {
-        nodeSelectorTerms = [
-          {
-            matchExpressions = [
-              {
-                key      = "node-role.kubernetes.io/master"
-                operator = "Exists"
-              },
-              {
-                key      = "node-role.kubernetes.io/control-plane"
-                operator = "Exists"
-              },
-            ]
-          },
-        ]
-      }
-    }
-  }
+  source   = "../../../modules/daemonset"
+  name     = var.name
+  app      = var.name
+  release  = var.release
+  affinity = var.affinity
   template_spec = {
     hostNetwork        = true
     serviceAccountName = var.name
