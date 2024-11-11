@@ -118,7 +118,7 @@ locals {
     kapprover          = "ghcr.io/randomcoww/kapprover:20240126"
     external_dns       = "registry.k8s.io/external-dns/external-dns:v0.14.2"
     kube_proxy         = "ghcr.io/randomcoww/kubernetes:kube-proxy-${local.kubernetes.version}"
-    vaultwarden        = "docker.io/vaultwarden/server:1.32.0-alpine"
+    vaultwarden        = "docker.io/vaultwarden/server:1.32.4-alpine"
     litestream         = "docker.io/litestream/litestream:0.3"
     tailscale          = "ghcr.io/randomcoww/tailscale:1.74.0"
     fuse_device_plugin = "docker.io/soolaugust/fuse-device-plugin:v1.0"
