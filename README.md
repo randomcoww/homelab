@@ -100,10 +100,10 @@ ssh_client = {
 EOF
 ```
 
-Create `kubernetes_client/secrets.tfvars` file
+Create `kubernetes_service/secrets.tfvars` file
 
 ```bash
-cat > kubernetes_client/secrets.tfvars <<EOF
+cat > kubernetes_service/secrets.tfvars <<EOF
 smtp = {
   host     = "smtp.gmail.com"
   port     = 587
