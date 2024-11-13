@@ -73,6 +73,7 @@ module "statefulset" {
   }
   template_spec = {
     hostNetwork = true
+    dnsPolicy   = "ClusterFirstWithHostNet"
     containers = [
       {
         name  = var.name

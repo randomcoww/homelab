@@ -11,14 +11,14 @@ locals {
     module.authelia-redis,
     module.authelia,
     module.tailscale,
-    module.hostapd,
+    # module.hostapd,
     module.qrcode,
     module.alpaca-db,
     # module.alpaca-stream,
     module.code,
     module.webdav-pictures,
     module.webdav-videos,
-    module.sunshine,
+    # module.sunshine,
     module.audioserve,
   ]
 }
