@@ -363,7 +363,7 @@ locals {
           mtu       = local.default_mtu
         }
         wlan0 = {
-          match_mac = "3e-b1-a0-f3-9b-34"
+          match_mac = "00-28-f8-af-2a-f8"
         }
       }
       vlan_interfaces = {
@@ -393,7 +393,7 @@ locals {
       disks = {
         pv = {
           wipe   = false
-          device = "/dev/disk/by-id/scsi-SATA_SAMSUNG_MZNLN512_S2SWNX0HC04051"
+          device = "/dev/disk/by-id/ata-SAMSUNG_MZNLN512HMJP-00000_S2SWNX0HC04051"
           partitions = [
             {
               mount_path = local.mounts.home_path
