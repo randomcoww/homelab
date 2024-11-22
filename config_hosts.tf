@@ -354,7 +354,7 @@ locals {
     # remote site
     r-0 = {
       users = [
-        "admin",
+        "client",
       ]
       netnum = 7
       physical_interfaces = {
