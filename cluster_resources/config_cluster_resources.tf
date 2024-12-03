@@ -17,6 +17,10 @@ locals {
         bucket = "randomcoww-backup-2"
         path   = "documents"
       }
+      pictures = {
+        bucket = "randomcoww-pictures"
+        path   = ""
+      }
     } :
     name => merge(res, {
       resource = join("/", concat([res.bucket], compact(split("/", res.path))))
