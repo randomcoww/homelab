@@ -12,7 +12,6 @@ locals {
     module.server,
     module.client,
     module.desktop-environment,
-    module.remote,
     module.wireguard-client,
   ]
 }

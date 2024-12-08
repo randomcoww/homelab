@@ -350,81 +350,14 @@ locals {
         "nvidia.com/mps.capable"                = true
       }
     }
-
-    # remote site
-    r-0 = {
-      users = [
-        "client",
-      ]
-      netnum = 7
-      physical_interfaces = {
-        phy0 = {
-          match_mac = "ec-21-e5-72-46-27"
-          mtu       = local.default_mtu
-        }
-        wlan0 = {
-          match_mac = "00-28-f8-af-2a-f8"
-        }
-      }
-      vlan_interfaces = {
-        phy0-node = {
-          source  = "phy0"
-          network = "node"
-        }
-        phy0-service = {
-          source  = "phy0"
-          network = "service"
-        }
-      }
-      networks = {
-        remote = {
-          interface   = "phy0"
-          enable_dhcp = true
-        }
-        node = {
-          interface     = "phy0-node"
-          enable_netnum = true
-        }
-        service = {
-          interface     = "phy0-service"
-          enable_netnum = true
-        }
-      }
-      disks = {
-        pv = {
-          wipe   = false
-          device = "/dev/disk/by-id/ata-SAMSUNG_MZNLN512HMJP-00000_S2SWNX0HC04051"
-          partitions = [
-            {
-              mount_path = local.mounts.home_path
-              format     = "xfs"
-              wipe       = false
-              options    = ["-s", "size=4096"]
-              bind_mounts = [
-                {
-                  relative_path = "containers"
-                  mount_path    = local.mounts.containers_path
-                },
-                {
-                  relative_path = "tmp"
-                  mount_path    = "/var/tmp"
-                },
-              ]
-            },
-          ]
-        }
-      }
-      kubernetes_node_labels = {
-      }
-    }
   }
 
   base_members = {
-    base                = ["gw-0", "gw-1", "q-0", "de-1", "r-0"]
-    systemd-networkd    = ["gw-0", "gw-1", "q-0", "de-1", "r-0"]
-    server              = ["gw-0", "gw-1", "q-0", "de-1", "r-0"]
-    disks               = ["gw-0", "gw-1", "q-0", "de-1", "r-0"]
-    upstream-dns        = ["gw-0", "gw-1", "q-0", "r-0"]
+    base                = ["gw-0", "gw-1", "q-0", "de-1"]
+    systemd-networkd    = ["gw-0", "gw-1", "q-0", "de-1"]
+    server              = ["gw-0", "gw-1", "q-0", "de-1"]
+    disks               = ["gw-0", "gw-1", "q-0", "de-1"]
+    upstream-dns        = ["gw-0", "gw-1", "q-0"]
     gateway             = ["gw-0", "gw-1"]
     kubernetes-master   = ["q-0", "de-1"]
     kubernetes-worker   = ["gw-0", "gw-1", "q-0", "de-1"]
@@ -433,7 +366,6 @@ locals {
     client              = ["de-1"]
     desktop-environment = ["de-1"]
     wireguard-client    = ["de-1"]
-    remote              = ["r-0"]
   }
 
   # finalized local vars #
