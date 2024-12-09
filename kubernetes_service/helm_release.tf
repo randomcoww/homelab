@@ -7,7 +7,7 @@ locals {
     module.kea,
     module.matchbox,
     module.lldap,
-    module.vaultwarden,
+    # module.vaultwarden,
     module.authelia-redis,
     module.authelia,
     module.tailscale,
