@@ -14,11 +14,15 @@ locals {
         path   = "litestream"
       }
       documents = {
-        bucket = "randomcoww-backup-2"
-        path   = "documents"
+        bucket = "randomcoww-documents"
+        path   = ""
       }
       pictures = {
         bucket = "randomcoww-pictures"
+        path   = ""
+      }
+      music = {
+        bucket = "randomcoww-music"
         path   = ""
       }
     } :

@@ -52,6 +52,13 @@ output "mc_config" {
         api       = "S3v4"
         path      = "auto"
       }
+      music = {
+        url       = "https://s3.amazonaws.com"
+        accessKey = data.terraform_remote_state.sr.outputs.s3.music.access_key_id
+        secretKey = data.terraform_remote_state.sr.outputs.s3.music.secret_access_key
+        api       = "S3v4"
+        path      = "auto"
+      }
     }
   }
   sensitive = true
