@@ -98,12 +98,6 @@ module "litestream" {
             sync-interval            = "100ms"
             snapshot-interval        = "20m"
           },
-          {
-            name              = "s3"
-            url               = "s3://${var.s3_resource}/${basename(local.db_path)}"
-            access-key-id     = var.s3_access_key_id
-            secret-access-key = var.s3_secret_access_key
-          },
         ]
       },
     ]

@@ -9,10 +9,6 @@ locals {
         bucket = "randomcoww-etcd-2"
         path   = "snapshot"
       }
-      vaultwarden = {
-        bucket = "randomcoww-vaultwarden-2"
-        path   = "litestream"
-      }
       documents = {
         bucket = "randomcoww-documents"
         path   = ""

@@ -59,10 +59,6 @@ module "vaultwarden" {
   ingress_class_name        = local.ingress_classes.ingress_nginx_external
   nginx_ingress_annotations = local.nginx_ingress_auth_annotations
 
-  s3_resource          = data.terraform_remote_state.sr.outputs.s3.vaultwarden.resource
-  s3_access_key_id     = data.terraform_remote_state.sr.outputs.s3.vaultwarden.access_key_id
-  s3_secret_access_key = data.terraform_remote_state.sr.outputs.s3.vaultwarden.secret_access_key
-
   minio_endpoint          = "http://${local.kubernetes_services.minio.endpoint}:${local.service_ports.minio}"
   minio_bucket            = minio_s3_bucket.vaultwarden.id
   minio_access_key_id     = minio_iam_user.vaultwarden.id

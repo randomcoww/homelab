@@ -40,18 +40,6 @@ variable "nginx_ingress_annotations" {
   type = map(string)
 }
 
-variable "s3_resource" {
-  type = string
-}
-
-variable "s3_access_key_id" {
-  type = string
-}
-
-variable "s3_secret_access_key" {
-  type = string
-}
-
 variable "minio_endpoint" {
   type = string
 }
