@@ -286,8 +286,8 @@ locals {
     music = {
       name = "data-music"
     }
-    backup = {
-      name = "data-backup"
+    documents = {
+      name = "data-documents"
     }
     pictures = {
       name = "data-pictures"
