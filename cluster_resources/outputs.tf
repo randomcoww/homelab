@@ -3,6 +3,7 @@ output "s3" {
     for name, res in local.s3_resources :
     name => {
       resource          = res.resource
+      bucket            = res.bucket
       access_key_id     = aws_iam_access_key.s3[name].id
       secret_access_key = aws_iam_access_key.s3[name].secret
       aws_region        = local.aws_region
