@@ -286,9 +286,6 @@ locals {
     music = {
       name = "data-music"
     }
-    documents = {
-      name = "data-documents"
-    }
     pictures = {
       name = "data-pictures"
     }
