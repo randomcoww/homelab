@@ -233,3 +233,54 @@ module "sunshine" {
   ingress_class_name        = local.ingress_classes.ingress_nginx_external
   nginx_ingress_annotations = local.nginx_ingress_auth_annotations
 }
+
+## kasm
+
+module "kasm-steam" {
+  source  = "./modules/kasm"
+  name    = "kasm-steam"
+  release = "0.1.1"
+  images = {
+    kasm = local.container_images.kasm_steam
+  }
+  kasm_extra_envs = [
+    {
+      name  = "NVIDIA_DISABLE_REQUIRE"
+      value = "1"
+    },
+    {
+      name  = "NVIDIA_VISIBLE_DEVICES"
+      value = "all"
+    },
+  ]
+  kasm_resources = {
+    limits = {
+      "nvidia.com/gpu.shared" = 1
+    }
+  }
+  kasm_security_context = {
+    privileged = true
+  }
+  affinity = {
+    nodeAffinity = {
+      requiredDuringSchedulingIgnoredDuringExecution = {
+        nodeSelectorTerms = [
+          {
+            matchExpressions = [
+              {
+                key      = "kubernetes.io/hostname"
+                operator = "In"
+                values = [
+                  "de-1.local",
+                ]
+              },
+            ]
+          },
+        ]
+      }
+    }
+  }
+  service_hostname          = local.kubernetes_ingress_endpoints.kasm_steam
+  ingress_class_name        = local.ingress_classes.ingress_nginx_external
+  nginx_ingress_annotations = local.nginx_ingress_auth_annotations
+}

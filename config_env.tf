@@ -136,10 +136,11 @@ locals {
     audioserve         = "docker.io/izderadicka/audioserve:latest"
     syncthing          = "docker.io/syncthing/syncthing:1.27"
     kube_vip           = "docker.io/plndr/kube-vip:v0.8.3"
+    kasm_steam         = "docker.io/kasmweb/steam:1.16.0"
   }
 
   pxeboot_images = {
-    coreos     = "fedora-coreos-41.20241104.0"
+    coreos     = "fedora-coreos-41.20241214.0"
     silverblue = "fedora-silverblue-40.20241101.0"
   }
 
@@ -190,6 +191,7 @@ locals {
       sunshine        = "sunshine"
       sunshine_admin  = "sunadmin"
       audioserve      = "audioserve"
+      kasm_steam      = "steam"
     } :
     k => "${domain}.${local.domains.public}"
   }

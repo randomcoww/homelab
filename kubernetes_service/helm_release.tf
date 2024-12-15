@@ -2,7 +2,7 @@
 
 locals {
   modules_enabled = [
-    module.apiserver_service,
+    module.apiserver-service,
     module.fuse-device-plugin,
     module.kea,
     module.matchbox,
@@ -11,7 +11,7 @@ locals {
     module.authelia-redis,
     module.authelia,
     module.tailscale,
-    # module.hostapd,
+    module.hostapd,
     module.qrcode,
     module.alpaca-db,
     # module.alpaca-stream,
@@ -20,10 +20,11 @@ locals {
     module.webdav-videos,
     # module.sunshine,
     module.audioserve,
+    module.kasm-steam,
   ]
 }
 
-module "apiserver_service" {
+module "apiserver-service" {
   source = "./modules/apiserver_service"
 
   name       = local.kubernetes_services.apiserver_external.name

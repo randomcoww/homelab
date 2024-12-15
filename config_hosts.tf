@@ -325,7 +325,7 @@ locals {
       }
       network_boot = {
         interface = "phy0"
-        image     = local.pxeboot_image_set.silverblue
+        image     = local.pxeboot_image_set.coreos
         boot_args = [
           "iommu=pt",
           "amd_iommu=pt",
@@ -334,7 +334,7 @@ locals {
           "selinux=0",
           "rd.driver.blacklist=nouveau",
           "modprobe.blacklist=nouveau",
-          "nvidia-drm.modeset=1",
+          # "nvidia-drm.modeset=1",
           # "nvidia-drm.fbdev=1",
           ## stub all Nvidia GPUs
           # "vfio-pci.id=10de:ffffffff:ffffffff:ffffffff:00030000:ffff00ff,10de:ffffffff:ffffffff:ffffffff:00040300:ffffffff",

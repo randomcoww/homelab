@@ -136,3 +136,9 @@ storage:
       contents:
         inline: |
           net.bridge.bridge-nf-call-iptables=0
+    # steam container
+    - path: /etc/sysctl.d/50-bubblewrap.conf
+      mode: 0644
+      contents:
+        inline: |
+          kernel.unprivileged_userns_clone=1
