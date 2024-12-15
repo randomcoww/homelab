@@ -90,6 +90,7 @@ module "statefulset" {
     "checksum/secret" = sha256(module.secret.manifest)
   }
   template_spec = {
+    hostUsers = false
     containers = [
       {
         name  = var.name

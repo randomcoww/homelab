@@ -78,6 +78,9 @@ locals {
           registerNode           = true
           failSwapOn             = false
           enforceNodeAllocatable = []
+          featureGates = {
+            UserNamespacesSupport = true
+          }
         })
       }
     } :
