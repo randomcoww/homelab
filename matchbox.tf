@@ -18,6 +18,8 @@ resource "matchbox_profile" "ignition" {
     "initrd=${each.value.image.initrd}",
     "ignition.config.url=${local.matchbox_endpoint}/ignition?mac=$${mac:hexhyp}",
     "coreos.live.rootfs_url=${local.image_store_endpoint}/${each.value.image.rootfs}",
+    "rd.driver.blacklist=nouveau",
+    "modprobe.blacklist=nouveau",
   ], each.value.boot_args)
   raw_ignition = data.terraform_remote_state.ign.outputs.ignition[each.value.host_key]
   # Write local files so that this step can work without access to ignition tfstate on S3
