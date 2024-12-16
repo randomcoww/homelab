@@ -25,23 +25,16 @@ tw() {
 Define secrets
 
 ```bash
-LINUX_PASSWORD_HASH=$(echo $PASSWORD | openssl passwd -6 -stdin)
-
 LETSENCRYPT_USER=
 CLOUDFLARE_API_TOKEN=
 CLOUDFLARE_ACCOUNT_ID=
-GMAIL_USER=
-GMAIL_PASSWORD=
 TS_OAUTH_CLIENT_ID=
 TS_OAUTH_CLIENT_SECRET=
 
-WG_PRIVATE_KEY=
-WG_ADDRESS=
-WG_PUBLIC_KEY=
-WG_ENDPOINT=
-WG_ALLOWED_IPS=
-WG_DNS=
+LINUX_PASSWORD_HASH=$(echo $PASSWORD | openssl passwd -6 -stdin)
 
+GMAIL_USER=
+GMAIL_PASSWORD=
 APCA_API_KEY_ID=
 APCA_API_SECRET_KEY=
 APCA_API_BASE_URL=
@@ -74,15 +67,6 @@ users = {
   client = {
     password_hash = "$LINUX_PASSWORD_HASH"
   }
-}
-
-wireguard_client = {
-  private_key = "$WG_PRIVATE_KEY"
-  public_key  = "$WG_PUBLIC_KEY"
-  address     = "$WG_ADDRESS"
-  endpoint    = "$WG_ENDPOINT"
-  dns         = "$WG_DNS"
-  allowed_ips = "$WG_ALLOWED_IPS"
 }
 EOF
 ```
