@@ -363,7 +363,6 @@ locals {
     nvidia-container    = ["de-1"]
     client              = ["de-1"]
     desktop-environment = ["de-1"]
-    wireguard-client    = []
   }
 
   # finalized local vars #
