@@ -248,10 +248,6 @@ locals {
         wlan0 = {
           match_mac = "10-6f-d9-cf-d5-71"
         }
-        # backup WAN on mobile data
-        wlan1 = {
-          match_mac = "0e-db-ea-3e-3a-78"
-        }
       }
       vlan_interfaces = {
         phy0-service = {
@@ -277,7 +273,6 @@ locals {
       networks = {
         node = {
           interface     = "br-lan"
-          enable_dhcp   = true
           enable_netnum = true
         }
         service = {
@@ -291,12 +286,6 @@ locals {
         kubernetes = {
           interface     = "phy0-kubernetes"
           enable_netnum = true
-        }
-        mobile = {
-          interface   = "wlan1"
-          metric      = 512
-          enable_dhcp = true
-          enable_dns  = true
         }
       }
       disks = {
@@ -325,7 +314,7 @@ locals {
       }
       network_boot = {
         interface = "phy0"
-        image     = local.pxeboot_image_set.coreos
+        image     = local.pxeboot_image_set.silverblue
         boot_args = [
           "iommu=pt",
           "amd_iommu=pt",
@@ -355,7 +344,7 @@ locals {
     systemd-networkd    = ["gw-0", "gw-1", "q-0", "de-1"]
     server              = ["gw-0", "gw-1", "q-0", "de-1"]
     disks               = ["gw-0", "gw-1", "q-0", "de-1"]
-    upstream-dns        = ["gw-0", "gw-1", "q-0"]
+    upstream-dns        = ["gw-0", "gw-1", "q-0", "de-1"]
     gateway             = ["gw-0", "gw-1"]
     kubernetes-master   = ["q-0", "de-1"]
     kubernetes-worker   = ["gw-0", "gw-1", "q-0", "de-1"]

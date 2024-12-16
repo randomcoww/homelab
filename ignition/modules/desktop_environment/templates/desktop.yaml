@@ -101,6 +101,7 @@ storage:
           [org/gnome/settings-daemon/plugins/power]
           idle-dim=false
           power-button-action='interactive'
+          sleep-inactive-ac-timeout=uint32 0
           sleep-inactive-ac-type='nothing'
           sleep-inactive-battery-type='nothing'
 
