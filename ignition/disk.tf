@@ -4,5 +4,4 @@ module "disks" {
 
   ignition_version = local.ignition_version
   disks            = lookup(each.value, "disks", {})
-  mounts           = lookup(each.value, "mounts", [])
 }

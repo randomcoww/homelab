@@ -19,8 +19,3 @@ variable "disks" {
   type    = any
   default = {}
 }
-
-variable "mounts" {
-  type    = any
-  default = []
-}
