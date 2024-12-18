@@ -191,9 +191,9 @@ module "sunshine" {
     },
   ]
   sunshine_resources = {
-    limits = {
-      "nvidia.com/gpu.shared" = 1
-    }
+    # limits = {
+    #   "nvidia.com/gpu" = 1
+    # }
   }
   sunshine_extra_volume_mounts = [
     {
@@ -254,9 +254,9 @@ module "kasm-steam" {
     },
   ]
   kasm_resources = {
-    limits = {
-      "nvidia.com/gpu.shared" = 1
-    }
+    # limits = {
+    #   "nvidia.com/gpu.shared" = 1
+    # }
   }
   kasm_security_context = {
     privileged = true
