@@ -15,12 +15,12 @@ locals {
     module.qrcode,
     module.alpaca-db,
     # module.alpaca-stream,
-    module.code,
+    # module.code,
     module.webdav-pictures,
     module.webdav-videos,
     module.sunshine,
     module.audioserve,
-    # module.kasm-steam,
+    # module.steam-headless,
   ]
 }
 

@@ -13,8 +13,7 @@ variable "release" {
 
 variable "images" {
   type = object({
-    sunshine   = string
-    mountpoint = string
+    sunshine = string
   })
 }
 

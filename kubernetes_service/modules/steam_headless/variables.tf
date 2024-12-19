@@ -13,11 +13,11 @@ variable "release" {
 
 variable "images" {
   type = object({
-    kasm = string
+    steam = string
   })
 }
 
-variable "kasm_extra_envs" {
+variable "steam_extra_envs" {
   type = list(object({
     name  = string
     value = any
@@ -25,12 +25,12 @@ variable "kasm_extra_envs" {
   default = []
 }
 
-variable "kasm_resources" {
+variable "steam_resources" {
   type    = any
   default = {}
 }
 
-variable "kasm_security_context" {
+variable "steam_security_context" {
   type    = any
   default = {}
 }
@@ -40,7 +40,19 @@ variable "affinity" {
   default = {}
 }
 
-variable "service_hostname" {
+variable "vnc_hostname" {
+  type = string
+}
+
+variable "sunshine_hostname" {
+  type = string
+}
+
+variable "sunshine_ip" {
+  type = string
+}
+
+variable "sunshine_admin_hostname" {
   type = string
 }
 
@@ -52,12 +64,20 @@ variable "nginx_ingress_annotations" {
   type = map(string)
 }
 
-variable "kasm_extra_volume_mounts" {
+variable "steam_extra_volume_mounts" {
   type    = any
   default = []
 }
 
-variable "kasm_extra_volumes" {
+variable "steam_extra_volumes" {
   type    = any
   default = []
+}
+
+variable "loadbalancer_class_name" {
+  type = string
+}
+
+variable "storage_class_name" {
+  type = string
 }

@@ -15,7 +15,7 @@ locals {
     {
       path     = "/etc/udev/rules.d/85-sunshine-uinput.rules"
       contents = <<-EOF
-      KERNEL=="uinput", SUBSYSTEM=="misc", OPTIONS+="static_node=uinput", TAG+="uaccess"
+      KERNEL=="uinput", GROUP="input", MODE="0660", OPTIONS+="static_node=uinput"
       EOF
     },
   ]

@@ -150,8 +150,7 @@ module "sunshine" {
   name    = "sunshine"
   release = "0.1.1"
   images = {
-    sunshine   = local.container_images.sunshine
-    mountpoint = local.container_images.mountpoint
+    sunshine = local.container_images.sunshine
   }
   sunshine_extra_envs = [
     {
@@ -234,33 +233,48 @@ module "sunshine" {
   nginx_ingress_annotations = local.nginx_ingress_auth_annotations
 }
 
-## kasm
+## Steam headless
 
-module "kasm-steam" {
-  source  = "./modules/kasm"
-  name    = "kasm-steam"
+module "steam-headless" {
+  source  = "./modules/steam_headless"
+  name    = "steam-headless"
   release = "0.1.1"
   images = {
-    kasm = local.container_images.kasm_steam
+    steam = local.container_images.steam_headless
   }
-  kasm_extra_envs = [
+  steam_extra_envs = [
     {
-      name  = "NVIDIA_DISABLE_REQUIRE"
-      value = "1"
+      name  = "NVIDIA_DRIVER_CAPABILITIES"
+      value = "all"
     },
     {
       name  = "NVIDIA_VISIBLE_DEVICES"
       value = "all"
     },
+    {
+      name  = "DOCKER_RUNTIME"
+      value = "nvidia"
+    },
+    {
+      name  = "PUID"
+      value = local.users.client.uid
+    },
+    {
+      name  = "PGID"
+      value = local.users.client.uid
+    },
   ]
-  kasm_resources = {
+  steam_resources = {
     # limits = {
     #   "nvidia.com/gpu.shared" = 1
     # }
   }
-  kasm_security_context = {
+  steam_security_context = {
     privileged = true
+    fsGroup    = local.users.client.uid
   }
+  loadbalancer_class_name = "kube-vip.io/kube-vip-class"
+  storage_class_name      = "local-path"
   affinity = {
     nodeAffinity = {
       requiredDuringSchedulingIgnoredDuringExecution = {
@@ -280,7 +294,10 @@ module "kasm-steam" {
       }
     }
   }
-  service_hostname          = local.kubernetes_ingress_endpoints.kasm_steam
+  sunshine_hostname         = local.kubernetes_ingress_endpoints.steam_sunshine
+  sunshine_ip               = local.services.steam_sunshine.ip
+  sunshine_admin_hostname   = local.kubernetes_ingress_endpoints.steam_sunshine_admin
+  vnc_hostname              = local.kubernetes_ingress_endpoints.steam_vnc
   ingress_class_name        = local.ingress_classes.ingress_nginx_external
   nginx_ingress_annotations = local.nginx_ingress_auth_annotations
 }
