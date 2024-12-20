@@ -165,6 +165,8 @@ module "statefulset" {
     ]
   }
   template_spec = {
+    # hostNetwork makes sunshine inputs work
+    hostNetwork = true
     containers = [
       {
         name  = var.name
@@ -261,6 +263,10 @@ module "statefulset" {
             name      = "dev-shm"
             mountPath = "/dev/shm"
           },
+          {
+            name      = "run-udev"
+            mountPath = "/run/udev"
+          },
         ], var.steam_extra_volume_mounts)
         ports = concat([
           for name, port in local.tcp_ports :
@@ -288,6 +294,12 @@ module "statefulset" {
       },
       {
         name = "dev-shm"
+        emptyDir = {
+          medium = "Memory"
+        }
+      },
+      {
+        name = "run-udev"
         emptyDir = {
           medium = "Memory"
         }

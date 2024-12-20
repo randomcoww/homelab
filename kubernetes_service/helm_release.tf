@@ -18,9 +18,9 @@ locals {
     module.code,
     module.webdav-pictures,
     module.webdav-videos,
-    module.sunshine,
+    # module.sunshine,
     module.audioserve,
-    # module.steam-headless,
+    module.steam-headless,
   ]
 }
 

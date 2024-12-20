@@ -263,6 +263,14 @@ module "steam-headless" {
       name  = "PGID"
       value = local.users.client.uid
     },
+    {
+      name  = "DISPLAY_SIZEW"
+      value = "2560"
+    },
+    {
+      name  = "DISPLAY_SIZEH"
+      value = "1440"
+    },
   ]
   steam_resources = {
     # limits = {
