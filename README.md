@@ -275,12 +275,14 @@ chmod +x $HOME/bin/mc
 
 ```bash
 brew install \
+  bash \
   helm \
   podman \
   kubernetes-cli \
   minio-mc \
   tmux \
-  reattach-to-user-namespace
+  reattach-to-user-namespace \
+  unar
 
 brew install --cask \
   blender \
@@ -291,7 +293,15 @@ brew install --cask \
   tailscale \
   visual-studio-code \
   phoenix-slides \
-  iina
+  iina \
+  mullvadvpn \
+  transmission \
+  balenaetcher
+```
+
+```bash
+echo "/opt/homebrew/bin/bash" >> /etc/shells
+chsh -s /opt/homebrew/bin/bash
 ```
 
 ```bash
