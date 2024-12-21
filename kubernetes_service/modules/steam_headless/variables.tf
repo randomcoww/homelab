@@ -40,10 +40,6 @@ variable "affinity" {
   default = {}
 }
 
-variable "vnc_hostname" {
-  type = string
-}
-
 variable "sunshine_hostname" {
   type = string
 }

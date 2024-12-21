@@ -7,7 +7,6 @@ locals {
     http  = local.base_port
     web   = local.base_port + 1
     rtsp  = local.base_port + 21
-    novnc = 8083
   }
   udp_ports = {
     video   = local.base_port + 9
@@ -36,11 +35,10 @@ module "metadata" {
   release     = var.release
   app_version = split(":", var.images.steam)[1]
   manifests = {
-    "templates/secret.yaml"           = module.secret.manifest
-    "templates/service.yaml"          = module.service.manifest
-    "templates/ingress-sunshine.yaml" = module.ingress-sunshine.manifest
-    "templates/ingress-vnc.yaml"      = module.ingress-vnc.manifest
-    "templates/statefulset.yaml"      = module.statefulset.manifest
+    "templates/secret.yaml"      = module.secret.manifest
+    "templates/service.yaml"     = module.service.manifest
+    "templates/ingress.yaml"     = module.ingress.manifest
+    "templates/statefulset.yaml" = module.statefulset.manifest
   }
 }
 
@@ -87,9 +85,9 @@ module "service" {
   }
 }
 
-module "ingress-sunshine" {
+module "ingress" {
   source             = "../../../modules/ingress"
-  name               = "${var.name}-sunshine"
+  name               = var.name
   app                = var.name
   release            = var.release
   ingress_class_name = var.ingress_class_name
@@ -106,27 +104,6 @@ module "ingress-sunshine" {
         {
           service = module.service.name
           port    = local.tcp_ports.web
-          path    = "/"
-        },
-      ]
-    },
-  ]
-}
-
-module "ingress-vnc" {
-  source             = "../../../modules/ingress"
-  name               = "${var.name}-vnc"
-  app                = var.name
-  release            = var.release
-  ingress_class_name = var.ingress_class_name
-  annotations        = var.nginx_ingress_annotations
-  rules = [
-    {
-      host = var.vnc_hostname
-      paths = [
-        {
-          service = module.service.name
-          port    = local.tcp_ports.novnc
           path    = "/"
         },
       ]
@@ -185,10 +162,6 @@ module "statefulset" {
             value = ":55"
           },
           {
-            name  = "SHM_SIZE"
-            value = "8G"
-          },
-          {
             name  = "UMASK"
             value = "000"
           },
@@ -202,15 +175,11 @@ module "statefulset" {
           },
           {
             name  = "WEB_UI_MODE"
-            value = "vnc"
+            value = "none"
           },
           {
             name  = "ENABLE_VNC_AUDIO"
             value = "false"
-          },
-          {
-            name  = "PORT_NOVNC_WEB"
-            value = tostring(local.tcp_ports.novnc)
           },
           {
             name  = "NEKO_NAT1TO1"
@@ -218,7 +187,7 @@ module "statefulset" {
           },
           {
             name  = "ENABLE_EVDEV_INPUTS"
-            value = "true"
+            value = "false"
           },
           {
             name  = "ENABLE_SUNSHINE"
@@ -255,9 +224,8 @@ module "statefulset" {
             mountPath = local.home_path
           },
           {
-            name             = "dev-input"
-            mountPath        = "/dev/input"
-            mountPropagation = "HostToContainer"
+            name      = "dev-input"
+            mountPath = "/dev/input"
           },
           {
             name      = "dev-shm"

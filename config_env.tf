@@ -188,7 +188,6 @@ locals {
       audioserve           = "audioserve"
       steam_sunshine       = "steam"
       steam_sunshine_admin = "steamadmin"
-      steam_vnc            = "steamvnc"
     } :
     k => "${domain}.${local.domains.public}"
   }

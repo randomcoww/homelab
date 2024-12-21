@@ -290,11 +290,8 @@ module "steam-headless" {
           {
             matchExpressions = [
               {
-                key      = "kubernetes.io/hostname"
-                operator = "In"
-                values = [
-                  "de-1.local",
-                ]
+                key      = "nvidia.com/gpu.present"
+                operator = "Exists"
               },
             ]
           },
@@ -305,7 +302,6 @@ module "steam-headless" {
   sunshine_hostname         = local.kubernetes_ingress_endpoints.steam_sunshine
   sunshine_ip               = local.services.steam_sunshine.ip
   sunshine_admin_hostname   = local.kubernetes_ingress_endpoints.steam_sunshine_admin
-  vnc_hostname              = local.kubernetes_ingress_endpoints.steam_vnc
   ingress_class_name        = local.ingress_classes.ingress_nginx_external
   nginx_ingress_annotations = local.nginx_ingress_auth_annotations
 }
