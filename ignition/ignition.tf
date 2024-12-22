@@ -11,7 +11,6 @@ locals {
     module.nvidia-container,
     module.server,
     module.client,
-    module.desktop-environment,
   ]
 }
 

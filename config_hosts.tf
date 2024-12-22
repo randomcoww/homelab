@@ -316,9 +316,6 @@ locals {
         interface = "phy0"
         image     = local.pxeboot_image_set.silverblue
         boot_args = [
-          "iommu=pt",
-          "amd_iommu=pt",
-          "rd.driver.pre=vfio-pci",
           "numa=off",
           "systemd.unit=multi-user.target",
           "selinux=0",
@@ -341,18 +338,17 @@ locals {
   }
 
   base_members = {
-    base                = ["gw-0", "gw-1", "q-0", "de-1"]
-    systemd-networkd    = ["gw-0", "gw-1", "q-0", "de-1"]
-    server              = ["gw-0", "gw-1", "q-0", "de-1"]
-    client              = ["gw-0", "gw-1", "q-0", "de-1"]
-    disks               = ["gw-0", "gw-1", "q-0", "de-1"]
-    upstream-dns        = ["gw-0", "gw-1", "q-0", "de-1"]
-    gateway             = ["gw-0", "gw-1"]
-    kubernetes-master   = ["q-0", "de-1"]
-    kubernetes-worker   = ["gw-0", "gw-1", "q-0", "de-1"]
-    etcd                = ["gw-0", "gw-1", "q-0"]
-    nvidia-container    = ["de-1"]
-    desktop-environment = []
+    base              = ["gw-0", "gw-1", "q-0", "de-1"]
+    systemd-networkd  = ["gw-0", "gw-1", "q-0", "de-1"]
+    server            = ["gw-0", "gw-1", "q-0", "de-1"]
+    client            = ["gw-0", "gw-1", "q-0", "de-1"]
+    disks             = ["gw-0", "gw-1", "q-0", "de-1"]
+    upstream-dns      = ["gw-0", "gw-1", "q-0", "de-1"]
+    gateway           = ["gw-0", "gw-1"]
+    kubernetes-master = ["q-0", "de-1"]
+    kubernetes-worker = ["gw-0", "gw-1", "q-0", "de-1"]
+    etcd              = ["gw-0", "gw-1", "q-0"]
+    nvidia-container  = ["de-1"]
   }
 
   # finalized local vars #
