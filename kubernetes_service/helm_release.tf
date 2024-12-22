@@ -18,7 +18,6 @@ locals {
     module.code,
     module.webdav-pictures,
     module.webdav-videos,
-    # module.sunshine,
     module.audioserve,
     module.sunshine-desktop,
   ]
