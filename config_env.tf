@@ -41,7 +41,6 @@ locals {
         sunshine               = 36
         alpaca_stream          = 37
         alpaca_db              = 38
-        steam_sunshine         = 39
       }
     }
     # VRRP conntrack sync
@@ -131,7 +130,7 @@ locals {
     audioserve         = "docker.io/izderadicka/audioserve:latest"
     syncthing          = "docker.io/syncthing/syncthing:1.27"
     kube_vip           = "docker.io/plndr/kube-vip:v0.8.3"
-    steam_headless     = "docker.io/josh5/steam-headless:latest"
+    sunshine_desktop   = "ghcr.io/randomcoww/sunshine-desktop:2024.1221.192616-19"
   }
 
   pxeboot_images = {
@@ -172,22 +171,20 @@ locals {
 
   kubernetes_ingress_endpoints = {
     for k, domain in {
-      auth                 = "auth"
-      transmission         = "t"
-      vaultwarden          = "vw"
-      code                 = "code"
-      alpaca_stream        = "alpaca-stream"
-      alpaca_db            = "alpaca-db"
-      lldap_http           = "ldap"
-      qrcode               = "qrcode"
-      qrcode_wifi          = "wifi"
-      webdav_pictures      = "pictures"
-      webdav_videos        = "videos"
-      sunshine             = "sunshine"
-      sunshine_admin       = "sunadmin"
-      audioserve           = "audioserve"
-      steam_sunshine       = "steam"
-      steam_sunshine_admin = "steamadmin"
+      auth            = "auth"
+      transmission    = "t"
+      vaultwarden     = "vw"
+      code            = "code"
+      alpaca_stream   = "alpaca-stream"
+      alpaca_db       = "alpaca-db"
+      lldap_http      = "ldap"
+      qrcode          = "qrcode"
+      qrcode_wifi     = "wifi"
+      webdav_pictures = "pictures"
+      webdav_videos   = "videos"
+      sunshine        = "sunshine"
+      sunshine_admin  = "sunadmin"
+      audioserve      = "audioserve"
     } :
     k => "${domain}.${local.domains.public}"
   }

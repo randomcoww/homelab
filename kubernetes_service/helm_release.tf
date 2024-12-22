@@ -20,7 +20,7 @@ locals {
     module.webdav-videos,
     # module.sunshine,
     module.audioserve,
-    module.steam-headless,
+    module.sunshine-desktop,
   ]
 }
 

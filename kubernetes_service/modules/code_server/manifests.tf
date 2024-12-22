@@ -153,11 +153,11 @@ module "statefulset" {
           secretName = module.secret.name
         }
       },
-      ], [
       {
         name = "home"
         hostPath = {
           path = var.home_path
+          type = "Directory"
         }
       },
     ], var.code_server_extra_volumes)

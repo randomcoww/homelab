@@ -320,10 +320,10 @@ locals {
           "amd_iommu=pt",
           "rd.driver.pre=vfio-pci",
           "numa=off",
+          "systemd.unit=multi-user.target",
           "selinux=0",
           "nvidia-drm.modeset=1",
           # "nvidia-drm.fbdev=1",
-          "systemd.unit=multi-user.target",
           ## stub all Nvidia GPUs
           # "vfio-pci.id=10de:ffffffff:ffffffff:ffffffff:00030000:ffff00ff,10de:ffffffff:ffffffff:ffffffff:00040300:ffffffff",
           ## stub all AMD GPUs
@@ -335,7 +335,7 @@ locals {
         "node-role.kubernetes.io/control-plane" = true
         "hostapd"                               = true
         "nvidia.com/gpu.present"                = true
-        "nvidia.com/mps.capable"                = true
+        # "nvidia.com/mps.capable"                = true
       }
     }
   }
@@ -344,6 +344,7 @@ locals {
     base                = ["gw-0", "gw-1", "q-0", "de-1"]
     systemd-networkd    = ["gw-0", "gw-1", "q-0", "de-1"]
     server              = ["gw-0", "gw-1", "q-0", "de-1"]
+    client              = ["gw-0", "gw-1", "q-0", "de-1"]
     disks               = ["gw-0", "gw-1", "q-0", "de-1"]
     upstream-dns        = ["gw-0", "gw-1", "q-0", "de-1"]
     gateway             = ["gw-0", "gw-1"]
@@ -351,8 +352,7 @@ locals {
     kubernetes-worker   = ["gw-0", "gw-1", "q-0", "de-1"]
     etcd                = ["gw-0", "gw-1", "q-0"]
     nvidia-container    = ["de-1"]
-    client              = ["de-1"]
-    desktop-environment = ["de-1"]
+    desktop-environment = []
   }
 
   # finalized local vars #

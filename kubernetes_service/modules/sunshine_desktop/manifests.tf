@@ -1,5 +1,4 @@
 locals {
-  home_path = "/home/default"
   # https://docs.lizardbyte.dev/projects/sunshine/en/latest/about/advanced_usage.html#port
   base_port = 47989
   tcp_ports = {
@@ -33,7 +32,7 @@ module "metadata" {
   name        = var.name
   namespace   = var.namespace
   release     = var.release
-  app_version = split(":", var.images.steam)[1]
+  app_version = split(":", var.images.sunshine_desktop)[1]
   manifests = {
     "templates/secret.yaml"      = module.secret.manifest
     "templates/service.yaml"     = module.service.manifest
@@ -59,11 +58,11 @@ module "service" {
   app     = var.name
   release = var.release
   annotations = {
-    "external-dns.alpha.kubernetes.io/hostname" = var.sunshine_hostname
+    "external-dns.alpha.kubernetes.io/hostname" = var.service_hostname
   }
   spec = {
     type              = "LoadBalancer"
-    loadBalancerIP    = var.sunshine_ip
+    loadBalancerIP    = var.service_ip
     loadBalancerClass = var.loadbalancer_class_name
     ports = concat([
       for name, port in local.tcp_ports :
@@ -99,7 +98,7 @@ module "ingress" {
   })
   rules = [
     {
-      host = var.sunshine_admin_hostname
+      host = var.admin_hostname
       paths = [
         {
           service = module.service.name
@@ -121,80 +120,16 @@ module "statefulset" {
   annotations = {
     "checksum/secret" = sha256(module.secret.manifest)
   }
-  spec = {
-    volumeClaimTemplates = [
-      {
-        metadata = {
-          name = "home"
-        }
-        spec = {
-          accessModes = [
-            "ReadWriteOnce",
-          ]
-          resources = {
-            requests = {
-              storage = "600Gi"
-            }
-          }
-          storageClassName = var.storage_class_name
-        }
-      },
-    ]
-  }
   template_spec = {
     # hostNetwork makes sunshine inputs work
     hostNetwork = true
     containers = [
       {
         name  = var.name
-        image = var.images.steam
+        image = var.images.sunshine_desktop
         env = concat([
           {
-            name  = "NAME"
-            value = var.name
-          },
-          {
-            name  = "USER_LOCALES"
-            value = "en_US.UTF-8 UTF-8"
-          },
-          {
-            name  = "DISPLAY"
-            value = ":55"
-          },
-          {
-            name  = "UMASK"
-            value = "000"
-          },
-          {
-            name  = "USER_PASSWORD"
-            value = "password"
-          },
-          {
-            name  = "MODE"
-            value = "primary"
-          },
-          {
-            name  = "WEB_UI_MODE"
-            value = "none"
-          },
-          {
-            name  = "ENABLE_VNC_AUDIO"
-            value = "false"
-          },
-          {
-            name  = "NEKO_NAT1TO1"
-            value = ""
-          },
-          {
-            name  = "ENABLE_EVDEV_INPUTS"
-            value = "false"
-          },
-          {
-            name  = "ENABLE_SUNSHINE"
-            value = "true"
-          },
-          {
-            name = "SUNSHINE_USER"
+            name = "SUNSHINE_USERNAME"
             valueFrom = {
               secretKeyRef = {
                 name = module.secret.name
@@ -203,7 +138,7 @@ module "statefulset" {
             }
           },
           {
-            name = "SUNSHINE_PASS"
+            name = "SUNSHINE_PASSWORD"
             valueFrom = {
               secretKeyRef = {
                 name = module.secret.name
@@ -211,8 +146,28 @@ module "statefulset" {
               }
             }
           },
+          {
+            name  = "SUNSHINE_PORT"
+            value = tostring(local.base_port)
+          },
+          {
+            name  = "USER"
+            value = var.user
+          },
+          {
+            name  = "UID"
+            value = tostring(var.uid)
+          },
+          {
+            name  = "HOME"
+            value = var.home_path
+          },
+          {
+            name  = "XDG_RUNTIME_DIR"
+            value = "/run/user/${var.uid}"
+          },
           ], [
-          for _, e in var.steam_extra_envs :
+          for _, e in var.sunshine_extra_envs :
           {
             name  = e.name
             value = tostring(e.value)
@@ -221,7 +176,7 @@ module "statefulset" {
         volumeMounts = concat([
           {
             name      = "home"
-            mountPath = local.home_path
+            mountPath = var.home_path
           },
           {
             name      = "dev-input"
@@ -231,11 +186,7 @@ module "statefulset" {
             name      = "dev-shm"
             mountPath = "/dev/shm"
           },
-          {
-            name      = "run-udev"
-            mountPath = "/run/udev"
-          },
-        ], var.steam_extra_volume_mounts)
+        ], var.sunshine_extra_volume_mounts)
         ports = concat([
           for name, port in local.tcp_ports :
           {
@@ -249,8 +200,8 @@ module "statefulset" {
             protocol      = "UDP"
           }
         ])
-        securityContext = var.steam_security_context
-        resources       = var.steam_resources
+        securityContext = var.sunshine_security_context
+        resources       = var.sunshine_resources
       },
     ]
     volumes = concat([
@@ -267,11 +218,12 @@ module "statefulset" {
         }
       },
       {
-        name = "run-udev"
-        emptyDir = {
-          medium = "Memory"
+        name = "home"
+        hostPath = {
+          path = var.home_path
+          type = "Directory"
         }
       },
-    ], var.steam_extra_volumes)
+    ], var.sunshine_extra_volumes)
   }
 }

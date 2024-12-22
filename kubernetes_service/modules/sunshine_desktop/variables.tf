@@ -13,11 +13,11 @@ variable "release" {
 
 variable "images" {
   type = object({
-    steam = string
+    sunshine_desktop = string
   })
 }
 
-variable "steam_extra_envs" {
+variable "sunshine_extra_envs" {
   type = list(object({
     name  = string
     value = any
@@ -25,12 +25,12 @@ variable "steam_extra_envs" {
   default = []
 }
 
-variable "steam_resources" {
+variable "sunshine_resources" {
   type    = any
   default = {}
 }
 
-variable "steam_security_context" {
+variable "sunshine_security_context" {
   type    = any
   default = {}
 }
@@ -40,15 +40,27 @@ variable "affinity" {
   default = {}
 }
 
-variable "sunshine_hostname" {
+variable "service_hostname" {
   type = string
 }
 
-variable "sunshine_ip" {
+variable "service_ip" {
   type = string
 }
 
-variable "sunshine_admin_hostname" {
+variable "admin_hostname" {
+  type = string
+}
+
+variable "user" {
+  type = string
+}
+
+variable "uid" {
+  type = number
+}
+
+variable "home_path" {
   type = string
 }
 
@@ -60,20 +72,16 @@ variable "nginx_ingress_annotations" {
   type = map(string)
 }
 
-variable "steam_extra_volume_mounts" {
+variable "sunshine_extra_volume_mounts" {
   type    = any
   default = []
 }
 
-variable "steam_extra_volumes" {
+variable "sunshine_extra_volumes" {
   type    = any
   default = []
 }
 
 variable "loadbalancer_class_name" {
-  type = string
-}
-
-variable "storage_class_name" {
   type = string
 }
