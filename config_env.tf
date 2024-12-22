@@ -129,7 +129,7 @@ locals {
     audioserve         = "docker.io/izderadicka/audioserve:latest"
     syncthing          = "docker.io/syncthing/syncthing:1.27"
     kube_vip           = "docker.io/plndr/kube-vip:v0.8.3"
-    sunshine_desktop   = "ghcr.io/randomcoww/sunshine-desktop:2024.1222.851-23"
+    sunshine_desktop   = "ghcr.io/randomcoww/sunshine-desktop:2024.1222.851-22"
   }
 
   pxeboot_images = {
