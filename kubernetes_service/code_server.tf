@@ -58,12 +58,14 @@ module "code" {
   ]
   code_server_extra_volume_mounts = [
     {
-      name      = "run-podman"
-      mountPath = "/run/podman"
+      name             = "run-podman"
+      mountPath        = "/run/podman"
+      mountPropagation = "HostToContainer"
     },
     {
-      name      = "run-user"
-      mountPath = "/run/user/${local.users.client.uid}"
+      name             = "run-user"
+      mountPath        = "/run/user/${local.users.client.uid}"
+      mountPropagation = "HostToContainer"
     },
   ]
   code_server_resources = {
