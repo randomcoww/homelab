@@ -28,10 +28,6 @@ module "code" {
   ]
   code_server_extra_envs = [
     {
-      name  = "XDG_RUNTIME_DIR"
-      value = "/run/user/${local.users.client.uid}"
-    },
-    {
       name  = "NVIDIA_VISIBLE_DEVICES"
       value = "all"
     },
@@ -58,14 +54,12 @@ module "code" {
   ]
   code_server_extra_volume_mounts = [
     {
-      name             = "run-podman"
-      mountPath        = "/run/podman"
-      mountPropagation = "HostToContainer"
+      name      = "run-podman"
+      mountPath = "/run/podman"
     },
     {
-      name             = "run-user"
-      mountPath        = "/run/user/${local.users.client.uid}"
-      mountPropagation = "HostToContainer"
+      name      = "run-user"
+      mountPath = "/run/user/${local.users.client.uid}"
     },
   ]
   code_server_resources = {

@@ -4,6 +4,7 @@ locals {
     templatefile(f, {
       ignition_version = var.ignition_version
       hostname         = var.hostname
+      users            = var.users
     })
     ], [
     yamlencode({

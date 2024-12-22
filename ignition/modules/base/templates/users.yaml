@@ -1,6 +1,20 @@
 ---
 variant: fcos
 version: ${ignition_version}
+systemd:
+  units:
+    %{~ for i, user in users ~}
+    - name: getty@tty${i+1}.service
+      enabled: true
+      dropins:
+        - name: 10-autologin.conf
+          contents: |
+            [Service]
+            UnsetEnvironment=CREDENTIALS_DIRECTORY
+            ExecStart=
+            ExecStart=-/sbin/agetty --skip-login --noclear --autologin ${user.name} %I $TERM
+    %{~ endfor ~}
+
 storage:
   files:
     - path: /etc/sudoers.d/coreos-sudo-group

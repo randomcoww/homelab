@@ -30,9 +30,6 @@ CLOUDFLARE_API_TOKEN=
 CLOUDFLARE_ACCOUNT_ID=
 TS_OAUTH_CLIENT_ID=
 TS_OAUTH_CLIENT_SECRET=
-
-LINUX_PASSWORD_HASH=$(echo $PASSWORD | openssl passwd -6 -stdin)
-
 GMAIL_USER=
 GMAIL_PASSWORD=
 APCA_API_KEY_ID=
@@ -54,19 +51,6 @@ cloudflare = {
 tailscale = {
   oauth_client_id     = "$TS_OAUTH_CLIENT_ID"
   oauth_client_secret = "$TS_OAUTH_CLIENT_SECRET"
-}
-EOF
-```
-
-Create `ignition/secrets.tfvars` file
-
-```bash
-cat > ignition/secrets.tfvars <<EOF
-users = {
-  admin = {}
-  client = {
-    password_hash = "$LINUX_PASSWORD_HASH"
-  }
 }
 EOF
 ```
@@ -133,7 +117,7 @@ Generate ignition config for servers
 
 ```bash
 tw terraform -chdir=ignition init
-tw terraform -chdir=ignition apply -var-file=secrets.tfvars
+tw terraform -chdir=ignition apply
 ```
 
 Build OS images (see [fedora-coreos-config-custom](https://github.com/randomcoww/fedora-coreos-config-custom))
