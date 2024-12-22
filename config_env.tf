@@ -125,7 +125,6 @@ locals {
     qrcode_generator   = "ghcr.io/randomcoww/qrcode-generator:20240620.4"
     rclone             = "docker.io/rclone/rclone:1.68"
     cockroachdb        = "docker.io/cockroachdb/cockroach:v24.1.1"
-    sunshine           = "ghcr.io/randomcoww/sunshine:2024.1214.152703-565.57.01"
     mountpoint         = "ghcr.io/randomcoww/mountpoint:20240915.5"
     audioserve         = "docker.io/izderadicka/audioserve:latest"
     syncthing          = "docker.io/syncthing/syncthing:1.27"
