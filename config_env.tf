@@ -128,7 +128,7 @@ locals {
     mountpoint         = "ghcr.io/randomcoww/mountpoint:20240915.5"
     audioserve         = "docker.io/izderadicka/audioserve:latest"
     syncthing          = "docker.io/syncthing/syncthing:1.27"
-    kube_vip           = "docker.io/plndr/kube-vip:v0.8.3"
+    kube_vip           = "ghcr.io/kube-vip/kube-vip:v0.8.7"
     sunshine_desktop   = "ghcr.io/randomcoww/sunshine-desktop:2024.1222.851-22"
   }
 
