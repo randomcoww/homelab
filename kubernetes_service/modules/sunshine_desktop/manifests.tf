@@ -1,5 +1,6 @@
 locals {
   # https://docs.lizardbyte.dev/projects/sunshine/en/latest/about/advanced_usage.html#port
+  home_path = "/home/${var.user}"
   base_port = 47989
   tcp_ports = {
     https = local.base_port - 5
@@ -120,6 +121,26 @@ module "statefulset" {
   annotations = {
     "checksum/secret" = sha256(module.secret.manifest)
   }
+  spec = {
+    volumeClaimTemplates = [
+      {
+        metadata = {
+          name = "home"
+        }
+        spec = {
+          accessModes = [
+            "ReadWriteOnce",
+          ]
+          resources = {
+            requests = {
+              storage = "600Gi"
+            }
+          }
+          storageClassName = var.storage_class_name
+        }
+      },
+    ]
+  }
   template_spec = {
     # hostNetwork makes sunshine inputs work
     hostNetwork = true
@@ -160,7 +181,7 @@ module "statefulset" {
           },
           {
             name  = "HOME"
-            value = var.home_path
+            value = local.home_path
           },
           {
             name  = "XDG_RUNTIME_DIR"
@@ -176,7 +197,7 @@ module "statefulset" {
         volumeMounts = concat([
           {
             name      = "home"
-            mountPath = var.home_path
+            mountPath = local.home_path
           },
           {
             name      = "dev-input"
@@ -215,13 +236,6 @@ module "statefulset" {
         name = "dev-shm"
         emptyDir = {
           medium = "Memory"
-        }
-      },
-      {
-        name = "home"
-        hostPath = {
-          path = var.home_path
-          type = "Directory"
         }
       },
     ], var.sunshine_extra_volumes)
