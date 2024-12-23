@@ -116,7 +116,7 @@ locals {
     litestream         = "docker.io/litestream/litestream:0.3"
     tailscale          = "ghcr.io/randomcoww/tailscale:1.74.0"
     fuse_device_plugin = "docker.io/soolaugust/fuse-device-plugin:v1.0"
-    code_server        = "ghcr.io/randomcoww/code-server:20241104.1"
+    code_server        = "ghcr.io/randomcoww/code-server:4.96.2"
     alpaca_stream      = "ghcr.io/randomcoww/alpaca-client:stream-server-20240801.6"
     lldap              = "docker.io/lldap/lldap:2024-08-08-alpine"
     keydb              = "docker.io/eqalpha/keydb:alpine_x86_64_v6.3.4"
@@ -129,12 +129,13 @@ locals {
     audioserve         = "docker.io/izderadicka/audioserve:latest"
     syncthing          = "docker.io/syncthing/syncthing:1.27"
     kube_vip           = "ghcr.io/kube-vip/kube-vip:v0.8.7"
-    sunshine_desktop   = "ghcr.io/randomcoww/sunshine-desktop:2024.1222.851-22"
+    sunshine_desktop   = "ghcr.io/randomcoww/sunshine-desktop:2024.1222.851-23"
   }
 
   pxeboot_images = {
-    coreos     = "fedora-coreos-41.20241104.0"
-    silverblue = "fedora-silverblue-40.20241101.0"
+    coreos        = "fedora-coreos-41.20241104.0"
+    coreos-nvidia = "fedora-coreos-nvidia-40.20241223.0"
+    silverblue    = "fedora-silverblue-40.20241101.0"
   }
 
   kubernetes = {

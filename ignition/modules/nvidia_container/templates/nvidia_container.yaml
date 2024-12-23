@@ -20,7 +20,7 @@ systemd:
 
 storage:
   files:
-    - path: /etc/crio/crio.conf.d/20-nvidia.conf
+    - path: /etc/crio/crio.conf.d/30-nvidia.conf
       mode: 0644
       overwrite: true
       contents:
