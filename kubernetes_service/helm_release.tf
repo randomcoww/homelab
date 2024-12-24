@@ -326,7 +326,7 @@ resource "helm_release" "metrics-server" {
 }
 
 # nvidia device plugin #
-
+/*
 resource "helm_release" "nvidia-device-plugin" {
   name        = "nvidia-device-plugin"
   repository  = "https://nvidia.github.io/k8s-device-plugin"
@@ -358,6 +358,7 @@ resource "helm_release" "nvidia-device-plugin" {
     }),
   ]
 }
+*/
 
 # cloudflare tunnel #
 /*

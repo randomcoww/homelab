@@ -314,12 +314,12 @@ locals {
       }
       network_boot = {
         interface = "phy0"
-        image     = local.pxeboot_image_set.silverblue
+        image     = local.pxeboot_image_set.coreos-nvidia
         boot_args = [
           "numa=off",
           "systemd.unit=multi-user.target",
           "selinux=0",
-          "nvidia-drm.modeset=1",
+          # "nvidia-drm.modeset=1",
           # "nvidia-drm.fbdev=1",
           ## stub all Nvidia GPUs
           # "vfio-pci.id=10de:ffffffff:ffffffff:ffffffff:00030000:ffff00ff,10de:ffffffff:ffffffff:ffffffff:00040300:ffffffff",

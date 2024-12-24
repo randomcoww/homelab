@@ -134,7 +134,7 @@ locals {
 
   pxeboot_images = {
     coreos        = "fedora-coreos-41.20241104.0"
-    coreos-nvidia = "fedora-coreos-nvidia-40.20241223.0"
+    coreos-nvidia = "fedora-coreos-nvidia-40.20241224.0"
     silverblue    = "fedora-silverblue-40.20241101.0"
   }
 
