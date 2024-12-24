@@ -90,7 +90,7 @@ storage:
         inline: |
           [Login]
           InhibitDelayMaxSec=${graceful_shutdown_delay}
-    # kube-proxy #
+    # kube-proxy
     - path: /etc/modules-load.d/20-kube-proxy.conf
       mode: 0644
       contents:

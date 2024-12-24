@@ -7,6 +7,22 @@ systemd:
       enabled: true
 
 storage:
+  files:
+    - path: /etc/containers/containers.conf.d/10-runtime.conf
+      mode: 0644
+      contents:
+        inline: |
+          [network]
+          cni_plugin_dirs=["/usr/libexec/cni","/opt/cni/bin"]
+
+          [engine]
+          runtime="crun"
+          # path for conmon package
+          conmon_path=["/usr/bin/conmon"]
+
+          [engine.runtimes]
+          # path for crun package
+          crun=["/usr/bin/crun"]
   links:
     - path: /etc/systemd/user/sockets.target.wants/podman.socket
       target: /usr/lib/systemd/user/podman.socket
