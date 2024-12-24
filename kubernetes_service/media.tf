@@ -182,7 +182,7 @@ module "sunshine-desktop" {
   ]
   sunshine_resources = {
     # limits = {
-    #   "nvidia.com/gpu.shared" = 1
+    #   "nvidia.com/gpu" = 1
     # }
   }
   sunshine_security_context = {

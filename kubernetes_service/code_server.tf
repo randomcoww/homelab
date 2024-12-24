@@ -63,17 +63,16 @@ module "code" {
     },
   ]
   code_server_resources = {
-    # limits = {
-    #   "nvidia.com/gpu" = 1
-    # }
+    limits = {
+      "nvidia.com/gpu" = 1
+    }
   }
   code_server_security_context = {
-    privileged = true
-    # capabilities = {
-    #   add = [
-    #     "AUDIT_WRITE",
-    #   ]
-    # }
+    capabilities = {
+      add = [
+        "AUDIT_WRITE",
+      ]
+    }
   }
   affinity = {
     nodeAffinity = {

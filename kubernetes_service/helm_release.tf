@@ -326,7 +326,7 @@ resource "helm_release" "metrics-server" {
 }
 
 # nvidia device plugin #
-/*
+
 resource "helm_release" "nvidia-device-plugin" {
   name        = "nvidia-device-plugin"
   repository  = "https://nvidia.github.io/k8s-device-plugin"
@@ -337,6 +337,7 @@ resource "helm_release" "nvidia-device-plugin" {
   max_history = 2
   values = [
     yamlencode({
+      compatWithCPUManager = true
       config = {
         # map = {
         #   default = yamlencode({
@@ -358,7 +359,6 @@ resource "helm_release" "nvidia-device-plugin" {
     }),
   ]
 }
-*/
 
 # cloudflare tunnel #
 /*
