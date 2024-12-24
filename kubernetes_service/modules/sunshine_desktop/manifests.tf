@@ -142,8 +142,6 @@ module "statefulset" {
     ]
   }
   template_spec = {
-    # hostNetwork makes sunshine inputs work
-    hostNetwork = true
     containers = [
       {
         name  = var.name
