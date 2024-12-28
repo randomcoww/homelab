@@ -314,7 +314,7 @@ locals {
       }
       network_boot = {
         interface = "phy0"
-        image     = local.pxeboot_image_set.silverblue
+        image     = local.pxeboot_image_set.coreos-nvidia
         boot_args = [
           "numa=off",
           "systemd.unit=multi-user.target",
@@ -331,8 +331,6 @@ locals {
         "node-role.kubernetes.io/master"        = true
         "node-role.kubernetes.io/control-plane" = true
         "hostapd"                               = true
-        "nvidia.com/gpu.present"                = true
-        # "nvidia.com/mps.capable"                = true
       }
     }
   }

@@ -341,6 +341,9 @@ resource "helm_release" "nvidia-device-plugin" {
       cdi = {
         nvidiaHookPath = "/usr/bin/nvidia-ctk"
       }
+      gfd = {
+        enabled = true
+      }
       config = {
         # map = {
         #   default = yamlencode({

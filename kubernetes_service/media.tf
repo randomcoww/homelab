@@ -197,7 +197,7 @@ module "sunshine-desktop" {
           {
             matchExpressions = [
               {
-                key      = "nvidia.com/gpu.present"
+                key      = "nvidia.com/gpu.replicas"
                 operator = "Exists"
               },
             ]
