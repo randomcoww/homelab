@@ -173,7 +173,7 @@ module "sunshine-desktop" {
     },
     {
       name  = "REFRESH_RATE"
-      value = "120"
+      value = "144"
     },
     {
       name  = "COLOR_DEPTH"
