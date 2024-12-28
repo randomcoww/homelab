@@ -338,6 +338,9 @@ resource "helm_release" "nvidia-device-plugin" {
   values = [
     yamlencode({
       compatWithCPUManager = true
+      cdi = {
+        nvidiaHookPath = "/usr/bin/nvidia-ctk"
+      }
       config = {
         # map = {
         #   default = yamlencode({
