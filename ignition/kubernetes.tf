@@ -105,12 +105,3 @@ module "etcd" {
   s3_region            = data.terraform_remote_state.sr.outputs.s3.etcd.aws_region
   static_pod_path      = local.kubernetes.static_pod_manifest_path
 }
-
-# Nvidia container toolkit for Kubernetes GPU access
-
-module "nvidia-container" {
-  for_each = local.members.nvidia-container
-  source   = "./modules/nvidia_container"
-
-  ignition_version = local.ignition_version
-}

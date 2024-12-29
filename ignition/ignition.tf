@@ -8,7 +8,6 @@ locals {
     module.etcd,
     module.kubernetes-master,
     module.kubernetes-worker,
-    module.nvidia-container,
     module.server,
     module.client,
   ]

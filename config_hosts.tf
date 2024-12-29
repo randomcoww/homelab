@@ -319,8 +319,6 @@ locals {
           "numa=off",
           "systemd.unit=multi-user.target",
           "selinux=0",
-          # "nvidia-drm.modeset=1",
-          # "nvidia-drm.fbdev=1",
           ## stub all Nvidia GPUs
           # "vfio-pci.id=10de:ffffffff:ffffffff:ffffffff:00030000:ffff00ff,10de:ffffffff:ffffffff:ffffffff:00040300:ffffffff",
           ## stub all AMD GPUs
@@ -346,7 +344,6 @@ locals {
     kubernetes-master = ["q-0", "de-1"]
     kubernetes-worker = ["gw-0", "gw-1", "q-0", "de-1"]
     etcd              = ["gw-0", "gw-1", "q-0"]
-    nvidia-container  = ["de-1"]
   }
 
   # finalized local vars #
