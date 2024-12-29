@@ -243,7 +243,8 @@ module "statefulset" {
       {
         name = "dev-shm"
         emptyDir = {
-          medium = "Memory"
+          medium    = "Memory"
+          sizeLimit = "2Gi"
         }
       },
     ], var.sunshine_extra_volumes)
