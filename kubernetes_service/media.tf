@@ -197,8 +197,33 @@ module "sunshine-desktop" {
           {
             matchExpressions = [
               {
-                key      = "nvidia.com/gpu.replicas"
-                operator = "Exists"
+                key      = "feature.node.kubernetes.io/pci-10de.present"
+                operator = "In"
+                values = [
+                  "true",
+                ]
+              },
+            ]
+          },
+          {
+            matchExpressions = [
+              {
+                key      = "feature.node.kubernetes.io/cpu-model.vendor_id"
+                operator = "In"
+                values = [
+                  "NVIDIA",
+                ]
+              },
+            ]
+          },
+          {
+            matchExpressions = [
+              {
+                key      = "nvidia.com/gpu.present"
+                operator = "In"
+                values = [
+                  "true",
+                ]
               },
             ]
           },

@@ -1,28 +1,10 @@
 ---
 variant: fcos
 version: 1.5.0
-systemd:
-  units:
-    - name: nvidia-ctk-cdi.service
-      enabled: true
-      contents: |
-        [Unit]
-        Before=crio.service
-
-        [Service]
-        Type=oneshot
-        RemainAfterExit=yes
-        ExecStart=/usr/bin/nvidia-ctk cdi generate \
-          --output=/etc/cdi/nvidia.yaml
-
-        [Install]
-        WantedBy=multi-user.target
-
 storage:
   files:
     - path: /etc/crio/crio.conf.d/30-nvidia.conf
       mode: 0644
-      overwrite: true
       contents:
         inline: |
           [crio.runtime]
@@ -31,3 +13,47 @@ storage:
           [crio.runtime.runtimes.nvidia]
           runtime_path = "/usr/bin/nvidia-container-runtime"
           runtime_type = "oci"
+    - path: /etc/nvidia-container-runtime/config.toml
+      mode: 0644
+      overwrite: true
+      contents:
+        inline: |
+          #accept-nvidia-visible-devices-as-volume-mounts = false
+          #accept-nvidia-visible-devices-envvar-when-unprivileged = true
+          disable-require = false
+          supported-driver-capabilities = "compat32,compute,display,graphics,ngx,utility,video"
+          #swarm-resource = "DOCKER_RESOURCE_GPU"
+
+          [nvidia-container-cli]
+          #debug = "/var/log/nvidia-container-toolkit.log"
+          environment = []
+          #ldcache = "/etc/ld.so.cache"
+          ldconfig = "@/sbin/ldconfig"
+          load-kmods = true
+          #no-cgroups = false
+          #path = "/usr/bin/nvidia-container-cli"
+          root = "/run/nvidia/driver"
+          #user = "root:video"
+
+          [nvidia-container-runtime]
+          #debug = "/var/log/nvidia-container-runtime.log"
+          log-level = "info"
+          mode = "auto"
+          runtimes = ["/usr/libexec/crio/crun"]
+
+          [nvidia-container-runtime.modes]
+
+          [nvidia-container-runtime.modes.cdi]
+          annotation-prefixes = ["cdi.k8s.io/"]
+          default-kind = "nvidia.com/gpu"
+          spec-dirs = ["/etc/cdi", "/var/run/cdi"]
+
+          [nvidia-container-runtime.modes.csv]
+          mount-spec-path = "/etc/nvidia-container-runtime/host-files-for-container.d"
+
+          [nvidia-container-runtime-hook]
+          path = "nvidia-container-runtime-hook"
+          skip-mode-detection = false
+
+          [nvidia-ctk]
+          path = "nvidia-ctk"

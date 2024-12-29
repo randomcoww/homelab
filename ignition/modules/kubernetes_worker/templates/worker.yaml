@@ -129,8 +129,3 @@ storage:
       contents:
         inline: |
           net.bridge.bridge-nf-call-iptables=0
-  links:
-    - path: /usr/local/bin/conmon
-      target: /usr/libexec/crio/conmon
-    - path: /usr/local/bin/crun
-      target: /usr/libexec/crio/crun

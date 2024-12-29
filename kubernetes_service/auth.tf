@@ -78,7 +78,7 @@ module "authelia" {
   source         = "./modules/authelia"
   name           = local.kubernetes_services.authelia.name
   namespace      = local.kubernetes_services.authelia.namespace
-  source_release = "0.9.5"
+  source_release = "0.9.14"
   images = {
     litestream = local.container_images.litestream
   }

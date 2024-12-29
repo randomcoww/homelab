@@ -130,6 +130,7 @@ locals {
     syncthing          = "docker.io/syncthing/syncthing:1.27"
     kube_vip           = "ghcr.io/kube-vip/kube-vip:v0.8.7"
     sunshine_desktop   = "ghcr.io/randomcoww/sunshine-desktop:2024.1222.851-23"
+    nvidia_driver      = "ghcr.io/randomcoww/nvidia-driver:565.77-fedora41"
   }
 
   pxeboot_images = {

@@ -314,7 +314,7 @@ locals {
       }
       network_boot = {
         interface = "phy0"
-        image     = local.pxeboot_image_set.coreos-nvidia
+        image     = local.pxeboot_image_set.coreos
         boot_args = [
           "numa=off",
           "systemd.unit=multi-user.target",
