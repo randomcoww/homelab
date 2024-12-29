@@ -171,7 +171,6 @@ locals {
   kubernetes_ingress_endpoints = {
     for k, domain in {
       auth            = "auth"
-      transmission    = "t"
       vaultwarden     = "vw"
       code            = "code"
       alpaca_stream   = "alpaca-stream"
