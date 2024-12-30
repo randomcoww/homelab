@@ -179,6 +179,10 @@ module "sunshine-desktop" {
       name  = "COLOR_DEPTH"
       value = "24"
     },
+    {
+      name  = "TZ"
+      value = local.timezone
+    },
   ]
   sunshine_resources = {
     # limits = {

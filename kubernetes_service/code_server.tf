@@ -35,6 +35,10 @@ module "code" {
       name  = "NVIDIA_DRIVER_CAPABILITIES"
       value = "compute,utility"
     },
+    {
+      name  = "TZ"
+      value = local.timezone
+    },
   ]
   code_server_extra_volumes = [
     {
