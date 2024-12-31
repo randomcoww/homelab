@@ -224,6 +224,32 @@ Each node will now be able to PXE boot from the cluster as long as only one node
 
 ---
 
+### Write current PXE boot image to local disk
+
+Optionally if network boot is not working, hosts may fallback to booting from (USB) disk
+
+```bash
+export IMAGE_URL=$(xargs -n1 -a /proc/cmdline | grep ^coreos.live.rootfs_url= | sed -r 's/coreos.live.rootfs_url=(.*)-rootfs(.*)\.img$/\1\2.iso/')
+export IGNITION_URL=$(xargs -n1 -a /proc/cmdline | grep ^ignition.config.url= | sed 's/ignition.config.url=//')
+export DISK=/dev/$(lsblk -ndo pkname /dev/disk/by-label/fedora-*)
+
+echo image-url=$IMAGE_URL
+echo ignition-url=$IGNITION_URL
+echo disk=$DISK
+sudo lsof $DISK
+```
+
+```bash
+curl $IMAGE_URL --output coreos.iso
+curl $IGNITION_URL | coreos-installer iso ignition embed coreos.iso
+
+sudo dd if=coreos.iso of=$DISK bs=4M
+sync
+rm coreos.iso
+```
+
+---
+
 ### Committing
 
 Formatting for terraform files
