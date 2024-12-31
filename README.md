@@ -189,14 +189,14 @@ Check that `kubernetes` service is up
 kubectl get svc
 ```
 
-Deploy lower level services and Minio
+Deploy lower level services and MinIO
 
 ```bash
 tw terraform -chdir=kubernetes_bootstrap init
 tw terraform -chdir=kubernetes_bootstrap apply
 ```
 
-Deploy services including services dependant on Minio users and policies
+Deploy services including services dependant on MinIO users and policies
 
 ```bash
 tw terraform -chdir=kubernetes_service init
