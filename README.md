@@ -120,7 +120,11 @@ tw terraform -chdir=ignition init
 tw terraform -chdir=ignition apply
 ```
 
-Build OS images (see [fedora-coreos-config-custom](https://github.com/randomcoww/fedora-coreos-config-custom))
+---
+
+### Build OS images
+
+See [fedora-coreos-config-custom](https://github.com/randomcoww/fedora-coreos-config-custom)
 
 ---
 
@@ -203,7 +207,13 @@ tw terraform -chdir=kubernetes_service apply -var-file=secrets.tfvars
 
 ### Conifgure PXE boot from cluster
 
-Push images generated previously into Minio (see [fedora-coreos-config-custom](https://github.com/randomcoww/fedora-coreos-config-custom))
+Push images generated previously from [fedora-coreos-config-custom](https://github.com/randomcoww/fedora-coreos-config-custom) into MinIO
+
+From build path:
+
+```bash
+mc cp -r builds/latest/x86_64/fedora-*-live* m/data-boot/
+```
 
 Update image tags under `pxeboot_images` in [environment config](https://github.com/randomcoww/homelab/blob/master/config_env.tf) to match image file names
 
