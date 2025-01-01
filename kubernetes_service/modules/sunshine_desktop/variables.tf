@@ -25,6 +25,14 @@ variable "sunshine_extra_envs" {
   default = []
 }
 
+variable "sunshine_extra_configs" {
+  type = list(object({
+    path    = string
+    content = string
+  }))
+  default = []
+}
+
 variable "sunshine_resources" {
   type    = any
   default = {}

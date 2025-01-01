@@ -46,10 +46,13 @@ module "secret" {
   name    = var.name
   app     = var.name
   release = var.release
-  data = {
+  data = merge({
+    for i, config in var.sunshine_extra_configs :
+    "${i}-${basename(config.path)}" => config.content
+    }, {
     USERNAME = random_password.username.result
     PASSWORD = random_password.password.result
-  }
+  })
 }
 
 module "service" {
@@ -172,6 +175,13 @@ module "statefulset" {
           }
         ])
         volumeMounts = concat([
+          for i, config in var.sunshine_extra_configs :
+          {
+            name      = "config"
+            mountPath = config.path
+            subPath   = "${i}-${basename(config.path)}"
+          }
+          ], [
           {
             name      = "home"
             mountPath = var.home_path
@@ -213,6 +223,12 @@ module "statefulset" {
       },
     ]
     volumes = concat([
+      {
+        name = "config"
+        secret = {
+          secretName = module.secret.name
+        }
+      },
       {
         name = "dev-input"
         hostPath = {
