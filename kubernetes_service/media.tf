@@ -152,8 +152,9 @@ module "sunshine-desktop" {
   images = {
     sunshine_desktop = local.container_images.sunshine_desktop
   }
-  user = "sunshine"
-  uid  = 10000
+  user      = local.users.client.name
+  uid       = local.users.client.uid
+  home_path = "${local.mounts.home_path}/${local.users.client.name}"
   sunshine_extra_envs = [
     {
       name  = "NVIDIA_VISIBLE_DEVICES"
@@ -192,7 +193,6 @@ module "sunshine-desktop" {
   sunshine_security_context = {
     privileged = true
   }
-  storage_class_name      = "local-path"
   loadbalancer_class_name = "kube-vip.io/kube-vip-class"
   affinity = {
     nodeAffinity = {
@@ -201,32 +201,10 @@ module "sunshine-desktop" {
           {
             matchExpressions = [
               {
-                key      = "feature.node.kubernetes.io/pci-10de.present"
+                key      = "kubernetes.io/hostname"
                 operator = "In"
                 values = [
-                  "true",
-                ]
-              },
-            ]
-          },
-          {
-            matchExpressions = [
-              {
-                key      = "feature.node.kubernetes.io/cpu-model.vendor_id"
-                operator = "In"
-                values = [
-                  "NVIDIA",
-                ]
-              },
-            ]
-          },
-          {
-            matchExpressions = [
-              {
-                key      = "nvidia.com/gpu.present"
-                operator = "In"
-                values = [
-                  "true",
+                  "de-1.local",
                 ]
               },
             ]
