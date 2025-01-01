@@ -129,7 +129,7 @@ locals {
     audioserve         = "docker.io/izderadicka/audioserve:latest"
     syncthing          = "docker.io/syncthing/syncthing:1.27"
     kube_vip           = "ghcr.io/kube-vip/kube-vip:v0.8.7"
-    sunshine_desktop   = "ghcr.io/randomcoww/sunshine-desktop:2024.1230.200248-3"
+    sunshine_desktop   = "ghcr.io/randomcoww/sunshine-desktop:2024.1230.200248-5"
     nvidia_driver      = "ghcr.io/randomcoww/nvidia-driver:565.77-fedora41"
   }
 
