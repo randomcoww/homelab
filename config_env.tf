@@ -39,7 +39,6 @@ locals {
         matchbox_api           = 33
         minio                  = 34
         sunshine               = 36
-        alpaca_stream          = 37
         alpaca_db              = 38
       }
     }
@@ -117,7 +116,6 @@ locals {
     tailscale          = "ghcr.io/randomcoww/tailscale:1.74.0"
     fuse_device_plugin = "docker.io/soolaugust/fuse-device-plugin:v1.0"
     code_server        = "ghcr.io/randomcoww/code-server:4.96.2"
-    alpaca_stream      = "ghcr.io/randomcoww/alpaca-client:stream-server-20240801.6"
     lldap              = "docker.io/lldap/lldap:2024-08-08-alpine"
     keydb              = "docker.io/eqalpha/keydb:alpine_x86_64_v6.3.4"
     clickhouse         = "docker.io/clickhouse/clickhouse-server:24.8-alpine"
@@ -173,7 +171,6 @@ locals {
       auth            = "auth"
       vaultwarden     = "vw"
       code            = "code"
-      alpaca_stream   = "alpaca-stream"
       alpaca_db       = "alpaca-db"
       lldap_http      = "ldap"
       qrcode          = "qrcode"
@@ -230,10 +227,6 @@ locals {
         name      = "lldap"
         namespace = "lldap"
       }
-      alpaca_stream = {
-        name      = "alpaca-stream"
-        namespace = "alpaca"
-      }
       alpaca_db = {
         name      = "alpaca-db"
         namespace = "alpaca"
@@ -262,13 +255,12 @@ locals {
   }
 
   service_ports = {
-    matchbox      = 80
-    matchbox_api  = 50101
-    minio         = 9000
-    alpaca_stream = 38081
-    lldap         = 6360
-    redis         = 6379
-    cockroachdb   = 26258
+    matchbox     = 80
+    matchbox_api = 50101
+    minio        = 9000
+    lldap        = 6360
+    redis        = 6379
+    cockroachdb  = 26258
   }
 
   minio_data_buckets = {
