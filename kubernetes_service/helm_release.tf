@@ -15,7 +15,6 @@ locals {
     module.hostapd,
     module.qrcode,
     module.alpaca-db,
-    # module.alpaca-stream,
     module.code,
     module.webdav-pictures,
     module.webdav-videos,

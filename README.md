@@ -32,9 +32,6 @@ TS_OAUTH_CLIENT_ID=
 TS_OAUTH_CLIENT_SECRET=
 GMAIL_USER=
 GMAIL_PASSWORD=
-APCA_API_KEY_ID=
-APCA_API_SECRET_KEY=
-APCA_API_BASE_URL=
 ```
 
 Create `cluster_resources/secrets.tfvars` file
@@ -77,12 +74,6 @@ smtp = {
   port     = 587
   username = "$GMAIL_USER"
   password = "$GMAIL_PASSWORD"
-}
-
-alpaca = {
-  api_key_id     = "$APCA_API_KEY_ID"
-  api_secret_key = "$APCA_API_SECRET_KEY"
-  api_base_url   = "$APCA_API_BASE_URL"
 }
 EOF
 ```

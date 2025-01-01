@@ -1,22 +1,3 @@
-module "alpaca-stream" {
-  source    = "./modules/alpaca_stream"
-  name      = local.kubernetes_services.alpaca_stream.name
-  namespace = local.kubernetes_services.alpaca_stream.namespace
-  release   = "0.1.1"
-  images = {
-    alpaca_stream = local.container_images.alpaca_stream
-  }
-  ports = {
-    alpaca_stream = local.service_ports.alpaca_stream
-  }
-  service_hostname        = local.kubernetes_ingress_endpoints.alpaca_stream
-  service_ip              = local.services.alpaca_stream.ip
-  loadbalancer_class_name = "kube-vip.io/kube-vip-class"
-  alpaca_api_key_id       = var.alpaca.api_key_id
-  alpaca_api_secret_key   = var.alpaca.api_secret_key
-  alpaca_api_base_url     = var.alpaca.api_base_url
-}
-
 resource "tls_private_key" "alpaca-db-ca" {
   algorithm   = "ECDSA"
   ecdsa_curve = "P521"
