@@ -48,12 +48,12 @@ storage:
         inline: |
           vrrp_instance gateway {
             preempt
-            no_accept
             state BACKUP
             advert_int 0.1
             virtual_router_id ${virtual_router_id}
             interface ${lan_interface_name}
-            use_vmac
+            # no_accept
+            # use_vmac
             vmac_xmit_base
             priority 250
             garp_master_delay 0
