@@ -200,7 +200,7 @@ tw terraform -chdir=kubernetes_service apply -var-file=secrets.tfvars
 
 Push images generated previously from [fedora-coreos-config-custom](https://github.com/randomcoww/fedora-coreos-config-custom) into MinIO
 
-From build path:
+Run from build path
 
 ```bash
 mc cp -r builds/latest/x86_64/fedora-*-live* m/data-boot/
@@ -222,6 +222,18 @@ tw terraform -chdir=matchbox_client apply
 ```
 
 Each node will now be able to PXE boot from the cluster as long as only one node is taken down at a time
+
+---
+
+### Create user
+
+Go to `https://ldap.fuzzybunny.win`
+
+Get admin password
+
+bash```
+tw terraform -chdir=cluster_resources output -json lldap
+```
 
 ---
 
