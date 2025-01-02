@@ -45,8 +45,9 @@ module "server" {
     cidrhost(network.prefix, each.value.netnum)
     if lookup(network, "enable_netnum", false)
     ], [
-    each.value.hostname,
-    each.value.tailscale_hostname,
+    for _, domain in local.domains :
+    "${each.key}.${domain}"
+    ], [
     "127.0.0.1",
   ]))
   ca = data.terraform_remote_state.sr.outputs.ssh.ca

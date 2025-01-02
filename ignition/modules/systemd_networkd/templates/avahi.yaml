@@ -45,4 +45,4 @@ storage:
 
           [publish]
           publish-hinfo=no
-          publish-workstation=no
+          publish-workstation=yes

@@ -351,9 +351,7 @@ locals {
   hosts = {
     for host_key, host in local.base_hosts :
     host_key => merge(host, {
-      hostname           = "${host_key}.${local.domains.mdns}"
-      tailscale_hostname = "${host_key}.${local.domains.tailscale}"
-
+      hostname = "${host_key}.${local.domains.mdns}"
       networks = {
         for name, network in lookup(host, "networks", {}) :
         name => merge(local.networks[name], network)

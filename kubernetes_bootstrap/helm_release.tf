@@ -8,6 +8,7 @@ locals {
     module.kapprover,
     module.kube-dns,
     module.kube-vip,
+    module.coredns-mdns,
   ]
 }
 
@@ -111,7 +112,7 @@ module "kube-dns" {
   source         = "./modules/kube_dns"
   name           = "kube-dns"
   namespace      = "kube-system"
-  source_release = "1.32.0"
+  source_release = "1.37.0"
   replicas       = 3
   images = {
     etcd         = local.container_images.etcd
@@ -139,7 +140,7 @@ module "kube-dns" {
           parameters  = "${local.domains.kubernetes} in-addr.arpa ip6.arpa"
           configBlock = <<-EOF
           pods insecure
-          fallthrough in-addr.arpa ip6.arpa
+          fallthrough
           EOF
         },
         {
@@ -149,6 +150,11 @@ module "kube-dns" {
           fallthrough
           EOF
         },
+        # mdns
+        {
+          name       = "forward"
+          parameters = "${local.domains.kubernetes} ${local.services.cluster_dns_mdns.ip}:${local.host_ports.mdns_lookup}"
+        },
         # public DNS
         {
           name        = "forward"
@@ -157,6 +163,47 @@ module "kube-dns" {
           tls_servername ${local.upstream_dns.hostname}
           health_check 5s
           EOF
+        },
+        {
+          name       = "cache"
+          parameters = 30
+        },
+      ]
+    },
+  ]
+}
+
+# resolve mdns using coredns-mdns plugin
+# must run on hostNetwork
+
+module "coredns-mdns" {
+  source         = "./modules/coredns_mdns"
+  name           = "coredns-mdns"
+  namespace      = "kube-system"
+  source_release = "1.37.0"
+  replicas       = 2
+  images = {
+    coredns = local.container_images.coredns_mdns
+  }
+  service_cluster_ip = local.services.cluster_dns_mdns.ip
+  servers = [
+    {
+      zones = [
+        {
+          zone = "."
+        },
+      ]
+      port = local.host_ports.mdns_lookup
+      plugins = [
+        {
+          name = "health"
+        },
+        {
+          name = "ready"
+        },
+        {
+          name       = "mdns"
+          parameters = "${local.domains.kubernetes} 1"
         },
         {
           name       = "cache"
