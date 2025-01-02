@@ -36,8 +36,7 @@ module "server" {
   source   = "./modules/server"
 
   ignition_version = local.ignition_version
-
-  fw_mark = local.fw_marks.accept
+  fw_mark          = local.fw_marks.accept
   # SSH
   key_id = each.value.hostname
   valid_principals = sort(concat([
@@ -48,6 +47,7 @@ module "server" {
     for _, domain in local.domains :
     "${each.key}.${domain}"
     ], [
+    each.key,
     "127.0.0.1",
   ]))
   ca = data.terraform_remote_state.sr.outputs.ssh.ca
