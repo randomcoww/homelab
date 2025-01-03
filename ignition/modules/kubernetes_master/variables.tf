@@ -148,3 +148,23 @@ variable "bird_path" {
 variable "bird_cache_table_name" {
   type = string
 }
+
+variable "bgp_node_prefix" {
+  type = string
+}
+
+variable "bgp_node_as" {
+  type = number
+}
+
+variable "bgp_service_prefix" {
+  type = string
+}
+
+variable "bgp_service_as" {
+  type = number
+}
+
+variable "bgp_port" {
+  type = number
+}

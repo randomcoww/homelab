@@ -119,6 +119,11 @@ locals {
       haproxy_path              = var.haproxy_path
       bird_path                 = var.bird_path
       bird_cache_table_name     = var.bird_cache_table_name
+      bgp_node_prefix           = var.bgp_node_prefix
+      bgp_node_as               = var.bgp_node_as
+      bgp_service_prefix        = var.bgp_service_prefix
+      bgp_service_as            = var.bgp_service_as
+      bgp_port                  = var.bgp_port
     })
     ], [
     yamlencode({

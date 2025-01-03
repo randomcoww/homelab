@@ -82,7 +82,7 @@ module "kube-vip" {
   bgp_as     = local.ha.bgp_service_as
   bgp_peeras = local.ha.bgp_node_as
   bgp_neighbor_ips = [
-    for _, host in local.members.gateway :
+    for _, host in local.members.kubernetes-master :
     cidrhost(local.networks.service.prefix, host.netnum)
   ]
   apiserver_ip = local.services.apiserver.ip

@@ -56,18 +56,6 @@ module "server" {
   keepalived_path       = local.ha.keepalived_config_path
   bird_path             = local.ha.bird_config_path
   bird_cache_table_name = local.ha.bird_cache_table_name
-
-  bgp_router_id      = cidrhost(each.value.networks.node.prefix, each.value.netnum)
-  bgp_node_prefix    = each.value.networks.node.prefix
-  bgp_node_as        = local.ha.bgp_node_as
-  bgp_service_prefix = each.value.networks.service.prefix
-  bgp_service_as     = local.ha.bgp_service_as
-  bgp_neighbor_netnums = merge({
-    for host_key, host in local.members.gateway :
-    host_key => host.netnum if each.key != host_key
-    }, {
-    for host_key, host in local.members.kubernetes-master :
-    host_key => host.netnum if each.key != host_key
-  })
-  bgp_port = local.host_ports.bgp
+  bgp_router_id         = cidrhost(each.value.networks.node.prefix, each.value.netnum)
+  bgp_port              = local.host_ports.bgp
 }

@@ -15,6 +15,10 @@ locals {
       keepalived_path            = var.keepalived_path
       bird_path                  = var.bird_path
       bird_cache_table_name      = var.bird_cache_table_name
+      bgp_node_prefix            = var.bgp_node_prefix
+      bgp_node_as                = var.bgp_node_as
+      bgp_port                   = var.bgp_port
+      bgp_neighbor_netnums       = var.bgp_neighbor_netnums
 
       virtual_router_id = var.virtual_router_id
       vrrp_master_default_route = {
