@@ -2,7 +2,6 @@
 
 locals {
   modules_enabled = [
-    module.apiserver-service,
     module.fuse-device-plugin,
     module.nvidia-driver,
     module.kea,

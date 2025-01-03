@@ -3,6 +3,7 @@
 locals {
   modules_enabled = [
     module.bootstrap,
+    module.apiserver-service,
     module.kube-proxy,
     module.flannel,
     module.kapprover,
@@ -20,6 +21,19 @@ module "bootstrap" {
 
   node_bootstrap_user = local.kubernetes.node_bootstrap_user
   kubelet_client_user = local.kubernetes.kubelet_client_user
+}
+
+module "apiserver-service" {
+  source = "./modules/apiserver_service"
+
+  name       = local.kubernetes_services.apiserver_external.name
+  namespace  = local.kubernetes_services.apiserver_external.namespace
+  release    = "0.1.0"
+  service_ip = local.services.service_apiserver.ip
+  ports = {
+    apiserver = local.host_ports.apiserver_backend
+  }
+  loadbalancer_class_name = "kube-vip.io/kube-vip-class"
 }
 
 module "kube-proxy" {
