@@ -49,18 +49,12 @@ storage:
           vrrp_instance gateway {
             preempt
             state BACKUP
-            advert_int 0.1
+            advert_int 1
             virtual_router_id ${virtual_router_id}
             interface ${lan_interface_name}
-            no_accept
-            use_vmac
-            vmac_xmit_base
-            priority 250
-            garp_master_delay 0
-            garp_master_refresh 8
+            priority 100
             virtual_ipaddress {
               ${lan_gateway_ip}
-              0.0.0.0 dev ${wan_interface_name} no_track
             }
             virtual_rules {
               to all lookup ${vrrp_master_default_route.table_id} priority ${vrrp_master_default_route.table_priority}
