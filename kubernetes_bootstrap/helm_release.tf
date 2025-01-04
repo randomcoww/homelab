@@ -195,7 +195,7 @@ module "coredns-mdns" {
   name           = "coredns-mdns"
   namespace      = "kube-system"
   source_release = "1.37.0"
-  replicas       = 2
+  replicas       = 1
   images = {
     coredns = local.container_images.coredns_mdns
   }
