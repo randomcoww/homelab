@@ -231,7 +231,7 @@ Go to `https://ldap.fuzzybunny.win`
 
 Get admin password
 
-bash```
+```bash
 tw terraform -chdir=cluster_resources output -json lldap
 ```
 
