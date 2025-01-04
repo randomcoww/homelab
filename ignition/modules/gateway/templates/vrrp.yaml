@@ -28,6 +28,7 @@ storage:
               type filter hook input priority -10; policy accept;
               iifname ${wan_interface_name} meta mark & ${fw_mark} == 0x00000000 drop;
               iifname ${sync_interface_name} pkttype multicast jump mark-for-accept;
+              iifname ${lan_interface_name} pkttype multicast jump mark-for-accept;
             }
 
             chain forward {
@@ -52,6 +53,7 @@ storage:
             advert_int 1
             virtual_router_id ${virtual_router_id}
             interface ${lan_interface_name}
+            no_accept
             priority 100
             virtual_ipaddress {
               ${lan_gateway_ip}
