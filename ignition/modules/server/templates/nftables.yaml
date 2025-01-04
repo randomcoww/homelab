@@ -44,6 +44,8 @@ storage:
               tcp dport ${bgp_port} accept;
               # BFD
               udp dport {3784, 4784} accept;
+              # Keepalived
+              pkttype multicast accept;
               meta mark & ${fw_mark} == ${fw_mark} accept;
             }
 
