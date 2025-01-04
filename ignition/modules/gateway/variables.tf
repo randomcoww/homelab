@@ -54,11 +54,11 @@ variable "bird_cache_table_name" {
   type = string
 }
 
-variable "bgp_node_prefix" {
+variable "bgp_prefix" {
   type = string
 }
 
-variable "bgp_node_as" {
+variable "bgp_as" {
   type = number
 }
 
@@ -66,6 +66,10 @@ variable "bgp_port" {
   type = number
 }
 
-variable "bgp_neighbor_netnums" {
+variable "bgp_internal_neighbor_netnums" {
+  type = map(number)
+}
+
+variable "bgp_external_neighbor_netnums" {
   type = map(number)
 }

@@ -68,10 +68,25 @@ storage:
       mode: 0644
       contents:
         inline: |
-          %{~ for host_key, netnum in bgp_neighbor_netnums ~}
+          %{~ for host_key, netnum in bgp_internal_neighbor_netnums ~}
           protocol bgp ${replace(host_key, "-", "_")} {
-            local port ${bgp_port} as ${bgp_node_as};
-            neighbor ${cidrhost(bgp_node_prefix, netnum)} port ${bgp_port} as ${bgp_node_as};
+            local port ${bgp_port} as ${bgp_as};
+            neighbor ${cidrhost(bgp_prefix, netnum)} port ${bgp_port} internal;
+            direct;
+            bfd {
+            };
+            ipv4 {
+              import all;
+              export all;
+              table ${bird_cache_table_name};
+            };
+          }
+
+          %{~ endfor ~}
+          %{~ for host_key, netnum in bgp_external_neighbor_netnums ~}
+          protocol bgp ${replace(host_key, "-", "_")} {
+            local port ${bgp_port} as ${bgp_as};
+            neighbor ${cidrhost(bgp_prefix, netnum)} port ${bgp_port} external;
             direct;
             bfd {
             };

@@ -80,24 +80,10 @@ storage:
             };
           }
 
-          protocol bgp node {
-            debug all;
-            local port ${bgp_port} as ${bgp_node_as};
-            neighbor range ${bgp_node_prefix} port ${bgp_port} as ${bgp_node_as};
-            direct;
-            bfd {
-            };
-            ipv4 {
-              import all;
-              export all;
-              table ${bird_cache_table_name};
-            };
-          }
-
           protocol bgp service {
             debug all;
-            local port ${bgp_port} as ${bgp_node_as};
-            neighbor range ${bgp_service_prefix} port ${bgp_port} as ${bgp_service_as};
+            local port ${bgp_port} as ${bgp_as};
+            neighbor range ${bgp_prefix} port ${bgp_port} external;
             direct;
             bfd {
             };

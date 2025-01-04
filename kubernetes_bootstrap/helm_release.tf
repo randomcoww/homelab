@@ -93,8 +93,8 @@ module "kube-vip" {
   ports = {
     apiserver = local.host_ports.apiserver,
   }
-  bgp_as     = local.ha.bgp_service_as
-  bgp_peeras = local.ha.bgp_node_as
+  bgp_as     = local.ha.bgp_as_service
+  bgp_peeras = local.ha.bgp_as_apiserver
   bgp_neighbor_ips = [
     for _, host in local.members.kubernetes-master :
     cidrhost(local.networks.service.prefix, host.netnum)

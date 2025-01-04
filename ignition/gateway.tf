@@ -23,16 +23,17 @@ module "gateway" {
   keepalived_path       = local.ha.keepalived_config_path
   bird_path             = local.ha.bird_config_path
   bird_cache_table_name = local.ha.bird_cache_table_name
-  bgp_node_prefix       = each.value.networks.node.prefix
-  bgp_node_as           = local.ha.bgp_node_as
   bgp_port              = local.host_ports.bgp
-  bgp_neighbor_netnums = merge({
-    for host_key, host in local.members.kubernetes-master :
-    host_key => host.netnum if each.key != host_key
-    }, {
+  bgp_prefix            = each.value.networks.service.prefix
+  bgp_as                = local.ha.bgp_as_gateway
+  bgp_internal_neighbor_netnums = {
     for host_key, host in local.members.gateway :
     host_key => host.netnum if each.key != host_key
-  })
+  }
+  bgp_external_neighbor_netnums = {
+    for host_key, host in local.members.kubernetes-master :
+    host_key => host.netnum if each.key != host_key
+  }
 }
 
 # Configure upstream DNS for gateways

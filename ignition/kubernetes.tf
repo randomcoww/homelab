@@ -44,11 +44,9 @@ module "kubernetes-master" {
   haproxy_path               = local.ha.haproxy_config_path
   bird_path                  = local.ha.bird_config_path
   bird_cache_table_name      = local.ha.bird_cache_table_name
-  bgp_node_prefix            = each.value.networks.node.prefix
-  bgp_node_as                = local.ha.bgp_node_as
-  bgp_service_prefix         = each.value.networks.service.prefix
-  bgp_service_as             = local.ha.bgp_service_as
   bgp_port                   = local.host_ports.bgp
+  bgp_prefix                 = each.value.networks.service.prefix
+  bgp_as                     = local.ha.bgp_as_apiserver
 }
 
 module "kubernetes-worker" {
