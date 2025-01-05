@@ -30,10 +30,6 @@ variable "sync_prefix" {
   type = string
 }
 
-variable "lan_prefix" {
-  type = string
-}
-
 variable "lan_gateway_ip" {
   type = string
 }
@@ -54,10 +50,6 @@ variable "bird_cache_table_name" {
   type = string
 }
 
-variable "bgp_prefix" {
-  type = string
-}
-
 variable "bgp_as" {
   type = number
 }
@@ -66,10 +58,14 @@ variable "bgp_port" {
   type = number
 }
 
-variable "bgp_internal_neighbor_netnums" {
-  type = map(number)
+variable "bgp_node_prefix" {
+  type = string
 }
 
-variable "bgp_external_neighbor_netnums" {
+variable "bgp_service_prefix" {
+  type = string
+}
+
+variable "bgp_neighbor_netnums" {
   type = map(number)
 }

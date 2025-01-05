@@ -44,8 +44,12 @@ module "kubernetes-master" {
   bird_path                  = local.ha.bird_config_path
   bird_cache_table_name      = local.ha.bird_cache_table_name
   bgp_port                   = local.host_ports.bgp
-  bgp_prefix                 = each.value.networks.service.prefix
+  bgp_prefix                 = each.value.networks.node.prefix
   bgp_as                     = local.ha.bgp_as_apiserver
+  bgp_neighbor_netnums = {
+    for host_key, host in local.members.gateway :
+    host_key => host.netnum if each.key != host_key
+  }
 }
 
 module "kubernetes-worker" {

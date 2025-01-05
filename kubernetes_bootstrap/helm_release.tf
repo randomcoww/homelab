@@ -80,9 +80,9 @@ module "kube-vip" {
     apiserver = local.host_ports.apiserver,
   }
   bgp_as     = local.ha.bgp_as_service
-  bgp_peeras = local.ha.bgp_as_apiserver
+  bgp_peeras = local.ha.bgp_as_gateway
   bgp_neighbor_ips = [
-    for _, host in local.members.kubernetes-master :
+    for _, host in local.members.gateway :
     cidrhost(local.networks.service.prefix, host.netnum)
   ]
   apiserver_ip = local.services.apiserver.ip
@@ -92,10 +92,6 @@ module "kube-vip" {
         nodeSelectorTerms = [
           {
             matchExpressions = [
-              {
-                key      = "node-role.kubernetes.io/master"
-                operator = "Exists"
-              },
               {
                 key      = "node-role.kubernetes.io/control-plane"
                 operator = "Exists"

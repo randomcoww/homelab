@@ -141,7 +141,6 @@ locals {
         ]
       }
       kubernetes_node_labels = {
-        "node-role.kubernetes.io/master"        = true
         "node-role.kubernetes.io/control-plane" = true
       }
     }
@@ -206,7 +205,6 @@ locals {
         ]
       }
       kubernetes_node_labels = {
-        "node-role.kubernetes.io/master"        = true
         "node-role.kubernetes.io/control-plane" = true
       }
     }

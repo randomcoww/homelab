@@ -156,3 +156,7 @@ variable "bgp_prefix" {
 variable "bgp_as" {
   type = number
 }
+
+variable "bgp_neighbor_netnums" {
+  type = map(number)
+}

@@ -79,11 +79,11 @@ storage:
               table ${bird_cache_table_name};
             };
           }
+          %{~ for host_key, netnum in bgp_neighbor_netnums ~}
 
-          protocol bgp service {
-            debug all;
+          protocol bgp ${replace(host_key, "-", "_")} {
             local port ${bgp_port} as ${bgp_as};
-            neighbor range ${bgp_prefix} port ${bgp_port} external;
+            neighbor ${cidrhost(bgp_prefix, netnum)} port ${bgp_port} external;
             direct;
             bfd {
             };
@@ -93,3 +93,4 @@ storage:
               table ${bird_cache_table_name};
             };
           }
+          %{~ endfor ~}

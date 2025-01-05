@@ -147,8 +147,8 @@ locals {
     keepalived_config_path = "/etc/keepalived/keepalived.conf.d"
     bird_config_path       = "/etc/bird.conf.d"
     bird_cache_table_name  = "cache"
-    bgp_as_gateway         = 65001
-    bgp_as_apiserver       = 65002
+    bgp_as_gateway         = 65002
+    bgp_as_apiserver       = 65001
     bgp_as_service         = 65003
   }
 
