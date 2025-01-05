@@ -20,8 +20,9 @@ locals {
       enable_dns  = true
       enable_mdns = true
       netnums = {
-        gateway = 2
-        switch  = 127
+        gateway   = 2
+        apiserver = 4
+        switch    = 127
       }
     }
     # Kubernetes service external IP and LB
@@ -31,7 +32,6 @@ locals {
       vlan_id = 80
       mtu     = local.default_mtu
       netnums = {
-        service_apiserver      = 2
         external_dns           = 31
         ingress_nginx          = 32
         ingress_nginx_external = 35
@@ -55,16 +55,6 @@ locals {
       cidr    = 26
       vlan_id = 70
       mtu     = local.default_mtu
-    }
-    # Kubernetes master
-    kubernetes = {
-      network = "192.168.232.0"
-      cidr    = 26
-      vlan_id = 90
-      mtu     = local.default_mtu
-      netnums = {
-        apiserver = 2
-      }
     }
     # Main and mobile backup WAN
     wan = {

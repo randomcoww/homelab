@@ -39,7 +39,6 @@ module "kubernetes-master" {
   node_ip                    = cidrhost(each.value.networks[local.services.apiserver.network.name].prefix, each.value.netnum)
   apiserver_ip               = local.services.apiserver.ip
   cluster_apiserver_ip       = local.services.cluster_apiserver.ip
-  service_apiserver_ip       = local.services.service_apiserver.ip
   static_pod_path            = local.kubernetes.static_pod_manifest_path
   haproxy_path               = local.ha.haproxy_config_path
   bird_path                  = local.ha.bird_config_path

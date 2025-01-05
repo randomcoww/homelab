@@ -97,18 +97,9 @@ locals {
           source  = "phy0"
           network = "service"
         }
-        phy0-sync = {
-          source  = "phy0"
-          network = "sync"
-        }
         phy0-etcd = {
           source  = "phy0"
           network = "etcd"
-        }
-        phy0-wan = {
-          source  = "phy0"
-          network = "wan"
-          mac     = "52-54-00-63-6e-b3"
         }
       }
       networks = {
@@ -120,17 +111,9 @@ locals {
           interface     = "phy0-service"
           enable_netnum = true
         }
-        sync = {
-          interface     = "phy0-sync"
-          enable_netnum = true
-        }
         etcd = {
           interface     = "phy0-etcd"
           enable_netnum = true
-        }
-        wan = {
-          interface   = "phy0-wan"
-          enable_dhcp = true
         }
       }
       disks = {
@@ -158,7 +141,8 @@ locals {
         ]
       }
       kubernetes_node_labels = {
-        "node-role.kubernetes.io/gw" = true
+        "node-role.kubernetes.io/master"        = true
+        "node-role.kubernetes.io/control-plane" = true
       }
     }
 
@@ -182,10 +166,6 @@ locals {
           source  = "phy0"
           network = "etcd"
         }
-        phy0-kubernetes = {
-          source  = "phy0"
-          network = "kubernetes"
-        }
       }
       networks = {
         node = {
@@ -198,10 +178,6 @@ locals {
         }
         etcd = {
           interface     = "phy0-etcd"
-          enable_netnum = true
-        }
-        kubernetes = {
-          interface     = "phy0-kubernetes"
           enable_netnum = true
         }
       }
@@ -254,13 +230,18 @@ locals {
           source  = "phy0"
           network = "service"
         }
+        phy0-sync = {
+          source  = "phy0"
+          network = "sync"
+        }
         phy0-etcd = {
           source  = "phy0"
           network = "etcd"
         }
-        phy0-kubernetes = {
+        phy0-wan = {
           source  = "phy0"
-          network = "kubernetes"
+          network = "wan"
+          mac     = "52-54-00-63-6e-b3"
         }
       }
       bridge_interfaces = {
@@ -279,13 +260,17 @@ locals {
           interface     = "phy0-service"
           enable_netnum = true
         }
+        sync = {
+          interface     = "phy0-sync"
+          enable_netnum = true
+        }
         etcd = {
           interface     = "phy0-etcd"
           enable_netnum = true
         }
-        kubernetes = {
-          interface     = "phy0-kubernetes"
-          enable_netnum = true
+        wan = {
+          interface   = "phy0-wan"
+          enable_dhcp = true
         }
       }
       disks = {
@@ -326,9 +311,8 @@ locals {
         ]
       }
       kubernetes_node_labels = {
-        "node-role.kubernetes.io/master"        = true
-        "node-role.kubernetes.io/control-plane" = true
-        "hostapd"                               = true
+        "node-role.kubernetes.io/gw" = true
+        "hostapd"                    = true
       }
     }
   }
@@ -340,8 +324,8 @@ locals {
     client            = ["gw-0", "gw-1", "q-0", "de-1"]
     disks             = ["gw-0", "gw-1", "q-0", "de-1"]
     upstream-dns      = ["gw-0", "gw-1", "q-0", "de-1"]
-    gateway           = ["gw-0", "gw-1"]
-    kubernetes-master = ["q-0", "de-1"]
+    gateway           = ["gw-0", "de-1"]
+    kubernetes-master = ["gw-1", "q-0"]
     kubernetes-worker = ["gw-0", "gw-1", "q-0", "de-1"]
     etcd              = ["gw-0", "gw-1", "q-0"]
   }
