@@ -176,15 +176,15 @@ module "daemonset" {
             value = tostring(var.bgp_as)
           },
           {
-            name  = "bgp_peeras"
-            value = tostring(var.bgp_peeras)
-          },
-          {
             name = "bgp_peers"
             value = join(",", [
               for _, ip in var.bgp_neighbor_ips :
               "${ip}:${var.bgp_peeras}::false"
             ])
+          },
+          {
+            name  = "bgp_multihop"
+            value = "false"
           },
           {
             name  = "address"
