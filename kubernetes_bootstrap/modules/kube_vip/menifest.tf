@@ -100,6 +100,7 @@ module "daemonset" {
   affinity = var.affinity
   template_spec = {
     hostNetwork        = true
+    priorityClassName  = "system-cluster-critical"
     serviceAccountName = var.name
     tolerations = [
       {

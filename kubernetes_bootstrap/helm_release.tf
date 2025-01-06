@@ -275,10 +275,11 @@ resource "helm_release" "minio" {
   max_history      = 2
   values = [
     yamlencode({
-      clusterDomain = local.domains.kubernetes
-      mode          = "distributed"
-      rootUser      = data.terraform_remote_state.sr.outputs.minio.access_key_id
-      rootPassword  = data.terraform_remote_state.sr.outputs.minio.secret_access_key
+      clusterDomain     = local.domains.kubernetes
+      mode              = "distributed"
+      rootUser          = data.terraform_remote_state.sr.outputs.minio.access_key_id
+      rootPassword      = data.terraform_remote_state.sr.outputs.minio.secret_access_key
+      priorityClassName = "system-cluster-critical"
       persistence = {
         storageClass = "local-path"
       }

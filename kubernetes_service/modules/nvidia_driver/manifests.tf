@@ -15,6 +15,7 @@ module "daemonset" {
   app     = var.name
   release = var.release
   template_spec = {
+    priorityClassName = "system-node-critical"
     containers = [
       {
         name  = var.name
