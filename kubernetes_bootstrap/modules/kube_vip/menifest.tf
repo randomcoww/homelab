@@ -100,7 +100,7 @@ module "daemonset" {
   affinity = var.affinity
   template_spec = {
     hostNetwork        = true
-    priorityClassName  = "system-cluster-critical"
+    priorityClassName  = "system-node-critical"
     serviceAccountName = var.name
     tolerations = [
       {
@@ -149,6 +149,10 @@ module "daemonset" {
             value = "first"
           },
           {
+            name  = "cp_enable"
+            value = "true"
+          },
+          {
             name  = "svc_enable"
             value = "true"
           },
@@ -158,7 +162,7 @@ module "daemonset" {
           },
           {
             name  = "vip_routingtable"
-            value = "true"
+            value = "false"
           },
           {
             name  = "bgp_enable"

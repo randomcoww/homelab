@@ -33,10 +33,6 @@ variable "validity_period_hours" {
   default = 8760
 }
 
-variable "haproxy_path" {
-  type = string
-}
-
 variable "keepalived_path" {
   type = string
 }

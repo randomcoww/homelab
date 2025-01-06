@@ -52,7 +52,6 @@ module "server" {
   ]))
   ca = data.terraform_remote_state.sr.outputs.ssh.ca
   # HA config
-  haproxy_path          = local.ha.haproxy_config_path
   keepalived_path       = local.ha.keepalived_config_path
   bird_path             = local.ha.bird_config_path
   bird_cache_table_name = local.ha.bird_cache_table_name

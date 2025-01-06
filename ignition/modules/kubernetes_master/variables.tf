@@ -10,11 +10,6 @@ variable "name" {
   type = string
 }
 
-variable "namespace" {
-  type    = string
-  default = "kube-system"
-}
-
 variable "cluster_name" {
   type = string
 }
@@ -62,15 +57,10 @@ variable "images" {
 variable "ports" {
   type = object({
     apiserver          = number
-    apiserver_backend  = number
     controller_manager = number
     scheduler          = number
     etcd_client        = number
   })
-}
-
-variable "members" {
-  type = map(string)
 }
 
 variable "etcd_members" {
@@ -130,10 +120,6 @@ variable "config_base_path" {
 }
 
 variable "static_pod_path" {
-  type = string
-}
-
-variable "haproxy_path" {
   type = string
 }
 

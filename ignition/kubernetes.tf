@@ -4,17 +4,12 @@ module "kubernetes-master" {
 
   ignition_version = local.ignition_version
   fw_mark          = local.fw_marks.accept
-  name             = local.kubernetes_services.apiserver_external.name
-  namespace        = local.kubernetes_services.apiserver_external.namespace
+  name             = "kube-master"
   cluster_name     = local.kubernetes.cluster_name
   front_proxy_ca   = data.terraform_remote_state.sr.outputs.kubernetes.front_proxy_ca
   kubernetes_ca    = data.terraform_remote_state.sr.outputs.kubernetes.ca
   etcd_ca          = data.terraform_remote_state.sr.outputs.etcd.ca
   service_account  = data.terraform_remote_state.sr.outputs.kubernetes.service_account
-  members = {
-    for host_key, host in local.members.kubernetes-master :
-    host_key => cidrhost(local.networks[local.services.apiserver.network.name].prefix, host.netnum)
-  }
   etcd_members = {
     for host_key, host in local.members.etcd :
     host_key => cidrhost(local.networks.etcd.prefix, host.netnum)
@@ -26,7 +21,6 @@ module "kubernetes-master" {
   }
   ports = {
     apiserver          = local.host_ports.apiserver
-    apiserver_backend  = local.host_ports.apiserver_backend
     controller_manager = local.host_ports.controller_manager
     scheduler          = local.host_ports.scheduler
     etcd_client        = local.host_ports.etcd_client
@@ -40,7 +34,6 @@ module "kubernetes-master" {
   apiserver_ip               = local.services.apiserver.ip
   cluster_apiserver_ip       = local.services.cluster_apiserver.ip
   static_pod_path            = local.kubernetes.static_pod_manifest_path
-  haproxy_path               = local.ha.haproxy_config_path
   bird_path                  = local.ha.bird_config_path
   bird_cache_table_name      = local.ha.bird_cache_table_name
   bgp_port                   = local.host_ports.bgp

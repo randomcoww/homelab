@@ -5,8 +5,6 @@ systemd:
   units:
     - name: nftables@${name}.service
       enabled: true
-    - name: haproxy.service
-      enabled: true
       dropins:
         - name: 20-kubelet-dependency.conf
           contents: |
@@ -36,30 +34,11 @@ storage:
 
             chain input {
               type filter hook input priority 0; policy accept;
-              tcp dport {${ports.apiserver}, ${ports.apiserver_backend}} jump mark-for-accept;
+              tcp dport ${ports.apiserver} jump mark-for-accept;
             }
           }
           ;
-    # haproxy
-    - path: ${haproxy_path}/${name}.cfg
-      mode: 0644
-      contents:
-        inline: |
-          frontend ${name}
-            bind :::${ports.apiserver} v4v6
-            mode tcp
-            default_backend ${name}
-
-          backend ${name}
-            option httpchk GET ${apiserver_health_endpoint} HTTP/1.0
-            http-check expect status 200
-            mode tcp
-            balance leastconn
-            default-server verify none check-ssl rise 2 fall 2 maxconn 5000 maxqueue 5000 weight 100
-            %{~ for m, server in backend_servers ~}
-            server ${m} ${server} check
-            %{~ endfor ~}
-    # bird
+    # This is written by kube-vip but is needed for apiserver and kube-proxy so that kube-vip can come up
     - path: /etc/systemd/network/20-lo.network
       mode: 0644
       contents:
@@ -67,20 +46,14 @@ storage:
           [Match]
           Name=lo
 
-          [Network]
+          [Address]
           Address=${apiserver_ip}/32
+          Scope=host
     - path: ${bird_path}/apiserver.conf
       mode: 0644
       contents:
         inline: |
-          protocol static apiserver {
-            route ${apiserver_ip}/32 via "lo";
-            ipv4 {
-              table ${bird_cache_table_name};
-            };
-          }
           %{~ for host_key, netnum in bgp_neighbor_netnums ~}
-
           protocol bgp ${replace(host_key, "-", "_")} {
             local port ${bgp_port} as ${bgp_as};
             neighbor ${cidrhost(bgp_prefix, netnum)} port ${bgp_port} external;

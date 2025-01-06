@@ -305,6 +305,7 @@ resource "helm_release" "nvidia-device-plugin" {
   values = [
     yamlencode({
       compatWithCPUManager = true
+      priorityClassName    = "system-node-critical"
       nvidiaDriverRoot     = "/run/nvidia/driver"
       cdi = {
         nvidiaHookPath = "/usr/bin/nvidia-ctk"

@@ -32,7 +32,6 @@ locals {
       # SSH
       pki = local.pki
       # HA config
-      haproxy_path          = var.haproxy_path
       keepalived_path       = var.keepalived_path
       bird_path             = var.bird_path
       bird_cache_table_name = var.bird_cache_table_name

@@ -104,6 +104,8 @@ module "kube-vip" {
   }
 }
 
+# Loadbalancer
+
 module "kube-dns" {
   source         = "./modules/kube_dns"
   name           = "kube-dns"

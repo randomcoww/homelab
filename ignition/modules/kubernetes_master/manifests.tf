@@ -106,17 +106,12 @@ locals {
   ignition_snippets = concat([
     for f in fileset(".", "${path.module}/templates/*.yaml") :
     templatefile(f, {
-      ignition_version = var.ignition_version
-      fw_mark          = var.fw_mark
-      name             = var.name
-      ports            = var.ports
-      backend_servers = {
-        for host_key, ip in var.members :
-        "${host_key}" => "${ip}:${var.ports.apiserver_backend}"
-      }
+      ignition_version          = var.ignition_version
+      fw_mark                   = var.fw_mark
+      name                      = var.name
+      ports                     = var.ports
       apiserver_ip              = var.apiserver_ip
       apiserver_health_endpoint = local.apiserver_health_endpoint
-      haproxy_path              = var.haproxy_path
       bird_path                 = var.bird_path
       bird_cache_table_name     = var.bird_cache_table_name
       bgp_port                  = var.bgp_port
@@ -158,7 +153,7 @@ module "controller-manager-kubeconfig" {
   source             = "../../../modules/kubeconfig"
   cluster_name       = var.cluster_name
   user               = var.controller_manager_user
-  apiserver_endpoint = "https://127.0.0.1:${var.ports.apiserver}"
+  apiserver_endpoint = "https://${var.apiserver_ip}:${var.ports.apiserver}"
   ca_cert_pem        = var.kubernetes_ca.cert_pem
   client_cert_pem    = tls_locally_signed_cert.controller-manager.cert_pem
   client_key_pem     = tls_private_key.controller-manager.private_key_pem
@@ -168,17 +163,17 @@ module "scheduler-kubeconfig" {
   source             = "../../../modules/kubeconfig"
   cluster_name       = var.cluster_name
   user               = var.scheduler_user
-  apiserver_endpoint = "https://127.0.0.1:${var.ports.apiserver}"
+  apiserver_endpoint = "https://${var.apiserver_ip}:${var.ports.apiserver}"
   ca_cert_pem        = var.kubernetes_ca.cert_pem
   client_cert_pem    = tls_locally_signed_cert.scheduler.cert_pem
   client_key_pem     = tls_private_key.scheduler.private_key_pem
 }
 
 module "apiserver" {
-  source    = "../../../modules/static_pod"
-  name      = var.name
-  namespace = var.namespace
+  source = "../../../modules/static_pod"
+  name   = "kube-apiserver"
   spec = {
+    # kube-vip with local kube-proxy
     hostAliases = [
       {
         hostnames = [
@@ -220,7 +215,7 @@ module "apiserver" {
           "--kubelet-client-key=${local.pki.kubelet-client-key.path}",
           "--kubelet-preferred-address-types=InternalDNS,InternalIP",
           "--runtime-config=api/all=true",
-          "--secure-port=${var.ports.apiserver_backend}",
+          "--secure-port=${var.ports.apiserver}",
           "--service-account-issuer=https://${var.cluster_apiserver_endpoint}",
           "--service-account-key-file=${local.pki.service-account-cert.path}",
           "--service-account-signing-key-file=${local.pki.service-account-key.path}",
@@ -243,7 +238,7 @@ module "apiserver" {
           httpGet = {
             scheme = "HTTPS"
             host   = "127.0.0.1"
-            port   = var.ports.apiserver_backend
+            port   = var.ports.apiserver
             path   = local.apiserver_health_endpoint
           }
           initialDelaySeconds = 15
@@ -253,7 +248,7 @@ module "apiserver" {
           httpGet = {
             scheme = "HTTPS"
             host   = "127.0.0.1"
-            port   = var.ports.apiserver_backend
+            port   = var.ports.apiserver
             path   = "/readyz"
           }
           initialDelaySeconds = 15
@@ -280,9 +275,8 @@ module "apiserver" {
 }
 
 module "controller-manager" {
-  source    = "../../../modules/static_pod"
-  name      = "kube-contoller-manager"
-  namespace = var.namespace
+  source = "../../../modules/static_pod"
+  name   = "kube-contoller-manager"
   spec = {
     containers = [
       {
@@ -348,9 +342,8 @@ module "controller-manager" {
 }
 
 module "scheduler" {
-  source    = "../../../modules/static_pod"
-  name      = "kube-scheduler"
-  namespace = var.namespace
+  source = "../../../modules/static_pod"
+  name   = "kube-scheduler"
   spec = {
     containers = [
       {

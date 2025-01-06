@@ -143,7 +143,6 @@ locals {
   }
 
   ha = {
-    haproxy_config_path    = "/etc/haproxy/haproxy.cfg.d"
     keepalived_config_path = "/etc/keepalived/keepalived.conf.d"
     bird_config_path       = "/etc/bird.conf.d"
     bird_cache_table_name  = "cache"
@@ -188,10 +187,6 @@ locals {
         name      = "kubernetes"
         namespace = "default"
       }
-      apiserver_external = {
-        name      = "kube-apiserver"
-        namespace = "kube-system"
-      }
       authelia = {
         name      = "authelia"
         namespace = "authelia"
@@ -234,8 +229,7 @@ locals {
   host_ports = {
     kea_peer           = 50060
     tftpd              = 69
-    apiserver          = 58081
-    apiserver_backend  = 58181
+    apiserver          = 58181
     controller_manager = 50252
     scheduler          = 50251
     kubelet            = 50250
