@@ -89,7 +89,7 @@ locals {
     kube_apiserver          = "ghcr.io/randomcoww/kubernetes:kube-master-${local.kubernetes.version}"
     kube_controller_manager = "ghcr.io/randomcoww/kubernetes:kube-master-${local.kubernetes.version}"
     kube_scheduler          = "ghcr.io/randomcoww/kubernetes:kube-master-${local.kubernetes.version}"
-    etcd_wrapper            = "ghcr.io/randomcoww/etcd-wrapper:20240923.12"
+    etcd_wrapper            = "ghcr.io/randomcoww/etcd-wrapper:20250107.6"
     etcd                    = "gcr.io/etcd-development/etcd:v3.5.15-amd64"
 
     # Helm
@@ -124,7 +124,7 @@ locals {
   }
 
   pxeboot_images = {
-    coreos = "fedora-coreos-41.20250103.0"
+    coreos = "fedora-coreos-41.20250107.0"
   }
 
   kubernetes = {
