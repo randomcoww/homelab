@@ -100,7 +100,7 @@ module "daemonset" {
   affinity = var.affinity
   template_spec = {
     hostNetwork        = true
-    priorityClassName  = "system-node-critical"
+    priorityClassName  = "system-cluster-critical"
     serviceAccountName = var.name
     tolerations = [
       {
@@ -155,6 +155,14 @@ module "daemonset" {
           {
             name  = "svc_enable"
             value = "true"
+          },
+          {
+            name  = "lb_enable"
+            value = "true"
+          },
+          {
+            name  = "lb_port"
+            value = tostring(var.ports.apiserver)
           },
           {
             name  = "svc_leasename"
