@@ -157,6 +157,10 @@ module "daemonset" {
             value = "true"
           },
           {
+            name  = "lb_port"
+            value = tostring(var.ports.apiserver)
+          },
+          {
             name  = "svc_leasename"
             value = "plndr-svcs-lock"
           },
