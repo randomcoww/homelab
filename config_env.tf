@@ -42,13 +42,6 @@ locals {
         alpaca_db              = 38
       }
     }
-    # VRRP conntrack sync
-    sync = {
-      network = "192.168.224.0"
-      cidr    = 26
-      vlan_id = 60
-      mtu     = local.default_mtu
-    }
     # Etcd peering
     etcd = {
       network = "192.168.228.0"

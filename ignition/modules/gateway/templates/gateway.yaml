@@ -27,8 +27,6 @@ storage:
             chain input {
               type filter hook input priority -10; policy accept;
               iifname ${wan_interface_name} meta mark & ${fw_mark} == 0x00000000 drop;
-              iifname ${sync_interface_name} pkttype multicast jump mark-for-accept;
-              iifname ${lan_interface_name} pkttype multicast jump mark-for-accept;
             }
 
             chain forward {
