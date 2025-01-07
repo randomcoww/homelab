@@ -142,6 +142,7 @@ module "etcd-wrapper" {
           "--backup-interval=${var.backup_interval}",
           "--healthcheck-fail-count-allowed=${var.healthcheck_fail_count_allowed}",
           "--readiness-fail-count-allowed=${var.readiness_fail_count_allowed}",
+          "--etcd-pod-priority-class-name=system-cluster-critical",
           "--etcd-pod-priority=2000000000",
         ]
         env = [
