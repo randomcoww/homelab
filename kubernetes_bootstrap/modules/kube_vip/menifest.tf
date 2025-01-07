@@ -141,10 +141,6 @@ module "daemonset" {
             }
           },
           {
-            name  = "vip_cidr"
-            value = "32"
-          },
-          {
             name  = "dns_mode"
             value = "first"
           },
@@ -190,10 +186,6 @@ module "daemonset" {
               for _, ip in var.bgp_neighbor_ips :
               "${ip}:${var.bgp_peeras}::false"
             ])
-          },
-          {
-            name  = "bgp_multihop"
-            value = "false"
           },
           {
             name  = "address"
