@@ -182,6 +182,7 @@ module "apiserver" {
         ip = "127.0.0.1"
       },
     ]
+    priority = 2000001000
     containers = [
       {
         name  = "kube-apiserver"
@@ -252,7 +253,8 @@ module "apiserver" {
             path   = "/readyz"
           }
           initialDelaySeconds = 15
-          timeoutSeconds      = 15
+          timeoutSeconds      = 2
+          periodSeconds       = 2
         }
         volumeMounts = [
           {
@@ -301,16 +303,6 @@ module "controller-manager" {
           "--feature-gates=NodeOutOfServiceVolumeDetach=true",
           "--v=2",
         ]
-        readinessProbe = {
-          httpGet = {
-            scheme = "HTTPS"
-            host   = "127.0.0.1"
-            port   = var.ports.controller_manager
-            path   = "/healthz"
-          }
-          initialDelaySeconds = 15
-          timeoutSeconds      = 15
-        }
         livenessProbe = {
           httpGet = {
             scheme = "HTTPS"
@@ -356,16 +348,6 @@ module "scheduler" {
           "--bind-address=127.0.0.1",
           "--v=2",
         ]
-        readinessProbe = {
-          httpGet = {
-            scheme = "HTTPS"
-            host   = "127.0.0.1"
-            port   = var.ports.scheduler
-            path   = "/healthz"
-          }
-          initialDelaySeconds = 15
-          timeoutSeconds      = 15
-        }
         livenessProbe = {
           httpGet = {
             scheme = "HTTPS"

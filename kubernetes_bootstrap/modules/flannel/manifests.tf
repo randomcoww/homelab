@@ -244,14 +244,6 @@ module "daemonset" {
             value = "5000"
           },
         ]
-        readinessProbe = {
-          httpGet = {
-            scheme = "HTTP"
-            host   = "127.0.0.1"
-            port   = var.ports.healthz
-            path   = "/healthz"
-          }
-        }
         livenessProbe = {
           httpGet = {
             scheme = "HTTP"
