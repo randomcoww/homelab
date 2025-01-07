@@ -27,6 +27,11 @@ output "kubeconfig" {
   sensitive = true
 }
 
+output "kubeconfig_cluster" {
+  value     = module.admin-kubeconfig-cluster.manifest
+  sensitive = true
+}
+
 output "mc_config" {
   value = {
     version = "10"

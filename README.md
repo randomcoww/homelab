@@ -104,6 +104,12 @@ mkdir -p $HOME/.mc
 tw terraform -chdir=client_credentials output -json mc_config > $HOME/.mc/config.json
 ```
 
+In cluster kubeconfig
+
+```bash
+tw terraform -chdir=client_credentials output -raw kubeconfig_cluster > $HOME/.kube/config
+```
+
 Generate ignition config for servers
 
 ```bash
