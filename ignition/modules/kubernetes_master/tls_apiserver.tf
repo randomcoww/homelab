@@ -10,12 +10,11 @@ resource "tls_cert_request" "kube-apiserver" {
     common_name = "kube-apiserver"
   }
 
-  ip_addresses = [
+  ip_addresses = concat([
     "127.0.0.1",
-    var.node_ip,
     var.apiserver_ip,
     var.cluster_apiserver_ip,
-  ]
+  ], var.node_ips)
   dns_names = [
     for i, _ in split(".", var.cluster_apiserver_endpoint) :
     join(".", slice(split(".", var.cluster_apiserver_endpoint), 0, i + 1))

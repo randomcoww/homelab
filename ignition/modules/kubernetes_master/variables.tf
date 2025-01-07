@@ -102,8 +102,8 @@ variable "kubernetes_pod_prefix" {
   type = string
 }
 
-variable "node_ip" {
-  type = string
+variable "node_ips" {
+  type = list(string)
 }
 
 variable "apiserver_ip" {

@@ -30,15 +30,18 @@ module "kubernetes-master" {
   cluster_apiserver_endpoint = local.kubernetes_services.apiserver.fqdn
   kubernetes_service_prefix  = local.networks.kubernetes_service.prefix
   kubernetes_pod_prefix      = local.networks.kubernetes_pod.prefix
-  node_ip                    = cidrhost(each.value.networks[local.services.apiserver.network.name].prefix, each.value.netnum)
-  apiserver_ip               = local.services.apiserver.ip
-  cluster_apiserver_ip       = local.services.cluster_apiserver.ip
-  static_pod_path            = local.kubernetes.static_pod_manifest_path
-  bird_path                  = local.ha.bird_config_path
-  bird_cache_table_name      = local.ha.bird_cache_table_name
-  bgp_port                   = local.host_ports.bgp
-  bgp_prefix                 = each.value.networks.node.prefix
-  bgp_as                     = local.ha.bgp_as_apiserver
+  node_ips = [
+    for _, network in each.value.networks :
+    cidrhost(network.prefix, each.value.netnum)
+  ]
+  apiserver_ip          = local.services.apiserver.ip
+  cluster_apiserver_ip  = local.services.cluster_apiserver.ip
+  static_pod_path       = local.kubernetes.static_pod_manifest_path
+  bird_path             = local.ha.bird_config_path
+  bird_cache_table_name = local.ha.bird_cache_table_name
+  bgp_port              = local.host_ports.bgp
+  bgp_prefix            = each.value.networks.node.prefix
+  bgp_as                = local.ha.bgp_as_apiserver
   bgp_neighbor_netnums = {
     for host_key, host in local.members.gateway :
     host_key => host.netnum if each.key != host_key
