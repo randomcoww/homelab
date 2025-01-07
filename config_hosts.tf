@@ -16,10 +16,6 @@ locals {
           source  = "phy0"
           network = "service"
         }
-        phy0-sync = {
-          source  = "phy0"
-          network = "sync"
-        }
         phy0-etcd = {
           source  = "phy0"
           network = "etcd"
@@ -37,10 +33,6 @@ locals {
         }
         service = {
           interface     = "phy0-service"
-          enable_netnum = true
-        }
-        sync = {
-          interface     = "phy0-sync"
           enable_netnum = true
         }
         etcd = {
@@ -97,10 +89,6 @@ locals {
           source  = "phy0"
           network = "service"
         }
-        phy0-sync = {
-          source  = "phy0"
-          network = "sync"
-        }
         phy0-etcd = {
           source  = "phy0"
           network = "etcd"
@@ -118,10 +106,6 @@ locals {
         }
         service = {
           interface     = "phy0-service"
-          enable_netnum = true
-        }
-        sync = {
-          interface     = "phy0-sync"
           enable_netnum = true
         }
         etcd = {
