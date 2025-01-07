@@ -10,10 +10,9 @@ output "manifest" {
       }
     }
     spec = merge({
-      priorityClassName = "system-node-critical"
-      priority          = 2000001000
-      hostNetwork       = true
-      restartPolicy     = "Always"
+      priority      = 2000000000
+      hostNetwork   = true
+      restartPolicy = "Always"
       dnsConfig = {
         options = [
           {
