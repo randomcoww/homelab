@@ -20,9 +20,8 @@ locals {
       enable_dns  = true
       enable_mdns = true
       netnums = {
-        gateway   = 2
-        apiserver = 4
-        switch    = 127
+        gateway = 2
+        switch  = 127
       }
     }
     # Kubernetes service external IP and LB
@@ -32,6 +31,7 @@ locals {
       vlan_id = 80
       mtu     = local.default_mtu
       netnums = {
+        apiserver              = 2
         external_dns           = 31
         ingress_nginx          = 32
         ingress_nginx_external = 35
@@ -117,7 +117,7 @@ locals {
   }
 
   pxeboot_images = {
-    coreos = "fedora-coreos-41.20250107.0"
+    coreos = "fedora-coreos-41.20250103.0"
   }
 
   kubernetes = {
@@ -137,6 +137,7 @@ locals {
 
   ha = {
     keepalived_config_path = "/etc/keepalived/keepalived.conf.d"
+    haproxy_config_path    = "/etc/haproxy/haproxy.cfg.d"
     bird_config_path       = "/etc/bird.conf.d"
     bird_cache_table_name  = "cache"
     bgp_as_gateway         = 65002
@@ -179,6 +180,10 @@ locals {
       apiserver = {
         name      = "kubernetes"
         namespace = "default"
+      }
+      apiserver_service = {
+        name      = "kube-apiserver"
+        namespace = "kube-system"
       }
       authelia = {
         name      = "authelia"
@@ -223,6 +228,7 @@ locals {
     kea_peer           = 50060
     tftpd              = 69
     apiserver          = 58181
+    apiserver_backend  = 58081
     controller_manager = 50252
     scheduler          = 50251
     kubelet            = 50250

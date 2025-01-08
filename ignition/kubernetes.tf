@@ -21,6 +21,7 @@ module "kubernetes-master" {
   }
   ports = {
     apiserver          = local.host_ports.apiserver
+    apiserver_backend  = local.host_ports.apiserver_backend
     controller_manager = local.host_ports.controller_manager
     scheduler          = local.host_ports.scheduler
     etcd_client        = local.host_ports.etcd_client
@@ -39,6 +40,7 @@ module "kubernetes-master" {
   static_pod_path       = local.kubernetes.static_pod_manifest_path
   bird_path             = local.ha.bird_config_path
   bird_cache_table_name = local.ha.bird_cache_table_name
+  haproxy_path          = local.ha.haproxy_config_path
   bgp_port              = local.host_ports.bgp
   bgp_prefix            = each.value.networks.node.prefix
   bgp_as                = local.ha.bgp_as_apiserver

@@ -1,0 +1,40 @@
+---
+variant: fcos
+version: 1.5.0
+systemd:
+  units:
+    - name: haproxy.service
+      enabled: true
+      dropins:
+        - name: 10-config-directory.conf
+          contents: |
+            [Unit]
+            ConditionDirectoryNotEmpty=${haproxy_path}
+
+            [Service]
+            ExecStartPre=
+            ExecStart=
+            ExecReload=
+            ExecStartPre=/usr/bin/mkdir -p ${haproxy_path}
+            ExecStartPre=/usr/sbin/haproxy -f /etc/haproxy/haproxy.cfg -f ${haproxy_path} -c
+            ExecStart=/usr/sbin/haproxy -Ws -f /etc/haproxy/haproxy.cfg -f ${haproxy_path} -p $PIDFILE
+            ExecReload=/usr/sbin/haproxy -f /etc/haproxy/haproxy.cfg -f ${haproxy_path} -c
+
+storage:
+  files:
+    # Need to keep empty line
+    # https://stackoverflow.com/questions/68350378/unable-to-start-haproxy-2-4-missing-lf-on-last-line
+    - path: /etc/haproxy/haproxy.cfg
+      mode: 0644
+      contents:
+        inline: |+
+          defaults
+            mode tcp
+            option dontlognull
+            timeout http-request 4s
+            timeout queue 1m
+            timeout connect 4s
+            timeout client 86400s
+            timeout server 86400s
+            timeout tunnel 86400s
+          

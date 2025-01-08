@@ -53,6 +53,7 @@ module "server" {
   ca = data.terraform_remote_state.sr.outputs.ssh.ca
   # HA config
   keepalived_path       = local.ha.keepalived_config_path
+  haproxy_path          = local.ha.haproxy_config_path
   bird_path             = local.ha.bird_config_path
   bird_cache_table_name = local.ha.bird_cache_table_name
   bgp_router_id         = cidrhost(values(each.value.networks)[0].prefix, each.value.netnum)

@@ -41,6 +41,10 @@ variable "bird_path" {
   type = string
 }
 
+variable "haproxy_path" {
+  type = string
+}
+
 variable "bird_cache_table_name" {
   type = string
 }

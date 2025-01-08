@@ -57,6 +57,7 @@ variable "images" {
 variable "ports" {
   type = object({
     apiserver          = number
+    apiserver_backend  = number
     controller_manager = number
     scheduler          = number
     etcd_client        = number
@@ -120,6 +121,10 @@ variable "config_base_path" {
 }
 
 variable "static_pod_path" {
+  type = string
+}
+
+variable "haproxy_path" {
   type = string
 }
 

@@ -111,7 +111,9 @@ locals {
       name                      = var.name
       ports                     = var.ports
       apiserver_ip              = var.apiserver_ip
+      cluster_apiserver_ip      = var.cluster_apiserver_ip
       apiserver_health_endpoint = local.apiserver_health_endpoint
+      haproxy_path              = var.haproxy_path
       bird_path                 = var.bird_path
       bird_cache_table_name     = var.bird_cache_table_name
       bgp_port                  = var.bgp_port
@@ -217,7 +219,7 @@ module "apiserver" {
           "--kubelet-client-key=${local.pki.kubelet-client-key.path}",
           "--kubelet-preferred-address-types=InternalDNS,InternalIP",
           "--runtime-config=api/all=true",
-          "--secure-port=${var.ports.apiserver}",
+          "--secure-port=${var.ports.apiserver_backend}",
           "--service-account-issuer=https://${var.cluster_apiserver_endpoint}",
           "--service-account-key-file=${local.pki.service-account-cert.path}",
           "--service-account-signing-key-file=${local.pki.service-account-key.path}",
@@ -240,7 +242,7 @@ module "apiserver" {
           httpGet = {
             scheme = "HTTPS"
             host   = "127.0.0.1"
-            port   = var.ports.apiserver
+            port   = var.ports.apiserver_backend
             path   = local.apiserver_health_endpoint
           }
           initialDelaySeconds = 15
@@ -250,7 +252,7 @@ module "apiserver" {
           httpGet = {
             scheme = "HTTPS"
             host   = "127.0.0.1"
-            port   = var.ports.apiserver
+            port   = var.ports.apiserver_backend
             path   = "/readyz"
           }
           initialDelaySeconds = 15

@@ -34,6 +34,7 @@ locals {
       # HA config
       keepalived_path       = var.keepalived_path
       bird_path             = var.bird_path
+      haproxy_path          = var.haproxy_path
       bird_cache_table_name = var.bird_cache_table_name
       bgp_router_id         = var.bgp_router_id
       bgp_port              = var.bgp_port
