@@ -69,7 +69,6 @@ locals {
         ]
       }
       kubernetes_node_labels = {
-        "node-role.kubernetes.io/gw" = true
       }
     }
 
@@ -142,7 +141,6 @@ locals {
         ]
       }
       kubernetes_node_labels = {
-        "node-role.kubernetes.io/gw" = true
       }
     }
 

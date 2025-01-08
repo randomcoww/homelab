@@ -46,8 +46,8 @@ module "kea" {
           {
             matchExpressions = [
               {
-                key      = "node-role.kubernetes.io/gw"
-                operator = "Exists"
+                key      = "node-role.kubernetes.io/control-plane"
+                operator = "DoesNotExist"
               },
             ]
           },
@@ -220,8 +220,8 @@ module "tailscale" {
           {
             matchExpressions = [
               {
-                key      = "node-role.kubernetes.io/gw"
-                operator = "Exists"
+                key      = "node-role.kubernetes.io/control-plane"
+                operator = "DoesNotExist"
               },
             ]
           },
