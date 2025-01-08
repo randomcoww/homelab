@@ -154,15 +154,11 @@ module "daemonset" {
           },
           {
             name  = "lb_enable"
-            value = "true"
+            value = "false"
           },
           {
             name  = "lb_port"
             value = tostring(var.ports.apiserver)
-          },
-          {
-            name  = "lb_fwdmethod"
-            value = "directroute"
           },
           {
             name  = "svc_leasename"
