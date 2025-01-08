@@ -161,6 +161,10 @@ module "daemonset" {
             value = tostring(var.ports.apiserver)
           },
           {
+            name  = "lb_fwdmethod"
+            value = "directroute"
+          },
+          {
             name  = "svc_leasename"
             value = "plndr-svcs-lock"
           },
