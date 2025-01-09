@@ -181,10 +181,6 @@ locals {
         name      = "kubernetes"
         namespace = "default"
       }
-      apiserver_service = {
-        name      = "kube-apiserver"
-        namespace = "kube-system"
-      }
       authelia = {
         name      = "authelia"
         namespace = "authelia"
