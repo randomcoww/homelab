@@ -114,17 +114,15 @@ module "litestream" {
         path = local.db_path
         replicas = [
           {
-            name                     = "minio"
-            type                     = "s3"
-            endpoint                 = var.minio_endpoint
-            bucket                   = var.minio_bucket
-            path                     = var.minio_litestream_prefix
-            access-key-id            = var.minio_access_key_id
-            secret-access-key        = var.minio_secret_access_key
-            retention                = "2m"
-            retention-check-interval = "2m"
-            sync-interval            = "100ms"
-            snapshot-interval        = "20m"
+            name              = "minio"
+            type              = "s3"
+            endpoint          = var.minio_endpoint
+            bucket            = var.minio_bucket
+            path              = var.minio_litestream_prefix
+            access-key-id     = var.minio_access_key_id
+            secret-access-key = var.minio_secret_access_key
+            sync-interval     = "100ms"
+            snapshot-interval = "8m"
           },
         ]
       },
