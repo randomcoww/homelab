@@ -155,7 +155,7 @@ module "controller-manager-kubeconfig" {
   source             = "../../../modules/kubeconfig"
   cluster_name       = var.cluster_name
   user               = var.controller_manager_user
-  apiserver_endpoint = "https://${var.apiserver_ip}:${var.ports.apiserver}"
+  apiserver_endpoint = "https://127.0.0.1:${var.ports.apiserver}"
   ca_cert_pem        = var.kubernetes_ca.cert_pem
   client_cert_pem    = tls_locally_signed_cert.controller-manager.cert_pem
   client_key_pem     = tls_private_key.controller-manager.private_key_pem
@@ -165,7 +165,7 @@ module "scheduler-kubeconfig" {
   source             = "../../../modules/kubeconfig"
   cluster_name       = var.cluster_name
   user               = var.scheduler_user
-  apiserver_endpoint = "https://${var.apiserver_ip}:${var.ports.apiserver}"
+  apiserver_endpoint = "https://127.0.0.1:${var.ports.apiserver}"
   ca_cert_pem        = var.kubernetes_ca.cert_pem
   client_cert_pem    = tls_locally_signed_cert.scheduler.cert_pem
   client_key_pem     = tls_private_key.scheduler.private_key_pem

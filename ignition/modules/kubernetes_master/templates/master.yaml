@@ -57,7 +57,7 @@ storage:
             default-server verify none check-ssl rise 2 fall 2 maxconn 5000 maxqueue 5000 weight 100
             server local 127.0.0.1:${ports.apiserver_backend} check
             server cluster ${cluster_apiserver_ip}:443 check
-    # This is written by kube-vip but is needed for apiserver and kube-proxy so that kube-vip can come up
+    # This is written by kube-vip but is needed by apiserver and kube-proxy befoer kube-vip is able to come up
     - path: /etc/systemd/network/20-lo.network
       mode: 0644
       contents:
