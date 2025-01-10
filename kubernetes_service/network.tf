@@ -197,20 +197,4 @@ module "tailscale" {
       ]))
     },
   ]
-  affinity = {
-    nodeAffinity = {
-      requiredDuringSchedulingIgnoredDuringExecution = {
-        nodeSelectorTerms = [
-          {
-            matchExpressions = [
-              {
-                key      = "node-role.kubernetes.io/gw"
-                operator = "Exists"
-              },
-            ]
-          },
-        ]
-      }
-    }
-  }
 }
