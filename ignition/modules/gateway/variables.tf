@@ -14,22 +14,6 @@ variable "wan_interface_name" {
   type = string
 }
 
-variable "lan_interface_name" {
-  type = string
-}
-
-variable "lan_gateway_ip" {
-  type = string
-}
-
-variable "virtual_router_id" {
-  type = number
-}
-
-variable "keepalived_path" {
-  type = string
-}
-
 variable "bird_path" {
   type = string
 }
@@ -56,4 +40,32 @@ variable "bgp_service_prefix" {
 
 variable "bgp_neighbor_netnums" {
   type = map(number)
+}
+
+variable "conntrackd_prefix" {
+  type = string
+}
+
+variable "conntrackd_interface_name" {
+  type = string
+}
+
+variable "conntrackd_ignore_ipv4" {
+  type = list(string)
+}
+
+variable "keepalived_path" {
+  type = string
+}
+
+variable "keepalived_interface_name" {
+  type = string
+}
+
+variable "keepalived_vip" {
+  type = string
+}
+
+variable "keepalived_router_id" {
+  type = number
 }

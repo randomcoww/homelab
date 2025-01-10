@@ -7,10 +7,6 @@ module "gateway" {
   fw_mark               = local.fw_marks.accept
   host_netnum           = each.value.netnum
   wan_interface_name    = each.value.networks.wan.interface
-  lan_interface_name    = each.value.networks[local.services.gateway.network.name].interface
-  lan_gateway_ip        = local.services.gateway.ip
-  virtual_router_id     = 13
-  keepalived_path       = local.ha.keepalived_config_path
   bird_path             = local.ha.bird_config_path
   bird_cache_table_name = local.ha.bird_cache_table_name
   bgp_port              = local.host_ports.bgp
@@ -21,6 +17,24 @@ module "gateway" {
     for host_key, host in local.members.gateway :
     host_key => host.netnum if each.key != host_key
   }
+  conntrackd_prefix         = each.value.networks.sync.prefix
+  conntrackd_interface_name = each.value.networks.sync.interface
+  conntrackd_ignore_ipv4 = concat([
+    local.services.gateway.ip,
+    local.networks.kubernetes_pod.prefix,
+    local.networks.kubernetes_service.prefix,
+    ], flatten([
+      for _, host in local.members.gateway :
+      [
+        for _, network in host.networks :
+        cidrhost(network.prefix, host.netnum)
+        if lookup(network, "enable_netnum", false)
+      ]
+  ]))
+  keepalived_path           = local.ha.keepalived_config_path
+  keepalived_interface_name = each.value.networks[local.services.gateway.network.name].interface
+  keepalived_vip            = local.services.gateway.ip
+  keepalived_router_id      = 13
 }
 
 # Configure upstream DNS for gateways

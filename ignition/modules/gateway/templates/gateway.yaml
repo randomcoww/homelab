@@ -5,7 +5,8 @@ systemd:
   units:
     - name: nftables@gateway.service
       enabled: true
-
+    - name: conntrackd.service
+      enabled: true
 storage:
   files:
     # https://blog.fhrnet.eu/2019/03/07/ecmp-on-linux/
@@ -27,6 +28,7 @@ storage:
             chain input {
               type filter hook input priority -10; policy accept;
               iifname ${wan_interface_name} meta mark & ${fw_mark} == 0x00000000 drop;
+              iifname ${conntrackd_interface_name} pkttype multicast jump mark-for-accept;
             }
 
             chain forward {
@@ -48,21 +50,21 @@ storage:
           vrrp_instance gateway {
             preempt
             state BACKUP
-            advert_int 1
-            virtual_router_id ${virtual_router_id}
-            interface ${lan_interface_name}
+            advert_int 0.4
+            virtual_router_id ${keepalived_router_id}
+            interface ${keepalived_interface_name}
             no_accept
             use_vmac
             vmac_xmit_base
             priority 100
             virtual_ipaddress {
-              ${lan_gateway_ip}
+              ${keepalived_vip}
             }
             virtual_rules {
-              to all lookup ${vrrp_master_default_route.table_id} priority ${vrrp_master_default_route.table_priority}
+              to all lookup ${master_default_route.table_id} priority ${master_default_route.table_priority}
             }
             virtual_routes {
-              default dev ${lan_interface_name} table ${vrrp_slave_default_route.table_id}
+              default dev ${keepalived_interface_name} table ${slave_default_route.table_id}
             }
           }
     # bird
@@ -72,7 +74,7 @@ storage:
         inline: |
           protocol kernel gateway_kernel {
             learn;
-            kernel table ${vrrp_slave_default_route.table_id};
+            kernel table ${slave_default_route.table_id};
             ipv4 {
               import all;
               export none;
@@ -126,5 +128,49 @@ storage:
           [DHCPv4]
           RequestBroadcast=true
           ClientIdentifier=mac
-          RouteTable=${vrrp_master_default_route.table_id}
+          RouteTable=${master_default_route.table_id}
           UseTimezone=false
+    - path: /etc/conntrackd/conntrackd.conf
+      mode: 0644
+      overwrite: true
+      contents:
+        inline: |
+          Sync {
+            Mode FTFW {
+              DisableExternalCache on
+              PurgeTimeout 5
+              StartupResync on
+            }
+            Multicast {
+              IPv4_address 225.0.0.50
+              Group 3780
+              IPv4_interface ${cidrhost(conntrackd_prefix, host_netnum)}
+              Interface ${conntrackd_interface_name}
+              SndSocketBuffer 24985600
+              RcvSocketBuffer 24985600
+              Checksum on
+            }
+          }
+          General {
+            Systemd on
+            HashSize 32768
+            HashLimit 131072
+            LockFile /var/lock/conntrack.lock
+            UNIX {
+              Path /var/run/conntrackd.ctl
+            }
+            NetlinkBufferSize 2097152
+            NetlinkBufferSizeMaxGrowth 8388608
+            Filter From Userspace {
+              Protocol Accept {
+                TCP
+              }
+              Address Ignore {
+                IPv4_address 127.0.0.1
+                IPv6_address ::1
+                %{~ for _, address in conntrackd_ignore_ipv4 ~}
+                IPv4_address ${address}
+                %{~ endfor ~}
+              }
+            }
+          }

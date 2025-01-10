@@ -16,6 +16,10 @@ locals {
           source  = "phy0"
           network = "node"
         }
+        phy0-sync = {
+          source  = "phy0"
+          network = "sync"
+        }
         phy0-service = {
           source  = "phy0"
           network = "service"
@@ -38,6 +42,12 @@ locals {
         node = {
           interface     = "phy0-node"
           enable_netnum = true
+        }
+        sync = {
+          interface      = "phy0-sync"
+          enable_netnum  = true
+          table_id       = 220
+          table_priority = 32760
         }
         service = {
           interface     = "phy0-service"
@@ -96,6 +106,10 @@ locals {
           source  = "phy0"
           network = "node"
         }
+        phy0-sync = {
+          source  = "phy0"
+          network = "sync"
+        }
         phy0-service = {
           source  = "phy0"
           network = "service"
@@ -118,6 +132,12 @@ locals {
         node = {
           interface     = "phy0-node"
           enable_netnum = true
+        }
+        sync = {
+          interface      = "phy0-sync"
+          enable_netnum  = true
+          table_id       = 220
+          table_priority = 32760
         }
         service = {
           interface     = "phy0-service"
