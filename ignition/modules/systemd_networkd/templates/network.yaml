@@ -23,6 +23,9 @@ storage:
           UseRoutes=${!lookup(config, "enable_netnum", false)}
           RoutesToDNS=false
           RoutesToNTP=false
+          %{~ if contains(keys(config), "table_id") ~}
+          RouteTable=${config.table_id}
+          %{~ endif ~}
 
           [Network]
           LinkLocalAddressing=false
@@ -41,6 +44,16 @@ storage:
           PreferredSource=${cidrhost(config.prefix, host_netnum)}
           Destination=${config.prefix}
           Metric=${lookup(config, "metric", 1024)}
+          %{~ if contains(keys(config), "table_id") ~}
+          Table=${config.table_id}
+
+          [RoutingPolicyRule]
+          Table=${config.table_id}
+          From=${config.prefix}
+          %{~ if contains(keys(config), "table_priority") ~}
+          Priority=${config.table_priority}
+          %{~ endif ~}
+          %{~ endif ~}
           %{~ endif ~}
     %{~ endfor ~}
 

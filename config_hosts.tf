@@ -12,6 +12,10 @@ locals {
         }
       }
       vlan_interfaces = {
+        phy0-node = {
+          source  = "phy0"
+          network = "node"
+        }
         phy0-service = {
           source  = "phy0"
           network = "service"
@@ -27,8 +31,12 @@ locals {
         }
       }
       networks = {
-        node = {
+        lan = {
           interface     = "phy0"
+          enable_netnum = true
+        }
+        node = {
+          interface     = "phy0-node"
           enable_netnum = true
         }
         service = {
@@ -69,6 +77,7 @@ locals {
         ]
       }
       kubernetes_node_labels = {
+        "node-role.kubernetes.io/gw" = true
       }
     }
 
@@ -84,6 +93,10 @@ locals {
         }
       }
       vlan_interfaces = {
+        phy0-node = {
+          source  = "phy0"
+          network = "node"
+        }
         phy0-service = {
           source  = "phy0"
           network = "service"
@@ -99,8 +112,12 @@ locals {
         }
       }
       networks = {
-        node = {
+        lan = {
           interface     = "phy0"
+          enable_netnum = true
+        }
+        node = {
+          interface     = "phy0-node"
           enable_netnum = true
         }
         service = {
@@ -141,6 +158,7 @@ locals {
         ]
       }
       kubernetes_node_labels = {
+        "node-role.kubernetes.io/gw" = true
       }
     }
 
@@ -156,6 +174,10 @@ locals {
         }
       }
       vlan_interfaces = {
+        phy0-node = {
+          source  = "phy0"
+          network = "node"
+        }
         phy0-service = {
           source  = "phy0"
           network = "service"
@@ -166,8 +188,14 @@ locals {
         }
       }
       networks = {
+        lan = {
+          interface      = "phy0"
+          enable_netnum  = true
+          table_id       = 220
+          table_priority = 32760
+        }
         node = {
-          interface     = "phy0"
+          interface     = "phy0-node"
           enable_netnum = true
         }
         service = {
@@ -223,6 +251,10 @@ locals {
         }
       }
       vlan_interfaces = {
+        phy0-node = {
+          source  = "phy0"
+          network = "node"
+        }
         phy0-service = {
           source  = "phy0"
           network = "service"
@@ -240,8 +272,14 @@ locals {
         }
       }
       networks = {
+        lan = {
+          interface      = "br-lan"
+          enable_netnum  = true
+          table_id       = 220
+          table_priority = 32760
+        }
         node = {
-          interface     = "br-lan"
+          interface     = "phy0-node"
           enable_netnum = true
         }
         service = {

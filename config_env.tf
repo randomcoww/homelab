@@ -11,8 +11,8 @@ locals {
   default_mtu = 1500
 
   base_networks = {
-    # Kubernetes worker and netboot
-    node = {
+    # Client access
+    lan = {
       network     = "192.168.192.0"
       cidr        = 24
       vlan_id     = 2048
@@ -23,6 +23,13 @@ locals {
         gateway = 2
         switch  = 127
       }
+    }
+    # BGP
+    node = {
+      network = "192.168.200.0"
+      cidr    = 24
+      vlan_id = 60
+      mtu     = local.default_mtu
     }
     # Kubernetes service external IP and LB
     service = {

@@ -52,6 +52,8 @@ storage:
             virtual_router_id ${virtual_router_id}
             interface ${lan_interface_name}
             no_accept
+            use_vmac
+            vmac_xmit_base
             priority 100
             virtual_ipaddress {
               ${lan_gateway_ip}

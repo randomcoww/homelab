@@ -21,7 +21,7 @@ module "kea" {
   ipxe_script_url = "http://${local.services.matchbox.ip}:${local.service_ports.matchbox}/boot.ipxe"
   networks = [
     {
-      prefix = local.networks.node.prefix
+      prefix = local.networks.lan.prefix
       routers = [
         local.services.gateway.ip,
       ]
@@ -32,9 +32,9 @@ module "kea" {
         local.domains.public,
         local.domains.kubernetes,
       ]
-      mtu = lookup(local.networks.node, "mtu", 1500)
+      mtu = lookup(local.networks.lan, "mtu", 1500)
       pools = [
-        cidrsubnet(local.networks.node.prefix, 1, 1),
+        cidrsubnet(local.networks.lan.prefix, 1, 1),
       ]
     },
   ]
@@ -204,8 +204,8 @@ module "tailscale" {
           {
             matchExpressions = [
               {
-                key      = "node-role.kubernetes.io/control-plane"
-                operator = "DoesNotExist"
+                key      = "node-role.kubernetes.io/gw"
+                operator = "Exists"
               },
             ]
           },
