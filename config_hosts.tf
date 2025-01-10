@@ -36,8 +36,10 @@ locals {
       }
       networks = {
         lan = {
-          interface     = "phy0"
-          enable_netnum = true
+          interface      = "phy0"
+          enable_netnum  = true
+          table_id       = 220
+          table_priority = 32760
         }
         node = {
           interface     = "phy0-node"
@@ -46,7 +48,7 @@ locals {
         sync = {
           interface      = "phy0-sync"
           enable_netnum  = true
-          table_id       = 220
+          table_id       = 221
           table_priority = 32760
         }
         service = {
@@ -126,8 +128,10 @@ locals {
       }
       networks = {
         lan = {
-          interface     = "phy0"
-          enable_netnum = true
+          interface      = "phy0"
+          enable_netnum  = true
+          table_id       = 220
+          table_priority = 32760
         }
         node = {
           interface     = "phy0-node"
@@ -136,7 +140,7 @@ locals {
         sync = {
           interface      = "phy0-sync"
           enable_netnum  = true
-          table_id       = 220
+          table_id       = 221
           table_priority = 32760
         }
         service = {

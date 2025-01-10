@@ -13,12 +13,11 @@ locals {
   base_networks = {
     # Client access
     lan = {
-      network     = "192.168.192.0"
-      cidr        = 24
-      vlan_id     = 2048
-      mtu         = local.default_mtu
-      enable_dns  = true
-      enable_mdns = true
+      network    = "192.168.192.0"
+      cidr       = 24
+      vlan_id    = 2048
+      mtu        = local.default_mtu
+      enable_dns = true
       netnums = {
         gateway = 2
         switch  = 127
@@ -33,10 +32,11 @@ locals {
     }
     # Kubernetes service external IP and LB
     service = {
-      network = "192.168.208.0"
-      cidr    = 24
-      vlan_id = 80
-      mtu     = local.default_mtu
+      network     = "192.168.208.0"
+      cidr        = 24
+      vlan_id     = 80
+      mtu         = local.default_mtu
+      enable_mdns = true
       netnums = {
         apiserver              = 2
         external_dns           = 31

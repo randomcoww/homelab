@@ -17,8 +17,8 @@ module "gateway" {
     for host_key, host in local.members.gateway :
     host_key => host.netnum if each.key != host_key
   }
-  conntrackd_prefix         = each.value.networks.sync.prefix
-  conntrackd_interface_name = each.value.networks.sync.interface
+  sync_interface_name = each.value.networks.sync.interface
+  conntrackd_ip       = cidrhost(each.value.networks.sync.prefix, each.value.netnum)
   conntrackd_ignore_ipv4 = concat([
     local.services.gateway.ip,
     local.networks.kubernetes_pod.prefix,
@@ -34,6 +34,7 @@ module "gateway" {
   keepalived_path           = local.ha.keepalived_config_path
   keepalived_interface_name = each.value.networks[local.services.gateway.network.name].interface
   keepalived_vip            = local.services.gateway.ip
+  keepalived_prefix         = each.value.networks[local.services.gateway.network.name].prefix
   keepalived_router_id      = 13
 }
 

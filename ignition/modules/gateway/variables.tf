@@ -42,11 +42,11 @@ variable "bgp_neighbor_netnums" {
   type = map(number)
 }
 
-variable "conntrackd_prefix" {
+variable "sync_interface_name" {
   type = string
 }
 
-variable "conntrackd_interface_name" {
+variable "conntrackd_ip" {
   type = string
 }
 
@@ -68,4 +68,8 @@ variable "keepalived_vip" {
 
 variable "keepalived_router_id" {
   type = number
+}
+
+variable "keepalived_prefix" {
+  type = string
 }

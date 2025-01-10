@@ -28,7 +28,7 @@ storage:
             chain input {
               type filter hook input priority -10; policy accept;
               iifname ${wan_interface_name} meta mark & ${fw_mark} == 0x00000000 drop;
-              iifname ${conntrackd_interface_name} pkttype multicast jump mark-for-accept;
+              iifname ${sync_interface_name} pkttype multicast jump mark-for-accept;
             }
 
             chain forward {
@@ -52,19 +52,20 @@ storage:
             state BACKUP
             advert_int 0.4
             virtual_router_id ${keepalived_router_id}
-            interface ${keepalived_interface_name}
+            interface ${sync_interface_name}
             no_accept
-            use_vmac
-            vmac_xmit_base
+            # use_vmac
+            # vmac_xmit_base
             priority 100
             virtual_ipaddress {
-              ${keepalived_vip}
+              ${keepalived_vip} dev ${keepalived_interface_name}
             }
             virtual_rules {
               to all lookup ${master_default_route.table_id} priority ${master_default_route.table_priority}
             }
             virtual_routes {
               default dev ${keepalived_interface_name} table ${slave_default_route.table_id}
+              ${keepalived_prefix} dev ${keepalived_interface_name} scope link src ${cidrhost(keepalived_prefix, host_netnum)}
             }
           }
     # bird
@@ -144,8 +145,8 @@ storage:
             Multicast {
               IPv4_address 225.0.0.50
               Group 3780
-              IPv4_interface ${cidrhost(conntrackd_prefix, host_netnum)}
-              Interface ${conntrackd_interface_name}
+              IPv4_interface ${conntrackd_ip}
+              Interface ${sync_interface_name}
               SndSocketBuffer 24985600
               RcvSocketBuffer 24985600
               Checksum on
