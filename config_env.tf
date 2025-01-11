@@ -13,11 +13,13 @@ locals {
   base_networks = {
     # Client access
     lan = {
-      network    = "192.168.192.0"
-      cidr       = 24
-      vlan_id    = 2048
-      mtu        = local.default_mtu
-      enable_dns = true
+      network        = "192.168.192.0"
+      cidr           = 24
+      vlan_id        = 2048
+      mtu            = local.default_mtu
+      enable_dns     = true
+      table_id       = 220
+      table_priority = 32760
       netnums = {
         gateway = 2
         switch  = 127
@@ -51,10 +53,12 @@ locals {
     }
     # Conntrack sync
     sync = {
-      network = "192.168.224.0"
-      cidr    = 26
-      vlan_id = 90
-      mtu     = local.default_mtu
+      network        = "192.168.224.0"
+      cidr           = 26
+      vlan_id        = 90
+      mtu            = local.default_mtu
+      table_id       = 221
+      table_priority = 32760
     }
     # Etcd peering
     etcd = {

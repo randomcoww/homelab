@@ -36,20 +36,16 @@ locals {
       }
       networks = {
         lan = {
-          interface      = "phy0"
-          enable_netnum  = true
-          table_id       = 220
-          table_priority = 32760
+          interface     = "phy0"
+          enable_netnum = true
         }
         node = {
           interface     = "phy0-node"
           enable_netnum = true
         }
         sync = {
-          interface      = "phy0-sync"
-          enable_netnum  = true
-          table_id       = 221
-          table_priority = 32760
+          interface     = "phy0-sync"
+          enable_netnum = true
         }
         service = {
           interface     = "phy0-service"
@@ -128,20 +124,16 @@ locals {
       }
       networks = {
         lan = {
-          interface      = "phy0"
-          enable_netnum  = true
-          table_id       = 220
-          table_priority = 32760
+          interface     = "phy0"
+          enable_netnum = true
         }
         node = {
           interface     = "phy0-node"
           enable_netnum = true
         }
         sync = {
-          interface      = "phy0-sync"
-          enable_netnum  = true
-          table_id       = 221
-          table_priority = 32760
+          interface     = "phy0-sync"
+          enable_netnum = true
         }
         service = {
           interface     = "phy0-service"
@@ -211,10 +203,8 @@ locals {
       }
       networks = {
         lan = {
-          interface      = "phy0"
-          enable_netnum  = true
-          table_id       = 220
-          table_priority = 32760
+          interface     = "phy0"
+          enable_netnum = true
         }
         node = {
           interface     = "phy0-node"
@@ -295,10 +285,8 @@ locals {
       }
       networks = {
         lan = {
-          interface      = "br-lan"
-          enable_netnum  = true
-          table_id       = 220
-          table_priority = 32760
+          interface     = "br-lan"
+          enable_netnum = true
         }
         node = {
           interface     = "phy0-node"
