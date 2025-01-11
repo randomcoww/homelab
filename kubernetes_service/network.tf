@@ -191,7 +191,6 @@ module "tailscale" {
     {
       name = "TS_ROUTES"
       value = join(",", distinct([
-        local.networks[local.services.gateway.network.name].prefix,
         local.networks[local.services.apiserver.network.name].prefix,
         local.networks.service.prefix,
       ]))
