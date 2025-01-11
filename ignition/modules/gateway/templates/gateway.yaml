@@ -54,6 +54,7 @@ storage:
             virtual_router_id ${keepalived_router_id}
             interface ${sync_interface_name}
             no_accept
+            vmac_xmit_base
             priority 100
             virtual_ipaddress {
               ${keepalived_vip} dev ${keepalived_interface_name}
