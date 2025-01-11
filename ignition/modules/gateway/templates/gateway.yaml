@@ -54,8 +54,6 @@ storage:
             virtual_router_id ${keepalived_router_id}
             interface ${sync_interface_name}
             no_accept
-            # use_vmac
-            # vmac_xmit_base
             priority 100
             virtual_ipaddress {
               ${keepalived_vip} dev ${keepalived_interface_name}
@@ -65,7 +63,7 @@ storage:
             }
             virtual_routes {
               default dev ${keepalived_interface_name} table ${slave_default_route.table_id}
-              ${keepalived_prefix} dev ${keepalived_interface_name} scope link src ${cidrhost(keepalived_prefix, host_netnum)}
+              ${keepalived_prefix} dev ${keepalived_interface_name} scope link src ${keepalived_vip}
             }
           }
     # bird
