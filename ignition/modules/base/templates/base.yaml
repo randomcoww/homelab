@@ -28,6 +28,7 @@ systemd:
         Wants=network-pre.target
         Before=network-pre.target
         ConditionFileNotEmpty=/etc/nftables/%i.nft
+
         [Service]
         Type=oneshot
         ProtectSystem=full
@@ -36,6 +37,7 @@ systemd:
         ExecReload=/sbin/nft 'delete table inet %i; include "/etc/nftables/%i.nft";'
         ExecStop=/sbin/nft delete table inet %i
         RemainAfterExit=yes
+
         [Install]
         WantedBy=multi-user.target
 
