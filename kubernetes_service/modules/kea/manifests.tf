@@ -1,4 +1,11 @@
 locals {
+  base_path                = "/etc/kea"
+  kea_config_template_path = "${local.base_path}/kea-dhcp4.tpl"
+  kea_config_path          = "${local.base_path}/kea-dhcp4.conf"
+  ha_ca_cert_path          = "${local.base_path}/ca_cert.pem"
+  ha_cert_path             = "${local.base_path}/cert.pem"
+  ha_key_path              = "${local.base_path}/key.pem"
+
   members = [
     for i, ip in var.service_ips :
     {
@@ -7,7 +14,6 @@ locals {
       role = try(element(["primary", "secondary"], i), "backup")
     }
   ]
-
   subnet_id_base = 1
   configs = {
     for i, member in local.members :
@@ -34,6 +40,9 @@ locals {
               high-availability = [
                 {
                   this-server-name    = member.name
+                  trust-anchor        = local.ha_ca_cert_path,
+                  cert-file           = local.ha_cert_path,
+                  key-file            = local.ha_key_path,
                   mode                = "load-balancing"
                   max-unacked-clients = 0
                   peers = [
@@ -41,7 +50,7 @@ locals {
                     {
                       name          = peer.name
                       role          = peer.role
-                      url           = i == j ? "http://$POD_IP:${var.ports.kea_peer}/" : "http://${peer.ip}:${var.ports.kea_peer}/"
+                      url           = i == j ? "https://$POD_IP:${var.ports.kea_peer}/" : "https://${peer.ip}:${var.ports.kea_peer}/"
                       auto-failover = true
                     }
                   ]
@@ -124,7 +133,7 @@ module "metadata" {
   release     = var.release
   app_version = split(":", var.images.kea)[1]
   manifests = merge({
-    "templates/configmap.yaml"   = module.configmap.manifest
+    "templates/secret.yaml"      = module.secret.manifest
     "templates/statefulset.yaml" = module.statefulset.manifest
     }, {
     for k, service in module.service-peer :
@@ -132,15 +141,23 @@ module "metadata" {
   })
 }
 
-module "configmap" {
-  source  = "../../../modules/configmap"
+module "secret" {
+  source  = "../../../modules/secret"
   name    = var.name
   app     = var.name
   release = var.release
-  data = {
+  data = merge({
     for host, config in local.configs :
     "kea-dhcp4-${host}" => jsonencode(config)
-  }
+    }, {
+    for host, _ in local.configs :
+    "ha-cert-${host}" => tls_locally_signed_cert.kea[host].cert_pem
+    }, {
+    for host, _ in local.configs :
+    "ha-key-${host}" => tls_private_key.kea[host].private_key_pem
+    }, {
+    "ha-ca-cert" = tls_self_signed_cert.kea-ca.cert_pem
+  })
 }
 
 # Kea peers must know the IP (not DNS name) of all peers
@@ -181,7 +198,7 @@ module "statefulset" {
   affinity = var.affinity
   replicas = length(local.configs)
   annotations = {
-    "checksum/configmap" = sha256(module.configmap.manifest)
+    "checksum/secret" = sha256(module.secret.manifest)
   }
   spec = {
     minReadySeconds = 30
@@ -198,8 +215,8 @@ module "statefulset" {
           "-c",
           <<-EOF
           set -e
-          cat /etc/kea/kea-dhcp4.tpl | envsubst > /etc/kea/kea-dhcp4.conf
-          exec kea-dhcp4 -c /etc/kea/kea-dhcp4.conf
+          cat ${local.kea_config_template_path} | envsubst > ${local.kea_config_path}
+          exec kea-dhcp4 -c ${local.kea_config_path}
           EOF
         ]
         env = [
@@ -230,8 +247,23 @@ module "statefulset" {
         volumeMounts = [
           {
             name        = "kea-config"
-            mountPath   = "/etc/kea/kea-dhcp4.tpl"
+            mountPath   = local.kea_config_template_path
             subPathExpr = "kea-dhcp4-$(POD_NAME)"
+          },
+          {
+            name        = "kea-config"
+            mountPath   = local.ha_ca_cert_path
+            subPathExpr = "ha-ca-cert"
+          },
+          {
+            name        = "kea-config"
+            mountPath   = local.ha_cert_path
+            subPathExpr = "ha-cert-$(POD_NAME)"
+          },
+          {
+            name        = "kea-config"
+            mountPath   = local.ha_key_path
+            subPathExpr = "ha-key-$(POD_NAME)"
           },
         ]
       },
@@ -256,8 +288,8 @@ module "statefulset" {
     volumes = [
       {
         name = "kea-config"
-        configMap = {
-          name = module.configmap.name
+        secret = {
+          secretName = module.secret.name
         }
       },
     ]
