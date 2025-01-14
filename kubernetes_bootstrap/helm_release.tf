@@ -8,7 +8,6 @@ locals {
     module.kapprover,
     module.kube-dns,
     module.kube-vip,
-    # module.coredns-mdns,
   ]
 }
 
@@ -156,47 +155,6 @@ module "kube-dns" {
           tls_servername ${local.upstream_dns.hostname}
           health_check 5s
           EOF
-        },
-        {
-          name       = "cache"
-          parameters = 30
-        },
-      ]
-    },
-  ]
-}
-
-# resolve mdns using coredns-mdns plugin
-# must run on hostNetwork
-
-module "coredns-mdns" {
-  source         = "./modules/coredns_mdns"
-  name           = "coredns-mdns"
-  namespace      = "kube-system"
-  source_release = "1.37.0"
-  replicas       = 2
-  images = {
-    coredns = local.container_images.coredns_mdns
-  }
-  service_cluster_ip = local.services.cluster_dns_mdns.ip
-  servers = [
-    {
-      zones = [
-        {
-          zone = "."
-        },
-      ]
-      port = local.host_ports.mdns_lookup
-      plugins = [
-        {
-          name = "health"
-        },
-        {
-          name = "ready"
-        },
-        {
-          name       = "mdns"
-          parameters = "${local.domains.kubernetes} 1"
         },
         {
           name       = "cache"

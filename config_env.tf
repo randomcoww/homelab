@@ -78,7 +78,6 @@ locals {
       netnums = {
         cluster_apiserver     = 1
         cluster_dns           = 10
-        cluster_dns_mdns      = 15
         cluster_kea_primary   = 12
         cluster_kea_secondary = 13
         cluster_minio         = 14
@@ -131,7 +130,6 @@ locals {
     kube_vip           = "ghcr.io/kube-vip/kube-vip:v0.8.7"
     sunshine_desktop   = "ghcr.io/randomcoww/sunshine-desktop:2025.105.194345-3"
     nvidia_driver      = "ghcr.io/randomcoww/nvidia-driver:565.77-fedora41"
-    coredns_mdns       = "ghcr.io/randomcoww/coredns:1.12.0"
   }
 
   pxeboot_images = {
@@ -250,7 +248,6 @@ locals {
     flannel_healthz    = 58084
     code               = 58085
     bgp                = 179
-    mdns_lookup        = 50053
   }
 
   service_ports = {
