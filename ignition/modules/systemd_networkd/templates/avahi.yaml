@@ -3,9 +3,9 @@ version: ${ignition_version}
 systemd:
   units:
     - name: nftables@avahi.service
-      mask: true
+      enabled: true
     - name: avahi-daemon.service
-      mask: true
+      enabled: true
 
 storage:
   files:
@@ -45,4 +45,4 @@ storage:
 
           [publish]
           publish-hinfo=no
-          publish-workstation=yes
+          publish-workstation=no

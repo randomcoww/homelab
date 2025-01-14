@@ -18,6 +18,7 @@ locals {
       vlan_id        = 2048
       mtu            = local.default_mtu
       enable_dns     = true
+      enable_mdns    = true
       table_id       = 220
       table_priority = 32760
       netnums = {
@@ -34,11 +35,10 @@ locals {
     }
     # Kubernetes service external IP and LB
     service = {
-      network     = "192.168.208.0"
-      cidr        = 24
-      vlan_id     = 80
-      mtu         = local.default_mtu
-      enable_mdns = true
+      network = "192.168.208.0"
+      cidr    = 24
+      vlan_id = 80
+      mtu     = local.default_mtu
       netnums = {
         apiserver              = 2
         external_dns           = 31

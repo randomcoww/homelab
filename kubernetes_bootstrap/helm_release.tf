@@ -148,10 +148,6 @@ module "kube-dns" {
           fallthrough
           EOF
         },
-        # {
-        #   name       = "forward"
-        #   parameters = "${local.domains.kubernetes} ${local.services.cluster_dns_mdns.ip}:${local.host_ports.mdns_lookup}"
-        # },
         # public DNS
         {
           name        = "forward"
