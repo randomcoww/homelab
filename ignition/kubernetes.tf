@@ -43,7 +43,7 @@ module "kubernetes-master" {
   haproxy_path          = local.ha.haproxy_config_path
   bgp_port              = local.host_ports.bgp
   bgp_prefix            = each.value.networks.node.prefix
-  bgp_as                = local.ha.bgp_as_apiserver
+  bgp_as                = local.ha.bgp_as
   bgp_neighbor_netnums = {
     for host_key, host in local.members.gateway :
     host_key => host.netnum if each.key != host_key

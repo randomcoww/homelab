@@ -76,7 +76,7 @@ storage:
           protocol bgp ${replace(host_key, "-", "_")} {
             debug all;
             local port ${bgp_port} as ${bgp_as};
-            neighbor ${cidrhost(bgp_prefix, netnum)} port ${bgp_port} external;
+            neighbor ${cidrhost(bgp_prefix, netnum)} port ${bgp_port} internal;
             direct;
             bfd {
             };

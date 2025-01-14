@@ -8,7 +8,7 @@ locals {
     module.kapprover,
     module.kube-dns,
     module.kube-vip,
-    module.coredns-mdns,
+    # module.coredns-mdns,
   ]
 }
 
@@ -79,8 +79,8 @@ module "kube-vip" {
   ports = {
     apiserver = local.host_ports.apiserver,
   }
-  bgp_as     = local.ha.bgp_as_service
-  bgp_peeras = local.ha.bgp_as_gateway
+  bgp_as     = local.ha.bgp_as
+  bgp_peeras = local.ha.bgp_as
   bgp_neighbor_ips = [
     for _, host in local.members.gateway :
     cidrhost(local.networks.service.prefix, host.netnum)
@@ -148,11 +148,10 @@ module "kube-dns" {
           fallthrough
           EOF
         },
-        # mdns
-        {
-          name       = "forward"
-          parameters = "${local.domains.kubernetes} ${local.services.cluster_dns_mdns.ip}:${local.host_ports.mdns_lookup}"
-        },
+        # {
+        #   name       = "forward"
+        #   parameters = "${local.domains.kubernetes} ${local.services.cluster_dns_mdns.ip}:${local.host_ports.mdns_lookup}"
+        # },
         # public DNS
         {
           name        = "forward"

@@ -158,9 +158,7 @@ locals {
     haproxy_config_path    = "/etc/haproxy/haproxy.cfg.d"
     bird_config_path       = "/etc/bird.conf.d"
     bird_cache_table_name  = "cache"
-    bgp_as_gateway         = 65002
-    bgp_as_apiserver       = 65001
-    bgp_as_service         = 65003
+    bgp_as                 = 65005
   }
 
   domains = {

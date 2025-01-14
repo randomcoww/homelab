@@ -30,23 +30,23 @@ variable "bgp_port" {
   type = number
 }
 
-variable "bgp_node_prefix" {
-  type = string
-}
-
-variable "bgp_service_prefix" {
-  type = string
-}
-
 variable "bgp_neighbor_netnums" {
   type = map(number)
 }
 
-variable "sync_interface_name" {
+variable "node_prefix" {
   type = string
 }
 
-variable "conntrackd_ip" {
+variable "service_prefix" {
+  type = string
+}
+
+variable "sync_prefix" {
+  type = string
+}
+
+variable "sync_interface_name" {
   type = string
 }
 
@@ -68,8 +68,4 @@ variable "keepalived_vip" {
 
 variable "keepalived_router_id" {
   type = number
-}
-
-variable "keepalived_prefix" {
-  type = string
 }
