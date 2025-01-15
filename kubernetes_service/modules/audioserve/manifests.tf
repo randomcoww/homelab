@@ -10,8 +10,8 @@ module "metadata" {
   name        = var.name
   namespace   = var.namespace
   release     = var.release
-  app_version = split(":", var.images.s3fs)[1]
-  manifests = merge(module.s3fs.chart.manifests, {
+  app_version = split(":", var.images.mountpoint)[1]
+  manifests = merge(module.mountpoint.chart.manifests, {
     "templates/service.yaml" = module.service.manifest
     "templates/ingress.yaml" = module.ingress.manifest
   })
@@ -56,8 +56,8 @@ module "ingress" {
   ]
 }
 
-module "s3fs" {
-  source = "../statefulset_s3fs"
+module "mountpoint" {
+  source = "../statefulset_mountpoint"
   ## s3 config
   s3_endpoint          = var.s3_endpoint
   s3_bucket            = var.s3_bucket
@@ -67,7 +67,7 @@ module "s3fs" {
   s3_mount_path        = local.data_path
   s3_mount_extra_args  = var.s3_mount_extra_args
   images = {
-    s3fs = var.images.s3fs
+    mountpoint = var.images.mountpoint
   }
   ##
   name     = var.name

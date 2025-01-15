@@ -34,7 +34,7 @@ module "audioserve" {
   release   = "0.1.0"
   images = {
     audioserve = local.container_images.audioserve
-    s3fs       = local.container_images.s3fs
+    mountpoint = local.container_images.mountpoint
   }
   extra_audioserve_args = [
     "--read-playlist",
@@ -48,10 +48,8 @@ module "audioserve" {
   s3_access_key_id     = minio_iam_user.audioserve.id
   s3_secret_access_key = minio_iam_user.audioserve.secret
   s3_mount_extra_args = [
-    "use_path_request_style",
-    "allow_other",
-    "uid=1000",
-    "gid=1000",
+    "--cache /tmp",
+    "--read-only",
   ]
 }
 

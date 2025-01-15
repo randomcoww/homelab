@@ -120,6 +120,7 @@ locals {
     clickhouse         = "docker.io/clickhouse/clickhouse-server:24.12-alpine"
     qrcode_generator   = "ghcr.io/randomcoww/qrcode-generator:20240620.4"
     rclone             = "docker.io/rclone/rclone:1.68"
+    mountpoint         = "ghcr.io/randomcoww/mountpoint:20250115.4"
     s3fs               = "ghcr.io/randomcoww/s3fs:20250115.1"
     audioserve         = "docker.io/izderadicka/audioserve:latest"
     syncthing          = "docker.io/syncthing/syncthing:1.27"
@@ -131,7 +132,6 @@ locals {
     cockroachdb        = "docker.io/cockroachdb/cockroach:v24.1.1"
     fuse_device_plugin = "docker.io/soolaugust/fuse-device-plugin:v1.0"
     vaultwarden        = "docker.io/vaultwarden/server:1.32.4-alpine"
-    mountpoint         = "ghcr.io/randomcoww/mountpoint:20240915.5"
   }
 
   pxeboot_images = {
