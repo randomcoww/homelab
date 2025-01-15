@@ -120,17 +120,16 @@ locals {
     lldap              = "docker.io/lldap/lldap:2024-08-08-alpine"
     keydb              = "docker.io/eqalpha/keydb:alpine_x86_64_v6.3.4"
     clickhouse         = "docker.io/clickhouse/clickhouse-server:24.8-alpine"
-    jfs                = "ghcr.io/randomcoww/juicefs:1.2.1"
     qrcode_generator   = "ghcr.io/randomcoww/qrcode-generator:20240620.4"
     rclone             = "docker.io/rclone/rclone:1.68"
     cockroachdb        = "docker.io/cockroachdb/cockroach:v24.1.1"
     mountpoint         = "ghcr.io/randomcoww/mountpoint:20240915.5"
+    s3fs               = "ghcr.io/randomcoww/s3fs:20250115.1"
     audioserve         = "docker.io/izderadicka/audioserve:latest"
     syncthing          = "docker.io/syncthing/syncthing:1.27"
     kube_vip           = "ghcr.io/kube-vip/kube-vip:v0.8.7"
     sunshine_desktop   = "ghcr.io/randomcoww/sunshine-desktop:2025.105.194345-3"
     nvidia_driver      = "ghcr.io/randomcoww/nvidia-driver:565.77-fedora41"
-    s3fs               = "ghcr.io/randomcoww/s3fs:20250115.1"
   }
 
   pxeboot_images = {
