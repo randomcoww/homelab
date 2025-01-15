@@ -112,24 +112,26 @@ locals {
     kapprover          = "ghcr.io/randomcoww/kapprover:20240126"
     external_dns       = "registry.k8s.io/external-dns/external-dns:v0.14.2"
     kube_proxy         = "ghcr.io/randomcoww/kubernetes:kube-proxy-${local.kubernetes.version}"
-    vaultwarden        = "docker.io/vaultwarden/server:1.32.4-alpine"
     litestream         = "docker.io/litestream/litestream:0.3"
     tailscale          = "ghcr.io/randomcoww/tailscale:1.74.0"
-    fuse_device_plugin = "docker.io/soolaugust/fuse-device-plugin:v1.0"
     code_server        = "ghcr.io/randomcoww/code-server:4.96.2-1"
     lldap              = "docker.io/lldap/lldap:2024-08-08-alpine"
     keydb              = "docker.io/eqalpha/keydb:alpine_x86_64_v6.3.4"
     clickhouse         = "docker.io/clickhouse/clickhouse-server:24.12-alpine"
     qrcode_generator   = "ghcr.io/randomcoww/qrcode-generator:20240620.4"
     rclone             = "docker.io/rclone/rclone:1.68"
-    cockroachdb        = "docker.io/cockroachdb/cockroach:v24.1.1"
-    mountpoint         = "ghcr.io/randomcoww/mountpoint:20240915.5"
     s3fs               = "ghcr.io/randomcoww/s3fs:20250115.1"
     audioserve         = "docker.io/izderadicka/audioserve:latest"
     syncthing          = "docker.io/syncthing/syncthing:1.27"
     kube_vip           = "ghcr.io/kube-vip/kube-vip:v0.8.7"
     sunshine_desktop   = "ghcr.io/randomcoww/sunshine-desktop:2025.105.194345-3"
     nvidia_driver      = "ghcr.io/randomcoww/nvidia-driver:565.77-fedora41"
+
+    # Unused
+    cockroachdb        = "docker.io/cockroachdb/cockroach:v24.1.1"
+    fuse_device_plugin = "docker.io/soolaugust/fuse-device-plugin:v1.0"
+    vaultwarden        = "docker.io/vaultwarden/server:1.32.4-alpine"
+    mountpoint         = "ghcr.io/randomcoww/mountpoint:20240915.5"
   }
 
   pxeboot_images = {
