@@ -44,7 +44,7 @@ module "authelia-redis" {
 
 resource "minio_s3_bucket" "authelia" {
   bucket        = "authelia"
-  force_destroy = false
+  force_destroy = true
 }
 
 resource "minio_iam_user" "authelia" {
@@ -251,7 +251,7 @@ resource "tls_self_signed_cert" "lldap-ca" {
 
 resource "minio_s3_bucket" "lldap" {
   bucket        = "lldap"
-  force_destroy = false
+  force_destroy = true
 }
 
 resource "minio_iam_user" "lldap" {

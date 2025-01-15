@@ -1,6 +1,6 @@
 resource "minio_s3_bucket" "vaultwarden" {
   bucket        = "vaultwarden"
-  force_destroy = false
+  force_destroy = true
 }
 
 resource "minio_iam_user" "vaultwarden" {
