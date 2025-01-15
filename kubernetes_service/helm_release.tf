@@ -2,7 +2,7 @@
 
 locals {
   modules_enabled = [
-    module.fuse-device-plugin,
+    # module.fuse-device-plugin,
     module.nvidia-driver,
     module.kea,
     module.matchbox,
