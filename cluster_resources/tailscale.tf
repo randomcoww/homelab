@@ -7,11 +7,17 @@ resource "tailscale_acl" "cluster" {
     },
     acls = [
       {
-        action = "accept",
-        users  = ["*"],
-        ports  = ["*:*"],
+        action = "accept"
+        users  = ["*"]
+        ports  = ["*:*"]
       },
     ],
+    nodeAttrs = [
+      {
+        attr   = ["mullvad"]
+        target = ["autogroup:member"]
+      },
+    ]
   })
 }
 
