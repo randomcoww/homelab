@@ -18,7 +18,7 @@ variable "affinity" {
 variable "images" {
   type = object({
     audioserve = string
-    mountpoint = string
+    s3fs       = string
   })
 }
 

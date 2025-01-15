@@ -78,7 +78,6 @@ module "alpaca-db" {
   s3_secret_access_key = minio_iam_user.alpaca-db.secret
   s3_mount_extra_args = [
     "compat_dir",
-    "no_check_certificate",
     "use_path_request_style",
     "allow_other",
   ]
