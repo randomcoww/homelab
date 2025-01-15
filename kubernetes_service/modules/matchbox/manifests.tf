@@ -1,7 +1,7 @@
 locals {
   name      = split(".", var.cluster_service_endpoint)[0]
   namespace = split(".", var.cluster_service_endpoint)[1]
-  data_path = "/var/lib/matchbox/mnt"
+  data_path = "/var/lib/matchbox"
 }
 
 module "metadata" {
@@ -92,22 +92,11 @@ module "syncthing" {
       {
         name  = local.name
         image = var.images.matchbox
-        command = [
-          "sh",
-          "-c",
-          <<-EOF
-          set -e
-
-          until mountpoint ${local.data_path}; do
-          sleep 1
-          done
-
-          exec /matchbox \
-            -address=0.0.0.0:${var.ports.matchbox} \
-            -rpc-address=0.0.0.0:${var.ports.matchbox_api} \
-            -assets-path=${local.data_path} \
-            -data-path=${local.data_path}
-          EOF
+        args = [
+          "-address=0.0.0.0:${var.ports.matchbox}",
+          "-rpc-address=0.0.0.0:${var.ports.matchbox_api}",
+          "-assets-path=${local.data_path}",
+          "-data-path=${local.data_path}",
         ]
         volumeMounts = [
           {
