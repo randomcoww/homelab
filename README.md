@@ -180,20 +180,14 @@ tw terraform -chdir=bootstrap_server destroy \
 
 ### Deploy services to Kubernetes
 
-Check that `kubernetes` service is up
-
-```bash
-kubectl get svc
-```
-
-Deploy lower level services and MinIO
+Deploy critical bootstrap and services
 
 ```bash
 tw terraform -chdir=kubernetes_bootstrap init
 tw terraform -chdir=kubernetes_bootstrap apply
 ```
 
-Deploy services including services dependant on MinIO users and policies
+Deploy higher level services
 
 ```bash
 tw terraform -chdir=kubernetes_service init
@@ -206,19 +200,13 @@ tw terraform -chdir=kubernetes_service apply -var-file=secrets.tfvars
 
 Push images generated previously from [fedora-coreos-config-custom](https://github.com/randomcoww/fedora-coreos-config-custom) into MinIO
 
-Run from build path
+Run upload from build path
 
 ```bash
 mc cp -r builds/latest/x86_64/fedora-*-live* m/data-boot/
 ```
 
 Update image tags under `pxeboot_images` in [environment config](https://github.com/randomcoww/homelab/blob/master/config_env.tf) to match image file names
-
-Check that matchbox pods are running
-
-```bash
-kubectl get po -l app=matchbox
-```
 
 Push PXE boot and ignition configuration to cluster bootstrap service
 
@@ -235,7 +223,7 @@ Each node will now be able to PXE boot from the cluster as long as only one node
 
 Go to `https://ldap.fuzzybunny.win`
 
-Get admin password
+Get admin password by running
 
 ```bash
 tw terraform -chdir=cluster_resources output -json lldap
