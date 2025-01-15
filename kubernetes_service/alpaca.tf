@@ -24,7 +24,7 @@ resource "tls_self_signed_cert" "alpaca-db-ca" {
 
 resource "minio_s3_bucket" "alpaca-db" {
   bucket        = "alpaca-db"
-  force_destroy = false
+  force_destroy = true
 }
 
 resource "minio_iam_user" "alpaca-db" {
@@ -61,8 +61,7 @@ module "alpaca-db" {
   replicas                 = 3
   images = {
     clickhouse = local.container_images.clickhouse
-    jfs        = local.container_images.jfs
-    litestream = local.container_images.litestream
+    s3fs       = local.container_images.s3fs
   }
   ca = {
     algorithm       = tls_private_key.alpaca-db-ca.algorithm
@@ -73,11 +72,14 @@ module "alpaca-db" {
   service_ip              = local.services.alpaca_db.ip
   loadbalancer_class_name = "kube-vip.io/kube-vip-class"
 
-  minio_endpoint          = "http://${local.kubernetes_services.minio.fqdn}:${local.service_ports.minio}"
-  minio_bucket            = minio_s3_bucket.alpaca-db.id
-  minio_access_key_id     = minio_iam_user.alpaca-db.id
-  minio_secret_access_key = minio_iam_user.alpaca-db.secret
-  minio_clickhouse_prefix = "clickhouse"
-  minio_jfs_prefix        = "$(POD_NAME)"
-  minio_litestream_prefix = "$POD_NAME/litestream"
+  s3_endpoint          = "http://${local.services.cluster_minio.ip}:${local.service_ports.minio}"
+  s3_bucket            = minio_s3_bucket.alpaca-db.id
+  s3_access_key_id     = minio_iam_user.alpaca-db.id
+  s3_secret_access_key = minio_iam_user.alpaca-db.secret
+  s3_mount_extra_args = [
+    "compat_dir",
+    "no_check_certificate",
+    "use_path_request_style",
+    "allow_other",
+  ]
 }

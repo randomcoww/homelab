@@ -18,8 +18,7 @@ variable "affinity" {
 variable "images" {
   type = object({
     clickhouse = string
-    jfs        = string
-    litestream = string
+    s3fs       = string
   })
 }
 
@@ -73,30 +72,23 @@ variable "loadbalancer_class_name" {
   type = string
 }
 
-variable "minio_endpoint" {
+variable "s3_endpoint" {
   type = string
 }
 
-variable "minio_bucket" {
+variable "s3_bucket" {
   type = string
 }
 
-variable "minio_access_key_id" {
+variable "s3_access_key_id" {
   type = string
 }
 
-variable "minio_secret_access_key" {
+variable "s3_secret_access_key" {
   type = string
 }
 
-variable "minio_clickhouse_prefix" {
-  type = string
-}
-
-variable "minio_jfs_prefix" {
-  type = string
-}
-
-variable "minio_litestream_prefix" {
-  type = string
+variable "s3_mount_extra_args" {
+  type    = list(string)
+  default = []
 }

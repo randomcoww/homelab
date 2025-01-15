@@ -3,6 +3,7 @@ locals {
   namespace             = split(".", var.cluster_service_endpoint)[1]
   peer_name             = "${local.name}-peer"
   peer_service_endpoint = "${local.peer_name}.${join(".", slice(split(".", var.cluster_service_endpoint), 1, length(split(".", var.cluster_service_endpoint))))}"
+  s3_clickhouse_prefix  = "clickhouse"
 
   members = [
     for i in range(var.replicas) :
@@ -11,7 +12,6 @@ locals {
   user  = "clickhouse"
   group = "clickhouse"
 
-  mount_path   = "/var/tmp/clickhouse/mnt"
   base_path    = "/etc/clickhouse-server"
   config_path  = "${local.base_path}/config.d/server.yaml"
   cert_path    = "${local.base_path}/server.crt"
@@ -64,32 +64,32 @@ locals {
           type                 = "object_storage"
           object_storage_type  = "s3"
           metadata_type        = "plain_rewritable"
-          endpoint             = "${var.minio_endpoint}/${var.minio_bucket}/${var.minio_clickhouse_prefix}/s3/"
-          access_key_id        = var.minio_access_key_id
-          secret_access_key    = var.minio_secret_access_key
+          endpoint             = "${var.s3_endpoint}/${var.s3_bucket}/${local.s3_clickhouse_prefix}/s3/"
+          access_key_id        = var.s3_access_key_id
+          secret_access_key    = var.s3_secret_access_key
           region               = ""
           support_batch_delete = true
         }
         # needs old formatting for keeper storage configs
         log_s3_plain = {
           type              = "s3_plain"
-          endpoint          = "${var.minio_endpoint}/${var.minio_bucket}/${var.minio_clickhouse_prefix}/log/"
-          access_key_id     = var.minio_access_key_id
-          secret_access_key = var.minio_secret_access_key
+          endpoint          = "${var.s3_endpoint}/${var.s3_bucket}/${local.s3_clickhouse_prefix}/log/"
+          access_key_id     = var.s3_access_key_id
+          secret_access_key = var.s3_secret_access_key
           region            = ""
         }
         snapshot_s3_plain = {
           type              = "s3_plain"
-          endpoint          = "${var.minio_endpoint}/${var.minio_bucket}/${var.minio_clickhouse_prefix}/snapshot/"
-          access_key_id     = var.minio_access_key_id
-          secret_access_key = var.minio_secret_access_key
+          endpoint          = "${var.s3_endpoint}/${var.s3_bucket}/${local.s3_clickhouse_prefix}/snapshot/"
+          access_key_id     = var.s3_access_key_id
+          secret_access_key = var.s3_secret_access_key
           region            = ""
         }
         state_s3_plain = {
           type              = "s3_plain"
-          endpoint          = "${var.minio_endpoint}/${var.minio_bucket}/${var.minio_clickhouse_prefix}/state/"
-          access_key_id     = var.minio_access_key_id
-          secret_access_key = var.minio_secret_access_key
+          endpoint          = "${var.s3_endpoint}/${var.s3_bucket}/${local.s3_clickhouse_prefix}/state/"
+          access_key_id     = var.s3_access_key_id
+          secret_access_key = var.s3_secret_access_key
           region            = ""
         }
       }
@@ -215,7 +215,7 @@ module "metadata" {
   namespace   = local.namespace
   release     = var.release
   app_version = split(":", var.images.clickhouse)[1]
-  manifests = merge(module.jfs.chart.manifests, {
+  manifests = merge(module.s3fs.chart.manifests, {
     "templates/service.yaml"      = module.service.manifest
     "templates/service-peer.yaml" = module.service-peer.manifest
     "templates/secret.yaml"       = module.secret.manifest
@@ -328,20 +328,19 @@ module "service-peer" {
   }
 }
 
-module "jfs" {
-  source = "../statefulset_jfs"
-  ## jfs settings
+module "s3fs" {
+  source = "../statefulset_s3fs"
+  ## s3 config
+  s3_endpoint          = var.s3_endpoint
+  s3_bucket            = var.s3_bucket
+  s3_prefix            = "$(POD_NAME)"
+  s3_access_key_id     = var.s3_access_key_id
+  s3_secret_access_key = var.s3_secret_access_key
+  s3_mount_path        = local.clickhouse_config.path
+  s3_mount_extra_args  = var.s3_mount_extra_args
   images = {
-    litestream = var.images.litestream
-    jfs        = var.images.jfs
+    s3fs = var.images.s3fs
   }
-  jfs_mount_path          = local.mount_path
-  minio_endpoint          = var.minio_endpoint
-  minio_bucket            = var.minio_bucket
-  minio_jfs_prefix        = var.minio_jfs_prefix
-  minio_litestream_prefix = var.minio_litestream_prefix
-  minio_access_key_id     = var.minio_access_key_id
-  minio_secret_access_key = var.minio_secret_access_key
   ##
   name     = local.name
   app      = local.name
@@ -368,25 +367,9 @@ module "jfs" {
           <<-EOF
           set -e
 
-          until mountpoint ${local.mount_path}; do
+          until mountpoint ${local.clickhouse_config.path}; do
           sleep 1
           done
-
-          mkdir -p \
-            ${local.mount_path}/metadata \
-            ${local.mount_path}/store \
-            ${local.mount_path}/access \
-            ${local.clickhouse_config.path}
-          ln -sf \
-            ${local.mount_path}/metadata \
-            ${local.mount_path}/store \
-            ${local.mount_path}/access \
-            ${local.clickhouse_config.path}
-          chown ${local.user}:${local.group} \
-            ${local.mount_path}/metadata \
-            ${local.mount_path}/store \
-            ${local.mount_path}/access \
-            ${local.clickhouse_config.path}
 
           exec clickhouse su ${local.user}:${local.group} \
             clickhouse-server \

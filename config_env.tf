@@ -130,6 +130,7 @@ locals {
     kube_vip           = "ghcr.io/kube-vip/kube-vip:v0.8.7"
     sunshine_desktop   = "ghcr.io/randomcoww/sunshine-desktop:2025.105.194345-3"
     nvidia_driver      = "ghcr.io/randomcoww/nvidia-driver:565.77-fedora41"
+    s3fs               = "ghcr.io/randomcoww/s3fs:20250115.1"
   }
 
   pxeboot_images = {

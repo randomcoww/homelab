@@ -57,7 +57,7 @@ module "ingress" {
 }
 
 module "s3-mount" {
-  source = "../statefulset_s3"
+  source = "../statefulset_mountpoint"
   ## s3 config
   s3_endpoint          = var.s3_endpoint
   s3_bucket            = var.s3_bucket
