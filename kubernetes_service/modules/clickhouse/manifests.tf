@@ -231,7 +231,7 @@ module "secret" {
   release = var.release
   data = merge({
     basename(local.ca_cert_path) = chomp(var.ca.cert_pem)
-    users                        = yamlencode(var.extra_users_config)
+    basename(local.users_path)   = yamlencode(var.extra_users_config)
     }, {
     for i, member in local.members :
     "cert-${member}" => chomp(tls_locally_signed_cert.clickhouse[member].cert_pem)
@@ -408,7 +408,7 @@ module "s3fs" {
           {
             name        = "secret"
             mountPath   = local.users_path
-            subPathExpr = "users"
+            subPathExpr = basename(local.users_path)
           },
           {
             name        = "secret"
