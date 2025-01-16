@@ -12,6 +12,7 @@ locals {
   user  = "clickhouse"
   group = "clickhouse"
 
+  cache_path   = "/var/tmp/clickhouse"
   base_path    = "/etc/clickhouse-server"
   config_path  = "${local.base_path}/config.d/server.yaml"
   users_path   = "${local.base_path}/users.d/users.yaml"
@@ -372,6 +373,16 @@ module "s3fs" {
           until mountpoint ${local.clickhouse_config.path}; do
           sleep 1
           done
+
+          mkdir -p \
+            ${local.cache_path}/coordination \
+            ${local.cache_path}/preprocessed_configs \
+            ${local.cache_path}/tmp
+          chown -R ${local.user}:${local.group} \
+            ${local.cache_path}
+          ln -sf \
+            ${local.cache_path}/* \
+            ${local.clickhouse_config.path}
 
           exec clickhouse su ${local.user}:${local.group} \
             clickhouse-server \
