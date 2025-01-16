@@ -407,11 +407,6 @@ module "s3fs" {
           },
           {
             name        = "secret"
-            mountPath   = local.users_path
-            subPathExpr = basename(local.users_path)
-          },
-          {
-            name        = "secret"
             mountPath   = local.cert_path
             subPathExpr = "cert-$(POD_NAME)"
           },
@@ -419,6 +414,11 @@ module "s3fs" {
             name        = "secret"
             mountPath   = local.key_path
             subPathExpr = "key-$(POD_NAME)"
+          },
+          {
+            name      = "secret"
+            mountPath = local.users_path
+            subPath   = basename(local.users_path)
           },
           {
             name      = "secret"
