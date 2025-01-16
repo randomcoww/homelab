@@ -35,7 +35,8 @@ variable "service_hostname" {
 }
 
 variable "service_ip" {
-  type = string
+  type    = string
+  default = ""
 }
 
 variable "resources" {
@@ -49,6 +50,11 @@ variable "extra_clickhouse_config" {
 }
 
 variable "extra_keeper_config" {
+  type    = any
+  default = {}
+}
+
+variable "extra_users_config" {
   type    = any
   default = {}
 }

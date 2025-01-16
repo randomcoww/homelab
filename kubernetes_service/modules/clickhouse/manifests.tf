@@ -14,6 +14,7 @@ locals {
 
   base_path    = "/etc/clickhouse-server"
   config_path  = "${local.base_path}/config.d/server.yaml"
+  users_path   = "${local.base_path}/users.d/users.yaml"
   cert_path    = "${local.base_path}/server.crt"
   key_path     = "${local.base_path}/server.key"
   ca_cert_path = "${local.base_path}/ca.crt"
@@ -229,6 +230,7 @@ module "secret" {
   release = var.release
   data = merge({
     basename(local.ca_cert_path) = chomp(var.ca.cert_pem)
+    users                        = yamlencode(var.extra_users_config)
     }, {
     for i, member in local.members :
     "cert-${member}" => chomp(tls_locally_signed_cert.clickhouse[member].cert_pem)
@@ -391,6 +393,11 @@ module "s3fs" {
             name        = "secret"
             mountPath   = local.config_path
             subPathExpr = "config-$(POD_NAME)"
+          },
+          {
+            name        = "secret"
+            mountPath   = local.users_path
+            subPathExpr = "users"
           },
           {
             name        = "secret"

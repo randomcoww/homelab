@@ -21,10 +21,10 @@ resource "tls_cert_request" "clickhouse" {
     var.service_hostname,
     "${each.key}.${local.peer_service_endpoint}",
   ])
-  ip_addresses = [
+  ip_addresses = compact([
     "127.0.0.1",
     var.service_ip,
-  ]
+  ])
 }
 
 resource "tls_locally_signed_cert" "clickhouse" {
