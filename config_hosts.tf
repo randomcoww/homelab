@@ -79,7 +79,6 @@ locals {
         image     = local.pxeboot_image_set.coreos
         boot_args = [
           "numa=off",
-          "systemd.unit=multi-user.target",
           "selinux=0",
           "mitigations=off",
         ]
@@ -167,7 +166,6 @@ locals {
         image     = local.pxeboot_image_set.coreos
         boot_args = [
           "numa=off",
-          "systemd.unit=multi-user.target",
           "selinux=0",
           "mitigations=off",
         ]
@@ -238,7 +236,6 @@ locals {
         image     = local.pxeboot_image_set.coreos
         boot_args = [
           "numa=off",
-          "systemd.unit=multi-user.target",
           "selinux=0",
           "mitigations=off",
         ]
@@ -330,7 +327,6 @@ locals {
         image     = local.pxeboot_image_set.coreos
         boot_args = [
           "numa=off",
-          "systemd.unit=multi-user.target",
           "selinux=0",
           ## stub all Nvidia GPUs
           # "vfio-pci.id=10de:ffffffff:ffffffff:ffffffff:00030000:ffff00ff,10de:ffffffff:ffffffff:ffffffff:00040300:ffffffff",

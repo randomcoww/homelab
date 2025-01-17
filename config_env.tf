@@ -135,7 +135,7 @@ locals {
   }
 
   pxeboot_images = {
-    coreos = "fedora-coreos-41.20250109.0"
+    coreos = "fedora-coreos-41.20250117.0"
   }
 
   kubernetes = {
