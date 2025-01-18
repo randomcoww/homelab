@@ -251,22 +251,6 @@ module "sunshine-desktop" {
       value = "all"
     },
     {
-      name  = "SIZE_W"
-      value = "2752"
-    },
-    {
-      name  = "SIZE_H"
-      value = "2064"
-    },
-    {
-      name  = "REFRESH_RATE"
-      value = "120"
-    },
-    {
-      name  = "COLOR_DEPTH"
-      value = "24"
-    },
-    {
       name  = "TZ"
       value = local.timezone
     },
