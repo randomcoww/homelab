@@ -56,9 +56,10 @@ module "matchbox" {
     matchbox     = local.service_ports.matchbox
     matchbox_api = local.service_ports.matchbox_api
   }
-  service_ip     = local.services.matchbox.ip
-  api_service_ip = local.services.matchbox_api.ip
-  ca             = data.terraform_remote_state.sr.outputs.matchbox.ca
+  service_ip              = local.services.matchbox.ip
+  api_service_ip          = local.services.matchbox_api.ip
+  loadbalancer_class_name = "kube-vip.io/kube-vip-class"
+  ca                      = data.terraform_remote_state.sr.outputs.matchbox.ca
 }
 
 # Wifi AP

@@ -38,6 +38,10 @@ variable "service_ip" {
   type = string
 }
 
+variable "loadbalancer_class_name" {
+  type = string
+}
+
 variable "ca" {
   type = object({
     algorithm       = string

@@ -115,8 +115,9 @@ module "kube-dns" {
     etcd         = local.container_images.etcd
     external_dns = local.container_images.external_dns
   }
-  service_cluster_ip = local.services.cluster_dns.ip
-  service_ip         = local.services.external_dns.ip
+  service_cluster_ip      = local.services.cluster_dns.ip
+  service_ip              = local.services.external_dns.ip
+  loadbalancer_class_name = "kube-vip.io/kube-vip-class"
   servers = [
     {
       zones = [

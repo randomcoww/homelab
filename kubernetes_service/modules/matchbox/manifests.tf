@@ -37,7 +37,7 @@ module "service" {
   spec = {
     type              = "LoadBalancer"
     loadBalancerIP    = var.service_ip
-    loadBalancerClass = "kube-vip.io/kube-vip-class"
+    loadBalancerClass = var.loadbalancer_class_name
     ports = [
       {
         name       = "matchbox"
@@ -57,7 +57,7 @@ module "service-api" {
   spec = {
     type              = "LoadBalancer"
     loadBalancerIP    = var.api_service_ip
-    loadBalancerClass = "kube-vip.io/kube-vip-class"
+    loadBalancerClass = var.loadbalancer_class_name
     ports = [
       {
         name       = "matchbox-api"

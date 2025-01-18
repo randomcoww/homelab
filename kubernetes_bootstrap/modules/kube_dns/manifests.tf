@@ -15,7 +15,7 @@ data "helm_template" "coredns" {
       service = {
         clusterIP         = var.service_cluster_ip
         loadBalancerIP    = var.service_ip
-        loadBalancerClass = "kube-vip.io/kube-vip-class"
+        loadBalancerClass = var.loadbalancer_class_name
       }
       affinity = {
         podAntiAffinity = {

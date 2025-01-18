@@ -35,3 +35,7 @@ variable "servers" {
   type    = any
   default = []
 }
+
+variable "loadbalancer_class_name" {
+  type = string
+}
