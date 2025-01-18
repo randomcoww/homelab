@@ -252,11 +252,11 @@ module "sunshine-desktop" {
     },
     {
       name  = "SIZE_W"
-      value = "2560"
+      value = "2752"
     },
     {
       name  = "SIZE_H"
-      value = "1600"
+      value = "2064"
     },
     {
       name  = "REFRESH_RATE"
