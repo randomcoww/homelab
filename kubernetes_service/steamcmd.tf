@@ -56,10 +56,10 @@ module "satisfactory-server" {
 
     mkdir -p \
       $PERSISTENT_PATH/save \
-      $(dirname $HOME/$SAVE_PATH)
+      $(dirname $SAVE_PATH)
     ln -sf \
       $PERSISTENT_PATH/save \
-      $HOME/$SAVE_PATH
+      $SAVE_PATH
 
     exec $PERSISTENT_PATH/FactoryServer.sh \
       -Port="$PORT" \
@@ -85,7 +85,7 @@ module "satisfactory-server" {
   extra_envs = [
     {
       name  = "SAVE_PATH"
-      value = ".config/Epic/FactoryGame/Saved/SaveGames"
+      value = "$(HOME)/.config/Epic/FactoryGame/Saved/SaveGames"
     },
     {
       name  = "PORT"
