@@ -70,6 +70,14 @@ variable "service_ip" {
   type = string
 }
 
+variable "steamapp_id" {
+  type = number
+}
+
+variable "storage_class_name" {
+  type = string
+}
+
 variable "loadbalancer_class_name" {
   type = string
 }

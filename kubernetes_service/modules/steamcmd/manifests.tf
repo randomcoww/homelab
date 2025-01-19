@@ -1,5 +1,6 @@
 locals {
   home_path       = "/home/steam"
+  steamapp_path   = "/var/tmp/steamcmd"
   persistent_path = "/var/lib/steamcmd/mnt"
   uid             = 1000
   gid             = 1000
@@ -82,7 +83,67 @@ module "s3fs" {
   release  = var.release
   affinity = var.affinity
   replicas = 1
+  spec = {
+    volumeClaimTemplates = [
+      {
+        metadata = {
+          name = "steamapp"
+        }
+        spec = {
+          accessModes = [
+            "ReadWriteOnce",
+          ]
+          storageClassName = var.storage_class_name
+          resources = {
+            requests = {
+              storage = "20Gi"
+            }
+          }
+        }
+      },
+    ]
+  }
   template_spec = {
+    initContainers = [
+      {
+        name  = "${var.name}-steamcmd"
+        image = var.images.steamcmd
+        command = [
+          "bash",
+          "-c",
+          <<-EOF
+          set -xe
+
+          exec steamcmd \
+            +force_install_dir $STEAMAPP_PATH \
+            +login anonymous \
+            +app_update "${var.steamapp_id}" \
+            -beta "public" validate +quit
+          EOF
+        ]
+        env = [
+          {
+            name  = "HOME"
+            value = local.home_path
+          },
+          {
+            name  = "STEAMAPP_PATH"
+            value = local.steamapp_path
+          },
+        ]
+        volumeMounts = [
+          {
+            name      = "steamapp"
+            mountPath = local.steamapp_path
+          },
+        ]
+        securityContext = {
+          runAsUser  = local.uid
+          runAsGroup = local.gid
+          fsGroup    = local.gid
+        }
+      },
+    ]
     containers = [
       {
         name    = var.name
@@ -100,6 +161,10 @@ module "s3fs" {
           {
             name  = "HOME"
             value = local.home_path
+          },
+          {
+            name  = "STEAMAPP_PATH"
+            value = local.steamapp_path
           },
           {
             name  = "PERSISTENT_PATH"
@@ -127,6 +192,11 @@ module "s3fs" {
           }
         ])
         volumeMounts = concat([
+          {
+            name      = "steamapp"
+            mountPath = local.steamapp_path
+          },
+          ], [
           for i, config in var.extra_configs :
           {
             name      = "config"

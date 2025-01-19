@@ -48,20 +48,10 @@ module "satisfactory-server" {
     sleep 1
     done
 
-    steamcmd \
-      +force_install_dir $PERSISTENT_PATH \
-      +login anonymous \
-      +app_update "1690800" \
-      -beta "public" validate +quit
+    mkdir -p $PERSISTENT_PATH/save $(dirname $SAVE_PATH)
+    ln -sf $PERSISTENT_PATH/save $SAVE_PATH
 
-    mkdir -p \
-      $PERSISTENT_PATH/save \
-      $(dirname $SAVE_PATH)
-    ln -sf \
-      $PERSISTENT_PATH/save \
-      $SAVE_PATH
-
-    exec $PERSISTENT_PATH/FactoryServer.sh \
+    exec $STEAMAPP_PATH/FactoryServer.sh \
       -Port="$PORT" \
       -ini:Engine:[/Script/FactoryGame.FGSaveSession]:mNumRotatingAutosaves=5 \
       -ini:Engine:[/Script/Engine.GarbageCollectionSettings]:gc.MaxObjectsInEditor=2162688 \
@@ -76,6 +66,8 @@ module "satisfactory-server" {
       -ini:GameUserSettings:[/Script/Engine.GameSession]:MaxPlayers=3
     EOF
   ]
+  steamapp_id        = 1690800
+  storage_class_name = "local-path"
   tcp_ports = {
     api = 7777
   }
@@ -112,7 +104,9 @@ module "satisfactory-server" {
         EOF
       ]
     }
-    initialDelaySeconds = 300
+    timeoutSeconds      = 10
+    periodSeconds       = 30
+    initialDelaySeconds = 180
   }
   service_hostname        = local.kubernetes_ingress_endpoints.satisfactory_server
   service_ip              = local.services.satisfactory_server.ip
