@@ -47,7 +47,7 @@ module "secret" {
   app     = var.name
   release = var.release
   data = merge({
-    for i, config in var.sunshine_extra_configs :
+    for i, config in var.extra_configs :
     "${i}-${basename(config.path)}" => config.content
     }, {
     USERNAME = random_password.username.result
@@ -168,14 +168,14 @@ module "statefulset" {
             value = "/run/user/${var.uid}"
           },
           ], [
-          for _, e in var.sunshine_extra_envs :
+          for _, e in var.extra_envs :
           {
             name  = e.name
             value = tostring(e.value)
           }
         ])
         volumeMounts = concat([
-          for i, config in var.sunshine_extra_configs :
+          for i, config in var.extra_configs :
           {
             name      = "config"
             mountPath = config.path
@@ -194,7 +194,7 @@ module "statefulset" {
             name      = "dev-shm"
             mountPath = "/dev/shm"
           },
-        ], var.sunshine_extra_volume_mounts)
+        ], var.extra_volume_mounts)
         ports = concat([
           for name, port in local.tcp_ports :
           {
@@ -218,8 +218,8 @@ module "statefulset" {
             port = local.base_port
           }
         }
-        securityContext = var.sunshine_security_context
-        resources       = var.sunshine_resources
+        securityContext = var.security_context
+        resources       = var.resources
       },
     ]
     volumes = concat([
@@ -249,6 +249,6 @@ module "statefulset" {
           type = "Directory"
         }
       },
-    ], var.sunshine_extra_volumes)
+    ], var.extra_volumes)
   }
 }

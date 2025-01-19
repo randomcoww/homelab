@@ -22,7 +22,7 @@ variable "affinity" {
   default = {}
 }
 
-variable "tailscale_extra_envs" {
+variable "extra_envs" {
   type = list(object({
     name  = string
     value = any

@@ -18,7 +18,7 @@ module "secret" {
   app     = var.name
   release = var.release
   data = {
-    for i, config in var.code_server_extra_configs :
+    for i, config in var.extra_configs :
     "${i}-${basename(config.path)}" => config.content
   }
 }
@@ -98,7 +98,7 @@ module "statefulset" {
           EOF
         ]
         env = concat([
-          for _, e in var.code_server_extra_envs :
+          for _, e in var.extra_envs :
           {
             name  = e.name
             value = tostring(e.value)
@@ -114,7 +114,7 @@ module "statefulset" {
           },
         ])
         volumeMounts = concat([
-          for i, config in var.code_server_extra_configs :
+          for i, config in var.extra_configs :
           {
             name      = "config"
             mountPath = config.path
@@ -125,7 +125,7 @@ module "statefulset" {
             name      = "home"
             mountPath = var.home_path
           },
-        ], var.code_server_extra_volume_mounts)
+        ], var.extra_volume_mounts)
         ports = [
           {
             containerPort = var.ports.code_server
@@ -147,8 +147,8 @@ module "statefulset" {
             path   = "/healthz"
           }
         }
-        securityContext = var.code_server_security_context
-        resources       = var.code_server_resources
+        securityContext = var.security_context
+        resources       = var.resources
       },
     ]
     volumes = concat([
@@ -165,7 +165,7 @@ module "statefulset" {
           type = "Directory"
         }
       },
-    ], var.code_server_extra_volumes)
+    ], var.extra_volumes)
     dnsConfig = {
       options = [
         {

@@ -155,7 +155,7 @@ module "sunshine-desktop" {
   user      = local.users.client.name
   uid       = local.users.client.uid
   home_path = "${local.mounts.home_path}/${local.users.client.name}"
-  sunshine_extra_configs = [
+  extra_configs = [
     {
       path    = "/etc/ssh/ssh_known_hosts"
       content = "@cert-authority * ${chomp(data.terraform_remote_state.sr.outputs.ssh.ca.public_key_openssh)}"
@@ -241,7 +241,7 @@ module "sunshine-desktop" {
       EOF
     },
   ]
-  sunshine_extra_envs = [
+  extra_envs = [
     {
       name  = "NVIDIA_VISIBLE_DEVICES"
       value = "all"
@@ -255,12 +255,15 @@ module "sunshine-desktop" {
       value = local.timezone
     },
   ]
-  sunshine_resources = {
+  resources = {
+    requests = {
+      memory = "12Gi"
+    }
     # limits = {
     #   "nvidia.com/gpu" = 1
     # }
   }
-  sunshine_security_context = {
+  security_context = {
     privileged = true
   }
   loadbalancer_class_name = "kube-vip.io/kube-vip-class"

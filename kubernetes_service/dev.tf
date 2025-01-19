@@ -11,7 +11,7 @@ module "code" {
   user      = local.users.client.name
   uid       = local.users.client.uid
   home_path = "${local.mounts.home_path}/${local.users.client.name}"
-  code_server_extra_configs = [
+  extra_configs = [
     {
       path    = "/etc/ssh/ssh_known_hosts"
       content = "@cert-authority * ${chomp(data.terraform_remote_state.sr.outputs.ssh.ca.public_key_openssh)}"
@@ -26,7 +26,7 @@ module "code" {
       EOF
     },
   ]
-  code_server_extra_envs = [
+  extra_envs = [
     {
       name  = "NVIDIA_VISIBLE_DEVICES"
       value = "all"
@@ -40,7 +40,7 @@ module "code" {
       value = local.timezone
     },
   ]
-  code_server_extra_volumes = [
+  extra_volumes = [
     {
       name = "run-podman"
       hostPath = {
@@ -56,7 +56,7 @@ module "code" {
       }
     },
   ]
-  code_server_extra_volume_mounts = [
+  extra_volume_mounts = [
     {
       name      = "run-podman"
       mountPath = "/run/podman"
@@ -66,12 +66,12 @@ module "code" {
       mountPath = "/run/user/${local.users.client.uid}"
     },
   ]
-  code_server_resources = {
+  resources = {
     limits = {
       "nvidia.com/gpu" = 1
     }
   }
-  code_server_security_context = {
+  security_context = {
     capabilities = {
       add = [
         "AUDIT_WRITE",

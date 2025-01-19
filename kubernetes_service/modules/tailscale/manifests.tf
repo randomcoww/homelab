@@ -108,7 +108,7 @@ module "statefulset" {
             }
           },
           ], [
-          for _, e in var.tailscale_extra_envs :
+          for _, e in var.extra_envs :
           {
             name  = e.name
             value = tostring(e.value)

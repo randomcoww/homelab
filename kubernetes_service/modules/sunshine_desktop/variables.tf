@@ -17,7 +17,7 @@ variable "images" {
   })
 }
 
-variable "sunshine_extra_envs" {
+variable "extra_envs" {
   type = list(object({
     name  = string
     value = any
@@ -25,7 +25,7 @@ variable "sunshine_extra_envs" {
   default = []
 }
 
-variable "sunshine_extra_configs" {
+variable "extra_configs" {
   type = list(object({
     path    = string
     content = string
@@ -33,12 +33,12 @@ variable "sunshine_extra_configs" {
   default = []
 }
 
-variable "sunshine_resources" {
+variable "resources" {
   type    = any
   default = {}
 }
 
-variable "sunshine_security_context" {
+variable "security_context" {
   type    = any
   default = {}
 }
@@ -80,12 +80,12 @@ variable "nginx_ingress_annotations" {
   type = map(string)
 }
 
-variable "sunshine_extra_volume_mounts" {
+variable "extra_volume_mounts" {
   type    = any
   default = []
 }
 
-variable "sunshine_extra_volumes" {
+variable "extra_volumes" {
   type    = any
   default = []
 }

@@ -35,7 +35,7 @@ variable "home_path" {
   type = string
 }
 
-variable "code_server_extra_configs" {
+variable "extra_configs" {
   type = list(object({
     path    = string
     content = string
@@ -43,7 +43,7 @@ variable "code_server_extra_configs" {
   default = []
 }
 
-variable "code_server_extra_envs" {
+variable "extra_envs" {
   type = list(object({
     name  = string
     value = any
@@ -51,12 +51,12 @@ variable "code_server_extra_envs" {
   default = []
 }
 
-variable "code_server_resources" {
+variable "resources" {
   type    = any
   default = {}
 }
 
-variable "code_server_security_context" {
+variable "security_context" {
   type    = any
   default = {}
 }
@@ -78,12 +78,12 @@ variable "nginx_ingress_annotations" {
   type = map(string)
 }
 
-variable "code_server_extra_volume_mounts" {
+variable "extra_volume_mounts" {
   type    = any
   default = []
 }
 
-variable "code_server_extra_volumes" {
+variable "extra_volumes" {
   type    = any
   default = []
 }
