@@ -19,6 +19,7 @@ locals {
     module.webdav-videos,
     module.audioserve,
     module.sunshine-desktop,
+    module.satisfactory-server,
   ]
 }
 

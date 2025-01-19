@@ -49,6 +49,7 @@ locals {
         minio                  = 34
         sunshine               = 36
         alpaca_db              = 38
+        satisfactory_server    = 40
       }
     }
     # Conntrack sync
@@ -127,6 +128,7 @@ locals {
     kube_vip           = "ghcr.io/kube-vip/kube-vip:v0.8.7"
     sunshine_desktop   = "ghcr.io/randomcoww/sunshine-desktop:2025.118.41713-5"
     nvidia_driver      = "ghcr.io/randomcoww/nvidia-driver:565.77-fedora41"
+    steamcmd           = "ghcr.io/randomcoww/steamcmd:20250118.4"
 
     # Unused
     cockroachdb        = "docker.io/cockroachdb/cockroach:v24.1.1"
@@ -170,18 +172,19 @@ locals {
 
   kubernetes_ingress_endpoints = {
     for k, domain in {
-      auth            = "auth"
-      vaultwarden     = "vw"
-      code            = "code"
-      alpaca_db       = "alpaca-db"
-      lldap_http      = "ldap"
-      qrcode          = "qrcode"
-      qrcode_wifi     = "wifi"
-      webdav_pictures = "pictures"
-      webdav_videos   = "videos"
-      sunshine        = "sunshine"
-      sunshine_admin  = "sunadmin"
-      audioserve      = "audioserve"
+      auth                = "auth"
+      vaultwarden         = "vw"
+      code                = "code"
+      alpaca_db           = "alpaca-db"
+      lldap_http          = "ldap"
+      qrcode              = "qrcode"
+      qrcode_wifi         = "wifi"
+      webdav_pictures     = "pictures"
+      webdav_videos       = "videos"
+      sunshine            = "sunshine"
+      sunshine_admin      = "sunadmin"
+      audioserve          = "audioserve"
+      satisfactory_server = "satisfactory"
     } :
     k => "${domain}.${local.domains.public}"
   }
