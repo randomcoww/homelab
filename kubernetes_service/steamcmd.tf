@@ -107,6 +107,7 @@ module "satisfactory-server" {
     timeoutSeconds      = 10
     periodSeconds       = 30
     initialDelaySeconds = 30
+    failureThreshold    = 4
   }
   service_hostname        = local.kubernetes_ingress_endpoints.satisfactory_server
   service_ip              = local.services.satisfactory_server.ip

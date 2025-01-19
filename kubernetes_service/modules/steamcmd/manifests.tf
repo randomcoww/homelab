@@ -204,9 +204,8 @@ module "s3fs" {
             subPath   = "${i}-${basename(config.path)}"
           }
         ], var.extra_volume_mounts)
-        readinessProbe = var.healthcheck
-        livenessProbe  = var.healthcheck
-        resources      = var.resources
+        livenessProbe = var.healthcheck
+        resources     = var.resources
         securityContext = merge({
           runAsUser  = local.uid
           runAsGroup = local.gid
