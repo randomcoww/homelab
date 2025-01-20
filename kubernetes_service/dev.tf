@@ -40,7 +40,6 @@ module "coreos-assembler" {
     <<-EOF
     set -xe
 
-    cd $HOME
     curl https://dl.min.io/client/mc/release/linux-amd64/mc \
       --create-dirs \
       -o $HOME/mc
@@ -52,7 +51,6 @@ module "coreos-assembler" {
 
     cosa init -V $VARIANT \
       --force https://github.com/randomcoww/fedora-coreos-config-custom.git
-
     cosa clean
     cosa fetch
     cosa build metal4k
