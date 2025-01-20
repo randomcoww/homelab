@@ -22,6 +22,10 @@ variable "images" {
   })
 }
 
+variable "command" {
+  type = list(string)
+}
+
 variable "extra_envs" {
   type = list(object({
     name  = string

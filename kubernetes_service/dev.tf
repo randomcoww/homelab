@@ -1,17 +1,86 @@
+# cosa
+
+resource "minio_iam_user" "cosa" {
+  name          = "cosa"
+  force_destroy = true
+}
+
+resource "minio_iam_policy" "cosa" {
+  name = "cosa"
+  policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [
+      {
+        Effect = "Allow"
+        Action = "*"
+        Resource = [
+          minio_s3_bucket.data["boot"].arn,
+          "${minio_s3_bucket.data["boot"].arn}/*",
+        ]
+      },
+    ]
+  })
+}
+
+resource "minio_iam_user_policy_attachment" "cosa" {
+  user_name   = minio_iam_user.cosa.id
+  policy_name = minio_iam_policy.cosa.id
+}
+
 module "coreos-assembler" {
   source  = "./modules/coreos_assembler"
-  name    = "cosa"
+  name    = "cosa-build"
   release = "0.1.1"
   images = {
     coreos_assembler = local.container_images.coreos_assembler
   }
+  command = [
+    "sh",
+    "-c",
+    <<-EOF
+    set -xe
+
+    cd $HOME
+    curl https://dl.min.io/client/mc/release/linux-amd64/mc \
+      --create-dirs \
+      -o $HOME/mc
+    chmod +x $HOME/mc
+
+    BUILD_PATH=$HOME/$VARIANT
+    mkdir -p $BUILD_PATH
+    cd $BUILD_PATH
+
+    cosa init -V $VARIANT \
+      --force https://github.com/randomcoww/fedora-coreos-config-custom.git
+
+    cosa clean
+    cosa fetch
+    cosa build metal4k
+    cosa buildextend-metal
+    cosa buildextend-live
+
+    $HOME/mc cp -r -q --no-color \
+      $BUILD_PATH/builds/latest/x86_64/fedora-*-live* \
+      boot/${minio_s3_bucket.data["boot"].id}/
+    EOF
+  ]
   extra_envs = [
     {
       name  = "COSA_SUPERMIN_MEMORY"
       value = 4096
     },
+    {
+      name  = "VARIANT"
+      value = "coreos"
+    },
+    {
+      name  = "MC_HOST_boot"
+      value = "http://${minio_iam_user.cosa.id}:${minio_iam_user.cosa.secret}@${local.kubernetes_services.minio.fqdn}:${local.service_ports.minio}"
+    },
   ]
 }
+
+# code-server
 
 module "code" {
   source  = "./modules/code_server"
