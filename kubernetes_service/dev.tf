@@ -1,3 +1,18 @@
+module "coreos-assembler" {
+  source  = "./modules/coreos_assembler"
+  name    = "cosa"
+  release = "0.1.1"
+  images = {
+    coreos_assembler = local.container_images.coreos_assembler
+  }
+  extra_envs = [
+    {
+      name  = "COSA_SUPERMIN_MEMORY"
+      value = 4096
+    },
+  ]
+}
+
 module "code" {
   source  = "./modules/code_server"
   name    = "code"

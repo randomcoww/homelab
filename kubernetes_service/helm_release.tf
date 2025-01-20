@@ -3,6 +3,7 @@
 locals {
   modules_enabled = [
     # module.fuse-device-plugin,
+    module.kvm-device-plugin,
     module.nvidia-driver,
     module.kea,
     module.matchbox,
@@ -20,6 +21,7 @@ locals {
     module.audioserve,
     module.sunshine-desktop,
     module.satisfactory-server,
+    module.coreos-assembler,
   ]
 }
 

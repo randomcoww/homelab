@@ -9,6 +9,17 @@ module "fuse-device-plugin" {
   kubelet_root_path = local.kubernetes.kubelet_root_path
 }
 
+module "kvm-device-plugin" {
+  source    = "./modules/kvm_device_plugin"
+  name      = "kvm-device-plugin"
+  namespace = "kube-system"
+  release   = "0.1.1"
+  images = {
+    kvm_device_plugin = local.container_images.kvm_device_plugin
+  }
+  kubelet_root_path = local.kubernetes.kubelet_root_path
+}
+
 module "nvidia-driver" {
   source    = "./modules/nvidia_driver"
   name      = "nvidia-driver"

@@ -129,6 +129,8 @@ locals {
     sunshine_desktop   = "ghcr.io/randomcoww/sunshine-desktop:2025.118.41713-5"
     nvidia_driver      = "ghcr.io/randomcoww/nvidia-driver:565.77-fedora41"
     steamcmd           = "ghcr.io/randomcoww/steamcmd:20250118.4"
+    kvm_device_plugin  = "ghcr.io/randomcoww/kvm-device-plugin:main"
+    coreos_assembler   = "quay.io/coreos-assembler/coreos-assembler:latest"
 
     # Unused
     cockroachdb        = "docker.io/cockroachdb/cockroach:v24.1.1"
