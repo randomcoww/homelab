@@ -6,3 +6,9 @@ variable "smtp" {
     password = string
   })
 }
+
+variable "github" {
+  type = object({
+    renovate_token = string
+  })
+}

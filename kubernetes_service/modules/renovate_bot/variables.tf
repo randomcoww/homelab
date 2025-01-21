@@ -11,24 +11,14 @@ variable "release" {
   type = string
 }
 
-variable "affinity" {
-  type    = any
-  default = {}
-}
-
 variable "images" {
   type = object({
-    coreos_assembler = string
+    renovate_bot = string
   })
 }
 
-variable "command" {
-  type = list(string)
-}
-
-variable "cron" {
-  type    = string
-  default = "@weekly"
+variable "renovate_config" {
+  type = any
 }
 
 variable "extra_envs" {
@@ -37,4 +27,14 @@ variable "extra_envs" {
     value = any
   }))
   default = []
+}
+
+variable "cron" {
+  type    = string
+  default = "@hourly"
+}
+
+variable "affinity" {
+  type    = any
+  default = {}
 }

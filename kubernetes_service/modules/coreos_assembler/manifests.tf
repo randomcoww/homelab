@@ -20,7 +20,7 @@ module "metadata" {
         }
       }
       spec = {
-        schedule          = "0 0 * * 0"
+        schedule          = var.cron
         suspend           = true
         concurrencyPolicy = "Forbid"
         jobTemplate = {

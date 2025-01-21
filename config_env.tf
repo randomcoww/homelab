@@ -97,9 +97,9 @@ locals {
 
   container_images = {
     # Igntion
-    kube_apiserver          = "ghcr.io/randomcoww/kubernetes:kube-master-${local.kubernetes.version}"
-    kube_controller_manager = "ghcr.io/randomcoww/kubernetes:kube-master-${local.kubernetes.version}"
-    kube_scheduler          = "ghcr.io/randomcoww/kubernetes:kube-master-${local.kubernetes.version}"
+    kube_apiserver          = "ghcr.io/randomcoww/kubernetes:kube-master-1.31.1"
+    kube_controller_manager = "ghcr.io/randomcoww/kubernetes:kube-master-1.31.1"
+    kube_scheduler          = "ghcr.io/randomcoww/kubernetes:kube-master-1.31.1"
     etcd_wrapper            = "ghcr.io/randomcoww/etcd-wrapper:20250107.7"
     etcd                    = "gcr.io/etcd-development/etcd:v3.5.15-amd64"
 
@@ -112,7 +112,7 @@ locals {
     flannel_cni_plugin = "docker.io/flannel/flannel-cni-plugin:v1.5.1-flannel3"
     kapprover          = "ghcr.io/randomcoww/kapprover:20240126"
     external_dns       = "registry.k8s.io/external-dns/external-dns:v0.14.2"
-    kube_proxy         = "ghcr.io/randomcoww/kubernetes:kube-proxy-${local.kubernetes.version}"
+    kube_proxy         = "ghcr.io/randomcoww/kubernetes:kube-proxy-1.31.1"
     litestream         = "docker.io/litestream/litestream:0.3"
     tailscale          = "ghcr.io/randomcoww/tailscale:1.78.1"
     code_server        = "ghcr.io/randomcoww/code-server:4.96.2-1"
@@ -131,6 +131,7 @@ locals {
     steamcmd           = "ghcr.io/randomcoww/steamcmd:20250118.4"
     kvm_device_plugin  = "ghcr.io/randomcoww/kvm-device-plugin:main"
     coreos_assembler   = "quay.io/coreos-assembler/coreos-assembler:latest"
+    renovate_bot       = "docker.io/renovate/renovate:39"
 
     # Unused
     cockroachdb        = "docker.io/cockroachdb/cockroach:v24.1.1"
@@ -143,7 +144,6 @@ locals {
   }
 
   kubernetes = {
-    version                   = "1.31.1"
     cluster_name              = "prod-10"
     kubelet_root_path         = "/var/lib/kubelet"
     static_pod_manifest_path  = "/var/lib/kubelet/manifests"

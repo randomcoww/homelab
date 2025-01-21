@@ -32,6 +32,7 @@ TS_OAUTH_CLIENT_ID=
 TS_OAUTH_CLIENT_SECRET=
 GMAIL_USER=
 GMAIL_PASSWORD=
+GITHUB_RENOVATE_TOKEN=
 ```
 
 Create `cluster_resources/secrets.tfvars` file
@@ -74,6 +75,10 @@ smtp = {
   port     = 587
   username = "$GMAIL_USER"
   password = "$GMAIL_PASSWORD"
+}
+
+github = {
+  renovate_token = "$GITHUB_RENOVATE_TOKEN"
 }
 EOF
 ```

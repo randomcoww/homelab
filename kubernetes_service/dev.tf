@@ -60,6 +60,10 @@ module "coreos-assembler" {
     $HOME/mc cp -r -q --no-color \
       $BUILD_PATH/builds/latest/x86_64/fedora-*-live* \
       boot/${minio_s3_bucket.data["boot"].id}/
+
+    $HOME/mc rm -r -q --no-color \
+      --force --older-than 21d \
+      boot/${minio_s3_bucket.data["boot"].id}/
     EOF
   ]
   extra_envs = [
@@ -76,6 +80,36 @@ module "coreos-assembler" {
       value = "http://${minio_iam_user.cosa.id}:${minio_iam_user.cosa.secret}@${local.kubernetes_services.minio.fqdn}:${local.service_ports.minio}"
     },
   ]
+}
+
+# renovate-bot
+
+module "renovate-bot" {
+  source  = "./modules/renovate_bot"
+  name    = "renovate-bot"
+  release = "0.1.1"
+  images = {
+    renovate_bot = local.container_images.renovate_bot
+  }
+  extra_envs = [
+    {
+      name  = "RENOVATE_PLATFORM"
+      value = "github"
+    },
+    {
+      name  = "RENOVATE_TOKEN"
+      value = var.github.renovate_token
+    },
+    {
+      name  = "RENOVATE_AUTODISCOVER"
+      value = false
+    },
+  ]
+  renovate_config = {
+    repositories = [
+      "randomcoww/homelab",
+    ]
+  }
 }
 
 # code-server
