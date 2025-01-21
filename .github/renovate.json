@@ -7,6 +7,7 @@
         "README.md"
       ],
       "matchStrings": [
+        "(?<depName>gcr.io\/.+\/.+?):(?<currentValue>[\\w.-]+)",
         "(?<depName>ghcr.io\/.+\/.+?):(?<currentValue>[\\w.-]+)",
         "(?<depName>docker.io\/.+\/.+?):(?<currentValue>[\\w.-]+)",
         "(?<depName>quay.io\/.+\/.+?):(?<currentValue>[\\w.-]+)",
