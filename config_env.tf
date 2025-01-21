@@ -136,7 +136,7 @@ locals {
     # Unused
     cockroachdb        = "docker.io/cockroachdb/cockroach:v24.1.1"
     fuse_device_plugin = "docker.io/soolaugust/fuse-device-plugin:v1.0"
-    vaultwarden        = "docker.io/vaultwarden/server:1.32.4-alpine"
+    vaultwarden        = "docker.io/vaultwarden/server:1.32.7-alpine"
   }
 
   pxeboot_images = {
