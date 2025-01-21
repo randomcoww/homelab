@@ -2,7 +2,7 @@ module "secret" {
   source  = "../../../modules/secret"
   name    = "${var.name}-custom"
   app     = var.name
-  release = var.source_release
+  release = var.release
   data = {
     basename(local.ldap_client_cert_path)  = tls_locally_signed_cert.lldap.cert_pem
     basename(local.ldap_client_key_path)   = tls_private_key.lldap.private_key_pem
@@ -15,7 +15,7 @@ module "secret-litestream" {
   source  = "../../../modules/secret"
   name    = "${var.name}-litestream"
   app     = var.name
-  release = var.source_release
+  release = var.release
   data = {
     basename(local.litestream_config_path) = yamlencode({
       dbs = [
@@ -45,7 +45,7 @@ data "helm_template" "authelia" {
   namespace  = var.namespace
   repository = "https://charts.authelia.com"
   chart      = "authelia"
-  version    = var.source_release
+  version    = "0.9.14"
   values = [
     yamlencode({
       service = {
@@ -164,12 +164,11 @@ data "helm_template" "authelia" {
 }
 
 module "metadata" {
-  source      = "../../../modules/metadata"
-  name        = var.name
-  namespace   = var.namespace
-  release     = var.source_release
-  app_version = var.source_release
-  manifests   = local.manifests
+  source    = "../../../modules/metadata"
+  name      = var.name
+  namespace = var.namespace
+  release   = var.release
+  manifests = local.manifests
 }
 
 locals {

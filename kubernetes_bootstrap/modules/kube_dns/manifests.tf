@@ -3,8 +3,8 @@ data "helm_template" "coredns" {
   namespace  = var.namespace
   repository = "https://coredns.github.io/helm"
   chart      = "coredns"
+  version    = "1.37.0"
   wait       = false
-  version    = var.source_release
   values = [
     yamlencode({
       replicaCount = var.replicas
@@ -63,12 +63,11 @@ data "helm_template" "coredns" {
 }
 
 module "metadata" {
-  source      = "../../../modules/metadata"
-  name        = var.name
-  namespace   = var.namespace
-  release     = var.source_release
-  app_version = var.source_release
-  manifests   = local.manifests
+  source    = "../../../modules/metadata"
+  name      = var.name
+  namespace = var.namespace
+  release   = var.release
+  manifests = local.manifests
 }
 
 locals {

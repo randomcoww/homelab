@@ -177,8 +177,7 @@ module "authelia" {
   source    = "./modules/authelia"
   name      = local.kubernetes_services.authelia.name
   namespace = local.kubernetes_services.authelia.namespace
-  # renovate: repo: https://charts.authelia.com chart: authelia
-  source_release = "0.9.14"
+  release   = "0.1.1"
   images = {
     litestream = local.container_images.litestream
   }
