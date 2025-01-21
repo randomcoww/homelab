@@ -2,12 +2,15 @@
   "customManagers": [
     {
       "customType": "regex",
-      "fileMatch": ["config_env.tf"],
+      "fileMatch": [
+        "config_env.tf",
+        "README.md"
+      ],
       "matchStrings": [
-        "(?<depName>ghcr.io\/.+\/.+?):(?<currentValue>[^\"]+)",
-        "(?<depName>docker.io\/.+\/.+?):(?<currentValue>[^\"]+)",
-        "(?<depName>quay.io\/.+\/.+?):(?<currentValue>[^\"]+)",
-        "(?<depName>registry.k8s.io\/.+\/.+?):(?<currentValue>[^\"]+)"
+        "(?<depName>ghcr.io\/.+\/.+?):(?<currentValue>[\\w.-]+)",
+        "(?<depName>docker.io\/.+\/.+?):(?<currentValue>[\\w.-]+)",
+        "(?<depName>quay.io\/.+\/.+?):(?<currentValue>[\\w.-]+)",
+        "(?<depName>registry.k8s.io\/.+\/.+?):(?<currentValue>[\\w.-]+)"
       ],
       "autoReplaceStringTemplate": "{{{depName}}}:{{{newValue}}}",
       "datasourceTemplate": "docker"
