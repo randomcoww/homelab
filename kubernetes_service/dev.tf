@@ -60,10 +60,6 @@ module "coreos-assembler" {
     $HOME/mc cp -r -q --no-color \
       $BUILD_PATH/builds/latest/x86_64/fedora-*-live* \
       boot/${minio_s3_bucket.data["boot"].id}/
-
-    $HOME/mc rm -r -q --no-color \
-      --force --older-than 21d \
-      boot/${minio_s3_bucket.data["boot"].id}/
     EOF
   ]
   extra_envs = [
