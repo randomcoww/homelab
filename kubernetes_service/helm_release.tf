@@ -272,7 +272,7 @@ resource "helm_release" "metrics-server" {
   repository  = "https://kubernetes-sigs.github.io/metrics-server"
   chart       = "metrics-server"
   wait        = false
-  version     = "3.12.1"
+  version     = "3.12.2"
   max_history = 2
   values = [
     yamlencode({
