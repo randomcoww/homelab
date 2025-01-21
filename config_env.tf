@@ -125,7 +125,7 @@ locals {
     s3fs               = "ghcr.io/randomcoww/s3fs:20250115.1"
     audioserve         = "docker.io/izderadicka/audioserve:latest"
     syncthing          = "docker.io/syncthing/syncthing:1.29"
-    kube_vip           = "ghcr.io/kube-vip/kube-vip:v0.8.7"
+    kube_vip           = "ghcr.io/kube-vip/kube-vip:v0.8.9"
     sunshine_desktop   = "ghcr.io/randomcoww/sunshine-desktop:2025.118.41713-5"
     nvidia_driver      = "ghcr.io/randomcoww/nvidia-driver:565.77-fedora41"
     steamcmd           = "ghcr.io/randomcoww/steamcmd:20250118.4"
