@@ -86,6 +86,9 @@ resource "helm_release" "ingress-nginx" {
         }
         allowSnippetAnnotations = true
         config = {
+          # 4.12.0 annotations issue:
+          # https://github.com/kubernetes/ingress-nginx/issues/12618
+          annotations-risk-level  = "Critical"
           ignore-invalid-headers  = "off"
           proxy-body-size         = 0
           proxy-buffering         = "off"
