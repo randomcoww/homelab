@@ -227,7 +227,7 @@ resource "helm_release" "minio" {
   create_namespace = true
   wait             = true
   timeout          = 600
-  version          = "5.3.0"
+  version          = "5.4.0"
   max_history      = 2
   values = [
     yamlencode({
