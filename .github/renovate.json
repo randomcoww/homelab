@@ -4,10 +4,10 @@
       "customType": "regex",
       "fileMatch": ["config_env.tf"],
       "matchStrings": [
-        "(?<depName>ghcr.io\/.*\/.*?):(?<currentValue>.*)",
-        "(?<depName>docker.io\/.*\/.*?):(?<currentValue>.*)",
-        "(?<depName>quay.io\/.*\/.*?):(?<currentValue>.*)",
-        "(?<depName>registry.k8s.io\/.*\/.*?):(?<currentValue>.*)"
+        "(?<depName>ghcr.io\/.*\/.*?):(?<currentValue>.*?)\"",
+        "(?<depName>docker.io\/.*\/.*?):(?<currentValue>.*?)\"",
+        "(?<depName>quay.io\/.*\/.*?):(?<currentValue>.*?)\"",
+        "(?<depName>registry.k8s.io\/.*\/.*?):(?<currentValue>.*?)\""
       ],
       "autoReplaceStringTemplate": "{{{depName}}}:{{{newValue}}}",
       "datasourceTemplate": "docker"
