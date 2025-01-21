@@ -109,7 +109,7 @@ locals {
     tftpd              = "ghcr.io/randomcoww/tftpd-ipxe:20240822.3"
     hostapd            = "ghcr.io/randomcoww/hostapd:2.11"
     flannel            = "docker.io/flannel/flannel:v0.26.3"
-    flannel_cni_plugin = "docker.io/flannel/flannel-cni-plugin:v1.5.1-flannel3"
+    flannel_cni_plugin = "docker.io/flannel/flannel-cni-plugin:v1.6.0-flannel1"
     kapprover          = "ghcr.io/randomcoww/kapprover:20240126"
     external_dns       = "registry.k8s.io/external-dns/external-dns:v0.15.1"
     kube_proxy         = "ghcr.io/randomcoww/kubernetes:kube-proxy-1.31.1"
