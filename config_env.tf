@@ -134,7 +134,7 @@ locals {
     renovate_bot       = "docker.io/renovate/renovate:39"
 
     # Unused
-    cockroachdb        = "docker.io/cockroachdb/cockroach:v24.1.1"
+    cockroachdb        = "docker.io/cockroachdb/cockroach:v24.3.3"
     fuse_device_plugin = "docker.io/soolaugust/fuse-device-plugin:v1.0"
     vaultwarden        = "docker.io/vaultwarden/server:1.32.7-alpine"
   }
