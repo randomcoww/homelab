@@ -21,7 +21,7 @@
         "\\.tf$"
       ],
       "matchStrings": [
-        "^\\s*helm_template\\s*=\\s*{\\n\\s*repository\\s*=\\s*\"(?<registryUrl>.+)\"\\n\\s*chart\\s*=\\s*\"(?<depName>[\\w-]+)\"\\n\\s*version\\s*=\\s*\"(?<currentValue>[\\d.]+)\""
+        "^\\s*helm_template\\s*=\\s*{[^}]+\\s+repository\\s*=\\s*\"(?<registryUrl>.+)\"\\s+chart\\s*=\\s*\"(?<depName>[\\w-]+)\"\\s+version\\s*=\\s*\"(?<currentValue>[\\d.]+)\""
       ],
       "datasourceTemplate": "helm"
     }
