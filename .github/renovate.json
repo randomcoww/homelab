@@ -3,7 +3,7 @@
     {
       "customType": "regex",
       "fileMatch": [
-        "\\.tf$",
+        "^config_env.tf$",
         "^README.md$"
       ],
       "matchStrings": [
