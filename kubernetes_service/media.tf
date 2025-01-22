@@ -40,7 +40,7 @@ module "audioserve" {
     "--read-playlist",
   ]
   service_hostname          = local.kubernetes_ingress_endpoints.audioserve
-  ingress_class_name        = local.ingress_classes.ingress_nginx_external
+  ingress_class_name        = local.ingress_classes.ingress_nginx
   nginx_ingress_annotations = local.nginx_ingress_auth_annotations
 
   s3_endpoint          = "http://${local.services.cluster_minio.ip}:${local.service_ports.minio}"
@@ -90,7 +90,7 @@ module "webdav-pictures" {
     rclone = local.container_images.rclone
   }
   service_hostname          = local.kubernetes_ingress_endpoints.webdav_pictures
-  ingress_class_name        = local.ingress_classes.ingress_nginx_external
+  ingress_class_name        = local.ingress_classes.ingress_nginx
   nginx_ingress_annotations = local.nginx_ingress_annotations
 
   minio_endpoint          = "http://${local.kubernetes_services.minio.fqdn}:${local.service_ports.minio}"
@@ -134,7 +134,7 @@ module "webdav-videos" {
     rclone = local.container_images.rclone
   }
   service_hostname          = local.kubernetes_ingress_endpoints.webdav_videos
-  ingress_class_name        = local.ingress_classes.ingress_nginx_external
+  ingress_class_name        = local.ingress_classes.ingress_nginx
   nginx_ingress_annotations = local.nginx_ingress_annotations
 
   minio_endpoint          = "http://${local.kubernetes_services.minio.fqdn}:${local.service_ports.minio}"
@@ -289,6 +289,6 @@ module "sunshine-desktop" {
   service_hostname          = local.kubernetes_ingress_endpoints.sunshine
   service_ip                = local.services.sunshine.ip
   admin_hostname            = local.kubernetes_ingress_endpoints.sunshine_admin
-  ingress_class_name        = local.ingress_classes.ingress_nginx_external
+  ingress_class_name        = local.ingress_classes.ingress_nginx
   nginx_ingress_annotations = local.nginx_ingress_auth_annotations
 }

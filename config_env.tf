@@ -91,8 +91,7 @@ locals {
   }
 
   fw_marks = {
-    accept    = "0x00002000"
-    wireguard = "0x00008000"
+    accept = "0x00002000"
   }
 
   container_images = {

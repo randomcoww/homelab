@@ -56,7 +56,7 @@ module "vaultwarden" {
     SMTP_SECURITY            = "starttls"
     SMTP_AUTH_MECHANISM      = "Plain"
   }
-  ingress_class_name        = local.ingress_classes.ingress_nginx_external
+  ingress_class_name        = local.ingress_classes.ingress_nginx
   nginx_ingress_annotations = local.nginx_ingress_auth_annotations
 
   minio_endpoint          = "http://${local.kubernetes_services.minio.endpoint}:${local.service_ports.minio}"
