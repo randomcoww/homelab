@@ -177,7 +177,6 @@ module "authelia" {
   source    = "./modules/authelia"
   name      = local.kubernetes_services.authelia.name
   namespace = local.kubernetes_services.authelia.namespace
-  # renovate_helm_template
   helm_template = {
     repository = "https://charts.authelia.com"
     chart      = "authelia"
