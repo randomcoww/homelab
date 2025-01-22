@@ -109,8 +109,12 @@ module "kube-dns" {
   source    = "./modules/kube_dns"
   name      = "kube-dns"
   namespace = "kube-system"
-  release   = "0.1.1"
-  replicas  = 3
+  helm_template = {
+    repository = "https://coredns.github.io/helm"
+    chart      = "coredns"
+    version    = "1.37.0"
+  }
+  replicas = 3
   images = {
     etcd         = local.container_images.etcd
     external_dns = local.container_images.external_dns

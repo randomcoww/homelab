@@ -177,7 +177,12 @@ module "authelia" {
   source    = "./modules/authelia"
   name      = local.kubernetes_services.authelia.name
   namespace = local.kubernetes_services.authelia.namespace
-  release   = "0.1.1"
+  # renovate_helm_template
+  helm_template = {
+    repository = "https://charts.authelia.com"
+    chart      = "authelia"
+    version    = "0.9.14"
+  }
   images = {
     litestream = local.container_images.litestream
   }

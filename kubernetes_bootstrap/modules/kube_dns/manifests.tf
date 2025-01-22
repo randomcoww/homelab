@@ -1,9 +1,9 @@
 data "helm_template" "coredns" {
   name       = var.name
   namespace  = var.namespace
-  repository = "https://coredns.github.io/helm"
-  chart      = "coredns"
-  version    = "1.37.0"
+  repository = var.helm_template.repository
+  chart      = var.helm_template.chart
+  version    = var.helm_template.version
   wait       = false
   values = [
     yamlencode({
@@ -66,7 +66,7 @@ module "metadata" {
   source    = "../../../modules/metadata"
   name      = var.name
   namespace = var.namespace
-  release   = var.release
+  release   = var.helm_template.version
   manifests = local.manifests
 }
 

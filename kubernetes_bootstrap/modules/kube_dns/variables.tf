@@ -7,8 +7,12 @@ variable "namespace" {
   default = "default"
 }
 
-variable "release" {
-  type = string
+variable "helm_template" {
+  type = object({
+    repository = string
+    chart      = string
+    version    = string
+  })
 }
 
 variable "replicas" {
