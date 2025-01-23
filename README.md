@@ -17,7 +17,7 @@ tw() {
     -e AWS_SECRET_ACCESS_KEY=$AWS_SECRET_ACCESS_KEY \
     -w $(pwd) \
     --net=host \
-    docker.io/hashicorp/terraform:1.10.4 "$@"
+    docker.io/hashicorp/terraform:1.10.5 "$@"
   rc=$?; set +x; return $rc
 }
 ```
