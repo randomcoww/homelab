@@ -342,6 +342,72 @@ resource "helm_release" "nvidia-device-plugin" {
   ]
 }
 
+# Github actions runner #
+
+resource "helm_release" "arc" {
+  name             = "arc"
+  repository       = "oci://ghcr.io/actions/actions-runner-controller-charts"
+  chart            = "gha-runner-scale-set-controller"
+  namespace        = "arc-systems"
+  create_namespace = true
+  wait             = false
+  version          = "0.10.1"
+  max_history      = 2
+  values = [
+    yamlencode({
+      serviceAccount = {
+        create = true
+        name   = "gha-runner-scale-set-controller"
+      }
+    }),
+  ]
+}
+
+resource "helm_release" "arc-runner-set" {
+  for_each = toset([
+    "container-builds",
+    "etcd-wrapper",
+    "repos",
+    "kapprover",
+  ])
+
+  name             = "arc-runner-${each.key}"
+  repository       = "oci://ghcr.io/actions/actions-runner-controller-charts"
+  chart            = "gha-runner-scale-set"
+  namespace        = "arc-runners"
+  create_namespace = true
+  wait             = false
+  version          = "0.10.1"
+  max_history      = 2
+  values = [
+    yamlencode({
+      githubConfigUrl = "https://github.com/randomcoww/${each.key}"
+      githubConfigSecret = {
+        github_token = var.github.arc_token
+      }
+      maxRunners = 1
+      containerMode = {
+        type = "kubernetes"
+        kubernetesModeWorkVolumeClaim = {
+          accessModes = [
+            "ReadWriteOnce",
+          ]
+          storageClassName = "local-path"
+          resources = {
+            requests = {
+              storage = "1Gi"
+            }
+          }
+        }
+      }
+      controllerServiceAccount = {
+        namespace = "arc-systems"
+        name      = "gha-runner-scale-set-controller"
+      }
+    }),
+  ]
+}
+
 # cloudflare tunnel #
 /*
 resource "helm_release" "cloudflare-tunnel" {
