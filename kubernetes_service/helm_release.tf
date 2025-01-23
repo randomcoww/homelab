@@ -385,7 +385,7 @@ resource "helm_release" "arc-runner-set" {
       githubConfigSecret = {
         github_token = var.github.arc_token
       }
-      maxRunners = 1
+      maxRunners = 2
       containerMode = {
         type = "kubernetes"
         kubernetesModeWorkVolumeClaim = {
