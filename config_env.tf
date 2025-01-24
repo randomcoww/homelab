@@ -105,7 +105,7 @@ locals {
     # Helm
     kea                = "ghcr.io/randomcoww/kea:v2.7.5"
     matchbox           = "quay.io/poseidon/matchbox:v0.11.0-amd64"
-    tftpd              = "ghcr.io/randomcoww/tftpd-ipxe:v20250124.1"
+    tftpd              = "ghcr.io/randomcoww/tftpd-ipxe:v20250124.2"
     hostapd            = "ghcr.io/randomcoww/hostapd-noscan:v2.11"
     flannel            = "docker.io/flannel/flannel:v0.26.3"
     flannel_cni_plugin = "docker.io/flannel/flannel-cni-plugin:v1.6.0-flannel1"
@@ -128,7 +128,7 @@ locals {
     sunshine_desktop   = "ghcr.io/randomcoww/sunshine-desktop:2025.118.41713-5"
     nvidia_driver      = "ghcr.io/randomcoww/nvidia-driver:565.77-fedora41"
     steamcmd           = "ghcr.io/randomcoww/steamcmd:20250118.4"
-    kvm_device_plugin  = "ghcr.io/randomcoww/kvm-device-plugin:main"
+    kvm_device_plugin  = "ghcr.io/randomcoww/kvm-device-plugin:v20250124.2"
     coreos_assembler   = "quay.io/coreos-assembler/coreos-assembler:latest"
     renovate_bot       = "docker.io/renovate/renovate:39"
 

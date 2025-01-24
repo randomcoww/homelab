@@ -370,6 +370,7 @@ resource "helm_release" "arc-runner-set" {
     "tftpd-ipxe",
     "hostapd-noscan",
     "kea",
+    "kvm-device-plugin",
   ])
 
   name             = "arc-runner-${each.key}"
