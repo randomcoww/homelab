@@ -106,7 +106,7 @@ locals {
     kea                = "ghcr.io/randomcoww/kea:2.7.5"
     matchbox           = "quay.io/poseidon/matchbox:v0.11.0-amd64"
     tftpd              = "ghcr.io/randomcoww/tftpd-ipxe:v20250124.1"
-    hostapd            = "ghcr.io/randomcoww/hostapd:2.11"
+    hostapd            = "ghcr.io/randomcoww/hostapd-noscan:v2.11"
     flannel            = "docker.io/flannel/flannel:v0.26.3"
     flannel_cni_plugin = "docker.io/flannel/flannel-cni-plugin:v1.6.0-flannel1"
     kapprover          = "ghcr.io/randomcoww/kapprover:v0.1.0"
