@@ -215,7 +215,9 @@ module "statefulset" {
           "-c",
           <<-EOF
           set -e
+
           cat ${local.kea_config_template_path} | envsubst > ${local.kea_config_path}
+          mkdir -p /var/run/kea
           exec kea-dhcp4 -c ${local.kea_config_path}
           EOF
         ]
