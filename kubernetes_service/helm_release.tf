@@ -365,10 +365,11 @@ resource "helm_release" "arc" {
 
 resource "helm_release" "arc-runner-set" {
   for_each = toset([
-    "container-builds",
     "etcd-wrapper",
-    "repos",
     "kapprover",
+    "tftpd-ipxe",
+    "hostapd-noscan",
+    "kea",
   ])
 
   name             = "arc-runner-${each.key}"
@@ -395,7 +396,7 @@ resource "helm_release" "arc-runner-set" {
           storageClassName = "local-path"
           resources = {
             requests = {
-              storage = "1Gi"
+              storage = "2Gi"
             }
           }
         }
