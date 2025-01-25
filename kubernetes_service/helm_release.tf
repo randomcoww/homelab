@@ -453,6 +453,7 @@ resource "helm_release" "arc-runner-set" {
     "steamcmd",
     "qrcode-generator",
     "code-server",
+    "sunshine-desktop",
   ])
 
   name             = "arc-runner-${each.key}"
