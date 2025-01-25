@@ -13,7 +13,7 @@ locals {
     module.authelia,
     module.tailscale,
     module.hostapd,
-    module.qrcode,
+    module.qrcode-hostapd,
     module.alpaca-db,
     module.code,
     module.webdav-pictures,
@@ -376,6 +376,7 @@ resource "helm_release" "arc-runner-set" {
     "k8s-control-plane",
     "kube-proxy",
     "steamcmd",
+    "qrcode-generator",
   ])
 
   name             = "arc-runner-${each.key}"

@@ -2,6 +2,68 @@ locals {
   ports = {
     qrcode = 80
   }
+  index_path = "/usr/share/nginx/html/index.html"
+}
+
+module "secret" {
+  source  = "../../../modules/secret"
+  name    = var.name
+  app     = var.name
+  release = var.release
+  data = {
+    basename(local.index_path) = <<-EOF
+    <!DOCTYPE html>
+    <html>
+    <head>
+      <link href="lib/tailwind.min.css" rel="stylesheet" type="text/css" />
+      <style>
+        html,
+        body,
+        #app {
+          height: 100vh;
+          margin: 0;
+          padding: 0;
+          font-family: 'Inter', sans-serif;
+        }
+        svg {
+          width: 256px;
+          height: 256px;
+        }
+        .mwh {
+          min-width: 380px;
+          min-height: 290px;
+        }
+        a {
+          color: rgb(34, 125, 230);
+        }
+        a:hover {
+          color: rgb(0, 105, 224);
+        }
+      </style>
+    </head>
+    <body>
+      <div class="w-full h-full bg-gray-800 absolute flex flex-row justify-center items-center">
+        <div id="qrcode" class="m-2"></div>
+      </div>
+      <script src="lib/qrcode.min.js"></script>
+      <script type="module">
+        function genSvg(val) {
+          return new QRCode({
+            content: val,
+            container: 'svg-viewbox',
+            join: true,
+            width: 2048,
+            height: 2048,
+          }).svg()
+        }
+        window.onload = () => {
+          document.getElementById("qrcode").innerHTML = genSvg("${var.qrcode_value}")
+        }
+      </script>
+    </body>
+    </html>
+    EOF
+  }
 }
 
 module "metadata" {
@@ -10,14 +72,12 @@ module "metadata" {
   namespace   = var.namespace
   release     = var.release
   app_version = split(":", var.images.qrcode)[1]
-  manifests = merge({
+  manifests = {
     "templates/service.yaml"    = module.service.manifest
+    "templates/secret.yaml"     = module.secret.manifest
     "templates/ingress.yaml"    = module.ingress.manifest
     "templates/deployment.yaml" = module.deployment.manifest
-    }, {
-    for k, v in var.qrcodes :
-    "templates/ingress-${k}.yaml" => module.ingress-qrcodes[k].manifest
-  })
+  }
 }
 
 module "service" {
@@ -59,31 +119,6 @@ module "ingress" {
   ]
 }
 
-module "ingress-qrcodes" {
-  for_each = var.qrcodes
-
-  source             = "../../../modules/ingress"
-  name               = "${var.name}-${each.key}"
-  app                = var.name
-  release            = var.release
-  ingress_class_name = var.ingress_class_name
-  annotations = merge(var.nginx_ingress_annotations, {
-    "nginx.ingress.kubernetes.io/rewrite-target" = "https://${var.service_hostname}?q=${base64encode(each.value.code)}"
-  })
-  rules = [
-    {
-      host = each.value.service_hostname
-      paths = [
-        {
-          service = module.service.name
-          port    = local.ports.qrcode
-          path    = "/"
-        },
-      ]
-    },
-  ]
-}
-
 module "deployment" {
   source   = "../../../modules/deployment"
   name     = var.name
@@ -91,6 +126,9 @@ module "deployment" {
   release  = var.release
   affinity = var.affinity
   replicas = var.replicas
+  annotations = {
+    "checksum/secret" = sha256(module.secret.manifest)
+  }
   template_spec = {
     containers = [
       {
@@ -114,6 +152,21 @@ module "deployment" {
             port   = local.ports.qrcode
             path   = "/"
           }
+        }
+        volumeMounts = [
+          {
+            name        = "config"
+            mountPath   = local.index_path
+            subPathExpr = basename(local.index_path)
+          },
+        ]
+      },
+    ]
+    volumes = [
+      {
+        name = "config"
+        secret = {
+          secretName = module.secret.name
         }
       },
     ]

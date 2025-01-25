@@ -39,9 +39,6 @@ variable "nginx_ingress_annotations" {
   type = map(string)
 }
 
-variable "qrcodes" {
-  type = map(object({
-    service_hostname = string
-    code             = string
-  }))
+variable "qrcode_value" {
+  type = string
 }

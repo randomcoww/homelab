@@ -143,23 +143,18 @@ module "hostapd" {
 
 # Render QR code for wifi
 
-module "qrcode" {
+module "qrcode-hostapd" {
   source   = "./modules/qrcode"
-  name     = "qrcode"
+  name     = "qrcode-hostapd"
   replicas = 2
   release  = "0.1.0"
   images = {
     qrcode = local.container_images.qrcode_generator
   }
-  service_hostname          = local.kubernetes_ingress_endpoints.qrcode
+  service_hostname          = local.kubernetes_ingress_endpoints.qrcode_hostapd
   ingress_class_name        = local.ingress_classes.ingress_nginx
   nginx_ingress_annotations = local.nginx_ingress_auth_annotations
-  qrcodes = {
-    wifi = {
-      service_hostname = local.kubernetes_ingress_endpoints.qrcode_wifi
-      code             = "WIFI:S:${random_password.hostapd-ssid.result};T:WPA;P:${random_password.hostapd-password.result};H:true;;"
-    }
-  }
+  qrcode_value              = "WIFI:S:${random_password.hostapd-ssid.result};T:WPA;P:${random_password.hostapd-password.result};H:true;;"
 }
 
 # Tailscale remote access
