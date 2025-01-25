@@ -371,6 +371,8 @@ resource "helm_release" "arc-runner-set" {
     "hostapd-noscan",
     "kea",
     "kvm-device-plugin",
+    "mountpoint-s3",
+    "s3fs",
   ])
 
   name             = "arc-runner-${each.key}"
