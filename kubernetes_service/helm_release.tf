@@ -363,6 +363,81 @@ resource "helm_release" "arc" {
   ]
 }
 
+resource "minio_iam_user" "arc" {
+  name          = "arc"
+  force_destroy = true
+}
+
+resource "minio_iam_policy" "arc" {
+  name = "arc"
+  policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [
+      {
+        Effect = "Allow"
+        Action = "*"
+        Resource = [
+          minio_s3_bucket.data["boot"].arn,
+          "${minio_s3_bucket.data["boot"].arn}/*",
+        ]
+      },
+    ]
+  })
+}
+
+resource "minio_iam_user_policy_attachment" "arc" {
+  user_name   = minio_iam_user.arc.id
+  policy_name = minio_iam_policy.arc.id
+}
+
+# ADR
+# https://github.com/actions/actions-runner-controller/discussions/3152
+# SETFCAP needed in runner workflow pod to build code-server and sunshine-desktop images
+resource "helm_release" "arc-runner-hook-template" {
+  name        = "arc-runner-hook-template"
+  chart       = "../helm-wrapper"
+  namespace   = "arc-runners"
+  wait        = false
+  max_history = 2
+  values = [
+    yamlencode({
+      manifests = [
+        yamlencode({
+          apiVersion = "v1"
+          kind       = "Secret"
+          metadata = {
+            name = "workflow-template"
+          }
+          stringData = {
+            "workflow-podspec.yaml" = yamlencode({
+              spec = {
+                containers = [
+                  {
+                    name = "$job"
+                    securityContext = {
+                      capabilities = {
+                        add = [
+                          "SETFCAP",
+                        ]
+                      }
+                    }
+                    env = [
+                      {
+                        name  = "MC_HOST_arc"
+                        value = "http://${minio_iam_user.arc.id}:${minio_iam_user.arc.secret}@${local.kubernetes_services.minio.fqdn}:${local.service_ports.minio}"
+                      },
+                    ]
+                  },
+                ]
+              }
+            })
+          }
+        }),
+      ]
+    })
+  ]
+}
+
 resource "helm_release" "arc-runner-set" {
   for_each = toset([
     "etcd-wrapper",
@@ -377,6 +452,7 @@ resource "helm_release" "arc-runner-set" {
     "kube-proxy",
     "steamcmd",
     "qrcode-generator",
+    "code-server",
   ])
 
   name             = "arc-runner-${each.key}"
@@ -406,6 +482,40 @@ resource "helm_release" "arc-runner-set" {
               storage = "2Gi"
             }
           }
+        }
+      }
+      template = {
+        spec = {
+          containers = [
+            {
+              name  = "runner"
+              image = "ghcr.io/actions/actions-runner:latest"
+              command = [
+                "/home/runner/run.sh",
+              ]
+              env = [
+                {
+                  name  = "ACTIONS_RUNNER_CONTAINER_HOOK_TEMPLATE"
+                  value = "/home/runner/config/workflow-podspec.yaml"
+                },
+              ]
+              volumeMounts = [
+                {
+                  name      = "workflow-podspec-volume"
+                  mountPath = "/home/runner/config/workflow-podspec.yaml"
+                  subPath   = "workflow-podspec.yaml"
+                },
+              ]
+            },
+          ]
+          volumes = [
+            {
+              name = "workflow-podspec-volume"
+              secret = {
+                secretName = "workflow-template"
+              }
+            },
+          ]
         }
       }
       controllerServiceAccount = {
