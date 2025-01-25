@@ -373,6 +373,8 @@ resource "helm_release" "arc-runner-set" {
     "kvm-device-plugin",
     "mountpoint-s3",
     "s3fs",
+    "k8s-control-plane",
+    "kube-proxy",
   ])
 
   name             = "arc-runner-${each.key}"
