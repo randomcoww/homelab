@@ -303,7 +303,6 @@ module "controller-manager" {
           "--use-service-account-credentials=true",
           "--secure-port=${var.ports.controller_manager}",
           "--terminated-pod-gc-threshold=1",
-          "--feature-gates=NodeOutOfServiceVolumeDetach=true",
           "--v=2",
         ]
         livenessProbe = {
