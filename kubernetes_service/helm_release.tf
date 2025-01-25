@@ -21,7 +21,7 @@ locals {
     module.audioserve,
     module.sunshine-desktop,
     module.satisfactory-server,
-    module.coreos-assembler,
+    # module.coreos-assembler,
     module.renovate-bot,
   ]
 }
@@ -421,6 +421,15 @@ resource "helm_release" "arc-runner-hook-template" {
                         ]
                       }
                     }
+                    resources = {
+                      requests = {
+                        memory                    = "2Gi"
+                        "devices.kubevirt.io/kvm" = "1"
+                      }
+                      limits = {
+                        "devices.kubevirt.io/kvm" = "1"
+                      }
+                    }
                     env = [
                       {
                         name  = "MC_HOST_arc"
@@ -454,6 +463,7 @@ resource "helm_release" "arc-runner-set" {
     "qrcode-generator",
     "code-server",
     "sunshine-desktop",
+    "fedora-coreos-config-custom",
   ])
 
   name             = "arc-runner-${each.key}"
@@ -470,7 +480,7 @@ resource "helm_release" "arc-runner-set" {
       githubConfigSecret = {
         github_token = var.github.arc_token
       }
-      maxRunners = 2
+      maxRunners = 1
       containerMode = {
         type = "kubernetes"
         kubernetesModeWorkVolumeClaim = {

@@ -130,11 +130,7 @@ tw terraform -chdir=ignition apply
 
 See [fedora-coreos-config-custom](https://github.com/randomcoww/fedora-coreos-config-custom)
 
-Once the Kubernetes cluster is running, call `cosa-build` CronJob to build a new image
-
-```bash
-kubectl create job --from=cronjob/cosa-build cosa-build
-```
+Image build can be triggered from Github actions ocne ARC runners and MinIO are up.
 
 ---
 
