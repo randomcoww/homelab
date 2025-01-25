@@ -127,7 +127,7 @@ locals {
     kube_vip           = "ghcr.io/kube-vip/kube-vip:v0.8.9"
     sunshine_desktop   = "ghcr.io/randomcoww/sunshine-desktop:2025.118.41713-5"
     nvidia_driver      = "ghcr.io/randomcoww/nvidia-driver:565.77-fedora41"
-    steamcmd           = "ghcr.io/randomcoww/steamcmd:20250118.4"
+    steamcmd           = "ghcr.io/randomcoww/steamcmd:v20250125.1"
     kvm_device_plugin  = "ghcr.io/randomcoww/kvm-device-plugin:v20250124.2"
     coreos_assembler   = "quay.io/coreos-assembler/coreos-assembler:latest"
     renovate_bot       = "docker.io/renovate/renovate:39"

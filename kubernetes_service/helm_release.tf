@@ -375,6 +375,7 @@ resource "helm_release" "arc-runner-set" {
     "s3fs",
     "k8s-control-plane",
     "kube-proxy",
+    "steamcmd",
   ])
 
   name             = "arc-runner-${each.key}"
