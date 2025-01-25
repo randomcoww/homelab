@@ -130,7 +130,7 @@ tw terraform -chdir=ignition apply
 
 See [fedora-coreos-config-custom](https://github.com/randomcoww/fedora-coreos-config-custom)
 
-Image build can be triggered from Github actions ocne ARC runners and MinIO are up.
+Image build can be triggered from Github actions once ARC runners and MinIO are up.
 
 ---
 
