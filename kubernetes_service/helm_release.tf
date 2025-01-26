@@ -464,6 +464,7 @@ resource "helm_release" "arc-runner-set" {
     "code-server",
     "sunshine-desktop",
     "fedora-coreos-config-custom",
+    "tailscale-nft",
   ])
 
   name             = "arc-runner-${each.key}"
