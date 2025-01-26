@@ -26,6 +26,12 @@ module "daemonset" {
         securityContext = {
           privileged = true
         }
+        # env = [
+        #   {
+        #     name  = "OPEN_KERNEL_MODULES_ENABLED"
+        #     value = "true"
+        #   },
+        # ]
         volumeMounts = [
           {
             name      = "var-log"
