@@ -16,3 +16,11 @@ variable "images" {
     nvidia_driver = string
   })
 }
+
+variable "extra_envs" {
+  type = list(object({
+    name  = string
+    value = any
+  }))
+  default = []
+}

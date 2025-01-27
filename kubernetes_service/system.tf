@@ -28,6 +28,13 @@ module "nvidia-driver" {
   images = {
     nvidia_driver = local.container_images.nvidia_driver
   }
+  extra_envs = [
+    ## unstable
+    # {
+    #   name  = "OPEN_KERNEL_MODULES_ENABLED"
+    #   value = "true"
+    # },
+  ]
 }
 
 resource "minio_s3_bucket" "data" {
