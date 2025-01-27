@@ -39,15 +39,35 @@ module "coreos-assembler" {
     "-c",
     <<-EOF
     set -xe
+    ## build custom keepalived ##
 
+    cd $HOME
+    sudo dnf install -y --setopt=install_weak_deps=False \
+      rpmdevtools \
+      dnf-plugins-core \
+      git-core \
+      libnftnl-devel \
+      createrepo
+
+    mkdir -p rpmbuild/
+    cd rpmbuild
+    git clone -b f$(rpm -E %fedora) https://src.fedoraproject.org/rpms/keepalived.git SOURCES/
+    cd SOURCES
+    spectool -gR keepalived.spec
+    sudo dnf builddep -y keepalived.spec
+    rpmbuild -bb keepalived.spec \
+      --without snmp \
+      --with nftables \
+      --without debug
+
+    find $HOME/rpmbuild/RPMS/ -type d -mindepth 1 -maxdepth 1 -exec createrepo '{}' \;
+
+    ## build image ##
+
+    cd $HOME
     curl https://dl.min.io/client/mc/release/linux-amd64/mc \
-      --create-dirs \
-      -o $HOME/mc
-    chmod +x $HOME/mc
-
-    BUILD_PATH=$HOME/$VARIANT
-    mkdir -p $BUILD_PATH
-    cd $BUILD_PATH
+      --create-dirs -o mc
+    chmod +x mc
 
     cosa init -V $VARIANT \
       --force https://github.com/randomcoww/fedora-coreos-config-custom.git
@@ -56,6 +76,13 @@ module "coreos-assembler" {
     cosa build metal4k
     cosa buildextend-metal
     cosa buildextend-live
+
+    ## push ##
+
+    cd $HOME
+    curl https://dl.min.io/client/mc/release/linux-amd64/mc \
+      --create-dirs -o mc
+    chmod +x mc
 
     $HOME/mc cp -r -q --no-color \
       $BUILD_PATH/builds/latest/x86_64/fedora-*-live* \
