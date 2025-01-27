@@ -7,10 +7,12 @@ terraform {
   }
   required_providers {
     helm = {
-      source = "hashicorp/helm"
+      source  = "hashicorp/helm"
+      version = "2.17.0"
     }
     minio = {
-      source = "aminueza/minio"
+      source  = "aminueza/minio"
+      version = "3.2.2"
     }
   }
 }
