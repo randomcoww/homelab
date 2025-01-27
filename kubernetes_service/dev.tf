@@ -39,7 +39,11 @@ module "coreos-assembler" {
     "-c",
     <<-EOF
     set -xe
-    ## build custom keepalived ##
+
+    TARGETARCH=$(arch)
+    TARGETARCH=$${TARGETARCH/x86_64/amd64} && TARGETARCH=$${TARGETARCH/aarch64/arm64}
+
+    ## download dependencies ##
 
     cd $HOME
     sudo dnf install -y --setopt=install_weak_deps=False \
@@ -49,6 +53,13 @@ module "coreos-assembler" {
       libnftnl-devel \
       createrepo
 
+    curl https://dl.min.io/client/mc/release/linux-$TARGETARCH/mc \
+      --create-dirs -o mc
+    chmod +x mc
+
+    ## build keepalived ##
+
+    cd $HOME
     mkdir -p rpmbuild/
     cd rpmbuild
     git clone -b f$(rpm -E %fedora) https://src.fedoraproject.org/rpms/keepalived.git SOURCES/
@@ -60,15 +71,14 @@ module "coreos-assembler" {
       --with nftables \
       --without debug
 
-    find $HOME/rpmbuild/RPMS/ -type d -mindepth 1 -maxdepth 1 -exec createrepo '{}' \;
-
-    ## build image ##
+    ## run local repo ##
 
     cd $HOME
-    curl https://dl.min.io/client/mc/release/linux-amd64/mc \
-      --create-dirs -o mc
-    chmod +x mc
+    find rpmbuild/RPMS/ -type d -mindepth 1 -maxdepth 1 -exec createrepo '{}' \;
 
+    ## build cosa image ##
+
+    cd $HOME
     cosa init -V $VARIANT \
       --force https://github.com/randomcoww/fedora-coreos-config-custom.git
     cosa clean
@@ -77,14 +87,10 @@ module "coreos-assembler" {
     cosa buildextend-metal
     cosa buildextend-live
 
-    ## push ##
+    ## push to minio ##
 
     cd $HOME
-    curl https://dl.min.io/client/mc/release/linux-amd64/mc \
-      --create-dirs -o mc
-    chmod +x mc
-
-    $HOME/mc cp -r -q --no-color \
+    ./mc cp -r -q --no-color \
       $BUILD_PATH/builds/latest/x86_64/fedora-*-live* \
       boot/${minio_s3_bucket.data["boot"].id}/
     EOF
