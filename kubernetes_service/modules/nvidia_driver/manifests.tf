@@ -6,6 +6,23 @@ module "metadata" {
   app_version = split(":", var.images.nvidia_driver)[1]
   manifests = {
     "templates/daeonset.yaml" = module.daemonset.manifest
+    # These pods can't be killed if modules are in use and also can't be recovered if restart is attempted
+    "templates/poddisruptionbudget.yaml" = yamlencode({
+      apiVersion = "policy/v1"
+      kind       = "PodDisruptionBudget"
+      metadata = {
+        name = var.name
+      }
+      spec = {
+        maxUnavailable             = 0
+        unhealthyPodEvictionPolicy = "AlwaysAllow"
+        selector = {
+          matchLabels = {
+            app = var.name
+          }
+        }
+      }
+    })
   }
 }
 
