@@ -117,7 +117,7 @@ locals {
     code_server        = "ghcr.io/randomcoww/code-server:v20250127.2"
     lldap              = "docker.io/lldap/lldap:2024-12-24-alpine"
     keydb              = "docker.io/eqalpha/keydb:alpine_x86_64_v6.3.4"
-    clickhouse         = "docker.io/clickhouse/clickhouse-server:24.12-alpine"
+    clickhouse         = "docker.io/clickhouse/clickhouse-server:25.1-alpine"
     qrcode_generator   = "ghcr.io/randomcoww/qrcode-generator:v20250125.1"
     rclone             = "docker.io/rclone/rclone:1.69"
     mountpoint         = "ghcr.io/randomcoww/mountpoint-s3:v20250125.1"
