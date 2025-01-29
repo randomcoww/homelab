@@ -21,9 +21,11 @@ jobs:
         RENOVATE_CONFIG_FILE: /tmp/renovate.json
       run: |
         cat > /tmp/renovate.json <<EOF
-        repositories: [
-          "${{ github.repository }}"
-        ]
+        {
+          "repositories": [
+            "${{ github.repository }}"
+          ]
+        }
         EOF
 
         renovate-entrypoint.sh renovate
