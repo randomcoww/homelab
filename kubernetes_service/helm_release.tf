@@ -21,8 +21,6 @@ locals {
     module.audioserve,
     module.sunshine-desktop,
     module.satisfactory-server,
-    # module.coreos-assembler,
-    module.renovate-bot,
   ]
 }
 

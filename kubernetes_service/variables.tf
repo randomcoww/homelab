@@ -9,7 +9,6 @@ variable "smtp" {
 
 variable "github" {
   type = object({
-    renovate_token = string
-    arc_token      = string
+    arc_token = string
   })
 }

@@ -32,7 +32,6 @@ TS_OAUTH_CLIENT_ID=
 TS_OAUTH_CLIENT_SECRET=
 GMAIL_USER=
 GMAIL_PASSWORD=
-GITHUB_RENOVATE_TOKEN=
 GITHUB_ARC_TOKEN=
 ```
 
@@ -79,8 +78,7 @@ smtp = {
 }
 
 github = {
-  renovate_token = "$GITHUB_RENOVATE_TOKEN"
-  arc_token      = "$GITHUB_ARC_TOKEN"
+  arc_token = "$GITHUB_ARC_TOKEN"
 }
 EOF
 ```

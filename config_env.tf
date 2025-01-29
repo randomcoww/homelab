@@ -130,7 +130,6 @@ locals {
     steamcmd           = "ghcr.io/randomcoww/steamcmd:v20250125.1"
     kvm_device_plugin  = "ghcr.io/randomcoww/kvm-device-plugin:v20250124.2"
     coreos_assembler   = "quay.io/coreos-assembler/coreos-assembler:latest"
-    renovate_bot       = "docker.io/renovate/renovate:39"
 
     # Unused
     cockroachdb        = "docker.io/cockroachdb/cockroach:v24.3.3"
