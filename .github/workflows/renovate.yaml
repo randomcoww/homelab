@@ -2,7 +2,7 @@ name: Renovate bot
 on:
   workflow_dispatch:
   schedule:
-  - cron: "30 * * * *"
+  - cron: "0 */2 * * *"
 
 jobs:
   renovate:
@@ -13,13 +13,12 @@ jobs:
       contents: write
       pull-requests: write
     steps:
-    - name: Check updates
+    - name: Check for updates
       env:
         RENOVATE_PLATFORM: github
         RENOVATE_AUTODISCOVER: false
         RENOVATE_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         RENOVATE_CONFIG_FILE: /tmp/renovate.json
-        LOG_LEVEL: debug
       run: |
         cat > /tmp/renovate.json <<EOF
         {
