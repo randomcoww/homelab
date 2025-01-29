@@ -10,7 +10,7 @@ jobs:
     container:
       image: docker.io/renovate/renovate:latest
     permissions:
-      contents: read
+      contents: write
       pull-requests: write
     steps:
     - name: Check updates
