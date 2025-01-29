@@ -5,7 +5,7 @@ on:
   - cron: "30 * * * *"
 
 jobs:
-  build:
+  renovate:
     runs-on: arc-runner-${{ github.event.repository.name }}
     container:
       image: docker.io/renovate/renovate:latest
@@ -15,12 +15,15 @@ jobs:
     steps:
     - name: Check updates
       env:
-        RENOVATE_PLATFORM: "github"
-        RENOVATE_AUTODISCOVER: "false"
-        RENOVATE_TOKEN: "${{ secrets.GITHUB_TOKEN }}"
-        RENOVATE_CONFIG_FILE: |
-          repositories: [
-            "${{ github.repository }}"
-          ]
+        RENOVATE_PLATFORM: github
+        RENOVATE_AUTODISCOVER: false
+        RENOVATE_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        RENOVATE_CONFIG_FILE: /tmp/renovate.json
       run: |
+        cat > /tmp/renovate.json <<EOF
+        repositories: [
+          "${{ github.repository }}"
+        ]
+        EOF
+
         renovate-entrypoint.sh renovate
