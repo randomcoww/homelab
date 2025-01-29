@@ -63,7 +63,7 @@ locals {
       disks = {
         pv = {
           wipe   = false
-          device = "/dev/disk/by-id/nvme-VICKTER_NVME_SSD_WLN020A01247"
+          device = "/dev/nvme0n1"
           partitions = [
             {
               mount_path = local.mounts.containers_path
@@ -150,7 +150,7 @@ locals {
       disks = {
         pv = {
           wipe   = false
-          device = "/dev/disk/by-id/nvme-VICKTER_NVME_SSD_WLN020A00286"
+          device = "/dev/nvme0n1"
           partitions = [
             {
               mount_path = local.mounts.containers_path
@@ -220,7 +220,7 @@ locals {
       disks = {
         pv = {
           wipe   = false
-          device = "/dev/disk/by-id/nvme-VICKTER_NVME_SSD_WLN020A01227"
+          device = "/dev/nvme0n1"
           partitions = [
             {
               mount_path = local.mounts.containers_path
@@ -301,7 +301,7 @@ locals {
       disks = {
         pv = {
           wipe   = false
-          device = "/dev/disk/by-id/nvme-Samsung_SSD_970_EVO_Plus_2TB_S59CNM0W609225K"
+          device = "/dev/nvme0n1"
           partitions = [
             {
               mount_path = local.mounts.home_path
