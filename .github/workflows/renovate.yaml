@@ -1,0 +1,26 @@
+name: Renovate bot
+on:
+  workflow_dispatch:
+  schedule:
+  - cron: "30 * * * *"
+
+jobs:
+  build:
+    runs-on: arc-runner-${{ github.event.repository.name }}
+    container:
+      image: docker.io/renovate/renovate:latest
+    permissions:
+      contents: read
+      pull-requests: write
+    steps:
+    - name: Check updates
+      env:
+        RENOVATE_PLATFORM: "github"
+        RENOVATE_AUTODISCOVER: "false"
+        RENOVATE_TOKEN: "${{ secrets.GITHUB_TOKEN }}"
+        RENOVATE_CONFIG_FILE: |
+          repositories: [
+            "${{ github.repository }}"
+          ]
+      run: |
+        renovate-entrypoint.sh renovate
