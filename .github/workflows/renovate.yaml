@@ -12,6 +12,7 @@ jobs:
     permissions:
       contents: write
       pull-requests: write
+      security-events: read
     steps:
     - name: Check for updates
       env:
