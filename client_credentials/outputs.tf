@@ -45,22 +45,22 @@ output "mc_config" {
       }
       documents = {
         url       = "https://s3.amazonaws.com"
-        accessKey = data.terraform_remote_state.sr.outputs.s3.documents.access_key_id
-        secretKey = data.terraform_remote_state.sr.outputs.s3.documents.secret_access_key
+        accessKey = data.terraform_remote_state.sr.outputs.s3_bucket.documents.access_key_id
+        secretKey = data.terraform_remote_state.sr.outputs.s3_bucket.documents.secret_access_key
         api       = "S3v4"
         path      = "auto"
       }
       pictures = {
         url       = "https://s3.amazonaws.com"
-        accessKey = data.terraform_remote_state.sr.outputs.s3.pictures.access_key_id
-        secretKey = data.terraform_remote_state.sr.outputs.s3.pictures.secret_access_key
+        accessKey = data.terraform_remote_state.sr.outputs.s3_bucket.pictures.access_key_id
+        secretKey = data.terraform_remote_state.sr.outputs.s3_bucket.pictures.secret_access_key
         api       = "S3v4"
         path      = "auto"
       }
       music = {
         url       = "https://s3.amazonaws.com"
-        accessKey = data.terraform_remote_state.sr.outputs.s3.music.access_key_id
-        secretKey = data.terraform_remote_state.sr.outputs.s3.music.secret_access_key
+        accessKey = data.terraform_remote_state.sr.outputs.s3_bucket.music.access_key_id
+        secretKey = data.terraform_remote_state.sr.outputs.s3_bucket.music.secret_access_key
         api       = "S3v4"
         path      = "auto"
       }

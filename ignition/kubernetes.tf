@@ -103,9 +103,9 @@ module "etcd" {
   etcd_ips = sort([
     cidrhost(local.networks.etcd.prefix, each.value.netnum)
   ])
-  s3_resource          = "${data.terraform_remote_state.sr.outputs.s3.etcd.resource}/${local.kubernetes.cluster_name}.db"
-  s3_access_key_id     = data.terraform_remote_state.sr.outputs.s3.etcd.access_key_id
-  s3_secret_access_key = data.terraform_remote_state.sr.outputs.s3.etcd.secret_access_key
-  s3_region            = data.terraform_remote_state.sr.outputs.s3.etcd.aws_region
+  s3_resource          = "${data.terraform_remote_state.sr.outputs.s3_bucket.etcd.resource}/${local.kubernetes.cluster_name}.db"
+  s3_access_key_id     = data.terraform_remote_state.sr.outputs.s3_bucket.etcd.access_key_id
+  s3_secret_access_key = data.terraform_remote_state.sr.outputs.s3_bucket.etcd.secret_access_key
+  s3_region            = data.terraform_remote_state.sr.outputs.s3_bucket.etcd.aws_region
   static_pod_path      = local.kubernetes.static_pod_manifest_path
 }

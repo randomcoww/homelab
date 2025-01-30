@@ -26,8 +26,6 @@ Define secrets
 
 ```bash
 LETSENCRYPT_USER=
-CLOUDFLARE_API_TOKEN=
-CLOUDFLARE_ACCOUNT_ID=
 TS_OAUTH_CLIENT_ID=
 TS_OAUTH_CLIENT_SECRET=
 GMAIL_USER=
@@ -40,11 +38,6 @@ Create `cluster_resources/secrets.tfvars` file
 ```bash
 cat > cluster_resources/secrets.tfvars <<EOF
 letsencrypt_username  = "$LETSENCRYPT_USER"
-
-cloudflare = {
-  api_token  = "$CLOUDFLARE_API_TOKEN"
-  account_id = "$CLOUDFLARE_ACCOUNT_ID"
-}
 
 tailscale = {
   oauth_client_id     = "$TS_OAUTH_CLIENT_ID"
@@ -159,7 +152,7 @@ tw terraform -chdir=kubernetes_service apply -var-file=secrets.tfvars
 
 ### Create user
 
-Go to `https://ldap.fuzzybunny.win`
+Go to `https://ldap.fuzzybunny.link`
 
 Get admin password by running
 
@@ -167,7 +160,7 @@ Get admin password by running
 tw terraform -chdir=cluster_resources output -json lldap
 ```
 
-Set up 2FA at `https://auth.fuzzybunny.win`
+Set up 2FA at `https://auth.fuzzybunny.link`
 
 ---
 

@@ -161,10 +161,11 @@ resource "helm_release" "cert-issuer" {
             apiVersion = "v1"
             kind       = "Secret"
             metadata = {
-              name = "cloudflare-token"
+              name = "route53-credentials"
             }
             stringData = {
-              token = data.terraform_remote_state.sr.outputs.cloudflare_dns_api_token
+              access-key-id     = data.terraform_remote_state.sr.outputs.route53_hosted_zone.access_key_id
+              secret-access-key = data.terraform_remote_state.sr.outputs.route53_hosted_zone.secret_access_key
             }
             type = "Opaque"
           },
@@ -207,10 +208,15 @@ resource "helm_release" "cert-issuer" {
                 solvers = [
                   {
                     dns01 = {
-                      cloudflare = {
-                        apiTokenSecretRef = {
-                          name = "cloudflare-token"
-                          key  = "token"
+                      route53 = {
+                        region = local.aws_region
+                        accessKeyIDSecretRef = {
+                          name = "route53-credentials"
+                          key  = "access-key-id"
+                        }
+                        secretAccessKeySecretRef = {
+                          name = "route53-credentials"
+                          key  = "secret-access-key"
                         }
                       }
                     }
@@ -241,10 +247,15 @@ resource "helm_release" "cert-issuer" {
                 solvers = [
                   {
                     dns01 = {
-                      cloudflare = {
-                        apiTokenSecretRef = {
-                          name = "cloudflare-token"
-                          key  = "token"
+                      route53 = {
+                        region = local.aws_region
+                        accessKeyIDSecretRef = {
+                          name = "route53-credentials"
+                          key  = "access-key-id"
+                        }
+                        secretAccessKeySecretRef = {
+                          name = "route53-credentials"
+                          key  = "secret-access-key"
                         }
                       }
                     }
@@ -537,32 +548,3 @@ resource "helm_release" "arc-runner-set" {
     }),
   ]
 }
-
-# cloudflare tunnel #
-/*
-resource "helm_release" "cloudflare-tunnel" {
-  name        = "cloudflare-tunnel"
-  namespace   = "default"
-  repository  = "https://cloudflare.github.io/helm-charts/"
-  chart       = "cloudflare-tunnel"
-  wait        = false
-  version     = "0.3.0"
-  max_history = 2
-  values = [
-    yamlencode({
-      cloudflare = {
-        account    = data.terraform_remote_state.sr.outputs.cloudflare_tunnels.external.account_id
-        tunnelName = data.terraform_remote_state.sr.outputs.cloudflare_tunnels.external.name
-        tunnelId   = data.terraform_remote_state.sr.outputs.cloudflare_tunnels.external.id
-        secret     = data.terraform_remote_state.sr.outputs.cloudflare_tunnels.external.secret
-        ingress = [
-          {
-            hostname = "*.${local.domains.public}"
-            service  = "https://${local.kubernetes_services.ingress_nginx_external.endpoint}"
-          },
-        ]
-      }
-    }),
-  ]
-}
-*/

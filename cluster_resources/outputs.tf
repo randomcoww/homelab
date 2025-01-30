@@ -1,4 +1,4 @@
-output "s3" {
+output "s3_bucket" {
   value = {
     for name, res in local.s3_resources :
     name => {
@@ -12,17 +12,10 @@ output "s3" {
   sensitive = true
 }
 
-output "cloudflare_dns_api_token" {
-  value     = cloudflare_api_token.dns_edit.value
-  sensitive = true
-}
-
-output "cloudflare_tunnels" {
+output "route53_hosted_zone" {
   value = {
-    for tunnel in cloudflare_zero_trust_tunnel_cloudflared.tunnel :
-    tunnel.name => merge(tunnel, {
-      account_id = var.cloudflare.account_id
-    })
+    access_key_id     = aws_iam_access_key.hosted_zone.id
+    secret_access_key = aws_iam_access_key.hosted_zone.secret
   }
   sensitive = true
 }

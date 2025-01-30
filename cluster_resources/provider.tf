@@ -2,10 +2,6 @@ provider "aws" {
   region = local.aws_region
 }
 
-provider "cloudflare" {
-  api_token = var.cloudflare.api_token
-}
-
 provider "tailscale" {
   tailnet             = local.domains.tailscale
   oauth_client_id     = var.tailscale.oauth_client_id
