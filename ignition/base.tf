@@ -44,9 +44,8 @@ module "server" {
     cidrhost(network.prefix, each.value.netnum)
     if lookup(network, "enable_netnum", false)
     ], [
-    for _, domain in local.domains :
-    "${each.key}.${domain}"
-    ], [
+    local.domains.mdns,
+    local.domains.kubernetes,
     each.key,
     "127.0.0.1",
   ]))
