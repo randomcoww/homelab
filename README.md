@@ -1,6 +1,6 @@
 ### Configure environment
 
-Define Cloudflare R2 credentials for Terraform backend
+Define credentials for S3 Terraform backend (currently Cloudflare R2)
 
 ```bash
 AWS_ACCESS_KEY_ID=
