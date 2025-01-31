@@ -14,7 +14,7 @@ GMAIL_PASSWORD=
 GITHUB_ARC_TOKEN=
 ```
 
-Cloudflare API token needs the following permnissions
+Cloudflare API token needs the following permissions
 
 | | | |
 --- | --- | ---
@@ -37,7 +37,7 @@ AWS_SECRET_ACCESS_KEY=$(echo -n $CLOUDFLARE_API_TOKEN | sha256sum --quiet)
 EOF
 ```
 
-Define the `tw` (terraform wrapper) command
+Define `tw` (terraform wrapper)
 
 ```bash
 mkdir -p $HOME/.kube
