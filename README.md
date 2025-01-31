@@ -1,20 +1,28 @@
 ### Configure environment
 
+Define Cloudflare R2 credentials for Terraform backend
+
+```bash
+AWS_ACCESS_KEY_ID=
+AWS_SECRET_ACCESS_KEY=
+AWS_ENDPOINT_URL_S3=
+```
+
 Define the `tw` (terraform wrapper) command
 
 ```bash
-mkdir -p $HOME/.kube $HOME/.aws
+mkdir -p $HOME/.kube
 
 tw() {
   set -x
   podman run -it --rm --security-opt label=disable \
     --entrypoint='' \
     -v $(pwd):$(pwd) \
-    -v $HOME/.aws:/root/.aws \
     -v $HOME/.kube:/root/.kube \
     -e KUBE_CONFIG_PATH=/root/.kube/config \
     -e AWS_ACCESS_KEY_ID=$AWS_ACCESS_KEY_ID \
     -e AWS_SECRET_ACCESS_KEY=$AWS_SECRET_ACCESS_KEY \
+    -e AWS_ENDPOINT_URL_S3=$AWS_ENDPOINT_URL_S3 \
     -w $(pwd) \
     --net=host \
     docker.io/hashicorp/terraform:1.10.5 "$@"
@@ -22,9 +30,10 @@ tw() {
 }
 ```
 
-Define secrets
+Define Terraform secrets
 
 ```bash
+CLOUDFLARE_API_TOKEN=
 LETSENCRYPT_USER=
 TS_OAUTH_CLIENT_ID=
 TS_OAUTH_CLIENT_SECRET=
@@ -37,6 +46,10 @@ Create `cluster_resources/secrets.tfvars` file
 
 ```bash
 cat > cluster_resources/secrets.tfvars <<EOF
+cloudflare = {
+  api_token = "$CLOUDFLARE_API_TOKEN"
+}
+
 letsencrypt_username  = "$LETSENCRYPT_USER"
 
 tailscale = {

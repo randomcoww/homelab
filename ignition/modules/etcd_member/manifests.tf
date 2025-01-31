@@ -137,6 +137,7 @@ module "etcd-wrapper" {
           # etcd-wrapper args
           "--client-cert-file=${local.pki.client-cert.path}",
           "--client-key-file=${local.pki.client-key.path}",
+          "--s3-backup-endpoint=${var.s3_endpoint}",
           "--s3-backup-resource=${var.s3_resource}",
           "--healthcheck-interval=${var.healthcheck_interval}",
           "--backup-interval=${var.backup_interval}",
@@ -161,10 +162,6 @@ module "etcd-wrapper" {
           {
             name  = "AWS_SECRET_ACCESS_KEY"
             value = var.s3_secret_access_key
-          },
-          {
-            name  = "AWS_DEFAULT_REGION"
-            value = var.s3_region
           },
         ]
         volumeMounts = [

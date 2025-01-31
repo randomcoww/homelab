@@ -35,7 +35,7 @@ output "kubeconfig_cluster" {
 output "mc_config" {
   value = {
     version = "10"
-    aliases = {
+    aliases = merge({
       m = {
         url       = "http://${local.services.minio.ip}:${local.service_ports.minio}"
         accessKey = data.terraform_remote_state.sr.outputs.minio.access_key_id
@@ -43,28 +43,16 @@ output "mc_config" {
         api       = "S3v4"
         path      = "auto"
       }
-      documents = {
-        url       = "https://s3.amazonaws.com"
-        accessKey = data.terraform_remote_state.sr.outputs.s3_bucket.documents.access_key_id
-        secretKey = data.terraform_remote_state.sr.outputs.s3_bucket.documents.secret_access_key
+      }, {
+      for name, res in data.terraform_remote_state.sr.outputs.r2_bucket :
+      "cf-${name}" => {
+        url       = "https://${res.url}"
+        accessKey = res.access_key_id
+        secretKey = res.secret_access_key
         api       = "S3v4"
         path      = "auto"
       }
-      pictures = {
-        url       = "https://s3.amazonaws.com"
-        accessKey = data.terraform_remote_state.sr.outputs.s3_bucket.pictures.access_key_id
-        secretKey = data.terraform_remote_state.sr.outputs.s3_bucket.pictures.secret_access_key
-        api       = "S3v4"
-        path      = "auto"
-      }
-      music = {
-        url       = "https://s3.amazonaws.com"
-        accessKey = data.terraform_remote_state.sr.outputs.s3_bucket.music.access_key_id
-        secretKey = data.terraform_remote_state.sr.outputs.s3_bucket.music.secret_access_key
-        api       = "S3v4"
-        path      = "auto"
-      }
-    }
+    })
   }
   sensitive = true
 }

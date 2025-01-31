@@ -1,31 +1,41 @@
-output "s3_bucket" {
+# Cloudflare
+
+output "cloudflare_dns_api_token" {
+  value     = cloudflare_api_token.dns.value
+  sensitive = true
+}
+
+output "r2_bucket" {
   value = {
-    for name, res in local.s3_resources :
+    for name, _ in local.r2_buckets :
     name => {
-      resource          = res.resource
-      bucket            = res.bucket
-      access_key_id     = aws_iam_access_key.s3[name].id
-      secret_access_key = aws_iam_access_key.s3[name].secret
-      aws_region        = local.aws_region
+      url               = "${local.cloudflare_account_id}.r2.cloudflarestorage.com"
+      bucket            = cloudflare_r2_bucket.bucket[name].id
+      access_key_id     = cloudflare_api_token.r2_bucket[name].id
+      secret_access_key = sha256(cloudflare_api_token.r2_bucket[name].value)
     }
   }
   sensitive = true
 }
 
-output "route53_hosted_zone" {
+output "cloudflare_tunnels" {
   value = {
-    access_key_id     = aws_iam_access_key.hosted_zone.id
-    secret_access_key = aws_iam_access_key.hosted_zone.secret
+    for tunnel in cloudflare_zero_trust_tunnel_cloudflared.tunnel :
+    tunnel.name => merge(tunnel, {
+      account_id = local.cloudflare_account_id
+    })
   }
   sensitive = true
 }
+
+# Tailscale
 
 output "tailscale_auth_key" {
   value     = tailscale_tailnet_key.auth.key
   sensitive = true
 }
 
-# etcd
+# Etcd
 
 output "etcd" {
   value = {
@@ -43,7 +53,7 @@ output "etcd" {
   sensitive = true
 }
 
-# kubernetes
+# Kubernetes
 
 output "kubernetes" {
   value = {
