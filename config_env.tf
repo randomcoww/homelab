@@ -132,7 +132,7 @@ locals {
     coreos_assembler   = "quay.io/coreos-assembler/coreos-assembler:latest"
 
     # Unused
-    cockroachdb        = "docker.io/cockroachdb/cockroach:v24.3.3"
+    cockroachdb        = "docker.io/cockroachdb/cockroach:v24.3.4"
     fuse_device_plugin = "docker.io/soolaugust/fuse-device-plugin:v1.0"
     vaultwarden        = "docker.io/vaultwarden/server:1.33.0-alpine"
   }
