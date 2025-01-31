@@ -539,7 +539,7 @@ resource "helm_release" "arc-runner-set" {
 }
 
 # cloudflare tunnel #
-/*
+
 resource "helm_release" "cloudflare-tunnel" {
   name        = "cloudflare-tunnel"
   namespace   = "default"
@@ -565,4 +565,3 @@ resource "helm_release" "cloudflare-tunnel" {
     }),
   ]
 }
-*/

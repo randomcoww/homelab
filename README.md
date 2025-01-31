@@ -165,7 +165,7 @@ tw terraform -chdir=kubernetes_service apply -var-file=secrets.tfvars
 
 ### Create user
 
-Go to `https://ldap.fuzzybunny.link`
+Go to `https://ldap.fuzzybunny.win`
 
 Get admin password by running
 
@@ -173,7 +173,7 @@ Get admin password by running
 tw terraform -chdir=cluster_resources output -json lldap
 ```
 
-Set up 2FA at `https://auth.fuzzybunny.link`
+Set up 2FA at `https://auth.fuzzybunny.win`
 
 ---
 
