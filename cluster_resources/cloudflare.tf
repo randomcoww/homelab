@@ -307,7 +307,7 @@ resource "cloudflare_r2_bucket" "bucket" {
 
 resource "cloudflare_api_token" "r2_bucket" {
   for_each = local.r2_buckets
-  name     = each.key
+  name     = "r2-${each.key}"
   policy {
     permission_groups = [
       data.cloudflare_api_token_permission_groups.all.r2["Workers R2 Storage Bucket Item Read"],
@@ -322,7 +322,7 @@ resource "cloudflare_api_token" "r2_bucket" {
 # DNS
 
 resource "cloudflare_api_token" "dns" {
-  name = "dns_edit"
+  name = "zone-dns"
   policy {
     permission_groups = [
       data.cloudflare_api_token_permission_groups.all.zone["DNS Write"],
