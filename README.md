@@ -1,17 +1,48 @@
+## Terraform provisioner for Kubernetes homelab
+
 ### Configure environment
 
-Define credentials for S3 Terraform backend (currently Cloudflare R2)
+Define Terraform secrets
 
 ```bash
-AWS_ACCESS_KEY_ID=
-AWS_SECRET_ACCESS_KEY=
-AWS_ENDPOINT_URL_S3=
+CLOUDFLARE_API_TOKEN=
+CLOUDFLARE_R2_ACCOUNT_ENDPOINT=
+LETSENCRYPT_USER=
+TS_OAUTH_CLIENT_ID=
+TS_OAUTH_CLIENT_SECRET=
+GMAIL_USER=
+GMAIL_PASSWORD=
+GITHUB_ARC_TOKEN=
+```
+
+Cloudflare API token needs the following permnissions
+
+| | | |
+--- | --- | ---
+Account | Workers R2 Storage | Edit
+Account | Account Rulesets | Edit
+Account | Cloudflare Tunnel | Edit
+User | API Tokens | Edit
+Zone | Config Rules | Edit
+Zone | Zone Settings | Edit
+Zone | SSL and Certificates | Edit
+Zone | DNS | Edit
+
+Set env to use Terraform S3 backend on Cloudflare R2
+
+```bash
+cat > credentials.env <<EOF
+AWS_ENDPOINT_URL_S3=$CLOUDFLARE_R2_ACCOUNT_ENDPOINT
+AWS_ACCESS_KEY_ID=$(curl "https://api.cloudflare.com/client/v4/user/tokens/verify" --header "Authorization: Bearer $CLOUDFLARE_API_TOKEN" | jq -r .result.id )
+AWS_SECRET_ACCESS_KEY=$(echo -n $CLOUDFLARE_API_TOKEN | sha256sum --quiet)
+EOF
 ```
 
 Define the `tw` (terraform wrapper) command
 
 ```bash
 mkdir -p $HOME/.kube
+source credentials.env
 
 tw() {
   set -x
@@ -28,18 +59,6 @@ tw() {
     docker.io/hashicorp/terraform:1.10.5 "$@"
   rc=$?; set +x; return $rc
 }
-```
-
-Define Terraform secrets
-
-```bash
-CLOUDFLARE_API_TOKEN=
-LETSENCRYPT_USER=
-TS_OAUTH_CLIENT_ID=
-TS_OAUTH_CLIENT_SECRET=
-GMAIL_USER=
-GMAIL_PASSWORD=
-GITHUB_ARC_TOKEN=
 ```
 
 Create `cluster_resources/secrets.tfvars` file
