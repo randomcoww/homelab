@@ -180,7 +180,7 @@ module "authelia" {
   helm_template = {
     repository = "https://charts.authelia.com"
     chart      = "authelia"
-    version    = "0.9.14"
+    version    = "0.9.15"
   }
   images = {
     litestream = local.container_images.litestream
