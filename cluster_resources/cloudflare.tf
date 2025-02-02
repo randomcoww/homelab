@@ -334,6 +334,14 @@ resource "cloudflare_api_token" "dns" {
   }
 }
 
+# Zero trust
+
+resource "cloudflare_zero_trust_gateway_certificate" "tunnel" {
+  account_id      = local.cloudflare_account_id
+  activate        = true
+  gateway_managed = true
+}
+
 # CF tunnel
 
 data "cloudflare_zone" "zone" {
@@ -407,13 +415,6 @@ resource "cloudflare_zero_trust_tunnel_cloudflared_config" "tunnel" {
       service = "http_status:404"
     }
   }
-}
-
-resource "cloudflare_zero_trust_gateway_certificate" "tunnel" {
-  for_each        = local.cloudflare_tunnels
-  account_id      = local.cloudflare_account_id
-  activate        = true
-  gateway_managed = true
 }
 
 resource "cloudflare_record" "record" {
