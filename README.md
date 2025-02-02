@@ -21,6 +21,7 @@ Cloudflare API token needs the following permissions
 Account | Workers R2 Storage | Edit
 Account | Account Rulesets | Edit
 Account | Cloudflare Tunnel | Edit
+Account | Zero Trust | Edit
 User | API Tokens | Edit
 Zone | Config Rules | Edit
 Zone | Zone Settings | Edit

@@ -409,6 +409,13 @@ resource "cloudflare_zero_trust_tunnel_cloudflared_config" "tunnel" {
   }
 }
 
+resource "cloudflare_zero_trust_gateway_certificate" "tunnel" {
+  for_each        = local.cloudflare_tunnels
+  account_id      = local.cloudflare_account_id
+  activate        = true
+  gateway_managed = true
+}
+
 resource "cloudflare_record" "record" {
   for_each = local.cloudflare_tunnels
   zone_id  = data.cloudflare_zone.zone[each.key].id
