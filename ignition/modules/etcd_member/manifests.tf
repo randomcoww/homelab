@@ -134,6 +134,7 @@ module "etcd-wrapper" {
           "--etcd-pod-name=${var.name}",
           "--etcd-pod-namespace=$(POD_NAMESPACE)",
           "--etcd-pod-manifest-file=${local.etcd_manifest_file}",
+          "--etcd-pod-labels=app=${var.name}",
           # etcd-wrapper args
           "--client-cert-file=${local.pki.client-cert.path}",
           "--client-key-file=${local.pki.client-key.path}",

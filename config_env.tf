@@ -99,7 +99,7 @@ locals {
     kube_apiserver          = "ghcr.io/randomcoww/k8s-control-plane:v1.32.1"
     kube_controller_manager = "ghcr.io/randomcoww/k8s-control-plane:v1.32.1"
     kube_scheduler          = "ghcr.io/randomcoww/k8s-control-plane:v1.32.1"
-    etcd_wrapper            = "ghcr.io/randomcoww/etcd-wrapper:v0.3.6"
+    etcd_wrapper            = "ghcr.io/randomcoww/etcd-wrapper:v0.3.8"
     etcd                    = "gcr.io/etcd-development/etcd:v3.5.18"
 
     # Helm
