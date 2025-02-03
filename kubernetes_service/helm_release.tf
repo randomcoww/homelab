@@ -120,7 +120,7 @@ resource "helm_release" "cert-manager" {
   create_namespace = true
   wait             = true
   timeout          = 600
-  version          = "v1.16.3"
+  version          = "v1.17.0"
   max_history      = 2
   values = [
     yamlencode({
