@@ -138,6 +138,11 @@ module "litestream" {
     "checksum/secret" = sha256(module.secret.manifest)
   }
   template_spec = {
+    securityContext = {
+      runAsUser  = 1001
+      runAsGroup = 1001
+      fsGroup    = 1001
+    }
     containers = [
       {
         name  = local.name
