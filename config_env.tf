@@ -107,7 +107,7 @@ locals {
     matchbox           = "quay.io/poseidon/matchbox:v0.11.0"
     tftpd              = "ghcr.io/randomcoww/tftpd-ipxe:v20250126.1"
     hostapd            = "ghcr.io/randomcoww/hostapd-noscan:v2.11"
-    flannel            = "docker.io/flannel/flannel:v0.26.3"
+    flannel            = "docker.io/flannel/flannel:v0.26.4"
     flannel_cni_plugin = "docker.io/flannel/flannel-cni-plugin:v1.6.2-flannel1"
     kapprover          = "ghcr.io/randomcoww/kapprover:v0.1.0"
     external_dns       = "registry.k8s.io/external-dns/external-dns:v0.15.1"
