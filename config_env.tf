@@ -249,6 +249,7 @@ locals {
     kube_proxy         = 50254
     etcd_client        = 58082
     etcd_peer          = 58083
+    etcd_metrics       = 58086
     flannel_healthz    = 58084
     code               = 58085
     bgp                = 179

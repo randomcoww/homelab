@@ -565,3 +565,119 @@ resource "helm_release" "cloudflare-tunnel" {
     }),
   ]
 }
+
+# prometheus #
+
+resource "helm_release" "prometheus" {
+  name             = "prometheus"
+  namespace        = "prometheus"
+  create_namespace = true
+  repository       = "https://prometheus-community.github.io/helm-charts"
+  chart            = "prometheus"
+  wait             = false
+  version          = "27.3.0"
+  max_history      = 2
+  values = [
+    yamlencode({
+      server = {
+        persistentVolume = {
+          enabled = false
+        }
+      }
+      serverFiles = {
+        "prometheus.yml" = {
+          scrape_configs = [
+            {
+              job_name = "prometheus"
+              static_configs = [
+                {
+                  targets = [
+                    "localhost:9090",
+                  ]
+                },
+              ]
+            },
+            {
+              job_name = "kubernetes-apiservers"
+              kubernetes_sd_configs = [
+                {
+                  role = "endpoints"
+                },
+              ]
+              scheme = "https"
+              tls_config = {
+                ca_file = "/var/run/secrets/kubernetes.io/serviceaccount/ca.crt"
+              }
+              bearer_token_file = "/var/run/secrets/kubernetes.io/serviceaccount/token"
+              relabel_configs = [
+                {
+                  source_labels = [
+                    "__meta_kubernetes_namespace",
+                    "__meta_kubernetes_service_name",
+                    "__meta_kubernetes_endpoint_port_name",
+                  ]
+                  action = "keep"
+                  regex  = "default;kubernetes;https"
+                },
+              ]
+            },
+            {
+              job_name = "kubernetes-nodes"
+              scheme   = "https"
+              tls_config = {
+                ca_file = "/var/run/secrets/kubernetes.io/serviceaccount/ca.crt"
+              }
+              bearer_token_file = "/var/run/secrets/kubernetes.io/serviceaccount/token"
+              kubernetes_sd_configs = [
+                {
+                  role = "node"
+                },
+              ]
+              relabel_configs = [
+                {
+                  action = "labelmap"
+                  regex  = "__meta_kubernetes_node_label_(.+)"
+                },
+                {
+                  target_label = "__address__"
+                  replacement  = "kubernetes.default.svc:443"
+                },
+                {
+                  source_labels = [
+                    "__meta_kubernetes_node_name",
+                  ]
+                  regex        = "(.+)"
+                  target_label = "__metrics_path__"
+                  replacement  = "/api/v1/nodes/$1/proxy/metrics"
+                },
+              ]
+            },
+            {
+              job_name = "etcd"
+              static_configs = [
+                {
+                  targets = [
+                    for _, host in local.members.etcd :
+                    "${cidrhost(local.networks.etcd.prefix, host.netnum)}:${local.host_ports.etcd_metrics}"
+                  ]
+                },
+              ]
+            },
+          ]
+        }
+      }
+      alertmanager = {
+        enabled = false
+      }
+      kube-state-metrics = {
+        enabled = false
+      }
+      prometheus-node-exporter = {
+        enabled = false
+      }
+      prometheus-pushgateway = {
+        enabled = false
+      }
+    }),
+  ]
+}

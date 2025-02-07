@@ -43,8 +43,9 @@ variable "images" {
 
 variable "ports" {
   type = object({
-    etcd_client = number
-    etcd_peer   = number
+    etcd_client  = number
+    etcd_peer    = number
+    etcd_metrics = number
   })
 }
 

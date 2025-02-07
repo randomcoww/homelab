@@ -92,8 +92,9 @@ module "etcd" {
     etcd_wrapper = local.container_images.etcd_wrapper
   }
   ports = {
-    etcd_client = local.host_ports.etcd_client
-    etcd_peer   = local.host_ports.etcd_peer
+    etcd_client  = local.host_ports.etcd_client
+    etcd_peer    = local.host_ports.etcd_peer
+    etcd_metrics = local.host_ports.etcd_metrics
   }
 
   members = {

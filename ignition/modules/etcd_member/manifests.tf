@@ -149,6 +149,14 @@ module "etcd-wrapper" {
         ]
         env = [
           {
+            name = "POD_NAME"
+            valueFrom = {
+              fieldRef = {
+                fieldPath = "metadata.name"
+              }
+            }
+          },
+          {
             name = "POD_NAMESPACE"
             valueFrom = {
               fieldRef = {
