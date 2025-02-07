@@ -584,88 +584,42 @@ resource "helm_release" "prometheus" {
           enabled = false
         }
       }
-      serverFiles = {
-        "prometheus.yml" = {
-          scrape_configs = [
+      extraScrapeConfigs = yamlencode([
+        {
+          job_name = "etcd-nodes"
+          static_configs = [
             {
-              job_name = "prometheus"
-              static_configs = [
-                {
-                  targets = [
-                    "localhost:9090",
-                  ]
-                },
-              ]
-            },
-            {
-              job_name = "kubernetes-apiservers"
-              kubernetes_sd_configs = [
-                {
-                  role = "endpoints"
-                },
-              ]
-              scheme = "https"
-              tls_config = {
-                ca_file = "/var/run/secrets/kubernetes.io/serviceaccount/ca.crt"
-              }
-              bearer_token_file = "/var/run/secrets/kubernetes.io/serviceaccount/token"
-              relabel_configs = [
-                {
-                  source_labels = [
-                    "__meta_kubernetes_namespace",
-                    "__meta_kubernetes_service_name",
-                    "__meta_kubernetes_endpoint_port_name",
-                  ]
-                  action = "keep"
-                  regex  = "default;kubernetes;https"
-                },
-              ]
-            },
-            {
-              job_name = "kubernetes-nodes"
-              scheme   = "https"
-              tls_config = {
-                ca_file = "/var/run/secrets/kubernetes.io/serviceaccount/ca.crt"
-              }
-              bearer_token_file = "/var/run/secrets/kubernetes.io/serviceaccount/token"
-              kubernetes_sd_configs = [
-                {
-                  role = "node"
-                },
-              ]
-              relabel_configs = [
-                {
-                  action = "labelmap"
-                  regex  = "__meta_kubernetes_node_label_(.+)"
-                },
-                {
-                  target_label = "__address__"
-                  replacement  = "kubernetes.default.svc:443"
-                },
-                {
-                  source_labels = [
-                    "__meta_kubernetes_node_name",
-                  ]
-                  regex        = "(.+)"
-                  target_label = "__metrics_path__"
-                  replacement  = "/api/v1/nodes/$1/proxy/metrics"
-                },
-              ]
-            },
-            {
-              job_name = "etcd"
-              static_configs = [
-                {
-                  targets = [
-                    for _, host in local.members.etcd :
-                    "${cidrhost(local.networks.etcd.prefix, host.netnum)}:${local.host_ports.etcd_metrics}"
-                  ]
-                },
+              targets = [
+                for _, host in local.members.etcd :
+                "${cidrhost(local.networks.etcd.prefix, host.netnum)}:${local.host_ports.etcd_metrics}"
               ]
             },
           ]
-        }
-      }
+        },
+        {
+          job_name     = "minio-cluster"
+          metrics_path = "/minio/v2/metrics/cluster"
+          static_configs = [
+            {
+              targets = [
+                "${local.kubernetes_services.minio.endpoint}:${local.service_ports.minio}",
+              ]
+            },
+          ]
+        },
+        {
+          job_name     = "minio-nodes"
+          metrics_path = "/minio/v2/metrics/node"
+          static_configs = [
+            {
+              targets = [
+                for k, _ in range(local.minio.replicas) :
+                "${local.kubernetes_services.minio.name}-${k}.${local.kubernetes_services.minio.name}-svc.${local.kubernetes_services.minio.namespace}:${local.service_ports.minio}"
+              ]
+            },
+          ]
+        },
+      ])
       alertmanager = {
         enabled = false
       }

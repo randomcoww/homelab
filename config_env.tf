@@ -264,19 +264,22 @@ locals {
     cockroachdb  = 26258
   }
 
-  minio_data_buckets = {
-    boot = {
-      name = "data-boot"
-      acl  = "public-read"
-    }
-    music = {
-      name = "data-music"
-    }
-    pictures = {
-      name = "data-pictures"
-    }
-    videos = {
-      name = "data-videos"
+  minio = {
+    replicas = 4
+    data_buckets = {
+      boot = {
+        name = "data-boot"
+        acl  = "public-read"
+      }
+      music = {
+        name = "data-music"
+      }
+      pictures = {
+        name = "data-pictures"
+      }
+      videos = {
+        name = "data-videos"
+      }
     }
   }
 

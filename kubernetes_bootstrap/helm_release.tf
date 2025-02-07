@@ -244,7 +244,7 @@ resource "helm_release" "minio" {
         storageClass = "local-path"
       }
       drivesPerNode = 1
-      replicas      = 4
+      replicas      = local.minio.replicas
       resources = {
         requests = {
           memory = "16Gi"
@@ -264,6 +264,7 @@ resource "helm_release" "minio" {
         MINIO_API_REQUESTS_DEADLINE  = "2m"
         MINIO_STORAGE_CLASS_STANDARD = "EC:2"
         MINIO_STORAGE_CLASS_RRS      = "EC:2"
+        MINIO_PROMETHEUS_AUTH_TYPE   = "public"
       }
       buckets        = []
       users          = []

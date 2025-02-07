@@ -38,7 +38,7 @@ module "nvidia-driver" {
 }
 
 resource "minio_s3_bucket" "data" {
-  for_each = local.minio_data_buckets
+  for_each = local.minio.data_buckets
 
   bucket        = each.value.name
   acl           = lookup(each.value, "acl", "private")
