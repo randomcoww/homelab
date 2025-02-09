@@ -41,21 +41,18 @@ EOF
 Define `tw` (terraform wrapper)
 
 ```bash
-mkdir -p $HOME/.kube
 source credentials.env
 
 tw() {
   set -x
   podman run -it --rm --security-opt label=disable \
-    --entrypoint='' \
     -v $(pwd):$(pwd) \
-    -v $HOME/.kube:/root/.kube \
-    -e KUBE_CONFIG_PATH=/root/.kube/config \
+    -w $(pwd) \
     -e AWS_ACCESS_KEY_ID=$AWS_ACCESS_KEY_ID \
     -e AWS_SECRET_ACCESS_KEY=$AWS_SECRET_ACCESS_KEY \
     -e AWS_ENDPOINT_URL_S3=$AWS_ENDPOINT_URL_S3 \
-    -w $(pwd) \
     --net=host \
+    --entrypoint='' \
     docker.io/hashicorp/terraform:1.10.5 "$@"
   rc=$?; set +x; return $rc
 }
