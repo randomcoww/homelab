@@ -120,7 +120,7 @@ locals {
     clickhouse         = "docker.io/clickhouse/clickhouse-server:25.1-alpine"
     qrcode_generator   = "ghcr.io/randomcoww/qrcode-generator:v20250125.1"
     rclone             = "docker.io/rclone/rclone:1.69.0"
-    mountpoint         = "ghcr.io/randomcoww/mountpoint-s3:v20250209.2156"
+    mountpoint         = "ghcr.io/randomcoww/mountpoint-s3:v20250209.2202"
     s3fs               = "ghcr.io/randomcoww/s3fs:v20250125.1"
     audioserve         = "docker.io/izderadicka/audioserve:latest"
     syncthing          = "docker.io/syncthing/syncthing:1.29.2"
