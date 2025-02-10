@@ -127,7 +127,7 @@ locals {
     kube_vip           = "ghcr.io/kube-vip/kube-vip:v0.8.9"
     sunshine_desktop   = "ghcr.io/randomcoww/sunshine-desktop:v20250127.3"
     nvidia_driver      = "ghcr.io/randomcoww/nvidia-driver-container:v570.86.15-fedora41"
-    steamcmd           = "ghcr.io/randomcoww/steamcmd:v20250125.1"
+    steamcmd           = "ghcr.io/randomcoww/steamcmd:v20250210.0032"
     kvm_device_plugin  = "ghcr.io/randomcoww/kvm-device-plugin:v20250124.2"
 
     # Unused
