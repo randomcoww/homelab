@@ -131,7 +131,7 @@ locals {
     kvm_device_plugin  = "ghcr.io/randomcoww/kvm-device-plugin:v20250210.0031"
 
     # Unused
-    cockroachdb        = "docker.io/cockroachdb/cockroach:v24.3.4"
+    cockroachdb        = "docker.io/cockroachdb/cockroach:v24.3.5"
     fuse_device_plugin = "docker.io/soolaugust/fuse-device-plugin:v1.0"
     vaultwarden        = "docker.io/vaultwarden/server:1.33.2-alpine"
   }
