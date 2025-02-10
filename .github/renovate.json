@@ -45,6 +45,15 @@
         "ghcr.io/lldap/lldap"
       ],
       "versioning": "regex:^(?<major>\\d+)-(?<minor>\\d+)-(?<patch>\\d+)(-(?<compatibility>.*))?$"
+    },
+    {
+      "matchDatasources": [
+        "docker"
+      ],
+      "matchPackageNames": [
+        "docker.io/eqalpha/keydb"
+      ],
+      "versioning": "regex:^(?<compatibility>.*)_v(?<major>\\d+).(?<minor>\\d+).(?<patch>\\d+)$"
     }
   ]
 }
