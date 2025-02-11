@@ -103,7 +103,7 @@ locals {
     etcd                    = "gcr.io/etcd-development/etcd:v3.5.18"
 
     # Helm
-    kea                = "ghcr.io/randomcoww/kea:v2.7.5"
+    kea                = "ghcr.io/randomcoww/kea:v20250210.2345"
     matchbox           = "quay.io/poseidon/matchbox:v0.11.0"
     tftpd              = "ghcr.io/randomcoww/tftpd-ipxe:v20250210.0030"
     hostapd            = "ghcr.io/randomcoww/hostapd-noscan:v2.11"
@@ -111,7 +111,7 @@ locals {
     flannel_cni_plugin = "docker.io/flannel/flannel-cni-plugin:v1.6.2-flannel1"
     kapprover          = "ghcr.io/randomcoww/kapprover:v0.1.0"
     external_dns       = "registry.k8s.io/external-dns/external-dns:v0.15.1"
-    kube_proxy         = "ghcr.io/randomcoww/kube-proxy:v1.32.1"
+    kube_proxy         = "ghcr.io/randomcoww/kube-proxy:v20250211.0005"
     litestream         = "docker.io/litestream/litestream:0.3.13"
     tailscale          = "ghcr.io/randomcoww/tailscale-nft:v20250210.0031"
     code_server        = "ghcr.io/randomcoww/code-server:v20250209.2202"
