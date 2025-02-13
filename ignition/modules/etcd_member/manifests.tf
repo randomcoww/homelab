@@ -1,7 +1,8 @@
 locals {
-  config_path        = "${var.config_base_path}/${var.name}"
-  etcd_snapshot_file = "${local.config_path}/etcd-snapshot.db"
-  etcd_manifest_file = "${var.static_pod_path}/${var.name}.json"
+  config_path            = "${var.config_base_path}/${var.name}"
+  etcd_manifest_file     = "${var.static_pod_path}/${var.name}.json"
+  etcd_snapshot_file     = "${local.config_path}/etcd-snapshot.db"
+  etcd_pod_template_file = "${local.config_path}/etcd-template.yaml"
 
   # etcd cluster params
   initial_advertise_peer_urls = join(",", [
@@ -57,7 +58,7 @@ locals {
     })
   }
 
-  static_pod = {
+  static_pod = merge({
     for key, f in {
       etcd-wrapper = {
         contents = module.etcd-wrapper.manifest
@@ -66,7 +67,12 @@ locals {
     key => merge(f, {
       path = "${var.static_pod_path}/${key}.yaml"
     })
-  }
+    }, {
+    etcd = {
+      contents = module.etcd.manifest
+      path     = local.etcd_pod_template_file
+    }
+  })
 
   ignition_snippets = concat([
     for f in fileset(".", "${path.module}/templates/*.yaml") :
@@ -104,6 +110,41 @@ locals {
   ]
 }
 
+module "etcd" {
+  source = "../../../modules/static_pod"
+  name   = var.name
+  spec = {
+    containers = [
+      {
+        name  = "etcd"
+        image = var.images.etcd
+        env = [
+          {
+            name  = "ETCD_ENABLE_V2"
+            value = "false"
+          },
+          {
+            name  = "ETCD_STRICT_RECONFIG_CHECK"
+            value = "true"
+          },
+          {
+            name  = "ETCD_AUTO_COMPACTION_RETENTION"
+            value = tostring(var.auto_compaction_retention)
+          },
+          {
+            name  = "ETCD_AUTO_COMPACTION_MODE"
+            value = "revision"
+          },
+          {
+            name  = "ETCD_LISTEN_METRICS_URLS"
+            value = "http://0.0.0.0:${var.ports.etcd_metrics}"
+          },
+        ]
+      },
+    ]
+  }
+}
+
 module "etcd-wrapper" {
   source = "../../../modules/static_pod"
   name   = "${var.name}-wrapper"
@@ -115,37 +156,30 @@ module "etcd-wrapper" {
         args = [
           # etcd args
           "--name=${var.host_key}",
-          "--trusted-ca-file=${local.pki.ca-cert.path}",
-          "--peer-trusted-ca-file=${local.pki.peer-ca-cert.path}",
           "--cert-file=${local.pki.cert.path}",
           "--key-file=${local.pki.key.path}",
+          "--trusted-ca-file=${local.pki.ca-cert.path}",
           "--peer-cert-file=${local.pki.peer-cert.path}",
           "--peer-key-file=${local.pki.peer-key.path}",
+          "--peer-trusted-ca-file=${local.pki.peer-ca-cert.path}",
+          "--initial-cluster-token=${var.cluster_token}",
           "--initial-advertise-peer-urls=${local.initial_advertise_peer_urls}",
           "--listen-peer-urls=${local.listen_peer_urls}",
           "--advertise-client-urls=${local.advertise_client_urls}",
           "--listen-client-urls=${local.listen_client_urls}",
-          "--initial-cluster-token=${var.cluster_token}",
           "--initial-cluster=${local.initial_cluster}",
-          "--auto-compaction-retention=${tostring(var.auto_compaction_retention)}",
-          # pod manifest args
-          "--etcd-image=${var.images.etcd}",
-          "--etcd-snaphot-file=${local.etcd_snapshot_file}",
-          "--etcd-pod-name=${var.name}",
-          "--etcd-pod-namespace=$(POD_NAMESPACE)",
-          "--etcd-pod-manifest-file=${local.etcd_manifest_file}",
-          "--etcd-pod-labels=app=${var.name}",
           # etcd-wrapper args
+          "--etcd-snaphot-file=${local.etcd_snapshot_file}",
+          "--etcd-pod-template-file=${local.etcd_pod_template_file}",
           "--client-cert-file=${local.pki.client-cert.path}",
           "--client-key-file=${local.pki.client-key.path}",
+          "--etcd-pod-manifest-write-path=${local.etcd_manifest_file}",
           "--s3-backup-endpoint=${var.s3_endpoint}",
           "--s3-backup-resource=${var.s3_resource}",
           "--healthcheck-interval=${var.healthcheck_interval}",
           "--backup-interval=${var.backup_interval}",
           "--healthcheck-fail-count-allowed=${var.healthcheck_fail_count_allowed}",
           "--readiness-fail-count-allowed=${var.readiness_fail_count_allowed}",
-          "--etcd-pod-priority-class-name=system-cluster-critical",
-          "--etcd-pod-priority=2000000000",
         ]
         env = [
           {

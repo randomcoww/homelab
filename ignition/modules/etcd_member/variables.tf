@@ -90,7 +90,7 @@ variable "healthcheck_fail_count_allowed" {
 
 variable "readiness_fail_count_allowed" {
   type    = number
-  default = 32
+  default = 64
 }
 
 variable "auto_compaction_retention" {

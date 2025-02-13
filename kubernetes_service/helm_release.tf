@@ -591,7 +591,7 @@ resource "helm_release" "prometheus" {
             {
               targets = [
                 for _, host in local.members.etcd :
-                "${cidrhost(local.networks.etcd.prefix, host.netnum)}:${local.host_ports.etcd_metrics}"
+                "${cidrhost(local.networks.service.prefix, host.netnum)}:${local.host_ports.etcd_metrics}"
               ]
             },
           ]
