@@ -22,6 +22,13 @@ variable "images" {
   })
 }
 
+variable "ports" {
+  type = object({
+    clickhouse = number
+    prometheus = number
+  })
+}
+
 variable "ca" {
   type = object({
     algorithm       = string

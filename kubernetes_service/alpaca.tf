@@ -63,6 +63,10 @@ module "alpaca-db" {
     clickhouse = local.container_images.clickhouse
     s3fs       = local.container_images.s3fs
   }
+  ports = {
+    clickhouse = local.service_ports.clickhouse
+    prometheus = local.service_ports.clickhouse_metrics
+  }
   ca = {
     algorithm       = tls_private_key.alpaca-db-ca.algorithm
     private_key_pem = tls_private_key.alpaca-db-ca.private_key_pem

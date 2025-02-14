@@ -256,12 +256,14 @@ locals {
   }
 
   service_ports = {
-    matchbox     = 80
-    matchbox_api = 50101
-    minio        = 9000
-    lldap        = 6360
-    redis        = 6379
-    cockroachdb  = 26258
+    matchbox           = 80
+    matchbox_api       = 50101
+    minio              = 9000
+    lldap              = 6360
+    redis              = 6379
+    cockroachdb        = 26258
+    clickhouse         = 9440
+    clickhouse_metrics = 9363
   }
 
   minio = {

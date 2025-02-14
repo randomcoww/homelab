@@ -19,11 +19,12 @@ locals {
   cert_path    = "${local.base_path}/server.crt"
   key_path     = "${local.base_path}/server.key"
   ca_cert_path = "${local.base_path}/ca.crt"
-  ports = {
+  ports = merge({
     clickhouse = 9440
     keeper     = 9281
     raft       = 9444
-  }
+    prometheus = 9363
+  }, var.ports)
 
   clickhouse_config = merge({
     mysql_port             = 9004
@@ -182,6 +183,16 @@ locals {
         }
       }
     }
+
+    prometheus = {
+      "@replace"           = "replace"
+      port                 = local.ports.prometheus
+      endpoint             = "/metrics"
+      metrics              = true
+      asynchronous_metrics = true
+      events               = true
+      errors               = true
+    }
   })
 
   keeper_config = merge({
@@ -326,6 +337,12 @@ module "service-peer" {
         port       = local.ports.raft
         protocol   = "TCP"
         targetPort = local.ports.raft
+      },
+      {
+        name       = "prometheus"
+        port       = local.ports.prometheus
+        protocol   = "TCP"
+        targetPort = local.ports.prometheus
       },
     ]
   }
