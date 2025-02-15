@@ -206,6 +206,8 @@ locals {
       authelia_redis = {
         name      = "authelia-redis"
         namespace = "authelia"
+        headless  = "authelia-peer"
+        replicas  = 2
       }
       ingress_nginx = {
         name      = "${local.ingress_classes.ingress_nginx}-controller"
@@ -222,6 +224,8 @@ locals {
       minio = {
         name      = "minio"
         namespace = "minio"
+        headless  = "minio-svc"
+        replicas  = 4
       }
       lldap = {
         name      = "lldap"
@@ -230,11 +234,17 @@ locals {
       alpaca_db = {
         name      = "alpaca-db"
         namespace = "alpaca"
+        headless  = "alpaca-db-peer"
+        replicas  = 3
       }
     } :
     name => merge(e, {
       endpoint = "${e.name}.${e.namespace}"
       fqdn     = "${e.name}.${e.namespace}.svc.${local.domains.kubernetes}"
+      endpoints = try([
+        for i, _ in range(e.replicas) :
+        "${e.name}-${i}.${e.headless}.${e.namespace}"
+      ], [])
     })
   }
 
@@ -267,7 +277,6 @@ locals {
   }
 
   minio = {
-    replicas = 4
     data_buckets = {
       boot = {
         name = "data-boot"

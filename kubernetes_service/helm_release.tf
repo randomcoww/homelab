@@ -613,8 +613,19 @@ resource "helm_release" "prometheus" {
           static_configs = [
             {
               targets = [
-                for k, _ in range(local.minio.replicas) :
-                "${local.kubernetes_services.minio.name}-${k}.${local.kubernetes_services.minio.name}-svc.${local.kubernetes_services.minio.namespace}:${local.service_ports.minio}"
+                for _, ep in local.kubernetes_services.minio.endpoints :
+                "${ep}:${local.service_ports.minio}"
+              ]
+            },
+          ]
+        },
+        {
+          job_name = "alpaca-db"
+          static_configs = [
+            {
+              targets = [
+                for _, ep in local.kubernetes_services.alpaca_db.endpoints :
+                "${ep}:${local.service_ports.clickhouse_metrics}"
               ]
             },
           ]

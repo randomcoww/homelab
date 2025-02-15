@@ -58,7 +58,7 @@ module "alpaca-db" {
   source                   = "./modules/clickhouse"
   cluster_service_endpoint = local.kubernetes_services.alpaca_db.fqdn
   release                  = "0.1.1"
-  replicas                 = 3
+  replicas                 = local.kubernetes_services.alpaca_db.replicas
   images = {
     clickhouse = local.container_images.clickhouse
     s3fs       = local.container_images.s3fs
