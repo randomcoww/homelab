@@ -121,7 +121,7 @@ locals {
     qrcode_generator   = "ghcr.io/randomcoww/qrcode-generator:v20250210.0031"
     rclone             = "docker.io/rclone/rclone:1.69.1"
     mountpoint         = "ghcr.io/randomcoww/mountpoint-s3:v20250209.2202"
-    s3fs               = "ghcr.io/randomcoww/s3fs:v20250209.2204"
+    s3fs               = "ghcr.io/randomcoww/s3fs:v20250216.0316"
     audioserve         = "docker.io/izderadicka/audioserve:latest"
     syncthing          = "docker.io/syncthing/syncthing:1.29.2"
     kube_vip           = "ghcr.io/kube-vip/kube-vip:v0.8.9"
