@@ -45,7 +45,7 @@ module "kea" {
 
 module "matchbox" {
   source                   = "./modules/matchbox"
-  cluster_service_endpoint = local.kubernetes_services.matchbox.fqdn
+  cluster_service_endpoint = local.kubernetes_services.matchbox.endpoint
   release                  = "0.2.16"
   replicas                 = 3
   images = {

@@ -58,7 +58,7 @@ resource "minio_iam_user_policy_attachment" "lldap" {
 
 module "lldap" {
   source                   = "./modules/lldap"
-  cluster_service_endpoint = local.kubernetes_services.lldap.fqdn
+  cluster_service_endpoint = local.kubernetes_services.lldap.endpoint
   release                  = "0.1.0"
   images = {
     lldap      = local.container_images.lldap
@@ -125,7 +125,7 @@ resource "tls_self_signed_cert" "authelia-redis-ca" {
 
 module "authelia-redis" {
   source                   = "./modules/keydb"
-  cluster_service_endpoint = local.kubernetes_services.authelia_redis.fqdn
+  cluster_service_endpoint = local.kubernetes_services.authelia_redis.fqdn # peer connections don't work unless this is a fqdn
   release                  = "0.1.0"
   replicas                 = local.kubernetes_services.authelia_redis.replicas
   images = {
@@ -263,7 +263,7 @@ module "authelia" {
       redis = {
         enabled = true
         deploy  = false
-        host    = local.kubernetes_services.authelia_redis.fqdn
+        host    = local.kubernetes_services.authelia_redis.endpoint
         port    = local.service_ports.redis
         password = {
           disabled = true

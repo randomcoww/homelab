@@ -431,7 +431,7 @@ resource "helm_release" "arc-runner-hook-template" {
                     env = [
                       {
                         name  = "MC_HOST_arc"
-                        value = "http://${minio_iam_user.arc.id}:${minio_iam_user.arc.secret}@${local.kubernetes_services.minio.fqdn}:${local.service_ports.minio}"
+                        value = "http://${minio_iam_user.arc.id}:${minio_iam_user.arc.secret}@${local.kubernetes_services.minio.endpoint}:${local.service_ports.minio}"
                       },
                     ]
                   },

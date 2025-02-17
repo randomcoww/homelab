@@ -56,7 +56,7 @@ resource "minio_iam_user_policy_attachment" "alpaca-db" {
 
 module "alpaca-db" {
   source                   = "./modules/clickhouse"
-  cluster_service_endpoint = local.kubernetes_services.alpaca_db.fqdn
+  cluster_service_endpoint = local.kubernetes_services.alpaca_db.endpoint
   release                  = "0.1.1"
   replicas                 = local.kubernetes_services.alpaca_db.replicas
   images = {

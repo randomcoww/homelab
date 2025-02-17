@@ -93,7 +93,7 @@ module "webdav-pictures" {
   ingress_class_name        = local.ingress_classes.ingress_nginx
   nginx_ingress_annotations = local.nginx_ingress_annotations
 
-  minio_endpoint          = "http://${local.kubernetes_services.minio.fqdn}:${local.service_ports.minio}"
+  minio_endpoint          = "http://${local.kubernetes_services.minio.endpoint}:${local.service_ports.minio}"
   minio_bucket            = minio_s3_bucket.data["pictures"].id
   minio_access_key_id     = minio_iam_user.webdav-pictures.id
   minio_secret_access_key = minio_iam_user.webdav-pictures.secret
@@ -137,7 +137,7 @@ module "webdav-videos" {
   ingress_class_name        = local.ingress_classes.ingress_nginx
   nginx_ingress_annotations = local.nginx_ingress_annotations
 
-  minio_endpoint          = "http://${local.kubernetes_services.minio.fqdn}:${local.service_ports.minio}"
+  minio_endpoint          = "http://${local.kubernetes_services.minio.endpoint}:${local.service_ports.minio}"
   minio_bucket            = minio_s3_bucket.data["videos"].id
   minio_access_key_id     = minio_iam_user.webdav-videos.id
   minio_secret_access_key = minio_iam_user.webdav-videos.secret
