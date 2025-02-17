@@ -244,7 +244,7 @@ resource "helm_release" "minio" {
         storageClass = "local-path"
       }
       drivesPerNode = 1
-      replicas      = local.kubernetes_service.minio.replicas
+      replicas      = local.kubernetes_services.minio.replicas
       resources = {
         requests = {
           memory = "16Gi"
