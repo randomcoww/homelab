@@ -1,7 +1,7 @@
 locals {
   name      = split(".", var.cluster_service_endpoint)[0]
   namespace = split(".", var.cluster_service_endpoint)[1]
-  peer_name = "${local.name}-peer"
+  peer_name = "${local.name}-${var.headless_suffix}"
 
   certs_path       = "/etc/cockroachdb"
   init_client_user = "root"

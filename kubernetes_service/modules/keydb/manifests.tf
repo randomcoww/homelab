@@ -9,7 +9,7 @@ locals {
   socket_path           = "/tmp/keydb.sock"
   name                  = split(".", var.cluster_service_endpoint)[0]
   namespace             = split(".", var.cluster_service_endpoint)[1]
-  peer_name             = "${local.name}-peer"
+  peer_name             = "${local.name}-${var.headless_suffix}"
   peer_service_endpoint = "${local.peer_name}.${join(".", slice(split(".", var.cluster_service_endpoint), 1, length(split(".", var.cluster_service_endpoint))))}"
 
   peers = {
