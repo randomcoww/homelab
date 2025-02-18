@@ -621,7 +621,7 @@ resource "helm_release" "prometheus" {
           ]
         },
         {
-          job_name = "alpaca-db"
+          job_name = "alpaca-db-nodes"
           static_configs = [
             {
               targets = [
@@ -632,7 +632,7 @@ resource "helm_release" "prometheus" {
           ]
         },
         {
-          job_name = "kea"
+          job_name = "kea-nodes"
           static_configs = [
             {
               targets = [
