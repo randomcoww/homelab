@@ -13,15 +13,17 @@ variable "release" {
 
 variable "images" {
   type = object({
-    kea   = string
-    tftpd = string
+    kea         = string
+    tftpd       = string
+    stork_agent = string
   })
 }
 
 variable "ports" {
   type = object({
-    kea_peer = number
-    tftpd    = number
+    kea_peer    = number
+    kea_metrics = number
+    tftpd       = number
   })
 }
 

@@ -129,6 +129,7 @@ locals {
     nvidia_driver      = "ghcr.io/randomcoww/nvidia-driver-container:v570.86.15-fedora41"
     steamcmd           = "ghcr.io/randomcoww/steamcmd:v20250216.0424"
     kvm_device_plugin  = "ghcr.io/randomcoww/kvm-device-plugin:v20250211.0006"
+    stork_agent        = "ghcr.io/randomcoww/stork-agent:v20250217.2337"
 
     # Unused
     cockroachdb        = "docker.io/cockroachdb/cockroach:v24.3.5"
@@ -250,6 +251,7 @@ locals {
 
   host_ports = {
     kea_peer           = 50060
+    kea_metrics        = 58087
     tftpd              = 69
     apiserver          = 58181
     apiserver_backend  = 58081

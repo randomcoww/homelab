@@ -465,6 +465,7 @@ resource "helm_release" "arc-runner-set" {
     "tailscale-nft",
     "nvidia-driver-container",
     "homelab",
+    "stork-agent",
   ])
 
   name             = "arc-runner-${each.key}"
@@ -626,6 +627,17 @@ resource "helm_release" "prometheus" {
               targets = [
                 for _, ep in local.kubernetes_services.alpaca_db.endpoints :
                 "${ep}:${local.service_ports.clickhouse_metrics}"
+              ]
+            },
+          ]
+        },
+        {
+          job_name = "kea"
+          static_configs = [
+            {
+              targets = [
+                "${local.services.cluster_kea_primary.ip}:${local.host_ports.kea_metrics}",
+                "${local.services.cluster_kea_secondary.ip}:${local.host_ports.kea_metrics}",
               ]
             },
           ]

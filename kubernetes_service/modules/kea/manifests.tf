@@ -1,10 +1,12 @@
 locals {
-  base_path                = "/etc/kea"
-  kea_config_template_path = "${local.base_path}/kea-dhcp4.tpl"
-  kea_config_path          = "${local.base_path}/kea-dhcp4.conf"
-  ha_ca_cert_path          = "${local.base_path}/ca_cert.pem"
-  ha_cert_path             = "${local.base_path}/cert.pem"
-  ha_key_path              = "${local.base_path}/key.pem"
+  base_path                      = "/etc/kea"
+  kea_dhcp4_config_template_path = "${local.base_path}/kea-dhcp4.tpl"
+  kea_dhcp4_config_path          = "${local.base_path}/kea-dhcp4.conf"
+  kea_ctrl_agent_config_path     = "${local.base_path}/kea-ctrl-agent.conf"
+  ha_ca_cert_path                = "${local.base_path}/ca_cert.pem"
+  ha_cert_path                   = "${local.base_path}/cert.pem"
+  ha_key_path                    = "${local.base_path}/key.pem"
+  kea_socket_path                = "/var/tmp/kea/kea-dhcp4-ctrl.sock"
 
   members = [
     for i, ip in var.service_ips :
@@ -15,7 +17,19 @@ locals {
     }
   ]
   subnet_id_base = 1
-  configs = {
+  ctrl_agent_config = {
+    Control-agent = {
+      http-host = "127.0.0.1"
+      http-port = 8080
+      control-sockets = {
+        dhcp4 = {
+          socket-type = "unix"
+          socket-name = local.kea_socket_path
+        }
+      }
+    }
+  }
+  dhcp4_config = {
     for i, member in local.members :
     member.name => {
       Dhcp4 = {
@@ -29,11 +43,19 @@ locals {
         interfaces-config = {
           interfaces = ["*"]
         }
-        hooks-libraries = length(var.service_ips) > 1 ? [
+        control-socket = {
+          socket-type = "unix"
+          socket-name = local.kea_socket_path
+        }
+        hooks-libraries = concat([
           {
             library    = "${var.kea_hooks_libraries_path}/libdhcp_lease_cmds.so"
             parameters = {}
           },
+          {
+            library = "${var.kea_hooks_libraries_path}/libdhcp_stat_cmds.so"
+          },
+          ], length(var.service_ips) > 1 ? [
           {
             library = "${var.kea_hooks_libraries_path}/libdhcp_ha.so"
             parameters = {
@@ -58,7 +80,7 @@ locals {
               ]
             }
           },
-        ] : []
+        ] : [])
         client-classes = [
           {
             name           = "XClient_iPXE"
@@ -147,16 +169,17 @@ module "secret" {
   app     = var.name
   release = var.release
   data = merge({
-    for host, config in local.configs :
+    for host, config in local.dhcp4_config :
     "kea-dhcp4-${host}" => jsonencode(config)
     }, {
-    for host, _ in local.configs :
+    for host, _ in local.dhcp4_config :
     "ha-cert-${host}" => tls_locally_signed_cert.kea[host].cert_pem
     }, {
-    for host, _ in local.configs :
+    for host, _ in local.dhcp4_config :
     "ha-key-${host}" => tls_private_key.kea[host].private_key_pem
     }, {
-    "ha-ca-cert" = tls_self_signed_cert.kea-ca.cert_pem
+    basename(local.ha_ca_cert_path)            = tls_self_signed_cert.kea-ca.cert_pem
+    basename(local.kea_ctrl_agent_config_path) = jsonencode(local.ctrl_agent_config)
   })
 }
 
@@ -182,6 +205,12 @@ module "service-peer" {
         protocol   = "TCP"
         targetPort = var.ports.kea_peer
       },
+      {
+        name       = "kea-metrics"
+        port       = var.ports.kea_metrics
+        protocol   = "TCP"
+        targetPort = var.ports.kea_metrics
+      },
     ]
     selector = {
       app                                  = var.name
@@ -196,7 +225,7 @@ module "statefulset" {
   app      = var.name
   release  = var.release
   affinity = var.affinity
-  replicas = length(local.configs)
+  replicas = length(local.dhcp4_config)
   annotations = {
     "checksum/secret" = sha256(module.secret.manifest)
   }
@@ -204,8 +233,10 @@ module "statefulset" {
     minReadySeconds = 30
   }
   template_spec = {
-    hostNetwork = true
-    dnsPolicy   = "ClusterFirstWithHostNet"
+    # stork agent looks for kea-ctrl-agent process
+    shareProcessNamespace = true
+    hostNetwork           = true
+    dnsPolicy             = "ClusterFirstWithHostNet"
     containers = [
       {
         name  = var.name
@@ -216,9 +247,9 @@ module "statefulset" {
           <<-EOF
           set -e
 
-          cat ${local.kea_config_template_path} | envsubst > ${local.kea_config_path}
           mkdir -p /var/run/kea
-          exec kea-dhcp4 -c ${local.kea_config_path}
+          cat ${local.kea_dhcp4_config_template_path} | envsubst > ${local.kea_dhcp4_config_path}
+          exec kea-dhcp4 -c ${local.kea_dhcp4_config_path}
           EOF
         ]
         env = [
@@ -249,13 +280,13 @@ module "statefulset" {
         volumeMounts = [
           {
             name        = "kea-config"
-            mountPath   = local.kea_config_template_path
+            mountPath   = local.kea_dhcp4_config_template_path
             subPathExpr = "kea-dhcp4-$(POD_NAME)"
           },
           {
             name        = "kea-config"
             mountPath   = local.ha_ca_cert_path
-            subPathExpr = "ha-ca-cert"
+            subPathExpr = basename(local.ha_ca_cert_path)
           },
           {
             name        = "kea-config"
@@ -266,6 +297,10 @@ module "statefulset" {
             name        = "kea-config"
             mountPath   = local.ha_key_path
             subPathExpr = "ha-key-$(POD_NAME)"
+          },
+          {
+            name      = "socket-path"
+            mountPath = dirname(local.kea_socket_path)
           },
         ]
       },
@@ -286,12 +321,59 @@ module "statefulset" {
           }
         }
       },
+      {
+        name  = "${var.name}-ctrl-agent"
+        image = var.images.kea
+        command = [
+          "sh",
+          "-c",
+          <<-EOF
+          set -e
+
+          mkdir -p /var/run/kea
+          exec kea-ctrl-agent -c ${local.kea_ctrl_agent_config_path}
+          EOF
+        ]
+        volumeMounts = [
+          {
+            name        = "kea-config"
+            mountPath   = local.kea_ctrl_agent_config_path
+            subPathExpr = basename(local.kea_ctrl_agent_config_path)
+          },
+          {
+            name      = "socket-path"
+            mountPath = dirname(local.kea_socket_path)
+          },
+        ]
+      },
+      {
+        name  = "${var.name}-stork-agent"
+        image = var.images.stork_agent
+        args = [
+          "--listen-prometheus-only",
+          "--prometheus-kea-exporter-port=${var.ports.kea_metrics}",
+          "--prometheus-bind9-exporter-address=127.0.0.1", # don't want this
+        ]
+        volumeMounts = [
+          {
+            name        = "kea-config"
+            mountPath   = local.kea_ctrl_agent_config_path
+            subPathExpr = basename(local.kea_ctrl_agent_config_path)
+          },
+        ]
+      },
     ]
     volumes = [
       {
         name = "kea-config"
         secret = {
           secretName = module.secret.name
+        }
+      },
+      {
+        name = "socket-path"
+        emptyDir = {
+          medium = "Memory"
         }
       },
     ]
