@@ -589,14 +589,15 @@ resource "helm_release" "prometheus" {
         "alerting_rules.yml" = {
           groups = [
             {
-              # https://github.com/prometheus-community/helm-charts/blob/main/charts/prometheus/values.yaml
+              # https://monitoring.mixins.dev/etcd/
               name = "etcd"
               rules = [
                 {
                   alert = "etcdMembersDown"
                   annotations = {
-                    message = <<-EOF
-                    etcd cluster "{{`{{`}} $labels.job {{`}}`}}": members are down ({{`{{`}} $value {{`}}`}}).
+                    summary     = "etcd cluster members are down."
+                    description = <<-EOF
+                    etcd cluster "{{ $labels.job }}": members are down ({{ $value }}).
                     EOF
                   }
                   expr = <<-EOF
@@ -617,14 +618,89 @@ resource "helm_release" "prometheus" {
                 {
                   alert = "etcdInsufficientMembers"
                   annotations = {
-                    message = <<-EOF
-                    etcd cluster "{{`{{`}} $labels.job {{`}}`}}": insufficient members ({{`{{`}} $value {{`}}`}}).
+                    description = <<-EOF
+                    etcd cluster "{{ $labels.job }}": insufficient members ({{ $value }}).
                     EOF
+                    summary     = "etcd cluster has insufficient number of members."
                   }
                   expr = <<-EOF
                   sum(up{job=~".*etcd.*"} == bool 1) by (job) < ((count(up{job=~".*etcd.*"}) by (job) + 1) / 2)
                   EOF
                   for  = "3m"
+                  labels = {
+                    severity = "critical"
+                  }
+                },
+              ]
+            },
+            {
+              # https://monitoring.mixins.dev/clickhouse/
+              name = "alpaca-db"
+              rules = [
+                {
+                  alert = "ClickHouseReplicationQueueBackingUp"
+                  annotations = {
+                    description = <<-EOF
+                    ClickHouse replication tasks are processing slower than expected on {{ $labels.instance }} causing replication queue size to back up at {{ $value }} exceeding the threshold value of 99.
+                    EOF
+                    summary     = "ClickHouse replica max queue size backing up."
+                  }
+                  expr            = <<-EOF
+                  ClickHouseAsyncMetrics_ReplicasMaxQueueSize > 99
+                  EOF
+                  for             = "5m"
+                  keep_firing_for = "5m"
+                  labels = {
+                    severity = "warning"
+                  }
+                },
+                {
+                  alert = "ClickHouseRejectedInserts"
+                  annotations = {
+                    description = <<-EOF
+                    ClickHouse inserts are being rejected on {{ $labels.instance }} as items are being inserted faster than ClickHouse is able to merge them.
+                    EOF
+                    summary     = "ClickHouse has too many rejected inserts."
+                  }
+                  expr            = <<-EOF
+                  ClickHouseProfileEvents_RejectedInserts > 1
+                  EOF
+                  for             = "5m"
+                  keep_firing_for = "5m"
+                  labels = {
+                    severity = "critical"
+                  }
+                },
+                {
+                  alert = "ClickHouseZookeeperSessions"
+                  annotations = {
+                    description = <<-EOF
+                    ClickHouse has more than one connection to a Zookeeper on {{ $labels.instance }} which can lead to bugs due to stale reads in Zookeepers consistency model.
+                    EOF
+                    summary     = "ClickHouse has too many Zookeeper sessions."
+                  }
+                  expr            = <<-EOF
+                  ClickHouseMetrics_ZooKeeperSession > 1
+                  EOF
+                  for             = "5m"
+                  keep_firing_for = "5m"
+                  labels = {
+                    severity = "critical"
+                  }
+                },
+                {
+                  alert = "ClickHouseReplicasInReadOnly"
+                  annotations = {
+                    description = <<-EOF
+                    ClickHouse has replicas in a read only state on {{ $labels.instance }} after losing connection to Zookeeper or at startup.
+                    EOF
+                    summary     = "ClickHouse has too many replicas in read only state."
+                  }
+                  expr            = <<-EOF
+                  ClickHouseMetrics_ReadonlyReplica > 0
+                  EOF
+                  for             = "5m"
+                  keep_firing_for = "5m"
                   labels = {
                     severity = "critical"
                   }
