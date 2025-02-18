@@ -585,6 +585,93 @@ resource "helm_release" "prometheus" {
           enabled = false
         }
       }
+      serverFiles = {
+        "alerting_rules.yml" = {
+          groups = [
+            {
+              # https://github.com/prometheus-community/helm-charts/blob/main/charts/prometheus/values.yaml
+              name = "etcd"
+              rules = [
+                {
+                  alert = "etcdMembersDown"
+                  annotations = {
+                    message = <<-EOF
+                    etcd cluster "{{`{{`}} $labels.job {{`}}`}}": members are down ({{`{{`}} $value {{`}}`}}).
+                    EOF
+                  }
+                  expr = <<-EOF
+                  max by (job) (
+                    sum by (job) (up{job=~".*etcd.*"} == bool 0)
+                  or
+                    count by (job,endpoint) (
+                      sum by (job,endpoint,To) (rate(etcd_network_peer_sent_failures_total{job=~".*etcd.*"}[3m])) > 0.01
+                    )
+                  )
+                  > 0
+                  EOF
+                  for  = "3m"
+                  labels = {
+                    severity = "critical"
+                  }
+                },
+                {
+                  alert = "etcdInsufficientMembers"
+                  annotations = {
+                    message = <<-EOF
+                    etcd cluster "{{`{{`}} $labels.job {{`}}`}}": insufficient members ({{`{{`}} $value {{`}}`}}).
+                    EOF
+                  }
+                  expr = <<-EOF
+                  sum(up{job=~".*etcd.*"} == bool 1) by (job) < ((count(up{job=~".*etcd.*"}) by (job) + 1) / 2)
+                  EOF
+                  for  = "3m"
+                  labels = {
+                    severity = "critical"
+                  }
+                },
+              ]
+            },
+            {
+              # https://min.io/docs/minio/linux/operations/monitoring/collect-minio-metrics-using-prometheus.html
+              name = "minio"
+              rules = [
+                {
+                  alert = "NodesOffline"
+                  annotations = {
+                    summary     = "Node down in MinIO deployment"
+                    description = <<-EOF
+                    Node(s) in cluster {{ $labels.instance }} offline for more than 5 minutes
+                    EOF
+                  }
+                  expr = <<-EOF
+                  avg_over_time(minio_cluster_nodes_offline_total{job="minio-nodes"}[5m]) > 0
+                  EOF
+                  for  = "10m"
+                  labels = {
+                    severity = "warn"
+                  }
+                },
+                {
+                  alert = "DisksOffline"
+                  annotations = {
+                    summary     = "Disks down in MinIO deployment"
+                    description = <<-EOF
+                    Disks(s) in cluster {{ $labels.instance }} offline for more than 5 minutes
+                    EOF
+                  }
+                  expr = <<-EOF
+                  avg_over_time(minio_cluster_drive_offline_total{job="minio-nodes"}[5m]) > 0
+                  EOF
+                  for  = "10m"
+                  labels = {
+                    severity = "warn"
+                  }
+                },
+              ]
+            },
+          ]
+        }
+      }
       extraScrapeConfigs = yamlencode([
         {
           job_name = "etcd-nodes"
