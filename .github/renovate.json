@@ -31,7 +31,7 @@
         "^config_env.tf$"
       ],
       "matchStrings": [
-        "pxeboot_images\\s*=\\s*{[^}]*\\s+\"[\\w-]+-(?<major>\\d+)(.(?<minor>\\d+))?(.(?<patch>\\d+))?\"\\s+#\\s+(?<depName>[\\w\/-]+)"
+        "pxeboot_images\\s*=\\s*{[^}]*\\s+\"[\\w-]+-(?<currentValue>[\\d.]+)\"\\s+#\\s+(?<depName>[\\w\/-]+)"
       ],
       "datasourceTemplate": "github-tags"
     }
