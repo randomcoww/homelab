@@ -32,7 +32,7 @@ output "podlist" {
   sensitive = true
 }
 
-output "prometheus_jobs" {
+output "prometheus_targets" {
   value = merge([
     for i, m in local.modules_enabled :
     transpose(merge(flatten([
