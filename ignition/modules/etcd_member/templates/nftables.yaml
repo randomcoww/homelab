@@ -20,7 +20,7 @@ storage:
 
             chain input {
               type filter hook input priority 0; policy accept;
-              tcp dport {${ports.etcd_client}, ${ports.etcd_peer}} jump mark-for-accept;
+              tcp dport {${ports.etcd_client}, ${ports.etcd_peer}, ${ports.etcd_metrics}} jump mark-for-accept;
             }
           }
           ;

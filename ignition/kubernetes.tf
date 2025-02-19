@@ -96,14 +96,11 @@ module "etcd" {
     etcd_peer    = local.host_ports.etcd_peer
     etcd_metrics = local.host_ports.etcd_metrics
   }
-
+  node_ip = cidrhost(local.networks.etcd.prefix, each.value.netnum)
   members = {
     for host_key, host in local.members.etcd :
     host_key => cidrhost(local.networks.etcd.prefix, host.netnum)
   }
-  etcd_ips = sort([
-    cidrhost(local.networks.etcd.prefix, each.value.netnum)
-  ])
   s3_endpoint          = data.terraform_remote_state.sr.outputs.r2_bucket.etcd.url
   s3_resource          = "${data.terraform_remote_state.sr.outputs.r2_bucket.etcd.bucket}/snapshot/${local.kubernetes.cluster_name}.db"
   s3_access_key_id     = data.terraform_remote_state.sr.outputs.r2_bucket.etcd.access_key_id

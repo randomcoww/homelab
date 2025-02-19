@@ -10,7 +10,10 @@ resource "tls_cert_request" "kube-etcd" {
     common_name = "kube-etcd"
   }
 
-  ip_addresses = concat(["127.0.0.1"], var.etcd_ips)
+  ip_addresses = [
+    "127.0.0.1",
+    var.node_ip,
+  ]
 }
 
 resource "tls_locally_signed_cert" "kube-etcd" {

@@ -5,22 +5,10 @@ locals {
   etcd_pod_template_file = "${local.config_path}/etcd-template.yaml"
 
   # etcd cluster params
-  initial_advertise_peer_urls = join(",", [
-    for _, ip in var.etcd_ips :
-    "https://${ip}:${var.ports.etcd_peer}"
-  ])
-  listen_peer_urls = join(",", [
-    for _, ip in var.etcd_ips :
-    "https://${ip}:${var.ports.etcd_peer}"
-  ])
-  advertise_client_urls = join(",", [
-    for _, ip in var.etcd_ips :
-    "https://${ip}:${var.ports.etcd_client}"
-  ])
-  listen_client_urls = join(",", [
-    for _, ip in var.etcd_ips :
-    "https://${ip}:${var.ports.etcd_client}"
-  ])
+  initial_advertise_peer_urls = "https://${var.node_ip}:${var.ports.etcd_peer}"
+  listen_peer_urls            = "https://${var.node_ip}:${var.ports.etcd_peer}"
+  advertise_client_urls       = "https://${var.node_ip}:${var.ports.etcd_client}"
+  listen_client_urls          = "https://${var.node_ip}:${var.ports.etcd_client}"
   initial_cluster = join(",", [
     for host_key, ip in var.members :
     "${host_key}=https://${ip}:${var.ports.etcd_peer}"
@@ -108,6 +96,13 @@ locals {
     for pod in local.static_pod :
     pod.contents
   ]
+
+  prometheus_jobs = {
+    job = "${var.name}-nodes"
+    targets = [
+      "${var.node_ip}:${var.ports.etcd_metrics}",
+    ]
+  }
 }
 
 module "etcd" {

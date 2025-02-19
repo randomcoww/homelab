@@ -49,12 +49,12 @@ variable "ports" {
   })
 }
 
-variable "members" {
-  type = map(string)
+variable "node_ip" {
+  type = string
 }
 
-variable "etcd_ips" {
-  type = list(string)
+variable "members" {
+  type = map(string)
 }
 
 variable "s3_endpoint" {

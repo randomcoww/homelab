@@ -21,7 +21,7 @@ output "podlist" {
       apiVersion = "v1"
       kind       = "PodList"
       items = flatten([
-        for m in local.modules_enabled :
+        for _, m in local.modules_enabled :
         [
           for pod in try(m[host_key].pod_manifests, []) :
           yamldecode(pod)
@@ -30,4 +30,17 @@ output "podlist" {
     })
   }
   sensitive = true
+}
+
+output "prometheus_jobs" {
+  value = merge([
+    for i, m in local.modules_enabled :
+    transpose(merge([
+      for _, k in m :
+      {
+        for _, t in try(k.prometheus_jobs.targets, []) :
+        t => [try(k.prometheus_jobs.job, "")]
+      }
+    ]...))
+  ]...)
 }
