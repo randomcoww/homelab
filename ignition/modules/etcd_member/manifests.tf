@@ -97,12 +97,14 @@ locals {
     pod.contents
   ]
 
-  prometheus_jobs = {
-    job = "${var.name}-nodes"
-    targets = [
-      "${var.node_ip}:${var.ports.etcd_metrics}",
-    ]
-  }
+  prometheus_jobs = [
+    {
+      job = "${var.name}-nodes"
+      targets = [
+        "${var.node_ip}:${var.ports.etcd_metrics}",
+      ]
+    },
+  ]
 }
 
 module "etcd" {

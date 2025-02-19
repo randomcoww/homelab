@@ -35,12 +35,15 @@ output "podlist" {
 output "prometheus_jobs" {
   value = merge([
     for i, m in local.modules_enabled :
-    transpose(merge([
+    transpose(merge(flatten([
       for _, k in m :
-      {
-        for _, t in try(k.prometheus_jobs.targets, []) :
-        t => [try(k.prometheus_jobs.job, "")]
-      }
-    ]...))
+      [
+        for _, job in try(k.prometheus_jobs, []) :
+        {
+          for _, t in job.targets :
+          t => [job.job]
+        }
+      ]
+    ])...))
   ]...)
 }
