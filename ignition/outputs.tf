@@ -32,18 +32,21 @@ output "podlist" {
   sensitive = true
 }
 
-output "prometheus_targets" {
+output "prometheus_jobs" {
   value = merge([
     for i, m in local.modules_enabled :
-    transpose(merge(flatten([
-      for _, k in m :
-      [
-        for _, job in try(k.prometheus_jobs, []) :
-        {
-          for _, t in job.targets :
-          t => [job.job]
+    merge(flatten([
+      for _, host in m :
+      {
+        for _, job in try(host.prometheus_jobs, []) :
+        job.job_name => {
+          targets = local.prometheus_targets[job.job_name]
+          params = {
+            for k, v in job :
+            k => v if k != "targets"
+          }
         }
-      ]
-    ])...))
+      }
+    ])...)
   ]...)
 }

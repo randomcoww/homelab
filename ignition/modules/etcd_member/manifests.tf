@@ -99,7 +99,7 @@ locals {
 
   prometheus_jobs = [
     {
-      job = "${var.name}-nodes"
+      job_name = "${var.name}-nodes"
       targets = [
         "${var.node_ip}:${var.ports.etcd_metrics}",
       ]
