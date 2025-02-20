@@ -12,6 +12,11 @@ data "helm_template" "coredns" {
       serviceAccount = {
         create = false
       }
+      prometheus = {
+        service = {
+          enabled = true
+        }
+      }
       service = {
         clusterIP         = var.service_cluster_ip
         loadBalancerIP    = var.service_ip
@@ -93,4 +98,15 @@ locals {
       ])
     }))
   })
+
+  prometheus_jobs = [
+    {
+      params = {
+        job_name = "${var.name}-metrics"
+      }
+      targets = [
+        "${var.name}-coredns-metrics.${var.namespace}:${var.ports.metrics}"
+      ]
+    },
+  ]
 }

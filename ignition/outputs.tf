@@ -39,12 +39,9 @@ output "prometheus_jobs" {
       for _, host in m :
       {
         for _, job in try(host.prometheus_jobs, []) :
-        job.job_name => {
-          targets = local.prometheus_targets[job.job_name]
-          params = {
-            for k, v in job :
-            k => v if k != "targets"
-          }
+        job.params.job_name => {
+          targets = local.prometheus_targets[job.params.job_name]
+          params  = job.params
         }
       }
     ])...)

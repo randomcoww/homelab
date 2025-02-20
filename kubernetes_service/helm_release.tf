@@ -45,15 +45,12 @@ locals {
       for _, m in local.modules_enabled :
       [
         for _, job in try(m.prometheus_jobs, []) :
-        merge({
+        merge(job.params, {
           static_configs = [
             {
               targets = job.targets
-            }
+            },
           ]
-          }, {
-          for k, v in job :
-          k => v if k != "targets"
         })
       ]
   ]))

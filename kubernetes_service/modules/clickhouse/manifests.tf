@@ -221,7 +221,9 @@ locals {
 
   prometheus_jobs = [
     {
-      job_name = "${local.name}-nodes"
+      params = {
+        job_name = "${local.name}-nodes"
+      }
       targets = [
         for _, member in local.members :
         "${member}.${local.peer_service_endpoint}:${var.ports.metrics}"

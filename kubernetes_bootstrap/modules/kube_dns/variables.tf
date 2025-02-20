@@ -7,6 +7,12 @@ variable "namespace" {
   default = "default"
 }
 
+variable "ports" {
+  type = object({
+    metrics = number
+  })
+}
+
 variable "helm_template" {
   type = object({
     repository = string

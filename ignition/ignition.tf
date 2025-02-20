@@ -20,7 +20,7 @@ locals {
         for _, job in try(host.prometheus_jobs, []) :
         {
           for _, t in job.targets :
-          t => [job.job_name]
+          t => [job.params.job_name]
         }
       ]
     ])...))

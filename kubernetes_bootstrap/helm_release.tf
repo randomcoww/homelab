@@ -36,13 +36,7 @@ locals {
     for _, m in local.modules_enabled :
     merge({
       for _, job in try(m.prometheus_jobs, []) :
-      job.job_name => {
-        targets = job.targets
-        params = {
-          for k, v in job :
-          k => v if k != "targets"
-        }
-      }
+      job.params.job_name => job
     })
   ]...)
 }
@@ -155,6 +149,9 @@ module "kube-dns" {
     etcd         = local.container_images.etcd
     external_dns = local.container_images.external_dns
   }
+  ports = {
+    metrics = local.service_ports.prometheus
+  }
   service_cluster_ip      = local.services.cluster_dns.ip
   service_ip              = local.services.external_dns.ip
   loadbalancer_class_name = "kube-vip.io/kube-vip-class"
@@ -200,6 +197,10 @@ module "kube-dns" {
         {
           name       = "cache"
           parameters = 30
+        },
+        {
+          name       = "prometheus"
+          parameters = "0.0.0.0:${local.service_ports.prometheus}"
         },
       ]
     },
@@ -280,7 +281,7 @@ resource "helm_release" "minio" {
         storageClass = "local-path"
       }
       drivesPerNode = 1
-      replicas      = length(local.minio_replicas)
+      replicas      = local.minio_replicas
       resources = {
         requests = {
           memory = "16Gi"
