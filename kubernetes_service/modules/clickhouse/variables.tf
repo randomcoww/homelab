@@ -25,7 +25,7 @@ variable "images" {
 variable "ports" {
   type = object({
     clickhouse = number
-    prometheus = number
+    metrics    = number
   })
 }
 

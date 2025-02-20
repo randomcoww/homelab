@@ -20,10 +20,8 @@ locals {
   key_path     = "${local.base_path}/server.key"
   ca_cert_path = "${local.base_path}/ca.crt"
   ports = merge({
-    clickhouse = 9440
-    keeper     = 9281
-    raft       = 9444
-    prometheus = 9363
+    keeper = 9281
+    raft   = 9444
   }, var.ports)
 
   clickhouse_config = merge({
@@ -186,7 +184,7 @@ locals {
 
     prometheus = {
       "@replace"           = "replace"
-      port                 = local.ports.prometheus
+      port                 = local.ports.metrics
       endpoint             = "/metrics"
       metrics              = true
       asynchronous_metrics = true
@@ -226,7 +224,7 @@ locals {
       job_name = "${local.name}-nodes"
       targets = [
         for _, member in local.members :
-        "${member}.${local.peer_service_endpoint}"
+        "${member}.${local.peer_service_endpoint}:${var.ports.metrics}"
       ]
     },
   ]
@@ -349,10 +347,10 @@ module "service-peer" {
         targetPort = local.ports.raft
       },
       {
-        name       = "prometheus"
-        port       = local.ports.prometheus
+        name       = "metrics"
+        port       = local.ports.metrics
         protocol   = "TCP"
-        targetPort = local.ports.prometheus
+        targetPort = local.ports.metrics
       },
     ]
   }
