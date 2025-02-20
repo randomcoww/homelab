@@ -12,8 +12,8 @@ locals {
 
   minio_replicas = length(local.members.disks)
   minio_service  = local.kubernetes_services.minio
-  prometheus_jobs = merge({
-    "minio-cluster" = {
+  prometheus_jobs = concat([
+    {
       params = {
         job_name     = "minio-cluster"
         metrics_path = "/minio/v2/metrics/cluster"
@@ -22,7 +22,7 @@ locals {
         "${local.kubernetes_services.minio.endpoint}:${local.service_ports.minio}",
       ]
     },
-    "minio-nodes" = {
+    {
       params = {
         job_name     = "minio-nodes"
         metrics_path = "/minio/v2/metrics/node"
@@ -31,14 +31,11 @@ locals {
         for i, _ in range(local.minio_replicas) :
         "${local.minio_service.name}-${i}.${local.minio_service.name}-svc.${local.minio_service.namespace}:${local.service_ports.minio}"
       ]
-    }
-    }, [
-    for _, m in local.modules_enabled :
-    merge({
-      for _, job in try(m.prometheus_jobs, []) :
-      job.params.job_name => job
-    })
-  ]...)
+    },
+    ], flatten([
+      for _, m in local.modules_enabled :
+      try(m.prometheus_jobs, [])
+  ]))
 }
 
 module "bootstrap" {

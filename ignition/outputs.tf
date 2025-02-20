@@ -33,7 +33,7 @@ output "podlist" {
 }
 
 output "prometheus_jobs" {
-  value = merge([
+  value = values(merge([
     for _, m in local.modules_enabled :
     merge(flatten([
       for _, host in m :
@@ -45,5 +45,5 @@ output "prometheus_jobs" {
         }
       }
     ])...)
-  ]...)
+  ]...))
 }
