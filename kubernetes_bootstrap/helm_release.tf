@@ -10,7 +10,8 @@ locals {
     module.kube-vip,
   ]
 
-  minio_service = local.kubernetes_services.minio
+  minio_replicas = length(local.members.disks)
+  minio_service  = local.kubernetes_services.minio
   prometheus_jobs = merge({
     "minio-cluster" = {
       params = {
@@ -27,7 +28,7 @@ locals {
         metrics_path = "/minio/v2/metrics/node"
       }
       targets = [
-        for i, _ in range(length(local.members.disks)) :
+        for i, _ in range(local.minio_replicas) :
         "${local.minio_service.name}-${i}.${local.minio_service.name}-svc.${local.minio_service.namespace}:${local.service_ports.minio}"
       ]
     }
@@ -279,7 +280,7 @@ resource "helm_release" "minio" {
         storageClass = "local-path"
       }
       drivesPerNode = 1
-      replicas      = length(local.members.disks)
+      replicas      = length(local.minio_replicas)
       resources = {
         requests = {
           memory = "16Gi"
