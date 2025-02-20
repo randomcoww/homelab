@@ -29,7 +29,7 @@ locals {
       static_configs = [
         {
           targets = job.targets
-        }
+        },
       ]
     })
     ], [
@@ -38,7 +38,7 @@ locals {
       static_configs = [
         {
           targets = job.targets
-        }
+        },
       ]
     })
     ], flatten([
