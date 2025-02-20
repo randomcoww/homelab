@@ -132,7 +132,7 @@ locals {
     stork_agent        = "ghcr.io/randomcoww/stork-agent:v20250217.2337"
 
     # Unused
-    cockroachdb        = "docker.io/cockroachdb/cockroach:v24.3.5"
+    cockroachdb        = "docker.io/cockroachdb/cockroach:v24.3.6"
     fuse_device_plugin = "docker.io/soolaugust/fuse-device-plugin:v1.0"
     vaultwarden        = "docker.io/vaultwarden/server:1.33.2-alpine"
   }
