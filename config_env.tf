@@ -205,10 +205,8 @@ locals {
         namespace = "authelia"
       }
       authelia_redis = {
-        name            = "authelia-redis"
-        namespace       = "authelia"
-        headless_suffix = "peer"
-        replicas        = 2
+        name      = "authelia-redis"
+        namespace = "authelia"
       }
       ingress_nginx = {
         name      = "${local.ingress_classes.ingress_nginx}-controller"
@@ -223,29 +221,21 @@ locals {
         namespace = "default"
       }
       minio = {
-        name            = "minio"
-        namespace       = "minio"
-        headless_suffix = "svc" # hardcoded in minio helm chart
-        replicas        = 4
+        name      = "minio"
+        namespace = "minio"
       }
       lldap = {
         name      = "lldap"
         namespace = "lldap"
       }
       alpaca_db = {
-        name            = "alpaca-db"
-        namespace       = "alpaca"
-        headless_suffix = "peer"
-        replicas        = 3
+        name      = "alpaca-db"
+        namespace = "alpaca"
       }
     } :
     name => merge(e, {
       endpoint = "${e.name}.${e.namespace}"
       fqdn     = "${e.name}.${e.namespace}.svc.${local.domains.kubernetes}"
-      endpoints = try([
-        for i, _ in range(e.replicas) :
-        "${e.name}-${i}.${e.name}-${e.headless_suffix}.${e.namespace}"
-      ], [])
     })
   }
 

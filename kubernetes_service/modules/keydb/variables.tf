@@ -2,11 +2,6 @@ variable "cluster_service_endpoint" {
   type = string
 }
 
-variable "headless_suffix" {
-  type    = string
-  default = "peer"
-}
-
 variable "release" {
   type = string
 }

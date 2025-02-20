@@ -21,7 +21,7 @@ resource "matchbox_profile" "ignition" {
     "rd.driver.blacklist=nouveau",
     "modprobe.blacklist=nouveau",
   ], each.value.boot_args)
-  raw_ignition = data.terraform_remote_state.ign.outputs.ignition[each.value.host_key]
+  raw_ignition = data.terraform_remote_state.ignition.outputs.ignition[each.value.host_key]
   # Write local files so that this step can work without access to ignition tfstate on S3
   # raw_ignition = file("output/ignition/${each.value.host_key}.ign")
 }
@@ -37,7 +37,7 @@ resource "matchbox_group" "ignition" {
 }
 
 resource "matchbox_profile" "podlist" {
-  for_each = data.terraform_remote_state.ign.outputs.podlist
+  for_each = data.terraform_remote_state.ignition.outputs.podlist
 
   name           = each.key
   generic_config = each.value

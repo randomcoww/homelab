@@ -126,9 +126,8 @@ resource "tls_self_signed_cert" "authelia-redis-ca" {
 module "authelia-redis" {
   source                   = "./modules/keydb"
   cluster_service_endpoint = local.kubernetes_services.authelia_redis.fqdn # peer connections don't work unless this is a fqdn
-  headless_suffix          = local.kubernetes_services.authelia_redis.headless_suffix
   release                  = "0.1.0"
-  replicas                 = local.kubernetes_services.authelia_redis.replicas
+  replicas                 = 2
   images = {
     keydb = local.container_images.keydb
   }
