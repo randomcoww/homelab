@@ -22,6 +22,41 @@ locals {
     module.sunshine-desktop,
     module.satisfactory-server,
   ]
+
+  prometheus_jobs = concat([
+    for _, job in data.terraform_remote_state.ignition.outputs.prometheus_jobs :
+    merge(job.params, {
+      static_configs = [
+        {
+          targets = job.targets
+        }
+      ]
+    })
+    ], [
+    for _, job in data.terraform_remote_state.kubernetes_bootstrap.outputs.prometheus_jobs :
+    merge(job.params, {
+      static_configs = [
+        {
+          targets = job.targets
+        }
+      ]
+    })
+    ], flatten([
+      for _, m in local.modules_enabled :
+      [
+        for _, job in try(m.prometheus_jobs, []) :
+        merge({
+          static_configs = [
+            {
+              targets = job.targets
+            }
+          ]
+          }, {
+          for k, v in job :
+          k => v if k != "targets"
+        })
+      ]
+  ]))
 }
 
 resource "helm_release" "wrapper" {
@@ -748,64 +783,7 @@ resource "helm_release" "prometheus" {
           ]
         }
       }
-      extraScrapeConfigs = yamlencode([
-        {
-          job_name = "etcd-nodes"
-          static_configs = [
-            {
-              targets = [
-                for _, host in local.members.etcd :
-                "${cidrhost(local.networks.service.prefix, host.netnum)}:${local.host_ports.etcd_metrics}"
-              ]
-            },
-          ]
-        },
-        {
-          job_name     = "minio-cluster"
-          metrics_path = "/minio/v2/metrics/cluster"
-          static_configs = [
-            {
-              targets = [
-                "${local.kubernetes_services.minio.endpoint}:${local.service_ports.minio}",
-              ]
-            },
-          ]
-        },
-        {
-          job_name     = "minio-nodes"
-          metrics_path = "/minio/v2/metrics/node"
-          static_configs = [
-            {
-              targets = [
-                for _, ep in local.kubernetes_services.minio.endpoints :
-                "${ep}:${local.service_ports.minio}"
-              ]
-            },
-          ]
-        },
-        {
-          job_name = "alpaca-db-nodes"
-          static_configs = [
-            {
-              targets = [
-                for _, ep in local.kubernetes_services.alpaca_db.endpoints :
-                "${ep}:${local.service_ports.clickhouse_metrics}"
-              ]
-            },
-          ]
-        },
-        {
-          job_name = "kea-nodes"
-          static_configs = [
-            {
-              targets = [
-                "${local.services.cluster_kea_primary.ip}:${local.host_ports.kea_metrics}",
-                "${local.services.cluster_kea_secondary.ip}:${local.host_ports.kea_metrics}",
-              ]
-            },
-          ]
-        },
-      ])
+      extraScrapeConfigs = yamlencode(local.prometheus_jobs)
       alertmanager = {
         enabled = false
       }

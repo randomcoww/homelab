@@ -10,7 +10,28 @@ locals {
     module.kube-vip,
   ]
 
-  prometheus_jobs = merge([
+  minio_service = local.kubernetes_services.minio
+  prometheus_jobs = merge({
+    "minio-cluster" = {
+      params = {
+        job_name     = "minio-cluster"
+        metrics_path = "/minio/v2/metrics/cluster"
+      }
+      targets = [
+        "${local.kubernetes_services.minio.endpoint}:${local.service_ports.minio}",
+      ]
+    },
+    "minio-nodes" = {
+      params = {
+        job_name     = "minio-nodes"
+        metrics_path = "/minio/v2/metrics/node"
+      }
+      targets = [
+        for i, _ in range(length(local.members.disks)) :
+        "${local.minio_service.name}-${i}.${local.minio_service.name}-svc.${local.minio_service.namespace}:${local.service_ports.minio}"
+      ]
+    }
+    }, [
     for _, m in local.modules_enabled :
     merge({
       for _, job in try(m.prometheus_jobs, []) :
