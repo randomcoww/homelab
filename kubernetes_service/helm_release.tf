@@ -22,38 +22,6 @@ locals {
     module.sunshine-desktop,
     module.satisfactory-server,
   ]
-
-  prometheus_jobs = concat([
-    for _, job in data.terraform_remote_state.ignition.outputs.prometheus_jobs :
-    merge(job.params, {
-      static_configs = [
-        {
-          targets = job.targets
-        },
-      ]
-    })
-    ], [
-    for _, job in data.terraform_remote_state.kubernetes_bootstrap.outputs.prometheus_jobs :
-    merge(job.params, {
-      static_configs = [
-        {
-          targets = job.targets
-        },
-      ]
-    })
-    ], flatten([
-      for _, m in local.modules_enabled :
-      [
-        for _, job in try(m.prometheus_jobs, []) :
-        merge(job.params, {
-          static_configs = [
-            {
-              targets = job.targets
-            },
-          ]
-        })
-      ]
-  ]))
 }
 
 resource "helm_release" "wrapper" {
@@ -780,7 +748,38 @@ resource "helm_release" "prometheus" {
           ]
         }
       }
-      extraScrapeConfigs = yamlencode(local.prometheus_jobs)
+      extraScrapeConfigs = yamlencode(concat([
+        for _, job in data.terraform_remote_state.ignition.outputs.prometheus_jobs :
+        merge(job.params, {
+          static_configs = [
+            {
+              targets = job.targets
+            },
+          ]
+        })
+        ], [
+        for _, job in data.terraform_remote_state.kubernetes_bootstrap.outputs.prometheus_jobs :
+        merge(job.params, {
+          static_configs = [
+            {
+              targets = job.targets
+            },
+          ]
+        })
+        ], flatten([
+          for _, m in local.modules_enabled :
+          [
+            for _, job in try(m.prometheus_jobs, []) :
+            merge(job.params, {
+              static_configs = [
+                {
+                  targets = job.targets
+                },
+              ]
+            })
+          ]
+        ]
+      )))
       alertmanager = {
         enabled = false
       }
