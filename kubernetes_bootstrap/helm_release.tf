@@ -9,6 +9,20 @@ locals {
     module.kube-dns,
     module.kube-vip,
   ]
+
+  prometheus_jobs = merge([
+    for _, m in local.modules_enabled :
+    merge({
+      for _, job in try(m.prometheus_jobs, []) :
+      job.job_name => {
+        targets = job.targets
+        params = {
+          for k, v in job :
+          k => v if k != "targets"
+        }
+      }
+    })
+  ]...)
 }
 
 module "bootstrap" {
@@ -244,7 +258,7 @@ resource "helm_release" "minio" {
         storageClass = "local-path"
       }
       drivesPerNode = 1
-      replicas      = local.kubernetes_services.minio.replicas
+      replicas      = length(local.members.disks)
       resources = {
         requests = {
           memory = "16Gi"

@@ -146,6 +146,16 @@ locals {
       }
     }
   }
+
+  prometheus_jobs = [
+    {
+      job_name = "${var.name}-nodes"
+      targets = [
+        for _, member in local.members :
+        "${member.ip}:${var.ports.kea_metrics}"
+      ]
+    },
+  ]
 }
 
 module "metadata" {
