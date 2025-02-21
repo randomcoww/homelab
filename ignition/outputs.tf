@@ -31,19 +31,3 @@ output "podlist" {
   }
   sensitive = true
 }
-
-output "prometheus_jobs" {
-  value = values(merge([
-    for _, m in local.modules_enabled :
-    merge(flatten([
-      for _, host in m :
-      {
-        for _, job in try(host.prometheus_jobs, []) :
-        job.params.job_name => {
-          targets = local.prometheus_targets[job.params.job_name]
-          params  = job.params
-        }
-      }
-    ])...)
-  ]...))
-}

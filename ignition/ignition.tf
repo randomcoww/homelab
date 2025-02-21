@@ -11,20 +11,6 @@ locals {
     module.server,
     module.client,
   ]
-
-  prometheus_targets = merge([
-    for i, m in local.modules_enabled :
-    transpose(merge(flatten([
-      for _, host in m :
-      [
-        for _, job in try(host.prometheus_jobs, []) :
-        {
-          for _, t in job.targets :
-          t => [job.params.job_name]
-        }
-      ]
-    ])...))
-  ]...)
 }
 
 data "ct_config" "ignition" {

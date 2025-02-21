@@ -1,1 +1,0 @@
-../state_kubernetes_bootstrap.tf

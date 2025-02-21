@@ -98,15 +98,4 @@ locals {
       ])
     }))
   })
-
-  prometheus_jobs = [
-    {
-      params = {
-        job_name = "${var.name}-metrics"
-      }
-      targets = [
-        "${var.name}-coredns-metrics.${var.namespace}:${var.ports.metrics}"
-      ]
-    },
-  ]
 }

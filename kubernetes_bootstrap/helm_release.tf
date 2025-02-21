@@ -9,33 +9,6 @@ locals {
     module.kube-dns,
     module.kube-vip,
   ]
-
-  minio_replicas = length(local.members.disks)
-  minio_service  = local.kubernetes_services.minio
-  prometheus_jobs = concat([
-    {
-      params = {
-        job_name     = "minio-cluster"
-        metrics_path = "/minio/v2/metrics/cluster"
-      }
-      targets = [
-        "${local.kubernetes_services.minio.endpoint}:${local.service_ports.minio}",
-      ]
-    },
-    {
-      params = {
-        job_name     = "minio-nodes"
-        metrics_path = "/minio/v2/metrics/node"
-      }
-      targets = [
-        for i, _ in range(local.minio_replicas) :
-        "${local.minio_service.name}-${i}.${local.minio_service.name}-svc.${local.minio_service.namespace}:${local.service_ports.minio}"
-      ]
-    },
-    ], flatten([
-      for _, m in local.modules_enabled :
-      try(m.prometheus_jobs, [])
-  ]))
 }
 
 module "bootstrap" {
@@ -278,7 +251,7 @@ resource "helm_release" "minio" {
         storageClass = "local-path"
       }
       drivesPerNode = 1
-      replicas      = local.minio_replicas
+      replicas      = 4
       resources = {
         requests = {
           memory = "16Gi"
@@ -290,6 +263,11 @@ resource "helm_release" "minio" {
         clusterIP         = local.services.cluster_minio.ip
         loadBalancerIP    = local.services.minio.ip
         loadBalancerClass = "kube-vip.io/kube-vip-class"
+        annotations = {
+          "prometheus.io/scrape" = "true"
+          "prometheus.io/port"   = tostring(local.service_ports.minio)
+          "prometheus.io/path"   = "/minio/v2/metrics/node"
+        }
       }
       ingress = {
         enabled = false

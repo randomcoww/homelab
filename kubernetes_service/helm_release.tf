@@ -5,6 +5,7 @@ locals {
     # module.fuse-device-plugin,
     module.kvm-device-plugin,
     module.nvidia-driver,
+    module.etcd-monitoring,
     module.kea,
     module.matchbox,
     module.lldap,
@@ -597,15 +598,15 @@ resource "helm_release" "prometheus" {
                   annotations = {
                     summary     = "etcd cluster members are down."
                     description = <<-EOF
-                    etcd cluster "{{ $labels.job }}": members are down ({{ $value }}).
+                    etcd cluster "{{ $labels.app }}": members are down ({{ $value }}).
                     EOF
                   }
                   expr = <<-EOF
-                  max by (job) (
-                    sum by (job) (up{job=~".*etcd.*"} == bool 0)
+                  max by (app) (
+                    sum by (app) (up{app="etcd"} == bool 0)
                   or
-                    count by (job,endpoint) (
-                      sum by (job,endpoint,To) (rate(etcd_network_peer_sent_failures_total{job=~".*etcd.*"}[3m])) > 0.01
+                    count by (app,endpoint) (
+                      sum by (app,endpoint,To) (rate(etcd_network_peer_sent_failures_total{app="etcd"}[3m])) > 0.01
                     )
                   )
                   > 0
@@ -619,12 +620,12 @@ resource "helm_release" "prometheus" {
                   alert = "etcdInsufficientMembers"
                   annotations = {
                     description = <<-EOF
-                    etcd cluster "{{ $labels.job }}": insufficient members ({{ $value }}).
+                    etcd cluster "{{ $labels.app }}": insufficient members ({{ $value }}).
                     EOF
                     summary     = "etcd cluster has insufficient number of members."
                   }
                   expr = <<-EOF
-                  sum(up{job=~".*etcd.*"} == bool 1) by (job) < ((count(up{job=~".*etcd.*"}) by (job) + 1) / 2)
+                  sum(up{app="etcd"} == bool 1) by (app) < ((count(up{app="etcd"}) by (app) + 1) / 2)
                   EOF
                   for  = "3m"
                   labels = {
@@ -646,7 +647,7 @@ resource "helm_release" "prometheus" {
                     summary     = "ClickHouse replica max queue size backing up."
                   }
                   expr            = <<-EOF
-                  ClickHouseAsyncMetrics_ReplicasMaxQueueSize > 99
+                  ClickHouseAsyncMetrics_ReplicasMaxQueueSize{app="alpaca-db"} > 99
                   EOF
                   for             = "5m"
                   keep_firing_for = "5m"
@@ -663,7 +664,7 @@ resource "helm_release" "prometheus" {
                     summary     = "ClickHouse has too many rejected inserts."
                   }
                   expr            = <<-EOF
-                  ClickHouseProfileEvents_RejectedInserts > 1
+                  ClickHouseProfileEvents_RejectedInserts{app="alpaca-db"} > 1
                   EOF
                   for             = "5m"
                   keep_firing_for = "5m"
@@ -680,7 +681,7 @@ resource "helm_release" "prometheus" {
                     summary     = "ClickHouse has too many Zookeeper sessions."
                   }
                   expr            = <<-EOF
-                  ClickHouseMetrics_ZooKeeperSession > 1
+                  ClickHouseMetrics_ZooKeeperSession{app="alpaca-db"} > 1
                   EOF
                   for             = "5m"
                   keep_firing_for = "5m"
@@ -697,7 +698,7 @@ resource "helm_release" "prometheus" {
                     summary     = "ClickHouse has too many replicas in read only state."
                   }
                   expr            = <<-EOF
-                  ClickHouseMetrics_ReadonlyReplica > 0
+                  ClickHouseMetrics_ReadonlyReplica{app="alpaca-db"} > 0
                   EOF
                   for             = "5m"
                   keep_firing_for = "5m"
@@ -720,7 +721,7 @@ resource "helm_release" "prometheus" {
                     EOF
                   }
                   expr = <<-EOF
-                  avg_over_time(minio_cluster_nodes_offline_total{job="minio-nodes"}[5m]) > 0
+                  avg_over_time(minio_cluster_nodes_offline_total{app="minio"}[5m]) > 0
                   EOF
                   for  = "10m"
                   labels = {
@@ -736,7 +737,7 @@ resource "helm_release" "prometheus" {
                     EOF
                   }
                   expr = <<-EOF
-                  avg_over_time(minio_cluster_drive_offline_total{job="minio-nodes"}[5m]) > 0
+                  avg_over_time(minio_cluster_drive_offline_total{app="minio"}[5m]) > 0
                   EOF
                   for  = "10m"
                   labels = {
@@ -748,38 +749,6 @@ resource "helm_release" "prometheus" {
           ]
         }
       }
-      extraScrapeConfigs = yamlencode(concat([
-        for _, job in data.terraform_remote_state.ignition.outputs.prometheus_jobs :
-        merge(job.params, {
-          static_configs = [
-            {
-              targets = job.targets
-            },
-          ]
-        })
-        ], [
-        for _, job in data.terraform_remote_state.kubernetes_bootstrap.outputs.prometheus_jobs :
-        merge(job.params, {
-          static_configs = [
-            {
-              targets = job.targets
-            },
-          ]
-        })
-        ], flatten([
-          for _, m in local.modules_enabled :
-          [
-            for _, job in try(m.prometheus_jobs, []) :
-            merge(job.params, {
-              static_configs = [
-                {
-                  targets = job.targets
-                },
-              ]
-            })
-          ]
-        ]
-      )))
       alertmanager = {
         enabled = false
       }

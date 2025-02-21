@@ -146,18 +146,6 @@ locals {
       }
     }
   }
-
-  prometheus_jobs = [
-    {
-      params = {
-        job_name = "${var.name}-nodes"
-      }
-      targets = [
-        for _, member in local.members :
-        "${member.ip}:${var.ports.kea_metrics}"
-      ]
-    },
-  ]
 }
 
 module "metadata" {
@@ -207,6 +195,10 @@ module "service-peer" {
   name    = each.key
   app     = var.name
   release = var.release
+  annotations = {
+    "prometheus.io/scrape" = "true"
+    "prometheus.io/port"   = tostring(var.ports.kea_metrics)
+  }
   spec = {
     type      = "ClusterIP"
     clusterIP = each.value

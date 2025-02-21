@@ -10,6 +10,10 @@ variable "name" {
   type = string
 }
 
+variable "namespace" {
+  type = string
+}
+
 variable "host_key" {
   type = string
 }

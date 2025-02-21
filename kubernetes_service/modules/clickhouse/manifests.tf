@@ -218,18 +218,6 @@ locals {
       ]
     }
   }, var.extra_keeper_config)
-
-  prometheus_jobs = [
-    {
-      params = {
-        job_name = "${local.name}-nodes"
-      }
-      targets = [
-        for _, member in local.members :
-        "${member}.${local.peer_service_endpoint}:${var.ports.metrics}"
-      ]
-    },
-  ]
 }
 
 module "metadata" {
@@ -280,6 +268,8 @@ module "service" {
   release = var.release
   annotations = {
     "external-dns.alpha.kubernetes.io/hostname" = var.service_hostname
+    "prometheus.io/scrape"                      = "true"
+    "prometheus.io/port"                        = tostring(local.ports.metrics)
   }
   spec = {
     type              = "LoadBalancer"
@@ -316,6 +306,12 @@ module "service" {
         protocol   = "TCP"
         targetPort = local.ports.clickhouse
       },
+      {
+        name       = "metrics"
+        port       = local.ports.metrics
+        protocol   = "TCP"
+        targetPort = local.ports.metrics
+      },
     ]
   }
 }
@@ -347,12 +343,6 @@ module "service-peer" {
         port       = local.ports.raft
         protocol   = "TCP"
         targetPort = local.ports.raft
-      },
-      {
-        name       = "metrics"
-        port       = local.ports.metrics
-        protocol   = "TCP"
-        targetPort = local.ports.metrics
       },
     ]
   }

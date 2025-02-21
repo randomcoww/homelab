@@ -96,22 +96,12 @@ locals {
     for pod in local.static_pod :
     pod.contents
   ]
-
-  prometheus_jobs = [
-    {
-      params = {
-        job_name = "${var.name}-nodes"
-      }
-      targets = [
-        "${var.node_ip}:${var.ports.etcd_metrics}",
-      ]
-    },
-  ]
 }
 
 module "etcd" {
-  source = "../../../modules/static_pod"
-  name   = var.name
+  source    = "../../../modules/static_pod"
+  name      = var.name
+  namespace = var.namespace
   spec = {
     containers = [
       {
@@ -145,8 +135,9 @@ module "etcd" {
 }
 
 module "etcd-wrapper" {
-  source = "../../../modules/static_pod"
-  name   = "${var.name}-wrapper"
+  source    = "../../../modules/static_pod"
+  name      = "${var.name}-wrapper"
+  namespace = var.namespace
   spec = {
     containers = [
       {

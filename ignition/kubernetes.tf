@@ -82,7 +82,8 @@ module "etcd" {
 
   ignition_version = local.ignition_version
   fw_mark          = local.fw_marks.accept
-  name             = "etcd"
+  name             = local.kubernetes_services.etcd.name
+  namespace        = local.kubernetes_services.etcd.namespace
   host_key         = each.key
   cluster_token    = local.kubernetes.cluster_name
   ca               = data.terraform_remote_state.sr.outputs.etcd.ca

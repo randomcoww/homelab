@@ -200,6 +200,10 @@ locals {
         name      = "kubernetes"
         namespace = "default"
       }
+      etcd = {
+        name      = "etcd"
+        namespace = "kube-system"
+      }
       authelia = {
         name      = "authelia"
         namespace = "authelia"
