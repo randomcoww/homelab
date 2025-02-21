@@ -1,7 +1,7 @@
 locals {
   name      = split(".", var.cluster_service_endpoint)[0]
   namespace = split(".", var.cluster_service_endpoint)[1]
-  data_path = "/var/lib/matchbox"
+  data_path = "/var/lib/matchbox/mnt"
 }
 
 module "metadata" {
@@ -70,13 +70,17 @@ module "service-api" {
 }
 
 module "syncthing" {
-  source = "../statefulset_syncthing"
-  ## syncthing config
-  sync_data_paths = [
-    local.data_path,
-  ]
+  source = "../statefulset_mountpoint"
+  ## s3 config
+  s3_endpoint          = var.s3_endpoint
+  s3_bucket            = var.s3_bucket
+  s3_prefix            = ""
+  s3_access_key_id     = var.s3_access_key_id
+  s3_secret_access_key = var.s3_secret_access_key
+  s3_mount_path        = local.data_path
+  s3_mount_extra_args  = var.s3_mount_extra_args
   images = {
-    syncthing = var.images.syncthing
+    mountpoint = var.images.mountpoint
   }
   ##
   name     = local.name
@@ -92,11 +96,22 @@ module "syncthing" {
       {
         name  = local.name
         image = var.images.matchbox
-        args = [
-          "-address=0.0.0.0:${var.ports.matchbox}",
-          "-rpc-address=0.0.0.0:${var.ports.matchbox_api}",
-          "-assets-path=${local.data_path}",
-          "-data-path=${local.data_path}",
+        command = [
+          "sh",
+          "-c",
+          <<-EOF
+          set -e
+
+          until mountpoint ${local.data_path}; do
+          sleep 1
+          done
+
+          exec /matchbox \
+            -address=0.0.0.0:${var.ports.matchbox} \
+            -rpc-address=0.0.0.0:${var.ports.matchbox_api} \
+            -assets-path=${local.data_path} \
+            -data-path=${local.data_path}
+          EOF
         ]
         volumeMounts = [
           {

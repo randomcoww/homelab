@@ -45,14 +45,46 @@ module "kea" {
 
 # PXE boot server
 
+resource "minio_s3_bucket" "matchbox" {
+  bucket        = "matchbox"
+  force_destroy = true
+}
+
+resource "minio_iam_user" "matchbox" {
+  name          = "matchbox"
+  force_destroy = true
+}
+
+resource "minio_iam_policy" "matchbox" {
+  name = "matchbox"
+  policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [
+      {
+        Effect = "Allow"
+        Action = "*"
+        Resource = [
+          minio_s3_bucket.matchbox.arn,
+          "${minio_s3_bucket.matchbox.arn}/*",
+        ]
+      },
+    ]
+  })
+}
+
+resource "minio_iam_user_policy_attachment" "matchbox" {
+  user_name   = minio_iam_user.matchbox.id
+  policy_name = minio_iam_policy.matchbox.id
+}
+
 module "matchbox" {
   source                   = "./modules/matchbox"
   cluster_service_endpoint = local.kubernetes_services.matchbox.endpoint
   release                  = "0.2.16"
   replicas                 = 3
   images = {
-    matchbox  = local.container_images.matchbox
-    syncthing = local.container_images.syncthing
+    matchbox   = local.container_images.matchbox
+    mountpoint = local.container_images.mountpoint
   }
   ports = {
     matchbox     = local.service_ports.matchbox
@@ -62,6 +94,12 @@ module "matchbox" {
   api_service_ip          = local.services.matchbox_api.ip
   loadbalancer_class_name = "kube-vip.io/kube-vip-class"
   ca                      = data.terraform_remote_state.sr.outputs.matchbox.ca
+
+  s3_endpoint          = "http://${local.services.cluster_minio.ip}:${local.service_ports.minio}"
+  s3_bucket            = minio_s3_bucket.matchbox.id
+  s3_access_key_id     = minio_iam_user.matchbox.id
+  s3_secret_access_key = minio_iam_user.matchbox.secret
+  s3_mount_extra_args  = []
 }
 
 # Wifi AP
