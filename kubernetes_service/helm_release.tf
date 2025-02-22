@@ -586,6 +586,19 @@ resource "helm_release" "prometheus" {
           enabled = false
         }
       }
+      extraScrapeConfigs = yamlencode([
+        {
+          job_name     = "minio-job"
+          metrics_path = "/minio/v2/metrics/cluster"
+          static_configs = [
+            {
+              targets = [
+                "${local.services.cluster_minio.ip}:${local.service_ports.minio}",
+              ]
+            },
+          ]
+        },
+      ])
       serverFiles = {
         "alerting_rules.yml" = {
           groups = [
