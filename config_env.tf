@@ -129,7 +129,7 @@ locals {
     nvidia_driver      = "ghcr.io/randomcoww/nvidia-driver-container:v570.86.15-fedora41"
     steamcmd           = "ghcr.io/randomcoww/steamcmd:v20250223.0426"
     kvm_device_plugin  = "ghcr.io/randomcoww/kvm-device-plugin:v20250211.0006"
-    stork_agent        = "ghcr.io/randomcoww/stork-agent:v20250217.2337"
+    stork_agent        = "ghcr.io/randomcoww/stork-agent:v20250223.0317"
 
     # Unused
     cockroachdb        = "docker.io/cockroachdb/cockroach:v24.3.6"
