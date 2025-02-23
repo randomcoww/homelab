@@ -586,6 +586,11 @@ resource "helm_release" "prometheus" {
           enabled = false
         }
         replicaCount = 2
+        global = {
+          scrape_interval     = "10s"
+          scrape_timeout      = "4s"
+          evaluation_interval = "10s"
+        }
       }
       service = {
         enabled     = true
@@ -620,32 +625,23 @@ resource "helm_release" "prometheus" {
                     EOF
                   }
                   expr = <<-EOF
-                  max by (app) (
-                    sum by (app) (up{app="etcd"} == bool 0)
-                  or
-                    count by (app,endpoint) (
-                      sum by (app,endpoint,To) (rate(etcd_network_peer_sent_failures_total{app="etcd"}[3m])) > 0.01
+                  (
+                    (
+                      max by (app) (
+                        sum by (app) (up{app="etcd"} == bool 0)
+                      or
+                        count by (app,endpoint) (
+                          sum by (app,endpoint,To) (rate(etcd_network_peer_sent_failures_total{app="etcd"}[1m])) > 0.01
+                        )
+                      )
+                      > 0
                     )
+                  or
+                    sum(etcd_server_is_leader{app="etcd"}) by (app) > 1
+                  or
+                    sum(up{app="etcd"}) by (app) < ${length(local.members.etcd)}
                   )
-                  > 0
                   EOF
-                  for  = "3m"
-                  labels = {
-                    severity = "critical"
-                  }
-                },
-                {
-                  alert = "etcdInsufficientMembers"
-                  annotations = {
-                    description = <<-EOF
-                    etcd cluster "{{ $labels.app }}": insufficient members ({{ $value }}).
-                    EOF
-                    summary     = "etcd cluster has insufficient number of members."
-                  }
-                  expr = <<-EOF
-                  sum(up{app="etcd"} == bool 1) by (app) < ((count(up{app="etcd"}) by (app) + 1) / 2)
-                  EOF
-                  for  = "3m"
                   labels = {
                     severity = "critical"
                   }
@@ -735,13 +731,12 @@ resource "helm_release" "prometheus" {
                   annotations = {
                     summary     = "Node down in MinIO deployment"
                     description = <<-EOF
-                    Node(s) in cluster {{ $labels.instance }} offline for more than 5 minutes
+                    Node(s) in cluster {{ $labels.instance }} offline for more than 1 minute
                     EOF
                   }
                   expr = <<-EOF
-                  avg_over_time(minio_cluster_nodes_offline_total{app="minio"}[5m]) > 0
+                  avg_over_time(minio_cluster_nodes_offline_total{app="minio"}[1m]) > 0
                   EOF
-                  for  = "10m"
                   labels = {
                     severity = "warn"
                   }
@@ -751,13 +746,12 @@ resource "helm_release" "prometheus" {
                   annotations = {
                     summary     = "Disks down in MinIO deployment"
                     description = <<-EOF
-                    Disks(s) in cluster {{ $labels.instance }} offline for more than 5 minutes
+                    Disks(s) in cluster {{ $labels.instance }} offline for more than 1 minutes
                     EOF
                   }
                   expr = <<-EOF
-                  avg_over_time(minio_cluster_drive_offline_total{app="minio"}[5m]) > 0
+                  avg_over_time(minio_cluster_drive_offline_total{app="minio"}[1m]) > 0
                   EOF
-                  for  = "10m"
                   labels = {
                     severity = "warn"
                   }
