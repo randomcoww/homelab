@@ -125,7 +125,7 @@ locals {
     audioserve         = "docker.io/izderadicka/audioserve:latest"
     syncthing          = "docker.io/syncthing/syncthing:1.29.2"
     kube_vip           = "ghcr.io/kube-vip/kube-vip:v0.8.9"
-    sunshine_desktop   = "ghcr.io/randomcoww/sunshine-desktop:v20250216.0324"
+    sunshine_desktop   = "ghcr.io/randomcoww/sunshine-desktop:v20250223.0325"
     nvidia_driver      = "ghcr.io/randomcoww/nvidia-driver-container:v570.86.15-fedora41"
     steamcmd           = "ghcr.io/randomcoww/steamcmd:v20250223.0426"
     kvm_device_plugin  = "ghcr.io/randomcoww/kvm-device-plugin:v20250211.0006"
