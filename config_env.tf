@@ -185,6 +185,7 @@ locals {
       sunshine_admin      = "sunadmin"
       audioserve          = "audioserve"
       satisfactory_server = "satisfactory"
+      grafana             = "g"
     } :
     k => "${domain}.${local.domains.public}"
   }
@@ -236,6 +237,10 @@ locals {
         name      = "alpaca-db"
         namespace = "alpaca"
       }
+      prometheus = {
+        name      = "prometheus"
+        namespace = "monitoring"
+      }
     } :
     name => merge(e, {
       endpoint = "${e.name}.${e.namespace}"
@@ -269,7 +274,8 @@ locals {
     redis        = 6379
     cockroachdb  = 26258
     clickhouse   = 9440
-    prometheus   = 9153
+    metrics      = 9153
+    prometheus   = 80
   }
 
   minio = {

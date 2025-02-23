@@ -120,7 +120,7 @@ module "kube-dns" {
     external_dns = local.container_images.external_dns
   }
   ports = {
-    metrics = local.service_ports.prometheus
+    metrics = local.service_ports.metrics
   }
   service_cluster_ip      = local.services.cluster_dns.ip
   service_ip              = local.services.external_dns.ip
@@ -170,7 +170,7 @@ module "kube-dns" {
         },
         {
           name       = "prometheus"
-          parameters = "0.0.0.0:${local.service_ports.prometheus}"
+          parameters = "0.0.0.0:${local.service_ports.metrics}"
         },
       ]
     },
