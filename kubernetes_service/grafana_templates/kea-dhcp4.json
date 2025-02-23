@@ -843,6 +843,6 @@
     ]
   },
   "timezone": "browser",
-  "title": "Kea-dhcp4",
+  "title": "Kea DHCP4",
   "version": 5
 }
