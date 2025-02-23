@@ -846,45 +846,43 @@ resource "helm_release" "grafana" {
         default = {
           for f in fileset(".", "${path.module}/grafana_templates/*.json") :
           trimsuffix(basename(f), ".json") => {
-            json = <<-EOF
-            ${templatefile(f, {
-            datasource = "prometheus"
-      })}
-            EOF
+            json = templatefile(f, {
+              datasource = "prometheus"
+            })
+          }
+        }
       }
-    }
-  }
-  "grafana.ini" = {
-    "auth.anonymous" = {
-      enabled = true
-    }
-    auth = {
-      "disable_login_form" = true
-    }
-  }
-  dnsConfig = {
-    options = [
-      {
-        name  = "ndots"
-        value = "2"
-      },
-    ]
-  }
-  ingress = {
-    enabled          = true
-    ingressClassName = local.ingress_classes.ingress_nginx
-    annotations = merge(local.nginx_ingress_annotations, {
-      "nginx.ingress.kubernetes.io/configuration-snippet" = <<-EOF
+      "grafana.ini" = {
+        "auth.anonymous" = {
+          enabled = true
+        }
+        auth = {
+          "disable_login_form" = true
+        }
+      }
+      dnsConfig = {
+        options = [
+          {
+            name  = "ndots"
+            value = "2"
+          },
+        ]
+      }
+      ingress = {
+        enabled          = true
+        ingressClassName = local.ingress_classes.ingress_nginx
+        annotations = merge(local.nginx_ingress_annotations, {
+          "nginx.ingress.kubernetes.io/configuration-snippet" = <<-EOF
           proxy_set_header Authorization "Basic ${base64encode("${random_password.grafana_username.result}:${random_password.grafana_password.result}")}";
           EOF
+        })
+        hosts = [
+          local.kubernetes_ingress_endpoints.grafana,
+        ]
+        tls = [
+          local.ingress_tls_common,
+        ]
+      }
     })
-    hosts = [
-      local.kubernetes_ingress_endpoints.grafana,
-    ]
-    tls = [
-      local.ingress_tls_common,
-    ]
-  }
-})
-]
+  ]
 }
