@@ -29,7 +29,7 @@ jobs:
         export AWS_SECRET_ACCESS_KEY=$(echo -n $CLOUDFLARE_API_TOKEN | sha256sum | awk '{print $1}')
 
         terraform -chdir=ignition init -upgrade
-        terraform -chdir=ignition apply -f
+        terraform -chdir=ignition apply -auto-approve
 
         terraform -chdir=matchbox_client init -upgrade
-        terraform -chdir=matchbox_client apply -f
+        terraform -chdir=matchbox_client apply -auto-approve
