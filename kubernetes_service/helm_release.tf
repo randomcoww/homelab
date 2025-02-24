@@ -893,6 +893,15 @@ resource "helm_release" "kured" {
       configuration = {
         prometheusUrl = "http://${local.kubernetes_services.prometheus.name}-server.${local.kubernetes_services.prometheus.namespace}:${local.service_ports.prometheus}"
         period        = "10m"
+        metricsPort   = local.service_ports.metrics
+      }
+      service = {
+        create = true
+        port   = local.service_ports.metrics
+        annotations = {
+          "prometheus.io/scrape" = "true"
+          "prometheus.io/port"   = tostring(local.service_ports.metrics)
+        }
       }
     })
   ]
