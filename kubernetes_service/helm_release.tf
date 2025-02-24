@@ -627,17 +627,17 @@ resource "helm_release" "prometheus" {
                   (
                     (
                       max by (app) (
-                        sum by (app) (up{app="etcd"} == bool 0)
+                        sum by (app) (up{app="${local.kubernetes_services.etcd.name}",namespace="${local.kubernetes_services.etcd.namespace}"} == bool 0)
                       or
                         count by (app,endpoint) (
-                          sum by (app,endpoint,To) (rate(etcd_network_peer_sent_failures_total{app="etcd"}[1m])) > 0.01
+                          sum by (app,endpoint,To) (rate(etcd_network_peer_sent_failures_total{app="${local.kubernetes_services.etcd.name}",namespace="${local.kubernetes_services.etcd.namespace}"}[1m])) > 0.01
                         )
                       ) > 0
                     )
                   or
-                    count(etcd_server_is_leader{app="etcd"} == 1) by (app) > 1
+                    count(etcd_server_is_leader{app="${local.kubernetes_services.etcd.name}",namespace="${local.kubernetes_services.etcd.namespace}"} == 1) by (app) > 1
                   or
-                    count(etcd_server_has_leader{app="etcd"} == 1) by (app) < ${length(local.members.etcd)}
+                    count(etcd_server_has_leader{app="${local.kubernetes_services.etcd.name}",namespace="${local.kubernetes_services.etcd.namespace}"} == 1) by (app) < ${length(local.members.etcd)}
                   )
                   EOF
                   labels = {
@@ -659,7 +659,7 @@ resource "helm_release" "prometheus" {
                     summary     = "ClickHouse replica max queue size backing up."
                   }
                   expr            = <<-EOF
-                  ClickHouseAsyncMetrics_ReplicasMaxQueueSize{app="alpaca-db"} > 99
+                  count(ClickHouseAsyncMetrics_ReplicasMaxQueueSize{app="${local.kubernetes_services.alpaca_db.name}",namespace="${local.kubernetes_services.alpaca_db.namespace}"} > 99) by (app) > 0
                   EOF
                   for             = "5m"
                   keep_firing_for = "5m"
@@ -676,7 +676,7 @@ resource "helm_release" "prometheus" {
                     summary     = "ClickHouse has too many rejected inserts."
                   }
                   expr            = <<-EOF
-                  ClickHouseProfileEvents_RejectedInserts{app="alpaca-db"} > 1
+                  count(ClickHouseProfileEvents_RejectedInserts{app="${local.kubernetes_services.alpaca_db.name}",namespace="${local.kubernetes_services.alpaca_db.namespace}"} > 1) by (app) > 0
                   EOF
                   for             = "5m"
                   keep_firing_for = "5m"
@@ -693,7 +693,7 @@ resource "helm_release" "prometheus" {
                     summary     = "ClickHouse has too many Zookeeper sessions."
                   }
                   expr            = <<-EOF
-                  ClickHouseMetrics_ZooKeeperSession{app="alpaca-db"} > 1
+                  count(ClickHouseMetrics_ZooKeeperSession{app="${local.kubernetes_services.alpaca_db.name}",namespace="${local.kubernetes_services.alpaca_db.namespace}"} > 1) by (app) > 0
                   EOF
                   for             = "5m"
                   keep_firing_for = "5m"
@@ -710,7 +710,7 @@ resource "helm_release" "prometheus" {
                     summary     = "ClickHouse has too many replicas in read only state."
                   }
                   expr            = <<-EOF
-                  ClickHouseMetrics_ReadonlyReplica{app="alpaca-db"} > 0
+                  count(ClickHouseMetrics_ReadonlyReplica{app="${local.kubernetes_services.alpaca_db.name}",namespace="${local.kubernetes_services.alpaca_db.namespace}"} > 0) by (app) > 0
                   EOF
                   for             = "5m"
                   keep_firing_for = "5m"
@@ -733,7 +733,7 @@ resource "helm_release" "prometheus" {
                     EOF
                   }
                   expr = <<-EOF
-                  avg_over_time(minio_cluster_nodes_offline_total{app="minio"}[1m]) > 0
+                  avg_over_time(minio_cluster_nodes_offline_total{app="${local.kubernetes_services.minio.name}",namespace="${local.kubernetes_services.minio.namespace}"}[1m]) > 0
                   EOF
                   labels = {
                     severity = "warn"
@@ -748,7 +748,7 @@ resource "helm_release" "prometheus" {
                     EOF
                   }
                   expr = <<-EOF
-                  avg_over_time(minio_cluster_drive_offline_total{app="minio"}[1m]) > 0
+                  avg_over_time(minio_cluster_drive_offline_total{app="${local.kubernetes_services.minio.name}",namespace="${local.kubernetes_services.minio.namespace}"}[1m]) > 0
                   EOF
                   labels = {
                     severity = "warn"
