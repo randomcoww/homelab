@@ -9,7 +9,7 @@ on:
 
 jobs:
   terraform:
-    if: ${{ github.event.pull_request.merged }}
+    # if: ${{ github.event.pull_request.merged }}
     runs-on: arc-runner-${{ github.event.repository.name }}
     container:
       image: docker.io/hashicorp/terraform:latest
