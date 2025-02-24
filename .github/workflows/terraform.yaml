@@ -21,8 +21,8 @@ jobs:
         apk add --no-cache \
           jq
 
-        git clone ${{ github.server_url }}/${{ github.repository }}.git
-        cd ${{ github.repository }}
+        git clone ${{ github.server_url }}/${{ github.repository }}.git repo
+        cd repo
 
         AWS_ENDPOINT_URL_S3=https://$(wget -O - https://api.cloudflare.com/client/v4/accounts --header "Authorization: Bearer $CLOUDFLARE_API_TOKEN" | jq -r '.result.[0].id').r2.cloudflarestorage.com
         AWS_ACCESS_KEY_ID=$(wget -O - https://api.cloudflare.com/client/v4/user/tokens/verify --header "Authorization: Bearer $CLOUDFLARE_API_TOKEN" | jq -r '.result.id')
