@@ -633,13 +633,12 @@ resource "helm_release" "prometheus" {
                         count by (app,endpoint) (
                           sum by (app,endpoint,To) (rate(etcd_network_peer_sent_failures_total{app="etcd"}[1m])) > 0.01
                         )
-                      )
-                      > 0
+                      ) > 0
                     )
                   or
-                    sum(etcd_server_is_leader{app="etcd"}) by (app) > 1
+                    count(etcd_server_is_leader{app="etcd"} == 1) by (app) > 1
                   or
-                    sum(up{app="etcd"}) by (app) < ${length(local.members.etcd)}
+                    count(etcd_server_has_leader{app="etcd"} == 1) by (app) < ${length(local.members.etcd)}
                   )
                   EOF
                   labels = {
@@ -847,9 +846,6 @@ resource "helm_release" "grafana" {
         }
       }
       "grafana.ini" = {
-        "auth.anonymous" = {
-          enabled = true
-        }
         auth = {
           "disable_login_form" = true
         }
@@ -876,6 +872,26 @@ resource "helm_release" "grafana" {
         tls = [
           local.ingress_tls_common,
         ]
+      }
+    })
+  ]
+}
+
+# kured #
+
+resource "helm_release" "kured" {
+  name             = "kured"
+  namespace        = "monitoring"
+  create_namespace = true
+  repository       = "https://kubereboot.github.io/charts"
+  chart            = "kured"
+  wait             = false
+  version          = "5.6.0"
+  max_history      = 2
+  values = [
+    yamlencode({
+      configuration = {
+        prometheusUrl = "http://${local.kubernetes_services.prometheus.name}-server.${local.kubernetes_services.prometheus.namespace}:${local.service_ports.prometheus}"
       }
     })
   ]
