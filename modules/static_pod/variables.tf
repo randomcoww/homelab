@@ -7,6 +7,11 @@ variable "namespace" {
   default = "kube-system"
 }
 
+variable "annotations" {
+  type    = any
+  default = {}
+}
+
 variable "spec" {
   type    = any
   default = {}

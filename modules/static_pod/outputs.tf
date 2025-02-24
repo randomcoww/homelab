@@ -3,8 +3,9 @@ output "manifest" {
     apiVersion = "v1"
     kind       = "Pod"
     metadata = {
-      name      = var.name
-      namespace = var.namespace
+      name        = var.name
+      namespace   = var.namespace
+      annotations = var.annotations
       labels = {
         app = var.name
       }
