@@ -892,6 +892,7 @@ resource "helm_release" "kured" {
     yamlencode({
       configuration = {
         prometheusUrl = "http://${local.kubernetes_services.prometheus.name}-server.${local.kubernetes_services.prometheus.namespace}:${local.service_ports.prometheus}"
+        period        = "10m"
       }
     })
   ]
