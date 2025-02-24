@@ -37,16 +37,6 @@ module "nvidia-driver" {
   ]
 }
 
-module "etcd-monitoring" {
-  source    = "./modules/etcd_monitoring"
-  name      = local.kubernetes_services.etcd.name
-  namespace = local.kubernetes_services.etcd.namespace
-  release   = "0.1.1"
-  ports = {
-    etcd_metrics = local.host_ports.etcd_metrics
-  }
-}
-
 resource "minio_s3_bucket" "data" {
   for_each = local.minio.data_buckets
 

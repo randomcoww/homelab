@@ -5,7 +5,6 @@ locals {
     # module.fuse-device-plugin,
     module.kvm-device-plugin,
     module.nvidia-driver,
-    module.etcd-monitoring,
     module.kea,
     module.matchbox,
     module.lldap,
@@ -892,7 +891,7 @@ resource "helm_release" "kured" {
     yamlencode({
       configuration = {
         prometheusUrl = "http://${local.kubernetes_services.prometheus.name}-server.${local.kubernetes_services.prometheus.namespace}:${local.service_ports.prometheus}"
-        period        = "10m"
+        period        = "2m"
         metricsPort   = local.service_ports.metrics
       }
       service = {
