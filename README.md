@@ -230,7 +230,7 @@ for i in \
   fcos@q-0.local \
   de-1.local \
 ; do
-ssh -t $i 'touch /var/run/reboot-required'
+ssh -t $i 'sudo touch /var/run/reboot-required'
 done
 ```
 
