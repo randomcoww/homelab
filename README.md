@@ -219,6 +219,23 @@ rm coreos.iso
 
 ---
 
+### Trigger rolling reboot (WIP)
+
+Write file on all Kubernetes worker hosts to trigger rolling reboots coordinated by `kured`.
+
+```bash
+for i in \
+  fcos@gw-0.local \
+  fcos@gw-1.local \
+  fcos@q-0.local \
+  de-1.local \
+; do
+ssh -t $i 'touch /var/run/reboot-required'
+done
+```
+
+---
+
 ### Committing
 
 Formatting for terraform files
