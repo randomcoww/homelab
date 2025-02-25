@@ -894,6 +894,7 @@ resource "helm_release" "kured" {
         period        = "2m"
         metricsPort   = local.service_ports.metrics
         forceReboot   = true
+        drainTimeout  = "6m"
       }
       service = {
         create = true
