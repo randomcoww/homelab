@@ -1,6 +1,7 @@
 resource "tls_private_key" "ssh-client" {
-  algorithm   = "ECDSA"
+  algorithm   = data.terraform_remote_state.sr.outputs.ssh.ca.algorithm
   ecdsa_curve = "P521"
+  rsa_bits    = 4096
 }
 
 resource "ssh_user_cert" "ssh-client" {

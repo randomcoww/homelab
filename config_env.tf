@@ -6,6 +6,30 @@ locals {
   # Setting to 9000 seems to reduce success rate of PXE boot
   default_mtu = 1500
 
+  users = {
+    ssh = {
+      name     = "fcos"
+      home_dir = "/var/tmp-home/fcos"
+      groups = [
+        "adm",
+        "sudo",
+        "systemd-journal",
+        "wheel",
+      ],
+    }
+    client = {
+      name     = "randomcoww"
+      home_dir = "/var/home/randomcoww"
+      uid      = 10000
+      groups = [
+        "adm",
+        "sudo",
+        "systemd-journal",
+        "wheel",
+      ],
+    }
+  }
+
   base_networks = {
     # Client access
     lan = {
