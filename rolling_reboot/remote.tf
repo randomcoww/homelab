@@ -6,12 +6,12 @@ resource "terraform_data" "sentinel-file" {
 
   provisioner "remote-exec" {
     inline = [
-      "sudo touch /var/run/reboot-required"
+      "sudo touch /var/run/reboot-required",
     ]
   }
   connection {
     type        = "ssh"
-    host        = cidrhost(each.value.networks.lan.prefix, each.value.netnum)
+    host        = cidrhost(each.value.networks.service.prefix, each.value.netnum)
     user        = local.users.ssh.name
     private_key = tls_private_key.ssh-client.private_key_pem
     certificate = ssh_user_cert.ssh-client.cert_authorized_key

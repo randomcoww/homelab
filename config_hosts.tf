@@ -240,8 +240,8 @@ locals {
     }
 
     de-1 = {
-      # enable_rolling_reboot = true
-      netnum = 6
+      enable_rolling_reboot = true
+      netnum                = 6
       physical_interfaces = {
         phy0 = {
           match_mac = "74-56-3c-c3-10-68"
