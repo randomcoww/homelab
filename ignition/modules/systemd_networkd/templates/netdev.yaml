@@ -1,6 +1,6 @@
 ---
 variant: fcos
-version: ${ignition_version}
+version: ${butane_version}
 storage:
   files:
     # hardware interface #

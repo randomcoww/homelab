@@ -23,7 +23,7 @@ data "ct_config" "ignition" {
   }
   content = yamlencode({
     variant = "fcos"
-    version = local.ignition_version
+    version = local.butane_version
   })
   strict   = true
   snippets = sort(each.value)

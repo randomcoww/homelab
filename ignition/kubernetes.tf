@@ -2,14 +2,14 @@ module "kubernetes-master" {
   for_each = local.members.kubernetes-master
   source   = "./modules/kubernetes_master"
 
-  ignition_version = local.ignition_version
-  fw_mark          = local.fw_marks.accept
-  name             = "kube-master"
-  cluster_name     = local.kubernetes.cluster_name
-  front_proxy_ca   = data.terraform_remote_state.sr.outputs.kubernetes.front_proxy_ca
-  kubernetes_ca    = data.terraform_remote_state.sr.outputs.kubernetes.ca
-  etcd_ca          = data.terraform_remote_state.sr.outputs.etcd.ca
-  service_account  = data.terraform_remote_state.sr.outputs.kubernetes.service_account
+  butane_version  = local.butane_version
+  fw_mark         = local.fw_marks.accept
+  name            = "kube-master"
+  cluster_name    = local.kubernetes.cluster_name
+  front_proxy_ca  = data.terraform_remote_state.sr.outputs.kubernetes.front_proxy_ca
+  kubernetes_ca   = data.terraform_remote_state.sr.outputs.kubernetes.ca
+  etcd_ca         = data.terraform_remote_state.sr.outputs.etcd.ca
+  service_account = data.terraform_remote_state.sr.outputs.kubernetes.service_account
   etcd_members = {
     for host_key, host in local.members.etcd :
     host_key => cidrhost(local.networks.etcd.prefix, host.netnum)
@@ -54,11 +54,11 @@ module "kubernetes-worker" {
   for_each = local.members.kubernetes-worker
   source   = "./modules/kubernetes_worker"
 
-  ignition_version = local.ignition_version
-  fw_mark          = local.fw_marks.accept
-  name             = "kube-worker"
-  cluster_name     = local.kubernetes.cluster_name
-  ca               = data.terraform_remote_state.sr.outputs.kubernetes.ca
+  butane_version = local.butane_version
+  fw_mark        = local.fw_marks.accept
+  name           = "kube-worker"
+  cluster_name   = local.kubernetes.cluster_name
+  ca             = data.terraform_remote_state.sr.outputs.kubernetes.ca
   ports = {
     kubelet = local.host_ports.kubelet
   }
@@ -72,7 +72,7 @@ module "kubernetes-worker" {
   cluster_dns_ip            = local.services.cluster_dns.ip
   kubelet_root_path         = local.kubernetes.kubelet_root_path
   static_pod_path           = local.kubernetes.static_pod_manifest_path
-  container_storage_path    = "${local.mounts.containers_path}/storage"
+  container_storage_path    = "${local.kubernetes.containers_path}/storage"
   graceful_shutdown_delay   = 480
 }
 
@@ -80,14 +80,14 @@ module "etcd" {
   for_each = local.members.etcd
   source   = "./modules/etcd_member"
 
-  ignition_version = local.ignition_version
-  fw_mark          = local.fw_marks.accept
-  name             = local.kubernetes_services.etcd.name
-  namespace        = local.kubernetes_services.etcd.namespace
-  host_key         = each.key
-  cluster_token    = local.kubernetes.cluster_name
-  ca               = data.terraform_remote_state.sr.outputs.etcd.ca
-  peer_ca          = data.terraform_remote_state.sr.outputs.etcd.peer_ca
+  butane_version = local.butane_version
+  fw_mark        = local.fw_marks.accept
+  name           = local.kubernetes_services.etcd.name
+  namespace      = local.kubernetes_services.etcd.namespace
+  host_key       = each.key
+  cluster_token  = local.kubernetes.cluster_name
+  ca             = data.terraform_remote_state.sr.outputs.etcd.ca
+  peer_ca        = data.terraform_remote_state.sr.outputs.etcd.peer_ca
   images = {
     etcd         = local.container_images.etcd
     etcd_wrapper = local.container_images.etcd_wrapper

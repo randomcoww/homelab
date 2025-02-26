@@ -1,12 +1,8 @@
 locals {
-  timezone         = "America/Los_Angeles"
-  aws_region       = "us-west-2"
-  ignition_version = "1.5.0"
+  timezone       = "America/Los_Angeles"
+  aws_region     = "us-west-2"
+  butane_version = "1.5.0"
 
-  mounts = {
-    containers_path = "/var/lib/containers"
-    home_path       = "/var/home"
-  }
   # Setting to 9000 seems to reduce success rate of PXE boot
   default_mtu = 1500
 
@@ -145,6 +141,7 @@ locals {
     cluster_name              = "prod-10"
     kubelet_root_path         = "/var/lib/kubelet"
     static_pod_manifest_path  = "/var/lib/kubelet/manifests"
+    containers_path           = "/var/lib/containers"
     cni_bridge_interface_name = "cni0"
 
     cert_issuer_prod    = "letsencrypt-prod"

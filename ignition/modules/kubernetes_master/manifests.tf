@@ -106,7 +106,7 @@ locals {
   ignition_snippets = concat([
     for f in fileset(".", "${path.module}/templates/*.yaml") :
     templatefile(f, {
-      ignition_version          = var.ignition_version
+      butane_version            = var.butane_version
       fw_mark                   = var.fw_mark
       name                      = var.name
       ports                     = var.ports
@@ -124,7 +124,7 @@ locals {
     ], [
     yamlencode({
       variant = "fcos"
-      version = var.ignition_version
+      version = var.butane_version
       storage = {
         files = [
           for _, f in concat(

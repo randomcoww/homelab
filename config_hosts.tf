@@ -1,10 +1,8 @@
 locals {
   base_hosts = {
     gw-0 = {
-      users = [
-        "admin",
-      ]
-      netnum = 1
+      enable_rolling_reboot = true
+      netnum                = 1
       physical_interfaces = {
         phy0 = {
           match_mac = "1c-83-41-30-e2-23"
@@ -66,7 +64,7 @@ locals {
           device = "/dev/nvme0n1"
           partitions = [
             {
-              mount_path = local.mounts.containers_path
+              mount_path = local.kubernetes.containers_path
               format     = "xfs"
               wipe       = false
               options    = ["-s", "size=4096"]
@@ -88,10 +86,8 @@ locals {
     }
 
     gw-1 = {
-      users = [
-        "admin",
-      ]
-      netnum = 3
+      enable_rolling_reboot = true
+      netnum                = 3
       physical_interfaces = {
         phy0 = {
           match_mac = "1c-83-41-30-bd-6f"
@@ -153,7 +149,7 @@ locals {
           device = "/dev/nvme0n1"
           partitions = [
             {
-              mount_path = local.mounts.containers_path
+              mount_path = local.kubernetes.containers_path
               format     = "xfs"
               wipe       = false
               options    = ["-s", "size=4096"]
@@ -175,10 +171,8 @@ locals {
     }
 
     q-0 = {
-      users = [
-        "admin",
-      ]
-      netnum = 5
+      enable_rolling_reboot = true
+      netnum                = 5
       physical_interfaces = {
         phy0 = {
           match_mac = "1c-83-41-30-e2-54"
@@ -223,7 +217,7 @@ locals {
           device = "/dev/nvme0n1"
           partitions = [
             {
-              mount_path = local.mounts.containers_path
+              mount_path = local.kubernetes.containers_path
               format     = "xfs"
               wipe       = false
               options    = ["-s", "size=4096"]
@@ -246,9 +240,7 @@ locals {
     }
 
     de-1 = {
-      users = [
-        "client",
-      ]
+      # enable_rolling_reboot = true
       netnum = 6
       physical_interfaces = {
         phy0 = {
@@ -304,14 +296,14 @@ locals {
           device = "/dev/nvme0n1"
           partitions = [
             {
-              mount_path = local.mounts.home_path
+              mount_path = dirname(local.users.client.home_dir)
               format     = "xfs"
               wipe       = false
               options    = ["-s", "size=4096"]
               bind_mounts = [
                 {
                   relative_path = "containers"
-                  mount_path    = local.mounts.containers_path
+                  mount_path    = local.kubernetes.containers_path
                 },
                 {
                   relative_path = "tmp"
@@ -345,13 +337,13 @@ locals {
     base              = ["gw-0", "gw-1", "q-0", "de-1"]
     systemd-networkd  = ["gw-0", "gw-1", "q-0", "de-1"]
     server            = ["gw-0", "gw-1", "q-0", "de-1"]
-    client            = ["gw-0", "gw-1", "q-0", "de-1"]
     disks             = ["gw-0", "gw-1", "q-0", "de-1"]
     upstream-dns      = ["gw-0", "gw-1", "q-0", "de-1"]
     gateway           = ["gw-0", "gw-1"]
     kubernetes-master = ["q-0", "de-1"]
-    kubernetes-worker = ["gw-0", "gw-1", "q-0", "de-1"]
     etcd              = ["gw-0", "gw-1", "q-0"]
+    kubernetes-worker = ["gw-0", "gw-1", "q-0", "de-1"]
+    client            = ["de-1"]
   }
 
   # finalized local vars #

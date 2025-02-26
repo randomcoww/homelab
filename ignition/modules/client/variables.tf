@@ -1,7 +1,8 @@
-variable "ignition_version" {
+variable "butane_version" {
   type = string
 }
 
-variable "public_key_openssh" {
-  type = string
+variable "user" {
+  type    = any
+  default = {}
 }

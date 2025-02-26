@@ -1,9 +1,5 @@
-variable "ignition_version" {
+variable "butane_version" {
   type = string
-}
-
-variable "users" {
-  type = any
 }
 
 variable "hostname" {

@@ -1,4 +1,4 @@
-variable "ignition_version" {
+variable "butane_version" {
   type = string
 }
 
@@ -16,6 +16,11 @@ variable "ca" {
     private_key_pem    = string
     public_key_openssh = string
   })
+}
+
+variable "user" {
+  type    = any
+  default = {}
 }
 
 variable "valid_principals" {

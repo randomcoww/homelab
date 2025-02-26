@@ -2,7 +2,7 @@ locals {
   ignition_snippets = [
     for f in fileset(".", "${path.module}/templates/*.yaml") :
     templatefile(f, {
-      ignition_version    = var.ignition_version
+      butane_version      = var.butane_version
       fw_mark             = var.fw_mark
       host_netnum         = var.host_netnum
       physical_interfaces = var.physical_interfaces

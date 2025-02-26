@@ -154,7 +154,7 @@ module "sunshine-desktop" {
   }
   user      = local.users.client.name
   uid       = local.users.client.uid
-  home_path = "${local.mounts.home_path}/${local.users.client.name}"
+  home_path = local.users.client.home_dir
   extra_configs = [
     {
       path    = "/etc/ssh/ssh_known_hosts"

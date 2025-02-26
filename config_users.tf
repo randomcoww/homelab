@@ -1,17 +1,19 @@
 locals {
   users = {
-    admin = {
-      name = "fcos"
+    ssh = {
+      name     = "fcos"
+      home_dir = "/var/tmp-home/fcos"
       groups = [
         "adm",
         "sudo",
         "systemd-journal",
         "wheel",
-      ]
+      ],
     }
     client = {
-      name = "randomcoww"
-      uid  = 10000
+      name     = "randomcoww"
+      home_dir = "/var/home/randomcoww"
+      uid      = 10000
       groups = [
         "adm",
         "sudo",

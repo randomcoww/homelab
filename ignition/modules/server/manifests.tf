@@ -12,11 +12,6 @@ locals {
       path     = "/etc/ssh/ssh_host_${lower(var.ca.algorithm)}_key-cert.pub"
       contents = ssh_host_cert.ssh-host.cert_authorized_key
     }
-    authorized-keys = {
-      path     = "/etc/ssh/authorized_keys"
-      contents = "cert-authority ${chomp(var.ca.public_key_openssh)}"
-      mode     = 420
-    }
     known-hosts = {
       path     = "/etc/ssh/ssh_known_hosts"
       contents = "@cert-authority * ${chomp(var.ca.public_key_openssh)}"
@@ -27,8 +22,8 @@ locals {
   ignition_snippets = concat([
     for f in fileset(".", "${path.module}/templates/*.yaml") :
     templatefile(f, {
-      ignition_version = var.ignition_version
-      fw_mark          = var.fw_mark
+      butane_version = var.butane_version
+      fw_mark        = var.fw_mark
       # SSH
       pki = local.pki
       # HA config
@@ -42,7 +37,16 @@ locals {
     ], [
     yamlencode({
       variant = "fcos"
-      version = var.ignition_version
+      version = var.butane_version
+      passwd = {
+        users = [
+          merge(var.user, {
+            ssh_authorized_keys = [
+              "cert-authority ${chomp(var.ca.public_key_openssh)}",
+            ]
+          }),
+        ]
+      }
       storage = {
         files = [
           for _, f in concat(

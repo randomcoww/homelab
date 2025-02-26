@@ -218,7 +218,7 @@ resource "helm_release" "local-path-provisioner" {
       nodePathMap = [
         {
           node  = "DEFAULT_PATH_FOR_NON_LISTED_NODES"
-          paths = ["${local.mounts.containers_path}/local_path_provisioner"]
+          paths = ["${local.kubernetes.containers_path}/local_path_provisioner"]
         },
       ]
     }),

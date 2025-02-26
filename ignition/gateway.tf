@@ -3,7 +3,7 @@ module "gateway" {
   for_each = local.members.gateway
   source   = "./modules/gateway"
 
-  ignition_version      = local.ignition_version
+  butane_version        = local.butane_version
   fw_mark               = local.fw_marks.accept
   host_netnum           = each.value.netnum
   wan_interface_name    = each.value.networks.wan.interface
@@ -41,8 +41,8 @@ module "gateway" {
 # Configure upstream DNS for gateways
 
 module "upstream-dns" {
-  for_each         = local.members.upstream-dns
-  source           = "./modules/upstream_dns"
-  ignition_version = local.ignition_version
-  upstream_dns     = local.upstream_dns
+  for_each       = local.members.upstream-dns
+  source         = "./modules/upstream_dns"
+  butane_version = local.butane_version
+  upstream_dns   = local.upstream_dns
 }

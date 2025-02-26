@@ -1,6 +1,6 @@
 ---
 variant: fcos
-version: ${ignition_version}
+version: ${butane_version}
 systemd:
   units:
     - name: chronyd.service
@@ -110,3 +110,10 @@ storage:
         inline: |
           kernel.printk=4
           fs.inotify.max_user_watches=524288
+    # sudoers #
+    - path: /etc/sudoers.d/coreos-sudo-group
+      overwrite: true
+      mode: 0600
+      contents:
+        inline: |
+          %sudo ALL=(ALL) NOPASSWD: ALL

@@ -2,25 +2,15 @@ module "base" {
   for_each = local.members.base
   source   = "./modules/base"
 
-  ignition_version = local.ignition_version
-  hostname         = each.value.hostname
-  users = [
-    for user_key in each.value.users :
-    merge(local.users, {
-      for type, user in local.users :
-      type => merge(
-        user,
-        lookup(var.users, type, {}),
-      )
-    })[user_key]
-  ]
+  butane_version = local.butane_version
+  hostname       = each.value.hostname
 }
 
 module "systemd-networkd" {
   for_each = local.members.systemd-networkd
   source   = "./modules/systemd_networkd"
 
-  ignition_version    = local.ignition_version
+  butane_version      = local.butane_version
   fw_mark             = local.fw_marks.accept
   host_netnum         = each.value.netnum
   physical_interfaces = each.value.physical_interfaces
@@ -35,9 +25,10 @@ module "server" {
   for_each = local.members.server
   source   = "./modules/server"
 
-  ignition_version = local.ignition_version
-  fw_mark          = local.fw_marks.accept
+  butane_version = local.butane_version
+  fw_mark        = local.fw_marks.accept
   # SSH
+  user   = local.users.ssh
   key_id = each.value.hostname
   valid_principals = sort(concat([
     for _, network in each.value.networks :
@@ -57,4 +48,13 @@ module "server" {
   bird_cache_table_name = local.ha.bird_cache_table_name
   bgp_router_id         = cidrhost(values(each.value.networks)[0].prefix, each.value.netnum)
   bgp_port              = local.host_ports.bgp
+}
+
+# dev client
+module "client" {
+  for_each = local.members.client
+  source   = "./modules/client"
+
+  butane_version = local.butane_version
+  user           = local.users.client
 }

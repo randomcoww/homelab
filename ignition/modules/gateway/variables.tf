@@ -1,4 +1,4 @@
-variable "ignition_version" {
+variable "butane_version" {
   type = string
 }
 

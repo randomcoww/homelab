@@ -1,30 +1,19 @@
 locals {
-  pki = [
-    {
-      path     = "/etc/ssh/ssh_known_hosts"
-      contents = "@cert-authority * ${chomp(var.public_key_openssh)}"
-      mode     = 420
-    },
-  ]
-
-  ignition_snippets = [
+  ignition_snippets = concat([
+    for f in fileset(".", "${path.module}/templates/*.yaml") :
+    templatefile(f, {
+      butane_version = var.butane_version
+      user_name      = var.user.name
+    })
+    ], [
     yamlencode({
       variant = "fcos"
-      version = var.ignition_version
-      storage = {
-        files = [
-          for _, f in concat(
-            local.pki,
-          ) :
-          merge({
-            mode = 384
-            }, f, {
-            contents = {
-              inline = f.contents
-            }
-          })
+      version = var.butane_version
+      passwd = {
+        users = [
+          var.user,
         ]
       }
-    }),
-  ]
+    })
+  ])
 }

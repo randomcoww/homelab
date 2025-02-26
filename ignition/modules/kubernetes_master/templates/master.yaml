@@ -1,6 +1,6 @@
 ---
 variant: fcos
-version: ${ignition_version}
+version: ${butane_version}
 systemd:
   units:
     - name: nftables@${name}.service
