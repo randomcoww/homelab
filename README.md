@@ -195,26 +195,11 @@ Set up 2FA at `https://auth.fuzzybunny.win`
 
 ### Write current PXE boot image to local disk
 
-If network boot is not working, hosts may fallback to booting from (USB) disk.
+If network boot is not working, hosts may fallback to booting from (USB) disk. Looks for first disk with a partition labeled `fedora-coreos-<tag>` and update content.
 
 ```bash
-export IMAGE_URL=$(xargs -n1 -a /proc/cmdline | grep ^coreos.live.rootfs_url= | sed -r 's/coreos.live.rootfs_url=(.*)-rootfs(.*)\.img$/\1\2.iso/')
-export IGNITION_URL=$(xargs -n1 -a /proc/cmdline | grep ^ignition.config.url= | sed 's/ignition.config.url=//')
-export DISK=/dev/$(lsblk -ndo pkname /dev/disk/by-label/fedora-*)
-
-echo image-url=$IMAGE_URL
-echo ignition-url=$IGNITION_URL
-echo disk=$DISK
-sudo lsof $DISK
-```
-
-```bash
-curl $IMAGE_URL --output coreos.iso
-curl $IGNITION_URL | coreos-installer iso ignition embed coreos.iso
-
-sudo dd if=coreos.iso of=$DISK bs=4M
-sync
-rm coreos.iso
+tw terraform -chdir=write_local_disk init
+tw terraform -chdir=write_local_disk apply
 ```
 
 ---
