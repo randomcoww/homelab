@@ -590,10 +590,21 @@ resource "helm_release" "prometheus" {
           scrape_timeout      = "4s"
           evaluation_interval = "10s"
         }
-      }
-      service = {
-        enabled     = true
-        servicePort = local.service_ports.prometheus
+        service = {
+          enabled     = true
+          servicePort = local.service_ports.prometheus
+        }
+        ingress = {
+          enabled          = true
+          ingressClassName = local.ingress_classes.ingress_nginx
+          annotations      = local.nginx_ingress_auth_annotations
+          hosts = [
+            local.kubernetes_ingress_endpoints.monitoring,
+          ]
+          tls = [
+            local.ingress_tls_common,
+          ]
+        }
       }
       extraScrapeConfigs = yamlencode([
         {
@@ -772,107 +783,6 @@ resource "helm_release" "prometheus" {
         enabled = false
       }
     }),
-  ]
-}
-
-# grafana #
-
-# bypassed through nginx - no need to expose
-resource "random_password" "grafana_username" {
-  length  = 8
-  special = false
-}
-
-# bypassed through nginx - no need to expose
-resource "random_password" "grafana_password" {
-  length  = 16
-  special = false
-}
-
-resource "helm_release" "grafana" {
-  name             = "grafana"
-  namespace        = "monitoring"
-  create_namespace = true
-  repository       = "https://grafana.github.io/helm-charts"
-  chart            = "grafana"
-  wait             = false
-  version          = "8.10.1"
-  max_history      = 2
-  values = [
-    yamlencode({
-      adminUser     = random_password.grafana_username.result
-      adminPassword = random_password.grafana_password.result
-      datasources = {
-        "datasources.yaml" = {
-          apiVersion = 1
-          datasources = [
-            {
-              name      = "prometheus"
-              type      = "prometheus"
-              url       = "http://${local.kubernetes_services.prometheus.name}-server.${local.kubernetes_services.prometheus.namespace}:${local.service_ports.prometheus}"
-              access    = "proxy"
-              isDefault = true
-            },
-          ]
-        }
-      }
-      dashboardProviders = {
-        "dashboardproviders.yaml" = {
-          apiVersion = 1
-          providers = [
-            {
-              name            = "default"
-              orgId           = 1
-              folder          = ""
-              type            = "file"
-              disableDeletion = true
-              editable        = false
-              options = {
-                path = "/var/lib/grafana/dashboards/default"
-              }
-            },
-          ]
-        }
-      }
-      dashboards = {
-        default = {
-          for f in fileset(".", "${path.module}/grafana_templates/*.json") :
-          trimsuffix(basename(f), ".json") => {
-            json = templatefile(f, {
-              datasource = "prometheus"
-            })
-          }
-        }
-      }
-      "grafana.ini" = {
-        auth = {
-          "disable_login_form" = true
-        }
-      }
-      dnsConfig = {
-        options = [
-          {
-            name  = "ndots"
-            value = "2"
-          },
-        ]
-      }
-      ingress = {
-        enabled          = true
-        ingressClassName = local.ingress_classes.ingress_nginx
-        annotations = merge(local.nginx_ingress_annotations, {
-          "nginx.ingress.kubernetes.io/configuration-snippet" = <<-EOF
-          proxy_set_header Authorization "Basic ${base64encode("${random_password.grafana_username.result}:${random_password.grafana_password.result}")}";
-          EOF
-        })
-        hosts = [
-          local.kubernetes_ingress_endpoints.grafana,
-        ]
-        tls = [
-          local.ingress_tls_common,
-        ]
-      }
-    })
   ]
 }
 

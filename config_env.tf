@@ -206,7 +206,7 @@ locals {
       sunshine_admin      = "sunadmin"
       audioserve          = "audioserve"
       satisfactory_server = "satisfactory"
-      grafana             = "g"
+      monitoring          = "m"
     } :
     k => "${domain}.${local.domains.public}"
   }
