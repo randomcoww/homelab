@@ -575,7 +575,7 @@ resource "helm_release" "prometheus" {
   repository       = "https://prometheus-community.github.io/helm-charts"
   chart            = "prometheus"
   wait             = false
-  version          = "27.5.0"
+  version          = "27.5.1"
   max_history      = 2
   values = [
     yamlencode({
