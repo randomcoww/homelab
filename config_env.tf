@@ -151,7 +151,6 @@ locals {
     stork_agent        = "ghcr.io/randomcoww/stork-agent:v20250223.0317"
 
     # Unused
-    cockroachdb        = "docker.io/cockroachdb/cockroach:v24.3.6"
     fuse_device_plugin = "docker.io/soolaugust/fuse-device-plugin:v1.0"
     vaultwarden        = "docker.io/vaultwarden/server:1.33.2-alpine"
   }
@@ -292,7 +291,6 @@ locals {
     minio        = 9000
     lldap        = 6360
     redis        = 6379
-    cockroachdb  = 26258
     clickhouse   = 9440
     metrics      = 9153
     prometheus   = 80
