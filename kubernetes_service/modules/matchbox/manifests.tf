@@ -10,7 +10,7 @@ module "metadata" {
   namespace   = local.namespace
   release     = var.release
   app_version = split(":", var.images.matchbox)[1]
-  manifests = merge(module.syncthing.chart.manifests, {
+  manifests = merge(module.mountpoint.chart.manifests, {
     "templates/service.yaml"     = module.service.manifest
     "templates/service-api.yaml" = module.service-api.manifest
     "templates/secret.yaml"      = module.secret.manifest
@@ -69,7 +69,7 @@ module "service-api" {
   }
 }
 
-module "syncthing" {
+module "mountpoint" {
   source = "../statefulset_mountpoint"
   ## s3 config
   s3_endpoint          = var.s3_endpoint

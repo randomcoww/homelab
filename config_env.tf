@@ -143,7 +143,6 @@ locals {
     s3fs               = "ghcr.io/randomcoww/s3fs:v20250223.0316"
     mountpoint         = "ghcr.io/randomcoww/mountpoint-s3:v20250223.0328"
     audioserve         = "docker.io/izderadicka/audioserve:latest"
-    syncthing          = "docker.io/syncthing/syncthing:1.29.2"
     kube_vip           = "ghcr.io/kube-vip/kube-vip:v0.8.9"
     sunshine_desktop   = "ghcr.io/randomcoww/sunshine-desktop:v20250223.0325"
     nvidia_driver      = "ghcr.io/randomcoww/nvidia-driver-container:v570.86.15-fedora41"
