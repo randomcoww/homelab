@@ -1,5 +1,32 @@
 # code-server
 
+resource "minio_iam_user" "code" {
+  name          = "code"
+  force_destroy = true
+}
+
+resource "minio_iam_policy" "code" {
+  name = "code"
+  policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [
+      {
+        Effect = "Allow"
+        Action = "*"
+        Resource = [
+          minio_s3_bucket.data["models"].arn,
+          "${minio_s3_bucket.data["models"].arn}/*",
+        ]
+      },
+    ]
+  })
+}
+
+resource "minio_iam_user_policy_attachment" "code" {
+  user_name   = minio_iam_user.code.id
+  policy_name = minio_iam_policy.code.id
+}
+
 module "code" {
   source  = "./modules/code_server"
   name    = "code"
@@ -36,6 +63,10 @@ module "code" {
     {
       name  = "NVIDIA_DRIVER_CAPABILITIES"
       value = "compute,utility"
+    },
+    {
+      name  = "MC_HOST_code"
+      value = "http://${minio_iam_user.code.id}:${minio_iam_user.code.secret}@${local.kubernetes_services.minio.endpoint}:${local.service_ports.minio}"
     },
     {
       name  = "TZ"

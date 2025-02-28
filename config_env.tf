@@ -314,6 +314,9 @@ locals {
       videos = {
         name = "data-videos"
       }
+      models = {
+        name = "data-models"
+      }
     }
   }
 
