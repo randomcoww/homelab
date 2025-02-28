@@ -1,14 +1,3 @@
-module "fuse-device-plugin" {
-  source    = "./modules/fuse_device_plugin"
-  name      = "fuse-device-plugin"
-  namespace = "kube-system"
-  release   = "0.1.1"
-  images = {
-    fuse_device_plugin = local.container_images.fuse_device_plugin
-  }
-  kubelet_root_path = local.kubernetes.kubelet_root_path
-}
-
 module "kvm-device-plugin" {
   source    = "./modules/kvm_device_plugin"
   name      = "kvm-device-plugin"

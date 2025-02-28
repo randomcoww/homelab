@@ -149,9 +149,6 @@ locals {
     steamcmd           = "ghcr.io/randomcoww/steamcmd:v20250223.0426"
     kvm_device_plugin  = "ghcr.io/randomcoww/kvm-device-plugin:v20250211.0006"
     stork_agent        = "ghcr.io/randomcoww/stork-agent:v20250223.0317"
-
-    # Unused
-    fuse_device_plugin = "docker.io/soolaugust/fuse-device-plugin:v1.0"
     vaultwarden        = "docker.io/vaultwarden/server:1.33.2-alpine"
   }
 

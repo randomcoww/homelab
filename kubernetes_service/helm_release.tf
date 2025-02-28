@@ -2,7 +2,6 @@
 
 locals {
   modules_enabled = [
-    # module.fuse-device-plugin,
     module.kvm-device-plugin,
     module.nvidia-driver,
     module.kea,
