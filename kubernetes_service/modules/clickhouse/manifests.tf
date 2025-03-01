@@ -277,24 +277,6 @@ module "service" {
     loadBalancerClass = var.loadbalancer_class_name
     ports = [
       {
-        name       = "mysql"
-        port       = local.clickhouse_config.mysql_port
-        protocol   = "TCP"
-        targetPort = local.clickhouse_config.mysql_port
-      },
-      {
-        name       = "postgresql"
-        port       = local.clickhouse_config.postgresql_port
-        protocol   = "TCP"
-        targetPort = local.clickhouse_config.postgresql_port
-      },
-      {
-        name       = "https"
-        port       = local.clickhouse_config.https_port
-        protocol   = "TCP"
-        targetPort = local.clickhouse_config.https_port
-      },
-      {
         name       = "interserver"
         port       = local.clickhouse_config.interserver_https_port
         protocol   = "TCP"
@@ -444,15 +426,6 @@ module "s3fs" {
           },
         ], var.extra_volume_mounts)
         ports = [
-          {
-            containerPort = local.clickhouse_config.mysql_port
-          },
-          {
-            containerPort = local.clickhouse_config.postgresql_port
-          },
-          {
-            containerPort = local.clickhouse_config.https_port
-          },
           {
             containerPort = local.clickhouse_config.interserver_https_port
           },
