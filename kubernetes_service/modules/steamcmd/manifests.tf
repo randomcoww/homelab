@@ -11,8 +11,8 @@ module "metadata" {
   name        = var.name
   namespace   = var.namespace
   release     = var.release
-  app_version = split(":", var.images.s3fs)[1]
-  manifests = merge(module.s3fs.chart.manifests, {
+  app_version = split(":", var.images.mountpoint)[1]
+  manifests = merge(module.mountpoint.chart.manifests, {
     "templates/service.yaml" = module.service.manifest
     "templates/secret.yaml"  = module.secret.manifest
   })
@@ -61,21 +61,21 @@ module "service" {
   }
 }
 
-module "s3fs" {
-  source = "../statefulset_s3fs"
+module "mountpoint" {
+  source = "../statefulset_mountpoint"
   ## s3 config
   s3_endpoint          = var.s3_endpoint
   s3_bucket            = var.s3_bucket
-  s3_prefix            = "$(POD_NAME)"
+  s3_prefix            = var.steamapp_id
   s3_access_key_id     = var.s3_access_key_id
   s3_secret_access_key = var.s3_secret_access_key
   s3_mount_path        = local.persistent_path
   s3_mount_extra_args = concat([
-    "uid=${local.uid}",
-    "gid=${local.gid}",
+    "--uid ${local.uid}",
+    "--gid ${local.gid}",
   ], var.s3_mount_extra_args)
   images = {
-    s3fs = var.images.s3fs
+    mountpoint = var.images.mountpoint
   }
   ##
   name     = var.name

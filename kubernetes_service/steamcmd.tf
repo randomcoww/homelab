@@ -35,8 +35,8 @@ module "satisfactory-server" {
   name    = "satisfactory-server"
   release = "0.1.1"
   images = {
-    steamcmd = local.container_images.steamcmd
-    s3fs     = local.container_images.s3fs
+    steamcmd   = local.container_images.steamcmd
+    mountpoint = local.container_images.mountpoint
   }
   command = [
     "bash",
@@ -117,9 +117,6 @@ module "satisfactory-server" {
   s3_access_key_id        = minio_iam_user.steamcmd.id
   s3_secret_access_key    = minio_iam_user.steamcmd.secret
   s3_mount_extra_args = [
-    "compat_dir",
-    "use_path_request_style",
-    "allow_other",
-    "use_cache=/tmp",
+    "--cache /tmp",
   ]
 }

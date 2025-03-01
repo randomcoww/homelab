@@ -18,8 +18,8 @@ variable "affinity" {
 
 variable "images" {
   type = object({
-    s3fs     = string
-    steamcmd = string
+    mountpoint = string
+    steamcmd   = string
   })
 }
 
