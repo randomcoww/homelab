@@ -123,7 +123,7 @@ locals {
     etcd                    = "gcr.io/etcd-development/etcd:v3.5.18"
 
     # Helm
-    kea                = "ghcr.io/randomcoww/kea:v20250223.0327"
+    kea                = "ghcr.io/randomcoww/kea:v20250302.0329"
     matchbox           = "quay.io/poseidon/matchbox:v0.11.0"
     tftpd              = "ghcr.io/randomcoww/tftpd-ipxe:v20250210.0030"
     hostapd            = "ghcr.io/randomcoww/hostapd-noscan:v2.11"
@@ -131,7 +131,7 @@ locals {
     flannel_cni_plugin = "docker.io/flannel/flannel-cni-plugin:v1.6.2-flannel1"
     kapprover          = "ghcr.io/randomcoww/kapprover:v0.1.0"
     external_dns       = "registry.k8s.io/external-dns/external-dns:v0.15.1"
-    kube_proxy         = "ghcr.io/randomcoww/kube-proxy:v20250223.0251"
+    kube_proxy         = "ghcr.io/randomcoww/kube-proxy:v20250302.0254"
     litestream         = "docker.io/litestream/litestream:0.3.13"
     tailscale          = "ghcr.io/randomcoww/tailscale-nft:v20250223.0256"
     code_server        = "ghcr.io/randomcoww/code-server:v20250302.0258"
@@ -141,14 +141,14 @@ locals {
     qrcode_generator   = "ghcr.io/randomcoww/qrcode-generator:v20250210.0031"
     rclone             = "docker.io/rclone/rclone:1.69.1"
     s3fs               = "ghcr.io/randomcoww/s3fs:v20250302.0319"
-    mountpoint         = "ghcr.io/randomcoww/mountpoint-s3:v20250223.0328"
+    mountpoint         = "ghcr.io/randomcoww/mountpoint-s3:v20250302.0330"
     audioserve         = "docker.io/izderadicka/audioserve:latest"
     kube_vip           = "ghcr.io/kube-vip/kube-vip:v0.8.9"
     sunshine_desktop   = "ghcr.io/randomcoww/sunshine-desktop:v20250223.0325"
     nvidia_driver      = "ghcr.io/randomcoww/nvidia-driver-container:v570.86.15-fedora41"
-    steamcmd           = "ghcr.io/randomcoww/steamcmd:v20250223.0426"
+    steamcmd           = "ghcr.io/randomcoww/steamcmd:v20250302.0425"
     kvm_device_plugin  = "ghcr.io/randomcoww/kvm-device-plugin:v20250211.0006"
-    stork_agent        = "ghcr.io/randomcoww/stork-agent:v20250223.0317"
+    stork_agent        = "ghcr.io/randomcoww/stork-agent:v20250302.0320"
     vaultwarden        = "docker.io/vaultwarden/server:1.33.2-alpine"
   }
 
