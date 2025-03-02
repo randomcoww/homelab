@@ -140,7 +140,7 @@ locals {
     clickhouse         = "docker.io/clickhouse/clickhouse-server:25.1.5.31-alpine"
     qrcode_generator   = "ghcr.io/randomcoww/qrcode-generator:v20250210.0031"
     rclone             = "docker.io/rclone/rclone:1.69.1"
-    s3fs               = "ghcr.io/randomcoww/s3fs:v20250223.0316"
+    s3fs               = "ghcr.io/randomcoww/s3fs:v20250302.0319"
     mountpoint         = "ghcr.io/randomcoww/mountpoint-s3:v20250223.0328"
     audioserve         = "docker.io/izderadicka/audioserve:latest"
     kube_vip           = "ghcr.io/kube-vip/kube-vip:v0.8.9"
