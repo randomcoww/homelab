@@ -133,7 +133,7 @@ locals {
     external_dns       = "registry.k8s.io/external-dns/external-dns:v0.15.1"
     kube_proxy         = "ghcr.io/randomcoww/kube-proxy:v20250302.0254"
     litestream         = "docker.io/litestream/litestream:0.3.13"
-    tailscale          = "ghcr.io/randomcoww/tailscale-nft:v20250223.0256"
+    tailscale          = "ghcr.io/randomcoww/tailscale-nft:v20250302.0250"
     code_server        = "ghcr.io/randomcoww/code-server:v20250302.0258"
     lldap              = "ghcr.io/lldap/lldap:2025-02-05-alpine-rootless"
     keydb              = "docker.io/eqalpha/keydb:alpine_x86_64_v6.3.4"
