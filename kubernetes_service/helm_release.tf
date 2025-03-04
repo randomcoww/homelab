@@ -20,6 +20,7 @@ locals {
     module.audioserve,
     module.sunshine-desktop,
     module.satisfactory-server,
+    module.llama-cpp,
   ]
 }
 

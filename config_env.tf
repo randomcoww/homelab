@@ -150,6 +150,7 @@ locals {
     kvm_device_plugin  = "ghcr.io/randomcoww/kvm-device-plugin:v20250211.0006"
     stork_agent        = "ghcr.io/randomcoww/stork-agent:v20250302.0320"
     vaultwarden        = "docker.io/vaultwarden/server:1.33.2-alpine"
+    llama_cpp          = "ghcr.io/ggml-org/llama.cpp:server-cuda"
   }
 
   pxeboot_images = {
@@ -257,6 +258,10 @@ locals {
         name      = "prometheus"
         namespace = "monitoring"
       }
+      llama_cpp = {
+        name      = "llama-cpp"
+        namespace = "default"
+      }
     } :
     name => merge(e, {
       endpoint = "${e.name}.${e.namespace}"
@@ -291,6 +296,7 @@ locals {
     clickhouse   = 9440
     metrics      = 9153
     prometheus   = 80
+    llama_cpp    = 8080
   }
 
   minio = {
@@ -310,6 +316,7 @@ locals {
       }
       models = {
         name = "data-models"
+        acl  = "public-read"
       }
     }
   }
