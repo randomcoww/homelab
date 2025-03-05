@@ -53,7 +53,7 @@ tw() {
     -e AWS_ENDPOINT_URL_S3=$AWS_ENDPOINT_URL_S3 \
     --net=host \
     --entrypoint='' \
-    docker.io/hashicorp/terraform:1.11.0 "$@"
+    docker.io/hashicorp/terraform:1.11.1 "$@"
   rc=$?; set +x; return $rc
 }
 ```
