@@ -296,7 +296,7 @@ locals {
     clickhouse   = 9440
     metrics      = 9153
     prometheus   = 80
-    llama_cpp    = 8080
+    llama_cpp    = 80
   }
 
   minio = {
