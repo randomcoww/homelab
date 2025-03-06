@@ -120,7 +120,7 @@ locals {
     kube_controller_manager = "ghcr.io/randomcoww/k8s-control-plane:v1.32.1"
     kube_scheduler          = "ghcr.io/randomcoww/k8s-control-plane:v1.32.1"
     etcd_wrapper            = "ghcr.io/randomcoww/etcd-wrapper:v0.4.0"
-    etcd                    = "gcr.io/etcd-development/etcd:v3.5.18"
+    etcd                    = "gcr.io/etcd-development/etcd:v3.5.19"
 
     # Helm
     kea                = "ghcr.io/randomcoww/kea:v20250302.0329"
