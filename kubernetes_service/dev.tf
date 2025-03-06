@@ -195,35 +195,11 @@ module "llama-cpp" {
       value = "65"
     },
   ]
-  affinity = {
-    nodeAffinity = {
-      requiredDuringSchedulingIgnoredDuringExecution = {
-        nodeSelectorTerms = [
-          {
-            matchExpressions = [
-              {
-                key      = "kubernetes.io/hostname"
-                operator = "In"
-                values = [
-                  "de-1.local",
-                ]
-              },
-            ]
-          },
-        ]
-      }
+  resources = {
+    limits = {
+      "nvidia.com/gpu" = 1
     }
   }
-  ## TODO: Fix privileged to access GPU without assigning resource for now
-  # resources = {
-  #   limits = {
-  #     "nvidia.com/gpu" = 1
-  #   }
-  # }
-  security_context = {
-    privileged = true
-  }
-
   s3_endpoint          = "http://${local.services.cluster_minio.ip}:${local.service_ports.minio}"
   s3_bucket            = minio_s3_bucket.data["models"].id
   s3_access_key_id     = minio_iam_user.llama-cpp.id
