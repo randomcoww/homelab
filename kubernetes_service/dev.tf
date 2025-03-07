@@ -191,6 +191,10 @@ module "llama-cpp" {
       value = "$(MODEL_PATH)/DeepSeek-R1-Distill-Qwen-32B-Q4_K_M-GGUF/deepseek-r1-distill-qwen-32b-q4_k_m.gguf"
     },
     {
+      name  = "LLAMA_ARG_ALIAS"
+      value = "DeepSeek-R1-Distill-Qwen-32B-Q4_K_M-GGUF"
+    },
+    {
       name  = "LLAMA_ARG_N_GPU_LAYERS"
       value = "65"
     },
