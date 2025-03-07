@@ -72,6 +72,28 @@ module "alpaca-db" {
     private_key_pem = tls_private_key.alpaca-db-ca.private_key_pem
     cert_pem        = tls_self_signed_cert.alpaca-db-ca.cert_pem
   }
+  # extra_users_config = {
+  #   users = {
+  #     default = {
+  #       "@replace" = "replace"
+  #       ssl_certificates = {
+  #         common_name = [
+  #           "${local.kubernetes_services.alpaca_db.endpoint}:default",
+  #           "${local.kubernetes_ingress_endpoints.alpaca_db}:default",
+  #         ]
+  #       }
+  #       networks = {
+  #         ip = [
+  #           "::/0",
+  #         ]
+  #       }
+  #       profile                  = "default"
+  #       quota                    = "default"
+  #       access_management        = 1
+  #       named_collection_control = 1
+  #     }
+  #   }
+  # }
   service_hostname        = local.kubernetes_ingress_endpoints.alpaca_db
   service_ip              = local.services.alpaca_db.ip
   loadbalancer_class_name = "kube-vip.io/kube-vip-class"

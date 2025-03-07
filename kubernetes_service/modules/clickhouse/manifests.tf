@@ -9,8 +9,8 @@ locals {
     for i in range(var.replicas) :
     "${local.name}-${i}"
   ]
-  user  = "clickhouse"
-  group = "clickhouse"
+  process_user  = "clickhouse"
+  process_group = "clickhouse"
 
   cache_path   = "/var/tmp/clickhouse"
   base_path    = "/etc/clickhouse-server"
@@ -55,7 +55,9 @@ locals {
         caConfig        = local.ca_cert_path
       }
       client = {
-        caConfig = local.ca_cert_path
+        certificateFile = local.cert_path
+        privateKeyFile  = local.key_path
+        caConfig        = local.ca_cert_path
       }
     }
     storage_configuration = {
@@ -289,6 +291,12 @@ module "service" {
         targetPort = local.ports.clickhouse
       },
       {
+        name       = "https"
+        port       = local.clickhouse_config.https_port
+        protocol   = "TCP"
+        targetPort = local.clickhouse_config.https_port
+      },
+      {
         name       = "metrics"
         port       = local.ports.metrics
         protocol   = "TCP"
@@ -313,6 +321,12 @@ module "service-peer" {
         port       = local.ports.clickhouse
         protocol   = "TCP"
         targetPort = local.ports.clickhouse
+      },
+      {
+        name       = "https"
+        port       = local.clickhouse_config.https_port
+        protocol   = "TCP"
+        targetPort = local.clickhouse_config.https_port
       },
       {
         name       = "keeper"
@@ -377,13 +391,13 @@ module "s3fs" {
             ${local.cache_path}/coordination \
             ${local.cache_path}/preprocessed_configs \
             ${local.cache_path}/tmp
-          chown -R ${local.user}:${local.group} \
+          chown -R ${local.process_user}:${local.process_group} \
             ${local.cache_path}
           ln -sf \
             ${local.cache_path}/* \
             ${local.clickhouse_config.path}
 
-          exec clickhouse su ${local.user}:${local.group} \
+          exec clickhouse su ${local.process_user}:${local.process_group} \
             clickhouse-server \
             -C ${local.base_path}/config.xml
           EOF
