@@ -18,8 +18,8 @@ locals {
     module.webdav-pictures,
     module.webdav-videos,
     module.audioserve,
-    module.sunshine-desktop,
-    module.satisfactory-server,
+    # module.sunshine-desktop,
+    # module.satisfactory-server,
     module.llama-cpp,
   ]
 }

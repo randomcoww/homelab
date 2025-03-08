@@ -84,8 +84,6 @@ module "statefulset" {
           "-c",
           <<-EOF
           set -xe
-          nvidia-smi
-
           useradd ${var.user} -d ${var.home_path} -m -u ${var.uid}
           usermod -G wheel ${var.user}
 

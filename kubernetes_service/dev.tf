@@ -57,14 +57,6 @@ module "code" {
   ]
   extra_envs = [
     {
-      name  = "NVIDIA_VISIBLE_DEVICES"
-      value = "all"
-    },
-    {
-      name  = "NVIDIA_DRIVER_CAPABILITIES"
-      value = "compute,utility"
-    },
-    {
       name  = "MC_HOST_code"
       value = "http://${minio_iam_user.code.id}:${minio_iam_user.code.secret}@${local.kubernetes_services.minio.endpoint}:${local.service_ports.minio}"
     },
@@ -99,14 +91,7 @@ module "code" {
       mountPath = "/run/user/${local.users.client.uid}"
     },
   ]
-  ## TODO: Fix privileged to access GPU without assigning resource for now
-  # resources = {
-  #   limits = {
-  #     "nvidia.com/gpu" = 1
-  #   }
-  # }
   security_context = {
-    privileged = true
     capabilities = {
       add = [
         "AUDIT_WRITE",

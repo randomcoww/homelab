@@ -258,6 +258,12 @@ module "sunshine-desktop" {
       name  = "TZ"
       value = local.timezone
     },
+    {
+      name = "SUNSHINE_EXTRA_ARGS"
+      value = join(" ", [
+        "key_rightalt_to_key_win=enabled",
+      ])
+    },
   ]
   resources = {
     requests = {
