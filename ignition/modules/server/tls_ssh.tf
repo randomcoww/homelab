@@ -1,8 +1,3 @@
-resource "tls_private_key" "ssh-ca" {
-  algorithm   = "ECDSA"
-  ecdsa_curve = "P521"
-}
-
 resource "tls_private_key" "ssh-host" {
   algorithm   = var.ca.algorithm
   ecdsa_curve = "P521"
