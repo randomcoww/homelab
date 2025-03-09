@@ -134,7 +134,7 @@ locals {
     kube_proxy         = "ghcr.io/randomcoww/kube-proxy:v20250302.0254"
     litestream         = "docker.io/litestream/litestream:0.3.13"
     tailscale          = "ghcr.io/randomcoww/tailscale-nft:v20250302.0250"
-    code_server        = "ghcr.io/randomcoww/code-server:v20250305.0452"
+    code_server        = "ghcr.io/randomcoww/code-server:v20250309.0234"
     lldap              = "ghcr.io/lldap/lldap:2025-03-07-alpine-rootless"
     keydb              = "docker.io/eqalpha/keydb:alpine_x86_64_v6.3.4"
     clickhouse         = "docker.io/clickhouse/clickhouse-server:25.2.1.3085-alpine"
