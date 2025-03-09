@@ -7,7 +7,6 @@ locals {
     module.kea,
     module.matchbox,
     module.lldap,
-    # module.vaultwarden,
     module.authelia-redis,
     module.authelia,
     module.tailscale,
@@ -19,8 +18,9 @@ locals {
     module.webdav-videos,
     module.audioserve,
     # module.sunshine-desktop,
-    # module.satisfactory-server,
     module.llama-cpp,
+    # module.vaultwarden,
+    # module.satisfactory-server,
   ]
 }
 
