@@ -1,4 +1,5 @@
 locals {
+  terraform_bucket_name = "terraform"
   cloudflare_account_id = data.cloudflare_accounts.accounts.accounts[0].id
   r2_buckets = {
     etcd = {
@@ -56,6 +57,20 @@ resource "cloudflare_api_token" "r2_bucket" {
     ]
     resources = {
       "com.cloudflare.edge.r2.bucket.${local.cloudflare_account_id}_default_${each.key}" = "*"
+    }
+  }
+}
+
+# Terraform bucket access for secrets provisioning
+
+resource "cloudflare_api_token" "terraform_r2_bucket" {
+  name = "r2-terraform"
+  policy {
+    permission_groups = [
+      data.cloudflare_api_token_permission_groups.all.r2["Workers R2 Storage Bucket Item Read"],
+    ]
+    resources = {
+      "com.cloudflare.edge.r2.bucket.${local.cloudflare_account_id}_default_${local.terraform_bucket_name}" = "*"
     }
   }
 }
