@@ -89,7 +89,7 @@ locals {
           })
         ]
       }
-    })
+    }),
   ])
 
   pod_manifests = [
