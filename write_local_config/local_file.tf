@@ -5,6 +5,6 @@ resource "local_sensitive_file" "config" {
   }
 
   content         = each.value.contents
-  file_permission = lookup(each.value, "mode", "0600")
+  file_permission = format("%04o", lookup(each.value, "mode", 384))
   filename        = each.key
 }
