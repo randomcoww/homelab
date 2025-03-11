@@ -1,7 +1,8 @@
 locals {
-  name      = split(".", var.cluster_service_endpoint)[0]
-  namespace = split(".", var.cluster_service_endpoint)[1]
-  data_path = "/var/lib/matchbox/mnt"
+  name        = split(".", var.cluster_service_endpoint)[0]
+  namespace   = split(".", var.cluster_service_endpoint)[1]
+  data_path   = "/var/lib/matchbox/mnt"
+  config_path = "/etc/matchbox"
 }
 
 module "metadata" {
@@ -23,9 +24,11 @@ module "secret" {
   app     = local.name
   release = var.release
   data = {
-    "ca.crt"     = chomp(var.ca.cert_pem)
-    "server.crt" = chomp(tls_locally_signed_cert.matchbox.cert_pem)
-    "server.key" = chomp(tls_private_key.matchbox.private_key_pem)
+    ca       = chomp(var.ca.cert_pem)
+    api_cert = chomp(tls_locally_signed_cert.matchbox.cert_pem)
+    api_key  = chomp(tls_private_key.matchbox.private_key_pem)
+    web_cert = chomp(tls_locally_signed_cert.matchbox-web.cert_pem)
+    web_key  = chomp(tls_private_key.matchbox-web.private_key_pem)
   }
 }
 
@@ -113,10 +116,32 @@ module "mountpoint" {
             -data-path=${local.data_path}
           EOF
         ]
+        # Cert paths are fixed
         volumeMounts = [
           {
-            name      = "matchbox-secret"
-            mountPath = "/etc/matchbox"
+            name      = "secret"
+            mountPath = "${local.config_path}/ca.crt"
+            subPath   = "ca"
+          },
+          {
+            name      = "secret"
+            mountPath = "${local.config_path}/server.crt"
+            subPath   = "api_cert"
+          },
+          {
+            name      = "secret"
+            mountPath = "${local.config_path}/server.key"
+            subPath   = "api_key"
+          },
+          {
+            name      = "secret"
+            mountPath = "${local.config_path}/ssl/server.crt"
+            subPath   = "web_cert"
+          },
+          {
+            name      = "secret"
+            mountPath = "${local.config_path}/ssl/server.key"
+            subPath   = "web_key"
           },
         ]
         ports = [
@@ -145,7 +170,7 @@ module "mountpoint" {
     ]
     volumes = [
       {
-        name = "matchbox-secret"
+        name = "secret"
         secret = {
           secretName = module.secret.name
         }

@@ -83,27 +83,27 @@ locals {
         ] : [])
         client-classes = [
           {
-            name           = "XClient_iPXE"
-            test           = "substring(option[77].hex,0,4) == 'iPXE'"
+            name           = "iPXE UEFI"
+            test           = "substring(option[user-class].hex,0,4) == 'iPXE'"
             boot-file-name = var.ipxe_script_url
           },
           {
-            name           = "EFI_x86-64"
-            test           = "option[93].hex == 0x0007"
+            name           = "PXE UEFI"
+            test           = "option[client-system].hex == 0x0007",
             next-server    = "$POD_IP"
             boot-file-name = var.ipxe_boot_path
           },
-          # {
-          #   name           = "HTTPClient"
-          #   test           = "option[93].hex == 0x0010"
-          #   boot-file-name = "https://boot.ipxe.org/ipxe.efi"
-          #   option-data = [
-          #     {
-          #       name = "vendor-class-identifier"
-          #       data = "HTTPClient"
-          #     },
-          #   ]
-          # },
+          {
+            name           = "HTTP"
+            test           = "substring(option[vendor-class-identifier].hex,0,10) == 'HTTPClient'",
+            boot-file-name = var.ipxe_boot_url
+            option-data = [
+              {
+                name = "vendor-class-identifier"
+                data = "HTTPClient"
+              },
+            ]
+          },
         ]
         subnet4 = [
           for k, network in var.networks :

@@ -40,6 +40,10 @@ variable "ipxe_boot_path" {
   type = string
 }
 
+variable "ipxe_boot_url" {
+  type = string
+}
+
 variable "ipxe_script_url" {
   type = string
 }

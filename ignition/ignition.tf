@@ -25,6 +25,7 @@ data "ct_config" "ignition" {
     variant = "fcos"
     version = local.butane_version
   })
-  strict   = true
-  snippets = sort(each.value)
+  pretty_print = true
+  strict       = true
+  snippets     = sort(each.value)
 }
