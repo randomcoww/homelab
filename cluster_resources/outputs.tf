@@ -18,6 +18,16 @@ output "r2_bucket" {
   sensitive = true
 }
 
+output "backend_bucket" {
+  value = {
+    url               = "${local.cloudflare_account_id}.r2.cloudflarestorage.com"
+    bucket            = data.terraform_remote_state.sr.config.bucket
+    access_key_id     = cloudflare_api_token.backend_bucket.id
+    secret_access_key = sha256(cloudflare_api_token.backend_bucket.value)
+  }
+  sensitive = true
+}
+
 output "cloudflare_tunnels" {
   value = {
     for tunnel in cloudflare_zero_trust_tunnel_cloudflared.tunnel :
