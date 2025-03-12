@@ -305,7 +305,7 @@ resource "helm_release" "nvidia-device-plugin" {
   chart       = "nvidia-device-plugin"
   namespace   = "kube-system"
   wait        = false
-  version     = "0.17.0"
+  version     = "0.17.1"
   max_history = 2
   values = [
     yamlencode({
