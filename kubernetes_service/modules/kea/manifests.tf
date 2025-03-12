@@ -105,6 +105,7 @@ locals {
               },
             ]
           },
+          # TODO: migrate fully to HTTP boot and remove TFTP
           {
             name        = "PXE-UEFI"
             test        = "option[client-system].hex == 0x0007",
@@ -112,7 +113,7 @@ locals {
             option-data = [
               {
                 name = "boot-file-name"
-                data = var.ipxe_boot_path
+                data = basename(var.ipxe_boot_url)
               },
             ]
           },
@@ -334,6 +335,7 @@ module "statefulset" {
           },
         ]
       },
+      # TODO: migrate fully to HTTP boot and remove TFTP
       {
         name : "${var.name}-tftpd"
         image : var.images.tftpd

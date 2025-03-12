@@ -36,10 +36,6 @@ variable "service_ips" {
   type = list(string)
 }
 
-variable "ipxe_boot_path" {
-  type = string
-}
-
 variable "ipxe_boot_url" {
   type = string
 }

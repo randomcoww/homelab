@@ -19,7 +19,6 @@ module "kea" {
     kea_metrics = local.host_ports.kea_metrics
     tftpd       = local.host_ports.tftpd
   }
-  ipxe_boot_path  = "/ipxe.efi"
   ipxe_boot_url   = "http://${local.services.minio.ip}:${local.service_ports.minio}/${local.minio.data_buckets.boot.name}/ipxe.efi"
   ipxe_script_url = "http://${local.services.matchbox.ip}:${local.service_ports.matchbox}/boot.ipxe"
   networks = [
