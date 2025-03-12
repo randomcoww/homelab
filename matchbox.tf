@@ -36,6 +36,7 @@ resource "matchbox_group" "ignition" {
   }
 }
 
+/*
 resource "matchbox_profile" "podlist" {
   for_each = data.terraform_remote_state.ignition.outputs.podlist
 
@@ -52,3 +53,4 @@ resource "matchbox_group" "podlist" {
     node = local.hosts[each.key].hostname
   }
 }
+*/

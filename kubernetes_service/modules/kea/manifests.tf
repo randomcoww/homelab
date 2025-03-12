@@ -56,19 +56,18 @@ locals {
             library = "${var.kea_hooks_libraries_path}/libdhcp_stat_cmds.so"
           },
           # pass ipxe?mac={mac} host script endpoint directly from kea
-          # alternatively matchbox provides a boot.ipxe endpoint that handles this routing
-          {
-            library = "${var.kea_hooks_libraries_path}/libdhcp_flex_option.so"
-            parameters = {
-              options = [
-                {
-                  client-class = "iPXE-UEFI"
-                  name         = "boot-file-name"
-                  supersede    = "'${var.ipxe_script_url}?mac=' + hexstring(pkt4.mac, '-')"
-                },
-              ]
-            }
-          },
+          # {
+          #   library = "${var.kea_hooks_libraries_path}/libdhcp_flex_option.so"
+          #   parameters = {
+          #     options = [
+          #       {
+          #         client-class = "iPXE-UEFI"
+          #         name         = "boot-file-name"
+          #         supersede    = "'${var.ipxe_script_url}?mac=' + hexstring(pkt4.mac, '-')"
+          #       },
+          #     ]
+          #   }
+          # },
           ], length(var.service_ips) > 1 ? [
           {
             library = "${var.kea_hooks_libraries_path}/libdhcp_ha.so"
