@@ -55,6 +55,20 @@ locals {
           {
             library = "${var.kea_hooks_libraries_path}/libdhcp_stat_cmds.so"
           },
+          # pass ipxe?mac={mac} host script endpoint directly from kea
+          # alternatively matchbox provides a boot.ipxe endpoint that handles this routing
+          {
+            library = "${var.kea_hooks_libraries_path}/libdhcp_flex_option.so"
+            parameters = {
+              options = [
+                {
+                  client-class = "iPXE-UEFI"
+                  name         = "boot-file-name"
+                  supersede    = "'${var.ipxe_script_url}?mac=' + hexstring(pkt4.mac, '-')"
+                },
+              ]
+            }
+          },
           ], length(var.service_ips) > 1 ? [
           {
             library = "${var.kea_hooks_libraries_path}/libdhcp_ha.so"
@@ -83,21 +97,34 @@ locals {
         ] : [])
         client-classes = [
           {
-            name           = "iPXE UEFI"
-            test           = "substring(option[user-class].hex,0,4) == 'iPXE'"
-            boot-file-name = var.ipxe_script_url
-          },
-          {
-            name           = "PXE UEFI"
-            test           = "option[client-system].hex == 0x0007",
-            next-server    = "$POD_IP"
-            boot-file-name = var.ipxe_boot_path
-          },
-          {
-            name           = "HTTP"
-            test           = "substring(option[vendor-class-identifier].hex,0,10) == 'HTTPClient'",
-            boot-file-name = var.ipxe_boot_url
+            name = "iPXE-UEFI"
+            test = "substring(option[user-class].hex,0,4) == 'iPXE'"
             option-data = [
+              {
+                name = "boot-file-name"
+                data = var.ipxe_script_url
+              },
+            ]
+          },
+          {
+            name        = "PXE-UEFI"
+            test        = "option[client-system].hex == 0x0007",
+            next-server = "$POD_IP"
+            option-data = [
+              {
+                name = "boot-file-name"
+                data = var.ipxe_boot_path
+              },
+            ]
+          },
+          {
+            name = "HTTP"
+            test = "substring(option[vendor-class-identifier].hex,0,10) == 'HTTPClient'",
+            option-data = [
+              {
+                name = "boot-file-name"
+                data = var.ipxe_boot_url
+              },
               {
                 name = "vendor-class-identifier"
                 data = "HTTPClient"
