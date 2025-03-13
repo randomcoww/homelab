@@ -1,3 +1,3 @@
-variable "host_key" {
+variable "hostname" {
   type = string
 }
