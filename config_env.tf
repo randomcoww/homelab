@@ -137,7 +137,7 @@ locals {
     code_server        = "ghcr.io/randomcoww/code-server:v20250309.0234"
     lldap              = "ghcr.io/lldap/lldap:2025-03-07-alpine-rootless"
     keydb              = "docker.io/eqalpha/keydb:alpine_x86_64_v6.3.4"
-    clickhouse         = "docker.io/clickhouse/clickhouse-server:25.2.1.3085-alpine"
+    clickhouse         = "docker.io/clickhouse/clickhouse-server:25.2.2.39-alpine"
     qrcode_generator   = "ghcr.io/randomcoww/qrcode-generator:v20250210.0031"
     rclone             = "docker.io/rclone/rclone:1.69.1"
     s3fs               = "ghcr.io/randomcoww/s3fs:v20250309.0309"
