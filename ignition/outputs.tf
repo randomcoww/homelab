@@ -31,3 +31,14 @@ output "podlist" {
   }
   sensitive = true
 }
+
+output "remote_files" {
+  value = {
+    for host_key, host in local.hosts :
+    host.hostname => flatten([
+      for m in local.modules_enabled :
+      try(m[host_key].remote_files, [])
+    ])
+  }
+  sensitive = true
+}

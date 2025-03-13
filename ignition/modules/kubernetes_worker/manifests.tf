@@ -122,24 +122,30 @@ locals {
     yamlencode({
       variant = "fcos"
       version = var.butane_version
-      storage = {
-        files = [
-          for _, f in concat(
-            values(local.pki),
-            values(local.kubeconfig),
-            values(local.config),
-          ) :
-          merge({
-            mode = 384
-            }, f, {
-            contents = {
-              inline = f.contents
-            }
-          })
-        ]
-      }
+      # storage = {
+      #   files = [
+      #     for _, f in concat(
+      #       values(local.pki),
+      #       values(local.kubeconfig),
+      #       values(local.config),
+      #     ) :
+      #     merge({
+      #       mode = 384
+      #       }, f, {
+      #       contents = {
+      #         inline = f.contents
+      #       }
+      #     })
+      #   ]
+      # }
     }),
   ])
+
+  remote_files = concat(
+    values(local.pki),
+    values(local.kubeconfig),
+    values(local.config),
+  )
 }
 
 module "node-bootstrap-kubeconfig" {

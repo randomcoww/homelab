@@ -44,6 +44,9 @@ systemd:
     # does not work with read only system
     - name: rpm-ostree-fix-shadow-mode.service
       mask: true
+    - name: terraform-runtime-config.service
+      enabled: true
+
 storage:
   files:
     - path: /etc/hostname
@@ -117,3 +120,34 @@ storage:
       contents:
         inline: |
           %sudo ALL=(ALL) NOPASSWD: ALL
+    # This restarts until successful. Restart is handled in the pod definition and systemd service will not exit until successful
+    - path: ${quadlet_path}/terraform-runtime-config.kube
+      mode: 0600
+      contents:
+        inline: |
+          [Unit]
+          Wants=network-online.target
+          After=network-online.target
+          RequiredBy=kubelet.service
+          Before=kubelet.service
+          PropagatesReloadTo=kubelet.service
+          RequiredBy=sshd.service
+          Before=sshd.service
+          PropagatesReloadTo=sshd.service
+
+          [Service]
+          Type=oneshot
+          Restart=never
+
+          [Kube]
+          PodmanArgs="--wait"
+          ExitCodePropagation=any
+          ConfigMap=terraform-credentials.yaml
+          Yaml=terraform-runtime-config.yaml
+
+          [Install]
+          WantedBy=multi-user.target
+  # manually enable quadlet
+  links:
+    - path: /etc/systemd/system/multi-user.target.wants/terraform-runtime-config.kube
+      target: ${quadlet_path}/terraform-runtime-config.kube

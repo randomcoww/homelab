@@ -2,8 +2,12 @@ module "base" {
   for_each = local.members.base
   source   = "./modules/base"
 
-  butane_version = local.butane_version
-  hostname       = each.value.hostname
+  butane_version           = local.butane_version
+  hostname                 = each.value.hostname
+  terraform_backend_bucket = data.terraform_remote_state.sr.outputs.backend_bucket
+  images = {
+    terraform = local.container_images.terraform
+  }
 }
 
 module "systemd-networkd" {

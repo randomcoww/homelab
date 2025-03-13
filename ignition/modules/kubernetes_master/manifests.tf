@@ -125,23 +125,23 @@ locals {
     yamlencode({
       variant = "fcos"
       version = var.butane_version
-      storage = {
-        files = [
-          for _, f in concat(
-            values(local.pki),
-            values(local.kubeconfig),
-            values(local.config),
-            values(local.static_pod),
-          ) :
-          merge({
-            mode = 384
-            }, f, {
-            contents = {
-              inline = f.contents
-            }
-          })
-        ]
-      }
+      # storage = {
+      #   files = [
+      #     for _, f in concat(
+      #       values(local.pki),
+      #       values(local.kubeconfig),
+      #       values(local.config),
+      #       values(local.static_pod),
+      #     ) :
+      #     merge({
+      #       mode = 384
+      #       }, f, {
+      #       contents = {
+      #         inline = f.contents
+      #       }
+      #     })
+      #   ]
+      # }
     }),
   ])
 
@@ -149,6 +149,13 @@ locals {
     for pod in local.static_pod :
     pod.contents
   ]
+
+  remote_files = concat(
+    values(local.pki),
+    values(local.kubeconfig),
+    values(local.config),
+    values(local.static_pod),
+  )
 }
 
 module "controller-manager-kubeconfig" {

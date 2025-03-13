@@ -151,6 +151,7 @@ locals {
     stork_agent        = "ghcr.io/randomcoww/stork-agent:v20250309.0310"
     vaultwarden        = "docker.io/vaultwarden/server:1.33.2-alpine"
     llama_cpp          = "ghcr.io/ggml-org/llama.cpp:server-cuda"
+    terraform          = "docker.io/hashicorp/terraform:1.11.1"
   }
 
   pxeboot_images = {

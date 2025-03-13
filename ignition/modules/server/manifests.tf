@@ -47,20 +47,24 @@ locals {
           }),
         ]
       }
-      storage = {
-        files = [
-          for _, f in concat(
-            values(local.pki),
-          ) :
-          merge({
-            mode = 384
-            }, f, {
-            contents = {
-              inline = f.contents
-            }
-          })
-        ]
-      }
+      # storage = {
+      #   files = [
+      #     for _, f in concat(
+      #       values(local.pki),
+      #     ) :
+      #     merge({
+      #       mode = 384
+      #       }, f, {
+      #       contents = {
+      #         inline = f.contents
+      #       }
+      #     })
+      #   ]
+      # }
     }),
   ])
+
+  remote_files = concat(
+    values(local.pki),
+  )
 }
