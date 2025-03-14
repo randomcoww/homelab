@@ -407,6 +407,10 @@ resource "helm_release" "arc-runner-hook-template" {
             name = "workflow-template"
           }
           stringData = {
+            MC_HOST_arc           = "http://${minio_iam_user.arc.id}:${minio_iam_user.arc.secret}@${local.kubernetes_services.minio.endpoint}:${local.service_ports.minio}"
+            AWS_ENDPOINT_URL_S3   = "https://${data.terraform_remote_state.sr.outputs.backend_bucket.url}"
+            AWS_ACCESS_KEY_ID     = data.terraform_remote_state.sr.outputs.backend_bucket.access_key_id
+            AWS_SECRET_ACCESS_KEY = data.terraform_remote_state.sr.outputs.backend_bucket.secret_access_key
             "workflow-podspec.yaml" = yamlencode({
               spec = {
                 containers = [
@@ -429,24 +433,23 @@ resource "helm_release" "arc-runner-hook-template" {
                       }
                     }
                     env = [
-                      # write to minio boot bucket
+                      for _, key in [
+                        # write to minio boot bucket
+                        "MC_HOST_arc",
+                        # read remote terraform states
+                        "AWS_ENDPOINT_URL_S3",
+                        "AWS_ACCESS_KEY_ID",
+                        "AWS_SECRET_ACCESS_KEY",
+                      ] :
                       {
-                        name  = "MC_HOST_arc"
-                        value = "http://${minio_iam_user.arc.id}:${minio_iam_user.arc.secret}@${local.kubernetes_services.minio.endpoint}:${local.service_ports.minio}"
-                      },
-                      # read remote terraform states
-                      {
-                        name  = "AWS_ENDPOINT_URL_S3"
-                        value = "https://${data.terraform_remote_state.sr.outputs.backend_bucket.url}"
-                      },
-                      {
-                        name  = "AWS_ACCESS_KEY_ID"
-                        value = data.terraform_remote_state.sr.outputs.backend_bucket.access_key_id
-                      },
-                      {
-                        name  = "AWS_SECRET_ACCESS_KEY"
-                        value = data.terraform_remote_state.sr.outputs.backend_bucket.secret_access_key
-                      },
+                        name = key
+                        valueFrom = {
+                          secretKeyRef = {
+                            name = "workflow-template"
+                            key  = key
+                          }
+                        }
+                      }
                     ]
                   },
                 ]
