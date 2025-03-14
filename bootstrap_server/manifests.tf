@@ -115,10 +115,10 @@ module "bootstrap" {
       },
       {
         name  = "tftpd"
-        image = local.container_images.tftpd
+        image = local.container_images.ipxe_tftp
         args = [
           "--address",
-          "0.0.0.0:${local.host_ports.tftpd}",
+          "0.0.0.0:${local.host_ports.ipxe_tftp}",
           "--verbose",
         ]
         securityContext = {

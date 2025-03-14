@@ -338,7 +338,7 @@ module "statefulset" {
       # TODO: migrate fully to HTTP boot and remove TFTP
       {
         name : "${var.name}-tftpd"
-        image : var.images.tftpd
+        image : var.images.ipxe_tftp
         args = [
           "--address",
           "0.0.0.0:${var.ports.tftpd}",

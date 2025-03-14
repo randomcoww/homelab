@@ -466,7 +466,7 @@ resource "helm_release" "arc-runner-set" {
   for_each = toset([
     "etcd-wrapper",
     "kapprover",
-    "tftpd-ipxe",
+    "ipxe-tftp",
     "hostapd-noscan",
     "kea",
     "kvm-device-plugin",

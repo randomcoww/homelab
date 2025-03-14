@@ -14,7 +14,7 @@ variable "release" {
 variable "images" {
   type = object({
     kea         = string
-    tftpd       = string
+    ipxe_tftp   = string
     stork_agent = string
   })
 }

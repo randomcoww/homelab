@@ -7,7 +7,7 @@ module "kea" {
   release = "0.1.20"
   images = {
     kea         = local.container_images.kea
-    tftpd       = local.container_images.tftpd
+    ipxe_tftp   = local.container_images.ipxe_tftp
     stork_agent = local.container_images.stork_agent
   }
   service_ips = [

@@ -125,7 +125,7 @@ locals {
     # Helm
     kea                = "ghcr.io/randomcoww/kea:v20250309.0321"
     matchbox           = "quay.io/poseidon/matchbox:v0.11.0"
-    tftpd              = "ghcr.io/randomcoww/tftpd-ipxe:v20250210.0030"
+    ipxe_tftp          = "ghcr.io/randomcoww/ipxe-tftp:bd90abf487a6b0500f457193f86ff54fd2be3143"
     hostapd            = "ghcr.io/randomcoww/hostapd-noscan:v2.11"
     flannel            = "docker.io/flannel/flannel:v0.26.5"
     flannel_cni_plugin = "docker.io/flannel/flannel-cni-plugin:v1.6.2-flannel1"
