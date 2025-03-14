@@ -429,9 +429,23 @@ resource "helm_release" "arc-runner-hook-template" {
                       }
                     }
                     env = [
+                      # write to minio boot bucket
                       {
                         name  = "MC_HOST_arc"
                         value = "http://${minio_iam_user.arc.id}:${minio_iam_user.arc.secret}@${local.kubernetes_services.minio.endpoint}:${local.service_ports.minio}"
+                      },
+                      # read remote terraform states
+                      {
+                        name  = "AWS_ENDPOINT_URL_S3"
+                        value = "https://${data.terraform_remote_state.sr.outputs.backend_bucket.url}"
+                      },
+                      {
+                        name  = "AWS_ACCESS_KEY_ID"
+                        value = data.terraform_remote_state.sr.outputs.backend_bucket.access_key_id
+                      },
+                      {
+                        name  = "AWS_SECRET_ACCESS_KEY"
+                        value = data.terraform_remote_state.sr.outputs.backend_bucket.secret_access_key
                       },
                     ]
                   },
