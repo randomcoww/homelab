@@ -1,13 +1,14 @@
 resource "tls_private_key" "matchbox-web" {
   algorithm   = var.ca.algorithm
   ecdsa_curve = "P521"
+  rsa_bits    = 2048
 }
 
 resource "tls_cert_request" "matchbox-web" {
   private_key_pem = tls_private_key.matchbox-web.private_key_pem
 
   subject {
-    common_name = local.name
+    common_name = "${local.name}-web"
   }
 
   dns_names = [

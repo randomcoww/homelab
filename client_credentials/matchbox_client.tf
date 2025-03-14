@@ -1,13 +1,14 @@
 resource "tls_private_key" "matchbox-client" {
   algorithm   = data.terraform_remote_state.sr.outputs.matchbox.ca.algorithm
   ecdsa_curve = "P521"
+  rsa_bits    = 2048
 }
 
 resource "tls_cert_request" "matchbox-client" {
   private_key_pem = tls_private_key.matchbox-client.private_key_pem
 
   subject {
-    common_name = "matchbox"
+    common_name = "matchbox-client"
   }
 }
 

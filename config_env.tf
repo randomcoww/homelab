@@ -125,7 +125,7 @@ locals {
     # Helm
     kea                = "ghcr.io/randomcoww/kea:v20250309.0321"
     matchbox           = "quay.io/poseidon/matchbox:v0.11.0"
-    ipxe_tftp          = "ghcr.io/randomcoww/ipxe-tftp:bd90abf487a6b0500f457193f86ff54fd2be3143"
+    ipxe_tftp          = "ghcr.io/randomcoww/ipxe-tftp:v20250314.2341"
     hostapd            = "ghcr.io/randomcoww/hostapd-noscan:v2.11"
     flannel            = "docker.io/flannel/flannel:v0.26.5"
     flannel_cni_plugin = "docker.io/flannel/flannel-cni-plugin:v1.6.2-flannel1"
@@ -154,7 +154,7 @@ locals {
   }
 
   pxeboot_images = {
-    coreos = "fedora-coreos-41.20250314.08" # randomcoww/fedora-coreos-config-custom
+    coreos = "fedora-coreos-41.20250314.23" # randomcoww/fedora-coreos-config-custom
   }
 
   kubernetes = {
@@ -288,7 +288,7 @@ locals {
   }
 
   service_ports = {
-    matchbox     = 80
+    matchbox     = 443
     matchbox_api = 50101
     minio        = 9000
     lldap        = 6360

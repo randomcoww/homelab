@@ -113,7 +113,8 @@ module "mountpoint" {
             -address=0.0.0.0:${var.ports.matchbox} \
             -rpc-address=0.0.0.0:${var.ports.matchbox_api} \
             -assets-path=${local.data_path} \
-            -data-path=${local.data_path}
+            -data-path=${local.data_path} \
+            -web-ssl
           EOF
         ]
         # Cert paths are fixed
@@ -154,14 +155,14 @@ module "mountpoint" {
         ]
         readinessProbe = {
           httpGet = {
-            scheme = "HTTP"
+            scheme = "HTTPS"
             port   = var.ports.matchbox
             path   = "/"
           }
         }
         livenessProbe = {
           httpGet = {
-            scheme = "HTTP"
+            scheme = "HTTPS"
             port   = var.ports.matchbox
             path   = "/"
           }
