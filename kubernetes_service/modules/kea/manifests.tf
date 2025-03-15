@@ -3,10 +3,18 @@ locals {
   kea_dhcp4_config_template_path = "${local.base_path}/kea-dhcp4.tpl"
   kea_dhcp4_config_path          = "${local.base_path}/kea-dhcp4.conf"
   kea_ctrl_agent_config_path     = "${local.base_path}/kea-ctrl-agent.conf"
-  ha_ca_cert_path                = "${local.base_path}/ca_cert.pem"
-  ha_cert_path                   = "${local.base_path}/cert.pem"
-  ha_key_path                    = "${local.base_path}/key.pem"
   kea_socket_path                = "/var/tmp/kea/kea-dhcp4-ctrl.sock"
+  ca_cert_path                   = "${local.base_path}/ca-cert.pem"
+  ha_cert_path                   = "${local.base_path}/ha-cert.pem"
+  ha_key_path                    = "${local.base_path}/ha-key.pem"
+  ctrl_agent_cert_path           = "${local.base_path}/agent-cert.pem"
+  ctrl_agent_key_path            = "${local.base_path}/agent-key.pem"
+  # These paths are hard coded in stork
+  stork_agent_cert_path     = "/var/lib/stork-agent/certs/cert.pem"
+  stork_agent_key_path      = "/var/lib/stork-agent/certs/key.pem"
+  stork_agent_ca_cert_path  = "/var/lib/stork-agent/certs/ca.pem"
+  stork_agent_cert_sha_path = "/var/lib/stork-agent/tokens/server-cert.sha256"
+  stork_agent_token_path    = "/var/lib/stork-agent/tokens/agent-token.txt"
 
   members = [
     for i, ip in var.service_ips :
@@ -19,8 +27,12 @@ locals {
   subnet_id_base = 1
   ctrl_agent_config = {
     Control-agent = {
-      http-host = "127.0.0.1"
-      http-port = 8080
+      http-host     = "127.0.0.1"
+      http-port     = var.ports.kea_ctrl_agent
+      trust-anchor  = local.ca_cert_path
+      cert-file     = local.ctrl_agent_cert_path
+      key-file      = local.ctrl_agent_key_path
+      cert-required = true
       control-sockets = {
         dhcp4 = {
           socket-type = "unix"
@@ -75,7 +87,7 @@ locals {
               high-availability = [
                 {
                   this-server-name    = member.name
-                  trust-anchor        = local.ha_ca_cert_path,
+                  trust-anchor        = local.ca_cert_path,
                   cert-file           = local.ha_cert_path,
                   key-file            = local.ha_key_path,
                   mode                = "load-balancing"
@@ -105,18 +117,6 @@ locals {
               },
             ]
           },
-          # TODO: migrate fully to HTTP boot and remove TFTP
-          {
-            name        = "PXE-UEFI"
-            test        = "option[client-system].hex == 0x0007",
-            next-server = "$POD_IP"
-            option-data = [
-              {
-                name = "boot-file-name"
-                data = basename(var.ipxe_boot_url)
-              },
-            ]
-          },
           {
             name = "HTTP"
             test = "substring(option[vendor-class-identifier].hex,0,10) == 'HTTPClient'",
@@ -128,6 +128,18 @@ locals {
               {
                 name = "vendor-class-identifier"
                 data = "HTTPClient"
+              },
+            ]
+          },
+          # TODO: migrate fully to HTTP boot and remove TFTP
+          {
+            name        = "PXE-UEFI"
+            test        = "option[client-system].hex == 0x0007",
+            next-server = "$POD_IP"
+            option-data = [
+              {
+                name = "boot-file-name"
+                data = basename(var.ipxe_boot_url)
               },
             ]
           },
@@ -175,6 +187,11 @@ locals {
   }
 }
 
+resource "random_password" "stork-agent-token" {
+  length  = 32
+  special = false
+}
+
 module "metadata" {
   source      = "../../../modules/metadata"
   name        = var.name
@@ -205,8 +222,14 @@ module "secret" {
     for host, _ in local.dhcp4_config :
     "ha-key-${host}" => tls_private_key.kea[host].private_key_pem
     }, {
-    basename(local.ha_ca_cert_path)            = tls_self_signed_cert.kea-ca.cert_pem
-    basename(local.kea_ctrl_agent_config_path) = jsonencode(local.ctrl_agent_config)
+    "kea-ctrl-agent"       = jsonencode(local.ctrl_agent_config)
+    "ca-cert"              = tls_self_signed_cert.kea-ca.cert_pem
+    "ctrl-agent-cert"      = tls_locally_signed_cert.kea-ctrl-agent.cert_pem
+    "ctrl-agent-key"       = tls_private_key.kea-ctrl-agent.private_key_pem
+    "stork-agent-cert"     = tls_locally_signed_cert.kea-stork-agent.cert_pem
+    "stork-agent-key"      = tls_private_key.kea-stork-agent.private_key_pem_pkcs8
+    "stork-agent-cert-sha" = sha256(tls_locally_signed_cert.kea-stork-agent.cert_pem)
+    "stork-agent-token"    = random_password.stork-agent-token.result
   })
 }
 
@@ -316,8 +339,8 @@ module "statefulset" {
           },
           {
             name        = "kea-config"
-            mountPath   = local.ha_ca_cert_path
-            subPathExpr = basename(local.ha_ca_cert_path)
+            mountPath   = local.ca_cert_path
+            subPathExpr = "ca-cert"
           },
           {
             name        = "kea-config"
@@ -334,24 +357,6 @@ module "statefulset" {
             mountPath = dirname(local.kea_socket_path)
           },
         ]
-      },
-      # TODO: migrate fully to HTTP boot and remove TFTP
-      {
-        name : "${var.name}-tftpd"
-        image : var.images.ipxe_tftp
-        args = [
-          "--address",
-          "0.0.0.0:${var.ports.tftpd}",
-        ]
-        securityContext = {
-          capabilities = {
-            add = [
-              "SYS_CHROOT",
-              "SETUID",
-              "SETGID",
-            ]
-          }
-        }
       },
       {
         name  = "${var.name}-ctrl-agent"
@@ -370,7 +375,22 @@ module "statefulset" {
           {
             name        = "kea-config"
             mountPath   = local.kea_ctrl_agent_config_path
-            subPathExpr = basename(local.kea_ctrl_agent_config_path)
+            subPathExpr = "kea-ctrl-agent"
+          },
+          {
+            name        = "kea-config"
+            mountPath   = local.ca_cert_path
+            subPathExpr = "ca-cert"
+          },
+          {
+            name        = "kea-config"
+            mountPath   = local.ctrl_agent_cert_path
+            subPathExpr = "ctrl-agent-cert"
+          },
+          {
+            name        = "kea-config"
+            mountPath   = local.ctrl_agent_key_path
+            subPathExpr = "ctrl-agent-key"
           },
           {
             name      = "socket-path"
@@ -392,7 +412,50 @@ module "statefulset" {
             mountPath   = local.kea_ctrl_agent_config_path
             subPathExpr = basename(local.kea_ctrl_agent_config_path)
           },
+          {
+            name        = "kea-config"
+            mountPath   = local.stork_agent_ca_cert_path
+            subPathExpr = "ca-cert"
+          },
+          {
+            name        = "kea-config"
+            mountPath   = local.stork_agent_cert_path
+            subPathExpr = "stork-agent-cert"
+          },
+          {
+            name        = "kea-config"
+            mountPath   = local.stork_agent_key_path
+            subPathExpr = "stork-agent-key"
+          },
+          {
+            name        = "kea-config"
+            mountPath   = local.stork_agent_cert_sha_path
+            subPathExpr = "stork-agent-cert-sha"
+          },
+          {
+            name        = "kea-config"
+            mountPath   = local.stork_agent_token_path
+            subPathExpr = "stork-agent-token"
+          },
         ]
+      },
+      # TODO: migrate fully to HTTP boot and remove TFTP
+      {
+        name  = "${var.name}-ipxe-tftp"
+        image = var.images.ipxe_tftp
+        args = [
+          "--address",
+          "0.0.0.0:${var.ports.tftpd}",
+        ]
+        securityContext = {
+          capabilities = {
+            add = [
+              "SYS_CHROOT",
+              "SETUID",
+              "SETGID",
+            ]
+          }
+        }
       },
     ]
     volumes = [

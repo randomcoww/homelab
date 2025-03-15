@@ -15,9 +15,10 @@ module "kea" {
     local.services.cluster_kea_secondary.ip,
   ]
   ports = {
-    kea_peer    = local.host_ports.kea_peer
-    kea_metrics = local.host_ports.kea_metrics
-    tftpd       = local.host_ports.tftpd
+    kea_peer       = local.host_ports.kea_peer
+    kea_metrics    = local.host_ports.kea_metrics
+    kea_ctrl_agent = local.host_ports.kea_ctrl_agent
+    tftpd          = local.host_ports.tftpd
   }
   ipxe_boot_url   = "http://${local.services.minio.ip}:${local.service_ports.minio}/${local.minio.data_buckets.boot.name}/ipxe.efi"
   ipxe_script_url = "https://${local.services.matchbox.ip}:${local.service_ports.matchbox}/boot.ipxe"

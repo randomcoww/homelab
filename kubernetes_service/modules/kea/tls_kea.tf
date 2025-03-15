@@ -6,7 +6,7 @@ resource "tls_private_key" "kea" {
 
   algorithm   = tls_private_key.kea-ca.algorithm
   ecdsa_curve = "P521"
-  rsa_bits    = "4096"
+  rsa_bits    = 4096
 }
 
 resource "tls_cert_request" "kea" {
@@ -17,7 +17,7 @@ resource "tls_cert_request" "kea" {
 
   private_key_pem = tls_private_key.kea[each.key].private_key_pem
   subject {
-    common_name = "keydb"
+    common_name = "kea-${each.key}"
   }
 
   dns_names = []

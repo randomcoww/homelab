@@ -21,9 +21,10 @@ variable "images" {
 
 variable "ports" {
   type = object({
-    kea_peer    = number
-    kea_metrics = number
-    tftpd       = number
+    kea_peer       = number
+    kea_metrics    = number
+    kea_ctrl_agent = number
+    tftpd          = number
   })
 }
 
