@@ -131,7 +131,7 @@ locals {
     flannel            = "docker.io/flannel/flannel:v0.26.5"
     flannel_cni_plugin = "docker.io/flannel/flannel-cni-plugin:v1.6.2-flannel1"
     kapprover          = "ghcr.io/randomcoww/kapprover:v0.1.0"
-    external_dns       = "registry.k8s.io/external-dns/external-dns:v0.16.0"
+    external_dns       = "registry.k8s.io/external-dns/external-dns:v0.16.1"
     kube_proxy         = "ghcr.io/randomcoww/kube-proxy:v20250309.0231"
     litestream         = "docker.io/litestream/litestream:0.3.13"
     tailscale          = "ghcr.io/randomcoww/tailscale-nft:v20250309.0228"
