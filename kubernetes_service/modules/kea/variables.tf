@@ -64,3 +64,7 @@ variable "kea_hooks_libraries_path" {
 variable "timezone" {
   type = string
 }
+
+variable "stork_agent_token" {
+  type = string
+}

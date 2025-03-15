@@ -1,6 +1,11 @@
 
 # DHCP
 
+resource "random_password" "stork-agent-token" {
+  length  = 32
+  special = false
+}
+
 module "kea" {
   source  = "./modules/kea"
   name    = "kea"
@@ -41,7 +46,8 @@ module "kea" {
       ]
     },
   ]
-  timezone = local.timezone
+  timezone          = local.timezone
+  stork_agent_token = random_password.stork-agent-token.result
 }
 
 # PXE boot server

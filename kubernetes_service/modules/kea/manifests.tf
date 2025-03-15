@@ -187,11 +187,6 @@ locals {
   }
 }
 
-resource "random_password" "stork-agent-token" {
-  length  = 32
-  special = false
-}
-
 module "metadata" {
   source      = "../../../modules/metadata"
   name        = var.name
@@ -229,7 +224,7 @@ module "secret" {
     "stork-agent-cert"     = tls_locally_signed_cert.kea-stork-agent.cert_pem
     "stork-agent-key"      = tls_private_key.kea-stork-agent.private_key_pem_pkcs8
     "stork-agent-cert-sha" = sha256(tls_locally_signed_cert.kea-stork-agent.cert_pem)
-    "stork-agent-token"    = random_password.stork-agent-token.result
+    "stork-agent-token"    = var.stork_agent_token
   })
 }
 
