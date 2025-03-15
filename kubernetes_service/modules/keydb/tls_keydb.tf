@@ -1,7 +1,7 @@
 resource "tls_private_key" "keydb" {
   algorithm   = var.ca.algorithm
   ecdsa_curve = "P521"
-  rsa_bits    = "4096"
+  rsa_bits    = 4096
 }
 
 resource "tls_cert_request" "keydb" {
