@@ -15,6 +15,7 @@ variable "images" {
   type = object({
     kea         = string
     ipxe_tftp   = string
+    ipxe_http   = string
     stork_agent = string
   })
 }
@@ -25,6 +26,7 @@ variable "ports" {
     kea_metrics    = number
     kea_ctrl_agent = number
     ipxe_tftp      = number
+    ipxe_http      = number
   })
 }
 
@@ -37,7 +39,7 @@ variable "service_ips" {
   type = list(string)
 }
 
-variable "ipxe_boot_url" {
+variable "ipxe_boot_file_name" {
   type = string
 }
 
