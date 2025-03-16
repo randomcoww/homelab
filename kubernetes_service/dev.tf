@@ -91,13 +91,6 @@ module "code" {
       mountPath = "/run/user/${local.users.client.uid}"
     },
   ]
-  security_context = {
-    capabilities = {
-      add = [
-        "AUDIT_WRITE",
-      ]
-    }
-  }
   affinity = {
     nodeAffinity = {
       requiredDuringSchedulingIgnoredDuringExecution = {
