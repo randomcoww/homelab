@@ -132,6 +132,11 @@ output "minio" {
   value = {
     access_key_id     = random_password.minio-access-key-id.result
     secret_access_key = random_password.minio-secret-access-key.result
+    ca = {
+      algorithm       = tls_private_key.minio-ca.algorithm
+      private_key_pem = tls_private_key.minio-ca.private_key_pem
+      cert_pem        = tls_self_signed_cert.minio-ca.cert_pem
+    }
   }
   sensitive = true
 }
