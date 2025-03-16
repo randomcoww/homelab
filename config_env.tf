@@ -60,13 +60,14 @@ locals {
       vlan_id = 80
       mtu     = local.default_mtu
       netnums = {
-        apiserver              = 2
-        external_dns           = 31
+        apiserver    = 2
+        external_dns = 31
+        matchbox     = 39
+        matchbox_api = 33
+        minio        = 34
+
         ingress_nginx          = 32
         ingress_nginx_external = 35
-        matchbox               = 39
-        matchbox_api           = 33
-        minio                  = 34
         sunshine               = 36
         alpaca_db              = 38
         satisfactory_server    = 40
@@ -223,14 +224,6 @@ locals {
         name      = "etcd"
         namespace = "kube-system"
       }
-      authelia = {
-        name      = "authelia"
-        namespace = "authelia"
-      }
-      authelia_redis = {
-        name      = "authelia-redis"
-        namespace = "authelia"
-      }
       ingress_nginx = {
         name      = "${local.ingress_classes.ingress_nginx}-controller"
         namespace = "ingress-nginx"
@@ -251,6 +244,10 @@ locals {
         name      = "lldap"
         namespace = "lldap"
       }
+      authelia = {
+        name      = "authelia"
+        namespace = "authelia"
+      }
       alpaca_db = {
         name      = "alpaca-db"
         namespace = "alpaca"
@@ -266,7 +263,6 @@ locals {
     } :
     name => merge(e, {
       endpoint = "${e.name}.${e.namespace}"
-      fqdn     = "${e.name}.${e.namespace}.svc.${local.domains.kubernetes}"
     })
   }
 
@@ -274,7 +270,7 @@ locals {
     kea_peer           = 50060
     kea_metrics        = 58087
     kea_ctrl_agent     = 58088
-    tftpd              = 69
+    ipxe_tftp          = 69
     apiserver          = 58181
     apiserver_backend  = 58081
     controller_manager = 50252
@@ -285,7 +281,7 @@ locals {
     etcd_peer          = 58083
     etcd_metrics       = 58086
     flannel_healthz    = 58084
-    code               = 58085
+    code               = 58085 # run code server on host net to work seamlessly with podman-remote
     bgp                = 179
   }
 
@@ -294,7 +290,6 @@ locals {
     matchbox_api = 50101
     minio        = 9000
     lldap        = 6360
-    redis        = 6379
     clickhouse   = 9440
     metrics      = 9153
     prometheus   = 80

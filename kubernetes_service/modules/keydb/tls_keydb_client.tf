@@ -8,7 +8,7 @@ resource "tls_cert_request" "keydb-client" {
   private_key_pem = tls_private_key.keydb-client.private_key_pem
 
   subject {
-    common_name = local.name
+    common_name = var.name
   }
 }
 

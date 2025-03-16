@@ -1,7 +1,5 @@
 locals {
-  ports = {
-    rclone = 8080
-  }
+  rclone_port = 8080
 }
 
 module "metadata" {
@@ -39,9 +37,9 @@ module "service" {
     ports = [
       {
         name       = var.name
-        port       = local.ports.rclone
+        port       = local.rclone_port
         protocol   = "TCP"
-        targetPort = local.ports.rclone
+        targetPort = local.rclone_port
       },
     ]
   }
@@ -60,7 +58,7 @@ module "ingress" {
       paths = [
         {
           service = var.name
-          port    = local.ports.rclone
+          port    = local.rclone_port
           path    = "/"
         },
       ]
@@ -86,7 +84,7 @@ module "deployment" {
         args = [
           "serve",
           "webdav",
-          "--addr=0.0.0.0:${local.ports.rclone}",
+          "--addr=0.0.0.0:${local.rclone_port}",
           ":s3:${var.minio_bucket}",
           "--s3-provider=Minio",
           "--s3-endpoint=${var.minio_endpoint}",
@@ -105,14 +103,14 @@ module "deployment" {
         readinessProbe = {
           httpGet = {
             scheme = "HTTP"
-            port   = local.ports.rclone
+            port   = local.rclone_port
             path   = "/"
           }
         }
         livenessProbe = {
           httpGet = {
             scheme = "HTTP"
-            port   = local.ports.rclone
+            port   = local.rclone_port
             path   = "/"
           }
         }

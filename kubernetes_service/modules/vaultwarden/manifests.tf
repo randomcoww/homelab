@@ -1,14 +1,12 @@
 locals {
-  db_path = "/data/db.sqlite3"
+  vaultwarden_port = 8080
+  db_path          = "/data/db.sqlite3"
   extra_configs = merge(var.extra_configs, {
     DATA_FOLDER  = dirname(local.db_path)
     DATABASE_URL = local.db_path
-    ROCKET_PORT  = local.ports.vaultwarden
+    ROCKET_PORT  = local.vaultwarden_port
     DOMAIN       = "https://${var.service_hostname}"
   })
-  ports = {
-    vaultwarden = 8080
-  }
 }
 
 module "metadata" {
@@ -45,9 +43,9 @@ module "service" {
     ports = [
       {
         name       = "vaultwarden"
-        port       = local.ports.vaultwarden
+        port       = local.vaultwarden_port
         protocol   = "TCP"
-        targetPort = local.ports.vaultwarden
+        targetPort = local.vaultwarden_port
       },
     ]
   }
@@ -66,7 +64,7 @@ module "ingress" {
       paths = [
         {
           service = module.service.name
-          port    = local.ports.vaultwarden
+          port    = local.vaultwarden_port
           path    = "/"
         },
       ]
@@ -128,20 +126,20 @@ module "litestream" {
         ]
         ports = [
           {
-            containerPort = local.ports.vaultwarden
+            containerPort = local.vaultwarden_port
           },
         ]
         readinessProbe = {
           httpGet = {
             scheme = "HTTP"
-            port   = local.ports.vaultwarden
+            port   = local.vaultwarden_port
             path   = "/alive"
           }
         }
         livenessProbe = {
           httpGet = {
             scheme = "HTTP"
-            port   = local.ports.vaultwarden
+            port   = local.vaultwarden_port
             path   = "/alive"
           }
         }

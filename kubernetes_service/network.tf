@@ -23,7 +23,7 @@ module "kea" {
     kea_peer       = local.host_ports.kea_peer
     kea_metrics    = local.host_ports.kea_metrics
     kea_ctrl_agent = local.host_ports.kea_ctrl_agent
-    tftpd          = local.host_ports.tftpd
+    ipxe_tftp      = local.host_ports.ipxe_tftp
   }
   ipxe_boot_url   = "http://${local.services.minio.ip}:${local.service_ports.minio}/${local.minio.data_buckets.boot.name}/ipxe.efi"
   ipxe_script_url = "https://${local.services.matchbox.ip}:${local.service_ports.matchbox}/boot.ipxe"
@@ -85,10 +85,11 @@ resource "minio_iam_user_policy_attachment" "matchbox" {
 }
 
 module "matchbox" {
-  source                   = "./modules/matchbox"
-  cluster_service_endpoint = local.kubernetes_services.matchbox.endpoint
-  release                  = "0.2.16"
-  replicas                 = 3
+  source    = "./modules/matchbox"
+  name      = local.kubernetes_services.matchbox.name
+  namespace = local.kubernetes_services.matchbox.namespace
+  release   = "0.2.16"
+  replicas  = 3
   images = {
     matchbox   = local.container_images.matchbox
     mountpoint = local.container_images.mountpoint

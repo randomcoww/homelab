@@ -1,4 +1,8 @@
-variable "cluster_service_endpoint" {
+variable "name" {
+  type = string
+}
+
+variable "namespace" {
   type = string
 }
 

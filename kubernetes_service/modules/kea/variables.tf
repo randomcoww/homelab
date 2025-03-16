@@ -24,7 +24,7 @@ variable "ports" {
     kea_peer       = number
     kea_metrics    = number
     kea_ctrl_agent = number
-    tftpd          = number
+    ipxe_tftp      = number
   })
 }
 

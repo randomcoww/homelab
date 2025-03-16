@@ -440,7 +440,7 @@ module "statefulset" {
         image = var.images.ipxe_tftp
         args = [
           "--address",
-          "0.0.0.0:${var.ports.tftpd}",
+          "0.0.0.0:${var.ports.ipxe_tftp}",
         ]
         securityContext = {
           capabilities = {

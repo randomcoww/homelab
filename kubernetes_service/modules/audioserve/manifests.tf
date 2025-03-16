@@ -1,8 +1,6 @@
 locals {
-  data_path = "/var/lib/audioserve/mnt"
-  ports = {
-    audioserve = 3000
-  }
+  data_path       = "/var/lib/audioserve/mnt"
+  audioserve_port = 3000
 }
 
 module "metadata" {
@@ -27,9 +25,9 @@ module "service" {
     ports = [
       {
         name       = var.name
-        port       = local.ports.audioserve
+        port       = local.audioserve_port
         protocol   = "TCP"
-        targetPort = local.ports.audioserve
+        targetPort = local.audioserve_port
       },
     ]
   }
@@ -48,7 +46,7 @@ module "ingress" {
       paths = [
         {
           service = var.name
-          port    = local.ports.audioserve
+          port    = local.audioserve_port
           path    = "/"
         },
       ]
@@ -102,20 +100,20 @@ module "mountpoint" {
         ]
         ports = [
           {
-            containerPort = local.ports.audioserve
+            containerPort = local.audioserve_port
           },
         ]
         readinessProbe = {
           httpGet = {
             scheme = "HTTP"
-            port   = local.ports.audioserve
+            port   = local.audioserve_port
             path   = "/"
           }
         }
         livenessProbe = {
           httpGet = {
             scheme = "HTTP"
-            port   = local.ports.audioserve
+            port   = local.audioserve_port
             path   = "/"
           }
         }

@@ -57,9 +57,10 @@ resource "minio_iam_user_policy_attachment" "lldap" {
 }
 
 module "lldap" {
-  source                   = "./modules/lldap"
-  cluster_service_endpoint = local.kubernetes_services.lldap.endpoint
-  release                  = "0.1.0"
+  source    = "./modules/lldap"
+  name      = local.kubernetes_services.lldap.name
+  namespace = local.kubernetes_services.lldap.namespace
+  release   = "0.1.0"
   images = {
     lldap      = local.container_images.lldap
     litestream = local.container_images.litestream
@@ -98,48 +99,6 @@ module "lldap" {
 }
 
 ## authelia
-
-resource "tls_private_key" "authelia-redis-ca" {
-  algorithm   = "ECDSA"
-  ecdsa_curve = "P521"
-}
-
-resource "tls_self_signed_cert" "authelia-redis-ca" {
-  private_key_pem = tls_private_key.authelia-redis-ca.private_key_pem
-
-  validity_period_hours = 8760
-  is_ca_certificate     = true
-
-  subject {
-    common_name = "authelia"
-  }
-
-  allowed_uses = [
-    "key_encipherment",
-    "digital_signature",
-    "cert_signing",
-    "server_auth",
-    "client_auth",
-  ]
-}
-
-module "authelia-redis" {
-  source                   = "./modules/keydb"
-  cluster_service_endpoint = local.kubernetes_services.authelia_redis.fqdn # peer connections don't work unless this is a fqdn
-  release                  = "0.1.0"
-  replicas                 = 2
-  images = {
-    keydb = local.container_images.keydb
-  }
-  ports = {
-    keydb = local.service_ports.redis
-  }
-  ca = {
-    algorithm       = tls_private_key.authelia-redis-ca.algorithm
-    private_key_pem = tls_private_key.authelia-redis-ca.private_key_pem
-    cert_pem        = tls_self_signed_cert.authelia-redis-ca.cert_pem
-  }
-}
 
 resource "minio_s3_bucket" "authelia" {
   bucket        = "authelia"
@@ -184,17 +143,13 @@ module "authelia" {
   }
   images = {
     litestream = local.container_images.litestream
+    keydb      = local.container_images.keydb
   }
   service_hostname = local.kubernetes_ingress_endpoints.auth
   lldap_ca = {
     algorithm       = tls_private_key.lldap-ca.algorithm
     private_key_pem = tls_private_key.lldap-ca.private_key_pem
     cert_pem        = tls_self_signed_cert.lldap-ca.cert_pem
-  }
-  redis_ca = {
-    algorithm       = tls_private_key.authelia-redis-ca.algorithm
-    private_key_pem = tls_private_key.authelia-redis-ca.private_key_pem
-    cert_pem        = tls_self_signed_cert.authelia-redis-ca.cert_pem
   }
   configmap = {
     telemetry = {
@@ -259,20 +214,6 @@ module "authelia" {
       remember_me = 0
       encryption_key = {
         value = data.terraform_remote_state.sr.outputs.authelia.session_encryption_key
-      }
-      redis = {
-        enabled = true
-        deploy  = false
-        host    = local.kubernetes_services.authelia_redis.endpoint
-        port    = local.service_ports.redis
-        password = {
-          disabled = true
-        }
-        tls = {
-          enabled         = true
-          skip_verify     = false
-          minimum_version = "TLS1.3"
-        }
       }
     }
     regulation = {

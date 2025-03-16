@@ -1,8 +1,6 @@
 locals {
-  ports = {
-    qrcode = 80
-  }
-  index_path = "/usr/share/nginx/html/index.html"
+  qrcode_port = 80
+  index_path  = "/usr/share/nginx/html/index.html"
 }
 
 module "secret" {
@@ -90,9 +88,9 @@ module "service" {
     ports = [
       {
         name       = "qrcode"
-        port       = local.ports.qrcode
+        port       = local.qrcode_port
         protocol   = "TCP"
-        targetPort = local.ports.qrcode
+        targetPort = local.qrcode_port
       },
     ]
   }
@@ -111,7 +109,7 @@ module "ingress" {
       paths = [
         {
           service = module.service.name
-          port    = local.ports.qrcode
+          port    = local.qrcode_port
           path    = "/"
         },
       ]
@@ -136,20 +134,20 @@ module "deployment" {
         image = var.images.qrcode
         ports = [
           {
-            containerPort = local.ports.qrcode
+            containerPort = local.qrcode_port
           },
         ]
         readinessProbe = {
           httpGet = {
             scheme = "HTTP"
-            port   = local.ports.qrcode
+            port   = local.qrcode_port
             path   = "/"
           }
         }
         livenessProbe = {
           httpGet = {
             scheme = "HTTP"
-            port   = local.ports.qrcode
+            port   = local.qrcode_port
             path   = "/"
           }
         }

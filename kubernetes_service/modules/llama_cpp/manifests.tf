@@ -1,13 +1,11 @@
 locals {
-  name      = split(".", var.cluster_service_endpoint)[0]
-  namespace = split(".", var.cluster_service_endpoint)[1]
   data_path = "/var/lib/llama_cpp/models"
 }
 
 module "metadata" {
   source      = "../../../modules/metadata"
-  name        = local.name
-  namespace   = local.namespace
+  name        = var.name
+  namespace   = var.namespace
   release     = var.release
   app_version = split(":", var.images.llama_cpp)[1]
   manifests = merge(module.mountpoint.chart.manifests, {
@@ -17,14 +15,14 @@ module "metadata" {
 
 module "service" {
   source  = "../../../modules/service"
-  name    = local.name
-  app     = local.name
+  name    = var.name
+  app     = var.name
   release = var.release
   spec = {
     type = "ClusterIP"
     ports = [
       {
-        name       = local.name
+        name       = var.name
         port       = var.ports.llama_cpp
         protocol   = "TCP"
         targetPort = var.ports.llama_cpp
@@ -48,15 +46,15 @@ module "mountpoint" {
     llama_cpp  = var.images.llama_cpp
   }
   ##
-  name     = local.name
-  app      = local.name
+  name     = var.name
+  app      = var.name
   release  = var.release
   affinity = var.affinity
   replicas = 1
   template_spec = {
     containers = [
       {
-        name  = local.name
+        name  = var.name
         image = var.images.llama_cpp
         command = [
           "sh",

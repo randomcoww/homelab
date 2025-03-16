@@ -55,10 +55,11 @@ resource "minio_iam_user_policy_attachment" "alpaca-db" {
 }
 
 module "alpaca-db" {
-  source                   = "./modules/clickhouse"
-  cluster_service_endpoint = local.kubernetes_services.alpaca_db.endpoint
-  release                  = "0.1.1"
-  replicas                 = 3
+  source    = "./modules/clickhouse"
+  name      = local.kubernetes_services.alpaca_db.name
+  namespace = local.kubernetes_services.alpaca_db.namespace
+  release   = "0.1.1"
+  replicas  = 3
   images = {
     clickhouse = local.container_images.clickhouse
     s3fs       = local.container_images.s3fs

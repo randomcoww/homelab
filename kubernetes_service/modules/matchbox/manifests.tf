@@ -1,14 +1,12 @@
 locals {
-  name        = split(".", var.cluster_service_endpoint)[0]
-  namespace   = split(".", var.cluster_service_endpoint)[1]
   data_path   = "/var/lib/matchbox/mnt"
   config_path = "/etc/matchbox"
 }
 
 module "metadata" {
   source      = "../../../modules/metadata"
-  name        = local.name
-  namespace   = local.namespace
+  name        = var.name
+  namespace   = var.namespace
   release     = var.release
   app_version = split(":", var.images.matchbox)[1]
   manifests = merge(module.mountpoint.chart.manifests, {
@@ -20,8 +18,8 @@ module "metadata" {
 
 module "secret" {
   source  = "../../../modules/secret"
-  name    = local.name
-  app     = local.name
+  name    = var.name
+  app     = var.name
   release = var.release
   data = {
     ca       = chomp(var.ca.cert_pem)
@@ -34,8 +32,8 @@ module "secret" {
 
 module "service" {
   source  = "../../../modules/service"
-  name    = local.name
-  app     = local.name
+  name    = var.name
+  app     = var.name
   release = var.release
   spec = {
     type              = "LoadBalancer"
@@ -54,8 +52,8 @@ module "service" {
 
 module "service-api" {
   source  = "../../../modules/service"
-  name    = "${local.name}-api"
-  app     = local.name
+  name    = "${var.name}-api"
+  app     = var.name
   release = var.release
   spec = {
     type              = "LoadBalancer"
@@ -86,8 +84,8 @@ module "mountpoint" {
     mountpoint = var.images.mountpoint
   }
   ##
-  name     = local.name
-  app      = local.name
+  name     = var.name
+  app      = var.name
   release  = var.release
   affinity = var.affinity
   replicas = var.replicas
@@ -97,7 +95,7 @@ module "mountpoint" {
   template_spec = {
     containers = [
       {
-        name  = local.name
+        name  = var.name
         image = var.images.matchbox
         command = [
           "sh",

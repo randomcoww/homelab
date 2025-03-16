@@ -152,9 +152,10 @@ resource "minio_iam_user_policy_attachment" "llama-cpp" {
 }
 
 module "llama-cpp" {
-  source                   = "./modules/llama_cpp"
-  cluster_service_endpoint = local.kubernetes_services.llama_cpp.endpoint
-  release                  = "0.1.1"
+  source    = "./modules/llama_cpp"
+  name      = local.kubernetes_services.llama_cpp.name
+  namespace = local.kubernetes_services.llama_cpp.namespace
+  release   = "0.1.1"
   images = {
     mountpoint = local.container_images.mountpoint
     llama_cpp  = local.container_images.llama_cpp

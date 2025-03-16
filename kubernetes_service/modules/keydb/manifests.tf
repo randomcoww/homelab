@@ -1,27 +1,24 @@
 locals {
-  base_path             = "/var/lib/keydb"
-  cert_path             = "${local.base_path}/keydb.crt"
-  key_path              = "${local.base_path}/keydb.key"
-  client_cert_path      = "${local.base_path}/client.crt"
-  client_key_path       = "${local.base_path}/client.key"
-  ca_cert_path          = "${local.base_path}/ca.crt"
-  config_path           = "/etc/keydb.conf"
-  socket_path           = "/tmp/keydb.sock"
-  name                  = split(".", var.cluster_service_endpoint)[0]
-  namespace             = split(".", var.cluster_service_endpoint)[1]
-  peer_name             = "${local.name}-peer"
-  peer_service_endpoint = "${local.peer_name}.${join(".", slice(split(".", var.cluster_service_endpoint), 1, length(split(".", var.cluster_service_endpoint))))}"
+  base_path        = "/var/lib/keydb"
+  cert_path        = "${local.base_path}/keydb.crt"
+  key_path         = "${local.base_path}/keydb.key"
+  client_cert_path = "${local.base_path}/client.crt"
+  client_key_path  = "${local.base_path}/client.key"
+  ca_cert_path     = "${local.base_path}/ca.crt"
+  config_path      = "/etc/keydb.conf"
+  socket_path      = "/tmp/keydb.sock"
+  peer_name        = "${var.name}-peer"
 
   peers = {
     for i, _ in range(var.replicas) :
-    "${local.name}-${i}" => "${local.name}-${i}.${local.peer_service_endpoint}"
+    "${var.name}-${i}" => "${var.name}-${i}.${local.peer_name}.${var.namespace}"
   }
 }
 
 module "metadata" {
   source      = "../../../modules/metadata"
-  name        = local.name
-  namespace   = local.namespace
+  name        = var.name
+  namespace   = var.namespace
   release     = var.release
   app_version = split(":", var.images.keydb)[1]
   manifests = {
@@ -35,8 +32,8 @@ module "metadata" {
 
 module "secret" {
   source  = "../../../modules/secret"
-  name    = local.name
-  app     = local.name
+  name    = var.name
+  app     = var.name
   release = var.release
   data = {
     basename(local.cert_path)        = chomp(tls_locally_signed_cert.keydb.cert_pem)
@@ -49,8 +46,8 @@ module "secret" {
 
 module "configmap" {
   source  = "../../../modules/configmap"
-  name    = local.name
-  app     = local.name
+  name    = var.name
+  app     = var.name
   release = var.release
   data = {
     for hostname, _ in local.peers :
@@ -82,8 +79,8 @@ module "configmap" {
 
 module "service" {
   source  = "../../../modules/service"
-  name    = local.name
-  app     = local.name
+  name    = var.name
+  app     = var.name
   release = var.release
   spec = {
     type = "ClusterIP"
@@ -101,7 +98,7 @@ module "service" {
 module "service-peer" {
   source  = "../../../modules/service"
   name    = local.peer_name
-  app     = local.name
+  app     = var.name
   release = var.release
   spec = {
     type                     = "ClusterIP"
@@ -120,8 +117,8 @@ module "service-peer" {
 
 module "statefulset" {
   source   = "../../../modules/statefulset"
-  name     = local.name
-  app      = local.name
+  name     = var.name
+  app      = var.name
   release  = var.release
   replicas = var.replicas
   affinity = var.affinity
@@ -137,7 +134,7 @@ module "statefulset" {
   template_spec = {
     containers = [
       {
-        name  = local.name
+        name  = var.name
         image = var.images.keydb
         command = [
           "keydb-server",
@@ -205,5 +202,13 @@ module "statefulset" {
         }
       },
     ], var.extra_volumes)
+    dnsConfig = {
+      options = [
+        {
+          name  = "ndots"
+          value = "5"
+        },
+      ]
+    }
   }
 }

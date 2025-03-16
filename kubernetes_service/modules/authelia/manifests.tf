@@ -4,10 +4,10 @@ module "secret" {
   app     = var.name
   release = var.helm_template.version
   data = {
-    basename(local.ldap_client_cert_path)  = tls_locally_signed_cert.lldap.cert_pem
-    basename(local.ldap_client_key_path)   = tls_private_key.lldap.private_key_pem
-    basename(local.redis_client_cert_path) = tls_locally_signed_cert.redis.cert_pem
-    basename(local.redis_client_key_path)  = tls_private_key.redis.private_key_pem
+    basename(local.ldap_client_cert_path)  = tls_locally_signed_cert.lldap-client.cert_pem
+    basename(local.ldap_client_key_path)   = tls_private_key.lldap-client.private_key_pem
+    basename(local.redis_client_cert_path) = tls_locally_signed_cert.redis-client.cert_pem
+    basename(local.redis_client_key_path)  = tls_private_key.redis-client.private_key_pem
   }
 }
 
@@ -141,6 +141,20 @@ data "helm_template" "authelia" {
               subdomain = local.subdomain
             },
           ])
+          redis = {
+            enabled = true
+            deploy  = false
+            host    = "${var.name}-redis.${var.namespace}"
+            port    = local.redis_port
+            password = {
+              disabled = true
+            }
+            tls = {
+              enabled         = true
+              skip_verify     = false
+              minimum_version = "TLS1.3"
+            }
+          }
         })
       })
       secret = var.secret
@@ -152,7 +166,7 @@ data "helm_template" "authelia" {
           },
           {
             name  = "redis-ca.pem"
-            value = var.redis_ca.cert_pem
+            value = tls_self_signed_cert.redis-ca.cert_pem
           },
         ]
       }
@@ -163,12 +177,31 @@ data "helm_template" "authelia" {
   ]
 }
 
+module "redis" {
+  source    = "../keydb"
+  name      = "${var.name}-redis"
+  namespace = var.namespace
+  release   = var.helm_template.version
+  replicas  = var.redis_replicas
+  images = {
+    keydb = var.images.keydb
+  }
+  ports = {
+    keydb = local.redis_port
+  }
+  ca = {
+    algorithm       = tls_private_key.redis-ca.algorithm
+    private_key_pem = tls_private_key.redis-ca.private_key_pem
+    cert_pem        = tls_self_signed_cert.redis-ca.cert_pem
+  }
+}
+
 module "metadata" {
   source    = "../../../modules/metadata"
   name      = var.name
   namespace = var.namespace
   release   = var.helm_template.version
-  manifests = local.manifests
+  manifests = merge(local.manifests, module.redis.chart.manifests)
 }
 
 locals {
@@ -180,6 +213,7 @@ locals {
   ldap_client_key_path   = "/custom/ldap-client-key.pem"
   redis_client_cert_path = "/custom/redis-client-cert.pem"
   redis_client_key_path  = "/custom/redis-client-key.pem"
+  redis_port             = 6379
 
   s = yamldecode(data.helm_template.authelia.manifests["templates/deployment.yaml"])
   manifests = merge(data.helm_template.authelia.manifests, {

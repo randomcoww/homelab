@@ -1,13 +1,10 @@
 locals {
-  name                  = split(".", var.cluster_service_endpoint)[0]
-  namespace             = split(".", var.cluster_service_endpoint)[1]
-  peer_name             = "${local.name}-peer"
-  peer_service_endpoint = "${local.peer_name}.${join(".", slice(split(".", var.cluster_service_endpoint), 1, length(split(".", var.cluster_service_endpoint))))}"
-  s3_clickhouse_prefix  = "clickhouse"
+  peer_name            = "${var.name}-peer"
+  s3_clickhouse_prefix = "clickhouse"
 
   members = [
     for i in range(var.replicas) :
-    "${local.name}-${i}"
+    "${var.name}-${i}"
   ]
   process_user  = "clickhouse"
   process_group = "clickhouse"
@@ -151,7 +148,7 @@ locals {
       node = [
         for _, member in local.members :
         {
-          host   = "${member}.${local.peer_service_endpoint}"
+          host   = "${member}.${local.peer_name}.${var.namespace}"
           port   = local.ports.keeper
           secure = 1
         }
@@ -175,7 +172,7 @@ locals {
           replica = [
             for _, member in local.members :
             {
-              host   = "${member}.${local.peer_service_endpoint}"
+              host   = "${member}.${local.peer_name}.${var.namespace}"
               port   = local.ports.clickhouse
               secure = 1
             }
@@ -214,7 +211,7 @@ locals {
         for i, member in local.members :
         {
           id       = i + 1
-          hostname = "${member}.${local.peer_service_endpoint}"
+          hostname = "${member}.${local.peer_name}.${var.namespace}"
           port     = local.ports.raft
         }
       ]
@@ -224,8 +221,8 @@ locals {
 
 module "metadata" {
   source      = "../../../modules/metadata"
-  name        = local.name
-  namespace   = local.namespace
+  name        = var.name
+  namespace   = var.namespace
   release     = var.release
   app_version = split(":", var.images.clickhouse)[1]
   manifests = merge(module.s3fs.chart.manifests, {
@@ -237,8 +234,8 @@ module "metadata" {
 
 module "secret" {
   source  = "../../../modules/secret"
-  name    = local.name
-  app     = local.name
+  name    = var.name
+  app     = var.name
   release = var.release
   data = merge({
     basename(local.ca_cert_path) = chomp(var.ca.cert_pem)
@@ -258,15 +255,15 @@ module "secret" {
       macros = merge(local.clickhouse_config.macros, {
         replica = "replica_${i + 1}"
       })
-      interserver_http_host = "${member}.${local.peer_service_endpoint}"
+      interserver_http_host = "${member}.${local.peer_name}.${var.namespace}"
     }))
   })
 }
 
 module "service" {
   source  = "../../../modules/service"
-  name    = local.name
-  app     = local.name
+  name    = var.name
+  app     = var.name
   release = var.release
   annotations = {
     "external-dns.alpha.kubernetes.io/hostname" = var.service_hostname
@@ -309,7 +306,7 @@ module "service" {
 module "service-peer" {
   source  = "../../../modules/service"
   name    = local.peer_name
-  app     = local.name
+  app     = var.name
   release = var.release
   spec = {
     type                     = "ClusterIP"
@@ -358,8 +355,8 @@ module "s3fs" {
     s3fs = var.images.s3fs
   }
   ##
-  name     = local.name
-  app      = local.name
+  name     = var.name
+  app      = var.name
   release  = var.release
   replicas = var.replicas
   affinity = var.affinity
@@ -375,7 +372,7 @@ module "s3fs" {
   template_spec = {
     containers = [
       {
-        name  = local.name
+        name  = var.name
         image = var.images.clickhouse
         command = [
           "sh",

@@ -1,6 +1,4 @@
 locals {
-  name      = split(".", var.cluster_service_endpoint)[0]
-  namespace = split(".", var.cluster_service_endpoint)[1]
   ports = merge(var.ports, {
     lldap      = 3890
     lldap_http = 17170
@@ -31,8 +29,8 @@ locals {
 
 module "metadata" {
   source      = "../../../modules/metadata"
-  name        = local.name
-  namespace   = local.namespace
+  name        = var.name
+  namespace   = var.namespace
   release     = var.release
   app_version = split(":", var.images.lldap)[1]
   manifests = merge(module.litestream.chart.manifests, {
@@ -44,8 +42,8 @@ module "metadata" {
 
 module "secret" {
   source  = "../../../modules/secret"
-  name    = local.name
-  app     = local.name
+  name    = var.name
+  app     = var.name
   release = var.release
   data = merge({
     basename(local.storage_secret_path) = var.storage_secret
@@ -59,8 +57,8 @@ module "secret" {
 
 module "service" {
   source  = "../../../modules/service"
-  name    = local.name
-  app     = local.name
+  name    = var.name
+  app     = var.name
   release = var.release
   spec = {
     type = "ClusterIP"
@@ -83,8 +81,8 @@ module "service" {
 
 module "ingress" {
   source             = "../../../modules/ingress"
-  name               = local.name
-  app                = local.name
+  name               = var.name
+  app                = var.name
   release            = var.release
   ingress_class_name = var.ingress_class_name
   annotations        = var.nginx_ingress_annotations
@@ -130,8 +128,8 @@ module "litestream" {
   }
   sqlite_path = local.db_path
   ##
-  name     = local.name
-  app      = local.name
+  name     = var.name
+  app      = var.name
   release  = var.release
   affinity = var.affinity
   annotations = {
@@ -145,7 +143,7 @@ module "litestream" {
     }
     containers = [
       {
-        name  = local.name
+        name  = var.name
         image = var.images.lldap
         args = [
           "run",

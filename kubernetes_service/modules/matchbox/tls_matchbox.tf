@@ -8,12 +8,12 @@ resource "tls_cert_request" "matchbox" {
   private_key_pem = tls_private_key.matchbox.private_key_pem
 
   subject {
-    common_name = "${local.name}-api"
+    common_name = "${var.name}-api"
   }
 
   dns_names = [
-    for i, _ in split(".", var.cluster_service_endpoint) :
-    join(".", slice(split(".", var.cluster_service_endpoint), 0, i + 1))
+    var.name,
+    "${var.name}.${var.namespace}",
   ]
   ip_addresses = [
     var.api_service_ip,
