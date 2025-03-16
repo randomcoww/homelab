@@ -23,7 +23,6 @@ resource "tls_cert_request" "clickhouse" {
   ])
   ip_addresses = compact([
     "127.0.0.1",
-    var.service_ip,
   ])
 }
 

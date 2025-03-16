@@ -45,11 +45,6 @@ variable "service_hostname" {
   type = string
 }
 
-variable "service_ip" {
-  type    = string
-  default = ""
-}
-
 variable "resources" {
   type    = map(any)
   default = {}

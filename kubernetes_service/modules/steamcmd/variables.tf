@@ -66,10 +66,6 @@ variable "service_hostname" {
   type = string
 }
 
-variable "service_ip" {
-  type = string
-}
-
 variable "steamapp_id" {
   type = number
 }

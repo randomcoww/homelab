@@ -98,6 +98,10 @@ module "daemonset" {
   app      = var.name
   release  = var.release
   affinity = var.affinity
+  annotations = {
+    "prometheus.io/scrape" = "true"
+    "prometheus.io/port"   = tostring(var.ports.kube_vip_metrics)
+  }
   template_spec = {
     hostNetwork        = true
     priorityClassName  = "system-cluster-critical"
@@ -114,10 +118,13 @@ module "daemonset" {
     ]
     containers = [
       {
-        name  = "kube-vip"
+        name  = var.name
         image = var.images.kube_vip
         args = [
           "manager",
+          "--serviceInterface=${var.service_interface}",
+          "--prometheusHTTPServer=0.0.0.0:${var.ports.kube_vip_metrics}",
+          "--cleanRoutingTable",
         ]
         env = [
           {

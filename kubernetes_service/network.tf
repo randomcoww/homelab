@@ -1,3 +1,34 @@
+# Kube-vip IP pool allocation
+
+module "kube-vip-cloud-provider" {
+  source    = "./modules/kube_vip_cloud_provider"
+  name      = "kube-vip-cloud-provider"
+  namespace = "kube-system"
+  release   = "0.1.1"
+  images = {
+    kube_vip_cloud_provider = local.container_images.kube_vip_cloud_provider
+  }
+  affinity = {
+    nodeAffinity = {
+      requiredDuringSchedulingIgnoredDuringExecution = {
+        nodeSelectorTerms = [
+          {
+            matchExpressions = [
+              {
+                key      = "node-role.kubernetes.io/control-plane"
+                operator = "Exists"
+              },
+            ]
+          },
+        ]
+      }
+    }
+  }
+  # https://kube-vip.io/docs/usage/cloud-provider/#the-kube-vip-cloud-provider-configmap
+  ip_pools = {
+    cidr-global = cidrsubnet(local.networks.service.prefix, 1, 1)
+  }
+}
 
 # DHCP
 
@@ -43,6 +74,23 @@ module "kea" {
       mtu = lookup(local.networks.lan, "mtu", 1500)
       pools = [
         cidrsubnet(local.networks.lan.prefix, 1, 1),
+      ]
+    },
+    {
+      prefix = local.networks.service.prefix
+      routers = [
+        local.services.gateway.ip,
+      ]
+      domain_name_servers = [
+        local.services.external_dns.ip,
+      ]
+      domain_search = [
+        local.domains.public,
+        local.domains.kubernetes,
+      ]
+      mtu = lookup(local.networks.service, "mtu", 1500)
+      pools = [
+        cidrsubnet(local.networks.service.prefix, 1, 1),
       ]
     },
   ]

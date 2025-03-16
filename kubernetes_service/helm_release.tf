@@ -16,10 +16,10 @@ locals {
     module.webdav-pictures,
     module.webdav-videos,
     module.audioserve,
-    # module.sunshine-desktop,
-    module.llama-cpp,
+    module.satisfactory-server,
+    module.sunshine-desktop,
+    # module.llama-cpp,
     # module.vaultwarden,
-    # module.satisfactory-server,
   ]
 }
 

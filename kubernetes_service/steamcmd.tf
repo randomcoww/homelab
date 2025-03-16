@@ -110,7 +110,6 @@ module "satisfactory-server" {
     failureThreshold    = 4
   }
   service_hostname        = local.kubernetes_ingress_endpoints.satisfactory_server
-  service_ip              = local.services.satisfactory_server.ip
   loadbalancer_class_name = "kube-vip.io/kube-vip-class"
   s3_endpoint             = "http://${local.services.cluster_minio.ip}:${local.service_ports.minio}"
   s3_bucket               = minio_s3_bucket.steamcmd.id

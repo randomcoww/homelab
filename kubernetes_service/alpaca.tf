@@ -96,7 +96,6 @@ module "alpaca-db" {
   #   }
   # }
   service_hostname        = local.kubernetes_ingress_endpoints.alpaca_db
-  service_ip              = local.services.alpaca_db.ip
   loadbalancer_class_name = "kube-vip.io/kube-vip-class"
 
   s3_endpoint          = "http://${local.services.cluster_minio.ip}:${local.service_ports.minio}"

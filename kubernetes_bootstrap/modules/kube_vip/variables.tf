@@ -19,7 +19,8 @@ variable "images" {
 
 variable "ports" {
   type = object({
-    apiserver = number
+    apiserver        = number
+    kube_vip_metrics = number
   })
 }
 
@@ -41,5 +42,9 @@ variable "bgp_neighbor_ips" {
 }
 
 variable "apiserver_ip" {
+  type = string
+}
+
+variable "service_interface" {
   type = string
 }

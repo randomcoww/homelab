@@ -39,7 +39,7 @@ module "service" {
   }
   spec = {
     type              = "LoadBalancer"
-    loadBalancerIP    = var.service_ip
+    loadBalancerIP    = "0.0.0.0"
     loadBalancerClass = var.loadbalancer_class_name
     ports = concat([
       for name, port in var.tcp_ports :

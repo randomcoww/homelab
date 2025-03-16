@@ -76,7 +76,8 @@ module "kube-vip" {
     kube_vip = local.container_images.kube_vip
   }
   ports = {
-    apiserver = local.host_ports.apiserver,
+    apiserver        = local.host_ports.apiserver,
+    kube_vip_metrics = local.host_ports.kube_vip_metrics,
   }
   bgp_as     = local.ha.bgp_as
   bgp_peeras = local.ha.bgp_as
@@ -84,7 +85,8 @@ module "kube-vip" {
     for _, host in local.members.gateway :
     cidrhost(local.networks.service.prefix, host.netnum)
   ]
-  apiserver_ip = local.services.apiserver.ip
+  apiserver_ip      = local.services.apiserver.ip
+  service_interface = "phy0-service"
   affinity = {
     nodeAffinity = {
       requiredDuringSchedulingIgnoredDuringExecution = {

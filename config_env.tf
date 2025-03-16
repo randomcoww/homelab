@@ -60,17 +60,13 @@ locals {
       vlan_id = 80
       mtu     = local.default_mtu
       netnums = {
-        apiserver    = 2
-        external_dns = 31
-        matchbox     = 39
-        matchbox_api = 33
-        minio        = 34
-
+        apiserver              = 2
+        external_dns           = 31
+        matchbox               = 39
+        matchbox_api           = 33
+        minio                  = 34
         ingress_nginx          = 32
         ingress_nginx_external = 35
-        sunshine               = 36
-        alpaca_db              = 38
-        satisfactory_server    = 40
       }
     }
     # Conntrack sync
@@ -124,35 +120,36 @@ locals {
     etcd                    = "gcr.io/etcd-development/etcd:v3.5.19"
 
     # Helm
-    kea                = "ghcr.io/randomcoww/kea:v20250309.0321"
-    matchbox           = "quay.io/poseidon/matchbox:v0.11.0"
-    ipxe_tftp          = "ghcr.io/randomcoww/ipxe:v20250315.0335-tftp"
-    ipxe_http          = "ghcr.io/randomcoww/ipxe:v20250315.0331-http"
-    hostapd            = "ghcr.io/randomcoww/hostapd-noscan:v2.11"
-    flannel            = "docker.io/flannel/flannel:v0.26.5"
-    flannel_cni_plugin = "docker.io/flannel/flannel-cni-plugin:v1.6.2-flannel1"
-    kapprover          = "ghcr.io/randomcoww/kapprover:v0.1.0"
-    external_dns       = "registry.k8s.io/external-dns/external-dns:v0.16.1"
-    kube_proxy         = "ghcr.io/randomcoww/kube-proxy:v20250309.0231"
-    litestream         = "docker.io/litestream/litestream:0.3.13"
-    tailscale          = "ghcr.io/randomcoww/tailscale-nft:v20250309.0228"
-    code_server        = "ghcr.io/randomcoww/code-server:v20250309.0234"
-    lldap              = "ghcr.io/lldap/lldap:2025-03-07-alpine-rootless"
-    keydb              = "docker.io/eqalpha/keydb:alpine_x86_64_v6.3.4"
-    clickhouse         = "docker.io/clickhouse/clickhouse-server:25.2.2.39-alpine"
-    qrcode_generator   = "ghcr.io/randomcoww/qrcode-generator:v20250210.0031"
-    rclone             = "docker.io/rclone/rclone:1.69.1"
-    s3fs               = "ghcr.io/randomcoww/s3fs:v20250309.0309"
-    mountpoint         = "ghcr.io/randomcoww/mountpoint-s3:v20250309.0322"
-    audioserve         = "docker.io/izderadicka/audioserve:latest"
-    kube_vip           = "ghcr.io/kube-vip/kube-vip:v0.8.9"
-    sunshine_desktop   = "ghcr.io/randomcoww/sunshine-desktop:v20250309.0318"
-    nvidia_driver      = "ghcr.io/randomcoww/nvidia-driver-container:v570.86.15-fedora41"
-    steamcmd           = "ghcr.io/randomcoww/steamcmd:v20250309.0421"
-    kvm_device_plugin  = "ghcr.io/randomcoww/kvm-device-plugin:v20250211.0006"
-    stork_agent        = "ghcr.io/randomcoww/stork-agent:v20250309.0310"
-    vaultwarden        = "docker.io/vaultwarden/server:1.33.2-alpine"
-    llama_cpp          = "ghcr.io/ggml-org/llama.cpp:server-cuda"
+    kea                     = "ghcr.io/randomcoww/kea:v20250309.0321"
+    matchbox                = "quay.io/poseidon/matchbox:v0.11.0"
+    ipxe_tftp               = "ghcr.io/randomcoww/ipxe:v20250315.0335-tftp"
+    ipxe_http               = "ghcr.io/randomcoww/ipxe:v20250315.0331-http"
+    hostapd                 = "ghcr.io/randomcoww/hostapd-noscan:v2.11"
+    flannel                 = "docker.io/flannel/flannel:v0.26.5"
+    flannel_cni_plugin      = "docker.io/flannel/flannel-cni-plugin:v1.6.2-flannel1"
+    kapprover               = "ghcr.io/randomcoww/kapprover:v0.1.0"
+    external_dns            = "registry.k8s.io/external-dns/external-dns:v0.16.1"
+    kube_proxy              = "ghcr.io/randomcoww/kube-proxy:v20250309.0231"
+    litestream              = "docker.io/litestream/litestream:0.3.13"
+    tailscale               = "ghcr.io/randomcoww/tailscale-nft:v20250309.0228"
+    code_server             = "ghcr.io/randomcoww/code-server:v20250309.0234"
+    lldap                   = "ghcr.io/lldap/lldap:2025-03-07-alpine-rootless"
+    keydb                   = "docker.io/eqalpha/keydb:alpine_x86_64_v6.3.4"
+    clickhouse              = "docker.io/clickhouse/clickhouse-server:25.2.2.39-alpine"
+    qrcode_generator        = "ghcr.io/randomcoww/qrcode-generator:v20250210.0031"
+    rclone                  = "docker.io/rclone/rclone:1.69.1"
+    s3fs                    = "ghcr.io/randomcoww/s3fs:v20250309.0309"
+    mountpoint              = "ghcr.io/randomcoww/mountpoint-s3:v20250309.0322"
+    audioserve              = "docker.io/izderadicka/audioserve:latest"
+    kube_vip                = "ghcr.io/kube-vip/kube-vip:v0.8.9"
+    kube_vip_cloud_provider = "ghcr.io/kube-vip/kube-vip-cloud-provider:v0.0.11"
+    sunshine_desktop        = "ghcr.io/randomcoww/sunshine-desktop:v20250309.0318"
+    nvidia_driver           = "ghcr.io/randomcoww/nvidia-driver-container:v570.86.15-fedora41"
+    steamcmd                = "ghcr.io/randomcoww/steamcmd:v20250309.0421"
+    kvm_device_plugin       = "ghcr.io/randomcoww/kvm-device-plugin:v20250211.0006"
+    stork_agent             = "ghcr.io/randomcoww/stork-agent:v20250309.0310"
+    vaultwarden             = "docker.io/vaultwarden/server:1.33.2-alpine"
+    llama_cpp               = "ghcr.io/ggml-org/llama.cpp:server-cuda"
   }
 
   pxeboot_images = {
@@ -283,6 +280,7 @@ locals {
     flannel_healthz    = 58084
     code               = 58085 # run code server on host net to work seamlessly with podman-remote
     bgp                = 179
+    kube_vip_metrics   = 58089
   }
 
   service_ports = {
