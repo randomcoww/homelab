@@ -233,8 +233,7 @@ module "authelia" {
       smtp = {
         enabled       = true
         enabledSecret = true
-        host          = var.smtp.host
-        port          = var.smtp.port
+        address       = "submission://${var.smtp.host}:${var.smtp.port}"
         username      = var.smtp.username
         sender        = var.smtp.username
         password = {
