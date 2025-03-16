@@ -269,9 +269,9 @@ module "sunshine-desktop" {
     requests = {
       memory = "12Gi"
     }
-    # limits = {
-    #   "nvidia.com/gpu" = 1
-    # }
+    limits = {
+      "nvidia.com/gpu" = 1
+    }
   }
   security_context = {
     privileged = true
