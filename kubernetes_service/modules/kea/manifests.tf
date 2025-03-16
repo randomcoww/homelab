@@ -123,7 +123,7 @@ locals {
             option-data = [
               {
                 name = "boot-file-name"
-                data = var.ipxe_boot_url
+                data = "http://$POD_IP:${var.ports.ipxe_http}/${var.ipxe_boot_file_name}"
               },
               {
                 name = "vendor-class-identifier"
@@ -139,7 +139,7 @@ locals {
             option-data = [
               {
                 name = "boot-file-name"
-                data = basename(var.ipxe_boot_url)
+                data = var.ipxe_boot_file_name
               },
             ]
           },
@@ -240,10 +240,6 @@ module "service-peer" {
   name    = each.key
   app     = var.name
   release = var.release
-  annotations = {
-    "prometheus.io/scrape" = "true"
-    "prometheus.io/port"   = tostring(var.ports.kea_metrics)
-  }
   spec = {
     type      = "ClusterIP"
     clusterIP = each.value
@@ -253,12 +249,6 @@ module "service-peer" {
         port       = var.ports.kea_peer
         protocol   = "TCP"
         targetPort = var.ports.kea_peer
-      },
-      {
-        name       = "kea-metrics"
-        port       = var.ports.kea_metrics
-        protocol   = "TCP"
-        targetPort = var.ports.kea_metrics
       },
     ]
     selector = {
@@ -276,7 +266,9 @@ module "statefulset" {
   affinity = var.affinity
   replicas = length(local.dhcp4_config)
   annotations = {
-    "checksum/secret" = sha256(module.secret.manifest)
+    "checksum/secret"      = sha256(module.secret.manifest)
+    "prometheus.io/scrape" = "true"
+    "prometheus.io/port"   = tostring(var.ports.kea_metrics)
   }
   spec = {
     minReadySeconds = 30
@@ -432,6 +424,14 @@ module "statefulset" {
             mountPath   = local.stork_agent_token_path
             subPathExpr = "stork-agent-token"
           },
+        ]
+      },
+      {
+        name  = "${var.name}-ipxe-http"
+        image = var.images.ipxe_http
+        args = [
+          "-p",
+          "0.0.0.0:${var.ports.ipxe_http}",
         ]
       },
       # TODO: migrate fully to HTTP boot and remove TFTP

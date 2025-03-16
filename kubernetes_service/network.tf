@@ -12,6 +12,7 @@ module "kea" {
   images = {
     kea         = local.container_images.kea
     ipxe_tftp   = local.container_images.ipxe_tftp
+    ipxe_http   = local.container_images.ipxe_http
     stork_agent = local.container_images.stork_agent
   }
   service_ips = [
@@ -23,9 +24,10 @@ module "kea" {
     kea_metrics    = local.host_ports.kea_metrics
     kea_ctrl_agent = local.host_ports.kea_ctrl_agent
     ipxe_tftp      = local.host_ports.ipxe_tftp
+    ipxe_http      = local.host_ports.ipxe_http
   }
-  ipxe_boot_url   = "http://${local.services.minio.ip}:${local.service_ports.minio}/${local.minio.data_buckets.boot.name}/ipxe.efi"
-  ipxe_script_url = "https://${local.services.matchbox.ip}:${local.service_ports.matchbox}/boot.ipxe"
+  ipxe_boot_file_name = "ipxe.efi"
+  ipxe_script_url     = "https://${local.services.matchbox.ip}:${local.service_ports.matchbox}/boot.ipxe"
   networks = [
     {
       prefix = local.networks.lan.prefix
@@ -46,17 +48,7 @@ module "kea" {
     },
     {
       prefix = local.networks.service.prefix
-      routers = [
-        local.services.gateway.ip,
-      ]
-      domain_name_servers = [
-        local.services.external_dns.ip,
-      ]
-      domain_search = [
-        local.domains.public,
-        local.domains.kubernetes,
-      ]
-      mtu = lookup(local.networks.service, "mtu", 1500)
+      mtu    = lookup(local.networks.service, "mtu", 1500)
       pools = [
         cidrsubnet(local.networks.service.prefix, 1, 1),
       ]
