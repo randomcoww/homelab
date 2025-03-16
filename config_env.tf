@@ -60,13 +60,11 @@ locals {
       vlan_id = 80
       mtu     = local.default_mtu
       netnums = {
-        apiserver              = 2
-        external_dns           = 31
-        matchbox               = 39
-        matchbox_api           = 33
-        minio                  = 34
-        ingress_nginx          = 32
-        ingress_nginx_external = 35
+        apiserver    = 2
+        external_dns = 31
+        matchbox     = 39
+        matchbox_api = 33
+        minio        = 34
       }
     }
     # Conntrack sync

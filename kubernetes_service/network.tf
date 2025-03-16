@@ -1,35 +1,3 @@
-# Kube-vip IP pool allocation
-
-module "kube-vip-cloud-provider" {
-  source    = "./modules/kube_vip_cloud_provider"
-  name      = "kube-vip-cloud-provider"
-  namespace = "kube-system"
-  release   = "0.1.1"
-  images = {
-    kube_vip_cloud_provider = local.container_images.kube_vip_cloud_provider
-  }
-  affinity = {
-    nodeAffinity = {
-      requiredDuringSchedulingIgnoredDuringExecution = {
-        nodeSelectorTerms = [
-          {
-            matchExpressions = [
-              {
-                key      = "node-role.kubernetes.io/control-plane"
-                operator = "Exists"
-              },
-            ]
-          },
-        ]
-      }
-    }
-  }
-  # https://kube-vip.io/docs/usage/cloud-provider/#the-kube-vip-cloud-provider-configmap
-  ip_pools = {
-    cidr-global = cidrsubnet(local.networks.service.prefix, 1, 1)
-  }
-}
-
 # DHCP
 
 resource "random_password" "stork-agent-token" {

@@ -16,9 +16,9 @@ locals {
     module.webdav-pictures,
     module.webdav-videos,
     module.audioserve,
-    module.satisfactory-server,
-    module.sunshine-desktop,
-    # module.llama-cpp,
+    # module.satisfactory-server,
+    # module.sunshine-desktop,
+    module.llama-cpp,
     # module.vaultwarden,
   ]
 }
@@ -78,7 +78,7 @@ resource "helm_release" "ingress-nginx" {
         ingressClass = each.value
         service = {
           type              = "LoadBalancer"
-          loadBalancerIP    = local.services[each.key].ip
+          loadBalancerIP    = "0.0.0.0"
           loadBalancerClass = "kube-vip.io/kube-vip-class"
         }
         allowSnippetAnnotations = true
