@@ -1,22 +1,21 @@
-resource "tls_private_key" "matchbox-ca" {
+resource "tls_private_key" "trusted-ca" {
   ## needs compatibility with iPXE
-  # algorithm   = "ECDSA"
-  # ecdsa_curve = "P521"
   algorithm = "RSA"
-  rsa_bits  = 2048
+  rsa_bits  = 4096
 }
 
-resource "tls_self_signed_cert" "matchbox-ca" {
-  private_key_pem = tls_private_key.matchbox-ca.private_key_pem
+resource "tls_self_signed_cert" "trusted-ca" {
+  private_key_pem = tls_private_key.trusted-ca.private_key_pem
 
   validity_period_hours = 8760
   is_ca_certificate     = true
 
   subject {
-    common_name = "matchbox"
+    common_name = local.domains.public
   }
 
   allowed_uses = [
+    "key_encipherment",
     "digital_signature",
     "code_signing",
     "cert_signing",

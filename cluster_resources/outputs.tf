@@ -99,12 +99,12 @@ output "ssh" {
   sensitive = true
 }
 
-output "matchbox" {
+output "trust" {
   value = {
     ca = {
-      algorithm       = tls_private_key.matchbox-ca.algorithm
-      private_key_pem = tls_private_key.matchbox-ca.private_key_pem
-      cert_pem        = tls_self_signed_cert.matchbox-ca.cert_pem
+      algorithm       = tls_private_key.trusted-ca.algorithm
+      private_key_pem = tls_private_key.trusted-ca.private_key_pem
+      cert_pem        = tls_self_signed_cert.trusted-ca.cert_pem
     }
   }
   sensitive = true
@@ -132,11 +132,6 @@ output "minio" {
   value = {
     access_key_id     = random_password.minio-access-key-id.result
     secret_access_key = random_password.minio-secret-access-key.result
-    ca = {
-      algorithm       = tls_private_key.minio-ca.algorithm
-      private_key_pem = tls_private_key.minio-ca.private_key_pem
-      cert_pem        = tls_self_signed_cert.minio-ca.cert_pem
-    }
   }
   sensitive = true
 }
