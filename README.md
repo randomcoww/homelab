@@ -127,8 +127,9 @@ tw terraform -chdir=client_credentials output -raw kubeconfig > $HOME/.kube/conf
 SSH_KEY=$HOME/.ssh/id_ecdsa
 tw terraform -chdir=client_credentials output -raw ssh_user_cert_authorized_key > $SSH_KEY-cert.pub
 
-mkdir -p $HOME/.mc
+mkdir -p $HOME/.mc/certs/CAs
 tw terraform -chdir=client_credentials output -json mc_config > $HOME/.mc/config.json
+tw terraform -chdir=client_credentials output -json minio_client | jq -r '.ca_cert_pem' > $HOME/.mc/certs/CAs/ca.crt
 ```
 
 In cluster kubeconfig
