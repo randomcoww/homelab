@@ -120,8 +120,8 @@ locals {
     # Helm
     kea                     = "ghcr.io/randomcoww/kea:v20250316.0333"
     matchbox                = "quay.io/poseidon/matchbox:v0.11.0"
-    ipxe_tftp               = "ghcr.io/randomcoww/ipxe:v20250316.0942-tftp"
-    ipxe_http               = "ghcr.io/randomcoww/ipxe:v20250316.0947-http"
+    ipxe_tftp               = "ghcr.io/randomcoww/ipxe:v20250317.0256-tftp"
+    ipxe_http               = "ghcr.io/randomcoww/ipxe:v20250317.0254-http"
     hostapd                 = "ghcr.io/randomcoww/hostapd-noscan:v2.11"
     flannel                 = "docker.io/flannel/flannel:v0.26.5"
     flannel_cni_plugin      = "docker.io/flannel/flannel-cni-plugin:v1.6.2-flannel1"
