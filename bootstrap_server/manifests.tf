@@ -36,15 +36,39 @@ module "bootstrap" {
                 }
                 client-classes = [
                   {
-                    name           = "XClient_iPXE"
-                    test           = "substring(option[77].hex,0,4) == 'iPXE'"
-                    boot-file-name = "http://${local.listen_ip}:${local.service_ports.matchbox}/boot.ipxe"
+                    name = "iPXE-UEFI"
+                    test = "substring(option[user-class].hex,0,4) == 'iPXE'"
+                    option-data = [
+                      {
+                        name = "boot-file-name"
+                        data = "http://${local.listen_ip}:${local.service_ports.matchbox}/boot.ipxe"
+                      },
+                    ]
                   },
                   {
-                    name           = "EFI_x86-64"
-                    test           = "option[93].hex == 0x0007"
-                    next-server    = local.listen_ip
-                    boot-file-name = var.ipxe_boot_path
+                    name = "HTTP"
+                    test = "substring(option[vendor-class-identifier].hex,0,10) == 'HTTPClient'",
+                    option-data = [
+                      {
+                        name = "boot-file-name"
+                        data = "http://${local.listen_ip}:${local.host_ports.ipxe_http}/${var.ipxe_boot_file_name}"
+                      },
+                      {
+                        name = "vendor-class-identifier"
+                        data = "HTTPClient"
+                      },
+                    ]
+                  },
+                  {
+                    name        = "PXE-UEFI"
+                    test        = "option[client-system].hex == 0x0007",
+                    next-server = local.listen_ip
+                    option-data = [
+                      {
+                        name = "boot-file-name"
+                        data = var.ipxe_boot_file_name
+                      },
+                    ]
                   },
                 ]
                 subnet4 = [
@@ -57,8 +81,9 @@ module "bootstrap" {
                       },
                     ]
                     require-client-classes = [
-                      "XClient_iPXE",
-                      "EFI_x86-64",
+                      "iPXE-UEFI",
+                      "HTTP",
+                      "PXE-UEFI",
                     ]
                   },
                 ]
@@ -114,7 +139,15 @@ module "bootstrap" {
         ]
       },
       {
-        name  = "tftpd"
+        name  = "ipxe-http"
+        image = local.container_images.ipxe_http
+        args = [
+          "-p",
+          "0.0.0.0:${local.host_ports.ipxe_http}",
+        ]
+      },
+      {
+        name  = "ipxe-tftp"
         image = local.container_images.ipxe_tftp
         args = [
           "--address",
