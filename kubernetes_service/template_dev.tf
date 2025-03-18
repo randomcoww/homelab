@@ -1,5 +1,9 @@
 # code-server
 
+locals {
+  code_mc_config_dir = "/var/tmp/minio"
+}
+
 resource "minio_iam_user" "code" {
   name          = "code"
   force_destroy = true
@@ -55,18 +59,46 @@ module "code" {
       EOF
     },
     {
-      path    = "/etc/pki/ca-trust/source/anchors/ca.crt"
+      path    = "${local.code_mc_config_dir}/certs/CAs/ca.crt"
       content = data.terraform_remote_state.sr.outputs.trust.ca.cert_pem
+    },
+    {
+      path = "${local.code_mc_config_dir}/config.json"
+      content = jsonencode({
+        aliases = {
+          code = {
+            url       = "https://${local.kubernetes_services.minio.endpoint}:${local.service_ports.minio}"
+            accessKey = minio_iam_user.code.id
+            secretKey = minio_iam_user.code.secret
+            api       = "S3v4"
+            path      = "auto"
+          }
+        }
+      })
     },
   ]
   extra_envs = [
     {
-      name  = "MC_HOST_code"
-      value = "https://${minio_iam_user.code.id}:${minio_iam_user.code.secret}@${local.kubernetes_services.minio.endpoint}:${local.service_ports.minio}"
+      name  = "MC_CONFIG_DIR"
+      value = local.code_mc_config_dir
     },
     {
       name  = "TZ"
       value = local.timezone
+    },
+  ]
+  extra_volume_mounts = [
+    {
+      name      = "run-podman"
+      mountPath = "/run/podman"
+    },
+    {
+      name      = "run-user"
+      mountPath = "/run/user/${local.users.client.uid}"
+    },
+    {
+      name      = "mc-config-dir"
+      mountPath = local.code_mc_config_dir
     },
   ]
   extra_volumes = [
@@ -84,15 +116,11 @@ module "code" {
         type = "Directory"
       }
     },
-  ]
-  extra_volume_mounts = [
     {
-      name      = "run-podman"
-      mountPath = "/run/podman"
-    },
-    {
-      name      = "run-user"
-      mountPath = "/run/user/${local.users.client.uid}"
+      name = "mc-config-dir"
+      emptyDir = {
+        medium = "Memory"
+      }
     },
   ]
   affinity = {
