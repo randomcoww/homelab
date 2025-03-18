@@ -54,11 +54,15 @@ module "code" {
       bind-key -T copy-mode MouseDragEnd1Pane send-keys -X copy-pipe-and-cancel "xclip -in -sel clip"
       EOF
     },
+    {
+      path    = "etc/pki/ca-trust/source/anchors/ca.crt"
+      content = data.terraform_remote_state.sr.outputs.trust.ca.cert_pem
+    },
   ]
   extra_envs = [
     {
       name  = "MC_HOST_code"
-      value = "http://${minio_iam_user.code.id}:${minio_iam_user.code.secret}@${local.kubernetes_services.minio.endpoint}:${local.service_ports.minio}"
+      value = "https://${minio_iam_user.code.id}:${minio_iam_user.code.secret}@${local.kubernetes_services.minio.endpoint}:${local.service_ports.minio}"
     },
     {
       name  = "TZ"
@@ -183,7 +187,7 @@ module "llama-cpp" {
       "nvidia.com/gpu" = 1
     }
   }
-  s3_endpoint          = "http://${local.services.cluster_minio.ip}:${local.service_ports.minio}"
+  s3_endpoint          = "https://${local.services.cluster_minio.ip}:${local.service_ports.minio}"
   s3_bucket            = minio_s3_bucket.data["models"].id
   s3_access_key_id     = minio_iam_user.llama-cpp.id
   s3_secret_access_key = minio_iam_user.llama-cpp.secret
