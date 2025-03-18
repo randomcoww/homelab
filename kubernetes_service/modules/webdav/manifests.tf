@@ -1,5 +1,6 @@
 locals {
-  rclone_port = 8080
+  rclone_port  = 8080
+  ca_cert_path = "/var/tmp/rclone/trusted-ca.crt"
 }
 
 module "metadata" {
@@ -22,8 +23,9 @@ module "secret" {
   app     = var.name
   release = var.release
   data = {
-    RCLONE_S3_ACCESS_KEY_ID     = var.minio_access_key_id
-    RCLONE_S3_SECRET_ACCESS_KEY = var.minio_secret_access_key
+    RCLONE_S3_ACCESS_KEY_ID      = var.minio_access_key_id
+    RCLONE_S3_SECRET_ACCESS_KEY  = var.minio_secret_access_key
+    basename(local.ca_cert_path) = var.minio_ca_cert
   }
 }
 
@@ -92,12 +94,20 @@ module "deployment" {
           "--read-only",
           "--dir-cache-time=4s",
           "--poll-interval=2s",
+          "--ca-cert=${local.ca_cert_path}",
         ]
         envFrom = [
           {
             secretRef = {
               name = module.secret.name
             }
+          },
+        ]
+        volumeMounts = [
+          {
+            name      = "secret"
+            mountPath = local.ca_cert_path
+            subPath   = basename(local.ca_cert_path)
           },
         ]
         readinessProbe = {
@@ -113,6 +123,14 @@ module "deployment" {
             port   = local.rclone_port
             path   = "/"
           }
+        }
+      },
+    ]
+    volumes = [
+      {
+        name = "secret"
+        secret = {
+          secretName = var.name
         }
       },
     ]
