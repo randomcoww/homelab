@@ -1,5 +1,9 @@
 # Github actions runner #
 
+locals {
+  github_arc_mc_config_dir = "/var/tmp/minio"
+}
+
 resource "helm_release" "arc" {
   name             = "arc"
   repository       = "oci://ghcr.io/actions/actions-runner-controller-charts"
@@ -65,10 +69,21 @@ resource "helm_release" "arc-runner-hook-template" {
             name = "workflow-template"
           }
           stringData = {
-            MC_HOST_arc           = "http://${minio_iam_user.arc.id}:${minio_iam_user.arc.secret}@${local.kubernetes_services.minio.endpoint}:${local.service_ports.minio}"
             AWS_ENDPOINT_URL_S3   = "https://${data.terraform_remote_state.sr.outputs.backend_bucket.url}"
             AWS_ACCESS_KEY_ID     = data.terraform_remote_state.sr.outputs.backend_bucket.access_key_id
             AWS_SECRET_ACCESS_KEY = data.terraform_remote_state.sr.outputs.backend_bucket.secret_access_key
+            minio_ca_cert         = data.terraform_remote_state.sr.outputs.trust.ca.cert_pem
+            minio_config = jsonencode({
+              aliases = {
+                arc = {
+                  url       = "https://${local.kubernetes_services.minio.endpoint}:${local.service_ports.minio}"
+                  accessKey = minio_iam_user.arc.id
+                  secretKey = minio_iam_user.arc.secret
+                  api       = "S3v4"
+                  path      = "auto"
+                }
+              }
+            })
             "workflow-podspec.yaml" = yamlencode({
               spec = {
                 containers = [
@@ -90,11 +105,8 @@ resource "helm_release" "arc-runner-hook-template" {
                         "devices.kubevirt.io/kvm" = "1"
                       }
                     }
-                    env = [
+                    env = concat([
                       for _, key in [
-                        # write to minio boot bucket
-                        "MC_HOST_arc",
-                        # read remote terraform states
                         "AWS_ENDPOINT_URL_S3",
                         "AWS_ACCESS_KEY_ID",
                         "AWS_SECRET_ACCESS_KEY",
@@ -108,7 +120,42 @@ resource "helm_release" "arc-runner-hook-template" {
                           }
                         }
                       }
+                      ], [
+                      {
+                        name  = "MC_CONFIG_DIR"
+                        value = local.github_arc_mc_config_dir
+                      },
+                    ])
+                    volumeMounts = [
+                      {
+                        name      = "mc-config-dir"
+                        mountPath = local.github_arc_mc_config_dir
+                      },
+                      {
+                        name      = "workflow-template"
+                        mountPath = "${local.github_arc_mc_config_dir}/certs/CAs/ca.crt"
+                        subPath   = "minio_ca_cert"
+                      },
+                      {
+                        name      = "workflow-template"
+                        mountPath = "${local.github_arc_mc_config_dir}/config.json"
+                        subPath   = "minio_config"
+                      },
                     ]
+                  },
+                ]
+                volumes = [
+                  {
+                    name = "mc-config-dir"
+                    emptyDir = {
+                      medium = "Memory"
+                    }
+                  },
+                  {
+                    name = "workflow-template"
+                    secret = {
+                      secretName = "workflow-template"
+                    }
                   },
                 ]
               }
