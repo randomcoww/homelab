@@ -43,7 +43,6 @@ module "mountpoint" {
   s3_mount_extra_args  = var.s3_mount_extra_args
   images = {
     mountpoint = var.images.mountpoint
-    llama_cpp  = var.images.llama_cpp
   }
   ##
   name     = var.name
