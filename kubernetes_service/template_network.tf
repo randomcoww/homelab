@@ -109,9 +109,9 @@ module "matchbox" {
   service_ip              = local.services.matchbox.ip
   api_service_ip          = local.services.matchbox_api.ip
   loadbalancer_class_name = "kube-vip.io/kube-vip-class"
-  ca                      = data.terraform_remote_state.sr.outputs.matchbox.ca
+  ca                      = data.terraform_remote_state.sr.outputs.trust.ca
 
-  s3_endpoint          = "http://${local.services.cluster_minio.ip}:${local.service_ports.minio}"
+  s3_endpoint          = "https://${local.services.cluster_minio.ip}:${local.service_ports.minio}"
   s3_bucket            = minio_s3_bucket.matchbox.id
   s3_access_key_id     = minio_iam_user.matchbox.id
   s3_secret_access_key = minio_iam_user.matchbox.secret
