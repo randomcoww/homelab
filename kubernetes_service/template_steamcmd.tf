@@ -111,7 +111,7 @@ module "satisfactory-server" {
   }
   service_hostname        = local.kubernetes_ingress_endpoints.satisfactory_server
   loadbalancer_class_name = "kube-vip.io/kube-vip-class"
-  s3_endpoint             = "http://${local.services.cluster_minio.ip}:${local.service_ports.minio}"
+  s3_endpoint             = "https://${local.services.cluster_minio.ip}:${local.service_ports.minio}"
   s3_bucket               = minio_s3_bucket.steamcmd.id
   s3_access_key_id        = minio_iam_user.steamcmd.id
   s3_secret_access_key    = minio_iam_user.steamcmd.secret
