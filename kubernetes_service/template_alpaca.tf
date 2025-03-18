@@ -1,27 +1,3 @@
-resource "tls_private_key" "alpaca-db-ca" {
-  algorithm   = "ECDSA"
-  ecdsa_curve = "P521"
-}
-
-resource "tls_self_signed_cert" "alpaca-db-ca" {
-  private_key_pem = tls_private_key.alpaca-db-ca.private_key_pem
-
-  validity_period_hours = 8760
-  is_ca_certificate     = true
-
-  subject {
-    common_name = "alpaca-db"
-  }
-
-  allowed_uses = [
-    "key_encipherment",
-    "digital_signature",
-    "cert_signing",
-    "server_auth",
-    "client_auth",
-  ]
-}
-
 resource "minio_s3_bucket" "alpaca-db" {
   bucket        = "alpaca-db"
   force_destroy = true
@@ -68,11 +44,8 @@ module "alpaca-db" {
     clickhouse = local.service_ports.clickhouse
     metrics    = local.service_ports.metrics
   }
-  ca = {
-    algorithm       = tls_private_key.alpaca-db-ca.algorithm
-    private_key_pem = tls_private_key.alpaca-db-ca.private_key_pem
-    cert_pem        = tls_self_signed_cert.alpaca-db-ca.cert_pem
-  }
+  # Use same CA as minio backend
+  ca = data.terraform_remote_state.sr.outputs.trust.ca
   # extra_users_config = {
   #   users = {
   #     default = {
@@ -98,7 +71,7 @@ module "alpaca-db" {
   service_hostname        = local.kubernetes_ingress_endpoints.alpaca_db
   loadbalancer_class_name = "kube-vip.io/kube-vip-class"
 
-  s3_endpoint          = "http://${local.services.cluster_minio.ip}:${local.service_ports.minio}"
+  s3_endpoint          = "https://${local.services.cluster_minio.ip}:${local.service_ports.minio}"
   s3_bucket            = minio_s3_bucket.alpaca-db.id
   s3_access_key_id     = minio_iam_user.alpaca-db.id
   s3_secret_access_key = minio_iam_user.alpaca-db.secret

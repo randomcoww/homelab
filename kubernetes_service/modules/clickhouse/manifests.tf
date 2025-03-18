@@ -13,9 +13,9 @@ locals {
   base_path    = "/etc/clickhouse-server"
   config_path  = "${local.base_path}/config.d/server.yaml"
   users_path   = "${local.base_path}/users.d/users.yaml"
-  cert_path    = "${local.base_path}/server.crt"
-  key_path     = "${local.base_path}/server.key"
-  ca_cert_path = "${local.base_path}/ca.crt"
+  cert_path    = "${local.base_path}/certs/server.crt"
+  key_path     = "${local.base_path}/certs/server.key"
+  ca_cert_path = "${local.base_path}/certs/ca.crt"
   ports = merge({
     keeper = 9281
     raft   = 9444
