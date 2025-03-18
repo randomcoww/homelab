@@ -91,7 +91,7 @@ module "lldap" {
   ingress_class_name        = local.ingress_classes.ingress_nginx
   nginx_ingress_annotations = local.nginx_ingress_annotations
 
-  minio_endpoint          = "http://${local.kubernetes_services.minio.endpoint}:${local.service_ports.minio}"
+  minio_endpoint          = "https://${local.kubernetes_services.minio.endpoint}:${local.service_ports.minio}"
   minio_bucket            = minio_s3_bucket.lldap.id
   minio_access_key_id     = minio_iam_user.lldap.id
   minio_secret_access_key = minio_iam_user.lldap.secret
@@ -259,7 +259,7 @@ module "authelia" {
   ingress_class_name  = local.ingress_classes.ingress_nginx_external
   ingress_cert_issuer = local.kubernetes.cert_issuer_prod
 
-  minio_endpoint          = "http://${local.kubernetes_services.minio.endpoint}:${local.service_ports.minio}"
+  minio_endpoint          = "https://${local.kubernetes_services.minio.endpoint}:${local.service_ports.minio}"
   minio_bucket            = minio_s3_bucket.authelia.id
   minio_litestream_prefix = "$POD_NAME/litestream"
   minio_access_key_id     = minio_iam_user.authelia.id

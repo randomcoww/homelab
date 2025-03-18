@@ -188,6 +188,7 @@ resource "helm_release" "arc-runner-set" {
     "nvidia-driver-container",
     "homelab",
     "stork-agent",
+    "litestream",
   ])
 
   name             = "arc-runner-${each.key}"
