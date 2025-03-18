@@ -55,7 +55,7 @@ module "code" {
       EOF
     },
     {
-      path    = "etc/pki/ca-trust/source/anchors/ca.crt"
+      path    = "/etc/pki/ca-trust/source/anchors/ca.crt"
       content = data.terraform_remote_state.sr.outputs.trust.ca.cert_pem
     },
   ]
