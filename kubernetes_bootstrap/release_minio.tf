@@ -3,6 +3,29 @@
 
 locals {
   minio_replicas = 4
+  minio_secret_client_cert = yamlencode({
+    apiVersion = "v1"
+    kind       = "Secret"
+    metadata = {
+      name = "${local.kubernetes_services.minio.name}-client"
+    }
+    stringData = {
+      "public.crt"  = tls_locally_signed_cert.minio.cert_pem
+      "private.key" = tls_private_key.minio.private_key_pem
+    }
+    type = "Opaque"
+  })
+  minio_secret_ca_cert = yamlencode({
+    apiVersion = "v1"
+    kind       = "Secret"
+    metadata = {
+      name = "${local.kubernetes_services.minio.name}-ca"
+    }
+    stringData = {
+      "ca.crt" = data.terraform_remote_state.sr.outputs.trust.ca.cert_pem
+    }
+    type = "Opaque"
+  })
 }
 
 resource "tls_private_key" "minio" {
@@ -57,32 +80,8 @@ resource "helm_release" "minio-tls" {
   values = [
     yamlencode({
       manifests = [
-        for m in [
-          {
-            apiVersion = "v1"
-            kind       = "Secret"
-            metadata = {
-              name = "${local.kubernetes_services.minio.name}-client"
-            }
-            stringData = {
-              "public.crt"  = tls_locally_signed_cert.minio.cert_pem
-              "private.key" = tls_private_key.minio.private_key_pem
-            }
-            type = "Opaque"
-          },
-          {
-            apiVersion = "v1"
-            kind       = "Secret"
-            metadata = {
-              name = "${local.kubernetes_services.minio.name}-ca"
-            }
-            stringData = {
-              "ca.crt" = data.terraform_remote_state.sr.outputs.trust.ca.cert_pem
-            }
-            type = "Opaque"
-          },
-        ] :
-        yamlencode(m)
+        local.minio_secret_client_cert,
+        local.minio_secret_ca_cert,
       ]
     }),
   ]
@@ -133,6 +132,10 @@ resource "helm_release" "minio" {
         publicCrt  = "public.crt"
         privateKey = "private.key"
         certSecret = "${local.kubernetes_services.minio.name}-client"
+      }
+      podAnnotations = {
+        "checksum/client-cert" = sha256(local.minio_secret_client_cert)
+        "checksum/ca-cert"     = sha256(local.minio_secret_ca_cert)
       }
       trustedCertsSecret = "${local.kubernetes_services.minio.name}-ca"
       ingress = {
