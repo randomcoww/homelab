@@ -1,3 +1,9 @@
+locals {
+  matchbox_endpoint     = "https://${local.services.matchbox.ip}:${local.service_ports.matchbox}"
+  matchbox_api_endpoint = "${local.services.matchbox_api.ip}:${local.service_ports.matchbox_api}"
+  image_store_endpoint  = "https://${local.services.minio.ip}:${local.service_ports.minio}/${local.minio.data_buckets.boot.name}"
+}
+
 provider "matchbox" {
   endpoint    = local.matchbox_api_endpoint
   client_cert = data.terraform_remote_state.client.outputs.matchbox_client.cert_pem
