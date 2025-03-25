@@ -34,7 +34,7 @@ resource "helm_release" "ingress-nginx" {
   namespace        = local.kubernetes_services[each.key].namespace
   create_namespace = true
   wait             = false
-  version          = "4.12.0"
+  version          = "4.12.1"
   max_history      = 2
   values = [
     yamlencode({
