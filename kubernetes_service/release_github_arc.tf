@@ -197,7 +197,7 @@ resource "helm_release" "arc-runner-set" {
   namespace        = "arc-runners"
   create_namespace = true
   wait             = false
-  version          = "0.10.1"
+  version          = "0.11.0"
   max_history      = 2
   values = [
     yamlencode({
