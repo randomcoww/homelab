@@ -144,7 +144,7 @@ locals {
     nvidia_driver      = "ghcr.io/randomcoww/nvidia-driver-container:v570.86.15-fedora41"
     steamcmd           = "ghcr.io/randomcoww/steamcmd:v20250323.0426"
     kvm_device_plugin  = "ghcr.io/randomcoww/kvm-device-plugin:v20250211.0006"
-    stork_agent        = "ghcr.io/randomcoww/stork-agent:v20250323.0327"
+    stork_agent        = "ghcr.io/randomcoww/stork-agent:v20250330.0331"
     vaultwarden        = "docker.io/vaultwarden/server:1.33.2-alpine"
     llama_cpp          = "ghcr.io/ggml-org/llama.cpp:server-cuda"
   }
