@@ -128,7 +128,7 @@ locals {
     kapprover          = "ghcr.io/randomcoww/kapprover:v0.1.0"
     external_dns       = "registry.k8s.io/external-dns/external-dns:v0.16.1"
     code_server        = "ghcr.io/randomcoww/code-server:v20250330.0308"
-    litestream         = "ghcr.io/randomcoww/litestream:v20250323.0333"
+    litestream         = "ghcr.io/randomcoww/litestream:v20250330.0337"
     kube_proxy         = "ghcr.io/randomcoww/kube-proxy:v20250330.0304"
     tailscale          = "ghcr.io/randomcoww/tailscale-nft:v20250323.1726"
     lldap              = "ghcr.io/lldap/lldap:2025-03-07-alpine-rootless"
