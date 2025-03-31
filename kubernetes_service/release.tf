@@ -16,10 +16,10 @@ locals {
     module.webdav-pictures,
     module.webdav-videos,
     module.audioserve,
-    # module.satisfactory-server,
-    # module.sunshine-desktop,
     module.llama-cpp,
+    # module.sunshine-desktop,
     # module.vaultwarden,
+    # module.satisfactory-server,
   ]
 }
 
@@ -176,11 +176,12 @@ resource "helm_release" "kured" {
     yamlencode({
       configuration = {
         # promethues chart creates service name <name>-server
-        prometheusUrl = "http://${local.kubernetes_services.prometheus.name}-server.${local.kubernetes_services.prometheus.namespace}:${local.service_ports.prometheus}"
-        period        = "2m"
-        metricsPort   = local.service_ports.metrics
-        forceReboot   = true
-        drainTimeout  = "6m"
+        prometheusUrl            = "http://${local.kubernetes_services.prometheus.name}-server.${local.kubernetes_services.prometheus.namespace}:${local.service_ports.prometheus}"
+        period                   = "2m"
+        metricsPort              = local.service_ports.metrics
+        forceReboot              = true
+        drainTimeout             = "6m"
+        skipWaitForDeleteTimeout = 300
       }
       service = {
         create = true
