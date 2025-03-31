@@ -53,6 +53,10 @@ storage:
             advert_int 0.4
             virtual_router_id ${keepalived_router_id}
             interface ${sync_interface_name}
+            track_interface {
+              ${keepalived_interface_name}
+              ${wan_interface_name}
+            }
             no_accept
             vmac_xmit_base
             priority 100
