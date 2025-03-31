@@ -111,9 +111,9 @@ locals {
 
   container_images = {
     # Igntion
-    kube_apiserver          = "ghcr.io/randomcoww/k8s-control-plane:v1.32.1"
-    kube_controller_manager = "ghcr.io/randomcoww/k8s-control-plane:v1.32.1"
-    kube_scheduler          = "ghcr.io/randomcoww/k8s-control-plane:v1.32.1"
+    kube_apiserver          = "ghcr.io/randomcoww/k8s-control-plane:v1.32.3"
+    kube_controller_manager = "ghcr.io/randomcoww/k8s-control-plane:v1.32.3"
+    kube_scheduler          = "ghcr.io/randomcoww/k8s-control-plane:v1.32.3"
     etcd_wrapper            = "ghcr.io/randomcoww/etcd-wrapper:v0.4.0"
     etcd                    = "gcr.io/etcd-development/etcd:v3.5.21"
 
