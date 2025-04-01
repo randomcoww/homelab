@@ -27,15 +27,13 @@ locals {
     http_port              = 8123
     https_port             = 8443
     interserver_https_port = 9010
-    interserver_http_port = {
-      "@remove" = "1"
-    }
-    tcp_port_secure   = local.ports.clickhouse
-    path              = "/var/lib/clickhouse"
-    listen_reuse_port = 1
+    interserver_http_port  = { "@remove" = "1" }
+    tcp_port_secure        = local.ports.clickhouse
+    path                   = "/var/lib/clickhouse"
+    listen_reuse_port      = 1
     }, var.extra_clickhouse_config, {
     logger = {
-      "@replace" = "replace"
+      "@replace" = "1"
       level      = "warning"
       console    = 1
     }
@@ -58,7 +56,7 @@ locals {
       }
     }
     storage_configuration = {
-      "@replace" = "replace"
+      "@replace" = "1"
       disks = {
         s3 = {
           type                 = "object_storage"
@@ -111,54 +109,22 @@ locals {
       storage_policy                        = "s3"
       allow_remote_fs_zero_copy_replication = false
     }
-    asynchronous_metric_log = {
-      "@remove" = "1"
-    }
-    metric_log = {
-      "@remove" = "1"
-    }
-    opentelemetry_span_log = {
-      "@remove" = "1"
-    }
-    zookeeper_log = {
-      "@remove" = "1"
-    }
-    text_log = {
-      "@remove" = "1"
-    }
-    session_log = {
-      "@remove" = "1"
-    }
-    query_thread_log = {
-      "@remove" = "1"
-    }
-    query_log = {
-      "@remove" = "1"
-    }
-    query_views_log = {
-      "@remove" = "1"
-    }
-    query_metric_log = {
-      "@remove" = "1"
-    }
-    part_log = {
-      "@remove" = "1"
-    }
-    trace_log = {
-      "@remove" = "1"
-    }
-    crash_log = {
-      "@remove" = "1"
-    }
-    latency_log = {
-      "@remove" = "1"
-    }
-    blob_storage_log = {
-      "@remove" = "1"
-    }
-    error_log = {
-      "@remove" = "1"
-    }
+    asynchronous_metric_log = { "@remove" = "1" }
+    blob_storage_log        = { "@remove" = "1" }
+    crash_log               = { "@remove" = "1" }
+    error_log               = { "@remove" = "1" }
+    latency_log             = { "@remove" = "1" }
+    metric_log              = { "@remove" = "1" }
+    opentelemetry_span_log  = { "@remove" = "1" }
+    part_log                = { "@remove" = "1" }
+    query_log               = { "@remove" = "1" }
+    query_metric_log        = { "@remove" = "1" }
+    query_thread_log        = { "@remove" = "1" }
+    query_views_log         = { "@remove" = "1" }
+    session_log             = { "@remove" = "1" }
+    text_log                = { "@remove" = "1" }
+    trace_log               = { "@remove" = "1" }
+    zookeeper_log           = { "@remove" = "1" }
 
     zookeeper = {
       node = [
@@ -181,7 +147,7 @@ locals {
     }
 
     remote_servers = {
-      "@replace" = "replace"
+      "@replace" = "1"
       default = {
         shard = {
           internal_replication = true
@@ -198,7 +164,7 @@ locals {
     }
 
     prometheus = {
-      "@replace"           = "replace"
+      "@replace"           = "1"
       port                 = local.ports.metrics
       endpoint             = "/metrics"
       metrics              = true
