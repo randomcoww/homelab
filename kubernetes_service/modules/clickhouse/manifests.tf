@@ -28,7 +28,7 @@ locals {
     https_port             = 8443
     interserver_https_port = 9010
     interserver_http_port = {
-      "@remove" = "remove"
+      "@remove" = "1"
     }
     tcp_port_secure   = local.ports.clickhouse
     path              = "/var/lib/clickhouse"
@@ -78,6 +78,10 @@ locals {
           secret_access_key = var.s3_secret_access_key
           region            = ""
         }
+        log_local = {
+          type = "local"
+          path = "${local.cache_path}/coordination/logs/"
+        }
         snapshot_s3_plain = {
           type              = "s3_plain"
           endpoint          = "${var.s3_endpoint}/${var.s3_bucket}/${local.s3_clickhouse_prefix}/snapshot/"
@@ -108,40 +112,52 @@ locals {
       allow_remote_fs_zero_copy_replication = false
     }
     asynchronous_metric_log = {
-      "@remove" = "remove"
+      "@remove" = "1"
     }
     metric_log = {
-      "@remove" = "remove"
+      "@remove" = "1"
     }
     opentelemetry_span_log = {
-      "@remove" = "remove"
+      "@remove" = "1"
     }
     zookeeper_log = {
-      "@remove" = "remove"
+      "@remove" = "1"
     }
     text_log = {
-      "@remove" = "remove"
+      "@remove" = "1"
     }
     session_log = {
-      "@remove" = "remove"
+      "@remove" = "1"
     }
     query_thread_log = {
-      "@remove" = "remove"
+      "@remove" = "1"
     }
     query_log = {
-      "@remove" = "remove"
+      "@remove" = "1"
     }
     query_views_log = {
-      "@remove" = "remove"
+      "@remove" = "1"
+    }
+    query_metric_log = {
+      "@remove" = "1"
     }
     part_log = {
-      "@remove" = "remove"
+      "@remove" = "1"
     }
     trace_log = {
-      "@remove" = "remove"
+      "@remove" = "1"
     }
     crash_log = {
-      "@remove" = "remove"
+      "@remove" = "1"
+    }
+    latency_log = {
+      "@remove" = "1"
+    }
+    blob_storage_log = {
+      "@remove" = "1"
+    }
+    error_log = {
+      "@remove" = "1"
     }
 
     zookeeper = {
@@ -195,7 +211,7 @@ locals {
   keeper_config = merge({
     tcp_port_secure       = local.ports.keeper
     async_replication     = true
-    log_storage_disk      = "log_s3_plain"
+    log_storage_disk      = "log_local"
     snapshot_storage_disk = "snapshot_s3_plain"
     state_storage_disk    = "state_s3_plain"
     coordination_settings = {
