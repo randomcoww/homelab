@@ -137,7 +137,7 @@ locals {
     qrcode_generator   = "ghcr.io/randomcoww/qrcode-generator:v20250210.0031"
     rclone             = "docker.io/rclone/rclone:1.69.1"
     s3fs               = "ghcr.io/randomcoww/s3fs:v20250401.2322"
-    mountpoint         = "ghcr.io/randomcoww/mountpoint-s3:v20250330.0339"
+    mountpoint         = "ghcr.io/randomcoww/mountpoint-s3:v20250401.2309"
     audioserve         = "docker.io/izderadicka/audioserve:latest"
     kube_vip           = "ghcr.io/kube-vip/kube-vip:v0.8.9"
     sunshine_desktop   = "ghcr.io/randomcoww/sunshine-desktop:v20250330.0337"
