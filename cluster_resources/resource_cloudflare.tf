@@ -67,6 +67,7 @@ resource "cloudflare_api_token" "backend_bucket" {
   policy {
     permission_groups = [
       data.cloudflare_api_token_permission_groups.all.r2["Workers R2 Storage Bucket Item Read"],
+      data.cloudflare_api_token_permission_groups.all.r2["Workers R2 Storage Bucket Item Write"],
     ]
     resources = {
       "com.cloudflare.edge.r2.bucket.${local.cloudflare_account_id}_default_${data.terraform_remote_state.sr.config.bucket}" = "*"
