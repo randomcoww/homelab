@@ -9,7 +9,7 @@ on:
     - master
 
 jobs:
-  renovate:
+  terraform:
     runs-on: arc-runner-${{ github.event.repository.name }}
     container:
       image: docker.io/hashicorp/terraform:latest
@@ -31,11 +31,11 @@ jobs:
         }
         EOF
 
-        tw terraform -chdir=client_credentials init
-        tw terraform -chdir=client_credentials apply -auto-approve -var-file=secrets.tfvars
+        terraform -chdir=client_credentials init
+        terraform -chdir=client_credentials apply -auto-approve -var-file=secrets.tfvars
 
-        tw terraform -chdir=ignition init
-        tw terraform -chdir=ignition apply -auto-approve
+        terraform -chdir=ignition init
+        terraform -chdir=ignition apply -auto-approve
 
-        tw terraform -chdir=matchbox_client init
-        tw terraform -chdir=matchbox_client apply -auto-approve
+        terraform -chdir=matchbox_client init
+        terraform -chdir=matchbox_client apply -auto-approve
