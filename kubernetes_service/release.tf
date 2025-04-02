@@ -18,7 +18,7 @@ locals {
     module.audioserve,
     module.llama-cpp,
     # module.sunshine-desktop,
-    # module.vaultwarden,
+    module.vaultwarden,
     # module.satisfactory-server,
   ]
 }
@@ -134,7 +134,7 @@ resource "helm_release" "nvidia-device-plugin" {
 }
 
 # cloudflare tunnel #
-
+/*
 resource "helm_release" "cloudflare-tunnel" {
   name        = "cloudflare-tunnel"
   namespace   = "default"
@@ -160,7 +160,7 @@ resource "helm_release" "cloudflare-tunnel" {
     }),
   ]
 }
-
+*/
 # kured #
 
 resource "helm_release" "kured" {

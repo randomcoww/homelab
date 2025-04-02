@@ -56,12 +56,12 @@ module "vaultwarden" {
     SMTP_SECURITY            = "starttls"
     SMTP_AUTH_MECHANISM      = "Plain"
   }
-  ingress_class_name        = local.ingress_classes.ingress_nginx
+  ingress_class_name        = local.ingress_classes.ingress_nginx_external
   nginx_ingress_annotations = local.nginx_ingress_auth_annotations
 
   minio_endpoint          = "https://${local.kubernetes_services.minio.endpoint}:${local.service_ports.minio}"
   minio_bucket            = minio_s3_bucket.vaultwarden.id
+  minio_litestream_prefix = "$POD_NAME/litestream"
   minio_access_key_id     = minio_iam_user.vaultwarden.id
   minio_secret_access_key = minio_iam_user.vaultwarden.secret
-  minio_litestream_prefix = "$POD_NAME/litestream"
 }
