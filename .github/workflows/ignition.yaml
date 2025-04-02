@@ -1,4 +1,4 @@
-name: Ignition Update
+name: Ignition update
 on:
   workflow_dispatch:
   push:
