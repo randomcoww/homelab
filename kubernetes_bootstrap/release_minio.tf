@@ -3,29 +3,6 @@
 
 locals {
   minio_replicas = 4
-  minio_secret_client_cert = yamlencode({
-    apiVersion = "v1"
-    kind       = "Secret"
-    metadata = {
-      name = "${local.kubernetes_services.minio.name}-client"
-    }
-    stringData = {
-      "public.crt"  = tls_locally_signed_cert.minio.cert_pem
-      "private.key" = tls_private_key.minio.private_key_pem
-    }
-    type = "Opaque"
-  })
-  minio_secret_ca_cert = yamlencode({
-    apiVersion = "v1"
-    kind       = "Secret"
-    metadata = {
-      name = "${local.kubernetes_services.minio.name}-ca"
-    }
-    stringData = {
-      "ca.crt" = data.terraform_remote_state.sr.outputs.trust.ca.cert_pem
-    }
-    type = "Opaque"
-  })
 }
 
 resource "tls_private_key" "minio" {
@@ -71,6 +48,27 @@ resource "tls_locally_signed_cert" "minio" {
   ]
 }
 
+module "minio-client-secret" {
+  source  = "../modules/secret"
+  name    = "${local.kubernetes_services.minio.name}-client"
+  app     = local.kubernetes_services.minio.name
+  release = "0.1.0"
+  data = merge({
+    "public.crt"  = tls_locally_signed_cert.minio.cert_pem
+    "private.key" = tls_private_key.minio.private_key_pem
+  })
+}
+
+module "minio-ca-secret" {
+  source  = "../modules/secret"
+  name    = "${local.kubernetes_services.minio.name}-ca"
+  app     = local.kubernetes_services.minio.name
+  release = "0.1.0"
+  data = merge({
+    "ca.crt" = data.terraform_remote_state.sr.outputs.trust.ca.cert_pem
+  })
+}
+
 resource "helm_release" "minio-tls" {
   name        = "${local.kubernetes_services.minio.name}-tls"
   chart       = "../helm-wrapper"
@@ -80,8 +78,8 @@ resource "helm_release" "minio-tls" {
   values = [
     yamlencode({
       manifests = [
-        local.minio_secret_client_cert,
-        local.minio_secret_ca_cert,
+        module.minio-client-secret.manifest,
+        module.minio-ca-secret.manifest,
       ]
     }),
   ]
@@ -134,8 +132,8 @@ resource "helm_release" "minio" {
         certSecret = "${local.kubernetes_services.minio.name}-client"
       }
       podAnnotations = {
-        "checksum/client-cert" = sha256(local.minio_secret_client_cert)
-        "checksum/ca-cert"     = sha256(local.minio_secret_ca_cert)
+        "checksum/client-cert" = sha256(module.minio-client-secret.manifest)
+        "checksum/ca-cert"     = sha256(module.minio-ca-secret.manifest)
       }
       trustedCertsSecret = "${local.kubernetes_services.minio.name}-ca"
       ingress = {
@@ -155,7 +153,7 @@ resource "helm_release" "minio" {
       extraContainers = [
         # bypass TLS for metrics endpoints
         {
-          name  = "minio-metrics"
+          name  = "${local.kubernetes_services.minio.name}-metrics"
           image = local.container_images.nginx
           securityContext = {
             runAsUser = 0
