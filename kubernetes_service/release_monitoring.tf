@@ -73,6 +73,10 @@ resource "helm_release" "prometheus" {
         {
           job_name     = "minio-job"
           metrics_path = "/minio/v2/metrics/cluster"
+          scheme       = "https"
+          tls_config = {
+            insecure_skip_verify = true
+          }
           static_configs = [
             {
               targets = [

@@ -122,7 +122,7 @@ resource "helm_release" "minio" {
         loadBalancerClass = "kube-vip.io/kube-vip-class"
         annotations = {
           "prometheus.io/scrape" = "true"
-          "prometheus.io/port"   = tostring(local.service_ports.minio)
+          "prometheus.io/port"   = tostring(local.service_ports.metrics)
           "prometheus.io/path"   = "/minio/v2/metrics/node"
         }
       }
@@ -152,6 +152,48 @@ resource "helm_release" "minio" {
       policies       = []
       customCommands = []
       svcaccts       = []
+      extraContainers = [
+        # bypass TLS for metrics endpoints
+        {
+          name  = "minio-metrics"
+          image = local.container_images.nginx
+          securityContext = {
+            runAsUser = 0
+          }
+          command = [
+            "sh",
+            "-c",
+            <<-EOT
+            set -e
+
+            cat > /etc/nginx/conf.d/default.conf <<EOF
+            proxy_request_buffering off;
+            proxy_buffering off;
+
+            server {
+              listen      ${local.service_ports.metrics};
+              server_name localhost;
+
+              location /minio/v2/metrics {
+                proxy_pass https://127.0.0.1:${local.service_ports.minio};
+              }
+
+              location /minio/metrics/v3 {
+                proxy_pass https://127.0.0.1:${local.service_ports.minio};
+              }
+            }
+            EOF
+
+            exec nginx -g 'daemon off;'
+            EOT
+          ]
+          ports = [
+            {
+              containerPort = local.service_ports.metrics
+            },
+          ]
+        },
+      ]
       affinity = {
         podAntiAffinity = {
           requiredDuringSchedulingIgnoredDuringExecution = [
