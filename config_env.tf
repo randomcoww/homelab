@@ -120,7 +120,7 @@ locals {
     # Helm
     kea                = "ghcr.io/randomcoww/kea:v20250401.2312"
     matchbox           = "quay.io/poseidon/matchbox:v0.11.0"
-    ipxe               = "ghcr.io/randomcoww/ipxe:v20250404.0214"
+    ipxe               = "ghcr.io/randomcoww/ipxe:v20250404.0942"
     ipxe_tftp          = "ghcr.io/randomcoww/ipxe:v20250404.0217-tftp"
     hostapd            = "ghcr.io/randomcoww/hostapd-noscan:v20250404.0115"
     flannel            = "docker.io/flannel/flannel:v0.26.5"
