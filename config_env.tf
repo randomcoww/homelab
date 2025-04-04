@@ -127,7 +127,7 @@ locals {
     flannel_cni_plugin = "docker.io/flannel/flannel-cni-plugin:v1.6.2-flannel1"
     kapprover          = "ghcr.io/randomcoww/kapprover:v0.1.0"
     external_dns       = "registry.k8s.io/external-dns/external-dns:v0.16.1"
-    code_server        = "ghcr.io/randomcoww/code-server:v4.98.2.20250404.0838"
+    code_server        = "ghcr.io/randomcoww/code-server:v4.98.2.20250404.2113"
     litestream         = "ghcr.io/randomcoww/litestream:v20250404.1727"
     kube_proxy         = "ghcr.io/randomcoww/kubernetes:v1.32.3.20250404.0808"
     tailscale          = "ghcr.io/randomcoww/tailscale-nft:v1.82.0.20250404.0824"
