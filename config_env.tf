@@ -120,8 +120,8 @@ locals {
     # Helm
     kea                = "ghcr.io/randomcoww/kea:v20250401.2312"
     matchbox           = "quay.io/poseidon/matchbox:v0.11.0"
-    ipxe_tftp          = "ghcr.io/randomcoww/ipxe:v20250317.0908-tftp"
-    ipxe_http          = "ghcr.io/randomcoww/ipxe:v20250317.0913-http"
+    ipxe               = "ghcr.io/randomcoww/ipxe:v20250404.0214"
+    ipxe_tftp          = "ghcr.io/randomcoww/ipxe:v20250404.0217-tftp"
     hostapd            = "ghcr.io/randomcoww/hostapd-noscan:v20250404.0115"
     flannel            = "docker.io/flannel/flannel:v0.26.5"
     flannel_cni_plugin = "docker.io/flannel/flannel-cni-plugin:v1.6.2-flannel1"
@@ -266,7 +266,7 @@ locals {
     kea_metrics        = 58087
     kea_ctrl_agent     = 58088
     ipxe_tftp          = 69
-    ipxe_http          = 58090
+    ipxe               = 58090
     apiserver          = 58181
     apiserver_backend  = 58081
     controller_manager = 50252

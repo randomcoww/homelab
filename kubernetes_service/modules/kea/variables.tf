@@ -14,8 +14,8 @@ variable "release" {
 variable "images" {
   type = object({
     kea         = string
+    ipxe        = string
     ipxe_tftp   = string
-    ipxe_http   = string
     stork_agent = string
   })
 }
@@ -25,8 +25,8 @@ variable "ports" {
     kea_peer       = number
     kea_metrics    = number
     kea_ctrl_agent = number
+    ipxe           = number
     ipxe_tftp      = number
-    ipxe_http      = number
   })
 }
 

@@ -51,7 +51,7 @@ module "bootstrap" {
                     option-data = [
                       {
                         name = "boot-file-name"
-                        data = "http://${local.listen_ip}:${local.host_ports.ipxe_http}/${var.ipxe_boot_file_name}"
+                        data = "http://${local.listen_ip}:${local.host_ports.ipxe}/${var.ipxe_boot_file_name}"
                       },
                       {
                         name = "vendor-class-identifier"
@@ -140,10 +140,10 @@ module "bootstrap" {
       },
       {
         name  = "ipxe-http"
-        image = local.container_images.ipxe_http
+        image = local.container_images.ipxe
         args = [
           "-p",
-          "0.0.0.0:${local.host_ports.ipxe_http}",
+          "0.0.0.0:${local.host_ports.ipxe}",
         ]
       },
       {

@@ -11,8 +11,8 @@ module "kea" {
   release = "0.1.20"
   images = {
     kea         = local.container_images.kea
+    ipxe        = local.container_images.ipxe
     ipxe_tftp   = local.container_images.ipxe_tftp
-    ipxe_http   = local.container_images.ipxe_http
     stork_agent = local.container_images.stork_agent
   }
   service_ips = [
@@ -23,8 +23,8 @@ module "kea" {
     kea_peer       = local.host_ports.kea_peer
     kea_metrics    = local.host_ports.kea_metrics
     kea_ctrl_agent = local.host_ports.kea_ctrl_agent
+    ipxe           = local.host_ports.ipxe
     ipxe_tftp      = local.host_ports.ipxe_tftp
-    ipxe_http      = local.host_ports.ipxe_http
   }
   ipxe_boot_file_name = "ipxe.efi"
   ipxe_script_url     = "https://${local.services.matchbox.ip}:${local.service_ports.matchbox}/boot.ipxe"

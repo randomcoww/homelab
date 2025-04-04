@@ -123,7 +123,7 @@ locals {
             option-data = [
               {
                 name = "boot-file-name"
-                data = "http://$POD_IP:${var.ports.ipxe_http}/${var.ipxe_boot_file_name}"
+                data = "http://$POD_IP:${var.ports.ipxe}/${var.ipxe_boot_file_name}"
               },
               {
                 name = "vendor-class-identifier"
@@ -427,11 +427,11 @@ module "statefulset" {
         ]
       },
       {
-        name  = "${var.name}-ipxe-http"
-        image = var.images.ipxe_http
+        name  = "${var.name}-ipxe"
+        image = var.images.ipxe
         args = [
           "-p",
-          "0.0.0.0:${var.ports.ipxe_http}",
+          "0.0.0.0:${var.ports.ipxe}",
         ]
       },
       # TODO: migrate fully to HTTP boot and remove TFTP
