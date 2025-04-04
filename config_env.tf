@@ -122,7 +122,7 @@ locals {
     matchbox           = "quay.io/poseidon/matchbox:v0.11.0"
     ipxe_tftp          = "ghcr.io/randomcoww/ipxe:v20250317.0908-tftp"
     ipxe_http          = "ghcr.io/randomcoww/ipxe:v20250317.0913-http"
-    hostapd            = "ghcr.io/randomcoww/hostapd-noscan:v2.11"
+    hostapd            = "ghcr.io/randomcoww/hostapd-noscan:v20250404.0115"
     flannel            = "docker.io/flannel/flannel:v0.26.5"
     flannel_cni_plugin = "docker.io/flannel/flannel-cni-plugin:v1.6.2-flannel1"
     kapprover          = "ghcr.io/randomcoww/kapprover:v0.1.0"
