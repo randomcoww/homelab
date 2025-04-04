@@ -111,9 +111,9 @@ locals {
 
   container_images = {
     # Igntion
-    kube_apiserver          = "ghcr.io/randomcoww/k8s-control-plane:v1.32.3"
-    kube_controller_manager = "ghcr.io/randomcoww/k8s-control-plane:v1.32.3"
-    kube_scheduler          = "ghcr.io/randomcoww/k8s-control-plane:v1.32.3"
+    kube_apiserver          = "ghcr.io/randomcoww/kubernetes:v1.32.3.20250404.0328"
+    kube_controller_manager = "ghcr.io/randomcoww/kubernetes:v1.32.3.20250404.0328"
+    kube_scheduler          = "ghcr.io/randomcoww/kubernetes:v1.32.3.20250404.0328"
     etcd_wrapper            = "ghcr.io/randomcoww/etcd-wrapper:v0.4.0"
     etcd                    = "gcr.io/etcd-development/etcd:v3.5.21"
 
@@ -129,7 +129,7 @@ locals {
     external_dns       = "registry.k8s.io/external-dns/external-dns:v0.16.1"
     code_server        = "ghcr.io/randomcoww/code-server:v20250401.2108"
     litestream         = "ghcr.io/randomcoww/litestream:v20250401.2309"
-    kube_proxy         = "ghcr.io/randomcoww/kube-proxy:v20250401.2113"
+    kube_proxy         = "ghcr.io/randomcoww/kubernetes:v1.32.3.20250404.0328"
     tailscale          = "ghcr.io/randomcoww/tailscale-nft:v20250401.2110"
     lldap              = "ghcr.io/lldap/lldap:2025-04-01-alpine-rootless"
     keydb              = "docker.io/eqalpha/keydb:alpine_x86_64_v6.3.4"
