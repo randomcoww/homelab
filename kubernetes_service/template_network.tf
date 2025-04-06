@@ -175,7 +175,6 @@ module "hostapd" {
     ieee80211ax                  = 1
     ieee80211d                   = 1
     ieee80211w                   = 2
-    ignore_broadcast_ssid        = 0
     auth_algs                    = 1
     wmm_enabled                  = 1
     require_ht                   = 1
