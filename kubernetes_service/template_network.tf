@@ -172,7 +172,7 @@ module "hostapd" {
     wpa_pairwise                 = "CCMP"
     hw_mode                      = "a"
     ieee80211n                   = 1
-    ieee80211ax                  = 1
+    ieee80211ac                  = 1
     ieee80211d                   = 1
     ieee80211w                   = 2
     auth_algs                    = 1
