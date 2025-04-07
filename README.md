@@ -209,21 +209,6 @@ terraform -chdir=rolling_reboot apply
 
 ---
 
-### Committing
-
-Formatting for terraform files
-
-```bash
-podman run -it --rm \
-  -v $(pwd):$(pwd) \
-  -w $(pwd) \
-  --entrypoint='' \
-  docker.io/hashicorp/terraform:1.11.3 \
-  find . -name '*.tf' -exec terraform fmt '{}' \;
-```
-
----
-
 ### Full cluster restart over the network
 
 Launch bootstrap DHCP service on a workstation on the same network as the server. Path `assets_path` should contains PXE image builds from [fedora-coreos-config-custom](https://github.com/randomcoww/fedora-coreos-config-custom).
