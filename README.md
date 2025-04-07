@@ -38,24 +38,7 @@ AWS_SECRET_ACCESS_KEY=$(echo -n $CLOUDFLARE_API_TOKEN | sha256sum --quiet)
 EOF
 ```
 
-Define `tw` (terraform wrapper)
-
-```bash
-source credentials.env
-
-terraform() {
-  set -x
-  podman run -it --rm --security-opt label=disable \
-    -v $(pwd):$(pwd) \
-    -w $(pwd) \
-    -e AWS_ACCESS_KEY_ID=$AWS_ACCESS_KEY_ID \
-    -e AWS_SECRET_ACCESS_KEY=$AWS_SECRET_ACCESS_KEY \
-    -e AWS_ENDPOINT_URL_S3=$AWS_ENDPOINT_URL_S3 \
-    --net=host \
-    docker.io/hashicorp/terraform:1.11.3 "$@"
-  rc=$?; set +x; return $rc
-}
-```
+Write secrets for Terraform
 
 Create `cluster_resources/secrets.tfvars` file
 
@@ -104,18 +87,33 @@ github = {
 EOF
 ```
 
+Run Terraform in container (optional)
+
+```bash
+terraform() {
+  set -x
+  podman run -it --rm --security-opt label=disable \
+    -v $(pwd):$(pwd) \
+    -w $(pwd) \
+    --env-file=credentials.env \
+    --net=host \
+    docker.io/hashicorp/terraform:1.11.3 "$@"
+  rc=$?; set +x; return $rc
+}
+```
+
 ---
 
 ### Generate credentials
 
-Generate cluster resources
+Generate external and cluster wide resources
 
 ```bash
 terraform -chdir=cluster_resources init
 terraform -chdir=cluster_resources apply -var-file=secrets.tfvars
 ```
 
-Write client credentials
+Write local client credentials
 
 ```bash
 terraform -chdir=client_credentials init
@@ -157,7 +155,7 @@ terraform -chdir=matchbox_client apply
 
 ### Deploy services to Kubernetes
 
-Deploy critical bootstrap and services
+Deploy bootstrap and lower level services
 
 ```bash
 terraform -chdir=kubernetes_bootstrap init
