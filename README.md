@@ -38,8 +38,6 @@ AWS_SECRET_ACCESS_KEY=$(echo -n $CLOUDFLARE_API_TOKEN | sha256sum --quiet)
 EOF
 ```
 
-Write secrets for Terraform
-
 Create `cluster_resources/secrets.tfvars` file
 
 ```bash
