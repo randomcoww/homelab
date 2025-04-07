@@ -1,0 +1,6 @@
+podman run -it --rm \
+  -v $(pwd):$(pwd) \
+  -w $(pwd) \
+  --entrypoint='' \
+  docker.io/hashicorp/terraform:latest \
+  find . -name '*.tf' -exec terraform fmt '{}' \;
