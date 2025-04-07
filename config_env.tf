@@ -188,8 +188,7 @@ locals {
       code                = "code"
       alpaca_db           = "alpaca-db"
       lldap_http          = "ldap"
-      qrcode              = "qrcode"
-      qrcode_hostapd      = "wifi"
+      qrcode_hostapd      = "hostapd"
       webdav_pictures     = "pictures"
       webdav_videos       = "videos"
       sunshine            = "sunshine"
@@ -197,6 +196,7 @@ locals {
       audioserve          = "audioserve"
       satisfactory_server = "satisfactory"
       monitoring          = "m"
+      llama_cpp           = "llama"
     } :
     k => "${domain}.${local.domains.public}"
   }

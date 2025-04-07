@@ -10,6 +10,7 @@ module "metadata" {
   app_version = split(":", var.images.llama_cpp)[1]
   manifests = merge(module.mountpoint.chart.manifests, {
     "templates/service.yaml" = module.service.manifest
+    "templates/ingress.yaml" = module.ingress.manifest
   })
 }
 
@@ -29,6 +30,27 @@ module "service" {
       },
     ]
   }
+}
+
+module "ingress" {
+  source             = "../../../modules/ingress"
+  name               = var.name
+  app                = var.name
+  release            = var.release
+  ingress_class_name = var.ingress_class_name
+  annotations        = var.nginx_ingress_annotations
+  rules = [
+    {
+      host = var.service_hostname
+      paths = [
+        {
+          service = module.service.name
+          port    = var.ports.llama_cpp
+          path    = "/"
+        },
+      ]
+    },
+  ]
 }
 
 module "mountpoint" {

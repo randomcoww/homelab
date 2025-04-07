@@ -210,6 +210,9 @@ module "llama-cpp" {
       value = "65"
     },
   ]
+  service_hostname          = local.kubernetes_ingress_endpoints.llama_cpp
+  ingress_class_name        = local.ingress_classes.ingress_nginx
+  nginx_ingress_annotations = local.nginx_ingress_annotations
   resources = {
     limits = {
       "nvidia.com/gpu" = 1
