@@ -43,7 +43,7 @@ Define `tw` (terraform wrapper)
 ```bash
 source credentials.env
 
-tw() {
+terraform() {
   set -x
   podman run -it --rm --security-opt label=disable \
     -v $(pwd):$(pwd) \
@@ -52,7 +52,6 @@ tw() {
     -e AWS_SECRET_ACCESS_KEY=$AWS_SECRET_ACCESS_KEY \
     -e AWS_ENDPOINT_URL_S3=$AWS_ENDPOINT_URL_S3 \
     --net=host \
-    --entrypoint='' \
     docker.io/hashicorp/terraform:1.11.3 "$@"
   rc=$?; set +x; return $rc
 }
@@ -112,30 +111,24 @@ EOF
 Generate cluster resources
 
 ```bash
-tw terraform -chdir=cluster_resources init
-tw terraform -chdir=cluster_resources apply -var-file=secrets.tfvars
+terraform -chdir=cluster_resources init
+terraform -chdir=cluster_resources apply -var-file=secrets.tfvars
 ```
 
 Write client credentials
 
 ```bash
-tw terraform -chdir=client_credentials init
-tw terraform -chdir=client_credentials apply -auto-approve -var-file=secrets.tfvars
-
-tw terraform -chdir=client_credentials output -raw kubeconfig > $HOME/.kube/config
+terraform -chdir=client_credentials init
+terraform -chdir=client_credentials apply -auto-approve -var-file=secrets.tfvars
 
 SSH_KEY=$HOME/.ssh/id_ecdsa
-tw terraform -chdir=client_credentials output -raw ssh_user_cert_authorized_key > $SSH_KEY-cert.pub
+terraform -chdir=client_credentials output -raw ssh_user_cert_authorized_key > $SSH_KEY-cert.pub
+
+terraform -chdir=client_credentials output -raw kubeconfig > $HOME/.kube/config
 
 mkdir -p $HOME/.mc/certs/CAs
-tw terraform -chdir=client_credentials output -json mc_config > $HOME/.mc/config.json
-tw terraform -chdir=client_credentials output -json minio_client | jq -r '.ca_cert_pem' > $HOME/.mc/certs/CAs/ca.crt
-```
-
-In cluster kubeconfig
-
-```bash
-tw terraform -chdir=client_credentials output -raw kubeconfig_cluster > $HOME/.kube/config
+terraform -chdir=client_credentials output -json mc_config > $HOME/.mc/config.json
+terraform -chdir=client_credentials output -json minio_client | jq -r '.ca_cert_pem' > $HOME/.mc/certs/CAs/ca.crt
 ```
 
 ---
@@ -149,15 +142,15 @@ Image build can be triggered from Github actions if ARC runners and MinIO are up
 Generate host ignition
 
 ```bash
-tw terraform -chdir=ignition init
-tw terraform -chdir=ignition apply
+terraform -chdir=ignition init
+terraform -chdir=ignition apply
 ```
 
 Push image tag and ignition to matchbox for iPXE boot
 
 ```bash
-tw terraform -chdir=matchbox_client init
-tw terraform -chdir=matchbox_client apply
+terraform -chdir=matchbox_client init
+terraform -chdir=matchbox_client apply
 ```
 
 ---
@@ -167,15 +160,15 @@ tw terraform -chdir=matchbox_client apply
 Deploy critical bootstrap and services
 
 ```bash
-tw terraform -chdir=kubernetes_bootstrap init
-tw terraform -chdir=kubernetes_bootstrap apply
+terraform -chdir=kubernetes_bootstrap init
+terraform -chdir=kubernetes_bootstrap apply
 ```
 
 Deploy higher level services
 
 ```bash
-tw terraform -chdir=kubernetes_service init
-tw terraform -chdir=kubernetes_service apply -var-file=secrets.tfvars
+terraform -chdir=kubernetes_service init
+terraform -chdir=kubernetes_service apply -var-file=secrets.tfvars
 ```
 
 ---
@@ -187,7 +180,7 @@ Go to `https://ldap.fuzzybunny.win`
 Get admin password by running
 
 ```bash
-tw terraform -chdir=cluster_resources output -json lldap
+terraform -chdir=cluster_resources output -json lldap
 ```
 
 Set up 2FA at `https://auth.fuzzybunny.win`
@@ -199,8 +192,8 @@ Set up 2FA at `https://auth.fuzzybunny.win`
 If network boot is not working, hosts may fallback to booting from (USB) disk. Looks for first disk with a partition labeled `fedora-coreos-<tag>` and update content.
 
 ```bash
-tw terraform -chdir=write_local_disk init
-tw terraform -chdir=write_local_disk apply
+terraform -chdir=write_local_disk init
+terraform -chdir=write_local_disk apply
 ```
 
 ---
@@ -210,8 +203,8 @@ tw terraform -chdir=write_local_disk apply
 Write file on all Kubernetes worker hosts to trigger rolling reboots coordinated by `kured`.
 
 ```bash
-tw terraform -chdir=rolling_reboot init
-tw terraform -chdir=rolling_reboot apply
+terraform -chdir=rolling_reboot init
+terraform -chdir=rolling_reboot apply
 ```
 
 ---
@@ -221,7 +214,12 @@ tw terraform -chdir=rolling_reboot apply
 Formatting for terraform files
 
 ```bash
-tw find . -name '*.tf' -exec terraform fmt '{}' \;
+podman run -it --rm \
+  -v $(pwd):$(pwd) \
+  -w $(pwd) \
+  --entrypoint='' \
+  docker.io/hashicorp/terraform:1.11.3 \
+  find . -name '*.tf' -exec terraform fmt '{}' \;
 ```
 
 ---
@@ -242,8 +240,8 @@ echo assets_path=$assets_path
 ```
 
 ```bash
-tw terraform -chdir=bootstrap_server init
-tw terraform -chdir=bootstrap_server apply \
+terraform -chdir=bootstrap_server init
+terraform -chdir=bootstrap_server apply \
   -var host_ip=$host_ip \
   -var assets_path=$assets_path
 ```
@@ -251,15 +249,15 @@ tw terraform -chdir=bootstrap_server apply \
 Launch bootstrap service with Podman
 
 ```bash
-tw terraform -chdir=bootstrap_server output -raw pod_manifest > bootstrap.yaml
+terraform -chdir=bootstrap_server output -raw pod_manifest > bootstrap.yaml
 sudo podman play kube bootstrap.yaml
 ```
 
 Push PXE boot and ignition configuration to bootstrap service
 
 ```bash
-tw terraform -chdir=bootstrap_client init
-tw terraform -chdir=bootstrap_client apply
+terraform -chdir=bootstrap_client init
+terraform -chdir=bootstrap_client apply
 ```
 
 Start all servers and allow them to PXE boot
@@ -269,7 +267,7 @@ Bootstrap service can be stopped once servers are up
 ```bash
 sudo podman play kube bootstrap.yaml --down
 
-tw terraform -chdir=bootstrap_server destroy \
+terraform -chdir=bootstrap_server destroy \
   -var host_ip=$host_ip \
   -var assets_path=$assets_path
 ```
