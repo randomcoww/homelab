@@ -52,9 +52,9 @@ module "kube-dns" {
         {
           name = "hosts"
           configBlock = join("\n", concat([
-            for key, host in local.hosts:
+            for key, host in local.hosts :
             "${cidrhost(host.networks.service.prefix, host.netnum)} ${key}.${local.domains.public}"
-          ], [
+            ], [
             "fallthrough"
           ]))
         },
