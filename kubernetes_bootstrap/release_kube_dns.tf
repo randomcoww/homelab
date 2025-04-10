@@ -49,7 +49,15 @@ module "kube-dns" {
           fallthrough
           EOF
         },
-        # public DNS
+        {
+          name = "hosts"
+          configBlock = join("\n", concat([
+            for key, host in local.hosts:
+            "${cidrhost(host.networks.service.prefix, host.netnum)} ${key}.${local.domains.public}"
+          ], [
+            "fallthrough"
+          ]))
+        },
         {
           name        = "forward"
           parameters  = ". tls://${local.upstream_dns.ip}"
