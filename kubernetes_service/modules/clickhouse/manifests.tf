@@ -248,9 +248,8 @@ module "service" {
   app     = var.name
   release = var.release
   annotations = {
-    "external-dns.alpha.kubernetes.io/hostname" = var.service_hostname
-    "prometheus.io/scrape"                      = "true"
-    "prometheus.io/port"                        = tostring(local.ports.metrics)
+    "prometheus.io/scrape" = "true"
+    "prometheus.io/port"   = tostring(local.ports.metrics)
   }
   spec = {
     type              = "LoadBalancer"

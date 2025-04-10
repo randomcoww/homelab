@@ -16,9 +16,9 @@ locals {
     module.webdav-videos,
     module.audioserve,
     module.vaultwarden,
-    module.llama-cpp,
+    # module.llama-cpp,
+    module.sunshine-desktop,
     # module.code,
-    # module.sunshine-desktop,
     # module.satisfactory-server,
   ]
 }

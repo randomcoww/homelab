@@ -41,10 +41,6 @@ variable "ca" {
   })
 }
 
-variable "service_hostname" {
-  type = string
-}
-
 variable "resources" {
   type    = map(any)
   default = {}

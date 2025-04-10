@@ -183,20 +183,17 @@ locals {
 
   kubernetes_ingress_endpoints = {
     for k, domain in {
-      auth                = "auth"
-      vaultwarden         = "vw"
-      code                = "code"
-      alpaca_db           = "alpaca-db"
-      lldap_http          = "ldap"
-      qrcode_hostapd      = "hostapd"
-      webdav_pictures     = "pictures"
-      webdav_videos       = "videos"
-      sunshine            = "sunshine"
-      sunshine_admin      = "sunadmin"
-      audioserve          = "audioserve"
-      satisfactory_server = "satisfactory"
-      monitoring          = "m"
-      llama_cpp           = "llama"
+      auth            = "auth"
+      vaultwarden     = "vw"
+      code            = "code"
+      lldap_http      = "ldap"
+      qrcode_hostapd  = "hostapd"
+      webdav_pictures = "pictures"
+      webdav_videos   = "videos"
+      sunshine_admin  = "sunadmin"
+      audioserve      = "audioserve"
+      monitoring      = "m"
+      llama_cpp       = "llama"
     } :
     k => "${domain}.${local.domains.public}"
   }

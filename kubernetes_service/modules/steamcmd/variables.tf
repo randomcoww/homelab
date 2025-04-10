@@ -62,10 +62,6 @@ variable "extra_volumes" {
   default = []
 }
 
-variable "service_hostname" {
-  type = string
-}
-
 variable "steamapp_id" {
   type = number
 }

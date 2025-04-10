@@ -18,7 +18,6 @@ resource "tls_cert_request" "clickhouse" {
   dns_names = concat([
     var.name,
     "${var.name}.${var.namespace}",
-    var.service_hostname,
     "${each.key}.${local.peer_name}.${var.namespace}",
   ])
   ip_addresses = compact([
