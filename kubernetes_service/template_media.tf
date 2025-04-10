@@ -159,10 +159,6 @@ module "sunshine-desktop" {
   home_path = local.users.client.home_dir
   extra_configs = [
     {
-      path    = "/etc/ssh/ssh_known_hosts"
-      content = "@cert-authority * ${chomp(data.terraform_remote_state.sr.outputs.ssh.ca.public_key_openssh)}"
-    },
-    {
       path    = "/etc/tmux.conf"
       content = <<-EOF
       set -g history-limit 10000
