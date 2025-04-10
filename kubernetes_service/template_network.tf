@@ -38,8 +38,8 @@ module "kea" {
         local.services.external_dns.ip,
       ]
       domain_search = [
-        local.domains.public,
         local.domains.kubernetes,
+        local.domains.public,
       ]
       mtu = lookup(local.networks.lan, "mtu", 1500)
       pools = [
