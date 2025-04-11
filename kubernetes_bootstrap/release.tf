@@ -179,7 +179,7 @@ module "kube-dns" {
         },
         {
           name        = "etcd"
-          parameters  = "${local.domains.public} in-addr.arpa ip6.arpa"
+          parameters  = local.domains.public
           configBlock = <<-EOF
           fallthrough
           EOF
