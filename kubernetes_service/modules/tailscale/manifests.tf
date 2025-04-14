@@ -1,7 +1,3 @@
-locals {
-  state_secret_name = "${var.name}-state"
-}
-
 module "metadata" {
   source      = "../../../modules/metadata"
   name        = var.name
@@ -24,10 +20,13 @@ module "metadata" {
           verbs     = ["create"]
         },
         {
-          apiGroups     = [""]
-          resourceNames = [local.state_secret_name]
-          resources     = ["secrets"]
-          verbs         = ["get", "update", "patch"]
+          apiGroups = [""]
+          resourceNames = [
+            for i, _ in range(var.replicas) :
+            "${var.name}-${i}"
+          ]
+          resources = ["secrets"]
+          verbs     = ["get", "update", "patch"]
         },
       ]
     })
@@ -75,7 +74,7 @@ module "statefulset" {
   app      = var.name
   release  = var.release
   affinity = var.affinity
-  replicas = 1
+  replicas = var.replicas
   annotations = {
     "checksum/secret" = sha256(module.secret.manifest)
   }
@@ -91,8 +90,12 @@ module "statefulset" {
         }
         env = concat([
           {
-            name  = "TS_KUBE_SECRET"
-            value = local.state_secret_name
+            name = "TS_KUBE_SECRET"
+            valueFrom = {
+              fieldRef = {
+                fieldPath = "metadata.name"
+              }
+            }
           },
           {
             name  = "TS_USERSPACE"

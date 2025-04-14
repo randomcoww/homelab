@@ -60,7 +60,7 @@ resource "helm_release" "prometheus" {
         ingress = {
           enabled          = true
           ingressClassName = local.ingress_classes.ingress_nginx
-          annotations      = local.nginx_ingress_auth_annotations
+          annotations      = local.nginx_ingress_annotations
           hosts = [
             local.kubernetes_ingress_endpoints.monitoring,
           ]

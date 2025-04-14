@@ -7,6 +7,11 @@ variable "namespace" {
   default = "default"
 }
 
+variable "replicas" {
+  type    = number
+  default = 1
+}
+
 variable "release" {
   type = string
 }

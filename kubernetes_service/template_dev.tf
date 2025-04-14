@@ -140,7 +140,7 @@ module "code" {
   }
   service_hostname          = local.kubernetes_ingress_endpoints.code
   ingress_class_name        = local.ingress_classes.ingress_nginx
-  nginx_ingress_annotations = local.nginx_ingress_auth_annotations
+  nginx_ingress_annotations = local.nginx_ingress_annotations
 }
 
 ## llama-cpp

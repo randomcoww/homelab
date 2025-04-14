@@ -205,7 +205,7 @@ module "qrcode-hostapd" {
   }
   service_hostname          = local.kubernetes_ingress_endpoints.qrcode_hostapd
   ingress_class_name        = local.ingress_classes.ingress_nginx
-  nginx_ingress_annotations = local.nginx_ingress_auth_annotations
+  nginx_ingress_annotations = local.nginx_ingress_annotations
   qrcode_value              = "WIFI:S:${random_password.hostapd-ssid.result};T:WPA;P:${random_password.hostapd-password.result};H:true;;"
 }
 
@@ -216,6 +216,7 @@ module "tailscale" {
   name      = "tailscale"
   namespace = "tailscale"
   release   = "0.1.1"
+  replicas  = 2
   images = {
     tailscale = local.container_images.tailscale
   }
