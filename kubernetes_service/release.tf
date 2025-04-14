@@ -18,7 +18,7 @@ locals {
     # module.vaultwarden,
     # module.llama-cpp,
     # module.sunshine-desktop,
-    module.code,
+    # module.code,
     # module.satisfactory-server,
   ]
 }
