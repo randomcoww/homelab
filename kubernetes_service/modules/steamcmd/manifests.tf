@@ -63,7 +63,7 @@ module "mountpoint" {
   ## s3 config
   s3_endpoint          = var.s3_endpoint
   s3_bucket            = var.s3_bucket
-  s3_prefix            = var.name
+  s3_prefix            = ""
   s3_access_key_id     = var.s3_access_key_id
   s3_secret_access_key = var.s3_secret_access_key
   s3_mount_path        = local.persistent_path

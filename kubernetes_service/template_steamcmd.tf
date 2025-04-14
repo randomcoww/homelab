@@ -1,15 +1,15 @@
-resource "minio_s3_bucket" "steamcmd" {
-  bucket        = "steamcmd"
+resource "minio_s3_bucket" "satisfactory-server" {
+  bucket        = "satisfactory-server"
   force_destroy = true
 }
 
-resource "minio_iam_user" "steamcmd" {
-  name          = "steamcmd"
+resource "minio_iam_user" "satisfactory-server" {
+  name          = "satisfactory-server"
   force_destroy = true
 }
 
-resource "minio_iam_policy" "steamcmd" {
-  name = "steamcmd"
+resource "minio_iam_policy" "satisfactory-server" {
+  name = "satisfactory-server"
   policy = jsonencode({
     Version = "2012-10-17"
     Statement = [
@@ -17,17 +17,17 @@ resource "minio_iam_policy" "steamcmd" {
         Effect = "Allow"
         Action = "*"
         Resource = [
-          minio_s3_bucket.steamcmd.arn,
-          "${minio_s3_bucket.steamcmd.arn}/*",
+          minio_s3_bucket.satisfactory-server.arn,
+          "${minio_s3_bucket.satisfactory-server.arn}/*",
         ]
       },
     ]
   })
 }
 
-resource "minio_iam_user_policy_attachment" "steamcmd" {
-  user_name   = minio_iam_user.steamcmd.id
-  policy_name = minio_iam_policy.steamcmd.id
+resource "minio_iam_user_policy_attachment" "satisfactory-server" {
+  user_name   = minio_iam_user.satisfactory-server.id
+  policy_name = minio_iam_policy.satisfactory-server.id
 }
 
 module "satisfactory-server" {
@@ -111,9 +111,9 @@ module "satisfactory-server" {
   }
   loadbalancer_class_name = "kube-vip.io/kube-vip-class"
   s3_endpoint             = "https://${local.services.cluster_minio.ip}:${local.service_ports.minio}"
-  s3_bucket               = minio_s3_bucket.steamcmd.id
-  s3_access_key_id        = minio_iam_user.steamcmd.id
-  s3_secret_access_key    = minio_iam_user.steamcmd.secret
+  s3_bucket               = minio_s3_bucket.satisfactory-server.id
+  s3_access_key_id        = minio_iam_user.satisfactory-server.id
+  s3_secret_access_key    = minio_iam_user.satisfactory-server.secret
   s3_mount_extra_args = [
     "--cache /tmp",
   ]
