@@ -1,36 +1,5 @@
 ## code-server
 
-locals {
-  code_mc_config_dir = "/var/tmp/minio"
-}
-
-resource "minio_iam_user" "code" {
-  name          = "code"
-  force_destroy = true
-}
-
-resource "minio_iam_policy" "code" {
-  name = "code"
-  policy = jsonencode({
-    Version = "2012-10-17"
-    Statement = [
-      {
-        Effect = "Allow"
-        Action = "*"
-        Resource = [
-          minio_s3_bucket.data["models"].arn,
-          "${minio_s3_bucket.data["models"].arn}/*",
-        ]
-      },
-    ]
-  })
-}
-
-resource "minio_iam_user_policy_attachment" "code" {
-  user_name   = minio_iam_user.code.id
-  policy_name = minio_iam_policy.code.id
-}
-
 module "code" {
   source  = "./modules/code_server"
   name    = "code"
@@ -54,29 +23,15 @@ module "code" {
       bind-key -T copy-mode MouseDragEnd1Pane send-keys -X copy-pipe-and-cancel "xclip -in -sel clip"
       EOF
     },
-    {
-      path    = "${local.code_mc_config_dir}/certs/CAs/ca.crt"
-      content = data.terraform_remote_state.sr.outputs.trust.ca.cert_pem
-    },
-    {
-      path = "${local.code_mc_config_dir}/config.json"
-      content = jsonencode({
-        aliases = {
-          code = {
-            url       = "https://${local.kubernetes_services.minio.endpoint}:${local.service_ports.minio}"
-            accessKey = minio_iam_user.code.id
-            secretKey = minio_iam_user.code.secret
-            api       = "S3v4"
-            path      = "auto"
-          }
-        }
-      })
-    },
   ]
   extra_envs = [
     {
-      name  = "MC_CONFIG_DIR"
-      value = local.code_mc_config_dir
+      name  = "NVIDIA_VISIBLE_DEVICES"
+      value = "all"
+    },
+    {
+      name  = "NVIDIA_DRIVER_CAPABILITIES"
+      value = "compute,utility"
     },
     {
       name  = "TZ"
@@ -91,10 +46,6 @@ module "code" {
     {
       name      = "run-user"
       mountPath = "/run/user/${local.users.client.uid}"
-    },
-    {
-      name      = "mc-config-dir"
-      mountPath = local.code_mc_config_dir
     },
   ]
   extra_volumes = [
@@ -119,6 +70,11 @@ module "code" {
       }
     },
   ]
+  resources = {
+    limits = {
+      "nvidia.com/gpu" = 1
+    }
+  }
   affinity = {
     nodeAffinity = {
       requiredDuringSchedulingIgnoredDuringExecution = {
