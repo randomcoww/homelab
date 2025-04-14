@@ -45,8 +45,8 @@ resource "tailscale_dns_preferences" "cluster" {
 
 resource "tailscale_dns_search_paths" "cluster" {
   search_paths = [
-    local.domains.public,
     local.domains.kubernetes,
+    local.domains.public,
   ]
 }
 
