@@ -316,7 +316,7 @@ locals {
       }
       network_boot = {
         interface = "phy0"
-        image     = local.pxeboot_image_set.f41
+        image     = local.pxeboot_image_set.latest
         boot_args = [
           "numa=off",
           "selinux=0",
