@@ -3,7 +3,7 @@
 locals {
   modules_enabled = [
     module.kvm-device-plugin,
-    module.nvidia-driver,
+    # module.nvidia-driver,
     module.kea,
     module.matchbox,
     # module.lldap,
