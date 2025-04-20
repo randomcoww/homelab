@@ -9,7 +9,7 @@ locals {
     # module.lldap,
     # module.authelia,
     module.tailscale,
-    module.hostapd,
+    # module.hostapd,
     module.qrcode-hostapd,
     module.alpaca-db,
     module.webdav-pictures,
