@@ -118,7 +118,7 @@ locals {
     etcd                    = "gcr.io/etcd-development/etcd:v3.5.21"
     flannel                 = "docker.io/flannel/flannel:v0.26.7"
     flannel_cni_plugin      = "docker.io/flannel/flannel-cni-plugin:v1.6.2-flannel1"
-    kube_vip                = "ghcr.io/kube-vip/kube-vip:v0.8.10"
+    kube_vip                = "ghcr.io/kube-vip/kube-vip:v0.9.0"
     kvm_device_plugin       = "ghcr.io/randomcoww/kvm-device-plugin:v20250211.0006"
     kea                     = "ghcr.io/randomcoww/kea:v2.7.7.20250407.0623"
     matchbox                = "quay.io/poseidon/matchbox:v0.11.0"
@@ -130,9 +130,9 @@ locals {
     code_server             = "ghcr.io/randomcoww/code-server:v4.98.2.20250404.2113"
     litestream              = "ghcr.io/randomcoww/litestream:v0.3.13.20250405.0151"
     tailscale               = "ghcr.io/randomcoww/tailscale-nft:v1.82.0.20250404.2130"
-    lldap                   = "ghcr.io/lldap/lldap:2025-04-09-alpine-rootless"
+    lldap                   = "ghcr.io/lldap/lldap:2025-04-21-alpine-rootless"
     keydb                   = "docker.io/eqalpha/keydb:alpine_x86_64_v6.3.4"
-    clickhouse              = "docker.io/clickhouse/clickhouse-server:25.3.2.39-alpine"
+    clickhouse              = "docker.io/clickhouse/clickhouse-server:25.4.1.2934-alpine"
     qrcode_generator        = "ghcr.io/randomcoww/qrcode-generator:v0.1.0"
     rclone                  = "docker.io/rclone/rclone:1.69.1"
     mountpoint              = "ghcr.io/randomcoww/mountpoint-s3:v1.16.1.20250405.0150"
@@ -148,7 +148,8 @@ locals {
   }
 
   pxeboot_images = {
-    coreos = "fedora-coreos-42.20250415.21" # randomcoww/fedora-coreos-config-custom
+    latest = "fedora-coreos-42.20250415.21" # randomcoww/fedora-coreos-config-custom
+    f41    = "fedora-coreos-41.20250401.04"
   }
 
   kubernetes = {

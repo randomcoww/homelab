@@ -3,13 +3,13 @@
 locals {
   modules_enabled = [
     module.kvm-device-plugin,
-    module.nvidia-driver,
+    # module.nvidia-driver,
     module.kea,
     module.matchbox,
     # module.lldap,
     # module.authelia,
     module.tailscale,
-    module.hostapd,
+    # module.hostapd,
     module.qrcode-hostapd,
     module.alpaca-db,
     module.webdav-pictures,
@@ -176,13 +176,13 @@ resource "helm_release" "kured" {
     yamlencode({
       configuration = {
         # promethues chart creates service name <name>-server
-        prometheusUrl            = "http://${local.kubernetes_services.prometheus.name}-server.${local.kubernetes_services.prometheus.namespace}:${local.service_ports.prometheus}"
-        period                   = "2m"
-        metricsPort              = local.service_ports.metrics
-        forceReboot              = true
-        drainTimeout             = "6m"
-        skipWaitForDeleteTimeout = 300
+        prometheusUrl = "http://${local.kubernetes_services.prometheus.name}-server.${local.kubernetes_services.prometheus.namespace}:${local.service_ports.prometheus}"
+        period        = "2m"
+        metricsPort   = local.service_ports.metrics
+        forceReboot   = true
+        drainTimeout  = "6m"
       }
+      priorityClassName = "system-node-critical"
       service = {
         create = true
         port   = local.service_ports.metrics
