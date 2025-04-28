@@ -118,7 +118,7 @@ locals {
     etcd                    = "gcr.io/etcd-development/etcd:v3.5.21"
     flannel                 = "docker.io/flannel/flannel:v0.26.7"
     flannel_cni_plugin      = "docker.io/flannel/flannel-cni-plugin:v1.6.2-flannel1"
-    kube_vip                = "ghcr.io/kube-vip/kube-vip:v0.9.0"
+    kube_vip                = "ghcr.io/kube-vip/kube-vip:v0.9.1"
     kvm_device_plugin       = "ghcr.io/randomcoww/kvm-device-plugin:v20250211.0006"
     kea                     = "ghcr.io/randomcoww/kea:v2.7.7.20250407.0623"
     matchbox                = "quay.io/poseidon/matchbox:v0.11.0"
