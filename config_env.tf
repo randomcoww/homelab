@@ -135,7 +135,7 @@ locals {
     clickhouse              = "docker.io/clickhouse/clickhouse-server:25.4.2.31-alpine"
     qrcode_generator        = "ghcr.io/randomcoww/qrcode-generator:v0.1.0"
     rclone                  = "docker.io/rclone/rclone:1.69.2"
-    mountpoint              = "ghcr.io/randomcoww/mountpoint-s3:v1.16.1.20250405.0150"
+    mountpoint              = "ghcr.io/randomcoww/mountpoint-s3:v1.16.2.20250501.2309"
     audioserve              = "docker.io/izderadicka/audioserve:latest"
     sunshine_desktop        = "ghcr.io/randomcoww/sunshine-desktop:v2025.404.171304.20250404.2119"
     nvidia_driver           = "ghcr.io/randomcoww/nvidia-driver-container:v570.124.06-fedora41"
