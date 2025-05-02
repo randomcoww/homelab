@@ -110,10 +110,10 @@ locals {
   }
 
   container_images = {
-    kube_apiserver          = "ghcr.io/randomcoww/kubernetes:v1.32.3.20250405.0152"
-    kube_controller_manager = "ghcr.io/randomcoww/kubernetes:v1.32.3.20250405.0152"
-    kube_scheduler          = "ghcr.io/randomcoww/kubernetes:v1.32.3.20250405.0152"
-    kube_proxy              = "ghcr.io/randomcoww/kubernetes:v1.32.3.20250405.0152"
+    kube_apiserver          = "ghcr.io/randomcoww/kubernetes:v1.33.0.20250501.2313"
+    kube_controller_manager = "ghcr.io/randomcoww/kubernetes:v1.33.0.20250501.2313"
+    kube_scheduler          = "ghcr.io/randomcoww/kubernetes:v1.33.0.20250501.2313"
+    kube_proxy              = "ghcr.io/randomcoww/kubernetes:v1.33.0.20250501.2313"
     etcd_wrapper            = "ghcr.io/randomcoww/etcd-wrapper:v0.4.2"
     etcd                    = "gcr.io/etcd-development/etcd:v3.5.21"
     flannel                 = "docker.io/flannel/flannel:v0.26.7"
@@ -139,12 +139,12 @@ locals {
     audioserve              = "docker.io/izderadicka/audioserve:latest"
     sunshine_desktop        = "ghcr.io/randomcoww/sunshine-desktop:v2025.404.171304.20250404.2119"
     nvidia_driver           = "ghcr.io/randomcoww/nvidia-driver-container:v570.124.06-fedora41"
-    steamcmd                = "ghcr.io/randomcoww/steamcmd:v20250401.2322"
     stork_agent             = "ghcr.io/randomcoww/stork-agent:v20250501.2122"
+    steamcmd                = "ghcr.io/randomcoww/steamcmd:v20250501.2322"
     vaultwarden             = "docker.io/vaultwarden/server:1.33.2-alpine"
     llama_cpp               = "ghcr.io/ggml-org/llama.cpp:server-cuda"
     nginx                   = "docker.io/nginx:1.27-alpine-slim"
-    s3fs                    = "ghcr.io/randomcoww/s3fs:v20250401.2322"
+    s3fs                    = "ghcr.io/randomcoww/s3fs:v20250501.2322"
   }
 
   pxeboot_images = {
