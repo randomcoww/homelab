@@ -107,14 +107,14 @@ terraform() {
 Generate external and cluster wide resources
 
 ```bash
-terraform -chdir=cluster_resources init
+terraform -chdir=cluster_resources init -upgrade
 terraform -chdir=cluster_resources apply -var-file=secrets.tfvars
 ```
 
 Write local client credentials
 
 ```bash
-terraform -chdir=client_credentials init
+terraform -chdir=client_credentials init -upgrade
 terraform -chdir=client_credentials apply -auto-approve -var-file=secrets.tfvars
 
 SSH_KEY=$HOME/.ssh/id_ecdsa
@@ -138,14 +138,14 @@ Image build can be triggered from Github actions if ARC runners and MinIO are up
 Generate host ignition
 
 ```bash
-terraform -chdir=ignition init
+terraform -chdir=ignition init -upgrade
 terraform -chdir=ignition apply
 ```
 
 Push image tag and ignition to matchbox for iPXE boot
 
 ```bash
-terraform -chdir=matchbox_client init
+terraform -chdir=matchbox_client init -upgrade
 terraform -chdir=matchbox_client apply
 ```
 
@@ -156,14 +156,14 @@ terraform -chdir=matchbox_client apply
 Deploy bootstrap and lower level services
 
 ```bash
-terraform -chdir=kubernetes_bootstrap init
+terraform -chdir=kubernetes_bootstrap init -upgrade
 terraform -chdir=kubernetes_bootstrap apply
 ```
 
 Deploy higher level services
 
 ```bash
-terraform -chdir=kubernetes_service init
+terraform -chdir=kubernetes_service init -upgrade
 terraform -chdir=kubernetes_service apply -var-file=secrets.tfvars
 ```
 
