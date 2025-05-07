@@ -188,7 +188,7 @@ Set up 2FA at `https://auth.fuzzybunny.win`
 If network boot is not working, hosts may fallback to booting from (USB) disk. Looks for first disk with a partition labeled `fedora-coreos-<tag>` and update content.
 
 ```bash
-terraform -chdir=write_local_disk init
+terraform -chdir=write_local_disk init -upgrade
 terraform -chdir=write_local_disk apply
 ```
 
@@ -199,7 +199,7 @@ terraform -chdir=write_local_disk apply
 Write file on all Kubernetes worker hosts to trigger rolling reboots coordinated by `kured`.
 
 ```bash
-terraform -chdir=rolling_reboot init
+terraform -chdir=rolling_reboot init -upgrade
 terraform -chdir=rolling_reboot apply
 ```
 

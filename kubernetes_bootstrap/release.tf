@@ -158,7 +158,9 @@ module "kube-dns" {
     {
       zones = [
         {
-          zone = "."
+          zone    = "."
+          scheme  = "dns://"
+          use_tcp = true
         },
       ]
       port = 53
