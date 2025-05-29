@@ -134,7 +134,7 @@ locals {
     keydb                   = "docker.io/eqalpha/keydb:alpine_x86_64_v6.3.4"
     clickhouse              = "docker.io/clickhouse/clickhouse-server:25.4.2.31-alpine"
     qrcode_generator        = "ghcr.io/randomcoww/qrcode-generator:v0.1.0"
-    rclone                  = "docker.io/rclone/rclone:1.69.2"
+    rclone                  = "docker.io/rclone/rclone:1.69.3"
     mountpoint              = "ghcr.io/randomcoww/mountpoint-s3:v1.16.2.20250501.2309"
     audioserve              = "docker.io/izderadicka/audioserve:latest"
     sunshine_desktop        = "ghcr.io/randomcoww/sunshine-desktop:v2025.404.171304.20250404.2119"
