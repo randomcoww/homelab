@@ -4,6 +4,6 @@
 *.tfstate.*
 secrets.tfvars
 *.log
-outputs/
+output/
 bootstrap.yaml
 credentials.env

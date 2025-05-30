@@ -175,8 +175,9 @@ locals {
       netnum                = 5
       physical_interfaces = {
         phy0 = {
-          match_mac = "1c-83-41-30-e2-54"
-          mtu       = local.default_mtu
+          match_mac = "b0-41-6f-16-9e-76"
+          # match_mac = "b0-41-6f-16-9e-77"
+          mtu = local.default_mtu
         }
       }
       vlan_interfaces = {
@@ -231,7 +232,6 @@ locals {
         boot_args = [
           "numa=off",
           "selinux=0",
-          "mitigations=off",
         ]
       }
       kubernetes_node_labels = {
