@@ -141,7 +141,7 @@ module "kube-dns" {
   helm_template = {
     repository = "https://coredns.github.io/helm"
     chart      = "coredns"
-    version    = "1.42.1"
+    version    = "1.42.2"
   }
   replicas = 3
   images = {
