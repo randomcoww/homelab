@@ -129,7 +129,7 @@ locals {
     external_dns            = "registry.k8s.io/external-dns/external-dns:v0.17.0"
     code_server             = "ghcr.io/randomcoww/code-server:v4.99.3.20250501.2108"
     litestream              = "ghcr.io/randomcoww/litestream:v0.3.13.20250405.0151"
-    tailscale               = "ghcr.io/randomcoww/tailscale-nft:v1.82.5.20250502.0810"
+    tailscale               = "ghcr.io/randomcoww/tailscale-nft:v1.84.0.20250601.2109"
     lldap                   = "ghcr.io/lldap/lldap:2025-05-19-alpine-rootless"
     keydb                   = "docker.io/eqalpha/keydb:alpine_x86_64_v6.3.4"
     clickhouse              = "docker.io/clickhouse/clickhouse-server:25.5.1.2782-alpine"
