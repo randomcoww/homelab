@@ -126,7 +126,7 @@ locals {
     ipxe_tftp               = "ghcr.io/randomcoww/ipxe:v20250501.2120-tftp"
     hostapd                 = "ghcr.io/randomcoww/hostapd-noscan:v20250406.1002"
     kapprover               = "ghcr.io/randomcoww/kapprover:v0.1.0"
-    external_dns            = "registry.k8s.io/external-dns/external-dns:v0.16.1"
+    external_dns            = "registry.k8s.io/external-dns/external-dns:v0.17.0"
     code_server             = "ghcr.io/randomcoww/code-server:v4.99.3.20250501.2108"
     litestream              = "ghcr.io/randomcoww/litestream:v0.3.13.20250405.0151"
     tailscale               = "ghcr.io/randomcoww/tailscale-nft:v1.82.5.20250502.0810"
