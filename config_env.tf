@@ -141,7 +141,7 @@ locals {
     nvidia_driver           = "ghcr.io/randomcoww/nvidia-driver-container:v570.124.06-fedora41"
     stork_agent             = "ghcr.io/randomcoww/stork-agent:v20250501.2122"
     steamcmd                = "ghcr.io/randomcoww/steamcmd:v20250501.2322"
-    vaultwarden             = "docker.io/vaultwarden/server:1.33.2-alpine"
+    vaultwarden             = "docker.io/vaultwarden/server:1.34.1-alpine"
     llama_cpp               = "ghcr.io/ggml-org/llama.cpp:server-cuda"
     nginx                   = "docker.io/nginx:1.27-alpine-slim"
     s3fs                    = "ghcr.io/randomcoww/s3fs:v20250501.2322"
