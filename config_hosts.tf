@@ -5,8 +5,9 @@ locals {
       netnum                = 1
       physical_interfaces = {
         phy0 = {
-          match_mac = "1c-83-41-30-e2-23"
-          mtu       = local.default_mtu
+          match_mac = "b0-41-6f-16-a2-dc"
+          # match_mac = "b0-41-6f-16-a2-dd"
+          mtu = local.default_mtu
         }
       }
       vlan_interfaces = {
@@ -76,9 +77,7 @@ locals {
         interface = "phy0"
         image     = local.pxeboot_image_set.latest
         boot_args = [
-          "numa=off",
           "selinux=0",
-          "mitigations=off",
         ]
       }
       kubernetes_node_labels = {
@@ -90,8 +89,9 @@ locals {
       netnum                = 3
       physical_interfaces = {
         phy0 = {
-          match_mac = "1c-83-41-30-bd-6f"
-          mtu       = local.default_mtu
+          match_mac = "b0-41-6f-16-f9-88"
+          # match_mac = "b0-41-6f-16-f9-89"
+          mtu = local.default_mtu
         }
       }
       vlan_interfaces = {
@@ -230,7 +230,6 @@ locals {
         interface = "phy0"
         image     = local.pxeboot_image_set.latest
         boot_args = [
-          "numa=off",
           "selinux=0",
         ]
       }
@@ -318,7 +317,6 @@ locals {
         interface = "phy0"
         image     = local.pxeboot_image_set.latest
         boot_args = [
-          "numa=off",
           "selinux=0",
           ## stub all Nvidia GPUs
           # "vfio-pci.id=10de:ffffffff:ffffffff:ffffffff:00030000:ffff00ff,10de:ffffffff:ffffffff:ffffffff:00040300:ffffffff",
