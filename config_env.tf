@@ -144,7 +144,7 @@ locals {
     vaultwarden             = "docker.io/vaultwarden/server:1.34.1-alpine"
     llama_cpp               = "ghcr.io/ggml-org/llama.cpp:server-cuda"
     nginx                   = "docker.io/nginx:1.27-alpine-slim"
-    s3fs                    = "ghcr.io/randomcoww/s3fs:v20250501.2322"
+    s3fs                    = "ghcr.io/randomcoww/s3fs:v20250601.2322"
   }
 
   pxeboot_images = {
