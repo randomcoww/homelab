@@ -139,7 +139,7 @@ locals {
     audioserve              = "docker.io/izderadicka/audioserve:latest"
     sunshine_desktop        = "ghcr.io/randomcoww/sunshine-desktop:v2025.404.171304.20250404.2119"
     nvidia_driver           = "registry.gitlab.com/container-toolkit-fcos/driver:570.133.20-fedora42"
-    stork_agent             = "ghcr.io/randomcoww/stork-agent:v20250603.1653"
+    stork_agent             = "ghcr.io/randomcoww/stork-agent:v20250603.1911"
     steamcmd                = "ghcr.io/randomcoww/steamcmd:v20250601.2322"
     vaultwarden             = "docker.io/vaultwarden/server:1.34.1-alpine"
     llama_cpp               = "ghcr.io/ggml-org/llama.cpp:server-cuda"
