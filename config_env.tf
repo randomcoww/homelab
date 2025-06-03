@@ -132,7 +132,7 @@ locals {
     tailscale               = "ghcr.io/randomcoww/tailscale-nft:v1.84.0.20250601.2109"
     lldap                   = "ghcr.io/lldap/lldap:2025-05-19-alpine-rootless"
     keydb                   = "docker.io/eqalpha/keydb:alpine_x86_64_v6.3.4"
-    clickhouse              = "docker.io/clickhouse/clickhouse-server:25.5.1.2782-alpine"
+    clickhouse              = "docker.io/clickhouse/clickhouse-server:25.5.2.47-alpine"
     qrcode_generator        = "ghcr.io/randomcoww/qrcode-generator:v0.1.0"
     rclone                  = "docker.io/rclone/rclone:1.69.3"
     mountpoint              = "ghcr.io/randomcoww/mountpoint-s3:v1.18.0.20250601.2309"
