@@ -3,7 +3,7 @@ locals {
   kea_dhcp4_config_template_path = "${local.base_path}/kea-dhcp4.tpl"
   kea_dhcp4_config_path          = "${local.base_path}/kea-dhcp4.conf"
   kea_ctrl_agent_config_path     = "${local.base_path}/kea-ctrl-agent.conf"
-  kea_socket_path                = "/var/tmp/kea/kea-dhcp4-ctrl.sock"
+  kea_socket_path                = "/var/run/kea/kea-dhcp4-ctrl.sock"
   ca_cert_path                   = "${local.base_path}/ca-cert.pem"
   ha_cert_path                   = "${local.base_path}/ha-cert.pem"
   ha_key_path                    = "${local.base_path}/ha-key.pem"
@@ -288,7 +288,7 @@ module "statefulset" {
           <<-EOF
           set -e
 
-          mkdir -p /var/run/kea
+          chmod 750 ${dirname(local.kea_socket_path)}
           cat ${local.kea_dhcp4_config_template_path} | envsubst > ${local.kea_dhcp4_config_path}
           exec kea-dhcp4 -c ${local.kea_dhcp4_config_path}
           EOF
@@ -354,7 +354,7 @@ module "statefulset" {
           <<-EOF
           set -e
 
-          mkdir -p /var/run/kea
+          chmod 750 ${dirname(local.kea_socket_path)}
           exec kea-ctrl-agent -c ${local.kea_ctrl_agent_config_path}
           EOF
         ]
