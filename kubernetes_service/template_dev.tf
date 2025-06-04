@@ -25,14 +25,14 @@ module "code" {
     },
   ]
   extra_envs = [
-    {
-      name  = "NVIDIA_VISIBLE_DEVICES"
-      value = "all"
-    },
-    {
-      name  = "NVIDIA_DRIVER_CAPABILITIES"
-      value = "compute,utility"
-    },
+    # {
+    #   name  = "NVIDIA_VISIBLE_DEVICES"
+    #   value = "all"
+    # },
+    # {
+    #   name  = "NVIDIA_DRIVER_CAPABILITIES"
+    #   value = "compute,utility"
+    # },
     {
       name  = "TZ"
       value = local.timezone

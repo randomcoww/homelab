@@ -9,7 +9,7 @@ locals {
     # module.lldap,
     # module.authelia,
     module.tailscale,
-    # module.hostapd,
+    module.hostapd,
     module.qrcode-hostapd,
     module.alpaca-db,
     module.webdav-pictures,
@@ -18,7 +18,7 @@ locals {
     # module.vaultwarden,
     # module.llama-cpp,
     # module.sunshine-desktop,
-    # module.code,
+    module.code,
     # module.satisfactory-server,
   ]
 }
