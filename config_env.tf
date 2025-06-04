@@ -148,7 +148,7 @@ locals {
   }
 
   pxeboot_images = {
-    latest = "fedora-coreos-42.20250603.19" # randomcoww/fedora-coreos-config-custom
+    latest = "fedora-coreos-42.20250604.00" # randomcoww/fedora-coreos-config-custom
     f41    = "fedora-coreos-41.20250401.04"
   }
 
