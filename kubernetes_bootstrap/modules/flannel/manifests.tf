@@ -149,12 +149,12 @@ module "daemonset" {
         args = [
           "-f",
           "/flannel",
-          "/opt/cni/bin/flannel",
+          var.cni_bin_path,
         ]
         volumeMounts = [
           {
             name      = "cni-plugin"
-            mountPath = "/opt/cni/bin"
+            mountPath = var.cni_bin_path
           },
         ]
       },
@@ -268,7 +268,7 @@ module "daemonset" {
       {
         name = "cni-plugin"
         hostPath = {
-          path = "/opt/cni/bin"
+          path = var.cni_bin_path
         }
       },
       {

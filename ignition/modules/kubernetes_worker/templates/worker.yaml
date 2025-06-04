@@ -11,6 +11,10 @@ systemd:
             [Unit]
             Wants=local-fs.target
             After=local-fs.target
+
+            [Service]
+            ExecStartPre=/usr/bin/mkdir -p \
+              ${cni_bin_path}
     - name: kubelet.service
       enabled: true
       dropins:
@@ -110,7 +114,7 @@ storage:
           big_files_temporary_dir="${container_storage_path}"
 
           [crio.network]
-          plugin_dirs=["/usr/libexec/cni","/opt/cni/bin"]
+          plugin_dirs=["/var/opt/cni/bin","${cni_bin_path}"]
 
           [crio.metrics]
           enable_metrics=false

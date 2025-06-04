@@ -72,6 +72,7 @@ module "kubernetes-worker" {
   cluster_dns_ip            = local.services.cluster_dns.ip
   kubelet_root_path         = local.kubernetes.kubelet_root_path
   static_pod_path           = local.kubernetes.static_pod_manifest_path
+  cni_bin_path              = local.kubernetes.cni_bin_path
   container_storage_path    = "${local.kubernetes.containers_path}/storage"
   graceful_shutdown_delay   = 480
 }

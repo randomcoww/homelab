@@ -148,8 +148,7 @@ locals {
   }
 
   pxeboot_images = {
-    latest = "fedora-coreos-42.20250603.19" # randomcoww/fedora-coreos-config-custom
-    f41    = "fedora-coreos-41.20250401.04"
+    latest = "fedora-coreos-42.20250604.16" # randomcoww/fedora-coreos-config-custom
   }
 
   kubernetes = {
@@ -157,6 +156,7 @@ locals {
     kubelet_root_path         = "/var/lib/kubelet"
     static_pod_manifest_path  = "/var/lib/kubelet/manifests"
     containers_path           = "/var/lib/containers"
+    cni_bin_path              = "/var/lib/cni/bin"
     cni_bridge_interface_name = "cni0"
 
     cert_issuer_prod    = "letsencrypt-prod"
@@ -340,7 +340,7 @@ locals {
   pxeboot_image_set = {
     for type, tag in local.pxeboot_images :
     type => {
-      kernel = "${tag}-live-kernel-x86_64"
+      kernel = "${tag}-live-kernel.x86_64"
       initrd = "${tag}-live-initramfs.x86_64.img"
       rootfs = "${tag}-live-rootfs.x86_64.img"
     }

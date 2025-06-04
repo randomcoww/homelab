@@ -182,7 +182,7 @@ resource "helm_release" "arc-runner-set" {
     "qrcode-generator",
     "code-server",
     "sunshine-desktop",
-    "fedora-coreos-config-custom",
+    "fedora-coreos-config",
     "tailscale-nft",
     "nvidia-driver-container",
     "homelab",

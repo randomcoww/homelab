@@ -3,6 +3,14 @@ variant: fcos
 version: ${butane_version}
 systemd:
   units:
+    - name: podman.service
+      enabled: true
+      dropins:
+        - name: 10-cni-path.conf
+          contents: |
+            [Service]
+            ExecStartPre=/usr/bin/mkdir -p \
+              ${cni_bin_path}
     - name: podman.socket
       enabled: true
 
@@ -13,7 +21,7 @@ storage:
       contents:
         inline: |
           [network]
-          cni_plugin_dirs=["/usr/libexec/cni","/opt/cni/bin"]
+          cni_plugin_dirs=["/var/opt/cni/bin","${cni_bin_path}"]
 
           [engine]
           runtime="crun"

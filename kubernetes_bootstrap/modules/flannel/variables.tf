@@ -35,3 +35,7 @@ variable "cni_version" {
 variable "cni_bridge_interface_name" {
   type = string
 }
+
+variable "cni_bin_path" {
+  type = string
+}

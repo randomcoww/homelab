@@ -52,6 +52,7 @@ module "flannel" {
   kubernetes_pod_prefix     = local.networks.kubernetes_pod.prefix
   cni_bridge_interface_name = local.kubernetes.cni_bridge_interface_name
   cni_version               = "0.3.1"
+  cni_bin_path              = local.kubernetes.cni_bin_path
 }
 
 module "kapprover" {

@@ -73,6 +73,10 @@ variable "container_storage_path" {
   type = string
 }
 
+variable "cni_bin_path" {
+  type = string
+}
+
 variable "graceful_shutdown_delay" {
   type = number
 }
