@@ -340,9 +340,9 @@ locals {
   pxeboot_image_set = {
     for type, tag in local.pxeboot_images :
     type => {
-      kernel = "${tag}-live-kernel.x86_64"
-      initrd = "${tag}-live-initramfs.x86_64.img"
-      rootfs = "${tag}-live-rootfs.x86_64.img"
+      kernel = "${tag}-live-kernel.$${buildarch}"
+      initrd = "${tag}-live-initramfs.$${buildarch}.img"
+      rootfs = "${tag}-live-rootfs.$${buildarch}.img"
     }
   }
 }

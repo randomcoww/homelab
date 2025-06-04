@@ -8,7 +8,7 @@ module "write-local-disk" {
     <<-EOF
     set -ex -o pipefail
 
-    export image_url=$(xargs -n1 -a /proc/cmdline | grep ^coreos.live.rootfs_url= | sed -r 's/coreos.live.rootfs_url=(.*)-rootfs(.*)\.img$/\1\2.iso/')
+    export image_url=$(xargs -n1 -a /proc/cmdline | grep ^coreos.live.rootfs_url= | sed -r 's/coreos.live.rootfs_url=(.*)-rootfs(.*)\.img$/\1-iso\2.iso/')
     export ignition_url=$(xargs -n1 -a /proc/cmdline | grep ^ignition.config.url= | sed 's/ignition.config.url=//')
     export disk=/dev/$(lsblk -ndo pkname /dev/disk/by-label/fedora-coreos-* | head -1)
 
