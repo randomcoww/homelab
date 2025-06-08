@@ -122,6 +122,7 @@ locals {
     kvm_device_plugin       = "ghcr.io/randomcoww/kvm-device-plugin:v20250211.0006"
     kea                     = "ghcr.io/randomcoww/kea:v2.7.9.20250601.2313"
     matchbox                = "quay.io/poseidon/matchbox:v0.11.0"
+    syncthing               = "docker.io/syncthing/syncthing:1.29"
     ipxe                    = "ghcr.io/randomcoww/ipxe:v20250601.2122"
     ipxe_tftp               = "ghcr.io/randomcoww/ipxe:v20250601.2120-tftp"
     hostapd                 = "ghcr.io/randomcoww/hostapd-noscan:v20250406.1002"
