@@ -1,5 +1,38 @@
 ## code-server
 
+locals {
+  code_mc_config_dir = "/var/tmp/minio"
+}
+
+resource "minio_iam_user" "code" {
+  name          = "code"
+  force_destroy = true
+}
+
+resource "minio_iam_policy" "code" {
+  name = "code"
+  policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [
+      {
+        Effect = "Allow"
+        Action = "*"
+        Resource = [
+          minio_s3_bucket.data["boot"].arn,
+          "${minio_s3_bucket.data["boot"].arn}/*",
+          minio_s3_bucket.data["models"].arn,
+          "${minio_s3_bucket.data["models"].arn}/*",
+        ]
+      },
+    ]
+  })
+}
+
+resource "minio_iam_user_policy_attachment" "code" {
+  user_name   = minio_iam_user.code.id
+  policy_name = minio_iam_policy.code.id
+}
+
 module "code" {
   source  = "./modules/code_server"
   name    = "code"
@@ -23,6 +56,24 @@ module "code" {
       bind-key -T copy-mode MouseDragEnd1Pane send-keys -X copy-pipe-and-cancel "xclip -in -sel clip"
       EOF
     },
+    {
+      path = "${local.code_mc_config_dir}/config.json"
+      content = jsonencode({
+        aliases = {
+          m = {
+            url       = "https://${local.kubernetes_services.minio.endpoint}:${local.service_ports.minio}"
+            accessKey = minio_iam_user.code.id
+            secretKey = minio_iam_user.code.secret
+            api       = "S3v4"
+            path      = "auto"
+          }
+        }
+      })
+    },
+    {
+      path    = "${local.code_mc_config_dir}/certs/CAs/ca.crt"
+      content = data.terraform_remote_state.sr.outputs.trust.ca.cert_pem
+    },
   ]
   extra_envs = [
     # {
@@ -33,6 +84,10 @@ module "code" {
     #   name  = "NVIDIA_DRIVER_CAPABILITIES"
     #   value = "compute,utility"
     # },
+    {
+      name  = "MC_CONFIG_DIR"
+      value = local.code_mc_config_dir
+    },
     {
       name  = "TZ"
       value = local.timezone
@@ -46,6 +101,10 @@ module "code" {
     {
       name      = "run-user"
       mountPath = "/run/user/${local.users.client.uid}"
+    },
+    {
+      name      = "mc-config-dir"
+      mountPath = local.code_mc_config_dir
     },
   ]
   extra_volumes = [
