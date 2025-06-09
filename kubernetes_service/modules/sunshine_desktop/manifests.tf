@@ -188,6 +188,10 @@ module "statefulset" {
             mountPath = "/dev/input"
           },
           {
+            name      = "dev-ntsync"
+            mountPath = "/dev/ntsync"
+          },
+          {
             name      = "dev-shm"
             mountPath = "/dev/shm"
           },
@@ -230,6 +234,12 @@ module "statefulset" {
         name = "dev-input"
         hostPath = {
           path = "/dev/input"
+        }
+      },
+      {
+        name = "dev-ntsync"
+        hostPath = {
+          path = "/dev/ntsync"
         }
       },
       {

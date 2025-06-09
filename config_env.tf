@@ -138,7 +138,7 @@ locals {
     rclone                  = "docker.io/rclone/rclone:1.69.3"
     mountpoint              = "ghcr.io/randomcoww/mountpoint-s3:v1.18.0.20250601.2309"
     audioserve              = "docker.io/izderadicka/audioserve:latest"
-    sunshine_desktop        = "ghcr.io/randomcoww/sunshine-desktop:v2025.608.232654.20250609.0301"
+    sunshine_desktop        = "ghcr.io/randomcoww/sunshine-desktop:v2025.609.163957.20250609.2130"
     nvidia_driver           = "registry.gitlab.com/container-toolkit-fcos/driver:570.133.20-fedora42"
     stork_agent             = "ghcr.io/randomcoww/stork-agent:v20250603.1911"
     steamcmd                = "ghcr.io/randomcoww/steamcmd:v20250601.2322"
