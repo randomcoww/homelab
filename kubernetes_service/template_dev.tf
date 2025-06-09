@@ -129,11 +129,11 @@ module "code" {
       }
     },
   ]
-  resources = {
-    limits = {
-      "nvidia.com/gpu" = 1
-    }
-  }
+  # resources = {
+  #   limits = {
+  #     "nvidia.com/gpu" = 1
+  #   }
+  # }
   affinity = {
     nodeAffinity = {
       requiredDuringSchedulingIgnoredDuringExecution = {
