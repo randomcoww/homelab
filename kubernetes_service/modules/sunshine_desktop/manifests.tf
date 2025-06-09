@@ -240,6 +240,7 @@ module "statefulset" {
         name = "dev-ntsync"
         hostPath = {
           path = "/dev/ntsync"
+          type = "CharDevice"
         }
       },
       {

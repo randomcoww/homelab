@@ -3,6 +3,11 @@ variant: fcos
 version: 1.5.0
 storage:
   files:
+    - path: /etc/modules-load.d/20-ntsync.conf
+      mode: 0644
+      contents:
+        inline: |
+          ntsync
     - path: /etc/crio/crio.conf.d/30-nvidia.conf
       mode: 0644
       contents:
