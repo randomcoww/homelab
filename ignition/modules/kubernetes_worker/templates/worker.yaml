@@ -94,12 +94,6 @@ storage:
         inline: |
           [Login]
           InhibitDelayMaxSec=${graceful_shutdown_delay}
-    # kube-proxy
-    - path: /etc/modules-load.d/20-kube-proxy.conf
-      mode: 0644
-      contents:
-        inline: |
-          ip_vs
     - path: /etc/crio/crio.conf.d/20-custom.conf
       mode: 0644
       contents:
