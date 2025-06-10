@@ -18,11 +18,10 @@ module "nvidia-driver" {
     nvidia_driver = local.container_images.nvidia_driver
   }
   extra_envs = [
-    ## unstable
-    # {
-    #   name  = "OPEN_KERNEL_MODULES_ENABLED"
-    #   value = "true"
-    # },
+    {
+      name  = "KERNEL_MODULE_TYPE"
+      value = "open"
+    },
   ]
 }
 
