@@ -110,10 +110,10 @@ locals {
   }
 
   container_images = {
-    kube_apiserver          = "ghcr.io/randomcoww/kubernetes:v1.33.1.20250610.1840"
-    kube_controller_manager = "ghcr.io/randomcoww/kubernetes:v1.33.1.20250610.1840"
-    kube_scheduler          = "ghcr.io/randomcoww/kubernetes:v1.33.1.20250610.1840"
-    kube_proxy              = "ghcr.io/randomcoww/kubernetes:v1.32.3.20250405.0152"
+    kube_apiserver          = "ghcr.io/randomcoww/kubernetes:v1.33.1.20250610.2001"
+    kube_controller_manager = "ghcr.io/randomcoww/kubernetes:v1.33.1.20250610.2001"
+    kube_scheduler          = "ghcr.io/randomcoww/kubernetes:v1.33.1.20250610.2001"
+    kube_proxy              = "ghcr.io/randomcoww/kubernetes:v1.33.1.20250610.2004-kube-proxy"
     etcd_wrapper            = "ghcr.io/randomcoww/etcd-wrapper:v0.4.2"
     etcd                    = "gcr.io/etcd-development/etcd:v3.6.1"
     flannel                 = "docker.io/flannel/flannel:v0.27.0"
@@ -130,7 +130,7 @@ locals {
     external_dns            = "registry.k8s.io/external-dns/external-dns:v0.17.0"
     code_server             = "ghcr.io/randomcoww/code-server:v4.100.3.20250610.1810"
     litestream              = "ghcr.io/randomcoww/litestream:v0.3.13.20250405.0151"
-    tailscale               = "ghcr.io/randomcoww/tailscale-nft:v1.84.0.20250601.2109"
+    tailscale               = "ghcr.io/randomcoww/tailscale-nft:v1.84.2.20250610.2001"
     lldap                   = "ghcr.io/lldap/lldap:2025-05-19-alpine-rootless"
     keydb                   = "docker.io/eqalpha/keydb:alpine_x86_64_v6.3.4"
     clickhouse              = "docker.io/clickhouse/clickhouse-server:25.5.2.47-alpine"
