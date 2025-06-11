@@ -22,8 +22,8 @@ variable "replicas" {
 
 variable "images" {
   type = object({
-    matchbox  = string
-    syncthing = string
+    matchbox   = string
+    mountpoint = string
   })
 }
 
@@ -52,4 +52,25 @@ variable "ca" {
     private_key_pem = string
     cert_pem        = string
   })
+}
+
+variable "s3_endpoint" {
+  type = string
+}
+
+variable "s3_bucket" {
+  type = string
+}
+
+variable "s3_access_key_id" {
+  type = string
+}
+
+variable "s3_secret_access_key" {
+  type = string
+}
+
+variable "s3_mount_extra_args" {
+  type    = list(string)
+  default = []
 }

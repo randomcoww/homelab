@@ -9,7 +9,7 @@ module "metadata" {
   namespace   = var.namespace
   release     = var.release
   app_version = split(":", var.images.matchbox)[1]
-  manifests = merge(module.syncthing.chart.manifests, {
+  manifests = merge(module.mountpoint.chart.manifests, {
     "templates/service.yaml"     = module.service.manifest
     "templates/service-api.yaml" = module.service-api.manifest
     "templates/secret.yaml"      = module.secret.manifest
@@ -70,15 +70,19 @@ module "service-api" {
   }
 }
 
-module "syncthing" {
-  source = "../statefulset_syncthing"
-  ## syncthing config
+module "mountpoint" {
+  source = "../statefulset_mountpoint"
+  ## s3 config
+  s3_endpoint          = var.s3_endpoint
+  s3_bucket            = var.s3_bucket
+  s3_prefix            = ""
+  s3_access_key_id     = var.s3_access_key_id
+  s3_secret_access_key = var.s3_secret_access_key
+  s3_mount_path        = local.data_path
+  s3_mount_extra_args  = var.s3_mount_extra_args
   images = {
-    syncthing = var.images.syncthing
+    mountpoint = var.images.mountpoint
   }
-  sync_data_paths = [
-    local.data_path,
-  ]
   ##
   name     = var.name
   app      = var.name
@@ -93,12 +97,23 @@ module "syncthing" {
       {
         name  = var.name
         image = var.images.matchbox
-        args = [
-          "-address=0.0.0.0:${var.ports.matchbox}",
-          "-rpc-address=0.0.0.0:${var.ports.matchbox_api}",
-          "-assets-path=${local.data_path}",
-          "-data-path=${local.data_path}",
-          "-web-ssl",
+        command = [
+          "sh",
+          "-c",
+          <<-EOF
+          set -e
+
+          until mountpoint ${local.data_path}; do
+          sleep 1
+          done
+
+          exec /matchbox \
+            -address=0.0.0.0:${var.ports.matchbox} \
+            -rpc-address=0.0.0.0:${var.ports.matchbox_api} \
+            -assets-path=${local.data_path} \
+            -data-path=${local.data_path} \
+            -web-ssl
+          EOF
         ]
         # Cert paths are fixed
         volumeMounts = [
