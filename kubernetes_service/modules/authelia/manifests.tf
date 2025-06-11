@@ -40,6 +40,11 @@ module "secret-litestream" {
   }
 }
 
+resource "random_password" "oidc-hmac" {
+  length  = 64
+  special = false
+}
+
 data "helm_template" "authelia" {
   name       = var.name
   namespace  = var.namespace
@@ -155,6 +160,26 @@ data "helm_template" "authelia" {
               minimum_version = "TLS1.3"
             }
           }
+        })
+        identity_providers = merge(lookup(var.configmap, "identity_providers", {}), {
+          oidc = merge(lookup(lookup(var.configmap, "identity_providers", {}), "oidc", {}), {
+            hmac_secret = {
+              value = random_password.oidc-hmac.result
+            }
+            jwks = [
+              {
+                key_id    = var.name
+                algorithm = "RS256"
+                use       = "sig"
+                certificate_chain = {
+                  value = tls_self_signed_cert.oidc-jwk-ca.cert_pem
+                }
+                key = {
+                  value = tls_private_key.oidc-jwk-ca.private_key_pem
+                }
+              },
+            ]
+          })
         })
       })
       secret = var.secret
