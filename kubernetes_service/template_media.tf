@@ -249,8 +249,9 @@ module "sunshine-desktop" {
       value = "all"
     },
     {
-      name  = "NVIDIA_DRIVER_BASE_URL"
-      value = "https://us.download.nvidia.com/tesla"
+      name = "NVIDIA_DRIVER_BASE_URL"
+      # value = "https://us.download.nvidia.com/tesla"
+      value = "https://us.download.nvidia.com/XFree86/Linux-x86_64"
     },
     {
       name  = "TZ"
