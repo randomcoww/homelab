@@ -260,7 +260,7 @@ module "sunshine-desktop" {
     {
       name = "SUNSHINE_EXTRA_ARGS"
       value = join(" ", [
-        "key_rightalt_to_key_win=enabled",
+        "native_pen_touch=disabled",
       ])
     },
   ]
