@@ -11,7 +11,7 @@ resource "helm_release" "arc" {
   namespace        = "arc-systems"
   create_namespace = true
   wait             = false
-  version          = "0.11.0"
+  version          = "0.12.0"
   max_history      = 2
   values = [
     yamlencode({
