@@ -179,6 +179,7 @@ module "hostapd" {
     wmm_enabled                  = 1
     require_ht                   = 1
     require_vht                  = 1
+    skip_inactivity_poll         = 1
     ht_capab = "[${join("][", [
       "HT40-", "HT40+", "SHORT-GI-20", "SHORT-GI-40",
       "LDPC", "TX-STBC", "RX-STBC1", "MAX-AMSDU-7935",
@@ -188,7 +189,7 @@ module "hostapd" {
       "MAX-MPDU-11454", "MAX-A-MPDU-LEN-EXP3",
       "BF-ANTENNA-1", "SOUNDING-DIMENSION-1", "SU-BEAMFORMEE",
       "BF-ANTENNA-2", "SOUNDING-DIMENSION-2", "MU-BEAMFORMEE",
-      "RX-ANTENNA-PATTERN", "TX-ANTENNA-PATTERN",
+      # "RX-ANTENNA-PATTERN", "TX-ANTENNA-PATTERN", # Not supported on RTL8852CE
     ])}]"
   }
 }

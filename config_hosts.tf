@@ -247,7 +247,8 @@ locals {
           mtu       = local.default_mtu
         }
         wlan0 = {
-          match_mac = "10-6f-d9-cf-d5-71"
+          # match_mac = "10-6f-d9-cf-d5-71" # MT7921
+          match_mac = "7c-66-ef-f4-57-a8" # RTL8852CE
         }
       }
       vlan_interfaces = {
