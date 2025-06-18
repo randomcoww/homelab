@@ -69,7 +69,8 @@ module "satisfactory-server" {
   steamapp_id        = 1690800
   storage_class_name = "local-path"
   tcp_ports = {
-    api = 7777
+    api  = 7777
+    api2 = 8888
   }
   udp_ports = {
     game = 7777
@@ -86,7 +87,7 @@ module "satisfactory-server" {
   ]
   resources = {
     requests = {
-      memory = "12Gi"
+      memory = "8Gi"
     }
   }
   healthcheck = {
