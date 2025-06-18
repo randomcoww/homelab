@@ -122,7 +122,6 @@ locals {
     kvm_device_plugin       = "ghcr.io/randomcoww/kvm-device-plugin:v20250610.2025"
     kea                     = "ghcr.io/randomcoww/kea:v2.7.9.20250601.2313"
     matchbox                = "quay.io/poseidon/matchbox:v0.11.0"
-    syncthing               = "docker.io/syncthing/syncthing:1.29"
     ipxe                    = "ghcr.io/randomcoww/ipxe:v20250610.1824"
     ipxe_tftp               = "ghcr.io/randomcoww/ipxe:v20250610.1821-tftp"
     hostapd                 = "ghcr.io/randomcoww/hostapd-noscan:v20250406.1002"
@@ -149,7 +148,7 @@ locals {
   }
 
   pxeboot_images = {
-    latest = "fedora-coreos-42.20250611.01" # randomcoww/fedora-coreos-config-custom
+    latest = "fedora-coreos-42.20250618.18" # randomcoww/fedora-coreos-config-custom
   }
 
   kubernetes = {
