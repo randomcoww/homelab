@@ -154,9 +154,10 @@ module "sunshine-desktop" {
   images = {
     sunshine_desktop = local.container_images.sunshine_desktop
   }
-  user      = local.users.client.name
-  uid       = local.users.client.uid
-  home_path = local.users.client.home_dir
+  user               = local.users.client.name
+  uid                = local.users.client.uid
+  home_path          = local.users.client.home_dir
+  storage_class_name = "local-path"
   extra_configs = [
     {
       path    = "/etc/tmux.conf"
@@ -296,5 +297,5 @@ module "sunshine-desktop" {
   }
   admin_hostname            = local.kubernetes_ingress_endpoints.sunshine_admin
   ingress_class_name        = local.ingress_classes.ingress_nginx
-  nginx_ingress_annotations = local.nginx_ingress_auth_annotations
+  nginx_ingress_annotations = local.nginx_ingress_annotations
 }
