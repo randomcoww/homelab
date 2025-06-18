@@ -41,11 +41,10 @@ module "metadata" {
 }
 
 module "secret" {
-  source    = "../../../modules/secret"
-  name      = var.name
-  namespace = var.namespace
-  app       = var.name
-  release   = var.release
+  source  = "../../../modules/secret"
+  name    = var.name
+  app     = var.name
+  release = var.release
   data = merge({
     basename(local.storage_secret_path) = var.storage_secret
     basename(local.ldaps_cert_path)     = tls_locally_signed_cert.lldap.cert_pem
@@ -57,11 +56,10 @@ module "secret" {
 }
 
 module "service" {
-  source    = "../../../modules/service"
-  name      = var.name
-  namespace = var.namespace
-  app       = var.name
-  release   = var.release
+  source  = "../../../modules/service"
+  name    = var.name
+  app     = var.name
+  release = var.release
   spec = {
     type = "ClusterIP"
     ports = [
@@ -84,7 +82,6 @@ module "service" {
 module "ingress" {
   source             = "../../../modules/ingress"
   name               = var.name
-  namespace          = var.namespace
   app                = var.name
   release            = var.release
   ingress_class_name = var.ingress_class_name

@@ -25,113 +25,113 @@ locals {
 
 # nginx ingress #
 
-resource "helm_release" "ingress-nginx" {
-  for_each = local.ingress_classes
+# resource "helm_release" "ingress-nginx" {
+#   for_each = local.ingress_classes
 
-  name             = each.value
-  repository       = "https://kubernetes.github.io/ingress-nginx"
-  chart            = "ingress-nginx"
-  namespace        = local.kubernetes_services[each.key].namespace
-  create_namespace = true
-  wait             = false
-  version          = "4.12.3"
-  max_history      = 2
-  values = [
-    yamlencode({
-      controller = {
-        kind = "DaemonSet"
-        image = {
-          digest       = ""
-          digestChroot = ""
-        }
-        admissionWebhooks = {
-          patch = {
-            image = {
-              digest = ""
-            }
-          }
-        }
-        ingressClassResource = {
-          enabled         = true
-          name            = each.value
-          controllerValue = "k8s.io/${each.value}"
-        }
-        ingressClass = each.value
-        service = {
-          type              = "LoadBalancer"
-          loadBalancerIP    = "0.0.0.0"
-          loadBalancerClass = "kube-vip.io/kube-vip-class"
-        }
-        allowSnippetAnnotations = true
-        config = {
-          # 4.12.0 annotations issue:
-          # https://github.com/kubernetes/ingress-nginx/issues/12618
-          annotations-risk-level  = "Critical"
-          ignore-invalid-headers  = "off"
-          proxy-body-size         = 0
-          proxy-buffering         = "off"
-          proxy-request-buffering = "off"
-          ssl-redirect            = "true"
-          use-forwarded-headers   = "true"
-          keep-alive              = "false"
-        }
-        controller = {
-          dnsConfig = {
-            options = [
-              {
-                name  = "ndots"
-                value = "2"
-              },
-            ]
-          }
-        }
-      }
-    }),
-  ]
-}
+#   name             = each.value
+#   repository       = "https://kubernetes.github.io/ingress-nginx"
+#   chart            = "ingress-nginx"
+#   namespace        = local.kubernetes_services[each.key].namespace
+#   create_namespace = true
+#   wait             = false
+#   version          = "4.12.3"
+#   max_history      = 2
+#   values = [
+#     yamlencode({
+#       controller = {
+#         kind = "DaemonSet"
+#         image = {
+#           digest       = ""
+#           digestChroot = ""
+#         }
+#         admissionWebhooks = {
+#           patch = {
+#             image = {
+#               digest = ""
+#             }
+#           }
+#         }
+#         ingressClassResource = {
+#           enabled         = true
+#           name            = each.value
+#           controllerValue = "k8s.io/${each.value}"
+#         }
+#         ingressClass = each.value
+#         service = {
+#           type              = "LoadBalancer"
+#           loadBalancerIP    = "0.0.0.0"
+#           loadBalancerClass = "kube-vip.io/kube-vip-class"
+#         }
+#         allowSnippetAnnotations = true
+#         config = {
+#           # 4.12.0 annotations issue:
+#           # https://github.com/kubernetes/ingress-nginx/issues/12618
+#           annotations-risk-level  = "Critical"
+#           ignore-invalid-headers  = "off"
+#           proxy-body-size         = 0
+#           proxy-buffering         = "off"
+#           proxy-request-buffering = "off"
+#           ssl-redirect            = "true"
+#           use-forwarded-headers   = "true"
+#           keep-alive              = "false"
+#         }
+#         controller = {
+#           dnsConfig = {
+#             options = [
+#               {
+#                 name  = "ndots"
+#                 value = "2"
+#               },
+#             ]
+#           }
+#         }
+#       }
+#     }),
+#   ]
+# }
 
-# nvidia device plugin #
+# # nvidia device plugin #
 
-resource "helm_release" "nvidia-device-plugin" {
-  name        = "nvidia-device-plugin"
-  repository  = "https://nvidia.github.io/k8s-device-plugin"
-  chart       = "nvidia-device-plugin"
-  namespace   = "kube-system"
-  wait        = false
-  version     = "0.17.1"
-  max_history = 2
-  values = [
-    yamlencode({
-      compatWithCPUManager = true
-      priorityClassName    = "system-node-critical"
-      nvidiaDriverRoot     = "/run/nvidia/driver"
-      cdi = {
-        nvidiaHookPath = "/usr/bin/nvidia-ctk"
-      }
-      gfd = {
-        enabled = true
-      }
-      config = {
-        # map = {
-        #   default = yamlencode({
-        #     version = "v1"
-        #     sharing = {
-        #       mps = {
-        #         renameByDefault = true
-        #         resources = [
-        #           {
-        #             name     = "nvidia.com/gpu"
-        #             replicas = 2
-        #           },
-        #         ]
-        #       }
-        #     }
-        #   })
-        # }
-      }
-    }),
-  ]
-}
+# resource "helm_release" "nvidia-device-plugin" {
+#   name        = "nvidia-device-plugin"
+#   repository  = "https://nvidia.github.io/k8s-device-plugin"
+#   chart       = "nvidia-device-plugin"
+#   namespace   = "kube-system"
+#   wait        = false
+#   version     = "0.17.1"
+#   max_history = 2
+#   values = [
+#     yamlencode({
+#       compatWithCPUManager = true
+#       priorityClassName    = "system-node-critical"
+#       nvidiaDriverRoot     = "/run/nvidia/driver"
+#       cdi = {
+#         nvidiaHookPath = "/usr/bin/nvidia-ctk"
+#       }
+#       gfd = {
+#         enabled = true
+#       }
+#       config = {
+#         # map = {
+#         #   default = yamlencode({
+#         #     version = "v1"
+#         #     sharing = {
+#         #       mps = {
+#         #         renameByDefault = true
+#         #         resources = [
+#         #           {
+#         #             name     = "nvidia.com/gpu"
+#         #             replicas = 2
+#         #           },
+#         #         ]
+#         #       }
+#         #     }
+#         #   })
+#         # }
+#       }
+#     }),
+#   ]
+# }
 
 # cloudflare tunnel #
 /*
@@ -163,36 +163,36 @@ resource "helm_release" "cloudflare-tunnel" {
 */
 # kured #
 
-resource "helm_release" "kured" {
-  name             = "kured"
-  namespace        = "monitoring"
-  create_namespace = true
-  repository       = "https://kubereboot.github.io/charts"
-  chart            = "kured"
-  wait             = false
-  version          = "5.6.1"
-  max_history      = 2
-  values = [
-    yamlencode({
-      configuration = {
-        # promethues chart creates service name <name>-server
-        prometheusUrl = "http://${local.kubernetes_services.prometheus.name}-server.${local.kubernetes_services.prometheus.namespace}:${local.service_ports.prometheus}"
-        period        = "2m"
-        metricsPort   = local.service_ports.metrics
-        forceReboot   = true
-        drainTimeout  = "6m"
-      }
-      podAnnotations = {
-        "prometheus.io/scrape" = "true"
-        "prometheus.io/port"   = tostring(local.service_ports.metrics)
-      }
-      priorityClassName = "system-node-critical"
-      service = {
-        create = false
-      }
-    })
-  ]
-}
+# resource "helm_release" "kured" {
+#   name             = "kured"
+#   namespace        = "monitoring"
+#   create_namespace = true
+#   repository       = "https://kubereboot.github.io/charts"
+#   chart            = "kured"
+#   wait             = false
+#   version          = "5.6.1"
+#   max_history      = 2
+#   values = [
+#     yamlencode({
+#       configuration = {
+#         # promethues chart creates service name <name>-server
+#         prometheusUrl = "http://${local.kubernetes_services.prometheus.name}-server.${local.kubernetes_services.prometheus.namespace}:${local.service_ports.prometheus}"
+#         period        = "2m"
+#         metricsPort   = local.service_ports.metrics
+#         forceReboot   = true
+#         drainTimeout  = "6m"
+#       }
+#       podAnnotations = {
+#         "prometheus.io/scrape" = "true"
+#         "prometheus.io/port"   = tostring(local.service_ports.metrics)
+#       }
+#       priorityClassName = "system-node-critical"
+#       service = {
+#         create = false
+#       }
+#     })
+#   ]
+# }
 
 # all modules
 

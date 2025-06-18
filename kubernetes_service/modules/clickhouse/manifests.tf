@@ -215,11 +215,10 @@ module "metadata" {
 }
 
 module "secret" {
-  source    = "../../../modules/secret"
-  name      = var.name
-  namespace = var.namespace
-  app       = var.name
-  release   = var.release
+  source  = "../../../modules/secret"
+  name    = var.name
+  app     = var.name
+  release = var.release
   data = merge({
     basename(local.ca_cert_path) = chomp(var.ca.cert_pem)
     basename(local.users_path)   = yamlencode(var.extra_users_config)
@@ -244,11 +243,10 @@ module "secret" {
 }
 
 module "service" {
-  source    = "../../../modules/service"
-  name      = var.name
-  namespace = var.namespace
-  app       = var.name
-  release   = var.release
+  source  = "../../../modules/service"
+  name    = var.name
+  app     = var.name
+  release = var.release
   annotations = {
     "prometheus.io/scrape" = "true"
     "prometheus.io/port"   = tostring(local.ports.metrics)
@@ -287,11 +285,10 @@ module "service" {
 }
 
 module "service-peer" {
-  source    = "../../../modules/service"
-  name      = local.peer_name
-  namespace = var.namespace
-  app       = var.name
-  release   = var.release
+  source  = "../../../modules/service"
+  name    = local.peer_name
+  app     = var.name
+  release = var.release
   spec = {
     type                     = "ClusterIP"
     clusterIP                = "None"

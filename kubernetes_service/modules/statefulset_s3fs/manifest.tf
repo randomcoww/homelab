@@ -10,11 +10,10 @@ module "metadata" {
 }
 
 module "secret" {
-  source    = "../../../modules/secret"
-  name      = "${var.name}-s3fs-mount"
-  namespace = var.namespace
-  app       = var.app
-  release   = var.release
+  source  = "../../../modules/secret"
+  name    = "${var.name}-s3fs-mount"
+  app     = var.app
+  release = var.release
   data = {
     AWS_ACCESS_KEY_ID     = var.s3_access_key_id
     AWS_SECRET_ACCESS_KEY = var.s3_secret_access_key
@@ -22,12 +21,11 @@ module "secret" {
 }
 
 module "statefulset" {
-  source    = "../../../modules/statefulset"
-  name      = var.name
-  namespace = var.namespace
-  app       = var.app
-  release   = var.release
-  replicas  = var.replicas
+  source   = "../../../modules/statefulset"
+  name     = var.name
+  app      = var.app
+  release  = var.release
+  replicas = var.replicas
   annotations = merge({
     "checksum/${module.secret.name}" = sha256(module.secret.manifest)
   }, var.annotations)

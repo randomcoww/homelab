@@ -4,25 +4,6 @@ locals {
   github_arc_mc_config_dir = "/var/tmp/minio"
 }
 
-resource "helm_release" "arc" {
-  name             = "arc"
-  repository       = "oci://ghcr.io/actions/actions-runner-controller-charts"
-  chart            = "gha-runner-scale-set-controller"
-  namespace        = "arc-systems"
-  create_namespace = true
-  wait             = false
-  version          = "0.12.0"
-  max_history      = 2
-  values = [
-    yamlencode({
-      serviceAccount = {
-        create = true
-        name   = "gha-runner-scale-set-controller"
-      }
-    }),
-  ]
-}
-
 resource "minio_iam_user" "arc" {
   name          = "arc"
   force_destroy = true
@@ -50,16 +31,37 @@ resource "minio_iam_user_policy_attachment" "arc" {
   policy_name = minio_iam_policy.arc.id
 }
 
+resource "helm_release" "arc" {
+  name             = "arc"
+  repository       = "oci://ghcr.io/actions/actions-runner-controller-charts"
+  chart            = "gha-runner-scale-set-controller"
+  namespace        = "arc-systems"
+  create_namespace = true
+  wait             = true
+  wait_for_jobs    = true
+  version          = "0.12.0"
+  max_history      = 2
+  values = [
+    yamlencode({
+      serviceAccount = {
+        create = true
+        name   = "gha-runner-scale-set-controller"
+      }
+    }),
+  ]
+}
+
 # ADR
 # https://github.com/actions/actions-runner-controller/discussions/3152
 # SETFCAP needed in runner workflow pod to build code-server and sunshine-desktop images
 
 resource "helm_release" "arc-runner-hook-template" {
-  name        = "arc-runner-hook-template"
-  chart       = "../helm-wrapper"
-  namespace   = "arc-runners"
-  wait        = false
-  max_history = 2
+  name          = "arc-runner-hook-template"
+  chart         = "../helm-wrapper"
+  namespace     = "arc-runners"
+  wait          = true
+  wait_for_jobs = true
+  max_history   = 2
   values = [
     yamlencode({
       manifests = [
@@ -263,12 +265,12 @@ resource "helm_release" "arc-runner-set" {
   ]
   depends_on = [
     helm_release.arc,
-    # helm_release.arc-runner-hook-template,
+    helm_release.arc-runner-hook-template,
   ]
   lifecycle {
     replace_triggered_by = [
       helm_release.arc,
-      # helm_release.arc-runner-hook-template,
+      helm_release.arc-runner-hook-template,
     ]
   }
 }

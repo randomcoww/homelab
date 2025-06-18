@@ -3,8 +3,7 @@ output "manifest" {
     apiVersion = "apps/v1"
     kind       = "DaemonSet"
     metadata = {
-      name      = var.name
-      namespace = var.namespace
+      name = var.name
       labels = {
         app     = var.app
         release = var.release

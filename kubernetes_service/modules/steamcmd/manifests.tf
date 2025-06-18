@@ -19,11 +19,10 @@ module "metadata" {
 }
 
 module "secret" {
-  source    = "../../../modules/secret"
-  name      = var.name
-  namespace = var.namespace
-  app       = var.name
-  release   = var.release
+  source  = "../../../modules/secret"
+  name    = var.name
+  app     = var.name
+  release = var.release
   data = {
     for i, config in var.extra_configs :
     "${i}-${basename(config.path)}" => config.content
@@ -31,11 +30,10 @@ module "secret" {
 }
 
 module "service" {
-  source    = "../../../modules/service"
-  name      = var.name
-  namespace = var.namespace
-  app       = var.name
-  release   = var.release
+  source  = "../../../modules/service"
+  name    = var.name
+  app     = var.name
+  release = var.release
   spec = {
     type              = "LoadBalancer"
     loadBalancerIP    = "0.0.0.0"

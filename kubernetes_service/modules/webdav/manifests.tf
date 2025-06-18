@@ -18,11 +18,10 @@ module "metadata" {
 }
 
 module "secret" {
-  source    = "../../../modules/secret"
-  name      = var.name
-  namespace = var.namespace
-  app       = var.name
-  release   = var.release
+  source  = "../../../modules/secret"
+  name    = var.name
+  app     = var.name
+  release = var.release
   data = {
     RCLONE_S3_ACCESS_KEY_ID      = var.minio_access_key_id
     RCLONE_S3_SECRET_ACCESS_KEY  = var.minio_secret_access_key
@@ -31,11 +30,10 @@ module "secret" {
 }
 
 module "service" {
-  source    = "../../../modules/service"
-  name      = var.name
-  namespace = var.namespace
-  app       = var.name
-  release   = var.release
+  source  = "../../../modules/service"
+  name    = var.name
+  app     = var.name
+  release = var.release
   spec = {
     type = "ClusterIP"
     ports = [
@@ -52,7 +50,6 @@ module "service" {
 module "ingress" {
   source             = "../../../modules/ingress"
   name               = var.name
-  namespace          = var.namespace
   app                = var.name
   release            = var.release
   ingress_class_name = var.ingress_class_name
@@ -72,13 +69,12 @@ module "ingress" {
 }
 
 module "deployment" {
-  source    = "../../../modules/deployment"
-  name      = var.name
-  namespace = var.namespace
-  app       = var.name
-  release   = var.release
-  affinity  = var.affinity
-  replicas  = var.replicas
+  source   = "../../../modules/deployment"
+  name     = var.name
+  app      = var.name
+  release  = var.release
+  affinity = var.affinity
+  replicas = var.replicas
   annotations = {
     "checksum/secret" = sha256(module.secret.manifest)
   }

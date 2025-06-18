@@ -1,5 +1,5 @@
 provider "helm" {
-  kubernetes = {
+  kubernetes {
     host                   = "https://${local.services.apiserver.ip}:${local.host_ports.apiserver}"
     client_certificate     = data.terraform_remote_state.client.outputs.kubernetes_admin.cert_pem
     client_key             = data.terraform_remote_state.client.outputs.kubernetes_admin.private_key_pem

@@ -57,11 +57,10 @@ module "metadata" {
 }
 
 module "secret" {
-  source    = "../../../modules/secret"
-  name      = var.name
-  namespace = var.namespace
-  app       = var.name
-  release   = var.release
+  source  = "../../../modules/secret"
+  name    = var.name
+  app     = var.name
+  release = var.release
   data = {
     for i, config in local.peer_configs :
     "${var.name}-${var.name}-${i}" => join("\n", flatten([
@@ -75,13 +74,12 @@ module "secret" {
 }
 
 module "statefulset" {
-  source    = "../../../modules/statefulset"
-  name      = var.name
-  namespace = var.namespace
-  app       = var.name
-  release   = var.release
-  affinity  = var.affinity
-  replicas  = var.replicas
+  source   = "../../../modules/statefulset"
+  name     = var.name
+  app      = var.name
+  release  = var.release
+  affinity = var.affinity
+  replicas = var.replicas
   annotations = {
     "checksum/secret" = sha256(module.secret.manifest)
   }

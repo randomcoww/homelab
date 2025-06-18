@@ -213,11 +213,10 @@ module "qrcode-hostapd" {
 # Tailscale remote access
 
 module "tailscale" {
-  source    = "./modules/tailscale"
-  name      = "tailscale"
-  namespace = "tailscale"
-  release   = "0.1.1"
-  replicas  = 2
+  source   = "./modules/tailscale"
+  name     = "tailscale"
+  release  = "0.1.1"
+  replicas = 2
   images = {
     tailscale = local.container_images.tailscale
   }

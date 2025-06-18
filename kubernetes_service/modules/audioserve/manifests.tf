@@ -16,11 +16,10 @@ module "metadata" {
 }
 
 module "service" {
-  source    = "../../../modules/service"
-  name      = var.name
-  namespace = var.namespace
-  app       = var.name
-  release   = var.release
+  source  = "../../../modules/service"
+  name    = var.name
+  app     = var.name
+  release = var.release
   spec = {
     type = "ClusterIP"
     ports = [
@@ -37,7 +36,6 @@ module "service" {
 module "ingress" {
   source             = "../../../modules/ingress"
   name               = var.name
-  namespace          = var.namespace
   app                = var.name
   release            = var.release
   ingress_class_name = var.ingress_class_name

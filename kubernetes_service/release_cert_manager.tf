@@ -1,5 +1,25 @@
 # cert-manager #
 
+module "cert-manager-cloudflare-secret" {
+  source  = "../modules/secret"
+  name    = "cloudflare-token"
+  app     = "cert-issuer"
+  release = "0.1.0"
+  data = merge({
+    token = data.terraform_remote_state.sr.outputs.cloudflare_dns_api_token
+  })
+}
+
+module "cert-manager-issuer-prod-secret" {
+  source  = "../modules/secret"
+  name    = local.kubernetes.cert_issuer_prod
+  app     = "cert-issuer"
+  release = "0.1.0"
+  data = merge({
+    "tls.key" = chomp(data.terraform_remote_state.sr.outputs.letsencrypt.private_key_pem)
+  })
+}
+
 resource "helm_release" "cert-manager" {
   name             = "cert-manager"
   repository       = "https://charts.jetstack.io"
@@ -33,26 +53,6 @@ resource "helm_release" "cert-manager" {
       }
     }),
   ]
-}
-
-module "cert-manager-cloudflare-secret" {
-  source  = "../modules/secret"
-  name    = "cloudflare-token"
-  app     = "cert-issuer"
-  release = "0.1.0"
-  data = merge({
-    token = data.terraform_remote_state.sr.outputs.cloudflare_dns_api_token
-  })
-}
-
-module "cert-manager-issuer-prod-secret" {
-  source  = "../modules/secret"
-  name    = local.kubernetes.cert_issuer_prod
-  app     = "cert-issuer"
-  release = "0.1.0"
-  data = merge({
-    "tls.key" = chomp(data.terraform_remote_state.sr.outputs.letsencrypt.private_key_pem)
-  })
 }
 
 module "cert-manager-issuer-staging-secret" {

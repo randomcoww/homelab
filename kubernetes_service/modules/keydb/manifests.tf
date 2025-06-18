@@ -31,11 +31,10 @@ module "metadata" {
 }
 
 module "secret" {
-  source    = "../../../modules/secret"
-  name      = var.name
-  namespace = var.namespace
-  app       = var.name
-  release   = var.release
+  source  = "../../../modules/secret"
+  name    = var.name
+  app     = var.name
+  release = var.release
   data = {
     basename(local.cert_path)        = chomp(tls_locally_signed_cert.keydb.cert_pem)
     basename(local.key_path)         = chomp(tls_private_key.keydb.private_key_pem)
@@ -46,11 +45,10 @@ module "secret" {
 }
 
 module "configmap" {
-  source    = "../../../modules/configmap"
-  name      = var.name
-  namespace = var.namespace
-  app       = var.name
-  release   = var.release
+  source  = "../../../modules/configmap"
+  name    = var.name
+  app     = var.name
+  release = var.release
   data = {
     for hostname, _ in local.peers :
     "${basename(local.config_path)}-${hostname}" => <<-EOF
@@ -80,11 +78,10 @@ module "configmap" {
 }
 
 module "service" {
-  source    = "../../../modules/service"
-  name      = var.name
-  namespace = var.namespace
-  app       = var.name
-  release   = var.release
+  source  = "../../../modules/service"
+  name    = var.name
+  app     = var.name
+  release = var.release
   spec = {
     type = "ClusterIP"
     ports = [
@@ -99,11 +96,10 @@ module "service" {
 }
 
 module "service-peer" {
-  source    = "../../../modules/service"
-  name      = local.peer_name
-  namespace = var.namespace
-  app       = var.name
-  release   = var.release
+  source  = "../../../modules/service"
+  name    = local.peer_name
+  app     = var.name
+  release = var.release
   spec = {
     type                     = "ClusterIP"
     clusterIP                = "None"
@@ -120,13 +116,12 @@ module "service-peer" {
 }
 
 module "statefulset" {
-  source    = "../../../modules/statefulset"
-  name      = var.name
-  namespace = var.namespace
-  app       = var.name
-  release   = var.release
-  replicas  = var.replicas
-  affinity  = var.affinity
+  source   = "../../../modules/statefulset"
+  name     = var.name
+  app      = var.name
+  release  = var.release
+  replicas = var.replicas
+  affinity = var.affinity
   annotations = {
     "checksum/secret"    = sha256(module.secret.manifest)
     "checksum/configmap" = sha256(module.configmap.manifest)

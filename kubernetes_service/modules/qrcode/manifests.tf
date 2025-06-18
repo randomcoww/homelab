@@ -4,11 +4,10 @@ locals {
 }
 
 module "secret" {
-  source    = "../../../modules/secret"
-  name      = var.name
-  namespace = var.namespace
-  app       = var.name
-  release   = var.release
+  source  = "../../../modules/secret"
+  name    = var.name
+  app     = var.name
+  release = var.release
   data = {
     basename(local.index_path) = <<-EOF
     <!DOCTYPE html>
@@ -80,11 +79,10 @@ module "metadata" {
 }
 
 module "service" {
-  source    = "../../../modules/service"
-  name      = var.name
-  namespace = var.namespace
-  app       = var.name
-  release   = var.release
+  source  = "../../../modules/service"
+  name    = var.name
+  app     = var.name
+  release = var.release
   spec = {
     type = "ClusterIP"
     ports = [
@@ -101,7 +99,6 @@ module "service" {
 module "ingress" {
   source             = "../../../modules/ingress"
   name               = var.name
-  namespace          = var.namespace
   app                = var.name
   release            = var.release
   ingress_class_name = var.ingress_class_name
@@ -121,13 +118,12 @@ module "ingress" {
 }
 
 module "deployment" {
-  source    = "../../../modules/deployment"
-  name      = var.name
-  namespace = var.namespace
-  app       = var.name
-  release   = var.release
-  affinity  = var.affinity
-  replicas  = var.replicas
+  source   = "../../../modules/deployment"
+  name     = var.name
+  app      = var.name
+  release  = var.release
+  affinity = var.affinity
+  replicas = var.replicas
   annotations = {
     "checksum/secret" = sha256(module.secret.manifest)
   }

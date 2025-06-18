@@ -17,11 +17,10 @@ module "metadata" {
 }
 
 module "secret" {
-  source    = "../../../modules/secret"
-  name      = var.name
-  namespace = var.namespace
-  app       = var.name
-  release   = var.release
+  source  = "../../../modules/secret"
+  name    = var.name
+  app     = var.name
+  release = var.release
   data = {
     ca       = chomp(var.ca.cert_pem)
     api_cert = chomp(tls_locally_signed_cert.matchbox.cert_pem)
