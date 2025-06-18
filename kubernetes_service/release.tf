@@ -11,7 +11,7 @@ locals {
     module.tailscale,
     module.hostapd,
     module.qrcode-hostapd,
-    module.alpaca-db,
+    # module.alpaca-db,
     module.webdav-pictures,
     module.webdav-videos,
     module.audioserve,

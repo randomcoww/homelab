@@ -53,6 +53,7 @@ resource "minio_iam_user_policy_attachment" "arc" {
 # ADR
 # https://github.com/actions/actions-runner-controller/discussions/3152
 # SETFCAP needed in runner workflow pod to build code-server and sunshine-desktop images
+
 resource "helm_release" "arc-runner-hook-template" {
   name        = "arc-runner-hook-template"
   chart       = "../helm-wrapper"
@@ -259,4 +260,12 @@ resource "helm_release" "arc-runner-set" {
       }
     }),
   ]
+  depends_on = [
+    helm_release.arc,
+  ]
+  lifecycle {
+    replace_triggered_by = [
+      helm_release.arc,
+    ]
+  }
 }
