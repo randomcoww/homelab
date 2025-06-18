@@ -3,9 +3,10 @@ locals {
 }
 
 module "metadata" {
-  source  = "../../../modules/metadata"
-  name    = var.name
-  release = var.release
+  source    = "../../../modules/metadata"
+  name      = var.name
+  namespace = var.namespace
+  release   = var.release
   manifests = {
     "templates/statefulset.yaml"       = module.statefulset.manifest
     "templates/secret-litestream.yaml" = module.secret.manifest
@@ -13,21 +14,23 @@ module "metadata" {
 }
 
 module "secret" {
-  source  = "../../../modules/secret"
-  name    = "${var.name}-litestream"
-  app     = var.app
-  release = var.release
+  source    = "../../../modules/secret"
+  name      = "${var.name}-litestream"
+  namespace = var.namespace
+  app       = var.app
+  release   = var.release
   data = {
     basename(local.config_path) = yamlencode(var.litestream_config)
   }
 }
 
 module "statefulset" {
-  source   = "../../../modules/statefulset"
-  name     = var.name
-  app      = var.app
-  release  = var.release
-  replicas = var.replicas
+  source    = "../../../modules/statefulset"
+  name      = var.name
+  namespace = var.namespace
+  app       = var.app
+  release   = var.release
+  replicas  = var.replicas
   annotations = merge({
     "checksum/${module.secret.name}" = sha256(module.secret.manifest)
   }, var.annotations)

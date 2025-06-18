@@ -3,7 +3,8 @@ output "manifest" {
     apiVersion = "apps/v1"
     kind       = "Deployment"
     metadata = {
-      name = var.name
+      name      = var.name
+      namespace = var.namespace
       labels = {
         app     = var.app
         release = var.release

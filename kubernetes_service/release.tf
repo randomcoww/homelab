@@ -182,14 +182,13 @@ resource "helm_release" "kured" {
         forceReboot   = true
         drainTimeout  = "6m"
       }
+      podAnnotations = {
+        "prometheus.io/scrape" = "true"
+        "prometheus.io/port"   = tostring(local.service_ports.metrics)
+      }
       priorityClassName = "system-node-critical"
       service = {
-        create = true
-        port   = local.service_ports.metrics
-        annotations = {
-          "prometheus.io/scrape" = "true"
-          "prometheus.io/port"   = tostring(local.service_ports.metrics)
-        }
+        create = false
       }
     })
   ]

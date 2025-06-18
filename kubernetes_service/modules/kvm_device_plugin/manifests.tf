@@ -10,10 +10,11 @@ module "metadata" {
 }
 
 module "daemonset" {
-  source  = "../../../modules/daemonset"
-  name    = var.name
-  app     = var.name
-  release = var.release
+  source    = "../../../modules/daemonset"
+  name      = var.name
+  namespace = var.namespace
+  app       = var.name
+  release   = var.release
   template_spec = {
     hostNetwork       = true
     priorityClassName = "system-node-critical"

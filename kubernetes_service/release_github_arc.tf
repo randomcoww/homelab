@@ -67,7 +67,8 @@ resource "helm_release" "arc-runner-hook-template" {
           apiVersion = "v1"
           kind       = "Secret"
           metadata = {
-            name = "workflow-template"
+            name      = "workflow-template"
+            namespace = "arc-runners" # namespace is not assigned correctly since provider 3.0.0
           }
           stringData = {
             AWS_ENDPOINT_URL_S3   = "https://${data.terraform_remote_state.sr.outputs.backend_bucket.url}"
@@ -262,10 +263,12 @@ resource "helm_release" "arc-runner-set" {
   ]
   depends_on = [
     helm_release.arc,
+    # helm_release.arc-runner-hook-template,
   ]
   lifecycle {
     replace_triggered_by = [
       helm_release.arc,
+      # helm_release.arc-runner-hook-template,
     ]
   }
 }

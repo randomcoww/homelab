@@ -203,10 +203,11 @@ module "metadata" {
 }
 
 module "secret" {
-  source  = "../../../modules/secret"
-  name    = var.name
-  app     = var.name
-  release = var.release
+  source    = "../../../modules/secret"
+  name      = var.name
+  namespace = var.namespace
+  app       = var.name
+  release   = var.release
   data = merge({
     for host, config in local.dhcp4_config :
     "kea-dhcp4-${host}" => jsonencode(config)
@@ -236,10 +237,11 @@ module "service-peer" {
     member.name => member.ip
   }
 
-  source  = "../../../modules/service"
-  name    = each.key
-  app     = var.name
-  release = var.release
+  source    = "../../../modules/service"
+  name      = each.key
+  namespace = var.namespace
+  app       = var.name
+  release   = var.release
   spec = {
     type      = "ClusterIP"
     clusterIP = each.value
@@ -259,12 +261,13 @@ module "service-peer" {
 }
 
 module "statefulset" {
-  source   = "../../../modules/statefulset"
-  name     = var.name
-  app      = var.name
-  release  = var.release
-  affinity = var.affinity
-  replicas = length(local.dhcp4_config)
+  source    = "../../../modules/statefulset"
+  name      = var.name
+  namespace = var.namespace
+  app       = var.name
+  release   = var.release
+  affinity  = var.affinity
+  replicas  = length(local.dhcp4_config)
   annotations = {
     "checksum/secret"      = sha256(module.secret.manifest)
     "prometheus.io/scrape" = "true"

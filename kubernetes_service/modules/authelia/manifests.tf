@@ -1,8 +1,9 @@
 module "secret" {
-  source  = "../../../modules/secret"
-  name    = "${var.name}-custom"
-  app     = var.name
-  release = var.helm_template.version
+  source    = "../../../modules/secret"
+  name      = "${var.name}-custom"
+  namespace = var.namespace
+  app       = var.name
+  release   = var.helm_template.version
   data = {
     basename(local.ldap_client_cert_path)  = tls_locally_signed_cert.lldap-client.cert_pem
     basename(local.ldap_client_key_path)   = tls_private_key.lldap-client.private_key_pem
@@ -12,10 +13,11 @@ module "secret" {
 }
 
 module "secret-litestream" {
-  source  = "../../../modules/secret"
-  name    = "${var.name}-litestream"
-  app     = var.name
-  release = var.helm_template.version
+  source    = "../../../modules/secret"
+  name      = "${var.name}-litestream"
+  namespace = var.namespace
+  app       = var.name
+  release   = var.helm_template.version
   data = {
     basename(local.litestream_config_path) = yamlencode({
       dbs = [

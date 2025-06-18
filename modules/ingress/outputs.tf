@@ -3,7 +3,8 @@ output "manifest" {
     apiVersion = "networking.k8s.io/v1"
     kind       = "Ingress"
     metadata = {
-      name = var.name
+      name      = var.name
+      namespace = var.namespace
       labels = {
         app     = var.app
         release = var.release

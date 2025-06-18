@@ -99,10 +99,11 @@ module "syncthing-config" {
 }
 
 module "secret" {
-  source  = "../../../modules/secret"
-  name    = local.sync_name
-  app     = var.app
-  release = var.release
+  source    = "../../../modules/secret"
+  name      = local.sync_name
+  namespace = var.namespace
+  app       = var.app
+  release   = var.release
   data = merge({
     "config.xml" = module.syncthing-config.config
     }, {
@@ -115,10 +116,11 @@ module "secret" {
 }
 
 module "service" {
-  source  = "../../../modules/service"
-  name    = local.sync_name
-  app     = var.app
-  release = var.release
+  source    = "../../../modules/service"
+  name      = local.sync_name
+  namespace = var.namespace
+  app       = var.app
+  release   = var.release
   spec = {
     type      = "ClusterIP"
     clusterIP = "None"
@@ -136,6 +138,7 @@ module "service" {
 module "statefulset-syncthing" {
   source      = "../../../modules/statefulset"
   name        = local.sync_name
+  namespace   = var.namespace
   app         = var.app
   release     = var.release
   replicas    = var.sync_replicas
@@ -183,6 +186,7 @@ module "statefulset-syncthing" {
 module "statefulset" {
   source      = "../../../modules/statefulset"
   name        = var.name
+  namespace   = var.namespace
   app         = var.app
   release     = var.release
   replicas    = var.replicas

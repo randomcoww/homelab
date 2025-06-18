@@ -31,20 +31,22 @@ module "metadata" {
 }
 
 module "configmap" {
-  source  = "../../../modules/configmap"
-  name    = var.name
-  app     = var.name
-  release = var.release
+  source    = "../../../modules/configmap"
+  name      = var.name
+  namespace = var.namespace
+  app       = var.name
+  release   = var.release
   data = {
     basename(local.init_path) = file("${path.module}/templates/${basename(local.init_path)}")
   }
 }
 
 module "daemonset" {
-  source  = "../../../modules/daemonset"
-  name    = var.name
-  app     = var.name
-  release = var.release
+  source    = "../../../modules/daemonset"
+  name      = var.name
+  namespace = var.namespace
+  app       = var.name
+  release   = var.release
   annotations = {
     "checksum/configmap" = sha256(module.configmap.manifest)
   }

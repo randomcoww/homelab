@@ -13,10 +13,11 @@ module "metadata" {
 }
 
 module "secret" {
-  source  = "../../../modules/secret"
-  name    = var.name
-  app     = var.name
-  release = var.release
+  source    = "../../../modules/secret"
+  name      = var.name
+  namespace = var.namespace
+  app       = var.name
+  release   = var.release
   data = {
     for i, config in var.extra_configs :
     "${i}-${basename(config.path)}" => config.content
@@ -24,10 +25,11 @@ module "secret" {
 }
 
 module "service" {
-  source  = "../../../modules/service"
-  name    = var.name
-  app     = var.name
-  release = var.release
+  source    = "../../../modules/service"
+  name      = var.name
+  namespace = var.namespace
+  app       = var.name
+  release   = var.release
   spec = {
     type = "ClusterIP"
     ports = [
@@ -44,6 +46,7 @@ module "service" {
 module "ingress" {
   source             = "../../../modules/ingress"
   name               = var.name
+  namespace          = var.namespace
   app                = var.name
   release            = var.release
   ingress_class_name = var.ingress_class_name
@@ -63,11 +66,12 @@ module "ingress" {
 }
 
 module "statefulset" {
-  source   = "../../../modules/statefulset"
-  name     = var.name
-  app      = var.name
-  release  = var.release
-  affinity = var.affinity
+  source    = "../../../modules/statefulset"
+  name      = var.name
+  namespace = var.namespace
+  app       = var.name
+  release   = var.release
+  affinity  = var.affinity
   annotations = {
     "checksum/secret" = sha256(module.secret.manifest)
   }
