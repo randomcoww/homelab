@@ -56,12 +56,11 @@ resource "helm_release" "arc" {
 # SETFCAP needed in runner workflow pod to build code-server and sunshine-desktop images
 
 resource "helm_release" "arc-runner-hook-template" {
-  name          = "arc-runner-hook-template"
-  chart         = "../helm-wrapper"
-  namespace     = "arc-runners"
-  wait          = true
-  wait_for_jobs = true
-  max_history   = 2
+  name        = "arc-runner-hook-template"
+  chart       = "../helm-wrapper"
+  namespace   = "arc-runners"
+  wait        = false
+  max_history = 2
   values = [
     yamlencode({
       manifests = [
@@ -69,8 +68,7 @@ resource "helm_release" "arc-runner-hook-template" {
           apiVersion = "v1"
           kind       = "Secret"
           metadata = {
-            name      = "workflow-template"
-            namespace = "arc-runners" # namespace is not assigned correctly since provider 3.0.0
+            name = "workflow-template"
           }
           stringData = {
             AWS_ENDPOINT_URL_S3   = "https://${data.terraform_remote_state.sr.outputs.backend_bucket.url}"
@@ -265,12 +263,10 @@ resource "helm_release" "arc-runner-set" {
   ]
   depends_on = [
     helm_release.arc,
-    helm_release.arc-runner-hook-template,
   ]
   lifecycle {
     replace_triggered_by = [
       helm_release.arc,
-      helm_release.arc-runner-hook-template,
     ]
   }
 }
