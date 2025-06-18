@@ -85,3 +85,7 @@ variable "extra_volumes" {
 variable "loadbalancer_class_name" {
   type = string
 }
+
+variable "storage_class_name" {
+  type = string
+}

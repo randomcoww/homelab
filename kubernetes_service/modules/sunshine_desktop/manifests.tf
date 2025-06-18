@@ -120,6 +120,26 @@ module "statefulset" {
   annotations = {
     "checksum/secret" = sha256(module.secret.manifest)
   }
+  spec = {
+    volumeClaimTemplates = [
+      {
+        metadata = {
+          name = "home"
+        }
+        spec = {
+          accessModes = [
+            "ReadWriteOnce",
+          ]
+          storageClassName = var.storage_class_name
+          resources = {
+            requests = {
+              storage = "20Gi"
+            }
+          }
+        }
+      },
+    ]
+  }
   template_spec = {
     containers = [
       {
@@ -248,13 +268,6 @@ module "statefulset" {
         emptyDir = {
           medium    = "Memory"
           sizeLimit = "2Gi"
-        }
-      },
-      {
-        name = "home"
-        hostPath = {
-          path = var.home_path
-          type = "Directory"
         }
       },
     ], var.extra_volumes)
