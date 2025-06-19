@@ -4,6 +4,7 @@ locals {
     templatefile(f, {
       butane_version = var.butane_version
       user_name      = var.user.name
+      cni_bin_path   = var.cni_bin_path
     })
     ], [
     yamlencode({

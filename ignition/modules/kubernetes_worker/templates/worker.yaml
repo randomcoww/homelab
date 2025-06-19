@@ -94,7 +94,7 @@ storage:
         inline: |
           [Login]
           InhibitDelayMaxSec=${graceful_shutdown_delay}
-    - path: /etc/crio/crio.conf.d/20-custom.conf
+    - path: /etc/crio/crio.conf.d/20-worker.conf
       mode: 0644
       contents:
         inline: |

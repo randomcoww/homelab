@@ -50,10 +50,6 @@ variable "haproxy_path" {
   type = string
 }
 
-variable "cni_bin_path" {
-  type = string
-}
-
 variable "bird_cache_table_name" {
   type = string
 }

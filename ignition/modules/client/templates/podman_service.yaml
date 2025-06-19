@@ -25,11 +25,9 @@ storage:
 
           [engine]
           runtime="crun"
-          # path for conmon package
           conmon_path=["/usr/bin/conmon"]
 
           [engine.runtimes]
-          # path for crun package
           crun=["/usr/bin/crun"]
   links:
     - path: /etc/systemd/user/sockets.target.wants/podman.socket

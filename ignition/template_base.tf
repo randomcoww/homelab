@@ -40,8 +40,7 @@ module "server" {
     each.key,
     "127.0.0.1",
   ]))
-  ca           = data.terraform_remote_state.sr.outputs.ssh.ca
-  cni_bin_path = local.kubernetes.cni_bin_path
+  ca = data.terraform_remote_state.sr.outputs.ssh.ca
   # HA config
   keepalived_path       = local.ha.keepalived_config_path
   haproxy_path          = local.ha.haproxy_config_path
@@ -58,4 +57,5 @@ module "client" {
 
   butane_version = local.butane_version
   user           = local.users.client
+  cni_bin_path   = local.kubernetes.cni_bin_path
 }
