@@ -342,7 +342,7 @@ locals {
     kubernetes-master = ["q-0", "de-1"]
     etcd              = ["gw-0", "gw-1", "q-0"]
     kubernetes-worker = ["gw-0", "gw-1", "q-0", "de-1"]
-    client            = ["de-1"]
+    client            = []
   }
 
   # finalized local vars #

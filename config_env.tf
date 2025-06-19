@@ -138,7 +138,7 @@ locals {
     mountpoint              = "ghcr.io/randomcoww/mountpoint-s3:v1.18.0.20250601.2309"
     audioserve              = "docker.io/izderadicka/audioserve:latest"
     sunshine_desktop        = "ghcr.io/randomcoww/sunshine-desktop:v2025.617.220707.20250618.2330"
-    nvidia_driver           = "ghcr.io/randomcoww/nvidia-driver-container:v570.153.02-fedora42"
+    nvidia_driver           = "ghcr.io/randomcoww/nvidia-driver-container:v570.169-fedora42"
     stork_agent             = "ghcr.io/randomcoww/stork-agent:v20250603.1911"
     steamcmd                = "ghcr.io/randomcoww/steamcmd:v20250612.2155"
     vaultwarden             = "docker.io/vaultwarden/server:1.34.1-alpine"
