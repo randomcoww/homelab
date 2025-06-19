@@ -44,10 +44,6 @@ module "satisfactory-server" {
     <<-EOF
     set -xe
 
-    until mountpoint $PERSISTENT_PATH; do
-    sleep 1
-    done
-
     mkdir -p $PERSISTENT_PATH/save $(dirname $SAVE_PATH)
     ln -sf $PERSISTENT_PATH/save $SAVE_PATH
 

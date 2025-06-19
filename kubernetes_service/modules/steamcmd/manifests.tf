@@ -112,6 +112,10 @@ module "mountpoint" {
           <<-EOF
           set -xe
 
+          until mountpoint $PERSISTENT_PATH; do
+          sleep 1
+          done
+
           exec steamcmd \
             +force_install_dir $STEAMAPP_PATH \
             +login anonymous \
@@ -127,6 +131,10 @@ module "mountpoint" {
           {
             name  = "STEAMAPP_PATH"
             value = local.steamapp_path
+          },
+          {
+            name  = "PERSISTENT_PATH"
+            value = local.persistent_path
           },
         ]
         volumeMounts = [
