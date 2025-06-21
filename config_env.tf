@@ -128,11 +128,7 @@ locals {
     kapprover               = "ghcr.io/randomcoww/kapprover:v0.1.0"
     external_dns            = "registry.k8s.io/external-dns/external-dns:v0.17.0"
     code_server             = "ghcr.io/randomcoww/code-server:v4.100.3.20250610.2026"
-    litestream              = "ghcr.io/randomcoww/litestream:v0.3.13.20250405.0151"
     tailscale               = "ghcr.io/randomcoww/tailscale-nft:v1.84.2.20250610.2001"
-    lldap                   = "ghcr.io/lldap/lldap:2025-05-19-alpine-rootless"
-    keydb                   = "docker.io/eqalpha/keydb:alpine_x86_64_v6.3.4"
-    clickhouse              = "docker.io/clickhouse/clickhouse-server:25.5.3.75-alpine"
     qrcode_generator        = "ghcr.io/randomcoww/qrcode-generator:v0.1.0"
     rclone                  = "docker.io/rclone/rclone:1.70.1"
     mountpoint              = "ghcr.io/randomcoww/mountpoint-s3:v1.18.0.20250601.2309"
@@ -140,11 +136,9 @@ locals {
     sunshine_desktop        = "ghcr.io/randomcoww/sunshine-desktop:v2025.617.220707.20250618.2330"
     nvidia_driver           = "ghcr.io/randomcoww/nvidia-driver-container:v570.169-fedora42"
     stork_agent             = "ghcr.io/randomcoww/stork-agent:v20250603.1911"
-    steamcmd                = "ghcr.io/randomcoww/steamcmd:v20250612.2155"
     vaultwarden             = "docker.io/vaultwarden/server:1.34.1-alpine"
     llama_cpp               = "ghcr.io/ggml-org/llama.cpp:server-cuda"
     nginx                   = "docker.io/nginx:1.27-alpine-slim"
-    s3fs                    = "ghcr.io/randomcoww/s3fs:v20250610.2025"
   }
 
   pxeboot_images = {

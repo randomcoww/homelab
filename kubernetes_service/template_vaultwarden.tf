@@ -1,3 +1,4 @@
+/*
 resource "minio_s3_bucket" "vaultwarden" {
   bucket        = "vaultwarden"
   force_destroy = true
@@ -65,3 +66,4 @@ module "vaultwarden" {
   minio_access_key_id     = minio_iam_user.vaultwarden.id
   minio_secret_access_key = minio_iam_user.vaultwarden.secret
 }
+*/

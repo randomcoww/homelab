@@ -20,6 +20,16 @@ module "cert-manager-issuer-prod-secret" {
   })
 }
 
+module "cert-manager-issuer-staging-secret" {
+  source  = "../modules/secret"
+  name    = local.kubernetes.cert_issuer_staging
+  app     = "cert-issuer"
+  release = "0.1.0"
+  data = merge({
+    "tls.key" = chomp(data.terraform_remote_state.sr.outputs.letsencrypt.staging_private_key_pem)
+  })
+}
+
 resource "helm_release" "cert-manager" {
   name             = "cert-manager"
   repository       = "https://charts.jetstack.io"
@@ -53,16 +63,6 @@ resource "helm_release" "cert-manager" {
       }
     }),
   ]
-}
-
-module "cert-manager-issuer-staging-secret" {
-  source  = "../modules/secret"
-  name    = local.kubernetes.cert_issuer_staging
-  app     = "cert-issuer"
-  release = "0.1.0"
-  data = merge({
-    "tls.key" = chomp(data.terraform_remote_state.sr.outputs.letsencrypt.staging_private_key_pem)
-  })
 }
 
 resource "helm_release" "cert-issuer" {

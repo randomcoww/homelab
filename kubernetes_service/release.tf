@@ -6,20 +6,15 @@ locals {
     module.nvidia-driver,
     module.kea,
     module.matchbox,
-    # module.lldap,
-    # module.authelia,
     module.tailscale,
     module.hostapd,
     module.qrcode-hostapd,
-    # module.alpaca-db,
     module.webdav-pictures,
     module.webdav-videos,
     module.audioserve,
     # module.vaultwarden,
     # module.llama-cpp,
     module.sunshine-desktop,
-    # module.code,
-    # module.satisfactory-server,
   ]
 }
 

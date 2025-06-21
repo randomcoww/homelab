@@ -9,7 +9,6 @@ locals {
     module.kubernetes-master,
     module.kubernetes-worker,
     module.server,
-    module.client,
   ]
 }
 

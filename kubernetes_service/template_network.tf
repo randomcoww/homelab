@@ -185,11 +185,10 @@ module "hostapd" {
       "LDPC", "TX-STBC", "RX-STBC1", "MAX-AMSDU-7935",
     ])}]"
     vht_capab = "[${join("][", [
-      "RXLDPC", "TX-STBC-2BY1", "RX-STBC-1", "SHORT-GI-80",
-      "MAX-MPDU-11454", "MAX-A-MPDU-LEN-EXP3",
+      "RXLDPC", "TX-STBC-2BY1", "RX-STBC-1", "SHORT-GI-80", "SHORT-GI-160",
+      "MAX-MPDU-11454", "MAX-A-MPDU-LEN-EXP2",
       "BF-ANTENNA-1", "SOUNDING-DIMENSION-1", "SU-BEAMFORMEE",
       "BF-ANTENNA-2", "SOUNDING-DIMENSION-2", "MU-BEAMFORMEE",
-      # "RX-ANTENNA-PATTERN", "TX-ANTENNA-PATTERN", # Not supported on RTL8852CE
     ])}]"
   }
 }
