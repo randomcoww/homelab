@@ -49,13 +49,3 @@ module "server" {
   bgp_router_id         = cidrhost(values(each.value.networks)[0].prefix, each.value.netnum)
   bgp_port              = local.host_ports.bgp
 }
-
-# dev client
-module "client" {
-  for_each = local.members.client
-  source   = "./modules/client"
-
-  butane_version = local.butane_version
-  user           = local.users.client
-  cni_bin_path   = local.kubernetes.cni_bin_path
-}

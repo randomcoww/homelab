@@ -43,7 +43,7 @@ resource "helm_release" "arc" {
   max_history      = 2
   values = [
     yamlencode({
-      replicaCount = 2
+      replicaCount = 3
       serviceAccount = {
         create = true
         name   = "gha-runner-scale-set-controller"

@@ -161,9 +161,7 @@ locals {
         interface = "phy0"
         image     = local.pxeboot_image_set.latest
         boot_args = [
-          "numa=off",
           "selinux=0",
-          "mitigations=off",
         ]
       }
       kubernetes_node_labels = {
@@ -296,20 +294,10 @@ locals {
           device = "/dev/nvme0n1"
           partitions = [
             {
-              mount_path = dirname(local.users.client.home_dir)
+              mount_path = local.kubernetes.containers_path
               format     = "xfs"
               wipe       = false
               options    = ["-s", "size=4096"]
-              bind_mounts = [
-                {
-                  relative_path = "containers"
-                  mount_path    = local.kubernetes.containers_path
-                },
-                {
-                  relative_path = "tmp"
-                  mount_path    = "/var/tmp"
-                },
-              ]
             },
           ]
         }
@@ -342,7 +330,6 @@ locals {
     kubernetes-master = ["q-0", "de-1"]
     etcd              = ["gw-0", "gw-1", "q-0"]
     kubernetes-worker = ["gw-0", "gw-1", "q-0", "de-1"]
-    client            = []
   }
 
   # finalized local vars #
