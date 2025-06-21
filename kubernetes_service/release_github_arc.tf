@@ -180,18 +180,14 @@ resource "helm_release" "arc-runner-set" {
     "kea",
     "kvm-device-plugin",
     "mountpoint-s3",
-    # "s3fs",
     "kubernetes",
-    # "steamcmd",
     "qrcode-generator",
-    # "code-server",
     "sunshine-desktop",
     "fedora-coreos-config",
     "tailscale-nft",
     "nvidia-driver-container",
     "homelab",
     "stork-agent",
-    # "litestream",
   ])
 
   name             = "arc-runner-${each.key}"

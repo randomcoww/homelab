@@ -249,10 +249,6 @@ module "sunshine-desktop" {
       name  = "NVIDIA_DRIVER_CAPABILITIES"
       value = "all"
     },
-    # {
-    #   name  = "NVIDIA_DRIVER_BASE_URL"
-    #   value = "https://us.download.nvidia.com/tesla"
-    # },
     {
       name  = "TZ"
       value = local.timezone
