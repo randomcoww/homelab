@@ -127,7 +127,6 @@ locals {
     hostapd                 = "ghcr.io/randomcoww/hostapd-noscan:v20250406.1002"
     kapprover               = "ghcr.io/randomcoww/kapprover:v0.1.0"
     external_dns            = "registry.k8s.io/external-dns/external-dns:v0.17.0"
-    code_server             = "ghcr.io/randomcoww/code-server:v4.100.3.20250610.2026"
     tailscale               = "ghcr.io/randomcoww/tailscale-nft:v1.84.2.20250610.2001"
     qrcode_generator        = "ghcr.io/randomcoww/qrcode-generator:v0.1.0"
     rclone                  = "docker.io/rclone/rclone:1.70.1"
@@ -136,7 +135,6 @@ locals {
     sunshine_desktop        = "ghcr.io/randomcoww/sunshine-desktop:v2025.617.220707.20250618.2330"
     nvidia_driver           = "ghcr.io/randomcoww/nvidia-driver-container:v570.169-fedora42"
     stork_agent             = "ghcr.io/randomcoww/stork-agent:v20250603.1911"
-    vaultwarden             = "docker.io/vaultwarden/server:1.34.1-alpine"
     llama_cpp               = "ghcr.io/ggml-org/llama.cpp:server-cuda"
     nginx                   = "docker.io/nginx:1.27-alpine-slim"
   }
