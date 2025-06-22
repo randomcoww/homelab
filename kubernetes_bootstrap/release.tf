@@ -78,7 +78,8 @@ resource "helm_release" "local-path-provisioner" {
     yamlencode({
       replicaCount = 2
       storageClass = {
-        name = "local-path"
+        name         = "local-path"
+        defaultClass = true
       }
       nodePathMap = [
         {

@@ -14,6 +14,7 @@ locals {
     module.audioserve,
     # module.llama-cpp,
     module.sunshine-desktop,
+    module.vaultwarden,
   ]
 }
 
@@ -52,9 +53,11 @@ resource "helm_release" "ingress-nginx" {
         }
         ingressClass = each.value
         service = {
-          type              = "LoadBalancer"
-          loadBalancerIP    = "0.0.0.0"
-          loadBalancerClass = "kube-vip.io/kube-vip-class"
+          type                  = "LoadBalancer"
+          loadBalancerIP        = "0.0.0.0"
+          loadBalancerClass     = "kube-vip.io/kube-vip-class"
+          externalTrafficPolicy = "Local"
+          sessionAffinity       = "ClientIP"
         }
         allowSnippetAnnotations = true
         config = {
@@ -84,7 +87,7 @@ resource "helm_release" "ingress-nginx" {
   ]
 }
 
-# # nvidia device plugin #
+# nvidia device plugin #
 
 resource "helm_release" "nvidia-device-plugin" {
   name        = "nvidia-device-plugin"

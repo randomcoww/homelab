@@ -137,6 +137,7 @@ locals {
     stork_agent             = "ghcr.io/randomcoww/stork-agent:v20250603.1911"
     llama_cpp               = "ghcr.io/ggml-org/llama.cpp:server-cuda"
     nginx                   = "docker.io/nginx:1.27-alpine-slim"
+    vaultwarden             = "docker.io/vaultwarden/server:1.34.1-alpine"
   }
 
   pxeboot_images = {
@@ -183,6 +184,7 @@ locals {
       audioserve      = "audioserve"
       monitoring      = "m"
       llama_cpp       = "llama"
+      vaultwarden     = "vw"
     } :
     k => "${domain}.${local.domains.public}"
   }
@@ -253,12 +255,13 @@ locals {
   }
 
   service_ports = {
-    matchbox     = 443
-    matchbox_api = 50101
-    minio        = 9000
-    metrics      = 9153
-    prometheus   = 80
-    llama_cpp    = 80
+    matchbox      = 443
+    matchbox_api  = 50101
+    minio         = 9000
+    metrics       = 9153
+    prometheus    = 80
+    llama_cpp     = 80
+    yugabyte_ysql = 5433
   }
 
   minio = {
