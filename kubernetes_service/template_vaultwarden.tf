@@ -18,7 +18,7 @@ resource "helm_release" "vaultwarden-db" {
   create_namespace = true
   wait             = true
   wait_for_jobs    = true
-  version          = "2.25.2"
+  version          = "2024.2.3"
   max_history      = 2
   values = [
     yamlencode({
