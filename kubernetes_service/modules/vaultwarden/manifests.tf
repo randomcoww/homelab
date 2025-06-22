@@ -144,11 +144,5 @@ module "deployment" {
         }
       },
     ]
-    volumes = [
-      {
-        name     = "litestream-data"
-        emptyDir = {}
-      },
-    ]
   }
 }

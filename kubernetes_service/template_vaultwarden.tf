@@ -1,5 +1,4 @@
 locals {
-  vaultwarden_db         = "vaultwarden"
   vaultwarden_db_user    = "vaultwarden"
   vaultwarden_db_service = "yb-tserver-service"
   vaultwarden_ns         = "vaultwarden"
@@ -11,7 +10,7 @@ resource "random_string" "vaultwarden-db-password" {
 }
 
 resource "helm_release" "vaultwarden-db" {
-  name             = "yugabytedb"
+  name             = "vaultwarden-db"
   repository       = "https://charts.yugabyte.com"
   chart            = "yugabyte"
   namespace        = local.vaultwarden_ns
@@ -28,18 +27,9 @@ resource "helm_release" "vaultwarden-db" {
         tserver = 3
       }
       domainName = local.domains.kubernetes
+      resource = {
+      }
       serviceEndpoints = [
-        {
-          name = "yb-master-ui"
-          type = "LoadBalancer"
-          annotations = {
-            "kube-vip.io/loadbalancerIPs" = "0.0.0.0"
-          }
-          app = "yb-master"
-          ports = {
-            http-ui = 7000
-          },
-        },
         {
           name = local.vaultwarden_db_service
           type = "LoadBalancer"
@@ -48,21 +38,7 @@ resource "helm_release" "vaultwarden-db" {
           }
           app = "yb-tserver"
           ports = {
-            tcp-yql-port   = 9042
-            tcp-yedis-port = 6379
-            tcp-ysql-port  = local.service_ports.yugabyte_ysql
-          },
-        },
-        {
-          name = "yugabyted-ui-service"
-          type = "LoadBalancer"
-          annotations = {
-            "kube-vip.io/loadbalancerIPs" = "0.0.0.0"
-          }
-          app             = "yb-master"
-          sessionAffinity = "ClientIP"
-          ports = {
-            yugabyted-ui = 15433
+            tcp-ysql-port = local.service_ports.yugabyte_ysql
           },
         },
       ]
@@ -70,7 +46,6 @@ resource "helm_release" "vaultwarden-db" {
         ysql = {
           user     = local.vaultwarden_db_user
           password = random_string.vaultwarden-db-password.result
-          database = local.vaultwarden_db
         }
       }
     }),
@@ -102,8 +77,12 @@ module "vaultwarden" {
     SMTP_FROM_NAME           = "Vaultwarden"
     SMTP_SECURITY            = "starttls"
     SMTP_AUTH_MECHANISM      = "Plain"
-    DATABASE_URL             = "postgresql://${local.vaultwarden_db_user}:${urlencode(random_string.vaultwarden-db-password.result)}@${local.vaultwarden_db_service}.${local.vaultwarden_ns}:${local.service_ports.yugabyte_ysql}/${local.vaultwarden_db}"
+    DATABASE_URL             = "postgresql://${local.vaultwarden_db_user}:${urlencode(random_string.vaultwarden-db-password.result)}@${local.vaultwarden_db_service}.${local.vaultwarden_ns}:${local.service_ports.yugabyte_ysql}/vaultwarden"
   }
   ingress_class_name        = local.ingress_classes.ingress_nginx
   nginx_ingress_annotations = local.nginx_ingress_annotations
+
+  depends_on = [
+    helm_release.vaultwarden-db,
+  ]
 }
