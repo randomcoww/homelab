@@ -176,10 +176,6 @@ locals {
 
   kubernetes_ingress_endpoints = {
     for k, domain in {
-      auth            = "auth"
-      vaultwarden     = "vw"
-      code            = "code"
-      lldap_http      = "ldap"
       qrcode_hostapd  = "hostapd"
       webdav_pictures = "pictures"
       webdav_videos   = "videos"
@@ -222,18 +218,6 @@ locals {
         name      = "minio"
         namespace = "minio"
       }
-      lldap = {
-        name      = "lldap"
-        namespace = "lldap"
-      }
-      authelia = {
-        name      = "authelia"
-        namespace = "authelia"
-      }
-      alpaca_db = {
-        name      = "alpaca-db"
-        namespace = "alpaca"
-      }
       prometheus = {
         name      = "prometheus"
         namespace = "monitoring"
@@ -264,7 +248,6 @@ locals {
     etcd_peer          = 58083
     etcd_metrics       = 58086
     flannel_healthz    = 58084
-    code               = 58085 # run code server on host net to work seamlessly with podman-remote
     bgp                = 179
     kube_vip_metrics   = 58089
   }
@@ -273,8 +256,6 @@ locals {
     matchbox     = 443
     matchbox_api = 50101
     minio        = 9000
-    lldap        = 6360
-    clickhouse   = 9440
     metrics      = 9153
     prometheus   = 80
     llama_cpp    = 80

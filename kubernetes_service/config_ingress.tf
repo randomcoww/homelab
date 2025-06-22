@@ -27,16 +27,6 @@ locals {
     EOF
   }
 
-  nginx_ingress_auth_annotations = merge({
-    "nginx.ingress.kubernetes.io/auth-method"           = "GET"
-    "nginx.ingress.kubernetes.io/auth-url"              = "http://${local.kubernetes_services.authelia.endpoint}.svc.${local.domains.kubernetes}/api/authz/auth-request"
-    "nginx.ingress.kubernetes.io/auth-signin"           = "https://${local.kubernetes_ingress_endpoints.auth}?rm=$request_method"
-    "nginx.ingress.kubernetes.io/auth-response-headers" = "Remote-User,Remote-Name,Remote-Groups,Remote-Email"
-    "nginx.ingress.kubernetes.io/auth-snippet"          = <<-EOF
-    proxy_set_header X-Forwarded-Method $request_method;
-    EOF
-  }, local.nginx_ingress_annotations)
-
   ingress_tls_common = {
     secretName = "${local.domains.public}-tls"
     hosts = [
