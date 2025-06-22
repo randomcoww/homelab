@@ -93,7 +93,21 @@ module "vaultwarden" {
   }
   ingress_class_name        = local.ingress_classes.ingress_nginx
   nginx_ingress_annotations = local.nginx_ingress_annotations
+}
 
+resource "helm_release" "vaultwarden" {
+  chart            = "../helm-wrapper"
+  name             = module.vaultwarden.chart.name
+  namespace        = module.vaultwarden.chart.namespace
+  create_namespace = true
+  wait             = false
+  timeout          = 300
+  max_history      = 2
+  values = [
+    yamlencode({
+      manifests = values(module.vaultwarden.chart.manifests)
+    }),
+  ]
   depends_on = [
     helm_release.vaultwarden-db,
   ]

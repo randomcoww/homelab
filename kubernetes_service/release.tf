@@ -14,7 +14,6 @@ locals {
     module.audioserve,
     # module.llama-cpp,
     module.sunshine-desktop,
-    module.vaultwarden,
   ]
 }
 
