@@ -110,15 +110,6 @@ output "trust" {
   sensitive = true
 }
 
-output "authelia" {
-  value = {
-    storage_secret         = random_password.authelia-storage-secret.result
-    session_encryption_key = random_password.authelia-session-encryption-key.result
-    jwt_token              = random_password.authelia-jwt-token.result
-  }
-  sensitive = true
-}
-
 output "letsencrypt" {
   value = {
     private_key_pem         = tls_private_key.letsencrypt-prod.private_key_pem
@@ -132,16 +123,6 @@ output "minio" {
   value = {
     access_key_id     = random_password.minio-access-key-id.result
     secret_access_key = random_password.minio-secret-access-key.result
-  }
-  sensitive = true
-}
-
-output "lldap" {
-  value = {
-    user           = random_password.lldap-user.result
-    password       = random_password.lldap-password.result
-    storage_secret = random_password.lldap-storage-secret.result
-    jwt_token      = random_password.lldap-jwt-token.result
   }
   sensitive = true
 }
