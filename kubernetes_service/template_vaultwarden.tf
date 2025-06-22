@@ -28,6 +28,18 @@ resource "helm_release" "vaultwarden-db" {
       }
       domainName = local.domains.kubernetes
       resource = {
+        master = {
+          requests = {
+            cpu    = "200m"
+            memory = "200Mi"
+          }
+        }
+        tserver = {
+          requests = {
+            cpu    = "400m"
+            memory = "400Mi"
+          }
+        }
       }
       serviceEndpoints = [
         {
