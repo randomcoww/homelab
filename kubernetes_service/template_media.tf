@@ -32,6 +32,7 @@ module "audioserve" {
   namespace = "default"
   source    = "./modules/audioserve"
   release   = "0.1.0"
+  replicas  = 2
   images = {
     audioserve = local.container_images.audioserve
     mountpoint = local.container_images.mountpoint
@@ -83,9 +84,10 @@ resource "minio_iam_user_policy_attachment" "webdav-pictures" {
 }
 
 module "webdav-pictures" {
-  source  = "./modules/webdav"
-  name    = "webdav-pictures"
-  release = "0.1.0"
+  source   = "./modules/webdav"
+  name     = "webdav-pictures"
+  release  = "0.1.0"
+  replicas = 2
   images = {
     rclone = local.container_images.rclone
   }
@@ -128,9 +130,10 @@ resource "minio_iam_user_policy_attachment" "webdav-videos" {
 }
 
 module "webdav-videos" {
-  source  = "./modules/webdav"
-  name    = "webdav-videos"
-  release = "0.1.0"
+  source   = "./modules/webdav"
+  name     = "webdav-videos"
+  release  = "0.1.0"
+  replicas = 2
   images = {
     rclone = local.container_images.rclone
   }

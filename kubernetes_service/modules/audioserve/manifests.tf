@@ -30,6 +30,12 @@ module "service" {
         targetPort = local.audioserve_port
       },
     ]
+    sessionAffinity = "ClientIP"
+    sessionAffinityConfig = {
+      clientIP = {
+        timeoutSeconds = 10800
+      }
+    }
   }
 }
 
@@ -73,7 +79,7 @@ module "mountpoint" {
   app       = var.name
   release   = var.release
   affinity  = var.affinity
-  replicas  = 1
+  replicas  = var.replicas
   template_spec = {
     containers = [
       {

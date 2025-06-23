@@ -24,6 +24,7 @@ locals {
     proxy_set_header Accept-Encoding gzip;
     chunked_transfer_encoding off;
     EOF
+    "nginx.ingress.kubernetes.io/affinity"          = "cookie"
   }
 
   ingress_tls_common = {
