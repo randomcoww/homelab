@@ -69,7 +69,7 @@ module "vaultwarden" {
   name      = "vaultwarden"
   namespace = local.vaultwarden_ns
   release   = "0.1.14"
-  replicas  = 3
+  replicas  = 1
   images = {
     vaultwarden = local.container_images.vaultwarden
   }
