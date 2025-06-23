@@ -17,11 +17,10 @@ module "metadata" {
   release     = var.release
   app_version = split(":", var.images.vaultwarden)[1]
   manifests = {
-    "templates/deployment.yaml"    = module.deployment.manifest
-    "templates/secret.yaml"        = module.secret.manifest
-    "templates/service.yaml"       = module.service.manifest
-    "templates/ingress.yaml"       = module.ingress.manifest
-    "templates/ingress-admin.yaml" = module.ingress-admin.manifest
+    "templates/deployment.yaml" = module.deployment.manifest
+    "templates/secret.yaml"     = module.secret.manifest
+    "templates/service.yaml"    = module.service.manifest
+    "templates/ingress.yaml"    = module.ingress.manifest
   }
 }
 
@@ -69,27 +68,6 @@ module "ingress" {
           service = module.service.name
           port    = local.vaultwarden_port
           path    = "/"
-        },
-      ]
-    },
-  ]
-}
-
-module "ingress-admin" {
-  source             = "../../../modules/ingress"
-  name               = "${var.name}-admin"
-  app                = var.name
-  release            = var.release
-  ingress_class_name = var.ingress_class_name
-  annotations        = var.nginx_ingress_annotations
-  rules = [
-    {
-      host = var.service_hostname
-      paths = [
-        {
-          service = module.service.name
-          port    = local.vaultwarden_port
-          path    = "/admin"
         },
       ]
     },
