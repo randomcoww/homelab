@@ -169,20 +169,6 @@ terraform -chdir=kubernetes_service apply -var-file=secrets.tfvars
 
 ---
 
-### Create user
-
-Go to `https://ldap.fuzzybunny.win`
-
-Get admin password by running
-
-```bash
-terraform -chdir=cluster_resources output -json lldap
-```
-
-Set up 2FA at `https://auth.fuzzybunny.win`
-
----
-
 ### Write current PXE boot image to local disk
 
 If network boot is not working, hosts may fallback to booting from (USB) disk. Looks for first disk with a partition labeled `fedora-coreos-<tag>` and update content.
