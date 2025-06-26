@@ -126,7 +126,7 @@ locals {
     ipxe_tftp               = "ghcr.io/randomcoww/ipxe:v20250610.1821-tftp"
     hostapd                 = "ghcr.io/randomcoww/hostapd-noscan:v20250406.1002"
     kapprover               = "ghcr.io/randomcoww/kapprover:v0.1.0"
-    external_dns            = "registry.k8s.io/external-dns/external-dns:v0.17.0"
+    external_dns            = "registry.k8s.io/external-dns/external-dns:v0.18.0"
     tailscale               = "ghcr.io/randomcoww/tailscale-nft:v1.84.2.20250610.2001"
     qrcode_generator        = "ghcr.io/randomcoww/qrcode-generator:v0.1.0"
     rclone                  = "docker.io/rclone/rclone:1.70.1"
