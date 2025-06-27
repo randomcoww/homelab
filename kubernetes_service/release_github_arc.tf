@@ -39,7 +39,7 @@ resource "helm_release" "arc" {
   create_namespace = true
   wait             = true
   wait_for_jobs    = true
-  version          = "0.12.0"
+  version          = "0.12.1"
   max_history      = 2
   values = [
     yamlencode({
