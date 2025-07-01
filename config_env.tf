@@ -43,6 +43,7 @@ locals {
       table_priority = 32760
       netnums = {
         gateway = 2
+        glkvm   = 126
         switch  = 127
       }
     }
