@@ -131,7 +131,7 @@ locals {
     tailscale               = "ghcr.io/randomcoww/tailscale-nft:v1.84.2.20250701.2110"
     qrcode_generator        = "ghcr.io/randomcoww/qrcode-generator:v0.1.0"
     rclone                  = "docker.io/rclone/rclone:1.70.2"
-    mountpoint              = "ghcr.io/randomcoww/mountpoint-s3:v1.18.0.20250601.2309"
+    mountpoint              = "ghcr.io/randomcoww/mountpoint-s3:v1.19.0.20250701.2310"
     audioserve              = "docker.io/izderadicka/audioserve:latest"
     sunshine_desktop        = "ghcr.io/randomcoww/sunshine-desktop:v2025.617.220707.20250618.2330"
     nvidia_driver           = "ghcr.io/randomcoww/nvidia-driver-container:v570.169-fedora42"
