@@ -111,10 +111,10 @@ locals {
   }
 
   container_images = {
-    kube_apiserver          = "ghcr.io/randomcoww/kubernetes:v1.33.1.20250610.2001"
-    kube_controller_manager = "ghcr.io/randomcoww/kubernetes:v1.33.1.20250610.2001"
-    kube_scheduler          = "ghcr.io/randomcoww/kubernetes:v1.33.1.20250610.2001"
-    kube_proxy              = "ghcr.io/randomcoww/kubernetes:v1.33.1.20250610.2004-kube-proxy"
+    kube_apiserver          = "ghcr.io/randomcoww/kubernetes:v1.33.2.20250701.2332"
+    kube_controller_manager = "ghcr.io/randomcoww/kubernetes:v1.33.2.20250701.2332"
+    kube_scheduler          = "ghcr.io/randomcoww/kubernetes:v1.33.2.20250701.2332"
+    kube_proxy              = "ghcr.io/randomcoww/kubernetes:v1.33.2.20250701.2335-kube-proxy"
     etcd_wrapper            = "ghcr.io/randomcoww/etcd-wrapper:v0.4.2"
     etcd                    = "gcr.io/etcd-development/etcd:v3.6.1"
     flannel                 = "docker.io/flannel/flannel:v0.27.0"
