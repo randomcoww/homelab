@@ -117,7 +117,7 @@ locals {
     kube_proxy              = "ghcr.io/randomcoww/kubernetes:v1.33.2.20250701.2335-kube-proxy"
     etcd_wrapper            = "ghcr.io/randomcoww/etcd-wrapper:v0.4.2"
     etcd                    = "gcr.io/etcd-development/etcd:v3.6.2"
-    flannel                 = "docker.io/flannel/flannel:v0.27.1"
+    flannel                 = "docker.io/flannel/flannel:v0.27.2"
     flannel_cni_plugin      = "docker.io/flannel/flannel-cni-plugin:v1.7.1-flannel1"
     kube_vip                = "ghcr.io/kube-vip/kube-vip:v0.9.2"
     kvm_device_plugin       = "ghcr.io/randomcoww/kvm-device-plugin:v20250610.2025"
