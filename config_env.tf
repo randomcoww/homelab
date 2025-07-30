@@ -138,7 +138,7 @@ locals {
     stork_agent             = "ghcr.io/randomcoww/stork-agent:v20250701.2124"
     llama_cpp               = "ghcr.io/ggml-org/llama.cpp:server-cuda-b5753"
     nginx                   = "docker.io/nginx:1.27-alpine-slim"
-    vaultwarden             = "docker.io/vaultwarden/server:1.34.2-alpine"
+    vaultwarden             = "docker.io/vaultwarden/server:1.34.3-alpine"
   }
 
   pxeboot_images = {
