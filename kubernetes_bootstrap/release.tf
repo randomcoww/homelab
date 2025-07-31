@@ -72,7 +72,7 @@ resource "helm_release" "local-path-provisioner" {
   repository  = "https://charts.containeroo.ch"
   chart       = "local-path-provisioner"
   wait        = false
-  version     = "0.0.32"
+  version     = "0.0.33"
   max_history = 2
   values = [
     yamlencode({
