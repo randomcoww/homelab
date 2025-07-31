@@ -60,7 +60,7 @@
         "github-tags"
       ],
       "matchPackageNames": [
-        "randomcoww/fedora-coreos-config-custom"
+        "randomcoww/fedora-coreos-config"
       ],
       "versioning": "regex:^(?<major>\\d+)(.(?<minor>\\d+))?(.(?<patch>\\d+))?$"
     }
