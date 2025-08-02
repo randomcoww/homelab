@@ -58,11 +58,6 @@ variable "networks" {
   }))
 }
 
-variable "kea_hooks_libraries_path" {
-  type    = string
-  default = "/usr/local/lib/kea/hooks"
-}
-
 variable "timezone" {
   type = string
 }

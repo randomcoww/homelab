@@ -4,6 +4,7 @@ locals {
   kea_dhcp4_config_path          = "${local.base_path}/kea-dhcp4.conf"
   kea_ctrl_agent_config_path     = "${local.base_path}/kea-ctrl-agent.conf"
   kea_socket_path                = "/var/run/kea/kea-dhcp4-ctrl.sock"
+  kea_hooks_libraries_path       = "/usr/lib/kea/hooks"
   ca_cert_path                   = "${local.base_path}/ca-cert.pem"
   ha_cert_path                   = "${local.base_path}/ha-cert.pem"
   ha_key_path                    = "${local.base_path}/ha-key.pem"
@@ -61,15 +62,18 @@ locals {
         }
         hooks-libraries = concat([
           {
-            library    = "${var.kea_hooks_libraries_path}/libdhcp_lease_cmds.so"
+            library    = "${local.kea_hooks_libraries_path}/libdhcp_lease_cmds.so"
             parameters = {}
           },
           {
-            library = "${var.kea_hooks_libraries_path}/libdhcp_stat_cmds.so"
+            library = "${local.kea_hooks_libraries_path}/libdhcp_stat_cmds.so"
+          },
+          {
+            library = "${local.kea_hooks_libraries_path}/libdhcp_subnet_cmds.so"
           },
           # pass ipxe?mac={mac} host script endpoint directly from kea
           # {
-          #   library = "${var.kea_hooks_libraries_path}/libdhcp_flex_option.so"
+          #   library = "${local.kea_hooks_libraries_path}/libdhcp_flex_option.so"
           #   parameters = {
           #     options = [
           #       {
@@ -82,7 +86,7 @@ locals {
           # },
           ], length(var.service_ips) > 1 ? [
           {
-            library = "${var.kea_hooks_libraries_path}/libdhcp_ha.so"
+            library = "${local.kea_hooks_libraries_path}/libdhcp_ha.so"
             parameters = {
               high-availability = [
                 {
