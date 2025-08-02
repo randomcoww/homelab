@@ -135,7 +135,7 @@ locals {
     audioserve              = "docker.io/izderadicka/audioserve:latest"
     sunshine_desktop        = "ghcr.io/randomcoww/sunshine-desktop:v2025.628.4510.20250701.2333"
     nvidia_driver           = "ghcr.io/randomcoww/nvidia-driver-container:v570.169-fedora42"
-    stork_agent             = "ghcr.io/randomcoww/stork-agent:v20250701.2124"
+    stork_agent             = "ghcr.io/randomcoww/stork-agent:v20250801.2126"
     llama_cpp               = "ghcr.io/ggml-org/llama.cpp:server-cuda-b5753"
     nginx                   = "docker.io/nginx:1.27-alpine-slim"
     vaultwarden             = "docker.io/vaultwarden/server:1.34.3-alpine"
