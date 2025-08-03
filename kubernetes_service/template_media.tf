@@ -256,19 +256,14 @@ module "sunshine-desktop" {
       name  = "TZ"
       value = local.timezone
     },
-    {
-      name = "SUNSHINE_EXTRA_ARGS"
-      value = join(" ", [
-        "native_pen_touch=disabled",
-      ])
-    },
   ]
   resources = {
     requests = {
       memory = "12Gi"
     }
     limits = {
-      "nvidia.com/gpu" = 1
+      ## Causes error: privileged container was configured with a device container path that already exists on the host
+      # "nvidia.com/gpu" = 1
     }
   }
   security_context = {
