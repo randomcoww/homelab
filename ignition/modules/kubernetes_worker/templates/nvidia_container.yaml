@@ -44,7 +44,7 @@ storage:
           #debug = "/var/log/nvidia-container-runtime.log"
           log-level = "info"
           mode = "auto"
-          runtimes = ["/usr/bin/crun"]
+          runtimes = ["crun"]
 
           [nvidia-container-runtime.modes]
 
