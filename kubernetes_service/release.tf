@@ -96,32 +96,15 @@ resource "helm_release" "nvidia-device-plugin" {
   max_history = 2
   values = [
     yamlencode({
-      compatWithCPUManager = true
-      priorityClassName    = "system-node-critical"
-      nvidiaDriverRoot     = "/run/nvidia/driver"
-      cdi = {
-        nvidiaHookPath = "/usr/bin/nvidia-ctk"
-      }
+      compatWithCPUManager    = true
+      priorityClassName       = "system-node-critical"
+      nvidiaDriverRoot        = "/run/nvidia/driver"
+      deviceDiscoveryStrategy = "nvml"
       gfd = {
         enabled = true
       }
-      config = {
-        # map = {
-        #   default = yamlencode({
-        #     version = "v1"
-        #     sharing = {
-        #       mps = {
-        #         renameByDefault = true
-        #         resources = [
-        #           {
-        #             name     = "nvidia.com/gpu"
-        #             replicas = 2
-        #           },
-        #         ]
-        #       }
-        #     }
-        #   })
-        # }
+      cdi = {
+        nvidiaHookPath = "/usr/bin/nvidia-ctk"
       }
     }),
   ]
