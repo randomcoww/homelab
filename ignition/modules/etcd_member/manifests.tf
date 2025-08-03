@@ -113,10 +113,6 @@ module "etcd" {
         image = var.images.etcd
         env = [
           {
-            name  = "ETCD_ENABLE_V2"
-            value = "false"
-          },
-          {
             name  = "ETCD_STRICT_RECONFIG_CHECK"
             value = "true"
           },

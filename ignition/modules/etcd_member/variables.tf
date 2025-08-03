@@ -89,12 +89,12 @@ variable "backup_interval" {
 
 variable "healthcheck_fail_count_allowed" {
   type    = number
-  default = 32
+  default = 10
 }
 
 variable "readiness_fail_count_allowed" {
   type    = number
-  default = 16
+  default = 10
 }
 
 variable "auto_compaction_retention" {
