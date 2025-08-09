@@ -50,11 +50,11 @@ module "llama-cpp" {
     },
     {
       name  = "LLAMA_ARG_MODEL"
-      value = "$(MODEL_PATH)/DeepSeek-R1-Distill-Qwen-32B-Q4_K_M-GGUF/deepseek-r1-distill-qwen-32b-q4_k_m.gguf"
+      value = "/models/gpt-oss-20b-mxfp4.gguf"
     },
     {
       name  = "LLAMA_ARG_ALIAS"
-      value = "DeepSeek-R1-Distill-Qwen-32B-Q4_K_M-GGUF"
+      value = "gpt-oss-20b"
     },
     {
       name  = "LLAMA_ARG_N_GPU_LAYERS"
