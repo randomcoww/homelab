@@ -87,6 +87,7 @@ module "mountpoint" {
           until mountpoint ${local.data_path}; do
           sleep 1
           done
+          ln -sf "${local.data_path}" /models
 
           exec /app/llama-server \
             --no-webui \
@@ -94,18 +95,13 @@ module "mountpoint" {
             --port ${var.ports.llama_cpp}
           EOF
         ]
-        env = concat([
-          {
-            name  = "MODEL_PATH"
-            value = local.data_path
-          },
-          ], [
+        env = [
           for _, e in var.extra_envs :
           {
             name  = e.name
             value = tostring(e.value)
           }
-        ])
+        ]
         securityContext = var.security_context
         resources       = var.resources
         ports = [
