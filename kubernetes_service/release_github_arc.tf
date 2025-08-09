@@ -1,7 +1,7 @@
 # Github actions runner #
 
 locals {
-  github_arc_mc_config_dir = "/var/tmp/minio"
+  github_arc_mc_config_dir = "/minio-auth"
 }
 
 resource "minio_iam_user" "arc" {
@@ -188,6 +188,7 @@ resource "helm_release" "arc-runner-set" {
     "nvidia-driver-container",
     "homelab",
     "stork-agent",
+    "llama-cpp-server-cuda",
   ])
 
   name             = "arc-runner-${each.key}"

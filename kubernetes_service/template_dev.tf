@@ -49,12 +49,8 @@ module "llama-cpp" {
       value = "compute,utility"
     },
     {
-      name  = "LLAMA_ARG_MODEL"
-      value = "/models/gpt-oss-20b-mxfp4.gguf"
-    },
-    {
-      name  = "LLAMA_ARG_ALIAS"
-      value = "gpt-oss-20b"
+      name  = "LLAMA_ARG_HF_REPO"
+      value = "ggml-org/gpt-oss-20b-GGUF"
     },
     {
       name  = "LLAMA_ARG_N_GPU_LAYERS"
