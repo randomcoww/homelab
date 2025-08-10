@@ -1,5 +1,6 @@
 locals {
-  data_path = "/var/lib/llama_cpp/models"
+  data_path     = "/var/lib/node_red/mnt"
+  node_red_port = 1880
 }
 
 module "metadata" {
@@ -7,11 +8,23 @@ module "metadata" {
   name        = var.name
   namespace   = var.namespace
   release     = var.release
-  app_version = split(":", var.images.llama_cpp)[1]
-  manifests = merge(module.mountpoint.chart.manifests, {
+  app_version = split(":", var.images.node_red)[1]
+  manifests = merge(module.s3fs.chart.manifests, {
     "templates/service.yaml" = module.service.manifest
     "templates/ingress.yaml" = module.ingress.manifest
+    "templates/secret.yaml"  = module.secret.manifest
   })
+}
+
+module "secret" {
+  source  = "../../../modules/secret"
+  name    = var.name
+  app     = var.name
+  release = var.release
+  data = {
+    for key, value in var.extra_envs :
+    key => tostring(value)
+  }
 }
 
 module "service" {
@@ -24,9 +37,9 @@ module "service" {
     ports = [
       {
         name       = var.name
-        port       = var.ports.llama_cpp
+        port       = local.node_red_port
         protocol   = "TCP"
-        targetPort = var.ports.llama_cpp
+        targetPort = local.node_red_port
       },
     ]
   }
@@ -45,7 +58,7 @@ module "ingress" {
       paths = [
         {
           service = module.service.name
-          port    = var.ports.llama_cpp
+          port    = local.node_red_port
           path    = "/"
         },
       ]
@@ -53,8 +66,8 @@ module "ingress" {
   ]
 }
 
-module "mountpoint" {
-  source = "../statefulset_mountpoint"
+module "s3fs" {
+  source = "../statefulset_s3fs"
   ## s3 config
   s3_endpoint          = var.s3_endpoint
   s3_bucket            = var.s3_bucket
@@ -64,20 +77,20 @@ module "mountpoint" {
   s3_mount_path        = local.data_path
   s3_mount_extra_args  = var.s3_mount_extra_args
   images = {
-    mountpoint = var.images.mountpoint
+    s3fs = var.images.s3fs
   }
   ##
   name      = var.name
   namespace = var.namespace
   app       = var.name
   release   = var.release
+  replicas  = var.replicas
   affinity  = var.affinity
-  replicas  = 1
   template_spec = {
     containers = [
       {
         name  = var.name
-        image = var.images.llama_cpp
+        image = var.images.node_red
         command = [
           "sh",
           "-c",
@@ -87,29 +100,50 @@ module "mountpoint" {
           until mountpoint ${local.data_path}; do
           sleep 1
           done
-          ln -sf "${local.data_path}" /models
 
-          exec /app/llama-server \
-            --no-webui \
-            --host 0.0.0.0 \
-            --port ${var.ports.llama_cpp} $@
+          exec node-red \
+            --port ${local.node_red_port} \
+            --userDir "${local.data_path}"
           EOF
         ]
-        args = var.args
-        env = [
-          for _, e in var.extra_envs :
+        env = concat([
           {
-            name  = e.name
-            value = tostring(e.value)
-          }
-        ]
-        securityContext = var.security_context
-        resources       = var.resources
+            name  = "HOME"
+            value = local.data_path
+          },
+          ],
+          [
+            for key, value in var.extra_envs :
+            {
+              name = key
+              valueFrom = {
+                secretKeyRef = {
+                  name = module.secret.name
+                  key  = key
+                }
+              }
+            }
+          ]
+        )
+        securityContext = {
+          runAsUser  = 1000
+          runAsGroup = 1000
+          fsGroup    = 1000
+        }
+        resources = var.resources
         ports = [
           {
-            containerPort = var.ports.llama_cpp
+            containerPort = local.node_red_port
           },
         ]
+      },
+    ]
+    volumes = [
+      {
+        name = "config"
+        secret = {
+          secretName = module.secret.name
+        }
       },
     ]
   }

@@ -10,9 +10,8 @@ variable "release" {
   type = string
 }
 
-variable "args" {
-  type    = list(string)
-  default = []
+variable "replicas" {
+  type = number
 }
 
 variable "affinity" {
@@ -22,14 +21,8 @@ variable "affinity" {
 
 variable "images" {
   type = object({
-    mountpoint = string
-    llama_cpp  = string
-  })
-}
-
-variable "ports" {
-  type = object({
-    llama_cpp = number
+    s3fs     = string
+    node_red = string
   })
 }
 
@@ -44,11 +37,8 @@ variable "security_context" {
 }
 
 variable "extra_envs" {
-  type = list(object({
-    name  = string
-    value = any
-  }))
-  default = []
+  type    = map(string)
+  default = {}
 }
 
 variable "s3_endpoint" {

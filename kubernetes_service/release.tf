@@ -13,6 +13,7 @@ locals {
     module.webdav-videos,
     module.audioserve,
     module.llama-cpp,
+    module.node-red,
     # module.sunshine-desktop,
   ]
 }

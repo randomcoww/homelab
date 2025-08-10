@@ -133,12 +133,14 @@ locals {
     rclone                  = "docker.io/rclone/rclone:1.70.3"
     mountpoint              = "ghcr.io/randomcoww/mountpoint-s3:v1.19.0.20250801.2311"
     audioserve              = "docker.io/izderadicka/audioserve:latest"
-    nvidia_driver           = "ghcr.io/randomcoww/nvidia-driver-container:v570.181-fedora42"
+    nvidia_driver           = "ghcr.io/randomcoww/nvidia-driver-container:v575.64.05-fedora42"
     sunshine_desktop        = "ghcr.io/randomcoww/sunshine-desktop:v2025.731.125037.20250803.2137"
     stork_agent             = "ghcr.io/randomcoww/stork-agent:v20250802.2330"
-    llama_cpp               = "ghcr.io/ggml-org/llama.cpp:server-cuda"
+    llama_cpp               = "ghcr.io/randomcoww/llama-cpp-server-cuda:v12.8.1.20250809.2047"
     nginx                   = "docker.io/nginx:1.27-alpine-slim"
     vaultwarden             = "docker.io/vaultwarden/server:1.34.3-alpine"
+    node_red                = "docker.io/nodered/node-red:4.1.0-22-minimal"
+    s3fs                    = "ghcr.io/randomcoww/s3fs:v20250810.1846"
   }
 
   pxeboot_images = {
@@ -186,6 +188,7 @@ locals {
       monitoring      = "m"
       llama_cpp       = "llama"
       vaultwarden     = "vw"
+      node_red        = "nodered"
     } :
     k => "${domain}.${local.domains.public}"
   }
