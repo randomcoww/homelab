@@ -45,6 +45,10 @@ module "llama-cpp" {
   ]
   extra_envs = [
     {
+      name  = "NVIDIA_DRIVER_CAPABILITIES"
+      value = "compute,utility"
+    },
+    {
       name  = "LLAMA_ARG_MODEL"
       value = "/models/gpt-oss-20b-mxfp4.gguf"
     },

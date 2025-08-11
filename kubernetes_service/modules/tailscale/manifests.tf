@@ -85,7 +85,6 @@ module "statefulset" {
         name  = var.name
         image = var.images.tailscale
         securityContext = {
-          # https://github.com/tailscale/tailscale/issues/10814
           privileged = true
         }
         env = concat([
