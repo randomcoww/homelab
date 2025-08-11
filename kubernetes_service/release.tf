@@ -13,7 +13,8 @@ locals {
     module.webdav-videos,
     module.audioserve,
     module.llama-cpp,
-    module.node-red,
+    module.vaultwarden,
+    # module.node-red,
     # module.sunshine-desktop,
   ]
 }
@@ -97,10 +98,10 @@ resource "helm_release" "nvidia-device-plugin" {
   max_history = 2
   values = [
     yamlencode({
-      compatWithCPUManager    = true
-      priorityClassName       = "system-node-critical"
+      deviceListStrategy      = "cdi-cri"
       nvidiaDriverRoot        = "/run/nvidia/driver"
       deviceDiscoveryStrategy = "nvml"
+      priorityClassName       = "system-node-critical"
       gfd = {
         enabled = true
       }

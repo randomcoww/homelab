@@ -138,8 +138,8 @@ locals {
     stork_agent             = "ghcr.io/randomcoww/stork-agent:v20250802.2330"
     llama_cpp               = "ghcr.io/randomcoww/llama-cpp-server-cuda:v12.8.1.20250809.2047"
     nginx                   = "docker.io/nginx:1.27-alpine-slim"
+    litestream              = "ghcr.io/randomcoww/litestream:v0.3.13.20250811.0420"
     vaultwarden             = "docker.io/vaultwarden/server:1.34.3-alpine"
-    node_red                = "docker.io/nodered/node-red:4.1.0-22-minimal"
     s3fs                    = "ghcr.io/randomcoww/s3fs:v20250810.1846"
   }
 
@@ -188,7 +188,6 @@ locals {
       monitoring      = "m"
       llama_cpp       = "llama"
       vaultwarden     = "vw"
-      node_red        = "nodered"
     } :
     k => "${domain}.${local.domains.public}"
   }

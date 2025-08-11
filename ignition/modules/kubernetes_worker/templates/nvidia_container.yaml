@@ -1,23 +1,42 @@
 ---
 variant: fcos
 version: 1.5.0
+systemd:
+  units:
+    # TODO: Track to remove. CDI generate process may be improved in upstream.
+    - name: nvidia-ctk-cdi.service
+      enabled: true
+      contents: |
+        [Unit]
+        RequiresMountsFor=/run/nvidia/driver
+
+        [Service]
+        Type=oneshot
+        Restart=on-failure
+        RestartSec=2s
+        RemainAfterExit=yes
+        ExecStart=/usr/bin/nvidia-ctk cdi generate \
+          --output=/etc/cdi/nvidia.yaml
+
+        [Install]
+        WantedBy=multi-user.target
+
 storage:
   files:
-    - path: /etc/modules-load.d/20-ntsync.conf
+    - path: /etc/crio/crio.conf.d/99-nvidia.conf
       mode: 0644
       contents:
         inline: |
-          ntsync
-    - path: /etc/crio/crio.conf.d/30-nvidia.conf
-      mode: 0644
-      contents:
-        inline: |
-          [crio.runtime]
-          default_runtime="nvidia"
+          [crio]
 
-          [crio.runtime.runtimes.nvidia]
-          runtime_path = "/usr/bin/nvidia-container-runtime"
-          runtime_type = "oci"
+            [crio.runtime]
+              default_runtime = "nvidia"
+
+              [crio.runtime.runtimes]
+
+                [crio.runtime.runtimes.nvidia]
+                  runtime_path = "/usr/bin/nvidia-container-runtime"
+                  runtime_type = "oci"
     - path: /etc/nvidia-container-runtime/config.toml
       mode: 0644
       overwrite: true
@@ -55,6 +74,9 @@ storage:
 
           [nvidia-container-runtime.modes.csv]
           mount-spec-path = "/etc/nvidia-container-runtime/host-files-for-container.d"
+
+          [nvidia-container-runtime.modes.legacy]
+          cuda-compat-mode = "ldconfig"
 
           [nvidia-container-runtime-hook]
           path = "nvidia-container-runtime-hook"

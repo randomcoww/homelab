@@ -190,6 +190,7 @@ resource "helm_release" "arc-runner-set" {
     "stork-agent",
     "llama-cpp-server-cuda",
     "s3fs",
+    "litestream",
   ])
 
   name             = "arc-runner-${each.key}"

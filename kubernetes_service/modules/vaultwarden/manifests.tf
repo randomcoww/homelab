@@ -1,8 +1,10 @@
 
 locals {
   vaultwarden_port = 8080
+  db_path          = "/data/db.sqlite3"
   extra_configs = merge(var.extra_configs, {
-    DATA_FOLDER           = "/data"
+    DATA_FOLDER           = dirname(local.db_path)
+    DATABASE_URL          = local.db_path
     ROCKET_PORT           = local.vaultwarden_port
     DOMAIN                = "https://${var.service_hostname}"
     USER_ATTACHMENT_LIMIT = "0"
@@ -16,12 +18,11 @@ module "metadata" {
   namespace   = var.namespace
   release     = var.release
   app_version = split(":", var.images.vaultwarden)[1]
-  manifests = {
-    "templates/deployment.yaml" = module.deployment.manifest
-    "templates/secret.yaml"     = module.secret.manifest
-    "templates/service.yaml"    = module.service.manifest
-    "templates/ingress.yaml"    = module.ingress.manifest
-  }
+  manifests = merge(module.litestream.chart.manifests, {
+    "templates/secret.yaml"  = module.secret.manifest
+    "templates/service.yaml" = module.service.manifest
+    "templates/ingress.yaml" = module.ingress.manifest
+  })
 }
 
 module "secret" {
@@ -80,13 +81,40 @@ module "ingress" {
   ]
 }
 
-module "deployment" {
-  source   = "../../../modules/deployment"
-  name     = var.name
-  app      = var.name
-  release  = var.release
-  affinity = var.affinity
-  replicas = var.replicas
+module "litestream" {
+  source = "../statefulset_litestream"
+  ## litestream settings
+  images = {
+    litestream = var.images.litestream
+  }
+  litestream_config = {
+    dbs = [
+      {
+        path = local.db_path
+        replicas = [
+          {
+            name              = "minio"
+            type              = "s3"
+            endpoint          = var.minio_endpoint
+            bucket            = var.minio_bucket
+            path              = var.minio_litestream_prefix
+            access-key-id     = var.minio_access_key_id
+            secret-access-key = var.minio_secret_access_key
+            sync-interval     = "100ms"
+            snapshot-interval = "1h"
+            retention         = "1h"
+          },
+        ]
+      },
+    ]
+  }
+  sqlite_path = local.db_path
+  ##
+  name      = var.name
+  namespace = var.namespace
+  app       = var.name
+  release   = var.release
+  affinity  = var.affinity
   annotations = {
     "checksum/secret" = sha256(module.secret.manifest)
   }
@@ -126,6 +154,12 @@ module "deployment" {
             path   = "/alive"
           }
         }
+      },
+    ]
+    volumes = [
+      {
+        name     = "litestream-data"
+        emptyDir = {}
       },
     ]
   }

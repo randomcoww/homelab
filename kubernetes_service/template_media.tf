@@ -245,10 +245,6 @@ module "sunshine-desktop" {
   ]
   extra_envs = [
     {
-      name  = "NVIDIA_VISIBLE_DEVICES"
-      value = "all"
-    },
-    {
       name  = "NVIDIA_DRIVER_CAPABILITIES"
       value = "all"
     },
@@ -262,11 +258,11 @@ module "sunshine-desktop" {
       memory = "12Gi"
     }
     limits = {
-      ## Causes error: privileged container was configured with a device container path that already exists on the host
-      # "nvidia.com/gpu" = 1
+      "nvidia.com/gpu" = 1
     }
   }
   security_context = {
+    # TODO: Might not be needed if flatpak is dropped
     privileged = true
   }
   loadbalancer_class_name = "kube-vip.io/kube-vip-class"

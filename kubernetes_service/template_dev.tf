@@ -45,14 +45,6 @@ module "llama-cpp" {
   ]
   extra_envs = [
     {
-      name  = "NVIDIA_VISIBLE_DEVICES"
-      value = "all"
-    },
-    {
-      name  = "NVIDIA_DRIVER_CAPABILITIES"
-      value = "compute,utility"
-    },
-    {
       name  = "LLAMA_ARG_MODEL"
       value = "/models/gpt-oss-20b-mxfp4.gguf"
     },
@@ -72,18 +64,22 @@ module "llama-cpp" {
       name  = "FORMAT"
       value = "none"
     },
+    {
+      name  = "LLAMA_ARG_THREADS"
+      value = 1
+    },
   ]
-  # TODO: Nvidia GPU access chain not fully working..
   security_context = {
+    # TODO: Revisit. Open /dev/nvidia-uvm currently fails without this.
     privileged = true
   }
   service_hostname          = local.kubernetes_ingress_endpoints.llama_cpp
   ingress_class_name        = local.ingress_classes.ingress_nginx
   nginx_ingress_annotations = local.nginx_ingress_annotations
   resources = {
-    # limits = {
-    #   "nvidia.com/gpu" = 1
-    # }
+    limits = {
+      "nvidia.com/gpu" = 1
+    }
   }
   s3_endpoint          = "https://${local.services.cluster_minio.ip}:${local.service_ports.minio}"
   s3_bucket            = minio_s3_bucket.data["models"].id
@@ -92,64 +88,5 @@ module "llama-cpp" {
   s3_mount_extra_args = [
     "--cache /tmp",
     "--read-only",
-  ]
-}
-
-resource "minio_s3_bucket" "node-red" {
-  bucket        = "node-red"
-  force_destroy = true
-}
-
-resource "minio_iam_user" "node-red" {
-  name          = "node-red"
-  force_destroy = true
-}
-
-resource "minio_iam_policy" "node-red" {
-  name = "node-red"
-  policy = jsonencode({
-    Version = "2012-10-17"
-    Statement = [
-      {
-        Effect = "Allow"
-        Action = "*"
-        Resource = [
-          minio_s3_bucket.node-red.arn,
-          "${minio_s3_bucket.node-red.arn}/*",
-        ]
-      },
-    ]
-  })
-}
-
-resource "minio_iam_user_policy_attachment" "node-red" {
-  user_name   = minio_iam_user.node-red.id
-  policy_name = minio_iam_policy.node-red.id
-}
-
-module "node-red" {
-  source    = "./modules/node_red"
-  name      = "node-red"
-  namespace = "default"
-  release   = "0.1.0"
-  replicas  = 1
-  images = {
-    node_red = local.container_images.node_red
-    s3fs     = local.container_images.s3fs
-  }
-  service_hostname          = local.kubernetes_ingress_endpoints.node_red
-  ingress_class_name        = local.ingress_classes.ingress_nginx
-  nginx_ingress_annotations = local.nginx_ingress_annotations
-
-  s3_endpoint          = "https://${local.kubernetes_services.minio.endpoint}:${local.service_ports.minio}"
-  s3_bucket            = minio_s3_bucket.node-red.id
-  s3_access_key_id     = minio_iam_user.node-red.id
-  s3_secret_access_key = minio_iam_user.node-red.secret
-  s3_mount_extra_args = [
-    "allow_other",
-    "compat_dir",
-    "use_path_request_style",
-    "uid=1000",
-    "gid=1000",
   ]
 }
