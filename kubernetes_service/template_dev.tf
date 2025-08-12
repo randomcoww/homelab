@@ -77,9 +77,6 @@ module "llama-cpp" {
     # TODO: Revisit. Open /dev/nvidia-uvm currently fails without this.
     privileged = true
   }
-  service_hostname          = local.kubernetes_ingress_endpoints.llama_cpp
-  ingress_class_name        = local.ingress_classes.ingress_nginx
-  nginx_ingress_annotations = local.nginx_ingress_annotations
   resources = {
     limits = {
       "nvidia.com/gpu" = 1
