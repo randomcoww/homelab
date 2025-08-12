@@ -58,7 +58,7 @@ module "llama-cpp" {
     },
     {
       name  = "LLAMA_ARG_N_GPU_LAYERS"
-      value = 25
+      value = 26
     },
     {
       name  = "LLAMA_ARG_CTX_SIZE"
@@ -159,6 +159,7 @@ module "open-webui" {
     S3_KEY_PREFIX               = "data"
     S3_BUCKET_NAME              = minio_s3_bucket.open-webui.id
     S3_ENDPOINT_URL             = "https://${local.kubernetes_services.minio.endpoint}:${local.service_ports.minio}"
+    ENABLE_FOLLOW_UP_GENERATION = false
   }
   ingress_class_name        = local.ingress_classes.ingress_nginx
   nginx_ingress_annotations = local.nginx_ingress_annotations

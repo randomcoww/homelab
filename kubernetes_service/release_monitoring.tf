@@ -94,7 +94,7 @@ resource "helm_release" "prometheus" {
               name = "etcd"
               rules = [
                 {
-                  alert = "etcdMembersDown"
+                  alert = "MembersDown"
                   annotations = {
                     summary     = "etcd cluster members are down."
                     description = <<-EOF
@@ -140,7 +140,7 @@ resource "helm_release" "prometheus" {
                   avg_over_time(minio_cluster_nodes_offline_total{app="${local.kubernetes_services.minio.name}",namespace="${local.kubernetes_services.minio.namespace}"}[1m]) > 0
                   EOF
                   labels = {
-                    severity = "warn"
+                    severity = "critical"
                   }
                 },
                 {
@@ -155,7 +155,103 @@ resource "helm_release" "prometheus" {
                   avg_over_time(minio_cluster_drive_offline_total{app="${local.kubernetes_services.minio.name}",namespace="${local.kubernetes_services.minio.namespace}"}[1m]) > 0
                   EOF
                   labels = {
-                    severity = "warn"
+                    severity = "critical"
+                  }
+                },
+              ]
+            },
+            {
+              name = "kube-apiserver"
+              rules = [
+                {
+                  alert = "NodesDown"
+                  annotations = {
+                    summary     = "Kube API server nodes down"
+                    description = <<-EOF
+                    Kube API server nodes {{ $labels.app }} down or flapping
+                    EOF
+                  }
+                  expr = <<-EOF
+                  (
+                    absent(up{job="kubernetes-apiservers"} == 1)
+                  or
+                    changes(up{job="kubernetes-apiservers"}[1m]) > 1
+                  )
+                  EOF
+                  for  = "1m"
+                  labels = {
+                    severity = "critical"
+                  }
+                },
+              ]
+            },
+            {
+              # Ref: https://github.com/Azure/AKS/blob/master/examples/kube-prometheus/coredns-prometheusRule.yaml
+              name = "kube-dns"
+              rules = [
+                {
+                  alert = "CoreDNSDown"
+                  annotations = {
+                    summary     = "CoreDNS nodes down"
+                    description = <<-EOF
+                    CoreDNS nodes {{ $labels.app }} down or flapping
+                    EOF
+                  }
+                  expr = <<-EOF
+                  (
+                    absent(up{k8s_app="coredns"} == 1)
+                  or
+                    changes(up{app="kea"}[1m]) > 1
+                  )
+                  EOF
+                  for  = "1m"
+                  labels = {
+                    severity = "critical"
+                  }
+                },
+                {
+                  alert = "CoreDNSErrorsHigh"
+                  annotations = {
+                    summary     = "CoreDNS errors high"
+                    description = <<-EOF
+                    CoreDNS is returning SERVFAIL for {{ $value | humanizePercentage }}
+                    EOF
+                  }
+                  expr = <<-EOF
+                  (
+                    sum(rate(coredns_dns_responses_total{k8s_app="coredns",rcode="SERVFAIL"}[5m]))
+                  and
+                    sum(rate(coredns_dns_responses_total{k8s_app="coredns"}[5m])) > 0.01
+                  )
+                  EOF
+                  for  = "10m"
+                  labels = {
+                    severity = "critical"
+                  }
+                },
+              ]
+            },
+            {
+              name = "kea"
+              rules = [
+                {
+                  alert = "KeaNodesDown"
+                  annotations = {
+                    summary     = "Kea nodes down"
+                    description = <<-EOF
+                    Kea nodes {{ $labels.app }} down or flapping
+                    EOF
+                  }
+                  expr = <<-EOF
+                  (
+                    absent(up{app="kea"} == 1)
+                  or
+                    changes(up{app="kea"}[1m]) > 1
+                  )
+                  EOF
+                  for  = "1m"
+                  labels = {
+                    severity = "critical"
                   }
                 },
               ]
