@@ -1,4 +1,3 @@
-
 resource "minio_s3_bucket" "vaultwarden" {
   bucket        = "vaultwarden"
   force_destroy = true
