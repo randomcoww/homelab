@@ -28,6 +28,12 @@ Zone | Zone Settings | Edit
 Zone | SSL and Certificates | Edit
 Zone | DNS | Edit
 
+Look up Cloudflare permissions
+
+```bash
+curl https://api.cloudflare.com/client/v4/user/tokens/permission_groups --header "Authorization: Bearer $CLOUDFLARE_API_TOKEN" | jq
+```
+
 Set env to use Terraform S3 backend on Cloudflare R2
 
 ```bash
