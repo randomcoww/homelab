@@ -187,7 +187,6 @@ locals {
       sunshine_admin  = "sunadmin"
       audioserve      = "audioserve"
       monitoring      = "m"
-      llama_cpp       = "llama"
       vaultwarden     = "vw"
       open_webui      = "chat"
     } :
@@ -229,6 +228,10 @@ locals {
         name      = "prometheus"
         namespace = "monitoring"
       }
+      prometheus_blackbox = {
+        name      = "prometheus-blackbox"
+        namespace = "monitoring"
+      }
       llama_cpp = {
         name      = "llama-cpp"
         namespace = "default"
@@ -260,13 +263,14 @@ locals {
   }
 
   service_ports = {
-    matchbox      = 443
-    matchbox_api  = 50101
-    minio         = 9000
-    metrics       = 9153
-    prometheus    = 80
-    llama_cpp     = 80
-    yugabyte_ysql = 5433
+    matchbox            = 443
+    matchbox_api        = 50101
+    minio               = 9000
+    metrics             = 9153
+    prometheus          = 80
+    prometheus_blackbox = 9115
+    llama_cpp           = 80
+    yugabyte_ysql       = 5433
   }
 
   minio = {
