@@ -1,9 +1,10 @@
 
 locals {
-  db_path          = "/data/db.sqlite3"
+  db_path = "/data/db.sqlite3"
   extra_configs = merge(var.extra_configs, {
-    PORT = 8080
-    DATABASE_URL = "sqlite://${local.db_path}"
+    PORT               = 8080
+    DATABASE_URL       = "sqlite:///${local.db_path}"
+    REQUESTS_CA_BUNDLE = "/etc/ssl/certs/ca-certificates.crt"
   })
 }
 
@@ -25,10 +26,12 @@ module "secret" {
   name    = var.name
   app     = var.name
   release = var.release
-  data = {
+  data = merge({
     for k, v in local.extra_configs :
     tostring(k) => tostring(v)
-  }
+    }, {
+    trusted_ca = var.trusted_ca
+  })
 }
 
 module "service" {
@@ -40,7 +43,7 @@ module "service" {
     type = "ClusterIP"
     ports = [
       {
-        name       = "open_webui"
+        name       = "open-webui"
         port       = local.extra_configs.PORT
         protocol   = "TCP"
         targetPort = local.extra_configs.PORT
@@ -118,6 +121,15 @@ module "litestream" {
       {
         name  = var.name
         image = var.images.open_webui
+        command = [
+          "bash",
+          "-c",
+          <<-EOF
+          update-ca-certificates
+
+          exec /app/backend/start.sh
+          EOF
+        ]
         env = [
           for k, v in local.extra_configs :
           {
@@ -135,30 +147,37 @@ module "litestream" {
             containerPort = local.extra_configs.PORT
           },
         ]
+        volumeMounts = [
+          {
+            name      = "config"
+            mountPath = "/usr/local/share/ca-certificates/ca-cert.crt"
+            subPath   = "trusted_ca"
+          },
+        ]
         startupProbe = {
           httpGet = {
-            port   = local.extra_configs.PORT
-            path   = "/health"
+            port = local.extra_configs.PORT
+            path = "/health"
           }
           initialDelaySeconds = 30
-          periodSeconds = 5
-          failureThreshold = 20
+          periodSeconds       = 5
+          failureThreshold    = 20
         }
         readinessProbe = {
           httpGet = {
-            port   = local.extra_configs.PORT
-            path   = "/health/db"
+            port = local.extra_configs.PORT
+            path = "/health/db"
           }
           failureThreshold = 1
-          periodSeconds = 10
+          periodSeconds    = 10
         }
         livenessProbe = {
           httpGet = {
-            port   = local.extra_configs.PORT
-            path   = "/health"
+            port = local.extra_configs.PORT
+            path = "/health"
           }
           failureThreshold = 1
-          periodSeconds = 10
+          periodSeconds    = 10
         }
       },
     ]
@@ -167,6 +186,20 @@ module "litestream" {
         name     = "litestream-data"
         emptyDir = {}
       },
+      {
+        name = "config"
+        secret = {
+          secretName = module.secret.name
+        }
+      },
     ]
+    dnsConfig = {
+      options = [
+        {
+          name  = "ndots"
+          value = "1"
+        },
+      ]
+    }
   }
 }

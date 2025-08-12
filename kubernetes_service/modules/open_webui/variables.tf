@@ -10,20 +10,24 @@ variable "release" {
   type = string
 }
 
-variable "replicas" {
-  type = number
-}
-
 variable "affinity" {
   type    = any
   default = {}
 }
 
+variable "service_hostname" {
+  type = string
+}
+
 variable "images" {
   type = object({
     open_webui = string
-    litestream     = string
+    litestream = string
   })
+}
+
+variable "trusted_ca" {
+  type = string
 }
 
 variable "resources" {

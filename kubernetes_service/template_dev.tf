@@ -131,37 +131,35 @@ resource "minio_iam_user_policy_attachment" "open-webui" {
 
 module "open-webui" {
   source    = "./modules/open_webui"
-  name      = local.kubernetes_services.open_webui.name
-  namespace = local.kubernetes_services.open_webui.namespace
+  name      = "open-webui"
+  namespace = "default"
   release   = "0.1.1"
   images = {
-    open_webui  = local.container_images.open_webui
-    litestream  = local.container_images.litestream
+    open_webui = local.container_images.open_webui
+    litestream = local.container_images.litestream
   }
   service_hostname = local.kubernetes_ingress_endpoints.open_webui
+  trusted_ca       = data.terraform_remote_state.sr.outputs.trust.ca.cert_pem
   extra_configs = {
-    WEBUI_URL = "https://${local.kubernetes_services.open_webui.endpoint}"
-    ENABLE_SIGNUP = false
-    ENABLE_LOGIN_FORM = false
-    DEFAULT_MODELS = "gpt-oss-20b"
-    WEBUI_AUTH = false
+    WEBUI_URL                   = "https://${local.kubernetes_ingress_endpoints.open_webui}"
+    ENABLE_SIGNUP               = false
+    ENABLE_LOGIN_FORM           = false
+    DEFAULT_MODELS              = "gpt-oss-20b"
+    WEBUI_AUTH                  = false
     ENABLE_VERSION_UPDATE_CHECK = false
-    ENABLE_OPENAI_API = true
-    OPENAI_API_BASE_URL = "http://${local.kubernetes_services.llama_cpp.endpoint}:${local.service_ports.llama_cpp}"
-    RAG_EMBEDDING_ENGINE = "openai"
-    RAG_EMBEDDING_MODEL = "gpt-oss-20b"
-    RAG_OPENAI_API_BASE_URL = "http://${local.kubernetes_services.llama_cpp.endpoint}:${local.service_ports.llama_cpp}"
-    ENABLE_WEB_SEARCH = true
-    WEB_SEARCH_ENGINE = "duckduckgo"
-    STORAGE_PROVIDER = "local"
-    # STORAGE_PROVIDER = "s3"
-    # S3_ACCESS_KEY_ID = minio_iam_user.open-webui.id
-    # S3_SECRET_ACCESS_KEY = minio_iam_user.open-webui.secret
-    # S3_ADDRESSING_STYLE = "path"
-    # S3_BUCKET_NAME = minio_s3_bucket.open-webui.id
-    # S3_ENDPOINT_URL = "https://${local.kubernetes_services.minio.endpoint}:${local.service_ports.minio}"
+    ENABLE_OPENAI_API           = true
+    OPENAI_API_BASE_URL         = "http://${local.kubernetes_services.llama_cpp.endpoint}:${local.service_ports.llama_cpp}"
+    ENABLE_WEB_SEARCH           = true
+    WEB_SEARCH_ENGINE           = "duckduckgo"
+    WEB_SEARCH_RESULT_COUNT     = 4
+    STORAGE_PROVIDER            = "s3"
+    S3_ACCESS_KEY_ID            = minio_iam_user.open-webui.id
+    S3_SECRET_ACCESS_KEY        = minio_iam_user.open-webui.secret
+    S3_ADDRESSING_STYLE         = "path"
+    S3_KEY_PREFIX               = "data"
+    S3_BUCKET_NAME              = minio_s3_bucket.open-webui.id
+    S3_ENDPOINT_URL             = "https://${local.kubernetes_services.minio.endpoint}:${local.service_ports.minio}"
   }
-  service_hostname          = local.kubernetes_ingress_endpoints.open_webui
   ingress_class_name        = local.ingress_classes.ingress_nginx
   nginx_ingress_annotations = local.nginx_ingress_annotations
 
