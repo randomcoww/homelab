@@ -133,7 +133,7 @@ locals {
     rclone                  = "docker.io/rclone/rclone:1.70.3"
     mountpoint              = "ghcr.io/randomcoww/mountpoint-s3:v1.19.0.20250801.2311"
     audioserve              = "docker.io/izderadicka/audioserve:latest"
-    nvidia_driver           = "ghcr.io/randomcoww/nvidia-driver-container:v575.64.05-fedora42"
+    nvidia_driver           = "ghcr.io/randomcoww/nvidia-driver-container:v580.65.06-fedora42"
     sunshine_desktop        = "ghcr.io/randomcoww/sunshine-desktop:v2025.731.125037.20250803.2137"
     stork_agent             = "ghcr.io/randomcoww/stork-agent:v20250802.2330"
     llama_cpp               = "ghcr.io/randomcoww/llama-cpp-server-cuda:v12.8.1.20250809.2047"
