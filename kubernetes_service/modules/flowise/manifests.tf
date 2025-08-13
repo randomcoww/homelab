@@ -1,11 +1,37 @@
 
 locals {
-  db_path = "/data/db.sqlite3"
   extra_configs = merge(var.extra_configs, {
-    PORT               = 8080
-    DATABASE_URL       = "sqlite:///${local.db_path}"
-    REQUESTS_CA_BUNDLE = "/etc/ssl/certs/ca-certificates.crt"
+    DATABASE_TYPE               = "sqlite"
+    DATABASE_PATH               = "/var/lib/flowise"
+    PORT                        = 3000
+    SECRETKEY_STORAGE_TYPE      = "local"
+    FLOWISE_SECRETKEY_OVERWRITE = random_password.flowise-secretkey-overwrite.result
+    JWT_AUTH_TOKEN_SECRET       = random_password.jwt-auth-token-secret.result
+    JWT_REFRESH_TOKEN_SECRET    = random_password.jwt-refresh-token-secret.result
+    TOKEN_HASH_SECRET           = random_password.token-hash-secret.result
+    NODE_EXTRA_CA_CERTS         = "/usr/local/share/ca-certificates/ca-cert.pem"
   })
+  db_path = "${local.extra_configs.DATABASE_PATH}/database.sqlite"
+}
+
+resource "random_password" "flowise-secretkey-overwrite" {
+  length  = 30
+  special = false
+}
+
+resource "random_password" "jwt-auth-token-secret" {
+  length  = 30
+  special = false
+}
+
+resource "random_password" "jwt-refresh-token-secret" {
+  length  = 30
+  special = false
+}
+
+resource "random_password" "token-hash-secret" {
+  length  = 30
+  special = false
 }
 
 module "metadata" {
@@ -13,7 +39,7 @@ module "metadata" {
   name        = var.name
   namespace   = var.namespace
   release     = var.release
-  app_version = split(":", var.images.open_webui)[1]
+  app_version = split(":", var.images.flowise)[1]
   manifests = merge(module.litestream.chart.manifests, {
     "templates/secret.yaml"  = module.secret.manifest
     "templates/service.yaml" = module.service.manifest
@@ -120,17 +146,7 @@ module "litestream" {
     containers = [
       {
         name  = var.name
-        image = var.images.open_webui
-        command = [
-          "bash",
-          "-c",
-          <<-EOF
-          set -e
-          update-ca-certificates
-
-          exec /app/backend/start.sh
-          EOF
-        ]
+        image = var.images.flowise
         env = [
           for k, v in local.extra_configs :
           {
@@ -151,34 +167,31 @@ module "litestream" {
         volumeMounts = [
           {
             name      = "config"
-            mountPath = "/usr/local/share/ca-certificates/ca-cert.crt"
+            mountPath = local.extra_configs.NODE_EXTRA_CA_CERTS
             subPath   = "trusted_ca"
           },
         ]
-        startupProbe = {
-          httpGet = {
-            port = local.extra_configs.PORT
-            path = "/health"
-          }
-          initialDelaySeconds = 30
-          periodSeconds       = 5
-          failureThreshold    = 20
-        }
         readinessProbe = {
           httpGet = {
             port = local.extra_configs.PORT
-            path = "/health/db"
+            path = "/api/v1/ping"
           }
-          failureThreshold = 1
-          periodSeconds    = 10
+          initialDelaySeconds = 0
+          periodSeconds       = 10
+          timeoutSeconds      = 1
+          failureThreshold    = 3
+          successThreshold    = 1
         }
         livenessProbe = {
           httpGet = {
             port = local.extra_configs.PORT
-            path = "/health"
+            path = "/api/v1/ping"
           }
-          failureThreshold = 1
-          periodSeconds    = 10
+          initialDelaySeconds = 0
+          periodSeconds       = 10
+          timeoutSeconds      = 1
+          failureThreshold    = 3
+          successThreshold    = 1
         }
       },
     ]
@@ -194,13 +207,5 @@ module "litestream" {
         }
       },
     ]
-    dnsConfig = {
-      options = [
-        {
-          name  = "ndots"
-          value = "1"
-        },
-      ]
-    }
   }
 }

@@ -15,6 +15,7 @@ locals {
     module.vaultwarden,
     module.llama-cpp,
     module.open-webui,
+    module.flowise,
     # module.sunshine-desktop,
   ]
 }

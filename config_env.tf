@@ -142,6 +142,7 @@ locals {
     vaultwarden             = "docker.io/vaultwarden/server:1.34.3-alpine"
     s3fs                    = "ghcr.io/randomcoww/s3fs:v20250810.1846"
     open_webui              = "ghcr.io/open-webui/open-webui:0.6.22"
+    flowise                 = "docker.io/flowiseai/flowise:3.0.5"
   }
 
   pxeboot_images = {
@@ -189,6 +190,7 @@ locals {
       monitoring      = "m"
       vaultwarden     = "vw"
       open_webui      = "chat"
+      flowise         = "flowise"
     } :
     k => "${domain}.${local.domains.public}"
   }

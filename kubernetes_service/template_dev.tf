@@ -185,12 +185,6 @@ module "open-webui" {
     - Err on generating queries if any chance of usefulness.
     - Be concise and prioritize high-quality queries.
 
-    ### Output:
-    Strictly return in JSON format:
-    {
-      "queries": ["query1", "query2"]
-    }
-
     ### Chat History:
     <chat_history>
     {{MESSAGES:END:6}}
@@ -207,4 +201,74 @@ module "open-webui" {
   minio_litestream_prefix = "$POD_NAME/litestream"
   minio_access_key_id     = minio_iam_user.open-webui.id
   minio_secret_access_key = minio_iam_user.open-webui.secret
+}
+
+## flowise
+
+resource "minio_s3_bucket" "flowise" {
+  bucket        = "flowise"
+  force_destroy = true
+}
+
+resource "minio_iam_user" "flowise" {
+  name          = "flowise"
+  force_destroy = true
+}
+
+resource "minio_iam_policy" "flowise" {
+  name = "flowise"
+  policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [
+      {
+        Effect = "Allow"
+        Action = "*"
+        Resource = [
+          minio_s3_bucket.flowise.arn,
+          "${minio_s3_bucket.flowise.arn}/*",
+        ]
+      },
+    ]
+  })
+}
+
+resource "minio_iam_user_policy_attachment" "flowise" {
+  user_name   = minio_iam_user.flowise.id
+  policy_name = minio_iam_policy.flowise.id
+}
+
+module "flowise" {
+  source    = "./modules/flowise"
+  name      = "flowise"
+  namespace = "default"
+  release   = "0.1.1"
+  images = {
+    flowise    = local.container_images.flowise
+    litestream = local.container_images.litestream
+  }
+  service_hostname = local.kubernetes_ingress_endpoints.flowise
+  trusted_ca       = data.terraform_remote_state.sr.outputs.trust.ca.cert_pem
+  extra_configs = {
+    STORAGE_TYPE                 = "s3"
+    S3_STORAGE_BUCKET_NAME       = minio_s3_bucket.flowise.id
+    S3_STORAGE_ACCESS_KEY_ID     = minio_iam_user.flowise.id
+    S3_STORAGE_SECRET_ACCESS_KEY = minio_iam_user.flowise.secret
+    S3_STORAGE_REGION            = "NA"
+    S3_ENDPOINT_URL              = "https://${local.kubernetes_services.minio.endpoint}:${local.service_ports.minio}"
+    S3_FORCE_PATH_STYLE          = true
+    SMTP_HOST                    = var.smtp.host
+    SMTP_PORT                    = var.smtp.port
+    SMTP_USER                    = var.smtp.username
+    SMTP_PASSWORD                = var.smtp.password
+    SMTP_SECURE                  = true
+    SENDER_EMAIL                 = var.smtp.username
+  }
+  ingress_class_name        = local.ingress_classes.ingress_nginx
+  nginx_ingress_annotations = local.nginx_ingress_annotations
+
+  minio_endpoint          = "https://${local.kubernetes_services.minio.endpoint}:${local.service_ports.minio}"
+  minio_bucket            = minio_s3_bucket.flowise.id
+  minio_litestream_prefix = "$POD_NAME/litestream"
+  minio_access_key_id     = minio_iam_user.flowise.id
+  minio_secret_access_key = minio_iam_user.flowise.secret
 }
