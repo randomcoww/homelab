@@ -136,7 +136,7 @@ locals {
     nvidia_driver           = "ghcr.io/randomcoww/nvidia-driver-container:v575.64.05-fedora42"
     sunshine_desktop        = "ghcr.io/randomcoww/sunshine-desktop:v2025.731.125037.20250803.2137"
     stork_agent             = "ghcr.io/randomcoww/stork-agent:v20250802.2330"
-    llama_cpp               = "ghcr.io/randomcoww/llama-cpp-server-cuda:v12.8.1.20250809.2047"
+    llama_cpp               = "ghcr.io/randomcoww/llama-cpp-server-cuda:v12.8.1.20250814.0704"
     nginx                   = "docker.io/nginx:1.27-alpine-slim"
     litestream              = "ghcr.io/randomcoww/litestream:v0.3.13.20250811.0420"
     vaultwarden             = "docker.io/vaultwarden/server:1.34.3-alpine"
