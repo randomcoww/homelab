@@ -69,7 +69,7 @@ module "service" {
     type = "ClusterIP"
     ports = [
       {
-        name       = "open-webui"
+        name       = "flowise"
         port       = local.extra_configs.PORT
         protocol   = "TCP"
         targetPort = local.extra_configs.PORT
