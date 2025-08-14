@@ -189,8 +189,8 @@ resource "helm_release" "arc-runner-set" {
     "homelab",
     "stork-agent",
     "llama-cpp-server-cuda",
-    "s3fs",
     "litestream",
+    "kaniko",
   ])
 
   name             = "arc-runner-${each.key}"
