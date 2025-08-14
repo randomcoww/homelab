@@ -278,7 +278,7 @@ locals {
     prometheus          = 80
     prometheus_blackbox = 9115
     llama_cpp           = 80
-    searxng             = 80
+    searxng             = 8080
   }
 
   minio = {
