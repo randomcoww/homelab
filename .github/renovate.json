@@ -44,16 +44,16 @@
       "matchPackageNames": [
         "ghcr.io/lldap/lldap"
       ],
-      "versioning": "regex:^(?<major>\\d+)-(?<minor>\\d+)(-(?<patch>\\d+))?(-(?<compatibility>.*))?$"
+      "versioning": "regex:^(?<major>\\d+)(-(?<minor>\\d+))(-(?<patch>\\d+))(-(?<compatibility>.*))?$"
     },
     {
       "matchDatasources": [
         "docker"
       ],
       "matchPackageNames": [
-        "docker.io/eqalpha/keydb"
+        "docker.io/searxng/searxng"
       ],
-      "versioning": "regex:^(?<compatibility>.*)_v(?<major>\\d+)(.(?<minor>\\d+))?(.(?<patch>\\d+))?$"
+      "versioning": "regex:^(?<major>\\d+)(.(?<minor>\\d+))(.(?<patch>\\d+))(-.*)?$"
     },
     {
       "matchDatasources": [
@@ -62,7 +62,7 @@
       "matchPackageNames": [
         "randomcoww/fedora-coreos-config"
       ],
-      "versioning": "regex:^(?<major>\\d+)(.(?<minor>\\d+))?(.(?<patch>\\d+))?$"
+      "versioning": "regex:^(?<major>\\d+)(.(?<minor>\\d+))(.(?<patch>\\d+))?$"
     }
   ]
 }
