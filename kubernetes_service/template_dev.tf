@@ -55,14 +55,14 @@ module "llama-cpp" {
       value = "compute,utility"
     },
     {
-      name = "LLAMA_ARG_MODEL"
-      # value = "/models/gpt-oss-20b-mxfp4.gguf"
-      value = "/models/DeepSeek-R1-Distill-Qwen-14B-Q4_K_M.gguf"
+      name  = "LLAMA_ARG_MODEL"
+      value = "/models/gpt-oss-20b-mxfp4.gguf"
+      # value = "/models/DeepSeek-R1-Distill-Qwen-14B-Q4_K_M.gguf"
     },
     {
-      name = "LLAMA_ARG_ALIAS"
-      # value = "gpt-oss-20b"
-      value = "deepseek-r1-14b"
+      name  = "LLAMA_ARG_ALIAS"
+      value = "gpt-oss-20b"
+      # value = "deepseek-r1-14b"
     },
     {
       name  = "LLAMA_ARG_THINK"
