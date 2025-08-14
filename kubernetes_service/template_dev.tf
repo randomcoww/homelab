@@ -272,3 +272,41 @@ module "flowise" {
   minio_access_key_id     = minio_iam_user.flowise.id
   minio_secret_access_key = minio_iam_user.flowise.secret
 }
+
+## SearXNG
+
+module "searxng" {
+  source    = "./modules/searxng"
+  name      = local.kubernetes_services.searxng.name
+  namespace = local.kubernetes_services.searxng.namespace
+  release   = "0.1.1"
+  images = {
+    searxng = local.container_images.searxng
+    valkey  = local.container_images.valkey
+  }
+  ports = {
+    searxng = local.service_ports.searxng
+  }
+  searxng_settings = {
+    use_default_settings = {
+      engines = {
+        keep_only = [
+          "google",
+          "bing",
+          "duckduckgo",
+        ]
+      }
+    }
+    general = {
+      debug = true
+    }
+    search = {
+      autocomplete = ""
+      safe_search  = 0
+      default_lang = "auto"
+      formats = [
+        "json",
+      ]
+    }
+  }
+}

@@ -143,6 +143,8 @@ locals {
     s3fs                    = "ghcr.io/randomcoww/s3fs:v20250810.1846"
     open_webui              = "ghcr.io/open-webui/open-webui:0.6.22"
     flowise                 = "docker.io/flowiseai/flowise:3.0.5"
+    searxng                 = "docker.io/searxng/searxng:2025.8.12-6b1516d"
+    valkey                  = "docker.io/valkey/valkey:8.1.3-alpine"
   }
 
   pxeboot_images = {
@@ -238,6 +240,10 @@ locals {
         name      = "llama-cpp"
         namespace = "default"
       }
+      searxng = {
+        name      = "searxng"
+        namespace = "default"
+      }
     } :
     name => merge(e, {
       endpoint = "${e.name}.${e.namespace}"
@@ -272,7 +278,7 @@ locals {
     prometheus          = 80
     prometheus_blackbox = 9115
     llama_cpp           = 80
-    yugabyte_ysql       = 5433
+    searxng             = 80
   }
 
   minio = {
