@@ -1,26 +1,6 @@
 ---
 variant: fcos
 version: 1.5.0
-systemd:
-  units:
-    # TODO: Track to remove. CDI generate process may be improved in upstream.
-    - name: nvidia-ctk-cdi.service
-      enabled: true
-      contents: |
-        [Unit]
-        RequiresMountsFor=/run/nvidia/driver
-
-        [Service]
-        Type=oneshot
-        Restart=on-failure
-        RestartSec=2s
-        RemainAfterExit=yes
-        ExecStart=/usr/bin/nvidia-ctk cdi generate \
-          --output=/etc/cdi/nvidia.yaml
-
-        [Install]
-        WantedBy=multi-user.target
-
 storage:
   files:
     - path: /etc/crio/crio.conf.d/99-nvidia.conf

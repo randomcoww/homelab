@@ -147,24 +147,6 @@ resource "helm_release" "nvidia-gpu-oprerator" {
       }
       devicePlugin = {
         enabled = true
-        env = [
-          {
-            name  = "DEVICE_DISCOVERY_STRATEGY"
-            value = "nvml"
-          },
-          {
-            name  = "DEVICE_LIST_STRATEGY"
-            value = "cdi-cri"
-          },
-          {
-            name  = "NVIDIA_DRIVER_ROOT"
-            value = "/run/nvidia/driver"
-          },
-          {
-            name  = "NVIDIA_CDI_HOOK_PATH"
-            value = "/usr/bin/nvidia-ctk"
-          },
-        ]
       }
       dcgmExporter = {
         enabled = false
