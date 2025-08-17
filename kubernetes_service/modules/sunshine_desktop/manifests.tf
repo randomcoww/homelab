@@ -145,6 +145,10 @@ module "statefulset" {
       {
         name  = var.name
         image = var.images.sunshine_desktop
+        command = [
+          "sleep",
+          "infinity",
+        ]
         env = concat([
           {
             name = "SUNSHINE_USERNAME"
@@ -225,16 +229,16 @@ module "statefulset" {
             protocol      = "UDP"
           }
         ])
-        readinessProbe = {
-          tcpSocket = {
-            port = local.base_port
-          }
-        }
-        livenessProbe = {
-          tcpSocket = {
-            port = local.base_port
-          }
-        }
+        # readinessProbe = {
+        #   tcpSocket = {
+        #     port = local.base_port
+        #   }
+        # }
+        # livenessProbe = {
+        #   tcpSocket = {
+        #     port = local.base_port
+        #   }
+        # }
         securityContext = var.security_context
         resources       = var.resources
       },
