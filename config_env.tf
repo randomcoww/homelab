@@ -120,7 +120,7 @@ locals {
     flannel                 = "docker.io/flannel/flannel:v0.27.2"
     flannel_cni_plugin      = "docker.io/flannel/flannel-cni-plugin:v1.7.1-flannel1"
     kube_vip                = "ghcr.io/kube-vip/kube-vip:v1.0.0"
-    kvm_device_plugin       = "ghcr.io/randomcoww/kvm-device-plugin:v20250610.2025"
+    kvm_device_plugin       = "ghcr.io/randomcoww/kvm-device-plugin:v20250816.2233"
     kea                     = "ghcr.io/randomcoww/kea:v3.1.0.20250816.2229"
     matchbox                = "quay.io/poseidon/matchbox:v0.11.0"
     ipxe                    = "ghcr.io/randomcoww/ipxe:v20250817.0504"
