@@ -40,7 +40,6 @@ module "llama-cpp" {
     llama_cpp = local.service_ports.llama_cpp
   }
   args = [
-    "/app/llama-server",
     "--flash-attn",
     "--jinja",
     "--temp",
@@ -76,10 +75,6 @@ module "llama-cpp" {
       value = 16384
     },
   ]
-  security_context = {
-    # TODO: Revisit. Open /dev/nvidia-uvm currently fails without this.
-    privileged = true
-  }
   resources = {
     limits = {
       "nvidia.com/gpu" = 1

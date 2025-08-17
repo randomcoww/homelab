@@ -67,7 +67,7 @@ module "mountpoint" {
           done
           ln -sf "${local.data_path}" /models
 
-          exec /app/llama-server \
+          exec /tini -- /app/llama-server \
             --no-webui \
             --host 0.0.0.0 \
             --port ${var.ports.llama_cpp} $@

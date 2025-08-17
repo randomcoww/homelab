@@ -3,7 +3,6 @@
 locals {
   modules_enabled = [
     module.kvm-device-plugin,
-    module.nvidia-driver,
     module.kea,
     module.matchbox,
     module.tailscale,
@@ -87,32 +86,6 @@ resource "helm_release" "ingress-nginx" {
   ]
 }
 
-# nvidia device plugin #
-
-resource "helm_release" "nvidia-device-plugin" {
-  name        = "nvidia-device-plugin"
-  repository  = "https://nvidia.github.io/k8s-device-plugin"
-  chart       = "nvidia-device-plugin"
-  namespace   = "kube-system"
-  wait        = false
-  version     = "0.17.3"
-  max_history = 2
-  values = [
-    yamlencode({
-      deviceListStrategy      = "cdi-cri"
-      nvidiaDriverRoot        = "/run/nvidia/driver"
-      deviceDiscoveryStrategy = "nvml"
-      priorityClassName       = "system-node-critical"
-      gfd = {
-        enabled = true
-      }
-      cdi = {
-        nvidiaHookPath = "/usr/bin/nvidia-ctk"
-      }
-    }),
-  ]
-}
-
 # kured #
 
 resource "helm_release" "kured" {
@@ -141,6 +114,69 @@ resource "helm_release" "kured" {
       priorityClassName = "system-node-critical"
       service = {
         create = false
+      }
+    })
+  ]
+}
+
+# Nvidia GPU
+
+resource "helm_release" "nvidia-gpu-oprerator" {
+  name        = "gpu-operator"
+  namespace   = "kube-system"
+  repository  = "https://helm.ngc.nvidia.com/nvidia"
+  chart       = "gpu-operator"
+  wait        = true
+  version     = "25.3.2"
+  max_history = 2
+  values = [
+    yamlencode({
+      cdi = {
+        enabled = true
+        default = true
+      }
+      # Operator automatically appends -<osrelease> to end of tag. E.g. :<version>-fedora42
+      driver = {
+        kernelModuleType = "open"
+        repository       = join("/", slice(split("/", split(":", local.container_images.nvidia_driver)[0]), 0, 2))
+        image            = split("/", split(":", local.container_images.nvidia_driver)[0])[2]
+        version          = split("-", split(":", local.container_images.nvidia_driver)[1])[0]
+      }
+      toolkit = {
+        enabled = false
+      }
+      devicePlugin = {
+        enabled = true
+        env = [
+          {
+            name  = "DEVICE_DISCOVERY_STRATEGY"
+            value = "nvml"
+          },
+          {
+            name  = "DEVICE_LIST_STRATEGY"
+            value = "cdi-cri"
+          },
+          {
+            name  = "NVIDIA_DRIVER_ROOT"
+            value = "/run/nvidia/driver"
+          },
+          {
+            name  = "NVIDIA_CDI_HOOK_PATH"
+            value = "/usr/bin/nvidia-ctk"
+          },
+        ]
+      }
+      dcgmExporter = {
+        enabled = false
+      }
+      migManager = {
+        enabled = false
+      }
+      vgpuDeviceManager = {
+        enabled = false
+      }
+      vfioManager = {
+        enabled = false
       }
     })
   ]
