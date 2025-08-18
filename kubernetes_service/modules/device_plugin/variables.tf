@@ -21,6 +21,12 @@ variable "images" {
   })
 }
 
+variable "ports" {
+  type = object({
+    device_plugin_metrics = number
+  })
+}
+
 variable "args" {
   type = list(string)
 }

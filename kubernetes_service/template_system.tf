@@ -6,6 +6,9 @@ module "device-plugin" {
   images = {
     device_plugin = local.container_images.device_plugin
   }
+  ports = {
+    device_plugin_metrics = local.service_ports.metrics
+  }
   args = [
     "--device",
     yamlencode({
@@ -58,6 +61,34 @@ module "device-plugin" {
           paths = [
             {
               path = "/dev/rfkill"
+            },
+          ]
+        },
+      ]
+    }),
+    "--device",
+    yamlencode({
+      name = "input"
+      groups = [
+        {
+          count = 100
+          paths = [
+            {
+              path = "/dev/input/*"
+            },
+          ]
+        },
+      ]
+    }),
+    "--device",
+    yamlencode({
+      name = "ntsync"
+      groups = [
+        {
+          count = 100
+          paths = [
+            {
+              path = "/dev/ntsync"
             },
           ]
         },

@@ -14,17 +14,28 @@ module "daemonset" {
   name    = var.name
   app     = var.name
   release = var.release
+  annotations = {
+    "prometheus.io/scrape" = "true"
+    "prometheus.io/port"   = tostring(var.ports.device_plugin_metrics)
+  }
   template_spec = {
-    hostNetwork       = true
     priorityClassName = "system-node-critical"
     containers = [
       {
         name  = var.name
         image = var.images.device_plugin
-        args  = var.args
+        args = concat(var.args, [
+          "--listen=0.0.0.0:${var.ports.device_plugin_metrics}",
+          "--plugin-directory=${var.kubelet_root_path}/device-plugins",
+        ])
         securityContext = {
           privileged = true
         }
+        ports = [
+          {
+            containerPort = var.ports.device_plugin_metrics
+          },
+        ]
         volumeMounts = [
           {
             name      = "device-plugin"
