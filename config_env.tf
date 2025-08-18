@@ -142,7 +142,7 @@ locals {
     vaultwarden             = "docker.io/vaultwarden/server:1.34.3-alpine"
     s3fs                    = "ghcr.io/randomcoww/s3fs:v20250810.1846"
     flowise                 = "docker.io/flowiseai/flowise:3.0.5"
-    searxng                 = "docker.io/searxng/searxng:2025.8.12-6b1516d"
+    searxng                 = "docker.io/searxng/searxng:2025.8.18-9bb04e2"
     valkey                  = "docker.io/valkey/valkey:8.1.3-alpine"
   }
 
