@@ -147,7 +147,7 @@ locals {
   }
 
   pxeboot_images = {
-    latest = "fedora-coreos-42.20250817.22" # randomcoww/fedora-coreos-config
+    latest = "fedora-coreos-42.20250818.01" # randomcoww/fedora-coreos-config
   }
 
   kubernetes = {
