@@ -178,7 +178,6 @@ resource "helm_release" "arc-runner-set" {
     "ipxe",
     "hostapd-noscan",
     "kea",
-    "kvm-device-plugin",
     "mountpoint-s3",
     "kubernetes",
     "qrcode-generator",

@@ -38,11 +38,6 @@ variable "resources" {
   default = {}
 }
 
-variable "security_context" {
-  type    = any
-  default = {}
-}
-
 variable "extra_envs" {
   type = list(object({
     name  = string

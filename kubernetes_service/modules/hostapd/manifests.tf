@@ -103,20 +103,21 @@ module "statefulset" {
             }
           },
         ]
-        securityContext = {
-          privileged = true
-        }
         volumeMounts = [
           {
             name        = "hostapd-config"
             mountPath   = local.config_path
             subPathExpr = "hostapd-$(POD_NAME)"
           },
-          {
-            name      = "rfkill"
-            mountPath = "/dev/rfkill"
-          },
         ]
+        resources = var.resources
+        securityContext = {
+          capabilities = {
+            add = [
+              "NET_ADMIN",
+            ]
+          }
+        }
       },
     ]
     volumes = [
@@ -124,12 +125,6 @@ module "statefulset" {
         name = "hostapd-config"
         secret = {
           secretName = module.secret.name
-        }
-      },
-      {
-        name = "rfkill"
-        hostPath = {
-          path = "/dev/rfkill"
         }
       },
     ]

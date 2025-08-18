@@ -43,11 +43,6 @@ variable "resources" {
   default = {}
 }
 
-variable "security_context" {
-  type    = any
-  default = {}
-}
-
 variable "extra_configs" {
   type    = map(string)
   default = {}

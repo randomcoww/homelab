@@ -113,8 +113,14 @@ module "statefulset" {
             value = tostring(e.value)
           }
         ])
-        resources       = var.resources
-        securityContext = var.security_context
+        resources = var.resources
+        securityContext = {
+          capabilities = {
+            add = [
+              "NET_ADMIN",
+            ]
+          }
+        }
       },
     ]
   }

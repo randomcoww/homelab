@@ -35,11 +35,6 @@ variable "resources" {
   default = {}
 }
 
-variable "security_context" {
-  type    = any
-  default = {}
-}
-
 variable "ingress_class_name" {
   type = string
 }

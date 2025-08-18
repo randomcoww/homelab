@@ -191,6 +191,11 @@ module "hostapd" {
       "BF-ANTENNA-2", "SOUNDING-DIMENSION-2", "MU-BEAMFORMEE",
     ])}]"
   }
+  resources = {
+    limits = {
+      "squat.ai/rfkill" = 1
+    }
+  }
 }
 
 # Render QR code for wifi
@@ -227,13 +232,6 @@ module "tailscale" {
     }
     limits = {
       "squat.ai/tun" = "1"
-    }
-  }
-  security_context = {
-    capabilities = {
-      add = [
-        "NET_ADMIN",
-      ]
     }
   }
   extra_envs = [

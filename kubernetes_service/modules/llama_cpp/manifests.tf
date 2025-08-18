@@ -81,8 +81,7 @@ module "mountpoint" {
             value = tostring(e.value)
           }
         ]
-        securityContext = var.security_context
-        resources       = var.resources
+        resources = var.resources
         ports = [
           {
             containerPort = var.ports.llama_cpp

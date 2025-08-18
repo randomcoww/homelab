@@ -51,13 +51,13 @@ module "device-plugin" {
     }),
     "--device",
     yamlencode({
-      name = "ntsync"
+      name = "rfkill"
       groups = [
         {
-          count = 10
+          count = 100
           paths = [
             {
-              path = "/dev/ntsync"
+              path = "/dev/rfkill"
             },
           ]
         },

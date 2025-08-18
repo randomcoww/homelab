@@ -34,3 +34,8 @@ variable "bssid_base" {
 variable "config" {
   type = any
 }
+
+variable "resources" {
+  type    = any
+  default = {}
+}
