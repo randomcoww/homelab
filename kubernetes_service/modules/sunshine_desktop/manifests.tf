@@ -229,16 +229,16 @@ module "statefulset" {
             protocol      = "UDP"
           }
         ])
-        # readinessProbe = {
-        #   tcpSocket = {
-        #     port = local.base_port
-        #   }
-        # }
-        # livenessProbe = {
-        #   tcpSocket = {
-        #     port = local.base_port
-        #   }
-        # }
+        readinessProbe = {
+          tcpSocket = {
+            port = local.base_port
+          }
+        }
+        livenessProbe = {
+          tcpSocket = {
+            port = local.base_port
+          }
+        }
         securityContext = var.security_context
         resources       = var.resources
       },

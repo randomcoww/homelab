@@ -1,11 +1,69 @@
-module "kvm-device-plugin" {
-  source    = "./modules/kvm_device_plugin"
-  name      = "kvm-device-plugin"
+module "device-plugin" {
+  source    = "./modules/device_plugin"
+  name      = "device-plugin"
   namespace = "kube-system"
   release   = "0.1.1"
   images = {
-    kvm_device_plugin = local.container_images.kvm_device_plugin
+    device_plugin = local.container_images.device_plugin
   }
+  args = [
+    "--device",
+    yamlencode({
+      name = "kvm"
+      groups = [
+        {
+          count = 100
+          paths = [
+            {
+              path = "/dev/kvm"
+            },
+          ]
+        },
+      ]
+    }),
+    "--device",
+    yamlencode({
+      name = "fuse"
+      groups = [
+        {
+          count = 100
+          paths = [
+            {
+              path = "/dev/fuse"
+            },
+          ]
+        },
+      ]
+    }),
+    "--device",
+    yamlencode({
+      name = "tun"
+      groups = [
+        {
+          count = 100
+          paths = [
+            {
+              path = "/dev/net/tun"
+            },
+          ]
+        },
+      ]
+    }),
+    "--device",
+    yamlencode({
+      name = "ntsync"
+      groups = [
+        {
+          count = 10
+          paths = [
+            {
+              path = "/dev/ntsync"
+            },
+          ]
+        },
+      ]
+    }),
+  ]
   kubelet_root_path = local.kubernetes.kubelet_root_path
 }
 

@@ -220,8 +220,22 @@ module "tailscale" {
   images = {
     tailscale = local.container_images.tailscale
   }
-
   tailscale_auth_key = data.terraform_remote_state.sr.outputs.tailscale_auth_key
+  resources = {
+    requests = {
+      "squat.ai/tun" = "1"
+    }
+    limits = {
+      "squat.ai/tun" = "1"
+    }
+  }
+  security_context = {
+    capabilities = {
+      add = [
+        "NET_ADMIN",
+      ]
+    }
+  }
   extra_envs = [
     {
       name  = "TS_ACCEPT_DNS"

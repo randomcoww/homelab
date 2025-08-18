@@ -84,9 +84,6 @@ module "statefulset" {
       {
         name  = var.name
         image = var.images.tailscale
-        securityContext = {
-          privileged = true
-        }
         env = concat([
           {
             name = "TS_KUBE_SECRET"
@@ -116,6 +113,8 @@ module "statefulset" {
             value = tostring(e.value)
           }
         ])
+        resources       = var.resources
+        securityContext = var.security_context
       },
     ]
   }

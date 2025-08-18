@@ -17,6 +17,10 @@ variable "kubelet_root_path" {
 
 variable "images" {
   type = object({
-    kvm_device_plugin = string
+    device_plugin = string
   })
+}
+
+variable "args" {
+  type = list(string)
 }

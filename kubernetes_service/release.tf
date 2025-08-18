@@ -2,7 +2,7 @@
 
 locals {
   modules_enabled = [
-    module.kvm-device-plugin,
+    module.device-plugin,
     module.kea,
     module.matchbox,
     module.tailscale,

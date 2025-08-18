@@ -3,7 +3,7 @@ module "metadata" {
   name        = var.name
   namespace   = var.namespace
   release     = var.release
-  app_version = split(":", var.images.kvm_device_plugin)[1]
+  app_version = split(":", var.images.device_plugin)[1]
   manifests = {
     "templates/daeonset.yaml" = module.daemonset.manifest
   }
@@ -17,11 +17,11 @@ module "daemonset" {
   template_spec = {
     hostNetwork       = true
     priorityClassName = "system-node-critical"
-    dnsPolicy         = "ClusterFirstWithHostNet"
     containers = [
       {
         name  = var.name
-        image = var.images.kvm_device_plugin
+        image = var.images.device_plugin
+        args  = var.args
         securityContext = {
           privileged = true
         }
@@ -29,6 +29,10 @@ module "daemonset" {
           {
             name      = "device-plugin"
             mountPath = "${var.kubelet_root_path}/device-plugins"
+          },
+          {
+            name      = "dev"
+            mountPath = "/dev"
           },
         ]
       },
@@ -38,6 +42,12 @@ module "daemonset" {
         name = "device-plugin"
         hostPath = {
           path = "${var.kubelet_root_path}/device-plugins"
+        }
+      },
+      {
+        name = "dev"
+        hostPath = {
+          path = "/dev"
         }
       },
     ]
