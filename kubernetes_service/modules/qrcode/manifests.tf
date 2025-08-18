@@ -93,12 +93,6 @@ module "service" {
         targetPort = local.qrcode_port
       },
     ]
-    sessionAffinity = "ClientIP"
-    sessionAffinityConfig = {
-      clientIP = {
-        timeoutSeconds = 10800
-      }
-    }
   }
 }
 

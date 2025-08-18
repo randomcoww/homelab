@@ -97,6 +97,7 @@ module "searxng" {
   name      = local.kubernetes_services.searxng.name
   namespace = local.kubernetes_services.searxng.namespace
   release   = "0.1.1"
+  replicas  = 2
   images = {
     searxng = local.container_images.searxng
     valkey  = local.container_images.valkey

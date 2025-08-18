@@ -75,12 +75,6 @@ module "service" {
         targetPort = local.extra_configs.PORT
       },
     ]
-    sessionAffinity = "ClientIP"
-    sessionAffinityConfig = {
-      clientIP = {
-        timeoutSeconds = 10800
-      }
-    }
   }
 }
 
