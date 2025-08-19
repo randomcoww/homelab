@@ -134,7 +134,7 @@ locals {
     mountpoint              = "ghcr.io/randomcoww/mountpoint-s3:v1.19.0.20250816.2154"
     audioserve              = "docker.io/izderadicka/audioserve:latest"
     nvidia_driver           = "ghcr.io/randomcoww/nvidia-driver-container:v580.76.05-fedora42"
-    sunshine_desktop        = "ghcr.io/randomcoww/sunshine-desktop:v2025.814.234924.20250816.2201"
+    sunshine_desktop        = "ghcr.io/randomcoww/sunshine-desktop:v2025.816.231536.20250818.2246"
     stork_agent             = "ghcr.io/randomcoww/stork-agent:v20250802.2330"
     llama_cpp               = "ghcr.io/randomcoww/llama-cpp-server-cuda:v12.9.1.20250817.1746-llama-swap"
     nginx                   = "docker.io/nginx:1.27-alpine-slim"
