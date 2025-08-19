@@ -145,10 +145,6 @@ module "statefulset" {
       {
         name  = var.name
         image = var.images.sunshine_desktop
-        command = [
-          "sleep",
-          "infinity",
-        ]
         env = concat([
           {
             name = "SUNSHINE_USERNAME"
@@ -208,10 +204,6 @@ module "statefulset" {
             mountPath = var.home_path
           },
           {
-            name      = "dev-input"
-            mountPath = "/dev/input"
-          },
-          {
             name      = "dev-shm"
             mountPath = "/dev/shm"
           },
@@ -239,8 +231,11 @@ module "statefulset" {
             port = local.base_port
           }
         }
-        securityContext = var.security_context
-        resources       = var.resources
+        resources = var.resources
+        # TODO: Revisit - currently enabled to make inputs work
+        securityContext = {
+          privileged = true
+        }
       },
     ]
     volumes = concat([
@@ -248,12 +243,6 @@ module "statefulset" {
         name = "config"
         secret = {
           secretName = module.secret.name
-        }
-      },
-      {
-        name = "dev-input"
-        hostPath = {
-          path = "/dev/input"
         }
       },
       {

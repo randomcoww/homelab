@@ -66,6 +66,37 @@ module "device-plugin" {
         },
       ]
     }),
+    "--device",
+    yamlencode({
+      name = "uinput"
+      groups = [
+        {
+          count = 100
+          paths = [
+            {
+              path = "/dev/uinput"
+            },
+          ]
+        },
+      ]
+    }),
+    "--device",
+    yamlencode({
+      name = "input"
+      groups = [
+        {
+          count = 100
+          paths = [
+            {
+              path        = "/dev/input"
+              type        = "Mount"
+              permissions = "mrw"
+              limit       = 10
+            },
+          ]
+        },
+      ]
+    }),
   ]
   kubelet_root_path = local.kubernetes.kubelet_root_path
 }
