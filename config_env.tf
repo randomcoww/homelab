@@ -133,8 +133,6 @@ locals {
     rclone                  = "docker.io/rclone/rclone:1.70.3"
     mountpoint              = "ghcr.io/randomcoww/mountpoint-s3:v1.19.0.20250816.2154"
     audioserve              = "docker.io/izderadicka/audioserve:latest"
-    # nvidia_driver           = "ghcr.io/randomcoww/nvidia-driver-container:v570.181-fedora42"
-    nvidia_driver           = "ghcr.io/randomcoww/nvidia-driver-container:v580.76.05-fedora42"
     sunshine_desktop        = "ghcr.io/randomcoww/sunshine-desktop:v20250819.0740"
     stork_agent             = "ghcr.io/randomcoww/stork-agent:v20250802.2330"
     llama_cpp               = "ghcr.io/randomcoww/llama-cpp-server-cuda:v12.9.1.20250817.1746-llama-swap"
@@ -145,6 +143,8 @@ locals {
     flowise                 = "docker.io/flowiseai/flowise:3.0.5"
     searxng                 = "docker.io/searxng/searxng:2025.8.18-9bb04e2"
     valkey                  = "docker.io/valkey/valkey:8.1.3-alpine"
+    nvidia_driver           = "ghcr.io/randomcoww/nvidia-driver-container:v580.76.05-fedora42"
+    # nvidia_driver           = "ghcr.io/randomcoww/nvidia-driver-container:v570.181-fedora42"
   }
 
   pxeboot_images = {
