@@ -204,6 +204,10 @@ module "statefulset" {
             mountPath = var.home_path
           },
           {
+            name      = "dev-input"
+            mountPath = "/dev/input"
+          },
+          {
             name      = "dev-shm"
             mountPath = "/dev/shm"
           },
@@ -232,7 +236,7 @@ module "statefulset" {
           }
         }
         resources = var.resources
-        # TODO: Revisit - currently enabled to make inputs work
+        # TODO: Revisit - privilege to make inputs work
         securityContext = {
           privileged = true
         }
@@ -243,6 +247,12 @@ module "statefulset" {
         name = "config"
         secret = {
           secretName = module.secret.name
+        }
+      },
+      {
+        name = "dev-input"
+        hostPath = {
+          path = "/dev/input"
         }
       },
       {

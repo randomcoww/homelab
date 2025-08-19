@@ -261,11 +261,6 @@ module "sunshine-desktop" {
     requests = {
       memory = "12Gi"
     }
-    limits = {
-      # "nvidia.com/gpu" = 1
-      # "squat.ai/uinput" = 1
-      "squat.ai/input" = 10
-    }
   }
   loadbalancer_class_name = "kube-vip.io/kube-vip-class"
   affinity = {
