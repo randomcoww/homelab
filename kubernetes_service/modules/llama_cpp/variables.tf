@@ -10,9 +10,9 @@ variable "release" {
   type = string
 }
 
-variable "args" {
-  type    = list(string)
-  default = []
+variable "llama_swap_config" {
+  type    = any
+  default = {}
 }
 
 variable "affinity" {
@@ -22,8 +22,8 @@ variable "affinity" {
 
 variable "images" {
   type = object({
-    mountpoint = string
     llama_cpp  = string
+    mountpoint = string
   })
 }
 
@@ -65,4 +65,16 @@ variable "s3_secret_access_key" {
 variable "s3_mount_extra_args" {
   type    = list(string)
   default = []
+}
+
+variable "service_hostname" {
+  type = string
+}
+
+variable "ingress_class_name" {
+  type = string
+}
+
+variable "nginx_ingress_annotations" {
+  type = map(string)
 }

@@ -1,5 +1,6 @@
 locals {
-  data_path = "/var/lib/llama_cpp/models"
+  model_path  = "/var/lib/llama_cpp/models"
+  config_path = "/var/lib/llama_cpp/config.yaml"
 }
 
 module "metadata" {
@@ -10,6 +11,18 @@ module "metadata" {
   app_version = split(":", var.images.llama_cpp)[1]
   manifests = merge(module.mountpoint.chart.manifests, {
     "templates/service.yaml" = module.service.manifest
+    "templates/ingress.yaml" = module.ingress.manifest
+    "templates/secret.yaml"  = module.secret.manifest
+  })
+}
+
+module "secret" {
+  source  = "../../../modules/secret"
+  name    = var.name
+  app     = var.name
+  release = var.release
+  data = merge({
+    basename(local.config_path) = yamlencode(var.llama_swap_config)
   })
 }
 
@@ -31,6 +44,28 @@ module "service" {
   }
 }
 
+module "ingress" {
+  source             = "../../../modules/ingress"
+  name               = var.name
+  app                = var.name
+  release            = var.release
+  ingress_class_name = var.ingress_class_name
+  annotations        = var.nginx_ingress_annotations
+  rules = [
+    {
+      host = var.service_hostname
+      paths = [
+        {
+          service = module.service.name
+          port    = var.ports.llama_cpp
+          path    = "/"
+        },
+      ]
+    },
+  ]
+}
+
+# Mounting S3 path seems to be faster for model loading than using --model-url
 module "mountpoint" {
   source = "../statefulset_mountpoint"
   ## s3 config
@@ -39,18 +74,21 @@ module "mountpoint" {
   s3_prefix            = ""
   s3_access_key_id     = var.s3_access_key_id
   s3_secret_access_key = var.s3_secret_access_key
-  s3_mount_path        = local.data_path
+  s3_mount_path        = local.model_path
   s3_mount_extra_args  = var.s3_mount_extra_args
   images = {
     mountpoint = var.images.mountpoint
   }
   ##
-  name      = var.name
-  namespace = var.namespace
-  app       = var.name
-  release   = var.release
-  affinity  = var.affinity
-  replicas  = 1
+  name    = var.name
+  app     = var.name
+  release = var.release
+  ## config reloaded by process
+  # annotations = {
+  #   "checksum/secret" = sha256(module.secret.manifest)
+  # }
+  affinity = var.affinity
+  replicas = 1
   template_spec = {
     containers = [
       {
@@ -62,18 +100,24 @@ module "mountpoint" {
           <<-EOF
           set -e
 
-          until mountpoint ${local.data_path}; do
+          until mountpoint ${local.model_path}; do
           sleep 1
           done
-          ln -sf "${local.data_path}" /models
+          ln -sf "${local.model_path}" /models
 
-          exec /tini -- /app/llama-server \
-            --no-webui \
-            --host 0.0.0.0 \
-            --port ${var.ports.llama_cpp} $@
+          exec /tini -- /app/llama-swap \
+            --config ${local.config_path} \
+            --watch-config \
+            --listen 0.0.0.0:${var.ports.llama_cpp}
           EOF
         ]
-        args = var.args
+        volumeMounts = [
+          {
+            name      = "config"
+            mountPath = local.config_path
+            subPath   = basename(local.config_path)
+          },
+        ]
         env = [
           for _, e in var.extra_envs :
           {
@@ -87,6 +131,26 @@ module "mountpoint" {
             containerPort = var.ports.llama_cpp
           },
         ]
+        livenessProbe = {
+          httpGet = {
+            port = var.ports.llama_cpp
+            path = "/health"
+          }
+        }
+        readinessProbe = {
+          httpGet = {
+            port = var.ports.llama_cpp
+            path = "/health"
+          }
+        }
+      },
+    ]
+    volumes = [
+      {
+        name = "config"
+        secret = {
+          secretName = module.secret.name
+        }
       },
     ]
   }

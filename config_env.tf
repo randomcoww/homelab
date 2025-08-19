@@ -192,6 +192,7 @@ locals {
       monitoring      = "m"
       vaultwarden     = "vw"
       flowise         = "flowise"
+      llama_cpp       = "llm"
     } :
     k => "${domain}.${local.domains.public}"
   }

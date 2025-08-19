@@ -33,46 +33,38 @@ module "llama-cpp" {
   namespace = local.kubernetes_services.llama_cpp.namespace
   release   = "0.1.1"
   images = {
-    mountpoint = local.container_images.mountpoint
     llama_cpp  = local.container_images.llama_cpp
+    mountpoint = local.container_images.mountpoint
   }
   ports = {
     llama_cpp = local.service_ports.llama_cpp
   }
-  args = [
-    "--flash-attn",
-    "--jinja",
-    "--temp",
-    "1.0",
-    "--top_p",
-    "1.0",
-    "--top_k",
-    0,
-  ]
+  service_hostname = local.kubernetes_ingress_endpoints.llama_cpp
+  llama_swap_config = {
+    healthCheckTimeout = 600
+    models = {
+      "gpt-oss-20b" = {
+        cmd = <<-EOF
+        /app/llama-server \
+        --port $${PORT} \
+        --model /models/gpt-oss-20b-mxfp4.gguf \
+        --alias gpt-oss-20b \
+        --reasoning-format auto \
+        --n-gpu-layers 99 \
+        --ctx-size 16384 \
+        --flash-attn \
+        --jinja \
+        --temp 1.0 \
+        --top_p 1.0 \
+        --top_k 0
+        EOF
+      }
+    }
+  }
   extra_envs = [
     {
       name  = "NVIDIA_DRIVER_CAPABILITIES"
       value = "compute,utility"
-    },
-    {
-      name  = "LLAMA_ARG_MODEL"
-      value = "/models/gpt-oss-20b-mxfp4.gguf"
-    },
-    {
-      name  = "LLAMA_ARG_ALIAS"
-      value = "gpt-oss-20b"
-    },
-    {
-      name  = "LLAMA_ARG_THINK"
-      value = "auto"
-    },
-    {
-      name  = "LLAMA_ARG_N_GPU_LAYERS"
-      value = 99
-    },
-    {
-      name  = "LLAMA_ARG_CTX_SIZE"
-      value = 16384
     },
   ]
   resources = {
@@ -88,6 +80,8 @@ module "llama-cpp" {
     "--cache /tmp",
     "--read-only",
   ]
+  ingress_class_name        = local.ingress_classes.ingress_nginx
+  nginx_ingress_annotations = local.nginx_ingress_annotations
 }
 
 ## SearXNG
