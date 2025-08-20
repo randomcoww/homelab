@@ -83,10 +83,9 @@ module "mountpoint" {
   name    = var.name
   app     = var.name
   release = var.release
-  ## config reloaded by process
-  # annotations = {
-  #   "checksum/secret" = sha256(module.secret.manifest)
-  # }
+  annotations = {
+    "checksum/secret" = sha256(module.secret.manifest)
+  }
   affinity = var.affinity
   replicas = 1
   template_spec = {
@@ -107,7 +106,6 @@ module "mountpoint" {
 
           exec /tini -- /app/llama-swap \
             --config ${local.config_path} \
-            --watch-config \
             --listen 0.0.0.0:${var.ports.llama_cpp}
           EOF
         ]

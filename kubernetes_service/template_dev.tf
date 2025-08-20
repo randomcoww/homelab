@@ -43,20 +43,22 @@ module "llama-cpp" {
   llama_swap_config = {
     healthCheckTimeout = 600
     models = {
+      # https://github.com/ggml-org/llama.cpp/discussions/15396
+      # https://docs.unsloth.ai/basics/gpt-oss-how-to-run-and-fine-tune#recommended-settings
       "gpt-oss-20b" = {
         cmd = <<-EOF
         /app/llama-server \
-        --port $${PORT} \
-        --model /models/gpt-oss-20b-mxfp4.gguf \
-        --alias gpt-oss-20b \
-        --reasoning-format auto \
-        --n-gpu-layers 99 \
-        --ctx-size 16384 \
-        --flash-attn \
-        --jinja \
-        --temp 1.0 \
-        --top_p 1.0 \
-        --top_k 0
+          --port $${PORT} \
+          --model /models/gpt-oss-20b-mxfp4.gguf \
+          --reasoning-format auto \
+          --ctx-size 32768 \
+          --ubatch-size 4096 \
+          --batch-size 4096 \
+          --flash-attn \
+          --jinja \
+          --temp 1.0 \
+          --top_p 1.0 \
+          --top_k 0
         EOF
       }
     }
