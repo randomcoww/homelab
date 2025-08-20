@@ -122,13 +122,14 @@ resource "helm_release" "kured" {
 # Nvidia GPU
 
 resource "helm_release" "nvidia-gpu-oprerator" {
-  name        = "gpu-operator"
-  namespace   = "kube-system"
-  repository  = "https://helm.ngc.nvidia.com/nvidia"
-  chart       = "gpu-operator"
-  wait        = true
-  version     = "25.3.2"
-  max_history = 2
+  name             = "gpu-operator"
+  namespace        = "nvidia"
+  create_namespace = true
+  repository       = "https://helm.ngc.nvidia.com/nvidia"
+  chart            = "gpu-operator"
+  wait             = true
+  version          = "25.3.2"
+  max_history      = 2
   values = [
     yamlencode({
       cdi = {
