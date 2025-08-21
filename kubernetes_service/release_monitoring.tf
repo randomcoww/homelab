@@ -39,7 +39,7 @@ resource "helm_release" "prometheus-blackbox" {
   repository       = "https://prometheus-community.github.io/helm-charts"
   chart            = "prometheus-blackbox-exporter"
   wait             = false
-  version          = "11.2.2"
+  version          = "11.3.0"
   max_history      = 2
   values = [
     yamlencode({
