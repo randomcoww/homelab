@@ -52,6 +52,12 @@ module "audioserve" {
     "--cache /tmp",
     "--read-only",
   ]
+
+  depends_on = [
+    minio_iam_user.audioserve,
+    minio_iam_policy.audioserve,
+    minio_iam_user_policy_attachment.audioserve,
+  ]
 }
 
 ## webdav

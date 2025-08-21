@@ -116,6 +116,12 @@ module "matchbox" {
   s3_access_key_id     = minio_iam_user.matchbox.id
   s3_secret_access_key = minio_iam_user.matchbox.secret
   s3_mount_extra_args  = []
+
+  depends_on = [
+    minio_iam_user.matchbox,
+    minio_iam_policy.matchbox,
+    minio_iam_user_policy_attachment.matchbox,
+  ]
 }
 
 # Wifi AP

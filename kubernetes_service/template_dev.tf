@@ -97,6 +97,12 @@ module "llama-cpp" {
   ]
   ingress_class_name        = local.ingress_classes.ingress_nginx
   nginx_ingress_annotations = local.nginx_ingress_annotations
+
+  depends_on = [
+    minio_iam_user.llama-cpp,
+    minio_iam_policy.llama-cpp,
+    minio_iam_user_policy_attachment.llama-cpp,
+  ]
 }
 
 ## SearXNG
