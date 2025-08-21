@@ -100,6 +100,12 @@ module "webdav-pictures" {
   minio_access_key_id     = minio_iam_user.webdav-pictures.id
   minio_secret_access_key = minio_iam_user.webdav-pictures.secret
   minio_ca_cert           = data.terraform_remote_state.sr.outputs.trust.ca.cert_pem
+
+  depends_on = [
+    minio_iam_user.webdav-pictures,
+    minio_iam_policy.webdav-pictures,
+    minio_iam_user_policy_attachment.webdav-pictures,
+  ]
 }
 
 resource "minio_iam_user" "webdav-videos" {
@@ -146,6 +152,12 @@ module "webdav-videos" {
   minio_access_key_id     = minio_iam_user.webdav-videos.id
   minio_secret_access_key = minio_iam_user.webdav-videos.secret
   minio_ca_cert           = data.terraform_remote_state.sr.outputs.trust.ca.cert_pem
+
+  depends_on = [
+    minio_iam_user.webdav-videos,
+    minio_iam_policy.webdav-videos,
+    minio_iam_user_policy_attachment.webdav-videos,
+  ]
 }
 
 ## Sunshine desktop
