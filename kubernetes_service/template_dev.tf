@@ -51,7 +51,7 @@ module "llama-cpp" {
           --port $${PORT} \
           --model /models/gpt-oss-20b-mxfp4.gguf \
           --reasoning-format auto \
-          --ctx-size 32768 \
+          --ctx-size 131072 \
           --ubatch-size 4096 \
           --batch-size 4096 \
           --flash-attn \
@@ -67,6 +67,10 @@ module "llama-cpp" {
     {
       name  = "NVIDIA_DRIVER_CAPABILITIES"
       value = "compute,utility"
+    },
+    {
+      name  = "GGML_CUDA_ENABLE_UNIFIED_MEMORY"
+      value = "1"
     },
   ]
   resources = {
@@ -192,4 +196,10 @@ module "flowise" {
   minio_litestream_prefix = "$POD_NAME/litestream"
   minio_access_key_id     = minio_iam_user.flowise.id
   minio_secret_access_key = minio_iam_user.flowise.secret
+
+  depends_on = [
+    minio_iam_user.flowise,
+    minio_iam_policy.flowise,
+    minio_iam_user_policy_attachment.flowise,
+  ]
 }
