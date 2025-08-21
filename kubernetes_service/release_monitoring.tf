@@ -261,26 +261,6 @@ resource "helm_release" "prometheus" {
                     severity = "critical"
                   }
                 },
-                {
-                  alert = "CoreDNSErrorsHigh"
-                  annotations = {
-                    summary     = "CoreDNS errors high"
-                    description = <<-EOF
-                    CoreDNS is returning SERVFAIL for {{ $value | humanizePercentage }}
-                    EOF
-                  }
-                  expr = <<-EOF
-                  (
-                    sum(rate(coredns_dns_responses_total{k8s_app="coredns",rcode="SERVFAIL"}[5m]))
-                  and
-                    sum(rate(coredns_dns_responses_total{k8s_app="coredns"}[5m])) > 0.01
-                  )
-                  EOF
-                  for  = "10m"
-                  labels = {
-                    severity = "critical"
-                  }
-                },
               ]
             },
             {
