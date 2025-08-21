@@ -50,7 +50,6 @@ module "llama-cpp" {
         /app/llama-server \
           --port $${PORT} \
           --model /models/gpt-oss-20b-mxfp4.gguf \
-          --reasoning-format auto \
           --ctx-size 131072 \
           --ubatch-size 4096 \
           --batch-size 4096 \
@@ -59,6 +58,16 @@ module "llama-cpp" {
           --temp 1.0 \
           --top_p 1.0 \
           --top_k 0
+        EOF
+      }
+      "jina-embeddings-v4-text-retrieval" = {
+        cmd = <<-EOF
+        /app/llama-server \
+          --port $${PORT} \
+          --model /models/jina-embeddings-v4-text-retrieval-Q8_0.gguf \
+          --pooling mean \
+          --embedding \
+          --ubatch-size 8192
         EOF
       }
     }
