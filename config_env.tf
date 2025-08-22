@@ -130,7 +130,7 @@ locals {
     external_dns            = "registry.k8s.io/external-dns/external-dns:v0.18.0"
     tailscale               = "ghcr.io/randomcoww/tailscale-nft:v1.86.2.20250801.2111"
     qrcode_generator        = "ghcr.io/randomcoww/qrcode-generator:v0.1.0"
-    rclone                  = "docker.io/rclone/rclone:1.70.3"
+    rclone                  = "docker.io/rclone/rclone:1.71.0"
     mountpoint              = "ghcr.io/randomcoww/mountpoint-s3:v1.19.0.20250821.0725"
     audioserve              = "docker.io/izderadicka/audioserve:latest"
     sunshine_desktop        = "ghcr.io/randomcoww/sunshine-desktop:v20250819.0740"
