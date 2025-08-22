@@ -175,9 +175,8 @@ module "sunshine-desktop" {
   images = {
     sunshine_desktop = local.container_images.sunshine_desktop
   }
-  user               = local.users.client.name
-  uid                = local.users.client.uid
-  home_path          = local.users.client.home_dir
+  user               = "sunshine"
+  uid                = 10000
   storage_class_name = "local-path"
   extra_configs = [
     {
