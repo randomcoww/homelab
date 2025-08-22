@@ -9,18 +9,7 @@ locals {
   users = {
     ssh = {
       name     = "fcos"
-      home_dir = "/var/tmp-home/fcos"
-      groups = [
-        "adm",
-        "sudo",
-        "systemd-journal",
-        "wheel",
-      ],
-    }
-    client = {
-      name     = "randomcoww"
-      home_dir = "/var/home/randomcoww"
-      uid      = 10000
+      home_dir = "/var/home/fcos"
       groups = [
         "adm",
         "sudo",
@@ -298,7 +287,6 @@ locals {
       }
       models = {
         name = "data-models"
-        acl  = "public-read"
       }
     }
   }
