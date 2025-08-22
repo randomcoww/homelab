@@ -24,6 +24,8 @@ module "daemonset" {
       {
         name  = var.name
         image = var.images.device_plugin
+        # TODO: Revisit. Images are not tagged in a way that works with renovate.
+        imagePullPolicy = "Always"
         args = concat(var.args, [
           "--listen=0.0.0.0:${var.ports.device_plugin_metrics}",
           "--plugin-directory=${var.kubelet_root_path}/device-plugins",

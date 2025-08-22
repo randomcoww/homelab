@@ -62,7 +62,7 @@
       "matchPackageNames": [
         "randomcoww/fedora-coreos-config"
       ],
-      "versioning": "regex:^(?<major>\\d+)?(.(?<minor>\\d+))?(.(?<patch>\\d+))?(-(?<compatibility>.*))?$"
+      "versioning": "semver"
     }
   ]
 }
