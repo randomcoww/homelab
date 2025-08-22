@@ -13,6 +13,7 @@ locals {
     audio   = local.base_port + 11
     mic     = local.base_port + 13
   }
+  home_path = "/home/${var.user}"
 }
 
 # bypassed through nginx - no need to expose
@@ -178,7 +179,7 @@ module "statefulset" {
           },
           {
             name  = "HOME"
-            value = var.home_path
+            value = local.home_path
           },
           {
             name  = "XDG_RUNTIME_DIR"
@@ -201,7 +202,7 @@ module "statefulset" {
           ], [
           {
             name      = "home"
-            mountPath = var.home_path
+            mountPath = local.home_path
           },
           {
             name      = "dev-input"

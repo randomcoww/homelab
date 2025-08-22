@@ -60,10 +60,6 @@ variable "uid" {
   type = number
 }
 
-variable "home_path" {
-  type = string
-}
-
 variable "ingress_class_name" {
   type = string
 }
