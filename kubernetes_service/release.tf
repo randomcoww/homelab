@@ -12,10 +12,11 @@ locals {
     module.webdav-videos,
     module.audioserve,
     module.vaultwarden,
-    module.llama-cpp,
     module.flowise,
     module.searxng,
-    # module.sunshine-desktop,
+    # remove for GPU driver upgrade
+    module.llama-cpp,
+    module.sunshine-desktop,
   ]
 }
 
