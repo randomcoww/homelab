@@ -175,10 +175,113 @@ module "sunshine-desktop" {
   images = {
     sunshine_desktop = local.container_images.sunshine_desktop
   }
+  args = [
+    "bash",
+    "-c",
+    <<EOF
+    set -e
+
+    ## Driver ##
+
+    mkdir -p $HOME/nvidia
+    targetarch=$(arch)
+    driver_version=$(nvidia-smi --query-gpu=driver_version --format=csv,noheader --id=0)
+    driver_file=$HOME/nvidia/NVIDIA-Linux-$targetarch-$driver_version.run
+
+    NVIDIA_DRIVER_BASE_URL=$${NVIDIA_DRIVER_BASE_URL:-https://us.download.nvidia.com/XFree86/$${targetarch/x86_64/Linux-x86_64}}
+    curl -L --skip-existing -o "$driver_file" \
+      $NVIDIA_DRIVER_BASE_URL/$driver_version/NVIDIA-Linux-$targetarch-$driver_version.run
+
+    chmod +x "$driver_file"
+
+    # TODO: try removing --no-install-libglvnd when https://github.com/LizardByte/Sunshine/issues/4050 is resolved
+    "$driver_file" \
+      --silent \
+      --accept-license \
+      --skip-depmod \
+      --skip-module-unload \
+      --no-kernel-modules \
+      --no-kernel-module-source \
+      --install-compat32-libs \
+      --no-nouveau-check \
+      --no-nvidia-modprobe \
+      --no-systemd \
+      --no-distro-scripts \
+      --no-rpms \
+      --no-backup \
+      --no-check-for-alternate-installs \
+      --no-libglx-indirect \
+      --no-install-libglvnd
+
+    ## User ##
+
+    mkdir -p $HOME $XDG_RUNTIME_DIR
+    chown $UID:$UID $HOME $XDG_RUNTIME_DIR
+
+    useradd $USER -d $HOME -m -u $UID
+    usermod -G wheel,video,input,render,dbus,seat $USER
+
+    ## Udev ##
+
+    /lib/systemd/systemd-udevd &
+
+    ## Seatd ##
+
+    seatd -u $USER &
+
+    runuser -p -u $USER -- bash <<EOT
+    set -e
+
+    ## Pulseaudio ##
+
+    pulseaudio \
+      --log-level=0 \
+      --daemonize=true \
+      --disallow-exit=true \
+      --log-target=stderr \
+      --exit-idle-time=-1
+
+    ## Sway ##
+
+    sway &
+    while ! wlr-randr >/dev/null 2>&1; do
+    sleep 1
+    done
+
+    ## Sunshine ##
+
+    sunshine --creds $SUNSHINE_USERNAME $SUNSHINE_PASSWORD
+    exec sunshine \
+      origin_web_ui_allowed=wan \
+      port=$SUNSHINE_PORT \
+      file_apps=/etc/sunshine/apps.json \
+      upnp=off
+    EOT
+    EOF
+  ]
   user               = "sunshine"
   uid                = 10000
   storage_class_name = "local-path"
   extra_configs = [
+    {
+      path = "/etc/sunshine/apps.json"
+      content = jsonencode({
+        apps = [
+          {
+            name       = "Desktop"
+            image-path = "desktop.png"
+            prep-cmd = [
+              {
+                do = "/usr/local/bin/sunshine-prep-cmd.sh"
+              },
+            ]
+          }
+        ],
+        env = {
+          PATH = "$(PATH):$(HOME)/.local/bin"
+        }
+      })
+    },
     {
       path    = "/etc/tmux.conf"
       content = <<-EOF

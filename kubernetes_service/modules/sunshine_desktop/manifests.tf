@@ -146,6 +146,7 @@ module "statefulset" {
       {
         name  = var.name
         image = var.images.sunshine_desktop
+        args  = var.args
         env = concat([
           {
             name = "SUNSHINE_USERNAME"

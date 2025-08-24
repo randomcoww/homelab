@@ -122,7 +122,7 @@ locals {
     rclone                  = "docker.io/rclone/rclone:1.71.0"
     mountpoint              = "ghcr.io/randomcoww/mountpoint-s3:v1.19.0.20250821.0725"
     audioserve              = "docker.io/izderadicka/audioserve:latest"
-    sunshine_desktop        = "ghcr.io/randomcoww/sunshine-desktop:v20250824.0843"
+    sunshine_desktop        = "ghcr.io/randomcoww/sunshine-desktop:v20250824.1925"
     stork_agent             = "ghcr.io/randomcoww/stork-agent:v20250802.2330"
     llama_cpp               = "ghcr.io/randomcoww/llama-cpp-server-cuda:v20250824.0647-12.9.1-llama-swap"
     nginx                   = "docker.io/nginx:1.27-alpine-slim"
