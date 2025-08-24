@@ -133,7 +133,6 @@ locals {
     searxng                 = "docker.io/searxng/searxng:2025.8.22-11ea1a8"
     valkey                  = "docker.io/valkey/valkey:8.1.3-alpine"
     nvidia_driver           = "ghcr.io/randomcoww/nvidia-driver-container:v580.76.05-fedora42"
-    # nvidia_driver           = "ghcr.io/randomcoww/nvidia-driver-container:v570.181-fedora42"
   }
 
   pxeboot_images = {
