@@ -233,11 +233,8 @@ module "tailscale" {
   }
   tailscale_auth_key = data.terraform_remote_state.sr.outputs.tailscale_auth_key
   resources = {
-    requests = {
-      "squat.ai/tun" = "1"
-    }
     limits = {
-      "squat.ai/tun" = "1"
+      "squat.ai/tun" = 1
     }
   }
   extra_envs = [

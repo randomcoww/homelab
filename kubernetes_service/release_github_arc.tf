@@ -102,11 +102,10 @@ resource "helm_release" "arc-runner-hook-template" {
                     }
                     resources = {
                       requests = {
-                        memory         = "2Gi"
-                        "squat.ai/kvm" = "1"
+                        memory = "2Gi"
                       }
                       limits = {
-                        "squat.ai/kvm" = "1"
+                        "squat.ai/kvm" = 1
                       }
                     }
                     env = concat([
