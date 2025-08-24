@@ -188,77 +188,6 @@ module "sunshine-desktop" {
       bind-key -T copy-mode MouseDragEnd1Pane send-keys -X copy-pipe-and-cancel "xclip -in -sel clip"
       EOF
     },
-    {
-      path    = "/etc/xdg/xfce4/terminal/terminalrc"
-      content = <<-EOF
-      [Configuration]
-      MiscTabCloseMiddleClick=FALSE
-      MiscShowUnsafePasteDialog=FALSE
-      MiscConfirmClose=FALSE
-      EOF
-    },
-    {
-      path    = "/etc/xdg/xfce4/xfconf/xfce-perchannel-xml/xfce4-desktop.xml"
-      content = <<-EOF
-      <?xml version="1.0" encoding="UTF-8"?>
-
-      <channel name="xfce4-desktop" version="1.0">
-        <property name="desktop-icons" type="empty">
-          <property name="style" type="int" value="0"/>
-        </property>
-      </channel>
-      EOF
-    },
-    {
-      path    = "/etc/xdg/xfce4/xfconf/xfce-perchannel-xml/xfce4-panel.xml"
-      content = <<-EOF
-      <?xml version="1.0" encoding="UTF-8"?>
-
-      <channel name="xfce4-panel" version="1.0">
-        <property name="configver" type="int" value="2"/>
-        <property name="panels" type="array">
-          <value type="int" value="1"/>
-          <property name="dark-mode" type="bool" value="true"/>
-          <property name="panel-1" type="empty">
-            <property name="position" type="string" value="p=6;x=0;y=0"/>
-            <property name="length" type="double" value="100"/>
-            <property name="position-locked" type="bool" value="true"/>
-            <property name="icon-size" type="uint" value="0"/>
-            <property name="size" type="uint" value="30"/>
-            <property name="plugin-ids" type="array">
-              <value type="int" value="1"/>
-              <value type="int" value="2"/>
-              <value type="int" value="3"/>
-            </property>
-            <property name="mode" type="uint" value="1"/>
-            <property name="enable-struts" type="bool" value="true"/>
-          </property>
-        </property>
-        <property name="plugins" type="empty">
-          <property name="plugin-1" type="string" value="tasklist">
-            <property name="grouping" type="uint" value="1"/>
-          </property>
-          <property name="plugin-2" type="string" value="separator">
-            <property name="expand" type="bool" value="true"/>
-            <property name="style" type="uint" value="0"/>
-          </property>
-          <property name="plugin-3" type="string" value="pager"/>
-        </property>
-      </channel>
-      EOF
-    },
-    {
-      path    = "/etc/xdg/xfce4/xfconf/xfce-perchannel-xml/xsettings.xml"
-      content = <<-EOF
-      <?xml version="1.0" encoding="UTF-8"?>
-
-      <channel name="xsettings" version="1.0">
-        <property name="Net" type="empty">
-          <property name="IconThemeName" type="string" value="gnome"/>
-        </property>
-      </channel>
-      EOF
-    },
   ]
   extra_envs = [
     {
@@ -272,6 +201,11 @@ module "sunshine-desktop" {
     {
       name  = "TZ"
       value = local.timezone
+    },
+    # This is dynamically generated but sway seems to pick wayland-1 pretty consistently
+    {
+      name  = "WAYLAND_DISPLAY"
+      value = "wayland-1"
     },
   ]
   resources = {

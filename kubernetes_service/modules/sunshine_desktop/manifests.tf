@@ -237,7 +237,7 @@ module "statefulset" {
           }
         }
         resources = var.resources
-        # TODO: Revisit - privilege to make inputs work
+        # TODO: Revisit - currently privileged to make libinput work
         securityContext = {
           privileged = true
         }
