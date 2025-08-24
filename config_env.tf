@@ -124,7 +124,7 @@ locals {
     audioserve              = "docker.io/izderadicka/audioserve:latest"
     sunshine_desktop        = "ghcr.io/randomcoww/sunshine-desktop:v20250824.0309"
     stork_agent             = "ghcr.io/randomcoww/stork-agent:v20250802.2330"
-    llama_cpp               = "ghcr.io/randomcoww/llama-cpp-server-cuda:v12.9.1.20250817.1746-llama-swap"
+    llama_cpp               = "ghcr.io/randomcoww/llama-cpp-server-cuda:v20250824.0647-12.9.1-llama-swap"
     nginx                   = "docker.io/nginx:1.27-alpine-slim"
     litestream              = "ghcr.io/randomcoww/litestream:v0.3.13.20250816.2156"
     vaultwarden             = "docker.io/vaultwarden/server:1.34.3-alpine"
