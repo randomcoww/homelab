@@ -79,7 +79,7 @@ resource "helm_release" "arc-runner-hook-template" {
             name = "workflow-template"
           }
           stringData = {
-            trusted_ca_cert = data.terraform_remote_state.sr.outputs.trust.ca.cert_pem
+            internal_ca_cert = data.terraform_remote_state.sr.outputs.trust.ca.cert_pem
             minio_config = jsonencode({
               aliases = {
                 arc = {
@@ -134,14 +134,18 @@ resource "helm_release" "arc-runner-hook-template" {
                         value = local.minio_path
                       },
                       {
-                        name = "TRUSTED_CA"
+                        name = "INTERNAL_CA_CERT"
                         valueFrom = {
                           secretKeyRef = {
                             name = "workflow-template"
-                            key  = "trusted_ca_cert"
+                            key  = "internal_ca_cert"
                           }
                         }
-                      }
+                      },
+                      {
+                        name  = "INTERNAL_REGISTRY"
+                        value = local.internal_registry
+                      },
                     ]
                     volumeMounts = [
                       {
@@ -151,7 +155,7 @@ resource "helm_release" "arc-runner-hook-template" {
                       {
                         name      = "workflow-template"
                         mountPath = "${local.minio_path}/certs/CAs/ca.crt"
-                        subPath   = "trusted_ca_cert"
+                        subPath   = "internal_ca_cert"
                       },
                       {
                         name      = "workflow-template"
