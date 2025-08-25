@@ -1,7 +1,7 @@
 # Github actions runner #
 
 locals {
-  minio_credentials_path = "/runner-credentials/minio"
+  minio_path = "/minio"
 }
 
 resource "minio_iam_user" "arc" {
@@ -16,7 +16,13 @@ resource "minio_iam_policy" "arc" {
     Statement = [
       {
         Effect = "Allow"
-        Action = "*"
+        Action = [
+          "s3:GetObject",
+          "s3:PutObject",
+          "s3:ListBucket",
+          "s3:DeleteObject",
+          "s3:AbortMultipartUpload",
+        ]
         Resource = [
           minio_s3_bucket.data["boot"].arn,
           "${minio_s3_bucket.data["boot"].arn}/*",
@@ -87,6 +93,23 @@ resource "helm_release" "arc-runner-hook-template" {
             })
             "workflow-podspec.yaml" = yamlencode({
               spec = {
+                initContainers = [
+                  {
+                    name  = "mc"
+                    image = local.container_images.mc
+                    command = [
+                      "cp",
+                      "/bin/mc",
+                      "${local.minio_path}/",
+                    ]
+                    volumeMounts = [
+                      {
+                        name      = "minio-path"
+                        mountPath = local.minio_path
+                      },
+                    ]
+                  }
+                ]
                 containers = [
                   {
                     name = "$job"
@@ -108,7 +131,7 @@ resource "helm_release" "arc-runner-hook-template" {
                     env = [
                       {
                         name  = "MC_CONFIG_DIR"
-                        value = local.minio_credentials_path
+                        value = local.minio_path
                       },
                       {
                         name = "TRUSTED_CA"
@@ -122,17 +145,17 @@ resource "helm_release" "arc-runner-hook-template" {
                     ]
                     volumeMounts = [
                       {
-                        name      = "mc-config-dir"
-                        mountPath = local.minio_credentials_path
+                        name      = "minio-path"
+                        mountPath = local.minio_path
                       },
                       {
                         name      = "workflow-template"
-                        mountPath = "${local.minio_credentials_path}/certs/CAs/ca.crt"
+                        mountPath = "${local.minio_path}/certs/CAs/ca.crt"
                         subPath   = "trusted_ca_cert"
                       },
                       {
                         name      = "workflow-template"
-                        mountPath = "${local.minio_credentials_path}/config.json"
+                        mountPath = "${local.minio_path}/config.json"
                         subPath   = "minio_config"
                       },
                     ]
@@ -140,7 +163,7 @@ resource "helm_release" "arc-runner-hook-template" {
                 ]
                 volumes = [
                   {
-                    name = "mc-config-dir"
+                    name = "minio-path"
                     emptyDir = {
                       medium = "Memory"
                     }

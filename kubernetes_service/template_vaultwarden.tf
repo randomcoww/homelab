@@ -15,7 +15,13 @@ resource "minio_iam_policy" "vaultwarden" {
     Statement = [
       {
         Effect = "Allow"
-        Action = "*"
+        Action = [
+          "s3:GetObject",
+          "s3:PutObject",
+          "s3:ListBucket",
+          "s3:DeleteObject",
+          "s3:AbortMultipartUpload",
+        ]
         Resource = [
           minio_s3_bucket.vaultwarden.arn,
           "${minio_s3_bucket.vaultwarden.arn}/*",

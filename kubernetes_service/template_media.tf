@@ -12,7 +12,13 @@ resource "minio_iam_policy" "audioserve" {
     Statement = [
       {
         Effect = "Allow"
-        Action = "*"
+        Action = [
+          "s3:GetObject",
+          "s3:PutObject",
+          "s3:ListBucket",
+          "s3:DeleteObject",
+          "s3:AbortMultipartUpload",
+        ]
         Resource = [
           minio_s3_bucket.data["music"].arn,
           "${minio_s3_bucket.data["music"].arn}/*",
@@ -74,7 +80,10 @@ resource "minio_iam_policy" "webdav-pictures" {
     Statement = [
       {
         Effect = "Allow"
-        Action = "*"
+        Action = [
+          "s3:GetObject",
+          "s3:ListBucket",
+        ]
         Resource = [
           minio_s3_bucket.data["pictures"].arn,
           "${minio_s3_bucket.data["pictures"].arn}/*",
@@ -126,7 +135,10 @@ resource "minio_iam_policy" "webdav-videos" {
     Statement = [
       {
         Effect = "Allow"
-        Action = "*"
+        Action = [
+          "s3:GetObject",
+          "s3:ListBucket",
+        ]
         Resource = [
           minio_s3_bucket.data["videos"].arn,
           "${minio_s3_bucket.data["videos"].arn}/*",
