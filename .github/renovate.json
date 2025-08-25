@@ -62,7 +62,7 @@
       "matchPackageNames": [
         "randomcoww/fedora-coreos-config"
       ],
-      "versioning": "semver"
+      "versioning": "docker"
     }
   ]
 }
