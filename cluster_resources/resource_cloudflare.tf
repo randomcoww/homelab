@@ -91,28 +91,6 @@ resource "cloudflare_api_token" "r2_bucket" {
   ]
 }
 
-# Terraform bucket access for secrets provisioning
-
-resource "cloudflare_api_token" "backend_bucket" {
-  name = "r2-${data.terraform_remote_state.sr.config.bucket}"
-  policies = [
-    {
-      effect = "allow"
-      permission_groups = [
-        {
-          id = data.cloudflare_api_token_permission_groups_list.r2_read.result[0].id
-        },
-        {
-          id = data.cloudflare_api_token_permission_groups_list.r2_write.result[0].id
-        },
-      ]
-      resources = {
-        "com.cloudflare.edge.r2.bucket.${local.cloudflare_account_id}_default_${data.terraform_remote_state.sr.config.bucket}" = "*"
-      }
-    },
-  ]
-}
-
 # DNS
 
 resource "cloudflare_api_token" "dns" {
