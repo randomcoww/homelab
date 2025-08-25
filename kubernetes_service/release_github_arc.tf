@@ -1,7 +1,7 @@
 # Github actions runner #
 
 locals {
-  github_arc_mc_config_dir = "/minio-auth"
+  minio_credentials_path = "/runner-credentials/minio"
 }
 
 resource "minio_iam_user" "arc" {
@@ -73,10 +73,7 @@ resource "helm_release" "arc-runner-hook-template" {
             name = "workflow-template"
           }
           stringData = {
-            AWS_ENDPOINT_URL_S3   = "https://${data.terraform_remote_state.sr.outputs.backend_bucket.url}"
-            AWS_ACCESS_KEY_ID     = data.terraform_remote_state.sr.outputs.backend_bucket.access_key_id
-            AWS_SECRET_ACCESS_KEY = data.terraform_remote_state.sr.outputs.backend_bucket.secret_access_key
-            minio_ca_cert         = data.terraform_remote_state.sr.outputs.trust.ca.cert_pem
+            trusted_ca_cert = data.terraform_remote_state.sr.outputs.trust.ca.cert_pem
             minio_config = jsonencode({
               aliases = {
                 arc = {
@@ -108,40 +105,34 @@ resource "helm_release" "arc-runner-hook-template" {
                         "squat.ai/kvm" = 1
                       }
                     }
-                    env = concat([
-                      for _, key in [
-                        "AWS_ENDPOINT_URL_S3",
-                        "AWS_ACCESS_KEY_ID",
-                        "AWS_SECRET_ACCESS_KEY",
-                      ] :
+                    env = [
                       {
-                        name = key
+                        name  = "MC_CONFIG_DIR"
+                        value = local.minio_credentials_path
+                      },
+                      {
+                        name = "TRUSTED_CA"
                         valueFrom = {
                           secretKeyRef = {
                             name = "workflow-template"
-                            key  = key
+                            key  = "trusted_ca_cert"
                           }
                         }
                       }
-                      ], [
-                      {
-                        name  = "MC_CONFIG_DIR"
-                        value = local.github_arc_mc_config_dir
-                      },
-                    ])
+                    ]
                     volumeMounts = [
                       {
                         name      = "mc-config-dir"
-                        mountPath = local.github_arc_mc_config_dir
+                        mountPath = local.minio_credentials_path
                       },
                       {
                         name      = "workflow-template"
-                        mountPath = "${local.github_arc_mc_config_dir}/certs/CAs/ca.crt"
-                        subPath   = "minio_ca_cert"
+                        mountPath = "${local.minio_credentials_path}/certs/CAs/ca.crt"
+                        subPath   = "trusted_ca_cert"
                       },
                       {
                         name      = "workflow-template"
-                        mountPath = "${local.github_arc_mc_config_dir}/config.json"
+                        mountPath = "${local.minio_credentials_path}/config.json"
                         subPath   = "minio_config"
                       },
                     ]
@@ -189,6 +180,7 @@ resource "helm_release" "arc-runner-set" {
     "llama-cpp-server-cuda",
     "litestream",
     "kaniko",
+    "s3fs",
   ])
 
   name             = "arc-runner-${each.key}"
