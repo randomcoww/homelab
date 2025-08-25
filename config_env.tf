@@ -126,7 +126,7 @@ locals {
     stork_agent             = "ghcr.io/randomcoww/stork-agent:v20250802.2330"
     llama_cpp               = "ghcr.io/randomcoww/llama-cpp-server-cuda:v20250824.0647-12.9.1-llama-swap"
     nginx                   = "docker.io/nginx:1.27-alpine-slim"
-    litestream              = "ghcr.io/randomcoww/litestream:v0.3.13.20250816.2156"
+    litestream              = "ghcr.io/randomcoww/litestream:v0.3.13.20250825.0039"
     vaultwarden             = "docker.io/vaultwarden/server:1.34.3-alpine"
     s3fs                    = "ghcr.io/randomcoww/s3fs:v20250810.1846"
     flowise                 = "docker.io/flowiseai/flowise:3.0.5"
