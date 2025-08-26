@@ -115,15 +115,20 @@ storage:
 
           [crio.tracing]
           enable_tracing=false
-    # clickhouse DB
-    - path: /etc/sysctl.d/99-clickhouse.conf
-      mode: 0644
-      contents:
-        inline: |
-          kernel.task_delayacct=1
     # needed if bridging wlan
     - path: /etc/sysctl.d/99-bridge-iptables.conf
       mode: 0644
       contents:
         inline: |
           net.bridge.bridge-nf-call-iptables=0
+    # registry mirrors
+    - path: /etc/containers/registries.conf.d/10-proxy.conf
+      mode: 0644
+      contents:
+        inline: |
+          %{~ for _, registry in registry_mirrors ~}
+          [[registry]]
+          location = "${registry.location}"
+          [[registry.mirror]]
+          location = "${registry.cluster_service_ip}:${ports.registry}"
+          %{~ endfor ~}

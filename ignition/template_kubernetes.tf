@@ -60,7 +60,8 @@ module "kubernetes-worker" {
   cluster_name   = local.kubernetes.cluster_name
   ca             = data.terraform_remote_state.sr.outputs.kubernetes.ca
   ports = {
-    kubelet = local.host_ports.kubelet
+    kubelet  = local.host_ports.kubelet
+    registry = local.service_ports.registry
   }
   host_netnum               = each.value.netnum
   node_bootstrap_user       = local.kubernetes.node_bootstrap_user
@@ -75,6 +76,7 @@ module "kubernetes-worker" {
   cni_bin_path              = local.kubernetes.cni_bin_path
   container_storage_path    = "${local.kubernetes.containers_path}/storage"
   graceful_shutdown_delay   = 480
+  registry_mirrors          = local.registry_mirrors
 }
 
 module "etcd" {

@@ -24,7 +24,8 @@ variable "ca" {
 
 variable "ports" {
   type = object({
-    kubelet = number
+    kubelet  = number
+    registry = number
   })
 }
 
@@ -83,4 +84,12 @@ variable "graceful_shutdown_delay" {
 
 variable "kubernetes_pod_prefix" {
   type = string
+}
+
+variable "registry_mirrors" {
+  type = map(object({
+    location           = string
+    remoteurl          = string
+    cluster_service_ip = string
+  }))
 }

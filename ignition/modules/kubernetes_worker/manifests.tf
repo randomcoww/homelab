@@ -118,6 +118,7 @@ locals {
       kubernetes_pod_prefix     = var.kubernetes_pod_prefix
       node_prefix               = var.node_prefix
       ports                     = var.ports
+      registry_mirrors          = var.registry_mirrors
     })
     ], [
     yamlencode({

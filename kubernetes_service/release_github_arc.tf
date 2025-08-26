@@ -142,10 +142,6 @@ resource "helm_release" "arc-runner-hook-template" {
                           }
                         }
                       },
-                      {
-                        name  = "INTERNAL_REGISTRY"
-                        value = local.internal_registry
-                      },
                     ]
                     volumeMounts = [
                       {

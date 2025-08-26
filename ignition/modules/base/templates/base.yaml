@@ -3,6 +3,8 @@ variant: fcos
 version: ${butane_version}
 systemd:
   units:
+    - name: rpm-ostree-countme.service
+      mask: true
     - name: chronyd.service
       enabled: true
     # enable trim on all disks

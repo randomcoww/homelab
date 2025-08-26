@@ -82,11 +82,16 @@ locals {
       network = "10.96.0.0"
       cidr    = 12
       netnums = {
-        cluster_apiserver     = 1
-        cluster_dns           = 10
-        cluster_kea_primary   = 12
-        cluster_kea_secondary = 13
-        cluster_minio         = 14
+        cluster_apiserver       = 1
+        cluster_dns             = 10
+        cluster_kea_primary     = 12
+        cluster_kea_secondary   = 13
+        cluster_minio           = 14
+        cluster_registry_docker = 15
+        cluster_registry_k8s    = 16
+        cluster_registry_gcr    = 17
+        cluster_registry_ghcr   = 18
+        cluster_registry_quay   = 19
       }
     }
     kubernetes_pod = {
@@ -111,6 +116,7 @@ locals {
     kube_vip                = "ghcr.io/kube-vip/kube-vip:v1.0.0"
     device_plugin           = "ghcr.io/squat/generic-device-plugin:latest"
     kea                     = "ghcr.io/randomcoww/kea:v3.1.0.20250816.2229"
+    stork_agent             = "ghcr.io/randomcoww/stork-agent:v20250802.2330"
     matchbox                = "quay.io/poseidon/matchbox:v0.11.0"
     ipxe                    = "ghcr.io/randomcoww/ipxe:v20250825.0047"
     ipxe_tftp               = "ghcr.io/randomcoww/ipxe:v20250825.0047-tftp"
@@ -121,9 +127,9 @@ locals {
     qrcode_generator        = "ghcr.io/randomcoww/qrcode-generator:v0.1.0"
     rclone                  = "docker.io/rclone/rclone:1.71.0"
     mountpoint              = "ghcr.io/randomcoww/mountpoint-s3:v1.19.0.20250825.0039"
+    registry                = "ghcr.io/distribution/distribution:3.0.0"
     audioserve              = "docker.io/izderadicka/audioserve:latest"
     sunshine_desktop        = "ghcr.io/randomcoww/sunshine-desktop:v20250824.1925"
-    stork_agent             = "ghcr.io/randomcoww/stork-agent:v20250802.2330"
     llama_cpp               = "ghcr.io/randomcoww/llama-cpp-server-cuda:v20250824.0647-12.9.1-llama-swap"
     nginx                   = "docker.io/nginx:1.27-alpine-slim"
     litestream              = "ghcr.io/randomcoww/litestream:v0.3.13.20250825.0039"
@@ -268,6 +274,7 @@ locals {
     prometheus_blackbox = 9115
     llama_cpp           = 80
     searxng             = 8080
+    registry            = 5000
   }
 
   minio = {
@@ -288,6 +295,34 @@ locals {
       models = {
         name = "data-models"
       }
+    }
+  }
+
+  registry_mirrors = {
+    docker = {
+      location           = "docker.io"
+      remoteurl          = "https://registry-1.docker.io"
+      cluster_service_ip = local.services.cluster_registry_docker.ip
+    }
+    k8s = {
+      location           = "registry.k8s.io"
+      remoteurl          = "https://registry.k8s.io"
+      cluster_service_ip = local.services.cluster_registry_k8s.ip
+    }
+    gcr = {
+      location           = "gcr.io"
+      remoteurl          = "https://gcr.io"
+      cluster_service_ip = local.services.cluster_registry_gcr.ip
+    }
+    ghcr = {
+      location           = "ghcr.io"
+      remoteurl          = "https://ghcr.io"
+      cluster_service_ip = local.services.cluster_registry_ghcr.ip
+    }
+    quay = {
+      location           = "quay.io"
+      remoteurl          = "https://quay.io"
+      cluster_service_ip = local.services.cluster_registry_quay.ip
     }
   }
 

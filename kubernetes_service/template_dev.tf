@@ -1,3 +1,75 @@
+## internal registry
+
+resource "minio_s3_bucket" "registry" {
+  bucket        = "registry"
+  force_destroy = true
+}
+
+resource "minio_iam_user" "registry" {
+  name          = "registry"
+  force_destroy = true
+}
+
+resource "minio_iam_policy" "registry" {
+  name = "registry"
+  policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [
+      {
+        Effect = "Allow"
+        Action = [
+          "s3:GetObject",
+          "s3:PutObject",
+          "s3:ListBucket",
+          "s3:DeleteObject",
+          "s3:AbortMultipartUpload",
+        ]
+        Resource = [
+          minio_s3_bucket.registry.arn,
+          "${minio_s3_bucket.registry.arn}/*",
+        ]
+      },
+    ]
+  })
+}
+
+resource "minio_iam_user_policy_attachment" "registry" {
+  user_name   = minio_iam_user.registry.id
+  policy_name = minio_iam_policy.registry.id
+}
+
+module "registry" {
+  for_each = local.registry_mirrors
+
+  source          = "./modules/registry"
+  name            = "registry-${each.key}"
+  namespace       = "registry"
+  release         = "0.1.1"
+  replicas        = 2
+  proxy_remoteurl = each.value.remoteurl
+  proxy_ttl       = "168h"
+  images = {
+    registry = local.container_images.registry
+  }
+  ports = {
+    registry = local.service_ports.registry
+  }
+  ca                 = data.terraform_remote_state.sr.outputs.trust.ca
+  cluster_service_ip = each.value.cluster_service_ip
+
+  s3_endpoint          = "https://${local.services.cluster_minio.ip}:${local.service_ports.minio}"
+  s3_bucket            = minio_s3_bucket.registry.id
+  s3_bucket_prefix     = "/${each.key}"
+  s3_access_key_id     = minio_iam_user.registry.id
+  s3_secret_access_key = minio_iam_user.registry.secret
+
+  depends_on = [
+    minio_iam_user.registry,
+    minio_iam_policy.registry,
+    minio_iam_user_policy_attachment.registry,
+  ]
+}
+
 ## llama-cpp
 
 resource "minio_iam_user" "llama-cpp" {
@@ -85,7 +157,7 @@ module "llama-cpp" {
     },
     {
       name  = "GGML_CUDA_ENABLE_UNIFIED_MEMORY"
-      value = "1"
+      value = 1
     },
   ]
   resources = {
