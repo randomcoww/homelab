@@ -318,11 +318,6 @@ module "sunshine-desktop" {
       name  = "TZ"
       value = local.timezone
     },
-    # This is dynamically generated but sway seems to pick wayland-1 pretty consistently
-    {
-      name  = "WAYLAND_DISPLAY"
-      value = "wayland-1"
-    },
   ]
   resources = {
     requests = {
