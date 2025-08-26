@@ -87,11 +87,7 @@ locals {
         cluster_kea_primary     = 12
         cluster_kea_secondary   = 13
         cluster_minio           = 14
-        cluster_registry_docker = 15
-        cluster_registry_k8s    = 16
-        cluster_registry_gcr    = 17
-        cluster_registry_ghcr   = 18
-        cluster_registry_quay   = 19
+        cluster_registry_mirror = 15
       }
     }
     kubernetes_pod = {
@@ -266,15 +262,19 @@ locals {
   }
 
   service_ports = {
-    matchbox            = 443
-    matchbox_api        = 50101
-    minio               = 9000
-    metrics             = 9153
-    prometheus          = 80
-    prometheus_blackbox = 9115
-    llama_cpp           = 80
-    searxng             = 8080
-    registry            = 5000
+    matchbox               = 443
+    matchbox_api           = 50101
+    minio                  = 9000
+    metrics                = 9153
+    prometheus             = 80
+    prometheus_blackbox    = 9115
+    llama_cpp              = 80
+    searxng                = 8080
+    registry_mirror_docker = 5000
+    registry_mirror_k8s    = 5002
+    registry_mirror_gcr    = 5004
+    registry_mirror_ghcr   = 5006
+    registry_mirror_quay   = 5008
   }
 
   minio = {
@@ -300,29 +300,29 @@ locals {
 
   registry_mirrors = {
     docker = {
-      location           = "docker.io"
-      remoteurl          = "https://registry-1.docker.io"
-      cluster_service_ip = local.services.cluster_registry_docker.ip
+      location  = "docker.io"
+      remoteurl = "https://registry-1.docker.io"
+      port      = local.service_ports.registry_mirror_docker
     }
     k8s = {
-      location           = "registry.k8s.io"
-      remoteurl          = "https://registry.k8s.io"
-      cluster_service_ip = local.services.cluster_registry_k8s.ip
+      location  = "registry.k8s.io"
+      remoteurl = "https://registry.k8s.io"
+      port      = local.service_ports.registry_mirror_k8s
     }
     gcr = {
-      location           = "gcr.io"
-      remoteurl          = "https://gcr.io"
-      cluster_service_ip = local.services.cluster_registry_gcr.ip
+      location  = "gcr.io"
+      remoteurl = "https://gcr.io"
+      port      = local.service_ports.registry_mirror_gcr
     }
     ghcr = {
-      location           = "ghcr.io"
-      remoteurl          = "https://ghcr.io"
-      cluster_service_ip = local.services.cluster_registry_ghcr.ip
+      location  = "ghcr.io"
+      remoteurl = "https://ghcr.io"
+      port      = local.service_ports.registry_mirror_ghcr
     }
     quay = {
-      location           = "quay.io"
-      remoteurl          = "https://quay.io"
-      cluster_service_ip = local.services.cluster_registry_quay.ip
+      location  = "quay.io"
+      remoteurl = "https://quay.io"
+      port      = local.service_ports.registry_mirror_quay
     }
   }
 

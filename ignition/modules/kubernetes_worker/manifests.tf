@@ -49,7 +49,7 @@ locals {
           }
           staticPodPath = var.static_pod_path
           address       = "0.0.0.0"
-          port          = var.ports.kubelet
+          port          = var.kubelet_port
           clusterDomain = var.cluster_domain
           clusterDNS = [
             var.cluster_dns_ip,
@@ -117,7 +117,7 @@ locals {
       graceful_shutdown_delay   = var.graceful_shutdown_delay
       kubernetes_pod_prefix     = var.kubernetes_pod_prefix
       node_prefix               = var.node_prefix
-      ports                     = var.ports
+      kubelet_port              = var.kubelet_port
       registry_mirrors          = var.registry_mirrors
     })
     ], [

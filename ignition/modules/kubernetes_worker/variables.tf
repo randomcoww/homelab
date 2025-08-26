@@ -22,11 +22,8 @@ variable "ca" {
   })
 }
 
-variable "ports" {
-  type = object({
-    kubelet  = number
-    registry = number
-  })
+variable "kubelet_port" {
+  type = number
 }
 
 variable "host_netnum" {
@@ -88,8 +85,8 @@ variable "kubernetes_pod_prefix" {
 
 variable "registry_mirrors" {
   type = map(object({
-    location           = string
-    remoteurl          = string
-    cluster_service_ip = string
+    remoteurl       = string
+    location        = string
+    mirror_location = string
   }))
 }

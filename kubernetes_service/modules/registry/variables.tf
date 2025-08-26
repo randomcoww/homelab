@@ -21,19 +21,9 @@ variable "images" {
   })
 }
 
-variable "ports" {
-  type = object({
-    registry = number
-  })
-}
-
 variable "replicas" {
   type    = number
   default = 1
-}
-
-variable "proxy_remoteurl" {
-  type = string
 }
 
 variable "proxy_ttl" {
@@ -61,6 +51,14 @@ variable "resources" {
 variable "config" {
   type    = any
   default = {}
+}
+
+variable "registry_mirrors" {
+  type = map(object({
+    remoteurl = string
+    location  = string
+    port      = number
+  }))
 }
 
 variable "s3_endpoint" {

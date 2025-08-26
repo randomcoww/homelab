@@ -39,27 +39,22 @@ resource "minio_iam_user_policy_attachment" "registry" {
 }
 
 module "registry" {
-  for_each = local.registry_mirrors
-
-  source          = "./modules/registry"
-  name            = "registry-${each.key}"
-  namespace       = "registry"
-  release         = "0.1.1"
-  replicas        = 2
-  proxy_remoteurl = each.value.remoteurl
-  proxy_ttl       = "168h"
+  source    = "./modules/registry"
+  name      = "registry"
+  namespace = "registry"
+  release   = "0.1.1"
+  replicas  = 2
   images = {
     registry = local.container_images.registry
   }
-  ports = {
-    registry = local.service_ports.registry
-  }
+  registry_mirrors   = local.registry_mirrors
+  proxy_ttl          = "168h"
   ca                 = data.terraform_remote_state.sr.outputs.trust.ca
-  cluster_service_ip = each.value.cluster_service_ip
+  cluster_service_ip = local.services.cluster_registry_mirror.ip
 
   s3_endpoint          = "https://${local.services.cluster_minio.ip}:${local.service_ports.minio}"
   s3_bucket            = minio_s3_bucket.registry.id
-  s3_bucket_prefix     = "/${each.key}"
+  s3_bucket_prefix     = "/"
   s3_access_key_id     = minio_iam_user.registry.id
   s3_secret_access_key = minio_iam_user.registry.secret
 

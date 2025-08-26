@@ -67,7 +67,7 @@ storage:
 
             chain input {
               type filter hook input priority 0; policy accept;
-              tcp dport ${ports.kubelet} jump mark-for-accept;
+              tcp dport ${kubelet_port} jump mark-for-accept;
               ip saddr ${kubernetes_pod_prefix} jump mark-for-accept;
               ip saddr ${node_prefix} jump mark-for-accept;
               ip daddr ${node_prefix} jump mark-for-accept;
@@ -130,5 +130,5 @@ storage:
           [[registry]]
           location = "${registry.location}"
           [[registry.mirror]]
-          location = "${registry.cluster_service_ip}:${ports.registry}"
+          location = "${registry.mirror_location}"
           %{~ endfor ~}

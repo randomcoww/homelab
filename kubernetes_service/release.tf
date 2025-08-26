@@ -1,7 +1,7 @@
 ## Hack to release custom charts as local chart
 
 locals {
-  modules_enabled = concat([
+  modules_enabled = [
     module.device-plugin,
     module.kea,
     module.matchbox,
@@ -14,10 +14,11 @@ locals {
     module.vaultwarden,
     module.flowise,
     module.searxng,
+    module.registry,
     # remove for GPU driver upgrade
     module.llama-cpp,
     module.sunshine-desktop,
-  ], values(module.registry))
+  ]
 }
 
 # nginx ingress #

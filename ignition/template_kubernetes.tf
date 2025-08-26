@@ -54,15 +54,12 @@ module "kubernetes-worker" {
   for_each = local.members.kubernetes-worker
   source   = "./modules/kubernetes_worker"
 
-  butane_version = local.butane_version
-  fw_mark        = local.fw_marks.accept
-  name           = "kube-worker"
-  cluster_name   = local.kubernetes.cluster_name
-  ca             = data.terraform_remote_state.sr.outputs.kubernetes.ca
-  ports = {
-    kubelet  = local.host_ports.kubelet
-    registry = local.service_ports.registry
-  }
+  butane_version            = local.butane_version
+  fw_mark                   = local.fw_marks.accept
+  name                      = "kube-worker"
+  cluster_name              = local.kubernetes.cluster_name
+  ca                        = data.terraform_remote_state.sr.outputs.kubernetes.ca
+  kubelet_port              = local.host_ports.kubelet
   host_netnum               = each.value.netnum
   node_bootstrap_user       = local.kubernetes.node_bootstrap_user
   cluster_domain            = local.domains.kubernetes
@@ -76,7 +73,16 @@ module "kubernetes-worker" {
   cni_bin_path              = local.kubernetes.cni_bin_path
   container_storage_path    = "${local.kubernetes.containers_path}/storage"
   graceful_shutdown_delay   = 480
-  registry_mirrors          = local.registry_mirrors
+  registry_mirrors = {
+    for key, registry in local.registry_mirrors :
+    key => merge({
+      for k, v in registry :
+      k => v
+      if k != "port"
+      }, {
+      mirror_location = "${local.services.cluster_registry_mirror.ip}:${registry.port}"
+    })
+  }
 }
 
 module "etcd" {
