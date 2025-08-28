@@ -92,12 +92,6 @@ module "service" {
         targetPort = registry.port
       }
     ]
-    sessionAffinity = "ClientIP"
-    sessionAffinityConfig = {
-      clientIP = {
-        timeoutSeconds = 10800
-      }
-    }
   }
 }
 
