@@ -318,10 +318,6 @@ module "sunshine-desktop" {
       name  = "TZ"
       value = local.timezone
     },
-    {
-      name  = "WAYLAND_DISPLAY"
-      value = "wayland-1"
-    },
   ]
   resources = {
     requests = {
