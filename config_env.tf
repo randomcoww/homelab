@@ -132,7 +132,7 @@ locals {
     vaultwarden             = "docker.io/vaultwarden/server:1.34.3-alpine"
     s3fs                    = "ghcr.io/randomcoww/s3fs:v20250825.0638"
     flowise                 = "docker.io/flowiseai/flowise:3.0.5"
-    searxng                 = "docker.io/searxng/searxng:2025.8.27-90e602b"
+    searxng                 = "docker.io/searxng/searxng:2025.8.28-5ca08c1"
     valkey                  = "docker.io/valkey/valkey:8.1.3-alpine"
     nvidia_driver           = "ghcr.io/randomcoww/nvidia-driver-container:v580.76.05-fedora42"
     mc                      = "docker.io/minio/mc:latest"
