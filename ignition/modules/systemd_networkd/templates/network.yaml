@@ -18,9 +18,9 @@ storage:
           UseDNS=${lookup(config, "enable_dns", false)}
           UseNTP=false
           UseHostname=false
-          UseTimezone=true
+          UseTimezone=false
           UseDomains=${lookup(config, "enable_dns", false)}
-          UseRoutes=${!lookup(config, "enable_netnum", false)}
+          UseRoutes=${!lookup(config, "enable_netnum", false) && lookup(config, "enable_routes", true)}
           RoutesToDNS=false
           RoutesToNTP=false
           %{~ if contains(keys(config), "table_id") ~}

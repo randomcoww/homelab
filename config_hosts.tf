@@ -261,6 +261,10 @@ locals {
           source  = "phy0"
           network = "etcd"
         }
+        phy0-hack = {
+          source  = "phy0"
+          network = "hack"
+        }
       }
       bridge_interfaces = {
         br-lan = {
@@ -285,6 +289,13 @@ locals {
         etcd = {
           interface     = "phy0-etcd"
           enable_netnum = true
+        }
+        hack = {
+          interface     = "phy0-hack"
+          enable_dhcp   = true
+          enable_dns    = false
+          enable_routes = false
+          metric        = 4096
         }
       }
       disks = {

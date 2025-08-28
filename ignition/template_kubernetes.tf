@@ -31,10 +31,10 @@ module "kubernetes-master" {
   cluster_apiserver_endpoint = "${local.kubernetes_services.apiserver.endpoint}.svc.${local.domains.kubernetes}"
   kubernetes_service_prefix  = local.networks.kubernetes_service.prefix
   kubernetes_pod_prefix      = local.networks.kubernetes_pod.prefix
-  node_ips = [
+  node_ips = compact([
     for _, network in each.value.networks :
-    cidrhost(network.prefix, each.value.netnum)
-  ]
+    try(cidrhost(network.prefix, each.value.netnum), null)
+  ])
   apiserver_ip          = local.services.apiserver.ip
   cluster_apiserver_ip  = local.services.cluster_apiserver.ip
   static_pod_path       = local.kubernetes.static_pod_manifest_path

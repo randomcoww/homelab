@@ -77,6 +77,10 @@ locals {
     wan = {
       vlan_id = 30
     }
+    # Hack bridge
+    hack = {
+      vlan_id = 1024
+    }
     # Cluster internal
     kubernetes_service = {
       network = "10.96.0.0"
@@ -124,7 +128,7 @@ locals {
     rclone                  = "docker.io/rclone/rclone:1.71.0"
     mountpoint              = "ghcr.io/randomcoww/mountpoint-s3:v1.19.0.20250825.0039"
     registry                = "ghcr.io/distribution/distribution:3.0.0"
-    audioserve              = "docker.io/izderadicka/audioserve:latest"
+    audioserve              = "docker.io/izderadicka/audioserve:unstable"
     sunshine_desktop        = "ghcr.io/randomcoww/sunshine-desktop:v20250828.0216"
     llama_cpp               = "ghcr.io/randomcoww/llama-cpp-server-cuda:v20250824.0647-12.9.1-llama-swap"
     nginx                   = "docker.io/nginx:1.27-alpine-slim"
