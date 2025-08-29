@@ -204,6 +204,7 @@ resource "helm_release" "arc-runner-set" {
     "litestream",
     "kaniko",
     "s3fs",
+    "audioserve",
   ])
 
   name             = "arc-runner-${each.key}"
