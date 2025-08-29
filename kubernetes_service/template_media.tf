@@ -296,6 +296,12 @@ module "sunshine-desktop" {
       })
     },
     {
+      path    = "/etc/xdg/foot/foot.ini"
+      content = <<-EOF
+      font=monospace:size=14
+      EOF
+    },
+    {
       path    = "/etc/tmux.conf"
       content = <<-EOF
       set -g history-limit 10000
