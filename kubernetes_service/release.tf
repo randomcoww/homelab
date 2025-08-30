@@ -97,7 +97,7 @@ resource "helm_release" "kured" {
   repository       = "https://kubereboot.github.io/charts"
   chart            = "kured"
   wait             = false
-  version          = "5.8.0"
+  version          = "5.9.0"
   max_history      = 2
   values = [
     yamlencode({
