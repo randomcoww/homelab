@@ -15,15 +15,16 @@ variable "release" {
   type = string
 }
 
+variable "images" {
+  type = object({
+    jfs        = string
+    litestream = string
+  })
+}
+
 variable "replicas" {
   type    = number
   default = 1
-}
-
-variable "images" {
-  type = object({
-    s3fs = string
-  })
 }
 
 variable "annotations" {
@@ -51,31 +52,32 @@ variable "template_spec" {
   default = {}
 }
 
-variable "s3_endpoint" {
+variable "jfs_mount_path" {
   type = string
 }
 
-variable "s3_bucket" {
+variable "minio_endpoint" {
   type = string
 }
 
-variable "s3_prefix" {
+variable "minio_bucket" {
   type = string
 }
 
-variable "s3_access_key_id" {
+variable "minio_jfs_prefix" {
+  type    = string
+  default = "$(POD_NAME)"
+}
+
+variable "minio_litestream_prefix" {
+  type    = string
+  default = "$POD_NAME/litestream"
+}
+
+variable "minio_access_key_id" {
   type = string
 }
 
-variable "s3_secret_access_key" {
+variable "minio_secret_access_key" {
   type = string
-}
-
-variable "s3_mount_path" {
-  type = string
-}
-
-variable "s3_mount_extra_args" {
-  type    = list(string)
-  default = []
 }

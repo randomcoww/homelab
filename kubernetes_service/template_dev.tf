@@ -283,7 +283,6 @@ module "flowise" {
     litestream = local.container_images.litestream
   }
   service_hostname = local.kubernetes_ingress_endpoints.flowise
-  trusted_ca       = data.terraform_remote_state.sr.outputs.trust.ca.cert_pem
   extra_configs = {
     STORAGE_TYPE                 = "s3"
     S3_STORAGE_BUCKET_NAME       = minio_s3_bucket.flowise.id
@@ -307,10 +306,99 @@ module "flowise" {
   minio_litestream_prefix = "$POD_NAME/litestream"
   minio_access_key_id     = minio_iam_user.flowise.id
   minio_secret_access_key = minio_iam_user.flowise.secret
+  minio_ca_cert           = data.terraform_remote_state.sr.outputs.trust.ca.cert_pem
 
   depends_on = [
     minio_iam_user.flowise,
     minio_iam_policy.flowise,
     minio_iam_user_policy_attachment.flowise,
+  ]
+}
+
+## code-server
+
+locals {
+  code_mc_config_dir = "/var/tmp/minio"
+}
+
+resource "minio_s3_bucket" "code" {
+  bucket        = "code"
+  force_destroy = true
+}
+
+resource "minio_iam_user" "code" {
+  name          = "code"
+  force_destroy = true
+}
+
+resource "minio_iam_policy" "code" {
+  name = "code"
+  policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [
+      {
+        Effect = "Allow"
+        Action = [
+          "s3:GetObject",
+          "s3:PutObject",
+          "s3:ListBucket",
+          "s3:DeleteObject",
+          "s3:AbortMultipartUpload",
+        ]
+        Resource = [
+          minio_s3_bucket.code.arn,
+          "${minio_s3_bucket.code.arn}/*",
+        ]
+      },
+    ]
+  })
+}
+
+resource "minio_iam_user_policy_attachment" "code" {
+  user_name   = minio_iam_user.code.id
+  policy_name = minio_iam_policy.code.id
+}
+
+module "code-server" {
+  source  = "./modules/code_server"
+  name    = "code-server"
+  release = "0.1.1"
+  images = {
+    code_server = local.container_images.code_server
+    jfs         = local.container_images.juicefs
+    litestream  = local.container_images.litestream
+  }
+  user = "code"
+  uid  = 10000
+  extra_configs = [
+    {
+      path    = "/etc/tmux.conf"
+      content = <<-EOF
+      set -g history-limit 10000
+      set -g mouse on
+      set-option -s set-clipboard off
+      bind-key -T copy-mode MouseDragEnd1Pane send-keys -X copy-pipe-and-cancel "xclip -in -sel clip"
+      EOF
+    },
+  ]
+  extra_envs = [
+    {
+      name  = "TZ"
+      value = local.timezone
+    },
+  ]
+  service_hostname          = local.kubernetes_ingress_endpoints.code_server
+  ingress_class_name        = local.ingress_classes.ingress_nginx
+  nginx_ingress_annotations = local.nginx_ingress_annotations
+
+  minio_endpoint          = "https://${local.services.cluster_minio.ip}:${local.service_ports.minio}"
+  minio_bucket            = minio_s3_bucket.code.id
+  minio_access_key_id     = minio_iam_user.code.id
+  minio_secret_access_key = minio_iam_user.code.secret
+
+  depends_on = [
+    minio_iam_user.code,
+    minio_iam_policy.code,
+    minio_iam_user_policy_attachment.code,
   ]
 }

@@ -56,7 +56,7 @@ module "secret" {
     for k, v in local.extra_configs :
     tostring(k) => tostring(v)
     }, {
-    trusted_ca = var.trusted_ca
+    minio_ca_cert = var.minio_ca_cert
   })
 }
 
@@ -162,7 +162,7 @@ module "litestream" {
           {
             name      = "config"
             mountPath = local.extra_configs.NODE_EXTRA_CA_CERTS
-            subPath   = "trusted_ca"
+            subPath   = "minio_ca_cert"
           },
         ]
         readinessProbe = {

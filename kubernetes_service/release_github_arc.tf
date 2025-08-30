@@ -1,7 +1,7 @@
 # Github actions runner #
 
 locals {
-  minio_path = "/minio"
+  arc_mc_config_dir = "/minio"
 }
 
 resource "minio_iam_user" "arc" {
@@ -100,12 +100,12 @@ resource "helm_release" "arc-runner-hook-template" {
                     command = [
                       "cp",
                       "/bin/mc",
-                      "${local.minio_path}/",
+                      "${local.arc_mc_config_dir}/",
                     ]
                     volumeMounts = [
                       {
                         name      = "minio-path"
-                        mountPath = local.minio_path
+                        mountPath = local.arc_mc_config_dir
                       },
                     ]
                   }
@@ -131,7 +131,7 @@ resource "helm_release" "arc-runner-hook-template" {
                     env = [
                       {
                         name  = "MC_CONFIG_DIR"
-                        value = local.minio_path
+                        value = local.arc_mc_config_dir
                       },
                       {
                         name = "INTERNAL_CA_CERT"
@@ -146,16 +146,16 @@ resource "helm_release" "arc-runner-hook-template" {
                     volumeMounts = [
                       {
                         name      = "minio-path"
-                        mountPath = local.minio_path
+                        mountPath = local.arc_mc_config_dir
                       },
                       {
                         name      = "workflow-template"
-                        mountPath = "${local.minio_path}/certs/CAs/ca.crt"
+                        mountPath = "${local.arc_mc_config_dir}/certs/CAs/ca.crt"
                         subPath   = "internal_ca_cert"
                       },
                       {
                         name      = "workflow-template"
-                        mountPath = "${local.minio_path}/config.json"
+                        mountPath = "${local.arc_mc_config_dir}/config.json"
                         subPath   = "minio_config"
                       },
                     ]
@@ -203,8 +203,9 @@ resource "helm_release" "arc-runner-set" {
     "llama-cpp-server-cuda",
     "litestream",
     "kaniko",
-    "s3fs",
     "audioserve",
+    "code-server",
+    "juicefs",
   ])
 
   name             = "arc-runner-${each.key}"

@@ -5,10 +5,11 @@ locals {
   extra_configs = merge(var.extra_configs, {
     DATA_FOLDER           = dirname(local.db_path)
     DATABASE_URL          = local.db_path
+    DATABASE_CONN_INIT    = "PRAGMA busy_timeout = 5000; PRAGMA synchronous = NORMAL;"
     ROCKET_PORT           = local.vaultwarden_port
     DOMAIN                = "https://${var.service_hostname}"
-    USER_ATTACHMENT_LIMIT = "0"
-    ORG_ATTACHMENT_LIMIT  = "0"
+    USER_ATTACHMENT_LIMIT = 0
+    ORG_ATTACHMENT_LIMIT  = 0
   })
 }
 
