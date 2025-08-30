@@ -19,6 +19,8 @@ systemd:
             ExecStartPre=/usr/sbin/haproxy -f /etc/haproxy/haproxy.cfg -f ${haproxy_path} -c
             ExecStart=/usr/sbin/haproxy -Ws -f /etc/haproxy/haproxy.cfg -f ${haproxy_path} -p $PIDFILE
             ExecReload=/usr/sbin/haproxy -f /etc/haproxy/haproxy.cfg -f ${haproxy_path} -c
+            Restart=always
+            RestartSec=3
 
 storage:
   files:
