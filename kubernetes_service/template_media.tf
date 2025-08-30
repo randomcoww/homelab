@@ -227,11 +227,11 @@ module "sunshine-desktop" {
 
     ## User ##
 
-    mkdir -p $HOME $XDG_RUNTIME_DIR
-    chown $UID:$UID $HOME $XDG_RUNTIME_DIR
-
     useradd $USER -d $HOME -m -u $UID
     usermod -G wheel,video,input,render,dbus,seat $USER
+
+    mkdir -p $HOME $XDG_RUNTIME_DIR
+    chown $UID:$UID $HOME $XDG_RUNTIME_DIR
 
     ## Udev ##
 

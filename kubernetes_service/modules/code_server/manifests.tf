@@ -106,6 +106,9 @@ module "jfs" {
           useradd $USER -d $HOME -m -u $UID
           usermod -G wheel $USER
 
+          mkdir -p $HOME $XDG_RUNTIME_DIR
+          chown $UID:$UID $HOME $XDG_RUNTIME_DIR
+
           runuser -p -u $USER -- bash <<EOT
           exec code-server \
             --auth=none \
