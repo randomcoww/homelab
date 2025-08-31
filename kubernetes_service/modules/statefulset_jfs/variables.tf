@@ -56,6 +56,11 @@ variable "jfs_mount_path" {
   type = string
 }
 
+variable "jfs_capacity_gb" {
+  type    = number
+  default = 0
+}
+
 variable "minio_endpoint" {
   type = string
 }

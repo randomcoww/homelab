@@ -76,6 +76,7 @@ module "jfs" {
   minio_access_key_id     = var.minio_access_key_id
   minio_secret_access_key = var.minio_secret_access_key
   jfs_mount_path          = local.jfs_mount_path
+  jfs_capacity_gb         = 80
   images = {
     jfs        = var.images.jfs
     litestream = var.images.litestream
@@ -110,11 +111,11 @@ module "jfs" {
           chown $UID:$UID $HOME $XDG_RUNTIME_DIR
 
           runuser -p -u $USER -- bash <<EOT
-          exec code-server \
-            --auth=none \
-            --disable-telemetry \
-            --disable-update-check \
-            --bind-addr=0.0.0.0:${local.code_server_port}
+          cd $HOME
+          exec /opt/openvscode-server/bin/openvscode-server \
+            --host 0.0.0.0 \
+            --port ${local.code_server_port} \
+            --without-connection-token
           EOT
           EOF
         ]
@@ -159,14 +160,14 @@ module "jfs" {
           httpGet = {
             scheme = "HTTP"
             port   = local.code_server_port
-            path   = "/healthz"
+            path   = "/"
           }
         }
         livenessProbe = {
           httpGet = {
             scheme = "HTTP"
             port   = local.code_server_port
-            path   = "/healthz"
+            path   = "/"
           }
         }
         securityContext = var.security_context

@@ -93,9 +93,10 @@ module "litestream" {
 
           juicefs format '${local.db_url}' \
             ${var.minio_jfs_prefix} \
-            --storage minio \
-            --bucket ${var.minio_endpoint}/${var.minio_bucket} \
-            --trash-days 0
+            --storage=minio \
+            --bucket=${var.minio_endpoint}/${var.minio_bucket} \
+            --trash-days=0 \
+            --capacity=${var.jfs_capacity_gb}
 
           juicefs gc '${local.db_url}' \
             --compact \
@@ -152,6 +153,7 @@ module "litestream" {
             --atime-mode=noatime \
             --backup-meta=0 \
             --no-usage-report=true \
+            --writeback \
             -o allow_other,noatime
           EOF
         ]
