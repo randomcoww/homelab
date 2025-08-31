@@ -203,7 +203,6 @@ resource "helm_release" "arc-runner-set" {
     "llama-cpp-server-cuda",
     "litestream",
     "kaniko",
-    "audioserve",
     "code-server",
     "juicefs",
   ])

@@ -15,10 +15,10 @@ locals {
     module.flowise,
     module.searxng,
     module.registry,
-    # remove for GPU driver upgrade
-    module.llama-cpp,
-    module.sunshine-desktop,
     module.code-server,
+    # remove for GPU driver upgrade
+    # module.llama-cpp,
+    module.sunshine-desktop,
   ]
 }
 
@@ -162,6 +162,25 @@ resource "helm_release" "nvidia-gpu-oprerator" {
         enabled = false
       }
       vfioManager = {
+        enabled = false
+      }
+    })
+  ]
+}
+
+resource "helm_release" "amd-gpu" {
+  name             = "amd-gpu"
+  namespace        = "amd"
+  create_namespace = true
+  repository       = "https://rocm.github.io/k8s-device-plugin/"
+  chart            = "amd-gpu"
+  version          = "0.20.0"
+  values = [
+    yamlencode({
+      nfd = {
+        enabled = false
+      }
+      labeller = {
         enabled = false
       }
     })
