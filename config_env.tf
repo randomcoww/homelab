@@ -130,7 +130,7 @@ locals {
     registry                = "ghcr.io/distribution/distribution:3.0.0"
     audioserve              = "docker.io/izderadicka/audioserve:unstable"
     sunshine_desktop        = "ghcr.io/randomcoww/sunshine-desktop:v20250830.2250"
-    llama_cpp               = "ghcr.io/randomcoww/llama-cpp-server-cuda:v20250824.0647-12.9.1-llama-swap"
+    llama_cpp               = "ghcr.io/randomcoww/llama-cpp-server-cuda:v20250901.2318-12.9.1-llama-swap"
     nginx                   = "docker.io/nginx:1.27-alpine-slim"
     litestream              = "ghcr.io/randomcoww/litestream:v0.3.13.20250825.0039"
     vaultwarden             = "docker.io/vaultwarden/server:1.34.3-alpine"
