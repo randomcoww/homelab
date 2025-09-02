@@ -132,7 +132,7 @@ locals {
     sunshine_desktop        = "ghcr.io/randomcoww/sunshine-desktop:v20250830.2250"
     llama_cpp               = "ghcr.io/randomcoww/llama-cpp-server-cuda:v20250824.0647-12.9.1-llama-swap"
     nginx                   = "docker.io/nginx:1.27-alpine-slim"
-    litestream              = "ghcr.io/randomcoww/litestream:v0.3.13.20250825.0039"
+    litestream              = "ghcr.io/randomcoww/litestream:v0.3.13.20250901.2321"
     vaultwarden             = "docker.io/vaultwarden/server:1.34.3-alpine"
     juicefs                 = "ghcr.io/randomcoww/juicefs:v1.3.0.20250901.2114"
     code_server             = "ghcr.io/randomcoww/code-server:v1.103.1.20250901.2116"
