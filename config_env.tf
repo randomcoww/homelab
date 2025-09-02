@@ -115,7 +115,7 @@ locals {
     flannel_cni_plugin      = "docker.io/flannel/flannel-cni-plugin:v1.7.1-flannel1"
     kube_vip                = "ghcr.io/kube-vip/kube-vip:v1.0.0"
     device_plugin           = "ghcr.io/squat/generic-device-plugin:latest"
-    kea                     = "ghcr.io/randomcoww/kea:v3.1.0.20250816.2229"
+    kea                     = "ghcr.io/randomcoww/kea:v3.1.0.20250901.2312"
     stork_agent             = "ghcr.io/randomcoww/stork-agent:v20250802.2330"
     matchbox                = "quay.io/poseidon/matchbox:v0.11.0"
     ipxe                    = "ghcr.io/randomcoww/ipxe:v20250825.0047"
