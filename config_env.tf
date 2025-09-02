@@ -123,7 +123,7 @@ locals {
     hostapd                 = "ghcr.io/randomcoww/hostapd-noscan:v2.11.20250901.2310"
     kapprover               = "ghcr.io/randomcoww/kapprover:v0.1.0"
     external_dns            = "registry.k8s.io/external-dns/external-dns:v0.18.0"
-    tailscale               = "ghcr.io/randomcoww/tailscale-nft:v1.86.2.20250824.1630"
+    tailscale               = "ghcr.io/randomcoww/tailscale-nft:v1.86.2.20250901.2109"
     qrcode_generator        = "ghcr.io/randomcoww/qrcode-generator:v0.1.0"
     rclone                  = "docker.io/rclone/rclone:1.71.0"
     mountpoint              = "ghcr.io/randomcoww/mountpoint-s3:v1.19.0.20250825.0039"
