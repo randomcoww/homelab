@@ -119,7 +119,7 @@ locals {
     stork_agent             = "ghcr.io/randomcoww/stork-agent:v20250802.2330"
     matchbox                = "quay.io/poseidon/matchbox:v0.11.0"
     ipxe                    = "ghcr.io/randomcoww/ipxe:v20250825.0047"
-    ipxe_tftp               = "ghcr.io/randomcoww/ipxe:v20250825.0047-tftp"
+    ipxe_tftp               = "ghcr.io/randomcoww/ipxe:v20250901.2119-tftp"
     hostapd                 = "ghcr.io/randomcoww/hostapd-noscan:v2.11.20250901.2310"
     kapprover               = "ghcr.io/randomcoww/kapprover:v0.1.0"
     external_dns            = "registry.k8s.io/external-dns/external-dns:v0.18.0"
