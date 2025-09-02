@@ -120,7 +120,7 @@ locals {
     matchbox                = "quay.io/poseidon/matchbox:v0.11.0"
     ipxe                    = "ghcr.io/randomcoww/ipxe:v20250825.0047"
     ipxe_tftp               = "ghcr.io/randomcoww/ipxe:v20250825.0047-tftp"
-    hostapd                 = "ghcr.io/randomcoww/hostapd-noscan:v2.11.20250824.1549"
+    hostapd                 = "ghcr.io/randomcoww/hostapd-noscan:v2.11.20250901.2310"
     kapprover               = "ghcr.io/randomcoww/kapprover:v0.1.0"
     external_dns            = "registry.k8s.io/external-dns/external-dns:v0.18.0"
     tailscale               = "ghcr.io/randomcoww/tailscale-nft:v1.86.2.20250824.1630"
