@@ -137,3 +137,9 @@ storage:
       contents:
         inline: |
           ntsync
+    # Image build
+    - path: /etc/modules-load.d/20-uinput.conf
+      mode: 0644
+      contents:
+        inline: |
+          uinput
