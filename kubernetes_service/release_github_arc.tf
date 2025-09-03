@@ -83,7 +83,7 @@ resource "helm_release" "arc-runner-hook-template" {
             minio_config = jsonencode({
               aliases = {
                 arc = {
-                  url       = "https://${local.kubernetes_services.minio.endpoint}:${local.service_ports.minio}"
+                  url       = "https://${local.services.cluster_minio.ip}:${local.service_ports.minio}"
                   accessKey = minio_iam_user.arc.id
                   secretKey = minio_iam_user.arc.secret
                   api       = "S3v4"

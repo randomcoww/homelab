@@ -289,7 +289,7 @@ module "flowise" {
     S3_STORAGE_ACCESS_KEY_ID     = minio_iam_user.flowise.id
     S3_STORAGE_SECRET_ACCESS_KEY = minio_iam_user.flowise.secret
     S3_STORAGE_REGION            = "NA"
-    S3_ENDPOINT_URL              = "https://${local.kubernetes_services.minio.endpoint}:${local.service_ports.minio}"
+    S3_ENDPOINT_URL              = "https://${local.services.cluster_minio.ip}:${local.service_ports.minio}"
     S3_FORCE_PATH_STYLE          = true
     SMTP_HOST                    = var.smtp.host
     SMTP_PORT                    = var.smtp.port
@@ -301,7 +301,7 @@ module "flowise" {
   ingress_class_name        = local.ingress_classes.ingress_nginx
   nginx_ingress_annotations = local.nginx_ingress_annotations
 
-  minio_endpoint          = "https://${local.kubernetes_services.minio.endpoint}:${local.service_ports.minio}"
+  minio_endpoint          = "https://${local.services.cluster_minio.ip}:${local.service_ports.minio}"
   minio_bucket            = minio_s3_bucket.flowise.id
   minio_litestream_prefix = "$POD_NAME/litestream"
   minio_access_key_id     = minio_iam_user.flowise.id
@@ -359,6 +359,39 @@ resource "minio_iam_user_policy_attachment" "code" {
   policy_name = minio_iam_policy.code.id
 }
 
+resource "minio_iam_user" "code-client" {
+  name          = "code-client"
+  force_destroy = true
+}
+
+resource "minio_iam_policy" "code-client" {
+  name = "code-client"
+  policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [
+      {
+        Effect = "Allow"
+        Action = [
+          "s3:GetObject",
+          "s3:PutObject",
+          "s3:ListBucket",
+          "s3:DeleteObject",
+          "s3:AbortMultipartUpload",
+        ]
+        Resource = [
+          minio_s3_bucket.data["models"].arn,
+          "${minio_s3_bucket.data["models"].arn}/*",
+        ]
+      },
+    ]
+  })
+}
+
+resource "minio_iam_user_policy_attachment" "code-client" {
+  user_name   = minio_iam_user.code-client.id
+  policy_name = minio_iam_policy.code-client.id
+}
+
 module "code-server" {
   source  = "./modules/code_server"
   name    = "code-server"
@@ -380,11 +413,47 @@ module "code-server" {
       bind-key -T copy-mode MouseDragEnd1Pane send-keys -X copy-pipe-and-cancel "xclip -in -sel clip"
       EOF
     },
+    {
+      path    = "${local.code_mc_config_dir}/certs/CAs/ca.crt"
+      content = data.terraform_remote_state.sr.outputs.trust.ca.cert_pem
+    },
+    {
+      path = "${local.code_mc_config_dir}/config.json"
+      content = jsonencode({
+        aliases = {
+          m = {
+            url       = "https://${local.services.cluster_minio.ip}:${local.service_ports.minio}"
+            accessKey = minio_iam_user.code-client.id
+            secretKey = minio_iam_user.code-client.secret
+            api       = "S3v4"
+            path      = "auto"
+          }
+        }
+      })
+    },
   ]
   extra_envs = [
     {
       name  = "TZ"
       value = local.timezone
+    },
+    {
+      name  = "MC_CONFIG_DIR"
+      value = local.code_mc_config_dir
+    },
+  ]
+  extra_volume_mounts = [
+    {
+      name      = "minio-path"
+      mountPath = local.code_mc_config_dir
+    },
+  ]
+  extra_volumes = [
+    {
+      name = "minio-path"
+      emptyDir = {
+        medium = "Memory"
+      }
     },
   ]
   service_hostname          = local.kubernetes_ingress_endpoints.code_server
