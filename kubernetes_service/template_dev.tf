@@ -414,7 +414,7 @@ module "code-server" {
       EOF
     },
     {
-      path    = "${local.code_mc_config_dir}/certs/CAs/ca.crt"
+      path    = "/etc/pki/ca-trust/source/anchors/ca-cert.pem"
       content = data.terraform_remote_state.sr.outputs.trust.ca.cert_pem
     },
     {

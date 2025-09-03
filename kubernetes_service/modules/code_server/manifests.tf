@@ -99,6 +99,7 @@ module "jfs" {
           "-c",
           <<-EOF
           set -e
+          update-ca-trust
 
           until mountpoint ${local.jfs_mount_path}; do
           sleep 1

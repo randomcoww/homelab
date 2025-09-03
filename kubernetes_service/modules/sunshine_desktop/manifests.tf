@@ -169,6 +169,7 @@ module "statefulset" {
           "-c",
           <<EOF
           set -e
+          update-ca-trust
 
           ## User ##
 
