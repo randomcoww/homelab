@@ -13,7 +13,8 @@ locals {
     audio   = local.base_port + 11
     mic     = local.base_port + 13
   }
-  home_path = "/home/${var.user}"
+  home_path          = "/home/${var.user}"
+  sunshine_apps_path = "/etc/sunshine/apps.json"
 }
 
 # bypassed through nginx - no need to expose
@@ -53,6 +54,22 @@ module "secret" {
     }, {
     USERNAME = random_password.username.result
     PASSWORD = random_password.password.result
+    basename(local.sunshine_apps_path) = jsonencode({
+      apps = [
+        {
+          name       = "Desktop"
+          image-path = "desktop.png"
+          prep-cmd = [
+            {
+              do = "/usr/local/bin/sunshine-prep-cmd.sh"
+            },
+          ]
+        }
+      ],
+      env = {
+        PATH = "$(PATH):$(HOME)/.local/bin"
+      }
+    })
   })
 }
 
@@ -147,7 +164,92 @@ module "statefulset" {
       {
         name  = var.name
         image = var.images.sunshine_desktop
-        args  = var.args
+        args = [
+          "bash",
+          "-c",
+          <<EOF
+          set -e
+
+          ## User ##
+
+          useradd $USER -d $HOME -m -u $UID
+          usermod -G wheel,video,input,render,dbus,seat $USER
+
+          mkdir -p $HOME $XDG_RUNTIME_DIR
+          chown $UID:$UID $HOME $XDG_RUNTIME_DIR
+
+          ## Driver ##
+
+          mkdir -p $HOME/nvidia
+          targetarch=$(arch)
+          driver_version=$(nvidia-smi --query-gpu=driver_version --format=csv,noheader --id=0)
+          driver_file=$HOME/nvidia/NVIDIA-Linux-$targetarch-$driver_version.run
+
+          NVIDIA_DRIVER_BASE_URL=$${NVIDIA_DRIVER_BASE_URL:-https://us.download.nvidia.com/XFree86/$${targetarch/x86_64/Linux-x86_64}}
+          curl -L --skip-existing -o "$driver_file" \
+            $NVIDIA_DRIVER_BASE_URL/$driver_version/NVIDIA-Linux-$targetarch-$driver_version.run
+
+          chmod +x "$driver_file"
+
+          # TODO: try removing --no-install-libglvnd when https://github.com/LizardByte/Sunshine/issues/4050 is resolved
+          "$driver_file" \
+            --silent \
+            --accept-license \
+            --skip-depmod \
+            --skip-module-unload \
+            --no-kernel-modules \
+            --no-kernel-module-source \
+            --install-compat32-libs \
+            --no-nouveau-check \
+            --no-nvidia-modprobe \
+            --no-systemd \
+            --no-distro-scripts \
+            --no-rpms \
+            --no-backup \
+            --no-check-for-alternate-installs \
+            --no-libglx-indirect \
+            --no-install-libglvnd
+
+          ## Udev ##
+
+          /lib/systemd/systemd-udevd &
+
+          ## Seatd ##
+
+          seatd -u $USER &
+
+          runuser -p -u $USER -- bash <<EOT
+          set -e
+          cd $HOME
+
+          ## Pulseaudio ##
+
+          pulseaudio \
+            --log-level=0 \
+            --daemonize=true \
+            --disallow-exit=true \
+            --log-target=stderr \
+            --exit-idle-time=-1
+
+          ## Sway ##
+
+          sway &
+
+          ## Sunshine ##
+
+          sunshine --creds $SUNSHINE_USERNAME $SUNSHINE_PASSWORD
+
+          while ! wlr-randr >/dev/null 2>&1; do
+          sleep 1
+          done
+          exec sunshine \
+            origin_web_ui_allowed=wan \
+            port=${local.base_port} \
+            file_apps=${local.sunshine_apps_path} \
+            upnp=off
+          EOT
+          EOF
+        ]
         env = concat([
           {
             name = "SUNSHINE_USERNAME"
@@ -166,10 +268,6 @@ module "statefulset" {
                 key  = "PASSWORD"
               }
             }
-          },
-          {
-            name  = "SUNSHINE_PORT"
-            value = tostring(local.base_port)
           },
           {
             name  = "USER"
@@ -213,6 +311,11 @@ module "statefulset" {
           {
             name      = "dev-shm"
             mountPath = "/dev/shm"
+          },
+          {
+            name      = "config"
+            mountPath = local.sunshine_apps_path
+            subPath   = basename(local.sunshine_apps_path)
           },
         ], var.extra_volume_mounts)
         ports = concat([

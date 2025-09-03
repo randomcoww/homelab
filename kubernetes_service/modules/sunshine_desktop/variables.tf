@@ -33,10 +33,6 @@ variable "extra_configs" {
   default = []
 }
 
-variable "args" {
-  type = list(string)
-}
-
 variable "resources" {
   type    = any
   default = {}

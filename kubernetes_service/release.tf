@@ -16,8 +16,8 @@ locals {
     module.searxng,
     module.registry,
     module.code-server,
-    module.llama-cpp,
-    # module.sunshine-desktop,
+    # module.llama-cpp,
+    module.sunshine-desktop,
   ]
 }
 
