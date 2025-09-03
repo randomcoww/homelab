@@ -16,9 +16,8 @@ locals {
     module.searxng,
     module.registry,
     module.code-server,
-    # remove for GPU driver upgrade
-    # module.llama-cpp,
-    module.sunshine-desktop,
+    module.llama-cpp,
+    # module.sunshine-desktop,
   ]
 }
 
@@ -145,9 +144,15 @@ resource "helm_release" "nvidia-gpu-oprerator" {
         repository       = join("/", slice(split("/", split(":", local.container_images.nvidia_driver)[0]), 0, 2))
         image            = split("/", split(":", local.container_images.nvidia_driver)[0])[2]
         version          = split("-", split(":", local.container_images.nvidia_driver)[1])[0]
+        upgradePolicy = {
+          gpuPodDeletion = {
+            force          = true
+            deleteEmptyDir = true
+          }
+        }
       }
       toolkit = {
-        enabled = false
+        enabled = true
       }
       devicePlugin = {
         enabled = true

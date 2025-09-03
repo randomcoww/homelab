@@ -89,6 +89,7 @@ module "mountpoint" {
   affinity = var.affinity
   replicas = 1
   template_spec = {
+    runtimeClassName = "nvidia-cdi"
     containers = [
       {
         name  = var.name

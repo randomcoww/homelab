@@ -1,6 +1,6 @@
 ---
 variant: fcos
-version: 1.5.0
+version: ${butane_version}
 systemd:
   units:
     - name: haproxy.service

@@ -142,6 +142,7 @@ module "statefulset" {
     ]
   }
   template_spec = {
+    runtimeClassName = "nvidia-cdi"
     containers = [
       {
         name  = var.name
@@ -237,11 +238,8 @@ module "statefulset" {
             port = local.base_port
           }
         }
-        resources = var.resources
-        # TODO: Revisit - currently privileged to make libinput work
-        securityContext = {
-          privileged = true
-        }
+        resources       = var.resources
+        securityContext = var.security_context
       },
     ]
     volumes = concat([

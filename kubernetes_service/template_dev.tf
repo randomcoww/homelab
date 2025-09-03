@@ -127,7 +127,7 @@ module "llama-cpp" {
           --ctx-size 131072 \
           --ubatch-size 4096 \
           --batch-size 4096 \
-          --flash-attn \
+          --flash-attn on \
           --jinja \
           --temp 1.0 \
           --top_p 1.0 \
@@ -143,7 +143,7 @@ module "llama-cpp" {
           --ctx-size 131072 \
           --ubatch-size 4096 \
           --batch-size 4096 \
-          --flash-attn \
+          --flash-attn on \
           --jinja \
           --temp 1.0 \
           --top_p 1.0 \

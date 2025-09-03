@@ -313,10 +313,6 @@ module "sunshine-desktop" {
   ]
   extra_envs = [
     {
-      name  = "NVIDIA_VISIBLE_DEVICES"
-      value = "all"
-    },
-    {
       name  = "NVIDIA_DRIVER_CAPABILITIES"
       value = "all"
     },
@@ -329,27 +325,15 @@ module "sunshine-desktop" {
     requests = {
       memory = "12Gi"
     }
-  }
-  loadbalancer_class_name = "kube-vip.io/kube-vip-class"
-  affinity = {
-    nodeAffinity = {
-      requiredDuringSchedulingIgnoredDuringExecution = {
-        nodeSelectorTerms = [
-          {
-            matchExpressions = [
-              {
-                key      = "kubernetes.io/hostname"
-                operator = "In"
-                values = [
-                  "de-1.local",
-                ]
-              },
-            ]
-          },
-        ]
-      }
+    limits = {
+      "nvidia.com/gpu" = 1
     }
   }
+  # TODO: Revisit - currently privileged to make libinput work
+  security_context = {
+    privileged = true
+  }
+  loadbalancer_class_name   = "kube-vip.io/kube-vip-class"
   admin_hostname            = local.kubernetes_ingress_endpoints.sunshine_admin
   ingress_class_name        = local.ingress_classes.ingress_nginx
   nginx_ingress_annotations = local.nginx_ingress_annotations

@@ -132,3 +132,8 @@ storage:
           [[registry.mirror]]
           location = "${registry.mirror_location}"
           %{~ endfor ~}
+    - path: /etc/modules-load.d/20-ntsync.conf
+      mode: 0644
+      contents:
+        inline: |
+          ntsync
