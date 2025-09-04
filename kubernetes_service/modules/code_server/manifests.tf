@@ -106,7 +106,6 @@ module "jfs" {
           done
 
           useradd $USER -d $HOME -m -u $UID
-          usermod -G wheel $USER
 
           mkdir -p $HOME $XDG_RUNTIME_DIR
           chown $UID:$UID $HOME $XDG_RUNTIME_DIR
