@@ -134,22 +134,6 @@ module "llama-cpp" {
           --top_k 0
         EOF
       }
-      "jinx-gpt-oss-20b-q4" = {
-        cmd = <<-EOF
-        /app/llama-server \
-          --port $${PORT} \
-          --model /models/jinx-gpt-oss-20b-Q4_K_M.gguf \
-          --n-gpu-layers 25 \
-          --ctx-size 131072 \
-          --ubatch-size 4096 \
-          --batch-size 4096 \
-          --flash-attn on \
-          --jinja \
-          --temp 1.0 \
-          --top_p 1.0 \
-          --top_k 0
-        EOF
-      }
       "jina-embeddings-v4-text-retrieval-q8" = {
         cmd = <<-EOF
         /app/llama-server \
