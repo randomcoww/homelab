@@ -1,5 +1,5 @@
 locals {
-  jfs_mount_path   = "/var/run/code/home"
+  jfs_mount_path   = "/var/code-server/home"
   code_server_port = 8080
 }
 
