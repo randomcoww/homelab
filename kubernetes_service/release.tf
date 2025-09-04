@@ -15,9 +15,9 @@ locals {
     module.flowise,
     module.searxng,
     module.registry,
-    # module.code-server,
+    module.code-server,
     # module.llama-cpp,
-    module.sunshine-desktop,
+    # module.sunshine-desktop,
   ]
 }
 

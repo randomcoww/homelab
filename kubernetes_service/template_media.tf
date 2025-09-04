@@ -180,52 +180,12 @@ module "webdav-videos" {
 
 ## Sunshine desktop
 
-resource "minio_s3_bucket" "sunshine" {
-  bucket        = "sunshine"
-  force_destroy = true
-}
-
-resource "minio_iam_user" "sunshine" {
-  name          = "sunshine"
-  force_destroy = true
-}
-
-resource "minio_iam_policy" "sunshine" {
-  name = "sunshine"
-  policy = jsonencode({
-    Version = "2012-10-17"
-    Statement = [
-      {
-        Effect = "Allow"
-        Action = [
-          "s3:GetObject",
-          "s3:PutObject",
-          "s3:ListBucket",
-          "s3:DeleteObject",
-          "s3:AbortMultipartUpload",
-        ]
-        Resource = [
-          minio_s3_bucket.sunshine.arn,
-          "${minio_s3_bucket.sunshine.arn}/*",
-        ]
-      },
-    ]
-  })
-}
-
-resource "minio_iam_user_policy_attachment" "sunshine" {
-  user_name   = minio_iam_user.sunshine.id
-  policy_name = minio_iam_policy.sunshine.id
-}
-
 module "sunshine-desktop" {
   source  = "./modules/sunshine_desktop"
   name    = "sunshine-desktop"
   release = "0.1.1"
   images = {
     sunshine_desktop = local.container_images.sunshine_desktop
-    jfs              = local.container_images.juicefs
-    litestream       = local.container_images.litestream
   }
   user               = "sunshine"
   uid                = 10000
@@ -275,15 +235,4 @@ module "sunshine-desktop" {
   admin_hostname            = local.kubernetes_ingress_endpoints.sunshine_admin
   ingress_class_name        = local.ingress_classes.ingress_nginx
   nginx_ingress_annotations = local.nginx_ingress_annotations
-
-  minio_endpoint          = "https://${local.services.cluster_minio.ip}:${local.service_ports.minio}"
-  minio_bucket            = minio_s3_bucket.sunshine.id
-  minio_access_key_id     = minio_iam_user.sunshine.id
-  minio_secret_access_key = minio_iam_user.sunshine.secret
-
-  depends_on = [
-    minio_iam_user.sunshine,
-    minio_iam_policy.sunshine,
-    minio_iam_user_policy_attachment.sunshine,
-  ]
 }
