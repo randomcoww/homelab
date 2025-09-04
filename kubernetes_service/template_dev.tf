@@ -441,6 +441,10 @@ module "code-server" {
       name  = "MC_CONFIG_DIR"
       value = local.code_mc_config_dir
     },
+    {
+      name  = "NVIDIA_DRIVER_CAPABILITIES"
+      value = "compute,utility"
+    },
   ]
   extra_volume_mounts = [
     {
@@ -456,6 +460,11 @@ module "code-server" {
       }
     },
   ]
+  resources = {
+    limits = {
+      "nvidia.com/gpu" = 1
+    }
+  }
   service_hostname          = local.kubernetes_ingress_endpoints.code_server
   ingress_class_name        = local.ingress_classes.ingress_nginx
   nginx_ingress_annotations = local.nginx_ingress_annotations

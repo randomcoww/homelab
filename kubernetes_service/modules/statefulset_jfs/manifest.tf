@@ -1,7 +1,9 @@
 
 locals {
-  db_path = "/var/lib/jfs/jfs.db"
-  db_url  = "sqlite3://${local.db_path}?_busy_timeout=5000&_synchronous=NORMAL&_wal_autocheckpoint=0"
+  # store both JFS write cache and litestream db here
+  # https://juicefs.com/docs/community/guide/cache/#cache-dir
+  jfs_cache_path = "/var/jfsCache"
+  db_url         = "sqlite3://${local.jfs_cache_path}/jfs.db?_busy_timeout=5000&_synchronous=NORMAL&_wal_autocheckpoint=0"
 }
 
 module "metadata" {
@@ -34,7 +36,7 @@ module "litestream" {
   litestream_config = {
     dbs = [
       {
-        path = local.db_path
+        path = "${local.jfs_cache_path}/jfs.db"
         replicas = [
           {
             name              = "minio"
@@ -52,7 +54,7 @@ module "litestream" {
       },
     ]
   }
-  sqlite_path = local.db_path
+  sqlite_path = "${local.jfs_cache_path}/jfs.db"
   ##
   name        = var.name
   app         = var.app
@@ -60,6 +62,7 @@ module "litestream" {
   replicas    = var.replicas
   affinity    = var.affinity
   tolerations = var.tolerations
+  # use local-path to keep database 
   spec = merge(var.spec, {
     volumeClaimTemplates = concat(lookup(var.spec, "volumeClaimTemplates", []), [
       {
@@ -72,7 +75,7 @@ module "litestream" {
           ]
           resources = {
             requests = {
-              storage = "1Gi"
+              storage = "16Gi"
             }
           }
           storageClassName = "local-path"
@@ -154,6 +157,7 @@ module "litestream" {
             --backup-meta=0 \
             --no-usage-report=true \
             --writeback \
+            --cache-dir=${local.jfs_cache_path} \
             -o allow_other,noatime
           EOF
         ]
@@ -197,6 +201,11 @@ module "litestream" {
         name     = "jfs-mount"
         emptyDir = {}
       },
+      # Use local-path for this
+      # {
+      #   name     = "litestream-data"
+      #   emptyDir = {}
+      # },
       {
         name = "secret"
         secret = {

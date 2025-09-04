@@ -90,6 +90,7 @@ module "jfs" {
     "checksum/secret" = sha256(module.secret.manifest)
   }
   template_spec = {
+    runtimeClassName = "nvidia-cdi"
     containers = [
       {
         name  = var.name
