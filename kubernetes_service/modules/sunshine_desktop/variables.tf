@@ -14,6 +14,8 @@ variable "release" {
 variable "images" {
   type = object({
     sunshine_desktop = string
+    jfs              = string
+    litestream       = string
   })
 }
 
@@ -83,5 +85,21 @@ variable "loadbalancer_class_name" {
 }
 
 variable "storage_class_name" {
+  type = string
+}
+
+variable "minio_endpoint" {
+  type = string
+}
+
+variable "minio_bucket" {
+  type = string
+}
+
+variable "minio_access_key_id" {
+  type = string
+}
+
+variable "minio_secret_access_key" {
   type = string
 }

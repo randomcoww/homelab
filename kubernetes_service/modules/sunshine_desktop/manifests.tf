@@ -13,8 +13,8 @@ locals {
     audio   = local.base_port + 11
     mic     = local.base_port + 13
   }
-  home_path          = "/home/${var.user}"
   sunshine_apps_path = "/etc/sunshine/apps.json"
+  jfs_mount_path     = "/var/sunshine/home"
 }
 
 # bypassed through nginx - no need to expose
@@ -35,12 +35,11 @@ module "metadata" {
   namespace   = var.namespace
   release     = var.release
   app_version = split(":", var.images.sunshine_desktop)[1]
-  manifests = {
-    "templates/secret.yaml"      = module.secret.manifest
-    "templates/service.yaml"     = module.service.manifest
-    "templates/ingress.yaml"     = module.ingress.manifest
-    "templates/statefulset.yaml" = module.statefulset.manifest
-  }
+  manifests = merge(module.jfs.chart.manifests, {
+    "templates/secret.yaml"  = module.secret.manifest
+    "templates/service.yaml" = module.service.manifest
+    "templates/ingress.yaml" = module.ingress.manifest
+  })
 }
 
 module "secret" {
@@ -128,8 +127,22 @@ module "ingress" {
   ]
 }
 
-module "statefulset" {
-  source   = "../../../modules/statefulset"
+module "jfs" {
+  source = "../statefulset_jfs"
+  ## jfs settings
+  minio_endpoint          = var.minio_endpoint
+  minio_bucket            = var.minio_bucket
+  minio_litestream_prefix = "litestream"
+  minio_jfs_prefix        = "jfs"
+  minio_access_key_id     = var.minio_access_key_id
+  minio_secret_access_key = var.minio_secret_access_key
+  jfs_mount_path          = local.jfs_mount_path
+  jfs_capacity_gb         = 160
+  images = {
+    jfs        = var.images.jfs
+    litestream = var.images.litestream
+  }
+  ##
   name     = var.name
   app      = var.name
   release  = var.release
@@ -137,26 +150,6 @@ module "statefulset" {
   affinity = var.affinity
   annotations = {
     "checksum/secret" = sha256(module.secret.manifest)
-  }
-  spec = {
-    volumeClaimTemplates = [
-      {
-        metadata = {
-          name = "home"
-        }
-        spec = {
-          accessModes = [
-            "ReadWriteOnce",
-          ]
-          storageClassName = var.storage_class_name
-          resources = {
-            requests = {
-              storage = "20Gi"
-            }
-          }
-        }
-      },
-    ]
   }
   template_spec = {
     runtimeClassName = "nvidia-cdi"
@@ -170,6 +163,10 @@ module "statefulset" {
           <<EOF
           set -e
           update-ca-trust
+
+          until mountpoint ${local.jfs_mount_path}; do
+          sleep 1
+          done
 
           ## User ##
 
@@ -280,7 +277,7 @@ module "statefulset" {
           },
           {
             name  = "HOME"
-            value = local.home_path
+            value = "${local.jfs_mount_path}/${var.user}"
           },
           {
             name  = "XDG_RUNTIME_DIR"
@@ -301,10 +298,6 @@ module "statefulset" {
             subPath   = "${i}-${basename(config.path)}"
           }
           ], [
-          {
-            name      = "home"
-            mountPath = local.home_path
-          },
           {
             name      = "dev-input"
             mountPath = "/dev/input"
