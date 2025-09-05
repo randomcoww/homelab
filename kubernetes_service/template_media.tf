@@ -213,6 +213,14 @@ module "sunshine-desktop" {
       value = "all"
     },
     {
+      name  = "__NV_PRIME_RENDER_OFFLOAD"
+      value = 1
+    },
+    {
+      name  = "__GLX_VENDOR_LIBRARY_NAME"
+      value = "nvidia"
+    },
+    {
       name  = "TZ"
       value = local.timezone
     },
