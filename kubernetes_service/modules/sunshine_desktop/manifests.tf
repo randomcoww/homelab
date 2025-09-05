@@ -191,8 +191,6 @@ module "statefulset" {
             $NVIDIA_DRIVER_BASE_URL/$driver_version/NVIDIA-Linux-$targetarch-$driver_version.run
 
           chmod +x "$driver_file"
-
-          # TODO: try removing --no-install-libglvnd when https://github.com/LizardByte/Sunshine/issues/4050 is resolved
           "$driver_file" \
             --silent \
             --accept-license \
@@ -200,10 +198,12 @@ module "statefulset" {
             --skip-module-unload \
             --no-kernel-modules \
             --no-kernel-module-source \
-            --install-compat32-libs \
             --no-nouveau-check \
             --no-nvidia-modprobe \
             --no-systemd \
+            --no-wine-files \
+            --no-x-check \
+            --no-dkms \
             --no-distro-scripts \
             --no-rpms \
             --no-backup \
