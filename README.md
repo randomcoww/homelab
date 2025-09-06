@@ -137,7 +137,7 @@ terraform -chdir=client_credentials output -json minio_client | jq -r '.ca_cert_
 
 ### Build OS images
 
-See [fedora-coreos-config-custom](https://github.com/randomcoww/fedora-coreos-config-custom)
+See [fedora-coreos-config](https://github.com/randomcoww/fedora-coreos-config)
 
 Image build can be triggered from Github actions if ARC runners and MinIO are up. A pull request should get created to update the boot image tag. Update check may be forced by running the renovate Github workflow under this repo.
 
@@ -199,7 +199,7 @@ terraform -chdir=rolling_reboot apply
 
 ### Full cluster restart over the network
 
-Launch bootstrap DHCP service on a workstation on the same network as the server. Path `assets_path` should contains PXE image builds from [fedora-coreos-config-custom](https://github.com/randomcoww/fedora-coreos-config-custom).
+Launch bootstrap DHCP service on a workstation on the same network as the server. Path `assets_path` should contains PXE image builds from [fedora-coreos-config](https://github.com/randomcoww/fedora-coreos-config).
 
 Update image tags under `pxeboot_images` in [environment config](https://github.com/randomcoww/homelab/blob/master/config_env.tf) to match image file names.
 
