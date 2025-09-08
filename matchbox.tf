@@ -1,12 +1,12 @@
 resource "matchbox_profile" "ignition" {
   for_each = {
     for key, host in local.hosts :
-    host.physical_interfaces[host.network_boot.interface].match_mac => merge(host.network_boot, {
-      host_key = key
+    key => merge(host.network_boot, {
+      match_mac = host.physical_interfaces[host.network_boot.interface].match_mac
     }) if contains(keys(host), "network_boot")
   }
 
-  name   = each.key
+  name   = each.value.match_mac
   kernel = "${local.image_store_endpoint}/${each.value.image.kernel}"
   initrd = ["${local.image_store_endpoint}/${each.value.image.initrd}"]
   args = concat([
@@ -21,18 +21,18 @@ resource "matchbox_profile" "ignition" {
     "rd.driver.blacklist=nouveau",
     "modprobe.blacklist=nouveau",
   ], each.value.boot_args)
-  raw_ignition = data.terraform_remote_state.ignition.outputs.ignition[each.value.host_key]
+  raw_ignition = data.terraform_remote_state.ignition.outputs.ignition[each.key]
   # Write local files so that this step can work without access to ignition tfstate on S3
-  # raw_ignition = file("output/ignition/${each.value.host_key}.ign")
+  # raw_ignition = file("output/ignition/${each.key}.ign")
 }
 
 resource "matchbox_group" "ignition" {
   for_each = matchbox_profile.ignition
 
-  profile = each.key
+  profile = each.value.name
   name    = each.key
   selector = {
-    mac = replace(each.key, "-", ":")
+    mac = replace(each.value.name, "-", ":")
   }
 }
 
