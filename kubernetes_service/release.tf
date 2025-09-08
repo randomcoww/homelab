@@ -143,7 +143,7 @@ resource "helm_release" "nvidia-gpu-oprerator" {
         kernelModuleType = "open"
         repository       = join("/", slice(split("/", split(":", local.container_images.nvidia_driver)[0]), 0, 2))
         image            = split("/", split(":", local.container_images.nvidia_driver)[0])[2]
-        version          = split("-", split(":", local.container_images.nvidia_driver)[1])[0]
+        version          = join("-", slice(split("-", split(":", local.container_images.nvidia_driver)[1]), 0, length(split("-", split(":", local.container_images.nvidia_driver)[1])) - 1))
         upgradePolicy = {
           gpuPodDeletion = {
             force          = true
