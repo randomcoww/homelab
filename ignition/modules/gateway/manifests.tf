@@ -5,7 +5,7 @@ locals {
       butane_version            = var.butane_version
       fw_mark                   = var.fw_mark
       host_netnum               = var.host_netnum
-      wan_interface_name        = var.wan_interface_name
+      wan_interface_names       = var.wan_interface_names
       bird_path                 = var.bird_path
       bird_cache_table_name     = var.bird_cache_table_name
       bgp_as                    = var.bgp_as

@@ -46,6 +46,10 @@ module "server" {
   haproxy_path          = local.ha.haproxy_config_path
   bird_path             = local.ha.bird_config_path
   bird_cache_table_name = local.ha.bird_cache_table_name
-  bgp_router_id         = cidrhost(values(each.value.networks)[0].prefix, each.value.netnum)
-  bgp_port              = local.host_ports.bgp
+  bgp_router_id = reverse(sort(compact([
+    for _, network in each.value.networks :
+    cidrhost(network.prefix, each.value.netnum)
+    if lookup(network, "enable_netnum", false)
+  ])))[0]
+  bgp_port = local.host_ports.bgp
 }

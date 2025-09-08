@@ -77,8 +77,8 @@ locals {
     wan = {
       vlan_id = 30
     }
-    # Hack bridge
-    hack = {
+    # backup wan
+    backup = {
       vlan_id = 1024
     }
     # Cluster internal

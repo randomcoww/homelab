@@ -32,6 +32,11 @@ locals {
           network = "wan"
           mac     = "52-54-00-63-6e-b3"
         }
+        phy0-backup = {
+          source  = "phy0"
+          network = "backup"
+          mac     = "52-54-00-63-6e-b4"
+        }
       }
       networks = {
         lan = {
@@ -57,6 +62,13 @@ locals {
         wan = {
           interface   = "phy0-wan"
           enable_dhcp = true
+        }
+        backup = {
+          interface     = "phy0-backup"
+          enable_dhcp   = true
+          enable_dns    = false
+          enable_routes = false
+          metric        = 4096
         }
       }
       disks = {
@@ -116,6 +128,11 @@ locals {
           network = "wan"
           mac     = "52-54-00-63-6e-b3"
         }
+        phy0-backup = {
+          source  = "phy0"
+          network = "backup"
+          mac     = "52-54-00-63-6e-b4"
+        }
       }
       networks = {
         lan = {
@@ -141,6 +158,13 @@ locals {
         wan = {
           interface   = "phy0-wan"
           enable_dhcp = true
+        }
+        backup = {
+          interface     = "phy0-backup"
+          enable_dhcp   = true
+          enable_dns    = false
+          enable_routes = false
+          metric        = 4096
         }
       }
       disks = {
@@ -261,10 +285,6 @@ locals {
           source  = "phy0"
           network = "etcd"
         }
-        phy0-hack = {
-          source  = "phy0"
-          network = "hack"
-        }
       }
       bridge_interfaces = {
         br-lan = {
@@ -289,13 +309,6 @@ locals {
         etcd = {
           interface     = "phy0-etcd"
           enable_netnum = true
-        }
-        hack = {
-          interface     = "phy0-hack"
-          enable_dhcp   = true
-          enable_dns    = false
-          enable_routes = false
-          metric        = 4096
         }
       }
       disks = {

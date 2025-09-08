@@ -175,6 +175,30 @@ terraform -chdir=kubernetes_service apply -var-file=secrets.tfvars
 
 ---
 
+### Trigger rolling reboot
+
+Trigger rolling reboot of modified Kubernetes workers coordinated by `kured`.
+
+```bash
+terraform -chdir=rolling_reboot init -upgrade
+terraform -chdir=rolling_reboot apply
+```
+
+---
+
+### Node update and reboot
+
+```bash
+terraform -chdir=ignition init -upgrade && \
+terraform -chdir=matchbox_client init -upgrade && \
+terraform -chdir=rolling_reboot init -upgrade && \
+terraform -chdir=ignition apply && \
+terraform -chdir=matchbox_client apply && \
+terraform -chdir=rolling_reboot apply
+```
+
+---
+
 ### Write current PXE boot image to local disk
 
 If network boot is not working, hosts may fallback to booting from (USB) disk. Looks for first disk with a partition labeled `fedora-coreos-<tag>` and update content.
@@ -182,17 +206,6 @@ If network boot is not working, hosts may fallback to booting from (USB) disk. L
 ```bash
 terraform -chdir=write_local_disk init -upgrade
 terraform -chdir=write_local_disk apply
-```
-
----
-
-### Trigger rolling reboot
-
-Write file on all Kubernetes worker hosts to trigger rolling reboots coordinated by `kured`.
-
-```bash
-terraform -chdir=rolling_reboot init -upgrade
-terraform -chdir=rolling_reboot apply
 ```
 
 ---

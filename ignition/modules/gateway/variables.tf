@@ -10,8 +10,8 @@ variable "host_netnum" {
   type = number
 }
 
-variable "wan_interface_name" {
-  type = string
+variable "wan_interface_names" {
+  type = list(string)
 }
 
 variable "bird_path" {

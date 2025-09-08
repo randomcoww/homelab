@@ -3,10 +3,13 @@ module "gateway" {
   for_each = local.members.gateway
   source   = "./modules/gateway"
 
-  butane_version        = local.butane_version
-  fw_mark               = local.fw_marks.accept
-  host_netnum           = each.value.netnum
-  wan_interface_name    = each.value.networks.wan.interface
+  butane_version = local.butane_version
+  fw_mark        = local.fw_marks.accept
+  host_netnum    = each.value.netnum
+  wan_interface_names = [
+    each.value.networks.wan.interface,
+    each.value.networks.backup.interface,
+  ]
   bird_path             = local.ha.bird_config_path
   bird_cache_table_name = local.ha.bird_cache_table_name
   bgp_port              = local.host_ports.bgp

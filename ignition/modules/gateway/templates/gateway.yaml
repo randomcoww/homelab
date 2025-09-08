@@ -27,18 +27,18 @@ storage:
 
             chain input {
               type filter hook input priority -10; policy accept;
-              iifname ${wan_interface_name} meta mark & ${fw_mark} == 0x00000000 drop;
               iifname ${sync_interface_name} pkttype multicast jump mark-for-accept;
+              iifname {${join(",", wan_interface_names)}} meta mark & ${fw_mark} == 0x00000000 drop;
             }
 
             chain forward {
               type filter hook forward priority 0; policy accept;
-              oifname ${wan_interface_name} jump mark-for-accept;
+              oifname {${join(",", wan_interface_names)}} jump mark-for-accept;
             }
 
             chain postrouting {
               type nat hook postrouting priority srcnat + 20; policy accept;
-              oifname ${wan_interface_name} masquerade;
+              oifname {${join(",", wan_interface_names)}} masquerade;
             }
           }
           ;
@@ -50,12 +50,14 @@ storage:
           vrrp_instance gateway {
             preempt
             state BACKUP
-            advert_int 0.4
+            advert_int 0.2
             virtual_router_id ${keepalived_router_id}
             interface ${sync_interface_name}
             track_interface {
               ${keepalived_interface_name}
-              ${wan_interface_name}
+              %{~ for _, interface in wan_interface_names ~}
+              ${interface}
+              %{~ endfor ~}
             }
             no_accept
             vmac_xmit_base
@@ -128,7 +130,8 @@ storage:
             };
           }
     # Create fallback route so backup node can access the internet through the wan interface
-    - path: /etc/systemd/network/20-${wan_interface_name}.network.d/20-master-default-route.conf
+    %{~ for _, interface in wan_interface_names ~}
+    - path: /etc/systemd/network/20-${interface}.network.d/20-master-default-route.conf
       mode: 0644
       contents:
         inline: |
@@ -137,6 +140,7 @@ storage:
           ClientIdentifier=mac
           RouteTable=${master_default_route.table_id}
           UseTimezone=false
+    %{~ endfor ~}
     - path: /etc/conntrackd/conntrackd.conf
       mode: 0644
       overwrite: true
