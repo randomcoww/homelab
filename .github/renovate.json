@@ -64,6 +64,10 @@
         "randomcoww/fedora-coreos-config"
       ],
       "versioning": "docker"
+    },
+    {
+      "matchUpdateTypes": ["minor", "patch"],
+      "automerge": true
     }
   ]
 }
