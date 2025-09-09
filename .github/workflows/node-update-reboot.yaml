@@ -14,7 +14,7 @@ jobs:
     - name: Init
       run: |
         set -e
-        git checkout --depth=1 ${{ github.server_url }}/${{ github.repository }}.git /tmp/project
+        git clone --depth=1 ${{ github.server_url }}/${{ github.repository }}.git /tmp/project
         cd /tmp/project
 
         terraform -chdir=matchbox_client init -upgrade
