@@ -20,6 +20,12 @@ locals {
     }
   }
 
+  terraform_bucket = {
+    terraform = {
+      bucket = data.terraform_remote_state.sr.config.bucket
+    }
+  }
+
   cloudflare_tunnels = {
     # type = map(object({
     #   path    = string
@@ -71,7 +77,7 @@ resource "cloudflare_r2_bucket" "bucket" {
 }
 
 resource "cloudflare_api_token" "r2_bucket" {
-  for_each = local.r2_buckets
+  for_each = merge(local.r2_buckets, local.terraform_bucket)
   name     = "r2-${each.key}"
   policies = [
     {
