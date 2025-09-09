@@ -17,8 +17,25 @@ jobs:
         git clone --depth=1 ${{ github.server_url }}/${{ github.repository }}.git $HOME/project
 
         cd $HOME/project
+        ssh-keygen -t ecdsa -f $HOME/.ssh/id_ecdsa  -q -N ""
+        cat > client_credentials/secrets.tfvars <<EOF
+        ssh_client = {
+          key_id                = "$(whoami)"
+          public_key_openssh    = "ssh_client_public_key=$(cat $HOME/.ssh/id_ecdsa.pub)"
+          early_renewal_hours   = 1
+          validity_period_hours = 1
+        }
+        EOF
+
+        terraform -chdir=client_credentials init -upgrade
         terraform -chdir=matchbox_client init -upgrade
         terraform -chdir=rolling_reboot init -upgrade
+
+    - name: Client credentials
+      run: |
+        cd $HOME/project
+        terraform -chdir=client_credentials apply -auto-approve -var-file=secrets.tfvars > /dev/null
+
     - name: Matchbox
       run: |
         cd $HOME/project
