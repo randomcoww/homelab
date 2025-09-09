@@ -18,7 +18,5 @@ module "write-local-disk" {
     rm coreos.iso
     EOF
   ]
-  triggers_replace = [
-    timestamp(),
-  ]
+  triggers_replace = data.terraform_remote_state.matchbox-client.outputs.config[each.key]
 }
