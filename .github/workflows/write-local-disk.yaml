@@ -6,7 +6,7 @@ concurrency:
   cancel-in-progress: false
 
 jobs:
-  node-update-reboot:
+  write-local-disk:
     runs-on: arc-runner-${{ github.event.repository.name }}
     container:
       image: docker.io/hashicorp/terraform:latest
