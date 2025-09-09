@@ -36,10 +36,12 @@ jobs:
         cd $HOME/project
         terraform -chdir=client_credentials apply -auto-approve -var-file=secrets.tfvars > /dev/null
 
-    - name: Matchbox
+    - name: Update matchbox
       run: |
         cd $HOME/project
         terraform -chdir=matchbox_client apply -auto-approve > /dev/null
-    # - name: Reboot
-    #   run: |
-    #     terraform -chdir=rolling_reboot apply -auto-approve
+
+    - name: Trigger rolling reboot
+      run: |
+        cd $HOME/project
+        terraform -chdir=rolling_reboot apply -auto-approve
