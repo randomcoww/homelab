@@ -14,13 +14,14 @@ jobs:
     - name: Init
       run: |
         set -e
-        git clone --depth=1 ${{ github.server_url }}/${{ github.repository }}.git /tmp/project
-        cd /tmp/project
+        git clone --depth=1 ${{ github.server_url }}/${{ github.repository }}.git $HOME/project
 
+        cd $HOME/project
         terraform -chdir=matchbox_client init -upgrade
         terraform -chdir=rolling_reboot init -upgrade
     - name: Matchbox
       run: |
+        cd $HOME/project
         terraform -chdir=matchbox_client apply -auto-approve > /dev/null
     # - name: Reboot
     #   run: |
