@@ -29,6 +29,7 @@ jobs:
 
         terraform -chdir=client_credentials init -upgrade
         terraform -chdir=matchbox_client init -upgrade
+        terraform -chdir=write_local_disk init -upgrade
         terraform -chdir=rolling_reboot init -upgrade
 
     - name: Client credentials
@@ -40,6 +41,11 @@ jobs:
       run: |
         cd $HOME/project
         terraform -chdir=matchbox_client apply -auto-approve > /dev/null
+
+    - name: Write local disk
+      run: |
+        cd $HOME/project
+        terraform -chdir=write_local_disk apply -auto-approve
 
     - name: Rolling reboot
       run: |
