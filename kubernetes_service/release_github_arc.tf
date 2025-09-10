@@ -79,10 +79,7 @@ resource "helm_release" "arc-runner-hook-template" {
             name = "workflow-template"
           }
           stringData = {
-            AWS_ENDPOINT_URL_S3   = "https://${data.terraform_remote_state.sr.outputs.r2_bucket["terraform"].url}"
-            AWS_ACCESS_KEY_ID     = data.terraform_remote_state.sr.outputs.r2_bucket["terraform"].access_key_id
-            AWS_SECRET_ACCESS_KEY = data.terraform_remote_state.sr.outputs.r2_bucket["terraform"].secret_access_key
-            INTERNAL_CA_CERT      = data.terraform_remote_state.sr.outputs.trust.ca.cert_pem
+            INTERNAL_CA_CERT = data.terraform_remote_state.sr.outputs.trust.ca.cert_pem
             minio_config = jsonencode({
               aliases = {
                 arc = {
@@ -134,28 +131,21 @@ resource "helm_release" "arc-runner-hook-template" {
                         "squat.ai/kvm" = 1
                       }
                     }
-                    env = concat([
-                      for _, key in [
-                        "AWS_ENDPOINT_URL_S3",
-                        "AWS_ACCESS_KEY_ID",
-                        "AWS_SECRET_ACCESS_KEY",
-                        "INTERNAL_CA_CERT",
-                      ] :
+                    env = [
                       {
-                        name = key
+                        name = "INTERNAL_CA_CERT"
                         valueFrom = {
                           secretKeyRef = {
                             name = "workflow-template"
-                            key  = key
+                            key  = "INTERNAL_CA_CERT"
                           }
                         }
-                      }
-                      ], [
+                      },
                       {
                         name  = "MC_CONFIG_DIR"
                         value = local.arc_mc_config_dir
                       },
-                    ])
+                    ]
                     volumeMounts = [
                       {
                         name      = "minio-path"
