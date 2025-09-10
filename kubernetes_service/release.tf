@@ -108,6 +108,9 @@ resource "helm_release" "kured" {
         metricsPort   = local.service_ports.metrics
         forceReboot   = true
         drainTimeout  = "6m"
+        blockingPodSelector = [
+          "app=arc-runner",
+        ]
       }
       podAnnotations = {
         "prometheus.io/scrape" = "true"

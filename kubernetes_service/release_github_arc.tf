@@ -96,6 +96,9 @@ resource "helm_release" "arc-runner-hook-template" {
             })
             "workflow-podspec.yaml" = yamlencode({
               spec = {
+                labels = {
+                  app = "arc-runner"
+                }
                 initContainers = [
                   {
                     name  = "mc"
@@ -248,6 +251,9 @@ resource "helm_release" "arc-runner-set" {
       }
       template = {
         spec = {
+          labels = {
+            app = "arc-runner"
+          }
           containers = [
             {
               name  = "runner"
