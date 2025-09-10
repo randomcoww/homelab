@@ -113,14 +113,14 @@ terraform() {
 Generate external and cluster wide resources
 
 ```bash
-terraform -chdir=cluster_resources init -upgrade
+terraform -chdir=cluster_resources init -upgrade && \
 terraform -chdir=cluster_resources apply -var-file=secrets.tfvars
 ```
 
 Write local client credentials
 
 ```bash
-terraform -chdir=client_credentials init -upgrade
+terraform -chdir=client_credentials init -upgrade && \
 terraform -chdir=client_credentials apply -auto-approve -var-file=secrets.tfvars
 
 SSH_KEY=$HOME/.ssh/id_ecdsa
@@ -144,14 +144,14 @@ Image build can be triggered from Github actions if ARC runners and MinIO are up
 Generate host ignition
 
 ```bash
-terraform -chdir=ignition init -upgrade
+terraform -chdir=ignition init -upgrade && \
 terraform -chdir=ignition apply
 ```
 
 Push image tag and ignition to matchbox for iPXE boot
 
 ```bash
-terraform -chdir=matchbox_client init -upgrade
+terraform -chdir=matchbox_client init -upgrade && \
 terraform -chdir=matchbox_client apply
 ```
 
@@ -162,26 +162,15 @@ terraform -chdir=matchbox_client apply
 Deploy bootstrap and lower level services
 
 ```bash
-terraform -chdir=kubernetes_bootstrap init -upgrade
+terraform -chdir=kubernetes_bootstrap init -upgrade && \
 terraform -chdir=kubernetes_bootstrap apply
 ```
 
 Deploy higher level services
 
 ```bash
-terraform -chdir=kubernetes_service init -upgrade
+terraform -chdir=kubernetes_service init -upgrade && \
 terraform -chdir=kubernetes_service apply -var-file=secrets.tfvars
-```
-
----
-
-### Trigger rolling reboot
-
-Trigger rolling reboot of modified Kubernetes workers coordinated by `kured`.
-
-```bash
-terraform -chdir=rolling_reboot init -upgrade
-terraform -chdir=rolling_reboot apply
 ```
 
 ---
@@ -191,14 +180,22 @@ terraform -chdir=rolling_reboot apply
 If network boot is not working, hosts may fallback to booting from (USB) disk. Looks for first disk with a partition labeled `fedora-coreos-<tag>` and update content.
 
 ```bash
-terraform -chdir=write_local_disk init -upgrade
+terraform -chdir=write_local_disk init -upgrade && \
 terraform -chdir=write_local_disk apply
 ```
 
-Occasionally nodes will fail to boot over the network and boot from backup disk even if the network boot environment is working. Check and reboot these nodes.
+---
+
+### Trigger rolling reboot
+
+Trigger rolling reboot of modified Kubernetes workers coordinated by `kured`.
+
+Occasionally nodes will fail to boot over the network and boot from backup disk even if the network boot environment is working. Also check and reboot these nodes.
 
 ```bash
-terraform -chdir=rolling_reboot_failed init -upgrade
+terraform -chdir=rolling_reboot init -upgrade && \
+terraform -chdir=rolling_reboot_failed init -upgrade && \
+terraform -chdir=rolling_reboot apply && \
 terraform -chdir=rolling_reboot_failed apply
 ```
 
@@ -220,7 +217,7 @@ echo assets_path=$assets_path
 ```
 
 ```bash
-terraform -chdir=bootstrap_server init
+terraform -chdir=bootstrap_server init && \
 terraform -chdir=bootstrap_server apply \
   -var host_ip=$host_ip \
   -var assets_path=$assets_path
@@ -236,7 +233,7 @@ sudo podman play kube bootstrap.yaml
 Push PXE boot and ignition configuration to bootstrap service
 
 ```bash
-terraform -chdir=bootstrap_client init
+terraform -chdir=bootstrap_client init && \
 terraform -chdir=bootstrap_client apply
 ```
 

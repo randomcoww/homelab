@@ -123,11 +123,9 @@ module "llama-cpp" {
         /app/llama-server \
           --port $${PORT} \
           --model /models/gpt-oss-20b-mxfp4.gguf \
-          --n-gpu-layers 25 \
-          --ctx-size 131072 \
+          --ctx-size 32768 \
           --ubatch-size 4096 \
           --batch-size 4096 \
-          --flash-attn on \
           --jinja \
           --temp 1.0 \
           --top_p 1.0 \
