@@ -195,6 +195,13 @@ terraform -chdir=write_local_disk init -upgrade
 terraform -chdir=write_local_disk apply
 ```
 
+Occasionally nodes will fail to boot over the network and boot from backup disk even if the network boot environment is working. Check and reboot these nodes.
+
+```bash
+terraform -chdir=rolling_reboot_failed init -upgrade
+terraform -chdir=rolling_reboot_failed apply
+```
+
 ---
 
 ### Full cluster restart over the network
