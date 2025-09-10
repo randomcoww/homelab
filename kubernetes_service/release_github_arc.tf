@@ -45,6 +45,7 @@ resource "helm_release" "arc" {
   create_namespace = true
   wait             = true
   wait_for_jobs    = true
+  timeout          = 600
   version          = "0.12.1"
   max_history      = 2
   values = [
@@ -68,6 +69,7 @@ resource "helm_release" "arc-runner-hook-template" {
   namespace     = "arc-runners"
   wait          = true
   wait_for_jobs = true
+  timeout       = 600
   max_history   = 2
   values = [
     yamlencode({
@@ -215,7 +217,8 @@ resource "helm_release" "arc-runner-set" {
   chart            = "gha-runner-scale-set"
   namespace        = "arc-runners"
   create_namespace = true
-  wait             = false
+  wait             = true
+  timeout          = 600
   version          = "0.12.1"
   max_history      = 2
   values = [

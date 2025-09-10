@@ -4,7 +4,6 @@ data "helm_template" "coredns" {
   repository = var.helm_template.repository
   chart      = var.helm_template.chart
   version    = var.helm_template.version
-  wait       = false
   values = [
     yamlencode({
       replicaCount = var.replicas

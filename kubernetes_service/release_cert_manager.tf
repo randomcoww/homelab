@@ -37,6 +37,7 @@ resource "helm_release" "cert-manager" {
   namespace        = "cert-manager"
   create_namespace = true
   wait             = true
+  wait_for_jobs    = true
   timeout          = 600
   version          = "v1.18.2"
   max_history      = 2
@@ -66,11 +67,13 @@ resource "helm_release" "cert-manager" {
 }
 
 resource "helm_release" "cert-issuer" {
-  name        = "cert-issuer"
-  chart       = "../helm-wrapper"
-  namespace   = "cert-manager"
-  wait        = false
-  max_history = 2
+  name          = "cert-issuer"
+  chart         = "../helm-wrapper"
+  namespace     = "cert-manager"
+  wait          = true
+  wait_for_jobs = true
+  timeout       = 600
+  max_history   = 2
   values = [
     yamlencode({
       manifests = [

@@ -70,11 +70,13 @@ module "minio-ca-secret" {
 }
 
 resource "helm_release" "minio-tls" {
-  name        = "${local.kubernetes_services.minio.name}-tls"
-  chart       = "../helm-wrapper"
-  namespace   = local.kubernetes_services.minio.namespace
-  wait        = false
-  max_history = 2
+  name          = "${local.kubernetes_services.minio.name}-tls"
+  chart         = "../helm-wrapper"
+  namespace     = local.kubernetes_services.minio.namespace
+  wait          = true
+  wait_for_jobs = true
+  timeout       = 600
+  max_history   = 2
   values = [
     yamlencode({
       manifests = [
@@ -92,7 +94,8 @@ resource "helm_release" "minio" {
   chart            = "minio"
   create_namespace = true
   wait             = true
-  timeout          = 60
+  wait_for_jobs    = true
+  timeout          = 600
   version          = "5.4.0"
   max_history      = 2
   values = [

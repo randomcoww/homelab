@@ -31,7 +31,9 @@ resource "helm_release" "ingress-nginx" {
   chart            = "ingress-nginx"
   namespace        = local.kubernetes_services[each.key].namespace
   create_namespace = true
-  wait             = false
+  wait             = true
+  wait_for_jobs    = true
+  timeout          = 600
   version          = "4.13.2"
   max_history      = 2
   values = [
@@ -96,7 +98,9 @@ resource "helm_release" "kured" {
   create_namespace = true
   repository       = "https://kubereboot.github.io/charts"
   chart            = "kured"
-  wait             = false
+  wait             = true
+  wait_for_jobs    = true
+  timeout          = 600
   version          = "5.10.0"
   max_history      = 2
   values = [
@@ -133,6 +137,8 @@ resource "helm_release" "nvidia-gpu-oprerator" {
   repository       = "https://helm.ngc.nvidia.com/nvidia"
   chart            = "gpu-operator"
   wait             = true
+  wait_for_jobs    = true
+  timeout          = 600
   version          = "v25.3.3"
   max_history      = 2
   values = [
@@ -206,8 +212,9 @@ resource "helm_release" "wrapper" {
   name             = each.key
   namespace        = each.value.namespace
   create_namespace = true
-  wait             = false
-  timeout          = 300
+  wait             = true
+  wait_for_jobs    = true
+  timeout          = 600
   max_history      = 2
   values = [
     yamlencode({
@@ -219,12 +226,14 @@ resource "helm_release" "wrapper" {
 # cloudflare tunnel #
 /*
 resource "helm_release" "cloudflare-tunnel" {
-  name        = "cloudflare-tunnel"
-  namespace   = "default"
-  repository  = "https://cloudflare.github.io/helm-charts/"
-  chart       = "cloudflare-tunnel"
-  wait        = false
-  version     = "0.3.2"
+  name          = "cloudflare-tunnel"
+  namespace     = "default"
+  repository    = "https://cloudflare.github.io/helm-charts/"
+  chart         = "cloudflare-tunnel"
+  wait          = true
+  wait_for_jobs = true
+  timeout       = 600
+  version       = "0.3.2"
   max_history = 2
   values = [
     yamlencode({

@@ -71,7 +71,8 @@ resource "helm_release" "local-path-provisioner" {
   namespace   = "kube-system"
   repository  = "https://charts.containeroo.ch"
   chart       = "local-path-provisioner"
-  wait        = false
+  wait        = true
+  timeout     = 600
   version     = "0.0.33"
   max_history = 2
   values = [
@@ -236,8 +237,9 @@ resource "helm_release" "wrapper" {
   name             = each.key
   namespace        = each.value.namespace
   create_namespace = true
-  wait             = false
-  timeout          = 300
+  wait             = true
+  wait_for_jobs    = true
+  timeout          = 600
   max_history      = 2
   values = [
     yamlencode({

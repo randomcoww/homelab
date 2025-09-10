@@ -1,13 +1,15 @@
 # metrics server #
 
 resource "helm_release" "metrics-server" {
-  name        = "metrics-server"
-  namespace   = "kube-system"
-  repository  = "https://kubernetes-sigs.github.io/metrics-server"
-  chart       = "metrics-server"
-  wait        = false
-  version     = "3.13.0"
-  max_history = 2
+  name          = "metrics-server"
+  namespace     = "kube-system"
+  repository    = "https://kubernetes-sigs.github.io/metrics-server"
+  chart         = "metrics-server"
+  wait          = true
+  wait_for_jobs = true
+  timeout       = 600
+  version       = "3.13.0"
+  max_history   = 2
   values = [
     yamlencode({
       replicas = 2
@@ -38,7 +40,9 @@ resource "helm_release" "prometheus-blackbox" {
   create_namespace = true
   repository       = "https://prometheus-community.github.io/helm-charts"
   chart            = "prometheus-blackbox-exporter"
-  wait             = false
+  wait             = true
+  wait_for_jobs    = true
+  timeout          = 600
   version          = "11.3.1"
   max_history      = 2
   values = [
@@ -59,7 +63,9 @@ resource "helm_release" "prometheus" {
   create_namespace = true
   repository       = "https://prometheus-community.github.io/helm-charts"
   chart            = "prometheus"
-  wait             = false
+  wait             = true
+  wait_for_jobs    = true
+  timeout          = 600
   version          = "27.37.0"
   max_history      = 2
   values = [
