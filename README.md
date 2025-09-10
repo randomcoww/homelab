@@ -186,19 +186,6 @@ terraform -chdir=rolling_reboot apply
 
 ---
 
-### Node update and reboot
-
-```bash
-terraform -chdir=ignition init -upgrade && \
-terraform -chdir=matchbox_client init -upgrade && \
-terraform -chdir=rolling_reboot init -upgrade && \
-terraform -chdir=ignition apply && \
-terraform -chdir=matchbox_client apply && \
-terraform -chdir=rolling_reboot apply
-```
-
----
-
 ### Write current PXE boot image to local disk
 
 If network boot is not working, hosts may fallback to booting from (USB) disk. Looks for first disk with a partition labeled `fedora-coreos-<tag>` and update content.
