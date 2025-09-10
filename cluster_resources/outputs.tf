@@ -7,16 +7,15 @@ output "cloudflare_dns_api_token" {
 
 output "r2_bucket" {
   value = {
-    for key, bucket in merge(local.r2_buckets, {
-      "${data.terraform_remote_state.sr.config.bucket}" = {
-        bucket = data.terraform_remote_state.sr.config.bucket
-      }
-    }) :
-    key => {
+    for _, name in concat(local.r2_buckets, [
+      data.terraform_remote_state.sr.config.bucket,
+    ]) :
+
+    name => {
       url               = "${local.cloudflare_account_id}.r2.cloudflarestorage.com"
-      bucket            = bucket.bucket
-      access_key_id     = cloudflare_api_token.r2_bucket[key].id
-      secret_access_key = sha256(cloudflare_api_token.r2_bucket[key].value)
+      bucket            = name
+      access_key_id     = cloudflare_api_token.r2_bucket[name].id
+      secret_access_key = sha256(cloudflare_api_token.r2_bucket[name].value)
     }
   }
   sensitive = true

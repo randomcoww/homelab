@@ -4,21 +4,12 @@ locals {
   cloudflare_zone_country_whitelist = [
     "US", "JP",
   ]
-
-  r2_buckets = {
-    etcd = {
-      bucket = "etcd-snapshot"
-    }
-    documents = {
-      bucket = "documents"
-    }
-    pictures = {
-      bucket = "pictures"
-    }
-    music = {
-      bucket = "music"
-    }
-  }
+  r2_buckets = [
+    "etcd",
+    "documents",
+    "pictures",
+    "music",
+  ]
 
   cloudflare_tunnels = {
     # type = map(object({
@@ -65,17 +56,16 @@ data "cloudflare_api_token_permission_groups_list" "dns_write" {
 # R2 buckets
 
 resource "cloudflare_r2_bucket" "bucket" {
-  for_each   = local.r2_buckets
+  for_each   = toset(local.r2_buckets)
   account_id = local.cloudflare_account_id
   name       = each.key
 }
 
 resource "cloudflare_api_token" "r2_bucket" {
-  for_each = merge(local.r2_buckets, {
-    "${data.terraform_remote_state.sr.config.bucket}" = {
-      bucket = data.terraform_remote_state.sr.config.bucket
-    }
-  })
+  for_each = toset(concat(local.r2_buckets, [
+    data.terraform_remote_state.sr.config.bucket,
+  ]))
+
   name = "r2-${each.key}"
   policies = [
     {
