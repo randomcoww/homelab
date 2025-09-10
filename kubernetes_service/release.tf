@@ -133,7 +133,7 @@ resource "helm_release" "nvidia-gpu-oprerator" {
   repository       = "https://helm.ngc.nvidia.com/nvidia"
   chart            = "gpu-operator"
   wait             = true
-  version          = "25.3.2"
+  version          = "v25.3.3"
   max_history      = 2
   values = [
     yamlencode({
