@@ -188,6 +188,9 @@ resource "helm_release" "amd-gpu" {
   create_namespace = true
   repository       = "https://rocm.github.io/k8s-device-plugin/"
   chart            = "amd-gpu"
+  wait             = true
+  wait_for_jobs    = true
+  timeout          = 600
   version          = "0.20.0"
   values = [
     yamlencode({

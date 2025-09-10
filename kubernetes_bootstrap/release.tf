@@ -66,37 +66,6 @@ module "kapprover" {
   }
 }
 
-resource "helm_release" "local-path-provisioner" {
-  name        = "local-path-provisioner"
-  namespace   = "kube-system"
-  repository  = "https://charts.containeroo.ch"
-  chart       = "local-path-provisioner"
-  wait        = true
-  timeout     = 600
-  version     = "0.0.33"
-  max_history = 2
-  values = [
-    yamlencode({
-      replicaCount = 2
-      storageClass = {
-        name         = "local-path"
-        defaultClass = true
-      }
-      nodePathMap = [
-        {
-          node  = "DEFAULT_PATH_FOR_NON_LISTED_NODES"
-          paths = ["${local.kubernetes.containers_path}/local_path_provisioner"]
-        },
-      ]
-    }),
-  ]
-  depends_on = [
-    kubernetes_labels.labels,
-  ]
-}
-
-# Kube-vip
-
 module "kube-vip" {
   source    = "./modules/kube_vip"
   name      = "kube-vip"
@@ -135,18 +104,12 @@ module "kube-vip" {
   }
 }
 
-# Kube-DNS
-
 module "kube-dns" {
   source    = "./modules/kube_dns"
   name      = "kube-dns"
   namespace = "kube-system"
-  helm_template = {
-    repository = "https://coredns.github.io/helm"
-    chart      = "coredns"
-    version    = "1.43.3"
-  }
-  replicas = 3
+  release   = "0.1.0"
+  replicas  = 3
   images = {
     etcd         = local.container_images.etcd
     external_dns = local.container_images.external_dns
@@ -223,6 +186,36 @@ module "kube-dns" {
         },
       ]
     },
+  ]
+}
+
+resource "helm_release" "local-path-provisioner" {
+  name          = "local-path-provisioner"
+  namespace     = "kube-system"
+  repository    = "https://charts.containeroo.ch"
+  chart         = "local-path-provisioner"
+  wait          = true
+  wait_for_jobs = true
+  timeout       = 600
+  version       = "0.0.33"
+  max_history   = 2
+  values = [
+    yamlencode({
+      replicaCount = 2
+      storageClass = {
+        name         = "local-path"
+        defaultClass = true
+      }
+      nodePathMap = [
+        {
+          node  = "DEFAULT_PATH_FOR_NON_LISTED_NODES"
+          paths = ["${local.kubernetes.containers_path}/local_path_provisioner"]
+        },
+      ]
+    }),
+  ]
+  depends_on = [
+    kubernetes_labels.labels,
   ]
 }
 
