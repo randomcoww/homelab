@@ -22,8 +22,6 @@ resource "matchbox_profile" "ignition" {
     "modprobe.blacklist=nouveau",
   ], each.value.boot_args)
   raw_ignition = data.terraform_remote_state.ignition.outputs.ignition[each.key]
-  # Write local files so that this step can work without access to ignition tfstate on S3
-  # raw_ignition = file("output/ignition/${each.key}.ign")
 }
 
 resource "matchbox_group" "ignition" {
