@@ -101,7 +101,7 @@ terraform() {
     -w $(pwd) \
     --env-file=credentials.env \
     --net=host \
-    docker.io/hashicorp/terraform:1.13.1 "$@"
+    docker.io/hashicorp/terraform:1.13.2 "$@"
   rc=$?; set +x; return $rc
 }
 ```
