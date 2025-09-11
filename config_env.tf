@@ -105,10 +105,10 @@ locals {
   }
 
   container_images = {
-    kube_apiserver          = "ghcr.io/randomcoww/kubernetes:v1.34.0.20250901.2318"
-    kube_controller_manager = "ghcr.io/randomcoww/kubernetes:v1.34.0.20250901.2318"
-    kube_scheduler          = "ghcr.io/randomcoww/kubernetes:v1.34.0.20250901.2318"
-    kube_proxy              = "ghcr.io/randomcoww/kubernetes:v1.34.0.20250901.2318-kube-proxy"
+    kube_apiserver          = "ghcr.io/randomcoww/kubernetes:v1.34.1.20250910.2347"
+    kube_controller_manager = "ghcr.io/randomcoww/kubernetes:v1.34.1.20250910.2347"
+    kube_scheduler          = "ghcr.io/randomcoww/kubernetes:v1.34.1.20250910.2347"
+    kube_proxy              = "ghcr.io/randomcoww/kubernetes-kube-proxy:v1.34.1.20250910.2347"
     etcd_wrapper            = "ghcr.io/randomcoww/etcd-wrapper:v0.4.3"
     etcd                    = "gcr.io/etcd-development/etcd:v3.6.4"
     flannel                 = "docker.io/flannel/flannel:v0.27.3"
@@ -118,8 +118,8 @@ locals {
     kea                     = "ghcr.io/randomcoww/kea:v3.1.0.20250901.2312"
     stork_agent             = "ghcr.io/randomcoww/stork-agent:v20250901.2120"
     matchbox                = "quay.io/poseidon/matchbox:v0.11.0"
-    ipxe                    = "ghcr.io/randomcoww/ipxe:v20250904.1907"
-    ipxe_tftp               = "ghcr.io/randomcoww/ipxe:v20250904.1907-tftp"
+    ipxe                    = "ghcr.io/randomcoww/ipxe:v20250910.2324"
+    ipxe_tftp               = "ghcr.io/randomcoww/ipxe-tftp:v20250910.2324"
     hostapd                 = "ghcr.io/randomcoww/hostapd-noscan:v2.11.20250901.2310"
     kapprover               = "ghcr.io/randomcoww/kapprover:v0.1.0"
     tailscale               = "ghcr.io/randomcoww/tailscale-nft:v1.86.2.20250901.2109"
@@ -129,7 +129,7 @@ locals {
     mountpoint              = "ghcr.io/randomcoww/mountpoint-s3:v1.19.0.20250901.2309"
     registry                = "ghcr.io/distribution/distribution:3.0.0"
     audioserve              = "docker.io/izderadicka/audioserve:unstable"
-    llama_cpp               = "ghcr.io/randomcoww/llama-cpp-server-cuda:v20250901.2318-12.9.1-llama-swap"
+    llama_cpp               = "ghcr.io/randomcoww/llama-cpp-server-cuda-llama-swap:v20250911.0002-12.9.1"
     sunshine_desktop        = "ghcr.io/randomcoww/sunshine-desktop:v20250904.2330"
     nginx                   = "docker.io/nginx:1.29-alpine-slim"
     litestream              = "ghcr.io/randomcoww/litestream:v0.3.13.20250901.2321"
@@ -141,6 +141,7 @@ locals {
     valkey                  = "docker.io/valkey/valkey:8.1.3-alpine"
     nvidia_driver           = "ghcr.io/randomcoww/nvidia-driver-container:v580.82.07-fedora42"
     mc                      = "docker.io/minio/mc:latest"
+    github_actions_runner   = "ghcr.io/actions/actions-runner:latest"
   }
 
   pxeboot_images = {
