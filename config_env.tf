@@ -116,7 +116,7 @@ locals {
     kube_vip                = "ghcr.io/kube-vip/kube-vip:v1.0.0"
     device_plugin           = "ghcr.io/squat/generic-device-plugin:latest"
     kea                     = "ghcr.io/randomcoww/kea:v3.1.0.20250901.2312"
-    stork_agent             = "ghcr.io/randomcoww/stork-agent:v20250901.2120"
+    stork_agent             = "ghcr.io/randomcoww/stork-agent:v2.3.0.20250911.0103"
     matchbox                = "quay.io/poseidon/matchbox:v0.11.0"
     ipxe                    = "ghcr.io/randomcoww/ipxe:v20250910.2324"
     ipxe_tftp               = "ghcr.io/randomcoww/ipxe-tftp:v20250910.2324"
