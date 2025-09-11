@@ -55,6 +55,9 @@ resource "helm_release" "arc" {
         create = true
         name   = "gha-runner-scale-set-controller"
       }
+      flags = {
+        updateStrategy = "eventual"
+      }
     }),
   ]
 }
@@ -250,7 +253,7 @@ resource "helm_release" "arc-runner-set" {
           containers = [
             {
               name  = "runner"
-              image = "ghcr.io/actions/actions-runner:latest"
+              image = local.container_images.github_actions_runner
               command = [
                 "/home/runner/run.sh",
               ]
