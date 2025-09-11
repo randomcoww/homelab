@@ -7,7 +7,7 @@
         "^README.md$"
       ],
       "matchStrings": [
-        "(?<depName>[a-z0-9.-_]+(?:\/[a-z0-9.-_]+|)):(?<currentValue>[\\w.-_]{1,127})"
+        "(?<depName>[a-z0-9.-]+\/[a-z0-9-]+(?:\/[a-z0-9-]+|)):(?<currentValue>[\\w.-]{1,127})"
       ],
       "datasourceTemplate": "docker"
     },
@@ -30,7 +30,9 @@
       "matchPackageNames": [
         "docker.io/searxng/searxng"
       ],
-      "versioning": "regex:^(?<major>\\d+)?(.(?<minor>\\d+))?(.(?<patch>\\d+))?(-.*)?$"
+      "versioning": "regex:^(?<major>\\d+)?(.(?<minor>\\d+))?(.(?<patch>\\d+))?(-.*)?$",
+      "automerge": true,
+      "ignoreTests": true
     },
     {
       "matchDatasources": [
