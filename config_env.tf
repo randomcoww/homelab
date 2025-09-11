@@ -22,6 +22,7 @@ locals {
       network        = "192.168.192.0"
       cidr           = 24
       vlan_id        = 2048
+      mtu            = local.default_mtu
       enable_dns     = true
       enable_mdns    = true
       table_id       = 220
@@ -58,6 +59,7 @@ locals {
       network        = "192.168.224.0"
       cidr           = 26
       vlan_id        = 90
+      mtu            = local.default_mtu
       table_id       = 221
       table_priority = 32760
     }
