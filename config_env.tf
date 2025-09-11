@@ -1,10 +1,7 @@
 locals {
   timezone       = "America/Los_Angeles"
-  aws_region     = "us-west-2"
   butane_version = "1.5.0"
-
-  # Setting to 9000 seems to reduce success rate of PXE boot
-  default_mtu = 1500
+  default_mtu    = 9000
 
   users = {
     ssh = {

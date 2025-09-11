@@ -203,11 +203,6 @@ module "hostapd" {
       "BF-ANTENNA-2", "SOUNDING-DIMENSION-2", "MU-BEAMFORMEE",
     ])}]"
   }
-  resources = {
-    limits = {
-      "squat.ai/rfkill" = 1
-    }
-  }
 }
 
 # Render QR code for wifi
@@ -238,11 +233,6 @@ module "tailscale" {
     tailscale = local.container_images.tailscale
   }
   tailscale_auth_key = data.terraform_remote_state.sr.outputs.tailscale_auth_key
-  resources = {
-    limits = {
-      "squat.ai/tun" = 1
-    }
-  }
   extra_envs = [
     {
       name  = "TS_ACCEPT_DNS"

@@ -113,6 +113,12 @@ module "statefulset" {
             value = tostring(e.value)
           }
         ])
+        volumeMounts = [
+          {
+            name      = "dev-net-tun"
+            mountPath = "/dev/net/tun"
+          },
+        ]
         resources = var.resources
         securityContext = {
           capabilities = {
@@ -120,6 +126,14 @@ module "statefulset" {
               "NET_ADMIN",
             ]
           }
+        }
+      },
+    ]
+    volumes = [
+      {
+        name = "dev-net-tun"
+        hostPath = {
+          path = "/dev/net/tun"
         }
       },
     ]

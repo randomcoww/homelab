@@ -230,9 +230,8 @@ module "sunshine-desktop" {
       memory = "12Gi"
     }
     limits = {
-      "nvidia.com/gpu"  = 1
-      "amd.com/gpu"     = 1
-      "squat.ai/uinput" = 1
+      "nvidia.com/gpu" = 1
+      "amd.com/gpu"    = 1
     }
   }
   # TODO: Revisit - currently privileged to make libinput work

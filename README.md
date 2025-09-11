@@ -194,8 +194,9 @@ Occasionally nodes will fail to boot over the network and boot from backup disk 
 
 ```bash
 terraform -chdir=rolling_reboot init -upgrade && \
+terraform -chdir=rolling_reboot apply
+
 terraform -chdir=rolling_reboot_failed init -upgrade && \
-terraform -chdir=rolling_reboot apply && \
 terraform -chdir=rolling_reboot_failed apply
 ```
 

@@ -38,48 +38,6 @@ module "device-plugin" {
         },
       ]
     }),
-    "--device",
-    yamlencode({
-      name = "tun"
-      groups = [
-        {
-          count = 100
-          paths = [
-            {
-              path = "/dev/net/tun"
-            },
-          ]
-        },
-      ]
-    }),
-    "--device",
-    yamlencode({
-      name = "rfkill"
-      groups = [
-        {
-          count = 100
-          paths = [
-            {
-              path = "/dev/rfkill"
-            },
-          ]
-        },
-      ]
-    }),
-    "--device",
-    yamlencode({
-      name = "uinput"
-      groups = [
-        {
-          count = 100
-          paths = [
-            {
-              path = "/dev/uinput"
-            },
-          ]
-        },
-      ]
-    }),
   ]
   kubelet_root_path = local.kubernetes.kubelet_root_path
 }
