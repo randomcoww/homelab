@@ -190,12 +190,14 @@ terraform -chdir=write_local_disk apply
 
 Trigger rolling reboot of modified Kubernetes workers coordinated by `kured`.
 
-Occasionally nodes will fail to boot over the network and boot from backup disk even if the network boot environment is working. Also check and reboot these nodes.
-
 ```bash
 terraform -chdir=rolling_reboot init -upgrade && \
 terraform -chdir=rolling_reboot apply
+```
 
+Occasionally nodes will fail to boot over the network and boot from backup disk even if the network boot environment is working. Also check and reboot these nodes.
+
+```bash
 terraform -chdir=rolling_reboot_failed init -upgrade && \
 terraform -chdir=rolling_reboot_failed apply
 ```

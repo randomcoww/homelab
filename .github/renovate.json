@@ -14,16 +14,6 @@
     {
       "customType": "regex",
       "fileMatch": [
-        "\\.tf$"
-      ],
-      "matchStrings": [
-        "^data\\s+\"helm_template\"\\s*\"[\\w_-]+\"\\s*(?={[^}]*\\s+repository\\s*=\\s*\"(?<registryUrl>.+)\")(?=[^}]*\\s+version\\s*=\\s*\"(?<currentValue>[\\d.]+)\")(?=[^}]*\\s+chart\\s*=\\s*\"(?<depName>[\\w-]+)\")"
-      ],
-      "datasourceTemplate": "helm"
-    },
-    {
-      "customType": "regex",
-      "fileMatch": [
         "^config_env.tf$"
       ],
       "matchStrings": [
