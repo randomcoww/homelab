@@ -22,9 +22,8 @@ module "daemonset" {
     priorityClassName = "system-node-critical"
     containers = [
       {
-        name            = var.name
-        image           = var.images.device_plugin
-        imagePullPolicy = "Always"
+        name  = var.name
+        image = var.images.device_plugin
         args = concat(var.args, [
           "--listen=0.0.0.0:${var.ports.device_plugin_metrics}",
           "--plugin-directory=${var.kubelet_root_path}/device-plugins",

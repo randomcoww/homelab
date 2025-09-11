@@ -213,6 +213,7 @@ resource "helm_release" "arc-runner-set" {
     "kaniko",
     "code-server",
     "juicefs",
+    "audioserve",
   ])
 
   name             = "arc-runner-${each.key}"

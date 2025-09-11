@@ -83,9 +83,8 @@ module "mountpoint" {
   template_spec = {
     containers = [
       {
-        name            = var.name
-        image           = var.images.audioserve
-        imagePullPolicy = "Always"
+        name  = var.name
+        image = var.images.audioserve
         command = [
           "sh",
           "-c",

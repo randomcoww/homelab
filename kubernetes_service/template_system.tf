@@ -12,6 +12,20 @@ module "device-plugin" {
   args = [
     "--device",
     yamlencode({
+      name = "rfkill"
+      groups = [
+        {
+          count = 100
+          paths = [
+            {
+              path = "/dev/rfkill"
+            },
+          ]
+        },
+      ]
+    }),
+    "--device",
+    yamlencode({
       name = "kvm"
       groups = [
         {
