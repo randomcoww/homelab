@@ -64,5 +64,10 @@ storage:
             chain prerouting {
               type nat hook prerouting priority dstnat + 20; policy accept;
             }
+
+            chain forward-mss {
+              type filter hook forward priority mangle; policy accept;
+              tcp flags syn / syn,rst tcp option maxseg size set rt mtu;
+            }
           }
           ;

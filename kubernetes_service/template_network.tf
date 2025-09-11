@@ -41,7 +41,7 @@ module "kea" {
         local.domains.kubernetes,
         local.domains.public,
       ]
-      mtu = lookup(local.networks.lan, "mtu", 1500)
+      mtu = 1500 # Force LAN clients to 1500
       pools = [
         cidrsubnet(local.networks.lan.prefix, 1, 1),
       ]

@@ -70,11 +70,11 @@ locals {
       vlan_id = 70
       mtu     = local.default_mtu
     }
-    # Main and mobile backup WAN
+    # Primary WAN
     wan = {
       vlan_id = 30
     }
-    # backup wan
+    # Backup WAN
     backup = {
       vlan_id = 1024
     }

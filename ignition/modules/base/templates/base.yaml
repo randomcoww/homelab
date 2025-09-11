@@ -106,6 +106,12 @@ storage:
         inline: |
           kernel.printk=4
           fs.inotify.max_user_watches=524288
+    # MSS clamping #
+    - path: /etc/sysctl.d/10-mss-clamping.conf
+      mode: 0644
+      contents:
+        inline: |
+          net.ipv4.tcp_mtu_probing=1
     # sudoers #
     - path: /etc/sudoers.d/coreos-sudo-group
       overwrite: true
