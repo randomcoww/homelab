@@ -38,9 +38,16 @@ locals {
           mac     = "52-54-00-63-6e-b4"
         }
       }
+      bridge_interfaces = {
+        br-lan = {
+          sources = [
+            "phy0",
+          ]
+        }
+      }
       networks = {
         lan = {
-          interface     = "phy0"
+          interface     = "br-lan"
           enable_netnum = true
         }
         node = {
@@ -134,9 +141,16 @@ locals {
           mac     = "52-54-00-63-6e-b4"
         }
       }
+      bridge_interfaces = {
+        br-lan = {
+          sources = [
+            "phy0",
+          ]
+        }
+      }
       networks = {
         lan = {
-          interface     = "phy0"
+          interface     = "br-lan"
           enable_netnum = true
         }
         node = {
@@ -216,9 +230,16 @@ locals {
           network = "etcd"
         }
       }
+      bridge_interfaces = {
+        br-lan = {
+          sources = [
+            "phy0",
+          ]
+        }
+      }
       networks = {
         lan = {
-          interface     = "phy0"
+          interface     = "br-lan"
           enable_netnum = true
         }
         node = {
