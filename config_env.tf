@@ -125,7 +125,7 @@ locals {
     rclone                  = "docker.io/rclone/rclone:1.71.0"
     mountpoint              = "ghcr.io/randomcoww/mountpoint-s3:v1.19.0.20250901.2309"
     registry                = "ghcr.io/distribution/distribution:3.0.0"
-    audioserve              = "ghcr.io/randomcoww/audioserve:v20250828.2116"
+    audioserve              = "ghcr.io/randomcoww/audioserve:v20250911.0727"
     llama_cpp               = "ghcr.io/randomcoww/llama-cpp-server-cuda-llama-swap:v20250911.0002-12.9.1"
     sunshine_desktop        = "ghcr.io/randomcoww/sunshine-desktop:v20250904.2330"
     nginx                   = "docker.io/nginx:1.29-alpine-slim"
@@ -137,12 +137,11 @@ locals {
     searxng                 = "docker.io/searxng/searxng:2025.9.10-a9b088d"
     valkey                  = "docker.io/valkey/valkey:8.1.3-alpine"
     nvidia_driver           = "ghcr.io/randomcoww/nvidia-driver-container:v580.82.07-fedora42"
-    mc                      = "docker.io/minio/mc:latest"
-    github_actions_runner   = "ghcr.io/actions/actions-runner:latest"
+    github_actions_runner   = "ghcr.io/actions/actions-runner:2.328.0"
   }
 
   pxeboot_images = {
-    latest = "fedora-coreos-42.20250909.19" # randomcoww/fedora-coreos-config
+    latest = "fedora-coreos-42.20250911.07" # randomcoww/fedora-coreos-config
   }
 
   kubernetes = {

@@ -101,23 +101,6 @@ resource "helm_release" "arc-runner-hook-template" {
                 labels = {
                   app = "arc-runner"
                 }
-                initContainers = [
-                  {
-                    name  = "mc"
-                    image = local.container_images.mc
-                    command = [
-                      "cp",
-                      "/bin/mc",
-                      "${local.arc_mc_config_dir}/",
-                    ]
-                    volumeMounts = [
-                      {
-                        name      = "minio-path"
-                        mountPath = local.arc_mc_config_dir
-                      },
-                    ]
-                  }
-                ]
                 containers = [
                   {
                     name = "$job"
