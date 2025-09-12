@@ -141,22 +141,7 @@ locals {
   }
 
   pxeboot_images = {
-    latest = "fedora-coreos-42.20250911.07" # randomcoww/fedora-coreos-config
-  }
-
-  ha = {
-    keepalived_config_path = "/etc/keepalived/keepalived.conf.d"
-    haproxy_config_path    = "/etc/haproxy/haproxy.cfg.d"
-    bird_config_path       = "/etc/bird.conf.d"
-    bird_cache_table_name  = "cache"
-    bgp_as                 = 65005
-  }
-
-  domains = {
-    mdns       = "local"
-    public     = "fuzzybunny.win"
-    kubernetes = "cluster.internal"
-    tailscale  = "fawn-turtle.ts.net"
+    coreos = "fedora-coreos-42.20250911.07" # randomcoww/fedora-coreos-config
   }
 
   host_ports = {
@@ -195,6 +180,26 @@ locals {
     registry_mirror_quay   = 5008
   }
 
+  ha = {
+    keepalived_config_path = "/etc/keepalived/keepalived.conf.d"
+    haproxy_config_path    = "/etc/haproxy/haproxy.cfg.d"
+    bird_config_path       = "/etc/bird.conf.d"
+    bird_cache_table_name  = "cache"
+    bgp_as                 = 65005
+  }
+
+  domains = {
+    mdns       = "local"
+    public     = "fuzzybunny.win"
+    kubernetes = "cluster.internal"
+    tailscale  = "fawn-turtle.ts.net"
+  }
+
+  upstream_dns = {
+    ip       = "1.1.1.1"
+    hostname = "one.one.one.one"
+  }
+
   kubernetes = {
     cluster_name              = "prod-10"
     kubelet_root_path         = "/var/lib/kubelet"
@@ -215,6 +220,27 @@ locals {
       ingress_nginx_external = "ingress-nginx-external"
     }
     helm_release_wait = 900
+  }
+
+  minio = {
+    data_buckets = {
+      boot = {
+        name = "data-boot"
+        acl  = "public-read"
+      }
+      music = {
+        name = "data-music"
+      }
+      pictures = {
+        name = "data-pictures"
+      }
+      videos = {
+        name = "data-videos"
+      }
+      models = {
+        name = "data-models"
+      }
+    }
   }
 
   kubernetes_services = {
@@ -279,27 +305,6 @@ locals {
     k => "${domain}.${local.domains.public}"
   }
 
-  minio = {
-    data_buckets = {
-      boot = {
-        name = "data-boot"
-        acl  = "public-read"
-      }
-      music = {
-        name = "data-music"
-      }
-      pictures = {
-        name = "data-pictures"
-      }
-      videos = {
-        name = "data-videos"
-      }
-      models = {
-        name = "data-models"
-      }
-    }
-  }
-
   registry_mirrors = {
     docker = {
       location  = "docker.io"
@@ -328,10 +333,6 @@ locals {
     }
   }
 
-  upstream_dns = {
-    ip       = "1.1.1.1"
-    hostname = "one.one.one.one"
-  }
 
   # finalized local vars #
 

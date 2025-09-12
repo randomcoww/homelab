@@ -87,7 +87,7 @@ locals {
       }
       network_boot = {
         interface = "phy0"
-        image     = local.pxeboot_image_set.latest
+        image     = local.pxeboot_image_set.coreos
         boot_args = [
           "selinux=0",
         ]
@@ -183,7 +183,7 @@ locals {
       }
       network_boot = {
         interface = "phy0"
-        image     = local.pxeboot_image_set.latest
+        image     = local.pxeboot_image_set.coreos
         boot_args = [
           "selinux=0",
         ]
@@ -250,7 +250,7 @@ locals {
       }
       network_boot = {
         interface = "phy0"
-        image     = local.pxeboot_image_set.latest
+        image     = local.pxeboot_image_set.coreos
         boot_args = [
           "selinux=0",
         ]
@@ -327,7 +327,7 @@ locals {
       }
       network_boot = {
         interface = "phy0"
-        image     = local.pxeboot_image_set.latest
+        image     = local.pxeboot_image_set.coreos
         boot_args = [
           "selinux=0",
           ## stub all Nvidia GPUs
