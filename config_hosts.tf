@@ -256,7 +256,6 @@ locals {
         ]
       }
       kubernetes_node_labels = {
-        "node-role.kubernetes.io/control-plane" = true
       }
     }
 
@@ -337,8 +336,7 @@ locals {
         ]
       }
       kubernetes_node_labels = {
-        "node-role.kubernetes.io/control-plane" = true
-        "hostapd"                               = true
+        "hostapd" = true
       }
     }
   }
@@ -378,6 +376,9 @@ locals {
           vlan_id = local.networks[interface.network].vlan_id
         })
       }
+      kubernetes_node_labels = merge(contains(local.base_members.kubernetes-master, host_key) ? {
+        "node-role.kubernetes.io/control-plane" = true
+      } : {}, lookup(host, "kubernetes_node_labels", {}))
     })
   }
 
