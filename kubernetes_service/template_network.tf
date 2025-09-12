@@ -220,8 +220,8 @@ module "qrcode-hostapd" {
   images = {
     qrcode = local.container_images.qrcode_generator
   }
-  service_hostname          = local.kubernetes_ingress_endpoints.qrcode_hostapd
-  ingress_class_name        = local.ingress_classes.ingress_nginx
+  service_hostname          = local.ingress_endpoints.qrcode_hostapd
+  ingress_class_name        = local.kubernetes.ingress_classes.ingress_nginx
   nginx_ingress_annotations = local.nginx_ingress_annotations
   qrcode_value              = "WIFI:S:${random_password.hostapd-ssid.result};T:WPA;P:${random_password.hostapd-password.result};H:true;;"
 }

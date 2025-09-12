@@ -144,22 +144,6 @@ locals {
     latest = "fedora-coreos-42.20250911.07" # randomcoww/fedora-coreos-config
   }
 
-  kubernetes = {
-    cluster_name              = "prod-10"
-    kubelet_root_path         = "/var/lib/kubelet"
-    static_pod_manifest_path  = "/var/lib/kubelet/manifests"
-    containers_path           = "/var/lib/containers"
-    cni_bin_path              = "/var/lib/cni/bin"
-    cni_bridge_interface_name = "cni0"
-
-    cert_issuer_prod    = "letsencrypt-prod"
-    cert_issuer_staging = "letsencrypt-staging"
-
-    kubelet_client_user     = "kube-apiserver-kubelet-client"
-    front_proxy_client_user = "front-proxy-client"
-    node_bootstrap_user     = "system:node-bootstrapper"
-  }
-
   ha = {
     keepalived_config_path = "/etc/keepalived/keepalived.conf.d"
     haproxy_config_path    = "/etc/haproxy/haproxy.cfg.d"
@@ -173,75 +157,6 @@ locals {
     public     = "fuzzybunny.win"
     kubernetes = "cluster.internal"
     tailscale  = "fawn-turtle.ts.net"
-  }
-
-  kubernetes_ingress_endpoints = {
-    for k, domain in {
-      qrcode_hostapd  = "hostapd"
-      webdav_pictures = "pictures"
-      webdav_videos   = "videos"
-      sunshine_admin  = "sunadmin"
-      audioserve      = "audioserve"
-      monitoring      = "m"
-      vaultwarden     = "vw"
-      flowise         = "flowise"
-      llama_cpp       = "llm"
-      code_server     = "code"
-    } :
-    k => "${domain}.${local.domains.public}"
-  }
-
-  ingress_classes = {
-    ingress_nginx          = "ingress-nginx"
-    ingress_nginx_external = "ingress-nginx-external"
-  }
-
-  kubernetes_services = {
-    for name, e in {
-      apiserver = {
-        name      = "kubernetes"
-        namespace = "default"
-      }
-      etcd = {
-        name      = "etcd"
-        namespace = "kube-system"
-      }
-      ingress_nginx = {
-        name      = "${local.ingress_classes.ingress_nginx}-controller"
-        namespace = "ingress-nginx"
-      }
-      ingress_nginx_external = {
-        name      = "${local.ingress_classes.ingress_nginx_external}-controller"
-        namespace = "ingress-nginx"
-      }
-      matchbox = {
-        name      = "matchbox"
-        namespace = "default"
-      }
-      minio = {
-        name      = "minio"
-        namespace = "minio"
-      }
-      prometheus = {
-        name      = "prometheus"
-        namespace = "monitoring"
-      }
-      prometheus_blackbox = {
-        name      = "prometheus-blackbox"
-        namespace = "monitoring"
-      }
-      llama_cpp = {
-        name      = "llama-cpp"
-        namespace = "default"
-      }
-      searxng = {
-        name      = "searxng"
-        namespace = "default"
-      }
-    } :
-    name => merge(e, {
-      endpoint = "${e.name}.${e.namespace}"
-    })
   }
 
   host_ports = {
@@ -278,6 +193,90 @@ locals {
     registry_mirror_gcr    = 5004
     registry_mirror_ghcr   = 5006
     registry_mirror_quay   = 5008
+  }
+
+  kubernetes = {
+    cluster_name              = "prod-10"
+    kubelet_root_path         = "/var/lib/kubelet"
+    static_pod_manifest_path  = "/var/lib/kubelet/manifests"
+    containers_path           = "/var/lib/containers"
+    cni_bin_path              = "/var/lib/cni/bin"
+    cni_bridge_interface_name = "cni0"
+
+    cert_issuer_prod    = "letsencrypt-prod"
+    cert_issuer_staging = "letsencrypt-staging"
+
+    kubelet_client_user     = "kube-apiserver-kubelet-client"
+    front_proxy_client_user = "front-proxy-client"
+    node_bootstrap_user     = "system:node-bootstrapper"
+
+    ingress_classes = {
+      ingress_nginx          = "ingress-nginx"
+      ingress_nginx_external = "ingress-nginx-external"
+    }
+    helm_release_wait = 900
+  }
+
+  kubernetes_services = {
+    for name, e in merge({
+      for k, class in local.kubernetes.ingress_classes :
+      k => {
+        name      = "${class}-controller"
+        namespace = "ingress-nginx"
+      }
+      }, {
+      apiserver = {
+        name      = "kubernetes"
+        namespace = "default"
+      }
+      etcd = {
+        name      = "etcd"
+        namespace = "kube-system"
+      }
+      matchbox = {
+        name      = "matchbox"
+        namespace = "default"
+      }
+      minio = {
+        name      = "minio"
+        namespace = "minio"
+      }
+      prometheus = {
+        name      = "prometheus"
+        namespace = "monitoring"
+      }
+      prometheus_blackbox = {
+        name      = "prometheus-blackbox"
+        namespace = "monitoring"
+      }
+      llama_cpp = {
+        name      = "llama-cpp"
+        namespace = "default"
+      }
+      searxng = {
+        name      = "searxng"
+        namespace = "default"
+      }
+    }) :
+    name => merge(e, {
+      endpoint = "${e.name}.${e.namespace}"
+    })
+  }
+
+  ingress_endpoints = {
+    for k, domain in {
+      qrcode_hostapd  = "hostapd"
+      webdav_pictures = "pictures"
+      webdav_videos   = "videos"
+      sunshine_admin  = "sunadmin"
+      audioserve      = "audioserve"
+      monitoring      = "m"
+      vaultwarden     = "vw"
+      flowise         = "flowise"
+      llama_cpp       = "llm"
+      code_server     = "code"
+    } :
+    k => "${domain}.${local.domains.public}"
   }
 
   minio = {

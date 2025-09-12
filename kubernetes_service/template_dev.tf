@@ -112,7 +112,7 @@ module "llama-cpp" {
   ports = {
     llama_cpp = local.service_ports.llama_cpp
   }
-  service_hostname = local.kubernetes_ingress_endpoints.llama_cpp
+  service_hostname = local.ingress_endpoints.llama_cpp
   llama_swap_config = {
     healthCheckTimeout = 600
     models = {
@@ -167,7 +167,7 @@ module "llama-cpp" {
     "--cache /tmp",
     "--read-only",
   ]
-  ingress_class_name        = local.ingress_classes.ingress_nginx
+  ingress_class_name        = local.kubernetes.ingress_classes.ingress_nginx
   nginx_ingress_annotations = local.nginx_ingress_annotations
 
   depends_on = [
@@ -264,7 +264,7 @@ module "flowise" {
     flowise    = local.container_images.flowise
     litestream = local.container_images.litestream
   }
-  service_hostname = local.kubernetes_ingress_endpoints.flowise
+  service_hostname = local.ingress_endpoints.flowise
   extra_configs = {
     STORAGE_TYPE                 = "s3"
     S3_STORAGE_BUCKET_NAME       = minio_s3_bucket.flowise.id
@@ -280,7 +280,7 @@ module "flowise" {
     SMTP_SECURE                  = true
     SENDER_EMAIL                 = var.smtp.username
   }
-  ingress_class_name        = local.ingress_classes.ingress_nginx
+  ingress_class_name        = local.kubernetes.ingress_classes.ingress_nginx
   nginx_ingress_annotations = local.nginx_ingress_annotations
 
   minio_endpoint          = "https://${local.services.cluster_minio.ip}:${local.service_ports.minio}"
@@ -447,8 +447,8 @@ module "code-server" {
       "nvidia.com/gpu" = 1
     }
   }
-  service_hostname          = local.kubernetes_ingress_endpoints.code_server
-  ingress_class_name        = local.ingress_classes.ingress_nginx
+  service_hostname          = local.ingress_endpoints.code_server
+  ingress_class_name        = local.kubernetes.ingress_classes.ingress_nginx
   nginx_ingress_annotations = local.nginx_ingress_annotations
 
   minio_endpoint          = "https://${local.services.cluster_minio.ip}:${local.service_ports.minio}"

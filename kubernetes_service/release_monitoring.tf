@@ -7,7 +7,7 @@ resource "helm_release" "metrics-server" {
   chart         = "metrics-server"
   wait          = true
   wait_for_jobs = true
-  timeout       = 600
+  timeout       = local.kubernetes.helm_release_wait
   version       = "3.13.0"
   max_history   = 2
   values = [
@@ -42,7 +42,7 @@ resource "helm_release" "prometheus-blackbox" {
   chart            = "prometheus-blackbox-exporter"
   wait             = true
   wait_for_jobs    = true
-  timeout          = 600
+  timeout          = local.kubernetes.helm_release_wait
   version          = "11.3.1"
   max_history      = 2
   values = [
@@ -65,7 +65,7 @@ resource "helm_release" "prometheus" {
   chart            = "prometheus"
   wait             = true
   wait_for_jobs    = true
-  timeout          = 600
+  timeout          = local.kubernetes.helm_release_wait
   version          = "27.37.0"
   max_history      = 2
   values = [
@@ -86,10 +86,10 @@ resource "helm_release" "prometheus" {
         }
         ingress = {
           enabled          = true
-          ingressClassName = local.ingress_classes.ingress_nginx
+          ingressClassName = local.kubernetes.ingress_classes.ingress_nginx
           annotations      = local.nginx_ingress_annotations
           hosts = [
-            local.kubernetes_ingress_endpoints.monitoring,
+            local.ingress_endpoints.monitoring,
           ]
           tls = [
             local.ingress_tls_common,

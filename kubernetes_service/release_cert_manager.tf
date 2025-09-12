@@ -38,7 +38,7 @@ resource "helm_release" "cert-manager" {
   create_namespace = true
   wait             = true
   wait_for_jobs    = true
-  timeout          = 600
+  timeout          = local.kubernetes.helm_release_wait
   version          = "v1.18.2"
   max_history      = 2
   values = [
@@ -72,7 +72,7 @@ resource "helm_release" "cert-issuer" {
   namespace     = "cert-manager"
   wait          = true
   wait_for_jobs = true
-  timeout       = 600
+  timeout       = local.kubernetes.helm_release_wait
   max_history   = 2
   values = [
     yamlencode({

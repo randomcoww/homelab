@@ -45,7 +45,7 @@ module "vaultwarden" {
     vaultwarden = local.container_images.vaultwarden
     litestream  = local.container_images.litestream
   }
-  service_hostname = local.kubernetes_ingress_endpoints.vaultwarden
+  service_hostname = local.ingress_endpoints.vaultwarden
   extra_configs = {
     SENDS_ALLOWED            = false
     EMERGENCY_ACCESS_ALLOWED = false
@@ -62,7 +62,7 @@ module "vaultwarden" {
     SMTP_SECURITY            = "starttls"
     SMTP_AUTH_MECHANISM      = "Plain"
   }
-  ingress_class_name        = local.ingress_classes.ingress_nginx_external
+  ingress_class_name        = local.kubernetes.ingress_classes.ingress_nginx_external
   nginx_ingress_annotations = local.nginx_ingress_annotations
 
   minio_endpoint          = "https://${local.services.cluster_minio.ip}:${local.service_ports.minio}"

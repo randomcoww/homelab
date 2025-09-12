@@ -75,7 +75,7 @@ resource "helm_release" "minio-tls" {
   namespace     = local.kubernetes_services.minio.namespace
   wait          = true
   wait_for_jobs = true
-  timeout       = 600
+  timeout       = local.kubernetes.helm_release_wait
   max_history   = 2
   values = [
     yamlencode({
@@ -95,7 +95,7 @@ resource "helm_release" "minio" {
   create_namespace = true
   wait             = true
   wait_for_jobs    = true
-  timeout          = 600
+  timeout          = local.kubernetes.helm_release_wait
   version          = "5.4.0"
   max_history      = 2
   values = [

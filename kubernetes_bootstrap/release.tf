@@ -196,7 +196,7 @@ resource "helm_release" "local-path-provisioner" {
   chart         = "local-path-provisioner"
   wait          = true
   wait_for_jobs = true
-  timeout       = 600
+  timeout       = local.kubernetes.helm_release_wait
   version       = "0.0.33"
   max_history   = 2
   values = [
@@ -232,7 +232,7 @@ resource "helm_release" "wrapper" {
   create_namespace = true
   wait             = true
   wait_for_jobs    = true
-  timeout          = 600
+  timeout          = local.kubernetes.helm_release_wait
   max_history      = 2
   values = [
     yamlencode({

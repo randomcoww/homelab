@@ -46,8 +46,8 @@ module "audioserve" {
   extra_audioserve_args = [
     "--read-playlist",
   ]
-  service_hostname          = local.kubernetes_ingress_endpoints.audioserve
-  ingress_class_name        = local.ingress_classes.ingress_nginx
+  service_hostname          = local.ingress_endpoints.audioserve
+  ingress_class_name        = local.kubernetes.ingress_classes.ingress_nginx
   nginx_ingress_annotations = local.nginx_ingress_annotations
 
   s3_endpoint          = "https://${local.services.cluster_minio.ip}:${local.service_ports.minio}"
@@ -106,8 +106,8 @@ module "webdav-pictures" {
   images = {
     rclone = local.container_images.rclone
   }
-  service_hostname          = local.kubernetes_ingress_endpoints.webdav_pictures
-  ingress_class_name        = local.ingress_classes.ingress_nginx
+  service_hostname          = local.ingress_endpoints.webdav_pictures
+  ingress_class_name        = local.kubernetes.ingress_classes.ingress_nginx
   nginx_ingress_annotations = local.nginx_ingress_annotations
 
   minio_endpoint          = "https://${local.services.cluster_minio.ip}:${local.service_ports.minio}"
@@ -161,8 +161,8 @@ module "webdav-videos" {
   images = {
     rclone = local.container_images.rclone
   }
-  service_hostname          = local.kubernetes_ingress_endpoints.webdav_videos
-  ingress_class_name        = local.ingress_classes.ingress_nginx
+  service_hostname          = local.ingress_endpoints.webdav_videos
+  ingress_class_name        = local.kubernetes.ingress_classes.ingress_nginx
   nginx_ingress_annotations = local.nginx_ingress_annotations
 
   minio_endpoint          = "https://${local.services.cluster_minio.ip}:${local.service_ports.minio}"
@@ -239,7 +239,7 @@ module "sunshine-desktop" {
     privileged = true
   }
   loadbalancer_class_name   = "kube-vip.io/kube-vip-class"
-  admin_hostname            = local.kubernetes_ingress_endpoints.sunshine_admin
-  ingress_class_name        = local.ingress_classes.ingress_nginx
+  admin_hostname            = local.ingress_endpoints.sunshine_admin
+  ingress_class_name        = local.kubernetes.ingress_classes.ingress_nginx
   nginx_ingress_annotations = local.nginx_ingress_annotations
 }

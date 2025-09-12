@@ -24,7 +24,7 @@ locals {
 # nginx ingress #
 
 resource "helm_release" "ingress-nginx" {
-  for_each = local.ingress_classes
+  for_each = local.kubernetes.ingress_classes
 
   name             = each.value
   repository       = "https://kubernetes.github.io/ingress-nginx"
@@ -33,7 +33,7 @@ resource "helm_release" "ingress-nginx" {
   create_namespace = true
   wait             = true
   wait_for_jobs    = true
-  timeout          = 600
+  timeout          = local.kubernetes.helm_release_wait
   version          = "4.13.2"
   max_history      = 2
   values = [
@@ -100,7 +100,7 @@ resource "helm_release" "kured" {
   chart            = "kured"
   wait             = true
   wait_for_jobs    = true
-  timeout          = 600
+  timeout          = local.kubernetes.helm_release_wait
   version          = "5.10.0"
   max_history      = 2
   values = [
@@ -138,7 +138,7 @@ resource "helm_release" "nvidia-gpu-oprerator" {
   chart            = "gpu-operator"
   wait             = true
   wait_for_jobs    = true
-  timeout          = 600
+  timeout          = local.kubernetes.helm_release_wait
   version          = "v25.3.3"
   max_history      = 2
   values = [
@@ -190,7 +190,7 @@ resource "helm_release" "amd-gpu" {
   chart            = "amd-gpu"
   wait             = true
   wait_for_jobs    = true
-  timeout          = 600
+  timeout          = local.kubernetes.helm_release_wait
   version          = "0.20.0"
   values = [
     yamlencode({
@@ -217,7 +217,7 @@ resource "helm_release" "wrapper" {
   create_namespace = true
   wait             = true
   wait_for_jobs    = true
-  timeout          = 600
+  timeout          = local.kubernetes.helm_release_wait
   max_history      = 2
   values = [
     yamlencode({
@@ -235,7 +235,7 @@ resource "helm_release" "cloudflare-tunnel" {
   chart         = "cloudflare-tunnel"
   wait          = true
   wait_for_jobs = true
-  timeout       = 600
+  timeout       = local.kubernetes.helm_release_wait
   version       = "0.3.2"
   max_history = 2
   values = [
