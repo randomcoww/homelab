@@ -164,7 +164,6 @@ module "llama-cpp" {
   s3_access_key_id     = minio_iam_user.llama-cpp.id
   s3_secret_access_key = minio_iam_user.llama-cpp.secret
   s3_mount_extra_args = [
-    "--cache /tmp",
     "--read-only",
   ]
   ingress_class_name        = local.kubernetes.ingress_classes.ingress_nginx

@@ -82,7 +82,6 @@ module "audioserve" {
   s3_access_key_id     = minio_iam_user.audioserve.id
   s3_secret_access_key = minio_iam_user.audioserve.secret
   s3_mount_extra_args = [
-    "--cache /tmp",
     "--read-only",
   ]
 

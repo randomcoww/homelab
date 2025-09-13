@@ -128,8 +128,10 @@ module "statefulset" {
     ]
     volumes = concat(lookup(var.template_spec, "volumes", []), [
       {
-        name     = "s3-mount-shared"
-        emptyDir = {}
+        name = "s3-mount-shared"
+        emptyDir = {
+          medium = "Memory"
+        }
       },
     ])
   })

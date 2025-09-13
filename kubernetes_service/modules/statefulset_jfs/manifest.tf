@@ -198,8 +198,10 @@ module "litestream" {
     ]
     volumes = concat(lookup(var.template_spec, "volumes", []), [
       {
-        name     = "jfs-mount"
-        emptyDir = {}
+        name = "jfs-mount"
+        emptyDir = {
+          medium = "Memory"
+        }
       },
       # Use local-path for this
       # {

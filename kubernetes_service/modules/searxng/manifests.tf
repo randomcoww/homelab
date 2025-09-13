@@ -158,8 +158,10 @@ module "deployment" {
         }
       },
       {
-        name     = "socket"
-        emptyDir = {}
+        name = "socket"
+        emptyDir = {
+          medium = "Memory"
+        }
       },
     ]
   }

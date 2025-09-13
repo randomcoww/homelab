@@ -81,7 +81,9 @@ module "mountpoint" {
   s3_access_key_id     = var.s3_access_key_id
   s3_secret_access_key = var.s3_secret_access_key
   s3_mount_path        = local.data_path
-  s3_mount_extra_args  = var.s3_mount_extra_args
+  s3_mount_extra_args = concat(var.s3_mount_extra_args, [
+    "--cache ${dirname(local.data_path)}",
+  ])
   images = {
     mountpoint = var.images.mountpoint
   }

@@ -153,8 +153,10 @@ module "litestream" {
     ]
     volumes = [
       {
-        name     = "litestream-data"
-        emptyDir = {}
+        name = "litestream-data"
+        emptyDir = {
+          medium = "Memory"
+        }
       },
     ]
   }
