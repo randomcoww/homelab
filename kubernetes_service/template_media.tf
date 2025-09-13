@@ -46,6 +46,33 @@ module "audioserve" {
   extra_audioserve_args = [
     "--read-playlist",
   ]
+  transcoding_config = {
+    transcoding = {
+      alt_configs = {
+        "iPhone|IPad|Mac OS" = {
+          low = {
+            "aac-in-adts" = {
+              bitrate = 32
+              sr      = "24kHz"
+              mono    = true
+            }
+          }
+          medium = {
+            "aac-in-adts" = {
+              bitrate = 48
+              mono    = false
+            }
+          }
+          high = {
+            "aac-in-adts" = {
+              bitrate = 64
+              mono    = false
+            }
+          }
+        }
+      }
+    }
+  }
   service_hostname          = local.ingress_endpoints.audioserve
   ingress_class_name        = local.kubernetes.ingress_classes.ingress_nginx
   nginx_ingress_annotations = local.nginx_ingress_annotations

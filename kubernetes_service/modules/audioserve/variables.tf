@@ -27,6 +27,11 @@ variable "images" {
   })
 }
 
+variable "transcoding_config" {
+  type    = any
+  default = {}
+}
+
 variable "extra_audioserve_args" {
   type    = list(string)
   default = []

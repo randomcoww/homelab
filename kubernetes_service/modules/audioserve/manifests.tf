@@ -1,5 +1,6 @@
 locals {
-  data_path       = "/var/lib/audioserve/mnt"
+  config_path     = "/var/lib/audioserve/config.yaml"
+  data_path       = "/var/lib/audioserve/music"
   audioserve_port = 3000
 }
 
@@ -10,9 +11,20 @@ module "metadata" {
   release     = var.release
   app_version = split(":", var.images.mountpoint)[1]
   manifests = merge(module.mountpoint.chart.manifests, {
-    "templates/service.yaml" = module.service.manifest
-    "templates/ingress.yaml" = module.ingress.manifest
+    "templates/service.yaml"   = module.service.manifest
+    "templates/ingress.yaml"   = module.ingress.manifest
+    "templates/configmap.yaml" = module.configmap.manifest
   })
+}
+
+module "configmap" {
+  source  = "../../../modules/configmap"
+  name    = var.name
+  app     = var.name
+  release = var.release
+  data = {
+    basename(local.config_path) = yamlencode(var.transcoding_config)
+  }
 }
 
 module "service" {
@@ -78,8 +90,11 @@ module "mountpoint" {
   namespace = var.namespace
   app       = var.name
   release   = var.release
-  affinity  = var.affinity
-  replicas  = var.replicas
+  annotations = {
+    "checksum/configmap" = sha256(module.configmap.manifest)
+  }
+  affinity = var.affinity
+  replicas = var.replicas
   template_spec = {
     containers = [
       {
@@ -98,12 +113,20 @@ module "mountpoint" {
           exec ./audioserve \
             --behind-proxy \
             --no-authentication \
-            --transcoding-max-parallel-processes 24 \
+            --disable-folder-download \
+            --config ${local.config_path} \
             %{~for arg in var.extra_audioserve_args~}
             ${arg} \
             %{~endfor~}
             ${local.data_path}
           EOF
+        ]
+        volumeMounts = [
+          {
+            name      = "config"
+            mountPath = local.config_path
+            subPath   = basename(local.config_path)
+          },
         ]
         ports = [
           {
@@ -123,6 +146,14 @@ module "mountpoint" {
             port   = local.audioserve_port
             path   = "/"
           }
+        }
+      },
+    ]
+    volumes = [
+      {
+        name = "config"
+        configMap = {
+          name = module.configmap.name
         }
       },
     ]
