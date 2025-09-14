@@ -7,13 +7,12 @@ module "write-local-disk" {
     <<-EOF
     set -ex -o pipefail
 
-    sudo mkdir -p /var/devfiles
-
     cleanup() {
       if mountpoint -q /var/devfiles; then
         sync
         sudo umount /var/devfiles
       fi
+      sudo rmdir /var/devfiles
 
       if [ -f coreos.iso ]; then
         sync
@@ -22,6 +21,7 @@ module "write-local-disk" {
     }
     trap cleanup EXIT
 
+    sudo mkdir -p /var/devfiles
     image_url=$(xargs -n1 -a /proc/cmdline | grep ^coreos.live.rootfs_url= | sed -r 's/coreos.live.rootfs_url=(.*)-rootfs(.*)\.img$/\1-iso\2.iso/')
     if [ -z "$image_url" ]; then
       exit 1
