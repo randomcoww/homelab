@@ -39,7 +39,7 @@ module "write-local-disk" {
     # Compare image version
     backup_label=$(sudo blkid /dev/$disk -s LABEL -o value)
     current_label=$(cat /proc/cmdline | awk '{print $1}' | sed -r 's/-live-kernel.*//')
-    if [ "$disk_label" != "$current_label" ]; then
+    if [ "$backup_label" != "$current_label" ]; then
       curl $image_url --output ${local.temp_image_path}
       sudo cat /run/ignition.json | coreos-installer iso ignition embed ${local.temp_image_path}
 
