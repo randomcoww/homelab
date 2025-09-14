@@ -7,6 +7,21 @@ module "write-local-disk" {
     <<-EOF
     set -ex -o pipefail
 
+    sudo mkdir -p /var/devfiles
+
+    cleanup() {
+      if mountpoint -q /var/devfiles; then
+        sync
+        sudo umount /var/devfiles
+      fi
+
+      if [ -f coreos.iso ]; then
+        sync
+        rm coreos.iso
+      fi
+    }
+    trap cleanup EXIT
+
     image_url=$(xargs -n1 -a /proc/cmdline | grep ^coreos.live.rootfs_url= | sed -r 's/coreos.live.rootfs_url=(.*)-rootfs(.*)\.img$/\1-iso\2.iso/')
     if [ -z "$image_url" ]; then
       exit 1
@@ -14,10 +29,6 @@ module "write-local-disk" {
     disk=$(lsblk -ndo pkname /dev/disk/by-label/fedora-coreos-* | head -1)
     if [ -z "$disk" ]; then
       exit 1
-    fi
-    sudo mkdir -p /var/devfiles
-    if mountpoint -q "/var/devfiles"; then
-      sudo umount "/var/devfiles"
     fi
 
     # Compare image version
@@ -28,8 +39,6 @@ module "write-local-disk" {
       sudo cat /run/ignition.json | coreos-installer iso ignition embed coreos.iso
 
       sudo dd if=coreos.iso of=/dev/$disk bs=4M
-      sync
-      rm coreos.iso
       exit 0
     fi
 
@@ -39,10 +48,7 @@ module "write-local-disk" {
     current_ign=$(sudo cat /run/ignition.json | sha256sum | awk '{print $1}')
     if [ "$backup_ign" != "$current_ign" ]; then
       sudo cat /run/ignition.json | sudo coreos-installer iso ignition embed /var/devfiles/$disk -f
-      sync
     fi
-    sudo umount "/var/devfiles"
-    exit 0
     EOF
   ]
   triggers_replace = data.terraform_remote_state.matchbox-client.outputs.config[each.key]
