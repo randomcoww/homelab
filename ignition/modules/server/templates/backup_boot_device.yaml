@@ -12,7 +12,8 @@ systemd:
         [Service]
         Type=oneshot
         RemainAfterExit=yes
-        ExecStart=/usr/local/bin/generate-backup-boot-device.sh
+        ExecStart=/usr/bin/systemd-inhibit --what=sleep:shutdown:idle \
+          generate-backup-boot-device.sh
         RestartSec=8
 
         [Install]
