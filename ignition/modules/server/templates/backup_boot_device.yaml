@@ -14,6 +14,7 @@ systemd:
         RemainAfterExit=yes
         ExecStart=/usr/bin/systemd-inhibit --what=sleep:shutdown:idle \
           generate-backup-boot-device.sh
+        Restart=on-failure
         RestartSec=8
 
         [Install]
