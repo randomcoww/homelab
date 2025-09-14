@@ -90,48 +90,6 @@ resource "helm_release" "ingress-nginx" {
   ]
 }
 
-# kured #
-
-resource "helm_release" "kured" {
-  name             = "kured"
-  namespace        = "monitoring"
-  create_namespace = true
-  repository       = "https://kubereboot.github.io/charts"
-  chart            = "kured"
-  wait             = true
-  wait_for_jobs    = true
-  timeout          = local.kubernetes.helm_release_wait
-  version          = "5.10.0"
-  max_history      = 2
-  values = [
-    yamlencode({
-      configuration = {
-        # promethues chart creates service name <name>-server
-        prometheusUrl = "http://${local.kubernetes_services.prometheus.name}-server.${local.kubernetes_services.prometheus.namespace}:${local.service_ports.prometheus}"
-        period        = "2m"
-        metricsPort   = local.service_ports.metrics
-        forceReboot   = true
-        drainTimeout  = "6m"
-        blockingPodSelector = [
-          "app=arc-runner",
-        ]
-        timeZone = local.timezone
-        # trigger reboot if either /var/run/reboot-required is set, or node failed network boot
-        useRebootSentinelHostPath = false
-        rebootSentinelCommand     = "sh -c \"if ([ -f /var/run/reboot-required ] || [ -z $(xargs -n1 -a /proc/cmdline | grep ^coreos.live.rootfs_url=) ]); then exit 0; else exit 1; fi\""
-      }
-      podAnnotations = {
-        "prometheus.io/scrape" = "true"
-        "prometheus.io/port"   = tostring(local.service_ports.metrics)
-      }
-      priorityClassName = "system-node-critical"
-      service = {
-        create = false
-      }
-    })
-  ]
-}
-
 # Nvidia GPU
 
 resource "helm_release" "nvidia-gpu-oprerator" {
