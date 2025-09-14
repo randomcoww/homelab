@@ -15,6 +15,10 @@ module "write-local-disk" {
     if [ -z "$disk" ]; then
       exit 1
     fi
+    sudo mkdir -p /var/devfiles
+    if mountpoint -q "/var/devfiles"; then
+      sudo umount "/var/devfiles"
+    fi
 
     # Compare image version
     backup_label=$(sudo blkid /dev/$disk -s LABEL -o value)
@@ -30,15 +34,14 @@ module "write-local-disk" {
     fi
 
     # Compare ignition
-    sudo mkdir -p /var/devfiles
     sudo bindfs --block-devices-as-files /dev /var/devfiles
     backup_ign=$(sudo coreos-installer iso ignition show /var/devfiles/$disk | sha256sum | awk '{print $1}')
     current_ign=$(sudo cat /run/ignition.json | sha256sum | awk '{print $1}')
     if [ "$backup_ign" != "$current_ign" ]; then
       sudo cat /run/ignition.json | sudo coreos-installer iso ignition embed /var/devfiles/$disk -f
       sync
-      sudo umount /var/devfiles
     fi
+    sudo umount "/var/devfiles"
     exit 0
     EOF
   ]
