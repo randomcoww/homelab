@@ -1,3 +1,8 @@
+locals {
+  bind_mount_path = "/var/devfiles"
+  temp_image_path = "/var/tmp/coreos-temp.iso"
+}
+
 module "write-local-disk" {
   for_each = local.hosts
 
@@ -8,20 +13,20 @@ module "write-local-disk" {
     set -ex -o pipefail
 
     cleanup() {
-      if mountpoint -q /var/devfiles; then
+      if mountpoint -q ${local.bind_mount_path}; then
         sync
-        sudo umount /var/devfiles
+        sudo umount ${local.bind_mount_path}
       fi
-      sudo rmdir /var/devfiles
+      sudo rmdir ${local.bind_mount_path}
 
-      if [ -f coreos.iso ]; then
+      if [ -f ${local.temp_image_path} ]; then
         sync
-        rm coreos.iso
+        rm ${local.temp_image_path}
       fi
     }
     trap cleanup EXIT
 
-    sudo mkdir -p /var/devfiles
+    sudo mkdir -p ${local.bind_mount_path}
     image_url=$(xargs -n1 -a /proc/cmdline | grep ^coreos.live.rootfs_url= | sed -r 's/coreos.live.rootfs_url=(.*)-rootfs(.*)\.img$/\1-iso\2.iso/')
     if [ -z "$image_url" ]; then
       exit 1
@@ -35,19 +40,19 @@ module "write-local-disk" {
     backup_label=$(sudo blkid /dev/$disk -s LABEL -o value)
     current_label=$(cat /proc/cmdline | awk '{print $1}' | sed -r 's/-live-kernel.*//')
     if [ "$disk_label" != "$current_label" ]; then
-      curl $image_url --output coreos.iso
-      sudo cat /run/ignition.json | coreos-installer iso ignition embed coreos.iso
+      curl $image_url --output ${local.temp_image_path}
+      sudo cat /run/ignition.json | coreos-installer iso ignition embed ${local.temp_image_path}
 
-      sudo dd if=coreos.iso of=/dev/$disk bs=4M
+      sudo dd if=${local.temp_image_path} of=/dev/$disk bs=4M
       exit 0
     fi
 
     # Compare ignition
-    sudo bindfs --block-devices-as-files /dev /var/devfiles
-    backup_ign=$(sudo coreos-installer iso ignition show /var/devfiles/$disk | sha256sum | awk '{print $1}')
+    sudo bindfs --block-devices-as-files /dev ${local.bind_mount_path}
+    backup_ign=$(sudo coreos-installer iso ignition show ${local.bind_mount_path}/$disk | sha256sum | awk '{print $1}')
     current_ign=$(sudo cat /run/ignition.json | sha256sum | awk '{print $1}')
     if [ "$backup_ign" != "$current_ign" ]; then
-      sudo cat /run/ignition.json | sudo coreos-installer iso ignition embed /var/devfiles/$disk -f
+      sudo cat /run/ignition.json | sudo coreos-installer iso ignition embed ${local.bind_mount_path}/$disk -f
     fi
     EOF
   ]
