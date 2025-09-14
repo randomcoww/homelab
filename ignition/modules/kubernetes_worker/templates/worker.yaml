@@ -25,6 +25,8 @@ systemd:
             After=crio.service
             Wants=local-fs.target
             After=local-fs.target
+            WantedBy=generate-backup-boot-device.service
+            Before=generate-backup-boot-device.service
 
             [Service]
             ExecStartPre=/usr/bin/mkdir -p \

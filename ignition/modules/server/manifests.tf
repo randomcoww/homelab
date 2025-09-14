@@ -33,6 +33,9 @@ locals {
       bird_cache_table_name = var.bird_cache_table_name
       bgp_router_id         = var.bgp_router_id
       bgp_port              = var.bgp_port
+      # backup device
+      backup_bind_mount_path = "/var/devfiles"
+      backup_temp_image_path = "/var/tmp/coreos-temp.iso"
     })
     ], [
     yamlencode({
