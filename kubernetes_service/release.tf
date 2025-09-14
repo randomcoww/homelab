@@ -115,6 +115,9 @@ resource "helm_release" "kured" {
         blockingPodSelector = [
           "app=arc-runner",
         ]
+        # trigger reboot if either /var/run/reboot-required is set, or node failed network boot
+        useRebootSentinelHostPath = false
+        rebootSentinelCommand     = "sh -c \"if ([ -f /var/run/reboot-required ] || [ -z $(xargs -n1 -a /proc/cmdline | grep ^coreos.live.rootfs_url=) ]); then exit 0; else exit 1; fi\""
       }
       podAnnotations = {
         "prometheus.io/scrape" = "true"

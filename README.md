@@ -195,12 +195,7 @@ terraform -chdir=rolling_reboot init -upgrade && \
 terraform -chdir=rolling_reboot apply
 ```
 
-Occasionally nodes will fail to boot over the network and boot from backup disk even if the network boot environment is working. Also check and reboot these nodes.
-
-```bash
-terraform -chdir=rolling_reboot_failed init -upgrade && \
-terraform -chdir=rolling_reboot_failed apply
-```
+Occasionally nodes will fail to boot from network and fallback to backup disk even when the network boot environment is working. `kured` will monitor and reboot these nodes as well.
 
 ---
 
