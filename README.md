@@ -61,19 +61,6 @@ tailscale = {
 EOF
 ```
 
-Create `client_credentials/secrets.tfvars` file
-
-```bash
-cat > client_credentials/secrets.tfvars <<EOF
-ssh_client = {
-  key_id                = "$(whoami)"
-  public_key_openssh    = "ssh_client_public_key=$(cat $HOME/.ssh/id_ecdsa.pub)"
-  early_renewal_hours   = 168
-  validity_period_hours = 336
-}
-EOF
-```
-
 Create `kubernetes_service/secrets.tfvars` file
 
 ```bash
@@ -121,7 +108,7 @@ Write local client credentials
 
 ```bash
 terraform -chdir=client_credentials init -upgrade && \
-terraform -chdir=client_credentials apply -auto-approve -var-file=secrets.tfvars
+terraform -chdir=client_credentials apply -auto-approve -var "ssh_client={key_id=\"$(whoami)\",public_key_openssh=\"ssh_client_public_key=$(cat $HOME/.ssh/id_ecdsa.pub)\"}"
 
 SSH_KEY=$HOME/.ssh/id_ecdsa
 terraform -chdir=client_credentials output -raw ssh_user_cert_authorized_key > $SSH_KEY-cert.pub
