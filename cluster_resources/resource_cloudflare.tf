@@ -33,6 +33,11 @@ data "cloudflare_zones" "zones" {
   name = local.domains.public
 }
 
+resource "cloudflare_zone_dnssec" "dnssec" {
+  zone_id = local.cloudflare_zone_id
+  status  = "active"
+}
+
 data "cloudflare_api_token_permission_groups_list" "r2_read" {
   scope = urlencode("com.cloudflare.edge.r2.bucket")
   name  = urlencode("Workers R2 Storage Bucket Item Read")
