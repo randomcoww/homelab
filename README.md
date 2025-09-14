@@ -162,17 +162,6 @@ terraform -chdir=kubernetes_service apply -var-file=secrets.tfvars
 
 ---
 
-### Write current PXE boot image to local disk
-
-If network boot is not working, hosts may fallback to booting from (USB) disk. Looks for first disk with a partition labeled `fedora-coreos-<tag>` and update content.
-
-```bash
-terraform -chdir=write_local_disk init -upgrade && \
-terraform -chdir=write_local_disk apply
-```
-
----
-
 ### Trigger rolling reboot
 
 Trigger rolling reboot of modified Kubernetes workers coordinated by `kured`.
