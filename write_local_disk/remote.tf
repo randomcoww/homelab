@@ -16,12 +16,30 @@ module "write-local-disk" {
       exit 1
     fi
 
-    curl $image_url --output coreos.iso
-    sudo cat /run/ignition.json | coreos-installer iso ignition embed coreos.iso
+    # Compare image version
+    backup_label=$(sudo blkid /dev/$disk -s LABEL -o value)
+    current_label=$(cat /proc/cmdline | awk '{print $1}' | sed -r 's/-live-kernel.*//')
+    if [ "$disk_label" != "$current_label" ]; then
+      curl $image_url --output coreos.iso
+      sudo cat /run/ignition.json | coreos-installer iso ignition embed coreos.iso
 
-    sudo dd if=coreos.iso of=/dev/$disk bs=4M
-    sync
-    rm coreos.iso
+      sudo dd if=coreos.iso of=/dev/$disk bs=4M
+      sync
+      rm coreos.iso
+      exit 0
+    fi
+
+    # Compare ignition
+    sudo mkdir -p /var/devfiles
+    sudo bindfs --block-devices-as-files /dev /var/devfiles
+    backup_ign=$(sudo coreos-installer iso ignition show /var/devfiles/$disk | sha256sum | awk '{print $1}')
+    current_ign=$(sudo cat /run/ignition.json | sha256sum | awk '{print $1}')
+    if [ "$backup_ign" != "$current_ign" ]; then
+      sudo cat /run/ignition.json | sudo coreos-installer iso ignition embed /var/devfiles/$disk -f
+      sync
+      sudo umount /var/devfiles
+    fi
+    exit 0
     EOF
   ]
   triggers_replace = data.terraform_remote_state.matchbox-client.outputs.config[each.key]
