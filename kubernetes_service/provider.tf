@@ -20,10 +20,3 @@ provider "minio" {
 provider "github" {
   token = var.github.token
 }
-
-provider "tailscale" {
-  tailnet             = local.domains.tailscale
-  oauth_client_id     = var.tailscale.oauth_client_id
-  oauth_client_secret = var.tailscale.oauth_client_secret
-  scopes              = ["auth_keys"]
-}

@@ -31,6 +31,13 @@ output "cloudflare_tunnels" {
   sensitive = true
 }
 
+# Tailscale
+
+output "tailscale_auth_key" {
+  value     = tailscale_tailnet_key.auth.key
+  sensitive = true
+}
+
 # Etcd
 
 output "etcd" {
