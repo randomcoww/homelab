@@ -96,7 +96,7 @@ Generate external and cluster wide resources
 
 ```bash
 terraform -chdir=cluster_resources init -upgrade && \
-terraform -chdir=cluster_resources apply -var-file=secrets.tfvars
+terraform -chdir=cluster_resources apply -var-file=../secrets.tfvars
 ```
 
 Write local client credentials
@@ -152,7 +152,7 @@ Deploy higher level services
 
 ```bash
 terraform -chdir=kubernetes_service init -upgrade && \
-terraform -chdir=kubernetes_service apply -var-file=secrets.tfvars
+terraform -chdir=kubernetes_service apply -var-file=../secrets.tfvars
 ```
 
 ---
