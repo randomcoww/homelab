@@ -228,6 +228,17 @@ module "qrcode-hostapd" {
 
 # Tailscale remote access
 
+resource "tailscale_tailnet_key" "auth" {
+  reusable            = true
+  ephemeral           = false
+  preauthorized       = true
+  recreate_if_invalid = "always"
+  expiry              = 7776000
+  tags = [
+    "tag:terraform",
+  ]
+}
+
 module "tailscale" {
   source    = "./modules/tailscale"
   name      = "tailscale"
@@ -237,7 +248,7 @@ module "tailscale" {
   images = {
     tailscale = local.container_images.tailscale
   }
-  tailscale_auth_key = data.terraform_remote_state.sr.outputs.tailscale_auth_key
+  tailscale_auth_key = tailscale_tailnet_key.auth.key
   extra_envs = [
     {
       name  = "TS_ACCEPT_DNS"

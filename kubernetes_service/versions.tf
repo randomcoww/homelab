@@ -19,5 +19,13 @@ terraform {
       source  = "aminueza/minio"
       version = "3.6.5"
     }
+    github = {
+      source  = "integrations/github"
+      version = "6.6.0"
+    }
+    tailscale = {
+      source  = "tailscale/tailscale"
+      version = "0.21.1"
+    }
   }
 }

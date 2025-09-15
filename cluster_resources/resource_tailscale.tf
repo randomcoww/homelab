@@ -49,17 +49,3 @@ resource "tailscale_dns_search_paths" "cluster" {
     local.domains.public,
   ]
 }
-
-resource "tailscale_tailnet_key" "auth" {
-  reusable            = true
-  ephemeral           = false
-  preauthorized       = true
-  recreate_if_invalid = "always"
-  expiry              = 7776000
-  tags = [
-    "tag:terraform",
-  ]
-  depends_on = [
-    tailscale_acl.cluster,
-  ]
-}

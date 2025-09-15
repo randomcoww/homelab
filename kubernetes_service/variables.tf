@@ -9,6 +9,14 @@ variable "smtp" {
 
 variable "github" {
   type = object({
-    arc_token = string
+    user  = string
+    token = string
+  })
+}
+
+variable "tailscale" {
+  type = object({
+    oauth_client_id     = string
+    oauth_client_secret = string
   })
 }

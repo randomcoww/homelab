@@ -44,10 +44,10 @@ AWS_SECRET_ACCESS_KEY=$(echo -n $CLOUDFLARE_API_TOKEN | sha256sum --quiet)
 EOF
 ```
 
-Create `cluster_resources/secrets.tfvars` file
+Create `secrets.tfvars` file
 
 ```bash
-cat > cluster_resources/secrets.tfvars <<EOF
+cat > secrets.tfvars <<EOF
 cloudflare = {
   api_token = "$CLOUDFLARE_API_TOKEN"
 }
@@ -58,13 +58,7 @@ tailscale = {
   oauth_client_id     = "$TS_OAUTH_CLIENT_ID"
   oauth_client_secret = "$TS_OAUTH_CLIENT_SECRET"
 }
-EOF
-```
 
-Create `kubernetes_service/secrets.tfvars` file
-
-```bash
-cat > kubernetes_service/secrets.tfvars <<EOF
 smtp = {
   host     = "smtp.gmail.com"
   port     = 587
@@ -73,7 +67,8 @@ smtp = {
 }
 
 github = {
-  arc_token = "$GITHUB_ARC_TOKEN"
+  user  = "randomcoww"
+  token = "$GITHUB_TOKEN"
 }
 EOF
 ```

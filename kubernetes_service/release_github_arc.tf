@@ -175,29 +175,12 @@ resource "helm_release" "arc-runner-hook-template" {
   ]
 }
 
+data "github_repositories" "builds" {
+  query = "user:${var.github.user} archived:false"
+}
+
 resource "helm_release" "arc-runner-set" {
-  for_each = toset([
-    "etcd-wrapper",
-    "kapprover",
-    "ipxe",
-    "hostapd-noscan",
-    "kea",
-    "mountpoint-s3",
-    "kubernetes",
-    "qrcode-generator",
-    "sunshine-desktop",
-    "fedora-coreos-config",
-    "tailscale-nft",
-    "nvidia-driver-container",
-    "homelab",
-    "stork-agent",
-    "llama-cpp-server-cuda",
-    "litestream",
-    "kaniko",
-    "code-server",
-    "juicefs",
-    "audioserve",
-  ])
+  for_each = toset(data.github_repositories.builds.names)
 
   name             = "arc-runner-${each.key}"
   repository       = "oci://ghcr.io/actions/actions-runner-controller-charts"
@@ -210,9 +193,9 @@ resource "helm_release" "arc-runner-set" {
   max_history      = 2
   values = [
     yamlencode({
-      githubConfigUrl = "https://github.com/randomcoww/${each.key}"
+      githubConfigUrl = "https://github.com/${var.github.user}/${each.key}"
       githubConfigSecret = {
-        github_token = var.github.arc_token
+        github_token = var.github.token
       }
       maxRunners = 1
       containerMode = {
