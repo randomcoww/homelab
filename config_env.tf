@@ -259,6 +259,10 @@ locals {
         name      = "etcd"
         namespace = "kube-system"
       }
+      kube_dns = {
+        name      = "kube-dns"
+        namespace = "kube-system"
+      }
       matchbox = {
         name      = "matchbox"
         namespace = "default"
