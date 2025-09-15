@@ -1,7 +1,7 @@
 resource "helm_release" "kube-dns-rbac" {
   name          = "${local.kubernetes_services.kube_dns.name}-rbac"
-  chart         = "../helm-wrapper"
   namespace     = local.kubernetes_services.kube_dns.namespace
+  chart         = "../helm-wrapper"
   wait          = true
   wait_for_jobs = true
   timeout       = local.kubernetes.helm_release_wait
@@ -63,11 +63,15 @@ resource "helm_release" "kube-dns-rbac" {
 }
 
 resource "helm_release" "kube-dns" {
-  name       = local.kubernetes_services.kube_dns.name
-  namespace  = local.kubernetes_services.kube_dns.namespace
-  repository = "https://coredns.github.io/helm"
-  chart      = "coredns"
-  version    = "1.43.3"
+  name          = local.kubernetes_services.kube_dns.name
+  namespace     = local.kubernetes_services.kube_dns.namespace
+  repository    = "https://coredns.github.io/helm"
+  chart         = "coredns"
+  wait          = true
+  wait_for_jobs = true
+  timeout       = local.kubernetes.helm_release_wait
+  max_history   = 2
+  version       = "1.43.3"
   values = [
     yamlencode({
       replicaCount = 3
@@ -191,6 +195,12 @@ resource "helm_release" "kube-dns" {
             "--log-level=debug",
             "--metrics-address=:7979",
           ]
+          env = [
+            {
+              name  = "ETCD_URLS"
+              value = "http://localhost:2379"
+            },
+          ]
           ports = [
             {
               name          = "http"
@@ -253,8 +263,8 @@ resource "helm_release" "kube-dns" {
               path = "/livez"
               port = "client"
             }
-            initialDelaySeconds = 60
-            periodSeconds       = 30
+            initialDelaySeconds = 10
+            periodSeconds       = 10
             timeoutSeconds      = 5
             successThreshold    = 1
             failureThreshold    = 5
@@ -264,7 +274,7 @@ resource "helm_release" "kube-dns" {
               path = "/readyz"
               port = "client"
             }
-            initialDelaySeconds = 60
+            initialDelaySeconds = 10
             periodSeconds       = 10
             timeoutSeconds      = 5
             successThreshold    = 1
