@@ -11,7 +11,7 @@ TS_OAUTH_CLIENT_ID=
 TS_OAUTH_CLIENT_SECRET=
 GMAIL_USER=
 GMAIL_PASSWORD=
-GITHUB_ARC_TOKEN=
+GITHUB_TOKEN=
 ```
 
 Cloudflare API token needs the following permissions
