@@ -1,9 +1,5 @@
 module "write-sentinel-file" {
-  for_each = {
-    for key, host in local.hosts :
-    key => host
-    if lookup(host, "enable_rolling_reboot", false)
-  }
+  for_each = local.hosts
 
   source = "../modules/remote_exec"
   host   = cidrhost(local.networks.service.prefix, each.value.netnum)

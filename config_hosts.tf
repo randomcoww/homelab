@@ -1,8 +1,7 @@
 locals {
   base_hosts = {
     gw-0 = {
-      enable_rolling_reboot = true
-      netnum                = 1
+      netnum = 1
       physical_interfaces = {
         phy0 = {
           match_mac = "b0-41-6f-16-a2-dc"
@@ -97,8 +96,7 @@ locals {
     }
 
     gw-1 = {
-      enable_rolling_reboot = true
-      netnum                = 3
+      netnum = 3
       physical_interfaces = {
         phy0 = {
           match_mac = "b0-41-6f-16-f9-88"
@@ -193,8 +191,7 @@ locals {
     }
 
     q-0 = {
-      enable_rolling_reboot = true
-      netnum                = 5
+      netnum = 5
       physical_interfaces = {
         phy0 = {
           match_mac = "b0-41-6f-16-9e-76"
@@ -260,8 +257,7 @@ locals {
     }
 
     de-1 = {
-      enable_rolling_reboot = true
-      netnum                = 6
+      netnum = 6
       physical_interfaces = {
         phy0 = {
           match_mac = "74-56-3c-c3-10-68"
