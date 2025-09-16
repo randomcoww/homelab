@@ -73,16 +73,6 @@ module "kubernetes-worker" {
   cni_bin_path              = local.kubernetes.cni_bin_path
   container_storage_path    = "${local.kubernetes.containers_path}/storage"
   graceful_shutdown_delay   = 480
-  registry_mirrors = {
-    for key, registry in local.registry_mirrors :
-    key => merge({
-      for k, v in registry :
-      k => v
-      if k != "port"
-      }, {
-      mirror_location = "${local.services.cluster_registry_mirror.ip}:${registry.port}"
-    })
-  }
 }
 
 module "etcd" {

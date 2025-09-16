@@ -83,12 +83,11 @@ locals {
       network = "10.96.0.0"
       cidr    = 12
       netnums = {
-        cluster_apiserver       = 1
-        cluster_dns             = 10
-        cluster_kea_primary     = 12
-        cluster_kea_secondary   = 13
-        cluster_minio           = 14
-        cluster_registry_mirror = 15
+        cluster_apiserver     = 1
+        cluster_dns           = 10
+        cluster_kea_primary   = 12
+        cluster_kea_secondary = 13
+        cluster_minio         = 14
       }
     }
     kubernetes_pod = {
@@ -124,7 +123,6 @@ locals {
     qrcode_generator        = "ghcr.io/randomcoww/qrcode-generator:v0.1.0"
     rclone                  = "docker.io/rclone/rclone:1.71.0"
     mountpoint              = "ghcr.io/randomcoww/mountpoint-s3:v1.19.0.20250901.2309"
-    registry                = "ghcr.io/distribution/distribution:3.0.0"
     audioserve              = "ghcr.io/randomcoww/audioserve:v20250911.0727"
     llama_cpp               = "ghcr.io/randomcoww/llama-cpp-server-cuda-llama-swap:v20250911.0002-12.9.1"
     sunshine_desktop        = "ghcr.io/randomcoww/sunshine-desktop:v20250904.2330"
@@ -136,7 +134,7 @@ locals {
     flowise                 = "docker.io/flowiseai/flowise:3.0.7"
     searxng                 = "docker.io/searxng/searxng:2025.9.14-23257bd"
     valkey                  = "docker.io/valkey/valkey:8.1.3-alpine"
-    nvidia_driver           = "ghcr.io/randomcoww/nvidia-driver-container:v580.82.07-fedora42"
+    nvidia_driver           = "ghcr.io/randomcoww/nvidia-driver-container:v580.82.09-fedora42"
     github_actions_runner   = "ghcr.io/actions/actions-runner:2.328.0"
   }
 
@@ -165,19 +163,14 @@ locals {
   }
 
   service_ports = {
-    matchbox               = 443
-    matchbox_api           = 50101
-    minio                  = 9000
-    metrics                = 9153
-    prometheus             = 80
-    prometheus_blackbox    = 9115
-    llama_cpp              = 80
-    searxng                = 8080
-    registry_mirror_docker = 5000
-    registry_mirror_k8s    = 5002
-    registry_mirror_gcr    = 5004
-    registry_mirror_ghcr   = 5006
-    registry_mirror_quay   = 5008
+    matchbox            = 443
+    matchbox_api        = 50101
+    minio               = 9000
+    metrics             = 9153
+    prometheus          = 80
+    prometheus_blackbox = 9115
+    llama_cpp           = 80
+    searxng             = 8080
   }
 
   ha = {
@@ -308,35 +301,6 @@ locals {
     } :
     k => "${domain}.${local.domains.public}"
   }
-
-  registry_mirrors = {
-    docker = {
-      location  = "docker.io"
-      remoteurl = "https://registry-1.docker.io"
-      port      = local.service_ports.registry_mirror_docker
-    }
-    k8s = {
-      location  = "registry.k8s.io"
-      remoteurl = "https://registry.k8s.io"
-      port      = local.service_ports.registry_mirror_k8s
-    }
-    gcr = {
-      location  = "gcr.io"
-      remoteurl = "https://gcr.io"
-      port      = local.service_ports.registry_mirror_gcr
-    }
-    ghcr = {
-      location  = "ghcr.io"
-      remoteurl = "https://ghcr.io"
-      port      = local.service_ports.registry_mirror_ghcr
-    }
-    quay = {
-      location  = "quay.io"
-      remoteurl = "https://quay.io"
-      port      = local.service_ports.registry_mirror_quay
-    }
-  }
-
 
   # finalized local vars #
 

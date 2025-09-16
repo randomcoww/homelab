@@ -82,11 +82,3 @@ variable "graceful_shutdown_delay" {
 variable "kubernetes_pod_prefix" {
   type = string
 }
-
-variable "registry_mirrors" {
-  type = map(object({
-    remoteurl       = string
-    location        = string
-    mirror_location = string
-  }))
-}

@@ -123,17 +123,6 @@ storage:
       contents:
         inline: |
           net.bridge.bridge-nf-call-iptables=0
-    # registry mirrors
-    - path: /etc/containers/registries.conf.d/10-proxy.conf
-      mode: 0644
-      contents:
-        inline: |
-          %{~ for _, registry in registry_mirrors ~}
-          [[registry]]
-          location = "${registry.location}"
-          [[registry.mirror]]
-          location = "${registry.mirror_location}"
-          %{~ endfor ~}
     - path: /etc/modules-load.d/20-ntsync.conf
       mode: 0644
       contents:
