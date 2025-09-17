@@ -5,7 +5,6 @@
       "fileMatch": [
         "^config_env.tf$",
         "^README.md$",
-        "^renovate.yaml$"
       ],
       "matchStrings": [
         "(?<depName>[a-z0-9.-]+(:\\d+|)\/[a-z0-9-]+(?:\/[a-z0-9-]+|)):(?<currentValue>[\\w.-]{1,127})"
