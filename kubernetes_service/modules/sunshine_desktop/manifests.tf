@@ -61,7 +61,7 @@ module "secret" {
           image-path = "desktop.png"
           prep-cmd = [
             {
-              do = "/usr/local/bin/sunshine-prep-cmd.sh"
+              do = "sunshine-prep-cmd.sh"
             },
           ]
         }
