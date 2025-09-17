@@ -11,7 +11,7 @@ jobs:
   renovate:
     runs-on: arc-runner-${{ github.event.repository.name }}
     container:
-      image: docker.io/renovate/renovate:latest
+      image: 192.168.208.35/randomcoww/renovate:v41.115.6.20250917.1025
     permissions:
       contents: write
       pull-requests: write
@@ -23,11 +23,7 @@ jobs:
         RENOVATE_AUTODISCOVER: false
         RENOVATE_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         RENOVATE_CONFIG_FILE: /tmp/renovate.json
-        NODE_EXTRA_CA_CERTS: /tmp/internal.crt
-        SSL_CERT_FILE: /tmp/internal.crt
-        GIT_SSL_CAINFO: /tmp/internal.crt
       run: |
-        echo -e "$INTERNAL_CA_CERT" > $NODE_EXTRA_CA_CERTS
         cat > $RENOVATE_CONFIG_FILE <<EOF
         {
           "repositories": [
