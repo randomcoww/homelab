@@ -73,9 +73,8 @@ resource "helm_release" "minio-tls" {
   name          = "${local.kubernetes_services.minio.name}-tls"
   chart         = "../helm-wrapper"
   namespace     = local.kubernetes_services.minio.namespace
-  wait          = true
-  wait_for_jobs = true
-  timeout       = local.kubernetes.helm_release_wait
+  wait          = false
+  wait_for_jobs = false
   max_history   = 2
   values = [
     yamlencode({
@@ -93,9 +92,8 @@ resource "helm_release" "minio" {
   repository       = "https://charts.min.io/"
   chart            = "minio"
   create_namespace = true
-  wait             = true
-  wait_for_jobs    = true
-  timeout          = local.kubernetes.helm_release_wait
+  wait             = false
+  wait_for_jobs    = false
   version          = "5.4.0"
   max_history      = 2
   values = [

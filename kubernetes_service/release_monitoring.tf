@@ -5,9 +5,8 @@ resource "helm_release" "metrics-server" {
   namespace     = "kube-system"
   repository    = "https://kubernetes-sigs.github.io/metrics-server"
   chart         = "metrics-server"
-  wait          = true
-  wait_for_jobs = true
-  timeout       = local.kubernetes.helm_release_wait
+  wait          = false
+  wait_for_jobs = false
   version       = "3.13.0"
   max_history   = 2
   values = [
@@ -40,9 +39,8 @@ resource "helm_release" "prometheus-blackbox" {
   create_namespace = true
   repository       = "https://prometheus-community.github.io/helm-charts"
   chart            = "prometheus-blackbox-exporter"
-  wait             = true
-  wait_for_jobs    = true
-  timeout          = local.kubernetes.helm_release_wait
+  wait             = false
+  wait_for_jobs    = false
   version          = "11.3.1"
   max_history      = 2
   values = [
@@ -63,9 +61,8 @@ resource "helm_release" "prometheus" {
   create_namespace = true
   repository       = "https://prometheus-community.github.io/helm-charts"
   chart            = "prometheus"
-  wait             = true
-  wait_for_jobs    = true
-  timeout          = local.kubernetes.helm_release_wait
+  wait             = false
+  wait_for_jobs    = false
   version          = "27.37.0"
   max_history      = 2
   values = [
@@ -346,9 +343,8 @@ resource "helm_release" "kured" {
   create_namespace = true
   repository       = "https://kubereboot.github.io/charts"
   chart            = "kured"
-  wait             = true
-  wait_for_jobs    = true
-  timeout          = local.kubernetes.helm_release_wait
+  wait             = false
+  wait_for_jobs    = false
   version          = "5.10.0"
   max_history      = 2
   values = [

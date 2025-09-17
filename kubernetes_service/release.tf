@@ -30,9 +30,8 @@ resource "helm_release" "ingress-nginx" {
   chart            = "ingress-nginx"
   namespace        = local.kubernetes_services[each.key].namespace
   create_namespace = true
-  wait             = true
-  wait_for_jobs    = true
-  timeout          = local.kubernetes.helm_release_wait
+  wait             = false
+  wait_for_jobs    = false
   version          = "4.13.2"
   max_history      = 2
   values = [
@@ -97,9 +96,8 @@ resource "helm_release" "nvidia-gpu-oprerator" {
   create_namespace = true
   repository       = "https://helm.ngc.nvidia.com/nvidia"
   chart            = "gpu-operator"
-  wait             = true
-  wait_for_jobs    = true
-  timeout          = local.kubernetes.helm_release_wait
+  wait             = false
+  wait_for_jobs    = false
   version          = "v25.3.3"
   max_history      = 2
   values = [
@@ -149,9 +147,8 @@ resource "helm_release" "amd-gpu" {
   create_namespace = true
   repository       = "https://rocm.github.io/k8s-device-plugin/"
   chart            = "amd-gpu"
-  wait             = true
-  wait_for_jobs    = true
-  timeout          = local.kubernetes.helm_release_wait
+  wait             = false
+  wait_for_jobs    = false
   version          = "0.20.0"
   values = [
     yamlencode({
@@ -176,9 +173,8 @@ resource "helm_release" "wrapper" {
   name             = each.key
   namespace        = each.value.namespace
   create_namespace = true
-  wait             = true
-  wait_for_jobs    = true
-  timeout          = local.kubernetes.helm_release_wait
+  wait             = false
+  wait_for_jobs    = false
   max_history      = 2
   values = [
     yamlencode({
@@ -194,9 +190,8 @@ resource "helm_release" "cloudflare-tunnel" {
   namespace     = "default"
   repository    = "https://cloudflare.github.io/helm-charts/"
   chart         = "cloudflare-tunnel"
-  wait          = true
-  wait_for_jobs = true
-  timeout       = local.kubernetes.helm_release_wait
+  wait          = false
+  wait_for_jobs = false
   version       = "0.3.2"
   max_history = 2
   values = [

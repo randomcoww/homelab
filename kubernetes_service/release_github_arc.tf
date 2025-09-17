@@ -43,9 +43,8 @@ resource "helm_release" "arc" {
   chart            = "gha-runner-scale-set-controller"
   namespace        = "arc-systems"
   create_namespace = true
-  wait             = true
-  wait_for_jobs    = true
-  timeout          = local.kubernetes.helm_release_wait
+  wait             = false
+  wait_for_jobs    = false
   version          = "0.12.1"
   max_history      = 2
   values = [
@@ -70,9 +69,8 @@ resource "helm_release" "arc-runner-hook-template" {
   name          = "arc-runner-hook-template"
   chart         = "../helm-wrapper"
   namespace     = "arc-runners"
-  wait          = true
-  wait_for_jobs = true
-  timeout       = local.kubernetes.helm_release_wait
+  wait          = false
+  wait_for_jobs = false
   max_history   = 2
   values = [
     yamlencode({
@@ -187,8 +185,8 @@ resource "helm_release" "arc-runner-set" {
   chart            = "gha-runner-scale-set"
   namespace        = "arc-runners"
   create_namespace = true
-  wait             = true
-  timeout          = local.kubernetes.helm_release_wait
+  wait             = false
+  wait_for_jobs    = false
   version          = "0.12.1"
   max_history      = 2
   values = [

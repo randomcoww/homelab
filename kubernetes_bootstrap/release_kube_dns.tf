@@ -2,9 +2,8 @@ resource "helm_release" "kube-dns-rbac" {
   name          = "${local.kubernetes_services.kube_dns.name}-rbac"
   namespace     = local.kubernetes_services.kube_dns.namespace
   chart         = "../helm-wrapper"
-  wait          = true
-  wait_for_jobs = true
-  timeout       = local.kubernetes.helm_release_wait
+  wait          = false
+  wait_for_jobs = false
   max_history   = 2
   values = [
     yamlencode({
@@ -67,9 +66,8 @@ resource "helm_release" "kube-dns" {
   namespace     = local.kubernetes_services.kube_dns.namespace
   repository    = "https://coredns.github.io/helm"
   chart         = "coredns"
-  wait          = true
-  wait_for_jobs = true
-  timeout       = local.kubernetes.helm_release_wait
+  wait          = false
+  wait_for_jobs = false
   max_history   = 2
   version       = "1.43.3"
   values = [
