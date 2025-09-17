@@ -132,7 +132,7 @@ locals {
     litestream              = "ghcr.io/randomcoww/litestream:v0.3.13.20250901.2321"
     vaultwarden             = "docker.io/vaultwarden/server:1.34.3-alpine"
     juicefs                 = "ghcr.io/randomcoww/juicefs:v1.3.0.20250901.2114"
-    code_server             = "192.168.208.35/randomcoww/code-server:v1.103.1.20250917.0515"
+    code_server             = "192.168.208.35/randomcoww/code-server:v1.103.1.20250917.0807"
     flowise                 = "docker.io/flowiseai/flowise:3.0.7"
     searxng                 = "docker.io/searxng/searxng:2025.9.14-23257bd"
     valkey                  = "docker.io/valkey/valkey:8.1.3-alpine"
