@@ -25,6 +25,7 @@ jobs:
         RENOVATE_CONFIG_FILE: /tmp/renovate.json
         NODE_EXTRA_CA_CERTS: /tmp/internal.crt
         SSL_CERT_FILE: /tmp/internal.crt
+        GIT_SSL_CAINFO: /tmp/internal.crt
       run: |
         echo -e "$INTERNAL_CA_CERT" > $NODE_EXTRA_CA_CERTS
         cat > $RENOVATE_CONFIG_FILE <<EOF
