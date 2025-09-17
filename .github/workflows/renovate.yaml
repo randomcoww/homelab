@@ -31,5 +31,7 @@ jobs:
           ]
         }
         EOF
+        echo -e "$INTERNAL_CA_CERT" > /tmp/internal.crt
 
+        NODE_EXTRA_CA_CERTS=/tmp/internal.crt \
         renovate-entrypoint.sh renovate
