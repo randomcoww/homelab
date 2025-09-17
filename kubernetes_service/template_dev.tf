@@ -1,3 +1,68 @@
+## internal registry
+
+resource "minio_s3_bucket" "registry" {
+  bucket        = "registry"
+  force_destroy = true
+}
+
+resource "minio_iam_user" "registry" {
+  name          = "registry"
+  force_destroy = true
+}
+
+resource "minio_iam_policy" "registry" {
+  name = "registry"
+  policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [
+      {
+        Effect = "Allow"
+        Action = [
+          "s3:*",
+        ]
+        Resource = [
+          minio_s3_bucket.registry.arn,
+          "${minio_s3_bucket.registry.arn}/*",
+        ]
+      },
+    ]
+  })
+}
+
+resource "minio_iam_user_policy_attachment" "registry" {
+  user_name   = minio_iam_user.registry.id
+  policy_name = minio_iam_policy.registry.id
+}
+
+module "registry" {
+  source    = "./modules/registry"
+  name      = "registry"
+  namespace = "default"
+  release   = "0.1.1"
+  replicas  = 2
+  images = {
+    registry = local.container_images.registry
+  }
+  ports = {
+    registry = local.service_ports.registry
+  }
+  ca                      = data.terraform_remote_state.sr.outputs.trust.ca
+  service_ip              = local.services.registry.ip
+  loadbalancer_class_name = "kube-vip.io/kube-vip-class"
+
+  s3_endpoint          = "https://${local.services.cluster_minio.ip}:${local.service_ports.minio}"
+  s3_bucket            = minio_s3_bucket.registry.id
+  s3_bucket_prefix     = "/"
+  s3_access_key_id     = minio_iam_user.registry.id
+  s3_secret_access_key = minio_iam_user.registry.secret
+
+  depends_on = [
+    minio_iam_user.registry,
+    minio_iam_policy.registry,
+    minio_iam_user_policy_attachment.registry,
+  ]
+}
+
 ## llama-cpp
 
 resource "minio_iam_user" "llama-cpp" {
