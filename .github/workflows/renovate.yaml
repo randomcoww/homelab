@@ -23,15 +23,16 @@ jobs:
         RENOVATE_AUTODISCOVER: false
         RENOVATE_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         RENOVATE_CONFIG_FILE: /tmp/renovate.json
+        NODE_EXTRA_CA_CERTS: /tmp/internal.crt
+        SSL_CERT_FILE: /tmp/internal.crt
       run: |
-        cat > /tmp/renovate.json <<EOF
+        echo -e "$INTERNAL_CA_CERT" > $NODE_EXTRA_CA_CERTS
+        cat > $RENOVATE_CONFIG_FILE <<EOF
         {
           "repositories": [
             "${{ github.repository }}"
           ]
         }
         EOF
-        echo -e "$INTERNAL_CA_CERT" > /tmp/internal.crt
 
-        NODE_EXTRA_CA_CERTS=/tmp/internal.crt \
         renovate-entrypoint.sh renovate
