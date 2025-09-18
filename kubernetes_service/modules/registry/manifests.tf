@@ -54,7 +54,7 @@ module "metadata" {
 
                       update-ca-certificates
                       exec registry garbage-collect \
-                        --delete-untagged=true \
+                        --delete-untagged \
                         ${local.config_path}
                       EOF
                     ]
