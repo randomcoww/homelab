@@ -28,7 +28,7 @@ module "metadata" {
         }
       }
       spec = {
-        schedule          = "0 0 * * *"
+        schedule          = "0 * * * *"
         suspend           = false
         concurrencyPolicy = "Forbid"
         jobTemplate = {
