@@ -4,6 +4,7 @@ locals {
   ca_cert_path    = "/etc/registry/ca-cert.pem"
   cert_path       = "/etc/registry/cert.pem"
   key_path        = "/etc/registry/key.pem"
+  registry_port   = 443
 }
 
 module "metadata" {
@@ -16,6 +17,98 @@ module "metadata" {
     "templates/deployment.yaml" = module.deployment.manifest
     "templates/secret.yaml"     = module.secret.manifest
     "templates/service.yaml"    = module.service.manifest
+    "templates/cronjob.yaml" = yamlencode({
+      apiVersion = "batch/v1"
+      kind       = "CronJob"
+      metadata = {
+        name = "${var.name}-garbage-collect"
+        labels = {
+          app     = var.name
+          release = var.release
+        }
+      }
+      spec = {
+        schedule          = "0 0 * * *"
+        suspend           = false
+        concurrencyPolicy = "Forbid"
+        jobTemplate = {
+          spec = {
+            ttlSecondsAfterFinished = 300
+            template = {
+              metadata = {
+                labels = {
+                  app = var.name
+                }
+              }
+              spec = {
+                restartPolicy = "Never"
+                containers = [
+                  {
+                    name  = var.name
+                    image = var.images.registry
+                    command = [
+                      "sh",
+                      "-c",
+                      <<-EOF
+                      set -e
+
+                      update-ca-certificates
+                      exec registry garbage-collect \
+                        --delete-untagged=true \
+                        ${local.config_path}
+                      EOF
+                    ]
+                    volumeMounts = [
+                      {
+                        name      = "config"
+                        mountPath = local.config_path
+                        subPath   = basename(local.config_path)
+                      },
+                      {
+                        name      = "config"
+                        mountPath = local.trusted_ca_path
+                        subPath   = basename(local.trusted_ca_path)
+                      },
+                      {
+                        name      = "config"
+                        mountPath = local.ca_cert_path
+                        subPath   = basename(local.ca_cert_path)
+                      },
+                      {
+                        name      = "config"
+                        mountPath = local.cert_path
+                        subPath   = basename(local.cert_path)
+                      },
+                      {
+                        name      = "config"
+                        mountPath = local.key_path
+                        subPath   = basename(local.key_path)
+                      },
+                    ]
+                  },
+                ]
+                volumes = [
+                  {
+                    name = "config"
+                    secret = {
+                      secretName = module.secret.name
+                    }
+                  },
+                ]
+                dnsConfig = {
+                  options = [
+                    {
+                      name  = "ndots"
+                      value = "2"
+                    },
+                  ]
+                }
+              }
+            }
+          }
+        }
+      }
+    })
   }
 }
 
@@ -33,7 +126,7 @@ module "secret" {
     basename(local.config_path) = yamlencode({
       version = "0.1"
       http = {
-        addr   = "0.0.0.0:${var.ports.registry}"
+        addr   = "0.0.0.0:${local.registry_port}"
         prefix = "/"
         tls = {
           certificate = local.cert_path
@@ -83,9 +176,9 @@ module "service" {
     ports = [
       {
         name       = "${var.name}-${var.namespace}"
-        port       = var.ports.registry
+        port       = local.registry_port
         protocol   = "TCP"
-        targetPort = var.ports.registry
+        targetPort = local.registry_port
       },
     ]
   }
@@ -129,7 +222,7 @@ module "deployment" {
         ]
         ports = [
           {
-            containerPort = var.ports.registry
+            containerPort = local.registry_port
           },
         ]
         volumeMounts = [
@@ -161,14 +254,14 @@ module "deployment" {
         ]
         readinessProbe = {
           httpGet = {
-            port   = var.ports.registry
+            port   = local.registry_port
             path   = "/"
             scheme = "HTTPS"
           }
         }
         livenessProbe = {
           httpGet = {
-            port   = var.ports.registry
+            port   = local.registry_port
             path   = "/"
             scheme = "HTTPS"
           }
