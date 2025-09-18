@@ -6,6 +6,13 @@ module "base" {
   hostname       = each.value.hostname
 }
 
+module "upstream-dns" {
+  for_each       = local.members.upstream-dns
+  source         = "./modules/upstream_dns"
+  butane_version = local.butane_version
+  upstream_dns   = local.upstream_dns
+}
+
 module "systemd-networkd" {
   for_each = local.members.systemd-networkd
   source   = "./modules/systemd_networkd"

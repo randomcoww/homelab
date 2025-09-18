@@ -40,12 +40,3 @@ module "gateway" {
   # Use VIP with network netmask to intentionally create a prefix route on main table
   keepalived_vip = "${local.services.gateway.ip}/${each.value.networks[local.services.gateway.network.name].cidr}"
 }
-
-# Configure upstream DNS for gateways
-
-module "upstream-dns" {
-  for_each       = local.members.upstream-dns
-  source         = "./modules/upstream_dns"
-  butane_version = local.butane_version
-  upstream_dns   = local.upstream_dns
-}
