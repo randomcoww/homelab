@@ -101,7 +101,7 @@ locals {
     accept = "0x00002000"
   }
 
-  # these fields are read by renovate so don't use var substitutions
+  # these fields are updated by renovate - don't use var substitutions
   container_images = {
     kube_apiserver          = "ghcr.io/randomcoww/kubernetes:v1.34.1.20250910.2347"
     kube_controller_manager = "ghcr.io/randomcoww/kubernetes:v1.34.1.20250910.2347"
@@ -112,7 +112,7 @@ locals {
     flannel                 = "docker.io/flannel/flannel:v0.27.3"
     flannel_cni_plugin      = "docker.io/flannel/flannel-cni-plugin:v1.7.1-flannel1"
     kube_vip                = "ghcr.io/kube-vip/kube-vip:v1.0.0"
-    device_plugin           = "ghcr.io/squat/generic-device-plugin:89bbd58"
+    device_plugin           = "ghcr.io/squat/generic-device-plugin:latest"
     kea                     = "ghcr.io/randomcoww/kea:v3.1.0.20250901.2312"
     stork_agent             = "ghcr.io/randomcoww/stork-agent:v2.3.0.20250911.0103"
     matchbox                = "quay.io/poseidon/matchbox:v0.11.0"
@@ -126,21 +126,22 @@ locals {
     rclone                  = "docker.io/rclone/rclone:1.71.0"
     mountpoint              = "ghcr.io/randomcoww/mountpoint-s3:v1.19.0.20250901.2309"
     audioserve              = "ghcr.io/randomcoww/audioserve:v20250911.0727"
-    llama_cpp               = "192.168.208.35/randomcoww/llama-cpp-server-cuda-llama-swap:v20250917.0516-12.9.1"
-    sunshine_desktop        = "192.168.208.35/randomcoww/sunshine-desktop:v20250917.0509"
+    llama_cpp               = "registry.default/randomcoww/llama-cpp-server-cuda-llama-swap:v20250917.0516-12.9.1"
+    sunshine_desktop        = "registry.default/randomcoww/sunshine-desktop:v20250917.0509"
     nginx                   = "docker.io/nginx:1.29-alpine-slim"
     litestream              = "ghcr.io/randomcoww/litestream:v0.3.13.20250901.2321"
     vaultwarden             = "docker.io/vaultwarden/server:1.34.3-alpine"
     juicefs                 = "ghcr.io/randomcoww/juicefs:v1.3.0.20250901.2114"
-    code_server             = "192.168.208.35/randomcoww/code-server:v1.103.1.20250917.0807"
+    code_server             = "registry.default/randomcoww/code-server:v1.103.1.20250917.0807"
     flowise                 = "docker.io/flowiseai/flowise:3.0.7"
     searxng                 = "docker.io/searxng/searxng:2025.9.14-23257bd"
     valkey                  = "docker.io/valkey/valkey:8.1.3-alpine"
-    nvidia_driver           = "192.168.208.35/randomcoww/nvidia-driver-container:v580.82.09-fedora42"
+    nvidia_driver           = "registry.default/randomcoww/nvidia-driver-container:v580.82.09-fedora42"
     github_actions_runner   = "ghcr.io/actions/actions-runner:2.328.0"
     registry                = "ghcr.io/distribution/distribution:3.0.0"
   }
 
+  # these fields are updated by renovate - don't use var substitutions
   pxeboot_images = {
     coreos = "fedora-coreos-42.20250914.19" # randomcoww/fedora-coreos-config
   }
@@ -174,7 +175,6 @@ locals {
     prometheus_blackbox = 9115
     llama_cpp           = 80
     searxng             = 8080
-    registry            = 443
   }
 
   ha = {
@@ -281,6 +281,10 @@ locals {
       }
       searxng = {
         name      = "searxng"
+        namespace = "default"
+      }
+      registry = {
+        name      = "registry"
         namespace = "default"
       }
     }) :

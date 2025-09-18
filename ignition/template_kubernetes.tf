@@ -73,6 +73,13 @@ module "kubernetes-worker" {
   cni_bin_path              = local.kubernetes.cni_bin_path
   container_storage_path    = "${local.kubernetes.containers_path}/storage"
   graceful_shutdown_delay   = 480
+  # allow host to resolve registry by name
+  internal_registries = [
+    {
+      prefix   = local.kubernetes_services.registry.endpoint
+      location = local.services.registry.ip
+    },
+  ]
 }
 
 module "etcd" {

@@ -82,3 +82,10 @@ variable "graceful_shutdown_delay" {
 variable "kubernetes_pod_prefix" {
   type = string
 }
+
+variable "internal_registries" {
+  type = list(object({
+    prefix   = string
+    location = string
+  }))
+}

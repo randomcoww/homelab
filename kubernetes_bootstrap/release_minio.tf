@@ -21,7 +21,7 @@ resource "tls_cert_request" "minio" {
   dns_names = concat([
     "localhost",
     local.kubernetes_services.minio.name,
-    "${local.kubernetes_services.minio.name}.${local.kubernetes_services.minio.namespace}",
+    local.kubernetes_services.minio.endpoint,
     ], [
     for i, _ in range(local.minio_replicas) :
     "${local.kubernetes_services.minio.name}-${i}.${local.kubernetes_services.minio.name}-svc.${local.kubernetes_services.minio.namespace}.svc"

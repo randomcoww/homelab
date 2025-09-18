@@ -129,7 +129,7 @@ resource "helm_release" "arc-runner-hook-template" {
                       },
                       {
                         name  = "INTERNAL_REGISTRY"
-                        value = "${local.services.registry.ip}:${local.service_ports.registry}"
+                        value = local.kubernetes_services.registry.endpoint
                       },
                       {
                         name  = "MC_CONFIG_DIR"

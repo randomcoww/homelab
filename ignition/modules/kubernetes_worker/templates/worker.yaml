@@ -134,3 +134,13 @@ storage:
       contents:
         inline: |
           uinput
+    # Internal registry
+    - path: /etc/containers/registries.conf.d/10-internal.conf
+      mode: 0644
+      contents:
+        inline: |
+          %{~ for _, registry in internal_registries ~}
+          [[registry]]
+          location = "${registry.location}"
+          prefix = "${registry.prefix}"
+          %{~ endfor ~}

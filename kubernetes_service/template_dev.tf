@@ -36,15 +36,12 @@ resource "minio_iam_user_policy_attachment" "registry" {
 
 module "registry" {
   source    = "./modules/registry"
-  name      = "registry"
-  namespace = "default"
+  name      = local.kubernetes_services.registry.name
+  namespace = local.kubernetes_services.registry.namespace
   release   = "0.1.1"
   replicas  = 2
   images = {
     registry = local.container_images.registry
-  }
-  ports = {
-    registry = local.service_ports.registry
   }
   ca                      = data.terraform_remote_state.sr.outputs.trust.ca
   service_ip              = local.services.registry.ip
