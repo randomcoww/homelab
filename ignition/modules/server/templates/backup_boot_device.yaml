@@ -7,6 +7,8 @@ systemd:
       enabled: true
       contents: |
         [Unit]
+        Wants=network-online.target
+        After=network-online.target
         ConditionKernelCommandLine=coreos.live.rootfs_url
 
         [Service]
@@ -15,7 +17,7 @@ systemd:
         ExecStart=/usr/bin/systemd-inhibit --what=sleep:shutdown:idle \
           generate-backup-boot-device.sh
         Restart=on-failure
-        RestartSec=8
+        RestartSec=30
 
         [Install]
         WantedBy=multi-user.target
