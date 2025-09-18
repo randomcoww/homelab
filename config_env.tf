@@ -132,7 +132,7 @@ locals {
     audioserve            = "registry.default/randomcoww/audioserve:v20250918.0850"
     llama_cpp             = "registry.default/randomcoww/llama-cpp-server-cuda-llama-swap:v20250917.0516-12.9.1"
     sunshine_desktop      = "registry.default/randomcoww/sunshine-desktop:v20250917.0509"
-    litestream            = "registry.default/randomcoww/litestream:v0.3.13.20250918.0234"
+    litestream            = "registry.default/randomcoww/litestream:v0.3.13.20250918.0850"
     vaultwarden           = "docker.io/vaultwarden/server:1.34.3-alpine"
     juicefs               = "registry.default/randomcoww/juicefs:v1.3.0.20250918.0850"
     code_server           = "registry.default/randomcoww/code-server:v1.103.1.20250917.0807"
