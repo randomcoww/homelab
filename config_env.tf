@@ -124,9 +124,9 @@ locals {
     matchbox    = "quay.io/poseidon/matchbox:v0.11.0"
     nginx       = "docker.io/nginx:1.29-alpine-slim"
     # services
-    hostapd               = "ghcr.io/randomcoww/hostapd-noscan:v2.11.20250901.2310"
-    tailscale             = "ghcr.io/randomcoww/tailscale-nft:v1.86.2.20250901.2109"
-    qrcode_generator      = "ghcr.io/randomcoww/qrcode-generator:v0.1.0"
+    hostapd               = "registry.default/randomcoww/hostapd-noscan:v2.11.20250918.1928"
+    tailscale             = "registry.default/randomcoww/tailscale-nft:v1.88.2.20250918.1947"
+    qrcode_generator      = "registry.default/randomcoww/qrcode-generator:v0.1.1"
     device_plugin         = "ghcr.io/squat/generic-device-plugin:latest"
     rclone                = "docker.io/rclone/rclone:1.71.0"
     audioserve            = "registry.default/randomcoww/audioserve:v20250918.0850"

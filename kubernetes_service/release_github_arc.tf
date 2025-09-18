@@ -43,8 +43,8 @@ resource "helm_release" "arc" {
   chart            = "gha-runner-scale-set-controller"
   namespace        = "arc-systems"
   create_namespace = true
-  wait             = false
-  wait_for_jobs    = false
+  wait             = true
+  wait_for_jobs    = true
   version          = "0.12.1"
   max_history      = 2
   values = [
@@ -69,8 +69,8 @@ resource "helm_release" "arc-runner-hook-template" {
   name          = "arc-runner-hook-template"
   chart         = "../helm-wrapper"
   namespace     = "arc-runners"
-  wait          = false
-  wait_for_jobs = false
+  wait          = true
+  wait_for_jobs = true
   max_history   = 2
   values = [
     yamlencode({
@@ -182,7 +182,9 @@ data "github_repositories" "builds" {
 }
 
 resource "helm_release" "arc-runner-set" {
-  for_each = toset(data.github_repositories.builds.names)
+  for_each = toset(concat(data.github_repositories.builds.names, [
+    "fedora-coreos-config",
+  ]))
 
   name             = "arc-runner-${each.key}"
   repository       = "oci://ghcr.io/actions/actions-runner-controller-charts"
