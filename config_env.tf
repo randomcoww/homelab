@@ -135,7 +135,7 @@ locals {
     litestream            = "registry.default/randomcoww/litestream:v0.3.13.20250918.0850"
     vaultwarden           = "docker.io/vaultwarden/server:1.34.3-alpine"
     juicefs               = "registry.default/randomcoww/juicefs:v1.3.0.20250918.0850"
-    code_server           = "registry.default/randomcoww/code-server:v1.103.1.20250917.0807"
+    code_server           = "registry.default/randomcoww/code-server:v1.103.1.20250918.2328"
     flowise               = "docker.io/flowiseai/flowise:3.0.7"
     searxng               = "docker.io/searxng/searxng:2025.9.14-23257bd"
     valkey                = "docker.io/valkey/valkey:8.1.3-alpine"
