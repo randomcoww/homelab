@@ -187,7 +187,7 @@ module "statefulset" {
           driver_file=$HOME/nvidia/NVIDIA-Linux-$targetarch-$driver_version.run
 
           NVIDIA_DRIVER_BASE_URL=$${NVIDIA_DRIVER_BASE_URL:-https://us.download.nvidia.com/XFree86/$${targetarch/x86_64/Linux-x86_64}}
-          curl -L --skip-existing -o "$driver_file" \
+          curl -fsSL --remove-on-error --skip-existing -o "$driver_file" \
             $NVIDIA_DRIVER_BASE_URL/$driver_version/NVIDIA-Linux-$targetarch-$driver_version.run
 
           chmod +x "$driver_file"
