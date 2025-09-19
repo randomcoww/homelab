@@ -59,7 +59,7 @@ storage:
           backup_label=$(blkid /dev/$disk -s LABEL -o value)
           current_label=$(cat /proc/cmdline | awk '{print $1}' | sed -r 's/-live-kernel.*//')
           if [ "$backup_label" != "$current_label" ]; then
-            curl -L -s $image_url --output ${backup_temp_image_path}
+            curl -fsSL --remove-on-error $image_url --output ${backup_temp_image_path}
             cat /run/ignition.json | coreos-installer iso ignition embed ${backup_temp_image_path}
 
             dd if=${backup_temp_image_path} of=/dev/$disk bs=4M
