@@ -53,10 +53,10 @@ module "minio-client-secret" {
   name    = "${local.kubernetes_services.minio.name}-client"
   app     = local.kubernetes_services.minio.name
   release = "0.1.0"
-  data = merge({
+  data = {
     "public.crt"  = tls_locally_signed_cert.minio.cert_pem
     "private.key" = tls_private_key.minio.private_key_pem
-  })
+  }
 }
 
 module "minio-ca-secret" {
@@ -64,23 +64,46 @@ module "minio-ca-secret" {
   name    = "${local.kubernetes_services.minio.name}-ca"
   app     = local.kubernetes_services.minio.name
   release = "0.1.0"
-  data = merge({
+  data = {
     "ca.crt" = data.terraform_remote_state.sr.outputs.trust.ca.cert_pem
-  })
+  }
 }
 
-resource "helm_release" "minio-tls" {
-  name          = "${local.kubernetes_services.minio.name}-tls"
-  chart         = "../helm-wrapper"
-  namespace     = local.kubernetes_services.minio.namespace
-  wait          = false
-  wait_for_jobs = false
-  max_history   = 2
+module "minio-metrics-proxy" {
+  source  = "../modules/configmap"
+  name    = "${local.kubernetes_services.minio.name}-proxy"
+  app     = local.kubernetes_services.minio.name
+  release = "0.1.0"
+  data = {
+    nginx-config = <<-EOF
+    proxy_request_buffering off;
+    proxy_buffering off;
+    proxy_cache off;
+
+    server {
+      listen ${local.service_ports.metrics};
+      location /minio/metrics/v3 {
+        proxy_pass https://127.0.0.1:${local.service_ports.minio};
+      }
+    }
+    EOF
+  }
+}
+
+resource "helm_release" "minio-resources" {
+  name             = "${local.kubernetes_services.minio.name}-resources"
+  chart            = "../helm-wrapper"
+  namespace        = local.kubernetes_services.minio.namespace
+  create_namespace = true
+  wait             = true
+  wait_for_jobs    = true
+  max_history      = 2
   values = [
     yamlencode({
       manifests = [
         module.minio-client-secret.manifest,
         module.minio-ca-secret.manifest,
+        module.minio-metrics-proxy.manifest,
       ]
     }),
   ]
@@ -122,7 +145,7 @@ resource "helm_release" "minio" {
         annotations = {
           "prometheus.io/scrape" = "true"
           "prometheus.io/port"   = tostring(local.service_ports.metrics)
-          "prometheus.io/path"   = "/minio/v2/metrics/node"
+          "prometheus.io/path"   = "/minio/metrics/v3"
         }
       }
       certsPath = "/opt/minio/certs"
@@ -133,8 +156,9 @@ resource "helm_release" "minio" {
         certSecret = "${local.kubernetes_services.minio.name}-client"
       }
       podAnnotations = {
-        "checksum/client-cert" = sha256(module.minio-client-secret.manifest)
-        "checksum/ca-cert"     = sha256(module.minio-ca-secret.manifest)
+        "checksum/client-cert"  = sha256(module.minio-client-secret.manifest)
+        "checksum/ca-cert"      = sha256(module.minio-ca-secret.manifest)
+        "checksum/proxy-config" = sha256(module.minio-metrics-proxy.manifest)
       }
       trustedCertsSecret = "${local.kubernetes_services.minio.name}-ca"
       ingress = {
@@ -151,44 +175,29 @@ resource "helm_release" "minio" {
       policies       = []
       customCommands = []
       svcaccts       = []
+      extraVolumes = [
+        {
+          name = "proxy-config"
+          configMap = {
+            name = "${local.kubernetes_services.minio.name}-proxy"
+          }
+        },
+      ]
       extraContainers = [
         # bypass TLS for metrics endpoints
         {
-          name  = "${local.kubernetes_services.minio.name}-metrics"
+          name  = "${local.kubernetes_services.minio.name}-proxy"
           image = local.container_images.nginx
-          securityContext = {
-            runAsUser = 0
-          }
-          command = [
-            "sh",
-            "-c",
-            <<-EOT
-            set -e
-
-            cat > /etc/nginx/conf.d/default.conf <<EOF
-            proxy_request_buffering off;
-            proxy_buffering off;
-
-            server {
-              listen      ${local.service_ports.metrics};
-              server_name localhost;
-
-              location /minio/v2/metrics {
-                proxy_pass https://127.0.0.1:${local.service_ports.minio};
-              }
-
-              location /minio/metrics/v3 {
-                proxy_pass https://127.0.0.1:${local.service_ports.minio};
-              }
-            }
-            EOF
-
-            exec nginx -g 'daemon off;'
-            EOT
-          ]
           ports = [
             {
               containerPort = local.service_ports.metrics
+            },
+          ]
+          volumeMounts = [
+            {
+              name      = "proxy-config"
+              mountPath = "/etc/nginx/conf.d/default.conf"
+              subPath   = "nginx-config"
             },
           ]
         },
@@ -217,5 +226,6 @@ resource "helm_release" "minio" {
   ]
   depends_on = [
     kubernetes_labels.labels,
+    helm_release.minio-resources,
   ]
 }

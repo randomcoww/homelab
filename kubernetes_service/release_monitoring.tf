@@ -55,6 +55,16 @@ resource "helm_release" "prometheus-blackbox" {
 
 # prometheus #
 
+module "prometheus-ca-secret" {
+  source  = "../modules/secret"
+  name    = local.kubernetes_services.prometheus.name
+  app     = local.kubernetes_services.prometheus.name
+  release = "0.1.0"
+  data = {
+    "ca-cert.pem" = data.terraform_remote_state.sr.outputs.trust.ca.cert_pem
+  }
+}
+
 resource "helm_release" "prometheus" {
   name             = local.kubernetes_services.prometheus.name
   namespace        = local.kubernetes_services.prometheus.namespace
@@ -92,14 +102,33 @@ resource "helm_release" "prometheus" {
             local.ingress_tls_common,
           ]
         }
+        extraVolumeMounts = [
+          {
+            name      = "config"
+            mountPath = "/etc/prometheus/certs/ca-cert.pem"
+            subPath   = "ca-cert.pem"
+          },
+        ]
+        extraVolumes = [
+          {
+            name = "config"
+            secret = {
+              secretName = module.prometheus-ca-secret.name
+            }
+          },
+        ]
       }
+      extraManifests = [
+        module.prometheus-ca-secret.manifest,
+      ]
       extraScrapeConfigs = yamlencode([
         {
           job_name     = "minio-job"
           metrics_path = "/minio/v2/metrics/cluster"
           scheme       = "https"
           tls_config = {
-            insecure_skip_verify = true
+            insecure_skip_verify = false
+            ca_file              = "/etc/prometheus/certs/ca-cert.pem"
           }
           static_configs = [
             {

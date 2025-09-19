@@ -122,7 +122,7 @@ locals {
     ipxe_tftp   = "ghcr.io/randomcoww/ipxe-tftp:v20250910.2324"
     mountpoint  = "ghcr.io/randomcoww/mountpoint-s3:v1.19.0.20250901.2309"
     matchbox    = "quay.io/poseidon/matchbox:v0.11.0"
-    nginx       = "docker.io/nginx:1.29-alpine-slim"
+    nginx       = "docker.io/nginxinc/nginx-unprivileged:1.29.1-alpine"
     # services
     hostapd               = "registry.default/randomcoww/hostapd-noscan:v2.11.20250918.1928"
     tailscale             = "registry.default/randomcoww/tailscale-nft:v1.88.2.20250918.1947"
