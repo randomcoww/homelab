@@ -115,8 +115,8 @@ resource "helm_release" "minio" {
   repository       = "https://charts.min.io/"
   chart            = "minio"
   create_namespace = true
-  wait             = false
-  wait_for_jobs    = false
+  wait             = true
+  wait_for_jobs    = true
   version          = "5.4.0"
   max_history      = 2
   values = [
