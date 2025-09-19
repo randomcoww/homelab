@@ -99,7 +99,7 @@ resource "helm_release" "nvidia-gpu-oprerator" {
   chart            = "gpu-operator"
   wait             = false
   wait_for_jobs    = false
-  version          = "v25.3.3"
+  version          = "v25.3.4"
   max_history      = 2
   values = [
     yamlencode({
