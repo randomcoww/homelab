@@ -119,8 +119,7 @@ locals {
     # tier 2
     kea         = "ghcr.io/randomcoww/kea:v3.1.0.20250901.2312"
     stork_agent = "ghcr.io/randomcoww/stork-agent:v2.3.0.20250911.0103"
-    ipxe        = "ghcr.io/randomcoww/ipxe:v20250910.2324"
-    ipxe_tftp   = "ghcr.io/randomcoww/ipxe-tftp:v20250910.2324"
+    ipxe        = "ghcr.io/randomcoww/ipxe:v20250921.0654"
     mountpoint  = "ghcr.io/randomcoww/mountpoint-s3:v1.20.0.20250921.0429"
     matchbox    = "quay.io/poseidon/matchbox:v0.11.0"
     nginx       = "docker.io/nginxinc/nginx-unprivileged:1.29.1-alpine"
@@ -154,7 +153,7 @@ locals {
     kea_peer           = 50060
     kea_metrics        = 58087
     kea_ctrl_agent     = 58088
-    ipxe_tftp          = 69
+    ipxe_tftp          = 69 # required
     ipxe               = 58090
     apiserver          = 58181
     apiserver_backend  = 58081
@@ -166,7 +165,7 @@ locals {
     etcd_peer          = 58083
     etcd_metrics       = 58086
     flannel_healthz    = 58084
-    bgp                = 179
+    bgp                = 179 # required
     kube_vip_metrics   = 58089
   }
 
@@ -179,6 +178,7 @@ locals {
     prometheus_blackbox = 9115
     llama_cpp           = 80
     searxng             = 8080
+    registry            = 443 # required
   }
 
   ha = {

@@ -12,7 +12,6 @@ module "kea" {
   images = {
     kea         = local.container_images.kea
     ipxe        = local.container_images.ipxe
-    ipxe_tftp   = local.container_images.ipxe_tftp
     stork_agent = local.container_images.stork_agent
   }
   service_ips = [

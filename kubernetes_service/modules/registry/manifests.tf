@@ -4,7 +4,6 @@ locals {
   ca_cert_path    = "/etc/registry/ca-cert.pem"
   cert_path       = "/etc/registry/cert.pem"
   key_path        = "/etc/registry/key.pem"
-  registry_port   = 443
 }
 
 module "metadata" {
@@ -126,7 +125,7 @@ module "secret" {
     basename(local.config_path) = yamlencode({
       version = "0.1"
       http = {
-        addr   = "0.0.0.0:${local.registry_port}"
+        addr   = "0.0.0.0:${var.ports.registry}"
         prefix = "/"
         tls = {
           certificate = local.cert_path
@@ -176,9 +175,9 @@ module "service" {
     ports = [
       {
         name       = "${var.name}-${var.namespace}"
-        port       = local.registry_port
+        port       = var.ports.registry
         protocol   = "TCP"
-        targetPort = local.registry_port
+        targetPort = var.ports.registry
       },
     ]
   }
@@ -222,7 +221,7 @@ module "deployment" {
         ]
         ports = [
           {
-            containerPort = local.registry_port
+            containerPort = var.ports.registry
           },
         ]
         volumeMounts = [
@@ -254,14 +253,14 @@ module "deployment" {
         ]
         readinessProbe = {
           httpGet = {
-            port   = local.registry_port
+            port   = var.ports.registry
             path   = "/"
             scheme = "HTTPS"
           }
         }
         livenessProbe = {
           httpGet = {
-            port   = local.registry_port
+            port   = var.ports.registry
             path   = "/"
             scheme = "HTTPS"
           }

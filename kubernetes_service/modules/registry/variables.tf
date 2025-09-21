@@ -21,6 +21,12 @@ variable "images" {
   })
 }
 
+variable "ports" {
+  type = object({
+    registry = number
+  })
+}
+
 variable "replicas" {
   type    = number
   default = 1

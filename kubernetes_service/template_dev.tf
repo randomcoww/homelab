@@ -43,6 +43,9 @@ module "registry" {
   images = {
     registry = local.container_images.registry
   }
+  ports = {
+    registry = local.service_ports.registry
+  }
   ca                      = data.terraform_remote_state.sr.outputs.trust.ca
   service_ip              = local.services.registry.ip
   loadbalancer_class_name = "kube-vip.io/kube-vip-class"

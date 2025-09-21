@@ -15,7 +15,6 @@ variable "images" {
   type = object({
     kea         = string
     ipxe        = string
-    ipxe_tftp   = string
     stork_agent = string
   })
 }

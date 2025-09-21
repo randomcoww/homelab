@@ -278,8 +278,7 @@ module "statefulset" {
     minReadySeconds = 30
   }
   template_spec = {
-    # stork agent looks for kea-ctrl-agent process
-    shareProcessNamespace = true
+    shareProcessNamespace = true # stork agent looks for kea-ctrl-agent process
     hostNetwork           = true
     dnsPolicy             = "ClusterFirstWithHostNet"
     containers = [
@@ -441,12 +440,20 @@ module "statefulset" {
       # TODO: migrate fully to HTTP boot and remove TFTP
       {
         name  = "${var.name}-ipxe-tftp"
-        image = var.images.ipxe_tftp
-        args = [
-          "--address",
-          "0.0.0.0:${var.ports.ipxe_tftp}",
+        image = var.images.ipxe
+        command = [
+          "udpsvd",
+          "-vE",
+          "0.0.0.0",
+          tostring(var.ports.ipxe_tftp),
+          "tftpd",
+          "-r",
+          "-u",
+          "www-data",
+          "/var/www",
         ]
         securityContext = {
+          runAsUser = 0 # needed to bind to port 69
           capabilities = {
             add = [
               "SYS_CHROOT",
