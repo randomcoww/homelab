@@ -11,7 +11,7 @@ jobs:
   renovate:
     runs-on: arc-runner-${{ github.event.repository.name }}
     container:
-      image: registry.default/randomcoww/renovate:v41.116.5.20250917.2347
+      image: registry.default/randomcoww/renovate:v41.116.5.20250917.2347@sha256:3b60cfe3d51385cbd745dc0808bc61a3bd8b6d24a9d9815f4ce03362bedeca73
     permissions:
       contents: write
       pull-requests: write
