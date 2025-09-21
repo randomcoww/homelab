@@ -4,8 +4,7 @@
       "customType": "regex",
       "fileMatch": [
         "^config_env.tf$",
-        "^README.md$",
-        "^.github\/workflows\/.+$"
+        "^README.md$"
       ],
       "matchStrings": [
         "(?<depName>[a-z0-9.-]+(:\\d+|)\/[a-z0-9-]+(?:\/[a-z0-9-]+|)):(?<currentValue>[\\w.-]{1,127})(@(?<currentDigest>sha256:[a-f0-9]+))?"
