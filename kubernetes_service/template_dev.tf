@@ -449,6 +449,7 @@ module "code-server" {
   minio_bucket            = minio_s3_bucket.code.id
   minio_access_key_id     = minio_iam_user.code.id
   minio_secret_access_key = minio_iam_user.code.secret
+  minio_ca_cert           = data.terraform_remote_state.sr.outputs.trust.ca.cert_pem
 
   depends_on = [
     minio_iam_user.code,

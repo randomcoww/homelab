@@ -58,3 +58,7 @@ variable "litestream_config" {
 variable "sqlite_path" {
   type = string
 }
+
+variable "s3_ca_cert" {
+  type = string
+}

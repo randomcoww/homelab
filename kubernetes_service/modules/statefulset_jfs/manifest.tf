@@ -55,6 +55,7 @@ module "litestream" {
     ]
   }
   sqlite_path = "${local.jfs_cache_path}/jfs.db"
+  s3_ca_cert  = var.minio_ca_cert
   ##
   name        = var.name
   app         = var.app

@@ -104,6 +104,7 @@ module "litestream" {
     ]
   }
   sqlite_path = local.db_path
+  s3_ca_cert  = var.minio_ca_cert
   ##
   name      = var.name
   namespace = var.namespace

@@ -1,5 +1,6 @@
 locals {
   config_path = "/etc/litestream.yml"
+  s3_ca_path  = "/var/lib/litestream/minio-ca-cert.pem"
 }
 
 module "metadata" {
@@ -20,6 +21,7 @@ module "secret" {
   release = var.release
   data = {
     basename(local.config_path) = yamlencode(var.litestream_config)
+    basename(local.s3_ca_path)  = var.s3_ca_cert
   }
 }
 
@@ -57,12 +59,21 @@ module "statefulset" {
               }
             }
           },
+          {
+            name  = "AWS_CA_BUNDLE"
+            value = local.s3_ca_path
+          },
         ]
         volumeMounts = [
           {
             name      = "litestream-config"
             mountPath = local.config_path
             subPath   = basename(local.config_path)
+          },
+          {
+            name      = "litestream-config"
+            mountPath = local.s3_ca_path
+            subPath   = basename(local.s3_ca_path)
           },
           {
             name      = "litestream-data"
@@ -88,12 +99,21 @@ module "statefulset" {
               }
             }
           },
+          {
+            name  = "AWS_CA_BUNDLE"
+            value = local.s3_ca_path
+          },
         ]
         volumeMounts = [
           {
             name      = "litestream-config"
             mountPath = local.config_path
             subPath   = basename(local.config_path)
+          },
+          {
+            name      = "litestream-config"
+            mountPath = local.s3_ca_path
+            subPath   = basename(local.s3_ca_path)
           },
           {
             name      = "litestream-data"

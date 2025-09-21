@@ -132,7 +132,7 @@ locals {
     audioserve            = "docker.io/izderadicka/audioserve:unstable"
     llama_cpp             = "ghcr.io/mostlygeek/llama-swap:v160-cuda-b6517"
     sunshine_desktop      = "registry.default/randomcoww/sunshine-desktop:v20250917.0509"
-    litestream            = "registry.default/randomcoww/litestream:v0.3.13.20250918.0850"
+    litestream            = "docker.io/litestream/litestream:0.3.13"
     vaultwarden           = "docker.io/vaultwarden/server:1.34.3-alpine"
     juicefs               = "registry.default/randomcoww/juicefs:v1.3.0.20250918.0850"
     code_server           = "registry.default/randomcoww/code-server:v1.103.1.20250920.2248"

@@ -75,6 +75,7 @@ module "jfs" {
   minio_jfs_prefix        = "jfs"
   minio_access_key_id     = var.minio_access_key_id
   minio_secret_access_key = var.minio_secret_access_key
+  minio_ca_cert           = var.minio_ca_cert
   jfs_mount_path          = local.jfs_mount_path
   jfs_capacity_gb         = 80
   images = {

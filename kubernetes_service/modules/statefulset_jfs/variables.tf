@@ -86,3 +86,7 @@ variable "minio_access_key_id" {
 variable "minio_secret_access_key" {
   type = string
 }
+
+variable "minio_ca_cert" {
+  type = string
+}

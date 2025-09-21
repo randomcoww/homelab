@@ -70,4 +70,5 @@ module "vaultwarden" {
   minio_litestream_prefix = "$POD_NAME/litestream"
   minio_access_key_id     = minio_iam_user.vaultwarden.id
   minio_secret_access_key = minio_iam_user.vaultwarden.secret
+  minio_ca_cert           = data.terraform_remote_state.sr.outputs.trust.ca.cert_pem
 }
