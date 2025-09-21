@@ -78,6 +78,10 @@ resource "helm_release" "prometheus" {
   values = [
     yamlencode({
       server = {
+        podDisruptionBudget = {
+          enabled        = true
+          maxUnavailable = "50%"
+        }
         persistentVolume = {
           enabled = false
         }
@@ -117,9 +121,6 @@ resource "helm_release" "prometheus" {
             }
           },
         ]
-      }
-      deploymentUpdate = {
-        maxUnavailable = "50%"
       }
       extraManifests = [
         module.prometheus-ca-secret.manifest,
