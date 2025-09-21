@@ -118,13 +118,16 @@ resource "helm_release" "prometheus" {
           },
         ]
       }
+      deploymentUpdate = {
+        maxUnavailable = "50%"
+      }
       extraManifests = [
         module.prometheus-ca-secret.manifest,
       ]
       extraScrapeConfigs = yamlencode([
         {
-          job_name     = "minio-job"
-          metrics_path = "/minio/v2/metrics/cluster"
+          job_name     = "minio-cluster"
+          metrics_path = "/minio/metrics/v3/cluster"
           scheme       = "https"
           tls_config = {
             insecure_skip_verify = false
