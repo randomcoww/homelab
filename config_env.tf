@@ -104,13 +104,13 @@ locals {
   # these fields are updated by renovate - don't use var substitutions
   container_images = {
     # static pod
-    kube_apiserver          = "ghcr.io/randomcoww/kubernetes:v1.34.1.20250910.2347"
-    kube_controller_manager = "ghcr.io/randomcoww/kubernetes:v1.34.1.20250910.2347"
-    kube_scheduler          = "ghcr.io/randomcoww/kubernetes:v1.34.1.20250910.2347"
+    kube_apiserver          = "ghcr.io/randomcoww/kubernetes-control-plane:v1.34.1"
+    kube_controller_manager = "ghcr.io/randomcoww/kubernetes-control-plane:v1.34.1"
+    kube_scheduler          = "ghcr.io/randomcoww/kubernetes-control-plane:v1.34.1"
     etcd_wrapper            = "ghcr.io/randomcoww/etcd-wrapper:v0.4.3"
     etcd                    = "gcr.io/etcd-development/etcd:v3.6.5"
     # tier 1
-    kube_proxy         = "ghcr.io/randomcoww/kubernetes-kube-proxy:v1.34.1.20250910.2347"
+    kube_proxy         = "ghcr.io/randomcoww/kubernetes-kube-proxy:v1.34.1.20250921.0744"
     kapprover          = "ghcr.io/randomcoww/kapprover:v0.1.0"
     flannel            = "docker.io/flannel/flannel:v0.27.3"
     flannel_cni_plugin = "docker.io/flannel/flannel-cni-plugin:v1.7.1-flannel1"
