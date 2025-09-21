@@ -60,7 +60,13 @@
       "matchDatasources": [
         "docker"
       ],
-      "pinDigests": true
+      "matchPackageNames": [
+        "ghcr.io/squat/generic-device-plugin",
+        "docker.io/izderadicka/audioserve"
+      ],
+      "pinDigests": true,
+      "automerge": true,
+      "ignoreTests": true
     },
     {
       "matchUpdateTypes": [
