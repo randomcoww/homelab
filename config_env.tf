@@ -142,7 +142,6 @@ locals {
     nvidia_driver         = "registry.default/randomcoww/nvidia-driver-container:v580.82.09.20250921.0120-fedora42"
     github_actions_runner = "ghcr.io/actions/actions-runner:2.328.0"
     registry              = "ghcr.io/distribution/distribution:3.0.0"
-    renovate              = "registry.default/randomcoww/renovate:v41.122.3.20250921.2254@sha256:d6fa46a48536049bda7c990ce74591f886512bb543139d1dc2245d7078a33d2d"
   }
 
   # these fields are updated by renovate - don't use var substitutions
