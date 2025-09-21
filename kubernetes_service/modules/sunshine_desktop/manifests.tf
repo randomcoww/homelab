@@ -169,6 +169,8 @@ module "statefulset" {
           "-c",
           <<EOF
           set -e
+          echo "Found driver $(nvidia-smi --query-gpu=driver_version --format=csv,noheader --id=0)"
+
           update-ca-trust
 
           ## User ##
