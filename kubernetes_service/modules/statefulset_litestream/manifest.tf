@@ -1,6 +1,6 @@
 locals {
-  config_path = "/etc/litestream.yml"
-  s3_ca_path  = "/var/lib/litestream/minio-ca-cert.pem"
+  config_path = "/var/lib/litestream/config.yml"
+  s3_ca_path  = "/var/lib/litestream/s3-ca-cert.pem"
 }
 
 module "metadata" {

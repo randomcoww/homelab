@@ -209,12 +209,6 @@ module "litestream" {
       #   name     = "litestream-data"
       #   emptyDir = {}
       # },
-      {
-        name = "secret"
-        secret = {
-          secretName = module.secret.name
-        }
-      },
     ])
   })
 }

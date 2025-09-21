@@ -120,7 +120,7 @@ locals {
     stork_agent = "ghcr.io/randomcoww/stork-agent:v2.3.0.20250911.0103"
     ipxe        = "ghcr.io/randomcoww/ipxe:v20250910.2324"
     ipxe_tftp   = "ghcr.io/randomcoww/ipxe-tftp:v20250910.2324"
-    mountpoint  = "ghcr.io/randomcoww/mountpoint-s3:v1.19.0.20250901.2309"
+    mountpoint  = "ghcr.io/randomcoww/mountpoint-s3:v1.20.0.20250921.0429"
     matchbox    = "quay.io/poseidon/matchbox:v0.11.0"
     nginx       = "docker.io/nginxinc/nginx-unprivileged:1.29.1-alpine"
     # tier 3
@@ -134,7 +134,7 @@ locals {
     sunshine_desktop      = "registry.default/randomcoww/sunshine-desktop:v20250917.0509"
     litestream            = "docker.io/litestream/litestream:0.3.13"
     vaultwarden           = "docker.io/vaultwarden/server:1.34.3-alpine"
-    juicefs               = "registry.default/randomcoww/juicefs:v1.3.0.20250921.0218"
+    juicefs               = "registry.default/randomcoww/juicefs:v1.3.0.20250921.0410"
     code_server           = "registry.default/randomcoww/code-server:v1.103.1.20250920.2248"
     flowise               = "docker.io/flowiseai/flowise:3.0.7"
     searxng               = "docker.io/searxng/searxng:2025.9.20-57ef342"
