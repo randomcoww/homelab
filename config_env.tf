@@ -103,18 +103,19 @@ locals {
 
   # these fields are updated by renovate - don't use var substitutions
   container_images = {
-    # tier 1
+    # static pod
     kube_apiserver          = "ghcr.io/randomcoww/kubernetes:v1.34.1.20250910.2347"
     kube_controller_manager = "ghcr.io/randomcoww/kubernetes:v1.34.1.20250910.2347"
     kube_scheduler          = "ghcr.io/randomcoww/kubernetes:v1.34.1.20250910.2347"
-    kube_proxy              = "ghcr.io/randomcoww/kubernetes-kube-proxy:v1.34.1.20250910.2347"
     etcd_wrapper            = "ghcr.io/randomcoww/etcd-wrapper:v0.4.3"
-    kapprover               = "ghcr.io/randomcoww/kapprover:v0.1.0"
     etcd                    = "gcr.io/etcd-development/etcd:v3.6.5"
-    flannel                 = "docker.io/flannel/flannel:v0.27.3"
-    flannel_cni_plugin      = "docker.io/flannel/flannel-cni-plugin:v1.7.1-flannel1"
-    kube_vip                = "ghcr.io/kube-vip/kube-vip:v1.0.0"
-    external_dns            = "registry.k8s.io/external-dns/external-dns:v0.19.0"
+    # tier 1
+    kube_proxy         = "ghcr.io/randomcoww/kubernetes-kube-proxy:v1.34.1.20250910.2347"
+    kapprover          = "ghcr.io/randomcoww/kapprover:v0.1.0"
+    flannel            = "docker.io/flannel/flannel:v0.27.3"
+    flannel_cni_plugin = "docker.io/flannel/flannel-cni-plugin:v1.7.1-flannel1"
+    kube_vip           = "ghcr.io/kube-vip/kube-vip:v1.0.0"
+    external_dns       = "registry.k8s.io/external-dns/external-dns:v0.19.0"
     # tier 2
     kea         = "ghcr.io/randomcoww/kea:v3.1.0.20250901.2312"
     stork_agent = "ghcr.io/randomcoww/stork-agent:v2.3.0.20250911.0103"
