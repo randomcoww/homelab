@@ -92,7 +92,15 @@ resource "helm_release" "prometheus" {
           servicePort = local.service_ports.prometheus
         }
         ingress = {
-          enabled = false
+          enabled          = true
+          ingressClassName = local.kubernetes.ingress_classes.ingress_nginx
+          annotations      = local.nginx_ingress_annotations
+          hosts = [
+            local.ingress_endpoints.monitoring,
+          ]
+          tls = [
+            local.ingress_tls_common,
+          ]
         }
         extraVolumeMounts = [
           {
