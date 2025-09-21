@@ -304,7 +304,6 @@ locals {
       webdav_videos   = "videos"
       sunshine_admin  = "sunadmin"
       audioserve      = "audioserve"
-      monitoring      = "m"
       vaultwarden     = "vw"
       flowise         = "flowise"
       llama_cpp       = "llm"
