@@ -131,7 +131,7 @@ locals {
     device_plugin         = "ghcr.io/squat/generic-device-plugin:latest"
     rclone                = "docker.io/rclone/rclone:1.71.0"
     audioserve            = "docker.io/izderadicka/audioserve:unstable"
-    llama_cpp             = "ghcr.io/mostlygeek/llama-swap:v160-cuda-b6517"
+    llama_cpp             = "ghcr.io/mostlygeek/llama-swap:v160-cuda-b6527"
     sunshine_desktop      = "registry.default/randomcoww/sunshine-desktop:v20250917.0509"
     litestream            = "docker.io/litestream/litestream:0.3.13"
     vaultwarden           = "docker.io/vaultwarden/server:1.34.3-alpine"
