@@ -126,7 +126,7 @@ locals {
     # tier 3
     hostapd               = "registry.default/randomcoww/hostapd-noscan:v2.11.20250918.1928"
     tailscale             = "registry.default/randomcoww/tailscale-nft:v1.88.2.20250918.1947"
-    qrcode_generator      = "registry.default/randomcoww/qrcode-generator:v0.1.1"
+    qrcode_generator      = "registry.default/randomcoww/qrcode-generator:v0.1.2"
     device_plugin         = "ghcr.io/squat/generic-device-plugin:latest"
     rclone                = "docker.io/rclone/rclone:1.71.0"
     audioserve            = "docker.io/izderadicka/audioserve:unstable"

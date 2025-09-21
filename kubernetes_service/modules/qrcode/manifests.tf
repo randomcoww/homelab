@@ -1,6 +1,6 @@
 locals {
-  qrcode_port = 80
-  index_path  = "/usr/share/nginx/html/index.html"
+  qrcode_port = 8080
+  index_path  = "/var/www/index.html"
 }
 
 module "secret" {
@@ -132,6 +132,10 @@ module "deployment" {
       {
         name  = var.name
         image = var.images.qrcode
+        args = [
+          "-p",
+          "0.0.0.0:${local.qrcode_port}",
+        ]
         ports = [
           {
             containerPort = local.qrcode_port
