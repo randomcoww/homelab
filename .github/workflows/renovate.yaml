@@ -11,7 +11,7 @@ jobs:
   renovate:
     runs-on: arc-runner-${{ github.event.repository.name }}
     container:
-      image: registry.default/randomcoww/renovate:latest
+      image: ghcr.io/renovatebot/renovate:latest
     permissions:
       contents: write
       pull-requests: write
@@ -23,7 +23,13 @@ jobs:
         RENOVATE_AUTODISCOVER: false
         RENOVATE_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         RENOVATE_CONFIG_FILE: /tmp/renovate.json
+        SSL_CERT_FILE: /etc/ssl/certs/ca-certificates.crt
       run: |
+        set -e
+        mkdir -p /usr/local/share/ca-certificates/
+        echo -e "$INTERNAL_CA_CERT" > /usr/local/share/ca-certificates/ca.crt
+        update-ca-certificates
+
         cat > $RENOVATE_CONFIG_FILE <<EOF
         {
           "repositories": [
