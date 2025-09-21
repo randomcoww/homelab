@@ -211,7 +211,7 @@ resource "helm_release" "arc-runner-set" {
           storageClassName = "local-path"
           resources = {
             requests = {
-              storage = "2Gi"
+              storage = "16Gi"
             }
           }
         }

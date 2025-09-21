@@ -103,7 +103,7 @@ locals {
 
   # these fields are updated by renovate - don't use var substitutions
   container_images = {
-    # kube-system
+    # tier 1
     kube_apiserver          = "ghcr.io/randomcoww/kubernetes:v1.34.1.20250910.2347"
     kube_controller_manager = "ghcr.io/randomcoww/kubernetes:v1.34.1.20250910.2347"
     kube_scheduler          = "ghcr.io/randomcoww/kubernetes:v1.34.1.20250910.2347"
@@ -115,7 +115,7 @@ locals {
     flannel_cni_plugin      = "docker.io/flannel/flannel-cni-plugin:v1.7.1-flannel1"
     kube_vip                = "ghcr.io/kube-vip/kube-vip:v1.0.0"
     external_dns            = "registry.k8s.io/external-dns/external-dns:v0.19.0"
-    # network boot dependencies
+    # tier 2
     kea         = "ghcr.io/randomcoww/kea:v3.1.0.20250901.2312"
     stork_agent = "ghcr.io/randomcoww/stork-agent:v2.3.0.20250911.0103"
     ipxe        = "ghcr.io/randomcoww/ipxe:v20250910.2324"
@@ -123,14 +123,14 @@ locals {
     mountpoint  = "ghcr.io/randomcoww/mountpoint-s3:v1.19.0.20250901.2309"
     matchbox    = "quay.io/poseidon/matchbox:v0.11.0"
     nginx       = "docker.io/nginxinc/nginx-unprivileged:1.29.1-alpine"
-    # services
+    # tier 3
     hostapd               = "registry.default/randomcoww/hostapd-noscan:v2.11.20250918.1928"
     tailscale             = "registry.default/randomcoww/tailscale-nft:v1.88.2.20250918.1947"
     qrcode_generator      = "registry.default/randomcoww/qrcode-generator:v0.1.1"
     device_plugin         = "ghcr.io/squat/generic-device-plugin:latest"
     rclone                = "docker.io/rclone/rclone:1.71.0"
-    audioserve            = "registry.default/randomcoww/audioserve:v20250918.0850"
-    llama_cpp             = "registry.default/randomcoww/llama-cpp-server-cuda:v20250920.2240"
+    audioserve            = "docker.io/izderadicka/audioserve:unstable"
+    llama_cpp             = "ghcr.io/mostlygeek/llama-swap:v160-cuda-b6517"
     sunshine_desktop      = "registry.default/randomcoww/sunshine-desktop:v20250917.0509"
     litestream            = "registry.default/randomcoww/litestream:v0.3.13.20250918.0850"
     vaultwarden           = "docker.io/vaultwarden/server:1.34.3-alpine"

@@ -105,7 +105,7 @@ module "mountpoint" {
           done
           ln -sf "${local.model_path}" /models
 
-          exec /tini -- /app/llama-swap \
+          exec /app/llama-swap \
             --config ${local.config_path} \
             --listen 0.0.0.0:${var.ports.llama_cpp}
           EOF
