@@ -54,13 +54,12 @@ locals {
           clusterDNS = [
             var.cluster_dns_ip,
           ]
-          imageGCHighThresholdPercent = 1
-          imageGCLowThresholdPercent  = 0
-          imageMinimumGCAge           = "1h"
-          resolvConf                  = "/run/systemd/resolve/resolv.conf"
-          runtimeRequestTimeout       = "15m"
-          rotateCertificates          = true
-          serverTLSBootstrap          = true
+          imageMinimumGCAge     = "4h"
+          imageMaximumGCAge     = "24h"
+          resolvConf            = "/run/systemd/resolve/resolv.conf"
+          runtimeRequestTimeout = "15m"
+          rotateCertificates    = true
+          serverTLSBootstrap    = true
           shutdownGracePeriodByPodPriority = [
             {
               priority                   = 0
