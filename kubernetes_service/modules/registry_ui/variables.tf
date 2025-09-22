@@ -29,6 +29,10 @@ variable "registry_url" {
   type = string
 }
 
+variable "timezone" {
+  type = string
+}
+
 variable "event_listener_token" {
   type = string
 }

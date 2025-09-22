@@ -1,5 +1,4 @@
 locals {
-  db_path          = "/opt/data/db.sqlite3" # required
   config_path      = "/opt/config.yml"
   registry_ui_port = 8080
 }
@@ -47,7 +46,7 @@ module "secret" {
         bearer_token      = var.event_listener_token
         retention_days    = 1
         database_driver   = "sqlite3"
-        database_location = local.db_path
+        database_location = "data/registry_events.db"
         deletion_enabled  = true
       }
     })
@@ -108,9 +107,19 @@ module "deployment" {
       {
         name  = var.name
         image = var.images.registry_ui
+        args = [
+          "-config-file",
+          local.config_path,
+        ]
         ports = [
           {
             containerPort = local.registry_ui_port
+          },
+        ]
+        env = [
+          {
+            name  = "TZ"
+            value = var.timezone
           },
         ]
         volumeMounts = [

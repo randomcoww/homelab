@@ -80,6 +80,7 @@ module "registry-ui" {
   }
   registry_url              = "${local.kubernetes_services.registry.endpoint}:${local.service_ports.registry}"
   service_hostname          = local.ingress_endpoints.registry_ui
+  timezone                  = local.timezone
   event_listener_token      = random_password.event-listener-token.result
   ingress_class_name        = local.kubernetes.ingress_classes.ingress_nginx
   nginx_ingress_annotations = local.nginx_ingress_annotations
