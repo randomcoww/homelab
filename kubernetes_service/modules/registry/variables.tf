@@ -49,6 +49,14 @@ variable "ca" {
   })
 }
 
+variable "event_listener_token" {
+  type = string
+}
+
+variable "event_listener_url" {
+  type = string
+}
+
 variable "resources" {
   type    = any
   default = {}

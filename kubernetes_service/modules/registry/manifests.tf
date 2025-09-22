@@ -1,9 +1,9 @@
 locals {
-  config_path     = "/etc/registry/config.yml"
+  config_path     = "/var/lib/registry/config.yml"
   trusted_ca_path = "/usr/local/share/ca-certificates/ca-cert.pem"
-  ca_cert_path    = "/etc/registry/ca-cert.pem"
-  cert_path       = "/etc/registry/cert.pem"
-  key_path        = "/etc/registry/key.pem"
+  ca_cert_path    = "/var/lib/registry/ca-cert.pem"
+  cert_path       = "/var/lib/registry/cert.pem"
+  key_path        = "/var/lib/registry/key.pem"
 }
 
 module "metadata" {
@@ -158,6 +158,29 @@ module "secret" {
         storagedriver = {
           enabled = true
         }
+      }
+      notifications = {
+        events = {
+          includereferences = true
+        }
+        endpoints = [
+          {
+            disabled = false
+            name     = "registry-ui"
+            url      = var.event_listener_url
+            headers = {
+              Authorization = [
+                "Bearer ${var.event_listener_token}",
+              ]
+            }
+            timeout   = "1s"
+            threshold = 5
+            backoff   = "10s"
+            ignoredmediatypes = [
+              "application/octet-stream",
+            ]
+          },
+        ]
       }
     })
   }

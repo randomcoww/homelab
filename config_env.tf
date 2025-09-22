@@ -142,6 +142,7 @@ locals {
     nvidia_driver         = "registry.default/randomcoww/nvidia-driver-container:v580.82.09.20250922.0711-fedora42"
     github_actions_runner = "ghcr.io/actions/actions-runner:2.328.0"
     registry              = "ghcr.io/distribution/distribution:3.0.0"
+    registry_ui           = "docker.io/quiq/registry-ui:0.10.4"
   }
 
   # these fields are updated by renovate - don't use var substitutions
@@ -309,6 +310,7 @@ locals {
       flowise         = "flowise"
       llama_cpp       = "llm"
       code_server     = "code"
+      registry_ui     = "reg"
     } :
     k => "${domain}.${local.domains.public}"
   }

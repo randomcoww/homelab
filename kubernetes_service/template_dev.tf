@@ -1,5 +1,10 @@
 ## internal registry
 
+resource "random_password" "event-listener-token" {
+  length  = 60
+  special = false
+}
+
 resource "minio_s3_bucket" "registry" {
   bucket        = "registry"
   force_destroy = true
@@ -49,6 +54,8 @@ module "registry" {
   ca                      = data.terraform_remote_state.sr.outputs.trust.ca
   service_ip              = local.services.registry.ip
   loadbalancer_class_name = "kube-vip.io/kube-vip-class"
+  event_listener_token    = random_password.event-listener-token.result
+  event_listener_url      = "https://${local.ingress_endpoints.registry_ui}/event-receiver"
 
   s3_endpoint          = "https://${local.services.cluster_minio.ip}:${local.service_ports.minio}"
   s3_bucket            = minio_s3_bucket.registry.id
@@ -61,6 +68,21 @@ module "registry" {
     minio_iam_policy.registry,
     minio_iam_user_policy_attachment.registry,
   ]
+}
+
+module "registry-ui" {
+  source    = "./modules/registry_ui"
+  name      = "registry-ui"
+  namespace = "default"
+  release   = "0.1.1"
+  images = {
+    registry_ui = local.container_images.registry_ui
+  }
+  registry_url              = "${local.kubernetes_services.registry.endpoint}:${local.service_ports.registry}"
+  service_hostname          = local.ingress_endpoints.registry_ui
+  event_listener_token      = random_password.event-listener-token.result
+  ingress_class_name        = local.kubernetes.ingress_classes.ingress_nginx
+  nginx_ingress_annotations = local.nginx_ingress_annotations
 }
 
 ## llama-cpp
