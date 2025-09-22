@@ -127,7 +127,7 @@ locals {
     hostapd               = "registry.default/randomcoww/hostapd-noscan:v2.11.20250918.1928"
     tailscale             = "registry.default/randomcoww/tailscale-nft:v1.88.2.20250918.1947"
     qrcode_generator      = "registry.default/randomcoww/qrcode-generator:v0.1.2"
-    device_plugin         = "ghcr.io/squat/generic-device-plugin:latest@sha256:e18ea28fb0f6d3db05b8b98fb0e5676dea20bdd5a9e6c67de0b3e7ebaf249f7c"
+    device_plugin         = "ghcr.io/squat/generic-device-plugin:latest@sha256:45787848aac84d6b8b592904614339fa82d7c0e422f3287d7f9913896ff3a3f7"
     rclone                = "docker.io/rclone/rclone:1.71.0"
     audioserve            = "docker.io/izderadicka/audioserve:unstable@sha256:045e824de95cfb8fbceb23a9a1f9e55df39cc3b55838fbaa480ed262c4f7c677"
     llama_cpp             = "ghcr.io/mostlygeek/llama-swap:v160-cuda-b6533"
