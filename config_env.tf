@@ -129,7 +129,7 @@ locals {
     qrcode_generator      = "registry.default/randomcoww/qrcode-generator:v0.1.2"
     device_plugin         = "ghcr.io/squat/generic-device-plugin:latest@sha256:e18ea28fb0f6d3db05b8b98fb0e5676dea20bdd5a9e6c67de0b3e7ebaf249f7c"
     rclone                = "docker.io/rclone/rclone:1.71.0"
-    audioserve            = "docker.io/izderadicka/audioserve:unstable@sha256:2d4c36f9c2256f0ece2410e23a2549e678c9fb2d3cb6aa710719f42ed2251dcd"
+    audioserve            = "docker.io/izderadicka/audioserve:unstable@sha256:045e824de95cfb8fbceb23a9a1f9e55df39cc3b55838fbaa480ed262c4f7c677"
     llama_cpp             = "ghcr.io/mostlygeek/llama-swap:v160-cuda-b6527"
     sunshine_desktop      = "registry.default/randomcoww/sunshine-desktop:v20250917.0509"
     litestream            = "docker.io/litestream/litestream:0.3.13"
