@@ -23,8 +23,6 @@ locals {
       cidr           = 24
       vlan_id        = 2048
       mtu            = local.default_mtu
-      enable_dns     = true
-      enable_mdns    = true
       table_id       = 220
       table_priority = 32760
       netnums = {
@@ -35,10 +33,11 @@ locals {
     }
     # BGP
     node = {
-      network = "192.168.200.0"
-      cidr    = 24
-      vlan_id = 60
-      mtu     = local.default_mtu
+      network     = "192.168.200.0"
+      cidr        = 24
+      vlan_id     = 60
+      mtu         = local.default_mtu
+      enable_mdns = true
     }
     # Kubernetes service external IP and LB
     service = {

@@ -53,7 +53,7 @@ storage:
       contents:
         inline:
           ${hostname}
-
+    # Use avahi and disable all resolved mdns
     - path: /etc/systemd/resolved.conf.d/10-base.conf
       mode: 0644
       contents:
