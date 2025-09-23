@@ -1,9 +1,5 @@
 # Github actions runner #
 
-locals {
-  arc_mc_config_dir = "/minio"
-}
-
 resource "minio_iam_user" "arc" {
   name          = "arc"
   force_destroy = true
@@ -82,18 +78,9 @@ resource "helm_release" "arc-runner-hook-template" {
             name = "workflow-template"
           }
           stringData = {
-            INTERNAL_CA_CERT = data.terraform_remote_state.sr.outputs.trust.ca.cert_pem
-            minio_config = jsonencode({
-              aliases = {
-                arc = {
-                  url       = "https://${local.services.cluster_minio.ip}:${local.service_ports.minio}"
-                  accessKey = minio_iam_user.arc.id
-                  secretKey = minio_iam_user.arc.secret
-                  api       = "S3v4"
-                  path      = "auto"
-                }
-              }
-            })
+            INTERNAL_CA_CERT                   = data.terraform_remote_state.sr.outputs.trust.ca.cert_pem
+            "MC_HOST_${minio_iam_user.arc.id}" = "https://${minio_iam_user.arc.id}:${minio_iam_user.arc.secret}@${local.services.cluster_minio.ip}:${local.service_ports.minio}"
+
             "workflow-podspec.yaml" = yamlencode({
               spec = {
                 labels = {
@@ -128,39 +115,26 @@ resource "helm_release" "arc-runner-hook-template" {
                         }
                       },
                       {
+                        name = "MC_HOST_${minio_iam_user.arc.id}"
+                        valueFrom = {
+                          secretKeyRef = {
+                            name = "workflow-template"
+                            key  = "MC_HOST_${minio_iam_user.arc.id}"
+                          }
+                        }
+                      },
+                      {
+                        name  = "MC_ALIAS"
+                        value = minio_iam_user.arc.id
+                      },
+                      {
                         name  = "INTERNAL_REGISTRY"
-                        value = local.kubernetes_services.registry.endpoint
-                      },
-                      {
-                        name  = "MC_CONFIG_DIR"
-                        value = local.arc_mc_config_dir
-                      },
-                    ]
-                    volumeMounts = [
-                      {
-                        name      = "minio-path"
-                        mountPath = local.arc_mc_config_dir
-                      },
-                      {
-                        name      = "workflow-template"
-                        mountPath = "${local.arc_mc_config_dir}/certs/CAs/ca.crt"
-                        subPath   = "internal_ca_cert"
-                      },
-                      {
-                        name      = "workflow-template"
-                        mountPath = "${local.arc_mc_config_dir}/config.json"
-                        subPath   = "minio_config"
+                        value = "${local.kubernetes_services.registry.endpoint}:${local.service_ports.registry}"
                       },
                     ]
                   },
                 ]
                 volumes = [
-                  {
-                    name = "minio-path"
-                    emptyDir = {
-                      medium = "Memory"
-                    }
-                  },
                   {
                     name = "workflow-template"
                     secret = {
@@ -193,6 +167,7 @@ resource "helm_release" "arc-runner-set" {
   create_namespace = true
   wait             = false
   wait_for_jobs    = false
+  timeout          = 600
   version          = "0.12.1"
   max_history      = 2
   values = [

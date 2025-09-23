@@ -163,7 +163,7 @@ module "deployment" {
           path = "/etc/ssl/certs/ca-certificates.crt"
           type = "File"
         }
-      }
+      },
     ]
   }
 }
