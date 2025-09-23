@@ -29,6 +29,10 @@ variable "registry_url" {
   type = string
 }
 
+variable "registry_ca_cert" {
+  type = string
+}
+
 variable "timezone" {
   type = string
 }

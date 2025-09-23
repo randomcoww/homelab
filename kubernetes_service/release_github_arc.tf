@@ -238,9 +238,4 @@ resource "helm_release" "arc-runner-set" {
     helm_release.arc,
     helm_release.arc-runner-hook-template,
   ]
-  lifecycle {
-    replace_triggered_by = [
-      helm_release.arc,
-    ]
-  }
 }

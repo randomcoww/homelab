@@ -1,4 +1,6 @@
 locals {
+  trusted_ca_path  = "/usr/local/share/ca-certificates/ca-cert.pem"
+  cert_mount_path  = "/mnt/ssl/certs"
   config_path      = "/opt/config.yml"
   registry_ui_port = 8080
 }
@@ -23,6 +25,7 @@ module "secret" {
   app     = var.name
   release = var.release
   data = {
+    basename(local.trusted_ca_path) = var.registry_ca_cert
     # https://github.com/Quiq/registry-ui/blob/master/config.yml
     basename(local.config_path) = yamlencode({
       listen_addr   = "0.0.0.0:${local.registry_ui_port}"
@@ -103,6 +106,35 @@ module "deployment" {
     "checksum/secret" = sha256(module.secret.manifest)
   }
   template_spec = {
+    initContainers = [
+      {
+        name  = "${var.name}-certs"
+        image = var.images.registry_ui
+        command = [
+          "sh",
+          "-c",
+          <<-EOF
+          set -e
+          update-ca-certificates
+          cp /etc/ssl/certs/ca-certificates.crt /mnt/
+          EOF
+        ]
+        volumeMounts = [
+          {
+            name      = "config"
+            mountPath = local.trusted_ca_path
+            subPath   = basename(local.trusted_ca_path)
+          },
+          {
+            name      = "certs"
+            mountPath = "/mnt"
+          },
+        ]
+        securityContext = {
+          runAsUser = 0
+        }
+      },
+    ]
     containers = [
       {
         name  = var.name
@@ -131,6 +163,7 @@ module "deployment" {
           {
             name      = "certs"
             mountPath = "/etc/ssl/certs/ca-certificates.crt"
+            subPath   = "ca-certificates.crt"
             readOnly  = true
           },
         ]
@@ -159,11 +192,10 @@ module "deployment" {
       },
       {
         name = "certs"
-        hostPath = {
-          path = "/etc/ssl/certs/ca-certificates.crt"
-          type = "File"
+        emptyDir = {
+          medium = "Memory"
         }
-      },
+      }
     ]
   }
 }

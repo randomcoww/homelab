@@ -79,6 +79,7 @@ module "registry-ui" {
     registry_ui = local.container_images.registry_ui
   }
   registry_url              = "${local.kubernetes_services.registry.endpoint}:${local.service_ports.registry}"
+  registry_ca_cert          = data.terraform_remote_state.sr.outputs.trust.ca.cert_pem
   service_hostname          = local.ingress_endpoints.registry_ui
   timezone                  = local.timezone
   event_listener_token      = random_password.event-listener-token.result
