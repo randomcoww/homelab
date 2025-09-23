@@ -136,7 +136,7 @@ locals {
     juicefs               = "registry.default/randomcoww/juicefs:v1.3.0.20250922.2028"
     code_server           = "registry.default/randomcoww/code-server:v1.103.1.20250922.1930"
     flowise               = "docker.io/flowiseai/flowise:3.0.7"
-    searxng               = "docker.io/searxng/searxng:latest@sha256:79922308314943f997776cee4fe8a76b9983ab09b1abd713b7b2169ea5b30e1c"
+    searxng               = "docker.io/searxng/searxng:latest@sha256:d3704a384057ed95e8bf61556277af356d18f809b9f2350f9b99ecb2da75d427"
     valkey                = "docker.io/valkey/valkey:8.1.3-alpine"
     nvidia_driver         = "registry.default/randomcoww/nvidia-driver-container:v580.82.09.20250922.0711-fedora42"
     github_actions_runner = "ghcr.io/actions/actions-runner:2.328.0"
