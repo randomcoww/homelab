@@ -26,28 +26,6 @@
   "packageRules": [
     {
       "matchDatasources": [
-        "docker"
-      ],
-      "matchPackageNames": [
-        "ghcr.io/mostlygeek/llama-swap"
-      ],
-      "versioning": "regex:^v(?<minor>\\d+)-(?<compatibility>\\w+)-b(?<major>\\d+)$",
-      "automerge": true,
-      "ignoreTests": true
-    },
-    {
-      "matchDatasources": [
-        "docker"
-      ],
-      "matchPackageNames": [
-        "docker.io/searxng/searxng"
-      ],
-      "versioning": "regex:^(?<major>\\d+)?(.(?<minor>\\d+))?(.(?<patch>\\d+))?(-.*)?$",
-      "automerge": true,
-      "ignoreTests": true
-    },
-    {
-      "matchDatasources": [
         "github-tags"
       ],
       "matchPackageNames": [
