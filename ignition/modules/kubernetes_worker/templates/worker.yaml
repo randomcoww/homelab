@@ -108,6 +108,7 @@ storage:
 
           [crio.image]
           big_files_temporary_dir="${container_storage_path}"
+          pull_progress_timeout=0
 
           [crio.network]
           plugin_dirs=["/var/opt/cni/bin","${cni_bin_path}"]
