@@ -111,7 +111,7 @@ storage:
       mode: 0644
       contents:
         inline: |
-          net.ipv4.tcp_mtu_probing=1
+          net.ipv4.tcp_mtu_probing=2
     # sudoers #
     - path: /etc/sudoers.d/coreos-sudo-group
       overwrite: true
