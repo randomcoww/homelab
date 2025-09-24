@@ -118,14 +118,14 @@ locals {
     # tier 2
     kea         = "ghcr.io/randomcoww/kea:v3.1.0.20250924.2151"
     stork_agent = "ghcr.io/randomcoww/stork-agent:v2.3.0.20250924.2147"
-    ipxe        = "ghcr.io/randomcoww/ipxe:v20250924.2147"
+    ipxe        = "ghcr.io/randomcoww/ipxe:v1.20250924.2240"
     mountpoint  = "ghcr.io/randomcoww/mountpoint-s3:v1.20.0.20250924.2151"
     matchbox    = "quay.io/poseidon/matchbox:v0.11.0"
     nginx       = "docker.io/nginxinc/nginx-unprivileged:1.29.1-alpine"
     # tier 3
     hostapd               = "registry.default/randomcoww/hostapd-noscan:v2.11.20250924.2149"
-    tailscale             = "registry.default/randomcoww/tailscale-nft:v20250924.2206"
-    qrcode_generator      = "registry.default/randomcoww/qrcode-resource:v20250924.2151"
+    tailscale             = "registry.default/randomcoww/tailscale-nft:v1.20250924.2241"
+    qrcode_generator      = "registry.default/randomcoww/qrcode-resource:v1.20250924.2240"
     device_plugin         = "ghcr.io/squat/generic-device-plugin:latest@sha256:45787848aac84d6b8b592904614339fa82d7c0e422f3287d7f9913896ff3a3f7"
     rclone                = "docker.io/rclone/rclone:1.71.1"
     audioserve            = "docker.io/izderadicka/audioserve:latest@sha256:c3609321701765671cae121fc0f61db122e8c124643c04770fbc9326c74b18e3"
