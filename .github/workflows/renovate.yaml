@@ -20,7 +20,7 @@ jobs:
     - name: Check for updates
       env:
         RENOVATE_PLATFORM: github
-        RENOVATE_AUTODISCOVER: false
+        RENOVATE_AUTODISCOVER: true
         RENOVATE_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         RENOVATE_CONFIG_FILE: /tmp/renovate.json
       run: |
@@ -32,4 +32,4 @@ jobs:
         }
         EOF
 
-        renovate-entrypoint.sh renovate
+        exec renovate-entrypoint.sh renovate
