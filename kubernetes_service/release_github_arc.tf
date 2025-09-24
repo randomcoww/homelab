@@ -151,14 +151,12 @@ resource "helm_release" "arc-runner-hook-template" {
   ]
 }
 
-data "github_repositories" "builds" {
-  query = "user:${var.github.user} archived:false"
+data "github_repositories" "repos" {
+  query = "user:${var.github.user} archived:false fork:true"
 }
 
 resource "helm_release" "arc-runner-set" {
-  for_each = toset(concat(data.github_repositories.builds.names, [
-    "fedora-coreos-config",
-  ]))
+  for_each = toset(data.github_repositories.repos.names)
 
   name             = "arc-runner-${each.key}"
   repository       = "oci://ghcr.io/actions/actions-runner-controller-charts"
