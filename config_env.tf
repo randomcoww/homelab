@@ -119,7 +119,7 @@ locals {
     kea         = "ghcr.io/randomcoww/kea:v3.1.0.20250924.0001"
     stork_agent = "ghcr.io/randomcoww/stork-agent:v2.3.0.20250923.2301"
     ipxe        = "ghcr.io/randomcoww/ipxe:v20250921.0654"
-    mountpoint  = "ghcr.io/randomcoww/mountpoint-s3:v1.20.0.20250923.2314"
+    mountpoint  = "ghcr.io/randomcoww/mountpoint-s3:v1.20.0.20250924.0556"
     matchbox    = "quay.io/poseidon/matchbox:v0.11.0"
     nginx       = "docker.io/nginxinc/nginx-unprivileged:1.29.1-alpine"
     # tier 3
