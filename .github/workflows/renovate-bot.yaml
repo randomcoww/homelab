@@ -14,6 +14,7 @@ jobs:
       image: registry.default/randomcoww/renovate:latest
     permissions:
       contents: write
+      issues: write
       pull-requests: write
       security-events: read
     steps:

@@ -1,5 +1,8 @@
 {
   "$schema": "https://docs.renovatebot.com/renovate-schema.json",
+  "extends": [
+    "config:best-practices"
+  ],
   "customManagers": [
     {
       "customType": "regex",
@@ -10,8 +13,7 @@
       "matchStrings": [
         "(?<depName>[a-z0-9.-]+(:\\d+|)\/[a-z0-9-]+(?:\/[a-z0-9-]+|)):(?<currentValue>[\\w.-]{1,127})(@(?<currentDigest>sha256:[a-f0-9]+))?"
       ],
-      "datasourceTemplate": "docker",
-      "versioningTemplate": "docker"
+      "datasourceTemplate": "docker"
     },
     {
       "customType": "regex",
@@ -33,12 +35,6 @@
         "randomcoww/fedora-coreos-config"
       ],
       "versioning": "docker"
-    },
-    {
-      "matchDatasources": [
-        "docker"
-      ],
-      "pinDigests": true
     },
     {
       "matchUpdateTypes": [
