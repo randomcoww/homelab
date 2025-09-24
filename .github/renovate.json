@@ -48,7 +48,8 @@
         "digest"
       ],
       "automerge": true,
-      "ignoreTests": true
+      "ignoreTests": true,
+      "groupName": "minor-update"
     }
   ]
 }
