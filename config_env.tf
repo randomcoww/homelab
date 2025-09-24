@@ -138,7 +138,7 @@ locals {
     flowise               = "docker.io/flowiseai/flowise:3.0.7"
     searxng               = "docker.io/searxng/searxng:latest@sha256:d3704a384057ed95e8bf61556277af356d18f809b9f2350f9b99ecb2da75d427"
     valkey                = "docker.io/valkey/valkey:8.1.3-alpine"
-    nvidia_driver         = "registry.default/randomcoww/nvidia-driver-container:v580.82.09.20250922.0711-fedora42"
+    nvidia_driver         = "registry.default/randomcoww/nvidia-driver-container:v580.82.09.20250923.2257-fedora42"
     github_actions_runner = "ghcr.io/actions/actions-runner:2.328.0"
     registry              = "ghcr.io/distribution/distribution:3.0.0"
     registry_ui           = "docker.io/quiq/registry-ui:0.10.4"
