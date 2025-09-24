@@ -52,7 +52,7 @@ module "statefulset" {
             --allow-overwrite \
             --auto-unmount \
             --allow-other \
-            --no-log \
+            --maximum-throughput-gbps 1 \
             %{~if length(var.s3_prefix) > 0~}
             --prefix ${var.s3_prefix}/ \
             %{~endif~}
