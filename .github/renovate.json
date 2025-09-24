@@ -6,22 +6,22 @@
   "customManagers": [
     {
       "customType": "regex",
-      "fileMatch": [
-        "^config_env.tf$",
-        "^README.md$"
+      "managerFilePatterns": [
+        "/^config_env.tf$/",
+        "/^README.md$/"
       ],
       "matchStrings": [
-        "(?<depName>[a-z0-9.-]+(:\\d+|)\/[a-z0-9-]+(?:\/[a-z0-9-]+|)):(?<currentValue>[\\w.-]{1,127})(@(?<currentDigest>sha256:[a-f0-9]+))?"
+        "(?<depName>[a-z0-9.-]+(:\\d+|)/[a-z0-9-]+(?:/[a-z0-9-]+|)):(?<currentValue>[\\w.-]{1,127})(@(?<currentDigest>sha256:[a-f0-9]+))?"
       ],
       "datasourceTemplate": "docker"
     },
     {
       "customType": "regex",
-      "fileMatch": [
-        "^config_env.tf$"
+      "managerFilePatterns": [
+        "/^config_env.tf$/"
       ],
       "matchStrings": [
-        "pxeboot_images\\s*=\\s*{[^}]*\\s+\"[\\w-]+-(?<currentValue>[\\d.]+)\"\\s+#\\s+(?<depName>[\\w\/-]+)"
+        "pxeboot_images\\s*=\\s*{[^}]*\\s+\"[\\w-]+-(?<currentValue>[\\d.]+)\"\\s+#\\s+(?<depName>[\\w/-]+)"
       ],
       "datasourceTemplate": "github-tags"
     }
