@@ -106,7 +106,7 @@ locals {
     kube_apiserver          = "ghcr.io/randomcoww/kubernetes-control-plane:v1.34.1"
     kube_controller_manager = "ghcr.io/randomcoww/kubernetes-control-plane:v1.34.1"
     kube_scheduler          = "ghcr.io/randomcoww/kubernetes-control-plane:v1.34.1"
-    etcd_wrapper            = "ghcr.io/randomcoww/etcd-wrapper:v0.4.3"
+    etcd_wrapper            = "ghcr.io/randomcoww/etcd-wrapper:v0.4.4"
     etcd                    = "gcr.io/etcd-development/etcd:v3.6.5"
     # tier 1
     kube_proxy         = "ghcr.io/randomcoww/kube-proxy:v1.34.1.20250923.2341"
