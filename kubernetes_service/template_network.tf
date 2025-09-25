@@ -257,6 +257,7 @@ module "tailscale" {
       value = join(",", distinct([
         local.networks[local.services.apiserver.network.name].prefix,
         local.networks.service.prefix,
+        local.networks.node.prefix,
       ]))
     },
   ]
