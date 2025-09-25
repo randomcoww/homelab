@@ -130,7 +130,7 @@ locals {
     rclone                = "docker.io/rclone/rclone:1.71.1"
     audioserve            = "docker.io/izderadicka/audioserve:latest@sha256:c3609321701765671cae121fc0f61db122e8c124643c04770fbc9326c74b18e3"
     llama_cpp             = "ghcr.io/mostlygeek/llama-swap:cuda@sha256:e9fb86ac9ae9033db20658abe0ebfd70aa74b7fc2c8756564edfd8bb12e8e236"
-    sunshine_desktop      = "registry.default/randomcoww/sunshine-desktop:v20250917.0509"
+    sunshine_desktop      = "registry.default/randomcoww/sunshine-desktop:v1.20250925.1654"
     litestream            = "docker.io/litestream/litestream:0.3.13"
     vaultwarden           = "docker.io/vaultwarden/server:1.34.3-alpine"
     juicefs               = "registry.default/randomcoww/juicefs:v1.3.0.20250925.0434"
