@@ -129,7 +129,7 @@ locals {
     device_plugin         = "ghcr.io/squat/generic-device-plugin:latest@sha256:45787848aac84d6b8b592904614339fa82d7c0e422f3287d7f9913896ff3a3f7"
     rclone                = "docker.io/rclone/rclone:1.71.1"
     audioserve            = "docker.io/izderadicka/audioserve:latest@sha256:c3609321701765671cae121fc0f61db122e8c124643c04770fbc9326c74b18e3"
-    llama_cpp             = "ghcr.io/mostlygeek/llama-swap:cuda@sha256:e9fb86ac9ae9033db20658abe0ebfd70aa74b7fc2c8756564edfd8bb12e8e236"
+    llama_cpp             = "ghcr.io/mostlygeek/llama-swap:cuda@sha256:764dfa85142653182515db8013d09a7f87b6d5f13fa777f33a0e3fe33bb8e709"
     sunshine_desktop      = "registry.default/randomcoww/sunshine-desktop:v1.20250925.1654"
     litestream            = "docker.io/litestream/litestream:0.3.13"
     vaultwarden           = "docker.io/vaultwarden/server:1.34.3-alpine"
