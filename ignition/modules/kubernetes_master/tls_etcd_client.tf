@@ -18,6 +18,7 @@ resource "tls_locally_signed_cert" "kube-apiserver-etcd-client" {
   ca_cert_pem        = var.etcd_ca.cert_pem
 
   validity_period_hours = 8760
+  early_renewal_hours   = 2160
 
   allowed_uses = [
     "key_encipherment",

@@ -24,6 +24,7 @@ resource "tls_locally_signed_cert" "matchbox" {
   ca_cert_pem        = tls_self_signed_cert.matchbox-ca.cert_pem
 
   validity_period_hours = 8760
+  early_renewal_hours   = 2160
 
   allowed_uses = [
     "key_encipherment",

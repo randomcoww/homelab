@@ -8,6 +8,7 @@ resource "tls_self_signed_cert" "trusted-ca" {
   private_key_pem = tls_private_key.trusted-ca.private_key_pem
 
   validity_period_hours = 8760
+  early_renewal_hours   = 2160
   is_ca_certificate     = true
 
   subject {

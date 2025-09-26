@@ -37,6 +37,7 @@ resource "tls_locally_signed_cert" "bootstrap" {
   ca_cert_pem        = var.ca.cert_pem
 
   validity_period_hours = 8760
+  early_renewal_hours   = 2160
 
   allowed_uses = [
     "key_encipherment",
