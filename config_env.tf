@@ -111,8 +111,8 @@ locals {
     # tier 1
     kube_proxy         = "ghcr.io/randomcoww/kube-proxy:v1.34.1.20250926.2050"
     kapprover          = "ghcr.io/randomcoww/kapprover:v0.1.2"
-    flannel            = "docker.io/flannel/flannel:v0.27.3"
-    flannel_cni_plugin = "docker.io/flannel/flannel-cni-plugin:v1.7.1-flannel1"
+    flannel            = "ghcr.io/flannel-io/flannel:v0.27.3"
+    flannel_cni_plugin = "ghcr.io/flannel-io/flannel-cni-plugin:v1.7.1-flannel2"
     kube_vip           = "ghcr.io/kube-vip/kube-vip:v1.0.0"
     external_dns       = "registry.k8s.io/external-dns/external-dns:v0.19.0"
     # tier 2
