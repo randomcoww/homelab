@@ -457,8 +457,6 @@ module "statefulset" {
           capabilities = {
             add = [
               "SYS_CHROOT",
-              "SETUID",
-              "SETGID",
             ]
           }
         }
