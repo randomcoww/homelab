@@ -3,6 +3,7 @@
   "extends": [
     "config:best-practices"
   ],
+  "pinDigests": false,
   "customManagers": [
     {
       "customType": "regex",
@@ -46,12 +47,6 @@
       "automerge": true,
       "ignoreTests": true,
       "groupName": "minor-update"
-    },
-    {
-      "matchDatasources": [
-        "docker"
-      ],
-      "pinDigests": false
     }
   ]
 }
