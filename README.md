@@ -1,18 +1,6 @@
 ## Terraform provisioner for Kubernetes homelab
 
-### Configure environment
-
-Define Terraform secrets
-
-```bash
-CLOUDFLARE_API_TOKEN=
-LETSENCRYPT_USER=
-TS_OAUTH_CLIENT_ID=
-TS_OAUTH_CLIENT_SECRET=
-GMAIL_USER=
-GMAIL_PASSWORD=
-GITHUB_TOKEN=
-```
+### Define secrets
 
 Cloudflare API token needs the following permissions
 
@@ -68,7 +56,8 @@ smtp = {
 
 github = {
   user  = "randomcoww"
-  token = "$GITHUB_TOKEN"
+  arc_runners_token  = "$GITHUB_ARC_RUNNERS_TOKEN"
+  renovate_bot_token = "$GITHUB_RENOVATE_BOT_TOKEN"
 }
 EOF
 ```
