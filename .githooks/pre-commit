@@ -3,4 +3,4 @@ podman run -it --rm \
   -w $(pwd) \
   --entrypoint='' \
   docker.io/hashicorp/terraform:latest \
-  terraform fmt $(git diff --staged --name-only | grep -e ".tf$" -e ".tfvars$" -e ".tftest.hcl")
+  terraform fmt $(git diff --staged --name-only | grep -e ".tf$" -e ".tfvars$" -e ".tftest.hcl$")
