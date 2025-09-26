@@ -16,13 +16,12 @@ jobs:
       contents: write
       issues: write
       pull-requests: write
-      security-events: read
     steps:
     - name: Check for updates
       env:
         RENOVATE_PLATFORM: github
         RENOVATE_AUTODISCOVER: false
-        RENOVATE_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        # RENOVATE_TOKEN: ${{ secrets.GITHUB_TOKEN }} # pass RENOVATE_TOKEN from runner
         RENOVATE_CONFIG_FILE: /tmp/renovate.json
       run: |
         cat > $RENOVATE_CONFIG_FILE <<EOF

@@ -9,7 +9,8 @@ variable "smtp" {
 
 variable "github" {
   type = object({
-    user  = string
-    token = string
+    user               = string
+    arc_runners_token  = string
+    renovate_bot_token = string
   })
 }
