@@ -18,5 +18,5 @@ provider "minio" {
 }
 
 provider "github" {
-  token = var.github.arc_runners_token
+  token = var.github.token
 }

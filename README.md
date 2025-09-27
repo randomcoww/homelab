@@ -2,7 +2,7 @@
 
 ### Define secrets
 
-Cloudflare API token needs the following permissions
+Cloudflare API token permissions
 
 | | | |
 --- | --- | ---
@@ -21,6 +21,11 @@ Look up Cloudflare permissions
 ```bash
 curl https://api.cloudflare.com/client/v4/user/tokens/permission_groups --header "Authorization: Bearer $CLOUDFLARE_API_TOKEN" | jq
 ```
+
+GitHub PAT permissions
+
+* repo
+* workflow
 
 Set env to use Terraform S3 backend on Cloudflare R2
 
@@ -56,8 +61,7 @@ smtp = {
 
 github = {
   user  = "randomcoww"
-  arc_runners_token  = "$GITHUB_ARC_RUNNERS_TOKEN"
-  renovate_bot_token = "$GITHUB_RENOVATE_BOT_TOKEN"
+  token = "$GITHUB_TOKEN"
 }
 EOF
 ```

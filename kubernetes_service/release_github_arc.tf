@@ -79,7 +79,7 @@ resource "helm_release" "arc-runner-hook-template" {
           }
           stringData = {
             # GITHUB_TOKEN cannot provide all permissions needed for renovate
-            RENOVATE_TOKEN                     = var.github.renovate_bot_token
+            RENOVATE_TOKEN                     = var.github.token
             INTERNAL_CA_CERT                   = data.terraform_remote_state.sr.outputs.trust.ca.cert_pem
             "MC_HOST_${minio_iam_user.arc.id}" = "https://${minio_iam_user.arc.id}:${minio_iam_user.arc.secret}@${local.services.cluster_minio.ip}:${local.service_ports.minio}"
 
@@ -183,7 +183,7 @@ resource "helm_release" "arc-runner-set" {
     yamlencode({
       githubConfigUrl = "https://github.com/${var.github.user}/${each.key}"
       githubConfigSecret = {
-        github_token = var.github.arc_runners_token
+        github_token = var.github.token
       }
       maxRunners = 3
       containerMode = {
