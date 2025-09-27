@@ -3,7 +3,6 @@
   "extends": [
     "config:best-practices"
   ],
-  "reuseExistingBranch": true,
   "customManagers": [
     {
       "customType": "regex",
