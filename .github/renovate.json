@@ -45,6 +45,12 @@
       "automerge": true,
       "ignoreTests": true,
       "groupName": "minor-update"
+    },
+    {
+      "matchDatasources": [
+        "helm"
+      ],
+      "pinDigests": false
     }
   ]
 }
