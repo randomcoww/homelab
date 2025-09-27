@@ -129,7 +129,7 @@ locals {
     device_plugin         = "ghcr.io/squat/generic-device-plugin:latest@sha256:45787848aac84d6b8b592904614339fa82d7c0e422f3287d7f9913896ff3a3f7"
     rclone                = "ghcr.io/rclone/rclone:1.71.1@sha256:d5971950c2b370fb04dd3292541b5bda6d9103143fd7e345aeb435a399388afc"
     audioserve            = "docker.io/izderadicka/audioserve:latest@sha256:c3609321701765671cae121fc0f61db122e8c124643c04770fbc9326c74b18e3"
-    llama_cpp             = "ghcr.io/mostlygeek/llama-swap:cuda@sha256:764dfa85142653182515db8013d09a7f87b6d5f13fa777f33a0e3fe33bb8e709"
+    llama_cpp             = "ghcr.io/mostlygeek/llama-swap:cuda@sha256:aa60801a792b387d20762207f6f8d1a500b2dd57f77747b71308fcd1c44f0cb9"
     sunshine_desktop      = "registry.default/randomcoww/sunshine-desktop:v1.20250925.1654@sha256:addbfb1f8b2a5f52fdd6a5c4f4b93e797cb48ef8c43d17d03ad9ee6ff76ac792"
     litestream            = "docker.io/litestream/litestream:0.3.13@sha256:027eda2a89a86015b9797d2129d4dd447e8953097b4190e1d5a30b73e76d8d58"
     vaultwarden           = "ghcr.io/dani-garcia/vaultwarden:1.34.3-alpine@sha256:d70118b9dafb8588ee2651ceb5df68db27dcbd8e18467722010644ba48d5d6d6"
