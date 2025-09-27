@@ -16,16 +16,24 @@ Zone | Zone Settings | Edit
 Zone | SSL and Certificates | Edit
 Zone | DNS | Edit
 
+GitHub PAT permissions
+
+* repo
+* workflow
+
+Tailscale auth scopes
+
+* auth_keys
+* devices:core:read
+* devices:posture_attributes
+* dns
+* policy_file
+
 Look up Cloudflare permissions
 
 ```bash
 curl https://api.cloudflare.com/client/v4/user/tokens/permission_groups --header "Authorization: Bearer $CLOUDFLARE_API_TOKEN" | jq
 ```
-
-GitHub PAT permissions
-
-* repo
-* workflow
 
 Set env to use Terraform S3 backend on Cloudflare R2
 
