@@ -23,7 +23,6 @@ jobs:
         RENOVATE_AUTODISCOVER: false
         # RENOVATE_TOKEN: ${{ secrets.GITHUB_TOKEN }} # pass RENOVATE_TOKEN from runner
         RENOVATE_CONFIG_FILE: /tmp/renovate.json
-        LOG_LEVEL: debug
       run: |
         cat > $RENOVATE_CONFIG_FILE <<EOF
         {
