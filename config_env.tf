@@ -107,14 +107,14 @@ locals {
     kube_controller_manager = "ghcr.io/randomcoww/kubernetes-control-plane:v1.34.1@sha256:9dd039d5c2456728d504e813958a0cd764d0a6784f7b54c13ec3ad555a1cc804"
     kube_scheduler          = "ghcr.io/randomcoww/kubernetes-control-plane:v1.34.1@sha256:9dd039d5c2456728d504e813958a0cd764d0a6784f7b54c13ec3ad555a1cc804"
     etcd_wrapper            = "ghcr.io/randomcoww/etcd-wrapper:v0.4.8@sha256:41ff93b85c5ae1aeca9af49fdfad54df02ecd4604331f6763a31bdaf73501464"
-    etcd                    = "gcr.io/etcd-development/etcd:v3.6.5"
+    etcd                    = "gcr.io/etcd-development/etcd:v3.6.5@sha256:042ef9c02799eb9303abf1aa99b09f09d94b8ee3ba0c2dd3f42dc4e1d3dce534"
     # tier 1
     kube_proxy         = "ghcr.io/randomcoww/kube-proxy:v1.34.1.20250926.2050@sha256:90161e1d550b74334c97130705b551b2cd5725421a222cc0d4210d55c518835e"
     kapprover          = "ghcr.io/randomcoww/kapprover:v0.1.2@sha256:b51c36ff5000e62eaee29406822c61aa01a1b008f3874c0f5d468803cd1bee7e"
     flannel            = "ghcr.io/flannel-io/flannel:v0.27.3@sha256:8cc0cf9e94df48e98be84bce3e61984bbd46c3c44ad35707ec7ef40e96b009d1"
     flannel_cni_plugin = "ghcr.io/flannel-io/flannel-cni-plugin:latest@sha256:fa4749909ed22921a6710496f6462ca300848222c084327fb2e83133e14378e1"
     kube_vip           = "ghcr.io/kube-vip/kube-vip:v1.0.0@sha256:4f256554a83a6d824ea9c5307450a2c3fd132e09c52b339326f94fefaf67155c"
-    external_dns       = "registry.k8s.io/external-dns/external-dns:v0.19.0"
+    external_dns       = "registry.k8s.io/external-dns/external-dns:v0.19.0@sha256:f76114338104264f655b23138444481b20bb9d6125742c7240fac25936fe164e"
     # tier 2
     kea         = "ghcr.io/randomcoww/kea:v3.1.0.20250926.2052@sha256:f64a30f8293f7d5dfba62d6c90794c864b2e72b5ce182ac289a391dc1893001a"
     stork_agent = "ghcr.io/randomcoww/stork-agent:v2.3.0.20250926.2053@sha256:936c7026dd46d8e32fffc1c2d42c3a70ca4911d5dbeee7f8e2d4b168a6a9e528"

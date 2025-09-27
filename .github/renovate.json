@@ -7,8 +7,7 @@
     {
       "customType": "regex",
       "managerFilePatterns": [
-        "/^config_env.tf$/",
-        "/^README.md$/"
+        "/^config_env.tf$/"
       ],
       "matchStrings": [
         "(?<depName>[a-z0-9.-]+(:\\d+|)/[a-z0-9-]+(?:/[a-z0-9-]+|)):(?<currentValue>[\\w.-]{1,127})(@(?<currentDigest>sha256:[a-f0-9]+))?"
