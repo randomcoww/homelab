@@ -27,12 +27,7 @@
   ],
   "packageRules": [
     {
-      "matchDatasources": [
-        "github-tags"
-      ],
-      "matchPackageNames": [
-        "randomcoww/fedora-coreos-config"
-      ],
+      "matchPackageNames": ["randomcoww/fedora-coreos-config"],
       "versioning": "docker"
     },
     {
@@ -47,9 +42,7 @@
       "groupName": "minor-update"
     },
     {
-      "matchDepTypes": [
-        "helm_release"
-      ],
+      "matchDepTypes": ["helm_release"],
       "pinDigests": false
     }
   ]
