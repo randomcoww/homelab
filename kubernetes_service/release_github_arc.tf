@@ -36,7 +36,7 @@ resource "minio_iam_user_policy_attachment" "arc" {
 resource "helm_release" "arc" {
   name             = "arc"
   repository       = "oci://ghcr.io/actions/actions-runner-controller-charts"
-  chart            = "gha-runner-scale-set-controller@sha256:621fb48c3fbf79cb817f03da35d19a26c35ad34de13e8cfa9816f9e462d2ce80"
+  chart            = "gha-runner-scale-set-controller"
   namespace        = "arc-systems"
   create_namespace = true
   wait             = true
@@ -171,7 +171,7 @@ resource "helm_release" "arc-runner-set" {
 
   name             = "arc-runner-${each.key}"
   repository       = "oci://ghcr.io/actions/actions-runner-controller-charts"
-  chart            = "gha-runner-scale-set@sha256:97125addd369e3fd2838ff279fc685a83d7cfe7e29d56af435c7733633026d53"
+  chart            = "gha-runner-scale-set"
   namespace        = "arc-runners"
   create_namespace = true
   wait             = false
