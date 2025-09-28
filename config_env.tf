@@ -126,7 +126,7 @@ locals {
     hostapd               = "registry.default/randomcoww/hostapd-noscan:v2.11.20250926.2051@sha256:f1b87bacef07ab2231f073f582eab32d9fb6b508b905bd5e86a981b06127c90f"
     tailscale             = "registry.default/randomcoww/tailscale-nft:v1.88.2.20250928.0031@sha256:41fa384c0b7efb80e18211c7d7751272beb147ecfe978d29eae570faaf5ebead"
     qrcode_generator      = "registry.default/randomcoww/qrcode-resource:v1.20250926.2053@sha256:9c63bb0f788a0c1ff855fa6cc9cd961faf7ddd982a541eeb32f8bbb58701ed71"
-    device_plugin         = "ghcr.io/squat/generic-device-plugin:latest@sha256:45787848aac84d6b8b592904614339fa82d7c0e422f3287d7f9913896ff3a3f7"
+    device_plugin         = "ghcr.io/squat/generic-device-plugin:latest@sha256:359bcdd5c7b45a815a50e2f69c5942d85de6db03ff4a3923462af06161bead08"
     rclone                = "ghcr.io/rclone/rclone:1.71.1@sha256:d5971950c2b370fb04dd3292541b5bda6d9103143fd7e345aeb435a399388afc"
     audioserve            = "docker.io/izderadicka/audioserve:latest@sha256:c3609321701765671cae121fc0f61db122e8c124643c04770fbc9326c74b18e3"
     llama_cpp             = "ghcr.io/mostlygeek/llama-swap:cuda@sha256:aa60801a792b387d20762207f6f8d1a500b2dd57f77747b71308fcd1c44f0cb9"
