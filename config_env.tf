@@ -124,7 +124,7 @@ locals {
     nginx       = "docker.io/nginxinc/nginx-unprivileged:1.29.1-alpine@sha256:9fda08cc7f7580567e9d8c477420d7beadb9387d4004074c89f41f9d90ecf300"
     # tier 3
     hostapd               = "registry.default/randomcoww/hostapd-noscan:v2.11.20250926.2051@sha256:f1b87bacef07ab2231f073f582eab32d9fb6b508b905bd5e86a981b06127c90f"
-    tailscale             = "registry.default/randomcoww/tailscale-nft:v1.20250926.2051@sha256:b311490cca119cd8a00b796f2ba46690c99018839770d78b2998172befc8c4d6"
+    tailscale             = "registry.default/randomcoww/tailscale-nft:v1.88.2.20250928.0031@	sha256:41fa384c0b7efb80e18211c7d7751272beb147ecfe978d29eae570faaf5ebead"
     qrcode_generator      = "registry.default/randomcoww/qrcode-resource:v1.20250926.2053@sha256:9c63bb0f788a0c1ff855fa6cc9cd961faf7ddd982a541eeb32f8bbb58701ed71"
     device_plugin         = "ghcr.io/squat/generic-device-plugin:latest@sha256:45787848aac84d6b8b592904614339fa82d7c0e422f3287d7f9913896ff3a3f7"
     rclone                = "ghcr.io/rclone/rclone:1.71.1@sha256:d5971950c2b370fb04dd3292541b5bda6d9103143fd7e345aeb435a399388afc"
