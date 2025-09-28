@@ -130,7 +130,7 @@ locals {
     rclone                = "ghcr.io/rclone/rclone:1.71.1@sha256:d5971950c2b370fb04dd3292541b5bda6d9103143fd7e345aeb435a399388afc"
     audioserve            = "docker.io/izderadicka/audioserve:latest@sha256:c3609321701765671cae121fc0f61db122e8c124643c04770fbc9326c74b18e3"
     llama_cpp             = "ghcr.io/mostlygeek/llama-swap:cuda@sha256:aa60801a792b387d20762207f6f8d1a500b2dd57f77747b71308fcd1c44f0cb9"
-    sunshine_desktop      = "registry.default/randomcoww/sunshine-desktop:v1.20250927.0825@sha256:95464fccd7cc08e79a2861a61dbc981a5737c777b09842dca9ee7791235713a8"
+    sunshine_desktop      = "registry.default/randomcoww/sunshine-desktop:v2025.927.211945.20250928.0101@sha256:86d74394415d5976d2bec6479ed6eb420c434fa13bbbb0e7115fd7fc4e96d759"
     litestream            = "docker.io/litestream/litestream:0.3.13@sha256:027eda2a89a86015b9797d2129d4dd447e8953097b4190e1d5a30b73e76d8d58"
     vaultwarden           = "ghcr.io/dani-garcia/vaultwarden:1.34.3-alpine@sha256:d70118b9dafb8588ee2651ceb5df68db27dcbd8e18467722010644ba48d5d6d6"
     juicefs               = "registry.default/randomcoww/juicefs:v1.3.0.20250926.2050@sha256:98739720027599a24ad19a5455e3a4721b3dc386cab0a3753cfaed93152638f0"
