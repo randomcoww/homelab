@@ -73,13 +73,12 @@ module "service-api" {
 module "mountpoint" {
   source = "../statefulset_mountpoint"
   ## s3 config
-  s3_endpoint          = var.s3_endpoint
-  s3_bucket            = var.s3_bucket
-  s3_prefix            = ""
-  s3_access_key_id     = var.s3_access_key_id
-  s3_secret_access_key = var.s3_secret_access_key
-  s3_mount_path        = local.data_path
-  s3_mount_extra_args  = var.s3_mount_extra_args
+  s3_endpoint         = var.minio_endpoint
+  s3_bucket           = var.minio_bucket
+  s3_prefix           = ""
+  s3_mount_path       = local.data_path
+  s3_mount_extra_args = var.minio_mount_extra_args
+  s3_access_secret    = var.minio_access_secret
   images = {
     mountpoint = var.images.mountpoint
   }

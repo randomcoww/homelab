@@ -1,10 +1,6 @@
 
 # minio #
 
-locals {
-  minio_replicas = 4
-}
-
 resource "tls_private_key" "minio" {
   algorithm   = data.terraform_remote_state.sr.outputs.trust.ca.algorithm
   ecdsa_curve = "P521"
@@ -96,8 +92,8 @@ resource "helm_release" "minio-resources" {
   chart            = "../helm-wrapper"
   namespace        = local.kubernetes_services.minio.namespace
   create_namespace = true
-  wait             = true
-  wait_for_jobs    = true
+  wait             = false
+  wait_for_jobs    = false
   max_history      = 2
   values = [
     yamlencode({

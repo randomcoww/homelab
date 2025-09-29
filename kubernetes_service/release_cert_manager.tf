@@ -63,6 +63,9 @@ resource "helm_release" "cert-manager" {
       }
     }),
   ]
+  depends_on = [
+    kubernetes_labels.labels,
+  ]
 }
 
 resource "helm_release" "cert-issuer" {

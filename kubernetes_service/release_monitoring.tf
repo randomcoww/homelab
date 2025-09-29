@@ -29,6 +29,9 @@ resource "helm_release" "metrics-server" {
       }
     }),
   ]
+  depends_on = [
+    kubernetes_labels.labels,
+  ]
 }
 
 # Blackbox exporter
@@ -50,6 +53,9 @@ resource "helm_release" "prometheus-blackbox" {
         port = local.service_ports.prometheus_blackbox
       }
     })
+  ]
+  depends_on = [
+    kubernetes_labels.labels,
   ]
 }
 
@@ -366,6 +372,9 @@ resource "helm_release" "prometheus" {
       }
     }),
   ]
+  depends_on = [
+    kubernetes_labels.labels,
+  ]
 }
 
 # kured #
@@ -406,5 +415,8 @@ resource "helm_release" "kured" {
         create = false
       }
     })
+  ]
+  depends_on = [
+    kubernetes_labels.labels,
   ]
 }

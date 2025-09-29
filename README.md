@@ -124,36 +124,13 @@ See [fedora-coreos-config](https://github.com/randomcoww/fedora-coreos-config)
 
 Image build can be triggered from Github actions if ARC runners and MinIO are up. A pull request should get created to update the boot image tag. Update check may be forced by running the renovate Github workflow under this repo.
 
-Generate host ignition
+Generate or update host network boot configuration
 
 ```bash
 terraform -chdir=ignition init -upgrade && \
-terraform -chdir=ignition apply
-```
-
-Push image tag and ignition to matchbox for iPXE boot
-
-```bash
+terraform -chdir=ignition apply -auto-approve && \
 terraform -chdir=matchbox_client init -upgrade && \
 terraform -chdir=matchbox_client apply
-```
-
----
-
-### Deploy services to Kubernetes
-
-Deploy bootstrap and lower level services
-
-```bash
-terraform -chdir=kubernetes_bootstrap init -upgrade && \
-terraform -chdir=kubernetes_bootstrap apply
-```
-
-Deploy higher level services
-
-```bash
-terraform -chdir=kubernetes_service init -upgrade && \
-terraform -chdir=kubernetes_service apply -var-file=../secrets.tfvars
 ```
 
 ---
@@ -167,54 +144,20 @@ terraform -chdir=rolling_reboot init -upgrade && \
 terraform -chdir=rolling_reboot apply
 ```
 
-Occasionally nodes will fail to boot from network and fallback to backup disk even when the network boot environment is working. `kured` will monitor and reboot these nodes as well.
-
 ---
 
-### Full cluster restart over the network
+### Deploy services to Kubernetes
 
-Launch bootstrap DHCP service on a workstation on the same network as the server. Path `assets_path` should contains PXE image builds from [fedora-coreos-config](https://github.com/randomcoww/fedora-coreos-config).
-
-Update image tags under `pxeboot_images` in [environment config](https://github.com/randomcoww/homelab/blob/master/config_env.tf) to match image file names.
+Deploy Kubernetes services
 
 ```bash
-export interface=br-lan
-export host_ip=$(ip -br addr show $interface | awk '{print $3}')
-export assets_path=${HOME}/store/boot
-
-echo host_ip=$host_ip
-echo assets_path=$assets_path
+terraform -chdir=kubernetes_service init -upgrade && \
+terraform -chdir=kubernetes_service apply -var-file=../secrets.tfvars
 ```
 
-```bash
-terraform -chdir=bootstrap_server init && \
-terraform -chdir=bootstrap_server apply \
-  -var host_ip=$host_ip \
-  -var assets_path=$assets_path
-```
-
-Launch bootstrap service with Podman
+Create MinIO resources
 
 ```bash
-terraform -chdir=bootstrap_server output -raw pod_manifest > bootstrap.yaml
-sudo podman play kube bootstrap.yaml
-```
-
-Push PXE boot and ignition configuration to bootstrap service
-
-```bash
-terraform -chdir=bootstrap_client init && \
-terraform -chdir=bootstrap_client apply
-```
-
-Start all servers and allow them to PXE boot
-
-Bootstrap service can be stopped once servers are up
-
-```bash
-sudo podman play kube bootstrap.yaml --down
-
-terraform -chdir=bootstrap_server destroy \
-  -var host_ip=$host_ip \
-  -var assets_path=$assets_path
+terraform -chdir=minio_resources init -upgrade && \
+terraform -chdir=minio_resources apply
 ```

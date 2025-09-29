@@ -59,6 +59,6 @@ variable "sqlite_path" {
   type = string
 }
 
-variable "s3_ca_cert" {
+variable "s3_access_secret" {
   type = string
 }

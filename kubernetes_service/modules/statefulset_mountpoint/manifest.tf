@@ -4,31 +4,17 @@ module "metadata" {
   namespace = var.namespace
   release   = var.release
   manifests = {
-    "templates/statefulset.yaml"     = module.statefulset.manifest
-    "templates/secret-s3-mount.yaml" = module.secret.manifest
-  }
-}
-
-module "secret" {
-  source  = "../../../modules/secret"
-  name    = "${var.name}-s3-mount"
-  app     = var.app
-  release = var.release
-  data = {
-    AWS_ACCESS_KEY_ID     = var.s3_access_key_id
-    AWS_SECRET_ACCESS_KEY = var.s3_secret_access_key
+    "templates/statefulset.yaml" = module.statefulset.manifest
   }
 }
 
 module "statefulset" {
-  source   = "../../../modules/statefulset"
-  name     = var.name
-  app      = var.app
-  release  = var.release
-  replicas = var.replicas
-  annotations = merge({
-    "checksum/${module.secret.name}" = sha256(module.secret.manifest)
-  }, var.annotations)
+  source      = "../../../modules/statefulset"
+  name        = var.name
+  app         = var.app
+  release     = var.release
+  replicas    = var.replicas
+  annotations = var.annotations
   affinity    = var.affinity
   tolerations = var.tolerations
   spec        = var.spec
@@ -68,7 +54,7 @@ module "statefulset" {
             name = "AWS_ACCESS_KEY_ID"
             valueFrom = {
               secretKeyRef = {
-                name = module.secret.name
+                name = var.s3_access_secret
                 key  = "AWS_ACCESS_KEY_ID"
               }
             }
@@ -77,7 +63,7 @@ module "statefulset" {
             name = "AWS_SECRET_ACCESS_KEY"
             valueFrom = {
               secretKeyRef = {
-                name = module.secret.name
+                name = var.s3_access_secret
                 key  = "AWS_SECRET_ACCESS_KEY"
               }
             }

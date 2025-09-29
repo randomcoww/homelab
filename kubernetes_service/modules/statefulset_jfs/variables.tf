@@ -79,14 +79,6 @@ variable "minio_litestream_prefix" {
   default = "$POD_NAME/litestream"
 }
 
-variable "minio_access_key_id" {
-  type = string
-}
-
-variable "minio_secret_access_key" {
-  type = string
-}
-
-variable "minio_ca_cert" {
+variable "minio_access_secret" {
   type = string
 }

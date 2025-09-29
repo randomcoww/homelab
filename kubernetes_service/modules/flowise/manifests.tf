@@ -52,12 +52,10 @@ module "secret" {
   name    = var.name
   app     = var.name
   release = var.release
-  data = merge({
+  data = {
     for k, v in local.extra_configs :
     tostring(k) => tostring(v)
-    }, {
-    minio_ca_cert = var.minio_ca_cert
-  })
+  }
 }
 
 module "service" {
@@ -116,8 +114,6 @@ module "litestream" {
             endpoint          = var.minio_endpoint
             bucket            = var.minio_bucket
             path              = var.minio_litestream_prefix
-            access-key-id     = var.minio_access_key_id
-            secret-access-key = var.minio_secret_access_key
             sync-interval     = "100ms"
             snapshot-interval = "1h"
             retention         = "1h"
@@ -126,8 +122,8 @@ module "litestream" {
       },
     ]
   }
-  sqlite_path = local.db_path
-  s3_ca_cert  = var.minio_ca_cert
+  sqlite_path      = local.db_path
+  s3_access_secret = var.minio_access_secret
   ##
   name      = var.name
   namespace = var.namespace
@@ -142,7 +138,7 @@ module "litestream" {
       {
         name  = var.name
         image = var.images.flowise
-        env = [
+        env = concat([
           for k, v in local.extra_configs :
           {
             name = tostring(k)
@@ -153,7 +149,26 @@ module "litestream" {
               }
             }
           }
-        ]
+          ], [
+          {
+            name = "S3_STORAGE_ACCESS_KEY_ID"
+            valueFrom = {
+              secretKeyRef = {
+                name = var.minio_access_secret
+                key  = "AWS_ACCESS_KEY_ID"
+              }
+            }
+          },
+          {
+            name = "S3_STORAGE_SECRET_ACCESS_KEY"
+            valueFrom = {
+              secretKeyRef = {
+                name = var.minio_access_secret
+                key  = "AWS_SECRET_ACCESS_KEY"
+              }
+            }
+          },
+        ])
         ports = [
           {
             containerPort = local.extra_configs.PORT
@@ -161,9 +176,9 @@ module "litestream" {
         ]
         volumeMounts = [
           {
-            name      = "config"
+            name      = "minio-access-secret"
             mountPath = local.extra_configs.NODE_EXTRA_CA_CERTS
-            subPath   = "minio_ca_cert"
+            subPath   = "AWS_CA_BUNDLE"
           },
         ]
         readinessProbe = {

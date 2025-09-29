@@ -54,23 +54,19 @@ variable "ca" {
   })
 }
 
-variable "s3_endpoint" {
+variable "minio_endpoint" {
   type = string
 }
 
-variable "s3_bucket" {
+variable "minio_bucket" {
   type = string
 }
 
-variable "s3_access_key_id" {
+variable "minio_access_secret" {
   type = string
 }
 
-variable "s3_secret_access_key" {
-  type = string
-}
-
-variable "s3_mount_extra_args" {
+variable "minio_mount_extra_args" {
   type    = list(string)
   default = []
 }

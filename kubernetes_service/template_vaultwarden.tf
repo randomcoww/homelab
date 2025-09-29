@@ -1,41 +1,3 @@
-resource "minio_s3_bucket" "vaultwarden" {
-  bucket        = "vaultwarden"
-  force_destroy = true
-}
-
-resource "minio_iam_user" "vaultwarden" {
-  name          = "vaultwarden"
-  force_destroy = true
-}
-
-resource "minio_iam_policy" "vaultwarden" {
-  name = "vaultwarden"
-  policy = jsonencode({
-    Version = "2012-10-17"
-    Statement = [
-      {
-        Effect = "Allow"
-        Action = [
-          "s3:GetObject",
-          "s3:PutObject",
-          "s3:ListBucket",
-          "s3:DeleteObject",
-          "s3:AbortMultipartUpload",
-        ]
-        Resource = [
-          minio_s3_bucket.vaultwarden.arn,
-          "${minio_s3_bucket.vaultwarden.arn}/*",
-        ]
-      },
-    ]
-  })
-}
-
-resource "minio_iam_user_policy_attachment" "vaultwarden" {
-  user_name   = minio_iam_user.vaultwarden.id
-  policy_name = minio_iam_policy.vaultwarden.id
-}
-
 module "vaultwarden" {
   source    = "./modules/vaultwarden"
   name      = "vaultwarden"
@@ -66,9 +28,7 @@ module "vaultwarden" {
   nginx_ingress_annotations = local.nginx_ingress_annotations
 
   minio_endpoint          = "https://${local.services.cluster_minio.ip}:${local.service_ports.minio}"
-  minio_bucket            = minio_s3_bucket.vaultwarden.id
+  minio_bucket            = "vaultwarden"
   minio_litestream_prefix = "$POD_NAME/litestream"
-  minio_access_key_id     = minio_iam_user.vaultwarden.id
-  minio_secret_access_key = minio_iam_user.vaultwarden.secret
-  minio_ca_cert           = data.terraform_remote_state.sr.outputs.trust.ca.cert_pem
+  minio_access_secret     = local.minio_users.vaultwarden.secret
 }

@@ -11,21 +11,8 @@ module "metadata" {
   app_version = split(":", var.images.rclone)[1]
   manifests = {
     "templates/service.yaml"    = module.service.manifest
-    "templates/secret.yaml"     = module.secret.manifest
     "templates/ingress.yaml"    = module.ingress.manifest
     "templates/deployment.yaml" = module.deployment.manifest
-  }
-}
-
-module "secret" {
-  source  = "../../../modules/secret"
-  name    = var.name
-  app     = var.name
-  release = var.release
-  data = {
-    RCLONE_S3_ACCESS_KEY_ID      = var.minio_access_key_id
-    RCLONE_S3_SECRET_ACCESS_KEY  = var.minio_secret_access_key
-    basename(local.ca_cert_path) = var.minio_ca_cert
   }
 }
 
@@ -81,9 +68,6 @@ module "deployment" {
   release  = var.release
   affinity = var.affinity
   replicas = var.replicas
-  annotations = {
-    "checksum/secret" = sha256(module.secret.manifest)
-  }
   template_spec = {
     containers = [
       {
@@ -102,18 +86,31 @@ module "deployment" {
           "--poll-interval=2s",
           "--ca-cert=${local.ca_cert_path}",
         ]
-        envFrom = [
+        env = [
           {
-            secretRef = {
-              name = module.secret.name
+            name = "RCLONE_S3_ACCESS_KEY_ID"
+            valueFrom = {
+              secretKeyRef = {
+                name = var.minio_access_secret
+                key  = "AWS_ACCESS_KEY_ID"
+              }
+            }
+          },
+          {
+            name = "RCLONE_S3_SECRET_ACCESS_KEY"
+            valueFrom = {
+              secretKeyRef = {
+                name = var.minio_access_secret
+                key  = "AWS_SECRET_ACCESS_KEY"
+              }
             }
           },
         ]
         volumeMounts = [
           {
-            name      = "secret"
+            name      = "minio-access-secret"
             mountPath = local.ca_cert_path
-            subPath   = basename(local.ca_cert_path)
+            subPath   = "AWS_CA_BUNDLE"
           },
         ]
         readinessProbe = {
@@ -137,6 +134,12 @@ module "deployment" {
         name = "secret"
         secret = {
           secretName = var.name
+        }
+      },
+      {
+        name = "minio-access-secret"
+        secret = {
+          secretName = var.minio_access_secret
         }
       },
     ]

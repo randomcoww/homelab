@@ -55,11 +55,3 @@ module "device-plugin" {
   ]
   kubelet_root_path = local.kubernetes.kubelet_root_path
 }
-
-resource "minio_s3_bucket" "data" {
-  for_each = local.minio.data_buckets
-
-  bucket        = each.value.name
-  acl           = lookup(each.value, "acl", "private")
-  force_destroy = false
-}

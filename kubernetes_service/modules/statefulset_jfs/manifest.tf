@@ -11,20 +11,7 @@ module "metadata" {
   name      = var.name
   namespace = var.namespace
   release   = var.release
-  manifests = merge(module.litestream.chart.manifests, {
-    "templates/secret-jfs.yaml" = module.secret.manifest
-  })
-}
-
-module "secret" {
-  source  = "../../../modules/secret"
-  name    = "${var.name}-jfs"
-  app     = var.app
-  release = var.release
-  data = {
-    ACCESS_KEY = var.minio_access_key_id
-    SECRET_KEY = var.minio_secret_access_key
-  }
+  manifests = module.litestream.chart.manifests
 }
 
 module "litestream" {
@@ -44,8 +31,6 @@ module "litestream" {
             endpoint          = var.minio_endpoint
             bucket            = var.minio_bucket
             path              = var.minio_litestream_prefix
-            access-key-id     = var.minio_access_key_id
-            secret-access-key = var.minio_secret_access_key
             sync-interval     = "100ms"
             snapshot-interval = "1h"
             retention         = "1h"
@@ -54,8 +39,8 @@ module "litestream" {
       },
     ]
   }
-  sqlite_path = "${local.jfs_cache_path}/jfs.db"
-  s3_ca_cert  = var.minio_ca_cert
+  sqlite_path      = "${local.jfs_cache_path}/jfs.db"
+  s3_access_secret = var.minio_access_secret
   ##
   name        = var.name
   app         = var.app
@@ -95,6 +80,12 @@ module "litestream" {
           <<-EOF
           set -e
 
+          juicefs config '${local.db_url}' \
+            --storage=minio \
+            --bucket=${var.minio_endpoint}/${var.minio_bucket} \
+            --access-key=$ACCESS_KEY \
+            --secret-key=$SECRET_KEY
+
           juicefs format '${local.db_url}' \
             ${var.minio_jfs_prefix} \
             --storage=minio \
@@ -114,8 +105,8 @@ module "litestream" {
             name = "ACCESS_KEY"
             valueFrom = {
               secretKeyRef = {
-                name = module.secret.name
-                key  = "ACCESS_KEY"
+                name = var.minio_access_secret
+                key  = "AWS_ACCESS_KEY_ID"
               }
             }
           },
@@ -123,8 +114,8 @@ module "litestream" {
             name = "SECRET_KEY"
             valueFrom = {
               secretKeyRef = {
-                name = module.secret.name
-                key  = "SECRET_KEY"
+                name = var.minio_access_secret
+                key  = "AWS_SECRET_ACCESS_KEY"
               }
             }
           },

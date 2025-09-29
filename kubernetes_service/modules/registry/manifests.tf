@@ -57,6 +57,26 @@ module "metadata" {
                         ${local.config_path}
                       EOF
                     ]
+                    env = [
+                      {
+                        name = "REGISTRY_STORAGE_S3_ACCESSKEY"
+                        valueFrom = {
+                          secretKeyRef = {
+                            name = var.minio_access_secret
+                            key  = "AWS_ACCESS_KEY_ID"
+                          }
+                        }
+                      },
+                      {
+                        name = "REGISTRY_STORAGE_S3_SECRETKEY"
+                        valueFrom = {
+                          secretKeyRef = {
+                            name = var.minio_access_secret
+                            key  = "AWS_SECRET_ACCESS_KEY"
+                          }
+                        }
+                      },
+                    ]
                     volumeMounts = [
                       {
                         name      = "config"
@@ -64,24 +84,9 @@ module "metadata" {
                         subPath   = basename(local.config_path)
                       },
                       {
-                        name      = "config"
+                        name      = "minio-access-secret"
                         mountPath = local.trusted_ca_path
-                        subPath   = basename(local.trusted_ca_path)
-                      },
-                      {
-                        name      = "config"
-                        mountPath = local.ca_cert_path
-                        subPath   = basename(local.ca_cert_path)
-                      },
-                      {
-                        name      = "config"
-                        mountPath = local.cert_path
-                        subPath   = basename(local.cert_path)
-                      },
-                      {
-                        name      = "config"
-                        mountPath = local.key_path
-                        subPath   = basename(local.key_path)
+                        subPath   = "AWS_CA_BUNDLE"
                       },
                     ]
                   },
@@ -91,6 +96,12 @@ module "metadata" {
                     name = "config"
                     secret = {
                       secretName = module.secret.name
+                    }
+                  },
+                  {
+                    name = "minio-access-secret"
+                    secret = {
+                      secretName = var.minio_access_secret
                     }
                   },
                 ]
@@ -137,21 +148,22 @@ module "secret" {
           minimumtls = "tls1.3"
         }
       }
+      log = {
+        level = "info"
+      }
       storage = {
         delete = {
           enabled = true
         }
         s3 = {
-          accesskey                   = var.s3_access_key_id
-          secretkey                   = var.s3_secret_access_key
-          regionendpoint              = var.s3_endpoint
+          regionendpoint              = var.minio_endpoint
           forcepathstyle              = true
-          bucket                      = var.s3_bucket
+          bucket                      = var.minio_bucket
           encrypt                     = false
           secure                      = true
           chunksize                   = 50 * 1024 * 1024
           multipartcopymaxconcurrency = 10
-          rootdirectory               = "/${join("/", compact(split("/", "${var.s3_bucket_prefix}/${var.name}.${var.namespace}")))}"
+          rootdirectory               = "/${join("/", compact(split("/", "${var.minio_bucket_prefix}/${var.name}.${var.namespace}")))}"
         }
       }
       health = {
@@ -238,8 +250,22 @@ module "deployment" {
             value = "none"
           },
           {
-            name  = "REGISTRY_LOG_LEVEL"
-            value = "info"
+            name = "REGISTRY_STORAGE_S3_ACCESSKEY"
+            valueFrom = {
+              secretKeyRef = {
+                name = var.minio_access_secret
+                key  = "AWS_ACCESS_KEY_ID"
+              }
+            }
+          },
+          {
+            name = "REGISTRY_STORAGE_S3_SECRETKEY"
+            valueFrom = {
+              secretKeyRef = {
+                name = var.minio_access_secret
+                key  = "AWS_SECRET_ACCESS_KEY"
+              }
+            }
           },
         ]
         ports = [
@@ -255,11 +281,6 @@ module "deployment" {
           },
           {
             name      = "config"
-            mountPath = local.trusted_ca_path
-            subPath   = basename(local.trusted_ca_path)
-          },
-          {
-            name      = "config"
             mountPath = local.ca_cert_path
             subPath   = basename(local.ca_cert_path)
           },
@@ -272,6 +293,11 @@ module "deployment" {
             name      = "config"
             mountPath = local.key_path
             subPath   = basename(local.key_path)
+          },
+          {
+            name      = "minio-access-secret"
+            mountPath = local.trusted_ca_path
+            subPath   = "AWS_CA_BUNDLE"
           },
         ]
         readinessProbe = {
@@ -295,6 +321,12 @@ module "deployment" {
         name = "config"
         secret = {
           secretName = module.secret.name
+        }
+      },
+      {
+        name = "minio-access-secret"
+        secret = {
+          secretName = var.minio_access_secret
         }
       },
     ]

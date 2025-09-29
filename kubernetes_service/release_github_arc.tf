@@ -1,46 +1,13 @@
 # Github actions runner #
 
-resource "minio_iam_user" "arc" {
-  name          = "arc"
-  force_destroy = true
-}
-
-resource "minio_iam_policy" "arc" {
-  name = "arc"
-  policy = jsonencode({
-    Version = "2012-10-17"
-    Statement = [
-      {
-        Effect = "Allow"
-        Action = [
-          "s3:GetObject",
-          "s3:PutObject",
-          "s3:ListBucket",
-          "s3:DeleteObject",
-          "s3:AbortMultipartUpload",
-        ]
-        Resource = [
-          minio_s3_bucket.data["boot"].arn,
-          "${minio_s3_bucket.data["boot"].arn}/*",
-        ]
-      },
-    ]
-  })
-}
-
-resource "minio_iam_user_policy_attachment" "arc" {
-  user_name   = minio_iam_user.arc.id
-  policy_name = minio_iam_policy.arc.id
-}
-
 resource "helm_release" "arc" {
   name             = "arc"
   repository       = "oci://ghcr.io/actions/actions-runner-controller-charts"
   chart            = "gha-runner-scale-set-controller"
   namespace        = "arc-systems"
   create_namespace = true
-  wait             = true
-  wait_for_jobs    = true
+  wait             = false
+  wait_for_jobs    = false
   version          = "0.12.1"
   max_history      = 2
   values = [
@@ -65,8 +32,8 @@ resource "helm_release" "arc-runner-hook-template" {
   name          = "arc-runner-hook-template"
   chart         = "../helm-wrapper"
   namespace     = "arc-runners"
-  wait          = true
-  wait_for_jobs = true
+  wait          = false
+  wait_for_jobs = false
   max_history   = 2
   values = [
     yamlencode({
@@ -79,9 +46,8 @@ resource "helm_release" "arc-runner-hook-template" {
           }
           stringData = {
             # GITHUB_TOKEN cannot provide all permissions needed for renovate
-            RENOVATE_TOKEN                     = var.github.token
-            INTERNAL_CA_CERT                   = data.terraform_remote_state.sr.outputs.trust.ca.cert_pem
-            "MC_HOST_${minio_iam_user.arc.id}" = "https://${minio_iam_user.arc.id}:${minio_iam_user.arc.secret}@${local.services.cluster_minio.ip}:${local.service_ports.minio}"
+            RENOVATE_TOKEN   = var.github.token
+            INTERNAL_CA_CERT = data.terraform_remote_state.sr.outputs.trust.ca.cert_pem
 
             "workflow-podspec.yaml" = yamlencode({
               spec = {
@@ -117,15 +83,6 @@ resource "helm_release" "arc-runner-hook-template" {
                         }
                       },
                       {
-                        name = "MC_HOST_${minio_iam_user.arc.id}"
-                        valueFrom = {
-                          secretKeyRef = {
-                            name = "workflow-template"
-                            key  = "MC_HOST_${minio_iam_user.arc.id}"
-                          }
-                        }
-                      },
-                      {
                         name = "RENOVATE_TOKEN"
                         valueFrom = {
                           secretKeyRef = {
@@ -135,12 +92,34 @@ resource "helm_release" "arc-runner-hook-template" {
                         }
                       },
                       {
-                        name  = "MC_ALIAS"
-                        value = minio_iam_user.arc.id
-                      },
-                      {
                         name  = "INTERNAL_REGISTRY"
                         value = "${local.kubernetes_services.registry.endpoint}:${local.service_ports.registry}"
+                      },
+                      {
+                        name = "MINIO_ACCESS_KEY_ID"
+                        valueFrom = {
+                          secretKeyRef = {
+                            name = local.minio_users.arc.secret
+                            key  = "AWS_ACCESS_KEY_ID"
+                          }
+                        }
+                      },
+                      {
+                        name = "MINIO_SECRET_ACCESS_KEY"
+                        valueFrom = {
+                          secretKeyRef = {
+                            name = local.minio_users.arc.secret
+                            key  = "AWS_SECRET_ACCESS_KEY"
+                          }
+                        }
+                      },
+                      {
+                        name  = "MC_ALIAS"
+                        value = "arc"
+                      },
+                      {
+                        name  = "MC_HOST_arc"
+                        value = "https://$MINIO_ACCESS_KEY_ID:$MINIO_SECRET_ACCESS_KEY@${local.services.cluster_minio.ip}:${local.service_ports.minio}"
                       },
                     ]
                   },
@@ -244,6 +223,7 @@ resource "helm_release" "arc-runner-set" {
     }),
   ]
   depends_on = [
+    kubernetes_labels.labels,
     helm_release.arc,
     helm_release.arc-runner-hook-template,
   ]

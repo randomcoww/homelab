@@ -63,14 +63,6 @@ variable "s3_prefix" {
   type = string
 }
 
-variable "s3_access_key_id" {
-  type = string
-}
-
-variable "s3_secret_access_key" {
-  type = string
-}
-
 variable "s3_mount_path" {
   type = string
 }
@@ -78,4 +70,8 @@ variable "s3_mount_path" {
 variable "s3_mount_extra_args" {
   type    = list(string)
   default = []
+}
+
+variable "s3_access_secret" {
+  type = string
 }

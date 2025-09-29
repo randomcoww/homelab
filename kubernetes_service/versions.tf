@@ -11,10 +11,6 @@ terraform {
     use_path_style              = true
   }
   required_providers {
-    helm = {
-      source  = "hashicorp/helm"
-      version = "3.0.2"
-    }
     minio = {
       source  = "aminueza/minio"
       version = "3.6.5"

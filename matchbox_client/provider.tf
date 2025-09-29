@@ -1,6 +1,6 @@
 locals {
   matchbox_endpoint    = "https://${local.services.matchbox.ip}:${local.service_ports.matchbox}"
-  image_store_endpoint = "https://${local.services.minio.ip}:${local.service_ports.minio}/${local.minio.data_buckets.boot.name}"
+  image_store_endpoint = "https://${local.services.minio.ip}:${local.service_ports.minio}/data-boot"
 }
 
 provider "matchbox" {

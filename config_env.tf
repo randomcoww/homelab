@@ -222,27 +222,6 @@ locals {
     }
   }
 
-  minio = {
-    data_buckets = {
-      boot = {
-        name = "data-boot"
-        acl  = "public-read"
-      }
-      music = {
-        name = "data-music"
-      }
-      pictures = {
-        name = "data-pictures"
-      }
-      videos = {
-        name = "data-videos"
-      }
-      models = {
-        name = "data-models"
-      }
-    }
-  }
-
   kubernetes_services = {
     for name, e in merge({
       for k, class in local.kubernetes.ingress_classes :

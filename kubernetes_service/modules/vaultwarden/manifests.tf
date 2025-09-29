@@ -93,8 +93,6 @@ module "litestream" {
             endpoint          = var.minio_endpoint
             bucket            = var.minio_bucket
             path              = var.minio_litestream_prefix
-            access-key-id     = var.minio_access_key_id
-            secret-access-key = var.minio_secret_access_key
             sync-interval     = "100ms"
             snapshot-interval = "1h"
             retention         = "1h"
@@ -103,8 +101,8 @@ module "litestream" {
       },
     ]
   }
-  sqlite_path = local.db_path
-  s3_ca_cert  = var.minio_ca_cert
+  sqlite_path      = local.db_path
+  s3_access_secret = var.minio_access_secret
   ##
   name      = var.name
   namespace = var.namespace

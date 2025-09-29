@@ -2,8 +2,8 @@ resource "helm_release" "kube-dns-rbac" {
   name          = "${local.kubernetes_services.kube_dns.name}-rbac"
   namespace     = local.kubernetes_services.kube_dns.namespace
   chart         = "../helm-wrapper"
-  wait          = true
-  wait_for_jobs = true
+  wait          = false
+  wait_for_jobs = false
   max_history   = 2
   values = [
     yamlencode({

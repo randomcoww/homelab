@@ -1,42 +1,8 @@
 ## internal registry
 
-resource "random_password" "event-listener-token" {
+resource "random_password" "registry-event-listener-token" {
   length  = 60
   special = false
-}
-
-resource "minio_s3_bucket" "registry" {
-  bucket        = "registry"
-  force_destroy = true
-}
-
-resource "minio_iam_user" "registry" {
-  name          = "registry"
-  force_destroy = true
-}
-
-resource "minio_iam_policy" "registry" {
-  name = "registry"
-  policy = jsonencode({
-    Version = "2012-10-17"
-    Statement = [
-      {
-        Effect = "Allow"
-        Action = [
-          "s3:*",
-        ]
-        Resource = [
-          minio_s3_bucket.registry.arn,
-          "${minio_s3_bucket.registry.arn}/*",
-        ]
-      },
-    ]
-  })
-}
-
-resource "minio_iam_user_policy_attachment" "registry" {
-  user_name   = minio_iam_user.registry.id
-  policy_name = minio_iam_policy.registry.id
 }
 
 module "registry" {
@@ -54,20 +20,13 @@ module "registry" {
   ca                      = data.terraform_remote_state.sr.outputs.trust.ca
   service_ip              = local.services.registry.ip
   loadbalancer_class_name = "kube-vip.io/kube-vip-class"
-  event_listener_token    = random_password.event-listener-token.result
+  event_listener_token    = random_password.registry-event-listener-token.result
   event_listener_url      = "https://${local.ingress_endpoints.registry_ui}/event-receiver"
 
-  s3_endpoint          = "https://${local.services.cluster_minio.ip}:${local.service_ports.minio}"
-  s3_bucket            = minio_s3_bucket.registry.id
-  s3_bucket_prefix     = "/"
-  s3_access_key_id     = minio_iam_user.registry.id
-  s3_secret_access_key = minio_iam_user.registry.secret
-
-  depends_on = [
-    minio_iam_user.registry,
-    minio_iam_policy.registry,
-    minio_iam_user_policy_attachment.registry,
-  ]
+  minio_endpoint      = "https://${local.services.cluster_minio.ip}:${local.service_ports.minio}"
+  minio_bucket        = "registry"
+  minio_bucket_prefix = "/"
+  minio_access_secret = local.minio_users.registry.secret
 }
 
 module "registry-ui" {
@@ -82,45 +41,12 @@ module "registry-ui" {
   registry_ca_cert          = data.terraform_remote_state.sr.outputs.trust.ca.cert_pem
   service_hostname          = local.ingress_endpoints.registry_ui
   timezone                  = local.timezone
-  event_listener_token      = random_password.event-listener-token.result
+  event_listener_token      = random_password.registry-event-listener-token.result
   ingress_class_name        = local.kubernetes.ingress_classes.ingress_nginx
   nginx_ingress_annotations = local.nginx_ingress_annotations
 }
 
 ## llama-cpp
-
-resource "minio_iam_user" "llama-cpp" {
-  name          = "llama-cpp"
-  force_destroy = true
-}
-
-resource "minio_iam_policy" "llama-cpp" {
-  name = "llama-cpp"
-  policy = jsonencode({
-    Version = "2012-10-17"
-    Statement = [
-      {
-        Effect = "Allow"
-        Action = [
-          "s3:GetObject",
-          "s3:PutObject",
-          "s3:ListBucket",
-          "s3:DeleteObject",
-          "s3:AbortMultipartUpload",
-        ]
-        Resource = [
-          minio_s3_bucket.data["models"].arn,
-          "${minio_s3_bucket.data["models"].arn}/*",
-        ]
-      },
-    ]
-  })
-}
-
-resource "minio_iam_user_policy_attachment" "llama-cpp" {
-  user_name   = minio_iam_user.llama-cpp.id
-  policy_name = minio_iam_policy.llama-cpp.id
-}
 
 module "llama-cpp" {
   source    = "./modules/llama_cpp"
@@ -181,21 +107,14 @@ module "llama-cpp" {
       "nvidia.com/gpu" = 1
     }
   }
-  s3_endpoint          = "https://${local.services.cluster_minio.ip}:${local.service_ports.minio}"
-  s3_bucket            = minio_s3_bucket.data["models"].id
-  s3_access_key_id     = minio_iam_user.llama-cpp.id
-  s3_secret_access_key = minio_iam_user.llama-cpp.secret
-  s3_mount_extra_args = [
+  minio_endpoint      = "https://${local.services.cluster_minio.ip}:${local.service_ports.minio}"
+  minio_bucket        = "data-models"
+  minio_access_secret = local.minio_users.llama-cpp.secret
+  minio_mount_extra_args = [
     "--read-only",
   ]
   ingress_class_name        = local.kubernetes.ingress_classes.ingress_nginx
   nginx_ingress_annotations = local.nginx_ingress_annotations
-
-  depends_on = [
-    minio_iam_user.llama-cpp,
-    minio_iam_policy.llama-cpp,
-    minio_iam_user_policy_attachment.llama-cpp,
-  ]
 }
 
 ## SearXNG
@@ -238,44 +157,6 @@ module "searxng" {
 
 ## flowise
 
-resource "minio_s3_bucket" "flowise" {
-  bucket        = "flowise"
-  force_destroy = true
-}
-
-resource "minio_iam_user" "flowise" {
-  name          = "flowise"
-  force_destroy = true
-}
-
-resource "minio_iam_policy" "flowise" {
-  name = "flowise"
-  policy = jsonencode({
-    Version = "2012-10-17"
-    Statement = [
-      {
-        Effect = "Allow"
-        Action = [
-          "s3:GetObject",
-          "s3:PutObject",
-          "s3:ListBucket",
-          "s3:DeleteObject",
-          "s3:AbortMultipartUpload",
-        ]
-        Resource = [
-          minio_s3_bucket.flowise.arn,
-          "${minio_s3_bucket.flowise.arn}/*",
-        ]
-      },
-    ]
-  })
-}
-
-resource "minio_iam_user_policy_attachment" "flowise" {
-  user_name   = minio_iam_user.flowise.id
-  policy_name = minio_iam_policy.flowise.id
-}
-
 module "flowise" {
   source    = "./modules/flowise"
   name      = "flowise"
@@ -287,113 +168,28 @@ module "flowise" {
   }
   service_hostname = local.ingress_endpoints.flowise
   extra_configs = {
-    STORAGE_TYPE                 = "s3"
-    S3_STORAGE_BUCKET_NAME       = minio_s3_bucket.flowise.id
-    S3_STORAGE_ACCESS_KEY_ID     = minio_iam_user.flowise.id
-    S3_STORAGE_SECRET_ACCESS_KEY = minio_iam_user.flowise.secret
-    S3_STORAGE_REGION            = "NA"
-    S3_ENDPOINT_URL              = "https://${local.services.cluster_minio.ip}:${local.service_ports.minio}"
-    S3_FORCE_PATH_STYLE          = true
-    SMTP_HOST                    = var.smtp.host
-    SMTP_PORT                    = var.smtp.port
-    SMTP_USER                    = var.smtp.username
-    SMTP_PASSWORD                = var.smtp.password
-    SMTP_SECURE                  = true
-    SENDER_EMAIL                 = var.smtp.username
+    STORAGE_TYPE           = "s3"
+    S3_STORAGE_BUCKET_NAME = "flowise"
+    S3_STORAGE_REGION      = "NA"
+    S3_ENDPOINT_URL        = "https://${local.services.cluster_minio.ip}:${local.service_ports.minio}"
+    S3_FORCE_PATH_STYLE    = true
+    SMTP_HOST              = var.smtp.host
+    SMTP_PORT              = var.smtp.port
+    SMTP_USER              = var.smtp.username
+    SMTP_PASSWORD          = var.smtp.password
+    SMTP_SECURE            = true
+    SENDER_EMAIL           = var.smtp.username
   }
   ingress_class_name        = local.kubernetes.ingress_classes.ingress_nginx
   nginx_ingress_annotations = local.nginx_ingress_annotations
 
   minio_endpoint          = "https://${local.services.cluster_minio.ip}:${local.service_ports.minio}"
-  minio_bucket            = minio_s3_bucket.flowise.id
+  minio_bucket            = "flowise"
   minio_litestream_prefix = "$POD_NAME/litestream"
-  minio_access_key_id     = minio_iam_user.flowise.id
-  minio_secret_access_key = minio_iam_user.flowise.secret
-  minio_ca_cert           = data.terraform_remote_state.sr.outputs.trust.ca.cert_pem
-
-  depends_on = [
-    minio_iam_user.flowise,
-    minio_iam_policy.flowise,
-    minio_iam_user_policy_attachment.flowise,
-  ]
+  minio_access_secret     = local.minio_users.flowise.secret
 }
 
 ## code-server
-
-locals {
-  code_mc_config_dir = "/var/tmp/minio"
-}
-
-resource "minio_s3_bucket" "code" {
-  bucket        = "code"
-  force_destroy = true
-}
-
-resource "minio_iam_user" "code" {
-  name          = "code"
-  force_destroy = true
-}
-
-resource "minio_iam_policy" "code" {
-  name = "code"
-  policy = jsonencode({
-    Version = "2012-10-17"
-    Statement = [
-      {
-        Effect = "Allow"
-        Action = [
-          "s3:GetObject",
-          "s3:PutObject",
-          "s3:ListBucket",
-          "s3:DeleteObject",
-          "s3:AbortMultipartUpload",
-        ]
-        Resource = [
-          minio_s3_bucket.code.arn,
-          "${minio_s3_bucket.code.arn}/*",
-        ]
-      },
-    ]
-  })
-}
-
-resource "minio_iam_user_policy_attachment" "code" {
-  user_name   = minio_iam_user.code.id
-  policy_name = minio_iam_policy.code.id
-}
-
-resource "minio_iam_user" "code-client" {
-  name          = "code-client"
-  force_destroy = true
-}
-
-resource "minio_iam_policy" "code-client" {
-  name = "code-client"
-  policy = jsonencode({
-    Version = "2012-10-17"
-    Statement = [
-      {
-        Effect = "Allow"
-        Action = [
-          "s3:GetObject",
-          "s3:PutObject",
-          "s3:ListBucket",
-          "s3:DeleteObject",
-          "s3:AbortMultipartUpload",
-        ]
-        Resource = [
-          minio_s3_bucket.data["models"].arn,
-          "${minio_s3_bucket.data["models"].arn}/*",
-        ]
-      },
-    ]
-  })
-}
-
-resource "minio_iam_user_policy_attachment" "code-client" {
-  user_name   = minio_iam_user.code-client.id
-  policy_name = minio_iam_policy.code-client.id
-}
 
 module "code-server" {
   source  = "./modules/code_server"
@@ -420,20 +216,6 @@ module "code-server" {
       path    = "/etc/pki/ca-trust/source/anchors/ca-cert.pem"
       content = data.terraform_remote_state.sr.outputs.trust.ca.cert_pem
     },
-    {
-      path = "${local.code_mc_config_dir}/config.json"
-      content = jsonencode({
-        aliases = {
-          m = {
-            url       = "https://${local.services.cluster_minio.ip}:${local.service_ports.minio}"
-            accessKey = minio_iam_user.code-client.id
-            secretKey = minio_iam_user.code-client.secret
-            api       = "S3v4"
-            path      = "auto"
-          }
-        }
-      })
-    },
   ]
   extra_envs = [
     {
@@ -441,26 +223,8 @@ module "code-server" {
       value = local.timezone
     },
     {
-      name  = "MC_CONFIG_DIR"
-      value = local.code_mc_config_dir
-    },
-    {
       name  = "NVIDIA_DRIVER_CAPABILITIES"
       value = "compute,utility"
-    },
-  ]
-  extra_volume_mounts = [
-    {
-      name      = "minio-path"
-      mountPath = local.code_mc_config_dir
-    },
-  ]
-  extra_volumes = [
-    {
-      name = "minio-path"
-      emptyDir = {
-        medium = "Memory"
-      }
     },
   ]
   resources = {
@@ -472,15 +236,7 @@ module "code-server" {
   ingress_class_name        = local.kubernetes.ingress_classes.ingress_nginx
   nginx_ingress_annotations = local.nginx_ingress_annotations
 
-  minio_endpoint          = "https://${local.services.cluster_minio.ip}:${local.service_ports.minio}"
-  minio_bucket            = minio_s3_bucket.code.id
-  minio_access_key_id     = minio_iam_user.code.id
-  minio_secret_access_key = minio_iam_user.code.secret
-  minio_ca_cert           = data.terraform_remote_state.sr.outputs.trust.ca.cert_pem
-
-  depends_on = [
-    minio_iam_user.code,
-    minio_iam_policy.code,
-    minio_iam_user_policy_attachment.code,
-  ]
+  minio_endpoint      = "https://${local.services.cluster_minio.ip}:${local.service_ports.minio}"
+  minio_bucket        = "code"
+  minio_access_secret = local.minio_users.code.secret
 }

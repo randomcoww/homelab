@@ -1,7 +1,7 @@
 terraform {
   backend "s3" {
     bucket                      = "terraform"
-    key                         = "state/kubernetes_bootstrap-0.tfstate"
+    key                         = "state/minio_resources-0.tfstate"
     region                      = "auto"
     skip_credentials_validation = true
     skip_metadata_api_check     = true
@@ -11,9 +11,9 @@ terraform {
     use_path_style              = true
   }
   required_providers {
-    helm = {
-      source  = "hashicorp/helm"
-      version = "3.0.2"
+    minio = {
+      source  = "aminueza/minio"
+      version = "3.6.5"
     }
   }
 }

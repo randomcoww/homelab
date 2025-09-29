@@ -21,7 +21,6 @@ module "secret" {
   release = var.release
   data = {
     basename(local.config_path) = yamlencode(var.litestream_config)
-    basename(local.s3_ca_path)  = var.s3_ca_cert
   }
 }
 
@@ -60,6 +59,24 @@ module "statefulset" {
             }
           },
           {
+            name = "AWS_ACCESS_KEY_ID"
+            valueFrom = {
+              secretKeyRef = {
+                name = var.s3_access_secret
+                key  = "AWS_ACCESS_KEY_ID"
+              }
+            }
+          },
+          {
+            name = "AWS_SECRET_ACCESS_KEY"
+            valueFrom = {
+              secretKeyRef = {
+                name = var.s3_access_secret
+                key  = "AWS_SECRET_ACCESS_KEY"
+              }
+            }
+          },
+          {
             name  = "AWS_CA_BUNDLE"
             value = local.s3_ca_path
           },
@@ -71,13 +88,13 @@ module "statefulset" {
             subPath   = basename(local.config_path)
           },
           {
-            name      = "litestream-config"
-            mountPath = local.s3_ca_path
-            subPath   = basename(local.s3_ca_path)
-          },
-          {
             name      = "litestream-data"
             mountPath = dirname(var.sqlite_path)
+          },
+          {
+            name      = "minio-access-secret"
+            mountPath = local.s3_ca_path
+            subPath   = "AWS_CA_BUNDLE"
           },
         ]
       },
@@ -100,6 +117,24 @@ module "statefulset" {
             }
           },
           {
+            name = "AWS_ACCESS_KEY_ID"
+            valueFrom = {
+              secretKeyRef = {
+                name = var.s3_access_secret
+                key  = "AWS_ACCESS_KEY_ID"
+              }
+            }
+          },
+          {
+            name = "AWS_SECRET_ACCESS_KEY"
+            valueFrom = {
+              secretKeyRef = {
+                name = var.s3_access_secret
+                key  = "AWS_SECRET_ACCESS_KEY"
+              }
+            }
+          },
+          {
             name  = "AWS_CA_BUNDLE"
             value = local.s3_ca_path
           },
@@ -111,13 +146,13 @@ module "statefulset" {
             subPath   = basename(local.config_path)
           },
           {
-            name      = "litestream-config"
-            mountPath = local.s3_ca_path
-            subPath   = basename(local.s3_ca_path)
-          },
-          {
             name      = "litestream-data"
             mountPath = dirname(var.sqlite_path)
+          },
+          {
+            name      = "minio-access-secret"
+            mountPath = local.s3_ca_path
+            subPath   = "AWS_CA_BUNDLE"
           },
         ]
       },
@@ -148,6 +183,12 @@ module "statefulset" {
         name = "litestream-config"
         secret = {
           secretName = module.secret.name
+        }
+      },
+      {
+        name = "minio-access-secret"
+        secret = {
+          secretName = var.s3_access_secret
         }
       },
     ])
