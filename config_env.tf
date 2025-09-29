@@ -231,8 +231,7 @@ locals {
       }
       }, {
       apiserver = {
-        name      = "kubernetes"
-        namespace = "default"
+        name = "kubernetes"
       }
       etcd = {
         name      = "etcd"
@@ -243,8 +242,7 @@ locals {
         namespace = "kube-system"
       }
       matchbox = {
-        name      = "matchbox"
-        namespace = "default"
+        name = "matchbox"
       }
       minio = {
         name      = "minio"
@@ -259,20 +257,18 @@ locals {
         namespace = "monitoring"
       }
       llama_cpp = {
-        name      = "llama-cpp"
-        namespace = "default"
+        name = "llama-cpp"
       }
       searxng = {
-        name      = "searxng"
-        namespace = "default"
+        name = "searxng"
       }
       registry = {
-        name      = "registry"
-        namespace = "default"
+        name = "registry"
       }
     }) :
     name => merge(e, {
-      endpoint = "${e.name}.${e.namespace}"
+      namespace = lookup(e, "namespace", "default")
+      endpoint  = "${e.name}.${lookup(e, "namespace", "default")}"
     })
   }
 
