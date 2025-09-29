@@ -124,19 +124,19 @@ locals {
     nginx       = "docker.io/nginxinc/nginx-unprivileged:1.29.1-alpine@sha256:7fe7fa7c0bda4c3cb0b7367eaad6a01db52226bce370eeb917664f7135c23b46"
     # tier 3
     hostapd               = "registry.default/randomcoww/hostapd-noscan:v2.11.20250926.2051@sha256:f1b87bacef07ab2231f073f582eab32d9fb6b508b905bd5e86a981b06127c90f"
-    tailscale             = "registry.default/randomcoww/tailscale-nft:v1.88.2.20250928.0031@sha256:41fa384c0b7efb80e18211c7d7751272beb147ecfe978d29eae570faaf5ebead"
+    tailscale             = "registry.default/randomcoww/tailscale-nft:v1.88.2.20250929.0657@sha256:56cf4723d805a7a03702d2afe55dcc87ef9d6b8afa2768b112fba1adee4ca8f5"
     qrcode_generator      = "registry.default/randomcoww/qrcode-resource:v1.20250926.2053@sha256:9c63bb0f788a0c1ff855fa6cc9cd961faf7ddd982a541eeb32f8bbb58701ed71"
     device_plugin         = "ghcr.io/squat/generic-device-plugin:latest@sha256:359bcdd5c7b45a815a50e2f69c5942d85de6db03ff4a3923462af06161bead08"
     rclone                = "ghcr.io/rclone/rclone:1.71.1@sha256:d5971950c2b370fb04dd3292541b5bda6d9103143fd7e345aeb435a399388afc"
     audioserve            = "docker.io/izderadicka/audioserve:latest@sha256:c3609321701765671cae121fc0f61db122e8c124643c04770fbc9326c74b18e3"
-    llama_cpp             = "ghcr.io/mostlygeek/llama-swap:cuda@sha256:32bc3dae662201040b08f2a24f5f91cf94f7b34d9bf334e090b3a85205fddf95"
+    llama_cpp             = "ghcr.io/mostlygeek/llama-swap:cuda@sha256:bb52ae6cedc1af4807a2849be716824e93921f3c824a873ef59530807a2dcd83"
     sunshine_desktop      = "registry.default/randomcoww/sunshine-desktop:v2025.927.211945.20250928.0101@sha256:86d74394415d5976d2bec6479ed6eb420c434fa13bbbb0e7115fd7fc4e96d759"
     litestream            = "docker.io/litestream/litestream:0.3.13@sha256:027eda2a89a86015b9797d2129d4dd447e8953097b4190e1d5a30b73e76d8d58"
     vaultwarden           = "ghcr.io/dani-garcia/vaultwarden:1.34.3-alpine@sha256:d70118b9dafb8588ee2651ceb5df68db27dcbd8e18467722010644ba48d5d6d6"
     juicefs               = "registry.default/randomcoww/juicefs:v1.3.0.20250928.0036@sha256:a7e5b85c3b14d8f35ef5e31f6c743f028c70a324ab75dc38941d6ef7b7c7ecc7"
     code_server           = "registry.default/randomcoww/code-server:v1.103.1.20250928.0029@sha256:ec6cede4d28990ce86f75fb9420961c99738851f486069a3cde20c50ccfd6f68"
     flowise               = "docker.io/flowiseai/flowise:3.0.7@sha256:11284f6a28c32d83df10f9382e66c576d9e73715d7ab8c416554dfd9af4e7570"
-    searxng               = "ghcr.io/searxng/searxng:latest@sha256:b8a28fdff4a1d7697705a5931407f10240f98553b90468793c993ae5e21d1c32"
+    searxng               = "ghcr.io/searxng/searxng:latest@sha256:8501548a848cdf3b412c02edc45dea506774583a8341d3d1bbf4e208064f66e0"
     valkey                = "ghcr.io/valkey-io/valkey:8.1.3-alpine@sha256:d827e7f7552cdee40cc7482dbae9da020f42bc47669af6f71182a4ef76a22773"
     nvidia_driver         = "registry.default/randomcoww/nvidia-driver-container:v580.82.09.20250923.2257-fedora42@sha256:d4ef9abc2aae670708e47f3dc98e6f8c88b6db3b1a70592afcb4328e6c447e05"
     github_actions_runner = "ghcr.io/actions/actions-runner:2.328.0@sha256:db0dcae6d28559e54277755a33aba7d0665f255b3bd2a66cdc5e132712f155e0"
@@ -146,7 +146,7 @@ locals {
 
   # these fields are updated by renovate - don't use var substitutions
   pxeboot_images = {
-    coreos = "fedora-coreos-42.20250925.16" # randomcoww/fedora-coreos-config
+    coreos = "fedora-coreos-42.20250929.06" # randomcoww/fedora-coreos-config
   }
 
   host_ports = {
