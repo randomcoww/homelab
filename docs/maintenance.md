@@ -18,6 +18,24 @@ terraform -chdir=client_credentials output -json minio_client | jq -r '.ca_cert_
 
 ---
 
+### Deploy services to Kubernetes
+
+Deploy Kubernetes services. Some services rely on MinIO and will crash loop until MinIO resources are created (below).
+
+```bash
+terraform -chdir=kubernetes_service init -upgrade && \
+terraform -chdir=kubernetes_service apply -var-file=../secrets.tfvars
+```
+
+Create MinIO resources and secrets containing access credentials in Kubernetes. MinIO must be running in Kubernetes for this to work.
+
+```bash
+terraform -chdir=minio_resources init -upgrade && \
+terraform -chdir=minio_resources apply
+```
+
+---
+
 ### Build OS images
 
 See [fedora-coreos-config](https://github.com/randomcoww/fedora-coreos-config)
@@ -46,22 +64,4 @@ Trigger rolling reboot of hosts coordinated by `kured`. Nodes occasionally fail 
 ```bash
 terraform -chdir=rolling_reboot init -upgrade && \
 terraform -chdir=rolling_reboot apply
-```
-
----
-
-### Deploy services to Kubernetes
-
-Deploy Kubernetes services. Some services rely on MinIO and will crash loop until MinIO resources are created (below).
-
-```bash
-terraform -chdir=kubernetes_service init -upgrade && \
-terraform -chdir=kubernetes_service apply -var-file=../secrets.tfvars
-```
-
-Create MinIO resources and secrets containing access credentials in Kubernetes. MinIO must be running in Kubernetes for this to work.
-
-```bash
-terraform -chdir=minio_resources init -upgrade && \
-terraform -chdir=minio_resources apply
 ```

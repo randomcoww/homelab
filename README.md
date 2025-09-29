@@ -15,6 +15,6 @@ terraform() {
 }
 ```
 
-* [Host provisioning](./docs/provisioning.md)
+* [Initial host provisioning](./docs/provisioning.md)
 
-* [Kubernetes provisioning and maintenance](./docs/maintenance.md)
+* [Kubernetes and host maintenance](./docs/maintenance.md)
