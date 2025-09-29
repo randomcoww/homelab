@@ -121,7 +121,7 @@ locals {
     ipxe        = "ghcr.io/randomcoww/ipxe:v1.20250926.2052@sha256:19b3fed2fbfb33b6e22771f7b4ffa7b19e5a629e54d8466fba2e92f43d610adb"
     mountpoint  = "ghcr.io/randomcoww/mountpoint-s3:v1.20.0.20250928.0050@sha256:77a262fb1c116eff09f5c420e8648ed6213224a2f4ded5bdd36fa93eab974199"
     matchbox    = "quay.io/poseidon/matchbox:v0.11.0@sha256:06bcdae85335fd00e8277b007b55cfb49d96a0114628c0f70db2b92b079d246a"
-    nginx       = "docker.io/nginxinc/nginx-unprivileged:1.29.1-alpine@sha256:9fda08cc7f7580567e9d8c477420d7beadb9387d4004074c89f41f9d90ecf300"
+    nginx       = "docker.io/nginxinc/nginx-unprivileged:1.29.1-alpine@sha256:7fe7fa7c0bda4c3cb0b7367eaad6a01db52226bce370eeb917664f7135c23b46"
     # tier 3
     hostapd               = "registry.default/randomcoww/hostapd-noscan:v2.11.20250926.2051@sha256:f1b87bacef07ab2231f073f582eab32d9fb6b508b905bd5e86a981b06127c90f"
     tailscale             = "registry.default/randomcoww/tailscale-nft:v1.88.2.20250928.0031@sha256:41fa384c0b7efb80e18211c7d7751272beb147ecfe978d29eae570faaf5ebead"
