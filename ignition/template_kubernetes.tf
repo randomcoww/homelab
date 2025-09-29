@@ -28,7 +28,7 @@ module "kubernetes-master" {
   }
   kubelet_client_user        = local.kubernetes.kubelet_client_user
   front_proxy_client_user    = local.kubernetes.front_proxy_client_user
-  cluster_apiserver_endpoint = "${local.endpoints.apiserver.service_fqdn}.svc.${local.domains.kubernetes}"
+  cluster_apiserver_endpoint = "${local.endpoints.apiserver.service}.svc.${local.domains.kubernetes}"
   kubernetes_service_prefix  = local.networks.kubernetes_service.prefix
   kubernetes_pod_prefix      = local.networks.kubernetes_pod.prefix
   node_ips = compact([
