@@ -38,6 +38,7 @@ locals {
 
     # internal container registry
     registry = {
+      namespace = local.kubernetes_services.registry.namespace
       policies = [
         {
           Effect = "Allow"
@@ -53,6 +54,7 @@ locals {
 
     # llama-cpp mount-s3 access to models
     llama-cpp = {
+      namespace = local.kubernetes_services.llama_cpp.namespace
       policies = [
         {
           Effect = "Allow"
@@ -161,6 +163,7 @@ locals {
 
     # matchbox mount-s3 access to boot
     matchbox = {
+      namespace = local.kubernetes_services.matchbox.namespace
       policies = [
         {
           Effect = "Allow"
