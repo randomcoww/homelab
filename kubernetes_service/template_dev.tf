@@ -7,8 +7,8 @@ resource "random_password" "registry-event-listener-token" {
 
 module "registry" {
   source    = "./modules/registry"
-  name      = local.kubernetes_services.registry.name
-  namespace = local.kubernetes_services.registry.namespace
+  name      = local.endpoints.registry.name
+  namespace = local.endpoints.registry.namespace
   release   = "0.1.1"
   replicas  = 2
   images = {
@@ -21,7 +21,7 @@ module "registry" {
   service_ip              = local.services.registry.ip
   loadbalancer_class_name = "kube-vip.io/kube-vip-class"
   event_listener_token    = random_password.registry-event-listener-token.result
-  event_listener_url      = "https://${local.ingress_endpoints.registry_ui}/event-receiver"
+  event_listener_url      = "https://${local.endpoints.registry_ui.ingress}/event-receiver"
 
   minio_endpoint      = "https://${local.services.cluster_minio.ip}:${local.service_ports.minio}"
   minio_bucket        = "registry"
@@ -31,15 +31,15 @@ module "registry" {
 
 module "registry-ui" {
   source    = "./modules/registry_ui"
-  name      = "registry-ui"
-  namespace = "default"
+  name      = local.endpoints.registry_ui.name
+  namespace = local.endpoints.registry_ui.namespace
   release   = "0.1.1"
   images = {
     registry_ui = local.container_images.registry_ui
   }
-  registry_url              = "${local.kubernetes_services.registry.endpoint}:${local.service_ports.registry}"
+  registry_url              = "${local.endpoints.registry.service}:${local.service_ports.registry}"
   registry_ca_cert          = data.terraform_remote_state.sr.outputs.trust.ca.cert_pem
-  service_hostname          = local.ingress_endpoints.registry_ui
+  service_hostname          = local.endpoints.registry_ui.ingress
   timezone                  = local.timezone
   event_listener_token      = random_password.registry-event-listener-token.result
   ingress_class_name        = local.kubernetes.ingress_classes.ingress_nginx
@@ -50,8 +50,8 @@ module "registry-ui" {
 
 module "llama-cpp" {
   source    = "./modules/llama_cpp"
-  name      = local.kubernetes_services.llama_cpp.name
-  namespace = local.kubernetes_services.llama_cpp.namespace
+  name      = local.endpoints.llama_cpp.name
+  namespace = local.endpoints.llama_cpp.namespace
   release   = "0.1.1"
   images = {
     llama_cpp  = local.container_images.llama_cpp
@@ -60,7 +60,7 @@ module "llama-cpp" {
   ports = {
     llama_cpp = local.service_ports.llama_cpp
   }
-  service_hostname = local.ingress_endpoints.llama_cpp
+  service_hostname = local.endpoints.llama_cpp.ingress
   llama_swap_config = {
     healthCheckTimeout = 600
     models = {
@@ -109,7 +109,7 @@ module "llama-cpp" {
   }
   minio_endpoint      = "https://${local.services.cluster_minio.ip}:${local.service_ports.minio}"
   minio_bucket        = "data-models"
-  minio_access_secret = local.minio_users.llama-cpp.secret
+  minio_access_secret = local.minio_users.llama_cpp.secret
   minio_mount_extra_args = [
     "--read-only",
   ]
@@ -121,8 +121,8 @@ module "llama-cpp" {
 
 module "searxng" {
   source    = "./modules/searxng"
-  name      = local.kubernetes_services.searxng.name
-  namespace = local.kubernetes_services.searxng.namespace
+  name      = local.endpoints.searxng.name
+  namespace = local.endpoints.searxng.namespace
   release   = "0.1.1"
   replicas  = 2
   images = {
@@ -159,14 +159,14 @@ module "searxng" {
 
 module "flowise" {
   source    = "./modules/flowise"
-  name      = "flowise"
-  namespace = "default"
+  name      = local.endpoints.flowise.name
+  namespace = local.endpoints.flowise.namespace
   release   = "0.1.1"
   images = {
     flowise    = local.container_images.flowise
     litestream = local.container_images.litestream
   }
-  service_hostname = local.ingress_endpoints.flowise
+  service_hostname = local.endpoints.flowise.ingress
   extra_configs = {
     STORAGE_TYPE           = "s3"
     S3_STORAGE_BUCKET_NAME = "flowise"
@@ -192,9 +192,10 @@ module "flowise" {
 ## code-server
 
 module "code-server" {
-  source  = "./modules/code_server"
-  name    = "code-server"
-  release = "0.1.1"
+  source    = "./modules/code_server"
+  name      = local.endpoints.code_server.name
+  namespace = local.endpoints.code_server.namespace
+  release   = "0.1.1"
   images = {
     code_server = local.container_images.code_server
     jfs         = local.container_images.juicefs
@@ -232,11 +233,11 @@ module "code-server" {
       "nvidia.com/gpu" = 1
     }
   }
-  service_hostname          = local.ingress_endpoints.code_server
+  service_hostname          = local.endpoints.code_server.ingress
   ingress_class_name        = local.kubernetes.ingress_classes.ingress_nginx
   nginx_ingress_annotations = local.nginx_ingress_annotations
 
   minio_endpoint      = "https://${local.services.cluster_minio.ip}:${local.service_ports.minio}"
   minio_bucket        = "code"
-  minio_access_secret = local.minio_users.code.secret
+  minio_access_secret = local.minio_users.code_server.secret
 }

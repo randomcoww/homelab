@@ -161,7 +161,7 @@ resource "helm_release" "ingress-nginx" {
   name             = each.value
   repository       = "https://kubernetes.github.io/ingress-nginx"
   chart            = "ingress-nginx"
-  namespace        = local.kubernetes_services[each.key].namespace
+  namespace        = local.endpoints[each.key].namespace
   create_namespace = true
   wait             = false
   wait_for_jobs    = false
@@ -349,7 +349,7 @@ resource "helm_release" "cloudflare-tunnel" {
         ingress = [
           {
             hostname = "*.${local.domains.public}"
-            service  = "https://${local.kubernetes_services.ingress_nginx_external.endpoint}"
+            service  = "https://${local.endpoints.ingress_nginx_external.service}"
           },
         ]
       }

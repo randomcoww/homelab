@@ -28,7 +28,7 @@ module "kubernetes-master" {
   }
   kubelet_client_user        = local.kubernetes.kubelet_client_user
   front_proxy_client_user    = local.kubernetes.front_proxy_client_user
-  cluster_apiserver_endpoint = "${local.kubernetes_services.apiserver.endpoint}.svc.${local.domains.kubernetes}"
+  cluster_apiserver_endpoint = "${local.endpoints.apiserver.service_fqdn}.svc.${local.domains.kubernetes}"
   kubernetes_service_prefix  = local.networks.kubernetes_service.prefix
   kubernetes_pod_prefix      = local.networks.kubernetes_pod.prefix
   node_ips = compact([
@@ -76,7 +76,7 @@ module "kubernetes-worker" {
   # allow host to resolve registry by name
   internal_registries = [
     {
-      prefix   = local.kubernetes_services.registry.endpoint
+      prefix   = local.endpoints.registry.service
       location = local.services.registry.ip
     },
   ]
@@ -88,8 +88,8 @@ module "etcd" {
 
   butane_version = local.butane_version
   fw_mark        = local.fw_marks.accept
-  name           = local.kubernetes_services.etcd.name
-  namespace      = local.kubernetes_services.etcd.namespace
+  name           = local.endpoints.etcd.name
+  namespace      = local.endpoints.etcd.namespace
   host_key       = each.key
   cluster_token  = local.kubernetes.cluster_name
   ca             = data.terraform_remote_state.sr.outputs.etcd.ca

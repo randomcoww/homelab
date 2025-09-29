@@ -1,13 +1,13 @@
 module "vaultwarden" {
   source    = "./modules/vaultwarden"
-  name      = "vaultwarden"
-  namespace = "vaultwarden"
+  name      = local.endpoints.vaultwarden.name
+  namespace = local.endpoints.vaultwarden.namespace
   release   = "0.1.14"
   images = {
     vaultwarden = local.container_images.vaultwarden
     litestream  = local.container_images.litestream
   }
-  service_hostname = local.ingress_endpoints.vaultwarden
+  service_hostname = local.endpoints.vaultwarden.ingress
   extra_configs = {
     SENDS_ALLOWED            = false
     EMERGENCY_ACCESS_ALLOWED = false

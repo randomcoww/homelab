@@ -11,16 +11,16 @@ resource "tls_cert_request" "minio" {
   private_key_pem = tls_private_key.minio.private_key_pem
 
   subject {
-    common_name = "${local.kubernetes_services.minio.name}-server"
+    common_name = "${local.endpoints.minio.name}-server"
   }
 
   dns_names = concat([
     "localhost",
-    local.kubernetes_services.minio.name,
-    local.kubernetes_services.minio.endpoint,
+    local.endpoints.minio.name,
+    local.endpoints.minio.service,
     ], [
     for i, _ in range(local.minio_replicas) :
-    "${local.kubernetes_services.minio.name}-${i}.${local.kubernetes_services.minio.name}-svc.${local.kubernetes_services.minio.namespace}.svc"
+    "${local.endpoints.minio.name}-${i}.${local.endpoints.minio.name}-svc.${local.endpoints.minio.namespace}.svc"
   ])
   ip_addresses = [
     "127.0.0.1",
@@ -47,8 +47,8 @@ resource "tls_locally_signed_cert" "minio" {
 
 module "minio-client-secret" {
   source  = "../modules/secret"
-  name    = "${local.kubernetes_services.minio.name}-client"
-  app     = local.kubernetes_services.minio.name
+  name    = "${local.endpoints.minio.name}-client"
+  app     = local.endpoints.minio.name
   release = "0.1.0"
   data = {
     "public.crt"  = tls_locally_signed_cert.minio.cert_pem
@@ -58,8 +58,8 @@ module "minio-client-secret" {
 
 module "minio-ca-secret" {
   source  = "../modules/secret"
-  name    = "${local.kubernetes_services.minio.name}-ca"
-  app     = local.kubernetes_services.minio.name
+  name    = "${local.endpoints.minio.name}-ca"
+  app     = local.endpoints.minio.name
   release = "0.1.0"
   data = {
     "ca.crt" = data.terraform_remote_state.sr.outputs.trust.ca.cert_pem
@@ -68,8 +68,8 @@ module "minio-ca-secret" {
 
 module "minio-metrics-proxy" {
   source  = "../modules/configmap"
-  name    = "${local.kubernetes_services.minio.name}-proxy"
-  app     = local.kubernetes_services.minio.name
+  name    = "${local.endpoints.minio.name}-proxy"
+  app     = local.endpoints.minio.name
   release = "0.1.0"
   data = {
     nginx-config = <<-EOF
@@ -88,9 +88,9 @@ module "minio-metrics-proxy" {
 }
 
 resource "helm_release" "minio-resources" {
-  name             = "${local.kubernetes_services.minio.name}-resources"
+  name             = "${local.endpoints.minio.name}-resources"
   chart            = "../helm-wrapper"
-  namespace        = local.kubernetes_services.minio.namespace
+  namespace        = local.endpoints.minio.namespace
   create_namespace = true
   wait             = false
   wait_for_jobs    = false
@@ -107,8 +107,8 @@ resource "helm_release" "minio-resources" {
 }
 
 resource "helm_release" "minio" {
-  name             = local.kubernetes_services.minio.name
-  namespace        = local.kubernetes_services.minio.namespace
+  name             = local.endpoints.minio.name
+  namespace        = local.endpoints.minio.namespace
   repository       = "https://charts.min.io/"
   chart            = "minio"
   create_namespace = true
@@ -150,14 +150,14 @@ resource "helm_release" "minio" {
         enabled    = true
         publicCrt  = "public.crt"
         privateKey = "private.key"
-        certSecret = "${local.kubernetes_services.minio.name}-client"
+        certSecret = "${local.endpoints.minio.name}-client"
       }
       podAnnotations = {
         "checksum/client-cert"  = sha256(module.minio-client-secret.manifest)
         "checksum/ca-cert"      = sha256(module.minio-ca-secret.manifest)
         "checksum/proxy-config" = sha256(module.minio-metrics-proxy.manifest)
       }
-      trustedCertsSecret = "${local.kubernetes_services.minio.name}-ca"
+      trustedCertsSecret = "${local.endpoints.minio.name}-ca"
       ingress = {
         enabled = false
       }
@@ -176,14 +176,14 @@ resource "helm_release" "minio" {
         {
           name = "proxy-config"
           configMap = {
-            name = "${local.kubernetes_services.minio.name}-proxy"
+            name = "${local.endpoints.minio.name}-proxy"
           }
         },
       ]
       extraContainers = [
         # bypass TLS for metrics endpoints
         {
-          name  = "${local.kubernetes_services.minio.name}-proxy"
+          name  = "${local.endpoints.minio.name}-proxy"
           image = local.container_images.nginx
           ports = [
             {

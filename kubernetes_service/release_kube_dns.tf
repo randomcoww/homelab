@@ -1,6 +1,6 @@
 resource "helm_release" "kube-dns-rbac" {
-  name          = "${local.kubernetes_services.kube_dns.name}-rbac"
-  namespace     = local.kubernetes_services.kube_dns.namespace
+  name          = "${local.endpoints.kube_dns.name}-rbac"
+  namespace     = local.endpoints.kube_dns.namespace
   chart         = "../helm-wrapper"
   wait          = false
   wait_for_jobs = false
@@ -12,7 +12,7 @@ resource "helm_release" "kube-dns-rbac" {
           apiVersion = "rbac.authorization.k8s.io/v1"
           kind       = "ClusterRole"
           metadata = {
-            name = local.kubernetes_services.kube_dns.name
+            name = local.endpoints.kube_dns.name
           }
           rules = [
             {
@@ -41,18 +41,18 @@ resource "helm_release" "kube-dns-rbac" {
           apiVersion = "rbac.authorization.k8s.io/v1"
           kind       = "ClusterRoleBinding"
           metadata = {
-            name = local.kubernetes_services.kube_dns.name
+            name = local.endpoints.kube_dns.name
           }
           roleRef = {
             apiGroup = "rbac.authorization.k8s.io"
             kind     = "ClusterRole"
-            name     = local.kubernetes_services.kube_dns.name
+            name     = local.endpoints.kube_dns.name
           }
           subjects = [
             {
               kind      = "ServiceAccount"
-              name      = "${local.kubernetes_services.kube_dns.name}-coredns"
-              namespace = local.kubernetes_services.kube_dns.namespace
+              name      = "${local.endpoints.kube_dns.name}-coredns"
+              namespace = local.endpoints.kube_dns.namespace
             },
           ]
         }),
@@ -62,8 +62,8 @@ resource "helm_release" "kube-dns-rbac" {
 }
 
 resource "helm_release" "kube-dns" {
-  name          = local.kubernetes_services.kube_dns.name
-  namespace     = local.kubernetes_services.kube_dns.namespace
+  name          = local.endpoints.kube_dns.name
+  namespace     = local.endpoints.kube_dns.namespace
   repository    = "https://coredns.github.io/helm"
   chart         = "coredns"
   wait          = false
@@ -91,7 +91,7 @@ resource "helm_release" "kube-dns" {
         loadBalancerClass = "kube-vip.io/kube-vip-class"
       }
       customLabels = {
-        app = local.kubernetes_services.kube_dns.name
+        app = local.endpoints.kube_dns.name
       }
       affinity = {
         podAntiAffinity = {
@@ -103,7 +103,7 @@ resource "helm_release" "kube-dns" {
                     key      = "app"
                     operator = "In"
                     values = [
-                      local.kubernetes_services.kube_dns.name,
+                      local.endpoints.kube_dns.name,
                     ]
                   },
                 ]
@@ -184,7 +184,7 @@ resource "helm_release" "kube-dns" {
       ]
       extraContainers = [
         {
-          name  = "${local.kubernetes_services.kube_dns.name}-external-dns"
+          name  = "${local.endpoints.kube_dns.name}-external-dns"
           image = local.container_images.external_dns
           args = [
             "--source=service",
@@ -230,7 +230,7 @@ resource "helm_release" "kube-dns" {
           }
         },
         {
-          name  = "${local.kubernetes_services.kube_dns.name}-etcd"
+          name  = "${local.endpoints.kube_dns.name}-etcd"
           image = local.container_images.etcd
           command = [
             "etcd",

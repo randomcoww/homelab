@@ -93,7 +93,7 @@ resource "helm_release" "arc-runner-hook-template" {
                       },
                       {
                         name  = "INTERNAL_REGISTRY"
-                        value = "${local.kubernetes_services.registry.endpoint}:${local.service_ports.registry}"
+                        value = "${local.endpoints.registry.service}:${local.service_ports.registry}"
                       },
                       {
                         name = "MINIO_ACCESS_KEY_ID"

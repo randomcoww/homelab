@@ -37,8 +37,8 @@ resource "helm_release" "metrics-server" {
 # Blackbox exporter
 
 resource "helm_release" "prometheus-blackbox" {
-  name             = local.kubernetes_services.prometheus_blackbox.name
-  namespace        = local.kubernetes_services.prometheus_blackbox.namespace
+  name             = local.endpoints.prometheus_blackbox.name
+  namespace        = local.endpoints.prometheus_blackbox.namespace
   create_namespace = true
   repository       = "https://prometheus-community.github.io/helm-charts"
   chart            = "prometheus-blackbox-exporter"
@@ -63,8 +63,8 @@ resource "helm_release" "prometheus-blackbox" {
 
 module "prometheus-ca-secret" {
   source  = "../modules/secret"
-  name    = local.kubernetes_services.prometheus.name
-  app     = local.kubernetes_services.prometheus.name
+  name    = local.endpoints.prometheus.name
+  app     = local.endpoints.prometheus.name
   release = "0.1.0"
   data = {
     "ca-cert.pem" = data.terraform_remote_state.sr.outputs.trust.ca.cert_pem
@@ -72,8 +72,8 @@ module "prometheus-ca-secret" {
 }
 
 resource "helm_release" "prometheus" {
-  name             = local.kubernetes_services.prometheus.name
-  namespace        = local.kubernetes_services.prometheus.namespace
+  name             = local.endpoints.prometheus.name
+  namespace        = local.endpoints.prometheus.namespace
   create_namespace = true
   repository       = "https://prometheus-community.github.io/helm-charts"
   chart            = "prometheus"
@@ -106,7 +106,7 @@ resource "helm_release" "prometheus" {
           ingressClassName = local.kubernetes.ingress_classes.ingress_nginx
           annotations      = local.nginx_ingress_annotations
           hosts = [
-            local.ingress_endpoints.monitoring,
+            local.endpoints.prometheus.ingress,
           ]
           tls = [
             local.ingress_tls_common,
@@ -175,7 +175,7 @@ resource "helm_release" "prometheus" {
             },
             {
               target_label = "__address__"
-              replacement  = "${local.kubernetes_services.prometheus_blackbox.name}-prometheus-blackbox-exporter.${local.kubernetes_services.prometheus_blackbox.namespace}:${local.service_ports.prometheus_blackbox}"
+              replacement  = "${local.endpoints.prometheus_blackbox.name}-prometheus-blackbox-exporter.${local.endpoints.prometheus_blackbox.namespace}:${local.service_ports.prometheus_blackbox}"
             },
           ]
         },
@@ -199,17 +199,17 @@ resource "helm_release" "prometheus" {
                   (
                     (
                       max by (app) (
-                        sum by (app) (up{app="${local.kubernetes_services.etcd.name}",namespace="${local.kubernetes_services.etcd.namespace}"} == bool 0)
+                        sum by (app) (up{app="${local.endpoints.etcd.name}",namespace="${local.endpoints.etcd.namespace}"} == bool 0)
                       or
                         count by (app,endpoint) (
-                          sum by (app,endpoint,To) (rate(etcd_network_peer_sent_failures_total{app="${local.kubernetes_services.etcd.name}",namespace="${local.kubernetes_services.etcd.namespace}"}[1m])) > 0.01
+                          sum by (app,endpoint,To) (rate(etcd_network_peer_sent_failures_total{app="${local.endpoints.etcd.name}",namespace="${local.endpoints.etcd.namespace}"}[1m])) > 0.01
                         )
                       ) > 0
                     )
                   or
-                    count(etcd_server_is_leader{app="${local.kubernetes_services.etcd.name}",namespace="${local.kubernetes_services.etcd.namespace}"} == 1) by (app) > 1
+                    count(etcd_server_is_leader{app="${local.endpoints.etcd.name}",namespace="${local.endpoints.etcd.namespace}"} == 1) by (app) > 1
                   or
-                    count(etcd_server_has_leader{app="${local.kubernetes_services.etcd.name}",namespace="${local.kubernetes_services.etcd.namespace}"} == 1) by (app) < ${length(local.members.etcd)}
+                    count(etcd_server_has_leader{app="${local.endpoints.etcd.name}",namespace="${local.endpoints.etcd.namespace}"} == 1) by (app) < ${length(local.members.etcd)}
                   )
                   EOF
                   labels = {
@@ -231,7 +231,7 @@ resource "helm_release" "prometheus" {
                     EOF
                   }
                   expr = <<-EOF
-                  avg_over_time(minio_cluster_nodes_offline_total{app="${local.kubernetes_services.minio.name}",namespace="${local.kubernetes_services.minio.namespace}"}[1m]) > 0
+                  avg_over_time(minio_cluster_nodes_offline_total{app="${local.endpoints.minio.name}",namespace="${local.endpoints.minio.namespace}"}[1m]) > 0
                   EOF
                   labels = {
                     severity = "critical"
@@ -246,7 +246,7 @@ resource "helm_release" "prometheus" {
                     EOF
                   }
                   expr = <<-EOF
-                  avg_over_time(minio_cluster_drive_offline_total{app="${local.kubernetes_services.minio.name}",namespace="${local.kubernetes_services.minio.namespace}"}[1m]) > 0
+                  avg_over_time(minio_cluster_drive_offline_total{app="${local.endpoints.minio.name}",namespace="${local.endpoints.minio.namespace}"}[1m]) > 0
                   EOF
                   labels = {
                     severity = "critical"
@@ -393,7 +393,7 @@ resource "helm_release" "kured" {
     yamlencode({
       configuration = {
         # promethues chart creates service name <name>-server
-        prometheusUrl = "http://${local.kubernetes_services.prometheus.name}-server.${local.kubernetes_services.prometheus.namespace}:${local.service_ports.prometheus}"
+        prometheusUrl = "http://${local.endpoints.prometheus.name}-server.${local.endpoints.prometheus.namespace}:${local.service_ports.prometheus}"
         period        = "2m"
         metricsPort   = local.service_ports.metrics
         forceReboot   = true

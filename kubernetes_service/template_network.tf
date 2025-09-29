@@ -61,8 +61,8 @@ module "kea" {
 
 module "matchbox" {
   source    = "./modules/matchbox"
-  name      = local.kubernetes_services.matchbox.name
-  namespace = local.kubernetes_services.matchbox.namespace
+  name      = local.endpoints.matchbox.name
+  namespace = local.endpoints.matchbox.namespace
   release   = "0.2.16"
   replicas  = 3
   images = {
@@ -167,14 +167,15 @@ module "hostapd" {
 # Render QR code for wifi
 
 module "qrcode-hostapd" {
-  source   = "./modules/qrcode"
-  name     = "qrcode-hostapd"
-  replicas = 2
-  release  = "0.1.0"
+  source    = "./modules/qrcode"
+  name      = local.endpoints.qrcode_hostapd.name
+  namespace = local.endpoints.qrcode_hostapd.namespace
+  replicas  = 2
+  release   = "0.1.0"
   images = {
     qrcode = local.container_images.qrcode_generator
   }
-  service_hostname          = local.ingress_endpoints.qrcode_hostapd
+  service_hostname          = local.endpoints.qrcode_hostapd.ingress
   ingress_class_name        = local.kubernetes.ingress_classes.ingress_nginx
   nginx_ingress_annotations = local.nginx_ingress_annotations
   qrcode_value              = "WIFI:S:${random_password.hostapd-ssid.result};T:WPA;P:${random_password.hostapd-password.result};H:true;;"

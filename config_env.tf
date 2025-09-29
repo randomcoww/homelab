@@ -222,7 +222,7 @@ locals {
     }
   }
 
-  kubernetes_services = {
+  endpoints = {
     for name, e in merge({
       for k, class in local.kubernetes.ingress_classes :
       k => {
@@ -251,6 +251,7 @@ locals {
       prometheus = {
         name      = "prometheus"
         namespace = "monitoring"
+        ingress   = "m"
       }
       prometheus_blackbox = {
         name      = "prometheus-blackbox"
@@ -265,28 +266,51 @@ locals {
       registry = {
         name = "registry"
       }
+      registry_ui = {
+        name    = "registry-ui"
+        ingress = "reg"
+      }
+      qrcode_hostapd = {
+        name    = "qrcode-hostapd"
+        ingress = "hostapd"
+      }
+      webdav_pictures = {
+        name    = "webdav-pictures"
+        ingress = "pictures"
+      }
+      webdav_videos = {
+        name    = "webdav-videos"
+        ingress = "videos"
+      }
+      audioserve = {
+        name = "audioserve"
+      }
+      vaultwarden = {
+        name      = "vaultwarden"
+        namespace = "vaultwarden"
+        ingress   = "vw"
+      }
+      flowise = {
+        name = "flowise"
+      }
+      llama_cpp = {
+        name    = "llama-cpp"
+        ingress = "llm"
+      }
+      code_server = {
+        name    = "code-server"
+        ingress = "code"
+      }
+      sunshine_desktop = {
+        name    = "sunshine-desktop"
+        ingress = "sunadmin"
+      }
     }) :
     name => merge(e, {
       namespace = lookup(e, "namespace", "default")
-      endpoint  = "${e.name}.${lookup(e, "namespace", "default")}"
+      service   = "${e.name}.${lookup(e, "namespace", "default")}"
+      ingress   = "${lookup(e, "ingress", e.name)}.${local.domains.public}"
     })
-  }
-
-  ingress_endpoints = {
-    for k, domain in {
-      qrcode_hostapd  = "hostapd"
-      webdav_pictures = "pictures"
-      webdav_videos   = "videos"
-      sunshine_admin  = "sunadmin"
-      audioserve      = "audioserve"
-      monitoring      = "m"
-      vaultwarden     = "vw"
-      flowise         = "flowise"
-      llama_cpp       = "llm"
-      code_server     = "code"
-      registry_ui     = "reg"
-    } :
-    k => "${domain}.${local.domains.public}"
   }
 
   # finalized local vars #

@@ -1,8 +1,8 @@
 ## audioserve
 
 module "audioserve" {
-  name      = "audioserve"
-  namespace = "default"
+  name      = local.endpoints.audioserve.name
+  namespace = local.endpoints.audioserve.namespace
   source    = "./modules/audioserve"
   release   = "0.1.0"
   replicas  = 2
@@ -40,7 +40,7 @@ module "audioserve" {
       }
     }
   }
-  service_hostname          = local.ingress_endpoints.audioserve
+  service_hostname          = local.endpoints.audioserve.ingress
   ingress_class_name        = local.kubernetes.ingress_classes.ingress_nginx
   nginx_ingress_annotations = local.nginx_ingress_annotations
 
@@ -55,45 +55,48 @@ module "audioserve" {
 ## webdav
 
 module "webdav-pictures" {
-  source   = "./modules/webdav"
-  name     = "webdav-pictures"
-  release  = "0.1.0"
-  replicas = 2
+  source    = "./modules/webdav"
+  name      = local.endpoints.webdav_pictures.name
+  namespace = local.endpoints.webdav_pictures.namespace
+  release   = "0.1.0"
+  replicas  = 2
   images = {
     rclone = local.container_images.rclone
   }
-  service_hostname          = local.ingress_endpoints.webdav_pictures
+  service_hostname          = local.endpoints.webdav_pictures.ingress
   ingress_class_name        = local.kubernetes.ingress_classes.ingress_nginx
   nginx_ingress_annotations = local.nginx_ingress_annotations
 
   minio_endpoint      = "https://${local.services.cluster_minio.ip}:${local.service_ports.minio}"
   minio_bucket        = "data-pictures"
-  minio_access_secret = local.minio_users.rclone-pictures.secret
+  minio_access_secret = local.minio_users.webdav_pictures.secret
 }
 
 module "webdav-videos" {
-  source   = "./modules/webdav"
-  name     = "webdav-videos"
-  release  = "0.1.0"
-  replicas = 2
+  source    = "./modules/webdav"
+  name      = local.endpoints.webdav_videos.name
+  namespace = local.endpoints.webdav_videos.namespace
+  release   = "0.1.0"
+  replicas  = 2
   images = {
     rclone = local.container_images.rclone
   }
-  service_hostname          = local.ingress_endpoints.webdav_videos
+  service_hostname          = local.endpoints.webdav_videos.ingress
   ingress_class_name        = local.kubernetes.ingress_classes.ingress_nginx
   nginx_ingress_annotations = local.nginx_ingress_annotations
 
   minio_endpoint      = "https://${local.services.cluster_minio.ip}:${local.service_ports.minio}"
   minio_bucket        = "data-videos"
-  minio_access_secret = local.minio_users.rclone-videos.secret
+  minio_access_secret = local.minio_users.webdav_videos.secret
 }
 
 ## Sunshine desktop
 
 module "sunshine-desktop" {
-  source  = "./modules/sunshine_desktop"
-  name    = "sunshine-desktop"
-  release = "0.1.1"
+  source    = "./modules/sunshine_desktop"
+  name      = local.endpoints.sunshine_desktop.name
+  namespace = local.endpoints.sunshine_desktop.namespace
+  release   = "0.1.1"
   images = {
     sunshine_desktop = local.container_images.sunshine_desktop
   }
@@ -149,7 +152,7 @@ module "sunshine-desktop" {
     privileged = true
   }
   loadbalancer_class_name   = "kube-vip.io/kube-vip-class"
-  admin_hostname            = local.ingress_endpoints.sunshine_admin
+  admin_hostname            = local.endpoints.sunshine_desktop.ingress
   ingress_class_name        = local.kubernetes.ingress_classes.ingress_nginx
   nginx_ingress_annotations = local.nginx_ingress_annotations
 }
