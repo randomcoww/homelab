@@ -1,7 +1,5 @@
 
-### Define external secrets
-
-Create service keys.
+### Create service tokens
 
 Cloudflare API token permissions:
 
@@ -36,6 +34,10 @@ Cloudflare permissions reference:
 curl https://api.cloudflare.com/client/v4/user/tokens/permission_groups --header "Authorization: Bearer $CLOUDFLARE_API_TOKEN" | jq
 ```
 
+---
+
+### Generate secrets files
+
 Add keys to `secrets.tfvars`.
 
 ```bash
@@ -65,9 +67,7 @@ github = {
 EOF
 ```
 
----
-
-Set up access for Terraform backend on Cloudflare.
+Set `credentials.env` to use Cloudflare R2 for Terraform backend.
 
 ```bash
 cat > credentials.env <<EOF
@@ -130,7 +130,7 @@ terraform -chdir=bootstrap_client apply
 
 Start all servers and allow them to PXE boot.
 
-Bootstrap service can be stopped once servers are up.
+Bootstrap service can be stopped once hosts are running.
 
 ```bash
 sudo podman play kube bootstrap.yaml --down
