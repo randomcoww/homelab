@@ -11,10 +11,6 @@ terraform {
     use_path_style              = true
   }
   required_providers {
-    minio = {
-      source  = "aminueza/minio"
-      version = "3.6.5"
-    }
     github = {
       source  = "integrations/github"
       version = "6.6.0"
