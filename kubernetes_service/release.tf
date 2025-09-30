@@ -165,7 +165,7 @@ resource "helm_release" "ingress-nginx" {
   create_namespace = true
   wait             = false
   wait_for_jobs    = false
-  version          = "4.13.2"
+  version          = "4.13.3"
   max_history      = 2
   values = [
     yamlencode({
