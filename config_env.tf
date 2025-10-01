@@ -190,9 +190,8 @@ locals {
   }
 
   domains = {
-    mdns       = "local"
-    public     = "fuzzybunny.win"
     kubernetes = "cluster.internal"
+    public     = "fuzzybunny.win"
     tailscale  = "fawn-turtle.ts.net"
   }
 
