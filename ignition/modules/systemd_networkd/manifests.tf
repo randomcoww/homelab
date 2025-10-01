@@ -10,11 +10,6 @@ locals {
       vlan_interfaces     = var.vlan_interfaces
       networks            = var.networks
       wlan_networks       = var.wlan_networks
-      mdns_interfaces = [
-        for name, config in var.networks :
-        config.interface if lookup(config, "enable_mdns", false)
-      ]
-      mdns_domain = var.mdns_domain
     })
   ]
 }
