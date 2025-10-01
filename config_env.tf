@@ -111,8 +111,8 @@ locals {
     # tier 1
     kube_proxy         = "ghcr.io/randomcoww/kube-proxy:v1.34.1.20250928.0029@sha256:288388c5ff11a8fcf5d3327cc42b868ba30df25686cf794a67cbd02f0a61d12d"
     kapprover          = "ghcr.io/randomcoww/kapprover:v0.1.2@sha256:b51c36ff5000e62eaee29406822c61aa01a1b008f3874c0f5d468803cd1bee7e"
-    flannel            = "ghcr.io/flannel-io/flannel:v0.27.3@sha256:8cc0cf9e94df48e98be84bce3e61984bbd46c3c44ad35707ec7ef40e96b009d1"
-    flannel_cni_plugin = "ghcr.io/flannel-io/flannel-cni-plugin:latest@sha256:fa4749909ed22921a6710496f6462ca300848222c084327fb2e83133e14378e1"
+    flannel            = "ghcr.io/flannel-io/flannel:v0.27.4@sha256:0de956bc24fbe61a7d12ee6e685ed5e2c9504a4cb6156d0eef613b158acdf640"
+    flannel_cni_plugin = "ghcr.io/flannel-io/flannel-cni-plugin:latest@sha256:25bd091c1867d0237432a4bcb5da720f39198b7d80edcae3bdf08262d242985c"
     kube_vip           = "ghcr.io/kube-vip/kube-vip:v1.0.0@sha256:4f256554a83a6d824ea9c5307450a2c3fd132e09c52b339326f94fefaf67155c"
     external_dns       = "registry.k8s.io/external-dns/external-dns:v0.19.0@sha256:f76114338104264f655b23138444481b20bb9d6125742c7240fac25936fe164e"
     # tier 2
