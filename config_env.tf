@@ -121,7 +121,7 @@ locals {
     ipxe        = "ghcr.io/randomcoww/ipxe:v1.20250926.2052@sha256:19b3fed2fbfb33b6e22771f7b4ffa7b19e5a629e54d8466fba2e92f43d610adb"
     mountpoint  = "ghcr.io/randomcoww/mountpoint-s3:v1.20.0.20250928.0050@sha256:77a262fb1c116eff09f5c420e8648ed6213224a2f4ded5bdd36fa93eab974199"
     matchbox    = "quay.io/poseidon/matchbox:v0.11.0@sha256:06bcdae85335fd00e8277b007b55cfb49d96a0114628c0f70db2b92b079d246a"
-    nginx       = "docker.io/nginxinc/nginx-unprivileged:1.29.1-alpine@sha256:7fe7fa7c0bda4c3cb0b7367eaad6a01db52226bce370eeb917664f7135c23b46"
+    nginx       = "docker.io/nginxinc/nginx-unprivileged:1.29.1-alpine@sha256:2bae49de8b7394f1ef4b6ddc5d8a6d07467d82883d20fb54556ce90b445870f9"
     # tier 3
     hostapd               = "registry.default/randomcoww/hostapd-noscan:v2.11.20250926.2051@sha256:f1b87bacef07ab2231f073f582eab32d9fb6b508b905bd5e86a981b06127c90f"
     tailscale             = "registry.default/randomcoww/tailscale-nft:v1.88.2.20250929.0657@sha256:56cf4723d805a7a03702d2afe55dcc87ef9d6b8afa2768b112fba1adee4ca8f5"
@@ -131,7 +131,7 @@ locals {
     audioserve            = "docker.io/izderadicka/audioserve:latest@sha256:c3609321701765671cae121fc0f61db122e8c124643c04770fbc9326c74b18e3"
     llama_cpp             = "ghcr.io/mostlygeek/llama-swap:cuda@sha256:905818291dae811c183c262828c997e9d9389c7f0804d840aa57c821b6ea40d1"
     sunshine_desktop      = "registry.default/randomcoww/sunshine-desktop:v2025.927.211945.20250928.0101@sha256:86d74394415d5976d2bec6479ed6eb420c434fa13bbbb0e7115fd7fc4e96d759"
-    litestream            = "docker.io/litestream/litestream:0.3.13@sha256:027eda2a89a86015b9797d2129d4dd447e8953097b4190e1d5a30b73e76d8d58"
+    litestream            = "docker.io/litestream/litestream:0.5.0@sha256:74ed4af3e223f6ad6a81d0c7eb31a57de3d9bdffcc4765128a89e0f069fdb839"
     vaultwarden           = "ghcr.io/dani-garcia/vaultwarden:1.34.3-alpine@sha256:d70118b9dafb8588ee2651ceb5df68db27dcbd8e18467722010644ba48d5d6d6"
     juicefs               = "registry.default/randomcoww/juicefs:v1.3.0.20250928.0036@sha256:a7e5b85c3b14d8f35ef5e31f6c743f028c70a324ab75dc38941d6ef7b7c7ecc7"
     code_server           = "registry.default/randomcoww/code-server:v1.103.1.20250928.0029@sha256:ec6cede4d28990ce86f75fb9420961c99738851f486069a3cde20c50ccfd6f68"
