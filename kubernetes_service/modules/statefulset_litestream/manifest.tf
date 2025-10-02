@@ -80,6 +80,10 @@ module "statefulset" {
             name  = "AWS_CA_BUNDLE"
             value = local.s3_ca_path
           },
+          {
+            name  = "SSL_CERT_FILE"
+            value = local.s3_ca_path
+          },
         ]
         volumeMounts = [
           {
