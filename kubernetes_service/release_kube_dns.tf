@@ -157,8 +157,8 @@ resource "helm_release" "kube-dns" {
             {
               name = "hosts"
               configBlock = join("\n", concat(compact([
-                for key, host in local.hosts :
-                try("${cidrhost(host.networks.service.prefix, host.netnum)} ${key}.${local.domains.kubernetes}", "")
+                for _, host in local.hosts :
+                try("${cidrhost(host.networks.service.prefix, host.netnum)} ${host.fqdn}", "")
                 ]), [
                 "fallthrough"
               ]))

@@ -53,6 +53,14 @@ storage:
       contents:
         inline:
           ${hostname}
+    - path: /etc/hosts
+      overwrite: true
+      mode: 0644
+      contents:
+        inline: |
+          127.0.0.1 localhost localhost.localdomain localhost4 localhost4.localdomain4
+          ::1       localhost localhost.localdomain localhost6 localhost6.localdomain6
+          ${hosts_entry}
     # Use avahi and disable all resolved mdns
     - path: /etc/systemd/resolved.conf.d/10-base.conf
       mode: 0644

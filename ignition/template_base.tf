@@ -3,7 +3,8 @@ module "base" {
   source   = "./modules/base"
 
   butane_version = local.butane_version
-  hostname       = each.value.hostname
+  hostname       = each.key
+  hosts_entry    = "${cidrhost(each.value.networks.service.prefix, each.value.netnum)} ${each.value.fqdn} ${each.key}"
 }
 
 module "upstream-dns" {
@@ -35,14 +36,14 @@ module "server" {
   fw_mark        = local.fw_marks.accept
   # SSH
   user   = local.users.ssh
-  key_id = each.value.hostname
+  key_id = each.key
   valid_principals = sort(concat([
     for _, network in each.value.networks :
     cidrhost(network.prefix, each.value.netnum)
     if lookup(network, "enable_netnum", false)
     ], [
-    local.domains.kubernetes,
     each.key,
+    "${each.value.fqdn}",
     "127.0.0.1",
   ]))
   ca = data.terraform_remote_state.sr.outputs.ssh.ca

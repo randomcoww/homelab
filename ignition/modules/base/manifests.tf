@@ -4,6 +4,7 @@ locals {
     templatefile(f, {
       butane_version = var.butane_version
       hostname       = var.hostname
+      hosts_entry    = var.hosts_entry
     })
     ], [
     yamlencode({

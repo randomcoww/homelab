@@ -1,6 +1,6 @@
 locals {
   base_hosts = {
-    gw-0 = {
+    k-0 = {
       netnum = 1
       physical_interfaces = {
         phy0 = {
@@ -95,7 +95,7 @@ locals {
       }
     }
 
-    gw-1 = {
+    k-1 = {
       netnum = 3
       physical_interfaces = {
         phy0 = {
@@ -190,7 +190,7 @@ locals {
       }
     }
 
-    q-0 = {
+    k-2 = {
       netnum = 5
       physical_interfaces = {
         phy0 = {
@@ -256,7 +256,7 @@ locals {
       }
     }
 
-    de-1 = {
+    k-3 = {
       netnum = 6
       physical_interfaces = {
         phy0 = {
@@ -338,15 +338,15 @@ locals {
   }
 
   base_members = {
-    base              = ["gw-0", "gw-1", "q-0", "de-1"]
-    systemd-networkd  = ["gw-0", "gw-1", "q-0", "de-1"]
-    server            = ["gw-0", "gw-1", "q-0", "de-1"]
-    disks             = ["gw-0", "gw-1", "q-0", "de-1"]
-    upstream-dns      = ["gw-0", "gw-1", "q-0", "de-1"]
-    gateway           = ["gw-0", "gw-1"]
-    kubernetes-master = ["q-0", "de-1"]
-    etcd              = ["gw-0", "gw-1", "q-0"]
-    kubernetes-worker = ["gw-0", "gw-1", "q-0", "de-1"]
+    base              = ["k-0", "k-1", "k-2", "k-3"]
+    systemd-networkd  = ["k-0", "k-1", "k-2", "k-3"]
+    server            = ["k-0", "k-1", "k-2", "k-3"]
+    disks             = ["k-0", "k-1", "k-2", "k-3"]
+    upstream-dns      = ["k-0", "k-1", "k-2", "k-3"]
+    gateway           = ["k-0", "k-1"]
+    kubernetes-master = ["k-2", "k-3"]
+    etcd              = ["k-0", "k-1", "k-2"]
+    kubernetes-worker = ["k-0", "k-1", "k-2", "k-3"]
   }
 
   # finalized local vars #
@@ -354,7 +354,7 @@ locals {
   hosts = {
     for host_key, host in local.base_hosts :
     host_key => merge(host, {
-      hostname = "${host_key}.${local.domains.mdns}"
+      fqdn = "${host_key}.${local.domains.kubernetes}"
       networks = {
         for name, network in lookup(host, "networks", {}) :
         name => merge(local.networks[name], network)

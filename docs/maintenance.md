@@ -50,7 +50,10 @@ Generate and push host ignition and iPXE scripts to Matchbox for network booting
 
 ```bash
 terraform -chdir=ignition init -upgrade && \
-terraform -chdir=ignition apply -auto-approve && \
+terraform -chdir=ignition apply
+```
+
+```bash
 terraform -chdir=matchbox_client init -upgrade && \
 terraform -chdir=matchbox_client apply
 ```

@@ -1,7 +1,7 @@
 resource "kubernetes_labels" "labels" {
   for_each = {
-    for key, host in local.members.kubernetes-worker :
-    host.hostname => lookup(host, "kubernetes_node_labels", {})
+    for host_key, host in local.members.kubernetes-worker :
+    host_key => lookup(host, "kubernetes_node_labels", {})
   }
 
   api_version = "v1"
