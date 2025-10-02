@@ -10,6 +10,6 @@ resource "ssh_host_cert" "ssh-host" {
   early_renewal_hours   = var.early_renewal_hours
   validity_period_hours = var.validity_period_hours
   valid_principals      = var.valid_principals
-  critical_options      = []
-  extensions            = []
+  critical_options      = {}
+  extensions            = {}
 }

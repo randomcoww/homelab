@@ -19,7 +19,7 @@ locals {
     module.webdav-videos,
     module.audioserve,
     # module.vaultwarden,
-    # module.flowise,
+    module.flowise,
     module.searxng,
     module.registry,
     module.registry-ui,

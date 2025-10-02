@@ -11,11 +11,11 @@ resource "ssh_user_cert" "ssh-client" {
   early_renewal_hours   = 0
   validity_period_hours = 1
   valid_principals      = []
-  extensions = [
-    "permit-agent-forwarding",
-    "permit-port-forwarding",
-    "permit-pty",
-    "permit-user-rc",
-  ]
-  critical_options = []
+  extensions = {
+    "permit-agent-forwarding" = ""
+    "permit-port-forwarding"  = ""
+    "permit-pty"              = ""
+    "permit-user-rc"          = ""
+  }
+  critical_options = {}
 }
