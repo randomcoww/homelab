@@ -117,6 +117,10 @@ resource "helm_release" "arc-runner-hook-template" {
                         name  = "MC_HOST_arc"
                         value = "https://$(MINIO_ACCESS_KEY_ID):$(MINIO_SECRET_ACCESS_KEY)@${local.services.cluster_minio.ip}:${local.service_ports.minio}"
                       },
+                      {
+                        name  = "FF_KANIKO_SQUASH_STAGES" # https://github.com/mzihlmann/kaniko/pull/141
+                        value = "true"
+                      },
                     ]
                   },
                 ]
