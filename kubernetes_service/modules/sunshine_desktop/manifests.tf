@@ -224,6 +224,7 @@ module "statefulset" {
           runuser -p -u $USER -- bash <<EOT
           set -e
           cd $HOME
+          cp -r /etc/skel/. $HOME/
 
           ## Pulseaudio ##
 

@@ -114,6 +114,8 @@ module "jfs" {
 
           runuser -p -u $USER -- bash <<EOT
           cd $HOME
+          cp -r /etc/skel/. $HOME/
+
           exec /opt/openvscode-server/bin/openvscode-server \
             --host 0.0.0.0 \
             --port ${local.code_server_port} \
