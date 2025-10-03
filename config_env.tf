@@ -146,7 +146,7 @@ locals {
 
   # these fields are updated by renovate - don't use var substitutions
   pxeboot_images = {
-    coreos = "fedora-coreos-42.20250929.06" # randomcoww/fedora-coreos-config
+    coreos = "fedora-coreos-42.20251003.17" # randomcoww/fedora-coreos-config
   }
 
   host_ports = {
