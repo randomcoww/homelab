@@ -69,7 +69,7 @@ resource "helm_release" "kube-dns" {
   wait          = false
   wait_for_jobs = false
   max_history   = 2
-  version       = "1.43.3"
+  version       = "1.44.3"
   values = [
     yamlencode({
       replicaCount = 3
