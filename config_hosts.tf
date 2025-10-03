@@ -332,7 +332,6 @@ locals {
         ]
       }
       kubernetes_node_labels = {
-        "hostapd" = true
       }
     }
   }

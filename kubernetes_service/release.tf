@@ -273,6 +273,36 @@ resource "helm_release" "nvidia-gpu-oprerator" {
       vfioManager = {
         enabled = false
       }
+      node-feature-discovery = {
+        worker = {
+          config = {
+            sources = {
+              custom = [
+                {
+                  name = "hostapd-hw"
+                  labels = {
+                    hostapd-hw = true
+                  }
+                  matchAny = [
+                    {
+                      matchFeatures = [
+                        {
+                          feature = "kernel.loadedmodule"
+                          matchExpressions = {
+                            rtw89_8852ce = {
+                              op = "Exists"
+                            }
+                          }
+                        },
+                      ]
+                    },
+                  ]
+                },
+              ]
+            }
+          }
+        }
+      }
     })
   ]
   depends_on = [
