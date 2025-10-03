@@ -33,11 +33,10 @@ locals {
     }
     # BGP
     node = {
-      network     = "192.168.200.0"
-      cidr        = 24
-      vlan_id     = 60
-      mtu         = local.default_mtu
-      enable_mdns = true
+      network = "192.168.200.0"
+      cidr    = 24
+      vlan_id = 60
+      mtu     = local.default_mtu
     }
     # Kubernetes service external IP and LB
     service = {
@@ -72,11 +71,13 @@ locals {
     }
     # Primary WAN
     wan = {
-      vlan_id = 30
+      vlan_id     = 30
+      enable_dhcp = true
     }
     # Backup WAN
     backup = {
-      vlan_id = 1024
+      vlan_id     = 1024
+      enable_dhcp = true
     }
     # Cluster internal
     kubernetes_service = {

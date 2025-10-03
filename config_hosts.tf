@@ -59,12 +59,10 @@ locals {
           enable_netnum = true
         }
         wan = {
-          interface   = "phy0-wan"
-          enable_dhcp = true
+          interface = "phy0-wan"
         }
         backup = {
           interface     = "phy0-backup"
-          enable_dhcp   = true
           enable_dns    = false
           enable_routes = false
           metric        = 4096
@@ -154,12 +152,10 @@ locals {
           enable_netnum = true
         }
         wan = {
-          interface   = "phy0-wan"
-          enable_dhcp = true
+          interface = "phy0-wan"
         }
         backup = {
           interface     = "phy0-backup"
-          enable_dhcp   = true
           enable_dns    = false
           enable_routes = false
           metric        = 4096
@@ -325,10 +321,6 @@ locals {
         image     = local.pxeboot_image_set.coreos
         boot_args = [
           "selinux=0",
-          ## stub all Nvidia GPUs
-          # "vfio-pci.id=10de:ffffffff:ffffffff:ffffffff:00030000:ffff00ff,10de:ffffffff:ffffffff:ffffffff:00040300:ffffffff",
-          ## stub all AMD GPUs
-          # "vfio-pci.id=1002:ffffffff:ffffffff:ffffffff:00030000:ffff00ff,1002:ffffffff:ffffffff:ffffffff:00040300:ffffffff",
         ]
       }
       kubernetes_node_labels = {
