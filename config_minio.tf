@@ -158,24 +158,6 @@ locals {
         ]
       }
 
-      # rclone access to videos for webdav
-      webdav_videos = {
-        name      = local.endpoints.webdav_videos.name
-        namespace = local.endpoints.webdav_videos.namespace
-        policies = [
-          {
-            Effect = "Allow"
-            Action = [
-              "s3:GetObject",
-              "s3:ListBucket",
-            ]
-            buckets = [
-              "data-videos",
-            ]
-          },
-        ]
-      }
-
       # matchbox mount-s3 access to boot
       matchbox = {
         name      = local.endpoints.matchbox.name
