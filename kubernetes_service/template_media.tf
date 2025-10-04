@@ -72,24 +72,6 @@ module "webdav-pictures" {
   minio_access_secret = local.minio_users.webdav_pictures.secret
 }
 
-module "webdav-videos" {
-  source    = "./modules/webdav"
-  name      = local.endpoints.webdav_videos.name
-  namespace = local.endpoints.webdav_videos.namespace
-  release   = "0.1.0"
-  replicas  = 2
-  images = {
-    rclone = local.container_images.rclone
-  }
-  service_hostname          = local.endpoints.webdav_videos.ingress
-  ingress_class_name        = local.kubernetes.ingress_classes.ingress_nginx
-  nginx_ingress_annotations = local.nginx_ingress_annotations
-
-  minio_endpoint      = "https://${local.services.cluster_minio.ip}:${local.service_ports.minio}"
-  minio_bucket        = "data-videos"
-  minio_access_secret = local.minio_users.webdav_videos.secret
-}
-
 ## Sunshine desktop
 
 module "sunshine-desktop" {

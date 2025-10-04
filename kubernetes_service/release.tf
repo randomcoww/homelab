@@ -16,7 +16,6 @@ locals {
     module.hostapd,
     module.qrcode-hostapd,
     module.webdav-pictures,
-    module.webdav-videos,
     module.audioserve,
     # module.vaultwarden,
     module.flowise,
@@ -279,22 +278,20 @@ resource "helm_release" "nvidia-gpu-oprerator" {
             sources = {
               custom = [
                 {
-                  name = "hostapd-hw"
+                  name = "hostapd-compat"
                   labels = {
-                    hostapd-hw = true
+                    hostapd-compat = true
                   }
-                  matchAny = [
+                  matchFeatures = [
                     {
-                      matchFeatures = [
-                        {
-                          feature = "kernel.loadedmodule"
-                          matchExpressions = {
-                            rtw89_8852ce = {
-                              op = "Exists"
-                            }
-                          }
-                        },
-                      ]
+                      feature = "kernel.loadedmodule"
+                      matchName = {
+                        op = "InRegexp",
+                        value = [
+                          "^rtw8",
+                          "^mt7",
+                        ]
+                      }
                     },
                   ]
                 },

@@ -111,7 +111,7 @@ module "hostapd" {
           {
             matchExpressions = [
               {
-                key      = "feature.node.kubernetes.io/hostapd-hw"
+                key      = "feature.node.kubernetes.io/hostapd-compat"
                 operator = "In"
                 values = [
                   "true",
