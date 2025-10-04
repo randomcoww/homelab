@@ -80,7 +80,6 @@ module "deployment" {
           ":s3:${var.minio_bucket}",
           "--s3-provider=Minio",
           "--s3-endpoint=${var.minio_endpoint}",
-          "--no-modtime",
           "--read-only",
           "--dir-cache-time=4s",
           "--poll-interval=2s",
