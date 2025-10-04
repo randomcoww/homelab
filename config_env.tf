@@ -137,7 +137,7 @@ locals {
     juicefs               = "registry.default/randomcoww/juicefs:v1.3.0.20250928.0036@sha256:a7e5b85c3b14d8f35ef5e31f6c743f028c70a324ab75dc38941d6ef7b7c7ecc7"
     code_server           = "registry.default/randomcoww/code-server:v1.103.1.20250928.0029@sha256:ec6cede4d28990ce86f75fb9420961c99738851f486069a3cde20c50ccfd6f68"
     flowise               = "docker.io/flowiseai/flowise:3.0.7@sha256:11284f6a28c32d83df10f9382e66c576d9e73715d7ab8c416554dfd9af4e7570"
-    searxng               = "ghcr.io/searxng/searxng:latest@sha256:a8b83538c53a6eae8c722d8deaa4317f21d380a28261a7566451433ad4241663"
+    searxng               = "ghcr.io/searxng/searxng:latest@sha256:6d971fa6cb34c86b4ff7c81811d0b144bcf84623b622355b3f7ae0555c19bc19"
     valkey                = "ghcr.io/valkey-io/valkey:8.1.4-alpine@sha256:e706d1213aaba6896c162bb6a3a9e1894e1a435f28f8f856d14fab2e10aa098b"
     nvidia_driver         = "registry.default/randomcoww/nvidia-driver-container:v580.95.05.20251002.0720-fedora42@sha256:7cafab4ddef75b51aaa86e7209309680f0ad6bdbcd1fd943a6bb9573b2d46102"
     github_actions_runner = "ghcr.io/actions/actions-runner:2.328.0@sha256:db0dcae6d28559e54277755a33aba7d0665f255b3bd2a66cdc5e132712f155e0"
