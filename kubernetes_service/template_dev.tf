@@ -177,7 +177,7 @@ module "flowise" {
     SMTP_SECURE            = true
     SENDER_EMAIL           = var.smtp.username
   }
-  ingress_class_name        = local.kubernetes.ingress_classes.ingress_nginx
+  ingress_class_name        = local.kubernetes.ingress_classes.ingress_nginx_external
   nginx_ingress_annotations = local.nginx_ingress_annotations
 
   minio_endpoint          = "https://${local.services.cluster_minio.ip}:${local.service_ports.minio}"

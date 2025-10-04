@@ -372,7 +372,7 @@ resource "helm_release" "cloudflare-tunnel" {
         account    = data.terraform_remote_state.sr.outputs.cloudflare_tunnels.public.account_id
         tunnelName = data.terraform_remote_state.sr.outputs.cloudflare_tunnels.public.name
         tunnelId   = data.terraform_remote_state.sr.outputs.cloudflare_tunnels.public.id
-        secret     = data.terraform_remote_state.sr.outputs.cloudflare_tunnels.public.secret
+        secret     = data.terraform_remote_state.sr.outputs.cloudflare_tunnels.public.tunnel_secret
         ingress = [
           {
             hostname = "*.${local.domains.public}"
