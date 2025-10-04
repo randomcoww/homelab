@@ -213,7 +213,8 @@ locals {
     node_bootstrap_user     = "system:node-bootstrapper"
 
     ingress_classes = {
-      ingress_nginx = "ingress-nginx"
+      ingress_nginx          = "ingress-nginx"
+      ingress_nginx_external = "ingress-nginx-external"
     }
   }
 

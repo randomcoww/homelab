@@ -18,7 +18,7 @@ locals {
     # }))
     public = {
       path    = "/"
-      service = "https://${local.endpoints.ingress_nginx.service}"
+      service = "https://${local.endpoints.ingress_nginx_external.service}"
     }
   }
 }

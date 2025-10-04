@@ -376,7 +376,7 @@ resource "helm_release" "cloudflare-tunnel" {
         ingress = [
           {
             hostname = "*.${local.domains.public}"
-            service  = "https://${local.endpoints.ingress_nginx.service}"
+            service  = "https://${local.endpoints.ingress_nginx_external.service}"
           },
         ]
       }
