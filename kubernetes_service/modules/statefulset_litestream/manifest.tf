@@ -44,7 +44,7 @@ module "statefulset" {
         args = [
           "restore",
           "-if-db-not-exists",
-          "-if-replica-exists",
+          # "-if-replica-exists", # TODO: not working in 0.5.0
           "-config",
           local.config_path,
           var.sqlite_path,
@@ -76,14 +76,15 @@ module "statefulset" {
               }
             }
           },
-          {
-            name  = "AWS_CA_BUNDLE"
-            value = local.s3_ca_path
-          },
-          {
-            name  = "SSL_CERT_FILE"
-            value = local.s3_ca_path
-          },
+          # TODO: passing CA not working in 0.5.0
+          # {
+          #   name  = "AWS_CA_BUNDLE"
+          #   value = local.s3_ca_path
+          # },
+          # {
+          #   name  = "SSL_CERT_FILE"
+          #   value = local.s3_ca_path
+          # },
         ]
         volumeMounts = [
           {
@@ -138,10 +139,15 @@ module "statefulset" {
               }
             }
           },
-          {
-            name  = "AWS_CA_BUNDLE"
-            value = local.s3_ca_path
-          },
+          # TODO: passing CA not working in 0.5.0
+          # {
+          #   name  = "AWS_CA_BUNDLE"
+          #   value = local.s3_ca_path
+          # },
+          # {
+          #   name  = "SSL_CERT_FILE"
+          #   value = local.s3_ca_path
+          # },
         ]
         volumeMounts = [
           {

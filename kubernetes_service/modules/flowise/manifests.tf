@@ -117,6 +117,7 @@ module "litestream" {
             sync-interval     = "100ms"
             snapshot-interval = "1h"
             retention         = "1h"
+            skip-verify       = true # TODO: test AWS_CA_BUNDLE again in later release
           },
         ]
       },
