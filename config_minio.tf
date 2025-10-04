@@ -13,6 +13,8 @@ locals {
     }
     data-videos = {
     }
+    registry = {
+    }
   }
 
   minio_users = {
@@ -216,14 +218,10 @@ locals {
       lookup(policy, "buckets", [])
     ])))) :
     bucket => {
-      acl           = "private"
       force_destroy = true
     }
     }, {
     for name, bucket in local.minio_static_buckets :
-    name => merge({
-      force_destroy = false
-      acl           = "private"
-    }, bucket)
+    name => bucket
   })
 }

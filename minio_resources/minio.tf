@@ -1,9 +1,10 @@
 resource "minio_s3_bucket" "bucket" {
   for_each = local.minio_buckets
 
-  bucket        = each.key
-  acl           = each.value.acl
-  force_destroy = each.value.force_destroy
+  bucket         = each.key
+  acl            = lookup(each.value, "acl", "private")
+  force_destroy  = lookup(each.value, "force_destroy", false)
+  object_locking = lookup(each.value, "object_locking", false)
 }
 
 resource "minio_iam_user" "user" {
