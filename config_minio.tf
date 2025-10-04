@@ -11,6 +11,8 @@ locals {
     }
     data-models = {
     }
+    data-videos = {
+    }
   }
 
   minio_users = {
