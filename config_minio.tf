@@ -9,8 +9,6 @@ locals {
     }
     data-pictures = {
     }
-    data-videos = {
-    }
     data-models = {
     }
   }
@@ -113,7 +111,7 @@ locals {
               "s3:AbortMultipartUpload",
             ]
             buckets = [
-              "code",
+              "code-server",
             ]
           },
         ]
