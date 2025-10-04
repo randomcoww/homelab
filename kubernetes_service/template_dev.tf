@@ -238,6 +238,6 @@ module "code-server" {
   nginx_ingress_annotations = local.nginx_ingress_annotations
 
   minio_endpoint      = "https://${local.services.cluster_minio.ip}:${local.service_ports.minio}"
-  minio_bucket        = "code"
+  minio_bucket        = "code-server"
   minio_access_secret = local.minio_users.code_server.secret
 }
