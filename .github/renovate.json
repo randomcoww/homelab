@@ -3,6 +3,9 @@
   "extends": [
     "config:best-practices"
   ],
+  "dockerfile": {
+    "enabled": false
+  },
   "customManagers": [
     {
       "customType": "regex",
