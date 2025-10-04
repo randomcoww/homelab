@@ -118,6 +118,10 @@ resource "helm_release" "minio" {
   max_history      = 2
   values = [
     yamlencode({
+      image = {
+        repository = regex(local.container_image_regex, local.container_images.minio).depName
+        tag        = regex(local.container_image_regex, local.container_images.minio).tag
+      }
       clusterDomain     = local.domains.kubernetes
       mode              = "distributed"
       rootUser          = data.terraform_remote_state.sr.outputs.minio.access_key_id

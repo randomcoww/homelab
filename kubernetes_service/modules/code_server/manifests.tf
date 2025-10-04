@@ -8,7 +8,7 @@ module "metadata" {
   name        = var.name
   namespace   = var.namespace
   release     = var.release
-  app_version = split(":", var.images.code_server)[1]
+  app_version = var.release
   manifests = merge(module.jfs.chart.manifests, {
     "templates/secret.yaml"  = module.secret.manifest
     "templates/service.yaml" = module.service.manifest

@@ -3,7 +3,7 @@ module "metadata" {
   name        = var.name
   namespace   = var.namespace
   release     = var.release
-  app_version = split(":", var.images.device_plugin)[1]
+  app_version = var.release
   manifests = {
     "templates/daeonset.yaml" = module.daemonset.manifest
   }

@@ -244,9 +244,9 @@ resource "helm_release" "nvidia-gpu-oprerator" {
       # Operator automatically appends -<osrelease> to end of tag. E.g. :<version>-fedora42
       driver = {
         kernelModuleType = "open"
-        repository       = join("/", slice(split("/", split(":", local.container_images.nvidia_driver)[0]), 0, 2))
-        image            = split("/", split(":", local.container_images.nvidia_driver)[0])[2]
-        version          = join("-", slice(split("-", split(":", local.container_images.nvidia_driver)[1]), 0, length(split("-", split(":", local.container_images.nvidia_driver)[1])) - 1))
+        repository       = regex(local.container_image_regex, local.container_images.nvidia_driver).repository
+        image            = regex(local.container_image_regex, local.container_images.nvidia_driver).image
+        version          = regex(local.container_image_regex, local.container_images.nvidia_driver).version
         upgradePolicy = {
           gpuPodDeletion = {
             force          = true

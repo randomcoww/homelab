@@ -41,7 +41,7 @@ module "metadata" {
   name        = var.name
   namespace   = var.namespace
   release     = var.release
-  app_version = split(":", var.images.kube_proxy)[1]
+  app_version = var.release
   manifests = {
     "templates/serviceaccount.yaml"     = yamlencode(local.serviceaccount)
     "templates/clusterrolebinding.yaml" = yamlencode(local.rolebinding)

@@ -49,7 +49,7 @@ module "metadata" {
   name        = var.name
   namespace   = var.namespace
   release     = var.release
-  app_version = split(":", var.images.hostapd)[1]
+  app_version = var.release
   manifests = {
     "templates/secret.yaml"      = module.secret.manifest
     "templates/statefulset.yaml" = module.statefulset.manifest

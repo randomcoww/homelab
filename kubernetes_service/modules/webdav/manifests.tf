@@ -8,7 +8,7 @@ module "metadata" {
   name        = var.name
   namespace   = var.namespace
   release     = var.release
-  app_version = split(":", var.images.rclone)[1]
+  app_version = var.release
   manifests = {
     "templates/service.yaml"    = module.service.manifest
     "templates/ingress.yaml"    = module.ingress.manifest

@@ -196,7 +196,7 @@ module "metadata" {
   name        = var.name
   namespace   = var.namespace
   release     = var.release
-  app_version = split(":", var.images.kea)[1]
+  app_version = var.release
   manifests = merge({
     "templates/secret.yaml"      = module.secret.manifest
     "templates/statefulset.yaml" = module.statefulset.manifest
