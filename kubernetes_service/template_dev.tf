@@ -9,7 +9,7 @@ module "registry" {
   source    = "./modules/registry"
   name      = local.endpoints.registry.name
   namespace = local.endpoints.registry.namespace
-  release   = "0.1.1"
+  release   = "0.1.0"
   replicas  = 2
   images = {
     registry = local.container_images.registry
@@ -33,7 +33,7 @@ module "registry-ui" {
   source    = "./modules/registry_ui"
   name      = local.endpoints.registry_ui.name
   namespace = local.endpoints.registry_ui.namespace
-  release   = "0.1.1"
+  release   = "0.1.0"
   images = {
     registry_ui = local.container_images.registry_ui
   }
@@ -52,7 +52,7 @@ module "llama-cpp" {
   source    = "./modules/llama_cpp"
   name      = local.endpoints.llama_cpp.name
   namespace = local.endpoints.llama_cpp.namespace
-  release   = "0.1.1"
+  release   = "0.1.0"
   images = {
     llama_cpp  = local.container_images.llama_cpp
     mountpoint = local.container_images.mountpoint
@@ -120,7 +120,7 @@ module "searxng" {
   source    = "./modules/searxng"
   name      = local.endpoints.searxng.name
   namespace = local.endpoints.searxng.namespace
-  release   = "0.1.1"
+  release   = "0.1.0"
   replicas  = 2
   images = {
     searxng = local.container_images.searxng
@@ -158,7 +158,7 @@ module "flowise" {
   source    = "./modules/flowise"
   name      = local.endpoints.flowise.name
   namespace = local.endpoints.flowise.namespace
-  release   = "0.1.1"
+  release   = "0.1.0"
   images = {
     flowise    = local.container_images.flowise
     litestream = local.container_images.litestream
@@ -192,7 +192,7 @@ module "code-server" {
   source    = "./modules/code_server"
   name      = local.endpoints.code_server.name
   namespace = local.endpoints.code_server.namespace
-  release   = "0.1.1"
+  release   = "0.1.0"
   images = {
     code_server = local.container_images.code_server
     jfs         = local.container_images.juicefs

@@ -2,7 +2,7 @@ module "vaultwarden" {
   source    = "./modules/vaultwarden"
   name      = local.endpoints.vaultwarden.name
   namespace = local.endpoints.vaultwarden.namespace
-  release   = "0.1.14"
+  release   = "0.1.0"
   images = {
     vaultwarden = local.container_images.vaultwarden
     litestream  = local.container_images.litestream

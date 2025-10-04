@@ -2,7 +2,7 @@ module "device-plugin" {
   source    = "./modules/device_plugin"
   name      = "device-plugin"
   namespace = "kube-system"
-  release   = "0.1.1"
+  release   = "0.1.0"
   images = {
     device_plugin = local.container_images.device_plugin
   }

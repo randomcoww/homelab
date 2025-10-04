@@ -78,7 +78,7 @@ module "sunshine-desktop" {
   source    = "./modules/sunshine_desktop"
   name      = local.endpoints.sunshine_desktop.name
   namespace = local.endpoints.sunshine_desktop.namespace
-  release   = "0.1.1"
+  release   = "0.1.0"
   images = {
     sunshine_desktop = local.container_images.sunshine_desktop
   }

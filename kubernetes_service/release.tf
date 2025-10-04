@@ -34,7 +34,7 @@ module "bootstrap" {
   source    = "./modules/bootstrap"
   name      = "bootstrap"
   namespace = "kube-system"
-  release   = "0.1.1"
+  release   = "0.1.0"
 
   node_bootstrap_user = local.kubernetes.node_bootstrap_user
   kubelet_client_user = local.kubernetes.kubelet_client_user
@@ -44,7 +44,7 @@ module "kube-proxy" {
   source    = "./modules/kube_proxy"
   name      = "kube-proxy"
   namespace = "kube-system"
-  release   = "0.1.2"
+  release   = "0.1.0"
   images = {
     kube_proxy = local.container_images.kube_proxy
   }
@@ -60,7 +60,7 @@ module "flannel" {
   source    = "./modules/flannel"
   name      = "flannel"
   namespace = "kube-system"
-  release   = "0.1.2"
+  release   = "0.1.0"
   images = {
     flannel            = local.container_images.flannel
     flannel_cni_plugin = local.container_images.flannel_cni_plugin
@@ -78,7 +78,7 @@ module "kapprover" {
   source    = "./modules/kapprover"
   name      = "kapprover"
   namespace = "kube-system"
-  release   = "0.1.1"
+  release   = "0.1.0"
   replicas  = 2
   images = {
     kapprover = local.container_images.kapprover

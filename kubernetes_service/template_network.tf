@@ -99,7 +99,7 @@ resource "random_password" "hostapd-password" {
 module "hostapd" {
   source   = "./modules/hostapd"
   name     = "hostapd"
-  release  = "0.1.8"
+  release  = "0.1.0"
   replicas = 2
   images = {
     hostapd = local.container_images.hostapd
@@ -190,7 +190,7 @@ module "tailscale" {
   source    = "./modules/tailscale"
   name      = "tailscale"
   namespace = "tailscale"
-  release   = "0.1.1"
+  release   = "0.1.0"
   replicas  = 2
   images = {
     tailscale = local.container_images.tailscale
