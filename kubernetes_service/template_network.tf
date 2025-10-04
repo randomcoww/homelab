@@ -100,7 +100,7 @@ module "hostapd" {
   source   = "./modules/hostapd"
   name     = "hostapd"
   release  = "0.1.8"
-  replicas = 1
+  replicas = 2
   images = {
     hostapd = local.container_images.hostapd
   }
