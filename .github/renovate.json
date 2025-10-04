@@ -13,7 +13,7 @@
         "/^config_env.tf$/"
       ],
       "matchStrings": [
-        "(?<depName>[a-z0-9.-]+(:\\d+|)/[a-z0-9-]+(?:/[a-z0-9-]+|)):(?<currentValue>[\\w.-]{1,127})(@(?<currentDigest>sha256:[a-f0-9]+))?"
+        "(?<depName>(?<repository>[a-z0-9.-]+(?::\\d+|)(?:/[a-z0-9-]+|))/(?<image>[a-z0-9-]+)):(?<tag>(?<currentValue>(?<version>[\\w.]+)(?:-(?<compat>[\\w.-]+))?)(?:@(?<currentDigest>sha256:[a-f0-9]+))?)"
       ],
       "autoReplaceStringTemplate": "{{{depName}}}:{{{newValue}}}@{{{newDigest}}}",
       "datasourceTemplate": "docker"

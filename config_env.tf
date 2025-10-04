@@ -116,6 +116,7 @@ locals {
     flannel_cni_plugin = "ghcr.io/flannel-io/flannel-cni-plugin:latest@sha256:25bd091c1867d0237432a4bcb5da720f39198b7d80edcae3bdf08262d242985c"
     kube_vip           = "ghcr.io/kube-vip/kube-vip:v1.0.0@sha256:4f256554a83a6d824ea9c5307450a2c3fd132e09c52b339326f94fefaf67155c"
     external_dns       = "registry.k8s.io/external-dns/external-dns:v0.19.0@sha256:f76114338104264f655b23138444481b20bb9d6125742c7240fac25936fe164e"
+    minio              = "quay.io/minio/minio:latest@sha256:14cea493d9a34af32f524e538b8346cf79f3321eff8e708c1e2960462bd8936e"
     # tier 2
     kea         = "ghcr.io/randomcoww/kea:v3.1.0.20250928.0049@sha256:29d6b6fbb0623c424edbc0d856e8f4dc015908c2eb90e6fa0b7da8c971db314c"
     stork_agent = "ghcr.io/randomcoww/stork-agent:v2.3.0.20250928.0049@sha256:e7e0b5b5123f56210ce7f99dfbde4b199faf9c02f15fb2b9c4e5720353c8819c"
@@ -144,6 +145,7 @@ locals {
     registry              = "ghcr.io/distribution/distribution:3.0.0@sha256:4ba3adf47f5c866e9a29288c758c5328ef03396cb8f5f6454463655fa8bc83e2"
     registry_ui           = "docker.io/quiq/registry-ui:0.10.4@sha256:88e90f14a2654b48a6ca8112b3bd000d3e2472a8cbf560d73af679f5558273f2"
   }
+  container_image_regex = "(?<depName>(?<repository>[a-z0-9.-]+(?::\\d+|)(?:/[a-z0-9-]+|))/(?<image>[a-z0-9-]+)):(?<tag>(?<currentValue>(?<version>[\\w.]+)(?:-(?<compat>[\\w.-]+))?)(?:@(?<currentDigest>sha256:[a-f0-9]+))?)" # compatible with renovate
 
   # these fields are updated by renovate - don't use var substitutions
   pxeboot_images = {
