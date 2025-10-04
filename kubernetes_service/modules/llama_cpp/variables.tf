@@ -27,12 +27,6 @@ variable "images" {
   })
 }
 
-variable "ports" {
-  type = object({
-    llama_cpp = number
-  })
-}
-
 variable "resources" {
   type    = any
   default = {}

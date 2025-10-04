@@ -1,6 +1,7 @@
 locals {
-  model_path  = "/var/lib/llama_cpp/models"
-  config_path = "/var/lib/llama_cpp/config.yaml"
+  llama_cpp_port = 8080
+  model_path     = "/var/lib/llama_cpp/models"
+  config_path    = "/var/lib/llama_cpp/config.yaml"
 }
 
 module "metadata" {
@@ -36,9 +37,9 @@ module "service" {
     ports = [
       {
         name       = var.name
-        port       = var.ports.llama_cpp
+        port       = local.llama_cpp_port
         protocol   = "TCP"
-        targetPort = var.ports.llama_cpp
+        targetPort = local.llama_cpp_port
       },
     ]
   }
@@ -57,7 +58,7 @@ module "ingress" {
       paths = [
         {
           service = module.service.name
-          port    = var.ports.llama_cpp
+          port    = local.llama_cpp_port
           path    = "/"
         },
       ]
@@ -107,7 +108,7 @@ module "mountpoint" {
 
           exec /app/llama-swap \
             --config ${local.config_path} \
-            --listen 0.0.0.0:${var.ports.llama_cpp}
+            --listen 0.0.0.0:${local.llama_cpp_port}
           EOF
         ]
         volumeMounts = [
@@ -127,18 +128,18 @@ module "mountpoint" {
         resources = var.resources
         ports = [
           {
-            containerPort = var.ports.llama_cpp
+            containerPort = local.llama_cpp_port
           },
         ]
         livenessProbe = {
           httpGet = {
-            port = var.ports.llama_cpp
+            port = local.llama_cpp_port
             path = "/health"
           }
         }
         readinessProbe = {
           httpGet = {
-            port = var.ports.llama_cpp
+            port = local.llama_cpp_port
             path = "/health"
           }
         }

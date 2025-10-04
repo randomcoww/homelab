@@ -20,12 +20,6 @@ variable "affinity" {
   default = {}
 }
 
-variable "ports" {
-  type = object({
-    searxng = number
-  })
-}
-
 variable "images" {
   type = object({
     searxng = string
@@ -46,4 +40,16 @@ variable "resources" {
 variable "extra_configs" {
   type    = map(string)
   default = {}
+}
+
+variable "service_hostname" {
+  type = string
+}
+
+variable "ingress_class_name" {
+  type = string
+}
+
+variable "nginx_ingress_annotations" {
+  type = map(string)
 }

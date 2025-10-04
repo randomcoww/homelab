@@ -97,10 +97,6 @@ resource "helm_release" "prometheus" {
           scrape_timeout      = "4s"
           evaluation_interval = "10s"
         }
-        service = {
-          enabled     = true
-          servicePort = local.service_ports.prometheus
-        }
         ingress = {
           enabled          = true
           ingressClassName = local.kubernetes.ingress_classes.ingress_nginx
@@ -392,8 +388,7 @@ resource "helm_release" "kured" {
   values = [
     yamlencode({
       configuration = {
-        # promethues chart creates service name <name>-server
-        prometheusUrl = "http://${local.endpoints.prometheus.name}-server.${local.endpoints.prometheus.namespace}:${local.service_ports.prometheus}"
+        prometheusUrl = "https://${local.endpoints.prometheus.ingress}"
         period        = "2m"
         metricsPort   = local.service_ports.metrics
         forceReboot   = true

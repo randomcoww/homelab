@@ -7,7 +7,7 @@ locals {
     SEARXNG_PUBLIC_INSTANCE = false
     SEARXNG_IMAGE_PROXY     = false
     SEARXNG_BIND_ADDRESS    = "0.0.0.0"
-    SEARXNG_PORT            = var.ports.searxng
+    SEARXNG_PORT            = 8080
     SEARXNG_SECRET          = random_password.searxng-secret.result
     SEARXNG_VALKEY_URL      = "unix://${local.valkey_socket_path}?db=0"
   })
@@ -28,6 +28,7 @@ module "metadata" {
     "templates/deployment.yaml" = module.deployment.manifest
     "templates/secret.yaml"     = module.secret.manifest
     "templates/service.yaml"    = module.service.manifest
+    "templates/ingress.yaml"    = module.ingress.manifest
   }
 }
 
@@ -54,9 +55,9 @@ module "service" {
     ports = [
       {
         name       = "searxng"
-        port       = var.ports.searxng
+        port       = local.extra_configs.SEARXNG_PORT
         protocol   = "TCP"
-        targetPort = var.ports.searxng
+        targetPort = local.extra_configs.SEARXNG_PORT
       },
     ]
     sessionAffinity = "ClientIP"
@@ -66,6 +67,27 @@ module "service" {
       }
     }
   }
+}
+
+module "ingress" {
+  source             = "../../../modules/ingress"
+  name               = var.name
+  app                = var.name
+  release            = var.release
+  ingress_class_name = var.ingress_class_name
+  annotations        = var.nginx_ingress_annotations
+  rules = [
+    {
+      host = var.service_hostname
+      paths = [
+        {
+          service = module.service.name
+          port    = local.extra_configs.SEARXNG_PORT
+          path    = "/"
+        },
+      ]
+    },
+  ]
 }
 
 module "deployment" {
@@ -116,7 +138,7 @@ module "deployment" {
         ]
         ports = [
           {
-            containerPort = var.ports.searxng
+            containerPort = local.extra_configs.SEARXNG_PORT
           },
         ]
         volumeMounts = [
@@ -132,19 +154,19 @@ module "deployment" {
         ]
         readinessProbe = {
           httpGet = {
-            port = var.ports.searxng
+            port = local.extra_configs.SEARXNG_PORT
             path = "/healthz"
           }
         }
         livenessProbe = {
           httpGet = {
-            port = var.ports.searxng
+            port = local.extra_configs.SEARXNG_PORT
             path = "/healthz"
           }
         }
         startupProbe = {
           httpGet = {
-            port = var.ports.searxng
+            port = local.extra_configs.SEARXNG_PORT
             path = "/healthz"
           }
         }

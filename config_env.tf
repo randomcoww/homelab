@@ -175,10 +175,7 @@ locals {
     matchbox_api        = 50101
     minio               = 9000
     metrics             = 9153
-    prometheus          = 80
     prometheus_blackbox = 9115
-    llama_cpp           = 80
-    searxng             = 8080
     registry            = 443 # required
   }
 
@@ -260,7 +257,8 @@ locals {
         name = "llama-cpp"
       }
       searxng = {
-        name = "searxng"
+        name    = "searxng"
+        ingress = "search"
       }
       registry = {
         name = "registry"
@@ -294,7 +292,7 @@ locals {
       }
       llama_cpp = {
         name    = "llama-cpp"
-        ingress = "llm"
+        ingress = "llama"
       }
       code_server = {
         name    = "code-server"

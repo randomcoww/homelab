@@ -57,9 +57,6 @@ module "llama-cpp" {
     llama_cpp  = local.container_images.llama_cpp
     mountpoint = local.container_images.mountpoint
   }
-  ports = {
-    llama_cpp = local.service_ports.llama_cpp
-  }
   service_hostname = local.endpoints.llama_cpp.ingress
   llama_swap_config = {
     healthCheckTimeout = 600
@@ -129,9 +126,6 @@ module "searxng" {
     searxng = local.container_images.searxng
     valkey  = local.container_images.valkey
   }
-  ports = {
-    searxng = local.service_ports.searxng
-  }
   searxng_settings = {
     use_default_settings = {
       engines = {
@@ -153,6 +147,9 @@ module "searxng" {
       ]
     }
   }
+  service_hostname          = local.endpoints.searxng.ingress
+  ingress_class_name        = local.kubernetes.ingress_classes.ingress_nginx
+  nginx_ingress_annotations = local.nginx_ingress_annotations
 }
 
 ## flowise
