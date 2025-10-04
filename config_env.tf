@@ -190,7 +190,6 @@ locals {
   domains = {
     kubernetes = "cluster.internal"
     public     = "fuzzybunny.win"
-    tailscale  = "fawn-turtle.ts.net"
   }
 
   upstream_dns = {
