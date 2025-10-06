@@ -2,18 +2,16 @@ locals {
   minio_replicas = 4
 
   minio_static_buckets = {
-    data-boot = {
+    boot = {
       acl = "public-read"
     }
-    data-music = {
+    music = {
     }
-    data-pictures = {
+    videos = {
     }
-    data-models = {
+    pictures = {
     }
-    data-videos = {
-    }
-    registry = {
+    models = {
     }
   }
 
@@ -35,7 +33,7 @@ locals {
               "s3:AbortMultipartUpload",
             ]
             buckets = [
-              "data-boot",
+              "boot",
             ]
           },
         ]
@@ -73,7 +71,7 @@ locals {
               "s3:AbortMultipartUpload",
             ]
             buckets = [
-              "data-models",
+              "models",
             ]
           },
         ]
@@ -136,7 +134,7 @@ locals {
               "s3:AbortMultipartUpload",
             ]
             buckets = [
-              "data-music",
+              "music",
             ]
           },
         ]
@@ -154,7 +152,7 @@ locals {
               "s3:ListBucket",
             ]
             buckets = [
-              "data-pictures",
+              "pictures",
             ]
           },
         ]
