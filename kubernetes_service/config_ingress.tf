@@ -1,6 +1,6 @@
 locals {
   nginx_ingress_annotations = {
-    "cert-manager.io/cluster-issuer"                = local.kubernetes.cert_issuer_prod
+    "cert-manager.io/cluster-issuer"                = local.kubernetes.cert_issuers.acme_prod
     "nginx.ingress.kubernetes.io/http-snippet"      = <<-EOF
     map $http_upgrade $connection_upgrade {
       default upgrade;

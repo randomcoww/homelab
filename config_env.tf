@@ -1,7 +1,8 @@
 locals {
-  timezone       = "America/Los_Angeles"
-  butane_version = "1.5.0"
-  default_mtu    = 9000
+  timezone              = "America/Los_Angeles"
+  butane_version        = "1.5.0"
+  default_mtu           = 9000
+  container_image_regex = "(?<depName>(?<repository>[a-z0-9.-]+(?::\\d+|)(?:/[a-z0-9-]+|))/(?<image>[a-z0-9-]+)):(?<tag>(?<currentValue>(?<version>[\\w.]+)(?:-(?<compat>[\\w.-]+))?)(?:@(?<currentDigest>sha256:[a-f0-9]+))?)" # compatible with renovate
 
   users = {
     ssh = {
@@ -144,7 +145,6 @@ locals {
     registry              = "ghcr.io/distribution/distribution:3.0.0@sha256:4ba3adf47f5c866e9a29288c758c5328ef03396cb8f5f6454463655fa8bc83e2"
     registry_ui           = "docker.io/quiq/registry-ui:0.10.4@sha256:88e90f14a2654b48a6ca8112b3bd000d3e2472a8cbf560d73af679f5558273f2"
   }
-  container_image_regex = "(?<depName>(?<repository>[a-z0-9.-]+(?::\\d+|)(?:/[a-z0-9-]+|))/(?<image>[a-z0-9-]+)):(?<tag>(?<currentValue>(?<version>[\\w.]+)(?:-(?<compat>[\\w.-]+))?)(?:@(?<currentDigest>sha256:[a-f0-9]+))?)" # compatible with renovate
 
   # these fields are updated by renovate - don't use var substitutions
   pxeboot_images = {
@@ -205,16 +205,17 @@ locals {
     containers_path           = "/var/lib/containers"
     cni_bin_path              = "/var/lib/cni/bin"
     cni_bridge_interface_name = "cni0"
+    kubelet_client_user       = "kube-apiserver-kubelet-client"
 
-    cert_issuer_prod    = "letsencrypt-prod"
-    cert_issuer_staging = "letsencrypt-staging"
-    kubelet_client_user = "kube-apiserver-kubelet-client"
-
+    cert_issuers = {
+      acme_prod    = "letsencrypt-prod"
+      acme_staging = "letsencrypt-staging"
+      ca_internal  = "internal"
+    }
     ingress_classes = {
       ingress_nginx          = "ingress-nginx"
       ingress_nginx_external = "ingress-nginx-external"
     }
-
     feature_gates = {
       ClusterTrustBundle           = true
       ClusterTrustBundleProjection = true

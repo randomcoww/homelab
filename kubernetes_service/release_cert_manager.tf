@@ -10,9 +10,9 @@ module "cert-manager-cloudflare-secret" {
   })
 }
 
-module "cert-manager-issuer-prod-secret" {
+module "cert-manager-issuer-acme-prod-secret" {
   source  = "../modules/secret"
-  name    = local.kubernetes.cert_issuer_prod
+  name    = local.kubernetes.cert_issuers.acme_prod
   app     = "cert-issuer"
   release = "0.1.0"
   data = merge({
@@ -20,13 +20,24 @@ module "cert-manager-issuer-prod-secret" {
   })
 }
 
-module "cert-manager-issuer-staging-secret" {
+module "cert-manager-issuer-acme-staging-secret" {
   source  = "../modules/secret"
-  name    = local.kubernetes.cert_issuer_staging
+  name    = local.kubernetes.cert_issuers.acme_staging
   app     = "cert-issuer"
   release = "0.1.0"
   data = merge({
     "tls.key" = chomp(data.terraform_remote_state.sr.outputs.letsencrypt.staging_private_key_pem)
+  })
+}
+
+module "cert-manager-issuer-ca-internal-secret" {
+  source  = "../modules/secret"
+  name    = local.kubernetes.cert_issuers.ca_internal
+  app     = "cert-issuer"
+  release = "0.1.0"
+  data = merge({
+    "tls.crt" = chomp(data.terraform_remote_state.sr.outputs.trust.ca.cert_pem)
+    "tls.key" = chomp(data.terraform_remote_state.sr.outputs.trust.ca.private_key_pem)
   })
 }
 
@@ -78,21 +89,24 @@ resource "helm_release" "cert-issuer" {
   values = [
     yamlencode({
       manifests = [
-        module.cert-manager-cloudflare-secret.manifest,
-        module.cert-manager-issuer-prod-secret.manifest,
-        module.cert-manager-issuer-staging-secret.manifest,
+        module.cert-manager-cloudflare-secret.manifest, # DNS update for ACME
+        module.cert-manager-issuer-acme-prod-secret.manifest,
+        module.cert-manager-issuer-acme-staging-secret.manifest,
+        module.cert-manager-issuer-ca-internal-secret.manifest,
+
+        # letsencrypt prod
         yamlencode({
           apiVersion = "cert-manager.io/v1"
           kind       = "ClusterIssuer"
           metadata = {
-            name = local.kubernetes.cert_issuer_prod
+            name = local.kubernetes.cert_issuers.acme_prod
           }
           spec = {
             acme = {
               server = "https://acme-v02.api.letsencrypt.org/directory"
               email  = data.terraform_remote_state.sr.outputs.letsencrypt.username
               privateKeySecretRef = {
-                name = local.kubernetes.cert_issuer_prod
+                name = module.cert-manager-issuer-acme-prod-secret.name
               }
               disableAccountKeyGeneration = true
               solvers = [
@@ -115,18 +129,20 @@ resource "helm_release" "cert-issuer" {
             }
           }
         }),
+
+        # letsencrypt staging
         yamlencode({
           apiVersion = "cert-manager.io/v1"
           kind       = "ClusterIssuer"
           metadata = {
-            name = local.kubernetes.cert_issuer_staging
+            name = local.kubernetes.cert_issuers.acme_staging
           }
           spec = {
             acme = {
               server = "https://acme-staging-v02.api.letsencrypt.org/directory"
               email  = data.terraform_remote_state.sr.outputs.letsencrypt.username
               privateKeySecretRef = {
-                name = local.kubernetes.cert_issuer_staging
+                name = module.cert-manager-issuer-acme-staging-secret.name
               }
               disableAccountKeyGeneration = true
               solvers = [
@@ -146,6 +162,20 @@ resource "helm_release" "cert-issuer" {
                   }
                 },
               ]
+            }
+          }
+        }),
+
+        # internal CA
+        yamlencode({
+          apiVersion = "cert-manager.io/v1"
+          kind       = "ClusterIssuer"
+          metadata = {
+            name = local.kubernetes.cert_issuers.ca_internal
+          }
+          spec = {
+            ca = {
+              secretName = module.cert-manager-issuer-ca-internal-secret.name
             }
           }
         }),
