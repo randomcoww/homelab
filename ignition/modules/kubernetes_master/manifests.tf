@@ -190,7 +190,7 @@ module "apiserver" {
       {
         name  = "kube-apiserver"
         image = var.images.apiserver
-        command = [
+        command = compact(concat([
           "kube-apiserver",
           "--advertise-address=$(POD_IP)",
           "--allow-privileged=true",
@@ -227,7 +227,12 @@ module "apiserver" {
           "--tls-cert-file=${local.pki.apiserver-cert.path}",
           "--tls-private-key-file=${local.pki.apiserver-key.path}",
           "--v=2",
-        ]
+          ], length(var.feature_gates) > 0 ? [
+          "--feature-gates=${join(",", [
+            for k, v in var.feature_gates :
+            "${k}=${tostring(v)}"
+          ])}",
+        ] : []))
         env = [
           {
             name = "POD_IP"
@@ -287,7 +292,7 @@ module "controller-manager" {
       {
         name  = "kube-controller-manager"
         image = var.images.controller_manager
-        command = [
+        command = compact(concat([
           "kube-controller-manager",
           "--allocate-node-cidrs=true",
           "--bind-address=127.0.0.1",
@@ -304,7 +309,12 @@ module "controller-manager" {
           "--secure-port=${var.ports.controller_manager}",
           "--terminated-pod-gc-threshold=1",
           "--v=2",
-        ]
+          ], length(var.feature_gates) > 0 ? [
+          "--feature-gates=${join(",", [
+            for k, v in var.feature_gates :
+            "${k}=${tostring(v)}"
+          ])}",
+        ] : []))
         livenessProbe = {
           httpGet = {
             scheme = "HTTPS"
@@ -343,13 +353,18 @@ module "scheduler" {
       {
         name  = "kube-scheduler"
         image = var.images.scheduler
-        command = [
+        command = compact(concat([
           "kube-scheduler",
           "--config=${local.config.scheduler.path}",
           "--secure-port=${var.ports.scheduler}",
           "--bind-address=127.0.0.1",
           "--v=2",
-        ]
+          ], length(var.feature_gates) > 0 ? [
+          "--feature-gates=${join(",", [
+            for k, v in var.feature_gates :
+            "${k}=${tostring(v)}"
+          ])}",
+        ] : []))
         livenessProbe = {
           httpGet = {
             scheme = "HTTPS"

@@ -124,6 +124,10 @@ variable "static_pod_path" {
   type = string
 }
 
+variable "feature_gates" {
+  type = map(bool)
+}
+
 variable "haproxy_path" {
   type = string
 }

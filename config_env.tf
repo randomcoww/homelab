@@ -218,6 +218,11 @@ locals {
       ingress_nginx          = "ingress-nginx"
       ingress_nginx_external = "ingress-nginx-external"
     }
+
+    feature_gates = {
+      ClusterTrustBundle           = true
+      ClusterTrustBundleProjection = true
+    }
   }
 
   endpoints = {

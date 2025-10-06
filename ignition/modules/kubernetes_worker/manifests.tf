@@ -85,6 +85,7 @@ locals {
           registerNode           = true
           failSwapOn             = false
           enforceNodeAllocatable = []
+          featureGates           = var.feature_gates
         })
       }
     } :

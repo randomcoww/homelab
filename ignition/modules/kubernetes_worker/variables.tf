@@ -67,6 +67,10 @@ variable "static_pod_path" {
   type = string
 }
 
+variable "feature_gates" {
+  type = map(bool)
+}
+
 variable "container_storage_path" {
   type = string
 }
