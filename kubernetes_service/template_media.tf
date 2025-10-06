@@ -45,7 +45,7 @@ module "audioserve" {
   nginx_ingress_annotations = local.nginx_ingress_annotations
 
   minio_endpoint      = "https://${local.services.cluster_minio.ip}:${local.service_ports.minio}"
-  minio_bucket        = "data-music"
+  minio_bucket        = "music"
   minio_access_secret = local.minio_users.audioserve.secret
   minio_mount_extra_args = [
     "--read-only",
@@ -68,7 +68,7 @@ module "webdav-pictures" {
   nginx_ingress_annotations = local.nginx_ingress_annotations
 
   minio_endpoint      = "https://${local.services.cluster_minio.ip}:${local.service_ports.minio}"
-  minio_bucket        = "data-pictures"
+  minio_bucket        = "pictures"
   minio_access_secret = local.minio_users.webdav_pictures.secret
 }
 

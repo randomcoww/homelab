@@ -105,7 +105,7 @@ module "llama-cpp" {
     }
   }
   minio_endpoint      = "https://${local.services.cluster_minio.ip}:${local.service_ports.minio}"
-  minio_bucket        = "data-models"
+  minio_bucket        = "models"
   minio_access_secret = local.minio_users.llama_cpp.secret
   minio_mount_extra_args = [
     "--read-only",
