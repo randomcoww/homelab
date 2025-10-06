@@ -34,10 +34,6 @@ variable "cni_bridge_interface_name" {
   type = string
 }
 
-variable "node_bootstrap_user" {
-  type = string
-}
-
 variable "cluster_domain" {
   type = string
 }
@@ -92,4 +88,9 @@ variable "internal_registries" {
     prefix   = string
     location = string
   }))
+}
+
+variable "kubelet_bootstrap_user" {
+  type    = string
+  default = "kubelet-bootstrap"
 }

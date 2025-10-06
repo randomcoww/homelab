@@ -144,7 +144,7 @@ locals {
 module "node-bootstrap-kubeconfig" {
   source             = "../../../modules/kubeconfig"
   cluster_name       = var.cluster_name
-  user               = var.node_bootstrap_user
+  user               = var.kubelet_bootstrap_user
   apiserver_endpoint = var.apiserver_endpoint
   ca_cert_pem        = var.ca.cert_pem
   client_cert_pem    = tls_locally_signed_cert.bootstrap.cert_pem

@@ -1,7 +1,3 @@
-locals {
-  kubelet_client_role_name = "system:kube-apiserver-to-kubelet"
-}
-
 module "metadata" {
   source      = "../../../modules/metadata"
   name        = var.name
@@ -9,13 +5,14 @@ module "metadata" {
   release     = var.release
   app_version = var.release
   manifests = {
-    # https://medium.com/@toddrosner/kubernetes-tls-bootstrapping-cf203776abc7
-    # https://github.com/kelseyhightower/kubernetes-the-hard-way/blob/master/docs/08-bootstrapping-kubernetes-controllers.md
-    "templates/node-bootstrap-rolebinding.yaml" = yamlencode({
+    # https://kubernetes.io/docs/reference/access-authn-authz/kubelet-tls-bootstrapping/
+
+    # enable bootstrapping nodes to create CSR
+    "templates/create-csrs-for-bootstrapping-rolebinding.yaml" = yamlencode({
       apiVersion = "rbac.authorization.k8s.io/v1"
       kind       = "ClusterRoleBinding"
       metadata = {
-        name = "kubelet-bootstrap"
+        name = "create-csrs-for-bootstrapping"
         labels = {
           app     = var.name
           release = var.release
@@ -29,17 +26,18 @@ module "metadata" {
       subjects = [
         {
           apiGroup = "rbac.authorization.k8s.io"
-          kind     = "User"
-          name     = var.node_bootstrap_user
+          kind     = "Group"
+          name     = "system:bootstrappers"
         },
       ]
     })
 
-    "templates/node-approver-rolebinding.yaml" = yamlencode({
+    # Approve all CSRs for the group "system:bootstrappers"
+    "templates/auto-approve-csrs-for-group-rolebinding.yaml" = yamlencode({
       apiVersion = "rbac.authorization.k8s.io/v1"
       kind       = "ClusterRoleBinding"
       metadata = {
-        name = "node-client-auto-approve-csr"
+        name = "auto-approve-csrs-for-group"
         labels = {
           app     = var.name
           release = var.release
@@ -53,13 +51,14 @@ module "metadata" {
       subjects = [
         {
           apiGroup = "rbac.authorization.k8s.io"
-          kind     = "User"
-          name     = var.node_bootstrap_user
+          kind     = "Group"
+          name     = "system:bootstrappers"
         },
       ]
     })
 
-    "templates/node-renewal-rolebinding.yaml" = yamlencode({
+    # Approve renewal CSRs for the group "system:nodes"
+    "templates/auto-approve-renewals-for-nodes-rolebinding.yaml" = yamlencode({
       apiVersion = "rbac.authorization.k8s.io/v1"
       kind       = "ClusterRoleBinding"
       metadata = {
@@ -90,7 +89,7 @@ module "metadata" {
       apiVersion = "rbac.authorization.k8s.io/v1"
       kind       = "ClusterRole"
       metadata = {
-        name = local.kubelet_client_role_name
+        name = "system:kube-apiserver-to-kubelet"
         annotations = {
           "rbac.authorization.kubernetes.io/autoupdate" = "true"
         }
@@ -132,7 +131,7 @@ module "metadata" {
       roleRef = {
         apiGroup = "rbac.authorization.k8s.io"
         kind     = "ClusterRole"
-        name     = local.kubelet_client_role_name
+        name     = "system:kube-apiserver-to-kubelet"
       }
       subjects = [
         {

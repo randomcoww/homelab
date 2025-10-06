@@ -111,7 +111,6 @@ locals {
     etcd                    = "gcr.io/etcd-development/etcd:v3.6.5@sha256:042ef9c02799eb9303abf1aa99b09f09d94b8ee3ba0c2dd3f42dc4e1d3dce534"
     # tier 1
     kube_proxy         = "ghcr.io/randomcoww/kube-proxy:v1.34.1.20251004.1832@sha256:bc70f7baebd2c6ae8aa9d803c4d9b16830e191c8c04390dfe1411de6c041b339"
-    kapprover          = "ghcr.io/randomcoww/kapprover:v0.1.2@sha256:b51c36ff5000e62eaee29406822c61aa01a1b008f3874c0f5d468803cd1bee7e"
     flannel            = "ghcr.io/flannel-io/flannel:v0.27.4@sha256:2ff3c5cb44d0e27b09f27816372084c98fa12486518ca95cb4a970f4a1a464c4"
     flannel_cni_plugin = "ghcr.io/flannel-io/flannel-cni-plugin:latest@sha256:25bd091c1867d0237432a4bcb5da720f39198b7d80edcae3bdf08262d242985c"
     kube_vip           = "ghcr.io/kube-vip/kube-vip:v1.0.1@sha256:554d1e07ee24a046bbc7fba67f438c01b480b072c6f0b99215321fc0eb440178"
@@ -209,10 +208,7 @@ locals {
 
     cert_issuer_prod    = "letsencrypt-prod"
     cert_issuer_staging = "letsencrypt-staging"
-
-    kubelet_client_user     = "kube-apiserver-kubelet-client"
-    front_proxy_client_user = "front-proxy-client"
-    node_bootstrap_user     = "system:node-bootstrapper"
+    kubelet_client_user = "kube-apiserver-kubelet-client"
 
     ingress_classes = {
       ingress_nginx          = "ingress-nginx"

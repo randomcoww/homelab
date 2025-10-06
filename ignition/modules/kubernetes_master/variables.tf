@@ -77,7 +77,8 @@ variable "kubelet_client_user" {
 }
 
 variable "front_proxy_client_user" {
-  type = string
+  type    = string
+  default = "front-proxy-client"
 }
 
 variable "controller_manager_user" {

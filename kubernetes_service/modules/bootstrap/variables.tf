@@ -14,7 +14,3 @@ variable "release" {
 variable "kubelet_client_user" {
   type = string
 }
-
-variable "node_bootstrap_user" {
-  type = string
-}

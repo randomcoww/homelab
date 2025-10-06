@@ -6,7 +6,6 @@ locals {
     module.bootstrap,
     module.kube-proxy,
     module.flannel,
-    module.kapprover,
     module.kube-vip,
     # services
     module.device-plugin,
@@ -31,12 +30,10 @@ locals {
 # bootstrap
 
 module "bootstrap" {
-  source    = "./modules/bootstrap"
-  name      = "bootstrap"
-  namespace = "kube-system"
-  release   = "0.1.0"
-
-  node_bootstrap_user = local.kubernetes.node_bootstrap_user
+  source              = "./modules/bootstrap"
+  name                = "bootstrap"
+  namespace           = "kube-system"
+  release             = "0.1.0"
   kubelet_client_user = local.kubernetes.kubelet_client_user
 }
 
@@ -72,17 +69,6 @@ module "flannel" {
   cni_bridge_interface_name = local.kubernetes.cni_bridge_interface_name
   cni_version               = "0.3.1"
   cni_bin_path              = local.kubernetes.cni_bin_path
-}
-
-module "kapprover" {
-  source    = "./modules/kapprover"
-  name      = "kapprover"
-  namespace = "kube-system"
-  release   = "0.1.0"
-  replicas  = 2
-  images = {
-    kapprover = local.container_images.kapprover
-  }
 }
 
 module "kube-vip" {
@@ -220,6 +206,41 @@ resource "helm_release" "ingress-nginx" {
   ]
   depends_on = [
     kubernetes_labels.labels,
+  ]
+}
+
+# CSR approver
+
+resource "helm_release" "kubelet-csr-approver" {
+  name             = "kubelet-csr-approver"
+  namespace        = "kube-system"
+  create_namespace = true
+  repository       = "https://postfinance.github.io/kubelet-csr-approver"
+  chart            = "kubelet-csr-approver"
+  wait             = false
+  wait_for_jobs    = false
+  version          = "v1.2.11"
+  max_history      = 2
+  values = [
+    yamlencode({
+      global = {
+        clusterDomain = local.domains.kubernetes
+      }
+      providerRegex       = "^k-\\d+$"
+      bypassDnsResolution = true
+      bypassHostnameCheck = true
+      providerIpPrefixes = [
+        local.networks.service.prefix,
+      ]
+      metrics = {
+        enable = true
+        port   = local.service_ports.metrics
+        annotations = {
+          "prometheus.io/scrape" = "true"
+          "prometheus.io/port"   = tostring(local.service_ports.metrics)
+        }
+      }
+    }),
   ]
 }
 

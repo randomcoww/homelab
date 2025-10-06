@@ -27,7 +27,6 @@ module "kubernetes-master" {
     etcd_client        = local.host_ports.etcd_client
   }
   kubelet_client_user        = local.kubernetes.kubelet_client_user
-  front_proxy_client_user    = local.kubernetes.front_proxy_client_user
   cluster_apiserver_endpoint = "${local.endpoints.apiserver.service}.svc.${local.domains.kubernetes}"
   kubernetes_service_prefix  = local.networks.kubernetes_service.prefix
   kubernetes_pod_prefix      = local.networks.kubernetes_pod.prefix
@@ -62,7 +61,6 @@ module "kubernetes-worker" {
   ca                        = data.terraform_remote_state.sr.outputs.kubernetes.ca
   kubelet_port              = local.host_ports.kubelet
   host_netnum               = each.value.netnum
-  node_bootstrap_user       = local.kubernetes.node_bootstrap_user
   cluster_domain            = local.domains.kubernetes
   apiserver_endpoint        = "https://${local.services.apiserver.ip}:${local.host_ports.apiserver}"
   cni_bridge_interface_name = local.kubernetes.cni_bridge_interface_name
