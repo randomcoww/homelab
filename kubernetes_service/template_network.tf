@@ -76,7 +76,7 @@ module "matchbox" {
   service_ip              = local.services.matchbox.ip
   api_service_ip          = local.services.matchbox_api.ip
   loadbalancer_class_name = "kube-vip.io/kube-vip-class"
-  ca                      = data.terraform_remote_state.sr.outputs.trust.ca
+  ca_issuer_name          = local.kubernetes.cert_issuers.ca_internal
 
   minio_endpoint         = "https://${local.services.cluster_minio.ip}:${local.service_ports.minio}"
   minio_bucket           = "matchbox"

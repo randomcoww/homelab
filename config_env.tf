@@ -242,7 +242,8 @@ locals {
         namespace = "kube-system"
       }
       matchbox = {
-        name = "matchbox"
+        name      = "matchbox"
+        namespace = "matchbox"
       }
       minio = {
         name      = "minio"

@@ -1,6 +1,8 @@
 locals {
-  data_path   = "/var/lib/matchbox/mnt"
-  config_path = "/etc/matchbox"
+  data_path           = "/var/lib/matchbox/mnt"
+  config_path         = "/etc/matchbox"
+  tls_secret_name     = "${var.name}-tls"
+  api_tls_secret_name = "${var.name}-api-tls"
 }
 
 module "metadata" {
@@ -12,21 +14,94 @@ module "metadata" {
   manifests = merge(module.mountpoint.chart.manifests, {
     "templates/service.yaml"     = module.service.manifest
     "templates/service-api.yaml" = module.service-api.manifest
-    "templates/secret.yaml"      = module.secret.manifest
+
+    "templates/api-cert.yaml" = yamlencode({
+      apiVersion = "cert-manager.io/v1"
+      kind       = "Certificate"
+      metadata = {
+        name      = "${var.name}-api"
+        namespace = var.namespace
+      }
+      spec = {
+        secretName = local.api_tls_secret_name
+        isCA       = false
+        privateKey = {
+          algorithm = "ECDSA"
+          size      = 521
+        }
+        commonName = var.name
+        usages = [
+          "key encipherment",
+          "digital signature",
+          "server auth",
+        ]
+        ipAddresses = [
+          var.api_service_ip,
+        ]
+        dnsNames = [
+          var.name,
+          "${var.name}.${var.namespace}",
+        ]
+        issuerRef = {
+          name = var.ca_issuer_name
+          kind = "ClusterIssuer"
+        }
+      }
+    })
+
+    "templates/cert.yaml" = yamlencode({
+      apiVersion = "cert-manager.io/v1"
+      kind       = "Certificate"
+      metadata = {
+        name      = var.name
+        namespace = var.namespace
+      }
+      spec = {
+        secretName = local.tls_secret_name
+        isCA       = false
+        privateKey = {
+          algorithm = "ECDSA"
+          size      = 521
+        }
+        commonName = var.name
+        usages = [
+          "key encipherment",
+          "digital signature",
+          "server auth",
+        ]
+        ipAddresses = [
+          var.service_ip,
+        ]
+        dnsNames = [
+          var.name,
+          "${var.name}.${var.namespace}",
+        ]
+        issuerRef = {
+          name = var.ca_issuer_name
+          kind = "ClusterIssuer"
+        }
+      }
+    })
   })
 }
 
-module "secret" {
-  source  = "../../../modules/secret"
-  name    = var.name
+module "service-api" {
+  source  = "../../../modules/service"
+  name    = "${var.name}-api"
   app     = var.name
   release = var.release
-  data = {
-    ca       = chomp(var.ca.cert_pem)
-    api_cert = chomp(tls_locally_signed_cert.matchbox.cert_pem)
-    api_key  = chomp(tls_private_key.matchbox.private_key_pem)
-    web_cert = chomp(tls_locally_signed_cert.matchbox-web.cert_pem)
-    web_key  = chomp(tls_private_key.matchbox-web.private_key_pem)
+  spec = {
+    type              = "LoadBalancer"
+    loadBalancerIP    = var.api_service_ip
+    loadBalancerClass = var.loadbalancer_class_name
+    ports = [
+      {
+        name       = "matchbox-api"
+        port       = var.ports.matchbox_api
+        protocol   = "TCP"
+        targetPort = var.ports.matchbox_api
+      },
+    ]
   }
 }
 
@@ -45,26 +120,6 @@ module "service" {
         port       = var.ports.matchbox
         protocol   = "TCP"
         targetPort = var.ports.matchbox
-      },
-    ]
-  }
-}
-
-module "service-api" {
-  source  = "../../../modules/service"
-  name    = "${var.name}-api"
-  app     = var.name
-  release = var.release
-  spec = {
-    type              = "LoadBalancer"
-    loadBalancerIP    = var.api_service_ip
-    loadBalancerClass = var.loadbalancer_class_name
-    ports = [
-      {
-        name       = "matchbox-api"
-        port       = var.ports.matchbox_api
-        protocol   = "TCP"
-        targetPort = var.ports.matchbox_api
       },
     ]
   }
@@ -89,9 +144,6 @@ module "mountpoint" {
   release   = var.release
   affinity  = var.affinity
   replicas  = var.replicas
-  annotations = {
-    "checksum/secret" = sha256(module.secret.manifest)
-  }
   template_spec = {
     containers = [
       {
@@ -118,29 +170,8 @@ module "mountpoint" {
         # Cert paths are fixed
         volumeMounts = [
           {
-            name      = "secret"
-            mountPath = "${local.config_path}/ca.crt"
-            subPath   = "ca"
-          },
-          {
-            name      = "secret"
-            mountPath = "${local.config_path}/server.crt"
-            subPath   = "api_cert"
-          },
-          {
-            name      = "secret"
-            mountPath = "${local.config_path}/server.key"
-            subPath   = "api_key"
-          },
-          {
-            name      = "secret"
-            mountPath = "${local.config_path}/ssl/server.crt"
-            subPath   = "web_cert"
-          },
-          {
-            name      = "secret"
-            mountPath = "${local.config_path}/ssl/server.key"
-            subPath   = "web_key"
+            name      = "config"
+            mountPath = local.config_path
           },
         ]
         ports = [
@@ -169,9 +200,44 @@ module "mountpoint" {
     ]
     volumes = [
       {
-        name = "secret"
-        secret = {
-          secretName = module.secret.name
+        name = "config"
+        projected = {
+          sources = [
+            {
+              secret = {
+                name = local.api_tls_secret_name
+                items = [
+                  {
+                    key  = "ca.crt"
+                    path = "ca.crt"
+                  },
+                  {
+                    key  = "tls.crt"
+                    path = "server.crt"
+                  },
+                  {
+                    key  = "tls.key"
+                    path = "server.key"
+                  },
+                ]
+              }
+            },
+            {
+              secret = {
+                name = local.tls_secret_name
+                items = [
+                  {
+                    key  = "tls.crt"
+                    path = "ssl/server.crt"
+                  },
+                  {
+                    key  = "tls.key"
+                    path = "ssl/server.key"
+                  },
+                ]
+              }
+            },
+          ]
         }
       },
     ]
