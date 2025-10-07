@@ -23,7 +23,6 @@ resource "tls_locally_signed_cert" "minio-client" {
   allowed_uses = [
     "key_encipherment",
     "digital_signature",
-    "server_auth",
     "client_auth",
   ]
 }
