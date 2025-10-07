@@ -1,9 +1,8 @@
 locals {
-  config_path     = "/var/lib/registry/config.yml"
-  trusted_ca_path = "/usr/local/share/ca-certificates/ca-cert.pem"
-  ca_cert_path    = "/var/lib/registry/ca-cert.pem"
-  cert_path       = "/var/lib/registry/cert.pem"
-  key_path        = "/var/lib/registry/key.pem"
+  config_path                  = "/etc/registry"
+  minio_ca_path                = "/usr/local/share/ca-certificates"
+  tls_secret_name              = "${var.name}-tls"
+  minio_client_tls_secret_name = "${var.name}-minio-client-tls"
 }
 
 module "metadata" {
@@ -16,6 +15,69 @@ module "metadata" {
     "templates/deployment.yaml" = module.deployment.manifest
     "templates/secret.yaml"     = module.secret.manifest
     "templates/service.yaml"    = module.service.manifest
+    "templates/cert.yaml" = yamlencode({
+      apiVersion = "cert-manager.io/v1"
+      kind       = "Certificate"
+      metadata = {
+        name      = local.tls_secret_name
+        namespace = var.namespace
+      }
+      spec = {
+        secretName = local.tls_secret_name
+        isCA       = false
+        privateKey = {
+          algorithm = "ECDSA"
+          size      = 521
+        }
+        commonName = var.name
+        usages = [
+          "key encipherment",
+          "digital signature",
+          "server auth",
+        ]
+        ipAddresses = [
+          "127.0.0.1",
+          var.service_ip,
+        ]
+        dnsNames = [
+          var.name,
+          "${var.name}.${var.namespace}",
+        ]
+        issuerRef = {
+          name = var.ca_issuer_name
+          kind = "ClusterIssuer"
+        }
+      }
+    })
+
+    # TODO: investigate better option - used only to pass in ca.crt
+    "templates/minio-client-cert.yaml" = yamlencode({
+      apiVersion = "cert-manager.io/v1"
+      kind       = "Certificate"
+      metadata = {
+        name      = local.minio_client_tls_secret_name
+        namespace = var.namespace
+      }
+      spec = {
+        secretName = local.minio_client_tls_secret_name
+        isCA       = false
+        privateKey = {
+          algorithm = "ECDSA"
+          size      = 521
+        }
+        commonName = var.name
+        usages = [
+          "key encipherment",
+          "digital signature",
+          "client auth",
+        ]
+        issuerRef = {
+          name = var.minio_ca_issuer_name
+          kind = "ClusterIssuer"
+        }
+      }
+    })
+
     "templates/cronjob.yaml" = yamlencode({
       apiVersion = "batch/v1"
       kind       = "CronJob"
@@ -54,7 +116,7 @@ module "metadata" {
                       update-ca-certificates
                       exec registry garbage-collect \
                         --delete-untagged \
-                        ${local.config_path}
+                        ${local.config_path}/config.yaml
                       EOF
                     ]
                     env = [
@@ -81,12 +143,10 @@ module "metadata" {
                       {
                         name      = "config"
                         mountPath = local.config_path
-                        subPath   = basename(local.config_path)
                       },
                       {
-                        name      = "minio-access-secret"
-                        mountPath = local.trusted_ca_path
-                        subPath   = "AWS_CA_BUNDLE"
+                        name      = "minio-ca"
+                        mountPath = local.minio_ca_path
                       },
                     ]
                   },
@@ -94,14 +154,38 @@ module "metadata" {
                 volumes = [
                   {
                     name = "config"
-                    secret = {
-                      secretName = module.secret.name
+                    projected = {
+                      sources = [
+                        {
+                          secret = {
+                            name = module.secret.name
+                            items = [
+                              {
+                                key  = "config.yaml"
+                                path = "config.yaml"
+                              },
+                            ]
+                          }
+                        },
+                      ]
                     }
                   },
                   {
-                    name = "minio-access-secret"
-                    secret = {
-                      secretName = var.minio_access_secret
+                    name = "minio-ca"
+                    projected = {
+                      sources = [
+                        {
+                          secret = {
+                            name = local.minio_client_tls_secret_name
+                            items = [
+                              {
+                                key  = "ca.crt"
+                                path = "ca-cert.pem"
+                              },
+                            ]
+                          }
+                        },
+                      ]
                     }
                   },
                 ]
@@ -128,21 +212,16 @@ module "secret" {
   app     = var.name
   release = var.release
   data = {
-    # use the same CA as other internal resources like minio
-    basename(local.trusted_ca_path) = var.ca.cert_pem
-    basename(local.ca_cert_path)    = var.ca.cert_pem
-    basename(local.cert_path)       = tls_locally_signed_cert.registry.cert_pem
-    basename(local.key_path)        = tls_private_key.registry.private_key_pem
-    basename(local.config_path) = yamlencode({
+    "config.yaml" = yamlencode({
       version = "0.1"
       http = {
         addr   = "0.0.0.0:${var.ports.registry}"
         prefix = "/"
         tls = {
-          certificate = local.cert_path
-          key         = local.key_path
+          certificate = "${local.config_path}/cert.pem"
+          key         = "${local.config_path}/key.pem"
           clientcas = [
-            local.ca_cert_path,
+            "${local.config_path}/ca-cert.pem",
           ]
           clientauth = "verify-client-cert-if-given"
           minimumtls = "tls1.3"
@@ -240,7 +319,7 @@ module "deployment" {
           set -e
 
           update-ca-certificates
-          exec registry serve ${local.config_path}
+          exec registry serve ${local.config_path}/config.yaml
           EOF
         ]
         env = [
@@ -277,27 +356,10 @@ module "deployment" {
           {
             name      = "config"
             mountPath = local.config_path
-            subPath   = basename(local.config_path)
           },
           {
-            name      = "config"
-            mountPath = local.ca_cert_path
-            subPath   = basename(local.ca_cert_path)
-          },
-          {
-            name      = "config"
-            mountPath = local.cert_path
-            subPath   = basename(local.cert_path)
-          },
-          {
-            name      = "config"
-            mountPath = local.key_path
-            subPath   = basename(local.key_path)
-          },
-          {
-            name      = "minio-access-secret"
-            mountPath = local.trusted_ca_path
-            subPath   = "AWS_CA_BUNDLE"
+            name      = "minio-ca"
+            mountPath = local.minio_ca_path
           },
         ]
         readinessProbe = {
@@ -319,14 +381,57 @@ module "deployment" {
     volumes = [
       {
         name = "config"
-        secret = {
-          secretName = module.secret.name
+        projected = {
+          sources = [
+            {
+              secret = {
+                name = local.tls_secret_name
+                items = [
+                  {
+                    key  = "ca.crt"
+                    path = "ca-cert.pem"
+                  },
+                  {
+                    key  = "tls.crt"
+                    path = "cert.pem"
+                  },
+                  {
+                    key  = "tls.key"
+                    path = "key.pem"
+                  },
+                ]
+              }
+            },
+            {
+              secret = {
+                name = module.secret.name
+                items = [
+                  {
+                    key  = "config.yaml"
+                    path = "config.yaml"
+                  },
+                ]
+              }
+            },
+          ]
         }
       },
       {
-        name = "minio-access-secret"
-        secret = {
-          secretName = var.minio_access_secret
+        name = "minio-ca"
+        projected = {
+          sources = [
+            {
+              secret = {
+                name = local.minio_client_tls_secret_name
+                items = [
+                  {
+                    key  = "ca.crt"
+                    path = "ca-cert.pem"
+                  },
+                ]
+              }
+            },
+          ]
         }
       },
     ]

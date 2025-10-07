@@ -17,7 +17,7 @@ module "metadata" {
       apiVersion = "cert-manager.io/v1"
       kind       = "Certificate"
       metadata = {
-        name      = var.name
+        name      = local.tls_secret_name
         namespace = var.namespace
       }
       spec = {

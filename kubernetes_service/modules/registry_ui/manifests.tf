@@ -1,8 +1,8 @@
 locals {
-  trusted_ca_path  = "/usr/local/share/ca-certificates/ca-cert.pem"
-  cert_mount_path  = "/mnt/ssl/certs"
-  config_path      = "/opt/config.yml"
-  registry_ui_port = 8080
+  config_path                     = "/etc/registry-ui"
+  registry_ca_path                = "/usr/local/share/ca-certificates"
+  registry_client_tls_secret_name = "${var.name}-registry-client-tls"
+  registry_ui_port                = 8080
 }
 
 module "metadata" {
@@ -16,6 +16,34 @@ module "metadata" {
     "templates/secret.yaml"     = module.secret.manifest
     "templates/service.yaml"    = module.service.manifest
     "templates/ingress.yaml"    = module.ingress.manifest
+
+    # TODO: investigate better option - used only to pass in ca.crt
+    "templates/registry-client-cert.yaml" = yamlencode({
+      apiVersion = "cert-manager.io/v1"
+      kind       = "Certificate"
+      metadata = {
+        name      = local.registry_client_tls_secret_name
+        namespace = var.namespace
+      }
+      spec = {
+        secretName = local.registry_client_tls_secret_name
+        isCA       = false
+        privateKey = {
+          algorithm = "ECDSA"
+          size      = 521
+        }
+        commonName = var.name
+        usages = [
+          "key encipherment",
+          "digital signature",
+          "client auth",
+        ]
+        issuerRef = {
+          name = var.registry_ca_issuer_name
+          kind = "ClusterIssuer"
+        }
+      }
+    })
   }
 }
 
@@ -25,9 +53,9 @@ module "secret" {
   app     = var.name
   release = var.release
   data = {
-    basename(local.trusted_ca_path) = var.registry_ca_cert
+    # basename(local.trusted_ca_path) = var.registry_ca_cert
     # https://github.com/Quiq/registry-ui/blob/master/config.yml
-    basename(local.config_path) = yamlencode({
+    "config.yml" = yamlencode({
       listen_addr   = "0.0.0.0:${local.registry_ui_port}"
       uri_base_path = "/"
       performance = {
@@ -116,18 +144,17 @@ module "deployment" {
           <<-EOF
           set -e
           update-ca-certificates
-          cp /etc/ssl/certs/ca-certificates.crt /mnt/
+          cp /etc/ssl/certs/ca-certificates.crt /tmp/ca-bundle/
           EOF
         ]
         volumeMounts = [
           {
-            name      = "config"
-            mountPath = local.trusted_ca_path
-            subPath   = basename(local.trusted_ca_path)
+            name      = "registry-ca"
+            mountPath = local.registry_ca_path
           },
           {
-            name      = "certs"
-            mountPath = "/mnt"
+            name      = "ca-bundle"
+            mountPath = "/tmp/ca-bundle"
           },
         ]
         securityContext = {
@@ -141,7 +168,7 @@ module "deployment" {
         image = var.images.registry_ui
         args = [
           "-config-file",
-          local.config_path,
+          "${local.config_path}/config.yml",
         ]
         ports = [
           {
@@ -158,10 +185,9 @@ module "deployment" {
           {
             name      = "config"
             mountPath = local.config_path
-            subPath   = basename(local.config_path)
           },
           {
-            name      = "certs"
+            name      = "ca-bundle"
             mountPath = "/etc/ssl/certs/ca-certificates.crt"
             subPath   = "ca-certificates.crt"
             readOnly  = true
@@ -185,13 +211,43 @@ module "deployment" {
     ]
     volumes = [
       {
-        name = "config"
-        secret = {
-          secretName = module.secret.name
+        name = "registry-ca"
+        projected = {
+          sources = [
+            {
+              secret = {
+                name = local.registry_client_tls_secret_name
+                items = [
+                  {
+                    key  = "ca.crt"
+                    path = "ca-cert.pem"
+                  },
+                ]
+              }
+            },
+          ]
         }
       },
       {
-        name = "certs"
+        name = "config"
+        projected = {
+          sources = [
+            {
+              secret = {
+                name = module.secret.name
+                items = [
+                  {
+                    key  = "config.yml"
+                    path = "config.yml"
+                  },
+                ]
+              }
+            },
+          ]
+        }
+      },
+      {
+        name = "ca-bundle"
         emptyDir = {
           medium = "Memory"
         }

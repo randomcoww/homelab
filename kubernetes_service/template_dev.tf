@@ -17,7 +17,8 @@ module "registry" {
   ports = {
     registry = local.service_ports.registry
   }
-  ca                      = data.terraform_remote_state.sr.outputs.trust.ca
+  ca_issuer_name          = local.kubernetes.cert_issuers.ca_internal
+  minio_ca_issuer_name    = local.kubernetes.cert_issuers.ca_internal
   service_ip              = local.services.registry.ip
   loadbalancer_class_name = "kube-vip.io/kube-vip-class"
   event_listener_token    = random_password.registry-event-listener-token.result
@@ -38,7 +39,7 @@ module "registry-ui" {
     registry_ui = local.container_images.registry_ui
   }
   registry_url              = "${local.endpoints.registry.service}:${local.service_ports.registry}"
-  registry_ca_cert          = data.terraform_remote_state.sr.outputs.trust.ca.cert_pem
+  registry_ca_issuer_name   = local.kubernetes.cert_issuers.ca_internal
   service_hostname          = local.endpoints.registry_ui.ingress
   timezone                  = local.timezone
   event_listener_token      = random_password.registry-event-listener-token.result
