@@ -50,3 +50,7 @@ variable "minio_bucket" {
 variable "minio_access_secret" {
   type = string
 }
+
+variable "minio_ca_issuer_name" {
+  type = string
+}

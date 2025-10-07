@@ -1,6 +1,7 @@
 locals {
-  rclone_port  = 8080
-  ca_cert_path = "/var/tmp/rclone/trusted-ca.crt"
+  rclone_port                  = 8080
+  minio_ca_path                = "/etc/rclone"
+  minio_client_tls_secret_name = "${var.name}-minio-client-tls"
 }
 
 module "metadata" {
@@ -13,6 +14,34 @@ module "metadata" {
     "templates/service.yaml"    = module.service.manifest
     "templates/ingress.yaml"    = module.ingress.manifest
     "templates/deployment.yaml" = module.deployment.manifest
+
+    # TODO: investigate better option - used only to pass in ca.crt
+    "templates/minio-client-cert.yaml" = yamlencode({
+      apiVersion = "cert-manager.io/v1"
+      kind       = "Certificate"
+      metadata = {
+        name      = local.minio_client_tls_secret_name
+        namespace = var.namespace
+      }
+      spec = {
+        secretName = local.minio_client_tls_secret_name
+        isCA       = false
+        privateKey = {
+          algorithm = "ECDSA"
+          size      = 521
+        }
+        commonName = var.name
+        usages = [
+          "key encipherment",
+          "digital signature",
+          "client auth",
+        ]
+        issuerRef = {
+          name = var.minio_ca_issuer_name
+          kind = "ClusterIssuer"
+        }
+      }
+    })
   }
 }
 
@@ -83,7 +112,7 @@ module "deployment" {
           "--read-only",
           "--dir-cache-time=4s",
           "--poll-interval=2s",
-          "--ca-cert=${local.ca_cert_path}",
+          "--ca-cert=${local.minio_ca_path}/ca-cert.pem",
         ]
         env = [
           {
@@ -107,9 +136,8 @@ module "deployment" {
         ]
         volumeMounts = [
           {
-            name      = "minio-access-secret"
-            mountPath = local.ca_cert_path
-            subPath   = "AWS_CA_BUNDLE"
+            name      = "minio-ca"
+            mountPath = local.minio_ca_path
           },
         ]
         readinessProbe = {
@@ -130,15 +158,21 @@ module "deployment" {
     ]
     volumes = [
       {
-        name = "secret"
-        secret = {
-          secretName = var.name
-        }
-      },
-      {
-        name = "minio-access-secret"
-        secret = {
-          secretName = var.minio_access_secret
+        name = "minio-ca"
+        projected = {
+          sources = [
+            {
+              secret = {
+                name = local.minio_client_tls_secret_name
+                items = [
+                  {
+                    key  = "ca.crt"
+                    path = "ca-cert.pem"
+                  },
+                ]
+              }
+            },
+          ]
         }
       },
     ]

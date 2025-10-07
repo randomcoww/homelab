@@ -67,9 +67,10 @@ module "webdav-pictures" {
   ingress_class_name        = local.kubernetes.ingress_classes.ingress_nginx
   nginx_ingress_annotations = local.nginx_ingress_annotations
 
-  minio_endpoint      = "https://${local.services.cluster_minio.ip}:${local.service_ports.minio}"
-  minio_bucket        = "pictures"
-  minio_access_secret = local.minio_users.webdav_pictures.secret
+  minio_endpoint       = "https://${local.services.cluster_minio.ip}:${local.service_ports.minio}"
+  minio_bucket         = "pictures"
+  minio_access_secret  = local.minio_users.webdav_pictures.secret
+  minio_ca_issuer_name = local.kubernetes.cert_issuers.ca_internal
 }
 
 ## Sunshine desktop
