@@ -1,5 +1,5 @@
 locals {
-  config_path     = "/var/lib/audioserve/config.yaml"
+  config_path     = "/etc/audioserve"
   data_path       = "/var/lib/audioserve/music"
   audioserve_port = 3000
 }
@@ -23,7 +23,7 @@ module "configmap" {
   app     = var.name
   release = var.release
   data = {
-    basename(local.config_path) = yamlencode(var.transcoding_config)
+    "config.yaml" = yamlencode(var.transcoding_config)
   }
 }
 
@@ -115,7 +115,7 @@ module "mountpoint" {
             --behind-proxy \
             --no-authentication \
             --disable-folder-download \
-            --config ${local.config_path} \
+            --config ${local.config_path}/config.yaml \
             %{~for arg in var.extra_audioserve_args~}
             ${arg} \
             %{~endfor~}
@@ -126,7 +126,6 @@ module "mountpoint" {
           {
             name      = "config"
             mountPath = local.config_path
-            subPath   = basename(local.config_path)
           },
         ]
         ports = [
@@ -153,8 +152,20 @@ module "mountpoint" {
     volumes = [
       {
         name = "config"
-        configMap = {
-          name = module.configmap.name
+        projected = {
+          sources = [
+            {
+              configMap = {
+                name = module.configmap.name
+                items = [
+                  {
+                    key  = "config.yaml"
+                    path = "config.yaml"
+                  },
+                ]
+              }
+            },
+          ]
         }
       },
     ]

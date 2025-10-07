@@ -55,7 +55,7 @@ module "secret" {
   data = {
     # basename(local.trusted_ca_path) = var.registry_ca_cert
     # https://github.com/Quiq/registry-ui/blob/master/config.yml
-    "config.yml" = yamlencode({
+    "config.yaml" = yamlencode({
       listen_addr   = "0.0.0.0:${local.registry_ui_port}"
       uri_base_path = "/"
       performance = {
@@ -168,7 +168,7 @@ module "deployment" {
         image = var.images.registry_ui
         args = [
           "-config-file",
-          "${local.config_path}/config.yml",
+          "${local.config_path}/config.yaml",
         ]
         ports = [
           {
@@ -237,8 +237,8 @@ module "deployment" {
                 name = module.secret.name
                 items = [
                   {
-                    key  = "config.yml"
-                    path = "config.yml"
+                    key  = "config.yaml"
+                    path = "config.yaml"
                   },
                 ]
               }
