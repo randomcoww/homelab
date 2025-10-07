@@ -56,7 +56,8 @@ resource "helm_release" "cert-manager" {
       deploymentAnnotations = {
         "certmanager.k8s.io/disable-validation" = "true"
       }
-      installCRDs = true
+      installCRDs               = true
+      enableCertificateOwnerRef = true
       prometheus = {
         enabled = false
       }
