@@ -49,7 +49,7 @@ resource "helm_release" "cert-manager" {
   create_namespace = true
   wait             = false
   wait_for_jobs    = false
-  version          = "v1.18.2"
+  version          = "v1.19.0"
   max_history      = 2
   values = [
     yamlencode({
