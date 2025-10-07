@@ -34,6 +34,7 @@ module "metadata" {
           "server auth",
         ]
         ipAddresses = [
+          "127.0.0.1",
           var.service_ip,
           var.api_service_ip,
         ]
