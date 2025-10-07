@@ -1,8 +1,7 @@
 locals {
-  data_path           = "/var/lib/matchbox/mnt"
-  config_path         = "/etc/matchbox"
-  tls_secret_name     = "${var.name}-tls"
-  api_tls_secret_name = "${var.name}-api-tls"
+  data_path       = "/var/lib/matchbox/mnt"
+  config_path     = "/etc/matchbox"
+  tls_secret_name = "${var.name}-tls"
 }
 
 module "metadata" {
@@ -14,41 +13,6 @@ module "metadata" {
   manifests = merge(module.mountpoint.chart.manifests, {
     "templates/service.yaml"     = module.service.manifest
     "templates/service-api.yaml" = module.service-api.manifest
-
-    "templates/api-cert.yaml" = yamlencode({
-      apiVersion = "cert-manager.io/v1"
-      kind       = "Certificate"
-      metadata = {
-        name      = "${var.name}-api"
-        namespace = var.namespace
-      }
-      spec = {
-        secretName = local.api_tls_secret_name
-        isCA       = false
-        privateKey = {
-          algorithm = "ECDSA"
-          size      = 521
-        }
-        commonName = var.name
-        usages = [
-          "key encipherment",
-          "digital signature",
-          "server auth",
-        ]
-        ipAddresses = [
-          var.api_service_ip,
-        ]
-        dnsNames = [
-          var.name,
-          "${var.name}.${var.namespace}",
-        ]
-        issuerRef = {
-          name = var.ca_issuer_name
-          kind = "ClusterIssuer"
-        }
-      }
-    })
-
     "templates/cert.yaml" = yamlencode({
       apiVersion = "cert-manager.io/v1"
       kind       = "Certificate"
@@ -71,6 +35,7 @@ module "metadata" {
         ]
         ipAddresses = [
           var.service_ip,
+          var.api_service_ip,
         ]
         dnsNames = [
           var.name,
@@ -205,7 +170,7 @@ module "mountpoint" {
           sources = [
             {
               secret = {
-                name = local.api_tls_secret_name
+                name = local.tls_secret_name
                 items = [
                   {
                     key  = "ca.crt"
@@ -219,13 +184,6 @@ module "mountpoint" {
                     key  = "tls.key"
                     path = "server.key"
                   },
-                ]
-              }
-            },
-            {
-              secret = {
-                name = local.tls_secret_name
-                items = [
                   {
                     key  = "tls.crt"
                     path = "ssl/server.crt"
