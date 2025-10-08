@@ -59,6 +59,6 @@ variable "sqlite_path" {
   type = string
 }
 
-variable "s3_access_secret" {
+variable "minio_access_secret" {
   type = string
 }

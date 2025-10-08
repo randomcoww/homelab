@@ -1,6 +1,5 @@
 locals {
-  config_path = "/var/lib/litestream/config.yml"
-  s3_ca_path  = "/var/lib/litestream/s3-ca-cert.pem"
+  config_file = "/etc/litestream/config.yaml"
 }
 
 module "metadata" {
@@ -20,7 +19,7 @@ module "secret" {
   app     = var.app
   release = var.release
   data = {
-    basename(local.config_path) = yamlencode(var.litestream_config)
+    "config.yaml" = yamlencode(var.litestream_config)
   }
 }
 
@@ -46,7 +45,7 @@ module "statefulset" {
           "-if-db-not-exists",
           # "-if-replica-exists", # TODO: not working in 0.5.0
           "-config",
-          local.config_path,
+          local.config_file,
           var.sqlite_path,
         ]
         env = [
@@ -62,7 +61,7 @@ module "statefulset" {
             name = "AWS_ACCESS_KEY_ID"
             valueFrom = {
               secretKeyRef = {
-                name = var.s3_access_secret
+                name = var.minio_access_secret
                 key  = "AWS_ACCESS_KEY_ID"
               }
             }
@@ -71,35 +70,21 @@ module "statefulset" {
             name = "AWS_SECRET_ACCESS_KEY"
             valueFrom = {
               secretKeyRef = {
-                name = var.s3_access_secret
+                name = var.minio_access_secret
                 key  = "AWS_SECRET_ACCESS_KEY"
               }
             }
           },
-          # TODO: passing CA not working in 0.5.0
-          # {
-          #   name  = "AWS_CA_BUNDLE"
-          #   value = local.s3_ca_path
-          # },
-          # {
-          #   name  = "SSL_CERT_FILE"
-          #   value = local.s3_ca_path
-          # },
         ]
         volumeMounts = [
           {
             name      = "litestream-config"
-            mountPath = local.config_path
-            subPath   = basename(local.config_path)
+            mountPath = local.config_file
+            subPath   = "config.yaml"
           },
           {
             name      = "litestream-data"
             mountPath = dirname(var.sqlite_path)
-          },
-          {
-            name      = "minio-access-secret"
-            mountPath = local.s3_ca_path
-            subPath   = "AWS_CA_BUNDLE"
           },
         ]
       },
@@ -110,7 +95,7 @@ module "statefulset" {
         args = [
           "replicate",
           "-config",
-          local.config_path,
+          local.config_file,
         ]
         env = [
           {
@@ -125,7 +110,7 @@ module "statefulset" {
             name = "AWS_ACCESS_KEY_ID"
             valueFrom = {
               secretKeyRef = {
-                name = var.s3_access_secret
+                name = var.minio_access_secret
                 key  = "AWS_ACCESS_KEY_ID"
               }
             }
@@ -134,35 +119,21 @@ module "statefulset" {
             name = "AWS_SECRET_ACCESS_KEY"
             valueFrom = {
               secretKeyRef = {
-                name = var.s3_access_secret
+                name = var.minio_access_secret
                 key  = "AWS_SECRET_ACCESS_KEY"
               }
             }
           },
-          # TODO: passing CA not working in 0.5.0
-          # {
-          #   name  = "AWS_CA_BUNDLE"
-          #   value = local.s3_ca_path
-          # },
-          # {
-          #   name  = "SSL_CERT_FILE"
-          #   value = local.s3_ca_path
-          # },
         ]
         volumeMounts = [
           {
             name      = "litestream-config"
-            mountPath = local.config_path
-            subPath   = basename(local.config_path)
+            mountPath = local.config_file
+            subPath   = "config.yaml"
           },
           {
             name      = "litestream-data"
             mountPath = dirname(var.sqlite_path)
-          },
-          {
-            name      = "minio-access-secret"
-            mountPath = local.s3_ca_path
-            subPath   = "AWS_CA_BUNDLE"
           },
         ]
       },
@@ -193,12 +164,6 @@ module "statefulset" {
         name = "litestream-config"
         secret = {
           secretName = module.secret.name
-        }
-      },
-      {
-        name = "minio-access-secret"
-        secret = {
-          secretName = var.s3_access_secret
         }
       },
     ])
