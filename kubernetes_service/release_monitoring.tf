@@ -61,16 +61,6 @@ resource "helm_release" "prometheus-blackbox" {
 
 # prometheus #
 
-module "prometheus-ca-secret" {
-  source  = "../modules/secret"
-  name    = local.endpoints.prometheus.name
-  app     = local.endpoints.prometheus.name
-  release = "0.1.0"
-  data = {
-    "ca-cert.pem" = data.terraform_remote_state.sr.outputs.trust.ca.cert_pem
-  }
-}
-
 resource "helm_release" "prometheus" {
   name             = local.endpoints.prometheus.name
   namespace        = local.endpoints.prometheus.namespace
@@ -119,13 +109,39 @@ resource "helm_release" "prometheus" {
           {
             name = "config"
             secret = {
-              secretName = module.prometheus-ca-secret.name
+              secretName = "${local.endpoints.prometheus.name}-internal-client-tls"
             }
           },
         ]
       }
       extraManifests = [
-        module.prometheus-ca-secret.manifest,
+        # module.prometheus-ca-secret.manifest,
+        yamlencode({
+          apiVersion = "cert-manager.io/v1"
+          kind       = "Certificate"
+          metadata = {
+            name      = "${local.endpoints.prometheus.name}-internal-client-tls"
+            namespace = local.endpoints.prometheus.namespace
+          }
+          spec = {
+            secretName = "${local.endpoints.prometheus.name}-internal-client-tls"
+            isCA       = false
+            privateKey = {
+              algorithm = "ECDSA"
+              size      = 521
+            }
+            commonName = local.endpoints.prometheus.name
+            usages = [
+              "key encipherment",
+              "digital signature",
+              "client auth",
+            ]
+            issuerRef = {
+              name = local.kubernetes.cert_issuers.ca_internal
+              kind = "ClusterIssuer"
+            }
+          }
+        })
       ]
       extraScrapeConfigs = yamlencode([
         {
