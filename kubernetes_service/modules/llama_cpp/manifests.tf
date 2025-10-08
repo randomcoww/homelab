@@ -1,7 +1,7 @@
 locals {
   llama_cpp_port = 8080
   model_path     = "/var/lib/llama_cpp/models"
-  config_path    = "/var/lib/llama_cpp/config.yaml"
+  config_file    = "/var/lib/llama_cpp/config.yaml"
 }
 
 module "metadata" {
@@ -23,7 +23,7 @@ module "secret" {
   app     = var.name
   release = var.release
   data = merge({
-    basename(local.config_path) = yamlencode(var.llama_swap_config)
+    "config.yaml" = yamlencode(var.llama_swap_config)
   })
 }
 
@@ -107,15 +107,15 @@ module "mountpoint" {
           ln -sf "${local.model_path}" /models
 
           exec /app/llama-swap \
-            --config ${local.config_path} \
+            --config ${local.config_file} \
             --listen 0.0.0.0:${local.llama_cpp_port}
           EOF
         ]
         volumeMounts = [
           {
             name      = "config"
-            mountPath = local.config_path
-            subPath   = basename(local.config_path)
+            mountPath = local.config_file
+            subPath   = "config.yaml"
           },
         ]
         env = [

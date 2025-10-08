@@ -1,6 +1,6 @@
 
 locals {
-  valkey_socket_path = "/var/run/valkey/socket.sock"
+  valkey_socket_file = "/var/run/valkey/socket.sock"
   extra_configs = merge(var.extra_configs, {
     SEARXNG_SETTINGS_PATH   = "/etc/searxng/settings.yml"
     SEARXNG_LIMITER         = false
@@ -9,7 +9,7 @@ locals {
     SEARXNG_BIND_ADDRESS    = "0.0.0.0"
     SEARXNG_PORT            = 8080
     SEARXNG_SECRET          = random_password.searxng-secret.result
-    SEARXNG_VALKEY_URL      = "unix://${local.valkey_socket_path}?db=0"
+    SEARXNG_VALKEY_URL      = "unix://${local.valkey_socket_file}?db=0"
   })
 }
 
@@ -108,14 +108,14 @@ module "deployment" {
         restartPolicy = "Always"
         args = [
           "--unixsocket",
-          "${local.valkey_socket_path}",
+          "${local.valkey_socket_file}",
           "--port",
           "0",
         ]
         volumeMounts = [
           {
             name      = "socket"
-            mountPath = dirname(local.valkey_socket_path)
+            mountPath = dirname(local.valkey_socket_file)
           },
         ]
       },
@@ -149,7 +149,7 @@ module "deployment" {
           },
           {
             name      = "socket"
-            mountPath = dirname(local.valkey_socket_path)
+            mountPath = dirname(local.valkey_socket_file)
           },
         ]
         readinessProbe = {

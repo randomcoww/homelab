@@ -14,7 +14,7 @@ locals {
     mic     = local.base_port + 13
   }
   home_path          = "/home/${var.user}"
-  sunshine_apps_path = "/etc/sunshine/apps.json"
+  sunshine_apps_file = "/etc/sunshine/apps.json"
 }
 
 # bypassed through nginx - no need to expose
@@ -54,7 +54,7 @@ module "secret" {
     }, {
     USERNAME = random_password.username.result
     PASSWORD = random_password.password.result
-    basename(local.sunshine_apps_path) = jsonencode({
+    "apps.json" = jsonencode({
       apps = [
         {
           name       = "Desktop"
@@ -249,7 +249,7 @@ module "statefulset" {
           exec sunshine \
             origin_web_ui_allowed=wan \
             port=${local.base_port} \
-            file_apps=${local.sunshine_apps_path} \
+            file_apps=${local.sunshine_apps_file} \
             upnp=off
           EOT
           EOF
@@ -318,8 +318,8 @@ module "statefulset" {
           },
           {
             name      = "config"
-            mountPath = local.sunshine_apps_path
-            subPath   = basename(local.sunshine_apps_path)
+            mountPath = local.sunshine_apps_file
+            subPath   = "apps.json"
           },
         ], var.extra_volume_mounts)
         ports = concat([

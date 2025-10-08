@@ -1,10 +1,8 @@
 
 locals {
   vaultwarden_port = 8080
-  db_path          = "/data/db.sqlite3"
   extra_configs = merge(var.extra_configs, {
-    DATA_FOLDER           = dirname(local.db_path)
-    DATABASE_URL          = local.db_path
+    DATABASE_URL          = "/data/db.sqlite3"
     DATABASE_CONN_INIT    = "PRAGMA busy_timeout = 5000; PRAGMA synchronous = NORMAL;"
     ROCKET_PORT           = local.vaultwarden_port
     DOMAIN                = "https://${var.service_hostname}"
@@ -31,10 +29,12 @@ module "secret" {
   name    = var.name
   app     = var.name
   release = var.release
-  data = {
+  data = merge({
     for k, v in local.extra_configs :
     tostring(k) => tostring(v)
-  }
+    }, {
+    DATA_FOLDER = dirname(local.extra_configs.DATABASE_URL)
+  })
 }
 
 module "service" {
@@ -85,7 +85,7 @@ module "litestream" {
   litestream_config = {
     dbs = [
       {
-        path = local.db_path
+        path = local.extra_configs.DATABASE_URL
         replicas = [
           {
             name              = "minio"
@@ -101,7 +101,7 @@ module "litestream" {
       },
     ]
   }
-  sqlite_path      = local.db_path
+  sqlite_path      = local.extra_configs.DATABASE_URL
   s3_access_secret = var.minio_access_secret
   ##
   name      = var.name
