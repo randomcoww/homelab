@@ -134,6 +134,10 @@ module "arc-workflow-secret" {
                   }
                 }
               },
+              {
+                name  = "SSL_CERT_FILE"
+                value = "/etc/ssl/certs/ca-certificates.crt"
+              },
             ]
             volumeMounts = [
               {
