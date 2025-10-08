@@ -94,17 +94,17 @@ resource "helm_release" "prometheus" {
         }
         extraVolumeMounts = [
           {
-            name      = "ca-bundle"
+            name      = "ca-trust-bundle"
             mountPath = "/etc/ssl/certs/ca-certificates.crt"
+            subPath   = "ca.crt"
             readOnly  = true
           },
         ]
         extraVolumes = [
           {
-            name = "ca-bundle"
-            hostPath = {
-              path = "/etc/ssl/certs/ca-certificates.crt"
-              type = "File"
+            name = "ca-trust-bundle"
+            configMap = {
+              name = "ca-trust-bundle.crt"
             }
           },
         ]

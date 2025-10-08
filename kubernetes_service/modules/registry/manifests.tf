@@ -116,8 +116,9 @@ module "metadata" {
                         mountPath = local.config_path
                       },
                       {
-                        name      = "ca-bundle"
+                        name      = "ca-trust-bundle"
                         mountPath = "/etc/ssl/certs/ca-certificates.crt"
+                        subPath   = "ca.crt"
                         readOnly  = true
                       },
                     ]
@@ -143,10 +144,9 @@ module "metadata" {
                     }
                   },
                   {
-                    name = "ca-bundle"
-                    hostPath = {
-                      path = "/etc/ssl/certs/ca-certificates.crt"
-                      type = "File"
+                    name = "ca-trust-bundle"
+                    configMap = {
+                      name = "ca-trust-bundle.crt"
                     }
                   },
                 ]
@@ -319,8 +319,9 @@ module "deployment" {
             mountPath = local.config_path
           },
           {
-            name      = "ca-bundle"
+            name      = "ca-trust-bundle"
             mountPath = "/etc/ssl/certs/ca-certificates.crt"
+            subPath   = "ca.crt"
             readOnly  = true
           },
         ]

@@ -215,7 +215,7 @@ resource "helm_release" "cert-issuer" {
           apiVersion = "trust.cert-manager.io/v1alpha1"
           kind       = "Bundle"
           metadata = {
-            name = "${local.kubernetes.cert_issuers.ca_internal}-ca-bundle"
+            name = "ca-trust-bundle.crt"
           }
           spec = {
             sources = [
@@ -231,7 +231,7 @@ resource "helm_release" "cert-issuer" {
             ]
             target = {
               configMap = {
-                key = "trust-bundle.pem"
+                key = "ca.crt"
               }
             }
           }

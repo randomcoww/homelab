@@ -176,8 +176,9 @@ module "litestream" {
         ]
         volumeMounts = [
           {
-            name      = "ca-bundle"
+            name      = "ca-trust-bundle"
             mountPath = "/etc/ssl/certs/ca-certificates.crt"
+            subPath   = "ca.crt"
             readOnly  = true
           },
         ]

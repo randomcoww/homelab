@@ -87,8 +87,9 @@ module "statefulset" {
             mountPath = dirname(var.sqlite_path)
           },
           {
-            name      = "ca-bundle"
+            name      = "ca-trust-bundle"
             mountPath = "/etc/ssl/certs/ca-certificates.crt"
+            subPath   = "ca.crt"
             readOnly  = true
           },
         ]
@@ -141,8 +142,9 @@ module "statefulset" {
             mountPath = dirname(var.sqlite_path)
           },
           {
-            name      = "ca-bundle"
+            name      = "ca-trust-bundle"
             mountPath = "/etc/ssl/certs/ca-certificates.crt"
+            subPath   = "ca.crt"
             readOnly  = true
           },
         ]

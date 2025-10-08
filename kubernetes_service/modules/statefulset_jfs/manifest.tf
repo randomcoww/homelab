@@ -130,8 +130,9 @@ module "litestream" {
         ]
         volumeMounts = [
           {
-            name      = "ca-bundle"
+            name      = "ca-trust-bundle"
             mountPath = "/etc/ssl/certs/ca-certificates.crt"
+            subPath   = "ca.crt"
             readOnly  = true
           },
         ]
@@ -167,8 +168,9 @@ module "litestream" {
             mountPropagation = "Bidirectional"
           },
           {
-            name      = "ca-bundle"
+            name      = "ca-trust-bundle"
             mountPath = "/etc/ssl/certs/ca-certificates.crt"
+            subPath   = "ca.crt"
             readOnly  = true
           },
         ]
