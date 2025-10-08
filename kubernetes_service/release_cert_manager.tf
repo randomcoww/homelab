@@ -53,6 +53,7 @@ resource "helm_release" "cert-manager" {
   max_history      = 2
   values = [
     yamlencode({
+      replicaCount = 2
       deploymentAnnotations = {
         "certmanager.k8s.io/disable-validation" = "true"
       }
@@ -60,9 +61,12 @@ resource "helm_release" "cert-manager" {
       enableCertificateOwnerRef = true
       prometheus = {
         enabled = true
-        servicemonitor = {
-          enabled = false
-        }
+      }
+      webhook = {
+        replicaCount = 2
+      }
+      cainjector = {
+        enabled = false
       }
       extraArgs = [
         "--dns01-recursive-nameservers-only",
@@ -75,6 +79,30 @@ resource "helm_release" "cert-manager" {
             value = "2"
           },
         ]
+      }
+    }),
+  ]
+}
+
+resource "helm_release" "cert-manager-csi-driver" {
+  name             = "cert-manager-csi-driver"
+  repository       = "https://charts.jetstack.io"
+  chart            = "cert-manager-csi-driver"
+  namespace        = "cert-manager"
+  create_namespace = true
+  wait             = false
+  wait_for_jobs    = false
+  version          = "v0.11.0"
+  max_history      = 2
+  values = [
+    yamlencode({
+      metrics = {
+        enabled = true
+        port    = local.service_ports.metrics
+      }
+      podAnnotations = {
+        "prometheus.io/scrape" = "true"
+        "prometheus.io/port"   = tostring(local.service_ports.metrics)
       }
     }),
   ]
