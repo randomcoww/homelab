@@ -9,7 +9,7 @@ concurrency:
 
 jobs:
   renovate:
-    runs-on: arc-runner-${{ github.event.repository.name }}
+    runs-on: renovate-${{ github.event.repository.name }}
     container:
       image: registry.default/randomcoww/renovate:latest@sha256:4aff037eb20e788af545cfafa97bfe038115d72b456adbfb05e609e25710a58d
     permissions:

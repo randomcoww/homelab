@@ -37,7 +37,7 @@ module "arc-workflow-secret" {
     INTERNAL_CA_CERT = data.terraform_remote_state.sr.outputs.trust.ca.cert_pem
     RENOVATE_TOKEN   = var.github.token # GITHUB_TOKEN cannot provide all permissions needed for renovate
 
-    "workflow-podspec.yaml" = yamlencode({
+    "workflow-podspec-builder.yaml" = yamlencode({
       spec = {
         labels = {
           app = "arc-runner"
@@ -67,17 +67,6 @@ module "arc-workflow-secret" {
                   secretKeyRef = {
                     name = "workflow-template"
                     key  = "INTERNAL_CA_CERT"
-                  }
-                }
-              },
-
-              # renovate
-              {
-                name = "RENOVATE_TOKEN"
-                valueFrom = {
-                  secretKeyRef = {
-                    name = "workflow-template"
-                    key  = "RENOVATE_TOKEN"
                   }
                 }
               },
@@ -120,6 +109,52 @@ module "arc-workflow-secret" {
         ]
       }
     })
+
+    # renovate
+    "workflow-podspec-renovate.yaml" = yamlencode({
+      spec = {
+        labels = {
+          app = "arc-runner"
+        }
+        containers = [
+          {
+            name = "$job"
+            resources = {
+              requests = {
+                memory = "2Gi"
+              }
+            }
+            env = [
+              {
+                name = "RENOVATE_TOKEN"
+                valueFrom = {
+                  secretKeyRef = {
+                    name = "workflow-template"
+                    key  = "RENOVATE_TOKEN"
+                  }
+                }
+              },
+            ]
+            volumeMounts = [
+              {
+                name      = "ca-bundle"
+                mountPath = "/etc/ssl/certs/ca-certificates.crt"
+                readOnly  = true
+              },
+            ]
+          },
+        ]
+        volumes = [
+          {
+            name = "ca-bundle"
+            hostPath = {
+              path = "/etc/ssl/certs/ca-certificates.crt"
+              type = "File"
+            }
+          },
+        ]
+      }
+    })
   }
 }
 
@@ -143,10 +178,10 @@ data "github_repositories" "repos" {
   query = "user:${var.github.user} archived:false fork:true"
 }
 
-resource "helm_release" "arc-runner-set" {
+resource "helm_release" "arc-runner-set-builder" {
   for_each = toset(data.github_repositories.repos.names)
 
-  name             = "arc-runner-${each.key}"
+  name             = "builder-${each.key}"
   repository       = "oci://ghcr.io/actions/actions-runner-controller-charts"
   chart            = "gha-runner-scale-set"
   namespace        = "arc-runners"
@@ -199,7 +234,86 @@ resource "helm_release" "arc-runner-set" {
                 {
                   name      = "workflow-podspec-volume"
                   mountPath = "/home/runner/config/workflow-podspec.yaml"
-                  subPath   = "workflow-podspec.yaml"
+                  subPath   = "workflow-podspec-builder.yaml"
+                },
+              ]
+            },
+          ]
+          volumes = [
+            {
+              name = "workflow-podspec-volume"
+              secret = {
+                secretName = "workflow-template"
+              }
+            },
+          ]
+        }
+      }
+      controllerServiceAccount = {
+        namespace = "arc-systems"
+        name      = "gha-runner-scale-set-controller"
+      }
+    }),
+  ]
+}
+
+resource "helm_release" "arc-runner-set-renovate" {
+  for_each = toset(data.github_repositories.repos.names)
+
+  name             = "renovate-${each.key}"
+  repository       = "oci://ghcr.io/actions/actions-runner-controller-charts"
+  chart            = "gha-runner-scale-set"
+  namespace        = "arc-runners"
+  create_namespace = true
+  wait             = false
+  wait_for_jobs    = false
+  timeout          = 600
+  version          = "0.12.1"
+  max_history      = 2
+  values = [
+    yamlencode({
+      githubConfigUrl = "https://github.com/${var.github.user}/${each.key}"
+      githubConfigSecret = {
+        github_token = var.github.token
+      }
+      maxRunners = 1
+      containerMode = {
+        type = "kubernetes"
+        kubernetesModeWorkVolumeClaim = {
+          accessModes = [
+            "ReadWriteOnce",
+          ]
+          storageClassName = "local-path"
+          resources = {
+            requests = {
+              storage = "16Gi"
+            }
+          }
+        }
+      }
+      template = {
+        spec = {
+          labels = {
+            app = "arc-runner"
+          }
+          containers = [
+            {
+              name  = "runner"
+              image = local.container_images.github_actions_runner
+              command = [
+                "/home/runner/run.sh",
+              ]
+              env = [
+                {
+                  name  = "ACTIONS_RUNNER_CONTAINER_HOOK_TEMPLATE"
+                  value = "/home/runner/config/workflow-podspec.yaml"
+                },
+              ]
+              volumeMounts = [
+                {
+                  name      = "workflow-podspec-volume"
+                  mountPath = "/home/runner/config/workflow-podspec.yaml"
+                  subPath   = "workflow-podspec-renovate.yaml"
                 },
               ]
             },
