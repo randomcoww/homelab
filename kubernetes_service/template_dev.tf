@@ -185,6 +185,7 @@ module "flowise" {
   minio_bucket            = "flowise"
   minio_litestream_prefix = "$POD_NAME/litestream"
   minio_access_secret     = local.minio_users.flowise.secret
+  minio_ca_issuer_name    = local.kubernetes.cert_issuers.ca_internal
 }
 
 ## code-server

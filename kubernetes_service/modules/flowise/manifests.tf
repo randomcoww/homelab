@@ -11,7 +11,8 @@ locals {
     TOKEN_HASH_SECRET           = random_password.token-hash-secret.result
     NODE_EXTRA_CA_CERTS         = "/usr/local/share/ca-certificates/ca-cert.pem"
   })
-  db_path = "${local.extra_configs.DATABASE_PATH}/database.sqlite"
+  db_path                      = "${local.extra_configs.DATABASE_PATH}/database.sqlite"
+  minio_client_tls_secret_name = "${var.name}-minio-client-tls"
 }
 
 resource "random_password" "flowise-secretkey-overwrite" {
@@ -44,6 +45,34 @@ module "metadata" {
     "templates/secret.yaml"  = module.secret.manifest
     "templates/service.yaml" = module.service.manifest
     "templates/ingress.yaml" = module.ingress.manifest
+
+    # TODO: investigate better option - used only to pass in ca.crt
+    "templates/minio-client-cert.yaml" = yamlencode({
+      apiVersion = "cert-manager.io/v1"
+      kind       = "Certificate"
+      metadata = {
+        name      = local.minio_client_tls_secret_name
+        namespace = var.namespace
+      }
+      spec = {
+        secretName = local.minio_client_tls_secret_name
+        isCA       = false
+        privateKey = {
+          algorithm = "ECDSA"
+          size      = 521
+        }
+        commonName = var.name
+        usages = [
+          "key encipherment",
+          "digital signature",
+          "client auth",
+        ]
+        issuerRef = {
+          name = var.minio_ca_issuer_name
+          kind = "ClusterIssuer"
+        }
+      }
+    })
   })
 }
 
@@ -123,8 +152,8 @@ module "litestream" {
       },
     ]
   }
-  sqlite_path      = local.db_path
-  s3_access_secret = var.minio_access_secret
+  sqlite_path         = local.db_path
+  minio_access_secret = var.minio_access_secret
   ##
   name      = var.name
   namespace = var.namespace
@@ -177,9 +206,9 @@ module "litestream" {
         ]
         volumeMounts = [
           {
-            name      = "minio-access-secret"
+            name      = "minio-ca"
             mountPath = local.extra_configs.NODE_EXTRA_CA_CERTS
-            subPath   = "AWS_CA_BUNDLE"
+            subPath   = "ca.crt"
           },
         ]
         readinessProbe = {
@@ -217,6 +246,12 @@ module "litestream" {
         name = "config"
         secret = {
           secretName = module.secret.name
+        }
+      },
+      {
+        name = "minio-ca"
+        secret = {
+          secretName = local.minio_client_tls_secret_name
         }
       },
     ]
