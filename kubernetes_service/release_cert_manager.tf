@@ -209,6 +209,33 @@ resource "helm_release" "cert-issuer" {
             }
           }
         }),
+
+        # trust manager bundle including internal CA
+        yamlencode({
+          apiVersion = "trust.cert-manager.io/v1alpha1"
+          kind       = "Bundle"
+          metadata = {
+            name = "${local.kubernetes.cert_issuers.ca_internal}-ca-bundle"
+          }
+          spec = {
+            sources = [
+              {
+                useDefaultCAs = true
+              },
+              {
+                secret = {
+                  name = module.cert-manager-issuer-ca-internal-secret.name
+                  key  = "tls.crt"
+                }
+              },
+            ]
+            target = {
+              configMap = {
+                key = "trust-bundle.pem"
+              }
+            }
+          }
+        }),
       ]
     }),
   ]
