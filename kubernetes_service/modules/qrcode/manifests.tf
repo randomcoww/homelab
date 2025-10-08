@@ -1,6 +1,6 @@
 locals {
   qrcode_port = 8080
-  index_path  = "/var/www/index.html"
+  config_file = "/var/www/index.html"
 }
 
 module "secret" {
@@ -9,7 +9,7 @@ module "secret" {
   app     = var.name
   release = var.release
   data = {
-    basename(local.index_path) = <<-EOF
+    "index.html" = <<-EOF
     <!DOCTYPE html>
     <html>
     <head>
@@ -157,9 +157,9 @@ module "deployment" {
         }
         volumeMounts = [
           {
-            name        = "config"
-            mountPath   = local.index_path
-            subPathExpr = basename(local.index_path)
+            name      = "config"
+            mountPath = local.config_file
+            subPath   = "index.html"
           },
         ]
       },

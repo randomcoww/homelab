@@ -1,6 +1,6 @@
 locals {
-  config_path                     = "/etc/registry-ui"
-  registry_ca_path                = "/usr/local/share/ca-certificates"
+  config_file                     = "/etc/registry-ui/config.yaml"
+  registry_ca_file                = "/usr/local/share/ca-certificates/ca-cert.pem"
   registry_client_tls_secret_name = "${var.name}-registry-client-tls"
   registry_ui_port                = 8080
 }
@@ -150,7 +150,8 @@ module "deployment" {
         volumeMounts = [
           {
             name      = "registry-ca"
-            mountPath = local.registry_ca_path
+            mountPath = local.registry_ca_file
+            subPath   = "ca.crt"
           },
           {
             name      = "ca-bundle"
@@ -168,7 +169,7 @@ module "deployment" {
         image = var.images.registry_ui
         args = [
           "-config-file",
-          "${local.config_path}/config.yaml",
+          local.config_file,
         ]
         ports = [
           {
@@ -184,7 +185,8 @@ module "deployment" {
         volumeMounts = [
           {
             name      = "config"
-            mountPath = local.config_path
+            mountPath = local.config_file
+            subPath   = "config.yaml"
           },
           {
             name      = "ca-bundle"
@@ -212,20 +214,8 @@ module "deployment" {
     volumes = [
       {
         name = "registry-ca"
-        projected = {
-          sources = [
-            {
-              secret = {
-                name = local.registry_client_tls_secret_name
-                items = [
-                  {
-                    key  = "ca.crt"
-                    path = "ca-cert.pem"
-                  },
-                ]
-              }
-            },
-          ]
+        secret = {
+          secretName = local.registry_client_tls_secret_name
         }
       },
       {

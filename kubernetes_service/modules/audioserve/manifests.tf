@@ -1,5 +1,5 @@
 locals {
-  config_path     = "/etc/audioserve"
+  config_file     = "/etc/audioserve/config.yaml"
   data_path       = "/var/lib/audioserve/music"
   audioserve_port = 3000
 }
@@ -115,7 +115,7 @@ module "mountpoint" {
             --behind-proxy \
             --no-authentication \
             --disable-folder-download \
-            --config ${local.config_path}/config.yaml \
+            --config ${local.config_file} \
             %{~for arg in var.extra_audioserve_args~}
             ${arg} \
             %{~endfor~}
@@ -125,7 +125,8 @@ module "mountpoint" {
         volumeMounts = [
           {
             name      = "config"
-            mountPath = local.config_path
+            mountPath = local.config_file
+            subPath   = "config.yaml"
           },
         ]
         ports = [

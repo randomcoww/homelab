@@ -1,6 +1,6 @@
 locals {
   config_path                  = "/etc/registry"
-  minio_ca_path                = "/usr/local/share/ca-certificates"
+  minio_ca_file                = "/usr/local/share/ca-certificates/ca-cert.pem"
   tls_secret_name              = "${var.name}-tls"
   minio_client_tls_secret_name = "${var.name}-minio-client-tls"
 }
@@ -146,7 +146,8 @@ module "metadata" {
                       },
                       {
                         name      = "minio-ca"
-                        mountPath = local.minio_ca_path
+                        mountPath = local.minio_ca_file
+                        subPath   = "ca.crt"
                       },
                     ]
                   },
@@ -172,20 +173,8 @@ module "metadata" {
                   },
                   {
                     name = "minio-ca"
-                    projected = {
-                      sources = [
-                        {
-                          secret = {
-                            name = local.minio_client_tls_secret_name
-                            items = [
-                              {
-                                key  = "ca.crt"
-                                path = "ca-cert.pem"
-                              },
-                            ]
-                          }
-                        },
-                      ]
+                    secret = {
+                      secretName = local.minio_client_tls_secret_name
                     }
                   },
                 ]
@@ -359,7 +348,8 @@ module "deployment" {
           },
           {
             name      = "minio-ca"
-            mountPath = local.minio_ca_path
+            mountPath = local.minio_ca_file
+            subPath   = "ca.crt"
           },
         ]
         readinessProbe = {
@@ -418,20 +408,8 @@ module "deployment" {
       },
       {
         name = "minio-ca"
-        projected = {
-          sources = [
-            {
-              secret = {
-                name = local.minio_client_tls_secret_name
-                items = [
-                  {
-                    key  = "ca.crt"
-                    path = "ca-cert.pem"
-                  },
-                ]
-              }
-            },
-          ]
+        secret = {
+          secretName = local.minio_client_tls_secret_name
         }
       },
     ]

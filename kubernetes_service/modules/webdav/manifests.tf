@@ -1,6 +1,6 @@
 locals {
   rclone_port                  = 8080
-  minio_ca_path                = "/etc/rclone"
+  minio_ca_file                = "/etc/rclone/ca-cert.pem"
   minio_client_tls_secret_name = "${var.name}-minio-client-tls"
 }
 
@@ -112,7 +112,7 @@ module "deployment" {
           "--read-only",
           "--dir-cache-time=4s",
           "--poll-interval=2s",
-          "--ca-cert=${local.minio_ca_path}/ca-cert.pem",
+          "--ca-cert=${local.minio_ca_file}",
         ]
         env = [
           {
@@ -137,7 +137,8 @@ module "deployment" {
         volumeMounts = [
           {
             name      = "minio-ca"
-            mountPath = local.minio_ca_path
+            mountPath = local.minio_ca_file
+            subPath   = "ca.crt"
           },
         ]
         readinessProbe = {
@@ -159,20 +160,8 @@ module "deployment" {
     volumes = [
       {
         name = "minio-ca"
-        projected = {
-          sources = [
-            {
-              secret = {
-                name = local.minio_client_tls_secret_name
-                items = [
-                  {
-                    key  = "ca.crt"
-                    path = "ca-cert.pem"
-                  },
-                ]
-              }
-            },
-          ]
+        secret = {
+          secretName = local.minio_client_tls_secret_name
         }
       },
     ]

@@ -143,7 +143,7 @@ resource "helm_release" "minio" {
       extraContainers = [
         # bypass TLS for metrics endpoints
         {
-          name  = "${local.endpoints.minio.name}-proxy"
+          name  = "${local.endpoints.minio.name}-metrics-proxy"
           image = local.container_images.nginx
           ports = [
             {
@@ -153,7 +153,8 @@ resource "helm_release" "minio" {
           volumeMounts = [
             {
               name      = "metrics-proxy-config"
-              mountPath = "/etc/nginx/conf.d"
+              mountPath = "/etc/nginx/conf.d/default.conf"
+              subPath   = "default.conf"
             },
           ]
         },
@@ -162,7 +163,7 @@ resource "helm_release" "minio" {
         {
           name = "metrics-proxy-config"
           configMap = {
-            name = "${local.endpoints.minio.name}-proxy"
+            name = module.minio-metrics-proxy.name
           }
         },
       ]
