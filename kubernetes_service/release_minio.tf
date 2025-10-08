@@ -1,78 +1,10 @@
-
-# minio #
-
-resource "tls_private_key" "minio" {
-  algorithm   = data.terraform_remote_state.sr.outputs.trust.ca.algorithm
-  ecdsa_curve = "P521"
-  rsa_bits    = 4096
-}
-
-resource "tls_cert_request" "minio" {
-  private_key_pem = tls_private_key.minio.private_key_pem
-
-  subject {
-    common_name = "${local.endpoints.minio.name}-server"
-  }
-
-  dns_names = concat([
-    "localhost",
-    local.endpoints.minio.name,
-    local.endpoints.minio.service,
-    ], [
-    for i, _ in range(local.minio_replicas) :
-    "${local.endpoints.minio.name}-${i}.${local.endpoints.minio.name}-svc.${local.endpoints.minio.namespace}.svc"
-  ])
-  ip_addresses = [
-    "127.0.0.1",
-    local.services.minio.ip,
-    local.services.cluster_minio.ip,
-  ]
-}
-
-resource "tls_locally_signed_cert" "minio" {
-  cert_request_pem   = tls_cert_request.minio.cert_request_pem
-  ca_private_key_pem = data.terraform_remote_state.sr.outputs.trust.ca.private_key_pem
-  ca_cert_pem        = data.terraform_remote_state.sr.outputs.trust.ca.cert_pem
-
-  validity_period_hours = 8760
-  early_renewal_hours   = 2160
-
-  allowed_uses = [
-    "key_encipherment",
-    "digital_signature",
-    "server_auth",
-    "client_auth",
-  ]
-}
-
-module "minio-client-secret" {
-  source  = "../modules/secret"
-  name    = "${local.endpoints.minio.name}-client"
-  app     = local.endpoints.minio.name
-  release = "0.1.0"
-  data = {
-    "public.crt"  = tls_locally_signed_cert.minio.cert_pem
-    "private.key" = tls_private_key.minio.private_key_pem
-  }
-}
-
-module "minio-ca-secret" {
-  source  = "../modules/secret"
-  name    = "${local.endpoints.minio.name}-ca"
-  app     = local.endpoints.minio.name
-  release = "0.1.0"
-  data = {
-    "ca.crt" = data.terraform_remote_state.sr.outputs.trust.ca.cert_pem
-  }
-}
-
 module "minio-metrics-proxy" {
   source  = "../modules/configmap"
   name    = "${local.endpoints.minio.name}-proxy"
   app     = local.endpoints.minio.name
   release = "0.1.0"
   data = {
-    nginx-config = <<-EOF
+    "default.conf" = <<-EOF
     proxy_request_buffering off;
     proxy_buffering off;
     proxy_cache off;
@@ -98,8 +30,45 @@ resource "helm_release" "minio-resources" {
   values = [
     yamlencode({
       manifests = [
-        module.minio-client-secret.manifest,
-        module.minio-ca-secret.manifest,
+        yamlencode({
+          apiVersion = "cert-manager.io/v1"
+          kind       = "Certificate"
+          metadata = {
+            name      = "${local.endpoints.minio.name}-tls"
+            namespace = local.endpoints.minio.namespace
+          }
+          spec = {
+            secretName = "${local.endpoints.minio.name}-tls"
+            isCA       = false
+            privateKey = {
+              algorithm = "ECDSA"
+              size      = 521
+            }
+            commonName = local.endpoints.minio.name
+            usages = [
+              "key encipherment",
+              "digital signature",
+              "server auth",
+            ]
+            ipAddresses = [
+              "127.0.0.1",
+              local.services.minio.ip,
+              local.services.cluster_minio.ip,
+            ]
+            dnsNames = concat([
+              "localhost",
+              local.endpoints.minio.name,
+              local.endpoints.minio.service,
+              ], [
+              for i, _ in range(local.minio_replicas) :
+              "${local.endpoints.minio.name}-${i}.${local.endpoints.minio.name}-svc.${local.endpoints.minio.namespace}.svc"
+            ])
+            issuerRef = {
+              name = local.kubernetes.cert_issuers.ca_internal
+              kind = "ClusterIssuer"
+            }
+          }
+        }),
         module.minio-metrics-proxy.manifest,
       ]
     }),
@@ -152,16 +121,11 @@ resource "helm_release" "minio" {
       certsPath = "/opt/minio/certs"
       tls = {
         enabled    = true
-        publicCrt  = "public.crt"
-        privateKey = "private.key"
-        certSecret = "${local.endpoints.minio.name}-client"
+        publicCrt  = "tls.crt"
+        privateKey = "tls.key"
+        certSecret = "${local.endpoints.minio.name}-tls"
       }
-      podAnnotations = {
-        "checksum/client-cert"  = sha256(module.minio-client-secret.manifest)
-        "checksum/ca-cert"      = sha256(module.minio-ca-secret.manifest)
-        "checksum/proxy-config" = sha256(module.minio-metrics-proxy.manifest)
-      }
-      trustedCertsSecret = "${local.endpoints.minio.name}-ca"
+      trustedCertsSecret = "${local.endpoints.minio.name}-tls"
       ingress = {
         enabled = false
       }
@@ -176,14 +140,6 @@ resource "helm_release" "minio" {
       policies       = []
       customCommands = []
       svcaccts       = []
-      extraVolumes = [
-        {
-          name = "proxy-config"
-          configMap = {
-            name = "${local.endpoints.minio.name}-proxy"
-          }
-        },
-      ]
       extraContainers = [
         # bypass TLS for metrics endpoints
         {
@@ -196,11 +152,18 @@ resource "helm_release" "minio" {
           ]
           volumeMounts = [
             {
-              name      = "proxy-config"
-              mountPath = "/etc/nginx/conf.d/default.conf"
-              subPath   = "nginx-config"
+              name      = "metrics-proxy-config"
+              mountPath = "/etc/nginx/conf.d"
             },
           ]
+        },
+      ]
+      extraVolumes = [
+        {
+          name = "metrics-proxy-config"
+          configMap = {
+            name = "${local.endpoints.minio.name}-proxy"
+          }
         },
       ]
       affinity = {
@@ -224,9 +187,5 @@ resource "helm_release" "minio" {
         }
       }
     }),
-  ]
-  depends_on = [
-    kubernetes_labels.labels,
-    helm_release.minio-resources,
   ]
 }

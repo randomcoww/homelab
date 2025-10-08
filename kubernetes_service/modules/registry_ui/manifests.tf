@@ -230,20 +230,8 @@ module "deployment" {
       },
       {
         name = "config"
-        projected = {
-          sources = [
-            {
-              secret = {
-                name = module.secret.name
-                items = [
-                  {
-                    key  = "config.yaml"
-                    path = "config.yaml"
-                  },
-                ]
-              }
-            },
-          ]
+        secret = {
+          secretName = module.secret.name
         }
       },
       {

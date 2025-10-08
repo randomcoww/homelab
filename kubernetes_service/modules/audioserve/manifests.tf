@@ -152,20 +152,8 @@ module "mountpoint" {
     volumes = [
       {
         name = "config"
-        projected = {
-          sources = [
-            {
-              configMap = {
-                name = module.configmap.name
-                items = [
-                  {
-                    key  = "config.yaml"
-                    path = "config.yaml"
-                  },
-                ]
-              }
-            },
-          ]
+        configMap = {
+          name = module.configmap.name
         }
       },
     ]
