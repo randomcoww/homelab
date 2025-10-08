@@ -86,6 +86,11 @@ module "statefulset" {
             name      = "litestream-data"
             mountPath = dirname(var.sqlite_path)
           },
+          {
+            name      = "ca-bundle"
+            mountPath = "/etc/ssl/certs/ca-certificates.crt"
+            readOnly  = true
+          },
         ]
       },
       {
@@ -134,6 +139,11 @@ module "statefulset" {
           {
             name      = "litestream-data"
             mountPath = dirname(var.sqlite_path)
+          },
+          {
+            name      = "ca-bundle"
+            mountPath = "/etc/ssl/certs/ca-certificates.crt"
+            readOnly  = true
           },
         ]
       },

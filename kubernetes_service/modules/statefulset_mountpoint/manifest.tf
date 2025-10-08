@@ -83,6 +83,11 @@ module "statefulset" {
             mountPath        = dirname(var.s3_mount_path)
             mountPropagation = "Bidirectional"
           },
+          {
+            name      = "ca-bundle"
+            mountPath = "/etc/ssl/certs/ca-certificates.crt"
+            readOnly  = true
+          },
         ]
         securityContext = {
           privileged = true

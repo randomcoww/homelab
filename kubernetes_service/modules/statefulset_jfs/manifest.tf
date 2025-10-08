@@ -128,6 +128,13 @@ module "litestream" {
             }
           },
         ]
+        volumeMounts = [
+          {
+            name      = "ca-bundle"
+            mountPath = "/etc/ssl/certs/ca-certificates.crt"
+            readOnly  = true
+          },
+        ]
       },
       {
         name          = "${var.name}-jfs-mount"
@@ -158,6 +165,11 @@ module "litestream" {
             name             = "jfs-mount"
             mountPath        = dirname(var.jfs_mount_path)
             mountPropagation = "Bidirectional"
+          },
+          {
+            name      = "ca-bundle"
+            mountPath = "/etc/ssl/certs/ca-certificates.crt"
+            readOnly  = true
           },
         ]
         securityContext = {

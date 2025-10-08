@@ -94,49 +94,21 @@ resource "helm_release" "prometheus" {
         }
         extraVolumeMounts = [
           {
-            name      = "config"
-            mountPath = "/etc/prometheus/certs/ca-cert.pem"
-            subPath   = "ca-cert.pem"
+            name      = "ca-bundle"
+            mountPath = "/etc/ssl/certs/ca-certificates.crt"
+            readOnly  = true
           },
         ]
         extraVolumes = [
           {
-            name = "config"
-            secret = {
-              secretName = "${local.endpoints.prometheus.name}-internal-client-tls"
+            name = "ca-bundle"
+            hostPath = {
+              path = "/etc/ssl/certs/ca-certificates.crt"
+              type = "File"
             }
           },
         ]
       }
-      extraManifests = [
-        # module.prometheus-ca-secret.manifest,
-        yamlencode({
-          apiVersion = "cert-manager.io/v1"
-          kind       = "Certificate"
-          metadata = {
-            name      = "${local.endpoints.prometheus.name}-internal-client-tls"
-            namespace = local.endpoints.prometheus.namespace
-          }
-          spec = {
-            secretName = "${local.endpoints.prometheus.name}-internal-client-tls"
-            isCA       = false
-            privateKey = {
-              algorithm = "ECDSA"
-              size      = 521
-            }
-            commonName = local.endpoints.prometheus.name
-            usages = [
-              "key encipherment",
-              "digital signature",
-              "client auth",
-            ]
-            issuerRef = {
-              name = local.kubernetes.cert_issuers.ca_internal
-              kind = "ClusterIssuer"
-            }
-          }
-        })
-      ]
       extraScrapeConfigs = yamlencode([
         {
           job_name     = "minio-cluster"
@@ -144,7 +116,6 @@ resource "helm_release" "prometheus" {
           scheme       = "https"
           tls_config = {
             insecure_skip_verify = false
-            ca_file              = "/etc/prometheus/certs/ca-cert.pem"
           }
           static_configs = [
             {

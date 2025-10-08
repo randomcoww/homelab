@@ -1,7 +1,5 @@
 locals {
-  rclone_port                  = 8080
-  minio_ca_file                = "/etc/rclone/ca-cert.pem"
-  minio_client_tls_secret_name = "${var.name}-minio-client-tls"
+  rclone_port = 8080
 }
 
 module "metadata" {
@@ -14,34 +12,6 @@ module "metadata" {
     "templates/service.yaml"    = module.service.manifest
     "templates/ingress.yaml"    = module.ingress.manifest
     "templates/deployment.yaml" = module.deployment.manifest
-
-    # TODO: investigate better option - used only to pass in ca.crt
-    "templates/minio-client-cert.yaml" = yamlencode({
-      apiVersion = "cert-manager.io/v1"
-      kind       = "Certificate"
-      metadata = {
-        name      = local.minio_client_tls_secret_name
-        namespace = var.namespace
-      }
-      spec = {
-        secretName = local.minio_client_tls_secret_name
-        isCA       = false
-        privateKey = {
-          algorithm = "ECDSA"
-          size      = 521
-        }
-        commonName = var.name
-        usages = [
-          "key encipherment",
-          "digital signature",
-          "client auth",
-        ]
-        issuerRef = {
-          name = var.minio_ca_issuer_name
-          kind = "ClusterIssuer"
-        }
-      }
-    })
   }
 }
 
@@ -112,7 +82,6 @@ module "deployment" {
           "--read-only",
           "--dir-cache-time=4s",
           "--poll-interval=2s",
-          "--ca-cert=${local.minio_ca_file}",
         ]
         env = [
           {
@@ -136,9 +105,9 @@ module "deployment" {
         ]
         volumeMounts = [
           {
-            name      = "minio-ca"
-            mountPath = local.minio_ca_file
-            subPath   = "ca.crt"
+            name      = "ca-bundle"
+            mountPath = "/etc/ssl/certs/ca-certificates.crt"
+            readOnly  = true
           },
         ]
         readinessProbe = {
@@ -154,14 +123,6 @@ module "deployment" {
             port   = local.rclone_port
             path   = "/"
           }
-        }
-      },
-    ]
-    volumes = [
-      {
-        name = "minio-ca"
-        secret = {
-          secretName = local.minio_client_tls_secret_name
         }
       },
     ]

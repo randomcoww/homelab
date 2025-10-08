@@ -1,8 +1,6 @@
 locals {
-  config_file                     = "/etc/registry-ui/config.yaml"
-  registry_ca_file                = "/usr/local/share/ca-certificates/ca-cert.pem"
-  registry_client_tls_secret_name = "${var.name}-registry-client-tls"
-  registry_ui_port                = 8080
+  config_file      = "/etc/registry-ui/config.yaml"
+  registry_ui_port = 8080
 }
 
 module "metadata" {
@@ -16,34 +14,6 @@ module "metadata" {
     "templates/secret.yaml"     = module.secret.manifest
     "templates/service.yaml"    = module.service.manifest
     "templates/ingress.yaml"    = module.ingress.manifest
-
-    # TODO: investigate better option - used only to pass in ca.crt
-    "templates/registry-client-cert.yaml" = yamlencode({
-      apiVersion = "cert-manager.io/v1"
-      kind       = "Certificate"
-      metadata = {
-        name      = local.registry_client_tls_secret_name
-        namespace = var.namespace
-      }
-      spec = {
-        secretName = local.registry_client_tls_secret_name
-        isCA       = false
-        privateKey = {
-          algorithm = "ECDSA"
-          size      = 521
-        }
-        commonName = var.name
-        usages = [
-          "key encipherment",
-          "digital signature",
-          "client auth",
-        ]
-        issuerRef = {
-          name = var.registry_ca_issuer_name
-          kind = "ClusterIssuer"
-        }
-      }
-    })
   }
 }
 
@@ -134,35 +104,6 @@ module "deployment" {
     "checksum/secret" = sha256(module.secret.manifest)
   }
   template_spec = {
-    initContainers = [
-      {
-        name  = "${var.name}-certs"
-        image = var.images.registry_ui
-        command = [
-          "sh",
-          "-c",
-          <<-EOF
-          set -e
-          update-ca-certificates
-          cp /etc/ssl/certs/ca-certificates.crt /tmp/ca-bundle/
-          EOF
-        ]
-        volumeMounts = [
-          {
-            name      = "registry-ca"
-            mountPath = local.registry_ca_file
-            subPath   = "ca.crt"
-          },
-          {
-            name      = "ca-bundle"
-            mountPath = "/tmp/ca-bundle"
-          },
-        ]
-        securityContext = {
-          runAsUser = 0
-        }
-      },
-    ]
     containers = [
       {
         name  = var.name
@@ -191,7 +132,6 @@ module "deployment" {
           {
             name      = "ca-bundle"
             mountPath = "/etc/ssl/certs/ca-certificates.crt"
-            subPath   = "ca-certificates.crt"
             readOnly  = true
           },
         ]
@@ -213,23 +153,11 @@ module "deployment" {
     ]
     volumes = [
       {
-        name = "registry-ca"
-        secret = {
-          secretName = local.registry_client_tls_secret_name
-        }
-      },
-      {
         name = "config"
         secret = {
           secretName = module.secret.name
         }
       },
-      {
-        name = "ca-bundle"
-        emptyDir = {
-          medium = "Memory"
-        }
-      }
     ]
   }
 }

@@ -34,7 +34,17 @@ output "manifest" {
               },
             ]
           }
-        }, var.template_spec)
+          }, var.template_spec, {
+          volumes = concat(lookup(var.template_spec, "volumes", []), [
+            {
+              name = "ca-bundle"
+              hostPath = {
+                path = "/etc/ssl/certs/ca-certificates.crt"
+                type = "File"
+              }
+            },
+          ])
+        })
       }
     }, var.spec)
   })

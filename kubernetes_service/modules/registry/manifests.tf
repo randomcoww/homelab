@@ -1,8 +1,7 @@
 locals {
-  config_path                  = "/etc/registry"
-  minio_ca_file                = "/usr/local/share/ca-certificates/ca-cert.pem"
-  tls_secret_name              = "${var.name}-tls"
-  minio_client_tls_secret_name = "${var.name}-minio-client-tls"
+  config_path     = "/etc/registry"
+  minio_ca_file   = "/usr/local/share/ca-certificates/ca-cert.pem"
+  tls_secret_name = "${var.name}-tls"
 }
 
 module "metadata" {
@@ -45,34 +44,6 @@ module "metadata" {
         ]
         issuerRef = {
           name = var.ca_issuer_name
-          kind = "ClusterIssuer"
-        }
-      }
-    })
-
-    # TODO: investigate better option - used only to pass in ca.crt
-    "templates/minio-client-cert.yaml" = yamlencode({
-      apiVersion = "cert-manager.io/v1"
-      kind       = "Certificate"
-      metadata = {
-        name      = local.minio_client_tls_secret_name
-        namespace = var.namespace
-      }
-      spec = {
-        secretName = local.minio_client_tls_secret_name
-        isCA       = false
-        privateKey = {
-          algorithm = "ECDSA"
-          size      = 521
-        }
-        commonName = var.name
-        usages = [
-          "key encipherment",
-          "digital signature",
-          "client auth",
-        ]
-        issuerRef = {
-          name = var.minio_ca_issuer_name
           kind = "ClusterIssuer"
         }
       }
@@ -145,9 +116,9 @@ module "metadata" {
                         mountPath = local.config_path
                       },
                       {
-                        name      = "minio-ca"
-                        mountPath = local.minio_ca_file
-                        subPath   = "ca.crt"
+                        name      = "ca-bundle"
+                        mountPath = "/etc/ssl/certs/ca-certificates.crt"
+                        readOnly  = true
                       },
                     ]
                   },
@@ -172,9 +143,10 @@ module "metadata" {
                     }
                   },
                   {
-                    name = "minio-ca"
-                    secret = {
-                      secretName = local.minio_client_tls_secret_name
+                    name = "ca-bundle"
+                    hostPath = {
+                      path = "/etc/ssl/certs/ca-certificates.crt"
+                      type = "File"
                     }
                   },
                 ]
@@ -347,9 +319,9 @@ module "deployment" {
             mountPath = local.config_path
           },
           {
-            name      = "minio-ca"
-            mountPath = local.minio_ca_file
-            subPath   = "ca.crt"
+            name      = "ca-bundle"
+            mountPath = "/etc/ssl/certs/ca-certificates.crt"
+            readOnly  = true
           },
         ]
         readinessProbe = {
@@ -404,12 +376,6 @@ module "deployment" {
               }
             },
           ]
-        }
-      },
-      {
-        name = "minio-ca"
-        secret = {
-          secretName = local.minio_client_tls_secret_name
         }
       },
     ]
