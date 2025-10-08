@@ -121,7 +121,7 @@ locals {
     kea         = "ghcr.io/randomcoww/kea:v3.1.2.20251006.1629@sha256:93aa2ec2dbd39df2f24c5ea9fe8f7b80b1259d87002f62a2aeaaea6b36dff737"
     stork_agent = "ghcr.io/randomcoww/stork-agent:v2.3.0.20251006.1620@sha256:c07d1326f80aa229775c739902e0c74deb59ec45f1c9cba52039cb71de5b406f"
     ipxe        = "ghcr.io/randomcoww/ipxe:v1.20251006.1631@sha256:d1815931b10f711029e8a12749913a3b1273081837455b5106c4c753c4f28dde"
-    mountpoint  = "ghcr.io/randomcoww/mountpoint-s3:v1.20.0.20251006.1611@sha256:8f503165a704c82e9a51e117e9a4297295f47fbf25d63a899a3f19e77d2595bf"
+    mountpoint  = "ghcr.io/randomcoww/mountpoint-s3:v1.20.0.20251008.0917@sha256:57328baf35c5d2c9bd360ad29b04c6f12cd207d44e1f322143168ef8c02754c6"
     matchbox    = "quay.io/poseidon/matchbox:v0.11.0@sha256:06bcdae85335fd00e8277b007b55cfb49d96a0114628c0f70db2b92b079d246a"
     nginx       = "docker.io/nginxinc/nginx-unprivileged:1.29.1-alpine@sha256:3245911073f8a6f8f5257aa08339096f90ef8d5db70f502f8ffeb2b9ecd5ca18"
     # tier 3
@@ -131,11 +131,11 @@ locals {
     device_plugin         = "ghcr.io/squat/generic-device-plugin:latest@sha256:7b67623b583cd77951f5c52085e25fd988a0d2d9b29ed18dfc942be0621c41cf"
     rclone                = "ghcr.io/rclone/rclone:1.71.1@sha256:d5971950c2b370fb04dd3292541b5bda6d9103143fd7e345aeb435a399388afc"
     audioserve            = "docker.io/izderadicka/audioserve:latest@sha256:c3609321701765671cae121fc0f61db122e8c124643c04770fbc9326c74b18e3"
-    llama_cpp             = "ghcr.io/mostlygeek/llama-swap:cuda@sha256:a68a073e4c0a468c9a343d12e83e0b54729e27a3cb5e46c1dd915acd4a8daf7b"
+    llama_cpp             = "ghcr.io/mostlygeek/llama-swap:cuda@sha256:77996826b17630226e64345b63c9760e474c9bbbbcce087ddcd10228adf2264b"
     sunshine_desktop      = "registry.default/randomcoww/sunshine-desktop:v2025.930.130407.20251006.1611@sha256:1ca72dfcd5a0d78df21898a0d3999a3820dcf8ee4f6e8a9b628300ad1bee666d"
     litestream            = "docker.io/litestream/litestream:0.5.0@sha256:74ed4af3e223f6ad6a81d0c7eb31a57de3d9bdffcc4765128a89e0f069fdb839"
     vaultwarden           = "ghcr.io/dani-garcia/vaultwarden:1.34.3-alpine@sha256:d70118b9dafb8588ee2651ceb5df68db27dcbd8e18467722010644ba48d5d6d6"
-    juicefs               = "registry.default/randomcoww/juicefs:v1.3.0.20251006.1629@sha256:07c18448cb7590502cecea48df3b6e74c60fddc76fa49c7a3b745d82de0e2799"
+    juicefs               = "registry.default/randomcoww/juicefs:v1.3.0.20251008.0918@sha256:0b3dbd30a718ff1e8e24d788772fa3ae916274ef6b5428c2b2393fbefa84456f"
     code_server           = "registry.default/randomcoww/code-server:v1.103.1.20251006.1622@sha256:8630f66ff84bffa872df1f0a9a30ead41e81dcc85d293825d24ec835f7240024"
     flowise               = "docker.io/flowiseai/flowise:3.0.7@sha256:11284f6a28c32d83df10f9382e66c576d9e73715d7ab8c416554dfd9af4e7570"
     searxng               = "ghcr.io/searxng/searxng:latest@sha256:9438a9be3df82652ebc804a2ace2ab335704d92a6dc0e5b29d771acd404e9f6c"
@@ -148,7 +148,7 @@ locals {
 
   # these fields are updated by renovate - don't use var substitutions
   pxeboot_images = {
-    coreos = "fedora-coreos-42.20251003.17" # randomcoww/fedora-coreos-config
+    coreos = "fedora-coreos-42.20251007.21" # randomcoww/fedora-coreos-config
   }
 
   host_ports = {
