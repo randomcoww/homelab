@@ -54,7 +54,6 @@ module "minio-user-secret" {
   data = merge({
     AWS_ACCESS_KEY_ID     = minio_iam_user.user[each.key].id
     AWS_SECRET_ACCESS_KEY = minio_iam_user.user[each.key].secret
-    AWS_CA_BUNDLE         = data.terraform_remote_state.sr.outputs.trust.ca.cert_pem
   })
 }
 
