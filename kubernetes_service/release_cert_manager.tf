@@ -59,7 +59,10 @@ resource "helm_release" "cert-manager" {
       installCRDs               = true
       enableCertificateOwnerRef = true
       prometheus = {
-        enabled = false
+        enabled = true
+        servicemonitor = {
+          enabled = false
+        }
       }
       extraArgs = [
         "--dns01-recursive-nameservers-only",
@@ -91,6 +94,9 @@ resource "helm_release" "trust-manager" {
     yamlencode({
       replicaCount = 2
       app = {
+        trust = {
+          namespace = "cert-manager"
+        }
         metrics = {
           port = local.service_ports.metrics
         }
