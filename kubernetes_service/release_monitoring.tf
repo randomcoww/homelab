@@ -41,7 +41,7 @@ resource "helm_release" "prometheus-blackbox" {
   chart            = "prometheus-blackbox-exporter"
   wait             = false
   wait_for_jobs    = false
-  version          = "11.3.1"
+  version          = "11.4.0"
   max_history      = 2
   values = [
     yamlencode({
