@@ -101,8 +101,8 @@ module "litestream" {
       },
     ]
   }
-  sqlite_path      = local.extra_configs.DATABASE_URL
-  s3_access_secret = var.minio_access_secret
+  sqlite_path         = local.extra_configs.DATABASE_URL
+  minio_access_secret = var.minio_access_secret
   ##
   name      = var.name
   namespace = var.namespace

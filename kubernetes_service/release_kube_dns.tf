@@ -282,7 +282,4 @@ resource "helm_release" "kube-dns" {
       ]
     })
   ]
-  depends_on = [
-    helm_release.kube-dns-rbac,
-  ]
 }

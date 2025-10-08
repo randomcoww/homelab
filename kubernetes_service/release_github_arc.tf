@@ -222,9 +222,4 @@ resource "helm_release" "arc-runner-set" {
       }
     }),
   ]
-  depends_on = [
-    kubernetes_labels.labels,
-    helm_release.arc,
-    helm_release.arc-runner-hook-template,
-  ]
 }

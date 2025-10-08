@@ -39,8 +39,8 @@ module "litestream" {
       },
     ]
   }
-  sqlite_path      = "${local.jfs_cache_path}/jfs.db"
-  s3_access_secret = var.minio_access_secret
+  sqlite_path         = "${local.jfs_cache_path}/jfs.db"
+  minio_access_secret = var.minio_access_secret
   ##
   name        = var.name
   app         = var.app

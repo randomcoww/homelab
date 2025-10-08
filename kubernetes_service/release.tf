@@ -133,9 +133,6 @@ resource "helm_release" "local-path-provisioner" {
       ]
     }),
   ]
-  depends_on = [
-    kubernetes_labels.labels,
-  ]
 }
 
 # nginx ingress #
@@ -203,9 +200,6 @@ resource "helm_release" "ingress-nginx" {
         }
       }
     }),
-  ]
-  depends_on = [
-    kubernetes_labels.labels,
   ]
 }
 
@@ -323,9 +317,6 @@ resource "helm_release" "nvidia-gpu-oprerator" {
       }
     })
   ]
-  depends_on = [
-    kubernetes_labels.labels,
-  ]
 }
 
 resource "helm_release" "amd-gpu" {
@@ -347,9 +338,6 @@ resource "helm_release" "amd-gpu" {
       }
     })
   ]
-  depends_on = [
-    kubernetes_labels.labels,
-  ]
 }
 
 # all modules
@@ -370,9 +358,6 @@ resource "helm_release" "wrapper" {
     yamlencode({
       manifests = values(each.value.manifests)
     }),
-  ]
-  depends_on = [
-    kubernetes_labels.labels,
   ]
 }
 
@@ -402,9 +387,6 @@ resource "helm_release" "cloudflare-tunnel" {
         ]
       }
     }),
-  ]
-  depends_on = [
-    kubernetes_labels.labels,
   ]
 }
 */
