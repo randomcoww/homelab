@@ -77,6 +77,32 @@ resource "helm_release" "cert-manager" {
   ]
 }
 
+resource "helm_release" "trust-manager" {
+  name             = "trust-manager"
+  repository       = "https://charts.jetstack.io"
+  chart            = "trust-manager"
+  namespace        = "cert-manager"
+  create_namespace = true
+  wait             = false
+  wait_for_jobs    = false
+  version          = "v0.19.0"
+  max_history      = 2
+  values = [
+    yamlencode({
+      replicaCount = 2
+      app = {
+        metrics = {
+          port = local.service_ports.metrics
+        }
+      }
+      commonAnnotations = {
+        "prometheus.io/scrape" = "true"
+        "prometheus.io/port"   = tostring(local.service_ports.metrics)
+      }
+    }),
+  ]
+}
+
 resource "helm_release" "cert-issuer" {
   name          = "cert-issuer"
   chart         = "../helm-wrapper"
