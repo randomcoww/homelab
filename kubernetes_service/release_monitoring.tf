@@ -63,7 +63,7 @@ resource "helm_release" "prometheus" {
   chart            = "prometheus"
   wait             = false
   wait_for_jobs    = false
-  version          = "27.39.0"
+  version          = "27.40.0"
   max_history      = 2
   values = [
     yamlencode({
