@@ -1,8 +1,7 @@
 locals {
-  timezone              = "America/Los_Angeles"
-  butane_version        = "1.5.0"
-  default_mtu           = 9000
-  container_image_regex = "(?<depName>(?<repository>[a-z0-9.-]+(?::\\d+|)(?:/[a-z0-9-]+|))/(?<image>[a-z0-9-]+)):(?<tag>(?<currentValue>(?<version>[\\w.]+)(?:-(?<compat>[\\w.-]+))?)(?:@(?<currentDigest>sha256:[a-f0-9]+))?)" # compatible with renovate
+  timezone       = "America/Los_Angeles"
+  butane_version = "1.5.0"
+  default_mtu    = 9000
 
   users = {
     ssh = {
@@ -101,6 +100,8 @@ locals {
   fw_marks = {
     accept = "0x00002000"
   }
+
+  container_image_regex = "(?<depName>(?<repository>[a-z0-9.-]+(?::\\d+|)(?:/[a-z0-9-]+|))/(?<image>[a-z0-9-]+)):(?<tag>(?<currentValue>(?<version>[\\w.]+)(?:-(?<compat>[\\w.-]+))?)(?:@(?<currentDigest>sha256:[a-f0-9]+))?)" # compatible with renovate
 
   # these fields are updated by renovate - don't use var substitutions
   container_images = {
