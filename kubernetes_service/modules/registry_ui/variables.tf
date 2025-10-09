@@ -49,3 +49,7 @@ variable "resources" {
   type    = any
   default = {}
 }
+
+variable "ca_bundle_configmap" {
+  type = string
+}

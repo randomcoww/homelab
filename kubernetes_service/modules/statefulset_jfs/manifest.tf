@@ -41,6 +41,7 @@ module "litestream" {
   }
   sqlite_path         = "${local.jfs_cache_path}/jfs.db"
   minio_access_secret = var.minio_access_secret
+  ca_bundle_configmap = var.ca_bundle_configmap
   ##
   name        = var.name
   app         = var.app
@@ -203,6 +204,12 @@ module "litestream" {
       })
     ]
     volumes = concat(lookup(var.template_spec, "volumes", []), [
+      {
+        name = "ca-trust-bundle"
+        configMap = {
+          name = var.ca_bundle_configmap
+        }
+      },
       {
         name = "jfs-mount"
         emptyDir = {

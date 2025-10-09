@@ -103,6 +103,7 @@ module "mountpoint" {
   images = {
     mountpoint = var.images.mountpoint
   }
+  ca_bundle_configmap = var.ca_bundle_configmap
   ##
   name      = var.name
   namespace = var.namespace

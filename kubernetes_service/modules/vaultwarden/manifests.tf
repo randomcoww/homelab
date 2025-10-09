@@ -103,6 +103,7 @@ module "litestream" {
   }
   sqlite_path         = local.extra_configs.DATABASE_URL
   minio_access_secret = var.minio_access_secret
+  ca_bundle_configmap = var.ca_bundle_configmap
   ##
   name      = var.name
   namespace = var.namespace

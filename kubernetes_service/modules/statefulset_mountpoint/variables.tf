@@ -75,3 +75,7 @@ variable "s3_mount_extra_args" {
 variable "s3_access_secret" {
   type = string
 }
+
+variable "ca_bundle_configmap" {
+  type = string
+}

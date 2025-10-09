@@ -124,6 +124,7 @@ module "litestream" {
   }
   sqlite_path         = local.db_path
   minio_access_secret = var.minio_access_secret
+  ca_bundle_configmap = var.ca_bundle_configmap
   ##
   name      = var.name
   namespace = var.namespace
@@ -217,6 +218,12 @@ module "litestream" {
         name = "config"
         secret = {
           secretName = module.secret.name
+        }
+      },
+      {
+        name = "ca-trust-bundle"
+        configMap = {
+          name = var.ca_bundle_configmap
         }
       },
     ]

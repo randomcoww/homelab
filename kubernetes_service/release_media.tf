@@ -1,4 +1,4 @@
-## audioserve
+# Audioserve
 
 module "audioserve" {
   name      = local.endpoints.audioserve.name
@@ -50,9 +50,10 @@ module "audioserve" {
   minio_mount_extra_args = [
     "--read-only",
   ]
+  ca_bundle_configmap = local.kubernetes.ca_bundle_configmap
 }
 
-## webdav
+# Webdav
 
 module "webdav-pictures" {
   source    = "./modules/webdav"
@@ -70,9 +71,10 @@ module "webdav-pictures" {
   minio_endpoint      = "https://${local.services.cluster_minio.ip}:${local.service_ports.minio}"
   minio_bucket        = "pictures"
   minio_access_secret = local.minio_users.webdav_pictures.secret
+  ca_bundle_configmap = local.kubernetes.ca_bundle_configmap
 }
 
-## Sunshine desktop
+# Sunshine desktop
 
 module "sunshine-desktop" {
   source    = "./modules/sunshine_desktop"

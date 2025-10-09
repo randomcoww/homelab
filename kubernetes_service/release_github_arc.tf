@@ -1,4 +1,4 @@
-# Github actions runner #
+# Github actions runner
 
 resource "helm_release" "arc" {
   name             = "arc"
@@ -153,7 +153,7 @@ module "arc-workflow-secret" {
           {
             name = "ca-trust-bundle"
             configMap = {
-              name = "ca-trust-bundle.crt"
+              name = local.kubernetes.ca_bundle_configmap
             }
           },
         ]

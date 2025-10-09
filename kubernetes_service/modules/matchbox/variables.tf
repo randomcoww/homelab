@@ -66,3 +66,7 @@ variable "minio_mount_extra_args" {
   type    = list(string)
   default = []
 }
+
+variable "ca_bundle_configmap" {
+  type = string
+}

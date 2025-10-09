@@ -146,7 +146,7 @@ module "metadata" {
                   {
                     name = "ca-trust-bundle"
                     configMap = {
-                      name = "ca-trust-bundle.crt"
+                      name = var.ca_bundle_configmap
                     }
                   },
                 ]
@@ -377,6 +377,12 @@ module "deployment" {
               }
             },
           ]
+        }
+      },
+      {
+        name = "ca-trust-bundle"
+        configMap = {
+          name = var.ca_bundle_configmap
         }
       },
     ]

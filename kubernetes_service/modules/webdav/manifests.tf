@@ -127,5 +127,13 @@ module "deployment" {
         }
       },
     ]
+    volumes = [
+      {
+        name = "ca-trust-bundle"
+        configMap = {
+          name = var.ca_bundle_configmap
+        }
+      },
+    ]
   }
 }

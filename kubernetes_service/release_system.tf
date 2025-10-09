@@ -117,7 +117,7 @@ module "kube-vip" {
   }
 }
 
-# Ingress #
+# Ingress
 
 resource "helm_release" "ingress-nginx" {
   for_each = local.kubernetes.ingress_classes
@@ -211,4 +211,53 @@ resource "helm_release" "local-path-provisioner" {
       ]
     }),
   ]
+}
+
+# Internal registry
+
+resource "random_password" "registry-event-listener-token" {
+  length  = 60
+  special = false
+}
+
+module "registry" {
+  source    = "./modules/registry"
+  name      = local.endpoints.registry.name
+  namespace = local.endpoints.registry.namespace
+  release   = "0.1.0"
+  replicas  = 2
+  images = {
+    registry = local.container_images.registry
+  }
+  ports = {
+    registry = local.service_ports.registry
+  }
+  ca_issuer_name          = local.kubernetes.cert_issuers.ca_internal
+  service_ip              = local.services.registry.ip
+  loadbalancer_class_name = "kube-vip.io/kube-vip-class"
+  event_listener_token    = random_password.registry-event-listener-token.result
+  event_listener_url      = "https://${local.endpoints.registry_ui.ingress}/event-receiver"
+
+  minio_endpoint      = "https://${local.services.cluster_minio.ip}:${local.service_ports.minio}"
+  minio_bucket        = "registry"
+  minio_bucket_prefix = "/"
+  minio_access_secret = local.minio_users.registry.secret
+  ca_bundle_configmap = local.kubernetes.ca_bundle_configmap
+}
+
+module "registry-ui" {
+  source    = "./modules/registry_ui"
+  name      = local.endpoints.registry_ui.name
+  namespace = local.endpoints.registry_ui.namespace
+  release   = "0.1.0"
+  images = {
+    registry_ui = local.container_images.registry_ui
+  }
+  registry_url              = "${local.endpoints.registry.service}:${local.service_ports.registry}"
+  service_hostname          = local.endpoints.registry_ui.ingress
+  timezone                  = local.timezone
+  event_listener_token      = random_password.registry-event-listener-token.result
+  ingress_class_name        = local.kubernetes.ingress_classes.ingress_nginx
+  nginx_ingress_annotations = local.nginx_ingress_annotations
+  ca_bundle_configmap       = local.kubernetes.ca_bundle_configmap
 }

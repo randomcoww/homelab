@@ -62,3 +62,7 @@ variable "sqlite_path" {
 variable "minio_access_secret" {
   type = string
 }
+
+variable "ca_bundle_configmap" {
+  type = string
+}

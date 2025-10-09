@@ -58,16 +58,7 @@ output "manifest" {
               },
             ]
           }
-          }, var.template_spec, {
-          volumes = concat(lookup(var.template_spec, "volumes", []), [
-            {
-              name = "ca-trust-bundle"
-              configMap = {
-                name = "ca-trust-bundle.crt"
-              }
-            },
-          ])
-        })
+        }, var.template_spec)
       }
     }, var.spec)
   })

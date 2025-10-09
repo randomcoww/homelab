@@ -212,6 +212,8 @@ locals {
       acme_staging = "letsencrypt-staging"
       ca_internal  = "internal"
     }
+    ca_bundle_configmap = "ca-trust-bundle.crt"
+
     ingress_classes = {
       ingress_nginx          = "ingress-nginx"
       ingress_nginx_external = "ingress-nginx-external"

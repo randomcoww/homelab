@@ -159,6 +159,12 @@ module "deployment" {
           secretName = module.secret.name
         }
       },
+      {
+        name = "ca-trust-bundle"
+        configMap = {
+          name = var.ca_bundle_configmap
+        }
+      },
     ]
   }
 }

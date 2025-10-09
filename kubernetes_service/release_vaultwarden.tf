@@ -31,4 +31,5 @@ module "vaultwarden" {
   minio_bucket            = "vaultwarden"
   minio_litestream_prefix = "$POD_NAME/litestream"
   minio_access_secret     = local.minio_users.vaultwarden.secret
+  ca_bundle_configmap     = local.kubernetes.ca_bundle_configmap
 }

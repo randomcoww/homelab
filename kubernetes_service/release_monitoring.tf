@@ -1,4 +1,4 @@
-# metrics server #
+# Metrics server
 
 resource "helm_release" "metrics-server" {
   name          = "metrics-server"
@@ -53,7 +53,7 @@ resource "helm_release" "prometheus-blackbox" {
   ]
 }
 
-# prometheus #
+# Prometheus
 
 resource "helm_release" "prometheus" {
   name             = local.endpoints.prometheus.name
@@ -104,7 +104,7 @@ resource "helm_release" "prometheus" {
           {
             name = "ca-trust-bundle"
             configMap = {
-              name = "ca-trust-bundle.crt"
+              name = local.kubernetes.ca_bundle_configmap
             }
           },
         ]
@@ -351,7 +351,7 @@ resource "helm_release" "prometheus" {
   ]
 }
 
-# kured #
+# Kured
 
 resource "helm_release" "kured" {
   name             = "kured"

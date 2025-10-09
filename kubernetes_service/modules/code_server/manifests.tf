@@ -80,6 +80,7 @@ module "jfs" {
     jfs        = var.images.jfs
     litestream = var.images.litestream
   }
+  ca_bundle_configmap = var.ca_bundle_configmap
   ##
   name     = var.name
   app      = var.name

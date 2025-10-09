@@ -65,3 +65,7 @@ variable "minio_mount_extra_args" {
 variable "minio_access_secret" {
   type = string
 }
+
+variable "ca_bundle_configmap" {
+  type = string
+}

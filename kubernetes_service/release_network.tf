@@ -83,6 +83,7 @@ module "matchbox" {
   minio_bucket           = "matchbox"
   minio_access_secret    = local.minio_users.matchbox.secret
   minio_mount_extra_args = []
+  ca_bundle_configmap    = local.kubernetes.ca_bundle_configmap
 }
 
 # Wifi AP
@@ -222,7 +223,7 @@ module "tailscale" {
   ]
 }
 
-# cloudflare tunnel #
+# Cloudflare tunnel
 /*
 resource "helm_release" "cloudflare-tunnel" {
   name          = "cloudflare-tunnel"

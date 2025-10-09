@@ -1,3 +1,5 @@
+# Generic device plugin
+
 module "device-plugin" {
   source    = "./modules/device_plugin"
   name      = "device-plugin"
@@ -136,6 +138,8 @@ resource "helm_release" "nvidia-gpu-oprerator" {
     })
   ]
 }
+
+# AMD GPU
 
 resource "helm_release" "amd-gpu" {
   name             = "amd-gpu"

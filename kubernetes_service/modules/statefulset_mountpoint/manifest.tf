@@ -125,6 +125,12 @@ module "statefulset" {
           medium = "Memory"
         }
       },
+      {
+        name = "ca-trust-bundle"
+        configMap = {
+          name = var.ca_bundle_configmap
+        }
+      },
     ])
   })
 }
