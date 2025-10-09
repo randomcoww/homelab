@@ -55,6 +55,7 @@ module "kea" {
   ]
   timezone          = local.timezone
   stork_agent_token = random_password.stork-agent-token.result
+  ca_issuer_name    = local.kubernetes.cert_issuers.ca_internal
 }
 
 # PXE boot server

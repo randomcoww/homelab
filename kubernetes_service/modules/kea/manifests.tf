@@ -1,50 +1,179 @@
 locals {
-  base_path                      = "/etc/kea"
-  kea_dhcp4_config_template_path = "${local.base_path}/kea-dhcp4.tpl"
-  kea_dhcp4_config_path          = "${local.base_path}/kea-dhcp4.conf"
-  kea_ctrl_agent_config_path     = "${local.base_path}/kea-ctrl-agent.conf"
-  kea_socket_path                = "/var/run/kea/kea-dhcp4-ctrl.sock"
-  kea_hooks_libraries_path       = "/usr/lib/kea/hooks"
-  ca_cert_path                   = "${local.base_path}/ca-cert.pem"
-  ha_cert_path                   = "${local.base_path}/ha-cert.pem"
-  ha_key_path                    = "${local.base_path}/ha-key.pem"
-  ctrl_agent_cert_path           = "${local.base_path}/agent-cert.pem"
-  ctrl_agent_key_path            = "${local.base_path}/agent-key.pem"
-  # These paths are hard coded in stork
-  stork_agent_cert_path     = "/var/lib/stork-agent/certs/cert.pem"
-  stork_agent_key_path      = "/var/lib/stork-agent/certs/key.pem"
-  stork_agent_ca_cert_path  = "/var/lib/stork-agent/certs/ca.pem"
-  stork_agent_cert_sha_path = "/var/lib/stork-agent/tokens/server-cert.sha256"
-  stork_agent_token_path    = "/var/lib/stork-agent/tokens/agent-token.txt"
+  kea_base_path            = "/etc/kea"
+  kea_socket_path          = "/var/run/kea/kea-dhcp4-ctrl.sock"
+  kea_hooks_libraries_path = "/usr/lib/kea/hooks" # path in image
+  subnet_id_base           = 1
 
+  # These paths are not configurable
+  # /var/lib/stork-agent/certs/cert.pem
+  # /var/lib/stork-agent/certs/key.pem
+  # /var/lib/stork-agent/certs/ca.pem
+  # /var/lib/stork-agent/tokens/server-cert.sha256
+  # /var/lib/stork-agent/tokens/agent-token.txt
+  stork_agent_base_path = "/var/lib/stork-agent"
+
+  kea_ctrl_agent_tls_secret_name = "${var.name}-kea-ctrl-agent-tls"
+  stork_agent_tls_secret_name    = "${var.name}-stork-agent-tls"
   members = [
     for i, ip in var.service_ips :
     {
-      name = "${var.name}-${i}"
-      ip   = ip
-      role = try(element(["primary", "secondary"], i), "backup")
+      name                = "${var.name}-${i}"
+      ip                  = ip
+      role                = try(element(["primary", "secondary"], i), "backup")
+      kea_tls_secret_name = "${var.name}-${i}-kea-tls"
     }
   ]
-  subnet_id_base = 1
-  ctrl_agent_config = {
-    Control-agent = {
-      http-host     = "127.0.0.1"
-      http-port     = var.ports.kea_ctrl_agent
-      trust-anchor  = local.ca_cert_path
-      cert-file     = local.ctrl_agent_cert_path
-      key-file      = local.ctrl_agent_key_path
-      cert-required = true
-      control-sockets = {
-        dhcp4 = {
-          socket-type = "unix"
-          socket-name = local.kea_socket_path
-        }
-      }
+}
+
+# Kea peers must know the IP (not DNS name) of all peers
+# Create a service for each pod with a known IP
+module "service-peer" {
+  for_each = {
+    for _, member in local.members :
+    member.name => member.ip
+  }
+
+  source  = "../../../modules/service"
+  name    = each.key
+  app     = var.name
+  release = var.release
+  spec = {
+    type      = "ClusterIP"
+    clusterIP = each.value
+    ports = [
+      {
+        name       = "kea-peer"
+        port       = var.ports.kea_peer
+        protocol   = "TCP"
+        targetPort = var.ports.kea_peer
+      },
+    ]
+    selector = {
+      app                                  = var.name
+      "statefulset.kubernetes.io/pod-name" = each.key
     }
   }
-  dhcp4_config = {
+}
+
+module "metadata" {
+  source      = "../../../modules/metadata"
+  name        = var.name
+  namespace   = var.namespace
+  release     = var.release
+  app_version = var.release
+  manifests = merge({
+    "templates/secret.yaml"      = module.secret.manifest
+    "templates/statefulset.yaml" = module.statefulset.manifest
+
+    # shared cert for ctrl-agent
+    "templates/kea-ctrl-agent-cert.yaml" = yamlencode({
+      apiVersion = "cert-manager.io/v1"
+      kind       = "Certificate"
+      metadata = {
+        name      = local.kea_ctrl_agent_tls_secret_name
+        namespace = var.namespace
+      }
+      spec = {
+        secretName = local.kea_ctrl_agent_tls_secret_name
+        isCA       = false
+        privateKey = {
+          algorithm = "ECDSA"
+          size      = 521
+        }
+        commonName = var.name
+        usages = [
+          "key encipherment",
+          "digital signature",
+          "server auth",
+        ]
+        ipAddresses = [
+          "127.0.0.1",
+        ]
+        issuerRef = {
+          name = var.ca_issuer_name
+          kind = "ClusterIssuer"
+        }
+      }
+    })
+
+    # shared cert for stork agent client
+    "templates/stork-agent-cert.yaml" = yamlencode({
+      apiVersion = "cert-manager.io/v1"
+      kind       = "Certificate"
+      metadata = {
+        name      = local.stork_agent_tls_secret_name
+        namespace = var.namespace
+      }
+      spec = {
+        secretName = local.stork_agent_tls_secret_name
+        isCA       = false
+        privateKey = {
+          algorithm = "ECDSA"
+          encoding  = "PKCS8"
+          size      = 521
+        }
+        commonName = var.name
+        usages = [
+          "key encipherment",
+          "digital signature",
+          "client auth",
+        ]
+        issuerRef = {
+          name = var.ca_issuer_name
+          kind = "ClusterIssuer"
+        }
+      }
+    })
+    }, {
+
+    # cert for each kea member
+    for _, member in local.members :
+    "templates/cert-${member.name}.yaml" => yamlencode({
+      apiVersion = "cert-manager.io/v1"
+      kind       = "Certificate"
+      metadata = {
+        name      = member.kea_tls_secret_name
+        namespace = var.namespace
+      }
+      spec = {
+        secretName = member.kea_tls_secret_name
+        isCA       = false
+        privateKey = {
+          algorithm = "ECDSA"
+          size      = 521
+        }
+        commonName = member.name
+        usages = [
+          "key encipherment",
+          "digital signature",
+          "client auth",
+          "server auth",
+        ]
+        issuerRef = {
+          name = var.ca_issuer_name
+          kind = "ClusterIssuer"
+        }
+      }
+    })
+    }, {
+
+    # service with known IP for each member
+    for _, service in module.service-peer :
+    "templates/service-${service.name}.yaml" => service.manifest
+    }
+  )
+}
+
+module "secret" {
+  source  = "../../../modules/secret"
+  name    = var.name
+  app     = var.name
+  release = var.release
+  data = merge({
+
+    # config for each kea kea-dhcp4-${POD_NAME}.tpl
     for i, member in local.members :
-    member.name => {
+    "kea-dhcp4-${member.name}.tpl" => jsonencode({
       Dhcp4 = {
         valid-lifetime = 7200
         renew-timer    = 1800
@@ -91,9 +220,9 @@ locals {
               high-availability = [
                 {
                   this-server-name    = member.name
-                  trust-anchor        = local.ca_cert_path,
-                  cert-file           = local.ha_cert_path,
-                  key-file            = local.ha_key_path,
+                  trust-anchor        = "${local.kea_base_path}/ca-cert.pem",
+                  cert-file           = "${local.kea_base_path}/kea-cert-${member.name}.pem",
+                  key-file            = "${local.kea_base_path}/kea-key-${member.name}.pem",
                   mode                = "load-balancing"
                   max-unacked-clients = 0
                   peers = [
@@ -187,79 +316,30 @@ locals {
           }
         ]
       }
-    }
-  }
-}
-
-module "metadata" {
-  source      = "../../../modules/metadata"
-  name        = var.name
-  namespace   = var.namespace
-  release     = var.release
-  app_version = var.release
-  manifests = merge({
-    "templates/secret.yaml"      = module.secret.manifest
-    "templates/statefulset.yaml" = module.statefulset.manifest
+    })
     }, {
-    for k, service in module.service-peer :
-    "templates/service-${k}.yaml" => service.manifest
+
+    # shared config for ctrl-agent
+    "kea-ctrl-agent.conf" = jsonencode({
+      Control-agent = {
+        http-host     = "127.0.0.1"
+        http-port     = var.ports.kea_ctrl_agent
+        trust-anchor  = "${local.kea_base_path}/ca-cert.pem",
+        cert-file     = "${local.kea_base_path}/kea-ctrl-agent-cert.pem",
+        key-file      = "${local.kea_base_path}/kea-ctrl-agent-key.pem",
+        cert-required = true
+        control-sockets = {
+          dhcp4 = {
+            socket-type = "unix"
+            socket-name = local.kea_socket_path
+          }
+        }
+      }
+    })
+
+    # shared stork secret
+    "agent-token.txt" = var.stork_agent_token
   })
-}
-
-module "secret" {
-  source  = "../../../modules/secret"
-  name    = var.name
-  app     = var.name
-  release = var.release
-  data = merge({
-    for host, config in local.dhcp4_config :
-    "kea-dhcp4-${host}" => jsonencode(config)
-    }, {
-    for host, _ in local.dhcp4_config :
-    "ha-cert-${host}" => tls_locally_signed_cert.kea[host].cert_pem
-    }, {
-    for host, _ in local.dhcp4_config :
-    "ha-key-${host}" => tls_private_key.kea[host].private_key_pem
-    }, {
-    "kea-ctrl-agent"       = jsonencode(local.ctrl_agent_config)
-    "ca-cert"              = tls_self_signed_cert.kea-ca.cert_pem
-    "ctrl-agent-cert"      = tls_locally_signed_cert.kea-ctrl-agent.cert_pem
-    "ctrl-agent-key"       = tls_private_key.kea-ctrl-agent.private_key_pem
-    "stork-agent-cert"     = tls_locally_signed_cert.kea-stork-agent.cert_pem
-    "stork-agent-key"      = tls_private_key.kea-stork-agent.private_key_pem_pkcs8
-    "stork-agent-cert-sha" = sha256(tls_locally_signed_cert.kea-stork-agent.cert_pem)
-    "stork-agent-token"    = var.stork_agent_token
-  })
-}
-
-# Kea peers must know the IP (not DNS name) of all peers
-# Create a service for each pod with a known IP
-module "service-peer" {
-  for_each = {
-    for _, member in local.members :
-    member.name => member.ip
-  }
-
-  source  = "../../../modules/service"
-  name    = each.key
-  app     = var.name
-  release = var.release
-  spec = {
-    type      = "ClusterIP"
-    clusterIP = each.value
-    ports = [
-      {
-        name       = "kea-peer"
-        port       = var.ports.kea_peer
-        protocol   = "TCP"
-        targetPort = var.ports.kea_peer
-      },
-    ]
-    selector = {
-      app                                  = var.name
-      "statefulset.kubernetes.io/pod-name" = each.key
-    }
-  }
 }
 
 module "statefulset" {
@@ -268,7 +348,7 @@ module "statefulset" {
   app      = var.name
   release  = var.release
   affinity = var.affinity
-  replicas = length(local.dhcp4_config)
+  replicas = length(local.members)
   annotations = {
     "checksum/secret"      = sha256(module.secret.manifest)
     "prometheus.io/scrape" = "true"
@@ -292,8 +372,8 @@ module "statefulset" {
           set -e
 
           chmod 750 ${dirname(local.kea_socket_path)}
-          cat ${local.kea_dhcp4_config_template_path} | envsubst > ${local.kea_dhcp4_config_path}
-          exec kea-dhcp4 -c ${local.kea_dhcp4_config_path}
+          cat ${local.kea_base_path}/kea-dhcp4-$(POD_NAME).tpl | envsubst > /var/run/kea-dhcp4.conf
+          exec kea-dhcp4 -c /var/run/kea-dhcp4.conf
           EOF
         ]
         env = [
@@ -323,24 +403,8 @@ module "statefulset" {
         }
         volumeMounts = [
           {
-            name        = "kea-config"
-            mountPath   = local.kea_dhcp4_config_template_path
-            subPathExpr = "kea-dhcp4-$(POD_NAME)"
-          },
-          {
-            name        = "kea-config"
-            mountPath   = local.ca_cert_path
-            subPathExpr = "ca-cert"
-          },
-          {
-            name        = "kea-config"
-            mountPath   = local.ha_cert_path
-            subPathExpr = "ha-cert-$(POD_NAME)"
-          },
-          {
-            name        = "kea-config"
-            mountPath   = local.ha_key_path
-            subPathExpr = "ha-key-$(POD_NAME)"
+            name      = "kea-config"
+            mountPath = local.kea_base_path
           },
           {
             name      = "socket-path"
@@ -349,7 +413,7 @@ module "statefulset" {
         ]
       },
       {
-        name  = "${var.name}-ctrl-agent"
+        name  = "${var.name}-kea-ctrl-agent"
         image = var.images.kea
         command = [
           "sh",
@@ -358,29 +422,13 @@ module "statefulset" {
           set -e
 
           chmod 750 ${dirname(local.kea_socket_path)}
-          exec kea-ctrl-agent -c ${local.kea_ctrl_agent_config_path}
+          exec kea-ctrl-agent -c ${local.kea_base_path}/kea-ctrl-agent.conf
           EOF
         ]
         volumeMounts = [
           {
-            name        = "kea-config"
-            mountPath   = local.kea_ctrl_agent_config_path
-            subPathExpr = "kea-ctrl-agent"
-          },
-          {
-            name        = "kea-config"
-            mountPath   = local.ca_cert_path
-            subPathExpr = "ca-cert"
-          },
-          {
-            name        = "kea-config"
-            mountPath   = local.ctrl_agent_cert_path
-            subPathExpr = "ctrl-agent-cert"
-          },
-          {
-            name        = "kea-config"
-            mountPath   = local.ctrl_agent_key_path
-            subPathExpr = "ctrl-agent-key"
+            name      = "kea-config"
+            mountPath = local.kea_base_path
           },
           {
             name      = "socket-path"
@@ -391,41 +439,36 @@ module "statefulset" {
       {
         name  = "${var.name}-stork-agent"
         image = var.images.stork_agent
-        args = [
-          "--listen-prometheus-only",
-          "--prometheus-kea-exporter-port=${var.ports.kea_metrics}",
-          "--prometheus-bind9-exporter-address=127.0.0.1", # don't want this
+        command = [
+          "sh",
+          "-c",
+          <<-EOF
+          set -e
+          sum=$(sha256sum ${local.stork_agent_base_path}/certs/cert.pem | awk '{print $1}')
+
+          mkdir -p ${local.stork_agent_base_path}/tokens
+          echo -e "$sum" > ${local.stork_agent_base_path}/tokens/server-cert.sha256
+
+          exec stork-agent \
+          --listen-prometheus-only \
+          --prometheus-kea-exporter-port=${var.ports.kea_metrics} \
+          --prometheus-bind9-exporter-address=127.0.0.1
+          EOF
         ]
         volumeMounts = [
           {
-            name        = "kea-config"
-            mountPath   = local.kea_ctrl_agent_config_path
-            subPathExpr = basename(local.kea_ctrl_agent_config_path)
+            name      = "kea-config"
+            mountPath = local.kea_base_path
           },
           {
-            name        = "kea-config"
-            mountPath   = local.stork_agent_ca_cert_path
-            subPathExpr = "ca-cert"
+            name      = "stork-agent-certs"
+            mountPath = "${local.stork_agent_base_path}/certs"
           },
+          # This keeps the token path writable to generate server-cert.sha256
           {
-            name        = "kea-config"
-            mountPath   = local.stork_agent_cert_path
-            subPathExpr = "stork-agent-cert"
-          },
-          {
-            name        = "kea-config"
-            mountPath   = local.stork_agent_key_path
-            subPathExpr = "stork-agent-key"
-          },
-          {
-            name        = "kea-config"
-            mountPath   = local.stork_agent_cert_sha_path
-            subPathExpr = "stork-agent-cert-sha"
-          },
-          {
-            name        = "kea-config"
-            mountPath   = local.stork_agent_token_path
-            subPathExpr = "stork-agent-token"
+            name      = "stork-agent-token"
+            mountPath = "${local.stork_agent_base_path}/tokens/agent-token.txt"
+            subPath   = "agent-token.txt"
           },
         ]
       },
@@ -464,15 +507,101 @@ module "statefulset" {
     ]
     volumes = [
       {
-        name = "kea-config"
-        secret = {
-          secretName = module.secret.name
-        }
-      },
-      {
         name = "socket-path"
         emptyDir = {
           medium = "Memory"
+        }
+      },
+      {
+        name = "kea-config"
+        projected = {
+          sources = concat([
+            for _, member in local.members :
+            {
+              secret = {
+                name = member.kea_tls_secret_name
+                items = [
+                  {
+                    key  = "tls.crt"
+                    path = "kea-cert-${member.name}.pem"
+                  },
+                  {
+                    key  = "tls.key"
+                    path = "kea-key-${member.name}.pem"
+                  },
+                ]
+              }
+            }
+            ], [
+            {
+              secret = {
+                name = module.secret.name
+                items = concat([
+                  for _, member in local.members :
+                  {
+                    key  = "kea-dhcp4-${member.name}.tpl"
+                    path = "kea-dhcp4-${member.name}.tpl"
+                  }
+                  ], [
+                  {
+                    key  = "kea-ctrl-agent.conf"
+                    path = "kea-ctrl-agent.conf"
+                  },
+                ])
+              }
+            },
+            {
+              secret = {
+                name = local.kea_ctrl_agent_tls_secret_name
+                items = [
+                  {
+                    key  = "ca.crt"
+                    path = "ca-cert.pem"
+                  },
+                  {
+                    key  = "tls.crt"
+                    path = "kea-ctrl-agent-cert.pem"
+                  },
+                  {
+                    key  = "tls.key"
+                    path = "kea-ctrl-agent-key.pem"
+                  },
+                ]
+              }
+            },
+          ])
+        }
+      },
+      {
+        name = "stork-agent-certs"
+        projected = {
+          sources = [
+            {
+              secret = {
+                name = local.stork_agent_tls_secret_name
+                items = [
+                  {
+                    key  = "ca.crt"
+                    path = "ca.pem"
+                  },
+                  {
+                    key  = "tls.crt"
+                    path = "cert.pem"
+                  },
+                  {
+                    key  = "tls.key"
+                    path = "key.pem"
+                  },
+                ]
+              }
+            },
+          ]
+        }
+      },
+      {
+        name = "stork-agent-token"
+        secret = {
+          secretName = module.secret.name
         }
       },
     ]

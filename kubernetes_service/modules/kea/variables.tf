@@ -64,3 +64,7 @@ variable "timezone" {
 variable "stork_agent_token" {
   type = string
 }
+
+variable "ca_issuer_name" {
+  type = string
+}
