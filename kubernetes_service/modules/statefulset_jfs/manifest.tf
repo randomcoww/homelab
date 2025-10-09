@@ -47,6 +47,7 @@ module "litestream" {
   app         = var.app
   release     = var.release
   replicas    = var.replicas
+  annotations = var.annotations
   affinity    = var.affinity
   tolerations = var.tolerations
   # use local-path to keep database 

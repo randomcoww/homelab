@@ -92,11 +92,8 @@ module "mountpoint" {
   namespace = var.namespace
   app       = var.name
   release   = var.release
-  annotations = {
-    "checksum/configmap" = sha256(module.configmap.manifest)
-  }
-  affinity = var.affinity
-  replicas = var.replicas
+  affinity  = var.affinity
+  replicas  = var.replicas
   template_spec = {
     containers = [
       {

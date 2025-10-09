@@ -350,7 +350,6 @@ module "statefulset" {
   affinity = var.affinity
   replicas = length(local.members)
   annotations = {
-    "checksum/secret"      = sha256(module.secret.manifest)
     "prometheus.io/scrape" = "true"
     "prometheus.io/port"   = tostring(var.ports.kea_metrics)
   }

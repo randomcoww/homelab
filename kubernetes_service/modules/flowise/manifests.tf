@@ -131,9 +131,6 @@ module "litestream" {
   app       = var.name
   release   = var.release
   affinity  = var.affinity
-  annotations = {
-    "checksum/secret" = sha256(module.secret.manifest)
-  }
   template_spec = {
     containers = [
       {

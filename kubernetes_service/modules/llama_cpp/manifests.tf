@@ -81,12 +81,9 @@ module "mountpoint" {
   }
   ca_bundle_configmap = var.ca_bundle_configmap
   ##
-  name    = var.name
-  app     = var.name
-  release = var.release
-  annotations = {
-    "checksum/secret" = sha256(module.secret.manifest)
-  }
+  name     = var.name
+  app      = var.name
+  release  = var.release
   affinity = var.affinity
   replicas = 1
   template_spec = {

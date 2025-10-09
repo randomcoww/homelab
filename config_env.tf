@@ -155,7 +155,7 @@ locals {
     kea_peer           = 50060
     kea_metrics        = 58087
     kea_ctrl_agent     = 58088
-    ipxe_tftp          = 69 # required
+    ipxe_tftp          = 69 # not configurable
     ipxe               = 58090
     apiserver          = 58181
     apiserver_backend  = 58081
@@ -167,7 +167,7 @@ locals {
     etcd_peer          = 58083
     etcd_metrics       = 58086
     flannel_healthz    = 58084
-    bgp                = 179 # required
+    bgp                = 179 # not configurable
     kube_vip_metrics   = 58089
   }
 
@@ -177,7 +177,8 @@ locals {
     minio               = 9000
     metrics             = 9153
     prometheus_blackbox = 9115
-    registry            = 443 # required
+    registry            = 443  # not configurable
+    reloader            = 9090 # not configurable
   }
 
   ha = {
