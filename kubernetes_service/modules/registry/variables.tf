@@ -44,10 +44,6 @@ variable "ca_issuer_name" {
   type = string
 }
 
-variable "minio_ca_issuer_name" {
-  type = string
-}
-
 variable "event_listener_token" {
   type = string
 }

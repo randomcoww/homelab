@@ -18,7 +18,6 @@ module "registry" {
     registry = local.service_ports.registry
   }
   ca_issuer_name          = local.kubernetes.cert_issuers.ca_internal
-  minio_ca_issuer_name    = local.kubernetes.cert_issuers.ca_internal
   service_ip              = local.services.registry.ip
   loadbalancer_class_name = "kube-vip.io/kube-vip-class"
   event_listener_token    = random_password.registry-event-listener-token.result
@@ -39,7 +38,6 @@ module "registry-ui" {
     registry_ui = local.container_images.registry_ui
   }
   registry_url              = "${local.endpoints.registry.service}:${local.service_ports.registry}"
-  registry_ca_issuer_name   = local.kubernetes.cert_issuers.ca_internal
   service_hostname          = local.endpoints.registry_ui.ingress
   timezone                  = local.timezone
   event_listener_token      = random_password.registry-event-listener-token.result
@@ -185,7 +183,6 @@ module "flowise" {
   minio_bucket            = "flowise"
   minio_litestream_prefix = "$POD_NAME/litestream"
   minio_access_secret     = local.minio_users.flowise.secret
-  minio_ca_issuer_name    = local.kubernetes.cert_issuers.ca_internal
 }
 
 ## code-server

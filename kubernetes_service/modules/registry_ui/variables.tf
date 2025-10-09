@@ -29,10 +29,6 @@ variable "registry_url" {
   type = string
 }
 
-variable "registry_ca_issuer_name" {
-  type = string
-}
-
 variable "timezone" {
   type = string
 }

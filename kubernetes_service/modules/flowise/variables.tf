@@ -59,7 +59,3 @@ variable "minio_litestream_prefix" {
 variable "minio_access_secret" {
   type = string
 }
-
-variable "minio_ca_issuer_name" {
-  type = string
-}

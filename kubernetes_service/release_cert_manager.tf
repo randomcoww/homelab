@@ -83,7 +83,7 @@ resource "helm_release" "cert-manager" {
     }),
   ]
 }
-
+/*
 resource "helm_release" "cert-manager-csi-driver" {
   name             = "cert-manager-csi-driver"
   repository       = "https://charts.jetstack.io"
@@ -107,7 +107,7 @@ resource "helm_release" "cert-manager-csi-driver" {
     }),
   ]
 }
-
+*/
 resource "helm_release" "trust-manager" {
   name             = "trust-manager"
   repository       = "https://charts.jetstack.io"
