@@ -1,5 +1,3 @@
-# cert-manager #
-
 module "cert-manager-cloudflare-secret" {
   source  = "../modules/secret"
   name    = "cloudflare-token"

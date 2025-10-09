@@ -221,3 +221,33 @@ module "tailscale" {
     },
   ]
 }
+
+# cloudflare tunnel #
+/*
+resource "helm_release" "cloudflare-tunnel" {
+  name          = "cloudflare-tunnel"
+  namespace     = "default"
+  repository    = "https://cloudflare.github.io/helm-charts/"
+  chart         = "cloudflare-tunnel"
+  wait          = false
+  wait_for_jobs = false
+  version       = "0.3.2"
+  max_history = 2
+  values = [
+    yamlencode({
+      cloudflare = {
+        account    = data.terraform_remote_state.sr.outputs.cloudflare_tunnels.public.account_id
+        tunnelName = data.terraform_remote_state.sr.outputs.cloudflare_tunnels.public.name
+        tunnelId   = data.terraform_remote_state.sr.outputs.cloudflare_tunnels.public.id
+        secret     = data.terraform_remote_state.sr.outputs.cloudflare_tunnels.public.tunnel_secret
+        ingress = [
+          {
+            hostname = "*.${local.domains.public}"
+            service  = "https://${local.endpoints.ingress_nginx_external.service}"
+          },
+        ]
+      }
+    }),
+  ]
+}
+*/
