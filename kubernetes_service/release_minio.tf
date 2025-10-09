@@ -41,14 +41,15 @@ resource "helm_release" "minio-resources" {
             secretName = "${local.endpoints.minio.name}-tls"
             isCA       = false
             privateKey = {
-              algorithm = "ECDSA"
-              size      = 521
+              algorithm = "RSA" # iPXE compatibility
+              size      = 4096
             }
             commonName = local.endpoints.minio.name
             usages = [
               "key encipherment",
               "digital signature",
               "server auth",
+              "client auth",
             ]
             ipAddresses = [
               "127.0.0.1",

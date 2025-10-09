@@ -1,6 +1,5 @@
 resource "tls_private_key" "trusted-ca" {
-  ## needs compatibility with iPXE
-  algorithm = "RSA"
+  algorithm = "RSA" # iPXE compatibility
   rsa_bits  = 4096
 }
 

@@ -24,8 +24,8 @@ module "metadata" {
         secretName = local.tls_secret_name
         isCA       = false
         privateKey = {
-          algorithm = "ECDSA"
-          size      = 521
+          algorithm = "RSA" # iPXE compatibility
+          size      = 4096
         }
         commonName = var.name
         usages = [
