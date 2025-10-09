@@ -27,6 +27,7 @@ resource "helm_release" "minio-resources" {
   wait             = false
   wait_for_jobs    = false
   max_history      = 2
+  timeout          = local.kubernetes.helm_release_timeout
   values = [
     yamlencode({
       manifests = [
@@ -86,6 +87,7 @@ resource "helm_release" "minio" {
   wait_for_jobs    = true
   version          = "5.4.0"
   max_history      = 2
+  timeout          = local.kubernetes.helm_release_timeout
   values = [
     yamlencode({
       image = {

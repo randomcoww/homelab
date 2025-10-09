@@ -66,6 +66,7 @@ resource "helm_release" "minio-user-secret" {
   wait          = false
   wait_for_jobs = false
   max_history   = 2
+  timeout       = local.kubernetes.helm_release_timeout
   values = [
     yamlencode({
       manifests = [

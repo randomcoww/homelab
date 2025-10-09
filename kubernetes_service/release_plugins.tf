@@ -70,6 +70,7 @@ resource "helm_release" "nvidia-gpu-oprerator" {
   wait_for_jobs    = false
   version          = "v25.3.4"
   max_history      = 2
+  timeout          = local.kubernetes.helm_release_timeout
   values = [
     yamlencode({
       cdi = {
@@ -150,6 +151,8 @@ resource "helm_release" "amd-gpu" {
   wait             = false
   wait_for_jobs    = false
   version          = "0.20.0"
+  max_history      = 2
+  timeout          = local.kubernetes.helm_release_timeout
   values = [
     yamlencode({
       nfd = {

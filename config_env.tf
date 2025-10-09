@@ -207,6 +207,7 @@ locals {
     cni_bin_path              = "/var/lib/cni/bin"
     cni_bridge_interface_name = "cni0"
     kubelet_client_user       = "kube-apiserver-kubelet-client"
+    helm_release_timeout      = 600
 
     cert_issuers = {
       acme_prod    = "letsencrypt-prod"

@@ -9,6 +9,7 @@ resource "helm_release" "metrics-server" {
   wait_for_jobs = false
   version       = "3.13.0"
   max_history   = 2
+  timeout       = local.kubernetes.helm_release_timeout
   values = [
     yamlencode({
       replicas = 2
@@ -43,6 +44,7 @@ resource "helm_release" "prometheus-blackbox" {
   wait_for_jobs    = false
   version          = "11.4.0"
   max_history      = 2
+  timeout          = local.kubernetes.helm_release_timeout
   values = [
     yamlencode({
       replicas = 2
@@ -65,6 +67,7 @@ resource "helm_release" "prometheus" {
   wait_for_jobs    = false
   version          = "27.40.0"
   max_history      = 2
+  timeout          = local.kubernetes.helm_release_timeout
   values = [
     yamlencode({
       server = {
@@ -363,6 +366,7 @@ resource "helm_release" "kured" {
   wait_for_jobs    = false
   version          = "5.10.0"
   max_history      = 2
+  timeout          = local.kubernetes.helm_release_timeout
   values = [
     yamlencode({
       configuration = {

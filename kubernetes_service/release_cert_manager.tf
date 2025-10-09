@@ -49,6 +49,7 @@ resource "helm_release" "cert-manager" {
   wait_for_jobs    = false
   version          = "v1.19.0"
   max_history      = 2
+  timeout          = local.kubernetes.helm_release_timeout
   values = [
     yamlencode({
       replicaCount = 2
@@ -92,6 +93,7 @@ resource "helm_release" "cert-manager-csi-driver" {
   wait_for_jobs    = false
   version          = "v0.11.0"
   max_history      = 2
+  timeout          = local.kubernetes.helm_release_timeout
   values = [
     yamlencode({
       metrics = {
@@ -116,6 +118,7 @@ resource "helm_release" "trust-manager" {
   wait_for_jobs    = false
   version          = "v0.19.0"
   max_history      = 2
+  timeout          = local.kubernetes.helm_release_timeout
   values = [
     yamlencode({
       replicaCount = 2
@@ -142,6 +145,7 @@ resource "helm_release" "cert-issuer" {
   wait          = false
   wait_for_jobs = false
   max_history   = 2
+  timeout       = local.kubernetes.helm_release_timeout
   values = [
     yamlencode({
       manifests = [

@@ -20,6 +20,7 @@ resource "helm_release" "kubelet-csr-approver" {
   wait_for_jobs    = false
   version          = "v1.2.11"
   max_history      = 2
+  timeout          = local.kubernetes.helm_release_timeout
   values = [
     yamlencode({
       global = {
@@ -131,6 +132,7 @@ resource "helm_release" "ingress-nginx" {
   wait_for_jobs    = false
   version          = "4.13.3"
   max_history      = 2
+  timeout          = local.kubernetes.helm_release_timeout
   values = [
     yamlencode({
       controller = {
@@ -196,6 +198,7 @@ resource "helm_release" "local-path-provisioner" {
   wait_for_jobs = false
   version       = "0.0.33"
   max_history   = 2
+  timeout       = local.kubernetes.helm_release_timeout
   values = [
     yamlencode({
       replicaCount = 2
@@ -225,6 +228,7 @@ resource "helm_release" "reloader" {
   wait_for_jobs    = false
   version          = "v2.2.3"
   max_history      = 2
+  timeout          = local.kubernetes.helm_release_timeout
   values = [
     yamlencode({
       kubernetes = {

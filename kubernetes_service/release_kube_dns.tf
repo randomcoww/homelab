@@ -5,6 +5,7 @@ resource "helm_release" "kube-dns-rbac" {
   wait          = false
   wait_for_jobs = false
   max_history   = 2
+  timeout       = local.kubernetes.helm_release_timeout
   values = [
     yamlencode({
       manifests = [
@@ -68,8 +69,9 @@ resource "helm_release" "kube-dns" {
   chart         = "coredns"
   wait          = false
   wait_for_jobs = false
-  max_history   = 2
   version       = "1.44.3"
+  max_history   = 2
+  timeout       = local.kubernetes.helm_release_timeout
   values = [
     yamlencode({
       replicaCount = 3

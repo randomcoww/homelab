@@ -10,6 +10,7 @@ resource "helm_release" "arc" {
   wait_for_jobs    = false
   version          = "0.12.1"
   max_history      = 2
+  timeout          = local.kubernetes.helm_release_timeout
   values = [
     yamlencode({
       replicaCount = 3
@@ -169,6 +170,7 @@ resource "helm_release" "arc-runner-hook-template" {
   wait          = false
   wait_for_jobs = false
   max_history   = 2
+  timeout       = local.kubernetes.helm_release_timeout
   values = [
     yamlencode({
       manifests = [
@@ -192,9 +194,9 @@ resource "helm_release" "arc-runner-set-builder" {
   create_namespace = true
   wait             = false
   wait_for_jobs    = false
-  timeout          = 600
   version          = "0.12.1"
   max_history      = 2
+  timeout          = local.kubernetes.helm_release_timeout
   values = [
     yamlencode({
       githubConfigUrl = "https://github.com/${var.github.user}/${each.key}"
@@ -271,7 +273,7 @@ resource "helm_release" "arc-runner-set-renovate" {
   create_namespace = true
   wait             = false
   wait_for_jobs    = false
-  timeout          = 600
+  timeout          = local.kubernetes.helm_release_timeout
   version          = "0.12.1"
   max_history      = 2
   values = [
