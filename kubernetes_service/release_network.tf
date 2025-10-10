@@ -6,9 +6,10 @@ resource "random_password" "stork-agent-token" {
 }
 
 module "kea" {
-  source  = "./modules/kea"
-  name    = "kea"
-  release = "0.1.20"
+  source    = "./modules/kea"
+  name      = local.endpoints.kea.name
+  namespace = local.endpoints.kea.namespace
+  release   = "0.1.20"
   images = {
     kea         = local.container_images.kea
     ipxe        = local.container_images.ipxe

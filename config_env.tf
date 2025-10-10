@@ -246,6 +246,9 @@ locals {
         name      = "kube-dns"
         namespace = "kube-system"
       }
+      kea = {
+        name = "kea"
+      }
       matchbox = {
         name      = "matchbox"
         namespace = "matchbox"
@@ -284,10 +287,6 @@ locals {
       webdav_pictures = {
         name    = "webdav-pictures"
         ingress = "pictures"
-      }
-      webdav_videos = {
-        name    = "webdav-videos"
-        ingress = "videos"
       }
       audioserve = {
         name = "audioserve"

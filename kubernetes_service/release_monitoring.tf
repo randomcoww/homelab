@@ -70,6 +70,11 @@ resource "helm_release" "prometheus" {
   timeout          = local.kubernetes.helm_release_timeout
   values = [
     yamlencode({
+      configmapReload = {
+        prometheus = {
+          enabled = false
+        }
+      }
       server = {
         podDisruptionBudget = {
           enabled        = true
@@ -203,7 +208,7 @@ resource "helm_release" "prometheus" {
               name = "minio"
               rules = [
                 {
-                  alert = "NodesOffline"
+                  alert = "NodesDown"
                   annotations = {
                     summary     = "Node down in MinIO deployment"
                     description = <<-EOF
@@ -211,7 +216,11 @@ resource "helm_release" "prometheus" {
                     EOF
                   }
                   expr = <<-EOF
-                  avg_over_time(minio_cluster_nodes_offline_total{app="${local.endpoints.minio.name}",namespace="${local.endpoints.minio.namespace}"}[1m]) > 0
+                  (
+                    absent(up{app="${local.endpoints.minio.name}",namespace="${local.endpoints.minio.namespace}"})
+                  or
+                    avg_over_time(minio_cluster_nodes_offline_total{app="${local.endpoints.minio.name}",namespace="${local.endpoints.minio.namespace}"}[1m]) > 0
+                  )
                   EOF
                   labels = {
                     severity = "critical"
@@ -247,7 +256,7 @@ resource "helm_release" "prometheus" {
                   }
                   expr = <<-EOF
                   (
-                    absent(up{job="kubernetes-apiservers"} == 1)
+                    absent(up{job="kubernetes-apiservers"})
                   or
                     changes(up{job="kubernetes-apiservers"}[1m]) > 1
                   )
@@ -264,18 +273,18 @@ resource "helm_release" "prometheus" {
               name = "kube-dns"
               rules = [
                 {
-                  alert = "CoreDNSDown"
+                  alert = "NodesDown"
                   annotations = {
-                    summary     = "CoreDNS nodes down"
+                    summary     = "Kube DNS nodes down"
                     description = <<-EOF
                     CoreDNS nodes {{ $labels.app }} down or flapping
                     EOF
                   }
                   expr = <<-EOF
                   (
-                    absent(up{k8s_app="coredns"} == 1)
+                    absent(up{app="${local.endpoints.kube_dns.name}",namespace="${local.endpoints.kube_dns.namespace}"})
                   or
-                    changes(up{app="kea"}[1m]) > 1
+                    changes(up{app="${local.endpoints.kube_dns.name}",namespace="${local.endpoints.kube_dns.namespace}"}[1m]) > 1
                   )
                   EOF
                   for  = "1m"
@@ -289,7 +298,7 @@ resource "helm_release" "prometheus" {
               name = "kea"
               rules = [
                 {
-                  alert = "KeaNodesDown"
+                  alert = "NodesDown"
                   annotations = {
                     summary     = "Kea nodes down"
                     description = <<-EOF
@@ -298,9 +307,9 @@ resource "helm_release" "prometheus" {
                   }
                   expr = <<-EOF
                   (
-                    absent(up{app="kea"} == 1)
+                    absent(up{app="${local.endpoints.kea.name}",namespace="${local.endpoints.kea.namespace}"})
                   or
-                    changes(up{app="kea"}[1m]) > 1
+                    changes(up{app="${local.endpoints.kea.name}",namespace="${local.endpoints.kea.namespace}"}[1m]) > 1
                   )
                   EOF
                   for  = "1m"
@@ -314,16 +323,16 @@ resource "helm_release" "prometheus" {
               name = "matchbox"
               rules = [
                 {
-                  alert = "ServiceDown"
+                  alert = "NodesDown"
                   annotations = {
-                    summary     = "Matchbox service down"
+                    summary     = "Matchbox nodes down"
                     description = <<-EOF
                     Matchbox service down
                     EOF
                   }
                   expr = <<-EOF
                   (
-                    absent(up{job="matchbox-blackbox"} == 1)
+                    absent(up{job="matchbox-blackbox"})
                   or
                     changes(up{job="matchbox-blackbox"}[1m]) > 1
                   )
