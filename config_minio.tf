@@ -77,10 +77,10 @@ locals {
         ]
       }
 
-      # flowise + litestream sqlite
-      flowise = {
-        name      = local.endpoints.flowise.name
-        namespace = local.endpoints.flowise.namespace
+      # open-webui + litestream sqlite
+      open_webui = {
+        name      = local.endpoints.open_webui.name
+        namespace = local.endpoints.open_webui.namespace
         policies = [
           {
             Effect = "Allow"
@@ -92,7 +92,7 @@ locals {
               "s3:AbortMultipartUpload",
             ]
             buckets = [
-              "flowise",
+              "open-webui",
             ]
           },
         ]

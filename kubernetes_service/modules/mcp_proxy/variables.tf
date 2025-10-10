@@ -10,6 +10,11 @@ variable "release" {
   type = string
 }
 
+variable "replicas" {
+  type    = number
+  default = 2
+}
+
 variable "affinity" {
   type    = any
   default = {}
@@ -21,9 +26,12 @@ variable "service_hostname" {
 
 variable "images" {
   type = object({
-    flowise    = string
-    litestream = string
+    mcp_proxy = string
   })
+}
+
+variable "config" {
+  type = any
 }
 
 variable "resources" {
@@ -37,27 +45,6 @@ variable "ingress_class_name" {
 
 variable "nginx_ingress_annotations" {
   type = map(string)
-}
-
-variable "extra_configs" {
-  type    = map(string)
-  default = {}
-}
-
-variable "minio_endpoint" {
-  type = string
-}
-
-variable "minio_bucket" {
-  type = string
-}
-
-variable "minio_litestream_prefix" {
-  type = string
-}
-
-variable "minio_access_secret" {
-  type = string
 }
 
 variable "ca_bundle_configmap" {

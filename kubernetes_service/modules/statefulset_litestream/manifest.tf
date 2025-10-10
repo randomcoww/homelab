@@ -41,7 +41,7 @@ module "statefulset" {
         args = [
           "restore",
           "-if-db-not-exists",
-          # "-if-replica-exists", # TODO: not working in 0.5.0
+          # "-if-replica-exists", # TODO: add back in - not working in 0.5.x
           "-config",
           local.config_file,
           var.sqlite_path,
@@ -85,7 +85,7 @@ module "statefulset" {
             mountPath = dirname(var.sqlite_path)
           },
           {
-            name      = "ca-trust-bundle"
+            name      = "litestream-ca-trust-bundle"
             mountPath = "/etc/ssl/certs/ca-certificates.crt"
             subPath   = "ca.crt"
             readOnly  = true
@@ -140,7 +140,7 @@ module "statefulset" {
             mountPath = dirname(var.sqlite_path)
           },
           {
-            name      = "ca-trust-bundle"
+            name      = "litestream-ca-trust-bundle"
             mountPath = "/etc/ssl/certs/ca-certificates.crt"
             subPath   = "ca.crt"
             readOnly  = true
@@ -177,7 +177,7 @@ module "statefulset" {
         }
       },
       {
-        name = "ca-trust-bundle"
+        name = "litestream-ca-trust-bundle"
         configMap = {
           name = var.ca_bundle_configmap
         }

@@ -132,7 +132,7 @@ module "litestream" {
         ]
         volumeMounts = [
           {
-            name      = "ca-trust-bundle"
+            name      = "jfs-ca-trust-bundle"
             mountPath = "/etc/ssl/certs/ca-certificates.crt"
             subPath   = "ca.crt"
             readOnly  = true
@@ -170,7 +170,7 @@ module "litestream" {
             mountPropagation = "Bidirectional"
           },
           {
-            name      = "ca-trust-bundle"
+            name      = "jfs-ca-trust-bundle"
             mountPath = "/etc/ssl/certs/ca-certificates.crt"
             subPath   = "ca.crt"
             readOnly  = true
@@ -206,7 +206,7 @@ module "litestream" {
     ]
     volumes = concat(lookup(var.template_spec, "volumes", []), [
       {
-        name = "ca-trust-bundle"
+        name = "jfs-ca-trust-bundle"
         configMap = {
           name = var.ca_bundle_configmap
         }

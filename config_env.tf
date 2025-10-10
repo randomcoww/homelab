@@ -138,13 +138,14 @@ locals {
     vaultwarden           = "ghcr.io/dani-garcia/vaultwarden:1.34.3-alpine@sha256:d70118b9dafb8588ee2651ceb5df68db27dcbd8e18467722010644ba48d5d6d6"
     juicefs               = "registry.default/randomcoww/juicefs:v1.3.0.20251008.0918@sha256:0b3dbd30a718ff1e8e24d788772fa3ae916274ef6b5428c2b2393fbefa84456f"
     code_server           = "registry.default/randomcoww/code-server:v1.103.1.20251006.1622@sha256:8630f66ff84bffa872df1f0a9a30ead41e81dcc85d293825d24ec835f7240024"
-    flowise               = "docker.io/flowiseai/flowise:3.0.8@sha256:c437a0e5967b1841069d3b78478108fc0fa8c86f3474cf31c13218a0fcb9d7d0"
-    searxng               = "ghcr.io/searxng/searxng:latest@sha256:d6e4edcd961169d3ea9ca65a6af3871c5603478d9c77bfbd4268acaa0ff7f576"
     valkey                = "ghcr.io/valkey-io/valkey:8.1.4-alpine@sha256:e706d1213aaba6896c162bb6a3a9e1894e1a435f28f8f856d14fab2e10aa098b"
     nvidia_driver         = "registry.default/randomcoww/nvidia-driver-container:v580.95.05.20251002.0720-fedora42@sha256:7cafab4ddef75b51aaa86e7209309680f0ad6bdbcd1fd943a6bb9573b2d46102"
     github_actions_runner = "ghcr.io/actions/actions-runner:2.328.0@sha256:db0dcae6d28559e54277755a33aba7d0665f255b3bd2a66cdc5e132712f155e0"
     registry              = "ghcr.io/distribution/distribution:3.0.0@sha256:4ba3adf47f5c866e9a29288c758c5328ef03396cb8f5f6454463655fa8bc83e2"
     registry_ui           = "docker.io/quiq/registry-ui:0.10.4@sha256:88e90f14a2654b48a6ca8112b3bd000d3e2472a8cbf560d73af679f5558273f2"
+    mcp_proxy             = "ghcr.io/tbxark/mcp-proxy:v0.39.1"
+    searxng               = "ghcr.io/searxng/searxng:latest@sha256:d6e4edcd961169d3ea9ca65a6af3871c5603478d9c77bfbd4268acaa0ff7f576"
+    open_webui            = "ghcr.io/open-webui/open-webui:0.6.33"
   }
 
   # these fields are updated by renovate - don't use var substitutions
@@ -267,9 +268,6 @@ locals {
         name      = "prometheus-blackbox"
         namespace = "monitoring"
       }
-      llama_cpp = {
-        name = "llama-cpp"
-      }
       searxng = {
         name    = "searxng"
         ingress = "search"
@@ -297,9 +295,6 @@ locals {
         namespace = "vaultwarden"
         ingress   = "vw"
       }
-      flowise = {
-        name = "flowise"
-      }
       llama_cpp = {
         name    = "llama-cpp"
         ingress = "llama"
@@ -311,6 +306,14 @@ locals {
       sunshine_desktop = {
         name    = "sunshine-desktop"
         ingress = "sunadmin"
+      }
+      mcp_proxy = {
+        name    = "mcp-proxy"
+        ingress = "mcp"
+      }
+      open_webui = {
+        name    = "open-webui"
+        ingress = "chat"
       }
     }) :
     name => merge(e, {

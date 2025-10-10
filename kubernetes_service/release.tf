@@ -2,12 +2,10 @@
 
 locals {
   modules_enabled = [
-    # bootstrap
     module.bootstrap,
     module.kube-proxy,
     module.flannel,
     module.kube-vip,
-    # services
     module.device-plugin,
     module.kea,
     module.matchbox,
@@ -17,12 +15,13 @@ locals {
     module.webdav-pictures,
     module.audioserve,
     # module.vaultwarden,
-    module.flowise,
-    module.searxng,
     module.registry,
     module.registry-ui,
-    # module.code-server,
+    module.searxng,
+    module.mcp-proxy,
+    module.open-webui,
     module.llama-cpp,
+    # module.code-server,
     # module.sunshine-desktop,
   ]
 }

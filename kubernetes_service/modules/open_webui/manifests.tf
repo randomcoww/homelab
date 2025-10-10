@@ -1,37 +1,16 @@
-
 locals {
+  db_path = "/data/db.sqlite3"
   extra_configs = merge(var.extra_configs, {
-    DATABASE_TYPE               = "sqlite"
-    DATABASE_PATH               = "/var/lib/flowise"
-    PORT                        = 3000
-    SECRETKEY_STORAGE_TYPE      = "local"
-    FLOWISE_SECRETKEY_OVERWRITE = random_password.flowise-secretkey-overwrite.result
-    JWT_AUTH_TOKEN_SECRET       = random_password.jwt-auth-token-secret.result
-    JWT_REFRESH_TOKEN_SECRET    = random_password.jwt-refresh-token-secret.result
-    TOKEN_HASH_SECRET           = random_password.token-hash-secret.result
-    NODE_EXTRA_CA_CERTS         = "/usr/local/share/ca-certificates/ca-cert.pem"
+    PORT                       = 8080
+    REQUESTS_CA_BUNDLE         = "/etc/ssl/certs/ca-certificates.crt"
+    DATABASE_URL               = "sqlite:///${local.db_path}"
+    DATABASE_ENABLE_SQLITE_WAL = true
+    STORAGE_PROVIDER           = "s3"
+    S3_ADDRESSING_STYLE        = "path"
+    S3_KEY_PREFIX              = "data"
+    S3_BUCKET_NAME             = var.minio_bucket
+    S3_ENDPOINT_URL            = var.minio_endpoint
   })
-  db_path = "${local.extra_configs.DATABASE_PATH}/database.sqlite"
-}
-
-resource "random_password" "flowise-secretkey-overwrite" {
-  length  = 30
-  special = false
-}
-
-resource "random_password" "jwt-auth-token-secret" {
-  length  = 30
-  special = false
-}
-
-resource "random_password" "jwt-refresh-token-secret" {
-  length  = 30
-  special = false
-}
-
-resource "random_password" "token-hash-secret" {
-  length  = 30
-  special = false
 }
 
 module "metadata" {
@@ -39,7 +18,7 @@ module "metadata" {
   name        = var.name
   namespace   = var.namespace
   release     = var.release
-  app_version = var.release
+  app_version = split(":", var.images.open_webui)[1]
   manifests = merge(module.litestream.chart.manifests, {
     "templates/secret.yaml"  = module.secret.manifest
     "templates/service.yaml" = module.service.manifest
@@ -67,12 +46,18 @@ module "service" {
     type = "ClusterIP"
     ports = [
       {
-        name       = "flowise"
+        name       = "open-webui"
         port       = local.extra_configs.PORT
         protocol   = "TCP"
         targetPort = local.extra_configs.PORT
       },
     ]
+    sessionAffinity = "ClientIP"
+    sessionAffinityConfig = {
+      clientIP = {
+        timeoutSeconds = 10800
+      }
+    }
   }
 }
 
@@ -131,11 +116,31 @@ module "litestream" {
   app       = var.name
   release   = var.release
   affinity  = var.affinity
+  spec = {
+    volumeClaimTemplates = [
+      {
+        metadata = {
+          name = "litestream-data"
+        }
+        spec = {
+          accessModes = [
+            "ReadWriteOnce",
+          ]
+          resources = {
+            requests = {
+              storage = "16Gi"
+            }
+          }
+          storageClassName = "local-path"
+        }
+      },
+    ]
+  }
   template_spec = {
     containers = [
       {
         name  = var.name
-        image = var.images.flowise
+        image = var.images.open_webui
         env = concat([
           for k, v in local.extra_configs :
           {
@@ -149,7 +154,7 @@ module "litestream" {
           }
           ], [
           {
-            name = "S3_STORAGE_ACCESS_KEY_ID"
+            name = "S3_ACCESS_KEY_ID"
             valueFrom = {
               secretKeyRef = {
                 name = var.minio_access_secret
@@ -158,7 +163,7 @@ module "litestream" {
             }
           },
           {
-            name = "S3_STORAGE_SECRET_ACCESS_KEY"
+            name = "S3_SECRET_ACCESS_KEY"
             valueFrom = {
               secretKeyRef = {
                 name = var.minio_access_secret
@@ -175,42 +180,46 @@ module "litestream" {
         volumeMounts = [
           {
             name      = "ca-trust-bundle"
-            mountPath = "/etc/ssl/certs/ca-certificates.crt"
+            mountPath = local.extra_configs.REQUESTS_CA_BUNDLE
             subPath   = "ca.crt"
             readOnly  = true
           },
         ]
+        startupProbe = {
+          httpGet = {
+            port = local.extra_configs.PORT
+            path = "/health"
+          }
+          initialDelaySeconds = 30
+          periodSeconds       = 5
+          failureThreshold    = 20
+        }
         readinessProbe = {
           httpGet = {
             port = local.extra_configs.PORT
-            path = "/api/v1/ping"
+            path = "/health/db"
           }
-          initialDelaySeconds = 0
-          periodSeconds       = 10
-          timeoutSeconds      = 1
-          failureThreshold    = 3
-          successThreshold    = 1
+          failureThreshold = 1
+          periodSeconds    = 10
         }
         livenessProbe = {
           httpGet = {
             port = local.extra_configs.PORT
-            path = "/api/v1/ping"
+            path = "/health"
           }
-          initialDelaySeconds = 0
-          periodSeconds       = 10
-          timeoutSeconds      = 1
-          failureThreshold    = 3
-          successThreshold    = 1
+          failureThreshold = 1
+          periodSeconds    = 10
         }
       },
     ]
     volumes = [
-      {
-        name = "litestream-data"
-        emptyDir = {
-          medium = "Memory"
-        }
-      },
+      # Use local-path for this
+      # {
+      #   name     = "litestream-data"
+      #   emptyDir = {
+      #     medium = "Memory"
+      #   }
+      # },
       {
         name = "config"
         secret = {
@@ -224,5 +233,13 @@ module "litestream" {
         }
       },
     ]
+    dnsConfig = {
+      options = [
+        {
+          name  = "ndots"
+          value = "1"
+        },
+      ]
+    }
   }
 }

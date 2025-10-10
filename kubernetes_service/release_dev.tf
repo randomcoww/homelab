@@ -105,38 +105,124 @@ module "searxng" {
   nginx_ingress_annotations = local.nginx_ingress_annotations
 }
 
-# Flowise
+# MCP
 
-module "flowise" {
-  source    = "./modules/flowise"
-  name      = local.endpoints.flowise.name
-  namespace = local.endpoints.flowise.namespace
+locals {
+  mcp_servers = {
+    fetch = {
+      command = "uvx"
+      args = [
+        "mcp-server-fetch",
+      ]
+    },
+    time = {
+      command = "uvx"
+      args = [
+        "mcp-server-time",
+        "--local-timezone=${local.timezone}",
+      ]
+    },
+    sequential-thinking = {
+      command = "npx"
+      args = [
+        "-y",
+        "@modelcontextprotocol/server-sequential-thinking",
+      ]
+    },
+    searxng = {
+      command = "npx"
+      args = [
+        "-y",
+        "mcp-searxng",
+      ]
+      env = {
+        SEARXNG_URL = "https://${local.endpoints.searxng.ingress}/search?q=<query>"
+      }
+    }
+  }
+}
+
+module "mcp-proxy" {
+  source    = "./modules/mcp_proxy"
+  name      = local.endpoints.mcp_proxy.name
+  namespace = local.endpoints.mcp_proxy.namespace
   release   = "0.1.0"
+  replicas  = 2
   images = {
-    flowise    = local.container_images.flowise
-    litestream = local.container_images.litestream
+    mcp_proxy = local.container_images.mcp_proxy
   }
-  service_hostname = local.endpoints.flowise.ingress
-  extra_configs = {
-    STORAGE_TYPE           = "s3"
-    S3_STORAGE_BUCKET_NAME = "flowise"
-    S3_STORAGE_REGION      = "NA"
-    S3_ENDPOINT_URL        = "https://${local.services.cluster_minio.ip}:${local.service_ports.minio}"
-    S3_FORCE_PATH_STYLE    = true
-    SMTP_HOST              = var.smtp.host
-    SMTP_PORT              = var.smtp.port
-    SMTP_USER              = var.smtp.username
-    SMTP_PASSWORD          = var.smtp.password
-    SMTP_SECURE            = true
-    SENDER_EMAIL           = var.smtp.username
+  config = {
+    mcpProxy = {
+      version = "1.0.0"
+      type    = "streamable-http"
+      options = {
+        panicIfInvalid = true
+        logEnabled     = true
+      }
+    },
+    mcpServers = local.mcp_servers
   }
+  service_hostname          = local.endpoints.mcp_proxy.ingress
   ingress_class_name        = local.kubernetes.ingress_classes.ingress_nginx_external
   nginx_ingress_annotations = local.nginx_ingress_annotations
+  ca_bundle_configmap       = local.kubernetes.ca_bundle_configmap
+}
 
-  minio_endpoint          = "https://${local.services.cluster_minio.ip}:${local.service_ports.minio}"
-  minio_bucket            = "flowise"
+# Open WebUI
+
+module "open-webui" {
+  source    = "./modules/open_webui"
+  name      = local.endpoints.open_webui.name
+  namespace = local.endpoints.open_webui.namespace
+  release   = "0.1.0"
+  images = {
+    open_webui = local.container_images.open_webui
+    litestream = local.container_images.litestream
+  }
+  service_hostname = local.endpoints.open_webui.ingress
+  extra_configs = {
+    WEBUI_URL                   = "https://${local.endpoints.open_webui.ingress}"
+    ENABLE_SIGNUP               = false
+    ENABLE_LOGIN_FORM           = false
+    DEFAULT_MODELS              = "ggml-gpt-oss-20b-mxfp4"
+    WEBUI_AUTH                  = false
+    ENABLE_VERSION_UPDATE_CHECK = false
+    ENABLE_OPENAI_API           = true
+    OPENAI_API_BASE_URL         = "https://${local.endpoints.llama_cpp.ingress}/v1"
+    ENABLE_WEB_SEARCH           = false
+    ENABLE_FOLLOW_UP_GENERATION = true
+    ENABLE_PERSISTENT_CONFIG    = true
+    # https://github.com/varunvasudeva1/llm-server-docs?tab=readme-ov-file#mcp-proxy-server
+    # https://github.com/open-webui/docs/issues/609
+    # https://github.com/javydekoning/homelab/blob/main/k8s/ai-platform/openwebui/TOOL_SERVER_CONNECTIONS.json
+    TOOL_SERVER_CONNECTIONS = jsonencode([
+      for type, _ in local.mcp_servers :
+      {
+        type      = "mcp"
+        url       = "https://${local.endpoints.mcp_proxy.ingress}/${type}/mcp"
+        auth_type = "none"
+        config = {
+          enable = true
+        }
+        spec_type = "url"
+        spec      = ""
+        path      = ""
+        key       = ""
+        info = {
+          id          = type
+          name        = type
+          description = ""
+        }
+      }
+    ])
+  }
+  ingress_class_name        = local.kubernetes.ingress_classes.ingress_nginx
+  nginx_ingress_annotations = local.nginx_ingress_annotations
+
+  minio_endpoint          = "https://${local.endpoints.minio.service}:${local.service_ports.minio}"
+  minio_bucket            = "open-webui"
   minio_litestream_prefix = "$POD_NAME/litestream"
-  minio_access_secret     = local.minio_users.flowise.secret
+  minio_access_secret     = local.minio_users.open_webui.secret
   ca_bundle_configmap     = local.kubernetes.ca_bundle_configmap
 }
 
