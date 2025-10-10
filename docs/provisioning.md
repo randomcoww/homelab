@@ -97,7 +97,7 @@ Launch bootstrap DHCP service on a workstation on the same network as the server
 Update image tags under `pxeboot_images` in [environment config](https://github.com/randomcoww/homelab/blob/master/config_env.tf) to match image file names.
 
 ```bash
-export interface=br-lan
+export interface=phy0
 export host_ip=$(ip -br addr show $interface | awk '{print $3}')
 export assets_path=${HOME}/store/boot
 

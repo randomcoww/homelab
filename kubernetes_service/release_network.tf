@@ -1,10 +1,5 @@
 # DHCP
 
-resource "random_password" "stork-agent-token" {
-  length  = 32
-  special = false
-}
-
 module "kea" {
   source    = "./modules/kea"
   name      = local.endpoints.kea.name
@@ -54,9 +49,8 @@ module "kea" {
       ]
     },
   ]
-  timezone          = local.timezone
-  stork_agent_token = random_password.stork-agent-token.result
-  ca_issuer_name    = local.kubernetes.cert_issuers.ca_internal
+  timezone       = local.timezone
+  ca_issuer_name = local.kubernetes.cert_issuers.ca_internal
 }
 
 # PXE boot server
@@ -136,7 +130,7 @@ module "hostapd" {
     ssid                         = random_password.hostapd-ssid.result
     sae_password                 = random_password.hostapd-password.result
     interface                    = "wlan0"
-    bridge                       = "br-lan"
+    bridge                       = "br0"
     driver                       = "nl80211"
     noscan                       = 1
     wpa                          = 2

@@ -2,7 +2,6 @@ locals {
   kea_base_path            = "/etc/kea"
   kea_socket_path          = "/var/run/kea/kea-dhcp4-ctrl.sock"
   kea_hooks_libraries_path = "/usr/lib/kea/hooks" # path in image
-  subnet_id_base           = 1
 
   # These paths are not configurable
   # /var/lib/stork-agent/certs/cert.pem
@@ -23,6 +22,11 @@ locals {
       kea_tls_secret_name = "${var.name}-${i}-kea-tls"
     }
   ]
+}
+
+resource "random_password" "stork-agent-token" {
+  length  = 32
+  special = false
 }
 
 # Kea peers must know the IP (not DNS name) of all peers
@@ -281,7 +285,7 @@ module "secret" {
           for k, network in var.networks :
           {
             subnet = network.prefix
-            id     = local.subnet_id_base + k
+            id     = k + 1
             option-data = concat([
               {
                 name = "interface-mtu"
@@ -337,8 +341,7 @@ module "secret" {
       }
     })
 
-    # shared stork secret
-    "agent-token.txt" = var.stork_agent_token
+    "agent-token.txt" = random_password.stork-agent-token.result # unused but needs to exist
   })
 }
 
@@ -450,8 +453,7 @@ module "statefulset" {
 
           exec stork-agent \
           --listen-prometheus-only \
-          --prometheus-kea-exporter-port=${var.ports.kea_metrics} \
-          --prometheus-bind9-exporter-address=127.0.0.1
+          --prometheus-kea-exporter-port=${var.ports.kea_metrics}
           EOF
         ]
         volumeMounts = [
@@ -463,7 +465,7 @@ module "statefulset" {
             name      = "stork-agent-certs"
             mountPath = "${local.stork_agent_base_path}/certs"
           },
-          # This keeps the token path writable to generate server-cert.sha256
+          # This keeps the token path writable to produce tokens/server-cert.sha256
           {
             name      = "stork-agent-token"
             mountPath = "${local.stork_agent_base_path}/tokens/agent-token.txt"

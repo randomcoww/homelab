@@ -85,11 +85,6 @@ locals {
       network_boot = {
         interface = "phy0"
         image     = local.pxeboot_image_set.coreos
-        boot_args = [
-          "selinux=0",
-        ]
-      }
-      kubernetes_node_labels = {
       }
     }
 
@@ -178,11 +173,6 @@ locals {
       network_boot = {
         interface = "phy0"
         image     = local.pxeboot_image_set.coreos
-        boot_args = [
-          "selinux=0",
-        ]
-      }
-      kubernetes_node_labels = {
       }
     }
 
@@ -244,11 +234,6 @@ locals {
       network_boot = {
         interface = "phy0"
         image     = local.pxeboot_image_set.coreos
-        boot_args = [
-          "selinux=0",
-        ]
-      }
-      kubernetes_node_labels = {
       }
     }
 
@@ -278,7 +263,7 @@ locals {
         }
       }
       bridge_interfaces = {
-        br-lan = {
+        br0 = {
           sources = [
             "phy0",
           ]
@@ -286,7 +271,7 @@ locals {
       }
       networks = {
         lan = {
-          interface     = "br-lan"
+          interface     = "br0"
           enable_netnum = true
         }
         node = {
@@ -319,11 +304,6 @@ locals {
       network_boot = {
         interface = "phy0"
         image     = local.pxeboot_image_set.coreos
-        boot_args = [
-          "selinux=0",
-        ]
-      }
-      kubernetes_node_labels = {
       }
     }
   }

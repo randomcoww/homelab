@@ -20,7 +20,8 @@ resource "matchbox_profile" "ignition" {
     "coreos.live.rootfs_url=${local.image_store_endpoint}/${each.value.image.rootfs}",
     "rd.driver.blacklist=nouveau",
     "modprobe.blacklist=nouveau",
-  ], each.value.boot_args)
+    "selinux=0",
+  ], lookup(each.value, "boot_args", []))
   raw_ignition = data.terraform_remote_state.ignition.outputs.ignition[each.key]
 }
 
