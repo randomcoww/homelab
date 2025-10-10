@@ -247,11 +247,12 @@ locals {
         namespace = "kube-system"
       }
       kea = {
-        name = "kea"
+        name      = "kea"
+        namespace = "netboot"
       }
       matchbox = {
         name      = "matchbox"
-        namespace = "matchbox"
+        namespace = "netboot"
       }
       minio = {
         name      = "minio"
