@@ -53,7 +53,6 @@ variable "networks" {
     routers             = optional(list(string), [])
     domain_name_servers = optional(list(string), [])
     domain_search       = optional(list(string), [])
-    pools               = list(string)
   }))
 }
 

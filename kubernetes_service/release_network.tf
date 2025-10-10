@@ -37,16 +37,10 @@ module "kea" {
         local.domains.public,
       ]
       mtu = 1500 # Force LAN clients to 1500
-      pools = [
-        "${cidrhost(cidrsubnet(local.networks.lan.prefix, 1, 1), 0)} - ${cidrhost(local.networks.lan.prefix, -2)}",
-      ]
     },
     {
       prefix = local.networks.service.prefix
       mtu    = lookup(local.networks.service, "mtu", 1500)
-      pools = [
-        "${cidrhost(cidrsubnet(local.networks.service.prefix, 1, 1), 0)} - ${cidrhost(local.networks.service.prefix, -2)}",
-      ]
     },
   ]
   timezone       = local.timezone

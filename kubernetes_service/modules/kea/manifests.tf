@@ -289,7 +289,7 @@ module "secret" {
             option-data = concat([
               {
                 name = "interface-mtu"
-                data = format("%s", network.mtu)
+                data = tostring(network.mtu)
               },
               {
                 name = "tcode"
@@ -312,10 +312,9 @@ module "secret" {
               }
             ] : [])
             pools = [
-              for _, pool in network.pools :
               {
-                pool = pool
-              }
+                pool = "${cidrhost(cidrsubnet(network.prefix, 1, 1), 0)} - ${cidrhost(network.prefix, -2)}"
+              },
             ]
           }
         ]
