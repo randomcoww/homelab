@@ -38,14 +38,14 @@ module "kea" {
       ]
       mtu = 1500 # Force LAN clients to 1500
       pools = [
-        cidrsubnet(local.networks.lan.prefix, 1, 1),
+        "${cidrhost(cidrsubnet(local.networks.lan.prefix, 1, 1), 1)} - ${cidrhost(local.networks.lan.prefix, -2)}",
       ]
     },
     {
       prefix = local.networks.service.prefix
       mtu    = lookup(local.networks.service, "mtu", 1500)
       pools = [
-        cidrsubnet(local.networks.service.prefix, 1, 1),
+        "${cidrhost(cidrsubnet(local.networks.service.prefix, 1, 1), 1)} - ${cidrhost(local.networks.service.prefix, -2)}",
       ]
     },
   ]
