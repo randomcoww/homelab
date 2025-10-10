@@ -76,9 +76,8 @@ resource "helm_release" "prometheus" {
         }
       }
       server = {
-        podDisruptionBudget = {
-          enabled        = true
-          maxUnavailable = "50%"
+        strategy = {
+          type = "RollingUpdate"
         }
         persistentVolume = {
           enabled = false
