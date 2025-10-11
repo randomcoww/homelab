@@ -1,5 +1,5 @@
 locals {
-  mcp_servers = {
+  mcp_proxies = {
     fetch = {
       command = "uvx"
       args = [
@@ -167,7 +167,7 @@ module "mcp-proxy" {
         logEnabled     = true
       }
     },
-    mcpServers = local.mcp_servers
+    mcpServers = local.mcp_proxies
   }
   service_hostname          = local.endpoints.mcp_proxy.ingress
   ingress_class_name        = local.kubernetes.ingress_classes.ingress_nginx
@@ -211,7 +211,7 @@ module "open-webui" {
     # https://github.com/open-webui/docs/issues/609
     # https://github.com/javydekoning/homelab/blob/main/k8s/ai-platform/openwebui/TOOL_SERVER_CONNECTIONS.json
     TOOL_SERVER_CONNECTIONS = jsonencode([
-      for type, _ in local.mcp_servers :
+      for type, _ in local.mcp_proxies :
       {
         type      = "mcp"
         url       = "https://${local.endpoints.mcp_proxy.ingress}/${type}/mcp"
