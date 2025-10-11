@@ -10,6 +10,7 @@ locals {
     S3_KEY_PREFIX              = "data"
     S3_BUCKET_NAME             = var.minio_bucket
     S3_ENDPOINT_URL            = var.minio_endpoint
+    ENABLE_CODE_INTERPRETER    = false
   })
 }
 
