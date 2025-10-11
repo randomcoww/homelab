@@ -178,27 +178,6 @@ locals {
           },
         ]
       }
-
-      # vaultwarden litestream sqlite
-      vaultwarden = {
-        name      = local.endpoints.vaultwarden.name
-        namespace = local.endpoints.vaultwarden.namespace
-        policies = [
-          {
-            Effect = "Allow"
-            Action = [
-              "s3:GetObject",
-              "s3:PutObject",
-              "s3:ListBucket",
-              "s3:DeleteObject",
-              "s3:AbortMultipartUpload",
-            ]
-            buckets = [
-              "vaultwarden",
-            ]
-          },
-        ]
-      }
     } :
 
     key => merge(params, {

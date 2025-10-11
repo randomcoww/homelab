@@ -14,7 +14,6 @@ locals {
     module.qrcode-hostapd,
     module.webdav-pictures,
     module.audioserve,
-    # module.vaultwarden,
     module.registry,
     module.registry-ui,
     module.searxng,
