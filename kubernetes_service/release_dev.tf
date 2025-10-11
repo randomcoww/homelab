@@ -1,3 +1,45 @@
+locals {
+  mcp_servers = {
+    fetch = {
+      command = "uvx"
+      args = [
+        "mcp-server-fetch",
+      ]
+    },
+    time = {
+      command = "uvx"
+      args = [
+        "mcp-server-time",
+        "--local-timezone=${local.timezone}",
+      ]
+    },
+    sequential-thinking = {
+      command = "npx"
+      args = [
+        "-y",
+        "@modelcontextprotocol/server-sequential-thinking",
+      ]
+    },
+    memory = {
+      command = "npx"
+      args = [
+        "-y",
+        "@modelcontextprotocol/server-memory",
+      ]
+    }
+    searxng = {
+      command = "npx"
+      args = [
+        "-y",
+        "mcp-searxng",
+      ]
+      env = {
+        SEARXNG_URL = "https://${local.endpoints.searxng.ingress}/search?q=<query>"
+      }
+    }
+  }
+}
+
 # llama-cpp
 
 module "llama-cpp" {
@@ -106,41 +148,6 @@ module "searxng" {
 }
 
 # MCP
-
-locals {
-  mcp_servers = {
-    fetch = {
-      command = "uvx"
-      args = [
-        "mcp-server-fetch",
-      ]
-    },
-    time = {
-      command = "uvx"
-      args = [
-        "mcp-server-time",
-        "--local-timezone=${local.timezone}",
-      ]
-    },
-    sequential-thinking = {
-      command = "npx"
-      args = [
-        "-y",
-        "@modelcontextprotocol/server-sequential-thinking",
-      ]
-    },
-    searxng = {
-      command = "npx"
-      args = [
-        "-y",
-        "mcp-searxng",
-      ]
-      env = {
-        SEARXNG_URL = "https://${local.endpoints.searxng.ingress}/search?q=<query>"
-      }
-    }
-  }
-}
 
 module "mcp-proxy" {
   source    = "./modules/mcp_proxy"
