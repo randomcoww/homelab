@@ -163,7 +163,7 @@ module "mcp-proxy" {
     mcpServers = local.mcp_servers
   }
   service_hostname          = local.endpoints.mcp_proxy.ingress
-  ingress_class_name        = local.kubernetes.ingress_classes.ingress_nginx_external
+  ingress_class_name        = local.kubernetes.ingress_classes.ingress_nginx
   nginx_ingress_annotations = local.nginx_ingress_annotations
   ca_bundle_configmap       = local.kubernetes.ca_bundle_configmap
 }
