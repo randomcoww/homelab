@@ -143,9 +143,9 @@ locals {
     github_actions_runner = "ghcr.io/actions/actions-runner:2.328.0@sha256:db0dcae6d28559e54277755a33aba7d0665f255b3bd2a66cdc5e132712f155e0"
     registry              = "ghcr.io/distribution/distribution:3.0.0@sha256:4ba3adf47f5c866e9a29288c758c5328ef03396cb8f5f6454463655fa8bc83e2"
     registry_ui           = "docker.io/quiq/registry-ui:0.10.4@sha256:88e90f14a2654b48a6ca8112b3bd000d3e2472a8cbf560d73af679f5558273f2"
-    mcp_proxy             = "ghcr.io/tbxark/mcp-proxy:v0.39.1"
+    mcp_proxy             = "ghcr.io/tbxark/mcp-proxy:v0.39.1@sha256:8e7a15c1375744ab9f5c42ebbee5aa694685af9ec43fe6da2ddf76ef96d765a5"
     searxng               = "ghcr.io/searxng/searxng:latest@sha256:1458a9e6df554fa0306f2f4b770e2e49ad49dc726dddaa598eb4613718cb3b81"
-    open_webui            = "ghcr.io/open-webui/open-webui:0.6.33"
+    open_webui            = "ghcr.io/open-webui/open-webui:0.6.33@sha256:133c51d50defc253251150a89dfbe6d55b797a630ac44a644394d01fc80b6225"
   }
 
   # these fields are updated by renovate - don't use var substitutions
