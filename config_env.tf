@@ -124,7 +124,7 @@ locals {
     ipxe        = "ghcr.io/randomcoww/ipxe:v1.20251006.1631@sha256:d1815931b10f711029e8a12749913a3b1273081837455b5106c4c753c4f28dde"
     mountpoint  = "ghcr.io/randomcoww/mountpoint-s3:v1.20.0.20251008.0917@sha256:57328baf35c5d2c9bd360ad29b04c6f12cd207d44e1f322143168ef8c02754c6"
     matchbox    = "quay.io/poseidon/matchbox:v0.11.0@sha256:06bcdae85335fd00e8277b007b55cfb49d96a0114628c0f70db2b92b079d246a"
-    nginx       = "docker.io/nginxinc/nginx-unprivileged:1.29.1-alpine@sha256:27985295bdb22a1ef8f712863210bd5877c0f3006494a593e86b3fe0fa55467e"
+    nginx       = "docker.io/nginxinc/nginx-unprivileged:1.29.2-alpine@sha256:a9155b22c828f8d76320c778f0d1735440dbdaad545984a6ed7c76614b66ebd9"
     # tier 3
     hostapd               = "registry.default/randomcoww/hostapd-noscan:v2.11.20251006.2201@sha256:a1a17ca7d5a862322f240655349c9590500e5436ce99989914300aeeadf91a9a"
     tailscale             = "registry.default/randomcoww/tailscale-nft:v1.88.3.20251006.1629@sha256:8fbb7d5ad76288c044b4953699329d4eca1446a4df34b05e1f49dfc2508f6e79"
@@ -144,7 +144,7 @@ locals {
     registry              = "ghcr.io/distribution/distribution:3.0.0@sha256:4ba3adf47f5c866e9a29288c758c5328ef03396cb8f5f6454463655fa8bc83e2"
     registry_ui           = "docker.io/quiq/registry-ui:0.10.4@sha256:88e90f14a2654b48a6ca8112b3bd000d3e2472a8cbf560d73af679f5558273f2"
     mcp_proxy             = "ghcr.io/tbxark/mcp-proxy:v0.39.1"
-    searxng               = "ghcr.io/searxng/searxng:latest@sha256:d6e4edcd961169d3ea9ca65a6af3871c5603478d9c77bfbd4268acaa0ff7f576"
+    searxng               = "ghcr.io/searxng/searxng:latest@sha256:1458a9e6df554fa0306f2f4b770e2e49ad49dc726dddaa598eb4613718cb3b81"
     open_webui            = "ghcr.io/open-webui/open-webui:0.6.33"
   }
 
