@@ -136,7 +136,6 @@ locals {
     sunshine_desktop      = "registry.default/randomcoww/sunshine-desktop:v2025.930.130407.20251006.1611@sha256:1ca72dfcd5a0d78df21898a0d3999a3820dcf8ee4f6e8a9b628300ad1bee666d"
     litestream            = "docker.io/litestream/litestream:0.5.0@sha256:74ed4af3e223f6ad6a81d0c7eb31a57de3d9bdffcc4765128a89e0f069fdb839"
     juicefs               = "registry.default/randomcoww/juicefs:v1.3.0.20251008.0918@sha256:0b3dbd30a718ff1e8e24d788772fa3ae916274ef6b5428c2b2393fbefa84456f"
-    code_server           = "registry.default/randomcoww/code-server:v1.103.1.20251006.1622@sha256:8630f66ff84bffa872df1f0a9a30ead41e81dcc85d293825d24ec835f7240024"
     valkey                = "ghcr.io/valkey-io/valkey:8.1.4-alpine@sha256:e706d1213aaba6896c162bb6a3a9e1894e1a435f28f8f856d14fab2e10aa098b"
     nvidia_driver         = "registry.default/randomcoww/nvidia-driver-container:v580.95.05.20251002.0720-fedora42@sha256:7cafab4ddef75b51aaa86e7209309680f0ad6bdbcd1fd943a6bb9573b2d46102"
     github_actions_runner = "ghcr.io/actions/actions-runner:2.328.0@sha256:db0dcae6d28559e54277755a33aba7d0665f255b3bd2a66cdc5e132712f155e0"
@@ -292,10 +291,6 @@ locals {
       llama_cpp = {
         name    = "llama-cpp"
         ingress = "llama"
-      }
-      code_server = {
-        name    = "code-server"
-        ingress = "code"
       }
       sunshine_desktop = {
         name    = "sunshine-desktop"

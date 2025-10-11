@@ -98,27 +98,6 @@ locals {
         ]
       }
 
-      # code-server juicefs + litestream sqlite
-      code_server = {
-        name      = local.endpoints.code_server.name
-        namespace = local.endpoints.code_server.namespace
-        policies = [
-          {
-            Effect = "Allow"
-            Action = [
-              "s3:GetObject",
-              "s3:PutObject",
-              "s3:ListBucket",
-              "s3:DeleteObject",
-              "s3:AbortMultipartUpload",
-            ]
-            buckets = [
-              "code-server",
-            ]
-          },
-        ]
-      }
-
       # audioserve mount-s3 access to music
       audioserve = {
         name      = local.endpoints.audioserve.name

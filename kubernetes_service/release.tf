@@ -20,7 +20,6 @@ locals {
     module.mcp-proxy,
     module.open-webui,
     module.llama-cpp,
-    # module.code-server,
     # module.sunshine-desktop,
   ]
 }

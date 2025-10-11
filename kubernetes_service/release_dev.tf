@@ -241,60 +241,6 @@ module "open-webui" {
   ca_bundle_configmap     = local.kubernetes.ca_bundle_configmap
 }
 
-# code-server
-
-module "code-server" {
-  source    = "./modules/code_server"
-  name      = local.endpoints.code_server.name
-  namespace = local.endpoints.code_server.namespace
-  release   = "0.1.0"
-  images = {
-    code_server = local.container_images.code_server
-    jfs         = local.container_images.juicefs
-    litestream  = local.container_images.litestream
-  }
-  user = "code"
-  uid  = 10000
-  extra_configs = [
-    {
-      path    = "/etc/tmux.conf"
-      content = <<-EOF
-      set -g history-limit 10000
-      set -g mouse on
-      set-option -s set-clipboard off
-      bind-key -T copy-mode MouseDragEnd1Pane send-keys -X copy-pipe-and-cancel "xclip -in -sel clip"
-      EOF
-    },
-    {
-      path    = "/etc/pki/ca-trust/source/anchors/ca-cert.pem"
-      content = data.terraform_remote_state.sr.outputs.trust.ca.cert_pem
-    },
-  ]
-  extra_envs = [
-    {
-      name  = "TZ"
-      value = local.timezone
-    },
-    {
-      name  = "NVIDIA_DRIVER_CAPABILITIES"
-      value = "compute,utility"
-    },
-  ]
-  resources = {
-    limits = {
-      "nvidia.com/gpu" = 1
-    }
-  }
-  service_hostname          = local.endpoints.code_server.ingress
-  ingress_class_name        = local.kubernetes.ingress_classes.ingress_nginx
-  nginx_ingress_annotations = local.nginx_ingress_annotations
-
-  minio_endpoint      = "https://${local.services.cluster_minio.ip}:${local.service_ports.minio}"
-  minio_bucket        = "code-server"
-  minio_access_secret = local.minio_users.code_server.secret
-  ca_bundle_configmap = local.kubernetes.ca_bundle_configmap
-}
-
 # Internal registry
 
 resource "random_password" "registry-event-listener-token" {
