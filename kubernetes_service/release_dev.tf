@@ -84,6 +84,7 @@ module "searxng" {
       engines = {
         keep_only = [
           "google",
+          "duckduckgo",
         ]
       }
     }
