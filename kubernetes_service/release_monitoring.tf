@@ -32,29 +32,6 @@ resource "helm_release" "metrics-server" {
   ]
 }
 
-# Blackbox exporter
-
-resource "helm_release" "prometheus-blackbox" {
-  name             = local.endpoints.prometheus_blackbox.name
-  namespace        = local.endpoints.prometheus_blackbox.namespace
-  create_namespace = true
-  repository       = "https://prometheus-community.github.io/helm-charts"
-  chart            = "prometheus-blackbox-exporter"
-  wait             = false
-  wait_for_jobs    = false
-  version          = "11.4.0"
-  max_history      = 2
-  timeout          = local.kubernetes.helm_release_timeout
-  values = [
-    yamlencode({
-      replicas = 2
-      service = {
-        port = local.service_ports.prometheus_blackbox
-      }
-    })
-  ]
-}
-
 # Prometheus
 
 resource "helm_release" "prometheus" {
@@ -129,37 +106,6 @@ resource "helm_release" "prometheus" {
               targets = [
                 "${local.services.cluster_minio.ip}:${local.service_ports.minio}",
               ]
-            },
-          ]
-        },
-        {
-          job_name     = "matchbox-blackbox"
-          metrics_path = "/probe"
-          params = {
-            module = [
-              "http_2xx",
-            ]
-          }
-          static_configs = [
-            {
-              targets = [
-                "https://${local.services.matchbox.ip}:${local.service_ports.matchbox}",
-              ]
-            },
-          ]
-          # chart creates blackbox service name <name>-prometheus-blackbox-exporter
-          relabel_configs = [
-            {
-              source_labels = ["__address__"]
-              target_label  = "__param_target"
-            },
-            {
-              source_labels = ["__param_target"]
-              target_label  = "instance"
-            },
-            {
-              target_label = "__address__"
-              replacement  = "${local.endpoints.prometheus_blackbox.name}-prometheus-blackbox-exporter.${local.endpoints.prometheus_blackbox.namespace}:${local.service_ports.prometheus_blackbox}"
             },
           ]
         },
@@ -309,31 +255,6 @@ resource "helm_release" "prometheus" {
                     absent(up{app="${local.endpoints.kea.name}",namespace="${local.endpoints.kea.namespace}"})
                   or
                     changes(up{app="${local.endpoints.kea.name}",namespace="${local.endpoints.kea.namespace}"}[1m]) > 1
-                  )
-                  EOF
-                  for  = "1m"
-                  labels = {
-                    severity = "critical"
-                  }
-                },
-              ]
-            },
-            {
-              name = "matchbox"
-              rules = [
-                {
-                  alert = "NodesDown"
-                  annotations = {
-                    summary     = "Matchbox nodes down"
-                    description = <<-EOF
-                    Matchbox service down
-                    EOF
-                  }
-                  expr = <<-EOF
-                  (
-                    absent(up{job="matchbox-blackbox"})
-                  or
-                    changes(up{job="matchbox-blackbox"}[1m]) > 1
                   )
                   EOF
                   for  = "1m"

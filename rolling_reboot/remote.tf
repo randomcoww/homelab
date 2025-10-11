@@ -6,5 +6,5 @@ module "write-sentinel-file" {
   command = [
     "sudo touch /var/run/reboot-required",
   ]
-  triggers_replace = data.terraform_remote_state.matchbox-client.outputs.config[each.key]
+  # triggers_replace = 
 }

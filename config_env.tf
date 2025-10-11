@@ -47,8 +47,6 @@ locals {
       netnums = {
         apiserver    = 2
         external_dns = 31
-        matchbox     = 32
-        matchbox_api = 33
         minio        = 34
         registry     = 35
       }
@@ -123,7 +121,6 @@ locals {
     stork_agent = "ghcr.io/randomcoww/stork-agent:v2.3.0.20251006.1620@sha256:c07d1326f80aa229775c739902e0c74deb59ec45f1c9cba52039cb71de5b406f"
     ipxe        = "ghcr.io/randomcoww/ipxe:v1.20251006.1631@sha256:d1815931b10f711029e8a12749913a3b1273081837455b5106c4c753c4f28dde"
     mountpoint  = "ghcr.io/randomcoww/mountpoint-s3:v1.20.0.20251008.0917@sha256:57328baf35c5d2c9bd360ad29b04c6f12cd207d44e1f322143168ef8c02754c6"
-    matchbox    = "quay.io/poseidon/matchbox:v0.11.0@sha256:06bcdae85335fd00e8277b007b55cfb49d96a0114628c0f70db2b92b079d246a"
     nginx       = "docker.io/nginxinc/nginx-unprivileged:1.29.2-alpine@sha256:a9155b22c828f8d76320c778f0d1735440dbdaad545984a6ed7c76614b66ebd9"
     # tier 3
     hostapd               = "registry.default/randomcoww/hostapd-noscan:v2.11.20251006.2201@sha256:a1a17ca7d5a862322f240655349c9590500e5436ce99989914300aeeadf91a9a"
@@ -179,8 +176,6 @@ locals {
   }
 
   service_ports = {
-    matchbox            = 443
-    matchbox_api        = 50101
     minio               = 9000
     metrics             = 9153
     prometheus_blackbox = 9115
@@ -254,10 +249,6 @@ locals {
       }
       kea = {
         name      = "kea"
-        namespace = "netboot"
-      }
-      matchbox = {
-        name      = "matchbox"
         namespace = "netboot"
       }
       minio = {

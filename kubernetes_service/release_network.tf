@@ -47,34 +47,6 @@ module "kea" {
   ca_issuer_name = local.kubernetes.cert_issuers.ca_internal
 }
 
-# PXE boot server
-
-module "matchbox" {
-  source    = "./modules/matchbox"
-  name      = local.endpoints.matchbox.name
-  namespace = local.endpoints.matchbox.namespace
-  release   = "0.2.16"
-  replicas  = 3
-  images = {
-    matchbox   = local.container_images.matchbox
-    mountpoint = local.container_images.mountpoint
-  }
-  ports = {
-    matchbox     = local.service_ports.matchbox
-    matchbox_api = local.service_ports.matchbox_api
-  }
-  service_ip              = local.services.matchbox.ip
-  api_service_ip          = local.services.matchbox_api.ip
-  loadbalancer_class_name = "kube-vip.io/kube-vip-class"
-  ca_issuer_name          = local.kubernetes.cert_issuers.ca_internal
-
-  minio_endpoint         = "https://${local.services.cluster_minio.ip}:${local.service_ports.minio}"
-  minio_bucket           = "matchbox"
-  minio_access_secret    = local.minio_users.matchbox.secret
-  minio_mount_extra_args = []
-  ca_bundle_configmap    = local.kubernetes.ca_bundle_configmap
-}
-
 # Wifi AP
 
 resource "random_password" "hostapd-ssid" {

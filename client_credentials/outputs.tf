@@ -12,16 +12,6 @@ output "kubernetes_admin" {
   sensitive = true
 }
 
-output "matchbox_client" {
-  value = {
-    algorithm       = tls_private_key.matchbox-client.algorithm
-    private_key_pem = tls_private_key.matchbox-client.private_key_pem
-    cert_pem        = tls_locally_signed_cert.matchbox-client.cert_pem
-    ca_cert_pem     = data.terraform_remote_state.sr.outputs.trust.ca.cert_pem
-  }
-  sensitive = true
-}
-
 output "minio_client" {
   value = {
     algorithm       = tls_private_key.minio-client.algorithm

@@ -18,6 +18,15 @@ terraform -chdir=client_credentials output -json minio_client | jq -r '.ca_cert_
 
 ---
 
+### Generate host configuration
+
+```bash
+terraform -chdir=ignition init -upgrade && \
+terraform -chdir=ignition apply
+```
+
+---
+
 ### Deploy services to Kubernetes
 
 Deploy Kubernetes services. Some services rely on MinIO and will crash loop until MinIO resources are created (below).
@@ -41,22 +50,6 @@ terraform -chdir=minio_resources apply
 See [fedora-coreos-config](https://github.com/randomcoww/fedora-coreos-config)
 
 Run `live-image-build` workflow in the repo above. An updated image tag should be merged into this project once finished and the new tag is picked up by a Renovate run.
-
----
-
-### Generate network boot configuration
-
-Generate and push host ignition and iPXE scripts to Matchbox for network booting.
-
-```bash
-terraform -chdir=ignition init -upgrade && \
-terraform -chdir=ignition apply
-```
-
-```bash
-terraform -chdir=matchbox_client init -upgrade && \
-terraform -chdir=matchbox_client apply
-```
 
 ---
 
