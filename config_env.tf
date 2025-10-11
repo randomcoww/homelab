@@ -132,7 +132,7 @@ locals {
     device_plugin         = "ghcr.io/squat/generic-device-plugin:latest@sha256:7b67623b583cd77951f5c52085e25fd988a0d2d9b29ed18dfc942be0621c41cf"
     rclone                = "ghcr.io/rclone/rclone:1.71.1@sha256:d5971950c2b370fb04dd3292541b5bda6d9103143fd7e345aeb435a399388afc"
     audioserve            = "docker.io/izderadicka/audioserve:latest@sha256:c3609321701765671cae121fc0f61db122e8c124643c04770fbc9326c74b18e3"
-    llama_cpp             = "ghcr.io/mostlygeek/llama-swap:cuda@sha256:fa2b4524450d046b798f6aae1ebf48e9bc6573d03ec63661c5e2e42e81a5832b"
+    llama_cpp             = "ghcr.io/mostlygeek/llama-swap:cuda@sha256:dc8c9ed293d5ce5eae74cd018812b974315a9d3b5d132c17a3271bc55243bb4b"
     sunshine_desktop      = "registry.default/randomcoww/sunshine-desktop:v2025.930.130407.20251006.1611@sha256:1ca72dfcd5a0d78df21898a0d3999a3820dcf8ee4f6e8a9b628300ad1bee666d"
     litestream            = "docker.io/litestream/litestream:0.5.0@sha256:74ed4af3e223f6ad6a81d0c7eb31a57de3d9bdffcc4765128a89e0f069fdb839"
     juicefs               = "registry.default/randomcoww/juicefs:v1.3.0.20251008.0918@sha256:0b3dbd30a718ff1e8e24d788772fa3ae916274ef6b5428c2b2393fbefa84456f"
@@ -142,7 +142,7 @@ locals {
     registry              = "ghcr.io/distribution/distribution:3.0.0@sha256:4ba3adf47f5c866e9a29288c758c5328ef03396cb8f5f6454463655fa8bc83e2"
     registry_ui           = "docker.io/quiq/registry-ui:0.10.4@sha256:88e90f14a2654b48a6ca8112b3bd000d3e2472a8cbf560d73af679f5558273f2"
     mcp_proxy             = "ghcr.io/tbxark/mcp-proxy:v0.39.1@sha256:8e7a15c1375744ab9f5c42ebbee5aa694685af9ec43fe6da2ddf76ef96d765a5"
-    searxng               = "ghcr.io/searxng/searxng:latest@sha256:1458a9e6df554fa0306f2f4b770e2e49ad49dc726dddaa598eb4613718cb3b81"
+    searxng               = "ghcr.io/searxng/searxng:latest@sha256:67ba98e59f96906bf806a83ccdb467bc9fd86c7e35f59faabdf8df9afdb2add1"
     open_webui            = "ghcr.io/open-webui/open-webui:0.6.33@sha256:133c51d50defc253251150a89dfbe6d55b797a630ac44a644394d01fc80b6225"
   }
 
