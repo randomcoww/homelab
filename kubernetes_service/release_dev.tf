@@ -184,12 +184,13 @@ module "open-webui" {
     WEBUI_URL                   = "https://${local.endpoints.open_webui.ingress}"
     ENABLE_SIGNUP               = false
     ENABLE_LOGIN_FORM           = false
-    DEFAULT_MODELS              = "ggml-gpt-oss-20b-mxfp4"
     WEBUI_AUTH                  = false
     ENABLE_VERSION_UPDATE_CHECK = false
     ENABLE_OPENAI_API           = true
     OPENAI_API_BASE_URL         = "https://${local.endpoints.llama_cpp.ingress}/v1"
+    DEFAULT_MODELS              = "ggml-gpt-oss-20b-mxfp4"
     ENABLE_WEB_SEARCH           = false
+    ENABLE_CODE_INTERPRETER     = false
     ENABLE_FOLLOW_UP_GENERATION = true
     ENABLE_PERSISTENT_CONFIG    = true
     # https://github.com/varunvasudeva1/llm-server-docs?tab=readme-ov-file#mcp-proxy-server
