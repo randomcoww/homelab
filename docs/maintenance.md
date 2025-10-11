@@ -53,7 +53,7 @@ Run `live-image-build` workflow in the repo above. An updated image tag should b
 
 ---
 
-### Rollout host updates
+### Roll out host updates
 
 Trigger rolling reboot of hosts coordinated by `kured`. Nodes occasionally fail to network boot falling back to booting from backup USB disk. `kured` will also attempt to restart nodes in this state.
 
