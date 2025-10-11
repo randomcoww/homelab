@@ -23,7 +23,9 @@ module "litestream" {
   litestream_config = {
     dbs = [
       {
-        path = "${local.jfs_cache_path}/jfs.db"
+        path                = "${local.jfs_cache_path}/jfs.db"
+        monitor-interval    = "100ms"
+        checkpoint-interval = "6s"
         replicas = [
           {
             name              = "minio"
@@ -31,9 +33,9 @@ module "litestream" {
             endpoint          = var.minio_endpoint
             bucket            = var.minio_bucket
             path              = var.minio_litestream_prefix
-            sync-interval     = "100ms"
+            retention         = "6h"
             snapshot-interval = "1h"
-            retention         = "1h"
+            sync-interval     = "100ms"
           },
         ]
       },

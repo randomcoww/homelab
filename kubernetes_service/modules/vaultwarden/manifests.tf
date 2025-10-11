@@ -85,17 +85,17 @@ module "litestream" {
   litestream_config = {
     dbs = [
       {
-        path = local.extra_configs.DATABASE_URL
+        path                = local.extra_configs.DATABASE_URL
+        monitor-interval    = "100ms"
+        checkpoint-interval = "6s"
         replicas = [
           {
-            name              = "minio"
-            type              = "s3"
-            endpoint          = var.minio_endpoint
-            bucket            = var.minio_bucket
-            path              = var.minio_litestream_prefix
-            sync-interval     = "100ms"
-            snapshot-interval = "1h"
-            retention         = "1h"
+            name          = "minio"
+            type          = "s3"
+            endpoint      = var.minio_endpoint
+            bucket        = var.minio_bucket
+            path          = var.minio_litestream_prefix
+            sync-interval = "100ms"
           },
         ]
       },
