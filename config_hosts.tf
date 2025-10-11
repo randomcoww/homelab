@@ -1,7 +1,8 @@
 locals {
   base_hosts = {
     k-0 = {
-      netnum = 1
+      host_image = local.host_images.coreos
+      netnum     = 1
       physical_interfaces = {
         phy0 = {
           match_mac = "b0-41-6f-16-a2-dc"
@@ -82,14 +83,11 @@ locals {
           ]
         }
       }
-      network_boot = {
-        interface = "phy0"
-        image     = local.pxeboot_image_set.coreos
-      }
     }
 
     k-1 = {
-      netnum = 3
+      host_image = local.host_images.coreos
+      netnum     = 3
       physical_interfaces = {
         phy0 = {
           match_mac = "b0-41-6f-16-f9-88"
@@ -170,14 +168,11 @@ locals {
           ]
         }
       }
-      network_boot = {
-        interface = "phy0"
-        image     = local.pxeboot_image_set.coreos
-      }
     }
 
     k-2 = {
-      netnum = 5
+      host_image = local.host_images.coreos
+      netnum     = 5
       physical_interfaces = {
         phy0 = {
           match_mac = "b0-41-6f-16-9e-76"
@@ -231,14 +226,11 @@ locals {
           ]
         }
       }
-      network_boot = {
-        interface = "phy0"
-        image     = local.pxeboot_image_set.coreos
-      }
     }
 
     k-3 = {
-      netnum = 6
+      host_image = local.host_images.coreos
+      netnum     = 6
       physical_interfaces = {
         phy0 = {
           match_mac = "74-56-3c-c3-10-68"
@@ -301,10 +293,6 @@ locals {
           ]
         }
       }
-      network_boot = {
-        interface = "phy0"
-        image     = local.pxeboot_image_set.coreos
-      }
     }
   }
 
@@ -343,6 +331,10 @@ locals {
           vlan_id = local.networks[interface.network].vlan_id
         })
       }
+      match_macs = compact([
+        for _, interface in lookup(host, "physical_interfaces", {}) :
+        lookup(interface, "match_mac", "")
+      ])
       kubernetes_node_labels = merge(contains(local.base_members.kubernetes-master, host_key) ? {
         "node-role.kubernetes.io/control-plane" = true
       } : {}, lookup(host, "kubernetes_node_labels", {}))

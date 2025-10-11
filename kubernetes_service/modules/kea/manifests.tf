@@ -204,19 +204,18 @@ module "secret" {
           {
             library = "${local.kea_hooks_libraries_path}/libdhcp_subnet_cmds.so"
           },
-          # pass ipxe?mac={mac} host script endpoint directly from kea
-          # {
-          #   library = "${local.kea_hooks_libraries_path}/libdhcp_flex_option.so"
-          #   parameters = {
-          #     options = [
-          #       {
-          #         client-class = "iPXE-UEFI"
-          #         name         = "boot-file-name"
-          #         supersede    = "'${var.ipxe_script_url}?mac=' + hexstring(pkt4.mac, '-')"
-          #       },
-          #     ]
-          #   }
-          # },
+          {
+            library = "${local.kea_hooks_libraries_path}/libdhcp_flex_option.so"
+            parameters = {
+              options = [
+                {
+                  client-class = "iPXE-UEFI"
+                  name         = "boot-file-name"
+                  supersede    = "'${var.ipxe_script_base_url}' + hexstring(pkt4.mac, '-')"
+                },
+              ]
+            }
+          },
           ], length(var.service_ips) > 1 ? [
           {
             library = "${local.kea_hooks_libraries_path}/libdhcp_ha.so"
@@ -250,7 +249,7 @@ module "secret" {
             option-data = [
               {
                 name = "boot-file-name"
-                data = var.ipxe_script_url
+                data = var.ipxe_script_base_url # non working URL - assume supersede from libdhcp_flex_option.so
               },
             ]
           },

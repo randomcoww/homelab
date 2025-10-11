@@ -234,7 +234,7 @@ module "open-webui" {
   ingress_class_name        = local.kubernetes.ingress_classes.ingress_nginx
   nginx_ingress_annotations = local.nginx_ingress_annotations
 
-  minio_endpoint          = "https://${local.endpoints.minio.service}:${local.service_ports.minio}"
+  minio_endpoint          = "https://${local.services.cluster_minio.ip}:${local.service_ports.minio}"
   minio_bucket            = "open-webui"
   minio_litestream_prefix = "$POD_NAME/litestream"
   minio_access_secret     = local.minio_users.open_webui.secret

@@ -21,8 +21,8 @@ module "kea" {
     ipxe           = local.host_ports.ipxe
     ipxe_tftp      = local.host_ports.ipxe_tftp
   }
-  ipxe_boot_file_name = "ipxe.efi"
-  ipxe_script_url     = "https://${local.services.matchbox.ip}:${local.service_ports.matchbox}/boot.ipxe"
+  ipxe_boot_file_name  = "ipxe.efi"
+  ipxe_script_base_url = "https://${local.services.minio.ip}:${local.service_ports.minio}/boot/ipxe-"
   networks = [
     {
       prefix = local.networks.lan.prefix

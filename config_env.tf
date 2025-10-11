@@ -101,7 +101,7 @@ locals {
     accept = "0x00002000"
   }
 
-  container_image_regex = "(?<depName>(?<repository>[a-z0-9.-]+(?::\\d+|)(?:/[a-z0-9-]+|))/(?<image>[a-z0-9-]+)):(?<tag>(?<currentValue>(?<version>[\\w.]+)(?:-(?<compat>[\\w.-]+))?)(?:@(?<currentDigest>sha256:[a-f0-9]+))?)" # compatible with renovate
+  container_image_regex = "(?<depName>(?<repository>[a-z0-9.-]+(?::\\d+|)(?:/[a-z0-9-]+|)+)/(?<image>[a-z0-9-]+)):(?<tag>(?<currentValue>(?<version>[\\w.]+)(?:-(?<compat>[\\w.-]+))?)(?:@(?<currentDigest>sha256:[a-f0-9]+))?)" # compatible with renovate
 
   # these fields are updated by renovate - don't use var substitutions
   container_images = {
@@ -146,9 +146,16 @@ locals {
     open_webui            = "ghcr.io/open-webui/open-webui:0.6.33@sha256:133c51d50defc253251150a89dfbe6d55b797a630ac44a644394d01fc80b6225"
   }
 
-  # these fields are updated by renovate - don't use var substitutions
-  pxeboot_images = {
-    coreos = "fedora-coreos-42.20251007.21" # randomcoww/fedora-coreos-config
+  host_images = {
+    for name, tag in {
+      # these fields are updated by renovate - don't use var substitutions
+      coreos = "fedora-coreos-42.20251007.21" # randomcoww/fedora-coreos-config
+    } :
+    name => {
+      kernel = "${tag}-live-kernel.$${buildarch:uristring}"
+      initrd = "${tag}-live-initramfs.$${buildarch:uristring}.img"
+      rootfs = "${tag}-live-rootfs.$${buildarch:uristring}.img"
+    }
   }
 
   host_ports = {
@@ -333,13 +340,4 @@ locals {
     }, {})
     ]...
   )
-
-  pxeboot_image_set = {
-    for type, tag in local.pxeboot_images :
-    type => {
-      kernel = "${tag}-live-kernel.$${buildarch}"
-      initrd = "${tag}-live-initramfs.$${buildarch}.img"
-      rootfs = "${tag}-live-rootfs.$${buildarch}.img"
-    }
-  }
 }

@@ -8,7 +8,6 @@ locals {
     module.kube-vip,
     module.device-plugin,
     module.kea,
-    module.matchbox,
     module.tailscale,
     module.hostapd,
     module.qrcode-hostapd,

@@ -42,7 +42,7 @@ variable "ipxe_boot_file_name" {
   type = string
 }
 
-variable "ipxe_script_url" {
+variable "ipxe_script_base_url" {
   type = string
 }
 
