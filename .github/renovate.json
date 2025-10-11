@@ -13,7 +13,7 @@
         "/^config_env.tf$/"
       ],
       "matchStrings": [
-        "(?<depName>(?<repository>[a-z0-9.-]+(?::\\d+|)(?:/[a-z0-9-]+|))/(?<image>[a-z0-9-]+)):(?<tag>(?<currentValue>(?<version>[\\w.]+)(?:-(?<compat>[\\w.-]+))?)(?:@(?<currentDigest>sha256:[a-f0-9]+))?)"
+        "(?<depName>(?<repository>[a-z0-9.-]+(?::\\d+|)(?:/[a-z0-9-]+|)+)/(?<image>[a-z0-9-]+)):(?<tag>(?<currentValue>(?<version>[\\w.]+)(?:-(?<compat>[\\w.-]+))?)(?:@(?<currentDigest>sha256:[a-f0-9]+))?)"
       ],
       "autoReplaceStringTemplate": "{{{depName}}}:{{{newValue}}}@{{{newDigest}}}",
       "datasourceTemplate": "docker"
@@ -24,7 +24,7 @@
         "/^config_env.tf$/"
       ],
       "matchStrings": [
-        "pxeboot_images\\s*=\\s*{[^}]*\\s+\"[\\w-]+-(?<currentValue>[\\d.]+)\"\\s+#\\s+(?<depName>[\\w/-]+)"
+        "\"[a-z0-9.-]+-(?<currentValue>[\\d.]+)\"\\s*# renovate: (?<depName>[\\w/-]+)"
       ],
       "datasourceTemplate": "github-tags"
     }
