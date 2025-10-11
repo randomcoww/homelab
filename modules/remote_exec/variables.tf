@@ -7,6 +7,6 @@ variable "command" {
 }
 
 variable "triggers_replace" {
-  type    = list(any)
-  default = []
+  type    = map(string)
+  default = {}
 }

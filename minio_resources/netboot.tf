@@ -10,6 +10,35 @@ locals {
       boot_args = lookup(local.hosts[host_key[0]], "boot_args", [])
     })
   }
+
+  # use for change detection
+  ipxe_configs = {
+    for mac, boot in local.boot_config :
+    mac => <<-EOF
+    #!ipxe
+    kernel https://${local.minio_endpoint}/boot/${boot.kernel} ${join(" ", sort(concat([
+    "rd.neednet=1",
+    "ip=dhcp",
+    "ignition.firstboot",
+    "ignition.platform.id=metal",
+    "coreos.no_persist_ip",
+    "initrd=${boot.initrd}",
+    "ignition.config.url=https://${local.minio_endpoint}/boot/ignition-$${mac:hexhyp}",
+    "coreos.live.rootfs_url=https://${local.minio_endpoint}/boot/${boot.rootfs}",
+    "rd.driver.blacklist=nouveau",
+    "modprobe.blacklist=nouveau",
+    "selinux=0",
+], boot.boot_args)))}
+    initrd https://${local.minio_endpoint}/boot/${boot.initrd}
+    boot
+    EOF
+}
+
+# use for change detection
+ignition_configs = {
+  for mac, boot in local.boot_config :
+  mac => data.terraform_remote_state.ignition.outputs.ignition[boot.host_key]
+}
 }
 
 resource "minio_s3_object" "ipxe" {
@@ -18,28 +47,11 @@ resource "minio_s3_object" "ipxe" {
   bucket_name  = "boot"
   object_name  = "ipxe-${each.key}"
   content_type = "text/plain"
-  content = <<-EOF
-  #!ipxe
-  kernel https://${local.minio_endpoint}/boot/${each.value.kernel} ${join(" ", concat([
-  "rd.neednet=1",
-  "ip=dhcp",
-  "ignition.firstboot",
-  "ignition.platform.id=metal",
-  "coreos.no_persist_ip",
-  "initrd=${each.value.initrd}",
-  "ignition.config.url=https://${local.minio_endpoint}/boot/ignition-$${mac:hexhyp}",
-  "coreos.live.rootfs_url=https://${local.minio_endpoint}/boot/${each.value.rootfs}",
-  "rd.driver.blacklist=nouveau",
-  "modprobe.blacklist=nouveau",
-  "selinux=0",
-], each.value.boot_args))}
-  initrd https://${local.minio_endpoint}/boot/${each.value.initrd}
-  boot
-  EOF
+  content      = local.ipxe_configs[each.key]
 
-depends_on = [
-  minio_s3_bucket.bucket["boot"],
-]
+  depends_on = [
+    minio_s3_bucket.bucket["boot"],
+  ]
 }
 
 resource "minio_s3_object" "ignition" {
@@ -48,7 +60,7 @@ resource "minio_s3_object" "ignition" {
   bucket_name  = "boot"
   object_name  = "ignition-${each.key}"
   content_type = "application/json"
-  content      = data.terraform_remote_state.ignition.outputs.ignition[each.value.host_key]
+  content      = local.ignition_configs[each.key]
 
   depends_on = [
     minio_s3_bucket.bucket["boot"],

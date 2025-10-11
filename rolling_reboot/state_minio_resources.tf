@@ -1,0 +1,1 @@
+../state_minio_resources.tf

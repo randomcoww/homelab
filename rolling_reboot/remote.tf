@@ -6,5 +6,5 @@ module "write-sentinel-file" {
   command = [
     "sudo touch /var/run/reboot-required",
   ]
-  # triggers_replace = 
+  triggers_replace = data.terraform_remote_state.minio.outputs.trigger[each.key]
 }
