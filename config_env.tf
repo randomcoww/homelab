@@ -176,11 +176,10 @@ locals {
   }
 
   service_ports = {
-    minio               = 9000
-    metrics             = 9153
-    prometheus_blackbox = 9115
-    registry            = 443  # not configurable
-    reloader            = 9090 # not configurable
+    minio    = 9000
+    metrics  = 9153
+    registry = 443  # not configurable
+    reloader = 9090 # not configurable
   }
 
   ha = {
@@ -259,10 +258,6 @@ locals {
         name      = "prometheus"
         namespace = "monitoring"
         ingress   = "m"
-      }
-      prometheus_blackbox = {
-        name      = "prometheus-blackbox"
-        namespace = "monitoring"
       }
       searxng = {
         name    = "searxng"
