@@ -17,7 +17,8 @@ variable "affinity" {
 
 variable "images" {
   type = object({
-    registry = string
+    registry    = string
+    registry_ui = string
   })
 }
 
@@ -36,19 +37,15 @@ variable "service_ip" {
   type = string
 }
 
+variable "service_hostname" {
+  type = string
+}
+
 variable "loadbalancer_class_name" {
   type = string
 }
 
 variable "ca_issuer_name" {
-  type = string
-}
-
-variable "event_listener_token" {
-  type = string
-}
-
-variable "event_listener_url" {
   type = string
 }
 
@@ -76,6 +73,14 @@ variable "minio_bucket_prefix" {
 
 variable "minio_access_secret" {
   type = string
+}
+
+variable "ingress_class_name" {
+  type = string
+}
+
+variable "nginx_ingress_annotations" {
+  type = map(string)
 }
 
 variable "ca_bundle_configmap" {

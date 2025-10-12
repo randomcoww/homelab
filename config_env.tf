@@ -264,10 +264,7 @@ locals {
         ingress = "search"
       }
       registry = {
-        name = "registry"
-      }
-      registry_ui = {
-        name    = "registry-ui"
+        name    = "registry"
         ingress = "reg"
       }
       qrcode_hostapd = {

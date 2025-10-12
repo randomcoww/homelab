@@ -14,7 +14,7 @@ locals {
     module.webdav-pictures,
     module.audioserve,
     module.registry,
-    module.registry-ui,
+    # module.registry-ui,
     module.searxng,
     module.mcp-proxy,
     module.open-webui,
