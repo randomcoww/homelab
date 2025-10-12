@@ -72,7 +72,7 @@ module "metadata" {
         concurrencyPolicy = "Forbid"
         jobTemplate = {
           spec = {
-            ttlSecondsAfterFinished = 300
+            ttlSecondsAfterFinished = 1800
             template = {
               metadata = {
                 labels = {
@@ -113,7 +113,8 @@ module "metadata" {
                     volumeMounts = [
                       {
                         name      = "config"
-                        mountPath = local.config_path
+                        mountPath = "${local.config_path}/config.yaml"
+                        subPath   = "registry-config"
                       },
                       {
                         name      = "ca-trust-bundle"
@@ -127,20 +128,8 @@ module "metadata" {
                 volumes = [
                   {
                     name = "config"
-                    projected = {
-                      sources = [
-                        {
-                          secret = {
-                            name = module.secret.name
-                            items = [
-                              {
-                                key  = "config.yaml"
-                                path = "config.yaml"
-                              },
-                            ]
-                          }
-                        },
-                      ]
+                    secret = {
+                      secretName = module.secret.name
                     }
                   },
                   {
