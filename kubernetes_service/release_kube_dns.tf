@@ -133,6 +133,7 @@ resource "helm_release" "kube-dns" {
             {
               name = "ready"
             },
+            # internal service
             {
               name        = "kubernetes"
               parameters  = "${local.domains.kubernetes} in-addr.arpa ip6.arpa"
@@ -141,14 +142,16 @@ resource "helm_release" "kube-dns" {
               fallthrough
               EOF
             },
+            # ingress
             {
               name        = "etcd"
-              parameters  = local.domains.public
+              parameters  = "${local.domains.public} ${local.domains.kubernetes}"
               configBlock = <<-EOF
               endpoint http://localhost:2379
               fallthrough
               EOF
             },
+            # external service
             {
               name        = "k8s_external"
               parameters  = local.domains.public
