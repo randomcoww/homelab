@@ -3,6 +3,7 @@ locals {
   extra_configs = merge(var.extra_configs, {
     PORT                       = 8080
     REQUESTS_CA_BUNDLE         = "/etc/ssl/certs/ca-certificates.crt"
+    SSL_CERT_FILE              = "/etc/ssl/certs/ca-certificates.crt" # needed for tools server TLS
     DATABASE_URL               = "sqlite:///${local.db_path}"
     DATABASE_ENABLE_SQLITE_WAL = true
     STORAGE_PROVIDER           = "s3"
@@ -52,12 +53,6 @@ module "service" {
         targetPort = local.extra_configs.PORT
       },
     ]
-    sessionAffinity = "ClientIP"
-    sessionAffinityConfig = {
-      clientIP = {
-        timeoutSeconds = 10800
-      }
-    }
   }
 }
 
@@ -233,13 +228,5 @@ module "litestream" {
         }
       },
     ]
-    dnsConfig = {
-      options = [
-        {
-          name  = "ndots"
-          value = "1"
-        },
-      ]
-    }
   }
 }

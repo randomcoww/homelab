@@ -217,10 +217,6 @@ locals {
     }
     ca_bundle_configmap = "ca-trust-bundle.crt"
 
-    ingress_classes = {
-      ingress_nginx          = "ingress-nginx"
-      ingress_nginx_external = "ingress-nginx-external"
-    }
     feature_gates = {
       ClusterTrustBundle           = true
       ClusterTrustBundleProjection = true
@@ -228,13 +224,15 @@ locals {
   }
 
   endpoints = {
-    for name, e in merge({
-      for k, class in local.kubernetes.ingress_classes :
-      k => {
-        name      = "${class}-controller"
+    for name, e in {
+      ingress_nginx = {
+        name      = "ingress-nginx"
         namespace = "ingress-nginx"
       }
-      }, {
+      ingress_nginx_internal = {
+        name      = "ingress-nginx-internal"
+        namespace = "ingress-nginx"
+      }
       apiserver = {
         name = "kubernetes"
       }
@@ -257,48 +255,48 @@ locals {
       prometheus = {
         name      = "prometheus"
         namespace = "monitoring"
-        ingress   = "m"
+        ingress   = "prometheus.${local.domains.kubernetes}"
       }
       searxng = {
         name    = "searxng"
-        ingress = "search"
+        ingress = "search.${local.domains.kubernetes}"
       }
       registry = {
         name    = "registry"
-        ingress = "reg"
+        ingress = "reg.${local.domains.public}"
       }
       qrcode_hostapd = {
         name    = "qrcode-hostapd"
-        ingress = "hostapd"
+        ingress = "hostapd.${local.domains.public}"
       }
       webdav_pictures = {
         name    = "webdav-pictures"
-        ingress = "pictures"
+        ingress = "pictures.${local.domains.public}"
       }
       audioserve = {
         name = "audioserve"
       }
       llama_cpp = {
         name    = "llama-cpp"
-        ingress = "llama"
+        ingress = "llama.${local.domains.kubernetes}"
       }
       sunshine_desktop = {
         name    = "sunshine-desktop"
-        ingress = "sunadmin"
+        ingress = "sunadmin.${local.domains.public}"
       }
       mcp_proxy = {
         name    = "mcp-proxy"
-        ingress = "mcp"
+        ingress = "mcp.${local.domains.kubernetes}"
       }
       open_webui = {
         name    = "open-webui"
-        ingress = "chat"
+        ingress = "chat.${local.domains.public}"
       }
-    }) :
+    } :
     name => merge(e, {
       namespace = lookup(e, "namespace", "default")
       service   = "${e.name}.${lookup(e, "namespace", "default")}"
-      ingress   = "${lookup(e, "ingress", e.name)}.${local.domains.public}"
+      ingress   = "${lookup(e, "ingress", "${e.name}.${local.domains.public}")}"
     })
   }
 

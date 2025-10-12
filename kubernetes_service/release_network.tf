@@ -141,10 +141,12 @@ module "qrcode-hostapd" {
   images = {
     qrcode = local.container_images.qrcode_generator
   }
-  service_hostname          = local.endpoints.qrcode_hostapd.ingress
-  ingress_class_name        = local.kubernetes.ingress_classes.ingress_nginx
-  nginx_ingress_annotations = local.nginx_ingress_annotations
-  qrcode_value              = "WIFI:S:${random_password.hostapd-ssid.result};T:WPA;P:${random_password.hostapd-password.result};H:true;;"
+  service_hostname   = local.endpoints.qrcode_hostapd.ingress
+  ingress_class_name = "ingress-nginx"
+  nginx_ingress_annotations = merge(local.nginx_ingress_annotations_common, {
+    "cert-manager.io/cluster-issuer" = local.kubernetes.cert_issuers.acme_prod
+  })
+  qrcode_value = "WIFI:S:${random_password.hostapd-ssid.result};T:WPA;P:${random_password.hostapd-password.result};H:true;;"
 }
 
 # Tailscale remote access
@@ -206,7 +208,7 @@ resource "helm_release" "cloudflare-tunnel" {
         ingress = [
           {
             hostname = "*.${local.domains.public}"
-            service  = "https://${local.endpoints.ingress_nginx_external.service}"
+            service  = "https://${local.endpoints.ingress_nginx.service}"
           },
         ]
       }

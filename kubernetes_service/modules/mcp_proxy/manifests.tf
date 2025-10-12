@@ -94,6 +94,16 @@ module "deployment" {
             containerPort = local.mcp_proxy_port
           },
         ]
+        env = [
+          {
+            name  = "SSL_CERT_FILE"
+            value = "/etc/ssl/certs/ca-certificates.crt"
+          },
+          {
+            name  = "NODE_EXTRA_CA_CERTS" # allow npx to use internal CA
+            value = "/etc/ssl/certs/ca-certificates.crt"
+          },
+        ]
         volumeMounts = [
           {
             name      = "config"

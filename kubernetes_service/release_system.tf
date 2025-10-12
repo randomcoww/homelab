@@ -121,12 +121,10 @@ module "kube-vip" {
 # Ingress
 
 resource "helm_release" "ingress-nginx" {
-  for_each = local.kubernetes.ingress_classes
-
-  name             = each.value
+  name             = local.endpoints.ingress_nginx.name
   repository       = "https://kubernetes.github.io/ingress-nginx"
   chart            = "ingress-nginx"
-  namespace        = local.endpoints[each.key].namespace
+  namespace        = local.endpoints.ingress_nginx.namespace
   create_namespace = true
   wait             = false
   wait_for_jobs    = false
@@ -150,14 +148,79 @@ resource "helm_release" "ingress-nginx" {
         }
         ingressClassResource = {
           enabled         = true
-          name            = each.value
-          controllerValue = "k8s.io/${each.value}"
+          name            = "ingress-nginx"
+          controllerValue = "k8s.io/ingress-nginx"
         }
-        ingressClass = each.value
+        ingressClass = "ingress-nginx"
         service = {
-          type              = "LoadBalancer"
-          loadBalancerIP    = "0.0.0.0"
-          loadBalancerClass = "kube-vip.io/kube-vip-class"
+          type                  = "LoadBalancer"
+          loadBalancerIP        = "0.0.0.0"
+          loadBalancerClass     = "kube-vip.io/kube-vip-class"
+          externalTrafficPolicy = "Local"
+          sessionAffinity       = "ClientIP"
+        }
+        allowSnippetAnnotations = true
+        config = {
+          # 4.12.0 annotations issue:
+          # https://github.com/kubernetes/ingress-nginx/issues/12618
+          annotations-risk-level  = "Critical"
+          ignore-invalid-headers  = "off"
+          proxy-body-size         = 0
+          proxy-buffering         = "off"
+          proxy-request-buffering = "off"
+          ssl-redirect            = "true"
+          use-forwarded-headers   = "true"
+          keep-alive              = "false"
+        }
+        controller = {
+          dnsConfig = {
+            options = [
+              {
+                name  = "ndots"
+                value = "2"
+              },
+            ]
+          }
+        }
+      }
+    }),
+  ]
+}
+
+resource "helm_release" "ingress-nginx-internal" {
+  name             = local.endpoints.ingress_nginx_internal.name
+  repository       = "https://kubernetes.github.io/ingress-nginx"
+  chart            = "ingress-nginx"
+  namespace        = local.endpoints.ingress_nginx_internal.namespace
+  create_namespace = true
+  wait             = false
+  wait_for_jobs    = false
+  version          = "4.13.3"
+  max_history      = 2
+  timeout          = local.kubernetes.helm_release_timeout
+  values = [
+    yamlencode({
+      controller = {
+        kind = "DaemonSet"
+        image = {
+          digest       = ""
+          digestChroot = ""
+        }
+        admissionWebhooks = {
+          patch = {
+            image = {
+              digest = ""
+            }
+          }
+        }
+        ingressClassResource = {
+          enabled         = true
+          name            = "ingress-nginx-internal"
+          controllerValue = "k8s.io/ingress-nginx-internal"
+        }
+        ingressClass = "ingress-nginx-internal"
+        service = {
+          type = "ClusterIP"
         }
         allowSnippetAnnotations = true
         config = {

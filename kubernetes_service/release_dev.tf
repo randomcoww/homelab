@@ -34,7 +34,7 @@ locals {
         "mcp-searxng",
       ]
       env = {
-        SEARXNG_URL = "https://${local.endpoints.searxng.ingress}/search?q=<query>"
+        SEARXNG_URL = "https://${local.endpoints.searxng.ingress}"
       }
     }
   }
@@ -104,9 +104,11 @@ module "llama-cpp" {
   minio_mount_extra_args = [
     "--read-only",
   ]
-  ingress_class_name        = local.kubernetes.ingress_classes.ingress_nginx
-  nginx_ingress_annotations = local.nginx_ingress_annotations
-  ca_bundle_configmap       = local.kubernetes.ca_bundle_configmap
+  ingress_class_name = "ingress-nginx-internal"
+  nginx_ingress_annotations = merge(local.nginx_ingress_annotations_common, {
+    "cert-manager.io/cluster-issuer" = local.kubernetes.cert_issuers.ca_internal
+  })
+  ca_bundle_configmap = local.kubernetes.ca_bundle_configmap
 }
 
 # SearXNG
@@ -142,9 +144,11 @@ module "searxng" {
       ]
     }
   }
-  service_hostname          = local.endpoints.searxng.ingress
-  ingress_class_name        = local.kubernetes.ingress_classes.ingress_nginx
-  nginx_ingress_annotations = local.nginx_ingress_annotations
+  service_hostname   = local.endpoints.searxng.ingress
+  ingress_class_name = "ingress-nginx-internal"
+  nginx_ingress_annotations = merge(local.nginx_ingress_annotations_common, {
+    "cert-manager.io/cluster-issuer" = local.kubernetes.cert_issuers.ca_internal
+  })
 }
 
 # MCP
@@ -169,10 +173,12 @@ module "mcp-proxy" {
     },
     mcpServers = local.mcp_proxies
   }
-  service_hostname          = local.endpoints.mcp_proxy.ingress
-  ingress_class_name        = local.kubernetes.ingress_classes.ingress_nginx
-  nginx_ingress_annotations = local.nginx_ingress_annotations
-  ca_bundle_configmap       = local.kubernetes.ca_bundle_configmap
+  service_hostname   = local.endpoints.mcp_proxy.ingress
+  ingress_class_name = "ingress-nginx-internal"
+  nginx_ingress_annotations = merge(local.nginx_ingress_annotations_common, {
+    "cert-manager.io/cluster-issuer" = local.kubernetes.cert_issuers.ca_internal
+  })
+  ca_bundle_configmap = local.kubernetes.ca_bundle_configmap
 }
 
 # Open WebUI
@@ -231,8 +237,10 @@ module "open-webui" {
       }
     ])
   }
-  ingress_class_name        = local.kubernetes.ingress_classes.ingress_nginx
-  nginx_ingress_annotations = local.nginx_ingress_annotations
+  ingress_class_name = "ingress-nginx"
+  nginx_ingress_annotations = merge(local.nginx_ingress_annotations_common, {
+    "cert-manager.io/cluster-issuer" = local.kubernetes.cert_issuers.acme_prod
+  })
 
   minio_endpoint          = "https://${local.services.cluster_minio.ip}:${local.service_ports.minio}"
   minio_bucket            = "open-webui"
@@ -261,11 +269,13 @@ module "registry" {
   service_hostname        = local.endpoints.registry.ingress
   loadbalancer_class_name = "kube-vip.io/kube-vip-class"
 
-  minio_endpoint            = "https://${local.services.cluster_minio.ip}:${local.service_ports.minio}"
-  minio_bucket              = "registry"
-  minio_bucket_prefix       = "/"
-  minio_access_secret       = local.minio_users.registry.secret
-  ingress_class_name        = local.kubernetes.ingress_classes.ingress_nginx
-  nginx_ingress_annotations = local.nginx_ingress_annotations
-  ca_bundle_configmap       = local.kubernetes.ca_bundle_configmap
+  minio_endpoint      = "https://${local.services.cluster_minio.ip}:${local.service_ports.minio}"
+  minio_bucket        = "registry"
+  minio_bucket_prefix = "/"
+  minio_access_secret = local.minio_users.registry.secret
+  ingress_class_name  = "ingress-nginx"
+  nginx_ingress_annotations = merge(local.nginx_ingress_annotations_common, {
+    "cert-manager.io/cluster-issuer" = local.kubernetes.cert_issuers.acme_prod
+  })
+  ca_bundle_configmap = local.kubernetes.ca_bundle_configmap
 }

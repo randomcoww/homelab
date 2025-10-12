@@ -1,6 +1,5 @@
 locals {
-  nginx_ingress_annotations = {
-    "cert-manager.io/cluster-issuer"                = local.kubernetes.cert_issuers.acme_prod
+  nginx_ingress_annotations_common = {
     "nginx.ingress.kubernetes.io/http-snippet"      = <<-EOF
     map $http_upgrade $connection_upgrade {
       default upgrade;
@@ -25,12 +24,5 @@ locals {
     chunked_transfer_encoding off;
     EOF
     "nginx.ingress.kubernetes.io/affinity"          = "cookie"
-  }
-
-  ingress_tls_common = {
-    secretName = "${local.domains.public}-tls"
-    hosts = [
-      "*.${local.domains.public}",
-    ]
   }
 }

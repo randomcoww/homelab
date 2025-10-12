@@ -36,14 +36,11 @@ output "manifest" {
         }
       ]
       tls = [
-        for wildcard_domain in distinct([
-          for rule in var.rules :
-          join(".", slice(compact(split(".", rule.host)), 1, length(compact(split(".", rule.host)))))
-        ]) :
+        for rule in distinct(var.rules) :
         {
-          secretName = "${wildcard_domain}-tls"
+          secretName = "${rule.host}-tls"
           hosts = [
-            "*.${wildcard_domain}",
+            rule.host,
           ]
         }
       ]

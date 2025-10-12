@@ -67,13 +67,20 @@ resource "helm_release" "prometheus" {
         }
         ingress = {
           enabled          = true
-          ingressClassName = local.kubernetes.ingress_classes.ingress_nginx
-          annotations      = local.nginx_ingress_annotations
+          ingressClassName = "ingress-nginx-internal"
+          annotations = merge(local.nginx_ingress_annotations_common, {
+            "cert-manager.io/cluster-issuer" = local.kubernetes.cert_issuers.ca_internal
+          })
           hosts = [
             local.endpoints.prometheus.ingress,
           ]
           tls = [
-            local.ingress_tls_common,
+            {
+              secretName = "${local.endpoints.prometheus.ingress}-tls"
+              hosts = [
+                local.endpoints.prometheus.ingress,
+              ]
+            },
           ]
         }
         extraVolumeMounts = [
@@ -320,6 +327,22 @@ resource "helm_release" "kured" {
       service = {
         create = false
       }
+      volumeMounts = [
+        {
+          name      = "ca-trust-bundle"
+          mountPath = "/etc/ssl/certs/ca-certificates.crt"
+          subPath   = "ca.crt"
+          readOnly  = true
+        },
+      ]
+      volumes = [
+        {
+          name = "ca-trust-bundle"
+          configMap = {
+            name = local.kubernetes.ca_bundle_configmap
+          }
+        },
+      ]
     })
   ]
 }

@@ -40,9 +40,11 @@ module "audioserve" {
       }
     }
   }
-  service_hostname          = local.endpoints.audioserve.ingress
-  ingress_class_name        = local.kubernetes.ingress_classes.ingress_nginx
-  nginx_ingress_annotations = local.nginx_ingress_annotations
+  service_hostname   = local.endpoints.audioserve.ingress
+  ingress_class_name = "ingress-nginx"
+  nginx_ingress_annotations = merge(local.nginx_ingress_annotations_common, {
+    "cert-manager.io/cluster-issuer" = local.kubernetes.cert_issuers.acme_prod
+  })
 
   minio_endpoint      = "https://${local.services.cluster_minio.ip}:${local.service_ports.minio}"
   minio_bucket        = "music"
@@ -64,9 +66,11 @@ module "webdav-pictures" {
   images = {
     rclone = local.container_images.rclone
   }
-  service_hostname          = local.endpoints.webdav_pictures.ingress
-  ingress_class_name        = local.kubernetes.ingress_classes.ingress_nginx
-  nginx_ingress_annotations = local.nginx_ingress_annotations
+  service_hostname   = local.endpoints.webdav_pictures.ingress
+  ingress_class_name = "ingress-nginx"
+  nginx_ingress_annotations = merge(local.nginx_ingress_annotations_common, {
+    "cert-manager.io/cluster-issuer" = local.kubernetes.cert_issuers.acme_prod
+  })
 
   minio_endpoint      = "https://${local.services.cluster_minio.ip}:${local.service_ports.minio}"
   minio_bucket        = "pictures"
@@ -135,8 +139,10 @@ module "sunshine-desktop" {
   security_context = {
     privileged = true
   }
-  loadbalancer_class_name   = "kube-vip.io/kube-vip-class"
-  admin_hostname            = local.endpoints.sunshine_desktop.ingress
-  ingress_class_name        = local.kubernetes.ingress_classes.ingress_nginx
-  nginx_ingress_annotations = local.nginx_ingress_annotations
+  loadbalancer_class_name = "kube-vip.io/kube-vip-class"
+  admin_hostname          = local.endpoints.sunshine_desktop.ingress
+  ingress_class_name      = "ingress-nginx"
+  nginx_ingress_annotations = merge(local.nginx_ingress_annotations_common, {
+    "cert-manager.io/cluster-issuer" = local.kubernetes.cert_issuers.acme_prod
+  })
 }
