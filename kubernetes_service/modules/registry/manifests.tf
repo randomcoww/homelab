@@ -308,18 +308,18 @@ module "deployment" {
   affinity = var.affinity
   replicas = var.replicas
   template_spec = {
+    hostAliases = [
+      {
+        ip = "127.0.0.1"
+        hostnames = [
+          "${var.name}.${var.namespace}",
+        ]
+      },
+    ]
     containers = [
       {
         name  = var.name
         image = var.images.registry
-        hostAliases = [
-          {
-            ip = "127.0.0.1"
-            hostnames = [
-              "${var.name}.${var.namespace}",
-            ]
-          },
-        ]
         args = [
           "serve",
           "${local.config_path}/config.yaml",
