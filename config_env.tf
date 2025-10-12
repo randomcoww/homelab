@@ -126,7 +126,7 @@ locals {
     hostapd               = "registry.default/randomcoww/hostapd-noscan:v2.11.20251006.2201@sha256:a1a17ca7d5a862322f240655349c9590500e5436ce99989914300aeeadf91a9a"
     tailscale             = "registry.default/randomcoww/tailscale-nft:v1.88.3.20251006.1629@sha256:8fbb7d5ad76288c044b4953699329d4eca1446a4df34b05e1f49dfc2508f6e79"
     qrcode_generator      = "registry.default/randomcoww/qrcode-resource:v1.20250926.2053@sha256:9c63bb0f788a0c1ff855fa6cc9cd961faf7ddd982a541eeb32f8bbb58701ed71"
-    device_plugin         = "ghcr.io/squat/generic-device-plugin:latest@sha256:7b67623b583cd77951f5c52085e25fd988a0d2d9b29ed18dfc942be0621c41cf"
+    device_plugin         = "ghcr.io/squat/generic-device-plugin:latest@sha256:08ce98c7afed6843fc1e6082b1c414a00981bc8b90f3261c31b8efef8eca7c0e"
     rclone                = "ghcr.io/rclone/rclone:1.71.1@sha256:d5971950c2b370fb04dd3292541b5bda6d9103143fd7e345aeb435a399388afc"
     audioserve            = "docker.io/izderadicka/audioserve:latest@sha256:c3609321701765671cae121fc0f61db122e8c124643c04770fbc9326c74b18e3"
     llama_cpp             = "ghcr.io/mostlygeek/llama-swap:cuda@sha256:dc8c9ed293d5ce5eae74cd018812b974315a9d3b5d132c17a3271bc55243bb4b"
@@ -139,7 +139,7 @@ locals {
     registry              = "ghcr.io/distribution/distribution:3.0.0@sha256:4ba3adf47f5c866e9a29288c758c5328ef03396cb8f5f6454463655fa8bc83e2"
     registry_ui           = "docker.io/quiq/registry-ui:0.10.4@sha256:88e90f14a2654b48a6ca8112b3bd000d3e2472a8cbf560d73af679f5558273f2"
     mcp_proxy             = "ghcr.io/tbxark/mcp-proxy:v0.39.1@sha256:8e7a15c1375744ab9f5c42ebbee5aa694685af9ec43fe6da2ddf76ef96d765a5"
-    searxng               = "ghcr.io/searxng/searxng:latest@sha256:67ba98e59f96906bf806a83ccdb467bc9fd86c7e35f59faabdf8df9afdb2add1"
+    searxng               = "ghcr.io/searxng/searxng:latest@sha256:7a13ee96e98ef78aaf89acd86dfea668cbf3942dc886511a4d4007833da435e9"
     open_webui            = "ghcr.io/open-webui/open-webui:0.6.33@sha256:133c51d50defc253251150a89dfbe6d55b797a630ac44a644394d01fc80b6225"
   }
 
