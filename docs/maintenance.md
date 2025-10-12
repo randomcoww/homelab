@@ -27,6 +27,14 @@ terraform -chdir=ignition apply
 
 ---
 
+### Build OS images
+
+See [fedora-coreos-config](https://github.com/randomcoww/fedora-coreos-config)
+
+Run `live-image-build` workflow in the repo above. An updated image tag should be merged into this project once finished and the new tag is picked up by a Renovate run.
+
+---
+
 ### Deploy services to Kubernetes
 
 Deploy Kubernetes services. Some services rely on MinIO and will crash loop until MinIO resources are created (below).
@@ -42,14 +50,6 @@ Create MinIO resources and secrets containing access credentials in Kubernetes. 
 terraform -chdir=minio_resources init -upgrade && \
 terraform -chdir=minio_resources apply
 ```
-
----
-
-### Build OS images
-
-See [fedora-coreos-config](https://github.com/randomcoww/fedora-coreos-config)
-
-Run `live-image-build` workflow in the repo above. An updated image tag should be merged into this project once finished and the new tag is picked up by a Renovate run.
 
 ---
 
