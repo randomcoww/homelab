@@ -47,7 +47,7 @@ module "metadata" {
         ]
         dnsNames = [
           var.name,
-          "${var.name}.${var.namespace}",
+          var.service_hostname,
         ]
         issuerRef = {
           name = var.ca_issuer_name
@@ -174,7 +174,6 @@ module "secret" {
             "${local.config_path}/tls/ca-cert.pem",
           ]
           clientauth = "verify-client-cert-if-given"
-          minimumtls = "tls1.3"
         }
       }
       log = {
@@ -192,7 +191,7 @@ module "secret" {
           secure                      = true
           chunksize                   = 50 * 1024 * 1024
           multipartcopymaxconcurrency = 10
-          rootdirectory               = "/${join("/", compact(split("/", "${var.minio_bucket_prefix}/${var.name}.${var.namespace}")))}"
+          rootdirectory               = "/${join("/", compact(split("/", "${var.minio_bucket_prefix}/${var.service_hostname}")))}"
         }
       }
       health = {
@@ -233,7 +232,7 @@ module "secret" {
         tags_count_refresh_interval = 60
       }
       registry = {
-        hostname = "${var.name}.${var.namespace}:${var.ports.registry}"
+        hostname = var.service_hostname
         insecure = false
         username = "none"
         password = "none"
@@ -258,6 +257,9 @@ module "service" {
   name    = var.name
   app     = var.name
   release = var.release
+  annotations = {
+    "external-dns.alpha.kubernetes.io/hostname" = var.service_hostname
+  }
   spec = {
     type              = "LoadBalancer"
     loadBalancerIP    = var.service_ip
@@ -288,7 +290,7 @@ module "ingress" {
   annotations        = var.nginx_ingress_annotations
   rules = [
     {
-      host = var.service_hostname
+      host = var.ui_hostname
       paths = [
         {
           service = module.service.name
@@ -312,7 +314,7 @@ module "deployment" {
       {
         ip = "127.0.0.1"
         hostnames = [
-          "${var.name}.${var.namespace}",
+          var.service_hostname,
         ]
       },
     ]

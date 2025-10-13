@@ -33,14 +33,6 @@ variable "replicas" {
   default = 1
 }
 
-variable "service_ip" {
-  type = string
-}
-
-variable "service_hostname" {
-  type = string
-}
-
 variable "loadbalancer_class_name" {
   type = string
 }
@@ -72,6 +64,18 @@ variable "minio_bucket_prefix" {
 }
 
 variable "minio_access_secret" {
+  type = string
+}
+
+variable "service_ip" {
+  type = string
+}
+
+variable "service_hostname" {
+  type = string
+}
+
+variable "ui_hostname" {
   type = string
 }
 

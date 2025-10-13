@@ -265,15 +265,18 @@ module "registry" {
     registry = local.service_ports.registry
   }
   ca_issuer_name          = local.kubernetes.cert_issuers.ca_internal
-  service_ip              = local.services.registry.ip
-  service_hostname        = local.endpoints.registry.ingress
   loadbalancer_class_name = "kube-vip.io/kube-vip-class"
 
   minio_endpoint      = "https://${local.services.cluster_minio.ip}:${local.service_ports.minio}"
   minio_bucket        = "registry"
   minio_bucket_prefix = "/"
   minio_access_secret = local.minio_users.registry.secret
-  ingress_class_name  = "ingress-nginx"
+
+  service_ip       = local.services.registry.ip
+  service_hostname = local.endpoints.registry.service
+  ui_hostname      = local.endpoints.registry.ingress
+
+  ingress_class_name = "ingress-nginx"
   nginx_ingress_annotations = merge(local.nginx_ingress_annotations_common, {
     "cert-manager.io/cluster-issuer" = local.kubernetes.cert_issuers.acme_prod
   })
