@@ -30,12 +30,6 @@ module "service" {
         targetPort = local.rclone_port
       },
     ]
-    sessionAffinity = "ClientIP"
-    sessionAffinityConfig = {
-      clientIP = {
-        timeoutSeconds = 10800
-      }
-    }
   }
 }
 

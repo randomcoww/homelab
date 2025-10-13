@@ -42,12 +42,6 @@ module "service" {
         targetPort = local.audioserve_port
       },
     ]
-    sessionAffinity = "ClientIP"
-    sessionAffinityConfig = {
-      clientIP = {
-        timeoutSeconds = 10800
-      }
-    }
   }
 }
 

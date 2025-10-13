@@ -60,12 +60,6 @@ module "service" {
         targetPort = local.extra_configs.SEARXNG_PORT
       },
     ]
-    sessionAffinity = "ClientIP"
-    sessionAffinityConfig = {
-      clientIP = {
-        timeoutSeconds = 10800
-      }
-    }
   }
 }
 

@@ -5,7 +5,7 @@ module "audioserve" {
   namespace = local.endpoints.audioserve.namespace
   source    = "./modules/audioserve"
   release   = "0.1.0"
-  replicas  = 2
+  replicas  = 1
   images = {
     audioserve = local.container_images.audioserve
     mountpoint = local.container_images.mountpoint
