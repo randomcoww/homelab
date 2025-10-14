@@ -13,8 +13,6 @@ locals {
     }
     models = {
     }
-    ebooks = {
-    }
   }
 
   minio_users = {
