@@ -104,7 +104,7 @@ module "llama-cpp" {
   minio_mount_extra_args = [
     "--read-only",
   ]
-  ingress_class_name = "ingress-nginx-internal"
+  ingress_class_name = local.endpoints.ingress_nginx_internal.name
   nginx_ingress_annotations = merge(local.nginx_ingress_annotations_common, {
     "cert-manager.io/cluster-issuer" = local.kubernetes.cert_issuers.ca_internal
   })
@@ -145,7 +145,7 @@ module "searxng" {
     }
   }
   service_hostname   = local.endpoints.searxng.ingress
-  ingress_class_name = "ingress-nginx-internal"
+  ingress_class_name = local.endpoints.ingress_nginx_internal.name
   nginx_ingress_annotations = merge(local.nginx_ingress_annotations_common, {
     "cert-manager.io/cluster-issuer" = local.kubernetes.cert_issuers.ca_internal
   })
@@ -174,7 +174,7 @@ module "mcp-proxy" {
     mcpServers = local.mcp_proxies
   }
   service_hostname   = local.endpoints.mcp_proxy.ingress
-  ingress_class_name = "ingress-nginx-internal"
+  ingress_class_name = local.endpoints.ingress_nginx_internal.name
   nginx_ingress_annotations = merge(local.nginx_ingress_annotations_common, {
     "cert-manager.io/cluster-issuer" = local.kubernetes.cert_issuers.ca_internal
   })
@@ -237,7 +237,7 @@ module "open-webui" {
       }
     ])
   }
-  ingress_class_name = "ingress-nginx"
+  ingress_class_name = local.endpoints.ingress_nginx.name
   nginx_ingress_annotations = merge(local.nginx_ingress_annotations_common, {
     "cert-manager.io/cluster-issuer" = local.kubernetes.cert_issuers.acme_prod
   })
@@ -276,7 +276,7 @@ module "registry" {
   service_hostname = local.endpoints.registry.service
   ui_hostname      = local.endpoints.registry.ingress
 
-  ingress_class_name = "ingress-nginx"
+  ingress_class_name = local.endpoints.ingress_nginx.name
   nginx_ingress_annotations = merge(local.nginx_ingress_annotations_common, {
     "cert-manager.io/cluster-issuer" = local.kubernetes.cert_issuers.acme_prod
   })

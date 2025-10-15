@@ -67,7 +67,7 @@ resource "helm_release" "prometheus" {
         }
         ingress = {
           enabled          = true
-          ingressClassName = "ingress-nginx-internal"
+          ingressClassName = local.endpoints.ingress_nginx_internal.name
           annotations = merge(local.nginx_ingress_annotations_common, {
             "cert-manager.io/cluster-issuer" = local.kubernetes.cert_issuers.ca_internal
           })

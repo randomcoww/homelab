@@ -41,7 +41,7 @@ module "audioserve" {
     }
   }
   service_hostname   = local.endpoints.audioserve.ingress
-  ingress_class_name = "ingress-nginx"
+  ingress_class_name = local.endpoints.ingress_nginx.name
   nginx_ingress_annotations = merge(local.nginx_ingress_annotations_common, {
     "cert-manager.io/cluster-issuer" = local.kubernetes.cert_issuers.acme_prod
   })
@@ -67,7 +67,7 @@ module "webdav-pictures" {
     rclone = local.container_images.rclone
   }
   service_hostname   = local.endpoints.webdav_pictures.ingress
-  ingress_class_name = "ingress-nginx"
+  ingress_class_name = local.endpoints.ingress_nginx.name
   nginx_ingress_annotations = merge(local.nginx_ingress_annotations_common, {
     "cert-manager.io/cluster-issuer" = local.kubernetes.cert_issuers.acme_prod
   })
@@ -141,7 +141,7 @@ module "sunshine-desktop" {
   }
   loadbalancer_class_name = "kube-vip.io/kube-vip-class"
   admin_hostname          = local.endpoints.sunshine_desktop.ingress
-  ingress_class_name      = "ingress-nginx"
+  ingress_class_name      = local.endpoints.ingress_nginx.name
   nginx_ingress_annotations = merge(local.nginx_ingress_annotations_common, {
     "cert-manager.io/cluster-issuer" = local.kubernetes.cert_issuers.acme_prod
   })

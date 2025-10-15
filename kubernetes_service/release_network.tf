@@ -142,7 +142,7 @@ module "qrcode-hostapd" {
     qrcode = local.container_images.qrcode_generator
   }
   service_hostname   = local.endpoints.qrcode_hostapd.ingress
-  ingress_class_name = "ingress-nginx"
+  ingress_class_name = local.endpoints.ingress_nginx.name
   nginx_ingress_annotations = merge(local.nginx_ingress_annotations_common, {
     "cert-manager.io/cluster-issuer" = local.kubernetes.cert_issuers.acme_prod
   })

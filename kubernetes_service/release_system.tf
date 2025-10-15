@@ -148,10 +148,10 @@ resource "helm_release" "ingress-nginx" {
         }
         ingressClassResource = {
           enabled         = true
-          name            = "ingress-nginx"
-          controllerValue = "k8s.io/ingress-nginx"
+          name            = local.endpoints.ingress_nginx.name
+          controllerValue = "k8s.io/${local.endpoints.ingress_nginx.name}"
         }
-        ingressClass = "ingress-nginx"
+        ingressClass = local.endpoints.ingress_nginx.name
         service = {
           type                  = "LoadBalancer"
           loadBalancerIP        = "0.0.0.0"
@@ -215,10 +215,10 @@ resource "helm_release" "ingress-nginx-internal" {
         }
         ingressClassResource = {
           enabled         = true
-          name            = "ingress-nginx-internal"
-          controllerValue = "k8s.io/ingress-nginx-internal"
+          name            = local.endpoints.ingress_nginx_internal.name
+          controllerValue = "k8s.io/${local.endpoints.ingress_nginx_internal.name}"
         }
-        ingressClass = "ingress-nginx-internal"
+        ingressClass = local.endpoints.ingress_nginx_internal.name
         service = {
           type = "ClusterIP"
         }
