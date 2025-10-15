@@ -41,7 +41,7 @@ module "statefulset" {
         args = [
           "restore",
           "-if-db-not-exists",
-          # "-if-replica-exists", # TODO: add back in - not working in 0.5.x
+          "-if-replica-exists",
           "-config",
           local.config_file,
           var.sqlite_path,
