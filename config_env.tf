@@ -104,13 +104,13 @@ locals {
   # these fields are updated by renovate - don't use var substitutions
   container_images = {
     # static pod
-    kube_apiserver          = "ghcr.io/randomcoww/kubernetes-control-plane:v1.34.1@sha256:9dd039d5c2456728d504e813958a0cd764d0a6784f7b54c13ec3ad555a1cc804"
-    kube_controller_manager = "ghcr.io/randomcoww/kubernetes-control-plane:v1.34.1@sha256:9dd039d5c2456728d504e813958a0cd764d0a6784f7b54c13ec3ad555a1cc804"
-    kube_scheduler          = "ghcr.io/randomcoww/kubernetes-control-plane:v1.34.1@sha256:9dd039d5c2456728d504e813958a0cd764d0a6784f7b54c13ec3ad555a1cc804"
+    kube_apiserver          = "registry.k8s.io/kube-apiserver:v1.34.1"
+    kube_controller_manager = "registry.k8s.io/kube-controller-manager:v1.34.1"
+    kube_scheduler          = "registry.k8s.io/kube-scheduler:v1.34.1"
     etcd_wrapper            = "ghcr.io/randomcoww/etcd-wrapper:v0.4.8@sha256:41ff93b85c5ae1aeca9af49fdfad54df02ecd4604331f6763a31bdaf73501464"
     etcd                    = "gcr.io/etcd-development/etcd:v3.6.5@sha256:042ef9c02799eb9303abf1aa99b09f09d94b8ee3ba0c2dd3f42dc4e1d3dce534"
     # tier 1
-    kube_proxy         = "ghcr.io/randomcoww/kube-proxy:v1.34.1.20251013.1420@sha256:3bad8b9533f1928d1e2b7bdd537a14b26d6491ae346af9e978b16c9fe2482d2d"
+    kube_proxy         = "registry.k8s.io/kube-proxy:v1.34.1"
     flannel            = "ghcr.io/flannel-io/flannel:v0.27.4@sha256:2ff3c5cb44d0e27b09f27816372084c98fa12486518ca95cb4a970f4a1a464c4"
     flannel_cni_plugin = "ghcr.io/flannel-io/flannel-cni-plugin:latest@sha256:25bd091c1867d0237432a4bcb5da720f39198b7d80edcae3bdf08262d242985c"
     kube_vip           = "ghcr.io/kube-vip/kube-vip:v1.0.1@sha256:554d1e07ee24a046bbc7fba67f438c01b480b072c6f0b99215321fc0eb440178"
@@ -128,7 +128,7 @@ locals {
     # tier 3
     mountpoint       = "reg.cluster.internal/randomcoww/mountpoint-s3:v1.20.0.20251015.1929@sha256:309f014eda002b70526d1ee1702a8be84852d4118a732beb8359ca6a6643c9ae"
     hostapd          = "reg.cluster.internal/randomcoww/hostapd-noscan:v2.11.20251013.1424@sha256:3605ab6230dbcf49335b997e69c70a762478b0d972ce9e7c8effcce424be5fb3"
-    tailscale        = "reg.cluster.internal/randomcoww/tailscale-nft:v1.88.3.20251013.1419@sha256:0221aa614b28e193c55021e6a13bcfe3f153d65fad0779c57de025d8895be9f0"
+    tailscale        = "ghcr.io/tailscale/tailscale:v1.88.4"
     qrcode_generator = "reg.cluster.internal/randomcoww/qrcode-resource:v1.20250926.2053@sha256:9c63bb0f788a0c1ff855fa6cc9cd961faf7ddd982a541eeb32f8bbb58701ed71"
     rclone           = "ghcr.io/rclone/rclone:1.71.1@sha256:d5971950c2b370fb04dd3292541b5bda6d9103143fd7e345aeb435a399388afc"
     audioserve       = "docker.io/izderadicka/audioserve:latest@sha256:c3609321701765671cae121fc0f61db122e8c124643c04770fbc9326c74b18e3"

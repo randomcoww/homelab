@@ -81,6 +81,17 @@ module "statefulset" {
       {
         name  = var.name
         image = var.images.tailscale
+        command = [
+          "sh",
+          "-c",
+          <<-EOF
+          set -e
+
+          ln -sf $(which xtables-nft-multi) $(which iptables)
+          ln -sf $(which xtables-nft-multi) $(which ip6tables)
+          exec containerboot
+          EOF
+        ]
         env = concat([
           {
             name = "TS_KUBE_SECRET"
