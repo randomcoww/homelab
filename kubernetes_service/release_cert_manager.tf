@@ -116,7 +116,7 @@ resource "helm_release" "trust-manager" {
   create_namespace = true
   wait             = false
   wait_for_jobs    = false
-  version          = "v0.20.1"
+  version          = "v0.20.2"
   max_history      = 2
   timeout          = local.kubernetes.helm_release_timeout
   values = [
