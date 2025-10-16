@@ -56,9 +56,6 @@ module "configmap" {
       mode               = "nftables"
       clusterCIDR        = var.kubernetes_pod_prefix
       healthzBindAddress = "127.0.0.1:${var.ports.kube_proxy}"
-      featureGates = {
-        NFTablesProxyMode = true
-      }
     })
   }
 }
@@ -83,16 +80,26 @@ module "daemonset" {
         effect   = "NoSchedule"
       },
     ]
-    containers = [
+    initContainers = [
       {
-        name  = var.name
+        name  = "${var.name}-init"
         image = var.images.kube_proxy
         command = [
           "kube-proxy",
           "--config=/etc/kube-proxy/kube-proxy-config.yaml",
+          "--hostname-override=$(NODE_NAME)",
           "--v=2",
+          "--init-only",
         ]
         env = [
+          {
+            name = "NODE_NAME"
+            valueFrom = {
+              fieldRef = {
+                fieldPath = "spec.nodeName"
+              }
+            }
+          },
           {
             name  = "KUBERNETES_SERVICE_HOST"
             value = var.kube_apiserver_ip
@@ -106,11 +113,51 @@ module "daemonset" {
           privileged = true
         }
         volumeMounts = [
+          # /lib/modules and /run/xtables.lock mounts seem to not be needed when on nftables mode
           {
-            name      = "modules"
-            mountPath = "/lib/modules"
-            readOnly  = true
+            name      = "kube-proxy-config"
+            mountPath = "/etc/kube-proxy"
           },
+        ]
+      },
+    ]
+    containers = [
+      {
+        name  = var.name
+        image = var.images.kube_proxy
+        command = [
+          "kube-proxy",
+          "--config=/etc/kube-proxy/kube-proxy-config.yaml",
+          "--hostname-override=$(NODE_NAME)",
+          "--v=2",
+        ]
+        env = [
+          {
+            name = "NODE_NAME"
+            valueFrom = {
+              fieldRef = {
+                fieldPath = "spec.nodeName"
+              }
+            }
+          },
+          {
+            name  = "KUBERNETES_SERVICE_HOST"
+            value = var.kube_apiserver_ip
+          },
+          {
+            name  = "KUBERNETES_SERVICE_PORT"
+            value = tostring(var.ports.kube_apiserver)
+          },
+        ]
+        securityContext = {
+          capabilities = {
+            add = [
+              "NET_ADMIN",
+            ]
+          }
+        }
+        volumeMounts = [
+          # /lib/modules and /run/xtables.lock mounts seem to not be needed when on nftables mode
           {
             name      = "kube-proxy-config"
             mountPath = "/etc/kube-proxy"
@@ -127,12 +174,6 @@ module "daemonset" {
       },
     ]
     volumes = [
-      {
-        name = "modules"
-        hostPath = {
-          path = "/usr/lib/modules"
-        }
-      },
       {
         name = "kube-proxy-config"
         configMap = {
