@@ -82,6 +82,13 @@ module "llama-cpp" {
         EOF
       }
     }
+    hooks = {
+      on_startup = {
+        preload = [
+          "ggml-gpt-oss-20b-mxfp4",
+        ]
+      }
+    }
   }
   extra_envs = [
     {
