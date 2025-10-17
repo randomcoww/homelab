@@ -127,7 +127,7 @@ locals {
     github_actions_runner = "ghcr.io/actions/actions-runner:2.329.0@sha256:75599cd393958a52142f489a160123f5b9b21605a40609696deb13d49867d53f"
     # tier 3
     mountpoint       = "reg.cluster.internal/randomcoww/mountpoint-s3:v1.20.0.20251015.1929@sha256:309f014eda002b70526d1ee1702a8be84852d4118a732beb8359ca6a6643c9ae"
-    hostapd          = "reg.cluster.internal/randomcoww/hostapd-noscan:v2.11.20251013.1424@sha256:3605ab6230dbcf49335b997e69c70a762478b0d972ce9e7c8effcce424be5fb3"
+    hostapd          = "reg.cluster.internal/randomcoww/hostapd-noscan:v1.20251017.2009"
     tailscale        = "ghcr.io/tailscale/tailscale:v1.88.4@sha256:360e10ad95ad03950f66df03e0dab66287f9f89076ee4012d50bc6adceafcdf3"
     qrcode_generator = "reg.cluster.internal/randomcoww/qrcode-resource:v1.20250926.2053@sha256:9c63bb0f788a0c1ff855fa6cc9cd961faf7ddd982a541eeb32f8bbb58701ed71"
     rclone           = "ghcr.io/rclone/rclone:1.71.1@sha256:d5971950c2b370fb04dd3292541b5bda6d9103143fd7e345aeb435a399388afc"
