@@ -273,4 +273,10 @@ resource "helm_release" "cert-issuer" {
     helm_release.trust-manager,
     helm_release.cert-manager,
   ]
+  lifecycle {
+    replace_triggered_by = [
+      helm_release.trust-manager,
+      helm_release.cert-manager,
+    ]
+  }
 }
