@@ -13,7 +13,7 @@ resource "helm_release" "arc" {
   timeout          = local.kubernetes.helm_release_timeout
   values = [
     yamlencode({
-      replicaCount = 3
+      replicaCount = 2
       serviceAccount = {
         create = true
         name   = "gha-runner-scale-set-controller"
@@ -261,6 +261,14 @@ resource "helm_release" "arc-runner-set-builder" {
       }
     }),
   ]
+  depends_on = [
+    helm_release.arc,
+  ]
+  lifecycle {
+    replace_triggered_by = [
+      helm_release.arc,
+    ]
+  }
 }
 
 resource "helm_release" "arc-runner-set-renovate" {
@@ -340,4 +348,12 @@ resource "helm_release" "arc-runner-set-renovate" {
       }
     }),
   ]
+  depends_on = [
+    helm_release.arc,
+  ]
+  lifecycle {
+    replace_triggered_by = [
+      helm_release.arc,
+    ]
+  }
 }

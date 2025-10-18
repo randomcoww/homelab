@@ -269,4 +269,8 @@ resource "helm_release" "cert-issuer" {
       ]
     }),
   ]
+  depends_on = [
+    helm_release.trust-manager,
+    helm_release.cert-manager,
+  ]
 }
