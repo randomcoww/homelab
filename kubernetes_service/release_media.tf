@@ -62,7 +62,7 @@ module "webdav-pictures" {
   name      = local.endpoints.webdav_pictures.name
   namespace = local.endpoints.webdav_pictures.namespace
   release   = "0.1.0"
-  replicas  = 2
+  replicas  = 1
   images = {
     rclone = local.container_images.rclone
   }
