@@ -7,8 +7,6 @@ locals {
     }
     music = {
     }
-    videos = {
-    }
     pictures = {
     }
     models = {
