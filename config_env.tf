@@ -132,14 +132,14 @@ locals {
     qrcode_generator = "reg.cluster.internal/randomcoww/qrcode-resource:v1.20250926.2053@sha256:9c63bb0f788a0c1ff855fa6cc9cd961faf7ddd982a541eeb32f8bbb58701ed71"
     rclone           = "ghcr.io/rclone/rclone:1.71.1@sha256:d5971950c2b370fb04dd3292541b5bda6d9103143fd7e345aeb435a399388afc"
     audioserve       = "docker.io/izderadicka/audioserve:latest@sha256:c3609321701765671cae121fc0f61db122e8c124643c04770fbc9326c74b18e3"
-    llama_cpp        = "ghcr.io/mostlygeek/llama-swap:cuda@sha256:c42f390da5b4ea12694a591cc99020c73ff0250f5d91b88542f432703d63d395"
+    llama_cpp        = "ghcr.io/mostlygeek/llama-swap:cuda@sha256:0ef827ca812e9f0d2b1bbc71293891f0ee8f913a673b32215bdca669797d446c"
     sunshine_desktop = "reg.cluster.internal/randomcoww/sunshine-desktop:v2025.1011.235710.20251013.1424@sha256:ca9d2f702bcfa012a80307926eadef4cf47f6253890a019720ab4f558d31db21"
     litestream       = "docker.io/litestream/litestream:0.5.2@sha256:e4fd484cb1cd9d6fa58fff7127d551118e150ab75b389cf868a053152ba6c9c0"
     juicefs          = "reg.cluster.internal/randomcoww/juicefs:v1.3.0.20251013.1421@sha256:78d5369ab124f200bec263e29e3d6ec5bc4ae92974c80e34b8e04ccb0539f0bc"
     valkey           = "ghcr.io/valkey-io/valkey:8.1.4-alpine@sha256:e706d1213aaba6896c162bb6a3a9e1894e1a435f28f8f856d14fab2e10aa098b"
     nvidia_driver    = "reg.cluster.internal/randomcoww/nvidia-driver-container:v580.95.05.20251002.0720-fedora42@sha256:7cafab4ddef75b51aaa86e7209309680f0ad6bdbcd1fd943a6bb9573b2d46102"
     mcp_proxy        = "ghcr.io/tbxark/mcp-proxy:v0.41.1@sha256:ff480cdf6f84ceaa5c02c3065abb1c333b5b4bb417270278267c3fbac0dc80e7"
-    searxng          = "ghcr.io/searxng/searxng:latest@sha256:6d434698522bc63c2ceb9790cace2dc86a0e6ed57e58d18697321bad015c32d0"
+    searxng          = "ghcr.io/searxng/searxng:latest@sha256:622f78fc81e33255ec57dc29aef33807fea6005b4480c3d1e4155110c10ac307"
     open_webui       = "ghcr.io/open-webui/open-webui:0.6.34@sha256:98d13c0a9285c110fba9814ef8bfbbaff9250863236fe3a18d29e93534289312"
   }
 
