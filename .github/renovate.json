@@ -26,14 +26,11 @@
       "matchStrings": [
         "\"[a-z0-9.-]+-(?<currentValue>[\\d.]+)\"\\s*# renovate: (?<depName>[\\w/-]+)"
       ],
-      "datasourceTemplate": "github-tags"
+      "datasourceTemplate": "github-tags",
+      "versioningTemplate": "docker"
     }
   ],
   "packageRules": [
-    {
-      "matchPackageNames": ["randomcoww/fedora-coreos-config"],
-      "versioning": "docker"
-    },
     {
       "matchUpdateTypes": [
         "minor",
