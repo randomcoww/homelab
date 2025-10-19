@@ -123,7 +123,7 @@ locals {
     ipxe                  = "ghcr.io/randomcoww/ipxe:v1.20251013.1418@sha256:fbb809b6d731b8a5a742e4437cb930e06ce8c7058df5f034e7ec1391d6f16d94"
     registry              = "ghcr.io/distribution/distribution:3.0.0@sha256:4ba3adf47f5c866e9a29288c758c5328ef03396cb8f5f6454463655fa8bc83e2"
     registry_ui           = "docker.io/quiq/registry-ui:0.10.4@sha256:88e90f14a2654b48a6ca8112b3bd000d3e2472a8cbf560d73af679f5558273f2"
-    device_plugin         = "ghcr.io/squat/generic-device-plugin:latest@sha256:dfed9c5fa93385719ef25eb5e88e5a06bd8748519b6a26ed2c9a2529d1c4f88c"
+    device_plugin         = "ghcr.io/squat/generic-device-plugin:latest@sha256:62dda74362cc607b00d1ade291c192ea894d8bdc53a969ed5328b866b2988597"
     github_actions_runner = "ghcr.io/actions/actions-runner:2.329.0@sha256:75599cd393958a52142f489a160123f5b9b21605a40609696deb13d49867d53f"
     # tier 3
     mountpoint       = "reg.cluster.internal/randomcoww/mountpoint-s3:v1.20.0.20251015.1929@sha256:309f014eda002b70526d1ee1702a8be84852d4118a732beb8359ca6a6643c9ae"
@@ -132,7 +132,7 @@ locals {
     qrcode_generator = "reg.cluster.internal/randomcoww/qrcode-resource:v1.20250926.2053@sha256:9c63bb0f788a0c1ff855fa6cc9cd961faf7ddd982a541eeb32f8bbb58701ed71"
     rclone           = "ghcr.io/rclone/rclone:1.71.1@sha256:d5971950c2b370fb04dd3292541b5bda6d9103143fd7e345aeb435a399388afc"
     audioserve       = "docker.io/izderadicka/audioserve:latest@sha256:c3609321701765671cae121fc0f61db122e8c124643c04770fbc9326c74b18e3"
-    llama_cpp        = "ghcr.io/mostlygeek/llama-swap:cuda@sha256:0ef827ca812e9f0d2b1bbc71293891f0ee8f913a673b32215bdca669797d446c"
+    llama_cpp        = "ghcr.io/mostlygeek/llama-swap:cuda@sha256:a81f3a99f12cdd31d0f19f64704cb6b8c6962d220694d756327e2034832be337"
     sunshine_desktop = "reg.cluster.internal/randomcoww/sunshine-desktop:v2025.1011.235710.20251013.1424@sha256:ca9d2f702bcfa012a80307926eadef4cf47f6253890a019720ab4f558d31db21"
     litestream       = "docker.io/litestream/litestream:0.5.2@sha256:e4fd484cb1cd9d6fa58fff7127d551118e150ab75b389cf868a053152ba6c9c0"
     juicefs          = "reg.cluster.internal/randomcoww/juicefs:v1.3.0.20251013.1421@sha256:78d5369ab124f200bec263e29e3d6ec5bc4ae92974c80e34b8e04ccb0539f0bc"
