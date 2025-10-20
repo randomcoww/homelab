@@ -243,6 +243,7 @@ module "secret" {
           },
         ] : [])
         client-classes = [
+          # TODO: support multiple archs
           {
             name = "iPXE-UEFI"
             test = "substring(option[user-class].hex,0,4) == 'iPXE'"
