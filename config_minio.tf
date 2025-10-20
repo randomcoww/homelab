@@ -5,8 +5,6 @@ locals {
     boot = {
       acl = "public-read"
     }
-    music = {
-    }
     pictures = {
     }
     models = {
@@ -91,27 +89,6 @@ locals {
             ]
             buckets = [
               "open-webui",
-            ]
-          },
-        ]
-      }
-
-      # audioserve mount-s3 access to music
-      audioserve = {
-        name      = local.endpoints.audioserve.name
-        namespace = local.endpoints.audioserve.namespace
-        policies = [
-          {
-            Effect = "Allow"
-            Action = [
-              "s3:GetObject",
-              "s3:PutObject",
-              "s3:ListBucket",
-              "s3:DeleteObject",
-              "s3:AbortMultipartUpload",
-            ]
-            buckets = [
-              "music",
             ]
           },
         ]

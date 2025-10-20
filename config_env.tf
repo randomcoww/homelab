@@ -131,7 +131,6 @@ locals {
     tailscale        = "ghcr.io/tailscale/tailscale:v1.88.4@sha256:360e10ad95ad03950f66df03e0dab66287f9f89076ee4012d50bc6adceafcdf3"
     qrcode_generator = "reg.cluster.internal/randomcoww/qrcode-resource:v1.20251020.1416@sha256:98a33ccd1dd76831bfd44f97a80e1eafefdc4ecea3e0abf488edaa245cd0af9a"
     rclone           = "ghcr.io/rclone/rclone:1.71.2@sha256:3103526c506266a9ecdf064efe99bf3677d92ef6407af124d8c56b4f49cbaa51"
-    audioserve       = "docker.io/izderadicka/audioserve:latest@sha256:c3609321701765671cae121fc0f61db122e8c124643c04770fbc9326c74b18e3"
     llama_cpp        = "ghcr.io/mostlygeek/llama-swap:cuda@sha256:22bbbecd76a02be67f64f6f19934c9886d348382bfe82e8bdd45f8b6916d5421"
     sunshine_desktop = "reg.cluster.internal/randomcoww/sunshine-desktop:v2025.1014.193231.20251020.1423@sha256:e538fe4bd6c4220ea96a7aab5e12e2da205cade529fa99a5b18fa6e3d7cdbbc6"
     litestream       = "docker.io/litestream/litestream:0.5.2@sha256:e4fd484cb1cd9d6fa58fff7127d551118e150ab75b389cf868a053152ba6c9c0"
@@ -274,9 +273,6 @@ locals {
       webdav_pictures = {
         name    = "webdav-pictures"
         ingress = "pictures.${local.domains.public}"
-      }
-      audioserve = {
-        name = "audioserve"
       }
       llama_cpp = {
         name    = "llama-cpp"
