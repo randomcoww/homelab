@@ -243,20 +243,15 @@ module "secret" {
           },
         ] : [])
         client-classes = [
-          # TODO: support multiple archs
           {
             name = "iPXE-UEFI"
             test = "substring(option[user-class].hex,0,4) == 'iPXE'"
-            option-data = [
-              {
-                name = "boot-file-name"
-                data = var.ipxe_script_base_url # non working URL - assume supersede from libdhcp_flex_option.so
-              },
-            ]
+            # option-data is added by flex options
           },
+          # TODO: support multiple archs
           {
-            name = "HTTP"
-            test = "substring(option[vendor-class-identifier].hex,0,10) == 'HTTPClient'",
+            name = "HTTP-UEFI-amd64"
+            test = "option[client-system].hex == 0x0010",
             option-data = [
               {
                 name = "boot-file-name"
@@ -270,7 +265,7 @@ module "secret" {
           },
           # TODO: migrate fully to HTTP boot and remove TFTP
           {
-            name        = "PXE-UEFI"
+            name        = "PXE-UEFI-amd64"
             test        = "option[client-system].hex == 0x0007",
             next-server = "$POD_IP"
             option-data = [
