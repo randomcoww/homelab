@@ -12,7 +12,7 @@ locals {
     module.hostapd,
     module.qrcode-hostapd,
     module.webdav-pictures,
-    module.audioserve,
+    # module.audioserve,
     module.registry,
     module.searxng,
     module.mcp-proxy,

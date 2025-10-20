@@ -243,6 +243,8 @@ module "secret" {
           },
         ] : [])
         client-classes = [
+          # client-system types:
+          # https://www.iana.org/assignments/dhcpv6-parameters/dhcpv6-parameters.xhtml#processor-architecture
           {
             name = "iPXE-UEFI"
             test = "substring(option[user-class].hex,0,4) == 'iPXE'"
