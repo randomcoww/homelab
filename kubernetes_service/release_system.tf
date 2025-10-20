@@ -266,13 +266,18 @@ resource "helm_release" "local-path-provisioner" {
     yamlencode({
       replicaCount = 2
       storageClass = {
-        name         = "local-path"
-        defaultClass = true
+        create            = true
+        name              = "local-path"
+        provisionerName   = "rancher.io/local-path"
+        defaultClass      = true
+        defaultVolumeType = "local"
       }
       nodePathMap = [
         {
-          node  = "DEFAULT_PATH_FOR_NON_LISTED_NODES"
-          paths = ["${local.kubernetes.containers_path}/local_path_provisioner"]
+          node = "DEFAULT_PATH_FOR_NON_LISTED_NODES"
+          paths = [
+            "${local.kubernetes.containers_path}/local_path_provisioner",
+          ]
         },
       ]
     }),
