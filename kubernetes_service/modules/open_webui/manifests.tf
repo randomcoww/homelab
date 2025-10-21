@@ -19,11 +19,15 @@ module "metadata" {
   name        = var.name
   namespace   = var.namespace
   release     = var.release
-  app_version = split(":", var.images.open_webui)[1]
-  manifests = merge(module.litestream.chart.manifests, {
-    "templates/secret.yaml"  = module.secret.manifest
-    "templates/service.yaml" = module.service.manifest
-    "templates/ingress.yaml" = module.ingress.manifest
+  app_version = var.release
+  manifests = merge({
+    "templates/statefulset.yaml" = module.statefulset.manifest
+    "templates/secret.yaml"      = module.secret.manifest
+    "templates/service.yaml"     = module.service.manifest
+    "templates/ingress.yaml"     = module.ingress.manifest
+    }, {
+    for i, m in module.litestream-overlay.additional_manifests :
+    "templates/overlay-${i}.yaml" => m
   })
 }
 
@@ -77,9 +81,12 @@ module "ingress" {
   ]
 }
 
-module "litestream" {
-  source = "../statefulset_litestream"
-  ## litestream settings
+module "litestream-overlay" {
+  source = "../litestream_overlay"
+
+  name    = var.name
+  app     = var.name
+  release = var.release
   images = {
     litestream = var.images.litestream
   }
@@ -105,32 +112,7 @@ module "litestream" {
   sqlite_path         = local.db_path
   minio_access_secret = var.minio_access_secret
   ca_bundle_configmap = var.ca_bundle_configmap
-  ##
-  name      = var.name
-  namespace = var.namespace
-  app       = var.name
-  release   = var.release
-  affinity  = var.affinity
-  spec = {
-    volumeClaimTemplates = [
-      {
-        metadata = {
-          name = "litestream-data"
-        }
-        spec = {
-          accessModes = [
-            "ReadWriteOnce",
-          ]
-          resources = {
-            requests = {
-              storage = "16Gi"
-            }
-          }
-          storageClassName = "local-path"
-        }
-      },
-    ]
-  }
+
   template_spec = {
     containers = [
       {
@@ -229,4 +211,34 @@ module "litestream" {
       },
     ]
   }
+}
+
+module "statefulset" {
+  source = "../../../modules/statefulset"
+
+  name     = var.name
+  app      = var.name
+  release  = var.release
+  affinity = var.affinity
+  spec = {
+    volumeClaimTemplates = [
+      {
+        metadata = {
+          name = "litestream-data"
+        }
+        spec = {
+          accessModes = [
+            "ReadWriteOnce",
+          ]
+          resources = {
+            requests = {
+              storage = "16Gi"
+            }
+          }
+          storageClassName = "local-path"
+        }
+      },
+    ]
+  }
+  template_spec = module.litestream-overlay.template_spec
 }

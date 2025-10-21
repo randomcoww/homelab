@@ -2,6 +2,14 @@ variable "name" {
   type = string
 }
 
+variable "app" {
+  type = string
+}
+
+variable "release" {
+  type = string
+}
+
 variable "images" {
   type = object({
     mountpoint = string

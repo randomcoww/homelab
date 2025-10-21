@@ -1,39 +1,11 @@
-locals {
-  config_file = "/etc/litestream/config.yaml"
+output "additional_manifests" {
+  value = [
+    module.secret.manifest,
+  ]
 }
 
-module "metadata" {
-  source    = "../../../modules/metadata"
-  name      = var.name
-  namespace = var.namespace
-  release   = var.release
-  manifests = {
-    "templates/statefulset.yaml"       = module.statefulset.manifest
-    "templates/secret-litestream.yaml" = module.secret.manifest
-  }
-}
-
-module "secret" {
-  source  = "../../../modules/secret"
-  name    = "${var.name}-litestream"
-  app     = var.app
-  release = var.release
-  data = {
-    "config.yaml" = yamlencode(var.litestream_config)
-  }
-}
-
-module "statefulset" {
-  source      = "../../../modules/statefulset"
-  name        = var.name
-  app         = var.app
-  release     = var.release
-  replicas    = var.replicas
-  annotations = var.annotations
-  affinity    = var.affinity
-  tolerations = var.tolerations
-  spec        = var.spec
-  template_spec = merge(var.template_spec, {
+output "template_spec" {
+  value = merge(var.template_spec, {
     initContainers = concat([
       {
         name  = "${var.name}-litestream-restore"

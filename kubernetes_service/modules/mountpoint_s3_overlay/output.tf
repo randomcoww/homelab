@@ -1,3 +1,8 @@
+output "additional_manifests" {
+  value = [
+  ]
+}
+
 output "template_spec" {
   value = merge(var.template_spec, {
     initContainers = concat([
