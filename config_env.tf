@@ -120,7 +120,7 @@ locals {
     # tier 2
     kea                   = "ghcr.io/randomcoww/kea:v3.1.2.20251020.1409@sha256:7f830b7cf470598fc489135447d467aa201a16b9871b2994ba92355542cee8bf"
     stork_agent           = "ghcr.io/randomcoww/stork-agent:v2.3.1.20251020.1417@sha256:76fe2824b308cbd3f807b4ad8c8095962aac2ee0cf05b7d4f7ad4f19b97ced0a"
-    ipxe                  = "ghcr.io/randomcoww/ipxe:v1.20251020.2047"
+    ipxe                  = "ghcr.io/randomcoww/ipxe:v1.20251020.2047@sha256:10fa11e405ab6f0d1cd84960bb07565f0b7ce84cf4875808b79fa001f1a2ddee"
     registry              = "ghcr.io/distribution/distribution:3.0.0@sha256:4ba3adf47f5c866e9a29288c758c5328ef03396cb8f5f6454463655fa8bc83e2"
     registry_ui           = "docker.io/quiq/registry-ui:0.10.4@sha256:88e90f14a2654b48a6ca8112b3bd000d3e2472a8cbf560d73af679f5558273f2"
     device_plugin         = "ghcr.io/squat/generic-device-plugin:latest@sha256:62dda74362cc607b00d1ade291c192ea894d8bdc53a969ed5328b866b2988597"
