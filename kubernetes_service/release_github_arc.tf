@@ -43,6 +43,24 @@ module "arc-workflow-secret" {
         labels = {
           app = "arc-runner"
         }
+        initContainers = [
+          # TODO: replace with image volume when supported
+          {
+            name  = "tools"
+            image = local.container_images.minio_mc
+            command = [
+              "cp",
+              "/usr/bin/mc",
+              "/tools/",
+            ]
+            volumeMounts = [
+              {
+                name      = "tools"
+                mountPath = "/tools"
+              },
+            ]
+          },
+        ]
         containers = [
           {
             name = "$job"
@@ -107,6 +125,35 @@ module "arc-workflow-secret" {
                 value = "https://$(MINIO_ACCESS_KEY_ID):$(MINIO_SECRET_ACCESS_KEY)@${local.services.cluster_minio.ip}:${local.service_ports.minio}"
               },
             ]
+            volumeMounts = [
+              /* TODO: worker template doesn't support image volume yet
+              {
+                name = "minio-mc"
+                mountPath = "/minio"
+              },
+              */
+              {
+                name      = "tools"
+                mountPath = "/tools"
+              },
+            ]
+          },
+        ]
+        volumes = [
+          /* TODO: worker template doesn't support image volume yet
+          {
+            name = "minio-mc"
+            image = {
+              reference = local.container_images.minio_mc
+              pullPolicy = "IfNotPresent"
+            }
+          },
+          */
+          {
+            name = "tools"
+            emptyDir = {
+              medium = "Memory"
+            }
           },
         ]
       }
