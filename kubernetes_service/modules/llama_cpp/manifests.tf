@@ -10,11 +10,12 @@ module "metadata" {
   namespace   = var.namespace
   release     = var.release
   app_version = var.release
-  manifests = merge(module.mountpoint.chart.manifests, {
-    "templates/service.yaml" = module.service.manifest
-    "templates/ingress.yaml" = module.ingress.manifest
-    "templates/secret.yaml"  = module.secret.manifest
-  })
+  manifests = {
+    "templates/statefulset.yaml" = module.statefulset.manifest
+    "templates/service.yaml"     = module.service.manifest
+    "templates/ingress.yaml"     = module.ingress.manifest
+    "templates/secret.yaml"      = module.secret.manifest
+  }
 }
 
 module "secret" {
@@ -66,10 +67,10 @@ module "ingress" {
   ]
 }
 
-# Mounting S3 path seems to be faster for model loading than using --model-url
-module "mountpoint" {
-  source = "../statefulset_mountpoint"
-  ## s3 config
+module "mountpoint-s3-overlay" {
+  source = "../mountpoint_s3_overlay"
+
+  name                = var.name
   s3_endpoint         = var.minio_endpoint
   s3_bucket           = var.minio_bucket
   s3_prefix           = ""
@@ -80,12 +81,7 @@ module "mountpoint" {
     mountpoint = var.images.mountpoint
   }
   ca_bundle_configmap = var.ca_bundle_configmap
-  ##
-  name     = var.name
-  app      = var.name
-  release  = var.release
-  affinity = var.affinity
-  replicas = 1
+
   template_spec = {
     runtimeClassName = "nvidia-cdi"
     containers = [
@@ -152,4 +148,16 @@ module "mountpoint" {
       },
     ]
   }
+}
+
+# Mounting S3 path seems to be faster for model loading than using --model-url
+module "statefulset" {
+  source = "../../../modules/statefulset"
+
+  name          = var.name
+  app           = var.name
+  release       = var.release
+  affinity      = var.affinity
+  replicas      = 1
+  template_spec = module.mountpoint-s3-overlay.template_spec
 }

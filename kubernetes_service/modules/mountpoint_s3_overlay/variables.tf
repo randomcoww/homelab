@@ -2,48 +2,10 @@ variable "name" {
   type = string
 }
 
-variable "namespace" {
-  type    = string
-  default = "default"
-}
-
-variable "app" {
-  type = string
-}
-
-variable "release" {
-  type = string
-}
-
-variable "replicas" {
-  type    = number
-  default = 1
-}
-
 variable "images" {
   type = object({
     mountpoint = string
   })
-}
-
-variable "annotations" {
-  type    = any
-  default = {}
-}
-
-variable "affinity" {
-  type    = any
-  default = {}
-}
-
-variable "tolerations" {
-  type    = any
-  default = []
-}
-
-variable "spec" {
-  type    = any
-  default = {}
 }
 
 variable "template_spec" {

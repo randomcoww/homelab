@@ -1,24 +1,5 @@
-module "metadata" {
-  source    = "../../../modules/metadata"
-  name      = var.name
-  namespace = var.namespace
-  release   = var.release
-  manifests = {
-    "templates/statefulset.yaml" = module.statefulset.manifest
-  }
-}
-
-module "statefulset" {
-  source      = "../../../modules/statefulset"
-  name        = var.name
-  app         = var.app
-  release     = var.release
-  replicas    = var.replicas
-  annotations = var.annotations
-  affinity    = var.affinity
-  tolerations = var.tolerations
-  spec        = var.spec
-  template_spec = merge(var.template_spec, {
+output "template_spec" {
+  value = merge(var.template_spec, {
     initContainers = concat([
       {
         name          = "${var.name}-s3-mount"
