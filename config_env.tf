@@ -115,7 +115,7 @@ locals {
     flannel_cni_plugin = "ghcr.io/flannel-io/flannel-cni-plugin:latest@sha256:25bd091c1867d0237432a4bcb5da720f39198b7d80edcae3bdf08262d242985c"
     kube_vip           = "ghcr.io/kube-vip/kube-vip:v1.0.1@sha256:554d1e07ee24a046bbc7fba67f438c01b480b072c6f0b99215321fc0eb440178"
     external_dns       = "registry.k8s.io/external-dns/external-dns:v0.19.0@sha256:f76114338104264f655b23138444481b20bb9d6125742c7240fac25936fe164e"
-    minio              = "ghcr.io/randomcoww/minio:RELEASE.2025-10-15T17-29-55Z.20251021.2244"
+    minio              = "ghcr.io/randomcoww/minio:RELEASE.2025-10-15T17-29-55Z.20251021.2244@sha256:21f046fd3848b8c2539c3aae29a3bd6921438c97a320955dafa41820169e7364"
     nginx              = "docker.io/nginxinc/nginx-unprivileged:1.29.2-alpine@sha256:7662e7dd548daacb2e1c0d00d1a9cd785cfad08e1f559cf233f84a7e08cc23a0"
     # tier 2
     kea                   = "ghcr.io/randomcoww/kea:v3.1.2.20251020.1409@sha256:7f830b7cf470598fc489135447d467aa201a16b9871b2994ba92355542cee8bf"
@@ -139,7 +139,7 @@ locals {
     mcp_proxy        = "ghcr.io/tbxark/mcp-proxy:v0.41.1@sha256:ff480cdf6f84ceaa5c02c3065abb1c333b5b4bb417270278267c3fbac0dc80e7"
     searxng          = "ghcr.io/searxng/searxng:latest@sha256:eb6dd18eaa8b8da62249d51775e054d657f2dc026b12b9fac86ba5ddbeda970d"
     open_webui       = "ghcr.io/open-webui/open-webui:0.6.34@sha256:98d13c0a9285c110fba9814ef8bfbbaff9250863236fe3a18d29e93534289312"
-    kavita           = "ghcr.io/kareadita/kavita:latest"
+    kavita           = "ghcr.io/kareadita/kavita:latest@sha256:1ac8a0a2eb4324186e13b0e7717e0eab0df499477801168f60ae84d13a449e9b"
   }
 
   host_images = {
