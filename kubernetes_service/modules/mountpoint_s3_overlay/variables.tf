@@ -21,6 +21,10 @@ variable "template_spec" {
   default = {}
 }
 
+variable "mount_path" {
+  type = string
+}
+
 variable "s3_endpoint" {
   type = string
 }
@@ -30,10 +34,6 @@ variable "s3_bucket" {
 }
 
 variable "s3_prefix" {
-  type = string
-}
-
-variable "s3_mount_path" {
   type = string
 }
 

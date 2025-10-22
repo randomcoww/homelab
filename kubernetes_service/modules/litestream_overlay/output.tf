@@ -48,16 +48,16 @@ output "template_spec" {
         ]
         volumeMounts = [
           {
-            name      = "litestream-config"
+            name      = "${var.name}-litestream-config"
             mountPath = local.config_file
             subPath   = "config.yaml"
           },
           {
-            name      = "litestream-data"
+            name      = "${var.name}-litestream-data"
             mountPath = dirname(var.sqlite_path)
           },
           {
-            name      = "litestream-ca-trust-bundle"
+            name      = "${var.name}-litestream-ca-trust-bundle"
             mountPath = "/etc/ssl/certs/ca-certificates.crt"
             subPath   = "ca.crt"
             readOnly  = true
@@ -103,16 +103,16 @@ output "template_spec" {
         ]
         volumeMounts = [
           {
-            name      = "litestream-config"
+            name      = "${var.name}-litestream-config"
             mountPath = local.config_file
             subPath   = "config.yaml"
           },
           {
-            name      = "litestream-data"
+            name      = "${var.name}-litestream-data"
             mountPath = dirname(var.sqlite_path)
           },
           {
-            name      = "litestream-ca-trust-bundle"
+            name      = "${var.name}-litestream-ca-trust-bundle"
             mountPath = "/etc/ssl/certs/ca-certificates.crt"
             subPath   = "ca.crt"
             readOnly  = true
@@ -124,7 +124,7 @@ output "template_spec" {
       merge(container, {
         volumeMounts = concat(lookup(container, "volumeMounts", []), [
           {
-            name      = "litestream-data"
+            name      = "${var.name}-litestream-data"
             mountPath = dirname(var.sqlite_path)
           },
         ])
@@ -135,7 +135,7 @@ output "template_spec" {
       merge(container, {
         volumeMounts = concat(lookup(container, "volumeMounts", []), [
           {
-            name      = "litestream-data"
+            name      = "${var.name}-litestream-data"
             mountPath = dirname(var.sqlite_path)
           },
         ])
@@ -143,13 +143,13 @@ output "template_spec" {
     ]
     volumes = concat(lookup(var.template_spec, "volumes", []), [
       {
-        name = "litestream-config"
+        name = "${var.name}-litestream-config"
         secret = {
           secretName = module.secret.name
         }
       },
       {
-        name = "litestream-ca-trust-bundle"
+        name = "${var.name}-litestream-ca-trust-bundle"
         configMap = {
           name = var.ca_bundle_configmap
         }

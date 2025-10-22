@@ -15,9 +15,6 @@ module "metadata" {
     "templates/service.yaml"     = module.service.manifest
     "templates/ingress.yaml"     = module.ingress.manifest
     }, {
-    for i, m in module.mountpoint-s3-overlay.additional_manifests :
-    "templates/mountpoint-s3-${i}.yaml" => m
-    }, {
     for i, m in module.litestream-overlay.additional_manifests :
     "templates/litestream-${i}.yaml" => m
   })
@@ -136,14 +133,13 @@ module "litestream-overlay" {
     volumes = [
       # Use local-path for this
       # {
-      #   name     = "litestream-data"
+      #   name     = "${var.name}-litestream-data"
       #   emptyDir = {
       #     medium = "Memory"
       #   }
       # },
     ]
   }
-
 }
 
 module "mountpoint-s3-overlay" {
@@ -152,10 +148,10 @@ module "mountpoint-s3-overlay" {
   name                = var.name
   app                 = var.name
   release             = var.release
+  mount_path          = local.data_path
   s3_endpoint         = var.minio_endpoint
   s3_bucket           = var.minio_bucket
   s3_prefix           = ""
-  s3_mount_path       = local.data_path
   s3_mount_extra_args = var.minio_mount_extra_args
   s3_access_secret    = var.minio_access_secret
   images = {
@@ -178,7 +174,7 @@ module "statefulset" {
     volumeClaimTemplates = [
       {
         metadata = {
-          name = "litestream-data"
+          name = "${var.name}-litestream-data"
         }
         spec = {
           accessModes = [

@@ -10,15 +10,12 @@ module "metadata" {
   namespace   = var.namespace
   release     = var.release
   app_version = var.release
-  manifests = merge({
+  manifests = {
     "templates/statefulset.yaml" = module.statefulset.manifest
     "templates/service.yaml"     = module.service.manifest
     "templates/ingress.yaml"     = module.ingress.manifest
     "templates/secret.yaml"      = module.secret.manifest
-    }, {
-    for i, m in module.mountpoint-s3-overlay.additional_manifests :
-    "templates/overlay-${i}.yaml" => m
-  })
+  }
 }
 
 module "secret" {
@@ -76,10 +73,10 @@ module "mountpoint-s3-overlay" {
   name                = var.name
   app                 = var.name
   release             = var.release
+  mount_path          = local.model_path
   s3_endpoint         = var.minio_endpoint
   s3_bucket           = var.minio_bucket
   s3_prefix           = ""
-  s3_mount_path       = local.model_path
   s3_mount_extra_args = var.minio_mount_extra_args
   s3_access_secret    = var.minio_access_secret
   images = {

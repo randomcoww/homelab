@@ -167,7 +167,7 @@ module "litestream-overlay" {
             port = local.extra_configs.PORT
             path = "/health"
           }
-          initialDelaySeconds = 30
+          initialDelaySeconds = 60
           periodSeconds       = 5
           failureThreshold    = 20
         }
@@ -192,7 +192,7 @@ module "litestream-overlay" {
     volumes = [
       # Use local-path for this
       # {
-      #   name     = "litestream-data"
+      #   name     = "${var.name}-litestream-data"
       #   emptyDir = {
       #     medium = "Memory"
       #   }
@@ -224,7 +224,7 @@ module "statefulset" {
     volumeClaimTemplates = [
       {
         metadata = {
-          name = "litestream-data"
+          name = "${var.name}-litestream-data"
         }
         spec = {
           accessModes = [

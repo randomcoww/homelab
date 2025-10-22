@@ -1,13 +1,8 @@
-output "additional_manifests" {
-  value = [
-  ]
-}
-
 output "template_spec" {
   value = merge(var.template_spec, {
     initContainers = concat([
       {
-        name          = "${var.name}-s3-mount"
+        name          = "${var.name}-mountpoint-mount"
         image         = var.images.mountpoint
         restartPolicy = "Always"
         command = [
@@ -16,7 +11,7 @@ output "template_spec" {
           <<-EOF
           set -e
 
-          mkdir -p ${var.s3_mount_path}
+          mkdir -p ${var.mount_path}
           exec mount-s3 \
             -f \
             --endpoint-url ${var.s3_endpoint} \
@@ -32,7 +27,7 @@ output "template_spec" {
             ${arg} \
             %{~endfor~}
             ${var.s3_bucket} \
-            ${var.s3_mount_path}
+            ${var.mount_path}
           EOF
         ]
         env = [
@@ -65,12 +60,12 @@ output "template_spec" {
         ]
         volumeMounts = [
           {
-            name             = "s3-mount-shared"
-            mountPath        = dirname(var.s3_mount_path)
+            name             = "${var.name}-mountpoint-shared"
+            mountPath        = dirname(var.mount_path)
             mountPropagation = "Bidirectional"
           },
           {
-            name      = "ca-trust-bundle"
+            name      = "${var.name}-mountpoint-ca-trust-bundle"
             mountPath = "/etc/ssl/certs/ca-certificates.crt"
             subPath   = "ca.crt"
             readOnly  = true
@@ -85,8 +80,8 @@ output "template_spec" {
       merge(container, {
         volumeMounts = concat(lookup(container, "volumeMounts", []), [
           {
-            name             = "s3-mount-shared"
-            mountPath        = dirname(var.s3_mount_path)
+            name             = "${var.name}-mountpoint-shared"
+            mountPath        = dirname(var.mount_path)
             mountPropagation = "HostToContainer"
           },
         ])
@@ -97,8 +92,8 @@ output "template_spec" {
       merge(container, {
         volumeMounts = concat(lookup(container, "volumeMounts", []), [
           {
-            name             = "s3-mount-shared"
-            mountPath        = dirname(var.s3_mount_path)
+            name             = "${var.name}-mountpoint-shared"
+            mountPath        = dirname(var.mount_path)
             mountPropagation = "HostToContainer"
           },
         ])
@@ -106,13 +101,13 @@ output "template_spec" {
     ]
     volumes = concat(lookup(var.template_spec, "volumes", []), [
       {
-        name = "s3-mount-shared"
+        name = "${var.name}-mountpoint-shared"
         emptyDir = {
           medium = "Memory"
         }
       },
       {
-        name = "ca-trust-bundle"
+        name = "${var.name}-mountpoint-ca-trust-bundle"
         configMap = {
           name = var.ca_bundle_configmap
         }
