@@ -11,7 +11,7 @@ locals {
     module.tailscale,
     module.hostapd,
     module.qrcode-hostapd,
-    module.webdav-pictures,
+    module.kavita,
     module.registry,
     module.searxng,
     module.mcp-proxy,

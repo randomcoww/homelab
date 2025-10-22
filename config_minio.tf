@@ -7,6 +7,8 @@ locals {
     }
     pictures = {
     }
+    ebooks = {
+    }
     models = {
     }
   }
@@ -94,19 +96,23 @@ locals {
         ]
       }
 
-      # rclone access to pictures for webdav
-      webdav_pictures = {
-        name      = local.endpoints.webdav_pictures.name
-        namespace = local.endpoints.webdav_pictures.namespace
+      # kavita mount-s3 access for ebooks
+      kavita = {
+        name      = local.endpoints.kavita.name
+        namespace = local.endpoints.kavita.namespace
         policies = [
           {
             Effect = "Allow"
             Action = [
               "s3:GetObject",
+              "s3:PutObject",
               "s3:ListBucket",
+              "s3:DeleteObject",
+              "s3:AbortMultipartUpload",
             ]
             buckets = [
-              "pictures",
+              "ebooks",
+              "kavita",
             ]
           },
         ]

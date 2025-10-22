@@ -115,7 +115,7 @@ locals {
     flannel_cni_plugin = "ghcr.io/flannel-io/flannel-cni-plugin:latest@sha256:25bd091c1867d0237432a4bcb5da720f39198b7d80edcae3bdf08262d242985c"
     kube_vip           = "ghcr.io/kube-vip/kube-vip:v1.0.1@sha256:554d1e07ee24a046bbc7fba67f438c01b480b072c6f0b99215321fc0eb440178"
     external_dns       = "registry.k8s.io/external-dns/external-dns:v0.19.0@sha256:f76114338104264f655b23138444481b20bb9d6125742c7240fac25936fe164e"
-    minio              = "quay.io/minio/minio:latest@sha256:14cea493d9a34af32f524e538b8346cf79f3321eff8e708c1e2960462bd8936e"
+    minio              = "ghcr.io/randomcoww/minio:RELEASE.2025-10-15T17-29-55Z.20251021.2244"
     nginx              = "docker.io/nginxinc/nginx-unprivileged:1.29.2-alpine@sha256:20c59c7bf3602ebcc0b6866f900698ba2e6c6cb195ec6f36907eb192cd5a1ece"
     # tier 2
     kea                   = "ghcr.io/randomcoww/kea:v3.1.2.20251020.1409@sha256:7f830b7cf470598fc489135447d467aa201a16b9871b2994ba92355542cee8bf"
@@ -130,7 +130,6 @@ locals {
     hostapd          = "reg.cluster.internal/randomcoww/hostapd-noscan:v1.20251020.1423@sha256:9f1946858611c9ccf4c0a464d3ea9d932bc96520bc92f3bf99ca697e1eb8789e"
     tailscale        = "ghcr.io/tailscale/tailscale:v1.88.4@sha256:360e10ad95ad03950f66df03e0dab66287f9f89076ee4012d50bc6adceafcdf3"
     qrcode_generator = "reg.cluster.internal/randomcoww/qrcode-resource:v1.20251020.1416@sha256:98a33ccd1dd76831bfd44f97a80e1eafefdc4ecea3e0abf488edaa245cd0af9a"
-    rclone           = "ghcr.io/rclone/rclone:1.71.2@sha256:3103526c506266a9ecdf064efe99bf3677d92ef6407af124d8c56b4f49cbaa51"
     llama_cpp        = "ghcr.io/mostlygeek/llama-swap:cuda@sha256:22bbbecd76a02be67f64f6f19934c9886d348382bfe82e8bdd45f8b6916d5421"
     sunshine_desktop = "reg.cluster.internal/randomcoww/sunshine-desktop:v2025.1014.193231.20251020.1423@sha256:e538fe4bd6c4220ea96a7aab5e12e2da205cade529fa99a5b18fa6e3d7cdbbc6"
     litestream       = "docker.io/litestream/litestream:0.5.2@sha256:e4fd484cb1cd9d6fa58fff7127d551118e150ab75b389cf868a053152ba6c9c0"
@@ -140,6 +139,7 @@ locals {
     mcp_proxy        = "ghcr.io/tbxark/mcp-proxy:v0.41.1@sha256:ff480cdf6f84ceaa5c02c3065abb1c333b5b4bb417270278267c3fbac0dc80e7"
     searxng          = "ghcr.io/searxng/searxng:latest@sha256:80250983c8f2cc4cc6e32fc315571e7bfc180e5005d535c73fc124f226ca04fc"
     open_webui       = "ghcr.io/open-webui/open-webui:0.6.34@sha256:98d13c0a9285c110fba9814ef8bfbbaff9250863236fe3a18d29e93534289312"
+    kavita           = "ghcr.io/kareadita/kavita:latest"
   }
 
   host_images = {
@@ -270,9 +270,9 @@ locals {
         name    = "qrcode-hostapd"
         ingress = "hostapd.${local.domains.public}"
       }
-      webdav_pictures = {
-        name    = "webdav-pictures"
-        ingress = "pictures.${local.domains.public}"
+      kavita = {
+        name    = "kavita"
+        ingress = "kavita.${local.domains.public}"
       }
       llama_cpp = {
         name    = "llama-cpp"

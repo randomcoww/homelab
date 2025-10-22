@@ -3,8 +3,7 @@ variable "name" {
 }
 
 variable "namespace" {
-  type    = string
-  default = "default"
+  type = string
 }
 
 variable "release" {
@@ -12,8 +11,7 @@ variable "release" {
 }
 
 variable "replicas" {
-  type    = number
-  default = 1
+  type = number
 }
 
 variable "affinity" {
@@ -23,12 +21,15 @@ variable "affinity" {
 
 variable "images" {
   type = object({
-    rclone = string
+    kavita     = string
+    mountpoint = string
+    litestream = string
   })
 }
 
-variable "service_hostname" {
-  type = string
+variable "resources" {
+  type    = any
+  default = {}
 }
 
 variable "ingress_class_name" {
@@ -47,7 +48,24 @@ variable "minio_bucket" {
   type = string
 }
 
+variable "minio_mount_extra_args" {
+  type    = list(string)
+  default = []
+}
+
+variable "minio_litestream_bucket" {
+  type = string
+}
+
+variable "minio_litestream_prefix" {
+  type = string
+}
+
 variable "minio_access_secret" {
+  type = string
+}
+
+variable "service_hostname" {
   type = string
 }
 

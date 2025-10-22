@@ -1,24 +1,31 @@
-# Webdav
-
-module "webdav-pictures" {
-  source    = "./modules/webdav"
-  name      = local.endpoints.webdav_pictures.name
-  namespace = local.endpoints.webdav_pictures.namespace
+module "kavita" {
+  source    = "./modules/kavita"
+  name      = local.endpoints.kavita.name
+  namespace = local.endpoints.kavita.namespace
   release   = "0.1.0"
   replicas  = 1
   images = {
-    rclone = local.container_images.rclone
+    kavita     = local.container_images.kavita
+    mountpoint = local.container_images.mountpoint
+    litestream = local.container_images.litestream
   }
-  service_hostname   = local.endpoints.webdav_pictures.ingress
+  resources = {
+    limits = {
+      memory = "4Gi"
+    }
+  }
+  service_hostname   = local.endpoints.kavita.ingress
   ingress_class_name = local.endpoints.ingress_nginx.name
   nginx_ingress_annotations = merge(local.nginx_ingress_annotations_common, {
     "cert-manager.io/cluster-issuer" = local.kubernetes.cert_issuers.acme_prod
   })
 
-  minio_endpoint      = "https://${local.services.cluster_minio.ip}:${local.service_ports.minio}"
-  minio_bucket        = "pictures"
-  minio_access_secret = local.minio_users.webdav_pictures.secret
-  ca_bundle_configmap = local.kubernetes.ca_bundle_configmap
+  minio_endpoint          = "https://${local.services.cluster_minio.ip}:${local.service_ports.minio}"
+  minio_bucket            = "ebooks"
+  minio_litestream_bucket = "kavita"
+  minio_litestream_prefix = "$POD_NAME/litestream"
+  minio_access_secret     = local.minio_users.kavita.secret
+  ca_bundle_configmap     = local.kubernetes.ca_bundle_configmap
 }
 
 # Sunshine desktop
