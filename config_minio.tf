@@ -11,6 +11,8 @@ locals {
     }
     models = {
     }
+    documents = {
+    }
   }
 
   minio_users = {
