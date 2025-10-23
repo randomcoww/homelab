@@ -145,17 +145,17 @@ module "litestream-overlay" {
 module "mountpoint-s3-overlay" {
   source = "../mountpoint_s3_overlay"
 
-  name                = var.name
-  app                 = var.name
-  release             = var.release
-  mount_path          = local.data_path
-  s3_endpoint         = var.minio_endpoint
-  s3_bucket           = var.minio_bucket
-  s3_prefix           = ""
+  name        = var.name
+  app         = var.name
+  release     = var.release
+  mount_path  = local.data_path
+  s3_endpoint = var.minio_endpoint
+  s3_bucket   = var.minio_bucket
+  s3_prefix   = ""
   s3_mount_extra_args = concat(var.minio_mount_extra_args, [
     "--cache ${dirname(local.data_path)}",
   ])
-  s3_access_secret    = var.minio_access_secret
+  s3_access_secret = var.minio_access_secret
   images = {
     mountpoint = var.images.mountpoint
   }

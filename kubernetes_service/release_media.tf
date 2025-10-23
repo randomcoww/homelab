@@ -27,8 +27,8 @@ module "kavita" {
   minio_mount_extra_args = [
     "--read-only",
   ]
-  minio_access_secret     = local.minio_users.kavita.secret
-  ca_bundle_configmap     = local.kubernetes.ca_bundle_configmap
+  minio_access_secret = local.minio_users.kavita.secret
+  ca_bundle_configmap = local.kubernetes.ca_bundle_configmap
 }
 
 # Sunshine desktop
