@@ -130,16 +130,16 @@ locals {
     hostapd          = "reg.cluster.internal/randomcoww/hostapd-noscan:v1.20251020.1423@sha256:9f1946858611c9ccf4c0a464d3ea9d932bc96520bc92f3bf99ca697e1eb8789e"
     tailscale        = "ghcr.io/tailscale/tailscale:v1.88.4@sha256:360e10ad95ad03950f66df03e0dab66287f9f89076ee4012d50bc6adceafcdf3"
     qrcode_generator = "reg.cluster.internal/randomcoww/qrcode-resource:v1.20251020.1416@sha256:98a33ccd1dd76831bfd44f97a80e1eafefdc4ecea3e0abf488edaa245cd0af9a"
-    llama_cpp        = "ghcr.io/mostlygeek/llama-swap:cuda@sha256:89484d1111b433dcdd77684390ef29ea767eaafb37ccec7631f20ce137c545fb"
+    llama_cpp        = "ghcr.io/mostlygeek/llama-swap:cuda@sha256:8b10baaac414f003d67ac0b86694139dc6d30aa1d4b2c17bfdd47c86612abfbe"
     sunshine_desktop = "reg.cluster.internal/randomcoww/sunshine-desktop:v2025.1014.193231.20251020.1423@sha256:e538fe4bd6c4220ea96a7aab5e12e2da205cade529fa99a5b18fa6e3d7cdbbc6"
     litestream       = "docker.io/litestream/litestream:0.5.2@sha256:e4fd484cb1cd9d6fa58fff7127d551118e150ab75b389cf868a053152ba6c9c0"
     juicefs          = "reg.cluster.internal/randomcoww/juicefs:v1.3.0.20251020.1419@sha256:cabff777dbf929397ded71ec5f41288d2abc82f45229db46b9ad498ae3ae11d1"
     valkey           = "ghcr.io/valkey-io/valkey:8.1.4-alpine@sha256:e706d1213aaba6896c162bb6a3a9e1894e1a435f28f8f856d14fab2e10aa098b"
     nvidia_driver    = "reg.cluster.internal/randomcoww/nvidia-driver-container:v580.95.05.20251002.0720-fedora42@sha256:7cafab4ddef75b51aaa86e7209309680f0ad6bdbcd1fd943a6bb9573b2d46102"
     mcp_proxy        = "ghcr.io/tbxark/mcp-proxy:v0.41.1@sha256:ff480cdf6f84ceaa5c02c3065abb1c333b5b4bb417270278267c3fbac0dc80e7"
-    searxng          = "ghcr.io/searxng/searxng:latest@sha256:eb6dd18eaa8b8da62249d51775e054d657f2dc026b12b9fac86ba5ddbeda970d"
+    searxng          = "ghcr.io/searxng/searxng:latest@sha256:ffc01f261943ae18e203c01fafd8c7eba75f9dd30f9a1c352f39511d668d6df6"
     open_webui       = "ghcr.io/open-webui/open-webui:0.6.34@sha256:98d13c0a9285c110fba9814ef8bfbbaff9250863236fe3a18d29e93534289312"
-    kavita           = "ghcr.io/kareadita/kavita:latest@sha256:1ac8a0a2eb4324186e13b0e7717e0eab0df499477801168f60ae84d13a449e9b"
+    kavita           = "ghcr.io/kareadita/kavita:latest@sha256:22c42f3cc83fb98b98a6d6336200b615faf2cfd2db22dab363136744efda1bb0"
   }
 
   host_images = {
