@@ -24,6 +24,9 @@ module "kavita" {
   minio_bucket            = "ebooks"
   minio_litestream_bucket = "kavita"
   minio_litestream_prefix = "$POD_NAME/litestream"
+  minio_mount_extra_args = [
+    "--read-only",
+  ]
   minio_access_secret     = local.minio_users.kavita.secret
   ca_bundle_configmap     = local.kubernetes.ca_bundle_configmap
 }
