@@ -8,6 +8,7 @@ locals {
     "etcd",
     "documents",
     "pictures",
+    "ebooks",
     "music",
   ]
 
