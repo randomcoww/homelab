@@ -139,7 +139,7 @@ locals {
     mcp_proxy        = "ghcr.io/tbxark/mcp-proxy:v0.41.1@sha256:ff480cdf6f84ceaa5c02c3065abb1c333b5b4bb417270278267c3fbac0dc80e7"
     searxng          = "ghcr.io/searxng/searxng:latest@sha256:ffc01f261943ae18e203c01fafd8c7eba75f9dd30f9a1c352f39511d668d6df6"
     open_webui       = "ghcr.io/open-webui/open-webui:0.6.34@sha256:98d13c0a9285c110fba9814ef8bfbbaff9250863236fe3a18d29e93534289312"
-    kavita           = "ghcr.io/kareadita/kavita:0.8.8"
+    kavita           = "ghcr.io/kareadita/kavita:0.8.8@sha256:22c42f3cc83fb98b98a6d6336200b615faf2cfd2db22dab363136744efda1bb0"
   }
 
   host_images = {
