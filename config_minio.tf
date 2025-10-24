@@ -5,10 +5,11 @@ locals {
     boot = {
       acl = "public-read"
     }
-    ebooks = {
-    }
-    models = {
-    }
+    ebooks    = {}
+    models    = {}
+    documents = {}
+    pictures  = {}
+    music     = {}
   }
 
   minio_users = {
