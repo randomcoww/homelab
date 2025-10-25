@@ -53,13 +53,6 @@ tailscale = {
   oauth_client_secret = "$TS_OAUTH_CLIENT_SECRET"
 }
 
-smtp = {
-  host     = "smtp.gmail.com"
-  port     = 587
-  username = "$GMAIL_USER"
-  password = "$GMAIL_PASSWORD"
-}
-
 github = {
   user  = "randomcoww"
   token = "$GITHUB_TOKEN"
