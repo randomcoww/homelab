@@ -68,7 +68,7 @@ resource "helm_release" "nvidia-gpu-oprerator" {
   chart            = "gpu-operator"
   wait             = false
   wait_for_jobs    = false
-  version          = "v25.3.4"
+  version          = "v25.10.0"
   max_history      = 2
   timeout          = local.kubernetes.helm_release_timeout
   values = [
