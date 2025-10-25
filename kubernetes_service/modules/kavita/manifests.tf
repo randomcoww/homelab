@@ -4,6 +4,10 @@ locals {
   db_path     = "/kavita/config/kavita.db"
 }
 
+resource "random_bytes" "jwt_secret" {
+  length = 256
+}
+
 module "metadata" {
   source      = "../../../modules/metadata"
   name        = var.name
@@ -12,12 +16,37 @@ module "metadata" {
   app_version = var.release
   manifests = merge({
     "templates/statefulset.yaml" = module.statefulset.manifest
+    "templates/secret.yaml"      = module.secret.manifest
     "templates/service.yaml"     = module.service.manifest
     "templates/ingress.yaml"     = module.ingress.manifest
     }, {
     for i, m in module.litestream-overlay.additional_manifests :
     "templates/litestream-${i}.yaml" => m
   })
+}
+
+module "secret" {
+  source  = "../../../modules/secret"
+  name    = var.name
+  app     = var.name
+  release = var.release
+  data = {
+    "appsettings.json" = jsonencode({
+      TokenKey      = random_bytes.jwt_secret.base64
+      Port          = local.kavita_port
+      IpAddresses   = "0.0.0.0"
+      BaseUrl       = "/"
+      Cache         = 75
+      AllowIFraming = false
+      OpenIdConnectSettings = { # TODO: configure OIDC
+        Authority    = ""
+        ClientId     = "kavita"
+        Secret       = ""
+        CustomScopes = []
+        Enabled      = false
+      }
+    })
+  }
 }
 
 module "service" {
@@ -106,6 +135,7 @@ module "litestream-overlay" {
           until mountpoint ${local.data_path}; do
           sleep 1
           done
+          echo "$APPSETTINGS" > "${dirname(local.db_path)}/appsettings.json"
 
           exec /entrypoint.sh
           EOF
@@ -114,6 +144,17 @@ module "litestream-overlay" {
         ports = [
           {
             containerPort = local.kavita_port
+          },
+        ]
+        env = [
+          {
+            name = "APPSETTINGS"
+            valueFrom = {
+              secretKeyRef = {
+                name = module.secret.name
+                key  = "appsettings.json"
+              }
+            }
           },
         ]
         livenessProbe = {
