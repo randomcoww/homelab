@@ -123,7 +123,7 @@ locals {
     ipxe                  = "ghcr.io/randomcoww/ipxe:v1.20251020.2047@sha256:10fa11e405ab6f0d1cd84960bb07565f0b7ce84cf4875808b79fa001f1a2ddee"
     registry              = "ghcr.io/distribution/distribution:3.0.0@sha256:4ba3adf47f5c866e9a29288c758c5328ef03396cb8f5f6454463655fa8bc83e2"
     registry_ui           = "docker.io/quiq/registry-ui:0.10.4@sha256:88e90f14a2654b48a6ca8112b3bd000d3e2472a8cbf560d73af679f5558273f2"
-    device_plugin         = "ghcr.io/squat/generic-device-plugin:latest@sha256:62dda74362cc607b00d1ade291c192ea894d8bdc53a969ed5328b866b2988597"
+    device_plugin         = "ghcr.io/squat/generic-device-plugin:latest@sha256:33b9a5ee5abd56144033286aba59431571b03e4dcfc14c0b565e2e93a408a8e3"
     github_actions_runner = "ghcr.io/actions/actions-runner:2.329.0@sha256:75599cd393958a52142f489a160123f5b9b21605a40609696deb13d49867d53f"
     # tier 3
     mountpoint       = "reg.cluster.internal/randomcoww/mountpoint-s3:v1.20.0.20251020.1425@sha256:e9c328cd5ae89572893c5c5b8e4222f2b69991a4f4bd2a4c812a983ad358c45a"
@@ -136,7 +136,7 @@ locals {
     valkey           = "ghcr.io/valkey-io/valkey:9.0.0-alpine@sha256:b4ee67d73e00393e712accc72cfd7003b87d0fcd63f0eba798b23251bfc9c394"
     nvidia_driver    = "reg.cluster.internal/randomcoww/nvidia-driver-container:v580.95.05.20251002.0720-fedora42@sha256:7cafab4ddef75b51aaa86e7209309680f0ad6bdbcd1fd943a6bb9573b2d46102"
     mcp_proxy        = "ghcr.io/tbxark/mcp-proxy:v0.41.1@sha256:ff480cdf6f84ceaa5c02c3065abb1c333b5b4bb417270278267c3fbac0dc80e7"
-    searxng          = "ghcr.io/searxng/searxng:latest@sha256:7a8b6b67a98a3ca372d9057e09adb99137ed31ca62f3a4a29802e9f873f80bc9"
+    searxng          = "ghcr.io/searxng/searxng:latest@sha256:38e59d4ca33e9baeb224ead5071f457ade20f2a68e3f097bbc84377d28ad896f"
     open_webui       = "ghcr.io/open-webui/open-webui:0.6.34@sha256:98d13c0a9285c110fba9814ef8bfbbaff9250863236fe3a18d29e93534289312"
     kavita           = "ghcr.io/kareadita/kavita:0.8.8@sha256:22c42f3cc83fb98b98a6d6336200b615faf2cfd2db22dab363136744efda1bb0"
   }
