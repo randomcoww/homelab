@@ -116,7 +116,7 @@ locals {
     kube_vip           = "ghcr.io/kube-vip/kube-vip:v1.0.1@sha256:554d1e07ee24a046bbc7fba67f438c01b480b072c6f0b99215321fc0eb440178"
     external_dns       = "registry.k8s.io/external-dns/external-dns:v0.19.0@sha256:f76114338104264f655b23138444481b20bb9d6125742c7240fac25936fe164e"
     minio              = "ghcr.io/randomcoww/minio:RELEASE.2025-10-15T17-29-55Z.20251021.2244@sha256:21f046fd3848b8c2539c3aae29a3bd6921438c97a320955dafa41820169e7364"
-    nginx              = "docker.io/nginxinc/nginx-unprivileged:1.29.2-alpine@sha256:d4ca1619a456ef1b8cdaf1421306ad137a06baaf9dd0c5cc0e750c6f8ec308a3"
+    nginx              = "docker.io/nginxinc/nginx-unprivileged:1.29.2-alpine@sha256:dd1707e363384e88791da80a60d1566c0822731ef15ad8080a69bcbb2729c331"
     # tier 2
     kea                   = "ghcr.io/randomcoww/kea:v3.1.2.20251027.1410@sha256:84d1fea455d70fb3f31ac2cfff88eb8f96b3a254610af82096f0f441b42aab9b"
     stork_agent           = "ghcr.io/randomcoww/stork-agent:v2.3.1.20251027.1419@sha256:c6d9df6e394b8520861748776659ce4a5ce60c6059ceec8a51c6613f52f9d2d9"
@@ -135,8 +135,8 @@ locals {
     litestream       = "docker.io/litestream/litestream:0.5.2@sha256:e4fd484cb1cd9d6fa58fff7127d551118e150ab75b389cf868a053152ba6c9c0"
     valkey           = "ghcr.io/valkey-io/valkey:9.0.0-alpine@sha256:b4ee67d73e00393e712accc72cfd7003b87d0fcd63f0eba798b23251bfc9c394"
     nvidia_driver    = "reg.cluster.internal/randomcoww/nvidia-driver-container:v580.95.05.20251002.0720-fedora42@sha256:7cafab4ddef75b51aaa86e7209309680f0ad6bdbcd1fd943a6bb9573b2d46102"
-    mcp_proxy        = "ghcr.io/tbxark/mcp-proxy:v0.41.1@sha256:ff480cdf6f84ceaa5c02c3065abb1c333b5b4bb417270278267c3fbac0dc80e7"
-    searxng          = "ghcr.io/searxng/searxng:latest@sha256:cad8502d4595a4bd0b214deda8021710d8b9143da29bd8c197e540e8d6162b5b"
+    mcp_proxy        = "ghcr.io/tbxark/mcp-proxy:v0.42.0@sha256:fa322a8f68097ad182235865049ee3fa7d26bca7d2155156bdc1e179569a86bc"
+    searxng          = "ghcr.io/searxng/searxng:latest@sha256:a943cb1111c2a61ef74162359de687cca94f5472d336e0a2dfef7be2259a4e8f"
     open_webui       = "ghcr.io/open-webui/open-webui:0.6.34@sha256:98d13c0a9285c110fba9814ef8bfbbaff9250863236fe3a18d29e93534289312"
     kavita           = "ghcr.io/kareadita/kavita:0.8.8@sha256:22c42f3cc83fb98b98a6d6336200b615faf2cfd2db22dab363136744efda1bb0"
   }
