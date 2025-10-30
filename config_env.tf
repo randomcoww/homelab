@@ -144,7 +144,7 @@ locals {
   host_images = {
     for name, tag in {
       # these fields are updated by renovate - don't use var substitutions
-      coreos = "fedora-coreos-42.20251024.19" # renovate: randomcoww/fedora-coreos-config-custom
+      coreos = "fedora-coreos-43.20251030.00" # renovate: randomcoww/fedora-coreos-config-custom
     } :
     name => {
       kernel = "${tag}-live-kernel.$${buildarch:uristring}"
