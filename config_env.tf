@@ -136,7 +136,7 @@ locals {
     valkey           = "ghcr.io/valkey-io/valkey:9.0.0-alpine@sha256:b4ee67d73e00393e712accc72cfd7003b87d0fcd63f0eba798b23251bfc9c394"
     nvidia_driver    = "reg.cluster.internal/randomcoww/nvidia-driver-container:v580.95.05.20251030.0646-fedora43"
     mcp_proxy        = "ghcr.io/tbxark/mcp-proxy:v0.42.0@sha256:fa322a8f68097ad182235865049ee3fa7d26bca7d2155156bdc1e179569a86bc"
-    searxng          = "ghcr.io/searxng/searxng:latest@sha256:a943cb1111c2a61ef74162359de687cca94f5472d336e0a2dfef7be2259a4e8f"
+    searxng          = "ghcr.io/searxng/searxng:latest@sha256:f35769e1837292576ee28169a5a65e7abafc2f51ad3c80e390c15532cc31fc29"
     open_webui       = "ghcr.io/open-webui/open-webui:0.6.34@sha256:98d13c0a9285c110fba9814ef8bfbbaff9250863236fe3a18d29e93534289312"
     kavita           = "ghcr.io/kareadita/kavita:0.8.8@sha256:22c42f3cc83fb98b98a6d6336200b615faf2cfd2db22dab363136744efda1bb0"
   }
