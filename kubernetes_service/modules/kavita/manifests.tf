@@ -4,7 +4,7 @@ locals {
   db_path     = "/kavita/config/kavita.db"
 }
 
-resource "random_bytes" "jwt_secret" {
+resource "random_bytes" "jwt-secret" {
   length = 256
 }
 
@@ -32,7 +32,7 @@ module "secret" {
   release = var.release
   data = {
     "appsettings.json" = jsonencode({
-      TokenKey      = random_bytes.jwt_secret.base64
+      TokenKey      = random_bytes.jwt-secret.base64
       Port          = local.kavita_port
       IpAddresses   = "0.0.0.0"
       BaseUrl       = "/"
