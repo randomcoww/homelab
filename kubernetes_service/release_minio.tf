@@ -35,8 +35,7 @@ resource "helm_release" "minio-resources" {
           apiVersion = "cert-manager.io/v1"
           kind       = "Certificate"
           metadata = {
-            name      = "${local.endpoints.minio.name}-tls"
-            namespace = local.endpoints.minio.namespace
+            name = "${local.endpoints.minio.name}-tls"
           }
           spec = {
             secretName = "${local.endpoints.minio.name}-tls"
