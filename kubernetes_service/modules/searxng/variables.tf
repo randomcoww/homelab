@@ -42,7 +42,7 @@ variable "extra_configs" {
   default = {}
 }
 
-variable "service_hostname" {
+variable "ingress_hostname" {
   type = string
 }
 

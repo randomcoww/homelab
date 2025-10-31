@@ -26,7 +26,7 @@ module "secret" {
   data = {
     "config.json" = jsonencode(merge(var.config, {
       mcpProxy = merge(lookup(var.config, "mcpProxy", {}), {
-        baseURL = "https://${var.service_hostname}",
+        baseURL = "https://${var.ingress_hostname}",
         addr    = ":${local.mcp_proxy_port}",
         name    = var.name,
       }),
@@ -61,7 +61,7 @@ module "ingress" {
   annotations        = var.nginx_ingress_annotations
   rules = [
     {
-      host = var.service_hostname
+      host = var.ingress_hostname
       paths = [
         {
           service = module.service.name

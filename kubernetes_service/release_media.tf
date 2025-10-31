@@ -14,7 +14,7 @@ module "kavita" {
       memory = "4Gi"
     }
   }
-  service_hostname   = local.endpoints.kavita.ingress
+  ingress_hostname   = local.endpoints.kavita.ingress
   ingress_class_name = local.endpoints.ingress_nginx.name
   nginx_ingress_annotations = merge(local.nginx_ingress_annotations_common, {
     "cert-manager.io/cluster-issuer" = local.kubernetes.cert_issuers.acme_prod

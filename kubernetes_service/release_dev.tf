@@ -51,7 +51,7 @@ module "llama-cpp" {
     llama_cpp  = local.container_images.llama_cpp
     mountpoint = local.container_images.mountpoint
   }
-  service_hostname = local.endpoints.llama_cpp.ingress
+  ingress_hostname = local.endpoints.llama_cpp.ingress
   llama_swap_config = {
     healthCheckTimeout = 600
     models = {
@@ -151,7 +151,7 @@ module "searxng" {
       ]
     }
   }
-  service_hostname   = local.endpoints.searxng.ingress
+  ingress_hostname   = local.endpoints.searxng.ingress
   ingress_class_name = local.endpoints.ingress_nginx_internal.name
   nginx_ingress_annotations = merge(local.nginx_ingress_annotations_common, {
     "cert-manager.io/cluster-issuer" = local.kubernetes.cert_issuers.ca_internal
@@ -180,7 +180,7 @@ module "mcp-proxy" {
     },
     mcpServers = local.mcp_proxies
   }
-  service_hostname   = local.endpoints.mcp_proxy.ingress
+  ingress_hostname   = local.endpoints.mcp_proxy.ingress
   ingress_class_name = local.endpoints.ingress_nginx_internal.name
   nginx_ingress_annotations = merge(local.nginx_ingress_annotations_common, {
     "cert-manager.io/cluster-issuer" = local.kubernetes.cert_issuers.ca_internal
@@ -199,7 +199,7 @@ module "open-webui" {
     open_webui = local.container_images.open_webui
     litestream = local.container_images.litestream
   }
-  service_hostname = local.endpoints.open_webui.ingress
+  ingress_hostname = local.endpoints.open_webui.ingress
   extra_configs = {
     WEBUI_URL                      = "https://${local.endpoints.open_webui.ingress}"
     ENABLE_SIGNUP                  = false
@@ -281,7 +281,7 @@ module "registry" {
 
   service_ip       = local.services.registry.ip
   service_hostname = local.endpoints.registry.service
-  ui_hostname      = local.endpoints.registry.ingress
+  ingress_hostname = local.endpoints.registry.ingress
 
   ingress_class_name = local.endpoints.ingress_nginx.name
   nginx_ingress_annotations = merge(local.nginx_ingress_annotations_common, {

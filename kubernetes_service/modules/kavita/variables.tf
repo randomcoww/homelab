@@ -65,7 +65,7 @@ variable "minio_access_secret" {
   type = string
 }
 
-variable "service_hostname" {
+variable "ingress_hostname" {
   type = string
 }
 

@@ -289,7 +289,7 @@ module "ingress" {
   annotations        = var.nginx_ingress_annotations
   rules = [
     {
-      host = var.ui_hostname
+      host = var.ingress_hostname
       paths = [
         {
           service = module.service.name

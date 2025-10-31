@@ -55,7 +55,7 @@ module "ingress" {
   annotations        = var.nginx_ingress_annotations
   rules = [
     {
-      host = var.service_hostname
+      host = var.ingress_hostname
       paths = [
         {
           service = module.service.name

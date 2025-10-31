@@ -75,7 +75,7 @@ variable "service_hostname" {
   type = string
 }
 
-variable "ui_hostname" {
+variable "ingress_hostname" {
   type = string
 }
 
