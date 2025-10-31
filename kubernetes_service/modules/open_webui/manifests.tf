@@ -1,10 +1,10 @@
 locals {
-  db_path = "/data/db.sqlite3"
+  db_file = "/data/db.sqlite3"
   extra_configs = merge(var.extra_configs, {
     PORT                       = 8080
     REQUESTS_CA_BUNDLE         = "/etc/ssl/certs/ca-certificates.crt"
     SSL_CERT_FILE              = "/etc/ssl/certs/ca-certificates.crt" # needed for tools server TLS
-    DATABASE_URL               = "sqlite:///${local.db_path}"
+    DATABASE_URL               = "sqlite:///${local.db_file}"
     DATABASE_ENABLE_SQLITE_WAL = true
     STORAGE_PROVIDER           = "s3"
     S3_ADDRESSING_STYLE        = "path"
@@ -93,7 +93,7 @@ module "litestream-overlay" {
   litestream_config = {
     dbs = [
       {
-        path                = local.db_path
+        path                = local.db_file
         monitor-interval    = "100ms"
         checkpoint-interval = "6s"
         replicas = [
@@ -109,7 +109,7 @@ module "litestream-overlay" {
       },
     ]
   }
-  sqlite_path         = local.db_path
+  sqlite_path         = local.db_file
   minio_access_secret = var.minio_access_secret
   ca_bundle_configmap = var.ca_bundle_configmap
 

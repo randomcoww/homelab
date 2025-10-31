@@ -1,7 +1,7 @@
 locals {
   kavita_port = 5000
   data_path   = "/var/lib/kavita/mnt"
-  db_path     = "/kavita/config/kavita.db"
+  db_file     = "/kavita/config/kavita.db"
 }
 
 resource "random_bytes" "jwt-secret" {
@@ -100,7 +100,7 @@ module "litestream-overlay" {
   litestream_config = {
     dbs = [
       {
-        path                = local.db_path
+        path                = local.db_file
         monitor-interval    = "100ms"
         checkpoint-interval = "6s"
         replicas = [
@@ -117,7 +117,7 @@ module "litestream-overlay" {
     ]
   }
 
-  sqlite_path         = local.db_path
+  sqlite_path         = local.db_file
   minio_access_secret = var.minio_access_secret
   ca_bundle_configmap = var.ca_bundle_configmap
 
@@ -135,7 +135,7 @@ module "litestream-overlay" {
           until mountpoint ${local.data_path}; do
           sleep 1
           done
-          echo "$APPSETTINGS" > "${dirname(local.db_path)}/appsettings.json"
+          echo "$APPSETTINGS" > "${dirname(local.db_file)}/appsettings.json"
 
           exec /entrypoint.sh
           EOF
