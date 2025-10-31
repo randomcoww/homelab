@@ -55,11 +55,10 @@ module "arc-workflow-secret" {
             }
             resources = {
               requests = {
-                memory = "2Gi"
+                memory = "4Gi"
               }
               limits = {
-                "squat.ai/kvm"  = 1
-                "squat.ai/fuse" = 1
+                "squat.ai/kvm" = 1
               }
             }
             env = [
