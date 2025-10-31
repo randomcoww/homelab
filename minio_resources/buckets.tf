@@ -60,13 +60,14 @@ module "minio-user-secret" {
 resource "helm_release" "minio-user-secret" {
   for_each = local.minio_users
 
-  chart         = "../helm-wrapper"
-  name          = each.value.secret
-  namespace     = each.value.namespace
-  wait          = false
-  wait_for_jobs = false
-  max_history   = 2
-  timeout       = local.kubernetes.helm_release_timeout
+  chart            = "../helm-wrapper"
+  name             = each.value.secret
+  namespace        = each.value.namespace
+  create_namespace = true
+  wait             = false
+  wait_for_jobs    = false
+  max_history      = 2
+  timeout          = local.kubernetes.helm_release_timeout
   values = [
     yamlencode({
       manifests = [
