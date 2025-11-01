@@ -31,21 +31,14 @@ module "secret" {
   app     = var.name
   release = var.release
   data = {
-    "appsettings.json" = jsonencode({
+    "appsettings.json" = jsonencode(merge({
       TokenKey      = random_bytes.jwt-secret.base64
       Port          = local.kavita_port
       IpAddresses   = "0.0.0.0"
       BaseUrl       = "/"
       Cache         = 75
       AllowIFraming = false
-      OpenIdConnectSettings = { # TODO: configure OIDC
-        Authority    = ""
-        ClientId     = "kavita"
-        Secret       = ""
-        CustomScopes = []
-        Enabled      = false
-      }
-    })
+    }, var.extra_configs))
   }
 }
 

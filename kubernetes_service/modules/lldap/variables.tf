@@ -10,8 +10,17 @@ variable "release" {
   type = string
 }
 
-variable "replicas" {
-  type = number
+variable "images" {
+  type = object({
+    lldap      = string
+    litestream = string
+  })
+}
+
+variable "ports" {
+  type = object({
+    ldaps = number
+  })
 }
 
 variable "affinity" {
@@ -19,21 +28,20 @@ variable "affinity" {
   default = {}
 }
 
-variable "images" {
-  type = object({
-    kavita     = string
-    mountpoint = string
-    litestream = string
-  })
+variable "ca_issuer_name" {
+  type = string
 }
 
-variable "resources" {
-  type    = any
-  default = {}
+variable "service_hostname" {
+  type = string
+}
+
+variable "ingress_hostname" {
+  type = string
 }
 
 variable "extra_configs" {
-  type    = any
+  type    = map(any)
   default = {}
 }
 
@@ -53,24 +61,11 @@ variable "minio_bucket" {
   type = string
 }
 
-variable "minio_mount_extra_args" {
-  type    = list(string)
-  default = []
-}
-
-variable "minio_litestream_bucket" {
-  type = string
-}
-
 variable "minio_litestream_prefix" {
   type = string
 }
 
 variable "minio_access_secret" {
-  type = string
-}
-
-variable "ingress_hostname" {
   type = string
 }
 

@@ -11,7 +11,13 @@ locals {
     S3_KEY_PREFIX              = "data"
     S3_BUCKET_NAME             = var.minio_bucket
     S3_ENDPOINT_URL            = var.minio_endpoint
+    WEBUI_SECRET_KEY           = random_password.webui-secret-key.result
   })
+}
+
+resource "random_password" "webui-secret-key" {
+  length  = 64
+  special = false
 }
 
 module "metadata" {

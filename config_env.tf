@@ -139,6 +139,8 @@ locals {
     searxng          = "ghcr.io/searxng/searxng:latest@sha256:50a94dae025ba1d9732bb354d23d0a61cdbfbc7f5a6ee538ef7f692c999ee8e5"
     open_webui       = "ghcr.io/open-webui/open-webui:0.6.34@sha256:98d13c0a9285c110fba9814ef8bfbbaff9250863236fe3a18d29e93534289312"
     kavita           = "ghcr.io/kareadita/kavita:0.8.8@sha256:22c42f3cc83fb98b98a6d6336200b615faf2cfd2db22dab363136744efda1bb0"
+    lldap            = "ghcr.io/lldap/lldap:latest-alpine"
+    authelia         = "ghcr.io/authelia/authelia:4.39.13"
   }
 
   host_images = {
@@ -178,6 +180,7 @@ locals {
     metrics  = 9153
     registry = 443  # not configurable
     reloader = 9090 # not configurable
+    ldaps    = 6360
   }
 
   ha = {
@@ -187,6 +190,8 @@ locals {
     bird_cache_table_name  = "cache"
     bgp_as                 = 65005
   }
+
+  domain_regex = "(?<subdomain>[a-z0-9-]+)\\.(?<domain>[a-z0-9.-]+)"
 
   domains = {
     kubernetes = "cluster.internal"
@@ -288,6 +293,17 @@ locals {
       open_webui = {
         name    = "open-webui"
         ingress = "chat.${local.domains.public}"
+      }
+      lldap = {
+        name      = "lldap"
+        namespace = "auth"
+        ingress   = "ldap.${local.domains.public}"
+        service   = "lldap.auth.svc.${local.domains.kubernetes}"
+      }
+      authelia = {
+        name      = "authelia"
+        namespace = "auth"
+        ingress   = "auth0.${local.domains.public}" # "auth" subdomain dns record fails to create for some reason. just use "auth0"
       }
     } :
     name => merge(e, {

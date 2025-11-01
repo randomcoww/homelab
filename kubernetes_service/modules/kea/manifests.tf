@@ -113,7 +113,7 @@ module "metadata" {
         isCA       = false
         privateKey = {
           algorithm = "ECDSA"
-          encoding  = "PKCS8"
+          encoding  = "PKCS8" # required format
           size      = 521
         }
         commonName = var.name

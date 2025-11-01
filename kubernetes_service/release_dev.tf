@@ -203,8 +203,6 @@ module "open-webui" {
   extra_configs = {
     WEBUI_URL                      = "https://${local.endpoints.open_webui.ingress}"
     ENABLE_SIGNUP                  = false
-    ENABLE_LOGIN_FORM              = false
-    WEBUI_AUTH                     = false
     ENABLE_VERSION_UPDATE_CHECK    = false
     ENABLE_OPENAI_API              = true
     OPENAI_API_BASE_URL            = "https://${local.endpoints.llama_cpp.ingress}/v1"
@@ -243,6 +241,18 @@ module "open-webui" {
         }
       }
     ])
+    # OIDC
+    ENABLE_OAUTH_SIGNUP           = true
+    OAUTH_MERGE_ACCOUNTS_BY_EMAIL = true
+    OAUTH_CLIENT_ID               = "open-webui"
+    OAUTH_CLIENT_SECRET           = random_password.authelia-oidc-open-webui.result
+    OPENID_PROVIDER_URL           = "https://${local.endpoints.authelia.ingress}/.well-known/openid-configuration"
+    OAUTH_PROVIDER_NAME           = "Authelia"
+    OAUTH_SCOPES                  = "openid email profile groups"
+    ENABLE_OAUTH_ROLE_MANAGEMENT  = true
+    OAUTH_ALLOWED_ROLES           = "openwebui,openwebui-admin"
+    OAUTH_ADMIN_ROLES             = "openwebui-admin"
+    OAUTH_ROLES_CLAIM             = "groups"
   }
   ingress_class_name = local.endpoints.ingress_nginx.name
   nginx_ingress_annotations = merge(local.nginx_ingress_annotations_common, {

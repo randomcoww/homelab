@@ -22,6 +22,15 @@ locals {
     proxy_set_header Connection $connection_upgrade;
     proxy_set_header Accept-Encoding gzip;
     chunked_transfer_encoding off;
+
+    proxy_no_cache 1;
+    proxy_cache_bypass 1;
+    proxy_set_header Host $host;
+    proxy_set_header X-Real-IP $remote_addr;
+    proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+    proxy_set_header X-Forwarded-Proto $scheme;
+    proxy_read_timeout 3600s;
+    proxy_send_timeout 3600s;
     EOF
     "nginx.ingress.kubernetes.io/affinity"          = "cookie"
   }

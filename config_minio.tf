@@ -138,6 +138,27 @@ locals {
         ]
       }
 
+      # authelia litestream
+      authelia = {
+        name      = local.endpoints.authelia.name
+        namespace = local.endpoints.authelia.namespace
+        policies = [
+          {
+            Effect = "Allow"
+            Action = [
+              "s3:GetObject",
+              "s3:PutObject",
+              "s3:ListBucket",
+              "s3:DeleteObject",
+              "s3:AbortMultipartUpload",
+            ]
+            buckets = [
+              "authelia",
+            ]
+          },
+        ]
+      }
+
     } :
 
     key => merge(params, {

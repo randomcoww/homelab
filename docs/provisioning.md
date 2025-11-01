@@ -57,6 +57,13 @@ github = {
   user  = "randomcoww"
   token = "$GITHUB_TOKEN"
 }
+
+smtp = {
+  host     = "smtp.gmail.com"
+  port     = 587
+  username = "$GMAIL_USER"
+  password = "$GMAIL_PASSWORD"
+}
 EOF
 ```
 
