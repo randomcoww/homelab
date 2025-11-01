@@ -164,7 +164,7 @@ module "statefulset" {
         args = [
           "bash",
           "-c",
-          <<EOF
+          <<-EOF
           set -e
           echo "Found driver $(nvidia-smi --query-gpu=driver_version --format=csv,noheader --id=0)"
 

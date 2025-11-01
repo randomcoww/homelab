@@ -54,16 +54,39 @@ module "lldap" {
 ## authelia
 
 locals {
-  authelia_db_file                = "/config/db.sqlite3" # base path not configurable
-  authelia_litestream_config_file = "/etc/litestream/config.yaml"
-  authelia_client_tls_secret_name = "${local.endpoints.authelia.name}-tls"
-  authelia_client_tls_cert_file   = "/custom/client-cert.pem"
-  authelia_client_tls_key_file    = "/custom/client-key.pem"
-  authelia_oidc_jwk_key_file      = "/custom/oidc-jwk-key.pem"
-  authelia_oidc_hmac_secret_file  = "/custom/oidc-hmac-secret"
-  # clients
-  authelia_oidc_open_webui_file = "/oidc/client.open-webui.value"
-  authelia_oidc_kavita_file     = "/oidc/client.kavita.value"
+  authelia_db_file                 = "/config/db.sqlite3" # base path not configurable
+  authelia_litestream_config_file  = "/etc/litestream/config.yaml"
+  authelia_client_tls_secret_name  = "${local.endpoints.authelia.name}-tls"
+  authelia_client_tls_cert_file    = "/custom/client-cert.pem"
+  authelia_client_tls_key_file     = "/custom/client-key.pem"
+  authelia_oidc_jwk_key_file       = "/custom/oidc-jwk-key.pem"
+  authelia_oidc_hmac_secret_file   = "/custom/oidc-hmac-secret"
+  autehlia_oidc_client_shared_path = "/oidc"
+
+  authelia_oidc_clients = {
+    open-webui = {
+      client_name           = "Open WebUI"
+      require_pkce          = false # TODO: enable
+      pkce_challenge_method = ""    # TODO: remove
+      redirect_uris = [
+        "https://${local.endpoints.open_webui.ingress}/oauth/oidc/callback",
+      ]
+    }
+    kavita = {
+      client_name = "Kavita"
+      scopes = [
+        "openid",
+        "email",
+        "profile",
+        "groups",
+        "offline_access",
+      ]
+      redirect_uris = [
+        "https://${local.endpoints.kavita.ingress}/signin-oidc",
+      ]
+      token_endpoint_auth_method = "client_secret_post"
+    }
+  }
 }
 
 resource "random_bytes" "authelia-jwt-secret" {
@@ -90,13 +113,18 @@ resource "random_password" "authelia-oidc-hmac-secret" {
   special = false
 }
 
-resource "random_password" "authelia-oidc-open-webui" {
-  length  = 30
+resource "random_string" "authelia-oidc-client-id" {
+  for_each = local.authelia_oidc_clients
+
+  length  = 32
   special = false
+  upper   = false
 }
 
-resource "random_password" "authelia-oidc-kavita" {
-  length  = 30
+resource "random_password" "authelia-oidc-client-secret" {
+  for_each = local.authelia_oidc_clients
+
+  length  = 32
   special = false
 }
 
@@ -105,7 +133,7 @@ module "authelia-secret" {
   name    = "${local.endpoints.authelia.name}-secret-custom"
   app     = local.endpoints.authelia.name
   release = "0.1.0"
-  data = {
+  data = merge({
     "litestream" = yamlencode({
       dbs = [
         {
@@ -127,10 +155,14 @@ module "authelia-secret" {
     })
     "oidc-jwk-key"     = tls_private_key.authelia-oidc-jwk.private_key_pem
     "oidc-hmac-secret" = random_password.authelia-oidc-hmac-secret.result
+    }, {
     # clients
-    "oidc-open-webui" = random_password.authelia-oidc-open-webui.result
-    "oidc-kavita"     = random_password.authelia-oidc-kavita.result
-  }
+    for key, client in local.authelia_oidc_clients :
+    "oidc-client-id-${key}" => random_string.authelia-oidc-client-id[key].result
+    }, {
+    for key, client in local.authelia_oidc_clients :
+    "oidc-client-secret-${key}" => random_password.authelia-oidc-client-secret[key].result
+  })
 }
 
 resource "helm_release" "authelia-resources" {
@@ -234,8 +266,8 @@ resource "helm_release" "authelia" {
             subPath   = "tls.key"
           },
           {
-            name      = "oidc-share"
-            mountPath = "/oidc"
+            name      = "oidc-client-share"
+            mountPath = local.autehlia_oidc_client_shared_path
           },
           {
             name      = "secret-custom"
@@ -256,7 +288,7 @@ resource "helm_release" "authelia" {
             }
           },
           {
-            name = "oidc-share"
+            name = "oidc-client-share"
             emptyDir = {
               medium = "Memory"
             }
@@ -295,38 +327,29 @@ resource "helm_release" "authelia" {
             command = [
               "sh",
               "-c",
-              <<EOF
+              <<-EOF
+              %{~for key, _ in local.authelia_oidc_clients~}
               authelia crypto hash generate \
-                --password "$OIDC_OPEN_WEBUI" pbkdf2 | sed -e 's/Digest: //' > ${local.authelia_oidc_open_webui_file}
-
-              authelia crypto hash generate \
-                --password "$OIDC_KAVITA" pbkdf2 | sed -e 's/Digest: //' > ${local.authelia_oidc_kavita_file}
+                --password "$${OIDC_CLIENT_SECRET_${random_string.authelia-oidc-client-id[key].result}}" pbkdf2 | sed -e 's/Digest: //' > "${local.autehlia_oidc_client_shared_path}/client-secret-${key}"
+              %{~endfor~}
               EOF
             ]
             env = [
+              for key, _ in local.authelia_oidc_clients :
               {
-                name = "OIDC_OPEN_WEBUI"
+                name = "OIDC_CLIENT_SECRET_${random_string.authelia-oidc-client-id[key].result}"
                 valueFrom = {
                   secretKeyRef = {
                     name = module.authelia-secret.name
-                    key  = "oidc-open-webui"
+                    key  = "oidc-client-secret-${key}"
                   }
                 }
-              },
-              {
-                name = "OIDC_KAVITA"
-                valueFrom = {
-                  secretKeyRef = {
-                    name = module.authelia-secret.name
-                    key  = "oidc-kavita"
-                  }
-                }
-              },
+              }
             ]
             volumeMounts = [
               {
-                name      = "oidc-share"
-                mountPath = "/oidc"
+                name      = "oidc-client-share"
+                mountPath = local.autehlia_oidc_client_shared_path
               },
             ]
           },
@@ -514,49 +537,20 @@ resource "helm_release" "authelia" {
             ]
             enable_client_debug_messages = true
             clients = [
-              {
-                client_id   = "open-webui"
-                client_name = "Open WebUI"
+              for key, client in local.authelia_oidc_clients :
+              merge({
+                client_id = random_string.authelia-oidc-client-id[key].result
                 client_secret = {
-                  path = local.authelia_oidc_open_webui_file
+                  path = "${local.autehlia_oidc_client_shared_path}/client-secret-${key}"
                 }
-                public                = false
-                authorization_policy  = "two_factor"
-                require_pkce          = false
-                pkce_challenge_method = ""
-                # require_pkce = true
-                # pkce_challenge_method = "S256"
-                redirect_uris = [
-                  "https://${local.endpoints.open_webui.ingress}/oauth/oidc/callback",
-                ]
+                public                           = false
+                authorization_policy             = "two_factor"
+                require_pkce                     = true
+                pkce_challenge_method            = "S256"
                 access_token_signed_response_alg = "none"
                 userinfo_signed_response_alg     = "none"
                 token_endpoint_auth_method       = "client_secret_basic"
-              },
-              {
-                client_id   = "kavita"
-                client_name = "Kavita"
-                client_secret = {
-                  path = local.authelia_oidc_kavita_file
-                }
-                scopes = [
-                  "openid",
-                  "email",
-                  "profile",
-                  "groups",
-                  "offline_access",
-                ]
-                public                = false
-                authorization_policy  = "two_factor"
-                require_pkce          = true
-                pkce_challenge_method = "S256"
-                redirect_uris = [
-                  "https://${local.endpoints.kavita.ingress}/signin-oidc",
-                ]
-                access_token_signed_response_alg = "none"
-                userinfo_signed_response_alg     = "none"
-                token_endpoint_auth_method       = "client_secret_post"
-              },
+              }, client)
             ]
           }
         }

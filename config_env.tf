@@ -303,7 +303,7 @@ locals {
       authelia = {
         name      = "authelia"
         namespace = "auth"
-        ingress   = "auth0.${local.domains.public}" # "auth" subdomain dns record fails to create for some reason. just use "auth0"
+        ingress   = "authelia.${local.domains.public}"
       }
     } :
     name => merge(e, {

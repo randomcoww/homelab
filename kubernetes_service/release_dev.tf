@@ -244,8 +244,8 @@ module "open-webui" {
     # OIDC
     ENABLE_OAUTH_SIGNUP           = true
     OAUTH_MERGE_ACCOUNTS_BY_EMAIL = true
-    OAUTH_CLIENT_ID               = "open-webui"
-    OAUTH_CLIENT_SECRET           = random_password.authelia-oidc-open-webui.result
+    OAUTH_CLIENT_ID               = random_string.authelia-oidc-client-id["open-webui"].result
+    OAUTH_CLIENT_SECRET           = random_password.authelia-oidc-client-secret["open-webui"].result
     OPENID_PROVIDER_URL           = "https://${local.endpoints.authelia.ingress}/.well-known/openid-configuration"
     OAUTH_PROVIDER_NAME           = "Authelia"
     OAUTH_SCOPES                  = "openid email profile groups"
