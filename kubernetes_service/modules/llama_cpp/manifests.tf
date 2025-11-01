@@ -1,7 +1,7 @@
 locals {
   llama_cpp_port = 8080
-  model_path     = "/var/lib/llama_cpp/models"
-  config_file    = "/var/lib/llama_cpp/config.yaml"
+  model_path     = "/llama-cpp/models"
+  config_file    = "/var/lib/llama-cpp/config.yaml"
 }
 
 module "metadata" {
@@ -100,7 +100,6 @@ module "mountpoint-s3-overlay" {
           until mountpoint ${local.model_path}; do
           sleep 1
           done
-          ln -sf "${local.model_path}" /models
 
           exec /app/llama-swap \
             --config ${local.config_file} \
