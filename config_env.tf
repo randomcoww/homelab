@@ -128,15 +128,15 @@ locals {
     # tier 3
     mountpoint       = "reg.cluster.internal/randomcoww/mountpoint-s3:v1.20.0.20251027.1427@sha256:c150e2a3135d0594e8cac15b06c7610dc6bc6310e28ddcbc366f6abc8aa512e5"
     hostapd          = "reg.cluster.internal/randomcoww/hostapd-noscan:v1.20251027.1426@sha256:2f9213d49b7469dd1d915a4dd6b043bc18b2c5c58423206573631149d00bf7f1"
-    tailscale        = "ghcr.io/tailscale/tailscale:v1.90.5@sha256:8528b4f401c950308efc5cdb32b7030c3dc3c3f41884b6f1af25157a7ae051bb"
+    tailscale        = "ghcr.io/tailscale/tailscale:v1.90.6@sha256:8eb8b450a85856807e8a216c4697333e15f8701cb6d344bed851bf6aa6a9605c"
     qrcode_generator = "reg.cluster.internal/randomcoww/qrcode-resource:v1.20251027.1418@sha256:1a44ee9e42cd16c3b0094dd9882be4a34702fb039c96de6bee173705c0db9258"
-    llama_cpp        = "ghcr.io/mostlygeek/llama-swap:cuda@sha256:a0d439f946c84eb1eda0ea7dd8abd919cacd9d48f75e20f6609b5e6cebd20911"
+    llama_cpp        = "ghcr.io/mostlygeek/llama-swap:cuda@sha256:b293a0270ca793c09506c9cb3991e7595cf22380f3c8bcf9964307dfd8c89ac7"
     sunshine_desktop = "reg.cluster.internal/randomcoww/sunshine-desktop:v2025.1026.25932.20251027.1425@sha256:68a04b45516d0fbd945e903e75038e2cd37715d974c087427cc16fb31ca65114"
     litestream       = "docker.io/litestream/litestream:0.5.2@sha256:e4fd484cb1cd9d6fa58fff7127d551118e150ab75b389cf868a053152ba6c9c0"
     valkey           = "ghcr.io/valkey-io/valkey:9.0.0-alpine@sha256:b4ee67d73e00393e712accc72cfd7003b87d0fcd63f0eba798b23251bfc9c394"
     nvidia_driver    = "reg.cluster.internal/randomcoww/nvidia-driver-container:v580.95.05.20251030.0646-fedora43@sha256:221e7b5be7a2115bbd3712fb750f967689fb3751eb0d2b0c70c8b2a3a18e7d28"
     mcp_proxy        = "ghcr.io/tbxark/mcp-proxy:v0.42.0@sha256:fa322a8f68097ad182235865049ee3fa7d26bca7d2155156bdc1e179569a86bc"
-    searxng          = "ghcr.io/searxng/searxng:latest@sha256:70d60ffb95eaf99e23203ada5f3f0c634dfb7177e176a9b9f79c328bba42243e"
+    searxng          = "ghcr.io/searxng/searxng:latest@sha256:50a94dae025ba1d9732bb354d23d0a61cdbfbc7f5a6ee538ef7f692c999ee8e5"
     open_webui       = "ghcr.io/open-webui/open-webui:0.6.34@sha256:98d13c0a9285c110fba9814ef8bfbbaff9250863236fe3a18d29e93534289312"
     kavita           = "ghcr.io/kareadita/kavita:0.8.8@sha256:22c42f3cc83fb98b98a6d6336200b615faf2cfd2db22dab363136744efda1bb0"
   }
