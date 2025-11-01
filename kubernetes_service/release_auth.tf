@@ -548,10 +548,8 @@ resource "helm_release" "authelia" {
                 ]
                 public                = false
                 authorization_policy  = "two_factor"
-                require_pkce          = false
-                pkce_challenge_method = ""
-                # require_pkce = true
-                # pkce_challenge_method = "S256"
+                require_pkce          = true
+                pkce_challenge_method = "S256"
                 redirect_uris = [
                   "https://${local.endpoints.kavita.ingress}/signin-oidc",
                 ]
