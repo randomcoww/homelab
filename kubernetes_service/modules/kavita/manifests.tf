@@ -1,6 +1,6 @@
 locals {
   kavita_port = 5000
-  data_path   = "/var/lib/kavita/mnt"
+  data_path   = "/library/mnt"
   db_file     = "/kavita/config/kavita.db"
 }
 
