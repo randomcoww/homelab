@@ -255,7 +255,7 @@ resource "helm_release" "authelia" {
                   labelSelector = {
                     matchExpressions = [
                       {
-                        key = "app"
+                        key      = "app"
                         operator = "In"
                         values = [
                           local.endpoints.lldap.name,
