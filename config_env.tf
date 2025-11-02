@@ -139,8 +139,8 @@ locals {
     searxng          = "ghcr.io/searxng/searxng:latest@sha256:50a94dae025ba1d9732bb354d23d0a61cdbfbc7f5a6ee538ef7f692c999ee8e5"
     open_webui       = "ghcr.io/open-webui/open-webui:0.6.34@sha256:98d13c0a9285c110fba9814ef8bfbbaff9250863236fe3a18d29e93534289312"
     kavita           = "ghcr.io/kareadita/kavita:0.8.8@sha256:22c42f3cc83fb98b98a6d6336200b615faf2cfd2db22dab363136744efda1bb0"
-    lldap            = "ghcr.io/lldap/lldap:latest-alpine"
-    authelia         = "ghcr.io/authelia/authelia:4.39.13"
+    lldap            = "ghcr.io/lldap/lldap:latest-alpine@sha256:59e99ffb8ca3634a907945ad33c50c328cc188618fe6a2a10a22703694d14313"
+    authelia         = "ghcr.io/authelia/authelia:4.39.13@sha256:7adc2a95b6a4be9332f6a420fdf59c7031bff203d1046ab80d8fbd66f5b1095f"
   }
 
   host_images = {
