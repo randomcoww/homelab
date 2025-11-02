@@ -247,6 +247,28 @@ resource "helm_release" "authelia" {
       pod = {
         replicas = 1
         kind     = "StatefulSet"
+        selectors = {
+          affinity = {
+            podAffinity = {
+              requiredDuringSchedulingIgnoredDuringExecution = [
+                {
+                  labelSelector = {
+                    matchExpressions = [
+                      {
+                        key = "app"
+                        operator = "In"
+                        values = [
+                          local.endpoints.lldap.name,
+                        ]
+                      },
+                    ]
+                  }
+                  topologyKey = "kubernetes.io/hostname"
+                },
+              ]
+            }
+          }
+        }
         extraVolumeMounts = [
           # "authelia" persistent volume is mounted to /config
           {
