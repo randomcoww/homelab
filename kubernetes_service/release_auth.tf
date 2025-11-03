@@ -66,8 +66,8 @@ locals {
   authelia_oidc_clients = {
     open-webui = {
       client_name           = "Open WebUI"
-      require_pkce          = false # TODO: enable
-      pkce_challenge_method = ""    # TODO: remove
+      require_pkce          = false
+      pkce_challenge_method = ""
       redirect_uris = [
         "https://${local.endpoints.open_webui.ingress}/oauth/oidc/callback",
       ]

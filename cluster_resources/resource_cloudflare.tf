@@ -15,6 +15,7 @@ locals {
   cloudflare_tunnel_ingress_endpoints = [
     local.endpoints.authelia.ingress,
     local.endpoints.kavita.ingress,
+    local.endpoints.open_webui.ingress,
   ]
 }
 

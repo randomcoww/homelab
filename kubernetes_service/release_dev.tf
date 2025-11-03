@@ -242,6 +242,7 @@ module "open-webui" {
       }
     ])
     # OIDC
+    ENABLE_LOGIN_FORM             = false
     ENABLE_OAUTH_SIGNUP           = true
     OAUTH_MERGE_ACCOUNTS_BY_EMAIL = true
     OAUTH_CLIENT_ID               = random_string.authelia-oidc-client-id["open-webui"].result
