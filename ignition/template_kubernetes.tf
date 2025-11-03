@@ -59,6 +59,7 @@ module "kubernetes-worker" {
   name                      = "kube-worker"
   cluster_name              = local.kubernetes.cluster_name
   ca                        = data.terraform_remote_state.sr.outputs.kubernetes.ca
+  registry_ca               = data.terraform_remote_state.sr.outputs.trust.ca
   kubelet_port              = local.host_ports.kubelet
   host_netnum               = each.value.netnum
   cluster_domain            = local.domains.kubernetes

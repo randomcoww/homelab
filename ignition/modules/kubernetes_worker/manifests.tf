@@ -115,7 +115,14 @@ locals {
       kubernetes_pod_prefix     = var.kubernetes_pod_prefix
       node_prefix               = var.node_prefix
       kubelet_port              = var.kubelet_port
-      internal_registries       = var.internal_registries
+      internal_registries = [
+        for _, reg in var.internal_registries :
+        merge(reg, {
+          client_cert_pem = tls_locally_signed_cert.registry-client[reg.prefix].cert_pem
+          client_key_pem  = tls_private_key.registry-client[reg.prefix].private_key_pem
+          ca_cert_pem     = var.registry_ca.cert_pem
+        })
+      ]
     })
     ], [
     yamlencode({

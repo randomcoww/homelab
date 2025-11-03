@@ -140,8 +140,26 @@ storage:
       mode: 0644
       contents:
         inline: |
-          %{~ for _, registry in internal_registries ~}
+          %{~ for _, reg in internal_registries ~}
           [[registry]]
-          location = "${registry.location}"
-          prefix = "${registry.prefix}"
+          location = "${reg.location}"
+          prefix = "${reg.prefix}"
           %{~ endfor ~}
+    # https://man.archlinux.org/man/containers-certs.d.5.en
+    %{~ for _, reg in internal_registries ~}
+    - path: /etc/containers/certs.d/${reg.prefix}/ca.crt
+      mode: 0600
+      contents:
+        inline: |
+          ${indent(10, chomp(reg.ca_cert_pem))}
+    - path: /etc/containers/certs.d/${reg.prefix}/client.cert
+      mode: 0600
+      contents:
+        inline: |
+          ${indent(10, chomp(reg.client_cert_pem))}
+    - path: /etc/containers/certs.d/${reg.prefix}/client.key
+      mode: 0600
+      contents:
+        inline: |
+          ${indent(10, chomp(reg.client_key_pem))}
+    %{~ endfor ~}
