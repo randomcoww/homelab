@@ -8,6 +8,7 @@ locals {
     module.kube-vip,
     module.device-plugin,
     module.kea,
+    module.lldap,
     module.tailscale,
     module.hostapd,
     module.qrcode-hostapd,
@@ -18,7 +19,6 @@ locals {
     module.open-webui,
     module.llama-cpp,
     # module.sunshine-desktop,
-    module.lldap,
   ]
 }
 

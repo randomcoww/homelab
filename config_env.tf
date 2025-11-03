@@ -130,7 +130,7 @@ locals {
     tailscale        = "ghcr.io/tailscale/tailscale:v1.90.6@sha256:8eb8b450a85856807e8a216c4697333e15f8701cb6d344bed851bf6aa6a9605c"
     qrcode_generator = "reg.cluster.internal/randomcoww/qrcode-resource:v1.20251027.1418@sha256:1a44ee9e42cd16c3b0094dd9882be4a34702fb039c96de6bee173705c0db9258"
     llama_cpp        = "ghcr.io/mostlygeek/llama-swap:cuda@sha256:d196738003fcf0000e1b21e9f9fa4dfb25073ccc173f4a6ed6db538fe72ebfc0"
-    sunshine_desktop = "reg.cluster.internal/randomcoww/sunshine-desktop:v2025.1026.25932.20251027.1425@sha256:68a04b45516d0fbd945e903e75038e2cd37715d974c087427cc16fb31ca65114"
+    sunshine_desktop = "reg.cluster.internal/randomcoww/sunshine-desktop:v2025.1027.181930.20251103.0140@sha256:ede7334fbce5842f39e60b25a6db1e26b3cf71eee412f2f0ae5bd6332dbfc26c"
     litestream       = "docker.io/litestream/litestream:0.5.2@sha256:e4fd484cb1cd9d6fa58fff7127d551118e150ab75b389cf868a053152ba6c9c0"
     valkey           = "ghcr.io/valkey-io/valkey:9.0.0-alpine@sha256:b4ee67d73e00393e712accc72cfd7003b87d0fcd63f0eba798b23251bfc9c394"
     nvidia_driver    = "reg.cluster.internal/randomcoww/nvidia-driver-container:v580.95.05.20251030.0646-fedora43@sha256:221e7b5be7a2115bbd3712fb750f967689fb3751eb0d2b0c70c8b2a3a18e7d28"
