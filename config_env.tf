@@ -296,7 +296,6 @@ locals {
         name      = "lldap"
         namespace = "auth"
         ingress   = "ldap.${local.domains.public}"
-        service   = "lldap.auth.svc.${local.domains.kubernetes}"
       }
       authelia = {
         name      = "authelia"
@@ -305,9 +304,10 @@ locals {
       }
     } :
     name => merge(e, {
-      namespace = lookup(e, "namespace", "default")
-      service   = "${lookup(e, "service", "${e.name}.${lookup(e, "namespace", "default")}")}"
-      ingress   = "${lookup(e, "ingress", "${e.name}.${local.domains.public}")}"
+      namespace    = lookup(e, "namespace", "default")
+      service      = "${lookup(e, "service", "${e.name}.${lookup(e, "namespace", "default")}")}"
+      service_fqdn = "${e.name}.${lookup(e, "namespace", "default")}.svc.${local.domains.kubernetes}"
+      ingress      = "${lookup(e, "ingress", "${e.name}.${local.domains.public}")}"
     })
   }
 

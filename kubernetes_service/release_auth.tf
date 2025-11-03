@@ -42,7 +42,7 @@ module "lldap" {
   minio_litestream_prefix = "$POD_NAME/litestream"
   minio_access_secret     = local.minio_users.lldap.secret
 
-  service_hostname   = local.endpoints.lldap.service
+  service_hostname   = local.endpoints.lldap.service_fqdn
   ingress_hostname   = local.endpoints.lldap.ingress
   ingress_class_name = local.endpoints.ingress_nginx.name
   nginx_ingress_annotations = merge(local.nginx_ingress_annotations_common, {
@@ -522,8 +522,8 @@ resource "helm_release" "authelia" {
               skip_verify     = false
               minimum_version = "TLS1.3"
             }
-            address = "ldaps://${local.endpoints.lldap.service}:${local.service_ports.ldaps}"
-            base_dn = "dc=${join(",dc=", slice(compact(split(".", local.endpoints.lldap.service)), 1, length(compact(split(".", local.endpoints.lldap.service)))))}"
+            address = "ldaps://${local.endpoints.lldap.service_fqdn}:${local.service_ports.ldaps}"
+            base_dn = "dc=${join(",dc=", slice(compact(split(".", local.endpoints.lldap.service_fqdn)), 1, length(compact(split(".", local.endpoints.lldap.service_fqdn)))))}"
             attributes = {
               username     = "uid"
               mail         = "mail"
@@ -534,7 +534,7 @@ resource "helm_release" "authelia" {
             users_filter         = "(&({username_attribute}={input})(objectClass=person))"
             additional_groups_dn = "ou=groups"
             groups_filter        = "(member={dn})"
-            user                 = "uid=${random_password.lldap-user.result},ou=people,dc=${join(",dc=", slice(compact(split(".", local.endpoints.lldap.service)), 1, length(compact(split(".", local.endpoints.lldap.service)))))}"
+            user                 = "uid=${random_password.lldap-user.result},ou=people,dc=${join(",dc=", slice(compact(split(".", local.endpoints.lldap.service_fqdn)), 1, length(compact(split(".", local.endpoints.lldap.service_fqdn)))))}"
             password = {
               value = random_password.lldap-password.result
             }

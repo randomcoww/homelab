@@ -27,11 +27,19 @@ locals {
     proxy_cache_bypass 1;
     proxy_set_header Host $host;
     proxy_set_header X-Real-IP $remote_addr;
+    proxy_set_header X-Forwarded-Method $request_method;
     proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
     proxy_set_header X-Forwarded-Proto $scheme;
     proxy_read_timeout 3600s;
     proxy_send_timeout 3600s;
     EOF
     "nginx.ingress.kubernetes.io/affinity"          = "cookie"
+  }
+
+  nginx_ingress_annotations_authelia = {
+    "nginx.ingress.kubernetes.io/auth-method"           = "GET"
+    "nginx.ingress.kubernetes.io/auth-url"              = "http://${local.endpoints.authelia.service_fqdn}/api/authz/auth-request"
+    "nginx.ingress.kubernetes.io/auth-signin"           = "https://${local.endpoints.authelia.ingress}?rm=$request_method"
+    "nginx.ingress.kubernetes.io/auth-response-headers" = "Remote-User,Remote-Name,Remote-Groups,Remote-Email"
   }
 }
