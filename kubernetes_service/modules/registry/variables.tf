@@ -17,8 +17,7 @@ variable "affinity" {
 
 variable "images" {
   type = object({
-    registry    = string
-    registry_ui = string
+    registry = string
   })
 }
 
@@ -72,14 +71,6 @@ variable "service_ip" {
 }
 
 variable "service_hostname" {
-  type = string
-}
-
-variable "ingress_hostname" {
-  type = string
-}
-
-variable "ingress_class_name" {
   type = string
 }
 

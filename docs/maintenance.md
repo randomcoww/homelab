@@ -53,6 +53,18 @@ terraform -chdir=minio_resources apply
 
 ---
 
+#### Registry management
+
+```bash
+regctl registry set reg.cluster.internal --tls enabled --cacert "$(cat $HOME/.mc/certs/CAs/ca.crt)"
+
+regctl repo ls reg.cluster.internal
+regctl tag ls reg.cluster.internal/${REPO}
+regctl tag delete reg.cluster.internal/${REPO}:${TAG}
+```
+
+---
+
 ### User management
 
 Get LDAP admin password

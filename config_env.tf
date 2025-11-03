@@ -122,7 +122,6 @@ locals {
     stork_agent           = "ghcr.io/randomcoww/stork-agent:v2.3.1.20251027.1419@sha256:c6d9df6e394b8520861748776659ce4a5ce60c6059ceec8a51c6613f52f9d2d9"
     ipxe                  = "ghcr.io/randomcoww/ipxe:v1.20251027.1418@sha256:e7b7cc1859de9c291bee8d938ba311c2b01d62a3b8d5a6ec85c96f95101e8965"
     registry              = "ghcr.io/distribution/distribution:3.0.0@sha256:4ba3adf47f5c866e9a29288c758c5328ef03396cb8f5f6454463655fa8bc83e2"
-    registry_ui           = "docker.io/quiq/registry-ui:0.10.4@sha256:88e90f14a2654b48a6ca8112b3bd000d3e2472a8cbf560d73af679f5558273f2"
     device_plugin         = "ghcr.io/squat/generic-device-plugin:latest@sha256:0573cc6f83db2e3466caa8b597620fd05aea914c4b96f6232203a165c0c1dd86"
     github_actions_runner = "ghcr.io/actions/actions-runner:2.329.0@sha256:75599cd393958a52142f489a160123f5b9b21605a40609696deb13d49867d53f"
     # tier 3
@@ -268,7 +267,6 @@ locals {
       registry = {
         name    = "registry"
         service = "reg.${local.domains.kubernetes}"
-        ingress = "reg.${local.domains.public}"
       }
       qrcode_hostapd = {
         name    = "qrcode-hostapd"

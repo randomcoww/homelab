@@ -275,8 +275,7 @@ module "registry" {
   release   = "0.1.0"
   replicas  = 2
   images = {
-    registry    = local.container_images.registry
-    registry_ui = local.container_images.registry_ui
+    registry = local.container_images.registry
   }
   ports = {
     registry = local.service_ports.registry
@@ -291,9 +290,6 @@ module "registry" {
 
   service_ip       = local.services.registry.ip
   service_hostname = local.endpoints.registry.service
-  ingress_hostname = local.endpoints.registry.ingress
-
-  ingress_class_name = local.endpoints.ingress_nginx.name
   nginx_ingress_annotations = merge(local.nginx_ingress_annotations_common, {
     "cert-manager.io/cluster-issuer" = local.kubernetes.cert_issuers.acme_prod
   })
