@@ -22,7 +22,15 @@ output "r2_bucket" {
 }
 
 output "cloudflare_tunnel" {
-  value     = cloudflare_zero_trust_tunnel_cloudflared.tunnel
+  value = merge({
+    for _, k in [
+      "account_id",
+      "name",
+      "id",
+      "tunnel_secret",
+    ] :
+    k => cloudflare_zero_trust_tunnel_cloudflared.tunnel[k]
+  })
   sensitive = true
 }
 

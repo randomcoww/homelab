@@ -189,7 +189,7 @@ resource "cloudflare_dns_record" "record" {
   for_each = toset(local.cloudflare_tunnel_ingress_endpoints)
 
   zone_id = local.cloudflare_zone_id
-  name    = regex(local.domain_regex, each.key).subdomain
+  name    = each.key
   ttl     = 1
   content = "${cloudflare_zero_trust_tunnel_cloudflared.tunnel.id}.cfargotunnel.com"
   type    = "CNAME"
