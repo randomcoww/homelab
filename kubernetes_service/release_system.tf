@@ -153,11 +153,9 @@ resource "helm_release" "ingress-nginx" {
         }
         ingressClass = local.endpoints.ingress_nginx.name
         service = {
-          type                  = "LoadBalancer"
-          loadBalancerIP        = "0.0.0.0"
-          loadBalancerClass     = "kube-vip.io/kube-vip-class"
-          externalTrafficPolicy = "Local"
-          sessionAffinity       = "ClientIP"
+          type              = "LoadBalancer"
+          loadBalancerIP    = "0.0.0.0"
+          loadBalancerClass = "kube-vip.io/kube-vip-class"
         }
         allowSnippetAnnotations = true
         config = {

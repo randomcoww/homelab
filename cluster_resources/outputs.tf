@@ -21,13 +21,8 @@ output "r2_bucket" {
   sensitive = true
 }
 
-output "cloudflare_tunnels" {
-  value = {
-    for tunnel in cloudflare_zero_trust_tunnel_cloudflared.tunnel :
-    tunnel.name => merge(tunnel, {
-      account_id = local.cloudflare_account_id
-    })
-  }
+output "cloudflare_tunnel" {
+  value     = cloudflare_zero_trust_tunnel_cloudflared.tunnel
   sensitive = true
 }
 

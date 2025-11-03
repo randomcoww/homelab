@@ -12,16 +12,10 @@ locals {
     "music",
   ]
 
-  cloudflare_tunnels = {
-    # type = map(object({
-    #   path    = string
-    #   service = string
-    # }))
-    public = {
-      path    = "/"
-      service = "https://${local.endpoints.ingress_nginx.service}"
-    }
-  }
+  cloudflare_tunnel_ingress_endpoints = [
+    local.endpoints.authelia.ingress,
+    local.endpoints.kavita.ingress,
+  ]
 }
 
 data "cloudflare_accounts" "accounts" {
@@ -152,27 +146,25 @@ resource "cloudflare_ruleset" "geo_filter" {
 }
 
 resource "random_id" "cloudflare_tunnel_secret" {
-  for_each    = local.cloudflare_tunnels
-  byte_length = 35
+  byte_length = 64
 }
 
 resource "cloudflare_zero_trust_tunnel_cloudflared" "tunnel" {
-  for_each      = local.cloudflare_tunnels
-  name          = each.key
+  name          = "public"
   account_id    = local.cloudflare_account_id
-  tunnel_secret = random_id.cloudflare_tunnel_secret[each.key].b64_std
+  tunnel_secret = random_id.cloudflare_tunnel_secret.b64_std
 }
 
 resource "cloudflare_zero_trust_tunnel_cloudflared_config" "tunnel" {
-  for_each   = local.cloudflare_tunnels
   account_id = local.cloudflare_account_id
-  tunnel_id  = cloudflare_zero_trust_tunnel_cloudflared.tunnel[each.key].id
+  tunnel_id  = cloudflare_zero_trust_tunnel_cloudflared.tunnel.id
   config = {
-    ingress = [
+    ingress = concat([
+      for _, hostname in local.cloudflare_tunnel_ingress_endpoints :
       {
-        hostname = "*.${local.domains.public}"
-        service  = each.value.service
-        path     = each.value.path
+        hostname = hostname
+        service  = "https://${local.endpoints.ingress_nginx.service}"
+        path     = "/"
         # need to remove default params from terrafrom
         origin_request = {
           http2_origin           = true
@@ -184,20 +176,22 @@ resource "cloudflare_zero_trust_tunnel_cloudflared_config" "tunnel" {
           keep_alive_timeout     = 0
           keep_alive_connections = 0
         }
-      },
+      }
+      ], [
       {
         service = "http_status:404"
       },
-    ]
+    ])
   }
 }
 
 resource "cloudflare_dns_record" "record" {
-  for_each = local.cloudflare_tunnels
-  zone_id  = local.cloudflare_zone_id
-  name     = "*"
-  ttl      = 1
-  content  = "${cloudflare_zero_trust_tunnel_cloudflared.tunnel[each.key].id}.cfargotunnel.com"
-  type     = "CNAME"
-  proxied  = true
+  for_each = toset(local.cloudflare_tunnel_ingress_endpoints)
+
+  zone_id = local.cloudflare_zone_id
+  name    = regex(local.domain_regex, each.key).subdomain
+  ttl     = 1
+  content = "${cloudflare_zero_trust_tunnel_cloudflared.tunnel.id}.cfargotunnel.com"
+  type    = "CNAME"
+  proxied = true
 }

@@ -140,6 +140,7 @@ locals {
     kavita           = "ghcr.io/kareadita/kavita:0.8.8@sha256:22c42f3cc83fb98b98a6d6336200b615faf2cfd2db22dab363136744efda1bb0"
     lldap            = "ghcr.io/lldap/lldap:latest-alpine@sha256:59e99ffb8ca3634a907945ad33c50c328cc188618fe6a2a10a22703694d14313"
     authelia         = "ghcr.io/authelia/authelia:4.39.13@sha256:7adc2a95b6a4be9332f6a420fdf59c7031bff203d1046ab80d8fbd66f5b1095f"
+    cloudflared      = "docker.io/cloudflare/cloudflared:2025.10.1"
   }
 
   host_images = {
@@ -190,7 +191,7 @@ locals {
     bgp_as                 = 65005
   }
 
-  domain_regex = "(?<subdomain>[a-z0-9-]+)\\.(?<domain>[a-z0-9.-]+)"
+  domain_regex = "(?<subdomain>[a-z0-9-*]+)\\.(?<domain>[a-z0-9.-]+)"
 
   domains = {
     kubernetes = "cluster.internal"
@@ -231,10 +232,12 @@ locals {
       ingress_nginx = {
         name      = "ingress-nginx"
         namespace = "ingress-nginx"
+        service   = "ingress-nginx-controller.ingress-nginx" # Name created by helm chart
       }
       ingress_nginx_internal = {
         name      = "ingress-nginx-internal"
         namespace = "ingress-nginx"
+        service   = "ingress-nginx-internal-controller.ingress-nginx" # Name created by helm chart
       }
       apiserver = {
         name = "kubernetes"

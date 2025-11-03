@@ -189,7 +189,7 @@ module "tailscale" {
 }
 
 # Cloudflare tunnel
-/*
+
 resource "helm_release" "cloudflare-tunnel" {
   name          = "cloudflare-tunnel"
   namespace     = "default"
@@ -202,11 +202,15 @@ resource "helm_release" "cloudflare-tunnel" {
   timeout       = local.kubernetes.helm_release_timeout
   values = [
     yamlencode({
+      image = {
+        repository = regex(local.container_image_regex, local.container_images.cloudflared).depName
+        tag        = regex(local.container_image_regex, local.container_images.cloudflared).tag
+      }
       cloudflare = {
-        account    = data.terraform_remote_state.sr.outputs.cloudflare_tunnels.public.account_id
-        tunnelName = data.terraform_remote_state.sr.outputs.cloudflare_tunnels.public.name
-        tunnelId   = data.terraform_remote_state.sr.outputs.cloudflare_tunnels.public.id
-        secret     = data.terraform_remote_state.sr.outputs.cloudflare_tunnels.public.tunnel_secret
+        account    = data.terraform_remote_state.sr.outputs.cloudflare_tunnel.account_id
+        tunnelName = data.terraform_remote_state.sr.outputs.cloudflare_tunnel.name
+        tunnelId   = data.terraform_remote_state.sr.outputs.cloudflare_tunnel.id
+        secret     = data.terraform_remote_state.sr.outputs.cloudflare_tunnel.tunnel_secret
         ingress = [
           {
             hostname = "*.${local.domains.public}"
@@ -217,4 +221,3 @@ resource "helm_release" "cloudflare-tunnel" {
     }),
   ]
 }
-*/
