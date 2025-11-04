@@ -124,10 +124,6 @@ module "litestream-overlay" {
           "-c",
           <<-EOF
           set -e
-
-          until mountpoint ${local.data_path}; do
-          sleep 1
-          done
           echo "$APPSETTINGS" > "${dirname(local.db_file)}/appsettings.json"
 
           exec /entrypoint.sh

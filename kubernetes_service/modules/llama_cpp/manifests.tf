@@ -97,10 +97,6 @@ module "mountpoint-s3-overlay" {
           set -e
           echo "Found driver $(nvidia-smi --query-gpu=driver_version --format=csv,noheader --id=0)"
 
-          until mountpoint ${local.model_path}; do
-          sleep 1
-          done
-
           exec /app/llama-swap \
             --config ${local.config_file} \
             --listen 0.0.0.0:${local.llama_cpp_port}

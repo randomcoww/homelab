@@ -75,6 +75,28 @@ output "template_spec" {
           privileged = true
         }
       },
+      {
+        name  = "${var.name}-mountpoint-mount-wait"
+        image = var.images.mountpoint
+        command = [
+          "sh",
+          "-c",
+          <<-EOF
+          set -e
+
+          until mountpoint ${var.mount_path}; do
+          sleep 1
+          done
+          EOF
+        ]
+        volumeMounts = [
+          {
+            name             = "${var.name}-mountpoint-shared"
+            mountPath        = dirname(var.mount_path)
+            mountPropagation = "HostToContainer"
+          },
+        ]
+      },
       ], [
       for _, container in lookup(var.template_spec, "initContainers", []) :
       merge(container, {
