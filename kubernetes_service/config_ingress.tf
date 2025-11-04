@@ -1,5 +1,8 @@
 locals {
   nginx_ingress_annotations_common = {
+    "nginx.ingress.kubernetes.io/proxy-buffering"         = "off"
+    "nginx.ingress.kubernetes.io/proxy-request-buffering" = "off"
+
     "nginx.ingress.kubernetes.io/http-snippet"      = <<-EOF
     map $http_upgrade $connection_upgrade {
       default upgrade;
@@ -12,7 +15,7 @@ locals {
     add_header X-XSS-Protection "0" always;
     add_header Permissions-Policy "interest-cohort=()";
     add_header Pragma "no-cache";
-    add_header Cache-Control "no-store";
+    add_header Cache-Control "no-store,no-cache";
     client_max_body_size 0;
     EOF
     "nginx.ingress.kubernetes.io/location-snippets" = <<-EOF
