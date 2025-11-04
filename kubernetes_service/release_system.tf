@@ -292,7 +292,7 @@ resource "helm_release" "reloader" {
   chart            = "reloader"
   wait             = false
   wait_for_jobs    = false
-  version          = "v2.2.3"
+  version          = "2.2.4"
   max_history      = 2
   timeout          = local.kubernetes.helm_release_timeout
   values = [
