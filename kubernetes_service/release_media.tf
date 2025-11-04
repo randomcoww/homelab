@@ -102,7 +102,8 @@ module "sunshine-desktop" {
     privileged = true
   }
   loadbalancer_class_name = "kube-vip.io/kube-vip-class"
-  admin_hostname          = local.endpoints.sunshine_desktop.ingress
+  ingress_hostname        = local.endpoints.sunshine_desktop.ingress
+  service_hostname        = local.endpoints.sunshine_desktop.service
   ingress_class_name      = local.endpoints.ingress_nginx.name
   nginx_ingress_annotations = merge(
     local.nginx_ingress_annotations_common,

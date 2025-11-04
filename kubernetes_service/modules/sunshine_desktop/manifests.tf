@@ -4,7 +4,6 @@ locals {
   tcp_ports = {
     https = local.base_port - 5
     http  = local.base_port
-    web   = local.base_port + 1
     rtsp  = local.base_port + 21
   }
   udp_ports = {
@@ -13,6 +12,7 @@ locals {
     audio   = local.base_port + 11
     mic     = local.base_port + 13
   }
+  web_port           = local.base_port + 1
   home_path          = "/home/${var.user}"
   sunshine_apps_file = "/etc/sunshine/apps.json"
 }
@@ -38,6 +38,7 @@ module "metadata" {
   manifests = {
     "templates/secret.yaml"      = module.secret.manifest
     "templates/service.yaml"     = module.service.manifest
+    "templates/web-service.yaml" = module.web-service.manifest
     "templates/ingress.yaml"     = module.ingress.manifest
     "templates/statefulset.yaml" = module.statefulset.manifest
   }
@@ -78,6 +79,9 @@ module "service" {
   name    = var.name
   app     = var.name
   release = var.release
+  annotations = {
+    "external-dns.alpha.kubernetes.io/hostname" = var.service_hostname
+  }
   spec = {
     type              = "LoadBalancer"
     loadBalancerIP    = "0.0.0.0"
@@ -102,6 +106,24 @@ module "service" {
   }
 }
 
+module "web-service" {
+  source  = "../../../modules/service"
+  name    = "${var.name}-web"
+  app     = var.name
+  release = var.release
+  spec = {
+    type = "ClusterIP"
+    ports = [
+      {
+        name       = "web"
+        port       = local.web_port
+        protocol   = "TCP"
+        targetPort = local.web_port
+      },
+    ]
+  }
+}
+
 module "ingress" {
   source             = "../../../modules/ingress"
   name               = var.name
@@ -116,11 +138,11 @@ module "ingress" {
   })
   rules = [
     {
-      host = var.admin_hostname
+      host = var.ingress_hostname
       paths = [
         {
-          service = module.service.name
-          port    = local.tcp_ports.web
+          service = module.web-service.name
+          port    = local.web_port
           path    = "/"
         },
       ]

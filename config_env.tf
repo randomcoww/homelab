@@ -265,7 +265,7 @@ locals {
       }
       searxng = {
         name    = "searxng"
-        ingress = "search.${local.domains.kubernetes}"
+        ingress = "searxng.${local.domains.kubernetes}"
       }
       registry = {
         name    = "registry"
@@ -281,19 +281,20 @@ locals {
       }
       llama_cpp = {
         name    = "llama-cpp"
-        ingress = "llama.${local.domains.kubernetes}"
+        ingress = "llama-cpp.${local.domains.kubernetes}"
       }
       sunshine_desktop = {
         name    = "sunshine-desktop"
+        service = "sunshine.${local.domains.public}"
         ingress = "sunadmin.${local.domains.public}"
       }
       mcp_proxy = {
         name    = "mcp-proxy"
-        ingress = "mcp.${local.domains.kubernetes}"
+        ingress = "mcp-proxy.${local.domains.kubernetes}"
       }
       open_webui = {
         name    = "open-webui"
-        ingress = "chat.${local.domains.public}"
+        ingress = "ai.${local.domains.public}"
       }
       lldap = {
         name      = "lldap"
@@ -303,7 +304,7 @@ locals {
       authelia = {
         name      = "authelia"
         namespace = "auth"
-        ingress   = "authelia.${local.domains.public}"
+        ingress   = "auth.${local.domains.public}"
       }
     } :
     name => merge(e, {

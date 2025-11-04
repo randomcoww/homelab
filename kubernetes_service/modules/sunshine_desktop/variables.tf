@@ -48,7 +48,11 @@ variable "affinity" {
   default = {}
 }
 
-variable "admin_hostname" {
+variable "ingress_hostname" {
+  type = string
+}
+
+variable "service_hostname" {
   type = string
 }
 

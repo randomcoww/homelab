@@ -151,14 +151,6 @@ resource "helm_release" "kube-dns" {
               fallthrough
               EOF
             },
-            # external service
-            {
-              name        = "k8s_external"
-              parameters  = local.domains.public
-              configBlock = <<-EOF
-              fallthrough
-              EOF
-            },
             {
               name = "hosts"
               configBlock = join("\n", concat(compact([

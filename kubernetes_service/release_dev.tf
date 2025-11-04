@@ -202,7 +202,6 @@ module "open-webui" {
   ingress_hostname = local.endpoints.open_webui.ingress
   extra_configs = {
     WEBUI_URL                      = "https://${local.endpoints.open_webui.ingress}"
-    ENABLE_SIGNUP                  = false
     ENABLE_VERSION_UPDATE_CHECK    = false
     ENABLE_OPENAI_API              = true
     OPENAI_API_BASE_URL            = "https://${local.endpoints.llama_cpp.ingress}/v1"
@@ -242,6 +241,7 @@ module "open-webui" {
       }
     ])
     # OIDC
+    ENABLE_SIGNUP                 = false
     ENABLE_LOGIN_FORM             = false
     ENABLE_OAUTH_SIGNUP           = true
     OAUTH_MERGE_ACCOUNTS_BY_EMAIL = true
