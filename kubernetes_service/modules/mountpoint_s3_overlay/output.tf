@@ -20,6 +20,7 @@ output "template_spec" {
             --auto-unmount \
             --allow-other \
             --maximum-throughput-gbps 1 \
+            --cache ${dirname(var.mount_path)} \
             %{~if length(var.s3_prefix) > 0~}
             --prefix ${var.s3_prefix}/ \
             %{~endif~}
@@ -102,9 +103,9 @@ output "template_spec" {
       merge(container, {
         volumeMounts = concat(lookup(container, "volumeMounts", []), [
           {
-            name             = "${var.name}-mountpoint-shared"
-            mountPath        = dirname(var.mount_path)
-            mountPropagation = "HostToContainer"
+            name      = "${var.name}-mountpoint-shared"
+            mountPath = var.mount_path
+            subPath   = basename(var.mount_path)
           },
         ])
       })
@@ -114,9 +115,9 @@ output "template_spec" {
       merge(container, {
         volumeMounts = concat(lookup(container, "volumeMounts", []), [
           {
-            name             = "${var.name}-mountpoint-shared"
-            mountPath        = dirname(var.mount_path)
-            mountPropagation = "HostToContainer"
+            name      = "${var.name}-mountpoint-shared"
+            mountPath = var.mount_path
+            subPath   = basename(var.mount_path)
           },
         ])
       })

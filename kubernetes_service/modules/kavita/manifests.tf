@@ -1,7 +1,8 @@
 locals {
-  kavita_port = 5000
-  data_path   = "/library/mnt"
-  db_file     = "/kavita/config/kavita.db"
+  kavita_port      = 5000
+  data_path        = "/library/mnt"
+  appsettings_file = "/kavita/config/appsettings.json" # not configurable
+  db_file          = "/kavita/config/kavita.db"        # not configurable
 }
 
 resource "random_bytes" "jwt-secret" {
@@ -124,7 +125,7 @@ module "litestream-overlay" {
           "-c",
           <<-EOF
           set -e
-          echo "$APPSETTINGS" > "${dirname(local.db_file)}/appsettings.json"
+          echo "$APPSETTINGS" > "${local.appsettings_file}"
 
           exec /entrypoint.sh
           EOF
@@ -175,17 +176,15 @@ module "litestream-overlay" {
 module "mountpoint-s3-overlay" {
   source = "../mountpoint_s3_overlay"
 
-  name        = var.name
-  app         = var.name
-  release     = var.release
-  mount_path  = local.data_path
-  s3_endpoint = var.minio_endpoint
-  s3_bucket   = var.minio_bucket
-  s3_prefix   = ""
-  s3_mount_extra_args = concat(var.minio_mount_extra_args, [
-    "--cache ${dirname(local.data_path)}",
-  ])
-  s3_access_secret = var.minio_access_secret
+  name                = var.name
+  app                 = var.name
+  release             = var.release
+  mount_path          = local.data_path
+  s3_endpoint         = var.minio_endpoint
+  s3_bucket           = var.minio_bucket
+  s3_prefix           = ""
+  s3_mount_extra_args = var.minio_mount_extra_args
+  s3_access_secret    = var.minio_access_secret
   images = {
     mountpoint = var.images.mountpoint
   }
