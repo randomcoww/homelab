@@ -221,7 +221,7 @@ resource "helm_release" "authelia" {
   namespace  = local.endpoints.authelia.namespace
   repository = "https://charts.authelia.com"
   chart      = "authelia"
-  version    = "0.10.47"
+  version    = "0.10.49"
   values = [
     yamlencode({
       image = {
