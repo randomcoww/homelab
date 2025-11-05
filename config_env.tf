@@ -294,7 +294,7 @@ locals {
       }
       open_webui = {
         name    = "open-webui"
-        ingress = "ai.${local.domains.public}"
+        ingress = "owui.${local.domains.public}"
       }
       lldap = {
         name      = "lldap"

@@ -196,13 +196,12 @@ module "litestream-overlay" {
       },
     ]
     volumes = [
-      # Use local-path for this
-      # {
-      #   name     = "${var.name}-litestream-data"
-      #   emptyDir = {
-      #     medium = "Memory"
-      #   }
-      # },
+      {
+        name = "${var.name}-litestream-data"
+        emptyDir = {
+          medium = "Memory"
+        }
+      },
       {
         name = "config"
         secret = {
@@ -226,6 +225,7 @@ module "statefulset" {
   app      = var.name
   release  = var.release
   affinity = var.affinity
+  /* persistent path for sqlite
   spec = {
     volumeClaimTemplates = [
       {
@@ -246,5 +246,6 @@ module "statefulset" {
       },
     ]
   }
+  */
   template_spec = module.litestream-overlay.template_spec
 }

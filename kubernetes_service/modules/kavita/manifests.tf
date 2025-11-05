@@ -148,6 +148,13 @@ module "litestream-overlay" {
             }
           },
         ]
+        startupProbe = {
+          httpGet = {
+            path = "/api/health"
+            port = local.kavita_port
+          }
+          initialDelaySeconds = 60
+        }
         livenessProbe = {
           httpGet = {
             path = "/api/health"
@@ -163,13 +170,12 @@ module "litestream-overlay" {
       },
     ]
     volumes = [
-      # Use local-path for this
-      # {
-      #   name     = "${var.name}-litestream-data"
-      #   emptyDir = {
-      #     medium = "Memory"
-      #   }
-      # },
+      {
+        name = "${var.name}-litestream-data"
+        emptyDir = {
+          medium = "Memory"
+        }
+      },
     ]
   }
 }
@@ -224,6 +230,7 @@ module "statefulset" {
   release  = var.release
   affinity = var.affinity
   replicas = var.replicas
+  /* persistent path for sqlite
   spec = {
     volumeClaimTemplates = [
       {
@@ -244,5 +251,6 @@ module "statefulset" {
       },
     ]
   }
+  */
   template_spec = module.covers-mountpoint-s3-overlay.template_spec
 }
