@@ -103,11 +103,11 @@ module "llama-cpp" {
   resources = {
     requests = {
       "nvidia.com/gpu" = 1
-      memory = "16Gi"
+      memory           = "16Gi"
     }
     limits = {
       "nvidia.com/gpu" = 1
-      memory = "16Gi"
+      memory           = "16Gi"
     }
   }
   minio_endpoint      = "https://${local.services.cluster_minio.ip}:${local.service_ports.minio}"
