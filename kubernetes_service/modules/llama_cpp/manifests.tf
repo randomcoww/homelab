@@ -90,17 +90,11 @@ module "mountpoint-s3-overlay" {
       {
         name  = var.name
         image = var.images.llama_cpp
-        command = [
-          "sh",
-          "-c",
-          <<-EOF
-          set -e
-          echo "Found driver $(nvidia-smi --query-gpu=driver_version --format=csv,noheader --id=0)"
-
-          exec /app/llama-swap \
-            --config ${local.config_file} \
-            --listen 0.0.0.0:${local.llama_cpp_port}
-          EOF
+        args = [
+          "--config",
+          "${local.config_file}",
+          "--listen",
+          "0.0.0.0:${local.llama_cpp_port}",
         ]
         volumeMounts = [
           {

@@ -124,6 +124,9 @@ module "hostapd" {
     ])}]"
   }
   resources = {
+    requests = {
+      "squat.ai/rfkill" = 1
+    }
     limits = {
       "squat.ai/rfkill" = 1
     }

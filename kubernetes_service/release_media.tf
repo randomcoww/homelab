@@ -10,6 +10,9 @@ module "kavita" {
     litestream = local.container_images.litestream
   }
   resources = {
+    requests = {
+      memory = "4Gi"
+    }
     limits = {
       memory = "4Gi"
     }
@@ -87,9 +90,12 @@ module "sunshine-desktop" {
   ]
   resources = {
     requests = {
-      memory = "12Gi"
+      memory = "16Gi"
+      "nvidia.com/gpu" = 1
+      "amd.com/gpu"    = 1
     }
     limits = {
+      memory = "16Gi"
       "nvidia.com/gpu" = 1
       "amd.com/gpu"    = 1
     }
