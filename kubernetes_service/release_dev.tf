@@ -239,7 +239,7 @@ module "open-webui" {
           description = ""
         }
       }
-    ], [
+      ], [
       {
         type      = "mcp"
         url       = "https://api.githubcopilot.com/mcp"
