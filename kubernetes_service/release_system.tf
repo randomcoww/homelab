@@ -18,7 +18,7 @@ resource "helm_release" "kubelet-csr-approver" {
   chart            = "kubelet-csr-approver"
   wait             = false
   wait_for_jobs    = false
-  version          = "v1.2.11"
+  version          = "1.2.12"
   max_history      = 2
   timeout          = local.kubernetes.helm_release_timeout
   values = [
@@ -292,7 +292,7 @@ resource "helm_release" "reloader" {
   chart            = "reloader"
   wait             = false
   wait_for_jobs    = false
-  version          = "2.2.4"
+  version          = "2.2.5"
   max_history      = 2
   timeout          = local.kubernetes.helm_release_timeout
   values = [
