@@ -94,9 +94,8 @@ module "sunshine-desktop" {
       "amd.com/gpu"    = 1
     }
   }
-  # TODO: Revisit - currently privileged to make libinput work
   security_context = {
-    privileged = true
+    privileged = true # TODO: Revisit - currently privileged to make libinput work
   }
   loadbalancer_class_name = "kube-vip.io/kube-vip-class"
   ingress_hostname        = local.endpoints.sunshine_desktop.ingress
