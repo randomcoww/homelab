@@ -108,7 +108,7 @@ module "litestream-overlay" {
             type          = "s3"
             endpoint      = var.minio_endpoint
             bucket        = var.minio_bucket
-            path          = var.minio_litestream_prefix
+            path          = "$POD_NAME/litestream"
             sync-interval = "100ms"
           },
         ]

@@ -29,15 +29,12 @@ module "kavita" {
     "cert-manager.io/cluster-issuer" = local.kubernetes.cert_issuers.acme_prod
   })
 
-  minio_endpoint          = "https://${local.services.cluster_minio.ip}:${local.service_ports.minio}"
-  minio_bucket            = "ebooks"
-  minio_litestream_bucket = "kavita"
-  minio_litestream_prefix = "$POD_NAME/litestream"
-  minio_mount_extra_args = [
-    "--read-only",
-  ]
-  minio_access_secret = local.minio_users.kavita.secret
-  ca_bundle_configmap = local.kubernetes.ca_bundle_configmap
+  minio_endpoint         = "https://${local.services.cluster_minio.ip}:${local.service_ports.minio}"
+  minio_data_bucket      = "ebooks"
+  minio_bucket           = "kavita"
+  minio_mount_extra_args = []
+  minio_access_secret    = local.minio_users.kavita.secret
+  ca_bundle_configmap    = local.kubernetes.ca_bundle_configmap
 }
 
 # Sunshine desktop

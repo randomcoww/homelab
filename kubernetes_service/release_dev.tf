@@ -106,7 +106,7 @@ module "llama-cpp" {
     }
   }
   minio_endpoint      = "https://${local.services.cluster_minio.ip}:${local.service_ports.minio}"
-  minio_bucket        = "models"
+  minio_data_bucket   = "models"
   minio_access_secret = local.minio_users.llama_cpp.secret
   minio_mount_extra_args = [
     "--read-only",
@@ -260,11 +260,10 @@ module "open-webui" {
     "cert-manager.io/cluster-issuer" = local.kubernetes.cert_issuers.acme_prod
   })
 
-  minio_endpoint          = "https://${local.services.cluster_minio.ip}:${local.service_ports.minio}"
-  minio_bucket            = "open-webui"
-  minio_litestream_prefix = "$POD_NAME/litestream"
-  minio_access_secret     = local.minio_users.open_webui.secret
-  ca_bundle_configmap     = local.kubernetes.ca_bundle_configmap
+  minio_endpoint      = "https://${local.services.cluster_minio.ip}:${local.service_ports.minio}"
+  minio_bucket        = "open-webui"
+  minio_access_secret = local.minio_users.open_webui.secret
+  ca_bundle_configmap = local.kubernetes.ca_bundle_configmap
 }
 
 # Internal registry

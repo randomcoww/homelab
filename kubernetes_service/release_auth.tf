@@ -37,10 +37,9 @@ module "lldap" {
   }
   ca_issuer_name = local.kubernetes.cert_issuers.ca_internal
 
-  minio_endpoint          = "https://${local.services.cluster_minio.ip}:${local.service_ports.minio}"
-  minio_bucket            = "lldap"
-  minio_litestream_prefix = "$POD_NAME/litestream"
-  minio_access_secret     = local.minio_users.lldap.secret
+  minio_endpoint      = "https://${local.services.cluster_minio.ip}:${local.service_ports.minio}"
+  minio_bucket        = "lldap"
+  minio_access_secret = local.minio_users.lldap.secret
 
   service_hostname   = local.endpoints.lldap.service_fqdn
   ingress_hostname   = local.endpoints.lldap.ingress

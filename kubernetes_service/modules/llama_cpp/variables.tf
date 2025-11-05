@@ -44,7 +44,7 @@ variable "minio_endpoint" {
   type = string
 }
 
-variable "minio_bucket" {
+variable "minio_data_bucket" {
   type = string
 }
 

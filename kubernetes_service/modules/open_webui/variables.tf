@@ -57,10 +57,6 @@ variable "minio_bucket" {
   type = string
 }
 
-variable "minio_litestream_prefix" {
-  type = string
-}
-
 variable "minio_access_secret" {
   type = string
 }

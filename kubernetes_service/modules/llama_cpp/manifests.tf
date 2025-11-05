@@ -75,7 +75,7 @@ module "mountpoint-s3-overlay" {
   release             = var.release
   mount_path          = local.model_path
   s3_endpoint         = var.minio_endpoint
-  s3_bucket           = var.minio_bucket
+  s3_bucket           = var.minio_data_bucket
   s3_prefix           = ""
   s3_mount_extra_args = var.minio_mount_extra_args
   s3_access_secret    = var.minio_access_secret

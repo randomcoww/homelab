@@ -1,3 +1,7 @@
+locals {
+  mount_path_internal = "/${var.name}-mountpoint-s3/mnt"
+}
+
 output "template_spec" {
   value = merge(var.template_spec, {
     initContainers = concat([
@@ -11,7 +15,7 @@ output "template_spec" {
           <<-EOF
           set -e
 
-          mkdir -p ${var.mount_path}
+          mkdir -p ${local.mount_path_internal}
           exec mount-s3 \
             -f \
             --endpoint-url ${var.s3_endpoint} \
@@ -20,7 +24,7 @@ output "template_spec" {
             --auto-unmount \
             --allow-other \
             --maximum-throughput-gbps 1 \
-            --cache ${dirname(var.mount_path)} \
+            --cache ${dirname(local.mount_path_internal)} \
             %{~if length(var.s3_prefix) > 0~}
             --prefix ${var.s3_prefix}/ \
             %{~endif~}
@@ -28,7 +32,7 @@ output "template_spec" {
             ${arg} \
             %{~endfor~}
             ${var.s3_bucket} \
-            ${var.mount_path}
+            ${local.mount_path_internal}
           EOF
         ]
         env = [
@@ -62,7 +66,7 @@ output "template_spec" {
         volumeMounts = [
           {
             name             = "${var.name}-mountpoint-shared"
-            mountPath        = dirname(var.mount_path)
+            mountPath        = dirname(local.mount_path_internal)
             mountPropagation = "Bidirectional"
           },
           {
@@ -85,7 +89,7 @@ output "template_spec" {
           <<-EOF
           set -e
 
-          until mountpoint ${var.mount_path}; do
+          until mountpoint ${local.mount_path_internal}; do
           sleep 1
           done
           EOF
@@ -93,7 +97,7 @@ output "template_spec" {
         volumeMounts = [
           {
             name             = "${var.name}-mountpoint-shared"
-            mountPath        = dirname(var.mount_path)
+            mountPath        = dirname(local.mount_path_internal)
             mountPropagation = "HostToContainer"
           },
         ]
@@ -105,7 +109,7 @@ output "template_spec" {
           {
             name      = "${var.name}-mountpoint-shared"
             mountPath = var.mount_path
-            subPath   = basename(var.mount_path)
+            subPath   = basename(local.mount_path_internal)
           },
         ])
       })
@@ -117,7 +121,7 @@ output "template_spec" {
           {
             name      = "${var.name}-mountpoint-shared"
             mountPath = var.mount_path
-            subPath   = basename(var.mount_path)
+            subPath   = basename(local.mount_path_internal)
           },
         ])
       })

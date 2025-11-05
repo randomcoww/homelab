@@ -3,6 +3,7 @@ locals {
   data_path        = "/library/mnt"
   appsettings_file = "/kavita/config/appsettings.json" # not configurable
   db_file          = "/kavita/config/kavita.db"        # not configurable
+  covers_path      = "/kavita/config/covers"           # not configurable
 }
 
 resource "random_bytes" "jwt-secret" {
@@ -102,8 +103,8 @@ module "litestream-overlay" {
             name          = "minio"
             type          = "s3"
             endpoint      = var.minio_endpoint
-            bucket        = var.minio_litestream_bucket
-            path          = var.minio_litestream_prefix
+            bucket        = var.minio_bucket
+            path          = "$POD_NAME/litestream"
             sync-interval = "100ms"
           },
         ]
@@ -176,13 +177,35 @@ module "litestream-overlay" {
 module "mountpoint-s3-overlay" {
   source = "../mountpoint_s3_overlay"
 
-  name                = var.name
+  name        = var.name
+  app         = var.name
+  release     = var.release
+  mount_path  = local.data_path
+  s3_endpoint = var.minio_endpoint
+  s3_bucket   = var.minio_data_bucket
+  s3_prefix   = ""
+  s3_mount_extra_args = concat(var.minio_mount_extra_args, [
+    "--read-only",
+  ])
+  s3_access_secret = var.minio_access_secret
+  images = {
+    mountpoint = var.images.mountpoint
+  }
+  ca_bundle_configmap = var.ca_bundle_configmap
+
+  template_spec = module.litestream-overlay.template_spec
+}
+
+module "covers-mountpoint-s3-overlay" {
+  source = "../mountpoint_s3_overlay"
+
+  name                = "${var.name}-covers"
   app                 = var.name
   release             = var.release
-  mount_path          = local.data_path
+  mount_path          = local.covers_path
   s3_endpoint         = var.minio_endpoint
   s3_bucket           = var.minio_bucket
-  s3_prefix           = ""
+  s3_prefix           = "covers"
   s3_mount_extra_args = var.minio_mount_extra_args
   s3_access_secret    = var.minio_access_secret
   images = {
@@ -190,7 +213,7 @@ module "mountpoint-s3-overlay" {
   }
   ca_bundle_configmap = var.ca_bundle_configmap
 
-  template_spec = module.litestream-overlay.template_spec
+  template_spec = module.mountpoint-s3-overlay.template_spec
 }
 
 module "statefulset" {
@@ -221,5 +244,5 @@ module "statefulset" {
       },
     ]
   }
-  template_spec = module.mountpoint-s3-overlay.template_spec
+  template_spec = module.covers-mountpoint-s3-overlay.template_spec
 }

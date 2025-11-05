@@ -49,7 +49,7 @@ variable "minio_endpoint" {
   type = string
 }
 
-variable "minio_bucket" {
+variable "minio_data_bucket" {
   type = string
 }
 
@@ -58,11 +58,7 @@ variable "minio_mount_extra_args" {
   default = []
 }
 
-variable "minio_litestream_bucket" {
-  type = string
-}
-
-variable "minio_litestream_prefix" {
+variable "minio_bucket" {
   type = string
 }
 
