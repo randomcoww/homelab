@@ -252,6 +252,12 @@ module "litestream-overlay" {
           secretName = local.lldap_tls_secret_name
         }
       },
+      {
+        name = "${var.name}-litestream-data"
+        emptyDir = {
+          medium = "Memory"
+        }
+      },
     ]
   }
 }
@@ -263,6 +269,7 @@ module "statefulset" {
   app      = var.name
   release  = var.release
   affinity = var.affinity
+  /* persistent path for sqlite
   spec = {
     volumeClaimTemplates = [
       {
@@ -283,5 +290,6 @@ module "statefulset" {
       },
     ]
   }
+  */
   template_spec = module.litestream-overlay.template_spec
 }

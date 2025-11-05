@@ -269,7 +269,10 @@ resource "helm_release" "authelia" {
           }
         }
         extraVolumeMounts = [
-          # "authelia" persistent volume is mounted to /config
+          {
+            name      = local.endpoints.authelia.name # this is mounted automatically if persistance is enabled
+            mountPath = dirname(local.authelia_db_file)
+          },
           {
             name      = "ca-trust-bundle"
             mountPath = "/etc/ssl/certs/ca-certificates.crt"
@@ -302,6 +305,12 @@ resource "helm_release" "authelia" {
           },
         ]
         extraVolumes = [
+          {
+            name = local.endpoints.authelia.name # remove if persistance is enabled
+            emptyDir = {
+              medium = "Memory"
+            }
+          },
           {
             name = "secret-custom"
             secret = {
@@ -623,12 +632,15 @@ resource "helm_release" "authelia" {
         additionalSecrets = {
         }
       }
-      persistence = { # volume name for mount is "authelia"
+      persistence = {
+        enabled = false
+        /* persistent path for sqlite - remove extraVolumeMounts and extraVolumes entries if enabled
         enabled      = true
         storageClass = "local-path"
         accessModes = [
           "ReadWriteOnce",
         ]
+        */
       }
     }),
   ]
