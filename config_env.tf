@@ -125,7 +125,7 @@ locals {
     device_plugin         = "ghcr.io/squat/generic-device-plugin:latest@sha256:0cf725e91c3eb2ea095e8d825f290b9de5dc97110c82d0e92a76bf94618a8f50"
     github_actions_runner = "ghcr.io/actions/actions-runner:2.329.0@sha256:75599cd393958a52142f489a160123f5b9b21605a40609696deb13d49867d53f"
     # tier 3
-    mountpoint       = "reg.cluster.internal/randomcoww/mountpoint-s3:v1.21.0.20251105.0520@sha256:814c54b4d51e364b332d615d08f7107fd27233a82a1b0b2856cc223461a5406f"
+    mountpoint       = "reg.cluster.internal/randomcoww/mountpoint-s3:v1.21.0.20251106.0135@sha256:68245e71b016627579acd7910e6d83fd098fdcbc56e1d3fcd27be2b557e0682a"
     hostapd          = "reg.cluster.internal/randomcoww/hostapd-noscan:v1.20251103.1425@sha256:a4133aa84c644cf2e62eb96448ec1f48715b4b2fe36407b7a617d614de0dcf45"
     tailscale        = "ghcr.io/tailscale/tailscale:v1.90.6@sha256:8eb8b450a85856807e8a216c4697333e15f8701cb6d344bed851bf6aa6a9605c"
     qrcode_generator = "reg.cluster.internal/randomcoww/qrcode-resource:v1.20251103.1417@sha256:ea9faabb3ece13c092455321c8f6cdbd15207a1580efbcf34f03bc2b748bd388"
