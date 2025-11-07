@@ -59,7 +59,6 @@ module "arc-workflow-secret" {
                 "squat.ai/kvm" = 1
               }
               limits = {
-                memory         = "4Gi"
                 "squat.ai/kvm" = 1
               }
             }

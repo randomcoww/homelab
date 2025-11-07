@@ -204,6 +204,11 @@ module "open-webui" {
     open_webui = local.container_images.open_webui
     litestream = local.container_images.litestream
   }
+  resources = {
+    requests = {
+      memory = "4Gi"
+    }
+  }
   ingress_hostname = local.endpoints.open_webui.ingress
   extra_configs = {
     WEBUI_URL                      = "https://${local.endpoints.open_webui.ingress}"
