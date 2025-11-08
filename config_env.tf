@@ -129,7 +129,7 @@ locals {
     hostapd          = "reg.cluster.internal/randomcoww/hostapd-noscan:v1.20251103.1425@sha256:a4133aa84c644cf2e62eb96448ec1f48715b4b2fe36407b7a617d614de0dcf45"
     tailscale        = "ghcr.io/tailscale/tailscale:v1.90.6@sha256:8eb8b450a85856807e8a216c4697333e15f8701cb6d344bed851bf6aa6a9605c"
     qrcode_generator = "reg.cluster.internal/randomcoww/qrcode-resource:v1.20251103.1417@sha256:ea9faabb3ece13c092455321c8f6cdbd15207a1580efbcf34f03bc2b748bd388"
-    llama_cpp        = "ghcr.io/mostlygeek/llama-swap:cuda@sha256:fd1e402ea0c116d1f538bed11b895d60d560f28660ddb6c83392e7769b1f4b38"
+    llama_cpp        = "ghcr.io/mostlygeek/llama-swap:cuda@sha256:74807a75bc44b4d318a2faf360b96cde06f399f5866aaf4da9fa5b1bf1ad92f0"
     sunshine_desktop = "reg.cluster.internal/randomcoww/sunshine-desktop:v2025.1027.181930.20251103.1424@sha256:ce75f850ccb7e30f092ebbcee614835e6ac295f9712eee1fdac54e635d55e699"
     litestream       = "docker.io/litestream/litestream:0.5.2@sha256:e4fd484cb1cd9d6fa58fff7127d551118e150ab75b389cf868a053152ba6c9c0"
     valkey           = "ghcr.io/valkey-io/valkey:9.0.0-alpine@sha256:b4ee67d73e00393e712accc72cfd7003b87d0fcd63f0eba798b23251bfc9c394"
@@ -140,7 +140,7 @@ locals {
     kavita           = "ghcr.io/kareadita/kavita:0.8.8@sha256:22c42f3cc83fb98b98a6d6336200b615faf2cfd2db22dab363136744efda1bb0"
     lldap            = "ghcr.io/lldap/lldap:latest-alpine@sha256:59e99ffb8ca3634a907945ad33c50c328cc188618fe6a2a10a22703694d14313"
     authelia         = "ghcr.io/authelia/authelia:4.39.13@sha256:7adc2a95b6a4be9332f6a420fdf59c7031bff203d1046ab80d8fbd66f5b1095f"
-    cloudflared      = "docker.io/cloudflare/cloudflared:2025.10.1@sha256:21f3607baf2384c54d592b0efe76dd5f548c0dbc083e62fa22c7fac3923d077f"
+    cloudflared      = "docker.io/cloudflare/cloudflared:2025.11.1@sha256:89ee50efb1e9cb2ae30281a8a404fed95eb8f02f0a972617526f8c5b417acae2"
   }
 
   host_images = {
