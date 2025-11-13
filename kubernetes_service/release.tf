@@ -13,6 +13,7 @@ locals {
     module.hostapd,
     module.qrcode-hostapd,
     module.kavita,
+    module.webdav-ebooks,
     module.registry,
     module.searxng,
     module.mcp-proxy,
