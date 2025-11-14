@@ -141,7 +141,6 @@ locals {
     lldap            = "ghcr.io/lldap/lldap:latest-alpine@sha256:36482c2bf004d9ce1c67d95a7ef1788515f35707930294a477a814bcb2acc969"
     authelia         = "ghcr.io/authelia/authelia:4.39.14@sha256:88f1494b6ac1174641770f106335ab67752d66e5822b4059badca220b5d6153b"
     cloudflared      = "docker.io/cloudflare/cloudflared:2025.11.1@sha256:89ee50efb1e9cb2ae30281a8a404fed95eb8f02f0a972617526f8c5b417acae2"
-    rclone           = "ghcr.io/rclone/rclone:1.71.2@sha256:3103526c506266a9ecdf064efe99bf3677d92ef6407af124d8c56b4f49cbaa51"
   }
 
   host_images = {
@@ -279,10 +278,6 @@ locals {
       kavita = {
         name    = "kavita"
         ingress = "kavita.${local.domains.public}"
-      }
-      webdav_ebooks = {
-        name    = "webdav-ebooks"
-        ingress = "ebooks.${local.domains.public}"
       }
       llama_cpp = {
         name    = "llama-cpp"

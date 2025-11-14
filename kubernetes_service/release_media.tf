@@ -39,29 +39,6 @@ module "kavita" {
   ca_bundle_configmap    = local.kubernetes.ca_bundle_configmap
 }
 
-# Webdav
-
-module "webdav-ebooks" {
-  source    = "./modules/webdav"
-  name      = local.endpoints.webdav_ebooks.name
-  namespace = local.endpoints.webdav_ebooks.namespace
-  release   = "0.1.0"
-  replicas  = 1
-  images = {
-    rclone = local.container_images.rclone
-  }
-  service_hostname   = local.endpoints.webdav_ebooks.ingress
-  ingress_class_name = local.endpoints.ingress_nginx.name
-  nginx_ingress_annotations = merge(local.nginx_ingress_annotations_common, {
-    "cert-manager.io/cluster-issuer" = local.kubernetes.cert_issuers.acme_prod
-  })
-
-  minio_endpoint      = "https://${local.services.cluster_minio.ip}:${local.service_ports.minio}"
-  minio_bucket        = "ebooks"
-  minio_access_secret = local.minio_users.kavita.secret
-  ca_bundle_configmap = local.kubernetes.ca_bundle_configmap
-}
-
 # Sunshine desktop
 
 module "sunshine-desktop" {
