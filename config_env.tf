@@ -135,7 +135,7 @@ locals {
     valkey           = "ghcr.io/valkey-io/valkey:9.0.0-alpine@sha256:b4ee67d73e00393e712accc72cfd7003b87d0fcd63f0eba798b23251bfc9c394"
     nvidia_driver    = "reg.cluster.internal/randomcoww/nvidia-driver-container:v580.105.08.20251105.1811-fedora43@sha256:45aa19ddd0fb4adb374bd2cbb49f1212177cbb22ff125729148b2a82bda849c5"
     mcp_proxy        = "ghcr.io/tbxark/mcp-proxy:v0.43.0@sha256:0ab33e72c494ee795e9b95922beab736f251514d9e6ec1dcbe6ca317749ba5d3"
-    searxng          = "ghcr.io/searxng/searxng:latest@sha256:83c3d61dc9d8fa13016ba8208a9bdb60e29701a0f789fc9c7ecd1ff8c4ae51c2"
+    searxng          = "ghcr.io/searxng/searxng:latest@sha256:d5a54dde3968851d6a15f394bd1d64e0ac5e440e6b21c73bddf215dfcd82fe16"
     open_webui       = "ghcr.io/open-webui/open-webui:v0.6.36@sha256:dfe43b30a5474164b1a81e1cce298a6769bb22144f74df556beefee4ccca5394"
     kavita           = "ghcr.io/kareadita/kavita:0.8.8@sha256:22c42f3cc83fb98b98a6d6336200b615faf2cfd2db22dab363136744efda1bb0"
     lldap            = "ghcr.io/lldap/lldap:latest-alpine@sha256:36482c2bf004d9ce1c67d95a7ef1788515f35707930294a477a814bcb2acc969"
