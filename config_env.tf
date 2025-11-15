@@ -129,13 +129,13 @@ locals {
     hostapd          = "reg.cluster.internal/randomcoww/hostapd-noscan:v1.20251110.1425@sha256:bc112f81f0136a661bd6c4b1f300c6fcc7d47d4c5717cbdd26f6722805cf74da"
     tailscale        = "ghcr.io/tailscale/tailscale:v1.90.6@sha256:8eb8b450a85856807e8a216c4697333e15f8701cb6d344bed851bf6aa6a9605c"
     qrcode_generator = "reg.cluster.internal/randomcoww/qrcode-resource:v1.20251110.1417@sha256:24c085be4b09e1c7a2149042d88b20f0e266d63453b48fb4a0561fa3c3e2007f"
-    llama_cpp        = "ghcr.io/mostlygeek/llama-swap:cuda@sha256:50bc42441ac45d4ce7fe81eab653d70d6642bf34515093c04deb107b59ef7984"
+    llama_cpp        = "ghcr.io/mostlygeek/llama-swap:cuda@sha256:35c57644ef6ef4482842354a29db24137238ed63a32ddc4fac03f800627b4106"
     sunshine_desktop = "reg.cluster.internal/randomcoww/sunshine-desktop:v2025.1027.181930.20251110.1425@sha256:df9187c4b4a32306349a565f5cbed25fa15a0b92f02d062a4ad81de988df1393"
     litestream       = "docker.io/litestream/litestream:0.5.2@sha256:e4fd484cb1cd9d6fa58fff7127d551118e150ab75b389cf868a053152ba6c9c0"
     valkey           = "ghcr.io/valkey-io/valkey:9.0.0-alpine@sha256:b4ee67d73e00393e712accc72cfd7003b87d0fcd63f0eba798b23251bfc9c394"
     nvidia_driver    = "reg.cluster.internal/randomcoww/nvidia-driver-container:v580.105.08.20251105.1811-fedora43@sha256:45aa19ddd0fb4adb374bd2cbb49f1212177cbb22ff125729148b2a82bda849c5"
     mcp_proxy        = "ghcr.io/tbxark/mcp-proxy:v0.43.0@sha256:0ab33e72c494ee795e9b95922beab736f251514d9e6ec1dcbe6ca317749ba5d3"
-    searxng          = "ghcr.io/searxng/searxng:latest@sha256:7b763e6a95da4c5d320ba48c886fa0cae8745337f7510cdf216e96eabdbe0e65"
+    searxng          = "ghcr.io/searxng/searxng:latest@sha256:83c3d61dc9d8fa13016ba8208a9bdb60e29701a0f789fc9c7ecd1ff8c4ae51c2"
     open_webui       = "ghcr.io/open-webui/open-webui:v0.6.36@sha256:dfe43b30a5474164b1a81e1cce298a6769bb22144f74df556beefee4ccca5394"
     kavita           = "ghcr.io/kareadita/kavita:0.8.8@sha256:22c42f3cc83fb98b98a6d6336200b615faf2cfd2db22dab363136744efda1bb0"
     lldap            = "ghcr.io/lldap/lldap:latest-alpine@sha256:36482c2bf004d9ce1c67d95a7ef1788515f35707930294a477a814bcb2acc969"
@@ -146,7 +146,7 @@ locals {
   host_images = {
     for name, tag in {
       # these fields are updated by renovate - don't use var substitutions
-      coreos = "fedora-coreos-43.20251107.08" # renovate: randomcoww/fedora-coreos-config-custom
+      coreos = "fedora-coreos-43.20251115.03" # renovate: randomcoww/fedora-coreos-config-custom
     } :
     name => {
       kernel = "${tag}-live-kernel.$${buildarch:uristring}"
