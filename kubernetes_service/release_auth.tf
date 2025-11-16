@@ -503,10 +503,10 @@ resource "helm_release" "authelia" {
             enabled = false
           }
         }
-        default_2fa_method = "totp"
+        default_2fa_method = "webauthn"
         theme              = "dark"
         totp = {
-          disable = false
+          disable = true
         }
         webauthn = {
           disable = false
