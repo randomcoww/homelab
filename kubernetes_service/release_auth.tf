@@ -509,7 +509,7 @@ resource "helm_release" "authelia" {
           disable = false
         }
         webauthn = {
-          disable = true
+          disable = false
         }
         identity_validation = {
           reset_password = {
