@@ -129,7 +129,7 @@ locals {
     hostapd          = "reg.cluster.internal/randomcoww/hostapd-noscan:v1.20251110.1425@sha256:bc112f81f0136a661bd6c4b1f300c6fcc7d47d4c5717cbdd26f6722805cf74da"
     tailscale        = "ghcr.io/tailscale/tailscale:v1.90.6@sha256:8eb8b450a85856807e8a216c4697333e15f8701cb6d344bed851bf6aa6a9605c"
     qrcode_generator = "reg.cluster.internal/randomcoww/qrcode-resource:v1.20251110.1417@sha256:24c085be4b09e1c7a2149042d88b20f0e266d63453b48fb4a0561fa3c3e2007f"
-    llama_cpp        = "ghcr.io/mostlygeek/llama-swap:cuda@sha256:35c57644ef6ef4482842354a29db24137238ed63a32ddc4fac03f800627b4106"
+    llama_cpp        = "ghcr.io/mostlygeek/llama-swap:cuda@sha256:607fcd8a4623a732203c6323e655f4d00daa25d64f1e594a34879035cba0152e"
     sunshine_desktop = "reg.cluster.internal/randomcoww/sunshine-desktop:v2025.1027.181930.20251110.1425@sha256:df9187c4b4a32306349a565f5cbed25fa15a0b92f02d062a4ad81de988df1393"
     litestream       = "docker.io/litestream/litestream:0.5.2@sha256:e4fd484cb1cd9d6fa58fff7127d551118e150ab75b389cf868a053152ba6c9c0"
     valkey           = "ghcr.io/valkey-io/valkey:9.0.0-alpine@sha256:b4ee67d73e00393e712accc72cfd7003b87d0fcd63f0eba798b23251bfc9c394"
@@ -138,7 +138,7 @@ locals {
     searxng          = "ghcr.io/searxng/searxng:latest@sha256:d5a54dde3968851d6a15f394bd1d64e0ac5e440e6b21c73bddf215dfcd82fe16"
     open_webui       = "ghcr.io/open-webui/open-webui:v0.6.36@sha256:dfe43b30a5474164b1a81e1cce298a6769bb22144f74df556beefee4ccca5394"
     kavita           = "ghcr.io/kareadita/kavita:0.8.8@sha256:22c42f3cc83fb98b98a6d6336200b615faf2cfd2db22dab363136744efda1bb0"
-    lldap            = "ghcr.io/lldap/lldap:latest-alpine@sha256:36482c2bf004d9ce1c67d95a7ef1788515f35707930294a477a814bcb2acc969"
+    lldap            = "ghcr.io/lldap/lldap:latest-alpine@sha256:761bb5c0efd096b4d2dbf8c56a48e77c771692e374f89bf03e9e051611f93bfc"
     authelia         = "ghcr.io/authelia/authelia:4.39.14@sha256:88f1494b6ac1174641770f106335ab67752d66e5822b4059badca220b5d6153b"
     cloudflared      = "docker.io/cloudflare/cloudflared:2025.11.1@sha256:89ee50efb1e9cb2ae30281a8a404fed95eb8f02f0a972617526f8c5b417acae2"
   }
