@@ -5,5 +5,4 @@
 secrets.tfvars
 *.log
 output/
-bootstrap.yaml
 credentials.env
