@@ -44,7 +44,7 @@
     },
     {
       "matchPackageNames": [
-        "randomcoww/minio"
+        "minio/minio"
       ],
       "versioning": "regex:^(?<compatibility>\\w+)\\.(?<major>\\d{4})-(?<minor>\\d{2})-(?<patch>\\d{2})T(?<build>\\d{2}-\\d{2}-\\d{2})Z?$"
     },
