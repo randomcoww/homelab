@@ -133,7 +133,7 @@ locals {
     sunshine_desktop = "reg.cluster.internal/randomcoww/sunshine-desktop:v2025.1027.181930@sha256:39b1646ae3e8e2ef0a3ebbdfca917116974bc87e6e4cff3cdaee1799a55ac790"
     litestream       = "docker.io/litestream/litestream:0.5.2@sha256:e4fd484cb1cd9d6fa58fff7127d551118e150ab75b389cf868a053152ba6c9c0"
     valkey           = "ghcr.io/valkey-io/valkey:9.0.0-alpine@sha256:b4ee67d73e00393e712accc72cfd7003b87d0fcd63f0eba798b23251bfc9c394"
-    nvidia_driver    = "reg.cluster.internal/randomcoww/nvidia-driver-container:v580.105.08-fedora43@sha256:f7e33ee7ebd6a91d0a9c5bf66080c80c6235003fa647f51571766d35ab06181f"
+    nvidia_driver    = "reg.cluster.internal/randomcoww/nvidia-driver-container:v580.105.08-fedora43@sha256:86b5e4a13fb9d1766471156bbf7f378bae3163f50cd74a06b4f1a4c35c8a453c"
     mcp_proxy        = "ghcr.io/tbxark/mcp-proxy:v0.43.0@sha256:0ab33e72c494ee795e9b95922beab736f251514d9e6ec1dcbe6ca317749ba5d3"
     searxng          = "ghcr.io/searxng/searxng:latest@sha256:91da34403fc1d2c7ac23d1459af87870d87810b7d50b0c6a4585ab78846cb534"
     open_webui       = "ghcr.io/open-webui/open-webui:v0.6.36@sha256:dfe43b30a5474164b1a81e1cce298a6769bb22144f74df556beefee4ccca5394"
