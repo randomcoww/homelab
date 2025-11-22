@@ -79,9 +79,9 @@ resource "cloudflare_api_token" "r2_bucket" {
           id = data.cloudflare_api_token_permission_groups_list.r2_write.result[0].id
         },
       ]
-      resources = {
+      resources = jsonencode({
         "com.cloudflare.edge.r2.bucket.${local.cloudflare_account_id}_default_${each.key}" = "*"
-      }
+      })
     },
   ]
 }
@@ -101,9 +101,9 @@ resource "cloudflare_api_token" "dns" {
           id = data.cloudflare_api_token_permission_groups_list.dns_write.result[0].id
         },
       ]
-      resources = {
+      resources = jsonencode({
         "com.cloudflare.api.account.zone.*" = "*"
-      }
+      })
     },
   ]
 }
