@@ -116,7 +116,7 @@ locals {
     kube_vip           = "ghcr.io/kube-vip/kube-vip:v1.0.2@sha256:ee3702abc2daeb93399c22b14aa61aa233013f2a610e64ff3864033ebb3fedbc"
     external_dns       = "registry.k8s.io/external-dns/external-dns:v0.20.0@sha256:ddc7f4212ed09a21024deb1f470a05240837712e74e4b9f6d1f2632ff10672e7"
     minio              = "ghcr.io/randomcoww/minio:v20251015.172955@sha256:51bbb62c795f54a69fdb601e29504cbd75c3ffdfe0cd5ad34afbf3fc154d0615"
-    nginx              = "docker.io/nginxinc/nginx-unprivileged:1.29.2-alpine@sha256:e48070544dc976257eba7e208f0ae048b9f00f7a63d522bbd84fcd392cecb234"
+    nginx              = "docker.io/nginxinc/nginx-unprivileged:1.29.2-alpine@sha256:1334f319b3f53168e696b593c0307f58d68d367ac9cae1da746f5f3c4e222143"
     # tier 2
     kea                   = "ghcr.io/randomcoww/kea:v3.1.3@sha256:addebbf835a50103a655b3804f5c5e1ae1ded0502b816123b0ce3931abcec44c"
     stork_agent           = "ghcr.io/randomcoww/stork-agent:v2.3.1@sha256:95088d8f56cbbb497b0eaaf6a853d391580f8c7ee0cb237c812ffd68b89ebcdd"
@@ -127,9 +127,9 @@ locals {
     # tier 3
     mountpoint       = "reg.cluster.internal/randomcoww/mountpoint-s3:v1.21.0@sha256:1eb3f31774d7482a2357d87098abae6bad5a4a6dbb64f1391e84be44ace71766"
     hostapd          = "reg.cluster.internal/randomcoww/hostapd-noscan:v20251124.142638@sha256:b19dfb311b04e97b9d7e15145a2a7f5b12b25a42a90f9661e737dcac51a72b13"
-    tailscale        = "ghcr.io/tailscale/tailscale:v1.90.8@sha256:4dacf554cf34e84c15fb816aa68fb3428993c3d27feeafb86a9b3eb94248c40f"
+    tailscale        = "ghcr.io/tailscale/tailscale:v1.90.9@sha256:9975353aae933e8fbd1a81226d092a9225b9a0f98b173d365a9d525eca1cc298"
     qrcode_generator = "reg.cluster.internal/randomcoww/qrcode-resource:v20251119.015059@sha256:668df6ae8fd71340f63f4f8a37b4a00331b52c33c46f6095538b94c23c9b76d8"
-    llama_cpp        = "ghcr.io/mostlygeek/llama-swap:cuda@sha256:09ca6b204f92dc0135794087e069a1b44547caec03ebd724219d9c40a81bff9a"
+    llama_cpp        = "ghcr.io/mostlygeek/llama-swap:cuda@sha256:b3e5295c441273acb0805719001a0cdd580a705522bda669538101d816f18bcc"
     sunshine_desktop = "reg.cluster.internal/randomcoww/sunshine-desktop:v2025.1027.181930@sha256:a63c9e72f0b885d00a1de54b6cd1e2172441b9b15d497270c36e283090512055"
     litestream       = "docker.io/litestream/litestream:0.5.2@sha256:e4fd484cb1cd9d6fa58fff7127d551118e150ab75b389cf868a053152ba6c9c0"
     valkey           = "ghcr.io/valkey-io/valkey:9.0.0-alpine@sha256:b4ee67d73e00393e712accc72cfd7003b87d0fcd63f0eba798b23251bfc9c394"
