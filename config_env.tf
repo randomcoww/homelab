@@ -128,7 +128,7 @@ locals {
     mountpoint       = "reg.cluster.internal/randomcoww/mountpoint-s3:v1.21.0@sha256:1eb3f31774d7482a2357d87098abae6bad5a4a6dbb64f1391e84be44ace71766"
     hostapd          = "reg.cluster.internal/randomcoww/hostapd-noscan:v20251124.142638@sha256:b19dfb311b04e97b9d7e15145a2a7f5b12b25a42a90f9661e737dcac51a72b13"
     tailscale        = "ghcr.io/tailscale/tailscale:v1.90.9@sha256:9975353aae933e8fbd1a81226d092a9225b9a0f98b173d365a9d525eca1cc298"
-    qrcode_generator = "reg.cluster.internal/randomcoww/qrcode-resource:v20251119.015059@sha256:668df6ae8fd71340f63f4f8a37b4a00331b52c33c46f6095538b94c23c9b76d8"
+    qrcode_generator = "reg.cluster.internal/randomcoww/qrcode-resource:v20251124.141825@sha256:41d59bc5187543d6f67d60872c6ed179f578f82e6753733e1f718b7a292555d8"
     llama_cpp        = "ghcr.io/mostlygeek/llama-swap:cuda@sha256:b3e5295c441273acb0805719001a0cdd580a705522bda669538101d816f18bcc"
     sunshine_desktop = "reg.cluster.internal/randomcoww/sunshine-desktop:v2025.1027.181930@sha256:a63c9e72f0b885d00a1de54b6cd1e2172441b9b15d497270c36e283090512055"
     litestream       = "docker.io/litestream/litestream:0.5.2@sha256:e4fd484cb1cd9d6fa58fff7127d551118e150ab75b389cf868a053152ba6c9c0"
