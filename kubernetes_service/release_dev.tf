@@ -49,7 +49,7 @@ module "llama-cpp" {
   release   = "0.1.0"
   images = {
     llama_cpp  = local.container_images.llama_cpp
-    mountpoint = local.container_images_nodigest.mountpoint
+    mountpoint = local.container_images.mountpoint
   }
   ingress_hostname = local.endpoints.llama_cpp.ingress
   llama_swap_config = {

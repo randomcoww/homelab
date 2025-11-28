@@ -8,7 +8,7 @@ module "kavita" {
   replicas  = 1
   images = {
     kavita     = local.container_images.kavita
-    mountpoint = local.container_images_nodigest.mountpoint
+    mountpoint = local.container_images.mountpoint
     litestream = local.container_images.litestream
   }
   resources = {

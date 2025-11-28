@@ -143,11 +143,6 @@ locals {
     cloudflared      = "docker.io/cloudflare/cloudflared:2025.11.1@sha256:89ee50efb1e9cb2ae30281a8a404fed95eb8f02f0a972617526f8c5b417acae2"
   }
 
-  container_images_nodigest = {
-    for k, v in local.container_images :
-    k => "${regex(local.container_image_regex, v).depName}:${regex(local.container_image_regex, v).currentValue}"
-  }
-
   host_images = {
     for name, tag in {
       # these fields are updated by renovate - don't use var substitutions
