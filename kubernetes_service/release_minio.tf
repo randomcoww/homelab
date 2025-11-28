@@ -146,7 +146,7 @@ resource "helm_release" "minio" {
         # bypass TLS for metrics endpoints
         {
           name  = "${local.endpoints.minio.name}-metrics-proxy"
-          image = local.container_images.nginx
+          image = "${regex(local.container_image_regex, local.container_images.nginx).depName}:${regex(local.container_image_regex, local.container_images.nginx).currentValue}"
           ports = [
             {
               containerPort = local.service_ports.metrics
