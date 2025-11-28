@@ -91,7 +91,7 @@ resource "helm_release" "minio" {
     yamlencode({
       image = {
         repository = regex(local.container_image_regex, local.container_images.minio).depName
-        tag        = regex(local.container_image_regex, local.container_images.minio).tag
+        tag        = regex(local.container_image_regex, local.container_images.minio).currentValue
       }
       clusterDomain     = local.domains.kubernetes
       mode              = "distributed"
@@ -146,7 +146,7 @@ resource "helm_release" "minio" {
         # bypass TLS for metrics endpoints
         {
           name  = "${local.endpoints.minio.name}-metrics-proxy"
-          image = "${regex(local.container_image_regex, local.container_images.nginx).depName}:${regex(local.container_image_regex, local.container_images.nginx).currentValue}"
+          image = local.container_images_nodigest.nginx
           ports = [
             {
               containerPort = local.service_ports.metrics

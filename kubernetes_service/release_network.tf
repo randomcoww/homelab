@@ -6,9 +6,9 @@ module "kea" {
   namespace = local.endpoints.kea.namespace
   release   = "0.1.20"
   images = {
-    kea         = local.container_images.kea
+    kea         = local.container_images_nodigest.kea
     ipxe        = local.container_images.ipxe
-    stork_agent = local.container_images.stork_agent
+    stork_agent = local.container_images_nodigest.stork_agent
   }
   service_ips = [
     local.services.cluster_kea_primary.ip,
