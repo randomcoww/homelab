@@ -115,27 +115,27 @@ locals {
     flannel_cni_plugin = "ghcr.io/flannel-io/flannel-cni-plugin:latest@sha256:20bcb9ad81033d9b22378f7834800437bc77ffa92509d78830d0008a29f430d5"
     kube_vip           = "ghcr.io/kube-vip/kube-vip:v1.0.2@sha256:ee3702abc2daeb93399c22b14aa61aa233013f2a610e64ff3864033ebb3fedbc"
     external_dns       = "registry.k8s.io/external-dns/external-dns:v0.20.0@sha256:ddc7f4212ed09a21024deb1f470a05240837712e74e4b9f6d1f2632ff10672e7"
-    minio              = "ghcr.io/randomcoww/minio:v20251015.172955@sha256:cad9fa1a3d456391cdbb5ce804132bc3840d51e53aacecf84df3848f4bcaf02b"
-    nginx              = "docker.io/nginxinc/nginx-unprivileged:1.29.2-alpine@sha256:2af55ce6348ca31e01f37f74cfb59617209b6c685a67b25e235bf45d86164d40"
+    minio              = "ghcr.io/randomcoww/minio:v20251015.172955@sha256:ac122d08d24661632b4c82054530b0dc86c3add3ae0cd1a3827956dbb1bb9f34"
+    nginx              = "docker.io/nginxinc/nginx-unprivileged:1.29.2-alpine@sha256:ef3718c97c32241d2626fcf8890ce4dc913520a04dc304c28f894bb010b29809"
     # tier 2
-    kea                   = "ghcr.io/randomcoww/kea:v3.1.3@sha256:addebbf835a50103a655b3804f5c5e1ae1ded0502b816123b0ce3931abcec44c"
-    stork_agent           = "ghcr.io/randomcoww/stork-agent:v2.3.1@sha256:95088d8f56cbbb497b0eaaf6a853d391580f8c7ee0cb237c812ffd68b89ebcdd"
+    kea                   = "ghcr.io/randomcoww/kea:v3.1.4@sha256:403f5902181ceab79804144fd3f32d8b9a51274520b5fcb182b0b6b567c3844c"
+    stork_agent           = "ghcr.io/randomcoww/stork-agent:v2.3.1@sha256:ce6c6e551d5b5079535117aea427edbf7629a83c4f7d2c86fe95d660eddc5d25"
     ipxe                  = "ghcr.io/randomcoww/ipxe:v20251124.141917@sha256:8fd415a02d3ff386de6c8bdf36e8a458ee7017c0fec7a66fe166f816080463b9"
     registry              = "ghcr.io/distribution/distribution:3.0.0@sha256:4ba3adf47f5c866e9a29288c758c5328ef03396cb8f5f6454463655fa8bc83e2"
-    device_plugin         = "ghcr.io/squat/generic-device-plugin:latest@sha256:ef5deb09dcf7e577c8603857ae56ef479d91be6ab6f40dd2427166d510b0745f"
+    device_plugin         = "ghcr.io/squat/generic-device-plugin:latest@sha256:4896ffd516624d6eb7572e102bc4397e91f8bc3b2fb38b5bfefd758baae3dcf2"
     github_actions_runner = "ghcr.io/actions/actions-runner:2.330.0@sha256:ee54ad8776606f29434f159196529b7b9c83c0cb9195c1ff5a7817e7e570dcfe"
     # tier 3
-    mountpoint       = "reg.cluster.internal/randomcoww/mountpoint-s3:v1.21.0@sha256:1eb3f31774d7482a2357d87098abae6bad5a4a6dbb64f1391e84be44ace71766"
+    mountpoint       = "reg.cluster.internal/randomcoww/mountpoint-s3:v1.21.0@sha256:bcd41eb52afd4f43b54d9d1a6f474cba2fd73003699c24ba4e35033b964bf769"
     hostapd          = "reg.cluster.internal/randomcoww/hostapd-noscan:v20251124.142638@sha256:b19dfb311b04e97b9d7e15145a2a7f5b12b25a42a90f9661e737dcac51a72b13"
     tailscale        = "ghcr.io/tailscale/tailscale:v1.90.9@sha256:9975353aae933e8fbd1a81226d092a9225b9a0f98b173d365a9d525eca1cc298"
     qrcode_generator = "reg.cluster.internal/randomcoww/qrcode-resource:v20251124.141825@sha256:41d59bc5187543d6f67d60872c6ed179f578f82e6753733e1f718b7a292555d8"
-    llama_cpp        = "ghcr.io/mostlygeek/llama-swap:cuda@sha256:f9c2b63c7e5cedba550f4aae25599abb799a5e59de077324443c51dfc2b11a83"
-    sunshine_desktop = "reg.cluster.internal/randomcoww/sunshine-desktop:v2025.1027.181930@sha256:a63c9e72f0b885d00a1de54b6cd1e2172441b9b15d497270c36e283090512055"
+    llama_cpp        = "ghcr.io/mostlygeek/llama-swap:cuda@sha256:29cebdcecca59cfd2118754872c3141e6922c4ab3dee782201e9d1b40c26b15d"
+    sunshine_desktop = "reg.cluster.internal/randomcoww/sunshine-desktop:v2025.1129.183945@sha256:6ac96f954b95fc38fe39141c0a091a6e55aee96a2dbedde2941d9bdf99920099"
     litestream       = "docker.io/litestream/litestream:0.5.2@sha256:e4fd484cb1cd9d6fa58fff7127d551118e150ab75b389cf868a053152ba6c9c0"
     valkey           = "ghcr.io/valkey-io/valkey:9.0.0-alpine@sha256:b4ee67d73e00393e712accc72cfd7003b87d0fcd63f0eba798b23251bfc9c394"
-    nvidia_driver    = "reg.cluster.internal/randomcoww/nvidia-driver-container:v580.105.08-fedora43@sha256:33355448bb1865e7594f1acbac767aab7e741f4e851a35957e797392561b3bc3"
+    nvidia_driver    = "reg.cluster.internal/randomcoww/nvidia-driver-container:v580.105.08-fedora43@sha256:b84a1f8f2ae22727a66cdfe518279917fb1cf752474d89af7ca87992642a0fa4"
     mcp_proxy        = "ghcr.io/tbxark/mcp-proxy:v0.43.0@sha256:0ab33e72c494ee795e9b95922beab736f251514d9e6ec1dcbe6ca317749ba5d3"
-    searxng          = "ghcr.io/searxng/searxng:latest@sha256:0124d32d77e0c7360d0b85f5d91882d1837e6ceb243c82e190f5d7e9f1401334"
+    searxng          = "ghcr.io/searxng/searxng:latest@sha256:faa7118f9167c2c1e09a3fbb9bd87eee0905d76456d297e62e815646afc97037"
     open_webui       = "ghcr.io/open-webui/open-webui:0.6.40@sha256:c13ea534284fa52b282fb2780ffc34a42cc66495234789be8327a9f3d35b53dd"
     kavita           = "ghcr.io/kareadita/kavita:0.8.8@sha256:22c42f3cc83fb98b98a6d6336200b615faf2cfd2db22dab363136744efda1bb0"
     lldap            = "ghcr.io/lldap/lldap:latest-alpine@sha256:033161798f5592ac65ab62f406da51d1fa4272848be5535664ea19675b302f39"
@@ -146,7 +146,7 @@ locals {
   host_images = {
     for name, tag in {
       # these fields are updated by renovate - don't use var substitutions
-      coreos = "fedora-coreos-43.20251121.02" # renovate: randomcoww/fedora-coreos-config-custom
+      coreos = "fedora-coreos-43.20251201.07" # renovate: randomcoww/fedora-coreos-config-custom
     } :
     name => {
       kernel = "${tag}-live-kernel.$${buildarch:uristring}"
