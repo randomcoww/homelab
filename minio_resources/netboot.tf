@@ -25,8 +25,8 @@ locals {
     "initrd=${boot.initrd}",
     "ignition.config.url=https://${local.minio_endpoint}/boot/ignition-$${mac:hexhyp}",
     "coreos.live.rootfs_url=https://${local.minio_endpoint}/boot/${boot.rootfs}",
-    "rd.driver.blacklist=nouveau",
-    "modprobe.blacklist=nouveau",
+    "rd.driver.blacklist=nouveau,nova_core",
+    "modprobe.blacklist=nouveau,nova_core",
     "selinux=0",
 ], boot.boot_args)))}
     initrd https://${local.minio_endpoint}/boot/${boot.initrd}
