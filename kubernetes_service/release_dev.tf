@@ -120,7 +120,6 @@ module "llama-cpp" {
   nginx_ingress_annotations = merge(local.nginx_ingress_annotations_common, {
     "cert-manager.io/cluster-issuer" = local.kubernetes.cert_issuers.ca_internal
   })
-  ca_bundle_configmap = local.kubernetes.ca_bundle_configmap
 }
 
 # SearXNG
@@ -190,7 +189,6 @@ module "mcp-proxy" {
   nginx_ingress_annotations = merge(local.nginx_ingress_annotations_common, {
     "cert-manager.io/cluster-issuer" = local.kubernetes.cert_issuers.ca_internal
   })
-  ca_bundle_configmap = local.kubernetes.ca_bundle_configmap
 }
 
 # Open WebUI
@@ -291,7 +289,6 @@ module "open-webui" {
   minio_endpoint      = "https://${local.services.cluster_minio.ip}:${local.service_ports.minio}"
   minio_bucket        = "open-webui"
   minio_access_secret = local.minio_users.open_webui.secret
-  ca_bundle_configmap = local.kubernetes.ca_bundle_configmap
 }
 
 # Internal registry
@@ -321,5 +318,4 @@ module "registry" {
   nginx_ingress_annotations = merge(local.nginx_ingress_annotations_common, {
     "cert-manager.io/cluster-issuer" = local.kubernetes.cert_issuers.acme_prod
   })
-  ca_bundle_configmap = local.kubernetes.ca_bundle_configmap
 }

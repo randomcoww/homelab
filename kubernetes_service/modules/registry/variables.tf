@@ -77,7 +77,3 @@ variable "service_hostname" {
 variable "nginx_ingress_annotations" {
   type = map(string)
 }
-
-variable "ca_bundle_configmap" {
-  type = string
-}

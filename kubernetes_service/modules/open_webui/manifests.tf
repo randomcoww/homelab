@@ -117,7 +117,6 @@ module "litestream-overlay" {
   }
   sqlite_path         = local.db_file
   minio_access_secret = var.minio_access_secret
-  ca_bundle_configmap = var.ca_bundle_configmap
 
   template_spec = {
     containers = [
@@ -164,7 +163,6 @@ module "litestream-overlay" {
           {
             name      = "ca-trust-bundle"
             mountPath = local.extra_configs.REQUESTS_CA_BUNDLE
-            subPath   = "ca.crt"
             readOnly  = true
           },
         ]
@@ -210,8 +208,9 @@ module "litestream-overlay" {
       },
       {
         name = "ca-trust-bundle"
-        configMap = {
-          name = var.ca_bundle_configmap
+        hostPath = {
+          path = "/etc/ssl/certs/ca-certificates.crt"
+          type = "File"
         }
       },
     ]

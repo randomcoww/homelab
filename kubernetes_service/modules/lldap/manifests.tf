@@ -168,7 +168,6 @@ module "litestream-overlay" {
   }
   sqlite_path         = local.db_file
   minio_access_secret = var.minio_access_secret
-  ca_bundle_configmap = var.ca_bundle_configmap
 
   template_spec = {
     containers = [

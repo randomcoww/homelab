@@ -47,7 +47,6 @@ module "lldap" {
   nginx_ingress_annotations = merge(local.nginx_ingress_annotations_common, {
     "cert-manager.io/cluster-issuer" = local.kubernetes.cert_issuers.acme_prod
   })
-  ca_bundle_configmap = local.kubernetes.ca_bundle_configmap
 }
 
 ## authelia
@@ -276,7 +275,6 @@ resource "helm_release" "authelia" {
           {
             name      = "ca-trust-bundle"
             mountPath = "/etc/ssl/certs/ca-certificates.crt"
-            subPath   = "ca.crt"
             readOnly  = true
           },
           {
@@ -325,8 +323,9 @@ resource "helm_release" "authelia" {
           },
           {
             name = "ca-trust-bundle"
-            configMap = {
-              name = local.kubernetes.ca_bundle_configmap
+            hostPath = {
+              path = "/etc/ssl/certs/ca-certificates.crt"
+              type = "File"
             }
           },
           {
@@ -435,7 +434,6 @@ resource "helm_release" "authelia" {
               {
                 name      = "ca-trust-bundle"
                 mountPath = "/etc/ssl/certs/ca-certificates.crt"
-                subPath   = "ca.crt"
                 readOnly  = true
               },
             ]
@@ -490,7 +488,6 @@ resource "helm_release" "authelia" {
               {
                 name      = "ca-trust-bundle"
                 mountPath = "/etc/ssl/certs/ca-certificates.crt"
-                subPath   = "ca.crt"
                 readOnly  = true
               },
             ]

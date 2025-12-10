@@ -114,7 +114,6 @@ module "litestream-overlay" {
 
   sqlite_path         = local.db_file
   minio_access_secret = var.minio_access_secret
-  ca_bundle_configmap = var.ca_bundle_configmap
 
   template_spec = {
     containers = [
@@ -197,7 +196,6 @@ module "mountpoint-s3-overlay" {
   images = {
     mountpoint = var.images.mountpoint
   }
-  ca_bundle_configmap = var.ca_bundle_configmap
 
   template_spec = module.litestream-overlay.template_spec
 }
@@ -217,7 +215,6 @@ module "covers-mountpoint-s3-overlay" {
   images = {
     mountpoint = var.images.mountpoint
   }
-  ca_bundle_configmap = var.ca_bundle_configmap
 
   template_spec = module.mountpoint-s3-overlay.template_spec
 }

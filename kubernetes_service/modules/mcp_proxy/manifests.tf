@@ -113,7 +113,6 @@ module "deployment" {
           {
             name      = "ca-trust-bundle"
             mountPath = "/etc/ssl/certs/ca-certificates.crt"
-            subPath   = "ca.crt"
             readOnly  = true
           },
         ]
@@ -129,8 +128,9 @@ module "deployment" {
       },
       {
         name = "ca-trust-bundle"
-        configMap = {
-          name = var.ca_bundle_configmap
+        hostPath = {
+          path = "/etc/ssl/certs/ca-certificates.crt"
+          type = "File"
         }
       },
     ]

@@ -82,61 +82,6 @@ resource "helm_release" "cert-manager" {
     }),
   ]
 }
-/*
-resource "helm_release" "cert-manager-csi-driver" {
-  name             = "cert-manager-csi-driver"
-  repository       = "https://charts.jetstack.io"
-  chart            = "cert-manager-csi-driver"
-  namespace        = "cert-manager"
-  create_namespace = true
-  wait             = false
-  wait_for_jobs    = false
-  version          = "v0.11.0"
-  max_history      = 2
-  timeout          = local.kubernetes.helm_release_timeout
-  values = [
-    yamlencode({
-      metrics = {
-        enabled = true
-        port    = local.service_ports.metrics
-      }
-      podAnnotations = {
-        "prometheus.io/scrape" = "true"
-        "prometheus.io/port"   = tostring(local.service_ports.metrics)
-      }
-    }),
-  ]
-}
-*/
-resource "helm_release" "trust-manager" {
-  name             = "trust-manager"
-  repository       = "https://charts.jetstack.io"
-  chart            = "trust-manager"
-  namespace        = "cert-manager"
-  create_namespace = true
-  wait             = false
-  wait_for_jobs    = false
-  version          = "v0.20.2"
-  max_history      = 2
-  timeout          = local.kubernetes.helm_release_timeout
-  values = [
-    yamlencode({
-      replicaCount = 2
-      app = {
-        trust = {
-          namespace = "cert-manager"
-        }
-        metrics = {
-          port = local.service_ports.metrics
-        }
-      }
-      commonAnnotations = {
-        "prometheus.io/scrape" = "true"
-        "prometheus.io/port"   = tostring(local.service_ports.metrics)
-      }
-    }),
-  ]
-}
 
 resource "helm_release" "cert-issuer" {
   name          = "cert-issuer"
@@ -239,44 +184,10 @@ resource "helm_release" "cert-issuer" {
             }
           }
         }),
-
-        # trust manager bundle including internal CA
-        yamlencode({
-          apiVersion = "trust.cert-manager.io/v1alpha1"
-          kind       = "Bundle"
-          metadata = {
-            name = local.kubernetes.ca_bundle_configmap
-          }
-          spec = {
-            sources = [
-              {
-                useDefaultCAs = true
-              },
-              {
-                secret = {
-                  name = module.cert-manager-issuer-ca-internal-secret.name
-                  key  = "tls.crt"
-                }
-              },
-            ]
-            target = {
-              configMap = {
-                key = "ca.crt"
-              }
-            }
-          }
-        }),
       ]
     }),
   ]
   depends_on = [
-    helm_release.trust-manager,
     helm_release.cert-manager,
   ]
-  lifecycle {
-    replace_triggered_by = [
-      helm_release.trust-manager,
-      helm_release.cert-manager,
-    ]
-  }
 }

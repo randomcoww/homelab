@@ -145,7 +145,6 @@ module "arc-workflow-secret" {
               {
                 name      = "ca-trust-bundle"
                 mountPath = "/etc/ssl/certs/ca-certificates.crt"
-                subPath   = "ca.crt"
                 readOnly  = true
               },
             ]
@@ -154,8 +153,9 @@ module "arc-workflow-secret" {
         volumes = [
           {
             name = "ca-trust-bundle"
-            configMap = {
-              name = local.kubernetes.ca_bundle_configmap
+            hostPath = {
+              path = "/etc/ssl/certs/ca-certificates.crt"
+              type = "File"
             }
           },
         ]

@@ -82,7 +82,6 @@ module "mountpoint-s3-overlay" {
   images = {
     mountpoint = var.images.mountpoint
   }
-  ca_bundle_configmap = var.ca_bundle_configmap
 
   template_spec = {
     runtimeClassName = "nvidia-cdi"

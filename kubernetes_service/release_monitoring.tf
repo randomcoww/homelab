@@ -87,15 +87,15 @@ resource "helm_release" "prometheus" {
           {
             name      = "ca-trust-bundle"
             mountPath = "/etc/ssl/certs/ca-certificates.crt"
-            subPath   = "ca.crt"
             readOnly  = true
           },
         ]
         extraVolumes = [
           {
             name = "ca-trust-bundle"
-            configMap = {
-              name = local.kubernetes.ca_bundle_configmap
+            hostPath = {
+              path = "/etc/ssl/certs/ca-certificates.crt"
+              type = "File"
             }
           },
         ]
@@ -331,15 +331,15 @@ resource "helm_release" "kured" {
         {
           name      = "ca-trust-bundle"
           mountPath = "/etc/ssl/certs/ca-certificates.crt"
-          subPath   = "ca.crt"
           readOnly  = true
         },
       ]
       volumes = [
         {
           name = "ca-trust-bundle"
-          configMap = {
-            name = local.kubernetes.ca_bundle_configmap
+          hostPath = {
+            path = "/etc/ssl/certs/ca-certificates.crt"
+            type = "File"
           }
         },
       ]

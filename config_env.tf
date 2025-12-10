@@ -218,8 +218,6 @@ locals {
       acme_staging = "letsencrypt-staging"
       ca_internal  = "internal"
     }
-    ca_bundle_configmap = "ca-trust-bundle.crt"
-
     feature_gates = {
       ClusterTrustBundle           = true
       ClusterTrustBundleProjection = true

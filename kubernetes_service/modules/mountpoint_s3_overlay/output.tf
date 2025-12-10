@@ -72,7 +72,6 @@ output "template_spec" {
           {
             name      = "${var.name}-mountpoint-ca-trust-bundle"
             mountPath = "/etc/ssl/certs/ca-certificates.crt"
-            subPath   = "ca.crt"
             readOnly  = true
           },
         ]
@@ -135,8 +134,9 @@ output "template_spec" {
       },
       {
         name = "${var.name}-mountpoint-ca-trust-bundle"
-        configMap = {
-          name = var.ca_bundle_configmap
+        hostPath = {
+          path = "/etc/ssl/certs/ca-certificates.crt"
+          type = "File"
         }
       },
     ])

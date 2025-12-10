@@ -60,7 +60,3 @@ variable "minio_bucket" {
 variable "minio_access_secret" {
   type = string
 }
-
-variable "ca_bundle_configmap" {
-  type = string
-}

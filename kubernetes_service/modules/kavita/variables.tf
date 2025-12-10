@@ -69,7 +69,3 @@ variable "minio_access_secret" {
 variable "ingress_hostname" {
   type = string
 }
-
-variable "ca_bundle_configmap" {
-  type = string
-}
