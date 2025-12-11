@@ -36,8 +36,12 @@ variable "loadbalancer_class_name" {
   type = string
 }
 
-variable "ca_issuer_name" {
-  type = string
+variable "ca" {
+  type = object({
+    algorithm       = string
+    private_key_pem = string
+    cert_pem        = string
+  })
 }
 
 variable "resources" {

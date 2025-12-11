@@ -1,7 +1,5 @@
 locals {
-  config_path     = "/etc/registry"
-  minio_ca_file   = "/usr/local/share/ca-certificates/ca-cert.pem"
-  tls_secret_name = "${var.name}-tls"
+  config_path = "/etc/registry"
 }
 
 module "metadata" {
@@ -13,41 +11,8 @@ module "metadata" {
   manifests = {
     "templates/deployment.yaml" = module.deployment.manifest
     "templates/secret.yaml"     = module.secret.manifest
+    "templates/tls.yaml"        = module.tls.manifest
     "templates/service.yaml"    = module.service.manifest
-    "templates/cert.yaml" = yamlencode({
-      apiVersion = "cert-manager.io/v1"
-      kind       = "Certificate"
-      metadata = {
-        name = local.tls_secret_name
-      }
-      spec = {
-        secretName = local.tls_secret_name
-        isCA       = false
-        privateKey = {
-          algorithm = "ECDSA"
-          size      = 521
-        }
-        commonName = var.name
-        usages = [
-          "key encipherment",
-          "digital signature",
-          "server auth",
-        ]
-        ipAddresses = [
-          "127.0.0.1",
-          var.service_ip,
-        ]
-        dnsNames = [
-          var.name,
-          var.service_hostname,
-        ]
-        issuerRef = {
-          name = var.ca_issuer_name
-          kind = "ClusterIssuer"
-        }
-      }
-    })
-
     "templates/cronjob.yaml" = yamlencode({
       apiVersion = "batch/v1"
       kind       = "CronJob"
@@ -225,6 +190,10 @@ module "deployment" {
   release  = var.release
   affinity = var.affinity
   replicas = var.replicas
+  annotations = {
+    "checksum/secret" = sha256(module.secret.manifest)
+    "checksum/tls"    = sha256(module.tls.manifest)
+  }
   template_spec = {
     hostAliases = [
       {
@@ -317,7 +286,7 @@ module "deployment" {
           sources = [
             {
               secret = {
-                name = local.tls_secret_name
+                name = module.tls.name
                 items = [
                   {
                     key  = "ca.crt"

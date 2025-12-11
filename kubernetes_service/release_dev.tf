@@ -305,7 +305,7 @@ module "registry" {
   ports = {
     registry = local.service_ports.registry
   }
-  ca_issuer_name          = local.kubernetes.cert_issuers.ca_internal
+  ca                      = data.terraform_remote_state.sr.outputs.trust.ca
   loadbalancer_class_name = "kube-vip.io/kube-vip-class"
 
   minio_endpoint      = "https://${local.services.cluster_minio.ip}:${local.service_ports.minio}"
