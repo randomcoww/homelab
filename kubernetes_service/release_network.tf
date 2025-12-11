@@ -43,8 +43,7 @@ module "kea" {
       mtu    = lookup(local.networks.service, "mtu", 1500)
     },
   ]
-  timezone       = local.timezone
-  ca_issuer_name = local.kubernetes.cert_issuers.ca_internal
+  timezone = local.timezone
 }
 
 # Wifi AP

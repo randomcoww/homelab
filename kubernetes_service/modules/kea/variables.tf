@@ -59,7 +59,3 @@ variable "networks" {
 variable "timezone" {
   type = string
 }
-
-variable "ca_issuer_name" {
-  type = string
-}
