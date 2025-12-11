@@ -9,10 +9,8 @@ resource "random_password" "storage-secret" {
 }
 
 locals {
-  db_file               = "/data/users.db"
-  base_path             = "/var/lib/lldap"
-  lldap_tls_secret_name = "${var.name}-tls"
-
+  db_file   = "/data/users.db"
+  base_path = "/var/lib/lldap"
   extra_envs = merge(var.extra_configs, {
     LLDAP_LDAP_PORT                = 3890
     LLDAP_HTTP_PORT                = 17170
@@ -41,39 +39,7 @@ module "metadata" {
     "templates/service.yaml"     = module.service.manifest
     "templates/ingress.yaml"     = module.ingress.manifest
     "templates/secret.yaml"      = module.secret.manifest
-
-    "templates/lldap-cert.yaml" = yamlencode({
-      apiVersion = "cert-manager.io/v1"
-      kind       = "Certificate"
-      metadata = {
-        name      = local.lldap_tls_secret_name
-        namespace = var.namespace
-      }
-      spec = {
-        secretName = local.lldap_tls_secret_name
-        isCA       = false
-        privateKey = {
-          algorithm = "RSA" # TODO: revisit ECDSA
-          size      = 4096
-        }
-        commonName = var.name
-        usages = [
-          "key encipherment",
-          "digital signature",
-          "server auth",
-        ]
-        ipAddresses = [
-          "127.0.0.1",
-        ]
-        dnsNames = [
-          var.service_hostname,
-        ]
-        issuerRef = {
-          name = var.ca_issuer_name
-          kind = "ClusterIssuer"
-        }
-      }
-    })
+    "templates/tls.yaml"         = module.tls.manifest
     }, {
     for i, m in module.litestream-overlay.additional_manifests :
     "templates/overlay-${i}.yaml" => m
@@ -248,7 +214,7 @@ module "litestream-overlay" {
       {
         name = "lldap-cert"
         secret = {
-          secretName = local.lldap_tls_secret_name
+          secretName = module.tls.name
         }
       },
       {
@@ -268,6 +234,10 @@ module "statefulset" {
   app      = var.name
   release  = var.release
   affinity = var.affinity
+  annotations = {
+    "checksum/secret" = sha256(module.secret.manifest)
+    "checksum/tls"    = sha256(module.tls.manifest)
+  }
   /* persistent path for sqlite
   spec = {
     volumeClaimTemplates = [

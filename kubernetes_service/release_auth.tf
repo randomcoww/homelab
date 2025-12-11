@@ -1,3 +1,28 @@
+resource "tls_private_key" "lldap-ca" {
+  algorithm = "RSA"
+  rsa_bits  = 4096
+}
+
+resource "tls_self_signed_cert" "lldap-ca" {
+  private_key_pem = tls_private_key.lldap-ca.private_key_pem
+
+  validity_period_hours = 8760
+  early_renewal_hours   = 2160
+  is_ca_certificate     = true
+
+  subject {
+    common_name = "lldap"
+  }
+
+  allowed_uses = [
+    "key_encipherment",
+    "digital_signature",
+    "cert_signing",
+    "server_auth",
+    "client_auth",
+  ]
+}
+
 ## lldap
 
 resource "random_password" "lldap-user" {
@@ -35,7 +60,11 @@ module "lldap" {
     LLDAP_SMTP_OPTIONS__PASSWORD              = var.smtp.password
     LLDAP_LDAPS_OPTIONS__ENABLED              = true
   }
-  ca_issuer_name = local.kubernetes.cert_issuers.ca_internal
+  ca = {
+    algorithm       = tls_private_key.lldap-ca.algorithm
+    private_key_pem = tls_private_key.lldap-ca.private_key_pem
+    cert_pem        = tls_self_signed_cert.lldap-ca.cert_pem
+  }
 
   minio_endpoint      = "https://${local.services.cluster_minio.ip}:${local.service_ports.minio}"
   minio_bucket        = "lldap"
@@ -51,10 +80,56 @@ module "lldap" {
 
 ## authelia
 
+resource "tls_private_key" "authelia" {
+  algorithm   = tls_private_key.lldap-ca.algorithm
+  ecdsa_curve = "P521"
+  rsa_bits    = 4096
+}
+
+resource "tls_cert_request" "authelia" {
+  private_key_pem = tls_private_key.authelia.private_key_pem
+
+  subject {
+    common_name = local.endpoints.authelia.name
+  }
+  ip_addresses = [
+    "127.0.0.1",
+  ]
+  dns_names = [
+    local.endpoints.authelia.ingress,
+  ]
+}
+
+resource "tls_locally_signed_cert" "authelia" {
+  cert_request_pem   = tls_cert_request.authelia.cert_request_pem
+  ca_private_key_pem = tls_private_key.lldap-ca.private_key_pem
+  ca_cert_pem        = tls_self_signed_cert.lldap-ca.cert_pem
+
+  validity_period_hours = 8760
+  early_renewal_hours   = 2160
+
+  allowed_uses = [
+    "key_encipherment",
+    "digital_signature",
+    "client_auth",
+  ]
+}
+
+module "authelia-tls" {
+  source  = "../modules/secret"
+  name    = "${local.endpoints.authelia.name}-tls"
+  app     = local.endpoints.authelia.name
+  release = "0.1.0"
+  data = {
+    "tls.crt" = tls_locally_signed_cert.authelia.cert_pem
+    "tls.key" = tls_private_key.authelia.private_key_pem
+    "ca.crt"  = tls_self_signed_cert.lldap-ca.cert_pem
+  }
+}
+
 locals {
   authelia_db_file                 = "/config/db.sqlite3" # base path not configurable
   authelia_litestream_config_file  = "/etc/litestream/config.yaml"
-  authelia_client_tls_secret_name  = "${local.endpoints.authelia.name}-tls"
   authelia_client_tls_cert_file    = "/custom/client-cert.pem"
   authelia_client_tls_key_file     = "/custom/client-key.pem"
   authelia_oidc_jwk_key_file       = "/custom/oidc-jwk-key.pem"
@@ -176,39 +251,7 @@ resource "helm_release" "authelia-resources" {
     yamlencode({
       manifests = [
         module.authelia-secret.manifest,
-
-        # lldap client
-        yamlencode({
-          apiVersion = "cert-manager.io/v1"
-          kind       = "Certificate"
-          metadata = {
-            name = local.authelia_client_tls_secret_name
-          }
-          spec = {
-            secretName = local.authelia_client_tls_secret_name
-            isCA       = false
-            privateKey = {
-              algorithm = "RSA" # TODO: revisit ECDSA
-              size      = 4096
-            }
-            commonName = local.endpoints.authelia.name
-            usages = [
-              "key encipherment",
-              "digital signature",
-              "client auth",
-            ]
-            ipAddresses = [
-              "127.0.0.1",
-            ]
-            dnsNames = [
-              local.endpoints.authelia.ingress,
-            ]
-            issuerRef = {
-              name = local.kubernetes.cert_issuers.ca_internal
-              kind = "ClusterIssuer"
-            }
-          }
-        }),
+        module.authelia-tls.manifest,
       ]
     }),
   ]
@@ -266,6 +309,10 @@ resource "helm_release" "authelia" {
               ]
             }
           }
+        }
+        annotations = {
+          "checksum/secret" = sha256(module.authelia-secret.manifest)
+          "checksum/tls"    = sha256(module.authelia-tls.manifest)
         }
         extraVolumeMounts = [
           {
@@ -331,7 +378,7 @@ resource "helm_release" "authelia" {
           {
             name = "authelia-client-tls"
             secret = {
-              secretName = local.authelia_client_tls_secret_name
+              secretName = module.authelia-tls.name
             }
           },
         ]
@@ -624,6 +671,12 @@ resource "helm_release" "authelia" {
         }
       }
       certificates = {
+        values = [
+          {
+            name  = "lldap-ca.pem"
+            value = tls_self_signed_cert.lldap-ca.cert_pem
+          },
+        ]
       }
       secret = {
         additionalSecrets = {

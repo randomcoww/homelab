@@ -146,9 +146,9 @@ resource "helm_release" "minio" {
         enabled    = true
         publicCrt  = "tls.crt"
         privateKey = "tls.key"
-        certSecret = "${local.endpoints.minio.name}-tls"
+        certSecret = module.minio-tls.name
       }
-      trustedCertsSecret = "${local.endpoints.minio.name}-tls"
+      trustedCertsSecret = module.minio-tls.name
       ingress = {
         enabled = false
       }
