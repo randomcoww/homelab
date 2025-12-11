@@ -33,7 +33,7 @@ module "metadata" {
     "templates/ingress.yaml"     = module.ingress.manifest
     }, {
     for i, m in module.litestream-overlay.additional_manifests :
-    "templates/overlay-${i}.yaml" => m
+    "templates/litestream-${i}.yaml" => m
   })
 }
 
@@ -224,6 +224,12 @@ module "statefulset" {
   app      = var.name
   release  = var.release
   affinity = var.affinity
+  annotations = merge({
+    "checksum/secret" = sha256(module.secret.manifest)
+    }, {
+    for i, m in module.litestream-overlay.additional_manifests :
+    "checksum/litestream-${i}" => sha256(m)
+  })
   /* persistent path for sqlite
   spec = {
     volumeClaimTemplates = [

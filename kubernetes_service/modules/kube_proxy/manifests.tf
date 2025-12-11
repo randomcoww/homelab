@@ -66,6 +66,9 @@ module "daemonset" {
   app      = var.name
   affinity = var.affinity
   release  = var.release
+  annotations = {
+    "checksum/configmap" = sha256(module.configmap.manifest)
+  }
   template_spec = {
     priorityClassName  = "system-node-critical"
     hostNetwork        = true

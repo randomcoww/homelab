@@ -144,10 +144,13 @@ module "mountpoint-s3-overlay" {
 module "statefulset" {
   source = "../../../modules/statefulset"
 
-  name          = var.name
-  app           = var.name
-  release       = var.release
-  affinity      = var.affinity
-  replicas      = 1
+  name     = var.name
+  app      = var.name
+  release  = var.release
+  affinity = var.affinity
+  replicas = 1
+  annotations = {
+    "checksum/secret" = sha256(module.secret.manifest)
+  }
   template_spec = module.mountpoint-s3-overlay.template_spec
 }

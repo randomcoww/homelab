@@ -80,6 +80,9 @@ module "deployment" {
   release  = var.release
   replicas = var.replicas
   affinity = var.affinity
+  annotations = {
+    "checksum/secret" = sha256(module.secret.manifest)
+  }
   template_spec = {
     containers = [
       {

@@ -157,6 +157,9 @@ module "statefulset" {
   release  = var.release
   replicas = 1
   affinity = var.affinity
+  annotations = {
+    "checksum/secret" = sha256(module.secret.manifest)
+  }
   spec = {
     volumeClaimTemplates = [
       {
