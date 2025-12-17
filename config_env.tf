@@ -104,13 +104,13 @@ locals {
   # these fields are updated by renovate - don't use var substitutions
   container_images = {
     # static pod
-    kube_apiserver          = "registry.k8s.io/kube-apiserver:v1.34.3@sha256:5af1030676ceca025742ef5e73a504d11b59be0e5551cdb8c9cf0d3c1231b460"
-    kube_controller_manager = "registry.k8s.io/kube-controller-manager:v1.34.3@sha256:716a210d31ee5e27053ea0e1a3a3deb4910791a85ba4b1120410b5a4cbcf1954"
-    kube_scheduler          = "registry.k8s.io/kube-scheduler:v1.34.3@sha256:f9a9bc7948fd804ef02255fe82ac2e85d2a66534bae2fe1348c14849260a1fe2"
-    etcd_wrapper            = "ghcr.io/randomcoww/etcd-wrapper:v0.4.8@sha256:41ff93b85c5ae1aeca9af49fdfad54df02ecd4604331f6763a31bdaf73501464"
+    kube_apiserver          = "registry.k8s.io/kube-apiserver:v1.35.0@sha256:32f98b308862e1cf98c900927d84630fb86a836a480f02752a779eb85c1489f3"
+    kube_controller_manager = "registry.k8s.io/kube-controller-manager:v1.35.0@sha256:3e343fd915d2e214b9a68c045b94017832927edb89aafa471324f8d05a191111"
+    kube_scheduler          = "registry.k8s.io/kube-scheduler:v1.35.0@sha256:0ab622491a82532e01876d55e365c08c5bac01bcd5444a8ed58c1127ab47819f"
+    etcd_wrapper            = "ghcr.io/randomcoww/etcd-wrapper:v0.5.0@sha256:a3cef30fe29e37d3d36d71edc3cea7bbfe7912668f08b4273636b2f713e719e4"
     etcd                    = "gcr.io/etcd-development/etcd:v3.6.6@sha256:60a30b5d81b2217555e2cfb9537f655b7ba97220b99c39ee2e162a7127225890"
     # tier 1
-    kube_proxy         = "registry.k8s.io/kube-proxy:v1.34.3@sha256:7298ab89a103523d02ff4f49bedf9359710af61df92efdc07bac873064f03ed6"
+    kube_proxy         = "registry.k8s.io/kube-proxy:v1.35.0@sha256:c818ca1eff765e35348b77e484da915175cdf483f298e1f9885ed706fcbcb34c"
     flannel            = "ghcr.io/flannel-io/flannel:v0.27.4@sha256:2ff3c5cb44d0e27b09f27816372084c98fa12486518ca95cb4a970f4a1a464c4"
     flannel_cni_plugin = "ghcr.io/flannel-io/flannel-cni-plugin:latest@sha256:c6a08fe5bcb23b19c2fc7c1e47b95a967cc924224ebedf94e8623f27b6c258fa"
     kube_vip           = "ghcr.io/kube-vip/kube-vip:v1.0.2@sha256:ee3702abc2daeb93399c22b14aa61aa233013f2a610e64ff3864033ebb3fedbc"
@@ -127,15 +127,15 @@ locals {
     # tier 3
     mountpoint       = "reg.cluster.internal/randomcoww/mountpoint-s3:v1.21.0@sha256:77644dfd56c0e8cb588dc5258e44bec1d1d1fcf1615161973b9bd254260e13b5"
     hostapd          = "reg.cluster.internal/randomcoww/hostapd-noscan:v20251215.143221@sha256:d4b9fd4e9b234da95eed59aa3725e4cd02044f5f702a854ab4ff3c2a65b1b167"
-    tailscale        = "ghcr.io/tailscale/tailscale:v1.90.9@sha256:9975353aae933e8fbd1a81226d092a9225b9a0f98b173d365a9d525eca1cc298"
+    tailscale        = "ghcr.io/tailscale/tailscale:v1.92.3@sha256:00e029e54305d8d8112db38ceb8817389aefb0d337d428605bf34058f06a971c"
     qrcode_generator = "reg.cluster.internal/randomcoww/qrcode-resource:v20251215.142240@sha256:c4052eb7d6e638f0fa404a833552869b25273ee64f713a601c0c9556908093ce"
-    llama_cpp        = "ghcr.io/mostlygeek/llama-swap:cuda@sha256:e4ecbab8fdec6530bd0ae07ce62f7a5eaf2bc20e928ef4c316275e9f8d039d4e"
+    llama_cpp        = "ghcr.io/mostlygeek/llama-swap:cuda@sha256:f231f76ec3dd41208993df76c837f2eb634118b0f20d3eadefae0e2b6e600612"
     sunshine_desktop = "reg.cluster.internal/randomcoww/sunshine-desktop:v2025.1210.519@sha256:16742039f364356a23745802f109708a0178682cabfd9d2dcd44d8670b1cd2b2"
     litestream       = "docker.io/litestream/litestream:0.5.3@sha256:b3d459d09d63df998d26bf32530ee020a6ab9a9151152cb57be3ee6e9dc45625"
     valkey           = "ghcr.io/valkey-io/valkey:9.0.1-alpine@sha256:1be494495248d53e3558b198a1c704e6b559d5e99fe4c926e14a8ad24d76c6fa"
     nvidia_driver    = "reg.cluster.internal/randomcoww/nvidia-driver-container:v580.105.08-fedora43@sha256:b84a1f8f2ae22727a66cdfe518279917fb1cf752474d89af7ca87992642a0fa4"
     mcp_proxy        = "ghcr.io/tbxark/mcp-proxy:v0.43.0@sha256:0ab33e72c494ee795e9b95922beab736f251514d9e6ec1dcbe6ca317749ba5d3"
-    searxng          = "ghcr.io/searxng/searxng:latest@sha256:b88ef002ab1d9a901766f9eb59779089a74e8f444477e0151fa8cd1f91a02006"
+    searxng          = "ghcr.io/searxng/searxng:latest@sha256:a39ce90965a1650655c10f6e1b83bf0d1f09caf9af3ea182196e53f158f2bc5d"
     open_webui       = "ghcr.io/open-webui/open-webui:0.6.41@sha256:3e07bcede92e97cc3e741de095045a8b5d20bc257ecdb713bd2a47f68e9dff72"
     kavita           = "ghcr.io/kareadita/kavita:0.8.8@sha256:22c42f3cc83fb98b98a6d6336200b615faf2cfd2db22dab363136744efda1bb0"
     lldap            = "ghcr.io/lldap/lldap:latest-alpine@sha256:72f526a8df92e8457d44d9a625cfbe43273285776c979e7144a31b26ebe65d1a"
