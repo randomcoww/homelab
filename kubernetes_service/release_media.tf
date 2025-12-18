@@ -15,6 +15,9 @@ module "kavita" {
     requests = {
       memory = "4Gi"
     }
+    limits = {
+      memory = "4Gi"
+    }
   }
   extra_configs = {
     OpenIdConnectSettings = {

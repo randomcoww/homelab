@@ -154,6 +154,7 @@ module "litestream-overlay" {
             }
           },
         ])
+        resources = var.resources
         ports = [
           {
             containerPort = local.extra_configs.PORT

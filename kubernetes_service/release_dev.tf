@@ -206,6 +206,9 @@ module "open-webui" {
     requests = {
       memory = "4Gi"
     }
+    limits = {
+      memory = "4Gi"
+    }
   }
   ingress_hostname = local.endpoints.open_webui.ingress
   extra_configs = {
