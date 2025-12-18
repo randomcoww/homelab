@@ -1,19 +1,6 @@
 locals {
-  config_path            = "${var.config_base_path}/${var.name}"
-  etcd_manifest_file     = "${var.static_pod_path}/${var.name}.json"
-  etcd_snapshot_file     = "${local.config_path}/etcd-snapshot.db"
-  etcd_pod_template_file = "${local.config_path}/etcd-template.yaml"
-
-  # etcd cluster params
-  initial_advertise_peer_urls = "https://${var.node_ip}:${var.ports.etcd_peer}"
-  listen_peer_urls            = "https://${var.node_ip}:${var.ports.etcd_peer}"
-  advertise_client_urls       = "https://${var.node_ip}:${var.ports.etcd_client}"
-  listen_client_urls          = "https://${var.node_ip}:${var.ports.etcd_client}"
-  initial_cluster = join(",", [
-    for host_key, ip in var.members :
-    "${host_key}=https://${ip}:${var.ports.etcd_peer}"
-  ])
-
+  config_path     = "${var.config_base_path}/${var.name}"
+  etcd_mount_path = "/etcd"
   pki = {
     for key, f in {
       ca-cert = {
@@ -46,7 +33,7 @@ locals {
     })
   }
 
-  static_pod = merge({
+  static_pod = {
     for key, f in {
       etcd-wrapper = {
         contents = module.etcd-wrapper.manifest
@@ -55,12 +42,7 @@ locals {
     key => merge(f, {
       path = "${var.static_pod_path}/${key}.yaml"
     })
-    }, {
-    etcd = {
-      contents = module.etcd.manifest
-      path     = local.etcd_pod_template_file
-    }
-  })
+  }
 
   ignition_snippets = concat([
     for f in fileset(".", "${path.module}/templates/*.yaml") :
@@ -98,7 +80,7 @@ locals {
   ]
 }
 
-module "etcd" {
+module "etcd-wrapper" {
   source    = "../../../modules/static_pod"
   name      = var.name
   namespace = var.namespace
@@ -109,107 +91,76 @@ module "etcd" {
   spec = {
     containers = [
       {
-        name  = "etcd"
-        image = var.images.etcd
-        env = [
-          {
-            name  = "ETCD_STRICT_RECONFIG_CHECK"
-            value = "true"
-          },
-          {
-            name  = "ETCD_AUTO_COMPACTION_RETENTION"
-            value = tostring(var.auto_compaction_retention)
-          },
-          {
-            name  = "ETCD_AUTO_COMPACTION_MODE"
-            value = "revision"
-          },
-          {
-            name  = "ETCD_LISTEN_METRICS_URLS"
-            value = "http://0.0.0.0:${var.ports.etcd_metrics}"
-          },
-        ]
-      },
-    ]
-  }
-}
-
-module "etcd-wrapper" {
-  source    = "../../../modules/static_pod"
-  name      = "${var.name}-wrapper"
-  namespace = var.namespace
-  spec = {
-    containers = [
-      {
-        name  = "etcd-wrapper"
+        name  = "${var.name}-wrapper"
         image = var.images.etcd_wrapper
         args = [
-          # etcd args
-          "--name=${var.host_key}",
-          "--cert-file=${local.pki.cert.path}",
-          "--key-file=${local.pki.key.path}",
-          "--trusted-ca-file=${local.pki.ca-cert.path}",
-          "--peer-cert-file=${local.pki.peer-cert.path}",
-          "--peer-key-file=${local.pki.peer-key.path}",
-          "--peer-trusted-ca-file=${local.pki.peer-ca-cert.path}",
-          "--initial-cluster-token=${var.cluster_token}",
-          "--initial-advertise-peer-urls=${local.initial_advertise_peer_urls}",
-          "--listen-peer-urls=${local.listen_peer_urls}",
-          "--advertise-client-urls=${local.advertise_client_urls}",
-          "--listen-client-urls=${local.listen_client_urls}",
-          "--initial-cluster=${local.initial_cluster}",
-          # etcd-wrapper args
-          "--etcd-snaphot-file=${local.etcd_snapshot_file}",
-          "--etcd-pod-template-file=${local.etcd_pod_template_file}",
-          "--client-cert-file=${local.pki.client-cert.path}",
-          "--client-key-file=${local.pki.client-key.path}",
-          "--etcd-pod-manifest-write-path=${local.etcd_manifest_file}",
-          "--s3-backup-endpoint=${var.s3_endpoint}",
-          "--s3-backup-resource=${var.s3_resource}",
-          "--healthcheck-interval=${var.healthcheck_interval}",
-          "--backup-interval=${var.backup_interval}",
-          "--healthcheck-fail-count-allowed=${var.healthcheck_fail_count_allowed}",
-          "--readiness-fail-count-allowed=${var.readiness_fail_count_allowed}",
+          "-etcd-binary-file",
+          "${local.etcd_mount_path}/usr/local/bin/etcd",
+          "-etcdutl-binary-file",
+          "${local.etcd_mount_path}/usr/local/bin/etcdutl",
+          "-s3-backup-resource",
+          var.s3_resource,
+          "-initial-cluster-timeout",
+          "2m",
+          "-node-run-interval",
+          "10m",
         ]
         env = [
+          for k, v in {
+            "ETCD_NAME"                        = var.host_key
+            "ETCD_DATA_DIR"                    = "${var.data_storage_path}/data"
+            "ETCD_LISTEN_PEER_URLS"            = "https://127.0.0.1:${var.ports.etcd_peer},https://${var.node_ip}:${var.ports.etcd_peer}"
+            "ETCD_INITIAL_ADVERTISE_PEER_URLS" = "https://${var.node_ip}:${var.ports.etcd_peer}"
+            "ETCD_LISTEN_CLIENT_URLS"          = "https://127.0.0.1:${var.ports.etcd_client},https://${var.node_ip}:${var.ports.etcd_client}"
+            "ETCD_ADVERTISE_CLIENT_URLS"       = "https://${var.node_ip}:${var.ports.etcd_client}"
+            "ETCD_INITIAL_CLUSTER" = join(",", [
+              for host_key, ip in var.members :
+              "${host_key}=https://${ip}:${var.ports.etcd_peer}"
+            ])
+            "ETCD_INITIAL_CLUSTER_TOKEN"     = var.cluster_token
+            "ETCD_TRUSTED_CA_FILE"           = local.pki.ca-cert.path
+            "ETCD_CERT_FILE"                 = local.pki.cert.path
+            "ETCD_KEY_FILE"                  = local.pki.key.path
+            "ETCD_PEER_TRUSTED_CA_FILE"      = local.pki.peer-ca-cert.path
+            "ETCD_PEER_CERT_FILE"            = local.pki.peer-cert.path
+            "ETCD_PEER_KEY_FILE"             = local.pki.peer-key.path
+            "ETCD_STRICT_RECONFIG_CHECK"     = true
+            "ETCD_LOG_LEVEL"                 = "error"
+            "ETCD_AUTO_COMPACTION_RETENTION" = 1
+            "ETCD_AUTO_COMPACTION_MODE"      = "revision"
+            "ETCD_LISTEN_METRICS_URLS"       = "http://0.0.0.0:${var.ports.etcd_metrics}"
+            "AWS_ACCESS_KEY_ID"              = var.s3_access_key_id
+            "AWS_SECRET_ACCESS_KEY"          = var.s3_secret_access_key
+          } :
           {
-            name = "POD_NAME"
-            valueFrom = {
-              fieldRef = {
-                fieldPath = "metadata.name"
-              }
-            }
-          },
-          {
-            name = "POD_NAMESPACE"
-            valueFrom = {
-              fieldRef = {
-                fieldPath = "metadata.namespace"
-              }
-            }
-          },
-          {
-            name  = "AWS_ACCESS_KEY_ID"
-            value = var.s3_access_key_id
-          },
-          {
-            name  = "AWS_SECRET_ACCESS_KEY"
-            value = var.s3_secret_access_key
-          },
+            name  = tostring(k)
+            value = tostring(v)
+          }
         ]
         volumeMounts = [
+          {
+            name      = "etcd"
+            mountPath = local.etcd_mount_path
+          },
           {
             name      = "config"
             mountPath = local.config_path
           },
           {
-            name      = "static-pod"
-            mountPath = var.static_pod_path
+            name      = "data"
+            mountPath = var.data_storage_path
           },
         ]
       },
     ]
     volumes = [
+      {
+        name = "etcd"
+        image = {
+          reference  = var.images.etcd
+          pullPolicy = "IfNotPresent"
+        }
+      },
       {
         name = "config"
         hostPath = {
@@ -217,9 +168,12 @@ module "etcd-wrapper" {
         }
       },
       {
-        name = "static-pod"
-        hostPath = {
-          path = var.static_pod_path
+        name = "data"
+        # hostPath = {
+        #   path = var.data_storage_path
+        # }
+        emptyDir = {
+          medium = "Memory"
         }
       },
     ]

@@ -61,10 +61,6 @@ variable "members" {
   type = map(string)
 }
 
-variable "s3_endpoint" {
-  type = string
-}
-
 variable "s3_resource" {
   type = string
 }
@@ -77,31 +73,6 @@ variable "s3_secret_access_key" {
   type = string
 }
 
-variable "healthcheck_interval" {
-  type    = string
-  default = "2s"
-}
-
-variable "backup_interval" {
-  type    = string
-  default = "15m"
-}
-
-variable "healthcheck_fail_count_allowed" {
-  type    = number
-  default = 10
-}
-
-variable "readiness_fail_count_allowed" {
-  type    = number
-  default = 10
-}
-
-variable "auto_compaction_retention" {
-  type    = number
-  default = 1
-}
-
 variable "static_pod_path" {
   type = string
 }
@@ -109,4 +80,8 @@ variable "static_pod_path" {
 variable "config_base_path" {
   type    = string
   default = "/var/lib"
+}
+
+variable "data_storage_path" {
+  type = string
 }

@@ -109,9 +109,9 @@ module "etcd" {
     for host_key, host in local.members.etcd :
     host_key => cidrhost(local.networks.etcd.prefix, host.netnum)
   }
-  s3_endpoint          = data.terraform_remote_state.sr.outputs.r2_bucket.etcd.url
-  s3_resource          = "${data.terraform_remote_state.sr.outputs.r2_bucket.etcd.bucket}/snapshot/${local.kubernetes.cluster_name}.db"
+  s3_resource          = "${data.terraform_remote_state.sr.outputs.r2_bucket.etcd.url}/${data.terraform_remote_state.sr.outputs.r2_bucket.etcd.bucket}/snapshot/${local.kubernetes.cluster_name}.db"
   s3_access_key_id     = data.terraform_remote_state.sr.outputs.r2_bucket.etcd.access_key_id
   s3_secret_access_key = data.terraform_remote_state.sr.outputs.r2_bucket.etcd.secret_access_key
   static_pod_path      = local.kubernetes.static_pod_manifest_path
+  data_storage_path    = "${local.kubernetes.containers_path}/etcd"
 }
