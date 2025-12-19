@@ -32,6 +32,7 @@ locals {
       path = "${local.config_path}/${key}.pem"
     })
   }
+  initial_startup_delay_seconds = 120
 
   static_pod = {
     for key, f in {
@@ -101,7 +102,7 @@ module "etcd-wrapper" {
           "-s3-backup-resource",
           var.s3_resource,
           "-initial-cluster-timeout",
-          "2m",
+          "${local.initial_startup_delay_seconds}s",
           "-node-run-interval",
           "10m",
         ]
@@ -137,6 +138,32 @@ module "etcd-wrapper" {
             value = tostring(v)
           }
         ]
+        livenessProbe = {
+          httpGet = {
+            scheme = "HTTP"
+            host   = "127.0.0.1"
+            port   = var.ports.etcd_metrics
+            path   = "/livez"
+          }
+          initialDelaySeconds = 10
+          timeoutSeconds      = 15
+          periodSeconds       = 10
+          successThreshold    = 1
+          failureThreshold    = 8
+        }
+        startupProbe = {
+          httpGet = {
+            scheme = "HTTP"
+            host   = "127.0.0.1"
+            port   = var.ports.etcd_metrics
+            path   = "/readyz"
+          }
+          initialDelaySeconds = local.initial_startup_delay_seconds
+          timeoutSeconds      = 15
+          periodSeconds       = 10
+          successThreshold    = 1
+          failureThreshold    = 24
+        }
         volumeMounts = [
           {
             name      = "etcd"

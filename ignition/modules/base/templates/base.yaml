@@ -46,6 +46,8 @@ systemd:
     # does not work with read only system
     - name: rpm-ostree-fix-shadow-mode.service
       mask: true
+    - name: zincati.service
+      mask: true
 storage:
   files:
     - path: /etc/hostname
