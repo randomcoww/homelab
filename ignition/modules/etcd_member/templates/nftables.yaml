@@ -8,6 +8,11 @@ systemd:
 
 storage:
   files:
+    - path: /etc/sysctl.d/10-time-wait.conf
+      mode: 0644
+      contents:
+        inline: |
+          net.ipv4.tcp_tw_reuse=1
     - path: /etc/nftables/${name}.nft
       mode: 0644
       overwrite: true

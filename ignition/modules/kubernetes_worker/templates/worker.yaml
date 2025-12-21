@@ -103,6 +103,9 @@ storage:
           [crio]
           root="${container_storage_path}"
 
+          [crio.runtime]
+          cgroup_manager="systemd"
+
           [crio.api]
           listen="${crio_socket}"
 

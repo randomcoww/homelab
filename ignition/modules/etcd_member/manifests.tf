@@ -21,12 +21,6 @@ locals {
       peer-key = {
         contents = tls_private_key.kube-etcd-peer.private_key_pem
       }
-      client-cert = {
-        contents = tls_locally_signed_cert.etcd-wrapper-etcd-client.cert_pem
-      }
-      client-key = {
-        contents = tls_private_key.etcd-wrapper-etcd-client.private_key_pem
-      }
     } :
     key => merge(f, {
       path = "${local.config_path}/${key}.pem"
@@ -95,6 +89,8 @@ module "etcd-wrapper" {
         name  = "${var.name}-wrapper"
         image = var.images.etcd_wrapper
         args = [
+          "-local-client-url",
+          "https://127.0.0.1:${var.ports.etcd_client}",
           "-etcd-binary-file",
           "${local.etcd_mount_path}/usr/local/bin/etcd",
           "-etcdutl-binary-file",
@@ -118,20 +114,22 @@ module "etcd-wrapper" {
               for host_key, ip in var.members :
               "${host_key}=https://${ip}:${var.ports.etcd_peer}"
             ])
-            "ETCD_INITIAL_CLUSTER_TOKEN"     = var.cluster_token
-            "ETCD_TRUSTED_CA_FILE"           = local.pki.ca-cert.path
-            "ETCD_CERT_FILE"                 = local.pki.cert.path
-            "ETCD_KEY_FILE"                  = local.pki.key.path
-            "ETCD_PEER_TRUSTED_CA_FILE"      = local.pki.peer-ca-cert.path
-            "ETCD_PEER_CERT_FILE"            = local.pki.peer-cert.path
-            "ETCD_PEER_KEY_FILE"             = local.pki.peer-key.path
-            "ETCD_STRICT_RECONFIG_CHECK"     = true
-            "ETCD_LOG_LEVEL"                 = "error"
-            "ETCD_AUTO_COMPACTION_RETENTION" = 1
-            "ETCD_AUTO_COMPACTION_MODE"      = "revision"
-            "ETCD_LISTEN_METRICS_URLS"       = "http://0.0.0.0:${var.ports.etcd_metrics}"
-            "AWS_ACCESS_KEY_ID"              = var.s3_access_key_id
-            "AWS_SECRET_ACCESS_KEY"          = var.s3_secret_access_key
+            "ETCD_INITIAL_CLUSTER_TOKEN"   = var.cluster_token
+            "ETCD_TRUSTED_CA_FILE"         = local.pki.ca-cert.path
+            "ETCD_CERT_FILE"               = local.pki.cert.path
+            "ETCD_KEY_FILE"                = local.pki.key.path
+            "ETCD_PEER_TRUSTED_CA_FILE"    = local.pki.peer-ca-cert.path
+            "ETCD_PEER_CERT_FILE"          = local.pki.peer-cert.path
+            "ETCD_PEER_KEY_FILE"           = local.pki.peer-key.path
+            "ETCD_STRICT_RECONFIG_CHECK"   = true
+            "ETCD_LOG_LEVEL"               = "info"
+            "ETCD_LISTEN_METRICS_URLS"     = "http://0.0.0.0:${var.ports.etcd_metrics}"
+            "ETCD_SOCKET_REUSE_PORT"       = true
+            "ETCD_SOCKET_REUSE_ADDRESS"    = true
+            "ETCD_GRPC_KEEPALIVE_MIN_TIME" = "1s"
+            "ETCD_GRPC_KEEPALIVE_TIMEOUT"  = "10s"
+            "AWS_ACCESS_KEY_ID"            = var.s3_access_key_id
+            "AWS_SECRET_ACCESS_KEY"        = var.s3_secret_access_key
           } :
           {
             name  = tostring(k)
