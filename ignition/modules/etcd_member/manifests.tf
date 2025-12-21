@@ -114,20 +114,20 @@ module "etcd-wrapper" {
               for host_key, ip in var.members :
               "${host_key}=https://${ip}:${var.ports.etcd_peer}"
             ])
-            "ETCD_INITIAL_CLUSTER_TOKEN"   = var.cluster_token
-            "ETCD_TRUSTED_CA_FILE"         = local.pki.ca-cert.path
-            "ETCD_CERT_FILE"               = local.pki.cert.path
-            "ETCD_KEY_FILE"                = local.pki.key.path
-            "ETCD_PEER_TRUSTED_CA_FILE"    = local.pki.peer-ca-cert.path
-            "ETCD_PEER_CERT_FILE"          = local.pki.peer-cert.path
-            "ETCD_PEER_KEY_FILE"           = local.pki.peer-key.path
-            "ETCD_STRICT_RECONFIG_CHECK"   = true
-            "ETCD_LOG_LEVEL"               = "info"
-            "ETCD_LISTEN_METRICS_URLS"     = "http://0.0.0.0:${var.ports.etcd_metrics}"
-            "ETCD_SOCKET_REUSE_PORT"       = true
-            "ETCD_SOCKET_REUSE_ADDRESS"    = true
-            "AWS_ACCESS_KEY_ID"            = var.s3_access_key_id
-            "AWS_SECRET_ACCESS_KEY"        = var.s3_secret_access_key
+            "ETCD_INITIAL_CLUSTER_TOKEN" = var.cluster_token
+            "ETCD_TRUSTED_CA_FILE"       = local.pki.ca-cert.path
+            "ETCD_CERT_FILE"             = local.pki.cert.path
+            "ETCD_KEY_FILE"              = local.pki.key.path
+            "ETCD_PEER_TRUSTED_CA_FILE"  = local.pki.peer-ca-cert.path
+            "ETCD_PEER_CERT_FILE"        = local.pki.peer-cert.path
+            "ETCD_PEER_KEY_FILE"         = local.pki.peer-key.path
+            "ETCD_STRICT_RECONFIG_CHECK" = true
+            "ETCD_LOG_LEVEL"             = "info"
+            "ETCD_LISTEN_METRICS_URLS"   = "http://0.0.0.0:${var.ports.etcd_metrics}"
+            "ETCD_SOCKET_REUSE_PORT"     = true
+            "ETCD_SOCKET_REUSE_ADDRESS"  = true
+            "AWS_ACCESS_KEY_ID"          = var.s3_access_key_id
+            "AWS_SECRET_ACCESS_KEY"      = var.s3_secret_access_key
           } :
           {
             name  = tostring(k)
