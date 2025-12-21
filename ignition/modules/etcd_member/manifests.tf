@@ -126,8 +126,6 @@ module "etcd-wrapper" {
             "ETCD_LISTEN_METRICS_URLS"     = "http://0.0.0.0:${var.ports.etcd_metrics}"
             "ETCD_SOCKET_REUSE_PORT"       = true
             "ETCD_SOCKET_REUSE_ADDRESS"    = true
-            "ETCD_GRPC_KEEPALIVE_MIN_TIME" = "1s"
-            "ETCD_GRPC_KEEPALIVE_TIMEOUT"  = "10s"
             "AWS_ACCESS_KEY_ID"            = var.s3_access_key_id
             "AWS_SECRET_ACCESS_KEY"        = var.s3_secret_access_key
           } :
