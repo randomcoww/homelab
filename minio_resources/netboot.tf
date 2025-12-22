@@ -28,6 +28,7 @@ locals {
     "rd.driver.blacklist=nouveau,nova_core",
     "modprobe.blacklist=nouveau,nova_core",
     "selinux=0",
+    "pcie_aspm=off", # work around r8169 NETDEV WATCHDOG: transmit queue 0 timed out
 ], boot.boot_args)))}
     initrd https://${local.minio_endpoint}/boot/${boot.initrd}
     boot
