@@ -120,15 +120,15 @@ locals {
     # tier 2
     kea                   = "ghcr.io/randomcoww/kea:v3.1.4@sha256:4e39daed40e1f040b1de83592cb11bc8f71e06327313c2ddaef0dcbd979f4ede"
     stork_agent           = "ghcr.io/randomcoww/stork-agent:v2.3.2@sha256:a274284cc9ef93b4b3f4bb9d30d7698bda4709528e7a90d52f5dfc12e8613662"
-    ipxe                  = "ghcr.io/randomcoww/ipxe:v20251215.142351@sha256:33e8d4e3302fc8b94f1433e023c09ff347adb629721b472153c989a4a3454ef3"
+    ipxe                  = "ghcr.io/randomcoww/ipxe:v20251222.141954@sha256:c8beb2c3dbbe2bd1abdf5f67278ad3d54e4da6ea18cfa867fb3c8892e00baf49"
     registry              = "ghcr.io/distribution/distribution:3.0.0@sha256:4ba3adf47f5c866e9a29288c758c5328ef03396cb8f5f6454463655fa8bc83e2"
     device_plugin         = "ghcr.io/squat/generic-device-plugin:latest@sha256:2b53d255017668d70d7f59ff0b874a66c3a50922d1f8cfff182e4c55b82251a1"
     github_actions_runner = "ghcr.io/actions/actions-runner:2.330.0@sha256:ee54ad8776606f29434f159196529b7b9c83c0cb9195c1ff5a7817e7e570dcfe"
     # tier 3
     mountpoint       = "reg.cluster.internal/randomcoww/mountpoint-s3:v1.21.0@sha256:a91494ef56b9ff1ea4273c54ee42590a251547dc2263813cef2e55a9cf31c3eb"
-    hostapd          = "reg.cluster.internal/randomcoww/hostapd-noscan:v20251215.143221@sha256:d4b9fd4e9b234da95eed59aa3725e4cd02044f5f702a854ab4ff3c2a65b1b167"
+    hostapd          = "reg.cluster.internal/randomcoww/hostapd-noscan:v20251222.142650@sha256:6cbfc83210fb147167bb99c57af7484ebb4f1a0da6424f209314977ecaa84c8b"
     tailscale        = "ghcr.io/tailscale/tailscale:v1.92.4@sha256:d6734d69fd7d31b1861589e347463954aa6097f9a61aa4f8f763ba94bfe0e5b9"
-    qrcode_generator = "reg.cluster.internal/randomcoww/qrcode-resource:v20251215.142240@sha256:c4052eb7d6e638f0fa404a833552869b25273ee64f713a601c0c9556908093ce"
+    qrcode_generator = "reg.cluster.internal/randomcoww/qrcode-resource:v20251222.141851@sha256:f60755e6d2cdeb15b190a758b4b1f2371f15d0a143f3ad1ccf82aaa11c8ec268"
     llama_cpp        = "ghcr.io/mostlygeek/llama-swap:cuda@sha256:e2203f93ad9561bab2cce4b8f12b019a889c1d1ad7ea338803d6332e55e699a6"
     sunshine_desktop = "reg.cluster.internal/randomcoww/sunshine-desktop:v2025.1210.519@sha256:f44421bec95df3ddaea3d95bdeab200cf4a73d3c58c9eacc4ac0590dd7ca28e4"
     litestream       = "docker.io/litestream/litestream:0.5.5@sha256:bc24c1bc5a551dca0f235c446e5fa890eaf455723cd8b8b294e732f144f091e4"
