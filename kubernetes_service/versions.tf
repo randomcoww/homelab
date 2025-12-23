@@ -10,10 +10,4 @@ terraform {
     skip_s3_checksum            = true
     use_path_style              = true
   }
-  required_providers {
-    github = {
-      source  = "integrations/github"
-      version = "6.9.0"
-    }
-  }
 }

@@ -13,7 +13,3 @@ provider "helm" {
     cluster_ca_certificate = data.terraform_remote_state.client.outputs.kubernetes_admin.ca_cert_pem
   }
 }
-
-provider "github" {
-  token = var.github.token
-}

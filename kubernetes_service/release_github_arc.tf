@@ -183,12 +183,12 @@ resource "helm_release" "arc-runner-hook-template" {
   ]
 }
 
-data "github_repositories" "repos" {
-  query = "user:${var.github.user} archived:false fork:true"
-}
-
 resource "helm_release" "arc-runner-set-builder" {
-  for_each = toset(data.github_repositories.repos.names)
+  for_each = toset([
+    "container-builds",
+    "fedora-coreos-config-custom",
+    "etcd-wrapper",
+  ])
 
   name             = "builder-${each.key}"
   repository       = "oci://ghcr.io/actions/actions-runner-controller-charts"
@@ -275,7 +275,12 @@ resource "helm_release" "arc-runner-set-builder" {
 }
 
 resource "helm_release" "arc-runner-set-renovate" {
-  for_each = toset(data.github_repositories.repos.names)
+  for_each = toset([
+    "homelab",
+    "container-builds",
+    "fedora-coreos-config-custom",
+    "etcd-wrapper",
+  ])
 
   name             = "renovate-${each.key}"
   repository       = "oci://ghcr.io/actions/actions-runner-controller-charts"
