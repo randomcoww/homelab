@@ -159,12 +159,12 @@ module "daemonset" {
         args = [
           "-f",
           "/etc/kube-flannel/cni-conf.json",
-          "/etc/cni/net.d/10-flannel.conflist",
+          "${var.cni_config_path}/10-flannel.conflist",
         ]
         volumeMounts = [
           {
             name      = "cni"
-            mountPath = "/etc/cni/net.d"
+            mountPath = var.cni_config_path
           },
           {
             name      = "flannel-cfg"
@@ -272,7 +272,7 @@ module "daemonset" {
       {
         name = "cni"
         hostPath = {
-          path = "/etc/cni/net.d"
+          path = var.cni_config_path
         }
       },
       {

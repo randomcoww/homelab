@@ -146,7 +146,7 @@ locals {
   host_images = {
     for name, tag in {
       # these fields are updated by renovate - don't use var substitutions
-      coreos = "fedora-coreos-43.20251201.07" # renovate: randomcoww/fedora-coreos-config-custom
+      coreos = "fedora-coreos-43.20251223.03" # renovate: randomcoww/fedora-coreos-config-custom
     } :
     name => {
       kernel = "${tag}-live-kernel.$${buildarch:uristring}"
@@ -209,6 +209,7 @@ locals {
     static_pod_manifest_path  = "/var/lib/kubelet/manifests"
     containers_path           = "/var/lib/containers"
     cni_bin_path              = "/var/lib/cni/bin"
+    cni_config_path           = "/etc/cni/net-custom.d" # crio package drops unwanted configs into /etc/cni/net.d - work around by using another path
     cni_bridge_interface_name = "cni0"
     kubelet_client_user       = "kube-apiserver-kubelet-client"
     helm_release_timeout      = 600

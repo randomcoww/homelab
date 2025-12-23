@@ -14,7 +14,8 @@ systemd:
 
             [Service]
             ExecStartPre=/usr/bin/mkdir -p \
-              ${cni_bin_path}
+              ${cni_bin_path} \
+              ${cni_config_path}
     - name: kubelet.service
       enabled: true
       dropins:
@@ -115,6 +116,7 @@ storage:
 
           [crio.network]
           plugin_dirs=["/var/opt/cni/bin","${cni_bin_path}"]
+          network_dir="${cni_config_path}"
 
           [crio.metrics]
           enable_metrics=false

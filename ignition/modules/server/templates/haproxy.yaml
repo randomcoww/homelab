@@ -28,6 +28,7 @@ storage:
     # https://stackoverflow.com/questions/68350378/unable-to-start-haproxy-2-4-missing-lf-on-last-line
     - path: /etc/haproxy/haproxy.cfg
       mode: 0644
+      overwrite: true
       contents:
         inline: |+
           defaults

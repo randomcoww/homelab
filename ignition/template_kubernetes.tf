@@ -72,6 +72,7 @@ module "kubernetes-worker" {
   static_pod_path           = local.kubernetes.static_pod_manifest_path
   feature_gates             = local.kubernetes.feature_gates
   cni_bin_path              = local.kubernetes.cni_bin_path
+  cni_config_path           = local.kubernetes.cni_config_path
   container_storage_path    = "${local.kubernetes.containers_path}/storage"
   graceful_shutdown_delay   = 480
   # allow host to resolve registry by name

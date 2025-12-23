@@ -109,6 +109,7 @@ locals {
       kubeconfig_path           = "${local.config_path}/kubelet.kubeconfig"
       container_storage_path    = var.container_storage_path
       cni_bin_path              = var.cni_bin_path
+      cni_config_path           = var.cni_config_path
       crio_socket               = local.crio_socket
       cni_bridge_interface_name = var.cni_bridge_interface_name
       graceful_shutdown_delay   = var.graceful_shutdown_delay

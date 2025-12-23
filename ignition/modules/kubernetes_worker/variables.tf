@@ -83,6 +83,10 @@ variable "cni_bin_path" {
   type = string
 }
 
+variable "cni_config_path" {
+  type = string
+}
+
 variable "graceful_shutdown_delay" {
   type = number
 }
