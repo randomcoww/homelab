@@ -1,7 +1,7 @@
 locals {
   base_hosts = {
     k-0 = {
-      host_image = local.host_images.coreos
+      host_image = local.host_images.default
       netnum     = 1
       physical_interfaces = {
         phy0 = {
@@ -86,7 +86,7 @@ locals {
     }
 
     k-1 = {
-      host_image = local.host_images.coreos
+      host_image = local.host_images.default
       netnum     = 3
       physical_interfaces = {
         phy0 = {
@@ -171,7 +171,7 @@ locals {
     }
 
     k-2 = {
-      host_image = local.host_images.coreos
+      host_image = local.host_images.default
       netnum     = 5
       physical_interfaces = {
         phy0 = {
@@ -229,7 +229,7 @@ locals {
     }
 
     k-3 = {
-      host_image = local.host_images.coreos
+      host_image = local.host_images.default
       netnum     = 6
       physical_interfaces = {
         phy0 = {

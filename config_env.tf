@@ -1,7 +1,7 @@
 locals {
   timezone       = "America/Los_Angeles"
   butane_version = "1.5.0"
-  default_mtu    = 9000
+  default_mtu    = 1500 # attempt to mitigate r8169 transmit queue 0 timed
 
   users = {
     ssh = {
@@ -146,7 +146,8 @@ locals {
   host_images = {
     for name, tag in {
       # these fields are updated by renovate - don't use var substitutions
-      coreos = "fedora-coreos-43.20251223.22" # renovate: randomcoww/fedora-coreos-config-custom
+      amdcompat = "fedora-coreos-43.20251121.02"
+      default   = "fedora-coreos-43.20251223.22" # renovate: randomcoww/fedora-coreos-config-custom
     } :
     name => {
       kernel = "${tag}-live-kernel.$${buildarch:uristring}"
