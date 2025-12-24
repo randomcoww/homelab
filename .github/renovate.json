@@ -33,7 +33,6 @@
   "packageRules": [
     {
       "matchUpdateTypes": [
-        "major",
         "minor",
         "patch",
         "pin",
