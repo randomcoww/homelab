@@ -118,7 +118,7 @@ locals {
     minio              = "ghcr.io/randomcoww/minio:v20251015.172955@sha256:228bf7b720e6a477ebfba2fb206eb921157adf14b156a530d67de13cb403722a"
     nginx              = "docker.io/nginxinc/nginx-unprivileged:1.29.3-alpine@sha256:c3b9dd893f9ecd7046d3ac37b0dc218ff3c65fe53acd5cb5e1f97f3988272760"
     # tier 2
-    kea                   = "ghcr.io/randomcoww/kea:v3.1.4@sha256:4e39daed40e1f040b1de83592cb11bc8f71e06327313c2ddaef0dcbd979f4ede"
+    kea                   = "ghcr.io/randomcoww/kea:v3.1.4@sha256:32dd7549d3f1b417714cba50c8d7fcb6eae5faf185f254d0c9750d3441fe01cc"
     stork_agent           = "ghcr.io/randomcoww/stork-agent:v2.3.2@sha256:a274284cc9ef93b4b3f4bb9d30d7698bda4709528e7a90d52f5dfc12e8613662"
     ipxe                  = "ghcr.io/randomcoww/ipxe:v20251222.141954@sha256:c8beb2c3dbbe2bd1abdf5f67278ad3d54e4da6ea18cfa867fb3c8892e00baf49"
     registry              = "ghcr.io/distribution/distribution:3.0.0@sha256:4ba3adf47f5c866e9a29288c758c5328ef03396cb8f5f6454463655fa8bc83e2"
@@ -129,7 +129,7 @@ locals {
     hostapd          = "reg.cluster.internal/randomcoww/hostapd-noscan:v20251222.142650@sha256:6cbfc83210fb147167bb99c57af7484ebb4f1a0da6424f209314977ecaa84c8b"
     tailscale        = "ghcr.io/tailscale/tailscale:v1.92.4@sha256:d6734d69fd7d31b1861589e347463954aa6097f9a61aa4f8f763ba94bfe0e5b9"
     qrcode_generator = "reg.cluster.internal/randomcoww/qrcode-resource:v20251222.141851@sha256:f60755e6d2cdeb15b190a758b4b1f2371f15d0a143f3ad1ccf82aaa11c8ec268"
-    llama_cpp        = "ghcr.io/mostlygeek/llama-swap:cuda@sha256:3b36ca3f4e2bb89fc05754fb183c9601a0d54b70d901af8a69f40eee3b07cf4c"
+    llama_cpp        = "ghcr.io/mostlygeek/llama-swap:cuda@sha256:0c4e2f04fc3890d0c7db2cf6d0f8bba6991a37ea60f4514db590b8f9de25f95a"
     sunshine_desktop = "reg.cluster.internal/randomcoww/sunshine-desktop:v2025.1210.519@sha256:f44421bec95df3ddaea3d95bdeab200cf4a73d3c58c9eacc4ac0590dd7ca28e4"
     litestream       = "docker.io/litestream/litestream:0.5.5@sha256:bc24c1bc5a551dca0f235c446e5fa890eaf455723cd8b8b294e732f144f091e4"
     valkey           = "ghcr.io/valkey-io/valkey:9.0.1-alpine@sha256:c106a0c03bcb23cbdf9febe693114cb7800646b11ca8b303aee7409de005faa8"
