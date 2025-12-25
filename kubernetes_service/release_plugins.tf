@@ -150,7 +150,7 @@ resource "helm_release" "amd-gpu" {
   chart            = "amd-gpu"
   wait             = false
   wait_for_jobs    = false
-  version          = "0.20.0"
+  version          = "0.21.0"
   max_history      = 2
   timeout          = local.kubernetes.helm_release_timeout
   values = [
