@@ -102,16 +102,13 @@ module "litestream-overlay" {
         path                = local.db_file
         monitor-interval    = "100ms"
         checkpoint-interval = "6s"
-        replicas = [
-          {
-            name          = "minio"
-            type          = "s3"
-            endpoint      = var.minio_endpoint
-            bucket        = var.minio_bucket
-            path          = "$POD_NAME/litestream"
-            sync-interval = "100ms"
-          },
-        ]
+        replica = {
+          type          = "s3"
+          endpoint      = var.minio_endpoint
+          bucket        = var.minio_bucket
+          path          = "$POD_NAME/litestream"
+          sync-interval = "100ms"
+        }
       },
     ]
   }
