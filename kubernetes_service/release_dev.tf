@@ -155,6 +155,14 @@ module "searxng" {
       ]
     }
   }
+  resources = {
+    requests = {
+      memory = "512Mi"
+    }
+    limits = {
+      memory = "512Mi"
+    }
+  }
   ingress_hostname   = local.endpoints.searxng.ingress
   ingress_class_name = local.endpoints.ingress_nginx_internal.name
   nginx_ingress_annotations = merge(local.nginx_ingress_annotations_common, {
@@ -183,6 +191,14 @@ module "mcp-proxy" {
       }
     },
     mcpServers = local.mcp_proxies
+  }
+  resources = {
+    requests = {
+      memory = "1Gi"
+    }
+    limits = {
+      memory = "1Gi"
+    }
   }
   ingress_hostname   = local.endpoints.mcp_proxy.ingress
   ingress_class_name = local.endpoints.ingress_nginx_internal.name

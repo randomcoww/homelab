@@ -97,6 +97,7 @@ module "deployment" {
             containerPort = local.mcp_proxy_port
           },
         ]
+        resources = var.resources
         env = [
           {
             name  = "SSL_CERT_FILE"

@@ -130,6 +130,7 @@ module "deployment" {
             }
           }
         ]
+        resources = var.resources
         ports = [
           {
             containerPort = local.extra_configs.SEARXNG_PORT

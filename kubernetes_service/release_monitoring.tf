@@ -65,6 +65,15 @@ resource "helm_release" "prometheus" {
           scrape_timeout      = "4s"
           evaluation_interval = "10s"
         }
+        retentionSize = "512MB"
+        resources = {
+          requests = {
+            memory = "2Gi"
+          }
+          limits = {
+            memory = "2Gi"
+          }
+        }
         ingress = {
           enabled          = true
           ingressClassName = local.endpoints.ingress_nginx_internal.name
