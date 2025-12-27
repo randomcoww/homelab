@@ -128,6 +128,9 @@ resource "helm_release" "minio" {
         requests = {
           memory = "12Gi"
         }
+        limits = {
+          memory = "16Gi"
+        }
       }
       service = {
         type              = "LoadBalancer"

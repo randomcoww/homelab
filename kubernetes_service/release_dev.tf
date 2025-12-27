@@ -220,7 +220,7 @@ module "open-webui" {
   }
   resources = {
     requests = {
-      memory = "4Gi"
+      memory = "2Gi"
     }
     limits = {
       memory = "4Gi"
