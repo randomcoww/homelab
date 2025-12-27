@@ -270,6 +270,7 @@ module "statefulset" {
     shareProcessNamespace = true # stork agent looks for kea-ctrl-agent process
     hostNetwork           = true
     dnsPolicy             = "ClusterFirstWithHostNet"
+    priorityClassName     = "system-cluster-critical"
     containers = [
       {
         name  = var.name

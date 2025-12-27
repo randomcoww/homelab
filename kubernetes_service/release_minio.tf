@@ -118,7 +118,7 @@ resource "helm_release" "minio" {
       mode              = "distributed"
       rootUser          = data.terraform_remote_state.sr.outputs.minio.access_key_id
       rootPassword      = data.terraform_remote_state.sr.outputs.minio.secret_access_key
-      priorityClassName = "system-cluster-critical"
+      priorityClassName = "system-node-critical"
       persistence = {
         storageClass = "local-path"
       }

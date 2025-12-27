@@ -195,6 +195,7 @@ module "deployment" {
     "checksum/tls"    = sha256(module.tls.manifest)
   }
   template_spec = {
+    priorityClassName = "system-cluster-critical"
     hostAliases = [
       {
         ip = "127.0.0.1"

@@ -80,6 +80,7 @@ module "statefulset" {
   }
   template_spec = {
     serviceAccountName = var.name
+    priorityClassName  = "system-cluster-critical"
     containers = [
       {
         name  = var.name
