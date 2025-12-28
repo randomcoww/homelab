@@ -65,13 +65,17 @@ resource "helm_release" "prometheus" {
           scrape_timeout      = "4s"
           evaluation_interval = "10s"
         }
+        extraFlags = [
+          "storage.tsdb.wal-compression",
+        ]
+        retention     = "1d"
         retentionSize = "512MB"
         resources = {
           requests = {
-            memory = "2Gi"
+            memory = "3Gi"
           }
           limits = {
-            memory = "2Gi"
+            memory = "4Gi"
           }
         }
         ingress = {

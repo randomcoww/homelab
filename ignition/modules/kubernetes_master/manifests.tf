@@ -325,10 +325,10 @@ module "controller-manager" {
         ] : []))
         resources = {
           requests = {
-            memory = "256Mi"
+            memory = "512Mi"
           }
           limits = {
-            memory = "256Mi"
+            memory = "512Mi"
           }
         }
         livenessProbe = {
