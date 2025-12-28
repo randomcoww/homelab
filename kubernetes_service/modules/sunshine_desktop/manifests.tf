@@ -184,10 +184,10 @@ module "statefulset" {
     runtimeClassName = "nvidia-cdi"
     resources = {
       requests = {
-        memory = "12Gi"
+        memory = "14Gi"
       }
       limits = {
-        memory = "16Gi"
+        memory = "20Gi"
       }
     }
     containers = [

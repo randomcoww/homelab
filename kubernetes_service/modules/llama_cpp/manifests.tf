@@ -89,10 +89,10 @@ module "mountpoint-s3-overlay" {
     runtimeClassName = "nvidia-cdi"
     resources = {
       requests = {
-        memory = "16Gi"
+        memory = "14Gi"
       }
       limits = {
-        memory = "24Gi"
+        memory = "20Gi"
       }
     }
     containers = [
