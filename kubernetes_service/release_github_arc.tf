@@ -21,6 +21,14 @@ resource "helm_release" "arc" {
       flags = {
         updateStrategy = "eventual"
       }
+      resources = {
+        requests = {
+          memory = "128Mi"
+        }
+        limits = {
+          memory = "128Mi"
+        }
+      }
     }),
   ]
 }
@@ -126,10 +134,10 @@ module "arc-workflow-secret" {
             name = "$job"
             resources = {
               requests = {
-                memory = "1Gi"
+                memory = "512Mi"
               }
               limits = {
-                memory = "2Gi"
+                memory = "512Mi"
               }
             }
             env = [

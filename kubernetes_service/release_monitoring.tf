@@ -75,7 +75,7 @@ resource "helm_release" "prometheus" {
             memory = "3Gi"
           }
           limits = {
-            memory = "4Gi"
+            memory = "3Gi"
           }
         }
         ingress = {
@@ -331,6 +331,14 @@ resource "helm_release" "kured" {
         # trigger reboot if either /var/run/reboot-required is set, or node failed network boot
         useRebootSentinelHostPath = false
         rebootSentinelCommand     = "sh -c \"if ([ -f /var/run/reboot-required ] || [ -z $(xargs -n1 -a /proc/cmdline | grep ^coreos.live.rootfs_url=) ]); then exit 0; else exit 1; fi\""
+      }
+      resources = {
+        requests = {
+          memory = "128Mi"
+        }
+        limits = {
+          memory = "128Mi"
+        }
       }
       podAnnotations = {
         "prometheus.io/scrape" = "true"

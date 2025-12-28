@@ -63,6 +63,22 @@ resource "helm_release" "cert-manager" {
       }
       webhook = {
         replicaCount = 2
+        resources = {
+          requests = {
+            memory = "128Mi"
+          }
+          limits = {
+            memory = "128Mi"
+          }
+        }
+      }
+      resources = {
+        requests = {
+          memory = "128Mi"
+        }
+        limits = {
+          memory = "128Mi"
+        }
       }
       cainjector = {
         enabled = false

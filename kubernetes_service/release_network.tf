@@ -212,6 +212,14 @@ resource "helm_release" "cloudflare-tunnel" {
           },
         ]
       }
+      resources = {
+        requests = {
+          memory = "128Mi"
+        }
+        limits = {
+          memory = "128Mi"
+        }
+      }
     }),
   ]
 }
