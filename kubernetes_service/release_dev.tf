@@ -107,7 +107,7 @@ module "llama-cpp" {
     }
     limits = {
       "nvidia.com/gpu" = 1
-      memory           = "16Gi"
+      memory           = "24Gi"
     }
   }
   minio_endpoint      = "https://${local.services.cluster_minio.ip}:${local.service_ports.minio}"
