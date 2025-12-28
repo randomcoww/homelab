@@ -11,14 +11,6 @@ module "kavita" {
     mountpoint = local.container_images.mountpoint
     litestream = local.container_images.litestream
   }
-  resources = {
-    requests = {
-      memory = "2Gi"
-    }
-    limits = {
-      memory = "4Gi"
-    }
-  }
   extra_configs = {
     OpenIdConnectSettings = {
       Authority    = "https://${local.endpoints.authelia.ingress}"
@@ -34,11 +26,10 @@ module "kavita" {
     "cert-manager.io/cluster-issuer" = local.kubernetes.cert_issuers.acme_prod
   })
 
-  minio_endpoint         = "https://${local.services.cluster_minio.ip}:${local.service_ports.minio}"
-  minio_data_bucket      = "ebooks"
-  minio_bucket           = "kavita"
-  minio_mount_extra_args = []
-  minio_access_secret    = local.minio_users.kavita.secret
+  minio_endpoint      = "https://${local.services.cluster_minio.ip}:${local.service_ports.minio}"
+  minio_data_bucket   = "ebooks"
+  minio_bucket        = "kavita"
+  minio_access_secret = local.minio_users.kavita.secret
 }
 
 # Sunshine desktop
@@ -89,18 +80,6 @@ module "sunshine-desktop" {
       value = local.timezone
     },
   ]
-  resources = {
-    requests = {
-      memory           = "16Gi"
-      "nvidia.com/gpu" = 1
-      "amd.com/gpu"    = 1
-    }
-    limits = {
-      memory           = "16Gi"
-      "nvidia.com/gpu" = 1
-      "amd.com/gpu"    = 1
-    }
-  }
   security_context = {
     privileged = true # TODO: Revisit - currently privileged to make libinput work
   }

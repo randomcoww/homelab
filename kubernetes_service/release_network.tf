@@ -122,14 +122,6 @@ module "hostapd" {
       "BF-ANTENNA-2", "SOUNDING-DIMENSION-2", "MU-BEAMFORMEE",
     ])}]"
   }
-  resources = {
-    requests = {
-      "squat.ai/rfkill" = 1
-    }
-    limits = {
-      "squat.ai/rfkill" = 1
-    }
-  }
 }
 
 # Render QR code for wifi

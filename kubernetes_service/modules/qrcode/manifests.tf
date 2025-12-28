@@ -128,6 +128,14 @@ module "deployment" {
     "checksum/secret" = sha256(module.secret.manifest)
   }
   template_spec = {
+    resources = {
+      requests = {
+        memory = "16Mi"
+      }
+      limits = {
+        memory = "16Mi"
+      }
+    }
     containers = [
       {
         name  = var.name

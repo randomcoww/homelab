@@ -47,7 +47,6 @@ module "lldap" {
   ports = {
     ldaps = local.service_ports.ldaps
   }
-
   extra_configs = {
     LLDAP_VERBOSE                             = true
     LLDAP_LDAP_USER_DN                        = random_password.lldap-user.result

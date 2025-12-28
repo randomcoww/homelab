@@ -20,6 +20,14 @@ module "daemonset" {
   }
   template_spec = {
     priorityClassName = "system-node-critical"
+    resources = {
+      requests = {
+        memory = "64Mi"
+      }
+      limits = {
+        memory = "64Mi"
+      }
+    }
     containers = [
       {
         name  = var.name

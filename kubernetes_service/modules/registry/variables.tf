@@ -44,11 +44,6 @@ variable "ca" {
   })
 }
 
-variable "resources" {
-  type    = any
-  default = {}
-}
-
 variable "config" {
   type    = any
   default = {}

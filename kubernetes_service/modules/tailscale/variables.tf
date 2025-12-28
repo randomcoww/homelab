@@ -38,8 +38,3 @@ variable "extra_envs" {
 variable "tailscale_auth_key" {
   type = string
 }
-
-variable "resources" {
-  type    = any
-  default = {}
-}

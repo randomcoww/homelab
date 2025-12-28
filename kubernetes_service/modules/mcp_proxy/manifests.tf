@@ -84,6 +84,14 @@ module "deployment" {
     "checksum/secret" = sha256(module.secret.manifest)
   }
   template_spec = {
+    resources = {
+      requests = {
+        memory = "1Gi"
+      }
+      limits = {
+        memory = "1Gi"
+      }
+    }
     containers = [
       {
         name  = var.name
@@ -97,7 +105,6 @@ module "deployment" {
             containerPort = local.mcp_proxy_port
           },
         ]
-        resources = var.resources
         env = [
           {
             name  = "SSL_CERT_FILE"

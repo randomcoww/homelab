@@ -133,6 +133,14 @@ module "litestream-overlay" {
   minio_access_secret = var.minio_access_secret
 
   template_spec = {
+    resources = {
+      requests = {
+        memory = "64Mi"
+      }
+      limits = {
+        memory = "64Mi"
+      }
+    }
     containers = [
       {
         name  = var.name

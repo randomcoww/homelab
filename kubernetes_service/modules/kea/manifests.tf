@@ -271,6 +271,14 @@ module "statefulset" {
     hostNetwork           = true
     dnsPolicy             = "ClusterFirstWithHostNet"
     priorityClassName     = "system-cluster-critical"
+    resources = {
+      requests = {
+        memory = "128Mi"
+      }
+      limits = {
+        memory = "128Mi"
+      }
+    }
     containers = [
       {
         name  = var.name

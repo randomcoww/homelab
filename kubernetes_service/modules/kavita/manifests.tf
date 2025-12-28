@@ -113,6 +113,14 @@ module "litestream-overlay" {
   minio_access_secret = var.minio_access_secret
 
   template_spec = {
+    resources = {
+      requests = {
+        memory = "2Gi"
+      }
+      limits = {
+        memory = "4Gi"
+      }
+    }
     containers = [
       {
         name  = var.name
@@ -127,7 +135,6 @@ module "litestream-overlay" {
           exec /entrypoint.sh
           EOF
         ]
-        resources = var.resources
         ports = [
           {
             containerPort = local.kavita_port
@@ -186,9 +193,10 @@ module "mountpoint-s3-overlay" {
   s3_endpoint = var.minio_endpoint
   s3_bucket   = var.minio_data_bucket
   s3_prefix   = ""
-  s3_mount_extra_args = concat(var.minio_mount_extra_args, [
+  s3_mount_extra_args = [
     "--read-only",
-  ])
+    "--cache /var/cache", # cache to disk
+  ]
   s3_access_secret = var.minio_access_secret
   images = {
     mountpoint = var.images.mountpoint
@@ -200,15 +208,17 @@ module "mountpoint-s3-overlay" {
 module "covers-mountpoint-s3-overlay" {
   source = "../mountpoint_s3_overlay"
 
-  name                = "${var.name}-covers"
-  app                 = var.name
-  release             = var.release
-  mount_path          = local.covers_path
-  s3_endpoint         = var.minio_endpoint
-  s3_bucket           = var.minio_bucket
-  s3_prefix           = "covers"
-  s3_mount_extra_args = var.minio_mount_extra_args
-  s3_access_secret    = var.minio_access_secret
+  name        = "${var.name}-covers"
+  app         = var.name
+  release     = var.release
+  mount_path  = local.covers_path
+  s3_endpoint = var.minio_endpoint
+  s3_bucket   = var.minio_bucket
+  s3_prefix   = "covers"
+  s3_mount_extra_args = [
+    "--cache /var/tmp", # cache to memory
+  ]
+  s3_access_secret = var.minio_access_secret
   images = {
     mountpoint = var.images.mountpoint
   }

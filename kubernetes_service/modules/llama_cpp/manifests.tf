@@ -70,21 +70,31 @@ module "ingress" {
 module "mountpoint-s3-overlay" {
   source = "../mountpoint_s3_overlay"
 
-  name                = var.name
-  app                 = var.name
-  release             = var.release
-  mount_path          = local.model_path
-  s3_endpoint         = var.minio_endpoint
-  s3_bucket           = var.minio_data_bucket
-  s3_prefix           = ""
-  s3_mount_extra_args = var.minio_mount_extra_args
-  s3_access_secret    = var.minio_access_secret
+  name        = var.name
+  app         = var.name
+  release     = var.release
+  mount_path  = local.model_path
+  s3_endpoint = var.minio_endpoint
+  s3_bucket   = var.minio_data_bucket
+  s3_prefix   = ""
+  s3_mount_extra_args = [
+    "--read-only",
+    "--cache /var/cache", # cache to disk
+  ]
+  s3_access_secret = var.minio_access_secret
   images = {
     mountpoint = var.images.mountpoint
   }
-
   template_spec = {
     runtimeClassName = "nvidia-cdi"
+    resources = {
+      requests = {
+        memory = "16Gi"
+      }
+      limits = {
+        memory = "24Gi"
+      }
+    }
     containers = [
       {
         name  = var.name
@@ -109,7 +119,14 @@ module "mountpoint-s3-overlay" {
             value = tostring(e.value)
           }
         ]
-        resources = var.resources
+        resources = {
+          requests = {
+            "nvidia.com/gpu" = 1
+          }
+          limits = {
+            "nvidia.com/gpu" = 1
+          }
+        }
         ports = [
           {
             containerPort = local.llama_cpp_port

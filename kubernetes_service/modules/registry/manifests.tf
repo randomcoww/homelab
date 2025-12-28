@@ -204,6 +204,14 @@ module "deployment" {
         ]
       },
     ]
+    resources = {
+      requests = {
+        memory = "64Mi"
+      }
+      limits = {
+        memory = "64Mi"
+      }
+    }
     containers = [
       {
         name  = var.name

@@ -86,6 +86,14 @@ module "statefulset" {
   template_spec = {
     hostNetwork = true
     dnsPolicy   = "ClusterFirstWithHostNet"
+    resources = {
+      requests = {
+        memory = "16Mi"
+      }
+      limits = {
+        memory = "16Mi"
+      }
+    }
     containers = [
       {
         name  = var.name
@@ -103,6 +111,14 @@ module "statefulset" {
             }
           },
         ]
+        resources = {
+          requests = {
+            "squat.ai/rfkill" = 1
+          }
+          limits = {
+            "squat.ai/rfkill" = 1
+          }
+        }
         volumeMounts = [
           {
             name        = "hostapd-config"
@@ -110,7 +126,6 @@ module "statefulset" {
             subPathExpr = "hostapd-$(POD_NAME)"
           },
         ]
-        resources = var.resources
         securityContext = {
           capabilities = {
             add = [

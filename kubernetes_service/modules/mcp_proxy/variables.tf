@@ -34,11 +34,6 @@ variable "config" {
   type = any
 }
 
-variable "resources" {
-  type    = any
-  default = {}
-}
-
 variable "ingress_class_name" {
   type = string
 }

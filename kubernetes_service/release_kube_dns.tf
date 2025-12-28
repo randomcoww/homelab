@@ -203,6 +203,14 @@ resource "helm_release" "kube-dns" {
               containerPort = 7979
             },
           ]
+          resources = {
+            requests = {
+              memory = "128Mi"
+            }
+            limits = {
+              memory = "128Mi"
+            }
+          }
           livenessProbe = {
             httpGet = {
               path = "/healthz"
@@ -253,6 +261,14 @@ resource "helm_release" "kube-dns" {
               containerPort = 2379
             },
           ]
+          resources = {
+            requests = {
+              memory = "32Mi"
+            }
+            limits = {
+              memory = "32Mi"
+            }
+          }
           livenessProbe = {
             httpGet = {
               path = "/livez"

@@ -95,6 +95,14 @@ module "deployment" {
     "checksum/secret" = sha256(module.secret.manifest)
   }
   template_spec = {
+    resources = {
+      requests = {
+        memory = "256Mi"
+      }
+      limits = {
+        memory = "512Mi"
+      }
+    }
     initContainers = [
       {
         name          = "${var.name}-valkey"
@@ -130,7 +138,6 @@ module "deployment" {
             }
           }
         ]
-        resources = var.resources
         ports = [
           {
             containerPort = local.extra_configs.SEARXNG_PORT

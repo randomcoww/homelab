@@ -116,6 +116,14 @@ module "litestream-overlay" {
   minio_access_secret = var.minio_access_secret
 
   template_spec = {
+    resources = {
+      requests = {
+        memory = "2Gi"
+      }
+      limits = {
+        memory = "4Gi"
+      }
+    }
     containers = [
       {
         name  = var.name
@@ -151,7 +159,6 @@ module "litestream-overlay" {
             }
           },
         ])
-        resources = var.resources
         ports = [
           {
             containerPort = local.extra_configs.PORT

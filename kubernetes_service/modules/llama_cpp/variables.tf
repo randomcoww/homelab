@@ -27,11 +27,6 @@ variable "images" {
   })
 }
 
-variable "resources" {
-  type    = any
-  default = {}
-}
-
 variable "extra_envs" {
   type = list(object({
     name  = string
@@ -46,11 +41,6 @@ variable "minio_endpoint" {
 
 variable "minio_data_bucket" {
   type = string
-}
-
-variable "minio_mount_extra_args" {
-  type    = list(string)
-  default = []
 }
 
 variable "minio_access_secret" {

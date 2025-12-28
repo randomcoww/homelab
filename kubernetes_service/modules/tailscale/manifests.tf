@@ -81,6 +81,14 @@ module "statefulset" {
   template_spec = {
     serviceAccountName = var.name
     priorityClassName  = "system-cluster-critical"
+    resources = {
+      requests = {
+        memory = "128Mi"
+      }
+      limits = {
+        memory = "128Mi"
+      }
+    }
     containers = [
       {
         name  = var.name
@@ -131,7 +139,6 @@ module "statefulset" {
             mountPath = "/dev/net/tun"
           },
         ]
-        resources = var.resources
         securityContext = {
           capabilities = {
             add = [

@@ -100,23 +100,10 @@ module "llama-cpp" {
       value = 1
     },
   ]
-  resources = {
-    requests = {
-      "nvidia.com/gpu" = 1
-      memory           = "16Gi"
-    }
-    limits = {
-      "nvidia.com/gpu" = 1
-      memory           = "24Gi"
-    }
-  }
   minio_endpoint      = "https://${local.services.cluster_minio.ip}:${local.service_ports.minio}"
   minio_data_bucket   = "models"
   minio_access_secret = local.minio_users.llama_cpp.secret
-  minio_mount_extra_args = [
-    "--read-only",
-  ]
-  ingress_class_name = local.endpoints.ingress_nginx_internal.name
+  ingress_class_name  = local.endpoints.ingress_nginx_internal.name
   nginx_ingress_annotations = merge(local.nginx_ingress_annotations_common, {
     "cert-manager.io/cluster-issuer" = local.kubernetes.cert_issuers.ca_internal
   })
@@ -155,14 +142,6 @@ module "searxng" {
       ]
     }
   }
-  resources = {
-    requests = {
-      memory = "512Mi"
-    }
-    limits = {
-      memory = "512Mi"
-    }
-  }
   ingress_hostname   = local.endpoints.searxng.ingress
   ingress_class_name = local.endpoints.ingress_nginx_internal.name
   nginx_ingress_annotations = merge(local.nginx_ingress_annotations_common, {
@@ -192,14 +171,6 @@ module "mcp-proxy" {
     },
     mcpServers = local.mcp_proxies
   }
-  resources = {
-    requests = {
-      memory = "1Gi"
-    }
-    limits = {
-      memory = "1Gi"
-    }
-  }
   ingress_hostname   = local.endpoints.mcp_proxy.ingress
   ingress_class_name = local.endpoints.ingress_nginx_internal.name
   nginx_ingress_annotations = merge(local.nginx_ingress_annotations_common, {
@@ -217,14 +188,6 @@ module "open-webui" {
   images = {
     open_webui = local.container_images.open_webui
     litestream = local.container_images.litestream
-  }
-  resources = {
-    requests = {
-      memory = "2Gi"
-    }
-    limits = {
-      memory = "4Gi"
-    }
   }
   ingress_hostname = local.endpoints.open_webui.ingress
   extra_configs = {

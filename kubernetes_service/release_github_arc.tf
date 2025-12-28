@@ -55,7 +55,7 @@ module "arc-workflow-secret" {
             }
             resources = {
               requests = {
-                memory          = "4Gi"
+                memory          = "2Gi"
                 "squat.ai/kvm"  = 1
                 "squat.ai/fuse" = 1
               }
@@ -126,7 +126,7 @@ module "arc-workflow-secret" {
             name = "$job"
             resources = {
               requests = {
-                memory = "2Gi"
+                memory = "1Gi"
               }
               limits = {
                 memory = "2Gi"

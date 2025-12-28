@@ -108,6 +108,14 @@ module "daemonset" {
         effect   = "NoSchedule"
       },
     ]
+    resources = {
+      requests = {
+        memory = "128Mi"
+      }
+      limits = {
+        memory = "128Mi"
+      }
+    }
     containers = [
       {
         name  = var.name

@@ -182,6 +182,14 @@ module "statefulset" {
   }
   template_spec = {
     runtimeClassName = "nvidia-cdi"
+    resources = {
+      requests = {
+        memory = "12Gi"
+      }
+      limits = {
+        memory = "16Gi"
+      }
+    }
     containers = [
       {
         name  = var.name
@@ -364,7 +372,16 @@ module "statefulset" {
             port = local.base_port
           }
         }
-        resources       = var.resources
+        resources = {
+          requests = {
+            "nvidia.com/gpu" = 1
+            "amd.com/gpu"    = 1
+          }
+          limits = {
+            "nvidia.com/gpu" = 1
+            "amd.com/gpu"    = 1
+          }
+        }
         securityContext = var.security_context
       },
     ]

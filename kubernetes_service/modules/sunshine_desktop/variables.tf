@@ -33,11 +33,6 @@ variable "extra_configs" {
   default = []
 }
 
-variable "resources" {
-  type    = any
-  default = {}
-}
-
 variable "security_context" {
   type    = any
   default = {}

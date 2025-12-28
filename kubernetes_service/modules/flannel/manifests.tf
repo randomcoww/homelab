@@ -131,6 +131,14 @@ module "daemonset" {
         effect   = "NoSchedule"
       },
     ]
+    resources = {
+      requests = {
+        memory = "64Mi"
+      }
+      limits = {
+        memory = "64Mi"
+      }
+    }
     initContainers = [
       {
         name  = "${var.name}-cni-plugin"
@@ -188,16 +196,7 @@ module "daemonset" {
           "--healthz-ip=127.0.0.1",
           "--healthz-port=${var.ports.healthz}",
         ]
-        resources = {
-          requests = {
-            cpu    = "100m"
-            memory = "50Mi"
-          }
-          limits = {
-            cpu    = "100m"
-            memory = "50Mi"
-          }
-        }
+
         securityContext = {
           capabilities = {
             add = [

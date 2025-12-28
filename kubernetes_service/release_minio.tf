@@ -126,10 +126,10 @@ resource "helm_release" "minio" {
       replicas      = local.minio_replicas
       resources = {
         requests = {
-          memory = "12Gi"
+          memory = "8Gi"
         }
         limits = {
-          memory = "16Gi"
+          memory = "8Gi"
         }
       }
       service = {

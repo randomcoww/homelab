@@ -83,6 +83,14 @@ module "daemonset" {
         effect   = "NoSchedule"
       },
     ]
+    resources = {
+      requests = {
+        memory = "128Mi"
+      }
+      limits = {
+        memory = "128Mi"
+      }
+    }
     initContainers = [
       {
         name  = "${var.name}-init"

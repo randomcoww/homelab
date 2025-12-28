@@ -24,7 +24,6 @@ output "template_spec" {
             --auto-unmount \
             --allow-other \
             --maximum-throughput-gbps 1 \
-            --cache ${dirname(local.mount_path_internal)} \
             %{~if length(var.s3_prefix) > 0~}
             --prefix ${var.s3_prefix}/ \
             %{~endif~}
@@ -68,6 +67,10 @@ output "template_spec" {
             name             = "${var.name}-mountpoint-shared"
             mountPath        = dirname(local.mount_path_internal)
             mountPropagation = "Bidirectional"
+          },
+          {
+            name      = "${var.name}-mountpoint-tmp"
+            mountPath = "/var/tmp"
           },
           {
             name      = "${var.name}-mountpoint-ca-trust-bundle"
@@ -128,6 +131,12 @@ output "template_spec" {
     volumes = concat(lookup(var.template_spec, "volumes", []), [
       {
         name = "${var.name}-mountpoint-shared"
+        emptyDir = {
+          medium = "Memory"
+        }
+      },
+      {
+        name = "${var.name}-mountpoint-tmp"
         emptyDir = {
           medium = "Memory"
         }
