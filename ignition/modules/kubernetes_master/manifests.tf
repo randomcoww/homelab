@@ -233,6 +233,14 @@ module "apiserver" {
             "${k}=${tostring(v)}"
           ])}",
         ] : []))
+        resources = {
+          requests = {
+            memory = "2Gi"
+          }
+          limits = {
+            memory = "2Gi"
+          }
+        }
         env = [
           {
             name = "POD_IP"
@@ -315,6 +323,14 @@ module "controller-manager" {
             "${k}=${tostring(v)}"
           ])}",
         ] : []))
+        resources = {
+          requests = {
+            memory = "256Mi"
+          }
+          limits = {
+            memory = "256Mi"
+          }
+        }
         livenessProbe = {
           httpGet = {
             scheme = "HTTPS"
@@ -365,6 +381,14 @@ module "scheduler" {
             "${k}=${tostring(v)}"
           ])}",
         ] : []))
+        resources = {
+          requests = {
+            memory = "256Mi"
+          }
+          limits = {
+            memory = "256Mi"
+          }
+        }
         livenessProbe = {
           httpGet = {
             scheme = "HTTPS"

@@ -134,6 +134,14 @@ module "etcd-wrapper" {
             value = tostring(v)
           }
         ]
+        resources = {
+          requests = {
+            memory = "2Gi"
+          }
+          limits = {
+            memory = "2Gi"
+          }
+        }
         livenessProbe = {
           httpGet = {
             scheme = "HTTP"
