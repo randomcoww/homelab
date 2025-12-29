@@ -53,8 +53,9 @@ module "kube-proxy" {
     kube_proxy = local.container_images.kube_proxy
   }
   ports = {
-    kube_proxy     = local.host_ports.kube_proxy
-    kube_apiserver = local.host_ports.apiserver
+    kube_proxy         = local.host_ports.kube_proxy
+    kube_proxy_metrics = local.host_ports.kube_proxy_metrics
+    kube_apiserver     = local.host_ports.apiserver
   }
   kubernetes_pod_prefix = local.networks.kubernetes_pod.prefix
   kube_apiserver_ip     = local.services.apiserver.ip
