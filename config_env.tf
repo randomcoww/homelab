@@ -22,7 +22,7 @@ locals {
       network        = "192.168.192.0"
       cidr           = 24
       vlan_id        = 2048
-      mtu            = local.default_mtu
+      mtu            = 1500 # may bridge to wifi - fix to 1500
       table_id       = 220
       table_priority = 32760
       netnums = {
