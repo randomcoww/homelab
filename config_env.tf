@@ -168,6 +168,7 @@ locals {
     scheduler          = 50251
     kubelet            = 50250
     kube_proxy         = 50254
+    kube_proxy_metrics = 50255
     etcd_client        = 58082
     etcd_peer          = 58083
     etcd_metrics       = 58086

@@ -56,6 +56,7 @@ module "configmap" {
       mode               = "nftables"
       clusterCIDR        = var.kubernetes_pod_prefix
       healthzBindAddress = "127.0.0.1:${var.ports.kube_proxy}"
+      metricsBindAddress = "0.0.0.0:${var.ports.kube_proxy_metrics}"
     })
   }
 }
@@ -67,7 +68,9 @@ module "daemonset" {
   affinity = var.affinity
   release  = var.release
   annotations = {
-    "checksum/configmap" = sha256(module.configmap.manifest)
+    "checksum/configmap"   = sha256(module.configmap.manifest)
+    "prometheus.io/scrape" = "true"
+    "prometheus.io/port"   = tostring(var.ports.kube_proxy_metrics)
   }
   template_spec = {
     priorityClassName  = "system-node-critical"
@@ -179,7 +182,7 @@ module "daemonset" {
             scheme = "HTTP"
             host   = "127.0.0.1"
             port   = var.ports.kube_proxy
-            path   = "/healthz"
+            path   = "/livez"
           }
         }
       },

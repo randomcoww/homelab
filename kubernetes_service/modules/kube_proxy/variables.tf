@@ -24,8 +24,9 @@ variable "images" {
 
 variable "ports" {
   type = object({
-    kube_proxy     = number
-    kube_apiserver = number
+    kube_proxy         = number
+    kube_proxy_metrics = number
+    kube_apiserver     = number
   })
 }
 
