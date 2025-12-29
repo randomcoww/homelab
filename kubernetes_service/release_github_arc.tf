@@ -134,10 +134,10 @@ module "arc-workflow-secret" {
             name = "$job"
             resources = {
               requests = {
-                memory = "512Mi"
+                memory = "2Gi"
               }
               limits = {
-                memory = "512Mi"
+                memory = "6Gi"
               }
             }
             env = [
