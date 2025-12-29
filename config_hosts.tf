@@ -9,6 +9,9 @@ locals {
           # match_mac = "b0-41-6f-16-a2-dd"
           mtu = local.default_mtu
         }
+        wlan0 = {
+          match_mac = "a8-59-5f-be-af-f0" # AX200
+        }
       }
       vlan_interfaces = {
         phy0-node = {
@@ -38,9 +41,16 @@ locals {
           mac     = "52-54-00-63-6e-b4"
         }
       }
+      bridge_interfaces = {
+        br0 = {
+          sources = [
+            "phy0",
+          ]
+        }
+      }
       networks = {
         lan = {
-          interface     = "phy0"
+          interface     = "br0"
           enable_netnum = true
         }
         node = {
@@ -94,6 +104,9 @@ locals {
           # match_mac = "b0-41-6f-16-f9-89"
           mtu = local.default_mtu
         }
+        wlan0 = {
+          match_mac = "ec-4c-8c-50-17-ed" # AX200
+        }
       }
       vlan_interfaces = {
         phy0-node = {
@@ -123,9 +136,16 @@ locals {
           mac     = "52-54-00-63-6e-b4"
         }
       }
+      bridge_interfaces = {
+        br0 = {
+          sources = [
+            "phy0",
+          ]
+        }
+      }
       networks = {
         lan = {
-          interface     = "phy0"
+          interface     = "br0"
           enable_netnum = true
         }
         node = {
@@ -179,6 +199,9 @@ locals {
           # match_mac = "b0-41-6f-16-9e-77"
           mtu = local.default_mtu
         }
+        wlan0 = {
+          match_mac = "a8-59-5f-98-b9-80" # AX200
+        }
       }
       vlan_interfaces = {
         phy0-node = {
@@ -194,9 +217,16 @@ locals {
           network = "etcd"
         }
       }
+      bridge_interfaces = {
+        br0 = {
+          sources = [
+            "phy0",
+          ]
+        }
+      }
       networks = {
         lan = {
-          interface     = "phy0"
+          interface     = "br0"
           enable_netnum = true
         }
         node = {
