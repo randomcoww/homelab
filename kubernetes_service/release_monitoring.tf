@@ -69,7 +69,7 @@ resource "helm_release" "prometheus" {
           "storage.tsdb.wal-compression",
         ]
         retention     = "1d"
-        retentionSize = "512MB"
+        retentionSize = "128MB"
         resources = {
           requests = {
             memory = "4Gi"
