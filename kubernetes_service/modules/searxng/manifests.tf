@@ -154,17 +154,20 @@ module "deployment" {
             mountPath = dirname(local.valkey_socket_file)
           },
         ]
-        readinessProbe = {
-          httpGet = {
-            port = local.extra_configs.SEARXNG_PORT
-            path = "/healthz"
-          }
-        }
         livenessProbe = {
           httpGet = {
             port = local.extra_configs.SEARXNG_PORT
             path = "/healthz"
           }
+          initialDelaySeconds = 10
+          timeoutSeconds      = 4
+        }
+        readinessProbe = {
+          httpGet = {
+            port = local.extra_configs.SEARXNG_PORT
+            path = "/healthz"
+          }
+          timeoutSeconds = 4
         }
       },
     ]

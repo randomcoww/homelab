@@ -88,9 +88,8 @@ output "template_spec" {
               local.mount_path_internal,
             ]
           }
-          periodSeconds    = 1
-          successThreshold = 1
-          failureThreshold = 24
+          periodSeconds    = 2
+          failureThreshold = 12
         }
       },
       ], [

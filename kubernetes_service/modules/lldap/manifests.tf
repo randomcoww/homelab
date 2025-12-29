@@ -187,7 +187,7 @@ module "litestream-overlay" {
             containerPort = local.extra_envs.LLDAP_LDAPS_OPTIONS__PORT
           },
         ]
-        readinessProbe = {
+        livenessProbe = {
           exec = {
             command = [
               "/app/lldap",
@@ -196,8 +196,10 @@ module "litestream-overlay" {
               "/data/lldap_config.toml",
             ]
           }
+          initialDelaySeconds = 10
+          timeoutSeconds      = 2
         }
-        livenessProbe = {
+        readinessProbe = {
           exec = {
             command = [
               "/app/lldap",

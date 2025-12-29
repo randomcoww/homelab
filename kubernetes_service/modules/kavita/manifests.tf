@@ -151,24 +151,25 @@ module "litestream-overlay" {
             }
           },
         ]
-        startupProbe = {
-          httpGet = {
-            path = "/api/health"
-            port = local.kavita_port
-          }
-          initialDelaySeconds = 60
-        }
         livenessProbe = {
           httpGet = {
             path = "/api/health"
             port = local.kavita_port
           }
+          timeoutSeconds = 2
         }
         readinessProbe = {
           httpGet = {
             path = "/api/health"
             port = local.kavita_port
           }
+        }
+        startupProbe = {
+          httpGet = {
+            path = "/api/health"
+            port = local.kavita_port
+          }
+          failureThreshold = 6
         }
       },
     ]

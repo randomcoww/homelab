@@ -184,6 +184,16 @@ module "daemonset" {
             port   = var.ports.kube_proxy
             path   = "/livez"
           }
+          initialDelaySeconds = 10
+          timeoutSeconds      = 2
+        }
+        readinessProbe = {
+          httpGet = {
+            scheme = "HTTP"
+            host   = "127.0.0.1"
+            port   = var.ports.kube_proxy
+            path   = "/healthz"
+          }
         }
       },
     ]

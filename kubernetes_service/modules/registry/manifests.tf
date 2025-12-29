@@ -266,19 +266,21 @@ module "deployment" {
             readOnly  = true
           },
         ]
-        readinessProbe = {
-          httpGet = {
-            port   = var.ports.registry
-            path   = "/"
-            scheme = "HTTPS"
-          }
-        }
         livenessProbe = {
           httpGet = {
             port   = var.ports.registry
             path   = "/"
             scheme = "HTTPS"
           }
+          timeoutSeconds = 4
+        }
+        readinessProbe = {
+          httpGet = {
+            port   = var.ports.registry
+            path   = "/"
+            scheme = "HTTPS"
+          }
+          timeoutSeconds = 4
         }
       },
     ]

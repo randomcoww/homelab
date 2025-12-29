@@ -149,11 +149,17 @@ module "etcd-wrapper" {
             port   = var.ports.etcd_metrics
             path   = "/livez"
           }
-          initialDelaySeconds = 10
-          timeoutSeconds      = 15
-          periodSeconds       = 10
-          successThreshold    = 1
-          failureThreshold    = 8
+          timeoutSeconds   = 10
+          failureThreshold = 6
+        }
+        readinessProbe = {
+          httpGet = {
+            scheme = "HTTP"
+            host   = "127.0.0.1"
+            port   = var.ports.etcd_metrics
+            path   = "/readyz"
+          }
+          timeoutSeconds = 5
         }
         startupProbe = {
           httpGet = {
@@ -162,11 +168,7 @@ module "etcd-wrapper" {
             port   = var.ports.etcd_metrics
             path   = "/readyz"
           }
-          initialDelaySeconds = local.initial_startup_delay_seconds
-          timeoutSeconds      = 15
-          periodSeconds       = 10
-          successThreshold    = 1
-          failureThreshold    = 24
+          failureThreshold = 6 + ceil(local.initial_startup_delay_seconds / 10)
         }
         volumeMounts = [
           {

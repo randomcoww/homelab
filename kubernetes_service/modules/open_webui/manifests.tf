@@ -171,30 +171,25 @@ module "litestream-overlay" {
             readOnly  = true
           },
         ]
-        startupProbe = {
-          httpGet = {
-            port = local.extra_configs.PORT
-            path = "/health"
-          }
-          initialDelaySeconds = 60
-          periodSeconds       = 5
-          failureThreshold    = 20
-        }
         readinessProbe = {
           httpGet = {
             port = local.extra_configs.PORT
             path = "/health/db"
           }
-          failureThreshold = 1
-          periodSeconds    = 10
+          timeoutSeconds = 2
         }
         livenessProbe = {
           httpGet = {
             port = local.extra_configs.PORT
             path = "/health"
           }
-          failureThreshold = 1
-          periodSeconds    = 10
+        }
+        startupProbe = {
+          httpGet = {
+            port = local.extra_configs.PORT
+            path = "/health"
+          }
+          failureThreshold = 6
         }
       },
     ]

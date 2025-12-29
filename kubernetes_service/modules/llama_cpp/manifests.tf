@@ -137,6 +137,8 @@ module "mountpoint-s3-overlay" {
             port = local.llama_cpp_port
             path = "/health"
           }
+          initialDelaySeconds = 10
+          timeoutSeconds      = 2
         }
         readinessProbe = {
           httpGet = {

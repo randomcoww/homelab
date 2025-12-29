@@ -362,15 +362,22 @@ module "statefulset" {
             protocol      = "UDP"
           }
         ])
+        livenessProbe = {
+          tcpSocket = {
+            port = local.base_port
+          }
+          timeoutSeconds = 2
+        }
         readinessProbe = {
           tcpSocket = {
             port = local.base_port
           }
         }
-        livenessProbe = {
+        startupProbe = {
           tcpSocket = {
             port = local.base_port
           }
+          failureThreshold = 6
         }
         resources = {
           requests = {

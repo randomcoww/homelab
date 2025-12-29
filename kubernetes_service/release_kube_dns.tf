@@ -217,21 +217,13 @@ resource "helm_release" "kube-dns" {
               port = "http"
             }
             initialDelaySeconds = 10
-            periodSeconds       = 10
-            timeoutSeconds      = 5
-            failureThreshold    = 2
-            successThreshold    = 1
+            timeoutSeconds      = 2
           }
           readinessProbe = {
             httpGet = {
               path = "/healthz"
               port = "http"
             }
-            initialDelaySeconds = 5
-            periodSeconds       = 10
-            timeoutSeconds      = 5
-            failureThreshold    = 6
-            successThreshold    = 1
           }
         },
         {
@@ -275,21 +267,13 @@ resource "helm_release" "kube-dns" {
               port = "client"
             }
             initialDelaySeconds = 10
-            periodSeconds       = 10
-            timeoutSeconds      = 5
-            successThreshold    = 1
-            failureThreshold    = 5
+            timeoutSeconds      = 2
           }
           readinessProbe = {
             httpGet = {
               path = "/readyz"
               port = "client"
             }
-            initialDelaySeconds = 10
-            periodSeconds       = 10
-            timeoutSeconds      = 5
-            successThreshold    = 1
-            failureThreshold    = 5
           }
         },
       ]

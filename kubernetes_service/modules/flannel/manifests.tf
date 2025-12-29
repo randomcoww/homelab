@@ -242,6 +242,16 @@ module "daemonset" {
             port   = var.ports.healthz
             path   = "/healthz"
           }
+          initialDelaySeconds = 10
+          timeoutSeconds      = 2
+        }
+        readinessProbe = {
+          httpGet = {
+            scheme = "HTTP"
+            host   = "127.0.0.1"
+            port   = var.ports.healthz
+            path   = "/healthz"
+          }
         }
         volumeMounts = [
           {

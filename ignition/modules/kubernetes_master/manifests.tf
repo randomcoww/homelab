@@ -1,7 +1,5 @@
 locals {
-  config_path               = "${var.config_base_path}/${var.name}"
-  apiserver_health_endpoint = "/livez"
-
+  config_path = "${var.config_base_path}/${var.name}"
   pki = {
     for key, f in {
       kubernetes-ca-cert = {
@@ -106,20 +104,19 @@ locals {
   ignition_snippets = concat([
     for f in fileset(".", "${path.module}/templates/*.yaml") :
     templatefile(f, {
-      butane_version            = var.butane_version
-      fw_mark                   = var.fw_mark
-      name                      = var.name
-      ports                     = var.ports
-      apiserver_ip              = var.apiserver_ip
-      cluster_apiserver_ip      = var.cluster_apiserver_ip
-      apiserver_health_endpoint = local.apiserver_health_endpoint
-      haproxy_path              = var.haproxy_path
-      bird_path                 = var.bird_path
-      bird_cache_table_name     = var.bird_cache_table_name
-      bgp_port                  = var.bgp_port
-      bgp_prefix                = var.bgp_prefix
-      bgp_as                    = var.bgp_as
-      bgp_neighbor_netnums      = var.bgp_neighbor_netnums
+      butane_version        = var.butane_version
+      fw_mark               = var.fw_mark
+      name                  = var.name
+      ports                 = var.ports
+      apiserver_ip          = var.apiserver_ip
+      cluster_apiserver_ip  = var.cluster_apiserver_ip
+      haproxy_path          = var.haproxy_path
+      bird_path             = var.bird_path
+      bird_cache_table_name = var.bird_cache_table_name
+      bgp_port              = var.bgp_port
+      bgp_prefix            = var.bgp_prefix
+      bgp_as                = var.bgp_as
+      bgp_neighbor_netnums  = var.bgp_neighbor_netnums
     })
     ], [
     yamlencode({
@@ -256,10 +253,10 @@ module "apiserver" {
             scheme = "HTTPS"
             host   = "127.0.0.1"
             port   = var.ports.apiserver_backend
-            path   = local.apiserver_health_endpoint
+            path   = "/livez"
           }
-          initialDelaySeconds = 15
-          timeoutSeconds      = 15
+          timeoutSeconds   = 10
+          failureThreshold = 6
         }
         readinessProbe = {
           httpGet = {
@@ -268,9 +265,16 @@ module "apiserver" {
             port   = var.ports.apiserver_backend
             path   = "/readyz"
           }
-          initialDelaySeconds = 15
-          timeoutSeconds      = 2
-          periodSeconds       = 2
+          timeoutSeconds = 5
+        }
+        startupProbe = {
+          httpGet = {
+            scheme = "HTTPS"
+            host   = "127.0.0.1"
+            port   = var.ports.apiserver_backend
+            path   = "/livez"
+          }
+          failureThreshold = 6
         }
         volumeMounts = [
           {
@@ -338,8 +342,26 @@ module "controller-manager" {
             port   = var.ports.controller_manager
             path   = "/healthz"
           }
-          initialDelaySeconds = 15
-          timeoutSeconds      = 15
+          timeoutSeconds   = 10
+          failureThreshold = 6
+        }
+        readinessProbe = {
+          httpGet = {
+            scheme = "HTTPS"
+            host   = "127.0.0.1"
+            port   = var.ports.controller_manager
+            path   = "/healthz"
+          }
+          timeoutSeconds = 5
+        }
+        startupProbe = {
+          httpGet = {
+            scheme = "HTTPS"
+            host   = "127.0.0.1"
+            port   = var.ports.controller_manager
+            path   = "/healthz"
+          }
+          failureThreshold = 6
         }
         volumeMounts = [
           {
@@ -396,8 +418,26 @@ module "scheduler" {
             port   = var.ports.scheduler
             path   = "/healthz"
           }
-          initialDelaySeconds = 15
-          timeoutSeconds      = 15
+          timeoutSeconds   = 10
+          failureThreshold = 6
+        }
+        readinessProbe = {
+          httpGet = {
+            scheme = "HTTPS"
+            host   = "127.0.0.1"
+            port   = var.ports.scheduler
+            path   = "/healthz"
+          }
+          timeoutSeconds = 5
+        }
+        startupProbe = {
+          httpGet = {
+            scheme = "HTTPS"
+            host   = "127.0.0.1"
+            port   = var.ports.scheduler
+            path   = "/healthz"
+          }
+          failureThreshold = 6
         }
         volumeMounts = [
           {

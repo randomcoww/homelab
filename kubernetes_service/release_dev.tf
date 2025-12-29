@@ -65,6 +65,8 @@ module "llama-cpp" {
           --ctx-size 32768 \
           --ubatch-size 4096 \
           --batch-size 4096 \
+          --cache-type-k q4_0 \
+          --cache-type-v q4_0 \
           --jinja \
           --temp 1.0 \
           --top_p 1.0 \
