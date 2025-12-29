@@ -8,7 +8,7 @@ output "template_spec" {
       {
         name          = "${var.name}-mountpoint-mount"
         image         = var.images.mountpoint
-        restartPolicy = "Always"
+        restartPolicy = "Always" # sidecar mode
         command = [
           "sh",
           "-c",
@@ -81,28 +81,17 @@ output "template_spec" {
         securityContext = {
           privileged = true
         }
-      },
-      {
-        name  = "${var.name}-mountpoint-mount-wait"
-        image = var.images.mountpoint
-        command = [
-          "sh",
-          "-c",
-          <<-EOF
-          set -e
-
-          until mountpoint ${local.mount_path_internal}; do
-          sleep 1
-          done
-          EOF
-        ]
-        volumeMounts = [
-          {
-            name             = "${var.name}-mountpoint-shared"
-            mountPath        = dirname(local.mount_path_internal)
-            mountPropagation = "HostToContainer"
-          },
-        ]
+        startupProbe = {
+          exec = {
+            command = [
+              "/usr/bin/mountpoint",
+              local.mount_path_internal,
+            ]
+          }
+          periodSeconds    = 1
+          successThreshold = 1
+          failureThreshold = 24
+        }
       },
       ], [
       for _, container in lookup(var.template_spec, "initContainers", []) :

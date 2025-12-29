@@ -166,12 +166,6 @@ module "deployment" {
             path = "/healthz"
           }
         }
-        startupProbe = {
-          httpGet = {
-            port = local.extra_configs.SEARXNG_PORT
-            path = "/healthz"
-          }
-        }
       },
     ]
     volumes = [

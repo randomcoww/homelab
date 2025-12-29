@@ -66,7 +66,7 @@ output "template_spec" {
       {
         name          = "${var.name}-litestream-replicate"
         image         = var.images.litestream
-        restartPolicy = "Always"
+        restartPolicy = "Always" # sidecar mode
         args = [
           "replicate",
           "-config",
