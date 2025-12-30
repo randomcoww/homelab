@@ -33,6 +33,7 @@
   "packageRules": [
     {
       "matchUpdateTypes": [
+        "major",
         "minor",
         "patch",
         "pin",
@@ -40,7 +41,7 @@
       ],
       "automerge": true,
       "ignoreTests": true,
-      "groupName": "minor-update"
+      "groupName": "renovate"
     },
     {
       "matchDepTypes": ["helm_release"],
