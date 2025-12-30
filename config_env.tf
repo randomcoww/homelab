@@ -107,7 +107,7 @@ locals {
     kube_apiserver          = "registry.k8s.io/kube-apiserver:v1.35.0@sha256:32f98b308862e1cf98c900927d84630fb86a836a480f02752a779eb85c1489f3"
     kube_controller_manager = "registry.k8s.io/kube-controller-manager:v1.35.0@sha256:3e343fd915d2e214b9a68c045b94017832927edb89aafa471324f8d05a191111"
     kube_scheduler          = "registry.k8s.io/kube-scheduler:v1.35.0@sha256:0ab622491a82532e01876d55e365c08c5bac01bcd5444a8ed58c1127ab47819f"
-    etcd_wrapper            = "ghcr.io/randomcoww/etcd-wrapper:v0.5.11@sha256:43941534f5d3773a7c1e15bd78683dc19bb8f78287a4e4282d2d473c7c8cf738"
+    etcd_wrapper            = "ghcr.io/randomcoww/etcd-wrapper:v0.5.12@sha256:4a71b957538547e0bcf6def288e3a07f67e14b30f9b9bac7014a9fd1c7f306a8"
     etcd                    = "gcr.io/etcd-development/etcd:v3.6.7@sha256:70cd5d29d2efcbc4c15f2a63183fd537aae77ddbc46b3b97a8a97bc8751ec3b4"
     # tier 1
     kube_proxy         = "registry.k8s.io/kube-proxy:v1.35.0@sha256:c818ca1eff765e35348b77e484da915175cdf483f298e1f9885ed706fcbcb34c"
@@ -147,7 +147,7 @@ locals {
     for name, tag in {
       # these fields are updated by renovate - don't use var substitutions
       amdcompat = "fedora-coreos-43.20251121.02"
-      default   = "fedora-coreos-43.20251223.22" # renovate: randomcoww/fedora-coreos-config-custom
+      default   = "fedora-coreos-43.20251230.06" # renovate: randomcoww/fedora-coreos-config-custom
     } :
     name => {
       kernel = "${tag}-live-kernel.$${buildarch:uristring}"
@@ -211,7 +211,7 @@ locals {
     static_pod_manifest_path  = "/var/lib/kubelet/manifests"
     containers_path           = "/var/lib/containers"
     cni_bin_path              = "/var/lib/cni/bin"
-    cni_config_path           = "/etc/cni/net-custom.d" # crio package drops unwanted configs into /etc/cni/net.d - work around by using another path
+    cni_config_path           = "/etc/cni/net.d"
     cni_bridge_interface_name = "cni0"
     kubelet_client_user       = "kube-apiserver-kubelet-client"
     helm_release_timeout      = 600
