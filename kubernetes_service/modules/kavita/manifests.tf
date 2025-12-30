@@ -160,8 +160,8 @@ module "litestream-overlay" {
               "sh",
               "-c",
               <<-EOF
-              curl -f http://127.0.0.1:${local.kavita_port}/api/health && \
-              curl -f https://${var.ingress_hostname}/oidc/login
+              curl -fsSL http://127.0.0.1:${local.kavita_port}/api/health && \
+              curl -fsSL https://${var.ingress_hostname}/oidc/login
               EOF
             ]
           }
