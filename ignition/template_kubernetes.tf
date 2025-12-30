@@ -25,6 +25,8 @@ module "kubernetes-master" {
     controller_manager = local.host_ports.controller_manager
     scheduler          = local.host_ports.scheduler
     etcd_client        = local.host_ports.etcd_client
+    etcd_client_proxy  = local.host_ports.etcd_client_proxy
+    etcd_metrics       = local.host_ports.etcd_metrics
   }
   kubelet_client_user        = local.kubernetes.kubelet_client_user
   cluster_apiserver_endpoint = "${local.endpoints.apiserver.service}.svc.${local.domains.kubernetes}"

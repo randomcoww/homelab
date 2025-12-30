@@ -45,7 +45,7 @@ storage:
       contents:
         inline: |
           frontend ${name}
-            bind :::${ports.apiserver} v4v6
+            bind 0.0.0.0:${ports.apiserver}
             mode tcp
             default_backend ${name}
 
@@ -54,9 +54,30 @@ storage:
             http-check expect status 200
             mode tcp
             balance leastconn
-            default-server verify none check-ssl rise 2 fall 2 maxconn 5000 maxqueue 5000 weight 100
+            default-server verify none check-ssl rise 1 fall 2 maxconn 5000 maxqueue 5000 weight 100
             server local 127.0.0.1:${ports.apiserver_backend} check
             server cluster ${cluster_apiserver_ip}:443 check
+    # there are occasional port conflicts when etcd and apiserver are on the same host
+    # put etcd behind haproxy to see if this mitigates the issue
+    - path: ${haproxy_path}/${name}-etcd.cfg
+      mode: 0644
+      contents:
+        inline: |
+          frontend ${name}-etcd
+            bind 127.0.0.1:${ports.etcd_client_proxy}
+            mode tcp
+            default_backend ${name}-etcd
+
+          backend ${name}-etcd
+            option httpchk GET /readyz HTTP/1.0
+            http-check expect status 200
+            mode tcp
+            balance leastconn
+            default-server verify none rise 1 fall 2 maxconn 5000 maxqueue 5000 weight 100
+            %{~ for node, ip in etcd_members ~}
+            server etcd-${node} ${ip}:${ports.etcd_client} check port ${ports.etcd_metrics}
+            %{~ endfor ~}
+
     # This is written by kube-vip but is needed by apiserver and kube-proxy befoer kube-vip is able to come up
     - path: /etc/systemd/network/20-lo.network
       mode: 0644

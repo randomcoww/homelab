@@ -147,7 +147,7 @@ locals {
     for name, tag in {
       # these fields are updated by renovate - don't use var substitutions
       amdcompat = "fedora-coreos-43.20251121.02"
-      default   = "fedora-coreos-43.20251230.06" # renovate: randomcoww/fedora-coreos-config-custom
+      default   = "fedora-coreos-43.20251230.10" # renovate: randomcoww/fedora-coreos-config-custom
     } :
     name => {
       kernel = "${tag}-live-kernel.$${buildarch:uristring}"
@@ -170,6 +170,7 @@ locals {
     kube_proxy         = 50254
     kube_proxy_metrics = 50255
     etcd_client        = 58082
+    etcd_client_proxy  = 58085 # only listens on localhost
     etcd_peer          = 58083
     etcd_metrics       = 58086
     flannel_healthz    = 58084
