@@ -212,16 +212,13 @@ module "authelia-secret" {
           path                = local.authelia_db_file
           monitor-interval    = "100ms"
           checkpoint-interval = "6s"
-          replicas = [
-            {
-              name          = "minio"
-              type          = "s3"
-              endpoint      = "https://${local.services.cluster_minio.ip}:${local.service_ports.minio}"
-              bucket        = "authelia"
-              path          = "$POD_NAME/litestream"
-              sync-interval = "100ms"
-            },
-          ]
+          replica = {
+            type          = "s3"
+            endpoint      = "https://${local.services.cluster_minio.ip}:${local.service_ports.minio}"
+            bucket        = "authelia"
+            path          = "$POD_NAME/litestream"
+            sync-interval = "100ms"
+          }
         },
       ]
     })
