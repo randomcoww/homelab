@@ -156,6 +156,7 @@ module "litestream-overlay" {
             # OIDC login occasionally breaks with this error even when /api/health reports Ok
             # "status":500,"message":"No authentication handler is registered...
             # restarting kavita seems to resolve it
+            # TODO: remove if this gets fixed upstream
             command = [
               "sh",
               "-c",
