@@ -26,7 +26,7 @@ locals {
       path = "${local.config_path}/${key}.pem"
     })
   }
-  initial_startup_delay_seconds = 120
+  initial_startup_delay_seconds = 240
 
   static_pod = {
     for key, f in {
@@ -149,7 +149,7 @@ module "etcd-wrapper" {
             port   = var.ports.etcd_metrics
             path   = "/livez"
           }
-          timeoutSeconds   = 10
+          timeoutSeconds   = 4
           failureThreshold = 6
         }
         readinessProbe = {
@@ -159,7 +159,7 @@ module "etcd-wrapper" {
             port   = var.ports.etcd_metrics
             path   = "/readyz"
           }
-          timeoutSeconds = 5
+          timeoutSeconds = 4
         }
         startupProbe = {
           httpGet = {
@@ -168,7 +168,7 @@ module "etcd-wrapper" {
             port   = var.ports.etcd_metrics
             path   = "/readyz"
           }
-          failureThreshold = 6 + ceil(local.initial_startup_delay_seconds / 10)
+          failureThreshold = 12 + ceil(local.initial_startup_delay_seconds / 10)
         }
         volumeMounts = [
           {

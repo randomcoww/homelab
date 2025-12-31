@@ -253,7 +253,7 @@ module "apiserver" {
             port   = var.ports.apiserver_backend
             path   = "/livez"
           }
-          timeoutSeconds   = 10
+          timeoutSeconds   = 4
           failureThreshold = 6
         }
         readinessProbe = {
@@ -263,7 +263,7 @@ module "apiserver" {
             port   = var.ports.apiserver_backend
             path   = "/readyz"
           }
-          timeoutSeconds = 5
+          timeoutSeconds = 4
         }
         startupProbe = {
           httpGet = {
@@ -340,7 +340,7 @@ module "controller-manager" {
             port   = var.ports.controller_manager
             path   = "/healthz"
           }
-          timeoutSeconds   = 10
+          timeoutSeconds   = 4
           failureThreshold = 6
         }
         readinessProbe = {
@@ -350,7 +350,7 @@ module "controller-manager" {
             port   = var.ports.controller_manager
             path   = "/healthz"
           }
-          timeoutSeconds = 5
+          timeoutSeconds = 4
         }
         startupProbe = {
           httpGet = {
@@ -416,7 +416,7 @@ module "scheduler" {
             port   = var.ports.scheduler
             path   = "/healthz"
           }
-          timeoutSeconds   = 10
+          timeoutSeconds   = 4
           failureThreshold = 6
         }
         readinessProbe = {
@@ -426,7 +426,7 @@ module "scheduler" {
             port   = var.ports.scheduler
             path   = "/healthz"
           }
-          timeoutSeconds = 5
+          timeoutSeconds = 4
         }
         startupProbe = {
           httpGet = {
