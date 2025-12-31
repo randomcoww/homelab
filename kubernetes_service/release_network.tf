@@ -90,8 +90,6 @@ module "hostapd" {
   config = {
     country_code                 = "PA"
     channel                      = 149 # one of 36 44 52 60 100 108 116 124 132 140 149 157 184 192
-    vht_oper_centr_freq_seg0_idx = 155 # channel+6 and one of 42 58 106 122 138 155
-    vht_oper_chwidth             = 1
     ssid                         = random_password.hostapd-ssid.result
     sae_password                 = random_password.hostapd-password.result
     interface                    = "wlan0"
@@ -104,13 +102,23 @@ module "hostapd" {
     hw_mode                      = "a"
     ieee80211n                   = 1
     ieee80211ac                  = 1
+    ieee80211ax                  = 1
     ieee80211d                   = 1
+    ieee80211h                   = 1
     ieee80211w                   = 2
     auth_algs                    = 1
     wmm_enabled                  = 1
-    require_ht                   = 1
-    require_vht                  = 1
-    skip_inactivity_poll         = 1
+    require_he                   = 1
+    vht_oper_centr_freq_seg0_idx = 155 # channel+6 and one of 42 58 106 122 138 155
+    vht_oper_chwidth             = 2
+    he_su_beamformer             = 1
+    he_su_beamformee             = 1
+    he_mu_beamformer             = 1
+    he_bss_color                 = 12
+    he_oper_chwidth              = 1
+    he_oper_centr_freq_seg0_idx  = 155 # channel+6 and one of 42 58 106 122 138 155
+    ap_max_inactivity            = 300
+    disassoc_low_ack             = 1
     ht_capab = "[${join("][", [
       "HT40-", "HT40+", "SHORT-GI-20", "SHORT-GI-40",
       "LDPC", "TX-STBC", "RX-STBC1", "MAX-AMSDU-7935",
