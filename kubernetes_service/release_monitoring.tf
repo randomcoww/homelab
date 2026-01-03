@@ -49,7 +49,7 @@ resource "helm_release" "prometheus" {
     yamlencode({
       configmapReload = {
         prometheus = {
-          enabled = false
+          enabled = true
         }
       }
       server = {
@@ -209,7 +209,7 @@ resource "helm_release" "prometheus" {
               ]
             },
             {
-              name = "kube-apiserver"
+              name = "kube-api-server"
               rules = [
                 {
                   alert = "NodesDown"
@@ -221,9 +221,9 @@ resource "helm_release" "prometheus" {
                   }
                   expr = <<-EOF
                   (
-                    absent(up{job="kubernetes-apiservers"})
+                    absent(up{job="kubernetes-api-servers"})
                   or
-                    changes(up{job="kubernetes-apiservers"}[1m]) > 1
+                    changes(up{job="kubernetes-api-servers"}[1m]) > 1
                   )
                   EOF
                   for  = "1m"
