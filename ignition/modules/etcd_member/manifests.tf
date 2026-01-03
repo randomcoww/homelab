@@ -99,8 +99,6 @@ module "etcd-wrapper" {
           var.s3_resource,
           "-initial-cluster-timeout",
           "${local.initial_startup_delay_seconds}s",
-          "-node-run-interval",
-          "10m",
         ]
         env = [
           for k, v in {
