@@ -14,6 +14,9 @@ terraform -chdir=client_credentials output -raw kubeconfig > $HOME/.kube/config
 mkdir -p $HOME/.mc/certs/CAs
 terraform -chdir=client_credentials output -json mc_config > $HOME/.mc/config.json
 terraform -chdir=client_credentials output -json minio_client | jq -r '.ca_cert_pem' > $HOME/.mc/certs/CAs/ca.crt
+
+mkdir -p $HOME/.config/rclone
+terraform -chdir=client_credentials output -raw rclone_config > $HOME/.config/rclone/rclone.conf
 ```
 
 ---
