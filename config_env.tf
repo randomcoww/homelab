@@ -130,7 +130,7 @@ locals {
     hostapd          = "reg.cluster.internal/randomcoww/hostapd-noscan:v20251229.230418@sha256:7739c3f446e5ae326e82eedfdcd418e1e533c0e9a770b9520507866e89745147"
     tailscale        = "ghcr.io/tailscale/tailscale:v1.92.4@sha256:d6734d69fd7d31b1861589e347463954aa6097f9a61aa4f8f763ba94bfe0e5b9"
     qrcode_generator = "reg.cluster.internal/randomcoww/qrcode-resource:v20251229.141928@sha256:e3ac16365490e8e1fefc224d1ec59445a6de852d567a2401dbab8a5516115d14"
-    llama_cpp        = "ghcr.io/mostlygeek/llama-swap:cuda@sha256:33db677eda8e63a5c0e967c62ada0450d6d61b839f9a74190d8261ee38843271"
+    llama_cpp        = "ghcr.io/mostlygeek/llama-swap:cuda@sha256:2e87367ebe7d498a1b4cd35379d2135776f119b72b86e26a177c42c37a97e698"
     sunshine_desktop = "reg.cluster.internal/randomcoww/sunshine-desktop:v2025.1227.223216@sha256:e00698099fbc8b2f1d3e57590f610eb575c21f418d14381b6d8b5a50d35b520f"
     litestream       = "docker.io/litestream/litestream:0.5.5@sha256:bc24c1bc5a551dca0f235c446e5fa890eaf455723cd8b8b294e732f144f091e4"
     valkey           = "ghcr.io/valkey-io/valkey:9.0.1-alpine@sha256:c106a0c03bcb23cbdf9febe693114cb7800646b11ca8b303aee7409de005faa8"
