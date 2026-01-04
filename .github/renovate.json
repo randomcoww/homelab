@@ -33,7 +33,7 @@
   "packageRules": [
     {
       "matchPackageNames": [
-        "litestream/litestream"
+        "docker.io/litestream/litestream"
       ],
       "enabled": false
     },
