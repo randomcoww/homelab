@@ -132,7 +132,7 @@ locals {
     qrcode_generator = "reg.cluster.internal/randomcoww/qrcode-resource:v20251229.141928@sha256:e3ac16365490e8e1fefc224d1ec59445a6de852d567a2401dbab8a5516115d14"
     llama_cpp        = "ghcr.io/mostlygeek/llama-swap:cuda@sha256:2e87367ebe7d498a1b4cd35379d2135776f119b72b86e26a177c42c37a97e698"
     sunshine_desktop = "reg.cluster.internal/randomcoww/sunshine-desktop:v2025.1227.223216@sha256:e00698099fbc8b2f1d3e57590f610eb575c21f418d14381b6d8b5a50d35b520f"
-    litestream       = "docker.io/litestream/litestream:0.5.5@sha256:bc24c1bc5a551dca0f235c446e5fa890eaf455723cd8b8b294e732f144f091e4"
+    litestream       = "docker.io/litestream/litestream:0.5.2@sha256:e4fd484cb1cd9d6fa58fff7127d551118e150ab75b389cf868a053152ba6c9c0"
     valkey           = "ghcr.io/valkey-io/valkey:9.0.1-alpine@sha256:c106a0c03bcb23cbdf9febe693114cb7800646b11ca8b303aee7409de005faa8"
     nvidia_driver    = "reg.cluster.internal/randomcoww/nvidia-driver-container:v580.105.08-fedora43@sha256:b84a1f8f2ae22727a66cdfe518279917fb1cf752474d89af7ca87992642a0fa4"
     mcp_proxy        = "ghcr.io/tbxark/mcp-proxy:v0.43.0@sha256:0ab33e72c494ee795e9b95922beab736f251514d9e6ec1dcbe6ca317749ba5d3"
