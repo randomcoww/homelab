@@ -17,6 +17,8 @@ systemd:
               ${bird_path}
             ExecStartPre=/usr/sbin/bird -p
 
+            [Install]
+            WantedBy=network-online.target
 storage:
   files:
     - path: /etc/sysctl.d/20-bird.conf
