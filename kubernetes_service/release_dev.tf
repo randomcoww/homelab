@@ -212,7 +212,7 @@ module "open-webui" {
     # https://github.com/varunvasudeva1/llm-server-docs?tab=readme-ov-file#mcp-proxy-server
     # https://github.com/open-webui/docs/issues/609
     # https://github.com/javydekoning/homelab/blob/main/k8s/ai-platform/openwebui/TOOL_SERVER_CONNECTIONS.json
-    TOOL_SERVER_CONNECTIONS = jsonencode(concat([
+    TOOL_SERVER_CONNECTIONS = jsonencode([
       for type, _ in local.mcp_proxies :
       {
         type      = "mcp"
@@ -231,25 +231,7 @@ module "open-webui" {
           description = ""
         }
       }
-      ], [
-      {
-        type      = "mcp"
-        url       = "https://api.githubcopilot.com/mcp"
-        auth_type = "bearer"
-        config = {
-          enable = true
-        }
-        spec_type = "url"
-        spec      = ""
-        path      = ""
-        key       = var.github.token
-        info = {
-          id          = "github"
-          name        = "github"
-          description = ""
-        }
-      },
-    ]))
+    ])
     # OIDC
     ENABLE_SIGNUP                 = false
     ENABLE_LOGIN_FORM             = false
