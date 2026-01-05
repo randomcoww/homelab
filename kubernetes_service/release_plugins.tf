@@ -107,7 +107,7 @@ resource "helm_release" "node-feature-discovery" {
 }
 
 # Nvidia GPU
-
+/*
 resource "helm_release" "nvidia-gpu-oprerator" {
   name             = "gpu-operator"
   namespace        = "nvidia"
@@ -159,7 +159,7 @@ resource "helm_release" "nvidia-gpu-oprerator" {
     })
   ]
 }
-
+*/
 # AMD GPU
 
 resource "helm_release" "amd-gpu" {
