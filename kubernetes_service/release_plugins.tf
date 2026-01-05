@@ -58,6 +58,54 @@ module "device-plugin" {
   kubelet_root_path = local.kubernetes.kubelet_root_path
 }
 
+# Node feature discovery
+
+resource "helm_release" "node-feature-discovery" {
+  name             = "node-feature-discovery"
+  namespace        = "kube-system"
+  create_namespace = true
+  repository       = "oci://gcr.io/k8s-staging-nfd/charts"
+  chart            = "node-feature-discovery"
+  wait             = false
+  wait_for_jobs    = false
+  version          = "0.18.3"
+  max_history      = 2
+  timeout          = local.kubernetes.helm_release_timeout
+  values = [
+    yamlencode({
+      master = {
+        replicaCount = 2
+      }
+      worker = {
+        config = {
+          sources = {
+            custom = [
+              {
+                name = "hostapd-compat"
+                labels = {
+                  hostapd-compat = true
+                }
+                matchFeatures = [
+                  {
+                    feature = "kernel.loadedmodule"
+                    matchName = {
+                      op = "InRegexp",
+                      value = [
+                        "^rtw8",
+                        "^mt7",
+                      ]
+                    }
+                  },
+                ]
+              },
+            ]
+          }
+        }
+      }
+    })
+  ]
+}
+
 # Nvidia GPU
 
 resource "helm_release" "nvidia-gpu-oprerator" {
@@ -107,34 +155,6 @@ resource "helm_release" "nvidia-gpu-oprerator" {
       }
       vfioManager = {
         enabled = false
-      }
-      node-feature-discovery = {
-        worker = {
-          config = {
-            sources = {
-              custom = [
-                {
-                  name = "hostapd-compat"
-                  labels = {
-                    hostapd-compat = true
-                  }
-                  matchFeatures = [
-                    {
-                      feature = "kernel.loadedmodule"
-                      matchName = {
-                        op = "InRegexp",
-                        value = [
-                          "^rtw8",
-                          "^mt7",
-                        ]
-                      }
-                    },
-                  ]
-                },
-              ]
-            }
-          }
-        }
       }
     })
   ]
