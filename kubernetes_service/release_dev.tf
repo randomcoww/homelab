@@ -53,7 +53,7 @@ module "llama-cpp" {
   }
   ingress_hostname = local.endpoints.llama_cpp.ingress
   llama_swap_config = {
-    healthCheckTimeout = 600
+    healthCheckTimeout = 1200
     models = {
       # https://github.com/ggml-org/llama.cpp/discussions/15396
       # https://docs.unsloth.ai/basics/gpt-oss-how-to-run-and-fine-tune#recommended-settings
@@ -62,46 +62,63 @@ module "llama-cpp" {
         /app/llama-server \
           --port $${PORT} \
           --model /llama-cpp/models/gpt-oss-20b-mxfp4.gguf \
-          --ctx-size 32768 \
-          --ubatch-size 4096 \
-          --batch-size 4096 \
-          --cache-type-k q4_0 \
-          --cache-type-v q4_0 \
+          --ctx-size 0 \
+          --ubatch-size 2048 \
+          --batch-size 2048 \
           --jinja \
           --temp 1.0 \
           --top_p 1.0 \
           --top_k 0
         EOF
       }
-      "jina-embeddings-v4-text-retrieval-q8" = {
+      "ggml-gpt-oss-120b-mxfp4" = {
         cmd = <<-EOF
         /app/llama-server \
           --port $${PORT} \
-          --model /llama-cpp/models/jina-embeddings-v4-text-retrieval-Q8_0.gguf \
-          --pooling mean \
-          --embedding \
-          --ubatch-size 8192
+          --model /llama-cpp/models/gpt-oss-120b-mxfp4-00001-of-00003.gguf \
+          --ctx-size 0 \
+          --ubatch-size 2048 \
+          --batch-size 2048 \
+          --jinja \
+          --temp 1.0 \
+          --top_p 1.0 \
+          --top_k 0
         EOF
       }
     }
     hooks = {
       on_startup = {
         preload = [
-          "ggml-gpt-oss-20b-mxfp4",
+          "ggml-gpt-oss-120b-mxfp4",
         ]
       }
     }
   }
   extra_envs = [
     {
-      name  = "NVIDIA_DRIVER_CAPABILITIES"
-      value = "compute,utility"
-    },
-    {
       name  = "GGML_CUDA_ENABLE_UNIFIED_MEMORY"
       value = 1
     },
   ]
+  affinity = {
+    nodeAffinity = {
+      requiredDuringSchedulingIgnoredDuringExecution = {
+        nodeSelectorTerms = [
+          {
+            matchExpressions = [
+              {
+                key      = "amd.com/gpu.vram"
+                operator = "In"
+                values = [
+                  "96G",
+                ]
+              },
+            ]
+          },
+        ]
+      }
+    }
+  }
   minio_endpoint      = "https://${local.services.cluster_minio.ip}:${local.service_ports.minio}"
   minio_data_bucket   = "models"
   minio_access_secret = local.minio_users.llama_cpp.secret
@@ -197,7 +214,7 @@ module "open-webui" {
     ENABLE_VERSION_UPDATE_CHECK    = false
     ENABLE_OPENAI_API              = true
     OPENAI_API_BASE_URL            = "https://${local.endpoints.llama_cpp.ingress}/v1"
-    DEFAULT_MODELS                 = "ggml-gpt-oss-20b-mxfp4"
+    DEFAULT_MODELS                 = "ggml-gpt-oss-120b-mxfp4"
     ENABLE_WEB_SEARCH              = false
     ENABLE_CODE_INTERPRETER        = false
     ENABLE_CODE_EXECUTION          = false

@@ -178,10 +178,10 @@ resource "helm_release" "amd-gpu" {
       dp = {
         resources = {
           requests = {
-            memory = "64Mi"
+            memory = "32Mi"
           }
           limits = {
-            memory = "64Mi"
+            memory = "32Mi"
           }
         }
       }
@@ -189,7 +189,15 @@ resource "helm_release" "amd-gpu" {
         enabled = false
       }
       labeller = {
-        enabled = false
+        enabled = true
+        resources = {
+          requests = {
+            memory = "32Mi"
+          }
+          limits = {
+            memory = "32Mi"
+          }
+        }
       }
     })
   ]

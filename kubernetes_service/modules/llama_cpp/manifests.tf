@@ -86,7 +86,6 @@ module "mountpoint-s3-overlay" {
     mountpoint = var.images.mountpoint
   }
   template_spec = {
-    runtimeClassName = "nvidia-cdi"
     resources = {
       requests = {
         memory = "14Gi"
@@ -121,10 +120,10 @@ module "mountpoint-s3-overlay" {
         ]
         resources = {
           requests = {
-            "nvidia.com/gpu" = 1
+            "amd.com/gpu" = 1
           }
           limits = {
-            "nvidia.com/gpu" = 1
+            "amd.com/gpu" = 1
           }
         }
         ports = [
