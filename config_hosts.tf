@@ -263,11 +263,11 @@ locals {
       netnum     = 6
       physical_interfaces = {
         phy0 = {
-          match_mac = "74-56-3c-c3-10-68"
+          match_mac = "9c-bf-0d-01-0e-7b"
           mtu       = local.default_mtu
         }
         wlan0 = {
-          match_mac = "7c-66-ef-f4-57-a8" # RTL8852CE
+          match_mac = "dc-56-7b-03-4c-e5" # MT7925
         }
       }
       vlan_interfaces = {
