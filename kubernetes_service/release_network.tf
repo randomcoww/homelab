@@ -103,6 +103,7 @@ module "hostapd" {
     ieee80211n                   = 1
     ieee80211ac                  = 1
     ieee80211ax                  = 1
+    ieee80211be                  = 1
     ieee80211d                   = 1
     ieee80211h                   = 1
     ieee80211w                   = 2
@@ -114,20 +115,24 @@ module "hostapd" {
     he_su_beamformer             = 1
     he_su_beamformee             = 1
     he_mu_beamformer             = 1
+    eht_mu_beamformer            = 1
     he_bss_color                 = 12
-    he_oper_chwidth              = 1
+    he_oper_chwidth              = 3
     he_oper_centr_freq_seg0_idx  = 155 # channel+6 and one of 42 58 106 122 138 155
+    eht_oper_chwidth             = 1
+    eht_oper_centr_freq_seg0_idx = 155
     ap_max_inactivity            = 300
     disassoc_low_ack             = 1
     ht_capab = "[${join("][", [
-      "HT40-", "HT40+", "SHORT-GI-20", "SHORT-GI-40",
-      "LDPC", "TX-STBC", "RX-STBC1", "MAX-AMSDU-7935",
+      "HT40+",
+      "SHORT-GI-40",
+      "LDPC",
     ])}]"
     vht_capab = "[${join("][", [
-      "RXLDPC", "TX-STBC-2BY1", "RX-STBC-1", "SHORT-GI-80", "SHORT-GI-160",
-      "MAX-MPDU-11454", "MAX-A-MPDU-LEN-EXP2",
-      "BF-ANTENNA-1", "SOUNDING-DIMENSION-1", "SU-BEAMFORMEE",
-      "BF-ANTENNA-2", "SOUNDING-DIMENSION-2", "MU-BEAMFORMEE",
+      "MAX-MPDU-11454",
+      "VHT160",
+      "SHORT-GI-160",
+      "RXLDPC",
     ])}]"
   }
 }

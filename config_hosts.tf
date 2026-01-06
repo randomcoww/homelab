@@ -323,10 +323,6 @@ locals {
           ]
         }
       }
-      boot_args = [
-        "rtw89_pci.disable_aspm_l1=Y",
-        "rtw89_pci.disable_clkreq=Y",
-      ]
     }
   }
 
