@@ -57,20 +57,6 @@ module "llama-cpp" {
     models = {
       # https://github.com/ggml-org/llama.cpp/discussions/15396
       # https://docs.unsloth.ai/basics/gpt-oss-how-to-run-and-fine-tune#recommended-settings
-      "ggml-gpt-oss-20b-mxfp4" = {
-        cmd = <<-EOF
-        /app/llama-server \
-          --port $${PORT} \
-          --model /llama-cpp/models/gpt-oss-20b-mxfp4.gguf \
-          --ctx-size 0 \
-          --ubatch-size 2048 \
-          --batch-size 2048 \
-          --jinja \
-          --temp 1.0 \
-          --top_p 1.0 \
-          --top_k 0
-        EOF
-      }
       "ggml-gpt-oss-120b-mxfp4" = {
         cmd = <<-EOF
         /app/llama-server \
