@@ -106,60 +106,6 @@ resource "helm_release" "node-feature-discovery" {
   ]
 }
 
-# Nvidia GPU
-/*
-resource "helm_release" "nvidia-gpu-oprerator" {
-  name             = "gpu-operator"
-  namespace        = "nvidia"
-  create_namespace = true
-  repository       = "https://helm.ngc.nvidia.com/nvidia"
-  chart            = "gpu-operator"
-  wait             = false
-  wait_for_jobs    = false
-  version          = "v25.10.1"
-  max_history      = 2
-  timeout          = local.kubernetes.helm_release_timeout
-  values = [
-    yamlencode({
-      cdi = {
-        enabled = true
-        default = true
-      }
-      # Operator automatically appends -<osrelease> to end of tag. E.g. :<version>-fedora42
-      driver = {
-        kernelModuleType = "open"
-        repository       = regex(local.container_image_regex, local.container_images.nvidia_driver).repository
-        image            = regex(local.container_image_regex, local.container_images.nvidia_driver).image
-        version          = regex(local.container_image_regex, local.container_images.nvidia_driver).version
-        upgradePolicy = {
-          gpuPodDeletion = {
-            force          = true
-            deleteEmptyDir = true
-          }
-        }
-      }
-      toolkit = {
-        enabled = true
-      }
-      devicePlugin = {
-        enabled = true
-      }
-      dcgmExporter = {
-        enabled = false
-      }
-      migManager = {
-        enabled = false
-      }
-      vgpuDeviceManager = {
-        enabled = false
-      }
-      vfioManager = {
-        enabled = false
-      }
-    })
-  ]
-}
-*/
 # AMD GPU
 
 resource "helm_release" "amd-gpu" {
