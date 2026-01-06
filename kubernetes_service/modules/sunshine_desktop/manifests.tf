@@ -183,7 +183,7 @@ module "statefulset" {
   template_spec = {
     resources = {
       requests = {
-        memory = "8Gi"
+        memory = "2Gi"
       }
       limits = {
         memory = "16Gi"
@@ -379,7 +379,7 @@ module "statefulset" {
         name = "dev-shm"
         emptyDir = {
           medium    = "Memory"
-          sizeLimit = "2Gi"
+          sizeLimit = "1Gi"
         }
       },
       {
