@@ -94,12 +94,6 @@ module "llama-cpp" {
       }
     }
   }
-  extra_envs = [
-    {
-      name  = "GGML_CUDA_ENABLE_UNIFIED_MEMORY"
-      value = 1
-    },
-  ]
   affinity = {
     nodeAffinity = {
       requiredDuringSchedulingIgnoredDuringExecution = {

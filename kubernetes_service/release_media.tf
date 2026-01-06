@@ -64,22 +64,29 @@ module "sunshine-desktop" {
   ]
   extra_envs = [
     {
-      name  = "NVIDIA_DRIVER_CAPABILITIES"
-      value = "all"
-    },
-    {
-      name  = "__NV_PRIME_RENDER_OFFLOAD"
-      value = 1
-    },
-    {
-      name  = "__GLX_VENDOR_LIBRARY_NAME"
-      value = "nvidia"
-    },
-    {
       name  = "TZ"
       value = local.timezone
     },
   ]
+  affinity = {
+    nodeAffinity = {
+      requiredDuringSchedulingIgnoredDuringExecution = {
+        nodeSelectorTerms = [
+          {
+            matchExpressions = [
+              {
+                key      = "amd.com/gpu.cu-count"
+                operator = "Gt"
+                values = [
+                  "31",
+                ]
+              },
+            ]
+          },
+        ]
+      }
+    }
+  }
   security_context = {
     privileged = true # TODO: Revisit - currently privileged to make libinput work
   }

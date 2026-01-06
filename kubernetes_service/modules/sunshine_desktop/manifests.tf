@@ -181,13 +181,12 @@ module "statefulset" {
     ]
   }
   template_spec = {
-    runtimeClassName = "nvidia-cdi"
     resources = {
       requests = {
-        memory = "14Gi"
+        memory = "8Gi"
       }
       limits = {
-        memory = "20Gi"
+        memory = "16Gi"
       }
     }
     containers = [
@@ -207,38 +206,6 @@ module "statefulset" {
 
           mkdir -p $HOME $XDG_RUNTIME_DIR
           chown $UID:$UID $HOME $XDG_RUNTIME_DIR
-
-          ## Driver ##
-
-          mkdir -p $HOME/nvidia
-          targetarch=$(arch)
-          driver_version=$(nvidia-smi --query-gpu=driver_version --format=csv,noheader --id=0)
-          driver_file=$HOME/nvidia/NVIDIA-Linux-$targetarch-$driver_version.run
-
-          NVIDIA_DRIVER_BASE_URL=$${NVIDIA_DRIVER_BASE_URL:-https://us.download.nvidia.com/XFree86/$${targetarch/x86_64/Linux-x86_64}}
-          curl -fsSL --remove-on-error --skip-existing -o "$driver_file" \
-            $NVIDIA_DRIVER_BASE_URL/$driver_version/NVIDIA-Linux-$targetarch-$driver_version.run
-
-          chmod +x "$driver_file"
-          "$driver_file" \
-            --silent \
-            --accept-license \
-            --skip-depmod \
-            --skip-module-unload \
-            --no-kernel-modules \
-            --no-kernel-module-source \
-            --no-nouveau-check \
-            --no-nvidia-modprobe \
-            --no-systemd \
-            --no-wine-files \
-            --no-x-check \
-            --no-dkms \
-            --no-distro-scripts \
-            --no-rpms \
-            --no-backup \
-            --no-check-for-alternate-installs \
-            --no-libglx-indirect \
-            --no-install-libglvnd
 
           ## Udev ##
 
@@ -344,6 +311,10 @@ module "statefulset" {
             mountPath = "/dev/shm"
           },
           {
+            name      = "dev-dri"
+            mountPath = "/dev/dri"
+          },
+          {
             name      = "config"
             mountPath = local.sunshine_apps_file
             subPath   = "apps.json"
@@ -380,14 +351,13 @@ module "statefulset" {
           failureThreshold = 6
         }
         resources = {
-          requests = {
-            "nvidia.com/gpu" = 1
-            "amd.com/gpu"    = 1
-          }
-          limits = {
-            "nvidia.com/gpu" = 1
-            "amd.com/gpu"    = 1
-          }
+          # use /dev/dri mount to share gpu with another container
+          # requests = {
+          #   "amd.com/gpu" = 1
+          # }
+          # limits = {
+          #   "amd.com/gpu" = 1
+          # }
         }
         securityContext = var.security_context
       },
@@ -410,6 +380,12 @@ module "statefulset" {
         emptyDir = {
           medium    = "Memory"
           sizeLimit = "2Gi"
+        }
+      },
+      {
+        name = "dev-dri"
+        hostPath = {
+          path = "/dev/dri"
         }
       },
     ], var.extra_volumes)

@@ -88,10 +88,10 @@ module "mountpoint-s3-overlay" {
   template_spec = {
     resources = {
       requests = {
-        memory = "14Gi"
+        memory = "8Gi"
       }
       limits = {
-        memory = "20Gi"
+        memory = "16Gi"
       }
     }
     containers = [

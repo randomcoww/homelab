@@ -18,7 +18,7 @@ locals {
     module.mcp-proxy,
     module.open-webui,
     module.llama-cpp,
-    # module.sunshine-desktop,
+    module.sunshine-desktop,
   ]
 }
 
