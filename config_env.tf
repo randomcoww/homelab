@@ -147,7 +147,6 @@ locals {
   host_images = {
     for name, tag in {
       # these fields are updated by renovate - don't use var substitutions
-      compat  = "fedora-coreos-43.20251230.10"
       default = "fedora-coreos-43.20260104.22" # renovate: randomcoww/fedora-coreos-config-custom
     } :
     name => {
