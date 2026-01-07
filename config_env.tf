@@ -128,9 +128,9 @@ locals {
     # tier 3
     mountpoint       = "reg.cluster.internal/randomcoww/mountpoint-s3:v1.21.0@sha256:6b2d8f6619c18096f082b3aa554e57f0fc5a19bb8f9e22549a1dea6e538b0c63"
     hostapd          = "reg.cluster.internal/randomcoww/hostapd-noscan:v20251229.230418@sha256:7739c3f446e5ae326e82eedfdcd418e1e533c0e9a770b9520507866e89745147"
-    tailscale        = "ghcr.io/tailscale/tailscale:v1.92.4@sha256:d6734d69fd7d31b1861589e347463954aa6097f9a61aa4f8f763ba94bfe0e5b9"
+    tailscale        = "ghcr.io/tailscale/tailscale:v1.92.5@sha256:4a0aaacee6f28e724c1f80c986e5776c9c979d8f7e19274c2cae2d495cc8d625"
     qrcode_generator = "reg.cluster.internal/randomcoww/qrcode-resource:v20251229.141928@sha256:e3ac16365490e8e1fefc224d1ec59445a6de852d567a2401dbab8a5516115d14"
-    llama_cpp        = "ghcr.io/mostlygeek/llama-swap:vulkan-non-root@sha256:797a1244671015fda281b21053089ca8577a5ee63088db16c48c41d125500a07"
+    llama_cpp        = "ghcr.io/mostlygeek/llama-swap:vulkan-non-root@sha256:f92876ca14a227207c007e34b538d2c302635878fbe194fe2de507828dca86d2"
     sunshine_desktop = "reg.cluster.internal/randomcoww/sunshine-desktop:v2025.1230.11628@sha256:f0a16d2912dd05b5e0a6b1f8aa7a558b32b45e9dedb91f013bdd6ff45b3de903"
     litestream       = "docker.io/litestream/litestream:0.5.2@sha256:e4fd484cb1cd9d6fa58fff7127d551118e150ab75b389cf868a053152ba6c9c0"
     valkey           = "ghcr.io/valkey-io/valkey:9.0.1-alpine@sha256:c106a0c03bcb23cbdf9febe693114cb7800646b11ca8b303aee7409de005faa8"
@@ -138,7 +138,7 @@ locals {
     searxng          = "ghcr.io/searxng/searxng:latest@sha256:472dd0c84b8e2a05bca773b4a430b9fc9e4e92cd4fa0afaa223efab925ab752a"
     open_webui       = "ghcr.io/open-webui/open-webui:0.6.43@sha256:9cb724e0bc84f05ba2f81a3da5f53f5add07e1001065d83f3b6b70b9a9eeef19"
     kavita           = "ghcr.io/kareadita/kavita:0.8.8@sha256:22c42f3cc83fb98b98a6d6336200b615faf2cfd2db22dab363136744efda1bb0"
-    lldap            = "ghcr.io/lldap/lldap:latest-alpine@sha256:39190e688c130207380bf0789f1b09dd1786c1bac8c08ac9ca880ed8e34c4499"
+    lldap            = "ghcr.io/lldap/lldap:latest-alpine@sha256:898f91b2042ab23659954588999eb38bb4d556c340318c76012000fa4f4b56ef"
     authelia         = "ghcr.io/authelia/authelia:4.39.15@sha256:d23ee3c721d465b4749cc58541cda4aebe5aa6f19d7b5ce0afebb44ebee69591"
     cloudflared      = "docker.io/cloudflare/cloudflared:2025.11.1@sha256:89ee50efb1e9cb2ae30281a8a404fed95eb8f02f0a972617526f8c5b417acae2"
   }
