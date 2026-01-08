@@ -89,9 +89,10 @@ module "hostapd" {
   # https://blog.fraggod.net/2017/04/27/wifi-hostapd-configuration-for-80211ac-networks.html
   config = {
     country_code                 = "PA"
-    channel                      = 149 # one of 36 44 52 60 100 108 116 124 132 140 149 157 184 192
+    channel                      = 36
     ssid                         = random_password.hostapd-ssid.result
     sae_password                 = random_password.hostapd-password.result
+    sae_pwe                      = 2
     interface                    = "wlan0"
     bridge                       = "br0"
     driver                       = "nl80211"
@@ -111,28 +112,41 @@ module "hostapd" {
     wmm_enabled                  = 1
     require_he                   = 1
     vht_oper_chwidth             = 2
-    vht_oper_centr_freq_seg0_idx = 155 # channel+6 and one of 42 58 106 122 138 155
-    he_oper_chwidth              = 3
-    he_oper_centr_freq_seg0_idx  = 155 # channel+6 and one of 42 58 106 122 138 155
-    eht_oper_chwidth             = 1
-    eht_oper_centr_freq_seg0_idx = 155
-    he_bss_color                 = 12
+    vht_oper_centr_freq_seg0_idx = 50
+    he_oper_chwidth              = 2
+    he_oper_centr_freq_seg0_idx  = 50
+    eht_oper_chwidth             = 2
+    eht_oper_centr_freq_seg0_idx = 50
     he_su_beamformer             = 1
     he_su_beamformee             = 1
     he_mu_beamformer             = 1
+    eht_su_beamformer            = 1
+    eht_su_beamformee            = 1
     eht_mu_beamformer            = 1
-    ap_max_inactivity            = 300
-    disassoc_low_ack             = 1
     ht_capab = "[${join("][", [
-      "HT40+",
-      "SHORT-GI-40",
       "LDPC",
+      "HT40+",
+      "HT40-",
+      "SHORT-GI-20",
+      "SHORT-GI-40",
+      "TX-STBC",
+      "RX-STBC1",
+      "MAX-AMSDU-7935",
     ])}]"
     vht_capab = "[${join("][", [
-      "MAX-MPDU-11454",
-      "VHT160",
-      "SHORT-GI-160",
       "RXLDPC",
+      "SHORT-GI-80",
+      "SHORT-GI-160",
+      "TX-STBC-2BY1",
+      "SU-BEAMFORMEE",
+      "MU-BEAMFORMEE",
+      "RX-ANTENNA-PATTERN",
+      "TX-ANTENNA-PATTERN",
+      "RX-STBC-1",
+      "BF-ANTENNA-4",
+      "MAX-MPDU-11454",
+      "MAX-A-MPDU-LEN-EXP7",
+      "VHT160",
     ])}]"
   }
 }
