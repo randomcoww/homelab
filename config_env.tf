@@ -131,7 +131,7 @@ locals {
     tailscale        = "ghcr.io/tailscale/tailscale:v1.92.5@sha256:4a0aaacee6f28e724c1f80c986e5776c9c979d8f7e19274c2cae2d495cc8d625"
     qrcode_generator = "reg.cluster.internal/randomcoww/qrcode-resource:v20251229.141928@sha256:e3ac16365490e8e1fefc224d1ec59445a6de852d567a2401dbab8a5516115d14"
     llama_cpp        = "ghcr.io/mostlygeek/llama-swap:vulkan-non-root@sha256:862560de47990465ada79d6f50e83f7253700e16538cb2f3bddd1101348c8c70"
-    sunshine_desktop = "reg.cluster.internal/randomcoww/sunshine-desktop:v2025.1230.11628@sha256:f0a16d2912dd05b5e0a6b1f8aa7a558b32b45e9dedb91f013bdd6ff45b3de903"
+    sunshine_desktop = "reg.cluster.internal/randomcoww/sunshine-desktop:v2026.105.231052@sha256:97e49ff726315d153f4feb98ff6098df4631613af80165678087ce67f45ead6f"
     litestream       = "docker.io/litestream/litestream:0.5.2@sha256:e4fd484cb1cd9d6fa58fff7127d551118e150ab75b389cf868a053152ba6c9c0"
     valkey           = "ghcr.io/valkey-io/valkey:9.0.1-alpine@sha256:c106a0c03bcb23cbdf9febe693114cb7800646b11ca8b303aee7409de005faa8"
     mcp_proxy        = "ghcr.io/tbxark/mcp-proxy:v0.43.2@sha256:70c0e02d39c4c0898e610b3a30954f7930628fa6f4fb447bad14c32382a25879"

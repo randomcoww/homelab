@@ -12,9 +12,10 @@ locals {
     audio   = local.base_port + 11
     mic     = local.base_port + 13
   }
-  web_port           = local.base_port + 1
-  home_path          = "/home/${var.user}"
-  sunshine_apps_file = "/etc/sunshine/apps.json"
+  web_port               = local.base_port + 1
+  home_path              = "/home/${var.user}"
+  sunshine_apps_file     = "/etc/sunshine/apps.json"
+  sunshine_prep_cmd_file = "/usr/local/bin/sunshine-prep-cmd.sh"
 }
 
 # bypassed through nginx - no need to expose
@@ -55,14 +56,14 @@ module "secret" {
     }, {
     USERNAME = random_password.username.result
     PASSWORD = random_password.password.result
-    "apps.json" = jsonencode({
+    basename(local.sunshine_apps_file) = jsonencode({
       apps = [
         {
           name       = "Desktop"
           image-path = "desktop.png"
           prep-cmd = [
             {
-              do = "sunshine-prep-cmd.sh"
+              do = local.sunshine_prep_cmd_file
             },
           ]
         }
@@ -71,6 +72,21 @@ module "secret" {
         PATH = "$(PATH):$(HOME)/.local/bin"
       }
     })
+    basename(local.sunshine_prep_cmd_file) = <<-EOF
+    #!/bin/bash
+    set -xe
+
+    # make these available to steam
+    cat >> $HOME/.bashrc <<EOT
+    export SUNSHINE_CLIENT_WIDTH=$SUNSHINE_CLIENT_WIDTH
+    export SUNSHINE_CLIENT_HEIGHT=$SUNSHINE_CLIENT_HEIGHT
+    export SUNSHINE_CLIENT_FPS=$SUNSHINE_CLIENT_FPS
+    EOT
+
+    wlr-randr \
+      --output HEADLESS-1 \
+      --custom-mode $${SUNSHINE_CLIENT_WIDTH}x$${SUNSHINE_CLIENT_HEIGHT}@$${SUNSHINE_CLIENT_FPS}
+    EOF
   })
 }
 
@@ -317,7 +333,12 @@ module "statefulset" {
           {
             name      = "config"
             mountPath = local.sunshine_apps_file
-            subPath   = "apps.json"
+            subPath   = basename(local.sunshine_apps_file)
+          },
+          {
+            name      = "commands"
+            mountPath = local.sunshine_prep_cmd_file
+            subPath   = basename(local.sunshine_prep_cmd_file)
           },
         ], var.extra_volume_mounts)
         ports = concat([
@@ -367,6 +388,13 @@ module "statefulset" {
         name = "config"
         secret = {
           secretName = module.secret.name
+        }
+      },
+      {
+        name = "commands"
+        secret = {
+          secretName  = module.secret.name
+          defaultMode = 493
         }
       },
       {
