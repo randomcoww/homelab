@@ -286,7 +286,7 @@ module "statefulset" {
           ], [
           for _, e in var.extra_envs :
           {
-            name  = e.name
+            name  = tostring(e.name)
             value = tostring(e.value)
           }
         ])
@@ -351,13 +351,13 @@ module "statefulset" {
           failureThreshold = 6
         }
         resources = {
-          # use /dev/dri mount to share gpu with another container
-          # requests = {
-          #   "amd.com/gpu" = 1
-          # }
-          # limits = {
-          #   "amd.com/gpu" = 1
-          # }
+          # use /dev/dri in place of gpu resource to share gpu with another container
+          requests = {
+            "squat.ai/ntsync" = 1
+          }
+          limits = {
+            "squat.ai/ntsync" = 1
+          }
         }
         securityContext = var.security_context
       },

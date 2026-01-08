@@ -54,6 +54,20 @@ module "device-plugin" {
         },
       ]
     }),
+    "--device",
+    yamlencode({
+      name = "ntsync"
+      groups = [
+        {
+          count = 100
+          paths = [
+            {
+              path = "/dev/ntsync"
+            },
+          ]
+        },
+      ]
+    }),
   ]
   kubelet_root_path = local.kubernetes.kubelet_root_path
 }

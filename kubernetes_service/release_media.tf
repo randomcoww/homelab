@@ -67,6 +67,18 @@ module "sunshine-desktop" {
       name  = "TZ"
       value = local.timezone
     },
+    {
+      name  = "PROTON_USE_NTSYNC"
+      value = 1
+    },
+    {
+      name  = "PROTON_ENABLE_WAYLAND"
+      value = 1
+    },
+    {
+      name  = "SDL_VIDEODRIVER"
+      value = "wayland"
+    },
   ]
   affinity = {
     nodeAffinity = {
