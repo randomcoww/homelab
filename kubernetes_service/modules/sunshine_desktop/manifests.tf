@@ -320,6 +320,10 @@ module "statefulset" {
             mountPath = local.home_path
           },
           {
+            name      = "bashrc"
+            mountPath = "${local.home_path}/.bashrc.d"
+          },
+          {
             name      = "dev-input"
             mountPath = "/dev/input"
           },
@@ -405,16 +409,23 @@ module "statefulset" {
         }
       },
       {
+        name = "dev-dri"
+        hostPath = {
+          path = "/dev/dri"
+        }
+      },
+      {
         name = "dev-shm"
         emptyDir = {
           medium    = "Memory"
           sizeLimit = "1Gi"
         }
       },
+      # prevent leaving files permanently in bashrc.d
       {
-        name = "dev-dri"
-        hostPath = {
-          path = "/dev/dri"
+        name = "bashrc"
+        emptyDir = {
+          medium = "Memory"
         }
       },
     ], var.extra_volumes)
