@@ -76,8 +76,8 @@ module "secret" {
     #!/bin/bash
     set -xe
 
-    # make these available to steam
-    cat >> $HOME/.bashrc <<EOT
+    mkdir -p $HOME/.bashrc.d
+    cat > $HOME/.bashrc.d/sunshine-client-profile.sh <<EOT
     export SUNSHINE_CLIENT_WIDTH=$SUNSHINE_CLIENT_WIDTH
     export SUNSHINE_CLIENT_HEIGHT=$SUNSHINE_CLIENT_HEIGHT
     export SUNSHINE_CLIENT_FPS=$SUNSHINE_CLIENT_FPS
