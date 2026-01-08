@@ -81,6 +81,7 @@ module "secret" {
     export SUNSHINE_CLIENT_WIDTH=$SUNSHINE_CLIENT_WIDTH
     export SUNSHINE_CLIENT_HEIGHT=$SUNSHINE_CLIENT_HEIGHT
     export SUNSHINE_CLIENT_FPS=$SUNSHINE_CLIENT_FPS
+    export GAMESCOPE_LAUNCH="gamescope -f -w $SUNSHINE_CLIENT_WIDTH -h $SUNSHINE_CLIENT_HEIGHT --immediate-flips --force-grab-cursor --rt --adaptive-sync --"
     EOT
 
     wlr-randr \
