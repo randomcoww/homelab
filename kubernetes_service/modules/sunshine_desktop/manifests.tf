@@ -83,6 +83,7 @@ module "secret" {
     EOF
     basename(local.gamescope_cmd_file)     = <<-EOF
     #!/bin/bash
+    set -e
 
     gamescope -f \
       -W $(wlr-randr --json | jq '.[] | select(.name == "HEADLESS-1") | .modes[] | select(.current == true).width') \
