@@ -67,10 +67,10 @@ module "secret" {
               do = local.sunshine_prep_cmd_file
             },
           ]
-        }
+        },
       ],
       env = {
-        PATH = "$(PATH):$(HOME)/.local/bin"
+        PATH = "$(PATH):$(HOME)/.local/bin" # needed for some client connection step
       }
     })
     basename(local.sunshine_prep_cmd_file) = <<-EOF
