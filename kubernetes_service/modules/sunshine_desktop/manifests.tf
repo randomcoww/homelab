@@ -85,8 +85,8 @@ module "secret" {
     #!/bin/bash
 
     gamescope -f \
-      -w $(wlr-randr --json | jq '.[] | select(.name == "HEADLESS-1") | .modes[] | select(.current == true).width') \
-      -h $(wlr-randr --json | jq '.[] | select(.name == "HEADLESS-1") | .modes[] | select(.current == true).height') \
+      -W $(wlr-randr --json | jq '.[] | select(.name == "HEADLESS-1") | .modes[] | select(.current == true).width') \
+      -H $(wlr-randr --json | jq '.[] | select(.name == "HEADLESS-1") | .modes[] | select(.current == true).height') \
       --immediate-flips --force-grab-cursor --rt --adaptive-sync $@
     EOF
   })

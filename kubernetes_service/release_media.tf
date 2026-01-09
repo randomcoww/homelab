@@ -61,11 +61,26 @@ module "sunshine-desktop" {
       bind-key -T copy-mode MouseDragEnd1Pane send-keys -X copy-pipe-and-cancel "xclip -in -sel clip"
       EOF
     },
+    {
+      path    = "/etc/sway/config.d/sync"
+      content = <<-EOF
+      output * allow_tearing yes
+      output * max_render_time off
+      EOF
+    },
   ]
   extra_envs = [
     {
       name  = "TZ"
       value = local.timezone
+    },
+    {
+      name  = "WLR_DRM_NO_MODIFIERS"
+      value = 1
+    },
+    {
+      name  = "WLR_DRM_NO_ATOMIC"
+      value = 1
     },
   ]
   affinity = {
