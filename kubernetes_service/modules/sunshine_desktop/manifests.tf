@@ -16,6 +16,7 @@ locals {
   home_path              = "/home/${var.user}"
   sunshine_apps_file     = "/etc/sunshine/apps.json"
   sunshine_prep_cmd_file = "/usr/local/bin/sunshine-prep-cmd.sh"
+  gamescope_cmd_file     = "/usr/local/bin/gamescope-launch"
 }
 
 # bypassed through nginx - no need to expose
@@ -76,17 +77,17 @@ module "secret" {
     #!/bin/bash
     set -xe
 
-    mkdir -p $HOME/.bashrc.d
-    cat > $HOME/.bashrc.d/sunshine-client-profile.sh <<EOT
-    export SUNSHINE_CLIENT_WIDTH=$SUNSHINE_CLIENT_WIDTH
-    export SUNSHINE_CLIENT_HEIGHT=$SUNSHINE_CLIENT_HEIGHT
-    export SUNSHINE_CLIENT_FPS=$SUNSHINE_CLIENT_FPS
-    export GAMESCOPE_LAUNCH="gamescope -f -w $SUNSHINE_CLIENT_WIDTH -h $SUNSHINE_CLIENT_HEIGHT --immediate-flips --force-grab-cursor --rt --adaptive-sync --"
-    EOT
-
     wlr-randr \
       --output HEADLESS-1 \
       --custom-mode $${SUNSHINE_CLIENT_WIDTH}x$${SUNSHINE_CLIENT_HEIGHT}@$${SUNSHINE_CLIENT_FPS}
+    EOF
+    basename(local.gamescope_cmd_file)     = <<-EOF
+    #!/bin/bash
+
+    gamescope -f \
+      -w $(wlr-randr --json | jq '.[] | select(.name == "HEADLESS-1") | .modes[] | select(.current == true).width') \
+      -h $(wlr-randr --json | jq '.[] | select(.name == "HEADLESS-1") | .modes[] | select(.current == true).height') \
+      --immediate-flips --force-grab-cursor --rt --adaptive-sync $@
     EOF
   })
 }
@@ -340,6 +341,11 @@ module "statefulset" {
             name      = "commands"
             mountPath = local.sunshine_prep_cmd_file
             subPath   = basename(local.sunshine_prep_cmd_file)
+          },
+          {
+            name      = "commands"
+            mountPath = local.gamescope_cmd_file
+            subPath   = basename(local.gamescope_cmd_file)
           },
         ], var.extra_volume_mounts)
         ports = concat([
