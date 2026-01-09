@@ -64,6 +64,7 @@ module "sunshine-desktop" {
     {
       path    = "/etc/sway/config.d/sync"
       content = <<-EOF
+      output * bg #000000 solid_color
       output * allow_tearing yes
       output * max_render_time off
       EOF
@@ -80,6 +81,10 @@ module "sunshine-desktop" {
     },
     {
       name  = "WLR_DRM_NO_ATOMIC"
+      value = 1
+    },
+    {
+      name  = "PROTON_ENABLE_HDR"
       value = 1
     },
   ]
