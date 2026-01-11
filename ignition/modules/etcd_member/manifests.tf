@@ -97,8 +97,10 @@ module "etcd-wrapper" {
           "-etcdutl-binary-file",
           # "${local.etcd_mount_path}/usr/local/bin/etcdutl",
           "/bin/etcdutl",
-          "-s3-backup-resource",
-          var.s3_resource,
+          "-s3-backup-resource-prefix",
+          var.s3_resource_prefix,
+          "-s3-backup-count",
+          tostring(var.s3_backup_count),
           "-initial-cluster-timeout",
           "${local.initial_startup_delay_seconds}s",
         ]
