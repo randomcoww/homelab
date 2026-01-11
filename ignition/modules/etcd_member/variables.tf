@@ -65,11 +65,6 @@ variable "s3_resource_prefix" {
   type = string
 }
 
-variable "s3_backup_count" {
-  type    = number
-  default = 4
-}
-
 variable "s3_access_key_id" {
   type = string
 }
