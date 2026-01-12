@@ -91,9 +91,24 @@ module "llama-cpp" {
           --port $${PORT} \
           --model /llama-cpp/models/Qwen3-Embedding-0.6B-Q8_0.gguf \
           --ctx-size 0 \
-          --ubatch-size 2048 \
-          --batch-size 2048 \
-          --embedding
+          --embedding \
+          --pooling last \
+          --ubatch-size 8192 \
+          --batch-size 8192 \
+          --log-disable
+        EOF
+      }
+      "jina-reranker-v3-Q8_0" = {
+        cmd = <<-EOF
+        /app/llama-server \
+          --port $${PORT} \
+          --model /llama-cpp/models/jina-reranker-v3-Q8_0.gguf \
+          --ctx-size 0 \
+          --embedding \
+          --reranking \
+          --ubatch-size 8192 \
+          --batch-size 8192 \
+          --log-disable
         EOF
       }
     }
@@ -102,6 +117,7 @@ module "llama-cpp" {
         swap = false
         members = [
           "Qwen3-Embedding-0.6B-Q8_0",
+          "jina-reranker-v3-Q8_0",
           "gpt-oss-120b-mxfp4",
         ]
       }
@@ -110,6 +126,7 @@ module "llama-cpp" {
       on_startup = {
         preload = [
           "Qwen3-Embedding-0.6B-Q8_0",
+          "jina-reranker-v3-Q8_0",
           "gpt-oss-120b-mxfp4",
         ]
       }
@@ -247,6 +264,8 @@ module "open-webui" {
     RAG_EMBEDDING_ENGINE                    = "openai"
     RAG_EMBEDDING_MODEL                     = "Qwen3-Embedding-0.6B-Q8_0"
     RAG_OPENAI_API_BASE_URL                 = "https://${local.endpoints.llama_cpp.ingress}/v1"
+    RAG_RERANKING_MODEL                     = "jina-reranker-v3-Q8_0"
+    RAG_EXTERNAL_RERANKER_URL               = "https://${local.endpoints.llama_cpp.ingress}/v1/rerank"
     # https://github.com/varunvasudeva1/llm-server-docs?tab=readme-ov-file#mcp-proxy-server
     # https://github.com/open-webui/docs/issues/609
     # https://github.com/javydekoning/homelab/blob/main/k8s/ai-platform/openwebui/TOOL_SERVER_CONNECTIONS.json
