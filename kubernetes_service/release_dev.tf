@@ -190,24 +190,25 @@ module "open-webui" {
   }
   ingress_hostname = local.endpoints.open_webui.ingress
   extra_configs = {
-    WEBUI_URL                      = "https://${local.endpoints.open_webui.ingress}"
-    ENABLE_VERSION_UPDATE_CHECK    = false
-    ENABLE_OPENAI_API              = true
-    OPENAI_API_BASE_URL            = "https://${local.endpoints.llama_cpp.ingress}/v1"
-    DEFAULT_MODELS                 = "ggml-gpt-oss-120b-mxfp4"
-    ENABLE_WEB_SEARCH              = false
-    WEB_SEARCH_ENGINE              = "searxng"
-    SEARXNG_QUERY_URL              = "https://${local.endpoints.searxng.ingress}/search?q=<query>"
-    ENABLE_CODE_INTERPRETER        = false
-    ENABLE_CODE_EXECUTION          = false
-    ENABLE_FOLLOW_UP_GENERATION    = true
-    ENABLE_PERSISTENT_CONFIG       = false
-    ENABLE_EVALUATION_ARENA_MODELS = false
-    ENABLE_MESSAGE_RATING          = false
-    SHOW_ADMIN_DETAILS             = false
-    BYPASS_MODEL_ACCESS_CONTROL    = true
-    ENABLE_OLLAMA_API              = false
-    ENABLE_COMMUNITY_SHARING       = false
+    WEBUI_URL                               = "https://${local.endpoints.open_webui.ingress}"
+    ENABLE_VERSION_UPDATE_CHECK             = false
+    ENABLE_OPENAI_API                       = true
+    OPENAI_API_BASE_URL                     = "https://${local.endpoints.llama_cpp.ingress}/v1"
+    DEFAULT_MODELS                          = "ggml-gpt-oss-120b-mxfp4"
+    ENABLE_WEB_SEARCH                       = false
+    WEB_SEARCH_ENGINE                       = "searxng"
+    SEARXNG_QUERY_URL                       = "https://${local.endpoints.searxng.ingress}/search?q=<query>"
+    ENABLE_CODE_INTERPRETER                 = false
+    ENABLE_CODE_EXECUTION                   = false
+    ENABLE_FOLLOW_UP_GENERATION             = true
+    ENABLE_PERSISTENT_CONFIG                = false
+    ENABLE_EVALUATION_ARENA_MODELS          = false
+    ENABLE_MESSAGE_RATING                   = false
+    SHOW_ADMIN_DETAILS                      = false
+    BYPASS_MODEL_ACCESS_CONTROL             = true
+    ENABLE_OLLAMA_API                       = false
+    ENABLE_COMMUNITY_SHARING                = false
+    AIOHTTP_CLIENT_TIMEOUT_TOOL_SERVER_DATA = 60
     # https://github.com/varunvasudeva1/llm-server-docs?tab=readme-ov-file#mcp-proxy-server
     # https://github.com/open-webui/docs/issues/609
     # https://github.com/javydekoning/homelab/blob/main/k8s/ai-platform/openwebui/TOOL_SERVER_CONNECTIONS.json
