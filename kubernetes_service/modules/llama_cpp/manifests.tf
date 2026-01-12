@@ -79,7 +79,6 @@ module "mountpoint-s3-overlay" {
   s3_prefix   = ""
   s3_mount_extra_args = [
     "--read-only",
-    "--cache /var/cache", # cache to disk
   ]
   s3_access_secret = var.minio_access_secret
   images = {

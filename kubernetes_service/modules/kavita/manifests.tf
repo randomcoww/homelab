@@ -206,7 +206,9 @@ module "mountpoint-s3-overlay" {
   s3_prefix   = ""
   s3_mount_extra_args = [
     "--read-only",
-    "--cache /var/cache", # cache to disk
+    # "--cache /var/cache", # cache to disk
+    "--cache /var/tmp",      # cache to memory
+    "--max-cache-size 1024", # 1Gi
   ]
   s3_access_secret = var.minio_access_secret
   images = {
@@ -227,7 +229,8 @@ module "covers-mountpoint-s3-overlay" {
   s3_bucket   = var.minio_bucket
   s3_prefix   = "covers"
   s3_mount_extra_args = [
-    "--cache /var/tmp", # cache to memory
+    "--cache /var/tmp",      # cache to memory
+    "--max-cache-size 1024", # 1Gi
   ]
   s3_access_secret = var.minio_access_secret
   images = {
