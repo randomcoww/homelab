@@ -195,9 +195,8 @@ module "open-webui" {
     ENABLE_OPENAI_API              = true
     OPENAI_API_BASE_URL            = "https://${local.endpoints.llama_cpp.ingress}/v1"
     DEFAULT_MODELS                 = "ggml-gpt-oss-120b-mxfp4"
-    ENABLE_WEB_SEARCH              = true
+    ENABLE_WEB_SEARCH              = false
     WEB_SEARCH_ENGINE              = "searxng"
-    BYPASS_WEB_SEARCH_WEB_LOADER   = true
     SEARXNG_QUERY_URL              = "https://${local.endpoints.searxng.ingress}/search?q=<query>"
     ENABLE_CODE_INTERPRETER        = false
     ENABLE_CODE_EXECUTION          = false

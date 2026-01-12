@@ -2,6 +2,9 @@ locals {
   nginx_ingress_annotations_common = {
     "nginx.ingress.kubernetes.io/proxy-buffering"         = "off"
     "nginx.ingress.kubernetes.io/proxy-request-buffering" = "off"
+    "nginx.ingress.kubernetes.io/proxy-read-timeout"      = "3600"
+    "nginx.ingress.kubernetes.io/proxy-send-timeout"      = "3600"
+    "nginx.ingress.kubernetes.io/proxy-body-size"         = "0"
 
     "nginx.ingress.kubernetes.io/http-snippet"      = <<-EOF
     map $http_upgrade $connection_upgrade {
@@ -33,8 +36,6 @@ locals {
     proxy_set_header X-Forwarded-Method $request_method;
     proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
     proxy_set_header X-Forwarded-Proto $scheme;
-    proxy_read_timeout 3600s;
-    proxy_send_timeout 3600s;
     EOF
     "nginx.ingress.kubernetes.io/affinity"          = "cookie"
   }
