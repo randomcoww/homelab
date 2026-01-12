@@ -249,6 +249,7 @@ module "open-webui" {
     DEFAULT_MODELS                          = "gpt-oss-120b-mxfp4"
     ENABLE_WEB_SEARCH                       = true
     WEB_SEARCH_ENGINE                       = "searxng"
+    WEB_SEARCH_RESULT_COUNT                 = 10
     SEARXNG_QUERY_URL                       = "https://${local.endpoints.searxng.ingress}/search?q=<query>"
     ENABLE_CODE_INTERPRETER                 = false
     ENABLE_CODE_EXECUTION                   = false
