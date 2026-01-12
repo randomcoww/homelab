@@ -242,31 +242,34 @@ module "open-webui" {
   }
   ingress_hostname = local.endpoints.open_webui.ingress
   extra_configs = {
-    WEBUI_URL                               = "https://${local.endpoints.open_webui.ingress}"
-    ENABLE_VERSION_UPDATE_CHECK             = false
-    ENABLE_OPENAI_API                       = true
-    OPENAI_API_BASE_URL                     = "https://${local.endpoints.llama_cpp.ingress}/v1"
-    DEFAULT_MODELS                          = "gpt-oss-120b-mxfp4"
-    ENABLE_WEB_SEARCH                       = true
-    WEB_SEARCH_ENGINE                       = "searxng"
-    WEB_SEARCH_RESULT_COUNT                 = 10
-    SEARXNG_QUERY_URL                       = "https://${local.endpoints.searxng.ingress}/search?q=<query>"
-    ENABLE_CODE_INTERPRETER                 = false
-    ENABLE_CODE_EXECUTION                   = false
-    ENABLE_FOLLOW_UP_GENERATION             = true
-    ENABLE_PERSISTENT_CONFIG                = false
-    ENABLE_EVALUATION_ARENA_MODELS          = false
-    ENABLE_MESSAGE_RATING                   = false
-    SHOW_ADMIN_DETAILS                      = false
-    BYPASS_MODEL_ACCESS_CONTROL             = true
-    ENABLE_OLLAMA_API                       = false
-    ENABLE_COMMUNITY_SHARING                = false
-    AIOHTTP_CLIENT_TIMEOUT_TOOL_SERVER_DATA = 60
-    RAG_EMBEDDING_ENGINE                    = "openai"
-    RAG_EMBEDDING_MODEL                     = "Qwen3-Embedding-0.6B-Q8_0"
-    RAG_OPENAI_API_BASE_URL                 = "https://${local.endpoints.llama_cpp.ingress}/v1"
-    RAG_RERANKING_MODEL                     = "jina-reranker-v3-Q8_0"
-    RAG_EXTERNAL_RERANKER_URL               = "https://${local.endpoints.llama_cpp.ingress}/v1/rerank"
+    WEBUI_URL                      = "https://${local.endpoints.open_webui.ingress}"
+    ENABLE_VERSION_UPDATE_CHECK    = false
+    ENABLE_OPENAI_API              = true
+    OPENAI_API_BASE_URL            = "https://${local.endpoints.llama_cpp.ingress}/v1"
+    DEFAULT_MODELS                 = "gpt-oss-120b-mxfp4"
+    ENABLE_WEB_SEARCH              = true
+    WEB_SEARCH_ENGINE              = "searxng"
+    WEB_SEARCH_RESULT_COUNT        = 10
+    SEARXNG_QUERY_URL              = "https://${local.endpoints.searxng.ingress}/search?q=<query>"
+    ENABLE_CODE_INTERPRETER        = false
+    ENABLE_CODE_EXECUTION          = false
+    ENABLE_FOLLOW_UP_GENERATION    = true
+    ENABLE_PERSISTENT_CONFIG       = false
+    ENABLE_EVALUATION_ARENA_MODELS = false
+    ENABLE_MESSAGE_RATING          = false
+    SHOW_ADMIN_DETAILS             = false
+    BYPASS_MODEL_ACCESS_CONTROL    = true
+    ENABLE_OLLAMA_API              = false
+    ENABLE_COMMUNITY_SHARING       = false
+    ENABLE_RAG_HYBRID_SEARCH       = true
+    RAG_TOP_K                      = 5
+    RAG_EMBEDDING_ENGINE           = "openai"
+    RAG_OPENAI_API_BASE_URL        = "https://${local.endpoints.llama_cpp.ingress}/v1"
+    RAG_EMBEDDING_MODEL            = "Qwen3-Embedding-0.6B-Q8_0"
+    RAG_TOP_K_RERANKER             = 5
+    RAG_RERANKING_ENGINE           = "external"
+    RAG_EXTERNAL_RERANKER_URL      = "https://${local.endpoints.llama_cpp.ingress}/v1/rerank"
+    RAG_RERANKING_MODEL            = "jina-reranker-v3-Q8_0"
     # https://github.com/varunvasudeva1/llm-server-docs?tab=readme-ov-file#mcp-proxy-server
     # https://github.com/open-webui/docs/issues/609
     # https://github.com/javydekoning/homelab/blob/main/k8s/ai-platform/openwebui/TOOL_SERVER_CONNECTIONS.json
