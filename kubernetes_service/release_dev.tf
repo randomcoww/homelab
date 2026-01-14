@@ -221,7 +221,7 @@ module "open-webui" {
     SEARXNG_QUERY_URL              = "https://${local.endpoints.searxng.ingress}/search?q=<query>"
     ENABLE_CODE_INTERPRETER        = false
     ENABLE_CODE_EXECUTION          = false
-    ENABLE_FOLLOW_UP_GENERATION    = true
+    ENABLE_FOLLOW_UP_GENERATION    = false
     ENABLE_PERSISTENT_CONFIG       = false
     ENABLE_EVALUATION_ARENA_MODELS = false
     ENABLE_MESSAGE_RATING          = false
