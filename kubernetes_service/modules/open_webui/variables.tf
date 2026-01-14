@@ -27,7 +27,6 @@ variable "ingress_hostname" {
 variable "images" {
   type = object({
     open_webui = string
-    playwright = string
     litestream = string
   })
 }

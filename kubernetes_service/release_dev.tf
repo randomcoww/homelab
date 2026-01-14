@@ -9,6 +9,8 @@ locals {
       env = {
         SEARXNG_URL = "https://${local.endpoints.searxng.ingress}"
       }
+      name        = "web-search"
+      description = "Search the web with SearXNG"
     }
   }
 }
@@ -30,20 +32,6 @@ module "llama-cpp" {
     models = {
       # https://github.com/ggml-org/llama.cpp/discussions/15396
       # https://docs.unsloth.ai/basics/gpt-oss-how-to-run-and-fine-tune#recommended-settings
-      "gpt-oss-20b-mxfp4" = {
-        cmd = <<-EOF
-        /app/llama-server \
-          --port $${PORT} \
-          --model /llama-cpp/models/gpt-oss-20b-mxfp4.gguf \
-          --ctx-size 0 \
-          --ubatch-size 2048 \
-          --batch-size 2048 \
-          --jinja \
-          --temp 1.0 \
-          --top_p 1.0 \
-          --top_k 0
-        EOF
-      }
       "gpt-oss-120b-mxfp4" = {
         cmd = <<-EOF
         /app/llama-server \
@@ -193,7 +181,14 @@ module "mcp-proxy" {
         logEnabled     = true
       }
     },
-    mcpServers = local.mcp_proxies
+    mcpServers = {
+      for type, config in local.mcp_proxies :
+      type => {
+        command = config.command
+        args    = config.args
+        env     = config.env
+      }
+    }
   }
   ingress_hostname   = local.endpoints.mcp_proxy.ingress
   ingress_class_name = local.endpoints.ingress_nginx_internal.name
@@ -211,7 +206,6 @@ module "open-webui" {
   release   = "0.1.0"
   images = {
     open_webui = local.container_images.open_webui
-    playwright = local.container_images.playwright
     litestream = local.container_images.litestream
   }
   ingress_hostname = local.endpoints.open_webui.ingress
@@ -247,8 +241,8 @@ module "open-webui" {
     # https://github.com/varunvasudeva1/llm-server-docs?tab=readme-ov-file#mcp-proxy-server
     # https://github.com/open-webui/docs/issues/609
     # https://github.com/javydekoning/homelab/blob/main/k8s/ai-platform/openwebui/TOOL_SERVER_CONNECTIONS.json
-    TOOL_SERVER_CONNECTIONS = jsonencode(concat([
-      for type, _ in local.mcp_proxies :
+    TOOL_SERVER_CONNECTIONS = jsonencode([
+      for type, config in local.mcp_proxies :
       {
         type      = "mcp"
         url       = "https://${local.endpoints.mcp_proxy.ingress}/${type}/mcp"
@@ -262,12 +256,11 @@ module "open-webui" {
         key       = ""
         info = {
           id          = type
-          name        = type
-          description = ""
+          name        = config.name
+          description = config.description
         }
       }
-      ], [
-    ]))
+    ])
     # OIDC
     ENABLE_SIGNUP                 = false
     ENABLE_LOGIN_FORM             = false
