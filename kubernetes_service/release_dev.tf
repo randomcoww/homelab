@@ -1,32 +1,5 @@
 locals {
   mcp_proxies = {
-    fetch = {
-      command = "uvx"
-      args = [
-        "mcp-server-fetch",
-      ]
-    },
-    time = {
-      command = "uvx"
-      args = [
-        "mcp-server-time",
-        "--local-timezone=${local.timezone}",
-      ]
-    },
-    sequential-thinking = {
-      command = "npx"
-      args = [
-        "-y",
-        "@modelcontextprotocol/server-sequential-thinking",
-      ]
-    },
-    memory = {
-      command = "npx"
-      args = [
-        "-y",
-        "@modelcontextprotocol/server-memory",
-      ]
-    }
     searxng = {
       command = "npx"
       args = [
@@ -238,6 +211,7 @@ module "open-webui" {
   release   = "0.1.0"
   images = {
     open_webui = local.container_images.open_webui
+    playwright = local.container_images.playwright
     litestream = local.container_images.litestream
   }
   ingress_hostname = local.endpoints.open_webui.ingress
@@ -273,7 +247,7 @@ module "open-webui" {
     # https://github.com/varunvasudeva1/llm-server-docs?tab=readme-ov-file#mcp-proxy-server
     # https://github.com/open-webui/docs/issues/609
     # https://github.com/javydekoning/homelab/blob/main/k8s/ai-platform/openwebui/TOOL_SERVER_CONNECTIONS.json
-    TOOL_SERVER_CONNECTIONS = jsonencode([
+    TOOL_SERVER_CONNECTIONS = jsonencode(concat([
       for type, _ in local.mcp_proxies :
       {
         type      = "mcp"
@@ -292,7 +266,8 @@ module "open-webui" {
           description = ""
         }
       }
-    ])
+      ], [
+    ]))
     # OIDC
     ENABLE_SIGNUP                 = false
     ENABLE_LOGIN_FORM             = false
