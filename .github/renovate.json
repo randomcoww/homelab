@@ -32,6 +32,12 @@
   ],
   "packageRules": [
     {
+      "matchPackageNames": [
+        "docker.io/litestream/litestream"
+      ],
+      "enabled": false
+    },
+    {
       "matchUpdateTypes": [
         "major",
         "minor",
