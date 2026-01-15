@@ -206,6 +206,7 @@ module "open-webui" {
   release   = "0.1.0"
   images = {
     open_webui = local.container_images.open_webui
+    playwright = local.container_images.playwright
     litestream = local.container_images.litestream
   }
   ingress_hostname = local.endpoints.open_webui.ingress

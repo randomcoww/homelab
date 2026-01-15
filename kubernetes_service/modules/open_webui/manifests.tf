@@ -1,5 +1,6 @@
 locals {
-  db_file = "/data/db.sqlite3"
+  db_file         = "/data/db.sqlite3"
+  playwright_port = 3000
   extra_configs = merge(var.extra_configs, {
     PORT                       = 8080
     REQUESTS_CA_BUNDLE         = "/etc/ssl/certs/ca-certificates.crt"
@@ -12,6 +13,8 @@ locals {
     S3_BUCKET_NAME             = var.minio_bucket
     S3_ENDPOINT_URL            = var.minio_endpoint
     WEBUI_SECRET_KEY           = random_password.webui-secret-key.result
+    WEB_LOADER_ENGINE          = "safe_web" # leave this default
+    PLAYWRIGHT_WS_URL          = "ws://127.0.0.1:${local.playwright_port}"
   })
 }
 
@@ -124,6 +127,45 @@ module "litestream-overlay" {
         memory = "4Gi"
       }
     }
+    initContainers = [
+      {
+        name          = "${var.name}-playwright"
+        image         = var.images.playwright
+        restartPolicy = "Always" # sidecar mode
+        command = [
+          "sh",
+          "-c",
+          <<-EOF
+          npx -y patchright run-server \
+            --port ${local.playwright_port} \
+            --host 0.0.0.0
+          EOF
+        ]
+        ports = [
+          {
+            containerPort = local.playwright_port
+          },
+        ]
+        readinessProbe = {
+          httpGet = {
+            port = local.playwright_port
+            path = "/status"
+          }
+        }
+        livenessProbe = {
+          httpGet = {
+            port = local.playwright_port
+            path = "/status"
+          }
+        }
+        startupProbe = {
+          httpGet = {
+            port = local.playwright_port
+            path = "/status"
+          }
+        }
+      },
+    ]
     containers = [
       {
         name  = var.name
