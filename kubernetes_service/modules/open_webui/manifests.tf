@@ -206,6 +206,10 @@ module "litestream-overlay" {
             mountPath = local.playwright_server_file
             subPath   = basename(local.playwright_server_file)
           },
+          {
+            name      = "dev-shm"
+            mountPath = "/dev/shm"
+          },
         ]
         readinessProbe = {
           httpGet = {
@@ -314,6 +318,13 @@ module "litestream-overlay" {
         hostPath = {
           path = "/etc/ssl/certs/ca-certificates.crt"
           type = "File"
+        }
+      },
+      {
+        name = "dev-shm"
+        emptyDir = {
+          medium    = "Memory"
+          sizeLimit = "1Gi"
         }
       },
     ]
