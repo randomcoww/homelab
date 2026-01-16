@@ -197,6 +197,23 @@ module "mcp-proxy" {
   })
 }
 
+module "prometheus-mcp" {
+  source    = "./modules/prometheus_mcp"
+  name      = local.endpoints.prometheus_mcp.name
+  namespace = local.endpoints.prometheus_mcp.namespace
+  release   = "0.1.0"
+  replicas  = 2
+  images = {
+    prometheus_mcp = local.container_images.prometheus_mcp
+  }
+  prometheus_url     = "https://${local.endpoints.prometheus.ingress}"
+  ingress_hostname   = local.endpoints.prometheus_mcp.ingress
+  ingress_class_name = local.endpoints.ingress_nginx_internal.name
+  nginx_ingress_annotations = merge(local.nginx_ingress_annotations_common, {
+    "cert-manager.io/cluster-issuer" = local.kubernetes.cert_issuers.ca_internal
+  })
+}
+
 # Open WebUI
 
 module "open-webui" {
@@ -242,7 +259,7 @@ module "open-webui" {
     # https://github.com/varunvasudeva1/llm-server-docs?tab=readme-ov-file#mcp-proxy-server
     # https://github.com/open-webui/docs/issues/609
     # https://github.com/javydekoning/homelab/blob/main/k8s/ai-platform/openwebui/TOOL_SERVER_CONNECTIONS.json
-    TOOL_SERVER_CONNECTIONS = jsonencode([
+    TOOL_SERVER_CONNECTIONS = jsonencode(concat([
       for type, config in local.mcp_proxies :
       {
         type      = "mcp"
@@ -261,7 +278,25 @@ module "open-webui" {
           description = config.description
         }
       }
-    ])
+      ], [
+      {
+        type      = "mcp"
+        url       = "https://${local.endpoints.prometheus_mcp.ingress}/mcp"
+        auth_type = "none"
+        config = {
+          enable = true
+        }
+        spec_type = "url"
+        spec      = ""
+        path      = ""
+        key       = ""
+        info = {
+          id          = "prometheus"
+          name        = "metrics-query"
+          description = "Query service and node metrics and trends"
+        }
+      },
+    ]))
     # OIDC
     ENABLE_SIGNUP                 = false
     ENABLE_LOGIN_FORM             = false
