@@ -141,7 +141,7 @@ locals {
     lldap            = "ghcr.io/lldap/lldap:latest-alpine@sha256:898f91b2042ab23659954588999eb38bb4d556c340318c76012000fa4f4b56ef"
     authelia         = "ghcr.io/authelia/authelia:4.39.15@sha256:d23ee3c721d465b4749cc58541cda4aebe5aa6f19d7b5ce0afebb44ebee69591"
     cloudflared      = "docker.io/cloudflare/cloudflared:2025.11.1@sha256:89ee50efb1e9cb2ae30281a8a404fed95eb8f02f0a972617526f8c5b417acae2"
-    playwright       = "reg.cluster.internal/randomcoww/patchright-server:v1.57.0@sha256:bad7ac298f4b1e269b506b257e29591becd41ca29221d3c1eccd9d02b28e4dab"
+    playwright       = "reg.cluster.internal/randomcoww/patchright-server:v1.57.0@sha256:cf5190020ef47a4a4384b23b638b2afe3c00d70785dbda038b35e2d20b344c68"
   }
 
   host_images = {
