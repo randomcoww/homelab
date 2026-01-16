@@ -303,6 +303,31 @@ resource "helm_release" "prometheus" {
   ]
 }
 
+resource "helm_release" "prometheus-node-exporter" {
+  name             = "${local.endpoints.prometheus.name}-node-exporter"
+  namespace        = local.endpoints.prometheus.namespace
+  create_namespace = true
+  repository       = "https://prometheus-community.github.io/helm-charts"
+  chart            = "prometheus-node-exporter"
+  wait             = false
+  wait_for_jobs    = false
+  version          = "4.51.0"
+  max_history      = 2
+  timeout          = local.kubernetes.helm_release_timeout
+  values = [
+    yamlencode({
+      resources = {
+        requests = {
+          memory = "32Mi"
+        }
+        limits = {
+          memory = "32Mi"
+        }
+      }
+    })
+  ]
+}
+
 # Kured
 
 resource "helm_release" "kured" {
