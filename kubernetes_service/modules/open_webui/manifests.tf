@@ -1,6 +1,7 @@
 locals {
-  db_file         = "/data/db.sqlite3"
-  playwright_port = 3000
+  db_file                = "/data/db.sqlite3"
+  playwright_port        = 3000
+  playwright_server_file = "/app/server.js"
   extra_configs = merge(var.extra_configs, {
     PORT                       = 8080
     REQUESTS_CA_BUNDLE         = "/etc/ssl/certs/ca-certificates.crt"
@@ -45,10 +46,66 @@ module "secret" {
   name    = var.name
   app     = var.name
   release = var.release
-  data = {
+  data = merge({
     for k, v in local.extra_configs :
     tostring(k) => tostring(v)
-  }
+    }, {
+    basename(local.playwright_server_file) = <<-EOF
+    const patchright = require('patchright');
+
+    (async () => {
+      try {
+        const browserServer = await patchright.chromium.launchServer({
+          headless: true,
+          host: "0.0.0.0",
+          port: ${local.playwright_port},
+          executablePath: undefined,
+          wsPath: '/',
+          args: [
+            '--no-sandbox',
+            '--disable-setuid-sandbox',
+            '--disable-dev-shm-usage',
+            '--disable-accelerated-2d-canvas',
+            '--disable-gpu',
+            '--window-size=1920,1080',
+            '--start-maximized',
+            '--disable-infobars',
+            '--disable-breakpad',
+            '--disable-client-side-phishing-detection',
+            '--disable-component-extensions-with-background-pages',
+            '--disable-default-apps',
+            '--disable-extensions',
+            '--disable-features=Translate',
+            '--disable-popup-blocking',
+            '--disable-sync',
+            '--hide-scrollbars',
+            '--mute-audio',
+          ],
+          ignoreDefaultArgs: ['--enable-automation'],
+          viewport: null,
+          bypassCSP: true,
+          logger: {
+            isEnabled: () => false,
+          },
+        });
+
+        console.log('Patchright started');
+        console.log('WS Endpoint:', browserServer.wsEndpoint());
+        const shutdown = async (signal) => {
+          console.log(`Received $${signal}. Closing browser server...`);
+          await browserServer.close();
+          process.exit(0);
+        };
+        process.on('SIGINT', () => shutdown('SIGINT'));
+        process.on('SIGTERM', () => shutdown('SIGTERM'));
+
+      } catch (error) {
+        console.error('Failed to launch Patchright server:', error);
+        process.exit(1);
+      }
+    })();
+    EOF
+  })
 }
 
 module "service" {
@@ -133,17 +190,21 @@ module "litestream-overlay" {
         image         = var.images.playwright
         restartPolicy = "Always" # sidecar mode
         command = [
-          "sh",
-          "-c",
-          <<-EOF
-          npx -y patchright run-server \
-            --port ${local.playwright_port} \
-            --host 0.0.0.0
-          EOF
+          "npx",
+          "-y",
+          "node",
+          local.playwright_server_file,
         ]
         ports = [
           {
             containerPort = local.playwright_port
+          },
+        ]
+        volumeMounts = [
+          {
+            name      = "config"
+            mountPath = local.playwright_server_file
+            subPath   = basename(local.playwright_server_file)
           },
         ]
         readinessProbe = {
