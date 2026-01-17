@@ -356,32 +356,3 @@ module "open-webui" {
   minio_bucket        = "open-webui"
   minio_access_secret = local.minio_users.open_webui.secret
 }
-
-# Internal registry
-
-module "registry" {
-  source    = "./modules/registry"
-  name      = local.endpoints.registry.name
-  namespace = local.endpoints.registry.namespace
-  release   = "0.1.0"
-  replicas  = 2
-  images = {
-    registry = local.container_images.registry
-  }
-  ports = {
-    registry = local.service_ports.registry
-  }
-  ca                      = data.terraform_remote_state.sr.outputs.trust.ca
-  loadbalancer_class_name = "kube-vip.io/kube-vip-class"
-
-  minio_endpoint      = "https://${local.services.cluster_minio.ip}:${local.service_ports.minio}"
-  minio_bucket        = "registry"
-  minio_bucket_prefix = "/"
-  minio_access_secret = local.minio_users.registry.secret
-
-  service_ip       = local.services.registry.ip
-  service_hostname = local.endpoints.registry.service
-  nginx_ingress_annotations = merge(local.nginx_ingress_annotations_common, {
-    "cert-manager.io/cluster-issuer" = local.kubernetes.cert_issuers.acme_prod
-  })
-}
