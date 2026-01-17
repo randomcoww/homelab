@@ -210,14 +210,14 @@ module "authelia-secret" {
       dbs = [
         {
           path                = local.authelia_db_file
-          monitor-interval    = "100ms"
-          checkpoint-interval = "6s"
+          monitor-interval    = "1s"
+          checkpoint-interval = "60s"
           replica = {
             type          = "s3"
             endpoint      = "https://${local.services.cluster_minio.ip}:${local.service_ports.minio}"
             bucket        = "authelia"
             path          = "$POD_NAME/litestream"
-            sync-interval = "100ms"
+            sync-interval = "1s"
           }
         },
       ]
