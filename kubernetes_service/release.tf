@@ -20,6 +20,7 @@ locals {
     module.llama-cpp,
     module.sunshine-desktop,
     module.prometheus-mcp,
+    module.kubernetes-mcp,
   ]
 }
 

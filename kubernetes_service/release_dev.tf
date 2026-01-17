@@ -1,5 +1,6 @@
 locals {
   mcp_proxies = {
+    /*
     searxng = {
       command = "npx"
       args = [
@@ -12,6 +13,7 @@ locals {
       name        = "web-search"
       description = "Search the web with SearXNG"
     }
+    */
   }
 }
 
@@ -214,6 +216,22 @@ module "prometheus-mcp" {
   })
 }
 
+module "kubernetes-mcp" {
+  source    = "./modules/kubernetes_mcp"
+  name      = local.endpoints.kubernetes_mcp.name
+  namespace = local.endpoints.kubernetes_mcp.namespace
+  release   = "0.1.0"
+  replicas  = 2
+  images = {
+    kubernetes_mcp = local.container_images.kubernetes_mcp
+  }
+  ingress_hostname   = local.endpoints.kubernetes_mcp.ingress
+  ingress_class_name = local.endpoints.ingress_nginx_internal.name
+  nginx_ingress_annotations = merge(local.nginx_ingress_annotations_common, {
+    "cert-manager.io/cluster-issuer" = local.kubernetes.cert_issuers.ca_internal
+  })
+}
+
 # Open WebUI
 
 module "open-webui" {
@@ -294,6 +312,23 @@ module "open-webui" {
           id          = "prometheus"
           name        = "metrics-query"
           description = "Query service and node metrics and trends"
+        }
+      },
+      {
+        type      = "mcp"
+        url       = "https://${local.endpoints.kubernetes_mcp.ingress}/mcp"
+        auth_type = "none"
+        config = {
+          enable = true
+        }
+        spec_type = "url"
+        spec      = ""
+        path      = ""
+        key       = ""
+        info = {
+          id          = "kubernetes"
+          name        = "kubernetes-query"
+          description = "Query Kubernetes resources and logs"
         }
       },
     ]))
