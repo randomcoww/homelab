@@ -143,7 +143,7 @@ locals {
     cloudflared      = "docker.io/cloudflare/cloudflared:2025.11.1@sha256:89ee50efb1e9cb2ae30281a8a404fed95eb8f02f0a972617526f8c5b417acae2"
     playwright       = "reg.cluster.internal/randomcoww/patchright-server:v1.57.0@sha256:cf5190020ef47a4a4384b23b638b2afe3c00d70785dbda038b35e2d20b344c68"
     prometheus_mcp   = "ghcr.io/pab1it0/prometheus-mcp-server:1.5.2@sha256:4cad9af3814dba1d128b126f7393b98c4f98a183c12352fc6d6210da3410a96e"
-    kubernetes_mcp   = "reg.cluster.internal/randomcoww/kubernetes-mcp-server:main"
+    kubernetes_mcp   = "reg.cluster.internal/randomcoww/kubernetes-mcp-server:main@sha256:ec037fdc591af2e2f8d7655a8d05237da07100201b944ea54458bdb53f3489b4"
   }
 
   host_images = {
