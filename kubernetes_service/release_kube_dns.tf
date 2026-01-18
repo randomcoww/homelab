@@ -1,11 +1,12 @@
 resource "helm_release" "kube-dns-rbac" {
-  name          = "${local.endpoints.kube_dns.name}-rbac"
-  namespace     = local.endpoints.kube_dns.namespace
-  chart         = "../helm-wrapper"
-  wait          = false
-  wait_for_jobs = false
-  max_history   = 2
-  timeout       = local.kubernetes.helm_release_timeout
+  name             = "${local.endpoints.kube_dns.name}-rbac"
+  namespace        = local.endpoints.kube_dns.namespace
+  chart            = "../helm-wrapper"
+  create_namespace = true
+  wait             = false
+  wait_for_jobs    = false
+  max_history      = 2
+  timeout          = local.kubernetes.helm_release_timeout
   values = [
     yamlencode({
       manifests = [
@@ -63,15 +64,16 @@ resource "helm_release" "kube-dns-rbac" {
 }
 
 resource "helm_release" "kube-dns" {
-  name          = local.endpoints.kube_dns.name
-  namespace     = local.endpoints.kube_dns.namespace
-  repository    = "https://coredns.github.io/helm"
-  chart         = "coredns"
-  wait          = false
-  wait_for_jobs = false
-  version       = "1.45.0"
-  max_history   = 2
-  timeout       = local.kubernetes.helm_release_timeout
+  name             = local.endpoints.kube_dns.name
+  namespace        = local.endpoints.kube_dns.namespace
+  repository       = "https://coredns.github.io/helm"
+  chart            = "coredns"
+  create_namespace = true
+  wait             = false
+  wait_for_jobs    = false
+  version          = "1.45.0"
+  max_history      = 2
+  timeout          = local.kubernetes.helm_release_timeout
   values = [
     yamlencode({
       replicaCount = 3

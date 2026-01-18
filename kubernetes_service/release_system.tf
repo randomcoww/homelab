@@ -13,9 +13,9 @@ module "bootstrap" {
 resource "helm_release" "kubelet-csr-approver" {
   name             = "kubelet-csr-approver"
   namespace        = "kube-system"
-  create_namespace = true
   repository       = "https://postfinance.github.io/kubelet-csr-approver"
   chart            = "kubelet-csr-approver"
+  create_namespace = true
   wait             = false
   wait_for_jobs    = false
   version          = "1.2.12"
@@ -253,15 +253,16 @@ resource "helm_release" "ingress-nginx-internal" {
 # Basic storage class
 
 resource "helm_release" "local-path-provisioner" {
-  name          = "local-path-provisioner"
-  namespace     = "kube-system"
-  repository    = "https://charts.containeroo.ch"
-  chart         = "local-path-provisioner"
-  wait          = false
-  wait_for_jobs = false
-  version       = "0.0.35"
-  max_history   = 2
-  timeout       = local.kubernetes.helm_release_timeout
+  name             = "local-path-provisioner"
+  namespace        = "kube-system"
+  repository       = "https://charts.containeroo.ch"
+  chart            = "local-path-provisioner"
+  create_namespace = true
+  wait             = false
+  wait_for_jobs    = false
+  version          = "0.0.35"
+  max_history      = 2
+  timeout          = local.kubernetes.helm_release_timeout
   values = [
     yamlencode({
       replicaCount = 2

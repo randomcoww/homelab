@@ -100,13 +100,14 @@ resource "helm_release" "cert-manager" {
 }
 
 resource "helm_release" "cert-issuer" {
-  name          = "cert-issuer"
-  chart         = "../helm-wrapper"
-  namespace     = "cert-manager"
-  wait          = false
-  wait_for_jobs = false
-  max_history   = 2
-  timeout       = local.kubernetes.helm_release_timeout
+  name             = "cert-issuer"
+  chart            = "../helm-wrapper"
+  namespace        = "cert-manager"
+  create_namespace = true
+  wait             = false
+  wait_for_jobs    = false
+  max_history      = 2
+  timeout          = local.kubernetes.helm_release_timeout
   values = [
     yamlencode({
       manifests = [

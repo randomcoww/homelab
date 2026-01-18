@@ -179,13 +179,14 @@ module "arc-workflow-secret" {
 }
 
 resource "helm_release" "arc-runner-hook-template" {
-  name          = "arc-runner-hook-template"
-  chart         = "../helm-wrapper"
-  namespace     = "arc-runners"
-  wait          = false
-  wait_for_jobs = false
-  max_history   = 2
-  timeout       = local.kubernetes.helm_release_timeout
+  name             = "arc-runner-hook-template"
+  chart            = "../helm-wrapper"
+  namespace        = "arc-runners"
+  create_namespace = true
+  wait             = false
+  wait_for_jobs    = false
+  max_history      = 2
+  timeout          = local.kubernetes.helm_release_timeout
   values = [
     yamlencode({
       manifests = [

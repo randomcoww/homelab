@@ -77,9 +77,9 @@ module "device-plugin" {
 resource "helm_release" "node-feature-discovery" {
   name             = "node-feature-discovery"
   namespace        = "kube-system"
-  create_namespace = true
   repository       = "oci://gcr.io/k8s-staging-nfd/charts"
   chart            = "node-feature-discovery"
+  create_namespace = true
   wait             = false
   wait_for_jobs    = false
   version          = "0.18.3"
