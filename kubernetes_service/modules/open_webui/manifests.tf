@@ -3,23 +3,35 @@ locals {
   playwright_port        = 3000
   playwright_server_file = "/app/server.js"
   extra_configs = merge(var.extra_configs, {
-    PORT                       = 8080
-    REQUESTS_CA_BUNDLE         = "/etc/ssl/certs/ca-certificates.crt"
-    SSL_CERT_FILE              = "/etc/ssl/certs/ca-certificates.crt" # needed for tools server TLS
-    DATABASE_URL               = "sqlite:///${local.db_file}"
-    DATABASE_ENABLE_SQLITE_WAL = true
-    STORAGE_PROVIDER           = "s3"
-    S3_ADDRESSING_STYLE        = "path"
-    S3_KEY_PREFIX              = "data"
-    S3_BUCKET_NAME             = var.minio_bucket
-    S3_ENDPOINT_URL            = var.minio_endpoint
-    WEBUI_SECRET_KEY           = random_password.webui-secret-key.result
-    WEB_LOADER_ENGINE          = "safe_web" # leave this default
-    PLAYWRIGHT_WS_URL          = "ws://127.0.0.1:${local.playwright_port}"
+    PORT                               = 8080
+    REQUESTS_CA_BUNDLE                 = "/etc/ssl/certs/ca-certificates.crt"
+    SSL_CERT_FILE                      = "/etc/ssl/certs/ca-certificates.crt" # needed for tools server TLS
+    DATABASE_URL                       = "sqlite:///${local.db_file}"
+    DATABASE_ENABLE_SQLITE_WAL         = true
+    STORAGE_PROVIDER                   = "s3"
+    S3_ADDRESSING_STYLE                = "path"
+    S3_KEY_PREFIX                      = "data"
+    S3_BUCKET_NAME                     = var.minio_bucket
+    S3_ENDPOINT_URL                    = var.minio_endpoint
+    WEBUI_SECRET_KEY                   = random_password.webui-secret-key.result
+    OAUTH_CLIENT_INFO_ENCRYPTION_KEY   = random_password.client-info-encryption-key.result
+    OAUTH_SESSION_TOKEN_ENCRYPTION_KEY = random_password.session-token-encryption-key.result
+    WEB_LOADER_ENGINE                  = "safe_web" # leave this default
+    PLAYWRIGHT_WS_URL                  = "ws://127.0.0.1:${local.playwright_port}"
   })
 }
 
 resource "random_password" "webui-secret-key" {
+  length  = 64
+  special = false
+}
+
+resource "random_password" "client-info-encryption-key" {
+  length  = 64
+  special = false
+}
+
+resource "random_password" "session-token-encryption-key" {
   length  = 64
   special = false
 }
