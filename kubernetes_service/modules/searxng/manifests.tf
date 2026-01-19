@@ -120,6 +120,36 @@ module "deployment" {
             mountPath = dirname(local.valkey_socket_file)
           },
         ]
+        livenessProbe = {
+          exec = {
+            command = [
+              "redis-cli",
+              "-s",
+              local.valkey_socket_file,
+              "ping",
+            ]
+          }
+        }
+        livenessProbe = {
+          exec = {
+            command = [
+              "redis-cli",
+              "-s",
+              local.valkey_socket_file,
+              "ping",
+            ]
+          }
+        }
+        startupProbe = {
+          exec = {
+            command = [
+              "redis-cli",
+              "-s",
+              local.valkey_socket_file,
+              "ping",
+            ]
+          }
+        }
       },
     ]
     containers = [
