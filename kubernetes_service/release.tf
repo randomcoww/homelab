@@ -15,7 +15,6 @@ locals {
     module.kavita,
     module.registry,
     module.searxng,
-    module.mcp-proxy,
     module.open-webui,
     module.llama-cpp,
     module.sunshine-desktop,

@@ -134,7 +134,6 @@ locals {
     sunshine_desktop = "reg.cluster.internal/randomcoww/sunshine-desktop:v2026.105.231052@sha256:f9b877e777a9941c6802ea89b49d793c1a42a21477b5868a8208b314be027c99"
     litestream       = "docker.io/litestream/litestream:0.5.2@sha256:e4fd484cb1cd9d6fa58fff7127d551118e150ab75b389cf868a053152ba6c9c0"
     valkey           = "ghcr.io/valkey-io/valkey:9.0.1-alpine@sha256:c106a0c03bcb23cbdf9febe693114cb7800646b11ca8b303aee7409de005faa8"
-    mcp_proxy        = "ghcr.io/tbxark/mcp-proxy:v0.43.2@sha256:70c0e02d39c4c0898e610b3a30954f7930628fa6f4fb447bad14c32382a25879"
     searxng          = "ghcr.io/searxng/searxng:latest@sha256:445319b907a0e01d0ff5bf8192be396b1c439a47e12675d626ce29af1b439d93"
     open_webui       = "ghcr.io/open-webui/open-webui:0.7.2@sha256:16d9a3615b45f14a0c89f7ad7a3bf151f923ed32c2e68f9204eb17d1ce40774b"
     kavita           = "ghcr.io/kareadita/kavita:0.8.9@sha256:69e9117b9b681849a6f6d5dc8411bfa6a326ed77f78cc49d9cbce49584ff6c0d"
@@ -254,11 +253,7 @@ locals {
         name      = "kube-dns"
         namespace = "kube-system"
       }
-      kubernetes_mcp = {
-        name      = "kubernetes-mcp"
-        namespace = "kube-system"
-        ingress   = "kubernetes-mcp.${local.domains.kubernetes}"
-      }
+
       kea = {
         name      = "kea"
         namespace = "netboot"
@@ -271,11 +266,6 @@ locals {
         name      = "prometheus"
         namespace = "monitoring"
         ingress   = "prometheus.${local.domains.kubernetes}"
-      }
-      prometheus_mcp = {
-        name      = "prometheus-mcp"
-        namespace = "monitoring"
-        ingress   = "prometheus-mcp.${local.domains.kubernetes}"
       }
       searxng = {
         name    = "searxng"
@@ -302,10 +292,6 @@ locals {
         service = "sunshine.${local.domains.public}"
         ingress = "sunadmin.${local.domains.public}"
       }
-      mcp_proxy = {
-        name    = "mcp-proxy"
-        ingress = "mcp-proxy.${local.domains.kubernetes}"
-      }
       open_webui = {
         name    = "open-webui"
         ingress = "owui.${local.domains.public}"
@@ -319,6 +305,16 @@ locals {
         name      = "authelia"
         namespace = "auth"
         ingress   = "auth.${local.domains.public}"
+      }
+      kubernetes_mcp = {
+        name      = "kubernetes-mcp"
+        namespace = "kube-system"
+        ingress   = "kubernetes-mcp.${local.domains.kubernetes}"
+      }
+      prometheus_mcp = {
+        name      = "prometheus-mcp"
+        namespace = "monitoring"
+        ingress   = "prometheus-mcp.${local.domains.kubernetes}"
       }
     } :
     name => merge(e, {

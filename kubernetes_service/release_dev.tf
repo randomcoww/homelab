@@ -1,22 +1,3 @@
-locals {
-  mcp_proxies = {
-    /*
-    searxng = {
-      command = "npx"
-      args = [
-        "-y",
-        "mcp-searxng",
-      ]
-      env = {
-        SEARXNG_URL = "https://${local.endpoints.searxng.ingress}"
-      }
-      name        = "web-search"
-      description = "Search the web with SearXNG"
-    }
-    */
-  }
-}
-
 # llama-cpp
 
 module "llama-cpp" {
@@ -163,42 +144,6 @@ module "searxng" {
   })
 }
 
-# MCP
-
-module "mcp-proxy" {
-  source    = "./modules/mcp_proxy"
-  name      = local.endpoints.mcp_proxy.name
-  namespace = local.endpoints.mcp_proxy.namespace
-  release   = "0.1.0"
-  replicas  = 2
-  images = {
-    mcp_proxy = local.container_images.mcp_proxy
-  }
-  config = {
-    mcpProxy = {
-      version = "1.0.0"
-      type    = "streamable-http"
-      options = {
-        panicIfInvalid = true
-        logEnabled     = true
-      }
-    },
-    mcpServers = {
-      for type, config in local.mcp_proxies :
-      type => {
-        command = config.command
-        args    = config.args
-        env     = config.env
-      }
-    }
-  }
-  ingress_hostname   = local.endpoints.mcp_proxy.ingress
-  ingress_class_name = local.endpoints.ingress_nginx_internal.name
-  nginx_ingress_annotations = merge(local.nginx_ingress_annotations_common, {
-    "cert-manager.io/cluster-issuer" = local.kubernetes.cert_issuers.ca_internal
-  })
-}
-
 module "prometheus-mcp" {
   source    = "./modules/prometheus_mcp"
   name      = local.endpoints.prometheus_mcp.name
@@ -277,26 +222,7 @@ module "open-webui" {
     # https://github.com/varunvasudeva1/llm-server-docs?tab=readme-ov-file#mcp-proxy-server
     # https://github.com/open-webui/docs/issues/609
     # https://github.com/javydekoning/homelab/blob/main/k8s/ai-platform/openwebui/TOOL_SERVER_CONNECTIONS.json
-    TOOL_SERVER_CONNECTIONS = jsonencode(concat([
-      for type, config in local.mcp_proxies :
-      {
-        type      = "mcp"
-        url       = "https://${local.endpoints.mcp_proxy.ingress}/${type}/mcp"
-        auth_type = "none"
-        config = {
-          enable = true
-        }
-        spec_type = "url"
-        spec      = ""
-        path      = ""
-        key       = ""
-        info = {
-          id          = type
-          name        = config.name
-          description = config.description
-        }
-      }
-      ], [
+    TOOL_SERVER_CONNECTIONS = jsonencode([
       {
         type      = "mcp"
         url       = "https://${local.endpoints.prometheus_mcp.ingress}/mcp"
@@ -309,8 +235,8 @@ module "open-webui" {
         path      = ""
         key       = ""
         info = {
-          id          = "prometheus"
-          name        = "metrics-query"
+          id          = "prometheus-metrics"
+          name        = "prometheus-metrics"
           description = "Query service and node metrics and trends"
         }
       },
@@ -327,25 +253,27 @@ module "open-webui" {
         key       = ""
         info = {
           id          = "kubernetes"
-          name        = "kubernetes-query"
+          name        = "kubernetes"
           description = "Query Kubernetes resources and logs"
         }
       },
-    ]))
+    ])
     # OIDC
-    ENABLE_SIGNUP                 = false
-    ENABLE_LOGIN_FORM             = false
-    ENABLE_OAUTH_SIGNUP           = true
-    OAUTH_MERGE_ACCOUNTS_BY_EMAIL = true
-    OAUTH_CLIENT_ID               = random_string.authelia-oidc-client-id["open-webui"].result
-    OAUTH_CLIENT_SECRET           = random_password.authelia-oidc-client-secret["open-webui"].result
-    OPENID_PROVIDER_URL           = "https://${local.endpoints.authelia.ingress}/.well-known/openid-configuration"
-    OAUTH_PROVIDER_NAME           = "Authelia"
-    OAUTH_SCOPES                  = "openid email profile groups"
-    ENABLE_OAUTH_ROLE_MANAGEMENT  = true
-    OAUTH_ALLOWED_ROLES           = "openwebui,openwebui-admin"
-    OAUTH_ADMIN_ROLES             = "openwebui-admin"
-    OAUTH_ROLES_CLAIM             = "groups"
+    ENABLE_SIGNUP                  = false
+    ENABLE_LOGIN_FORM              = false
+    ENABLE_OAUTH_SIGNUP            = true
+    ENABLE_OAUTH_PERSISTENT_CONFIG = false
+    ENABLE_OAUTH_ID_TOKEN_COOKIE   = false
+    OAUTH_MERGE_ACCOUNTS_BY_EMAIL  = true
+    OAUTH_CLIENT_ID                = random_string.authelia-oidc-client-id["open-webui"].result
+    OAUTH_CLIENT_SECRET            = random_password.authelia-oidc-client-secret["open-webui"].result
+    OPENID_PROVIDER_URL            = "https://${local.endpoints.authelia.ingress}/.well-known/openid-configuration"
+    OAUTH_PROVIDER_NAME            = "Authelia"
+    OAUTH_SCOPES                   = "openid email profile groups"
+    ENABLE_OAUTH_ROLE_MANAGEMENT   = true
+    OAUTH_ALLOWED_ROLES            = "openwebui,openwebui-admin"
+    OAUTH_ADMIN_ROLES              = "openwebui-admin"
+    OAUTH_ROLES_CLAIM              = "groups"
   }
   ingress_class_name = local.endpoints.ingress_nginx.name
   nginx_ingress_annotations = merge(local.nginx_ingress_annotations_common, {

@@ -140,6 +140,7 @@ locals {
       client_name           = "Open WebUI"
       require_pkce          = false
       pkce_challenge_method = ""
+      consent_mode          = "implicit"
       redirect_uris = [
         "https://${local.endpoints.open_webui.ingress}/oauth/oidc/callback",
       ]
@@ -153,6 +154,7 @@ locals {
         "groups",
         "offline_access",
       ]
+      consent_mode = "implicit"
       redirect_uris = [
         "https://${local.endpoints.kavita.ingress}/signin-oidc",
       ]
@@ -254,11 +256,14 @@ resource "helm_release" "authelia-resources" {
 }
 
 resource "helm_release" "authelia" {
-  name       = local.endpoints.authelia.name
-  namespace  = local.endpoints.authelia.namespace
-  repository = "https://charts.authelia.com"
-  chart      = "authelia"
-  version    = "0.10.49"
+  name             = local.endpoints.authelia.name
+  namespace        = local.endpoints.authelia.namespace
+  create_namespace = true
+  wait             = false
+  wait_for_jobs    = false
+  repository       = "https://charts.authelia.com"
+  chart            = "authelia"
+  version          = "0.10.49"
   values = [
     yamlencode({
       image = {
