@@ -307,11 +307,6 @@ locals {
         namespace = "auth"
         ingress   = "auth.${local.domains.public}"
       }
-      oauth2_proxy = {
-        name      = "oauth2-proxy"
-        namespace = "auth"
-        ingress   = "oauth.${local.domains.public}"
-      }
       kubernetes_mcp = {
         name      = "kubernetes-mcp"
         namespace = "kube-system"
