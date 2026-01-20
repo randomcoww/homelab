@@ -166,8 +166,8 @@ locals {
       ]
       token_endpoint_auth_method = "client_secret_post"
     }
-    oauth2-proxy = {
-      client_name           = "Oauth2 Proxy"
+    prometheus-mcp = {
+      client_name           = "Prometheus MCP"
       require_pkce          = false
       pkce_challenge_method = ""
       scopes = [
@@ -177,7 +177,7 @@ locals {
       ]
       consent_mode = "implicit"
       redirect_uris = [
-        "https://${local.endpoints.oauth2_proxy.ingress}/oauth2/callback",
+        "https://${local.endpoints.prometheus_mcp.ingress}/.auth/oidc/callback",
       ]
     }
   }
@@ -327,6 +327,9 @@ resource "helm_release" "authelia" {
                     ]
                   }
                   topologyKey = "kubernetes.io/hostname"
+                  namespaces = [
+                    local.endpoints.lldap.namespace,
+                  ]
                 },
               ]
             }
@@ -719,7 +722,7 @@ resource "helm_release" "authelia" {
 }
 
 # Oauth2 proxy
-
+/*
 module "oauth2-proxy" {
   source    = "./modules/oauth2_proxy"
   name      = local.endpoints.oauth2_proxy.name
@@ -771,3 +774,4 @@ module "oauth2-proxy" {
   client_id     = random_string.authelia-oidc-client-id["oauth2-proxy"].result
   client_secret = random_password.authelia-oidc-client-secret["oauth2-proxy"].result
 }
+*/

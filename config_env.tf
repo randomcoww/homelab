@@ -141,9 +141,9 @@ locals {
     authelia         = "ghcr.io/authelia/authelia:4.39.15@sha256:d23ee3c721d465b4749cc58541cda4aebe5aa6f19d7b5ce0afebb44ebee69591"
     cloudflared      = "docker.io/cloudflare/cloudflared:2025.11.1@sha256:89ee50efb1e9cb2ae30281a8a404fed95eb8f02f0a972617526f8c5b417acae2"
     playwright       = "reg.cluster.internal/randomcoww/patchright-server:v1.57.0@sha256:6fca26aa3e7b0bff0be945c11d8111b80fe02e9b639e49f610774e4907f76006"
+    mcp_oauth_proxy  = "reg.cluster.internal/randomcoww/mcp-auth-proxy:v2.5.3@sha256:40c8f6413b7adfc2e0dff85700fc5d6de041d5e6256e66129101462e4a5c58dd"
     prometheus_mcp   = "ghcr.io/pab1it0/prometheus-mcp-server:1.5.2@sha256:4cad9af3814dba1d128b126f7393b98c4f98a183c12352fc6d6210da3410a96e"
     kubernetes_mcp   = "reg.cluster.internal/randomcoww/kubernetes-mcp-server:main@sha256:440a0ede9dcb0a1ebe90aab4f73e8bad037a44a94c42a4d97c616b6b15ce5436"
-    oauth2_proxy     = "quay.io/oauth2-proxy/oauth2-proxy:v7.14.2-alpine"
   }
 
   host_images = {
@@ -320,7 +320,7 @@ locals {
       prometheus_mcp = {
         name      = "prometheus-mcp"
         namespace = "monitoring"
-        ingress   = "prometheus-mcp.${local.domains.kubernetes}"
+        ingress   = "prometheus-mcp.${local.domains.public}"
       }
     } :
     name => merge(e, {
