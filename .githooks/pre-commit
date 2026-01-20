@@ -2,5 +2,5 @@ podman run -it --rm \
   -v $(pwd):$(pwd) \
   -w $(pwd) \
   --entrypoint='' \
-  docker.io/hashicorp/terraform:latest \
-  terraform fmt $(git diff --staged --name-only --diff-filter=AMR | grep -e ".tf$" -e ".tfvars$" -e ".tftest.hcl$")
+  ghcr.io/opentofu/opentofu:latest \
+  tofu fmt $(git diff --staged --name-only --diff-filter=AMR | grep -e ".tf$" -e ".tfvars$" -e ".tftest.hcl$")

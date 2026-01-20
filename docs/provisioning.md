@@ -84,8 +84,8 @@ EOF
 Generate external and other cluster wide resources like CAs.
 
 ```bash
-terraform -chdir=cluster_resources init -upgrade && \
-terraform -chdir=cluster_resources apply -var-file=../secrets.tfvars
+tofu -chdir=cluster_resources init -upgrade && \
+tofu -chdir=cluster_resources apply -var-file=../secrets.tfvars
 ```
 
 ---

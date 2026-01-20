@@ -15,5 +15,21 @@ terraform {
       source  = "aminueza/minio"
       version = "3.13.0"
     }
+    tls = {
+      source  = "opentofu/tls"
+      version = "4.1.0"
+    }
+    random = {
+      source  = "opentofu/random"
+      version = "3.8.0"
+    }
+    kubernetes = {
+      source  = "opentofu/kubernetes"
+      version = "3.0.1"
+    }
+    helm = {
+      source  = "opentofu/helm"
+      version = "3.1.1"
+    }
   }
 }

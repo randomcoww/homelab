@@ -52,6 +52,15 @@
     {
       "matchDepTypes": ["helm_release"],
       "pinDigests": false
+    },
+    {
+      "matchDatasources": [
+        "terraform-provider",
+        "terraform-module"
+      ],
+      "registryUrls": [
+        "https://registry.opentofu.org"
+      ]
     }
   ]
 }

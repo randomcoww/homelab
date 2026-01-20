@@ -3,14 +3,14 @@
 Run Terraform in container (optional).
 
 ```bash
-terraform() {
+tofu() {
   set -x
   podman run -it --rm --security-opt label=disable \
     -v $(pwd):$(pwd) \
     -w $(pwd) \
     --env-file=credentials.env \
     --net=host \
-    docker.io/hashicorp/terraform:latest "$@"
+    ghcr.io/opentofu/opentofu:latest "$@"
   rc=$?; set +x; return $rc
 }
 ```
