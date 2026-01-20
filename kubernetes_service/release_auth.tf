@@ -137,7 +137,13 @@ locals {
 
   authelia_oidc_clients = {
     open-webui = {
-      client_name           = "Open WebUI"
+      client_name = "Open WebUI"
+      scopes = [
+        "openid",
+        "email",
+        "profile",
+        "groups",
+      ]
       require_pkce          = false
       pkce_challenge_method = ""
       consent_mode          = "implicit"
@@ -159,6 +165,20 @@ locals {
         "https://${local.endpoints.kavita.ingress}/signin-oidc",
       ]
       token_endpoint_auth_method = "client_secret_post"
+    }
+    oauth2-proxy = {
+      client_name           = "Oauth2 Proxy"
+      require_pkce          = false
+      pkce_challenge_method = ""
+      scopes = [
+        "openid",
+        "email",
+        "profile",
+      ]
+      consent_mode = "implicit"
+      redirect_uris = [
+        "https://${local.endpoints.oauth2_proxy.ingress}/oauth2/callback",
+      ]
     }
   }
 }
@@ -261,6 +281,7 @@ resource "helm_release" "authelia" {
   create_namespace = true
   wait             = false
   wait_for_jobs    = false
+  max_history      = 2
   repository       = "https://charts.authelia.com"
   chart            = "authelia"
   version          = "0.10.49"
@@ -695,4 +716,58 @@ resource "helm_release" "authelia" {
       }
     }),
   ]
+}
+
+# Oauth2 proxy
+
+module "oauth2-proxy" {
+  source    = "./modules/oauth2_proxy"
+  name      = local.endpoints.oauth2_proxy.name
+  namespace = local.endpoints.oauth2_proxy.namespace
+  release   = "0.1.0"
+  images = {
+    oauth2_proxy = local.container_images.oauth2_proxy
+  }
+  affinity = {
+    podAffinity = {
+      requiredDuringSchedulingIgnoredDuringExecution = [
+        {
+          labelSelector = {
+            matchExpressions = [
+              {
+                key      = "app"
+                operator = "In"
+                values = [
+                  local.endpoints.lldap.name,
+                ]
+              },
+            ]
+          }
+          topologyKey = "kubernetes.io/hostname"
+        },
+      ]
+    }
+  }
+  extra_args = [
+    "--show-debug-on-error",
+    "--provider",
+    "oidc",
+    "--scope",
+    join(" ", local.authelia_oidc_clients.oauth2-proxy.scopes),
+    "--upstream",
+    "https://${local.endpoints.oauth2_proxy.ingress}/",
+    "--email-domain",
+    "*",
+    "--insecure-oidc-allow-unverified-email",
+    "true",
+    "--oidc-issuer-url",
+    "https://${local.endpoints.authelia.ingress}",
+  ]
+  ingress_hostname   = local.endpoints.oauth2_proxy.ingress
+  ingress_class_name = local.endpoints.ingress_nginx.name
+  nginx_ingress_annotations = merge(local.nginx_ingress_annotations_common, {
+    "cert-manager.io/cluster-issuer" = local.kubernetes.cert_issuers.acme_prod
+  })
+  client_id     = random_string.authelia-oidc-client-id["oauth2-proxy"].result
+  client_secret = random_password.authelia-oidc-client-secret["oauth2-proxy"].result
 }

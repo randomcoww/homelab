@@ -143,6 +143,7 @@ locals {
     playwright       = "reg.cluster.internal/randomcoww/patchright-server:v1.57.0@sha256:6fca26aa3e7b0bff0be945c11d8111b80fe02e9b639e49f610774e4907f76006"
     prometheus_mcp   = "ghcr.io/pab1it0/prometheus-mcp-server:1.5.2@sha256:4cad9af3814dba1d128b126f7393b98c4f98a183c12352fc6d6210da3410a96e"
     kubernetes_mcp   = "reg.cluster.internal/randomcoww/kubernetes-mcp-server:main@sha256:440a0ede9dcb0a1ebe90aab4f73e8bad037a44a94c42a4d97c616b6b15ce5436"
+    oauth2_proxy     = "quay.io/oauth2-proxy/oauth2-proxy:v7.14.2-alpine"
   }
 
   host_images = {
@@ -305,6 +306,11 @@ locals {
         name      = "authelia"
         namespace = "auth"
         ingress   = "auth.${local.domains.public}"
+      }
+      oauth2_proxy = {
+        name      = "oauth2-proxy"
+        namespace = "auth"
+        ingress   = "oauth.${local.domains.public}"
       }
       kubernetes_mcp = {
         name      = "kubernetes-mcp"

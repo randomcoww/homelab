@@ -269,7 +269,7 @@ module "open-webui" {
     OAUTH_CLIENT_SECRET            = random_password.authelia-oidc-client-secret["open-webui"].result
     OPENID_PROVIDER_URL            = "https://${local.endpoints.authelia.ingress}/.well-known/openid-configuration"
     OAUTH_PROVIDER_NAME            = "Authelia"
-    OAUTH_SCOPES                   = "openid email profile groups"
+    OAUTH_SCOPES                   = join(" ", local.authelia_oidc_clients.open-webui.scopes)
     ENABLE_OAUTH_ROLE_MANAGEMENT   = true
     OAUTH_ALLOWED_ROLES            = "openwebui,openwebui-admin"
     OAUTH_ADMIN_ROLES              = "openwebui-admin"

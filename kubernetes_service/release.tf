@@ -18,6 +18,7 @@ locals {
     module.open-webui,
     module.llama-cpp,
     module.sunshine-desktop,
+    module.oauth2-proxy,
     module.prometheus-mcp,
     module.kubernetes-mcp,
   ]
