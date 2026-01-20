@@ -180,6 +180,20 @@ locals {
         "https://${local.endpoints.prometheus_mcp.ingress}/.auth/oidc/callback",
       ]
     }
+    kubernetes-mcp = {
+      client_name           = "Kubernetes MCP"
+      require_pkce          = false
+      pkce_challenge_method = ""
+      scopes = [
+        "openid",
+        "email",
+        "profile",
+      ]
+      consent_mode = "implicit"
+      redirect_uris = [
+        "https://${local.endpoints.kubernetes_mcp.ingress}/.auth/oidc/callback",
+      ]
+    }
   }
 }
 

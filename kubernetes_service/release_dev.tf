@@ -151,8 +151,8 @@ module "prometheus-mcp" {
   release   = "0.1.0"
   images = {
     prometheus_mcp  = local.container_images.prometheus_mcp
-    litestream      = local.container_images.litestream
     mcp_oauth_proxy = local.container_images.mcp_oauth_proxy
+    litestream      = local.container_images.litestream
   }
   affinity = {
     podAffinity = {
@@ -182,7 +182,7 @@ module "prometheus-mcp" {
     OIDC_CONFIGURATION_URL = "https://${local.endpoints.authelia.ingress}/.well-known/openid-configuration"
     OIDC_CLIENT_ID         = random_string.authelia-oidc-client-id["prometheus-mcp"].result
     OIDC_CLIENT_SECRET     = random_password.authelia-oidc-client-secret["prometheus-mcp"].result
-    OIDC_PROVIDER_NAME     = "Prometheus MCP"
+    OIDC_PROVIDER_NAME     = "Authelia"
     OIDC_SCOPES            = join(",", local.authelia_oidc_clients.prometheus-mcp.scopes)
   }
 
@@ -202,15 +202,51 @@ module "kubernetes-mcp" {
   name      = local.endpoints.kubernetes_mcp.name
   namespace = local.endpoints.kubernetes_mcp.namespace
   release   = "0.1.0"
-  replicas  = 2
   images = {
-    kubernetes_mcp = local.container_images.kubernetes_mcp
+    kubernetes_mcp  = local.container_images.kubernetes_mcp
+    mcp_oauth_proxy = local.container_images.mcp_oauth_proxy
+    litestream      = local.container_images.litestream
   }
+  affinity = {
+    podAffinity = {
+      requiredDuringSchedulingIgnoredDuringExecution = [
+        {
+          labelSelector = {
+            matchExpressions = [
+              {
+                key      = "app"
+                operator = "In"
+                values = [
+                  local.endpoints.open_webui.name,
+                ]
+              },
+            ]
+          }
+          topologyKey = "kubernetes.io/hostname"
+          namespaces = [
+            local.endpoints.open_webui.namespace,
+          ]
+        },
+      ]
+    }
+  }
+  extra_oauth_configs = {
+    OIDC_CONFIGURATION_URL = "https://${local.endpoints.authelia.ingress}/.well-known/openid-configuration"
+    OIDC_CLIENT_ID         = random_string.authelia-oidc-client-id["kubernetes-mcp"].result
+    OIDC_CLIENT_SECRET     = random_password.authelia-oidc-client-secret["kubernetes-mcp"].result
+    OIDC_PROVIDER_NAME     = "Authelia"
+    OIDC_SCOPES            = join(",", local.authelia_oidc_clients.kubernetes-mcp.scopes)
+  }
+
   ingress_hostname   = local.endpoints.kubernetes_mcp.ingress
-  ingress_class_name = local.endpoints.ingress_nginx_internal.name
+  ingress_class_name = local.endpoints.ingress_nginx.name
   nginx_ingress_annotations = merge(local.nginx_ingress_annotations_common, {
-    "cert-manager.io/cluster-issuer" = local.kubernetes.cert_issuers.ca_internal
+    "cert-manager.io/cluster-issuer" = local.kubernetes.cert_issuers.acme_prod
   })
+
+  minio_endpoint      = "https://${local.services.cluster_minio.ip}:${local.service_ports.minio}"
+  minio_bucket        = "kubernetes-mcp"
+  minio_access_secret = local.minio_users.kubernetes_mcp.secret
 }
 
 # Open WebUI
@@ -279,7 +315,7 @@ module "open-webui" {
       {
         type      = "mcp"
         url       = "https://${local.endpoints.kubernetes_mcp.ingress}/mcp"
-        auth_type = "none"
+        auth_type = "oauth_2.1"
         config = {
           enable = true
         }

@@ -310,7 +310,7 @@ locals {
       kubernetes_mcp = {
         name      = "kubernetes-mcp"
         namespace = "kube-system"
-        ingress   = "kubernetes-mcp.${local.domains.kubernetes}"
+        ingress   = "kubernetes-mcp.${local.domains.public}"
       }
       prometheus_mcp = {
         name      = "prometheus-mcp"

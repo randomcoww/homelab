@@ -15,10 +15,6 @@ variable "affinity" {
   default = {}
 }
 
-variable "ingress_hostname" {
-  type = string
-}
-
 variable "images" {
   type = object({
     prometheus_mcp  = string
@@ -28,6 +24,10 @@ variable "images" {
 }
 
 variable "prometheus_url" {
+  type = string
+}
+
+variable "ingress_hostname" {
   type = string
 }
 
