@@ -75,7 +75,7 @@ module "arc-workflow-secret" {
             }
             env = [
               {
-                name = "INTERNAL_CA_CERT"
+                name = "INTERNAL_CA_CERT" # feed to OS image build
                 valueFrom = {
                   secretKeyRef = {
                     name = "workflow-template"
@@ -96,7 +96,11 @@ module "arc-workflow-secret" {
 
               # cosa
               {
-                name = "MINIO_ACCESS_KEY_ID"
+                name  = "RCLONE_S3_ENDPOINT"
+                value = "${local.services.cluster_minio.ip}:${local.service_ports.minio}"
+              },
+              {
+                name = "AWS_ACCESS_KEY_ID"
                 valueFrom = {
                   secretKeyRef = {
                     name = local.minio_users.arc.secret
@@ -105,7 +109,7 @@ module "arc-workflow-secret" {
                 }
               },
               {
-                name = "MINIO_SECRET_ACCESS_KEY"
+                name = "AWS_SECRET_ACCESS_KEY"
                 valueFrom = {
                   secretKeyRef = {
                     name = local.minio_users.arc.secret
@@ -113,11 +117,23 @@ module "arc-workflow-secret" {
                   }
                 }
               },
+            ]
+            volumeMounts = [
               {
-                name  = "MC_HOST_arc"
-                value = "https://$(MINIO_ACCESS_KEY_ID):$(MINIO_SECRET_ACCESS_KEY)@${local.services.cluster_minio.ip}:${local.service_ports.minio}"
+                name      = "ca-trust-bundle"
+                mountPath = "/etc/ssl/certs/ca-certificates.crt"
+                readOnly  = true
               },
             ]
+          },
+        ]
+        volumes = [
+          {
+            name = "ca-trust-bundle"
+            hostPath = {
+              path = "/etc/ssl/certs/ca-certificates.crt"
+              type = "File"
+            }
           },
         ]
       }
