@@ -86,7 +86,6 @@ module "hostapd" {
     }
   }
   # https://w1.fi/cgit/hostap/plain/hostapd/hostapd.conf
-  # https://blog.fraggod.net/2017/04/27/wifi-hostapd-configuration-for-80211ac-networks.html
   config = {
     country_code                 = "PA"
     channel                      = 36
