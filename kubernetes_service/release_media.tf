@@ -115,7 +115,8 @@ module "sunshine-desktop" {
   service_hostname        = local.endpoints.sunshine_desktop.service
   ingress_class_name      = local.endpoints.ingress_nginx.name
   nginx_ingress_annotations = merge(
-    local.nginx_ingress_annotations_common, {
+    local.nginx_ingress_annotations_common,
+    local.nginx_ingress_annotations_authelia, {
       "cert-manager.io/cluster-issuer" = local.kubernetes.cert_issuers.acme_prod
   })
 }
