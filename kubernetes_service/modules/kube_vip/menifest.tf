@@ -215,6 +215,7 @@ module "daemonset" {
             ]
           }
         }
+        # TODO: add health checks
       },
     ]
   }

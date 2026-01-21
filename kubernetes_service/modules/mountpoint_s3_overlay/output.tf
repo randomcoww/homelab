@@ -91,6 +91,7 @@ output "template_spec" {
           periodSeconds    = 2
           failureThreshold = 12
         }
+        # TODO: add health checks
       },
       ], [
       for _, container in lookup(var.template_spec, "initContainers", []) :

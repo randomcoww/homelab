@@ -369,6 +369,7 @@ module "statefulset" {
             mountPath = dirname(local.kea_socket_path)
           },
         ]
+        # TODO: add health checks
       },
       {
         name  = "${var.name}-stork-agent"
@@ -387,6 +388,7 @@ module "statefulset" {
             mountPath = local.stork_agent_base_path
           },
         ]
+        # TODO: add health checks
       },
       {
         name  = "${var.name}-ipxe"

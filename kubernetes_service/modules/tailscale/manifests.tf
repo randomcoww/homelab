@@ -146,6 +146,7 @@ module "statefulset" {
             ]
           }
         }
+        # TODO: add health checks
       },
     ]
     volumes = [

@@ -116,6 +116,7 @@ output "template_spec" {
             readOnly  = true
           },
         ]
+        # TODO: add health checks
       },
       ], [
       for _, container in lookup(var.template_spec, "initContainers", []) :
