@@ -1,4 +1,4 @@
-## Terraform provisioner for Kubernetes homelab
+## Terraform (OpenTofu) provisioner for Kubernetes homelab
 
 Run Terraform in container (optional).
 
