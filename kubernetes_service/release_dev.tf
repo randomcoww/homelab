@@ -154,29 +154,6 @@ module "prometheus-mcp" {
     mcp_oauth_proxy = local.container_images.mcp_oauth_proxy
     litestream      = local.container_images.litestream
   }
-  affinity = {
-    podAffinity = {
-      requiredDuringSchedulingIgnoredDuringExecution = [
-        {
-          labelSelector = {
-            matchExpressions = [
-              {
-                key      = "app"
-                operator = "In"
-                values = [
-                  local.endpoints.open_webui.name,
-                ]
-              },
-            ]
-          }
-          topologyKey = "kubernetes.io/hostname"
-          namespaces = [
-            local.endpoints.open_webui.namespace,
-          ]
-        },
-      ]
-    }
-  }
   prometheus_url = "https://${local.endpoints.prometheus.ingress}"
   extra_oauth_configs = {
     OIDC_CONFIGURATION_URL = "https://${local.endpoints.authelia.ingress}/.well-known/openid-configuration"
@@ -206,29 +183,6 @@ module "kubernetes-mcp" {
     kubernetes_mcp  = local.container_images.kubernetes_mcp
     mcp_oauth_proxy = local.container_images.mcp_oauth_proxy
     litestream      = local.container_images.litestream
-  }
-  affinity = {
-    podAffinity = {
-      requiredDuringSchedulingIgnoredDuringExecution = [
-        {
-          labelSelector = {
-            matchExpressions = [
-              {
-                key      = "app"
-                operator = "In"
-                values = [
-                  local.endpoints.open_webui.name,
-                ]
-              },
-            ]
-          }
-          topologyKey = "kubernetes.io/hostname"
-          namespaces = [
-            local.endpoints.open_webui.namespace,
-          ]
-        },
-      ]
-    }
   }
   extra_oauth_configs = {
     OIDC_CONFIGURATION_URL = "https://${local.endpoints.authelia.ingress}/.well-known/openid-configuration"
