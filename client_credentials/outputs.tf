@@ -12,6 +12,22 @@ output "kubernetes_admin" {
   sensitive = true
 }
 
+output "mc_config" {
+  value = {
+    version = "10"
+    aliases = {
+      m = {
+        url       = "https://${local.services.minio.ip}:${local.service_ports.minio}"
+        accessKey = data.terraform_remote_state.sr.outputs.minio.access_key_id
+        secretKey = data.terraform_remote_state.sr.outputs.minio.secret_access_key
+        api       = "S3v4"
+        path      = "auto"
+      }
+    }
+  }
+  sensitive = true
+}
+
 output "internal_ca" {
   value = data.terraform_remote_state.sr.outputs.trust.ca.cert_pem
 }
