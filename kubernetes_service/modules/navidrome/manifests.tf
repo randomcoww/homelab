@@ -1,16 +1,24 @@
 locals {
   navidrome_config = merge(var.extra_configs, {
-    ND_MUSICFOLDER          = "/navidrome/library/mnt"
-    ND_DATAFOLDER           = "/navidrome/data"
-    ND_CACHEFOLDER          = "/navidrome/cache"
-    ND_ADDRESS              = "0.0.0.0"
-    ND_PORT                 = 4533
-    ND_AGENTS               = ""
-    ND_DEEZER_ENABLED       = false
-    ND_ENABLEDOWNLOADS      = false
-    ND_LASTFM_ENABLED       = false
-    ND_LISTENBRAINZ_ENABLED = false
-    ND_PROMETHEUS_ENABLED   = true
+    ND_MUSICFOLDER             = "/navidrome/library/mnt"
+    ND_DATAFOLDER              = "/navidrome/data"
+    ND_CACHEFOLDER             = "/navidrome/cache"
+    ND_ADDRESS                 = "0.0.0.0"
+    ND_PORT                    = 4533
+    ND_AGENTS                  = ""
+    ND_DEEZER_ENABLED          = false
+    ND_ENABLEDOWNLOADS         = false
+    ND_LASTFM_ENABLED          = false
+    ND_LISTENBRAINZ_ENABLED    = false
+    ND_PROMETHEUS_ENABLED      = true
+    ND_ENABLEINSIGHTSCOLLECTOR = false
+    ND_ENABLEFAVOURITES        = false
+    ND_ENABLESTARRATING        = false
+    ND_ENABLEUSEREDITING       = false
+    ND_ENABLESCROBBLEHISTORY   = false
+    ND_SEARCHFULLSTRING        = true
+    ND_PROMETHEUS_METRICSPATH  = "/metrics"
+    ND_SCANNER_PURGEMISSING    = "always"
   })
   db_file = "${local.navidrome_config["ND_DATAFOLDER"]}/navidrome.db" # db name not configurable
 }
@@ -36,6 +44,11 @@ module "service" {
   name    = var.name
   app     = var.name
   release = var.release
+  annotations = {
+    "prometheus.io/scrape" = "true"
+    "prometheus.io/port"   = tostring(local.navidrome_config["ND_PORT"])
+    "prometheus.io/path"   = local.navidrome_config["ND_PROMETHEUS_METRICSPATH"]
+  }
   spec = {
     type = "ClusterIP"
     ports = [
