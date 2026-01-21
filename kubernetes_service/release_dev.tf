@@ -98,9 +98,9 @@ module "llama-cpp" {
   minio_endpoint      = "https://${local.services.cluster_minio.ip}:${local.service_ports.minio}"
   minio_data_bucket   = "models"
   minio_access_secret = local.minio_users.llama_cpp.secret
-  ingress_class_name  = local.endpoints.ingress_nginx_internal.name
+  ingress_class_name  = local.endpoints.ingress_nginx.name
   nginx_ingress_annotations = merge(local.nginx_ingress_annotations_common, {
-    "cert-manager.io/cluster-issuer" = local.kubernetes.cert_issuers.ca_internal
+    "cert-manager.io/cluster-issuer" = local.kubernetes.cert_issuers.acme_prod
   })
 }
 
