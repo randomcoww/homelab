@@ -229,7 +229,6 @@ module "open-webui" {
     ENABLE_CODE_INTERPRETER        = false
     ENABLE_CODE_EXECUTION          = false
     ENABLE_FOLLOW_UP_GENERATION    = false
-    ENABLE_PERSISTENT_CONFIG       = false
     ENABLE_EVALUATION_ARENA_MODELS = false
     ENABLE_MESSAGE_RATING          = false
     SHOW_ADMIN_DETAILS             = false
@@ -285,10 +284,11 @@ module "open-webui" {
       },
     ])
     # OIDC
+    ENABLE_PERSISTENT_CONFIG       = false # persist mcp oauth registration
     ENABLE_SIGNUP                  = false
     ENABLE_LOGIN_FORM              = false
-    ENABLE_OAUTH_SIGNUP            = true
-    ENABLE_OAUTH_PERSISTENT_CONFIG = true
+    ENABLE_OAUTH_SIGNUP            = false
+    ENABLE_OAUTH_PERSISTENT_CONFIG = false
     ENABLE_OAUTH_ID_TOKEN_COOKIE   = false
     OAUTH_MERGE_ACCOUNTS_BY_EMAIL  = true
     OAUTH_CLIENT_ID                = random_string.authelia-oidc-client-id["open-webui"].result
