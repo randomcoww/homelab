@@ -12,7 +12,7 @@ variable "release" {
 
 variable "replicas" {
   type    = number
-  default = 2
+  default = 1
 }
 
 variable "affinity" {

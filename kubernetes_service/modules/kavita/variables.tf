@@ -11,7 +11,8 @@ variable "release" {
 }
 
 variable "replicas" {
-  type = number
+  type    = number
+  default = 1
 }
 
 variable "affinity" {

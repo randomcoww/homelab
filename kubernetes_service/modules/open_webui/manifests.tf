@@ -350,6 +350,7 @@ module "statefulset" {
   app      = var.name
   release  = var.release
   affinity = var.affinity
+  replicas = var.replicas
   annotations = merge({
     "checksum/secret" = sha256(module.secret.manifest)
     }, {

@@ -208,6 +208,7 @@ module "litestream-overlay" {
           "--sse-base-url",
           "https://${var.ingress_hostname}",
         ]
+        # TODO: add health checks
       },
       {
         name  = "${var.name}-oauth-proxy"
@@ -248,6 +249,7 @@ module "litestream-overlay" {
             subPath   = basename(local.oauth_secret_file)
           },
         ]
+        # TODO: add health checks
       },
     ]
     volumes = [
@@ -280,6 +282,7 @@ module "statefulset" {
   app      = var.name
   release  = var.release
   affinity = var.affinity
+  replicas = var.replicas
   annotations = merge({
     "checksum/secret" = sha256(module.secret.manifest)
     }, {
