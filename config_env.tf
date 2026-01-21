@@ -130,7 +130,7 @@ locals {
     hostapd          = "reg.cluster.internal/randomcoww/hostapd-noscan:v20251229.230418@sha256:7739c3f446e5ae326e82eedfdcd418e1e533c0e9a770b9520507866e89745147"
     tailscale        = "ghcr.io/tailscale/tailscale:v1.92.5@sha256:4a0aaacee6f28e724c1f80c986e5776c9c979d8f7e19274c2cae2d495cc8d625"
     qrcode_generator = "reg.cluster.internal/randomcoww/qrcode-resource:v20251229.141928@sha256:e3ac16365490e8e1fefc224d1ec59445a6de852d567a2401dbab8a5516115d14"
-    llama_cpp        = "ghcr.io/mostlygeek/llama-swap:vulkan-non-root@sha256:3efd51c71803d37ba1344ac4d2798a38f3aa90b393b03918d25bb81dce9aa73f"
+    llama_cpp        = "ghcr.io/mostlygeek/llama-swap:vulkan-non-root@sha256:1429380551a4e85e81c82fecdb1a4deb96c8f9c793752d0ae68f86df3a63404e"
     sunshine_desktop = "reg.cluster.internal/randomcoww/sunshine-desktop:v2026.118.33530@sha256:e9dda1eea03713ca5a5bf0aeb342069ac559b58ff0547df753af56c538cdb663"
     litestream       = "docker.io/litestream/litestream:0.5.2@sha256:e4fd484cb1cd9d6fa58fff7127d551118e150ab75b389cf868a053152ba6c9c0"
     valkey           = "ghcr.io/valkey-io/valkey:9.0.1-alpine@sha256:c106a0c03bcb23cbdf9febe693114cb7800646b11ca8b303aee7409de005faa8"
@@ -150,7 +150,7 @@ locals {
   host_images = {
     for name, tag in {
       # these fields are updated by renovate - don't use var substitutions
-      default = "fedora-coreos-43.20260112.04" # renovate: randomcoww/fedora-coreos-config-custom
+      default = "fedora-coreos-43.20260120.23" # renovate: randomcoww/fedora-coreos-config-custom
     } :
     name => {
       kernel = "${tag}-live-kernel.$${buildarch:uristring}"
