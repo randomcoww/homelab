@@ -32,6 +32,37 @@ module "kavita" {
   minio_access_secret = local.minio_users.kavita.secret
 }
 
+# Navidrome
+
+module "navidrome" {
+  source    = "./modules/navidrome"
+  name      = local.endpoints.navidrome.name
+  namespace = local.endpoints.navidrome.namespace
+  release   = "0.1.0"
+  replicas  = 1
+  images = {
+    navidrome  = local.container_images.navidrome
+    mountpoint = local.container_images.mountpoint
+    litestream = local.container_images.litestream
+  }
+  ingress_hostname   = local.endpoints.navidrome.ingress
+  ingress_class_name = local.endpoints.ingress_nginx.name
+  nginx_ingress_annotations = merge(
+    local.nginx_ingress_annotations_common,
+    local.nginx_ingress_annotations_authelia, {
+      "cert-manager.io/cluster-issuer" = local.kubernetes.cert_issuers.acme_prod
+  })
+  extra_configs = {
+    ND_EXTAUTH_TRUSTEDSOURCES = local.networks.kubernetes_pod.prefix
+    ND_ENABLEUSEREDITING      = false
+  }
+
+  minio_endpoint      = "https://${local.services.cluster_minio.ip}:${local.service_ports.minio}"
+  minio_data_bucket   = "music"
+  minio_bucket        = "navidrome"
+  minio_access_secret = local.minio_users.navidrome.secret
+}
+
 # Sunshine desktop
 
 module "sunshine-desktop" {

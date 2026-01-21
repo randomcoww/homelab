@@ -95,7 +95,7 @@ locals {
         ]
       }
 
-      # kavita mount-s3 access for ebooks
+      # kavita mount-s3 access for ebooks and metadata
       kavita = {
         name      = local.endpoints.kavita.name
         namespace = local.endpoints.kavita.namespace
@@ -112,6 +112,28 @@ locals {
             buckets = [
               "ebooks",
               "kavita",
+            ]
+          },
+        ]
+      }
+
+      # navidrome mount-s3 access for music and metadata
+      navidrome = {
+        name      = local.endpoints.navidrome.name
+        namespace = local.endpoints.navidrome.namespace
+        policies = [
+          {
+            Effect = "Allow"
+            Action = [
+              "s3:GetObject",
+              "s3:PutObject",
+              "s3:ListBucket",
+              "s3:DeleteObject",
+              "s3:AbortMultipartUpload",
+            ]
+            buckets = [
+              "music",
+              "navidrome",
             ]
           },
         ]

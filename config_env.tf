@@ -137,6 +137,7 @@ locals {
     searxng          = "ghcr.io/searxng/searxng:latest@sha256:b1d1e80c75adda484544b6162ee12b790813905430ac6f0d2ca3da83fe4de846"
     open_webui       = "ghcr.io/open-webui/open-webui:0.7.2@sha256:16d9a3615b45f14a0c89f7ad7a3bf151f923ed32c2e68f9204eb17d1ce40774b"
     kavita           = "ghcr.io/kareadita/kavita:0.8.9@sha256:1f2acae7466d022f037ea09f7989eb7c487f916b881174c7a6de33dbfa8acb39"
+    navidrome        = "ghcr.io/navidrome/navidrome:0.59.0@sha256:4edc8a1de3e042f30b78a478325839f4395177eb8201c27543dccc0eba674f23"
     lldap            = "ghcr.io/lldap/lldap:latest-alpine@sha256:898f91b2042ab23659954588999eb38bb4d556c340318c76012000fa4f4b56ef"
     authelia         = "ghcr.io/authelia/authelia:4.39.15@sha256:d23ee3c721d465b4749cc58541cda4aebe5aa6f19d7b5ce0afebb44ebee69591"
     cloudflared      = "docker.io/cloudflare/cloudflared:2026.1.1@sha256:5bb6a0870686742d00e171f36c892ba91e5994631bc363d808b9ba822262dad6"
@@ -254,7 +255,6 @@ locals {
         name      = "kube-dns"
         namespace = "kube-system"
       }
-
       kea = {
         name      = "kea"
         namespace = "netboot"
@@ -283,6 +283,10 @@ locals {
       kavita = {
         name    = "kavita"
         ingress = "kavita.${local.domains.public}"
+      }
+      navidrome = {
+        name    = "navidrome"
+        ingress = "navidrome.${local.domains.public}"
       }
       llama_cpp = {
         name    = "llama-cpp"

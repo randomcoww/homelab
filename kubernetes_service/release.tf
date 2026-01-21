@@ -13,6 +13,7 @@ locals {
     module.hostapd,
     module.qrcode-hostapd,
     module.kavita,
+    module.navidrome,
     module.registry,
     module.searxng,
     module.open-webui,
