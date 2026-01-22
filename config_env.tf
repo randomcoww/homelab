@@ -130,7 +130,7 @@ locals {
     hostapd          = "reg.cluster.internal/randomcoww/hostapd-noscan:v20251229.230418@sha256:7739c3f446e5ae326e82eedfdcd418e1e533c0e9a770b9520507866e89745147"
     tailscale        = "ghcr.io/tailscale/tailscale:v1.92.5@sha256:4a0aaacee6f28e724c1f80c986e5776c9c979d8f7e19274c2cae2d495cc8d625"
     qrcode_generator = "reg.cluster.internal/randomcoww/qrcode-resource:v20251229.141928@sha256:e3ac16365490e8e1fefc224d1ec59445a6de852d567a2401dbab8a5516115d14"
-    llama_cpp        = "ghcr.io/mostlygeek/llama-swap:vulkan-non-root@sha256:1429380551a4e85e81c82fecdb1a4deb96c8f9c793752d0ae68f86df3a63404e"
+    llama_cpp        = "ghcr.io/mostlygeek/llama-swap:vulkan-non-root@sha256:8df951ad85799832da41c1ea0d5aeb48a8ab235abc2d51123aa1ddb34c238beb"
     sunshine_desktop = "reg.cluster.internal/randomcoww/sunshine-desktop:v2026.118.33530@sha256:e9dda1eea03713ca5a5bf0aeb342069ac559b58ff0547df753af56c538cdb663"
     litestream       = "docker.io/litestream/litestream:0.5.6@sha256:871d0c5f28b52b0a0a29614728d6e9e5cbdaaab36d8af177010de2c63d9da9a5"
     valkey           = "ghcr.io/valkey-io/valkey:9.0.1-alpine@sha256:c106a0c03bcb23cbdf9febe693114cb7800646b11ca8b303aee7409de005faa8"
@@ -143,7 +143,7 @@ locals {
     cloudflared      = "docker.io/cloudflare/cloudflared:2026.1.1@sha256:5bb6a0870686742d00e171f36c892ba91e5994631bc363d808b9ba822262dad6"
     playwright       = "reg.cluster.internal/randomcoww/patchright-server:v1.57.0@sha256:6fca26aa3e7b0bff0be945c11d8111b80fe02e9b639e49f610774e4907f76006"
     mcp_oauth_proxy  = "reg.cluster.internal/randomcoww/mcp-auth-proxy:v2.5.3@sha256:40c8f6413b7adfc2e0dff85700fc5d6de041d5e6256e66129101462e4a5c58dd"
-    prometheus_mcp   = "ghcr.io/pab1it0/prometheus-mcp-server:1.5.2@sha256:4cad9af3814dba1d128b126f7393b98c4f98a183c12352fc6d6210da3410a96e"
+    prometheus_mcp   = "ghcr.io/pab1it0/prometheus-mcp-server:1.5.3@sha256:32d47c88845ee78bc343d4c3a39a24b1bd9bebce4f53becdbbf5704221185925"
     kubernetes_mcp   = "reg.cluster.internal/randomcoww/kubernetes-mcp-server:main@sha256:440a0ede9dcb0a1ebe90aab4f73e8bad037a44a94c42a4d97c616b6b15ce5436"
   }
 
