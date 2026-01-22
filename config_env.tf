@@ -1,7 +1,7 @@
 locals {
   timezone       = "America/Los_Angeles"
   butane_version = "1.5.0"
-  default_mtu    = 9000
+  default_mtu    = 1500 # TODO: move to 9000 - workaround for r8169 transmit queue timed out issue
 
   users = {
     ssh = {
