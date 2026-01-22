@@ -184,8 +184,7 @@ locals {
   service_ports = {
     minio    = 9000
     metrics  = 9153
-    registry = 443  # not configurable
-    reloader = 9090 # not configurable
+    registry = 443 # not configurable
     ldaps    = 6360
   }
 

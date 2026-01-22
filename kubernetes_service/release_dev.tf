@@ -253,7 +253,8 @@ module "open-webui" {
         url       = "https://${local.endpoints.prometheus_mcp.ingress}/mcp"
         auth_type = "oauth_2.1"
         config = {
-          enable = true
+          enable                    = true
+          function_name_filter_list = ""
         }
         spec_type = "url"
         spec      = ""
@@ -263,6 +264,7 @@ module "open-webui" {
           id          = "prometheus-metrics"
           name        = "prometheus-metrics"
           description = "Query service and node metrics and trends"
+          # oauth_client_info = ""
         }
       },
       {
@@ -270,7 +272,8 @@ module "open-webui" {
         url       = "https://${local.endpoints.kubernetes_mcp.ingress}/mcp"
         auth_type = "oauth_2.1"
         config = {
-          enable = true
+          enable                    = true
+          function_name_filter_list = ""
         }
         spec_type = "url"
         spec      = ""
@@ -280,6 +283,7 @@ module "open-webui" {
           id          = "kubernetes"
           name        = "kubernetes"
           description = "Query Kubernetes resources and logs"
+          # oauth_client_info = ""
         }
       },
     ])
