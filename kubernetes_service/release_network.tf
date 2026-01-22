@@ -163,9 +163,7 @@ module "qrcode-hostapd" {
   }
   ingress_hostname   = local.endpoints.qrcode_hostapd.ingress
   ingress_class_name = local.endpoints.ingress_nginx.name
-  nginx_ingress_annotations = merge(
-    local.nginx_ingress_annotations_common,
-    local.nginx_ingress_annotations_authelia, {
+  nginx_ingress_annotations = merge(local.nginx_ingress_annotations_common, {
       "cert-manager.io/cluster-issuer" = local.kubernetes.cert_issuers.acme_prod
   })
   qrcode_value = "WIFI:S:${random_password.hostapd-ssid.result};T:WPA;P:${random_password.hostapd-password.result};H:true;;"
