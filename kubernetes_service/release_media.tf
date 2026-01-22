@@ -55,6 +55,7 @@ module "navidrome" {
   extra_configs = {
     ND_EXTAUTH_TRUSTEDSOURCES = local.networks.kubernetes_pod.prefix
     ND_ENABLEUSEREDITING      = false
+    TZ                        = local.timezone
   }
 
   minio_endpoint      = "https://${local.services.cluster_minio.ip}:${local.service_ports.minio}"
@@ -145,9 +146,7 @@ module "sunshine-desktop" {
   ingress_hostname        = local.endpoints.sunshine_desktop.ingress
   service_hostname        = local.endpoints.sunshine_desktop.service
   ingress_class_name      = local.endpoints.ingress_nginx.name
-  nginx_ingress_annotations = merge(
-    local.nginx_ingress_annotations_common,
-    local.nginx_ingress_annotations_authelia, {
-      "cert-manager.io/cluster-issuer" = local.kubernetes.cert_issuers.acme_prod
+  nginx_ingress_annotations = merge(local.nginx_ingress_annotations_common, {
+    "cert-manager.io/cluster-issuer" = local.kubernetes.cert_issuers.acme_prod
   })
 }
