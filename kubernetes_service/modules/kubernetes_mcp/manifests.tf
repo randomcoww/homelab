@@ -11,7 +11,14 @@ locals {
     LISTEN                  = "0.0.0.0:${local.service_port}"
     DATA_PATH               = "/data"
     REPOSITORY_BACKEND      = "sqlite"
-    REPOSITORY_DSN          = "file:${local.oauth_db_file}?cache=shared&mode=rwc"
+    REPOSITORY_DSN = "file:${local.oauth_db_file}?${join("&", [
+      "cache=shared",
+      "mode=rwc",
+      "_busy_timeout=5000",
+      "_journal_mode=WAL",
+      "_foreign_keys=on",
+      "synchronous=normal",
+    ])}"
   }, var.extra_oauth_configs)
 
   oauth_private_key_file = "${local.oauth_config["DATA_PATH"]}/private_key.pem" # hardcoded filename
