@@ -93,6 +93,9 @@ locals {
           ]
         }
       }
+      boot_args = [
+        "pcie_aspm=off", # TODO: remove if this gets fixed - workaround for r8169 transmit queue timed out issue
+      ]
     }
 
     k-1 = {
@@ -188,6 +191,9 @@ locals {
           ]
         }
       }
+      boot_args = [
+        "pcie_aspm=off", # TODO: remove if this gets fixed - workaround for r8169 transmit queue timed out issue
+      ]
     }
 
     k-2 = {
@@ -256,6 +262,9 @@ locals {
           ]
         }
       }
+      boot_args = [
+        "pcie_aspm=off", # TODO: remove if this gets fixed - workaround for r8169 transmit queue timed out issue
+      ]
     }
 
     k-3 = {
@@ -323,6 +332,9 @@ locals {
           ]
         }
       }
+      boot_args = [
+        "pcie_aspm=off", # TODO: remove if this gets fixed - workaround for r8169 transmit queue timed out issue
+      ]
     }
   }
 

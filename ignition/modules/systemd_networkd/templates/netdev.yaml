@@ -5,6 +5,21 @@ storage:
   files:
     # hardware interface #
     %{~ for name, iface in physical_interfaces ~}
+    # TODO: remove if this gets fixed - disable TSO for r8169 transmit queue timed out issue
+    - path: /etc/systemd/network/09-${name}-r8169.link
+      mode: 0644
+      contents:
+        inline: |
+          [Match]
+          PermanentMACAddress=${iface.match_mac}
+          Driver=r8169
+
+          [Link]
+          MTUBytes=${lookup(iface, "mtu", 1500)}
+          Name=${name}
+          TCPSegmentationOffload=no
+          GenericSegmentationOffload=no
+          GenericReceiveOffload=no
     - path: /etc/systemd/network/10-${name}.link
       mode: 0644
       contents:
