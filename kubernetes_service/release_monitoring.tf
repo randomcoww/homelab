@@ -338,7 +338,7 @@ resource "helm_release" "kured" {
   chart            = "kured"
   wait             = false
   wait_for_jobs    = false
-  version          = "5.10.0"
+  version          = "5.11.0"
   max_history      = 2
   timeout          = local.kubernetes.helm_release_timeout
   values = [
