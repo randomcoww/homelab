@@ -318,10 +318,10 @@ resource "helm_release" "prometheus-node-exporter" {
     yamlencode({
       resources = {
         requests = {
-          memory = "32Mi"
+          memory = "64Mi"
         }
         limits = {
-          memory = "32Mi"
+          memory = "64Mi"
         }
       }
     })
