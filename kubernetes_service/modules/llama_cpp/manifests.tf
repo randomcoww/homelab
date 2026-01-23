@@ -79,7 +79,18 @@ module "mountpoint-s3-overlay" {
   s3_prefix   = ""
   s3_mount_extra_args = [
     "--read-only",
+    # "--cache /var/cache", # cache to disk
+    "--cache /var/tmp",      # cache to memory
+    "--max-cache-size 1024", # 1Gi
   ]
+  mountpoint_resources = {
+    requests = {
+      memory = "2Gi"
+    }
+    limits = {
+      memory = "4Gi"
+    }
+  }
   s3_access_secret = var.minio_access_secret
   images = {
     mountpoint = var.images.mountpoint
