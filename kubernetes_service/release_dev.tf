@@ -251,7 +251,7 @@ module "open-webui" {
       {
         type      = "mcp"
         url       = "https://${local.endpoints.prometheus_mcp.ingress}/mcp"
-        auth_type = "oauth_2.1"
+        auth_type = "oauth_2.1" # no persistence - need to register each time
         config = {
           enable                    = true
           function_name_filter_list = ""
@@ -270,7 +270,7 @@ module "open-webui" {
       {
         type      = "mcp"
         url       = "https://${local.endpoints.kubernetes_mcp.ingress}/mcp"
-        auth_type = "oauth_2.1"
+        auth_type = "oauth_2.1" # no persistence - need to register each time
         config = {
           enable                    = true
           function_name_filter_list = ""
@@ -306,7 +306,7 @@ module "open-webui" {
       },
     ])
     # OIDC
-    ENABLE_PERSISTENT_CONFIG       = true # persist mcp oauth registration
+    ENABLE_PERSISTENT_CONFIG       = false # persist mcp oauth registration
     ENABLE_SIGNUP                  = false
     ENABLE_LOGIN_FORM              = false
     ENABLE_OAUTH_SIGNUP            = true
