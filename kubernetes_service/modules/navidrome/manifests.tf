@@ -108,7 +108,6 @@ module "litestream-overlay" {
       },
     ]
   }
-
   sqlite_path         = local.db_file
   minio_access_secret = var.minio_access_secret
 

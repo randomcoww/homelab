@@ -78,6 +78,7 @@ output "template_spec" {
             readOnly  = true
           },
         ]
+        resources = var.mountpoint_resources
         securityContext = {
           privileged = true
         }

@@ -45,3 +45,15 @@ variable "s3_mount_extra_args" {
 variable "s3_access_secret" {
   type = string
 }
+
+variable "mountpoint_resources" {
+  type = any
+  default = {
+    requests = {
+      memory = "128Mi"
+    }
+    limits = {
+      memory = "1Gi"
+    }
+  }
+}

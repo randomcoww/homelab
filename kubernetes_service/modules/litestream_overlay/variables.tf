@@ -37,3 +37,15 @@ variable "sqlite_path" {
 variable "minio_access_secret" {
   type = string
 }
+
+variable "litestream_resources" {
+  type = any
+  default = {
+    requests = {
+      memory = "128Mi"
+    }
+    limits = {
+      memory = "1Gi"
+    }
+  }
+}

@@ -579,7 +579,7 @@ resource "helm_release" "authelia" {
             ]
             resources = {
               requests = {
-                memory = "1Gi"
+                memory = "128Mi"
               }
               limits = {
                 memory = "1Gi"

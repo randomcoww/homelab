@@ -116,6 +116,7 @@ output "template_spec" {
             readOnly  = true
           },
         ]
+        resources = var.litestream_resources
         # TODO: add health checks
       },
       ], [

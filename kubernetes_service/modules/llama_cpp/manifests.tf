@@ -90,7 +90,7 @@ module "mountpoint-s3-overlay" {
         memory = "8Gi"
       }
       limits = {
-        memory = "24Gi"
+        memory = "16Gi"
       }
     }
     containers = [
