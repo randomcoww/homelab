@@ -577,8 +577,24 @@ resource "helm_release" "authelia" {
                 readOnly  = true
               },
             ]
+            resources = {
+              requests = {
+                memory = "1Gi"
+              }
+              limits = {
+                memory = "1Gi"
+              }
+            }
           },
         ]
+        resources = {
+          requests = {
+            memory = "128Mi"
+          }
+          limits = {
+            memory = "128Mi"
+          }
+        }
       }
       configMap = {
         telemetry = {
