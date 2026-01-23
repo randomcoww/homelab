@@ -135,27 +135,29 @@ resource "helm_release" "amd-gpu" {
   timeout          = local.kubernetes.helm_release_timeout
   values = [
     yamlencode({
-      dp = {
-        resources = {
-          requests = {
-            memory = "32Mi"
-          }
-          limits = {
-            memory = "32Mi"
-          }
-        }
-      }
       nfd = {
         enabled = false
       }
       labeller = {
         enabled = true
+      }
+      dp = {
         resources = {
           requests = {
-            memory = "32Mi"
+            memory = "64Mi"
           }
           limits = {
-            memory = "32Mi"
+            memory = "64Mi"
+          }
+        }
+      }
+      lbl = {
+        resources = {
+          requests = {
+            memory = "64Mi"
+          }
+          limits = {
+            memory = "64Mi"
           }
         }
       }
