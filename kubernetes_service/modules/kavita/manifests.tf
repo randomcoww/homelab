@@ -151,6 +151,11 @@ module "litestream-overlay" {
           },
         ]
         livenessProbe = {
+          httpGet = {
+            path = "/api/health"
+            port = local.kavita_port
+          }
+          /*
           exec = {
             # OIDC login occasionally breaks with this error even when /api/health reports Ok
             # "status":500,"message":"No authentication handler is registered...
@@ -166,6 +171,7 @@ module "litestream-overlay" {
             ]
           }
           timeoutSeconds = 4
+          */
         }
         readinessProbe = {
           httpGet = {

@@ -579,10 +579,10 @@ resource "helm_release" "authelia" {
             ]
             resources = {
               requests = {
-                memory = "128Mi"
+                memory = "1Gi"
               }
               limits = {
-                memory = "1Gi"
+                memory = "2Gi"
               }
             }
           },
@@ -597,6 +597,9 @@ resource "helm_release" "authelia" {
         }
       }
       configMap = {
+        log = {
+          level = "debug"
+        }
         telemetry = {
           metrics = {
             enabled = false
