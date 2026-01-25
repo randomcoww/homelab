@@ -17,6 +17,7 @@ locals {
   sunshine_apps_file     = "/etc/sunshine/apps.json"
   sunshine_prep_cmd_file = "/usr/local/bin/sunshine-prep-cmd.sh"
   gamescope_cmd_file     = "/usr/local/bin/gamescope-launch"
+  ge_proton_update       = "/usr/local/bin/ge-protonup"
 }
 
 # bypassed through nginx - no need to expose
@@ -89,6 +90,17 @@ module "secret" {
       -W $(wlr-randr --json | jq '.[] | select(.name == "HEADLESS-1") | .modes[] | select(.current == true).width') \
       -H $(wlr-randr --json | jq '.[] | select(.name == "HEADLESS-1") | .modes[] | select(.current == true).height') \
       --immediate-flips --force-grab-cursor --rt --hdr-enabled $@
+    EOF
+    basename(local.ge_proton_update)       = <<-EOF
+    #!/bin/bash
+    set -xe
+
+    VERSION=$(curl -s https://api.github.com/repos/GloriousEggroll/proton-ge-custom/releases/latest | grep tag_name | cut -d '"' -f 4)
+    curl -fsSL --remove-on-error -o ge-proton.tgz https://github.com/GloriousEggroll/proton-ge-custom/releases/download/$VERSION/$VERSION.tar.gz
+
+    mkdir -p $HOME/.steam/steam/compatibilitytools.d/
+    tar xzf ge-proton.tgz -C $HOME/.steam/steam/compatibilitytools.d/
+    rm ge-proton.tgz
     EOF
   })
 }
@@ -347,6 +359,11 @@ module "statefulset" {
             name      = "commands"
             mountPath = local.gamescope_cmd_file
             subPath   = basename(local.gamescope_cmd_file)
+          },
+          {
+            name      = "commands"
+            mountPath = local.ge_proton_update
+            subPath   = basename(local.ge_proton_update)
           },
         ], var.extra_volume_mounts)
         ports = concat([
