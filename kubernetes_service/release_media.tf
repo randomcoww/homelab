@@ -53,9 +53,11 @@ module "navidrome" {
       "cert-manager.io/cluster-issuer" = local.kubernetes.cert_issuers.acme_prod
   })
   extra_configs = {
-    ND_EXTAUTH_TRUSTEDSOURCES = local.networks.kubernetes_pod.prefix
-    ND_ENABLEUSEREDITING      = false
-    TZ                        = local.timezone
+    ND_EXTAUTH_TRUSTEDSOURCES = join(",", [
+      local.networks.kubernetes_pod.prefix,
+    ])
+    ND_ENABLEUSEREDITING = false
+    TZ                   = local.timezone
   }
 
   minio_endpoint      = "https://${local.services.cluster_minio.ip}:${local.service_ports.minio}"

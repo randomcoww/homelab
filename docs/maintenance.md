@@ -16,7 +16,7 @@ tofu -chdir=client_credentials output -raw rclone_config > $HOME/.config/rclone/
 
 mkdir -p $HOME/.mc/certs/CAs
 tofu -chdir=client_credentials output -json mc_config > $HOME/.mc/config.json
-tofu -chdir=client_credentials output -raw internal_ca > $HOME/ca.crt > $HOME/.mc/certs/CAs/ca.crt
+tofu -chdir=client_credentials output -raw internal_ca > $HOME/.mc/certs/CAs/ca.crt
 ```
 
 ---

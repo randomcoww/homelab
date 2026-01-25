@@ -12,6 +12,20 @@ output "kubernetes_admin" {
   sensitive = true
 }
 
+output "internal_ca" {
+  value = data.terraform_remote_state.sr.outputs.trust.ca.cert_pem
+}
+
+output "kubeconfig" {
+  value     = module.admin-kubeconfig.manifest
+  sensitive = true
+}
+
+output "kubeconfig_cluster" {
+  value     = module.admin-kubeconfig-cluster.manifest
+  sensitive = true
+}
+
 output "mc_config" {
   value = {
     version = "10"
@@ -25,20 +39,6 @@ output "mc_config" {
       }
     }
   }
-  sensitive = true
-}
-
-output "internal_ca" {
-  value = data.terraform_remote_state.sr.outputs.trust.ca.cert_pem
-}
-
-output "kubeconfig" {
-  value     = module.admin-kubeconfig.manifest
-  sensitive = true
-}
-
-output "kubeconfig_cluster" {
-  value     = module.admin-kubeconfig-cluster.manifest
   sensitive = true
 }
 
