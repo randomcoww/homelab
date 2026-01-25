@@ -145,8 +145,8 @@ module "sunshine-desktop" {
   loadbalancer_class_name = "kube-vip.io/kube-vip-class"
   ingress_hostname        = local.endpoints.sunshine_desktop.ingress
   service_hostname        = local.endpoints.sunshine_desktop.service
-  ingress_class_name      = local.endpoints.ingress_nginx.name
+  ingress_class_name      = local.endpoints.ingress_nginx_internal.name
   nginx_ingress_annotations = merge(local.nginx_ingress_annotations_common, {
-    "cert-manager.io/cluster-issuer" = local.kubernetes.cert_issuers.acme_prod
+    "cert-manager.io/cluster-issuer" = local.kubernetes.cert_issuers.ca_internal
   })
 }

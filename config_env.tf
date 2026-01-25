@@ -277,7 +277,7 @@ locals {
       }
       qrcode_hostapd = {
         name    = "qrcode-hostapd"
-        ingress = "hostapd.${local.domains.public}"
+        ingress = "hostapd.${local.domains.kubernetes}"
       }
       kavita = {
         name    = "kavita"
@@ -289,12 +289,12 @@ locals {
       }
       llama_cpp = {
         name    = "llama-cpp"
-        ingress = "llama-cpp.${local.domains.public}"
+        ingress = "llama-cpp.${local.domains.kubernetes}"
       }
       sunshine_desktop = {
         name    = "sunshine-desktop"
-        service = "sunshine.${local.domains.public}"
-        ingress = "sunadmin.${local.domains.public}"
+        service = "sunshine.${local.domains.kubernetes}"
+        ingress = "sunadmin.${local.domains.kubernetes}"
       }
       open_webui = {
         name    = "open-webui"
@@ -303,7 +303,7 @@ locals {
       lldap = {
         name      = "lldap"
         namespace = "auth"
-        ingress   = "ldap.${local.domains.public}"
+        ingress   = "ldap.${local.domains.kubernetes}"
       }
       authelia = {
         name      = "authelia"
@@ -325,7 +325,7 @@ locals {
       namespace    = lookup(e, "namespace", "default")
       service      = "${lookup(e, "service", "${e.name}.${lookup(e, "namespace", "default")}")}"
       service_fqdn = "${e.name}.${lookup(e, "namespace", "default")}.svc.${local.domains.kubernetes}"
-      ingress      = "${lookup(e, "ingress", "${e.name}.${local.domains.public}")}"
+      ingress      = "${lookup(e, "ingress", "${e.name}.${local.domains.kubernetes}")}"
     })
   }
 
