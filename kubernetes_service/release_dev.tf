@@ -144,34 +144,34 @@ module "searxng" {
   })
 }
 
+resource "random_password" "prometheus-mcp-auth-token" {
+  length           = 32
+  override_special = "-_"
+}
+
 module "prometheus-mcp" {
   source    = "./modules/prometheus_mcp"
   name      = local.endpoints.prometheus_mcp.name
   namespace = local.endpoints.prometheus_mcp.namespace
   release   = "0.1.0"
+  replicas  = 2
   images = {
-    prometheus_mcp  = local.container_images.prometheus_mcp
-    mcp_oauth_proxy = local.container_images.mcp_oauth_proxy
-    litestream      = local.container_images.litestream
+    prometheus_mcp = local.container_images.prometheus_mcp
+    mcp_proxy      = local.container_images.mcp_proxy
   }
   prometheus_url = "https://${local.endpoints.prometheus.ingress}"
-  extra_oauth_configs = {
-    OIDC_CONFIGURATION_URL = "https://${local.endpoints.authelia.ingress}/.well-known/openid-configuration"
-    OIDC_CLIENT_ID         = random_string.authelia-oidc-client-id["prometheus-mcp"].result
-    OIDC_CLIENT_SECRET     = random_password.authelia-oidc-client-secret["prometheus-mcp"].result
-    OIDC_PROVIDER_NAME     = "Authelia"
-    OIDC_SCOPES            = join(",", local.authelia_oidc_clients.prometheus-mcp.scopes)
-  }
+  auth_token     = random_password.prometheus-mcp-auth-token.result
 
   ingress_hostname   = local.endpoints.prometheus_mcp.ingress
-  ingress_class_name = local.endpoints.ingress_nginx.name
+  ingress_class_name = local.endpoints.ingress_nginx_internal.name
   nginx_ingress_annotations = merge(local.nginx_ingress_annotations_common, {
-    "cert-manager.io/cluster-issuer" = local.kubernetes.cert_issuers.acme_prod
+    "cert-manager.io/cluster-issuer" = local.kubernetes.cert_issuers.ca_internal
   })
+}
 
-  minio_endpoint      = "https://${local.services.cluster_minio.ip}:${local.service_ports.minio}"
-  minio_bucket        = "prometheus-mcp"
-  minio_access_secret = local.minio_users.prometheus_mcp.secret
+resource "random_password" "kubernetes-mcp-auth-token" {
+  length           = 32
+  override_special = "-_"
 }
 
 module "kubernetes-mcp" {
@@ -179,28 +179,18 @@ module "kubernetes-mcp" {
   name      = local.endpoints.kubernetes_mcp.name
   namespace = local.endpoints.kubernetes_mcp.namespace
   release   = "0.1.0"
+  replicas  = 2
   images = {
-    kubernetes_mcp  = local.container_images.kubernetes_mcp
-    mcp_oauth_proxy = local.container_images.mcp_oauth_proxy
-    litestream      = local.container_images.litestream
+    kubernetes_mcp = local.container_images.kubernetes_mcp
+    mcp_proxy      = local.container_images.mcp_proxy
   }
-  extra_oauth_configs = {
-    OIDC_CONFIGURATION_URL = "https://${local.endpoints.authelia.ingress}/.well-known/openid-configuration"
-    OIDC_CLIENT_ID         = random_string.authelia-oidc-client-id["kubernetes-mcp"].result
-    OIDC_CLIENT_SECRET     = random_password.authelia-oidc-client-secret["kubernetes-mcp"].result
-    OIDC_PROVIDER_NAME     = "Authelia"
-    OIDC_SCOPES            = join(",", local.authelia_oidc_clients.kubernetes-mcp.scopes)
-  }
+  auth_token = random_password.kubernetes-mcp-auth-token.result
 
   ingress_hostname   = local.endpoints.kubernetes_mcp.ingress
-  ingress_class_name = local.endpoints.ingress_nginx.name
+  ingress_class_name = local.endpoints.ingress_nginx_internal.name
   nginx_ingress_annotations = merge(local.nginx_ingress_annotations_common, {
-    "cert-manager.io/cluster-issuer" = local.kubernetes.cert_issuers.acme_prod
+    "cert-manager.io/cluster-issuer" = local.kubernetes.cert_issuers.ca_internal
   })
-
-  minio_endpoint      = "https://${local.services.cluster_minio.ip}:${local.service_ports.minio}"
-  minio_bucket        = "kubernetes-mcp"
-  minio_access_secret = local.minio_users.kubernetes_mcp.secret
 }
 
 # Open WebUI
@@ -250,8 +240,8 @@ module "open-webui" {
     TOOL_SERVER_CONNECTIONS = jsonencode([
       {
         type      = "mcp"
-        url       = "https://${local.endpoints.prometheus_mcp.ingress}/mcp"
-        auth_type = "oauth_2.1" # no persistence - need to register each time
+        url       = "https://${local.endpoints.prometheus_mcp.ingress}/prometheus-mcp/mcp"
+        auth_type = "bearer"
         config = {
           enable                    = true
           function_name_filter_list = ""
@@ -259,18 +249,17 @@ module "open-webui" {
         spec_type = "url"
         spec      = ""
         path      = ""
-        key       = ""
+        key       = random_password.prometheus-mcp-auth-token.result
         info = {
           id          = "prometheus-metrics"
           name        = "prometheus-metrics"
           description = "Query service and node metrics and trends"
-          # oauth_client_info = ""
         }
       },
       {
         type      = "mcp"
-        url       = "https://${local.endpoints.kubernetes_mcp.ingress}/mcp"
-        auth_type = "oauth_2.1" # no persistence - need to register each time
+        url       = "https://${local.endpoints.kubernetes_mcp.ingress}/kubernetes-mcp/mcp"
+        auth_type = "bearer"
         config = {
           enable                    = true
           function_name_filter_list = ""
@@ -278,12 +267,11 @@ module "open-webui" {
         spec_type = "url"
         spec      = ""
         path      = ""
-        key       = ""
+        key       = random_password.kubernetes-mcp-auth-token.result
         info = {
           id          = "kubernetes"
           name        = "kubernetes"
           description = "Query Kubernetes resources and logs"
-          # oauth_client_info = ""
         }
       },
       {

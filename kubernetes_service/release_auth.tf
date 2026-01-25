@@ -166,34 +166,6 @@ locals {
       ]
       token_endpoint_auth_method = "client_secret_post"
     }
-    prometheus-mcp = {
-      client_name           = "Prometheus MCP"
-      require_pkce          = false
-      pkce_challenge_method = ""
-      scopes = [
-        "openid",
-        "email",
-        "profile",
-      ]
-      consent_mode = "implicit"
-      redirect_uris = [
-        "https://${local.endpoints.prometheus_mcp.ingress}/.auth/oidc/callback",
-      ]
-    }
-    kubernetes-mcp = {
-      client_name           = "Kubernetes MCP"
-      require_pkce          = false
-      pkce_challenge_method = ""
-      scopes = [
-        "openid",
-        "email",
-        "profile",
-      ]
-      consent_mode = "implicit"
-      redirect_uris = [
-        "https://${local.endpoints.kubernetes_mcp.ingress}/.auth/oidc/callback",
-      ]
-    }
   }
 }
 

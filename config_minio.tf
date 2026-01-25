@@ -181,48 +181,6 @@ locals {
         ]
       }
 
-      # prometheus-mcp litestream
-      prometheus_mcp = {
-        name      = local.endpoints.prometheus_mcp.name
-        namespace = local.endpoints.prometheus_mcp.namespace
-        policies = [
-          {
-            Effect = "Allow"
-            Action = [
-              "s3:GetObject",
-              "s3:PutObject",
-              "s3:ListBucket",
-              "s3:DeleteObject",
-              "s3:AbortMultipartUpload",
-            ]
-            buckets = [
-              "prometheus-mcp",
-            ]
-          },
-        ]
-      }
-
-      # kubernetes-mcp litestream
-      kubernetes_mcp = {
-        name      = local.endpoints.kubernetes_mcp.name
-        namespace = local.endpoints.kubernetes_mcp.namespace
-        policies = [
-          {
-            Effect = "Allow"
-            Action = [
-              "s3:GetObject",
-              "s3:PutObject",
-              "s3:ListBucket",
-              "s3:DeleteObject",
-              "s3:AbortMultipartUpload",
-            ]
-            buckets = [
-              "kubernetes-mcp",
-            ]
-          },
-        ]
-      }
-
     } :
 
     key => merge(params, {

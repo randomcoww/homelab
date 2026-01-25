@@ -11,8 +11,7 @@ variable "release" {
 }
 
 variable "replicas" {
-  type    = number
-  default = 1
+  type = number
 }
 
 variable "affinity" {
@@ -22,9 +21,8 @@ variable "affinity" {
 
 variable "images" {
   type = object({
-    kubernetes_mcp  = string
-    mcp_oauth_proxy = string
-    litestream      = string
+    kubernetes_mcp = string
+    mcp_proxy      = string
   })
 }
 
@@ -40,19 +38,6 @@ variable "nginx_ingress_annotations" {
   type = map(string)
 }
 
-variable "extra_oauth_configs" {
-  type    = map(string)
-  default = {}
-}
-
-variable "minio_endpoint" {
-  type = string
-}
-
-variable "minio_bucket" {
-  type = string
-}
-
-variable "minio_access_secret" {
+variable "auth_token" {
   type = string
 }
