@@ -118,22 +118,9 @@ module "arc-workflow-secret" {
                 }
               },
             ]
-            volumeMounts = [
-              {
-                name      = "ca-trust-bundle"
-                mountPath = "/etc/ssl/certs/ca-certificates.crt"
-                readOnly  = true
-              },
-            ]
-          },
-        ]
-        volumes = [
-          {
-            name = "ca-trust-bundle"
-            hostPath = {
-              path = "/etc/ssl/certs/ca-certificates.crt"
-              type = "File"
-            }
+            # ** Don't mount volumes to this container **
+            # Volumes can interfere with container build process if the same resource is being used in the build
+            # volumeMounts = []
           },
         ]
       }
