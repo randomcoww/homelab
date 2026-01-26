@@ -17,6 +17,7 @@ locals {
     local.endpoints.authelia.ingress,
     local.endpoints.kavita.ingress,
     local.endpoints.navidrome.ingress,
+    local.endpoints.open_webui.ingress,
   ]
 }
 
