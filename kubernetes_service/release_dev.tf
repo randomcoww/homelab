@@ -11,8 +11,9 @@ module "llama-cpp" {
   namespace = local.endpoints.llama_cpp.namespace
   release   = "0.1.0"
   images = {
-    llama_cpp  = local.container_images.llama_cpp
-    mountpoint = local.container_images.mountpoint
+    llama_cpp  = local.container_images.llama_cpp_vulkan
+    llama_swap = local.container_images.llama_swap
+    rclone     = local.container_images.rclone
   }
   ingress_hostname = local.endpoints.llama_cpp.ingress
   llama_swap_config = {
@@ -103,6 +104,7 @@ module "llama-cpp" {
       }
     }
   }
+  storage_class_name  = "local-path"
   minio_endpoint      = "https://${local.services.cluster_minio.ip}:${local.service_ports.minio}"
   minio_data_bucket   = "models"
   minio_access_secret = local.minio_users.llama_cpp.secret

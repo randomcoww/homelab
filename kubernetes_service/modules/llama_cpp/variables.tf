@@ -23,7 +23,8 @@ variable "affinity" {
 variable "images" {
   type = object({
     llama_cpp  = string
-    mountpoint = string
+    llama_swap = string
+    rclone     = string
   })
 }
 
@@ -57,4 +58,8 @@ variable "ingress_class_name" {
 
 variable "nginx_ingress_annotations" {
   type = map(string)
+}
+
+variable "storage_class_name" {
+  type = string
 }

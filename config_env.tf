@@ -130,7 +130,9 @@ locals {
     hostapd          = "reg.cluster.internal/randomcoww/hostapd-noscan:v20251229.230418@sha256:7739c3f446e5ae326e82eedfdcd418e1e533c0e9a770b9520507866e89745147"
     tailscale        = "ghcr.io/tailscale/tailscale:v1.92.5@sha256:4a0aaacee6f28e724c1f80c986e5776c9c979d8f7e19274c2cae2d495cc8d625"
     qrcode_generator = "reg.cluster.internal/randomcoww/qrcode-resource:v20251229.141928@sha256:e3ac16365490e8e1fefc224d1ec59445a6de852d567a2401dbab8a5516115d14"
-    llama_cpp        = "ghcr.io/mostlygeek/llama-swap:vulkan-non-root@sha256:7b17c12983bc4efac0a70f3c82073e686fa86b5e19aada7afa092c072bfb8920"
+    llama_cpp_vulkan = "ghcr.io/ggml-org/llama.cpp:server-vulkan@sha256:bf0072d63a69aa2ce78bfadcf759e8de939584dd4a5956a465a6f77fbf67e633"
+    llama_cpp_rocm   = "reg.cluster.internal/randomcoww/llama-cpp-rocm:b7836-7.2@sha256:f9f26f923a93536ae467deaad3754e184536103125950a1a20bcd821464625a9"
+    llama_swap       = "reg.cluster.internal/randomcoww/llama-swap:v186@sha256:5cd600a95a9a63207047594c884ad45b481ee0d33db624597280cdc7f89815ca"
     sunshine_desktop = "reg.cluster.internal/randomcoww/sunshine-desktop:v2026.123.3809@sha256:ab605b1fe0ef9e886c369dec7c1217a2d42fbb5fd0c3c06f37c6b73603eb7690"
     litestream       = "docker.io/litestream/litestream:0.5.6@sha256:871d0c5f28b52b0a0a29614728d6e9e5cbdaaab36d8af177010de2c63d9da9a5"
     valkey           = "ghcr.io/valkey-io/valkey:9.0.1-alpine@sha256:c106a0c03bcb23cbdf9febe693114cb7800646b11ca8b303aee7409de005faa8"
@@ -145,6 +147,7 @@ locals {
     mcp_proxy        = "ghcr.io/tbxark/mcp-proxy:v0.43.2@sha256:70c0e02d39c4c0898e610b3a30954f7930628fa6f4fb447bad14c32382a25879"
     prometheus_mcp   = "ghcr.io/pab1it0/prometheus-mcp-server:1.5.3@sha256:32d47c88845ee78bc343d4c3a39a24b1bd9bebce4f53becdbbf5704221185925"
     kubernetes_mcp   = "reg.cluster.internal/randomcoww/kubernetes-mcp-server:main@sha256:80e9d1124f55fb0ba1117da68cac65ff3ad3d070fda072a869d8d764f5d25374"
+    rclone           = "ghcr.io/rclone/rclone:1.72.1@sha256:21c136749a6594cbfb30c3229b42bb95092997b9e93563d59a9ac953d9464366"
   }
 
   host_images = {

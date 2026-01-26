@@ -1,7 +1,8 @@
 locals {
-  llama_cpp_port = 8080
-  model_path     = "/llama-cpp/models"
-  config_file    = "/var/lib/llama-cpp/config.yaml"
+  llama_cpp_port  = 8080
+  models_path     = "/llama-cpp/models"
+  llama_swap_path = "/llama-swap"
+  config_file     = "/var/lib/llama-cpp/config.yaml"
 }
 
 module "metadata" {
@@ -67,33 +68,36 @@ module "ingress" {
   ]
 }
 
-module "mountpoint-s3-overlay" {
-  source = "../mountpoint_s3_overlay"
+module "statefulset" {
+  source = "../../../modules/statefulset"
 
-  name        = var.name
-  app         = var.name
-  release     = var.release
-  mount_path  = local.model_path
-  s3_endpoint = var.minio_endpoint
-  s3_bucket   = var.minio_data_bucket
-  s3_prefix   = ""
-  s3_mount_extra_args = [
-    "--read-only",
-    # "--cache /var/cache", # cache to disk
-    "--cache /var/tmp",      # cache to memory
-    "--max-cache-size 1024", # 1Gi
-  ]
-  mountpoint_resources = {
-    requests = {
-      memory = "2Gi"
-    }
-    limits = {
-      memory = "4Gi"
-    }
+  name     = var.name
+  app      = var.name
+  release  = var.release
+  affinity = var.affinity
+  replicas = 1
+  annotations = {
+    "checksum/secret" = sha256(module.secret.manifest)
   }
-  s3_access_secret = var.minio_access_secret
-  images = {
-    mountpoint = var.images.mountpoint
+  spec = {
+    volumeClaimTemplates = [
+      {
+        metadata = {
+          name = "models"
+        }
+        spec = {
+          accessModes = [
+            "ReadWriteOnce",
+          ]
+          storageClassName = var.storage_class_name
+          resources = {
+            requests = {
+              storage = "120Gi"
+            }
+          }
+        }
+      },
+    ]
   }
   template_spec = {
     resources = {
@@ -104,11 +108,75 @@ module "mountpoint-s3-overlay" {
         memory = "16Gi"
       }
     }
+    initContainers = [
+      {
+        name  = "${var.name}-rclone"
+        image = var.images.rclone
+        args = [
+          "sync",
+          "-v",
+          ":s3:${var.minio_data_bucket}/",
+          "${local.models_path}/",
+        ]
+        env = [
+          {
+            name  = "RCLONE_S3_ENDPOINT"
+            value = var.minio_endpoint
+          },
+          {
+            name = "AWS_ACCESS_KEY_ID"
+            valueFrom = {
+              secretKeyRef = {
+                name = var.minio_access_secret
+                key  = "AWS_ACCESS_KEY_ID"
+              }
+            }
+          },
+          {
+            name = "AWS_SECRET_ACCESS_KEY"
+            valueFrom = {
+              secretKeyRef = {
+                name = var.minio_access_secret
+                key  = "AWS_SECRET_ACCESS_KEY"
+              }
+            }
+          },
+        ]
+        volumeMounts = [
+          {
+            name      = "models"
+            mountPath = local.models_path
+          },
+          {
+            name      = "ca-trust-bundle"
+            mountPath = "/etc/ssl/certs/ca-certificates.crt"
+            readOnly  = true
+          },
+        ]
+      },
+      {
+        name  = "${var.name}-llama-swap"
+        image = var.images.llama_swap
+        command = [
+          "cp",
+          "-r",
+          "/app",
+          "${local.llama_swap_path}/",
+        ]
+        volumeMounts = [
+          {
+            name      = "llama-swap"
+            mountPath = local.llama_swap_path
+          },
+        ]
+      },
+    ]
     containers = [
       {
         name  = var.name
         image = var.images.llama_cpp
-        args = [
+        command = [
+          "${local.llama_swap_path}/app/llama-swap",
           "--config",
           "${local.config_file}",
           "--listen",
@@ -119,6 +187,14 @@ module "mountpoint-s3-overlay" {
             name      = "config"
             mountPath = local.config_file
             subPath   = basename(local.config_file)
+          },
+          {
+            name      = "llama-swap"
+            mountPath = local.llama_swap_path
+          },
+          {
+            name      = "models"
+            mountPath = local.models_path
           },
         ]
         env = [
@@ -164,21 +240,24 @@ module "mountpoint-s3-overlay" {
           secretName = module.secret.name
         }
       },
+      {
+        name = "llama-swap"
+        emptyDir = {
+          medium = "Memory"
+        }
+        # TODO: use image volume when stable
+        # image = {
+        #   reference  = var.images.llama_swap
+        #   pullPolicy = "IfNotPresent"
+        # }
+      },
+      {
+        name = "ca-trust-bundle"
+        hostPath = {
+          path = "/etc/ssl/certs/ca-certificates.crt"
+          type = "File"
+        }
+      },
     ]
   }
-}
-
-# Mounting S3 path seems to be faster for model loading than using --model-url
-module "statefulset" {
-  source = "../../../modules/statefulset"
-
-  name     = var.name
-  app      = var.name
-  release  = var.release
-  affinity = var.affinity
-  replicas = 1
-  annotations = {
-    "checksum/secret" = sha256(module.secret.manifest)
-  }
-  template_spec = module.mountpoint-s3-overlay.template_spec
 }
