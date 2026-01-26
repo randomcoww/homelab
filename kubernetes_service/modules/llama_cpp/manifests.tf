@@ -24,7 +24,7 @@ module "secret" {
   app     = var.name
   release = var.release
   data = merge({
-    "config.yaml" = yamlencode(var.llama_swap_config)
+    basename(local.config_file) = yamlencode(var.llama_swap_config)
   })
 }
 
@@ -118,7 +118,7 @@ module "mountpoint-s3-overlay" {
           {
             name      = "config"
             mountPath = local.config_file
-            subPath   = "config.yaml"
+            subPath   = basename(local.config_file)
           },
         ]
         env = [

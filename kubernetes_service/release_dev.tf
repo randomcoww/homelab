@@ -1,5 +1,10 @@
 # llama-cpp
 
+resource "random_password" "llama-cpp-auth-token" {
+  length           = 32
+  override_special = "-_"
+}
+
 module "llama-cpp" {
   source    = "./modules/llama_cpp"
   name      = local.endpoints.llama_cpp.name
@@ -18,6 +23,7 @@ module "llama-cpp" {
       "gpt-oss-120b-mxfp4" = {
         cmd = <<-EOF
         /app/llama-server \
+          --api-key ${random_password.llama-cpp-auth-token.result} \
           --port $${PORT} \
           --model /llama-cpp/models/gpt-oss-120b-mxfp4-00001-of-00003.gguf \
           --ctx-size 0 \
@@ -32,6 +38,7 @@ module "llama-cpp" {
       "Qwen3-Embedding-0.6B-Q8_0" = {
         cmd = <<-EOF
         /app/llama-server \
+          --api-key ${random_password.llama-cpp-auth-token.result} \
           --port $${PORT} \
           --model /llama-cpp/models/Qwen3-Embedding-0.6B-Q8_0.gguf \
           --ctx-size 0 \
@@ -45,6 +52,7 @@ module "llama-cpp" {
       "jina-reranker-v3-Q8_0" = {
         cmd = <<-EOF
         /app/llama-server \
+          --api-key ${random_password.llama-cpp-auth-token.result} \
           --port $${PORT} \
           --model /llama-cpp/models/jina-reranker-v3-Q8_0.gguf \
           --ctx-size 0 \
@@ -211,6 +219,7 @@ module "open-webui" {
     ENABLE_VERSION_UPDATE_CHECK    = false
     ENABLE_OPENAI_API              = true
     OPENAI_API_BASE_URL            = "https://${local.endpoints.llama_cpp.ingress}/v1"
+    OPENAI_API_KEY                 = random_password.llama-cpp-auth-token.result
     DEFAULT_MODELS                 = "gpt-oss-120b-mxfp4"
     ENABLE_WEB_SEARCH              = true
     WEB_SEARCH_ENGINE              = "searxng"
@@ -229,10 +238,12 @@ module "open-webui" {
     RAG_TOP_K                      = 5
     RAG_EMBEDDING_ENGINE           = "openai"
     RAG_OPENAI_API_BASE_URL        = "https://${local.endpoints.llama_cpp.ingress}/v1"
+    RAG_OPENAI_API_KEY             = random_password.llama-cpp-auth-token.result
     RAG_EMBEDDING_MODEL            = "Qwen3-Embedding-0.6B-Q8_0"
     RAG_TOP_K_RERANKER             = 5
     RAG_RERANKING_ENGINE           = "external"
     RAG_EXTERNAL_RERANKER_URL      = "https://${local.endpoints.llama_cpp.ingress}/v1/rerank"
+    RAG_EXTERNAL_RERANKER_API_KEY  = random_password.llama-cpp-auth-token.result
     RAG_RERANKING_MODEL            = "jina-reranker-v3-Q8_0"
     # https://github.com/varunvasudeva1/llm-server-docs?tab=readme-ov-file#mcp-proxy-server
     # https://github.com/open-webui/docs/issues/609
