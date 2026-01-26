@@ -116,22 +116,22 @@ locals {
     flannel_cni_plugin = "ghcr.io/flannel-io/flannel-cni-plugin:latest@sha256:c6a08fe5bcb23b19c2fc7c1e47b95a967cc924224ebedf94e8623f27b6c258fa"
     kube_vip           = "ghcr.io/kube-vip/kube-vip:v1.0.3@sha256:4e2791cc0238ae01b3986d827f4d568a25d846c94bab51238fe6241281a27113"
     external_dns       = "registry.k8s.io/external-dns/external-dns:v0.20.0@sha256:ddc7f4212ed09a21024deb1f470a05240837712e74e4b9f6d1f2632ff10672e7"
-    minio              = "ghcr.io/randomcoww/minio:v20251015.172955@sha256:2e53a52a621b158089331912855c332a89a57ad96bf010361ef2e71a0a5f50cd"
-    nginx              = "docker.io/nginxinc/nginx-unprivileged:1.29.3-alpine@sha256:062042031264627f065dbe8e16a2b54ec9a12757843c2d956e65623e650a1142"
+    minio              = "ghcr.io/randomcoww/minio:v20251015.172955@sha256:64b4d211aab00ea02c6b8ffa37d9a4f65b9df62b7edd3b53c68b1227b0d9ddb9"
+    nginx              = "docker.io/nginxinc/nginx-unprivileged:1.29.3-alpine@sha256:5aea7cc516b419e3526f47dd1531be31a56a046cfe44754d94f9383e13e2ee99"
     # tier 2
-    kea                   = "ghcr.io/randomcoww/kea:v3.1.4@sha256:f380a5ca82a734686abef60d4aa583a9374d7e985dd4aca4e77b1bde692a1780"
-    stork_agent           = "ghcr.io/randomcoww/stork-agent:v2.3.2@sha256:3fd0b7caf76b3d4001531d91341d4e980819da331a94eff9bf320547884d56d2"
+    kea                   = "ghcr.io/randomcoww/kea:v3.1.4@sha256:0e046ad43c0c757bf4ec647007b0a07b26c7864a5785dcf457e591867a2c9bc1"
+    stork_agent           = "ghcr.io/randomcoww/stork-agent:v2.3.2@sha256:a266e8cced9f44cc8611baa1d1ff5b58d9058f3018af7c3915d9dc5c10be4bcf"
     ipxe                  = "ghcr.io/randomcoww/ipxe:v20251229.142018@sha256:aa94d7236b073207f427a6f6678cbb66d4bedc4e1581429792478e45ce5b51ab"
     registry              = "ghcr.io/distribution/distribution:3.0.0@sha256:4ba3adf47f5c866e9a29288c758c5328ef03396cb8f5f6454463655fa8bc83e2"
     device_plugin         = "ghcr.io/squat/generic-device-plugin:latest@sha256:8e74085edef446b02116d0e851a7a5576b4681e07fe5be75c4e5f6791a8ad0f7"
     github_actions_runner = "ghcr.io/actions/actions-runner:2.331.0@sha256:dced476aa42703ebd9aafc295ce52f160989c4528e831fc3be2aef83a1b3f6da"
     # tier 3
-    mountpoint       = "reg.cluster.internal/randomcoww/mountpoint-s3:v1.21.0@sha256:3469956d5b1fb9af06f8d9c32c4a348557e910c7664f7ab3cf69f31fdac64044"
+    mountpoint       = "reg.cluster.internal/randomcoww/mountpoint-s3:v1.22.0@sha256:dfd7481a7da1b86a1acc8bee579984fa0c03dabe3598a67a8d5ca12bd7af5095"
     hostapd          = "reg.cluster.internal/randomcoww/hostapd-noscan:v20251229.230418@sha256:7739c3f446e5ae326e82eedfdcd418e1e533c0e9a770b9520507866e89745147"
     tailscale        = "ghcr.io/tailscale/tailscale:v1.92.5@sha256:4a0aaacee6f28e724c1f80c986e5776c9c979d8f7e19274c2cae2d495cc8d625"
     qrcode_generator = "reg.cluster.internal/randomcoww/qrcode-resource:v20251229.141928@sha256:e3ac16365490e8e1fefc224d1ec59445a6de852d567a2401dbab8a5516115d14"
-    llama_cpp        = "ghcr.io/mostlygeek/llama-swap:vulkan-non-root@sha256:acc872cb8b2a6a0c9b9a2a3daaea760ba6e76c86f6913689a91e1af4086dfbaa"
-    sunshine_desktop = "reg.cluster.internal/randomcoww/sunshine-desktop:v2026.118.33530@sha256:e9dda1eea03713ca5a5bf0aeb342069ac559b58ff0547df753af56c538cdb663"
+    llama_cpp        = "ghcr.io/mostlygeek/llama-swap:vulkan-non-root@sha256:7b17c12983bc4efac0a70f3c82073e686fa86b5e19aada7afa092c072bfb8920"
+    sunshine_desktop = "reg.cluster.internal/randomcoww/sunshine-desktop:v2026.123.3809@sha256:ab605b1fe0ef9e886c369dec7c1217a2d42fbb5fd0c3c06f37c6b73603eb7690"
     litestream       = "docker.io/litestream/litestream:0.5.6@sha256:871d0c5f28b52b0a0a29614728d6e9e5cbdaaab36d8af177010de2c63d9da9a5"
     valkey           = "ghcr.io/valkey-io/valkey:9.0.1-alpine@sha256:c106a0c03bcb23cbdf9febe693114cb7800646b11ca8b303aee7409de005faa8"
     searxng          = "ghcr.io/searxng/searxng:latest@sha256:d6c00e1d34c199a7ca141f7a6b0b9ddb850d931ff06d4cd0ffb53ef02c05b666"
@@ -144,7 +144,7 @@ locals {
     playwright       = "reg.cluster.internal/randomcoww/patchright-server:v1.57.0@sha256:6fca26aa3e7b0bff0be945c11d8111b80fe02e9b639e49f610774e4907f76006"
     mcp_proxy        = "ghcr.io/tbxark/mcp-proxy:v0.43.2@sha256:70c0e02d39c4c0898e610b3a30954f7930628fa6f4fb447bad14c32382a25879"
     prometheus_mcp   = "ghcr.io/pab1it0/prometheus-mcp-server:1.5.3@sha256:32d47c88845ee78bc343d4c3a39a24b1bd9bebce4f53becdbbf5704221185925"
-    kubernetes_mcp   = "reg.cluster.internal/randomcoww/kubernetes-mcp-server:main@sha256:440a0ede9dcb0a1ebe90aab4f73e8bad037a44a94c42a4d97c616b6b15ce5436"
+    kubernetes_mcp   = "reg.cluster.internal/randomcoww/kubernetes-mcp-server:main@sha256:80e9d1124f55fb0ba1117da68cac65ff3ad3d070fda072a869d8d764f5d25374"
   }
 
   host_images = {
