@@ -5,8 +5,10 @@ locals {
     boot = {
       acl = "public-read"
     }
+    models    = {
+      acl = "public-read"
+    }
     ebooks    = {}
-    models    = {}
     documents = {}
     pictures  = {}
     music     = {}
