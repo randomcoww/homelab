@@ -174,7 +174,7 @@ module "prometheus-mcp" {
   name      = local.endpoints.prometheus_mcp.name
   namespace = local.endpoints.prometheus_mcp.namespace
   release   = "0.1.0"
-  replicas  = 2
+  replicas  = 1
   images = {
     prometheus_mcp = local.container_images.prometheus_mcp
     mcp_proxy      = local.container_images.mcp_proxy
@@ -199,7 +199,7 @@ module "kubernetes-mcp" {
   name      = local.endpoints.kubernetes_mcp.name
   namespace = local.endpoints.kubernetes_mcp.namespace
   release   = "0.1.0"
-  replicas  = 2
+  replicas  = 1
   images = {
     kubernetes_mcp = local.container_images.kubernetes_mcp
     mcp_proxy      = local.container_images.mcp_proxy

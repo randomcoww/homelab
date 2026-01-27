@@ -27,24 +27,6 @@ module "metadata" {
         }
       }
     })
-    "templates/clusterrole.yaml" = yamlencode({
-      apiVersion = "rbac.authorization.k8s.io/v1"
-      kind       = "ClusterRole"
-      metadata = {
-        name = var.name
-        labels = {
-          app     = var.name
-          release = var.release
-        }
-      }
-      rules = [
-        {
-          apiGroups = ["*"]
-          resources = ["*"]
-          verbs     = ["list", "watch", "get"]
-        },
-      ]
-    })
     "templates/clusterrolebinding.yaml" = yamlencode({
       apiVersion = "rbac.authorization.k8s.io/v1"
       kind       = "ClusterRoleBinding"
@@ -58,7 +40,7 @@ module "metadata" {
       roleRef = {
         apiGroup = "rbac.authorization.k8s.io"
         kind     = "ClusterRole"
-        name     = var.name
+        name     = "view"
       }
       subjects = [
         {
@@ -165,18 +147,14 @@ module "deployment" {
       {
         name  = var.name
         image = var.images.kubernetes_mcp
-        ports = [
-          {
-            containerPort = local.mcp_port
-          },
-        ]
         args = [
           "--port",
           tostring(local.mcp_port),
           "--disable-multi-cluster",
           "--disable-destructive",
-          "--sse-base-url",
-          "https://${var.ingress_hostname}",
+          "--stateless",
+          "--cluster-provider",
+          "in-cluster",
         ]
         # TODO: add health checks
       },

@@ -146,7 +146,7 @@ locals {
     playwright       = "reg.cluster.internal/randomcoww/patchright-server:v1.57.0@sha256:6fca26aa3e7b0bff0be945c11d8111b80fe02e9b639e49f610774e4907f76006"
     mcp_proxy        = "ghcr.io/tbxark/mcp-proxy:v0.43.2@sha256:70c0e02d39c4c0898e610b3a30954f7930628fa6f4fb447bad14c32382a25879"
     prometheus_mcp   = "ghcr.io/pab1it0/prometheus-mcp-server:1.5.3@sha256:32d47c88845ee78bc343d4c3a39a24b1bd9bebce4f53becdbbf5704221185925"
-    kubernetes_mcp   = "reg.cluster.internal/randomcoww/kubernetes-mcp-server:main@sha256:80e9d1124f55fb0ba1117da68cac65ff3ad3d070fda072a869d8d764f5d25374"
+    kubernetes_mcp   = "reg.cluster.internal/randomcoww/kubernetes-mcp-server:main@sha256:b6230faabb3251f7b0ef1e31dbefc383c5296a6d905af9e02f131fba321d277f"
     rclone           = "ghcr.io/rclone/rclone:1.72.1@sha256:21c136749a6594cbfb30c3229b42bb95092997b9e93563d59a9ac953d9464366"
   }
 
@@ -315,7 +315,7 @@ locals {
       }
       kubernetes_mcp = {
         name      = "kubernetes-mcp"
-        namespace = "kube-system"
+        namespace = "monitoring"
         ingress   = "kubernetes-mcp.${local.domains.kubernetes}"
       }
       prometheus_mcp = {

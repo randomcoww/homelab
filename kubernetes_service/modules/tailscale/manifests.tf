@@ -12,6 +12,10 @@ module "metadata" {
       kind       = "Role"
       metadata = {
         name = var.name
+        labels = {
+          app     = var.name
+          release = var.release
+        }
       }
       rules = [
         {
@@ -35,6 +39,10 @@ module "metadata" {
       kind       = "RoleBinding"
       metadata = {
         name = var.name
+        labels = {
+          app     = var.name
+          release = var.release
+        }
       }
       roleRef = {
         apiGroup = "rbac.authorization.k8s.io"
@@ -53,6 +61,10 @@ module "metadata" {
       kind       = "ServiceAccount"
       metadata = {
         name = var.name
+        labels = {
+          app     = var.name
+          release = var.release
+        }
       }
     })
   }

@@ -28,6 +28,7 @@ locals {
     "rd.driver.blacklist=nouveau,nova_core",
     "modprobe.blacklist=nouveau,nova_core",
     "selinux=0",
+    "amd_iommu=off", # memory performance for LLM
 ], boot.boot_args)))}
     initrd https://${local.minio_endpoint}/boot/${boot.initrd}
     boot

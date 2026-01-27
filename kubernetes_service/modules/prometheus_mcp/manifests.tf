@@ -111,11 +111,6 @@ module "deployment" {
       {
         name  = var.name
         image = var.images.prometheus_mcp
-        ports = [
-          {
-            containerPort = local.mcp_port
-          },
-        ]
         env = [
           {
             name  = "SSL_CERT_FILE"
