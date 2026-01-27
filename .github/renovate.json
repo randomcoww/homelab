@@ -32,6 +32,19 @@
   ],
   "packageRules": [
     {
+      "matchPackageNames": [
+        "randomcoww/minio",
+        "randomcoww/ipxe",
+        "randomcoww/hostapd-noscan",
+        "randomcoww/qrcode-resource",
+        "ggml-org/llama.cpp",
+        "randomcoww/llama-swap",
+        "randomcoww/sunshine-desktop",
+        "cloudflare/cloudflared"
+      ],
+      "versioning": "^(?<compatibility>[^\\d]+)?(?<minor>\\d+)(\\.(?<patch>\\d+)(\\.(?<build>\\d+))?)?$"
+    },
+    {
       "matchUpdateTypes": [
         "minor",
         "patch",
