@@ -189,30 +189,6 @@ module "prometheus-mcp" {
   })
 }
 
-resource "random_password" "kubernetes-mcp-auth-token" {
-  length           = 32
-  override_special = "-_"
-}
-
-module "kubernetes-mcp" {
-  source    = "./modules/kubernetes_mcp"
-  name      = local.endpoints.kubernetes_mcp.name
-  namespace = local.endpoints.kubernetes_mcp.namespace
-  release   = "0.1.0"
-  replicas  = 1
-  images = {
-    kubernetes_mcp = local.container_images.kubernetes_mcp
-    mcp_proxy      = local.container_images.mcp_proxy
-  }
-  auth_token = random_password.kubernetes-mcp-auth-token.result
-
-  ingress_hostname   = local.endpoints.kubernetes_mcp.ingress
-  ingress_class_name = local.endpoints.ingress_nginx_internal.name
-  nginx_ingress_annotations = merge(local.nginx_ingress_annotations_common, {
-    "cert-manager.io/cluster-issuer" = local.kubernetes.cert_issuers.ca_internal
-  })
-}
-
 # Open WebUI
 
 module "open-webui" {
@@ -277,42 +253,6 @@ module "open-webui" {
           id          = "prometheus-metrics"
           name        = "prometheus-metrics"
           description = "Query service and node metrics and trends"
-        }
-      },
-      {
-        type      = "mcp"
-        url       = "https://${local.endpoints.kubernetes_mcp.ingress}/kubernetes-mcp/mcp"
-        auth_type = "bearer"
-        config = {
-          enable                    = true
-          function_name_filter_list = ""
-        }
-        spec_type = "url"
-        spec      = ""
-        path      = ""
-        key       = random_password.kubernetes-mcp-auth-token.result
-        info = {
-          id          = "kubernetes"
-          name        = "kubernetes"
-          description = "Query Kubernetes resources and logs"
-        }
-      },
-      {
-        type      = "mcp"
-        url       = "https://api.githubcopilot.com/mcp"
-        auth_type = "bearer"
-        config = {
-          enable                    = true
-          function_name_filter_list = ""
-        }
-        spec_type = "url"
-        spec      = ""
-        path      = ""
-        key       = var.github.token
-        info = {
-          id          = "github"
-          name        = "github"
-          description = "Query GitHub resources"
         }
       },
     ])
