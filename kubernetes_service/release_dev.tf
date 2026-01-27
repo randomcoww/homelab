@@ -11,7 +11,7 @@ module "llama-cpp" {
   namespace = local.endpoints.llama_cpp.namespace
   release   = "0.1.0"
   images = {
-    llama_cpp  = local.container_images.llama_cpp_rocm
+    llama_cpp  = local.container_images.llama_cpp_vulkan
     llama_swap = local.container_images.llama_swap
     rclone     = local.container_images.rclone
   }
@@ -94,6 +94,10 @@ module "llama-cpp" {
     {
       name  = "ROCBLAS_USE_HIPBLASLT"
       value = 1
+    },
+    {
+      name  = "RADV_PERFTEST"
+      value = "sam"
     },
   ]
   affinity = {
