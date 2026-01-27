@@ -30,12 +30,13 @@ module "llama-cpp" {
           --port $${PORT} \
           --model /llama-cpp/models/gpt-oss-120b-mxfp4-00001-of-00003.gguf \
           --ctx-size 0 \
-          --ubatch-size 2048 \
-          --batch-size 2048 \
+          --ubatch-size 4096 \
+          --batch-size 4096 \
           --jinja \
-          --temp 1.0 \
-          --top_p 1.0 \
-          --top_k 0
+          --temp 1 \
+          --top_k 0 \
+          --top_p 1 \
+          --min-p 0
         EOF
       }
       "Qwen3-Embedding-0.6B-Q8_0" = {
@@ -225,7 +226,7 @@ module "open-webui" {
     ENABLE_RAG_HYBRID_SEARCH       = true
     RAG_TOP_K                      = 5
     RAG_EMBEDDING_ENGINE           = "openai"
-    RAG_OPENAI_API_BASE_URL        = "https://${local.endpoints.llama_cpp.ingress}/v1"
+    RAG_OPENAI_API_BASE_URL        = "https://${local.endpoints.llama_cpp.ingress}/v1/embeddings"
     RAG_OPENAI_API_KEY             = random_password.llama-cpp-auth-token.result
     RAG_EMBEDDING_MODEL            = "Qwen3-Embedding-0.6B-Q8_0"
     RAG_TOP_K_RERANKER             = 5
