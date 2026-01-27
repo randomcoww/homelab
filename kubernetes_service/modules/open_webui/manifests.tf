@@ -1,7 +1,5 @@
 locals {
-  db_file                = "/data/db.sqlite3"
-  playwright_port        = 3000
-  playwright_server_file = "/app/server.js"
+  db_file = "/data/db.sqlite3"
   extra_configs = merge(var.extra_configs, {
     PORT                               = 8080
     REQUESTS_CA_BUNDLE                 = "/etc/ssl/certs/ca-certificates.crt"
@@ -14,8 +12,7 @@ locals {
     S3_BUCKET_NAME                     = var.minio_bucket
     S3_ENDPOINT_URL                    = var.minio_endpoint
     WEBUI_SECRET_KEY                   = random_password.webui-secret-key.result
-    WEB_LOADER_ENGINE                  = "safe_web" # leave this default
-    PLAYWRIGHT_WS_URL                  = "ws://127.0.0.1:${local.playwright_port}"
+    WEB_LOADER_ENGINE                  = "safe_web"
     OAUTH_CLIENT_INFO_ENCRYPTION_KEY   = random_password.client-info-encryption-key.result
     OAUTH_SESSION_TOKEN_ENCRYPTION_KEY = random_password.session-token-encryption-key.result
   })
@@ -58,66 +55,10 @@ module "secret" {
   name    = var.name
   app     = var.name
   release = var.release
-  data = merge({
+  data = {
     for k, v in local.extra_configs :
     tostring(k) => tostring(v)
-    }, {
-    basename(local.playwright_server_file) = <<-EOF
-    const patchright = require('patchright');
-
-    (async () => {
-      try {
-        const browserServer = await patchright.chromium.launchServer({
-          headless: true,
-          host: "0.0.0.0",
-          port: ${local.playwright_port},
-          executablePath: undefined,
-          wsPath: '/',
-          args: [
-            '--no-sandbox',
-            '--disable-setuid-sandbox',
-            '--disable-dev-shm-usage',
-            '--disable-accelerated-2d-canvas',
-            '--disable-gpu',
-            '--window-size=1920,1080',
-            '--start-maximized',
-            '--disable-infobars',
-            '--disable-breakpad',
-            '--disable-client-side-phishing-detection',
-            '--disable-component-extensions-with-background-pages',
-            '--disable-default-apps',
-            '--disable-extensions',
-            '--disable-features=Translate',
-            '--disable-popup-blocking',
-            '--disable-sync',
-            '--hide-scrollbars',
-            '--mute-audio',
-          ],
-          ignoreDefaultArgs: ['--enable-automation'],
-          viewport: null,
-          bypassCSP: true,
-          logger: {
-            isEnabled: () => false,
-          },
-        });
-
-        console.log('Patchright started');
-        console.log('WS Endpoint:', browserServer.wsEndpoint());
-        const shutdown = async (signal) => {
-          console.log(`Received $${signal}. Closing browser server...`);
-          await browserServer.close();
-          process.exit(0);
-        };
-        process.on('SIGINT', () => shutdown('SIGINT'));
-        process.on('SIGTERM', () => shutdown('SIGTERM'));
-
-      } catch (error) {
-        console.error('Failed to launch Patchright server:', error);
-        process.exit(1);
-      }
-    })();
-    EOF
-  })
+  }
 }
 
 module "service" {
@@ -196,53 +137,6 @@ module "litestream-overlay" {
         memory = "4Gi"
       }
     }
-    initContainers = [
-      {
-        name          = "${var.name}-playwright"
-        image         = var.images.playwright
-        restartPolicy = "Always" # sidecar mode
-        command = [
-          "npx",
-          "-y",
-          "node",
-          local.playwright_server_file,
-        ]
-        ports = [
-          {
-            containerPort = local.playwright_port
-          },
-        ]
-        volumeMounts = [
-          {
-            name      = "config"
-            mountPath = local.playwright_server_file
-            subPath   = basename(local.playwright_server_file)
-          },
-          {
-            name      = "dev-shm"
-            mountPath = "/dev/shm"
-          },
-        ]
-        readinessProbe = {
-          httpGet = {
-            port = local.playwright_port
-            path = "/status"
-          }
-        }
-        livenessProbe = {
-          httpGet = {
-            port = local.playwright_port
-            path = "/status"
-          }
-        }
-        startupProbe = {
-          httpGet = {
-            port = local.playwright_port
-            path = "/status"
-          }
-        }
-      },
-    ]
     containers = [
       {
         name  = var.name
