@@ -33,10 +33,10 @@ module "llama-cpp" {
           --ubatch-size 4096 \
           --batch-size 4096 \
           --jinja \
-          --temp 1 \
-          --top_k 0 \
-          --top_p 1 \
-          --min-p 0
+          --temp 1.0 \
+          --top_k 100 \
+          --top_p 1.0 \
+          --min-p 0.0
         EOF
       }
       "Qwen3-Embedding-0.6B-Q8_0" = {
