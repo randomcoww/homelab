@@ -47,11 +47,10 @@ module "llama-cpp" {
           --port $${PORT} \
           --model /llama-cpp/models/Qwen3-Embedding-0.6B-Q8_0.gguf \
           --ctx-size 0 \
+          --ubatch-size 2048 \
+          --batch-size 2048 \
           --embedding \
-          --pooling last \
-          --ubatch-size 8192 \
-          --batch-size 8192 \
-          --log-disable
+          --pooling last
         EOF
       }
       "jina-reranker-v3-Q8_0" = {
@@ -63,11 +62,10 @@ module "llama-cpp" {
           --port $${PORT} \
           --model /llama-cpp/models/jina-reranker-v3-Q8_0.gguf \
           --ctx-size 0 \
+          --ubatch-size 2048 \
+          --batch-size 2048 \
           --embedding \
-          --reranking \
-          --ubatch-size 8192 \
-          --batch-size 8192 \
-          --log-disable
+          --reranking
         EOF
       }
     }
@@ -91,6 +89,12 @@ module "llama-cpp" {
       }
     }
   }
+  extra_envs = [
+    {
+      name  = "ROCBLAS_USE_HIPBLASLT"
+      value = 1
+    },
+  ]
   affinity = {
     nodeAffinity = {
       requiredDuringSchedulingIgnoredDuringExecution = {
