@@ -333,7 +333,10 @@ locals {
         }
       }
       boot_args = [
-        "pcie_aspm=off", # TODO: remove if this gets fixed - workaround for r8169 transmit queue timed out issue
+        "pcie_aspm=off",               # TODO: remove if this gets fixed - workaround for r8169 transmit queue timed out issue
+        "ttm.pages_limit=31457280",    # 120G https://community.frame.work/t/igpu-vram-how-much-can-be-assigned/73081
+        "ttm.page_pool_size=24576000", # 96G preallocated
+        "amd_iommu=off",
       ]
     }
   }

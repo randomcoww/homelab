@@ -11,19 +11,21 @@ module "llama-cpp" {
   namespace = local.endpoints.llama_cpp.namespace
   release   = "0.1.0"
   images = {
-    llama_cpp  = local.container_images.llama_cpp_vulkan
+    llama_cpp  = local.container_images.llama_cpp_rocm
     llama_swap = local.container_images.llama_swap
     rclone     = local.container_images.rclone
   }
   ingress_hostname = local.endpoints.llama_cpp.ingress
   llama_swap_config = {
-    healthCheckTimeout = 1200
+    healthCheckTimeout = 300
     models = {
       # https://github.com/ggml-org/llama.cpp/discussions/15396
       # https://docs.unsloth.ai/basics/gpt-oss-how-to-run-and-fine-tune#recommended-settings
       "gpt-oss-120b-mxfp4" = {
         cmd = <<-EOF
         /app/llama-server \
+          --flash-attn on \
+          --no-mmap \
           --api-key ${random_password.llama-cpp-auth-token.result} \
           --port $${PORT} \
           --model /llama-cpp/models/gpt-oss-120b-mxfp4-00001-of-00003.gguf \
@@ -39,6 +41,8 @@ module "llama-cpp" {
       "Qwen3-Embedding-0.6B-Q8_0" = {
         cmd = <<-EOF
         /app/llama-server \
+          --flash-attn on \
+          --no-mmap \
           --api-key ${random_password.llama-cpp-auth-token.result} \
           --port $${PORT} \
           --model /llama-cpp/models/Qwen3-Embedding-0.6B-Q8_0.gguf \
@@ -53,6 +57,8 @@ module "llama-cpp" {
       "jina-reranker-v3-Q8_0" = {
         cmd = <<-EOF
         /app/llama-server \
+          --flash-attn on \
+          --no-mmap \
           --api-key ${random_password.llama-cpp-auth-token.result} \
           --port $${PORT} \
           --model /llama-cpp/models/jina-reranker-v3-Q8_0.gguf \
@@ -69,18 +75,18 @@ module "llama-cpp" {
       owui-concurrent = {
         swap = false
         members = [
+          "gpt-oss-120b-mxfp4",
           "Qwen3-Embedding-0.6B-Q8_0",
           "jina-reranker-v3-Q8_0",
-          "gpt-oss-120b-mxfp4",
         ]
       }
     }
     hooks = {
       on_startup = {
         preload = [
+          "gpt-oss-120b-mxfp4",
           "Qwen3-Embedding-0.6B-Q8_0",
           "jina-reranker-v3-Q8_0",
-          "gpt-oss-120b-mxfp4",
         ]
       }
     }
@@ -95,7 +101,7 @@ module "llama-cpp" {
                 key      = "amd.com/gpu.vram"
                 operator = "In"
                 values = [
-                  "96G",
+                  "94G",
                 ]
               },
             ]

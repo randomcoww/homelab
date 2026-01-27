@@ -105,7 +105,7 @@ module "statefulset" {
         memory = "8Gi"
       }
       limits = {
-        memory = "16Gi"
+        memory = "96Gi" # GTT
       }
     }
     initContainers = [
