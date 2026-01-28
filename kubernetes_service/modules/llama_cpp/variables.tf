@@ -28,6 +28,11 @@ variable "images" {
   })
 }
 
+variable "api_keys" {
+  type    = list(string)
+  default = []
+}
+
 variable "extra_envs" {
   type = list(object({
     name  = string

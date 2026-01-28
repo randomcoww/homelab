@@ -25,7 +25,24 @@ module "secret" {
   app     = var.name
   release = var.release
   data = merge({
-    basename(local.config_file) = yamlencode(var.llama_swap_config)
+    basename(local.config_file) = yamlencode(merge(var.llama_swap_config, {
+      macros = {
+        models_path = local.models_path
+        default_cmd = <<-EOF
+          /app/llama-server \
+          --port $${PORT} \
+          --flash-attn on \
+          --no-mmap
+        EOF
+      }
+      apiKeys = [
+        for i, k in var.api_keys :
+        "$${env.API_KEY_${i}}"
+      ]
+    }))
+    }, {
+    for i, k in var.api_keys :
+    "API_KEY_${i}" => k
   })
 }
 
@@ -197,13 +214,24 @@ module "statefulset" {
             mountPath = local.models_path
           },
         ]
-        env = [
+        env = concat([
           for _, e in var.extra_envs :
           {
             name  = e.name
             value = tostring(e.value)
           }
-        ]
+          ], [
+          for i, _ in var.api_keys :
+          {
+            name = "API_KEY_${i}"
+            valueFrom = {
+              secretKeyRef = {
+                name = module.secret.name
+                key  = "API_KEY_${i}"
+              }
+            }
+          }
+        ])
         resources = {
           requests = {
             "amd.com/gpu" = 1

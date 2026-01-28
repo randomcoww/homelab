@@ -16,6 +16,9 @@ module "llama-cpp" {
     rclone     = local.container_images.rclone
   }
   ingress_hostname = local.endpoints.llama_cpp.ingress
+  api_keys = [
+    random_password.llama-cpp-auth-token.result,
+  ]
   llama_swap_config = {
     healthCheckTimeout = 300
     models = {
@@ -23,12 +26,8 @@ module "llama-cpp" {
       # https://docs.unsloth.ai/basics/gpt-oss-how-to-run-and-fine-tune#recommended-settings
       "gpt-oss-120b-mxfp4" = {
         cmd = <<-EOF
-        /app/llama-server \
-          --flash-attn on \
-          --no-mmap \
-          --api-key ${random_password.llama-cpp-auth-token.result} \
-          --port $${PORT} \
-          --model /llama-cpp/models/gpt-oss-120b-mxfp4-00001-of-00003.gguf \
+        $${default_cmd} \
+          --model $${models_path}/gpt-oss-120b-mxfp4-00001-of-00003.gguf \
           --ctx-size 0 \
           --ubatch-size 4096 \
           --batch-size 4096 \
@@ -41,12 +40,8 @@ module "llama-cpp" {
       }
       "Qwen3-Embedding-0.6B-Q8_0" = {
         cmd = <<-EOF
-        /app/llama-server \
-          --flash-attn on \
-          --no-mmap \
-          --api-key ${random_password.llama-cpp-auth-token.result} \
-          --port $${PORT} \
-          --model /llama-cpp/models/Qwen3-Embedding-0.6B-Q8_0.gguf \
+        $${default_cmd} \
+          --model $${models_path}/Qwen3-Embedding-0.6B-Q8_0.gguf \
           --ctx-size 0 \
           --ubatch-size 2048 \
           --batch-size 2048 \
@@ -56,12 +51,8 @@ module "llama-cpp" {
       }
       "jina-reranker-v3-Q8_0" = {
         cmd = <<-EOF
-        /app/llama-server \
-          --flash-attn on \
-          --no-mmap \
-          --api-key ${random_password.llama-cpp-auth-token.result} \
-          --port $${PORT} \
-          --model /llama-cpp/models/jina-reranker-v3-Q8_0.gguf \
+        $${default_cmd} \
+          --model $${models_path}/jina-reranker-v3-Q8_0.gguf \
           --ctx-size 0 \
           --ubatch-size 2048 \
           --batch-size 2048 \
@@ -72,12 +63,8 @@ module "llama-cpp" {
       # https://unsloth.ai/docs/models/glm-4.7-flash
       "GLM-4.7-Flash-BF16" = {
         cmd = <<-EOF
-        /app/llama-server \
-          --flash-attn on \
-          --no-mmap \
-          --api-key ${random_password.llama-cpp-auth-token.result} \
-          --port $${PORT} \
-          --model /llama-cpp/models/GLM-4.7-Flash-BF16-00001-of-00002.gguf \
+        $${default_cmd} \
+          --model $${models_path}/GLM-4.7-Flash-BF16-00001-of-00002.gguf \
           --ctx-size 0 \
           --jinja \
           --temp 1.0 \
