@@ -69,14 +69,38 @@ module "llama-cpp" {
           --reranking
         EOF
       }
+      # https://unsloth.ai/docs/models/glm-4.7-flash
+      "GLM-4.7-Flash-BF16" = {
+        cmd = <<-EOF
+        /app/llama-server \
+          --flash-attn on \
+          --no-mmap \
+          --api-key ${random_password.llama-cpp-auth-token.result} \
+          --port $${PORT} \
+          --model /llama-cpp/models/GLM-4.7-Flash-BF16-00001-of-00002.gguf \
+          --ctx-size 0 \
+          --jinja \
+          --temp 1.0 \
+          --top-p 0.95 \
+          --min-p 0.01
+        EOF
+      }
     }
     groups = {
       owui-concurrent = {
-        swap = false
+        swap      = false
+        exclusive = true
         members = [
           "gpt-oss-120b-mxfp4",
           "Qwen3-Embedding-0.6B-Q8_0",
           "jina-reranker-v3-Q8_0",
+        ]
+      }
+      code-concurrent = {
+        swap      = false
+        exclusive = true
+        members = [
+          "GLM-4.7-Flash-BF16",
         ]
       }
     }
@@ -84,8 +108,6 @@ module "llama-cpp" {
       on_startup = {
         preload = [
           "gpt-oss-120b-mxfp4",
-          "Qwen3-Embedding-0.6B-Q8_0",
-          "jina-reranker-v3-Q8_0",
         ]
       }
     }
