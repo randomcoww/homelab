@@ -314,10 +314,6 @@ module "registry" {
   minio_bucket        = "registry"
   minio_bucket_prefix = "/"
   minio_access_secret = local.minio_users.registry.secret
-
-  service_ip       = local.services.registry.ip
-  service_hostname = local.endpoints.registry.service
-  nginx_ingress_annotations = merge(local.nginx_ingress_annotations_common, {
-    "cert-manager.io/cluster-issuer" = local.kubernetes.cert_issuers.acme_prod
-  })
+  service_ip          = local.services.registry.ip
+  service_hostname    = local.endpoints.registry.service
 }

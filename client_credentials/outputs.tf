@@ -13,7 +13,10 @@ output "kubernetes_admin" {
 }
 
 output "internal_ca" {
-  value = data.terraform_remote_state.sr.outputs.trust.ca.cert_pem
+  value = {
+    algorithm = data.terraform_remote_state.sr.outputs.trust.ca.algorithm
+    cert_pem  = data.terraform_remote_state.sr.outputs.trust.ca.cert_pem
+  }
 }
 
 output "kubeconfig" {

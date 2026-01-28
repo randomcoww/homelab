@@ -72,7 +72,3 @@ variable "service_ip" {
 variable "service_hostname" {
   type = string
 }
-
-variable "nginx_ingress_annotations" {
-  type = map(string)
-}
