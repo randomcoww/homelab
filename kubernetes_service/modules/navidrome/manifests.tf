@@ -136,12 +136,24 @@ module "litestream-overlay" {
             value = tostring(v)
           }
         ]
+        volumeMounts = [
+          {
+            name      = "cache"
+            mountPath = local.navidrome_config["ND_CACHEFOLDER"]
+          },
+        ]
         # TODO: add health checks
       },
     ]
     volumes = [
       {
         name = "${var.name}-litestream-data"
+        emptyDir = {
+          medium = "Memory"
+        }
+      },
+      {
+        name = "cache"
         emptyDir = {
           medium = "Memory"
         }
