@@ -68,7 +68,7 @@ regctl tag delete reg.cluster.internal/${REPO}:${TAG}
 
 ---
 
-### User management
+### Services
 
 Get LDAP admin password
 
@@ -76,11 +76,7 @@ Get LDAP admin password
 tofu -chdir=kubernetes_service output -json lldap | jq
 ```
 
----
-
-### llama.cpp API key
-
-Get LDAP admin password
+Get llama.cpp API key
 
 ```bash
 tofu -chdir=kubernetes_service output -json llama-cpp | jq
