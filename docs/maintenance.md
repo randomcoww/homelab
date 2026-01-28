@@ -78,6 +78,16 @@ tofu -chdir=kubernetes_service output -json lldap | jq
 
 ---
 
+### llama.cpp API key
+
+Get LDAP admin password
+
+```bash
+tofu -chdir=kubernetes_service output -json llama-cpp | jq
+```
+
+---
+
 ### Roll out host updates
 
 Trigger rolling reboot of hosts coordinated by `kured`. Nodes occasionally fail to network boot falling back to booting from backup USB disk. `kured` will also attempt to restart nodes in this state.

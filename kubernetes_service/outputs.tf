@@ -7,3 +7,10 @@ output "lldap" {
   }
   sensitive = true
 }
+
+output "llama-cpp" {
+  value = {
+    api_key = random_password.llama-cpp-auth-token.result
+  }
+  sensitive = true
+}
