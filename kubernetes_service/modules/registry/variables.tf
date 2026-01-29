@@ -17,7 +17,8 @@ variable "affinity" {
 
 variable "images" {
   type = object({
-    registry = string
+    registry    = string
+    registry_ui = string
   })
 }
 
@@ -71,4 +72,16 @@ variable "service_ip" {
 
 variable "service_hostname" {
   type = string
+}
+
+variable "ingress_hostname" {
+  type = string
+}
+
+variable "ingress_class_name" {
+  type = string
+}
+
+variable "nginx_ingress_annotations" {
+  type = map(string)
 }

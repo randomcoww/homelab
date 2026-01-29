@@ -1,5 +1,11 @@
 locals {
   config_path = "/etc/registry"
+  ui_port     = 8080
+}
+
+resource "random_password" "event-listener-token" {
+  length  = 60
+  special = false
 }
 
 module "metadata" {
@@ -11,6 +17,7 @@ module "metadata" {
   manifests = {
     "templates/deployment.yaml" = module.deployment.manifest
     "templates/secret.yaml"     = module.secret.manifest
+    "templates/ingress.yaml"    = module.ingress.manifest
     "templates/tls.yaml"        = module.tls.manifest
     "templates/service.yaml"    = module.service.manifest
     "templates/cronjob.yaml" = yamlencode({
@@ -156,6 +163,55 @@ module "secret" {
           enabled = true
         }
       }
+      notifications = {
+        events = {
+          includereferences = true
+        }
+        endpoints = [
+          {
+            disabled = false
+            name     = "registry-ui"
+            url      = "http://127.0.0.1:${local.ui_port}/event-receiver"
+            headers = {
+              Authorization = [
+                "Bearer ${random_password.event-listener-token.result}",
+              ]
+            }
+            timeout   = "1s"
+            threshold = 5
+            backoff   = "10s"
+            ignoredmediatypes = [
+              "application/octet-stream",
+            ]
+          },
+        ]
+      }
+    })
+    ui-config = yamlencode({
+      listen_addr   = "0.0.0.0:${local.ui_port}"
+      uri_base_path = "/"
+      performance = {
+        catalog_page_size           = 100
+        catalog_refresh_interval    = 10
+        tags_count_refresh_interval = 60
+      }
+      registry = {
+        hostname = var.ports.registry == 443 ? var.service_hostname : "${var.service_hostname}:${var.ports.registry}"
+        insecure = false
+        username = "none"
+        password = "none"
+      }
+      access_control = {
+        anyone_can_view_events = true
+        anyone_can_delete_tags = true
+      }
+      event_listener = {
+        bearer_token      = random_password.event-listener-token.result
+        retention_days    = 1
+        database_driver   = "sqlite3"
+        database_location = "data/registry_events.db"
+        deletion_enabled  = true
+      }
     })
   }
 }
@@ -179,8 +235,35 @@ module "service" {
         protocol   = "TCP"
         targetPort = var.ports.registry
       },
+      {
+        name       = "${var.name}-ui"
+        port       = local.ui_port
+        protocol   = "TCP"
+        targetPort = local.ui_port
+      },
     ]
   }
+}
+
+module "ingress" {
+  source             = "../../../modules/ingress"
+  name               = var.name
+  app                = var.name
+  release            = var.release
+  ingress_class_name = var.ingress_class_name
+  annotations        = var.nginx_ingress_annotations
+  rules = [
+    {
+      host = var.ingress_hostname
+      paths = [
+        {
+          service = module.service.name
+          port    = local.ui_port
+          path    = "/"
+        },
+      ]
+    },
+  ]
 }
 
 module "deployment" {
@@ -281,6 +364,55 @@ module "deployment" {
             scheme = "HTTPS"
           }
           timeoutSeconds = 4
+        }
+      },
+      {
+        name  = "${var.name}-ui"
+        image = var.images.registry_ui
+        args = [
+          "-config-file",
+          "${local.config_path}/config.yaml",
+        ]
+        env = [
+          {
+            name  = "SSL_CERT_FILE"
+            value = "${local.config_path}/tls/ca-cert.pem"
+          },
+          {
+            name  = "NODE_EXTRA_CA_CERTS"
+            value = "${local.config_path}/tls/ca-cert.pem"
+          },
+        ]
+        ports = [
+          {
+            containerPort = local.ui_port
+          },
+        ]
+        volumeMounts = [
+          {
+            name      = "config"
+            mountPath = "${local.config_path}/config.yaml"
+            subPath   = "ui-config"
+          },
+          {
+            name      = "registry-tls"
+            mountPath = "${local.config_path}/tls/ca-cert.pem"
+            subPath   = "ca-cert.pem"
+          },
+        ]
+        readinessProbe = {
+          httpGet = {
+            port   = local.ui_port
+            path   = "/"
+            scheme = "HTTP"
+          }
+        }
+        livenessProbe = {
+          httpGet = {
+            port   = local.ui_port
+            path   = "/"
+            scheme = "HTTP"
+          }
         }
       },
     ]
