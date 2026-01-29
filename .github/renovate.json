@@ -41,7 +41,7 @@
         "reg.cluster.internal/randomcoww/sunshine-desktop",
         "docker.io/cloudflare/cloudflared"
       ],
-      "versioning": "regex:^(?<compatibility>[^\\d]+)?(?<minor>\\d+)(\\.(?<patch>\\d+)(\\.(?<build>\\d+))?)?$"
+      "versioning": "regex:^(((?<compatibility>[\\w-]+)-)?[bv])?(?<minor>\\d+)(\\.(?<patch>\\d+)(\\.(?<build>\\d+))?)?$"
     },
     {
       "matchUpdateTypes": [
