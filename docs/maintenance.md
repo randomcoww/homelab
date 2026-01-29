@@ -92,3 +92,22 @@ Trigger rolling reboot of hosts coordinated by `kured`. Nodes occasionally fail 
 tofu -chdir=rolling_reboot init -upgrade && \
 tofu -chdir=rolling_reboot apply
 ```
+
+### Renovate local test
+
+```bash
+GITHUB_TOKEN=<token>
+
+podman run -it --rm \
+  -v $(pwd):$(pwd) \
+  -w $(pwd) \
+  -e RENOVATE_TOKEN=$GITHUB_TOKEN \
+  -e GITHUB_COM_TOKEN=$GITHUB_TOKEN \
+  -e LOG_LEVEL=debug \
+  ghcr.io/renovatebot/renovate \
+  bash
+```
+
+```bash
+renovate --platform=local --dry-run
+```

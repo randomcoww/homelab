@@ -13,7 +13,7 @@
         "/^config_env.tf$/"
       ],
       "matchStrings": [
-        "(?<depName>(?<repository>[a-z0-9.-]+(?::\\d+|)(?:/[a-z0-9-]+|)+)/(?<image>[a-z0-9-]+)):(?<tag>(?<currentValue>(?<version>[\\w.]+)(?:-(?<compat>[\\w.-]+))?)(?:@(?<currentDigest>sha256:[a-f0-9]+))?)"
+        "(?<depName>(?<repository>[a-z0-9.-]+(?::\\d+|)(?:/[a-z0-9-]+|)+)/(?<image>[a-z0-9.-]+)):(?<tag>(?<currentValue>(?<version>[\\w.]+)(?:-(?<compat>[\\w.-]+))?)(?:@(?<currentDigest>sha256:[a-f0-9]+))?)"
       ],
       "autoReplaceStringTemplate": "{{{depName}}}:{{{newValue}}}@{{{newDigest}}}",
       "datasourceTemplate": "docker"
@@ -33,16 +33,15 @@
   "packageRules": [
     {
       "matchPackageNames": [
-        "randomcoww/minio",
-        "randomcoww/ipxe",
-        "randomcoww/hostapd-noscan",
-        "randomcoww/qrcode-resource",
-        "ggml-org/llama.cpp",
-        "randomcoww/llama-swap",
-        "randomcoww/sunshine-desktop",
-        "cloudflare/cloudflared"
+        "ghcr.io/randomcoww/ipxe",
+        "reg.cluster.internal/randomcoww/hostapd-noscan",
+        "reg.cluster.internal/randomcoww/qrcode-resource",
+        "ghcr.io/ggml-org/llama.cpp",
+        "reg.cluster.internal/randomcoww/llama-swap",
+        "reg.cluster.internal/randomcoww/sunshine-desktop",
+        "docker.io/cloudflare/cloudflared"
       ],
-      "versioning": "^(?<compatibility>[^\\d]+)?(?<minor>\\d+)(\\.(?<patch>\\d+)(\\.(?<build>\\d+))?)?$"
+      "versioning": "regex:^(?<compatibility>[^\\d]+)?(?<minor>\\d+)(\\.(?<patch>\\d+)(\\.(?<build>\\d+))?)?$"
     },
     {
       "matchUpdateTypes": [
