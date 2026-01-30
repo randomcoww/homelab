@@ -56,7 +56,9 @@ resource "helm_release" "cert-manager" {
       deploymentAnnotations = {
         "certmanager.k8s.io/disable-validation" = "true"
       }
-      installCRDs               = true
+      crds = {
+        enabled = true
+      }
       enableCertificateOwnerRef = true
       prometheus = {
         enabled = true
@@ -85,7 +87,10 @@ resource "helm_release" "cert-manager" {
       }
       extraArgs = [
         "--dns01-recursive-nameservers-only",
-        "--dns01-recursive-nameservers=${local.upstream_dns.ip}:53",
+        "--dns01-recursive-nameservers=${join(",", [
+          for _, d in local.upstream_dns :
+          "${d.ip}:53"
+        ])}",
       ]
       podDnsConfig = {
         options = [

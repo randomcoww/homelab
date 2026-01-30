@@ -128,7 +128,7 @@ resource "helm_release" "kube-dns" {
             },
           ]
           port = 53
-          plugins = [
+          plugins = concat([
             {
               name = "health"
             },
@@ -161,15 +161,24 @@ resource "helm_release" "kube-dns" {
                 ]), [
                 "fallthrough"
               ]))
-            },
+            }
+            ], [
+            for tlshostname, ips in merge({
+              for _, d in local.upstream_dns :
+              d.hostname => d.ip...
+            }) :
             {
-              name        = "forward"
-              parameters  = ". tls://${local.upstream_dns.ip}"
+              name = "forward"
+              parameters = ". ${join(" ", [
+                for _, ip in ips :
+                "tls://${ip}"
+              ])}"
               configBlock = <<-EOF
-              tls_servername ${local.upstream_dns.hostname}
+              tls_servername ${tlshostname}
               health_check 5s
               EOF
-            },
+            }
+            ], [
             {
               name       = "cache"
               parameters = 30
@@ -178,7 +187,7 @@ resource "helm_release" "kube-dns" {
               name       = "prometheus"
               parameters = "0.0.0.0:${local.service_ports.metrics}"
             },
-          ]
+          ])
         },
       ]
       extraContainers = [

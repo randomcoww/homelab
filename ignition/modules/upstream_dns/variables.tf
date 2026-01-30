@@ -3,8 +3,8 @@ variable "butane_version" {
 }
 
 variable "upstream_dns" {
-  type = object({
+  type = list(object({
     ip       = string
     hostname = string
-  })
+  }))
 }

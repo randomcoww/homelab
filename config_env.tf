@@ -205,10 +205,16 @@ locals {
     public     = "fuzzybunny.win"
   }
 
-  upstream_dns = {
-    ip       = "1.1.1.1"
-    hostname = "one.one.one.one"
-  }
+  upstream_dns = [
+    {
+      ip       = "1.1.1.1"
+      hostname = "one.one.one.one"
+    },
+    {
+      ip       = "1.0.0.1"
+      hostname = "one.one.one.one"
+    },
+  ]
 
   kubernetes = {
     cluster_name              = "prod-10"

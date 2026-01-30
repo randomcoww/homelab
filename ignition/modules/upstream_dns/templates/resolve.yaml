@@ -9,4 +9,7 @@ storage:
         inline: |
           [Resolve]
           DNSOverTLS=true
-          DNS=${upstream_dns.ip}#${upstream_dns.hostname}
+          DNS=${join(" ", [
+            for _, d in upstream_dns:
+            "${d.ip}#${d.hostname}"
+          ])}
