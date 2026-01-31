@@ -114,10 +114,10 @@ module "litestream-overlay" {
   template_spec = {
     resources = {
       requests = {
-        memory = "2Gi"
+        memory = "8Gi"
       }
       limits = {
-        memory = "4Gi"
+        memory = "8Gi"
       }
     }
     containers = [
@@ -219,6 +219,14 @@ module "mountpoint-s3-overlay" {
   images = {
     mountpoint = var.images.mountpoint
   }
+  mountpoint_resources = {
+    requests = {
+      memory = "2Gi"
+    }
+    limits = {
+      memory = "4Gi"
+    }
+  }
   template_spec = module.litestream-overlay.template_spec
 }
 
@@ -239,6 +247,14 @@ module "covers-mountpoint-s3-overlay" {
   s3_access_secret = var.minio_access_secret
   images = {
     mountpoint = var.images.mountpoint
+  }
+  mountpoint_resources = {
+    requests = {
+      memory = "512Mi"
+    }
+    limits = {
+      memory = "2Gi"
+    }
   }
   template_spec = module.mountpoint-s3-overlay.template_spec
 }
