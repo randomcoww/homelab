@@ -131,7 +131,7 @@ locals {
     hostapd          = "reg.cluster.internal/randomcoww/hostapd-noscan:v20260126.143504@sha256:c873378e3bbfbc6ca9736f25d4e000a9de0593fbf74674835e37e93df6b4eda2"
     tailscale        = "ghcr.io/tailscale/tailscale:v1.92.5@sha256:4a0aaacee6f28e724c1f80c986e5776c9c979d8f7e19274c2cae2d495cc8d625"
     qrcode_generator = "reg.cluster.internal/randomcoww/qrcode-resource:v20260126.142620@sha256:9d053d2b779de9e14d3696744e90aa352c16e4bb1e98358792e538a9f68f023a"
-    llama_cpp_vulkan = "ghcr.io/ggml-org/llama.cpp:server-vulkan-b7897@sha256:ec1f7d73e70c5036a520155313e858c1f4589949cb1152c3d5df2effe04d1ffe"
+    llama_cpp_vulkan = "ghcr.io/ggml-org/llama.cpp:server-vulkan-b7899@sha256:ddb3c87b65122ceb4d48ef8996876ec6f6771962ecfa34d18c38f9a255669af0"
     llama_cpp_rocm   = "reg.cluster.internal/randomcoww/llama-cpp-rocm:v7839-rocm7.2@sha256:d2fb7e9446c607ec7b92621d3b177b4ea769ce786f1d02dc50206bf25d9ce731"
     llama_swap       = "reg.cluster.internal/randomcoww/llama-swap:v186@sha256:5cd600a95a9a63207047594c884ad45b481ee0d33db624597280cdc7f89815ca"
     sunshine_desktop = "reg.cluster.internal/randomcoww/sunshine-desktop:v2026.123.3809@sha256:ab605b1fe0ef9e886c369dec7c1217a2d42fbb5fd0c3c06f37c6b73603eb7690"
