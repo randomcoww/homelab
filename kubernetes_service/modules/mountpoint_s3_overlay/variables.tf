@@ -48,12 +48,5 @@ variable "s3_access_secret" {
 
 variable "mountpoint_resources" {
   type = any
-  default = {
-    requests = {
-      memory = "128Mi"
-    }
-    limits = {
-      memory = "1Gi"
-    }
-  }
+  default = {}
 }
