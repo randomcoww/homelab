@@ -47,6 +47,6 @@ variable "s3_access_secret" {
 }
 
 variable "mountpoint_resources" {
-  type = any
+  type    = any
   default = {}
 }
