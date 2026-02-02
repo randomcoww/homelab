@@ -6,20 +6,18 @@ module "kea" {
   namespace = local.endpoints.kea.namespace
   release   = "0.1.20"
   images = {
-    kea         = local.container_images.kea
-    ipxe        = local.container_images.ipxe
-    stork_agent = local.container_images.stork_agent
+    kea  = local.container_images.kea
+    ipxe = local.container_images.ipxe
   }
   service_ips = [
     local.services.cluster_kea_primary.ip,
     local.services.cluster_kea_secondary.ip,
   ]
   ports = {
-    kea_peer       = local.host_ports.kea_peer
-    kea_metrics    = local.host_ports.kea_metrics
-    kea_ctrl_agent = local.host_ports.kea_ctrl_agent
-    ipxe           = local.host_ports.ipxe
-    ipxe_tftp      = local.host_ports.ipxe_tftp
+    kea_peer    = local.host_ports.kea_peer
+    kea_metrics = local.host_ports.kea_metrics
+    ipxe        = local.host_ports.ipxe
+    ipxe_tftp   = local.host_ports.ipxe_tftp
   }
   ipxe_boot_file_name  = "ipxe.efi"
   ipxe_script_base_url = "https://${local.services.minio.ip}:${local.service_ports.minio}/boot/ipxe-"

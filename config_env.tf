@@ -119,8 +119,7 @@ locals {
     minio              = "cgr.dev/chainguard/minio:latest@sha256:0a81d2765aab1b4427786ac8f6179ce00d438edd6d5aa367bfadb6d44be79592"
     nginx              = "docker.io/nginxinc/nginx-unprivileged:1.29.3-alpine@sha256:5aea7cc516b419e3526f47dd1531be31a56a046cfe44754d94f9383e13e2ee99"
     # tier 2
-    kea                   = "ghcr.io/randomcoww/kea:v3.1.5@sha256:70ebe26a9beb9c34da2fe5771f1cffd4ea9e378c147b2cf37cf7cfea79c72685"
-    stork_agent           = "ghcr.io/randomcoww/stork-agent:v2.3.2@sha256:4b8e464107c6133b476ca04d1059b8242746afff4456caad7241160a6329ed71"
+    kea                   = "ghcr.io/randomcoww/kea:v3.1.5@sha256:3ba43c235c694daaf010a511160e5515fe5e1b6109e261debf8d6467b4b346cf"
     ipxe                  = "ghcr.io/randomcoww/ipxe:v20260202.143916@sha256:6766f3d8487c6e15590679bfda039b8c183eb46189d406c0df493146d8358c96"
     registry              = "ghcr.io/distribution/distribution:3.0.0@sha256:4ba3adf47f5c866e9a29288c758c5328ef03396cb8f5f6454463655fa8bc83e2"
     registry_ui           = "docker.io/quiq/registry-ui:0.11.0@sha256:9dac46b82a0df53cf2a8090c34c7d9e3ac0f5134ddd73cd948e2e3f9bb02f38d"
@@ -135,7 +134,7 @@ locals {
     llama_cpp_rocm   = "reg.cluster.internal/randomcoww/llama-cpp-rocm:v7839-rocm7.2@sha256:d2fb7e9446c607ec7b92621d3b177b4ea769ce786f1d02dc50206bf25d9ce731"
     llama_swap       = "reg.cluster.internal/randomcoww/llama-swap:v188@sha256:03842509527dd86ba145c1879580d44a3aa8b0c9bc3f378f5a8913fae5ba8bd9"
     sunshine_desktop = "reg.cluster.internal/randomcoww/sunshine-desktop:v2026.131.140325@sha256:64de4312ddd13f56a3f1b9841b6ce8a634502bc987b48e3d296fab86be4f8f11"
-    litestream       = "docker.io/litestream/litestream:0.5.6@sha256:871d0c5f28b52b0a0a29614728d6e9e5cbdaaab36d8af177010de2c63d9da9a5"
+    litestream       = "docker.io/litestream/litestream:0.5.7@sha256:c96c7f68b714c09f482e10502b838e4eee42470f686501ce89916af30e18f9ef"
     valkey           = "ghcr.io/valkey-io/valkey:9.0.1-alpine@sha256:c106a0c03bcb23cbdf9febe693114cb7800646b11ca8b303aee7409de005faa8"
     searxng          = "ghcr.io/searxng/searxng:latest@sha256:771d475fd7a6b9e254ad725220f977303cdb132fb2136401ea806553330214eb"
     open_webui       = "ghcr.io/open-webui/open-webui:0.7.2@sha256:16d9a3615b45f14a0c89f7ad7a3bf151f923ed32c2e68f9204eb17d1ce40774b"
@@ -164,7 +163,6 @@ locals {
   host_ports = {
     kea_peer           = 50060
     kea_metrics        = 58087
-    kea_ctrl_agent     = 58088
     ipxe_tftp          = 69 # not configurable
     ipxe               = 58090
     apiserver          = 58181

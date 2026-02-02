@@ -13,19 +13,17 @@ variable "release" {
 
 variable "images" {
   type = object({
-    kea         = string
-    ipxe        = string
-    stork_agent = string
+    kea  = string
+    ipxe = string
   })
 }
 
 variable "ports" {
   type = object({
-    kea_peer       = number
-    kea_metrics    = number
-    kea_ctrl_agent = number
-    ipxe           = number
-    ipxe_tftp      = number
+    kea_peer    = number
+    kea_metrics = number
+    ipxe        = number
+    ipxe_tftp   = number
   })
 }
 
