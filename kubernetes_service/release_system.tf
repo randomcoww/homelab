@@ -130,7 +130,7 @@ resource "helm_release" "ingress-nginx" {
   create_namespace = true
   wait             = false
   wait_for_jobs    = false
-  version          = "4.14.2"
+  version          = "4.14.3"
   max_history      = 2
   timeout          = local.kubernetes.helm_release_timeout
   values = [
@@ -195,7 +195,7 @@ resource "helm_release" "ingress-nginx-internal" {
   create_namespace = true
   wait             = false
   wait_for_jobs    = false
-  version          = "4.14.2"
+  version          = "4.14.3"
   max_history      = 2
   timeout          = local.kubernetes.helm_release_timeout
   values = [
