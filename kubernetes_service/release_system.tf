@@ -18,7 +18,7 @@ resource "helm_release" "kubelet-csr-approver" {
   create_namespace = true
   wait             = false
   wait_for_jobs    = false
-  version          = "1.2.12"
+  version          = "1.2.13"
   max_history      = 2
   timeout          = local.kubernetes.helm_release_timeout
   values = [
