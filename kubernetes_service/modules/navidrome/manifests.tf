@@ -142,7 +142,22 @@ module "litestream-overlay" {
             mountPath = local.navidrome_config["ND_CACHEFOLDER"]
           },
         ]
-        # TODO: add health checks
+        livenessProbe = {
+          httpGet = {
+            scheme = "HTTP"
+            port   = local.navidrome_config["ND_PORT"]
+            path   = "/"
+          }
+          initialDelaySeconds = 10
+          timeoutSeconds      = 2
+        }
+        readinessProbe = {
+          httpGet = {
+            scheme = "HTTP"
+            port   = local.navidrome_config["ND_PORT"]
+            path   = "/"
+          }
+        }
       },
     ]
     volumes = [
