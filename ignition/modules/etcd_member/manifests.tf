@@ -92,11 +92,9 @@ module "etcd-wrapper" {
           "-local-client-url",
           "https://127.0.0.1:${var.ports.etcd_client}",
           "-etcd-binary-file",
-          # "${local.etcd_mount_path}/usr/local/bin/etcd",
-          "/bin/etcd",
+          "${local.etcd_mount_path}/usr/local/bin/etcd",
           "-etcdutl-binary-file",
-          # "${local.etcd_mount_path}/usr/local/bin/etcdutl",
-          "/bin/etcdutl",
+          "${local.etcd_mount_path}/usr/local/bin/etcdutl",
           "-s3-backup-resource-prefix",
           var.s3_resource_prefix,
           "-initial-cluster-timeout",
@@ -171,11 +169,10 @@ module "etcd-wrapper" {
           failureThreshold = 12 + ceil(local.initial_startup_delay_seconds / 10)
         }
         volumeMounts = [
-          # TODO: re-enable once working consistently
-          # {
-          #   name      = "etcd"
-          #   mountPath = local.etcd_mount_path
-          # },
+          {
+            name      = "etcd"
+            mountPath = local.etcd_mount_path
+          },
           {
             name      = "config"
             mountPath = local.config_path
@@ -188,14 +185,13 @@ module "etcd-wrapper" {
       },
     ]
     volumes = [
-      # TODO: re-enable once working consistently
-      # {
-      #   name = "etcd"
-      #   image = {
-      #     reference  = var.images.etcd
-      #     pullPolicy = "IfNotPresent"
-      #   }
-      # },
+      {
+        name = "etcd"
+        image = {
+          reference  = var.images.etcd
+          pullPolicy = "Always" # TODO: currently fails to start if this image already exists unless pull policy is "Always"
+        }
+      },
       {
         name = "config"
         hostPath = {
