@@ -116,7 +116,7 @@ locals {
     flannel_cni_plugin = "ghcr.io/flannel-io/flannel-cni-plugin:latest@sha256:c6a08fe5bcb23b19c2fc7c1e47b95a967cc924224ebedf94e8623f27b6c258fa"
     kube_vip           = "ghcr.io/kube-vip/kube-vip:v1.0.4@sha256:5e0d817bfa35f922e7ca5cf5fa88f30b71a88ab4837e550185b1c97bcef818c2"
     external_dns       = "registry.k8s.io/external-dns/external-dns:v0.20.0@sha256:ddc7f4212ed09a21024deb1f470a05240837712e74e4b9f6d1f2632ff10672e7"
-    minio              = "cgr.dev/chainguard/minio:latest@sha256:6a0ac10e24f9a9ea2a496bc886d69e5003976673eaf44b66788f2f78a01e18e1"
+    minio              = "cgr.dev/chainguard/minio:latest@sha256:e83aea17c97d2c4a08ed0b149879d244d78f320e70f3f178a351465e38f19e9f"
     nginx              = "docker.io/nginxinc/nginx-unprivileged:1.29.3-alpine@sha256:5aea7cc516b419e3526f47dd1531be31a56a046cfe44754d94f9383e13e2ee99"
     # tier 2
     kea                   = "ghcr.io/randomcoww/kea:v3.1.5@sha256:3ba43c235c694daaf010a511160e5515fe5e1b6109e261debf8d6467b4b346cf"
@@ -139,7 +139,7 @@ locals {
     searxng          = "ghcr.io/searxng/searxng:latest@sha256:8d77102a0d2c615e88c5184868dc2c32cd361413dbc104abc301f54079fd40a2"
     open_webui       = "ghcr.io/open-webui/open-webui:0.7.2@sha256:16d9a3615b45f14a0c89f7ad7a3bf151f923ed32c2e68f9204eb17d1ce40774b"
     kavita           = "ghcr.io/kareadita/kavita:0.8.9@sha256:1f2acae7466d022f037ea09f7989eb7c487f916b881174c7a6de33dbfa8acb39"
-    navidrome        = "ghcr.io/navidrome/navidrome:0.59.0@sha256:4edc8a1de3e042f30b78a478325839f4395177eb8201c27543dccc0eba674f23"
+    navidrome        = "ghcr.io/navidrome/navidrome:0.60.0@sha256:5d0f6ab343397c043c7063db14ae10e4e3980e54ae7388031cbce47e84af6657"
     lldap            = "ghcr.io/lldap/lldap:latest-alpine@sha256:244097722edaf9aeb0154d83318ff812ceb488cb4be7092defacbb7435243a0a"
     authelia         = "ghcr.io/authelia/authelia:4.39.15@sha256:d23ee3c721d465b4749cc58541cda4aebe5aa6f19d7b5ce0afebb44ebee69591"
     cloudflared      = "docker.io/cloudflare/cloudflared:2026.1.2@sha256:e9bcb2ef08d25632ff74344e73a025f4f4bf12718335b196fa0e670cacace8c5"
