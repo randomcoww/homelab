@@ -171,22 +171,6 @@ module "statefulset" {
           },
         ]
       },
-      {
-        name  = "${var.name}-llama-swap"
-        image = var.images.llama_swap
-        command = [
-          "cp",
-          "-r",
-          "/app",
-          "${local.llama_swap_path}/",
-        ]
-        volumeMounts = [
-          {
-            name      = "llama-swap"
-            mountPath = local.llama_swap_path
-          },
-        ]
-      },
     ]
     containers = [
       {
@@ -270,14 +254,9 @@ module "statefulset" {
       },
       {
         name = "llama-swap"
-        emptyDir = {
-          medium = "Memory"
+        image = {
+          reference = var.images.llama_swap
         }
-        # TODO: use image volume when stable
-        # image = {
-        #   reference  = var.images.llama_swap
-        #   pullPolicy = "IfNotPresent"
-        # }
       },
       {
         name = "ca-trust-bundle"
