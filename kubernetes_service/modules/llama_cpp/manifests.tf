@@ -255,7 +255,8 @@ module "statefulset" {
       {
         name = "llama-swap"
         image = {
-          reference = var.images.llama_swap
+          reference  = var.images.llama_swap
+          pullPolicy = "Always" # TODO: currently fails to start if this image already exists unless pull policy is "Always"
         }
       },
       {
