@@ -125,6 +125,7 @@ module "daemonset" {
           "--serviceInterface=${var.service_interface}",
           "--prometheusHTTPServer=0.0.0.0:${var.ports.kube_vip_metrics}",
           "--cleanRoutingTable",
+          "--healthCheckPort=${var.ports.kube_vip_health}",
         ]
         env = [
           {
@@ -207,6 +208,24 @@ module "daemonset" {
             value = "true"
           },
         ]
+        livenessProbe = {
+          httpGet = {
+            scheme = "HTTP"
+            host   = "127.0.0.1"
+            port   = var.ports.kube_vip_health
+            path   = "/healthz"
+          }
+          initialDelaySeconds = 10
+          timeoutSeconds      = 2
+        }
+        readinessProbe = {
+          httpGet = {
+            scheme = "HTTP"
+            host   = "127.0.0.1"
+            port   = var.ports.kube_vip_health
+            path   = "/healthz"
+          }
+        }
         securityContext = {
           capabilities = {
             add = [
@@ -215,7 +234,6 @@ module "daemonset" {
             ]
           }
         }
-        # TODO: add health checks
       },
     ]
   }

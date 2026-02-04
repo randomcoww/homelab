@@ -1,3 +1,7 @@
+locals {
+  metrics_port = 9002
+}
+
 module "metadata" {
   source      = "../../../modules/metadata"
   name        = var.name
@@ -138,6 +142,14 @@ module "statefulset" {
               }
             }
           },
+          {
+            name  = "TS_ENABLE_HEALTH_CHECK"
+            value = "true"
+          },
+          {
+            name  = "TS_LOCAL_ADDR_PORT"
+            value = "0.0.0.0:${local.metrics_port}"
+          },
           ], [
           for _, e in var.extra_envs :
           {
@@ -145,6 +157,22 @@ module "statefulset" {
             value = tostring(e.value)
           }
         ])
+        livenessProbe = {
+          httpGet = {
+            scheme = "HTTP"
+            port   = local.metrics_port
+            path   = "/healthz"
+          }
+          initialDelaySeconds = 10
+          timeoutSeconds      = 2
+        }
+        readinessProbe = {
+          httpGet = {
+            scheme = "HTTP"
+            port   = local.metrics_port
+            path   = "/healthz"
+          }
+        }
         volumeMounts = [
           {
             name      = "dev-net-tun"
@@ -158,7 +186,6 @@ module "statefulset" {
             ]
           }
         }
-        # TODO: add health checks
       },
     ]
     volumes = [

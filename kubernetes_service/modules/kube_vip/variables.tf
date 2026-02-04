@@ -21,6 +21,7 @@ variable "ports" {
   type = object({
     apiserver        = number
     kube_vip_metrics = number
+    kube_vip_health  = number
   })
 }
 

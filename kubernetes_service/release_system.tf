@@ -93,6 +93,7 @@ module "kube-vip" {
   ports = {
     apiserver        = local.host_ports.apiserver,
     kube_vip_metrics = local.host_ports.kube_vip_metrics,
+    kube_vip_health  = local.host_ports.kube_vip_health,
   }
   bgp_as     = local.ha.bgp_as
   bgp_peeras = local.ha.bgp_as
