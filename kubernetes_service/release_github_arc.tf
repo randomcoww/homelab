@@ -68,7 +68,7 @@ module "arc-workflow-secret" {
                 "squat.ai/fuse" = 1
               }
               limits = {
-                memory          = "6Gi"
+                memory          = "12Gi"
                 "squat.ai/kvm"  = 1
                 "squat.ai/fuse" = 1
               }
