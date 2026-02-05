@@ -112,11 +112,11 @@ locals {
     etcd_wrapper            = "ghcr.io/randomcoww/etcd-wrapper:v0.5.22@sha256:df898340b4d8e57758d9b3aa82981bc09e2c7943456ecbb25adf0e97b3cdde64"
     # tier 1
     kube_proxy         = "registry.k8s.io/kube-proxy:v1.35.0@sha256:c818ca1eff765e35348b77e484da915175cdf483f298e1f9885ed706fcbcb34c"
-    flannel            = "ghcr.io/flannel-io/flannel:v0.28.0@sha256:adecdcb715b153ef4fadda24142f85556818b6b75170a9dae83ff82995183c86"
+    flannel            = "ghcr.io/flannel-io/flannel:v0.28.1@sha256:6a9c170acece4457ccb9cdfe53c787cc451e87990e20451bf20070b8895fa538"
     flannel_cni_plugin = "ghcr.io/flannel-io/flannel-cni-plugin:latest@sha256:c6a08fe5bcb23b19c2fc7c1e47b95a967cc924224ebedf94e8623f27b6c258fa"
     kube_vip           = "ghcr.io/kube-vip/kube-vip:v1.0.4@sha256:5e0d817bfa35f922e7ca5cf5fa88f30b71a88ab4837e550185b1c97bcef818c2"
     external_dns       = "registry.k8s.io/external-dns/external-dns:v0.20.0@sha256:ddc7f4212ed09a21024deb1f470a05240837712e74e4b9f6d1f2632ff10672e7"
-    minio              = "cgr.dev/chainguard/minio:latest@sha256:e83aea17c97d2c4a08ed0b149879d244d78f320e70f3f178a351465e38f19e9f"
+    minio              = "cgr.dev/chainguard/minio:latest@sha256:14832794cf7bd4d14dbbaf1ebb02934c6a9bc573da5646a25987d9b7894c4499"
     nginx              = "docker.io/nginxinc/nginx-unprivileged:1.29.3-alpine@sha256:5aea7cc516b419e3526f47dd1531be31a56a046cfe44754d94f9383e13e2ee99"
     # tier 2
     kea                   = "ghcr.io/randomcoww/kea:v3.1.5@sha256:3ba43c235c694daaf010a511160e5515fe5e1b6109e261debf8d6467b4b346cf"
@@ -128,7 +128,7 @@ locals {
     # tier 3
     mountpoint       = "reg.cluster.internal/randomcoww/mountpoint-s3:v1.22.0@sha256:b1995275bd35801ff4307ee434a31bcb919916e5ff41d47e3eb656ebb4c7b858"
     hostapd          = "reg.cluster.internal/randomcoww/hostapd-noscan:v20260202.145255@sha256:a0f4d96af428173df5e3ce91529290a26c290cdd705aaa20b91830420a4893f9"
-    tailscale        = "ghcr.io/tailscale/tailscale:v1.92.5@sha256:4a0aaacee6f28e724c1f80c986e5776c9c979d8f7e19274c2cae2d495cc8d625"
+    tailscale        = "ghcr.io/tailscale/tailscale:v1.94.1@sha256:21df0b5a84efa35c0a507f4dd2340e1b1295683634a28968707354d5bd991d9c"
     qrcode_generator = "reg.cluster.internal/randomcoww/qrcode-resource:v20260202.143842@sha256:b11e7f8a6fe916cf8f72f42cc4e24576cadf689eb5860380ad3f609878be06d1"
     llama_cpp_vulkan = "ghcr.io/ggml-org/llama.cpp:server-vulkan-b7903@sha256:cc75d041eee0aa56b633864c8c7d86ceb8a018ccb0c11dbf378b872424d38b85"
     llama_cpp_rocm   = "reg.cluster.internal/randomcoww/llama-cpp-rocm:v7935-rocm7.2@sha256:54b405c6aa47840bf3a7da3cdc25c3db94bf631dfdd5acb5946937ddc6977c3c"
