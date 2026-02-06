@@ -32,6 +32,8 @@ module "secret" {
           /app/llama-server \
           --port $${PORT} \
           --flash-attn on \
+          --no-webui \
+          --context-shift \
           --no-mmap
         EOF
       }

@@ -99,7 +99,7 @@ module "etcd" {
   ca             = data.terraform_remote_state.sr.outputs.etcd.ca
   peer_ca        = data.terraform_remote_state.sr.outputs.etcd.peer_ca
   images = {
-    etcd         = local.container_images.etcd
+    etcd         = "${regex(local.container_image_regex, local.container_images.etcd).depName}@${regex(local.container_image_regex, local.container_images.etcd).currentDigest}"
     etcd_wrapper = local.container_images.etcd_wrapper
   }
   ports = {
