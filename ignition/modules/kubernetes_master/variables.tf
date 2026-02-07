@@ -61,7 +61,6 @@ variable "ports" {
     controller_manager = number
     scheduler          = number
     etcd_client        = number
-    etcd_client_proxy  = number
     etcd_metrics       = number
   })
 }

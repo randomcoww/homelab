@@ -173,7 +173,6 @@ locals {
     kube_proxy         = 50254
     kube_proxy_metrics = 50255
     etcd_client        = 58082
-    etcd_client_proxy  = 58085 # only listens on localhost
     etcd_peer          = 58083
     etcd_metrics       = 58086
     flannel_healthz    = 58084

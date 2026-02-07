@@ -12,7 +12,7 @@ module "kubernetes-master" {
   service_account = data.terraform_remote_state.sr.outputs.kubernetes.service_account
   etcd_members = {
     for host_key, host in local.members.etcd :
-    host_key => cidrhost(local.networks.etcd.prefix, host.netnum)
+    host_key => host.netnum == each.value.netnum ? "127.0.0.1" : cidrhost(local.networks.etcd.prefix, host.netnum)
   }
   images = {
     apiserver          = local.container_images.kube_apiserver
@@ -25,7 +25,6 @@ module "kubernetes-master" {
     controller_manager = local.host_ports.controller_manager
     scheduler          = local.host_ports.scheduler
     etcd_client        = local.host_ports.etcd_client
-    etcd_client_proxy  = local.host_ports.etcd_client_proxy
     etcd_metrics       = local.host_ports.etcd_metrics
   }
   kubelet_client_user        = local.kubernetes.kubelet_client_user
@@ -99,7 +98,7 @@ module "etcd" {
   ca             = data.terraform_remote_state.sr.outputs.etcd.ca
   peer_ca        = data.terraform_remote_state.sr.outputs.etcd.peer_ca
   images = {
-    etcd         = "${regex(local.container_image_regex, local.container_images.etcd).depName}@${regex(local.container_image_regex, local.container_images.etcd).currentDigest}"
+    etcd         = local.container_images.etcd
     etcd_wrapper = local.container_images.etcd_wrapper
   }
   ports = {

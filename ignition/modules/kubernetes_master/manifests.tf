@@ -117,7 +117,6 @@ locals {
       bgp_prefix            = var.bgp_prefix
       bgp_as                = var.bgp_as
       bgp_neighbor_netnums  = var.bgp_neighbor_netnums
-      etcd_members          = var.etcd_members
     })
     ], [
     yamlencode({
@@ -198,7 +197,10 @@ module "apiserver" {
           "--etcd-cafile=${local.pki.etcd-ca-cert.path}",
           "--etcd-certfile=${local.pki.etcd-client-cert.path}",
           "--etcd-keyfile=${local.pki.etcd-client-key.path}",
-          "--etcd-servers=https://127.0.0.1:${var.ports.etcd_client_proxy}",
+          "--etcd-servers=${join(",", [
+            for _, ip in var.etcd_members :
+            "https://${ip}:${var.ports.etcd_client}"
+          ])}",
           "--event-ttl=1h",
           ## If not running kubelet on the same node
           # "--enable-aggregator-routing=true",
