@@ -12,7 +12,7 @@ module "llama-cpp" {
   release   = "0.1.0"
   images = {
     llama_cpp  = local.container_images.llama_cpp_vulkan
-    llama_swap = "${regex(local.container_image_regex, local.container_images.llama_swap).depName}@${regex(local.container_image_regex, local.container_images.llama_swap).currentDigest}"
+    llama_swap = local.container_images.llama_swap
     rclone     = local.container_images.rclone
   }
   ingress_hostname = local.endpoints.llama_cpp.ingress
