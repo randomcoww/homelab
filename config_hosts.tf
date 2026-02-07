@@ -336,6 +336,7 @@ locals {
         "pcie_aspm=off",               # TODO: remove if this gets fixed - workaround for r8169 transmit queue timed out issue
         "ttm.pages_limit=31457280",    # 120G https://community.frame.work/t/igpu-vram-how-much-can-be-assigned/73081
         "ttm.page_pool_size=24576000", # 96G preallocated
+        "amdgpu.cwsr_enable=0",        # https://community.frame.work/t/amd-gpu-mes-timeouts-causing-system-hangs-on-framework-laptop-13-amd-ai-300-series/71364/42?page=3
       ]
     }
   }
