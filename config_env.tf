@@ -117,7 +117,7 @@ locals {
     kube_vip           = "ghcr.io/kube-vip/kube-vip:v1.0.4@sha256:5e0d817bfa35f922e7ca5cf5fa88f30b71a88ab4837e550185b1c97bcef818c2"
     external_dns       = "registry.k8s.io/external-dns/external-dns:v0.20.0@sha256:ddc7f4212ed09a21024deb1f470a05240837712e74e4b9f6d1f2632ff10672e7"
     minio              = "cgr.dev/chainguard/minio:latest@sha256:14832794cf7bd4d14dbbaf1ebb02934c6a9bc573da5646a25987d9b7894c4499"
-    nginx              = "docker.io/nginxinc/nginx-unprivileged:1.29.4-alpine@sha256:a6c4f61f456b85b8fdf7ec7ab28cc3e299440e6fb4a9dea520e5fd8fd440025e"
+    nginx              = "docker.io/nginxinc/nginx-unprivileged:1.29.5-alpine@sha256:a731ba0194833ae0f80994a4ae08988aa95fdcc88f4f991340ce160770cf2b6d"
     # tier 2
     kea                   = "ghcr.io/randomcoww/kea:v3.1.5@sha256:3ba43c235c694daaf010a511160e5515fe5e1b6109e261debf8d6467b4b346cf"
     ipxe                  = "ghcr.io/randomcoww/ipxe:v20260202.143916@sha256:6766f3d8487c6e15590679bfda039b8c183eb46189d406c0df493146d8358c96"
@@ -130,7 +130,7 @@ locals {
     hostapd          = "reg.cluster.internal/randomcoww/hostapd-noscan:v20260202.145255@sha256:a0f4d96af428173df5e3ce91529290a26c290cdd705aaa20b91830420a4893f9"
     tailscale        = "ghcr.io/tailscale/tailscale:v1.94.1@sha256:21df0b5a84efa35c0a507f4dd2340e1b1295683634a28968707354d5bd991d9c"
     qrcode_generator = "reg.cluster.internal/randomcoww/qrcode-resource:v20260202.143842@sha256:b11e7f8a6fe916cf8f72f42cc4e24576cadf689eb5860380ad3f609878be06d1"
-    llama_cpp_vulkan = "ghcr.io/ggml-org/llama.cpp:server-vulkan-b7951@sha256:9ff5f901dcf90638ec609e60fdd145567a1b42f6eb3daf6aa91411a5873c19ef"
+    llama_cpp_vulkan = "ghcr.io/ggml-org/llama.cpp:server-vulkan-b7964@sha256:9471d5a05073e97afdb24940a54b5bfe1c1f52e1a9aa8f68f97a7d430dbceb87"
     llama_cpp_rocm   = "reg.cluster.internal/randomcoww/llama-cpp-rocm:v7935-rocm7.2@sha256:54b405c6aa47840bf3a7da3cdc25c3db94bf631dfdd5acb5946937ddc6977c3c"
     llama_swap       = "reg.cluster.internal/randomcoww/llama-swap:v189@sha256:a9ca0ab3140bb88d12acc826d137be3cd1083a6179b85855b2478a3157c1a35f"
     sunshine_desktop = "reg.cluster.internal/randomcoww/sunshine-desktop:v2026.131.140325@sha256:64de4312ddd13f56a3f1b9841b6ce8a634502bc987b48e3d296fab86be4f8f11"
