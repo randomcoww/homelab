@@ -42,7 +42,7 @@ resource "helm_release" "prometheus" {
   chart            = "prometheus"
   wait             = false
   wait_for_jobs    = false
-  version          = "28.8.1"
+  version          = "28.9.0"
   max_history      = 2
   timeout          = local.kubernetes.helm_release_timeout
   values = [
