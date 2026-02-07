@@ -233,8 +233,7 @@ module "covers-mountpoint-s3-overlay" {
   s3_bucket   = var.minio_bucket
   s3_prefix   = "covers"
   s3_mount_extra_args = [
-    "--cache /var/tmp",      # cache to memory
-    "--max-cache-size 1024", # 1Gi
+    # cache may be causing some cover generation to fail
   ]
   s3_access_secret = var.minio_access_secret
   images = {
