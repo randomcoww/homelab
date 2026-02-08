@@ -96,19 +96,19 @@ module "sunshine-desktop" {
       EOF
     },
     {
-      path    = "/etc/sway/config.d/sync"
-      content = <<-EOF
-      output * bg #000000 solid_color
-      output * allow_tearing yes
-      output * max_render_time off
-      EOF
-    },
-    {
       path    = "/etc/profile.d/tmux.sh"
       content = <<-EOF
       if [ -z "$TMUX" ]; then
         exec tmux new-session -A -s default
       fi
+      EOF
+    },
+    {
+      path    = "/etc/sway/config.d/sync"
+      content = <<-EOF
+      output * bg #000000 solid_color
+      output * allow_tearing yes
+      output * max_render_time off
       EOF
     },
   ]
@@ -128,10 +128,6 @@ module "sunshine-desktop" {
     {
       name  = "PROTON_ENABLE_HDR"
       value = 1
-    },
-    {
-      name  = "LD_PRELOAD"
-      value = ""
     },
     {
       name  = "AMD_USERQ"

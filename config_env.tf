@@ -133,7 +133,7 @@ locals {
     llama_cpp_vulkan = "ghcr.io/ggml-org/llama.cpp:server-vulkan-b7964@sha256:9471d5a05073e97afdb24940a54b5bfe1c1f52e1a9aa8f68f97a7d430dbceb87"
     llama_cpp_rocm   = "reg.cluster.internal/randomcoww/llama-cpp-rocm:v7935-rocm7.2@sha256:54b405c6aa47840bf3a7da3cdc25c3db94bf631dfdd5acb5946937ddc6977c3c"
     llama_swap       = "reg.cluster.internal/randomcoww/llama-swap:v189@sha256:1cde0a8aabaa8e70fa1496cba9cfafc5652fdabe4e74d44270c1b3f56f58f3fe"
-    sunshine_desktop = "reg.cluster.internal/randomcoww/sunshine-desktop:v2026.131.140325@sha256:64de4312ddd13f56a3f1b9841b6ce8a634502bc987b48e3d296fab86be4f8f11"
+    sunshine_desktop = "reg.cluster.internal/randomcoww/sunshine-desktop:v2026.206.151412@sha256:779d879975b00f88ed1351d4b0d81b70b0d2f83ac038a8e97634d19a00b1120f"
     litestream       = "docker.io/litestream/litestream:0.5.7@sha256:c96c7f68b714c09f482e10502b838e4eee42470f686501ce89916af30e18f9ef"
     valkey           = "ghcr.io/valkey-io/valkey:9.0.2-alpine@sha256:68677f85c863830af7836ff07c4a13b7f085ebeff62f4dedb71499ca27d229f2"
     searxng          = "ghcr.io/searxng/searxng:latest@sha256:670bd1076097640fc25221bf92a8af7d344503ce17ba3305abedf28e3634e807"
