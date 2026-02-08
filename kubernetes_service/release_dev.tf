@@ -268,6 +268,24 @@ module "open-webui" {
           description = "Query service and node metrics and trends"
         }
       },
+      {
+        type      = "mcp"
+        url       = "https://api.githubcopilot.com/mcp"
+        auth_type = "bearer"
+        config = {
+          enable                    = true
+          function_name_filter_list = ""
+        }
+        spec_type = "url"
+        spec      = ""
+        path      = ""
+        key       = var.github.token
+        info = {
+          id          = "github"
+          name        = "github"
+          description = "Query GitHub resources"
+        }
+      },
     ])
     # OIDC
     ENABLE_PERSISTENT_CONFIG       = false # persist mcp oauth registration
