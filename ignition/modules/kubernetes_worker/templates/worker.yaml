@@ -3,6 +3,12 @@ variant: fcos
 version: ${butane_version}
 systemd:
   units:
+    - name: docker.service
+      mask: true
+    - name: docker.socket
+      mask: true
+    - name: containerd.service
+      mask: true
     - name: crio.service
       enabled: true
       dropins:
