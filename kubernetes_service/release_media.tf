@@ -130,7 +130,27 @@ module "sunshine-desktop" {
       value = 1
     },
     {
+      name  = "PROTON_ENABLE_WAYLAND"
+      value = 1
+    },
+    {
+      name  = "PROTON_FSR4_UPGRADE"
+      value = 1
+    },
+    {
+      name  = "AMD_VULKAN_ICD"
+      value = "RADV"
+    },
+    {
+      name  = "MESA_SHADER_CACHE_MAX_SIZE"
+      value = "12G"
+    },
+    {
       name  = "AMD_USERQ"
+      value = 1
+    },
+    {
+      name  = "ENABLE_LAYER_MESA_ANTI_LAG"
       value = 1
     },
   ]
