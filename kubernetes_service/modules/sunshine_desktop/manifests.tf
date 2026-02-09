@@ -204,7 +204,7 @@ module "statefulset" {
           storageClassName = var.storage_class_name
           resources = {
             requests = {
-              storage = "20Gi"
+              storage = "120Gi"
             }
           }
         }
