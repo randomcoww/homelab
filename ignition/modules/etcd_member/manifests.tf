@@ -1,6 +1,6 @@
 locals {
-  config_path     = "${var.config_base_path}/${var.name}"
-  etcd_mount_path = "/etcd"
+  config_path       = "${var.config_base_path}/${var.name}"
+  etcd_wrapper_path = "/etcd-wrapper"
   pki = {
     for key, f in {
       ca-cert = {
@@ -87,14 +87,15 @@ module "etcd-wrapper" {
     containers = [
       {
         name  = "${var.name}-wrapper"
-        image = var.images.etcd_wrapper
-        args = [
+        image = var.images.etcd
+        command = [
+          "${local.etcd_wrapper_path}/bin/etcd-wrapper",
           "-local-client-url",
           "https://127.0.0.1:${var.ports.etcd_client}",
           "-etcd-binary-file",
-          "${local.etcd_mount_path}/usr/local/bin/etcd",
+          "/usr/local/bin/etcd",
           "-etcdutl-binary-file",
-          "${local.etcd_mount_path}/usr/local/bin/etcdutl",
+          "/usr/local/bin/etcdutl",
           "-s3-backup-resource-prefix",
           var.s3_resource_prefix,
           "-initial-cluster-timeout",
@@ -170,8 +171,8 @@ module "etcd-wrapper" {
         }
         volumeMounts = [
           {
-            name      = "etcd"
-            mountPath = local.etcd_mount_path
+            name      = "etcd-wrapper"
+            mountPath = local.etcd_wrapper_path
           },
           {
             name      = "config"
@@ -186,9 +187,9 @@ module "etcd-wrapper" {
     ]
     volumes = [
       {
-        name = "etcd"
+        name = "etcd-wrapper"
         image = {
-          reference  = var.images.etcd
+          reference  = var.images.etcd_wrapper
           pullPolicy = "Always" # TODO: currently fails to start if this image already exists unless pull policy is "Always"
         }
       },
