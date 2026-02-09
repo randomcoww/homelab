@@ -39,6 +39,7 @@
         "ghcr.io/ggml-org/llama.cpp",
         "reg.cluster.internal/randomcoww/llama-swap",
         "reg.cluster.internal/randomcoww/sunshine-desktop",
+        "reg.cluster.internal/randomcoww/llama-cpp-rocm",
         "docker.io/cloudflare/cloudflared"
       ],
       "versioning": "regex:^(((?<compatibility>[\\w-]+)-)?[bv])?(?<minor>\\d+)(\\.(?<patch>\\d+)(\\.(?<build>\\d+))?)?$"
