@@ -135,11 +135,6 @@ storage:
       contents:
         inline: |
           net.bridge.bridge-nf-call-iptables=0
-    - path: /etc/modules-load.d/20-ntsync.conf
-      mode: 0644
-      contents:
-        inline: |
-          ntsync
     # Image build
     - path: /etc/modules-load.d/20-uinput.conf
       mode: 0644
