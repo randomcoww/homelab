@@ -130,10 +130,6 @@ module "sunshine-desktop" {
       value = 1
     },
     {
-      name  = "PROTON_ENABLE_WAYLAND"
-      value = 1
-    },
-    {
       name  = "PROTON_FSR4_UPGRADE"
       value = 1
     },
