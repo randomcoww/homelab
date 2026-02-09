@@ -141,6 +141,12 @@ storage:
       contents:
         inline: |
           uinput
+    # Sunshine desktop
+    - path: /etc/modules-load.d/20-ntsync.conf
+      mode: 0644
+      contents:
+        inline: |
+          ntsync
     # Internal registry
     - path: /etc/containers/registries.conf.d/10-internal.conf
       mode: 0644

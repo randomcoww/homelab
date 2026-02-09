@@ -334,16 +334,8 @@ module "statefulset" {
             mountPath = local.home_path
           },
           {
-            name      = "dev-input"
-            mountPath = "/dev/input"
-          },
-          {
             name      = "dev-shm"
             mountPath = "/dev/shm"
-          },
-          {
-            name      = "dev-dri"
-            mountPath = "/dev/dri"
           },
           {
             name      = "config"
@@ -397,12 +389,15 @@ module "statefulset" {
           failureThreshold = 6
         }
         resources = {
-          # use /dev/dri in place of gpu resource to share gpu with another container
           requests = {
+            "amd.com/gpu"     = 1
             "squat.ai/ntsync" = 1
+            "squat.ai/input"  = 1
           }
           limits = {
+            "amd.com/gpu"     = 1
             "squat.ai/ntsync" = 1
+            "squat.ai/input"  = 1
           }
         }
         securityContext = var.security_context
@@ -420,18 +415,6 @@ module "statefulset" {
         secret = {
           secretName  = module.secret.name
           defaultMode = 493
-        }
-      },
-      {
-        name = "dev-input"
-        hostPath = {
-          path = "/dev/input"
-        }
-      },
-      {
-        name = "dev-dri"
-        hostPath = {
-          path = "/dev/dri"
         }
       },
       {
