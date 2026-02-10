@@ -73,10 +73,8 @@ locals {
           interface = "phy0-wan"
         }
         backup = {
-          interface     = "phy0-backup"
-          enable_dns    = false
-          enable_routes = false
-          metric        = 4096
+          interface = "phy0-backup"
+          metric    = 4096
         }
       }
       disks = {
@@ -171,10 +169,8 @@ locals {
           interface = "phy0-wan"
         }
         backup = {
-          interface     = "phy0-backup"
-          enable_dns    = false
-          enable_routes = false
-          metric        = 4096
+          interface = "phy0-backup"
+          metric    = 4096
         }
       }
       disks = {
