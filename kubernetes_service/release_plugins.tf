@@ -56,21 +56,6 @@ module "device-plugin" {
     }),
     "--device",
     yamlencode({
-      name = "input"
-      groups = [
-        {
-          count = 100
-          paths = [
-            {
-              path     = "/dev/input/event*"
-              optional = true
-            },
-          ]
-        },
-      ]
-    }),
-    "--device",
-    yamlencode({
       name = "ntsync"
       groups = [
         {
@@ -78,6 +63,35 @@ module "device-plugin" {
           paths = [
             {
               path = "/dev/ntsync"
+            },
+          ]
+        },
+      ]
+    }),
+    "--device",
+    yamlencode({
+      name = "uinput"
+      groups = [
+        {
+          count = 100
+          paths = [
+            {
+              path = "/dev/uinput"
+            },
+          ]
+        },
+      ]
+    }),
+    "--device",
+    yamlencode({
+      name = "input"
+      groups = [
+        {
+          count = 100
+          paths = [
+            {
+              path = "/dev/input"
+              type = "Mount"
             },
           ]
         },

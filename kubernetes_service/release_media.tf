@@ -67,7 +67,7 @@ module "navidrome" {
 }
 
 # Sunshine desktop
-/*
+
 module "sunshine-desktop" {
   source    = "./modules/sunshine_desktop"
   name      = local.endpoints.sunshine_desktop.name
@@ -121,6 +121,10 @@ module "sunshine-desktop" {
       name  = "WLR_DRM_NO_MODIFIERS"
       value = 1
     },
+    # {
+    #   name = "WLR_RENDERER" # TODO: wait for https://github.com/LizardByte/Sunshine/issues/4050
+    #   value = "vulkan"
+    # },
     {
       name  = "WLR_DRM_NO_ATOMIC"
       value = 1
@@ -180,4 +184,3 @@ module "sunshine-desktop" {
     "cert-manager.io/cluster-issuer" = local.kubernetes.cert_issuers.ca_internal
   })
 }
-*/
