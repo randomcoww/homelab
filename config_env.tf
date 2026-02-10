@@ -109,7 +109,7 @@ locals {
     kube_controller_manager = "registry.k8s.io/kube-controller-manager:v1.35.1@sha256:9fb295baa9d68543d7bbecc23e16fcdf85c8c06680f91e628535aa6fbe180dbd"
     kube_scheduler          = "registry.k8s.io/kube-scheduler:v1.35.1@sha256:fc251ed4b8a03830bb8f75fb5fe983b3b0b5cc15a9c066d8f6c5d2e547deece8"
     etcd                    = "registry.k8s.io/etcd:v3.6.7@sha256:70cd5d29d2efcbc4c15f2a63183fd537aae77ddbc46b3b97a8a97bc8751ec3b4"
-    etcd_wrapper            = "ghcr.io/randomcoww/etcd-wrapper:v0.5.23@sha256:f327b038793b53cd887d9756aff1b7639ec72b5b5c5d477a5971a2d298cc590a"
+    etcd_wrapper            = "ghcr.io/randomcoww/etcd-wrapper:v0.5.24@sha256:ea02ab030d31d5655bcd64733cf2e3a6a2354ca716d269f18087cc08619e52f7"
     # tier 1
     kube_proxy         = "registry.k8s.io/kube-proxy:v1.35.1@sha256:a832f1cece7252b2e52294be5a59b7579ccde35202ad63e09e9f4f04c5676435"
     flannel            = "ghcr.io/flannel-io/flannel:v0.28.1@sha256:6a9c170acece4457ccb9cdfe53c787cc451e87990e20451bf20070b8895fa538"
@@ -132,7 +132,7 @@ locals {
     qrcode_generator = "reg.cluster.internal/randomcoww/qrcode-resource:v20260209.144920@sha256:13816912b4a4efdfec060dd34087f3955f3b63142ac1301c40159b8739bc1f39"
     llama_cpp_vulkan = "ghcr.io/ggml-org/llama.cpp:server-vulkan-b7981@sha256:03a2b4b1873a4aa3332cb6245524ac677ea482ab50fffdf21f2169345b53672d"
     llama_cpp_rocm   = "reg.cluster.internal/randomcoww/llama-cpp-rocm:v7972-rocm7.2@sha256:a5957151783abb6af7d811106d488d56bf11789b61493b11724ba3e69a4d8278"
-    llama_swap       = "reg.cluster.internal/randomcoww/llama-swap:v190@sha256:3504494a7a74ff18955823e96f1fd0f6c8c8975ea089b8d1f80ed1b842b46471"
+    llama_swap       = "reg.cluster.internal/randomcoww/llama-swap:v190@sha256:7215f941f7fbdd5cff6119292340085a688c27e443cf95a518680d69b64c9c71"
     sunshine_desktop = "reg.cluster.internal/randomcoww/sunshine-desktop:v2026.206.151412@sha256:779d879975b00f88ed1351d4b0d81b70b0d2f83ac038a8e97634d19a00b1120f"
     litestream       = "docker.io/litestream/litestream:0.5.7@sha256:c96c7f68b714c09f482e10502b838e4eee42470f686501ce89916af30e18f9ef"
     valkey           = "ghcr.io/valkey-io/valkey:9.0.2-alpine@sha256:68677f85c863830af7836ff07c4a13b7f085ebeff62f4dedb71499ca27d229f2"
@@ -151,7 +151,7 @@ locals {
   host_images = {
     for name, tag in {
       # these fields are updated by renovate - don't use var substitutions
-      default = "fedora-coreos-43.20260208.02" # renovate: randomcoww/fedora-coreos-config-custom
+      default = "fedora-coreos-43.20260210.21" # renovate: randomcoww/fedora-coreos-config-custom
     } :
     name => {
       kernel = "${tag}-live-kernel.$${buildarch:uristring}"
