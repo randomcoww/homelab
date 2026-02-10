@@ -105,18 +105,18 @@ locals {
   # these fields are updated by renovate - don't use var substitutions
   container_images = {
     # static pod
-    kube_apiserver          = "registry.k8s.io/kube-apiserver:v1.35.0@sha256:32f98b308862e1cf98c900927d84630fb86a836a480f02752a779eb85c1489f3"
-    kube_controller_manager = "registry.k8s.io/kube-controller-manager:v1.35.0@sha256:3e343fd915d2e214b9a68c045b94017832927edb89aafa471324f8d05a191111"
-    kube_scheduler          = "registry.k8s.io/kube-scheduler:v1.35.0@sha256:0ab622491a82532e01876d55e365c08c5bac01bcd5444a8ed58c1127ab47819f"
+    kube_apiserver          = "registry.k8s.io/kube-apiserver:v1.35.1@sha256:011838b85f65454b95a013b2b902dd506789fd07f9abc84e52eb2b6a044cd392"
+    kube_controller_manager = "registry.k8s.io/kube-controller-manager:v1.35.1@sha256:9fb295baa9d68543d7bbecc23e16fcdf85c8c06680f91e628535aa6fbe180dbd"
+    kube_scheduler          = "registry.k8s.io/kube-scheduler:v1.35.1@sha256:fc251ed4b8a03830bb8f75fb5fe983b3b0b5cc15a9c066d8f6c5d2e547deece8"
     etcd                    = "registry.k8s.io/etcd:v3.6.7@sha256:70cd5d29d2efcbc4c15f2a63183fd537aae77ddbc46b3b97a8a97bc8751ec3b4"
     etcd_wrapper            = "ghcr.io/randomcoww/etcd-wrapper:v0.5.22@sha256:df898340b4d8e57758d9b3aa82981bc09e2c7943456ecbb25adf0e97b3cdde64"
     # tier 1
-    kube_proxy         = "registry.k8s.io/kube-proxy:v1.35.0@sha256:c818ca1eff765e35348b77e484da915175cdf483f298e1f9885ed706fcbcb34c"
+    kube_proxy         = "registry.k8s.io/kube-proxy:v1.35.1@sha256:a832f1cece7252b2e52294be5a59b7579ccde35202ad63e09e9f4f04c5676435"
     flannel            = "ghcr.io/flannel-io/flannel:v0.28.1@sha256:6a9c170acece4457ccb9cdfe53c787cc451e87990e20451bf20070b8895fa538"
     flannel_cni_plugin = "ghcr.io/flannel-io/flannel-cni-plugin:latest@sha256:c6a08fe5bcb23b19c2fc7c1e47b95a967cc924224ebedf94e8623f27b6c258fa"
     kube_vip           = "ghcr.io/kube-vip/kube-vip:v1.0.4@sha256:5e0d817bfa35f922e7ca5cf5fa88f30b71a88ab4837e550185b1c97bcef818c2"
     external_dns       = "registry.k8s.io/external-dns/external-dns:v0.20.0@sha256:ddc7f4212ed09a21024deb1f470a05240837712e74e4b9f6d1f2632ff10672e7"
-    minio              = "cgr.dev/chainguard/minio:latest@sha256:14832794cf7bd4d14dbbaf1ebb02934c6a9bc573da5646a25987d9b7894c4499"
+    minio              = "cgr.dev/chainguard/minio:latest@sha256:d93cc06b0562fd8140f9089f0a9942d6492bdc1560df33f69bbe0fba80b4f0d0"
     nginx              = "docker.io/nginxinc/nginx-unprivileged:1.29.5-alpine@sha256:bae24904860527735a08e04722a92add40784b91e61389b710367c7d0e6d3b25"
     # tier 2
     kea                   = "ghcr.io/randomcoww/kea:v3.1.5@sha256:9cef004d657f1f6faae523491639531633bbf1b857e8b42abe82fbba6c824416"
@@ -130,7 +130,7 @@ locals {
     hostapd          = "reg.cluster.internal/randomcoww/hostapd-noscan:v20260209.145725@sha256:171c6f19ef804421106462008b2086b7b12345338ce1ccd30cde960c1b8807f8"
     tailscale        = "ghcr.io/tailscale/tailscale:v1.94.1@sha256:21df0b5a84efa35c0a507f4dd2340e1b1295683634a28968707354d5bd991d9c"
     qrcode_generator = "reg.cluster.internal/randomcoww/qrcode-resource:v20260209.144920@sha256:13816912b4a4efdfec060dd34087f3955f3b63142ac1301c40159b8739bc1f39"
-    llama_cpp_vulkan = "ghcr.io/ggml-org/llama.cpp:server-vulkan-b7973@sha256:85e31859cba2736bd5a55e2b22b1449395b71a6315350043c175809a2436bd0e"
+    llama_cpp_vulkan = "ghcr.io/ggml-org/llama.cpp:server-vulkan-b7981@sha256:03a2b4b1873a4aa3332cb6245524ac677ea482ab50fffdf21f2169345b53672d"
     llama_cpp_rocm   = "reg.cluster.internal/randomcoww/llama-cpp-rocm:v7972-rocm7.2@sha256:a5957151783abb6af7d811106d488d56bf11789b61493b11724ba3e69a4d8278"
     llama_swap       = "reg.cluster.internal/randomcoww/llama-swap:v190@sha256:3504494a7a74ff18955823e96f1fd0f6c8c8975ea089b8d1f80ed1b842b46471"
     sunshine_desktop = "reg.cluster.internal/randomcoww/sunshine-desktop:v2026.206.151412@sha256:779d879975b00f88ed1351d4b0d81b70b0d2f83ac038a8e97634d19a00b1120f"
