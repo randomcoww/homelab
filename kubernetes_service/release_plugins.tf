@@ -17,7 +17,7 @@ module "device-plugin" {
       name = "rfkill"
       groups = [
         {
-          count = 100
+          count = 8
           paths = [
             {
               path = "/dev/rfkill"
@@ -31,7 +31,7 @@ module "device-plugin" {
       name = "kvm"
       groups = [
         {
-          count = 100
+          count = 8
           paths = [
             {
               path = "/dev/kvm"
@@ -45,7 +45,7 @@ module "device-plugin" {
       name = "fuse"
       groups = [
         {
-          count = 100
+          count = 8
           paths = [
             {
               path = "/dev/fuse"
@@ -59,7 +59,7 @@ module "device-plugin" {
       name = "ntsync"
       groups = [
         {
-          count = 100
+          count = 8
           paths = [
             {
               path = "/dev/ntsync"
@@ -73,7 +73,7 @@ module "device-plugin" {
       name = "uinput"
       groups = [
         {
-          count = 100
+          count = 8
           paths = [
             {
               path = "/dev/uinput"
@@ -87,11 +87,25 @@ module "device-plugin" {
       name = "input"
       groups = [
         {
-          count = 100
+          count = 8
           paths = [
             {
               path = "/dev/input"
               type = "Mount"
+            },
+          ]
+        },
+      ]
+    }),
+    "--device",
+    yamlencode({
+      name = "tty"
+      groups = [
+        {
+          count = 256
+          paths = [
+            {
+              path = "/dev/tty*"
             },
           ]
         },

@@ -175,7 +175,13 @@ module "sunshine-desktop" {
     }
   }
   security_context = {
-    privileged = true # TODO: Revisit - currently privileged to make libinput work
+    # TODO: Revisit - currently privileged to make libinput work
+    privileged = true
+    # capabilities = {
+    #   add = [
+    #     "ALL",
+    #   ]
+    # }
   }
   loadbalancer_class_name = "kube-vip.io/kube-vip-class"
   ingress_hostname        = local.endpoints.sunshine_desktop.ingress
