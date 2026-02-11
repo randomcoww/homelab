@@ -177,9 +177,9 @@ module "statefulset" {
     containers = [
       {
         name  = var.name
-        image = var.images.llama_cpp
+        image = var.images.llama_swap # TODO: use llama-cpp image and mount swap into image
         command = [
-          "${local.llama_swap_path}/app/llama-swap",
+          "/app/llama-swap", # TODO: use mounted binary
           "--config",
           "${local.config_file}",
           "--listen",
@@ -191,10 +191,11 @@ module "statefulset" {
             mountPath = local.config_file
             subPath   = basename(local.config_file)
           },
-          {
-            name      = "llama-swap"
-            mountPath = local.llama_swap_path
-          },
+          # TODO: replace with image volume
+          # {
+          #   name      = "llama-swap"
+          #   mountPath = local.llama_swap_path
+          # },
           {
             name      = "models"
             mountPath = local.models_path
@@ -254,13 +255,14 @@ module "statefulset" {
           secretName = module.secret.name
         }
       },
-      {
-        name = "llama-swap"
-        image = {
-          reference  = var.images.llama_swap
-          pullPolicy = "Always" # TODO: currently fails to start if this image already exists unless pull policy is "Always"
-        }
-      },
+      # TODO: replace with image volume
+      # {
+      #   name = "llama-swap"
+      #   image = {
+      #     reference  = var.images.llama_swap
+      #     pullPolicy = "Always" # TODO: currently fails to start if this image already exists unless pull policy is "Always"
+      #   }
+      # },
       {
         name = "ca-trust-bundle"
         hostPath = {
