@@ -54,12 +54,13 @@ locals {
           clusterDNS = [
             var.cluster_dns_ip,
           ]
-          imageMinimumGCAge     = "4h"
-          imageMaximumGCAge     = "24h"
-          resolvConf            = "/run/systemd/resolve/resolv.conf"
-          runtimeRequestTimeout = "15m"
-          rotateCertificates    = true
-          serverTLSBootstrap    = true
+          imageGCHighThresholdPercent = 1
+          imageGCLowThresholdPercent  = 0
+          imageMinimumGCAge           = "4h"
+          resolvConf                  = "/run/systemd/resolve/resolv.conf"
+          runtimeRequestTimeout       = "15m"
+          rotateCertificates          = true
+          serverTLSBootstrap          = true
           shutdownGracePeriodByPodPriority = [
             {
               priority                   = 0
@@ -77,10 +78,10 @@ locals {
           containerLogMaxSize  = "10Mi"
           containerLogMaxFiles = 2
           evictionHard = {
-            "imagefs.available" = "1%"
-            "memory.available"  = "100Mi"
-            "nodefs.available"  = "1%"
-            "nodefs.inodesFree" = "1%"
+            "memory.available"   = "2%"
+            "nodefs.available"   = "1%"
+            "imagefs.available"  = "2%"
+            "imagefs.inodesFree" = "2%"
           }
           registerNode           = true
           failSwapOn             = false
