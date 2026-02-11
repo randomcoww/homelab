@@ -121,8 +121,9 @@ module "sunshine-desktop" {
       name  = "WLR_DRM_NO_MODIFIERS"
       value = 1
     },
+    # TODO: track https://github.com/LizardByte/Sunshine/issues/4050
     # {
-    #   name = "WLR_RENDERER" # TODO: wait for https://github.com/LizardByte/Sunshine/issues/4050
+    #   name  = "WLR_RENDERER"
     #   value = "vulkan"
     # },
     {
