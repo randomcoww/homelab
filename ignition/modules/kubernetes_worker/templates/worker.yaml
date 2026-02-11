@@ -109,6 +109,7 @@ storage:
         inline: |
           [crio]
           root="${container_storage_path}"
+          internal_repair=true
 
           [crio.runtime]
           cgroup_manager="systemd"
