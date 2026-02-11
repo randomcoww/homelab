@@ -101,7 +101,16 @@ module "etcd-wrapper" {
           "-initial-cluster-timeout",
           "${local.initial_startup_delay_seconds}s",
         ]
-        env = [
+        env = concat([
+          {
+            name = "POD_IP"
+            valueFrom = {
+              fieldRef = {
+                fieldPath = "status.podIP"
+              }
+            }
+          },
+          ], [
           for k, v in {
             "ETCD_NAME"                        = var.host_key
             "ETCD_DATA_DIR"                    = "${var.data_storage_path}/data"
@@ -122,7 +131,7 @@ module "etcd-wrapper" {
             "ETCD_PEER_KEY_FILE"         = local.pki.peer-key.path
             "ETCD_STRICT_RECONFIG_CHECK" = true
             "ETCD_LOG_LEVEL"             = "info"
-            "ETCD_LISTEN_METRICS_URLS"   = "http://0.0.0.0:${var.ports.etcd_metrics}"
+            "ETCD_LISTEN_METRICS_URLS"   = "http://127.0.0.1:${var.ports.etcd_metrics},http://$POD_IP:${var.ports.etcd_metrics}"
             "ETCD_SOCKET_REUSE_PORT"     = true
             "ETCD_SOCKET_REUSE_ADDRESS"  = true
             "AWS_ACCESS_KEY_ID"          = var.s3_access_key_id
@@ -132,7 +141,7 @@ module "etcd-wrapper" {
             name  = tostring(k)
             value = tostring(v)
           }
-        ]
+        ])
         resources = {
           requests = {
             memory = "2Gi"
