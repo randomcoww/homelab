@@ -116,7 +116,7 @@ locals {
     flannel_cni_plugin = "ghcr.io/flannel-io/flannel-cni-plugin:latest@sha256:c6a08fe5bcb23b19c2fc7c1e47b95a967cc924224ebedf94e8623f27b6c258fa"
     kube_vip           = "ghcr.io/kube-vip/kube-vip:v1.0.4@sha256:5e0d817bfa35f922e7ca5cf5fa88f30b71a88ab4837e550185b1c97bcef818c2"
     external_dns       = "registry.k8s.io/external-dns/external-dns:v0.20.0@sha256:ddc7f4212ed09a21024deb1f470a05240837712e74e4b9f6d1f2632ff10672e7"
-    minio              = "cgr.dev/chainguard/minio:latest@sha256:d93cc06b0562fd8140f9089f0a9942d6492bdc1560df33f69bbe0fba80b4f0d0"
+    minio              = "cgr.dev/chainguard/minio:latest@sha256:ff9bb09cf1783a695457b311b3b716b3ca3d981591634bb1f7e8be219e89603a"
     nginx              = "docker.io/nginxinc/nginx-unprivileged:1.29.5-alpine@sha256:bae24904860527735a08e04722a92add40784b91e61389b710367c7d0e6d3b25"
     # tier 2
     kea                   = "ghcr.io/randomcoww/kea:v3.1.5@sha256:42b6b90cf6d2157e5b090b41e8862d9d38b970795317a076c35b2dd9ad574f2d"
@@ -134,7 +134,7 @@ locals {
     llama_cpp_rocm   = "reg.cluster.internal/randomcoww/llama-cpp-rocm:v7999-rocm7.2@sha256:40dcbf3c6c7857acd48403491c1a1bbf9e596180a636331234bb9bc2efb61e7a"
     llama_swap       = "reg.cluster.internal/randomcoww/llama-swap:v190@sha256:4fecdaa32628ee773c98229b3971cfd1919a37690a188330af0174ec67492dee"
     sunshine_desktop = "reg.cluster.internal/randomcoww/sunshine-desktop:v2026.206.151412@sha256:779d879975b00f88ed1351d4b0d81b70b0d2f83ac038a8e97634d19a00b1120f"
-    litestream       = "docker.io/litestream/litestream:0.5.7@sha256:c96c7f68b714c09f482e10502b838e4eee42470f686501ce89916af30e18f9ef"
+    litestream       = "docker.io/litestream/litestream:0.5.8@sha256:9874588ddb04789179d0d93cc902ba9309bb0cac4c33eb5631599d4559c60106"
     valkey           = "ghcr.io/valkey-io/valkey:9.0.2-alpine@sha256:68677f85c863830af7836ff07c4a13b7f085ebeff62f4dedb71499ca27d229f2"
     searxng          = "ghcr.io/searxng/searxng:latest@sha256:1502823ea918998e325d95f8c0cbd3db1dbd024da412dcce9f504e6244632b26"
     open_webui       = "ghcr.io/open-webui/open-webui:0.7.2@sha256:16d9a3615b45f14a0c89f7ad7a3bf151f923ed32c2e68f9204eb17d1ce40774b"
