@@ -67,7 +67,7 @@ module "navidrome" {
 }
 
 # Sunshine desktop
-
+/*
 module "sunshine-desktop" {
   source    = "./modules/sunshine_desktop"
   name      = local.endpoints.sunshine_desktop.name
@@ -191,3 +191,4 @@ module "sunshine-desktop" {
     "cert-manager.io/cluster-issuer" = local.kubernetes.cert_issuers.ca_internal
   })
 }
+*/
