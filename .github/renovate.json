@@ -42,7 +42,7 @@
         "reg.cluster.internal/randomcoww/llama-cpp-rocm",
         "docker.io/cloudflare/cloudflared"
       ],
-      "versioning": "regex:^(((?<compatibility>[\\w-]+)-)?[bv])?(?<minor>\\d+)(\\.(?<patch>\\d+)(\\.(?<build>\\d+))?)?$"
+      "versioning": "regex:^(((?<compatibility>[\\w-]+)-)?[bv])?(?<minor>\\d+)(\\.(?<patch>\\d+)(\\.(?<build>\\d+))?)?(-(?<compat>[\\w.-]+))?$"
     },
     {
       "matchUpdateTypes": [
