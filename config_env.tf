@@ -109,7 +109,7 @@ locals {
     kube_controller_manager = "registry.k8s.io/kube-controller-manager:v1.35.1@sha256:9fb295baa9d68543d7bbecc23e16fcdf85c8c06680f91e628535aa6fbe180dbd"
     kube_scheduler          = "registry.k8s.io/kube-scheduler:v1.35.1@sha256:fc251ed4b8a03830bb8f75fb5fe983b3b0b5cc15a9c066d8f6c5d2e547deece8"
     etcd                    = "registry.k8s.io/etcd:v3.6.7@sha256:70cd5d29d2efcbc4c15f2a63183fd537aae77ddbc46b3b97a8a97bc8751ec3b4"
-    etcd_wrapper            = "ghcr.io/randomcoww/etcd-wrapper:v0.5.25@sha256:bbb7ac94d11f51533aadc1dbf5ac911e9521d12413f9560c5739fe919a08ca47"
+    etcd_wrapper            = "ghcr.io/randomcoww/etcd-wrapper:v0.5.27@sha256:b0a9926089e152490dfa215e6176a3fcc6deb72636b1c22cd16b2c0216509c4c"
     # tier 1
     kube_proxy         = "registry.k8s.io/kube-proxy:v1.35.1@sha256:a832f1cece7252b2e52294be5a59b7579ccde35202ad63e09e9f4f04c5676435"
     flannel            = "ghcr.io/flannel-io/flannel:v0.28.1@sha256:6a9c170acece4457ccb9cdfe53c787cc451e87990e20451bf20070b8895fa538"
