@@ -78,6 +78,16 @@ output "template_spec" {
             readOnly  = true
           },
         ]
+        lifecycle = {
+          preStop = {
+            exec = {
+              command = [
+                "/usr/bin/umount",
+                local.mount_path_internal,
+              ]
+            }
+          }
+        }
         resources = var.mountpoint_resources
         securityContext = {
           privileged = true
