@@ -155,23 +155,6 @@ module "litestream-overlay" {
             path = "/api/health"
             port = local.kavita_port
           }
-          /*
-          exec = {
-            # OIDC login occasionally breaks with this error even when /api/health reports Ok
-            # "status":500,"message":"No authentication handler is registered...
-            # restarting kavita seems to resolve it
-            # TODO: remove if this gets fixed upstream
-            command = [
-              "sh",
-              "-c",
-              <<-EOF
-              curl -fsSL http://127.0.0.1:${local.kavita_port}/api/health && \
-              curl -fsSL https://${var.ingress_hostname}/oidc/login
-              EOF
-            ]
-          }
-          timeoutSeconds = 4
-          */
         }
         readinessProbe = {
           httpGet = {

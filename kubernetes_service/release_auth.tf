@@ -158,6 +158,7 @@ locals {
         "email",
         "profile",
         "groups",
+        "roles",
         "offline_access",
       ]
       consent_mode = "implicit"
