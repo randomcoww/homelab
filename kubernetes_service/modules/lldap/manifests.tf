@@ -125,6 +125,8 @@ module "litestream-overlay" {
           bucket        = var.minio_bucket
           path          = "$POD_NAME/litestream"
           sync-interval = "1s"
+          part-size     = "50MB"
+          concurrency   = 10
         }
       },
     ]
