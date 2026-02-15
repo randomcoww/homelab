@@ -68,7 +68,7 @@ module "arc-workflow-secret" {
                 "squat.ai/fuse" = 1
               }
               limits = {
-                memory          = "12Gi"
+                memory          = "8Gi"
                 "squat.ai/kvm"  = 1
                 "squat.ai/fuse" = 1
               }
@@ -118,9 +118,24 @@ module "arc-workflow-secret" {
                 }
               },
             ]
-            # ** Don't mount volumes to this container **
+            # ** Don't mount volumes outside of /kaniko to this container **
             # Volumes can interfere with container build process if the same resource is being used in the build
-            # volumeMounts = []
+            volumeMounts = [
+              {
+                name      = "ca-trust-bundle"
+                mountPath = "/kaniko/ssl/certs/ca-certificates.crt" # This should be path used in https://github.com/osscontainertools/kaniko/blob/main/deploy/Dockerfile
+                readOnly  = true
+              },
+            ]
+          },
+        ]
+        volumes = [
+          {
+            name = "ca-trust-bundle"
+            hostPath = {
+              path = "/etc/ssl/certs/ca-certificates.crt"
+              type = "File"
+            }
           },
         ]
       }
