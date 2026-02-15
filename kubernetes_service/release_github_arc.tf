@@ -121,11 +121,11 @@ module "arc-workflow-secret" {
             # ** Don't mount volumes outside of /kaniko to this container **
             # Volumes can interfere with container build process if the same resource is being used in the build
             volumeMounts = [
-              {
-                name      = "ca-trust-bundle"
-                mountPath = "/kaniko/ssl/certs/ca-certificates.crt" # This should be path used in https://github.com/osscontainertools/kaniko/blob/main/deploy/Dockerfile
-                readOnly  = true
-              },
+              # {
+              #   name      = "ca-trust-bundle"
+              #   mountPath = "/kaniko/ssl/certs/ca-certificates.crt" # This should be path used in https://github.com/osscontainertools/kaniko/blob/main/deploy/Dockerfile
+              #   readOnly  = true
+              # },
             ]
           },
         ]
