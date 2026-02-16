@@ -10,7 +10,6 @@ locals {
     }
     ebooks    = {}
     documents = {}
-    pictures  = {}
     music     = {}
   }
 
