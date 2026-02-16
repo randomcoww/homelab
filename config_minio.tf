@@ -9,7 +9,6 @@ locals {
       acl = "public-read"
     }
     ebooks    = {}
-    documents = {}
     music     = {}
   }
 
