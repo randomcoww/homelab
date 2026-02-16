@@ -8,8 +8,8 @@ locals {
     models = {
       acl = "public-read"
     }
-    ebooks    = {}
-    music     = {}
+    ebooks = {}
+    music  = {}
   }
 
   minio_users = {
