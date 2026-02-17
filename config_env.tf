@@ -280,7 +280,7 @@ locals {
       registry = {
         name    = "registry"
         service = "reg.${local.domains.kubernetes}"
-        ingress = "hub.reg.${local.domains.kubernetes}"
+        ingress = "reg-admin.${local.domains.kubernetes}"
       }
       qrcode_hostapd = {
         name    = "qrcode-hostapd"
@@ -301,7 +301,7 @@ locals {
       sunshine_desktop = {
         name    = "sunshine-desktop"
         service = "sunshine.${local.domains.kubernetes}"
-        ingress = "admin.sunshine.${local.domains.kubernetes}"
+        ingress = "sunshine-admin.${local.domains.kubernetes}"
       }
       open_webui = {
         name    = "open-webui"
