@@ -130,14 +130,14 @@ locals {
     hostapd          = "reg.cluster.internal/randomcoww/hostapd-noscan:v20260216.144901@sha256:28c788859163bfbf7514b9e6471b467a59a6b4645b629ebb389800740a3cb366"
     tailscale        = "ghcr.io/tailscale/tailscale:v1.94.2@sha256:95e528798bebe75f39b10e74e7051cf51188ee615934f232ba7ad06a3390ffa1"
     qrcode_generator = "reg.cluster.internal/randomcoww/qrcode-resource:v20260216.143912@sha256:3caeefdf3a4e2fcf7ea7408310b61d0c3eae94e4c65ac4384d752b060af7bc57"
-    llama_cpp_vulkan = "ghcr.io/ggml-org/llama.cpp:server-vulkan-b8067@sha256:00d1d287b395c5afbc1b97409ed29a20f4ce4ab1d35dfd2c723f42b8303bb33e"
+    llama_cpp_vulkan = "ghcr.io/ggml-org/llama.cpp:server-vulkan-b8077@sha256:60acb29900ef9fd0cf3ea1335db482b29330d77485d4ded8aa99429630dd781d"
     llama_cpp_rocm   = "reg.cluster.internal/randomcoww/llama-cpp-rocm:v8062-rocm7.2@sha256:f8f26d14a5913715f4f322cd80ff08440a407afd45ceb2cbf402259f6e1ffd1a"
-    llama_swap       = "ghcr.io/mostlygeek/llama-swap:vulkan-non-root@sha256:0328d6d815a3c556ab9b644df4f739a6bdd4a19522e57be265c6e3457db0a9e4"
+    llama_swap       = "ghcr.io/mostlygeek/llama-swap:vulkan-non-root@sha256:70b6ab2e87ce03592bd5a5d12473fe27619eb9a690fc5c94a588dfced5428f61"
     sunshine_desktop = "reg.cluster.internal/randomcoww/sunshine-desktop:v2026.206.151412@sha256:779d879975b00f88ed1351d4b0d81b70b0d2f83ac038a8e97634d19a00b1120f"
     litestream       = "docker.io/litestream/litestream:0.5.8@sha256:9874588ddb04789179d0d93cc902ba9309bb0cac4c33eb5631599d4559c60106"
     valkey           = "ghcr.io/valkey-io/valkey:9.0.2-alpine@sha256:68677f85c863830af7836ff07c4a13b7f085ebeff62f4dedb71499ca27d229f2"
     searxng          = "ghcr.io/searxng/searxng:latest@sha256:60055af6f2f1ca14b488d9c0f47a019d1dbaf15b4f6547a7194253bf2ab94744"
-    open_webui       = "ghcr.io/open-webui/open-webui:v0.8.2@sha256:7b7d324724ea4aa95d206362d8e9332544f11be167cd254ff83af9ab75734db8"
+    open_webui       = "ghcr.io/open-webui/open-webui:v0.8.3@sha256:205e9cf23b66553643b065afcdeffb7f86b35bf36e0ce643dc56946a911954b7"
     kavita           = "ghcr.io/kareadita/kavita:0.8.9@sha256:1f2acae7466d022f037ea09f7989eb7c487f916b881174c7a6de33dbfa8acb39"
     navidrome        = "ghcr.io/navidrome/navidrome:0.60.3@sha256:a5dce8f33304714dd138e870cca0dcab3d937ca236be1a9f2b97da009d1a0048"
     lldap            = "ghcr.io/lldap/lldap:latest-alpine@sha256:244097722edaf9aeb0154d83318ff812ceb488cb4be7092defacbb7435243a0a"
@@ -151,7 +151,7 @@ locals {
   host_images = {
     for name, tag in {
       # these fields are updated by renovate - don't use var substitutions
-      default = "fedora-coreos-43.20260213.21" # renovate: randomcoww/fedora-coreos-config-custom
+      default = "fedora-coreos-43.20260217.09" # renovate: randomcoww/fedora-coreos-config-custom
     } :
     name => {
       kernel = "${tag}-live-kernel.$${buildarch:uristring}"
