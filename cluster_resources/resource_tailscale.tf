@@ -21,33 +21,35 @@ resource "tailscale_acl" "cluster" {
   })
 }
 
-resource "tailscale_dns_nameservers" "cluster" {
-  nameservers = [
-    local.upstream_dns.ip,
-  ]
-}
+resource "tailscale_dns_configuration" "sample_configuration" {
+  dynamic "nameservers" {
+    for_each = toset(local.upstream_dns)
 
-resource "tailscale_dns_split_nameservers" "cluster" {
-  for_each = toset([
-    local.domains.public,
-    local.domains.kubernetes,
-  ])
+    content {
+      address            = nameservers.value.ip
+      use_with_exit_node = true
+    }
+  }
+  dynamic "split_dns" {
+    for_each = toset([
+      local.domains.public,
+      local.domains.kubernetes,
+    ])
 
-  domain = each.key
-  nameservers = [
-    local.services.external_dns.ip,
-  ]
-}
-
-resource "tailscale_dns_preferences" "cluster" {
-  magic_dns = true
-}
-
-resource "tailscale_dns_search_paths" "cluster" {
+    content {
+      domain = split_dns.value
+      nameservers {
+        address            = local.services.external_dns.ip
+        use_with_exit_node = true
+      }
+    }
+  }
   search_paths = [
-    local.domains.kubernetes,
     local.domains.public,
+    local.domains.kubernetes,
   ]
+  override_local_dns = true
+  magic_dns          = false
 }
 
 resource "tailscale_tailnet_key" "auth" {
