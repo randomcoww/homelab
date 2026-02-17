@@ -34,7 +34,12 @@ module "kea" {
         local.domains.kubernetes,
         local.domains.public,
       ]
-      mtu = 1500 # Force LAN clients to 1500
+      classless_static_route = compact([
+        # allow local access to these from clients that set default route over VPN
+        for _, network in local.networks :
+        "${network.prefix} - ${local.services.gateway.ip}" if contains(keys(network), "prefix")
+      ])
+      mtu = lookup(local.networks.lan, "mtu", 1500)
     },
     {
       prefix = local.networks.service.prefix

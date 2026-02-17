@@ -205,6 +205,11 @@ module "secret" {
                 name = "domain-search"
                 data = join(",", network.domain_search)
               }
+              ] : [], length(network.classless_static_route) > 0 ? [
+              {
+                name = "classless-static-route"
+                data = join(",", network.classless_static_route)
+              }
             ] : [])
             pools = [
               {
