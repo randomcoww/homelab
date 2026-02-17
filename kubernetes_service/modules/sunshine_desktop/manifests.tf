@@ -96,11 +96,10 @@ module "secret" {
     set -xe
 
     VERSION=$(curl -s https://api.github.com/repos/GloriousEggroll/proton-ge-custom/releases/latest | grep tag_name | cut -d '"' -f 4)
-    curl -fsSL --remove-on-error -o ge-proton.tgz https://github.com/GloriousEggroll/proton-ge-custom/releases/download/$VERSION/$VERSION.tar.gz
+    curl -fsSL --remove-on-error --skip-existing -O https://github.com/GloriousEggroll/proton-ge-custom/releases/download/$VERSION/$VERSION.tar.gz
 
     mkdir -p $HOME/.steam/steam/compatibilitytools.d/
-    tar xzf ge-proton.tgz -C $HOME/.steam/steam/compatibilitytools.d/
-    rm ge-proton.tgz
+    tar xzf $VERSION.tar.gz -C $HOME/.steam/steam/compatibilitytools.d/
     EOF
   })
 }
@@ -214,10 +213,10 @@ module "statefulset" {
   template_spec = {
     resources = {
       requests = {
-        memory = "2Gi"
+        memory = "8Gi"
       }
       limits = {
-        memory = "16Gi"
+        memory = "32Gi"
       }
     }
     containers = [
