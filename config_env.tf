@@ -130,9 +130,9 @@ locals {
     hostapd          = "reg.cluster.internal/randomcoww/hostapd-noscan:v20260216.144901@sha256:28c788859163bfbf7514b9e6471b467a59a6b4645b629ebb389800740a3cb366"
     tailscale        = "ghcr.io/tailscale/tailscale:v1.94.2@sha256:95e528798bebe75f39b10e74e7051cf51188ee615934f232ba7ad06a3390ffa1"
     qrcode_generator = "reg.cluster.internal/randomcoww/qrcode-resource:v20260216.143912@sha256:3caeefdf3a4e2fcf7ea7408310b61d0c3eae94e4c65ac4384d752b060af7bc57"
-    llama_cpp_vulkan = "ghcr.io/ggml-org/llama.cpp:server-vulkan-b8077@sha256:60acb29900ef9fd0cf3ea1335db482b29330d77485d4ded8aa99429630dd781d"
+    llama_cpp_vulkan = "ghcr.io/ggml-org/llama.cpp:server-vulkan-b8087@sha256:102876a3b0a518710abd1ae8bf8511e59c75b3e4c011566aaa4c340432c14eaa"
     llama_cpp_rocm   = "reg.cluster.internal/randomcoww/llama-cpp-rocm:v8062-rocm7.2@sha256:f8f26d14a5913715f4f322cd80ff08440a407afd45ceb2cbf402259f6e1ffd1a"
-    llama_swap       = "ghcr.io/mostlygeek/llama-swap:vulkan-non-root@sha256:70b6ab2e87ce03592bd5a5d12473fe27619eb9a690fc5c94a588dfced5428f61"
+    llama_swap       = "ghcr.io/mostlygeek/llama-swap:vulkan-non-root@sha256:5946783bd5d728574d517711041a2f9a304d7476ff5951a2b71bf9033a0a83ec"
     sunshine_desktop = "reg.cluster.internal/randomcoww/sunshine-desktop:v2026.206.151412@sha256:779d879975b00f88ed1351d4b0d81b70b0d2f83ac038a8e97634d19a00b1120f"
     litestream       = "docker.io/litestream/litestream:0.5.8@sha256:9874588ddb04789179d0d93cc902ba9309bb0cac4c33eb5631599d4559c60106"
     valkey           = "ghcr.io/valkey-io/valkey:9.0.2-alpine@sha256:68677f85c863830af7836ff07c4a13b7f085ebeff62f4dedb71499ca27d229f2"
@@ -145,7 +145,7 @@ locals {
     cloudflared      = "docker.io/cloudflare/cloudflared:2026.2.0@sha256:404528c1cd63c3eb882c257ae524919e4376115e6fe57befca8d603656a91a4c"
     mcp_proxy        = "ghcr.io/tbxark/mcp-proxy:v0.43.2@sha256:70c0e02d39c4c0898e610b3a30954f7930628fa6f4fb447bad14c32382a25879"
     prometheus_mcp   = "ghcr.io/pab1it0/prometheus-mcp-server:1.5.3@sha256:32d47c88845ee78bc343d4c3a39a24b1bd9bebce4f53becdbbf5704221185925"
-    rclone           = "ghcr.io/rclone/rclone:1.73.0@sha256:9f59fda717a48aced38d7f27e9ec8fd9992b5651e7a03897bebf204d3a9197d6"
+    rclone           = "ghcr.io/rclone/rclone:1.73.1@sha256:c08f5e100e1c4fa4deb1315b56a47c0cc0e765222b7c0834bc93305f2e4d85c0"
   }
 
   host_images = {
