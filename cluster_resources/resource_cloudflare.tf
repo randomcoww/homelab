@@ -9,7 +9,6 @@ locals {
     "documents",
     "ebooks",
     "music",
-    "test",
   ]
 
   cloudflare_tunnel_ingress_endpoints = [
