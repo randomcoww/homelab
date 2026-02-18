@@ -7,7 +7,6 @@ locals {
   r2_buckets = [
     "etcd",
     "documents",
-    "pictures",
     "ebooks",
     "music",
     "test",
