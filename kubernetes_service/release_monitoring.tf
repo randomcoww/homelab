@@ -72,10 +72,10 @@ resource "helm_release" "prometheus" {
         retentionSize = "128MB"
         resources = {
           requests = {
-            memory = "3Gi"
+            memory = "4Gi"
           }
           limits = {
-            memory = "3Gi"
+            memory = "4Gi"
           }
         }
         ingress = {
