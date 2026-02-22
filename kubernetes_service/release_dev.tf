@@ -67,8 +67,8 @@ module "llama-cpp" {
           --model $${models_path}/GLM-4.7-Flash-BF16-00001-of-00002.gguf \
           --ctx-size 0 \
           --jinja \
-          --temp 1.0 \
-          --top-p 0.95 \
+          --temp 0.7 \
+          --top-p 1.0 \
           --min-p 0.01
         EOF
       }
@@ -224,7 +224,7 @@ module "open-webui" {
     DEFAULT_MODELS                 = "GLM-4.7-Flash-BF16"
     ENABLE_WEB_SEARCH              = true
     WEB_SEARCH_ENGINE              = "searxng"
-    WEB_SEARCH_RESULT_COUNT        = 10
+    WEB_SEARCH_RESULT_COUNT        = 4
     SEARXNG_QUERY_URL              = "https://${local.endpoints.searxng.ingress}/search?q=<query>"
     ENABLE_CODE_INTERPRETER        = false
     ENABLE_CODE_EXECUTION          = false
