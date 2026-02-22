@@ -67,8 +67,8 @@ module "llama-cpp" {
           --model $${models_path}/GLM-4.7-Flash-BF16-00001-of-00002.gguf \
           --ctx-size 0 \
           --jinja \
-          --temp 0.7 \
-          --top-p 1.0 \
+          --temp 1.0 \
+          --top-p 0.95 \
           --min-p 0.01
         EOF
       }
