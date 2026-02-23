@@ -17,7 +17,7 @@ locals {
     module.registry,
     module.searxng,
     module.open-webui,
-    module.prometheus-mcp,
+    # module.prometheus-mcp,
     module.llama-cpp,
     # module.sunshine-desktop,
   ]

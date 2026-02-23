@@ -24,18 +24,15 @@ module "llama-cpp" {
     models = {
       # https://github.com/ggml-org/llama.cpp/discussions/15396
       # https://docs.unsloth.ai/basics/gpt-oss-how-to-run-and-fine-tune#recommended-settings
-      "gpt-oss-120b-mxfp4" = {
+      "gpt-oss-120b-F16" = {
         cmd = <<-EOF
         $${default_cmd} \
-          --model $${models_path}/gpt-oss-120b-mxfp4-00001-of-00003.gguf \
+          --model $${models_path}/gpt-oss-120b-F16.gguf \
           --ctx-size 0 \
-          --ubatch-size 4096 \
-          --batch-size 4096 \
           --jinja \
           --temp 1.0 \
-          --top_k 100 \
           --top_p 1.0 \
-          --min-p 0.0
+          --top_k 0.0
         EOF
       }
       "Qwen3-Embedding-0.6B-Q8_0" = {
@@ -69,7 +66,8 @@ module "llama-cpp" {
           --jinja \
           --temp 1.0 \
           --top-p 0.95 \
-          --min-p 0.01
+          --min-p 0.01 \
+          --repeat-penalty 1.0
         EOF
       }
     }
@@ -78,7 +76,7 @@ module "llama-cpp" {
         swap      = false
         exclusive = true
         members = [
-          "gpt-oss-120b-mxfp4",
+          "gpt-oss-120b-F16",
           "Qwen3-Embedding-0.6B-Q8_0",
           "jina-reranker-v3-Q8_0",
         ]
@@ -94,7 +92,7 @@ module "llama-cpp" {
     hooks = {
       on_startup = {
         preload = [
-          "GLM-4.7-Flash-BF16",
+          "gpt-oss-120b-F16",
         ]
       }
     }
@@ -250,6 +248,7 @@ module "open-webui" {
     # https://github.com/open-webui/docs/issues/609
     # https://github.com/javydekoning/homelab/blob/main/k8s/ai-platform/openwebui/TOOL_SERVER_CONNECTIONS.json
     TOOL_SERVER_CONNECTIONS = jsonencode([
+      /*
       {
         type      = "mcp"
         url       = "https://${local.endpoints.prometheus_mcp.ingress}/prometheus-mcp/mcp"
@@ -268,6 +267,7 @@ module "open-webui" {
           description = "Query service and node metrics and trends"
         }
       },
+      */
     ])
     # OIDC
     ENABLE_PERSISTENT_CONFIG       = false # persist mcp oauth registration
