@@ -296,7 +296,7 @@ locals {
       }
       llama_cpp = {
         name    = "llama-cpp"
-        ingress = "llama-cpp.${local.domains.public}"
+        ingress = "llama-cpp.${local.domains.kubernetes}"
       }
       sunshine_desktop = {
         name    = "sunshine-desktop"
