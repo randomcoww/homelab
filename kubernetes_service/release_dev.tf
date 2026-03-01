@@ -175,31 +175,6 @@ module "searxng" {
   })
 }
 
-resource "random_password" "prometheus-mcp-auth-token" {
-  length           = 32
-  override_special = "-_"
-}
-
-module "prometheus-mcp" {
-  source    = "./modules/prometheus_mcp"
-  name      = local.endpoints.prometheus_mcp.name
-  namespace = local.endpoints.prometheus_mcp.namespace
-  release   = "0.1.0"
-  replicas  = 1
-  images = {
-    prometheus_mcp = local.container_images.prometheus_mcp
-    mcp_proxy      = local.container_images.mcp_proxy
-  }
-  prometheus_url = "https://${local.endpoints.prometheus.ingress}"
-  auth_token     = random_password.prometheus-mcp-auth-token.result
-
-  ingress_hostname   = local.endpoints.prometheus_mcp.ingress
-  ingress_class_name = local.endpoints.ingress_nginx_internal.name
-  nginx_ingress_annotations = merge(local.nginx_ingress_annotations_common, {
-    "cert-manager.io/cluster-issuer" = local.kubernetes.cert_issuers.ca_internal
-  })
-}
-
 # Open WebUI
 
 module "open-webui" {

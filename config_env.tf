@@ -142,8 +142,6 @@ locals {
     lldap            = "ghcr.io/lldap/lldap:latest-alpine@sha256:2c94c4d296a3e629fa0249caeff31e3de65ad2463a0818b36e8b5705562ecd13"
     authelia         = "ghcr.io/authelia/authelia:4.39.15@sha256:d23ee3c721d465b4749cc58541cda4aebe5aa6f19d7b5ce0afebb44ebee69591"
     cloudflared      = "docker.io/cloudflare/cloudflared:2026.2.0@sha256:404528c1cd63c3eb882c257ae524919e4376115e6fe57befca8d603656a91a4c"
-    mcp_proxy        = "ghcr.io/tbxark/mcp-proxy:v0.43.2@sha256:70c0e02d39c4c0898e610b3a30954f7930628fa6f4fb447bad14c32382a25879"
-    prometheus_mcp   = "ghcr.io/pab1it0/prometheus-mcp-server:1.5.3@sha256:32d47c88845ee78bc343d4c3a39a24b1bd9bebce4f53becdbbf5704221185925"
     rclone           = "ghcr.io/rclone/rclone:1.73.1@sha256:c08f5e100e1c4fa4deb1315b56a47c0cc0e765222b7c0834bc93305f2e4d85c0"
   }
 
@@ -315,11 +313,6 @@ locals {
         name      = "authelia"
         namespace = "auth"
         ingress   = "auth.${local.domains.public}"
-      }
-      prometheus_mcp = {
-        name      = "prometheus-mcp"
-        namespace = "monitoring"
-        ingress   = "prometheus-mcp.${local.domains.kubernetes}"
       }
     } :
     name => merge(e, {
