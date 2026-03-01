@@ -175,7 +175,7 @@ module "sunshine-desktop" {
     }
   }
   security_context = {
-    # TODO: Revisit - currently privileged to make libinput work
+    # TODO: Privileged to make libinput work https://github.com/squat/generic-device-plugin/issues/148
     privileged = true
     # capabilities = {
     #   add = [
