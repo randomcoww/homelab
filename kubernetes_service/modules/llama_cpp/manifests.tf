@@ -177,9 +177,9 @@ module "statefulset" {
     containers = [
       {
         name  = var.name
-        image = var.images.llama_swap # TODO: use llama-cpp image and mount swap into image
+        image = var.images.llama_swap
         command = [
-          "/app/llama-swap", # TODO: use mounted binary
+          "/app/llama-swap",
           "--config",
           "${local.config_file}",
           "--listen",
