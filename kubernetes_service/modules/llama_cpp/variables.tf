@@ -22,7 +22,6 @@ variable "affinity" {
 
 variable "images" {
   type = object({
-    llama_cpp  = string
     llama_swap = string
     rclone     = string
   })

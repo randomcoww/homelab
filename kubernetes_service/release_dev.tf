@@ -11,8 +11,7 @@ module "llama-cpp" {
   namespace = local.endpoints.llama_cpp.namespace
   release   = "0.1.0"
   images = {
-    llama_cpp  = local.container_images.llama_cpp_vulkan
-    llama_swap = local.container_images.llama_swap
+    llama_swap = local.container_images.llama_cpp_vulkan
     rclone     = local.container_images.rclone
   }
   ingress_hostname = local.endpoints.llama_cpp.ingress
