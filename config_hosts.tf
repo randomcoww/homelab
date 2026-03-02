@@ -332,6 +332,8 @@ locals {
         "pcie_aspm=off",               # TODO: remove if this gets fixed - workaround for r8169 transmit queue timed out issue
         "ttm.pages_limit=31457280",    # 120G https://community.frame.work/t/igpu-vram-how-much-can-be-assigned/73081
         "ttm.page_pool_size=24576000", # 96G preallocated
+        "mt7925e.disable_aspm=1",
+        "swiotlb=65535", # 7925e stability
       ]
     }
   }
