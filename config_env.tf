@@ -127,7 +127,7 @@ locals {
     github_actions_runner = "ghcr.io/actions/actions-runner:2.332.0@sha256:8c3f5970b8ceb90cbd3e89b80c6806bb74d9c31686e9177c743323a4539d12f5"
     # tier 3
     mountpoint       = "reg.cluster.internal/randomcoww/mountpoint-s3:v1.22.0@sha256:2f46945f64183d311c9e9d307439f6589606210d96092922f48897642b1d2bfe"
-    hostapd          = "reg.cluster.internal/randomcoww/hostapd-noscan:v20260302.144930@sha256:3573d2c22bf0d7924c5986741a7bc066f2b6dd9578049904ad634ac4da1cdf80"
+    hostapd          = "reg.cluster.internal/randomcoww/hostapd:v2.11@sha256:dbc6b2d09e2f4f2359697427dd605e5429c57b0438c393eba78c362196d9dbfb"
     tailscale        = "ghcr.io/tailscale/tailscale:v1.94.2@sha256:95e528798bebe75f39b10e74e7051cf51188ee615934f232ba7ad06a3390ffa1"
     qrcode_generator = "reg.cluster.internal/randomcoww/qrcode-resource:v20260302.144020@sha256:fc073ce81eb76944fdab1e51dd4478d14ac30148b93d24a4e4ec702fea835b7e"
     llama_cpp_vulkan = "ghcr.io/mostlygeek/llama-swap:vulkan-non-root@sha256:7750bc88ef526f6dbdf15beede5b01560413b2b7db03d9cdd8bae340a3ba76b9"
