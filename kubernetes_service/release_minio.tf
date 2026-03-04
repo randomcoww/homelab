@@ -136,12 +136,12 @@ resource "helm_release" "minio" {
         type              = "LoadBalancer"
         port              = local.service_ports.minio
         clusterIP         = local.services.cluster_minio.ip
-        loadBalancerIP    = local.services.minio.ip
         loadBalancerClass = "kube-vip.io/kube-vip-class"
         annotations = {
-          "prometheus.io/scrape" = "true"
-          "prometheus.io/port"   = tostring(local.service_ports.metrics)
-          "prometheus.io/path"   = "/minio/metrics/v3"
+          "prometheus.io/scrape"        = "true"
+          "prometheus.io/port"          = tostring(local.service_ports.metrics)
+          "prometheus.io/path"          = "/minio/metrics/v3"
+          "kube-vip.io/loadbalancerIPs" = local.services.minio.ip
         }
       }
       certsPath = "/opt/minio/certs"

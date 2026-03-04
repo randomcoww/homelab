@@ -156,8 +156,10 @@ resource "helm_release" "ingress-nginx" {
         }
         ingressClass = local.endpoints.ingress_nginx.name
         service = {
+          annotations = {
+            "kube-vip.io/loadbalancerIPs" = "0.0.0.0"
+          }
           type              = "LoadBalancer"
-          loadBalancerIP    = "0.0.0.0"
           loadBalancerClass = "kube-vip.io/kube-vip-class"
         }
         allowSnippetAnnotations = true

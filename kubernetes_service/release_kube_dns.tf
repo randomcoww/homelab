@@ -90,8 +90,10 @@ resource "helm_release" "kube-dns" {
         }
       }
       service = {
+        annotations = {
+          "kube-vip.io/loadbalancerIPs" = local.services.external_dns.ip
+        }
         clusterIP         = local.services.cluster_dns.ip
-        loadBalancerIP    = local.services.external_dns.ip
         loadBalancerClass = "kube-vip.io/kube-vip-class"
       }
       customLabels = {
