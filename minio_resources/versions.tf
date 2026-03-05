@@ -13,7 +13,7 @@ terraform {
   required_providers {
     minio = {
       source  = "aminueza/minio"
-      version = "3.25.0"
+      version = "3.26.0"
     }
     tls = {
       source  = "opentofu/tls"
