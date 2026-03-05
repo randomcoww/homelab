@@ -130,7 +130,7 @@ module "llama-cpp" {
   minio_data_bucket   = "models"
   minio_access_secret = local.minio_users.llama_cpp.secret
   ingress_class_name  = local.endpoints.ingress_nginx_internal.name
-  nginx_ingress_annotations = merge(local.nginx_ingress_annotations_common, {
+  ingress_annotations = merge(local.nginx_ingress_annotations_common, {
     "cert-manager.io/cluster-issuer" = local.kubernetes.cert_issuers.ca_internal
   })
 }
@@ -170,7 +170,7 @@ module "searxng" {
   }
   ingress_hostname   = local.endpoints.searxng.ingress
   ingress_class_name = local.endpoints.ingress_nginx_internal.name
-  nginx_ingress_annotations = merge(local.nginx_ingress_annotations_common, {
+  ingress_annotations = merge(local.nginx_ingress_annotations_common, {
     "cert-manager.io/cluster-issuer" = local.kubernetes.cert_issuers.ca_internal
   })
 }
@@ -262,7 +262,7 @@ module "open-webui" {
     OAUTH_ROLES_CLAIM              = "groups"
   }
   ingress_class_name = local.endpoints.ingress_nginx.name
-  nginx_ingress_annotations = merge(local.nginx_ingress_annotations_common, {
+  ingress_annotations = merge(local.nginx_ingress_annotations_common, {
     "cert-manager.io/cluster-issuer" = local.kubernetes.cert_issuers.acme_prod
   })
 

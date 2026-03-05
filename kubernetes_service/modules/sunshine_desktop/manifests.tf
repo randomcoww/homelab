@@ -160,7 +160,7 @@ module "ingress" {
   app                = var.name
   release            = var.release
   ingress_class_name = var.ingress_class_name
-  annotations = merge(var.nginx_ingress_annotations, {
+  annotations = merge(var.ingress_annotations, {
     "nginx.ingress.kubernetes.io/backend-protocol"      = "HTTPS"
     "nginx.ingress.kubernetes.io/configuration-snippet" = <<-EOF
     proxy_set_header Authorization "Basic ${base64encode("${random_password.username.result}:${random_password.password.result}")}";

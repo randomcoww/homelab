@@ -82,6 +82,7 @@ variable "ingress_class_name" {
   type = string
 }
 
-variable "nginx_ingress_annotations" {
-  type = map(string)
+variable "ingress_annotations" {
+  type    = map(string)
+  default = {}
 }

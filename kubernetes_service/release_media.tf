@@ -22,7 +22,7 @@ module "kavita" {
   }
   ingress_hostname   = local.endpoints.kavita.ingress
   ingress_class_name = local.endpoints.ingress_nginx.name
-  nginx_ingress_annotations = merge(local.nginx_ingress_annotations_common, {
+  ingress_annotations = merge(local.nginx_ingress_annotations_common, {
     "cert-manager.io/cluster-issuer" = local.kubernetes.cert_issuers.acme_prod
   })
 
@@ -47,7 +47,7 @@ module "navidrome" {
   }
   ingress_hostname   = local.endpoints.navidrome.ingress
   ingress_class_name = local.endpoints.ingress_nginx.name
-  nginx_ingress_annotations = merge(
+  ingress_annotations = merge(
     local.nginx_ingress_annotations_common,
     local.nginx_ingress_annotations_authelia, {
       "cert-manager.io/cluster-issuer" = local.kubernetes.cert_issuers.acme_prod
@@ -187,7 +187,7 @@ module "sunshine-desktop" {
   ingress_hostname        = local.endpoints.sunshine_desktop.ingress
   service_hostname        = local.endpoints.sunshine_desktop.service
   ingress_class_name      = local.endpoints.ingress_nginx_internal.name
-  nginx_ingress_annotations = merge(local.nginx_ingress_annotations_common, {
+  ingress_annotations = merge(local.nginx_ingress_annotations_common, {
     "cert-manager.io/cluster-issuer" = local.kubernetes.cert_issuers.ca_internal
   })
 }

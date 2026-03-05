@@ -68,7 +68,7 @@ module "ingress" {
   app                = var.name
   release            = var.release
   ingress_class_name = var.ingress_class_name
-  annotations        = var.nginx_ingress_annotations
+  annotations        = var.ingress_annotations
   rules = [
     {
       host = var.ingress_hostname

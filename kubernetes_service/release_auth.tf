@@ -72,7 +72,7 @@ module "lldap" {
   service_hostname   = local.endpoints.lldap.service_fqdn
   ingress_hostname   = local.endpoints.lldap.ingress
   ingress_class_name = local.endpoints.ingress_nginx_internal.name
-  nginx_ingress_annotations = merge(local.nginx_ingress_annotations_common, {
+  ingress_annotations = merge(local.nginx_ingress_annotations_common, {
     "cert-manager.io/cluster-issuer" = local.kubernetes.cert_issuers.ca_internal
   })
 }
