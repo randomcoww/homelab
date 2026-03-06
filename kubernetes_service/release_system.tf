@@ -193,6 +193,17 @@ resource "helm_release" "traefik" {
           "kube-vip.io/loadbalancerIPs" = "0.0.0.0"
         }
       }
+      metrics = {
+        prometheus = {
+          service = {
+            enabled = true
+            annotations = {
+              "prometheus.io/scrape" = "true"
+              "prometheus.io/port"   = tostring(local.service_ports.metrics)
+            }
+          }
+        }
+      }
       ports = {
         web = {
           expose = {
@@ -202,138 +213,6 @@ resource "helm_release" "traefik" {
         websecure = {
           expose = {
             default = true
-          }
-        }
-      }
-    }),
-  ]
-}
-
-# Ingress
-
-resource "helm_release" "ingress-nginx" {
-  name             = local.endpoints.ingress_nginx.name
-  repository       = "https://kubernetes.github.io/ingress-nginx"
-  chart            = "ingress-nginx"
-  namespace        = local.endpoints.ingress_nginx.namespace
-  create_namespace = true
-  wait             = false
-  wait_for_jobs    = false
-  version          = "4.14.3"
-  max_history      = 2
-  timeout          = local.kubernetes.helm_release_timeout
-  values = [
-    yamlencode({
-      controller = {
-        kind = "DaemonSet"
-        image = {
-          digest       = ""
-          digestChroot = ""
-        }
-        admissionWebhooks = {
-          patch = {
-            image = {
-              digest = ""
-            }
-          }
-        }
-        ingressClassResource = {
-          enabled         = true
-          name            = local.endpoints.ingress_nginx.name
-          controllerValue = "k8s.io/${local.endpoints.ingress_nginx.name}"
-        }
-        ingressClass = local.endpoints.ingress_nginx.name
-        service = {
-          annotations = {
-            "kube-vip.io/loadbalancerIPs" = "0.0.0.0"
-          }
-          type              = "LoadBalancer"
-          loadBalancerClass = "kube-vip.io/kube-vip-class"
-        }
-        allowSnippetAnnotations = true
-        config = {
-          # 4.12.0 annotations issue:
-          # https://github.com/kubernetes/ingress-nginx/issues/12618
-          annotations-risk-level  = "Critical"
-          ignore-invalid-headers  = "off"
-          proxy-body-size         = 0
-          proxy-buffering         = "off"
-          proxy-request-buffering = "off"
-          ssl-redirect            = "true"
-          use-forwarded-headers   = "true"
-          keep-alive              = "false"
-        }
-        controller = {
-          dnsConfig = {
-            options = [
-              {
-                name  = "ndots"
-                value = "2"
-              },
-            ]
-          }
-        }
-      }
-    }),
-  ]
-}
-
-resource "helm_release" "ingress-nginx-internal" {
-  name             = local.endpoints.ingress_nginx_internal.name
-  repository       = "https://kubernetes.github.io/ingress-nginx"
-  chart            = "ingress-nginx"
-  namespace        = local.endpoints.ingress_nginx_internal.namespace
-  create_namespace = true
-  wait             = false
-  wait_for_jobs    = false
-  version          = "4.14.3"
-  max_history      = 2
-  timeout          = local.kubernetes.helm_release_timeout
-  values = [
-    yamlencode({
-      controller = {
-        kind = "DaemonSet"
-        image = {
-          digest       = ""
-          digestChroot = ""
-        }
-        admissionWebhooks = {
-          patch = {
-            image = {
-              digest = ""
-            }
-          }
-        }
-        ingressClassResource = {
-          enabled         = true
-          name            = local.endpoints.ingress_nginx_internal.name
-          controllerValue = "k8s.io/${local.endpoints.ingress_nginx_internal.name}"
-        }
-        ingressClass = local.endpoints.ingress_nginx_internal.name
-        service = {
-          type = "ClusterIP"
-        }
-        allowSnippetAnnotations = true
-        config = {
-          # 4.12.0 annotations issue:
-          # https://github.com/kubernetes/ingress-nginx/issues/12618
-          annotations-risk-level  = "Critical"
-          ignore-invalid-headers  = "off"
-          proxy-body-size         = 0
-          proxy-buffering         = "off"
-          proxy-request-buffering = "off"
-          ssl-redirect            = "true"
-          use-forwarded-headers   = "true"
-          keep-alive              = "false"
-        }
-        controller = {
-          dnsConfig = {
-            options = [
-              {
-                name  = "ndots"
-                value = "2"
-              },
-            ]
           }
         }
       }

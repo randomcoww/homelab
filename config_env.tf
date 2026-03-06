@@ -180,7 +180,7 @@ locals {
 
   service_ports = {
     minio    = 9000
-    metrics  = 9153
+    metrics  = 9100
     registry = 443 # not configurable
     ldaps    = 6360
   }
@@ -274,7 +274,7 @@ locals {
         namespace = "monitoring"
       }
       searxng = {
-        name    = "searxng"
+        name = "searxng"
       }
       registry = {
         name    = "registry"
@@ -286,13 +286,13 @@ locals {
         ingress = "hostapd.${local.domains.public}"
       }
       kavita = {
-        name    = "kavita"
+        name = "kavita"
       }
       navidrome = {
-        name    = "navidrome"
+        name = "navidrome"
       }
       llama_cpp = {
-        name    = "llama-cpp"
+        name = "llama-cpp"
       }
       sunshine_desktop = {
         name    = "sunshine-desktop"

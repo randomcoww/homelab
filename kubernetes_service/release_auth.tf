@@ -281,6 +281,10 @@ resource "helm_release" "authelia" {
       }
       service = {
         type = "ClusterIP"
+        annotations = {
+          "prometheus.io/scrape" = "true"
+          "prometheus.io/port"   = tostring(local.service_ports.metrics)
+        }
       }
       ingress = {
         enabled = true
@@ -575,7 +579,8 @@ resource "helm_release" "authelia" {
         }
         telemetry = {
           metrics = {
-            enabled = false
+            enabled = true
+            port    = local.service_ports.metrics
           }
         }
         default_2fa_method = "webauthn"
