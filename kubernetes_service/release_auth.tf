@@ -284,14 +284,14 @@ resource "helm_release" "authelia" {
       }
       ingress = {
         enabled = true
-        annotations = {
-          "cert-manager.io/cluster-issuer" = local.kubernetes.cert_issuers.acme_prod
-        }
-        certManager = true
-        className   = local.endpoints.ingress_nginx.name
-        tls = {
+        gatewayAPI = {
           enabled = true
-          secret  = "${local.endpoints.authelia.ingress}-tls"
+          parentRefs = [
+            {
+              name      = local.endpoints.traefik.name
+              namespace = local.endpoints.traefik.namespace
+            },
+          ]
         }
       }
       pod = {
