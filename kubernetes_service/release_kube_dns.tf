@@ -207,7 +207,6 @@ resource "helm_release" "kube-dns" {
           image = local.container_images.external_dns
           args = [
             "--source=service",
-            "--source=ingress",
             "--source=gateway-httproute",
             "--provider=coredns",
             "--log-level=debug",
