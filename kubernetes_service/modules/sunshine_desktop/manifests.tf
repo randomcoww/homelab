@@ -453,14 +453,14 @@ module "statefulset" {
             "squat.ai/ntsync" = 1
             "squat.ai/input"  = 1
             "squat.ai/uinput" = 1
-            "squat.ai/tty"    = 256
+            "squat.ai/tty"    = 1
           }
           limits = {
             "amd.com/gpu"     = 1
             "squat.ai/ntsync" = 1
             "squat.ai/input"  = 1
             "squat.ai/uinput" = 1
-            "squat.ai/tty"    = 256
+            "squat.ai/tty"    = 1
           }
         }
         securityContext = var.security_context

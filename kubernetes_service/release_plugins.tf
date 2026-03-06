@@ -102,10 +102,13 @@ module "device-plugin" {
       name = "tty"
       groups = [
         {
-          count = 256
+          count = 8
           paths = [
             {
-              path = "/dev/tty*"
+              path = "/dev/tty0"
+            },
+            {
+              path = "/dev/tty1"
             },
           ]
         },
