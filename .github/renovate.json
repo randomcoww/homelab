@@ -33,7 +33,6 @@
   "packageRules": [
     {
       "matchPackageNames": [
-        "ghcr.io/randomcoww/ipxe",
         "reg.cluster.internal/randomcoww/qrcode-resource",
         "ghcr.io/ggml-org/llama.cpp",
         "reg.cluster.internal/randomcoww/llama-swap",

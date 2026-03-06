@@ -120,7 +120,7 @@ locals {
     nginx              = "docker.io/nginxinc/nginx-unprivileged:1.29.5-alpine@sha256:e93571f3d08325964770168617743bcce2d308255ded81e38172fb1803407e74"
     # tier 2
     kea                   = "ghcr.io/randomcoww/kea:v3.1.5@sha256:6e6bf4a1e600a8f14c0fa3b50844f2d0a60551f412966c66d05534ac1255281e"
-    ipxe                  = "ghcr.io/randomcoww/ipxe:v20260302.144104@sha256:e42ac79323fd9854b5e222e1769ceb90d0361dc278c06215b4408a5f1e61f476"
+    ipxe                  = "ghcr.io/randomcoww/ipxe:v2.0.0@sha256:f465e7da9a95e5456216e68d50ee4d6d32ac55e43462e589c3d607a26b47fcc3"
     registry              = "ghcr.io/distribution/distribution:3.0.0@sha256:4ba3adf47f5c866e9a29288c758c5328ef03396cb8f5f6454463655fa8bc83e2"
     registry_ui           = "docker.io/quiq/registry-ui:0.12.0@sha256:0d066cddfb87427d1907801cd5f955a5af4633ac3bae25273184dd80a96289be"
     device_plugin         = "ghcr.io/squat/generic-device-plugin:latest@sha256:78127620563730680371e2915d48d69dc3ab513f12c742ca6bcacd156051fd4b"
