@@ -218,7 +218,7 @@ module "tailscale" {
 }
 
 # Cloudflare tunnel
-/*
+
 resource "helm_release" "cloudflare-tunnel" {
   name          = "cloudflare-tunnel"
   namespace     = "default"
@@ -243,7 +243,7 @@ resource "helm_release" "cloudflare-tunnel" {
         ingress = [
           {
             hostname = "*.${local.domains.public}"
-            service  = "https://${local.endpoints.ingress_nginx.service}"
+            service  = "https://${local.endpoints.traefik.service}"
           },
         ]
       }
@@ -258,4 +258,3 @@ resource "helm_release" "cloudflare-tunnel" {
     }),
   ]
 }
-*/

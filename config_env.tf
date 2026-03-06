@@ -236,16 +236,6 @@ locals {
 
   endpoints = {
     for name, e in {
-      ingress_nginx = {
-        name      = "ingress-nginx"
-        namespace = "ingress-nginx"
-        service   = "ingress-nginx-controller.ingress-nginx" # Name created by helm chart
-      }
-      ingress_nginx_internal = {
-        name      = "ingress-nginx-internal"
-        namespace = "ingress-nginx"
-        service   = "ingress-nginx-internal-controller.ingress-nginx" # Name created by helm chart
-      }
       traefik = {
         name      = "traefik"
         namespace = "traefik"
@@ -288,16 +278,8 @@ locals {
       kavita = {
         name = "kavita"
       }
-      navidrome = {
-        name = "navidrome"
-      }
       llama_cpp = {
         name = "llama-cpp"
-      }
-      sunshine_desktop = {
-        name    = "sunshine-desktop"
-        service = "sunshine.${local.domains.kubernetes}"
-        ingress = "sunshine.${local.domains.public}"
       }
       open_webui = {
         name    = "open-webui"

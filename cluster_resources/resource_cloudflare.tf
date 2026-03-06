@@ -14,7 +14,6 @@ locals {
   cloudflare_tunnel_ingress_endpoints = [
     local.endpoints.authelia.ingress,
     local.endpoints.kavita.ingress,
-    local.endpoints.navidrome.ingress,
     local.endpoints.open_webui.ingress,
   ]
 }
@@ -164,7 +163,7 @@ resource "cloudflare_zero_trust_tunnel_cloudflared_config" "tunnel" {
       for _, hostname in local.cloudflare_tunnel_ingress_endpoints :
       {
         hostname = hostname
-        service  = "https://${local.endpoints.ingress_nginx.service}"
+        service  = "https://${local.endpoints.traefik.service}"
         path     = "/"
         # need to remove default params from terrafrom
         origin_request = {
