@@ -92,6 +92,10 @@ resource "helm_release" "kube-dns" {
       prometheus = {
         service = {
           enabled = true
+          annotations = {
+            "prometheus.io/scrape" = "true"
+            "prometheus.io/port"   = tostring(local.service_ports.metrics)
+          }
         }
       }
       service = {
