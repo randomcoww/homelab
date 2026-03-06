@@ -17,6 +17,7 @@ locals {
     module.searxng,
     module.open-webui,
     module.llama-cpp,
+    # module.sunshine-desktop,
   ]
 }
 

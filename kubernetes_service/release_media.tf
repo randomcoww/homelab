@@ -30,3 +30,130 @@ module "kavita" {
   minio_bucket        = "kavita"
   minio_access_secret = local.minio_users.kavita.secret
 }
+
+# Sunshine desktop
+
+module "sunshine-desktop" {
+  source    = "./modules/sunshine_desktop"
+  name      = local.endpoints.sunshine_desktop.name
+  namespace = local.endpoints.sunshine_desktop.namespace
+  release   = "0.1.0"
+  images = {
+    sunshine_desktop = local.container_images.sunshine_desktop
+    nginx            = "${regex(local.container_image_regex, local.container_images.nginx).depName}:${regex(local.container_image_regex, local.container_images.nginx).currentValue}"
+  }
+  user               = "sunshine"
+  uid                = 10000
+  storage_class_name = "local-path"
+  extra_configs = [
+    {
+      path    = "/etc/xdg/foot/foot.ini"
+      content = <<-EOF
+      font=monospace:size=14
+      EOF
+    },
+    {
+      path    = "/etc/tmux.conf"
+      content = <<-EOF
+      set -g history-limit 10000
+      set -g mouse on
+      set-option -s set-clipboard off
+      bind-key -T copy-mode MouseDragEnd1Pane send-keys -X copy-pipe-and-cancel "xclip -in -sel clip"
+      EOF
+    },
+    {
+      path    = "/etc/profile.d/tmux.sh"
+      content = <<-EOF
+      if [ -z "$TMUX" ]; then
+        exec tmux new-session -A -s default
+      fi
+      EOF
+    },
+    {
+      path    = "/etc/sway/config.d/sync"
+      content = <<-EOF
+      output * bg #000000 solid_color
+      output * allow_tearing yes
+      output * max_render_time off
+      EOF
+    },
+  ]
+  extra_envs = [
+    {
+      name  = "TZ"
+      value = local.timezone
+    },
+    {
+      name  = "WLR_DRM_NO_MODIFIERS"
+      value = 1
+    },
+    # TODO: track https://github.com/LizardByte/Sunshine/issues/4050
+    # {
+    #   name  = "WLR_RENDERER"
+    #   value = "vulkan"
+    # },
+    {
+      name  = "WLR_DRM_NO_ATOMIC"
+      value = 1
+    },
+    {
+      name  = "PROTON_ENABLE_HDR"
+      value = 1
+    },
+    {
+      name  = "PROTON_FSR4_UPGRADE"
+      value = 1
+    },
+    {
+      name  = "AMD_VULKAN_ICD"
+      value = "RADV"
+    },
+    {
+      name  = "MESA_SHADER_CACHE_MAX_SIZE"
+      value = "12G"
+    },
+    {
+      name  = "AMD_USERQ"
+      value = 1
+    },
+    {
+      name  = "ENABLE_LAYER_MESA_ANTI_LAG"
+      value = 1
+    },
+  ]
+  affinity = {
+    nodeAffinity = {
+      requiredDuringSchedulingIgnoredDuringExecution = {
+        nodeSelectorTerms = [
+          {
+            matchExpressions = [
+              {
+                key      = "amd.com/gpu.cu-count"
+                operator = "Gt"
+                values = [
+                  "31",
+                ]
+              },
+            ]
+          },
+        ]
+      }
+    }
+  }
+  security_context = {
+    # TODO: Privileged to make libinput work https://github.com/squat/generic-device-plugin/issues/148
+    privileged = true
+    # capabilities = {
+    #   add = [
+    #     "ALL",
+    #   ]
+    # }
+  }
+  loadbalancer_class_name = "kube-vip.io/kube-vip-class"
+  service_hostname        = local.endpoints.sunshine_desktop.service
+  ingress_hostname        = local.endpoints.sunshine_desktop.ingress
+  gateway_ref = {
+    name      = local.endpoints.traefik.name
+    namespace = local.endpoints.traefik.namespace
+  }
+}

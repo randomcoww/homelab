@@ -59,7 +59,7 @@ module "minio-metrics-proxy" {
   app     = local.endpoints.minio.name
   release = "0.1.0"
   data = {
-    "default.conf" = <<-EOF
+    "nginx-proxy.conf" = <<-EOF
     proxy_request_buffering off;
     proxy_buffering off;
     proxy_cache off;
@@ -68,6 +68,11 @@ module "minio-metrics-proxy" {
       listen ${local.service_ports.metrics};
       location /minio/metrics/v3 {
         proxy_pass https://127.0.0.1:${local.service_ports.minio};
+
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
       }
     }
     EOF
@@ -180,7 +185,7 @@ resource "helm_release" "minio" {
             {
               name      = "metrics-proxy-config"
               mountPath = "/etc/nginx/conf.d/default.conf"
-              subPath   = "default.conf"
+              subPath   = "nginx-proxy.conf"
             },
           ]
         },

@@ -141,6 +141,7 @@ locals {
     authelia         = "ghcr.io/authelia/authelia:4.39.15@sha256:d23ee3c721d465b4749cc58541cda4aebe5aa6f19d7b5ce0afebb44ebee69591"
     cloudflared      = "docker.io/cloudflare/cloudflared:2026.2.0@sha256:404528c1cd63c3eb882c257ae524919e4376115e6fe57befca8d603656a91a4c"
     rclone           = "ghcr.io/rclone/rclone:1.73.1@sha256:c08f5e100e1c4fa4deb1315b56a47c0cc0e765222b7c0834bc93305f2e4d85c0"
+    sunshine_desktop = "reg.cluster.internal/randomcoww/sunshine-desktop:v2026.306.10834@sha256:392d2ea813e560d71a646ddca28496e0142380330db223594ff3a1c2bb7ac02c"
   }
 
   host_images = {
@@ -292,6 +293,11 @@ locals {
         name      = "authelia"
         namespace = "auth"
         ingress   = "auth.${local.domains.public}"
+      }
+      sunshine_desktop = {
+        name    = "sunshine-desktop"
+        service = "sunshine.${local.domains.kubernetes}"
+        ingress = "sunshine.${local.domains.public}"
       }
     } :
     name => merge(e, {
