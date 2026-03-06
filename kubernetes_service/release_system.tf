@@ -121,6 +121,102 @@ module "kube-vip" {
   }
 }
 
+# Traefik gateway
+
+resource "helm_release" "traefik" {
+  name             = local.endpoints.traefik.name
+  repository       = "https://traefik.github.io/charts"
+  chart            = "traefik"
+  namespace        = local.endpoints.traefik.namespace
+  create_namespace = true
+  wait             = false
+  wait_for_jobs    = false
+  version          = "39.0.2"
+  max_history      = 2
+  timeout          = local.kubernetes.helm_release_timeout
+  values = [
+    yamlencode({
+      deployment = {
+        kind = "DaemonSet"
+      }
+      api = {
+        dashboard = false
+      }
+      ingressClass = {
+        enabled = false
+      }
+      gateway = {
+        name = local.endpoints.traefik.name
+        annotations = {
+          "cert-manager.io/cluster-issuer" = local.kubernetes.cert_issuers.acme_prod
+        }
+        listeners = {
+          web = {
+            hostname = "*.${local.domains.public}"
+            port     = 8000
+            protocol = "HTTP"
+            namespacePolicy = {
+              from = "All"
+            }
+          }
+          websecure = {
+            hostname = "*.${local.domains.public}"
+            port     = 8443
+            protocol = "HTTPS"
+            namespacePolicy = {
+              from = "All"
+            }
+            certificateRefs = [
+              {
+                name  = "${local.domains.public}-tls"
+                kind  = "Secret"
+                group = "core"
+              },
+            ]
+          }
+        }
+      }
+      gatewayClass = {
+        name = local.endpoints.traefik.name
+      }
+      experimental = {
+        kubernetesGateway = {
+          enabled = true
+        }
+      }
+      providers = {
+        kubernetesCRD = {
+          enabled = false
+        }
+        kubernetesIngress = {
+          enabled = false
+        }
+        kubernetesGateway = {
+          enabled = true
+        }
+      }
+      service = {
+        loadBalancerClass = "kube-vip.io/kube-vip-class"
+        annotations = {
+          "kube-vip.io/loadbalancerIPs" = "0.0.0.0"
+        }
+      }
+      ports = {
+        web = {
+          expose = {
+            default = true
+          }
+        }
+        websecure = {
+          expose = {
+            default = true
+          }
+        }
+      }
+    }),
+  ]
+}
+
 # Ingress
 
 resource "helm_release" "ingress-nginx" {

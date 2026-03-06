@@ -246,6 +246,10 @@ locals {
         namespace = "ingress-nginx"
         service   = "ingress-nginx-internal-controller.ingress-nginx" # Name created by helm chart
       }
+      traefik = {
+        name      = "traefik"
+        namespace = "traefik"
+      }
       apiserver = {
         name = "kubernetes"
       }

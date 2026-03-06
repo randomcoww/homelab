@@ -37,6 +37,11 @@ resource "helm_release" "kube-dns-rbac" {
               resources = ["gateways"]
               verbs     = ["list", "watch", "get"]
             },
+            {
+              apiGroups = ["gateway.networking.k8s.io"]
+              resources = ["gateways", "httproutes", "tcproutes", "udproutes"]
+              verbs     = ["list", "watch", "get"]
+            },
           ]
         }),
         yamlencode({
@@ -199,6 +204,7 @@ resource "helm_release" "kube-dns" {
           args = [
             "--source=service",
             "--source=ingress",
+            "--source=gateway-httproute",
             "--provider=coredns",
             "--log-level=debug",
             "--metrics-address=:7979",
@@ -229,7 +235,7 @@ resource "helm_release" "kube-dns" {
               path = "/healthz"
               port = "http"
             }
-            initialDelaySeconds = 10
+            initialDelaySeconds = 30
             timeoutSeconds      = 2
           }
           readinessProbe = {

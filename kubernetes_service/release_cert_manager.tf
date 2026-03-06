@@ -60,6 +60,9 @@ resource "helm_release" "cert-manager" {
         enabled = true
       }
       enableCertificateOwnerRef = true
+      config = {
+        enableGatewayAPI = true
+      }
       prometheus = {
         enabled = true
       }
