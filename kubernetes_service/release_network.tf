@@ -171,12 +171,12 @@ module "qrcode-hostapd" {
   images = {
     qrcode = local.container_images.qrcode_generator
   }
-  ingress_hostname   = local.endpoints.qrcode_hostapd.ingress
-  ingress_class_name = local.endpoints.ingress_nginx_internal.name
-  ingress_annotations = merge(local.nginx_ingress_annotations_common, {
-    "cert-manager.io/cluster-issuer" = local.kubernetes.cert_issuers.ca_internal
-  })
-  qrcode_value = "WIFI:S:${random_password.hostapd-ssid.result};T:WPA;P:${random_password.hostapd-password.result};H:true;;"
+  qrcode_value     = "WIFI:S:${random_password.hostapd-ssid.result};T:WPA;P:${random_password.hostapd-password.result};H:true;;"
+  ingress_hostname = local.endpoints.qrcode_hostapd.ingress
+  gateway_ref = {
+    name      = local.endpoints.traefik.name
+    namespace = local.endpoints.traefik.namespace
+  }
 }
 
 # Tailscale remote access
@@ -218,7 +218,7 @@ module "tailscale" {
 }
 
 # Cloudflare tunnel
-
+/*
 resource "helm_release" "cloudflare-tunnel" {
   name          = "cloudflare-tunnel"
   namespace     = "default"
@@ -258,3 +258,4 @@ resource "helm_release" "cloudflare-tunnel" {
     }),
   ]
 }
+*/

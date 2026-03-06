@@ -14,7 +14,6 @@ module "llama-cpp" {
     llama_swap = local.container_images.llama_cpp_vulkan
     rclone     = local.container_images.rclone
   }
-  ingress_hostname = local.endpoints.llama_cpp.ingress
   api_keys = [
     random_password.llama-cpp-auth-token.result,
   ]
@@ -125,14 +124,15 @@ module "llama-cpp" {
       }
     }
   }
+  ingress_hostname = local.endpoints.llama_cpp.ingress
+  gateway_ref = {
+    name      = local.endpoints.traefik.name
+    namespace = local.endpoints.traefik.namespace
+  }
   storage_class_name  = "local-path"
   minio_endpoint      = "https://${local.services.cluster_minio.ip}:${local.service_ports.minio}"
   minio_data_bucket   = "models"
   minio_access_secret = local.minio_users.llama_cpp.secret
-  ingress_class_name  = local.endpoints.ingress_nginx_internal.name
-  ingress_annotations = merge(local.nginx_ingress_annotations_common, {
-    "cert-manager.io/cluster-issuer" = local.kubernetes.cert_issuers.ca_internal
-  })
 }
 
 # SearXNG
@@ -168,11 +168,11 @@ module "searxng" {
       ]
     }
   }
-  ingress_hostname   = local.endpoints.searxng.ingress
-  ingress_class_name = local.endpoints.ingress_nginx_internal.name
-  ingress_annotations = merge(local.nginx_ingress_annotations_common, {
-    "cert-manager.io/cluster-issuer" = local.kubernetes.cert_issuers.ca_internal
-  })
+  ingress_hostname = local.endpoints.searxng.ingress
+  gateway_ref = {
+    name      = local.endpoints.traefik.name
+    namespace = local.endpoints.traefik.namespace
+  }
 }
 
 # Open WebUI
@@ -265,7 +265,6 @@ module "open-webui" {
     name      = local.endpoints.traefik.name
     namespace = local.endpoints.traefik.namespace
   }
-
   minio_endpoint      = "https://${local.services.cluster_minio.ip}:${local.service_ports.minio}"
   minio_bucket        = "open-webui"
   minio_access_secret = local.minio_users.open_webui.secret

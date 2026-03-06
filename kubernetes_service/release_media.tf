@@ -25,7 +25,6 @@ module "kavita" {
     name      = local.endpoints.traefik.name
     namespace = local.endpoints.traefik.namespace
   }
-
   minio_endpoint      = "https://${local.services.cluster_minio.ip}:${local.service_ports.minio}"
   minio_data_bucket   = "ebooks"
   minio_bucket        = "kavita"
@@ -45,13 +44,11 @@ module "navidrome" {
     mountpoint = local.container_images.mountpoint
     litestream = local.container_images.litestream
   }
-  ingress_hostname   = local.endpoints.navidrome.ingress
-  ingress_class_name = local.endpoints.ingress_nginx.name
-  ingress_annotations = merge(
-    local.nginx_ingress_annotations_common,
-    local.nginx_ingress_annotations_authelia, {
-      "cert-manager.io/cluster-issuer" = local.kubernetes.cert_issuers.acme_prod
-  })
+  ingress_hostname = local.endpoints.navidrome.ingress
+  gateway_ref = {
+    name      = local.endpoints.traefik.name
+    namespace = local.endpoints.traefik.namespace
+  }
   extra_configs = {
     ND_EXTAUTH_TRUSTEDSOURCES = join(",", [
       local.networks.kubernetes_pod.prefix,
@@ -184,10 +181,10 @@ module "sunshine-desktop" {
     # }
   }
   loadbalancer_class_name = "kube-vip.io/kube-vip-class"
-  ingress_hostname        = local.endpoints.sunshine_desktop.ingress
   service_hostname        = local.endpoints.sunshine_desktop.service
-  ingress_class_name      = local.endpoints.ingress_nginx_internal.name
-  ingress_annotations = merge(local.nginx_ingress_annotations_common, {
-    "cert-manager.io/cluster-issuer" = local.kubernetes.cert_issuers.ca_internal
-  })
+  ingress_hostname        = local.endpoints.sunshine_desktop.ingress
+  gateway_ref = {
+    name      = local.endpoints.traefik.name
+    namespace = local.endpoints.traefik.namespace
+  }
 }

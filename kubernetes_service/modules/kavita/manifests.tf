@@ -88,7 +88,7 @@ module "httproute" {
         ]
         backendRefs = [
           {
-            name = var.name
+            name = module.service.name
             port = local.kavita_port
           },
         ]

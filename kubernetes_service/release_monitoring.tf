@@ -79,22 +79,21 @@ resource "helm_release" "prometheus" {
           }
         }
         ingress = {
-          enabled          = true
-          ingressClassName = local.endpoints.ingress_nginx_internal.name
-          annotations = merge(local.nginx_ingress_annotations_common, {
-            "cert-manager.io/cluster-issuer" = local.kubernetes.cert_issuers.ca_internal
-          })
-          hosts = [
-            local.endpoints.prometheus.ingress,
-          ]
-          tls = [
-            {
-              secretName = "${local.endpoints.prometheus.ingress}-tls"
-              hosts = [
-                local.endpoints.prometheus.ingress,
-              ]
-            },
-          ]
+          enabled = false
+        }
+        route = {
+          main = {
+            enabled = true
+            parentRefs = [
+              {
+                name      = local.endpoints.traefik.name
+                namespace = local.endpoints.traefik.namespace
+              },
+            ]
+            hostnames = [
+              local.endpoints.prometheus.ingress,
+            ]
+          }
         }
         extraVolumeMounts = [
           {

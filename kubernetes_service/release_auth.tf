@@ -69,12 +69,12 @@ module "lldap" {
   minio_bucket        = "lldap"
   minio_access_secret = local.minio_users.lldap.secret
 
-  service_hostname   = local.endpoints.lldap.service_fqdn
-  ingress_hostname   = local.endpoints.lldap.ingress
-  ingress_class_name = local.endpoints.ingress_nginx_internal.name
-  ingress_annotations = merge(local.nginx_ingress_annotations_common, {
-    "cert-manager.io/cluster-issuer" = local.kubernetes.cert_issuers.ca_internal
-  })
+  service_hostname = local.endpoints.lldap.service_fqdn
+  ingress_hostname = local.endpoints.lldap.ingress
+  gateway_ref = {
+    name      = local.endpoints.traefik.name
+    namespace = local.endpoints.traefik.namespace
+  }
 }
 
 ## authelia

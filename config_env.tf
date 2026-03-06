@@ -272,37 +272,32 @@ locals {
       prometheus = {
         name      = "prometheus"
         namespace = "monitoring"
-        ingress   = "prometheus.${local.domains.kubernetes}"
       }
       searxng = {
         name    = "searxng"
-        ingress = "searxng.${local.domains.kubernetes}"
       }
       registry = {
         name    = "registry"
         service = "reg.${local.domains.kubernetes}"
-        ingress = "reg-admin.${local.domains.kubernetes}"
+        ingress = "reg.${local.domains.public}"
       }
       qrcode_hostapd = {
         name    = "qrcode-hostapd"
-        ingress = "hostapd.${local.domains.kubernetes}"
+        ingress = "hostapd.${local.domains.public}"
       }
       kavita = {
         name    = "kavita"
-        ingress = "kavita.${local.domains.public}"
       }
       navidrome = {
         name    = "navidrome"
-        ingress = "navidrome.${local.domains.public}"
       }
       llama_cpp = {
         name    = "llama-cpp"
-        ingress = "llama-cpp.${local.domains.kubernetes}"
       }
       sunshine_desktop = {
         name    = "sunshine-desktop"
         service = "sunshine.${local.domains.kubernetes}"
-        ingress = "sunshine-admin.${local.domains.kubernetes}"
+        ingress = "sunshine.${local.domains.public}"
       }
       open_webui = {
         name    = "open-webui"
@@ -311,7 +306,7 @@ locals {
       lldap = {
         name      = "lldap"
         namespace = "auth"
-        ingress   = "ldap.${local.domains.kubernetes}"
+        ingress   = "ldap.${local.domains.public}"
       }
       authelia = {
         name      = "authelia"
@@ -323,7 +318,7 @@ locals {
       namespace    = lookup(e, "namespace", "default")
       service      = "${lookup(e, "service", "${e.name}.${lookup(e, "namespace", "default")}")}"
       service_fqdn = "${e.name}.${lookup(e, "namespace", "default")}.svc.${local.domains.kubernetes}"
-      ingress      = "${lookup(e, "ingress", "${e.name}.${local.domains.kubernetes}")}"
+      ingress      = "${lookup(e, "ingress", "${e.name}.${local.domains.public}")}"
     })
   }
 

@@ -105,7 +105,7 @@ module "httproute" {
         ]
         backendRefs = [
           {
-            name = var.name
+            name = module.service.name
             port = local.extra_configs.PORT
           },
         ]

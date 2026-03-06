@@ -151,14 +151,6 @@ resource "helm_release" "traefik" {
           "cert-manager.io/cluster-issuer" = local.kubernetes.cert_issuers.acme_prod
         }
         listeners = {
-          web = {
-            hostname = "*.${local.domains.public}"
-            port     = 8000
-            protocol = "HTTP"
-            namespacePolicy = {
-              from = "All"
-            }
-          }
           websecure = {
             hostname = "*.${local.domains.public}"
             port     = 8443
@@ -417,9 +409,9 @@ module "registry" {
   service_ip          = local.services.registry.ip
   service_hostname    = local.endpoints.registry.service
 
-  ingress_hostname   = local.endpoints.registry.ingress
-  ingress_class_name = local.endpoints.ingress_nginx_internal.name
-  ingress_annotations = merge(local.nginx_ingress_annotations_common, {
-    "cert-manager.io/cluster-issuer" = local.kubernetes.cert_issuers.ca_internal
-  })
+  ingress_hostname = local.endpoints.registry.ingress
+  gateway_ref = {
+    name      = local.endpoints.traefik.name
+    namespace = local.endpoints.traefik.namespace
+  }
 }

@@ -24,15 +24,15 @@ variable "ingress_hostname" {
   type = string
 }
 
+variable "gateway_ref" {
+  type = any
+}
+
 variable "images" {
   type = object({
     open_webui = string
     litestream = string
   })
-}
-
-variable "gateway_ref" {
-  type = any
 }
 
 variable "extra_configs" {

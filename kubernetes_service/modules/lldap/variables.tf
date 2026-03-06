@@ -44,17 +44,12 @@ variable "ingress_hostname" {
   type = string
 }
 
+variable "gateway_ref" {
+  type = any
+}
+
 variable "extra_configs" {
   type    = map(any)
-  default = {}
-}
-
-variable "ingress_class_name" {
-  type = string
-}
-
-variable "ingress_annotations" {
-  type    = map(string)
   default = {}
 }
 

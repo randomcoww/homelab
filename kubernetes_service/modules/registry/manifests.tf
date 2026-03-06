@@ -17,7 +17,7 @@ module "metadata" {
   manifests = {
     "templates/deployment.yaml" = module.deployment.manifest
     "templates/secret.yaml"     = module.secret.manifest
-    "templates/ingress.yaml"    = module.ingress.manifest
+    "templates/httproute.yaml"  = module.httproute.manifest
     "templates/tls.yaml"        = module.tls.manifest
     "templates/service.yaml"    = module.service.manifest
     "templates/cronjob.yaml" = yamlencode({
@@ -245,25 +245,39 @@ module "service" {
   }
 }
 
-module "ingress" {
-  source             = "../../../modules/ingress"
-  name               = var.name
-  app                = var.name
-  release            = var.release
-  ingress_class_name = var.ingress_class_name
-  annotations        = var.ingress_annotations
-  rules = [
-    {
-      host = var.ingress_hostname
-      paths = [
-        {
-          service = module.service.name
-          port    = local.ui_port
-          path    = "/"
-        },
-      ]
-    },
-  ]
+module "httproute" {
+  source  = "../../../modules/httproute"
+  name    = var.name
+  app     = var.name
+  release = var.release
+  spec = {
+    parentRefs = [
+      merge({
+        kind = "Gateway"
+      }, var.gateway_ref),
+    ]
+    hostnames = [
+      var.ingress_hostname,
+    ]
+    rules = [
+      {
+        matches = [
+          {
+            path = {
+              type  = "PathPrefix"
+              value = "/"
+            }
+          },
+        ]
+        backendRefs = [
+          {
+            name = module.service.name
+            port = local.ui_port
+          },
+        ]
+      }
+    ]
+  }
 }
 
 module "deployment" {

@@ -56,13 +56,8 @@ variable "ingress_hostname" {
   type = string
 }
 
-variable "ingress_class_name" {
-  type = string
-}
-
-variable "ingress_annotations" {
-  type    = map(string)
-  default = {}
+variable "gateway_ref" {
+  type = any
 }
 
 variable "storage_class_name" {
