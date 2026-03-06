@@ -20,11 +20,11 @@ module "kavita" {
       Enabled      = true
     }
   }
-  ingress_hostname   = local.endpoints.kavita.ingress
-  ingress_class_name = local.endpoints.ingress_nginx.name
-  ingress_annotations = merge(local.nginx_ingress_annotations_common, {
-    "cert-manager.io/cluster-issuer" = local.kubernetes.cert_issuers.acme_prod
-  })
+  ingress_hostname = local.endpoints.kavita.ingress
+  gateway_ref = {
+    name      = local.endpoints.traefik.name
+    namespace = local.endpoints.traefik.namespace
+  }
 
   minio_endpoint      = "https://${local.services.cluster_minio.ip}:${local.service_ports.minio}"
   minio_data_bucket   = "ebooks"

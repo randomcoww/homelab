@@ -186,7 +186,6 @@ module "open-webui" {
     open_webui = local.container_images.open_webui
     litestream = local.container_images.litestream
   }
-  ingress_hostname = local.endpoints.open_webui.ingress
   extra_configs = {
     WEBUI_URL                      = "https://${local.endpoints.open_webui.ingress}"
     ENABLE_VERSION_UPDATE_CHECK    = false
@@ -261,10 +260,11 @@ module "open-webui" {
     OAUTH_ADMIN_ROLES              = "openwebui-admin"
     OAUTH_ROLES_CLAIM              = "groups"
   }
-  ingress_class_name = local.endpoints.ingress_nginx.name
-  ingress_annotations = merge(local.nginx_ingress_annotations_common, {
-    "cert-manager.io/cluster-issuer" = local.kubernetes.cert_issuers.acme_prod
-  })
+  ingress_hostname = local.endpoints.open_webui.ingress
+  gateway_ref = {
+    name      = local.endpoints.traefik.name
+    namespace = local.endpoints.traefik.namespace
+  }
 
   minio_endpoint      = "https://${local.services.cluster_minio.ip}:${local.service_ports.minio}"
   minio_bucket        = "open-webui"

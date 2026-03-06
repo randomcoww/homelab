@@ -20,7 +20,7 @@ module "metadata" {
     "templates/statefulset.yaml" = module.statefulset.manifest
     "templates/secret.yaml"      = module.secret.manifest
     "templates/service.yaml"     = module.service.manifest
-    "templates/ingress.yaml"     = module.ingress.manifest
+    "templates/httproute.yaml"   = module.httproute.manifest
     }, {
     for i, m in module.litestream-overlay.additional_manifests :
     "templates/litestream-${i}.yaml" => m
@@ -62,25 +62,39 @@ module "service" {
   }
 }
 
-module "ingress" {
-  source             = "../../../modules/ingress"
-  name               = var.name
-  app                = var.name
-  release            = var.release
-  ingress_class_name = var.ingress_class_name
-  annotations        = var.ingress_annotations
-  rules = [
-    {
-      host = var.ingress_hostname
-      paths = [
-        {
-          service = module.service.name
-          port    = local.kavita_port
-          path    = "/"
-        },
-      ]
-    },
-  ]
+module "httproute" {
+  source  = "../../../modules/httproute"
+  name    = var.name
+  app     = var.name
+  release = var.release
+  spec = {
+    parentRefs = [
+      merge({
+        kind = "Gateway"
+      }, var.gateway_ref),
+    ]
+    hostnames = [
+      var.ingress_hostname,
+    ]
+    rules = [
+      {
+        matches = [
+          {
+            path = {
+              type  = "PathPrefix"
+              value = "/"
+            }
+          },
+        ]
+        backendRefs = [
+          {
+            name = var.name
+            port = local.kavita_port
+          },
+        ]
+      }
+    ]
+  }
 }
 
 module "litestream-overlay" {

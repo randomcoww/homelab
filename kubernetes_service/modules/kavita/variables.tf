@@ -33,13 +33,12 @@ variable "extra_configs" {
   default = {}
 }
 
-variable "ingress_class_name" {
+variable "ingress_hostname" {
   type = string
 }
 
-variable "ingress_annotations" {
-  type    = map(string)
-  default = {}
+variable "gateway_ref" {
+  type = any
 }
 
 variable "minio_endpoint" {
@@ -55,9 +54,5 @@ variable "minio_bucket" {
 }
 
 variable "minio_access_secret" {
-  type = string
-}
-
-variable "ingress_hostname" {
   type = string
 }
