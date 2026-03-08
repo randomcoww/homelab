@@ -5,7 +5,13 @@ locals {
   pki = {
     for key, f in {
       ca-cert = {
-        contents = var.ca.cert_pem
+        contents = var.kubernetes_ca.cert_pem
+      }
+      crio-metrics-cert = {
+        contents = tls_locally_signed_cert.crio-metrics.cert_pem
+      }
+      crio-metrics-key = {
+        contents = tls_private_key.crio-metrics.private_key_pem
       }
     } :
     key => merge(f, {
@@ -48,8 +54,8 @@ locals {
             mode = "Webhook"
           }
           staticPodPath = var.static_pod_path
-          address       = "0.0.0.0"
-          port          = var.kubelet_port
+          address       = cidrhost(var.node_prefix, var.host_netnum)
+          port          = var.ports.kubelet
           clusterDomain = var.cluster_domain
           clusterDNS = [
             var.cluster_dns_ip,
@@ -116,7 +122,9 @@ locals {
       graceful_shutdown_delay   = var.graceful_shutdown_delay
       kubernetes_pod_prefix     = var.kubernetes_pod_prefix
       node_prefix               = var.node_prefix
-      kubelet_port              = var.kubelet_port
+      crio_metrics_cert_path    = local.pki.crio-metrics-cert.path
+      crio_metrics_key_path     = local.pki.crio-metrics-key.path
+      ports                     = var.ports
       internal_registries = [
         for _, reg in var.internal_registries :
         merge(reg, {
@@ -155,7 +163,7 @@ module "node-bootstrap-kubeconfig" {
   cluster_name       = var.cluster_name
   user               = var.kubelet_bootstrap_user
   apiserver_endpoint = var.apiserver_endpoint
-  ca_cert_pem        = var.ca.cert_pem
+  ca_cert_pem        = var.kubernetes_ca.cert_pem
   client_cert_pem    = tls_locally_signed_cert.bootstrap.cert_pem
   client_key_pem     = tls_private_key.bootstrap.private_key_pem
 }

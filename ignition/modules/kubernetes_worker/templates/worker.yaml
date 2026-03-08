@@ -76,7 +76,7 @@ storage:
 
             chain input {
               type filter hook input priority 0; policy accept;
-              tcp dport ${kubelet_port} jump mark-for-accept;
+              tcp dport ${ports.kubelet} jump mark-for-accept;
               ip saddr ${kubernetes_pod_prefix} jump mark-for-accept;
               ip saddr ${node_prefix} jump mark-for-accept;
               ip daddr ${node_prefix} jump mark-for-accept;
@@ -126,7 +126,11 @@ storage:
           network_dir="${cni_config_path}"
 
           [crio.metrics]
-          enable_metrics=false
+          enable_metrics=true
+          metrics_port=${ports.crio_metrics}
+          metrics_host="${node_ip}"
+          metrics_cert="${crio_metrics_cert_path}"
+          metrics_key="${crio_metrics_key_path}"
 
           [crio.tracing]
           enable_tracing=false

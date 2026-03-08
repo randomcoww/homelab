@@ -113,7 +113,6 @@ locals {
       haproxy_path          = var.haproxy_path
       bird_path             = var.bird_path
       bird_cache_table_name = var.bird_cache_table_name
-      bgp_port              = var.bgp_port
       bgp_prefix            = var.bgp_prefix
       bgp_as                = var.bgp_as
       bgp_neighbor_netnums  = var.bgp_neighbor_netnums
@@ -193,6 +192,7 @@ module "apiserver" {
           "--allow-privileged=true",
           "--authorization-mode=Node,RBAC",
           "--bind-address=0.0.0.0",
+          "--secure-port=${var.ports.apiserver_backend}",
           "--client-ca-file=${local.pki.kubernetes-ca-cert.path}",
           "--etcd-cafile=${local.pki.etcd-ca-cert.path}",
           "--etcd-certfile=${local.pki.etcd-client-cert.path}",
@@ -216,7 +216,6 @@ module "apiserver" {
           "--kubelet-client-key=${local.pki.kubelet-client-key.path}",
           "--kubelet-preferred-address-types=InternalDNS,InternalIP",
           "--runtime-config=api/all=true",
-          "--secure-port=${var.ports.apiserver_backend}",
           "--service-account-issuer=https://${var.cluster_apiserver_endpoint}",
           "--service-account-key-file=${local.pki.service-account-cert.path}",
           "--service-account-signing-key-file=${local.pki.service-account-key.path}",

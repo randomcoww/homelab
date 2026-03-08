@@ -14,7 +14,7 @@ variable "cluster_name" {
   type = string
 }
 
-variable "ca" {
+variable "kubernetes_ca" {
   type = object({
     algorithm       = string
     private_key_pem = string
@@ -30,8 +30,11 @@ variable "registry_ca" {
   })
 }
 
-variable "kubelet_port" {
-  type = number
+variable "ports" {
+  type = object({
+    kubelet      = number
+    crio_metrics = number
+  })
 }
 
 variable "host_netnum" {

@@ -26,6 +26,7 @@ module "kubernetes-master" {
     scheduler          = local.host_ports.scheduler
     etcd_client        = local.host_ports.etcd_client
     etcd_metrics       = local.host_ports.etcd_metrics
+    bgp                = local.host_ports.bgp
   }
   kubelet_client_user        = local.kubernetes.kubelet_client_user
   cluster_apiserver_endpoint = "${local.endpoints.apiserver.service}.svc.${local.domains.kubernetes}"
@@ -42,7 +43,6 @@ module "kubernetes-master" {
   bird_path             = local.ha.bird_config_path
   bird_cache_table_name = local.ha.bird_cache_table_name
   haproxy_path          = local.ha.haproxy_config_path
-  bgp_port              = local.host_ports.bgp
   bgp_prefix            = each.value.networks.node.prefix
   bgp_as                = local.ha.bgp_as
   bgp_neighbor_netnums = {
@@ -59,9 +59,8 @@ module "kubernetes-worker" {
   fw_mark                   = local.fw_marks.accept
   name                      = "kube-worker"
   cluster_name              = local.kubernetes.cluster_name
-  ca                        = data.terraform_remote_state.sr.outputs.kubernetes.ca
+  kubernetes_ca             = data.terraform_remote_state.sr.outputs.kubernetes.ca
   registry_ca               = data.terraform_remote_state.sr.outputs.trust.ca
-  kubelet_port              = local.host_ports.kubelet
   host_netnum               = each.value.netnum
   cluster_domain            = local.domains.kubernetes
   apiserver_endpoint        = "https://${local.services.apiserver.ip}:${local.host_ports.apiserver}"
@@ -76,6 +75,10 @@ module "kubernetes-worker" {
   cni_config_path           = local.kubernetes.cni_config_path
   container_storage_path    = "${local.kubernetes.containers_path}/storage"
   graceful_shutdown_delay   = 480
+  ports = {
+    kubelet      = local.host_ports.kubelet
+    crio_metrics = local.host_ports.crio_metrics
+  }
   # allow host to resolve registry by name
   internal_registries = [
     {

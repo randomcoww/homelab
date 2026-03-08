@@ -117,14 +117,31 @@ resource "helm_release" "prometheus" {
           job_name     = "minio-cluster"
           metrics_path = "/minio/metrics/v3/cluster"
           scheme       = "https"
-          tls_config = {
-            insecure_skip_verify = false
-          }
           static_configs = [
             {
               targets = [
                 "${local.services.cluster_minio.ip}:${local.service_ports.minio}",
               ]
+            },
+          ]
+        },
+        {
+          job_name = "cri-o"
+          scheme   = "https"
+          tls_config = {
+            ca_file = "/var/run/secrets/kubernetes.io/serviceaccount/ca.crt"
+          }
+          kubernetes_sd_configs = [
+            {
+              role = "node"
+            },
+          ]
+          relabel_configs = [
+            {
+              source_labels = ["__address__"]
+              regex         = "([^:]+):\\d+$"
+              target_label  = "__address__"
+              replacement   = "$1:${local.host_ports.crio_metrics}"
             },
           ]
         },
