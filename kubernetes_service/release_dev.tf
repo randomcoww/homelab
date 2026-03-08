@@ -115,7 +115,7 @@ module "llama-cpp" {
                 key      = "amd.com/gpu.vram"
                 operator = "In"
                 values = [
-                  "120G",
+                  "128G",
                 ]
               },
             ]
