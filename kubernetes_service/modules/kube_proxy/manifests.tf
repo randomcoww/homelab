@@ -39,25 +39,7 @@ module "metadata" {
         },
       ]
     })
-    "templates/configmap.yaml" = module.configmap.manifest
     "templates/daemonset.yaml" = module.daemonset.manifest
-  }
-}
-
-module "configmap" {
-  source  = "../../../modules/configmap"
-  name    = var.name
-  app     = var.name
-  release = var.release
-  data = {
-    "kube-proxy-config.yaml" = yamlencode({
-      kind               = "KubeProxyConfiguration"
-      apiVersion         = "kubeproxy.config.k8s.io/v1alpha1"
-      mode               = "nftables"
-      clusterCIDR        = var.kubernetes_pod_prefix
-      healthzBindAddress = "127.0.0.1:${var.ports.kube_proxy}"
-      metricsBindAddress = "0.0.0.0:${var.ports.kube_proxy_metrics}"
-    })
   }
 }
 
@@ -68,7 +50,6 @@ module "daemonset" {
   affinity = var.affinity
   release  = var.release
   annotations = {
-    "checksum/configmap"   = sha256(module.configmap.manifest)
     "prometheus.io/scrape" = "true"
     "prometheus.io/port"   = tostring(var.ports.kube_proxy_metrics)
   }
@@ -100,8 +81,9 @@ module "daemonset" {
         image = var.images.kube_proxy
         command = [
           "kube-proxy",
-          "--config=/etc/kube-proxy/kube-proxy-config.yaml",
           "--hostname-override=$(NODE_NAME)",
+          "--cluster-cidr=${var.kubernetes_pod_prefix}",
+          "--proxy-mode=nftables",
           "--v=2",
           "--init-only",
         ]
@@ -126,13 +108,6 @@ module "daemonset" {
         securityContext = {
           privileged = true
         }
-        volumeMounts = [
-          # /lib/modules and /run/xtables.lock mounts seem to not be needed when on nftables mode
-          {
-            name      = "kube-proxy-config"
-            mountPath = "/etc/kube-proxy"
-          },
-        ]
       },
     ]
     containers = [
@@ -141,8 +116,11 @@ module "daemonset" {
         image = var.images.kube_proxy
         command = [
           "kube-proxy",
-          "--config=/etc/kube-proxy/kube-proxy-config.yaml",
           "--hostname-override=$(NODE_NAME)",
+          "--cluster-cidr=${var.kubernetes_pod_prefix}",
+          "--proxy-mode=nftables",
+          "--healthz-bind-address=127.0.0.1:${var.ports.kube_proxy}",
+          "--metrics-bind-address=$(POD_IP):${var.ports.kube_proxy_metrics}",
           "--v=2",
         ]
         env = [
@@ -151,6 +129,14 @@ module "daemonset" {
             valueFrom = {
               fieldRef = {
                 fieldPath = "spec.nodeName"
+              }
+            }
+          },
+          {
+            name = "POD_IP"
+            valueFrom = {
+              fieldRef = {
+                fieldPath = "status.podIP"
               }
             }
           },
@@ -170,13 +156,6 @@ module "daemonset" {
             ]
           }
         }
-        volumeMounts = [
-          # /lib/modules and /run/xtables.lock mounts seem to not be needed when on nftables mode
-          {
-            name      = "kube-proxy-config"
-            mountPath = "/etc/kube-proxy"
-          },
-        ]
         livenessProbe = {
           httpGet = {
             scheme = "HTTP"
@@ -194,14 +173,6 @@ module "daemonset" {
             port   = var.ports.kube_proxy
             path   = "/healthz"
           }
-        }
-      },
-    ]
-    volumes = [
-      {
-        name = "kube-proxy-config"
-        configMap = {
-          name = module.configmap.name
         }
       },
     ]
