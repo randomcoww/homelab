@@ -86,10 +86,10 @@ module "etcd-wrapper" {
   spec = {
     containers = [
       {
-        name  = "${var.name}-wrapper"
-        image = var.images.etcd_wrapper # TODO: use etcd image and mount wrapper into image
+        name  = var.name
+        image = var.images.etcd
         command = [
-          "etcd-wrapper", # TODO: use mounted binary
+          "${local.etcd_wrapper_path}/usr/local/bin/etcd-wrapper",
           "-local-client-url",
           "https://127.0.0.1:${var.ports.etcd_client}",
           "-etcd-binary-file",
@@ -179,11 +179,10 @@ module "etcd-wrapper" {
           failureThreshold = 12 + ceil(local.initial_startup_delay_seconds / 10)
         }
         volumeMounts = [
-          # TODO: replace with image volume
-          # {
-          #   name      = "etcd-wrapper"
-          #   mountPath = local.etcd_wrapper_path
-          # },
+          {
+            name      = "etcd-wrapper"
+            mountPath = local.etcd_wrapper_path
+          },
           {
             name      = "config"
             mountPath = local.config_path
@@ -196,13 +195,12 @@ module "etcd-wrapper" {
       },
     ]
     volumes = [
-      # TODO: replace with image volume
-      # {
-      #   name = "etcd-wrapper"
-      #   image = {
-      #     reference  = var.images.etcd_wrapper
-      #   }
-      # },
+      {
+        name = "etcd-wrapper"
+        image = {
+          reference = var.images.etcd_wrapper
+        }
+      },
       {
         name = "config"
         hostPath = {
