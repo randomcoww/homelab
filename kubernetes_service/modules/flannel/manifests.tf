@@ -196,7 +196,6 @@ module "daemonset" {
           "--healthz-ip=127.0.0.1",
           "--healthz-port=${var.ports.healthz}",
         ]
-
         securityContext = {
           capabilities = {
             add = [

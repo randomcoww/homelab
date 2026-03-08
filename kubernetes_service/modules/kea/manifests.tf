@@ -333,7 +333,17 @@ module "statefulset" {
         image = var.images.ipxe
         args = [
           "-p",
-          "0.0.0.0:${var.ports.ipxe}",
+          "$(POD_IP):${var.ports.ipxe}",
+        ]
+        env = [
+          {
+            name = "POD_IP"
+            valueFrom = {
+              fieldRef = {
+                fieldPath = "status.podIP"
+              }
+            }
+          },
         ]
       },
       # TODO: migrate fully to HTTP boot and remove TFTP
@@ -343,13 +353,23 @@ module "statefulset" {
         command = [
           "udpsvd",
           "-vE",
-          "0.0.0.0",
+          "$(POD_IP)",
           tostring(var.ports.ipxe_tftp),
           "tftpd",
           "-r",
           "-u",
           "www-data",
           "/var/www",
+        ]
+        env = [
+          {
+            name = "POD_IP"
+            valueFrom = {
+              fieldRef = {
+                fieldPath = "status.podIP"
+              }
+            }
+          },
         ]
         securityContext = {
           runAsUser = 0 # needed to bind to port 69
