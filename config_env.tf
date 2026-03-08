@@ -36,14 +36,14 @@ locals {
       network = "192.168.200.0"
       cidr    = 24
       vlan_id = 60
-      mtu     = local.default_mtu
+      mtu     = 1500
     }
     # Kubernetes service external IP and LB
     service = {
       network = "192.168.208.0"
       cidr    = 24
       vlan_id = 80
-      mtu     = local.default_mtu
+      mtu     = 1500
       netnums = {
         apiserver    = 2
         external_dns = 31
@@ -56,7 +56,7 @@ locals {
       network        = "192.168.224.0"
       cidr           = 26
       vlan_id        = 90
-      mtu            = local.default_mtu
+      mtu            = 1500
       table_id       = 221
       table_priority = 32760
     }
@@ -65,7 +65,7 @@ locals {
       network = "192.168.228.0"
       cidr    = 26
       vlan_id = 70
-      mtu     = local.default_mtu
+      mtu     = 1500
     }
     # Primary WAN
     wan = {
