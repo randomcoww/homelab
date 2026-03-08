@@ -266,7 +266,7 @@ module "statefulset" {
 
           stork-agent \
             --listen-prometheus-only \
-            --prometheus-kea-exporter-address=0.0.0.0 \
+            --prometheus-kea-exporter-address=$(POD_IP) \
             --prometheus-kea-exporter-port=${var.ports.kea_metrics} \
             --prometheus-kea-exporter-per-subnet-stats=true \
             --prometheus-bind9-exporter-address=127.0.0.1 \

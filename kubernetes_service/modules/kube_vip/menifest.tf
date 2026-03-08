@@ -123,7 +123,7 @@ module "daemonset" {
         args = [
           "manager",
           "--serviceInterface=${var.service_interface}",
-          "--prometheusHTTPServer=0.0.0.0:${var.ports.kube_vip_metrics}",
+          "--prometheusHTTPServer=$(bgp_routerid):${var.ports.kube_vip_metrics}",
           "--cleanRoutingTable",
           "--healthCheckPort=${var.ports.kube_vip_health}",
         ]
