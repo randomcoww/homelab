@@ -114,7 +114,7 @@ resource "helm_release" "prometheus" {
       }
       extraScrapeConfigs = yamlencode([
         {
-          job_name     = "minio-cluster"
+          job_name     = "minio"
           metrics_path = "/minio/metrics/v3/cluster"
           scheme       = "https"
           static_configs = [
