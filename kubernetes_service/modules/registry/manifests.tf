@@ -263,8 +263,8 @@ module "secret" {
         deletion_enabled  = true
       }
       purge_tags = {
-        keep_days   = 30
-        keep_count  = 4
+        keep_days   = 2
+        keep_count  = 6
         keep_regexp = "^latest$"
       }
     })
