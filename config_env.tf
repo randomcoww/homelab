@@ -133,7 +133,7 @@ locals {
     qrcode_generator = "reg.cluster.internal/randomcoww/qrcode-resource:v20260309.144728@sha256:b6ba464ea3bb9e4af76b03bacdf52bf2db1b1c97d78e121fa0bbf9c04414ca09"
     llama_cpp_vulkan = "ghcr.io/mostlygeek/llama-swap:vulkan-non-root@sha256:47e9dbb74913c0072d58bf3beabf7366d9c1cc160198e01f66b3b2befede34d4"
     llama_cpp_rocm   = "ghcr.io/mostlygeek/llama-swap:rocm-non-root@sha256:f0ede2f6123b056f0b186588c4041812cff265e438d4699d7e72418c5f112539"
-    litestream       = "docker.io/litestream/litestream:0.5.9-scratch@sha256:941de628b1eddaff821fea53e9ef3c4923511307ee923914d4c04ff38a3eb688"
+    litestream       = "docker.io/litestream/litestream:0.5.9@sha256:58e338ede90c193d5f880348170cd6d80164bbc35220906a3c360271e7317f71"
     valkey           = "ghcr.io/valkey-io/valkey:9.0.3-alpine@sha256:ad4541b28b017bf4cd83ee057c51aafb21ea32e898e3f3b8b75e268650f2ac20"
     searxng          = "ghcr.io/searxng/searxng:latest@sha256:a973f277a9025be36675ee803039d5f309c57e8521a500b5edee4cdba01c316a"
     open_webui       = "ghcr.io/open-webui/open-webui:v0.8.10@sha256:ee057955040ce91e3e787e4b7978c9c23e828972c68d01d787ed40f9a307df9f"
