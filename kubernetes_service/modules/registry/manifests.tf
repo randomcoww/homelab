@@ -45,13 +45,45 @@ module "metadata" {
               }
               spec = {
                 restartPolicy = "Never"
+                initContainers = [
+                  {
+                    name  = "${var.name}-purge-old"
+                    image = var.images.registry_ui
+                    args = [
+                      "-config-file",
+                      "${local.config_path}/config.yaml",
+                      "-purge-tags",
+                    ]
+                    env = [
+                      {
+                        name  = "SSL_CERT_FILE"
+                        value = "${local.config_path}/tls/ca-cert.pem"
+                      },
+                      {
+                        name  = "NODE_EXTRA_CA_CERTS"
+                        value = "${local.config_path}/tls/ca-cert.pem"
+                      },
+                    ]
+                    volumeMounts = [
+                      {
+                        name      = "config"
+                        mountPath = "${local.config_path}/config.yaml"
+                        subPath   = "ui-config"
+                      },
+                      {
+                        name      = "registry-tls"
+                        mountPath = "${local.config_path}/tls/ca-cert.pem"
+                        subPath   = "ca-cert.pem"
+                      },
+                    ]
+                  },
+                ]
                 containers = [
                   {
                     name  = var.name
                     image = var.images.registry
                     args = [
                       "garbage-collect",
-                      "--delete-untagged",
                       "${local.config_path}/config.yaml",
                     ]
                     env = [
@@ -93,6 +125,24 @@ module "metadata" {
                     name = "config"
                     secret = {
                       secretName = module.secret.name
+                    }
+                  },
+                  {
+                    name = "registry-tls"
+                    projected = {
+                      sources = [
+                        {
+                          secret = {
+                            name = module.tls.name
+                            items = [
+                              {
+                                key  = "ca.crt"
+                                path = "ca-cert.pem"
+                              },
+                            ]
+                          }
+                        },
+                      ]
                     }
                   },
                   {
@@ -211,6 +261,11 @@ module "secret" {
         database_driver   = "sqlite3"
         database_location = "data/registry_events.db"
         deletion_enabled  = true
+      }
+      purge_tags = {
+        keep_days   = 30
+        keep_count  = 4
+        keep_regexp = "^latest$"
       }
     })
   }
