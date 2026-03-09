@@ -84,6 +84,7 @@ module "metadata" {
                     image = var.images.registry
                     args = [
                       "garbage-collect",
+                      "--delete-untagged",
                       "${local.config_path}/config.yaml",
                     ]
                     env = [
