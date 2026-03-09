@@ -120,15 +120,15 @@ locals {
     minio              = "cgr.dev/chainguard/minio:latest@sha256:27d198f7409fb95e99d337a62c34d1813657c18afea485f588776794133dd001"
     nginx              = "docker.io/nginxinc/nginx-unprivileged:1.29.5-alpine@sha256:aec540f08f99df3c830549d5dd7bfaf63e01cbbb499e37400c5af9f8e8554e9f"
     # tier 2
-    kea                   = "ghcr.io/randomcoww/kea:v3.1.5@sha256:6e6bf4a1e600a8f14c0fa3b50844f2d0a60551f412966c66d05534ac1255281e"
-    ipxe                  = "ghcr.io/randomcoww/ipxe:v2.0.0@sha256:511fed3ed5a0f4495494abfd1baea4b6806dcd25141c7929616c6b13645e1c3f"
+    kea                   = "ghcr.io/randomcoww/kea:v3.1.6.1773093061@sha256:c510d3b399b5c6aa108a493ee4fcd96147cba5021cd471955abaaaabb974f091"
+    ipxe                  = "ghcr.io/randomcoww/ipxe:v2.0.0.1773092507@sha256:a20bf0c1fe0fb7524024ba062cc80a427e503696b2040ed00c50f1984e010a16"
     registry              = "ghcr.io/distribution/distribution:3.0.0@sha256:4ba3adf47f5c866e9a29288c758c5328ef03396cb8f5f6454463655fa8bc83e2"
     registry_ui           = "docker.io/quiq/registry-ui:0.12.0@sha256:0d066cddfb87427d1907801cd5f955a5af4633ac3bae25273184dd80a96289be"
     device_plugin         = "ghcr.io/squat/generic-device-plugin:latest@sha256:5acdaa40af84adf8b6f7bb1b8930d4e7be1ebe7f0109f00211ce3df43217b3b7"
     github_actions_runner = "ghcr.io/actions/actions-runner:2.332.0@sha256:8c3f5970b8ceb90cbd3e89b80c6806bb74d9c31686e9177c743323a4539d12f5"
     # tier 3
-    mountpoint       = "reg.cluster.internal/randomcoww/mountpoint-s3:v1.22.0@sha256:4e19f82e7e94e65be79bb63cce03b723b1decf605788e812d5271ae3853d6509"
-    hostapd          = "reg.cluster.internal/randomcoww/hostapd:v2.11@sha256:cd87c66d8b04eaeb9adeaddd7f5d8f69063d5db1cf66dde2fdf6b8bc028ea015"
+    mountpoint       = "reg.cluster.internal/randomcoww/mountpoint-s3:v1.22.0.1773092542@sha256:14c809b0e696b3df7f629ed6688b2ba246f8310a55ba34edc77c787da209886a"
+    hostapd          = "reg.cluster.internal/randomcoww/hostapd:v2.11.1773092504@sha256:3529d405c75aec0af7dbb1eaf045b0a7beab7724175c71d89648189b30f51e7e"
     tailscale        = "ghcr.io/tailscale/tailscale:v1.94.2@sha256:95e528798bebe75f39b10e74e7051cf51188ee615934f232ba7ad06a3390ffa1"
     qrcode_generator = "reg.cluster.internal/randomcoww/qrcode-resource:v1773092553@sha256:eecee8dbca0deeecb38bca78ebeffd9cf8edcb7137fabc848db4fcad8652fd9c"
     llama_cpp_vulkan = "ghcr.io/mostlygeek/llama-swap:vulkan-non-root@sha256:47e9dbb74913c0072d58bf3beabf7366d9c1cc160198e01f66b3b2befede34d4"
@@ -142,7 +142,7 @@ locals {
     authelia         = "ghcr.io/authelia/authelia:4.39.15@sha256:d23ee3c721d465b4749cc58541cda4aebe5aa6f19d7b5ce0afebb44ebee69591"
     cloudflared      = "docker.io/cloudflare/cloudflared:2026.3.0@sha256:6b599ca3e974349ead3286d178da61d291961182ec3fe9c505e1dd02c8ac31b0"
     rclone           = "ghcr.io/rclone/rclone:1.73.2@sha256:8a17d9b5cd5ce71bbb42e49e92ee83575d7fb03f6233d949d328e9d029b9376d"
-    sunshine_desktop = "reg.cluster.internal/randomcoww/sunshine-desktop:v2026.307.191712@sha256:2ef83ce55ea97610c63339b0146329d0b971e9cf1f947fb23b9578efc5d16bdf"
+    sunshine_desktop = "reg.cluster.internal/randomcoww/sunshine-desktop:v2026.309.21603.1773092574@sha256:52039893b01c12ba10c47588884044bb371e095958eb6d66eec203c96abe669d"
   }
 
   host_images = {
