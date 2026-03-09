@@ -260,7 +260,7 @@ resource "helm_release" "arc-runner-set-builder" {
           containers = [
             {
               name  = "runner"
-              image = local.container_images.github_actions_runner
+              image = local.container_images_digest.github_actions_runner
               command = [
                 "/home/runner/run.sh",
               ]
@@ -352,7 +352,7 @@ resource "helm_release" "arc-runner-set-renovate" {
           containers = [
             {
               name  = "runner"
-              image = local.container_images.github_actions_runner
+              image = local.container_images_digest.github_actions_runner
               command = [
                 "/home/runner/run.sh",
               ]

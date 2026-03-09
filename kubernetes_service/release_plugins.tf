@@ -6,7 +6,7 @@ module "device-plugin" {
   namespace = "kube-system"
   release   = "0.1.0"
   images = {
-    device_plugin = local.container_images.device_plugin
+    device_plugin = local.container_images_digest.device_plugin
   }
   ports = {
     device_plugin_metrics = local.service_ports.metrics

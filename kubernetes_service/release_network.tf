@@ -6,8 +6,8 @@ module "kea" {
   namespace = local.endpoints.kea.namespace
   release   = "0.1.20"
   images = {
-    kea  = local.container_images.kea
-    ipxe = local.container_images.ipxe
+    kea  = local.container_images_digest.kea
+    ipxe = local.container_images_digest.ipxe
   }
   service_ips = [
     local.services.cluster_kea_primary.ip,
@@ -71,7 +71,7 @@ module "hostapd" {
   release  = "0.1.0"
   replicas = 1
   images = {
-    hostapd = local.container_images.hostapd
+    hostapd = local.container_images_digest.hostapd
   }
   affinity = {
     nodeAffinity = {
@@ -169,7 +169,7 @@ module "qrcode-hostapd" {
   replicas  = 2
   release   = "0.1.0"
   images = {
-    qrcode = local.container_images.qrcode_generator
+    qrcode = local.container_images_digest.qrcode_generator
   }
   qrcode_value     = "WIFI:S:${random_password.hostapd-ssid.result};T:WPA;P:${random_password.hostapd-password.result};H:true;;"
   ingress_hostname = local.endpoints.qrcode_hostapd.ingress
@@ -188,7 +188,7 @@ module "tailscale" {
   release   = "0.1.0"
   replicas  = 2
   images = {
-    tailscale = local.container_images.tailscale
+    tailscale = local.container_images_digest.tailscale
   }
   tailscale_auth_key = data.terraform_remote_state.sr.outputs.tailscale_auth_key
   extra_envs = [

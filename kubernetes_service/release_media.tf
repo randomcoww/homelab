@@ -7,9 +7,9 @@ module "kavita" {
   release   = "0.1.0"
   replicas  = 1
   images = {
-    kavita     = local.container_images.kavita
-    mountpoint = local.container_images.mountpoint
-    litestream = local.container_images.litestream
+    kavita     = local.container_images_digest.kavita
+    mountpoint = local.container_images_digest.mountpoint
+    litestream = local.container_images_digest.litestream
   }
   extra_configs = {
     OpenIdConnectSettings = {
@@ -39,8 +39,8 @@ module "sunshine-desktop" {
   namespace = local.endpoints.sunshine_desktop.namespace
   release   = "0.1.0"
   images = {
-    sunshine_desktop = local.container_images.sunshine_desktop
-    nginx            = "${regex(local.container_image_regex, local.container_images.nginx).depName}:${regex(local.container_image_regex, local.container_images.nginx).currentValue}"
+    sunshine_desktop = local.container_images_digest.sunshine_desktop
+    nginx            = local.container_images_tag.nginx
   }
   user               = "sunshine"
   uid                = 10000

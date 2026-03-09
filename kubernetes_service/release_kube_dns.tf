@@ -204,7 +204,7 @@ resource "helm_release" "kube-dns" {
       extraContainers = [
         {
           name  = "${local.endpoints.kube_dns.name}-external-dns"
-          image = local.container_images.external_dns
+          image = local.container_images_digest.external_dns
           args = [
             "--source=service",
             "--source=gateway-httproute",
@@ -250,7 +250,7 @@ resource "helm_release" "kube-dns" {
         },
         {
           name  = "${local.endpoints.kube_dns.name}-etcd"
-          image = local.container_images.etcd
+          image = local.container_images_digest.etcd
           command = [
             "etcd",
             "--listen-client-urls",

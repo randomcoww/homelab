@@ -41,8 +41,8 @@ module "lldap" {
   namespace = local.endpoints.lldap.namespace
   release   = "0.1.0"
   images = {
-    lldap      = local.container_images.lldap
-    litestream = local.container_images.litestream
+    lldap      = local.container_images_digest.lldap
+    litestream = local.container_images_digest.litestream
   }
   ports = {
     ldaps = local.service_ports.ldaps
@@ -415,7 +415,7 @@ resource "helm_release" "authelia" {
         initContainers = [
           {
             name  = "${local.endpoints.authelia.name}-password-generate"
-            image = local.container_images.authelia
+            image = local.container_images_digest.authelia
             command = [
               "sh",
               "-c",
@@ -447,7 +447,7 @@ resource "helm_release" "authelia" {
           },
           {
             name  = "${local.endpoints.authelia.name}-litestream-restore"
-            image = local.container_images.litestream
+            image = local.container_images_digest.litestream
             args = [
               "restore",
               "-if-db-not-exists",
@@ -503,7 +503,7 @@ resource "helm_release" "authelia" {
           },
           {
             name          = "${local.endpoints.authelia.name}-litestream-replicate"
-            image         = local.container_images.litestream
+            image         = local.container_images_digest.litestream
             restartPolicy = "Always"
             args = [
               "replicate",

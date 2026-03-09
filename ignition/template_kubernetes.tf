@@ -15,9 +15,9 @@ module "kubernetes-master" {
     host_key => host.netnum == each.value.netnum ? "127.0.0.1" : cidrhost(local.networks.etcd.prefix, host.netnum)
   }
   images = {
-    apiserver          = local.container_images.kube_apiserver
-    controller_manager = local.container_images.kube_controller_manager
-    scheduler          = local.container_images.kube_scheduler
+    apiserver          = local.container_images_digest.kube_apiserver
+    controller_manager = local.container_images_digest.kube_controller_manager
+    scheduler          = local.container_images_digest.kube_scheduler
   }
   ports = {
     apiserver          = local.host_ports.apiserver
@@ -101,8 +101,8 @@ module "etcd" {
   ca             = data.terraform_remote_state.sr.outputs.etcd.ca
   peer_ca        = data.terraform_remote_state.sr.outputs.etcd.peer_ca
   images = {
-    etcd         = local.container_images.etcd
-    etcd_wrapper = local.container_images.etcd_wrapper
+    etcd         = local.container_images_digest.etcd
+    etcd_wrapper = local.container_images_digest.etcd_wrapper
   }
   ports = {
     etcd_client  = local.host_ports.etcd_client

@@ -50,7 +50,7 @@ module "kube-proxy" {
   namespace = "kube-system"
   release   = "0.1.0"
   images = {
-    kube_proxy = local.container_images.kube_proxy
+    kube_proxy = local.container_images_digest.kube_proxy
   }
   ports = {
     kube_proxy         = local.host_ports.kube_proxy
@@ -67,8 +67,8 @@ module "flannel" {
   namespace = "kube-system"
   release   = "0.1.0"
   images = {
-    flannel            = local.container_images.flannel
-    flannel_cni_plugin = local.container_images.flannel_cni_plugin
+    flannel            = local.container_images_digest.flannel
+    flannel_cni_plugin = local.container_images_digest.flannel_cni_plugin
   }
   ports = {
     healthz = local.host_ports.flannel_healthz
@@ -88,7 +88,7 @@ module "kube-vip" {
   namespace = "kube-system"
   release   = "0.1.0"
   images = {
-    kube_vip = local.container_images.kube_vip
+    kube_vip = local.container_images_digest.kube_vip
   }
   ports = {
     apiserver        = local.host_ports.apiserver,
@@ -190,7 +190,7 @@ resource "helm_release" "traefik" {
       service = {
         loadBalancerClass = "kube-vip.io/kube-vip-class"
         annotations = {
-          "kube-vip.io/loadbalancerIPs" = "0.0.0.0"
+          "kube-vip.io/loadbalancerIPs" = local.services.gateway_api.ip
         }
       }
       metrics = {
@@ -272,8 +272,8 @@ module "registry" {
   release   = "0.1.0"
   replicas  = 2
   images = {
-    registry    = local.container_images.registry
-    registry_ui = local.container_images.registry_ui
+    registry    = local.container_images_digest.registry
+    registry_ui = local.container_images_digest.registry_ui
   }
   ports = {
     registry = local.service_ports.registry

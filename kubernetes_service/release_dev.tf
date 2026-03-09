@@ -11,8 +11,8 @@ module "llama-cpp" {
   namespace = local.endpoints.llama_cpp.namespace
   release   = "0.1.0"
   images = {
-    llama_swap = local.container_images.llama_cpp_vulkan
-    rclone     = local.container_images.rclone
+    llama_swap = local.container_images_digest.llama_cpp_vulkan
+    rclone     = local.container_images_digest.rclone
   }
   api_keys = [
     random_password.llama-cpp-auth-token.result,
@@ -144,8 +144,8 @@ module "searxng" {
   release   = "0.1.0"
   replicas  = 2
   images = {
-    searxng = local.container_images.searxng
-    valkey  = local.container_images.valkey
+    searxng = local.container_images_digest.searxng
+    valkey  = local.container_images_digest.valkey
   }
   searxng_settings = {
     use_default_settings = {
@@ -183,8 +183,8 @@ module "open-webui" {
   namespace = local.endpoints.open_webui.namespace
   release   = "0.1.0"
   images = {
-    open_webui = local.container_images.open_webui
-    litestream = local.container_images.litestream
+    open_webui = local.container_images_digest.open_webui
+    litestream = local.container_images_digest.litestream
   }
   extra_configs = {
     WEBUI_URL                      = "https://${local.endpoints.open_webui.ingress}"
