@@ -27,8 +27,8 @@ module "secret" {
   data = merge({
     basename(local.config_file) = yamlencode(merge(var.llama_swap_config, {
       macros = {
-        models_url  = "${var.minio_endpoint}/${var.minio_data_bucket}"
-        models_path = local.models_path
+        model_url   = "${var.minio_endpoint}/${var.minio_data_bucket}"
+        model_path  = local.models_path
         default_cmd = <<-EOF
           /app/llama-server \
           --port $${PORT} \
@@ -209,6 +209,11 @@ module "statefulset" {
           {
             name      = "models"
             mountPath = local.models_path
+          },
+          {
+            name      = "ca-trust-bundle"
+            mountPath = "/etc/ssl/certs/ca-certificates.crt"
+            readOnly  = true
           },
         ]
         env = concat([

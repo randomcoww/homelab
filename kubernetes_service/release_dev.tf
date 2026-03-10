@@ -25,7 +25,7 @@ module "llama-cpp" {
       "gpt-oss-120b-F16" = {
         cmd = <<-EOF
         $${default_cmd} \
-          --model $${models_path}/gpt-oss-120b-F16.gguf \
+          --model $${model_path}/gpt-oss-120b-F16.gguf \
           --ctx-size 0 \
           --jinja \
           --temp 1.0 \
@@ -36,7 +36,7 @@ module "llama-cpp" {
       "Qwen3-Embedding-0.6B-Q8_0" = {
         cmd = <<-EOF
         $${default_cmd} \
-          --model $${models_path}/Qwen3-Embedding-0.6B-Q8_0.gguf \
+          --model $${model_path}/Qwen3-Embedding-0.6B-Q8_0.gguf \
           --ctx-size 0 \
           --ubatch-size 2048 \
           --batch-size 2048 \
@@ -47,7 +47,7 @@ module "llama-cpp" {
       "jina-reranker-v3-Q8_0" = {
         cmd = <<-EOF
         $${default_cmd} \
-          --model $${models_path}/jina-reranker-v3-Q8_0.gguf \
+          --model $${model_path}/jina-reranker-v3-Q8_0.gguf \
           --ctx-size 0 \
           --ubatch-size 2048 \
           --batch-size 2048 \
@@ -59,7 +59,7 @@ module "llama-cpp" {
       "GLM-4.7-Flash-BF16" = {
         cmd = <<-EOF
         $${default_cmd} \
-          --model $${models_path}/GLM-4.7-Flash-BF16-00001-of-00002.gguf \
+          --model $${model_path}/GLM-4.7-Flash-BF16-00001-of-00002.gguf \
           --ctx-size 0 \
           --jinja \
           --temp 1.0 \
