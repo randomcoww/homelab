@@ -28,13 +28,24 @@
   ],
   "packageRules": [
     {
-      "matchPackageNames": [
-        "reg.cluster.internal/randomcoww/qrcode-resource"
+      "matchUpdateTypes": [
+        "minor",
+        "patch",
+        "pin",
+        "digest"
       ],
-      "versioning": "regex:^(((?<compatibility>[\\w-]+)-)?[bv])?(?<minor>\\d+)(\\.(?<patch>\\d+)(\\.(?<build>\\d+))?)?(-(?<compat>[\\w.-]+))?$"
+      "automerge": true,
+      "ignoreTests": true,
+      "groupName": "renovate"
     },
     {
+      "matchPackageNames": [
+        "reg.cluster.internal/randomcoww/qrcode-resource",
+        "reg.cluster.internal/randomcoww/sunshine-desktop",
+        "docker.io/cloudflare/cloudflared"
+      ],
       "matchUpdateTypes": [
+        "major",
         "minor",
         "patch",
         "pin",
