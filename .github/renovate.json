@@ -59,6 +59,15 @@
       "registryUrls": [
         "https://registry.opentofu.org"
       ]
+    },
+    {
+      "matchManagers": [
+        "github-actions"
+      ],
+      "matchDatasources": [
+        "docker"
+      ],
+      "pinDigests": false
     }
   ]
 }
