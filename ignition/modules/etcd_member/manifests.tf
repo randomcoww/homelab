@@ -89,7 +89,7 @@ module "etcd-wrapper" {
         name  = var.name
         image = var.images.etcd
         command = [
-          "${local.etcd_wrapper_path}/usr/local/bin/etcd-wrapper",
+          "${local.etcd_wrapper_path}/bin/etcd-wrapper",
           "-local-client-url",
           "https://127.0.0.1:${var.ports.etcd_client}",
           "-etcd-binary-file",
