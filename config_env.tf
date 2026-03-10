@@ -148,12 +148,12 @@ locals {
   host_images = {
     for name, tag in {
       # these fields are updated by renovate - don't use var substitutions
-      default = "fedora-coreos-43.20260307.22" # renovate: datasource=github-tag depName=randomcoww/fedora-coreos-config-custom
+      default = "43.20260307.22" # renovate: datasource=github-tag depName=randomcoww/fedora-coreos-config-custom
     } :
     name => {
-      kernel = "${tag}-live-kernel.$${buildarch:uristring}"
-      initrd = "${tag}-live-initramfs.$${buildarch:uristring}.img"
-      rootfs = "${tag}-live-rootfs.$${buildarch:uristring}.img"
+      kernel = "fedora-coreos-${tag}-live-kernel.$${buildarch:uristring}"
+      initrd = "fedora-coreos-${tag}-live-initramfs.$${buildarch:uristring}.img"
+      rootfs = "fedora-coreos-${tag}-live-rootfs.$${buildarch:uristring}.img"
     }
   }
 
