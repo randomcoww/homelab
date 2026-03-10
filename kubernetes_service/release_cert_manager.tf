@@ -47,7 +47,7 @@ resource "helm_release" "cert-manager" {
   create_namespace = true
   wait             = false
   wait_for_jobs    = false
-  version          = "v1.19.4"
+  version          = "v1.20.0"
   max_history      = 2
   timeout          = local.kubernetes.helm_release_timeout
   values = [
