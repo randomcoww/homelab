@@ -40,7 +40,7 @@ module "sunshine-desktop" {
   release   = "0.1.0"
   images = {
     sunshine_desktop = local.container_images_digest.sunshine_desktop
-    nginx            = local.container_images_tag.nginx
+    nginx            = local.container_images_digest.nginx
   }
   user               = "sunshine"
   uid                = 10000

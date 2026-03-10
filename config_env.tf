@@ -332,10 +332,6 @@ locals {
     ]...
   )
 
-  container_images_tag = {
-    for name, image in local.container_images :
-    name => "${regex(local.container_image_regex, image).depName}:${regex(local.container_image_regex, image).currentValue}"
-  }
   container_images_digest = {
     for name, image in local.container_images :
     name => "${regex(local.container_image_regex, image).depName}@${regex(local.container_image_regex, image).currentDigest}"
