@@ -56,10 +56,6 @@
       "groupName": "renovate"
     },
     {
-      "matchDepTypes": ["helm_release"],
-      "pinDigests": false
-    },
-    {
       "matchDatasources": [
         "terraform-provider",
         "terraform-module"
@@ -67,6 +63,12 @@
       "registryUrls": [
         "https://registry.opentofu.org"
       ]
+    },
+    {
+      "matchDepTypes": [
+        "helm_release"
+      ],
+      "pinDigests": false
     },
     {
       "matchManagers": [
