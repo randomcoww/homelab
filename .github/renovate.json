@@ -21,17 +21,15 @@
         "/^config_env.tf$/"
       ],
       "matchStrings": [
-        "\"[a-z0-9.-]+-(?<currentValue>[\\d.]+)\"\\s*# renovate: (?<depName>[\\w/-]+)"
+        "\"(?<currentValue>[^\"]+)\" # renovate: datasource=(?<datasource>[a-zA-Z0-9-._]+?) depName=(?<depName>[^\\s]+?)\\s"
       ],
-      "datasourceTemplate": "github-tags",
       "versioningTemplate": "docker"
     }
   ],
   "packageRules": [
     {
       "matchPackageNames": [
-        "reg.cluster.internal/randomcoww/qrcode-resource",
-        "docker.io/cloudflare/cloudflared"
+        "reg.cluster.internal/randomcoww/qrcode-resource"
       ],
       "versioning": "regex:^(((?<compatibility>[\\w-]+)-)?[bv])?(?<minor>\\d+)(\\.(?<patch>\\d+)(\\.(?<build>\\d+))?)?(-(?<compat>[\\w.-]+))?$"
     },
