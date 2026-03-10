@@ -120,8 +120,8 @@ locals {
     minio              = "cgr.dev/chainguard/minio:latest@sha256:27d198f7409fb95e99d337a62c34d1813657c18afea485f588776794133dd001"
     nginx              = "docker.io/nginxinc/nginx-unprivileged:1.29.5-alpine@sha256:aec540f08f99df3c830549d5dd7bfaf63e01cbbb499e37400c5af9f8e8554e9f"
     # tier 2
-    kea                   = "ghcr.io/randomcoww/kea:v3.1.6.1773093061@sha256:c510d3b399b5c6aa108a493ee4fcd96147cba5021cd471955abaaaabb974f091"
-    ipxe                  = "ghcr.io/randomcoww/ipxe:v2.0.0.1773092507@sha256:a20bf0c1fe0fb7524024ba062cc80a427e503696b2040ed00c50f1984e010a16"
+    kea                   = "reg.cluster.internal/randomcoww/kea:v3.1.6.1773099558@sha256:d87067f4f21e9eb809558989802a6215702f1e29d9aebe7c5187e310c92036b1"
+    ipxe                  = "reg.cluster.internal/randomcoww/ipxe:v2.0.0.1773099564@sha256:f17777880edb26995c958ba1569b5abbe8f9b18ac59296e28063de8984de7ee1"
     registry              = "ghcr.io/distribution/distribution:3.0.0@sha256:4ba3adf47f5c866e9a29288c758c5328ef03396cb8f5f6454463655fa8bc83e2"
     registry_ui           = "docker.io/quiq/registry-ui:0.12.0@sha256:0d066cddfb87427d1907801cd5f955a5af4633ac3bae25273184dd80a96289be"
     device_plugin         = "ghcr.io/squat/generic-device-plugin:latest@sha256:5acdaa40af84adf8b6f7bb1b8930d4e7be1ebe7f0109f00211ce3df43217b3b7"
