@@ -27,6 +27,7 @@ module "secret" {
   data = merge({
     basename(local.config_file) = yamlencode(merge(var.llama_swap_config, {
       macros = {
+        models_url  = "${var.minio_endpoint}/${var.minio_data_bucket}"
         models_path = local.models_path
         default_cmd = <<-EOF
           /app/llama-server \
