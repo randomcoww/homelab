@@ -51,27 +51,6 @@ locals {
         ]
       }
 
-      # llama-cpp mount-s3 access to models
-      llama_cpp = {
-        name      = local.endpoints.llama_cpp.name
-        namespace = local.endpoints.llama_cpp.namespace
-        policies = [
-          {
-            Effect = "Allow"
-            Action = [
-              "s3:GetObject",
-              "s3:PutObject",
-              "s3:ListBucket",
-              "s3:DeleteObject",
-              "s3:AbortMultipartUpload",
-            ]
-            buckets = [
-              "models",
-            ]
-          },
-        ]
-      }
-
       # open-webui + litestream sqlite
       open_webui = {
         name      = local.endpoints.open_webui.name
