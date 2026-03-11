@@ -131,8 +131,8 @@ locals {
     hostapd          = "reg.cluster.internal/randomcoww/hostapd:v2.11.1773092504@sha256:3529d405c75aec0af7dbb1eaf045b0a7beab7724175c71d89648189b30f51e7e"
     tailscale        = "ghcr.io/tailscale/tailscale:v1.94.2@sha256:95e528798bebe75f39b10e74e7051cf51188ee615934f232ba7ad06a3390ffa1"
     qrcode_generator = "reg.cluster.internal/randomcoww/qrcode-resource:v1773092553@sha256:eecee8dbca0deeecb38bca78ebeffd9cf8edcb7137fabc848db4fcad8652fd9c"
-    llama_cpp_vulkan = "ghcr.io/mostlygeek/llama-swap:vulkan-non-root@sha256:e2a20dc31f848cad0aff0152f3126a0be578339ae9d82f867165f61711412bb8"
-    llama_cpp_rocm   = "ghcr.io/mostlygeek/llama-swap:rocm-non-root@sha256:9e1d44249bb7c9841c5bc7fc8b3fa9b6feb523577c66d0dc0fc00e252bc236df"
+    llama_cpp_vulkan = "ghcr.io/mostlygeek/llama-swap:vulkan@sha256:2a023491a651c43f78b3ceebd2e0cf3a0f2da980f941397852800448318017d7"
+    llama_cpp_rocm   = "ghcr.io/mostlygeek/llama-swap:rocm@sha256:cfda61a4e101685f825aa739e1b981c48456299034f3734062626acff2169ca6"
     litestream       = "docker.io/litestream/litestream:0.5.9@sha256:58e338ede90c193d5f880348170cd6d80164bbc35220906a3c360271e7317f71"
     valkey           = "ghcr.io/valkey-io/valkey:9.0.3-alpine@sha256:84c96f47ebe197e635cd3ddbe3ab74e8bdf783cf3befbfb1c36387275c1cd5d5"
     searxng          = "ghcr.io/searxng/searxng:latest@sha256:943c8997857aa050ef405779df2fd809960b0e230707f0c45d8e1f0d6a5bb4b7"
@@ -143,6 +143,11 @@ locals {
     cloudflared      = "docker.io/cloudflare/cloudflared:2026.3.0@sha256:6b599ca3e974349ead3286d178da61d291961182ec3fe9c505e1dd02c8ac31b0"
     rclone           = "ghcr.io/rclone/rclone:1.73.2@sha256:8a17d9b5cd5ce71bbb42e49e92ee83575d7fb03f6233d949d328e9d029b9376d"
     sunshine_desktop = "reg.cluster.internal/randomcoww/sunshine-desktop:v2026.309.21603.1773092574@sha256:52039893b01c12ba10c47588884044bb371e095958eb6d66eec203c96abe669d"
+    # models
+    jina_reranker_v3 = "reg.cluster.internal/randomcoww/jina-reranker-v3-q8-0:v1773185353@sha256:f9f985cd629f0a3f39d07de317545bb733ca14148f31040d567d267a8364ab4f"
+    qwen3_embedding  = "reg.cluster.internal/randomcoww/qwen3-embedding-0.6b-q8-0:v1773185427@sha256:5972e58e32ef002d7ec48c488121ffd5b65ceb530c1abe11fde17aa2b736f8bb"
+    glm_4_7_flash    = "reg.cluster.internal/randomcoww/glm-4.7-flash-q8-0:v1773204840@sha256:e1884692f2adfecdf46669526af42cd8ad71c58f22e1cc5a536db60bc326222c"
+    gpt_oss_120b     = "reg.cluster.internal/randomcoww/gpt-oss-120b-f16:v1773207785@sha256:3e1751a02a0190ec5316a7d27e31c5d4b485599a0a14087424fb76fcf88f9c18"
   }
 
   host_images = {

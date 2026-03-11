@@ -1,6 +1,6 @@
 locals {
   llama_cpp_port  = 8080
-  models_path     = "/llama-cpp/models"
+  models_path     = "/models"
   llama_swap_path = "/llama-swap"
   config_file     = "/var/lib/llama-cpp/config.yaml"
 }
@@ -27,7 +27,6 @@ module "secret" {
   data = merge({
     basename(local.config_file) = yamlencode(merge(var.llama_swap_config, {
       macros = {
-        model_url   = "${var.minio_endpoint}/${var.minio_data_bucket}"
         model_path  = local.models_path
         default_cmd = <<-EOF
           /app/llama-server \
@@ -113,26 +112,6 @@ module "statefulset" {
   annotations = {
     "checksum/secret" = sha256(module.secret.manifest)
   }
-  spec = {
-    volumeClaimTemplates = [
-      {
-        metadata = {
-          name = "models"
-        }
-        spec = {
-          accessModes = [
-            "ReadWriteOnce",
-          ]
-          storageClassName = var.storage_class_name
-          resources = {
-            requests = {
-              storage = "120Gi"
-            }
-          }
-        }
-      },
-    ]
-  }
   template_spec = {
     resources = {
       requests = {
@@ -142,53 +121,6 @@ module "statefulset" {
         memory = "96Gi" # GTT
       }
     }
-    initContainers = [
-      {
-        name  = "${var.name}-rclone"
-        image = var.images.rclone
-        args = [
-          "sync",
-          "-v",
-          ":s3:${var.minio_data_bucket}/",
-          "${local.models_path}/",
-        ]
-        env = [
-          {
-            name  = "RCLONE_S3_ENDPOINT"
-            value = var.minio_endpoint
-          },
-          {
-            name = "AWS_ACCESS_KEY_ID"
-            valueFrom = {
-              secretKeyRef = {
-                name = var.minio_access_secret
-                key  = "AWS_ACCESS_KEY_ID"
-              }
-            }
-          },
-          {
-            name = "AWS_SECRET_ACCESS_KEY"
-            valueFrom = {
-              secretKeyRef = {
-                name = var.minio_access_secret
-                key  = "AWS_SECRET_ACCESS_KEY"
-              }
-            }
-          },
-        ]
-        volumeMounts = [
-          {
-            name      = "models"
-            mountPath = local.models_path
-          },
-          {
-            name      = "ca-trust-bundle"
-            mountPath = "/etc/ssl/certs/ca-certificates.crt"
-            readOnly  = true
-          },
-        ]
-      },
-    ]
     containers = [
       {
         name  = var.name
@@ -207,13 +139,25 @@ module "statefulset" {
             subPath   = basename(local.config_file)
           },
           {
-            name      = "models"
-            mountPath = local.models_path
-          },
-          {
             name      = "ca-trust-bundle"
             mountPath = "/etc/ssl/certs/ca-certificates.crt"
             readOnly  = true
+          },
+          {
+            name      = "jina-reranker-v3"
+            mountPath = "${local.models_path}/jina-reranker-v3"
+          },
+          {
+            name      = "qwen3-embedding"
+            mountPath = "${local.models_path}/qwen3-embedding"
+          },
+          {
+            name      = "glm-4-7-flash"
+            mountPath = "${local.models_path}/glm-4-7-flash"
+          },
+          {
+            name      = "gpt-oss-120b"
+            mountPath = "${local.models_path}/gpt-oss-120b"
           },
         ]
         env = concat([
@@ -275,6 +219,30 @@ module "statefulset" {
         hostPath = {
           path = "/etc/ssl/certs/ca-certificates.crt"
           type = "File"
+        }
+      },
+      {
+        name = "jina-reranker-v3"
+        image = {
+          reference = var.images.jina_reranker_v3
+        }
+      },
+      {
+        name = "qwen3-embedding"
+        image = {
+          reference = var.images.qwen3_embedding
+        }
+      },
+      {
+        name = "glm-4-7-flash"
+        image = {
+          reference = var.images.glm_4_7_flash
+        }
+      },
+      {
+        name = "gpt-oss-120b"
+        image = {
+          reference = var.images.gpt_oss_120b
         }
       },
     ]

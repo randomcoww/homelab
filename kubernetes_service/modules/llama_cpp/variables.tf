@@ -22,8 +22,11 @@ variable "affinity" {
 
 variable "images" {
   type = object({
-    llama_swap = string
-    rclone     = string
+    llama_swap       = string
+    jina_reranker_v3 = string
+    qwen3_embedding  = string
+    glm_4_7_flash    = string
+    gpt_oss_120b     = string
   })
 }
 
@@ -40,26 +43,10 @@ variable "extra_envs" {
   default = []
 }
 
-variable "minio_endpoint" {
-  type = string
-}
-
-variable "minio_data_bucket" {
-  type = string
-}
-
-variable "minio_access_secret" {
-  type = string
-}
-
 variable "ingress_hostname" {
   type = string
 }
 
 variable "gateway_ref" {
   type = any
-}
-
-variable "storage_class_name" {
-  type = string
 }
