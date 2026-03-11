@@ -1,6 +1,7 @@
 locals {
   config_path = "/etc/registry"
   ui_port     = 8080
+  ui_name     = "${var.name}-ui"
 }
 
 resource "random_password" "event-listener-token" {
@@ -15,11 +16,13 @@ module "metadata" {
   release     = var.release
   app_version = var.release
   manifests = {
-    "templates/deployment.yaml" = module.deployment.manifest
-    "templates/secret.yaml"     = module.secret.manifest
-    "templates/httproute.yaml"  = module.httproute.manifest
-    "templates/tls.yaml"        = module.tls.manifest
-    "templates/service.yaml"    = module.service.manifest
+    "templates/secret.yaml"        = module.secret.manifest
+    "templates/deployment.yaml"    = module.deployment.manifest
+    "templates/tls.yaml"           = module.tls.manifest
+    "templates/service.yaml"       = module.service.manifest
+    "templates/ui-deployment.yaml" = module.ui-deployment.manifest
+    "templates/ui-service.yaml"    = module.ui-service.manifest
+    "templates/ui-httproute.yaml"  = module.ui-httproute.manifest
     "templates/cronjob.yaml" = yamlencode({
       apiVersion = "batch/v1"
       kind       = "CronJob"
@@ -222,7 +225,7 @@ module "secret" {
           {
             disabled = false
             name     = "registry-ui"
-            url      = "http://127.0.0.1:${local.ui_port}/event-receiver"
+            url      = "https://${var.ui_ingress_hostname}/event-receiver"
             headers = {
               Authorization = [
                 "Bearer ${random_password.event-listener-token.result}",
@@ -269,70 +272,6 @@ module "secret" {
         keep_regexp = "^latest$"
       }
     })
-  }
-}
-
-module "service" {
-  source  = "../../../modules/service"
-  name    = var.name
-  app     = var.name
-  release = var.release
-  annotations = {
-    "external-dns.alpha.kubernetes.io/hostname" = var.service_hostname
-    "kube-vip.io/loadbalancerIPs"               = var.service_ip
-  }
-  spec = {
-    type              = "LoadBalancer"
-    loadBalancerClass = var.loadbalancer_class_name
-    ports = [
-      {
-        name       = var.name
-        port       = var.ports.registry
-        protocol   = "TCP"
-        targetPort = var.ports.registry
-      },
-      {
-        name       = "${var.name}-ui"
-        port       = local.ui_port
-        protocol   = "TCP"
-        targetPort = local.ui_port
-      },
-    ]
-  }
-}
-
-module "httproute" {
-  source  = "../../../modules/httproute"
-  name    = var.name
-  app     = var.name
-  release = var.release
-  spec = {
-    parentRefs = [
-      merge({
-        kind = "Gateway"
-      }, var.gateway_ref),
-    ]
-    hostnames = [
-      var.ingress_hostname,
-    ]
-    rules = [
-      {
-        matches = [
-          {
-            path = {
-              type  = "PathPrefix"
-              value = "/"
-            }
-          },
-        ]
-        backendRefs = [
-          {
-            name = module.service.name
-            port = local.ui_port
-          },
-        ]
-      }
-    ]
   }
 }
 
@@ -436,8 +375,100 @@ module "deployment" {
           timeoutSeconds = 4
         }
       },
+    ]
+    volumes = [
       {
-        name  = "${var.name}-ui"
+        name = "config"
+        secret = {
+          secretName = module.secret.name
+        }
+      },
+      {
+        name = "registry-tls"
+        projected = {
+          sources = [
+            {
+              secret = {
+                name = module.tls.name
+                items = [
+                  {
+                    key  = "ca.crt"
+                    path = "ca-cert.pem"
+                  },
+                  {
+                    key  = "tls.crt"
+                    path = "cert.pem"
+                  },
+                  {
+                    key  = "tls.key"
+                    path = "key.pem"
+                  },
+                ]
+              }
+            },
+          ]
+        }
+      },
+      {
+        name = "ca-trust-bundle"
+        hostPath = {
+          path = "/etc/ssl/certs/ca-certificates.crt"
+          type = "File"
+        }
+      },
+    ]
+  }
+}
+
+module "service" {
+  source  = "../../../modules/service"
+  name    = var.name
+  app     = var.name
+  release = var.release
+  annotations = {
+    "external-dns.alpha.kubernetes.io/hostname" = var.service_hostname
+    "kube-vip.io/loadbalancerIPs"               = var.service_ip
+  }
+  spec = {
+    type              = "LoadBalancer"
+    loadBalancerClass = var.loadbalancer_class_name
+    ports = [
+      {
+        name       = var.name
+        port       = var.ports.registry
+        protocol   = "TCP"
+        targetPort = var.ports.registry
+      },
+    ]
+  }
+}
+
+# UI
+
+module "ui-deployment" {
+  source   = "../../../modules/deployment"
+  name     = local.ui_name
+  app      = local.ui_name
+  release  = var.release
+  affinity = var.affinity
+  replicas = 1
+  annotations = {
+    "checksum/secret" = sha256(module.secret.manifest)
+    "checksum/tls"    = sha256(module.tls.manifest)
+  }
+  template_spec = {
+    priorityClassName = "system-cluster-critical"
+    resources = {
+      requests = {
+        memory = "32Mi"
+      }
+      limits = {
+        memory = "32Mi"
+      }
+    }
+    containers = [
+      {
+        name  = local.ui_name
         image = var.images.registry_ui
         args = [
           "-config-file",
@@ -505,27 +536,66 @@ module "deployment" {
                     key  = "ca.crt"
                     path = "ca-cert.pem"
                   },
-                  {
-                    key  = "tls.crt"
-                    path = "cert.pem"
-                  },
-                  {
-                    key  = "tls.key"
-                    path = "key.pem"
-                  },
                 ]
               }
             },
           ]
         }
       },
+    ]
+  }
+}
+
+module "ui-service" {
+  source  = "../../../modules/service"
+  name    = local.ui_name
+  app     = local.ui_name
+  release = var.release
+  spec = {
+    type              = "LoadBalancer"
+    loadBalancerClass = var.loadbalancer_class_name
+    ports = [
       {
-        name = "ca-trust-bundle"
-        hostPath = {
-          path = "/etc/ssl/certs/ca-certificates.crt"
-          type = "File"
-        }
+        name       = local.ui_name
+        port       = local.ui_port
+        protocol   = "TCP"
+        targetPort = local.ui_port
       },
+    ]
+  }
+}
+
+module "ui-httproute" {
+  source  = "../../../modules/httproute"
+  name    = local.ui_name
+  app     = local.ui_name
+  release = var.release
+  spec = {
+    parentRefs = [
+      merge({
+        kind = "Gateway"
+      }, var.gateway_ref),
+    ]
+    hostnames = [
+      var.ui_ingress_hostname,
+    ]
+    rules = [
+      {
+        matches = [
+          {
+            path = {
+              type  = "PathPrefix"
+              value = "/"
+            }
+          },
+        ]
+        backendRefs = [
+          {
+            name = module.ui-service.name
+            port = local.ui_port
+          },
+        ]
+      }
     ]
   }
 }

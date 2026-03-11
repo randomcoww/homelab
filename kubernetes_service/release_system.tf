@@ -287,8 +287,7 @@ module "registry" {
   minio_access_secret = local.minio_users.registry.secret
   service_ip          = local.services.registry.ip
   service_hostname    = local.endpoints.registry.service
-
-  ingress_hostname = local.endpoints.registry.ingress
+  ui_ingress_hostname = local.endpoints.registry.ingress
   gateway_ref = {
     name      = local.endpoints.traefik.name
     namespace = local.endpoints.traefik.namespace
