@@ -62,7 +62,7 @@ locals {
           ]
           imageGCHighThresholdPercent = 1
           imageGCLowThresholdPercent  = 0
-          imageMinimumGCAge           = "4h"
+          imageMinimumGCAge           = "48h"
           resolvConf                  = "/run/systemd/resolve/resolv.conf"
           runtimeRequestTimeout       = "15m"
           rotateCertificates          = true
