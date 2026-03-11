@@ -22,12 +22,12 @@ variable "affinity" {
 
 variable "images" {
   type = object({
-    llama_swap       = string
-    jina_reranker_v3 = string
-    qwen3_embedding  = string
-    glm_4_7_flash    = string
-    gpt_oss_120b     = string
+    llama_swap = string
   })
+}
+
+variable "models" {
+  type = map(string)
 }
 
 variable "api_keys" {

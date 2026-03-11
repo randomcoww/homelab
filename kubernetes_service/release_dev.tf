@@ -11,11 +11,16 @@ module "llama-cpp" {
   namespace = local.endpoints.llama_cpp.namespace
   release   = "0.1.0"
   images = {
-    llama_swap       = local.container_images_digest.llama_cpp_vulkan
-    jina_reranker_v3 = local.container_images_digest.jina_reranker_v3
-    qwen3_embedding  = local.container_images_digest.qwen3_embedding
-    glm_4_7_flash    = local.container_images_digest.glm_4_7_flash
-    gpt_oss_120b     = local.container_images_digest.gpt_oss_120b
+    llama_swap = local.container_images_digest.llama_cpp_vulkan
+  }
+  models = {
+    for _, k in [
+      "gpt-oss-120b-F16",
+      "Qwen3-Embedding-0.6B-Q8_0",
+      "jina-reranker-v3-Q8_0",
+      "GLM-4.7-Flash-Q8_0",
+    ] :
+    k => local.container_images_digest[k]
   }
   api_keys = [
     random_password.llama-cpp-auth-token.result,
@@ -28,7 +33,7 @@ module "llama-cpp" {
       "gpt-oss-120b-F16" = {
         cmd = <<-EOF
         $${default_cmd} \
-          --model $${model_path}/gpt-oss-120b/gpt-oss-120b-F16.gguf \
+          --model $${gpt-oss-120b-f16} \
           --ctx-size 0 \
           --jinja \
           --temp 1.0 \
@@ -39,7 +44,7 @@ module "llama-cpp" {
       "Qwen3-Embedding-0.6B-Q8_0" = {
         cmd = <<-EOF
         $${default_cmd} \
-          --model $${model_path}/qwen3-embedding/Qwen3-Embedding-0.6B-Q8_0.gguf \
+          --model $${qwen3-embedding-0-6b-q8-0} \
           --ctx-size 0 \
           --ubatch-size 2048 \
           --batch-size 2048 \
@@ -50,7 +55,7 @@ module "llama-cpp" {
       "jina-reranker-v3-Q8_0" = {
         cmd = <<-EOF
         $${default_cmd} \
-          --model $${model_path}/jina-reranker-v3/jina-reranker-v3-Q8_0.gguf \
+          --model $${jina-reranker-v3-q8-0} \
           --ctx-size 0 \
           --ubatch-size 2048 \
           --batch-size 2048 \
@@ -62,7 +67,7 @@ module "llama-cpp" {
       "GLM-4.7-Flash-Q8_0" = {
         cmd = <<-EOF
         $${default_cmd} \
-          --model $${model_path}/glm-4-7-flash/GLM-4.7-Flash-Q8_0.gguf \
+          --model $${glm-4-7-flash-q8-0} \
           --ctx-size 0 \
           --jinja \
           --temp 1.0 \

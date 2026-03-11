@@ -3,6 +3,14 @@ locals {
   models_path     = "/models"
   llama_swap_path = "/llama-swap"
   config_file     = "/var/lib/llama-cpp/config.yaml"
+  models = [
+    for k, image in var.models :
+    {
+      name  = k
+      image = image
+      key   = lower(replace(k, "/[_.]/", "-"))
+    }
+  ]
 }
 
 module "metadata" {
@@ -26,7 +34,7 @@ module "secret" {
   release = var.release
   data = merge({
     basename(local.config_file) = yamlencode(merge(var.llama_swap_config, {
-      macros = {
+      macros = merge({
         model_path  = local.models_path
         default_cmd = <<-EOF
           /app/llama-server \
@@ -36,7 +44,10 @@ module "secret" {
           --context-shift \
           --no-mmap
         EOF
-      }
+        }, {
+        for _, v in local.models :
+        "${v.key}" => "${local.models_path}/${v.key}/${v.name}.gguf"
+      })
       apiKeys = [
         for i, k in var.api_keys :
         "$${env.API_KEY_${i}}"
@@ -132,7 +143,7 @@ module "statefulset" {
           "--listen",
           "0.0.0.0:${local.llama_cpp_port}",
         ]
-        volumeMounts = [
+        volumeMounts = concat([
           {
             name      = "config"
             mountPath = local.config_file
@@ -143,23 +154,13 @@ module "statefulset" {
             mountPath = "/etc/ssl/certs/ca-certificates.crt"
             readOnly  = true
           },
+          ], [
+          for _, v in local.models :
           {
-            name      = "jina-reranker-v3"
-            mountPath = "${local.models_path}/jina-reranker-v3"
-          },
-          {
-            name      = "qwen3-embedding"
-            mountPath = "${local.models_path}/qwen3-embedding"
-          },
-          {
-            name      = "glm-4-7-flash"
-            mountPath = "${local.models_path}/glm-4-7-flash"
-          },
-          {
-            name      = "gpt-oss-120b"
-            mountPath = "${local.models_path}/gpt-oss-120b"
-          },
-        ]
+            name      = v.key
+            mountPath = "${local.models_path}/${v.key}"
+          }
+        ])
         env = concat([
           for _, e in var.extra_envs :
           {
@@ -207,7 +208,7 @@ module "statefulset" {
         }
       },
     ]
-    volumes = [
+    volumes = concat([
       {
         name = "config"
         secret = {
@@ -221,30 +222,14 @@ module "statefulset" {
           type = "File"
         }
       },
+      ], [
+      for _, v in local.models :
       {
-        name = "jina-reranker-v3"
+        name = v.key
         image = {
-          reference = var.images.jina_reranker_v3
+          reference = v.image
         }
-      },
-      {
-        name = "qwen3-embedding"
-        image = {
-          reference = var.images.qwen3_embedding
-        }
-      },
-      {
-        name = "glm-4-7-flash"
-        image = {
-          reference = var.images.glm_4_7_flash
-        }
-      },
-      {
-        name = "gpt-oss-120b"
-        image = {
-          reference = var.images.gpt_oss_120b
-        }
-      },
-    ]
+      }
+    ])
   }
 }

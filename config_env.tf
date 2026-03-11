@@ -143,11 +143,12 @@ locals {
     cloudflared      = "docker.io/cloudflare/cloudflared:2026.3.0@sha256:6b599ca3e974349ead3286d178da61d291961182ec3fe9c505e1dd02c8ac31b0"
     rclone           = "ghcr.io/rclone/rclone:1.73.2@sha256:8a17d9b5cd5ce71bbb42e49e92ee83575d7fb03f6233d949d328e9d029b9376d"
     sunshine_desktop = "reg.cluster.internal/randomcoww/sunshine-desktop:v2026.309.21603.1773092574@sha256:52039893b01c12ba10c47588884044bb371e095958eb6d66eec203c96abe669d"
+
     # models
-    jina_reranker_v3 = "reg.cluster.internal/randomcoww/jina-reranker-v3-q8-0:v1773185353@sha256:f9f985cd629f0a3f39d07de317545bb733ca14148f31040d567d267a8364ab4f"
-    qwen3_embedding  = "reg.cluster.internal/randomcoww/qwen3-embedding-0.6b-q8-0:v1773185427@sha256:5972e58e32ef002d7ec48c488121ffd5b65ceb530c1abe11fde17aa2b736f8bb"
-    glm_4_7_flash    = "reg.cluster.internal/randomcoww/glm-4.7-flash-q8-0:v1773204840@sha256:e1884692f2adfecdf46669526af42cd8ad71c58f22e1cc5a536db60bc326222c"
-    gpt_oss_120b     = "reg.cluster.internal/randomcoww/gpt-oss-120b-f16:v1773207785@sha256:3e1751a02a0190ec5316a7d27e31c5d4b485599a0a14087424fb76fcf88f9c18"
+    "gpt-oss-120b-F16"          = "reg.cluster.internal/randomcoww/gpt-oss-120b-f16:v1773207785@sha256:3e1751a02a0190ec5316a7d27e31c5d4b485599a0a14087424fb76fcf88f9c18"
+    "Qwen3-Embedding-0.6B-Q8_0" = "reg.cluster.internal/randomcoww/qwen3-embedding-0.6b-q8-0:v1773185427@sha256:5972e58e32ef002d7ec48c488121ffd5b65ceb530c1abe11fde17aa2b736f8bb"
+    "jina-reranker-v3-Q8_0"     = "reg.cluster.internal/randomcoww/jina-reranker-v3-q8-0:v1773185353@sha256:f9f985cd629f0a3f39d07de317545bb733ca14148f31040d567d267a8364ab4f"
+    "GLM-4.7-Flash-Q8_0"        = "reg.cluster.internal/randomcoww/glm-4.7-flash-q8-0:v1773204840@sha256:e1884692f2adfecdf46669526af42cd8ad71c58f22e1cc5a536db60bc326222c"
   }
 
   host_images = {
