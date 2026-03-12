@@ -143,6 +143,8 @@ locals {
     cloudflared      = "docker.io/cloudflare/cloudflared:2026.3.0@sha256:6b599ca3e974349ead3286d178da61d291961182ec3fe9c505e1dd02c8ac31b0"
     rclone           = "ghcr.io/rclone/rclone:1.73.2@sha256:8a17d9b5cd5ce71bbb42e49e92ee83575d7fb03f6233d949d328e9d029b9376d"
     sunshine_desktop = "reg.cluster.internal/randomcoww/sunshine-desktop:v2026.309.21603.1773092574@sha256:52039893b01c12ba10c47588884044bb371e095958eb6d66eec203c96abe669d"
+    kubernetes_mcp   = "ghcr.io/containers/kubernetes-mcp-server:latest@sha256:d1fdae75e8e6128341ff16c2641439a49f4531b4578564fc3d852b2a8b9e9e54"
+    mcp_proxy        = "ghcr.io/tbxark/mcp-proxy:v0.43.2@sha256:70c0e02d39c4c0898e610b3a30954f7930628fa6f4fb447bad14c32382a25879"
 
     # models
     "gpt-oss-120b-F16"          = "reg.cluster.internal/randomcoww/gpt-oss-120b-f16:v1773207785@sha256:3e1751a02a0190ec5316a7d27e31c5d4b485599a0a14087424fb76fcf88f9c18"
@@ -306,6 +308,9 @@ locals {
         name    = "sunshine-desktop"
         service = "sunshine.${local.domains.kubernetes}"
         ingress = "sunshine.${local.domains.public}"
+      }
+      kubernetes_mcp = {
+        name = "kubernetes-mcp"
       }
     } :
     name => merge(e, {

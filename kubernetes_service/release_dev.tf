@@ -225,10 +225,9 @@ module "open-webui" {
     # https://github.com/open-webui/docs/issues/609
     # https://github.com/javydekoning/homelab/blob/main/k8s/ai-platform/openwebui/TOOL_SERVER_CONNECTIONS.json
     TOOL_SERVER_CONNECTIONS = jsonencode([
-      /*
       {
         type      = "mcp"
-        url       = "https://${local.endpoints.prometheus_mcp.ingress}/prometheus-mcp/mcp"
+        url       = "https://${local.endpoints.kubernetes_mcp.ingress}/mcp"
         auth_type = "bearer"
         config = {
           enable                    = true
@@ -237,14 +236,13 @@ module "open-webui" {
         spec_type = "url"
         spec      = ""
         path      = ""
-        key       = random_password.prometheus-mcp-auth-token.result
+        key       = random_password.kubernetes-mcp-auth-token.result
         info = {
-          id          = "prometheus-metrics"
-          name        = "prometheus-metrics"
-          description = "Query service and node metrics and trends"
+          id          = "kubernetes"
+          name        = "kubernetes"
+          description = "Query Kubernetes resources and logs"
         }
       },
-      */
     ])
     # OIDC
     ENABLE_PERSISTENT_CONFIG       = false # persist mcp oauth registration
@@ -272,4 +270,27 @@ module "open-webui" {
   minio_endpoint      = "https://${local.services.cluster_minio.ip}:${local.service_ports.minio}"
   minio_bucket        = "open-webui"
   minio_access_secret = local.minio_users.open_webui.secret
+}
+
+resource "random_password" "kubernetes-mcp-auth-token" {
+  length           = 32
+  override_special = "-_"
+}
+
+module "kubernetes-mcp" {
+  source    = "./modules/kubernetes_mcp"
+  name      = local.endpoints.kubernetes_mcp.name
+  namespace = local.endpoints.kubernetes_mcp.namespace
+  release   = "0.1.0"
+  replicas  = 2
+  images = {
+    kubernetes_mcp = local.container_images.kubernetes_mcp
+    mcp_proxy      = local.container_images.mcp_proxy
+  }
+  auth_token       = random_password.kubernetes-mcp-auth-token.result
+  ingress_hostname = local.endpoints.kubernetes_mcp.ingress
+  gateway_ref = {
+    name      = local.endpoints.traefik.name
+    namespace = local.endpoints.traefik.namespace
+  }
 }
