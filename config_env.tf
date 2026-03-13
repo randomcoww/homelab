@@ -131,11 +131,11 @@ locals {
     hostapd          = "reg.cluster.internal/randomcoww/hostapd:v2.11.1773092504@sha256:3529d405c75aec0af7dbb1eaf045b0a7beab7724175c71d89648189b30f51e7e"
     tailscale        = "ghcr.io/tailscale/tailscale:v1.94.2@sha256:95e528798bebe75f39b10e74e7051cf51188ee615934f232ba7ad06a3390ffa1"
     qrcode_generator = "reg.cluster.internal/randomcoww/qrcode-resource:v1773092553@sha256:eecee8dbca0deeecb38bca78ebeffd9cf8edcb7137fabc848db4fcad8652fd9c"
-    llama_cpp_vulkan = "ghcr.io/mostlygeek/llama-swap:vulkan@sha256:6bf31bee3a1313344fa4b16bf8d4f1e7ea4b0f544beae82b11b5bf27ec72a9a9"
-    llama_cpp_rocm   = "ghcr.io/mostlygeek/llama-swap:rocm@sha256:b1ea6f6ead8b9f426056f012520a7d1ffff8757f7cc7cf4f4d019677c759b529"
+    llama_cpp_vulkan = "ghcr.io/mostlygeek/llama-swap:vulkan@sha256:d5ce424852c3264716a681c17955a7ccd6a454653e919aad34e49eeb8a8d5370"
+    llama_cpp_rocm   = "ghcr.io/mostlygeek/llama-swap:rocm@sha256:076a8901828525ed172492ae75097f0f4817e3876a8d7e76c1897d6c47450892"
     litestream       = "docker.io/litestream/litestream:0.5.9@sha256:58e338ede90c193d5f880348170cd6d80164bbc35220906a3c360271e7317f71"
     valkey           = "ghcr.io/valkey-io/valkey:9.0.3-alpine@sha256:84c96f47ebe197e635cd3ddbe3ab74e8bdf783cf3befbfb1c36387275c1cd5d5"
-    searxng          = "ghcr.io/searxng/searxng:latest@sha256:5cdcc74aa8048d41b545f1577d5d3a2acebb49d56ea609c65a7adb5f3fc6791d"
+    searxng          = "ghcr.io/searxng/searxng:latest@sha256:174f6a8498d88d2d98c265a952c2d552859bf315cd505746d1c0d4fbec37952f"
     open_webui       = "ghcr.io/open-webui/open-webui:v0.8.10@sha256:ee057955040ce91e3e787e4b7978c9c23e828972c68d01d787ed40f9a307df9f"
     kavita           = "ghcr.io/kareadita/kavita:0.8.9@sha256:1f2acae7466d022f037ea09f7989eb7c487f916b881174c7a6de33dbfa8acb39"
     lldap            = "ghcr.io/lldap/lldap:latest-alpine@sha256:af6daf88e67b2c6885d2426f711cb241751b515cc36a995d36ba77f2ffd199fb"
@@ -143,7 +143,7 @@ locals {
     cloudflared      = "docker.io/cloudflare/cloudflared:2026.3.0@sha256:6b599ca3e974349ead3286d178da61d291961182ec3fe9c505e1dd02c8ac31b0"
     rclone           = "ghcr.io/rclone/rclone:1.73.2@sha256:8a17d9b5cd5ce71bbb42e49e92ee83575d7fb03f6233d949d328e9d029b9376d"
     sunshine_desktop = "reg.cluster.internal/randomcoww/sunshine-desktop:v2026.309.21603.1773092574@sha256:52039893b01c12ba10c47588884044bb371e095958eb6d66eec203c96abe669d"
-    kubernetes_mcp   = "ghcr.io/containers/kubernetes-mcp-server:latest@sha256:d1fdae75e8e6128341ff16c2641439a49f4531b4578564fc3d852b2a8b9e9e54"
+    kubernetes_mcp   = "ghcr.io/containers/kubernetes-mcp-server:latest@sha256:eb3c8de12812b620455aa98637f0f0a4487a479c96b1e324b5b8602d9ec79aa0"
     mcp_proxy        = "ghcr.io/tbxark/mcp-proxy:v0.43.2@sha256:70c0e02d39c4c0898e610b3a30954f7930628fa6f4fb447bad14c32382a25879"
 
     # models
