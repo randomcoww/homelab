@@ -1,7 +1,8 @@
 locals {
   mcp_port          = 8080
-  proxy_port        = 8081
+  nginx_port        = 8081
   proxy_config_file = "/var/lib/mcp-proxy/config.json"
+  config_path       = "/etc/kubernetes-mcp-server/config.d"
 }
 
 module "metadata" {
@@ -14,6 +15,7 @@ module "metadata" {
     "templates/deployment.yaml" = module.deployment.manifest
     "templates/service.yaml"    = module.service.manifest
     "templates/secret.yaml"     = module.secret.manifest
+    "templates/configmap.yaml"  = module.configmap.manifest
     "templates/httproute.yaml"  = module.httproute.manifest
     "templates/serviceaccount.yaml" = yamlencode({
       apiVersion = "v1"
@@ -70,34 +72,54 @@ module "metadata" {
   }
 }
 
+# TODO: issues with aud and client_id
+# I0314 05:53:10.772722       1 authorization.go:91] "Authentication failed - JWT validation error: POST / from 10.244.3.4:54144, error: JWT token validation error: go-jose/go-jose/jwt: validation failed, invalid audience claim (aud)"
+# I0314 07:27:23.099809       1 authorization.go:91] "Authentication failed - JWT validation error: POST /mcp from 10.244.0.4:57372, error: OIDC token validation error: oidc: invalid configuration, clientID must be provided or SkipClientIDCheck must be set"
+# I0314 07:48:46.412161       1 authorization.go:91] "Authentication failed - JWT validation error: POST /mcp from 10.244.0.4:58454, error: JWT token validation error: go-jose/go-jose/jwt: validation failed, invalid audience claim (aud)"
 module "secret" {
   source  = "../../../modules/secret"
   name    = var.name
   app     = var.name
   release = var.release
   data = merge({
-    basename(local.proxy_config_file) = jsonencode({
-      mcpProxy = {
-        baseURL = "https://${var.ingress_hostname}"
-        addr    = "0.0.0.0:${local.proxy_port}"
-        name    = var.name
-        type    = "streamable-http"
-        options = {
-          panicIfInvalid = true
-          logEnabled     = true
-          authTokens = [
-            var.auth_token,
-          ]
-        }
+    "oauth.toml" = <<-EOF
+    require_oauth = true
+    oauth_audience = "${var.oauth_client_id}"
+    oauth_scopes = ["${join("\",\"", var.oauth_scopes)}"]
+    disable_dynamic_client_registration = false
+    authorization_url = "${var.oauth_authorization_url}"
+    server_url = "https://${var.ingress_hostname}"
+    EOF
+  }, var.extra_configs)
+}
+
+# TODO: remove if implementation changes
+# MCP tried to fetch .well-known/oauth-protected-resource from authelia which it does not serve
+module "configmap" {
+  source  = "../../../modules/configmap"
+  name    = var.name
+  app     = var.name
+  release = var.release
+  data = {
+    "nginx-oauth-protected-resource.conf" = <<-EOF
+    server {
+      listen ${local.nginx_port};
+
+      location = /.well-known/oauth-protected-resource {
+        default_type application/json;
+        return 200 '{
+          "resource": "https://${var.ingress_hostname}",
+          "authorization_servers": ["${var.oauth_authorization_url}"],
+          "scopes_supported": ["${join("\",\"", var.oauth_scopes)}"]
+          "bearer_methods_supported": ["header"]
+        }';
+        add_header Access-Control-Allow-Origin "*" always;
+        add_header Access-Control-Allow-Methods "GET, OPTIONS" always;
+        add_header Access-Control-Allow-Headers "Content-Type, Authorization" always;
       }
-      mcpServers = {
-        "/" = {
-          url           = "http://127.0.0.1:${local.mcp_port}/mcp"
-          transportType = "streamable-http"
-        }
-      }
-    })
-  })
+    }
+    EOF
+  }
 }
 
 module "service" {
@@ -110,9 +132,15 @@ module "service" {
     ports = [
       {
         name       = "mcp"
-        port       = local.proxy_port
+        port       = local.mcp_port
         protocol   = "TCP"
-        targetPort = local.proxy_port
+        targetPort = local.mcp_port
+      },
+      {
+        name       = "nginx"
+        port       = local.nginx_port
+        protocol   = "TCP"
+        targetPort = local.nginx_port
       },
     ]
   }
@@ -138,6 +166,22 @@ module "httproute" {
           {
             path = {
               type  = "PathPrefix"
+              value = "/.well-known/oauth-protected-resource"
+            }
+          },
+        ]
+        backendRefs = [
+          {
+            name = module.service.name
+            port = local.nginx_port
+          },
+        ]
+      },
+      {
+        matches = [
+          {
+            path = {
+              type  = "PathPrefix"
               value = "/"
             }
           },
@@ -145,10 +189,10 @@ module "httproute" {
         backendRefs = [
           {
             name = module.service.name
-            port = local.proxy_port
+            port = local.mcp_port
           },
         ]
-      }
+      },
     ]
   }
 }
@@ -161,7 +205,8 @@ module "deployment" {
   replicas = var.replicas
   affinity = var.affinity
   annotations = {
-    "checksum/secret" = sha256(module.secret.manifest)
+    "checksum/secret"    = sha256(module.secret.manifest)
+    "checksum/configmap" = sha256(module.configmap.manifest)
   }
   template_spec = {
     serviceAccountName = var.name
@@ -175,26 +220,6 @@ module "deployment" {
     }
     containers = [
       {
-        name  = "${var.name}-proxy"
-        image = var.images.mcp_proxy
-        args = [
-          "--config",
-          local.proxy_config_file,
-        ]
-        ports = [
-          {
-            containerPort = local.proxy_port
-          },
-        ]
-        volumeMounts = [
-          {
-            name      = "config"
-            mountPath = local.proxy_config_file
-            subPath   = basename(local.proxy_config_file)
-          },
-        ]
-      },
-      {
         name  = var.name
         image = var.images.kubernetes_mcp
         args = [
@@ -202,8 +227,18 @@ module "deployment" {
           tostring(local.mcp_port),
           "--disable-multi-cluster",
           "--stateless",
+          "--cluster-provider",
+          "in-cluster",
           "--sse-base-url",
           "https://${var.ingress_hostname}",
+          "--config-dir",
+          local.config_path,
+        ]
+        volumeMounts = [
+          {
+            name      = "config"
+            mountPath = local.config_path
+          },
         ]
         livenessProbe = {
           httpGet = {
@@ -220,12 +255,35 @@ module "deployment" {
           }
         }
       },
+      {
+        name          = "${var.name}-nginx"
+        image         = var.images.nginx
+        restartPolicy = "Always"
+        ports = [
+          {
+            containerPort = local.nginx_port
+          },
+        ]
+        volumeMounts = [
+          {
+            name      = "nginx-config"
+            mountPath = "/etc/nginx/conf.d/default.conf"
+            subPath   = "nginx-oauth-protected-resource.conf"
+          },
+        ]
+      },
     ]
     volumes = [
       {
         name = "config"
         secret = {
           secretName = module.secret.name
+        }
+      },
+      {
+        name = "nginx-config"
+        configMap = {
+          name = module.configmap.name
         }
       },
     ]

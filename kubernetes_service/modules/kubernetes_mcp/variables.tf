@@ -23,8 +23,25 @@ variable "affinity" {
 variable "images" {
   type = object({
     kubernetes_mcp = string
-    mcp_proxy      = string
+    nginx          = string
   })
+}
+
+variable "extra_configs" {
+  type    = map(string)
+  default = {}
+}
+
+variable "oauth_client_id" {
+  type = string
+}
+
+variable "oauth_authorization_url" {
+  type = string
+}
+
+variable "oauth_scopes" {
+  type = list(string)
 }
 
 variable "auth_token" {

@@ -146,7 +146,6 @@ locals {
       ]
       require_pkce          = false
       pkce_challenge_method = ""
-      consent_mode          = "implicit"
       redirect_uris = [
         "https://${local.endpoints.open_webui.ingress}/oauth/oidc/callback",
       ]
@@ -161,11 +160,25 @@ locals {
         "roles",
         "offline_access",
       ]
-      consent_mode = "implicit"
       redirect_uris = [
         "https://${local.endpoints.kavita.ingress}/signin-oidc",
       ]
       token_endpoint_auth_method = "client_secret_post"
+    }
+    kubernetes-mcp = {
+      client_name = "Kubernetes MCP"
+      public      = true
+      scopes = [
+        "openid",
+        "profile",
+        "email",
+      ]
+      require_pkce          = false
+      pkce_challenge_method = ""
+      redirect_uris = [
+        "https://${local.endpoints.kubernetes_mcp.ingress}/mcp",
+      ]
+      token_endpoint_auth_method = "none"
     }
   }
 }
@@ -645,21 +658,33 @@ resource "helm_release" "authelia" {
                 }
               },
             ]
+            claims_policies = {
+              policy_name = {
+                id_token_audience_mode = "experimental-merged"
+              }
+            }
+            cors = {
+              endpoints = [
+                "token",
+                "authorization",
+              ]
+              allowed_origins_from_client_redirect_uris = true
+            },
             enable_client_debug_messages = true
             clients = [
               for key, client in local.authelia_oidc_clients :
               merge({
-                client_id = random_string.authelia-oidc-client-id[key].result
-                client_secret = {
-                  path = "${local.autehlia_oidc_client_shared_path}/client-secret-${key}"
-                }
+                client_id                        = random_string.authelia-oidc-client-id[key].result
                 public                           = false
                 authorization_policy             = "two_factor"
                 require_pkce                     = true
                 pkce_challenge_method            = "S256"
-                access_token_signed_response_alg = "none"
-                userinfo_signed_response_alg     = "none"
+                access_token_signed_response_alg = "RS256"
                 token_endpoint_auth_method       = "client_secret_basic"
+                }, lookup(client, "public", false) ? {} : {
+                client_secret = {
+                  path = "${local.autehlia_oidc_client_shared_path}/client-secret-${key}"
+                }
               }, client)
             ]
           }

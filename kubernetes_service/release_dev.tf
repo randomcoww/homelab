@@ -282,13 +282,16 @@ module "kubernetes-mcp" {
   name      = local.endpoints.kubernetes_mcp.name
   namespace = local.endpoints.kubernetes_mcp.namespace
   release   = "0.1.0"
-  replicas  = 2
+  replicas  = 1
   images = {
     kubernetes_mcp = local.container_images.kubernetes_mcp
-    mcp_proxy      = local.container_images.mcp_proxy
+    nginx          = local.container_images.nginx
   }
-  auth_token       = random_password.kubernetes-mcp-auth-token.result
-  ingress_hostname = local.endpoints.kubernetes_mcp.ingress
+  oauth_client_id         = random_string.authelia-oidc-client-id["kubernetes-mcp"].result
+  oauth_authorization_url = "https://${local.endpoints.authelia.ingress}"
+  oauth_scopes            = local.authelia_oidc_clients.kubernetes-mcp.scopes
+  auth_token              = random_password.kubernetes-mcp-auth-token.result
+  ingress_hostname        = local.endpoints.kubernetes_mcp.ingress
   gateway_ref = {
     name      = local.endpoints.traefik.name
     namespace = local.endpoints.traefik.namespace
