@@ -208,7 +208,8 @@ module "deployment" {
     "checksum/configmap" = sha256(module.configmap.manifest)
   }
   template_spec = {
-    serviceAccountName = var.name
+    automountServiceAccountToken = true
+    serviceAccountName           = var.name
     resources = {
       requests = {
         memory = "128Mi"

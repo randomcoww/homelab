@@ -118,9 +118,10 @@ module "daemonset" {
     "checksum/configmap" = sha256(module.configmap.manifest)
   }
   template_spec = {
-    priorityClassName  = "system-node-critical"
-    hostNetwork        = true
-    serviceAccountName = var.name
+    automountServiceAccountToken = true
+    priorityClassName            = "system-node-critical"
+    hostNetwork                  = true
+    serviceAccountName           = var.name
     tolerations = [
       {
         operator = "Exists"

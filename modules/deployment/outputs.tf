@@ -27,6 +27,7 @@ output "manifest" {
           annotations = var.annotations
         }
         spec = merge({
+          automountServiceAccountToken = false
           affinity = merge({
             podAntiAffinity = {
               requiredDuringSchedulingIgnoredDuringExecution = [

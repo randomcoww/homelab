@@ -23,9 +23,10 @@ output "manifest" {
           annotations = var.annotations
         }
         spec = merge({
-          affinity      = var.affinity
-          tolerations   = var.tolerations
-          restartPolicy = "Always"
+          automountServiceAccountToken = false
+          affinity                     = var.affinity
+          tolerations                  = var.tolerations
+          restartPolicy                = "Always"
           dnsConfig = {
             options = [
               {

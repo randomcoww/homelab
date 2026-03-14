@@ -95,8 +95,9 @@ module "statefulset" {
     "checksum/secret" = sha256(module.secret.manifest)
   }
   template_spec = {
-    serviceAccountName = var.name
-    priorityClassName  = "system-cluster-critical"
+    automountServiceAccountToken = true
+    serviceAccountName           = var.name
+    priorityClassName            = "system-cluster-critical"
     resources = {
       requests = {
         memory = "128Mi"

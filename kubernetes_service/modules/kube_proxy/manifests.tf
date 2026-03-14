@@ -54,9 +54,10 @@ module "daemonset" {
     "prometheus.io/port"   = tostring(var.ports.kube_proxy_metrics)
   }
   template_spec = {
-    priorityClassName  = "system-node-critical"
-    hostNetwork        = true
-    serviceAccountName = var.name
+    automountServiceAccountToken = true
+    priorityClassName            = "system-node-critical"
+    hostNetwork                  = true
+    serviceAccountName           = var.name
     tolerations = [
       {
         operator = "Exists"
