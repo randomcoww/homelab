@@ -30,8 +30,17 @@ variable "gateway_ref" {
 
 variable "images" {
   type = object({
-    open_webui = string
-    litestream = string
+    open_webui     = string
+    litestream     = string
+    kubernetes_mcp = string
+  })
+}
+
+variable "internal_ca" {
+  type = object({
+    algorithm       = string
+    private_key_pem = string
+    cert_pem        = string
   })
 }
 

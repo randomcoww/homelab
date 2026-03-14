@@ -187,8 +187,9 @@ module "open-webui" {
   namespace = local.endpoints.open_webui.namespace
   release   = "0.1.0"
   images = {
-    open_webui = local.container_images_digest.open_webui
-    litestream = local.container_images_digest.litestream
+    open_webui     = local.container_images_digest.open_webui
+    litestream     = local.container_images_digest.litestream
+    kubernetes_mcp = local.container_images_digest.kubernetes_mcp
   }
   extra_configs = {
     WEBUI_URL                      = "https://${local.endpoints.open_webui.ingress}"
@@ -221,9 +222,6 @@ module "open-webui" {
     RAG_EXTERNAL_RERANKER_URL      = "https://${local.endpoints.llama_cpp.ingress}/v1/rerank"
     RAG_EXTERNAL_RERANKER_API_KEY  = random_password.llama-cpp-auth-token.result
     RAG_RERANKING_MODEL            = "jina-reranker-v3-Q8_0"
-    # https://github.com/varunvasudeva1/llm-server-docs?tab=readme-ov-file#mcp-proxy-server
-    # https://github.com/open-webui/docs/issues/609
-    # https://github.com/javydekoning/homelab/blob/main/k8s/ai-platform/openwebui/TOOL_SERVER_CONNECTIONS.json
     TOOL_SERVER_CONNECTIONS = jsonencode([
       /*
       {
@@ -264,6 +262,7 @@ module "open-webui" {
     OAUTH_ADMIN_ROLES              = "openwebui-admin"
     OAUTH_ROLES_CLAIM              = "groups"
   }
+  internal_ca      = data.terraform_remote_state.sr.outputs.trust.ca
   ingress_hostname = local.endpoints.open_webui.ingress
   gateway_ref = {
     name      = local.endpoints.traefik.name
@@ -281,8 +280,8 @@ module "kubernetes-mcp" {
   release   = "0.1.0"
   replicas  = 1
   images = {
-    kubernetes_mcp = local.container_images.kubernetes_mcp
-    nginx          = local.container_images.nginx
+    kubernetes_mcp = local.container_images_digest.kubernetes_mcp
+    nginx          = local.container_images_digest.nginx
   }
   oauth_client_id         = random_string.authelia-oidc-client-id["kubernetes-mcp"].result
   oauth_authorization_url = "https://${local.endpoints.authelia.ingress}"
