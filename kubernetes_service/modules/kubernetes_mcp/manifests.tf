@@ -75,7 +75,6 @@ module "metadata" {
 # TODO: issues with aud and client_id
 # I0314 05:53:10.772722       1 authorization.go:91] "Authentication failed - JWT validation error: POST / from 10.244.3.4:54144, error: JWT token validation error: go-jose/go-jose/jwt: validation failed, invalid audience claim (aud)"
 # I0314 07:27:23.099809       1 authorization.go:91] "Authentication failed - JWT validation error: POST /mcp from 10.244.0.4:57372, error: OIDC token validation error: oidc: invalid configuration, clientID must be provided or SkipClientIDCheck must be set"
-# I0314 07:48:46.412161       1 authorization.go:91] "Authentication failed - JWT validation error: POST /mcp from 10.244.0.4:58454, error: JWT token validation error: go-jose/go-jose/jwt: validation failed, invalid audience claim (aud)"
 module "secret" {
   source  = "../../../modules/secret"
   name    = var.name

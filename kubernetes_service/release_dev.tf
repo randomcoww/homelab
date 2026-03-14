@@ -225,6 +225,7 @@ module "open-webui" {
     # https://github.com/open-webui/docs/issues/609
     # https://github.com/javydekoning/homelab/blob/main/k8s/ai-platform/openwebui/TOOL_SERVER_CONNECTIONS.json
     TOOL_SERVER_CONNECTIONS = jsonencode([
+      /*
       {
         type      = "mcp"
         url       = "https://${local.endpoints.kubernetes_mcp.ingress}/mcp"
@@ -243,6 +244,7 @@ module "open-webui" {
           description = "Query Kubernetes resources and logs"
         }
       },
+      */
     ])
     # OIDC
     ENABLE_PERSISTENT_CONFIG       = false # persist mcp oauth registration
@@ -272,11 +274,6 @@ module "open-webui" {
   minio_access_secret = local.minio_users.open_webui.secret
 }
 
-resource "random_password" "kubernetes-mcp-auth-token" {
-  length           = 32
-  override_special = "-_"
-}
-
 module "kubernetes-mcp" {
   source    = "./modules/kubernetes_mcp"
   name      = local.endpoints.kubernetes_mcp.name
@@ -290,7 +287,6 @@ module "kubernetes-mcp" {
   oauth_client_id         = random_string.authelia-oidc-client-id["kubernetes-mcp"].result
   oauth_authorization_url = "https://${local.endpoints.authelia.ingress}"
   oauth_scopes            = local.authelia_oidc_clients.kubernetes-mcp.scopes
-  auth_token              = random_password.kubernetes-mcp-auth-token.result
   ingress_hostname        = local.endpoints.kubernetes_mcp.ingress
   gateway_ref = {
     name      = local.endpoints.traefik.name

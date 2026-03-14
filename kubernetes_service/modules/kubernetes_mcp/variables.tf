@@ -44,10 +44,6 @@ variable "oauth_scopes" {
   type = list(string)
 }
 
-variable "auth_token" {
-  type = string
-}
-
 variable "ingress_hostname" {
   type = string
 }
