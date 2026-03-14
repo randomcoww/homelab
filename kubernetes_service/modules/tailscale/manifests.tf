@@ -95,9 +95,8 @@ module "statefulset" {
     "checksum/secret" = sha256(module.secret.manifest)
   }
   template_spec = {
-    automountServiceAccountToken = true
-    serviceAccountName           = var.name
-    priorityClassName            = "system-cluster-critical"
+    serviceAccountName = var.name
+    priorityClassName  = "system-cluster-critical"
     resources = {
       requests = {
         memory = "128Mi"
@@ -179,6 +178,11 @@ module "statefulset" {
             name      = "dev-net-tun"
             mountPath = "/dev/net/tun"
           },
+          {
+            name      = "service-account"
+            mountPath = "/var/run/secrets/kubernetes.io/serviceaccount"
+            readOnly  = true
+          },
         ]
         securityContext = {
           capabilities = {
@@ -194,6 +198,42 @@ module "statefulset" {
         name = "dev-net-tun"
         hostPath = {
           path = "/dev/net/tun"
+        }
+      },
+      {
+        name = "service-account"
+        projected = {
+          sources = [
+            {
+              serviceAccountToken = {
+                path              = "token"
+                expirationSeconds = 3600
+              }
+            },
+            {
+              downwardAPI = {
+                items = [
+                  {
+                    path = "namespace"
+                    fieldRef = {
+                      fieldPath = "metadata.namespace"
+                    }
+                  },
+                ]
+              }
+            },
+            {
+              configMap = {
+                name = "kube-root-ca.crt"
+                items = [
+                  {
+                    key  = "ca.crt"
+                    path = "ca.crt"
+                  },
+                ]
+              }
+            },
+          ]
         }
       },
     ]

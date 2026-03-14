@@ -95,10 +95,9 @@ module "daemonset" {
     "prometheus.io/port"   = tostring(var.ports.kube_vip_metrics)
   }
   template_spec = {
-    automountServiceAccountToken = true
-    hostNetwork                  = true
-    priorityClassName            = "system-cluster-critical"
-    serviceAccountName           = var.name
+    hostNetwork        = true
+    priorityClassName  = "system-cluster-critical"
+    serviceAccountName = var.name
     tolerations = [
       {
         operator = "Exists"
@@ -209,6 +208,13 @@ module "daemonset" {
             value = "true"
           },
         ]
+        volumeMounts = [
+          {
+            name      = "service-account"
+            mountPath = "/var/run/secrets/kubernetes.io/serviceaccount"
+            readOnly  = true
+          },
+        ]
         livenessProbe = {
           httpGet = {
             scheme = "HTTP"
@@ -234,6 +240,44 @@ module "daemonset" {
               "NET_RAW",
             ]
           }
+        }
+      },
+    ]
+    volumes = [
+      {
+        name = "service-account"
+        projected = {
+          sources = [
+            {
+              serviceAccountToken = {
+                path              = "token"
+                expirationSeconds = 3600
+              }
+            },
+            {
+              downwardAPI = {
+                items = [
+                  {
+                    path = "namespace"
+                    fieldRef = {
+                      fieldPath = "metadata.namespace"
+                    }
+                  },
+                ]
+              }
+            },
+            {
+              configMap = {
+                name = "kube-root-ca.crt"
+                items = [
+                  {
+                    key  = "ca.crt"
+                    path = "ca.crt"
+                  },
+                ]
+              }
+            },
+          ]
         }
       },
     ]

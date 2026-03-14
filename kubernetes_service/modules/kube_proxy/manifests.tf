@@ -54,10 +54,9 @@ module "daemonset" {
     "prometheus.io/port"   = tostring(var.ports.kube_proxy_metrics)
   }
   template_spec = {
-    automountServiceAccountToken = true
-    priorityClassName            = "system-node-critical"
-    hostNetwork                  = true
-    serviceAccountName           = var.name
+    priorityClassName  = "system-node-critical"
+    hostNetwork        = true
+    serviceAccountName = var.name
     tolerations = [
       {
         operator = "Exists"
@@ -106,6 +105,13 @@ module "daemonset" {
             value = tostring(var.ports.kube_apiserver)
           },
         ]
+        volumeMounts = [
+          {
+            name      = "service-account"
+            mountPath = "/var/run/secrets/kubernetes.io/serviceaccount"
+            readOnly  = true
+          },
+        ]
         securityContext = {
           privileged = true
         }
@@ -150,6 +156,13 @@ module "daemonset" {
             value = tostring(var.ports.kube_apiserver)
           },
         ]
+        volumeMounts = [
+          {
+            name      = "service-account"
+            mountPath = "/var/run/secrets/kubernetes.io/serviceaccount"
+            readOnly  = true
+          },
+        ]
         securityContext = {
           capabilities = {
             add = [
@@ -174,6 +187,44 @@ module "daemonset" {
             port   = var.ports.kube_proxy
             path   = "/healthz"
           }
+        }
+      },
+    ]
+    volumes = [
+      {
+        name = "service-account"
+        projected = {
+          sources = [
+            {
+              serviceAccountToken = {
+                path              = "token"
+                expirationSeconds = 3600
+              }
+            },
+            {
+              downwardAPI = {
+                items = [
+                  {
+                    path = "namespace"
+                    fieldRef = {
+                      fieldPath = "metadata.namespace"
+                    }
+                  },
+                ]
+              }
+            },
+            {
+              configMap = {
+                name = "kube-root-ca.crt"
+                items = [
+                  {
+                    key  = "ca.crt"
+                    path = "ca.crt"
+                  },
+                ]
+              }
+            },
+          ]
         }
       },
     ]

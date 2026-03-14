@@ -208,8 +208,7 @@ module "deployment" {
     "checksum/configmap" = sha256(module.configmap.manifest)
   }
   template_spec = {
-    automountServiceAccountToken = true
-    serviceAccountName           = var.name
+    serviceAccountName = var.name
     resources = {
       requests = {
         memory = "128Mi"
@@ -270,6 +269,11 @@ module "deployment" {
             mountPath = "/etc/nginx/conf.d/default.conf"
             subPath   = "nginx-oauth-protected-resource.conf"
           },
+          {
+            name      = "service-account"
+            mountPath = "/var/run/secrets/kubernetes.io/serviceaccount"
+            readOnly  = true
+          },
         ]
       },
     ]
@@ -284,6 +288,42 @@ module "deployment" {
         name = "nginx-config"
         configMap = {
           name = module.configmap.name
+        }
+      },
+      {
+        name = "service-account"
+        projected = {
+          sources = [
+            {
+              serviceAccountToken = {
+                path              = "token"
+                expirationSeconds = 3600
+              }
+            },
+            {
+              downwardAPI = {
+                items = [
+                  {
+                    path = "namespace"
+                    fieldRef = {
+                      fieldPath = "metadata.namespace"
+                    }
+                  },
+                ]
+              }
+            },
+            {
+              configMap = {
+                name = "kube-root-ca.crt"
+                items = [
+                  {
+                    key  = "ca.crt"
+                    path = "ca.crt"
+                  },
+                ]
+              }
+            },
+          ]
         }
       },
     ]

@@ -118,10 +118,9 @@ module "daemonset" {
     "checksum/configmap" = sha256(module.configmap.manifest)
   }
   template_spec = {
-    automountServiceAccountToken = true
-    priorityClassName            = "system-node-critical"
-    hostNetwork                  = true
-    serviceAccountName           = var.name
+    priorityClassName  = "system-node-critical"
+    hostNetwork        = true
+    serviceAccountName = var.name
     tolerations = [
       {
         operator = "Exists"
@@ -262,6 +261,11 @@ module "daemonset" {
             name      = "flannel-cfg"
             mountPath = "/etc/kube-flannel"
           },
+          {
+            name      = "service-account"
+            mountPath = "/var/run/secrets/kubernetes.io/serviceaccount"
+            readOnly  = true
+          },
         ]
       },
     ]
@@ -288,6 +292,42 @@ module "daemonset" {
         name = "flannel-cfg"
         configMap = {
           name = module.configmap.name
+        }
+      },
+      {
+        name = "service-account"
+        projected = {
+          sources = [
+            {
+              serviceAccountToken = {
+                path              = "token"
+                expirationSeconds = 3600
+              }
+            },
+            {
+              downwardAPI = {
+                items = [
+                  {
+                    path = "namespace"
+                    fieldRef = {
+                      fieldPath = "metadata.namespace"
+                    }
+                  },
+                ]
+              }
+            },
+            {
+              configMap = {
+                name = "kube-root-ca.crt"
+                items = [
+                  {
+                    key  = "ca.crt"
+                    path = "ca.crt"
+                  },
+                ]
+              }
+            },
+          ]
         }
       },
     ]
