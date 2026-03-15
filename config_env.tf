@@ -117,7 +117,7 @@ locals {
     flannel            = "ghcr.io/flannel-io/flannel:v0.28.1@sha256:6a9c170acece4457ccb9cdfe53c787cc451e87990e20451bf20070b8895fa538"
     flannel_cni_plugin = "ghcr.io/flannel-io/flannel-cni-plugin:v1.9.0-flannel1@sha256:c6a08fe5bcb23b19c2fc7c1e47b95a967cc924224ebedf94e8623f27b6c258fa"
     kube_vip           = "ghcr.io/kube-vip/kube-vip:v1.1.0@sha256:c12498086c5ef3cb121c5b7f9aa755c14bd938ed4f6303da739eb0a0e9ca3410"
-    minio              = "cgr.dev/chainguard/minio:latest@sha256:f140d2cf58df44f235e756ac09e9da5e681f1cdba0849352b6951ea11c9bb23b"
+    minio              = "cgr.dev/chainguard/minio:latest@sha256:44cf8da6814e92d4e95f73c243ce462b27f546aa8ef3243fcd19759faab1b53f"
     nginx              = "docker.io/nginxinc/nginx-unprivileged:1.29.5-alpine@sha256:aec540f08f99df3c830549d5dd7bfaf63e01cbbb499e37400c5af9f8e8554e9f"
     # tier 2
     kea                   = "reg.cluster.internal/randomcoww/kea:v3.1.6.1773099558@sha256:d87067f4f21e9eb809558989802a6215702f1e29d9aebe7c5187e310c92036b1"
@@ -132,7 +132,7 @@ locals {
     tailscale        = "ghcr.io/tailscale/tailscale:v1.94.2@sha256:95e528798bebe75f39b10e74e7051cf51188ee615934f232ba7ad06a3390ffa1"
     qrcode_generator = "reg.cluster.internal/randomcoww/qrcode-resource:v1773092553@sha256:eecee8dbca0deeecb38bca78ebeffd9cf8edcb7137fabc848db4fcad8652fd9c"
     llama_cpp_vulkan = "ghcr.io/mostlygeek/llama-swap:vulkan@sha256:69285ee6d0fcc075734e79f4a93a5f74679726e3b42a49ab0b943d99cdbbb6ac"
-    llama_cpp_rocm   = "ghcr.io/mostlygeek/llama-swap:rocm@sha256:2870d3b81884fb6ea4456fd9da943ea64f7232dd3d93dbe47976258e9bce1381"
+    llama_cpp_rocm   = "ghcr.io/mostlygeek/llama-swap:rocm@sha256:752db866693e8b5507bf48c95c74e5a2c6117c9ea384464cc669a73624f8c93d"
     litestream       = "docker.io/litestream/litestream:0.5.9@sha256:58e338ede90c193d5f880348170cd6d80164bbc35220906a3c360271e7317f71"
     valkey           = "ghcr.io/valkey-io/valkey:9.0.3-alpine@sha256:84c96f47ebe197e635cd3ddbe3ab74e8bdf783cf3befbfb1c36387275c1cd5d5"
     searxng          = "ghcr.io/searxng/searxng:latest@sha256:174f6a8498d88d2d98c265a952c2d552859bf315cd505746d1c0d4fbec37952f"
