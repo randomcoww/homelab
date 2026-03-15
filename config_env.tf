@@ -131,7 +131,7 @@ locals {
     hostapd          = "reg.cluster.internal/randomcoww/hostapd:v2.11.1773092504@sha256:3529d405c75aec0af7dbb1eaf045b0a7beab7724175c71d89648189b30f51e7e"
     tailscale        = "ghcr.io/tailscale/tailscale:v1.94.2@sha256:95e528798bebe75f39b10e74e7051cf51188ee615934f232ba7ad06a3390ffa1"
     qrcode_generator = "reg.cluster.internal/randomcoww/qrcode-resource:v1773092553@sha256:eecee8dbca0deeecb38bca78ebeffd9cf8edcb7137fabc848db4fcad8652fd9c"
-    llama_cpp_vulkan = "ghcr.io/mostlygeek/llama-swap:vulkan@sha256:51e52117795b515588320cd82b34965f4943dd69c88b942a595ba3f223ff5f57"
+    llama_cpp_vulkan = "ghcr.io/mostlygeek/llama-swap:vulkan@sha256:69285ee6d0fcc075734e79f4a93a5f74679726e3b42a49ab0b943d99cdbbb6ac"
     llama_cpp_rocm   = "ghcr.io/mostlygeek/llama-swap:rocm@sha256:2870d3b81884fb6ea4456fd9da943ea64f7232dd3d93dbe47976258e9bce1381"
     litestream       = "docker.io/litestream/litestream:0.5.9@sha256:58e338ede90c193d5f880348170cd6d80164bbc35220906a3c360271e7317f71"
     valkey           = "ghcr.io/valkey-io/valkey:9.0.3-alpine@sha256:84c96f47ebe197e635cd3ddbe3ab74e8bdf783cf3befbfb1c36387275c1cd5d5"
@@ -146,10 +146,11 @@ locals {
     kubernetes_mcp   = "ghcr.io/containers/kubernetes-mcp-server:latest@sha256:eb3c8de12812b620455aa98637f0f0a4487a479c96b1e324b5b8602d9ec79aa0"
 
     # models
-    "gpt-oss-120b-F16"          = "reg.cluster.internal/randomcoww/gpt-oss-120b-f16:v1773207785@sha256:3e1751a02a0190ec5316a7d27e31c5d4b485599a0a14087424fb76fcf88f9c18"
-    "Qwen3-Embedding-0.6B-Q8_0" = "reg.cluster.internal/randomcoww/qwen3-embedding-0.6b-q8-0:v1773185427@sha256:5972e58e32ef002d7ec48c488121ffd5b65ceb530c1abe11fde17aa2b736f8bb"
-    "jina-reranker-v3-Q8_0"     = "reg.cluster.internal/randomcoww/jina-reranker-v3-q8-0:v1773185353@sha256:f9f985cd629f0a3f39d07de317545bb733ca14148f31040d567d267a8364ab4f"
-    "GLM-4.7-Flash-Q8_0"        = "reg.cluster.internal/randomcoww/glm-4.7-flash-q8-0:v1773204840@sha256:e1884692f2adfecdf46669526af42cd8ad71c58f22e1cc5a536db60bc326222c"
+    "gpt-oss-120b-F16"           = "reg.cluster.internal/randomcoww/gpt-oss-120b-f16:v1773207785@sha256:3e1751a02a0190ec5316a7d27e31c5d4b485599a0a14087424fb76fcf88f9c18"
+    "Qwen3-Embedding-0.6B-Q8_0"  = "reg.cluster.internal/randomcoww/qwen3-embedding-0.6b-q8-0:v1773185427@sha256:5972e58e32ef002d7ec48c488121ffd5b65ceb530c1abe11fde17aa2b736f8bb"
+    "jina-reranker-v3-Q8_0"      = "reg.cluster.internal/randomcoww/jina-reranker-v3-q8-0:v1773185353@sha256:f9f985cd629f0a3f39d07de317545bb733ca14148f31040d567d267a8364ab4f"
+    "GLM-4.7-Flash-Q8_0"         = "reg.cluster.internal/randomcoww/glm-4.7-flash-q8-0:v1773557239@sha256:0cfae0bd801fa3ca295a69b106b60aed39993202a7916a6742539677fbbd41dc"
+    "Nemotron-3-Super-120B-Q4_K" = "reg.cluster.internal/randomcoww/nemotron-3-super-120b-q4-k:v1773560584@sha256:44a5f07247b4a1ac2c7aaac34228aa3d13fd39d7cdef1fd53938ed59e4f1624d"
   }
 
   host_images = {

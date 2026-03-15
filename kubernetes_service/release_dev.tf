@@ -19,6 +19,7 @@ module "llama-cpp" {
       "Qwen3-Embedding-0.6B-Q8_0",
       "jina-reranker-v3-Q8_0",
       "GLM-4.7-Flash-Q8_0",
+      "Nemotron-3-Super-120B-Q4_K",
     ] :
     k => local.container_images_digest[k]
   }
@@ -39,6 +40,16 @@ module "llama-cpp" {
           --temp 1.0 \
           --top_p 1.0 \
           --top_k 0.0
+        EOF
+      }
+      "Nemotron-3-Super-120B-Q4_K" = {
+        cmd = <<-EOF
+        $${default_cmd} \
+          --model $${nemotron-3-super-120b-q4-k} \
+          --ctx-size 0 \
+          --jinja \
+          --temp 1.0 \
+          --top_p 1.0
         EOF
       }
       "Qwen3-Embedding-0.6B-Q8_0" = {
@@ -82,7 +93,7 @@ module "llama-cpp" {
         swap      = false
         exclusive = true
         members = [
-          "gpt-oss-120b-F16",
+          "Nemotron-3-Super-120B-Q4_K",
           "Qwen3-Embedding-0.6B-Q8_0",
           "jina-reranker-v3-Q8_0",
         ]
@@ -98,7 +109,7 @@ module "llama-cpp" {
     hooks = {
       on_startup = {
         preload = [
-          "gpt-oss-120b-F16",
+          "Nemotron-3-Super-120B-Q4_K",
         ]
       }
     }
@@ -197,7 +208,7 @@ module "open-webui" {
     ENABLE_OPENAI_API              = true
     OPENAI_API_BASE_URL            = "https://${local.endpoints.llama_cpp.ingress}/v1"
     OPENAI_API_KEY                 = random_password.llama-cpp-auth-token.result
-    DEFAULT_MODELS                 = "gpt-oss-120b-F16"
+    DEFAULT_MODELS                 = "Nemotron-3-Super-120B-Q4_K"
     ENABLE_WEB_SEARCH              = true
     WEB_SEARCH_ENGINE              = "searxng"
     WEB_SEARCH_RESULT_COUNT        = 4
