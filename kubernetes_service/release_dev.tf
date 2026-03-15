@@ -226,7 +226,7 @@ module "open-webui" {
       /*
       {
         type      = "mcp"
-        url       = "https://${local.endpoints.kubernetes_mcp.ingress}/mcp"
+        url       = "https://api.githubcopilot.com/mcp"
         auth_type = "bearer"
         config = {
           enable                    = true
@@ -235,11 +235,11 @@ module "open-webui" {
         spec_type = "url"
         spec      = ""
         path      = ""
-        key       = random_password.kubernetes-mcp-auth-token.result
+        key       = var.github.token
         info = {
-          id          = "kubernetes"
-          name        = "kubernetes"
-          description = "Query Kubernetes resources and logs"
+          id          = "github"
+          name        = "github"
+          description = "Query GitHub resources"
         }
       },
       */

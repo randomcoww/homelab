@@ -314,6 +314,9 @@ module "litestream-overlay" {
           "${local.kubernetes_mcp_cert_path}/tls.crt",
           "--tls-key",
           "${local.kubernetes_mcp_cert_path}/tls.key",
+          "--toolsets",
+          "core",
+          "--read-only",
         ]
         volumeMounts = [
           {
