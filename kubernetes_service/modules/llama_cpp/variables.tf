@@ -27,7 +27,10 @@ variable "images" {
 }
 
 variable "models" {
-  type = map(string)
+  type = map(object({
+    image = string
+    file  = string
+  }))
 }
 
 variable "api_keys" {

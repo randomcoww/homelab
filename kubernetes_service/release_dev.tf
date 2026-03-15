@@ -14,14 +14,16 @@ module "llama-cpp" {
     llama_swap = local.container_images_digest.llama_cpp_vulkan
   }
   models = {
-    for _, k in [
-      "gpt-oss-120b-F16",
-      "Qwen3-Embedding-0.6B-Q8_0",
-      "jina-reranker-v3-Q8_0",
-      "GLM-4.7-Flash-Q8_0",
-      "Nemotron-3-Super-120B-Q4_K",
-    ] :
-    k => local.container_images_digest[k]
+    for key, model in {
+      jina-embeddings-v5 = "v5-small-text-matching-Q8_0.gguf", # jina-embeddings-v5
+      jina-reranker-v5   = "jina-reranker-v3-Q8_0.gguf",
+      nemotron-3-super   = "NVIDIA-Nemotron-3-Super-120B-A12B-MXFP4_MOE-00001-of-00003.gguf",
+      glm-4-7-flash      = "GLM-4.7-Flash-Q8_0.gguf",
+    } :
+    key => {
+      image = local.container_images_digest[model]
+      file  = model
+    }
   }
   api_keys = [
     random_password.llama-cpp-auth-token.result,
@@ -29,33 +31,20 @@ module "llama-cpp" {
   llama_swap_config = {
     healthCheckTimeout = 300
     models = {
-      # https://github.com/ggml-org/llama.cpp/discussions/15396
-      # https://docs.unsloth.ai/basics/gpt-oss-how-to-run-and-fine-tune#recommended-settings
-      "gpt-oss-120b-F16" = {
+      "NVIDIA-Nemotron-3-Super-120B-A12B-MXFP4_MOE" = {
         cmd = <<-EOF
         $${default_cmd} \
-          --model $${gpt-oss-120b-f16} \
-          --ctx-size 0 \
-          --jinja \
-          --temp 1.0 \
-          --top_p 1.0 \
-          --top_k 0.0
-        EOF
-      }
-      "Nemotron-3-Super-120B-Q4_K" = {
-        cmd = <<-EOF
-        $${default_cmd} \
-          --model $${nemotron-3-super-120b-q4-k} \
+          --model $${nemotron-3-super} \
           --ctx-size 0 \
           --jinja \
           --temp 1.0 \
           --top_p 1.0
         EOF
       }
-      "Qwen3-Embedding-0.6B-Q8_0" = {
+      "jina-embeddings-v5-text-small-text-matching-Q8_0" = {
         cmd = <<-EOF
         $${default_cmd} \
-          --model $${qwen3-embedding-0-6b-q8-0} \
+          --model $${jina-embeddings-v5} \
           --ctx-size 0 \
           --ubatch-size 2048 \
           --batch-size 2048 \
@@ -66,7 +55,7 @@ module "llama-cpp" {
       "jina-reranker-v3-Q8_0" = {
         cmd = <<-EOF
         $${default_cmd} \
-          --model $${jina-reranker-v3-q8-0} \
+          --model $${jina-reranker-v5} \
           --ctx-size 0 \
           --ubatch-size 2048 \
           --batch-size 2048 \
@@ -74,11 +63,10 @@ module "llama-cpp" {
           --reranking
         EOF
       }
-      # https://unsloth.ai/docs/models/glm-4.7-flash
       "GLM-4.7-Flash-Q8_0" = {
         cmd = <<-EOF
         $${default_cmd} \
-          --model $${glm-4-7-flash-q8-0} \
+          --model $${glm-4-7-flash} \
           --ctx-size 0 \
           --jinja \
           --temp 1.0 \
@@ -93,8 +81,8 @@ module "llama-cpp" {
         swap      = false
         exclusive = true
         members = [
-          "Nemotron-3-Super-120B-Q4_K",
-          "Qwen3-Embedding-0.6B-Q8_0",
+          "NVIDIA-Nemotron-3-Super-120B-A12B-MXFP4_MOE",
+          "jina-embeddings-v5-text-small-text-matching-Q8_0",
           "jina-reranker-v3-Q8_0",
         ]
       }
@@ -109,7 +97,7 @@ module "llama-cpp" {
     hooks = {
       on_startup = {
         preload = [
-          "Nemotron-3-Super-120B-Q4_K",
+          "NVIDIA-Nemotron-3-Super-120B-A12B-MXFP4_MOE",
         ]
       }
     }
@@ -208,7 +196,7 @@ module "open-webui" {
     ENABLE_OPENAI_API              = true
     OPENAI_API_BASE_URL            = "https://${local.endpoints.llama_cpp.ingress}/v1"
     OPENAI_API_KEY                 = random_password.llama-cpp-auth-token.result
-    DEFAULT_MODELS                 = "Nemotron-3-Super-120B-Q4_K"
+    DEFAULT_MODELS                 = "NVIDIA-Nemotron-3-Super-120B-A12B-MXFP4_MOE"
     ENABLE_WEB_SEARCH              = true
     WEB_SEARCH_ENGINE              = "searxng"
     WEB_SEARCH_RESULT_COUNT        = 4
@@ -227,7 +215,7 @@ module "open-webui" {
     RAG_EMBEDDING_ENGINE           = "openai"
     RAG_OPENAI_API_BASE_URL        = "https://${local.endpoints.llama_cpp.ingress}/v1/embeddings"
     RAG_OPENAI_API_KEY             = random_password.llama-cpp-auth-token.result
-    RAG_EMBEDDING_MODEL            = "Qwen3-Embedding-0.6B-Q8_0"
+    RAG_EMBEDDING_MODEL            = "jina-embeddings-v5-text-small-text-matching-Q8_0"
     RAG_TOP_K_RERANKER             = 5
     RAG_RERANKING_ENGINE           = "external"
     RAG_EXTERNAL_RERANKER_URL      = "https://${local.endpoints.llama_cpp.ingress}/v1/rerank"

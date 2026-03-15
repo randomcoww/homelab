@@ -146,11 +146,10 @@ locals {
     kubernetes_mcp   = "ghcr.io/containers/kubernetes-mcp-server:latest@sha256:eb3c8de12812b620455aa98637f0f0a4487a479c96b1e324b5b8602d9ec79aa0"
 
     # models
-    "gpt-oss-120b-F16"           = "reg.cluster.internal/randomcoww/gpt-oss-120b-f16:v1773207785@sha256:3e1751a02a0190ec5316a7d27e31c5d4b485599a0a14087424fb76fcf88f9c18"
-    "Qwen3-Embedding-0.6B-Q8_0"  = "reg.cluster.internal/randomcoww/qwen3-embedding-0.6b-q8-0:v1773185427@sha256:5972e58e32ef002d7ec48c488121ffd5b65ceb530c1abe11fde17aa2b736f8bb"
-    "jina-reranker-v3-Q8_0"      = "reg.cluster.internal/randomcoww/jina-reranker-v3-q8-0:v1773185353@sha256:f9f985cd629f0a3f39d07de317545bb733ca14148f31040d567d267a8364ab4f"
-    "GLM-4.7-Flash-Q8_0"         = "reg.cluster.internal/randomcoww/glm-4.7-flash-q8-0:v1773557239@sha256:0cfae0bd801fa3ca295a69b106b60aed39993202a7916a6742539677fbbd41dc"
-    "Nemotron-3-Super-120B-Q4_K" = "reg.cluster.internal/randomcoww/nemotron-3-super-120b-q4-k:v1773560584@sha256:44a5f07247b4a1ac2c7aaac34228aa3d13fd39d7cdef1fd53938ed59e4f1624d"
+    "v5-small-text-matching-Q8_0.gguf"                                = "reg.cluster.internal/randomcoww/jina-embeddings-v5-text-small-text-matching-q8-0:v1773615151@sha256:ead9710eb051ea3b6ee32cebc1d1a8ba782c9e589ea972b48b15c173e169c4ee"
+    "jina-reranker-v3-Q8_0.gguf"                                      = "reg.cluster.internal/randomcoww/jina-reranker-v3-q8-0:v1773185353@sha256:f9f985cd629f0a3f39d07de317545bb733ca14148f31040d567d267a8364ab4f"
+    "NVIDIA-Nemotron-3-Super-120B-A12B-MXFP4_MOE-00001-of-00003.gguf" = "reg.cluster.internal/randomcoww/nvidia-nemotron-3-super-120b-a12b-mxfp4-moe:v1773610375@sha256:7c5065d9e53b4752fd40b496cd287946f5f5e5308ad29bfdea81c0622de6da0f"
+    "GLM-4.7-Flash-Q8_0.gguf"                                         = "reg.cluster.internal/randomcoww/glm-4.7-flash-q8-0:v1773557239@sha256:0cfae0bd801fa3ca295a69b106b60aed39993202a7916a6742539677fbbd41dc"
   }
 
   host_images = {

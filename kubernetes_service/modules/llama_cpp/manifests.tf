@@ -6,9 +6,9 @@ locals {
   models = [
     for k, image in var.models :
     {
-      name  = k
-      image = image
-      key   = lower(replace(k, "/[_.]/", "-"))
+      key   = k
+      image = image.image
+      file  = image.file
     }
   ]
 }
@@ -46,7 +46,7 @@ module "secret" {
         EOF
         }, {
         for _, v in local.models :
-        "${v.key}" => "${local.models_path}/${v.key}/${v.name}.gguf"
+        "${v.key}" => "${local.models_path}/${v.key}/${v.file}"
       })
       apiKeys = [
         for i, k in var.api_keys :
