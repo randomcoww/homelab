@@ -1,6 +1,5 @@
 
 locals {
-  valkey_socket_file = "/var/run/valkey/socket.sock"
   extra_configs = merge(var.extra_configs, {
     SEARXNG_SETTINGS_PATH   = "/etc/searxng/settings.yml"
     SEARXNG_LIMITER         = false
@@ -9,7 +8,6 @@ locals {
     SEARXNG_BIND_ADDRESS    = "0.0.0.0"
     SEARXNG_PORT            = 8080
     SEARXNG_SECRET          = random_password.searxng-secret.result
-    SEARXNG_VALKEY_URL      = "unix://${local.valkey_socket_file}?db=0"
   })
 }
 
@@ -117,55 +115,6 @@ module "deployment" {
         memory = "512Mi"
       }
     }
-    initContainers = [
-      {
-        name          = "${var.name}-valkey"
-        image         = var.images.valkey
-        restartPolicy = "Always"
-        args = [
-          "--unixsocket",
-          "${local.valkey_socket_file}",
-          "--port",
-          "0",
-        ]
-        volumeMounts = [
-          {
-            name      = "socket"
-            mountPath = dirname(local.valkey_socket_file)
-          },
-        ]
-        livenessProbe = {
-          exec = {
-            command = [
-              "redis-cli",
-              "-s",
-              local.valkey_socket_file,
-              "ping",
-            ]
-          }
-        }
-        livenessProbe = {
-          exec = {
-            command = [
-              "redis-cli",
-              "-s",
-              local.valkey_socket_file,
-              "ping",
-            ]
-          }
-        }
-        startupProbe = {
-          exec = {
-            command = [
-              "redis-cli",
-              "-s",
-              local.valkey_socket_file,
-              "ping",
-            ]
-          }
-        }
-      },
-    ]
     containers = [
       {
         name  = var.name
@@ -193,10 +142,6 @@ module "deployment" {
             mountPath = local.extra_configs.SEARXNG_SETTINGS_PATH
             subPath   = basename(local.extra_configs.SEARXNG_SETTINGS_PATH)
           },
-          {
-            name      = "socket"
-            mountPath = dirname(local.valkey_socket_file)
-          },
         ]
         livenessProbe = {
           httpGet = {
@@ -220,12 +165,6 @@ module "deployment" {
         name = "config"
         secret = {
           secretName = module.secret.name
-        }
-      },
-      {
-        name = "socket"
-        emptyDir = {
-          medium = "Memory"
         }
       },
     ]

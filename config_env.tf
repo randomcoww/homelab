@@ -134,7 +134,6 @@ locals {
     llama_cpp_vulkan = "ghcr.io/mostlygeek/llama-swap:vulkan@sha256:fb63e76d984c6af6a0db99ffe010620af17b5a0ac35bbf2082f7d0f58d52c6e6"
     llama_cpp_rocm   = "ghcr.io/mostlygeek/llama-swap:rocm@sha256:19aa9d74557535ddd4b27687dbdf4faa300b74a9ed9f58e99bed07295b01cf7a"
     litestream       = "docker.io/litestream/litestream:0.5.9@sha256:58e338ede90c193d5f880348170cd6d80164bbc35220906a3c360271e7317f71"
-    valkey           = "ghcr.io/valkey-io/valkey:9.0.3-alpine@sha256:84c96f47ebe197e635cd3ddbe3ab74e8bdf783cf3befbfb1c36387275c1cd5d5"
     searxng          = "ghcr.io/searxng/searxng:latest@sha256:174f6a8498d88d2d98c265a952c2d552859bf315cd505746d1c0d4fbec37952f"
     open_webui       = "ghcr.io/open-webui/open-webui:v0.8.10@sha256:ee057955040ce91e3e787e4b7978c9c23e828972c68d01d787ed40f9a307df9f"
     kavita           = "ghcr.io/kareadita/kavita:0.8.9@sha256:1f2acae7466d022f037ea09f7989eb7c487f916b881174c7a6de33dbfa8acb39"

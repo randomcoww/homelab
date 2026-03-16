@@ -23,7 +23,6 @@ variable "affinity" {
 variable "images" {
   type = object({
     searxng = string
-    valkey  = string
   })
 }
 

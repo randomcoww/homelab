@@ -148,7 +148,6 @@ module "searxng" {
   replicas  = 2
   images = {
     searxng = local.container_images_digest.searxng
-    valkey  = local.container_images_digest.valkey
   }
   searxng_settings = {
     use_default_settings = {
