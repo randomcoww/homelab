@@ -16,7 +16,7 @@ module "llama-cpp" {
   models = {
     for key, model in {
       jina-embeddings-v5 = "v5-small-text-matching-Q8_0.gguf", # jina-embeddings-v5
-      jina-reranker-v5   = "jina-reranker-v3-Q8_0.gguf",
+      jina-reranker-v3   = "jina-reranker-v3-Q8_0.gguf",
       nemotron-3-super   = "NVIDIA-Nemotron-3-Super-120B-A12B-MXFP4_MOE-00001-of-00003.gguf",
       glm-4-7-flash      = "GLM-4.7-Flash-Q8_0.gguf",
     } :
@@ -31,7 +31,7 @@ module "llama-cpp" {
   llama_swap_config = {
     healthCheckTimeout = 300
     models = {
-      "NVIDIA-Nemotron-3-Super-120B-A12B-MXFP4_MOE" = {
+      "nemotron-3-super" = {
         cmd = <<-EOF
         $${default_cmd} \
           --model $${nemotron-3-super} \
@@ -41,7 +41,7 @@ module "llama-cpp" {
           --top_p 1.0
         EOF
       }
-      "jina-embeddings-v5-text-small-text-matching-Q8_0" = {
+      "jina-embeddings-v5" = {
         cmd = <<-EOF
         $${default_cmd} \
           --model $${jina-embeddings-v5} \
@@ -52,10 +52,10 @@ module "llama-cpp" {
           --pooling last
         EOF
       }
-      "jina-reranker-v3-Q8_0" = {
+      "jina-reranker-v3" = {
         cmd = <<-EOF
         $${default_cmd} \
-          --model $${jina-reranker-v5} \
+          --model $${jina-reranker-v3} \
           --ctx-size 0 \
           --ubatch-size 2048 \
           --batch-size 2048 \
@@ -63,7 +63,7 @@ module "llama-cpp" {
           --reranking
         EOF
       }
-      "GLM-4.7-Flash-Q8_0" = {
+      "glm-4-7-flash" = {
         cmd = <<-EOF
         $${default_cmd} \
           --model $${glm-4-7-flash} \
@@ -81,23 +81,23 @@ module "llama-cpp" {
         swap      = false
         exclusive = true
         members = [
-          "NVIDIA-Nemotron-3-Super-120B-A12B-MXFP4_MOE",
-          "jina-embeddings-v5-text-small-text-matching-Q8_0",
-          "jina-reranker-v3-Q8_0",
+          "nemotron-3-super",
+          "jina-embeddings-v5",
+          "jina-reranker-v3",
         ]
       }
       code-concurrent = {
         swap      = false
         exclusive = true
         members = [
-          "GLM-4.7-Flash-Q8_0",
+          "glm-4-7-flash",
         ]
       }
     }
     hooks = {
       on_startup = {
         preload = [
-          "NVIDIA-Nemotron-3-Super-120B-A12B-MXFP4_MOE",
+          "nemotron-3-super",
         ]
       }
     }
@@ -196,7 +196,7 @@ module "open-webui" {
     ENABLE_OPENAI_API              = true
     OPENAI_API_BASE_URL            = "https://${local.endpoints.llama_cpp.ingress}/v1"
     OPENAI_API_KEY                 = random_password.llama-cpp-auth-token.result
-    DEFAULT_MODELS                 = "NVIDIA-Nemotron-3-Super-120B-A12B-MXFP4_MOE"
+    DEFAULT_MODELS                 = "nemotron-3-super"
     ENABLE_WEB_SEARCH              = true
     WEB_SEARCH_ENGINE              = "searxng"
     WEB_SEARCH_RESULT_COUNT        = 4
@@ -215,12 +215,12 @@ module "open-webui" {
     RAG_EMBEDDING_ENGINE           = "openai"
     RAG_OPENAI_API_BASE_URL        = "https://${local.endpoints.llama_cpp.ingress}/v1/embeddings"
     RAG_OPENAI_API_KEY             = random_password.llama-cpp-auth-token.result
-    RAG_EMBEDDING_MODEL            = "jina-embeddings-v5-text-small-text-matching-Q8_0"
+    RAG_EMBEDDING_MODEL            = "jina-embeddings-v5"
     RAG_TOP_K_RERANKER             = 5
     RAG_RERANKING_ENGINE           = "external"
     RAG_EXTERNAL_RERANKER_URL      = "https://${local.endpoints.llama_cpp.ingress}/v1/rerank"
     RAG_EXTERNAL_RERANKER_API_KEY  = random_password.llama-cpp-auth-token.result
-    RAG_RERANKING_MODEL            = "jina-reranker-v3-Q8_0"
+    RAG_RERANKING_MODEL            = "jina-reranker-v3"
     TOOL_SERVER_CONNECTIONS = jsonencode([
       /*
       {

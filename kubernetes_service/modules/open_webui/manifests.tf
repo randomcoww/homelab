@@ -225,10 +225,10 @@ module "litestream-overlay" {
     serviceAccountName = var.name
     resources = {
       requests = {
-        memory = "2Gi"
+        memory = "6Gi"
       }
       limits = {
-        memory = "4Gi"
+        memory = "6Gi"
       }
     }
     containers = [
