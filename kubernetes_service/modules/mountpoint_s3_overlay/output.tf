@@ -149,5 +149,6 @@ output "template_spec" {
         }
       },
     ])
+    terminationGracePeriodSeconds = 60
   })
 }
