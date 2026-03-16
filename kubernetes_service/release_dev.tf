@@ -221,6 +221,7 @@ module "open-webui" {
     RAG_EXTERNAL_RERANKER_API_KEY  = random_password.llama-cpp-auth-token.result
     RAG_RERANKING_MODEL            = "jina-reranker-v3"
     TOOL_SERVER_CONNECTIONS = jsonencode([
+      /*
       {
         type      = "mcp"
         url       = "https://api.githubcopilot.com/mcp"
@@ -239,6 +240,7 @@ module "open-webui" {
           description = "Query GitHub resources"
         }
       },
+      */
     ])
     # OIDC
     ENABLE_PERSISTENT_CONFIG       = false # persist mcp oauth registration
