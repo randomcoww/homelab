@@ -15,7 +15,7 @@ resource "tls_cert_request" "registry-client" {
     "${reg.prefix}" => reg
   }
 
-  private_key_pem = var.registry_ca.private_key_pem
+  private_key_pem = tls_private_key.registry-client[each.key].private_key_pem
 
   subject {
     common_name = each.key

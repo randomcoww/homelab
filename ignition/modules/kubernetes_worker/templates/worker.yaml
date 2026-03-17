@@ -164,17 +164,17 @@ storage:
           %{~ endfor ~}
     # https://man.archlinux.org/man/containers-certs.d.5.en
     %{~ for _, reg in internal_registries ~}
-    - path: /etc/containers/certs.d/${reg.prefix}/ca.crt
+    - path: /etc/containers/certs.d/${reg.location}/ca.crt
       mode: 0600
       contents:
         inline: |
           ${indent(10, chomp(reg.ca_cert_pem))}
-    - path: /etc/containers/certs.d/${reg.prefix}/client.cert
+    - path: /etc/containers/certs.d/${reg.location}/client.cert
       mode: 0600
       contents:
         inline: |
           ${indent(10, chomp(reg.client_cert_pem))}
-    - path: /etc/containers/certs.d/${reg.prefix}/client.key
+    - path: /etc/containers/certs.d/${reg.location}/client.key
       mode: 0600
       contents:
         inline: |

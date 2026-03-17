@@ -82,8 +82,8 @@ module "kubernetes-worker" {
   # allow host to resolve registry by name
   internal_registries = [
     {
-      prefix   = local.endpoints.registry.service
-      location = local.services.registry.ip
+      prefix   = local.service_ports.registry == 443 ? local.endpoints.registry.service : "${local.endpoints.registry.service}:${local.service_ports.registry}"
+      location = local.service_ports.registry == 443 ? local.services.registry.ip : "${local.services.registry.ip}:${local.service_ports.registry}"
     },
   ]
 }
