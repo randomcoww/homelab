@@ -131,7 +131,6 @@ locals {
     tailscale        = "ghcr.io/tailscale/tailscale:v1.94.2@sha256:95e528798bebe75f39b10e74e7051cf51188ee615934f232ba7ad06a3390ffa1"
     qrcode_generator = "reg.cluster.internal/randomcoww/qrcode-resource:v1773092553@sha256:eecee8dbca0deeecb38bca78ebeffd9cf8edcb7137fabc848db4fcad8652fd9c"
     llama_cpp_vulkan = "ghcr.io/mostlygeek/llama-swap:vulkan@sha256:fb63e76d984c6af6a0db99ffe010620af17b5a0ac35bbf2082f7d0f58d52c6e6"
-    llama_cpp_rocm   = "ghcr.io/mostlygeek/llama-swap:rocm@sha256:19aa9d74557535ddd4b27687dbdf4faa300b74a9ed9f58e99bed07295b01cf7a"
     litestream       = "docker.io/litestream/litestream:0.5.9@sha256:58e338ede90c193d5f880348170cd6d80164bbc35220906a3c360271e7317f71"
     searxng          = "ghcr.io/searxng/searxng:latest@sha256:174f6a8498d88d2d98c265a952c2d552859bf315cd505746d1c0d4fbec37952f"
     open_webui       = "ghcr.io/open-webui/open-webui:v0.8.10@sha256:ee057955040ce91e3e787e4b7978c9c23e828972c68d01d787ed40f9a307df9f"
@@ -139,7 +138,6 @@ locals {
     lldap            = "ghcr.io/lldap/lldap:latest-alpine@sha256:af6daf88e67b2c6885d2426f711cb241751b515cc36a995d36ba77f2ffd199fb"
     authelia         = "ghcr.io/authelia/authelia:4.39.16@sha256:edbce01c5125249e4f4faea01e0f76f0031d64b4a1d0c2514a0ca69cb126d05f"
     cloudflared      = "docker.io/cloudflare/cloudflared:2026.3.0@sha256:6b599ca3e974349ead3286d178da61d291961182ec3fe9c505e1dd02c8ac31b0"
-    rclone           = "ghcr.io/rclone/rclone:1.73.2@sha256:8a17d9b5cd5ce71bbb42e49e92ee83575d7fb03f6233d949d328e9d029b9376d"
     sunshine_desktop = "reg.cluster.internal/randomcoww/sunshine-desktop:v2026.314.174349.1773673086@sha256:cc14d211dff915b473eb911612b68ccded9698b212f730dc9897d608e48d9211"
     kubernetes_mcp   = "ghcr.io/containers/kubernetes-mcp-server:latest@sha256:f5e6d8f01bf71a2186e9c8209044e51bdaa8d1e75315813f15c80c714acc02fb"
 
