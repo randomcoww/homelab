@@ -6,6 +6,8 @@ Write credentials for management access from localhost.
 tofu -chdir=client_credentials init -upgrade && \
 tofu -chdir=client_credentials apply -auto-approve -var "ssh_client={key_id=\"$(whoami)\",public_key_openssh=\"ssh_client_public_key=$(cat $HOME/.ssh/id_ecdsa.pub)\"}"
 
+tofu -chdir=client_credentials output -json internal_ca | jq -r '.cert_pem' > $HOME/ca.crt
+
 SSH_KEY=$HOME/.ssh/id_ecdsa
 tofu -chdir=client_credentials output -raw ssh_user_cert_authorized_key > $SSH_KEY-cert.pub
 
@@ -17,6 +19,9 @@ tofu -chdir=client_credentials output -raw rclone_config > $HOME/.config/rclone/
 mkdir -p $HOME/.mc/certs/CAs
 tofu -chdir=client_credentials output -json mc_config > $HOME/.mc/config.json
 tofu -chdir=client_credentials output -json internal_ca | jq -r '.cert_pem' > $HOME/.mc/certs/CAs/ca.crt
+
+tofu -chdir=client_credentials output -json registry_client | jq -r '.cert_pem' > $HOME/registry.cert
+tofu -chdir=client_credentials output -json registry_client | jq -r '.private_key_pem' > $HOME/registry.key
 ```
 
 ---
@@ -80,6 +85,22 @@ Trigger rolling reboot of hosts coordinated by `kured`. Nodes occasionally fail 
 tofu -chdir=rolling_reboot init -upgrade && \
 tofu -chdir=rolling_reboot apply
 ```
+
+### Registry management
+
+```bash
+regctl registry set reg.cluster.internal \
+  --tls enabled \
+  --cacert "$(cat $HOME/ca.crt)" \
+  --client-cert "$(cat $HOME/registry.cert)" \
+  --client-key "$(cat $HOME/registry.key)"
+
+regctl repo ls reg.cluster.internal
+regctl tag ls reg.cluster.internal/${REPO}
+regctl tag delete reg.cluster.internal/${REPO}:${TAG}
+```
+
+---
 
 ### Renovate local test
 
