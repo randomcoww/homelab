@@ -282,32 +282,34 @@ module "arc-workflow-secret" {
                 value = "/etc/ssl/certs/ca-certificates.crt"
               },
               {
-                name  = "INTERNAL_REGISTRY"
-                value = local.service_ports.registry == 443 ? local.endpoints.registry.service : "${local.endpoints.registry.service}:${local.service_ports.registry}"
+                # Set certs for internal registry from env
+                # https://docs.renovatebot.com/self-hosted-configuration/#detecthostrulesfromenv
+                name  = "RENOVATE_DETECT_HOST_RULES_FROM_ENV"
+                value = "true"
               },
               {
-                name = "INTERNAL_REGISTRY_CERT"
+                name = "DOCKER_${upper(replace(local.endpoints.registry.service, "/[.-]/", "_"))}_HTTPSCERTIFICATE"
                 valueFrom = {
                   secretKeyRef = {
-                    name = "workflow-template"
+                    name = "registry-tls"
                     key  = "tls.crt"
                   }
                 }
               },
               {
-                name = "INTERNAL_REGISTRY_KEY"
+                name = "DOCKER_${upper(replace(local.endpoints.registry.service, "/[.-]/", "_"))}_HTTPSPRIVATEKEY"
                 valueFrom = {
                   secretKeyRef = {
-                    name = "workflow-template"
+                    name = "registry-tls"
                     key  = "tls.key"
                   }
                 }
               },
               {
-                name = "INTERNAL_REGISTRY_CA_CERT"
+                name = "DOCKER_${upper(replace(local.endpoints.registry.service, "/[.-]/", "_"))}_HTTPSCERTIFICATEAUTHORITY"
                 valueFrom = {
                   secretKeyRef = {
-                    name = "workflow-template"
+                    name = "registry-tls"
                     key  = "ca.crt"
                   }
                 }
