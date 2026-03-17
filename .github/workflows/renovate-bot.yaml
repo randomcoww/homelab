@@ -22,6 +22,7 @@ jobs:
         RENOVATE_PLATFORM: github
         RENOVATE_AUTODISCOVER: false
         # RENOVATE_TOKEN: ${{ secrets.GITHUB_TOKEN }} # pass RENOVATE_TOKEN from runner
+        RENOVATE_CONFIG_FILE: .github/renovate-config.js
       run: |
         set -e
 
