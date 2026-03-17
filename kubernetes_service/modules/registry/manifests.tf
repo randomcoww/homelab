@@ -193,6 +193,12 @@ module "secret" {
           ]
           clientauth = "verify-client-cert-if-given"
         }
+        debug = {
+          addr = "0.0.0.0:${var.ports.metrics}"
+          prometheus = {
+            enabled = true
+          }
+        }
       }
       log = {
         level = "info"
@@ -245,9 +251,8 @@ module "secret" {
       listen_addr   = "0.0.0.0:${local.ui_port}"
       uri_base_path = "/"
       performance = {
-        catalog_page_size           = 100
         catalog_refresh_interval    = 10
-        tags_count_refresh_interval = 60
+        tags_count_refresh_interval = 0
       }
       registry = {
         hostname = var.ports.registry == 443 ? var.service_hostname : "${var.service_hostname}:${var.ports.registry}"
@@ -360,17 +365,17 @@ module "deployment" {
         ]
         livenessProbe = {
           httpGet = {
-            port   = var.ports.registry
-            path   = "/"
-            scheme = "HTTPS"
+            port   = var.ports.metrics
+            path   = "/debug/health"
+            scheme = "HTTP"
           }
           timeoutSeconds = 4
         }
         readinessProbe = {
           httpGet = {
-            port   = var.ports.registry
-            path   = "/"
-            scheme = "HTTPS"
+            port   = var.ports.metrics
+            path   = "/debug/health"
+            scheme = "HTTP"
           }
           timeoutSeconds = 4
         }
@@ -428,6 +433,8 @@ module "service" {
   annotations = {
     "external-dns.alpha.kubernetes.io/hostname" = var.service_hostname
     "kube-vip.io/loadbalancerIPs"               = var.service_ip
+    "prometheus.io/scrape"                      = "true"
+    "prometheus.io/port"                        = tostring(var.ports.metrics)
   }
   spec = {
     type              = "LoadBalancer"
@@ -438,6 +445,12 @@ module "service" {
         port       = var.ports.registry
         protocol   = "TCP"
         targetPort = var.ports.registry
+      },
+      {
+        name       = "${var.name}-metrics"
+        port       = var.ports.metrics
+        protocol   = "TCP"
+        targetPort = var.ports.metrics
       },
     ]
   }

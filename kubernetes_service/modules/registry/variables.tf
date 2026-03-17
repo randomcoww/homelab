@@ -25,6 +25,7 @@ variable "images" {
 variable "ports" {
   type = object({
     registry = number
+    metrics  = number
   })
 }
 

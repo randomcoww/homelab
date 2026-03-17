@@ -277,6 +277,7 @@ module "registry" {
   }
   ports = {
     registry = local.service_ports.registry
+    metrics  = local.service_ports.metrics
   }
   ca                      = data.terraform_remote_state.sr.outputs.trust.ca
   loadbalancer_class_name = "kube-vip.io/kube-vip-class"
