@@ -122,6 +122,14 @@ module "arc-workflow-secret" {
                 name  = "FF_KANIKO_SQUASH_STAGES" # https://github.com/mzihlmann/kaniko/pull/141
                 value = "true"
               },
+              {
+                name  = "SSL_CERT_DIR"
+                value = "/kaniko/ssl/certs"
+              },
+              {
+                name  = "DOCKER_CONFIG"
+                value = "/kaniko/.docker"
+              },
             ]
             # ** Don't mount volumes outside of /kaniko to this container **
             # Volumes can interfere with container build process if the same resource is being used in the build
