@@ -216,7 +216,7 @@ module "httproute" {
             port = local.proxy_web_port
           },
         ]
-      }
+      },
     ]
   }
 }

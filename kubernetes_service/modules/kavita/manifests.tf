@@ -92,7 +92,7 @@ module "httproute" {
             port = local.kavita_port
           },
         ]
-      }
+      },
     ]
   }
 }

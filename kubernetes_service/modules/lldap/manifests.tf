@@ -113,7 +113,7 @@ module "httproute" {
             port = local.extra_envs.LLDAP_HTTP_PORT
           },
         ]
-      }
+      },
     ]
   }
 }

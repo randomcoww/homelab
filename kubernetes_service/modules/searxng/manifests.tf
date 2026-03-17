@@ -91,7 +91,7 @@ module "httproute" {
             port = local.extra_configs.SEARXNG_PORT
           },
         ]
-      }
+      },
     ]
   }
 }

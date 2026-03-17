@@ -107,7 +107,7 @@ module "httproute" {
             port = local.llama_cpp_port
           },
         ]
-      }
+      },
     ]
   }
 }

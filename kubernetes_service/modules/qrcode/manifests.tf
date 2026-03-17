@@ -126,7 +126,7 @@ module "httproute" {
             port = local.qrcode_port
           },
         ]
-      }
+      },
     ]
   }
 }

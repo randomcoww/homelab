@@ -186,7 +186,7 @@ module "httproute" {
             port = local.extra_configs.PORT
           },
         ]
-      }
+      },
     ]
   }
 }
