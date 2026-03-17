@@ -234,7 +234,7 @@ locals {
     feature_gates = {
       ClusterTrustBundle           = true
       ClusterTrustBundleProjection = true
-      ImageVolume                  = true
+      NodeLogQuery                 = true
     }
   }
 

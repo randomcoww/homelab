@@ -92,6 +92,8 @@ locals {
           registerNode           = true
           failSwapOn             = false
           enforceNodeAllocatable = []
+          enableSystemLogHandler = true
+          enableSystemLogQuery   = true
           featureGates           = var.feature_gates
         })
       }
