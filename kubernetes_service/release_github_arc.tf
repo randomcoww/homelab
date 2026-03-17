@@ -87,7 +87,7 @@ module "arc-workflow-secret" {
               # kaniko
               {
                 name  = "INTERNAL_REGISTRY"
-                value = local.endpoints.registry.service
+                value = local.service_ports.registry == 443 ? local.endpoints.registry.service : "${local.endpoints.registry.service}:${local.service_ports.registry}"
               },
               {
                 name  = "FF_KANIKO_SQUASH_STAGES" # https://github.com/mzihlmann/kaniko/pull/141
