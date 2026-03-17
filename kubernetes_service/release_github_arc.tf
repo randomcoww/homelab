@@ -33,10 +33,6 @@ resource "helm_release" "arc" {
   ]
 }
 
-# ADR
-# https://github.com/actions/actions-runner-controller/discussions/3152
-# SETFCAP needed in runner workflow pod to build code-server and sunshine-desktop images
-
 resource "tls_private_key" "registry-client" {
   algorithm   = data.terraform_remote_state.sr.outputs.trust.ca.algorithm
   ecdsa_curve = "P521"
@@ -66,18 +62,114 @@ resource "tls_locally_signed_cert" "registry-client" {
   ]
 }
 
+module "registry-tls" {
+  source  = "../modules/secret"
+  name    = "registry-tls"
+  app     = "registry-tls"
+  release = "0.1.0"
+  data = {
+    "tls.crt" = tls_locally_signed_cert.registry-client.cert_pem
+    "tls.key" = tls_private_key.registry-client.private_key_pem
+    "ca.crt"  = data.terraform_remote_state.sr.outputs.trust.ca.cert_pem
+  }
+}
+
 module "arc-workflow-secret" {
   source  = "../modules/secret"
   name    = "workflow-template"
   app     = "workflow-template"
   release = "0.1.0"
   data = {
-    INTERNAL_CA_CERT              = data.terraform_remote_state.sr.outputs.trust.ca.cert_pem
-    INTERNAL_REGISTRY_CLIENT_CERT = tls_locally_signed_cert.registry-client.cert_pem
-    INTERNAL_REGISTRY_CLIENT_KEY  = tls_private_key.registry-client.private_key_pem
-    RENOVATE_TOKEN                = var.github.token # GITHUB_TOKEN cannot provide all permissions needed for renovate
+    INTERNAL_CA_CERT = data.terraform_remote_state.sr.outputs.trust.ca.cert_pem
+    RENOVATE_TOKEN   = var.github.token # GITHUB_TOKEN cannot provide all permissions needed for renovate
 
-    "workflow-podspec-builder.yaml" = yamlencode({
+    # ADR
+    # https://github.com/actions/actions-runner-controller/discussions/3152
+
+    # kaniko container build
+    "workflow-podspec-kaniko.yaml" = yamlencode({
+      spec = {
+        labels = {
+          app = "arc-runner"
+        }
+        containers = [
+          {
+            name = "$job"
+            securityContext = {
+              capabilities = {
+                add = [
+                  "SETFCAP", # needed to build code-server and sunshine-desktop images
+                ]
+              }
+            }
+            env = [
+              {
+                name = "INTERNAL_CA_CERT" # add to some builds such as iPXE
+                valueFrom = {
+                  secretKeyRef = {
+                    name = "workflow-template"
+                    key  = "INTERNAL_CA_CERT"
+                  }
+                }
+              },
+
+              # kaniko
+              {
+                name  = "INTERNAL_REGISTRY"
+                value = local.service_ports.registry == 443 ? local.endpoints.registry.service : "${local.endpoints.registry.service}:${local.service_ports.registry}"
+              },
+              {
+                name  = "FF_KANIKO_SQUASH_STAGES" # https://github.com/mzihlmann/kaniko/pull/141
+                value = "true"
+              },
+            ]
+            # ** Don't mount volumes outside of /kaniko to this container **
+            # Volumes can interfere with container build process if the same resource is being used in the build
+            # Use paths from https://github.com/osscontainertools/kaniko/blob/main/deploy/Dockerfile
+            volumeMounts = [
+              {
+                name      = "ca-trust-bundle"
+                mountPath = "/kaniko/ssl/certs/ca-certificates.crt"
+                readOnly  = true
+              },
+              {
+                name      = "registry-tls"
+                mountPath = "/kaniko/.docker/ca.crt"
+                subPath   = "ca.crt"
+              },
+              {
+                name      = "registry-tls"
+                mountPath = "/kaniko/.docker/client.cert"
+                subPath   = "tls.crt"
+              },
+              {
+                name      = "registry-tls"
+                mountPath = "/kaniko/.docker/client.key"
+                subPath   = "tls.key"
+              },
+            ]
+          },
+        ]
+        volumes = [
+          {
+            name = "ca-trust-bundle"
+            hostPath = {
+              path = "/etc/ssl/certs/ca-certificates.crt"
+              type = "File"
+            }
+          },
+          {
+            name = "registry-tls"
+            secret = {
+              secretName = module.registry-tls.name
+            }
+          },
+        ]
+      }
+    })
+
+    # cosa build
+    "workflow-podspec-cosa.yaml" = yamlencode({
       spec = {
         labels = {
           app = "arc-runner"
@@ -115,36 +207,6 @@ module "arc-workflow-secret" {
                 }
               },
               {
-                name = "INTERNAL_REGISTRY_CLIENT_CERT"
-                valueFrom = {
-                  secretKeyRef = {
-                    name = "workflow-template"
-                    key  = "INTERNAL_REGISTRY_CLIENT_CERT"
-                  }
-                }
-              },
-              {
-                name = "INTERNAL_REGISTRY_CLIENT_KEY"
-                valueFrom = {
-                  secretKeyRef = {
-                    name = "workflow-template"
-                    key  = "INTERNAL_REGISTRY_CLIENT_KEY"
-                  }
-                }
-              },
-
-              # kaniko
-              {
-                name  = "INTERNAL_REGISTRY"
-                value = local.service_ports.registry == 443 ? local.endpoints.registry.service : "${local.endpoints.registry.service}:${local.service_ports.registry}"
-              },
-              {
-                name  = "FF_KANIKO_SQUASH_STAGES" # https://github.com/mzihlmann/kaniko/pull/141
-                value = "true"
-              },
-
-              # cosa
-              {
                 name  = "RCLONE_S3_ENDPOINT"
                 value = "${local.services.cluster_minio.ip}:${local.service_ports.minio}"
               },
@@ -167,14 +229,12 @@ module "arc-workflow-secret" {
                 }
               },
             ]
-            # ** Don't mount volumes outside of /kaniko to this container **
-            # Volumes can interfere with container build process if the same resource is being used in the build
             volumeMounts = [
-              # {
-              #   name      = "ca-trust-bundle"
-              #   mountPath = "/kaniko/ssl/certs/ca-certificates.crt" # This should be path used in https://github.com/osscontainertools/kaniko/blob/main/deploy/Dockerfile
-              #   readOnly  = true
-              # },
+              {
+                name      = "ca-trust-bundle"
+                mountPath = "/etc/ssl/certs/ca-certificates.crt"
+                readOnly  = true
+              },
             ]
           },
         ]
@@ -258,19 +318,43 @@ resource "helm_release" "arc-runner-hook-template" {
     yamlencode({
       manifests = [
         module.arc-workflow-secret.manifest,
+        module.registry-tls.manifest,
       ]
     }),
   ]
 }
 
-resource "helm_release" "arc-runner-set-builder" {
-  for_each = toset([
-    "container-builds",
-    "fedora-coreos-config-custom",
-    "etcd-wrapper",
-  ])
+resource "helm_release" "arc-runner-set" {
+  for_each = {
+    for k in flatten([
+      for workflow, repos in {
+        "renovate" = [
+          "homelab",
+          "container-builds",
+          "fedora-coreos-config-custom",
+          "etcd-wrapper",
+        ]
+        "kaniko" = [
+          "container-builds",
+          "etcd-wrapper",
+        ]
+        "cosa" = [
+          "fedora-coreos-config-custom",
+        ]
+        } : [
+        for repo in repos : {
+          repo     = repo
+          workflow = workflow
+        }
+      ]
+    ]) :
+    "${k.workflow}-${k.repo}" => {
+      repo = k.repo
+      spec = "workflow-podspec-${k.workflow}.yaml"
+    }
+  }
 
-  name             = "builder-${each.key}"
+  name             = each.key
   repository       = "oci://ghcr.io/actions/actions-runner-controller-charts"
   chart            = "gha-runner-scale-set"
   namespace        = "arc-runners"
@@ -282,7 +366,7 @@ resource "helm_release" "arc-runner-set-builder" {
   timeout          = local.kubernetes.helm_release_timeout
   values = [
     yamlencode({
-      githubConfigUrl = "https://github.com/${var.github.user}/${each.key}"
+      githubConfigUrl = "https://github.com/${var.github.user}/${each.value.repo}"
       githubConfigSecret = {
         github_token = var.github.token
       }
@@ -323,99 +407,7 @@ resource "helm_release" "arc-runner-set-builder" {
                 {
                   name      = "workflow-podspec-volume"
                   mountPath = "/home/runner/config/workflow-podspec.yaml"
-                  subPath   = "workflow-podspec-builder.yaml"
-                },
-              ]
-            },
-          ]
-          volumes = [
-            {
-              name = "workflow-podspec-volume"
-              secret = {
-                secretName = "workflow-template"
-              }
-            },
-          ]
-        }
-      }
-      controllerServiceAccount = {
-        namespace = "arc-systems"
-        name      = "gha-runner-scale-set-controller"
-      }
-    }),
-  ]
-  depends_on = [
-    helm_release.arc,
-  ]
-  lifecycle {
-    replace_triggered_by = [
-      helm_release.arc,
-    ]
-  }
-}
-
-resource "helm_release" "arc-runner-set-renovate" {
-  for_each = toset([
-    "homelab",
-    "container-builds",
-    "fedora-coreos-config-custom",
-    "etcd-wrapper",
-  ])
-
-  name             = "renovate-${each.key}"
-  repository       = "oci://ghcr.io/actions/actions-runner-controller-charts"
-  chart            = "gha-runner-scale-set"
-  namespace        = "arc-runners"
-  create_namespace = true
-  wait             = false
-  wait_for_jobs    = false
-  timeout          = local.kubernetes.helm_release_timeout
-  version          = "0.13.1"
-  max_history      = 2
-  values = [
-    yamlencode({
-      githubConfigUrl = "https://github.com/${var.github.user}/${each.key}"
-      githubConfigSecret = {
-        github_token = var.github.token
-      }
-      maxRunners = 1
-      containerMode = {
-        type = "kubernetes"
-        kubernetesModeWorkVolumeClaim = {
-          accessModes = [
-            "ReadWriteOnce",
-          ]
-          storageClassName = "local-path"
-          resources = {
-            requests = {
-              storage = "16Gi"
-            }
-          }
-        }
-      }
-      template = {
-        spec = {
-          labels = {
-            app = "arc-runner"
-          }
-          containers = [
-            {
-              name  = "runner"
-              image = local.container_images_digest.github_actions_runner
-              command = [
-                "/home/runner/run.sh",
-              ]
-              env = [
-                {
-                  name  = "ACTIONS_RUNNER_CONTAINER_HOOK_TEMPLATE"
-                  value = "/home/runner/config/workflow-podspec.yaml"
-                },
-              ]
-              volumeMounts = [
-                {
-                  name      = "workflow-podspec-volume"
-                  mountPath = "/home/runner/config/workflow-podspec.yaml"
-                  subPath   = "workflow-podspec-renovate.yaml"
+                  subPath   = each.value.spec
                 },
               ]
             },
