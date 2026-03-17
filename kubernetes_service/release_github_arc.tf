@@ -37,14 +37,45 @@ resource "helm_release" "arc" {
 # https://github.com/actions/actions-runner-controller/discussions/3152
 # SETFCAP needed in runner workflow pod to build code-server and sunshine-desktop images
 
+resource "tls_private_key" "registry-client" {
+  algorithm   = data.terraform_remote_state.sr.outputs.trust.ca.algorithm
+  ecdsa_curve = "P521"
+  rsa_bits    = 4096
+}
+
+resource "tls_cert_request" "registry-client" {
+  private_key_pem = tls_private_key.registry-client.private_key_pem
+
+  subject {
+    common_name = local.endpoints.registry.service
+  }
+}
+
+resource "tls_locally_signed_cert" "registry-client" {
+  cert_request_pem   = tls_cert_request.registry-client.cert_request_pem
+  ca_private_key_pem = data.terraform_remote_state.sr.outputs.trust.ca.private_key_pem
+  ca_cert_pem        = data.terraform_remote_state.sr.outputs.trust.ca.cert_pem
+
+  validity_period_hours = 8760
+  early_renewal_hours   = 2160
+
+  allowed_uses = [
+    "key_encipherment",
+    "digital_signature",
+    "client_auth",
+  ]
+}
+
 module "arc-workflow-secret" {
   source  = "../modules/secret"
   name    = "workflow-template"
   app     = "workflow-template"
   release = "0.1.0"
   data = {
-    INTERNAL_CA_CERT = data.terraform_remote_state.sr.outputs.trust.ca.cert_pem
-    RENOVATE_TOKEN   = var.github.token # GITHUB_TOKEN cannot provide all permissions needed for renovate
+    INTERNAL_CA_CERT              = data.terraform_remote_state.sr.outputs.trust.ca.cert_pem
+    INTERNAL_REGISTRY_CLIENT_CERT = tls_locally_signed_cert.registry-client.cert_pem
+    INTERNAL_REGISTRY_CLIENT_KEY  = tls_private_key.registry-client.private_key_pem
+    RENOVATE_TOKEN                = var.github.token # GITHUB_TOKEN cannot provide all permissions needed for renovate
 
     "workflow-podspec-builder.yaml" = yamlencode({
       spec = {
@@ -80,6 +111,24 @@ module "arc-workflow-secret" {
                   secretKeyRef = {
                     name = "workflow-template"
                     key  = "INTERNAL_CA_CERT"
+                  }
+                }
+              },
+              {
+                name = "INTERNAL_REGISTRY_CLIENT_CERT"
+                valueFrom = {
+                  secretKeyRef = {
+                    name = "workflow-template"
+                    key  = "INTERNAL_REGISTRY_CLIENT_CERT"
+                  }
+                }
+              },
+              {
+                name = "INTERNAL_REGISTRY_CLIENT_KEY"
+                valueFrom = {
+                  secretKeyRef = {
+                    name = "workflow-template"
+                    key  = "INTERNAL_REGISTRY_CLIENT_KEY"
                   }
                 }
               },

@@ -1,12 +1,5 @@
 locals {
   config_path = "/etc/registry"
-  ui_port     = 8080
-  ui_name     = "${var.name}-ui"
-}
-
-resource "random_password" "event-listener-token" {
-  length  = 60
-  special = false
 }
 
 module "metadata" {
@@ -16,13 +9,10 @@ module "metadata" {
   release     = var.release
   app_version = var.release
   manifests = {
-    "templates/secret.yaml"        = module.secret.manifest
-    "templates/deployment.yaml"    = module.deployment.manifest
-    "templates/tls.yaml"           = module.tls.manifest
-    "templates/service.yaml"       = module.service.manifest
-    "templates/ui-deployment.yaml" = module.ui-deployment.manifest
-    "templates/ui-service.yaml"    = module.ui-service.manifest
-    "templates/ui-httproute.yaml"  = module.ui-httproute.manifest
+    "templates/secret.yaml"     = module.secret.manifest
+    "templates/deployment.yaml" = module.deployment.manifest
+    "templates/tls.yaml"        = module.tls.manifest
+    "templates/service.yaml"    = module.service.manifest
     "templates/cronjob.yaml" = yamlencode({
       apiVersion = "batch/v1"
       kind       = "CronJob"
@@ -48,39 +38,6 @@ module "metadata" {
               }
               spec = {
                 restartPolicy = "Never"
-                initContainers = [
-                  {
-                    name  = "${var.name}-purge-old"
-                    image = var.images.registry_ui
-                    args = [
-                      "-config-file",
-                      "${local.config_path}/config.yaml",
-                      "-purge-tags",
-                    ]
-                    env = [
-                      {
-                        name  = "SSL_CERT_FILE"
-                        value = "${local.config_path}/tls/ca-cert.pem"
-                      },
-                      {
-                        name  = "NODE_EXTRA_CA_CERTS"
-                        value = "${local.config_path}/tls/ca-cert.pem"
-                      },
-                    ]
-                    volumeMounts = [
-                      {
-                        name      = "config"
-                        mountPath = "${local.config_path}/config.yaml"
-                        subPath   = "ui-config"
-                      },
-                      {
-                        name      = "registry-tls"
-                        mountPath = "${local.config_path}/tls/ca-cert.pem"
-                        subPath   = "ca-cert.pem"
-                      },
-                    ]
-                  },
-                ]
                 containers = [
                   {
                     name  = var.name
@@ -191,7 +148,7 @@ module "secret" {
           clientcas = [
             "${local.config_path}/tls/ca-cert.pem",
           ]
-          clientauth = "verify-client-cert-if-given"
+          clientauth = "require-and-verify-client-cert"
         }
         debug = {
           addr = "0.0.0.0:${var.ports.metrics}"
@@ -227,54 +184,6 @@ module "secret" {
         events = {
           includereferences = true
         }
-        endpoints = [
-          {
-            disabled = false
-            name     = "registry-ui"
-            url      = "https://${var.ui_ingress_hostname}/event-receiver"
-            headers = {
-              Authorization = [
-                "Bearer ${random_password.event-listener-token.result}",
-              ]
-            }
-            timeout   = "1s"
-            threshold = 5
-            backoff   = "10s"
-            ignoredmediatypes = [
-              "application/octet-stream",
-            ]
-          },
-        ]
-      }
-    })
-    ui-config = yamlencode({
-      listen_addr   = "0.0.0.0:${local.ui_port}"
-      uri_base_path = "/"
-      performance = {
-        catalog_refresh_interval    = 10
-        tags_count_refresh_interval = 0
-      }
-      registry = {
-        hostname = var.ports.registry == 443 ? var.service_hostname : "${var.service_hostname}:${var.ports.registry}"
-        insecure = false
-        username = "none"
-        password = "none"
-      }
-      access_control = {
-        anyone_can_view_events = true
-        anyone_can_delete_tags = true
-      }
-      event_listener = {
-        bearer_token      = random_password.event-listener-token.result
-        retention_days    = 1
-        database_driver   = "sqlite3"
-        database_location = "data/registry_events.db"
-        deletion_enabled  = true
-      }
-      purge_tags = {
-        keep_days   = 2
-        keep_count  = 6
-        keep_regexp = "^latest$"
       }
     })
   }
@@ -452,163 +361,6 @@ module "service" {
         protocol   = "TCP"
         targetPort = var.ports.metrics
       },
-    ]
-  }
-}
-
-# UI
-
-module "ui-deployment" {
-  source   = "../../../modules/deployment"
-  name     = local.ui_name
-  app      = local.ui_name
-  release  = var.release
-  affinity = var.affinity
-  replicas = 1
-  annotations = {
-    "checksum/secret" = sha256(module.secret.manifest)
-    "checksum/tls"    = sha256(module.tls.manifest)
-  }
-  template_spec = {
-    priorityClassName = "system-cluster-critical"
-    resources = {
-      requests = {
-        memory = "32Mi"
-      }
-      limits = {
-        memory = "32Mi"
-      }
-    }
-    containers = [
-      {
-        name  = local.ui_name
-        image = var.images.registry_ui
-        args = [
-          "-config-file",
-          "${local.config_path}/config.yaml",
-        ]
-        env = [
-          {
-            name  = "SSL_CERT_FILE"
-            value = "${local.config_path}/tls/ca-cert.pem"
-          },
-          {
-            name  = "NODE_EXTRA_CA_CERTS"
-            value = "${local.config_path}/tls/ca-cert.pem"
-          },
-        ]
-        ports = [
-          {
-            containerPort = local.ui_port
-          },
-        ]
-        volumeMounts = [
-          {
-            name      = "config"
-            mountPath = "${local.config_path}/config.yaml"
-            subPath   = "ui-config"
-          },
-          {
-            name      = "registry-tls"
-            mountPath = "${local.config_path}/tls/ca-cert.pem"
-            subPath   = "ca-cert.pem"
-          },
-        ]
-        readinessProbe = {
-          httpGet = {
-            port   = local.ui_port
-            path   = "/"
-            scheme = "HTTP"
-          }
-        }
-        livenessProbe = {
-          httpGet = {
-            port   = local.ui_port
-            path   = "/"
-            scheme = "HTTP"
-          }
-        }
-      },
-    ]
-    volumes = [
-      {
-        name = "config"
-        secret = {
-          secretName = module.secret.name
-        }
-      },
-      {
-        name = "registry-tls"
-        projected = {
-          sources = [
-            {
-              secret = {
-                name = module.tls.name
-                items = [
-                  {
-                    key  = "ca.crt"
-                    path = "ca-cert.pem"
-                  },
-                ]
-              }
-            },
-          ]
-        }
-      },
-    ]
-  }
-}
-
-module "ui-service" {
-  source  = "../../../modules/service"
-  name    = local.ui_name
-  app     = local.ui_name
-  release = var.release
-  spec = {
-    type              = "LoadBalancer"
-    loadBalancerClass = var.loadbalancer_class_name
-    ports = [
-      {
-        name       = local.ui_name
-        port       = local.ui_port
-        protocol   = "TCP"
-        targetPort = local.ui_port
-      },
-    ]
-  }
-}
-
-module "ui-httproute" {
-  source  = "../../../modules/httproute"
-  name    = local.ui_name
-  app     = local.ui_name
-  release = var.release
-  spec = {
-    parentRefs = [
-      merge({
-        kind = "Gateway"
-      }, var.gateway_ref),
-    ]
-    hostnames = [
-      var.ui_ingress_hostname,
-    ]
-    rules = [
-      {
-        matches = [
-          {
-            path = {
-              type  = "PathPrefix"
-              value = "/"
-            }
-          },
-        ]
-        backendRefs = [
-          {
-            name = module.ui-service.name
-            port = local.ui_port
-          },
-        ]
-      }
     ]
   }
 }

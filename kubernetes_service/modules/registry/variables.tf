@@ -17,8 +17,7 @@ variable "affinity" {
 
 variable "images" {
   type = object({
-    registry    = string
-    registry_ui = string
+    registry = string
   })
 }
 

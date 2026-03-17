@@ -272,8 +272,7 @@ module "registry" {
   release   = "0.1.0"
   replicas  = 2
   images = {
-    registry    = local.container_images_digest.registry
-    registry_ui = local.container_images_digest.registry_ui
+    registry = local.container_images_digest.registry
   }
   ports = {
     registry = local.service_ports.registry

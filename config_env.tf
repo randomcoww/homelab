@@ -123,7 +123,6 @@ locals {
     kea                   = "reg.cluster.internal/randomcoww/kea:v3.1.6.1773672731@sha256:f0087ea5643b1e146894a97467a21705985b53516e5764cfae5d3edd70ea2bd0"
     ipxe                  = "reg.cluster.internal/randomcoww/ipxe:v2.0.0.1773673098@sha256:916e86c3413f1c2152593b84bc015dcf73f43a59d02691b4046a7df7633f80e2"
     registry              = "ghcr.io/distribution/distribution:3.0.0@sha256:4ba3adf47f5c866e9a29288c758c5328ef03396cb8f5f6454463655fa8bc83e2"
-    registry_ui           = "docker.io/quiq/registry-ui:0.12.0@sha256:0d066cddfb87427d1907801cd5f955a5af4633ac3bae25273184dd80a96289be"
     device_plugin         = "ghcr.io/squat/generic-device-plugin:latest@sha256:6a58b2896918e1a4a587d9b39bceec43b3f2e7c85aabdd39f8041add8a7a8585"
     github_actions_runner = "ghcr.io/actions/actions-runner:2.332.0@sha256:8c3f5970b8ceb90cbd3e89b80c6806bb74d9c31686e9177c743323a4539d12f5"
     # tier 3
@@ -276,7 +275,6 @@ locals {
       registry = {
         name    = "registry"
         service = "reg.${local.domains.kubernetes}"
-        ingress = "reg.${local.domains.public}"
       }
       qrcode_hostapd = {
         name    = "qrcode-hostapd"
