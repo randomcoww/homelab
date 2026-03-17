@@ -6,6 +6,14 @@
   "lockFileMaintenance": {
     "enabled": false
   },
+  "hostRules": [
+    {
+      "matchHost": "{{ secrets.INTERNAL_REGISTRY }}",
+      "httpsCertificate": "{{ secrets.INTERNAL_REGISTRY_CERT }}",
+      "httpsPrivateKey": "{{ secrets.INTERNAL_REGISTRY_KEY }}",
+      "httpsCertificateAuthority": "{{ secrets.INTERNAL_REGISTRY_CA_CERT }}"
+    }
+  ],
   "customManagers": [
     {
       "customType": "regex",

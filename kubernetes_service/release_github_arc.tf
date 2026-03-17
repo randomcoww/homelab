@@ -281,6 +281,37 @@ module "arc-workflow-secret" {
                 name  = "SSL_CERT_FILE"
                 value = "/etc/ssl/certs/ca-certificates.crt"
               },
+              {
+                name  = "INTERNAL_REGISTRY"
+                value = local.service_ports.registry == 443 ? local.endpoints.registry.service : "${local.endpoints.registry.service}:${local.service_ports.registry}"
+              },
+              {
+                name = "INTERNAL_REGISTRY_CERT"
+                valueFrom = {
+                  secretKeyRef = {
+                    name = "workflow-template"
+                    key  = "tls.crt"
+                  }
+                }
+              },
+              {
+                name = "INTERNAL_REGISTRY_KEY"
+                valueFrom = {
+                  secretKeyRef = {
+                    name = "workflow-template"
+                    key  = "tls.key"
+                  }
+                }
+              },
+              {
+                name = "INTERNAL_REGISTRY_CA_CERT"
+                valueFrom = {
+                  secretKeyRef = {
+                    name = "workflow-template"
+                    key  = "ca.crt"
+                  }
+                }
+              },
             ]
             volumeMounts = [
               {
@@ -297,6 +328,12 @@ module "arc-workflow-secret" {
             hostPath = {
               path = "/etc/ssl/certs/ca-certificates.crt"
               type = "File"
+            }
+          },
+          {
+            name = "registry-tls"
+            secret = {
+              secretName = module.registry-tls.name
             }
           },
         ]

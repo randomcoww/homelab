@@ -22,14 +22,3 @@ jobs:
         RENOVATE_PLATFORM: github
         RENOVATE_AUTODISCOVER: false
         # RENOVATE_TOKEN: ${{ secrets.GITHUB_TOKEN }} # pass RENOVATE_TOKEN from runner
-        RENOVATE_CONFIG_FILE: /tmp/renovate.json
-      run: |
-        cat > $RENOVATE_CONFIG_FILE <<EOF
-        {
-          "repositories": [
-            "${{ github.repository }}"
-          ]
-        }
-        EOF
-
-        exec renovate-entrypoint.sh renovate
