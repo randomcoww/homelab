@@ -29,17 +29,57 @@ module "llama-cpp" {
     random_password.llama-cpp-auth-token.result,
   ]
   llama_swap_config = {
-    healthCheckTimeout = 300
+    includeAliasesInList = true
     models = {
       "nemotron-3-super" = {
         cmd = <<-EOF
         $${default_cmd} \
           --model $${nemotron-3-super} \
           --ctx-size 0 \
-          --jinja \
-          --temp 1.0 \
-          --top_p 1.0
+          --jinja
         EOF
+        filters = {
+          stripParams = "temperature, top_p"
+          setParams = {
+            reasoning_budget = 16384
+            chat_template_kwargs = {
+              enable_thinking = true
+            }
+          }
+          setParamsByID = {
+            "$${MODEL_ID}" = {
+              temperature = 1.0
+              top_p = 1.0
+            }
+            "$${MODEL_ID}:low" = {
+              temperature = 0.6
+              top_p = 0.95
+            }
+          }
+        }
+      }
+      "glm-4-7-flash" = {
+        cmd = <<-EOF
+        $${default_cmd} \
+          --model $${glm-4-7-flash} \
+          --ctx-size 0 \
+          --jinja \
+          --min-p 0.01 \
+          --repeat-penalty 1.0
+        EOF
+        filters = {
+          stripParams = "temperature, top_p"
+          setParamsByID = {
+           "$${MODEL_ID}" = {
+              temperature = 1.0
+              top_p = 0.95
+            }
+            "$${MODEL_ID}:low" = {
+              temperature = 0.7
+              top_p = 1.0
+            }
+          }
+        }
       }
       "jina-embeddings-v5" = {
         cmd = <<-EOF
@@ -61,18 +101,6 @@ module "llama-cpp" {
           --batch-size 2048 \
           --embedding \
           --reranking
-        EOF
-      }
-      "glm-4-7-flash" = {
-        cmd = <<-EOF
-        $${default_cmd} \
-          --model $${glm-4-7-flash} \
-          --ctx-size 0 \
-          --jinja \
-          --temp 1.0 \
-          --top-p 0.95 \
-          --min-p 0.01 \
-          --repeat-penalty 1.0
         EOF
       }
     }
