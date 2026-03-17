@@ -22,3 +22,7 @@ jobs:
         RENOVATE_PLATFORM: github
         RENOVATE_AUTODISCOVER: false
         # RENOVATE_TOKEN: ${{ secrets.GITHUB_TOKEN }} # pass RENOVATE_TOKEN from runner
+      run: |
+        set -e
+
+        exec renovate-entrypoint.sh renovate
