@@ -49,11 +49,11 @@ module "llama-cpp" {
           setParamsByID = {
             "$${MODEL_ID}" = {
               temperature = 1.0
-              top_p = 1.0
+              top_p       = 1.0
             }
             "$${MODEL_ID}:low" = {
               temperature = 0.6
-              top_p = 0.95
+              top_p       = 0.95
             }
           }
         }
@@ -70,13 +70,13 @@ module "llama-cpp" {
         filters = {
           stripParams = "temperature, top_p"
           setParamsByID = {
-           "$${MODEL_ID}" = {
+            "$${MODEL_ID}" = {
               temperature = 1.0
-              top_p = 0.95
+              top_p       = 0.95
             }
             "$${MODEL_ID}:low" = {
               temperature = 0.7
-              top_p = 1.0
+              top_p       = 1.0
             }
           }
         }
