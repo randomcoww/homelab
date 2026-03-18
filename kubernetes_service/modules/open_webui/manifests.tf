@@ -34,10 +34,29 @@ locals {
           description = "Query Kubernetes resources and logs"
         }
       },
+      {
+        type      = "mcp"
+        url       = "http://127.0.0.1:${local.prometheus_mcp_port}/mcp"
+        auth_type = "none"
+        config = {
+          enable                    = true
+          function_name_filter_list = ""
+        }
+        spec_type = "url"
+        spec      = ""
+        path      = ""
+        key       = ""
+        info = {
+          id          = "prometheus"
+          name        = "prometheus"
+          description = "Query Prometheus resources"
+        }
+      },
     ]))
   })
   kubernetes_mcp_port      = 8081
   kubernetes_mcp_cert_path = "/etc/kubernetes-mcp-server/tls"
+  prometheus_mcp_port      = 8082
 }
 
 resource "random_password" "webui-secret-key" {
@@ -299,6 +318,7 @@ module "litestream-overlay" {
           failureThreshold = 6
         }
       },
+
       # kubernetes-mcp
       {
         name  = "${var.name}-kubernetes-mcp"
@@ -346,6 +366,31 @@ module "litestream-overlay" {
             path   = "/healthz"
           }
         }
+      },
+
+      # prometheus-mcp
+      {
+        name  = "${var.name}-prometheus-mcp"
+        image = var.images.prometheus_mcp
+        env = [
+          {
+            name  = "PROMETHEUS_URL"
+            value = var.prometheus_server_url
+          },
+          {
+            name  = "PROMETHEUS_MCP_SERVER_TRANSPORT"
+            value = "http"
+          },
+          {
+            name  = "PROMETHEUS_MCP_BIND_HOST"
+            value = "0.0.0.0"
+          },
+          {
+            name  = "PROMETHEUS_MCP_BIND_PORT"
+            value = tostring(local.prometheus_mcp_port)
+          },
+        ]
+        # TODO: add health checks
       },
     ]
     volumes = [
