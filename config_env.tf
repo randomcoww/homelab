@@ -138,7 +138,7 @@ locals {
     lldap            = "ghcr.io/lldap/lldap:latest-alpine@sha256:af6daf88e67b2c6885d2426f711cb241751b515cc36a995d36ba77f2ffd199fb"
     authelia         = "ghcr.io/authelia/authelia:4.39.16@sha256:edbce01c5125249e4f4faea01e0f76f0031d64b4a1d0c2514a0ca69cb126d05f"
     cloudflared      = "docker.io/cloudflare/cloudflared:2026.3.0@sha256:6b599ca3e974349ead3286d178da61d291961182ec3fe9c505e1dd02c8ac31b0"
-    sunshine_desktop = "reg.cluster.internal/randomcoww/sunshine-desktop:v2026.314.174349.1773673086@sha256:cc14d211dff915b473eb911612b68ccded9698b212f730dc9897d608e48d9211"
+    sunshine_desktop = "reg.cluster.internal/randomcoww/sunshine-desktop:v2026.316.182600.1773820510@sha256:d4fc849a700a890e8f4c93cfad6d23499908b69d6217b54a3e931edde16fc063"
     kubernetes_mcp   = "ghcr.io/containers/kubernetes-mcp-server:latest@sha256:f5e6d8f01bf71a2186e9c8209044e51bdaa8d1e75315813f15c80c714acc02fb"
 
     # models (model_file)
