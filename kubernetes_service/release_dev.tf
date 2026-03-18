@@ -216,7 +216,6 @@ module "open-webui" {
     open_webui     = local.container_images_digest.open_webui
     litestream     = local.container_images_digest.litestream
     kubernetes_mcp = local.container_images_digest.kubernetes_mcp
-    prometheus_mcp = local.container_images_digest.prometheus_mcp
   }
   extra_configs = {
     WEBUI_URL                      = "https://${local.endpoints.open_webui.ingress}"
@@ -289,10 +288,8 @@ module "open-webui" {
     OAUTH_ADMIN_ROLES              = "openwebui-admin"
     OAUTH_ROLES_CLAIM              = "groups"
   }
-
-  prometheus_server_url = "https://${local.endpoints.prometheus.ingress}"
-  internal_ca           = data.terraform_remote_state.sr.outputs.trust.ca
-  ingress_hostname      = local.endpoints.open_webui.ingress
+  internal_ca      = data.terraform_remote_state.sr.outputs.trust.ca
+  ingress_hostname = local.endpoints.open_webui.ingress
   gateway_ref = {
     name      = local.endpoints.traefik.name
     namespace = local.endpoints.traefik.namespace

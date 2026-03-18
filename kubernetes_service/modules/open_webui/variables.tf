@@ -33,7 +33,6 @@ variable "images" {
     open_webui     = string
     litestream     = string
     kubernetes_mcp = string
-    prometheus_mcp = string
   })
 }
 
@@ -59,9 +58,5 @@ variable "minio_bucket" {
 }
 
 variable "minio_access_secret" {
-  type = string
-}
-
-variable "prometheus_server_url" {
   type = string
 }
