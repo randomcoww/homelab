@@ -301,23 +301,3 @@ module "open-webui" {
   minio_bucket        = "open-webui"
   minio_access_secret = local.minio_users.open_webui.secret
 }
-
-module "kubernetes-mcp" {
-  source    = "./modules/kubernetes_mcp"
-  name      = local.endpoints.kubernetes_mcp.name
-  namespace = local.endpoints.kubernetes_mcp.namespace
-  release   = "0.1.0"
-  replicas  = 1
-  images = {
-    kubernetes_mcp = local.container_images_digest.kubernetes_mcp
-    nginx          = local.container_images_digest.nginx
-  }
-  oauth_client_id         = random_string.authelia-oidc-client-id["kubernetes-mcp"].result
-  oauth_authorization_url = "https://${local.endpoints.authelia.ingress}"
-  oauth_scopes            = local.authelia_oidc_clients.kubernetes-mcp.scopes
-  ingress_hostname        = local.endpoints.kubernetes_mcp.ingress
-  gateway_ref = {
-    name      = local.endpoints.traefik.name
-    namespace = local.endpoints.traefik.namespace
-  }
-}

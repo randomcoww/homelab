@@ -304,9 +304,6 @@ locals {
         service = "sunshine.${local.domains.kubernetes}"
         ingress = "sunshine.${local.domains.public}"
       }
-      kubernetes_mcp = {
-        name = "kubernetes-mcp"
-      }
     } :
     name => merge(e, {
       namespace    = lookup(e, "namespace", "default")

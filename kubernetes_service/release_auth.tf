@@ -165,21 +165,6 @@ locals {
       ]
       token_endpoint_auth_method = "client_secret_post"
     }
-    kubernetes-mcp = {
-      client_name = "Kubernetes MCP"
-      public      = true
-      scopes = [
-        "openid",
-        "profile",
-        "email",
-      ]
-      require_pkce          = false
-      pkce_challenge_method = ""
-      redirect_uris = [
-        "https://${local.endpoints.kubernetes_mcp.ingress}/mcp",
-      ]
-      token_endpoint_auth_method = "none"
-    }
   }
 }
 

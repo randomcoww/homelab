@@ -17,7 +17,6 @@ locals {
     module.searxng,
     module.open-webui,
     module.llama-cpp,
-    # module.kubernetes-mcp,
     # module.sunshine-desktop,
   ]
 }
