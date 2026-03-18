@@ -344,6 +344,48 @@ resource "helm_release" "prometheus-node-exporter" {
   ]
 }
 
+resource "helm_release" "prometheus-systemd-exporter" {
+  name             = "${local.endpoints.prometheus.name}-systemd-exporter"
+  namespace        = local.endpoints.prometheus.namespace
+  create_namespace = true
+  repository       = "https://prometheus-community.github.io/helm-charts"
+  chart            = "prometheus-systemd-exporter"
+  wait             = false
+  wait_for_jobs    = false
+  version          = "0.5.2"
+  max_history      = 2
+  timeout          = local.kubernetes.helm_release_timeout
+  values = [
+    yamlencode({
+      config = {
+        systemd = {
+          collector = {
+            unitInclude = [
+              "kubelet.service",
+              "crio.service",
+              "keepalived.service",
+              "haproxy.service",
+              "bird.service",
+              "conntrackd.service",
+              "systemd-networkd.service",
+              "systemd-resolved.service",
+              "chronyd.service",
+            ]
+          }
+        }
+      }
+      resources = {
+        requests = {
+          memory = "64Mi"
+        }
+        limits = {
+          memory = "64Mi"
+        }
+      }
+    })
+  ]
+}
+
 # Kured
 
 resource "helm_release" "kured" {
