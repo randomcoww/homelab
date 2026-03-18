@@ -269,7 +269,7 @@ resource "helm_release" "authelia" {
   max_history      = 2
   repository       = "https://charts.authelia.com"
   chart            = "authelia"
-  version          = "0.10.49"
+  version          = "0.10.50"
   values = [
     yamlencode({
       image = {
