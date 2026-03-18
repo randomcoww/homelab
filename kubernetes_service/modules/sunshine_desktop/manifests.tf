@@ -104,7 +104,7 @@ module "secret" {
     #!/bin/bash
     set -xe
 
-    VERSION=$(curl -s https://api.github.com/repos/GloriousEggroll/proton-ge-custom/releases/latest | grep tag_name | cut -d '"' -f 4)
+    VERSION=$${VERSION:-$(curl -s https://api.github.com/repos/GloriousEggroll/proton-ge-custom/releases/latest | grep tag_name | cut -d '"' -f 4)}
     curl -fsSL --remove-on-error --skip-existing -O https://github.com/GloriousEggroll/proton-ge-custom/releases/download/$VERSION/$VERSION.tar.gz
 
     mkdir -p $HOME/.steam/steam/compatibilitytools.d/

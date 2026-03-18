@@ -83,21 +83,21 @@ module "sunshine-desktop" {
       name  = "TZ"
       value = local.timezone
     },
-    {
-      name  = "WLR_DRM_NO_MODIFIERS"
-      value = 1
-    },
     # TODO: track https://github.com/LizardByte/Sunshine/issues/4050
     # {
     #   name  = "WLR_RENDERER"
     #   value = "vulkan"
     # },
     {
-      name  = "WLR_DRM_NO_ATOMIC"
+      name  = "PROTON_ENABLE_WAYLAND"
       value = 1
     },
     {
       name  = "PROTON_ENABLE_HDR"
+      value = 1
+    },
+    {
+      name  = "PROTON_USE_NTSYNC"
       value = 1
     },
     {
