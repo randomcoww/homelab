@@ -105,6 +105,14 @@ module "sunshine-desktop" {
       value = 1
     },
     {
+      name  = "PROTON_NO_WM_DECORATION"
+      value = 1
+    },
+    {
+      name  = "PROTON_LOCAL_SHADER_CACHE"
+      value = 1
+    },
+    {
       name  = "AMD_VULKAN_ICD"
       value = "RADV"
     },
