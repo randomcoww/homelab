@@ -300,8 +300,8 @@ locals {
       }
       sunshine_desktop = {
         name    = "sunshine-desktop"
-        service = "sunshine.${local.domains.kubernetes}"
-        ingress = "sunshine.${local.domains.public}"
+        service = "sunshine.${local.domains.public}"
+        ingress = "sunshine-admin.${local.domains.public}"
       }
     } :
     name => merge(e, {
