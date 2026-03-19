@@ -8,7 +8,7 @@ resource "helm_release" "arc" {
   create_namespace = true
   wait             = false
   wait_for_jobs    = false
-  version          = "0.13.1"
+  version          = "0.14.0"
   max_history      = 2
   timeout          = local.kubernetes.helm_release_timeout
   values = [
@@ -408,7 +408,7 @@ resource "helm_release" "arc-runner-set" {
   create_namespace = true
   wait             = false
   wait_for_jobs    = false
-  version          = "0.13.1"
+  version          = "0.14.0"
   max_history      = 2
   timeout          = local.kubernetes.helm_release_timeout
   values = [
