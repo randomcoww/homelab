@@ -106,32 +106,32 @@ locals {
   # these fields are updated by renovate - don't use var substitutions
   container_images = {
     # static pod
-    kube_apiserver          = "registry.k8s.io/kube-apiserver:v1.35.2@sha256:68cdc586f13b13edb7aa30a18155be530136a39cfd5ef8672aad8ccc98f0a7f7"
-    kube_controller_manager = "registry.k8s.io/kube-controller-manager:v1.35.2@sha256:d9784320a41dd1b155c0ad8fdb5823d60c475870f3dd23865edde36b585748f2"
-    kube_scheduler          = "registry.k8s.io/kube-scheduler:v1.35.2@sha256:5833e2c4b779215efe7a48126c067de199e86aa5a86518693adeef16db0ff943"
+    kube_apiserver          = "registry.k8s.io/kube-apiserver:v1.35.3@sha256:6c6e2571f98e738015a39ed21305ab4166a3e2873f9cc01d7fa58371cf0f5d30"
+    kube_controller_manager = "registry.k8s.io/kube-controller-manager:v1.35.3@sha256:23a24aafa10831eb47477b0b31a525ee8a4a99d2c17251aac46c43be8201ec59"
+    kube_scheduler          = "registry.k8s.io/kube-scheduler:v1.35.3@sha256:7070dff574916315268ab483f1088a107b1f3a8a1a87f3e3645933111ade7013"
     etcd                    = "registry.k8s.io/etcd:v3.6.8@sha256:397189418d1a00e500c0605ad18d1baf3b541a1004d768448c367e48071622e5"
     etcd_wrapper            = "ghcr.io/randomcoww/etcd-wrapper:v0.5.28@sha256:e7291e59be84f8b2ac2be25604922b01c7cbc6b474b5f26e15c48dfb777997f8"
     # tier 1
-    kube_proxy         = "registry.k8s.io/kube-proxy:v1.35.2@sha256:015265214cc874b593a7adccdcfe4ac15d2b8e9ae89881bdcd5bcb99d42e1862"
+    kube_proxy         = "registry.k8s.io/kube-proxy:v1.35.3@sha256:8743aec6a360aedcb7a076cbecea367b072abe1bfade2e2098650df502e2bc89"
     external_dns       = "registry.k8s.io/external-dns/external-dns:v0.20.0@sha256:ddc7f4212ed09a21024deb1f470a05240837712e74e4b9f6d1f2632ff10672e7"
     flannel            = "ghcr.io/flannel-io/flannel:v0.28.1@sha256:6a9c170acece4457ccb9cdfe53c787cc451e87990e20451bf20070b8895fa538"
     flannel_cni_plugin = "ghcr.io/flannel-io/flannel-cni-plugin:v1.9.0-flannel1@sha256:c6a08fe5bcb23b19c2fc7c1e47b95a967cc924224ebedf94e8623f27b6c258fa"
     kube_vip           = "ghcr.io/kube-vip/kube-vip:v1.1.0@sha256:c12498086c5ef3cb121c5b7f9aa755c14bd938ed4f6303da739eb0a0e9ca3410"
-    minio              = "cgr.dev/chainguard/minio:latest@sha256:44cf8da6814e92d4e95f73c243ce462b27f546aa8ef3243fcd19759faab1b53f"
+    minio              = "cgr.dev/chainguard/minio:latest@sha256:47524fcb09f3b1ec76b3b5bbf9f8a57a283cc26dc71e472a45ce429232981f38"
     nginx              = "docker.io/nginxinc/nginx-unprivileged:1.29.5-alpine@sha256:ccbac1a4c20a8b41c5dd1691bd91d63eda3b7989d643a33fd47841838519bfb9"
     # tier 2
     kea                   = "reg.cluster.internal/randomcoww/kea:v3.1.6.1773672731@sha256:f0087ea5643b1e146894a97467a21705985b53516e5764cfae5d3edd70ea2bd0"
     ipxe                  = "reg.cluster.internal/randomcoww/ipxe:v2.0.0.1773673098@sha256:916e86c3413f1c2152593b84bc015dcf73f43a59d02691b4046a7df7633f80e2"
     registry              = "ghcr.io/distribution/distribution:3.0.0@sha256:4ba3adf47f5c866e9a29288c758c5328ef03396cb8f5f6454463655fa8bc83e2"
-    device_plugin         = "ghcr.io/squat/generic-device-plugin:latest@sha256:72c445003efe7818eb87ba8aae0109fe39ac2fd2ccf94fa044f0878c2ea99c91"
-    github_actions_runner = "ghcr.io/actions/actions-runner:2.332.0@sha256:8c3f5970b8ceb90cbd3e89b80c6806bb74d9c31686e9177c743323a4539d12f5"
+    device_plugin         = "ghcr.io/squat/generic-device-plugin:latest@sha256:1e5a0c3a8b0b74f2a0fa00a9a3f777e1a78671c00fd038dc2dad42ff1be9781e"
+    github_actions_runner = "ghcr.io/actions/actions-runner:2.333.0@sha256:1ad983536759ceec39ed75a2c8f007ca8c37b66eee35ed86f13623b29a4db97d"
     # tier 3
     mountpoint       = "reg.cluster.internal/randomcoww/mountpoint-s3:v1.22.1.1773730563@sha256:2001f93ad263a8ca1bc7d8fecf45dcd3b87773be87a62b2a06703936c7f6c211"
     hostapd          = "reg.cluster.internal/randomcoww/hostapd:v2.11.1773672764@sha256:1fd1b22baf1fc1a9a2cd160a0c1e19c2fbb4b95ae5aca049de7579411f39ae85"
     tailscale        = "ghcr.io/tailscale/tailscale:v1.94.2@sha256:95e528798bebe75f39b10e74e7051cf51188ee615934f232ba7ad06a3390ffa1"
     qrcode_generator = "reg.cluster.internal/randomcoww/qrcode-resource:v1773787702@sha256:1ebb85787f71474cc4c73ed3378328b00290e71ab62831cccd28f3387b6b3390"
-    llama_cpp_vulkan = "ghcr.io/mostlygeek/llama-swap:vulkan@sha256:9edd0271d59284b437cbe91aed42a44eb6ac3ffd6a00b942a03cbc3b2731c1fc"
-    litestream       = "docker.io/litestream/litestream:0.5.9@sha256:58e338ede90c193d5f880348170cd6d80164bbc35220906a3c360271e7317f71"
+    llama_cpp_vulkan = "ghcr.io/mostlygeek/llama-swap:vulkan@sha256:d23fcff67dbe12f4e28537269e719fb6760c70ec13ec59d6328b56015eddce4c"
+    litestream       = "docker.io/litestream/litestream:0.5.10@sha256:66c0ef32779b20f7ce682751ec50ba0f1363cad5cb9dba1e23fbeee6ae3197b9"
     searxng          = "ghcr.io/searxng/searxng:latest@sha256:67a3e2e339eb33e60d16df2b328961583c908c4b6f3a176b23ecb9ddd6f137fd"
     open_webui       = "ghcr.io/open-webui/open-webui:v0.8.10@sha256:ee057955040ce91e3e787e4b7978c9c23e828972c68d01d787ed40f9a307df9f"
     kavita           = "ghcr.io/kareadita/kavita:0.8.9@sha256:1f2acae7466d022f037ea09f7989eb7c487f916b881174c7a6de33dbfa8acb39"
@@ -139,7 +139,7 @@ locals {
     authelia         = "ghcr.io/authelia/authelia:4.39.16@sha256:edbce01c5125249e4f4faea01e0f76f0031d64b4a1d0c2514a0ca69cb126d05f"
     cloudflared      = "docker.io/cloudflare/cloudflared:2026.3.0@sha256:6b599ca3e974349ead3286d178da61d291961182ec3fe9c505e1dd02c8ac31b0"
     sunshine_desktop = "reg.cluster.internal/randomcoww/sunshine-desktop:v2026.316.182600.1773820510@sha256:d4fc849a700a890e8f4c93cfad6d23499908b69d6217b54a3e931edde16fc063"
-    kubernetes_mcp   = "ghcr.io/containers/kubernetes-mcp-server:latest@sha256:e8f316b1d73924fb43dbe053a534502d2d814b905757db72074050fb111f613d"
+    kubernetes_mcp   = "ghcr.io/containers/kubernetes-mcp-server:latest@sha256:9d72d7e8d8969ff6bc065fe20dee316909026a2982e37e7adf0d6733ee0c1e99"
 
     # models (model_file)
     "v5-small-text-matching-Q8_0.gguf"                                = "reg.cluster.internal/randomcoww/jina-embeddings-v5-text-small-text-matching-q8-0:v1773615151@sha256:ead9710eb051ea3b6ee32cebc1d1a8ba782c9e589ea972b48b15c173e169c4ee"
