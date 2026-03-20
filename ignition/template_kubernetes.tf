@@ -12,7 +12,7 @@ module "kubernetes-master" {
   service_account = data.terraform_remote_state.sr.outputs.kubernetes.service_account
   etcd_members = {
     for host_key, host in local.members.etcd :
-    host_key => host.netnum == each.value.netnum ? "127.0.0.1" : cidrhost(local.networks.etcd.prefix, host.netnum)
+    host_key => host_key == each.key ? "127.0.0.1" : cidrhost(local.networks.etcd.prefix, host.netnum)
   }
   images = {
     apiserver          = local.container_images_digest.kube_apiserver
