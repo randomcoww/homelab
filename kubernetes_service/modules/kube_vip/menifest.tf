@@ -238,6 +238,7 @@ module "daemonset" {
             add = [
               "NET_ADMIN",
               "NET_RAW",
+              "SYS_TIME",
             ]
           }
         }
