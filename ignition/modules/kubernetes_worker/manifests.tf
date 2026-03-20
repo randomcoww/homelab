@@ -60,8 +60,8 @@ locals {
           clusterDNS = [
             var.cluster_dns_ip,
           ]
-          imageGCHighThresholdPercent = 1
-          imageGCLowThresholdPercent  = 0
+          imageGCHighThresholdPercent = 64
+          imageGCLowThresholdPercent  = 60
           imageMinimumGCAge           = "48h"
           resolvConf                  = "/run/systemd/resolve/resolv.conf"
           runtimeRequestTimeout       = "15m"
@@ -85,7 +85,7 @@ locals {
           containerLogMaxFiles = 2
           evictionHard = {
             "memory.available"   = "2%"
-            "nodefs.available"   = "1%"
+            "nodefs.available"   = "2%"
             "imagefs.available"  = "2%"
             "imagefs.inodesFree" = "2%"
           }
