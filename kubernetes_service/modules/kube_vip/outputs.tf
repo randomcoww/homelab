@@ -1,81 +1,58 @@
-output "manifests" {
-  value = concat([
+output "flux_manifests" {
+  value = [
     for _, m in [
       {
-        apiVersion = "v1"
-        kind       = "ServiceAccount"
+        apiVersion = "source.toolkit.fluxcd.io/v1"
+        kind       = "HelmRepository"
         metadata = {
-          name = var.name
-          labels = {
-            app = var.name
-          }
+          name      = var.name
+          namespace = var.namespace
+        }
+        spec = {
+          interval = "15m"
+          url      = "https://randomcoww.github.io/homelab/"
         }
       },
       {
-        apiVersion = "rbac.authorization.k8s.io/v1"
-        kind       = "ClusterRole"
+        apiVersion = "helm.toolkit.fluxcd.io/v2"
+        kind       = "HelmRelease"
         metadata = {
-          name = var.name
-          labels = {
-            app = var.name
-          }
-          annotations = {
-            "rbac.authorization.kubernetes.io/autoupdate" = "true"
-          }
+          name      = var.name
+          namespace = var.namespace
         }
-        rules = [
-          {
-            apiGroups = [""]
-            resources = ["services/status"]
-            verbs     = ["update"]
-          },
-          {
-            apiGroups = [""]
-            resources = ["services", "endpoints"]
-            verbs     = ["list", "get", "watch", "update"]
-          },
-          {
-            apiGroups = [""]
-            resources = ["nodes"]
-            verbs     = ["list", "get", "watch", "update", "patch"]
-          },
-          {
-            apiGroups = ["coordination.k8s.io"]
-            resources = ["leases"]
-            verbs     = ["list", "get", "watch", "update", "create"]
-          },
-          {
-            apiGroups = ["discovery.k8s.io"]
-            resources = ["endpointslices"]
-            verbs     = ["list", "get", "watch", "update"]
-          },
-        ]
-      },
-      {
-        apiVersion = "rbac.authorization.k8s.io/v1"
-        kind       = "ClusterRoleBinding"
-        metadata = {
-          name = var.name
-          labels = {
-            app = var.name
+        spec = {
+          interval = "15m"
+          timeout  = "5m"
+          chart = {
+            spec = {
+              chart = "helm-wrapper"
+              sourceRef = {
+                kind = "HelmRepository"
+                name = var.name
+              }
+              interval = "5m"
+            }
+          }
+          releaseName = var.name
+          install = {
+            remediation = {
+              retries = -1
+            }
+          }
+          upgrade = {
+            remediation = {
+              retries = -1
+            }
+          }
+          test = {
+            enable = false
+          }
+          values = {
+            manifests = local.manifests
           }
         }
-        roleRef = {
-          apiGroup = "rbac.authorization.k8s.io"
-          kind     = "ClusterRole"
-          name     = var.name
-        }
-        subjects = [
-          {
-            kind      = "ServiceAccount"
-            name      = var.name
-            namespace = var.namespace
-          },
-        ]
       },
     ] :
     yamlencode(m)
-    ], [
-    module.daemonset.manifest,
-  ])
+  ]
 }

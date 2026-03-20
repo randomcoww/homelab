@@ -1,3 +1,9 @@
+locals {
+  manifests = [
+    module.daemonset.manifest,
+  ]
+}
+
 module "daemonset" {
   source  = "../../../modules/daemonset"
   name    = var.name
