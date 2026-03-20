@@ -14,35 +14,35 @@ locals {
         }
       }
       vlan_interfaces = {
-        phy0-node = {
+        phy-node = {
           source  = "phy0"
           network = "node"
         }
-        phy0-sync = {
+        phy-sync = {
           source  = "phy0"
           network = "sync"
         }
-        phy0-service = {
+        phy-service = {
           source  = "phy0"
           network = "service"
         }
-        phy0-etcd = {
+        phy-etcd = {
           source  = "phy0"
           network = "etcd"
         }
-        phy0-wan = {
+        phy-wan = {
           source  = "phy0"
           network = "wan"
           mac     = "52-54-00-63-6e-b3"
         }
-        phy0-backup = {
+        phy-backup = {
           source  = "phy0"
           network = "backup"
           mac     = "52-54-00-63-6e-b4"
         }
       }
       bridge_interfaces = {
-        br0 = {
+        phy-lan = {
           sources = [
             "phy0",
           ]
@@ -50,30 +50,30 @@ locals {
       }
       networks = {
         lan = {
-          interface     = "br0"
+          interface     = "phy-lan"
           enable_netnum = true
         }
         node = {
-          interface     = "phy0-node"
+          interface     = "phy-node"
           enable_netnum = true
         }
         sync = {
-          interface     = "phy0-sync"
+          interface     = "phy-sync"
           enable_netnum = true
         }
         service = {
-          interface     = "phy0-service"
+          interface     = "phy-service"
           enable_netnum = true
         }
         etcd = {
-          interface     = "phy0-etcd"
+          interface     = "phy-etcd"
           enable_netnum = true
         }
         wan = {
-          interface = "phy0-wan"
+          interface = "phy-wan"
         }
         backup = {
-          interface = "phy0-backup"
+          interface = "phy-backup"
           metric    = 4096
         }
       }
@@ -110,35 +110,35 @@ locals {
         }
       }
       vlan_interfaces = {
-        phy0-node = {
+        phy-node = {
           source  = "phy0"
           network = "node"
         }
-        phy0-sync = {
+        phy-sync = {
           source  = "phy0"
           network = "sync"
         }
-        phy0-service = {
+        phy-service = {
           source  = "phy0"
           network = "service"
         }
-        phy0-etcd = {
+        phy-etcd = {
           source  = "phy0"
           network = "etcd"
         }
-        phy0-wan = {
+        phy-wan = {
           source  = "phy0"
           network = "wan"
           mac     = "52-54-00-63-6e-b3"
         }
-        phy0-backup = {
+        phy-backup = {
           source  = "phy0"
           network = "backup"
           mac     = "52-54-00-63-6e-b4"
         }
       }
       bridge_interfaces = {
-        br0 = {
+        phy-lan = {
           sources = [
             "phy0",
           ]
@@ -146,30 +146,30 @@ locals {
       }
       networks = {
         lan = {
-          interface     = "br0"
+          interface     = "phy-lan"
           enable_netnum = true
         }
         node = {
-          interface     = "phy0-node"
+          interface     = "phy-node"
           enable_netnum = true
         }
         sync = {
-          interface     = "phy0-sync"
+          interface     = "phy-sync"
           enable_netnum = true
         }
         service = {
-          interface     = "phy0-service"
+          interface     = "phy-service"
           enable_netnum = true
         }
         etcd = {
-          interface     = "phy0-etcd"
+          interface     = "phy-etcd"
           enable_netnum = true
         }
         wan = {
-          interface = "phy0-wan"
+          interface = "phy-wan"
         }
         backup = {
-          interface = "phy0-backup"
+          interface = "phy-backup"
           metric    = 4096
         }
       }
@@ -206,21 +206,21 @@ locals {
         }
       }
       vlan_interfaces = {
-        phy0-node = {
+        phy-node = {
           source  = "phy0"
           network = "node"
         }
-        phy0-service = {
+        phy-service = {
           source  = "phy0"
           network = "service"
         }
-        phy0-etcd = {
+        phy-etcd = {
           source  = "phy0"
           network = "etcd"
         }
       }
       bridge_interfaces = {
-        br0 = {
+        phy-lan = {
           sources = [
             "phy0",
           ]
@@ -228,19 +228,19 @@ locals {
       }
       networks = {
         lan = {
-          interface     = "br0"
+          interface     = "phy-lan"
           enable_netnum = true
         }
         node = {
-          interface     = "phy0-node"
+          interface     = "phy-node"
           enable_netnum = true
         }
         service = {
-          interface     = "phy0-service"
+          interface     = "phy-service"
           enable_netnum = true
         }
         etcd = {
-          interface     = "phy0-etcd"
+          interface     = "phy-etcd"
           enable_netnum = true
         }
       }
@@ -276,21 +276,21 @@ locals {
         }
       }
       vlan_interfaces = {
-        phy0-node = {
+        phy-node = {
           source  = "phy0"
           network = "node"
         }
-        phy0-service = {
+        phy-service = {
           source  = "phy0"
           network = "service"
         }
-        phy0-etcd = {
+        phy-etcd = {
           source  = "phy0"
           network = "etcd"
         }
       }
       bridge_interfaces = {
-        br0 = {
+        phy-lan = {
           sources = [
             "phy0",
           ]
@@ -298,19 +298,19 @@ locals {
       }
       networks = {
         lan = {
-          interface     = "br0"
+          interface     = "phy-lan"
           enable_netnum = true
         }
         node = {
-          interface     = "phy0-node"
+          interface     = "phy-node"
           enable_netnum = true
         }
         service = {
-          interface     = "phy0-service"
+          interface     = "phy-service"
           enable_netnum = true
         }
         etcd = {
-          interface     = "phy0-etcd"
+          interface     = "phy-etcd"
           enable_netnum = true
         }
       }
