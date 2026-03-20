@@ -102,6 +102,15 @@ regctl tag delete reg.cluster.internal/${REPO}:${TAG}
 
 ---
 
+### Update helm chart
+
+```bash
+helm package helm-wrapper/ -d docs/
+helm repo index docs/ --url https://randomcoww.github.io/homelab/
+```
+
+---
+
 ### Renovate local test
 
 ```bash
