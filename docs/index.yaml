@@ -1,0 +1,13 @@
+apiVersion: v1
+entries:
+  helm-wrapper:
+  - apiVersion: v2
+    created: "2026-03-19T21:19:13.608888-07:00"
+    description: Wrap manifests in helm to deploy using terraform helm provider
+    digest: a69ab776c5502f67e8c807d2262d3cfe5b1e023c699d6e19daf99fe37f1cd964
+    name: helm-wrapper
+    type: application
+    urls:
+    - https://randomcoww.github.io/homelab/helm-wrapper-0.1.0.tgz
+    version: 0.1.0
+generated: "2026-03-19T21:19:13.608456-07:00"

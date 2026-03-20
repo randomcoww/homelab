@@ -15,6 +15,6 @@ tofu() {
 }
 ```
 
-* [Initial host provisioning](./docs/provisioning.md)
+* [Initial host provisioning](./provisioning.md)
 
-* [Kubernetes and host maintenance](./docs/maintenance.md)
+* [Kubernetes and host maintenance](./maintenance.md)
