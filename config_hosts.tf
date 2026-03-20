@@ -49,32 +49,17 @@ locals {
         }
       }
       networks = {
-        lan = {
-          interface     = "phy-lan"
-          enable_netnum = true
-        }
-        node = {
-          interface     = "phy-node"
-          enable_netnum = true
-        }
-        sync = {
-          interface     = "phy-sync"
-          enable_netnum = true
-        }
-        service = {
-          interface     = "phy-service"
-          enable_netnum = true
-        }
-        etcd = {
-          interface     = "phy-etcd"
-          enable_netnum = true
-        }
-        wan = {
-          interface = "phy-wan"
-        }
-        backup = {
-          interface = "phy-backup"
-          metric    = 4096
+        for _, name in [
+          "lan",
+          "node",
+          "sync",
+          "service",
+          "etcd",
+          "wan",
+          "backup",
+        ] :
+        name => {
+          interface = "phy-${name}"
         }
       }
       disks = {
@@ -145,32 +130,17 @@ locals {
         }
       }
       networks = {
-        lan = {
-          interface     = "phy-lan"
-          enable_netnum = true
-        }
-        node = {
-          interface     = "phy-node"
-          enable_netnum = true
-        }
-        sync = {
-          interface     = "phy-sync"
-          enable_netnum = true
-        }
-        service = {
-          interface     = "phy-service"
-          enable_netnum = true
-        }
-        etcd = {
-          interface     = "phy-etcd"
-          enable_netnum = true
-        }
-        wan = {
-          interface = "phy-wan"
-        }
-        backup = {
-          interface = "phy-backup"
-          metric    = 4096
+        for _, name in [
+          "lan",
+          "node",
+          "sync",
+          "service",
+          "etcd",
+          "wan",
+          "backup",
+        ] :
+        name => {
+          interface = "phy-${name}"
         }
       }
       disks = {
@@ -227,21 +197,14 @@ locals {
         }
       }
       networks = {
-        lan = {
-          interface     = "phy-lan"
-          enable_netnum = true
-        }
-        node = {
-          interface     = "phy-node"
-          enable_netnum = true
-        }
-        service = {
-          interface     = "phy-service"
-          enable_netnum = true
-        }
-        etcd = {
-          interface     = "phy-etcd"
-          enable_netnum = true
+        for _, name in [
+          "lan",
+          "node",
+          "service",
+          "etcd",
+        ] :
+        name => {
+          interface = "phy-${name}"
         }
       }
       disks = {
@@ -297,21 +260,14 @@ locals {
         }
       }
       networks = {
-        lan = {
-          interface     = "phy-lan"
-          enable_netnum = true
-        }
-        node = {
-          interface     = "phy-node"
-          enable_netnum = true
-        }
-        service = {
-          interface     = "phy-service"
-          enable_netnum = true
-        }
-        etcd = {
-          interface     = "phy-etcd"
-          enable_netnum = true
+        for _, name in [
+          "lan",
+          "node",
+          "service",
+          "etcd",
+        ] :
+        name => {
+          interface = "phy-${name}"
         }
       }
       disks = {

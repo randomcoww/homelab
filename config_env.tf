@@ -25,6 +25,7 @@ locals {
       mtu            = 1500 # may bridge to wifi - fix to 1500
       table_id       = 220
       table_priority = 32760
+      enable_netnum  = true
       netnums = {
         gateway = 2
         glkvm   = 126
@@ -33,17 +34,19 @@ locals {
     }
     # BGP
     node = {
-      network = "192.168.200.0"
-      cidr    = 24
-      vlan_id = 60
-      mtu     = 1500
+      network       = "192.168.200.0"
+      cidr          = 24
+      vlan_id       = 60
+      mtu           = 1500
+      enable_netnum = true
     }
     # Kubernetes service external IP and LB
     service = {
-      network = "192.168.208.0"
-      cidr    = 24
-      vlan_id = 80
-      mtu     = 1500
+      network       = "192.168.208.0"
+      cidr          = 24
+      vlan_id       = 80
+      mtu           = 1500
+      enable_netnum = true
       netnums = {
         apiserver    = 2
         external_dns = 31
@@ -60,13 +63,15 @@ locals {
       mtu            = 1500
       table_id       = 221
       table_priority = 32760
+      enable_netnum  = true
     }
     # Etcd peering
     etcd = {
-      network = "192.168.228.0"
-      cidr    = 26
-      vlan_id = 70
-      mtu     = 1500
+      network       = "192.168.228.0"
+      cidr          = 26
+      vlan_id       = 70
+      mtu           = 1500
+      enable_netnum = true
     }
     # Primary WAN
     wan = {
@@ -76,6 +81,7 @@ locals {
     # Backup WAN
     backup = {
       vlan_id     = 1024
+      metric      = 4096
       enable_dhcp = true
     }
     # Cluster internal
