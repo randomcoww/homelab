@@ -1,3 +1,5 @@
-output "chart" {
-  value = module.metadata.chart
+output "manifests" {
+  value = [
+    module.daemonset.manifest,
+  ]
 }

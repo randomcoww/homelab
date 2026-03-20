@@ -1,37 +1,3 @@
-# Metrics server
-
-resource "helm_release" "metrics-server" {
-  name          = "metrics-server"
-  namespace     = "kube-system"
-  repository    = "https://kubernetes-sigs.github.io/metrics-server"
-  chart         = "metrics-server"
-  wait          = false
-  wait_for_jobs = false
-  version       = "3.13.0"
-  max_history   = 2
-  timeout       = local.kubernetes.helm_release_timeout
-  values = [
-    yamlencode({
-      replicas = 2
-      defaultArgs = [
-        "--cert-dir=/tmp",
-        "--metric-resolution=15s",
-        "--kubelet-preferred-address-types=InternalIP",
-        "--kubelet-use-node-status-port",
-        "--v=2",
-      ]
-      dnsConfig = {
-        options = [
-          {
-            name  = "ndots"
-            value = "2"
-          },
-        ]
-      }
-    }),
-  ]
-}
-
 # Prometheus
 
 resource "helm_release" "prometheus" {
