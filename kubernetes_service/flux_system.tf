@@ -116,83 +116,6 @@ resource "helm_release" "system" {
           }
         },
 
-        # local-path-provisioner
-        {
-          apiVersion = "source.toolkit.fluxcd.io/v1"
-          kind       = "HelmRepository"
-          metadata = {
-            name      = "local-path-provisioner"
-            namespace = "kube-system"
-          }
-          spec = {
-            interval = "15m"
-            url      = "https://charts.containeroo.ch"
-          }
-        },
-        {
-          apiVersion = "helm.toolkit.fluxcd.io/v2"
-          kind       = "HelmRelease"
-          metadata = {
-            name      = "local-path-provisioner"
-            namespace = "kube-system"
-          }
-          spec = {
-            interval = "15m"
-            timeout  = "5m"
-            chart = {
-              spec = {
-                chart   = "local-path-provisioner"
-                version = "0.0.36"
-                sourceRef = {
-                  kind = "HelmRepository"
-                  name = "local-path-provisioner"
-                }
-                interval = "5m"
-              }
-            }
-            releaseName = "local-path-provisioner"
-            install = {
-              remediation = {
-                retries = 3
-              }
-            }
-            upgrade = {
-              remediation = {
-                retries = 3
-              }
-            }
-            test = {
-              enable = true
-            }
-            values = {
-              replicaCount = 2
-              storageClass = {
-                create            = true
-                name              = "local-path"
-                provisionerName   = "rancher.io/local-path"
-                defaultClass      = true
-                defaultVolumeType = "local"
-              }
-              nodePathMap = [
-                {
-                  node = "DEFAULT_PATH_FOR_NON_LISTED_NODES"
-                  paths = [
-                    "${local.kubernetes.containers_path}/local_path_provisioner",
-                  ]
-                },
-              ]
-              resources = {
-                requests = {
-                  memory = "128Mi"
-                }
-                limits = {
-                  memory = "128Mi"
-                }
-              }
-            }
-          }
-        },
-
         # traefik
         {
           apiVersion = "source.toolkit.fluxcd.io/v1"
@@ -570,6 +493,297 @@ resource "helm_release" "system" {
                   }
                 }),
               ]
+            }
+          }
+        },
+
+        # local-path-provisioner
+        {
+          apiVersion = "source.toolkit.fluxcd.io/v1"
+          kind       = "HelmRepository"
+          metadata = {
+            name      = "local-path-provisioner"
+            namespace = "kube-system"
+          }
+          spec = {
+            interval = "15m"
+            url      = "https://charts.containeroo.ch"
+          }
+        },
+        {
+          apiVersion = "helm.toolkit.fluxcd.io/v2"
+          kind       = "HelmRelease"
+          metadata = {
+            name      = "local-path-provisioner"
+            namespace = "kube-system"
+          }
+          spec = {
+            interval = "15m"
+            timeout  = "5m"
+            chart = {
+              spec = {
+                chart   = "local-path-provisioner"
+                version = "0.0.36"
+                sourceRef = {
+                  kind = "HelmRepository"
+                  name = "local-path-provisioner"
+                }
+                interval = "5m"
+              }
+            }
+            releaseName = "local-path-provisioner"
+            install = {
+              remediation = {
+                retries = 3
+              }
+            }
+            upgrade = {
+              remediation = {
+                retries = 3
+              }
+            }
+            test = {
+              enable = true
+            }
+            values = {
+              replicaCount = 2
+              storageClass = {
+                create            = true
+                name              = "local-path"
+                provisionerName   = "rancher.io/local-path"
+                defaultClass      = true
+                defaultVolumeType = "local"
+              }
+              nodePathMap = [
+                {
+                  node = "DEFAULT_PATH_FOR_NON_LISTED_NODES"
+                  paths = [
+                    "${local.kubernetes.containers_path}/local_path_provisioner",
+                  ]
+                },
+              ]
+              resources = {
+                requests = {
+                  memory = "128Mi"
+                }
+                limits = {
+                  memory = "128Mi"
+                }
+              }
+            }
+          }
+        },
+
+        # minio
+        {
+          apiVersion = "source.toolkit.fluxcd.io/v1"
+          kind       = "HelmRepository"
+          metadata = {
+            name      = "${local.endpoints.minio.name}-resources"
+            namespace = local.endpoints.minio.namespace
+          }
+          spec = {
+            interval = "15m"
+            url      = "https://randomcoww.github.io/homelab/"
+          }
+        },
+        {
+          apiVersion = "helm.toolkit.fluxcd.io/v2"
+          kind       = "HelmRelease"
+          metadata = {
+            name      = "${local.endpoints.minio.name}-resources"
+            namespace = local.endpoints.minio.namespace
+          }
+          spec = {
+            interval = "15m"
+            timeout  = "5m"
+            chart = {
+              spec = {
+                chart = "helm-wrapper"
+                sourceRef = {
+                  kind = "HelmRepository"
+                  name = "${local.endpoints.minio.name}-resources"
+                }
+                interval = "5m"
+              }
+            }
+            releaseName = "${local.endpoints.minio.name}-resources"
+            install = {
+              remediation = {
+                retries = 3
+              }
+            }
+            upgrade = {
+              remediation = {
+                retries = 3
+              }
+            }
+            test = {
+              enable = true
+            }
+            values = {
+              manifests = [
+                module.minio-tls.manifest,
+                module.minio-metrics-proxy.manifest,
+              ]
+            }
+          }
+        },
+
+        {
+          apiVersion = "source.toolkit.fluxcd.io/v1"
+          kind       = "HelmRepository"
+          metadata = {
+            name      = local.endpoints.minio.name
+            namespace = local.endpoints.minio.namespace
+          }
+          spec = {
+            interval = "15m"
+            url      = "https://charts.min.io/"
+          }
+        },
+        {
+          apiVersion = "helm.toolkit.fluxcd.io/v2"
+          kind       = "HelmRelease"
+          metadata = {
+            name      = local.endpoints.minio.name
+            namespace = local.endpoints.minio.namespace
+          }
+          spec = {
+            interval = "15m"
+            timeout  = "5m"
+            chart = {
+              spec = {
+                chart   = "minio"
+                version = "5.4.0"
+                sourceRef = {
+                  kind = "HelmRepository"
+                  name = local.endpoints.minio.name
+                }
+                interval = "5m"
+              }
+            }
+            releaseName = local.endpoints.minio.name
+            install = {
+              remediation = {
+                retries = 3
+              }
+            }
+            upgrade = {
+              remediation = {
+                retries = 3
+              }
+            }
+            test = {
+              enable = true
+            }
+            values = {
+              image = {
+                repository = regex(local.container_image_regex, local.container_images.minio).depName
+                tag        = regex(local.container_image_regex, local.container_images.minio).tag
+              }
+              podAnnotations = {
+                "checksum/tls"           = sha256(module.minio-tls.manifest)
+                "checksum/metrics-proxy" = sha256(module.minio-metrics-proxy.manifest)
+              }
+              clusterDomain     = local.domains.kubernetes
+              mode              = "distributed"
+              rootUser          = data.terraform_remote_state.sr.outputs.minio.access_key_id
+              rootPassword      = data.terraform_remote_state.sr.outputs.minio.secret_access_key
+              priorityClassName = "system-node-critical"
+              persistence = {
+                storageClass = "local-path"
+              }
+              drivesPerNode = 1
+              replicas      = local.minio_replicas
+              resources = {
+                requests = {
+                  memory = "8Gi"
+                }
+                limits = {
+                  memory = "8Gi"
+                }
+              }
+              service = {
+                type              = "LoadBalancer"
+                port              = local.service_ports.minio
+                clusterIP         = local.services.cluster_minio.ip
+                loadBalancerClass = "kube-vip.io/kube-vip-class"
+                annotations = {
+                  "prometheus.io/scrape"        = "true"
+                  "prometheus.io/port"          = tostring(local.service_ports.metrics)
+                  "prometheus.io/path"          = "/minio/metrics/v3"
+                  "kube-vip.io/loadbalancerIPs" = local.services.minio.ip
+                }
+              }
+              certsPath = "/opt/minio/certs"
+              tls = {
+                enabled    = true
+                publicCrt  = "tls.crt"
+                privateKey = "tls.key"
+                certSecret = module.minio-tls.name
+              }
+              trustedCertsSecret = module.minio-tls.name
+              ingress = {
+                enabled = false
+              }
+              environment = {
+                MINIO_API_REQUESTS_DEADLINE  = "2m"
+                MINIO_STORAGE_CLASS_STANDARD = "EC:2"
+                MINIO_STORAGE_CLASS_RRS      = "EC:2"
+              }
+              buckets        = []
+              users          = []
+              policies       = []
+              customCommands = []
+              svcaccts       = []
+              extraContainers = [
+                # bypass TLS for metrics endpoints
+                {
+                  name  = "${local.endpoints.minio.name}-metrics-proxy"
+                  image = local.container_images_digest.nginx
+                  ports = [
+                    {
+                      containerPort = local.service_ports.metrics
+                    },
+                  ]
+                  volumeMounts = [
+                    {
+                      name      = "metrics-proxy-config"
+                      mountPath = "/etc/nginx/conf.d/default.conf"
+                      subPath   = "nginx-proxy.conf"
+                    },
+                  ]
+                },
+              ]
+              extraVolumes = [
+                {
+                  name = "metrics-proxy-config"
+                  configMap = {
+                    name = module.minio-metrics-proxy.name
+                  }
+                },
+              ]
+              affinity = {
+                podAntiAffinity = {
+                  requiredDuringSchedulingIgnoredDuringExecution = [
+                    {
+                      labelSelector = {
+                        matchExpressions = [
+                          {
+                            key      = "app"
+                            operator = "In"
+                            values = [
+                              "minio",
+                            ]
+                          },
+                        ]
+                      }
+                      topologyKey = "kubernetes.io/hostname"
+                    },
+                  ]
+                }
+              }
             }
           }
         },
