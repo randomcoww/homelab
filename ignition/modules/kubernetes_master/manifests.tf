@@ -231,10 +231,10 @@ module "apiserver" {
         ] : []))
         resources = {
           requests = {
-            memory = "2Gi"
+            memory = "3Gi"
           }
           limits = {
-            memory = "2Gi"
+            memory = "3Gi"
           }
         }
         env = [
