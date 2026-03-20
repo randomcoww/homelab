@@ -233,9 +233,8 @@ locals {
     helm_release_timeout      = 600
 
     cert_issuers = {
-      acme_prod    = "letsencrypt-prod"
-      acme_staging = "letsencrypt-staging"
-      ca_internal  = "internal"
+      acme_prod   = "letsencrypt-prod"
+      ca_internal = "internal"
     }
     feature_gates = {
       ClusterTrustBundle           = true

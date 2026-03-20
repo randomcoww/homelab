@@ -15,7 +15,7 @@ resource "helm_release" "system" {
           apiVersion = "source.toolkit.fluxcd.io/v1"
           kind       = "HelmRepository"
           metadata = {
-            name      = "traefik"
+            name      = local.endpoints.traefik.name
             namespace = local.endpoints.traefik.namespace
           }
           spec = {
@@ -39,7 +39,7 @@ resource "helm_release" "system" {
                 version = "39.0.5"
                 sourceRef = {
                   kind = "HelmRepository"
-                  name = "traefik"
+                  name = local.endpoints.traefik.name
                 }
                 interval = "5m"
               }
@@ -296,7 +296,6 @@ resource "helm_release" "system" {
             }
             values = {
               manifests = [
-                module.cert-manager-cloudflare-secret.manifest, # DNS update for ACME
                 module.cert-manager-issuer-acme-prod-secret.manifest,
                 module.cert-manager-issuer-ca-internal-secret.manifest,
 
@@ -320,44 +319,8 @@ resource "helm_release" "system" {
                           dns01 = {
                             cloudflare = {
                               apiTokenSecretRef = {
-                                name = "cloudflare-token"
-                                key  = "token"
-                              }
-                            }
-                          }
-                          selector = {
-                            dnsZones = [
-                              local.domains.public,
-                            ]
-                          }
-                        },
-                      ]
-                    }
-                  }
-                }),
-
-                # letsencrypt staging
-                yamlencode({
-                  apiVersion = "cert-manager.io/v1"
-                  kind       = "ClusterIssuer"
-                  metadata = {
-                    name = local.kubernetes.cert_issuers.acme_staging
-                  }
-                  spec = {
-                    acme = {
-                      server = "https://acme-staging-v02.api.letsencrypt.org/directory"
-                      email  = data.terraform_remote_state.sr.outputs.letsencrypt.username
-                      privateKeySecretRef = {
-                        name = module.cert-manager-issuer-acme-staging-secret.name
-                      }
-                      disableAccountKeyGeneration = true
-                      solvers = [
-                        {
-                          dns01 = {
-                            cloudflare = {
-                              apiTokenSecretRef = {
-                                name = "cloudflare-token"
-                                key  = "token"
+                                name = module.cert-manager-issuer-acme-prod-secret.name
+                                key  = "cloudflare-token"
                               }
                             }
                           }

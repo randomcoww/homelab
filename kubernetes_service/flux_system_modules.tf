@@ -90,33 +90,14 @@ module "registry" {
 
 # cert-manager
 
-module "cert-manager-cloudflare-secret" {
-  source  = "../modules/secret"
-  name    = "cloudflare-token"
-  app     = "cert-issuer"
-  release = "0.1.0"
-  data = merge({
-    token = data.terraform_remote_state.sr.outputs.cloudflare_dns_api_token
-  })
-}
-
 module "cert-manager-issuer-acme-prod-secret" {
   source  = "../modules/secret"
   name    = local.kubernetes.cert_issuers.acme_prod
   app     = "cert-issuer"
   release = "0.1.0"
   data = merge({
-    "tls.key" = chomp(data.terraform_remote_state.sr.outputs.letsencrypt.private_key_pem)
-  })
-}
-
-module "cert-manager-issuer-acme-staging-secret" {
-  source  = "../modules/secret"
-  name    = local.kubernetes.cert_issuers.acme_staging
-  app     = "cert-issuer"
-  release = "0.1.0"
-  data = merge({
-    "tls.key" = chomp(data.terraform_remote_state.sr.outputs.letsencrypt.staging_private_key_pem)
+    "tls.key"        = chomp(data.terraform_remote_state.sr.outputs.letsencrypt.private_key_pem)
+    cloudflare-token = data.terraform_remote_state.sr.outputs.cloudflare_dns_api_token
   })
 }
 
