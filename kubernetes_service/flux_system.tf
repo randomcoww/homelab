@@ -1,10 +1,10 @@
 resource "helm_release" "system" {
   name             = "system"
   chart            = "../helm-wrapper"
-  namespace        = "kube-system"
+  namespace        = "flux-runners"
   create_namespace = true
-  wait             = false
-  wait_for_jobs    = false
+  wait             = true
+  wait_for_jobs    = true
   max_history      = 2
   values = [
     yamlencode({ manifests = concat([
@@ -226,6 +226,9 @@ resource "helm_release" "system" {
                 }
               }
               cainjector = {
+                enabled = false
+              }
+              startupapicheck = {
                 enabled = false
               }
               extraArgs = [
@@ -769,8 +772,6 @@ resource "helm_release" "system" {
       module.kube-vip.flux_manifests,
       module.registry.flux_manifests,
       module.minio.flux_manifests,
-      module.lldap.flux_manifests,
-      module.authelia.flux_manifests,
       module.kea.flux_manifests,
       module.prometheus.flux_manifests,
     ) }),
