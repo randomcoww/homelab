@@ -203,8 +203,6 @@ locals {
     bgp_as                 = 65005
   }
 
-  domain_regex = "(?<subdomain>[a-z0-9-*]+)\\.(?<domain>[a-z0-9.-]+)"
-
   domains = {
     kubernetes = "cluster.internal"
     public     = "fuzzybunny.win"
