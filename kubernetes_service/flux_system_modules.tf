@@ -481,3 +481,207 @@ module "kea" {
   ]
   timezone = local.timezone
 }
+
+# prometheus
+
+module "prometheus" {
+  source    = "./modules/prometheus"
+  name      = local.endpoints.prometheus.name
+  namespace = local.endpoints.prometheus.namespace
+  scrape_configs = yamlencode([
+    {
+      job_name     = "minio"
+      metrics_path = "/minio/metrics/v3/cluster"
+      scheme       = "https"
+      static_configs = [
+        {
+          targets = [
+            "${local.services.cluster_minio.ip}:${local.service_ports.minio}",
+          ]
+        },
+      ]
+    },
+    {
+      job_name = "cri-o"
+      scheme   = "https"
+      tls_config = {
+        ca_file = "/var/run/secrets/kubernetes.io/serviceaccount/ca.crt"
+      }
+      kubernetes_sd_configs = [
+        {
+          role = "node"
+        },
+      ]
+      relabel_configs = [
+        {
+          source_labels = ["__address__"]
+          regex         = "([^:]+):\\d+$"
+          target_label  = "__address__"
+          replacement   = "$1:${local.host_ports.crio_metrics}"
+        },
+      ]
+    },
+  ])
+  server_files = {
+    "alerting_rules.yml" = {
+      groups = [
+        {
+          # https://monitoring.mixins.dev/etcd/
+          name = "etcd"
+          rules = [
+            {
+              alert = "MembersDown"
+              annotations = {
+                summary     = "etcd cluster members are down."
+                description = <<-EOF
+                etcd cluster "{{ $labels.app }}": members are down ({{ $value }}).
+                EOF
+              }
+              expr = <<-EOF
+              (
+                (
+                  max by (app) (
+                    sum by (app) (up{app="${local.endpoints.etcd.name}",namespace="${local.endpoints.etcd.namespace}"} == bool 0)
+                  or
+                    count by (app,endpoint) (
+                      sum by (app,endpoint,To) (rate(etcd_network_peer_sent_failures_total{app="${local.endpoints.etcd.name}",namespace="${local.endpoints.etcd.namespace}"}[1m])) > 0.01
+                    )
+                  ) > 0
+                )
+              or
+                count(etcd_server_is_leader{app="${local.endpoints.etcd.name}",namespace="${local.endpoints.etcd.namespace}"} == 1) by (app) > 1
+              or
+                count(etcd_server_has_leader{app="${local.endpoints.etcd.name}",namespace="${local.endpoints.etcd.namespace}"} == 1) by (app) < ${length(local.members.etcd)}
+              )
+              EOF
+              labels = {
+                severity = "critical"
+              }
+            },
+          ]
+        },
+        {
+          # https://min.io/docs/minio/linux/operations/monitoring/collect-minio-metrics-using-prometheus.html
+          name = "minio"
+          rules = [
+            {
+              alert = "NodesDown"
+              annotations = {
+                summary     = "Node down in MinIO deployment"
+                description = <<-EOF
+                Node(s) in cluster {{ $labels.instance }} offline for more than 1 minute
+                EOF
+              }
+              expr = <<-EOF
+              (
+                absent(up{app="${local.endpoints.minio.name}",namespace="${local.endpoints.minio.namespace}"})
+              or
+                avg_over_time(minio_cluster_nodes_offline_total{app="${local.endpoints.minio.name}",namespace="${local.endpoints.minio.namespace}"}[1m]) > 0
+              )
+              EOF
+              labels = {
+                severity = "critical"
+              }
+            },
+            {
+              alert = "DisksOffline"
+              annotations = {
+                summary     = "Disks down in MinIO deployment"
+                description = <<-EOF
+                Disks(s) in cluster {{ $labels.instance }} offline for more than 1 minutes
+                EOF
+              }
+              expr = <<-EOF
+              avg_over_time(minio_cluster_drive_offline_total{app="${local.endpoints.minio.name}",namespace="${local.endpoints.minio.namespace}"}[1m]) > 0
+              EOF
+              labels = {
+                severity = "critical"
+              }
+            },
+          ]
+        },
+        {
+          name = "kube-api-server"
+          rules = [
+            {
+              alert = "NodesDown"
+              annotations = {
+                summary     = "Kube API server nodes down"
+                description = <<-EOF
+                Kube API server nodes {{ $labels.app }} down or flapping
+                EOF
+              }
+              expr = <<-EOF
+              (
+                absent(up{job="kubernetes-api-servers"})
+              or
+                changes(up{job="kubernetes-api-servers"}[1m]) > 1
+              )
+              EOF
+              for  = "1m"
+              labels = {
+                severity = "critical"
+              }
+            },
+          ]
+        },
+        {
+          # Ref: https://github.com/Azure/AKS/blob/master/examples/kube-prometheus/coredns-prometheusRule.yaml
+          name = "kube-dns"
+          rules = [
+            {
+              alert = "NodesDown"
+              annotations = {
+                summary     = "Kube DNS nodes down"
+                description = <<-EOF
+                CoreDNS nodes {{ $labels.app }} down or flapping
+                EOF
+              }
+              expr = <<-EOF
+              (
+                absent(up{app="${local.endpoints.kube_dns.name}",namespace="${local.endpoints.kube_dns.namespace}"})
+              or
+                changes(up{app="${local.endpoints.kube_dns.name}",namespace="${local.endpoints.kube_dns.namespace}"}[1m]) > 1
+              )
+              EOF
+              for  = "1m"
+              labels = {
+                severity = "critical"
+              }
+            },
+          ]
+        },
+        {
+          name = "kea"
+          rules = [
+            {
+              alert = "NodesDown"
+              annotations = {
+                summary     = "Kea nodes down"
+                description = <<-EOF
+                Kea nodes {{ $labels.app }} down or flapping
+                EOF
+              }
+              expr = <<-EOF
+              (
+                absent(up{app="${local.endpoints.kea.name}",namespace="${local.endpoints.kea.namespace}"})
+              or
+                changes(up{app="${local.endpoints.kea.name}",namespace="${local.endpoints.kea.namespace}"}[1m]) > 1
+              )
+              EOF
+              for  = "1m"
+              labels = {
+                severity = "critical"
+              }
+            },
+          ]
+        },
+      ]
+    }
+  }
+  ingress_hostname = local.endpoints.prometheus.ingress
+  gateway_ref = {
+    name      = local.endpoints.traefik.name
+    namespace = local.endpoints.traefik.namespace
+  }
+}

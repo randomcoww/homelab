@@ -1,4 +1,6 @@
 locals {
+  config_path = "/etc/registry"
+
   manifests = concat([
     for _, m in [
       {
@@ -77,24 +79,6 @@ locals {
                       }
                     },
                     {
-                      name = "registry-tls"
-                      projected = {
-                        sources = [
-                          {
-                            secret = {
-                              name = module.tls.name
-                              items = [
-                                {
-                                  key  = "ca.crt"
-                                  path = "ca-cert.pem"
-                                },
-                              ]
-                            }
-                          },
-                        ]
-                      }
-                    },
-                    {
                       name = "ca-trust-bundle"
                       hostPath = {
                         path = "/etc/ssl/certs/ca-certificates.crt"
@@ -124,8 +108,6 @@ locals {
     module.tls.manifest,
     module.service.manifest,
   ])
-
-  config_path = "/etc/registry"
 }
 
 module "secret" {

@@ -467,12 +467,12 @@ resource "helm_release" "system" {
             releaseName = "metrics-server"
             install = {
               remediation = {
-                retries = 3
+                retries = -1
               }
             }
             upgrade = {
               remediation = {
-                retries = 3
+                retries = -1
               }
             }
             test = {
@@ -536,12 +536,12 @@ resource "helm_release" "system" {
             releaseName = "node-feature-discovery"
             install = {
               remediation = {
-                retries = 3
+                retries = -1
               }
             }
             upgrade = {
               remediation = {
-                retries = 3
+                retries = -1
               }
             }
             test = {
@@ -618,12 +618,12 @@ resource "helm_release" "system" {
             releaseName = "amd-gpu"
             install = {
               remediation = {
-                retries = 3
+                retries = -1
               }
             }
             upgrade = {
               remediation = {
-                retries = 3
+                retries = -1
               }
             }
             test = {
@@ -660,6 +660,108 @@ resource "helm_release" "system" {
           }
         },
 
+        # kured
+        {
+          apiVersion = "source.toolkit.fluxcd.io/v1"
+          kind       = "HelmRepository"
+          metadata = {
+            name      = "kured"
+            namespace = "monitoring"
+          }
+          spec = {
+            interval = "15m"
+            url      = "https://kubereboot.github.io/charts"
+          }
+        },
+        {
+          apiVersion = "helm.toolkit.fluxcd.io/v2"
+          kind       = "HelmRelease"
+          metadata = {
+            name      = "kured"
+            namespace = "monitoring"
+          }
+          spec = {
+            interval = "15m"
+            timeout  = "5m"
+            chart = {
+              spec = {
+                chart   = "kured"
+                version = "5.11.0"
+                sourceRef = {
+                  kind = "HelmRepository"
+                  name = "kured"
+                }
+                interval = "5m"
+              }
+            }
+            releaseName = "kured"
+            install = {
+              remediation = {
+                retries = -1
+              }
+            }
+            upgrade = {
+              remediation = {
+                retries = -1
+              }
+            }
+            test = {
+              enable = false
+            }
+            values = {
+
+              # manifest #
+
+              configuration = {
+                prometheusUrl = "https://${local.endpoints.prometheus.ingress}"
+                period        = "2m"
+                metricsPort   = local.service_ports.metrics
+                forceReboot   = true
+                drainTimeout  = "6m"
+                blockingPodSelector = [
+                  "app=arc-runner",
+                ]
+                timeZone = local.timezone
+                # trigger reboot if either /var/run/reboot-required is set, or node failed network boot
+                useRebootSentinelHostPath = false
+                rebootSentinelCommand     = "sh -c \"if ([ -f /var/run/reboot-required ] || [ -z $(xargs -n1 -a /proc/cmdline | grep ^coreos.live.rootfs_url=) ]); then exit 0; else exit 1; fi\""
+              }
+              resources = {
+                requests = {
+                  memory = "128Mi"
+                }
+                limits = {
+                  memory = "128Mi"
+                }
+              }
+              podAnnotations = {
+                "prometheus.io/scrape" = "true"
+                "prometheus.io/port"   = tostring(local.service_ports.metrics)
+              }
+              priorityClassName = "system-node-critical"
+              service = {
+                create = false
+              }
+              volumeMounts = [
+                {
+                  name      = "ca-trust-bundle"
+                  mountPath = "/etc/ssl/certs/ca-certificates.crt"
+                  readOnly  = true
+                },
+              ]
+              volumes = [
+                {
+                  name = "ca-trust-bundle"
+                  hostPath = {
+                    path = "/etc/ssl/certs/ca-certificates.crt"
+                    type = "File"
+                  }
+                },
+              ]
+            }
+          }
+        },
+
       ] :
       yamlencode(m)
       ],
@@ -670,6 +772,7 @@ resource "helm_release" "system" {
       module.lldap.flux_manifests,
       module.authelia.flux_manifests,
       module.kea.flux_manifests,
+      module.prometheus.flux_manifests,
     ) }),
   ]
 }
