@@ -40,6 +40,21 @@ locals {
   }
 }
 
+resource "random_string" "authelia-oidc-client-id" {
+  for_each = local.authelia_oidc_clients_base
+
+  length  = 32
+  special = false
+  upper   = false
+}
+
+resource "random_password" "authelia-oidc-client-secret" {
+  for_each = local.authelia_oidc_clients_base
+
+  length  = 32
+  special = false
+}
+
 # auth
 
 resource "tls_private_key" "lldap-ca" {
