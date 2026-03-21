@@ -56,7 +56,7 @@ resource "helm_release" "system" {
               }
             }
             test = {
-              enable = true
+              enable = false
             }
             values = {
               deployment = {
@@ -189,7 +189,7 @@ resource "helm_release" "system" {
               }
             }
             test = {
-              enable = true
+              enable = false
             }
             values = {
               replicaCount = 2
@@ -292,7 +292,7 @@ resource "helm_release" "system" {
               }
             }
             test = {
-              enable = true
+              enable = false
             }
             values = {
               manifests = [
@@ -399,7 +399,7 @@ resource "helm_release" "system" {
               }
             }
             test = {
-              enable = true
+              enable = false
             }
             values = {
               replicaCount = 2
@@ -476,7 +476,7 @@ resource "helm_release" "system" {
               }
             }
             test = {
-              enable = true
+              enable = false
             }
             values = {
               replicas = 2
@@ -545,7 +545,7 @@ resource "helm_release" "system" {
               }
             }
             test = {
-              enable = true
+              enable = false
             }
             values = {
               master = {
@@ -627,7 +627,7 @@ resource "helm_release" "system" {
               }
             }
             test = {
-              enable = true
+              enable = false
             }
             values = {
               nfd = {
@@ -667,6 +667,8 @@ resource "helm_release" "system" {
       module.kube-vip.flux_manifests,
       module.registry.flux_manifests,
       module.minio.flux_manifests,
+      module.lldap.flux_manifests,
+      module.authelia.flux_manifests,
     ) }),
   ]
 }

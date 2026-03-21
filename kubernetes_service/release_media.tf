@@ -14,8 +14,8 @@ module "kavita" {
   extra_configs = {
     OpenIdConnectSettings = {
       Authority    = "https://${local.endpoints.authelia.ingress}"
-      ClientId     = random_string.authelia-oidc-client-id["kavita"].result
-      Secret       = random_password.authelia-oidc-client-secret["kavita"].result
+      ClientId     = local.authelia_oidc_clients.kavita.client_id
+      Secret       = local.authelia_oidc_clients.kavita.client_secret
       CustomScopes = []
       Enabled      = true
     }

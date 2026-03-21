@@ -278,8 +278,8 @@ module "open-webui" {
     ENABLE_OAUTH_PERSISTENT_CONFIG = false
     ENABLE_OAUTH_ID_TOKEN_COOKIE   = false
     OAUTH_MERGE_ACCOUNTS_BY_EMAIL  = true
-    OAUTH_CLIENT_ID                = random_string.authelia-oidc-client-id["open-webui"].result
-    OAUTH_CLIENT_SECRET            = random_password.authelia-oidc-client-secret["open-webui"].result
+    OAUTH_CLIENT_ID                = local.authelia_oidc_clients.open-webui.client_id
+    OAUTH_CLIENT_SECRET            = local.authelia_oidc_clients.open-webui.client_secret
     OPENID_PROVIDER_URL            = "https://${local.endpoints.authelia.ingress}/.well-known/openid-configuration"
     OAUTH_PROVIDER_NAME            = "Authelia"
     OAUTH_SCOPES                   = join(" ", local.authelia_oidc_clients.open-webui.scopes)

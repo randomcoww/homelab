@@ -1,4 +1,14 @@
 
+locals {
+  manifests = concat([
+    module.statefulset.manifest,
+    module.service.manifest,
+    module.httproute.manifest,
+    module.secret.manifest,
+    module.tls.manifest,
+  ], module.litestream-overlay.additional_manifests)
+}
+
 resource "random_bytes" "jwt-secret" {
   length = 256
 }
@@ -25,24 +35,6 @@ locals {
     LLDAP_LDAP_HOST                = "0.0.0.0"
     LLDAP_HTTP_URL                 = "https://${var.ingress_hostname}"
     LLDAP_LDAP_BASE_DN             = "dc=${join(",dc=", slice(compact(split(".", var.service_hostname)), 1, length(compact(split(".", var.service_hostname)))))}"
-  })
-}
-
-module "metadata" {
-  source      = "../../../modules/metadata"
-  name        = var.name
-  namespace   = var.namespace
-  release     = var.release
-  app_version = var.release
-  manifests = merge({
-    "templates/statefulset.yaml" = module.statefulset.manifest
-    "templates/service.yaml"     = module.service.manifest
-    "templates/httproute.yaml"   = module.httproute.manifest
-    "templates/secret.yaml"      = module.secret.manifest
-    "templates/tls.yaml"         = module.tls.manifest
-    }, {
-    for i, m in module.litestream-overlay.additional_manifests :
-    "templates/litestream-${i}.yaml" => m
   })
 }
 

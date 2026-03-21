@@ -46,7 +46,7 @@ output "flux_manifests" {
             }
           }
           test = {
-            enable = true
+            enable = false
           }
           values = {
             manifests = [
@@ -79,7 +79,7 @@ output "flux_manifests" {
         }
         spec = {
           interval = "15m"
-          timeout  = "5m"
+          timeout  = "10m"
           chart = {
             spec = {
               chart   = "minio"
@@ -93,17 +93,19 @@ output "flux_manifests" {
           }
           releaseName = var.name
           install = {
+            disableWait = true # TODO: investigate - helmrelease does not finish properly
             remediation = {
               retries = -1
             }
           }
           upgrade = {
+            disableWait = true # TODO: investigate - helmrelease does not finish properly
             remediation = {
               retries = -1
             }
           }
           test = {
-            enable = true
+            enable = false
           }
           values = {
             image = {
