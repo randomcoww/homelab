@@ -669,6 +669,7 @@ resource "helm_release" "system" {
       module.minio.flux_manifests,
       module.lldap.flux_manifests,
       module.authelia.flux_manifests,
+      module.kea.flux_manifests,
     ) }),
   ]
 }

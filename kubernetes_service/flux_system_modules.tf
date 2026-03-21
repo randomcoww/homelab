@@ -427,3 +427,57 @@ module "authelia" {
     }
   }
 }
+
+# DHCP
+
+module "kea" {
+  source    = "./modules/kea"
+  name      = local.endpoints.kea.name
+  namespace = local.endpoints.kea.namespace
+  images = {
+    kea  = local.container_images_digest.kea
+    ipxe = local.container_images_digest.ipxe
+  }
+  service_ips = [
+    local.services.cluster_kea_primary.ip,
+    local.services.cluster_kea_secondary.ip,
+  ]
+  ports = {
+    kea_peer    = local.host_ports.kea_peer
+    kea_metrics = local.host_ports.kea_metrics
+    ipxe        = local.host_ports.ipxe
+    ipxe_tftp   = local.host_ports.ipxe_tftp
+  }
+  ipxe_boot_file_name  = "ipxe.efi"
+  ipxe_script_base_url = "https://${local.services.minio.ip}:${local.service_ports.minio}/boot/ipxe-"
+  networks = [
+    {
+      prefix = local.networks.lan.prefix
+      routers = [
+        local.services.gateway.ip,
+      ]
+      domain_name_servers = [
+        local.services.external_dns.ip,
+      ]
+      domain_search = [
+        local.domains.kubernetes,
+        local.domains.public,
+      ]
+      classless_static_route = [
+        # allow local access to these from clients that set default route over VPN
+        for _, prefix in distinct([
+          local.networks[local.services.apiserver.network.name].prefix,
+          local.networks.service.prefix,
+          local.networks.kubernetes_service.prefix,
+        ]) :
+        "${prefix} - ${local.services.gateway.ip}"
+      ]
+      mtu = lookup(local.networks.lan, "mtu", 1500)
+    },
+    {
+      prefix = local.networks.service.prefix
+      mtu    = lookup(local.networks.service, "mtu", 1500)
+    },
+  ]
+  timezone = local.timezone
+}
