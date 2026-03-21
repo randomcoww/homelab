@@ -115,7 +115,7 @@ locals {
     kube_apiserver          = "registry.k8s.io/kube-apiserver:v1.35.3@sha256:6c6e2571f98e738015a39ed21305ab4166a3e2873f9cc01d7fa58371cf0f5d30"
     kube_controller_manager = "registry.k8s.io/kube-controller-manager:v1.35.3@sha256:23a24aafa10831eb47477b0b31a525ee8a4a99d2c17251aac46c43be8201ec59"
     kube_scheduler          = "registry.k8s.io/kube-scheduler:v1.35.3@sha256:7070dff574916315268ab483f1088a107b1f3a8a1a87f3e3645933111ade7013"
-    etcd                    = "registry.k8s.io/etcd:v3.6.8@sha256:397189418d1a00e500c0605ad18d1baf3b541a1004d768448c367e48071622e5"
+    etcd                    = "registry.k8s.io/etcd:v3.6.9@sha256:38e46ab26aa2a82251d3f24cbbdaefe2e68a66346404ee4b7afe7e90db26805d"
     etcd_wrapper            = "ghcr.io/randomcoww/etcd-wrapper:v0.5.28@sha256:e7291e59be84f8b2ac2be25604922b01c7cbc6b474b5f26e15c48dfb777997f8"
     # tier 1
     kube_proxy         = "registry.k8s.io/kube-proxy:v1.35.3@sha256:8743aec6a360aedcb7a076cbecea367b072abe1bfade2e2098650df502e2bc89"
