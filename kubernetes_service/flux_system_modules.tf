@@ -90,7 +90,7 @@ module "registry" {
   ca                      = data.terraform_remote_state.sr.outputs.trust.ca
   loadbalancer_class_name = "kube-vip.io/kube-vip-class"
 
-  minio_endpoint      = "https://${local.services.cluster_minio.ip}:${local.service_ports.minio}"
+  minio_endpoint      = "${local.services.cluster_minio.ip}:${local.service_ports.minio}"
   minio_bucket        = "registry"
   minio_bucket_prefix = "/"
   minio_access_secret = local.minio_users.registry.secret

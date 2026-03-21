@@ -106,7 +106,7 @@ module "lldap" {
     cert_pem        = tls_self_signed_cert.lldap-ca.cert_pem
   }
 
-  minio_endpoint      = "https://${local.services.cluster_minio.ip}:${local.service_ports.minio}"
+  minio_endpoint      = "${local.services.cluster_minio.ip}:${local.service_ports.minio}"
   minio_bucket        = "lldap"
   minio_access_secret = local.minio_users.lldap.secret
 
@@ -145,7 +145,7 @@ module "authelia" {
     password = random_password.lldap-password.result
   }
   authelia_oidc_clients = local.authelia_oidc_clients
-  minio_endpoint        = "https://${local.services.cluster_minio.ip}:${local.service_ports.minio}"
+  minio_endpoint        = "${local.services.cluster_minio.ip}:${local.service_ports.minio}"
   minio_bucket          = "authelia"
   minio_access_secret   = local.minio_users.authelia.secret
 

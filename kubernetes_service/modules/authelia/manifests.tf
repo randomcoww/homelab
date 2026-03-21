@@ -6,7 +6,7 @@ locals {
   authelia_oidc_jwk_key_file       = "/custom/oidc-jwk-key.pem"
   authelia_oidc_hmac_secret_file   = "/custom/oidc-hmac-secret"
   autehlia_oidc_client_shared_path = "/oidc"
-  domain_regex                     = "(?<subdomain>[a-z0-9-*]+)\\.(?<domain>[a-z0-9.-]+)"
+  domain_regex                     = "(?<hostname>(?<subdomain>[a-z0-9-*]+)\\.(?<domain>[a-z0-9.-]+))(?::(?<port>\\d+))?"
 }
 
 resource "random_bytes" "authelia-jwt-secret" {
@@ -62,7 +62,7 @@ module "secret" {
           checkpoint-interval = "60s"
           replica = {
             type          = "s3"
-            endpoint      = var.minio_endpoint
+            endpoint      = "https://${var.minio_endpoint}"
             bucket        = var.minio_bucket
             path          = "$POD_NAME/litestream"
             sync-interval = "1s"

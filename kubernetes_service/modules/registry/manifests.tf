@@ -144,7 +144,7 @@ module "secret" {
           enabled = true
         }
         s3 = {
-          regionendpoint              = var.minio_endpoint
+          regionendpoint              = "https://${var.minio_endpoint}"
           forcepathstyle              = true
           bucket                      = var.minio_bucket
           encrypt                     = false

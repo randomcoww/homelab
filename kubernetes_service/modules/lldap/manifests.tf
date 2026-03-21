@@ -127,7 +127,7 @@ module "litestream-overlay" {
         checkpoint-interval = "60s"
         replica = {
           type          = "s3"
-          endpoint      = var.minio_endpoint
+          endpoint      = "https://${var.minio_endpoint}"
           bucket        = var.minio_bucket
           path          = "$POD_NAME/litestream"
           sync-interval = "1s"

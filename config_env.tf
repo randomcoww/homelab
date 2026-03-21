@@ -126,11 +126,11 @@ locals {
     minio              = "cgr.dev/chainguard/minio:latest@sha256:47524fcb09f3b1ec76b3b5bbf9f8a57a283cc26dc71e472a45ce429232981f38"
     nginx              = "docker.io/nginxinc/nginx-unprivileged:1.29.5-alpine@sha256:ccbac1a4c20a8b41c5dd1691bd91d63eda3b7989d643a33fd47841838519bfb9"
     # tier 2
-    kea                   = "reg.cluster.internal/randomcoww/kea:v3.1.6.1773672731@sha256:f0087ea5643b1e146894a97467a21705985b53516e5764cfae5d3edd70ea2bd0"
-    ipxe                  = "reg.cluster.internal/randomcoww/ipxe:v2.0.0.1773673098@sha256:916e86c3413f1c2152593b84bc015dcf73f43a59d02691b4046a7df7633f80e2"
-    registry              = "ghcr.io/distribution/distribution:3.0.0@sha256:4ba3adf47f5c866e9a29288c758c5328ef03396cb8f5f6454463655fa8bc83e2"
-    device_plugin         = "ghcr.io/squat/generic-device-plugin:latest@sha256:1e5a0c3a8b0b74f2a0fa00a9a3f777e1a78671c00fd038dc2dad42ff1be9781e"
-    github_actions_runner = "ghcr.io/actions/actions-runner:2.333.0@sha256:1ad983536759ceec39ed75a2c8f007ca8c37b66eee35ed86f13623b29a4db97d"
+    kea           = "reg.cluster.internal/randomcoww/kea:v3.1.6.1773672731@sha256:f0087ea5643b1e146894a97467a21705985b53516e5764cfae5d3edd70ea2bd0"
+    ipxe          = "reg.cluster.internal/randomcoww/ipxe:v2.0.0.1773673098@sha256:916e86c3413f1c2152593b84bc015dcf73f43a59d02691b4046a7df7633f80e2"
+    registry      = "ghcr.io/distribution/distribution:3.0.0@sha256:4ba3adf47f5c866e9a29288c758c5328ef03396cb8f5f6454463655fa8bc83e2"
+    device_plugin = "ghcr.io/squat/generic-device-plugin:latest@sha256:1e5a0c3a8b0b74f2a0fa00a9a3f777e1a78671c00fd038dc2dad42ff1be9781e"
+    gha_runner    = "ghcr.io/actions/actions-runner:2.333.0@sha256:1ad983536759ceec39ed75a2c8f007ca8c37b66eee35ed86f13623b29a4db97d"
     # tier 3
     mountpoint       = "reg.cluster.internal/randomcoww/mountpoint-s3:v1.22.1.1773730563@sha256:2001f93ad263a8ca1bc7d8fecf45dcd3b87773be87a62b2a06703936c7f6c211"
     hostapd          = "reg.cluster.internal/randomcoww/hostapd:v2.11.1773672764@sha256:1fd1b22baf1fc1a9a2cd160a0c1e19c2fbb4b95ae5aca049de7579411f39ae85"
