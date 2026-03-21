@@ -774,6 +774,7 @@ resource "helm_release" "system" {
       module.minio.flux_manifests,
       module.kea.flux_manifests,
       module.prometheus.flux_manifests,
+      module.gha-runner.flux_manifests,
     ) }),
   ]
 }

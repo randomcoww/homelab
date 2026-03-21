@@ -1,7 +1,7 @@
 variable "github" {
   type = object({
-    user  = string
-    token = string
+    username = string
+    token    = string
   })
 }
 
