@@ -131,7 +131,7 @@ resource "helm_release" "traefik" {
   create_namespace = true
   wait             = false
   wait_for_jobs    = false
-  version          = "39.0.5"
+  version          = "39.0.6"
   max_history      = 2
   timeout          = local.kubernetes.helm_release_timeout
   values = [
