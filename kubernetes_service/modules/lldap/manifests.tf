@@ -1,5 +1,6 @@
 
 locals {
+  domain_regex = "(?<hostname>(?<subdomain>[a-z0-9-*]+)\\.(?<domain>[a-z0-9.-]+))(?::(?<port>\\d+))?"
   manifests = concat([
     module.statefulset.manifest,
     module.service.manifest,
@@ -34,7 +35,7 @@ locals {
     LLDAP_HTTP_HOST                = "0.0.0.0"
     LLDAP_LDAP_HOST                = "0.0.0.0"
     LLDAP_HTTP_URL                 = "https://${var.ingress_hostname}"
-    LLDAP_LDAP_BASE_DN             = "dc=${join(",dc=", slice(compact(split(".", var.service_hostname)), 1, length(compact(split(".", var.service_hostname)))))}"
+    LLDAP_LDAP_BASE_DN             = "dc=${join(",dc=", split(".", regex(local.domain_regex, var.service_hostname).domain))}"
   })
 }
 

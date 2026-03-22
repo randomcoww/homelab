@@ -48,11 +48,11 @@ locals {
       mtu           = 1500
       enable_netnum = true
       netnums = {
-        apiserver    = 2
-        external_dns = 31
-        minio        = 34
-        registry     = 35 # used by hosts without access to cluster DNS
-        gateway_api  = 36
+        apiserver   = 2
+        k8s_gateway = 31
+        minio       = 34
+        registry    = 35 # used by hosts without access to cluster DNS
+        gateway_api = 36
       }
     }
     # Conntrack sync
@@ -119,7 +119,6 @@ locals {
     etcd_wrapper            = "ghcr.io/randomcoww/etcd-wrapper:v0.5.28@sha256:e7291e59be84f8b2ac2be25604922b01c7cbc6b474b5f26e15c48dfb777997f8"
     # tier 1
     kube_proxy         = "registry.k8s.io/kube-proxy:v1.35.3@sha256:8743aec6a360aedcb7a076cbecea367b072abe1bfade2e2098650df502e2bc89"
-    external_dns       = "registry.k8s.io/external-dns/external-dns:v0.20.0@sha256:ddc7f4212ed09a21024deb1f470a05240837712e74e4b9f6d1f2632ff10672e7"
     flannel            = "ghcr.io/flannel-io/flannel:v0.28.1@sha256:6a9c170acece4457ccb9cdfe53c787cc451e87990e20451bf20070b8895fa538"
     flannel_cni_plugin = "ghcr.io/flannel-io/flannel-cni-plugin:v1.9.0-flannel1@sha256:c6a08fe5bcb23b19c2fc7c1e47b95a967cc924224ebedf94e8623f27b6c258fa"
     kube_vip           = "ghcr.io/kube-vip/kube-vip:v1.1.0@sha256:c12498086c5ef3cb121c5b7f9aa755c14bd938ed4f6303da739eb0a0e9ca3410"
@@ -256,6 +255,10 @@ locals {
       }
       kube_dns = {
         name      = "kube-dns"
+        namespace = "kube-system"
+      }
+      k8s_gateway = {
+        name      = "k8s-gateway"
         namespace = "kube-system"
       }
       kea = {

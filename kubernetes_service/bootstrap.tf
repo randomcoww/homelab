@@ -44,122 +44,124 @@ resource "helm_release" "bootstrap" {
   max_history      = 2
   values = [
     yamlencode({ manifests = [
-      # https://kubernetes.io/docs/reference/access-authn-authz/kubelet-tls-bootstrapping/
-      # enable bootstrapping nodes to create CSR
-      yamlencode({
-        apiVersion = "rbac.authorization.k8s.io/v1"
-        kind       = "ClusterRoleBinding"
-        metadata = {
-          name = "create-csrs-for-bootstrapping"
-        }
-        roleRef = {
-          apiGroup = "rbac.authorization.k8s.io"
-          kind     = "ClusterRole"
-          name     = "system:node-bootstrapper"
-        }
-        subjects = [
-          {
-            apiGroup = "rbac.authorization.k8s.io"
-            kind     = "Group"
-            name     = "system:bootstrappers"
-          },
-        ]
-      }),
-
-      # Approve all CSRs for the group "system:bootstrappers"
-      yamlencode({
-        apiVersion = "rbac.authorization.k8s.io/v1"
-        kind       = "ClusterRoleBinding"
-        metadata = {
-          name = "auto-approve-csrs-for-group"
-        }
-        roleRef = {
-          apiGroup = "rbac.authorization.k8s.io"
-          kind     = "ClusterRole"
-          name     = "system:certificates.k8s.io:certificatesigningrequests:nodeclient"
-        }
-        subjects = [
-          {
-            apiGroup = "rbac.authorization.k8s.io"
-            kind     = "Group"
-            name     = "system:bootstrappers"
-          },
-        ]
-      }),
-
-      # Approve renewal CSRs for the group "system:nodes"
-      yamlencode({
-        apiVersion = "rbac.authorization.k8s.io/v1"
-        kind       = "ClusterRoleBinding"
-        metadata = {
-          name = "auto-approve-renewals-for-nodes"
-        }
-        roleRef = {
-          apiGroup = "rbac.authorization.k8s.io"
-          kind     = "ClusterRole"
-          name     = "system:certificates.k8s.io:certificatesigningrequests:selfnodeclient"
-        }
-        subjects = [
-          {
-            apiGroup = "rbac.authorization.k8s.io"
-            kind     = "Group"
-            name     = "system:nodes"
-          },
-        ]
-      }),
-
-      # kube apiserver access to kubelet #
-      # https://stackoverflow.com/questions/48118125/kubernetes-rbac-role-verbs-to-exec-to-pod
-      yamlencode({
-        apiVersion = "rbac.authorization.k8s.io/v1"
-        kind       = "ClusterRole"
-        metadata = {
-          name = "system:kube-apiserver-to-kubelet"
-          annotations = {
-            "rbac.authorization.kubernetes.io/autoupdate" = "true"
+      for _, m in [
+        # https://kubernetes.io/docs/reference/access-authn-authz/kubelet-tls-bootstrapping/
+        # enable bootstrapping nodes to create CSR
+        {
+          apiVersion = "rbac.authorization.k8s.io/v1"
+          kind       = "ClusterRoleBinding"
+          metadata = {
+            name = "create-csrs-for-bootstrapping"
           }
-          labels = {
-            "kubernetes.io/bootstrapping" = "rbac-defaults"
-          }
-        }
-        rules = [
-          {
-            apiGroups = [""]
-            resources = ["nodes/proxy", "nodes/stats", "nodes/log", "nodes/spec", "nodes/metrics"]
-            verbs     = ["*"]
-          },
-          {
-            apiGroups = [""]
-            resources = ["pods", "pods/log"]
-            verbs     = ["get", "list"]
-          },
-          {
-            apiGroups = [""]
-            resources = ["pods/exec"]
-            verbs     = ["create"]
-          },
-        ]
-      }),
-
-      yamlencode({
-        apiVersion = "rbac.authorization.k8s.io/v1"
-        kind       = "ClusterRoleBinding"
-        metadata = {
-          name = "system:kube-apiserver"
-        }
-        roleRef = {
-          apiGroup = "rbac.authorization.k8s.io"
-          kind     = "ClusterRole"
-          name     = "system:kube-apiserver-to-kubelet"
-        }
-        subjects = [
-          {
+          roleRef = {
             apiGroup = "rbac.authorization.k8s.io"
-            kind     = "User"
-            name     = local.kubernetes.kubelet_client_user
-          },
-        ]
-      }),
+            kind     = "ClusterRole"
+            name     = "system:node-bootstrapper"
+          }
+          subjects = [
+            {
+              apiGroup = "rbac.authorization.k8s.io"
+              kind     = "Group"
+              name     = "system:bootstrappers"
+            },
+          ]
+        },
+
+        # Approve all CSRs for the group "system:bootstrappers"
+        {
+          apiVersion = "rbac.authorization.k8s.io/v1"
+          kind       = "ClusterRoleBinding"
+          metadata = {
+            name = "auto-approve-csrs-for-group"
+          }
+          roleRef = {
+            apiGroup = "rbac.authorization.k8s.io"
+            kind     = "ClusterRole"
+            name     = "system:certificates.k8s.io:certificatesigningrequests:nodeclient"
+          }
+          subjects = [
+            {
+              apiGroup = "rbac.authorization.k8s.io"
+              kind     = "Group"
+              name     = "system:bootstrappers"
+            },
+          ]
+        },
+
+        # Approve renewal CSRs for the group "system:nodes"
+        {
+          apiVersion = "rbac.authorization.k8s.io/v1"
+          kind       = "ClusterRoleBinding"
+          metadata = {
+            name = "auto-approve-renewals-for-nodes"
+          }
+          roleRef = {
+            apiGroup = "rbac.authorization.k8s.io"
+            kind     = "ClusterRole"
+            name     = "system:certificates.k8s.io:certificatesigningrequests:selfnodeclient"
+          }
+          subjects = [
+            {
+              apiGroup = "rbac.authorization.k8s.io"
+              kind     = "Group"
+              name     = "system:nodes"
+            },
+          ]
+        },
+
+        # kube apiserver access to kubelet #
+        # https://stackoverflow.com/questions/48118125/kubernetes-rbac-role-verbs-to-exec-to-pod
+        {
+          apiVersion = "rbac.authorization.k8s.io/v1"
+          kind       = "ClusterRole"
+          metadata = {
+            name = "system:kube-apiserver-to-kubelet"
+            annotations = {
+              "rbac.authorization.kubernetes.io/autoupdate" = "true"
+            }
+            labels = {
+              "kubernetes.io/bootstrapping" = "rbac-defaults"
+            }
+          }
+          rules = [
+            {
+              apiGroups = [""]
+              resources = ["nodes/proxy", "nodes/stats", "nodes/log", "nodes/spec", "nodes/metrics"]
+              verbs     = ["*"]
+            },
+            {
+              apiGroups = [""]
+              resources = ["pods", "pods/log"]
+              verbs     = ["get", "list"]
+            },
+            {
+              apiGroups = [""]
+              resources = ["pods/exec"]
+              verbs     = ["create"]
+            },
+          ]
+        },
+        {
+          apiVersion = "rbac.authorization.k8s.io/v1"
+          kind       = "ClusterRoleBinding"
+          metadata = {
+            name = "system:kube-apiserver"
+          }
+          roleRef = {
+            apiGroup = "rbac.authorization.k8s.io"
+            kind     = "ClusterRole"
+            name     = "system:kube-apiserver-to-kubelet"
+          }
+          subjects = [
+            {
+              apiGroup = "rbac.authorization.k8s.io"
+              kind     = "User"
+              name     = local.kubernetes.kubelet_client_user
+            },
+          ]
+        },
+      ] :
+      yamlencode(m)
     ] }),
   ]
 }
@@ -198,75 +200,6 @@ resource "helm_release" "flannel" {
   ]
 }
 
-# kube-dns
-
-resource "helm_release" "kube-dns-rbac" {
-  chart            = "../helm-wrapper"
-  name             = "${local.endpoints.kube_dns.name}-rbac"
-  namespace        = local.endpoints.kube_dns.namespace
-  create_namespace = true
-  wait             = false
-  wait_for_jobs    = false
-  max_history      = 2
-  values = [
-    yamlencode({ manifests = [
-      yamlencode({
-        apiVersion = "rbac.authorization.k8s.io/v1"
-        kind       = "ClusterRole"
-        metadata = {
-          name = local.endpoints.kube_dns.name
-        }
-        rules = [
-          {
-            apiGroups = [""]
-            resources = ["endpoints", "services", "pods", "namespaces", "nodes"]
-            verbs     = ["list", "watch", "get"]
-          },
-          {
-            apiGroups = ["discovery.k8s.io"]
-            resources = ["endpointslices"]
-            verbs     = ["list", "watch"]
-          },
-          {
-            apiGroups = ["extensions", "networking.k8s.io"]
-            resources = ["ingresses"]
-            verbs     = ["list", "watch", "get"]
-          },
-          {
-            apiGroups = ["networking.istio.io"]
-            resources = ["gateways"]
-            verbs     = ["list", "watch", "get"]
-          },
-          {
-            apiGroups = ["gateway.networking.k8s.io"]
-            resources = ["gateways", "httproutes", "tcproutes", "udproutes"]
-            verbs     = ["list", "watch", "get"]
-          },
-        ]
-      }),
-      yamlencode({
-        apiVersion = "rbac.authorization.k8s.io/v1"
-        kind       = "ClusterRoleBinding"
-        metadata = {
-          name = local.endpoints.kube_dns.name
-        }
-        roleRef = {
-          apiGroup = "rbac.authorization.k8s.io"
-          kind     = "ClusterRole"
-          name     = local.endpoints.kube_dns.name
-        }
-        subjects = [
-          {
-            kind      = "ServiceAccount"
-            name      = "${local.endpoints.kube_dns.name}-coredns"
-            namespace = local.endpoints.kube_dns.namespace
-          },
-        ]
-      }),
-    ] }),
-  ]
-}
-
 resource "helm_release" "kube-dns" {
   name             = local.endpoints.kube_dns.name
   namespace        = local.endpoints.kube_dns.namespace
@@ -281,12 +214,12 @@ resource "helm_release" "kube-dns" {
   values = [
     yamlencode({
       replicaCount = 3
-      serviceType  = "LoadBalancer"
+      serviceType  = "ClusterIP"
       serviceAccount = {
         create = true
       }
       rbac = {
-        create = false
+        create = true
       }
       prometheus = {
         service = {
@@ -298,11 +231,7 @@ resource "helm_release" "kube-dns" {
         }
       }
       service = {
-        annotations = {
-          "kube-vip.io/loadbalancerIPs" = local.services.external_dns.ip
-        }
-        clusterIP         = local.services.cluster_dns.ip
-        loadBalancerClass = "kube-vip.io/kube-vip-class"
+        clusterIP = local.services.cluster_dns.ip
       }
       customLabels = {
         app = local.endpoints.kube_dns.name
@@ -345,7 +274,13 @@ resource "helm_release" "kube-dns" {
             {
               name = "ready"
             },
-            # internal service
+            {
+              name = "loop"
+            },
+            {
+              name       = "prometheus"
+              parameters = "0.0.0.0:${local.service_ports.metrics}"
+            },
             {
               name        = "kubernetes"
               parameters  = "${local.domains.kubernetes} in-addr.arpa ip6.arpa"
@@ -354,24 +289,14 @@ resource "helm_release" "kube-dns" {
               fallthrough
               EOF
             },
-            # ingress
             {
-              name        = "etcd"
-              parameters  = "${local.domains.public} ${local.domains.kubernetes}"
-              configBlock = <<-EOF
-              endpoint http://localhost:2379
-              fallthrough
-              EOF
+              name       = "forward"
+              parameters = "${local.domains.public} ${local.services.k8s_gateway.ip}"
             },
             {
-              name = "hosts"
-              configBlock = join("\n", concat(compact([
-                for _, host in local.hosts :
-                try("${cidrhost(host.networks.service.prefix, host.netnum)} ${host.fqdn}", "")
-                ]), [
-                "fallthrough"
-              ]))
-            }
+              name       = "forward"
+              parameters = "${local.domains.kubernetes} ${local.services.k8s_gateway.ip}"
+            },
             ], [
             for tlshostname, ips in merge({
               for _, d in local.upstream_dns :
@@ -388,114 +313,7 @@ resource "helm_release" "kube-dns" {
               health_check 5s
               EOF
             }
-            ], [
-            {
-              name       = "cache"
-              parameters = 30
-            },
-            {
-              name       = "prometheus"
-              parameters = "0.0.0.0:${local.service_ports.metrics}"
-            },
           ])
-        },
-      ]
-      extraContainers = [
-        {
-          name  = "${local.endpoints.kube_dns.name}-external-dns"
-          image = local.container_images_digest.external_dns
-          args = [
-            "--source=service",
-            "--source=gateway-httproute",
-            "--provider=coredns",
-            "--log-level=debug",
-            "--metrics-address=:7979",
-          ]
-          env = [
-            {
-              name  = "ETCD_URLS"
-              value = "http://localhost:2379"
-            },
-          ]
-          ports = [
-            {
-              name          = "http"
-              protocol      = "TCP"
-              containerPort = 7979
-            },
-          ]
-          resources = {
-            requests = {
-              memory = "128Mi"
-            }
-            limits = {
-              memory = "128Mi"
-            }
-          }
-          livenessProbe = {
-            httpGet = {
-              path = "/healthz"
-              port = "http"
-            }
-            initialDelaySeconds = 30
-            timeoutSeconds      = 2
-          }
-          readinessProbe = {
-            httpGet = {
-              path = "/healthz"
-              port = "http"
-            }
-          }
-        },
-        {
-          name  = "${local.endpoints.kube_dns.name}-etcd"
-          image = local.container_images_digest.etcd
-          command = [
-            "etcd",
-            "--listen-client-urls",
-            "http://$(POD_IP):2379,http://127.0.0.1:2379",
-            "--advertise-client-urls",
-            "http://$(POD_IP):2379,http://127.0.0.1:2379",
-          ]
-          env = [
-            {
-              name = "POD_IP"
-              valueFrom = {
-                fieldRef = {
-                  fieldPath = "status.podIP"
-                }
-              }
-            },
-          ]
-          ports = [
-            {
-              name          = "client"
-              protocol      = "TCP"
-              containerPort = 2379
-            },
-          ]
-          resources = {
-            requests = {
-              memory = "32Mi"
-            }
-            limits = {
-              memory = "32Mi"
-            }
-          }
-          livenessProbe = {
-            httpGet = {
-              path = "/livez"
-              port = "client"
-            }
-            initialDelaySeconds = 10
-            timeoutSeconds      = 2
-          }
-          readinessProbe = {
-            httpGet = {
-              path = "/readyz"
-              port = "client"
-            }
-          }
         },
       ]
     }),

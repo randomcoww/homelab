@@ -18,6 +18,7 @@ resource "tls_cert_request" "minio" {
   dns_names = concat([
     "localhost",
     var.name,
+    var.service_hostname,
     ], [
     for i, _ in range(var.replicas) :
     "${var.name}-${i}.${var.name}-svc.${var.namespace}.svc"

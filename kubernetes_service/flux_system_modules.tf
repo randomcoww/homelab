@@ -56,6 +56,7 @@ module "minio" {
   minio_credentials  = data.terraform_remote_state.sr.outputs.minio
   cluster_domain     = local.domains.kubernetes
   ca                 = data.terraform_remote_state.sr.outputs.trust.ca
+  service_hostname   = local.endpoints.minio.service
   service_ip         = local.services.minio.ip
   cluster_service_ip = local.services.cluster_minio.ip
 }
@@ -79,9 +80,8 @@ module "registry" {
   minio_bucket        = "registry"
   minio_bucket_prefix = "/"
   minio_access_secret = local.minio_users.registry.secret
-  service_ip          = local.services.registry.ip
   service_hostname    = local.endpoints.registry.service
-  ui_ingress_hostname = local.endpoints.registry.ingress
+  service_ip          = local.services.registry.ip
   gateway_ref = {
     name      = local.endpoints.traefik.name
     namespace = local.endpoints.traefik.namespace
@@ -260,7 +260,7 @@ module "kea" {
         local.services.gateway.ip,
       ]
       domain_name_servers = [
-        local.services.external_dns.ip,
+        local.services.k8s_gateway.ip,
       ]
       domain_search = [
         local.domains.kubernetes,
@@ -501,7 +501,7 @@ module "gha-runner" {
   }
   github_credentials  = var.github
   internal_ca         = data.terraform_remote_state.sr.outputs.trust.ca
-  registry_endpoint   = "${local.endpoints.registry.ingress}:${local.service_ports.registry}"
+  registry_endpoint   = "${local.endpoints.registry.service}:${local.service_ports.registry}"
   minio_endpoint      = "${local.services.cluster_minio.ip}:${local.service_ports.minio}"
   minio_access_secret = local.minio_users.arc.secret
 }

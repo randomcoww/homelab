@@ -1,14 +1,135 @@
 resource "helm_release" "system" {
-  name             = "system"
-  chart            = "../helm-wrapper"
-  namespace        = "flux-runners"
-  create_namespace = true
-  wait             = true
-  wait_for_jobs    = true
-  max_history      = 2
+  name                       = "system"
+  chart                      = "../helm-wrapper"
+  namespace                  = "flux-runners"
+  create_namespace           = true
+  wait                       = false
+  wait_for_jobs              = false
+  max_history                = 1
+  disable_crd_hooks          = true
+  disable_webhooks           = true
+  disable_openapi_validation = true
+  skip_crds                  = true
+  replace                    = true
+  render_subchart_notes      = false
   values = [
     yamlencode({ manifests = concat([
       for _, m in [
+
+        # k8s-gateway
+        {
+          apiVersion = "source.toolkit.fluxcd.io/v1"
+          kind       = "HelmRepository"
+          metadata = {
+            name      = local.endpoints.k8s_gateway.name
+            namespace = local.endpoints.k8s_gateway.namespace
+          }
+          spec = {
+            interval = "15m"
+            url      = "https://k8s-gateway.github.io/k8s_gateway/"
+          }
+        },
+        {
+          apiVersion = "helm.toolkit.fluxcd.io/v2"
+          kind       = "HelmRelease"
+          metadata = {
+            name      = local.endpoints.k8s_gateway.name
+            namespace = local.endpoints.k8s_gateway.namespace
+          }
+          spec = {
+            interval = "15m"
+            timeout  = "5m"
+            chart = {
+              spec = {
+                chart   = "k8s-gateway"
+                version = "3.4.2"
+                sourceRef = {
+                  kind = "HelmRepository"
+                  name = local.endpoints.k8s_gateway.name
+                }
+                interval = "5m"
+              }
+            }
+            releaseName = local.endpoints.k8s_gateway.name
+            install = {
+              remediation = {
+                retries = -1
+              }
+            }
+            upgrade = {
+              remediation = {
+                retries = -1
+              }
+            }
+            test = {
+              enable = false
+            }
+            values = {
+              domain = "."
+              watchedResources = [
+                "Service",
+                "HTTPRoute",
+              ]
+              fallthrough = {
+                enabled = true
+              }
+              resources = {
+                requests = {
+                  memory = "128Mi"
+                }
+                limits = {
+                  memory = "128Mi"
+                }
+              }
+              service = {
+                type              = "LoadBalancer"
+                loadBalancerIP    = local.services.k8s_gateway.ip
+                loadBalancerClass = "kube-vip.io/kube-vip-class"
+              }
+              replicaCount = 3
+              extraZonePlugins = concat([
+                {
+                  name = "health"
+                },
+                {
+                  name = "ready"
+                },
+                {
+                  name = "loop"
+                },
+                {
+                  name       = "prometheus"
+                  parameters = "0.0.0.0:9153" # not configurable
+                },
+                {
+                  name = "hosts"
+                  configBlock = join("\n", concat(compact([
+                    for _, host in local.hosts :
+                    try("${cidrhost(host.networks.service.prefix, host.netnum)} ${host.fqdn}", "")
+                    ]), [
+                    "fallthrough"
+                  ]))
+                },
+                ], [
+                for tlshostname, ips in merge({
+                  for _, d in local.upstream_dns :
+                  d.hostname => d.ip...
+                }) :
+                {
+                  name = "forward"
+                  parameters = ". ${join(" ", [
+                    for _, ip in ips :
+                    "tls://${ip}"
+                  ])}"
+                  configBlock = <<-EOF
+                  tls_servername ${tlshostname}
+                  health_check 5s
+                  EOF
+                }
+              ])
+            }
+          }
+        },
 
         # traefik
         {
