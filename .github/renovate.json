@@ -25,10 +25,9 @@
         "/\\.tf$/"
       ],
       "matchStrings": [
-        "\"(?<currentValue>[^\"]+)\" # renovate: datasource=(?<datasource>[a-zA-Z0-9-._]+?) depName=(?<depName>[^\\s]+?)(?: registryUrl=(?<registryUrl>[^\\s]+?))?\\s"
+        "\"(?<currentValue>[^\"]+)\" # renovate: datasource=(?<datasource>[a-zA-Z0-9-._]+?) depName=(?<depName>[^\\s]+?)(?: registryUrl=(?<registryUrl>[^\\s]+?))?(?: depType=(?<depType>[^\\s]+?))?\\s"
       ],
-      "versioningTemplate": "docker",
-      "pinDigests": false
+      "versioningTemplate": "docker"
     }
   ],
   "packageRules": [
@@ -70,8 +69,9 @@
       ]
     },
     {
-      "matchDatasources": [
-        "helm"
+      "matchDepTypes": [
+        "helm_release",
+        "helm_regex"
       ],
       "pinDigests": false
     },
