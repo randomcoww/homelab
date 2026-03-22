@@ -78,6 +78,35 @@ locals {
           }
         })
       }
+      apiserver_encryption = {
+        contents = yamlencode({
+          apiVersion = "apiserver.config.k8s.io/v1"
+          kind       = "EncryptionConfiguration"
+          resources = [
+            {
+              resources = [
+                "secrets",
+                "configmaps",
+              ]
+              providers = [
+                {
+                  aescbc = {
+                    keys = [
+                      {
+                        name   = "key1"
+                        secret = var.apiserver_encryption_key
+                      },
+                    ]
+                  }
+                },
+                {
+                  identity = {}
+                },
+              ]
+            },
+          ]
+        })
+      }
     } :
     key => merge(f, {
       path = "${local.config_path}/${key}.config"
@@ -222,6 +251,7 @@ module "apiserver" {
           "--service-cluster-ip-range=${var.kubernetes_service_prefix}",
           "--tls-cert-file=${local.pki.apiserver-cert.path}",
           "--tls-private-key-file=${local.pki.apiserver-key.path}",
+          "--encryption-provider-config=${local.config.apiserver_encryption.path}",
           "--v=2",
           ], length(var.feature_gates) > 0 ? [
           "--feature-gates=${join(",", [

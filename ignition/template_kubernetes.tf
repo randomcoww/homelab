@@ -1,3 +1,8 @@
+
+resource "random_bytes" "apiserver_encryption_key" {
+  length = 32
+}
+
 module "kubernetes-master" {
   for_each = local.members.kubernetes-master
   source   = "./modules/kubernetes_master"
@@ -36,15 +41,16 @@ module "kubernetes-master" {
     for _, network in each.value.networks :
     try(cidrhost(network.prefix, each.value.netnum), null)
   ])
-  apiserver_ip          = local.services.apiserver.ip
-  cluster_apiserver_ip  = local.services.cluster_apiserver.ip
-  static_pod_path       = local.kubernetes.static_pod_manifest_path
-  feature_gates         = local.kubernetes.feature_gates
-  bird_path             = local.ha.bird_config_path
-  bird_cache_table_name = local.ha.bird_cache_table_name
-  haproxy_path          = local.ha.haproxy_config_path
-  bgp_prefix            = each.value.networks.node.prefix
-  bgp_as                = local.ha.bgp_as
+  apiserver_encryption_key = random_bytes.apiserver_encryption_key.base64
+  apiserver_ip             = local.services.apiserver.ip
+  cluster_apiserver_ip     = local.services.cluster_apiserver.ip
+  static_pod_path          = local.kubernetes.static_pod_manifest_path
+  feature_gates            = local.kubernetes.feature_gates
+  bird_path                = local.ha.bird_config_path
+  bird_cache_table_name    = local.ha.bird_cache_table_name
+  haproxy_path             = local.ha.haproxy_config_path
+  bgp_prefix               = each.value.networks.node.prefix
+  bgp_as                   = local.ha.bgp_as
   bgp_neighbor_netnums = {
     for host_key, host in local.members.gateway :
     host_key => host.netnum if each.key != host_key
