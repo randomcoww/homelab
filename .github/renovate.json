@@ -69,8 +69,8 @@
       ]
     },
     {
-      "matchDepTypes": [
-        "helm_release"
+      "matchDatasources": [
+        "helm"
       ],
       "pinDigests": false
     },
