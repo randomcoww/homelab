@@ -73,6 +73,7 @@ output "flux_manifests" {
                 evaluation_interval = "10s"
               }
               extraFlags = [
+                "web.enable-lifecycle",
                 "storage.tsdb.wal-compression",
               ]
               retention     = "1d"
