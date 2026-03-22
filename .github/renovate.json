@@ -27,7 +27,8 @@
       "matchStrings": [
         "\"(?<currentValue>[^\"]+)\" # renovate: datasource=(?<datasource>[a-zA-Z0-9-._]+?) depName=(?<depName>[^\\s]+?)(?: registryUrl=(?<registryUrl>[^\\s]+?))?\\s"
       ],
-      "versioningTemplate": "docker"
+      "versioningTemplate": "docker",
+      "pinDigests": false
     }
   ],
   "packageRules": [
