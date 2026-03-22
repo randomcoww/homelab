@@ -1,75 +1,71 @@
-module "metadata" {
-  source      = "../../../modules/metadata"
-  name        = var.name
-  namespace   = var.namespace
-  release     = var.release
-  app_version = var.release
-  manifests = {
-    "templates/serviceaccount.yaml" = yamlencode({
-      apiVersion = "v1"
-      kind       = "ServiceAccount"
-      metadata = {
-        name = var.name
-        labels = {
-          app     = var.name
-          release = var.release
+locals {
+  manifests = concat([
+    for _, m in [
+      {
+        apiVersion = "v1"
+        kind       = "ServiceAccount"
+        metadata = {
+          name = var.name
+          labels = {
+            app = var.name
+          }
         }
-      }
-    })
-    "templates/clusterrole.yaml" = yamlencode({
-      apiVersion = "rbac.authorization.k8s.io/v1"
-      kind       = "ClusterRole"
-      metadata = {
-        name = var.name
-        labels = {
-          app     = var.name
-          release = var.release
+      },
+      {
+        apiVersion = "rbac.authorization.k8s.io/v1"
+        kind       = "ClusterRole"
+        metadata = {
+          name = var.name
+          labels = {
+            app = var.name
+          }
         }
-      }
-      rules = [
-        {
-          apiGroups = [""]
-          resources = ["pods"]
-          verbs     = ["get"]
-        },
-        {
-          apiGroups = [""]
-          resources = ["nodes"]
-          verbs     = ["list", "watch"]
-        },
-        {
-          apiGroups = [""]
-          resources = ["nodes/status"]
-          verbs     = ["patch"]
-        },
-      ]
-    })
-    "templates/clusterrolebinding.yaml" = yamlencode({
-      apiVersion = "rbac.authorization.k8s.io/v1"
-      kind       = "ClusterRoleBinding"
-      metadata = {
-        name = var.name
-        labels = {
-          app     = var.name
-          release = var.release
+        rules = [
+          {
+            apiGroups = [""]
+            resources = ["pods"]
+            verbs     = ["get"]
+          },
+          {
+            apiGroups = [""]
+            resources = ["nodes"]
+            verbs     = ["list", "watch"]
+          },
+          {
+            apiGroups = [""]
+            resources = ["nodes/status"]
+            verbs     = ["patch"]
+          },
+        ]
+      },
+      {
+        apiVersion = "rbac.authorization.k8s.io/v1"
+        kind       = "ClusterRoleBinding"
+        metadata = {
+          name = var.name
+          labels = {
+            app = var.name
+          }
         }
+        roleRef = {
+          apiGroup = "rbac.authorization.k8s.io"
+          kind     = "ClusterRole"
+          name     = var.name
+        }
+        subjects = [
+          {
+            kind      = "ServiceAccount"
+            name      = var.name
+            namespace = var.namespace
+          },
+        ]
       }
-      roleRef = {
-        apiGroup = "rbac.authorization.k8s.io"
-        kind     = "ClusterRole"
-        name     = var.name
-      }
-      subjects = [
-        {
-          kind      = "ServiceAccount"
-          name      = var.name
-          namespace = var.namespace
-        },
-      ]
-    })
-    "templates/configmap.yaml" = module.configmap.manifest
-    "templates/daemonset.yaml" = module.daemonset.manifest
-  }
+    ] :
+    yamlencode(m)
+    ], [
+    module.configmap.manifest,
+    module.daemonset.manifest,
+  ])
 }
 
 module "configmap" {

@@ -98,6 +98,10 @@ variable "admin_user" {
   default = "default-admin"
 }
 
+variable "apiserver_encryption_key" {
+  type = string
+}
+
 variable "kubernetes_service_prefix" {
   type = string
 }

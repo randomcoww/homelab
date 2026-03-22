@@ -48,11 +48,11 @@ locals {
       mtu           = 1500
       enable_netnum = true
       netnums = {
-        apiserver    = 2
-        external_dns = 31
-        minio        = 34
-        registry     = 35 # used by hosts without access to cluster DNS
-        gateway_api  = 36
+        apiserver   = 2
+        k8s_gateway = 31
+        minio       = 34
+        registry    = 35 # used by hosts without access to cluster DNS
+        gateway_api = 36
       }
     }
     # Conntrack sync
@@ -119,18 +119,17 @@ locals {
     etcd_wrapper            = "ghcr.io/randomcoww/etcd-wrapper:v0.5.28@sha256:e7291e59be84f8b2ac2be25604922b01c7cbc6b474b5f26e15c48dfb777997f8"
     # tier 1
     kube_proxy         = "registry.k8s.io/kube-proxy:v1.35.3@sha256:8743aec6a360aedcb7a076cbecea367b072abe1bfade2e2098650df502e2bc89"
-    external_dns       = "registry.k8s.io/external-dns/external-dns:v0.20.0@sha256:ddc7f4212ed09a21024deb1f470a05240837712e74e4b9f6d1f2632ff10672e7"
     flannel            = "ghcr.io/flannel-io/flannel:v0.28.1@sha256:6a9c170acece4457ccb9cdfe53c787cc451e87990e20451bf20070b8895fa538"
     flannel_cni_plugin = "ghcr.io/flannel-io/flannel-cni-plugin:v1.9.0-flannel1@sha256:c6a08fe5bcb23b19c2fc7c1e47b95a967cc924224ebedf94e8623f27b6c258fa"
     kube_vip           = "ghcr.io/kube-vip/kube-vip:v1.1.1@sha256:87e88b44edc98f0079eac3e03b2ec4de9bde6ea100acd27a63e738d23b9aedbc"
     minio              = "cgr.dev/chainguard/minio:latest@sha256:3290091e1c3ea3cf7c7cc2b5a8493a9cf0fe279ec521396086aa76d35196bb9a"
     nginx              = "docker.io/nginxinc/nginx-unprivileged:1.29.5-alpine@sha256:ccbac1a4c20a8b41c5dd1691bd91d63eda3b7989d643a33fd47841838519bfb9"
     # tier 2
-    kea                   = "reg.cluster.internal/randomcoww/kea:v3.1.6.1773672731@sha256:f0087ea5643b1e146894a97467a21705985b53516e5764cfae5d3edd70ea2bd0"
-    ipxe                  = "reg.cluster.internal/randomcoww/ipxe:v2.0.0.1773673098@sha256:916e86c3413f1c2152593b84bc015dcf73f43a59d02691b4046a7df7633f80e2"
-    registry              = "ghcr.io/distribution/distribution:3.0.0@sha256:4ba3adf47f5c866e9a29288c758c5328ef03396cb8f5f6454463655fa8bc83e2"
-    device_plugin         = "ghcr.io/squat/generic-device-plugin:latest@sha256:5ff359bfbac2983afe9ccf4ecee1d11243745755a02981b8bd913ee3b76fde57"
-    github_actions_runner = "ghcr.io/actions/actions-runner:2.333.0@sha256:1ad983536759ceec39ed75a2c8f007ca8c37b66eee35ed86f13623b29a4db97d"
+    kea           = "reg.cluster.internal/randomcoww/kea:v3.1.6.1773672731@sha256:f0087ea5643b1e146894a97467a21705985b53516e5764cfae5d3edd70ea2bd0"
+    ipxe          = "reg.cluster.internal/randomcoww/ipxe:v2.0.0.1773673098@sha256:916e86c3413f1c2152593b84bc015dcf73f43a59d02691b4046a7df7633f80e2"
+    registry      = "ghcr.io/distribution/distribution:3.0.0@sha256:4ba3adf47f5c866e9a29288c758c5328ef03396cb8f5f6454463655fa8bc83e2"
+    device_plugin = "ghcr.io/squat/generic-device-plugin:latest@sha256:1e5a0c3a8b0b74f2a0fa00a9a3f777e1a78671c00fd038dc2dad42ff1be9781e"
+    gha_runner    = "ghcr.io/actions/actions-runner:2.333.0@sha256:1ad983536759ceec39ed75a2c8f007ca8c37b66eee35ed86f13623b29a4db97d"
     # tier 3
     mountpoint       = "reg.cluster.internal/randomcoww/mountpoint-s3:v1.22.1.1773730563@sha256:2001f93ad263a8ca1bc7d8fecf45dcd3b87773be87a62b2a06703936c7f6c211"
     hostapd          = "reg.cluster.internal/randomcoww/hostapd:v2.11.1773672764@sha256:1fd1b22baf1fc1a9a2cd160a0c1e19c2fbb4b95ae5aca049de7579411f39ae85"
@@ -203,8 +202,6 @@ locals {
     bgp_as                 = 65005
   }
 
-  domain_regex = "(?<subdomain>[a-z0-9-*]+)\\.(?<domain>[a-z0-9.-]+)"
-
   domains = {
     kubernetes = "cluster.internal"
     public     = "fuzzybunny.win"
@@ -233,9 +230,8 @@ locals {
     helm_release_timeout      = 600
 
     cert_issuers = {
-      acme_prod    = "letsencrypt-prod"
-      acme_staging = "letsencrypt-staging"
-      ca_internal  = "internal"
+      acme_prod   = "letsencrypt-prod"
+      ca_internal = "internal"
     }
     feature_gates = {
       ClusterTrustBundle           = true
@@ -259,6 +255,10 @@ locals {
       }
       kube_dns = {
         name      = "kube-dns"
+        namespace = "kube-system"
+      }
+      k8s_gateway = {
+        name      = "k8s-gateway"
         namespace = "kube-system"
       }
       kea = {

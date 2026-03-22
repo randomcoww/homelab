@@ -1,6 +1,13 @@
 locals {
   qrcode_port = 8080
   config_file = "/var/www/index.html"
+
+  manifests = [
+    module.service.manifest,
+    module.secret.manifest,
+    module.httproute.manifest,
+    module.deployment.manifest,
+  ]
 }
 
 module "secret" {
@@ -61,20 +68,6 @@ module "secret" {
     </body>
     </html>
     EOF
-  }
-}
-
-module "metadata" {
-  source      = "../../../modules/metadata"
-  name        = var.name
-  namespace   = var.namespace
-  release     = var.release
-  app_version = var.release
-  manifests = {
-    "templates/service.yaml"    = module.service.manifest
-    "templates/secret.yaml"     = module.secret.manifest
-    "templates/httproute.yaml"  = module.httproute.manifest
-    "templates/deployment.yaml" = module.deployment.manifest
   }
 }
 

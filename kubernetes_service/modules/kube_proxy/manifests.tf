@@ -1,46 +1,43 @@
-module "metadata" {
-  source      = "../../../modules/metadata"
-  name        = var.name
-  namespace   = var.namespace
-  release     = var.release
-  app_version = var.release
-  manifests = {
-    "templates/serviceaccount.yaml" = yamlencode({
-      apiVersion = "v1"
-      kind       = "ServiceAccount"
-      metadata = {
-        name = var.name
-        labels = {
-          app     = var.name
-          release = var.release
+locals {
+  manifests = concat([
+    for _, m in [
+      {
+        apiVersion = "v1"
+        kind       = "ServiceAccount"
+        metadata = {
+          name = var.name
+          labels = {
+            app = var.name
+          }
         }
-      }
-    })
-    "templates/clusterrolebinding.yaml" = yamlencode({
-      apiVersion = "rbac.authorization.k8s.io/v1"
-      kind       = "ClusterRoleBinding"
-      metadata = {
-        name = "system:kube-proxy"
-        labels = {
-          app     = var.name
-          release = var.release
+      },
+      {
+        apiVersion = "rbac.authorization.k8s.io/v1"
+        kind       = "ClusterRoleBinding"
+        metadata = {
+          name = "system:kube-proxy"
+          labels = {
+            app = var.name
+          }
         }
-      }
-      roleRef = {
-        apiGroup = "rbac.authorization.k8s.io"
-        kind     = "ClusterRole"
-        name     = "system:node-proxier"
-      }
-      subjects = [
-        {
-          kind      = "ServiceAccount"
-          name      = var.name
-          namespace = var.namespace
-        },
-      ]
-    })
-    "templates/daemonset.yaml" = module.daemonset.manifest
-  }
+        roleRef = {
+          apiGroup = "rbac.authorization.k8s.io"
+          kind     = "ClusterRole"
+          name     = "system:node-proxier"
+        }
+        subjects = [
+          {
+            kind      = "ServiceAccount"
+            name      = var.name
+            namespace = var.namespace
+          },
+        ]
+      },
+    ] :
+    yamlencode(m)
+    ], [
+    module.daemonset.manifest,
+  ])
 }
 
 module "daemonset" {

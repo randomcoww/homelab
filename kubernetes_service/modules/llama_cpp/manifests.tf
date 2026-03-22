@@ -11,20 +11,13 @@ locals {
       file  = image.file
     }
   ]
-}
 
-module "metadata" {
-  source      = "../../../modules/metadata"
-  name        = var.name
-  namespace   = var.namespace
-  release     = var.release
-  app_version = var.release
-  manifests = {
-    "templates/statefulset.yaml" = module.statefulset.manifest
-    "templates/service.yaml"     = module.service.manifest
-    "templates/httproute.yaml"   = module.httproute.manifest
-    "templates/secret.yaml"      = module.secret.manifest
-  }
+  manifests = [
+    module.statefulset.manifest,
+    module.service.manifest,
+    module.httproute.manifest,
+    module.secret.manifest,
+  ]
 }
 
 module "secret" {

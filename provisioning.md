@@ -54,8 +54,8 @@ tailscale = {
 }
 
 github = {
-  user  = "randomcoww"
-  token = "$GITHUB_TOKEN"
+  username = "randomcoww"
+  token    = "$GITHUB_TOKEN"
 }
 
 smtp = {

@@ -42,18 +42,11 @@ locals {
       mobility_domain       = random_id.hostapd-mobility-domain.hex
     }, var.config)
   ]
-}
 
-module "metadata" {
-  source      = "../../../modules/metadata"
-  name        = var.name
-  namespace   = var.namespace
-  release     = var.release
-  app_version = var.release
-  manifests = {
-    "templates/secret.yaml"      = module.secret.manifest
-    "templates/statefulset.yaml" = module.statefulset.manifest
-  }
+  manifests = [
+    module.secret.manifest,
+    module.statefulset.manifest,
+  ]
 }
 
 module "secret" {

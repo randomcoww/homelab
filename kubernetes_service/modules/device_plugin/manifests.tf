@@ -1,12 +1,7 @@
-module "metadata" {
-  source      = "../../../modules/metadata"
-  name        = var.name
-  namespace   = var.namespace
-  release     = var.release
-  app_version = var.release
-  manifests = {
-    "templates/daeonset.yaml" = module.daemonset.manifest
-  }
+locals {
+  manifests = [
+    module.daemonset.manifest,
+  ]
 }
 
 module "daemonset" {

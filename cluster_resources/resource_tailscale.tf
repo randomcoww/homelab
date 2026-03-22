@@ -21,7 +21,7 @@ resource "tailscale_acl" "cluster" {
   })
 }
 
-resource "tailscale_dns_configuration" "sample_configuration" {
+resource "tailscale_dns_configuration" "cluster" {
   dynamic "nameservers" {
     for_each = toset(local.upstream_dns)
 
@@ -39,7 +39,7 @@ resource "tailscale_dns_configuration" "sample_configuration" {
     content {
       domain = split_dns.value
       nameservers {
-        address            = local.services.external_dns.ip
+        address            = local.services.k8s_gateway.ip
         use_with_exit_node = true
       }
     }

@@ -7,7 +7,8 @@ variable "namespace" {
 }
 
 variable "release" {
-  type = string
+  type    = string
+  default = "0.1.0"
 }
 
 variable "affinity" {
@@ -50,6 +51,14 @@ variable "config" {
   default = {}
 }
 
+variable "service_ip" {
+  type = string
+}
+
+variable "service_hostname" {
+  type = string
+}
+
 variable "minio_endpoint" {
   type = string
 }
@@ -63,18 +72,6 @@ variable "minio_bucket_prefix" {
 }
 
 variable "minio_access_secret" {
-  type = string
-}
-
-variable "service_ip" {
-  type = string
-}
-
-variable "service_hostname" {
-  type = string
-}
-
-variable "ui_ingress_hostname" {
   type = string
 }
 

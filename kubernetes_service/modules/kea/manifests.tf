@@ -17,6 +17,15 @@ locals {
       role = try(element(["primary", "secondary"], i), "backup")
     }
   ]
+
+  manifests = concat([
+    module.secret.manifest,
+    module.statefulset.manifest,
+    module.kea-tls.manifest,
+    ], [
+    for _, service in module.service-peer :
+    service.manifest
+  ])
 }
 
 # Kea peers must know the IP (not DNS name) of all peers
@@ -47,23 +56,6 @@ module "service-peer" {
       "statefulset.kubernetes.io/pod-name" = each.key
     }
   }
-}
-
-module "metadata" {
-  source      = "../../../modules/metadata"
-  name        = var.name
-  namespace   = var.namespace
-  release     = var.release
-  app_version = var.release
-  manifests = merge({
-    "templates/secret.yaml"      = module.secret.manifest
-    "templates/statefulset.yaml" = module.statefulset.manifest
-    "templates/kea-tls.yaml"     = module.kea-tls.manifest
-    }, {
-    # service with known IP for each member
-    for _, service in module.service-peer :
-    "templates/service-${service.name}.yaml" => service.manifest
-  })
 }
 
 module "secret" {

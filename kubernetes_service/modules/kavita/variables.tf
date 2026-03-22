@@ -7,7 +7,8 @@ variable "namespace" {
 }
 
 variable "release" {
-  type = string
+  type    = string
+  default = "0.1.0"
 }
 
 variable "replicas" {

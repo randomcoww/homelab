@@ -1,77 +1,74 @@
 locals {
   metrics_port = 9002
-}
 
-module "metadata" {
-  source      = "../../../modules/metadata"
-  name        = var.name
-  namespace   = var.namespace
-  release     = var.release
-  app_version = var.release
-  manifests = {
-    "templates/secret.yaml"      = module.secret.manifest
-    "templates/statefulset.yaml" = module.statefulset.manifest
-    "templates/role.yaml" = yamlencode({
-      apiVersion = "rbac.authorization.k8s.io/v1"
-      kind       = "Role"
-      metadata = {
-        name = var.name
-        labels = {
-          app     = var.name
-          release = var.release
-        }
-      }
-      rules = [
-        {
-          apiGroups = [""]
-          resources = ["secrets"]
-          verbs     = ["create"]
-        },
-        {
-          apiGroups = [""]
-          resourceNames = [
-            for i, _ in range(var.replicas) :
-            "${var.name}-${i}"
-          ]
-          resources = ["secrets"]
-          verbs     = ["get", "update", "patch"]
-        },
-      ]
-    })
-    "templates/rolebinding.yaml" = yamlencode({
-      apiVersion = "rbac.authorization.k8s.io/v1"
-      kind       = "RoleBinding"
-      metadata = {
-        name = var.name
-        labels = {
-          app     = var.name
-          release = var.release
-        }
-      }
-      roleRef = {
-        apiGroup = "rbac.authorization.k8s.io"
-        kind     = "Role"
-        name     = var.name
-      }
-      subjects = [
-        {
-          kind = "ServiceAccount"
+  manifests = concat([
+    module.secret.manifest,
+    module.statefulset.manifest,
+    ], [
+    for _, m in [
+      {
+        apiVersion = "rbac.authorization.k8s.io/v1"
+        kind       = "Role"
+        metadata = {
           name = var.name
-        },
-      ]
-    })
-    "templates/serviceaccount.yaml" = yamlencode({
-      apiVersion = "v1"
-      kind       = "ServiceAccount"
-      metadata = {
-        name = var.name
-        labels = {
-          app     = var.name
-          release = var.release
+          labels = {
+            app     = var.name
+            release = var.release
+          }
         }
-      }
-    })
-  }
+        rules = [
+          {
+            apiGroups = [""]
+            resources = ["secrets"]
+            verbs     = ["create"]
+          },
+          {
+            apiGroups = [""]
+            resourceNames = [
+              for i, _ in range(var.replicas) :
+              "${var.name}-${i}"
+            ]
+            resources = ["secrets"]
+            verbs     = ["get", "update", "patch"]
+          },
+        ]
+      },
+      {
+        apiVersion = "rbac.authorization.k8s.io/v1"
+        kind       = "RoleBinding"
+        metadata = {
+          name = var.name
+          labels = {
+            app     = var.name
+            release = var.release
+          }
+        }
+        roleRef = {
+          apiGroup = "rbac.authorization.k8s.io"
+          kind     = "Role"
+          name     = var.name
+        }
+        subjects = [
+          {
+            kind = "ServiceAccount"
+            name = var.name
+          },
+        ]
+      },
+      {
+        apiVersion = "v1"
+        kind       = "ServiceAccount"
+        metadata = {
+          name = var.name
+          labels = {
+            app     = var.name
+            release = var.release
+          }
+        }
+      },
+    ] :
+    yamlencode(m)
+  ])
 }
 
 module "secret" {

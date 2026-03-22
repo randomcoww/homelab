@@ -1,3 +1,3 @@
-output "chart" {
-  value = module.metadata.chart
+output "manifests" {
+  value = local.manifests
 }
