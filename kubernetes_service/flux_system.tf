@@ -15,6 +15,75 @@ resource "helm_release" "system" {
   values = [
     yamlencode({ manifests = concat([
       for _, m in [
+        # Kubelet CSR approver
+        {
+          apiVersion = "source.toolkit.fluxcd.io/v1"
+          kind       = "HelmRepository"
+          metadata = {
+            name      = "kubelet-csr-approver"
+            namespace = "kube-system"
+          }
+          spec = {
+            interval = "15m"
+            url      = "https://postfinance.github.io/kubelet-csr-approver"
+          }
+        },
+        {
+          apiVersion = "helm.toolkit.fluxcd.io/v2"
+          kind       = "HelmRelease"
+          metadata = {
+            name      = "kubelet-csr-approver"
+            namespace = "kube-system"
+          }
+          spec = {
+            interval = "15m"
+            timeout  = "5m"
+            chart = {
+              spec = {
+                chart   = "kubelet-csr-approver"
+                version = "1.2.13"
+                sourceRef = {
+                  kind = "HelmRepository"
+                  name = "kubelet-csr-approver"
+                }
+                interval = "5m"
+              }
+            }
+            releaseName = "kubelet-csr-approver"
+            install = {
+              remediation = {
+                retries = -1
+              }
+            }
+            upgrade = {
+              remediation = {
+                retries = -1
+              }
+            }
+            test = {
+              enable = false
+            }
+            values = {
+              global = {
+                clusterDomain = local.domains.kubernetes
+              }
+              providerRegex       = "^k-\\d+$"
+              bypassDnsResolution = true
+              bypassHostnameCheck = true
+              providerIpPrefixes = [
+                local.networks.service.prefix,
+              ]
+              metrics = {
+                enable = true
+                port   = local.service_ports.metrics
+                annotations = {
+                  "prometheus.io/scrape" = "true"
+                  "prometheus.io/port"   = tostring(local.service_ports.metrics)
+                }
+              }
+            }
+          }
+        },
 
         # k8s-gateway
         {
@@ -85,6 +154,29 @@ resource "helm_release" "system" {
                 type              = "LoadBalancer"
                 loadBalancerIP    = local.services.k8s_gateway.ip
                 loadBalancerClass = "kube-vip.io/kube-vip-class"
+              }
+              customLabels = {
+                app = local.endpoints.k8s_gateway.name
+              }
+              affinity = {
+                podAntiAffinity = {
+                  requiredDuringSchedulingIgnoredDuringExecution = [
+                    {
+                      labelSelector = {
+                        matchExpressions = [
+                          {
+                            key      = "app"
+                            operator = "In"
+                            values = [
+                              local.endpoints.k8s_gateway.name,
+                            ]
+                          },
+                        ]
+                      }
+                      topologyKey = "kubernetes.io/hostname"
+                    },
+                  ]
+                }
               }
               replicaCount = 3
               extraZonePlugins = concat([
@@ -611,6 +703,29 @@ resource "helm_release" "system" {
                 "--kubelet-use-node-status-port",
                 "--v=2",
               ]
+              podLabels = {
+                app = "metrics-server"
+              }
+              affinity = {
+                podAntiAffinity = {
+                  requiredDuringSchedulingIgnoredDuringExecution = [
+                    {
+                      labelSelector = {
+                        matchExpressions = [
+                          {
+                            key      = "app"
+                            operator = "In"
+                            values = [
+                              "metrics-server",
+                            ]
+                          },
+                        ]
+                      }
+                      topologyKey = "kubernetes.io/hostname"
+                    },
+                  ]
+                }
+              }
               dnsConfig = {
                 options = [
                   {

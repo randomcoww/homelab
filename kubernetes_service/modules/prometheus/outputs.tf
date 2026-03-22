@@ -67,6 +67,9 @@ output "flux_manifests" {
                 enabled = false
               }
               replicaCount = 2
+              statefulSet = {
+                enabled = true
+              }
               global = {
                 scrape_interval     = "10s"
                 scrape_timeout      = "4s"
@@ -116,6 +119,29 @@ output "flux_manifests" {
                   }
                 },
               ]
+              podLabels = {
+                app = var.name
+              }
+              affinity = {
+                podAntiAffinity = {
+                  requiredDuringSchedulingIgnoredDuringExecution = [
+                    {
+                      labelSelector = {
+                        matchExpressions = [
+                          {
+                            key      = "app"
+                            operator = "In"
+                            values = [
+                              var.name,
+                            ]
+                          },
+                        ]
+                      }
+                      topologyKey = "kubernetes.io/hostname"
+                    },
+                  ]
+                }
+              }
             }
             extraScrapeConfigs = var.scrape_configs
             serverFiles        = var.server_files

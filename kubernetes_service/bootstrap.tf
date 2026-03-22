@@ -247,6 +247,29 @@ resource "helm_release" "kube-dns" {
       service = {
         clusterIP = local.services.cluster_dns.ip
       }
+      customLabels = {
+        app = local.endpoints.kube_dns.name
+      }
+      affinity = {
+        podAntiAffinity = {
+          requiredDuringSchedulingIgnoredDuringExecution = [
+            {
+              labelSelector = {
+                matchExpressions = [
+                  {
+                    key      = "app"
+                    operator = "In"
+                    values = [
+                      local.endpoints.kube_dns.name,
+                    ]
+                  },
+                ]
+              }
+              topologyKey = "kubernetes.io/hostname"
+            },
+          ]
+        }
+      }
       priorityClassName = "system-cluster-critical"
       servers = [
         {
@@ -307,41 +330,6 @@ resource "helm_release" "kube-dns" {
           ])
         },
       ]
-    }),
-  ]
-}
-
-# Kubelet CSR approver
-
-resource "helm_release" "kubelet-csr-approver" {
-  name             = "kubelet-csr-approver"
-  namespace        = "kube-system"
-  repository       = "https://postfinance.github.io/kubelet-csr-approver"
-  chart            = "kubelet-csr-approver"
-  create_namespace = true
-  wait             = false
-  wait_for_jobs    = false
-  version          = "1.2.13"
-  max_history      = 2
-  values = [
-    yamlencode({
-      global = {
-        clusterDomain = local.domains.kubernetes
-      }
-      providerRegex       = "^k-\\d+$"
-      bypassDnsResolution = true
-      bypassHostnameCheck = true
-      providerIpPrefixes = [
-        local.networks.service.prefix,
-      ]
-      metrics = {
-        enable = true
-        port   = local.service_ports.metrics
-        annotations = {
-          "prometheus.io/scrape" = "true"
-          "prometheus.io/port"   = tostring(local.service_ports.metrics)
-        }
-      }
     }),
   ]
 }

@@ -442,9 +442,9 @@ module "prometheus" {
               }
               expr = <<-EOF
               (
-                absent(up{app_kubernetes_io_instance="${local.endpoints.kube_dns.name}",namespace="${local.endpoints.kube_dns.namespace}"})
+                absent(up{app="${local.endpoints.kube_dns.name}",namespace="${local.endpoints.kube_dns.namespace}"})
               or
-                changes(up{app_kubernetes_io_instance="${local.endpoints.kube_dns.name}",namespace="${local.endpoints.kube_dns.namespace}"}[1m]) > 1
+                changes(up{app="${local.endpoints.kube_dns.name}",namespace="${local.endpoints.kube_dns.namespace}"}[1m]) > 1
               )
               EOF
               for  = "1m"
