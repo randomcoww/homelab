@@ -9,25 +9,18 @@ locals {
     SEARXNG_PORT            = 8080
     SEARXNG_SECRET          = random_password.searxng-secret.result
   })
+
+  manifests = [
+    module.deployment.manifest,
+    module.secret.manifest,
+    module.service.manifest,
+    module.httproute.manifest,
+  ]
 }
 
 resource "random_password" "searxng-secret" {
   length  = 30
   special = false
-}
-
-module "metadata" {
-  source      = "../../../modules/metadata"
-  name        = var.name
-  namespace   = var.namespace
-  release     = var.release
-  app_version = var.release
-  manifests = {
-    "templates/deployment.yaml" = module.deployment.manifest
-    "templates/secret.yaml"     = module.secret.manifest
-    "templates/service.yaml"    = module.service.manifest
-    "templates/httproute.yaml"  = module.httproute.manifest
-  }
 }
 
 module "secret" {

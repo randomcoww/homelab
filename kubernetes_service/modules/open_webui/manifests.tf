@@ -38,6 +38,71 @@ locals {
   })
   kubernetes_mcp_port      = 8081
   kubernetes_mcp_cert_path = "/etc/kubernetes-mcp-server/tls"
+
+  manifests = concat([
+    module.statefulset.manifest,
+    module.secret.manifest,
+    module.tls-kubernetes-mcp.manifest,
+    module.service.manifest,
+    module.httproute.manifest,
+    ], [
+    for _, m in [
+      # kubernetes-mcp
+      {
+        apiVersion = "v1"
+        kind       = "ServiceAccount"
+        metadata = {
+          name = var.name
+          labels = {
+            app     = var.name
+            release = var.release
+          }
+        }
+      },
+      {
+        apiVersion = "rbac.authorization.k8s.io/v1"
+        kind       = "ClusterRole"
+        metadata = {
+          name = var.name
+          labels = {
+            app     = var.name
+            release = var.release
+          }
+        }
+        rules = [
+          {
+            apiGroups = ["*"]
+            resources = ["*"]
+            verbs     = ["list", "watch", "get"]
+          },
+        ]
+      },
+      {
+        apiVersion = "rbac.authorization.k8s.io/v1"
+        kind       = "ClusterRoleBinding"
+        metadata = {
+          name = var.name
+          labels = {
+            app     = var.name
+            release = var.release
+          }
+        }
+        roleRef = {
+          apiGroup = "rbac.authorization.k8s.io"
+          kind     = "ClusterRole"
+          name     = var.name
+        }
+        subjects = [
+          {
+            kind      = "ServiceAccount"
+            name      = var.name
+            namespace = var.namespace
+          },
+        ]
+      },
+    ] :
+    yamlencode(m)
+  ], module.litestream-overlay.additional_manifests)
 }
 
 resource "random_password" "webui-secret-key" {
@@ -53,78 +118,6 @@ resource "random_password" "client-info-encryption-key" {
 resource "random_password" "session-token-encryption-key" {
   length  = 64
   special = false
-}
-
-module "metadata" {
-  source      = "../../../modules/metadata"
-  name        = var.name
-  namespace   = var.namespace
-  release     = var.release
-  app_version = var.release
-  manifests = merge({
-    "templates/statefulset.yaml"        = module.statefulset.manifest
-    "templates/secret.yaml"             = module.secret.manifest
-    "templates/tls-kubernetes-mcp.yaml" = module.tls-kubernetes-mcp.manifest
-    "templates/service.yaml"            = module.service.manifest
-    "templates/httproute.yaml"          = module.httproute.manifest
-
-    # kubernetes-mcp
-    "templates/mcp-serviceaccount.yaml" = yamlencode({
-      apiVersion = "v1"
-      kind       = "ServiceAccount"
-      metadata = {
-        name = var.name
-        labels = {
-          app     = var.name
-          release = var.release
-        }
-      }
-    })
-    "templates/mcp-clusterrole.yaml" = yamlencode({
-      apiVersion = "rbac.authorization.k8s.io/v1"
-      kind       = "ClusterRole"
-      metadata = {
-        name = var.name
-        labels = {
-          app     = var.name
-          release = var.release
-        }
-      }
-      rules = [
-        {
-          apiGroups = ["*"]
-          resources = ["*"]
-          verbs     = ["list", "watch", "get"]
-        },
-      ]
-    })
-    "templates/mcp-clusterrolebinding.yaml" = yamlencode({
-      apiVersion = "rbac.authorization.k8s.io/v1"
-      kind       = "ClusterRoleBinding"
-      metadata = {
-        name = var.name
-        labels = {
-          app     = var.name
-          release = var.release
-        }
-      }
-      roleRef = {
-        apiGroup = "rbac.authorization.k8s.io"
-        kind     = "ClusterRole"
-        name     = var.name
-      }
-      subjects = [
-        {
-          kind      = "ServiceAccount"
-          name      = var.name
-          namespace = var.namespace
-        },
-      ]
-    })
-    }, {
-    for i, m in module.litestream-overlay.additional_manifests :
-    "templates/litestream-${i}.yaml" => m
-  })
 }
 
 module "secret" {

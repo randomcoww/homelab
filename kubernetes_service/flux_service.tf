@@ -16,12 +16,94 @@ resource "helm_release" "service" {
   values = [
     yamlencode({ manifests = concat([
       for _, m in [
-
+        {
+          apiVersion = "source.toolkit.fluxcd.io/v1"
+          kind       = "HelmRepository"
+          metadata = {
+            name      = "cloudflare-tunnel"
+            namespace = "default"
+          }
+          spec = {
+            interval = "15m"
+            url      = "https://cloudflare.github.io/helm-charts/"
+          }
+        },
+        {
+          apiVersion = "helm.toolkit.fluxcd.io/v2"
+          kind       = "HelmRelease"
+          metadata = {
+            name      = "cloudflare-tunnel"
+            namespace = "default"
+          }
+          spec = {
+            interval = "15m"
+            timeout  = "5m"
+            chart = {
+              spec = {
+                chart   = "cloudflare-tunnel"
+                version = "0.3.2"
+                sourceRef = {
+                  kind = "HelmRepository"
+                  name = "cloudflare-tunnel"
+                }
+                interval = "5m"
+              }
+            }
+            releaseName = "cloudflare-tunnel"
+            install = {
+              remediation = {
+                retries = -1
+              }
+            }
+            upgrade = {
+              remediation = {
+                retries = -1
+              }
+            }
+            test = {
+              enable = false
+            }
+            values = {
+              image = {
+                repository = regex(local.container_image_regex, local.container_images.cloudflared).depName
+                tag        = regex(local.container_image_regex, local.container_images.cloudflared).tag
+              }
+              cloudflare = {
+                account    = data.terraform_remote_state.sr.outputs.cloudflare_tunnel.account_id
+                tunnelName = data.terraform_remote_state.sr.outputs.cloudflare_tunnel.name
+                tunnelId   = data.terraform_remote_state.sr.outputs.cloudflare_tunnel.id
+                secret     = data.terraform_remote_state.sr.outputs.cloudflare_tunnel.tunnel_secret
+                ingress = [
+                  {
+                    hostname = "*.${local.domains.public}"
+                    service  = "https://${local.endpoints.traefik.service}"
+                  },
+                ]
+              }
+              resources = {
+                requests = {
+                  memory = "128Mi"
+                }
+                limits = {
+                  memory = "128Mi"
+                }
+              }
+            }
+          }
+        },
       ] :
       yamlencode(m)
       ],
       module.lldap.flux_manifests,
       module.authelia.flux_manifests,
+      module.llama-cpp.flux_manifests,
+      # module.sunshine-desktop.flux_manifests,
+      module.searxng.flux_manifests,
+      module.open-webui.flux_manifests,
+      module.tailscale.flux_manifests,
+      module.hostapd.flux_manifests,
+      module.qrcode-hostapd.flux_manifests,
+      module.kavita.flux_manifests,
     ) }),
   ]
 }

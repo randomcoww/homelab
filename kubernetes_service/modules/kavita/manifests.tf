@@ -4,27 +4,17 @@ locals {
   appsettings_file = "/kavita/config/appsettings.json" # not configurable
   db_file          = "/kavita/config/kavita.db"        # not configurable
   covers_path      = "/kavita/config/covers"           # not configurable
+
+  manifests = concat([
+    module.statefulset.manifest,
+    module.secret.manifest,
+    module.service.manifest,
+    module.httproute.manifest,
+  ], module.litestream-overlay.additional_manifests)
 }
 
 resource "random_bytes" "jwt-secret" {
   length = 256
-}
-
-module "metadata" {
-  source      = "../../../modules/metadata"
-  name        = var.name
-  namespace   = var.namespace
-  release     = var.release
-  app_version = var.release
-  manifests = merge({
-    "templates/statefulset.yaml" = module.statefulset.manifest
-    "templates/secret.yaml"      = module.secret.manifest
-    "templates/service.yaml"     = module.service.manifest
-    "templates/httproute.yaml"   = module.httproute.manifest
-    }, {
-    for i, m in module.litestream-overlay.additional_manifests :
-    "templates/litestream-${i}.yaml" => m
-  })
 }
 
 module "secret" {

@@ -19,6 +19,14 @@ locals {
   sunshine_prep_cmd_file = "/usr/local/bin/sunshine-prep-cmd.sh"
   gamescope_cmd_file     = "/usr/local/bin/gamescope-launch"
   ge_proton_update       = "/usr/local/bin/ge-protonup"
+
+  manifests = [
+    module.secret.manifest,
+    module.service.manifest,
+    module.web-service.manifest,
+    module.httproute.manifest,
+    module.statefulset.manifest,
+  ]
 }
 
 # bypassed through nginx - no need to expose
@@ -31,21 +39,6 @@ resource "random_password" "username" {
 resource "random_password" "password" {
   length  = 16
   special = false
-}
-
-module "metadata" {
-  source      = "../../../modules/metadata"
-  name        = var.name
-  namespace   = var.namespace
-  release     = var.release
-  app_version = var.release
-  manifests = {
-    "templates/secret.yaml"      = module.secret.manifest
-    "templates/service.yaml"     = module.service.manifest
-    "templates/web-service.yaml" = module.web-service.manifest
-    "templates/httproute.yaml"   = module.httproute.manifest
-    "templates/statefulset.yaml" = module.statefulset.manifest
-  }
 }
 
 module "secret" {
