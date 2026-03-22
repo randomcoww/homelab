@@ -249,7 +249,7 @@ resource "helm_release" "system" {
             chart = {
               spec = {
                 chart   = "traefik"
-                version = "39.0.5" # renovate: datasource=helm depName=traefik registryUrl=https://traefik.github.io/charts
+                version = "39.0.6" # renovate: datasource=helm depName=traefik registryUrl=https://traefik.github.io/charts
                 sourceRef = {
                   kind = "HelmRepository"
                   name = local.endpoints.traefik.name
