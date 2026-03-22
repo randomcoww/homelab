@@ -83,7 +83,7 @@ output "flux_manifests" {
           chart = {
             spec = {
               chart   = "authelia"
-              version = "0.10.50"
+              version = "0.10.50" # renovate: datasource=helm depName=authelia registryUrl=https://charts.authelia.com
               sourceRef = {
                 kind = "HelmRepository"
                 name = var.name

@@ -41,7 +41,7 @@ resource "helm_release" "service" {
             chart = {
               spec = {
                 chart   = "cloudflare-tunnel"
-                version = "0.3.2"
+                version = "0.3.2" # renovate: datasource=helm depName=cloudflare-tunnel registryUrl=https://cloudflare.github.io/helm-charts
                 sourceRef = {
                   kind = "HelmRepository"
                   name = "cloudflare-tunnel"

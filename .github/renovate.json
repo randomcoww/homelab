@@ -11,7 +11,7 @@
     {
       "customType": "regex",
       "managerFilePatterns": [
-        "/^config_env.tf$/"
+        "/^config_env\\.tf$/"
       ],
       "matchStrings": [
         "(?<depName>(?<repository>[a-z0-9.-]+(?::\\d+|)(?:/[a-z0-9-]+|)+)/(?<image>[a-z0-9.-]+)):(?<tag>(?<currentValue>(?<version>[\\w.]+)(?:-(?<compat>[\\w.-]+))?)(?:@(?<currentDigest>sha256:[a-f0-9]+))?)"
@@ -22,10 +22,10 @@
     {
       "customType": "regex",
       "managerFilePatterns": [
-        "/^config_env.tf$/"
+        "/\\.tf$/"
       ],
       "matchStrings": [
-        "\"(?<currentValue>[^\"]+)\" # renovate: datasource=(?<datasource>[a-zA-Z0-9-._]+?) depName=(?<depName>[^\\s]+?)\\s"
+        "\"(?<currentValue>[^\"]+)\" # renovate: datasource=(?<datasource>[a-zA-Z0-9-._]+?) depName=(?<depName>[^\\s]+?)(?: registryUrl=(?<registryUrl>[^\\s]+?))?\\s"
       ],
       "versioningTemplate": "docker"
     }

@@ -83,7 +83,7 @@ output "flux_manifests" {
           chart = {
             spec = {
               chart   = "minio"
-              version = "5.4.0"
+              version = "5.4.0" # renovate: datasource=helm depName=minio registryUrl=https://charts.min.io
               sourceRef = {
                 kind = "HelmRepository"
                 name = var.name

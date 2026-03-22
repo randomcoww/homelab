@@ -28,7 +28,7 @@ output "flux_manifests" {
           chart = {
             spec = {
               chart   = "prometheus"
-              version = "28.14.0"
+              version = "28.14.0" # renovate: datasource=helm depName=prometheus registryUrl=https://prometheus-community.github.io/helm-charts
               sourceRef = {
                 kind = "HelmRepository"
                 name = var.name
@@ -175,7 +175,7 @@ output "flux_manifests" {
           chart = {
             spec = {
               chart   = "prometheus-node-exporter"
-              version = "4.52.1"
+              version = "4.52.1" # renovate: datasource=helm depName=prometheus-node-exporter registryUrl=https://prometheus-community.github.io/helm-charts
               sourceRef = {
                 kind = "HelmRepository"
                 name = var.name
@@ -224,7 +224,7 @@ output "flux_manifests" {
           chart = {
             spec = {
               chart   = "prometheus-systemd-exporter"
-              version = "0.5.2"
+              version = "0.5.2" # renovate: datasource=helm depName=prometheus-systemd-exporter registryUrl=https://prometheus-community.github.io/helm-charts
               sourceRef = {
                 kind = "HelmRepository"
                 name = var.name

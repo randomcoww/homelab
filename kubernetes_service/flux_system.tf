@@ -41,7 +41,7 @@ resource "helm_release" "system" {
             chart = {
               spec = {
                 chart   = "kubelet-csr-approver"
-                version = "1.2.13"
+                version = "1.2.13" # renovate: datasource=helm depName=kubelet-csr-approver registryUrl=https://postfinance.github.io/kubelet-csr-approver
                 sourceRef = {
                   kind = "HelmRepository"
                   name = "kubelet-csr-approver"
@@ -111,7 +111,7 @@ resource "helm_release" "system" {
             chart = {
               spec = {
                 chart   = "k8s-gateway"
-                version = "3.4.2"
+                version = "3.4.2" # renovate: datasource=helm depName=k8s-gateway registryUrl=https://k8s-gateway.github.io/k8s_gateway
                 sourceRef = {
                   kind = "HelmRepository"
                   name = local.endpoints.k8s_gateway.name
@@ -249,7 +249,7 @@ resource "helm_release" "system" {
             chart = {
               spec = {
                 chart   = "traefik"
-                version = "39.0.5"
+                version = "39.0.5" # renovate: datasource=helm depName=traefik registryUrl=https://traefik.github.io/charts
                 sourceRef = {
                   kind = "HelmRepository"
                   name = local.endpoints.traefik.name
@@ -382,7 +382,7 @@ resource "helm_release" "system" {
             chart = {
               spec = {
                 chart   = "cert-manager"
-                version = "1.20.0"
+                version = "1.20.0" # renovate: datasource=helm depName=cert-manager registryUrl=https://charts.jetstack.io
                 sourceRef = {
                   kind = "HelmRepository"
                   name = "cert-manager"
@@ -595,7 +595,7 @@ resource "helm_release" "system" {
             chart = {
               spec = {
                 chart   = "local-path-provisioner"
-                version = "0.0.36"
+                version = "0.0.36" # renovate: datasource=helm depName=local-path-provisioner registryUrl=https://charts.containeroo.ch
                 sourceRef = {
                   kind = "HelmRepository"
                   name = "local-path-provisioner"
@@ -672,7 +672,7 @@ resource "helm_release" "system" {
             chart = {
               spec = {
                 chart   = "metrics-server"
-                version = "3.13.0"
+                version = "3.13.0" # renovate: datasource=helm depName=metrics-server registryUrl=https://kubernetes-sigs.github.io/metrics-server
                 sourceRef = {
                   kind = "HelmRepository"
                   name = "metrics-server"
@@ -764,7 +764,7 @@ resource "helm_release" "system" {
             chart = {
               spec = {
                 chart   = "node-feature-discovery"
-                version = "0.18.3"
+                version = "0.18.3" # renovate: datasource=helm depName=node-feature-discovery registryUrl=https://kubernetes-sigs.github.io/node-feature-discovery/charts
                 sourceRef = {
                   kind = "HelmRepository"
                   name = "node-feature-discovery"
@@ -846,7 +846,7 @@ resource "helm_release" "system" {
             chart = {
               spec = {
                 chart   = "amd-gpu"
-                version = "0.21.0"
+                version = "0.21.0" # renovate: datasource=helm depName=amd-gpu registryUrl=https://rocm.github.io/k8s-device-plugin
                 sourceRef = {
                   kind = "HelmRepository"
                   name = "amd-gpu"
@@ -925,7 +925,7 @@ resource "helm_release" "system" {
             chart = {
               spec = {
                 chart   = "kured"
-                version = "5.11.0"
+                version = "5.11.0" # renovate: datasource=helm depName=kured registryUrl=https://kubereboot.github.io/charts
                 sourceRef = {
                   kind = "HelmRepository"
                   name = "kured"
