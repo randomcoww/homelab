@@ -1013,4 +1013,8 @@ resource "helm_release" "system" {
       module.gha-runner.flux_manifests,
     ) }),
   ]
+
+  depends_on = [
+    helm_release.flux2,
+  ]
 }

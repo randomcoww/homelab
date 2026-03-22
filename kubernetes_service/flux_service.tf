@@ -106,4 +106,8 @@ resource "helm_release" "service" {
       module.kavita.flux_manifests,
     ) }),
   ]
+
+  depends_on = [
+    helm_release.flux2,
+  ]
 }
