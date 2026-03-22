@@ -233,29 +233,6 @@ resource "helm_release" "kube-dns" {
       service = {
         clusterIP = local.services.cluster_dns.ip
       }
-      customLabels = {
-        app = local.endpoints.kube_dns.name
-      }
-      affinity = {
-        podAntiAffinity = {
-          requiredDuringSchedulingIgnoredDuringExecution = [
-            {
-              labelSelector = {
-                matchExpressions = [
-                  {
-                    key      = "app"
-                    operator = "In"
-                    values = [
-                      local.endpoints.kube_dns.name,
-                    ]
-                  },
-                ]
-              }
-              topologyKey = "kubernetes.io/hostname"
-            },
-          ]
-        }
-      }
       priorityClassName = "system-cluster-critical"
       servers = [
         {
