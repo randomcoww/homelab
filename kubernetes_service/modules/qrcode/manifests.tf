@@ -137,10 +137,10 @@ module "deployment" {
   template_spec = {
     resources = {
       requests = {
-        memory = "16Mi"
+        memory = "32Mi"
       }
       limits = {
-        memory = "16Mi"
+        memory = "32Mi"
       }
     }
     containers = [

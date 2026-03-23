@@ -81,10 +81,10 @@ module "statefulset" {
     dnsPolicy   = "ClusterFirstWithHostNet"
     resources = {
       requests = {
-        memory = "16Mi"
+        memory = "32Mi"
       }
       limits = {
-        memory = "16Mi"
+        memory = "32Mi"
       }
     }
     containers = [
