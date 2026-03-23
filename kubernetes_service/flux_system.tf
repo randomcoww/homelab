@@ -76,10 +76,6 @@ resource "helm_release" "system" {
               metrics = {
                 enable = true
                 port   = local.service_ports.metrics
-                annotations = {
-                  "prometheus.io/scrape" = "true"
-                  "prometheus.io/port"   = tostring(local.service_ports.metrics)
-                }
               }
             }
           }
