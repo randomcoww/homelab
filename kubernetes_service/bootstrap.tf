@@ -178,6 +178,9 @@ resource "helm_release" "bootstrap" {
       yamlencode(m)
     ] }),
   ]
+  depends_on = [
+    kubernetes_labels.labels,
+  ]
 }
 
 # kube-proxy
@@ -195,6 +198,9 @@ resource "helm_release" "kube-proxy" {
       manifests = module.kube-proxy.manifests
     }),
   ]
+  depends_on = [
+    kubernetes_labels.labels,
+  ]
 }
 
 # CNI
@@ -211,6 +217,9 @@ resource "helm_release" "flannel" {
     yamlencode({
       manifests = module.flannel.manifests
     }),
+  ]
+  depends_on = [
+    kubernetes_labels.labels,
   ]
 }
 
@@ -332,6 +341,9 @@ resource "helm_release" "kube-dns" {
       ]
     }),
   ]
+  depends_on = [
+    kubernetes_labels.labels,
+  ]
 }
 
 # fluxCD
@@ -359,5 +371,8 @@ resource "helm_release" "flux2" {
         create = false
       }
     }),
+  ]
+  depends_on = [
+    kubernetes_labels.labels,
   ]
 }
