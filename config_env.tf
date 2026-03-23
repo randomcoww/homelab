@@ -285,7 +285,8 @@ locals {
         ingress = "hostapd.${local.domains.public}"
       }
       kavita = {
-        name = "kavita"
+        name   = "kavita"
+        tunnel = true
       }
       llama_cpp = {
         name = "llama-cpp"
@@ -293,6 +294,7 @@ locals {
       open_webui = {
         name    = "open-webui"
         ingress = "owui.${local.domains.public}"
+        tunnel  = true
       }
       lldap = {
         name      = "lldap"
@@ -303,6 +305,7 @@ locals {
         name      = "authelia"
         namespace = "auth"
         ingress   = "auth.${local.domains.public}"
+        tunnel    = true
       }
       sunshine_desktop = {
         name    = "sunshine-desktop"

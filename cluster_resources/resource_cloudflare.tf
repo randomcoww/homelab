@@ -10,12 +10,6 @@ locals {
     "ebooks",
     "music",
   ]
-
-  cloudflare_tunnel_ingress_endpoints = [
-    local.endpoints.authelia.ingress,
-    local.endpoints.kavita.ingress,
-    local.endpoints.open_webui.ingress,
-  ]
 }
 
 data "cloudflare_accounts" "accounts" {
@@ -160,9 +154,9 @@ resource "cloudflare_zero_trust_tunnel_cloudflared_config" "tunnel" {
   tunnel_id  = cloudflare_zero_trust_tunnel_cloudflared.tunnel.id
   config = {
     ingress = concat([
-      for _, hostname in local.cloudflare_tunnel_ingress_endpoints :
+      for _, e in local.endpoints :
       {
-        hostname = hostname
+        hostname = e.ingress
         service  = "https://${local.endpoints.traefik.service}"
         path     = "/"
         # need to remove default params from terrafrom
@@ -176,7 +170,7 @@ resource "cloudflare_zero_trust_tunnel_cloudflared_config" "tunnel" {
           keep_alive_timeout     = 0
           keep_alive_connections = 0
         }
-      }
+      } if lookup(e, "tunnel", false)
       ], [
       {
         service = "http_status:404"
@@ -186,10 +180,13 @@ resource "cloudflare_zero_trust_tunnel_cloudflared_config" "tunnel" {
 }
 
 resource "cloudflare_dns_record" "record" {
-  for_each = toset(local.cloudflare_tunnel_ingress_endpoints)
+  for_each = {
+    for k, e in local.endpoints :
+    k => e.ingress if lookup(e, "tunnel", false)
+  }
 
   zone_id = local.cloudflare_zone_id
-  name    = each.key
+  name    = each.value
   ttl     = 1
   content = "${cloudflare_zero_trust_tunnel_cloudflared.tunnel.id}.cfargotunnel.com"
   type    = "CNAME"

@@ -74,10 +74,11 @@ resource "helm_release" "service" {
                 tunnelId   = data.terraform_remote_state.sr.outputs.cloudflare_tunnel.id
                 secret     = data.terraform_remote_state.sr.outputs.cloudflare_tunnel.tunnel_secret
                 ingress = [
+                  for _, e in local.endpoints :
                   {
-                    hostname = "*.${local.domains.public}"
+                    hostname = e.ingress
                     service  = "https://${local.endpoints.traefik.service}"
-                  },
+                  } if lookup(e, "tunnel", false)
                 ]
               }
               resources = {
