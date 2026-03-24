@@ -175,7 +175,7 @@ output "flux_manifests" {
           chart = {
             spec = {
               chart   = "prometheus-node-exporter"
-              version = "4.52.1" # renovate: datasource=helm depName=prometheus-node-exporter registryUrl=https://prometheus-community.github.io/helm-charts
+              version = "4.52.2" # renovate: datasource=helm depName=prometheus-node-exporter registryUrl=https://prometheus-community.github.io/helm-charts
               sourceRef = {
                 kind = "HelmRepository"
                 name = var.name
