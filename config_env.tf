@@ -122,7 +122,7 @@ locals {
     flannel            = "ghcr.io/flannel-io/flannel:v0.28.1@sha256:6a9c170acece4457ccb9cdfe53c787cc451e87990e20451bf20070b8895fa538"
     flannel_cni_plugin = "ghcr.io/flannel-io/flannel-cni-plugin:v1.9.0-flannel1@sha256:c6a08fe5bcb23b19c2fc7c1e47b95a967cc924224ebedf94e8623f27b6c258fa"
     kube_vip           = "ghcr.io/kube-vip/kube-vip:v1.1.1@sha256:87e88b44edc98f0079eac3e03b2ec4de9bde6ea100acd27a63e738d23b9aedbc"
-    minio              = "cgr.dev/chainguard/minio:latest@sha256:3290091e1c3ea3cf7c7cc2b5a8493a9cf0fe279ec521396086aa76d35196bb9a"
+    minio              = "cgr.dev/chainguard/minio:latest@sha256:e395c92a38f44238f3d4f21b55af0a17328e04ab3c31b8825a7b457f8d69618a"
     nginx              = "docker.io/nginxinc/nginx-unprivileged:1.29.5-alpine@sha256:6582a34398ce9530ea3ae5b46595391a26ef44955335bed21a9afa4c3f715c70"
     # tier 2
     kea           = "reg.cluster.internal/randomcoww/kea:v3.1.6.1774277228@sha256:36182ac837245052bd95d768e3ff913fa4035ff99d8e7ee02198714306acf739"
@@ -135,16 +135,16 @@ locals {
     hostapd          = "reg.cluster.internal/randomcoww/hostapd:v2.11.1774277249@sha256:248ca7083fb75a767bd6c74a7bc90dbb8ec44bf9b82caf3b138fb45f698ca166"
     tailscale        = "ghcr.io/tailscale/tailscale:v1.94.2@sha256:95e528798bebe75f39b10e74e7051cf51188ee615934f232ba7ad06a3390ffa1"
     qrcode_generator = "reg.cluster.internal/randomcoww/qrcode-resource:v1774277541@sha256:a4d05cf7cc0dd9af70590247957119b0a907e6ae3eccd71105ef341bcb18f966"
-    llama_cpp_vulkan = "ghcr.io/mostlygeek/llama-swap:vulkan@sha256:ca16615ae40d637f101c8f510595956f72fa81c813fe77778279500f6a3e9d34"
+    llama_cpp_vulkan = "ghcr.io/mostlygeek/llama-swap:vulkan@sha256:acf08c3f811503401a8998c5344fca3f09a61d9c0713200adfb0301a3da45247"
     litestream       = "docker.io/litestream/litestream:0.5.10@sha256:66c0ef32779b20f7ce682751ec50ba0f1363cad5cb9dba1e23fbeee6ae3197b9"
-    searxng          = "ghcr.io/searxng/searxng:latest@sha256:7aa203b367ed02eaacd44a17794726d5a16b5c4904c87062ea6c6fa846df20e8"
+    searxng          = "ghcr.io/searxng/searxng:latest@sha256:5cb5844fcb0f6e739cca03352a9d48e6e936323cb90f717cd07cee872b6d081a"
     open_webui       = "ghcr.io/open-webui/open-webui:v0.8.10@sha256:ee057955040ce91e3e787e4b7978c9c23e828972c68d01d787ed40f9a307df9f"
     kavita           = "ghcr.io/kareadita/kavita:0.8.9@sha256:1f2acae7466d022f037ea09f7989eb7c487f916b881174c7a6de33dbfa8acb39"
     lldap            = "ghcr.io/lldap/lldap:latest-alpine@sha256:af6daf88e67b2c6885d2426f711cb241751b515cc36a995d36ba77f2ffd199fb"
     authelia         = "ghcr.io/authelia/authelia:4.39.16@sha256:edbce01c5125249e4f4faea01e0f76f0031d64b4a1d0c2514a0ca69cb126d05f"
     cloudflared      = "docker.io/cloudflare/cloudflared:2026.3.0@sha256:6b599ca3e974349ead3286d178da61d291961182ec3fe9c505e1dd02c8ac31b0"
     sunshine_desktop = "reg.cluster.internal/randomcoww/sunshine-desktop:v2026.322.21442.1774277610@sha256:b140f163db4f534901a957bb3b55db965682ecb401d504056538433f060f6dc9"
-    kubernetes_mcp   = "ghcr.io/containers/kubernetes-mcp-server:latest@sha256:501b0ee0f803a718d9850bce63a6497bfd38a083419e50158a046e4c4adce208"
+    kubernetes_mcp   = "ghcr.io/containers/kubernetes-mcp-server:latest@sha256:6e2c000f64a416fed00a50dfa90ffccc88afdb1a80f3f4c8893a5bfacf519a66"
 
     # models (model_file)
     "v5-small-text-matching-Q8_0.gguf"                                = "reg.cluster.internal/randomcoww/jina-embeddings-v5-text-small-text-matching-q8-0:v1773615151@sha256:ead9710eb051ea3b6ee32cebc1d1a8ba782c9e589ea972b48b15c173e169c4ee"
