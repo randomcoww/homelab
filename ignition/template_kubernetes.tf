@@ -7,14 +7,30 @@ module "kubernetes-master" {
   for_each = local.members.kubernetes-master
   source   = "./modules/kubernetes_master"
 
-  butane_version  = local.butane_version
-  fw_mark         = local.fw_marks.accept
-  name            = "kube-master"
-  cluster_name    = local.kubernetes.cluster_name
-  front_proxy_ca  = data.terraform_remote_state.sr.outputs.kubernetes.front_proxy_ca
-  kubernetes_ca   = data.terraform_remote_state.sr.outputs.kubernetes.ca
-  etcd_ca         = data.terraform_remote_state.sr.outputs.etcd.ca
-  service_account = data.terraform_remote_state.sr.outputs.kubernetes.service_account
+  butane_version = local.butane_version
+  fw_mark        = local.fw_marks.accept
+  name           = "kube-master"
+  cluster_name   = local.kubernetes.cluster_name
+  front_proxy_ca = {
+    algorithm       = tls_private_key.kubernetes-front-proxy-ca.algorithm
+    private_key_pem = tls_private_key.kubernetes-front-proxy-ca.private_key_pem
+    cert_pem        = tls_self_signed_cert.kubernetes-front-proxy-ca.cert_pem
+  }
+  kubernetes_ca = {
+    algorithm       = tls_private_key.kubernetes-ca.algorithm
+    private_key_pem = tls_private_key.kubernetes-ca.private_key_pem
+    cert_pem        = tls_self_signed_cert.kubernetes-ca.cert_pem
+  }
+  etcd_ca = {
+    algorithm       = tls_private_key.etcd-ca.algorithm
+    private_key_pem = tls_private_key.etcd-ca.private_key_pem
+    cert_pem        = tls_self_signed_cert.etcd-ca.cert_pem
+  }
+  service_account = {
+    algorithm       = tls_private_key.service-account.algorithm
+    public_key_pem  = tls_private_key.service-account.public_key_pem
+    private_key_pem = tls_private_key.service-account.private_key_pem
+  }
   etcd_members = {
     for host_key, host in local.members.etcd :
     host_key => host_key == each.key ? "127.0.0.1" : cidrhost(local.networks.etcd.prefix, host.netnum)
@@ -61,12 +77,20 @@ module "kubernetes-worker" {
   for_each = local.members.kubernetes-worker
   source   = "./modules/kubernetes_worker"
 
-  butane_version            = local.butane_version
-  fw_mark                   = local.fw_marks.accept
-  name                      = "kube-worker"
-  cluster_name              = local.kubernetes.cluster_name
-  kubernetes_ca             = data.terraform_remote_state.sr.outputs.kubernetes.ca
-  registry_ca               = data.terraform_remote_state.sr.outputs.trust.ca
+  butane_version = local.butane_version
+  fw_mark        = local.fw_marks.accept
+  name           = "kube-worker"
+  cluster_name   = local.kubernetes.cluster_name
+  kubernetes_ca = {
+    algorithm       = tls_private_key.kubernetes-ca.algorithm
+    private_key_pem = tls_private_key.kubernetes-ca.private_key_pem
+    cert_pem        = tls_self_signed_cert.kubernetes-ca.cert_pem
+  }
+  registry_ca = {
+    algorithm       = tls_private_key.trusted-ca.algorithm
+    private_key_pem = tls_private_key.trusted-ca.private_key_pem
+    cert_pem        = tls_self_signed_cert.trusted-ca.cert_pem
+  }
   host_netnum               = each.value.netnum
   cluster_domain            = local.domains.kubernetes
   apiserver_endpoint        = "https://${local.services.apiserver.ip}:${local.host_ports.apiserver}"
@@ -104,8 +128,16 @@ module "etcd" {
   namespace      = local.endpoints.etcd.namespace
   host_key       = each.key
   cluster_token  = local.kubernetes.cluster_name
-  ca             = data.terraform_remote_state.sr.outputs.etcd.ca
-  peer_ca        = data.terraform_remote_state.sr.outputs.etcd.peer_ca
+  ca = {
+    algorithm       = tls_private_key.etcd-ca.algorithm
+    private_key_pem = tls_private_key.etcd-ca.private_key_pem
+    cert_pem        = tls_self_signed_cert.etcd-ca.cert_pem
+  }
+  peer_ca = {
+    algorithm       = tls_private_key.etcd-peer-ca.algorithm
+    private_key_pem = tls_private_key.etcd-peer-ca.private_key_pem
+    cert_pem        = tls_self_signed_cert.etcd-peer-ca.cert_pem
+  }
   images = {
     etcd         = local.container_images_digest.etcd
     etcd_wrapper = local.container_images_digest.etcd_wrapper

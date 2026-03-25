@@ -23,3 +23,30 @@ output "podlist" {
   }
   sensitive = true
 }
+
+output "kubernetes-ca" {
+  value = {
+    algorithm       = tls_private_key.kubernetes-ca.algorithm
+    private_key_pem = tls_private_key.kubernetes-ca.private_key_pem
+    cert_pem        = tls_self_signed_cert.kubernetes-ca.cert_pem
+  }
+  sensitive = true
+}
+
+output "ssh-ca" {
+  value = {
+    algorithm          = tls_private_key.ssh-ca.algorithm
+    private_key_pem    = tls_private_key.ssh-ca.private_key_pem
+    public_key_openssh = tls_private_key.ssh-ca.public_key_openssh
+  }
+  sensitive = true
+}
+
+output "internal-ca" {
+  value = {
+    algorithm       = tls_private_key.trusted-ca.algorithm
+    private_key_pem = tls_private_key.trusted-ca.private_key_pem
+    cert_pem        = tls_self_signed_cert.trusted-ca.cert_pem
+  }
+  sensitive = true
+}

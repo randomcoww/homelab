@@ -46,7 +46,14 @@ module "server" {
     "${each.value.fqdn}",
     "127.0.0.1",
   ]))
-  ca = data.terraform_remote_state.sr.outputs.ssh.ca
+  ssh_ca = {
+    algorithm          = tls_private_key.ssh-ca.algorithm
+    private_key_pem    = tls_private_key.ssh-ca.private_key_pem
+    public_key_openssh = tls_private_key.ssh-ca.public_key_openssh
+  }
+  internal_ca = {
+    cert_pem = tls_self_signed_cert.trusted-ca.cert_pem
+  }
   # HA config
   keepalived_path       = local.ha.keepalived_config_path
   haproxy_path          = local.ha.haproxy_config_path

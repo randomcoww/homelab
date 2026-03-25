@@ -10,11 +10,17 @@ variable "key_id" {
   type = string
 }
 
-variable "ca" {
+variable "ssh_ca" {
   type = object({
     algorithm          = string
     private_key_pem    = string
     public_key_openssh = string
+  })
+}
+
+variable "internal_ca" {
+  type = object({
+    cert_pem = string
   })
 }
 
