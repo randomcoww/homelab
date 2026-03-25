@@ -107,7 +107,7 @@ resource "helm_release" "system" {
             chart = {
               spec = {
                 chart   = "k8s-gateway"
-                version = "3.4.2" # renovate: datasource=helm depName=k8s-gateway registryUrl=https://k8s-gateway.github.io/k8s_gateway
+                version = "3.6.0" # renovate: datasource=helm depName=k8s-gateway registryUrl=https://k8s-gateway.github.io/k8s_gateway
                 sourceRef = {
                   kind = "HelmRepository"
                   name = local.endpoints.k8s_gateway.name
