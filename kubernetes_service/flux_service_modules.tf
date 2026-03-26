@@ -789,3 +789,38 @@ module "gha-runner" {
   minio_endpoint      = "${local.services.cluster_minio.ip}:${local.service_ports.minio}"
   minio_access_secret = local.minio_users.arc.secret
 }
+
+# Navidrome
+
+module "navidrome" {
+  source    = "./modules/navidrome"
+  name      = local.endpoints.navidrome.name
+  namespace = local.endpoints.navidrome.namespace
+  images = {
+    navidrome  = local.container_images.navidrome
+    mountpoint = local.container_images.mountpoint
+    litestream = local.container_images.litestream
+  }
+  extra_configs = {
+    ND_EXTAUTH_TRUSTEDSOURCES = join(",", [
+      local.networks.kubernetes_pod.prefix,
+    ])
+    ND_ENABLEUSEREDITING  = false
+    TZ                    = local.timezone
+    ND_EXTAUTH_USERHEADER = "Remote-User"
+    ND_SESSIONTIMEOUT     = "24h"
+  }
+  ingress_hostname = local.endpoints.navidrome.ingress
+  gateway_ref = {
+    name      = local.endpoints.traefik.name
+    namespace = local.endpoints.traefik.namespace
+  }
+  middleware_ref = {
+    name      = "forwardauth-authelia"
+    namespace = local.endpoints.traefik.namespace
+  }
+  minio_endpoint      = "https://${local.services.cluster_minio.ip}:${local.service_ports.minio}"
+  minio_data_bucket   = "music"
+  minio_bucket        = "navidrome"
+  minio_access_secret = local.minio_users.navidrome.secret
+}

@@ -324,7 +324,8 @@ resource "helm_release" "system" {
               }
               providers = {
                 kubernetesCRD = {
-                  enabled = false
+                  enabled             = true
+                  allowCrossNamespace = true
                 }
                 kubernetesIngress = {
                   enabled = false
@@ -362,6 +363,28 @@ resource "helm_release" "system" {
                   }
                 }
               }
+              extraObjects = [
+                yamlencode({
+                  apiVersion = "traefik.io/v1alpha1"
+                  kind       = "Middleware"
+                  metadata = {
+                    name      = "forwardauth-authelia"
+                    namespace = local.endpoints.traefik.namespace
+                  }
+                  spec = {
+                    forwardAuth = {
+                      address            = "http://${local.endpoints.authelia.service_fqdn}/api/authz/forward-auth"
+                      trustForwardHeader = true
+                      authResponseHeaders = [
+                        "Remote-User",
+                        "Remote-Groups",
+                        "Remote-Email",
+                        "Remote-Name",
+                      ]
+                    }
+                  }
+                }),
+              ]
             }
           }
         },

@@ -145,6 +145,7 @@ locals {
     cloudflared      = "docker.io/cloudflare/cloudflared:2026.3.0@sha256:6b599ca3e974349ead3286d178da61d291961182ec3fe9c505e1dd02c8ac31b0"
     sunshine_desktop = "reg.cluster.internal/randomcoww/sunshine-desktop:v2026.322.21442.1774277610@sha256:b140f163db4f534901a957bb3b55db965682ecb401d504056538433f060f6dc9"
     kubernetes_mcp   = "ghcr.io/containers/kubernetes-mcp-server:latest@sha256:e8aba0b232c7643cee4dbf48360132923e12d7365b690d046d0125d4bb5f0033"
+    navidrome        = "ghcr.io/navidrome/navidrome:0.60.3@sha256:a5dce8f33304714dd138e870cca0dcab3d937ca236be1a9f2b97da009d1a0048"
 
     # models (model_file)
     "v5-small-text-matching-Q8_0.gguf"                                = "reg.cluster.internal/randomcoww/jina-embeddings-v5-text-small-text-matching-q8-0:v1773615151@sha256:ead9710eb051ea3b6ee32cebc1d1a8ba782c9e589ea972b48b15c173e169c4ee"
@@ -311,6 +312,9 @@ locals {
         name    = "sunshine-desktop"
         service = "sunshine.${local.domains.public}"
         ingress = "sunshine-admin.${local.domains.public}"
+      }
+      navidrome = {
+        name = "navidrome"
       }
     } :
     name => merge(e, {
