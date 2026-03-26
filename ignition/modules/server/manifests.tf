@@ -1,20 +1,24 @@
 locals {
   pki = {
+    internal-ca-cert = {
+      path     = "/etc/pki/ca-trust/source/anchors/internal-ca-cert.pem"
+      contents = var.internal_ca.cert_pem
+    }
     server-private-key = {
-      path     = "/etc/ssh/ssh_host_${lower(var.ca.algorithm)}_key"
+      path     = "/etc/ssh/ssh_host_${lower(var.ssh_ca.algorithm)}_key"
       contents = tls_private_key.ssh-host.private_key_pem
     }
     server-public-key = {
-      path     = "/etc/ssh/ssh_host_${lower(var.ca.algorithm)}_key.pub"
+      path     = "/etc/ssh/ssh_host_${lower(var.ssh_ca.algorithm)}_key.pub"
       contents = tls_private_key.ssh-host.public_key_openssh
     }
     server-certificate = {
-      path     = "/etc/ssh/ssh_host_${lower(var.ca.algorithm)}_key-cert.pub"
+      path     = "/etc/ssh/ssh_host_${lower(var.ssh_ca.algorithm)}_key-cert.pub"
       contents = ssh_host_cert.ssh-host.cert_authorized_key
     }
     known-hosts = {
       path     = "/etc/ssh/ssh_known_hosts"
-      contents = "@cert-authority * ${chomp(var.ca.public_key_openssh)}"
+      contents = "@cert-authority * ${chomp(var.ssh_ca.public_key_openssh)}"
       mode     = 420
     }
   }
@@ -45,7 +49,7 @@ locals {
         users = [
           merge(var.user, {
             ssh_authorized_keys = [
-              "cert-authority ${chomp(var.ca.public_key_openssh)}",
+              "cert-authority ${chomp(var.ssh_ca.public_key_openssh)}",
             ]
           }),
         ]

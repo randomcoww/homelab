@@ -1,19 +1,6 @@
-output "flux_manifests" {
+output "releases" {
   value = [
     for _, m in [
-      # resource
-      {
-        apiVersion = "source.toolkit.fluxcd.io/v1"
-        kind       = "HelmRepository"
-        metadata = {
-          name      = "${var.name}-resources"
-          namespace = var.namespace
-        }
-        spec = {
-          interval = "15m"
-          url      = "https://randomcoww.github.io/homelab/"
-        }
-      },
       {
         apiVersion = "helm.toolkit.fluxcd.io/v2"
         kind       = "HelmRelease"
@@ -28,8 +15,9 @@ output "flux_manifests" {
             spec = {
               chart = "helm-wrapper"
               sourceRef = {
-                kind = "HelmRepository"
-                name = "${var.name}-resources"
+                kind      = "HelmRepository"
+                name      = "wrapper"
+                namespace = "flux-runners"
               }
               interval = "5m"
             }
@@ -106,9 +94,7 @@ output "flux_manifests" {
             enable = false
           }
           values = {
-
             ## manifest start ##
-
             image = {
               registry   = var.images.authelia.registry
               repository = var.images.authelia.repository

@@ -55,7 +55,7 @@ module "minio" {
   }
   minio_credentials  = data.terraform_remote_state.sr.outputs.minio
   cluster_domain     = local.domains.kubernetes
-  ca                 = data.terraform_remote_state.sr.outputs.trust.ca
+  ca                 = data.terraform_remote_state.ignition.outputs.internal_ca
   service_hostname   = local.endpoints.minio.service
   service_ip         = local.services.minio.ip
   cluster_service_ip = local.services.cluster_minio.ip
@@ -73,7 +73,7 @@ module "registry" {
     registry = local.service_ports.registry
     metrics  = local.service_ports.metrics
   }
-  ca                      = data.terraform_remote_state.sr.outputs.trust.ca
+  ca                      = data.terraform_remote_state.ignition.outputs.internal_ca
   loadbalancer_class_name = "kube-vip.io/kube-vip-class"
 
   minio_endpoint      = "${local.services.cluster_minio.ip}:${local.service_ports.minio}"
@@ -107,8 +107,8 @@ module "cert-manager-issuer-ca-internal-secret" {
   app     = "cert-issuer"
   release = "0.1.0"
   data = merge({
-    "tls.crt" = chomp(data.terraform_remote_state.sr.outputs.trust.ca.cert_pem)
-    "tls.key" = chomp(data.terraform_remote_state.sr.outputs.trust.ca.private_key_pem)
+    "tls.crt" = chomp(data.terraform_remote_state.ignition.outputs.internal_ca.cert_pem)
+    "tls.key" = chomp(data.terraform_remote_state.ignition.outputs.internal_ca.private_key_pem)
   })
 }
 
@@ -283,6 +283,43 @@ module "kea" {
     },
   ]
   timezone = local.timezone
+}
+
+# Tailscale remote access
+
+module "tailscale" {
+  source    = "./modules/tailscale"
+  name      = "tailscale"
+  namespace = "tailscale"
+  replicas  = 2
+  images = {
+    tailscale = local.container_images_digest.tailscale
+  }
+  tailscale_auth_key = data.terraform_remote_state.sr.outputs.tailscale_auth_key
+  extra_envs = [
+    {
+      name  = "TS_ACCEPT_DNS"
+      value = false
+    },
+    {
+      name  = "TS_DEBUG_FIREWALL_MODE"
+      value = "nftables"
+    },
+    {
+      name = "TS_EXTRA_ARGS"
+      value = join(",", [
+        "--advertise-exit-node",
+      ])
+    },
+    {
+      name = "TS_ROUTES"
+      value = join(",", distinct([
+        local.networks[local.services.apiserver.network.name].prefix,
+        local.networks.service.prefix,
+        local.networks.kubernetes_service.prefix,
+      ]))
+    },
+  ]
 }
 
 # prometheus
@@ -487,21 +524,4 @@ module "prometheus" {
     name      = local.endpoints.traefik.name
     namespace = local.endpoints.traefik.namespace
   }
-}
-
-# github-actions
-
-module "gha-runner" {
-  source           = "./modules/gha_runner"
-  name             = "gha"
-  namespace        = "arc-systems"
-  runner_namespace = "arc-runners"
-  images = {
-    gha_runner = local.container_images_digest.gha_runner
-  }
-  github_credentials  = var.github
-  internal_ca         = data.terraform_remote_state.sr.outputs.trust.ca
-  registry_endpoint   = "${local.endpoints.registry.service}:${local.service_ports.registry}"
-  minio_endpoint      = "${local.services.cluster_minio.ip}:${local.service_ports.minio}"
-  minio_access_secret = local.minio_users.arc.secret
 }

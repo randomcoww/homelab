@@ -1,4 +1,4 @@
-output "flux_manifests" {
+output "releases" {
   value = [
     for _, m in [
       {

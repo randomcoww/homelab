@@ -1,10 +1,10 @@
 resource "tls_private_key" "ssh-host" {
-  algorithm   = var.ca.algorithm
+  algorithm   = var.ssh_ca.algorithm
   ecdsa_curve = "P521"
 }
 
 resource "ssh_host_cert" "ssh-host" {
-  ca_private_key_pem    = var.ca.private_key_pem
+  ca_private_key_pem    = var.ssh_ca.private_key_pem
   public_key_openssh    = tls_private_key.ssh-host.public_key_openssh
   key_id                = var.key_id
   early_renewal_hours   = var.early_renewal_hours

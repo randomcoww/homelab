@@ -2,20 +2,9 @@ output "ssh_user_cert_authorized_key" {
   value = ssh_user_cert.ssh-client.cert_authorized_key
 }
 
-output "kubernetes_admin" {
-  value = {
-    algorithm       = tls_private_key.kubernetes-admin.algorithm
-    private_key_pem = tls_private_key.kubernetes-admin.private_key_pem
-    cert_pem        = tls_locally_signed_cert.kubernetes-admin.cert_pem
-    ca_cert_pem     = data.terraform_remote_state.sr.outputs.kubernetes.ca.cert_pem
-  }
-  sensitive = true
-}
-
 output "internal_ca" {
   value = {
-    algorithm = data.terraform_remote_state.sr.outputs.trust.ca.algorithm
-    cert_pem  = data.terraform_remote_state.sr.outputs.trust.ca.cert_pem
+    cert_pem = data.terraform_remote_state.ignition.outputs.internal_ca.cert_pem
   }
 }
 
@@ -27,18 +16,23 @@ output "registry_client" {
   sensitive = true
 }
 
-output "kubeconfig" {
-  value     = module.admin-kubeconfig.manifest
+output "kubernetes_client" {
+  value = {
+    algorithm       = tls_private_key.kubernetes-client.algorithm
+    private_key_pem = tls_private_key.kubernetes-client.private_key_pem
+    cert_pem        = tls_locally_signed_cert.kubernetes-client.cert_pem
+    ca_cert_pem     = data.terraform_remote_state.ignition.outputs.kubernetes_ca.cert_pem
+  }
   sensitive = true
 }
 
-output "kubeconfig_cluster" {
-  value     = module.admin-kubeconfig-cluster.manifest
+output "kubeconfig" {
+  value     = module.kubeconfig.manifest
   sensitive = true
 }
 
 output "mc_config" {
-  value = {
+  value = jsonencode({
     version = "10"
     aliases = {
       m = {
@@ -49,7 +43,7 @@ output "mc_config" {
         path      = "auto"
       }
     }
-  }
+  })
   sensitive = true
 }
 

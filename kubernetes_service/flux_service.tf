@@ -1,4 +1,3 @@
-
 resource "helm_release" "service" {
   name                       = "service"
   chart                      = "../helm-wrapper"
@@ -16,6 +15,7 @@ resource "helm_release" "service" {
   values = [
     yamlencode({ manifests = concat([
       for _, m in [
+        # cloudflare tunnel
         {
           apiVersion = "source.toolkit.fluxcd.io/v1"
           kind       = "HelmRepository"
@@ -25,7 +25,7 @@ resource "helm_release" "service" {
           }
           spec = {
             interval = "15m"
-            url      = "https://cloudflare.github.io/helm-charts/"
+            url      = "https://cloudflare.github.io/helm-charts"
           }
         },
         {
@@ -95,19 +95,18 @@ resource "helm_release" "service" {
       ] :
       yamlencode(m)
       ],
-      module.lldap.flux_manifests,
-      module.authelia.flux_manifests,
-      module.llama-cpp.flux_manifests,
-      # module.sunshine-desktop.flux_manifests,
-      module.searxng.flux_manifests,
-      module.open-webui.flux_manifests,
-      module.tailscale.flux_manifests,
-      module.hostapd.flux_manifests,
-      module.qrcode-hostapd.flux_manifests,
-      module.kavita.flux_manifests,
+      module.lldap.releases,
+      module.authelia.releases,
+      module.llama-cpp.releases,
+      # module.sunshine-desktop.releases,
+      module.searxng.releases,
+      module.open-webui.releases,
+      module.hostapd.releases,
+      module.qrcode-hostapd.releases,
+      module.kavita.releases,
+      module.gha-runner.releases,
     ) }),
   ]
-
   depends_on = [
     helm_release.flux2,
   ]
