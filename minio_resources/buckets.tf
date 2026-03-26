@@ -58,20 +58,64 @@ module "minio-user-secret" {
 }
 
 resource "helm_release" "minio-user-secret" {
-  for_each = local.minio_users
-
-  chart            = "../helm-wrapper"
-  name             = each.value.secret
-  namespace        = each.value.namespace
-  create_namespace = true
-  wait             = false
-  wait_for_jobs    = false
-  max_history      = 2
-  timeout          = local.kubernetes.helm_release_timeout
+  chart                      = "../helm-wrapper"
+  name                       = "minio-user-secret"
+  namespace                  = "flux-runners"
+  create_namespace           = true
+  wait                       = false
+  wait_for_jobs              = false
+  max_history                = 1
+  disable_crd_hooks          = true
+  disable_webhooks           = true
+  disable_openapi_validation = true
+  skip_crds                  = true
+  replace                    = true
+  render_subchart_notes      = false
   values = [
-    yamlencode({
-      manifests = [
-        module.minio-user-secret[each.key].manifest,
+    yamlencode({ manifests = [
+      for k, v in local.minio_users :
+      yamlencode({
+        apiVersion = "helm.toolkit.fluxcd.io/v2"
+        kind       = "HelmRelease"
+        metadata = {
+          name      = v.secret
+          namespace = v.namespace
+        }
+        spec = {
+          interval = "15m"
+          timeout  = "5m"
+          chart = {
+            spec = {
+              chart = "helm-wrapper"
+              sourceRef = {
+                kind      = "HelmRepository"
+                name      = "wrapper"
+                namespace = "flux-runners"
+              }
+              interval = "5m"
+            }
+          }
+          releaseName = v.secret
+          install = {
+            remediation = {
+              retries = -1
+            }
+          }
+          upgrade = {
+            remediation = {
+              retries = -1
+            }
+          }
+          test = {
+            enable = false
+          }
+          values = {
+            manifests = [
+              module.minio-user-secret[k].manifest,
+            ]
+          }
+        }
+      })
       ]
     })
   ]
