@@ -449,10 +449,11 @@ resource "helm_release" "system" {
                 }
               }
               cainjector = {
-                enabled = false
+                enabled      = true
+                replicaCount = 2
               }
               startupapicheck = {
-                enabled = false
+                enabled = true
               }
               extraArgs = [
                 "--dns01-recursive-nameservers-only",
