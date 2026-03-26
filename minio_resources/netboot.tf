@@ -38,7 +38,7 @@ locals {
 # use for change detection
 ignition_configs = {
   for mac, boot in local.boot_config :
-  mac => data.terraform_remote_state.ignition.outputs.ignition[boot.host_key]
+  mac => data.terraform_remote_state.host.outputs.ignition[boot.host_key]
 }
 }
 

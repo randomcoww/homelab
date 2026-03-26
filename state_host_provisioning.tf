@@ -1,4 +1,4 @@
-data "terraform_remote_state" "ignition" {
+data "terraform_remote_state" "host" {
   backend = "s3"
   config = {
     bucket                      = "terraform"

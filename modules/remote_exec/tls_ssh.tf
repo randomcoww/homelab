@@ -1,11 +1,11 @@
 resource "tls_private_key" "ssh-client" {
-  algorithm   = data.terraform_remote_state.ignition.outputs.ssh_ca.algorithm
+  algorithm   = data.terraform_remote_state.host.outputs.ssh_ca.algorithm
   ecdsa_curve = "P521"
   rsa_bits    = 4096
 }
 
 resource "ssh_user_cert" "ssh-client" {
-  ca_private_key_pem    = data.terraform_remote_state.ignition.outputs.ssh_ca.private_key_pem
+  ca_private_key_pem    = data.terraform_remote_state.host.outputs.ssh_ca.private_key_pem
   public_key_openssh    = tls_private_key.ssh-client.public_key_openssh
   key_id                = local.users.ssh.name
   early_renewal_hours   = 0

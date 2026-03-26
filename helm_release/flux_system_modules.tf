@@ -53,9 +53,9 @@ module "minio" {
     minio   = local.service_ports.minio
     metrics = local.service_ports.metrics
   }
-  minio_credentials  = data.terraform_remote_state.sr.outputs.minio
+  minio_credentials  = data.terraform_remote_state.host.outputs.minio
   cluster_domain     = local.domains.kubernetes
-  ca                 = data.terraform_remote_state.ignition.outputs.internal_ca
+  ca                 = data.terraform_remote_state.host.outputs.internal_ca
   service_hostname   = local.endpoints.minio.service
   service_ip         = local.services.minio.ip
   cluster_service_ip = local.services.cluster_minio.ip
@@ -73,7 +73,7 @@ module "registry" {
     registry = local.service_ports.registry
     metrics  = local.service_ports.metrics
   }
-  ca                      = data.terraform_remote_state.ignition.outputs.internal_ca
+  ca                      = data.terraform_remote_state.host.outputs.internal_ca
   loadbalancer_class_name = "kube-vip.io/kube-vip-class"
 
   minio_endpoint      = "${local.services.cluster_minio.ip}:${local.service_ports.minio}"
@@ -107,8 +107,8 @@ module "cert-manager-issuer-ca-internal-secret" {
   app     = "cert-issuer"
   release = "0.1.0"
   data = merge({
-    "tls.crt" = chomp(data.terraform_remote_state.ignition.outputs.internal_ca.cert_pem)
-    "tls.key" = chomp(data.terraform_remote_state.ignition.outputs.internal_ca.private_key_pem)
+    "tls.crt" = chomp(data.terraform_remote_state.host.outputs.internal_ca.cert_pem)
+    "tls.key" = chomp(data.terraform_remote_state.host.outputs.internal_ca.private_key_pem)
   })
 }
 

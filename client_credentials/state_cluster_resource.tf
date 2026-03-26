@@ -1,1 +1,0 @@
-../state_cluster_resource.tf

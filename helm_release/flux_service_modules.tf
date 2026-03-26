@@ -478,7 +478,7 @@ module "open-webui" {
     OAUTH_ADMIN_ROLES              = "openwebui-admin"
     OAUTH_ROLES_CLAIM              = "groups"
   }
-  internal_ca      = data.terraform_remote_state.ignition.outputs.internal_ca
+  internal_ca      = data.terraform_remote_state.host.outputs.internal_ca
   ingress_hostname = local.endpoints.open_webui.ingress
   gateway_ref = {
     name      = local.endpoints.traefik.name
@@ -784,7 +784,7 @@ module "gha-runner" {
     gha_runner = local.container_images_digest.gha_runner
   }
   github_credentials  = var.github
-  internal_ca         = data.terraform_remote_state.ignition.outputs.internal_ca
+  internal_ca         = data.terraform_remote_state.host.outputs.internal_ca
   registry_endpoint   = "${local.endpoints.registry.service}:${local.service_ports.registry}"
   minio_endpoint      = "${local.services.cluster_minio.ip}:${local.service_ports.minio}"
   minio_access_secret = local.minio_users.arc.secret

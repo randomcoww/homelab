@@ -4,7 +4,7 @@ output "ssh_user_cert_authorized_key" {
 
 output "internal_ca" {
   value = {
-    cert_pem = data.terraform_remote_state.ignition.outputs.internal_ca.cert_pem
+    cert_pem = data.terraform_remote_state.host.outputs.internal_ca.cert_pem
   }
 }
 
@@ -12,16 +12,6 @@ output "registry_client" {
   value = {
     private_key_pem = tls_private_key.registry-client.private_key_pem
     cert_pem        = tls_locally_signed_cert.registry-client.cert_pem
-  }
-  sensitive = true
-}
-
-output "kubernetes_client" {
-  value = {
-    algorithm       = tls_private_key.kubernetes-client.algorithm
-    private_key_pem = tls_private_key.kubernetes-client.private_key_pem
-    cert_pem        = tls_locally_signed_cert.kubernetes-client.cert_pem
-    ca_cert_pem     = data.terraform_remote_state.ignition.outputs.kubernetes_ca.cert_pem
   }
   sensitive = true
 }
@@ -37,8 +27,8 @@ output "mc_config" {
     aliases = {
       m = {
         url       = "https://${local.services.minio.ip}:${local.service_ports.minio}"
-        accessKey = data.terraform_remote_state.ignition.outputs.minio.access_key_id
-        secretKey = data.terraform_remote_state.ignition.outputs.minio.secret_access_key
+        accessKey = data.terraform_remote_state.host.outputs.minio.access_key_id
+        secretKey = data.terraform_remote_state.host.outputs.minio.secret_access_key
         api       = "S3v4"
         path      = "auto"
       }
@@ -52,8 +42,8 @@ output "rclone_config" {
 [m]
 type = s3
 provider = Minio
-access_key_id = ${data.terraform_remote_state.ignition.outputs.minio.access_key_id}
-secret_access_key = ${data.terraform_remote_state.ignition.outputs.minio.secret_access_key}
+access_key_id = ${data.terraform_remote_state.host.outputs.minio.access_key_id}
+secret_access_key = ${data.terraform_remote_state.host.outputs.minio.secret_access_key}
 region = auto
 endpoint = https://${local.services.minio.ip}:${local.service_ports.minio}
 %{~for name, res in data.terraform_remote_state.sr.outputs.r2_bucket~}
