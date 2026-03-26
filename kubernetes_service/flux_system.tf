@@ -493,53 +493,9 @@ resource "helm_release" "system" {
                   },
                 ]
               }
-            }
-          }
-        },
+              extraObjects = [
+                # cert issuers and associated secrets #
 
-        # cert-issuer
-        {
-          apiVersion = "helm.toolkit.fluxcd.io/v2"
-          kind       = "HelmRelease"
-          metadata = {
-            name      = "cert-issuer"
-            namespace = "cert-manager"
-          }
-          spec = {
-            dependsOn = [
-              {
-                name = "cert-manager"
-              },
-            ]
-            interval = "15m"
-            timeout  = "5m"
-            chart = {
-              spec = {
-                chart = "helm-wrapper"
-                sourceRef = {
-                  kind      = "HelmRepository"
-                  name      = "wrapper"
-                  namespace = "flux-runners"
-                }
-                interval = "5m"
-              }
-            }
-            releaseName = "cert-issuer"
-            install = {
-              remediation = {
-                retries = -1
-              }
-            }
-            upgrade = {
-              remediation = {
-                retries = -1
-              }
-            }
-            test = {
-              enable = false
-            }
-            values = {
-              manifests = [
                 module.cert-manager-issuer-acme-prod-secret.manifest,
                 module.cert-manager-issuer-ca-internal-secret.manifest,
 
