@@ -483,6 +483,11 @@ resource "helm_release" "system" {
             namespace = "cert-manager"
           }
           spec = {
+            dependsOn = [
+              {
+                name = "cert-manager"
+              },
+            ]
             interval = "15m"
             timeout  = "5m"
             chart = {
