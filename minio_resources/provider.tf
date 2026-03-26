@@ -9,8 +9,8 @@ provider "helm" {
 
 provider "minio" {
   minio_server   = local.minio_endpoint
-  minio_user     = data.terraform_remote_state.sr.outputs.minio.access_key_id
-  minio_password = data.terraform_remote_state.sr.outputs.minio.secret_access_key
+  minio_user     = data.terraform_remote_state.ignition.outputs.minio.access_key_id
+  minio_password = data.terraform_remote_state.ignition.outputs.minio.secret_access_key
   minio_ssl      = true
   # CA needs to be provided as a file which in inconvenient for an argument to a provider
   minio_insecure = true

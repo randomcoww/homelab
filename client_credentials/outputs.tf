@@ -37,8 +37,8 @@ output "mc_config" {
     aliases = {
       m = {
         url       = "https://${local.services.minio.ip}:${local.service_ports.minio}"
-        accessKey = data.terraform_remote_state.sr.outputs.minio.access_key_id
-        secretKey = data.terraform_remote_state.sr.outputs.minio.secret_access_key
+        accessKey = data.terraform_remote_state.ignition.outputs.minio.access_key_id
+        secretKey = data.terraform_remote_state.ignition.outputs.minio.secret_access_key
         api       = "S3v4"
         path      = "auto"
       }
@@ -52,8 +52,8 @@ output "rclone_config" {
 [m]
 type = s3
 provider = Minio
-access_key_id = ${data.terraform_remote_state.sr.outputs.minio.access_key_id}
-secret_access_key = ${data.terraform_remote_state.sr.outputs.minio.secret_access_key}
+access_key_id = ${data.terraform_remote_state.ignition.outputs.minio.access_key_id}
+secret_access_key = ${data.terraform_remote_state.ignition.outputs.minio.secret_access_key}
 region = auto
 endpoint = https://${local.services.minio.ip}:${local.service_ports.minio}
 %{~for name, res in data.terraform_remote_state.sr.outputs.r2_bucket~}
