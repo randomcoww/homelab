@@ -124,15 +124,6 @@ module "workflow-config" {
             }
             env = [
               {
-                name = "INTERNAL_CA_CERT" # feed to OS image build
-                valueFrom = {
-                  secretKeyRef = {
-                    name = module.tls.name
-                    key  = "ca.crt"
-                  }
-                }
-              },
-              {
                 name  = "RCLONE_S3_ENDPOINT"
                 value = var.minio_endpoint
               },

@@ -478,7 +478,7 @@ module "open-webui" {
     OAUTH_ADMIN_ROLES              = "openwebui-admin"
     OAUTH_ROLES_CLAIM              = "groups"
   }
-  internal_ca      = data.terraform_remote_state.sr.outputs.trust.ca
+  internal_ca      = data.terraform_remote_state.ignition.outputs.internal_ca
   ingress_hostname = local.endpoints.open_webui.ingress
   gateway_ref = {
     name      = local.endpoints.traefik.name
@@ -487,43 +487,6 @@ module "open-webui" {
   minio_endpoint      = "https://${local.services.cluster_minio.ip}:${local.service_ports.minio}"
   minio_bucket        = "open-webui"
   minio_access_secret = local.minio_users.open_webui.secret
-}
-
-# Tailscale remote access
-
-module "tailscale" {
-  source    = "./modules/tailscale"
-  name      = "tailscale"
-  namespace = "tailscale"
-  replicas  = 2
-  images = {
-    tailscale = local.container_images_digest.tailscale
-  }
-  tailscale_auth_key = data.terraform_remote_state.sr.outputs.tailscale_auth_key
-  extra_envs = [
-    {
-      name  = "TS_ACCEPT_DNS"
-      value = false
-    },
-    {
-      name  = "TS_DEBUG_FIREWALL_MODE"
-      value = "nftables"
-    },
-    {
-      name = "TS_EXTRA_ARGS"
-      value = join(",", [
-        "--advertise-exit-node",
-      ])
-    },
-    {
-      name = "TS_ROUTES"
-      value = join(",", distinct([
-        local.networks[local.services.apiserver.network.name].prefix,
-        local.networks.service.prefix,
-        local.networks.kubernetes_service.prefix,
-      ]))
-    },
-  ]
 }
 
 # Wifi AP
@@ -808,4 +771,21 @@ module "sunshine-desktop" {
     name      = local.endpoints.traefik.name
     namespace = local.endpoints.traefik.namespace
   }
+}
+
+# github-actions
+
+module "gha-runner" {
+  source           = "./modules/gha_runner"
+  name             = "gha"
+  namespace        = "arc-systems"
+  runner_namespace = "arc-runners"
+  images = {
+    gha_runner = local.container_images_digest.gha_runner
+  }
+  github_credentials  = var.github
+  internal_ca         = data.terraform_remote_state.ignition.outputs.internal_ca
+  registry_endpoint   = "${local.endpoints.registry.service}:${local.service_ports.registry}"
+  minio_endpoint      = "${local.services.cluster_minio.ip}:${local.service_ports.minio}"
+  minio_access_secret = local.minio_users.arc.secret
 }

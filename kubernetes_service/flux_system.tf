@@ -15,6 +15,20 @@ resource "helm_release" "system" {
   values = [
     yamlencode({ manifests = concat([
       for _, m in [
+        # helm-wrapper source
+        {
+          apiVersion = "source.toolkit.fluxcd.io/v1"
+          kind       = "HelmRepository"
+          metadata = {
+            name      = "wrapper"
+            namespace = "flux-runners"
+          }
+          spec = {
+            interval = "15m"
+            url      = "https://randomcoww.github.io/homelab"
+          }
+        },
+
         # Kubelet CSR approver
         {
           apiVersion = "source.toolkit.fluxcd.io/v1"
@@ -91,7 +105,7 @@ resource "helm_release" "system" {
           }
           spec = {
             interval = "15m"
-            url      = "https://k8s-gateway.github.io/k8s_gateway/"
+            url      = "https://k8s-gateway.github.io/k8s_gateway"
           }
         },
         {
@@ -461,18 +475,6 @@ resource "helm_release" "system" {
 
         # cert-issuer
         {
-          apiVersion = "source.toolkit.fluxcd.io/v1"
-          kind       = "HelmRepository"
-          metadata = {
-            name      = "cert-issuer"
-            namespace = "cert-manager"
-          }
-          spec = {
-            interval = "15m"
-            url      = "https://randomcoww.github.io/homelab/"
-          }
-        },
-        {
           apiVersion = "helm.toolkit.fluxcd.io/v2"
           kind       = "HelmRelease"
           metadata = {
@@ -486,8 +488,9 @@ resource "helm_release" "system" {
               spec = {
                 chart = "helm-wrapper"
                 sourceRef = {
-                  kind = "HelmRepository"
-                  name = "cert-issuer"
+                  kind      = "HelmRepository"
+                  name      = "wrapper"
+                  namespace = "flux-runners"
                 }
                 interval = "5m"
               }
@@ -826,7 +829,7 @@ resource "helm_release" "system" {
           }
           spec = {
             interval = "15m"
-            url      = "https://rocm.github.io/k8s-device-plugin/"
+            url      = "https://rocm.github.io/k8s-device-plugin"
           }
         },
         {
@@ -944,7 +947,6 @@ resource "helm_release" "system" {
               enable = false
             }
             values = {
-
               # manifest #
 
               configuration = {
@@ -996,20 +998,18 @@ resource "helm_release" "system" {
             }
           }
         },
-
       ] :
       yamlencode(m)
       ],
-      module.device-plugin.flux_manifests,
-      module.kube-vip.flux_manifests,
-      module.registry.flux_manifests,
-      module.minio.flux_manifests,
-      module.kea.flux_manifests,
-      module.prometheus.flux_manifests,
-      module.gha-runner.flux_manifests,
+      module.device-plugin.releases,
+      module.kube-vip.releases,
+      module.registry.releases,
+      module.minio.releases,
+      module.kea.releases,
+      module.prometheus.releases,
+      module.tailscale.releases,
     ) }),
   ]
-
   depends_on = [
     helm_release.flux2,
   ]
