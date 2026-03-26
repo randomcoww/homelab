@@ -18,12 +18,6 @@ variable "ssh_ca" {
   })
 }
 
-variable "internal_ca" {
-  type = object({
-    cert_pem = string
-  })
-}
-
 variable "user" {
   type    = any
   default = {}

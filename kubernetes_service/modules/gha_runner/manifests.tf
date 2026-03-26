@@ -124,6 +124,15 @@ module "workflow-config" {
             }
             env = [
               {
+                name = "INTERNAL_CA_CERT" # add to image for pulling rootfs and ignition
+                valueFrom = {
+                  secretKeyRef = {
+                    name = module.tls.name
+                    key  = "ca.crt"
+                  }
+                }
+              },
+              {
                 name  = "RCLONE_S3_ENDPOINT"
                 value = var.minio_endpoint
               },

@@ -1,9 +1,5 @@
 locals {
   pki = {
-    internal-ca-cert = {
-      path     = "/etc/pki/ca-trust/source/anchors/internal-ca-cert.pem"
-      contents = var.internal_ca.cert_pem
-    }
     server-private-key = {
       path     = "/etc/ssh/ssh_host_${lower(var.ssh_ca.algorithm)}_key"
       contents = tls_private_key.ssh-host.private_key_pem
