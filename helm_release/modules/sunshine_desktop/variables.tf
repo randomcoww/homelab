@@ -57,6 +57,13 @@ variable "gateway_ref" {
   type = any
 }
 
+variable "middleware_ref" {
+  type = object({
+    name      = string
+    namespace = string
+  })
+}
+
 variable "user" {
   type = string
 }

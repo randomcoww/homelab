@@ -609,6 +609,10 @@ module "qrcode-hostapd" {
     name      = local.endpoints.traefik.name
     namespace = local.endpoints.traefik.namespace
   }
+  middleware_ref = {
+    name      = "forwardauth-authelia"
+    namespace = local.endpoints.traefik.namespace
+  }
 }
 
 module "kavita" {
@@ -769,6 +773,10 @@ module "sunshine-desktop" {
   ingress_hostname        = local.endpoints.sunshine_desktop.ingress
   gateway_ref = {
     name      = local.endpoints.traefik.name
+    namespace = local.endpoints.traefik.namespace
+  }
+  middleware_ref = {
+    name      = "forwardauth-authelia"
     namespace = local.endpoints.traefik.namespace
   }
 }

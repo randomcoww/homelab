@@ -2,12 +2,30 @@ locals {
   qrcode_port = 8080
   config_file = "/var/www/index.html"
 
-  manifests = [
+  manifests = concat([
     module.service.manifest,
     module.secret.manifest,
     module.httproute.manifest,
     module.deployment.manifest,
-  ]
+    ], [
+    for _, m in [
+      {
+        apiVersion = "traefik.io/v1alpha1"
+        kind       = "Middleware"
+        metadata = {
+          name = var.name
+        }
+        spec = {
+          chain = {
+            middlewares = [
+              var.middleware_ref,
+            ]
+          }
+        }
+      },
+    ] :
+    yamlencode(m)
+  ])
 }
 
 module "secret" {
@@ -117,6 +135,16 @@ module "httproute" {
           {
             name = module.service.name
             port = local.qrcode_port
+          },
+        ]
+        filters = [
+          {
+            type = "ExtensionRef"
+            extensionRef = {
+              group = "traefik.io"
+              kind  = "Middleware"
+              name  = var.name
+            }
           },
         ]
       },

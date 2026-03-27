@@ -28,6 +28,10 @@ variable "affinity" {
   default = {}
 }
 
+variable "qrcode_value" {
+  type = string
+}
+
 variable "ingress_hostname" {
   type = string
 }
@@ -36,6 +40,9 @@ variable "gateway_ref" {
   type = any
 }
 
-variable "qrcode_value" {
-  type = string
+variable "middleware_ref" {
+  type = object({
+    name      = string
+    namespace = string
+  })
 }

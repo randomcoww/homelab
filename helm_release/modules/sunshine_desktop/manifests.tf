@@ -20,13 +20,31 @@ locals {
   gamescope_cmd_file     = "/usr/local/bin/gamescope-launch"
   ge_proton_update       = "/usr/local/bin/ge-protonup"
 
-  manifests = [
+  manifests = concat([
     module.secret.manifest,
     module.service.manifest,
     module.web-service.manifest,
     module.httproute.manifest,
     module.statefulset.manifest,
-  ]
+    ], [
+    for _, m in [
+      {
+        apiVersion = "traefik.io/v1alpha1"
+        kind       = "Middleware"
+        metadata = {
+          name = var.name
+        }
+        spec = {
+          chain = {
+            middlewares = [
+              var.middleware_ref,
+            ]
+          }
+        }
+      },
+    ] :
+    yamlencode(m)
+  ])
 }
 
 # bypassed through nginx - no need to expose
@@ -207,6 +225,16 @@ module "httproute" {
           {
             name = module.web-service.name
             port = local.proxy_web_port
+          },
+        ]
+        filters = [
+          {
+            type = "ExtensionRef"
+            extensionRef = {
+              group = "traefik.io"
+              kind  = "Middleware"
+              name  = var.name
+            }
           },
         ]
       },
