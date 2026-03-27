@@ -176,10 +176,8 @@ module "deployment" {
   affinity = var.affinity
   replicas = var.replicas
   annotations = {
-    "checksum/secret"      = sha256(module.secret.manifest)
-    "checksum/tls"         = sha256(module.tls.manifest)
-    "prometheus.io/scrape" = "true" # TODO: investigate failure exposed as a service
-    "prometheus.io/port"   = tostring(var.ports.metrics)
+    "checksum/secret" = sha256(module.secret.manifest)
+    "checksum/tls"    = sha256(module.tls.manifest)
   }
   template_spec = {
     priorityClassName = "system-cluster-critical"
@@ -323,6 +321,8 @@ module "service" {
   annotations = {
     "external-dns.alpha.kubernetes.io/hostname" = var.service_hostname
     "kube-vip.io/loadbalancerIPs"               = var.service_ip
+    "prometheus.io/scrape"                      = "true"
+    "prometheus.io/port"                        = tostring(var.ports.metrics)
   }
   spec = {
     type              = "LoadBalancer"
@@ -333,6 +333,12 @@ module "service" {
         port       = var.ports.registry
         protocol   = "TCP"
         targetPort = var.ports.registry
+      },
+      {
+        name       = "${var.name}-metrics"
+        port       = var.ports.metrics
+        protocol   = "TCP"
+        targetPort = var.ports.metrics
       },
     ]
   }

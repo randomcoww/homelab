@@ -956,13 +956,13 @@ resource "helm_release" "system" {
                   memory = "128Mi"
                 }
               }
-              podAnnotations = {
-                "prometheus.io/scrape" = "true"
-                "prometheus.io/port"   = tostring(local.service_ports.metrics)
-              }
               priorityClassName = "system-node-critical"
               service = {
-                create = false
+                create = true
+                annotations = {
+                  "prometheus.io/scrape" = "true"
+                  "prometheus.io/port"   = tostring(local.service_ports.metrics)
+                }
               }
               volumeMounts = [
                 {
