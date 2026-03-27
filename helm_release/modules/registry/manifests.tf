@@ -21,11 +21,6 @@ locals {
             spec = {
               ttlSecondsAfterFinished = 1800
               template = {
-                metadata = {
-                  labels = {
-                    app = var.name
-                  }
-                }
                 spec = {
                   restartPolicy = "Never"
                   containers = [
