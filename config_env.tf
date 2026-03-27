@@ -138,13 +138,13 @@ locals {
     llama_cpp_vulkan = "ghcr.io/mostlygeek/llama-swap:vulkan@sha256:5d1d15bafb4f1c46cc92ed68852dc08069d4e05af9a6bd3db63cd5171d1530e0"
     litestream       = "docker.io/litestream/litestream:0.5.10@sha256:66c0ef32779b20f7ce682751ec50ba0f1363cad5cb9dba1e23fbeee6ae3197b9"
     searxng          = "ghcr.io/searxng/searxng:latest@sha256:f01ceee858fe70e0ba6bf96934cdfad1ecc51fc528e72e17065b800f98ea87bb"
-    open_webui       = "ghcr.io/open-webui/open-webui:v0.8.11@sha256:a1e098b30bf4e06fe2bac1c7af1282b1c8adccd34aff02f9f7e843ffc257452b"
+    open_webui       = "ghcr.io/open-webui/open-webui:v0.8.12@sha256:8113fa5510020ef05a44afc0c42d33eabeeb2524a996e3e3fb8c437c00f0d792"
     kavita           = "ghcr.io/kareadita/kavita:0.8.9@sha256:1f2acae7466d022f037ea09f7989eb7c487f916b881174c7a6de33dbfa8acb39"
     lldap            = "ghcr.io/lldap/lldap:latest-alpine@sha256:af6daf88e67b2c6885d2426f711cb241751b515cc36a995d36ba77f2ffd199fb"
     authelia         = "ghcr.io/authelia/authelia:4.39.16@sha256:edbce01c5125249e4f4faea01e0f76f0031d64b4a1d0c2514a0ca69cb126d05f"
     cloudflared      = "docker.io/cloudflare/cloudflared:2026.3.0@sha256:6b599ca3e974349ead3286d178da61d291961182ec3fe9c505e1dd02c8ac31b0"
     sunshine_desktop = "reg.cluster.internal/randomcoww/sunshine-desktop:v2026.322.21442.1774277610@sha256:b140f163db4f534901a957bb3b55db965682ecb401d504056538433f060f6dc9"
-    kubernetes_mcp   = "ghcr.io/containers/kubernetes-mcp-server:latest@sha256:7266ebf7d18925c9a879bb7bbfdbf5deff53c4ae2c89cfed5954d06166ba52b9"
+    kubernetes_mcp   = "ghcr.io/containers/kubernetes-mcp-server:latest@sha256:f634413ff16ce9933b2654a0fb3622c4050c6024d7b62068f640102b4a81de7a"
     navidrome        = "ghcr.io/navidrome/navidrome:0.60.3@sha256:a5dce8f33304714dd138e870cca0dcab3d937ca236be1a9f2b97da009d1a0048"
 
     # models (model_file)
@@ -157,7 +157,7 @@ locals {
   host_images = {
     for name, tag in {
       # these fields are updated by renovate - don't use var substitutions
-      default = "43.20260326.18" # renovate: datasource=github-tags depName=randomcoww/fedora-coreos-config-custom
+      default = "43.20260327.04" # renovate: datasource=github-tags depName=randomcoww/fedora-coreos-config-custom
     } :
     name => {
       kernel = "fedora-coreos-${tag}-live-kernel.$${buildarch:uristring}"
