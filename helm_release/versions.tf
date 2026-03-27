@@ -1,7 +1,7 @@
 terraform {
   backend "s3" {
     bucket                      = "terraform"
-    key                         = "state/kubernetes_service-0.tfstate"
+    key                         = "state/helm_release-0.tfstate"
     region                      = "auto"
     skip_credentials_validation = true
     skip_metadata_api_check     = true
