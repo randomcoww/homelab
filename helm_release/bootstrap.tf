@@ -53,8 +53,8 @@ resource "helm_release" "bootstrap" {
   name             = "bootstrap"
   namespace        = "kube-system"
   create_namespace = true
-  wait             = true
-  wait_for_jobs    = true
+  wait             = false
+  wait_for_jobs    = false
   max_history      = 2
   values = [
     yamlencode({ manifests = [
@@ -190,8 +190,8 @@ resource "helm_release" "kube-proxy" {
   name             = "kube-proxy"
   namespace        = "kube-system"
   create_namespace = true
-  wait             = true
-  wait_for_jobs    = true
+  wait             = false
+  wait_for_jobs    = false
   max_history      = 2
   values = [
     yamlencode({
@@ -210,8 +210,8 @@ resource "helm_release" "flannel" {
   name             = "flannel"
   namespace        = "kube-system"
   create_namespace = true
-  wait             = true
-  wait_for_jobs    = true
+  wait             = false
+  wait_for_jobs    = false
   max_history      = 2
   values = [
     yamlencode({
@@ -229,8 +229,8 @@ resource "helm_release" "kube-dns" {
   repository       = "https://coredns.github.io/helm"
   chart            = "coredns"
   create_namespace = true
-  wait             = true
-  wait_for_jobs    = true
+  wait             = false
+  wait_for_jobs    = false
   version          = "1.45.2"
   max_history      = 2
   timeout          = local.kubernetes.helm_release_timeout
