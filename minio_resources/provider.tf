@@ -8,7 +8,7 @@ provider "helm" {
 }
 
 provider "minio" {
-  minio_server   = local.minio_endpoint
+  minio_server   = "${local.services.minio.ip}:${local.service_ports.minio}"
   minio_user     = data.terraform_remote_state.host.outputs.minio.access_key_id
   minio_password = data.terraform_remote_state.host.outputs.minio.secret_access_key
   minio_ssl      = true
