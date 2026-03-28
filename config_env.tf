@@ -254,6 +254,10 @@ locals {
         name      = "etcd"
         namespace = "kube-system"
       }
+      kube_proxy = {
+        name      = "kube-proxy"
+        namespace = "kube-system"
+      }
       kube_dns = {
         name      = "kube-dns"
         namespace = "kube-system"
