@@ -37,7 +37,7 @@ module "tls" {
   source  = "../../../modules/secret"
   name    = "${var.name}-tls"
   app     = var.name
-  release = "0.1.0"
+  release = var.release
   data = {
     "tls.crt" = tls_locally_signed_cert.lldap.cert_pem
     "tls.key" = tls_private_key.lldap.private_key_pem

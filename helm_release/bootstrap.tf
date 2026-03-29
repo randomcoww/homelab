@@ -187,8 +187,8 @@ resource "helm_release" "bootstrap" {
 
 resource "helm_release" "kube-proxy" {
   chart            = "../helm-wrapper"
-  name             = local.endpoints.kube_proxy.name
-  namespace        = local.endpoints.kube_proxy.namespace
+  name             = "kube-proxy"
+  namespace        = "kube-system"
   create_namespace = true
   wait             = false
   wait_for_jobs    = false

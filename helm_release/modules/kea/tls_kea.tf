@@ -46,7 +46,7 @@ module "kea-tls" {
   source  = "../../../modules/secret"
   name    = "${var.name}-tls"
   app     = var.name
-  release = "0.1.0"
+  release = var.release
   data = merge({
     for _, member in local.members :
     "${member.name}-tls.crt" => tls_locally_signed_cert.kea[member.name].cert_pem

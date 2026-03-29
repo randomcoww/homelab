@@ -1026,9 +1026,9 @@ module "prometheus" {
             {
               alert = "KubeProxyDown"
               expr  = <<-EOF
-              sum(up{app="${local.endpoints.kube_proxy.name}",namespace="${local.endpoints.kube_proxy.namespace}"}) < sum(up{job="kubernetes-nodes"})
+              sum(up{app="kube-proxy",namespace="kube-system"}) < sum(up{job="kubernetes-nodes"})
               or
-              absent(up{app="${local.endpoints.kube_proxy.name}",namespace="${local.endpoints.kube_proxy.namespace}"})
+              absent(up{app="kube-proxy",namespace="kube-system"})
               EOF
               for   = "90s"
               labels = {
@@ -1046,7 +1046,7 @@ module "prometheus" {
               alert = "KubeProxySyncRulesSlow"
               expr  = <<-EOF
               histogram_quantile(0.99,
-                sum by (le, instance, node) (rate(kubeproxy_sync_proxy_rules_duration_seconds_bucket{app="${local.endpoints.kube_proxy.name}",namespace="${local.endpoints.kube_proxy.namespace}"}[5m]))
+                sum by (le, instance, node) (rate(kubeproxy_sync_proxy_rules_duration_seconds_bucket{app="kube-proxy",namespace="kube-system"}[5m]))
               ) > 2.0
               EOF
               for   = "5m"
@@ -1064,7 +1064,7 @@ module "prometheus" {
             {
               alert = "KubeProxyFlapping"
               expr  = <<-EOF
-              changes(process_start_time_seconds{app="${local.endpoints.kube_proxy.name}",namespace="${local.endpoints.kube_proxy.namespace}"}[15m]) > 3
+              changes(process_start_time_seconds{app="kube-proxy",namespace="kube-system"}[15m]) > 3
               EOF
               for   = "0m"
               labels = {

@@ -34,7 +34,7 @@ module "tls-kubernetes-mcp" {
   source  = "../../../modules/secret"
   name    = "${var.name}-kubernetes-mcp-tls"
   app     = var.name
-  release = "0.1.0"
+  release = var.release
   data = {
     "tls.crt" = tls_locally_signed_cert.kubernetes-mcp.cert_pem
     "tls.key" = tls_private_key.kubernetes-mcp.private_key_pem
