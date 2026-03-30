@@ -55,8 +55,6 @@ resource "random_password" "authelia-oidc-client-secret" {
   special = false
 }
 
-# auth
-
 resource "tls_private_key" "lldap-ca" {
   algorithm = "RSA"
   rsa_bits  = 4096
@@ -70,7 +68,7 @@ resource "tls_self_signed_cert" "lldap-ca" {
   is_ca_certificate     = true
 
   subject {
-    common_name = "lldap"
+    common_name = local.endpoints.lldap.name
   }
 
   allowed_uses = [
@@ -90,6 +88,31 @@ resource "random_password" "lldap-user" {
 resource "random_password" "lldap-password" {
   length  = 30
   special = false
+}
+
+resource "tls_private_key" "authelia-valkey-ca" {
+  algorithm = "RSA"
+  rsa_bits  = 4096
+}
+
+resource "tls_self_signed_cert" "authelia-valkey-ca" {
+  private_key_pem = tls_private_key.authelia-valkey-ca.private_key_pem
+
+  validity_period_hours = 8760
+  early_renewal_hours   = 2160
+  is_ca_certificate     = true
+
+  subject {
+    common_name = local.endpoints.authelia_valkey.name
+  }
+
+  allowed_uses = [
+    "key_encipherment",
+    "digital_signature",
+    "cert_signing",
+    "server_auth",
+    "client_auth",
+  ]
 }
 
 module "lldap" {
@@ -133,6 +156,24 @@ module "lldap" {
   }
 }
 
+module "authelia-valkey" {
+  source    = "./modules/valkey"
+  name      = local.endpoints.authelia_valkey.name
+  namespace = local.endpoints.authelia_valkey.namespace
+  images = {
+    valkey = local.container_images_digest.valkey
+  }
+  ports = {
+    sentinel = local.service_ports.redis_sentinel
+  }
+  service_hostname = local.endpoints.authelia_valkey.service_fqdn
+  ca = {
+    algorithm       = tls_private_key.authelia-valkey-ca.algorithm
+    private_key_pem = tls_private_key.authelia-valkey-ca.private_key_pem
+    cert_pem        = tls_self_signed_cert.authelia-valkey-ca.cert_pem
+  }
+}
+
 module "authelia" {
   source    = "./modules/authelia"
   name      = local.endpoints.authelia.name
@@ -153,8 +194,18 @@ module "authelia" {
     private_key_pem = tls_private_key.lldap-ca.private_key_pem
     cert_pem        = tls_self_signed_cert.lldap-ca.cert_pem
   }
+  redis_ca = {
+    algorithm       = tls_private_key.authelia-valkey-ca.algorithm
+    private_key_pem = tls_private_key.authelia-valkey-ca.private_key_pem
+    cert_pem        = tls_self_signed_cert.authelia-valkey-ca.cert_pem
+  }
   ldap_endpoint = "${local.endpoints.lldap.service_fqdn}:${local.service_ports.ldaps}"
-  smtp          = var.smtp
+  redis_sentinel_endpoint = {
+    host        = local.endpoints.authelia_valkey.service_fqdn
+    port        = local.service_ports.redis_sentinel
+    master_name = local.endpoints.authelia_valkey.name
+  }
+  smtp = var.smtp
   ldap_credentials = {
     username = random_password.lldap-user.result
     password = random_password.lldap-password.result
@@ -805,9 +856,9 @@ module "navidrome" {
   name      = local.endpoints.navidrome.name
   namespace = local.endpoints.navidrome.namespace
   images = {
-    navidrome  = local.container_images.navidrome
-    mountpoint = local.container_images.mountpoint
-    litestream = local.container_images.litestream
+    navidrome  = local.container_images_digest.navidrome
+    mountpoint = local.container_images_digest.mountpoint
+    litestream = local.container_images_digest.litestream
   }
   extra_configs = {
     ND_EXTAUTH_TRUSTEDSOURCES = join(",", [

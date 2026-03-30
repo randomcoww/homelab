@@ -54,6 +54,14 @@ variable "ldap_ca" {
   })
 }
 
+variable "redis_ca" {
+  type = object({
+    algorithm       = string
+    private_key_pem = string
+    cert_pem        = string
+  })
+}
+
 variable "smtp" {
   type = object({
     host     = string
@@ -76,6 +84,14 @@ variable "ingress_hostname" {
 
 variable "ldap_endpoint" {
   type = string
+}
+
+variable "redis_sentinel_endpoint" {
+  type = object({
+    host        = string
+    port        = number
+    master_name = string
+  })
 }
 
 variable "minio_endpoint" {

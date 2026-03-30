@@ -96,6 +96,7 @@ resource "helm_release" "service" {
       yamlencode(m)
       ],
       module.lldap.releases,
+      module.authelia-valkey.releases,
       module.authelia.releases,
       module.llama-cpp.releases,
       # module.sunshine-desktop.releases,

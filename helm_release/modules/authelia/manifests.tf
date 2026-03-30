@@ -1,8 +1,10 @@
 locals {
   authelia_db_file                 = "/config/db.sqlite3" # base path not configurable
   authelia_litestream_config_file  = "/etc/litestream/config.yaml"
-  authelia_client_tls_cert_file    = "/custom/client-cert.pem"
-  authelia_client_tls_key_file     = "/custom/client-key.pem"
+  authelia_ldap_tls_cert_file      = "/custom/ldap-cert.pem"
+  authelia_ldap_tls_key_file       = "/custom/ldap-key.pem"
+  authelia_redis_tls_cert_file     = "/custom/redis-cert.pem"
+  authelia_redis_tls_key_file      = "/custom/redis-key.pem"
   authelia_oidc_jwk_key_file       = "/custom/oidc-jwk-key.pem"
   authelia_oidc_hmac_secret_file   = "/custom/oidc-hmac-secret"
   autehlia_oidc_client_shared_path = "/oidc"

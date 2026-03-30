@@ -40,6 +40,7 @@ output "releases" {
             manifests = [
               module.secret.manifest,
               module.ldap-tls.manifest,
+              module.redis-tls.manifest,
             ]
           }
         }
@@ -137,14 +138,28 @@ output "releases" {
                   readOnly  = true
                 },
                 {
-                  name      = "authelia-client-tls"
-                  mountPath = local.authelia_client_tls_cert_file
+                  name      = "authelia-ldap-tls"
+                  mountPath = local.authelia_ldap_tls_cert_file
                   subPath   = "tls.crt"
+                  readOnly  = true
                 },
                 {
-                  name      = "authelia-client-tls"
-                  mountPath = local.authelia_client_tls_key_file
+                  name      = "authelia-ldap-tls"
+                  mountPath = local.authelia_ldap_tls_key_file
                   subPath   = "tls.key"
+                  readOnly  = true
+                },
+                {
+                  name      = "authelia-redis-tls"
+                  mountPath = local.authelia_redis_tls_cert_file
+                  subPath   = "tls.crt"
+                  readOnly  = true
+                },
+                {
+                  name      = "authelia-redis-tls"
+                  mountPath = local.authelia_redis_tls_key_file
+                  subPath   = "tls.key"
+                  readOnly  = true
                 },
                 {
                   name      = "oidc-client-share"
@@ -154,11 +169,13 @@ output "releases" {
                   name      = "secret-custom"
                   mountPath = local.authelia_oidc_hmac_secret_file
                   subPath   = "oidc-hmac-secret"
+                  readOnly  = true
                 },
                 {
                   name      = "secret-custom"
                   mountPath = local.authelia_oidc_jwk_key_file
                   subPath   = "oidc-jwk-key"
+                  readOnly  = true
                 },
               ]
               extraVolumes = [
@@ -188,20 +205,34 @@ output "releases" {
                   }
                 },
                 {
-                  name = "authelia-client-tls"
+                  name = "authelia-ldap-tls"
                   secret = {
                     secretName = module.ldap-tls.name
+                  }
+                },
+                {
+                  name = "authelia-redis-tls"
+                  secret = {
+                    secretName = module.redis-tls.name
                   }
                 },
               ]
               env = [
                 {
                   name  = "AUTHELIA_AUTHENTICATION_BACKEND_LDAP_TLS_PRIVATE_KEY_FILE"
-                  value = local.authelia_client_tls_key_file
+                  value = local.authelia_ldap_tls_key_file
                 },
                 {
                   name  = "AUTHELIA_AUTHENTICATION_BACKEND_LDAP_TLS_CERTIFICATE_CHAIN_FILE"
-                  value = local.authelia_client_tls_cert_file
+                  value = local.authelia_ldap_tls_cert_file
+                },
+                {
+                  name  = "AUTHELIA_SESSION_REDIS_TLS_PRIVATE_KEY_FILE"
+                  value = local.authelia_redis_tls_key_file
+                },
+                {
+                  name  = "AUTHELIA_SESSION_REDIS_TLS_CERTIFICATE_CHAIN_FILE"
+                  value = local.authelia_redis_tls_cert_file
                 },
                 {
                   name  = "AUTHELIA_IDENTITY_PROVIDERS_OIDC_HMAC_SECRET_FILE"
@@ -488,6 +519,24 @@ output "releases" {
                     subdomain = regex(local.domain_regex, var.ingress_hostname).subdomain
                   },
                 ]
+                redis = {
+                  enabled = true
+                  host    = var.redis_sentinel_endpoint.host
+                  port    = var.redis_sentinel_endpoint.port
+                  password = {
+                    disabled = true
+                  }
+                  tls = {
+                    enabled = true
+                  }
+                  high_availability = {
+                    enabled       = true
+                    sentinel_name = var.redis_sentinel_endpoint.master_name
+                    password = {
+                      disabled = true
+                    }
+                  }
+                }
               }
               regulation = {
                 max_retries = 4
@@ -522,6 +571,10 @@ output "releases" {
                 {
                   name  = "ldap-ca.pem"
                   value = var.ldap_ca.cert_pem
+                },
+                {
+                  name  = "redis-ca.pem"
+                  value = var.redis_ca.cert_pem
                 },
               ]
             }

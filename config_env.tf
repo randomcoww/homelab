@@ -146,6 +146,7 @@ locals {
     sunshine_desktop = "reg.cluster.internal/randomcoww/sunshine-desktop:v2026.322.21442.1774277610@sha256:b140f163db4f534901a957bb3b55db965682ecb401d504056538433f060f6dc9"
     kubernetes_mcp   = "ghcr.io/containers/kubernetes-mcp-server:latest@sha256:b4be739ec8537b9e67e892f022c941c26c64ce98fe6e9d5990f511bdf6369254"
     navidrome        = "ghcr.io/navidrome/navidrome:0.60.3@sha256:a5dce8f33304714dd138e870cca0dcab3d937ca236be1a9f2b97da009d1a0048"
+    valkey           = "ghcr.io/valkey-io/valkey:9.1-alpine@sha256:355ae2c6c965769a0d9b9810711e6befd5b79fe676d1faa848247733ad6a4408"
 
     # models (model_file)
     "v5-small-text-matching-Q8_0.gguf"                                = "reg.cluster.internal/randomcoww/jina-embeddings-v5-text-small-text-matching-q8-0:v1773615151@sha256:ead9710eb051ea3b6ee32cebc1d1a8ba782c9e589ea972b48b15c173e169c4ee"
@@ -189,10 +190,11 @@ locals {
   }
 
   service_ports = {
-    minio    = 9000
-    metrics  = 9100
-    registry = 443 # not configurable
-    ldaps    = 6360
+    minio          = 9000
+    metrics        = 9100
+    registry       = 443 # not configurable
+    ldaps          = 6360
+    redis_sentinel = 26379
   }
 
   ha = {
@@ -254,10 +256,6 @@ locals {
         name      = "etcd"
         namespace = "kube-system"
       }
-      kube_proxy = {
-        name      = "kube-proxy"
-        namespace = "kube-system"
-      }
       kube_dns = {
         name      = "kube-dns"
         namespace = "kube-system"
@@ -305,6 +303,10 @@ locals {
         name      = "lldap"
         namespace = "auth"
         ingress   = "ldap.${local.domains.public}"
+      }
+      authelia_valkey = {
+        name      = "authelia-valkey"
+        namespace = "auth"
       }
       authelia = {
         name      = "authelia"
