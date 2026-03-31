@@ -66,6 +66,15 @@ sentinel monitor ${var.name} ${local.initial_master}.${local.headless_service_fq
 sentinel down-after-milliseconds ${var.name} 5000
 sentinel failover-timeout ${var.name} 60000
 sentinel parallel-syncs ${var.name} 1
+sentinel myid ${sha1(member.name)}
+
+%{~for _, remote in local.members~}
+%{~if remote.name != member.name~}
+
+sentinel known-sentinel ${var.name} ${remote.name}.${local.headless_service_fqdn} ${var.ports.sentinel} ${sha1(remote.name)}
+
+%{~endif~}
+%{~endfor~}
 EOF
   }
 
@@ -156,8 +165,8 @@ module "statefulset" {
           <<-EOF
           set -e
 
-          mkdir -p ${local.base_path}
-          cp /tmp/valkey.conf ${local.base_path}
+          cp ${local.base_path}/valkey-init.conf \
+            ${local.base_path}/valkey.conf
           exec valkey-server ${local.base_path}/valkey.conf
           EOF
         ]
@@ -178,8 +187,12 @@ module "statefulset" {
         ]
         volumeMounts = [
           {
+            name      = "valkey-data"
+            mountPath = local.base_path
+          },
+          {
             name        = "config"
-            mountPath   = "/tmp/valkey.conf"
+            mountPath   = "${local.base_path}/valkey-init.conf"
             subPathExpr = "valkey-$(POD_NAME).conf"
           },
           {
@@ -246,8 +259,8 @@ module "statefulset" {
           <<-EOF
           set -e
 
-          mkdir -p ${local.base_path}
-          cp /tmp/sentinel.conf ${local.base_path}
+          cp ${local.base_path}/sentinel-init.conf \
+            ${local.base_path}/sentinel.conf
           exec valkey-server ${local.base_path}/sentinel.conf --sentinel
           EOF
         ]
@@ -268,24 +281,31 @@ module "statefulset" {
         ]
         volumeMounts = [
           {
+            name      = "sentinel-data"
+            mountPath = local.base_path
+          },
+          {
             name        = "config"
-            mountPath   = "/tmp/sentinel.conf"
+            mountPath   = "${local.base_path}/sentinel-init.conf"
             subPathExpr = "sentinel-$(POD_NAME).conf"
           },
           {
             name        = "tls"
             mountPath   = "${local.base_path}/valkey.crt"
             subPathExpr = "$(POD_NAME)-tls.crt"
+            readOnly    = true
           },
           {
             name        = "tls"
             mountPath   = "${local.base_path}/valkey.key"
             subPathExpr = "$(POD_NAME)-tls.key"
+            readOnly    = true
           },
           {
             name      = "tls"
             mountPath = "${local.base_path}/ca.crt"
             subPath   = "ca.crt"
+            readOnly  = true
           },
         ]
         livenessProbe = {
@@ -326,6 +346,18 @@ module "statefulset" {
       },
     ]
     volumes = [
+      {
+        name = "valkey-data"
+        emptyDir = {
+          medium = "Memory"
+        }
+      },
+      {
+        name = "sentinel-data"
+        emptyDir = {
+          medium = "Memory"
+        }
+      },
       {
         name = "config"
         configMap = {
