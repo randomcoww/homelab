@@ -122,7 +122,7 @@ locals {
     flannel            = "ghcr.io/flannel-io/flannel:v0.28.2@sha256:3726b7dd2f758f1cc8155edc442e7f3fbad68cf42530d6bcb3ddffdba40a1394"
     flannel_cni_plugin = "ghcr.io/flannel-io/flannel-cni-plugin:v1.9.0-flannel1@sha256:c6a08fe5bcb23b19c2fc7c1e47b95a967cc924224ebedf94e8623f27b6c258fa"
     kube_vip           = "ghcr.io/kube-vip/kube-vip:v1.1.2@sha256:840305b94ef2a89abb3b7fd2b09edfbde690d90052020da4dff90679fe892da2"
-    minio              = "cgr.dev/chainguard/minio:latest@sha256:e395c92a38f44238f3d4f21b55af0a17328e04ab3c31b8825a7b457f8d69618a"
+    minio              = "cgr.dev/chainguard/minio:latest@sha256:ad9623a229addfb8d8ad1caaa3ba3095716e0ee43d181867aca6c8ce85135d7d"
     nginx              = "docker.io/nginxinc/nginx-unprivileged:1.29.5-alpine@sha256:f99cc61bf1719f30230602036314ff6ba5dcede8965c5ed3ded71b8bbced3723"
     # tier 2
     kea           = "ghcr.io/randomcoww/kea:v3.1.7@sha256:c35219e5417884fa64d68d5c923fbbea40c036d9f86039bccad8b4bc8d5ec2b0"
@@ -144,8 +144,8 @@ locals {
     authelia         = "ghcr.io/authelia/authelia:4.39.16@sha256:edbce01c5125249e4f4faea01e0f76f0031d64b4a1d0c2514a0ca69cb126d05f"
     cloudflared      = "docker.io/cloudflare/cloudflared:2026.3.0@sha256:6b599ca3e974349ead3286d178da61d291961182ec3fe9c505e1dd02c8ac31b0"
     sunshine_desktop = "reg.cluster.internal/randomcoww/sunshine-desktop:v2026.329.31930.1774882930@sha256:ec39e88ea74ce524c82f6cc16394e58256780314db90ab76ef245f8839ec2459"
-    kubernetes_mcp   = "ghcr.io/containers/kubernetes-mcp-server:latest@sha256:dd5a3ad2b9a59cf9cbcdd9325e03dd5e45c8cbbd1e75373732de6db093d7d692"
-    navidrome        = "ghcr.io/navidrome/navidrome:0.60.3@sha256:a5dce8f33304714dd138e870cca0dcab3d937ca236be1a9f2b97da009d1a0048"
+    kubernetes_mcp   = "ghcr.io/containers/kubernetes-mcp-server:latest@sha256:78c28f4233c8c2265ad9b690c2171d84a96cc3bc47c071681866749972801f04"
+    navidrome        = "ghcr.io/navidrome/navidrome:0.61.0@sha256:b14a6acb5cd5ee73f3a13d63d8d68ede82dedb796aa522fbada94769d990cf0b"
     valkey           = "ghcr.io/valkey-io/valkey:9.1-alpine@sha256:355ae2c6c965769a0d9b9810711e6befd5b79fe676d1faa848247733ad6a4408"
 
     # models (model_file)
@@ -158,7 +158,7 @@ locals {
   host_images = {
     for name, tag in {
       # these fields are updated by renovate - don't use var substitutions
-      default = "43.20260327.20.1.1774632529" # renovate: datasource=github-tags depName=randomcoww/fedora-coreos-config-custom
+      default = "43.20260331.20.1.1775016471" # renovate: datasource=github-tags depName=randomcoww/fedora-coreos-config-custom
     } :
     name => {
       kernel = "fedora-coreos-${tag}-live-kernel.$${buildarch:uristring}"
