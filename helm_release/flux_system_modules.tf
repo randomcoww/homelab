@@ -766,7 +766,7 @@ module "prometheus" {
               EOF
               for   = "30m"
               labels = {
-                severity = "critical"
+                severity = "warning"
               }
               annotations = {
                 summary = "Cluster storage decreasing rapidly (>1GB/hour)"
@@ -779,7 +779,7 @@ module "prometheus" {
               EOF
               for   = "30m"
               labels = {
-                severity = "critical"
+                severity = "warning"
               }
               annotations = {
                 summary = "Cluster free space increasing rapidly (>1GB/hour)"
@@ -793,7 +793,7 @@ module "prometheus" {
               EOF
               for   = "10m"
               labels = {
-                severity = "critical"
+                severity = "warning"
               }
               annotations = {
                 summary = "Cluster storage {{ $value | humanizePercentage }} free (below 30%)"
@@ -858,7 +858,7 @@ module "prometheus" {
               EOF
               for   = "10m"
               labels = {
-                severity = "warning"
+                severity = "critical"
               }
               annotations = {
                 summary = "Drive {{ $labels.drive }} at index {{ $labels.drive_index }} in server {{$labels.server}} is offline."
@@ -871,7 +871,7 @@ module "prometheus" {
               EOF
               for   = "10m"
               labels = {
-                severity = "warning"
+                severity = "critical"
               }
               annotations = {
                 summary = "Memory usage on {{ $labels.server }} at {{ $value }}%"

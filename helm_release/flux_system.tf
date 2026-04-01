@@ -941,7 +941,7 @@ resource "helm_release" "system" {
                 forceReboot   = true
                 drainTimeout  = "6m"
                 blockingPodSelector = [
-                  "app=arc-runner",
+                  "app.kubernetes.io/part-of=gha-runner-scale-set,app.kubernetes.io/component=runner",
                 ]
                 timeZone = local.timezone
                 # trigger reboot if either /var/run/reboot-required is set, or node failed network boot
