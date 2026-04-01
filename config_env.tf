@@ -135,7 +135,7 @@ locals {
     hostapd          = "reg.cluster.internal/randomcoww/hostapd:v2.11.1774882541@sha256:4e836087ab10ea4024f3e2507a5d8e959d38cde42261fa6b2d185c975a69a712"
     tailscale        = "ghcr.io/tailscale/tailscale:v1.94.2@sha256:95e528798bebe75f39b10e74e7051cf51188ee615934f232ba7ad06a3390ffa1"
     qrcode_generator = "reg.cluster.internal/randomcoww/qrcode-resource:v1774882877@sha256:db6c56f9700d03f2bb80445deada3f525030f23a78247667644285e186d817cb"
-    llama_cpp_vulkan = "ghcr.io/mostlygeek/llama-swap:vulkan@sha256:3f77484b435ceb2be1cafdbef2124ddbae9ced224631032480528fcf0bc38354"
+    llama_cpp_vulkan = "ghcr.io/mostlygeek/llama-swap:vulkan@sha256:68639134d35448a1ede0d2689e51b2e2c0f4b57768179236b0159410d986ef1e"
     litestream       = "docker.io/litestream/litestream:0.5.10@sha256:66c0ef32779b20f7ce682751ec50ba0f1363cad5cb9dba1e23fbeee6ae3197b9"
     searxng          = "ghcr.io/searxng/searxng:latest@sha256:4d7ed8b7035ecf827bd901ba6d32f5c32d8119bc09bb3cdafeb0ce58f1b951c1"
     open_webui       = "ghcr.io/open-webui/open-webui:v0.8.12@sha256:8113fa5510020ef05a44afc0c42d33eabeeb2524a996e3e3fb8c437c00f0d792"
@@ -144,7 +144,7 @@ locals {
     authelia         = "ghcr.io/authelia/authelia:4.39.16@sha256:edbce01c5125249e4f4faea01e0f76f0031d64b4a1d0c2514a0ca69cb126d05f"
     cloudflared      = "docker.io/cloudflare/cloudflared:2026.3.0@sha256:6b599ca3e974349ead3286d178da61d291961182ec3fe9c505e1dd02c8ac31b0"
     sunshine_desktop = "reg.cluster.internal/randomcoww/sunshine-desktop:v2026.329.31930.1774882930@sha256:ec39e88ea74ce524c82f6cc16394e58256780314db90ab76ef245f8839ec2459"
-    kubernetes_mcp   = "ghcr.io/containers/kubernetes-mcp-server:latest@sha256:78c28f4233c8c2265ad9b690c2171d84a96cc3bc47c071681866749972801f04"
+    kubernetes_mcp   = "ghcr.io/containers/kubernetes-mcp-server:latest@sha256:af855648f00263c9d97b531c481ad40b2d04770639b9669d098c0ec82e200b76"
     navidrome        = "ghcr.io/navidrome/navidrome:0.61.0@sha256:b14a6acb5cd5ee73f3a13d63d8d68ede82dedb796aa522fbada94769d990cf0b"
     valkey           = "ghcr.io/valkey-io/valkey:9.1-alpine@sha256:355ae2c6c965769a0d9b9810711e6befd5b79fe676d1faa848247733ad6a4408"
 
