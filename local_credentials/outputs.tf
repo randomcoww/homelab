@@ -38,7 +38,7 @@ output "mc_config" {
 }
 
 output "rclone_config" {
-  value     = <<-EOF
+  value     = <<EOF
 [m]
 type = s3
 provider = Minio
@@ -46,9 +46,8 @@ access_key_id = ${data.terraform_remote_state.host.outputs.minio.access_key_id}
 secret_access_key = ${data.terraform_remote_state.host.outputs.minio.secret_access_key}
 region = auto
 endpoint = https://${local.services.minio.ip}:${local.service_ports.minio}
-%{~for name, res in data.terraform_remote_state.sr.outputs.r2_bucket~}
 
-
+%{~for name, res in data.terraform_remote_state.sr.outputs.r2_bucket}
 [cf-${name}]
 type = s3
 provider = Cloudflare
@@ -56,7 +55,7 @@ access_key_id = ${res.access_key_id}
 secret_access_key = ${res.secret_access_key}
 region = auto
 endpoint = https://${res.url}
-%{~endfor~}
+%{endfor~}
 EOF
   sensitive = true
 }

@@ -14,7 +14,7 @@ locals {
 
   valkey_configs = {
     for _, member in local.members :
-    "valkey-${member.name}.conf" => <<-EOF
+    "valkey-${member.name}.conf" => <<EOF
 port 0
 tls-port ${local.redis_port}
 bind 0.0.0.0
@@ -31,10 +31,9 @@ tls-ca-cert-file ${local.base_path}/ca.crt
 tls-cert-file ${local.base_path}/valkey.crt
 tls-key-file ${local.base_path}/valkey.key
 
-%{~if member.name != local.initial_master~}
+%{if member.name != local.initial_master~}
 replicaof ${local.initial_master}.${local.headless_service_fqdn} ${local.redis_port}
-%{~endif~}
-
+%{~endif}
 replica-announce-ip ${member.name}.${local.headless_service_fqdn}
 min-replicas-to-write 1
 min-replicas-max-lag 10
@@ -43,7 +42,7 @@ EOF
 
   sentinel_configs = {
     for _, member in local.members :
-    "sentinel-${member.name}.conf" => <<-EOF
+    "sentinel-${member.name}.conf" => <<EOF
 port 0
 tls-port ${var.ports.sentinel}
 bind 0.0.0.0
@@ -67,14 +66,9 @@ sentinel down-after-milliseconds ${var.name} 5000
 sentinel failover-timeout ${var.name} 60000
 sentinel parallel-syncs ${var.name} 1
 sentinel myid ${sha1(member.name)}
-
-%{~for _, remote in local.members~}
-%{~if remote.name != member.name~}
-
+%{~for _, remote in local.members}%{if remote.name != member.name}
 sentinel known-sentinel ${var.name} ${remote.name}.${local.headless_service_fqdn} ${var.ports.sentinel} ${sha1(remote.name)}
-
-%{~endif~}
-%{~endfor~}
+%{endif}%{endfor~}
 EOF
   }
 
