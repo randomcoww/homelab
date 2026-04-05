@@ -81,21 +81,6 @@ output "releases" {
                 "checksum/store-tls" = sha256(module.store-tls.manifest)
               }
               sidecarContainers = {
-                /*
-                thanos-querier-frontend = {
-                  image = var.images.thanos
-                  args = [
-                    "query-frontend",
-                    "--http-address=0.0.0.0:${local.thanos_querier_frontend_port}",
-                    "--query-frontend.downstream-url=http://127.0.0.1:${local.thanos_querier_port}",
-                  ]
-                  ports = [
-                    {
-                      containerPort = local.thanos_querier_frontend_port
-                    },
-                  ]
-                }
-                */
                 thanos-querier = {
                   image = var.images.thanos
                   args = [
@@ -143,6 +128,22 @@ output "releases" {
                       subPath   = "ca.crt"
                     },
                   ]
+                  livenessProbe = {
+                    httpGet = {
+                      scheme = "HTTP"
+                      port   = local.thanos_querier_port
+                      path   = "/-/healthy"
+                    }
+                    initialDelaySeconds = 10
+                    timeoutSeconds      = 2
+                  }
+                  readinessProbe = {
+                    httpGet = {
+                      scheme = "HTTP"
+                      port   = local.thanos_querier_port
+                      path   = "/-/ready"
+                    }
+                  }
                 }
                 thanos-sidecar = {
                   image = var.images.thanos
@@ -150,7 +151,7 @@ output "releases" {
                     "sidecar",
                     "--prometheus.url=http://127.0.0.1:9090", # port is hardcoded in helm chart
                     "--tsdb.path=${local.tsdb_path}",
-                    "--http-address=127.0.0.1:50902", # unused
+                    "--http-address=0.0.0.0:${local.thanos_sidecar_probe_port}",
                     "--grpc-address=0.0.0.0:${local.thanos_sidecar_port}",
                     "--grpc-server-tls-cert=${local.store_tls_path}/tls.crt",
                     "--grpc-server-tls-key=${local.store_tls_path}/tls.key",
@@ -218,13 +219,29 @@ output "releases" {
                       readOnly  = true
                     },
                   ]
+                  livenessProbe = {
+                    httpGet = {
+                      scheme = "HTTP"
+                      port   = local.thanos_sidecar_probe_port
+                      path   = "/-/healthy"
+                    }
+                    initialDelaySeconds = 10
+                    timeoutSeconds      = 2
+                  }
+                  readinessProbe = {
+                    httpGet = {
+                      scheme = "HTTP"
+                      port   = local.thanos_sidecar_probe_port
+                      path   = "/-/ready"
+                    }
+                  }
                 }
                 thanos-store = {
                   image = var.images.thanos
                   args = [
                     "store",
                     "--data-dir=${local.store_data_path}",
-                    "--http-address=127.0.0.1:50901", # unused
+                    "--http-address=0.0.0.0:${local.thanos_store_probe_port}",
                     "--grpc-address=0.0.0.0:${local.thanos_store_port}",
                     "--grpc-server-tls-cert=${local.store_tls_path}/tls.crt",
                     "--grpc-server-tls-key=${local.store_tls_path}/tls.key",
@@ -292,6 +309,22 @@ output "releases" {
                       readOnly  = true
                     },
                   ]
+                  livenessProbe = {
+                    httpGet = {
+                      scheme = "HTTP"
+                      port   = local.thanos_store_probe_port
+                      path   = "/-/healthy"
+                    }
+                    initialDelaySeconds = 10
+                    timeoutSeconds      = 2
+                  }
+                  readinessProbe = {
+                    httpGet = {
+                      scheme = "HTTP"
+                      port   = local.thanos_store_probe_port
+                      path   = "/-/ready"
+                    }
+                  }
                 }
               }
               replicaCount = var.replicas
