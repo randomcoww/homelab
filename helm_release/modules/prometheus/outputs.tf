@@ -28,7 +28,7 @@ output "releases" {
           chart = {
             spec = {
               chart   = "prometheus"
-              version = "28.15.0" # renovate: datasource=helm depName=prometheus registryUrl=https://prometheus-community.github.io/helm-charts
+              version = "28.16.0" # renovate: datasource=helm depName=prometheus registryUrl=https://prometheus-community.github.io/helm-charts
               sourceRef = {
                 kind = "HelmRepository"
                 name = var.name
