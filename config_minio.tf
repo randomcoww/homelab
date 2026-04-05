@@ -158,6 +158,27 @@ locals {
         ]
       }
 
+      # prometheus thanos sidecar
+      prometheus = {
+        name      = local.endpoints.prometheus.name
+        namespace = local.endpoints.prometheus.namespace
+        policies = [
+          {
+            Effect = "Allow"
+            Action = [
+              "s3:GetObject",
+              "s3:PutObject",
+              "s3:ListBucket",
+              "s3:DeleteObject",
+              "s3:AbortMultipartUpload",
+            ]
+            buckets = [
+              "prometheus",
+            ]
+          },
+        ]
+      }
+
     } :
 
     key => merge(params, {

@@ -51,7 +51,6 @@ output "releases" {
             enable = false
           }
           values = {
-
             # manifest start
 
             configmapReload = {
@@ -60,34 +59,283 @@ output "releases" {
               }
             }
             server = {
-              strategy = {
-                type = "RollingUpdate"
-              }
-              persistentVolume = {
-                enabled = false
-              }
-              replicaCount = 2
-              statefulSet = {
-                enabled = true
-              }
               global = {
                 scrape_interval     = "10s"
                 scrape_timeout      = "4s"
                 evaluation_interval = "10s"
+                external_labels = {
+                  replica = "$${POD_NAME}"
+                }
               }
+              strategy = {
+                type = "RollingUpdate"
+              }
+              persistentVolume = {
+                enabled   = false
+                mountPath = local.tsdb_path
+              }
+              emptyDir = {
+                medium = "Memory"
+              }
+              podAnnotations = {
+                "checksum/store-tls" = sha256(module.store-tls.manifest)
+              }
+              sidecarContainers = {
+                /*
+                thanos-querier-frontend = {
+                  image = var.images.thanos
+                  args = [
+                    "query-frontend",
+                    "--http-address=0.0.0.0:${local.thanos_querier_frontend_port}",
+                    "--query-frontend.downstream-url=http://127.0.0.1:${local.thanos_querier_port}",
+                  ]
+                  ports = [
+                    {
+                      containerPort = local.thanos_querier_frontend_port
+                    },
+                  ]
+                }
+                */
+                thanos-querier = {
+                  image = var.images.thanos
+                  args = [
+                    "query",
+                    "--query.replica-label=replica",
+                    "--http-address=0.0.0.0:${local.thanos_querier_port}",
+                    "--grpc-address=127.0.0.1:50903", # unused
+                    "--grpc-client-tls-secure",
+                    "--grpc-client-tls-cert=${local.store_tls_path}/tls.crt",
+                    "--grpc-client-tls-key=${local.store_tls_path}/tls.key",
+                    "--grpc-client-tls-ca=${local.store_tls_path}/ca.crt",
+                    <<-EOF
+                    --endpoint.sd-config=${yamlencode(local.thanos_querier_sd_config)}
+                    EOF
+                  ]
+                  env = [
+                    {
+                      name = "POD_NAME"
+                      valueFrom = {
+                        fieldRef = {
+                          fieldPath = "metadata.name"
+                        }
+                      }
+                    },
+                  ]
+                  volumeMounts = [
+                    {
+                      name        = "thanos-store-tls"
+                      mountPath   = "${local.store_tls_path}/tls.crt"
+                      subPathExpr = "$(POD_NAME)-tls.crt"
+                    },
+                    {
+                      name        = "thanos-store-tls"
+                      mountPath   = "${local.store_tls_path}/tls.key"
+                      subPathExpr = "$(POD_NAME)-tls.key"
+                    },
+                    {
+                      name      = "thanos-store-tls"
+                      mountPath = "${local.store_tls_path}/ca.crt"
+                      subPath   = "ca.crt"
+                    },
+                  ]
+                }
+                thanos-sidecar = {
+                  image = var.images.thanos
+                  args = [
+                    "sidecar",
+                    "--prometheus.url=http://127.0.0.1:9090", # port is hardcoded in helm chart
+                    "--tsdb.path=${local.tsdb_path}",
+                    "--http-address=127.0.0.1:50902", # unused
+                    "--grpc-address=0.0.0.0:${local.thanos_sidecar_port}",
+                    "--grpc-server-tls-cert=${local.store_tls_path}/tls.crt",
+                    "--grpc-server-tls-key=${local.store_tls_path}/tls.key",
+                    "--grpc-server-tls-client-ca=${local.store_tls_path}/ca.crt",
+                    <<-EOF
+                    --objstore.config=${yamlencode(local.thanos_sidecar_object_config)}
+                    EOF
+                  ]
+                  env = [
+                    {
+                      name = "POD_NAME"
+                      valueFrom = {
+                        fieldRef = {
+                          fieldPath = "metadata.name"
+                        }
+                      }
+                    },
+                    {
+                      name = "AWS_ACCESS_KEY_ID"
+                      valueFrom = {
+                        secretKeyRef = {
+                          name = var.minio_access_secret
+                          key  = "AWS_ACCESS_KEY_ID"
+                        }
+                      }
+                    },
+                    {
+                      name = "AWS_SECRET_ACCESS_KEY"
+                      valueFrom = {
+                        secretKeyRef = {
+                          name = var.minio_access_secret
+                          key  = "AWS_SECRET_ACCESS_KEY"
+                        }
+                      }
+                    },
+                  ]
+                  ports = [
+                    {
+                      containerPort = local.thanos_sidecar_port
+                    },
+                  ]
+                  volumeMounts = [
+                    {
+                      name      = "storage-volume"
+                      mountPath = local.tsdb_path
+                    },
+                    {
+                      name        = "thanos-store-tls"
+                      mountPath   = "${local.store_tls_path}/tls.crt"
+                      subPathExpr = "$(POD_NAME)-tls.crt"
+                    },
+                    {
+                      name        = "thanos-store-tls"
+                      mountPath   = "${local.store_tls_path}/tls.key"
+                      subPathExpr = "$(POD_NAME)-tls.key"
+                    },
+                    {
+                      name      = "thanos-store-tls"
+                      mountPath = "${local.store_tls_path}/ca.crt"
+                      subPath   = "ca.crt"
+                    },
+                    {
+                      name      = "ca-trust-bundle"
+                      mountPath = "/etc/ssl/certs/ca-certificates.crt"
+                      readOnly  = true
+                    },
+                  ]
+                }
+                thanos-store = {
+                  image = var.images.thanos
+                  args = [
+                    "store",
+                    "--data-dir=${local.store_data_path}",
+                    "--http-address=127.0.0.1:50901", # unused
+                    "--grpc-address=0.0.0.0:${local.thanos_store_port}",
+                    "--grpc-server-tls-cert=${local.store_tls_path}/tls.crt",
+                    "--grpc-server-tls-key=${local.store_tls_path}/tls.key",
+                    "--grpc-server-tls-client-ca=${local.store_tls_path}/ca.crt",
+                    <<-EOF
+                    --objstore.config=${yamlencode(local.thanos_store_object_config)}
+                    EOF
+                  ]
+                  env = [
+                    {
+                      name = "POD_NAME"
+                      valueFrom = {
+                        fieldRef = {
+                          fieldPath = "metadata.name"
+                        }
+                      }
+                    },
+                    {
+                      name = "AWS_ACCESS_KEY_ID"
+                      valueFrom = {
+                        secretKeyRef = {
+                          name = var.minio_access_secret
+                          key  = "AWS_ACCESS_KEY_ID"
+                        }
+                      }
+                    },
+                    {
+                      name = "AWS_SECRET_ACCESS_KEY"
+                      valueFrom = {
+                        secretKeyRef = {
+                          name = var.minio_access_secret
+                          key  = "AWS_SECRET_ACCESS_KEY"
+                        }
+                      }
+                    },
+                  ]
+                  ports = [
+                    {
+                      containerPort = local.thanos_store_port
+                    },
+                  ]
+                  volumeMounts = [
+                    {
+                      name      = "thanos-store-data"
+                      mountPath = local.store_data_path
+                    },
+                    {
+                      name        = "thanos-store-tls"
+                      mountPath   = "${local.store_tls_path}/tls.crt"
+                      subPathExpr = "$(POD_NAME)-tls.crt"
+                    },
+                    {
+                      name        = "thanos-store-tls"
+                      mountPath   = "${local.store_tls_path}/tls.key"
+                      subPathExpr = "$(POD_NAME)-tls.key"
+                    },
+                    {
+                      name      = "thanos-store-tls"
+                      mountPath = "${local.store_tls_path}/ca.crt"
+                      subPath   = "ca.crt"
+                    },
+                    {
+                      name      = "ca-trust-bundle"
+                      mountPath = "/etc/ssl/certs/ca-certificates.crt"
+                      readOnly  = true
+                    },
+                  ]
+                }
+              }
+              replicaCount = var.replicas
+              statefulSet = {
+                enabled = true
+                headless = {
+                  gRPC = {
+                    enabled = true
+                  }
+                }
+              }
+              storagePath = local.tsdb_path
               extraFlags = [
                 "web.enable-lifecycle",
-                "storage.tsdb.wal-compression",
+              ]
+              extraArgs = {
+                enable-feature                    = "expand-external-labels"
+                "storage.tsdb.min-block-duration" = "2h"
+                "storage.tsdb.max-block-duration" = "2h"
+              }
+              env = [
+                {
+                  name = "POD_NAME"
+                  valueFrom = {
+                    fieldRef = {
+                      fieldPath = "metadata.name"
+                    }
+                  }
+                },
               ]
               retention     = "1d"
               retentionSize = "128MB"
               resources = {
                 requests = {
-                  memory = "4Gi"
+                  memory = "6Gi"
                 }
                 limits = {
-                  memory = "4Gi"
+                  memory = "6Gi"
                 }
+              }
+              service = {
+                enabled = true
+                additionalPorts = [
+                  {
+                    name       = "thanos-querier"
+                    port       = local.thanos_querier_port
+                    targetPort = local.thanos_querier_port
+                  },
+                ]
               }
               ingress = {
                 enabled = false
@@ -100,6 +348,35 @@ output "releases" {
                   ]
                   hostnames = [
                     var.ingress_hostname,
+                  ]
+                  additionalRules = [
+                    {
+                      matches = [
+                        for _, p in [
+                          "/api/v1/query",
+                          "/api/v1/query_range",
+                          "/api/v1/series",
+                          "/api/v1/labels",
+                          "/api/v1/label",
+                          "/api/v1/metadata",
+                          "/api/v1/query_exemplars",
+                          "/api/v1/rules",
+                          "/api/v1/alerts",
+                        ] :
+                        {
+                          path = {
+                            type  = "PathPrefix"
+                            value = p
+                          }
+                        }
+                      ]
+                      backendRefs = [
+                        {
+                          name = "${var.name}-server"
+                          port = local.thanos_querier_port
+                        },
+                      ]
+                    },
                   ]
                 }
               }
@@ -118,7 +395,27 @@ output "releases" {
                     type = "File"
                   }
                 },
+                {
+                  name = "thanos-store-data"
+                  emptyDir = {
+                    medium = "Memory"
+                  }
+                },
+                {
+                  name = "thanos-store-tls"
+                  secret = {
+                    secretName = module.store-tls.name
+                  }
+                },
               ]
+              dnsConfig = {
+                options = [
+                  {
+                    name  = "ndots"
+                    value = "2"
+                  },
+                ]
+              }
               podLabels = {
                 app = var.name
               }
@@ -143,6 +440,9 @@ output "releases" {
                 }
               }
             }
+            extraManifests = [
+              module.store-tls.manifest,
+            ]
             extraScrapeConfigs = var.scrape_configs
             serverFiles        = var.server_files
             alertmanager = {
@@ -152,59 +452,18 @@ output "releases" {
               enabled = false
             }
             prometheus-node-exporter = {
-              enabled = false
+              enabled = true
+              resources = {
+                requests = {
+                  memory = "64Mi"
+                }
+                limits = {
+                  memory = "64Mi"
+                }
+              }
             }
             prometheus-pushgateway = {
               enabled = false
-            }
-          }
-        }
-      },
-
-      # node exporter
-      {
-        apiVersion = "helm.toolkit.fluxcd.io/v2"
-        kind       = "HelmRelease"
-        metadata = {
-          name      = "${var.name}-node-exporter"
-          namespace = var.namespace
-        }
-        spec = {
-          interval = "15m"
-          timeout  = "5m"
-          chart = {
-            spec = {
-              chart   = "prometheus-node-exporter"
-              version = "4.52.2" # renovate: datasource=helm depName=prometheus-node-exporter registryUrl=https://prometheus-community.github.io/helm-charts
-              sourceRef = {
-                kind = "HelmRepository"
-                name = var.name
-              }
-              interval = "5m"
-            }
-          }
-          releaseName = "${var.name}-node-exporter"
-          install = {
-            remediation = {
-              retries = -1
-            }
-          }
-          upgrade = {
-            remediation = {
-              retries = -1
-            }
-          }
-          test = {
-            enable = false
-          }
-          values = {
-            resources = {
-              requests = {
-                memory = "64Mi"
-              }
-              limits = {
-                memory = "64Mi"
-              }
             }
           }
         }

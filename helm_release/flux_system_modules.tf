@@ -328,6 +328,9 @@ module "prometheus" {
   source    = "./modules/prometheus"
   name      = local.endpoints.prometheus.name
   namespace = local.endpoints.prometheus.namespace
+  images = {
+    thanos = local.container_images_digest.thanos
+  }
   scrape_configs = yamlencode([
     {
       job_name = "cri-o"
@@ -1083,9 +1086,13 @@ module "prometheus" {
       ]
     }
   }
+  cluster_domain   = local.domains.kubernetes
   ingress_hostname = local.endpoints.prometheus.ingress
   gateway_ref = {
     name      = local.endpoints.traefik.name
     namespace = local.endpoints.traefik.namespace
   }
+  minio_endpoint      = "${local.services.cluster_minio.ip}:${local.service_ports.minio}"
+  minio_bucket        = "prometheus"
+  minio_access_secret = local.minio_users.prometheus.secret
 }
