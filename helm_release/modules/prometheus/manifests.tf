@@ -1,8 +1,9 @@
 locals {
-  tsdb_volume_name = "tsdb-volume"
-  tsdb_path        = "/etc/prometheus/data"
-  store_data_path  = "/etc/thanos/data"
-  store_tls_path   = "/etc/thanos/tls"
+  tsdb_volume_name    = "tsdb-volume"
+  tsdb_path           = "/etc/prometheus/data"
+  store_data_path     = "/etc/thanos/store"
+  compactor_data_path = "/etc/thanos/compactor"
+  store_tls_path      = "/etc/thanos/store-tls"
 
   thanos_querier_port          = 10902
   thanos_querier_frontend_port = 10904
@@ -37,6 +38,101 @@ locals {
       bucket       = var.minio_bucket
       endpoint     = var.minio_endpoint
       aws_sdk_auth = true
+    }
+  }
+
+  compactor_job = {
+    apiVersion = "batch/v1"
+    kind       = "CronJob"
+    metadata = {
+      name = "${var.name}-thanos-compactor"
+      labels = {
+        app     = var.name
+        release = "0.1.0"
+      }
+    }
+    spec = {
+      schedule          = "0 * * * *"
+      suspend           = false
+      concurrencyPolicy = "Forbid"
+      jobTemplate = {
+        spec = {
+          ttlSecondsAfterFinished = 1800
+          template = {
+            spec = {
+              restartPolicy = "Never"
+              containers = [
+                {
+                  name  = "thanos-compactor"
+                  image = var.images.thanos
+                  args = [
+                    "compact",
+                    "--web.disable",
+                    "--data-dir=${local.compactor_data_path}",
+                    <<-EOF
+                    --objstore.config=${yamlencode(local.thanos_object_config)}
+                    EOF
+                  ]
+                  env = [
+                    {
+                      name = "AWS_ACCESS_KEY_ID"
+                      valueFrom = {
+                        secretKeyRef = {
+                          name = var.minio_access_secret
+                          key  = "AWS_ACCESS_KEY_ID"
+                        }
+                      }
+                    },
+                    {
+                      name = "AWS_SECRET_ACCESS_KEY"
+                      valueFrom = {
+                        secretKeyRef = {
+                          name = var.minio_access_secret
+                          key  = "AWS_SECRET_ACCESS_KEY"
+                        }
+                      }
+                    },
+                  ]
+                  volumeMounts = [
+                    {
+                      name      = "thanos-compactor-data"
+                      mountPath = local.compactor_data_path
+                    },
+                    {
+                      name      = "ca-trust-bundle"
+                      mountPath = "/etc/ssl/certs/ca-certificates.crt"
+                      readOnly  = true
+                    },
+                  ]
+                },
+              ]
+              volumes = [
+                {
+                  name = "thanos-compactor-data"
+                  emptyDir = {
+                    medium = "Memory"
+                  }
+                },
+                {
+                  name = "ca-trust-bundle"
+                  hostPath = {
+                    path = "/etc/ssl/certs/ca-certificates.crt"
+                    type = "File"
+                  }
+                },
+              ]
+              dnsConfig = {
+                options = [
+                  {
+                    name  = "ndots"
+                    value = "2"
+                  },
+                ]
+              }
+            }
+          }
+        }
+      }
     }
   }
 }

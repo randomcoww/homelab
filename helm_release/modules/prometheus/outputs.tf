@@ -121,6 +121,11 @@ output "releases" {
                       }
                     },
                   ]
+                  ports = [
+                    {
+                      containerPort = local.thanos_querier_port
+                    },
+                  ]
                   volumeMounts = [
                     {
                       name        = "thanos-store-tls"
@@ -442,6 +447,7 @@ output "releases" {
             }
             extraManifests = [
               module.store-tls.manifest,
+              yamlencode(local.compactor_job),
             ]
             extraScrapeConfigs = var.scrape_configs
             serverFiles        = var.server_files
