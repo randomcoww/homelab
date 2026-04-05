@@ -151,7 +151,7 @@ output "releases" {
                     "--grpc-server-tls-key=${local.store_tls_path}/tls.key",
                     "--grpc-server-tls-client-ca=${local.store_tls_path}/ca.crt",
                     <<-EOF
-                    --objstore.config=${yamlencode(local.thanos_sidecar_object_config)}
+                    --objstore.config=${yamlencode(local.thanos_object_config)}
                     EOF
                   ]
                   env = [
@@ -225,7 +225,7 @@ output "releases" {
                     "--grpc-server-tls-key=${local.store_tls_path}/tls.key",
                     "--grpc-server-tls-client-ca=${local.store_tls_path}/ca.crt",
                     <<-EOF
-                    --objstore.config=${yamlencode(local.thanos_store_object_config)}
+                    --objstore.config=${yamlencode(local.thanos_object_config)}
                     EOF
                   ]
                   env = [

@@ -31,16 +31,7 @@ locals {
     ])
   }
 
-  thanos_sidecar_object_config = {
-    type = "S3"
-    config = {
-      bucket       = var.minio_bucket
-      endpoint     = var.minio_endpoint
-      aws_sdk_auth = true
-    }
-  }
-
-  thanos_store_object_config = {
+  thanos_object_config = {
     type = "S3"
     config = {
       bucket       = var.minio_bucket
