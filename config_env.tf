@@ -134,7 +134,7 @@ locals {
     mountpoint       = "reg.cluster.internal/randomcoww/mountpoint-s3:v1.22.2.1775487427@sha256:735e889368d3815e6ebaf7ccaadc4d0c02cb71ecbf73cb19d697ea17c9dd2f3e"
     hostapd          = "reg.cluster.internal/randomcoww/hostapd:v2.11.1775486354@sha256:dd76c932b41e58a68004ac61aac15e0bae8798bea7847f3ed888d49109ad2c2c"
     tailscale        = "ghcr.io/tailscale/tailscale:v1.94.2@sha256:95e528798bebe75f39b10e74e7051cf51188ee615934f232ba7ad06a3390ffa1"
-    qrcode_generator = "reg.cluster.internal/randomcoww/qrcode-resource:v1774882877@sha256:db6c56f9700d03f2bb80445deada3f525030f23a78247667644285e186d817cb"
+    qrcode_generator = "reg.cluster.internal/randomcoww/qrcode-resource:v1775486609@sha256:e94aceb581b4ecbd7477b99be249ecf6c8231e1dec62b00b5d5a364ddb9cff29"
     llama_cpp_vulkan = "ghcr.io/mostlygeek/llama-swap:vulkan@sha256:a5e271a78a70f6d00eadda96ef699dec664003ec821dd661dbba80beced4d1cb"
     litestream       = "docker.io/litestream/litestream:0.5.10@sha256:66c0ef32779b20f7ce682751ec50ba0f1363cad5cb9dba1e23fbeee6ae3197b9"
     searxng          = "ghcr.io/searxng/searxng:latest@sha256:7b924c76c2cd9e960cc6b522eed5faf57ea3e6796020878455d86fcc3e7c26a3"
