@@ -464,7 +464,7 @@ module "open-webui" {
     ENABLE_OPENAI_API              = true
     OPENAI_API_BASE_URL            = "https://${local.endpoints.llama_cpp.ingress}/v1"
     OPENAI_API_KEY                 = random_password.llama-cpp-auth-token.result
-    DEFAULT_MODELS                 = "nemotron-3-super"
+    DEFAULT_MODELS                 = "nemotron-3-super:low"
     ENABLE_WEB_SEARCH              = true
     WEB_SEARCH_ENGINE              = "searxng"
     WEB_SEARCH_RESULT_COUNT        = 4
