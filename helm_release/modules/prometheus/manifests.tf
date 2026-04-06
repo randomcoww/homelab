@@ -68,9 +68,9 @@ locals {
                     "compact",
                     "--web.disable",
                     "--data-dir=${local.compactor_data_path}",
-                    "--retention.resolution-raw=4h",
-                    "--retention.resolution-5m=1d",
-                    "--retention.resolution-1h=8d",
+                    "--retention.resolution-raw=10d",
+                    "--retention.resolution-5m=10d",
+                    "--retention.resolution-1h=30d",
                     <<-EOF
                     --objstore.config=${yamlencode(local.thanos_object_config)}
                     EOF
