@@ -85,18 +85,18 @@ output "releases" {
                   image = var.images.thanos
                   args = [
                     "query-frontend",
-                    "--http-address=0.0.0.0:${local.thanos_querier_frontend_port}",
-                    "--query-frontend.downstream-url=http://127.0.0.1:${local.thanos_querier_port}",
+                    "--http-address=0.0.0.0:${local.ports.thanos_querier_frontend}",
+                    "--query-frontend.downstream-url=http://127.0.0.1:${local.ports.thanos_querier}",
                   ]
                   ports = [
                     {
-                      containerPort = local.thanos_querier_frontend_port
+                      containerPort = local.ports.thanos_querier_frontend
                     },
                   ]
                   livenessProbe = {
                     httpGet = {
                       scheme = "HTTP"
-                      port   = local.thanos_querier_frontend_port
+                      port   = local.ports.thanos_querier_frontend
                       path   = "/-/healthy"
                     }
                     initialDelaySeconds = 10
@@ -105,7 +105,7 @@ output "releases" {
                   readinessProbe = {
                     httpGet = {
                       scheme = "HTTP"
-                      port   = local.thanos_querier_frontend_port
+                      port   = local.ports.thanos_querier_frontend
                       path   = "/-/ready"
                     }
                   }
@@ -115,7 +115,7 @@ output "releases" {
                   args = [
                     "query",
                     "--query.replica-label=replica",
-                    "--http-address=0.0.0.0:${local.thanos_querier_port}",
+                    "--http-address=0.0.0.0:${local.ports.thanos_querier}",
                     "--grpc-address=127.0.0.1:50903", # unused
                     "--grpc-client-tls-secure",
                     "--grpc-client-tls-cert=${local.store_tls_path}/tls.crt",
@@ -137,7 +137,7 @@ output "releases" {
                   ]
                   ports = [
                     {
-                      containerPort = local.thanos_querier_port
+                      containerPort = local.ports.thanos_querier
                     },
                   ]
                   volumeMounts = [
@@ -160,7 +160,7 @@ output "releases" {
                   livenessProbe = {
                     httpGet = {
                       scheme = "HTTP"
-                      port   = local.thanos_querier_port
+                      port   = local.ports.thanos_querier
                       path   = "/-/healthy"
                     }
                     initialDelaySeconds = 10
@@ -169,7 +169,7 @@ output "releases" {
                   readinessProbe = {
                     httpGet = {
                       scheme = "HTTP"
-                      port   = local.thanos_querier_port
+                      port   = local.ports.thanos_querier
                       path   = "/-/ready"
                     }
                   }
@@ -180,8 +180,8 @@ output "releases" {
                     "sidecar",
                     "--prometheus.url=http://127.0.0.1:9090", # port is hardcoded in helm chart
                     "--tsdb.path=${local.tsdb_path}",
-                    "--http-address=0.0.0.0:${local.thanos_sidecar_probe_port}",
-                    "--grpc-address=0.0.0.0:${local.thanos_sidecar_port}",
+                    "--http-address=0.0.0.0:${local.ports.thanos_sidecar_probe}",
+                    "--grpc-address=0.0.0.0:${local.ports.thanos_sidecar}",
                     "--grpc-server-tls-cert=${local.store_tls_path}/tls.crt",
                     "--grpc-server-tls-key=${local.store_tls_path}/tls.key",
                     "--grpc-server-tls-client-ca=${local.store_tls_path}/ca.crt",
@@ -219,7 +219,7 @@ output "releases" {
                   ]
                   ports = [
                     {
-                      containerPort = local.thanos_sidecar_port
+                      containerPort = local.ports.thanos_sidecar
                     },
                   ]
                   volumeMounts = [
@@ -251,7 +251,7 @@ output "releases" {
                   livenessProbe = {
                     httpGet = {
                       scheme = "HTTP"
-                      port   = local.thanos_sidecar_probe_port
+                      port   = local.ports.thanos_sidecar_probe
                       path   = "/-/healthy"
                     }
                     initialDelaySeconds = 10
@@ -260,7 +260,7 @@ output "releases" {
                   readinessProbe = {
                     httpGet = {
                       scheme = "HTTP"
-                      port   = local.thanos_sidecar_probe_port
+                      port   = local.ports.thanos_sidecar_probe
                       path   = "/-/ready"
                     }
                   }
@@ -270,8 +270,8 @@ output "releases" {
                   args = [
                     "store",
                     "--data-dir=${local.store_data_path}",
-                    "--http-address=0.0.0.0:${local.thanos_store_probe_port}",
-                    "--grpc-address=0.0.0.0:${local.thanos_store_port}",
+                    "--http-address=0.0.0.0:${local.ports.thanos_store_probe}",
+                    "--grpc-address=0.0.0.0:${local.ports.thanos_store}",
                     "--grpc-server-tls-cert=${local.store_tls_path}/tls.crt",
                     "--grpc-server-tls-key=${local.store_tls_path}/tls.key",
                     "--grpc-server-tls-client-ca=${local.store_tls_path}/ca.crt",
@@ -309,7 +309,7 @@ output "releases" {
                   ]
                   ports = [
                     {
-                      containerPort = local.thanos_store_port
+                      containerPort = local.ports.thanos_store
                     },
                   ]
                   volumeMounts = [
@@ -341,7 +341,7 @@ output "releases" {
                   livenessProbe = {
                     httpGet = {
                       scheme = "HTTP"
-                      port   = local.thanos_store_probe_port
+                      port   = local.ports.thanos_store_probe
                       path   = "/-/healthy"
                     }
                     initialDelaySeconds = 10
@@ -350,7 +350,7 @@ output "releases" {
                   readinessProbe = {
                     httpGet = {
                       scheme = "HTTP"
-                      port   = local.thanos_store_probe_port
+                      port   = local.ports.thanos_store_probe
                       path   = "/-/ready"
                     }
                   }
@@ -399,8 +399,8 @@ output "releases" {
                 additionalPorts = [
                   {
                     name       = "thanos-querier"
-                    port       = local.thanos_querier_frontend_port
-                    targetPort = local.thanos_querier_frontend_port
+                    port       = local.ports.thanos_querier_frontend
+                    targetPort = local.ports.thanos_querier_frontend
                   },
                 ]
               }
@@ -440,7 +440,7 @@ output "releases" {
                       backendRefs = [
                         {
                           name = "${var.name}-server"
-                          port = local.thanos_querier_frontend_port
+                          port = local.ports.thanos_querier_frontend
                         },
                       ]
                     },
