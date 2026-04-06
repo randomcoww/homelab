@@ -142,7 +142,7 @@ tofu -chdir=rolling_reboot init -upgrade && \
 tofu -chdir=rolling_reboot apply
 ```
 
-### Service credentials
+## Service management
 
 Generate local credentials to local state:
 
