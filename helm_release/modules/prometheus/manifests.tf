@@ -1,13 +1,14 @@
 locals {
-  tsdb_path                 = "/prometheus/data"
-  store_data_path           = "/thanos/store/data"
-  store_tls_path            = "/thanos/store/tls"
-  compactor_data_path       = "/thanos/compactor/data"
-  thanos_querier_port       = 10902
-  thanos_sidecar_port       = 10901
-  thanos_sidecar_probe_port = 10904
-  thanos_store_port         = 10903
-  thanos_store_probe_port   = 10905
+  tsdb_path                    = "/prometheus/data"
+  store_data_path              = "/thanos/store/data"
+  store_tls_path               = "/thanos/store/tls"
+  compactor_data_path          = "/thanos/compactor/data"
+  thanos_querier_port          = 10902
+  thanos_querier_frontend_port = 10906
+  thanos_sidecar_port          = 10901
+  thanos_sidecar_probe_port    = 10904
+  thanos_store_port            = 10903
+  thanos_store_probe_port      = 10905
 
   members = [
     for i, _ in range(var.replicas) :

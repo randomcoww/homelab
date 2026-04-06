@@ -81,6 +81,35 @@ output "releases" {
                 "checksum/store-tls" = sha256(module.store-tls.manifest)
               }
               sidecarContainers = {
+                thanos-querier-frontend = {
+                  image = var.images.thanos
+                  args = [
+                    "query-frontend",
+                    "--http-address=0.0.0.0:${local.thanos_querier_frontend_port}",
+                    "--query-frontend.downstream-url=http://127.0.0.1:${local.thanos_querier_port}",
+                  ]
+                  ports = [
+                    {
+                      containerPort = local.thanos_querier_frontend_port
+                    },
+                  ]
+                  livenessProbe = {
+                    httpGet = {
+                      scheme = "HTTP"
+                      port   = local.thanos_querier_frontend_port
+                      path   = "/-/healthy"
+                    }
+                    initialDelaySeconds = 10
+                    timeoutSeconds      = 2
+                  }
+                  readinessProbe = {
+                    httpGet = {
+                      scheme = "HTTP"
+                      port   = local.thanos_querier_frontend_port
+                      path   = "/-/ready"
+                    }
+                  }
+                }
                 thanos-querier = {
                   image = var.images.thanos
                   args = [
@@ -370,8 +399,8 @@ output "releases" {
                 additionalPorts = [
                   {
                     name       = "thanos-querier"
-                    port       = local.thanos_querier_port
-                    targetPort = local.thanos_querier_port
+                    port       = local.thanos_querier_frontend_port
+                    targetPort = local.thanos_querier_frontend_port
                   },
                 ]
               }
@@ -411,7 +440,7 @@ output "releases" {
                       backendRefs = [
                         {
                           name = "${var.name}-server"
-                          port = local.thanos_querier_port
+                          port = local.thanos_querier_frontend_port
                         },
                       ]
                     },
