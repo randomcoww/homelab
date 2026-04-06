@@ -108,60 +108,13 @@ See [fedora-coreos-config-custom](https://github.com/randomcoww/fedora-coreos-co
 
 If the internal cluster is up, call `image-build` workflow in the repo above to generate a new image. Run `renovate` workflow in this repo to update to using the new image.
 
-
 ### Create host configuration and secrets
 
-Create host igntiion and cluster wide secrets:
+Create host ignition and secrets:
 
 ```bash
 tofu -chdir=host_provisioning init -upgrade && \
 tofu -chdir=host_provisioning apply
-```
-
-### Write credentials to local host for management
-
-Generate credentials to local terraform state:
-
-```bash
-tofu -chdir=local_credentials init -upgrade && \
-tofu -chdir=local_credentials apply -auto-approve -var "ssh_client={key_id=\"$(whoami)\",public_key_openssh=\"ssh_client_public_key=$(cat $HOME/.ssh/id_ecdsa.pub)\"}"
-```
-
-Internal CA:
-
-```bash
-tofu -chdir=local_credentials output -json internal_ca | jq -r '.cert_pem' > $HOME/ca.crt
-```
-
-SSH CA client:
-
-```bash
-SSH_KEY=$HOME/.ssh/id_ecdsa
-tofu -chdir=local_credentials output -raw ssh_user_cert_authorized_key > $SSH_KEY-cert.pub
-```
-
-Admin kubeconfig:
-
-```bash
-tofu -chdir=local_credentials output -raw kubeconfig > $HOME/.kube/config
-```
-
-Internal S3:
-
-```bash
-mkdir -p $HOME/.config/rclone
-tofu -chdir=local_credentials output -raw rclone_config > $HOME/.config/rclone/rclone.conf
-
-mkdir -p $HOME/.mc/certs/CAs
-tofu -chdir=local_credentials output -raw mc_config > $HOME/.mc/config.json
-tofu -chdir=local_credentials output -json internal_ca | jq -r '.cert_pem' > $HOME/.mc/certs/CAs/ca.crt
-```
-
-Internal registry:
-
-```bash
-tofu -chdir=local_credentials output -json registry_client | jq -r '.cert_pem' > $HOME/registry.cert
-tofu -chdir=local_credentials output -json registry_client | jq -r '.private_key_pem' > $HOME/registry.key
 ```
 
 ### Deploy services to Kubernetes
@@ -189,21 +142,66 @@ tofu -chdir=rolling_reboot init -upgrade && \
 tofu -chdir=rolling_reboot apply
 ```
 
-### Service Management
+### Service credentials
 
-Get LDAP admin credentials:
+Generate local credentials to local state:
+
+```bash
+tofu -chdir=local_credentials init -upgrade && \
+tofu -chdir=local_credentials apply -auto-approve -var "ssh_client={key_id=\"$(whoami)\",public_key_openssh=\"ssh_client_public_key=$(cat $HOME/.ssh/id_ecdsa.pub)\"}"
+```
+
+Internal CA:
+
+```bash
+tofu -chdir=host_provisioning output -json internal_ca | jq -r '.cert_pem' > $HOME/ca.crt
+```
+
+SSH CA client:
+
+```bash
+SSH_KEY=$HOME/.ssh/id_ecdsa
+tofu -chdir=local_credentials output -raw ssh_user_cert_authorized_key > $SSH_KEY-cert.pub
+```
+
+Admin kubeconfig:
+
+```bash
+tofu -chdir=local_credentials output -raw kubeconfig > $HOME/.kube/config
+```
+
+Internal S3:
+
+```bash
+mkdir -p $HOME/.config/rclone
+cat > $HOME/.config/rclone/rclone.conf <<EOF
+$(tofu -chdir=helm_release output -raw rclone_config)
+$(tofu -chdir=cloud_resources output -raw rclone_config)
+EOF
+
+mkdir -p $HOME/.mc/certs/CAs
+tofu -chdir=helm_release output -raw mc_config > $HOME/.mc/config.json
+tofu -chdir=host_provisioning output -json internal_ca | jq -r '.cert_pem' > $HOME/.mc/certs/CAs/ca.crt
+```
+
+LDAP admin:
 
 ```bash
 tofu -chdir=helm_release output -json lldap | jq
 ```
 
-Get llama.cpp API key:
+llama.cpp API key:
 
 ```bash
 tofu -chdir=helm_release output -json llama-cpp | jq
 ```
 
-Manage internal registry:
+Internal registry:
+
+```bash
+tofu -chdir=local_credentials output -json registry_client | jq -r '.cert_pem' > $HOME/registry.cert
+tofu -chdir=local_credentials output -json registry_client | jq -r '.private_key_pem' > $HOME/registry.key
+```
 
 ```bash
 regctl registry set reg.cluster.internal \

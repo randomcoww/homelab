@@ -38,6 +38,18 @@ module "kube-vip" {
   }
 }
 
+# internal s3
+
+resource "random_password" "minio-access-key-id" {
+  length  = 30
+  special = false
+}
+
+resource "random_password" "minio-secret-access-key" {
+  length  = 30
+  special = false
+}
+
 module "minio" {
   source    = "./modules/minio"
   name      = local.endpoints.minio.name
@@ -53,13 +65,18 @@ module "minio" {
     minio   = local.service_ports.minio
     metrics = local.service_ports.metrics
   }
-  minio_credentials  = data.terraform_remote_state.host.outputs.minio
+  minio_credentials = {
+    access_key_id     = random_password.minio-access-key-id.result
+    secret_access_key = random_password.minio-secret-access-key.result
+  }
   cluster_domain     = local.domains.kubernetes
   ca                 = data.terraform_remote_state.host.outputs.internal_ca
   service_hostname   = local.endpoints.minio.service
   service_ip         = local.services.minio.ip
   cluster_service_ip = local.services.cluster_minio.ip
 }
+
+# internal registry
 
 module "registry" {
   source    = "./modules/registry"

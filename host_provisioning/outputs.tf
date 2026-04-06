@@ -6,6 +6,8 @@ output "ignition" {
   sensitive = true
 }
 
+# Can be used with kubelet for static pod resources over HTTP
+/*
 output "podlist" {
   value = {
     for host_key in keys(local.hosts) :
@@ -23,6 +25,7 @@ output "podlist" {
   }
   sensitive = true
 }
+*/
 
 output "kubernetes_ca" {
   value = {
@@ -51,15 +54,8 @@ output "internal_ca" {
   sensitive = true
 }
 
-output "minio" {
-  value = {
-    access_key_id     = random_password.minio-access-key-id.result
-    secret_access_key = random_password.minio-secret-access-key.result
-  }
-  sensitive = true
-}
-
-# provider credentials for other terraform modules #
+# provider credentials for other terraform modules
+# providers are not able to accept resource outputs as inputs, so they are generated here
 output "kubernetes_client" {
   value = {
     algorithm       = tls_private_key.kubernetes-client.algorithm
