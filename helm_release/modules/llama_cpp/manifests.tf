@@ -35,7 +35,9 @@ module "secret" {
           --flash-attn on \
           --no-webui \
           --context-shift \
-          --no-mmap
+          --no-mmap \
+          --batch-size 2048 \
+          --ubatch-size 2048
         EOF
         }, {
         for _, v in local.models :

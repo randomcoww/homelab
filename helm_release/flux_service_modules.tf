@@ -283,7 +283,9 @@ module "llama-cpp" {
         $${default_cmd} \
           --model $${nemotron-3-super} \
           --ctx-size 0 \
-          --jinja
+          --jinja \
+          --cache-type-k q8_0 \
+          --cache-type-v q8_0
         EOF
         filters = {
           stripParams = "temperature, top_p"
@@ -311,6 +313,8 @@ module "llama-cpp" {
           --model $${glm-4-7-flash} \
           --ctx-size 0 \
           --jinja \
+          --cache-type-k q8_0 \
+          --cache-type-v q8_0 \
           --min-p 0.01 \
           --repeat-penalty 1.0
         EOF
@@ -333,8 +337,6 @@ module "llama-cpp" {
         $${default_cmd} \
           --model $${jina-embeddings-v5} \
           --ctx-size 0 \
-          --ubatch-size 2048 \
-          --batch-size 2048 \
           --embedding \
           --pooling last
         EOF
@@ -344,8 +346,6 @@ module "llama-cpp" {
         $${default_cmd} \
           --model $${jina-reranker-v3} \
           --ctx-size 0 \
-          --ubatch-size 2048 \
-          --batch-size 2048 \
           --embedding \
           --reranking
         EOF
@@ -381,6 +381,10 @@ module "llama-cpp" {
     {
       name  = "ROCBLAS_USE_HIPBLASLT"
       value = 1
+    },
+    {
+      name  = "AMD_VULKAN_ICD"
+      value = "RADV"
     },
     {
       name  = "RADV_PERFTEST"
@@ -512,22 +516,23 @@ module "open-webui" {
       */
     ])
     # OIDC
-    ENABLE_PERSISTENT_CONFIG       = false # persist mcp oauth registration
-    ENABLE_SIGNUP                  = false
-    ENABLE_LOGIN_FORM              = false
-    ENABLE_OAUTH_SIGNUP            = true
-    ENABLE_OAUTH_PERSISTENT_CONFIG = false
-    ENABLE_OAUTH_ID_TOKEN_COOKIE   = false
-    OAUTH_MERGE_ACCOUNTS_BY_EMAIL  = true
-    OAUTH_CLIENT_ID                = local.authelia_oidc_clients.open-webui.client_id
-    OAUTH_CLIENT_SECRET            = local.authelia_oidc_clients.open-webui.client_secret
-    OPENID_PROVIDER_URL            = "https://${local.endpoints.authelia.ingress}/.well-known/openid-configuration"
-    OAUTH_PROVIDER_NAME            = "Authelia"
-    OAUTH_SCOPES                   = join(" ", local.authelia_oidc_clients.open-webui.scopes)
-    ENABLE_OAUTH_ROLE_MANAGEMENT   = true
-    OAUTH_ALLOWED_ROLES            = "openwebui,openwebui-admin"
-    OAUTH_ADMIN_ROLES              = "openwebui-admin"
-    OAUTH_ROLES_CLAIM              = "groups"
+    ENABLE_PERSISTENT_CONFIG            = false # persist mcp oauth registration
+    ENABLE_SIGNUP                       = false
+    ENABLE_LOGIN_FORM                   = false
+    ENABLE_OAUTH_SIGNUP                 = true
+    ENABLE_OAUTH_PERSISTENT_CONFIG      = false
+    ENABLE_OAUTH_ID_TOKEN_COOKIE        = false
+    OAUTH_MERGE_ACCOUNTS_BY_EMAIL       = true
+    OAUTH_CLIENT_ID                     = local.authelia_oidc_clients.open-webui.client_id
+    OAUTH_CLIENT_SECRET                 = local.authelia_oidc_clients.open-webui.client_secret
+    OPENID_PROVIDER_URL                 = "https://${local.endpoints.authelia.ingress}/.well-known/openid-configuration"
+    OAUTH_PROVIDER_NAME                 = "Authelia"
+    OAUTH_SCOPES                        = join(" ", local.authelia_oidc_clients.open-webui.scopes)
+    ENABLE_OAUTH_ROLE_MANAGEMENT        = true
+    OAUTH_ALLOWED_ROLES                 = "openwebui,openwebui-admin"
+    OAUTH_ADMIN_ROLES                   = "openwebui-admin"
+    OAUTH_ROLES_CLAIM                   = "groups"
+    CHAT_RESPONSE_MAX_TOOL_CALL_RETRIES = 60
   }
   internal_ca      = data.terraform_remote_state.host.outputs.internal_ca
   ingress_hostname = local.endpoints.open_webui.ingress
