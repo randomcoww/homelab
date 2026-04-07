@@ -34,6 +34,7 @@ variable "images" {
     open_webui     = string
     litestream     = string
     kubernetes_mcp = string
+    prometheus_mcp = string
   })
 }
 
@@ -43,6 +44,10 @@ variable "internal_ca" {
     private_key_pem = string
     cert_pem        = string
   })
+}
+
+variable "prometheus_endpoint" {
+  type = string
 }
 
 variable "extra_configs" {

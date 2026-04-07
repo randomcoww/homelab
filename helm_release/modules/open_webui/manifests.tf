@@ -34,9 +34,28 @@ locals {
           description = "Query Kubernetes resources and logs"
         }
       },
+      {
+        type      = "mcp"
+        url       = "http://127.0.0.1:${local.prometheus_mcp_port}/mcp"
+        auth_type = "none"
+        config = {
+          enable                    = true
+          function_name_filter_list = ""
+        }
+        spec_type = "url"
+        spec      = ""
+        path      = ""
+        key       = ""
+        info = {
+          id          = "prometheus"
+          name        = "prometheus"
+          description = "Query Prometheus metrics"
+        }
+      },
     ]))
   })
   kubernetes_mcp_port      = 8081
+  prometheus_mcp_port      = 8082
   kubernetes_mcp_cert_path = "/etc/kubernetes-mcp-server/tls"
 
   manifests = concat([
@@ -339,6 +358,49 @@ module "litestream-overlay" {
             path   = "/healthz"
           }
         }
+      },
+      # prometheus mcp
+      {
+        name  = "${var.name}-prometheus-mcp"
+        image = var.images.prometheus_mcp
+        env = [
+          {
+            name  = "SSL_CERT_FILE"
+            value = "/etc/ssl/certs/ca-certificates.crt"
+          },
+          {
+            name  = "REQUESTS_CA_BUNDLE"
+            value = "/etc/ssl/certs/ca-certificates.crt"
+          },
+          {
+            name  = "PROMETHEUS_URL"
+            value = "https://${var.prometheus_endpoint}"
+          },
+          {
+            name  = "PROMETHEUS_URL_SSL_VERIFY"
+            value = "true"
+          },
+          {
+            name  = "PROMETHEUS_MCP_SERVER_TRANSPORT"
+            value = "http"
+          },
+          {
+            name  = "PROMETHEUS_MCP_BIND_HOST"
+            value = "127.0.0.1"
+          },
+          {
+            name  = "PROMETHEUS_MCP_BIND_PORT"
+            value = tostring(local.prometheus_mcp_port)
+          },
+        ]
+        volumeMounts = [
+          {
+            name      = "ca-trust-bundle"
+            mountPath = "/etc/ssl/certs/ca-certificates.crt"
+            readOnly  = true
+          },
+        ]
+        # TODO: add health checks
       },
     ]
     volumes = [
