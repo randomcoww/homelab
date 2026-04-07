@@ -1,20 +1,5 @@
 # Terraform (OpenTofu) provisioner for Kubernetes homelab
 
-Run Terraform in container (optional):
-
-```bash
-tofu() {
-  set -x
-  podman run -it --rm --security-opt label=disable \
-    -v $(pwd):$(pwd) \
-    -w $(pwd) \
-    --env-file=credentials.env \
-    --net=host \
-    ghcr.io/opentofu/opentofu:latest "$@"
-  rc=$?; set +x; return $rc
-}
-```
-
 ## External dependencies
 
 ### Create service tokens
@@ -91,6 +76,21 @@ AWS_SECRET_ACCESS_KEY=$(echo -n $CLOUDFLARE_API_TOKEN | sha256sum --quiet)
 EOF
 ```
 
+Run Terraform in container (optional):
+
+```bash
+tofu() {
+  set -x
+  podman run -it --rm --security-opt label=disable \
+    -v $(pwd):$(pwd) \
+    -w $(pwd) \
+    --env-file=credentials.env \
+    --net=host \
+    ghcr.io/opentofu/opentofu:latest "$@"
+  rc=$?; set +x; return $rc
+}
+```
+
 ### Run external configuration
 
 Generate external and other cluster wide resources like CAs:
@@ -151,12 +151,6 @@ tofu -chdir=local_credentials init -upgrade && \
 tofu -chdir=local_credentials apply -auto-approve -var "ssh_client={key_id=\"$(whoami)\",public_key_openssh=\"ssh_client_public_key=$(cat $HOME/.ssh/id_ecdsa.pub)\"}"
 ```
 
-Internal CA:
-
-```bash
-tofu -chdir=host_provisioning output -json internal_ca | jq -r '.cert_pem' > $HOME/ca.crt
-```
-
 SSH CA client:
 
 ```bash
@@ -179,16 +173,32 @@ tofu -chdir=helm_release output -raw mc_config > $HOME/.mc/config.json
 
 mkdir -p $HOME/.config/rclone
 cat > $HOME/.config/rclone/rclone.conf <<EOF
-[m]
-type = s3
-provider = Minio
-access_key_id = $(tofu -chdir=helm_release output -json minio | jq -r '.access_key_id')
-secret_access_key = $(tofu -chdir=helm_release output -json minio | jq -r '.secret_access_key')
-region = auto
-endpoint = https://$(tofu -chdir=helm_release output -json minio | jq -r '.endpoint')
+$(tofu -chdir=helm_release output -json minio | jq -r '
+  "[m]",
+  "type = s3",
+  "provider = Minio",
+  "access_key_id = \(.access_key_id)",
+  "secret_access_key = \(.secret_access_key)",
+  "region = auto",
+  "endpoint = https://\(.endpoint)"
+')
 override.ca_cert = $HOME/.mc/certs/CAs/ca.crt
 
-$(tofu -chdir=cloud_resources output -raw rclone_config)
+$(tofu -chdir=cloud_resources output -json r2_bucket | jq -r '
+  to_entries |
+  map(
+    [
+      "[cf-\(.value.bucket)]",
+      "type = s3",
+      "provider = Cloudflare",
+      "access_key_id = \(.value.access_key_id)",
+      "secret_access_key = \(.value.secret_access_key)",
+      "region = auto",
+      "endpoint = https://\(.value.url)"
+    ] | join("\n")
+  ) |
+  join("\n\n")
+')
 EOF
 ```
 

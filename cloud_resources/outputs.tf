@@ -48,20 +48,3 @@ output "letsencrypt" {
   }
   sensitive = true
 }
-
-# storage access from rclone
-
-output "rclone_config" {
-  value     = <<EOF
-%{~for _, name in concat(local.r2_buckets, [data.terraform_remote_state.sr.config.bucket])~}
-[cf-${name}]
-type = s3
-provider = Cloudflare
-access_key_id = ${cloudflare_api_token.r2_bucket[name].id}
-secret_access_key = ${sha256(cloudflare_api_token.r2_bucket[name].value)}
-region = auto
-endpoint = https://${local.cloudflare_account_id}.r2.cloudflarestorage.com
-%{endfor~}
-EOF
-  sensitive = true
-}
