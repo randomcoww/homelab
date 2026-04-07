@@ -14,5 +14,5 @@ provider "minio" {
   minio_ssl      = true
   # CA needs to be provided as a file which in inconvenient for an argument to a provider
   minio_insecure = true
-  # minio_cert_file = "outputs/trusted-ca.crt"
+  # minio_cert_file = "outputs/internal-ca.crt"
 }

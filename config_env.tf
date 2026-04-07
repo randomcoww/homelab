@@ -126,7 +126,7 @@ locals {
     nginx              = "docker.io/nginxinc/nginx-unprivileged:1.29.5-alpine@sha256:601c823234c474696ded03d619e67f1e59538802731543099c691aea67e4a553"
     # tier 2
     kea           = "ghcr.io/randomcoww/kea:v3.1.7@sha256:4cf60778cc36e7bcd9ee23023ff22f1610d63a6d40bdc1b6a5b6ada244842b71"
-    ipxe          = "ghcr.io/randomcoww/ipxe:v2.0.0@sha256:dac8eb4562eb0db0990b292448609b843258b0649dd26f8b56b51ce6047c9d2d"
+    ipxe          = "ghcr.io/randomcoww/ipxe:v2.0.0@sha256:fc1717f11736cce39fa463102a934fa5540cd12820e4eb39bb87904b72db922f"
     registry      = "ghcr.io/distribution/distribution:3.0.0@sha256:4ba3adf47f5c866e9a29288c758c5328ef03396cb8f5f6454463655fa8bc83e2"
     device_plugin = "ghcr.io/squat/generic-device-plugin:latest@sha256:cc4b9b4f81ec1d857dd5257b8eeebf5d2f86c5522196f5157fb0c96616f97c85"
     gha_runner    = "ghcr.io/actions/actions-runner:2.333.1@sha256:b57864c9fcda15ea4a270446aa9cfb108b819a26f6e71fc515f6caf6c27989c6"
@@ -159,7 +159,7 @@ locals {
   host_images = {
     for name, tag in {
       # these fields are updated by renovate - don't use var substitutions
-      default = "43.20260404.20.1.1775380116" # renovate: datasource=github-tags depName=randomcoww/fedora-coreos-config-custom
+      default = "43.20260405.20.1.1775549347" # renovate: datasource=github-tags depName=randomcoww/fedora-coreos-config-custom
     } :
     name => {
       kernel = "fedora-coreos-${tag}-live-kernel.$${buildarch:uristring}"

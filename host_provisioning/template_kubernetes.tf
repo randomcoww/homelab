@@ -87,9 +87,9 @@ module "kubernetes-worker" {
     cert_pem        = tls_self_signed_cert.kubernetes-ca.cert_pem
   }
   registry_ca = {
-    algorithm       = tls_private_key.trusted-ca.algorithm
-    private_key_pem = tls_private_key.trusted-ca.private_key_pem
-    cert_pem        = tls_self_signed_cert.trusted-ca.cert_pem
+    algorithm       = tls_private_key.internal-ca.algorithm
+    private_key_pem = tls_private_key.internal-ca.private_key_pem
+    cert_pem        = tls_self_signed_cert.internal-ca.cert_pem
   }
   host_netnum               = each.value.netnum
   cluster_domain            = local.domains.kubernetes

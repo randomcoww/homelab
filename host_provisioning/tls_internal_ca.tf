@@ -1,17 +1,17 @@
-resource "tls_private_key" "trusted-ca" {
+resource "tls_private_key" "internal-ca" {
   algorithm = "RSA" # iPXE compatibility
   rsa_bits  = 4096
 }
 
-resource "tls_self_signed_cert" "trusted-ca" {
-  private_key_pem = tls_private_key.trusted-ca.private_key_pem
+resource "tls_self_signed_cert" "internal-ca" {
+  private_key_pem = tls_private_key.internal-ca.private_key_pem
 
   validity_period_hours = 8760
   early_renewal_hours   = 2160
   is_ca_certificate     = true
 
   subject {
-    common_name = local.domains.public
+    common_name = "internal"
   }
 
   allowed_uses = [
