@@ -355,8 +355,7 @@ output "releases" {
                   }
                 },
               ]
-              retention     = "1d"
-              retentionSize = "1GB"
+              retention = "6h"
               resources = {
                 requests = {
                   memory = "6Gi"
