@@ -4,12 +4,11 @@ locals {
   store_tls_path      = "/thanos/store/tls"
   compactor_data_path = "/thanos/compactor/data"
   ports = {
-    thanos_querier          = 10902
-    thanos_querier_frontend = 10906
-    thanos_sidecar          = 10901
-    thanos_sidecar_probe    = 10904
-    thanos_store            = 10903
-    thanos_store_probe      = 10905
+    thanos_querier       = 10902
+    thanos_sidecar       = 10901
+    thanos_sidecar_probe = 10904
+    thanos_store         = 10903
+    thanos_store_probe   = 10905
   }
 
   members = [
