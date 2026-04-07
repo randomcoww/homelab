@@ -173,15 +173,23 @@ tofu -chdir=local_credentials output -raw kubeconfig > $HOME/.kube/config
 Internal S3:
 
 ```bash
+mkdir -p $HOME/.mc/certs/CAs
+tofu -chdir=host_provisioning output -json internal_ca | jq -r '.cert_pem' > $HOME/.mc/certs/CAs/ca.crt
+tofu -chdir=helm_release output -raw mc_config > $HOME/.mc/config.json
+
 mkdir -p $HOME/.config/rclone
 cat > $HOME/.config/rclone/rclone.conf <<EOF
-$(tofu -chdir=helm_release output -raw rclone_config)
+[m]
+type = s3
+provider = Minio
+access_key_id = $(tofu -chdir=helm_release output -json minio | jq -r '.access_key_id')
+secret_access_key = $(tofu -chdir=helm_release output -json minio | jq -r '.secret_access_key')
+region = auto
+endpoint = https://$(tofu -chdir=helm_release output -json minio | jq -r '.endpoint')
+override.ca_cert = $HOME/.mc/certs/CAs/ca.crt
+
 $(tofu -chdir=cloud_resources output -raw rclone_config)
 EOF
-
-mkdir -p $HOME/.mc/certs/CAs
-tofu -chdir=helm_release output -raw mc_config > $HOME/.mc/config.json
-tofu -chdir=host_provisioning output -json internal_ca | jq -r '.cert_pem' > $HOME/.mc/certs/CAs/ca.crt
 ```
 
 LDAP admin:
@@ -199,16 +207,11 @@ tofu -chdir=helm_release output -json llama-cpp | jq
 Internal registry:
 
 ```bash
-tofu -chdir=local_credentials output -json registry_client | jq -r '.cert_pem' > $HOME/registry.cert
-tofu -chdir=local_credentials output -json registry_client | jq -r '.private_key_pem' > $HOME/registry.key
-```
-
-```bash
 regctl registry set reg.cluster.internal \
   --tls enabled \
-  --cacert "$(cat $HOME/ca.crt)" \
-  --client-cert "$(cat $HOME/registry.cert)" \
-  --client-key "$(cat $HOME/registry.key)"
+  --cacert "$(tofu -chdir=host_provisioning output -json internal_ca | jq -r '.cert_pem')" \
+  --client-cert "$(tofu -chdir=local_credentials output -json registry_client | jq -r '.cert_pem')" \
+  --client-key "$(tofu -chdir=local_credentials output -json registry_client | jq -r '.private_key_pem')"
 
 regctl repo ls reg.cluster.internal
 regctl tag ls reg.cluster.internal/${REPO}
