@@ -169,7 +169,22 @@ Internal S3:
 ```bash
 mkdir -p $HOME/.mc/certs/CAs
 tofu -chdir=host_provisioning output -json internal_ca | jq -r '.cert_pem' > $HOME/.mc/certs/CAs/ca.crt
-tofu -chdir=helm_release output -raw mc_config > $HOME/.mc/config.json
+cat > $HOME/.mc/config.json <<EOF
+$(tofu -chdir=helm_release output -json minio | jq -r '
+  {
+    aliases: {
+      m: {
+        accessKey: .access_key_id,
+        api: "S3v4",
+        path: "auto",
+        secretKey: .secret_access_key,
+        url: "https://\(.endpoint)"
+      }
+    },
+    version: "10"
+  }
+')
+EOF
 
 mkdir -p $HOME/.config/rclone
 cat > $HOME/.config/rclone/rclone.conf <<EOF

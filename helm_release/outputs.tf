@@ -27,21 +27,3 @@ output "llama-cpp" {
   }
   sensitive = true
 }
-
-# storage access from MC
-
-output "mc_config" {
-  value = jsonencode({
-    version = "10"
-    aliases = {
-      m = {
-        url       = "https://${local.services.minio.ip}:${local.service_ports.minio}"
-        accessKey = random_password.minio-access-key-id.result
-        secretKey = random_password.minio-secret-access-key.result
-        api       = "S3v4"
-        path      = "auto"
-      }
-    }
-  })
-  sensitive = true
-}
