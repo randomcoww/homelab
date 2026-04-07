@@ -456,19 +456,19 @@ resource "helm_release" "system" {
                 replicaCount = 2
                 resources = {
                   requests = {
-                    memory = "128Mi"
+                    memory = "256Mi"
                   }
                   limits = {
-                    memory = "128Mi"
+                    memory = "256Mi"
                   }
                 }
               }
               resources = {
                 requests = {
-                  memory = "128Mi"
+                  memory = "256Mi"
                 }
                 limits = {
-                  memory = "128Mi"
+                  memory = "256Mi"
                 }
               }
               cainjector = {
