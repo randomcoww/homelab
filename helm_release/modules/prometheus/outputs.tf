@@ -149,7 +149,7 @@ output "releases" {
                   image = var.images.thanos
                   args = [
                     "sidecar",
-                    "--prometheus.url=http://127.0.0.1:9090", # port is hardcoded in helm chart
+                    "--prometheus.url=http://127.0.0.1:${local.ports.prometheus}",
                     "--tsdb.path=${local.tsdb_path}",
                     "--http-address=0.0.0.0:${local.ports.thanos_sidecar_probe}",
                     "--grpc-address=0.0.0.0:${local.ports.thanos_sidecar}",

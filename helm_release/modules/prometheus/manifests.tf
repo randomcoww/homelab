@@ -9,6 +9,7 @@ locals {
     thanos_sidecar_probe = 10904
     thanos_store         = 10903
     thanos_store_probe   = 10905
+    prometheus           = 9090 # non configurable - hardcoded in helm chart
   }
 
   members = [
