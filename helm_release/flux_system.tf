@@ -474,6 +474,14 @@ resource "helm_release" "system" {
               cainjector = {
                 enabled      = true
                 replicaCount = 2
+                resources = {
+                  requests = {
+                    memory = "256Mi"
+                  }
+                  limits = {
+                    memory = "256Mi"
+                  }
+                }
               }
               startupapicheck = {
                 enabled = true
