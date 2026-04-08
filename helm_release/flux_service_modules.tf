@@ -299,10 +299,14 @@ module "llama-cpp" {
             "$${MODEL_ID}" = {
               temperature = 1.0
               top_p       = 1.0
+              batch-size  = 2048
+              ubatch-size = 2048
             }
             "$${MODEL_ID}:low" = {
               temperature = 0.6
               top_p       = 0.95
+              batch-size  = 8192
+              ubatch-size = 8192
             }
           }
         }
@@ -324,10 +328,14 @@ module "llama-cpp" {
             "$${MODEL_ID}" = {
               temperature = 1.0
               top_p       = 0.95
+              batch-size  = 2048
+              ubatch-size = 2048
             }
             "$${MODEL_ID}:low" = {
               temperature = 0.7
               top_p       = 1.0
+              batch-size  = 8192
+              ubatch-size = 8192
             }
           }
         }
@@ -337,6 +345,8 @@ module "llama-cpp" {
         $${default_cmd} \
           --model $${jina-embeddings-v5} \
           --ctx-size 0 \
+          --batch-size 2048 \
+          --ubatch-size 2048 \
           --embedding \
           --pooling last
         EOF
@@ -346,6 +356,8 @@ module "llama-cpp" {
         $${default_cmd} \
           --model $${jina-reranker-v3} \
           --ctx-size 0 \
+          --batch-size 2048 \
+          --ubatch-size 2048 \
           --embedding \
           --reranking
         EOF
