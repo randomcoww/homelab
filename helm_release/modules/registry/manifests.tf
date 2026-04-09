@@ -113,6 +113,9 @@ module "secret" {
   data = {
     registry-config = yamlencode({
       version = "0.1"
+      tags = {
+        maxtags = 10000 # renovate compatibility
+      }
       http = {
         addr   = "0.0.0.0:${var.ports.registry}"
         prefix = "/"
