@@ -136,7 +136,7 @@ locals {
     tailscale        = "ghcr.io/tailscale/tailscale:v1.96.5@sha256:dbeff02d2337344b351afac203427218c4d0a06c43fc10a865184063498472a6"
     qrcode_generator = "reg.cluster.internal/randomcoww/qrcode-resource:v1775486609@sha256:e94aceb581b4ecbd7477b99be249ecf6c8231e1dec62b00b5d5a364ddb9cff29"
     llama_cpp_vulkan = "ghcr.io/mostlygeek/llama-swap:vulkan@sha256:1ebc6acaa7cb5cb36b7564d15dff32e2a8ed0e8141e21b4e865d685b3dad79d1"
-    litestream       = "docker.io/litestream/litestream:0.5.10@sha256:66c0ef32779b20f7ce682751ec50ba0f1363cad5cb9dba1e23fbeee6ae3197b9"
+    litestream       = "docker.io/litestream/litestream:0.5.11@sha256:79e3bfce6ed758722916f816b028fffd9e0a971058f41b88e2779510cead1d8d"
     searxng          = "ghcr.io/searxng/searxng:latest@sha256:6a89a150d0163877caab1982b7a20d0a03fd4b39401a0d3f26f61ad205949442"
     open_webui       = "ghcr.io/open-webui/open-webui:v0.8.12@sha256:8113fa5510020ef05a44afc0c42d33eabeeb2524a996e3e3fb8c437c00f0d792"
     kavita           = "ghcr.io/kareadita/kavita:0.8.9@sha256:1f2acae7466d022f037ea09f7989eb7c487f916b881174c7a6de33dbfa8acb39"
