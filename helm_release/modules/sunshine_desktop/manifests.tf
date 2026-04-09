@@ -355,6 +355,7 @@ module "statefulset" {
             origin_web_ui_allowed=wan \
             port=${local.base_port} \
             file_apps=${local.sunshine_apps_file} \
+            encoder=vulkan \
             upnp=off
           EOT
           EOF
