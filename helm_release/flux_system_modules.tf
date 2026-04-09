@@ -423,9 +423,9 @@ module "prometheus" {
               expr  = <<-EOF
               histogram_quantile(0.99,
                 sum by (le, verb, instance) (
-                  rate(apiserver_request_duration_seconds_bucket{job="kubernetes-api-servers", verb!~"LIST|WATCH"}[5m])
+                  rate(apiserver_request_duration_seconds_bucket{job="kubernetes-api-servers", verb!~"LIST|WATCH|CONNECT"}[5m])
                 )
-              ) > 1.0
+              ) > 0.4
               EOF
               for   = "5m"
               labels = {
