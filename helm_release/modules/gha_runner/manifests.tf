@@ -37,7 +37,7 @@ module "workflow-config" {
               },
               {
                 name  = "INTERNAL_REGISTRY"
-                value = regex(local.domain_regex, var.registry_endpoint).port == 443 ? regex(local.domain_regex, var.registry_endpoint).hostname : var.registry_endpoint
+                value = regex(local.domain_regex, var.registry_endpoint).port == "443" ? regex(local.domain_regex, var.registry_endpoint).hostname : var.registry_endpoint
               },
               {
                 name  = "FF_KANIKO_SQUASH_STAGES" # https://github.com/mzihlmann/kaniko/pull/141
