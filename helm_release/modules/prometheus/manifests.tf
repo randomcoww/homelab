@@ -71,9 +71,10 @@ locals {
                     "compact",
                     "--web.disable",
                     "--data-dir=${local.compactor_data_path}",
-                    "--retention.resolution-raw=10d",
-                    "--retention.resolution-5m=10d",
-                    "--retention.resolution-1h=30d",
+                    "--retention.resolution-raw=40h",
+                    "--retention.resolution-5m=10d", # should not be used with downsampling.disable
+                    "--retention.resolution-1h=10d", # should not be used with downsampling.disable
+                    "--downsampling.disable",
                     <<-EOF
                     --objstore.config=${yamlencode(local.thanos_object_config)}
                     EOF
