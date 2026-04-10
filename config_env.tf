@@ -291,8 +291,7 @@ locals {
         ingress = "hostapd.${local.domains.public}"
       }
       kavita = {
-        name   = "kavita"
-        tunnel = true
+        name = "kavita"
       }
       llama_cpp = {
         name = "llama-cpp"
@@ -327,8 +326,7 @@ locals {
         tunnel = true
       }
       stump = {
-        name   = "stump"
-        tunnel = true
+        name = "stump"
       }
     } :
     name => merge(e, {

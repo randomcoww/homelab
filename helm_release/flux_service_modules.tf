@@ -22,6 +22,7 @@ locals {
       redirect_uris = [
         "https://${local.endpoints.open_webui.ingress}/oauth/oidc/callback",
       ]
+      consent_mode = "implicit"
     }
     kavita = {
       client_name = "Kavita"
@@ -37,6 +38,7 @@ locals {
         "https://${local.endpoints.kavita.ingress}/signin-oidc",
       ]
       token_endpoint_auth_method = "client_secret_post"
+      consent_mode               = "implicit"
     }
     stump = {
       client_name = "Stump"
