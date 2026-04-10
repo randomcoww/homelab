@@ -4,6 +4,7 @@ locals {
     STUMP_DB_PATH                 = "/stump/data"
     STUMP_PORT                    = 8000
     STUMP_OIDC_ENABLED            = true
+    STUMP_OIDC_ALLOW_REGISTRATION = true
     STUMP_OIDC_DISABLE_LOCAL_AUTH = true
     ENABLE_SWAGGER_UI             = false
     ENABLE_KOREADER_SYNC          = false
