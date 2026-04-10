@@ -9,6 +9,7 @@ locals {
     "documents",
     "ebooks",
     "music",
+    "pictures",
   ]
 }
 
