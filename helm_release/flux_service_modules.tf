@@ -1,4 +1,13 @@
 locals {
+  authelia_oidc_claims_policies = {
+    stump_policy = {
+      id_token = [
+        "email",
+        "name",
+      ]
+    }
+  }
+
   authelia_oidc_clients_base = {
     open-webui = {
       client_name = "Open WebUI"
@@ -28,6 +37,21 @@ locals {
         "https://${local.endpoints.kavita.ingress}/signin-oidc",
       ]
       token_endpoint_auth_method = "client_secret_post"
+    }
+    stump = {
+      client_name = "Stump"
+      scopes = [
+        "openid",
+        "email",
+        "profile",
+      ]
+      require_pkce          = false
+      pkce_challenge_method = ""
+      redirect_uris = [
+        "https://${local.endpoints.stump.ingress}/api/v2/auth/oidc/callback",
+      ]
+      claims_policy = "stump_policy"
+      consent_mode  = "implicit"
     }
   }
 
@@ -210,10 +234,11 @@ module "authelia" {
     username = random_password.lldap-user.result
     password = random_password.lldap-password.result
   }
-  authelia_oidc_clients = local.authelia_oidc_clients
-  minio_endpoint        = "${local.services.cluster_minio.ip}:${local.service_ports.minio}"
-  minio_bucket          = "authelia"
-  minio_access_secret   = local.minio_users.authelia.secret
+  oidc_clients         = local.authelia_oidc_clients
+  oidc_claims_policies = local.authelia_oidc_claims_policies
+  minio_endpoint       = "${local.services.cluster_minio.ip}:${local.service_ports.minio}"
+  minio_bucket         = "authelia"
+  minio_access_secret  = local.minio_users.authelia.secret
 
   ingress_hostname = local.endpoints.authelia.ingress
   gateway_ref = {
@@ -713,6 +738,33 @@ module "kavita" {
   minio_data_bucket   = "ebooks"
   minio_bucket        = "kavita"
   minio_access_secret = local.minio_users.kavita.secret
+}
+
+module "stump" {
+  source    = "./modules/stump"
+  name      = local.endpoints.stump.name
+  namespace = local.endpoints.stump.namespace
+  replicas  = 1
+  images = {
+    stump      = local.container_images_digest.stump
+    mountpoint = local.container_images_digest.mountpoint
+    litestream = local.container_images_digest.litestream
+  }
+  extra_configs = {
+    STUMP_OIDC_ISSUER_URL    = "https://${local.endpoints.authelia.ingress}"
+    STUMP_OIDC_CLIENT_ID     = local.authelia_oidc_clients.stump.client_id
+    STUMP_OIDC_CLIENT_SECRET = local.authelia_oidc_clients.stump.client_secret
+    STUMP_OIDC_SCOPES        = join(",", local.authelia_oidc_clients.stump.scopes)
+  }
+  ingress_hostname = local.endpoints.stump.ingress
+  gateway_ref = {
+    name      = local.endpoints.traefik.name
+    namespace = local.endpoints.traefik.namespace
+  }
+  minio_endpoint      = "https://${local.services.cluster_minio.ip}:${local.service_ports.minio}"
+  minio_data_bucket   = "ebooks"
+  minio_bucket        = "stump"
+  minio_access_secret = local.minio_users.stump.secret
 }
 
 module "sunshine-desktop" {

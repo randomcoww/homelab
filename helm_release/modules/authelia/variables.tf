@@ -17,7 +17,12 @@ variable "affinity" {
   default = {}
 }
 
-variable "authelia_oidc_clients" {
+variable "oidc_clients" {
+  type    = any
+  default = {}
+}
+
+variable "oidc_claims_policies" {
   type    = any
   default = {}
 }

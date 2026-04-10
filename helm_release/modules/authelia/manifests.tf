@@ -36,7 +36,7 @@ resource "random_password" "authelia-oidc-hmac-secret" {
 }
 
 resource "random_string" "authelia-oidc-client-id" {
-  for_each = var.authelia_oidc_clients
+  for_each = var.oidc_clients
 
   length  = 32
   special = false
@@ -44,7 +44,7 @@ resource "random_string" "authelia-oidc-client-id" {
 }
 
 resource "random_password" "authelia-oidc-client-secret" {
-  for_each = var.authelia_oidc_clients
+  for_each = var.oidc_clients
 
   length  = 32
   special = false
@@ -78,10 +78,10 @@ module "secret" {
     "oidc-hmac-secret" = random_password.authelia-oidc-hmac-secret.result
     }, {
     # clients
-    for key, v in var.authelia_oidc_clients :
+    for key, v in var.oidc_clients :
     "oidc-client-id-${key}" => v.client_id
     }, {
-    for key, v in var.authelia_oidc_clients :
+    for key, v in var.oidc_clients :
     "oidc-client-secret-${key}" => v.client_secret
   })
 }

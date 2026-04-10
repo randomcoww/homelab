@@ -94,6 +94,28 @@ locals {
         ]
       }
 
+      # stump mount-s3 access for ebooks and metadata
+      stump = {
+        name      = local.endpoints.stump.name
+        namespace = local.endpoints.stump.namespace
+        policies = [
+          {
+            Effect = "Allow"
+            Action = [
+              "s3:GetObject",
+              "s3:PutObject",
+              "s3:ListBucket",
+              "s3:DeleteObject",
+              "s3:AbortMultipartUpload",
+            ]
+            buckets = [
+              "ebooks",
+              "stump",
+            ]
+          },
+        ]
+      }
+
       # lldap litestream
       lldap = {
         name      = local.endpoints.lldap.name

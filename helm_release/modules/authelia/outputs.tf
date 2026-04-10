@@ -247,14 +247,14 @@ output "releases" {
                     "sh",
                     "-c",
                     <<-EOF
-                    %{~for key, v in var.authelia_oidc_clients~}
+                    %{~for key, v in var.oidc_clients~}
                     authelia crypto hash generate \
                       --password "$${OIDC_CLIENT_SECRET_${v.client_id}}" pbkdf2 | sed -e 's/Digest: //' > "${local.autehlia_oidc_client_shared_path}/client-secret-${key}"
                     %{~endfor~}
                     EOF
                   ]
                   env = [
-                    for key, v in var.authelia_oidc_clients :
+                    for key, v in var.oidc_clients :
                     {
                       name = "OIDC_CLIENT_SECRET_${v.client_id}"
                       valueFrom = {
@@ -472,11 +472,7 @@ output "releases" {
                       }
                     },
                   ]
-                  claims_policies = {
-                    policy_name = {
-                      id_token_audience_mode = "experimental-merged"
-                    }
-                  }
+                  claims_policies = var.oidc_claims_policies
                   cors = {
                     endpoints = [
                       "token",
@@ -486,7 +482,7 @@ output "releases" {
                   },
                   enable_client_debug_messages = true
                   clients = [
-                    for key, client in var.authelia_oidc_clients :
+                    for key, client in var.oidc_clients :
                     merge({
                       public                           = false
                       authorization_policy             = "two_factor"

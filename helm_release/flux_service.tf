@@ -105,6 +105,7 @@ resource "helm_release" "service" {
       module.hostapd.releases,
       module.qrcode-hostapd.releases,
       module.kavita.releases,
+      module.stump.releases,
       module.gha-runner.releases,
       module.navidrome.releases,
     ) }),
