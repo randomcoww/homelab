@@ -698,6 +698,14 @@ resource "helm_release" "system" {
               podLabels = {
                 app = "metrics-server"
               }
+              resources = {
+                requests = {
+                  memory = "200Mi"
+                }
+                limits = {
+                  memory = "200Mi"
+                }
+              }
               affinity = {
                 podAntiAffinity = {
                   requiredDuringSchedulingIgnoredDuringExecution = [
