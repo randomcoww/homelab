@@ -102,7 +102,7 @@ module "deployment" {
   template_spec = {
     resources = {
       requests = {
-        memory = "256Mi"
+        memory = "512Mi"
       }
       limits = {
         memory = "512Mi"

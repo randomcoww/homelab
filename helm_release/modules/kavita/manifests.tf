@@ -123,7 +123,7 @@ module "litestream-overlay" {
         memory = "8Gi"
       }
       limits = {
-        memory = "12Gi"
+        memory = "8Gi"
       }
     }
     containers = [
