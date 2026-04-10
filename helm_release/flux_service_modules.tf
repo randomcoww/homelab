@@ -330,8 +330,8 @@ module "llama-cpp" {
             "$${MODEL_ID}:low" = {
               temperature = 0.6
               top_p       = 0.95
-              batch-size  = 8192
-              ubatch-size = 8192
+              batch-size  = 4096
+              ubatch-size = 4096
             }
           }
         }
@@ -359,8 +359,8 @@ module "llama-cpp" {
             "$${MODEL_ID}:low" = {
               temperature = 0.7
               top_p       = 1.0
-              batch-size  = 8192
-              ubatch-size = 8192
+              batch-size  = 4096
+              ubatch-size = 4096
             }
           }
         }
