@@ -6,10 +6,6 @@
 
 Cloudflare API token permissions:
 
-```bash
-curl https://api.cloudflare.com/client/v4/user/tokens/permission_groups --header "Authorization: Bearer $CLOUDFLARE_API_TOKEN" | jq
-```
-
 | | | |
 --- | --- | ---
 Account | Workers R2 Storage | Edit
@@ -21,6 +17,10 @@ Zone | Config Rules | Edit
 Zone | Zone Settings | Edit
 Zone | SSL and Certificates | Edit
 Zone | DNS | Edit
+
+```bash
+curl https://api.cloudflare.com/client/v4/user/tokens/permission_groups --header "Authorization: Bearer $CLOUDFLARE_API_TOKEN" | jq
+```
 
 GitHub PAT permissions:
 
@@ -220,13 +220,13 @@ EOF
 LDAP admin:
 
 ```bash
-tofu -chdir=helm_release output -json lldap | jq
+tofu -chdir=helm_release output lldap
 ```
 
 llama.cpp API key:
 
 ```bash
-tofu -chdir=helm_release output -json llama-cpp | jq
+tofu -chdir=helm_release output llama-cpp
 ```
 
 Internal registry:
@@ -243,7 +243,7 @@ regctl tag ls reg.cluster.internal/${REPO}
 regctl tag delete reg.cluster.internal/${REPO}:${TAG}
 ```
 
-## Repo notes
+## Notes
 
 ### Update helm chart
 
