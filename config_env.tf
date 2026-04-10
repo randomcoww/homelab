@@ -326,7 +326,8 @@ locals {
         tunnel = true
       }
       stump = {
-        name = "stump"
+        name   = "stump"
+        tunnel = true
       }
     } :
     name => merge(e, {

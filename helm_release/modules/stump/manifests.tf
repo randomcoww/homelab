@@ -10,6 +10,9 @@ locals {
     ENABLE_KOREADER_SYNC          = false
     ENABLE_OPDS_PROGRESSION       = false
     STUMP_ENABLE_UPLOAD           = false
+    STUMP_PRETTY_LOGS             = false
+    STUMP_VERBOSITY               = 1
+    STUMP_ALLOWED_ORIGINS         = "https://${var.ingress_hostname}"
   })
   db_file         = "${local.extra_configs.STUMP_DB_PATH}/stump.db" # non-configurable
   data_path       = "/data"
