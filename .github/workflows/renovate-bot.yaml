@@ -22,6 +22,7 @@ jobs:
         RENOVATE_PLATFORM: github
         RENOVATE_AUTODISCOVER: false
         # RENOVATE_TOKEN: ${{ secrets.GITHUB_TOKEN }} # pass RENOVATE_TOKEN from runner
+        RENOVATE_GIT_AUTHOR: ${{ github.actor }}@users.noreply.github.com
         RENOVATE_CONFIG_FILE: /tmp/renovate.json
       run: |
         cat > $RENOVATE_CONFIG_FILE <<EOF
