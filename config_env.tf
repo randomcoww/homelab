@@ -116,13 +116,13 @@ locals {
     kube_controller_manager = "registry.k8s.io/kube-controller-manager:v1.35.3@sha256:23a24aafa10831eb47477b0b31a525ee8a4a99d2c17251aac46c43be8201ec59"
     kube_scheduler          = "registry.k8s.io/kube-scheduler:v1.35.3@sha256:7070dff574916315268ab483f1088a107b1f3a8a1a87f3e3645933111ade7013"
     etcd                    = "registry.k8s.io/etcd:v3.6.10@sha256:f65c61039e7b7fd6e651f7ec2459b880589892cb13cf79c2f71c92aa08fc5144"
-    etcd_wrapper            = "ghcr.io/randomcoww/etcd-wrapper:v0.5.28@sha256:e7291e59be84f8b2ac2be25604922b01c7cbc6b474b5f26e15c48dfb777997f8"
+    etcd_wrapper            = "ghcr.io/randomcoww/etcd-wrapper:v0.5.31@sha256:b3349d42a116d7406bfde97b41f2fff80696e5ffc35ce5e6571b9b441901b386"
     # tier 1
     kube_proxy         = "registry.k8s.io/kube-proxy:v1.35.3@sha256:8743aec6a360aedcb7a076cbecea367b072abe1bfade2e2098650df502e2bc89"
     flannel            = "ghcr.io/flannel-io/flannel:v0.28.2@sha256:3726b7dd2f758f1cc8155edc442e7f3fbad68cf42530d6bcb3ddffdba40a1394"
     flannel_cni_plugin = "ghcr.io/flannel-io/flannel-cni-plugin:v1.9.0-flannel1@sha256:c6a08fe5bcb23b19c2fc7c1e47b95a967cc924224ebedf94e8623f27b6c258fa"
     kube_vip           = "ghcr.io/kube-vip/kube-vip:v1.1.2@sha256:840305b94ef2a89abb3b7fd2b09edfbde690d90052020da4dff90679fe892da2"
-    minio              = "cgr.dev/chainguard/minio:latest@sha256:b1325294b873ae604e3741f4509c82c6cd800da6ec24db0c86e82fc8da296b88"
+    minio              = "cgr.dev/chainguard/minio:latest@sha256:745a7292941cf0df2cff39af949be8e54e2d1631a363dda9f521a1e59d00ea64"
     nginx              = "docker.io/nginxinc/nginx-unprivileged:1.29.5-alpine@sha256:601c823234c474696ded03d619e67f1e59538802731543099c691aea67e4a553"
     # tier 2
     kea           = "ghcr.io/randomcoww/kea:v3.1.7@sha256:4cf60778cc36e7bcd9ee23023ff22f1610d63a6d40bdc1b6a5b6ada244842b71"
