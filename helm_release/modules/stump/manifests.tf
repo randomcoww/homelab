@@ -198,7 +198,8 @@ module "thumbnails-mountpoint-s3-overlay" {
   s3_bucket   = var.minio_bucket
   s3_prefix   = "thumbnails"
   s3_mount_extra_args = [
-    # cache may be causing some cover generation to fail
+    "--cache /var/tmp",      # cache to memory
+    "--max-cache-size 1024", # 1Gi
   ]
   s3_access_secret = var.minio_access_secret
   images = {
