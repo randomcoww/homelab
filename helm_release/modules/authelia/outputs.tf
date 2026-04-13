@@ -72,7 +72,7 @@ output "releases" {
           chart = {
             spec = {
               chart   = "authelia"
-              version = "0.10.54" # renovate: datasource=helm depName=authelia registryUrl=https://charts.authelia.com
+              version = "0.10.57" # renovate: datasource=helm depName=authelia registryUrl=https://charts.authelia.com
               sourceRef = {
                 kind = "HelmRepository"
                 name = var.name

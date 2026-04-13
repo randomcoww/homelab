@@ -415,7 +415,7 @@ resource "helm_release" "system" {
             chart = {
               spec = {
                 chart   = "cert-manager"
-                version = "1.20.1" # renovate: datasource=helm depName=cert-manager registryUrl=https://charts.jetstack.io
+                version = "1.20.2" # renovate: datasource=helm depName=cert-manager registryUrl=https://charts.jetstack.io
                 sourceRef = {
                   kind = "HelmRepository"
                   name = "cert-manager"
