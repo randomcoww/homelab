@@ -102,7 +102,7 @@ resource "helm_release" "service" {
       # module.sunshine-desktop.releases,
       module.searxng.releases,
       module.open-webui.releases,
-      module.hostapd.releases,
+      # module.hostapd.releases,
       module.qrcode-hostapd.releases,
       # module.kavita.releases,
       module.stump.releases,
