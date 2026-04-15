@@ -356,7 +356,7 @@ resource "helm_release" "flux2" {
   create_namespace = true
   wait             = true
   wait_for_jobs    = true
-  version          = "2.18.2"
+  version          = "2.18.3"
   max_history      = 2
   values = [
     yamlencode({
