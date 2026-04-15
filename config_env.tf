@@ -119,10 +119,10 @@ locals {
     etcd_wrapper            = "ghcr.io/randomcoww/etcd-wrapper:v0.5.31@sha256:b3349d42a116d7406bfde97b41f2fff80696e5ffc35ce5e6571b9b441901b386"
     # tier 1
     kube_proxy         = "registry.k8s.io/kube-proxy:v1.35.3@sha256:8743aec6a360aedcb7a076cbecea367b072abe1bfade2e2098650df502e2bc89"
-    flannel            = "ghcr.io/flannel-io/flannel:v0.28.2@sha256:3726b7dd2f758f1cc8155edc442e7f3fbad68cf42530d6bcb3ddffdba40a1394"
-    flannel_cni_plugin = "ghcr.io/flannel-io/flannel-cni-plugin:v1.9.0-flannel1@sha256:c6a08fe5bcb23b19c2fc7c1e47b95a967cc924224ebedf94e8623f27b6c258fa"
+    flannel            = "ghcr.io/flannel-io/flannel:v0.28.3@sha256:8e5228b764002ef674af9519fb848e8d2004b8d03d7d18edc3333c749b87fadf"
+    flannel_cni_plugin = "ghcr.io/flannel-io/flannel-cni-plugin:v1.9.1-flannel1@sha256:7c3377e977b4b77b8efdad96e207ebee371537d6dcd7b9c40853cf0c0f0aade3"
     kube_vip           = "ghcr.io/kube-vip/kube-vip:v1.1.2@sha256:840305b94ef2a89abb3b7fd2b09edfbde690d90052020da4dff90679fe892da2"
-    minio              = "cgr.dev/chainguard/minio:latest@sha256:ecba9ddf8ac5d988e046f92f1eff99ccb2cb9d62d20a4300f99c31f8486eb31e"
+    minio              = "cgr.dev/chainguard/minio:latest@sha256:43487a4155e5d9ff874480ae63e9b8cb36676bd0f25114da953c6664471a8d42"
     nginx              = "docker.io/nginxinc/nginx-unprivileged:1.29.8-alpine@sha256:72cd9a222d01fdf47bd47ad8dc50b0221a768742b84a66c5e0b94ed13bcc6c72"
     # tier 2
     kea           = "ghcr.io/randomcoww/kea:v3.1.7@sha256:7dee1db74d16386194ec650b7d2e593fd0d8449ab1684880a689bf30426ef30f"
@@ -135,7 +135,7 @@ locals {
     hostapd          = "reg.cluster.internal/randomcoww/hostapd:v2.11.1776092802@sha256:4b1f182c1601bfece58d4a1ee5dbef2250ea1e9a7e6419cdbe3d507879487773"
     tailscale        = "ghcr.io/tailscale/tailscale:v1.96.5@sha256:dbeff02d2337344b351afac203427218c4d0a06c43fc10a865184063498472a6"
     qrcode_generator = "reg.cluster.internal/randomcoww/qrcode-resource:v1776093227@sha256:343e69e6b524578252cd0b8e60e7a7e7de05f0c17e109fd61544153112b3a52d"
-    llama_cpp_vulkan = "ghcr.io/mostlygeek/llama-swap:vulkan@sha256:4498037cfecdbffeb09213247b5726b17a3cff60a2cd19e85bd2f943b0bb07d6"
+    llama_cpp_vulkan = "ghcr.io/mostlygeek/llama-swap:vulkan@sha256:acc58c437e66d6ff40ebdf38a562626a5dc0b437b70d96c9f6e7ba98b471d2c6"
     litestream       = "docker.io/litestream/litestream:0.5.11@sha256:79e3bfce6ed758722916f816b028fffd9e0a971058f41b88e2779510cead1d8d"
     searxng          = "ghcr.io/searxng/searxng:latest@sha256:4c6b4f3e1fc10a907a40b7eaaf5b92d50f5b4097d6fb5b02041c0f9926233b36"
     open_webui       = "ghcr.io/open-webui/open-webui:v0.8.12@sha256:8113fa5510020ef05a44afc0c42d33eabeeb2524a996e3e3fb8c437c00f0d792"
@@ -143,12 +143,12 @@ locals {
     authelia         = "ghcr.io/authelia/authelia:4.39.19@sha256:0c824dcab1ae97c56bf673c5e77fe8cc6bcd400564555140cc8002a12c6b6463"
     cloudflared      = "docker.io/cloudflare/cloudflared:2026.3.0@sha256:6b599ca3e974349ead3286d178da61d291961182ec3fe9c505e1dd02c8ac31b0"
     sunshine_desktop = "reg.cluster.internal/randomcoww/sunshine-desktop:v2026.412.25828.1776093272@sha256:b263ceaac52903b60cd48b6ffba106e7e51680c82e8b15d92941e0b01b5a5236"
-    kubernetes_mcp   = "ghcr.io/containers/kubernetes-mcp-server:latest@sha256:f5d192da0405a29800ad15b4c46b6292c10d2fca764b81c6afe2f4d8fcdc06b5"
+    kubernetes_mcp   = "ghcr.io/containers/kubernetes-mcp-server:latest@sha256:7c535dccdff0d3e61b5d58f62530a480240e17f794e003eec16d1b427a97b518"
     prometheus_mcp   = "ghcr.io/pab1it0/prometheus-mcp-server:1.6.0@sha256:06259d8cc17469edd79989fd4b9de57cec7afb028e1469c02ebada6a952de5e1"
     navidrome        = "ghcr.io/navidrome/navidrome:0.61.2@sha256:9fa40b3d8dec43ceb2213d1fa551da3dcfef6ac6d19c2e534efb92527c2bafd2"
     valkey           = "ghcr.io/valkey-io/valkey:9.1-alpine@sha256:355ae2c6c965769a0d9b9810711e6befd5b79fe676d1faa848247733ad6a4408"
     thanos           = "quay.io/thanos/thanos:v0.41.0@sha256:cf3e9b292e4302ad4a4955b56379703aea39516607d382a57604a3d003c35d10"
-    stump            = "docker.io/aaronleopold/stump:nightly@sha256:44e94d36808fac9fe72b57779d89ae3028b3d632ec5cb64f887d2d2fa7182070"
+    stump            = "docker.io/aaronleopold/stump:nightly@sha256:868152e7b560aebf1e3faa5637669a546c68a49a7ee18bb8044aa5b0c3624459"
 
     # models (model_file)
     "v5-small-text-matching-Q8_0.gguf"                                = "reg.cluster.internal/randomcoww/jina-embeddings-v5-text-small-text-matching-q8-0:v1773615151@sha256:ead9710eb051ea3b6ee32cebc1d1a8ba782c9e589ea972b48b15c173e169c4ee"
