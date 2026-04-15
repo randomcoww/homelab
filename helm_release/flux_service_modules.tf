@@ -24,22 +24,6 @@ locals {
       ]
       consent_mode = "implicit"
     }
-    kavita = {
-      client_name = "Kavita"
-      scopes = [
-        "openid",
-        "email",
-        "profile",
-        "groups",
-        "roles",
-        "offline_access",
-      ]
-      redirect_uris = [
-        "https://${local.endpoints.kavita.ingress}/signin-oidc",
-      ]
-      token_endpoint_auth_method = "client_secret_post"
-      consent_mode               = "implicit"
-    }
     stump = {
       client_name = "Stump"
       scopes = [
@@ -710,36 +694,6 @@ module "qrcode-hostapd" {
     name      = "forwardauth-authelia"
     namespace = local.endpoints.traefik.namespace
   }
-}
-
-module "kavita" {
-  source    = "./modules/kavita"
-  name      = local.endpoints.kavita.name
-  namespace = local.endpoints.kavita.namespace
-  replicas  = 1
-  images = {
-    kavita     = local.container_images_digest.kavita
-    mountpoint = local.container_images_digest.mountpoint
-    litestream = local.container_images_digest.litestream
-  }
-  extra_configs = {
-    OpenIdConnectSettings = {
-      Authority    = "https://${local.endpoints.authelia.ingress}"
-      ClientId     = local.authelia_oidc_clients.kavita.client_id
-      Secret       = local.authelia_oidc_clients.kavita.client_secret
-      CustomScopes = []
-      Enabled      = true
-    }
-  }
-  ingress_hostname = local.endpoints.kavita.ingress
-  gateway_ref = {
-    name      = local.endpoints.traefik.name
-    namespace = local.endpoints.traefik.namespace
-  }
-  minio_endpoint      = "https://${local.services.cluster_minio.ip}:${local.service_ports.minio}"
-  minio_data_bucket   = "ebooks"
-  minio_bucket        = "kavita"
-  minio_access_secret = local.minio_users.kavita.secret
 }
 
 module "stump" {
