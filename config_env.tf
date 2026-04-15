@@ -128,7 +128,7 @@ locals {
     kea           = "ghcr.io/randomcoww/kea:v3.1.7@sha256:7dee1db74d16386194ec650b7d2e593fd0d8449ab1684880a689bf30426ef30f"
     ipxe          = "ghcr.io/randomcoww/ipxe:v2.0.0@sha256:dc7c61de8f4f122026689184d9427f495d98901859f15d31920c7af5523f7732"
     registry      = "ghcr.io/distribution/distribution:3.1.0@sha256:4fdc7c11dd6b58fd06e386971bf29929eebd831a074197ad1457a1aefeacf3da"
-    device_plugin = "ghcr.io/squat/generic-device-plugin:latest@sha256:d9e098e33a20c32a561adb1ef8cace7d5912cd5ffb38f07dd9f83af4bdf38505"
+    device_plugin = "ghcr.io/squat/generic-device-plugin:0.2.0@sha256:66c8d5c270eb2b721f1064c549b9b7898152a6d2f0163380a5d37dc7636c20ff"
     gha_runner    = "ghcr.io/actions/actions-runner:2.333.1@sha256:b57864c9fcda15ea4a270446aa9cfb108b819a26f6e71fc515f6caf6c27989c6"
     # tier 3
     mountpoint       = "reg.cluster.internal/randomcoww/mountpoint-s3:v1.22.2.1776093703@sha256:e41432252902855289d37fc691be210af944c66531c0ceb7a875bc1609dec355"

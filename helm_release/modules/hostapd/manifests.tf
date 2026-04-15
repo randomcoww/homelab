@@ -106,10 +106,10 @@ module "statefulset" {
         ]
         resources = {
           requests = {
-            "squat.ai/rfkill" = 1
+            "devic.es/rfkill" = 1
           }
           limits = {
-            "squat.ai/rfkill" = 1
+            "devic.es/rfkill" = 1
           }
         }
         volumeMounts = [

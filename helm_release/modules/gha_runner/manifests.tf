@@ -113,13 +113,13 @@ module "workflow-config" {
             resources = {
               requests = {
                 memory          = "4Gi"
-                "squat.ai/kvm"  = 1
-                "squat.ai/fuse" = 1
+                "devic.es/kvm"  = 1
+                "devic.es/fuse" = 1
               }
               limits = {
                 memory          = "8Gi"
-                "squat.ai/kvm"  = 1
-                "squat.ai/fuse" = 1
+                "devic.es/kvm"  = 1
+                "devic.es/fuse" = 1
               }
             }
             env = [

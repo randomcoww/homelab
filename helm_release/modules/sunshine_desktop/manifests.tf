@@ -472,17 +472,17 @@ module "statefulset" {
         resources = {
           requests = {
             "amd.com/gpu"     = 1
-            "squat.ai/ntsync" = 1
-            "squat.ai/input"  = 1
-            "squat.ai/uinput" = 1
-            "squat.ai/tty"    = 1
+            "devic.es/ntsync" = 1
+            "devic.es/input"  = 1
+            "devic.es/uinput" = 1
+            "devic.es/tty"    = 1
           }
           limits = {
             "amd.com/gpu"     = 1
-            "squat.ai/ntsync" = 1
-            "squat.ai/input"  = 1
-            "squat.ai/uinput" = 1
-            "squat.ai/tty"    = 1
+            "devic.es/ntsync" = 1
+            "devic.es/input"  = 1
+            "devic.es/uinput" = 1
+            "devic.es/tty"    = 1
           }
         }
         securityContext = var.security_context
