@@ -60,9 +60,9 @@ output "releases" {
             }
             server = {
               global = {
-                scrape_interval     = "1m"
+                scrape_interval     = "20s"
                 scrape_timeout      = "10s"
-                evaluation_interval = "1m"
+                evaluation_interval = "20s"
                 external_labels = {
                   replica = "$${POD_NAME}"
                 }
