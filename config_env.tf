@@ -122,7 +122,7 @@ locals {
     flannel            = "ghcr.io/flannel-io/flannel:v0.28.4@sha256:cc44a1a8969c4f14b8dd45664546f14abc3fc7682b125399103e555f1ad2528b"
     flannel_cni_plugin = "ghcr.io/flannel-io/flannel-cni-plugin:v1.9.1-flannel1@sha256:7c3377e977b4b77b8efdad96e207ebee371537d6dcd7b9c40853cf0c0f0aade3"
     kube_vip           = "ghcr.io/kube-vip/kube-vip:v1.1.2@sha256:840305b94ef2a89abb3b7fd2b09edfbde690d90052020da4dff90679fe892da2"
-    minio              = "cgr.dev/chainguard/minio:latest@sha256:759265cf0301389fb21297ea4dbe7835492373904fd3a16cc26a55568707166a"
+    minio              = "cgr.dev/chainguard/minio:latest@sha256:9bc70f39110b736efe8f657999c57b6bc2e26ff9f79ab72e4970f4c45d926e73"
     nginx              = "docker.io/nginxinc/nginx-unprivileged:1.29.8-alpine@sha256:72cd9a222d01fdf47bd47ad8dc50b0221a768742b84a66c5e0b94ed13bcc6c72"
     # tier 2
     kea           = "ghcr.io/randomcoww/kea:v3.1.7@sha256:7dee1db74d16386194ec650b7d2e593fd0d8449ab1684880a689bf30426ef30f"
@@ -160,7 +160,7 @@ locals {
   host_images = {
     for name, tag in {
       # these fields are updated by renovate - don't use var substitutions
-      default = "43.20260405.20.1.1775862745" # renovate: datasource=github-tags depName=randomcoww/fedora-coreos-config-custom
+      default = "43.20260417.20.1.1776476305" # renovate: datasource=github-tags depName=randomcoww/fedora-coreos-config-custom
     } :
     name => {
       kernel = "fedora-coreos-${tag}-live-kernel.$${buildarch:uristring}"
