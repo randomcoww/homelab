@@ -106,7 +106,7 @@ resource "helm_release" "service" {
       module.qrcode-hostapd.releases,
       module.stump.releases,
       module.gha-runner.releases,
-      module.navidrome.releases,
+      # module.navidrome.releases,
     ) }),
   ]
   depends_on = [
