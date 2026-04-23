@@ -112,13 +112,13 @@ locals {
   # these fields are updated by renovate - don't use var substitutions
   container_images = {
     # static pod
-    kube_apiserver          = "registry.k8s.io/kube-apiserver:v1.35.4@sha256:06b4bb208634a107ab9e6c50cdb9df178d05166a700c0cc448d59522091074b5"
-    kube_controller_manager = "registry.k8s.io/kube-controller-manager:v1.35.4@sha256:7b036c805d57f203e9efaf43672cff6019b9083a9c0eb107ea8500eace29d8fd"
-    kube_scheduler          = "registry.k8s.io/kube-scheduler:v1.35.4@sha256:9054fecb4fa04cc63aec47b0913c8deb3487d414190cd15211f864cfe0d0b4d6"
+    kube_apiserver          = "registry.k8s.io/kube-apiserver:v1.36.0@sha256:4ae8c24a97630f8cfc9eed02fb95e2371d172bb231915e83d27f6ea0e64fa297"
+    kube_controller_manager = "registry.k8s.io/kube-controller-manager:v1.36.0@sha256:886b5c5623206b7bddf0303484cf632e3f5514a20ef1a1b685f38634b42531dd"
+    kube_scheduler          = "registry.k8s.io/kube-scheduler:v1.36.0@sha256:00b57dfadc2e99fe85481f56ea15f391d5447ebc3ac243896f0e7afd869ef60e"
     etcd                    = "registry.k8s.io/etcd:v3.6.10@sha256:f65c61039e7b7fd6e651f7ec2459b880589892cb13cf79c2f71c92aa08fc5144"
     etcd_wrapper            = "ghcr.io/randomcoww/etcd-wrapper:v0.5.31@sha256:b3349d42a116d7406bfde97b41f2fff80696e5ffc35ce5e6571b9b441901b386"
     # tier 1
-    kube_proxy         = "registry.k8s.io/kube-proxy:v1.35.4@sha256:c5daa23c72474e5e4062c320177d3b485fd42e7010f052bc80d657c4c00a0672"
+    kube_proxy         = "registry.k8s.io/kube-proxy:v1.36.0@sha256:0585504d29fee419791fdbc36c88a9d39773376a565d6f0c688673243df139fc"
     flannel            = "ghcr.io/flannel-io/flannel:v0.28.4@sha256:cc44a1a8969c4f14b8dd45664546f14abc3fc7682b125399103e555f1ad2528b"
     flannel_cni_plugin = "ghcr.io/flannel-io/flannel-cni-plugin:v1.9.1-flannel1@sha256:7c3377e977b4b77b8efdad96e207ebee371537d6dcd7b9c40853cf0c0f0aade3"
     kube_vip           = "ghcr.io/kube-vip/kube-vip:v1.1.2@sha256:840305b94ef2a89abb3b7fd2b09edfbde690d90052020da4dff90679fe892da2"
@@ -135,7 +135,7 @@ locals {
     hostapd          = "reg.cluster.internal/randomcoww/hostapd:v2.11.1776697633@sha256:03fd4d12b839df9786bcf79994c38a08a285faf29ae468a72d5072229e8d39e6"
     tailscale        = "ghcr.io/tailscale/tailscale:v1.96.5@sha256:dbeff02d2337344b351afac203427218c4d0a06c43fc10a865184063498472a6"
     qrcode_generator = "reg.cluster.internal/randomcoww/qrcode-resource:v1776698068@sha256:735068263572845d98f5509e753aa1b8bda6c8bbe7a54fec8c7567a9694c54f5"
-    llama_cpp_vulkan = "ghcr.io/mostlygeek/llama-swap:vulkan@sha256:820e40ec6f9eded8be0d620b8e11caaf6c80eb69f8eb819bb89a14d432f01af4"
+    llama_cpp_vulkan = "ghcr.io/mostlygeek/llama-swap:vulkan@sha256:4848068cdfe2e4d3d9bef60ee6d56bec821a1286f70009c1c6ef8101d9eec7d3"
     litestream       = "docker.io/litestream/litestream:0.5.11@sha256:79e3bfce6ed758722916f816b028fffd9e0a971058f41b88e2779510cead1d8d"
     searxng          = "ghcr.io/searxng/searxng:latest@sha256:37c616a774b90fb5df9239eb143f1b11866ddf7b830cd1ebcca6ba11b38cc2bf"
     open_webui       = "ghcr.io/open-webui/open-webui:v0.9.1@sha256:03d2b006989f0fe6559391a0c5d4ccac12688d7813d23cb4de86e5cc0ab22978"
@@ -143,7 +143,7 @@ locals {
     authelia         = "ghcr.io/authelia/authelia:4.39.19@sha256:0c824dcab1ae97c56bf673c5e77fe8cc6bcd400564555140cc8002a12c6b6463"
     cloudflared      = "docker.io/cloudflare/cloudflared:2026.3.0@sha256:6b599ca3e974349ead3286d178da61d291961182ec3fe9c505e1dd02c8ac31b0"
     sunshine_desktop = "reg.cluster.internal/randomcoww/sunshine-desktop:v2026.419.214410.1776698110@sha256:afdeeed96de10fdcd12bdb2995bf47c64d429478e1614e1f700f667425651e39"
-    kubernetes_mcp   = "ghcr.io/containers/kubernetes-mcp-server:latest@sha256:30dded1a20b1c00e3a20de711511699a6593d8d4643781288cae14de1b9f9b6f"
+    kubernetes_mcp   = "ghcr.io/containers/kubernetes-mcp-server:latest@sha256:d6beec03599198c233649d0379b3351c3833a29dcdc34a317ada52943f1815b9"
     prometheus_mcp   = "ghcr.io/pab1it0/prometheus-mcp-server:1.6.0@sha256:06259d8cc17469edd79989fd4b9de57cec7afb028e1469c02ebada6a952de5e1"
     navidrome        = "ghcr.io/navidrome/navidrome:0.61.2@sha256:9fa40b3d8dec43ceb2213d1fa551da3dcfef6ac6d19c2e534efb92527c2bafd2"
     valkey           = "ghcr.io/valkey-io/valkey:9.1-alpine@sha256:355ae2c6c965769a0d9b9810711e6befd5b79fe676d1faa848247733ad6a4408"
