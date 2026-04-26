@@ -14,6 +14,7 @@ locals {
     WEBUI_SECRET_KEY                   = random_password.webui-secret-key.result
     WEB_LOADER_ENGINE                  = "playwright"
     PLAYWRIGHT_WS_URL                  = "ws://127.0.0.1:${local.camoufox_port}"
+    PLAYWRIGHT_TIMEOUT                 = 120000
     OAUTH_CLIENT_INFO_ENCRYPTION_KEY   = random_password.client-info-encryption-key.result
     OAUTH_SESSION_TOKEN_ENCRYPTION_KEY = random_password.session-token-encryption-key.result
     TOOL_SERVER_CONNECTIONS = jsonencode(concat(jsondecode(lookup(var.extra_configs, "TOOL_SERVER_CONNECTIONS", "[]")), [
