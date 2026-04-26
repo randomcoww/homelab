@@ -122,7 +122,7 @@ locals {
     flannel            = "ghcr.io/flannel-io/flannel:v0.28.4@sha256:cc44a1a8969c4f14b8dd45664546f14abc3fc7682b125399103e555f1ad2528b"
     flannel_cni_plugin = "ghcr.io/flannel-io/flannel-cni-plugin:v1.9.1-flannel1@sha256:7c3377e977b4b77b8efdad96e207ebee371537d6dcd7b9c40853cf0c0f0aade3"
     kube_vip           = "ghcr.io/kube-vip/kube-vip:v1.1.2@sha256:840305b94ef2a89abb3b7fd2b09edfbde690d90052020da4dff90679fe892da2"
-    minio              = "cgr.dev/chainguard/minio:latest@sha256:a9b4277a0b23f4f7052940f25892a7f5461983ec9347622b1bba8c96f18c6202"
+    minio              = "cgr.dev/chainguard/minio:latest@sha256:9184e3b63731f5131117ccf636c9c1f9012fb9438e48cb2f07158c4358ecd654"
     nginx              = "docker.io/nginxinc/nginx-unprivileged:1.30.0-alpine@sha256:8a7fd2dfd8bfae329b96118207b7a9153293f71c7fee042ed7ffbc4461a8788d"
     # tier 2
     kea           = "ghcr.io/randomcoww/kea:v3.1.7@sha256:eb29e6d8ded5dd182b56f7f44cd6ccf179a4a1dea2063b28c7080ec5fbc6d68b"
@@ -135,7 +135,7 @@ locals {
     hostapd          = "reg.cluster.internal/randomcoww/hostapd:v2.11.1776697633@sha256:03fd4d12b839df9786bcf79994c38a08a285faf29ae468a72d5072229e8d39e6"
     tailscale        = "ghcr.io/tailscale/tailscale:v1.96.5@sha256:dbeff02d2337344b351afac203427218c4d0a06c43fc10a865184063498472a6"
     qrcode_generator = "reg.cluster.internal/randomcoww/qrcode-resource:v1776698068@sha256:735068263572845d98f5509e753aa1b8bda6c8bbe7a54fec8c7567a9694c54f5"
-    llama_cpp_vulkan = "ghcr.io/mostlygeek/llama-swap:vulkan@sha256:e6e7ab4b218c9f4bd3944da9da49e4fb9689cccd32b0617d7fa0f0917c85d7f3"
+    llama_cpp_vulkan = "ghcr.io/mostlygeek/llama-swap:vulkan@sha256:1042337824643c064f12b630096e611d78f8718e136f8bfc7f66a4146e015a82"
     litestream       = "docker.io/litestream/litestream:0.5.11@sha256:79e3bfce6ed758722916f816b028fffd9e0a971058f41b88e2779510cead1d8d"
     searxng          = "ghcr.io/searxng/searxng:latest@sha256:c9100c29c14a77d5289263a671580226c3b8a396a1a0130d2f500f57076a0119"
     open_webui       = "ghcr.io/open-webui/open-webui:v0.9.2@sha256:a7e4796ae894d1e2a0c1824860ade472f35c507608a01c3581377b5c19b0ed49"
