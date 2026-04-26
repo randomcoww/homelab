@@ -485,6 +485,7 @@ module "open-webui" {
     litestream     = local.container_images_digest.litestream
     kubernetes_mcp = local.container_images_digest.kubernetes_mcp
     prometheus_mcp = local.container_images_digest.prometheus_mcp
+    camoufox       = local.container_images_digest.camoufox
   }
   extra_configs = {
     WEBUI_URL                      = "https://${local.endpoints.open_webui.ingress}"
@@ -558,6 +559,7 @@ module "open-webui" {
     OAUTH_ROLES_CLAIM                   = "groups"
     CHAT_RESPONSE_MAX_TOOL_CALL_RETRIES = 60
   }
+  scrape_proxy        = var.scrape_proxy
   prometheus_endpoint = local.endpoints.prometheus.ingress
   internal_ca         = data.terraform_remote_state.host.outputs.internal_ca
   ingress_hostname    = local.endpoints.open_webui.ingress

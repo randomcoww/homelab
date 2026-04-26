@@ -13,3 +13,11 @@ variable "smtp" {
     password = string
   })
 }
+
+variable "scrape_proxy" {
+  type = object({
+    server   = string
+    username = string
+    password = string
+  })
+}

@@ -12,7 +12,8 @@ locals {
     S3_BUCKET_NAME                     = var.minio_bucket
     S3_ENDPOINT_URL                    = var.minio_endpoint
     WEBUI_SECRET_KEY                   = random_password.webui-secret-key.result
-    WEB_LOADER_ENGINE                  = "safe_web"
+    WEB_LOADER_ENGINE                  = "playwright"
+    PLAYWRIGHT_WS_URL                  = "ws://127.0.0.1:${local.camoufox_port}"
     OAUTH_CLIENT_INFO_ENCRYPTION_KEY   = random_password.client-info-encryption-key.result
     OAUTH_SESSION_TOKEN_ENCRYPTION_KEY = random_password.session-token-encryption-key.result
     TOOL_SERVER_CONNECTIONS = jsonencode(concat(jsondecode(lookup(var.extra_configs, "TOOL_SERVER_CONNECTIONS", "[]")), [
@@ -56,6 +57,7 @@ locals {
   })
   kubernetes_mcp_port      = 8081
   prometheus_mcp_port      = 8082
+  camoufox_port            = 1234
   kubernetes_mcp_cert_path = "/etc/kubernetes-mcp-server/tls"
 
   manifests = concat([
@@ -144,10 +146,23 @@ module "secret" {
   name    = var.name
   app     = var.name
   release = var.release
-  data = {
+  data = merge({
     for k, v in local.extra_configs :
     tostring(k) => tostring(v)
-  }
+    }, {
+    "camoufox-server.py" = <<-EOF
+      import os
+      from camoufox.server import launch_server
+      launch_server(
+        humanize=True,
+        proxy=${jsonencode(var.scrape_proxy)},
+        geoip=True,
+        window=(1920, 1080),
+        port=os.getenv("PORT"),
+        ws_path="/"
+      )
+    EOF
+  })
 }
 
 module "service" {
@@ -402,6 +417,84 @@ module "litestream-overlay" {
         ]
         # TODO: add health checks
       },
+      # camoufox-server
+      {
+        name  = "${var.name}-camoufox-server"
+        image = var.images.camoufox
+        args = [
+          "xvfb-run",
+          "-a",
+          "-s",
+          "-screen 0 1920x1080x24",
+          "python",
+          "/server.py",
+        ]
+        env = [
+          {
+            name  = "PORT"
+            value = tostring(local.camoufox_port)
+          },
+          {
+            name  = "DEBUG"
+            value = "pw:browser,pw:api"
+          },
+          {
+            name  = "MOZ_DISABLE_CONTENT_SANDBOX"
+            value = "1"
+          },
+          {
+            name  = "MOZ_DISABLE_SOCKET_PROCESS_SANDBOX"
+            value = "1"
+          },
+          {
+            name  = "MOZ_DISABLE_RDD_SANDBOX"
+            value = "1"
+          },
+          {
+            name  = "MOZ_DISABLE_GMP_SANDBOX"
+            value = "1"
+          },
+          {
+            name  = "MOZ_DISABLE_UTILITY_SANDBOX"
+            value = "1"
+          },
+          {
+            name  = "MOZ_DISABLE_NPAPI_SANDBOX"
+            value = "1"
+          },
+          {
+            name  = "MOZ_NODEJS_REMOTE_GDB"
+            value = "1"
+          },
+        ]
+        volumeMounts = [
+          {
+            name      = "config"
+            mountPath = "/server.py"
+            subPath   = "camoufox-server.py"
+          },
+          {
+            name      = "dev-shm"
+            mountPath = "/dev/shm"
+          },
+        ]
+        livenessProbe = {
+          httpGet = {
+            scheme = "HTTP"
+            port   = local.camoufox_port
+            path   = "/"
+          }
+          initialDelaySeconds = 10
+          timeoutSeconds      = 2
+        }
+        readinessProbe = {
+          httpGet = {
+            scheme = "HTTP"
+            port   = local.camoufox_port
+            path   = "/"
+          }
+        }
+      },
     ]
     volumes = [
       {
@@ -427,7 +520,7 @@ module "litestream-overlay" {
         name = "dev-shm"
         emptyDir = {
           medium    = "Memory"
-          sizeLimit = "1Gi"
+          sizeLimit = "2Gi"
         }
       },
       {

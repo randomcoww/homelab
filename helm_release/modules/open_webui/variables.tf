@@ -35,6 +35,7 @@ variable "images" {
     litestream     = string
     kubernetes_mcp = string
     prometheus_mcp = string
+    camoufox       = string
   })
 }
 
@@ -43,6 +44,14 @@ variable "internal_ca" {
     algorithm       = string
     private_key_pem = string
     cert_pem        = string
+  })
+}
+
+variable "scrape_proxy" {
+  type = object({
+    server   = string
+    username = string
+    password = string
   })
 }
 
