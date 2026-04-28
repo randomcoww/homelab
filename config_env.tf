@@ -143,13 +143,16 @@ locals {
     authelia         = "ghcr.io/authelia/authelia:4.39.19@sha256:0c824dcab1ae97c56bf673c5e77fe8cc6bcd400564555140cc8002a12c6b6463"
     cloudflared      = "docker.io/cloudflare/cloudflared:2026.3.0@sha256:6b599ca3e974349ead3286d178da61d291961182ec3fe9c505e1dd02c8ac31b0"
     sunshine_desktop = "reg.cluster.internal/randomcoww/sunshine-desktop:v2026.423.21833.1777304796@sha256:e532afec789e5262a5c6fca09d713407d2e102dcacac503038d7e51eea0737a5"
-    kubernetes_mcp   = "ghcr.io/containers/kubernetes-mcp-server:latest@sha256:96d8b3310b5bd2622ae31ecc3d5a249eeaddd4c28e6734b657e80b7249bd5276"
+    mcp_proxy        = "ghcr.io/tbxark/mcp-proxy:v0.43.2@sha256:70c0e02d39c4c0898e610b3a30954f7930628fa6f4fb447bad14c32382a25879"
+    kubernetes_mcp   = "ghcr.io/containers/kubernetes-mcp-server:latest@sha256:7c36722a6cbfd06b0662ce2237a19f563643988ad6669a9cfeac677b26adf591"
     prometheus_mcp   = "ghcr.io/pab1it0/prometheus-mcp-server:1.6.0@sha256:06259d8cc17469edd79989fd4b9de57cec7afb028e1469c02ebada6a952de5e1"
+    searxng_mcp      = "docker.io/isokoliuk/mcp-searxng:1.0.3@sha256:2d936f821eae1f4859b3534e1dd10d73f9c3687f366f1755538cf3217b2716f0"
+    camofox_browser  = "ghcr.io/redf0x1/camofox-browser:2.2.1@sha256:7b1297e4c5465247325175a29b622872f658b8bfbaa61a08369f32f94d05aa52"
+    camofox_mcp      = "ghcr.io/redf0x1/camofox-mcp:1.13.1@sha256:95def778da394b1cf6c7cc0cfc0b0a1462c3669a3bc0719af00cf32a3986dd52"
     navidrome        = "ghcr.io/navidrome/navidrome:0.61.2@sha256:9fa40b3d8dec43ceb2213d1fa551da3dcfef6ac6d19c2e534efb92527c2bafd2"
     valkey           = "ghcr.io/valkey-io/valkey:9.1-alpine@sha256:355ae2c6c965769a0d9b9810711e6befd5b79fe676d1faa848247733ad6a4408"
     thanos           = "quay.io/thanos/thanos:v0.41.0@sha256:cf3e9b292e4302ad4a4955b56379703aea39516607d382a57604a3d003c35d10"
     stump            = "docker.io/aaronleopold/stump:0.1.2@sha256:70594ad1e65d62663c47cd2ffb1a6e7367962a6a878889f4c5beeb81387c95d6"
-    camoufox         = "reg.cluster.internal/randomcoww/camoufox:v0.4.11.1777303811@sha256:a09592ba21fc04ea8b61677b649d6b8b3def3960c452a4e4609631e4d683e746"
 
     # models (model_file)
     "v5-small-text-matching-Q8_0.gguf"                                = "reg.cluster.internal/randomcoww/jina-embeddings-v5-text-small-text-matching-q8-0:v1773615151@sha256:ead9710eb051ea3b6ee32cebc1d1a8ba782c9e589ea972b48b15c173e169c4ee"
@@ -324,6 +327,9 @@ locals {
       stump = {
         name   = "stump"
         tunnel = true
+      }
+      mcp_proxy = {
+        name = "mcp"
       }
     } :
     name => merge(e, {

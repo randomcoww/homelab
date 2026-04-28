@@ -476,16 +476,42 @@ module "searxng" {
   }
 }
 
+resource "random_password" "mcp-auth-token" {
+  length           = 32
+  override_special = "-_"
+}
+
+module "mcp-proxy" {
+  source    = "./modules/mcp_proxy"
+  name      = local.endpoints.mcp_proxy.name
+  namespace = local.endpoints.mcp_proxy.namespace
+  images = {
+    mcp_proxy       = local.container_images_digest.mcp_proxy
+    prometheus_mcp  = local.container_images_digest.prometheus_mcp
+    kubernetes_mcp  = local.container_images_digest.kubernetes_mcp
+    searxng_mcp     = local.container_images_digest.searxng_mcp
+    camofox_mcp     = local.container_images_digest.camofox_mcp
+    camofox_browser = local.container_images_digest.camofox_browser
+  }
+  replicas            = 1
+  searxng_endpoint    = local.endpoints.searxng.ingress
+  prometheus_endpoint = local.endpoints.prometheus.ingress
+  scrape_proxy        = var.scrape_proxy
+  ingress_hostname    = local.endpoints.mcp_proxy.ingress
+  auth_token          = random_password.mcp-auth-token.result
+  gateway_ref = {
+    name      = local.endpoints.traefik.name
+    namespace = local.endpoints.traefik.namespace
+  }
+}
+
 module "open-webui" {
   source    = "./modules/open_webui"
   name      = local.endpoints.open_webui.name
   namespace = local.endpoints.open_webui.namespace
   images = {
-    open_webui     = local.container_images_digest.open_webui
-    litestream     = local.container_images_digest.litestream
-    kubernetes_mcp = local.container_images_digest.kubernetes_mcp
-    prometheus_mcp = local.container_images_digest.prometheus_mcp
-    camoufox       = local.container_images_digest.camoufox
+    open_webui = local.container_images_digest.open_webui
+    litestream = local.container_images_digest.litestream
   }
   extra_configs = {
     WEBUI_URL                      = "https://${local.endpoints.open_webui.ingress}"
@@ -493,8 +519,8 @@ module "open-webui" {
     ENABLE_OPENAI_API              = true
     OPENAI_API_BASE_URL            = "https://${local.endpoints.llama_cpp.ingress}/v1"
     OPENAI_API_KEY                 = random_password.llama-cpp-auth-token.result
-    DEFAULT_MODELS                 = "nemotron-3-super"
-    ENABLE_WEB_SEARCH              = true
+    DEFAULT_MODELS                 = "nemotron-3-super:low"
+    ENABLE_WEB_SEARCH              = false
     WEB_SEARCH_ENGINE              = "searxng"
     WEB_SEARCH_RESULT_COUNT        = 4
     SEARXNG_QUERY_URL              = "https://${local.endpoints.searxng.ingress}/search?q=<query>"
@@ -518,11 +544,16 @@ module "open-webui" {
     RAG_EXTERNAL_RERANKER_URL      = "https://${local.endpoints.llama_cpp.ingress}/v1/rerank"
     RAG_EXTERNAL_RERANKER_API_KEY  = random_password.llama-cpp-auth-token.result
     RAG_RERANKING_MODEL            = "jina-reranker-v3"
-    TOOL_SERVER_CONNECTIONS = jsonencode([
-      /*
+    TOOL_SERVER_CONNECTIONS = jsonencode(concat([
+      for _, m in [
+        "kubernetes",
+        "searxng",
+        "camofox",
+        "prometheus",
+      ] :
       {
         type      = "mcp"
-        url       = "https://api.githubcopilot.com/mcp"
+        url       = "https://${local.endpoints.mcp_proxy.ingress}/${m}/mcp"
         auth_type = "bearer"
         config = {
           enable                    = true
@@ -531,15 +562,32 @@ module "open-webui" {
         spec_type = "url"
         spec      = ""
         path      = ""
-        key       = var.github.token
+        key       = random_password.mcp-auth-token.result
         info = {
-          id          = "github"
-          name        = "github"
-          description = "Query GitHub resources"
+          id   = m
+          name = m
         }
-      },
-      */
-    ])
+      }
+      ], [
+      # {
+      #   type      = "mcp"
+      #   url       = "https://api.githubcopilot.com/mcp"
+      #   auth_type = "bearer"
+      #   config = {
+      #     enable                    = true
+      #     function_name_filter_list = ""
+      #   }
+      #   spec_type = "url"
+      #   spec      = ""
+      #   path      = ""
+      #   key       = var.github.token
+      #   info = {
+      #     id          = "github"
+      #     name        = "github"
+      #     description = "Query GitHub resources"
+      #   }
+      # },
+    ]))
     # OIDC
     ENABLE_PERSISTENT_CONFIG            = false # persist mcp oauth registration
     ENABLE_SIGNUP                       = false
@@ -559,10 +607,7 @@ module "open-webui" {
     OAUTH_ROLES_CLAIM                   = "groups"
     CHAT_RESPONSE_MAX_TOOL_CALL_RETRIES = 60
   }
-  scrape_proxy        = var.scrape_proxy
-  prometheus_endpoint = local.endpoints.prometheus.ingress
-  internal_ca         = data.terraform_remote_state.host.outputs.internal_ca
-  ingress_hostname    = local.endpoints.open_webui.ingress
+  ingress_hostname = local.endpoints.open_webui.ingress
   gateway_ref = {
     name      = local.endpoints.traefik.name
     namespace = local.endpoints.traefik.namespace

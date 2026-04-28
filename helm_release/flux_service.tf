@@ -107,6 +107,7 @@ resource "helm_release" "service" {
       module.stump.releases,
       module.gha-runner.releases,
       # module.navidrome.releases,
+      module.mcp-proxy.releases,
     ) }),
   ]
   depends_on = [
