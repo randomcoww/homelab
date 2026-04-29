@@ -104,9 +104,9 @@ module "secret" {
           transportType = "streamable-http"
           options = {
             toolFilter = {
-              mode = "block"
+              mode = "allow"
               list = [
-                "web_url_read",
+                "searxng_web_search",
               ]
             }
           }
@@ -115,6 +115,16 @@ module "secret" {
           url           = "http://127.0.0.1:${local.ports.camofox_mcp}/mcp"
           name          = "camofox"
           transportType = "streamable-http"
+          options = {
+            toolFilter = {
+              mode = "allow"
+              list = [
+                "create_tab",
+                "camofox_wait_for",
+                "snapshot",
+              ]
+            }
+          }
         }
         kubernetes = {
           url           = "http://127.0.0.1:${local.ports.kubernetes_mcp}/mcp"

@@ -343,7 +343,7 @@ module "llama-cpp" {
               ubatch-size = 2048
             }
             "$${MODEL_ID}:low" = {
-              temperature = 0.7
+              temperature = 0.6
               top_p       = 1.0
               batch-size  = 4096
               ubatch-size = 4096
