@@ -247,10 +247,6 @@ module "deployment" {
             value = tostring(local.ports.camofox_browser)
           },
           {
-            name  = "CAMOFOX_HEADLESS"
-            value = "virtual"
-          },
-          {
             name = "PROXY_HOST"
             valueFrom = {
               secretKeyRef = {
@@ -258,6 +254,10 @@ module "deployment" {
                 key  = "PROXY_HOST"
               }
             }
+          },
+          {
+            name  = "MAX_OLD_SPACE_SIZE"
+            value = "2048"
           },
           {
             name = "PROXY_PORT"
@@ -285,6 +285,30 @@ module "deployment" {
                 key  = "PROXY_PASSWORD"
               }
             }
+          },
+          {
+            name  = "MOZ_DISABLE_CONTENT_SANDBOX"
+            value = "1"
+          },
+          {
+            name  = "MOZ_DISABLE_SOCKET_PROCESS_SANDBOX"
+            value = "1"
+          },
+          {
+            name  = "MOZ_DISABLE_RDD_SANDBOX"
+            value = "1"
+          },
+          {
+            name  = "MOZ_DISABLE_GMP_SANDBOX"
+            value = "1"
+          },
+          {
+            name  = "MOZ_DISABLE_UTILITY_SANDBOX"
+            value = "1"
+          },
+          {
+            name  = "MOZ_DISABLE_NPAPI_SANDBOX"
+            value = "1"
           },
         ]
         volumeMounts = [
