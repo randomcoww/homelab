@@ -273,10 +273,10 @@ module "llama-cpp" {
   }
   models = {
     for key, model in {
-      jina-embeddings-v5 = "v5-small-text-matching-Q8_0.gguf", # jina-embeddings-v5
-      jina-reranker-v3   = "jina-reranker-v3-Q8_0.gguf",
-      nemotron-3-super   = "NVIDIA-Nemotron-3-Super-120B-A12B-MXFP4_MOE-00001-of-00003.gguf",
-      glm-4-7-flash      = "GLM-4.7-Flash-Q8_0.gguf",
+      jina-embeddings-v5 = "v5-small-text-matching-Q8_0.gguf" # jina-embeddings-v5
+      jina-reranker-v3   = "jina-reranker-v3-Q8_0.gguf"
+      nemotron-3-super   = "NVIDIA-Nemotron-3-Super-120B-A12B-MXFP4_MOE-00001-of-00003.gguf"
+      glm-4-7-flash      = "GLM-4.7-Flash-Q8_0.gguf"
     } :
     key => {
       image = local.container_images_digest[model]
