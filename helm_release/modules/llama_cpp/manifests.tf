@@ -1,8 +1,7 @@
 locals {
-  llama_cpp_port  = 8080
-  models_path     = "/models"
-  llama_swap_path = "/llama-swap"
-  config_file     = "/var/lib/llama-cpp/config.yaml"
+  llama_cpp_port = 8080
+  models_path    = "/models"
+  config_file    = "/var/lib/llama-cpp/config.yaml"
   models = [
     for k, image in var.models :
     {
@@ -30,10 +29,9 @@ module "secret" {
       macros = merge({
         model_path  = local.models_path
         default_cmd = <<-EOF
-          /app/llama-server \
+          llama-server \
           --port $${PORT} \
           --flash-attn on \
-          --no-webui \
           --context-shift \
           --no-mmap
         EOF
@@ -130,7 +128,7 @@ module "statefulset" {
         name  = var.name
         image = var.images.llama_swap
         command = [
-          "/app/llama-swap",
+          "llama-swap",
           "--config",
           "${local.config_file}",
           "--listen",
