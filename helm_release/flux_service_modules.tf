@@ -302,12 +302,6 @@ module "llama-cpp" {
         EOF
         filters = {
           stripParams = "temperature, top_p"
-          setParams = {
-            reasoning_budget = 16384
-            chat_template_kwargs = {
-              enable_thinking = true
-            }
-          }
           setParamsByID = {
             "$${MODEL_ID}" = {
               temperature = 1.0
@@ -405,7 +399,6 @@ module "llama-cpp" {
           --ctx-size 0 \
           --batch-size 2048 \
           --ubatch-size 2048 \
-          --embedding \
           --reranking
         EOF
       }
