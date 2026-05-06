@@ -32,6 +32,9 @@
   ],
   "packageRules": [
     {
+      "matchPackageNames": [
+        "!randomcoww/fedora-coreos-config-custom"
+      ],
       "matchUpdateTypes": [
         "minor",
         "patch",
