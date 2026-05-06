@@ -122,7 +122,7 @@ locals {
     flannel            = "ghcr.io/flannel-io/flannel:v0.28.4@sha256:cc44a1a8969c4f14b8dd45664546f14abc3fc7682b125399103e555f1ad2528b"
     flannel_cni_plugin = "ghcr.io/flannel-io/flannel-cni-plugin:v1.9.1-flannel1@sha256:7c3377e977b4b77b8efdad96e207ebee371537d6dcd7b9c40853cf0c0f0aade3"
     kube_vip           = "ghcr.io/kube-vip/kube-vip:v1.1.2@sha256:840305b94ef2a89abb3b7fd2b09edfbde690d90052020da4dff90679fe892da2"
-    minio              = "cgr.dev/chainguard/minio:latest@sha256:723c5267aae76ab44ffedbca5a25ebcde50168def8446d3fbed38321467cd412"
+    minio              = "cgr.dev/chainguard/minio:latest@sha256:02c8d5aa2fe5c4fe654c3f7de08f1755f25216986d0d45a7f132e194f8fa505d"
     nginx              = "docker.io/nginxinc/nginx-unprivileged:1.30.0-alpine@sha256:9d4ab2b70ec4b86e8576f783066d178d4725dc8c4b3bd060cb09f6d058ba9291"
     # tier 2
     kea           = "ghcr.io/randomcoww/kea:v3.1.8@sha256:d75f2158baa1d0c41f0272e7b096414dc1444454a9fd028dc4440313af66a4a9"
@@ -137,7 +137,7 @@ locals {
     qrcode_generator = "reg.cluster.internal/randomcoww/qrcode-resource:v1777910431@sha256:da84224fb69062e92230934bfc4bdb48464aa0bdbbe31b67cd87bb24ed3d7fd5"
     llama_cpp_vulkan = "ghcr.io/mostlygeek/llama-swap:unified-vulkan@sha256:2ac188885ab2ff28e0e2203e39cdfd1fef494e6e7fb656f287edf8e61f213bee"
     litestream       = "docker.io/litestream/litestream:0.5.11@sha256:79e3bfce6ed758722916f816b028fffd9e0a971058f41b88e2779510cead1d8d"
-    searxng          = "ghcr.io/searxng/searxng:latest@sha256:885f1cd1bb86d759aa4724a1986a61c000292823ff8eeb17d34de1a8acb74477"
+    searxng          = "ghcr.io/searxng/searxng:latest@sha256:34d13094b1150bba739e16c95b7334040a524aadb557fbdbc41a42827aae5f8b"
     open_webui       = "ghcr.io/open-webui/open-webui:v0.9.2@sha256:a7e4796ae894d1e2a0c1824860ade472f35c507608a01c3581377b5c19b0ed49"
     lldap            = "ghcr.io/lldap/lldap:v0.6.3-alpine-rootless@sha256:ba2c50930ea998eefd5454aa678a7977448019248b1827da87d330df0b71c284"
     authelia         = "ghcr.io/authelia/authelia:4.39.19@sha256:0c824dcab1ae97c56bf673c5e77fe8cc6bcd400564555140cc8002a12c6b6463"
