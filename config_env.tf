@@ -166,7 +166,7 @@ locals {
   host_images = {
     for name, tag in {
       # these fields are updated by renovate - don't use var substitutions
-      default = "43.20260417.20.1.1776476305" # renovate: datasource=github-tags depName=randomcoww/fedora-coreos-config-custom
+      default = "44.20260505.20.1.1778105692" # renovate: datasource=github-tags depName=randomcoww/fedora-coreos-config-custom
     } :
     name => {
       kernel = "fedora-coreos-${tag}-live-kernel.$${buildarch:uristring}"
@@ -245,9 +245,10 @@ locals {
       ca_internal = "internal"
     }
     feature_gates = {
-      ClusterTrustBundle           = true
-      ClusterTrustBundleProjection = true
-      NodeLogQuery                 = true
+      ClusterTrustBundle                      = true
+      ClusterTrustBundleProjection            = true
+      NodeLogQuery                            = true
+      InPlacePodLevelResourcesVerticalScaling = false # TODO: workaround for kubelet 1.36.0 panic with doPodResizeAction
     }
   }
 

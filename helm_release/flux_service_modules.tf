@@ -558,7 +558,7 @@ module "open-webui" {
     ENABLE_COMMUNITY_SHARING       = false
     ENABLE_RAG_HYBRID_SEARCH       = true
     AUDIO_STT_ENGINE               = "openai"
-    AUDIO_STT_MODEL                = "nemotron-3-nano-omni:low" # TODO: wati for https://github.com/ggml-org/llama.cpp/pull/22520
+    AUDIO_STT_MODEL                = "nemotron-3-nano-omni:low" # TODO: wait for https://github.com/ggml-org/llama.cpp/pull/22520
     AUDIO_STT_OPENAI_API_BASE_URL  = "https://${local.endpoints.llama_cpp.ingress}/v1"
     AUDIO_STT_OPENAI_API_KEY       = random_password.llama-cpp-auth-token.result
     RAG_TOP_K                      = 5

@@ -43,10 +43,9 @@ systemd:
         [Install]
         WantedBy=multi-user.target
 
-    # does not work with read only system
-    - name: rpm-ostree-fix-shadow-mode.service
-      mask: true
     - name: zincati.service
+      mask: true
+    - name: bootloader-update.service # TODO: will be fixed with https://github.com/coreos/bootupd/pull/1088
       mask: true
 storage:
   files:
