@@ -276,7 +276,6 @@ module "llama-cpp" {
       jina-embeddings-v5          = "v5-small-text-matching-Q8_0.gguf" # jina-embeddings-v5
       jina-reranker-v3            = "jina-reranker-v3-Q8_0.gguf"
       nemotron-3-super            = "NVIDIA-Nemotron-3-Super-120B-A12B-MXFP4_MOE-00001-of-00003.gguf"
-      glm-4-7-flash               = "GLM-4.7-Flash-Q8_0.gguf"
       nemotron-3-nano-omni        = "NVIDIA-Nemotron-3-Nano-Omni-30B-A3B-Reasoning-UD-Q8_K_XL.gguf"
       nemotron-3-nano-omni-mmproj = "mmproj-F16.gguf"
     } :
@@ -346,35 +345,6 @@ module "llama-cpp" {
           }
         }
       }
-      "glm-4-7-flash" = {
-        cmd = <<-EOF
-        $${default_cmd} \
-          --model $${glm-4-7-flash} \
-          --ctx-size 0 \
-          --jinja \
-          --cache-type-k q8_0 \
-          --cache-type-v q8_0 \
-          --min-p 0.01 \
-          --repeat-penalty 1.0
-        EOF
-        filters = {
-          stripParams = "temperature, top_p"
-          setParamsByID = {
-            "$${MODEL_ID}" = {
-              temperature = 1.0
-              top_p       = 0.95
-              batch-size  = 2048
-              ubatch-size = 2048
-            }
-            "$${MODEL_ID}:low" = {
-              temperature = 0.6
-              top_p       = 1.0
-              batch-size  = 4096
-              ubatch-size = 4096
-            }
-          }
-        }
-      }
       "jina-embeddings-v5" = {
         cmd = <<-EOF
         $${default_cmd} \
@@ -405,13 +375,6 @@ module "llama-cpp" {
           "nemotron-3-super",
           "jina-embeddings-v5",
           "jina-reranker-v3",
-        ]
-      }
-      code-concurrent = {
-        swap      = false
-        exclusive = true
-        members = [
-          "glm-4-7-flash",
         ]
       }
     }
