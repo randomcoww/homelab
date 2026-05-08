@@ -335,7 +335,10 @@ resource "helm_release" "system" {
                 }
               }
               service = {
-                loadBalancerClass = "kube-vip.io/kube-vip-class"
+                spec = {
+                  type              = "LoadBalancer"
+                  loadBalancerClass = "kube-vip.io/kube-vip-class"
+                }
                 annotations = {
                   "kube-vip.io/loadbalancerIPs" = local.services.gateway_api.ip
                 }
