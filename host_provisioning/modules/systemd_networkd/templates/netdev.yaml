@@ -5,7 +5,7 @@ storage:
   files:
     # hardware interface #
     %{~ for name, iface in physical_interfaces ~}
-    # TODO: remove if this gets fixed - disable TSO for r8169 transmit queue timed out issue
+    # TODO: remove if this gets fixed - workaround for r8169 transmit queue timed out issue
     - path: /etc/systemd/network/09-${name}-r8169.link
       mode: 0644
       contents:
@@ -17,9 +17,8 @@ storage:
           [Link]
           MTUBytes=${lookup(iface, "mtu", 1500)}
           Name=${name}
-          TCPSegmentationOffload=no
-          GenericSegmentationOffload=no
-          GenericReceiveOffload=no
+          RxBufferSize=2048
+          TxBufferSize=2048
     - path: /etc/systemd/network/10-${name}.link
       mode: 0644
       contents:
