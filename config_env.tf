@@ -324,7 +324,8 @@ locals {
         ingress = "sunshine-admin.${local.domains.public}"
       }
       navidrome = {
-        name = "navidrome"
+        name   = "navidrome"
+        tunnel = true
       }
       stump = {
         name   = "stump"
