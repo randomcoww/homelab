@@ -590,7 +590,7 @@ resource "helm_release" "system" {
             chart = {
               spec = {
                 chart   = "local-path-provisioner"
-                version = "0.0.36" # renovate: datasource=helm depName=local-path-provisioner registryUrl=https://charts.containeroo.ch
+                version = "0.0.37" # renovate: datasource=helm depName=local-path-provisioner registryUrl=https://charts.containeroo.ch
                 sourceRef = {
                   kind = "HelmRepository"
                   name = "local-path-provisioner"
