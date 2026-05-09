@@ -285,11 +285,12 @@ locals {
         }
       }
       boot_args = [
-        "pcie_aspm=off",               # TODO: remove if this gets fixed - workaround for r8169 transmit queue timed out issue
         "ttm.pages_limit=33554432",    # 128G https://community.frame.work/t/igpu-vram-how-much-can-be-assigned/73081
         "ttm.page_pool_size=24576000", # 96G preallocated
-        "mt7925e.disable_aspm=1",
-        "swiotlb=65535", # mt7925e stability
+        "pcie_aspm=off",               # TODO: remove if this gets fixed - workaround for r8169 transmit queue timed out issue
+        "mt7925e.disable_aspm=1",      # TODO: workaround for mt7925e stability
+        "mt7925_common.disable_clc=1", # TODO: workaround for mt7925e stability
+        "swiotlb=65536",               # TODO: workaround for mt7925e stability
       ]
     }
   }
