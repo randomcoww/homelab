@@ -5,7 +5,7 @@ storage:
   files:
     # hardware interface #
     %{~ for name, iface in physical_interfaces ~}
-    # TODO: remove if this gets fixed - workaround for r8169 transmit queue timed out issue
+    # TODO: workaround for r8169 transmit queue timed out issue
     - path: /etc/systemd/network/09-${name}-r8169.link
       mode: 0644
       contents:
