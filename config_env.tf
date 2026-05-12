@@ -246,8 +246,7 @@ locals {
     feature_gates = {
       ClusterTrustBundle                      = true
       ClusterTrustBundleProjection            = true
-      NodeLogQuery                            = true
-      InPlacePodLevelResourcesVerticalScaling = false # TODO: workaround for kubelet 1.36.0 panic with doPodResizeAction
+      InPlacePodLevelResourcesVerticalScaling = false # TODO: workaround for kubelet 1.36.x panic with doPodResizeAction
     }
   }
 
