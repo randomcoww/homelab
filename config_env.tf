@@ -122,7 +122,7 @@ locals {
     flannel            = "ghcr.io/flannel-io/flannel:v0.28.4@sha256:cc44a1a8969c4f14b8dd45664546f14abc3fc7682b125399103e555f1ad2528b"
     flannel_cni_plugin = "ghcr.io/flannel-io/flannel-cni-plugin:v1.9.1-flannel1@sha256:7c3377e977b4b77b8efdad96e207ebee371537d6dcd7b9c40853cf0c0f0aade3"
     kube_vip           = "ghcr.io/kube-vip/kube-vip:v1.1.2@sha256:840305b94ef2a89abb3b7fd2b09edfbde690d90052020da4dff90679fe892da2"
-    minio              = "cgr.dev/chainguard/minio:latest@sha256:633ad9c0663f641cdb4265d8d0d2d0eb3b8529cc5bc7e6be7f2870b6384cdf3a"
+    minio              = "cgr.dev/chainguard/minio:latest@sha256:a71c1c6e98e9cf34316134f2e10cf7b7ee2e38086d7eda3be7c73b9311dac02b"
     nginx              = "docker.io/nginxinc/nginx-unprivileged:1.30.0-alpine@sha256:808f7846d21a9c94cf53833e8807a00a33fd0b65cc47fb05b79efe366c2d201f"
     # tier 2
     kea           = "ghcr.io/randomcoww/kea:v3.1.8@sha256:e98399ca8364d4dfd13b574b1a6ae9712eab4d8fe3c3ecb91448682ba178bebb"
