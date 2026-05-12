@@ -142,7 +142,7 @@ locals {
     lldap            = "ghcr.io/lldap/lldap:v0.6.3-alpine-rootless@sha256:ba2c50930ea998eefd5454aa678a7977448019248b1827da87d330df0b71c284"
     authelia         = "ghcr.io/authelia/authelia:4.39.19@sha256:0c824dcab1ae97c56bf673c5e77fe8cc6bcd400564555140cc8002a12c6b6463"
     cloudflared      = "docker.io/cloudflare/cloudflared:2026.3.0@sha256:6b599ca3e974349ead3286d178da61d291961182ec3fe9c505e1dd02c8ac31b0"
-    sunshine_desktop = "reg.cluster.internal/randomcoww/sunshine-desktop:v2026.423.21833.1777304796@sha256:e532afec789e5262a5c6fca09d713407d2e102dcacac503038d7e51eea0737a5"
+    sunshine_desktop = "reg.cluster.internal/randomcoww/sunshine-desktop:v2026.508.45922.1778544745@sha256:9d7d80dce9deb6cdbabfefe46c44f0e2ba61f1af5d2e672000a65943138abab1"
     mcp_proxy        = "ghcr.io/tbxark/mcp-proxy:v0.43.2@sha256:70c0e02d39c4c0898e610b3a30954f7930628fa6f4fb447bad14c32382a25879"
     kubernetes_mcp   = "ghcr.io/containers/kubernetes-mcp-server:v0.0.62@sha256:bd7e9ff49b0941ff230508dfceb87162c4a2be67b180c28f5d1b204fc58fa2e9"
     prometheus_mcp   = "ghcr.io/pab1it0/prometheus-mcp-server:1.6.1@sha256:ed91f3f9e4f6fb92c5b8fd48a29f3382c11498de405f59da5eac16398d47d43b"
