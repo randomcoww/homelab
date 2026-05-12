@@ -112,17 +112,17 @@ locals {
   # these fields are updated by renovate - don't use var substitutions
   container_images = {
     # static pod
-    kube_apiserver          = "registry.k8s.io/kube-apiserver:v1.36.0@sha256:4ae8c24a97630f8cfc9eed02fb95e2371d172bb231915e83d27f6ea0e64fa297"
-    kube_controller_manager = "registry.k8s.io/kube-controller-manager:v1.36.0@sha256:886b5c5623206b7bddf0303484cf632e3f5514a20ef1a1b685f38634b42531dd"
-    kube_scheduler          = "registry.k8s.io/kube-scheduler:v1.36.0@sha256:00b57dfadc2e99fe85481f56ea15f391d5447ebc3ac243896f0e7afd869ef60e"
+    kube_apiserver          = "registry.k8s.io/kube-apiserver:v1.36.1@sha256:2460df74307cafacf674573c88df511aeb1aece9daa7fbd968fe27cb1c8c4588"
+    kube_controller_manager = "registry.k8s.io/kube-controller-manager:v1.36.1@sha256:c8adb8daee5b30576bd87638a89351ab8388b3fda466bedb7eacf10cde77dbe7"
+    kube_scheduler          = "registry.k8s.io/kube-scheduler:v1.36.1@sha256:3a4333e8ba6e1f74c9bc467c791a06a26808474e8819582cf130cfe0fddc3155"
     etcd                    = "registry.k8s.io/etcd:v3.6.11@sha256:fbab3d2954652f592b2653cc1b9decdbe2a633de9320735e9f364b185b6b309a"
     etcd_wrapper            = "ghcr.io/randomcoww/etcd-wrapper:v0.5.31@sha256:b3349d42a116d7406bfde97b41f2fff80696e5ffc35ce5e6571b9b441901b386"
     # tier 1
-    kube_proxy         = "registry.k8s.io/kube-proxy:v1.36.0@sha256:0585504d29fee419791fdbc36c88a9d39773376a565d6f0c688673243df139fc"
+    kube_proxy         = "registry.k8s.io/kube-proxy:v1.36.1@sha256:a96b6e12863ef766d18f69afaad7a5329220c37ce21cb232bcb58362d284f3f7"
     flannel            = "ghcr.io/flannel-io/flannel:v0.28.4@sha256:cc44a1a8969c4f14b8dd45664546f14abc3fc7682b125399103e555f1ad2528b"
     flannel_cni_plugin = "ghcr.io/flannel-io/flannel-cni-plugin:v1.9.1-flannel1@sha256:7c3377e977b4b77b8efdad96e207ebee371537d6dcd7b9c40853cf0c0f0aade3"
     kube_vip           = "ghcr.io/kube-vip/kube-vip:v1.1.2@sha256:840305b94ef2a89abb3b7fd2b09edfbde690d90052020da4dff90679fe892da2"
-    minio              = "cgr.dev/chainguard/minio:latest@sha256:f2cbe739b01145a88176b1b6949fc0d0f568f24dbf27fa801795372d70aab38e"
+    minio              = "cgr.dev/chainguard/minio:latest@sha256:633ad9c0663f641cdb4265d8d0d2d0eb3b8529cc5bc7e6be7f2870b6384cdf3a"
     nginx              = "docker.io/nginxinc/nginx-unprivileged:1.30.0-alpine@sha256:808f7846d21a9c94cf53833e8807a00a33fd0b65cc47fb05b79efe366c2d201f"
     # tier 2
     kea           = "ghcr.io/randomcoww/kea:v3.1.8@sha256:e98399ca8364d4dfd13b574b1a6ae9712eab4d8fe3c3ecb91448682ba178bebb"
@@ -135,7 +135,7 @@ locals {
     hostapd          = "reg.cluster.internal/randomcoww/hostapd:v2.11.1778516525@sha256:5ac5e2468fce82e5a8036b74bf0ea44067bf08a86119c2c284ce091f7df7bd51"
     tailscale        = "ghcr.io/tailscale/tailscale:v1.96.5@sha256:dbeff02d2337344b351afac203427218c4d0a06c43fc10a865184063498472a6"
     qrcode_generator = "reg.cluster.internal/randomcoww/qrcode-resource:v1778517031@sha256:120781b6a5493bb103966c097db428b35b52cdcb45a7c554732d5f60a088f40c"
-    llama_cpp_vulkan = "ghcr.io/mostlygeek/llama-swap:unified-vulkan@sha256:ed22a6eb1d24f9565e2c53f0ed5cc1ff7e13d3ea2a903ef84f9610ac8f9724ca"
+    llama_cpp_vulkan = "ghcr.io/mostlygeek/llama-swap:unified-vulkan@sha256:534a5741e49d713a8a01e43f4653722a065bffd65efc58a50a585c42b9adb754"
     litestream       = "docker.io/litestream/litestream:0.5.11@sha256:79e3bfce6ed758722916f816b028fffd9e0a971058f41b88e2779510cead1d8d"
     searxng          = "ghcr.io/searxng/searxng:latest@sha256:a7f9188cc7fa8b6b037e0d85709c0dced8f05d0eba84145eb7fe7027a4c00850"
     open_webui       = "ghcr.io/open-webui/open-webui:v0.9.5@sha256:e045bde3b004cc7f8c319412345eb56c87ea6ac57031534a31ca37ad5424beb3"
@@ -148,7 +148,7 @@ locals {
     prometheus_mcp   = "ghcr.io/pab1it0/prometheus-mcp-server:1.6.1@sha256:ed91f3f9e4f6fb92c5b8fd48a29f3382c11498de405f59da5eac16398d47d43b"
     searxng_mcp      = "docker.io/isokoliuk/mcp-searxng:1.0.3@sha256:2d936f821eae1f4859b3534e1dd10d73f9c3687f366f1755538cf3217b2716f0"
     camofox_browser  = "ghcr.io/jo-inc/camofox-browser:1.10.0@sha256:c8cba21cdc4f443fc70b134cad34791507daebddd33743a0f95c6a2afa8b8d74"
-    camofox_mcp      = "ghcr.io/redf0x1/camofox-mcp:1.13.1@sha256:95def778da394b1cf6c7cc0cfc0b0a1462c3669a3bc0719af00cf32a3986dd52"
+    camofox_mcp      = "ghcr.io/redf0x1/camofox-mcp:1.13.2@sha256:8fe0edc310728401f3d17ff280a65bcb6f2b6d42756dd4033e80a6b985e88ef0"
     navidrome        = "ghcr.io/navidrome/navidrome:0.61.2@sha256:9fa40b3d8dec43ceb2213d1fa551da3dcfef6ac6d19c2e534efb92527c2bafd2"
     valkey           = "ghcr.io/valkey-io/valkey:9.1-alpine@sha256:34f4f659e02a67cfdf3995d11ae432219c936005055b2cd39a042e86280e053e"
     thanos           = "quay.io/thanos/thanos:v0.41.0@sha256:cf3e9b292e4302ad4a4955b56379703aea39516607d382a57604a3d003c35d10"
