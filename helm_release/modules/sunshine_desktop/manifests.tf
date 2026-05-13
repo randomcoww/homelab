@@ -356,6 +356,7 @@ module "statefulset" {
             port=${local.base_port} \
             file_apps=${local.sunshine_apps_file} \
             encoder=vulkan \
+            csrf_allowed_origins=https://${var.ingress_hostname} \
             upnp=off
           EOT
           EOF

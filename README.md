@@ -63,6 +63,12 @@ smtp = {
   username = "$GMAIL_USER"
   password = "$GMAIL_PASSWORD"
 }
+
+scrape_proxy = {
+  server   = "$THORDATA_SERVER"
+  username = "$THORDATA_USERNAME"
+  password = "$THORDATA_PASSWORD"
+}
 EOF
 ```
 
@@ -161,6 +167,7 @@ tofu -chdir=local_credentials output -raw ssh_user_cert_authorized_key > $SSH_KE
 Admin kubeconfig:
 
 ```bash
+mkdir -p $HOME/.kube
 tofu -chdir=local_credentials output -raw kubeconfig > $HOME/.kube/config
 ```
 
