@@ -2,7 +2,7 @@
 .terraform.*
 *.tfstate
 *.tfstate.*
-secrets.tfvars
+*.tfvars
 *.log
 output/
 credentials.env

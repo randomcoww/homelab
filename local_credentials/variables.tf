@@ -1,8 +1,17 @@
-variable "ssh_client" {
-  type = object({
-    public_key_openssh    = string
-    key_id                = string
-    early_renewal_hours   = optional(number, 168)
-    validity_period_hours = optional(number, 336)
-  })
+variable "ssh_client_public_key_openssh" {
+  type = string
+}
+
+variable "ssh_client_key_id" {
+  type = string
+}
+
+variable "ssh_client_early_renewal_hours" {
+  type    = number
+  default = 168
+}
+
+variable "ssh_client_validity_period_hours" {
+  type    = number
+  default = 336
 }

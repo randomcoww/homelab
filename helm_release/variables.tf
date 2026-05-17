@@ -1,23 +1,36 @@
-variable "github" {
-  type = object({
-    username = string
-    token    = string
-  })
+variable "github_username" {
+  type = string
 }
 
-variable "smtp" {
-  type = object({
-    host     = string
-    port     = number
-    username = string
-    password = string
-  })
+variable "github_token" {
+  type = string
 }
 
-variable "scrape_proxy" {
-  type = object({
-    server   = string
-    username = string
-    password = string
-  })
+variable "smtp_host" {
+  type = string
+}
+
+variable "smtp_port" {
+  type    = number
+  default = 587
+}
+
+variable "smtp_username" {
+  type = string
+}
+
+variable "smtp_password" {
+  type = string
+}
+
+variable "scrape_proxy_server" {
+  type = string
+}
+
+variable "scrape_proxy_username" {
+  type = string
+}
+
+variable "scrape_proxy_password" {
+  type = string
 }

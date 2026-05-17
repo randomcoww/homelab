@@ -1,10 +1,10 @@
 provider "cloudflare" {
-  api_token = var.cloudflare.api_token
+  api_token = var.cloudflare_api_token
 }
 
 provider "tailscale" {
-  oauth_client_id     = var.tailscale.oauth_client_id
-  oauth_client_secret = var.tailscale.oauth_client_secret
+  oauth_client_id     = var.tailscale_oauth_client_id
+  oauth_client_secret = var.tailscale_oauth_client_secret
   scopes = [
     "auth_keys",
     "devices:core:read",

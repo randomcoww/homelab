@@ -141,11 +141,11 @@ module "lldap" {
     LLDAP_LDAP_USER_DN                        = random_password.lldap-user.result
     LLDAP_LDAP_USER_PASS                      = random_password.lldap-password.result
     LLDAP_SMTP_OPTIONS__ENABLE_PASSWORD_RESET = true
-    LLDAP_SMTP_OPTIONS__SERVER                = var.smtp.host
-    LLDAP_SMTP_OPTIONS__PORT                  = var.smtp.port
+    LLDAP_SMTP_OPTIONS__SERVER                = var.smtp_host
+    LLDAP_SMTP_OPTIONS__PORT                  = var.smtp_port
     LLDAP_SMTP_OPTIONS__SMTP_ENCRYPTION       = "STARTTLS"
-    LLDAP_SMTP_OPTIONS__USER                  = var.smtp.username
-    LLDAP_SMTP_OPTIONS__PASSWORD              = var.smtp.password
+    LLDAP_SMTP_OPTIONS__USER                  = var.smtp_username
+    LLDAP_SMTP_OPTIONS__PASSWORD              = var.smtp_password
     LLDAP_LDAPS_OPTIONS__ENABLED              = true
   }
   ca = {
@@ -215,7 +215,12 @@ module "authelia" {
     port        = local.service_ports.redis_sentinel
     master_name = local.endpoints.authelia_valkey.name
   }
-  smtp = var.smtp
+  smtp = {
+    host     = var.smtp_host
+    port     = var.smtp_port
+    username = var.smtp_username
+    password = var.smtp_password
+  }
   ldap_credentials = {
     username = random_password.lldap-user.result
     password = random_password.lldap-password.result
@@ -482,9 +487,13 @@ module "mcp-proxy" {
   replicas            = 1
   searxng_endpoint    = local.endpoints.searxng.ingress
   prometheus_endpoint = local.endpoints.prometheus.ingress
-  scrape_proxy        = var.scrape_proxy
-  ingress_hostname    = local.endpoints.mcp_proxy.ingress
-  auth_token          = random_password.mcp-auth-token.result
+  scrape_proxy = {
+    server   = var.scrape_proxy_server
+    username = var.scrape_proxy_username
+    password = var.scrape_proxy_password
+  }
+  ingress_hostname = local.endpoints.mcp_proxy.ingress
+  auth_token       = random_password.mcp-auth-token.result
   gateway_ref = {
     name      = local.endpoints.traefik.name
     namespace = local.endpoints.traefik.namespace
@@ -570,7 +579,7 @@ module "open-webui" {
       #   spec_type = "url"
       #   spec      = ""
       #   path      = ""
-      #   key       = var.github.token
+      #   key       = var.github_token
       #   info = {
       #     id          = "github"
       #     name        = "github"
@@ -910,7 +919,10 @@ module "gha-runner" {
   images = {
     gha_runner = local.container_images_digest.gha_runner
   }
-  github_credentials  = var.github
+  github_credentials = {
+    username = var.github_username
+    token    = var.github_token
+  }
   internal_ca         = data.terraform_remote_state.host.outputs.internal_ca
   registry_endpoint   = "${local.endpoints.registry.service}:${local.service_ports.registry}"
   minio_endpoint      = "${local.services.cluster_minio.ip}:${local.service_ports.minio}"

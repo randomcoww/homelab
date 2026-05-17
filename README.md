@@ -37,45 +37,22 @@ Tailscale auth scopes:
 
 ### Generate secrets files
 
-Add keys to `secrets.tfvars`:
-
-```bash
-cat > secrets.tfvars <<EOF
-cloudflare = {
-  api_token = "$CLOUDFLARE_API_TOKEN"
-}
-
-letsencrypt_username  = "$LETSENCRYPT_USER"
-
-tailscale = {
-  oauth_client_id     = "$TS_OAUTH_CLIENT_ID"
-  oauth_client_secret = "$TS_OAUTH_CLIENT_SECRET"
-}
-
-github = {
-  username = "randomcoww"
-  token    = "$GITHUB_TOKEN"
-}
-
-smtp = {
-  host     = "smtp.gmail.com"
-  port     = 587
-  username = "$GMAIL_USER"
-  password = "$GMAIL_PASSWORD"
-}
-
-scrape_proxy = {
-  server   = "$THORDATA_SERVER"
-  username = "$THORDATA_USERNAME"
-  password = "$THORDATA_PASSWORD"
-}
-EOF
-```
-
-Set `credentials.env` to use Cloudflare R2 for Terraform backend:
-
 ```bash
 cat > credentials.env <<EOF
+TF_VAR_cloudflare_api_token=$CLOUDFLARE_API_TOKEN
+TF_VAR_letsencrypt_username=$LETSENCRYPT_USER
+TF_VAR_tailscale_oauth_client_id=$TS_OAUTH_CLIENT_ID
+TF_VAR_tailscale_oauth_client_secret=$TS_OAUTH_CLIENT_SECRET
+TF_VAR_github_username=$(whoami)
+TF_VAR_github_token=$GITHUB_TOKEN
+TF_VAR_smtp_host=smtp.gmail.com
+TF_VAR_smtp_username=$GMAIL_USER
+TF_VAR_smtp_password=$GMAIL_PASSWORD
+TF_VAR_scrape_proxy_server=$THORDATA_SERVER
+TF_VAR_scrape_proxy_username=$THORDATA_USERNAME
+TF_VAR_scrape_proxy_password=$THORDATA_PASSWORD
+TF_VAR_ssh_client_key_id=$(whoami)
+TF_VAR_ssh_client_public_key_openssh=$(cat $HOME/.ssh/id_ecdsa.pub)
 AWS_ENDPOINT_URL_S3=https://$(curl https://api.cloudflare.com/client/v4/accounts --header "Authorization: Bearer $CLOUDFLARE_API_TOKEN" | jq -r '.result.[0].id').r2.cloudflarestorage.com
 AWS_ACCESS_KEY_ID=$(curl https://api.cloudflare.com/client/v4/user/tokens/verify --header "Authorization: Bearer $CLOUDFLARE_API_TOKEN" | jq -r '.result.id')
 AWS_SECRET_ACCESS_KEY=$(echo -n $CLOUDFLARE_API_TOKEN | sha256sum --quiet)
@@ -103,7 +80,7 @@ Generate external and other cluster wide resources like CAs:
 
 ```bash
 tofu -chdir=cloud_resources init -upgrade && \
-tofu -chdir=cloud_resources apply -var-file=../secrets.tfvars
+tofu -chdir=cloud_resources apply
 ```
 
 ## Internal resources
@@ -129,7 +106,7 @@ Deploy Kubernetes services. Some services rely on MinIO and will crash loop unti
 
 ```bash
 tofu -chdir=helm_release init -upgrade && \
-tofu -chdir=helm_release apply -var-file=../secrets.tfvars
+tofu -chdir=helm_release apply
 ```
 
 Create MinIO resources and secrets containing access credentials in Kubernetes. MinIO must be running in Kubernetes for this to work.
@@ -154,7 +131,7 @@ Generate local credentials to local state:
 
 ```bash
 tofu -chdir=local_credentials init -upgrade && \
-tofu -chdir=local_credentials apply -auto-approve -var "ssh_client={key_id=\"$(whoami)\",public_key_openssh=\"ssh_client_public_key=$(cat $HOME/.ssh/id_ecdsa.pub)\"}"
+tofu -chdir=local_credentials apply
 ```
 
 SSH CA client:

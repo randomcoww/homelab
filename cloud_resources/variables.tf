@@ -1,16 +1,15 @@
-variable "cloudflare" {
-  type = object({
-    api_token = string
-  })
+variable "cloudflare_api_token" {
+  type = string
 }
 
 variable "letsencrypt_username" {
   type = string
 }
 
-variable "tailscale" {
-  type = object({
-    oauth_client_id     = string
-    oauth_client_secret = string
-  })
+variable "tailscale_oauth_client_id" {
+  type = string
+}
+
+variable "tailscale_oauth_client_secret" {
+  type = string
 }

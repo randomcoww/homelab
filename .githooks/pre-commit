@@ -3,4 +3,4 @@ podman run -it --rm \
   -w $(pwd) \
   --entrypoint='' \
   ghcr.io/opentofu/opentofu:latest \
-  tofu fmt $(git diff --staged --name-only --diff-filter=AMR | grep -e ".tf$" -e ".tfvars$" -e ".tftest.hcl$")
+  tofu fmt -recursive
