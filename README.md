@@ -38,6 +38,8 @@ Tailscale auth scopes:
 ### Generate secrets files
 
 ```bash
+[ -f $HOME/.ssh/id_ecdsa ] || ssh-keygen -t ecdsa -f $HOME/.ssh/id_ecdsa -N ""
+
 cat > credentials.env <<EOF
 TF_VAR_cloudflare_api_token=$CLOUDFLARE_API_TOKEN
 TF_VAR_letsencrypt_username=$LETSENCRYPT_USER
