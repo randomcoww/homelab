@@ -313,7 +313,7 @@ module "statefulset" {
           ## User ##
 
           useradd $USER -d $HOME -m -u $UID
-          usermod -G video,input,render,dbus,seat $USER
+          usermod -G video,input,render,dbus $USER
 
           mkdir -p $HOME $XDG_RUNTIME_DIR
           chown $UID:$UID $HOME $XDG_RUNTIME_DIR
@@ -321,10 +321,6 @@ module "statefulset" {
           ## Udev ##
 
           /lib/systemd/systemd-udevd &
-
-          ## Seatd ##
-
-          seatd -u $USER &
 
           runuser -p -u $USER -- bash <<EOT
           set -e

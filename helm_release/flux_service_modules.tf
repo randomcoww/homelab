@@ -852,10 +852,6 @@ module "sunshine-desktop" {
       value = "RADV"
     },
     {
-      name  = "RADV_PERFTEST"
-      value = "video_encode" # vulkan encoder support
-    },
-    {
       name  = "MESA_SHADER_CACHE_MAX_SIZE"
       value = "12G"
     },
