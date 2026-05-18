@@ -152,7 +152,7 @@ locals {
     navidrome        = "ghcr.io/navidrome/navidrome:0.61.2@sha256:9fa40b3d8dec43ceb2213d1fa551da3dcfef6ac6d19c2e534efb92527c2bafd2"
     valkey           = "ghcr.io/valkey-io/valkey:9.1-alpine@sha256:34f4f659e02a67cfdf3995d11ae432219c936005055b2cd39a042e86280e053e"
     thanos           = "quay.io/thanos/thanos:v0.41.0@sha256:cf3e9b292e4302ad4a4955b56379703aea39516607d382a57604a3d003c35d10"
-    stump            = "docker.io/aaronleopold/stump:0.1.2@sha256:70594ad1e65d62663c47cd2ffb1a6e7367962a6a878889f4c5beeb81387c95d6"
+    stump            = "docker.io/aaronleopold/stump:0.1.3@sha256:5fec2b7ac447d5eec71579beaa86998f83741b06acb56ae28287ee0bb7ad75c6"
 
     # models (model_file)
     "v5-small-text-matching-Q8_0.gguf"                                = "reg.cluster.internal/randomcoww/jina-embeddings-v5-text-small-text-matching-q8-0:v1773615151@sha256:ead9710eb051ea3b6ee32cebc1d1a8ba782c9e589ea972b48b15c173e169c4ee"
