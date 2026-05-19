@@ -122,7 +122,7 @@ locals {
     flannel            = "ghcr.io/flannel-io/flannel:v0.28.4@sha256:cc44a1a8969c4f14b8dd45664546f14abc3fc7682b125399103e555f1ad2528b"
     flannel_cni_plugin = "ghcr.io/flannel-io/flannel-cni-plugin:v1.9.1-flannel1@sha256:7c3377e977b4b77b8efdad96e207ebee371537d6dcd7b9c40853cf0c0f0aade3"
     kube_vip           = "ghcr.io/kube-vip/kube-vip:v1.1.2@sha256:840305b94ef2a89abb3b7fd2b09edfbde690d90052020da4dff90679fe892da2"
-    minio              = "cgr.dev/chainguard/minio:latest@sha256:c4d992f128ff11e6db20f7139f6941023a54a019bfe41c688df2b7241c588d30"
+    minio              = "cgr.dev/chainguard/minio:latest@sha256:8a070474112c9fa725948297c9b774f08331d9b67b00a156ca5a913a4cfa8b41"
     nginx              = "docker.io/nginxinc/nginx-unprivileged:1.31.0-alpine@sha256:f10950a9f4e6f4dd28634c51bdb74ed4b0a76d50f4424516bc715e7b9188dd37"
     # tier 2
     kea           = "ghcr.io/randomcoww/kea:v3.1.8@sha256:0a525f9477b117889aa1e6432a7e26f3a66f48fb4ba88d220229c5fb1a6db211"
@@ -135,7 +135,7 @@ locals {
     hostapd          = "reg.cluster.internal/randomcoww/hostapd:v2.11.1779122567@sha256:e62ffb442d6fe054ec1e3d3912d860404459868755efeb2d75ad977bc4ae1ab0"
     tailscale        = "ghcr.io/tailscale/tailscale:v1.96.5@sha256:dbeff02d2337344b351afac203427218c4d0a06c43fc10a865184063498472a6"
     qrcode_generator = "reg.cluster.internal/randomcoww/qrcode-resource:v1779122737@sha256:619076ffc55a56b5203d70f813cb4a98c202f6a2b35d05f26eb7831c883b7720"
-    llama_cpp_vulkan = "ghcr.io/mostlygeek/llama-swap:unified-vulkan@sha256:34af99f181d94d934b27430b2132b265b9bbd5b55eece93cff52e75b2e37c78f"
+    llama_cpp_vulkan = "ghcr.io/mostlygeek/llama-swap:unified-vulkan@sha256:2f9fd5441a7fc5cdc46e2d6b3bbc4c13aa77bf12a59a1f58dd89314a2dd9fff7"
     litestream       = "docker.io/litestream/litestream:0.5.11@sha256:79e3bfce6ed758722916f816b028fffd9e0a971058f41b88e2779510cead1d8d"
     searxng          = "ghcr.io/searxng/searxng:latest@sha256:25ff3c045548971d12726e54bea4564b8ec3bedb3d6951aecdefd01caf840974"
     open_webui       = "ghcr.io/open-webui/open-webui:v0.9.5@sha256:e045bde3b004cc7f8c319412345eb56c87ea6ac57031534a31ca37ad5424beb3"
@@ -150,7 +150,7 @@ locals {
     camofox_browser  = "ghcr.io/jo-inc/camofox-browser:1.10.0@sha256:c8cba21cdc4f443fc70b134cad34791507daebddd33743a0f95c6a2afa8b8d74"
     camofox_mcp      = "ghcr.io/redf0x1/camofox-mcp:1.14.1@sha256:ff83c7819a037b50798a863a27306f5967302b93acc4587d02df55897f8db62e"
     navidrome        = "ghcr.io/navidrome/navidrome:0.61.2@sha256:9fa40b3d8dec43ceb2213d1fa551da3dcfef6ac6d19c2e534efb92527c2bafd2"
-    valkey           = "ghcr.io/valkey-io/valkey:9.1-alpine@sha256:34f4f659e02a67cfdf3995d11ae432219c936005055b2cd39a042e86280e053e"
+    valkey           = "ghcr.io/valkey-io/valkey:9.1-alpine@sha256:a35428eba9043cc0b79dbe54100f0c92784f2de00ad09b01182bfb1c5c83d1bd"
     thanos           = "quay.io/thanos/thanos:v0.41.0@sha256:cf3e9b292e4302ad4a4955b56379703aea39516607d382a57604a3d003c35d10"
     stump            = "docker.io/aaronleopold/stump:0.1.3@sha256:5fec2b7ac447d5eec71579beaa86998f83741b06acb56ae28287ee0bb7ad75c6"
 
