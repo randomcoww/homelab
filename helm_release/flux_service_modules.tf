@@ -892,9 +892,8 @@ module "sunshine-desktop" {
     #   ]
     # }
   }
-  loadbalancer_class_name = "kube-vip.io/kube-vip-class"
-  service_hostname        = local.endpoints.sunshine_desktop.service
-  ingress_hostname        = local.endpoints.sunshine_desktop.ingress
+  service_hostname = local.endpoints.sunshine_desktop.service
+  ingress_hostname = local.endpoints.sunshine_desktop.ingress
   gateway_ref = {
     name      = local.endpoints.traefik.name
     namespace = local.endpoints.traefik.namespace

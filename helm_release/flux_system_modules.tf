@@ -90,9 +90,7 @@ module "registry" {
     registry = local.service_ports.registry
     metrics  = local.service_ports.metrics
   }
-  ca                      = data.terraform_remote_state.host.outputs.internal_ca
-  loadbalancer_class_name = "kube-vip.io/kube-vip-class"
-
+  ca                  = data.terraform_remote_state.host.outputs.internal_ca
   minio_endpoint      = "${local.services.cluster_minio.ip}:${local.service_ports.minio}"
   minio_bucket        = "registry"
   minio_bucket_prefix = "/"

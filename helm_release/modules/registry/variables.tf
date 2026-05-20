@@ -34,10 +34,6 @@ variable "replicas" {
   default = 1
 }
 
-variable "loadbalancer_class_name" {
-  type = string
-}
-
 variable "ca" {
   type = object({
     algorithm       = string

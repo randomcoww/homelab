@@ -324,7 +324,7 @@ module "service" {
   }
   spec = {
     type              = "LoadBalancer"
-    loadBalancerClass = var.loadbalancer_class_name
+    loadBalancerClass = "kube-vip.io/kube-vip-class"
     ports = [
       {
         name       = var.name

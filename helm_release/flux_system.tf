@@ -162,8 +162,10 @@ resource "helm_release" "system" {
               }
               service = {
                 type              = "LoadBalancer"
-                loadBalancerIP    = local.services.k8s_gateway.ip
                 loadBalancerClass = "kube-vip.io/kube-vip-class"
+                annotations = {
+                  "kube-vip.io/loadbalancerIPs" = local.services.k8s_gateway.ip
+                }
               }
               customLabels = {
                 app = local.endpoints.k8s_gateway.name
