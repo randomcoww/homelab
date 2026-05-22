@@ -301,6 +301,12 @@ resource "helm_release" "kube-dns" {
               name = "loop"
             },
             {
+              name        = "log"
+              configBlock = <<-EOF
+              class error
+              EOF
+            },
+            {
               name       = "prometheus"
               parameters = "0.0.0.0:${local.service_ports.metrics}"
             },

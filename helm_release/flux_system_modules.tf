@@ -645,7 +645,7 @@ module "prometheus" {
               expr  = <<-EOF
               sum by (instance, node) (rate(coredns_dns_responses_total{app="${local.endpoints.kube_dns.name}",namespace="${local.endpoints.kube_dns.namespace}",rcode=~"SERVFAIL|REFUSED"}[5m]))
               /
-              sum by (instance, node) (rate(coredns_dns_requests_total{app="${local.endpoints.kube_dns.name}",namespace="${local.endpoints.kube_dns.namespace}"}[5m])) > 0.05
+              sum by (instance, node) (rate(coredns_dns_requests_total{app="${local.endpoints.kube_dns.name}",namespace="${local.endpoints.kube_dns.namespace}"}[5m])) > 0.15
               EOF
               for   = "5m"
               labels = {
