@@ -848,6 +848,10 @@ module "sunshine-desktop" {
       value = 1
     },
     {
+      name  = "LIBSEAT_BACKEND"
+      value = "noop"
+    },
+    {
       name  = "AMD_VULKAN_ICD"
       value = "RADV"
     },
