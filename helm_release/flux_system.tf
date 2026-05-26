@@ -930,7 +930,7 @@ resource "helm_release" "system" {
             chart = {
               spec = {
                 chart   = "kured"
-                version = "5.11.0" # renovate: datasource=helm depName=kured registryUrl=https://kubereboot.github.io/charts
+                version = "5.12.0" # renovate: datasource=helm depName=kured registryUrl=https://kubereboot.github.io/charts
                 sourceRef = {
                   kind = "HelmRepository"
                   name = "kured"
