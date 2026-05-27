@@ -227,3 +227,18 @@ module "daemonset" {
     ]
   }
 }
+
+resource "helm_release" "wrapper" {
+  chart            = "../helm-wrapper"
+  name             = var.name
+  namespace        = var.namespace
+  create_namespace = true
+  wait             = false
+  wait_for_jobs    = false
+  max_history      = 2
+  values = [
+    yamlencode({
+      manifests = local.manifests
+    }),
+  ]
+}

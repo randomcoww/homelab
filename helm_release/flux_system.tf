@@ -566,83 +566,6 @@ resource "helm_release" "system" {
           }
         },
 
-        # local-path-provisioner
-        {
-          apiVersion = "source.toolkit.fluxcd.io/v1"
-          kind       = "HelmRepository"
-          metadata = {
-            name      = "local-path-provisioner"
-            namespace = "kube-system"
-          }
-          spec = {
-            interval = "15m"
-            url      = "https://charts.containeroo.ch"
-          }
-        },
-        {
-          apiVersion = "helm.toolkit.fluxcd.io/v2"
-          kind       = "HelmRelease"
-          metadata = {
-            name      = "local-path-provisioner"
-            namespace = "kube-system"
-          }
-          spec = {
-            interval = "15m"
-            timeout  = "5m"
-            chart = {
-              spec = {
-                chart   = "local-path-provisioner"
-                version = "0.0.37" # renovate: datasource=helm depName=local-path-provisioner registryUrl=https://charts.containeroo.ch
-                sourceRef = {
-                  kind = "HelmRepository"
-                  name = "local-path-provisioner"
-                }
-                interval = "5m"
-              }
-            }
-            releaseName = "local-path-provisioner"
-            install = {
-              remediation = {
-                retries = -1
-              }
-            }
-            upgrade = {
-              remediation = {
-                retries = -1
-              }
-            }
-            test = {
-              enable = false
-            }
-            values = {
-              replicaCount = 2
-              storageClass = {
-                create            = true
-                name              = "local-path"
-                provisionerName   = "rancher.io/local-path"
-                defaultClass      = true
-                defaultVolumeType = "local"
-              }
-              nodePathMap = [
-                {
-                  node = "DEFAULT_PATH_FOR_NON_LISTED_NODES"
-                  paths = [
-                    "${local.kubernetes.containers_path}/local_path_provisioner",
-                  ]
-                },
-              ]
-              resources = {
-                requests = {
-                  memory = "128Mi"
-                }
-                limits = {
-                  memory = "128Mi"
-                }
-              }
-            }
-          }
-        },
-
         # metrics-server
         {
           apiVersion = "source.toolkit.fluxcd.io/v1"
@@ -1009,7 +932,6 @@ resource "helm_release" "system" {
       ],
       module.device-plugin.releases,
       module.registry.releases,
-      module.minio.releases,
       module.kea.releases,
       module.prometheus.releases,
       module.tailscale.releases,

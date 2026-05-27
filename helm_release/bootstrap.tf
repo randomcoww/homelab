@@ -12,78 +12,6 @@ resource "kubernetes_labels" "labels" {
   force  = true
 }
 
-module "kube-proxy" {
-  source    = "./modules/kube_proxy"
-  name      = "kube-proxy"
-  namespace = "kube-system"
-  images = {
-    kube_proxy = local.container_images_digest.kube_proxy
-  }
-  ports = {
-    kube_proxy         = local.host_ports.kube_proxy
-    kube_proxy_metrics = local.host_ports.kube_proxy_metrics
-    kube_apiserver     = local.host_ports.apiserver
-  }
-  kubernetes_pod_prefix = local.networks.kubernetes_pod.prefix
-  kube_apiserver_ip     = local.services.apiserver.ip
-}
-
-module "flannel" {
-  source    = "./modules/flannel"
-  name      = "flannel"
-  namespace = "kube-system"
-  images = {
-    flannel            = local.container_images_digest.flannel
-    flannel_cni_plugin = local.container_images_digest.flannel_cni_plugin
-  }
-  ports = {
-    healthz = local.host_ports.flannel_healthz
-  }
-  kubernetes_pod_prefix     = local.networks.kubernetes_pod.prefix
-  cni_bridge_interface_name = local.kubernetes.cni_bridge_interface_name
-  cni_version               = "0.3.1"
-  cni_bin_path              = local.kubernetes.cni_bin_path
-  cni_config_path           = local.kubernetes.cni_config_path
-}
-
-module "kube-vip" {
-  source    = "./modules/kube_vip"
-  name      = "kube-vip"
-  namespace = "kube-system"
-  images = {
-    kube_vip = local.container_images_digest.kube_vip
-  }
-  ports = {
-    apiserver        = local.host_ports.apiserver,
-    kube_vip_metrics = local.host_ports.kube_vip_metrics,
-    kube_vip_health  = local.host_ports.kube_vip_health,
-  }
-  bgp_as     = local.ha.bgp_as
-  bgp_peeras = local.ha.bgp_as
-  bgp_neighbor_ips = [
-    for _, host in local.members.gateway :
-    cidrhost(local.networks.service.prefix, host.netnum)
-  ]
-  apiserver_ip      = local.services.apiserver.ip
-  service_interface = "phy-service"
-  affinity = {
-    nodeAffinity = {
-      requiredDuringSchedulingIgnoredDuringExecution = {
-        nodeSelectorTerms = [
-          {
-            matchExpressions = [
-              {
-                key      = "node-role.kubernetes.io/control-plane"
-                operator = "Exists"
-              },
-            ]
-          },
-        ]
-      }
-    }
-  }
-}
-
 # Bootstrap roles
 
 resource "helm_release" "bootstrap" {
@@ -223,19 +151,21 @@ resource "helm_release" "bootstrap" {
 
 # kube-proxy
 
-resource "helm_release" "kube-proxy" {
-  chart            = "../helm-wrapper"
-  name             = "kube-proxy"
-  namespace        = "kube-system"
-  create_namespace = true
-  wait             = false
-  wait_for_jobs    = false
-  max_history      = 2
-  values = [
-    yamlencode({
-      manifests = module.kube-proxy.manifests
-    }),
-  ]
+module "kube-proxy" {
+  source    = "./modules/kube_proxy_release"
+  name      = "kube-proxy"
+  namespace = "kube-system"
+  images = {
+    kube_proxy = local.container_images_digest.kube_proxy
+  }
+  ports = {
+    kube_proxy         = local.host_ports.kube_proxy
+    kube_proxy_metrics = local.host_ports.kube_proxy_metrics
+    kube_apiserver     = local.host_ports.apiserver
+  }
+  kubernetes_pod_prefix = local.networks.kubernetes_pod.prefix
+  kube_apiserver_ip     = local.services.apiserver.ip
+
   depends_on = [
     kubernetes_labels.labels,
   ]
@@ -243,19 +173,23 @@ resource "helm_release" "kube-proxy" {
 
 # CNI
 
-resource "helm_release" "flannel" {
-  chart            = "../helm-wrapper"
-  name             = "flannel"
-  namespace        = "kube-system"
-  create_namespace = true
-  wait             = false
-  wait_for_jobs    = false
-  max_history      = 2
-  values = [
-    yamlencode({
-      manifests = module.flannel.manifests
-    }),
-  ]
+module "flannel" {
+  source    = "./modules/flannel_release"
+  name      = "flannel"
+  namespace = "kube-system"
+  images = {
+    flannel            = local.container_images_digest.flannel
+    flannel_cni_plugin = local.container_images_digest.flannel_cni_plugin
+  }
+  ports = {
+    healthz = local.host_ports.flannel_healthz
+  }
+  kubernetes_pod_prefix     = local.networks.kubernetes_pod.prefix
+  cni_bridge_interface_name = local.kubernetes.cni_bridge_interface_name
+  cni_version               = "0.3.1"
+  cni_bin_path              = local.kubernetes.cni_bin_path
+  cni_config_path           = local.kubernetes.cni_config_path
+
   depends_on = [
     kubernetes_labels.labels,
   ]
@@ -394,17 +328,85 @@ resource "helm_release" "kube-dns" {
 
 # LoadBalancer
 
-resource "helm_release" "kube-vip" {
-  chart            = "../helm-wrapper"
-  name             = "kube-vip"
+module "kube-vip" {
+  source    = "./modules/kube_vip_release"
+  name      = "kube-vip"
+  namespace = "kube-system"
+  images = {
+    kube_vip = local.container_images_digest.kube_vip
+  }
+  ports = {
+    apiserver        = local.host_ports.apiserver,
+    kube_vip_metrics = local.host_ports.kube_vip_metrics,
+    kube_vip_health  = local.host_ports.kube_vip_health,
+  }
+  bgp_as     = local.ha.bgp_as
+  bgp_peeras = local.ha.bgp_as
+  bgp_neighbor_ips = [
+    for _, host in local.members.gateway :
+    cidrhost(local.networks.service.prefix, host.netnum)
+  ]
+  apiserver_ip      = local.services.apiserver.ip
+  service_interface = "phy-service"
+  affinity = {
+    nodeAffinity = {
+      requiredDuringSchedulingIgnoredDuringExecution = {
+        nodeSelectorTerms = [
+          {
+            matchExpressions = [
+              {
+                key      = "node-role.kubernetes.io/control-plane"
+                operator = "Exists"
+              },
+            ]
+          },
+        ]
+      }
+    }
+  }
+  depends_on = [
+    kubernetes_labels.labels,
+  ]
+}
+
+# Local-path provisioner
+
+resource "helm_release" "local-path-provisioner" {
+  chart            = "local-path-provisioner"
+  name             = "local-path-provisioner"
   namespace        = "kube-system"
+  repository       = "https://charts.containeroo.ch"
   create_namespace = true
   wait             = false
   wait_for_jobs    = false
+  version          = "0.0.37"
   max_history      = 2
   values = [
     yamlencode({
-      manifests = module.kube-vip.manifests
+      replicaCount = 2
+      storageClass = {
+        create            = true
+        name              = "local-path"
+        provisionerName   = "rancher.io/local-path"
+        defaultClass      = true
+        defaultVolumeType = "local"
+      }
+      nodePathMap = [
+        {
+          node = "DEFAULT_PATH_FOR_NON_LISTED_NODES"
+          paths = [
+            "${local.kubernetes.containers_path}/local_path_provisioner",
+          ]
+        },
+      ]
+      resources = {
+        requests = {
+          memory = "128Mi"
+        }
+        limits = {
+          memory = "128Mi"
+        }
+      }
     }),
   ]
   depends_on = [
@@ -438,6 +440,49 @@ resource "helm_release" "flux2" {
       }
     }),
   ]
+  depends_on = [
+    kubernetes_labels.labels,
+  ]
+}
+
+# Internal S3
+
+resource "random_password" "minio-access-key-id" {
+  length  = 30
+  special = false
+}
+
+resource "random_password" "minio-secret-access-key" {
+  length  = 30
+  special = false
+}
+
+module "minio" {
+  source    = "./modules/minio_release"
+  name      = local.endpoints.minio.name
+  namespace = local.endpoints.minio.namespace
+  timeout   = local.kubernetes.helm_release_timeout
+  images = {
+    nginx = local.container_images_digest.nginx
+    minio = {
+      repository = regex(local.container_image_regex, local.container_images.minio).depName
+      tag        = regex(local.container_image_regex, local.container_images.minio).tag
+    }
+  }
+  ports = {
+    minio   = local.service_ports.minio
+    metrics = local.service_ports.metrics
+  }
+  minio_credentials = {
+    access_key_id     = random_password.minio-access-key-id.result
+    secret_access_key = random_password.minio-secret-access-key.result
+  }
+  cluster_domain     = local.domains.kubernetes
+  ca                 = data.terraform_remote_state.host.outputs.internal_ca
+  service_hostname   = local.endpoints.minio.service
+  service_ip         = local.services.minio.ip
+  cluster_service_ip = local.services.cluster_minio.ip
+
   depends_on = [
     kubernetes_labels.labels,
   ]

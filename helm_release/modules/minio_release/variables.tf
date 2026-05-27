@@ -53,6 +53,10 @@ variable "ports" {
   })
 }
 
+variable "timeout" {
+  type = number
+}
+
 variable "service_hostname" {
   type = string
 }
