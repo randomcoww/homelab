@@ -122,7 +122,7 @@ locals {
     flannel            = "ghcr.io/flannel-io/flannel:v0.28.4@sha256:cc44a1a8969c4f14b8dd45664546f14abc3fc7682b125399103e555f1ad2528b"
     flannel_cni_plugin = "ghcr.io/flannel-io/flannel-cni-plugin:v1.9.1-flannel1@sha256:7c3377e977b4b77b8efdad96e207ebee371537d6dcd7b9c40853cf0c0f0aade3"
     kube_vip           = "ghcr.io/kube-vip/kube-vip:v1.1.2@sha256:840305b94ef2a89abb3b7fd2b09edfbde690d90052020da4dff90679fe892da2"
-    minio              = "cgr.dev/chainguard/minio:latest@sha256:6a04645a93493607c507bbdac515f8d44cfa2db76741643f6e8f61b712a18ca1"
+    minio              = "cgr.dev/chainguard/minio:latest@sha256:0b1e1dc675929e40df9e2ee421bdeca41fcb0ed92be4973d2f843a22b1e8890c"
     nginx              = "docker.io/nginxinc/nginx-unprivileged:1.31.1-alpine@sha256:8122337ed6c475bb486bc9340da453d4599f225e6b920ff0d92ca2267486b9b5"
     # tier 2
     kea           = "ghcr.io/randomcoww/kea:v3.1.8@sha256:c8a721d08af0d3b4bafb64cce1301bbdda5aa824a794f8b5d719383590f3ab60"
@@ -141,7 +141,7 @@ locals {
     open_webui       = "ghcr.io/open-webui/open-webui:v0.9.5@sha256:e045bde3b004cc7f8c319412345eb56c87ea6ac57031534a31ca37ad5424beb3"
     lldap            = "ghcr.io/lldap/lldap:v0.6.3-alpine-rootless@sha256:ba2c50930ea998eefd5454aa678a7977448019248b1827da87d330df0b71c284"
     authelia         = "ghcr.io/authelia/authelia:4.39.20@sha256:1b363e9279e742397966333f364e0876ae02bf5c876de73e83af6d48c57ff51b"
-    cloudflared      = "docker.io/cloudflare/cloudflared:2026.5.1@sha256:a5b5e6fd9a372f054b9a843c219bfbcdceb54691605312a8b1ee72978bdf1aa1"
+    cloudflared      = "docker.io/cloudflare/cloudflared:2026.5.2@sha256:12ff5c6992a9863db4da270746af7c244bcaee49353039af8104268a18d6c4f0"
     sunshine_desktop = "reg.cluster.internal/randomcoww/sunshine-desktop:v2026.518.24409.1779122817@sha256:61023152ddc6f0d52a7d6cb905a1cb7206bf3cd607380e48fd55058bd7b38c4a"
     mcp_proxy        = "ghcr.io/tbxark/mcp-proxy:v0.43.2@sha256:70c0e02d39c4c0898e610b3a30954f7930628fa6f4fb447bad14c32382a25879"
     kubernetes_mcp   = "ghcr.io/containers/kubernetes-mcp-server:v0.0.62@sha256:bd7e9ff49b0941ff230508dfceb87162c4a2be67b180c28f5d1b204fc58fa2e9"
