@@ -1008,7 +1008,6 @@ resource "helm_release" "system" {
       yamlencode(m)
       ],
       module.device-plugin.releases,
-      module.kube-vip.releases,
       module.registry.releases,
       module.minio.releases,
       module.kea.releases,

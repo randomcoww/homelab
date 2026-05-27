@@ -46,6 +46,44 @@ module "flannel" {
   cni_config_path           = local.kubernetes.cni_config_path
 }
 
+module "kube-vip" {
+  source    = "./modules/kube_vip"
+  name      = "kube-vip"
+  namespace = "kube-system"
+  images = {
+    kube_vip = local.container_images_digest.kube_vip
+  }
+  ports = {
+    apiserver        = local.host_ports.apiserver,
+    kube_vip_metrics = local.host_ports.kube_vip_metrics,
+    kube_vip_health  = local.host_ports.kube_vip_health,
+  }
+  bgp_as     = local.ha.bgp_as
+  bgp_peeras = local.ha.bgp_as
+  bgp_neighbor_ips = [
+    for _, host in local.members.gateway :
+    cidrhost(local.networks.service.prefix, host.netnum)
+  ]
+  apiserver_ip      = local.services.apiserver.ip
+  service_interface = "phy-service"
+  affinity = {
+    nodeAffinity = {
+      requiredDuringSchedulingIgnoredDuringExecution = {
+        nodeSelectorTerms = [
+          {
+            matchExpressions = [
+              {
+                key      = "node-role.kubernetes.io/control-plane"
+                operator = "Exists"
+              },
+            ]
+          },
+        ]
+      }
+    }
+  }
+}
+
 # Bootstrap roles
 
 resource "helm_release" "bootstrap" {
@@ -223,6 +261,8 @@ resource "helm_release" "flannel" {
   ]
 }
 
+# CoreDNS
+
 resource "helm_release" "kube-dns" {
   name             = local.endpoints.kube_dns.name
   namespace        = local.endpoints.kube_dns.namespace
@@ -345,6 +385,26 @@ resource "helm_release" "kube-dns" {
           ])
         },
       ]
+    }),
+  ]
+  depends_on = [
+    kubernetes_labels.labels,
+  ]
+}
+
+# LoadBalancer
+
+resource "helm_release" "kube-vip" {
+  chart            = "../helm-wrapper"
+  name             = "kube-vip"
+  namespace        = "kube-system"
+  create_namespace = true
+  wait             = false
+  wait_for_jobs    = false
+  max_history      = 2
+  values = [
+    yamlencode({
+      manifests = module.kube-vip.manifests
     }),
   ]
   depends_on = [
