@@ -3,26 +3,14 @@ locals {
   domain_regex         = "(?<hostname>(?<subdomain>[a-z0-9-*]+)\\.(?<domain>[a-z0-9.-]+))(?::(?<port>\\d+))?"
 
   manifests = concat([
+    # runner resources in arc-runners
     module.tls.manifest,
     module.workflow-config.manifest,
+
     ], [
     for _, m in concat([
-      # repos
-      {
-        apiVersion = "source.toolkit.fluxcd.io/v1"
-        kind       = "OCIRepository"
-        metadata = {
-          name      = "${var.name}-scale-set-controller"
-          namespace = var.namespace
-        }
-        spec = {
-          interval = "15m"
-          url      = "oci://ghcr.io/actions/actions-runner-controller-charts/gha-runner-scale-set-controller"
-          ref = {
-            tag = "0.14.2" # renovate: datasource=docker depName=ghcr.io/actions/actions-runner-controller-charts/gha-runner-scale-set-controller depType=helm_regex
-          }
-        }
-      },
+
+      # runner in arc-runners
       {
         apiVersion = "source.toolkit.fluxcd.io/v1"
         kind       = "OCIRepository"
@@ -38,59 +26,7 @@ locals {
           }
         }
       },
-
-      # controller
-      {
-        apiVersion = "helm.toolkit.fluxcd.io/v2"
-        kind       = "HelmRelease"
-        metadata = {
-          name      = var.name
-          namespace = var.namespace
-        }
-        spec = {
-          interval = "15m"
-          timeout  = "5m"
-          chartRef = {
-            kind      = "OCIRepository"
-            name      = "${var.name}-scale-set-controller"
-            namespace = var.namespace
-          }
-          releaseName = var.name
-          install = {
-            remediation = {
-              retries = -1
-            }
-          }
-          upgrade = {
-            remediation = {
-              retries = -1
-            }
-          }
-          test = {
-            enable = false
-          }
-          values = {
-            replicaCount = 2
-            serviceAccount = {
-              create = true
-              name   = local.service_account_name
-            }
-            flags = {
-              updateStrategy = "eventual"
-            }
-            resources = {
-              requests = {
-                memory = "128Mi"
-              }
-              limits = {
-                memory = "128Mi"
-              }
-            }
-          }
-        }
-      },
       ], [
-      # scale sets by workflow and repo
       for k in flatten([
         for workflow, repos in {
           "renovate" = [
@@ -204,16 +140,84 @@ locals {
           }
         }
       }
+      ], [
+
+      # runner-controller in arc-systems
+      {
+        apiVersion = "source.toolkit.fluxcd.io/v1"
+        kind       = "OCIRepository"
+        metadata = {
+          name      = "${var.name}-scale-set-controller"
+          namespace = var.namespace
+        }
+        spec = {
+          interval = "15m"
+          url      = "oci://ghcr.io/actions/actions-runner-controller-charts/gha-runner-scale-set-controller"
+          ref = {
+            tag = "0.14.2" # renovate: datasource=docker depName=ghcr.io/actions/actions-runner-controller-charts/gha-runner-scale-set-controller depType=helm_regex
+          }
+        }
+      },
+      {
+        apiVersion = "helm.toolkit.fluxcd.io/v2"
+        kind       = "HelmRelease"
+        metadata = {
+          name      = var.name
+          namespace = var.namespace
+        }
+        spec = {
+          interval = "15m"
+          timeout  = "5m"
+          chartRef = {
+            kind      = "OCIRepository"
+            name      = "${var.name}-scale-set-controller"
+            namespace = var.namespace
+          }
+          releaseName = var.name
+          install = {
+            remediation = {
+              retries = -1
+            }
+          }
+          upgrade = {
+            remediation = {
+              retries = -1
+            }
+          }
+          test = {
+            enable = false
+          }
+          values = {
+            replicaCount = 2
+            serviceAccount = {
+              create = true
+              name   = local.service_account_name
+            }
+            flags = {
+              updateStrategy = "eventual"
+            }
+            resources = {
+              requests = {
+                memory = "128Mi"
+              }
+              limits = {
+                memory = "128Mi"
+              }
+            }
+          }
+        }
+      },
     ]) :
     yamlencode(m)
   ])
 }
 
 module "workflow-config" {
-  source  = "../../../modules/configmap"
-  name    = "${var.name}-workflow-template"
-  app     = var.name
-  release = var.release
+  source    = "../../../modules/configmap"
+  name      = "${var.name}-workflow-template"
+  namespace = var.runner_namespace
+  app       = var.name
+  release   = var.release
   data = {
     # ADR
     # https://github.com/actions/actions-runner-controller/discussions/3152

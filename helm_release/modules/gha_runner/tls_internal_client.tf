@@ -28,10 +28,11 @@ resource "tls_locally_signed_cert" "internal-client" {
 }
 
 module "tls" {
-  source  = "../../../modules/secret"
-  name    = "${var.name}-tls"
-  app     = var.name
-  release = var.release
+  source    = "../../../modules/secret"
+  name      = "${var.name}-tls"
+  namespace = var.runner_namespace
+  app       = var.name
+  release   = var.release
   data = {
     "tls.crt"      = tls_locally_signed_cert.internal-client.cert_pem
     "tls.key"      = tls_private_key.internal-client.private_key_pem

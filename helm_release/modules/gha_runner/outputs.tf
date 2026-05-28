@@ -8,7 +8,7 @@ output "kustomize" {
     "kustomization.yaml" = yamlencode({
       apiVersion = "kustomize.config.k8s.io/v1beta1"
       kind       = "Kustomization"
-      namespace  = var.namespace
+      # deployes to two namespaces - do not specify namespace
       resources = [
         "release.yaml",
       ]
