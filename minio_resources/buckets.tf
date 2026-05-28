@@ -54,69 +54,80 @@ module "minio-user-secret" {
   data = merge({
     AWS_ACCESS_KEY_ID     = minio_iam_user.user[each.key].id
     AWS_SECRET_ACCESS_KEY = minio_iam_user.user[each.key].secret
+    accesskey             = minio_iam_user.user[each.key].id
+    secretkey             = minio_iam_user.user[each.key].secret
   })
 }
 
 resource "helm_release" "minio-user-secret" {
-  chart                      = "../helm-wrapper"
-  name                       = "minio-user-secret"
-  namespace                  = "flux-runners"
-  create_namespace           = true
-  wait                       = false
-  wait_for_jobs              = false
-  max_history                = 1
-  disable_crd_hooks          = true
-  disable_webhooks           = true
-  disable_openapi_validation = true
-  skip_crds                  = true
-  replace                    = true
-  render_subchart_notes      = false
+  for_each = local.minio_users
+
+  chart            = "../helm-wrapper"
+  name             = each.value.secret
+  namespace        = each.value.namespace
+  create_namespace = true
+  wait             = false
+  wait_for_jobs    = false
+  max_history      = 2
   values = [
-    yamlencode({ manifests = [
-      for k, v in local.minio_users :
-      yamlencode({
-        apiVersion = "helm.toolkit.fluxcd.io/v2"
-        kind       = "HelmRelease"
-        metadata = {
-          name      = v.secret
-          namespace = v.namespace
-        }
-        spec = {
-          interval = "15m"
-          timeout  = "5m"
-          chart = {
-            spec = {
-              chart = "helm-wrapper"
-              sourceRef = {
-                kind      = "HelmRepository"
-                name      = "wrapper"
-                namespace = "flux-runners"
-              }
-              interval = "5m"
-            }
-          }
-          releaseName = v.secret
-          install = {
-            remediation = {
-              retries = -1
-            }
-          }
-          upgrade = {
-            remediation = {
-              retries = -1
-            }
-          }
-          test = {
-            enable = false
-          }
-          values = {
-            manifests = [
-              module.minio-user-secret[k].manifest,
-            ]
-          }
-        }
-      })
+    yamlencode({
+      manifests = [
+        module.minio-user-secret[each.key].manifest,
       ]
     })
+  ]
+}
+
+resource "helm_release" "fluxcd-bucket" {
+  chart            = "../helm-wrapper"
+  name             = "${local.endpoints.fluxcd.name}-bucket"
+  namespace        = local.endpoints.fluxcd.namespace
+  create_namespace = true
+  wait             = false
+  wait_for_jobs    = false
+  max_history      = 2
+  values = [
+    yamlencode({
+      manifests = [
+        module.minio-tls.manifest,
+        yamlencode({
+          apiVersion = "source.toolkit.fluxcd.io/v1"
+          kind       = "Bucket"
+          metadata = {
+            name = "${local.endpoints.fluxcd.name}-bucket"
+          }
+          spec = {
+            interval = "10s"
+            provider = "generic"
+            endpoint = data.terraform_remote_state.helm.outputs.minio.endpoint
+            secretRef = {
+              name = local.minio_users.fluxcd.secret
+            }
+            bucketName = "fluxcd"
+            certSecretRef = {
+              name = "${local.endpoints.fluxcd.name}-minio-client-tls"
+            }
+          }
+        }),
+        yamlencode({
+          apiVersion = "kustomize.toolkit.fluxcd.io/v1"
+          kind       = "Kustomization"
+          metadata = {
+            name = "${local.endpoints.fluxcd.name}-bucket"
+          }
+          spec = {
+            interval = "1m"
+            sourceRef = {
+              kind = "Bucket"
+              name = "${local.endpoints.fluxcd.name}-bucket"
+            }
+            path    = "./"
+            prune   = true
+            wait    = true
+            timeout = "5m"
+          }
+        }),
+      ]
+    }),
   ]
 }

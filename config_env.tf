@@ -122,7 +122,7 @@ locals {
     flannel            = "ghcr.io/flannel-io/flannel:v0.28.4@sha256:cc44a1a8969c4f14b8dd45664546f14abc3fc7682b125399103e555f1ad2528b"
     flannel_cni_plugin = "ghcr.io/flannel-io/flannel-cni-plugin:v1.9.1-flannel1@sha256:7c3377e977b4b77b8efdad96e207ebee371537d6dcd7b9c40853cf0c0f0aade3"
     kube_vip           = "ghcr.io/kube-vip/kube-vip:v1.1.2@sha256:840305b94ef2a89abb3b7fd2b09edfbde690d90052020da4dff90679fe892da2"
-    minio              = "cgr.dev/chainguard/minio:latest@sha256:0b1e1dc675929e40df9e2ee421bdeca41fcb0ed92be4973d2f843a22b1e8890c"
+    minio              = "docker.io/pgsty/minio:RELEASE.2026-04-17T00-00-00Z@sha256:83885c27b3b5b673049e33ddf4029afe2c134fd51ce4309e65e4f39d3b9ca282"
     nginx              = "docker.io/nginxinc/nginx-unprivileged:1.31.1-alpine@sha256:8122337ed6c475bb486bc9340da453d4599f225e6b920ff0d92ca2267486b9b5"
     # tier 2
     kea           = "ghcr.io/randomcoww/kea:v3.1.8@sha256:c8a721d08af0d3b4bafb64cce1301bbdda5aa824a794f8b5d719383590f3ab60"
@@ -332,6 +332,10 @@ locals {
       }
       mcp_proxy = {
         name = "mcp"
+      }
+      fluxcd = {
+        name      = "fluxcd"
+        namespace = "flux-system"
       }
     } :
     name => merge(e, {

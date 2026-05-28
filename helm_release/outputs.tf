@@ -27,3 +27,25 @@ output "llama-cpp" {
   }
   sensitive = true
 }
+
+output "flux_system" {
+  value = merge([
+    for name, kustomize in local.flux_system :
+    {
+      for f, content in kustomize :
+      "${name}/${f}" => content
+    }
+  ]...)
+  sensitive = true
+}
+
+output "flux_service" {
+  value = merge([
+    for name, kustomize in local.flux_service :
+    {
+      for f, content in kustomize :
+      "${name}/${f}" => content
+    }
+  ]...)
+  sensitive = true
+}

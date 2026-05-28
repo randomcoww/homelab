@@ -149,8 +149,6 @@ resource "helm_release" "bootstrap" {
   ]
 }
 
-# kube-proxy
-
 module "kube-proxy" {
   source    = "./modules/kube_proxy_release"
   name      = "kube-proxy"
@@ -194,8 +192,6 @@ module "flannel" {
     kubernetes_labels.labels,
   ]
 }
-
-# CoreDNS
 
 resource "helm_release" "kube-dns" {
   name             = local.endpoints.kube_dns.name
@@ -369,8 +365,6 @@ module "kube-vip" {
   ]
 }
 
-# Local-path provisioner
-
 resource "helm_release" "local-path-provisioner" {
   chart            = "local-path-provisioner"
   name             = "local-path-provisioner"
@@ -416,15 +410,16 @@ resource "helm_release" "local-path-provisioner" {
 
 # fluxCD
 
-resource "helm_release" "flux2" {
-  name             = "flux2"
-  namespace        = "flux-system"
+resource "helm_release" "fluxcd" {
+  name             = local.endpoints.fluxcd.name
+  namespace        = local.endpoints.fluxcd.namespace
   repository       = "https://fluxcd-community.github.io/helm-charts"
   chart            = "flux2"
   create_namespace = true
   wait             = true
   wait_for_jobs    = true
   version          = "2.18.4"
+  timeout          = local.kubernetes.helm_release_timeout
   max_history      = 2
   values = [
     yamlencode({
