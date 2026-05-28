@@ -66,11 +66,24 @@ resource "minio_s3_object" "ignition" {
   ]
 }
 
+resource "minio_s3_object" "flux-crd" {
+  for_each = data.terraform_remote_state.helm.outputs.flux_crd
+
+  bucket_name  = "fluxcd"
+  object_name  = "crd/${each.key}"
+  content_type = "application/yaml"
+  content      = each.value
+
+  depends_on = [
+    minio_s3_bucket.bucket["fluxcd"],
+  ]
+}
+
 resource "minio_s3_object" "flux-system" {
   for_each = data.terraform_remote_state.helm.outputs.flux_system
 
   bucket_name  = "fluxcd"
-  object_name  = each.key
+  object_name  = "system/${each.key}"
   content_type = "application/yaml"
   content      = each.value
 
@@ -83,7 +96,7 @@ resource "minio_s3_object" "flux-service" {
   for_each = data.terraform_remote_state.helm.outputs.flux_service
 
   bucket_name  = "fluxcd"
-  object_name  = each.key
+  object_name  = "service/${each.key}"
   content_type = "application/yaml"
   content      = each.value
 

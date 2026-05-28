@@ -109,11 +109,13 @@ resource "helm_release" "fluxcd-bucket" {
             }
           }
         }),
+
+        # resources that include CRD
         yamlencode({
           apiVersion = "kustomize.toolkit.fluxcd.io/v1"
           kind       = "Kustomization"
           metadata = {
-            name = "${local.endpoints.fluxcd.name}-bucket"
+            name = "${local.endpoints.fluxcd.name}-bucket-crd"
           }
           spec = {
             interval = "1m"
@@ -121,7 +123,57 @@ resource "helm_release" "fluxcd-bucket" {
               kind = "Bucket"
               name = "${local.endpoints.fluxcd.name}-bucket"
             }
-            path    = "./"
+            path    = "./crd"
+            prune   = true
+            wait    = true
+            timeout = "5m"
+          }
+        }),
+
+        # lower level services
+        yamlencode({
+          apiVersion = "kustomize.toolkit.fluxcd.io/v1"
+          kind       = "Kustomization"
+          metadata = {
+            name = "${local.endpoints.fluxcd.name}-bucket-system"
+          }
+          spec = {
+            interval = "1m"
+            sourceRef = {
+              kind = "Bucket"
+              name = "${local.endpoints.fluxcd.name}-bucket"
+            }
+            dependsOn = [
+              {
+                name = "${local.endpoints.fluxcd.name}-bucket-crd"
+              },
+            ]
+            path    = "./system"
+            prune   = true
+            wait    = true
+            timeout = "5m"
+          }
+        }),
+
+        # service
+        yamlencode({
+          apiVersion = "kustomize.toolkit.fluxcd.io/v1"
+          kind       = "Kustomization"
+          metadata = {
+            name = "${local.endpoints.fluxcd.name}-bucket-service"
+          }
+          spec = {
+            interval = "1m"
+            sourceRef = {
+              kind = "Bucket"
+              name = "${local.endpoints.fluxcd.name}-bucket"
+            }
+            dependsOn = [
+              {
+                name = "${local.endpoints.fluxcd.name}-bucket-crd"
+              },
+            ]
+            path    = "./service"
             prune   = true
             wait    = true
             timeout = "5m"
