@@ -380,8 +380,8 @@ locals {
 
     }, {
     for _, m in [
-        module.prometheus,
-      ] :
-      m.name => m.kustomize
-    })
-  }
+      module.prometheus,
+    ] :
+    m.name => m.kustomize
+  })
+}

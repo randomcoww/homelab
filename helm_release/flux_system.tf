@@ -323,9 +323,9 @@ locals {
               }
             }
           },
-        ]:
+        ] :
         yamlencode(m)
-      ], [
+        ], [
         module.cert-manager-issuer-acme-prod-secret.manifest,
         module.cert-manager-issuer-ca-internal-secret.manifest,
       ]))
