@@ -6,6 +6,11 @@ variable "app" {
   type = string
 }
 
+variable "namespace" {
+  type    = string
+  default = ""
+}
+
 variable "release" {
   type = string
 }

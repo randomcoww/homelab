@@ -905,26 +905,6 @@ module "sunshine-desktop" {
   }
 }
 
-# github-actions
-
-module "gha-runner" {
-  source           = "./modules/gha_runner"
-  name             = "gha"
-  namespace        = "arc-systems"
-  runner_namespace = "arc-runners"
-  images = {
-    gha_runner = local.container_images_digest.gha_runner
-  }
-  github_credentials = {
-    username = var.github_username
-    token    = var.github_token
-  }
-  internal_ca         = data.terraform_remote_state.host.outputs.internal_ca
-  registry_endpoint   = "${local.endpoints.registry.service}:${local.service_ports.registry}"
-  minio_endpoint      = "${local.services.cluster_minio.ip}:${local.service_ports.minio}"
-  minio_access_secret = local.minio_users.arc.secret
-}
-
 # Navidrome
 
 module "navidrome" {

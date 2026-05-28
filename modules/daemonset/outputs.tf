@@ -2,13 +2,15 @@ output "manifest" {
   value = yamlencode({
     apiVersion = "apps/v1"
     kind       = "DaemonSet"
-    metadata = {
+    metadata = merge({
       name = var.name
       labels = {
         app     = var.app
         release = var.release
       }
-    }
+      }, length(var.namespace) > 0 ? {
+      namespace = var.namespace
+    } : {})
     spec = merge({
       selector = {
         matchLabels = merge({
