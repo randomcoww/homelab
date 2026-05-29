@@ -23,7 +23,7 @@ variable "affinity" {
 
 variable "images" {
   type = object({
-    stump      = string
+    navidrome  = string
     mountpoint = string
     litestream = string
   })
@@ -38,8 +38,20 @@ variable "ingress_hostname" {
   type = string
 }
 
+variable "auth_middleware" {
+  type    = any
+  default = {}
+}
+
 variable "gateway_ref" {
   type = any
+}
+
+variable "middleware_ref" {
+  type = object({
+    name      = string
+    namespace = string
+  })
 }
 
 variable "minio_endpoint" {
@@ -54,6 +66,9 @@ variable "minio_bucket" {
   type = string
 }
 
-variable "minio_access_secret" {
-  type = string
+variable "minio_user" {
+  type = object({
+    id     = string
+    secret = string
+  })
 }

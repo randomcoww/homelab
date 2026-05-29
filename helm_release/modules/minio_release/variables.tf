@@ -27,10 +27,10 @@ variable "images" {
   })
 }
 
-variable "minio_credentials" {
+variable "root_user" {
   type = object({
-    access_key_id     = string
-    secret_access_key = string
+    id     = string
+    secret = string
   })
 }
 

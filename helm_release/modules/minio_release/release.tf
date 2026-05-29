@@ -65,8 +65,8 @@ resource "helm_release" "minio" {
       }
       clusterDomain     = var.cluster_domain
       mode              = "distributed"
-      rootUser          = var.minio_credentials.access_key_id
-      rootPassword      = var.minio_credentials.secret_access_key
+      rootUser          = var.root_user.id
+      rootPassword      = var.root_user.secret
       priorityClassName = "system-node-critical"
       persistence = {
         storageClass = "local-path"

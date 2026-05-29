@@ -468,9 +468,9 @@ module "minio" {
     minio   = local.service_ports.minio
     metrics = local.service_ports.metrics
   }
-  minio_credentials = {
-    access_key_id     = random_password.minio-access-key-id.result
-    secret_access_key = random_password.minio-secret-access-key.result
+  root_user = {
+    id     = random_password.minio-access-key-id.result
+    secret = random_password.minio-secret-access-key.result
   }
   cluster_domain     = local.domains.kubernetes
   ca                 = data.terraform_remote_state.host.outputs.internal_ca

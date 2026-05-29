@@ -46,6 +46,9 @@ variable "minio_endpoint" {
   type = string
 }
 
-variable "minio_access_secret" {
-  type = string
+variable "minio_user" {
+  type = object({
+    id     = string
+    secret = string
+  })
 }

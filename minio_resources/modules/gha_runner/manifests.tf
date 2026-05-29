@@ -350,7 +350,7 @@ module "workflow-config" {
                 name = "AWS_ACCESS_KEY_ID"
                 valueFrom = {
                   secretKeyRef = {
-                    name = var.minio_access_secret
+                    name = module.minio-user-secret.name
                     key  = "AWS_ACCESS_KEY_ID"
                   }
                 }
@@ -359,7 +359,7 @@ module "workflow-config" {
                 name = "AWS_SECRET_ACCESS_KEY"
                 valueFrom = {
                   secretKeyRef = {
-                    name = var.minio_access_secret
+                    name = module.minio-user-secret.name
                     key  = "AWS_SECRET_ACCESS_KEY"
                   }
                 }
@@ -469,4 +469,15 @@ module "workflow-config" {
       }
     })
   }
+}
+
+module "minio-user-secret" {
+  source  = "../../../modules/secret"
+  name    = "${var.name}-minio-user-secret"
+  app     = var.name
+  release = "0.1.0"
+  data = merge({
+    AWS_ACCESS_KEY_ID     = var.minio_user.id
+    AWS_SECRET_ACCESS_KEY = var.minio_user.secret
+  })
 }

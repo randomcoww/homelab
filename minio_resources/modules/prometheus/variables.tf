@@ -3,22 +3,33 @@ variable "name" {
 }
 
 variable "namespace" {
-  type = string
-}
-
-variable "release" {
   type    = string
-  default = "0.1.0"
+  default = "default"
 }
 
 variable "replicas" {
   type    = number
-  default = 1
+  default = 2
 }
 
-variable "affinity" {
+variable "images" {
+  type = object({
+    thanos = string
+  })
+}
+
+variable "scrape_configs" {
+  type    = any
+  default = []
+}
+
+variable "server_files" {
   type    = any
   default = {}
+}
+
+variable "cluster_domain" {
+  type = string
 }
 
 variable "ingress_hostname" {
@@ -29,18 +40,6 @@ variable "gateway_ref" {
   type = any
 }
 
-variable "images" {
-  type = object({
-    open_webui = string
-    litestream = string
-  })
-}
-
-variable "extra_configs" {
-  type    = map(string)
-  default = {}
-}
-
 variable "minio_endpoint" {
   type = string
 }
@@ -49,6 +48,9 @@ variable "minio_bucket" {
   type = string
 }
 
-variable "minio_access_secret" {
-  type = string
+variable "minio_user" {
+  type = object({
+    id     = string
+    secret = string
+  })
 }

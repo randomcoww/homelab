@@ -37,7 +37,7 @@ locals {
                           name = "REGISTRY_STORAGE_S3_ACCESSKEY"
                           valueFrom = {
                             secretKeyRef = {
-                              name = var.minio_access_secret
+                              name = module.minio-user-secret.name
                               key  = "AWS_ACCESS_KEY_ID"
                             }
                           }
@@ -46,7 +46,7 @@ locals {
                           name = "REGISTRY_STORAGE_S3_SECRETKEY"
                           valueFrom = {
                             secretKeyRef = {
-                              name = var.minio_access_secret
+                              name = module.minio-user-secret.name
                               key  = "AWS_SECRET_ACCESS_KEY"
                             }
                           }
@@ -174,8 +174,9 @@ module "deployment" {
   affinity = var.affinity
   replicas = var.replicas
   annotations = {
-    "checksum/secret" = sha256(module.secret.manifest)
-    "checksum/tls"    = sha256(module.tls.manifest)
+    "checksum/secret"            = sha256(module.secret.manifest)
+    "checksum/tls"               = sha256(module.tls.manifest)
+    "checksum/minio-user-secret" = sha256(module.minio-user-secret.manifest)
   }
   template_spec = {
     priorityClassName = "system-cluster-critical"
@@ -213,7 +214,7 @@ module "deployment" {
             name = "REGISTRY_STORAGE_S3_ACCESSKEY"
             valueFrom = {
               secretKeyRef = {
-                name = var.minio_access_secret
+                name = module.minio-user-secret.name
                 key  = "AWS_ACCESS_KEY_ID"
               }
             }
@@ -222,7 +223,7 @@ module "deployment" {
             name = "REGISTRY_STORAGE_S3_SECRETKEY"
             valueFrom = {
               secretKeyRef = {
-                name = var.minio_access_secret
+                name = module.minio-user-secret.name
                 key  = "AWS_SECRET_ACCESS_KEY"
               }
             }
@@ -340,4 +341,15 @@ module "service" {
       },
     ]
   }
+}
+
+module "minio-user-secret" {
+  source  = "../../../modules/secret"
+  name    = "${var.name}-minio-user-secret"
+  app     = var.name
+  release = "0.1.0"
+  data = merge({
+    AWS_ACCESS_KEY_ID     = var.minio_user.id
+    AWS_SECRET_ACCESS_KEY = var.minio_user.secret
+  })
 }

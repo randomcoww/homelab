@@ -44,38 +44,15 @@ resource "minio_iam_user_policy_attachment" "policy" {
   policy_name = minio_iam_policy.policy[each.key].id
 }
 
-module "minio-user-secret" {
-  for_each = local.minio_users
-
+module "minio-user-secret-fluxcd" {
   source  = "../modules/secret"
-  name    = each.value.secret
-  app     = each.key
+  name    = "${local.endpoints.fluxcd.name}-bucket"
+  app     = local.endpoints.fluxcd.name
   release = "0.1.0"
   data = merge({
-    AWS_ACCESS_KEY_ID     = minio_iam_user.user[each.key].id
-    AWS_SECRET_ACCESS_KEY = minio_iam_user.user[each.key].secret
-    accesskey             = minio_iam_user.user[each.key].id
-    secretkey             = minio_iam_user.user[each.key].secret
+    accesskey = minio_iam_user.user.fluxcd.id
+    secretkey = minio_iam_user.user.fluxcd.secret
   })
-}
-
-resource "helm_release" "minio-user-secret" {
-  for_each = local.minio_users
-
-  chart            = "../helm-wrapper"
-  name             = each.value.secret
-  namespace        = each.value.namespace
-  create_namespace = true
-  wait             = false
-  wait_for_jobs    = false
-  max_history      = 2
-  values = [
-    yamlencode({
-      manifests = [
-        module.minio-user-secret[each.key].manifest,
-      ]
-    })
-  ]
 }
 
 resource "helm_release" "fluxcd-bucket" {
@@ -89,23 +66,29 @@ resource "helm_release" "fluxcd-bucket" {
   values = [
     yamlencode({
       manifests = [
+        module.minio-user-secret-fluxcd.manifest,
         module.minio-tls.manifest,
+
         yamlencode({
           apiVersion = "source.toolkit.fluxcd.io/v1"
           kind       = "Bucket"
           metadata = {
             name = "${local.endpoints.fluxcd.name}-bucket"
+            annotations = {
+              "checksum/minio-user-secret" = sha256(module.minio-user-secret-fluxcd.manifest)
+              "checksum/tls"               = sha256(module.minio-tls.manifest)
+            }
           }
           spec = {
             interval = "10s"
             provider = "generic"
             endpoint = data.terraform_remote_state.helm.outputs.minio.endpoint
             secretRef = {
-              name = local.minio_users.fluxcd.secret
+              name = module.minio-user-secret-fluxcd.name
             }
             bucketName = "fluxcd"
             certSecretRef = {
-              name = "${local.endpoints.fluxcd.name}-minio-client-tls"
+              name = module.minio-tls.name
             }
           }
         }),

@@ -155,9 +155,9 @@ module "lldap" {
     cert_pem        = tls_self_signed_cert.lldap-ca.cert_pem
   }
 
-  minio_endpoint      = "${local.services.cluster_minio.ip}:${local.service_ports.minio}"
-  minio_bucket        = "lldap"
-  minio_access_secret = local.minio_users.lldap.secret
+  minio_endpoint = "${local.services.cluster_minio.ip}:${local.service_ports.minio}"
+  minio_bucket   = "lldap"
+  minio_user     = minio_iam_user.user.lldap
 
   service_hostname = local.endpoints.lldap.service_fqdn
   ingress_hostname = local.endpoints.lldap.ingress
@@ -230,7 +230,7 @@ module "authelia" {
   oidc_claims_policies = local.authelia_oidc_claims_policies
   minio_endpoint       = "${local.services.cluster_minio.ip}:${local.service_ports.minio}"
   minio_bucket         = "authelia"
-  minio_access_secret  = local.minio_users.authelia.secret
+  minio_user           = minio_iam_user.user.authelia
 
   ingress_hostname = local.endpoints.authelia.ingress
   gateway_ref = {
@@ -612,9 +612,9 @@ module "open-webui" {
     name      = local.endpoints.traefik.name
     namespace = local.endpoints.traefik.namespace
   }
-  minio_endpoint      = "https://${local.services.cluster_minio.ip}:${local.service_ports.minio}"
-  minio_bucket        = "open-webui"
-  minio_access_secret = local.minio_users.open_webui.secret
+  minio_endpoint = "https://${local.services.cluster_minio.ip}:${local.service_ports.minio}"
+  minio_bucket   = "open-webui"
+  minio_user     = minio_iam_user.user.open_webui
 }
 
 # Wifi AP
@@ -764,10 +764,10 @@ module "stump" {
     name      = local.endpoints.traefik.name
     namespace = local.endpoints.traefik.namespace
   }
-  minio_endpoint      = "https://${local.services.cluster_minio.ip}:${local.service_ports.minio}"
-  minio_data_bucket   = "ebooks"
-  minio_bucket        = "stump"
-  minio_access_secret = local.minio_users.stump.secret
+  minio_endpoint    = "https://${local.services.cluster_minio.ip}:${local.service_ports.minio}"
+  minio_data_bucket = "ebooks"
+  minio_bucket      = "stump"
+  minio_user        = minio_iam_user.user.stump
 }
 
 module "sunshine-desktop" {
@@ -934,8 +934,8 @@ module "navidrome" {
     name      = "forwardauth-authelia"
     namespace = local.endpoints.traefik.namespace
   }
-  minio_endpoint      = "https://${local.services.cluster_minio.ip}:${local.service_ports.minio}"
-  minio_data_bucket   = "music"
-  minio_bucket        = "navidrome"
-  minio_access_secret = local.minio_users.navidrome.secret
+  minio_endpoint    = "https://${local.services.cluster_minio.ip}:${local.service_ports.minio}"
+  minio_data_bucket = "music"
+  minio_bucket      = "navidrome"
+  minio_user        = lminio_iam_user.user.navidrome
 }

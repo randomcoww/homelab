@@ -769,7 +769,7 @@ module "prometheus" {
     name      = local.endpoints.traefik.name
     namespace = local.endpoints.traefik.namespace
   }
-  minio_endpoint      = "${local.services.cluster_minio.ip}:${local.service_ports.minio}"
-  minio_bucket        = "prometheus"
-  minio_access_secret = local.minio_users.prometheus.secret
+  minio_endpoint = "${local.services.cluster_minio.ip}:${local.service_ports.minio}"
+  minio_bucket   = "prometheus"
+  minio_user     = minio_iam_user.user.prometheus
 }

@@ -1,51 +1,40 @@
-
 locals {
-  navidrome_config = merge(var.extra_configs, {
-    ND_MUSICFOLDER             = "/navidrome/library/mnt"
-    ND_DATAFOLDER              = "/navidrome/data"
-    ND_CACHEFOLDER             = "/navidrome/cache"
-    ND_ADDRESS                 = "0.0.0.0"
-    ND_PORT                    = 4533
-    ND_AGENTS                  = ""
-    ND_DEEZER_ENABLED          = false
-    ND_ENABLEDOWNLOADS         = false
-    ND_LASTFM_ENABLED          = false
-    ND_LISTENBRAINZ_ENABLED    = false
-    ND_PROMETHEUS_ENABLED      = true
-    ND_ENABLEINSIGHTSCOLLECTOR = false
-    ND_ENABLEFAVOURITES        = false
-    ND_ENABLESTARRATING        = false
-    ND_ENABLEUSEREDITING       = false
-    ND_ENABLESCROBBLEHISTORY   = false
-    ND_SEARCHFULLSTRING        = true
-    ND_PROMETHEUS_METRICSPATH  = "/metrics"
-    ND_SCANNER_PURGEMISSING    = "always"
+  extra_configs = merge(var.extra_configs, {
+    STUMP_CONFIG_DIR              = "/stump/config"
+    STUMP_DB_PATH                 = "/stump/data"
+    STUMP_PORT                    = 8000
+    STUMP_OIDC_ENABLED            = true
+    STUMP_OIDC_ALLOW_REGISTRATION = true
+    STUMP_OIDC_DISABLE_LOCAL_AUTH = true
+    ENABLE_SWAGGER_UI             = false
+    ENABLE_KOREADER_SYNC          = false
+    ENABLE_OPDS_PROGRESSION       = false
+    STUMP_ENABLE_UPLOAD           = false
+    STUMP_PRETTY_LOGS             = false
+    STUMP_VERBOSITY               = 1
+    STUMP_ALLOWED_ORIGINS         = "https://${var.ingress_hostname}"
   })
-  db_file = "${local.navidrome_config["ND_DATAFOLDER"]}/navidrome.db" # db name not configurable
+  db_file         = "${local.extra_configs.STUMP_DB_PATH}/stump.db" # non-configurable
+  data_path       = "/data"
+  thumbnails_path = "${local.extra_configs.STUMP_CONFIG_DIR}/thumbnails" # non-configurable
 
   manifests = concat([
     module.statefulset.manifest,
+    module.secret.manifest,
     module.service.manifest,
     module.httproute.manifest,
-    ], [
-    for _, m in [
-      {
-        apiVersion = "traefik.io/v1alpha1"
-        kind       = "Middleware"
-        metadata = {
-          name = var.name
-        }
-        spec = {
-          chain = {
-            middlewares = [
-              var.middleware_ref,
-            ]
-          }
-        }
-      },
-    ] :
-    yamlencode(m)
   ], module.litestream-overlay.additional_manifests)
+}
+
+module "secret" {
+  source  = "../../../modules/secret"
+  name    = var.name
+  app     = var.name
+  release = var.release
+  data = {
+    for k, v in local.extra_configs :
+    tostring(k) => tostring(v)
+  }
 }
 
 module "service" {
@@ -53,19 +42,14 @@ module "service" {
   name    = var.name
   app     = var.name
   release = var.release
-  annotations = {
-    "prometheus.io/scrape" = "true"
-    "prometheus.io/port"   = tostring(local.navidrome_config["ND_PORT"])
-    "prometheus.io/path"   = local.navidrome_config["ND_PROMETHEUS_METRICSPATH"]
-  }
   spec = {
     type = "ClusterIP"
     ports = [
       {
         name       = var.name
-        port       = local.navidrome_config["ND_PORT"]
+        port       = local.extra_configs.STUMP_PORT
         protocol   = "TCP"
-        targetPort = local.navidrome_config["ND_PORT"]
+        targetPort = local.extra_configs.STUMP_PORT
       },
     ]
   }
@@ -98,17 +82,7 @@ module "httproute" {
         backendRefs = [
           {
             name = module.service.name
-            port = local.navidrome_config["ND_PORT"]
-          },
-        ]
-        filters = [
-          {
-            type = "ExtensionRef"
-            extensionRef = {
-              group = "traefik.io"
-              kind  = "Middleware"
-              name  = var.name
-            }
+            port = local.extra_configs.STUMP_PORT
           },
         ]
       },
@@ -143,67 +117,45 @@ module "litestream-overlay" {
       },
     ]
   }
-  sqlite_path         = local.db_file
-  minio_access_secret = var.minio_access_secret
+  sqlite_path      = local.db_file
+  s3_access_secret = module.minio-user-secret.name
 
   template_spec = {
     resources = {
       requests = {
-        memory = "2Gi"
+        memory = "8Gi"
       }
       limits = {
-        memory = "2Gi"
+        memory = "8Gi"
       }
     }
     containers = [
       {
         name  = var.name
-        image = var.images.navidrome
+        image = var.images.stump
         ports = [
           {
-            containerPort = local.navidrome_config["ND_PORT"]
+            containerPort = local.extra_configs.STUMP_PORT
           },
         ]
-        env = [
-          for k, v in local.navidrome_config :
+        env = concat([
+          for k, v in local.extra_configs :
           {
-            name  = tostring(k)
-            value = tostring(v)
+            name = tostring(k)
+            valueFrom = {
+              secretKeyRef = {
+                name = module.secret.name
+                key  = tostring(k)
+              }
+            }
           }
-        ]
-        volumeMounts = [
-          {
-            name      = "cache"
-            mountPath = local.navidrome_config["ND_CACHEFOLDER"]
-          },
-        ]
-        livenessProbe = {
-          httpGet = {
-            scheme = "HTTP"
-            port   = local.navidrome_config["ND_PORT"]
-            path   = "/"
-          }
-          initialDelaySeconds = 10
-          timeoutSeconds      = 2
-        }
-        readinessProbe = {
-          httpGet = {
-            scheme = "HTTP"
-            port   = local.navidrome_config["ND_PORT"]
-            path   = "/"
-          }
-        }
+        ])
+        # TODO: add healthchecks
       },
     ]
     volumes = [
       {
         name = "${var.name}-litestream-data"
-        emptyDir = {
-          medium = "Memory"
-        }
-      },
-      {
-        name = "cache"
         emptyDir = {
           medium = "Memory"
         }
@@ -218,7 +170,7 @@ module "mountpoint-s3-overlay" {
   name        = var.name
   app         = var.name
   release     = var.release
-  mount_path  = local.navidrome_config["ND_MUSICFOLDER"]
+  mount_path  = local.data_path
   s3_endpoint = var.minio_endpoint
   s3_bucket   = var.minio_data_bucket
   s3_prefix   = ""
@@ -228,12 +180,32 @@ module "mountpoint-s3-overlay" {
     "--cache /var/tmp",      # cache to memory
     "--max-cache-size 1024", # 1Gi
   ]
-  s3_access_secret = var.minio_access_secret
+  s3_access_secret = module.minio-user-secret.name
   images = {
     mountpoint = var.images.mountpoint
   }
-
   template_spec = module.litestream-overlay.template_spec
+}
+
+module "thumbnails-mountpoint-s3-overlay" {
+  source = "../mountpoint_s3_overlay"
+
+  name        = "${var.name}-thumbnails"
+  app         = var.name
+  release     = var.release
+  mount_path  = local.thumbnails_path
+  s3_endpoint = var.minio_endpoint
+  s3_bucket   = var.minio_bucket
+  s3_prefix   = "thumbnails"
+  s3_mount_extra_args = [
+    "--cache /var/tmp",      # cache to memory
+    "--max-cache-size 1024", # 1Gi
+  ]
+  s3_access_secret = module.minio-user-secret.name
+  images = {
+    mountpoint = var.images.mountpoint
+  }
+  template_spec = module.mountpoint-s3-overlay.template_spec
 }
 
 module "statefulset" {
@@ -244,10 +216,13 @@ module "statefulset" {
   release  = var.release
   affinity = var.affinity
   replicas = var.replicas
-  annotations = {
+  annotations = merge({
+    "checksum/secret"            = sha256(module.secret.manifest)
+    "checksum/minio-user-secret" = sha256(module.minio-user-secret.manifest)
+    }, {
     for i, m in module.litestream-overlay.additional_manifests :
     "checksum/litestream-${i}" => sha256(m)
-  }
+  })
   /* persistent path for sqlite
   spec = {
     volumeClaimTemplates = [
@@ -270,5 +245,16 @@ module "statefulset" {
     ]
   }
   */
-  template_spec = module.mountpoint-s3-overlay.template_spec
+  template_spec = module.thumbnails-mountpoint-s3-overlay.template_spec
+}
+
+module "minio-user-secret" {
+  source  = "../../../modules/secret"
+  name    = "${var.name}-minio-user-secret"
+  app     = var.name
+  release = "0.1.0"
+  data = merge({
+    AWS_ACCESS_KEY_ID     = var.minio_user.id
+    AWS_SECRET_ACCESS_KEY = var.minio_user.secret
+  })
 }

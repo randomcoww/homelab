@@ -31,7 +31,7 @@ output "template_spec" {
             name = "AWS_ACCESS_KEY_ID"
             valueFrom = {
               secretKeyRef = {
-                name = var.minio_access_secret
+                name = var.s3_access_secret
                 key  = "AWS_ACCESS_KEY_ID"
               }
             }
@@ -40,7 +40,7 @@ output "template_spec" {
             name = "AWS_SECRET_ACCESS_KEY"
             valueFrom = {
               secretKeyRef = {
-                name = var.minio_access_secret
+                name = var.s3_access_secret
                 key  = "AWS_SECRET_ACCESS_KEY"
               }
             }
@@ -85,7 +85,7 @@ output "template_spec" {
             name = "AWS_ACCESS_KEY_ID"
             valueFrom = {
               secretKeyRef = {
-                name = var.minio_access_secret
+                name = var.s3_access_secret
                 key  = "AWS_ACCESS_KEY_ID"
               }
             }
@@ -94,7 +94,7 @@ output "template_spec" {
             name = "AWS_SECRET_ACCESS_KEY"
             valueFrom = {
               secretKeyRef = {
-                name = var.minio_access_secret
+                name = var.s3_access_secret
                 key  = "AWS_SECRET_ACCESS_KEY"
               }
             }

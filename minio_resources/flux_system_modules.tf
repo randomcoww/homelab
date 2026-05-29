@@ -16,7 +16,7 @@ module "registry" {
   minio_endpoint      = "${local.services.cluster_minio.ip}:${local.service_ports.minio}"
   minio_bucket        = "registry"
   minio_bucket_prefix = "/"
-  minio_access_secret = local.minio_users.registry.secret
+  minio_user          = minio_iam_user.user.registry
   service_hostname    = local.endpoints.registry.service
   service_ip          = local.services.registry.ip
   gateway_ref = {
@@ -273,8 +273,8 @@ module "gha-runner" {
     username = var.github_username
     token    = var.github_token
   }
-  internal_ca         = data.terraform_remote_state.host.outputs.internal_ca
-  registry_endpoint   = "${local.endpoints.registry.service}:${local.service_ports.registry}"
-  minio_endpoint      = "${local.services.cluster_minio.ip}:${local.service_ports.minio}"
-  minio_access_secret = local.minio_users.arc.secret
+  internal_ca       = data.terraform_remote_state.host.outputs.internal_ca
+  registry_endpoint = "${local.endpoints.registry.service}:${local.service_ports.registry}"
+  minio_endpoint    = "${local.services.cluster_minio.ip}:${local.service_ports.minio}"
+  minio_user        = minio_iam_user.user.arc
 }

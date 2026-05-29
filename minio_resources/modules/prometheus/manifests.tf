@@ -52,6 +52,9 @@ locals {
         app     = var.name
         release = "0.1.0"
       }
+      annotations = {
+        "checksum/minio-user-secret" = sha256(module.minio-user-secret.manifest)
+      }
     }
     spec = {
       schedule          = "0 * * * *"
@@ -84,7 +87,7 @@ locals {
                       name = "AWS_ACCESS_KEY_ID"
                       valueFrom = {
                         secretKeyRef = {
-                          name = var.minio_access_secret
+                          name = module.minio-user-secret.name
                           key  = "AWS_ACCESS_KEY_ID"
                         }
                       }
@@ -93,7 +96,7 @@ locals {
                       name = "AWS_SECRET_ACCESS_KEY"
                       valueFrom = {
                         secretKeyRef = {
-                          name = var.minio_access_secret
+                          name = module.minio-user-secret.name
                           key  = "AWS_SECRET_ACCESS_KEY"
                         }
                       }
@@ -221,7 +224,8 @@ locals {
                 medium = "Memory"
               }
               podAnnotations = {
-                "checksum/store-tls" = sha256(module.store-tls.manifest)
+                "checksum/store-tls"         = sha256(module.store-tls.manifest)
+                "checksum/minio-user-secret" = sha256(module.minio-user-secret.manifest)
               }
               sidecarContainers = {
                 thanos-querier = {
@@ -316,7 +320,7 @@ locals {
                       name = "AWS_ACCESS_KEY_ID"
                       valueFrom = {
                         secretKeyRef = {
-                          name = var.minio_access_secret
+                          name = module.minio-user-secret.name
                           key  = "AWS_ACCESS_KEY_ID"
                         }
                       }
@@ -325,7 +329,7 @@ locals {
                       name = "AWS_SECRET_ACCESS_KEY"
                       valueFrom = {
                         secretKeyRef = {
-                          name = var.minio_access_secret
+                          name = module.minio-user-secret.name
                           key  = "AWS_SECRET_ACCESS_KEY"
                         }
                       }
@@ -406,7 +410,7 @@ locals {
                       name = "AWS_ACCESS_KEY_ID"
                       valueFrom = {
                         secretKeyRef = {
-                          name = var.minio_access_secret
+                          name = module.minio-user-secret.name
                           key  = "AWS_ACCESS_KEY_ID"
                         }
                       }
@@ -415,7 +419,7 @@ locals {
                       name = "AWS_SECRET_ACCESS_KEY"
                       valueFrom = {
                         secretKeyRef = {
-                          name = var.minio_access_secret
+                          name = module.minio-user-secret.name
                           key  = "AWS_SECRET_ACCESS_KEY"
                         }
                       }
@@ -718,4 +722,15 @@ locals {
     ] :
     yamlencode(m)
   ]
+}
+
+module "minio-user-secret" {
+  source  = "../../../modules/secret"
+  name    = "${var.name}-minio-user-secret"
+  app     = var.name
+  release = "0.1.0"
+  data = merge({
+    AWS_ACCESS_KEY_ID     = var.minio_user.id
+    AWS_SECRET_ACCESS_KEY = var.minio_user.secret
+  })
 }
