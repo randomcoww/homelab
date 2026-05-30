@@ -1,0 +1,282 @@
+locals {
+  db_file = "/data/db.sqlite3"
+  extra_configs = merge(var.extra_configs, {
+    PORT                               = 8080
+    REQUESTS_CA_BUNDLE                 = "/etc/ssl/certs/ca-certificates.crt"
+    SSL_CERT_FILE                      = "/etc/ssl/certs/ca-certificates.crt" # needed for tools server TLS
+    DATABASE_URL                       = "sqlite:///${local.db_file}"
+    DATABASE_ENABLE_SQLITE_WAL         = true
+    STORAGE_PROVIDER                   = "s3"
+    S3_ADDRESSING_STYLE                = "path"
+    S3_KEY_PREFIX                      = "data"
+    S3_BUCKET_NAME                     = var.minio_bucket
+    S3_ENDPOINT_URL                    = var.minio_endpoint
+    WEBUI_SECRET_KEY                   = random_password.webui-secret-key.result
+    OAUTH_CLIENT_INFO_ENCRYPTION_KEY   = random_password.client-info-encryption-key.result
+    OAUTH_SESSION_TOKEN_ENCRYPTION_KEY = random_password.session-token-encryption-key.result
+  })
+
+  manifests = concat([
+    module.statefulset.manifest,
+    module.secret.manifest,
+    module.service.manifest,
+    module.httproute.manifest,
+    module.minio-user-secret.manifest,
+  ], module.litestream-overlay.additional_manifests)
+}
+
+resource "random_password" "webui-secret-key" {
+  length  = 64
+  special = false
+}
+
+resource "random_password" "client-info-encryption-key" {
+  length  = 64
+  special = false
+}
+
+resource "random_password" "session-token-encryption-key" {
+  length  = 64
+  special = false
+}
+
+module "secret" {
+  source  = "../../../modules/secret"
+  name    = var.name
+  app     = var.name
+  release = var.release
+  data = {
+    for k, v in local.extra_configs :
+    tostring(k) => tostring(v)
+  }
+}
+
+module "service" {
+  source  = "../../../modules/service"
+  name    = var.name
+  app     = var.name
+  release = var.release
+  spec = {
+    type = "ClusterIP"
+    ports = [
+      {
+        name       = "open-webui"
+        port       = local.extra_configs.PORT
+        protocol   = "TCP"
+        targetPort = local.extra_configs.PORT
+      },
+    ]
+  }
+}
+
+module "httproute" {
+  source  = "../../../modules/httproute"
+  name    = var.name
+  app     = var.name
+  release = var.release
+  spec = {
+    parentRefs = [
+      merge({
+        kind = "Gateway"
+      }, var.gateway_ref),
+    ]
+    hostnames = [
+      var.ingress_hostname,
+    ]
+    rules = [
+      {
+        matches = [
+          {
+            path = {
+              type  = "PathPrefix"
+              value = "/"
+            }
+          },
+        ]
+        backendRefs = [
+          {
+            name = module.service.name
+            port = local.extra_configs.PORT
+          },
+        ]
+      },
+    ]
+  }
+}
+
+module "litestream-overlay" {
+  source = "../litestream_overlay"
+
+  name    = var.name
+  app     = var.name
+  release = var.release
+  images = {
+    litestream = var.images.litestream
+  }
+  litestream_config = {
+    dbs = [
+      {
+        path                = local.db_file
+        monitor-interval    = "1s"
+        checkpoint-interval = "60s"
+        replica = {
+          type          = "s3"
+          endpoint      = var.minio_endpoint
+          bucket        = var.minio_bucket
+          path          = "$POD_NAME/litestream"
+          sync-interval = "1s"
+          part-size     = "50MB"
+          concurrency   = 10
+        }
+      },
+    ]
+  }
+  sqlite_path      = local.db_file
+  s3_access_secret = module.minio-user-secret.name
+
+  template_spec = {
+    resources = {
+      requests = {
+        memory = "6Gi"
+      }
+      limits = {
+        memory = "6Gi"
+      }
+    }
+    containers = [
+      {
+        name  = var.name
+        image = var.images.open_webui
+        env = concat([
+          for k, v in local.extra_configs :
+          {
+            name = tostring(k)
+            valueFrom = {
+              secretKeyRef = {
+                name = module.secret.name
+                key  = tostring(k)
+              }
+            }
+          }
+          ], [
+          {
+            name = "S3_ACCESS_KEY_ID"
+            valueFrom = {
+              secretKeyRef = {
+                name = module.minio-user-secret.name
+                key  = "AWS_ACCESS_KEY_ID"
+              }
+            }
+          },
+          {
+            name = "S3_SECRET_ACCESS_KEY"
+            valueFrom = {
+              secretKeyRef = {
+                name = module.minio-user-secret.name
+                key  = "AWS_SECRET_ACCESS_KEY"
+              }
+            }
+          },
+        ])
+        ports = [
+          {
+            containerPort = local.extra_configs.PORT
+          },
+        ]
+        volumeMounts = [
+          {
+            name      = "ca-trust-bundle"
+            mountPath = local.extra_configs.REQUESTS_CA_BUNDLE
+            readOnly  = true
+          },
+        ]
+        readinessProbe = {
+          httpGet = {
+            port = local.extra_configs.PORT
+            path = "/health/db"
+          }
+          timeoutSeconds = 2
+        }
+        livenessProbe = {
+          httpGet = {
+            port = local.extra_configs.PORT
+            path = "/health"
+          }
+        }
+        startupProbe = {
+          httpGet = {
+            port = local.extra_configs.PORT
+            path = "/health"
+          }
+          failureThreshold = 6
+        }
+      },
+    ]
+    volumes = [
+      {
+        name = "${var.name}-litestream-data"
+        emptyDir = {
+          medium = "Memory"
+        }
+      },
+      {
+        name = "ca-trust-bundle"
+        hostPath = {
+          path = "/etc/ssl/certs/ca-certificates.crt"
+          type = "File"
+        }
+      },
+    ]
+  }
+}
+
+module "statefulset" {
+  source = "../../../modules/statefulset"
+
+  name     = var.name
+  app      = var.name
+  release  = var.release
+  affinity = var.affinity
+  replicas = var.replicas
+  annotations = merge({
+    "checksum/secret"            = sha256(module.secret.manifest)
+    "checksum/minio-user-secret" = sha256(module.minio-user-secret.manifest)
+    }, {
+    for i, m in module.litestream-overlay.additional_manifests :
+    "checksum/litestream-${i}" => sha256(m)
+  })
+  /* persistent path for sqlite
+  spec = {
+    volumeClaimTemplates = [
+      {
+        metadata = {
+          name = "${var.name}-litestream-data"
+        }
+        spec = {
+          accessModes = [
+            "ReadWriteOnce",
+          ]
+          resources = {
+            requests = {
+              storage = "16Gi"
+            }
+          }
+          storageClassName = "local-path"
+        }
+      },
+    ]
+  }
+  */
+  template_spec = module.litestream-overlay.template_spec
+}
+
+module "minio-user-secret" {
+  source  = "../../../modules/secret"
+  name    = "${var.name}-minio-user-secret"
+  app     = var.name
+  release = "0.1.0"
+  data = merge({
+    AWS_ACCESS_KEY_ID     = var.minio_user.id
+    AWS_SECRET_ACCESS_KEY = var.minio_user.secret
+  })
+}
