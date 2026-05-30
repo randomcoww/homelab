@@ -50,8 +50,8 @@ module "minio-user-secret-fluxcd" {
   app     = local.endpoints.fluxcd.name
   release = "0.1.0"
   data = merge({
-    accesskey = minio_iam_user.user.fluxcd.id
-    secretkey = minio_iam_user.user.fluxcd.secret
+    accesskey = minio_iam_user.user["fluxcd"].id
+    secretkey = minio_iam_user.user["fluxcd"].secret
   })
 }
 

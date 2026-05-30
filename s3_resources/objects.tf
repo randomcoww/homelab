@@ -67,7 +67,13 @@ resource "minio_s3_object" "ignition" {
 }
 
 resource "minio_s3_object" "flux-crd" {
-  for_each = data.terraform_remote_state.bootstrap.outputs.flux_crd
+  for_each = merge([
+    for name, kustomize in local.flux_crd :
+    {
+      for f, content in kustomize :
+      "${name}/${f}" => content
+    }
+  ]...)
 
   bucket_name  = "fluxcd"
   object_name  = "crd/${each.key}"
@@ -80,7 +86,13 @@ resource "minio_s3_object" "flux-crd" {
 }
 
 resource "minio_s3_object" "flux-system" {
-  for_each = data.terraform_remote_state.bootstrap.outputs.flux_system
+  for_each = merge([
+    for name, kustomize in local.flux_system :
+    {
+      for f, content in kustomize :
+      "${name}/${f}" => content
+    }
+  ]...)
 
   bucket_name  = "fluxcd"
   object_name  = "system/${each.key}"
@@ -93,7 +105,13 @@ resource "minio_s3_object" "flux-system" {
 }
 
 resource "minio_s3_object" "flux-service" {
-  for_each = data.terraform_remote_state.bootstrap.outputs.flux_service
+  for_each = merge([
+    for name, kustomize in local.flux_service :
+    {
+      for f, content in kustomize :
+      "${name}/${f}" => content
+    }
+  ]...)
 
   bucket_name  = "fluxcd"
   object_name  = "service/${each.key}"

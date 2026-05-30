@@ -157,7 +157,7 @@ module "lldap" {
 
   minio_endpoint = "${local.services.cluster_minio.ip}:${local.service_ports.minio}"
   minio_bucket   = "lldap"
-  minio_user     = minio_iam_user.user.lldap
+  minio_user     = minio_iam_user.user["lldap"]
 
   service_hostname = local.endpoints.lldap.service_fqdn
   ingress_hostname = local.endpoints.lldap.ingress
@@ -230,7 +230,7 @@ module "authelia" {
   oidc_claims_policies = local.authelia_oidc_claims_policies
   minio_endpoint       = "${local.services.cluster_minio.ip}:${local.service_ports.minio}"
   minio_bucket         = "authelia"
-  minio_user           = minio_iam_user.user.authelia
+  minio_user           = minio_iam_user.user["authelia"]
 
   ingress_hostname = local.endpoints.authelia.ingress
   gateway_ref = {
@@ -614,7 +614,7 @@ module "open-webui" {
   }
   minio_endpoint = "https://${local.services.cluster_minio.ip}:${local.service_ports.minio}"
   minio_bucket   = "open-webui"
-  minio_user     = minio_iam_user.user.open_webui
+  minio_user     = minio_iam_user.user["open_webui"]
 }
 
 # Wifi AP
@@ -767,7 +767,7 @@ module "stump" {
   minio_endpoint    = "https://${local.services.cluster_minio.ip}:${local.service_ports.minio}"
   minio_data_bucket = "ebooks"
   minio_bucket      = "stump"
-  minio_user        = minio_iam_user.user.stump
+  minio_user        = minio_iam_user.user["stump"]
 }
 
 module "sunshine-desktop" {
@@ -937,5 +937,5 @@ module "navidrome" {
   minio_endpoint    = "https://${local.services.cluster_minio.ip}:${local.service_ports.minio}"
   minio_data_bucket = "music"
   minio_bucket      = "navidrome"
-  minio_user        = lminio_iam_user.user.navidrome
+  minio_user        = minio_iam_user.user["navidrome"]
 }

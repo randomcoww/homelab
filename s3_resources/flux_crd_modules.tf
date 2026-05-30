@@ -771,5 +771,5 @@ module "prometheus" {
   }
   minio_endpoint = "${local.services.cluster_minio.ip}:${local.service_ports.minio}"
   minio_bucket   = "prometheus"
-  minio_user     = minio_iam_user.user.prometheus
+  minio_user     = minio_iam_user.user["prometheus"]
 }
