@@ -133,11 +133,11 @@ locals {
     # tier 3
     mountpoint       = "reg.cluster.internal/randomcoww/mountpoint-s3:v1.22.3.1779726407@sha256:49d56bc83383c3915c93621ad90c988440a9737bfaa6cf9c31e2a1f99608d586"
     hostapd          = "reg.cluster.internal/randomcoww/hostapd:v2.11.1779725637@sha256:de3337ed7775068c181e9341ce7d298801a0c2103d524d7b0079e9f591cb6fc9"
-    tailscale        = "ghcr.io/tailscale/tailscale:v1.98.3@sha256:854b77123b9536adae2e97f5a5fdb1790ed03438b911ab7f07780155e0af6ce2"
+    tailscale        = "ghcr.io/tailscale/tailscale:v1.98.4@sha256:25cde9ad76020b0e29229136d0c38b5962e9a0e1774ffac9b0df68e4a37d6cf0"
     qrcode_generator = "reg.cluster.internal/randomcoww/qrcode-resource:v1779726026@sha256:5e6f4050f6e3500d00cd31fa6770982f7d75ee2808799387d42ea1eb731a4c15"
-    llama_cpp_vulkan = "ghcr.io/mostlygeek/llama-swap:unified-vulkan@sha256:c4f9031948db506963b54c1ac22b494e90c198ba695b081e8ff5300d012d5b7d"
+    llama_cpp_vulkan = "ghcr.io/mostlygeek/llama-swap:unified-vulkan@sha256:e440e73de920844f7d4ae505f5a5d32662b48bbaa76d26cb241f3c5ae13564bc"
     litestream       = "docker.io/litestream/litestream:0.5.11@sha256:79e3bfce6ed758722916f816b028fffd9e0a971058f41b88e2779510cead1d8d"
-    searxng          = "ghcr.io/searxng/searxng:latest@sha256:1a9d21346437a41ddfc2286968026dddece1d4d0721625cffa2c3b00bb2f9cf3"
+    searxng          = "ghcr.io/searxng/searxng:latest@sha256:19ea48795eb5a8c31c0574c5e1376f347248953a02e9e57287eaefb909bf9f0d"
     open_webui       = "ghcr.io/open-webui/open-webui:v0.9.5@sha256:e045bde3b004cc7f8c319412345eb56c87ea6ac57031534a31ca37ad5424beb3"
     lldap            = "ghcr.io/lldap/lldap:v0.6.3-alpine-rootless@sha256:ba2c50930ea998eefd5454aa678a7977448019248b1827da87d330df0b71c284"
     authelia         = "ghcr.io/authelia/authelia:4.39.20@sha256:1b363e9279e742397966333f364e0876ae02bf5c876de73e83af6d48c57ff51b"
@@ -152,7 +152,7 @@ locals {
     navidrome        = "ghcr.io/navidrome/navidrome:0.61.2@sha256:9fa40b3d8dec43ceb2213d1fa551da3dcfef6ac6d19c2e534efb92527c2bafd2"
     valkey           = "ghcr.io/valkey-io/valkey:9.1-alpine@sha256:a35428eba9043cc0b79dbe54100f0c92784f2de00ad09b01182bfb1c5c83d1bd"
     thanos           = "quay.io/thanos/thanos:v0.41.0@sha256:cf3e9b292e4302ad4a4955b56379703aea39516607d382a57604a3d003c35d10"
-    stump            = "docker.io/aaronleopold/stump:0.1.3@sha256:5fec2b7ac447d5eec71579beaa86998f83741b06acb56ae28287ee0bb7ad75c6"
+    stump            = "docker.io/aaronleopold/stump:0.1.4@sha256:09a3bfbfa6c44fade1e82b2f13fcd568062da85c760050ec0648ad89fd4dce5f"
 
     # models (model_file)
     "v5-small-text-matching-Q8_0.gguf"                                = "reg.cluster.internal/randomcoww/jina-embeddings-v5-text-small-text-matching-q8-0:v1773615151@sha256:ead9710eb051ea3b6ee32cebc1d1a8ba782c9e589ea972b48b15c173e169c4ee"
