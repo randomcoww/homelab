@@ -27,6 +27,7 @@ locals {
     module.statefulset.manifest,
     module.service.manifest,
     module.httproute.manifest,
+    module.minio-user-secret.manifest,
     ], [
     for _, m in [
       {

@@ -101,6 +101,7 @@ locals {
     module.secret.manifest,
     module.deployment.manifest,
     module.tls.manifest,
+    module.minio-user-secret.manifest,
     module.service.manifest,
   ])
 }

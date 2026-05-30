@@ -626,6 +626,7 @@ locals {
             }
             extraManifests = [
               module.store-tls.manifest,
+              module.minio-user-secret.manifest,
               yamlencode(local.compactor_job),
             ]
             extraScrapeConfigs = var.scrape_configs

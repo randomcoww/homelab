@@ -7,6 +7,7 @@ locals {
     module.httproute.manifest,
     module.secret.manifest,
     module.tls.manifest,
+    module.minio-user-secret.manifest,
   ], module.litestream-overlay.additional_manifests)
 }
 

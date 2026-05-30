@@ -14,6 +14,7 @@ locals {
     module.secret.manifest,
     module.ldap-tls.manifest,
     module.redis-tls.manifest,
+    module.minio-user-secret.manifest,
     ], [
     for _, m in [
       {
