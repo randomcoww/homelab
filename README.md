@@ -104,18 +104,18 @@ tofu -chdir=host_provisioning apply
 
 ### Deploy services to Kubernetes
 
-Deploy Kubernetes services. Some services rely on MinIO and will crash loop until MinIO resources are created (below).
+Bootstrap low level Kubernetes services needed for FluxCD including MinIO.
 
 ```bash
-tofu -chdir=helm_release init -upgrade && \
-tofu -chdir=helm_release apply
+tofu -chdir=cluster_bootstrap init -upgrade && \
+tofu -chdir=cluster_bootstrap apply
 ```
 
-Create MinIO resources and secrets containing access credentials in Kubernetes. MinIO must be running in Kubernetes for this to work.
+Create resources on MinIO needed for host provisioning and FluxCD Kustomizations.
 
 ```bash
-tofu -chdir=minio_resources init -upgrade && \
-tofu -chdir=minio_resources apply
+tofu -chdir=s3_resources init -upgrade && \
+tofu -chdir=s3_resources apply
 ```
 
 ### Roll out host updates
@@ -156,7 +156,7 @@ Internal S3:
 mkdir -p $HOME/.mc/certs/CAs
 tofu -chdir=host_provisioning output -json internal_ca | jq -r '.cert_pem' > $HOME/.mc/certs/CAs/ca.crt
 cat > $HOME/.mc/config.json <<EOF
-$(tofu -chdir=helm_release output -json minio | jq -r '
+$(tofu -chdir=cluster_bootstrap output -json minio | jq -r '
   {
     aliases: {
       m: {
@@ -174,7 +174,7 @@ EOF
 
 mkdir -p $HOME/.config/rclone
 cat > $HOME/.config/rclone/rclone.conf <<EOF
-$(tofu -chdir=helm_release output -json minio | jq -r '
+$(tofu -chdir=cluster_bootstrap output -json minio | jq -r '
   "[m]",
   "type = s3",
   "provider = Minio",
@@ -206,13 +206,13 @@ EOF
 LDAP admin:
 
 ```bash
-tofu -chdir=helm_release output lldap
+tofu -chdir=s3_resources output lldap
 ```
 
 llama.cpp API key:
 
 ```bash
-tofu -chdir=helm_release output llama-cpp
+tofu -chdir=s3_resources output llama-cpp
 ```
 
 Internal registry:

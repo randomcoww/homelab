@@ -67,7 +67,7 @@ resource "minio_s3_object" "ignition" {
 }
 
 resource "minio_s3_object" "flux-crd" {
-  for_each = data.terraform_remote_state.helm.outputs.flux_crd
+  for_each = data.terraform_remote_state.bootstrap.outputs.flux_crd
 
   bucket_name  = "fluxcd"
   object_name  = "crd/${each.key}"
@@ -80,7 +80,7 @@ resource "minio_s3_object" "flux-crd" {
 }
 
 resource "minio_s3_object" "flux-system" {
-  for_each = data.terraform_remote_state.helm.outputs.flux_system
+  for_each = data.terraform_remote_state.bootstrap.outputs.flux_system
 
   bucket_name  = "fluxcd"
   object_name  = "system/${each.key}"
@@ -93,7 +93,7 @@ resource "minio_s3_object" "flux-system" {
 }
 
 resource "minio_s3_object" "flux-service" {
-  for_each = data.terraform_remote_state.helm.outputs.flux_service
+  for_each = data.terraform_remote_state.bootstrap.outputs.flux_service
 
   bucket_name  = "fluxcd"
   object_name  = "service/${each.key}"

@@ -1,7 +1,8 @@
-terraform {
-  backend "s3" {
+data "terraform_remote_state" "bootstrap" {
+  backend = "s3"
+  config = {
     bucket                      = "terraform"
-    key                         = "state/helm_release-0.tfstate"
+    key                         = "state/cluster_bootstrap-0.tfstate"
     region                      = "auto"
     skip_credentials_validation = true
     skip_metadata_api_check     = true

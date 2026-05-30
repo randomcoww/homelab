@@ -1,8 +1,7 @@
-data "terraform_remote_state" "helm" {
-  backend = "s3"
-  config = {
+terraform {
+  backend "s3" {
     bucket                      = "terraform"
-    key                         = "state/helm_release-0.tfstate"
+    key                         = "state/cluster_bootstrap-0.tfstate"
     region                      = "auto"
     skip_credentials_validation = true
     skip_metadata_api_check     = true
