@@ -777,25 +777,6 @@ module "prometheus" {
 locals {
   flux_crd = {
 
-    namespaces = [
-      for _, ns in sort(concat(distinct([
-        for _, service in values(local.endpoints) :
-        service.namespace
-        ]), [
-        "tailscale",
-      ])) :
-      yamlencode({
-        apiVersion = "v1"
-        kind       = "Namespace"
-        metadata = {
-          name = ns
-          annotations = {
-            "kustomize.toolkit.fluxcd.io/prune" = "disabled"
-          }
-        }
-      })
-    ]
-
     traefik = [
       for _, m in [
         {

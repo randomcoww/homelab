@@ -112,6 +112,25 @@ resource "helm_release" "fluxcd-bucket" {
   ]
 }
 
+locals {
+  namespaces = [
+    for _, ns in sort(distinct([
+      for _, m in flatten(concat(values(local.flux_crd), values(local.flux_system), values(local.flux_service))) :
+      lookup(lookup(yamldecode(m), "metadata", {}), "namespace", "default")
+    ])) :
+    yamlencode({
+      apiVersion = "v1"
+      kind       = "Namespace"
+      metadata = {
+        name = ns
+        annotations = {
+          "kustomize.toolkit.fluxcd.io/prune" = "disabled"
+        }
+      }
+    })
+  ]
+}
+
 # bucket ops resources
 
 resource "minio_s3_object" "flux-crd" {
@@ -119,13 +138,16 @@ resource "minio_s3_object" "flux-crd" {
     for name, manifests in local.flux_crd :
     "${name}.yaml" => join("---\n", manifests)
     }, {
+    "namespaces.yaml" = join("---\n", local.namespaces)
     "kustomization.yaml" = yamlencode({
       apiVersion = "kustomize.config.k8s.io/v1beta1"
       kind       = "Kustomization"
-      resources = [
+      resources = concat([
+        "namespaces.yaml"
+        ], [
         for _, name in keys(local.flux_crd) :
         "${name}.yaml"
-      ]
+      ])
     })
   })
 
