@@ -2,6 +2,7 @@ output "manifests" {
   value = concat([
     # runner resources in arc-runners
     module.tls.manifest,
+    module.minio-user-secret.manifest,
     module.workflow-config.manifest,
 
     ], [
