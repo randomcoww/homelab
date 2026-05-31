@@ -1,8 +1,9 @@
 module "minio-metrics-proxy" {
-  source  = "../../../modules/configmap"
-  name    = "${var.name}-proxy"
-  app     = var.name
-  release = var.release
+  source    = "../../../modules/configmap"
+  name      = "${var.name}-proxy"
+  namespace = var.namespace
+  app       = var.name
+  release   = var.release
   data = {
     "nginx-proxy.conf" = <<-EOF
     proxy_request_buffering off;

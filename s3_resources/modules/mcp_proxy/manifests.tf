@@ -11,77 +11,14 @@ locals {
     camofox_mcp     = 8085
     searxng_mcp     = 8087
   }
-
-  manifests = concat([
-    module.deployment.manifest,
-    module.secret.manifest,
-    module.service.manifest,
-    module.httproute.manifest,
-    ], [
-    for _, m in [
-      # kubernetes-mcp
-      {
-        apiVersion = "v1"
-        kind       = "ServiceAccount"
-        metadata = {
-          name = var.name
-          labels = {
-            app     = var.name
-            release = var.release
-          }
-        }
-      },
-      {
-        apiVersion = "rbac.authorization.k8s.io/v1"
-        kind       = "ClusterRole"
-        metadata = {
-          name = var.name
-          labels = {
-            app     = var.name
-            release = var.release
-          }
-        }
-        rules = [
-          {
-            apiGroups = ["*"]
-            resources = ["*"]
-            verbs     = ["list", "watch", "get"]
-          },
-        ]
-      },
-      {
-        apiVersion = "rbac.authorization.k8s.io/v1"
-        kind       = "ClusterRoleBinding"
-        metadata = {
-          name = var.name
-          labels = {
-            app     = var.name
-            release = var.release
-          }
-        }
-        roleRef = {
-          apiGroup = "rbac.authorization.k8s.io"
-          kind     = "ClusterRole"
-          name     = var.name
-        }
-        subjects = [
-          {
-            kind      = "ServiceAccount"
-            name      = var.name
-            namespace = var.namespace
-          },
-        ]
-      },
-    ] :
-    yamlencode(m)
-  ])
 }
 
 module "secret" {
-  source  = "../../../modules/secret"
-  name    = var.name
-  app     = var.name
-  release = var.release
+  source    = "../../../modules/secret"
+  name      = var.name
+  namespace = var.namespace
+  app       = var.name
+  release   = var.release
   data = {
     basename(local.proxy_config_file) = jsonencode({
       mcpProxy = {
@@ -146,10 +83,11 @@ module "secret" {
 }
 
 module "service" {
-  source  = "../../../modules/service"
-  name    = var.name
-  app     = var.name
-  release = var.release
+  source    = "../../../modules/service"
+  name      = var.name
+  namespace = var.namespace
+  app       = var.name
+  release   = var.release
   spec = {
     type = "ClusterIP"
     ports = [
@@ -164,10 +102,11 @@ module "service" {
 }
 
 module "httproute" {
-  source  = "../../../modules/httproute"
-  name    = var.name
-  app     = var.name
-  release = var.release
+  source    = "../../../modules/httproute"
+  name      = var.name
+  namespace = var.namespace
+  app       = var.name
+  release   = var.release
   spec = {
     parentRefs = [
       merge({
@@ -201,11 +140,12 @@ module "httproute" {
 module "deployment" {
   source = "../../../modules/deployment"
 
-  name     = var.name
-  app      = var.name
-  release  = var.release
-  affinity = var.affinity
-  replicas = var.replicas
+  name      = var.name
+  namespace = var.namespace
+  app       = var.name
+  release   = var.release
+  affinity  = var.affinity
+  replicas  = var.replicas
   annotations = {
     "checksum/secret" = sha256(module.secret.manifest)
   }

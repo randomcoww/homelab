@@ -28,10 +28,11 @@ resource "tls_locally_signed_cert" "redis-client" {
 }
 
 module "redis-tls" {
-  source  = "../../../modules/secret"
-  name    = "${var.name}-redis-client-tls"
-  app     = var.name
-  release = var.release
+  source    = "../../../modules/secret"
+  name      = "${var.name}-redis-client-tls"
+  namespace = var.namespace
+  app       = var.name
+  release   = var.release
   data = {
     "tls.crt" = tls_locally_signed_cert.redis-client.cert_pem
     "tls.key" = tls_private_key.redis-client.private_key_pem

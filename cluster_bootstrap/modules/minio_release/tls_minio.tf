@@ -42,10 +42,11 @@ resource "tls_locally_signed_cert" "minio" {
 }
 
 module "minio-tls" {
-  source  = "../../../modules/secret"
-  name    = "${var.name}-tls"
-  app     = var.name
-  release = var.release
+  source    = "../../../modules/secret"
+  name      = "${var.name}-tls"
+  namespace = var.namespace
+  app       = var.name
+  release   = var.release
   data = {
     "tls.crt" = tls_locally_signed_cert.minio.cert_pem
     "tls.key" = tls_private_key.minio.private_key_pem

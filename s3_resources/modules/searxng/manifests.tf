@@ -9,13 +9,6 @@ locals {
     SEARXNG_PORT            = 8080
     SEARXNG_SECRET          = random_password.searxng-secret.result
   })
-
-  manifests = [
-    module.deployment.manifest,
-    module.secret.manifest,
-    module.service.manifest,
-    module.httproute.manifest,
-  ]
 }
 
 resource "random_password" "searxng-secret" {
@@ -24,10 +17,11 @@ resource "random_password" "searxng-secret" {
 }
 
 module "secret" {
-  source  = "../../../modules/secret"
-  name    = var.name
-  app     = var.name
-  release = var.release
+  source    = "../../../modules/secret"
+  name      = var.name
+  namespace = var.namespace
+  app       = var.name
+  release   = var.release
   data = merge({
     for k, v in local.extra_configs :
     tostring(k) => tostring(v)
@@ -37,10 +31,11 @@ module "secret" {
 }
 
 module "service" {
-  source  = "../../../modules/service"
-  name    = var.name
-  app     = var.name
-  release = var.release
+  source    = "../../../modules/service"
+  name      = var.name
+  namespace = var.namespace
+  app       = var.name
+  release   = var.release
   spec = {
     type = "ClusterIP"
     ports = [
@@ -55,10 +50,11 @@ module "service" {
 }
 
 module "httproute" {
-  source  = "../../../modules/httproute"
-  name    = var.name
-  app     = var.name
-  release = var.release
+  source    = "../../../modules/httproute"
+  name      = var.name
+  namespace = var.namespace
+  app       = var.name
+  release   = var.release
   spec = {
     parentRefs = [
       merge({
@@ -90,12 +86,13 @@ module "httproute" {
 }
 
 module "deployment" {
-  source   = "../../../modules/deployment"
-  name     = var.name
-  app      = var.name
-  release  = var.release
-  affinity = var.affinity
-  replicas = var.replicas
+  source    = "../../../modules/deployment"
+  name      = var.name
+  namespace = var.namespace
+  app       = var.name
+  release   = var.release
+  affinity  = var.affinity
+  replicas  = var.replicas
   annotations = {
     "checksum/secret" = sha256(module.secret.manifest)
   }

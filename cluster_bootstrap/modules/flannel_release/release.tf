@@ -5,7 +5,8 @@ locals {
         apiVersion = "v1"
         kind       = "ServiceAccount"
         metadata = {
-          name = var.name
+          name      = var.name
+          namespace = var.namespace
           labels = {
             app = var.name
           }
@@ -69,10 +70,11 @@ locals {
 }
 
 module "configmap" {
-  source  = "../../../modules/configmap"
-  name    = var.name
-  app     = var.name
-  release = var.release
+  source    = "../../../modules/configmap"
+  name      = var.name
+  namespace = var.namespace
+  app       = var.name
+  release   = var.release
   data = {
     "cni-conf.json" = jsonencode({
       name       = "cbr0"
@@ -106,10 +108,11 @@ module "configmap" {
 }
 
 module "daemonset" {
-  source  = "../../../modules/daemonset"
-  name    = var.name
-  app     = var.name
-  release = var.release
+  source    = "../../../modules/daemonset"
+  name      = var.name
+  namespace = var.namespace
+  app       = var.name
+  release   = var.release
   annotations = {
     "checksum/configmap" = sha256(module.configmap.manifest)
   }

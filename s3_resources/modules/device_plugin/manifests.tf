@@ -1,14 +1,9 @@
-locals {
-  manifests = [
-    module.daemonset.manifest,
-  ]
-}
-
 module "daemonset" {
-  source  = "../../../modules/daemonset"
-  name    = var.name
-  app     = var.name
-  release = var.release
+  source    = "../../../modules/daemonset"
+  name      = var.name
+  namespace = var.namespace
+  app       = var.name
+  release   = var.release
   annotations = {
     "prometheus.io/scrape" = "true"
     "prometheus.io/port"   = tostring(var.ports.device_plugin_metrics)

@@ -1,116 +1,13 @@
 locals {
   config_path = "/etc/registry"
-
-  manifests = concat([
-    for _, m in [
-      {
-        apiVersion = "batch/v1"
-        kind       = "CronJob"
-        metadata = {
-          name = "${var.name}-garbage-collect"
-          labels = {
-            app     = var.name
-            release = var.release
-          }
-        }
-        spec = {
-          schedule          = "0 * * * *"
-          suspend           = false
-          concurrencyPolicy = "Forbid"
-          jobTemplate = {
-            spec = {
-              ttlSecondsAfterFinished = 1800
-              template = {
-                spec = {
-                  restartPolicy = "Never"
-                  containers = [
-                    {
-                      name  = var.name
-                      image = var.images.registry
-                      args = [
-                        "garbage-collect",
-                        "--delete-untagged",
-                        "${local.config_path}/config.yaml",
-                      ]
-                      env = [
-                        {
-                          name = "REGISTRY_STORAGE_S3_ACCESSKEY"
-                          valueFrom = {
-                            secretKeyRef = {
-                              name = module.minio-user-secret.name
-                              key  = "AWS_ACCESS_KEY_ID"
-                            }
-                          }
-                        },
-                        {
-                          name = "REGISTRY_STORAGE_S3_SECRETKEY"
-                          valueFrom = {
-                            secretKeyRef = {
-                              name = module.minio-user-secret.name
-                              key  = "AWS_SECRET_ACCESS_KEY"
-                            }
-                          }
-                        },
-                      ]
-                      volumeMounts = [
-                        {
-                          name      = "config"
-                          mountPath = "${local.config_path}/config.yaml"
-                          subPath   = "registry-config"
-                        },
-                        {
-                          name      = "ca-trust-bundle"
-                          mountPath = "/etc/ssl/certs/ca-certificates.crt"
-                          readOnly  = true
-                        },
-                      ]
-                    },
-                  ]
-                  volumes = [
-                    {
-                      name = "config"
-                      secret = {
-                        secretName = module.secret.name
-                      }
-                    },
-                    {
-                      name = "ca-trust-bundle"
-                      hostPath = {
-                        path = "/etc/ssl/certs/ca-certificates.crt"
-                        type = "File"
-                      }
-                    },
-                  ]
-                  dnsConfig = {
-                    options = [
-                      {
-                        name  = "ndots"
-                        value = "2"
-                      },
-                    ]
-                  }
-                }
-              }
-            }
-          }
-        }
-      },
-    ] :
-    yamlencode(m)
-    ], [
-    module.secret.manifest,
-    module.deployment.manifest,
-    module.tls.manifest,
-    module.minio-user-secret.manifest,
-    module.service.manifest,
-  ])
 }
 
 module "secret" {
-  source  = "../../../modules/secret"
-  name    = var.name
-  app     = var.name
-  release = var.release
+  source    = "../../../modules/secret"
+  name      = var.name
+  namespace = var.namespace
+  app       = var.name
+  release   = var.release
   data = {
     registry-config = yamlencode({
       version = "0.1"
@@ -168,12 +65,13 @@ module "secret" {
 }
 
 module "deployment" {
-  source   = "../../../modules/deployment"
-  name     = var.name
-  app      = var.name
-  release  = var.release
-  affinity = var.affinity
-  replicas = var.replicas
+  source    = "../../../modules/deployment"
+  name      = var.name
+  namespace = var.namespace
+  app       = var.name
+  release   = var.release
+  affinity  = var.affinity
+  replicas  = var.replicas
   annotations = {
     "checksum/secret"            = sha256(module.secret.manifest)
     "checksum/tls"               = sha256(module.tls.manifest)
@@ -314,10 +212,11 @@ module "deployment" {
 }
 
 module "service" {
-  source  = "../../../modules/service"
-  name    = var.name
-  app     = var.name
-  release = var.release
+  source    = "../../../modules/service"
+  name      = var.name
+  namespace = var.namespace
+  app       = var.name
+  release   = var.release
   annotations = {
     "external-dns.alpha.kubernetes.io/hostname" = var.service_hostname
     "kube-vip.io/loadbalancerIPs"               = var.service_ip
@@ -345,10 +244,11 @@ module "service" {
 }
 
 module "minio-user-secret" {
-  source  = "../../../modules/secret"
-  name    = "${var.name}-minio-user-secret"
-  app     = var.name
-  release = "0.1.0"
+  source    = "../../../modules/secret"
+  name      = "${var.name}-minio-user-secret"
+  namespace = var.namespace
+  app       = var.name
+  release   = "0.1.0"
   data = merge({
     AWS_ACCESS_KEY_ID     = var.minio_user.id
     AWS_SECRET_ACCESS_KEY = var.minio_user.secret

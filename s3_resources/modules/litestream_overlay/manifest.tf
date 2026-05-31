@@ -3,10 +3,11 @@ locals {
 }
 
 module "secret" {
-  source  = "../../../modules/secret"
-  name    = "${var.name}-litestream"
-  app     = var.app
-  release = var.release
+  source    = "../../../modules/secret"
+  name      = "${var.name}-litestream"
+  namespace = var.namespace
+  app       = var.app
+  release   = var.release
   data = {
     "config.yaml" = yamlencode(var.litestream_config)
   }

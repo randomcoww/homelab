@@ -1,38 +1,14 @@
 locals {
   qrcode_port = 8080
   config_file = "/var/www/index.html"
-
-  manifests = concat([
-    module.service.manifest,
-    module.secret.manifest,
-    module.httproute.manifest,
-    module.deployment.manifest,
-    ], [
-    for _, m in [
-      {
-        apiVersion = "traefik.io/v1alpha1"
-        kind       = "Middleware"
-        metadata = {
-          name = var.name
-        }
-        spec = {
-          chain = {
-            middlewares = [
-              var.middleware_ref,
-            ]
-          }
-        }
-      },
-    ] :
-    yamlencode(m)
-  ])
 }
 
 module "secret" {
-  source  = "../../../modules/secret"
-  name    = var.name
-  app     = var.name
-  release = var.release
+  source    = "../../../modules/secret"
+  name      = var.name
+  namespace = var.namespace
+  app       = var.name
+  release   = var.release
   data = {
     "index.html" = <<-EOF
     <!DOCTYPE html>
@@ -90,10 +66,11 @@ module "secret" {
 }
 
 module "service" {
-  source  = "../../../modules/service"
-  name    = var.name
-  app     = var.name
-  release = var.release
+  source    = "../../../modules/service"
+  name      = var.name
+  namespace = var.namespace
+  app       = var.name
+  release   = var.release
   spec = {
     type = "ClusterIP"
     ports = [
@@ -108,10 +85,11 @@ module "service" {
 }
 
 module "httproute" {
-  source  = "../../../modules/httproute"
-  name    = var.name
-  app     = var.name
-  release = var.release
+  source    = "../../../modules/httproute"
+  name      = var.name
+  namespace = var.namespace
+  app       = var.name
+  release   = var.release
   spec = {
     parentRefs = [
       merge({
@@ -153,12 +131,13 @@ module "httproute" {
 }
 
 module "deployment" {
-  source   = "../../../modules/deployment"
-  name     = var.name
-  app      = var.name
-  release  = var.release
-  affinity = var.affinity
-  replicas = var.replicas
+  source    = "../../../modules/deployment"
+  name      = var.name
+  namespace = var.namespace
+  app       = var.name
+  release   = var.release
+  affinity  = var.affinity
+  replicas  = var.replicas
   annotations = {
     "checksum/secret" = sha256(module.secret.manifest)
   }

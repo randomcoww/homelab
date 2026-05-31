@@ -15,14 +15,6 @@ locals {
     OAUTH_CLIENT_INFO_ENCRYPTION_KEY   = random_password.client-info-encryption-key.result
     OAUTH_SESSION_TOKEN_ENCRYPTION_KEY = random_password.session-token-encryption-key.result
   })
-
-  manifests = concat([
-    module.statefulset.manifest,
-    module.secret.manifest,
-    module.service.manifest,
-    module.httproute.manifest,
-    module.minio-user-secret.manifest,
-  ], module.litestream-overlay.additional_manifests)
 }
 
 resource "random_password" "webui-secret-key" {
@@ -41,10 +33,11 @@ resource "random_password" "session-token-encryption-key" {
 }
 
 module "secret" {
-  source  = "../../../modules/secret"
-  name    = var.name
-  app     = var.name
-  release = var.release
+  source    = "../../../modules/secret"
+  name      = var.name
+  namespace = var.namespace
+  app       = var.name
+  release   = var.release
   data = {
     for k, v in local.extra_configs :
     tostring(k) => tostring(v)
@@ -52,10 +45,11 @@ module "secret" {
 }
 
 module "service" {
-  source  = "../../../modules/service"
-  name    = var.name
-  app     = var.name
-  release = var.release
+  source    = "../../../modules/service"
+  name      = var.name
+  namespace = var.namespace
+  app       = var.name
+  release   = var.release
   spec = {
     type = "ClusterIP"
     ports = [
@@ -70,10 +64,11 @@ module "service" {
 }
 
 module "httproute" {
-  source  = "../../../modules/httproute"
-  name    = var.name
-  app     = var.name
-  release = var.release
+  source    = "../../../modules/httproute"
+  name      = var.name
+  namespace = var.namespace
+  app       = var.name
+  release   = var.release
   spec = {
     parentRefs = [
       merge({
@@ -107,9 +102,10 @@ module "httproute" {
 module "litestream-overlay" {
   source = "../litestream_overlay"
 
-  name    = var.name
-  app     = var.name
-  release = var.release
+  name      = var.name
+  namespace = var.namespace
+  app       = var.name
+  release   = var.release
   images = {
     litestream = var.images.litestream
   }
@@ -233,11 +229,12 @@ module "litestream-overlay" {
 module "statefulset" {
   source = "../../../modules/statefulset"
 
-  name     = var.name
-  app      = var.name
-  release  = var.release
-  affinity = var.affinity
-  replicas = var.replicas
+  name      = var.name
+  namespace = var.namespace
+  app       = var.name
+  release   = var.release
+  affinity  = var.affinity
+  replicas  = var.replicas
   annotations = merge({
     "checksum/secret"            = sha256(module.secret.manifest)
     "checksum/minio-user-secret" = sha256(module.minio-user-secret.manifest)
@@ -271,10 +268,11 @@ module "statefulset" {
 }
 
 module "minio-user-secret" {
-  source  = "../../../modules/secret"
-  name    = "${var.name}-minio-user-secret"
-  app     = var.name
-  release = "0.1.0"
+  source    = "../../../modules/secret"
+  name      = "${var.name}-minio-user-secret"
+  namespace = var.namespace
+  app       = var.name
+  release   = "0.1.0"
   data = merge({
     AWS_ACCESS_KEY_ID     = var.minio_user.id
     AWS_SECRET_ACCESS_KEY = var.minio_user.secret

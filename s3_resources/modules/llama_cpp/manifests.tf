@@ -10,20 +10,14 @@ locals {
       file  = image.file
     }
   ]
-
-  manifests = [
-    module.statefulset.manifest,
-    module.service.manifest,
-    module.httproute.manifest,
-    module.secret.manifest,
-  ]
 }
 
 module "secret" {
-  source  = "../../../modules/secret"
-  name    = var.name
-  app     = var.name
-  release = var.release
+  source    = "../../../modules/secret"
+  name      = var.name
+  namespace = var.namespace
+  app       = var.name
+  release   = var.release
   data = merge({
     basename(local.config_file) = yamlencode(merge(var.llama_swap_config, {
       macros = merge({
@@ -51,10 +45,11 @@ module "secret" {
 }
 
 module "service" {
-  source  = "../../../modules/service"
-  name    = var.name
-  app     = var.name
-  release = var.release
+  source    = "../../../modules/service"
+  name      = var.name
+  namespace = var.namespace
+  app       = var.name
+  release   = var.release
   spec = {
     type = "ClusterIP"
     ports = [
@@ -69,10 +64,11 @@ module "service" {
 }
 
 module "httproute" {
-  source  = "../../../modules/httproute"
-  name    = var.name
-  app     = var.name
-  release = var.release
+  source    = "../../../modules/httproute"
+  name      = var.name
+  namespace = var.namespace
+  app       = var.name
+  release   = var.release
   spec = {
     parentRefs = [
       merge({
@@ -106,11 +102,12 @@ module "httproute" {
 module "statefulset" {
   source = "../../../modules/statefulset"
 
-  name     = var.name
-  app      = var.name
-  release  = var.release
-  affinity = var.affinity
-  replicas = 1
+  name      = var.name
+  namespace = var.namespace
+  app       = var.name
+  release   = var.release
+  affinity  = var.affinity
+  replicas  = 1
   annotations = {
     "checksum/secret" = sha256(module.secret.manifest)
   }

@@ -1,5 +1,5 @@
 locals {
-  boot_config = {
+  netboot_config = {
     for mac, host_key in transpose({
       for k, host in local.hosts :
       k => host.match_macs
@@ -36,7 +36,7 @@ locals {
 
 resource "minio_s3_object" "ipxe" {
   for_each = {
-    for mac, boot in local.boot_config :
+    for mac, boot in local.netboot_config :
     mac => local.ipxe_configs[boot.host_key]
   }
 
@@ -52,7 +52,7 @@ resource "minio_s3_object" "ipxe" {
 
 resource "minio_s3_object" "ignition" {
   for_each = {
-    for mac, boot in local.boot_config :
+    for mac, boot in local.netboot_config :
     mac => data.terraform_remote_state.host.outputs.ignition[boot.host_key]
   }
 
@@ -63,62 +63,5 @@ resource "minio_s3_object" "ignition" {
 
   depends_on = [
     minio_s3_bucket.bucket["boot"],
-  ]
-}
-
-resource "minio_s3_object" "flux-crd" {
-  for_each = merge([
-    for name, kustomize in local.flux_crd :
-    {
-      for f, content in kustomize :
-      "${name}/${f}" => content
-    }
-  ]...)
-
-  bucket_name  = "fluxcd"
-  object_name  = "crd/${each.key}"
-  content_type = "application/yaml"
-  content      = each.value
-
-  depends_on = [
-    minio_s3_bucket.bucket["fluxcd"],
-  ]
-}
-
-resource "minio_s3_object" "flux-system" {
-  for_each = merge([
-    for name, kustomize in local.flux_system :
-    {
-      for f, content in kustomize :
-      "${name}/${f}" => content
-    }
-  ]...)
-
-  bucket_name  = "fluxcd"
-  object_name  = "system/${each.key}"
-  content_type = "application/yaml"
-  content      = each.value
-
-  depends_on = [
-    minio_s3_bucket.bucket["fluxcd"],
-  ]
-}
-
-resource "minio_s3_object" "flux-service" {
-  for_each = merge([
-    for name, kustomize in local.flux_service :
-    {
-      for f, content in kustomize :
-      "${name}/${f}" => content
-    }
-  ]...)
-
-  bucket_name  = "fluxcd"
-  object_name  = "service/${each.key}"
-  content_type = "application/yaml"
-  content      = each.value
-
-  depends_on = [
-    minio_s3_bucket.bucket["fluxcd"],
   ]
 }

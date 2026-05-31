@@ -1,17 +1,106 @@
-output "name" {
-  value = var.name
-}
-
-output "kustomize" {
-  value = {
-    "release.yaml" = join("---\n", local.manifests)
-    "kustomization.yaml" = yamlencode({
-      apiVersion = "kustomize.config.k8s.io/v1beta1"
-      kind       = "Kustomization"
-      namespace  = var.namespace
-      resources = [
-        "release.yaml",
-      ]
-    })
-  }
+output "manifests" {
+  value = concat([
+    for _, m in [
+      {
+        apiVersion = "batch/v1"
+        kind       = "CronJob"
+        metadata = {
+          name      = "${var.name}-garbage-collect"
+          namespace = var.namespace
+          labels = {
+            app     = var.name
+            release = var.release
+          }
+        }
+        spec = {
+          schedule          = "0 * * * *"
+          suspend           = false
+          concurrencyPolicy = "Forbid"
+          jobTemplate = {
+            spec = {
+              ttlSecondsAfterFinished = 1800
+              template = {
+                spec = {
+                  restartPolicy = "Never"
+                  containers = [
+                    {
+                      name  = var.name
+                      image = var.images.registry
+                      args = [
+                        "garbage-collect",
+                        "--delete-untagged",
+                        "${local.config_path}/config.yaml",
+                      ]
+                      env = [
+                        {
+                          name = "REGISTRY_STORAGE_S3_ACCESSKEY"
+                          valueFrom = {
+                            secretKeyRef = {
+                              name = module.minio-user-secret.name
+                              key  = "AWS_ACCESS_KEY_ID"
+                            }
+                          }
+                        },
+                        {
+                          name = "REGISTRY_STORAGE_S3_SECRETKEY"
+                          valueFrom = {
+                            secretKeyRef = {
+                              name = module.minio-user-secret.name
+                              key  = "AWS_SECRET_ACCESS_KEY"
+                            }
+                          }
+                        },
+                      ]
+                      volumeMounts = [
+                        {
+                          name      = "config"
+                          mountPath = "${local.config_path}/config.yaml"
+                          subPath   = "registry-config"
+                        },
+                        {
+                          name      = "ca-trust-bundle"
+                          mountPath = "/etc/ssl/certs/ca-certificates.crt"
+                          readOnly  = true
+                        },
+                      ]
+                    },
+                  ]
+                  volumes = [
+                    {
+                      name = "config"
+                      secret = {
+                        secretName = module.secret.name
+                      }
+                    },
+                    {
+                      name = "ca-trust-bundle"
+                      hostPath = {
+                        path = "/etc/ssl/certs/ca-certificates.crt"
+                        type = "File"
+                      }
+                    },
+                  ]
+                  dnsConfig = {
+                    options = [
+                      {
+                        name  = "ndots"
+                        value = "2"
+                      },
+                    ]
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+    ] :
+    yamlencode(m)
+    ], [
+    module.secret.manifest,
+    module.deployment.manifest,
+    module.tls.manifest,
+    module.minio-user-secret.manifest,
+    module.service.manifest,
+  ])
 }

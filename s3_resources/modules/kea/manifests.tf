@@ -17,15 +17,6 @@ locals {
       role = try(element(["primary", "secondary"], i), "backup")
     }
   ]
-
-  manifests = concat([
-    module.secret.manifest,
-    module.statefulset.manifest,
-    module.kea-tls.manifest,
-    ], [
-    for _, service in module.service-peer :
-    service.manifest
-  ])
 }
 
 # Kea peers must know the IP (not DNS name) of all peers
@@ -36,10 +27,11 @@ module "service-peer" {
     member.name => member
   }
 
-  source  = "../../../modules/service"
-  name    = each.key
-  app     = var.name
-  release = var.release
+  source    = "../../../modules/service"
+  name      = each.key
+  namespace = var.namespace
+  app       = var.name
+  release   = var.release
   spec = {
     type      = "ClusterIP"
     clusterIP = each.value.ip
@@ -59,10 +51,11 @@ module "service-peer" {
 }
 
 module "secret" {
-  source  = "../../../modules/secret"
-  name    = var.name
-  app     = var.name
-  release = var.release
+  source    = "../../../modules/secret"
+  name      = var.name
+  namespace = var.namespace
+  app       = var.name
+  release   = var.release
   data = {
 
     # config for each kea kea-dhcp4-${POD_NAME}.tpl
@@ -216,12 +209,13 @@ module "secret" {
 }
 
 module "statefulset" {
-  source   = "../../../modules/statefulset"
-  name     = var.name
-  app      = var.name
-  release  = var.release
-  affinity = var.affinity
-  replicas = length(local.members)
+  source    = "../../../modules/statefulset"
+  name      = var.name
+  namespace = var.namespace
+  app       = var.name
+  release   = var.release
+  affinity  = var.affinity
+  replicas  = length(local.members)
   annotations = {
     "prometheus.io/scrape" = "true"
     "prometheus.io/port"   = tostring(var.ports.kea_metrics)

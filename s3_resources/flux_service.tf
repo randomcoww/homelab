@@ -940,117 +940,122 @@ module "navidrome" {
   minio_user        = minio_iam_user.user["navidrome"]
 }
 
+# github-actions
+
+module "gha-runner" {
+  source               = "./modules/gha_runner"
+  name                 = "gha"
+  namespace            = "arc-runners"
+  controller_namespace = "arc-systems"
+  images = {
+    gha_runner = local.container_images_digest.gha_runner
+  }
+  github_credentials = {
+    username = var.github_username
+    token    = var.github_token
+  }
+  internal_ca       = data.terraform_remote_state.host.outputs.internal_ca
+  registry_endpoint = "${local.endpoints.registry.service}:${local.service_ports.registry}"
+  minio_endpoint    = "${local.services.cluster_minio.ip}:${local.service_ports.minio}"
+  minio_user        = minio_iam_user.user["arc"]
+}
+
 locals {
-  flux_service = merge({
+  flux_service = {
 
-    cloudflare-tunnel = {
-      "release.yaml" = join("---\n", [
-        for _, m in [
-          {
-            apiVersion = "source.toolkit.fluxcd.io/v1"
-            kind       = "HelmRepository"
-            metadata = {
-              name      = "cloudflare-tunnel"
-              namespace = "default"
+    cloudflare-tunnel = [
+      for _, m in [
+        {
+          apiVersion = "source.toolkit.fluxcd.io/v1"
+          kind       = "HelmRepository"
+          metadata = {
+            name      = "cloudflare-tunnel"
+            namespace = "default"
+          }
+          spec = {
+            interval = "15m"
+            url      = "https://cloudflare.github.io/helm-charts"
+          }
+        },
+        {
+          apiVersion = "helm.toolkit.fluxcd.io/v2"
+          kind       = "HelmRelease"
+          metadata = {
+            name      = "cloudflare-tunnel"
+            namespace = "default"
+          }
+          spec = {
+            interval = "15m"
+            timeout  = "5m"
+            chart = {
+              spec = {
+                chart   = "cloudflare-tunnel"
+                version = "0.3.2" # renovate: datasource=helm depName=cloudflare-tunnel registryUrl=https://cloudflare.github.io/helm-charts
+                sourceRef = {
+                  kind = "HelmRepository"
+                  name = "cloudflare-tunnel"
+                }
+                interval = "5m"
+              }
             }
-            spec = {
-              interval = "15m"
-              url      = "https://cloudflare.github.io/helm-charts"
+            releaseName = "cloudflare-tunnel"
+            install = {
+              remediation = {
+                retries = -1
+              }
             }
-          },
-          {
-            apiVersion = "helm.toolkit.fluxcd.io/v2"
-            kind       = "HelmRelease"
-            metadata = {
-              name      = "cloudflare-tunnel"
-              namespace = "default"
+            upgrade = {
+              remediation = {
+                retries = -1
+              }
             }
-            spec = {
-              interval = "15m"
-              timeout  = "5m"
-              chart = {
-                spec = {
-                  chart   = "cloudflare-tunnel"
-                  version = "0.3.2" # renovate: datasource=helm depName=cloudflare-tunnel registryUrl=https://cloudflare.github.io/helm-charts
-                  sourceRef = {
-                    kind = "HelmRepository"
-                    name = "cloudflare-tunnel"
-                  }
-                  interval = "5m"
-                }
+            test = {
+              enable = false
+            }
+            values = {
+              image = {
+                repository = regex(local.container_image_regex, local.container_images.cloudflared).depName
+                tag        = regex(local.container_image_regex, local.container_images.cloudflared).tag
               }
-              releaseName = "cloudflare-tunnel"
-              install = {
-                remediation = {
-                  retries = -1
-                }
+              cloudflare = {
+                account    = data.terraform_remote_state.sr.outputs.cloudflare_tunnel.account_id
+                tunnelName = data.terraform_remote_state.sr.outputs.cloudflare_tunnel.name
+                tunnelId   = data.terraform_remote_state.sr.outputs.cloudflare_tunnel.id
+                secret     = data.terraform_remote_state.sr.outputs.cloudflare_tunnel.tunnel_secret
+                ingress = [
+                  for _, e in local.endpoints :
+                  {
+                    hostname = e.ingress
+                    service  = "https://${local.endpoints.traefik.service}"
+                  } if lookup(e, "tunnel", false)
+                ]
               }
-              upgrade = {
-                remediation = {
-                  retries = -1
+              resources = {
+                requests = {
+                  memory = "128Mi"
                 }
-              }
-              test = {
-                enable = false
-              }
-              values = {
-                image = {
-                  repository = regex(local.container_image_regex, local.container_images.cloudflared).depName
-                  tag        = regex(local.container_image_regex, local.container_images.cloudflared).tag
-                }
-                cloudflare = {
-                  account    = data.terraform_remote_state.sr.outputs.cloudflare_tunnel.account_id
-                  tunnelName = data.terraform_remote_state.sr.outputs.cloudflare_tunnel.name
-                  tunnelId   = data.terraform_remote_state.sr.outputs.cloudflare_tunnel.id
-                  secret     = data.terraform_remote_state.sr.outputs.cloudflare_tunnel.tunnel_secret
-                  ingress = [
-                    for _, e in local.endpoints :
-                    {
-                      hostname = e.ingress
-                      service  = "https://${local.endpoints.traefik.service}"
-                    } if lookup(e, "tunnel", false)
-                  ]
-                }
-                resources = {
-                  requests = {
-                    memory = "128Mi"
-                  }
-                  limits = {
-                    memory = "128Mi"
-                  }
+                limits = {
+                  memory = "128Mi"
                 }
               }
             }
-          },
-        ] :
-        yamlencode(m)
-      ])
-      "kustomization.yaml" = yamlencode({
-        apiVersion = "kustomize.config.k8s.io/v1beta1"
-        kind       = "Kustomization"
-        namespace  = "amd"
-        resources = [
-          "release.yaml",
-        ]
-      })
-    }
+          }
+        },
+      ] :
+      yamlencode(m)
+    ]
 
-    }, {
-    for _, m in [
-      module.lldap,
-      module.authelia-valkey,
-      module.authelia,
-      module.llama-cpp,
-      # module.sunshine-desktop,
-      module.searxng,
-      module.open-webui,
-      module.hostapd,
-      module.qrcode-hostapd,
-      module.stump,
-      module.gha-runner,
-      module.navidrome,
-      module.mcp-proxy,
-    ] :
-    m.name => m.kustomize
-  })
+    lldap     = module.lldap.manifests
+    authelia  = concat(module.authelia-valkey.manifests, module.authelia.manifests)
+    llama-cpp = module.llama-cpp.manifests
+    # sunshine-desktop = module.sunshine-desktop.manifests
+    searxng        = module.searxng.manifests
+    open-webui     = module.open-webui.manifests
+    hostapd        = module.hostapd.manifests
+    qrcode-hostapd = module.qrcode-hostapd.manifests
+    stump          = module.stump.manifests
+    gha-runner     = module.gha-runner.manifests
+    navidrome      = module.navidrome.manifests
+    mcp-proxy      = module.mcp-proxy.manifests
+  }
 }

@@ -1,17 +1,27 @@
-output "name" {
-  value = var.name
-}
-
-output "kustomize" {
-  value = {
-    "release.yaml" = join("---\n", local.manifests)
-    "kustomization.yaml" = yamlencode({
-      apiVersion = "kustomize.config.k8s.io/v1beta1"
-      kind       = "Kustomization"
-      namespace  = var.namespace
-      resources = [
-        "release.yaml",
-      ]
-    })
-  }
+output "manifests" {
+  value = concat([
+    module.service.manifest,
+    module.secret.manifest,
+    module.httproute.manifest,
+    module.deployment.manifest,
+    ], [
+    for _, m in [
+      {
+        apiVersion = "traefik.io/v1alpha1"
+        kind       = "Middleware"
+        metadata = {
+          name      = var.name
+          namespace = var.namespace
+        }
+        spec = {
+          chain = {
+            middlewares = [
+              var.middleware_ref,
+            ]
+          }
+        }
+      },
+    ] :
+    yamlencode(m)
+  ])
 }

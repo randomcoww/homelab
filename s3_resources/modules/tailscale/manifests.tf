@@ -1,93 +1,26 @@
 locals {
   metrics_port = 9002
-
-  manifests = concat([
-    module.secret.manifest,
-    module.statefulset.manifest,
-    ], [
-    for _, m in [
-      {
-        apiVersion = "rbac.authorization.k8s.io/v1"
-        kind       = "Role"
-        metadata = {
-          name = var.name
-          labels = {
-            app     = var.name
-            release = var.release
-          }
-        }
-        rules = [
-          {
-            apiGroups = [""]
-            resources = ["secrets"]
-            verbs     = ["create"]
-          },
-          {
-            apiGroups = [""]
-            resourceNames = [
-              for i, _ in range(var.replicas) :
-              "${var.name}-${i}"
-            ]
-            resources = ["secrets"]
-            verbs     = ["get", "update", "patch"]
-          },
-        ]
-      },
-      {
-        apiVersion = "rbac.authorization.k8s.io/v1"
-        kind       = "RoleBinding"
-        metadata = {
-          name = var.name
-          labels = {
-            app     = var.name
-            release = var.release
-          }
-        }
-        roleRef = {
-          apiGroup = "rbac.authorization.k8s.io"
-          kind     = "Role"
-          name     = var.name
-        }
-        subjects = [
-          {
-            kind = "ServiceAccount"
-            name = var.name
-          },
-        ]
-      },
-      {
-        apiVersion = "v1"
-        kind       = "ServiceAccount"
-        metadata = {
-          name = var.name
-          labels = {
-            app     = var.name
-            release = var.release
-          }
-        }
-      },
-    ] :
-    yamlencode(m)
-  ])
 }
 
 module "secret" {
-  source  = "../../../modules/secret"
-  name    = var.name
-  app     = var.name
-  release = var.release
+  source    = "../../../modules/secret"
+  name      = var.name
+  namespace = var.namespace
+  app       = var.name
+  release   = var.release
   data = {
     TS_AUTHKEY = var.tailscale_auth_key
   }
 }
 
 module "statefulset" {
-  source   = "../../../modules/statefulset"
-  name     = var.name
-  app      = var.name
-  release  = var.release
-  affinity = var.affinity
-  replicas = var.replicas
+  source    = "../../../modules/statefulset"
+  name      = var.name
+  namespace = var.namespace
+  app       = var.name
+  release   = var.release
+  affinity  = var.affinity
+  replicas  = var.replicas
   annotations = {
     "checksum/secret" = sha256(module.secret.manifest)
   }

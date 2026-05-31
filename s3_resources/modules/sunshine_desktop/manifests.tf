@@ -19,32 +19,6 @@ locals {
   sunshine_prep_cmd_file = "/usr/local/bin/sunshine-prep-cmd.sh"
   gamescope_cmd_file     = "/usr/local/bin/gamescope-launch"
   ge_proton_update       = "/usr/local/bin/ge-protonup"
-
-  manifests = concat([
-    module.secret.manifest,
-    module.service.manifest,
-    module.web-service.manifest,
-    module.httproute.manifest,
-    module.statefulset.manifest,
-    ], [
-    for _, m in [
-      {
-        apiVersion = "traefik.io/v1alpha1"
-        kind       = "Middleware"
-        metadata = {
-          name = var.name
-        }
-        spec = {
-          chain = {
-            middlewares = [
-              var.middleware_ref,
-            ]
-          }
-        }
-      },
-    ] :
-    yamlencode(m)
-  ])
 }
 
 # bypassed through nginx - no need to expose
@@ -60,10 +34,11 @@ resource "random_password" "password" {
 }
 
 module "secret" {
-  source  = "../../../modules/secret"
-  name    = var.name
-  app     = var.name
-  release = var.release
+  source    = "../../../modules/secret"
+  name      = var.name
+  namespace = var.namespace
+  app       = var.name
+  release   = var.release
   data = merge({
     for i, config in var.extra_configs :
     "${i}-${basename(config.path)}" => config.content
@@ -148,10 +123,11 @@ module "secret" {
 }
 
 module "service" {
-  source  = "../../../modules/service"
-  name    = var.name
-  app     = var.name
-  release = var.release
+  source    = "../../../modules/service"
+  name      = var.name
+  namespace = var.namespace
+  app       = var.name
+  release   = var.release
   annotations = {
     "external-dns.alpha.kubernetes.io/hostname" = var.service_hostname
     "kube-vip.io/loadbalancerIPs"               = "0.0.0.0"
@@ -180,10 +156,11 @@ module "service" {
 }
 
 module "web-service" {
-  source  = "../../../modules/service"
-  name    = "${var.name}-web"
-  app     = var.name
-  release = var.release
+  source    = "../../../modules/service"
+  name      = "${var.name}-web"
+  namespace = var.namespace
+  app       = var.name
+  release   = var.release
   spec = {
     type = "ClusterIP"
     ports = [
@@ -198,10 +175,11 @@ module "web-service" {
 }
 
 module "httproute" {
-  source  = "../../../modules/httproute"
-  name    = var.name
-  app     = var.name
-  release = var.release
+  source    = "../../../modules/httproute"
+  name      = var.name
+  namespace = var.namespace
+  app       = var.name
+  release   = var.release
   spec = {
     parentRefs = [
       merge({
@@ -243,12 +221,13 @@ module "httproute" {
 }
 
 module "statefulset" {
-  source   = "../../../modules/statefulset"
-  name     = var.name
-  app      = var.name
-  release  = var.release
-  replicas = 1
-  affinity = var.affinity
+  source    = "../../../modules/statefulset"
+  name      = var.name
+  namespace = var.namespace
+  app       = var.name
+  release   = var.release
+  replicas  = 1
+  affinity  = var.affinity
   annotations = {
     "checksum/secret" = sha256(module.secret.manifest)
   }

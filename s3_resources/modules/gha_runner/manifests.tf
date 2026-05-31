@@ -1,221 +1,12 @@
 locals {
   service_account_name = "${var.name}-scale-set-controller"
   domain_regex         = "(?<hostname>(?<subdomain>[a-z0-9-*]+)\\.(?<domain>[a-z0-9.-]+))(?::(?<port>\\d+))?"
-
-  manifests = concat([
-    # runner resources in arc-runners
-    module.tls.manifest,
-    module.workflow-config.manifest,
-
-    ], [
-    for _, m in concat([
-
-      # runner in arc-runners
-      {
-        apiVersion = "source.toolkit.fluxcd.io/v1"
-        kind       = "OCIRepository"
-        metadata = {
-          name      = "${var.name}-scale-set"
-          namespace = var.runner_namespace
-        }
-        spec = {
-          interval = "15m"
-          url      = "oci://ghcr.io/actions/actions-runner-controller-charts/gha-runner-scale-set"
-          ref = {
-            tag = "0.14.2" # renovate: datasource=docker depName=ghcr.io/actions/actions-runner-controller-charts/gha-runner-scale-set depType=helm_regex
-          }
-        }
-      },
-      ], [
-      for k in flatten([
-        for workflow, repos in {
-          "renovate" = [
-            "homelab",
-            "container-builds",
-            "fedora-coreos-config-custom",
-            "etcd-wrapper",
-          ]
-          "kaniko" = [
-            "container-builds",
-            "etcd-wrapper",
-          ]
-          "cosa" = [
-            "fedora-coreos-config-custom",
-          ]
-          } : [
-          for repo in repos : {
-            repo = repo
-            name = "${workflow}-${repo}"
-            spec = "workflow-podspec-${workflow}.yaml"
-          }
-        ]
-      ]) :
-      {
-        apiVersion = "helm.toolkit.fluxcd.io/v2"
-        kind       = "HelmRelease"
-        metadata = {
-          name      = "${var.name}-${k.name}"
-          namespace = var.runner_namespace
-        }
-        spec = {
-          interval = "15m"
-          timeout  = "5m"
-          chartRef = {
-            kind      = "OCIRepository"
-            name      = "${var.name}-scale-set"
-            namespace = var.runner_namespace
-          }
-          releaseName = k.name # should match runner name in github jobs
-          install = {
-            remediation = {
-              retries = -1
-            }
-          }
-          upgrade = {
-            remediation = {
-              retries = -1
-            }
-          }
-          test = {
-            enable = false
-          }
-          values = {
-            githubConfigUrl = "https://github.com/${var.github_credentials.username}/${k.repo}"
-            githubConfigSecret = {
-              github_token = var.github_credentials.token
-            }
-            maxRunners = 3
-            containerMode = {
-              type = "kubernetes"
-              kubernetesModeWorkVolumeClaim = {
-                accessModes = [
-                  "ReadWriteOnce",
-                ]
-                storageClassName = "local-path"
-                resources = {
-                  requests = {
-                    storage = "64Gi"
-                  }
-                }
-              }
-            }
-            template = {
-              spec = {
-                containers = [
-                  {
-                    name  = "runner"
-                    image = var.images.gha_runner
-                    command = [
-                      "/home/runner/run.sh",
-                    ]
-                    env = [
-                      {
-                        name  = "ACTIONS_RUNNER_CONTAINER_HOOK_TEMPLATE"
-                        value = "/home/runner/config/workflow-podspec.yaml"
-                      },
-                    ]
-                    volumeMounts = [
-                      {
-                        name      = "workflow-podspec-volume"
-                        mountPath = "/home/runner/config/workflow-podspec.yaml"
-                        subPath   = k.spec
-                      },
-                    ]
-                  },
-                ]
-                volumes = [
-                  {
-                    name = "workflow-podspec-volume"
-                    configMap = {
-                      name = module.workflow-config.name
-                    }
-                  },
-                ]
-              }
-            }
-            controllerServiceAccount = {
-              namespace = var.namespace
-              name      = local.service_account_name
-            }
-          }
-        }
-      }
-      ], [
-
-      # runner-controller in arc-systems
-      {
-        apiVersion = "source.toolkit.fluxcd.io/v1"
-        kind       = "OCIRepository"
-        metadata = {
-          name      = "${var.name}-scale-set-controller"
-          namespace = var.namespace
-        }
-        spec = {
-          interval = "15m"
-          url      = "oci://ghcr.io/actions/actions-runner-controller-charts/gha-runner-scale-set-controller"
-          ref = {
-            tag = "0.14.2" # renovate: datasource=docker depName=ghcr.io/actions/actions-runner-controller-charts/gha-runner-scale-set-controller depType=helm_regex
-          }
-        }
-      },
-      {
-        apiVersion = "helm.toolkit.fluxcd.io/v2"
-        kind       = "HelmRelease"
-        metadata = {
-          name      = var.name
-          namespace = var.namespace
-        }
-        spec = {
-          interval = "15m"
-          timeout  = "5m"
-          chartRef = {
-            kind      = "OCIRepository"
-            name      = "${var.name}-scale-set-controller"
-            namespace = var.namespace
-          }
-          releaseName = var.name
-          install = {
-            remediation = {
-              retries = -1
-            }
-          }
-          upgrade = {
-            remediation = {
-              retries = -1
-            }
-          }
-          test = {
-            enable = false
-          }
-          values = {
-            replicaCount = 2
-            serviceAccount = {
-              create = true
-              name   = local.service_account_name
-            }
-            flags = {
-              updateStrategy = "eventual"
-            }
-            resources = {
-              requests = {
-                memory = "128Mi"
-              }
-              limits = {
-                memory = "128Mi"
-              }
-            }
-          }
-        }
-      },
-    ]) :
-    yamlencode(m)
-  ])
 }
 
 module "workflow-config" {
   source    = "../../../modules/configmap"
   name      = "${var.name}-workflow-template"
-  namespace = var.runner_namespace
+  namespace = var.namespace
   app       = var.name
   release   = var.release
   data = {
@@ -472,10 +263,11 @@ module "workflow-config" {
 }
 
 module "minio-user-secret" {
-  source  = "../../../modules/secret"
-  name    = "${var.name}-minio-user-secret"
-  app     = var.name
-  release = "0.1.0"
+  source    = "../../../modules/secret"
+  name      = "${var.name}-minio-user-secret"
+  namespace = var.namespace
+  app       = var.name
+  release   = "0.1.0"
   data = merge({
     AWS_ACCESS_KEY_ID     = var.minio_user.id
     AWS_SECRET_ACCESS_KEY = var.minio_user.secret

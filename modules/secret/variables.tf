@@ -2,13 +2,12 @@ variable "name" {
   type = string
 }
 
-variable "app" {
+variable "namespace" {
   type = string
 }
 
-variable "namespace" {
-  type    = string
-  default = ""
+variable "app" {
+  type = string
 }
 
 variable "release" {

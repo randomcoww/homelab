@@ -28,10 +28,11 @@ resource "tls_locally_signed_cert" "minio-client" {
 }
 
 module "minio-tls" {
-  source  = "../modules/secret"
-  name    = "${local.endpoints.fluxcd.name}-minio-client-tls"
-  app     = local.endpoints.fluxcd.name
-  release = "0.1.0"
+  source    = "../modules/secret"
+  name      = "${local.endpoints.fluxcd.name}-minio-client-tls"
+  namespace = local.endpoints.fluxcd.namespace
+  app       = local.endpoints.fluxcd.name
+  release   = "0.1.0"
   data = {
     "tls.crt" = tls_locally_signed_cert.minio-client.cert_pem
     "tls.key" = tls_private_key.minio-client.private_key_pem

@@ -22,38 +22,14 @@ locals {
     ND_SCANNER_PURGEMISSING    = "always"
   })
   db_file = "${local.navidrome_config["ND_DATAFOLDER"]}/navidrome.db" # db name not configurable
-
-  manifests = concat([
-    module.statefulset.manifest,
-    module.service.manifest,
-    module.httproute.manifest,
-    module.minio-user-secret.manifest,
-    ], [
-    for _, m in [
-      {
-        apiVersion = "traefik.io/v1alpha1"
-        kind       = "Middleware"
-        metadata = {
-          name = var.name
-        }
-        spec = {
-          chain = {
-            middlewares = [
-              var.middleware_ref,
-            ]
-          }
-        }
-      },
-    ] :
-    yamlencode(m)
-  ], module.litestream-overlay.additional_manifests)
 }
 
 module "service" {
-  source  = "../../../modules/service"
-  name    = var.name
-  app     = var.name
-  release = var.release
+  source    = "../../../modules/service"
+  name      = var.name
+  namespace = var.namespace
+  app       = var.name
+  release   = var.release
   annotations = {
     "prometheus.io/scrape" = "true"
     "prometheus.io/port"   = tostring(local.navidrome_config["ND_PORT"])
@@ -73,10 +49,11 @@ module "service" {
 }
 
 module "httproute" {
-  source  = "../../../modules/httproute"
-  name    = var.name
-  app     = var.name
-  release = var.release
+  source    = "../../../modules/httproute"
+  name      = var.name
+  namespace = var.namespace
+  app       = var.name
+  release   = var.release
   spec = {
     parentRefs = [
       merge({
@@ -120,9 +97,10 @@ module "httproute" {
 module "litestream-overlay" {
   source = "../litestream_overlay"
 
-  name    = var.name
-  app     = var.name
-  release = var.release
+  name      = var.name
+  namespace = var.namespace
+  app       = var.name
+  release   = var.release
   images = {
     litestream = var.images.litestream
   }
@@ -217,6 +195,7 @@ module "mountpoint-s3-overlay" {
   source = "../mountpoint_s3_overlay"
 
   name        = var.name
+  namespace   = var.namespace
   app         = var.name
   release     = var.release
   mount_path  = local.navidrome_config["ND_MUSICFOLDER"]
@@ -240,11 +219,12 @@ module "mountpoint-s3-overlay" {
 module "statefulset" {
   source = "../../../modules/statefulset"
 
-  name     = var.name
-  app      = var.name
-  release  = var.release
-  affinity = var.affinity
-  replicas = var.replicas
+  name      = var.name
+  namespace = var.namespace
+  app       = var.name
+  release   = var.release
+  affinity  = var.affinity
+  replicas  = var.replicas
   annotations = merge({
     "checksum/minio-user-secret" = sha256(module.minio-user-secret.manifest)
     }, {
@@ -277,10 +257,11 @@ module "statefulset" {
 }
 
 module "minio-user-secret" {
-  source  = "../../../modules/secret"
-  name    = "${var.name}-minio-user-secret"
-  app     = var.name
-  release = "0.1.0"
+  source    = "../../../modules/secret"
+  name      = "${var.name}-minio-user-secret"
+  namespace = var.namespace
+  app       = var.name
+  release   = "0.1.0"
   data = merge({
     AWS_ACCESS_KEY_ID     = var.minio_user.id
     AWS_SECRET_ACCESS_KEY = var.minio_user.secret

@@ -49,10 +49,11 @@ resource "tls_locally_signed_cert" "store" {
 }
 
 module "store-tls" {
-  source  = "../../../modules/secret"
-  name    = "${var.name}-thanos-store-tls"
-  app     = var.name
-  release = "0.1.0"
+  source    = "../../../modules/secret"
+  name      = "${var.name}-thanos-store-tls"
+  namespace = var.namespace
+  app       = var.name
+  release   = "0.1.0"
   data = merge({
     for _, member in local.members :
     "${member.name}-tls.crt" => tls_locally_signed_cert.store[member.name].cert_pem

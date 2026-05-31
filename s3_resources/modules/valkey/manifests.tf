@@ -71,21 +71,14 @@ sentinel known-sentinel ${var.name} ${remote.name}.${local.headless_service_fqdn
 %{endif}%{endfor~}
 EOF
   }
-
-  manifests = [
-    module.configmap.manifest,
-    module.tls.manifest,
-    module.statefulset.manifest,
-    module.service.manifest,
-    module.service-headless.manifest,
-  ]
 }
 
 module "service" {
-  source  = "../../../modules/service"
-  name    = var.name
-  app     = var.name
-  release = var.release
+  source    = "../../../modules/service"
+  name      = var.name
+  namespace = var.namespace
+  app       = var.name
+  release   = var.release
   spec = {
     type = "ClusterIP"
     ports = [
@@ -100,10 +93,11 @@ module "service" {
 }
 
 module "service-headless" {
-  source  = "../../../modules/service"
-  name    = local.headless_service
-  app     = var.name
-  release = var.release
+  source    = "../../../modules/service"
+  name      = local.headless_service
+  namespace = var.namespace
+  app       = var.name
+  release   = var.release
   spec = {
     type                     = "ClusterIP"
     clusterIP                = "None"
@@ -126,20 +120,22 @@ module "service-headless" {
 }
 
 module "configmap" {
-  source  = "../../../modules/configmap"
-  name    = var.name
-  app     = var.name
-  release = var.release
-  data    = merge(local.valkey_configs, local.sentinel_configs)
+  source    = "../../../modules/configmap"
+  name      = var.name
+  namespace = var.namespace
+  app       = var.name
+  release   = var.release
+  data      = merge(local.valkey_configs, local.sentinel_configs)
 }
 
 module "statefulset" {
-  source   = "../../../modules/statefulset"
-  name     = var.name
-  app      = var.name
-  release  = var.release
-  affinity = var.affinity
-  replicas = var.replicas
+  source    = "../../../modules/statefulset"
+  name      = var.name
+  namespace = var.namespace
+  app       = var.name
+  release   = var.release
+  affinity  = var.affinity
+  replicas  = var.replicas
   annotations = {
     "checksum/configmap" = sha256(module.configmap.manifest)
     "checksum/secret"    = sha256(module.tls.manifest)

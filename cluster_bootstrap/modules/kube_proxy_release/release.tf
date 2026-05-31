@@ -5,7 +5,8 @@ locals {
         apiVersion = "v1"
         kind       = "ServiceAccount"
         metadata = {
-          name = var.name
+          name      = var.name
+          namespace = var.namespace
           labels = {
             app = var.name
           }
@@ -41,11 +42,12 @@ locals {
 }
 
 module "daemonset" {
-  source   = "../../../modules/daemonset"
-  name     = var.name
-  app      = var.name
-  affinity = var.affinity
-  release  = var.release
+  source    = "../../../modules/daemonset"
+  name      = var.name
+  namespace = var.namespace
+  app       = var.name
+  affinity  = var.affinity
+  release   = var.release
   annotations = {
     "prometheus.io/scrape" = "true"
     "prometheus.io/port"   = tostring(var.ports.kube_proxy_metrics)

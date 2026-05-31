@@ -28,10 +28,11 @@ resource "tls_locally_signed_cert" "ldap-client" {
 }
 
 module "ldap-tls" {
-  source  = "../../../modules/secret"
-  name    = "${var.name}-ldap-client-tls"
-  app     = var.name
-  release = var.release
+  source    = "../../../modules/secret"
+  name      = "${var.name}-ldap-client-tls"
+  namespace = var.namespace
+  app       = var.name
+  release   = var.release
   data = {
     "tls.crt" = tls_locally_signed_cert.ldap-client.cert_pem
     "tls.key" = tls_private_key.ldap-client.private_key_pem

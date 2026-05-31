@@ -3,8 +3,7 @@ variable "name" {
 }
 
 variable "namespace" {
-  type    = string
-  default = ""
+  type = string
 }
 
 variable "app" {

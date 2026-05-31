@@ -2,12 +2,12 @@ variable "name" {
   type = string
 }
 
-variable "namespace" {
+variable "controller_namespace" {
   type    = string
   default = "default"
 }
 
-variable "runner_namespace" {
+variable "namespace" {
   type    = string
   default = "default"
 }

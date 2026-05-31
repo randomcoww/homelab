@@ -30,7 +30,7 @@ resource "tls_locally_signed_cert" "internal-client" {
 module "tls" {
   source    = "../../../modules/secret"
   name      = "${var.name}-tls"
-  namespace = var.runner_namespace
+  namespace = var.namespace
   app       = var.name
   release   = var.release
   data = {
