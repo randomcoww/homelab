@@ -337,6 +337,10 @@ locals {
         name      = "fluxcd"
         namespace = "flux-system"
       }
+      cert_manager = {
+        name      = "cert-manager"
+        namespace = "cert-manager"
+      }
     } :
     name => merge(e, {
       namespace    = lookup(e, "namespace", "default")

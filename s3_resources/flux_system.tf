@@ -30,7 +30,7 @@ module "registry" {
 module "cert-manager-issuer-acme-prod-secret" {
   source    = "../modules/secret"
   name      = local.kubernetes.cert_issuers.acme_prod
-  namespace = "cert-manager"
+  namespace = local.endpoints.cert_manager.namespace
   app       = "cert-issuer"
   release   = "0.1.0"
   data = merge({
@@ -42,7 +42,7 @@ module "cert-manager-issuer-acme-prod-secret" {
 module "cert-manager-issuer-ca-internal-secret" {
   source    = "../modules/secret"
   name      = local.kubernetes.cert_issuers.ca_internal
-  namespace = "cert-manager"
+  namespace = local.endpoints.cert_manager.namespace
   app       = "cert-issuer"
   release   = "0.1.0"
   data = merge({
@@ -756,7 +756,7 @@ locals {
           kind       = "HelmRepository"
           metadata = {
             name      = "kured"
-            namespace = "monitoring"
+            namespace = local.endpoints.prometheus.namespace
           }
           spec = {
             interval = "15m"
@@ -768,7 +768,7 @@ locals {
           kind       = "HelmRelease"
           metadata = {
             name      = "kured"
-            namespace = "monitoring"
+            namespace = local.endpoints.prometheus.namespace
           }
           spec = {
             interval = "15m"
