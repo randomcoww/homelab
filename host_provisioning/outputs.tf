@@ -1,3 +1,8 @@
+output "ignition_snippets" {
+  value     = local.ignition_snippets
+  sensitive = true
+}
+
 output "ignition" {
   value = {
     for host_key, content in data.ct_config.ignition :

@@ -111,20 +111,11 @@ tofu -chdir=cluster_bootstrap init -upgrade && \
 tofu -chdir=cluster_bootstrap apply
 ```
 
-Create resources on MinIO needed for host provisioning and FluxCD Kustomizations.
+Create resources on MinIO needed for host provisioning and FluxCD Kustomizations. This may also trigger a rolling reboot of hosts managed by Kured.
 
 ```bash
 tofu -chdir=s3_resources init -upgrade && \
 tofu -chdir=s3_resources apply
-```
-
-### Roll out host updates
-
-Trigger rolling reboot of hosts coordinated by `kured`. Nodes occasionally fail to network boot falling back to booting from backup USB disk. `kured` will also attempt to restart nodes in this state.
-
-```bash
-tofu -chdir=rolling_reboot init -upgrade && \
-tofu -chdir=rolling_reboot apply
 ```
 
 ## Service management
@@ -227,6 +218,13 @@ regctl registry set reg.cluster.internal \
 regctl repo ls reg.cluster.internal
 regctl tag ls reg.cluster.internal/${REPO}
 regctl tag delete reg.cluster.internal/${REPO}:${TAG}
+```
+
+Force a rolling reboot of hosts:
+
+```bash
+tofu -chdir=rolling_reboot init -upgrade && \
+tofu -chdir=rolling_reboot apply
 ```
 
 ## Notes

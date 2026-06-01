@@ -6,5 +6,7 @@ module "write-sentinel-file" {
   command = [
     "sudo touch /var/run/reboot-required",
   ]
-  triggers_replace = data.terraform_remote_state.s3.outputs.trigger[each.key]
+  triggers_replace = {
+    always_run = timestamp()
+  }
 }

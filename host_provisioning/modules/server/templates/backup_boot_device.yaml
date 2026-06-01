@@ -14,8 +14,7 @@ systemd:
         [Service]
         Type=oneshot
         RemainAfterExit=yes
-        ExecStart=/usr/bin/systemd-inhibit --what=sleep:shutdown:idle \
-          generate-backup-boot-device.sh
+        ExecStart=/usr/bin/systemd-inhibit --what=sleep:shutdown:idle generate-backup-boot-device.sh
         Restart=on-failure
         RestartSec=30
 
@@ -46,7 +45,7 @@ storage:
           }
           trap cleanup EXIT
 
-          image_url=$(xargs -n1 -a /proc/cmdline | grep ^coreos.live.rootfs_url= | sed -r 's/coreos.live.rootfs_url=(.*)-rootfs(.*)\.img$/\1-iso\2.iso/')
+          image_url=$(xargs -n1 -a /proc/cmdline | grep ^coreos.live.rootfs_url= | sed -r 's/^coreos.live.rootfs_url=(.*)-rootfs(.*)\.img$/\1-iso\2.iso/')
           if [ -z "$image_url" ]; then
             exit 1
           fi
@@ -73,3 +72,24 @@ storage:
           if [ "$backup_ign" != "$current_ign" ]; then
             cat /run/ignition.json | coreos-installer iso ignition embed ${backup_bind_mount_path}/$disk -f
           fi
+
+    - path: /usr/local/bin/reboot-required.sh
+      mode: 0755
+      contents:
+        inline: |
+          #!/bin/bash
+          set -xe -o pipefail
+
+          if [ -f /var/run/reboot-required ]; then
+            exit 0
+          fi
+          if [ -z $(xargs -n1 -a /proc/cmdline | grep ^coreos.live.rootfs_url=) ]; then
+            exit 0
+          fi
+          ipxe_url=$(xargs -n1 -a /proc/cmdline | grep ^ipxe.url= | sed -r 's/^ipxe.url=//')
+          remote_digest=$(curl -fsSL --remove-on-error $ipxe_url | grep ^kernel | xargs -n1 | grep ^digest= | sed -e 's/^digest=//')
+          digest=$(xargs -n1 -a /proc/cmdline | grep ^digest= | sed -e 's/^digest=//')
+          if [ "$remote_digest" != "$digest" ]; then
+            exit 0
+          fi
+          exit 1

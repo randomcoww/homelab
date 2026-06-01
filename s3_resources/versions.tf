@@ -31,5 +31,9 @@ terraform {
       source  = "opentofu/helm"
       version = "3.1.2"
     }
+    ct = {
+      source  = "poseidon/ct"
+      version = "0.14.0"
+    }
   }
 }

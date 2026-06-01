@@ -19,9 +19,7 @@ systemd:
             After=local-fs.target
 
             [Service]
-            ExecStartPre=/usr/bin/mkdir -p \
-              ${cni_bin_path} \
-              ${cni_config_path}
+            ExecStartPre=/usr/bin/mkdir -p ${cni_bin_path} ${cni_config_path}
     - name: kubelet.service
       enabled: true
       dropins:
@@ -36,20 +34,18 @@ systemd:
             Before=generate-backup-boot-device.service
 
             [Service]
-            ExecStartPre=/usr/bin/mkdir -p \
-              ${kubelet_root_path} \
-              ${static_pod_path}
+            ExecStartPre=/usr/bin/mkdir -p ${kubelet_root_path} ${static_pod_path}
             ExecStart=
             ExecStart=/usr/bin/kubelet \
-              --exit-on-lock-contention \
-              --lock-file=/var/run/lock/kubelet.lock \
-              --node-ip=${node_ip} \
-              --cert-dir=${config_path} \
-              --root-dir=${kubelet_root_path} \
-              --bootstrap-kubeconfig=${bootstrap_kubeconfig_path} \
-              --config=${kubelet_config_path} \
-              --kubeconfig=${kubeconfig_path} \
-              --v=2
+            --exit-on-lock-contention \
+            --lock-file=/var/run/lock/kubelet.lock \
+            --node-ip=${node_ip} \
+            --cert-dir=${config_path} \
+            --root-dir=${kubelet_root_path} \
+            --bootstrap-kubeconfig=${bootstrap_kubeconfig_path} \
+            --config=${kubelet_config_path} \
+            --kubeconfig=${kubeconfig_path} \
+            --v=2
     - name: nftables@${name}.service
       enabled: true
     - name: bird.service

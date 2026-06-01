@@ -13,8 +13,7 @@ systemd:
 
             [Service]
             ExecStartPre=
-            ExecStartPre=/usr/bin/mkdir -p \
-              ${bird_path}
+            ExecStartPre=/usr/bin/mkdir -p ${bird_path}
             ExecStartPre=/usr/sbin/bird -p
 
             [Install]
