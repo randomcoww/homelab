@@ -10,104 +10,108 @@ resource "helm_release" "fluxcd-bucket" {
   max_history      = 2
   values = [
     yamlencode({
-      manifests = [
+      manifests = concat([
         module.minio-user-secret-fluxcd.manifest,
         module.minio-tls.manifest,
+        ], [
 
-        yamlencode({
-          apiVersion = "source.toolkit.fluxcd.io/v1"
-          kind       = "Bucket"
-          metadata = {
-            name = "${local.endpoints.fluxcd.name}-bucket"
-            annotations = {
-              "checksum/minio-user-secret" = sha256(module.minio-user-secret-fluxcd.manifest)
-              "checksum/tls"               = sha256(module.minio-tls.manifest)
-            }
-          }
-          spec = {
-            interval = "10s"
-            provider = "generic"
-            endpoint = data.terraform_remote_state.bootstrap.outputs.minio.endpoint
-            secretRef = {
-              name = module.minio-user-secret-fluxcd.name
-            }
-            bucketName = "fluxcd"
-            certSecretRef = {
-              name = module.minio-tls.name
-            }
-          }
-        }),
-
-        # resources that include CRD
-        yamlencode({
-          apiVersion = "kustomize.toolkit.fluxcd.io/v1"
-          kind       = "Kustomization"
-          metadata = {
-            name = "${local.endpoints.fluxcd.name}-bucket-crd"
-          }
-          spec = {
-            interval = "1m"
-            sourceRef = {
-              kind = "Bucket"
+        for _, m in [
+          {
+            apiVersion = "source.toolkit.fluxcd.io/v1"
+            kind       = "Bucket"
+            metadata = {
               name = "${local.endpoints.fluxcd.name}-bucket"
+              annotations = {
+                "checksum/minio-user-secret" = sha256(module.minio-user-secret-fluxcd.manifest)
+                "checksum/tls"               = sha256(module.minio-tls.manifest)
+              }
             }
-            path    = "./crd"
-            prune   = true
-            wait    = true
-            timeout = "5m"
-          }
-        }),
+            spec = {
+              interval = "10s"
+              provider = "generic"
+              endpoint = data.terraform_remote_state.bootstrap.outputs.minio.endpoint
+              secretRef = {
+                name = module.minio-user-secret-fluxcd.name
+              }
+              bucketName = "fluxcd"
+              certSecretRef = {
+                name = module.minio-tls.name
+              }
+            }
+          },
 
-        # lower level services
-        yamlencode({
-          apiVersion = "kustomize.toolkit.fluxcd.io/v1"
-          kind       = "Kustomization"
-          metadata = {
-            name = "${local.endpoints.fluxcd.name}-bucket-system"
-          }
-          spec = {
-            interval = "1m"
-            sourceRef = {
-              kind = "Bucket"
-              name = "${local.endpoints.fluxcd.name}-bucket"
+          # resources that include CRD
+          {
+            apiVersion = "kustomize.toolkit.fluxcd.io/v1"
+            kind       = "Kustomization"
+            metadata = {
+              name = "${local.endpoints.fluxcd.name}-bucket-crd"
             }
-            dependsOn = [
-              {
-                name = "${local.endpoints.fluxcd.name}-bucket-crd"
-              },
-            ]
-            path    = "./system"
-            prune   = true
-            wait    = true
-            timeout = "5m"
-          }
-        }),
+            spec = {
+              interval = "1m"
+              sourceRef = {
+                kind = "Bucket"
+                name = "${local.endpoints.fluxcd.name}-bucket"
+              }
+              path    = "./crd"
+              prune   = true
+              wait    = true
+              timeout = "5m"
+            }
+          },
 
-        # service
-        yamlencode({
-          apiVersion = "kustomize.toolkit.fluxcd.io/v1"
-          kind       = "Kustomization"
-          metadata = {
-            name = "${local.endpoints.fluxcd.name}-bucket-service"
-          }
-          spec = {
-            interval = "1m"
-            sourceRef = {
-              kind = "Bucket"
-              name = "${local.endpoints.fluxcd.name}-bucket"
+          # lower level services
+          {
+            apiVersion = "kustomize.toolkit.fluxcd.io/v1"
+            kind       = "Kustomization"
+            metadata = {
+              name = "${local.endpoints.fluxcd.name}-bucket-system"
             }
-            dependsOn = [
-              {
-                name = "${local.endpoints.fluxcd.name}-bucket-crd"
-              },
-            ]
-            path    = "./service"
-            prune   = true
-            wait    = true
-            timeout = "5m"
-          }
-        }),
-      ]
+            spec = {
+              interval = "1m"
+              sourceRef = {
+                kind = "Bucket"
+                name = "${local.endpoints.fluxcd.name}-bucket"
+              }
+              dependsOn = [
+                {
+                  name = "${local.endpoints.fluxcd.name}-bucket-crd"
+                },
+              ]
+              path    = "./system"
+              prune   = true
+              wait    = true
+              timeout = "5m"
+            }
+          },
+
+          # service
+          {
+            apiVersion = "kustomize.toolkit.fluxcd.io/v1"
+            kind       = "Kustomization"
+            metadata = {
+              name = "${local.endpoints.fluxcd.name}-bucket-service"
+            }
+            spec = {
+              interval = "1m"
+              sourceRef = {
+                kind = "Bucket"
+                name = "${local.endpoints.fluxcd.name}-bucket"
+              }
+              dependsOn = [
+                {
+                  name = "${local.endpoints.fluxcd.name}-bucket-crd"
+                },
+              ]
+              path    = "./service"
+              prune   = true
+              wait    = true
+              timeout = "5m"
+            }
+          },
+        ] :
+        yamlencode(m)
+      ])
     }),
   ]
 }
