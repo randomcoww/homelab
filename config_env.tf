@@ -123,7 +123,7 @@ locals {
     flannel_cni_plugin = "ghcr.io/flannel-io/flannel-cni-plugin:v1.9.1-flannel1@sha256:7c3377e977b4b77b8efdad96e207ebee371537d6dcd7b9c40853cf0c0f0aade3"
     kube_vip           = "ghcr.io/kube-vip/kube-vip:v1.2.0@sha256:fe8c7b6641ba7633a12b337821e9e83a6456e8edc3434f97577058edd4eecaf6"
     minio              = "docker.io/pgsty/minio:RELEASE.2026-04-17T00-00-00Z@sha256:83885c27b3b5b673049e33ddf4029afe2c134fd51ce4309e65e4f39d3b9ca282"
-    nginx              = "docker.io/nginxinc/nginx-unprivileged:1.31.1-alpine@sha256:8122337ed6c475bb486bc9340da453d4599f225e6b920ff0d92ca2267486b9b5"
+    nginx              = "docker.io/nginxinc/nginx-unprivileged:1.31.1-alpine@sha256:02c985e54bee40c14c6de677226f394d96c661944185d407e77ca73602f15e1b"
     # tier 2
     kea           = "ghcr.io/randomcoww/kea:v3.1.8@sha256:c8a721d08af0d3b4bafb64cce1301bbdda5aa824a794f8b5d719383590f3ab60"
     ipxe          = "ghcr.io/randomcoww/ipxe:v2.0.0@sha256:a07e5e353f033791f2f1399e1424d2c3cae7839272d3e062c96dbfbb5c7cdd28"
@@ -142,7 +142,7 @@ locals {
     lldap            = "ghcr.io/lldap/lldap:v0.6.3-alpine-rootless@sha256:ba2c50930ea998eefd5454aa678a7977448019248b1827da87d330df0b71c284"
     authelia         = "ghcr.io/authelia/authelia:4.39.20@sha256:1b363e9279e742397966333f364e0876ae02bf5c876de73e83af6d48c57ff51b"
     cloudflared      = "docker.io/cloudflare/cloudflared:2026.5.2@sha256:12ff5c6992a9863db4da270746af7c244bcaee49353039af8104268a18d6c4f0"
-    sunshine_desktop = "reg.cluster.internal/randomcoww/sunshine-desktop:v2026.518.24409.1779122817@sha256:61023152ddc6f0d52a7d6cb905a1cb7206bf3cd607380e48fd55058bd7b38c4a"
+    sunshine_desktop = "reg.cluster.internal/randomcoww/sunshine-desktop:v2026.531.163415.1780289440@sha256:010a70feffb50308d816207b157407def93c662265c9d2e177e14883bdf88c9b"
     mcp_proxy        = "ghcr.io/tbxark/mcp-proxy:v0.43.2@sha256:70c0e02d39c4c0898e610b3a30954f7930628fa6f4fb447bad14c32382a25879"
     kubernetes_mcp   = "ghcr.io/containers/kubernetes-mcp-server:v0.0.62@sha256:bd7e9ff49b0941ff230508dfceb87162c4a2be67b180c28f5d1b204fc58fa2e9"
     prometheus_mcp   = "ghcr.io/pab1it0/prometheus-mcp-server:1.6.1@sha256:ed91f3f9e4f6fb92c5b8fd48a29f3382c11498de405f59da5eac16398d47d43b"
