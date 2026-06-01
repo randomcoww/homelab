@@ -416,8 +416,8 @@ resource "helm_release" "fluxcd" {
   repository       = "https://fluxcd-community.github.io/helm-charts"
   chart            = "flux2"
   create_namespace = true
-  wait             = true
-  wait_for_jobs    = true
+  wait             = false
+  wait_for_jobs    = false
   version          = "2.18.4"
   timeout          = local.kubernetes.helm_release_timeout
   max_history      = 2
