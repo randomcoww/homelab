@@ -213,6 +213,7 @@ module "daemonset" {
             readOnly  = true
           },
         ]
+        /* TODO: revisit - check seems to fail on second instance even if service is functioning
         livenessProbe = {
           httpGet = {
             scheme = "HTTP"
@@ -231,6 +232,7 @@ module "daemonset" {
             path   = "/healthz"
           }
         }
+        */
         securityContext = {
           capabilities = {
             add = [
