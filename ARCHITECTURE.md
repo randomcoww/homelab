@@ -1,6 +1,6 @@
 # Homelab Architecture
 
-This document describes the high-level architecture of the Kubernetes homelab provisioning system.
+This document describes the high-level architecture of the Kubernetes homelab provisioning system. This is an AI summary and is mostly accurate.
 
 ## Overview
 
