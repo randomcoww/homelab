@@ -125,8 +125,8 @@ locals {
     minio              = "docker.io/pgsty/minio:RELEASE.2026-04-17T00-00-00Z@sha256:83885c27b3b5b673049e33ddf4029afe2c134fd51ce4309e65e4f39d3b9ca282"
     nginx              = "docker.io/nginxinc/nginx-unprivileged:1.31.1-alpine@sha256:02c985e54bee40c14c6de677226f394d96c661944185d407e77ca73602f15e1b"
     # tier 2
-    kea           = "ghcr.io/randomcoww/kea:v3.1.8@sha256:c8a721d08af0d3b4bafb64cce1301bbdda5aa824a794f8b5d719383590f3ab60"
-    ipxe          = "ghcr.io/randomcoww/ipxe:v2.0.0@sha256:a07e5e353f033791f2f1399e1424d2c3cae7839272d3e062c96dbfbb5c7cdd28"
+    kea           = "reg.cluster.internal/randomcoww/kea:v3.1.8.1779725598@sha256:c8a721d08af0d3b4bafb64cce1301bbdda5aa824a794f8b5d719383590f3ab60"
+    ipxe          = "reg.cluster.internal/randomcoww/ipxe:v2.0.0.1779726098@sha256:a07e5e353f033791f2f1399e1424d2c3cae7839272d3e062c96dbfbb5c7cdd28"
     registry      = "ghcr.io/distribution/distribution:3.1.1@sha256:bca24727f4002e51f959c18c42e816e4d1078198081a9837e16b8b7d7e43ebf8"
     device_plugin = "ghcr.io/squat/generic-device-plugin:0.2.0@sha256:66c8d5c270eb2b721f1064c549b9b7898152a6d2f0163380a5d37dc7636c20ff"
     gha_runner    = "ghcr.io/actions/actions-runner:2.334.0@sha256:b6614fce332517f74d0a76e7c762fb08e4f2ff13dcf333183397c8a5725b6e8e"
