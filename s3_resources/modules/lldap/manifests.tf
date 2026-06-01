@@ -139,6 +139,12 @@ module "litestream-overlay" {
   s3_access_secret = module.minio-user-secret.name
 
   template_spec = {
+    securityContext = {
+      # run litestream as same uid/gid as lldap
+      runAsUser  = 1000
+      runAsGroup = 1000
+      fsGroup    = 1000
+    }
     resources = {
       requests = {
         memory = "128Mi"
@@ -287,7 +293,7 @@ module "minio-user-secret" {
   name      = "${var.name}-minio-user-secret"
   namespace = var.namespace
   app       = var.name
-  release   = "0.1.0"
+  release   = var.release
   data = merge({
     AWS_ACCESS_KEY_ID     = var.minio_user.id
     AWS_SECRET_ACCESS_KEY = var.minio_user.secret
