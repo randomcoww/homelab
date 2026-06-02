@@ -48,11 +48,12 @@ locals {
       mtu           = 1500
       enable_netnum = true
       netnums = {
-        apiserver   = 2
-        k8s_gateway = 31
-        minio       = 34
-        registry    = 35 # used by hosts without access to cluster DNS
-        gateway_api = 36
+        apiserver        = 2
+        k8s_gateway      = 31
+        minio            = 34
+        registry         = 35 # used by hosts without access to cluster DNS
+        gateway_api      = 36
+        sunshine_desktop = 37
       }
     }
     # Conntrack sync

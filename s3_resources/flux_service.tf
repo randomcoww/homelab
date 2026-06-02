@@ -893,6 +893,7 @@ module "sunshine-desktop" {
     #   ]
     # }
   }
+  service_ip       = local.services.sunshine_desktop.ip
   service_hostname = local.endpoints.sunshine_desktop.service
   ingress_hostname = local.endpoints.sunshine_desktop.ingress
   gateway_ref = {

@@ -130,7 +130,7 @@ module "service" {
   release   = var.release
   annotations = {
     "external-dns.alpha.kubernetes.io/hostname" = var.service_hostname
-    "kube-vip.io/loadbalancerIPs"               = "0.0.0.0"
+    "kube-vip.io/loadbalancerIPs"               = var.service_ip
   }
   spec = {
     type              = "LoadBalancer"
