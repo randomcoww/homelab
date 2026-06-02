@@ -1045,16 +1045,16 @@ locals {
       yamlencode(m)
     ]
 
-    lldap     = module.lldap.manifests
-    authelia  = concat(module.authelia-valkey.manifests, module.authelia.manifests)
-    llama-cpp = module.llama-cpp.manifests
-    # sunshine-desktop = module.sunshine-desktop.manifests
-    searxng    = module.searxng.manifests
-    open-webui = module.open-webui.manifests
-    hostapd    = concat(module.hostapd.manifests, module.qrcode-hostapd.manifests)
-    stump      = module.stump.manifests
-    gha-runner = module.gha-runner.manifests
-    navidrome  = module.navidrome.manifests
-    mcp-proxy  = module.mcp-proxy.manifests
+    lldap            = module.lldap.manifests
+    authelia         = concat(module.authelia-valkey.manifests, module.authelia.manifests)
+    llama-cpp        = module.llama-cpp.manifests
+    sunshine-desktop = module.sunshine-desktop.manifests
+    searxng          = module.searxng.manifests
+    open-webui       = module.open-webui.manifests
+    hostapd          = concat(module.hostapd.manifests, module.qrcode-hostapd.manifests)
+    stump            = module.stump.manifests
+    gha-runner       = module.gha-runner.manifests
+    navidrome        = module.navidrome.manifests
+    mcp-proxy        = module.mcp-proxy.manifests
   }
 }

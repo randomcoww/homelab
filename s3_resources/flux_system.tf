@@ -166,6 +166,21 @@ module "device-plugin" {
         },
       ]
     }),
+    "--device",
+    yamlencode({
+      name = "dri"
+      groups = [
+        {
+          count = 8
+          paths = [
+            {
+              path = "/dev/dri"
+              type = "Mount"
+            },
+          ]
+        },
+      ]
+    }),
   ]
   kubelet_root_path = local.kubernetes.kubelet_root_path
 }

@@ -447,18 +447,20 @@ module "statefulset" {
         }
         resources = {
           requests = {
-            "amd.com/gpu"     = 1
+            # "amd.com/gpu"     = 1
             "devic.es/ntsync" = 1
             "devic.es/input"  = 1
             "devic.es/uinput" = 1
             "devic.es/tty"    = 1
+            "devic.es/dri"    = 1
           }
           limits = {
-            "amd.com/gpu"     = 1
+            # "amd.com/gpu"     = 1
             "devic.es/ntsync" = 1
             "devic.es/input"  = 1
             "devic.es/uinput" = 1
             "devic.es/tty"    = 1
+            "devic.es/dri"    = 1
           }
         }
         securityContext = var.security_context
