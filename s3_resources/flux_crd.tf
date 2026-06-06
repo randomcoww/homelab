@@ -760,6 +760,49 @@ module "prometheus" {
             },
           ]
         },
+        {
+          name = "kube-vip"
+          rules = [
+            {
+              alert = "KubeVIPDown"
+              expr  = <<-EOF
+              sum(up{app="kube-vip",namespace="kube-system"}) < 2
+              or
+              sum(kube_vip_manager_bgp_session_info{app="kube-vip",namespace="kube-system",state!="ESTABLISHED"}) > 0
+              or
+              absent(up{app="kube-vip",namespace="kube-system"})
+              EOF
+              for   = "90s"
+              labels = {
+                severity = "critical"
+              }
+              annotations = {
+                summary     = "kube-vip BGP is down on node"
+                description = <<-EOF
+                kube-vip BGP is down.
+                Nodes affected: {{ $labels.node }}
+                EOF
+              }
+            },
+            {
+              alert = "KubeVIPStateFlapping"
+              expr  = <<-EOF
+              changes(kube_vip_manager_bgp_session_info{app="kube-vip",namespace="kube-system"}[15m]) > 3
+              EOF
+              for   = "0m"
+              labels = {
+                severity = "warning"
+              }
+              annotations = {
+                summary     = "kube-vip BGP state flapping"
+                description = <<-EOF
+                kube-vip BGP state on {{ $labels.node }} has changed {{ $value }} times in 15 minutes.
+                Possible crash-loop or configuration reload issues.
+                EOF
+              }
+            },
+          ]
+        },
       ]
     }
   }
