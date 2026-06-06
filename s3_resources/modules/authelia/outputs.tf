@@ -341,6 +341,37 @@ output "manifests" {
                       readOnly  = true
                     },
                   ]
+                  livenessProbe = {
+                    exec = {
+                      command = [
+                        "sh",
+                        "-c",
+                        <<-EOF
+                        if ! litestream status -config ${local.authelia_litestream_config_file} | tail -n +2 | awk '{print $2}' | grep -qv 'ok'; then
+                          exit 0
+                        fi
+                        exit 1
+                        EOF
+                      ]
+                    }
+                    timeoutSeconds = 2
+                  }
+                  startupProbe = {
+                    exec = {
+                      command = [
+                        "sh",
+                        "-c",
+                        <<-EOF
+                        if ! litestream status -config ${local.authelia_litestream_config_file} | tail -n +2 | awk '{print $2}' | grep -qv 'ok'; then
+                          exit 0
+                        fi
+                        exit 1
+                        EOF
+                      ]
+                    }
+                    periodSeconds    = 2
+                    failureThreshold = 12
+                  }
                   resources = {
                     requests = {
                       memory = "1Gi"
