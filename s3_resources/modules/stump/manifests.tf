@@ -147,7 +147,21 @@ module "litestream-overlay" {
             }
           }
         ])
-        # TODO: add healthchecks
+        livenessProbe = {
+          httpGet = {
+            port = local.extra_configs.STUMP_PORT
+            path = "/api/v2/ping"
+          }
+          timeoutSeconds   = 4
+          failureThreshold = 6
+        }
+        readinessProbe = {
+          httpGet = {
+            port = local.extra_configs.STUMP_PORT
+            path = "/api/v2/ping"
+          }
+          timeoutSeconds = 4
+        }
       },
     ]
     volumes = [
