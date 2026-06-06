@@ -95,14 +95,22 @@ output "template_spec" {
         startupProbe = {
           exec = {
             command = [
-              "/usr/bin/mountpoint",
+              "mountpoint",
               local.mount_path_internal,
             ]
           }
           periodSeconds    = 2
           failureThreshold = 12
         }
-        # TODO: add health checks
+        livenessProbe = {
+          exec = {
+            command = [
+              "stat",
+              local.mount_path_internal,
+            ]
+          }
+          timeoutSeconds = 4
+        }
       },
       ], [
       for _, container in lookup(var.template_spec, "initContainers", []) :
