@@ -123,7 +123,7 @@ output "template_spec" {
               "sh",
               "-c",
               <<-EOF
-              if ! litestream status -config ${local.config_file} | tail -n +2 | awk '{print $2}' | grep -qv 'ok'; then
+              if ! litestream status -config ${local.config_file} | tail -n +2 | awk '{print $2}' | grep -q 'error'; then
                 exit 0
               fi
               exit 1
@@ -138,7 +138,7 @@ output "template_spec" {
               "sh",
               "-c",
               <<-EOF
-              if ! litestream status -config ${local.config_file} | tail -n +2 | awk '{print $2}' | grep -qv 'ok'; then
+              if ! litestream status -config ${local.config_file} | tail -n +2 | awk '{print $2}' | grep -q 'error'; then
                 exit 0
               fi
               exit 1
