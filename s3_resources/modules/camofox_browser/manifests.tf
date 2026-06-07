@@ -1,6 +1,6 @@
 locals {
   config = merge(var.extra_configs, {
-    CAMOFOX_PORT                       = 8080
+    CAMOFOX_PORT                       = 9377
     MAX_OLD_SPACE_SIZE                 = 2048
     MOZ_DISABLE_CONTENT_SANDBOX        = 1
     MOZ_DISABLE_SOCKET_PROCESS_SANDBOX = 1

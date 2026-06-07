@@ -213,6 +213,7 @@ locals {
     bgp_as                 = 65005
   }
 
+  domain_regex = "(?<hostname>(?<subdomain>[a-z0-9-*]+)\\.(?<domain>[a-z0-9.-]+))(?::(?<port>\\d+))?"
   domains = {
     kubernetes = "cluster.internal"
     public     = "fuzzybunny.win"
@@ -341,6 +342,9 @@ locals {
       cert_manager = {
         name      = "cert-manager"
         namespace = "cert-manager"
+      }
+      camofox_browser = {
+        name = "camofox"
       }
     } :
     name => merge(e, {
