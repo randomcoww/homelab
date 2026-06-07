@@ -501,6 +501,32 @@ module "mcp-proxy" {
   }
 }
 
+resource "random_password" "camofox-browser-auth-token" {
+  length           = 32
+  override_special = "-_"
+}
+
+module "camofox-browser" {
+  source    = "./modules/camofox_browser"
+  name      = local.endpoints.camofox_browser.name
+  namespace = local.endpoints.camofox_browser.namespace
+  images = {
+    camofox_browser = local.container_images_digest.camofox_browser
+  }
+  extra_configs = {
+    PROXY_HOST         = regex(local.domain_regex, var.scrape_proxy_server).hostname
+    PROXY_PORT         = regex(local.domain_regex, var.scrape_proxy_server).port
+    PROXY_USERNAME     = var.scrape_proxy_username
+    PROXY_PASSWORD     = var.scrape_proxy_password
+    CAMOFOX_ACCESS_KEY = random_password.camofox-browser-auth-token.result
+  }
+  ingress_hostname = local.endpoints.camofox_browser.ingress
+  gateway_ref = {
+    name      = local.endpoints.camofox_browser.name
+    namespace = local.endpoints.camofox_browser.namespace
+  }
+}
+
 module "open-webui" {
   source    = "./modules/open_webui"
   name      = local.endpoints.open_webui.name
@@ -1050,6 +1076,7 @@ locals {
     authelia         = concat(module.authelia-valkey.manifests, module.authelia.manifests)
     llama-cpp        = module.llama-cpp.manifests
     sunshine-desktop = module.sunshine-desktop.manifests
+    camofox-browser  = module.camofox-browser.manifests
     searxng          = module.searxng.manifests
     open-webui       = module.open-webui.manifests
     hostapd          = concat(module.hostapd.manifests, module.qrcode-hostapd.manifests)
