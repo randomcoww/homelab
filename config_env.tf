@@ -138,7 +138,7 @@ locals {
     qrcode_generator = "reg.cluster.internal/randomcoww/qrcode-resource:v1780341527@sha256:fb94024b5c95e2a3f34f356b41c70aba26271099ffcc93f6c44fbcdf09453ac8"
     llama_cpp_vulkan = "ghcr.io/mostlygeek/llama-swap:unified-vulkan@sha256:0fbfe13fb2d4b975a03b396c8f85423e25bbb46ab59ab8c02d1ce37ab9a6c6c1"
     litestream       = "docker.io/litestream/litestream:0.5.11@sha256:79e3bfce6ed758722916f816b028fffd9e0a971058f41b88e2779510cead1d8d"
-    searxng          = "ghcr.io/searxng/searxng:latest@sha256:283c3f8dcd55997c52d08cd491eea7b71012873c31879456260c85ec4fe7c198"
+    searxng          = "ghcr.io/searxng/searxng:latest@sha256:e4fade70be2f6a985178de7158c96fdb98d897500c548b3afc6e2033cf1c11e3"
     open_webui       = "ghcr.io/open-webui/open-webui:v0.9.6@sha256:90eae5b419e40b4c3dd684582b2c83440b36f9ae2f6532c09639b2ba4ee65158"
     lldap            = "ghcr.io/lldap/lldap:v0.6.3-alpine-rootless@sha256:ba2c50930ea998eefd5454aa678a7977448019248b1827da87d330df0b71c284"
     authelia         = "ghcr.io/authelia/authelia:4.39.20@sha256:1b363e9279e742397966333f364e0876ae02bf5c876de73e83af6d48c57ff51b"
