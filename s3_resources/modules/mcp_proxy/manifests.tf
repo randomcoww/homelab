@@ -1,15 +1,13 @@
 locals {
   proxy_config_file = "/var/lib/mcp-proxy/config.json"
-  domain_regex      = "(?<hostname>(?<subdomain>[a-z0-9-*]+)\\.(?<domain>[a-z0-9.-]+))(?::(?<port>\\d+))?"
 
   ports = {
-    service         = 8086
-    kubernetes_mcp  = 8081
-    prometheus_mcp  = 8082
-    searxng_mcp     = 8083
-    camofox_browser = 8084
-    camofox_mcp     = 8085
-    searxng_mcp     = 8087
+    service        = 8086
+    kubernetes_mcp = 8081
+    prometheus_mcp = 8082
+    searxng_mcp    = 8083
+    camofox_mcp    = 8085
+    searxng_mcp    = 8087
   }
 }
 
@@ -75,10 +73,6 @@ module "secret" {
         }
       }
     })
-    PROXY_HOST     = regex(local.domain_regex, var.scrape_proxy.server).hostname
-    PROXY_PORT     = regex(local.domain_regex, var.scrape_proxy.server).port
-    PROXY_USERNAME = var.scrape_proxy.username
-    PROXY_PASSWORD = var.scrape_proxy.password
   }
 }
 
@@ -178,88 +172,6 @@ module "deployment" {
       },
       # camofox-mcp
       {
-        name          = "${var.name}-camofox-browser"
-        image         = var.images.camofox_browser
-        restartPolicy = "Always"
-        env = [
-          {
-            name  = "CAMOFOX_PORT"
-            value = tostring(local.ports.camofox_browser)
-          },
-          {
-            name = "PROXY_HOST"
-            valueFrom = {
-              secretKeyRef = {
-                name = module.secret.name
-                key  = "PROXY_HOST"
-              }
-            }
-          },
-          {
-            name  = "MAX_OLD_SPACE_SIZE"
-            value = "2048"
-          },
-          {
-            name = "PROXY_PORT"
-            valueFrom = {
-              secretKeyRef = {
-                name = module.secret.name
-                key  = "PROXY_PORT"
-              }
-            }
-          },
-          {
-            name = "PROXY_USERNAME"
-            valueFrom = {
-              secretKeyRef = {
-                name = module.secret.name
-                key  = "PROXY_USERNAME"
-              }
-            }
-          },
-          {
-            name = "PROXY_PASSWORD"
-            valueFrom = {
-              secretKeyRef = {
-                name = module.secret.name
-                key  = "PROXY_PASSWORD"
-              }
-            }
-          },
-          {
-            name  = "MOZ_DISABLE_CONTENT_SANDBOX"
-            value = "1"
-          },
-          {
-            name  = "MOZ_DISABLE_SOCKET_PROCESS_SANDBOX"
-            value = "1"
-          },
-          {
-            name  = "MOZ_DISABLE_RDD_SANDBOX"
-            value = "1"
-          },
-          {
-            name  = "MOZ_DISABLE_GMP_SANDBOX"
-            value = "1"
-          },
-          {
-            name  = "MOZ_DISABLE_UTILITY_SANDBOX"
-            value = "1"
-          },
-          {
-            name  = "MOZ_DISABLE_NPAPI_SANDBOX"
-            value = "1"
-          },
-        ]
-        volumeMounts = [
-          {
-            name      = "dev-shm"
-            mountPath = "/dev/shm"
-          },
-        ]
-        # TODO: add healthchecks
-      },
-      {
         name          = "${var.name}-camofox-mcp"
         image         = var.images.camofox_mcp
         restartPolicy = "Always"
@@ -270,7 +182,7 @@ module "deployment" {
           },
           {
             name  = "CAMOFOX_URL"
-            value = "http://127.0.0.1:${local.ports.camofox_browser}"
+            value = "https://${var.camofox_endpoint}"
           },
           {
             name  = "CAMOFOX_HTTP_HOST"
@@ -279,6 +191,10 @@ module "deployment" {
           {
             name  = "CAMOFOX_HTTP_PORT"
             value = tostring(local.ports.camofox_mcp)
+          },
+          {
+            name  = "CAMOFOX_API_KEY"
+            value = var.camofox_api_key
           },
         ]
         # TODO: add healthchecks
@@ -401,13 +317,6 @@ module "deployment" {
         hostPath = {
           path = "/etc/ssl/certs/ca-certificates.crt"
           type = "File"
-        }
-      },
-      {
-        name = "dev-shm"
-        emptyDir = {
-          medium    = "Memory"
-          sizeLimit = "2Gi"
         }
       },
       {

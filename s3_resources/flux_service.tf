@@ -468,39 +468,6 @@ module "searxng" {
   }
 }
 
-resource "random_password" "mcp-auth-token" {
-  length           = 32
-  override_special = "-_"
-}
-
-module "mcp-proxy" {
-  source    = "./modules/mcp_proxy"
-  name      = local.endpoints.mcp_proxy.name
-  namespace = local.endpoints.mcp_proxy.namespace
-  images = {
-    mcp_proxy       = local.container_images_digest.mcp_proxy
-    prometheus_mcp  = local.container_images_digest.prometheus_mcp
-    kubernetes_mcp  = local.container_images_digest.kubernetes_mcp
-    searxng_mcp     = local.container_images_digest.searxng_mcp
-    camofox_mcp     = local.container_images_digest.camofox_mcp
-    camofox_browser = local.container_images_digest.camofox_browser
-  }
-  replicas            = 1
-  searxng_endpoint    = local.endpoints.searxng.ingress
-  prometheus_endpoint = local.endpoints.prometheus.ingress
-  scrape_proxy = {
-    server   = var.scrape_proxy_server
-    username = var.scrape_proxy_username
-    password = var.scrape_proxy_password
-  }
-  ingress_hostname = local.endpoints.mcp_proxy.ingress
-  auth_token       = random_password.mcp-auth-token.result
-  gateway_ref = {
-    name      = local.endpoints.traefik.name
-    namespace = local.endpoints.traefik.namespace
-  }
-}
-
 resource "random_password" "camofox-browser-auth-token" {
   length           = 32
   override_special = "-_"
@@ -522,8 +489,38 @@ module "camofox-browser" {
   }
   ingress_hostname = local.endpoints.camofox_browser.ingress
   gateway_ref = {
-    name      = local.endpoints.camofox_browser.name
-    namespace = local.endpoints.camofox_browser.namespace
+    name      = local.endpoints.traefik.name
+    namespace = local.endpoints.traefik.namespace
+  }
+}
+
+resource "random_password" "mcp-auth-token" {
+  length           = 32
+  override_special = "-_"
+}
+
+module "mcp-proxy" {
+  source    = "./modules/mcp_proxy"
+  name      = local.endpoints.mcp_proxy.name
+  namespace = local.endpoints.mcp_proxy.namespace
+  images = {
+    mcp_proxy      = local.container_images_digest.mcp_proxy
+    prometheus_mcp = local.container_images_digest.prometheus_mcp
+    kubernetes_mcp = local.container_images_digest.kubernetes_mcp
+    searxng_mcp    = local.container_images_digest.searxng_mcp
+    camofox_mcp    = local.container_images_digest.camofox_mcp
+  }
+  replicas            = 1
+  searxng_endpoint    = local.endpoints.searxng.ingress
+  prometheus_endpoint = local.endpoints.prometheus.ingress
+  camofox_endpoint    = local.endpoints.camofox_browser.ingress
+  camofox_api_key     = random_password.camofox-browser-auth-token.result
+
+  ingress_hostname = local.endpoints.mcp_proxy.ingress
+  auth_token       = random_password.mcp-auth-token.result
+  gateway_ref = {
+    name      = local.endpoints.traefik.name
+    namespace = local.endpoints.traefik.namespace
   }
 }
 

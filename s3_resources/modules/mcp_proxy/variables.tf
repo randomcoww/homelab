@@ -22,20 +22,11 @@ variable "affinity" {
 
 variable "images" {
   type = object({
-    mcp_proxy       = string
-    prometheus_mcp  = string
-    kubernetes_mcp  = string
-    searxng_mcp     = string
-    camofox_mcp     = string
-    camofox_browser = string
-  })
-}
-
-variable "scrape_proxy" {
-  type = object({
-    server   = string
-    username = string
-    password = string
+    mcp_proxy      = string
+    prometheus_mcp = string
+    kubernetes_mcp = string
+    searxng_mcp    = string
+    camofox_mcp    = string
   })
 }
 
@@ -48,6 +39,14 @@ variable "prometheus_endpoint" {
 }
 
 variable "searxng_endpoint" {
+  type = string
+}
+
+variable "camofox_endpoint" {
+  type = string
+}
+
+variable "camofox_api_key" {
   type = string
 }
 
