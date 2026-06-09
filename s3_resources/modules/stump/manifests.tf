@@ -114,7 +114,7 @@ module "litestream-overlay" {
       },
     ]
   }
-  sqlite_path      = local.db_file
+  mount_path       = dirname(local.db_file)
   s3_access_secret = module.minio-user-secret.name
 
   template_spec = {

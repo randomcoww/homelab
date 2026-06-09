@@ -34,7 +34,7 @@ variable "litestream_config" {
   type = any
 }
 
-variable "sqlite_path" {
+variable "mount_path" {
   type = string
 }
 

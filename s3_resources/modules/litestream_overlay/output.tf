@@ -7,8 +7,9 @@ output "additional_manifests" {
 output "template_spec" {
   value = merge(var.template_spec, {
     initContainers = concat([
+      for i, db in var.litestream_config.dbs :
       {
-        name  = "${var.name}-litestream-restore"
+        name  = "${var.name}-litestream-restore-${i}"
         image = var.images.litestream
         args = [
           "restore",
@@ -16,7 +17,7 @@ output "template_spec" {
           "-if-replica-exists",
           "-config",
           local.config_file,
-          var.sqlite_path,
+          db.path,
         ]
         env = [
           {
@@ -54,7 +55,7 @@ output "template_spec" {
           },
           {
             name      = "${var.name}-litestream-data"
-            mountPath = dirname(var.sqlite_path)
+            mountPath = var.mount_path
           },
           {
             name      = "${var.name}-litestream-ca-trust-bundle"
@@ -62,7 +63,8 @@ output "template_spec" {
             readOnly  = true
           },
         ]
-      },
+      }
+      ], [
       {
         name          = "${var.name}-litestream-replicate"
         image         = var.images.litestream
@@ -108,7 +110,7 @@ output "template_spec" {
           },
           {
             name      = "${var.name}-litestream-data"
-            mountPath = dirname(var.sqlite_path)
+            mountPath = var.mount_path
           },
           {
             name      = "${var.name}-litestream-ca-trust-bundle"
@@ -155,7 +157,7 @@ output "template_spec" {
         volumeMounts = concat(lookup(container, "volumeMounts", []), [
           {
             name      = "${var.name}-litestream-data"
-            mountPath = dirname(var.sqlite_path)
+            mountPath = var.mount_path
           },
         ])
       })
@@ -166,7 +168,7 @@ output "template_spec" {
         volumeMounts = concat(lookup(container, "volumeMounts", []), [
           {
             name      = "${var.name}-litestream-data"
-            mountPath = dirname(var.sqlite_path)
+            mountPath = var.mount_path
           },
         ])
       })

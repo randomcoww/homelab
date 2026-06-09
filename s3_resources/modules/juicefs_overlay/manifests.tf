@@ -29,14 +29,15 @@ module "litestream-overlay" {
           sync-interval = "1s"
           part-size     = "50MB"
           concurrency   = 10
+          auto-recover  = true
         }
       },
     ]
   }
-
-  sqlite_path      = local.db_path
+  mount_path       = local.cache_path
   s3_access_secret = var.minio_access_secret
-  template_spec    = var.template_spec
+
+  template_spec = var.template_spec
 }
 
 /*

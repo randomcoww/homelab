@@ -123,11 +123,12 @@ module "litestream-overlay" {
           sync-interval = "1s"
           part-size     = "50MB"
           concurrency   = 10
+          auto-recover  = true
         }
       },
     ]
   }
-  sqlite_path      = local.db_file
+  mount_path       = dirname(local.db_file)
   s3_access_secret = module.minio-user-secret.name
 
   template_spec = {

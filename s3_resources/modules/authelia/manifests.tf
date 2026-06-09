@@ -58,6 +58,9 @@ module "secret" {
   release   = var.release
   data = merge({
     "litestream" = yamlencode({
+      retention = {
+        enabled = true
+      }
       dbs = [
         {
           path                = local.authelia_db_file
@@ -71,6 +74,7 @@ module "secret" {
             sync-interval = "1s"
             part-size     = "50MB"
             concurrency   = 10
+            auto-recover  = true
           }
         },
       ]

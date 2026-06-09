@@ -4,7 +4,6 @@ locals {
     API_SERVER_HOST = "0.0.0.0"
     API_SERVER_PORT = 8642
   })
-  db_file   = "${local.extra_envs.HERMES_HOME}/state.db"
   data_path = "/opt/data-persist"
   tmp_path  = "/opt/data-tmp"
   uid       = 10000
@@ -96,23 +95,29 @@ module "litestream-overlay" {
   }
   litestream_config = {
     dbs = [
+      for _, db in [
+        "state.db",
+        "kanban.db",
+        "response_store.db",
+      ] :
       {
-        path                = local.db_file
+        path                = "${local.extra_envs.HERMES_HOME}/${db}"
         monitor-interval    = "1s"
         checkpoint-interval = "60s"
         replica = {
           type          = "s3"
           endpoint      = var.minio_endpoint
           bucket        = var.minio_bucket
-          path          = "$POD_NAME/litestream"
+          path          = "$POD_NAME/${db}"
           sync-interval = "1s"
           part-size     = "50MB"
           concurrency   = 10
+          auto-recover  = true
         }
-      },
+      }
     ]
   }
-  sqlite_path      = local.db_file
+  mount_path       = local.extra_envs.HERMES_HOME
   s3_access_secret = module.minio-user-secret.name
 
   template_spec = {

@@ -9,7 +9,11 @@ module "secret" {
   app       = var.app
   release   = var.release
   data = {
-    "config.yaml" = yamlencode(var.litestream_config)
+    "config.yaml" = yamlencode(merge({
+      retention = {
+        enabled = true
+      }
+    }, var.litestream_config))
   }
 }
 
