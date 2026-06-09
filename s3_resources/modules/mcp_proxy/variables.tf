@@ -46,10 +46,6 @@ variable "camofox_endpoint" {
   type = string
 }
 
-variable "camofox_api_key" {
-  type = string
-}
-
 variable "ingress_hostname" {
   type = string
 }

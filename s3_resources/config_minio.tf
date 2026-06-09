@@ -200,6 +200,27 @@ locals {
         ]
       }
 
+      # hermes agent
+      hermes_agent = {
+        name      = local.endpoints.hermes_agent.name
+        namespace = local.endpoints.hermes_agent.namespace
+        policies = [
+          {
+            Effect = "Allow"
+            Action = [
+              "s3:GetObject",
+              "s3:PutObject",
+              "s3:ListBucket",
+              "s3:DeleteObject",
+              "s3:AbortMultipartUpload",
+            ]
+            buckets = [
+              "hermes-agent",
+            ]
+          },
+        ]
+      }
+
     } :
 
     key => merge(params, {

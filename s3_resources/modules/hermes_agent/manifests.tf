@@ -1,0 +1,288 @@
+locals {
+  extra_envs = merge(var.extra_envs, {
+    HERMES_HOME     = "/opt/data"
+    API_SERVER_HOST = "0.0.0.0"
+    API_SERVER_PORT = 8642
+  })
+  db_file   = "${local.extra_envs.HERMES_HOME}/state.db"
+  data_path = "/opt/data-persist"
+  tmp_path  = "/opt/data-tmp"
+  uid       = 10000
+  gid       = 10000
+}
+
+module "secret" {
+  source    = "../../../modules/secret"
+  name      = var.name
+  namespace = var.namespace
+  app       = var.name
+  release   = var.release
+  data = {
+    "config.yaml" = yamlencode(var.extra_configs)
+    ".env"        = <<-EOF
+%{~for k, v in local.extra_envs~}
+${k}=${v}
+
+%{~endfor~}
+    EOF
+    "SOUL.md"     = var.soul
+  }
+}
+
+module "service" {
+  source    = "../../../modules/service"
+  name      = var.name
+  namespace = var.namespace
+  app       = var.name
+  release   = var.release
+  spec = {
+    type = "ClusterIP"
+    ports = [
+      {
+        name       = var.name
+        port       = local.extra_envs.API_SERVER_PORT
+        protocol   = "TCP"
+        targetPort = local.extra_envs.API_SERVER_PORT
+      },
+    ]
+  }
+}
+
+module "httproute" {
+  source    = "../../../modules/httproute"
+  name      = var.name
+  namespace = var.namespace
+  app       = var.name
+  release   = var.release
+  spec = {
+    parentRefs = [
+      merge({
+        kind = "Gateway"
+      }, var.gateway_ref),
+    ]
+    hostnames = [
+      var.ingress_hostname,
+    ]
+    rules = [
+      {
+        matches = [
+          {
+            path = {
+              type  = "PathPrefix"
+              value = "/"
+            }
+          },
+        ]
+        backendRefs = [
+          {
+            name = module.service.name
+            port = local.extra_envs.API_SERVER_PORT
+          },
+        ]
+      },
+    ]
+  }
+}
+
+module "litestream-overlay" {
+  source = "../litestream_overlay"
+
+  name      = var.name
+  namespace = var.namespace
+  app       = var.name
+  release   = var.release
+  images = {
+    litestream = var.images.litestream
+  }
+  litestream_config = {
+    dbs = [
+      {
+        path                = local.db_file
+        monitor-interval    = "1s"
+        checkpoint-interval = "60s"
+        replica = {
+          type          = "s3"
+          endpoint      = var.minio_endpoint
+          bucket        = var.minio_bucket
+          path          = "$POD_NAME/litestream"
+          sync-interval = "1s"
+          part-size     = "50MB"
+          concurrency   = 10
+        }
+      },
+    ]
+  }
+  sqlite_path      = local.db_file
+  s3_access_secret = module.minio-user-secret.name
+
+  template_spec = {
+    securityContext = {
+      # uid/gid of hermes
+      fsGroup = local.gid
+    }
+    resources = {
+      requests = {
+        memory = "6Gi"
+      }
+      limits = {
+        memory = "6Gi"
+      }
+    }
+    containers = [
+      {
+        name  = var.name
+        image = var.images.hermes_agent
+        command = [
+          "bash",
+          "-c",
+          <<-EOF
+          set -xe
+
+          mkdir -p \
+            ${local.data_path}/sessions \
+            ${local.data_path}/memories \
+            ${local.data_path}/cache \
+            ${local.data_path}/skills \
+            ${local.data_path}/pairing \
+            ${local.data_path}/workspace
+
+          ln -sf ${local.data_path}/* \
+            ${local.extra_envs.HERMES_HOME}/
+          cp -rfL ${local.tmp_path}/. \
+            ${local.extra_envs.HERMES_HOME}/
+          chown -R ${local.uid}:${local.gid} \
+            ${local.extra_envs.HERMES_HOME}
+
+          exec /init /opt/hermes/docker/main-wrapper.sh gateway run
+          EOF
+        ]
+        volumeMounts = [
+          {
+            name      = "ca-trust-bundle"
+            mountPath = "/etc/ssl/certs/ca-certificates.crt"
+            readOnly  = true
+          },
+          {
+            name      = "config"
+            mountPath = "${local.tmp_path}/.env"
+            subPath   = ".env"
+          },
+          {
+            name      = "config"
+            mountPath = "${local.tmp_path}/config.yaml"
+            subPath   = "config.yaml"
+          },
+          {
+            name      = "config"
+            mountPath = "${local.tmp_path}/SOUL.md"
+            subPath   = "SOUL.md"
+          },
+        ]
+        ports = [
+          {
+            containerPort = local.extra_envs.API_SERVER_PORT
+          },
+        ]
+      },
+    ]
+    volumes = [
+      {
+        name = "ca-trust-bundle"
+        hostPath = {
+          path = "/etc/ssl/certs/ca-certificates.crt"
+          type = "File"
+        }
+      },
+      {
+        name = "config"
+        secret = {
+          secretName  = module.secret.name
+          defaultMode = 493
+        }
+      },
+      {
+        name = "${var.name}-litestream-data"
+        emptyDir = {
+          medium = "Memory"
+        }
+      },
+    ]
+  }
+}
+
+module "mountpoint-s3-overlay" {
+  source = "../mountpoint_s3_overlay"
+
+  name        = var.name
+  namespace   = var.namespace
+  app         = var.name
+  release     = var.release
+  mount_path  = local.data_path
+  s3_endpoint = var.minio_endpoint
+  s3_bucket   = var.minio_bucket
+  s3_prefix   = "home"
+  s3_mount_extra_args = [
+    "--cache /var/tmp",      # cache to memory
+    "--max-cache-size 4096", # 4Gi
+    "--uid=${local.uid}",
+    "--gid=${local.gid}",
+  ]
+  s3_access_secret = module.minio-user-secret.name
+  images = {
+    mountpoint = var.images.mountpoint
+  }
+  template_spec = module.litestream-overlay.template_spec
+}
+
+module "statefulset" {
+  source = "../../../modules/statefulset"
+
+  name      = var.name
+  namespace = var.namespace
+  app       = var.name
+  release   = var.release
+  affinity  = var.affinity
+  replicas  = var.replicas
+  annotations = merge({
+    "checksum/secret"            = sha256(module.secret.manifest)
+    "checksum/minio-user-secret" = sha256(module.minio-user-secret.manifest)
+    }, {
+    for i, m in module.litestream-overlay.additional_manifests :
+    "checksum/litestream-${i}" => sha256(m)
+  })
+  /* persistent path for sqlite
+  spec = {
+    volumeClaimTemplates = [
+      {
+        metadata = {
+          name = "${var.name}-litestream-data"
+        }
+        spec = {
+          accessModes = [
+            "ReadWriteOnce",
+          ]
+          resources = {
+            requests = {
+              storage = "16Gi"
+            }
+          }
+          storageClassName = "local-path"
+        }
+      },
+    ]
+  }
+  */
+  template_spec = module.mountpoint-s3-overlay.template_spec
+}
+
+module "minio-user-secret" {
+  source    = "../../../modules/secret"
+  name      = "${var.name}-minio-user-secret"
+  namespace = var.namespace
+  app       = var.name
+  release   = var.release
+  data = merge({
+    AWS_ACCESS_KEY_ID     = var.minio_user.id
+    AWS_SECRET_ACCESS_KEY = var.minio_user.secret
+  })
+}

@@ -192,10 +192,6 @@ module "deployment" {
             name  = "CAMOFOX_HTTP_PORT"
             value = tostring(local.ports.camofox_mcp)
           },
-          {
-            name  = "CAMOFOX_API_KEY"
-            value = var.camofox_api_key
-          },
         ]
         # TODO: add healthchecks
       },

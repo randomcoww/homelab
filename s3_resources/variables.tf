@@ -34,3 +34,19 @@ variable "scrape_proxy_username" {
 variable "scrape_proxy_password" {
   type = string
 }
+
+variable "slack_bot_token" {
+  type = string
+}
+
+variable "slack_app_token" {
+  type = string
+}
+
+variable "slack_allowed_users" {
+  type = string
+}
+
+variable "slack_home_channel" {
+  type = string
+}

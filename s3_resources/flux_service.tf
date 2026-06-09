@@ -300,7 +300,7 @@ module "llama-cpp" {
         cmd = <<-EOF
         $${default_cmd} \
           --model $${nemotron-3-super} \
-          --ctx-size 0 \
+          --ctx-size 1048576 \
           --jinja \
           --cache-type-k q8_0 \
           --cache-type-v q8_0
@@ -327,7 +327,7 @@ module "llama-cpp" {
         cmd = <<-EOF
         $${default_cmd} \
           --model $${nemotron-3-nano-omni} \
-          --ctx-size 0 \
+          --ctx-size 262144 \
           --jinja \
           --cache-type-k q8_0 \
           --cache-type-v q8_0 \
@@ -468,11 +468,6 @@ module "searxng" {
   }
 }
 
-resource "random_password" "camofox-browser-auth-token" {
-  length           = 32
-  override_special = "-_"
-}
-
 module "camofox-browser" {
   source    = "./modules/camofox_browser"
   name      = local.endpoints.camofox_browser.name
@@ -481,11 +476,10 @@ module "camofox-browser" {
     camofox_browser = local.container_images_digest.camofox_browser
   }
   extra_configs = {
-    PROXY_HOST         = regex(local.domain_regex, var.scrape_proxy_server).hostname
-    PROXY_PORT         = regex(local.domain_regex, var.scrape_proxy_server).port
-    PROXY_USERNAME     = var.scrape_proxy_username
-    PROXY_PASSWORD     = var.scrape_proxy_password
-    CAMOFOX_ACCESS_KEY = random_password.camofox-browser-auth-token.result
+    PROXY_HOST     = regex(local.domain_regex, var.scrape_proxy_server).hostname
+    PROXY_PORT     = regex(local.domain_regex, var.scrape_proxy_server).port
+    PROXY_USERNAME = var.scrape_proxy_username
+    PROXY_PASSWORD = var.scrape_proxy_password
   }
   ingress_hostname = local.endpoints.camofox_browser.ingress
   gateway_ref = {
@@ -514,7 +508,6 @@ module "mcp-proxy" {
   searxng_endpoint    = local.endpoints.searxng.ingress
   prometheus_endpoint = local.endpoints.prometheus.ingress
   camofox_endpoint    = local.endpoints.camofox_browser.ingress
-  camofox_api_key     = random_password.camofox-browser-auth-token.result
 
   ingress_hostname = local.endpoints.mcp_proxy.ingress
   auth_token       = random_password.mcp-auth-token.result
@@ -522,6 +515,118 @@ module "mcp-proxy" {
     name      = local.endpoints.traefik.name
     namespace = local.endpoints.traefik.namespace
   }
+}
+
+resource "random_password" "hermes-agent-auth-token" {
+  length           = 32
+  override_special = "-_"
+}
+
+module "hermes-agent" {
+  source    = "./modules/hermes_agent"
+  name      = local.endpoints.hermes_agent.name
+  namespace = local.endpoints.hermes_agent.namespace
+  images = {
+    hermes_agent = local.container_images_digest.hermes_agent
+    mountpoint   = local.container_images_digest.mountpoint
+    litestream   = local.container_images_digest.litestream
+  }
+  extra_configs = {
+    stt_enabled = false
+    model = {
+      default        = "nemotron-3-super:low"
+      provider       = "custom"
+      base_url       = "https://${local.endpoints.llama_cpp.ingress}/v1"
+      api_key        = random_password.llama-cpp-auth-token.result
+      context_length = 1048576
+    }
+    web = {
+      backend     = "searxng"
+      searxng_url = "https://${local.endpoints.searxng.ingress}"
+    }
+    browser = {
+      camofox_url = "https://${local.endpoints.camofox_browser.ingress}"
+    }
+    mcp_servers = merge({
+      for name, m in [
+        # "kubernetes",
+        "prometheus",
+      ] :
+      name => {
+        url = "https://${local.endpoints.mcp_proxy.ingress}/${m}/mcp"
+        headers = {
+          Authorization : "Bearer ${random_password.mcp-auth-token.result}"
+        }
+      }
+      }, {
+      # "github" = {
+      #   url = "https://api.githubcopilot.com/mcp"
+      #   headers = {
+      #     Authorization: "Bearer ${var.github_token}"
+      #   }
+      # }
+    })
+    platforms = {
+      slack = {
+        reply_to_mode = "first"
+        extra = {
+          reply_in_thread = false
+          reply_broadcast = true
+        }
+      }
+    }
+    slack = {
+      require_mention = true
+      strict_mention  = true
+    }
+  }
+  extra_envs = {
+    SEARXNG_URL             = "https://${local.endpoints.searxng.ingress}"
+    CAMOFOX_URL             = "https://${local.endpoints.camofox_browser.ingress}"
+    API_SERVER_ENABLED      = true
+    API_SERVER_MODEL_NAME   = local.endpoints.hermes_agent.name
+    API_SERVER_KEY          = random_password.hermes-agent-auth-token.result
+    GATEWAY_ALLOW_ALL_USERS = true
+    SLACK_BOT_TOKEN         = var.slack_bot_token
+    SLACK_APP_TOKEN         = var.slack_app_token
+    SLACK_ALLOWED_USERS     = var.slack_allowed_users
+    SLACK_HOME_CHANNEL      = var.slack_home_channel
+    SLACK_HOME_CHANNEL_NAME = "bot"
+  }
+  # Sample from https://hermes-agent.nousresearch.com/docs/user-guide/features/personality
+  soul = <<-EOF
+# Personality
+
+You are a pragmatic senior engineer with strong taste.
+You optimize for truth, clarity, and usefulness over politeness theater.
+
+## Style
+- Be direct without being cold
+- Prefer substance over filler
+- Push back when something is a bad idea
+- Admit uncertainty plainly
+- Keep explanations compact unless depth is useful
+
+## What to avoid
+- Sycophancy
+- Hype language
+- Repeating the user's framing if it's wrong
+- Overexplaining obvious things
+
+## Technical posture
+- Prefer simple systems over clever systems
+- Care about operational reality, not idealized architecture
+- Treat edge cases as part of the design, not cleanup
+  EOF
+
+  ingress_hostname = local.endpoints.hermes_agent.ingress
+  gateway_ref = {
+    name      = local.endpoints.traefik.name
+    namespace = local.endpoints.traefik.namespace
+  }
+  minio_endpoint = "https://${local.services.cluster_minio.ip}:${local.service_ports.minio}"
+  minio_bucket   = "hermes-agent"
+  minio_user     = minio_iam_user.user["hermes_agent"]
 }
 
 module "open-webui" {
@@ -536,9 +641,9 @@ module "open-webui" {
     WEBUI_URL                      = "https://${local.endpoints.open_webui.ingress}"
     ENABLE_VERSION_UPDATE_CHECK    = false
     ENABLE_OPENAI_API              = true
-    OPENAI_API_BASE_URL            = "https://${local.endpoints.llama_cpp.ingress}/v1"
-    OPENAI_API_KEY                 = random_password.llama-cpp-auth-token.result
-    DEFAULT_MODELS                 = "nemotron-3-super:low"
+    OPENAI_API_BASE_URL            = "https://${local.endpoints.hermes_agent.ingress}/v1"
+    OPENAI_API_KEY                 = random_password.hermes-agent-auth-token.result
+    DEFAULT_MODELS                 = local.endpoints.hermes_agent.name
     ENABLE_WEB_SEARCH              = false
     WEB_SEARCH_ENGINE              = "searxng"
     WEB_SEARCH_RESULT_COUNT        = 4
@@ -1075,6 +1180,7 @@ locals {
     sunshine-desktop = module.sunshine-desktop.manifests
     camofox-browser  = module.camofox-browser.manifests
     searxng          = module.searxng.manifests
+    hermes-agent     = module.hermes-agent.manifests
     open-webui       = module.open-webui.manifests
     hostapd          = concat(module.hostapd.manifests, module.qrcode-hostapd.manifests)
     stump            = module.stump.manifests
