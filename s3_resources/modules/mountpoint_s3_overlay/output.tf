@@ -82,7 +82,7 @@ output "template_spec" {
           preStop = {
             exec = {
               command = [
-                "/usr/bin/umount",
+                "umount",
                 local.mount_path_internal,
               ]
             }
