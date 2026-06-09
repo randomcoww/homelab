@@ -142,6 +142,7 @@ module "litestream-overlay" {
             ${local.data_path}/sessions \
             ${local.data_path}/memories \
             ${local.data_path}/cache \
+            ${local.data_path}/cron \
             ${local.data_path}/skills \
             ${local.data_path}/pairing \
             ${local.data_path}/workspace
@@ -151,7 +152,8 @@ module "litestream-overlay" {
           cp -rfL ${local.tmp_path}/. \
             ${local.extra_envs.HERMES_HOME}/
           chown -R ${local.uid}:${local.gid} \
-            ${local.extra_envs.HERMES_HOME}
+            ${local.extra_envs.HERMES_HOME} \
+            ${local.data_path}
 
           exec /init /opt/hermes/docker/main-wrapper.sh gateway run
           EOF
@@ -210,26 +212,26 @@ module "litestream-overlay" {
   }
 }
 
-module "mountpoint-s3-overlay" {
-  source = "../mountpoint_s3_overlay"
+module "juicefs-overlay" {
+  source = "../juicefs_overlay"
 
-  name        = var.name
-  namespace   = var.namespace
-  app         = var.name
-  release     = var.release
-  mount_path  = local.data_path
-  s3_endpoint = var.minio_endpoint
-  s3_bucket   = var.minio_bucket
-  s3_prefix   = "home"
-  s3_mount_extra_args = [
-    "--cache /var/tmp",      # cache to memory
-    "--max-cache-size 4096", # 4Gi
-    "--uid=${local.uid}",
-    "--gid=${local.gid}",
+  name                = var.name
+  namespace           = var.namespace
+  app                 = var.name
+  release             = var.release
+  mount_path          = local.data_path
+  minio_endpoint      = var.minio_endpoint
+  minio_bucket        = var.minio_bucket
+  minio_prefix        = "jfs"
+  minio_access_secret = module.minio-user-secret.name
+  mount_extra_opts = [
+    "user_id=${local.uid}",
+    "group_id=${local.gid}",
   ]
-  s3_access_secret = module.minio-user-secret.name
+  capacity_gb = 32
   images = {
-    mountpoint = var.images.mountpoint
+    juicefs    = var.images.juicefs
+    litestream = var.images.litestream
   }
   template_spec = module.litestream-overlay.template_spec
 }
@@ -249,13 +251,15 @@ module "statefulset" {
     }, {
     for i, m in module.litestream-overlay.additional_manifests :
     "checksum/litestream-${i}" => sha256(m)
+    }, {
+    for i, m in module.juicefs-overlay.additional_manifests :
+    "checksum/juicefs-${i}" => sha256(m)
   })
-  /* persistent path for sqlite
   spec = {
     volumeClaimTemplates = [
       {
         metadata = {
-          name = "${var.name}-litestream-data"
+          name = "${var.name}-juicefs-litestream-data" # persist path used for juicefs db
         }
         spec = {
           accessModes = [
@@ -271,8 +275,7 @@ module "statefulset" {
       },
     ]
   }
-  */
-  template_spec = module.mountpoint-s3-overlay.template_spec
+  template_spec = module.juicefs-overlay.template_spec
 }
 
 module "minio-user-secret" {

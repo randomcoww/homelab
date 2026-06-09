@@ -530,6 +530,7 @@ module "hermes-agent" {
     hermes_agent = local.container_images_digest.hermes_agent
     mountpoint   = local.container_images_digest.mountpoint
     litestream   = local.container_images_digest.litestream
+    juicefs      = local.container_images_digest.juicefs
   }
   extra_configs = {
     stt_enabled = false

@@ -27,6 +27,7 @@ variable "images" {
     hermes_agent = string
     mountpoint   = string
     litestream   = string
+    juicefs      = string
   })
 }
 
