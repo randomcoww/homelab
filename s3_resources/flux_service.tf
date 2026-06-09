@@ -533,6 +533,7 @@ module "hermes-agent" {
     juicefs      = local.container_images_digest.juicefs
   }
   extra_configs = {
+    timezone    = local.timezone
     stt_enabled = false
     model = {
       default        = "nemotron-3-super:low"
