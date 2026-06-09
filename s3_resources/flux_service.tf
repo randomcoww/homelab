@@ -579,6 +579,9 @@ module "hermes-agent" {
         default_trust = "0.5"
         hrr_dim       = 1024
       }
+      enabled = [
+        "memory/holographic",
+      ]
     }
     auxiliary = {
       vision = {
