@@ -542,8 +542,9 @@ module "hermes-agent" {
       context_length = 1048576
     }
     web = {
-      backend     = "searxng"
-      searxng_url = "https://${local.endpoints.searxng.ingress}"
+      search_backend  = "searxng"
+      extract_backend = "camofox"
+      searxng_url     = "https://${local.endpoints.searxng.ingress}"
     }
     browser = {
       camofox_url = "https://${local.endpoints.camofox_browser.ingress}"
@@ -560,13 +561,23 @@ module "hermes-agent" {
         }
       }
       }, {
-      # "github" = {
-      #   url = "https://api.githubcopilot.com/mcp"
-      #   headers = {
-      #     Authorization: "Bearer ${var.github_token}"
-      #   }
-      # }
+      /*
+      "github" = {
+        url = "https://api.githubcopilot.com/mcp"
+        headers = {
+          Authorization: "Bearer ${var.github_token}"
+        }
+      }
+      */
     })
+    auxiliary = {
+      vision = {
+        provider = "custom"
+        model    = "nemotron-3-nano-omni:low"
+        base_url = "https://${local.endpoints.llama_cpp.ingress}/v1"
+        api_key  = random_password.llama-cpp-auth-token.result
+      }
+    }
     platforms = {
       slack = {
         reply_to_mode = "first"
@@ -675,10 +686,10 @@ module "open-webui" {
     RAG_RERANKING_MODEL            = "jina-reranker-v3"
     TOOL_SERVER_CONNECTIONS = jsonencode(concat([
       for _, m in [
-        "kubernetes",
-        "searxng",
-        "camofox",
-        "prometheus",
+        # "kubernetes",
+        # "searxng",
+        # "camofox",
+        # "prometheus",
       ] :
       {
         type      = "mcp"
@@ -698,24 +709,26 @@ module "open-webui" {
         }
       }
       ], [
-      # {
-      #   type      = "mcp"
-      #   url       = "https://api.githubcopilot.com/mcp"
-      #   auth_type = "bearer"
-      #   config = {
-      #     enable                    = true
-      #     function_name_filter_list = ""
-      #   }
-      #   spec_type = "url"
-      #   spec      = ""
-      #   path      = ""
-      #   key       = var.github_token
-      #   info = {
-      #     id          = "github"
-      #     name        = "github"
-      #     description = "Query GitHub resources"
-      #   }
-      # },
+      /*
+      {
+        type      = "mcp"
+        url       = "https://api.githubcopilot.com/mcp"
+        auth_type = "bearer"
+        config = {
+          enable                    = true
+          function_name_filter_list = ""
+        }
+        spec_type = "url"
+        spec      = ""
+        path      = ""
+        key       = var.github_token
+        info = {
+          id          = "github"
+          name        = "github"
+          description = "Query GitHub resources"
+        }
+      },
+      */
     ]))
     # OIDC
     ENABLE_PERSISTENT_CONFIG            = false # persist mcp oauth registration
