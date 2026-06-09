@@ -550,12 +550,12 @@ module "hermes-agent" {
       camofox_url = "https://${local.endpoints.camofox_browser.ingress}"
     }
     mcp_servers = merge({
-      for name, m in [
+      for _, name in [
         # "kubernetes",
         "prometheus",
       ] :
       name => {
-        url = "https://${local.endpoints.mcp_proxy.ingress}/${m}/mcp"
+        url = "https://${local.endpoints.mcp_proxy.ingress}/${name}/mcp"
         headers = {
           Authorization : "Bearer ${random_password.mcp-auth-token.result}"
         }
@@ -570,6 +570,16 @@ module "hermes-agent" {
       }
       */
     })
+    memory = {
+      provider = "holographic"
+    }
+    plugins = {
+      hermes-memory-store = {
+        auto_extract  = false
+        default_trust = "0.5"
+        hrr_dim       = 1024
+      }
+    }
     auxiliary = {
       vision = {
         provider = "custom"

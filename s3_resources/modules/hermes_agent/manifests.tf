@@ -99,6 +99,7 @@ module "litestream-overlay" {
         "state.db",
         "kanban.db",
         "response_store.db",
+        "memory_store.db",
       ] :
       {
         path                = "${local.extra_envs.HERMES_HOME}/${db}"
