@@ -164,6 +164,12 @@ module "litestream-overlay" {
           exec /init /opt/hermes/docker/main-wrapper.sh gateway run
           EOF
         ]
+        env = [
+          {
+            name  = "TZ"
+            value = lookup(var.extra_configs, "timezone", "UTC")
+          },
+        ]
         volumeMounts = [
           {
             name      = "ca-trust-bundle"
