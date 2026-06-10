@@ -41,6 +41,11 @@ variable "extra_envs" {
   default = {}
 }
 
+variable "extra_dbs" {
+  type    = list(string)
+  default = []
+}
+
 variable "soul" {
   type = string
 }

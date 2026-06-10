@@ -574,16 +574,17 @@ module "hermes-agent" {
       */
     })
     memory = {
-      provider = "holographic"
+      provider = "mnemosyne"
+      mnemosyne = {
+        shared_surface_path = "mnemosyne.db"
+        skip_contexts       = "cron,flush,subagent,background,skill_loop"
+        sleep_threshold     = 50
+        vector_type         = "int8"
+      }
     }
     plugins = {
-      hermes-memory-store = {
-        auto_extract  = false
-        default_trust = "0.5"
-        hrr_dim       = 1024
-      }
       enabled = [
-        "memory/holographic",
+        "memory/mnemosyne",
       ]
     }
     auxiliary = {
@@ -609,18 +610,23 @@ module "hermes-agent" {
     }
   }
   extra_envs = {
-    SEARXNG_URL             = "https://${local.endpoints.searxng.ingress}"
-    CAMOFOX_URL             = "https://${local.endpoints.camofox_browser.ingress}"
-    API_SERVER_ENABLED      = true
-    API_SERVER_MODEL_NAME   = local.endpoints.hermes_agent.name
-    API_SERVER_KEY          = random_password.hermes-agent-auth-token.result
-    GATEWAY_ALLOW_ALL_USERS = true
-    SLACK_BOT_TOKEN         = var.slack_bot_token
-    SLACK_APP_TOKEN         = var.slack_app_token
-    SLACK_ALLOWED_USERS     = var.slack_allowed_users
-    SLACK_HOME_CHANNEL      = var.slack_home_channel
-    SLACK_HOME_CHANNEL_NAME = "bot"
+    SEARXNG_URL                = "https://${local.endpoints.searxng.ingress}"
+    CAMOFOX_URL                = "https://${local.endpoints.camofox_browser.ingress}"
+    API_SERVER_ENABLED         = true
+    API_SERVER_MODEL_NAME      = local.endpoints.hermes_agent.name
+    API_SERVER_KEY             = random_password.hermes-agent-auth-token.result
+    GATEWAY_ALLOW_ALL_USERS    = true
+    SLACK_BOT_TOKEN            = var.slack_bot_token
+    SLACK_APP_TOKEN            = var.slack_app_token
+    SLACK_ALLOWED_USERS        = var.slack_allowed_users
+    SLACK_HOME_CHANNEL         = var.slack_home_channel
+    SLACK_HOME_CHANNEL_NAME    = "bot"
+    MNEMOSYNE_HOST_LLM_ENABLED = true
   }
+  extra_dbs = [
+    "mnemosyne.db",
+    "triples.db",
+  ]
   # Sample from https://hermes-agent.nousresearch.com/docs/user-guide/features/personality
   soul = <<-EOF
 # Personality

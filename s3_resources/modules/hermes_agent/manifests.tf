@@ -95,12 +95,11 @@ module "litestream-overlay" {
   }
   litestream_config = {
     dbs = [
-      for _, db in [
+      for _, db in concat([
         "state.db",
         "kanban.db",
         "response_store.db",
-        "memory_store.db",
-      ] :
+      ], var.extra_dbs) :
       {
         path                = "${local.env.HERMES_HOME}/${db}"
         monitor-interval    = "1s"
