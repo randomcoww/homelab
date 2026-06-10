@@ -374,7 +374,7 @@ module "llama-cpp" {
       }
     }
     groups = {
-      owui-concurrent = {
+      agent-concurrent = {
         swap      = false
         exclusive = true
         members = [
@@ -388,6 +388,8 @@ module "llama-cpp" {
       on_startup = {
         preload = [
           "nemotron-3-super",
+          "jina-embeddings-v5",
+          "jina-reranker-v3",
         ]
       }
     }

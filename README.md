@@ -204,6 +204,12 @@ LDAP admin:
 tofu -chdir=s3_resources output lldap
 ```
 
+llama.cpp OpenAI compatible endpoint:
+
+```bash
+tofu -chdir=s3_resources output llama-cpp
+```
+
 Hermes Agent OpenAI compatible endpoint:
 
 ```bash

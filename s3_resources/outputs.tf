@@ -10,6 +10,14 @@ output "lldap" {
 
 # LLM endpoint
 
+output "llama-cpp" {
+  value = {
+    base_url = "https://${local.endpoints.llama_cpp.ingress}/v1"
+    api_key  = random_password.llama-cpp-auth-token.result
+  }
+  sensitive = true
+}
+
 output "hermes-agent" {
   value = {
     base_url = "https://${local.endpoints.hermes_agent.ingress}/v1"

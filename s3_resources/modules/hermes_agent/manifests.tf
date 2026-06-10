@@ -1,5 +1,5 @@
 locals {
-  extra_envs = merge(var.extra_envs, {
+  env = merge(var.extra_envs, {
     HERMES_HOME     = "/opt/data"
     API_SERVER_HOST = "0.0.0.0"
     API_SERVER_PORT = 8642
@@ -19,7 +19,7 @@ module "secret" {
   data = {
     "config.yaml" = yamlencode(var.extra_configs)
     ".env"        = <<-EOF
-%{~for k, v in local.extra_envs~}
+%{~for k, v in local.env~}
 ${k}=${v}
 
 %{~endfor~}
@@ -39,9 +39,9 @@ module "service" {
     ports = [
       {
         name       = var.name
-        port       = local.extra_envs.API_SERVER_PORT
+        port       = local.env.API_SERVER_PORT
         protocol   = "TCP"
-        targetPort = local.extra_envs.API_SERVER_PORT
+        targetPort = local.env.API_SERVER_PORT
       },
     ]
   }
@@ -75,7 +75,7 @@ module "httproute" {
         backendRefs = [
           {
             name = module.service.name
-            port = local.extra_envs.API_SERVER_PORT
+            port = local.env.API_SERVER_PORT
           },
         ]
       },
@@ -102,7 +102,7 @@ module "litestream-overlay" {
         "memory_store.db",
       ] :
       {
-        path                = "${local.extra_envs.HERMES_HOME}/${db}"
+        path                = "${local.env.HERMES_HOME}/${db}"
         monitor-interval    = "1s"
         checkpoint-interval = "60s"
         replica = {
@@ -118,7 +118,7 @@ module "litestream-overlay" {
       }
     ]
   }
-  mount_path       = local.extra_envs.HERMES_HOME
+  mount_path       = local.env.HERMES_HOME
   s3_access_secret = module.minio-user-secret.name
 
   template_spec = {
@@ -154,11 +154,11 @@ module "litestream-overlay" {
             ${local.data_path}/workspace
 
           ln -sf ${local.data_path}/* \
-            ${local.extra_envs.HERMES_HOME}/
+            ${local.env.HERMES_HOME}/
           cp -rfL ${local.tmp_path}/. \
-            ${local.extra_envs.HERMES_HOME}/
+            ${local.env.HERMES_HOME}/
           chown -R ${local.uid}:${local.gid} \
-            ${local.extra_envs.HERMES_HOME} \
+            ${local.env.HERMES_HOME} \
             ${local.data_path}
 
           exec /init /opt/hermes/docker/main-wrapper.sh gateway run
@@ -194,7 +194,7 @@ module "litestream-overlay" {
         ]
         ports = [
           {
-            containerPort = local.extra_envs.API_SERVER_PORT
+            containerPort = local.env.API_SERVER_PORT
           },
         ]
       },
