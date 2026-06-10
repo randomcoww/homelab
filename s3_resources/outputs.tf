@@ -8,11 +8,12 @@ output "lldap" {
   sensitive = true
 }
 
-# llama.cpp auth token
+# LLM endpoint
 
-output "llama-cpp" {
+output "hermes-agent" {
   value = {
-    api_key = random_password.llama-cpp-auth-token.result
+    base_url = "https://${local.endpoints.hermes_agent.ingress}/v1"
+    api_key  = random_password.hermes-agent-auth-token.result
   }
   sensitive = true
 }

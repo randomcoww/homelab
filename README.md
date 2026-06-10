@@ -204,10 +204,10 @@ LDAP admin:
 tofu -chdir=s3_resources output lldap
 ```
 
-llama.cpp API key:
+Hermes Agent OpenAI compatible endpoint:
 
 ```bash
-tofu -chdir=s3_resources output llama-cpp
+tofu -chdir=s3_resources output hermes-agent
 ```
 
 Internal registry:
