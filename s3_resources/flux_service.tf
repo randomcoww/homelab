@@ -378,7 +378,7 @@ module "llama-cpp" {
         swap      = false
         exclusive = true
         members = [
-          "nemotron-3-super",
+          "nemotron-3-nano-omni",
           "jina-embeddings-v5",
           "jina-reranker-v3",
         ]
@@ -388,8 +388,6 @@ module "llama-cpp" {
       on_startup = {
         preload = [
           "nemotron-3-super",
-          "jina-embeddings-v5",
-          "jina-reranker-v3",
         ]
       }
     }
@@ -624,8 +622,8 @@ module "hermes-agent" {
     MNEMOSYNE_HOST_LLM_ENABLED = true
   }
   extra_dbs = [
-    "mnemosyne.db",
-    "triples.db",
+    "mnemosyne/data/mnemosyne.db",
+    "mnemosyne/data/triples.db",
   ]
   # Sample from https://hermes-agent.nousresearch.com/docs/user-guide/features/personality
   soul = <<-EOF
