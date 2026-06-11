@@ -8,7 +8,7 @@ output "template_spec" {
   value = merge(var.template_spec, {
     initContainers = concat([
       for i, db in var.litestream_config.dbs :
-      {
+      merge({
         name  = "${var.name}-litestream-restore-${i}"
         image = var.images.litestream
         args = [
@@ -63,9 +63,9 @@ output "template_spec" {
             readOnly  = true
           },
         ]
-      }
+      }, var.litestream_container_params)
       ], [
-      {
+      merge({
         name          = "${var.name}-litestream-replicate"
         image         = var.images.litestream
         restartPolicy = "Always" # sidecar mode
@@ -118,7 +118,14 @@ output "template_spec" {
             readOnly  = true
           },
         ]
-        resources = var.litestream_resources
+        resources = {
+          requests = {
+            memory = "128Mi"
+          }
+          limits = {
+            memory = "1Gi"
+          }
+        }
         livenessProbe = {
           exec = {
             command = [
@@ -150,7 +157,7 @@ output "template_spec" {
           periodSeconds    = 2
           failureThreshold = 12
         }
-      },
+      }, var.litestream_container_params)
       ], [
       for _, container in lookup(var.template_spec, "initContainers", []) :
       merge(container, {

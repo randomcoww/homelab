@@ -50,7 +50,7 @@ variable "s3_access_secret" {
   type = string
 }
 
-variable "mountpoint_resources" {
+variable "mountpoint_container_params" {
   type    = any
   default = {}
 }

@@ -119,6 +119,14 @@ module "litestream-overlay" {
   }
   mount_path       = local.env.HERMES_HOME
   s3_access_secret = module.minio-user-secret.name
+  litestream_container_params = {
+    securityContext = {
+      # run litestream as hermes user
+      runAsUser  = local.uid
+      runAsGroup = local.gid
+      fsGroup    = local.gid
+    }
+  }
 
   template_spec = {
     securityContext = {

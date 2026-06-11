@@ -5,7 +5,7 @@ locals {
 output "template_spec" {
   value = merge(var.template_spec, {
     initContainers = concat([
-      {
+      merge({
         name          = "${var.name}-mountpoint-mount"
         image         = var.images.mountpoint
         restartPolicy = "Always" # sidecar mode
@@ -88,7 +88,6 @@ output "template_spec" {
             }
           }
         }
-        resources = var.mountpoint_resources
         securityContext = {
           privileged = true
         }
@@ -111,7 +110,7 @@ output "template_spec" {
           }
           timeoutSeconds = 4
         }
-      },
+      }, var.mountpoint_container_params)
       ], [
       for _, container in lookup(var.template_spec, "initContainers", []) :
       merge(container, {

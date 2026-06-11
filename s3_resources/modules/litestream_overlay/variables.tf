@@ -42,14 +42,7 @@ variable "s3_access_secret" {
   type = string
 }
 
-variable "litestream_resources" {
-  type = any
-  default = {
-    requests = {
-      memory = "128Mi"
-    }
-    limits = {
-      memory = "1Gi"
-    }
-  }
+variable "litestream_container_params" {
+  type    = any
+  default = {}
 }
