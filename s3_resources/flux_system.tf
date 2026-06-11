@@ -604,7 +604,7 @@ locals {
             chart = {
               spec = {
                 chart   = "metrics-server"
-                version = "3.13.0" # renovate: datasource=helm depName=metrics-server registryUrl=https://kubernetes-sigs.github.io/metrics-server
+                version = "3.13.1" # renovate: datasource=helm depName=metrics-server registryUrl=https://kubernetes-sigs.github.io/metrics-server
                 sourceRef = {
                   kind = "HelmRepository"
                   name = "metrics-server"
