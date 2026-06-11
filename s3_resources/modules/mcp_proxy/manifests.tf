@@ -113,6 +113,7 @@ module "deployment" {
     "checksum/secret" = sha256(module.secret.manifest)
   }
   template_spec = {
+    serviceAccountName = var.name
     resources = {
       requests = {
         memory = "2Gi"
@@ -130,12 +131,13 @@ module "deployment" {
         args = [
           "--port",
           tostring(local.ports.kubernetes_mcp),
-          "--disable-multi-cluster",
           "--stateless",
           "--cluster-provider",
           "in-cluster",
           "--toolsets",
           "core,helm",
+          "--list-output",
+          "yaml",
           "--read-only",
         ]
         volumeMounts = [

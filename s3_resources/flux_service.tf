@@ -561,14 +561,12 @@ module "hermes-agent" {
         }
       }
       }, {
-      /*
       "github" = {
         url = "https://api.githubcopilot.com/mcp"
         headers = {
-          Authorization: "Bearer ${var.github_token}"
+          Authorization : "Bearer ${var.github_token}"
         }
       }
-      */
     })
     memory = {
       provider = "mnemosyne"
