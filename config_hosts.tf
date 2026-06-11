@@ -77,7 +77,9 @@ locals {
         }
       }
       boot_args = [
-        "pcie_aspm=off", # TODO: workaround for r8169 transmit queue timed out issue
+        "ttm.pages_limit=8388608",   # 32G
+        "ttm.page_pool_size=262144", # 1G preallocated
+        "pcie_aspm=off",             # TODO: workaround for r8169 transmit queue timed out issue
       ]
     }
 
@@ -158,7 +160,9 @@ locals {
         }
       }
       boot_args = [
-        "pcie_aspm=off", # TODO: workaround for r8169 transmit queue timed out issue
+        "ttm.pages_limit=8388608",   # 32G
+        "ttm.page_pool_size=262144", # 1G preallocated
+        "pcie_aspm=off",             # TODO: workaround for r8169 transmit queue timed out issue
       ]
     }
 
@@ -222,7 +226,9 @@ locals {
         }
       }
       boot_args = [
-        "pcie_aspm=off", # TODO: workaround for r8169 transmit queue timed out issue
+        "ttm.pages_limit=8388608",   # 32G
+        "ttm.page_pool_size=262144", # 1G preallocated
+        "pcie_aspm=off",             # TODO: workaround for r8169 transmit queue timed out issue
       ]
     }
 
@@ -286,7 +292,7 @@ locals {
       }
       boot_args = [
         "ttm.pages_limit=33554432",    # 128G https://community.frame.work/t/igpu-vram-how-much-can-be-assigned/73081
-        "ttm.page_pool_size=24576000", # 96G preallocated
+        "ttm.page_pool_size=25165824", # 96G preallocated
         "pcie_aspm=off",               # TODO: workaround for r8169 transmit queue timed out issue
         "mt7925e.disable_aspm=1",      # TODO: workaround for mt7925e stability
         "mt7925_common.disable_clc=1", # TODO: workaround for mt7925e stability
