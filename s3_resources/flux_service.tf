@@ -480,6 +480,7 @@ module "camofox-browser" {
     PROXY_PORT     = regex(local.domain_regex, var.scrape_proxy_server).port
     PROXY_USERNAME = var.scrape_proxy_username
     PROXY_PASSWORD = var.scrape_proxy_password
+    # TODO: add API key https://github.com/NousResearch/hermes-agent/pull/33264
   }
   ingress_hostname = local.endpoints.camofox_browser.ingress
   gateway_ref = {
@@ -501,13 +502,9 @@ module "mcp-proxy" {
     mcp_proxy      = local.container_images_digest.mcp_proxy
     prometheus_mcp = local.container_images_digest.prometheus_mcp
     kubernetes_mcp = local.container_images_digest.kubernetes_mcp
-    searxng_mcp    = local.container_images_digest.searxng_mcp
-    camofox_mcp    = local.container_images_digest.camofox_mcp
   }
   replicas            = 1
-  searxng_endpoint    = local.endpoints.searxng.ingress
   prometheus_endpoint = local.endpoints.prometheus.ingress
-  camofox_endpoint    = local.endpoints.camofox_browser.ingress
 
   ingress_hostname = local.endpoints.mcp_proxy.ingress
   auth_token       = random_password.mcp-auth-token.result
@@ -707,8 +704,6 @@ module "open-webui" {
     TOOL_SERVER_CONNECTIONS = jsonencode(concat([
       for _, m in [
         # "kubernetes",
-        # "searxng",
-        # "camofox",
         # "prometheus",
       ] :
       {
@@ -1214,12 +1209,12 @@ locals {
     camofox-browser = module.camofox-browser.manifests
     searxng         = module.searxng.manifests
     hermes-agent    = module.hermes-agent.manifests
-    open-webui      = module.open-webui.manifests
     hostapd         = concat(module.hostapd.manifests, module.qrcode-hostapd.manifests)
     stump           = module.stump.manifests
     gha-runner      = module.gha-runner.manifests
     navidrome       = module.navidrome.manifests
     mcp-proxy       = module.mcp-proxy.manifests
+    # open-webui      = module.open-webui.manifests
     # sunshine-desktop = module.sunshine-desktop.manifests
   }
 }

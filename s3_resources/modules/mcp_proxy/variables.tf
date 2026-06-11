@@ -25,8 +25,6 @@ variable "images" {
     mcp_proxy      = string
     prometheus_mcp = string
     kubernetes_mcp = string
-    searxng_mcp    = string
-    camofox_mcp    = string
   })
 }
 
@@ -35,14 +33,6 @@ variable "auth_token" {
 }
 
 variable "prometheus_endpoint" {
-  type = string
-}
-
-variable "searxng_endpoint" {
-  type = string
-}
-
-variable "camofox_endpoint" {
   type = string
 }
 

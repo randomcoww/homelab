@@ -147,9 +147,7 @@ locals {
     mcp_proxy        = "ghcr.io/tbxark/mcp-proxy:v0.43.2@sha256:70c0e02d39c4c0898e610b3a30954f7930628fa6f4fb447bad14c32382a25879"
     kubernetes_mcp   = "ghcr.io/containers/kubernetes-mcp-server:v0.0.62@sha256:bd7e9ff49b0941ff230508dfceb87162c4a2be67b180c28f5d1b204fc58fa2e9"
     prometheus_mcp   = "ghcr.io/pab1it0/prometheus-mcp-server:1.6.1@sha256:ed91f3f9e4f6fb92c5b8fd48a29f3382c11498de405f59da5eac16398d47d43b"
-    searxng_mcp      = "docker.io/isokoliuk/mcp-searxng:1.3.2@sha256:d811b890c5ee6d39ed89bdca72f9af12a994127de2608532e8e5396c6b9632a8"
     camofox_browser  = "ghcr.io/jo-inc/camofox-browser:1.11.2@sha256:826da04c4ec75b3eb450bc7cf2513176ba408f92b862b89f768ca30563171137"
-    camofox_mcp      = "ghcr.io/redf0x1/camofox-mcp:1.14.4@sha256:dea7e0ce1a4e1434c31a1e669725cd9b664880174b9a20747582e19d90b30183"
     navidrome        = "ghcr.io/navidrome/navidrome:0.62.0@sha256:c4b5cb36a790b3eb63ca6a68bbe2fe149c2d7fa2e586f7a480e61db630e6664b"
     valkey           = "ghcr.io/valkey-io/valkey:9.1-alpine@sha256:a35428eba9043cc0b79dbe54100f0c92784f2de00ad09b01182bfb1c5c83d1bd"
     thanos           = "quay.io/thanos/thanos:v0.41.0@sha256:cf3e9b292e4302ad4a4955b56379703aea39516607d382a57604a3d003c35d10"
@@ -304,7 +302,6 @@ locals {
       open_webui = {
         name    = "open-webui"
         ingress = "owui.${local.domains.public}"
-        tunnel  = true
       }
       lldap = {
         name      = "lldap"

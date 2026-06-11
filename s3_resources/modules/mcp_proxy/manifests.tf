@@ -5,9 +5,6 @@ locals {
     service        = 8086
     kubernetes_mcp = 8081
     prometheus_mcp = 8082
-    searxng_mcp    = 8083
-    camofox_mcp    = 8085
-    searxng_mcp    = 8087
   }
 }
 
@@ -33,34 +30,6 @@ module "secret" {
         }
       }
       mcpServers = {
-        searxng = {
-          url           = "http://127.0.0.1:${local.ports.searxng_mcp}/mcp"
-          name          = "searxng"
-          transportType = "streamable-http"
-          options = {
-            toolFilter = {
-              mode = "allow"
-              list = [
-                "searxng_web_search",
-              ]
-            }
-          }
-        }
-        camofox = {
-          url           = "http://127.0.0.1:${local.ports.camofox_mcp}/mcp"
-          name          = "camofox"
-          transportType = "streamable-http"
-          options = {
-            toolFilter = {
-              mode = "allow"
-              list = [
-                "create_tab",
-                "camofox_wait_for",
-                "snapshot",
-              ]
-            }
-          }
-        }
         kubernetes = {
           url           = "http://127.0.0.1:${local.ports.kubernetes_mcp}/mcp"
           name          = "kubernetes"
@@ -146,55 +115,13 @@ module "deployment" {
   template_spec = {
     resources = {
       requests = {
-        memory = "4Gi"
+        memory = "2Gi"
       }
       limits = {
-        memory = "4Gi"
+        memory = "2Gi"
       }
     }
     initContainers = [
-      # searxng
-      {
-        name          = "${var.name}-searxng-mcp"
-        image         = var.images.searxng_mcp
-        restartPolicy = "Always"
-        env = [
-          {
-            name  = "MCP_HTTP_PORT"
-            value = tostring(local.ports.searxng_mcp)
-          },
-          {
-            name  = "SEARXNG_URL"
-            value = "https://${var.searxng_endpoint}"
-          },
-        ]
-        # TODO: add healthchecks
-      },
-      # camofox-mcp
-      {
-        name          = "${var.name}-camofox-mcp"
-        image         = var.images.camofox_mcp
-        restartPolicy = "Always"
-        env = [
-          {
-            name  = "CAMOFOX_TRANSPORT"
-            value = "http"
-          },
-          {
-            name  = "CAMOFOX_URL"
-            value = "https://${var.camofox_endpoint}"
-          },
-          {
-            name  = "CAMOFOX_HTTP_HOST"
-            value = "127.0.0.1"
-          },
-          {
-            name  = "CAMOFOX_HTTP_PORT"
-            value = tostring(local.ports.camofox_mcp)
-          },
-        ]
-        # TODO: add healthchecks
-      },
       # kubernetes-mcp
       {
         name          = "${var.name}-kubernetes-mcp"
