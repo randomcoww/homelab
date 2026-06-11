@@ -5,6 +5,8 @@ systemd:
   units:
     - name: rpm-ostree-countme.service
       mask: true
+    - name: rpm-ostree-countme.timer
+      mask: true
     - name: chronyd.service
       enabled: true
     # enable trim on all disks

@@ -17,6 +17,14 @@ systemd:
       mask: true
     - name: NetworkManager-wait-online.service
       mask: true
+    # TODO: track and remove https://github.com/systemd/systemd/issues/42353
+    - name: systemd-networkd-resolve-hook.socket
+      dropins:
+        - name: 10-hack.conf
+          contents: |
+            [Unit]
+            Before=
+            Before=shutdown.target
 
 storage:
   files:
