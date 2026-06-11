@@ -530,8 +530,10 @@ module "hermes-agent" {
     juicefs      = local.container_images_digest.juicefs
   }
   extra_configs = {
-    timezone    = local.timezone
-    stt_enabled = false
+    timezone = local.timezone
+    stt = {
+      enabled = false
+    }
     model = {
       default        = "nemotron-3-super:low"
       provider       = "custom"
@@ -549,7 +551,7 @@ module "hermes-agent" {
     }
     mcp_servers = merge({
       for _, name in [
-        # "kubernetes",
+        "kubernetes",
         "prometheus",
       ] :
       name => {
@@ -1214,7 +1216,7 @@ locals {
     gha-runner      = module.gha-runner.manifests
     navidrome       = module.navidrome.manifests
     mcp-proxy       = module.mcp-proxy.manifests
-    # open-webui      = module.open-webui.manifests
+    open-webui      = module.open-webui.manifests
     # sunshine-desktop = module.sunshine-desktop.manifests
   }
 }
