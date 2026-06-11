@@ -592,12 +592,13 @@ module "hermes-agent" {
         api_key  = random_password.llama-cpp-auth-token.result
       }
     }
+    group_sessions_per_user = false
     platforms = {
       slack = {
         reply_to_mode = "first"
         extra = {
-          reply_in_thread = false
-          reply_broadcast = true
+          reply_in_thread = true
+          reply_broadcast = false
         }
       }
     }
