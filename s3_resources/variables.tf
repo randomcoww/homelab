@@ -50,3 +50,11 @@ variable "slack_allowed_users" {
 variable "slack_home_channel" {
   type = string
 }
+
+variable "alpaca_api_key" {
+  type = string
+}
+
+variable "alpaca_secret_key" {
+  type = string
+}

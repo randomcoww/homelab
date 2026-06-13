@@ -542,7 +542,7 @@ module "hermes-agent" {
       camofox_url = "https://${local.endpoints.camofox_browser.ingress}"
     }
     mcp_servers = {
-      "kubernetes" = {
+      kubernetes = {
         url = "https://${local.endpoints.kubernetes_mcp.service}:${local.service_ports.kubernetes_mcp}/mcp"
         client_cert = [
           "~/.certs/mcp-client.crt",
@@ -551,13 +551,24 @@ module "hermes-agent" {
         timeout         = 30
         connect_timeout = 30
       }
-      "github" = {
+      github = {
         url = "https://api.githubcopilot.com/mcp"
         headers = {
-          Authorization : "Bearer ${var.github_token}"
+          Authorization = "Bearer ${var.github_token}"
         }
         timeout         = 30
         connect_timeout = 30
+      }
+      alpaca = {
+        command = "uvx"
+        args = [
+          "alpaca-mcp-server",
+        ]
+        env = {
+          ALPACA_API_KEY     = var.alpaca_api_key
+          ALPACA_SECRET_KEY  = var.alpaca_secret_key
+          ALPACA_PAPER_TRADE = "true"
+        }
       }
     }
     # https://github.com/AxDSan/mnemosyne/blob/main/docs/hermes-integration.md
