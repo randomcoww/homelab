@@ -138,7 +138,7 @@ locals {
     qrcode_generator = "reg.cluster.internal/randomcoww/qrcode-resource:v1780932531@sha256:4fb4193e5a7652bf1c3bbe31b12caad96c475bf78deb3b3c9ff15dc5bc46cb5c"
     llama_cpp_vulkan = "ghcr.io/mostlygeek/llama-swap:unified-vulkan@sha256:19e7135ae0a7a1d651da3bd7d25a61a117d6b851fbd76846bbfa6c58231d8a81"
     litestream       = "docker.io/litestream/litestream:0.5.12@sha256:dfbb4d91b3d6f50f3185f29f5abb25118d00053de3fc6a45f4a399bc859f4e0f"
-    searxng          = "ghcr.io/searxng/searxng:latest@sha256:e5fc9d542ccdf84769b4c406a3cb758ed2fa7599a6679bc53e67ca1951984d6a"
+    searxng          = "ghcr.io/searxng/searxng:latest@sha256:9c310db45d2962176dbff847f0a1b68fdd911a72fa43da0255621650a5d0fcb4"
     open_webui       = "ghcr.io/open-webui/open-webui:v0.9.6@sha256:90eae5b419e40b4c3dd684582b2c83440b36f9ae2f6532c09639b2ba4ee65158"
     lldap            = "ghcr.io/lldap/lldap:v0.6.3-alpine-rootless@sha256:ba2c50930ea998eefd5454aa678a7977448019248b1827da87d330df0b71c284"
     authelia         = "ghcr.io/authelia/authelia:4.39.20@sha256:1b363e9279e742397966333f364e0876ae02bf5c876de73e83af6d48c57ff51b"
@@ -150,7 +150,7 @@ locals {
     valkey           = "ghcr.io/valkey-io/valkey:9.1-alpine@sha256:a35428eba9043cc0b79dbe54100f0c92784f2de00ad09b01182bfb1c5c83d1bd"
     thanos           = "quay.io/thanos/thanos:v0.41.0@sha256:cf3e9b292e4302ad4a4955b56379703aea39516607d382a57604a3d003c35d10"
     stump            = "docker.io/aaronleopold/stump:0.1.4@sha256:09a3bfbfa6c44fade1e82b2f13fcd568062da85c760050ec0648ad89fd4dce5f"
-    hermes_agent     = "reg.cluster.internal/randomcoww/hermes-mnemosyne:v2026.6.5.1781127927@sha256:00bf835694b3172885949115e85c7d31187969322ef3ea21f6ca1c8373c935df"
+    hermes_agent     = "reg.cluster.internal/randomcoww/hermes-mnemosyne:v2026.6.5.1781332971@sha256:5f865cd2d7f5c7208cde7f1b5015cace14ddc46c84677af8d619a1cf20008ce4"
     juicefs          = "reg.cluster.internal/randomcoww/juicefs:v1.3.1.1780981161@sha256:fc723719ed3542af488ac0db3da820a1a2e6386b549a4ba4978dffbae443e930"
 
     # models (model_file)
