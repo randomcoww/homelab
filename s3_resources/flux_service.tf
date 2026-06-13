@@ -489,29 +489,16 @@ module "camofox-browser" {
   }
 }
 
-resource "random_password" "mcp-auth-token" {
-  length           = 32
-  override_special = "-_"
-}
-
-module "mcp-proxy" {
-  source    = "./modules/mcp_proxy"
-  name      = local.endpoints.mcp_proxy.name
-  namespace = local.endpoints.mcp_proxy.namespace
+module "kubernetes-mcp" {
+  source    = "./modules/kubernetes_mcp"
+  name      = local.endpoints.kubernetes_mcp.name
+  namespace = local.endpoints.kubernetes_mcp.namespace
   images = {
-    mcp_proxy      = local.container_images_digest.mcp_proxy
-    prometheus_mcp = local.container_images_digest.prometheus_mcp
     kubernetes_mcp = local.container_images_digest.kubernetes_mcp
   }
-  replicas            = 1
-  prometheus_endpoint = local.endpoints.prometheus.ingress
-
-  ingress_hostname = local.endpoints.mcp_proxy.ingress
-  auth_token       = random_password.mcp-auth-token.result
-  gateway_ref = {
-    name      = local.endpoints.traefik.name
-    namespace = local.endpoints.traefik.namespace
-  }
+  service_hostname = local.endpoints.kubernetes_mcp.service
+  service_port     = local.service_ports.kubernetes_mcp
+  ca               = data.terraform_remote_state.host.outputs.internal_ca
 }
 
 resource "random_password" "hermes-agent-auth-token" {
@@ -549,25 +536,25 @@ module "hermes-agent" {
     browser = {
       camofox_url = "https://${local.endpoints.camofox_browser.ingress}"
     }
-    mcp_servers = merge({
-      for _, name in [
-        "kubernetes",
-        "prometheus",
-      ] :
-      name => {
-        url = "https://${local.endpoints.mcp_proxy.ingress}/${name}/mcp"
-        headers = {
-          Authorization : "Bearer ${random_password.mcp-auth-token.result}"
-        }
+    mcp_servers = {
+      "kubernetes" = {
+        url = "https://${local.endpoints.kubernetes_mcp.service}:${local.service_ports.kubernetes_mcp}/mcp"
+        client_cert = [
+          "~/.certs/mcp-client.crt",
+          "~/.certs/mcp-client.key",
+        ]
+        timeout         = 30
+        connect_timeout = 30
       }
-      }, {
       "github" = {
         url = "https://api.githubcopilot.com/mcp"
         headers = {
           Authorization : "Bearer ${var.github_token}"
         }
+        timeout         = 30
+        connect_timeout = 30
       }
-    })
+    }
     # https://github.com/AxDSan/mnemosyne/blob/main/docs/hermes-integration.md
     memory = {
       memory_enabled       = false
@@ -652,6 +639,7 @@ You optimize for truth, clarity, and usefulness over politeness theater.
 - Treat edge cases as part of the design, not cleanup
   EOF
 
+  mcp_ca           = data.terraform_remote_state.host.outputs.internal_ca
   ingress_hostname = local.endpoints.hermes_agent.ingress
   gateway_ref = {
     name      = local.endpoints.traefik.name
@@ -705,29 +693,7 @@ module "open-webui" {
     RAG_EXTERNAL_RERANKER_URL      = "https://${local.endpoints.llama_cpp.ingress}/v1/rerank"
     RAG_EXTERNAL_RERANKER_API_KEY  = random_password.llama-cpp-auth-token.result
     RAG_RERANKING_MODEL            = "jina-reranker-v3"
-    TOOL_SERVER_CONNECTIONS = jsonencode(concat([
-      for _, m in [
-        # "kubernetes",
-        # "prometheus",
-      ] :
-      {
-        type      = "mcp"
-        url       = "https://${local.endpoints.mcp_proxy.ingress}/${m}/mcp"
-        auth_type = "bearer"
-        config = {
-          enable                    = true
-          function_name_filter_list = ""
-        }
-        spec_type = "url"
-        spec      = ""
-        path      = ""
-        key       = random_password.mcp-auth-token.result
-        info = {
-          id   = m
-          name = m
-        }
-      }
-      ], [
+    TOOL_SERVER_CONNECTIONS = jsonencode([
       /*
       {
         type      = "mcp"
@@ -748,7 +714,7 @@ module "open-webui" {
         }
       },
       */
-    ]))
+    ])
     # OIDC
     ENABLE_PERSISTENT_CONFIG            = false # persist mcp oauth registration
     ENABLE_SIGNUP                       = false
@@ -1217,7 +1183,7 @@ locals {
     stump           = module.stump.manifests
     gha-runner      = module.gha-runner.manifests
     navidrome       = module.navidrome.manifests
-    mcp-proxy       = module.mcp-proxy.manifests
+    kubernetes-mcp  = module.kubernetes-mcp.manifests
     open-webui      = module.open-webui.manifests
     # sunshine-desktop = module.sunshine-desktop.manifests
   }

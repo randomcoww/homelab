@@ -196,6 +196,16 @@ module "litestream-overlay" {
             mountPath = "${local.tmp_path}/SOUL.md"
             subPath   = "SOUL.md"
           },
+          {
+            name      = "mcp-client-tls"
+            mountPath = "${local.tmp_path}/.certs/mcp-client.crt"
+            subPath   = "tls.crt"
+          },
+          {
+            name      = "mcp-client-tls"
+            mountPath = "${local.tmp_path}/.certs/mcp-client.key"
+            subPath   = "tls.key"
+          },
         ]
         ports = [
           {
@@ -223,6 +233,12 @@ module "litestream-overlay" {
         name = "${var.name}-litestream-data"
         emptyDir = {
           medium = "Memory"
+        }
+      },
+      {
+        name = "mcp-client-tls"
+        secret = {
+          secretName = module.mcp-client-tls.name
         }
       },
     ]

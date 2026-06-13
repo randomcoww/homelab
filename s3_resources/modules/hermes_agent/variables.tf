@@ -72,3 +72,11 @@ variable "minio_user" {
     secret = string
   })
 }
+
+variable "mcp_ca" {
+  type = object({
+    algorithm       = string
+    private_key_pem = string
+    cert_pem        = string
+  })
+}
