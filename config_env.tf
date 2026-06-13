@@ -301,6 +301,7 @@ locals {
       open_webui = {
         name    = "open-webui"
         ingress = "owui.${local.domains.public}"
+        tunnel  = true
       }
       lldap = {
         name      = "lldap"
