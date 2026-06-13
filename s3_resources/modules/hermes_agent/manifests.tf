@@ -8,6 +8,16 @@ locals {
   tmp_path  = "/opt/data-tmp"
   uid       = 10000
   gid       = 10000
+
+  files = merge({
+    "config.yaml" = yamlencode(var.extra_configs)
+    ".env"        = <<-EOF
+%{~for k, v in local.env~}
+${k}=${v}
+
+%{~endfor~}
+    EOF
+  }, var.extra_files)
 }
 
 module "secret" {
@@ -16,16 +26,7 @@ module "secret" {
   namespace = var.namespace
   app       = var.name
   release   = var.release
-  data = {
-    "config.yaml" = yamlencode(var.extra_configs)
-    ".env"        = <<-EOF
-%{~for k, v in local.env~}
-${k}=${v}
-
-%{~endfor~}
-    EOF
-    "SOUL.md"     = var.soul
-  }
+  data      = local.files
 }
 
 module "service" {
@@ -175,26 +176,11 @@ module "litestream-overlay" {
             value = lookup(var.extra_configs, "timezone", "UTC")
           },
         ]
-        volumeMounts = [
+        volumeMounts = concat([
           {
             name      = "ca-trust-bundle"
             mountPath = "/etc/ssl/certs/ca-certificates.crt"
             readOnly  = true
-          },
-          {
-            name      = "config"
-            mountPath = "${local.tmp_path}/.env"
-            subPath   = ".env"
-          },
-          {
-            name      = "config"
-            mountPath = "${local.tmp_path}/config.yaml"
-            subPath   = "config.yaml"
-          },
-          {
-            name      = "config"
-            mountPath = "${local.tmp_path}/SOUL.md"
-            subPath   = "SOUL.md"
           },
           {
             name      = "mcp-client-tls"
@@ -206,7 +192,14 @@ module "litestream-overlay" {
             mountPath = "${local.tmp_path}/.certs/mcp-client.key"
             subPath   = "tls.key"
           },
-        ]
+          ], [
+          for f, _ in local.files :
+          {
+            name      = "config"
+            mountPath = "${local.tmp_path}/${f}"
+            subPath   = f
+          }
+        ])
         ports = [
           {
             containerPort = local.env.API_SERVER_PORT

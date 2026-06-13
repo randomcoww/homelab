@@ -46,8 +46,9 @@ variable "extra_dbs" {
   default = []
 }
 
-variable "soul" {
-  type = string
+variable "extra_files" {
+  type    = map(string)
+  default = {}
 }
 
 variable "ingress_hostname" {
