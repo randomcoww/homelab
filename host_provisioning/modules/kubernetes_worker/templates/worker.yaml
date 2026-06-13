@@ -30,7 +30,6 @@ systemd:
             After=crio.service
             Wants=local-fs.target
             After=local-fs.target
-            WantedBy=generate-backup-boot-device.service
             Before=generate-backup-boot-device.service
 
             [Service]
@@ -54,7 +53,6 @@ systemd:
         - name: 20-kubelet-dependency.conf
           contents: |
             [Unit]
-            WantedBy=kubelet.service
             Before=kubelet.service
 
 storage:

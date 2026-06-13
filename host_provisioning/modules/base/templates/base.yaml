@@ -25,12 +25,19 @@ systemd:
     # configure nftables for each service
     - name: nftables.service
       mask: false
+    # TODO: work around loop with basic.target:
+    # Found ordering cycle: sockets.target/start after systemd-networkd-resolve-hook.socket/start after network-pre.target/start after nftables@kube-worker.service/start after basic.target/start - after sockets.target
+    # Add DefaultDependencies=no to remove defauts
+    # Add everything back except for basic.target
     - name: nftables@.service
       enabled: true
       contents: |
         [Unit]
+        DefaultDependencies=no
         Wants=network-pre.target
-        Before=network-pre.target
+        Before=network-pre.target shutdown.target
+        After=sysinit.target systemd-journald.socket system.slice
+        Conflicts=shutdown.target
         ConditionFileNotEmpty=/etc/nftables/%i.nft
 
         [Service]
