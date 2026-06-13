@@ -6,7 +6,8 @@ module "prometheus" {
   name      = local.endpoints.prometheus.name
   namespace = local.endpoints.prometheus.namespace
   images = {
-    thanos = local.container_images_digest.thanos
+    thanos         = local.container_images_digest.thanos
+    prometheus_mcp = local.container_images_digest.prometheus_mcp
   }
   scrape_configs = yamlencode([
     {
