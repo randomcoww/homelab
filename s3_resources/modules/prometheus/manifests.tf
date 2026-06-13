@@ -10,7 +10,6 @@ locals {
     thanos_store         = 10903
     thanos_store_probe   = 10905
     prometheus           = 9090 # non configurable - hardcoded in helm chart
-    prometheus_mcp       = 9091
   }
 
   members = [

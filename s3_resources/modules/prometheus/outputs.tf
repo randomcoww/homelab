@@ -327,37 +327,6 @@ output "manifests" {
                     }
                   }
                 }
-                prometheus-mcp = {
-                  image = var.images.prometheus_mcp
-                  env = [
-                    {
-                      name  = "PROMETHEUS_URL"
-                      value = "http://127.0.0.1:${local.ports.thanos_querier}"
-                    },
-                    {
-                      name  = "PROMETHEUS_URL_SSL_VERIFY"
-                      value = "false"
-                    },
-                    {
-                      name  = "PROMETHEUS_MCP_SERVER_TRANSPORT"
-                      value = "http"
-                    },
-                    {
-                      name  = "PROMETHEUS_MCP_BIND_HOST"
-                      value = "0.0.0.0"
-                    },
-                    {
-                      name  = "PROMETHEUS_MCP_BIND_PORT"
-                      value = tostring(local.ports.prometheus_mcp)
-                    },
-                  ]
-                  ports = [
-                    {
-                      containerPort = local.ports.prometheus_mcp
-                    },
-                  ]
-                  # TODO: add healthchecks
-                },
               }
               replicaCount = var.replicas
               statefulSet = {
@@ -404,11 +373,6 @@ output "manifests" {
                     port       = local.ports.thanos_querier
                     targetPort = local.ports.thanos_querier
                   },
-                  {
-                    name       = "prometheus-mcp"
-                    port       = local.ports.prometheus_mcp
-                    targetPort = local.ports.prometheus_mcp
-                  },
                 ]
               }
               ingress = {
@@ -448,25 +412,6 @@ output "manifests" {
                         {
                           name = "${var.name}-server"
                           port = local.ports.thanos_querier
-                        },
-                      ]
-                    },
-                    {
-                      matches = [
-                        for _, p in [
-                          "/mcp",
-                        ] :
-                        {
-                          path = {
-                            type  = "PathPrefix"
-                            value = p
-                          }
-                        }
-                      ]
-                      backendRefs = [
-                        {
-                          name = "${var.name}-server"
-                          port = local.ports.prometheus_mcp
                         },
                       ]
                     },

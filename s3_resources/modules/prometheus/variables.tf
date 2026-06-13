@@ -14,8 +14,7 @@ variable "replicas" {
 
 variable "images" {
   type = object({
-    thanos         = string
-    prometheus_mcp = string
+    thanos = string
   })
 }
 
