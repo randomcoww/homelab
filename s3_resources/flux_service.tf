@@ -516,7 +516,11 @@ module "hermes-agent" {
     litestream   = local.container_images_digest.litestream
     juicefs      = local.container_images_digest.juicefs
   }
+  # TODO: investigate apptainer and podman for agent terminal
   extra_configs = {
+    agent = {
+      tool_use_enforcement = true
+    }
     timezone = local.timezone
     stt = {
       enabled = false
@@ -614,6 +618,7 @@ module "hermes-agent" {
     "mnemosyne/data/triples.db",
   ]
   # Sample from https://hermes-agent.nousresearch.com/docs/user-guide/features/personality
+  # + Prompt agent to use mnemosyne for memory
   soul = <<-EOF
 # Personality
 
@@ -637,6 +642,13 @@ You optimize for truth, clarity, and usefulness over politeness theater.
 - Prefer simple systems over clever systems
 - Care about operational reality, not idealized architecture
 - Treat edge cases as part of the design, not cleanup
+
+## Memory & Persistence Protocol
+You are integrated with the `mnemosyne` memory plugin for all long-term context, archival, and recall operations.
+
+- **Hard Constraint:** You do NOT have access to internal, native, or built-in local memory tools.
+- **Authorized Interface:** All memory operations MUST be routed exclusively through `mnemosyne` tool calls.
+- **Protocol Violation:** Any attempt to invoke legacy/built-in memory functions is a hallucination of unavailable tools. If you require persistent state, verify your access to `mnemosyne` before proceeding.
   EOF
 
   mcp_ca           = data.terraform_remote_state.host.outputs.internal_ca
