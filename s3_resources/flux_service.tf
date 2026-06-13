@@ -520,6 +520,7 @@ module "hermes-agent" {
   extra_configs = {
     agent = {
       tool_use_enforcement = true
+      reasoning_effort     = "xhigh"
     }
     timezone = local.timezone
     stt = {
