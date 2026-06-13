@@ -569,6 +569,8 @@ module "hermes-agent" {
           ALPACA_SECRET_KEY  = var.alpaca_secret_key
           ALPACA_PAPER_TRADE = "true"
         }
+        timeout         = 30
+        connect_timeout = 30
       }
     }
     # https://github.com/AxDSan/mnemosyne/blob/main/docs/hermes-integration.md
