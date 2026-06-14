@@ -120,10 +120,10 @@ module "litestream-overlay" {
   template_spec = {
     resources = {
       requests = {
-        memory = "8Gi"
+        memory = "6Gi"
       }
       limits = {
-        memory = "8Gi"
+        memory = "6Gi"
       }
     }
     containers = [
