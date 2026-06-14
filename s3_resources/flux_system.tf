@@ -794,7 +794,7 @@ locals {
                 version = "6.0.0" # renovate: datasource=helm depName=kured registryUrl=https://kubereboot.github.io/charts
                 sourceRef = {
                   kind = "HelmRepository"
-                  name = "kured"
+                  name = local.endpoints.kured.name
                 }
                 interval = "5m"
               }
