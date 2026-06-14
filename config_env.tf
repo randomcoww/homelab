@@ -48,12 +48,11 @@ locals {
       mtu           = 1500
       enable_netnum = true
       netnums = {
-        apiserver        = 2
-        k8s_gateway      = 31
-        minio            = 34
-        registry         = 35 # used by hosts without access to cluster DNS
-        gateway_api      = 36
-        sunshine_desktop = 37
+        apiserver   = 2
+        k8s_gateway = 31
+        minio       = 34
+        registry    = 35 # used by hosts without access to cluster DNS
+        gateway_api = 36
       }
     }
     # Conntrack sync
@@ -143,7 +142,6 @@ locals {
     lldap            = "ghcr.io/lldap/lldap:v0.6.3-alpine-rootless@sha256:ba2c50930ea998eefd5454aa678a7977448019248b1827da87d330df0b71c284"
     authelia         = "ghcr.io/authelia/authelia:4.39.20@sha256:1b363e9279e742397966333f364e0876ae02bf5c876de73e83af6d48c57ff51b"
     cloudflared      = "docker.io/cloudflare/cloudflared:2026.6.0@sha256:ba461b8aa9c042156dbd39c38657fe7431bafa063220eab8d5330a523863da9f"
-    sunshine_desktop = "reg.cluster.internal/randomcoww/sunshine-desktop:v2026.611.125516.1781206046@sha256:d3ba1ebb22f9fef33fe7f05029c6a5e97067ce6b1c9f9baced125a83d440e6b5"
     kubernetes_mcp   = "ghcr.io/containers/kubernetes-mcp-server:v0.0.62@sha256:bd7e9ff49b0941ff230508dfceb87162c4a2be67b180c28f5d1b204fc58fa2e9"
     camofox_browser  = "ghcr.io/jo-inc/camofox-browser:1.11.2@sha256:826da04c4ec75b3eb450bc7cf2513176ba408f92b862b89f768ca30563171137"
     navidrome        = "ghcr.io/navidrome/navidrome:0.62.0@sha256:c4b5cb36a790b3eb63ca6a68bbe2fe149c2d7fa2e586f7a480e61db630e6664b"
@@ -317,11 +315,6 @@ locals {
         namespace = "auth"
         ingress   = "auth.${local.domains.public}"
         tunnel    = true
-      }
-      sunshine_desktop = {
-        name    = "sunshine-desktop"
-        service = "sunshine.${local.domains.public}"
-        ingress = "sunshine-admin.${local.domains.public}"
       }
       navidrome = {
         name = "navidrome"
