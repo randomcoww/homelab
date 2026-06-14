@@ -770,8 +770,8 @@ locals {
           apiVersion = "source.toolkit.fluxcd.io/v1"
           kind       = "HelmRepository"
           metadata = {
-            name      = "kured"
-            namespace = local.endpoints.prometheus.namespace
+            name      = local.endpoints.kured.name
+            namespace = local.endpoints.kured.namespace
           }
           spec = {
             interval = "15m"
@@ -782,7 +782,7 @@ locals {
           apiVersion = "helm.toolkit.fluxcd.io/v2"
           kind       = "HelmRelease"
           metadata = {
-            name      = "kured"
+            name      = local.endpoints.kured.name
             namespace = local.endpoints.prometheus.namespace
           }
           spec = {
@@ -799,7 +799,7 @@ locals {
                 interval = "5m"
               }
             }
-            releaseName = "kured"
+            releaseName = local.endpoints.kured.name
             install = {
               remediation = {
                 retries = -1

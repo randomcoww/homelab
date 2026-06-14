@@ -282,6 +282,10 @@ locals {
         name      = "prometheus"
         namespace = "monitoring"
       }
+      kured = {
+        name      = "kured"
+        namespace = "monitoring"
+      }
       searxng = {
         name = "searxng"
       }
