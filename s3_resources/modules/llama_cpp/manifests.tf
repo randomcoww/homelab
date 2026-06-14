@@ -99,8 +99,8 @@ module "httproute" {
   }
 }
 
-module "deployment" {
-  source = "../../../modules/deployment"
+module "statefulset" {
+  source = "../../../modules/statefulset"
 
   name      = var.name
   namespace = var.namespace
@@ -110,9 +110,6 @@ module "deployment" {
   replicas  = 1
   annotations = {
     "checksum/secret" = sha256(module.secret.manifest)
-  }
-  strategy = {
-    type = "Recreate"
   }
   template_spec = {
     resources = merge({
