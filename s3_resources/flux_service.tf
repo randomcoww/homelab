@@ -497,6 +497,14 @@ module "llama-cpp" {
       }
     }
   }
+  resources = {
+    requests = {
+      memory = "32Gi"
+    }
+    limits = {
+      memory = "112Gi" # GTT
+    }
+  }
   ingress_hostname = local.endpoints.llama_cpp.ingress
   gateway_ref = {
     name      = local.endpoints.traefik.name

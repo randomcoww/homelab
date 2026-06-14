@@ -111,6 +111,9 @@ module "deployment" {
   annotations = {
     "checksum/secret" = sha256(module.secret.manifest)
   }
+  strategy = {
+    type = "Recreate"
+  }
   template_spec = {
     resources = merge({
       requests = {
