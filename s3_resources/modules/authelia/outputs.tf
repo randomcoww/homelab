@@ -64,7 +64,7 @@ output "manifests" {
               type = "ClusterIP"
               annotations = {
                 "prometheus.io/scrape" = "true"
-                "prometheus.io/port"   = tostring(var.ports.metrics)
+                "prometheus.io/port"   = tostring(var.metrics_port)
               }
             }
             ingress = {
@@ -398,7 +398,7 @@ output "manifests" {
               telemetry = {
                 metrics = {
                   enabled = true
-                  port    = var.ports.metrics
+                  port    = var.metrics_port
                 }
               }
               default_2fa_method = "webauthn"

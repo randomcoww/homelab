@@ -19,10 +19,8 @@ variable "images" {
   })
 }
 
-variable "ports" {
-  type = object({
-    healthz = number
-  })
+variable "metrics_port" {
+  type = number
 }
 
 variable "kubernetes_pod_prefix" {

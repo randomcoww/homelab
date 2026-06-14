@@ -18,10 +18,8 @@ variable "images" {
   })
 }
 
-variable "ports" {
-  type = object({
-    ldaps = number
-  })
+variable "service_port" {
+  type = number
 }
 
 variable "affinity" {

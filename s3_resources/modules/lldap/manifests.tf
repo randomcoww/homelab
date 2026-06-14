@@ -18,7 +18,7 @@ locals {
   extra_envs = merge(var.extra_configs, {
     LLDAP_LDAP_PORT                = 3890
     LLDAP_HTTP_PORT                = 17170
-    LLDAP_LDAPS_OPTIONS__PORT      = var.ports.ldaps
+    LLDAP_LDAPS_OPTIONS__PORT      = var.service_port
     LLDAP_DATABASE_URL             = "sqlite://${local.db_file}?mode=rwc"
     LLDAP_LDAPS_OPTIONS__CERT_FILE = "${local.base_path}/tls.crt"
     LLDAP_LDAPS_OPTIONS__KEY_FILE  = "${local.base_path}/tls.key"

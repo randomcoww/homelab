@@ -44,7 +44,7 @@ EOF
     for _, member in local.members :
     "sentinel-${member.name}.conf" => <<EOF
 port 0
-tls-port ${var.ports.sentinel}
+tls-port ${var.service_port}
 bind 0.0.0.0
 daemonize no
 unixsocket ${local.base_path}/sentinel.sock
@@ -67,7 +67,7 @@ sentinel failover-timeout ${var.name} 60000
 sentinel parallel-syncs ${var.name} 1
 sentinel myid ${sha1(member.name)}
 %{~for _, remote in local.members}%{if remote.name != member.name}
-sentinel known-sentinel ${var.name} ${remote.name}.${local.headless_service_fqdn} ${var.ports.sentinel} ${sha1(remote.name)}
+sentinel known-sentinel ${var.name} ${remote.name}.${local.headless_service_fqdn} ${var.service_port} ${sha1(remote.name)}
 %{endif}%{endfor~}
 EOF
   }
@@ -84,9 +84,9 @@ module "service" {
     ports = [
       {
         name       = "sentinel"
-        port       = var.ports.sentinel
+        port       = var.service_port
         protocol   = "TCP"
-        targetPort = var.ports.sentinel
+        targetPort = var.service_port
       },
     ]
   }
@@ -111,9 +111,9 @@ module "service-headless" {
       },
       {
         name       = "sentinel"
-        port       = var.ports.sentinel
+        port       = var.service_port
         protocol   = "TCP"
-        targetPort = var.ports.sentinel
+        targetPort = var.service_port
       },
     ]
   }
@@ -266,7 +266,7 @@ module "statefulset" {
         ]
         ports = [
           {
-            containerPort = var.ports.sentinel
+            containerPort = var.service_port
           },
         ]
         volumeMounts = [

@@ -27,10 +27,8 @@ variable "images" {
   })
 }
 
-variable "ports" {
-  type = object({
-    sentinel = number
-  })
+variable "service_port" {
+  type = number
 }
 
 variable "ca" {

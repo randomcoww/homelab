@@ -60,9 +60,7 @@ module "device-plugin" {
   images = {
     device_plugin = local.container_images_digest.device_plugin
   }
-  ports = {
-    device_plugin_metrics = local.service_ports.metrics
-  }
+  metrics_port = local.service_ports.metrics
   args = [
     "--device",
     yamlencode({

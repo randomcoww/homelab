@@ -193,7 +193,7 @@ module "daemonset" {
           "--iface=$(POD_IP)",
           "--public-ip=$(POD_IP)",
           "--healthz-ip=127.0.0.1",
-          "--healthz-port=${var.ports.healthz}",
+          "--healthz-port=${var.metrics_port}",
         ]
         securityContext = {
           capabilities = {
@@ -237,7 +237,7 @@ module "daemonset" {
           httpGet = {
             scheme = "HTTP"
             host   = "127.0.0.1"
-            port   = var.ports.healthz
+            port   = var.metrics_port
             path   = "/healthz"
           }
           initialDelaySeconds = 10
@@ -247,7 +247,7 @@ module "daemonset" {
           httpGet = {
             scheme = "HTTP"
             host   = "127.0.0.1"
-            port   = var.ports.healthz
+            port   = var.metrics_port
             path   = "/healthz"
           }
         }

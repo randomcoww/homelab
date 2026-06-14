@@ -54,3 +54,8 @@ variable "ingress_hostname" {
 variable "gateway_ref" {
   type = any
 }
+
+variable "resources" {
+  type    = any
+  default = {}
+}

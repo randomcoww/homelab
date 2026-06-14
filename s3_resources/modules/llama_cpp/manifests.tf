@@ -112,14 +112,14 @@ module "statefulset" {
     "checksum/secret" = sha256(module.secret.manifest)
   }
   template_spec = {
-    resources = {
+    resources = merge({
       requests = {
         memory = "8Gi"
       }
       limits = {
         memory = "96Gi" # GTT
       }
-    }
+    }, var.resources)
     containers = [
       {
         name  = var.name

@@ -300,6 +300,9 @@ locals {
       llama_cpp = {
         name = "llama-cpp"
       }
+      llama_cpp_s = {
+        name = "llama-cpp-s" # small models
+      }
       open_webui = {
         name    = "open-webui"
         ingress = "owui.${local.domains.public}"
