@@ -57,13 +57,15 @@ module "deployment" {
           "--list-output",
           "yaml",
           "--toolsets",
-          "config,helm",
-          "--disable-destructive",
+          "core,helm",
           "--tls-cert",
           "${local.tls_path}/tls.crt",
           "--tls-key",
           "${local.tls_path}/tls.key",
           "--require-tls",
+          "--log-level",
+          "5",
+          "--read-only",
         ]
         volumeMounts = [
           {

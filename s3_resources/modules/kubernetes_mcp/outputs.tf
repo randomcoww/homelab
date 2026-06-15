@@ -5,7 +5,6 @@ output "manifests" {
     module.service.manifest,
     ], [
     for _, m in [
-      # kubernetes-mcp
       {
         apiVersion = "v1"
         kind       = "ServiceAccount"
@@ -20,6 +19,20 @@ output "manifests" {
       },
       {
         apiVersion = "rbac.authorization.k8s.io/v1"
+        kind       = "ClusterRole"
+        metadata = {
+          name = var.name
+        }
+        rules = [
+          {
+            apiGroups = ["*"]
+            resources = ["*"]
+            verbs     = ["get", "list", "watch"]
+          },
+        ]
+      },
+      {
+        apiVersion = "rbac.authorization.k8s.io/v1"
         kind       = "ClusterRoleBinding"
         metadata = {
           name = var.name
@@ -31,7 +44,7 @@ output "manifests" {
         roleRef = {
           apiGroup = "rbac.authorization.k8s.io"
           kind     = "ClusterRole"
-          name     = "view"
+          name     = var.name
         }
         subjects = [
           {
