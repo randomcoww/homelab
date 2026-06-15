@@ -655,14 +655,9 @@ module "hermes-agent" {
     }
     # https://github.com/AxDSan/mnemosyne/blob/main/docs/hermes-integration.md
     memory = {
-      memory_enabled       = false
-      user_profile_enabled = false
-      provider             = "mnemosyne"
+      provider = "mnemosyne"
       mnemosyne = {
         shared_surface_path = "mnemosyne.db"
-        skip_contexts       = "cron,flush,subagent,background,skill_loop"
-        sleep_threshold     = 50
-        vector_type         = "int8"
       }
     }
     plugins = {

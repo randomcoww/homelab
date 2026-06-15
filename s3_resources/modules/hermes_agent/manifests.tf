@@ -154,6 +154,7 @@ module "litestream-overlay" {
 
           mkdir -p \
             ${local.data_path}/sessions \
+            ${local.data_path}/memories \
             ${local.data_path}/cron \
             ${local.data_path}/skills \
             ${local.data_path}/pairing \
