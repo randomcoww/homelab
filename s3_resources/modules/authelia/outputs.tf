@@ -377,7 +377,7 @@ output "manifests" {
                       memory = "1Gi"
                     }
                     limits = {
-                      memory = "2Gi"
+                      memory = "1Gi"
                     }
                   }
                 },

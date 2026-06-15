@@ -363,7 +363,7 @@ module "llama-cpp-s" {
   }
   resources = {
     requests = {
-      memory = "8Gi"
+      memory = "16Gi"
     }
     limits = {
       memory = "16Gi" # GTT
@@ -499,7 +499,7 @@ module "llama-cpp" {
   }
   resources = {
     requests = {
-      memory = "32Gi"
+      memory = "96Gi"
     }
     limits = {
       memory = "112Gi" # GTT
