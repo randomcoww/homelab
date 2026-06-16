@@ -273,8 +273,9 @@ module "llama-cpp-s" {
   }
   models = {
     for key, model in {
-      jina-embeddings-v5 = "v5-small-text-matching-Q8_0.gguf" # jina-embeddings-v5
-      jina-reranker-v3   = "jina-reranker-v3-Q8_0.gguf"
+      jina-embeddings-v5     = "v5-small-text-matching-Q8_0.gguf"
+      jina-reranker-v3       = "jina-reranker-v3-Q8_0.gguf"
+      whisper-large-v3-turbo = "whisper-large-v3-turbo-q8_0.gguf"
     } :
     key => {
       image = local.container_images_digest[model]
@@ -308,6 +309,17 @@ module "llama-cpp-s" {
           --reranking
         EOF
       }
+      whisper-large-v3-turbo = {
+        ttl           = 0
+        checkEndpoint = "/v1/audio/transcriptions/"
+        cmd           = <<-EOF
+        whisper-server \
+          --port $${PORT} \
+          -m $${whisper-large-v3-turbo} \
+          --request-path /v1/audio/transcriptions \
+          --inference-path ""
+        EOF
+      }
     }
     groups = {
       agent-concurrent = {
@@ -316,6 +328,7 @@ module "llama-cpp-s" {
         members = [
           "jina-embeddings-v5",
           "jina-reranker-v3",
+          "whisper-large-v3-turbo",
         ]
       }
     }
@@ -324,6 +337,7 @@ module "llama-cpp-s" {
         preload = [
           "jina-embeddings-v5",
           "jina-reranker-v3",
+          "whisper-large-v3-turbo",
         ]
       }
     }
@@ -789,17 +803,17 @@ module "open-webui" {
     ENABLE_COMMUNITY_SHARING       = false
     ENABLE_RAG_HYBRID_SEARCH       = true
     AUDIO_STT_ENGINE               = "openai"
-    AUDIO_STT_MODEL                = "nemotron-3-nano-omni:low" # TODO: wait for https://github.com/ggml-org/llama.cpp/pull/22520
-    AUDIO_STT_OPENAI_API_BASE_URL  = "https://${local.endpoints.llama_cpp.ingress}/v1"
+    AUDIO_STT_MODEL                = "whisper-large-v3-turbo"
+    AUDIO_STT_OPENAI_API_BASE_URL  = "https://${local.endpoints.llama_cpp_s.ingress}/v1"
     AUDIO_STT_OPENAI_API_KEY       = random_password.llama-cpp-auth-token.result
     RAG_TOP_K                      = 5
     RAG_EMBEDDING_ENGINE           = "openai"
-    RAG_OPENAI_API_BASE_URL        = "https://${local.endpoints.llama_cpp_s.ingress}/v1/embeddings"
+    RAG_OPENAI_API_BASE_URL        = "https://${local.endpoints.llama_cpp_s.ingress}/v1"
     RAG_OPENAI_API_KEY             = random_password.llama-cpp-auth-token.result
     RAG_EMBEDDING_MODEL            = "jina-embeddings-v5"
     RAG_TOP_K_RERANKER             = 5
     RAG_RERANKING_ENGINE           = "external"
-    RAG_EXTERNAL_RERANKER_URL      = "https://${local.endpoints.llama_cpp_s.ingress}/v1/rerank"
+    RAG_EXTERNAL_RERANKER_URL      = "https://${local.endpoints.llama_cpp_s.ingress}/v1"
     RAG_EXTERNAL_RERANKER_API_KEY  = random_password.llama-cpp-auth-token.result
     RAG_RERANKING_MODEL            = "jina-reranker-v3"
     TOOL_SERVER_CONNECTIONS = jsonencode([
