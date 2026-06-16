@@ -275,7 +275,7 @@ module "llama-cpp-s" {
     for key, model in {
       jina-embeddings-v5     = "v5-small-text-matching-Q8_0.gguf"
       jina-reranker-v3       = "jina-reranker-v3-Q8_0.gguf"
-      whisper-large-v3-turbo = "whisper-large-v3-turbo-q8_0.gguf"
+      whisper-large-v3-turbo = "ggml-large-v3-turbo-q8_0.bin"
     } :
     key => {
       image = local.container_images_digest[model]
@@ -316,6 +316,7 @@ module "llama-cpp-s" {
           --port $${PORT} \
           -m $${whisper-large-v3-turbo} \
           --convert \
+          --language auto \
           --request-path /v1/audio/transcriptions \
           --inference-path ""
         EOF
