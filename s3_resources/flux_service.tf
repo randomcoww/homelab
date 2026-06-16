@@ -310,15 +310,18 @@ module "llama-cpp-s" {
         EOF
       }
       whisper-large-v3-turbo = {
-        ttl           = 0
         checkEndpoint = "/v1/audio/transcriptions/"
         cmd           = <<-EOF
         whisper-server \
           --port $${PORT} \
           -m $${whisper-large-v3-turbo} \
+          --convert \
           --request-path /v1/audio/transcriptions \
           --inference-path ""
         EOF
+        aliases = [
+          "whisper-1",
+        ]
       }
     }
     groups = {
@@ -618,7 +621,8 @@ module "hermes-agent" {
     }
     timezone = local.timezone
     stt = {
-      enabled = false
+      enabled  = true
+      provider = "groq"
     }
     model = {
       default        = "nemotron-3-super:low"
@@ -715,6 +719,10 @@ module "hermes-agent" {
     SLACK_HOME_CHANNEL         = var.slack_home_channel
     SLACK_HOME_CHANNEL_NAME    = "bot"
     MNEMOSYNE_HOST_LLM_ENABLED = true
+    # TODO: STT config - using groq is a hack that may only work because it expects the same whisper-large-v3-turbo model that I'm using
+    GROQ_BASE_URL  = "https://${local.endpoints.llama_cpp_s.ingress}/v1"
+    STT_GROQ_MODEL = "whisper-large-v3-turbo"
+    GROQ_API_KEY   = random_password.llama-cpp-auth-token.result
   }
   extra_dbs = [
     "mnemosyne/data/mnemosyne.db",
