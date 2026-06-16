@@ -821,7 +821,7 @@ module "open-webui" {
     RAG_EMBEDDING_MODEL            = "jina-embeddings-v5"
     RAG_TOP_K_RERANKER             = 5
     RAG_RERANKING_ENGINE           = "external"
-    RAG_EXTERNAL_RERANKER_URL      = "https://${local.endpoints.llama_cpp_s.ingress}/v1"
+    RAG_EXTERNAL_RERANKER_URL      = "https://${local.endpoints.llama_cpp_s.ingress}/v1/rerank"
     RAG_EXTERNAL_RERANKER_API_KEY  = random_password.llama-cpp-auth-token.result
     RAG_RERANKING_MODEL            = "jina-reranker-v3"
     TOOL_SERVER_CONNECTIONS = jsonencode([
