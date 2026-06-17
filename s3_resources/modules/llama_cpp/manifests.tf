@@ -27,6 +27,8 @@ module "secret" {
           --port $${PORT} \
           --flash-attn on \
           --context-shift \
+          --cache-type-k q8_0 \
+          --cache-type-v q8_0 \
           --no-mmap
         EOF
         }, {

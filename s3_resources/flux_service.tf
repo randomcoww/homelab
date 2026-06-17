@@ -298,9 +298,7 @@ module "llama-cpp" {
         $${default_cmd} \
           --model $${nemotron-3-super} \
           --ctx-size 1048576 \
-          --jinja \
-          --cache-type-k q8_0 \
-          --cache-type-v q8_0
+          --jinja
         EOF
         filters = {
           stripParams = "temperature, top_p"
@@ -326,8 +324,6 @@ module "llama-cpp" {
           --model $${nemotron-3-nano-omni} \
           --ctx-size 262144 \
           --jinja \
-          --cache-type-k q8_0 \
-          --cache-type-v q8_0 \
           --mmproj $${nemotron-3-nano-omni-mmproj}
         EOF
         filters = {
@@ -354,7 +350,6 @@ module "llama-cpp" {
           --model $${jina-embeddings-v5-omni} \
           --embedding \
           --pooling last \
-          --cache-ram 0 \
           --mmproj $${jina-embeddings-v5-omni-audio-mmproj} \
           --mmproj $${jina-embeddings-v5-omni-vision-mmproj}
         EOF
@@ -364,8 +359,7 @@ module "llama-cpp" {
         $${default_cmd} \
           --model $${jina-reranker-m0} \
           --reranking \
-          --pooling rank \
-          --cache-ram 0
+          --pooling rank
         EOF
       }
       whisper-large-v3-turbo = {
