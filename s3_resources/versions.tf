@@ -32,7 +32,7 @@ terraform {
       version = "3.2.0"
     }
     ct = {
-      source  = "poseidon/ct"
+      source  = "coreos/ct"
       version = "0.14.0"
     }
   }

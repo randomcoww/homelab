@@ -264,136 +264,6 @@ resource "random_password" "llama-cpp-auth-token" {
   override_special = "-_"
 }
 
-module "llama-cpp-s" {
-  source    = "./modules/llama_cpp"
-  name      = local.endpoints.llama_cpp_s.name
-  namespace = local.endpoints.llama_cpp_s.namespace
-  images = {
-    llama_swap = local.container_images_digest.llama_cpp_vulkan
-  }
-  models = {
-    for key, model in {
-      jina-embeddings-v5     = "v5-small-text-matching-Q8_0.gguf"
-      jina-reranker-v3       = "jina-reranker-v3-Q8_0.gguf"
-      whisper-large-v3-turbo = "ggml-large-v3-turbo-q8_0.bin"
-    } :
-    key => {
-      image = local.container_images_digest[model]
-      file  = model
-    }
-  }
-  api_keys = [
-    random_password.llama-cpp-auth-token.result,
-  ]
-  llama_swap_config = {
-    includeAliasesInList = true
-    models = {
-      jina-embeddings-v5 = {
-        cmd = <<-EOF
-        $${default_cmd} \
-          --model $${jina-embeddings-v5} \
-          --ctx-size 0 \
-          --batch-size 2048 \
-          --ubatch-size 2048 \
-          --embedding \
-          --pooling last
-        EOF
-      }
-      jina-reranker-v3 = {
-        cmd = <<-EOF
-        $${default_cmd} \
-          --model $${jina-reranker-v3} \
-          --ctx-size 0 \
-          --batch-size 2048 \
-          --ubatch-size 2048 \
-          --reranking
-        EOF
-      }
-      whisper-large-v3-turbo = {
-        checkEndpoint = "/v1/audio/transcriptions/"
-        cmd           = <<-EOF
-        whisper-server \
-          --port $${PORT} \
-          -m $${whisper-large-v3-turbo} \
-          --convert \
-          --language auto \
-          --request-path /v1/audio/transcriptions \
-          --inference-path ""
-        EOF
-        aliases = [
-          "whisper-1",
-        ]
-      }
-    }
-    groups = {
-      agent-concurrent = {
-        swap      = false
-        exclusive = true
-        members = [
-          "jina-embeddings-v5",
-          "jina-reranker-v3",
-          "whisper-large-v3-turbo",
-        ]
-      }
-    }
-    hooks = {
-      on_startup = {
-        preload = [
-          "jina-embeddings-v5",
-          "jina-reranker-v3",
-          "whisper-large-v3-turbo",
-        ]
-      }
-    }
-  }
-  extra_envs = [
-    {
-      name  = "ROCBLAS_USE_HIPBLASLT"
-      value = 1
-    },
-    {
-      name  = "AMD_VULKAN_ICD"
-      value = "RADV"
-    },
-    {
-      name  = "RADV_PERFTEST"
-      value = "sam"
-    },
-  ]
-  affinity = {
-    nodeAffinity = {
-      requiredDuringSchedulingIgnoredDuringExecution = {
-        nodeSelectorTerms = [
-          {
-            matchExpressions = [
-              {
-                key      = "amd.com/gpu.vram"
-                operator = "In"
-                values = [
-                  "32G",
-                ]
-              },
-            ]
-          },
-        ]
-      }
-    }
-  }
-  resources = {
-    requests = {
-      memory = "16Gi"
-    }
-    limits = {
-      memory = "16Gi" # GTT
-    }
-  }
-  ingress_hostname = local.endpoints.llama_cpp_s.ingress
-  gateway_ref = {
-    name      = local.endpoints.traefik.name
-    namespace = local.endpoints.traefik.namespace
-  }
-}
-
 module "llama-cpp" {
   source    = "./modules/llama_cpp"
   name      = local.endpoints.llama_cpp.name
@@ -406,6 +276,9 @@ module "llama-cpp" {
       nemotron-3-super            = "NVIDIA-Nemotron-3-Super-120B-A12B-MXFP4_MOE-00001-of-00003.gguf"
       nemotron-3-nano-omni        = "NVIDIA-Nemotron-3-Nano-Omni-30B-A3B-Reasoning-UD-Q8_K_XL.gguf"
       nemotron-3-nano-omni-mmproj = "mmproj-F16.gguf"
+      jina-embeddings-v5          = "v5-small-text-matching-Q8_0.gguf"
+      jina-reranker-v3            = "jina-reranker-v3-Q8_0.gguf"
+      whisper-large-v3-turbo      = "ggml-large-v3-turbo-q8_0.bin"
     } :
     key => {
       image = local.container_images_digest[model]
@@ -473,11 +346,62 @@ module "llama-cpp" {
           }
         }
       }
+      jina-embeddings-v5 = {
+        cmd = <<-EOF
+        $${default_cmd} \
+          --model $${jina-embeddings-v5} \
+          --ctx-size 0 \
+          --batch-size 2048 \
+          --ubatch-size 2048 \
+          --embedding \
+          --pooling last
+        EOF
+      }
+      jina-reranker-v3 = {
+        cmd = <<-EOF
+        $${default_cmd} \
+          --model $${jina-reranker-v3} \
+          --ctx-size 0 \
+          --batch-size 2048 \
+          --ubatch-size 2048 \
+          --reranking
+        EOF
+      }
+      whisper-large-v3-turbo = {
+        checkEndpoint = "/v1/audio/transcriptions/"
+        cmd           = <<-EOF
+        whisper-server \
+          --port $${PORT} \
+          -m $${whisper-large-v3-turbo} \
+          --convert \
+          --language auto \
+          --request-path /v1/audio/transcriptions \
+          --inference-path ""
+        EOF
+        aliases = [
+          "whisper-1",
+        ]
+      }
+    }
+    groups = {
+      agent-concurrent = {
+        swap      = false
+        exclusive = true
+        members = [
+          "nemotron-3-super",
+          "jina-embeddings-v5",
+          "jina-reranker-v3",
+          "whisper-large-v3-turbo",
+        ]
+      }
     }
     hooks = {
       on_startup = {
         preload = [
-          "nemotron-3-super:low",
+          "nemotron-3-super",
+          "jina-embeddings-v5",
+          "jina-reranker-v3",
+          "whisper-large-v3-turbo",
         ]
       }
     }
@@ -520,7 +444,7 @@ module "llama-cpp" {
       memory = "96Gi"
     }
     limits = {
-      memory = "112Gi" # GTT
+      memory = "96Gi" # GTT
     }
   }
   ingress_hostname = local.endpoints.llama_cpp.ingress
@@ -721,7 +645,7 @@ module "hermes-agent" {
     SLACK_HOME_CHANNEL_NAME    = "bot"
     MNEMOSYNE_HOST_LLM_ENABLED = true
     # TODO: STT config - using groq is a hack that may only work because it expects the same whisper-large-v3-turbo model that I'm using
-    GROQ_BASE_URL  = "https://${local.endpoints.llama_cpp_s.ingress}/v1"
+    GROQ_BASE_URL  = "https://${local.endpoints.llama_cpp.ingress}/v1"
     STT_GROQ_MODEL = "whisper-large-v3-turbo"
     GROQ_API_KEY   = random_password.llama-cpp-auth-token.result
   }
@@ -813,16 +737,16 @@ module "open-webui" {
     ENABLE_RAG_HYBRID_SEARCH       = true
     AUDIO_STT_ENGINE               = "openai"
     AUDIO_STT_MODEL                = "whisper-large-v3-turbo"
-    AUDIO_STT_OPENAI_API_BASE_URL  = "https://${local.endpoints.llama_cpp_s.ingress}/v1"
+    AUDIO_STT_OPENAI_API_BASE_URL  = "https://${local.endpoints.llama_cpp.ingress}/v1"
     AUDIO_STT_OPENAI_API_KEY       = random_password.llama-cpp-auth-token.result
     RAG_TOP_K                      = 5
     RAG_EMBEDDING_ENGINE           = "openai"
-    RAG_OPENAI_API_BASE_URL        = "https://${local.endpoints.llama_cpp_s.ingress}/v1"
+    RAG_OPENAI_API_BASE_URL        = "https://${local.endpoints.llama_cpp.ingress}/v1"
     RAG_OPENAI_API_KEY             = random_password.llama-cpp-auth-token.result
     RAG_EMBEDDING_MODEL            = "jina-embeddings-v5"
     RAG_TOP_K_RERANKER             = 5
     RAG_RERANKING_ENGINE           = "external"
-    RAG_EXTERNAL_RERANKER_URL      = "https://${local.endpoints.llama_cpp_s.ingress}/v1/rerank"
+    RAG_EXTERNAL_RERANKER_URL      = "https://${local.endpoints.llama_cpp.ingress}/v1/rerank"
     RAG_EXTERNAL_RERANKER_API_KEY  = random_password.llama-cpp-auth-token.result
     RAG_RERANKING_MODEL            = "jina-reranker-v3"
     TOOL_SERVER_CONNECTIONS = jsonencode([
@@ -1172,7 +1096,6 @@ locals {
     lldap           = module.lldap.manifests
     authelia        = concat(module.authelia-valkey.manifests, module.authelia.manifests)
     llama-cpp       = module.llama-cpp.manifests
-    llama-cpp-s     = module.llama-cpp-s.manifests
     camofox-browser = module.camofox-browser.manifests
     searxng         = module.searxng.manifests
     hermes-agent    = module.hermes-agent.manifests
