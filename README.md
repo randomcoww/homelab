@@ -77,7 +77,7 @@ tofu() {
     -w $(pwd) \
     --env-file=credentials.env \
     --net=host \
-    ghcr.io/opentofu/opentofu:latest "$@"
+    ghcr.io/opentofu/opentofu:1.11.9 "$@"
   rc=$?; set +x; return $rc
 }
 ```

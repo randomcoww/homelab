@@ -273,12 +273,14 @@ module "llama-cpp" {
   }
   models = {
     for key, model in {
-      nemotron-3-super            = "NVIDIA-Nemotron-3-Super-120B-A12B-MXFP4_MOE-00001-of-00003.gguf"
-      nemotron-3-nano-omni        = "NVIDIA-Nemotron-3-Nano-Omni-30B-A3B-Reasoning-UD-Q8_K_XL.gguf"
-      nemotron-3-nano-omni-mmproj = "mmproj-F16.gguf"
-      jina-embeddings-v5          = "v5-small-text-matching-Q8_0.gguf"
-      jina-reranker-v3            = "jina-reranker-v3-Q8_0.gguf"
-      whisper-large-v3-turbo      = "ggml-large-v3-turbo-q8_0.bin"
+      nemotron-3-super                      = "NVIDIA-Nemotron-3-Super-120B-A12B-MXFP4_MOE-00001-of-00003.gguf"
+      nemotron-3-nano-omni                  = "NVIDIA-Nemotron-3-Nano-Omni-30B-A3B-Reasoning-UD-Q8_K_XL.gguf"
+      nemotron-3-nano-omni-mmproj           = "mmproj-F16.gguf"
+      jina-reranker-m0                      = "jina-reranker-m0-Q8_0.gguf"
+      whisper-large-v3-turbo                = "ggml-large-v3-turbo-q8_0.bin"
+      jina-embeddings-v5-omni               = "jina-embeddings-v5-omni-small-text-matching-Q8_0.gguf"
+      jina-embeddings-v5-omni-audio-mmproj  = "jina-embeddings-v5-omni-small-text-matching-audio-mmproj-F16.gguf"
+      jina-embeddings-v5-omni-vision-mmproj = "jina-embeddings-v5-omni-small-text-matching-vision-mmproj-F16.gguf"
     } :
     key => {
       image = local.container_images_digest[model]
@@ -346,25 +348,24 @@ module "llama-cpp" {
           }
         }
       }
-      jina-embeddings-v5 = {
+      jina-embeddings-v5-omni = {
         cmd = <<-EOF
         $${default_cmd} \
-          --model $${jina-embeddings-v5} \
-          --ctx-size 0 \
-          --batch-size 2048 \
-          --ubatch-size 2048 \
+          --model $${jina-embeddings-v5-omni} \
           --embedding \
-          --pooling last
+          --pooling last \
+          --cache-ram 0 \
+          --mmproj $${jina-embeddings-v5-omni-audio-mmproj} \
+          --mmproj $${jina-embeddings-v5-omni-vision-mmproj}
         EOF
       }
-      jina-reranker-v3 = {
+      jina-reranker-m0 = {
         cmd = <<-EOF
         $${default_cmd} \
-          --model $${jina-reranker-v3} \
-          --ctx-size 0 \
-          --batch-size 2048 \
-          --ubatch-size 2048 \
-          --reranking
+          --model $${jina-reranker-m0} \
+          --reranking \
+          --pooling rank \
+          --cache-ram 0
         EOF
       }
       whisper-large-v3-turbo = {
@@ -389,8 +390,8 @@ module "llama-cpp" {
         exclusive = true
         members = [
           "nemotron-3-super",
-          "jina-embeddings-v5",
-          "jina-reranker-v3",
+          "jina-embeddings-v5-omni",
+          "jina-reranker-m0",
           "whisper-large-v3-turbo",
         ]
       }
@@ -399,8 +400,8 @@ module "llama-cpp" {
       on_startup = {
         preload = [
           "nemotron-3-super",
-          "jina-embeddings-v5",
-          "jina-reranker-v3",
+          "jina-embeddings-v5-omni",
+          "jina-reranker-m0",
           "whisper-large-v3-turbo",
         ]
       }
