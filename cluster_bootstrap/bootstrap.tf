@@ -2,6 +2,7 @@ resource "kubernetes_labels" "labels" {
   for_each = {
     for host_key, host in local.members.kubernetes-worker :
     host_key => lookup(host, "kubernetes_node_labels", {})
+    if length(lookup(host, "kubernetes_node_labels", {})) > 0
   }
   api_version = "v1"
   kind        = "Node"
