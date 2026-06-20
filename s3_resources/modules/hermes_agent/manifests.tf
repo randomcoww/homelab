@@ -157,7 +157,6 @@ module "litestream-overlay" {
             ${local.data_path}/memories \
             ${local.data_path}/cron \
             ${local.data_path}/skills \
-            ${local.data_path}/pairing \
             ${local.data_path}/workspace
 
           ln -sf ${local.data_path}/* \
