@@ -122,7 +122,7 @@ locals {
     flannel            = "ghcr.io/flannel-io/flannel:v0.28.5@sha256:5414132a5547ca336112dc00113530363aeeb7e8b59c1f6b8e5703c0ccb534e7"
     flannel_cni_plugin = "ghcr.io/flannel-io/flannel-cni-plugin:v1.9.1-flannel1@sha256:7c3377e977b4b77b8efdad96e207ebee371537d6dcd7b9c40853cf0c0f0aade3"
     kube_vip           = "ghcr.io/kube-vip/kube-vip:v1.2.0@sha256:fe8c7b6641ba7633a12b337821e9e83a6456e8edc3434f97577058edd4eecaf6"
-    minio              = "cgr.dev/chainguard/minio:latest@sha256:0476769da6d4a45d5b9d4d25bef0d2a5358a34d88ea4aa6bd0c42d657011a681"
+    minio              = "cgr.dev/chainguard/minio:latest@sha256:8aeacc27bfa4399bccf756245db126c7e5bc9c438f0f19d014851e2a696d29ec"
     nginx              = "docker.io/nginxinc/nginx-unprivileged:1.31.2-alpine@sha256:26b5d4920434bc4d8c17a68201488cf4b3d2391f0d25305cdfe66ccdc6d18aa4"
     # tier 2
     kea           = "reg.cluster.internal/randomcoww/kea:v3.1.9.1781543514@sha256:5299db6965e835191cecb21adc8a36926bc5e12c65f35883c3236a6f314b4361"
@@ -147,7 +147,7 @@ locals {
     navidrome        = "ghcr.io/navidrome/navidrome:0.62.0@sha256:c4b5cb36a790b3eb63ca6a68bbe2fe149c2d7fa2e586f7a480e61db630e6664b"
     valkey           = "ghcr.io/valkey-io/valkey:9.1-alpine@sha256:a35428eba9043cc0b79dbe54100f0c92784f2de00ad09b01182bfb1c5c83d1bd"
     thanos           = "quay.io/thanos/thanos:v0.41.0@sha256:cf3e9b292e4302ad4a4955b56379703aea39516607d382a57604a3d003c35d10"
-    stump            = "docker.io/aaronleopold/stump:0.1.4@sha256:09a3bfbfa6c44fade1e82b2f13fcd568062da85c760050ec0648ad89fd4dce5f"
+    stump            = "docker.io/aaronleopold/stump:0.1.5@sha256:02684fe218a2a54aee5e8bedd8306b971b857d562770ebc3c35400a706845b6e"
     hermes_agent     = "reg.cluster.internal/randomcoww/hermes-mnemosyne:v2026.6.5.1781674184@sha256:0354092fa244e82e9e5e99f818f97f5716fdc2701c09653b87d469545e308406"
     juicefs          = "reg.cluster.internal/randomcoww/juicefs:v1.3.1.1781543800@sha256:42b7e56fc7b5c868fdf13a12566826082262e484531cbb2955e648cb5d44e4ff"
 
