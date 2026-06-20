@@ -1184,8 +1184,8 @@ locals {
     hostapd         = concat(module.hostapd.manifests, module.qrcode-hostapd.manifests)
     stump           = module.stump.manifests
     gha-runner      = module.gha-runner.manifests
-    navidrome       = module.navidrome.manifests
     kubernetes-mcp  = module.kubernetes-mcp.manifests
     open-webui      = module.open-webui.manifests
+    # navidrome       = module.navidrome.manifests
   }
 }
