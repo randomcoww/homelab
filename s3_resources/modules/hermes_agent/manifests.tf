@@ -130,7 +130,6 @@ module "litestream-overlay" {
   }
 
   template_spec = {
-    priorityClassName = "system-cluster-critical"
     securityContext = {
       # uid/gid of hermes
       fsGroup = local.gid

@@ -114,7 +114,6 @@ module "statefulset" {
     "checksum/secret" = sha256(module.secret.manifest)
   }
   template_spec = {
-    priorityClassName = "system-cluster-critical"
     resources = merge({
       requests = {
         memory = "8Gi"
