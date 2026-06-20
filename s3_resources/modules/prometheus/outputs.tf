@@ -458,6 +458,24 @@ output "manifests" {
                 app = var.name
               }
               affinity = {
+                nodeAffinity = {
+                  preferredDuringSchedulingIgnoredDuringExecution = [
+                    {
+                      weight = 100
+                      preference = {
+                        matchExpressions = [
+                          {
+                            key      = "beta.amd.com/gpu.cu-count"
+                            operator = "Lt"
+                            values = [
+                              "16",
+                            ]
+                          },
+                        ]
+                      }
+                    },
+                  ]
+                }
                 podAntiAffinity = {
                   requiredDuringSchedulingIgnoredDuringExecution = [
                     {

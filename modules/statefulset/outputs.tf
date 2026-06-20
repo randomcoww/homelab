@@ -31,6 +31,24 @@ output "manifest" {
         spec = merge({
           automountServiceAccountToken = false
           affinity = merge({
+            nodeAffinity = merge(lookup(lookup(var.template_spec, "affinity", {}), "nodeAffinity", {}), {
+              preferredDuringSchedulingIgnoredDuringExecution = [
+                {
+                  weight = 100
+                  preference = {
+                    matchExpressions = [
+                      {
+                        key      = "beta.amd.com/gpu.cu-count"
+                        operator = "Lt"
+                        values = [
+                          "16",
+                        ]
+                      },
+                    ]
+                  }
+                },
+              ]
+            })
             podAntiAffinity = {
               requiredDuringSchedulingIgnoredDuringExecution = [
                 {
