@@ -396,10 +396,10 @@ module "llama-cpp" {
           {
             matchExpressions = [
               {
-                key      = "amd.com/gpu.vram"
-                operator = "In"
+                key      = "beta.amd.com/gpu.cu-count"
+                operator = "Gt"
                 values = [
-                  "128G",
+                  "16",
                 ]
               },
             ]
@@ -500,31 +500,12 @@ module "llama-cpp-s" {
       value = "sam"
     },
   ]
-  affinity = {
-    nodeAffinity = {
-      requiredDuringSchedulingIgnoredDuringExecution = {
-        nodeSelectorTerms = [
-          {
-            matchExpressions = [
-              {
-                key      = "amd.com/gpu.vram"
-                operator = "In"
-                values = [
-                  "32G",
-                ]
-              },
-            ]
-          },
-        ]
-      }
-    }
-  }
   resources = {
     requests = {
-      memory = "16Gi"
+      memory = "8Gi"
     }
     limits = {
-      memory = "16Gi" # GTT
+      memory = "8Gi" # GTT
     }
   }
   ingress_hostname = local.endpoints.llama_cpp_s.ingress
@@ -1164,6 +1145,26 @@ locals {
                 }
                 limits = {
                   memory = "128Mi"
+                }
+              }
+              affinity = {
+                nodeAffinity = {
+                  preferredDuringSchedulingIgnoredDuringExecution = [
+                    {
+                      weight = 100
+                      preference = {
+                        matchExpressions = [
+                          {
+                            key      = "beta.amd.com/gpu.cu-count"
+                            operator = "Lt"
+                            values = [
+                              "16",
+                            ]
+                          },
+                        ]
+                      }
+                    },
+                  ]
                 }
               }
             }
