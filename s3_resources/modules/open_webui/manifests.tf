@@ -187,17 +187,17 @@ module "litestream-overlay" {
             readOnly  = true
           },
         ]
-        readinessProbe = {
-          httpGet = {
-            port = local.extra_configs.PORT
-            path = "/health/db"
-          }
-          timeoutSeconds = 2
-        }
         livenessProbe = {
           httpGet = {
             port = local.extra_configs.PORT
             path = "/health"
+          }
+          timeoutSeconds = 2
+        }
+        readinessProbe = {
+          httpGet = {
+            port = local.extra_configs.PORT
+            path = "/health/db"
           }
         }
         startupProbe = {

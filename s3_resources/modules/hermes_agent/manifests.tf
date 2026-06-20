@@ -205,6 +205,22 @@ module "litestream-overlay" {
             containerPort = local.env.API_SERVER_PORT
           },
         ]
+        livenessProbe = {
+          httpGet = {
+            scheme = "HTTP"
+            port   = local.env.API_SERVER_PORT
+            path   = "/health"
+          }
+          initialDelaySeconds = 10
+          timeoutSeconds      = 2
+        }
+        readinessProbe = {
+          httpGet = {
+            scheme = "HTTP"
+            port   = local.env.API_SERVER_PORT
+            path   = "/health/detailed"
+          }
+        }
       },
     ]
     volumes = [
