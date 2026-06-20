@@ -954,6 +954,14 @@ locals {
                   }
                 }
               }
+              resources = {
+                requests = {
+                  memory = "128Mi"
+                }
+                limits = {
+                  memory = "128Mi"
+                }
+              }
             }
           }
         },

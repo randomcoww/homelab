@@ -145,6 +145,14 @@ module "statefulset" {
     serviceName     = module.service-headless.name
   }
   template_spec = {
+    resources = merge({
+      requests = {
+        memory = "64Mi"
+      }
+      limits = {
+        memory = "64Mi"
+      }
+    }, var.resources)
     containers = [
       {
         name  = var.name
