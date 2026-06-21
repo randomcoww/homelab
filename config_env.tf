@@ -137,7 +137,7 @@ locals {
     qrcode_generator = "reg.cluster.internal/randomcoww/qrcode-resource:v1781542588@sha256:a3bd7b9551ee7f87519b5d00a9d92bfd649d1c4115551fe8754a1c215c1c65f3"
     llama_cpp_vulkan = "reg.cluster.internal/randomcoww/llama-swap-ffmpeg:unified-vulkan-2026-06-15.1781583535@sha256:c3b4524709cf2092da6411f9042939c78dbf784e663d613a8cefeb7e0338adde"
     litestream       = "docker.io/litestream/litestream:0.5.12@sha256:dfbb4d91b3d6f50f3185f29f5abb25118d00053de3fc6a45f4a399bc859f4e0f"
-    searxng          = "ghcr.io/searxng/searxng:latest@sha256:0ed5e42ff34a6f783645911ca98643338246450866f367db32d1a4b288554633"
+    searxng          = "ghcr.io/searxng/searxng:latest@sha256:d0f6ccf9d3faab5bba07bb6bbeb533c47dd4ace648ed5a0f8830e10eb96b7082"
     open_webui       = "ghcr.io/open-webui/open-webui:v0.9.6@sha256:90eae5b419e40b4c3dd684582b2c83440b36f9ae2f6532c09639b2ba4ee65158"
     lldap            = "ghcr.io/lldap/lldap:v0.6.3-alpine-rootless@sha256:ba2c50930ea998eefd5454aa678a7977448019248b1827da87d330df0b71c284"
     authelia         = "ghcr.io/authelia/authelia:4.39.20@sha256:1b363e9279e742397966333f364e0876ae02bf5c876de73e83af6d48c57ff51b"
@@ -148,7 +148,7 @@ locals {
     valkey           = "ghcr.io/valkey-io/valkey:9.1-alpine@sha256:a35428eba9043cc0b79dbe54100f0c92784f2de00ad09b01182bfb1c5c83d1bd"
     thanos           = "quay.io/thanos/thanos:v0.41.0@sha256:cf3e9b292e4302ad4a4955b56379703aea39516607d382a57604a3d003c35d10"
     stump            = "docker.io/aaronleopold/stump:0.1.5@sha256:02684fe218a2a54aee5e8bedd8306b971b857d562770ebc3c35400a706845b6e"
-    hermes_agent     = "reg.cluster.internal/randomcoww/hermes-mnemosyne:v2026.6.5.1781674184@sha256:0354092fa244e82e9e5e99f818f97f5716fdc2701c09653b87d469545e308406"
+    hermes_agent     = "reg.cluster.internal/randomcoww/hermes-mnemosyne:v2026.6.5.1782009816@sha256:af28311dbbb99e9355fbdd4154de3e585228660a1940b1650e367c024cc7977c"
     juicefs          = "reg.cluster.internal/randomcoww/juicefs:v1.3.1.1781543800@sha256:42b7e56fc7b5c868fdf13a12566826082262e484531cbb2955e648cb5d44e4ff"
 
     # models (model_file)
