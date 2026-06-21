@@ -1,5 +1,5 @@
 locals {
-  config = merge(var.extra_configs, {
+  extra_envs = merge(var.extra_configs, {
     CAMOFOX_PORT                       = 9377
     MAX_OLD_SPACE_SIZE                 = 2048
     MOZ_DISABLE_CONTENT_SANDBOX        = 1
@@ -18,7 +18,7 @@ module "secret" {
   app       = var.name
   release   = var.release
   data = merge({
-    for k, v in local.config :
+    for k, v in local.extra_envs :
     tostring(k) => tostring(v)
   })
 }
@@ -34,9 +34,9 @@ module "service" {
     ports = [
       {
         name       = var.name
-        port       = local.config.CAMOFOX_PORT
+        port       = local.extra_envs.CAMOFOX_PORT
         protocol   = "TCP"
-        targetPort = local.config.CAMOFOX_PORT
+        targetPort = local.extra_envs.CAMOFOX_PORT
       },
     ]
   }
@@ -70,7 +70,7 @@ module "httproute" {
         backendRefs = [
           {
             name = module.service.name
-            port = local.config.CAMOFOX_PORT
+            port = local.extra_envs.CAMOFOX_PORT
           },
         ]
       },
@@ -104,7 +104,7 @@ module "deployment" {
         name  = var.name
         image = var.images.camofox_browser
         env = [
-          for k, v in local.config :
+          for k, v in local.extra_envs :
           {
             name = tostring(k)
             valueFrom = {
@@ -124,7 +124,7 @@ module "deployment" {
         livenessProbe = {
           httpGet = {
             scheme = "HTTP"
-            port   = local.config.CAMOFOX_PORT
+            port   = local.extra_envs.CAMOFOX_PORT
             path   = "/health"
           }
           initialDelaySeconds = 10
@@ -133,7 +133,7 @@ module "deployment" {
         readinessProbe = {
           httpGet = {
             scheme = "HTTP"
-            port   = local.config.CAMOFOX_PORT
+            port   = local.extra_envs.CAMOFOX_PORT
             path   = "/health"
           }
         }

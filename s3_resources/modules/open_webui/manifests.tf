@@ -1,6 +1,6 @@
 locals {
   db_file = "/data/db.sqlite3"
-  extra_configs = merge(var.extra_configs, {
+  extra_envs = merge(var.extra_configs, {
     PORT                               = 8080
     REQUESTS_CA_BUNDLE                 = "/etc/ssl/certs/ca-certificates.crt"
     SSL_CERT_FILE                      = "/etc/ssl/certs/ca-certificates.crt" # needed for tools server TLS
@@ -39,7 +39,7 @@ module "secret" {
   app       = var.name
   release   = var.release
   data = {
-    for k, v in local.extra_configs :
+    for k, v in local.extra_envs :
     tostring(k) => tostring(v)
   }
 }
@@ -55,9 +55,9 @@ module "service" {
     ports = [
       {
         name       = "open-webui"
-        port       = local.extra_configs.PORT
+        port       = local.extra_envs.PORT
         protocol   = "TCP"
-        targetPort = local.extra_configs.PORT
+        targetPort = local.extra_envs.PORT
       },
     ]
   }
@@ -91,7 +91,7 @@ module "httproute" {
         backendRefs = [
           {
             name = module.service.name
-            port = local.extra_configs.PORT
+            port = local.extra_envs.PORT
           },
         ]
       },
@@ -145,7 +145,7 @@ module "litestream-overlay" {
         name  = var.name
         image = var.images.open_webui
         env = concat([
-          for k, v in local.extra_configs :
+          for k, v in local.extra_envs :
           {
             name = tostring(k)
             valueFrom = {
@@ -177,32 +177,32 @@ module "litestream-overlay" {
         ])
         ports = [
           {
-            containerPort = local.extra_configs.PORT
+            containerPort = local.extra_envs.PORT
           },
         ]
         volumeMounts = [
           {
             name      = "ca-trust-bundle"
-            mountPath = local.extra_configs.REQUESTS_CA_BUNDLE
+            mountPath = local.extra_envs.REQUESTS_CA_BUNDLE
             readOnly  = true
           },
         ]
         livenessProbe = {
           httpGet = {
-            port = local.extra_configs.PORT
+            port = local.extra_envs.PORT
             path = "/health"
           }
           timeoutSeconds = 2
         }
         readinessProbe = {
           httpGet = {
-            port = local.extra_configs.PORT
+            port = local.extra_envs.PORT
             path = "/health/db"
           }
         }
         startupProbe = {
           httpGet = {
-            port = local.extra_configs.PORT
+            port = local.extra_envs.PORT
             path = "/health"
           }
           failureThreshold = 6

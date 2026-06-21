@@ -1,6 +1,6 @@
 
 locals {
-  extra_configs = merge(var.extra_configs, {
+  extra_envs = merge(var.extra_configs, {
     SEARXNG_SETTINGS_PATH   = "/etc/searxng/settings.yml"
     SEARXNG_LIMITER         = false
     SEARXNG_PUBLIC_INSTANCE = false
@@ -23,10 +23,10 @@ module "secret" {
   app       = var.name
   release   = var.release
   data = merge({
-    for k, v in local.extra_configs :
+    for k, v in local.extra_envs :
     tostring(k) => tostring(v)
     }, {
-    basename(local.extra_configs.SEARXNG_SETTINGS_PATH) = yamlencode(var.searxng_settings)
+    basename(local.extra_envs.SEARXNG_SETTINGS_PATH) = yamlencode(var.searxng_settings)
   })
 }
 
@@ -41,9 +41,9 @@ module "service" {
     ports = [
       {
         name       = "searxng"
-        port       = local.extra_configs.SEARXNG_PORT
+        port       = local.extra_envs.SEARXNG_PORT
         protocol   = "TCP"
-        targetPort = local.extra_configs.SEARXNG_PORT
+        targetPort = local.extra_envs.SEARXNG_PORT
       },
     ]
   }
@@ -77,7 +77,7 @@ module "httproute" {
         backendRefs = [
           {
             name = module.service.name
-            port = local.extra_configs.SEARXNG_PORT
+            port = local.extra_envs.SEARXNG_PORT
           },
         ]
       },
@@ -110,7 +110,7 @@ module "deployment" {
         name  = var.name
         image = var.images.searxng
         env = [
-          for k, v in local.extra_configs :
+          for k, v in local.extra_envs :
           {
             name = tostring(k)
             valueFrom = {
@@ -123,19 +123,19 @@ module "deployment" {
         ]
         ports = [
           {
-            containerPort = local.extra_configs.SEARXNG_PORT
+            containerPort = local.extra_envs.SEARXNG_PORT
           },
         ]
         volumeMounts = [
           {
             name      = "config"
-            mountPath = local.extra_configs.SEARXNG_SETTINGS_PATH
-            subPath   = basename(local.extra_configs.SEARXNG_SETTINGS_PATH)
+            mountPath = local.extra_envs.SEARXNG_SETTINGS_PATH
+            subPath   = basename(local.extra_envs.SEARXNG_SETTINGS_PATH)
           },
         ]
         livenessProbe = {
           httpGet = {
-            port = local.extra_configs.SEARXNG_PORT
+            port = local.extra_envs.SEARXNG_PORT
             path = "/healthz"
           }
           initialDelaySeconds = 10
@@ -143,7 +143,7 @@ module "deployment" {
         }
         readinessProbe = {
           httpGet = {
-            port = local.extra_configs.SEARXNG_PORT
+            port = local.extra_envs.SEARXNG_PORT
             path = "/healthz"
           }
           timeoutSeconds = 4

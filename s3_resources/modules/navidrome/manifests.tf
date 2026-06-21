@@ -1,6 +1,6 @@
 
 locals {
-  navidrome_config = merge(var.extra_configs, {
+  extra_envs = merge(var.extra_configs, {
     ND_MUSICFOLDER             = "/navidrome/library/mnt"
     ND_DATAFOLDER              = "/navidrome/data"
     ND_CACHEFOLDER             = "/navidrome/cache"
@@ -21,7 +21,7 @@ locals {
     ND_PROMETHEUS_METRICSPATH  = "/metrics"
     ND_SCANNER_PURGEMISSING    = "always"
   })
-  db_file = "${local.navidrome_config["ND_DATAFOLDER"]}/navidrome.db" # db name not configurable
+  db_file = "${local.extra_envs.ND_DATAFOLDER}/navidrome.db" # db name not configurable
 }
 
 module "service" {
@@ -32,17 +32,17 @@ module "service" {
   release   = var.release
   annotations = {
     "prometheus.io/scrape" = "true"
-    "prometheus.io/port"   = tostring(local.navidrome_config["ND_PORT"])
-    "prometheus.io/path"   = local.navidrome_config["ND_PROMETHEUS_METRICSPATH"]
+    "prometheus.io/port"   = tostring(local.extra_envs.ND_PORT)
+    "prometheus.io/path"   = local.extra_envs.ND_PROMETHEUS_METRICSPATH
   }
   spec = {
     type = "ClusterIP"
     ports = [
       {
         name       = var.name
-        port       = local.navidrome_config["ND_PORT"]
+        port       = local.extra_envs.ND_PORT
         protocol   = "TCP"
-        targetPort = local.navidrome_config["ND_PORT"]
+        targetPort = local.extra_envs.ND_PORT
       },
     ]
   }
@@ -76,7 +76,7 @@ module "httproute" {
         backendRefs = [
           {
             name = module.service.name
-            port = local.navidrome_config["ND_PORT"]
+            port = local.extra_envs.ND_PORT
           },
         ]
         filters = [
@@ -141,11 +141,11 @@ module "litestream-overlay" {
         image = var.images.navidrome
         ports = [
           {
-            containerPort = local.navidrome_config["ND_PORT"]
+            containerPort = local.extra_envs.ND_PORT
           },
         ]
         env = [
-          for k, v in local.navidrome_config :
+          for k, v in local.extra_envs :
           {
             name  = tostring(k)
             value = tostring(v)
@@ -154,13 +154,13 @@ module "litestream-overlay" {
         volumeMounts = [
           {
             name      = "cache"
-            mountPath = local.navidrome_config["ND_CACHEFOLDER"]
+            mountPath = local.extra_envs.ND_CACHEFOLDER
           },
         ]
         livenessProbe = {
           httpGet = {
             scheme = "HTTP"
-            port   = local.navidrome_config["ND_PORT"]
+            port   = local.extra_envs.ND_PORT
             path   = "/"
           }
           initialDelaySeconds = 10
@@ -169,7 +169,7 @@ module "litestream-overlay" {
         readinessProbe = {
           httpGet = {
             scheme = "HTTP"
-            port   = local.navidrome_config["ND_PORT"]
+            port   = local.extra_envs.ND_PORT
             path   = "/"
           }
         }
@@ -199,7 +199,7 @@ module "mountpoint-s3-overlay" {
   namespace   = var.namespace
   app         = var.name
   release     = var.release
-  mount_path  = local.navidrome_config["ND_MUSICFOLDER"]
+  mount_path  = local.extra_envs.ND_MUSICFOLDER
   s3_endpoint = var.minio_endpoint
   s3_bucket   = var.minio_data_bucket
   s3_prefix   = ""
