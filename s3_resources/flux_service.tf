@@ -35,7 +35,6 @@ locals {
       pkce_challenge_method = ""
       redirect_uris = [
         "https://${local.endpoints.stump.ingress}/api/v2/auth/oidc/callback",
-        "http://${local.endpoints.stump.ingress}/api/v2/auth/oidc/callback",
       ]
       claims_policy = "stump_policy"
       consent_mode  = "implicit"
