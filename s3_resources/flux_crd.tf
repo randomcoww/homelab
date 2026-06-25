@@ -996,7 +996,7 @@ locals {
             chart = {
               spec = {
                 chart   = "cert-manager"
-                version = "1.20.2" # renovate: datasource=helm depName=cert-manager registryUrl=https://charts.jetstack.io
+                version = "1.20.3" # renovate: datasource=helm depName=cert-manager registryUrl=https://charts.jetstack.io
                 sourceRef = {
                   kind = "HelmRepository"
                   name = local.endpoints.cert_manager.name
