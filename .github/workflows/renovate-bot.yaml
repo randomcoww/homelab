@@ -11,7 +11,7 @@ jobs:
   renovate:
     runs-on: renovate-${{ github.event.repository.name }}
     container:
-      image: ghcr.io/renovatebot/renovate:43.243.0@sha256:c693a8d796ca6e2def3bc12fde83b459ee30e91212a1dbdcc22a77198f555749
+      image: ghcr.io/renovatebot/renovate:43.244.1@sha256:9065c77f1b9b60bfcffec37bd1306d28692c8396fee5c679e3ff74d5e3599e28
     permissions:
       contents: write
       issues: write
