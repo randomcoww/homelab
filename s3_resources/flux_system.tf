@@ -789,7 +789,7 @@ locals {
             chart = {
               spec = {
                 chart   = "kured"
-                version = "6.0.0" # renovate: datasource=helm depName=kured registryUrl=https://kubereboot.github.io/charts
+                version = "6.1.0" # renovate: datasource=helm depName=kured registryUrl=https://kubereboot.github.io/charts
                 sourceRef = {
                   kind = "HelmRepository"
                   name = local.endpoints.kured.name
