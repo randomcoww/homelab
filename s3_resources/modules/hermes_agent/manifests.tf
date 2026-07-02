@@ -218,7 +218,7 @@ module "litestream-overlay" {
           httpGet = {
             scheme = "HTTP"
             port   = local.extra_envs.API_SERVER_PORT
-            path   = "/health/detailed"
+            path   = "/health"
           }
         }
       },
