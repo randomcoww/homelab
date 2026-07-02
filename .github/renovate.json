@@ -78,6 +78,12 @@
       "versioning": "regex:^RELEASE\\.(?<major>\\d{4})-(?<minor>\\d{2})-(?<patch>\\d{2})T(?<build>\\d{2}-\\d{2}-\\d{2})Z$"
     },
     {
+      "matchPackageNames": [
+        "reg.cluster.internal/randomcoww/llama-swap-ffmpeg"
+      ],
+      "versioning": "regex:^unified-vulkan-(?<major>\\d{4})-(?<minor>\\d{2})-(?<patch>\\d{2})$"
+    },
+    {
       "matchDepTypes": [
         "helm_release",
         "helm_regex"
