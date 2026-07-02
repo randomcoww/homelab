@@ -81,7 +81,7 @@
       "matchPackageNames": [
         "reg.cluster.internal/randomcoww/llama-swap-ffmpeg"
       ],
-      "versioning": "regex:^unified-vulkan-(?<major>\\d{4})-(?<minor>\\d{2})-(?<patch>\\d{2})$"
+      "versioning": "regex:^unified-vulkan-(?<major>\\d{4})-(?<minor>\\d{2})-(?<patch>\\d{2}).(?<build>\\d+)$"
     },
     {
       "matchDepTypes": [
