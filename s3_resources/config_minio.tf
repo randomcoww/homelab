@@ -87,7 +87,6 @@ locals {
               "s3:AbortMultipartUpload",
             ]
             buckets = [
-              "ebooks",
               "stump",
             ]
           },
@@ -151,7 +150,6 @@ locals {
               "s3:AbortMultipartUpload",
             ]
             buckets = [
-              "music",
               "navidrome",
             ]
           },
@@ -216,6 +214,38 @@ locals {
             ]
             buckets = [
               "hermes-agent",
+            ]
+          },
+        ]
+      }
+
+      # mountpoint-s3-csi
+      mountpoint_s3_csi = {
+        name      = local.endpoints.mountpoint_s3_csi.name
+        namespace = local.endpoints.mountpoint_s3_csi.namespace
+        policies = [
+          {
+            Effect = "Allow"
+            Action = [
+              "s3:GetObject",
+              "s3:PutObject",
+              "s3:ListBucket",
+              "s3:DeleteObject",
+              "s3:AbortMultipartUpload",
+            ]
+            buckets = [
+              "stump",
+            ]
+          },
+          {
+            Effect = "Allow"
+            Action = [
+              "s3:GetObject",
+              "s3:ListBucket",
+            ]
+            buckets = [
+              "music",
+              "ebooks",
             ]
           },
         ]

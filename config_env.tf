@@ -273,6 +273,13 @@ locals {
         name      = "k8s-gateway"
         namespace = "kube-system"
       }
+      kubernetes_mcp = {
+        name = "kubernetes-mcp"
+      }
+      mountpoint_s3_csi = {
+        name      = "s3-csi"
+        namespace = "s3-csi"
+      }
       kea = {
         name      = "kea"
         namespace = "netboot"
@@ -293,8 +300,9 @@ locals {
         name = "searxng"
       }
       registry = {
-        name    = "registry"
-        service = "reg.${local.domains.kubernetes}"
+        name      = "registry"
+        namespace = "registry"
+        service   = "reg.${local.domains.kubernetes}"
       }
       qrcode_hostapd = {
         name    = "qrcode-hostapd"
@@ -332,9 +340,6 @@ locals {
       stump = {
         name   = "stump"
         tunnel = true
-      }
-      kubernetes_mcp = {
-        name = "kubernetes-mcp"
       }
       fluxcd = {
         name      = "fluxcd"

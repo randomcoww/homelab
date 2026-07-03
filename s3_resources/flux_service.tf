@@ -1171,18 +1171,18 @@ locals {
       yamlencode(m)
     ]
 
-    lldap           = module.lldap.manifests
-    authelia        = concat(module.authelia-valkey.manifests, module.authelia.manifests)
+    gha-runner      = module.gha-runner.manifests
     llama-cpp       = module.llama-cpp.manifests
     llama-cpp-s     = module.llama-cpp-s.manifests
     camofox-browser = module.camofox-browser.manifests
     searxng         = module.searxng.manifests
-    hermes-agent    = module.hermes-agent.manifests
-    hostapd         = concat(module.hostapd.manifests, module.qrcode-hostapd.manifests)
-    stump           = module.stump.manifests
-    gha-runner      = module.gha-runner.manifests
     kubernetes-mcp  = module.kubernetes-mcp.manifests
+    hermes-agent    = module.hermes-agent.manifests
     open-webui      = module.open-webui.manifests
+    hostapd         = concat(module.hostapd.manifests, module.qrcode-hostapd.manifests)
+    authelia        = concat(module.authelia-valkey.manifests, module.authelia.manifests)
+    lldap           = module.lldap.manifests
+    stump           = module.stump.manifests
     navidrome       = module.navidrome.manifests
   }
 }

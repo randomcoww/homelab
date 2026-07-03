@@ -817,6 +817,20 @@ module "prometheus" {
   minio_user     = minio_iam_user.user["prometheus"]
 }
 
+module "mountpoint-s3-csi" {
+  source    = "./modules/mountpoint_s3_csi"
+  name      = local.endpoints.mountpoint_s3_csi.name
+  namespace = local.endpoints.mountpoint_s3_csi.namespace
+  images = {
+    mountpoint_s3_csi = {
+      repository = regex(local.container_image_regex, local.container_images.mountpoint_s3_csi).depName
+      tag        = regex(local.container_image_regex, local.container_images.mountpoint_s3_csi).currentValue
+    }
+  }
+  kubelet_root_path = local.kubernetes.kubelet_root_path
+  minio_user        = minio_iam_user.user["mountpoint_s3_csi"]
+}
+
 locals {
   flux_crd = {
 
@@ -1175,73 +1189,7 @@ locals {
       yamlencode(m)
     ]
 
-    mountpoint-s3-csi = [
-      for _, m in [
-        {
-          apiVersion = "source.toolkit.fluxcd.io/v1"
-          kind       = "HelmRepository"
-          metadata = {
-            name      = "mountpoint-s3-csi"
-            namespace = local.endpoints.minio.namespace
-          }
-          spec = {
-            interval = "15m"
-            url      = "https://awslabs.github.io/mountpoint-s3-csi-driver"
-          }
-        },
-        {
-          apiVersion = "helm.toolkit.fluxcd.io/v2"
-          kind       = "HelmRelease"
-          metadata = {
-            name      = "mountpoint-s3-csi"
-            namespace = local.endpoints.minio.namespace
-          }
-          spec = {
-            interval = "15m"
-            timeout  = "5m"
-            chart = {
-              spec = {
-                chart   = "aws-mountpoint-s3-csi-driver"
-                version = "2.7.0" # renovate: datasource=helm depName=aws-mountpoint-s3-csi-driver registryUrl=https://awslabs.github.io/mountpoint-s3-csi-driver
-                sourceRef = {
-                  kind = "HelmRepository"
-                  name = "mountpoint-s3-csi"
-                }
-                interval = "5m"
-              }
-            }
-            releaseName = "mountpoint-s3-csi"
-            install = {
-              remediation = {
-                retries = -1
-              }
-            }
-            upgrade = {
-              remediation = {
-                retries = -1
-              }
-            }
-            test = {
-              enable = false
-            }
-            values = {
-              image = {
-                repository = regex(local.container_image_regex, local.container_images.mountpoint_s3_csi).depName
-                tag        = regex(local.container_image_regex, local.container_images.mountpoint_s3_csi).currentValue
-              }
-              supportLegacySystemDMounts = false
-              awsAccessSecret = {
-                name      = local.endpoints.minio.name
-                keyId     = "rootUser"
-                accessKey = "rootPassword"
-              }
-            }
-          }
-        },
-      ] :
-      yamlencode(m)
-    ]
-
-    prometheus = module.prometheus.manifests
+    prometheus        = module.prometheus.manifests
+    mountpoint-s3-csi = module.mountpoint-s3-csi.manifests
   }
 }
