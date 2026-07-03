@@ -131,11 +131,11 @@ locals {
     device_plugin = "ghcr.io/squat/generic-device-plugin:0.2.0@sha256:66c8d5c270eb2b721f1064c549b9b7898152a6d2f0163380a5d37dc7636c20ff"
     gha_runner    = "ghcr.io/actions/actions-runner:2.335.1@sha256:08c30b0a7105f64bddfc485d2487a22aa03932a791402393352fdf674bda2c29"
     # tier 3
-    mountpoint_s3_csi = "reg.cluster.internal/randomcoww/mountpoint-s3-csi:v2.6.0.1783066598@sha256:85050253371091b7979d83939469062a3124407ba677761ee88ea7baaa84a150"
+    mountpoint_s3_csi = "reg.cluster.internal/randomcoww/mountpoint-s3-csi:v2.7.0.1783094426@sha256:2ccb3b80b58745157f02033ea2032635a91d30835c2ae60185bbcb2dfbff503a"
     hostapd           = "reg.cluster.internal/randomcoww/hostapd:v2.11.1782747376@sha256:76a9f005484f45e504604d96ad5520c68ff73380519bdf56637bd9d1c27a6f42"
     tailscale         = "ghcr.io/tailscale/tailscale:v1.98.4@sha256:25cde9ad76020b0e29229136d0c38b5962e9a0e1774ffac9b0df68e4a37d6cf0"
     qrcode_generator  = "reg.cluster.internal/randomcoww/qrcode-resource:v1782747012@sha256:ada388e04c2de4f0e894a9ecd0fcce78423a1c6141eb360f07832c236cc5665b"
-    llama_cpp_vulkan  = "reg.cluster.internal/randomcoww/llama-swap-ffmpeg:unified-vulkan-2026-07-01.1783030200@sha256:0b7600f9fa77058c5f4c0ae6cacae3b45ef02f196addf46d2ff4fcc423224d0a"
+    llama_cpp_vulkan  = "reg.cluster.internal/randomcoww/llama-swap-ffmpeg:unified-vulkan-2026-07-03.1783094623@sha256:43b50d505f5e50178e35a19ae3c7db0e60787d30d276ca36cc4e87ac310b86f7"
     litestream        = "docker.io/litestream/litestream:0.5.13@sha256:63134c853e43c12bf5b08aa93f0fae4dd63c7034b0972d626817ad562e6a8609"
     searxng           = "ghcr.io/searxng/searxng:latest@sha256:b7492e1b8fcb376191809982e6a45dc809a5d0e641d81feaa53a1fac6c599b9e"
     open_webui        = "ghcr.io/open-webui/open-webui:v0.10.2@sha256:9fcea9c6e32ab60b0498f3986c6cdf651ddbe61db48d2213a3d28048ddd673d4"
