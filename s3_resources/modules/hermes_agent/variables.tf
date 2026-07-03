@@ -25,7 +25,6 @@ variable "affinity" {
 variable "images" {
   type = object({
     hermes_agent = string
-    mountpoint   = string
     litestream   = string
     juicefs      = string
   })

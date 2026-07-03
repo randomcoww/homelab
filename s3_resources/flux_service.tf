@@ -594,7 +594,6 @@ module "hermes-agent" {
   namespace = local.endpoints.hermes_agent.namespace
   images = {
     hermes_agent = local.container_images_digest.hermes_agent
-    mountpoint   = local.container_images_digest.mountpoint
     litestream   = local.container_images_digest.litestream
     juicefs      = local.container_images_digest.juicefs
   }
@@ -651,6 +650,7 @@ module "hermes-agent" {
           ALPACA_API_KEY     = var.alpaca_api_key
           ALPACA_SECRET_KEY  = var.alpaca_secret_key
           ALPACA_PAPER_TRADE = "true"
+          ALPACA_TOOLSETS    = "all"
         }
         timeout         = 30
         connect_timeout = 30
@@ -993,7 +993,6 @@ module "stump" {
   replicas  = 1
   images = {
     stump      = local.container_images_digest.stump
-    mountpoint = local.container_images_digest.mountpoint
     litestream = local.container_images_digest.litestream
   }
   extra_configs = {
@@ -1021,7 +1020,6 @@ module "navidrome" {
   namespace = local.endpoints.navidrome.namespace
   images = {
     navidrome  = local.container_images_digest.navidrome
-    mountpoint = local.container_images_digest.mountpoint
     litestream = local.container_images_digest.litestream
   }
   extra_configs = {
@@ -1185,6 +1183,6 @@ locals {
     gha-runner      = module.gha-runner.manifests
     kubernetes-mcp  = module.kubernetes-mcp.manifests
     open-webui      = module.open-webui.manifests
-    # navidrome       = module.navidrome.manifests
+    navidrome       = module.navidrome.manifests
   }
 }

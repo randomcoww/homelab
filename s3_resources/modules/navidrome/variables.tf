@@ -24,7 +24,6 @@ variable "affinity" {
 variable "images" {
   type = object({
     navidrome  = string
-    mountpoint = string
     litestream = string
   })
 }

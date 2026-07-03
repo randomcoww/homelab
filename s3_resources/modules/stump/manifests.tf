@@ -148,6 +148,16 @@ module "litestream-overlay" {
             }
           }
         ])
+        volumeMounts = [
+          {
+            name      = "data"
+            mountPath = local.data_path
+          },
+          {
+            name      = "thumbnails"
+            mountPath = local.thumbnails_path
+          },
+        ]
         livenessProbe = {
           httpGet = {
             port = local.extra_envs.STUMP_PORT
@@ -172,54 +182,20 @@ module "litestream-overlay" {
           medium = "Memory"
         }
       },
+      {
+        name = "data"
+        persistentVolumeClaim = {
+          claimName = "${var.name}-${var.minio_data_bucket}"
+        }
+      },
+      {
+        name = "thumbnails"
+        persistentVolumeClaim = {
+          claimName = "${var.name}-${var.minio_bucket}"
+        }
+      },
     ]
   }
-}
-
-module "mountpoint-s3-overlay" {
-  source = "../mountpoint_s3_overlay"
-
-  name        = var.name
-  namespace   = var.namespace
-  app         = var.name
-  release     = var.release
-  mount_path  = local.data_path
-  s3_endpoint = var.minio_endpoint
-  s3_bucket   = var.minio_data_bucket
-  s3_prefix   = ""
-  s3_mount_extra_args = [
-    "--read-only",
-    # "--cache /var/cache", # cache to disk
-    "--cache /var/tmp",      # cache to memory
-    "--max-cache-size 1024", # 1Gi
-  ]
-  s3_access_secret = module.minio-user-secret.name
-  images = {
-    mountpoint = var.images.mountpoint
-  }
-  template_spec = module.litestream-overlay.template_spec
-}
-
-module "thumbnails-mountpoint-s3-overlay" {
-  source = "../mountpoint_s3_overlay"
-
-  name        = "${var.name}-thumbnails"
-  namespace   = var.namespace
-  app         = var.name
-  release     = var.release
-  mount_path  = local.thumbnails_path
-  s3_endpoint = var.minio_endpoint
-  s3_bucket   = var.minio_bucket
-  s3_prefix   = "thumbnails"
-  s3_mount_extra_args = [
-    "--cache /var/tmp",      # cache to memory
-    "--max-cache-size 1024", # 1Gi
-  ]
-  s3_access_secret = module.minio-user-secret.name
-  images = {
-    mountpoint = var.images.mountpoint
-  }
-  template_spec = module.mountpoint-s3-overlay.template_spec
 }
 
 module "statefulset" {
@@ -260,7 +236,7 @@ module "statefulset" {
     ]
   }
   */
-  template_spec = module.thumbnails-mountpoint-s3-overlay.template_spec
+  template_spec = module.litestream-overlay.template_spec
 }
 
 module "minio-user-secret" {
