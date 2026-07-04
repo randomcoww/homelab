@@ -59,6 +59,7 @@ output "manifests" {
               kubeletPath = var.kubelet_root_path
             }
             supportLegacySystemDMounts = false
+            # TODO: update credentials handling https://github.com/awslabs/mountpoint-s3-csi-driver/issues/334
             awsAccessSecret = {
               name      = module.minio-user-secret.name
               keyId     = "AWS_ACCESS_KEY_ID"
