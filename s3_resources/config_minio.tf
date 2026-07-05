@@ -93,48 +93,6 @@ locals {
         ]
       }
 
-      # lldap litestream
-      lldap = {
-        name      = local.endpoints.lldap.name
-        namespace = local.endpoints.lldap.namespace
-        policies = [
-          {
-            Effect = "Allow"
-            Action = [
-              "s3:GetObject",
-              "s3:PutObject",
-              "s3:ListBucket",
-              "s3:DeleteObject",
-              "s3:AbortMultipartUpload",
-            ]
-            buckets = [
-              "lldap",
-            ]
-          },
-        ]
-      }
-
-      # authelia litestream
-      authelia = {
-        name      = local.endpoints.authelia.name
-        namespace = local.endpoints.authelia.namespace
-        policies = [
-          {
-            Effect = "Allow"
-            Action = [
-              "s3:GetObject",
-              "s3:PutObject",
-              "s3:ListBucket",
-              "s3:DeleteObject",
-              "s3:AbortMultipartUpload",
-            ]
-            buckets = [
-              "authelia",
-            ]
-          },
-        ]
-      }
-
       # navidrome mount-s3 access for music and metadata
       navidrome = {
         name      = local.endpoints.navidrome.name

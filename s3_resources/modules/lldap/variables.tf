@@ -11,10 +11,14 @@ variable "release" {
   default = "0.1.0"
 }
 
+variable "replicas" {
+  type    = number
+  default = 2
+}
+
 variable "images" {
   type = object({
-    lldap      = string
-    litestream = string
+    lldap = string
   })
 }
 
@@ -50,19 +54,4 @@ variable "gateway_ref" {
 variable "extra_configs" {
   type    = map(any)
   default = {}
-}
-
-variable "minio_endpoint" {
-  type = string
-}
-
-variable "minio_bucket" {
-  type = string
-}
-
-variable "minio_user" {
-  type = object({
-    id     = string
-    secret = string
-  })
 }

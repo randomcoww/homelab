@@ -1,12 +1,13 @@
 locals {
-  authelia_db_file                 = "/config/db.sqlite3" # base path not configurable
-  authelia_litestream_config_file  = "/etc/litestream/config.yaml"
-  authelia_ldap_tls_cert_file      = "/custom/ldap-cert.pem"
-  authelia_ldap_tls_key_file       = "/custom/ldap-key.pem"
-  authelia_redis_tls_cert_file     = "/custom/redis-cert.pem"
-  authelia_redis_tls_key_file      = "/custom/redis-key.pem"
+  envs = {
+    AUTHELIA_AUTHENTICATION_BACKEND_LDAP_TLS_PRIVATE_KEY_FILE       = "/custom/ldap-client-key.pem"
+    AUTHELIA_AUTHENTICATION_BACKEND_LDAP_TLS_CERTIFICATE_CHAIN_FILE = "/custom/ldap-client-cert.pem"
+    AUTHELIA_SESSION_REDIS_TLS_PRIVATE_KEY_FILE                     = "/custom/redis-client-key.pem"
+    AUTHELIA_SESSION_REDIS_TLS_CERTIFICATE_CHAIN_FILE               = "/custom/redis-client-cert.pem"
+    AUTHELIA_STORAGE_POSTGRES_PASSWORD_FILE                         = "/custom/posgres-password"
+    AUTHELIA_IDENTITY_PROVIDERS_OIDC_HMAC_SECRET_FILE               = "/custom/oidc-hmac-secret"
+  }
   authelia_oidc_jwk_key_file       = "/custom/oidc-jwk-key.pem"
-  authelia_oidc_hmac_secret_file   = "/custom/oidc-hmac-secret"
   autehlia_oidc_client_shared_path = "/oidc"
   domain_regex                     = "(?<hostname>(?<subdomain>[a-z0-9-*]+)\\.(?<domain>[a-z0-9.-]+))(?::(?<port>\\d+))?"
 }
@@ -57,28 +58,6 @@ module "secret" {
   app       = var.name
   release   = var.release
   data = merge({
-    "litestream" = yamlencode({
-      retention = {
-        enabled = true
-      }
-      dbs = [
-        {
-          path                = local.authelia_db_file
-          monitor-interval    = "1s"
-          checkpoint-interval = "60s"
-          replica = {
-            type          = "s3"
-            endpoint      = "https://${var.minio_endpoint}"
-            bucket        = var.minio_bucket
-            path          = "$POD_NAME/litestream"
-            sync-interval = "1s"
-            part-size     = "50MB"
-            concurrency   = 10
-            auto-recover  = true
-          }
-        },
-      ]
-    })
     "oidc-jwk-key"     = tls_private_key.authelia-oidc-jwk.private_key_pem
     "oidc-hmac-secret" = random_password.authelia-oidc-hmac-secret.result
     }, {
@@ -88,17 +67,5 @@ module "secret" {
     }, {
     for key, v in var.oidc_clients :
     "oidc-client-secret-${key}" => v.client_secret
-  })
-}
-
-module "minio-user-secret" {
-  source    = "../../../modules/secret"
-  name      = "${var.name}-minio-user-secret"
-  namespace = var.namespace
-  app       = var.name
-  release   = var.release
-  data = merge({
-    AWS_ACCESS_KEY_ID     = var.minio_user.id
-    AWS_SECRET_ACCESS_KEY = var.minio_user.secret
   })
 }

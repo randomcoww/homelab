@@ -1189,6 +1189,64 @@ locals {
       yamlencode(m)
     ]
 
+    cnpg = [
+      for _, m in [
+        {
+          apiVersion = "source.toolkit.fluxcd.io/v1"
+          kind       = "HelmRepository"
+          metadata = {
+            name      = "cloudnative-pg"
+            namespace = "cnpg-system"
+          }
+          spec = {
+            interval = "15m"
+            url      = "https://cloudnative-pg.github.io/charts"
+          }
+        },
+        {
+          apiVersion = "helm.toolkit.fluxcd.io/v2"
+          kind       = "HelmRelease"
+          metadata = {
+            name      = "cloudnative-pg"
+            namespace = "cnpg-system"
+          }
+          spec = {
+            interval = "15m"
+            timeout  = "5m"
+            chart = {
+              spec = {
+                chart   = "cloudnative-pg"
+                version = "0.29.0" # renovate: datasource=helm depName=cloudnative-pg registryUrl=https://cloudnative-pg.github.io/charts
+                sourceRef = {
+                  kind = "HelmRepository"
+                  name = "cloudnative-pg"
+                }
+                interval = "5m"
+              }
+            }
+            releaseName = "cloudnative-pg"
+            install = {
+              remediation = {
+                retries = -1
+              }
+            }
+            upgrade = {
+              remediation = {
+                retries = -1
+              }
+            }
+            test = {
+              enable = false
+            }
+            values = {
+
+            }
+          }
+        },
+      ] :
+      yamlencode(m)
+    ]
+
     prometheus        = module.prometheus.manifests
     mountpoint-s3-csi = module.mountpoint-s3-csi.manifests
   }

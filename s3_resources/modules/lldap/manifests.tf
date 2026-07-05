@@ -13,13 +13,11 @@ resource "random_password" "storage-secret" {
 }
 
 locals {
-  db_file   = "/data/users.db"
   base_path = "/var/lib/lldap"
   extra_envs = merge(var.extra_configs, {
     LLDAP_LDAP_PORT                = 3890
     LLDAP_HTTP_PORT                = 17170
     LLDAP_LDAPS_OPTIONS__PORT      = var.service_port
-    LLDAP_DATABASE_URL             = "sqlite://${local.db_file}?mode=rwc"
     LLDAP_LDAPS_OPTIONS__CERT_FILE = "${local.base_path}/tls.crt"
     LLDAP_LDAPS_OPTIONS__KEY_FILE  = "${local.base_path}/tls.key"
     LLDAP_KEY_FILE                 = "${local.base_path}/private_key"
@@ -107,38 +105,19 @@ module "httproute" {
   }
 }
 
-module "litestream-overlay" {
-  source = "../litestream_overlay"
+module "deployment" {
+  source = "../../../modules/deployment"
 
   name      = var.name
   namespace = var.namespace
   app       = var.name
   release   = var.release
-  images = {
-    litestream = var.images.litestream
+  affinity  = var.affinity
+  replicas  = var.replicas
+  annotations = {
+    "checksum/secret" = sha256(module.secret.manifest)
+    "checksum/tls"    = sha256(module.tls.manifest)
   }
-  litestream_config = {
-    dbs = [
-      {
-        path                = local.db_file
-        monitor-interval    = "1s"
-        checkpoint-interval = "60s"
-        replica = {
-          type          = "s3"
-          endpoint      = "https://${var.minio_endpoint}"
-          bucket        = var.minio_bucket
-          path          = "$POD_NAME/litestream"
-          sync-interval = "1s"
-          part-size     = "50MB"
-          concurrency   = 10
-          auto-recover  = true
-        }
-      },
-    ]
-  }
-  mount_path       = dirname(local.db_file)
-  s3_access_secret = module.minio-user-secret.name
-
   template_spec = {
     securityContext = {
       # run litestream as same uid/gid as lldap
@@ -163,7 +142,7 @@ module "litestream-overlay" {
           "-c",
           "/dev/null",
         ]
-        env = [
+        env = concat([
           for k, v in local.extra_envs :
           {
             name = tostring(k)
@@ -174,7 +153,17 @@ module "litestream-overlay" {
               }
             }
           }
-        ]
+          ], [
+          {
+            name = "LLDAP_DATABASE_URL"
+            valueFrom = {
+              secretKeyRef = {
+                name = "${var.name}-pg-app"
+                key  = "uri"
+              }
+            }
+          },
+        ])
         volumeMounts = [
           {
             name      = "secret"
@@ -245,58 +234,4 @@ module "litestream-overlay" {
       },
     ]
   }
-}
-
-module "statefulset" {
-  source = "../../../modules/statefulset"
-
-  name      = var.name
-  namespace = var.namespace
-  app       = var.name
-  release   = var.release
-  affinity  = var.affinity
-  annotations = merge({
-    "checksum/secret"            = sha256(module.secret.manifest)
-    "checksum/tls"               = sha256(module.tls.manifest)
-    "checksum/minio-user-secret" = sha256(module.minio-user-secret.manifest)
-    }, {
-    for i, m in module.litestream-overlay.additional_manifests :
-    "checksum/litestream-${i}" => sha256(m)
-  })
-
-  /* persistent path for sqlite
-  spec = {
-    volumeClaimTemplates = [
-      {
-        metadata = {
-          name = "${var.name}-litestream-data"
-        }
-        spec = {
-          accessModes = [
-            "ReadWriteOnce",
-          ]
-          resources = {
-            requests = {
-              storage = "16Gi"
-            }
-          }
-          storageClassName = "local-path"
-        }
-      },
-    ]
-  }
-  */
-  template_spec = module.litestream-overlay.template_spec
-}
-
-module "minio-user-secret" {
-  source    = "../../../modules/secret"
-  name      = "${var.name}-minio-user-secret"
-  namespace = var.namespace
-  app       = var.name
-  release   = var.release
-  data = merge({
-    AWS_ACCESS_KEY_ID     = var.minio_user.id
-    AWS_SECRET_ACCESS_KEY = var.minio_user.secret
-  })
 }

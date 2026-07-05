@@ -130,8 +130,7 @@ module "lldap" {
   name      = local.endpoints.lldap.name
   namespace = local.endpoints.lldap.namespace
   images = {
-    lldap      = local.container_images_digest.lldap
-    litestream = local.container_images_digest.litestream
+    lldap = local.container_images_digest.lldap
   }
   service_port = local.service_ports.ldaps
   extra_configs = {
@@ -151,11 +150,6 @@ module "lldap" {
     private_key_pem = tls_private_key.lldap-ca.private_key_pem
     cert_pem        = tls_self_signed_cert.lldap-ca.cert_pem
   }
-
-  minio_endpoint = "${local.services.cluster_minio.ip}:${local.service_ports.minio}"
-  minio_bucket   = "lldap"
-  minio_user     = minio_iam_user.user["lldap"]
-
   service_hostname = local.endpoints.lldap.service_fqdn
   ingress_hostname = local.endpoints.lldap.ingress
   gateway_ref = {
@@ -190,7 +184,6 @@ module "authelia" {
       repository = regex(local.container_image_regex, local.container_images.authelia).image
       tag        = regex(local.container_image_regex, local.container_images.authelia).tag
     }
-    litestream = local.container_images_digest.litestream
   }
   metrics_port = local.service_ports.metrics
   ldap_ca = {
@@ -221,38 +214,11 @@ module "authelia" {
   }
   oidc_clients         = local.authelia_oidc_clients
   oidc_claims_policies = local.authelia_oidc_claims_policies
-  minio_endpoint       = "${local.services.cluster_minio.ip}:${local.service_ports.minio}"
-  minio_bucket         = "authelia"
-  minio_user           = minio_iam_user.user["authelia"]
 
   ingress_hostname = local.endpoints.authelia.ingress
   gateway_ref = {
     name      = local.endpoints.traefik.name
     namespace = local.endpoints.traefik.namespace
-  }
-
-  affinity = {
-    podAffinity = {
-      requiredDuringSchedulingIgnoredDuringExecution = [
-        {
-          labelSelector = {
-            matchExpressions = [
-              {
-                key      = "app"
-                operator = "In"
-                values = [
-                  local.endpoints.lldap.name,
-                ]
-              },
-            ]
-          }
-          topologyKey = "kubernetes.io/hostname"
-          namespaces = [
-            local.endpoints.lldap.namespace,
-          ]
-        },
-      ]
-    }
   }
 }
 
@@ -1180,8 +1146,8 @@ locals {
     hermes-agent    = module.hermes-agent.manifests
     open-webui      = module.open-webui.manifests
     hostapd         = concat(module.hostapd.manifests, module.qrcode-hostapd.manifests)
-    authelia        = concat(module.authelia-valkey.manifests, module.authelia.manifests)
     lldap           = module.lldap.manifests
+    authelia        = concat(module.authelia-valkey.manifests, module.authelia.manifests)
     stump           = module.stump.manifests
     navidrome       = module.navidrome.manifests
   }

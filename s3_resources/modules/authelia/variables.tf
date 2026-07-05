@@ -12,6 +12,11 @@ variable "release" {
   default = "0.1.0"
 }
 
+variable "replicas" {
+  type    = number
+  default = 2
+}
+
 variable "affinity" {
   type    = any
   default = {}
@@ -34,7 +39,6 @@ variable "images" {
       repository = string
       tag        = string
     })
-    litestream = string
   })
 }
 
@@ -94,20 +98,5 @@ variable "redis_sentinel_endpoint" {
     host        = string
     port        = number
     master_name = string
-  })
-}
-
-variable "minio_endpoint" {
-  type = string
-}
-
-variable "minio_bucket" {
-  type = string
-}
-
-variable "minio_user" {
-  type = object({
-    id     = string
-    secret = string
   })
 }

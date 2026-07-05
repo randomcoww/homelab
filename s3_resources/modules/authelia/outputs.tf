@@ -1,11 +1,33 @@
 output "manifests" {
   value = concat([
     module.secret.manifest,
-    module.ldap-tls.manifest,
-    module.redis-tls.manifest,
-    module.minio-user-secret.manifest,
+    module.ldap-client-tls.manifest,
+    module.redis-client-tls.manifest,
     ], [
     for _, m in [
+      # database
+      {
+        apiVersion = "postgresql.cnpg.io/v1"
+        kind       = "Cluster"
+        metadata = {
+          name      = "${var.name}-pg"
+          namespace = var.namespace
+        }
+        spec = {
+          instances = 3
+          storage = {
+            size = "2Gi"
+          }
+          bootstrap = {
+            initdb = {
+              database = "authelia"
+              owner    = "authelia"
+            }
+          }
+        }
+      },
+
+      # authelia helm
       {
         apiVersion = "source.toolkit.fluxcd.io/v1"
         kind       = "HelmRepository"
@@ -77,80 +99,72 @@ output "manifests" {
               }
             }
             pod = {
-              replicas = 1
-              kind     = "StatefulSet"
+              replicas = var.replicas
+              kind     = "Deployment"
               selectors = {
                 affinity = var.affinity
               }
               annotations = {
-                "checksum/secret"            = sha256(module.secret.manifest)
-                "checksum/tls"               = sha256(module.ldap-tls.manifest)
-                "checksum/minio-user-secret" = sha256(module.minio-user-secret.manifest)
+                "checksum/secret"           = sha256(module.secret.manifest)
+                "checksum/ldap-client-tls"  = sha256(module.ldap-client-tls.manifest)
+                "checksum/redis-client-tls" = sha256(module.redis-client-tls.manifest)
               }
               extraVolumeMounts = [
-                {
-                  name      = var.name # this is mounted automatically if persistance is enabled
-                  mountPath = dirname(local.authelia_db_file)
-                },
                 {
                   name      = "ca-trust-bundle"
                   mountPath = "/etc/ssl/certs/ca-certificates.crt"
                   readOnly  = true
                 },
                 {
-                  name      = "authelia-ldap-tls"
-                  mountPath = local.authelia_ldap_tls_cert_file
-                  subPath   = "tls.crt"
-                  readOnly  = true
-                },
-                {
-                  name      = "authelia-ldap-tls"
-                  mountPath = local.authelia_ldap_tls_key_file
-                  subPath   = "tls.key"
-                  readOnly  = true
-                },
-                {
-                  name      = "authelia-redis-tls"
-                  mountPath = local.authelia_redis_tls_cert_file
-                  subPath   = "tls.crt"
-                  readOnly  = true
-                },
-                {
-                  name      = "authelia-redis-tls"
-                  mountPath = local.authelia_redis_tls_key_file
-                  subPath   = "tls.key"
-                  readOnly  = true
-                },
-                {
                   name      = "oidc-client-share"
                   mountPath = local.autehlia_oidc_client_shared_path
                 },
+
+                # custom
                 {
-                  name      = "secret-custom"
-                  mountPath = local.authelia_oidc_hmac_secret_file
-                  subPath   = "oidc-hmac-secret"
+                  name      = module.ldap-client-tls.name
+                  mountPath = local.envs.AUTHELIA_AUTHENTICATION_BACKEND_LDAP_TLS_CERTIFICATE_CHAIN_FILE
+                  subPath   = "tls.crt"
                   readOnly  = true
                 },
                 {
-                  name      = "secret-custom"
+                  name      = module.ldap-client-tls.name
+                  mountPath = local.envs.AUTHELIA_AUTHENTICATION_BACKEND_LDAP_TLS_PRIVATE_KEY_FILE
+                  subPath   = "tls.key"
+                  readOnly  = true
+                },
+                {
+                  name      = module.redis-client-tls.name
+                  mountPath = local.envs.AUTHELIA_SESSION_REDIS_TLS_CERTIFICATE_CHAIN_FILE
+                  subPath   = "tls.crt"
+                  readOnly  = true
+                },
+                {
+                  name      = module.redis-client-tls.name
+                  mountPath = local.envs.AUTHELIA_SESSION_REDIS_TLS_PRIVATE_KEY_FILE
+                  subPath   = "tls.key"
+                  readOnly  = true
+                },
+                {
+                  name      = module.secret.name
                   mountPath = local.authelia_oidc_jwk_key_file
                   subPath   = "oidc-jwk-key"
                   readOnly  = true
                 },
+                {
+                  name      = module.secret.name
+                  mountPath = local.envs.AUTHELIA_IDENTITY_PROVIDERS_OIDC_HMAC_SECRET_FILE
+                  subPath   = "oidc-hmac-secret"
+                  readOnly  = true
+                },
+                {
+                  name      = "${var.name}-pg-app"
+                  mountPath = local.envs.AUTHELIA_STORAGE_POSTGRES_PASSWORD_FILE
+                  subPath   = "password"
+                  readOnly  = true
+                },
               ]
               extraVolumes = [
-                {
-                  name = var.name # remove if persistance is enabled
-                  emptyDir = {
-                    medium = "Memory"
-                  }
-                },
-                {
-                  name = "secret-custom"
-                  secret = {
-                    secretName = module.secret.name
-                  }
-                },
                 {
                   name = "oidc-client-share"
                   emptyDir = {
@@ -165,40 +179,78 @@ output "manifests" {
                   }
                 },
                 {
-                  name = "authelia-ldap-tls"
+                  name = module.ldap-client-tls.name
                   secret = {
-                    secretName = module.ldap-tls.name
+                    secretName = module.ldap-client-tls.name
                   }
                 },
                 {
-                  name = "authelia-redis-tls"
+                  name = module.redis-client-tls.name
                   secret = {
-                    secretName = module.redis-tls.name
+                    secretName = module.redis-client-tls.name
+                  }
+                },
+                {
+                  name = module.secret.name
+                  secret = {
+                    secretName = module.secret.name
+                  }
+                },
+                {
+                  name = "${var.name}-pg-app"
+                  secret = {
+                    secretName = "${var.name}-pg-app"
                   }
                 },
               ]
-              env = [
+              env = concat([
+                for k, v in local.envs :
                 {
-                  name  = "AUTHELIA_AUTHENTICATION_BACKEND_LDAP_TLS_PRIVATE_KEY_FILE"
-                  value = local.authelia_ldap_tls_key_file
+                  name  = tostring(k)
+                  value = tostring(v)
+                }
+                ], [
+                {
+                  name = "AUTHELIA_STORAGE_POSTGRES_DATABASE"
+                  valueFrom = {
+                    secretKeyRef = {
+                      name = "${var.name}-pg-app"
+                      key  = "dbname"
+                    }
+                  }
                 },
                 {
-                  name  = "AUTHELIA_AUTHENTICATION_BACKEND_LDAP_TLS_CERTIFICATE_CHAIN_FILE"
-                  value = local.authelia_ldap_tls_cert_file
+                  name = "AUTHELIA_STORAGE_POSTGRES_USERNAME"
+                  valueFrom = {
+                    secretKeyRef = {
+                      name = "${var.name}-pg-app"
+                      key  = "username"
+                    }
+                  }
                 },
                 {
-                  name  = "AUTHELIA_SESSION_REDIS_TLS_PRIVATE_KEY_FILE"
-                  value = local.authelia_redis_tls_key_file
+                  name = "postgres_host"
+                  valueFrom = {
+                    secretKeyRef = {
+                      name = "${var.name}-pg-app"
+                      key  = "host"
+                    }
+                  }
                 },
                 {
-                  name  = "AUTHELIA_SESSION_REDIS_TLS_CERTIFICATE_CHAIN_FILE"
-                  value = local.authelia_redis_tls_cert_file
+                  name = "postgres_port"
+                  valueFrom = {
+                    secretKeyRef = {
+                      name = "${var.name}-pg-app"
+                      key  = "port"
+                    }
+                  }
                 },
                 {
-                  name  = "AUTHELIA_IDENTITY_PROVIDERS_OIDC_HMAC_SECRET_FILE"
-                  value = local.authelia_oidc_hmac_secret_file
+                  name  = "AUTHELIA_STORAGE_POSTGRES_ADDRESS"
+                  value = "tcp://$(postgres_host).${var.namespace}:$(postgres_port)"
                 },
-              ]
+              ])
               initContainers = [
                 {
                   name  = "${var.name}-password-generate"
@@ -231,155 +283,6 @@ output "manifests" {
                       mountPath = local.autehlia_oidc_client_shared_path
                     },
                   ]
-                },
-                {
-                  name  = "${var.name}-litestream-restore"
-                  image = var.images.litestream
-                  args = [
-                    "restore",
-                    "-if-db-not-exists",
-                    "-if-replica-exists",
-                    "-config",
-                    local.authelia_litestream_config_file,
-                    local.authelia_db_file,
-                  ]
-                  env = [
-                    {
-                      name = "POD_NAME"
-                      valueFrom = {
-                        fieldRef = {
-                          fieldPath = "metadata.name"
-                        }
-                      }
-                    },
-                    {
-                      name = "AWS_ACCESS_KEY_ID"
-                      valueFrom = {
-                        secretKeyRef = {
-                          name = module.minio-user-secret.name
-                          key  = "AWS_ACCESS_KEY_ID"
-                        }
-                      }
-                    },
-                    {
-                      name = "AWS_SECRET_ACCESS_KEY"
-                      valueFrom = {
-                        secretKeyRef = {
-                          name = module.minio-user-secret.name
-                          key  = "AWS_SECRET_ACCESS_KEY"
-                        }
-                      }
-                    },
-                  ]
-                  volumeMounts = [
-                    {
-                      name      = var.name
-                      mountPath = dirname(local.authelia_db_file)
-                    },
-                    {
-                      name      = "secret-custom"
-                      mountPath = local.authelia_litestream_config_file
-                      subPath   = "litestream"
-                    },
-                    {
-                      name      = "ca-trust-bundle"
-                      mountPath = "/etc/ssl/certs/ca-certificates.crt"
-                      readOnly  = true
-                    },
-                  ]
-                },
-                {
-                  name          = "${var.name}-litestream-replicate"
-                  image         = var.images.litestream
-                  restartPolicy = "Always"
-                  args = [
-                    "replicate",
-                    "-config",
-                    local.authelia_litestream_config_file,
-                  ]
-                  env = [
-                    {
-                      name = "POD_NAME"
-                      valueFrom = {
-                        fieldRef = {
-                          fieldPath = "metadata.name"
-                        }
-                      }
-                    },
-                    {
-                      name = "AWS_ACCESS_KEY_ID"
-                      valueFrom = {
-                        secretKeyRef = {
-                          name = module.minio-user-secret.name
-                          key  = "AWS_ACCESS_KEY_ID"
-                        }
-                      }
-                    },
-                    {
-                      name = "AWS_SECRET_ACCESS_KEY"
-                      valueFrom = {
-                        secretKeyRef = {
-                          name = module.minio-user-secret.name
-                          key  = "AWS_SECRET_ACCESS_KEY"
-                        }
-                      }
-                    },
-                  ]
-                  volumeMounts = [
-                    {
-                      name      = var.name
-                      mountPath = dirname(local.authelia_db_file)
-                    },
-                    {
-                      name      = "secret-custom"
-                      mountPath = local.authelia_litestream_config_file
-                      subPath   = "litestream"
-                    },
-                    {
-                      name      = "ca-trust-bundle"
-                      mountPath = "/etc/ssl/certs/ca-certificates.crt"
-                      readOnly  = true
-                    },
-                  ]
-                  livenessProbe = {
-                    exec = {
-                      command = [
-                        "sh",
-                        "-c",
-                        <<-EOF
-                        if ! litestream status -config ${local.authelia_litestream_config_file} | tail -n +2 | awk '{print $2}' | grep -qv 'ok'; then
-                          exit 0
-                        fi
-                        exit 1
-                        EOF
-                      ]
-                    }
-                    timeoutSeconds = 2
-                  }
-                  startupProbe = {
-                    exec = {
-                      command = [
-                        "sh",
-                        "-c",
-                        <<-EOF
-                        if ! litestream status -config ${local.authelia_litestream_config_file} | tail -n +2 | awk '{print $2}' | grep -qv 'ok'; then
-                          exit 0
-                        fi
-                        exit 1
-                        EOF
-                      ]
-                    }
-                    periodSeconds    = 2
-                    failureThreshold = 12
-                  }
-                  resources = {
-                    requests = {
-                      memory = "1Gi"
-                    }
-                    limits = {
-                      memory = "1Gi"
-                    }
-                  }
                 },
               ]
               resources = {
@@ -532,9 +435,12 @@ output "manifests" {
                 encryption_key = {
                   value = random_password.authelia-storage-secret.result
                 }
-                local = {
+                postgres = {
                   enabled = true
-                  path    = local.authelia_db_file
+                  deploy  = false
+                  password = {
+                    disabled = true # manually create and define AUTHELIA_STORAGE_POSTGRES_PASSWORD_FILE
+                  }
                 }
               }
               notifier = {
@@ -571,13 +477,6 @@ output "manifests" {
             }
             persistence = {
               enabled = false
-              /* persistent path for sqlite - remove extraVolumeMounts and extraVolumes entries if enabled
-              enabled      = true
-              storageClass = "local-path"
-              accessModes = [
-                "ReadWriteOnce",
-              ]
-              */
             }
           }
         }

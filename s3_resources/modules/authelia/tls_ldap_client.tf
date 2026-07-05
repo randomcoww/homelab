@@ -27,7 +27,7 @@ resource "tls_locally_signed_cert" "ldap-client" {
   ]
 }
 
-module "ldap-tls" {
+module "ldap-client-tls" {
   source    = "../../../modules/secret"
   name      = "${var.name}-ldap-client-tls"
   namespace = var.namespace

@@ -20,6 +20,11 @@ variable "annotations" {
   default = {}
 }
 
+variable "labels" {
+  type    = any
+  default = {}
+}
+
 variable "data" {
   type    = any
   default = {}

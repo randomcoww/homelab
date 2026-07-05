@@ -27,7 +27,7 @@ resource "tls_locally_signed_cert" "redis-client" {
   ]
 }
 
-module "redis-tls" {
+module "redis-client-tls" {
   source    = "../../../modules/secret"
   name      = "${var.name}-redis-client-tls"
   namespace = var.namespace

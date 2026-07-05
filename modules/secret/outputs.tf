@@ -5,10 +5,10 @@ output "manifest" {
     metadata = {
       name      = var.name
       namespace = var.namespace
-      labels = {
+      labels = merge({
         app     = var.app
         release = var.release
-      }
+      }, var.labels)
       annotations = var.annotations
     }
     stringData = {
