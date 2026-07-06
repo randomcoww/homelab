@@ -209,8 +209,6 @@ module "apiserver" {
         ip = "127.0.0.1"
       },
     ]
-    priority          = 2000001000
-    priorityClassName = "system-node-critical"
     containers = [
       {
         name  = "kube-apiserver"

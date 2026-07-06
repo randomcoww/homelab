@@ -11,8 +11,8 @@ output "manifest" {
       }
     }
     spec = merge({
-      priority          = 2000000000
-      priorityClassName = "system-cluster-critical"
+      priority          = 2000001000
+      priorityClassName = "system-node-critical"
       hostUsers         = true
       hostNetwork       = true
       restartPolicy     = "Always"
