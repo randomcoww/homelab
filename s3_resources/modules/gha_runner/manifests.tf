@@ -118,7 +118,6 @@ module "workflow-config" {
                 "devic.es/fuse" = 1
               }
               limits = {
-                memory          = "8Gi"
                 "devic.es/kvm"  = 1
                 "devic.es/fuse" = 1
               }
@@ -186,9 +185,6 @@ module "workflow-config" {
             resources = {
               requests = {
                 memory = "2Gi"
-              }
-              limits = {
-                memory = "4Gi"
               }
             }
             env = [

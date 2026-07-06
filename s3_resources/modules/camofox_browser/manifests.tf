@@ -95,9 +95,6 @@ module "deployment" {
       requests = {
         memory = "2Gi"
       }
-      limits = {
-        memory = "2Gi"
-      }
     }
     containers = [
       {

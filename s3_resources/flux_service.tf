@@ -377,9 +377,6 @@ module "llama-cpp" {
     requests = {
       memory = "96Gi"
     }
-    limits = {
-      memory = "96Gi" # GTT
-    }
   }
   ingress_hostname = local.endpoints.llama_cpp.ingress
   gateway_ref = {
@@ -468,9 +465,6 @@ module "llama-cpp-s" {
   resources = {
     requests = {
       memory = "8Gi"
-    }
-    limits = {
-      memory = "8Gi" # GTT
     }
   }
   ingress_hostname = local.endpoints.llama_cpp_s.ingress
@@ -1105,9 +1099,6 @@ locals {
               }
               resources = {
                 requests = {
-                  memory = "128Mi"
-                }
-                limits = {
                   memory = "128Mi"
                 }
               }

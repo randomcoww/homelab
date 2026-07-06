@@ -118,9 +118,6 @@ module "statefulset" {
       requests = {
         memory = "8Gi"
       }
-      limits = {
-        memory = "96Gi" # GTT
-      }
     }, var.resources)
     containers = [
       {

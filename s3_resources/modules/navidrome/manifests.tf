@@ -131,9 +131,6 @@ module "litestream-overlay" {
       requests = {
         memory = "2Gi"
       }
-      limits = {
-        memory = "2Gi"
-      }
     }
     containers = [
       {

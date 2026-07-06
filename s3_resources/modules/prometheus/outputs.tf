@@ -358,9 +358,6 @@ output "manifests" {
                 requests = {
                   memory = "6Gi"
                 }
-                limits = {
-                  memory = "6Gi"
-                }
               }
               service = {
                 enabled = true
@@ -512,9 +509,6 @@ output "manifests" {
                 requests = {
                   memory = "64Mi"
                 }
-                limits = {
-                  memory = "64Mi"
-                }
               }
             }
             prometheus-pushgateway = {
@@ -580,9 +574,6 @@ output "manifests" {
             }
             resources = {
               requests = {
-                memory = "64Mi"
-              }
-              limits = {
                 memory = "64Mi"
               }
             }

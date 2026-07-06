@@ -122,9 +122,6 @@ output "template_spec" {
           requests = {
             memory = "128Mi"
           }
-          limits = {
-            memory = "1Gi"
-          }
         }
         livenessProbe = {
           exec = {
