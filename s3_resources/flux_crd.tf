@@ -768,8 +768,6 @@ module "prometheus" {
               expr  = <<-EOF
               sum(up{app="kube-vip",namespace="kube-system"}) < 2
               or
-              sum(kube_vip_manager_bgp_session_info{app="kube-vip",namespace="kube-system",state!="ESTABLISHED"}) > 0
-              or
               absent(up{app="kube-vip",namespace="kube-system"})
               EOF
               for   = "90s"
