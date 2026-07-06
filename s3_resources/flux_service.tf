@@ -535,6 +535,7 @@ module "kubernetes-mcp" {
   source    = "./modules/kubernetes_mcp"
   name      = local.endpoints.kubernetes_mcp.name
   namespace = local.endpoints.kubernetes_mcp.namespace
+  replicas  = 2
   images = {
     kubernetes_mcp = local.container_images_digest.kubernetes_mcp
   }
@@ -1136,11 +1137,11 @@ locals {
     searxng         = module.searxng.manifests
     kubernetes-mcp  = module.kubernetes-mcp.manifests
     hermes-agent    = module.hermes-agent.manifests
-    open-webui      = module.open-webui.manifests
     hostapd         = concat(module.hostapd.manifests, module.qrcode-hostapd.manifests)
     lldap           = module.lldap.manifests
     authelia        = concat(module.authelia-valkey.manifests, module.authelia.manifests)
     stump           = module.stump.manifests
-    navidrome       = module.navidrome.manifests
+    # open-webui      = module.open-webui.manifests
+    # navidrome       = module.navidrome.manifests
   }
 }
