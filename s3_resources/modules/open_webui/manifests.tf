@@ -1,11 +1,10 @@
 locals {
   db_file = "/data/db.sqlite3"
   extra_envs = merge(var.extra_configs, {
+    CORS_ALLOW_ORIGIN                  = "https://${var.ingress_hostname}"
     PORT                               = 8080
     REQUESTS_CA_BUNDLE                 = "/etc/ssl/certs/ca-certificates.crt"
     SSL_CERT_FILE                      = "/etc/ssl/certs/ca-certificates.crt" # needed for tools server TLS
-    DATABASE_URL                       = "sqlite:///${local.db_file}"
-    DATABASE_ENABLE_SQLITE_WAL         = true
     STORAGE_PROVIDER                   = "s3"
     S3_ADDRESSING_STYLE                = "path"
     S3_KEY_PREFIX                      = "data"
@@ -99,38 +98,19 @@ module "httproute" {
   }
 }
 
-module "litestream-overlay" {
-  source = "../litestream_overlay"
+module "deployment" {
+  source = "../../../modules/deployment"
 
   name      = var.name
   namespace = var.namespace
   app       = var.name
   release   = var.release
-  images = {
-    litestream = var.images.litestream
+  affinity  = var.affinity
+  replicas  = var.replicas
+  annotations = {
+    "checksum/secret"            = sha256(module.secret.manifest)
+    "checksum/minio-user-secret" = sha256(module.minio-user-secret.manifest)
   }
-  litestream_config = {
-    dbs = [
-      {
-        path                = local.db_file
-        monitor-interval    = "1s"
-        checkpoint-interval = "60s"
-        replica = {
-          type          = "s3"
-          endpoint      = var.minio_endpoint
-          bucket        = var.minio_bucket
-          path          = "$POD_NAME/litestream"
-          sync-interval = "1s"
-          part-size     = "50MB"
-          concurrency   = 10
-          auto-recover  = true
-        }
-      },
-    ]
-  }
-  mount_path       = dirname(local.db_file)
-  s3_access_secret = module.minio-user-secret.name
-
   template_spec = {
     resources = {
       requests = {
@@ -174,6 +154,15 @@ module "litestream-overlay" {
               }
             }
           },
+          {
+            name = "DATABASE_URL"
+            valueFrom = {
+              secretKeyRef = {
+                name = "${var.name}-pg-app"
+                key  = "uri"
+              }
+            }
+          },
         ])
         ports = [
           {
@@ -211,12 +200,6 @@ module "litestream-overlay" {
     ]
     volumes = [
       {
-        name = "${var.name}-litestream-data"
-        emptyDir = {
-          medium = "Memory"
-        }
-      },
-      {
         name = "ca-trust-bundle"
         hostPath = {
           path = "/etc/ssl/certs/ca-certificates.crt"
@@ -225,47 +208,6 @@ module "litestream-overlay" {
       },
     ]
   }
-}
-
-module "statefulset" {
-  source = "../../../modules/statefulset"
-
-  name      = var.name
-  namespace = var.namespace
-  app       = var.name
-  release   = var.release
-  affinity  = var.affinity
-  replicas  = var.replicas
-  annotations = merge({
-    "checksum/secret"            = sha256(module.secret.manifest)
-    "checksum/minio-user-secret" = sha256(module.minio-user-secret.manifest)
-    }, {
-    for i, m in module.litestream-overlay.additional_manifests :
-    "checksum/litestream-${i}" => sha256(m)
-  })
-  /* persistent path for sqlite
-  spec = {
-    volumeClaimTemplates = [
-      {
-        metadata = {
-          name = "${var.name}-litestream-data"
-        }
-        spec = {
-          accessModes = [
-            "ReadWriteOnce",
-          ]
-          resources = {
-            requests = {
-              storage = "16Gi"
-            }
-          }
-          storageClassName = "local-path"
-        }
-      },
-    ]
-  }
-  */
-  template_spec = module.litestream-overlay.template_spec
 }
 
 module "minio-user-secret" {
