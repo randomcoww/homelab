@@ -76,10 +76,10 @@ resource "helm_release" "minio" {
       replicas      = var.replicas
       resources = {
         requests = {
-          memory = "8Gi"
+          memory = "4Gi"
         }
         limits = {
-          memory = "8Gi"
+          memory = "4Gi"
         }
       }
       service = {
