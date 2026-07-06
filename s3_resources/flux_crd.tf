@@ -1247,6 +1247,97 @@ locals {
       yamlencode(m)
     ]
 
+    juicefs-csi-driver = [
+      for _, m in [
+        {
+          apiVersion = "source.toolkit.fluxcd.io/v1"
+          kind       = "HelmRepository"
+          metadata = {
+            name      = "juicefs-csi-driver"
+            namespace = "juicefs"
+          }
+          spec = {
+            interval = "15m"
+            url      = "https://juicedata.github.io/charts"
+          }
+        },
+        {
+          apiVersion = "helm.toolkit.fluxcd.io/v2"
+          kind       = "HelmRelease"
+          metadata = {
+            name      = "juicefs-csi-driver"
+            namespace = "juicefs"
+          }
+          spec = {
+            interval = "15m"
+            timeout  = "5m"
+            chart = {
+              spec = {
+                chart   = "juicefs-csi-driver"
+                version = "0.31.10" # renovate: datasource=helm depName=cloudnative-pg registryUrl=https://juicedata.github.io/charts
+                sourceRef = {
+                  kind = "HelmRepository"
+                  name = "juicefs-csi-driver"
+                }
+                interval = "5m"
+              }
+            }
+            releaseName = "juicefs-csi-driver"
+            install = {
+              remediation = {
+                retries = -1
+              }
+            }
+            upgrade = {
+              remediation = {
+                retries = -1
+              }
+            }
+            test = {
+              enable = false
+            }
+            values = {
+              kubeletDir = local.kubernetes.kubelet_root_path
+              dashboard = {
+                enabled = false
+              }
+              globalConfig = {
+                enabled = true
+                mountPodPatch = [
+                  {
+                    mountOptions = [
+                      "no-syslog",
+                      "atime-mode=noatime",
+                      "backup-meta=0",
+                      "no-usage-report=true",
+                    ]
+                  },
+                  {
+                    ceMountImage = local.container_images_digest.juicefs
+                  },
+                  {
+                    readinessProbe = {
+                      exec = {
+                        command = [
+                          "stat",
+                          "$${MOUNT_POINT}/$${SUB_PATH}",
+                        ]
+                      }
+                      failureThreshold    = 3
+                      initialDelaySeconds = 10
+                      periodSeconds       = 5
+                      successThreshold    = 1
+                    }
+                  },
+                ]
+              }
+            }
+          }
+        },
+      ] :
+      yamlencode(m)
+    ]
+
     prometheus        = module.prometheus.manifests
     mountpoint-s3-csi = module.mountpoint-s3-csi.manifests
   }

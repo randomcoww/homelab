@@ -18,6 +18,14 @@ ${k}=${v}
 %{~endfor~}
     EOF
   }, var.extra_files)
+
+  juicefs_postgres_database = "juicefs"
+  juicefs_postgres_user     = "juicefs"
+}
+
+resource "random_password" "juicefs-postgres-password" {
+  length  = 32
+  special = false
 }
 
 module "secret" {
@@ -27,6 +35,31 @@ module "secret" {
   app       = var.name
   release   = var.release
   data      = local.files
+}
+
+module "juicefs-secret" {
+  source    = "../../../modules/secret"
+  name      = "${var.name}-juicefs"
+  namespace = var.namespace
+  app       = var.name
+  release   = var.release
+  data = {
+    # juicefs params
+    name       = var.name
+    metaurl    = "postgres://${local.juicefs_postgres_user}:${random_password.juicefs-postgres-password.result}@${var.name}-pg-rw.${var.namespace}/${local.juicefs_postgres_database}"
+    storage    = "minio"
+    bucket     = "${var.minio_endpoint}/${var.minio_bucket}"
+    access-key = var.minio_user.id
+    secret-key = var.minio_user.secret
+    format-options = join(",", [
+      "trash-days=0",
+      "block-size=4096",
+    ])
+
+    # cngp params
+    username = local.juicefs_postgres_user
+    password = random_password.juicefs-postgres-password.result
+  }
 }
 
 module "service" {
@@ -178,6 +211,10 @@ module "litestream-overlay" {
         ]
         volumeMounts = concat([
           {
+            name      = "data"
+            mountPath = local.data_path
+          },
+          {
             name      = "ca-trust-bundle"
             mountPath = "/etc/ssl/certs/ca-certificates.crt"
             readOnly  = true
@@ -225,6 +262,12 @@ module "litestream-overlay" {
     ]
     volumes = [
       {
+        name = "data"
+        persistentVolumeClaim = {
+          claimName = "${var.name}-${var.minio_bucket}"
+        }
+      },
+      {
         name = "ca-trust-bundle"
         hostPath = {
           path = "/etc/ssl/certs/ca-certificates.crt"
@@ -254,30 +297,6 @@ module "litestream-overlay" {
   }
 }
 
-module "juicefs-overlay" {
-  source = "../juicefs_overlay"
-
-  name                = var.name
-  namespace           = var.namespace
-  app                 = var.name
-  release             = var.release
-  mount_path          = local.data_path
-  minio_endpoint      = var.minio_endpoint
-  minio_bucket        = var.minio_bucket
-  minio_prefix        = "jfs"
-  minio_access_secret = module.minio-user-secret.name
-  mount_extra_opts = [
-    "user_id=${local.uid}",
-    "group_id=${local.gid}",
-  ]
-  capacity_gb = 32
-  images = {
-    juicefs    = var.images.juicefs
-    litestream = var.images.litestream
-  }
-  template_spec = module.litestream-overlay.template_spec
-}
-
 module "statefulset" {
   source = "../../../modules/statefulset"
 
@@ -293,31 +312,9 @@ module "statefulset" {
     }, {
     for i, m in module.litestream-overlay.additional_manifests :
     "checksum/litestream-${i}" => sha256(m)
-    }, {
-    for i, m in module.juicefs-overlay.additional_manifests :
-    "checksum/juicefs-${i}" => sha256(m)
   })
-  spec = {
-    volumeClaimTemplates = [
-      {
-        metadata = {
-          name = "${var.name}-juicefs-litestream-data" # persist path used for juicefs db
-        }
-        spec = {
-          accessModes = [
-            "ReadWriteOnce",
-          ]
-          resources = {
-            requests = {
-              storage = "16Gi"
-            }
-          }
-          storageClassName = "local-path"
-        }
-      },
-    ]
-  }
-  template_spec = module.juicefs-overlay.template_spec
+
+  template_spec = module.litestream-overlay.template_spec
 }
 
 module "minio-user-secret" {

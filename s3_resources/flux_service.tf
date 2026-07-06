@@ -736,6 +736,7 @@ module "open-webui" {
   source    = "./modules/open_webui"
   name      = local.endpoints.open_webui.name
   namespace = local.endpoints.open_webui.namespace
+  replicas  = 1
   images = {
     open_webui = local.container_images_digest.open_webui
     litestream = local.container_images_digest.litestream

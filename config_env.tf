@@ -149,7 +149,7 @@ locals {
     thanos            = "quay.io/thanos/thanos:v0.41.0@sha256:cf3e9b292e4302ad4a4955b56379703aea39516607d382a57604a3d003c35d10"
     stump             = "docker.io/aaronleopold/stump:0.1.5@sha256:02684fe218a2a54aee5e8bedd8306b971b857d562770ebc3c35400a706845b6e"
     hermes_agent      = "reg.cluster.internal/randomcoww/hermes-mnemosyne:v2026.7.1.1783030190@sha256:1a4cc8434f66cc6fb5c8c076a522dd9572425784157a4e91a075097fc118bb85"
-    juicefs           = "reg.cluster.internal/randomcoww/juicefs:v1.3.1.1782748221@sha256:a252445b4a4160c8b2e7ed897cbd36d1dad6b2bf8cbe970bc0e273d786892e04"
+    juicefs           = "reg.cluster.internal/randomcoww/juicefs:ce-v1.3.1.1783366760@sha256:f4f43ceea5f5d5c7cbeac4416b32958244bd0855e5bacc097b78fceb7ecc57f4"
 
     # models (model_file)
     "NVIDIA-Nemotron-3-Super-120B-A12B-MXFP4_MOE-00001-of-00003.gguf"    = "reg.cluster.internal/randomcoww/nvidia-nemotron-3-super-120b-a12b-mxfp4-moe:v1773610375@sha256:7c5065d9e53b4752fd40b496cd287946f5f5e5308ad29bfdea81c0622de6da0f"
