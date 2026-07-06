@@ -119,12 +119,6 @@ module "deployment" {
     "checksum/tls"    = sha256(module.tls.manifest)
   }
   template_spec = {
-    securityContext = {
-      # run litestream as same uid/gid as lldap
-      runAsUser  = 1000
-      runAsGroup = 1000
-      fsGroup    = 1000
-    }
     resources = {
       requests = {
         memory = "128Mi"
@@ -224,12 +218,6 @@ module "deployment" {
         name = "lldap-cert"
         secret = {
           secretName = module.tls.name
-        }
-      },
-      {
-        name = "${var.name}-litestream-data"
-        emptyDir = {
-          medium = "Memory"
         }
       },
     ]
