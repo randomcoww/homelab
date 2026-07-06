@@ -71,11 +71,8 @@ output "manifests" {
                 type = "RollingUpdate"
               }
               persistentVolume = {
-                enabled   = false
+                enabled   = true
                 mountPath = local.tsdb_path
-              }
-              emptyDir = {
-                medium = "Memory"
               }
               podAnnotations = {
                 "checksum/store-tls"         = sha256(module.store-tls.manifest)
