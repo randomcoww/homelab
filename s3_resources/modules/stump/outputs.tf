@@ -2,6 +2,7 @@ output "manifests" {
   value = concat([
     module.statefulset.manifest,
     module.secret.manifest,
+    module.juicefs-secret.manifest,
     module.service.manifest,
     module.httproute.manifest,
     module.minio-user-secret.manifest,
@@ -29,16 +30,18 @@ output "manifests" {
           mountOptions = [
             "endpoint-url ${var.minio_endpoint}",
             "maximum-throughput-gbps 1",
+            "metadata-ttl 300",
           ]
           csi = {
             driver       = "s3.csi.aws.com"
             volumeHandle = "${var.name}-${var.minio_data_bucket}"
             volumeAttributes = {
-              authenticationSource   = "driver"
-              bucketName             = var.minio_data_bucket
-              cache                  = "emptyDir"
-              cacheEmptyDirSizeLimit = "1Gi"
-              cacheEmptyDirMedium    = "Memory"
+              authenticationSource                       = "driver"
+              bucketName                                 = var.minio_data_bucket
+              cache                                      = "emptyDir"
+              cacheEmptyDirSizeLimit                     = "1Gi"
+              cacheEmptyDirMedium                        = "Memory"
+              mountpointContainerResourcesRequestsMemory = "1Gi"
             }
           }
         }
@@ -64,7 +67,7 @@ output "manifests" {
         }
       },
 
-      # thumbnails bucket
+      # data volume
       {
         apiVersion = "v1"
         kind       = "PersistentVolume"
@@ -75,30 +78,22 @@ output "manifests" {
           capacity = {
             storage = "16Gi"
           }
+          volumeMode = "Filesystem"
           accessModes = [
-            "ReadWriteMany",
+            "ReadWriteOnce",
           ]
           storageClassName = ""
           claimRef = {
             namespace = var.namespace
             name      = "${var.name}-${var.minio_bucket}"
           }
-          mountOptions = [
-            "endpoint-url ${var.minio_endpoint}",
-            "maximum-throughput-gbps 1",
-            "prefix thumbnails/",
-            "allow-overwrite",
-            "allow-delete",
-          ]
           csi = {
-            driver       = "s3.csi.aws.com"
+            driver       = "csi.juicefs.com"
             volumeHandle = "${var.name}-${var.minio_bucket}"
-            volumeAttributes = {
-              authenticationSource   = "driver"
-              bucketName             = var.minio_bucket
-              cache                  = "emptyDir"
-              cacheEmptyDirSizeLimit = "1Gi"
-              cacheEmptyDirMedium    = "Memory"
+            fsType       = "juicefs"
+            nodePublishSecretRef = {
+              name      = module.juicefs-secret.name
+              namespace = var.namespace
             }
           }
         }
@@ -112,8 +107,9 @@ output "manifests" {
         }
         spec = {
           accessModes = [
-            "ReadWriteMany",
+            "ReadWriteOnce",
           ]
+          volumeMode       = "Filesystem"
           storageClassName = ""
           resources = {
             requests = {
@@ -121,6 +117,35 @@ output "manifests" {
             }
           }
           volumeName = "${var.name}-${var.minio_bucket}"
+        }
+      },
+      # data volume metadata
+      {
+        apiVersion = "postgresql.cnpg.io/v1"
+        kind       = "Cluster"
+        metadata = {
+          name      = "${var.name}-pg"
+          namespace = var.namespace
+        }
+        spec = {
+          instances = 3
+          storage = {
+            size = "2Gi"
+          }
+          bootstrap = {
+            initdb = {
+              database = local.juicefs_postgres_database
+              owner    = local.juicefs_postgres_user
+              secret = {
+                name = module.juicefs-secret.name
+              }
+            }
+          }
+          resources = {
+            requests = {
+              memory = "256Mi"
+            }
+          }
         }
       },
     ] :

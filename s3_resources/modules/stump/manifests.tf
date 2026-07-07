@@ -12,12 +12,20 @@ locals {
     STUMP_ENABLE_UPLOAD           = false
     STUMP_PRETTY_LOGS             = false
     STUMP_TRUST_PROXY_HEADERS     = true
-    STUMP_VERBOSITY               = 1
+    STUMP_VERBOSITY               = 0 # disable internal log file
     STUMP_ALLOWED_ORIGINS         = "https://${var.ingress_hostname}"
   })
   db_file         = "${local.extra_envs.STUMP_DB_PATH}/stump.db" # non-configurable
   data_path       = "/data"
   thumbnails_path = "${local.extra_envs.STUMP_CONFIG_DIR}/thumbnails" # non-configurable
+  # juicefs for thumbnails
+  juicefs_postgres_database = "juicefs"
+  juicefs_postgres_user     = "juicefs"
+}
+
+resource "random_password" "juicefs-postgres-password" {
+  length  = 32
+  special = false
 }
 
 module "secret" {
@@ -29,6 +37,31 @@ module "secret" {
   data = {
     for k, v in local.extra_envs :
     tostring(k) => tostring(v)
+  }
+}
+
+module "juicefs-secret" {
+  source    = "../../../modules/secret"
+  name      = "${var.name}-juicefs"
+  namespace = var.namespace
+  app       = var.name
+  release   = var.release
+  data = {
+    # juicefs params
+    name       = var.name
+    metaurl    = "postgres://${local.juicefs_postgres_user}:${random_password.juicefs-postgres-password.result}@${var.name}-pg-rw.${var.namespace}/${local.juicefs_postgres_database}"
+    storage    = "minio"
+    bucket     = "${var.minio_endpoint}/${var.minio_bucket}"
+    access-key = var.minio_user.id
+    secret-key = var.minio_user.secret
+    format-options = join(",", [
+      "trash-days=0",
+      "block-size=4096",
+    ])
+
+    # cngp params
+    username = local.juicefs_postgres_user
+    password = random_password.juicefs-postgres-password.result
   }
 }
 
