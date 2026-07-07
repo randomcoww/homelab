@@ -26,6 +26,11 @@ module "workflow-config" {
                 ]
               }
             }
+            resources = {
+              requests = {
+                memory = "8Gi"
+              }
+            }
             env = [
               {
                 name = "INTERNAL_CA_CERT" # add to some builds such as iPXE
