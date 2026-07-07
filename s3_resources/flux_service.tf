@@ -535,7 +535,6 @@ module "kubernetes-mcp" {
   source    = "./modules/kubernetes_mcp"
   name      = local.endpoints.kubernetes_mcp.name
   namespace = local.endpoints.kubernetes_mcp.namespace
-  replicas  = 2
   images = {
     kubernetes_mcp = local.container_images_digest.kubernetes_mcp
   }
