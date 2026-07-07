@@ -125,7 +125,7 @@ locals {
     minio              = "cgr.dev/chainguard/minio:latest@sha256:23e54aadcc2386845bcb9c3dd96bf255915cdf603aba45e6f16ab2c115743f3f"
     nginx              = "docker.io/nginxinc/nginx-unprivileged:1.31.2-alpine@sha256:592b23aa79a6e6c08ba4b20f1fff700e1328895705966722608e115d62e52d39"
     # tier 2
-    kea           = "reg.cluster.internal/randomcoww/kea:v3.1.9.1782147096@sha256:02acda614b50e73f8ecf829249ed751868d02e56c803186abf862ab42230781c"
+    kea           = "reg.cluster.internal/randomcoww/kea:v3.2.0.1783457153@sha256:62d241377246a72f72ebf161b3fe0b0c7e9229534f613196795e9319e6daadd9"
     ipxe          = "reg.cluster.internal/randomcoww/ipxe:v2.0.0.1783352359@sha256:9846ede062535c0a3a8a5543454f5f594ed678888d2ee76dddae59afcaedc185"
     registry      = "ghcr.io/distribution/distribution:3.1.1@sha256:bca24727f4002e51f959c18c42e816e4d1078198081a9837e16b8b7d7e43ebf8"
     device_plugin = "ghcr.io/squat/generic-device-plugin:0.2.0@sha256:66c8d5c270eb2b721f1064c549b9b7898152a6d2f0163380a5d37dc7636c20ff"
@@ -149,7 +149,7 @@ locals {
     thanos            = "quay.io/thanos/thanos:v0.41.0@sha256:cf3e9b292e4302ad4a4955b56379703aea39516607d382a57604a3d003c35d10"
     stump             = "docker.io/aaronleopold/stump:0.1.5@sha256:02684fe218a2a54aee5e8bedd8306b971b857d562770ebc3c35400a706845b6e"
     hermes_agent      = "reg.cluster.internal/randomcoww/hermes-mnemosyne:v2026.7.1.1783349794@sha256:d25f2f98bbb6da54f1d11b4fd4ffb6383a5723278e1068a6d45bd6e0938922af"
-    juicefs           = "reg.cluster.internal/randomcoww/juicefs:ce-v1.3.1.1783366760@sha256:f4f43ceea5f5d5c7cbeac4416b32958244bd0855e5bacc097b78fceb7ecc57f4"
+    juicefs           = "reg.cluster.internal/randomcoww/juicefs:v1.4.0.1783456837@sha256:3dd0e107156770b222b2a077f07fccbb548ba1a6c784dd4f0d6263943ccafb77"
 
     # models (model_file)
     "NVIDIA-Nemotron-3-Super-120B-A12B-MXFP4_MOE-00001-of-00003.gguf"    = "reg.cluster.internal/randomcoww/nvidia-nemotron-3-super-120b-a12b-mxfp4-moe:v1773610375@sha256:7c5065d9e53b4752fd40b496cd287946f5f5e5308ad29bfdea81c0622de6da0f"

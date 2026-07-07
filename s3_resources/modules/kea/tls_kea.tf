@@ -53,7 +53,7 @@ module "kea-tls" {
     "${member.name}-tls.crt" => tls_locally_signed_cert.kea[member.name].cert_pem
     }, {
     for _, member in local.members :
-    "${member.name}-tls.key" => tls_private_key.kea[member.name].private_key_pem
+    "${member.name}-tls.key" => tls_private_key.kea[member.name].private_key_pem_pkcs8
     }, {
     "ca.crt" = tls_self_signed_cert.kea-ca.cert_pem
   })

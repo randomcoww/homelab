@@ -1,7 +1,8 @@
 locals {
   kea_base_path            = "/etc/kea"
-  kea_socket_path          = "/var/run/kea/kea-dhcp4-ctrl.sock"
-  kea_hooks_libraries_path = "/usr/lib/kea/hooks" # path in image
+  prefix_path              = "/usr/local"
+  kea_socket_path          = "${local.prefix_path}/var/run/kea/kea-dhcp4-ctrl.sock"
+  kea_hooks_libraries_path = "${local.prefix_path}/lib/kea/hooks" # path in image
   # These paths are not configurable
   # /var/lib/stork-agent/certs/cert.pem
   # /var/lib/stork-agent/certs/key.pem

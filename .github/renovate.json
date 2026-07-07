@@ -84,12 +84,6 @@
       "versioning": "regex:^unified-vulkan-(?<major>\\d{4})-(?<minor>\\d{2})-(?<patch>\\d{2}).(?<build>\\d+)$"
     },
     {
-      "matchPackageNames": [
-        "reg.cluster.internal/randomcoww/juicefs"
-      ],
-      "versioning": "regex:^ce-v(?<major>\\d+).(?<minor>\\d+).(?<patch>\\d+).(?<build>\\d+)$"
-    },
-    {
       "matchDepTypes": [
         "helm_release",
         "helm_regex"
