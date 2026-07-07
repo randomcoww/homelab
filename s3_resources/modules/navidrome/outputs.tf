@@ -42,16 +42,18 @@ output "manifests" {
           mountOptions = [
             "endpoint-url ${var.minio_endpoint}",
             "maximum-throughput-gbps 1",
+            "metadata-ttl 300",
           ]
           csi = {
             driver       = "s3.csi.aws.com"
             volumeHandle = "${var.name}-${var.minio_data_bucket}"
             volumeAttributes = {
-              authenticationSource   = "driver"
-              bucketName             = var.minio_data_bucket
-              cache                  = "emptyDir"
-              cacheEmptyDirSizeLimit = "1Gi"
-              cacheEmptyDirMedium    = "Memory"
+              authenticationSource                       = "driver"
+              bucketName                                 = var.minio_data_bucket
+              cache                                      = "emptyDir"
+              cacheEmptyDirSizeLimit                     = "1Gi"
+              cacheEmptyDirMedium                        = "Memory"
+              mountpointContainerResourcesRequestsMemory = "1Gi"
             }
           }
         }

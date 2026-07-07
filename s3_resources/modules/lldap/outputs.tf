@@ -26,6 +26,11 @@ output "manifests" {
               owner    = "lldap"
             }
           }
+          resources = {
+            requests = {
+              memory = "256Mi"
+            }
+          }
         }
       },
     ] :

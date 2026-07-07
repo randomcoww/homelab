@@ -24,6 +24,11 @@ output "manifests" {
               owner    = "authelia"
             }
           }
+          resources = {
+            requests = {
+              memory = "256Mi"
+            }
+          }
         }
       },
 

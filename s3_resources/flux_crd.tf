@@ -1327,6 +1327,13 @@ locals {
                       successThreshold    = 1
                     }
                   },
+                  {
+                    resources = {
+                      requests = {
+                        memory = "512Mi"
+                      }
+                    }
+                  },
                 ]
               }
             }

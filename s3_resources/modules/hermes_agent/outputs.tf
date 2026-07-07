@@ -83,6 +83,11 @@ output "manifests" {
               }
             }
           }
+          resources = {
+            requests = {
+              memory = "256Mi"
+            }
+          }
         }
       },
     ] :
