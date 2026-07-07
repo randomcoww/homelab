@@ -186,6 +186,8 @@ module "litestream-overlay" {
             ${local.data_path}/sessions \
             ${local.data_path}/memories \
             ${local.data_path}/cron \
+            ${local.data_path}/plans \
+            ${local.data_path}/plugins \
             ${local.data_path}/skills \
             ${local.data_path}/workspace
 
