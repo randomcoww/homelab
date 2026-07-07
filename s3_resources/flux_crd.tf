@@ -859,7 +859,7 @@ locals {
             chart = {
               spec = {
                 chart   = "traefik"
-                version = "41.0.1" # renovate: datasource=helm depName=traefik registryUrl=https://traefik.github.io/charts
+                version = "41.0.2" # renovate: datasource=helm depName=traefik registryUrl=https://traefik.github.io/charts
                 sourceRef = {
                   kind = "HelmRepository"
                   name = local.endpoints.traefik.name
