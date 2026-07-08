@@ -238,9 +238,13 @@ module "llama-cpp" {
   }
   models = {
     for key, model in {
-      qwen-3-6-27b           = "Qwen3.6-27B-BF16-00001-of-00002.gguf"
-      qwen-3-6-27b-mmproj    = "Qwen3.6-27B-mmproj-BF16.gguf"
-      whisper-large-v3-turbo = "ggml-large-v3-turbo-q8_0.bin"
+      qwen-3-6-27b                          = "Qwen3.6-27B-BF16-00001-of-00002.gguf"
+      qwen-3-6-27b-mmproj                   = "Qwen3.6-27B-mmproj-BF16.gguf"
+      whisper-large-v3-turbo                = "ggml-large-v3-turbo-q8_0.bin"
+      jina-reranker-m0                      = "jina-reranker-m0-Q8_0.gguf"
+      jina-embeddings-v5-omni               = "jina-embeddings-v5-omni-small-text-matching-Q8_0.gguf"
+      jina-embeddings-v5-omni-audio-mmproj  = "jina-embeddings-v5-omni-small-text-matching-audio-mmproj-F16.gguf"
+      jina-embeddings-v5-omni-vision-mmproj = "jina-embeddings-v5-omni-small-text-matching-vision-mmproj-F16.gguf"
     } :
     key => {
       image = local.container_images_digest[model]
@@ -295,6 +299,24 @@ module "llama-cpp" {
           "whisper-1",
         ]
       }
+      jina-embeddings-v5-omni = {
+        cmd = <<-EOF
+        $${default_cmd} \
+          --model $${jina-embeddings-v5-omni} \
+          --embedding \
+          --pooling last \
+          --mmproj $${jina-embeddings-v5-omni-audio-mmproj} \
+          --mmproj $${jina-embeddings-v5-omni-vision-mmproj}
+        EOF
+      }
+      jina-reranker-m0 = {
+        cmd = <<-EOF
+        $${default_cmd} \
+          --model $${jina-reranker-m0} \
+          --reranking \
+          --pooling rank
+        EOF
+      }
     }
     groups = {
       agent-concurrent = {
@@ -303,6 +325,8 @@ module "llama-cpp" {
         members = [
           "qwen-3-6-27b",
           "whisper-large-v3-turbo",
+          "jina-embeddings-v5-omni",
+          "jina-reranker-m0",
         ]
       }
     }
@@ -354,95 +378,6 @@ module "llama-cpp" {
     }
   }
   ingress_hostname = local.endpoints.llama_cpp.ingress
-  gateway_ref = {
-    name      = local.endpoints.traefik.name
-    namespace = local.endpoints.traefik.namespace
-  }
-}
-
-module "llama-cpp-s" {
-  source    = "./modules/llama_cpp"
-  name      = local.endpoints.llama_cpp_s.name
-  namespace = local.endpoints.llama_cpp_s.namespace
-  images = {
-    llama_swap = local.container_images_digest.llama_cpp_vulkan
-  }
-  models = {
-    for key, model in {
-      jina-reranker-m0                      = "jina-reranker-m0-Q8_0.gguf"
-      jina-embeddings-v5-omni               = "jina-embeddings-v5-omni-small-text-matching-Q8_0.gguf"
-      jina-embeddings-v5-omni-audio-mmproj  = "jina-embeddings-v5-omni-small-text-matching-audio-mmproj-F16.gguf"
-      jina-embeddings-v5-omni-vision-mmproj = "jina-embeddings-v5-omni-small-text-matching-vision-mmproj-F16.gguf"
-    } :
-    key => {
-      image = local.container_images_digest[model]
-      file  = model
-    }
-  }
-  api_keys = [
-    random_password.llama-cpp-auth-token.result,
-  ]
-  llama_swap_config = {
-    includeAliasesInList = true
-    models = {
-      jina-embeddings-v5-omni = {
-        cmd = <<-EOF
-        $${default_cmd} \
-          --model $${jina-embeddings-v5-omni} \
-          --embedding \
-          --pooling last \
-          --mmproj $${jina-embeddings-v5-omni-audio-mmproj} \
-          --mmproj $${jina-embeddings-v5-omni-vision-mmproj}
-        EOF
-      }
-      jina-reranker-m0 = {
-        cmd = <<-EOF
-        $${default_cmd} \
-          --model $${jina-reranker-m0} \
-          --reranking \
-          --pooling rank
-        EOF
-      }
-    }
-    groups = {
-      agent-concurrent = {
-        swap      = false
-        exclusive = true
-        members = [
-          "jina-embeddings-v5-omni",
-          "jina-reranker-m0",
-        ]
-      }
-    }
-    hooks = {
-      on_startup = {
-        preload = [
-          "jina-embeddings-v5-omni",
-          "jina-reranker-m0",
-        ]
-      }
-    }
-  }
-  extra_envs = [
-    {
-      name  = "ROCBLAS_USE_HIPBLASLT"
-      value = 1
-    },
-    {
-      name  = "AMD_VULKAN_ICD"
-      value = "RADV"
-    },
-    {
-      name  = "RADV_PERFTEST"
-      value = "sam"
-    },
-  ]
-  resources = {
-    requests = {
-      memory = "8Gi"
-    }
-  }
-  ingress_hostname = local.endpoints.llama_cpp_s.ingress
   gateway_ref = {
     name      = local.endpoints.traefik.name
     namespace = local.endpoints.traefik.namespace
@@ -752,12 +687,12 @@ module "open-webui" {
     AUDIO_STT_OPENAI_API_KEY       = random_password.llama-cpp-auth-token.result
     RAG_TOP_K                      = 5
     RAG_EMBEDDING_ENGINE           = "openai"
-    RAG_OPENAI_API_BASE_URL        = "https://${local.endpoints.llama_cpp_s.ingress}/v1"
+    RAG_OPENAI_API_BASE_URL        = "https://${local.endpoints.llama_cpp.ingress}/v1"
     RAG_OPENAI_API_KEY             = random_password.llama-cpp-auth-token.result
     RAG_EMBEDDING_MODEL            = "jina-embeddings-v5-omni"
     RAG_TOP_K_RERANKER             = 5
     RAG_RERANKING_ENGINE           = "external"
-    RAG_EXTERNAL_RERANKER_URL      = "https://${local.endpoints.llama_cpp_s.ingress}/v1/rerank"
+    RAG_EXTERNAL_RERANKER_URL      = "https://${local.endpoints.llama_cpp.ingress}/v1/rerank"
     RAG_EXTERNAL_RERANKER_API_KEY  = random_password.llama-cpp-auth-token.result
     RAG_RERANKING_MODEL            = "jina-reranker-m0"
     TOOL_SERVER_CONNECTIONS = jsonencode([
@@ -1121,7 +1056,6 @@ locals {
 
     gha-runner      = module.gha-runner.manifests
     llama-cpp       = module.llama-cpp.manifests
-    llama-cpp-s     = module.llama-cpp-s.manifests
     camofox-browser = module.camofox-browser.manifests
     searxng         = module.searxng.manifests
     kubernetes-mcp  = module.kubernetes-mcp.manifests
