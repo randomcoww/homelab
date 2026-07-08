@@ -238,10 +238,9 @@ module "llama-cpp" {
   }
   models = {
     for key, model in {
-      nemotron-3-super            = "NVIDIA-Nemotron-3-Super-120B-A12B-MXFP4_MOE-00001-of-00003.gguf"
-      nemotron-3-nano-omni        = "NVIDIA-Nemotron-3-Nano-Omni-30B-A3B-Reasoning-UD-Q8_K_XL.gguf"
-      nemotron-3-nano-omni-mmproj = "mmproj-F16.gguf"
-      whisper-large-v3-turbo      = "ggml-large-v3-turbo-q8_0.bin"
+      qwen-3-6-27b           = "Qwen3.6-27B-BF16-00001-of-00002.gguf"
+      qwen-3-6-27b-mmproj    = "Qwen3.6-27B-mmproj-BF16.gguf"
+      whisper-large-v3-turbo = "ggml-large-v3-turbo-q8_0.bin"
     } :
     key => {
       image = local.container_images_digest[model]
@@ -254,53 +253,29 @@ module "llama-cpp" {
   llama_swap_config = {
     includeAliasesInList = true
     models = {
-      nemotron-3-super = {
+      qwen-3-6-27b = {
         cmd = <<-EOF
         $${default_cmd} \
-          --model $${nemotron-3-super} \
-          --ctx-size 1048576 \
-          --jinja
-        EOF
-        filters = {
-          stripParams = "temperature, top_p"
-          setParamsByID = {
-            "$${MODEL_ID}" = {
-              temperature = 1.0
-              top_p       = 1.0
-              batch-size  = 2048
-              ubatch-size = 2048
-            }
-            "$${MODEL_ID}:low" = {
-              temperature = 0.6
-              top_p       = 0.95
-              batch-size  = 4096
-              ubatch-size = 4096
-            }
-          }
-        }
-      }
-      nemotron-3-nano-omni = {
-        cmd = <<-EOF
-        $${default_cmd} \
-          --model $${nemotron-3-nano-omni} \
+          --model $${qwen-3-6-27b} \
           --ctx-size 262144 \
           --jinja \
-          --mmproj $${nemotron-3-nano-omni-mmproj}
+          --top-p 0.95 \
+          --top-k 20 \
+          --min-p 0.00 \
+          --spec-type draft-mtp \
+          --spec-draft-n-max 2 \
+          --cache-type-k bf16 \
+          --cache-type-v bf16 \
+          --mmproj $${qwen-3-6-27b-mmproj}
         EOF
         filters = {
-          stripParams = "temperature, top_p"
+          stripParams = "temperature"
           setParamsByID = {
             "$${MODEL_ID}" = {
               temperature = 1.0
-              top_p       = 1.0
-              batch-size  = 2048
-              ubatch-size = 2048
             }
             "$${MODEL_ID}:low" = {
               temperature = 0.6
-              top_p       = 0.95
-              batch-size  = 4096
-              ubatch-size = 4096
             }
           }
         }
@@ -326,7 +301,7 @@ module "llama-cpp" {
         swap      = false
         exclusive = true
         members = [
-          "nemotron-3-super",
+          "qwen-3-6-27b",
           "whisper-large-v3-turbo",
         ]
       }
@@ -334,7 +309,7 @@ module "llama-cpp" {
     hooks = {
       on_startup = {
         preload = [
-          "nemotron-3-super",
+          "qwen-3-6-27b",
           "whisper-large-v3-turbo",
         ]
       }
@@ -569,11 +544,11 @@ module "hermes-agent" {
       provider = "groq"
     }
     model = {
-      default        = "nemotron-3-super:low"
+      default        = "qwen-3-6-27b:low"
       provider       = "custom"
       base_url       = "https://${local.endpoints.llama_cpp.ingress}/v1"
       api_key        = random_password.llama-cpp-auth-token.result
-      context_length = 1048576
+      context_length = 262144
     }
     web = {
       search_backend  = "searxng"
@@ -630,8 +605,9 @@ module "hermes-agent" {
     }
     auxiliary = {
       vision = {
+        timeout  = 1800
         provider = "custom"
-        model    = "nemotron-3-nano-omni:low"
+        model    = "qwen-3-6-27b"
         base_url = "https://${local.endpoints.llama_cpp.ingress}/v1"
         api_key  = random_password.llama-cpp-auth-token.result
       }
@@ -652,18 +628,20 @@ module "hermes-agent" {
     }
   }
   extra_envs = {
-    SEARXNG_URL                = "https://${local.endpoints.searxng.ingress}"
-    CAMOFOX_URL                = "https://${local.endpoints.camofox_browser.ingress}"
-    API_SERVER_ENABLED         = true
-    API_SERVER_MODEL_NAME      = local.endpoints.hermes_agent.name
-    API_SERVER_KEY             = random_password.hermes-agent-auth-token.result
-    GATEWAY_ALLOW_ALL_USERS    = true
-    SLACK_BOT_TOKEN            = var.slack_bot_token
-    SLACK_APP_TOKEN            = var.slack_app_token
-    SLACK_ALLOWED_USERS        = var.slack_allowed_users
-    SLACK_HOME_CHANNEL         = var.slack_home_channel
-    SLACK_HOME_CHANNEL_NAME    = "bot"
-    MNEMOSYNE_HOST_LLM_ENABLED = true
+    SEARXNG_URL                 = "https://${local.endpoints.searxng.ingress}"
+    CAMOFOX_URL                 = "https://${local.endpoints.camofox_browser.ingress}"
+    HERMES_STREAM_READ_TIMEOUT  = 1800
+    HERMES_STREAM_STALE_TIMEOUT = 1800
+    API_SERVER_ENABLED          = true
+    API_SERVER_MODEL_NAME       = local.endpoints.hermes_agent.name
+    API_SERVER_KEY              = random_password.hermes-agent-auth-token.result
+    GATEWAY_ALLOW_ALL_USERS     = true
+    SLACK_BOT_TOKEN             = var.slack_bot_token
+    SLACK_APP_TOKEN             = var.slack_app_token
+    SLACK_ALLOWED_USERS         = var.slack_allowed_users
+    SLACK_HOME_CHANNEL          = var.slack_home_channel
+    SLACK_HOME_CHANNEL_NAME     = "bot"
+    MNEMOSYNE_HOST_LLM_ENABLED  = true
     # TODO: STT config - using groq is a hack that may only work because it expects the same whisper-large-v3-turbo model that I'm using
     GROQ_BASE_URL  = "https://${local.endpoints.llama_cpp.ingress}/v1"
     STT_GROQ_MODEL = "whisper-large-v3-turbo"
@@ -1140,7 +1118,7 @@ locals {
     lldap           = module.lldap.manifests
     authelia        = concat(module.authelia-valkey.manifests, module.authelia.manifests)
     stump           = module.stump.manifests
+    navidrome       = module.navidrome.manifests
     # open-webui      = module.open-webui.manifests
-    # navidrome       = module.navidrome.manifests
   }
 }
