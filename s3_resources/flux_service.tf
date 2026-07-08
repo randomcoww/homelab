@@ -240,6 +240,9 @@ module "llama-cpp" {
     for key, model in {
       qwen-3-6-27b                          = "Qwen3.6-27B-BF16-00001-of-00002.gguf"
       qwen-3-6-27b-mmproj                   = "Qwen3.6-27B-mmproj-BF16.gguf"
+      gemma-4-31b                           = "gemma-4-31B-it-BF16-00001-of-00002.gguf"
+      gemma-4-31b-mtp                       = "gemma-4-31B-it-BF16-MTP.gguf"
+      gemma-4-31b-mmproj                    = "gemma-4-31B-it-mmproj-BF16.gguf"
       whisper-large-v3-turbo                = "ggml-large-v3-turbo-q8_0.bin"
       jina-reranker-m0                      = "jina-reranker-m0-Q8_0.gguf"
       jina-embeddings-v5-omni               = "jina-embeddings-v5-omni-small-text-matching-Q8_0.gguf"
@@ -280,6 +283,33 @@ module "llama-cpp" {
             }
             "$${MODEL_ID}:low" = {
               temperature = 0.6
+            }
+          }
+        }
+      }
+      gemma-4-31b = {
+        cmd = <<-EOF
+        $${default_cmd} \
+          --model $${gemma-4-31b} \
+          --ctx-size 262144 \
+          --jinja \
+          --top-p 0.95 \
+          --top-k 64 \
+          --model-draft $${gemma-4-31b-mtp} \
+          --spec-type draft-mtp \
+          --spec-draft-n-max 4 \
+          --cache-type-k bf16 \
+          --cache-type-v bf16 \
+          --mmproj $${gemma-4-31b-mmproj} \
+        EOF
+        filters = {
+          stripParams = "temperature"
+          setParamsByID = {
+            "$${MODEL_ID}" = {
+              temperature = 1.0
+              chat_template_kwargs = {
+                enable_thinking = true
+              }
             }
           }
         }
@@ -479,7 +509,7 @@ module "hermes-agent" {
       provider = "groq"
     }
     model = {
-      default        = "qwen-3-6-27b:low"
+      default        = "qwen-3-6-27b"
       provider       = "custom"
       base_url       = "https://${local.endpoints.llama_cpp.ingress}/v1"
       api_key        = random_password.llama-cpp-auth-token.result
@@ -553,10 +583,7 @@ module "hermes-agent" {
     auxiliary = {
       vision = {
         timeout  = 1800
-        provider = "custom"
-        model    = "qwen-3-6-27b"
-        base_url = "https://${local.endpoints.llama_cpp.ingress}/v1"
-        api_key  = random_password.llama-cpp-auth-token.result
+        provider = "auto"
       }
     }
     group_sessions_per_user = false
