@@ -450,6 +450,11 @@ module "searxng" {
   }
 }
 
+resource "random_password" "camofox-browser-auth-token" {
+  length           = 32
+  override_special = "-_"
+}
+
 module "camofox-browser" {
   source    = "./modules/camofox_browser"
   name      = local.endpoints.camofox_browser.name
@@ -458,11 +463,11 @@ module "camofox-browser" {
     camofox_browser = local.container_images_digest.camofox_browser
   }
   extra_configs = {
-    PROXY_HOST     = regex(local.domain_regex, var.scrape_proxy_server).hostname
-    PROXY_PORT     = regex(local.domain_regex, var.scrape_proxy_server).port
-    PROXY_USERNAME = var.scrape_proxy_username
-    PROXY_PASSWORD = var.scrape_proxy_password
-    # TODO: add API key https://github.com/NousResearch/hermes-agent/pull/33264
+    PROXY_HOST         = regex(local.domain_regex, var.scrape_proxy_server).hostname
+    PROXY_PORT         = regex(local.domain_regex, var.scrape_proxy_server).port
+    PROXY_USERNAME     = var.scrape_proxy_username
+    PROXY_PASSWORD     = var.scrape_proxy_password
+    CAMOFOX_ACCESS_KEY = random_password.camofox-browser-auth-token.result
   }
   ingress_hostname = local.endpoints.camofox_browser.ingress
   gateway_ref = {
@@ -604,6 +609,7 @@ module "hermes-agent" {
   extra_envs = {
     SEARXNG_URL                 = "https://${local.endpoints.searxng.ingress}"
     CAMOFOX_URL                 = "https://${local.endpoints.camofox_browser.ingress}"
+    CAMOFOX_API_KEY             = random_password.camofox-browser-auth-token.result
     HERMES_STREAM_READ_TIMEOUT  = 1800
     HERMES_STREAM_STALE_TIMEOUT = 1800
     API_SERVER_ENABLED          = true
