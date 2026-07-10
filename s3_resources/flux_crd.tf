@@ -1128,7 +1128,7 @@ locals {
             chart = {
               spec = {
                 chart   = "node-feature-discovery"
-                version = "0.18.3" # renovate: datasource=helm depName=node-feature-discovery registryUrl=https://kubernetes-sigs.github.io/node-feature-discovery/charts
+                version = "0.19.0" # renovate: datasource=helm depName=node-feature-discovery registryUrl=https://kubernetes-sigs.github.io/node-feature-discovery/charts
                 sourceRef = {
                   kind = "HelmRepository"
                   name = "node-feature-discovery"
