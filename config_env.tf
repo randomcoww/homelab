@@ -131,7 +131,7 @@ locals {
     device_plugin = "ghcr.io/squat/generic-device-plugin:0.2.0@sha256:66c8d5c270eb2b721f1064c549b9b7898152a6d2f0163380a5d37dc7636c20ff"
     gha_runner    = "ghcr.io/actions/actions-runner:2.335.1@sha256:08c30b0a7105f64bddfc485d2487a22aa03932a791402393352fdf674bda2c29"
     # tier 3
-    mountpoint_s3_csi = "reg.cluster.internal/randomcoww/mountpoint-s3-csi:v2.7.0.1783349801@sha256:f904a2bcb2009f098200ef0a41d3ec437fbb05d3a8a88492f097378fc4032363"
+    mountpoint_s3_csi = "reg.cluster.internal/randomcoww/mountpoint-s3-csi:v2.7.0.1783975530@sha256:45a68a15351f4f5ea7ed4a4bbfa3e0ef30bc8217e26fd9c6b77354bd74e2589f"
     hostapd           = "reg.cluster.internal/randomcoww/hostapd:v2.11.1783952302@sha256:30f5b61432c354261577499921d0731d78b73be6d3057fb43deddeb07d1c6e7e"
     tailscale         = "ghcr.io/tailscale/tailscale:v1.98.8@sha256:d54b2e6a9c09f0e5ec52e82b9ad4af3d446b54a7c08075e92f11c39dd410105f"
     qrcode_generator  = "reg.cluster.internal/randomcoww/qrcode-resource:v1783951442@sha256:fce09abfce73ff49c185aad197491bf20aefc290a0bc185b9811262f65a01f60"
@@ -148,7 +148,7 @@ locals {
     valkey            = "ghcr.io/valkey-io/valkey:9.1-alpine@sha256:a35428eba9043cc0b79dbe54100f0c92784f2de00ad09b01182bfb1c5c83d1bd"
     thanos            = "quay.io/thanos/thanos:v0.42.0@sha256:cc1975aaeb64a744dc11319892345f4822f72860f0efcff030111fe08328bfa4"
     stump             = "docker.io/aaronleopold/stump:0.1.5@sha256:02684fe218a2a54aee5e8bedd8306b971b857d562770ebc3c35400a706845b6e"
-    hermes_agent      = "reg.cluster.internal/randomcoww/hermes-mnemosyne:v2026.7.1.1783349794@sha256:d25f2f98bbb6da54f1d11b4fd4ffb6383a5723278e1068a6d45bd6e0938922af"
+    hermes_agent      = "reg.cluster.internal/randomcoww/hermes-mnemosyne:v2026.7.7.1783975299@sha256:b1f34ed1384368b0278621b8b1e7271beb72b27311e18848229275f45c00c816"
     juicefs           = "reg.cluster.internal/randomcoww/juicefs:v1.4.0.1783953431@sha256:0f26ad0a1ab94b4313df83bf56ea53779e79cf671c3f8fc41b656ffbfc850aa4"
 
     # models (model_file)
