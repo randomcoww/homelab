@@ -1272,7 +1272,7 @@ locals {
             chart = {
               spec = {
                 chart   = "juicefs-csi-driver"
-                version = "0.31.10" # renovate: datasource=helm depName=cloudnative-pg registryUrl=https://juicedata.github.io/charts
+                version = "0.31.10" # renovate: datasource=helm depName=juicefs-csi-driver registryUrl=https://juicedata.github.io/charts
                 sourceRef = {
                   kind = "HelmRepository"
                   name = "juicefs-csi-driver"
