@@ -149,7 +149,7 @@ locals {
     thanos            = "quay.io/thanos/thanos:v0.42.0@sha256:cc1975aaeb64a744dc11319892345f4822f72860f0efcff030111fe08328bfa4"
     stump             = "docker.io/aaronleopold/stump:0.1.5@sha256:02684fe218a2a54aee5e8bedd8306b971b857d562770ebc3c35400a706845b6e"
     hermes_agent      = "reg.cluster.internal/randomcoww/hermes-mnemosyne:v2026.7.7.1783975299@sha256:b1f34ed1384368b0278621b8b1e7271beb72b27311e18848229275f45c00c816"
-    juicefs           = "reg.cluster.internal/randomcoww/juicefs:v1.4.0.1783953431@sha256:0f26ad0a1ab94b4313df83bf56ea53779e79cf671c3f8fc41b656ffbfc850aa4"
+    juicefs           = "reg.cluster.internal/randomcoww/juicefs:ce-v1.4.0.1784048396@sha256:29bc0126131a1f315d92d87476433004aeea10990c62eafc7c6c9cf4a5b8dc35"
 
     # models (model_file)
     "Qwen3.6-27B-BF16-00001-of-00002.gguf"                               = "reg.cluster.internal/randomcoww/qwen3.6-27b-bf16:v1783465086@sha256:48415dda9b84ae3de638c7e218d69e1feb56db51b966cf65eac18f9fafad7486"
