@@ -126,7 +126,8 @@ output "manifests" {
                 }
               }
               prometheusSpec = {
-                disableCompaction = true
+                disableCompaction        = true
+                replicaExternalLabelName = "replica" # value is fixed in thanos
                 thanos = {
                   objectStorageConfig = {
                     secret = {

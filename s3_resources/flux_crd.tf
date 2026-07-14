@@ -303,25 +303,6 @@ module "prometheus" {
           name = "kea"
           rules = [
             {
-              alert = "KeaDHCP4Down"
-              expr  = <<-EOF
-              sum(up{app="${local.endpoints.kea.name}",namespace="${local.endpoints.kea.namespace}"}) < 2
-              or
-              absent(up{app="${local.endpoints.kea.name}",namespace="${local.endpoints.kea.namespace}"})
-              EOF
-              for   = "90s"
-              labels = {
-                severity = "critical"
-              }
-              annotations = {
-                summary     = "Kea DHCPv4 instance is down"
-                description = <<-EOF
-                Kea DHCPv4 pods are unreachable.
-                Nodes affected: {{ $labels.node }}
-                EOF
-              }
-            },
-            {
               alert = "KeaDHCP4PoolUsageHigh"
               expr  = <<-EOF
               max by (subnet_id) (
@@ -337,23 +318,6 @@ module "prometheus" {
                 summary     = "Kea DHCPv4 pool usage high"
                 description = <<-EOF
                 DHCPv4 pool {{ $labels.subnet }} is at {{ $value | humanize }}% utilization.
-                EOF
-              }
-            },
-            {
-              alert = "KeaDHCP4Flapping"
-              expr  = <<-EOF
-              changes(process_start_time_seconds{app="${local.endpoints.kea.name}",namespace="${local.endpoints.kea.namespace}"}[15m]) > 3
-              EOF
-              for   = "0m"
-              labels = {
-                severity = "warning"
-              }
-              annotations = {
-                summary     = "Kea DHCPv4 instance flapping"
-                description = <<-EOF
-                Instance {{ $labels.instance }} has restarted {{ $value }} times in 15 minutes.
-                Possible crash-loop, OOM, or configuration reload issues.
                 EOF
               }
             },
