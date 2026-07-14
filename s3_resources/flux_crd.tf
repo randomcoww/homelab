@@ -6,7 +6,11 @@ module "prometheus" {
   name      = local.endpoints.prometheus.name
   namespace = local.endpoints.prometheus.namespace
   images = {
-    thanos = local.container_images_digest.thanos
+    thanos = {
+      registry   = regex(local.container_image_regex, local.container_images.thanos).repository
+      repository = regex(local.container_image_regex, local.container_images.thanos).image
+      tag        = regex(local.container_image_regex, local.container_images.thanos).tag
+    }
   }
   extra_values = {
     kubeControllerManager = {

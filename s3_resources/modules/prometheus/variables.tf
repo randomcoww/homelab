@@ -14,7 +14,11 @@ variable "replicas" {
 
 variable "images" {
   type = object({
-    thanos = string
+    thanos = object({
+      registry   = string
+      repository = string
+      tag        = string
+    })
   })
 }
 

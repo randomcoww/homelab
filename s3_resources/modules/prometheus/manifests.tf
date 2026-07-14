@@ -45,7 +45,7 @@ locals {
               containers = [
                 {
                   name  = "thanos-compactor"
-                  image = var.images.thanos
+                  image = "${var.images.thanos.registry}/${var.images.thanos.repository}:${var.images.thanos.tag}"
                   args = [
                     "compact",
                     "--web.disable",
@@ -145,6 +145,7 @@ locals {
       }
       kubeletEndpointsEnabled     = false
       kubeletEndpointSliceEnabled = true
+      thanosImage                 = var.images.thanos
     }
     prometheus = {
       enabled = true
@@ -233,7 +234,7 @@ locals {
         containers = [
           {
             name  = "thanos-querier"
-            image = var.images.thanos
+            image = "${var.images.thanos.registry}/${var.images.thanos.repository}:${var.images.thanos.tag}"
             args = [
               "query",
               "--query.replica-label=replica",
@@ -278,7 +279,7 @@ locals {
           },
           {
             name  = "thanos-store"
-            image = var.images.thanos
+            image = "${var.images.thanos.registry}/${var.images.thanos.repository}:${var.images.thanos.tag}"
             args = [
               "store",
               "--data-dir=${local.store_data_path}",
