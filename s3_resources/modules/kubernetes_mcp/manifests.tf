@@ -30,9 +30,6 @@ module "deployment" {
   release   = var.release
   affinity  = var.affinity
   replicas  = var.replicas
-  annotations = {
-    "checksum/secret" = sha256(module.tls.manifest)
-  }
   template_spec = {
     serviceAccountName = var.name
     resources = {
@@ -97,7 +94,7 @@ module "deployment" {
       {
         name = "tls"
         secret = {
-          secretName = module.tls.name
+          secretName = "${var.name}-tls"
         }
       },
       {

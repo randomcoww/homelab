@@ -36,7 +36,7 @@ module "workflow-config" {
                 name = "INTERNAL_CA_CERT" # add to some builds such as iPXE
                 valueFrom = {
                   secretKeyRef = {
-                    name = module.tls.name
+                    name = "${var.name}-client-tls"
                     key  = "ca.crt"
                   }
                 }
@@ -96,7 +96,7 @@ module "workflow-config" {
           {
             name = "internal-tls"
             secret = {
-              secretName = module.tls.name
+              secretName = "${var.name}-client-tls"
             }
           },
         ]
@@ -132,7 +132,7 @@ module "workflow-config" {
                 name = "INTERNAL_CA_CERT" # add to image for pulling rootfs and ignition
                 valueFrom = {
                   secretKeyRef = {
-                    name = module.tls.name
+                    name = "${var.name}-client-tls"
                     key  = "ca.crt"
                   }
                 }
@@ -145,7 +145,7 @@ module "workflow-config" {
                 name = "AWS_ACCESS_KEY_ID"
                 valueFrom = {
                   secretKeyRef = {
-                    name = module.minio-user-secret.name
+                    name = module.user-secret.name
                     key  = "AWS_ACCESS_KEY_ID"
                   }
                 }
@@ -154,7 +154,7 @@ module "workflow-config" {
                 name = "AWS_SECRET_ACCESS_KEY"
                 valueFrom = {
                   secretKeyRef = {
-                    name = module.minio-user-secret.name
+                    name = module.user-secret.name
                     key  = "AWS_SECRET_ACCESS_KEY"
                   }
                 }
@@ -197,7 +197,7 @@ module "workflow-config" {
                 name = "RENOVATE_TOKEN"
                 valueFrom = {
                   secretKeyRef = {
-                    name = module.tls.name
+                    name = module.user-secret.name
                     key  = "RENOVATE_TOKEN"
                   }
                 }
@@ -216,7 +216,7 @@ module "workflow-config" {
                 name = "DOCKER_${upper(replace(regex(local.domain_regex, var.registry_endpoint).hostname, "/[.-]/", "_"))}_HTTPSCERTIFICATE"
                 valueFrom = {
                   secretKeyRef = {
-                    name = module.tls.name
+                    name = "${var.name}-client-tls"
                     key  = "tls.crt"
                   }
                 }
@@ -225,7 +225,7 @@ module "workflow-config" {
                 name = "DOCKER_${upper(replace(regex(local.domain_regex, var.registry_endpoint).hostname, "/[.-]/", "_"))}_HTTPSPRIVATEKEY"
                 valueFrom = {
                   secretKeyRef = {
-                    name = module.tls.name
+                    name = "${var.name}-client-tls"
                     key  = "tls.key"
                   }
                 }
@@ -234,7 +234,7 @@ module "workflow-config" {
                 name = "DOCKER_${upper(replace(regex(local.domain_regex, var.registry_endpoint).hostname, "/[.-]/", "_"))}_HTTPSCERTIFICATEAUTHORITY"
                 valueFrom = {
                   secretKeyRef = {
-                    name = module.tls.name
+                    name = "${var.name}-client-tls"
                     key  = "ca.crt"
                   }
                 }
@@ -263,14 +263,15 @@ module "workflow-config" {
   }
 }
 
-module "minio-user-secret" {
+module "user-secret" {
   source    = "../../../modules/secret"
-  name      = "${var.name}-minio-user-secret"
+  name      = "${var.name}-user-secret"
   namespace = var.namespace
   app       = var.name
   release   = var.release
   data = merge({
     AWS_ACCESS_KEY_ID     = var.minio_user.id
     AWS_SECRET_ACCESS_KEY = var.minio_user.secret
+    RENOVATE_TOKEN        = var.github_credentials.token # GITHUB_TOKEN cannot provide all permissions needed for renovate
   })
 }

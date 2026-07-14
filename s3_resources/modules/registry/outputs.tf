@@ -94,12 +94,47 @@ output "manifests" {
           }
         }
       },
+
+      # server cert
+      {
+        apiVersion = "cert-manager.io/v1"
+        kind       = "Certificate"
+        metadata = {
+          name      = "${var.name}-tls"
+          namespace = var.namespace
+        }
+        spec = {
+          secretName = "${var.name}-tls"
+          isCA       = false
+          privateKey = {
+            algorithm = "ECDSA"
+            size      = 521
+          }
+          commonName = var.name
+          usages = [
+            "key encipherment",
+            "digital signature",
+            "server auth",
+          ]
+          ipAddresses = [
+            "127.0.0.1",
+            var.service_ip,
+          ]
+          dnsNames = [
+            var.name,
+            var.service_hostname,
+          ]
+          issuerRef = {
+            name = var.ca_issuer_name
+            kind = "ClusterIssuer"
+          }
+        }
+      },
     ] :
     yamlencode(m)
     ], [
     module.secret.manifest,
     module.deployment.manifest,
-    module.tls.manifest,
     module.minio-user-secret.manifest,
     module.service.manifest,
   ])

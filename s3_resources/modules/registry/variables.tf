@@ -34,12 +34,8 @@ variable "replicas" {
   default = 1
 }
 
-variable "ca" {
-  type = object({
-    algorithm       = string
-    private_key_pem = string
-    cert_pem        = string
-  })
+variable "ca_issuer_name" {
+  type = string
 }
 
 variable "config" {
@@ -72,8 +68,4 @@ variable "minio_user" {
     id     = string
     secret = string
   })
-}
-
-variable "gateway_ref" {
-  type = any
 }

@@ -485,7 +485,7 @@ module "kubernetes-mcp" {
   }
   service_hostname = local.endpoints.kubernetes_mcp.service
   service_port     = local.service_ports.kubernetes_mcp
-  ca               = data.terraform_remote_state.host.outputs.internal_ca
+  ca_issuer_name   = local.kubernetes.cert_issuers.ca_internal
 }
 
 resource "random_password" "hermes-agent-auth-token" {
@@ -673,7 +673,7 @@ module "hermes-agent" {
     EOF
   }
 
-  mcp_ca           = data.terraform_remote_state.host.outputs.internal_ca
+  ca_issuer_name   = local.kubernetes.cert_issuers.ca_internal
   ingress_hostname = local.endpoints.hermes_agent.ingress
   gateway_ref = {
     name      = local.endpoints.traefik.name
@@ -979,7 +979,7 @@ module "gha-runner" {
     username = var.github_username
     token    = var.github_token
   }
-  internal_ca       = data.terraform_remote_state.host.outputs.internal_ca
+  ca_issuer_name    = local.kubernetes.cert_issuers.ca_internal
   registry_endpoint = "${local.endpoints.registry.service}:${local.service_ports.registry}"
   minio_endpoint    = "${local.services.cluster_minio.ip}:${local.service_ports.minio}"
   minio_user        = minio_iam_user.user["arc"]

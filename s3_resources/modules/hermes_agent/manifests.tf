@@ -289,7 +289,7 @@ module "litestream-overlay" {
       {
         name = "mcp-client-tls"
         secret = {
-          secretName = module.mcp-client-tls.name
+          secretName = "${var.name}-client-tls"
         }
       },
     ]

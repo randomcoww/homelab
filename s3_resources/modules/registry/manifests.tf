@@ -74,7 +74,6 @@ module "deployment" {
   replicas  = var.replicas
   annotations = {
     "checksum/secret"            = sha256(module.secret.manifest)
-    "checksum/tls"               = sha256(module.tls.manifest)
     "checksum/minio-user-secret" = sha256(module.minio-user-secret.manifest)
   }
   template_spec = {
@@ -180,7 +179,7 @@ module "deployment" {
           sources = [
             {
               secret = {
-                name = module.tls.name
+                name = "${var.name}-tls"
                 items = [
                   {
                     key  = "ca.crt"

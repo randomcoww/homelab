@@ -6,7 +6,6 @@ output "manifests" {
     module.service.manifest,
     module.httproute.manifest,
     module.minio-user-secret.manifest,
-    module.mcp-client-tls.manifest,
     ], [
     for _, m in [
       # data volume
@@ -87,6 +86,34 @@ output "manifests" {
             requests = {
               memory = "256Mi"
             }
+          }
+        }
+      },
+
+      # client cert
+      {
+        apiVersion = "cert-manager.io/v1"
+        kind       = "Certificate"
+        metadata = {
+          name      = "${var.name}-client-tls"
+          namespace = var.namespace
+        }
+        spec = {
+          secretName = "${var.name}-client-tls"
+          isCA       = false
+          privateKey = {
+            algorithm = "ECDSA"
+            size      = 521
+          }
+          commonName = var.name
+          usages = [
+            "key encipherment",
+            "digital signature",
+            "client auth",
+          ]
+          issuerRef = {
+            name = var.ca_issuer_name
+            kind = "ClusterIssuer"
           }
         }
       },

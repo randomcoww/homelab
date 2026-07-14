@@ -1,8 +1,7 @@
 output "manifests" {
   value = concat([
     # runner resources in arc-runners
-    module.tls.manifest,
-    module.minio-user-secret.manifest,
+    module.user-secret.manifest,
     module.workflow-config.manifest,
 
     ], [
@@ -199,6 +198,34 @@ output "manifests" {
                 memory = "128Mi"
               }
             }
+          }
+        }
+      },
+
+      # client cert
+      {
+        apiVersion = "cert-manager.io/v1"
+        kind       = "Certificate"
+        metadata = {
+          name      = "${var.name}-client-tls"
+          namespace = var.namespace
+        }
+        spec = {
+          secretName = "${var.name}-client-tls"
+          isCA       = false
+          privateKey = {
+            algorithm = "ECDSA"
+            size      = 521
+          }
+          commonName = var.name
+          usages = [
+            "key encipherment",
+            "digital signature",
+            "client auth",
+          ]
+          issuerRef = {
+            name = var.ca_issuer_name
+            kind = "ClusterIssuer"
           }
         }
       },
