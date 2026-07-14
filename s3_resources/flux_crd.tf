@@ -8,13 +8,58 @@ module "prometheus" {
   images = {
     thanos = local.container_images_digest.thanos
   }
-  scrape_configs = yamlencode([
+  extra_values = {
+    kubeControllerManager = {
+      enabled = false
+    }
+    kubeScheduler = {
+      enabled = false
+    }
+    kubeProxy = {
+      enabled = true
+      service = {
+        enabled    = true
+        port       = local.host_ports.kube_proxy_metrics
+        targetPort = local.host_ports.kube_proxy_metrics
+        selector = {
+          app = "kube-proxy"
+        }
+      }
+    }
+    coreDns = {
+      enabled = true
+      service = {
+        enabled    = true
+        port       = local.service_ports.metrics
+        targetPort = local.service_ports.metrics
+        selector = {
+          k8s-app = "coredns"
+        }
+      }
+    }
+    kubeEtcd = {
+      enabled = true
+      service = {
+        enabled    = true
+        port       = local.host_ports.etcd_metrics
+        targetPort = local.host_ports.etcd_metrics
+        selector = {
+          k8s-app = "etcd"
+        }
+      }
+    }
+    kubelet = {
+      enabled = true
+    }
+  }
+  extra_scrape_configs = [
     {
       job_name = "cri-o"
       scheme   = "https"
       tls_config = {
         ca_file = "/var/run/secrets/kubernetes.io/serviceaccount/ca.crt"
       }
+      bearer_token_file = "/var/run/secrets/kubernetes.io/serviceaccount/token"
       kubernetes_sd_configs = [
         {
           role = "node"
@@ -22,378 +67,28 @@ module "prometheus" {
       ]
       relabel_configs = [
         {
-          source_labels = ["__address__"]
-          regex         = "([^:]+):\\d+$"
+          source_labels = ["__meta_kubernetes_node_address_InternalIP"]
+          regex         = "(.+)"
           target_label  = "__address__"
           replacement   = "$1:${local.host_ports.crio_metrics}"
         },
+        {
+          source_labels = ["__meta_kubernetes_node_address_InternalIP"]
+          regex         = "(.+)"
+          target_label  = "instance"
+          replacement   = "$1:${local.host_ports.crio_metrics}"
+        },
+        {
+          source_labels = ["__meta_kubernetes_node_address_Hostname"]
+          action        = "replace"
+          target_label  = "node"
+        },
       ]
     },
-  ])
-  server_files = {
-    "alerting_rules.yml" = {
+  ]
+  extra_rules_map = {
+    minio = {
       groups = [
-        {
-          name = "kube-apiserver"
-          rules = [
-            {
-              alert = "KubeAPIDown"
-              expr  = <<-EOF
-              sum(up{job="kubernetes-api-servers"}) < 2
-              or
-              absent(up{job="kubernetes-api-servers"})
-              EOF
-              for   = "90s"
-              labels = {
-                severity = "critical"
-              }
-              annotations = {
-                summary     = "kube-apiserver instance down"
-                description = <<-EOF
-                Kube-apiserver instances are unreachable.
-                Instances affected: {{ $labels.instance }}
-                EOF
-              }
-            },
-            {
-              alert = "KubeAPIErrorRateHigh"
-              expr  = <<-EOF
-              sum by (instance) (
-                rate(apiserver_request_total{job="kubernetes-api-servers", code=~"5.."}[2m])
-              )
-              /
-              sum by (instance) (
-                rate(apiserver_request_total{job="kubernetes-api-servers"}[2m])
-              ) > 0.05
-              EOF
-              for   = "3m"
-              labels = {
-                severity = "critical"
-              }
-              annotations = {
-                summary     = "High error rate on kube-apiserver"
-                description = <<-EOF
-                Instance {{ $labels.instance }} is returning >5% 5xx errors.
-                Cluster may be partially degraded.
-                EOF
-              }
-            },
-            {
-              alert = "KubeAPIHighLatency"
-              expr  = <<-EOF
-              histogram_quantile(0.99,
-                sum by (le, verb, instance) (
-                  rate(apiserver_request_duration_seconds_bucket{job="kubernetes-api-servers", verb!~"LIST|WATCH|CONNECT"}[5m])
-                )
-              ) > 0.4
-              EOF
-              for   = "5m"
-              labels = {
-                severity = "warning"
-              }
-              annotations = {
-                summary     = "High API server latency"
-                description = <<-EOF
-                p99 latency for {{ $labels.verb }} requests on {{ $labels.instance }} is {{ $value }}s.
-                EOF
-              }
-            },
-            {
-              alert = "KubeAPIServerSlowList"
-              expr  = <<-EOF
-              histogram_quantile(0.99,
-                sum by (le, resource, instance) (
-                  rate(apiserver_request_duration_seconds_bucket{job="kubernetes-api-servers", verb="LIST"}[5m])
-                )
-              ) > 5
-              EOF
-              for   = "5m"
-              labels = {
-                severity = "warning"
-              }
-              annotations = {
-                summary     = "Slow LIST requests on apiserver"
-                description = <<-EOF
-                p99 LIST latency for {{ $labels.resource }} on {{ $labels.instance }} is {{ $value }}s.
-                EOF
-              }
-            },
-            {
-              alert = "KubeAPIServerFlapping"
-              expr  = <<-EOF
-              changes(process_start_time_seconds{job="kubernetes-api-servers"}[10m]) > 3
-              EOF
-              for   = "0m"
-              labels = {
-                severity = "warning"
-              }
-              annotations = {
-                summary     = "kube-apiserver is flapping"
-                description = <<-EOF
-                Instance {{ $labels.instance }} has restarted {{ $value }} times in 10m.
-                Possible crash-loop or instability.
-                EOF
-              }
-            },
-            {
-              alert = "KubeAPIServerHighCPU"
-              expr  = <<-EOF
-              rate(process_cpu_seconds_total{job="kubernetes-api-servers"}[5m]) > 0.75
-              EOF
-              for   = "5m"
-              labels = {
-                severity = "warning"
-              }
-              annotations = {
-                summary     = "High CPU usage on kube-apiserver"
-                description = <<-EOF
-                Instance {{ $labels.instance }} using {{ $value | humanize }}% CPU.
-                EOF
-              }
-            },
-          ]
-        },
-        {
-          name = "etcd"
-          rules = [
-            {
-              alert = "EtcdMemberDown"
-              expr  = <<-EOF
-              sum(up{app="${local.endpoints.etcd.name}",namespace="${local.endpoints.etcd.namespace}"}) < ${length(local.members.etcd)}
-              or
-              absent(up{app="${local.endpoints.etcd.name}",namespace="${local.endpoints.etcd.namespace}"})
-              EOF
-              for   = "90s"
-              labels = {
-                severity = "critical"
-              }
-              annotations = {
-                summary     = "etcd member is down"
-                description = <<-EOF
-                Only {{ $value }} out of ${length(local.members.etcd)} etcd members are up.
-                Nodes affected: {{ $labels.node }}
-                EOF
-              }
-            },
-            {
-              alert = "EtcdNoLeader"
-              expr  = <<-EOF
-              sum(etcd_server_has_leader{app="${local.endpoints.etcd.name}",namespace="${local.endpoints.etcd.namespace}"}) == 0
-              EOF
-              for   = "30s"
-              labels = {
-                severity = "critical"
-              }
-              annotations = {
-                summary     = "etcd cluster has no leader"
-                description = <<-EOF
-                etcd cluster has lost its leader. Cluster operations may be blocked.
-                EOF
-              }
-            },
-            {
-              alert = "EtcdHighNumberOfLeaderChanges"
-              expr  = <<-EOF
-              increase(etcd_server_leader_changes_seen_total{app="${local.endpoints.etcd.name}",namespace="${local.endpoints.etcd.namespace}"}[15m]) > 3
-              EOF
-              for   = "0m"
-              labels = {
-                severity = "warning"
-              }
-              annotations = {
-                summary     = "High etcd leader changes"
-                description = <<-EOF
-                etcd leader has changed {{ $value }} times in the last 15 minutes.
-                This often indicates network issues, disk latency, or resource pressure on on-prem nodes.
-                EOF
-              }
-            },
-            {
-              alert = "EtcdProposalsFailed"
-              expr  = <<-EOF
-              rate(etcd_server_proposals_failed_total{app="${local.endpoints.etcd.name}",namespace="${local.endpoints.etcd.namespace}"}[5m]) > 0
-              EOF
-              for   = "3m"
-              labels = {
-                severity = "critical"
-              }
-              annotations = {
-                summary     = "etcd proposals are failing"
-                description = <<-EOF
-                etcd is failing to apply proposals on instance {{ $labels.instance }}.
-                This can lead to cluster instability.
-                EOF
-              }
-            },
-            {
-              alert = "EtcdHighCommitDuration"
-              expr  = <<-EOF
-              histogram_quantile(0.99,
-                sum by (le, instance) (rate(etcd_disk_backend_commit_duration_seconds_bucket{app="${local.endpoints.etcd.name}",namespace="${local.endpoints.etcd.namespace}"}[5m]))
-              ) > 0.1
-              EOF
-              for   = "5m"
-              labels = {
-                severity = "warning"
-              }
-              annotations = {
-                summary     = "High etcd commit duration"
-                description = <<-EOF
-                p99 etcd backend commit duration on {{ $labels.instance }} is {{ $value }} seconds.
-                Check disk I/O (SSD recommended for etcd).
-                EOF
-              }
-            },
-            {
-              alert = "EtcdDatabaseQuotaLow"
-              expr  = <<-EOF
-              etcd_mvcc_db_total_size_in_bytes{app="${local.endpoints.etcd.name}",namespace="${local.endpoints.etcd.namespace}"} / etcd_server_quota_backend_bytes{app="${local.endpoints.etcd.name}",namespace="${local.endpoints.etcd.namespace}"} > 0.85
-              EOF
-              for   = "5m"
-              labels = {
-                severity = "warning"
-              }
-              annotations = {
-                summary     = "etcd database size approaching quota"
-                description = <<-EOF
-                etcd DB usage on {{ $labels.instance }} is at {{ $value | humanize }}% of quota.
-                Consider defragmentation or increasing quota.
-                EOF
-              }
-            },
-            {
-              alert = "EtcdMemberFlapping"
-              expr  = <<-EOF
-              changes(process_start_time_seconds{app="${local.endpoints.etcd.name}",namespace="${local.endpoints.etcd.namespace}"}[15m]) > 3
-              EOF
-              for   = "0m"
-              labels = {
-                severity = "warning"
-              }
-              annotations = {
-                summary     = "etcd member is restarting frequently"
-                description = <<-EOF
-                Instance {{ $labels.instance }} has restarted {{ $value }} times in 15 minutes.
-                Possible crash-loop or OOM.
-                EOF
-              }
-            },
-          ]
-        },
-        {
-          name = "kube-dns"
-          rules = [
-            {
-              alert = "CoreDNSDown"
-              expr  = <<-EOF
-              sum(up{app="${local.endpoints.kube_dns.name}",namespace="${local.endpoints.kube_dns.namespace}"}) < 2
-              or
-              absent(up{app="${local.endpoints.kube_dns.name}",namespace="${local.endpoints.kube_dns.namespace}"})
-              EOF
-              for   = "90s"
-              labels = {
-                severity = "critical"
-              }
-              annotations = {
-                summary     = "CoreDNS / kube-dns instance is down"
-                description = <<-EOF
-                CoreDNS pods are unreachable.
-                Nodes affected: {{ $labels.node }}
-                EOF
-              }
-            },
-            {
-              alert = "CoreDNSHighErrorRate"
-              expr  = <<-EOF
-              sum by (instance, node) (rate(coredns_dns_responses_total{app="${local.endpoints.kube_dns.name}",namespace="${local.endpoints.kube_dns.namespace}",rcode=~"SERVFAIL|REFUSED"}[5m]))
-              /
-              sum by (instance, node) (rate(coredns_dns_requests_total{app="${local.endpoints.kube_dns.name}",namespace="${local.endpoints.kube_dns.namespace}"}[5m])) > 0.15
-              EOF
-              for   = "5m"
-              labels = {
-                severity = "warning"
-              }
-              annotations = {
-                summary     = "High CoreDNS error rate"
-                description = <<-EOF
-                CoreDNS instance on {{ $labels.node }} has >5% error responses (SERVFAIL/REFUSED/etc.).
-                EOF
-              }
-            },
-            {
-              alert = "CoreDNSHighLatency"
-              expr  = <<-EOF
-              histogram_quantile(0.99,
-                sum by (le, instance, node) (rate(coredns_dns_request_duration_seconds_bucket{app="${local.endpoints.kube_dns.name}",namespace="${local.endpoints.kube_dns.namespace}"}[5m]))
-              ) > 0.2
-              EOF
-              for   = "5m"
-              labels = {
-                severity = "warning"
-              }
-              annotations = {
-                summary     = "High CoreDNS query latency"
-                description = <<-EOF
-                p99 DNS query latency on {{ $labels.node }} is {{ $value }} seconds.
-                This can cause application timeouts.
-                EOF
-              }
-            },
-            {
-              alert = "CoreDNSCacheHitRateLow"
-              expr  = <<-EOF
-              sum by (instance, node) (rate(coredns_proxy_conn_cache_hits_total{app="${local.endpoints.kube_dns.name}",namespace="${local.endpoints.kube_dns.namespace}"}[5m]))
-              /
-              (sum by (instance, node) (rate(coredns_proxy_conn_cache_hits_total{app="${local.endpoints.kube_dns.name}",namespace="${local.endpoints.kube_dns.namespace}"}[5m])) + sum by (instance) (rate(coredns_proxy_conn_cache_misses_total{app="${local.endpoints.kube_dns.name}",namespace="${local.endpoints.kube_dns.namespace}"}[5m])))
-              < 0.7
-              EOF
-              for   = "10m"
-              labels = {
-                severity = "warning"
-              }
-              annotations = {
-                summary     = "CoreDNS cache hit rate low"
-                description = <<-EOF
-                Cache hit rate on {{ $labels.node }} is {{ $value | humanizePercentage }}.
-                Consider increasing cache size or checking query patterns.
-                EOF
-              }
-            },
-            {
-              alert = "CoreDNSForwardHealthcheckFailed"
-              expr  = <<-EOF
-              rate(coredns_forward_healthcheck_broken_total{app="${local.endpoints.kube_dns.name}",namespace="${local.endpoints.kube_dns.namespace}"}[5m]) > 0
-              EOF
-              for   = "3m"
-              labels = {
-                severity = "warning"
-              }
-              annotations = {
-                summary     = "CoreDNS forward healthcheck failing"
-                description = <<-EOF
-                CoreDNS is unable to reach upstream forwarders on {{ $labels.node }}.
-                EOF
-              }
-            },
-            {
-              alert = "CoreDNSFlapping"
-              expr  = <<-EOF
-              changes(process_start_time_seconds{app="${local.endpoints.kube_dns.name}",namespace="${local.endpoints.kube_dns.namespace}"}[15m]) > 3
-              EOF
-              for   = "0m"
-              labels = {
-                severity = "warning"
-              }
-              annotations = {
-                summary     = "CoreDNS instance flapping"
-                description = <<-EOF
-                Instance {{ $labels.instance }} has restarted {{ $value }} times in 15 minutes.
-                Possible crash-loop or OOM.
-                EOF
-              }
-            },
-          ]
-        },
         {
           name = "minio"
           rules = [
@@ -599,7 +294,11 @@ module "prometheus" {
               }
             },
           ]
-        },
+        }
+      ]
+    }
+    kea = {
+      groups = [
         {
           name = "kea"
           rules = [
@@ -660,151 +359,9 @@ module "prometheus" {
             },
           ]
         },
-        {
-          name = "cri-o"
-          rules = [
-            {
-              alert = "CRIOHighErrorRate"
-              expr  = <<-EOF
-              sum by (instance, operation) (rate(container_runtime_crio_operations_errors_total{job="cri-o"}[5m]))
-              /
-              sum by (instance, operation) (rate(container_runtime_crio_operations_total{job="cri-o"}[5m])) > 0.05
-              EOF
-              for   = "5m"
-              labels = {
-                severity = "warning"
-              }
-              annotations = {
-                summary     = "High CRI-O operation error rate"
-                description = <<-EOF
-                CRI-O on {{ $labels.instance }} has >5% errors for operation {{ $labels.operation }}.
-                EOF
-              }
-            },
-            {
-              alert = "CRIOFlapping"
-              expr  = <<-EOF
-              changes(process_start_time_seconds{job="cri-o"}[15m]) > 3
-              EOF
-              for   = "0m"
-              labels = {
-                severity = "warning"
-              }
-              annotations = {
-                summary     = "CRI-O instance flapping"
-                description = <<-EOF
-                CRI-O on {{ $labels.instance }} has restarted {{ $value }} times in 15 minutes.
-                Possible crash-loop, OOM, or configuration issue.
-                EOF
-              }
-            },
-          ]
-        },
-        {
-          name = "kube-proxy"
-          rules = [
-            {
-              alert = "KubeProxyDown"
-              expr  = <<-EOF
-              sum(up{app="kube-proxy",namespace="kube-system"}) < sum(up{job="kubernetes-nodes"})
-              or
-              absent(up{app="kube-proxy",namespace="kube-system"})
-              EOF
-              for   = "90s"
-              labels = {
-                severity = "critical"
-              }
-              annotations = {
-                summary     = "kube-proxy is down on node"
-                description = <<-EOF
-                kube-proxy pods are unreachable.
-                Nodes affected: {{ $labels.node }}
-                EOF
-              }
-            },
-            {
-              alert = "KubeProxySyncRulesSlow"
-              expr  = <<-EOF
-              histogram_quantile(0.99,
-                sum by (le, instance, node) (rate(kubeproxy_sync_proxy_rules_duration_seconds_bucket{app="kube-proxy",namespace="kube-system"}[5m]))
-              ) > 2.0
-              EOF
-              for   = "5m"
-              labels = {
-                severity = "warning"
-              }
-              annotations = {
-                summary     = "Slow kube-proxy rule synchronization"
-                description = <<-EOF
-                p99 sync proxy rules duration on node {{ $labels.node }} is {{ $value }} seconds.
-                New services or endpoint changes may be delayed.
-                EOF
-              }
-            },
-            {
-              alert = "KubeProxyFlapping"
-              expr  = <<-EOF
-              changes(process_start_time_seconds{app="kube-proxy",namespace="kube-system"}[15m]) > 3
-              EOF
-              for   = "0m"
-              labels = {
-                severity = "warning"
-              }
-              annotations = {
-                summary     = "kube-proxy instance flapping"
-                description = <<-EOF
-                kube-proxy on {{ $labels.node }} has restarted {{ $value }} times in 15 minutes.
-                Possible crash-loop or configuration reload issues.
-                EOF
-              }
-            },
-          ]
-        },
-        {
-          name = "kube-vip"
-          rules = [
-            {
-              alert = "KubeVIPDown"
-              expr  = <<-EOF
-              sum(up{app="kube-vip",namespace="kube-system"}) < 2
-              or
-              absent(up{app="kube-vip",namespace="kube-system"})
-              EOF
-              for   = "90s"
-              labels = {
-                severity = "critical"
-              }
-              annotations = {
-                summary     = "kube-vip BGP is down on node"
-                description = <<-EOF
-                kube-vip BGP is down.
-                Nodes affected: {{ $labels.node }}
-                EOF
-              }
-            },
-            {
-              alert = "KubeVIPStateFlapping"
-              expr  = <<-EOF
-              changes(kube_vip_manager_bgp_session_info{app="kube-vip",namespace="kube-system"}[15m]) > 3
-              EOF
-              for   = "0m"
-              labels = {
-                severity = "warning"
-              }
-              annotations = {
-                summary     = "kube-vip BGP state flapping"
-                description = <<-EOF
-                kube-vip BGP state on {{ $labels.node }} has changed {{ $value }} times in 15 minutes.
-                Possible crash-loop or configuration reload issues.
-                EOF
-              }
-            },
-          ]
-        },
       ]
     }
   }
-  cluster_domain   = local.domains.kubernetes
   ingress_hostname = local.endpoints.prometheus.ingress
   gateway_ref = {
     name      = local.endpoints.traefik.name

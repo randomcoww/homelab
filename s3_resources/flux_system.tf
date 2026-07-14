@@ -815,11 +815,12 @@ locals {
               # manifest #
 
               configuration = {
-                prometheusUrl = "https://${local.endpoints.prometheus.ingress}"
-                period        = "2m"
-                metricsPort   = local.service_ports.metrics
-                forceReboot   = true
-                drainTimeout  = "6m"
+                prometheusUrl     = "https://${local.endpoints.prometheus.ingress}"
+                period            = "2m"
+                metricsPort       = local.service_ports.metrics
+                forceReboot       = true
+                drainTimeout      = "6m"
+                alertFilterRegexp = "^Watchdog$|^PrometheusNotConnectedToAlertmanagers$"
                 blockingPodSelector = [
                   "app.kubernetes.io/part-of=gha-runner-scale-set,app.kubernetes.io/component=runner",
                 ]

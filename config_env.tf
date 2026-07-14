@@ -185,7 +185,7 @@ locals {
     apiserver_backend  = 58081
     controller_manager = 50252
     scheduler          = 50251
-    kubelet            = 50250
+    kubelet            = 10250 # prometheus operator assumes this port and is not configurable
     kube_proxy         = 50254
     kube_proxy_metrics = 50255
     etcd_client        = 58082

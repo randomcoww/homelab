@@ -13,8 +13,6 @@ output "manifests" {
           url      = "https://prometheus-community.github.io/helm-charts"
         }
       },
-
-      # prometheus
       {
         apiVersion = "helm.toolkit.fluxcd.io/v2"
         kind       = "HelmRelease"
@@ -27,8 +25,8 @@ output "manifests" {
           timeout  = "5m"
           chart = {
             spec = {
-              chart   = "prometheus"
-              version = "29.17.0" # renovate: datasource=helm depName=prometheus registryUrl=https://prometheus-community.github.io/helm-charts
+              chart   = "kube-prometheus-stack"
+              version = "87.12.2" # renovate: datasource=helm depName=kube-prometheus-stack registryUrl=https://prometheus-community.github.io/helm-charts
               sourceRef = {
                 kind = "HelmRepository"
                 name = var.name
@@ -50,314 +48,28 @@ output "manifests" {
           test = {
             enable = false
           }
-          values = {
-            # manifest start
-
-            configmapReload = {
-              prometheus = {
-                enabled = true
+          values = merge({
+            namespaceOverride = var.namespace
+            defaultRules = {
+              create = true
+              rules = {
+                alertmanager = false
+                windows      = false
               }
             }
-            server = {
-              global = {
-                scrape_interval     = "20s"
-                scrape_timeout      = "10s"
-                evaluation_interval = "20s"
-                external_labels = {
-                  replica = "$${POD_NAME}"
-                }
-              }
-              strategy = {
-                type = "RollingUpdate"
-              }
-              persistentVolume = {
-                enabled   = true
-                mountPath = local.tsdb_path
-              }
-              podAnnotations = {
-                "checksum/store-tls"         = sha256(module.store-tls.manifest)
-                "checksum/minio-user-secret" = sha256(module.minio-user-secret.manifest)
-              }
-              sidecarContainers = {
-                thanos-querier = {
-                  image = var.images.thanos
-                  args = [
-                    "query",
-                    "--query.replica-label=replica",
-                    "--http-address=0.0.0.0:${local.ports.thanos_querier}",
-                    "--grpc-address=127.0.0.1:50903", # unused
-                    "--grpc-client-tls-secure",
-                    "--grpc-client-tls-cert=${local.store_tls_path}/tls.crt",
-                    "--grpc-client-tls-key=${local.store_tls_path}/tls.key",
-                    "--grpc-client-tls-ca=${local.store_tls_path}/ca.crt",
-                    <<-EOF
-                    --endpoint.sd-config=${yamlencode(local.thanos_querier_sd_config)}
-                    EOF
-                  ]
-                  env = [
-                    {
-                      name = "POD_NAME"
-                      valueFrom = {
-                        fieldRef = {
-                          fieldPath = "metadata.name"
-                        }
-                      }
-                    },
-                  ]
-                  ports = [
-                    {
-                      containerPort = local.ports.thanos_querier
-                    },
-                  ]
-                  volumeMounts = [
-                    {
-                      name        = "thanos-store-tls"
-                      mountPath   = "${local.store_tls_path}/tls.crt"
-                      subPathExpr = "$(POD_NAME)-tls.crt"
-                    },
-                    {
-                      name        = "thanos-store-tls"
-                      mountPath   = "${local.store_tls_path}/tls.key"
-                      subPathExpr = "$(POD_NAME)-tls.key"
-                    },
-                    {
-                      name      = "thanos-store-tls"
-                      mountPath = "${local.store_tls_path}/ca.crt"
-                      subPath   = "ca.crt"
-                    },
-                  ]
-                  livenessProbe = {
-                    httpGet = {
-                      scheme = "HTTP"
-                      port   = local.ports.thanos_querier
-                      path   = "/-/healthy"
-                    }
-                    initialDelaySeconds = 10
-                    timeoutSeconds      = 2
-                  }
-                  readinessProbe = {
-                    httpGet = {
-                      scheme = "HTTP"
-                      port   = local.ports.thanos_querier
-                      path   = "/-/ready"
-                    }
-                  }
-                }
-                thanos-sidecar = {
-                  image = var.images.thanos
-                  args = [
-                    "sidecar",
-                    "--prometheus.url=http://127.0.0.1:${local.ports.prometheus}",
-                    "--tsdb.path=${local.tsdb_path}",
-                    "--http-address=0.0.0.0:${local.ports.thanos_sidecar_probe}",
-                    "--grpc-address=0.0.0.0:${local.ports.thanos_sidecar}",
-                    "--grpc-server-tls-cert=${local.store_tls_path}/tls.crt",
-                    "--grpc-server-tls-key=${local.store_tls_path}/tls.key",
-                    "--grpc-server-tls-client-ca=${local.store_tls_path}/ca.crt",
-                    <<-EOF
-                    --objstore.config=${yamlencode(local.thanos_object_config)}
-                    EOF
-                  ]
-                  env = [
-                    {
-                      name = "POD_NAME"
-                      valueFrom = {
-                        fieldRef = {
-                          fieldPath = "metadata.name"
-                        }
-                      }
-                    },
-                    {
-                      name = "AWS_ACCESS_KEY_ID"
-                      valueFrom = {
-                        secretKeyRef = {
-                          name = module.minio-user-secret.name
-                          key  = "AWS_ACCESS_KEY_ID"
-                        }
-                      }
-                    },
-                    {
-                      name = "AWS_SECRET_ACCESS_KEY"
-                      valueFrom = {
-                        secretKeyRef = {
-                          name = module.minio-user-secret.name
-                          key  = "AWS_SECRET_ACCESS_KEY"
-                        }
-                      }
-                    },
-                  ]
-                  ports = [
-                    {
-                      containerPort = local.ports.thanos_sidecar
-                    },
-                  ]
-                  volumeMounts = [
-                    {
-                      name      = "storage-volume"
-                      mountPath = local.tsdb_path
-                    },
-                    {
-                      name        = "thanos-store-tls"
-                      mountPath   = "${local.store_tls_path}/tls.crt"
-                      subPathExpr = "$(POD_NAME)-tls.crt"
-                    },
-                    {
-                      name        = "thanos-store-tls"
-                      mountPath   = "${local.store_tls_path}/tls.key"
-                      subPathExpr = "$(POD_NAME)-tls.key"
-                    },
-                    {
-                      name      = "thanos-store-tls"
-                      mountPath = "${local.store_tls_path}/ca.crt"
-                      subPath   = "ca.crt"
-                    },
-                    {
-                      name      = "ca-trust-bundle"
-                      mountPath = "/etc/ssl/certs/ca-certificates.crt"
-                      readOnly  = true
-                    },
-                  ]
-                  livenessProbe = {
-                    httpGet = {
-                      scheme = "HTTP"
-                      port   = local.ports.thanos_sidecar_probe
-                      path   = "/-/healthy"
-                    }
-                    initialDelaySeconds = 10
-                    timeoutSeconds      = 2
-                  }
-                  readinessProbe = {
-                    httpGet = {
-                      scheme = "HTTP"
-                      port   = local.ports.thanos_sidecar_probe
-                      path   = "/-/ready"
-                    }
-                  }
-                }
-                thanos-store = {
-                  image = var.images.thanos
-                  args = [
-                    "store",
-                    "--data-dir=${local.store_data_path}",
-                    "--http-address=0.0.0.0:${local.ports.thanos_store_probe}",
-                    "--grpc-address=0.0.0.0:${local.ports.thanos_store}",
-                    "--grpc-server-tls-cert=${local.store_tls_path}/tls.crt",
-                    "--grpc-server-tls-key=${local.store_tls_path}/tls.key",
-                    "--grpc-server-tls-client-ca=${local.store_tls_path}/ca.crt",
-                    <<-EOF
-                    --objstore.config=${yamlencode(local.thanos_object_config)}
-                    EOF
-                  ]
-                  env = [
-                    {
-                      name = "POD_NAME"
-                      valueFrom = {
-                        fieldRef = {
-                          fieldPath = "metadata.name"
-                        }
-                      }
-                    },
-                    {
-                      name = "AWS_ACCESS_KEY_ID"
-                      valueFrom = {
-                        secretKeyRef = {
-                          name = module.minio-user-secret.name
-                          key  = "AWS_ACCESS_KEY_ID"
-                        }
-                      }
-                    },
-                    {
-                      name = "AWS_SECRET_ACCESS_KEY"
-                      valueFrom = {
-                        secretKeyRef = {
-                          name = module.minio-user-secret.name
-                          key  = "AWS_SECRET_ACCESS_KEY"
-                        }
-                      }
-                    },
-                  ]
-                  ports = [
-                    {
-                      containerPort = local.ports.thanos_store
-                    },
-                  ]
-                  volumeMounts = [
-                    {
-                      name      = "thanos-store-data"
-                      mountPath = local.store_data_path
-                    },
-                    {
-                      name        = "thanos-store-tls"
-                      mountPath   = "${local.store_tls_path}/tls.crt"
-                      subPathExpr = "$(POD_NAME)-tls.crt"
-                    },
-                    {
-                      name        = "thanos-store-tls"
-                      mountPath   = "${local.store_tls_path}/tls.key"
-                      subPathExpr = "$(POD_NAME)-tls.key"
-                    },
-                    {
-                      name      = "thanos-store-tls"
-                      mountPath = "${local.store_tls_path}/ca.crt"
-                      subPath   = "ca.crt"
-                    },
-                    {
-                      name      = "ca-trust-bundle"
-                      mountPath = "/etc/ssl/certs/ca-certificates.crt"
-                      readOnly  = true
-                    },
-                  ]
-                  livenessProbe = {
-                    httpGet = {
-                      scheme = "HTTP"
-                      port   = local.ports.thanos_store_probe
-                      path   = "/-/healthy"
-                    }
-                    initialDelaySeconds = 10
-                    timeoutSeconds      = 2
-                  }
-                  readinessProbe = {
-                    httpGet = {
-                      scheme = "HTTP"
-                      port   = local.ports.thanos_store_probe
-                      path   = "/-/ready"
-                    }
-                  }
-                }
-              }
-              replicaCount = var.replicas
-              statefulSet = {
+            alertmanager = {
+              enabled = false
+            }
+            grafana = {
+              enabled = false
+            }
+            additionalPrometheusRulesMap = merge({
+            }, var.extra_rules_map)
+            prometheus = {
+              enabled = true
+              thanosService = {
                 enabled = true
-                headless = {
-                  gRPC = {
-                    enabled = true
-                  }
-                }
-              }
-              storagePath = local.tsdb_path
-              extraFlags = [
-                "web.enable-lifecycle",
-              ]
-              extraArgs = {
-                enable-feature                    = "expand-external-labels"
-                "storage.tsdb.min-block-duration" = "2h"
-                "storage.tsdb.max-block-duration" = "2h"
-              }
-              env = [
-                {
-                  name = "POD_NAME"
-                  valueFrom = {
-                    fieldRef = {
-                      fieldPath = "metadata.name"
-                    }
-                  }
-                },
-              ]
-              retention = "6h"
-              resources = {
-                requests = {
-                  memory = "6Gi"
-                }
+                port    = local.ports.thanos_sidecar
               }
               service = {
                 enabled = true
@@ -369,9 +81,10 @@ output "manifests" {
                   },
                 ]
               }
-              ingress = {
-                enabled = false
+              kubeletService = {
+                enabled = true
               }
+              kubeletEndpointsEnabled = false
               route = {
                 main = {
                   enabled = true
@@ -404,7 +117,7 @@ output "manifests" {
                       ]
                       backendRefs = [
                         {
-                          name = "${var.name}-server"
+                          name = "${var.name}-kube-prometheus-prometheus"
                           port = local.ports.thanos_querier
                         },
                       ]
@@ -412,172 +125,309 @@ output "manifests" {
                   ]
                 }
               }
-              extraVolumeMounts = [
-                {
-                  name      = "ca-trust-bundle"
-                  mountPath = "/etc/ssl/certs/ca-certificates.crt"
-                  readOnly  = true
-                },
-              ]
-              extraVolumes = [
-                {
-                  name = "ca-trust-bundle"
-                  hostPath = {
-                    path = "/etc/ssl/certs/ca-certificates.crt"
-                    type = "File"
+              prometheusSpec = {
+                disableCompaction = true
+                thanos = {
+                  objectStorageConfig = {
+                    secret = {
+                      type = "S3"
+                      config = {
+                        bucket     = var.minio_bucket
+                        endpoint   = var.minio_endpoint
+                        access_key = var.minio_user.id
+                        secret_key = var.minio_user.secret
+                      }
+                    }
                   }
-                },
-                {
-                  name = "thanos-store-data"
-                  emptyDir = {
-                    medium = "Memory"
-                  }
-                },
-                {
-                  name = "thanos-store-tls"
-                  secret = {
-                    secretName = module.store-tls.name
-                  }
-                },
-              ]
-              dnsConfig = {
-                options = [
+                  volumeMounts = [
+                    {
+                      name      = "ca-trust-bundle"
+                      mountPath = "/etc/ssl/certs/ca-certificates.crt"
+                      readOnly  = true
+                    },
+                  ]
+                }
+                service = {
+                  enabled    = true
+                  port       = local.ports.prometheus
+                  targetPort = local.ports.prometheus
+                }
+                containers = [
                   {
-                    name  = "ndots"
-                    value = "2"
+                    name  = "thanos-querier"
+                    image = var.images.thanos
+                    args = [
+                      "query",
+                      "--query.replica-label=replica",
+                      "--http-address=0.0.0.0:${local.ports.thanos_querier}",
+                      "--grpc-address=127.0.0.1:50903", # unused
+                      "--endpoint=dnssrv+_grpc._tcp.${var.name}-kube-prometheus-thanos-discovery.${var.namespace}:${local.ports.thanos_sidecar}",
+                      "--endpoint=dnssrv+_grpc._tcp.${var.name}-kube-prometheus-thanos-discovery.${var.namespace}:${local.ports.thanos_store}",
+                    ]
+                    env = [
+                      {
+                        name = "POD_NAME"
+                        valueFrom = {
+                          fieldRef = {
+                            fieldPath = "metadata.name"
+                          }
+                        }
+                      },
+                    ]
+                    ports = [
+                      {
+                        containerPort = local.ports.thanos_querier
+                      },
+                    ]
+                    volumeMounts = [
+                    ]
+                    livenessProbe = {
+                      httpGet = {
+                        scheme = "HTTP"
+                        port   = local.ports.thanos_querier
+                        path   = "/-/healthy"
+                      }
+                      initialDelaySeconds = 10
+                      timeoutSeconds      = 2
+                    }
+                    readinessProbe = {
+                      httpGet = {
+                        scheme = "HTTP"
+                        port   = local.ports.thanos_querier
+                        path   = "/-/ready"
+                      }
+                    }
+                  },
+                  {
+                    name  = "thanos-store"
+                    image = var.images.thanos
+                    args = [
+                      "store",
+                      "--data-dir=${local.store_data_path}",
+                      "--http-address=0.0.0.0:${local.ports.thanos_store_probe}",
+                      "--grpc-address=0.0.0.0:${local.ports.thanos_store}",
+                      <<-EOF
+                      --objstore.config=${yamlencode(local.thanos_object_config)}
+                      EOF
+                    ]
+                    env = [
+                      {
+                        name = "POD_NAME"
+                        valueFrom = {
+                          fieldRef = {
+                            fieldPath = "metadata.name"
+                          }
+                        }
+                      },
+                      {
+                        name = "AWS_ACCESS_KEY_ID"
+                        valueFrom = {
+                          secretKeyRef = {
+                            name = module.minio-user-secret.name
+                            key  = "AWS_ACCESS_KEY_ID"
+                          }
+                        }
+                      },
+                      {
+                        name = "AWS_SECRET_ACCESS_KEY"
+                        valueFrom = {
+                          secretKeyRef = {
+                            name = module.minio-user-secret.name
+                            key  = "AWS_SECRET_ACCESS_KEY"
+                          }
+                        }
+                      },
+                    ]
+                    ports = [
+                      {
+                        containerPort = local.ports.thanos_store
+                      },
+                    ]
+                    volumeMounts = [
+                      {
+                        name      = "thanos-store-data"
+                        mountPath = local.store_data_path
+                      },
+                      {
+                        name      = "ca-trust-bundle"
+                        mountPath = "/etc/ssl/certs/ca-certificates.crt"
+                        readOnly  = true
+                      },
+                    ]
+                    livenessProbe = {
+                      httpGet = {
+                        scheme = "HTTP"
+                        port   = local.ports.thanos_store_probe
+                        path   = "/-/healthy"
+                      }
+                      initialDelaySeconds = 10
+                      timeoutSeconds      = 2
+                    }
+                    readinessProbe = {
+                      httpGet = {
+                        scheme = "HTTP"
+                        port   = local.ports.thanos_store_probe
+                        path   = "/-/ready"
+                      }
+                    }
                   },
                 ]
-              }
-              podLabels = {
-                app = var.name
-              }
-              affinity = {
-                nodeAffinity = {
-                  preferredDuringSchedulingIgnoredDuringExecution = [
-                    {
-                      weight = 100
-                      preference = {
-                        matchExpressions = [
-                          {
-                            key      = "beta.amd.com/gpu.cu-count"
-                            operator = "Lt"
-                            values = [
-                              "16",
-                            ]
-                          },
-                        ]
+                storageSpec = {
+                  volumeClaimTemplate = {
+                    spec = {
+                      storageClassName = "local-path"
+                      accessModes = [
+                        "ReadWriteOnce",
+                      ]
+                      resources = {
+                        requests = {
+                          storage = "16Gi"
+                        }
                       }
+                    }
+                  }
+                }
+                volumeMounts = [
+                  {
+                    name      = "ca-trust-bundle"
+                    mountPath = "/etc/ssl/certs/ca-certificates.crt"
+                    readOnly  = true
+                  },
+                ]
+                volumes = [
+                  {
+                    name = "thanos-store-data"
+                    emptyDir = {
+                      medium = "Memory"
+                    }
+                  },
+                  {
+                    name = "ca-trust-bundle"
+                    hostPath = {
+                      path = "/etc/ssl/certs/ca-certificates.crt"
+                      type = "File"
+                    }
+                  },
+                ]
+                retention = "6h"
+                resources = {
+                  requests = {
+                    memory = "6Gi"
+                  }
+                }
+                replicas = var.replicas
+                dnsConfig = {
+                  options = [
+                    {
+                      name  = "ndots"
+                      value = "2"
                     },
                   ]
                 }
-                podAntiAffinity = {
-                  requiredDuringSchedulingIgnoredDuringExecution = [
-                    {
-                      labelSelector = {
-                        matchExpressions = [
-                          {
-                            key      = "app"
-                            operator = "In"
-                            values = [
-                              var.name,
-                            ]
-                          },
-                        ]
-                      }
-                      topologyKey = "kubernetes.io/hostname"
-                    },
-                  ]
+                podLabels = {
+                  app = var.name
                 }
+                additionalScrapeConfigs = concat(yamldecode(<<-EOF
+                  - job_name: kubernetes-service-endpoints
+                    honor_labels: true
+                    kubernetes_sd_configs:
+                      - role: endpointslice
+                    relabel_configs:
+                      - source_labels: [__meta_kubernetes_service_annotation_prometheus_io_scrape]
+                        action: keep
+                        regex: true
+                      - source_labels: [__meta_kubernetes_service_annotation_prometheus_io_scrape_slow]
+                        action: drop
+                        regex: true
+                      - source_labels: [__meta_kubernetes_service_annotation_prometheus_io_scheme]
+                        action: replace
+                        target_label: __scheme__
+                        regex: (https?)
+                      - source_labels: [__meta_kubernetes_service_annotation_prometheus_io_path]
+                        action: replace
+                        target_label: __metrics_path__
+                        regex: (.+)
+                      - source_labels:
+                        - __address__
+                        - __meta_kubernetes_service_annotation_prometheus_io_port
+                        action: replace
+                        target_label: __address__
+                        regex: (.+?)(?::\d+)?;(\d+)
+                        replacement: $1:$2
+                      - action: labelmap
+                        regex: __meta_kubernetes_service_annotation_prometheus_io_param_(.+)
+                        replacement: __param_$1
+                      - action: labelmap
+                        regex: __meta_kubernetes_service_label_(.+)
+                      - source_labels: [__meta_kubernetes_namespace]
+                        action: replace
+                        target_label: namespace
+                      - source_labels: [__meta_kubernetes_service_name]
+                        action: replace
+                        target_label: service
+                      - source_labels: [__meta_kubernetes_pod_node_name]
+                        action: replace
+                        target_label: node
+
+                  - job_name: kubernetes-pods
+                    honor_labels: true
+                    kubernetes_sd_configs:
+                      - role: pod
+                    relabel_configs:
+                      - source_labels: [__meta_kubernetes_pod_annotation_prometheus_io_scrape]
+                        action: keep
+                        regex: true
+                      - source_labels: [__meta_kubernetes_pod_annotation_prometheus_io_scrape_slow]
+                        action: drop
+                        regex: true
+                      - source_labels: [__meta_kubernetes_pod_annotation_prometheus_io_scheme]
+                        action: replace
+                        regex: (https?)
+                        target_label: __scheme__
+                      - source_labels: [__meta_kubernetes_pod_annotation_prometheus_io_path]
+                        action: replace
+                        target_label: __metrics_path__
+                        regex: (.+)
+                      - source_labels:
+                        - __meta_kubernetes_pod_annotation_prometheus_io_port
+                        - __meta_kubernetes_pod_ip
+                        action: replace
+                        regex: (\d+);(([A-Fa-f0-9]{1,4}::?){1,7}[A-Fa-f0-9]{1,4})
+                        replacement: '[$2]:$1'
+                        target_label: __address__
+                      - source_labels:
+                        - __meta_kubernetes_pod_annotation_prometheus_io_port
+                        - __meta_kubernetes_pod_ip
+                        action: replace
+                        regex: (\d+);((([0-9]+?)(\.|$)){4})
+                        replacement: $2:$1
+                        target_label: __address__
+                      - action: labelmap
+                        regex: __meta_kubernetes_pod_annotation_prometheus_io_param_(.+)
+                        replacement: __param_$1
+                      - action: labelmap
+                        regex: __meta_kubernetes_pod_label_(.+)
+                      - source_labels: [__meta_kubernetes_namespace]
+                        action: replace
+                        target_label: namespace
+                      - source_labels: [__meta_kubernetes_pod_name]
+                        action: replace
+                        target_label: pod
+                      - source_labels: [__meta_kubernetes_pod_phase]
+                        regex: Pending|Succeeded|Failed|Completed
+                        action: drop
+                      - source_labels: [__meta_kubernetes_pod_node_name]
+                        action: replace
+                        target_label: node
+                  EOF
+                ), var.extra_scrape_configs)
               }
             }
-            extraManifests = [
-              module.store-tls.manifest,
+            extraManifests = concat([
               module.minio-user-secret.manifest,
               yamlencode(local.compactor_job),
-            ]
-            extraScrapeConfigs = var.scrape_configs
-            serverFiles        = var.server_files
-            alertmanager = {
-              enabled = false
-            }
-            kube-state-metrics = {
-              enabled = false
-            }
-            prometheus-node-exporter = {
-              enabled = true
-              resources = {
-                requests = {
-                  memory = "64Mi"
-                }
-              }
-            }
-            prometheus-pushgateway = {
-              enabled = false
-            }
-          }
-        }
-      },
-
-      # systemd exporter
-      {
-        apiVersion = "helm.toolkit.fluxcd.io/v2"
-        kind       = "HelmRelease"
-        metadata = {
-          name      = "${var.name}-systemd-exporter"
-          namespace = var.namespace
-        }
-        spec = {
-          interval = "15m"
-          timeout  = "5m"
-          chart = {
-            spec = {
-              chart   = "prometheus-systemd-exporter"
-              version = "0.5.2" # renovate: datasource=helm depName=prometheus-systemd-exporter registryUrl=https://prometheus-community.github.io/helm-charts
-              sourceRef = {
-                kind = "HelmRepository"
-                name = var.name
-              }
-              interval = "5m"
-            }
-          }
-          releaseName = "${var.name}-systemd-exporter"
-          install = {
-            remediation = {
-              retries = -1
-            }
-          }
-          upgrade = {
-            remediation = {
-              retries = -1
-            }
-          }
-          test = {
-            enable = false
-          }
-          values = {
-            config = {
-              systemd = {
-                collector = {
-                  unitInclude = [
-                    "kubelet.service",
-                    "crio.service",
-                    "keepalived.service",
-                    "haproxy.service",
-                    "bird.service",
-                    "conntrackd.service",
-                    "systemd-networkd.service",
-                    "systemd-resolved.service",
-                    "chronyd.service",
-                  ]
-                }
-              }
-            }
-            resources = {
-              requests = {
-                memory = "64Mi"
-              }
-            }
-          }
+            ], var.extra_manifests)
+          }, var.extra_values)
         }
       },
     ] :

@@ -18,18 +18,24 @@ variable "images" {
   })
 }
 
-variable "scrape_configs" {
+variable "extra_scrape_configs" {
   type    = any
   default = []
 }
 
-variable "server_files" {
+variable "extra_rules_map" {
   type    = any
   default = {}
 }
 
-variable "cluster_domain" {
-  type = string
+variable "extra_values" {
+  type    = any
+  default = {}
+}
+
+variable "extra_manifests" {
+  type    = any
+  default = []
 }
 
 variable "ingress_hostname" {

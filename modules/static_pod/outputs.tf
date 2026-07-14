@@ -7,7 +7,7 @@ output "manifest" {
       namespace   = var.namespace
       annotations = var.annotations
       labels = {
-        app = var.name
+        k8s-app = var.name
       }
     }
     spec = merge({

@@ -1,37 +1,12 @@
 locals {
-  tsdb_path           = "/prometheus/data"
   store_data_path     = "/thanos/store/data"
-  store_tls_path      = "/thanos/store/tls"
   compactor_data_path = "/thanos/compactor/data"
   ports = {
-    thanos_querier       = 10902
-    thanos_sidecar       = 10901
-    thanos_sidecar_probe = 10904
-    thanos_store         = 10903
-    thanos_store_probe   = 10905
-    prometheus           = 9090 # non configurable - hardcoded in helm chart
-  }
-
-  members = [
-    for i, _ in range(var.replicas) :
-    {
-      name     = "${var.name}-server-${i}"
-      hostname = "${var.name}-server-${i}.${var.name}-server-headless.${var.namespace}.svc.${var.cluster_domain}"
-    }
-  ]
-
-  thanos_querier_sd_config = {
-    endpoints = concat([
-      for _, m in local.members :
-      {
-        address = "${m.hostname}:${local.ports.thanos_sidecar}"
-      }
-      ], [
-      for _, m in local.members :
-      {
-        address = "${m.hostname}:${local.ports.thanos_store}"
-      }
-    ])
+    thanos_querier     = 10906
+    thanos_sidecar     = 10901
+    thanos_store       = 10903
+    thanos_store_probe = 10905
+    prometheus         = 9090
   }
 
   thanos_object_config = {
