@@ -41,9 +41,7 @@ locals {
         affinity = var.affinity
       }
       annotations = {
-        "checksum/secret"           = sha256(module.secret.manifest)
-        "checksum/ldap-client-tls"  = sha256(module.ldap-client-tls.manifest)
-        "checksum/redis-client-tls" = sha256(module.redis-client-tls.manifest)
+        "checksum/secret" = sha256(module.secret.manifest)
       }
       extraVolumeMounts = [
         {
@@ -58,25 +56,25 @@ locals {
 
         # custom
         {
-          name      = module.ldap-client-tls.name
+          name      = "${var.name}-ldap-client-tls"
           mountPath = local.envs.AUTHELIA_AUTHENTICATION_BACKEND_LDAP_TLS_CERTIFICATE_CHAIN_FILE
           subPath   = "tls.crt"
           readOnly  = true
         },
         {
-          name      = module.ldap-client-tls.name
+          name      = "${var.name}-ldap-client-tls"
           mountPath = local.envs.AUTHELIA_AUTHENTICATION_BACKEND_LDAP_TLS_PRIVATE_KEY_FILE
           subPath   = "tls.key"
           readOnly  = true
         },
         {
-          name      = module.redis-client-tls.name
+          name      = "${var.name}-redis-client-tls"
           mountPath = local.envs.AUTHELIA_SESSION_REDIS_TLS_CERTIFICATE_CHAIN_FILE
           subPath   = "tls.crt"
           readOnly  = true
         },
         {
-          name      = module.redis-client-tls.name
+          name      = "${var.name}-redis-client-tls"
           mountPath = local.envs.AUTHELIA_SESSION_REDIS_TLS_PRIVATE_KEY_FILE
           subPath   = "tls.key"
           readOnly  = true
@@ -115,15 +113,15 @@ locals {
           }
         },
         {
-          name = module.ldap-client-tls.name
+          name = "${var.name}-ldap-client-tls"
           secret = {
-            secretName = module.ldap-client-tls.name
+            secretName = "${var.name}-ldap-client-tls"
           }
         },
         {
-          name = module.redis-client-tls.name
+          name = "${var.name}-redis-client-tls"
           secret = {
-            secretName = module.redis-client-tls.name
+            secretName = "${var.name}-redis-client-tls"
           }
         },
         {
@@ -397,14 +395,7 @@ locals {
     }
     certificates = {
       values = [
-        {
-          name  = "ldap-ca.pem"
-          value = var.ldap_ca.cert_pem
-        },
-        {
-          name  = "redis-ca.pem"
-          value = var.redis_ca.cert_pem
-        },
+        # using internal CA from ca-trust-bundle mount
       ]
     }
     secret = {

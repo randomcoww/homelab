@@ -65,31 +65,6 @@ resource "random_password" "authelia-oidc-client-secret" {
   special = false
 }
 
-resource "tls_private_key" "lldap-ca" {
-  algorithm = "RSA"
-  rsa_bits  = 4096
-}
-
-resource "tls_self_signed_cert" "lldap-ca" {
-  private_key_pem = tls_private_key.lldap-ca.private_key_pem
-
-  validity_period_hours = 8760
-  early_renewal_hours   = 2160
-  is_ca_certificate     = true
-
-  subject {
-    common_name = local.endpoints.lldap.name
-  }
-
-  allowed_uses = [
-    "key_encipherment",
-    "digital_signature",
-    "cert_signing",
-    "server_auth",
-    "client_auth",
-  ]
-}
-
 resource "random_password" "lldap-user" {
   length  = 30
   special = false
@@ -98,31 +73,6 @@ resource "random_password" "lldap-user" {
 resource "random_password" "lldap-password" {
   length  = 30
   special = false
-}
-
-resource "tls_private_key" "authelia-valkey-ca" {
-  algorithm = "RSA"
-  rsa_bits  = 4096
-}
-
-resource "tls_self_signed_cert" "authelia-valkey-ca" {
-  private_key_pem = tls_private_key.authelia-valkey-ca.private_key_pem
-
-  validity_period_hours = 8760
-  early_renewal_hours   = 2160
-  is_ca_certificate     = true
-
-  subject {
-    common_name = local.endpoints.authelia_valkey.name
-  }
-
-  allowed_uses = [
-    "key_encipherment",
-    "digital_signature",
-    "cert_signing",
-    "server_auth",
-    "client_auth",
-  ]
 }
 
 module "lldap" {
@@ -145,11 +95,7 @@ module "lldap" {
     LLDAP_SMTP_OPTIONS__PASSWORD              = var.smtp_password
     LLDAP_LDAPS_OPTIONS__ENABLED              = true
   }
-  ca = {
-    algorithm       = tls_private_key.lldap-ca.algorithm
-    private_key_pem = tls_private_key.lldap-ca.private_key_pem
-    cert_pem        = tls_self_signed_cert.lldap-ca.cert_pem
-  }
+  ca_issuer_name   = local.kubernetes.cert_issuers.ca_internal
   service_hostname = local.endpoints.lldap.service_fqdn
   ingress_hostname = local.endpoints.lldap.ingress
   gateway_ref = {
@@ -167,11 +113,7 @@ module "authelia-valkey" {
   }
   service_port     = local.service_ports.redis_sentinel
   service_hostname = local.endpoints.authelia_valkey.service_fqdn
-  ca = {
-    algorithm       = tls_private_key.authelia-valkey-ca.algorithm
-    private_key_pem = tls_private_key.authelia-valkey-ca.private_key_pem
-    cert_pem        = tls_self_signed_cert.authelia-valkey-ca.cert_pem
-  }
+  ca_issuer_name   = local.kubernetes.cert_issuers.ca_internal
 }
 
 module "authelia" {
@@ -185,18 +127,9 @@ module "authelia" {
       tag        = regex(local.container_image_regex, local.container_images.authelia).tag
     }
   }
-  metrics_port = local.service_ports.metrics
-  ldap_ca = {
-    algorithm       = tls_private_key.lldap-ca.algorithm
-    private_key_pem = tls_private_key.lldap-ca.private_key_pem
-    cert_pem        = tls_self_signed_cert.lldap-ca.cert_pem
-  }
-  redis_ca = {
-    algorithm       = tls_private_key.authelia-valkey-ca.algorithm
-    private_key_pem = tls_private_key.authelia-valkey-ca.private_key_pem
-    cert_pem        = tls_self_signed_cert.authelia-valkey-ca.cert_pem
-  }
-  ldap_endpoint = "${local.endpoints.lldap.service_fqdn}:${local.service_ports.ldaps}"
+  metrics_port   = local.service_ports.metrics
+  ca_issuer_name = local.kubernetes.cert_issuers.ca_internal
+  ldap_endpoint  = "${local.endpoints.lldap.service_fqdn}:${local.service_ports.ldaps}"
   redis_sentinel_endpoint = {
     host        = local.endpoints.authelia_valkey.service_fqdn
     port        = local.service_ports.redis_sentinel

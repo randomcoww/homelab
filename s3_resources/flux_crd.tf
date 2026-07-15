@@ -622,6 +622,49 @@ locals {
             }
           }
         },
+        {
+          apiVersion = "helm.toolkit.fluxcd.io/v2"
+          kind       = "HelmRelease"
+          metadata = {
+            name      = "${local.endpoints.cert_manager.name}-csi-driver"
+            namespace = local.endpoints.cert_manager.namespace
+          }
+          spec = {
+            interval = "15m"
+            timeout  = "5m"
+            chart = {
+              spec = {
+                chart   = "cert-manager-csi-driver"
+                version = "v0.15.0" # renovate: datasource=helm depName=cert-manager-csi-driver registryUrl=https://charts.jetstack.io
+                sourceRef = {
+                  kind = "HelmRepository"
+                  name = local.endpoints.cert_manager.name
+                }
+                interval = "5m"
+              }
+            }
+            releaseName = "${local.endpoints.cert_manager.name}-csi-driver"
+            install = {
+              remediation = {
+                retries = -1
+              }
+            }
+            upgrade = {
+              remediation = {
+                retries = -1
+              }
+            }
+            test = {
+              enable = false
+            }
+            values = {
+              metrics = {
+                enabled = true
+                port    = local.service_ports.metrics
+              }
+            }
+          }
+        },
       ] :
       yamlencode(m)
     ]

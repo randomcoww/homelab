@@ -116,7 +116,6 @@ module "deployment" {
   replicas  = var.replicas
   annotations = {
     "checksum/secret" = sha256(module.secret.manifest)
-    "checksum/tls"    = sha256(module.tls.manifest)
   }
   template_spec = {
     resources = {
@@ -217,7 +216,7 @@ module "deployment" {
       {
         name = "lldap-cert"
         secret = {
-          secretName = module.tls.name
+          secretName = "${var.name}-tls"
         }
       },
     ]

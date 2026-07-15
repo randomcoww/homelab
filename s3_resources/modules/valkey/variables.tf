@@ -31,12 +31,8 @@ variable "service_port" {
   type = number
 }
 
-variable "ca" {
-  type = object({
-    algorithm       = string
-    private_key_pem = string
-    cert_pem        = string
-  })
+variable "ca_issuer_name" {
+  type = string
 }
 
 variable "service_hostname" {

@@ -1,8 +1,6 @@
 output "manifests" {
   value = concat([
     module.secret.manifest,
-    module.ldap-client-tls.manifest,
-    module.redis-client-tls.manifest,
     ], [
     for _, m in [
       # database
@@ -81,6 +79,61 @@ output "manifests" {
             enable = false
           }
           values = local.values
+        }
+      },
+
+      # ldap client cert
+      {
+        apiVersion = "cert-manager.io/v1"
+        kind       = "Certificate"
+        metadata = {
+          name      = "${var.name}-ldap-client-tls"
+          namespace = var.namespace
+        }
+        spec = {
+          secretName = "${var.name}-ldap-client-tls"
+          isCA       = false
+          privateKey = {
+            algorithm = "RSA"
+            size      = 4096
+          }
+          commonName = var.name
+          usages = [
+            "key encipherment",
+            "digital signature",
+            "client auth",
+          ]
+          issuerRef = {
+            name = var.ca_issuer_name
+            kind = "ClusterIssuer"
+          }
+        }
+      },
+      # redis client cert
+      {
+        apiVersion = "cert-manager.io/v1"
+        kind       = "Certificate"
+        metadata = {
+          name      = "${var.name}-redis-client-tls"
+          namespace = var.namespace
+        }
+        spec = {
+          secretName = "${var.name}-redis-client-tls"
+          isCA       = false
+          privateKey = {
+            algorithm = "ECDSA"
+            size      = 521
+          }
+          commonName = var.name
+          usages = [
+            "key encipherment",
+            "digital signature",
+            "client auth",
+          ]
+          issuerRef = {
+            name = var.ca_issuer_name
+            kind = "ClusterIssuer"
+          }
         }
       },
     ] :

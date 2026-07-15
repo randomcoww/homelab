@@ -138,7 +138,6 @@ module "statefulset" {
   replicas  = var.replicas
   annotations = {
     "checksum/configmap" = sha256(module.configmap.manifest)
-    "checksum/secret"    = sha256(module.tls.manifest)
   }
   spec = {
     minReadySeconds = 30
@@ -196,13 +195,13 @@ module "statefulset" {
           {
             name        = "tls"
             mountPath   = "${local.base_path}/valkey.crt"
-            subPathExpr = "$(POD_NAME)-tls.crt"
+            subPathExpr = "tls.crt"
             readOnly    = true
           },
           {
             name        = "tls"
             mountPath   = "${local.base_path}/valkey.key"
-            subPathExpr = "$(POD_NAME)-tls.key"
+            subPathExpr = "tls.key"
             readOnly    = true
           },
           {
@@ -290,13 +289,13 @@ module "statefulset" {
           {
             name        = "tls"
             mountPath   = "${local.base_path}/valkey.crt"
-            subPathExpr = "$(POD_NAME)-tls.crt"
+            subPathExpr = "tls.crt"
             readOnly    = true
           },
           {
             name        = "tls"
             mountPath   = "${local.base_path}/valkey.key"
-            subPathExpr = "$(POD_NAME)-tls.key"
+            subPathExpr = "tls.key"
             readOnly    = true
           },
           {
@@ -364,8 +363,18 @@ module "statefulset" {
       },
       {
         name = "tls"
-        secret = {
-          secretName = module.tls.name
+        csi = {
+          driver   = "csi.cert-manager.io"
+          readOnly = true
+          volumeAttributes = {
+            "csi.cert-manager.io/issuer-name" = var.ca_issuer_name
+            "csi.cert-manager.io/issuer-kind" = "ClusterIssuer"
+            "csi.cert-manager.io/dns-names" = join(",", [
+              "$${POD_NAME}.${local.headless_service}",
+              "$${POD_NAME}.${local.headless_service_fqdn}",
+              var.service_hostname,
+            ])
+          }
         }
       },
     ]
